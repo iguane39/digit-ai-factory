@@ -35,6 +35,10 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge } from "../scripts/relever-heritage.mjs";
+// TF-0923 volet (a) : les rôles qui portent une page homonyme et la date d'entrée de la doctrine
+// sont DÉCLARÉS chez le générateur qui les applique, et LUS ici. Une copie se périmerait au
+// premier rôle ajouté là-bas, en silence.
+import { rolePageHomonyme, DOCTRINE_PAGE_HOMONYME } from "../scripts/generer-page-etude.mjs";
 
 // TF-0898 (08/09/2026) — R-4 DOIT ÊTRE JOUABLE SEULE, SUR UN `output\` ET RIEN D'AUTRE.
 // Le fait : onze livrables d'un mandat sont sortis en « AAAAMMJJ-objet.ext » parce que la FORME
@@ -630,6 +634,83 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
         so("R-32 bis", "aucun journal d'oracles à dater en jeu de règles — R-32 l'a déjà dit");
       }
     }
+  }
+}
+
+// ---- R-32 ter · TF-0923 volet (a) — UN DOCUMENT REMIS À UN HUMAIN SANS SA PAGE EST REFUSÉ ----
+//
+// LA DOCTRINE ÉTAIT ÉCRITE ET JOUÉE PAR PERSONNE — c'est la phrase qui ouvre déjà
+// `scripts\generer-page-etude.mjs`, et elle valait encore pour le CONTRÔLE : depuis le 16/09 le
+// générateur sait écrire la page homonyme, et aucun oracle ne constatait son ABSENCE. R-32 ne juge
+// que l'inverse — un `.html` DÉJÀ déposé doit porter son journal d'oracles ; un `.md` sans `.html`
+// ne déclenchait rien. Le retour fondateur est une phrase du destinataire, citée en tête du
+// générateur : « aucun fichier HTML n'a été généré […] il doit faire partie intégrante de la
+// proposition », et la page a dû être produite après coup avec trois passes d'oracles.
+//
+// LE TEXTE : `references\RUN-MANDAT.md` (pas 5, TF-0895 du 07/09/2026) — « toute proposition remise
+// à un humain se remet AUSSI en page HTML autoportante (socle digit-ai-page-html, R-32), SAUF ÉCART
+// DÉCLARÉ AU LEDGER AVEC SON MOTIF : le Markdown est la source, la page est le livrable » ; répété
+// par `references\RUN-CONSEIL.md` (C5) ; périmètre élargi aux études, trajectoires et conseils par
+// la décision humaine D-3 (a) du 16/09.
+//
+// TROIS BORNES, TOUTES DÉCLARÉES, et deux d'entre elles sont LUES chez le générateur plutôt que
+// recopiées : le RÔLE (porté par le nom que R-4 rend lisible — une note, un rapport, une synthèse
+// n'en sont pas), la DATE d'entrée de la doctrine (l'antérieur est une antériorité déclarée, que la
+// règle 5 interdit de toute façon de réécrire), et l'ÉCART DÉCLARÉ AU LEDGER, que le texte
+// doctrinal nomme lui-même comme la voie de sortie. Le remède tient en une commande et le message
+// la porte : un contrôle bloquant qui ne dit pas quoi faire s'apprend à contourner (TF-1013).
+{
+  const ledgerPage = p("forge", "ledger.jsonl");
+  const entreesPage = existsSync(ledgerPage)
+    ? readFileSync(ledgerPage, "utf8").split("\n").filter((l) => l.trim())
+      .map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean)
+    : [];
+  // L'écart se DÉCLARE au ledger avec son motif : une entrée dont le type porte « ecart », qui cite
+  // le radical du livrable, et dont la cause fait au moins vingt caractères — la même forme que la
+  // rectification par ajout de TF-0709, pour ne pas inventer une seconde convention.
+  const ecartDeclare = (radical) => entreesPage.some((e) => {
+    if (!/ecart|écart/i.test(String(e.type || e.ev || ""))) return false;
+    const cause = String(e.cause || e.motif || "").trim();
+    return cause.length >= 20 && JSON.stringify(e).includes(radical);
+  });
+
+  const candidats = [...fichiers(p("output"))].filter((f) => f.endsWith(".md")
+    && !/(^|\/)old\//i.test("/" + rel(f))
+    && !EXCLUS_NOMMAGE.has(basename(f))
+    && !estExcluDuDepot(rel(f)));
+  let anterieurs = 0, declares = 0;
+  const vises = [];
+  for (const f of candidats) {
+    const radical = basename(f, ".md");
+    const role = rolePageHomonyme(radical);
+    if (!role) continue;
+    const date = (/(\d{8})/.exec(radical) || [])[1];
+    if (!date || date < DOCTRINE_PAGE_HOMONYME) { anterieurs += 1; continue; }
+    if (existsSync(f.replace(/\.md$/i, ".html"))) continue;
+    if (ecartDeclare(radical)) { declares += 1; continue; }
+    vises.push({ f, role });
+  }
+  if (anterieurs) {
+    antecedences.push(`R-32 ter — ${anterieurs} livrable(s) de rôle proposition/étude/trajectoire/conseil ` +
+      `ANTÉRIEUR(S) au ${DOCTRINE_PAGE_HOMONYME} (entrée de la doctrine, TF-0895) : antériorité déclarée, ` +
+      "jamais un défaut de produit — la règle 5 interdit de les réécrire");
+  }
+  for (const { f, role } of vises) {
+    ko("R-32 ter", rel(f), `livrable de rôle « ${role} » remis à un humain sans sa PAGE HOMONYME ` +
+      `(attendu : ${rel(f).replace(/\.md$/i, ".html")}) — RUN-MANDAT.md pas 5 et RUN-CONSEIL.md C5 ` +
+      "(TF-0895) : le Markdown est la source, la page est le livrable. Remède : " +
+      `node scripts\\generer-page-etude.mjs "${rel(f)}" — ou déclarer l'écart AU LEDGER avec son ` +
+      "motif ({type: \"ecart_page_homonyme\", livrable: \"…\", cause: \"…\"}), voie que le texte " +
+      "doctrinal nomme lui-même");
+  }
+  if (!vises.length) {
+    const juges = candidats.filter((f) => rolePageHomonyme(basename(f, ".md"))).length - anterieurs;
+    juges > 0
+      ? ok("R-32 ter", "output/", `${juges} livrable(s) de rôle proposition/étude/trajectoire/conseil ` +
+        `postérieur(s) au ${DOCTRINE_PAGE_HOMONYME}, tous avec leur page homonyme` +
+        (declares ? ` (dont ${declares} par écart déclaré au ledger)` : ""))
+      : so("R-32 ter", "aucun livrable de rôle proposition/étude/trajectoire/conseil postérieur à " +
+        `l'entrée de la doctrine (${DOCTRINE_PAGE_HOMONYME}) dans output\\`);
   }
 }
 
@@ -1901,6 +1982,69 @@ else {
   }
 }
 
+// ---- R-35 · TF-0923 volet (b) — QUI EST « UN EXISTANT » SE MESURE, JAMAIS NE SE DÉCLARE ----
+//
+// `references\RUN-MANDAT.md` (TF-0266, amendé le 15/08) borne les FAIL portant sur des fichiers
+// ANTÉRIEURS à un mandat : ils partent en écarts déclarés au ledger — nommés un par un, jamais un
+// total anonyme — au lieu de bloquer le run. TF-0906 (07/09/2026) y a ajouté la phrase qui rend
+// cette exemption opposable : « TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est ANTÉRIEUR
+// au `run_open` du mandat. Un dépôt `git init` par le mandat lui-même n'a rien d'antérieur : tout
+// ce qu'il porte a été écrit par ce run, et aucun FAIL n'y est un écart déclarable. » Le geste y
+// est même écrit — `git log --reverse --format=%aI | head -1` comparé au `run_open` — et il
+// n'était joué par PERSONNE.
+//
+// CE QUE ÇA A COÛTÉ, mesuré le 07/09 : un produit créé le jour même a été traité comme un existant.
+// Six synthèses ont déclaré « socle hors mandat, écarts R-35 », la conformité est restée FAIL toute
+// la journée sur six règles, neuf tours ont été rendus sans mécanisme de jugement, et six retours
+// humains ont porté sur des règles déjà écrites.
+//
+// CE QUE CE CONTRÔLE FAIT, ET CE QU'IL NE FAIT PAS. Il MESURE l'antériorité et la PUBLIE — un dépôt
+// né dans son run n'a pas d'exemption, et le DIRE suffit à empêcher qu'on l'invente en cours de
+// route. Il n'échoue que sur la CONTRADICTION : une exemption INVOQUÉE au ledger que la mesure
+// refuse. Mettre en échec un projet parce qu'il est né dans son run serait absurde — c'est l'état
+// normal d'un produit neuf, dont tout est déjà jugé règle par règle, ici même.
+{
+  const ledgerAnt = p("forge", "ledger.jsonl");
+  const entreesAnt = existsSync(ledgerAnt)
+    ? readFileSync(ledgerAnt, "utf8").split("\n").filter((l) => l.trim())
+      .map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean)
+    : [];
+  const ouverture = entreesAnt.find((e) => (e.type || e.ev) === "run_open" && String(e.ts || "").trim());
+  const premierCommit = aGit
+    ? ((git("log", "--reverse", "--format=%aI").stdout || "").split(/\r?\n/).find((l) => l.trim()) || "").trim()
+    : "";
+  if (!aGit) {
+    so("R-35", "pas de dépôt git — sans histoire, aucune antériorité n'est mesurable : TF-0266 ne peut ni s'ouvrir ni se refuser (R-8 dit déjà le défaut)");
+  } else if (!premierCommit) {
+    so("R-35", "dépôt git sans aucun commit — l'antériorité se mesure sur le PREMIER commit (git log --reverse --format=%aI), qui n'existe pas encore");
+  } else if (!ouverture) {
+    so("R-35", "aucun run_open DATÉ au ledger — la comparaison de TF-0906 n'a pas de second terme ; R-19 dit déjà l'état du ledger");
+  } else {
+    const tOuverture = String(ouverture.ts).trim();
+    const anterieur = new Date(premierCommit).getTime() < new Date(tOuverture).getTime();
+    // L'exemption INVOQUÉE se reconnaît à la citation de son identifiant. Le vocabulaire est étroit
+    // et fermé par choix : une exemption racontée en d'autres mots, ou dans la prose d'une synthèse
+    // hors ledger, n'est pas vue — l'élargir à « antérieur » ou « existant » accuserait toute
+    // entrée qui décrit honnêtement un fichier ancien.
+    const invocations = entreesAnt.filter((e) => /TF-0266/i.test(JSON.stringify(e)));
+    if (anterieur) {
+      ok("R-35", "forge/ledger.jsonl", `antériorité MESURÉE : premier commit ${premierCommit}, antérieur au ` +
+        `run_open ${tOuverture} — l'exemption TF-0266 est OUVERTE, et les FAIL portant sur des fichiers ` +
+        "antérieurs se déclarent au ledger, nommés un par un (jamais un total anonyme)");
+    } else if (invocations.length) {
+      ko("R-35", "forge/ledger.jsonl", `l'exemption d'existant (TF-0266) est INVOQUÉE ${invocations.length} fois ` +
+        `au ledger alors que la MESURE la refuse : premier commit ${premierCommit}, run_open ${tOuverture} — ` +
+        "le dépôt est né DANS ce run, rien de ce qu'il porte ne lui est antérieur. Qui est « un existant » se " +
+        "MESURE, jamais ne se déclare (TF-0906). Remède : retirer l'invocation, et CORRIGER les constats — " +
+        "sur un projet né sous la doctrine, un FAIL n'est pas un écart déclarable, c'est un défaut à réparer");
+    } else {
+      ok("R-35", "forge/ledger.jsonl", `aucune antériorité : premier commit ${premierCommit}, run_open ${tOuverture} — ` +
+        "le dépôt est né dans ce run, l'exemption TF-0266 est FERMÉE et aucune n'est invoquée ; tout FAIL de " +
+        "ce run se corrige, il ne se déclare pas");
+    }
+  }
+}
+
 const nonJuge = [
   ...antecedences,
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
@@ -1922,6 +2066,8 @@ const nonJuge = [
   "R-2 localisation (TF-0319) : la structure INTERNE d'`output\\` (familles numérotées uniques, une seule version courante par famille, graphie `old\\`, LISEZMOI.md de correspondance — D-15 al. a à e) n'est PAS jugée ici : sa mécanisation vit chez `oracle-conventions.mjs` d'organization et reste suspendue à un mandat humain d'écriture dans ce dépôt frère",
   "R-20 nature des lignes (TF-0528) : les lignes dont l'Id reste un gabarit (`{A-01}`) ne sont pas jugées — juger l'exemple que le gabarit prescrit mettrait le gabarit en défaut, jamais l'auteur ; un produit qui garde ses placeholders échappe donc au contrôle",
   "R-20 nature des lignes (TF-0528) : le re-service d'un écart assumé est vu par RECOUVREMENT DE MOTS (quatre mots significatifs communs au moins), pas par compréhension — une ligne intégralement reformulée passe, et c'est un faux négatif ASSUMÉ : le seuil conservateur protège de l'inverse, crier sur deux sujets réellement distincts. La détection de condition repose sur un vocabulaire nommé (si, lorsque, dès que, au cas où, tant que, le jour où) moins les tournures qui modulent sans suspendre (si possible, si besoin, même si) — une condition dite autrement ne sera pas vue",
+  "R-32 ter (TF-0923 volet a) : le RÔLE d'un livrable est lu dans son NOM (R-4) — un document remis à un humain sous un objet qui ne dit pas « proposition », « étude », « trajectoire » ou « conseil » échappe au contrôle, et c'est un faux négatif ASSUMÉ : juger l'INTENTION d'un document demanderait de le lire. La PRÉSENCE de la page homonyme est jugée, jamais sa CONFORMITÉ — c'est R-32 qui exige son journal d'oracles une fois qu'elle existe. L'écart déclaré au ledger se reconnaît à un type portant « ecart », une cause d'au moins vingt caractères et la citation du radical du livrable : un écart déclaré en prose, ailleurs qu'au ledger, n'est pas vu",
+  "R-35 (TF-0923 volet b) : l'exemption d'existant (TF-0266) n'est REFUSÉE que lorsqu'elle est INVOQUÉE au ledger par son identifiant `TF-0266` alors que la mesure la contredit. Une exemption racontée en d'autres mots, ou dans la prose d'une synthèse hors ledger, n'est pas vue — le vocabulaire est étroit et fermé par choix : l'élargir à « antérieur » ou « existant » accuserait toute entrée qui décrit honnêtement un fichier ancien. Ce que le contrôle ne fait PAS non plus : il ne juge aucun constat un par un comme « couvert » ou « non couvert » par l'exemption — il dit si elle est ouverte, et la déclaration nommée reste la responsabilité du run (jamais un total anonyme)",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
@@ -1933,7 +2079,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-27, R-32, R-42, R-43, R-47)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-27, R-32, « R-32 bis », « R-32 ter », R-35, R-42, R-43, R-47)" });
     }
   }
 }

@@ -52,6 +52,41 @@ export function indiceDuNom(nom) {
 }
 
 /**
+ * LES RÔLES QUI PORTENT UNE PAGE HOMONYME, ET LA DATE D'ENTRÉE DE LA DOCTRINE — déclarés ICI,
+ * lus ailleurs (TF-0923 volet a, 20/09/2026).
+ *
+ * `references\RUN-MANDAT.md` (pas 5) et `references\RUN-CONSEIL.md` (C5) disent depuis le
+ * 07/09/2026 (TF-0895) que toute PROPOSITION remise à un humain se remet AUSSI en page HTML
+ * autoportante ; la décision humaine D-3 (a) du 16/09 y a joint les études, trajectoires et
+ * conseils — *un document dont le lecteur nommé est celui qui décide est remis à un humain*.
+ *
+ * `oracles\oracle-conformite-projet.mjs` les LIT pour refuser un tel document sans sa page. Une
+ * liste recopiée là-bas se périmerait au premier rôle ajouté ici, EN SILENCE — c'est la classe
+ * exacte que ce dépôt refuse partout ailleurs (TF-0151, TF-0367).
+ */
+export const ROLES_PAGE_HOMONYME = /^(proposition|trajectoire|etude|conseil)\b/i;
+export const DOCTRINE_PAGE_HOMONYME = "20260907";
+
+/**
+ * L'objet R-4 d'un nom de livrable, désaccentué et en minuscules — la part du nom qui porte le
+ * rôle. Deux formes de nom sont admises : la forme R-4 `<Projet> - <Objet> - AAAAMMJJ<indice>`,
+ * et la forme dérogatoire des études du pilot `AAAAMMJJ-objet`.
+ */
+export function objetDuNom(nom) {
+  const base = basename(String(nom)).replace(/\.[a-z0-9]+$/i, "");
+  const parts = base.split(" - ");
+  const objet = parts.length >= 3 ? parts.slice(1, -1).join(" ")
+    : (/^\d{8}[-_](.+)$/.exec(base) || [, base])[1].replace(/-/g, " ");
+  return objet.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+
+/** Le rôle qui impose une page homonyme, ou `null` si le nom n'en porte aucun. */
+export function rolePageHomonyme(nom) {
+  const m = ROLES_PAGE_HOMONYME.exec(objetDuNom(nom));
+  return m ? m[1].toLowerCase() : null;
+}
+
+/**
  * Le TITRE et la DESCRIPTION d'une étude. Le titre est le premier `# ` de la source ; la
  * description est la première phrase de prose qui suit, tronquée — jamais inventée, jamais vide :
  * une page sans description sort du socle par A4, et une description devinée ment au moteur de
@@ -353,19 +388,16 @@ if (lance) {
     // fabrique du travail que personne n'a demandé, et le fait passer pour une application de la
     // règle.* Deux bornes, donc, toutes deux déclarées et toutes deux désarmables à la main : le
     // RÔLE, lu dans le nom que R-4 rend porteur, et la DATE d'entrée de la doctrine (TF-0895).
-    const ROLES = /^(proposition|trajectoire|etude|conseil)\b/i;
+    // Les deux bornes vivent en tête de ce fichier (`ROLES_PAGE_HOMONYME`,
+    // `DOCTRINE_PAGE_HOMONYME`) : l'oracle de conformité les lit de là, plutôt que d'en tenir une
+    // copie qui se périmerait au premier rôle ajouté (TF-0923 volet a).
     const i2 = args.indexOf("--depuis");
-    const depuis = i2 >= 0 ? String(args[i2 + 1] || "") : "20260907";
-    const sansAccent = (x) => x.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    const depuis = i2 >= 0 ? String(args[i2 + 1] || "") : DOCTRINE_PAGE_HOMONYME;
     cibles = cibles.concat(readdirSync(dossier)
       .filter((f) => /\.md$/i.test(f) && !/^(README|LISEZMOI)\.md$/i.test(f))
       .filter((f) => {
-        const base = f.replace(/\.md$/i, "");
-        const parts = base.split(" - ");
-        const objet = parts.length >= 3 ? parts.slice(1, -1).join(" ")
-          : (/^\d{8}[-_](.+)$/.exec(base) || [, base])[1].replace(/-/g, " ");
-        if (!ROLES.test(sansAccent(objet))) return false;
-        const d = (/(\d{8})/.exec(base) || [])[1];
+        if (!rolePageHomonyme(f)) return false;
+        const d = (/(\d{8})/.exec(f.replace(/\.md$/i, "")) || [])[1];
         return !depuis || (d && d >= depuis);
       })
       .map((f) => join(dossier, f)));

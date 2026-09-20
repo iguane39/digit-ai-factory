@@ -1480,5 +1480,126 @@ check("TF-0902 borne : deux FORMATS d'un même livrable (.html et .pdf) ne sont 
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-0923 volet (a), 20/09 — R-32 ter : la PAGE HOMONYME d'un document remis à un humain ---
+// La doctrine (RUN-MANDAT.md pas 5, RUN-CONSEIL.md C5, TF-0895) était écrite depuis le 07/09 et
+// constatée par personne : R-32 ne juge qu'un `.html` DÉJÀ déposé, un `.md` sans `.html` ne
+// déclenchait rien. Cinq cas, quatre bornes — le rôle (lu dans le nom R-4), la date d'entrée de la
+// doctrine, l'existence de la page, et l'écart déclaré au ledger, que le texte nomme lui-même.
+const projetPage = (fichiers, ledger = null) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-page-"));
+  mkdirSync(join(d, "output"), { recursive: true });
+  for (const n of fichiers) writeFileSync(join(d, "output", n), "# livrable\n", "utf8");
+  if (ledger) {
+    mkdirSync(join(d, "forge"), { recursive: true });
+    writeFileSync(join(d, "forge", "ledger.jsonl"), ledger.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  }
+  return d;
+};
+const r32ter = (d) => (lanceArgs(d, "--regles", "R-32 ter").rapport.findings || []).find((x) => x.regle === "R-32 ter");
+check("TF-0923 (a) rouge : une PROPOSITION postérieure à la doctrine sans sa page homonyme → FAIL R-32 ter", () => {
+  const d = projetPage(["Client-A - Proposition de lot 2 - 20260918a.md"]);
+  try {
+    const f = r32ter(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`une proposition sans page passe : ${JSON.stringify(f)}`);
+    if (!/generer-page-etude\.mjs/.test(f.message)) throw new Error("le constat ne porte pas la commande de remède — un contrôle bloquant muet s'apprend à contourner (TF-1013)");
+    if (!/ledger/i.test(f.message)) throw new Error("le constat ne nomme pas la voie de sortie que la doctrine écrit elle-même (écart déclaré au ledger)");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0923 (a) verte : la même proposition AVEC sa page homonyme → plus de constat", () => {
+  const d = projetPage(["Client-A - Proposition de lot 2 - 20260918a.md", "Client-A - Proposition de lot 2 - 20260918a.html"]);
+  try {
+    const f = r32ter(d);
+    if (!f || f.statut === "FAIL") throw new Error(`le livrable conforme est accusé : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0923 (a) borne rôle : un RAPPORT sans page n'est pas jugé — le périmètre est le rôle, lu dans le nom R-4", () => {
+  const d = projetPage(["Client-A - Rapport de mapping - 20260918a.md"]);
+  try {
+    const f = r32ter(d);
+    if (f && f.statut === "FAIL") throw new Error(`le périmètre a débordé sur un rôle hors doctrine : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0923 (a) borne antériorité : une étude ANTÉRIEURE au 20260907 est déclarée, jamais accusée", () => {
+  const d = projetPage(["Client-A - Etude d opportunite - 20260901a.md"]);
+  try {
+    const r = lanceArgs(d, "--regles", "R-32 ter").rapport;
+    const f = (r.findings || []).find((x) => x.regle === "R-32 ter");
+    if (f && f.statut === "FAIL") throw new Error(`un livrable antérieur à l'entrée de la doctrine est accusé : ${f.message}`);
+    if (!(r.non_juge || []).some((x) => /R-32 ter/.test(x) && /ANTÉRIEUR/.test(x)))
+      throw new Error("l'antériorité n'est pas DÉCLARÉE au non_juge — un pardon muet est indiscernable d'un trou");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0923 (a) borne écart : l'écart DÉCLARÉ AU LEDGER avec son motif éteint le constat", () => {
+  const d = projetPage(["Client-A - Proposition de lot 2 - 20260918a.md"], [
+    { type: "run_open", ts: "2026-09-18T08:00:00Z" },
+    { type: "ecart_page_homonyme", livrable: "output/Client-A - Proposition de lot 2 - 20260918a.md",
+      cause: "remise par courriel en Markdown a la demande expresse du destinataire" },
+  ]);
+  try {
+    const f = r32ter(d);
+    if (!f || f.statut === "FAIL") throw new Error(`la voie de sortie que la doctrine écrit n'est pas honorée : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-0923 volet (b), 20/09 — R-35 : « un existant » se MESURE, jamais ne se déclare --------
+// TF-0906 (07/09) : TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est antérieur au
+// `run_open`. Le geste était écrit — `git log --reverse --format=%aI` comparé au run_open — et
+// joué par personne ; un produit créé le jour même a été traité comme un existant, neuf tours
+// durant. Quatre cas : la contradiction (rouge), l'antériorité réelle (verte), le dépôt né dans
+// son run qui n'invoque rien (borne — l'état NORMAL d'un produit neuf ne s'accuse pas), et
+// l'absence de second terme (borne — sans run_open daté, la comparaison n'existe pas).
+const projetAnteriorite = (tsRunOpen, dateCommit, entreesSup = []) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-ant-"));
+  mkdirSync(join(d, "forge"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"),
+    [{ type: "run_open", ts: tsRunOpen, versions_forges: { "digit-ai-factory": "abc1234" } }, ...entreesSup]
+      .map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  writeFileSync(join(d, "README.md"), "# produit\n", "utf8");
+  sh("git", ["init", "-q", "-b", "main"], d);
+  const env = ["-c", "user.email=t@t", "-c", "user.name=t"];
+  sh("git", [...env, "add", "-A"], d);
+  sh("git", [...env, "-c", `commit.gpgsign=false`, "commit", "-q", "--date", dateCommit, "-m", "feat: socle initial"], d);
+  return d;
+};
+const r35 = (d) => (lanceArgs(d, "--regles", "R-35").rapport.findings || []).find((x) => x.regle === "R-35");
+check("TF-0923 (b) rouge : TF-0266 INVOQUÉE au ledger alors que le dépôt est né DANS le run → FAIL R-35", () => {
+  const d = projetAnteriorite("2026-09-07T08:00:00Z", "2026-09-07T14:00:00+00:00",
+    [{ type: "retour", note: "socle hors mandat, ecarts declares au titre de TF-0266" }]);
+  try {
+    const f = r35(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`l'exemption invoquée sans antériorité passe : ${JSON.stringify(f)}`);
+    if (!/premier commit/.test(f.message) || !/run_open/.test(f.message))
+      throw new Error(`le constat ne rend pas la MESURE qui refuse l'exemption : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0923 (b) verte : premier commit ANTÉRIEUR au run_open → l'exemption est ouverte, PASS", () => {
+  const d = projetAnteriorite("2026-09-07T08:00:00Z", "2026-08-01T10:00:00+00:00",
+    [{ type: "retour", note: "socle anterieur au mandat, ecarts declares au titre de TF-0266" }]);
+  try {
+    const f = r35(d);
+    if (!f || f.statut !== "PASS") throw new Error(`une antériorité RÉELLE est refusée : ${JSON.stringify(f)}`);
+    if (!/OUVERTE/.test(f.message)) throw new Error(`le PASS ne dit pas que l'exemption est ouverte : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0923 (b) borne : un dépôt né dans son run qui n'invoque RIEN n'est pas accusé — c'est l'état normal d'un produit neuf", () => {
+  const d = projetAnteriorite("2026-09-07T08:00:00Z", "2026-09-07T14:00:00+00:00");
+  try {
+    const f = r35(d);
+    if (!f || f.statut === "FAIL") throw new Error(`un produit neuf est mis en échec pour être neuf : ${JSON.stringify(f)}`);
+    if (!/FERMÉE/.test(f.message)) throw new Error(`le constat ne DIT pas que l'exemption est fermée : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0923 (b) borne : sans run_open DATÉ au ledger, la comparaison n'a pas de second terme → SANS_OBJET", () => {
+  const d = mkdtempSync(join(tmpdir(), "conf-ant-"));
+  try {
+    writeFileSync(join(d, "README.md"), "# produit\n", "utf8");
+    sh("git", ["init", "-q", "-b", "main"], d);
+    sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], d);
+    sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "feat: socle"], d);
+    const f = r35(d);
+    if (!f || f.statut !== "SANS_OBJET") throw new Error(`sans second terme, l'oracle tranche quand même : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
