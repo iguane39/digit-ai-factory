@@ -147,6 +147,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub et procedure de l autre poste - 20260907i.md` | fichier | 15,8 Ko | Synthèse de mandat — synchronisation avec GitHub faite sur les quatorze dépôts, et la proc |
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md` | fichier | 25,2 Ko | Synthèse de mandat — synchronisation de la factory et des forges avec GitHub (03/09/2026) |
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md` | fichier | 19,4 Ko | Synthèse de mandat — synchronisation avec GitHub : le clone du pilot rebâti sur l'histoire |
+| `Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md` | fichier | 14,6 Ko | Synthèse de mandat — la synchronisation avec GitHub est suspendue avant toute écriture : s |
 | `Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md` | fichier | 12,3 Ko | Synthèse de mandat — deuxième chantier pilot clos : la rectification d'une collision de se |
 | `Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md` | fichier | 9,0 Ko | Synthèse de mandat — troisième chantier pilot clos : un contrôle qui déclare ses codes doi |
 | `Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md` | fichier | 10,0 Ko | Synthèse de mandat — quatrième chantier pilot clos : une clé de versions malformée a une v |
@@ -175,4 +176,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_158 fichier(s), 0 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_159 fichier(s), 0 sous-dossier(s)_
