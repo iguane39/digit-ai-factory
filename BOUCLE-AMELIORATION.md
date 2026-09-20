@@ -2292,3 +2292,30 @@ deux jours sous un « boîte à jour » ; règle B9, lue par le relevé d'ouvert
 heures écrites sans relever l'horloge**, quatre fois, toutes rattrapées avant l'affichage final.
 (5) **Du travail fini est resté quatre jours hors de l'histoire du dépôt** parce que chaque session
 enregistrait par chemins nommés sans que rien ne dise ce qui restait indexé derrière elle.
+
+## 20/09/2026 (soir) — « Traite tous les todos et retours » : 18 items décidés clos sur preuve rejouée, 8 constats en candidats, une régression d'agent trouvée au rejeu du pilot
+
+Mandat humain du 20/09/2026, périmètre choisi par l'humain à la question d'ouverture : les items
+décidés et en cours, pas les candidats. Boîte d'entrée vide de tout lot en attente (119 sidecars, tous
+ingérés). 36 items au départ (17 décidés, 19 en cours) : 20 traitables par l'IA, 16 en attente d'un
+geste humain ou d'un run chez un produit. 7 agents de campagne, un par dépôt et jamais deux en même
+temps dans un même dépôt, sur quatre vagues : forge-data (TF-1195, TF-1196), forge-audit (TF-1183),
+forge-agents (TF-1194, TF-1197, TF-1193, TF-1032), pilot (TF-1162, TF-1199, TF-0923, TF-1082, puis
+TF-1029, TF-1170, TF-1097, puis TF-1084, TF-0965, TF-1079), forge-agents et forge-tests (TF-1093).
+Restent ouverts : TF-0940 (deux choix de conception humains), TF-1094 (exige un run réel sur un second
+produit). Constats versés en candidats : TF-1244 à TF-1251 ; occurrences notées sur TF-1231 et TF-1224.
+Synthèse : `output\04-plans\`, campagne du 20260920.
+
+Leçons. (1) **Le rejeu du pilot a trouvé ce que l'agent n'avait pas vu** : un outil de recalage écrit
+par l'agent réécrivait les fichiers en fins de ligne Windows dans un dépôt déclaré en `eol=lf` ; `git
+status` restait muet, les blobs étaient justes, et seule la parité des copies embarquées du socle, jugée
+par le self-test d'un AUTRE skill, le disait. L'agent rejouait le self-test du skill qu'il modifiait,
+pas celui des skills consommateurs (TF-1224, nouvelle occurrence). (2) **L'inférence du pilot était
+fausse elle aussi** : « copies retouchées à la main » ; l'agent a établi la vraie cause par mesure
+(delta = lignes − 1). Une lecture transmise à un agent se marque comme inférence, et elle l'était.
+(3) **Quatre études citées dix fois par le registre n'existent nulle part** (TF-1248) : deux agents ont
+travaillé sur le texte des décisions. (4) **Des chiffres repris ont été contredits par la remesure**
+cinq fois (68 cas pour 84, 117 espacements pour 124, 43 couleurs pour 11, 6 classes sans contrôle pour
+31, 1430 tests pour 1379) : la consigne « remesurer plutôt que reprendre » du gabarit d'agent a payé.
+(5) **Le harnais du pilot est en défaut sur ce poste depuis avant la campagne** (2 recettes sur 130) :
+chaque agent l'a relevé à l'identique avant d'écrire, aucun n'en a ajouté.
