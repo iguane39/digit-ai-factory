@@ -62,8 +62,21 @@ Un gabarit est un **squelette déclaré**, jamais la copie d'un livrable client 
 - **`GABARIT.md`** — le contrat de structure : sections obligatoires, ce que chacune doit
   contenir, emplacements à remplir écrits en `{…}`, et les règles de la doctrine que la
   famille engage. C'est la pièce qui fait foi ; elle vaut pour tout format de sortie.
-- **`SQUELETTE.html`** (familles nativement HTML) — la page vide correspondante, bâtie sur le
-  socle `digit-ai-page-html`, portant déjà les correctifs de forme listés ci-dessous.
+- **`SQUELETTE.html`** — la page vide correspondante, bâtie sur le socle `digit-ai-page-html`,
+  portant déjà les correctifs de forme listés ci-dessous. **Huit des dix familles au statut
+  `ok` en portent un** au 20/09/2026 ; `gd-diagnostic` et `gd-ordonnancement-mep` n'en ont pas
+  encore. Décision humaine D-6 option (b) du 20/09/2026 : une famille neuve reçoit son
+  squelette de page, jugé par le contrôle des pages.
+- **`INSTANCE.html`** / **`INSTANCE.md`** — la preuve que le squelette a été rempli une fois.
+  **Le format du squelette DICTE celui de l'instance** (G1) : un `SQUELETTE.html` exige un
+  `INSTANCE.html`. Une `INSTANCE.md` peut rester à côté — mesuré le 20/09/2026, G1 rend alors
+  « doctrine + instance(s) .html, .md face au squelette .html ».
+
+*Pourquoi l'instance n'est pas une formalité.* En remplissant les cinq squelettes du 20/09, la
+page instanciée s'est révélée **rouge là où le squelette était vert** : ses emplacements `{…}`
+sont courts, la prose réelle ne l'est pas, et quatre règles de largeur ne se déclenchaient qu'au
+remplissage. Elles ont été **reportées dans les squelettes**. Un squelette qui produit des
+documents rouges est un squelette défectueux, et seule l'instance le dit.
 
 **Aucune donnée client** dans un gabarit. La forme se hisse, le contenu reste chez le projet —
 c'est aussi ce que l'oracle vérifie (G5).
