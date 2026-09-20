@@ -227,8 +227,8 @@
   "vu_le": "2026-09-19"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 8,
-  "vu_le": "2026-09-01"
+  "cas": 12,
+  "vu_le": "2026-09-20"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -393,6 +393,10 @@
  "scripts/verifier-secours.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
+ },
+ "scripts/verifier-sonde-glossaire.test.mjs": {
+  "cas": 12,
+  "vu_le": "2026-09-20"
  },
  "scripts/verifier-verdict-archive.test.mjs": {
   "cas": 8,

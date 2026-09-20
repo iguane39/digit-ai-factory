@@ -205,6 +205,15 @@ export function juger(texte) {
     // rende encore le même résultat : un oracle peut dire que le moyen manque, jamais qu'il marche.
     // Les termes CONTRACTUELS n'y sont pas soumis : leur preuve est l'exactitude lexicale et la
     // cohérence interlangue, qui se lisent dans le produit et non dans une sonde externe.
+    //
+    // LA FRONTIÈRE SE DÉCLARE DES DEUX CÔTÉS (TF-1084, 20/09/2026). Ce que G7 ne fait PAS — rejouer
+    // la commande et confronter son résultat — n'est pas un oubli : c'est la décision humaine du
+    // 26/08 sur TF-0657, « exiger la COMMANDE dans la preuve, pas rejouer la sonde » dans l'oracle.
+    // Un oracle de FORME qui exécuterait une commande externe ferait dépendre son verdict d'un état
+    // du monde, du réseau et d'une horloge. Le rejeu existe donc, mais comme VERBE SUR APPEL :
+    // `scripts\verifier-sonde-glossaire.mjs` (FRAIS / PÉRIMÉ / NON SCELLÉ, aucune commande exécutée
+    // sans `--rejouer`), appelé ici par le drapeau `--sondes` et par lui seul. G7 dit que le MOYEN
+    // existe ; le verbe dit s'il marche ENCORE.
     {
       const rejouables = toutesLignes.filter((l) => l.categorie === "visibilite");
       const muettes = rejouables.filter((l) => !/`[^`]{3,}`/.test(l.preuve || ""));
@@ -276,9 +285,16 @@ const NON_JUGE = [
   + "n'en portait qu'un — cet oracle juge ce qui est écrit, jamais ce qui manque",
   "l'APPLICATION : que les traductions servies emploient bien le terme retenu. C'est une confrontation "
   + "au catalogue de langue du projet, pas une lecture de ce fichier",
+  "la JUSTESSE d'une sonde citée : G7 exige que la commande SOIT LÀ, jamais qu'elle rende encore le "
+  + "même résultat (décision humaine du 26/08 sur TF-0657). Le rejeu est un verbe sur appel — "
+  + "`node scripts\\verifier-sonde-glossaire.mjs <glossaire> --rejouer`, ou `--sondes` sur cet oracle",
 ];
 
-const arg = process.argv[2];
+// Le module est IMPORTABLE (`termesDe` sert au verbe de rejeu, qui ne réécrit donc pas un second
+// analyseur du même format — c'est la classe de défaut qui a coûté dix listes d'exclusion
+// divergentes, cf. gabarits\GLOSSAIRE.md). Tout ce qui suit ne vaut que pour un lancement DIRECT.
+const LANCE_EN_DIRECT = process.argv[1] === fileURLToPath(import.meta.url);
+const arg = LANCE_EN_DIRECT ? process.argv[2] : null;
 if (arg === "--self-test") {
   const dir = mkdtempSync(join(tmpdir(), "glossaire-"));
   const verte = `---
@@ -360,12 +376,23 @@ verifie_le: 2026-08-26
   process.exit(casse.length ? 1 : 0);
 }
 
-if (!arg || !existsSync(arg)) {
+if (LANCE_EN_DIRECT && (!arg || !existsSync(arg))) {
   console.log(JSON.stringify({ oracle: "oracle-glossaire", verdict: "ERREUR",
-    message: "glossaire introuvable — usage : node oracle-glossaire.mjs <GLOSSAIRE.md> | --self-test" }));
+    message: "glossaire introuvable — usage : node oracle-glossaire.mjs <GLOSSAIRE.md> [--sondes] | --self-test" }));
   process.exit(2);
 }
-const findings = juger(readFileSync(arg, "utf8"));
-const verdict = verdictDe(findings);
-console.log(JSON.stringify({ oracle: "oracle-glossaire", version: "1.0.0", cible: arg, verdict, findings, non_juge: NON_JUGE }, null, 1));
-process.exit(verdict === "FAIL" ? 1 : 0);
+if (LANCE_EN_DIRECT) {
+  const findings = juger(readFileSync(arg, "utf8"));
+  const verdict = verdictDe(findings);
+  // `--sondes` (TF-1084) : le CÂBLAGE du verbe de rejeu, là où la doctrine le cite. Il est passant et
+  // jamais bloquant — le code de sortie reste celui de l'ORACLE. Le rejeu effectif exige encore
+  // `--rejouer` côté verbe : cet appel seul ne fait qu'ouvrir la porte, il ne l'exécute pas.
+  let sondes;
+  if (process.argv.includes("--sondes")) {
+    const verbe = fileURLToPath(new URL("../scripts/verifier-sonde-glossaire.mjs", import.meta.url));
+    const r = spawnSync(process.execPath, [verbe, arg, ...process.argv.slice(3).filter((a) => a !== "--sondes")], { encoding: "utf8" });
+    try { sondes = JSON.parse(r.stdout); } catch { sondes = { verdict: "ILLISIBLE", message: (r.stderr || "").slice(0, 300) }; }
+  }
+  console.log(JSON.stringify({ oracle: "oracle-glossaire", version: "1.0.0", cible: arg, verdict, findings, ...(sondes ? { sondes } : {}), non_juge: NON_JUGE }, null, 1));
+  process.exit(verdict === "FAIL" ? 1 : 0);
+}

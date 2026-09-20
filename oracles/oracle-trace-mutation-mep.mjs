@@ -31,6 +31,21 @@
  *        le produit (`forge\mutation-derniere-campagne.json`). Une déclaration sans marqueur est
  *        une affirmation ; le marqueur, lui, n'existe que si l'adaptateur est allé au bout. C'est
  *        la seule des trois règles qu'une phrase bien tournée ne peut pas satisfaire.
+ *   TM4  les verdicts de forge-ops ARCHIVÉS sous ce produit (`.ops-journal.jsonl`) sont confrontés
+ *        à l'état PRÉSENT de leur cible — AVERTISSEMENT, jamais un échec.
+ *
+ * TM4 EST UN CÂBLAGE, PAS UNE RÈGLE DE PLUS (TF-1084, 20/09/2026). `ETAPE-MEP.md` §4 prescrit depuis
+ * le 15/09 qu'« un verdict de forge-ops ARCHIVÉ ne se cite qu'après confrontation à l'état présent de
+ * sa cible — `node scripts\verifier-verdict-archive.mjs` ». Le verbe existait ; `relever-appelants`
+ * le désignait comme le SEUL contrôle du dépôt « cité en doctrine seulement », c'est-à-dire appelé
+ * par personne. *Toute affordance est câblée ou n'existe pas* : il est appelé ICI, sur le produit
+ * dont on juge le dossier de MEP, au moment exact où la doctrine l'exige.
+ *
+ * POURQUOI AVERTISSEMENT ET JAMAIS FAIL, et le choix est le point délicat. Un verdict périmé n'est
+ * pas une faute du dossier : c'est un fait à relire avant de citer la pièce, et le remède
+ * (« rejouer l'oracle ») appartient à forge-ops. Rendre bloquant un contrôle qui dépend de journaux
+ * écrits par un autre dépôt apprendrait à le contourner (R-33 bis). Un produit sans journal rend
+ * SANS_OBJET — l'absence d'un artefact d'un tiers n'est pas un défaut du produit.
  *
  * CE QU'IL NE JUGE PAS, et c'est déclaré plutôt que tu :
  *   · la QUALITÉ du refus. « Proposée et refusée » est une décision humaine (R-29) : l'oracle
@@ -50,6 +65,9 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+// LE calcul d'empreinte du pilot, en un seul endroit (E4, TF-0615) : le banc de TM4 scelle ses
+// fixtures exactement comme forge-ops scelle les siennes, sinon il mesurerait sa propre convention.
+import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const IGNORES = new Set(["node_modules", ".git", ".venv", "venv", "__pycache__", "dist", "build", ".next"]);
@@ -90,6 +108,39 @@ function marqueur(racine) {
     const j = JSON.parse(readFileSync(f, "utf8"));
     return (j && typeof j === "object") ? j : null;
   } catch { return null; }
+}
+
+/**
+ * TM4 — les verdicts forge-ops archivés sous ce produit, confrontés à l'état présent de leur cible.
+ * Délègue au verbe plutôt que de recalculer une empreinte ici : deux calculs d'un même sceau est la
+ * classe de défaut qui a été payée cinq fois (TF-0615, `scripts\lib-empreinte.mjs`).
+ */
+function confronterVerdictsArchives(racine) {
+  const verbe = join(ICI, "..", "scripts", "verifier-verdict-archive.mjs");
+  if (!existsSync(verbe)) {
+    return { statut: "SANS_OBJET", message: "scripts\\verifier-verdict-archive.mjs absent du pilot — "
+      + "les verdicts archivés ne sont confrontés à rien, et c'est dit plutôt que tu (ETAPE-MEP.md §4)" };
+  }
+  const r = spawnSync(process.execPath, [verbe, racine], { encoding: "utf8", timeout: 120000 });
+  let j = null;
+  try { j = JSON.parse(r.stdout || ""); } catch { /* dit ci-dessous */ }
+  if (!j) {
+    return { statut: "SANS_OBJET", message: `le verbe n'a pas rendu de verdict lisible (exit ${r.status}) — `
+      + `ce n'est PAS un constat sur ce produit : ${(r.stderr || "").trim().slice(0, 160)}` };
+  }
+  const m = j.mesure || {};
+  if (r.status === 2) {
+    return { statut: "SANS_OBJET", message: `aucun verdict forge-ops SCELLÉ sous ce produit `
+      + `(${m.journaux || 0} journal(aux), ${m.non_scelles || 0} verdict(s) non scellé(s)) — rien à confronter` };
+  }
+  if (r.status === 0) {
+    return { statut: "PASS", message: `${m.frais || 0} verdict(s) forge-ops archivé(s) confronté(s) à leur cible : `
+      + "tous FRAIS, ils se citent au dossier de MEP" };
+  }
+  return { statut: "AVERTISSEMENT", message: `${m.perimes || 0} verdict(s) PÉRIMÉ(S) et ${m.cibles_absentes || 0} cible(s) `
+    + `DISPARUE(S) sur ${m.cibles || 0} — ces verdicts ne se citent plus tels quels : rejouer l'oracle de forge-ops avant `
+    + `de les porter au dossier. ${(j.findings || []).map((f) => f.ou).filter(Boolean).slice(0, 6).join(" · ")}`
+    + " · détail : node scripts\\verifier-verdict-archive.mjs <produit> (ETAPE-MEP.md §4, TF-1084)" };
 }
 
 export function juger(racine) {
@@ -158,6 +209,10 @@ export function juger(racine) {
       ok("TM3", chemin, `campagne adossée au marqueur du produit (référence ${String(note.sha).slice(0, 12)})`);
     }
   }
+
+  // TM4 — une fois par produit, pas une fois par dossier : les journaux sont les mêmes.
+  const va = confronterVerdictsArchives(racine);
+  findings.push({ regle: "TM4", statut: va.statut, ou: racine, message: va.message });
   return findings;
 }
 
@@ -172,6 +227,10 @@ const NON_JUGE = [
   "un produit SANS dossier de MEP : SANS_OBJET, jamais FAIL — l'étape n'a pas été atteinte",
   "la véracité d'un score recopié à la main dans le dossier : TM3 adosse la déclaration au "
   + "marqueur, il ne recalcule pas la campagne",
+  "la JUSTESSE d'un verdict forge-ops archivé (TM4) : le verbe dit s'il porte encore sur la cible "
+  + "présente, jamais s'il était juste — et TM4 AVERTIT sans jamais bloquer, parce que le remède "
+  + "(rejouer l'oracle) appartient à forge-ops et qu'un contrôle qui bloque sur ce qu'il ne peut pas "
+  + "faire réparer apprend à être contourné",
 ];
 
 // --- Banc a double sens ------------------------------------------------------------------------
@@ -182,6 +241,18 @@ function selfTest() {
     mkdirSync(join(racine, "forge", "etapes", "mep"), { recursive: true });
     if (dossier !== null) writeFileSync(join(racine, "forge", "etapes", "mep", "DOSSIER-MEP.md"), dossier, "utf8");
     if (note) writeFileSync(join(racine, "forge", "mutation-derniere-campagne.json"), JSON.stringify(note), "utf8");
+    return racine;
+  };
+  // Un journal de verdicts forge-ops à côté de sa cible, au format `forge-ops/verdict@1`. `scelle`
+  // à faux pose une empreinte qui ne correspond plus : c'est le cas PÉRIMÉ, celui que TM4 existe
+  // pour voir. L'empreinte juste est calculée par la fonction PARTAGÉE, comme forge-ops l'écrit.
+  const avecJournal = (racine, scelle) => {
+    const cible = join(racine, "page.md");
+    writeFileSync(cible, "# Page\nligne\n", "utf8");
+    writeFileSync(join(racine, ".ops-journal.jsonl"), JSON.stringify({
+      format: "forge-ops/verdict@1", ts: "2026-09-20T10:00:00.000Z", cible, verdict: "PASS", exit: 0,
+      empreinte: { format: "forge-ops/empreinte@1", release: cible, fichiers: { "page.md": scelle ? empreinteFichier(cible) : "0".repeat(64) } },
+    }) + "\n", "utf8");
     return racine;
   };
   const casse = [];
@@ -224,6 +295,25 @@ function selfTest() {
   // SANS OBJET : produit sans dossier de MEP — une absence d'evenement ne s'accable pas.
   attendre("sans-dossier", produit("sans-dossier", null, null), "TM1", "SANS_OBJET");
 
+  // ---- TM4 : LE CÂBLAGE DU VERBE (TF-1084) ---------------------------------------------------
+  const DOSSIER_OK = "# Dossier de MEP\n\nCampagne de mutation jouée : score 0,91 sur 33 mutants.\n";
+  const MARQUEUR = { sha: "abc1234def5678" };
+  // SANS OBJET : aucun journal forge-ops sous le produit — l'absence d'un artefact d'un TIERS
+  // n'est pas un defaut du produit, et TM4 ne doit jamais la compter pour une fraicheur.
+  attendre("tm4-sans-journal", produit("tm4-sans-journal", DOSSIER_OK, MARQUEUR), "TM4", "SANS_OBJET");
+  // VERT : verdict archive dont la cible n'a pas bouge — il se cite au dossier.
+  attendre("tm4-frais", avecJournal(produit("tm4-frais", DOSSIER_OK, MARQUEUR), true), "TM4", "PASS");
+  // ROUGE (au sens de TM4 : un AVERTISSEMENT, jamais un echec) : la cible a change depuis le verdict.
+  const perime = avecJournal(produit("tm4-perime", DOSSIER_OK, MARQUEUR), false);
+  attendre("tm4-perime", perime, "TM4", "AVERTISSEMENT");
+  // ET LA PROPRIETE QUI COMPTE : un verdict perime NE MET PAS l'oracle en echec. Sans ce cas, rien
+  // ne distinguerait « avertit » de « bloque », et la promesse de l'en-tete serait invérifiable.
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), perime], { encoding: "utf8" });
+    if (r.status !== 0) casse.push("un verdict forge-ops PÉRIMÉ fait sortir l'oracle en échec — TM4 devait AVERTIR, pas bloquer");
+    if (!/TM4/.test(r.stdout) || !/PÉRIMÉ/.test(r.stdout)) casse.push("TM4 n'apparaît pas au verdict JSON — un avertissement que personne ne lit n'est pas un avertissement");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -233,11 +323,13 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 8/8 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 12/12 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
-      + "dossier de MEP SANS_OBJET et jamais FAIL ; codes de sortie 0 et 1 vérifiés)");
+      + "dossier de MEP SANS_OBJET et jamais FAIL ; codes de sortie 0 et 1 vérifiés ; TM4 sans journal "
+      + "forge-ops SANS_OBJET ; TM4 verdict archivé FRAIS PASS ; TM4 cas rouge — verdict PÉRIMÉ — rendu "
+      + "en AVERTISSEMENT ; TM4 un verdict périmé ne met PAS l'oracle en échec, code de sortie 0 vérifié)");
   return casse.length ? 1 : 0;
 }
 

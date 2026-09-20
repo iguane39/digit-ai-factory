@@ -1,7 +1,7 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\gabarits\\GLOSSAIRE.md",
-  "date_iso": "2026-08-26T11:23:50.527Z",
-  "registre_version": "2.13.0",
+  "date_iso": "2026-09-20T17:24:54.840Z",
+  "registre_version": "2.24.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -38,7 +38,7 @@
       "domaine": "Sécurité / secrets",
       "file": "gabarits\\GLOSSAIRE.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\GLOSSAIRE.md",
-    "ts": "2026-08-26T11:23:50.526Z",
+    "ts": "2026-09-20T17:24:54.840Z",
     "fichiers": {
-      "gabarits\\GLOSSAIRE.md": "9a01204cf5e2927988a6c1bca33e0c4645245c4340dcf468e34902da9ae9735d"
+      "gabarits\\GLOSSAIRE.md": "773c30dc672cbe957e0e50e39961d96426b7fb18eb241300334098bc37b79939"
     }
   },
   "empreinte_motif": null,

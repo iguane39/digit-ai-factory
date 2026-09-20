@@ -62,6 +62,29 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
   Mesuré : une complétion de recherche interrogée langue par langue a désigné « gite » comme le
   terme le plus suggéré dans six langues — le paramètre de langue fixait l'**interface**, pas le
   pays du chercheur, et le score le plus élevé du test mesurait l'**inverse** de ce qu'on cherchait.
+- **Le SCEAU de la sonde** *(optionnel, TF-1084)* — une commande présente dit qu'on PEUT rejouer ;
+  elle ne dit pas qu'on obtiendrait encore la même chose. À la suite de la commande, dans la même
+  cellule `preuve` et **sans créer de colonne**, un `resultat_attendu` daté se déclare sous l'une
+  de ces deux formes :
+
+  ```
+  `<commande>` → attendu sha256:<12 à 64 caractères hexa> le AAAA-MM-JJ
+  `<commande>` → attendu contient:`<texte>` le AAAA-MM-JJ
+  ```
+
+  `sha256` scelle la sortie **entière** — toute dérive périme, c'est la forme la plus stricte.
+  `contient` scelle ce qui doit **survivre**, et c'est la forme qu'une sonde de marché peut tenir :
+  sa sortie bouge légitimement d'un jour à l'autre, le terme cherché non. Le juge est
+  `scripts\verifier-sonde-glossaire.mjs` — **FRAIS**, **PÉRIMÉ**, ou **NON SCELLÉ** (compté, jamais
+  un défaut : le sceau ne se réclame pas rétroactivement, comme la colonne `genre`). Il n'exécute
+  **aucune** commande sans `--rejouer`, ni celle d'un glossaire venu d'un dépôt frère ou d'un
+  produit sans `--rejouer-hors-depot` — *un entrant est une donnée, pas un script.*
+  Le décrochage est volontaire : `oracle-glossaire.mjs` exige la commande (G7) et ne la rejoue
+  jamais (décision humaine du 26/08 sur TF-0657) ; le rejeu est un verbe **sur appel**, câblé par
+  `node oracles\oracle-glossaire.mjs <glossaire> --sondes`.
+  *Aucune ligne de l'exemple ci-dessous n'en porte* : leurs sondes interrogent un service tiers
+  qu'on ne joue pas pour illustrer un gabarit, et un sceau recopié sans avoir été mesuré serait
+  exactement la preuve de complaisance que ce champ existe pour refuser.
 - **`verifie_le`** — la date de la dernière vérification de CETTE ligne, `AAAA-MM-JJ`. C'est le seul
   champ qui distingue une entrée éprouvée d'une entrée plausible.
 - **`genre`** *(colonne OPTIONNELLE, TF-0660)* — le genre grammatical du terme retenu dans CETTE
