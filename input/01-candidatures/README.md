@@ -47,10 +47,11 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `referentiel-audit-contenu-21-08-20260910a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `registre-oracles-edite-en-copie-installee-20260910a.tf.jsonl` | fichier | 4,6 Ko | 1 ligne(s) JSONL |
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
+| `restes-critique-design-socle-20260919a.tf.jsonl` | fichier | 5,5 Ko | 2 ligne(s) JSONL |
 | `retours-instruction-ins-0002-0005-20260914a.tf.jsonl` | fichier | 6,5 Ko | 4 ligne(s) JSONL |
 | `revue-classes-20260903a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `socle-html-syne-faux-positif-20260911a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `style-redactionnel-sans-oracle-20260911a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_35 fichier(s), 1 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_36 fichier(s), 1 sous-dossier(s)_
