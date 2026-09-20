@@ -16,7 +16,7 @@ import { tmpdir, homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { concernes, confronter, encadrer, jouer, lireTable, TABLE_PAR_DEFAUT } from "./consommateurs-skills.mjs";
+import { concernes, confronter, encadrer, extraireEchecs, jouer, lireTable, resoudreInterprete, TABLE_PAR_DEFAUT } from "./consommateurs-skills.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 let pass = 0, fail = 0;
@@ -27,11 +27,15 @@ const check = (nom, fn) => {
 
 /**
  * Le parc factice : une « copie installée » d'un skill, et des dépôts qui la consomment.
- *   · faux-casse  : sa vérification échoue dès que la règle neuve apparaît dans la copie installée
- *                   — c'est le cas fondateur du 08/09, en miniature ;
- *   · faux-stable : elle passe quoi qu'il arrive ;
- *   · faux-rouge  : elle échoue AVANT comme APRÈS — la propagation n'en est pas la cause ;
- *   · faux-absent : déclaré à la table, jamais cloné sur ce poste.
+ *   · faux-casse   : passe avant, échoue dès que la règle neuve apparaît — le cas fondateur du 08/09 ;
+ *   · faux-stable  : passe quoi qu'il arrive ;
+ *   · faux-rouge   : échoue AVANT comme APRÈS, du MÊME échec — la propagation n'en est pas la cause ;
+ *   · faux-aggrave : échoue avant, et un échec de PLUS après — le défaut du 20/09, celui qu'un
+ *                    rouge préexistant cachait tant qu'on ne comparait que des codes de sortie ;
+ *   · faux-skip    : sort en 2 sans avoir rien jugé (code déclaré au consommateur) ;
+ *   · faux-muet    : rouge des deux côtés, sortie qui CHANGE, et aucun extracteur déclaré ;
+ *   · faux-fige    : rouge des deux côtés, sortie identique au caractère près, aucun extracteur ;
+ *   · faux-absent  : déclaré à la table, jamais cloné sur ce poste.
  */
 function parc() {
   const base = mkdtempSync(join(tmpdir(), "consommateurs-skills-"));
@@ -46,13 +50,25 @@ function parc() {
   };
   // `.mjs` : la lecture s'écrit en ESM. Écrite en `require`, la fixture jetait AVANT comme APRÈS —
   // elle était donc rouge des deux côtés et ne prouvait plus la TRANSITION, seule chose qui compte.
-  const lit = `import { readFileSync } from "node:fs";\nconst t = readFileSync(${JSON.stringify(regle)}, "utf8");`;
-  depot("faux-casse", `${lit}\nprocess.exit(t.includes("regle-neuve") ? 1 : 0);\n`);
+  const lit = `import { readFileSync } from "node:fs";\nconst t = readFileSync(${JSON.stringify(regle)}, "utf8");\nconst neuve = t.includes("regle-neuve");`;
+  depot("faux-casse", `${lit}\nif (neuve) console.log("[FAIL] regle-neuve-refusee");\nprocess.exit(neuve ? 1 : 0);\n`);
   depot("faux-stable", "process.exit(0);\n");
-  depot("faux-rouge", "console.log('rouge depuis toujours');\nprocess.exit(1);\n");
-  const entree = (nom) => ({ depot: nom, skills: ["faux-socle"],
-    verification: { commande: ["node", "verif.mjs"], delai_ms: 30000 } });
-  const table = { mesure_le: "2026-09-20", consommateurs: ["faux-casse", "faux-stable", "faux-rouge", "faux-absent"].map(entree) };
+  depot("faux-rouge", `${lit}\nconsole.log("[FAIL] rouge-de-toujours");\nprocess.exit(1);\n`);
+  depot("faux-aggrave", `${lit}\nconsole.log("[FAIL] rouge-de-toujours");\nif (neuve) console.log("[FAIL] rouge-neuf-du-jour");\nprocess.exit(1);\n`);
+  depot("faux-skip", `console.log("verifier : SKIP — aucun shell POSIX sur ce poste");\nprocess.exit(2);\n`);
+  depot("faux-muet", `${lit}\nconsole.log("desordre " + (neuve ? "apres" : "avant"));\nprocess.exit(1);\n`);
+  depot("faux-fige", `${lit}\nconsole.log("toujours la meme sortie");\nprocess.exit(1);\n`);
+  // L'EXTRACTEUR EST UNE DONNÉE DU CONSOMMATEUR, ici comme dans la vraie table : `faux-muet` et
+  // `faux-fige` n'en déclarent aucun, et c'est ce qui les rend incomparables — on veut le prouver.
+  const EXTRACTEUR = { nom: "banc", motif: "^\\s*\\[FAIL\\]\\s+(.+?)\\s*$", drapeaux: "gm", groupe: 1 };
+  const entree = (nom, extra = {}) => ({ depot: nom, skills: ["faux-socle"],
+    verification: { commande: ["node", "verif.mjs"], delai_ms: 30000, extracteur: EXTRACTEUR, ...extra } });
+  const table = { mesure_le: "2026-09-20", consommateurs: [
+    entree("faux-casse"), entree("faux-stable"), entree("faux-rouge"), entree("faux-aggrave"),
+    entree("faux-skip", { sortie_sans_jugement: [2] }),
+    entree("faux-muet", { extracteur: undefined }), entree("faux-fige", { extracteur: undefined }),
+    entree("faux-absent"),
+  ] };
   // LA PROPAGATION FACTICE : elle écrit la règle neuve dans la copie installée, comme
   // `--appliquer` recopie une source. Rien d'autre ne bouge entre les deux mesures.
   const propager = () => { writeFileSync(regle, "regles d'origine\nregle-neuve\n", "utf8"); return "applique"; };
@@ -86,12 +102,98 @@ check("borne — un consommateur ABSENT du poste : SKIP DÉCLARÉ, jamais un dé
   rmSync(p.base, { recursive: true, force: true });
 });
 
-check("borne — déjà ROUGE avant : la propagation n'en est PAS accusée (C3), et c'est dit", () => {
+check("borne — déjà ROUGE avant, MÊME échec après : non imputé (C3), et l'innocence est MONTRÉE", () => {
   const p = parc();
   const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
   const f = trouver(r.findings, "faux-rouge");
   if (!f || f.regle !== "C3" || f.statut !== "SANS_OBJET") throw new Error(`un rouge préexistant est imputé à la propagation : ${JSON.stringify(f)}`);
-  if (r.findings.filter((x) => x.statut === "FAIL").length !== 1) throw new Error("plus d'un DÉFAUT : le rouge préexistant en fait partie");
+  // L'innocence ne se prononce plus sans preuve : le constat dit COMBIEN d'échecs ont été comparés.
+  if (!/comparé\(s\)|IDENTIQUE/.test(f.message)) throw new Error(`C3 affirme l'innocence sans la montrer : ${f.message}`);
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("LE DÉFAUT DU 20/09 — rouge avant ET rouge AGGRAVÉ après : C5, l'échec NEUF est nommé", () => {
+  const p = parc();
+  const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
+  const f = trouver(r.findings, "faux-aggrave");
+  if (!f || f.regle !== "C5" || f.statut !== "FAIL") throw new Error(`un rouge préexistant masque encore un rouge neuf : ${JSON.stringify(f)}`);
+  if (!f.message.includes("rouge-neuf-du-jour")) throw new Error(`l'échec neuf n'est pas nommé : ${f.message}`);
+  if (f.message.includes("rouge-de-toujours")) throw new Error("l'échec préexistant est cité comme neuf — la différence n'est pas faite");
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("C5 est aussi grave que C1 : les deux sortent en DÉFAUT, aucun des deux n'annule quoi que ce soit", () => {
+  const p = parc();
+  const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
+  const defauts = r.findings.filter((x) => x.statut === "FAIL").map((x) => `${x.regle}:${x.ou}`).sort();
+  if (defauts.join(",") !== "C1:faux-casse,C5:faux-aggrave") throw new Error(`défauts = ${defauts.join(",")}`);
+  for (const f of r.findings.filter((x) => x.statut === "FAIL")) {
+    if (!/RIEN n'a été annulé|ne revient pas en arrière/.test(f.message)) throw new Error(`${f.regle} ne dit pas que rien n'est annulé`);
+  }
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("SORTIE DE SKIP — une vérification qui sort sans RIEN JUGER est INDÉTERMINÉE, jamais un rouge", () => {
+  const p = parc();
+  const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
+  const f = trouver(r.findings, "faux-skip");
+  if (!f || f.regle !== "C2" || f.statut !== "AVERTISSEMENT") throw new Error(`un « rien jugé » est classé ${f?.regle} : ${JSON.stringify(f)}`);
+  if (!/SORTIE SANS RIEN JUGER/.test(f.message) || !/INDÉTERMINÉ/.test(f.message)) throw new Error(f.message);
+  // Et surtout : il ne sert PAS de rouge préexistant qui innocenterait la propagation. La propriété
+  // se lit sur le STATUT, pas sur une chaîne — le message de C2 refuse explicitement de prononcer
+  // « elle n'en est pas la cause », donc chercher cette phrase attraperait sa propre négation.
+  if (f.statut === "SANS_OBJET") throw new Error("un « rien jugé » clôt encore le dossier comme un rouge préexistant");
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("EXTRACTEUR ABSENT et sortie qui CHANGE : INDÉTERMINÉ déclaré, jamais « elle n'en est pas la cause »", () => {
+  const p = parc();
+  const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
+  const f = trouver(r.findings, "faux-muet");
+  if (!f || f.regle !== "C2") throw new Error(`${f?.regle} au lieu de C2 : ${JSON.stringify(f)}`);
+  if (f.statut === "SANS_OBJET") throw new Error("innocence prononcée sans comparaison possible");
+  if (!/INDÉTERMINÉ/.test(f.message) || !/extracteur/.test(f.message)) throw new Error(`le motif ne nomme ni l'état ni le remède : ${f.message}`);
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("REPLI DÉCLARÉ — sans extracteur mais sortie IDENTIQUE au caractère près : C3, innocence prouvée", () => {
+  const p = parc();
+  const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
+  const f = trouver(r.findings, "faux-fige");
+  if (!f || f.regle !== "C3") throw new Error(`${f?.regle} au lieu de C3 : ${JSON.stringify(f)}`);
+  if (!/empreinte/.test(f.message)) throw new Error(`le repli par empreinte n'est pas dit : ${f.message}`);
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("un extracteur qui ne reconnaît RIEN dans une sortie en échec rend `lus: false`, jamais un ensemble vide", () => {
+  const vide = extraireEchecs({ nom: "derive", motif: "^ZZZ (.+)$", drapeaux: "gm" }, "[FAIL] quelque chose\n");
+  if (vide.lus !== false || !/n'a reconnu AUCUN échec/.test(vide.motif)) throw new Error(JSON.stringify(vide));
+  // Un ensemble vide se comparerait à un autre ensemble vide et conclurait « rien de neuf » :
+  // l'innocence, sur une mesure qui n'a rien lu. C'est le piège que ce cas ferme.
+  const sans = extraireEchecs(undefined, "peu importe");
+  if (sans.lus !== false || !/aucun extracteur/.test(sans.motif)) throw new Error(JSON.stringify(sans));
+  const bon = extraireEchecs({ nom: "banc", motif: "^\\s*\\[FAIL\\]\\s+(.+?)\\s*$", drapeaux: "gm", groupe: 1 }, "  [FAIL] b\n  [FAIL] a\n  [FAIL] a\n");
+  if (bon.echecs.join(",") !== "a,b") throw new Error(`dédoublonné et trié : ${JSON.stringify(bon)}`);
+});
+
+check("INTERPRÈTE — résolu par variable d'environnement, puis par candidat, sinon INDÉTERMINÉ nommé", () => {
+  const decl = { nom: "git-bash", variable: "FORGE_BASH_BANC", candidats: ["%RACINE_BANC%/bin/bash.exe", "/introuvable/bash"] };
+  const parVar = resoudreInterprete(decl, { env: { FORGE_BASH_BANC: "/vu/bash" }, existe: (p) => p === "/vu/bash" });
+  if (parVar.chemin !== "/vu/bash" || !/FORGE_BASH_BANC/.test(parVar.par)) throw new Error(JSON.stringify(parVar));
+  const parCand = resoudreInterprete(decl, { env: { RACINE_BANC: "/git" }, existe: (p) => p === "/git/bin/bash.exe" });
+  if (parCand.chemin !== "/git/bin/bash.exe") throw new Error(JSON.stringify(parCand));
+  const absent = resoudreInterprete(decl, { env: {}, existe: () => false });
+  if (absent.chemin !== null || !/INTROUVABLE/.test(absent.motif) || !/FORGE_BASH_BANC/.test(absent.motif)) throw new Error(JSON.stringify(absent));
+  // Aucun chemin n'est écrit dans le module : sans déclaration, il n'exige aucun interprète.
+  if (resoudreInterprete(undefined).requis !== false) throw new Error("un interprète est exigé sans être déclaré");
+});
+
+check("un consommateur dont l'INTERPRÈTE est introuvable est INDÉTERMINÉ, jamais rouge", () => {
+  const p = parc();
+  const e = { depot: "faux-rouge", skills: ["faux-socle"], verification: { commande: ["node", "verif.mjs"],
+    interprete: { nom: "shell-imaginaire", variable: "JAMAIS_POSEE_BANC", candidats: ["/nulle/part/sh"] } } };
+  const r = jouer(e, p.racine);
+  if (r.statut !== "INDETERMINE" || !/INTROUVABLE/.test(r.motif)) throw new Error(JSON.stringify(r));
   rmSync(p.base, { recursive: true, force: true });
 });
 
@@ -158,6 +260,13 @@ check("la TABLE livrée est lisible, DATÉE et ne déclare que des dépôts (loi
     if (!c.depot || !Array.isArray(c.skills) || !c.skills.length) throw new Error(`entrée incomplète : ${JSON.stringify(c)}`);
     if (!Array.isArray(c.verification?.commande) || !c.verification.commande.length) throw new Error(`${c.depot} : aucune commande de vérification native`);
     if (!c.motif) throw new Error(`${c.depot} : aucun motif — une entrée sans motif ne se relit pas`);
+    // CLIQUET du 20/09 : sans extracteur, ce dépôt ne serait comparé que sur son code de sortie,
+    // et un rouge préexistant y masquerait un rouge neuf. C'est le défaut du premier usage réel.
+    const e = c.verification.extracteur;
+    if (!e || !e.motif) throw new Error(`${c.depot} : aucun EXTRACTEUR d'échecs déclaré — la comparaison retomberait sur le code de sortie (TF-0965, 20/09)`);
+    let re;
+    try { re = new RegExp(e.motif, e.drapeaux || "gm"); } catch (err) { throw new Error(`${c.depot} : extracteur non compilable — ${err.message}`); }
+    if (!re.source.includes("(")) throw new Error(`${c.depot} : l'extracteur ne capture aucun groupe, il ne peut pas NOMMER un échec`);
   }
   // Le SOCLE lui-même n'est pas son propre consommateur : le mesurer serait le trou d'origine.
   if (t.consommateurs.some((c) => c.depot === "digit-ai-forge-agents")) throw new Error("le dépôt SOURCE des skills est listé comme consommateur (TF-0965)");
