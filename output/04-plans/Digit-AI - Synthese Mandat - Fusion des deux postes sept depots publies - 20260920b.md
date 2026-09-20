@@ -138,6 +138,10 @@ verts · porte des noms **PASS** 7 fois sur 7, jouée après le push et non avan
   motif `borne_atteinte` — le tableau d'empreinte de secret au gabarit de paramétrage, la phrase
   « une remontée se pseudonymise avant d'entrer dans la source » de quality-oracles, et les 6
   fixtures locales du socle. Ce tour synchronisait ; ils sont repris à l'action A-1.
+- Les index de dossiers et le fichier de verdict de cette synthèse, réécrits par le contrôle de
+  fin de tour après l'affichage : motif `borne_atteinte` — ils laisseront au plus 3 fichiers
+  modifiés au pilot, qui partiront au prochain enregistrement ; l'alignement mesuré au bloc 2
+  porte sur les enregistrements.
 - Les fichiers non suivis de forge-conception, forge-design, forge-tests et forge-agents :
   motif `hors_mandat` — non enregistrés par leur forge, ils ne se publient pas tels quels.
 
