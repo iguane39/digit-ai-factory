@@ -54,6 +54,7 @@ import { fileURLToPath } from "node:url";
 import {
   confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline,
 } from "./lib-baseline-recettes.mjs";
+import { confronterSensRouge } from "./lib-sens-rouge.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -389,6 +390,36 @@ if ((bilan.baisses.length || bilan.disparues.length) && APPLIQUER) {
   for (const d of bilan.disparues) delete accepte[d.nom];
   ecrireBaseline(CHEMIN_BASELINE, accepte);
   console.log(`  [CLIQUET] ${bilan.baisses.length} baisse(s) et ${bilan.disparues.length} disparition(s) ACCEPTÉE(S) par --appliquer`);
+}
+
+// ── I6 — LE SENS ROUGE DES RECETTES (TF-1082, reste du 20/09/2026) ───────────────────────────
+//
+// I5 compte les CAS et refuse qu'ils disparaissent ; le cliquet nomme depuis 779e11f toute recette
+// de la baseline absente d'un passage. Aucun des deux ne pose la question suivante : *cette recette
+// a-t-elle seulement vu son contrôle REFUSER quelque chose ?* Une recette qui ne joue que des
+// fixtures conformes est verte pour toujours, y compris le jour où sa règle est neutralisée.
+//
+// La voie retenue est la LECTURE des cas déclarés rouges dans la sortie, et non la mutation des
+// contrôles — le motif est écrit en tête de `lib-sens-rouge.mjs`, avec ce qu'elle ne prouve pas.
+// La propriété qui la rend probante : une recette n'est lue que si elle a réussi EN ENTIER, donc
+// son cas rouge a été joué et il est vert, donc la fixture fautive a bien été REJETÉE.
+//
+// AVERTISSEMENT, ET PAS ENCORE UN VERDICT. Ce passage MESURE une couverture et la publie. Mettre
+// le harnais au rouge sur l'existant transformerait une mesure en dette du jour et ferait
+// contourner le contrôle avant qu'il soit compris (R-33 bis) — le compte ci-dessous est
+// l'indicateur à faire monter, et le seuil de bascule une décision humaine.
+const sensRouge = confronterSensRouge(resultats);
+if (sensRouge.sansRouge.length) {
+  console.log(`  [SENS ROUGE] ${sensRouge.avecRouge}/${sensRouge.mesurees} recette(s) verte(s) déclarent au moins `
+    + `un cas ROUGE joué ; ${sensRouge.sansRouge.length} n'en déclarent AUCUN de lisible — AVERTISSEMENT, `
+    + "jamais un échec : le vocabulaire lu est fermé (cas « rouge », couverture « deux/double sens », "
+    + "« doit échouer »), donc un cas rouge nommé autrement compte ici comme absent. Les nommer est la "
+    + "seule façon d'en sortir :");
+  // UN AVEU TRONQUÉ EST UN AVEU PARTIEL (même leçon que le cliquet) : toutes nommées, une par ligne.
+  for (const { nom, via } of sensRouge.sansRouge) console.log(`               · ${nom} (${via})`);
+} else if (sensRouge.mesurees) {
+  console.log(`  [SENS ROUGE] ${sensRouge.mesurees}/${sensRouge.mesurees} recette(s) verte(s) déclarent au moins `
+    + "un cas ROUGE joué — le double sens est tenu sur tout le passage");
 }
 
 const echecs = resultats.filter((r) => r.statut !== "OK");

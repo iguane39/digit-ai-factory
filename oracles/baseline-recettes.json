@@ -266,6 +266,10 @@
   "cas": 17,
   "vu_le": "2026-09-17"
  },
+ "oracles/lib-sens-rouge.test.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-20"
+ },
  "oracles/oracle-controles-injoignables.test.mjs": {
   "cas": 22,
   "vu_le": "2026-09-05"
