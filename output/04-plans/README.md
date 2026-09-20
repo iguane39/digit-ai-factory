@@ -61,6 +61,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
 | `Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` | fichier | 20,1 Ko | Synthèse de mandat — campagnes en cours : trois corrections vérifiées et closes, trois cam |
 | `Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` | fichier | 25,4 Ko | Synthèse de mandat — le canal confidentiel existe et les tables y vivent, la forge des out |
+| `Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md` | fichier | 12,3 Ko | Ce poste a rattrapé la fusion publiée par l'autre poste : 7 dépôts tirés, 16 sur 16 aligné |
 | `Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md` | fichier | 9,5 Ko | Synthèse de mandat — le circuit hébergé ne dépend plus de ce poste, et l'accueil des lots  |
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
@@ -176,4 +177,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_159 fichier(s), 0 sous-dossier(s)_
+_160 fichier(s), 0 sous-dossier(s)_
