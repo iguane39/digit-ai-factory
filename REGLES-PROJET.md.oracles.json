@@ -1,14 +1,14 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\REGLES-PROJET.md",
-  "date_iso": "2026-09-01T05:26:13.412Z",
-  "registre_version": "2.13.0",
+  "date_iso": "2026-09-20T15:48:28.487Z",
+  "registre_version": "2.24.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
   "resume": {
     "pass": 4,
     "fail": 0,
-    "skip": 3,
+    "skip": 4,
     "cache": 0
   },
   "bilan_fichiers": {
@@ -38,7 +38,7 @@
       "domaine": "Sécurité / secrets",
       "file": "REGLES-PROJET.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
@@ -50,7 +50,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "REGLES-PROJET.md",
       "verdict": "PASS",
-      "detail": "11 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (11 avertissement(s)) ; nombre « 3 984 » non sourcé"
+      "detail": "12 constat(s) · 11 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (11 avertissement(s)) ; nombre « 3 984 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -63,15 +63,21 @@
       "file": "REGLES-PROJET.md",
       "verdict": "SKIP",
       "detail": ""
+    },
+    {
+      "domaine": "Livrabilité d'une conséquence déclarée",
+      "file": "REGLES-PROJET.md",
+      "verdict": "SKIP",
+      "detail": ""
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "REGLES-PROJET.md",
-    "ts": "2026-09-01T05:26:13.412Z",
+    "ts": "2026-09-20T15:48:28.487Z",
     "fichiers": {
-      "REGLES-PROJET.md": "8f491baf6b0ba02d17425770a76c3f466de50872c96e4bc936549e93da294519"
+      "REGLES-PROJET.md": "2de75caa6c8f53bccaef5308e7dd6fafed100a64e03c2984886a81df7c943ce8"
     }
   },
   "empreinte_motif": null,

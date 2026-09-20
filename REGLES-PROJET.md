@@ -73,11 +73,18 @@ préférence réel consigné au ledger.
 même fichier — une heure après que le même défaut ait été signalé à la Factory sur un gabarit. Ce
 n'est pas un problème de mémoire : c'est qu'aucun mécanisme ne regardait.
 
-Le moment où un fichier cesse d'être un brouillon est identifiable : **celui où il passe ses oracles
-pour la première fois**. `verifier-jugement.mjs` y pose un sceau — l'empreinte du contenu jugé — et
-refuse ensuite tout écart à indice inchangé. Un livrable **non scellé** n'est pas en défaut : c'est
-un état, et il est déclaré. Exiger un sceau sur tout l'existant ferait désactiver le contrôle le
-jour de son arrivée.
+Le moment où un fichier cesse d'être un brouillon est identifiable : **celui où il passe ses
+oracles**. `verifier-jugement.mjs` y pose un sceau — l'empreinte du contenu jugé — et refuse
+ensuite tout écart à indice inchangé ; depuis TF-1081 (19/09/2026) le hook Stop le repose à
+**chaque** passage vert, sur la seule synthèse que le tour a écrite, si bien que le sceau porte
+l'état du DERNIER contenu jugé et non celui du premier. Un livrable **non scellé** n'est pas en
+défaut : c'est un état, et il est déclaré. Exiger un sceau sur tout l'existant ferait désactiver le
+contrôle le jour de son arrivée. **Le sceau se suit avec ce qu'il scelle** : un fichier
+`<livrable>.jugement.json` est versionné comme le livrable dont il porte l'empreinte — 23 le sont
+sous `output\04-plans\` au 20/09/2026, dont un ajouté par un commit publié ce jour-là — et il ne
+relève pas de l'exclusion des sidecars d'oracles de la règle 10, qui vise des traces d'exécution
+quand le sceau est la pièce opposable qui rend cette règle vérifiable ailleurs que sur le poste
+qui l'a posée.
 ## C. Versions et git
 
 Ce qui est versionné, quand, et sous quelle forme. Le tableau ne dit pas comment utiliser git : il dit ce qui, chez nous, doit s'y trouver.
