@@ -1,0 +1,526 @@
+{
+ "schema": 1,
+ "version": "1.0.0",
+ "cree_le": "2026-09-14",
+ "decision": "D-8 (a) du 14/09/2026 — synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md",
+ "source": "todo/TODO-ARCHIVE.jsonl (reste_a_faire des items archives) ; tri : output/03-etudes/20260914-releve-restes-archives.md",
+ "modele": "c:/dev/digit-ai-forge-tests/registre-dette.json (statuts assume / todo / retiree / ok)",
+ "statuts": {
+  "assume": "limite ecrite et motivee par l item qui l a close ; ne demande pas de travail, elle ne se confond plus avec du travail oublie",
+  "todo": "reste ponctuel encore actif, sans manque commun avec d autres ; a instruire item par item"
+ },
+ "entrees": [
+  {
+   "id": "dette-pilot-001",
+   "item": "TF-0474",
+   "domaine": "pilot : cinq mécanismes d’empreinte sha256 coexistent sans format commun — la même classe de défaut est redécouverte forge par forge",
+   "enonce": "La CLE du registre est le NOM DE FICHIER, pas le chemin : deux homonymes dans deux depots comptent pour une seule declaration — un second `self-test.mjs` qui se mettrait a sceller autre chose passerait pour declare. Le controle ne juge pas la JUSTESSE d'un scellement (l'oracle qui le lit s'en charge), ni les sites hors des emplacements lus, ni les depots absents du poste. Enfin le format n'est pas IMPOSE aux sceaux courts existants : les vues generees gardent leur convention locale, declaree au registre — les aligner serait un autre sujet, et un sujet a gain faible.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-002",
+   "item": "TF-0476",
+   "domaine": "forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee ",
+   "enonce": "PERIMETRE VOLONTAIREMENT ETROIT : seul le noeud que la grille declare elle-meme non reproductible est couvert. Le balayage de la candidature avait releve 13 autres noeuds dont le critere de verdict est chiffre sur une source que la forge n'instrumente pas (2, 4, 20, 40, 41, 48, 51, 53, 54, 55, 56, 59, 61) : leur source est nettement plus stable qu'une generation, ils ne sont PAS traites ici, et ce chiffre dit ou passe desormais la frontiere du controle. Enfin le controle juge la PRESENCE des declarations, jamais leur sincerite : un plan invente le satisfait — il rend le mensonge couteux, pas impossible.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-003",
+   "item": "TF-0477",
+   "domaine": "La loi 4 dit ou vit une donnee volatile, jamais qu'une note ne doit pas la RECOPIER — la derive se detecte claim par claim, sur un seul docu",
+   "enonce": "Le balayage lit une PHRASE : il ne voit ni les tableaux, ni les titres, ni les blocs de code, et il accepte tout domicile NOMME sans verifier que ce domicile porte vraiment la valeur. Il porte donc des faux positifs — une affirmation historique (« les 17 regles sont adoptees ») ou un seuil (« touche au moins 3 forges ») n'est pas une valeur mobile — et c'est le prix d'un balayage de classe qui ne comprend pas ce qu'il lit. Les documents balayes sont une liste ECRITE, pas une decouverte : un document de pilotage neuf n'est pas balaye tant qu'il n'y figure pas. Et les README des forges, ou vivaient les deux dernieres derives avouees, ne sont pas balayes : ils appartiennent aux depots freres.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-004",
+   "item": "TF-0481",
+   "domaine": "pilot : le preflight anti-collision de TF-0394 est un check-then-act — il detecte une divergence DEJA PUBLIEE, pas deux sessions qui frappen",
+   "enonce": "LA FENETRE N'EST PAS FERMEE, et c'est ecrit noir sur blanc dans references/TODO-FORGE.md : deux sessions peuvent encore frapper le meme numero. Ce qui change est qu'elles le VOIENT tout de suite et que la reparation coute une commande. Rouvrir si le cout de la fenetre depasse celui du changement de modele — la voie (a), frapper les ids au push, reste la seule qui la ferme sans violer R-38.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-005",
+   "item": "TF-0482",
+   "domaine": "forge-ops : aucune porte de MEP ne surveille une bascule de domaine — les gates M-1..M-5 n interrogent QUE la nouvelle URL, un deploiement q",
+   "enonce": "M-6 n'est pas encore APPELE par un run : il est ecrit a l'oracle MEP et outille, mais aucun run n'a rejoue une MEP depuis. Le premier produit qui declare un hote historique sera le banc. Et le constat en passant sur produit-07 est verse en candidature separee plutot que corrige ici : la zone DNS n'est pas dans le perimetre du pilot.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-006",
+   "item": "TF-0489",
+   "domaine": "forge-design : aucun composant « lecteur de source » au catalogue alors que la regle d autoportance impose d embarquer les sources citees",
+   "enonce": "Le sous-ensemble de Markdown est BORNE et le restera : images, notes de bas de page, listes imbriquees et tableaux a cellules fusionnees sortent en paragraphe. C'est un choix de securite autant que d'economie, mais un document qui en depend sera moins lisible qu'attendu. Et le composant est COPIE dans chaque page autoportante : une correction du composant ne remonte pas dans les pages deja livrees — c'est le prix de l'autoportance, et il vaut d'etre connu.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-007",
+   "item": "TF-0490",
+   "domaine": "forge-design : confirmation de RD-12 — les exemples du socle emploient des glyphes absents des piles de repli declarees",
+   "enonce": "La PROSE des references n'est pas jugee, par choix declare : un glyphe employe dans une phrase explicative n'est pas repris dans un livrable. Si un jour un producteur recopie un glyphe depuis de la prose, la borne se rediscutera — elle est ecrite pour ca.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-008",
+   "item": "TF-0491",
+   "domaine": "forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme",
+   "enonce": "La regle ne se prononce que dans un FLUX VERTICAL : une grille dont les pistes sont mal reglees lui echappe, et c'est assume — la largeur d'un enfant de grille est decidee par sa piste, pas par lui. Le seuil de 80 % est un choix, pas une mesure : en dessous, l'oeil accroche le decalage du bord droit ; entre 80 et 100 %, personne n'a mesure. Et la SINCERITE d'un `data-mesure-lecture` n'est pas jugee : la declaration rend l'ecart visible au relecteur, elle ne prouve pas qu'il est reflechi.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-009",
+   "item": "TF-0492",
+   "domaine": "forge-design : aucun controle ne detecte un mot coupe en deux au rendu (Utilisabl/e, Plateform/e, 231 occurrenc/es)",
+   "enonce": "LE CONTROLE DU RENDU N EST PAS LIVRE, et c est declare dans `lisibilite.md` en toutes lettres : detecter au rendu qu un mot est effectivement tombe sur deux lignes sans cesure demande un navigateur. Une page HERITEE qui porte le defaut par un autre chemin que `anywhere` n est donc pas vue. A rouvrir si le defaut se represente malgre la garde statique.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-010",
+   "item": "TF-0494",
+   "domaine": "forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple",
+   "enonce": "L'oracle ne sait pas si un point a ete OUBLIE A LA SAISIE : il compare le tableau a son propre en-tete, jamais a la demande d'origine. C'est declare en non_juge, et c'est pourquoi le compte annonce est une REGLE et non une commodite. Un lien reel avec le fil de discussion demanderait de capturer la demande a l'entree du run — c'est un autre sujet, non ouvert ici.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-011",
+   "item": "TF-0495",
+   "domaine": "forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable »",
+   "enonce": "Le COMPOSANT qui rend la bonne pratique facile (lecteur de source a deux vues, rendu paresseux) est l'objet de TF-0489, encore ouvert. L20 rend la regle opposable ; TF-0489 rendra la conformite bon marche. Les deux se tiennent, et livrer la regle avant le composant est un choix — il vaut mieux savoir qu'on a un defaut sans avoir l'outil que d'avoir l'outil sans savoir qu'on en a besoin.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-012",
+   "item": "TF-0506",
+   "domaine": "forge-audit : la famille gd-fiche-securite declare deux formats (html, pdf) et la forge n en produit qu un — aucun outil HTML vers PDF n exi",
+   "enonce": "L'oracle juge le CONTENANT, jamais le contenu : ni le texte, ni les polices incorporees, ni les images. Un PDF dont les dictionnaires de pages vivent dans un flux COMPRESSE ne livre pas /MediaBox en clair — le format est alors declare NON JUGE, jamais faux. Et la conformite d'accessibilite du PDF (PDF/UA) reste hors perimetre : aucun moteur d'impression de navigateur ne la produit.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-013",
+   "item": "TF-0509",
+   "domaine": "pilot : la forme change d'un message au suivant — le lecteur reapprend la mise en page avant de pouvoir lire, et perd la comparaison avec le",
+   "enonce": "La stabilite de forme d'un TOUR AU SUIVANT n'est pas jugee — declaree en `non_juge`. Elle demanderait un etat persistant entre restitutions ; c'est un candidat a rouvrir si le defaut se represente malgre la coherence intra-document.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-014",
+   "item": "TF-0511",
+   "domaine": "pilot : le langage commanditaire n'est exige qu'au bloc 0 (S9) — tout le reste peut etre ecrit en jargon, et l'a ete, au point qu'un meme po",
+   "enonce": "Le jargon HORS liste n'est pas detecte — prix assume du zero faux positif, declare en `non_juge`. Le canal de croissance de la liste est le retour humain : chaque terme qu'un lecteur fait expliquer entre au referentiel, date et source.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-015",
+   "item": "TF-0514",
+   "domaine": "Produit-05 n'est PAS instancie sous la doctrine factory — ni forge\\, ni clause de precedence, ni hooks : c'est ce qui explique les QUATRE lo",
+   "enonce": "BLOQUE SUR UNE PRESENCE, ET LA TENTATIVE EST MESUREE — remesuree le 23/08/2026 : aucun dossier `*oopiz*` sous la racine du parc ni sous `_Client-A`, verification par listage direct. Le depot du produit n'est pas sur ce poste : il n'y a donc rien a instancier, et affirmer le contraire serait affirmer sans eprouver. Le geste appartient a l'humain : cloner le depot Produit-05 sur ce poste (ou dire ou il vit), apres quoi l'instanciation sous doctrine factory est mecanique — `forge/`, clause de precedence, hooks, oracle de conformite joue.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-016",
+   "item": "TF-0515",
+   "domaine": "quality-oracles : le controle « §6 niveaux » du self-test depend d un navigateur sans tete et DEPASSE son timeout de 180 s sur un poste char",
+   "enonce": "Sur ce poste le controle rend un SKIP a chaque passage, puisque le navigateur y depasse toujours 180 s : la preuve comportementale des niveaux n'est donc PAS rejouee ici, seulement declaree indisponible. Elle se rejouera sur un poste au repos ou en integration continue. C'est le prix assume de la voie (a), et il vaut mieux qu'un rouge qu'on apprend a ignorer.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-017",
+   "item": "TF-0516",
+   "domaine": "hook-restitution : un message CONFORME est refuse parce que le hook juge un AUTRE texte que celui affiche — le preambule d un tour, pas la r",
+   "enonce": "La course d'ecriture du transcript n'est pas SUPPRIMEE — elle est rendue INOFFENSIVE : le hook ne conclut plus sur un tour dont il ne voit pas la fin. Consequence assumee et declaree : un tour de travail dont la restitution n'est jamais parvenue au transcript ne sera PAS juge. C'est le bon arbitrage — mieux vaut un tour non juge qu'un refus sur un message conforme, et le gate reste entier sur tous les tours que le hook voit en entier.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-018",
+   "item": "TF-0518",
+   "domaine": "forge-agents : un livrable Markdown ne recoit aucun controle de lisibilite — la famille L1-L17 est enfermee derriere une porte HTML",
+   "enonce": "L3 et L12 restent hors mecanisation, declarees. Et le seuil de M10 (12 lignes de tableau) est une DONNEE, pas une verite : il se rediscutera au premier faux positif.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-22"
+  },
+  {
+   "id": "dette-pilot-019",
+   "item": "TF-0519",
+   "domaine": "produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate ne",
+   "enonce": "BLOQUE SUR UN ACCES, ET LA TENTATIVE EST MESUREE — remesuree le 23/08/2026 a 12h : `dns.lookup('forge.produit-07')` rend `ENOTFOUND`, et `nslookup` confirme « aucun enregistrement A+AAAA disponible » ; le domaine racine `produit-07`, lui, resout (188.114.97.2). L'ancien hote n'a donc AUCUN enregistrement, et le trafic qui le connait encore tombe dans le vide. Ce qui manque n'est pas un travail mais un ACCES : la zone DNS n'est pas administrable depuis ce poste — aucune API, aucun jeton, aucun panneau. Le geste appartient a l'humain : creer un enregistrement pour `forge` pointant vers l'hote courant, puis armer la redirection et rejouer `node scripts/verifier-bascule.mjs --historique https://forge.produit-07 --cible <hote courant> --apres` (le controle existe depuis TF-0482, il attend son enregistrement).",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-020",
+   "item": "TF-0525",
+   "domaine": "Un SECOND clone du pilot vit sur le poste sous son ancien nom (digit-ai-forge-steering_old) : registre TODO divergent, 88 commits de retard,",
+   "enonce": "LE MARQUEUR N'EST PAS VERSIONNE, ET C'EST DELIBERE : ce clone partage son depot distant avec le pilot vivant, donc committer puis pousser `PERIME.md` apposerait « PERIME » sur le depot VIVANT lui-meme. La limite est ecrite dans le marqueur : il ne survivrait pas a un nouveau clonage. Aucun n'est prevu, et l'alternative serait pire. Les 124 Mo restent sur disque — (b) archive, elle ne libere rien.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-021",
+   "item": "TF-0526",
+   "domaine": "pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (reg",
+   "enonce": "S21 ne juge pas la SINCERITE d'une trace : un code de reponse recopie sans avoir ete obtenu la satisfait. La regle rend le mensonge PLUS COUTEUX — il faut inventer un code plausible — sans le rendre impossible. Et l'attribution abusive sous `decision`, qui est exactement le cas fautif d'origine, reste hors de portee : le motif etait VRAI, seule l'attribution etait fausse, et aucune expression ne voit cela.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-022",
+   "item": "TF-0527",
+   "domaine": "ops : un travail PLANIFIE qu'on ne peut pas declencher a la demande n'est jamais prouve — il se decouvre casse au moment ou l'on compte dess",
+   "enonce": "L'EXERCICE lui-meme reste hors jugement : l'oracle lit des definitions, jamais un historique de passages, et `# exerce_le:` est un fait DECLARE, pas un fait mesure. Les planifications posees hors depot (interface web du systeme d'integration, tache planifiee d'un serveur, cron d'une machine) ne laissent aucun fichier a lire : declarees hors jugement, jamais jugees vertes. Enfin, la definition du produit qui a fait naitre le sujet n'a pas recu sa ligne `# exerce_le: 2026-08-23` — elle vit dans un depot produit, ou le pilot n'intervient que sur run demande ; l'avertissement de l'oracle la reclamera au prochain run.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-023",
+   "item": "TF-0528",
+   "domaine": "pilot : le reste-a-faire melange TROIS NATURES dans une seule table — un ecart assume et une contrainte conditionnelle ressortent indefinime",
+   "enonce": "Deux angles morts declares au non_juge, tous deux assumes. (1) Une ligne dont l'Id reste un gabarit n'est pas jugee : juger l'exemple que le gabarit prescrit mettrait le gabarit en defaut plutot que l'auteur — lecon payee le 22/08 par un controle qui accusait 7 blocs sur 9 d'une restitution CONFORME. Un produit qui garde ses placeholders echappe donc au controle. (2) Le re-service d'un ecart est vu par RECOUVREMENT DE MOTS, pas par comprehension : une ligne integralement reformulee passe. Faux negatif choisi — le seuil conservateur protege de l'inverse, qui serait pire.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-024",
+   "item": "TF-0529",
+   "domaine": "ops : une instance d'approbation FIGE la contrainte de separation des roles a sa creation — relacher le reglage ne debloque pas l'instance e",
+   "enonce": "C'est une DONNEE, pas un controle : rien ne verifie qu'on lit le referentiel avant de conclure a l'impossible. Le seul mecanisme qui s'en approche est S21, qui exige la trace mesuree d'une tentative — elle rend l'affirmation non eprouvee plus couteuse, sans obliger a consulter G-01. Et le comportement constate peut changer sans preavis chez l'editeur : l'entree est datee pour cela, elle n'est pas une garantie.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-025",
+   "item": "TF-0582",
+   "domaine": "Une mesure de contraste par styles calcules ne voit pas les pseudo-elements",
+   "enonce": "La mesure AU PIXEL reste à faire si le besoin revient : elle seule donnerait un verdict sur ces cas au lieu d'un non-mesurable. TF-0584 en documente déjà deux pièges payés — coordonnées page contre viewport, et échantillon d'un seul pixel qui tombe du mauvais côté d'une frontière.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-026",
+   "item": "TF-0585",
+   "domaine": "Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas",
+   "enonce": "Les axes méthode (GET/HEAD, dont un défaut du 23/08 relève déjà) et barre finale restent non parcourus. Ils sont nommés, pas couverts — la règle est tenue, le trou est connu et daté.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-027",
+   "item": "TF-0606",
+   "domaine": "pilot : un refus d OUTIL a ete pris pour une absence de CAPACITE, et le blocage rapporte comme un fait sur le monde — « je ne peux pas deplo",
+   "enonce": "L'AGGRAVANT DE L'ITEM N'EST PAS COUVERT, et c'est dit plutôt que sous-entendu : la documentation qui nommait l'autre porte était DÉJÀ CHARGÉE dans le contexte au moment de la conclusion. Ce n'était pas une lacune de connaissance mais un déclencheur manquant — même diagnostic que S22, et aucune règle de restitution ne peut le contrôler : elle juge un texte, pas ce qui a été lu avant de l'écrire.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-028",
+   "item": "TF-0629",
+   "domaine": "`bootstrap.mjs` n'est couvert par AUCUNE recette — le controle qui declare les depots pieges du parc n'est juge par rien",
+   "enonce": "La recette juge le BALAYAGE du parc, pas les sections 1 a 4 de bootstrap (prerequis, pilot, forges, skills) : elles restent non couvertes, et c'est dit plutot que sous-entendu par un fichier qui porte le nom du script entier.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-029",
+   "item": "TF-0632",
+   "domaine": "La taille en octets a servi de preuve d'identite entre deux fichiers",
+   "enonce": "Ce qu'aucun oracle ne peut juger est ecrit dans la regle : qu'une empreinte CITEE soit la bonne. S27 voit qu'on en cite une, jamais qu'elle correspond au fichier dont on parle.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-030",
+   "item": "TF-0633",
+   "domaine": "Un actif visuel valide sur son fichier, jamais sur son rendu en contexte",
+   "enonce": "LE SEUIL EST BAS ET C'EST DIT AU non_juge : WCAG 2.2 SC 1.4.11 demande 3:1 pour un objet graphique PORTEUR DE SENS ; V9 ne juge que l'INDISCERNABLE (sous 1,2). Ce qui vit entre 1,2 et 3,0 n'est PAS juge — distinguer un actif porteur de sens d'un decor demande un jugement, et une sonde qui accuserait tout aplat decoratif se ferait eteindre. Le declarer vaut mieux que de le taire : le silence d'une sonde n'est pas un verdict.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-031",
+   "item": "TF-0635",
+   "domaine": "Deux grandeurs comparees sans verifier qu'elles mesurent la meme chose",
+   "enonce": "La premiere face de la regle vit sans oracle, et c'est ECRIT dans la regle avec les trois mesures qui l'etablissent — pas passe sous silence. Si un motif la rend un jour mecanisable, il devra battre 44/44 a precision nulle.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-032",
+   "item": "TF-0636",
+   "domaine": "Le noeud 58 verifie la presence des directives IA, jamais leur exactitude",
+   "enonce": "Le controle exige la TRACE d'une lecture, jamais sa JUSTESSE : un constat qui cite douze URL sans les avoir ouvertes passe. Aucun oracle ne peut faire mieux sans crawler lui-meme, et le declarer vaut mieux que de le taire.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-033",
+   "item": "TF-0640",
+   "domaine": "Rien n'impose de consulter la terminologie avant d'ecrire une traduction",
+   "enonce": "R-53 point 2 est une regle d'ORDRE, donc non mecanisable : aucun oracle ne voit dans quel ordre deux gestes ont ete faits. C'est ecrit dans la regle plutot que sous-entendu.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-034",
+   "item": "TF-0642",
+   "domaine": "Un glossaire non verifie fait autorite : 3 entrees sur 7 etaient fausses",
+   "enonce": "La justesse d'une entree reste non jugeable et c'est ECRIT au `non_juge` : c'est `verifie_le` qui date la verification, et une relecture humaine qui la tranche.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-035",
+   "item": "TF-0644",
+   "domaine": "Aucun controle ne confronte les nombres du texte a la source de verite",
+   "enonce": "QUATRE LIMITES DECLAREES ET ENTREES AU REGISTRE DE DETTE : la justesse d'un fait declare n'est pas jugee (si la declaration est fausse, l'ecart rendu est faux dans l'autre sens — c'est un point fixe assume, pas une verite mesuree) ; un PLURIEL IRREGULIER n'est pas vu, le terme etant cherche suivi d'au plus deux caracteres de mot, parce qu'inventer une morphologie par locale serait affirmer ce que la donnee ne porte pas ; un nombre ECRIT EN LETTRES n'est pas vu ; et la coherence entre locales ne remplace pas cette confrontation.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-036",
+   "item": "TF-0646",
+   "domaine": "Un motif de derogation passe en ARGUMENT traverse un shell : quatre motifs ont ete mutiles en silence, et rien ne l'a signale parce qu'ils r",
+   "enonce": "Les quatre motifs deja consignes restent mutiles : le registre est en ajout seul et un evenement d'ingestion ne se reecrit pas. La verite est portee par cet item, qui les nomme un a un avec leur sceau.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-037",
+   "item": "TF-0649",
+   "domaine": "Une regle de socle sans porteur mecanique se viole en silence",
+   "enonce": "`.env` n'est PAS dans les motifs exiges : un produit peut legitimement ecrire `.env*` ou `/.env`, et exiger une graphie exacte ferait crier sur une protection equivalente. Le gabarit le porte, le controle ne l'exige pas — la difference est assumee et ecrite.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-038",
+   "item": "TF-0653",
+   "domaine": "Les TROIS tables de synthese de la grille SEO se contredisaient avec la grille qu'elles resument, depuis quinze jours — et c'est ce qu'on li",
+   "enonce": "Le controle confronte les axes NOMMES (branche, statut, volet). Un axe de synthese ajoute plus tard sans etre reconnu ici passerait — c'est le prix de ne juger que ce qui est ecrit, et il est prefere a une regle qui accuserait toute table chiffree du document.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-039",
+   "item": "TF-0656",
+   "domaine": "Une regle conditionnelle de glossaire ne bloque jamais, et l'arbitrage prouve reste inapplique",
+   "enonce": "Un terme employe UNIQUEMENT sous une forme flechie eloignee compte zero emploi — declare au non_juge plutot que comble par une morphologie inventee par langue.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-040",
+   "item": "TF-0660",
+   "domaine": "Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical",
+   "enonce": "LE PARTICIPE APRÈS COPULE N'EST PAS JUGÉ, et le motif est déclaré au registre de dette : LA COPULE NE NOMME PAS SON SUJET. Le corpus a exhibé le contre-exemple tout seul — « A Irène e o Samuel SÃO verdadeiramente acolhedores e SIMPÁTICOS », masculin pluriel JUSTE dans une chaîne qui parle par ailleurs du logement. Un contrôle qui ne sait pas de QUI on parle accuserait cette phrase ; il n'est donc pas écrit, et le combler demanderait de savoir analyser une phrase — pas un resserrement de motif. Deuxième limite déclarée : seules es, pt, it et fr ont une table de déterminants ; l'allemand et l'anglais n'entrent pas dans une opposition binaire. Enfin la RELECTURE NATIVE — que la candidature proposait en repli — n'est pas outillée ici : elle est l'étape A9 de TF-0664, déclarée ABSENTE et BLOQUANTE.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-041",
+   "item": "TF-0661",
+   "domaine": "Un run qui identifie un risque non couvert le DECLARE et passe la main, au lieu de boucler",
+   "enonce": "S29 ne verifie PAS qu'une action PORTE sur le risque declare : un bloc 8 non vide suffit. Elle attrape la contradiction, pas la negligence fine — et c'est ecrit.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-042",
+   "item": "TF-0662",
+   "domaine": "La route de deploiement prescrite par le gabarit contredit le mecanisme reel, et son dossier n'existe pas",
+   "enonce": "L'ORACLE MEP NE SAIT PAS LIRE UN RUN DE CI : il verifie des preuves posees sur disque. La variante se prouve donc par les traces du run CITEES AU LEDGER, comme les verdicts d'oracles y sont cites par leur seq — une preuve opposable, verifiable par un tiers, mais PAS REJOUEE par le pilot. C'est ecrit dans la section plutot que sous-entendu.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-043",
+   "item": "TF-0668",
+   "domaine": "Un verdict visuel rendu sur des captures viewport ne peut pas voir un defaut qui est une relation entre deux points eloignes de la page",
+   "enonce": "W3 JUGE UNE DÉCLARATION, PAS UN FAIT, et c'est irréductible ici : seule la page connaît sa hauteur, l'image ne la porte pas. W4 met cette déclaration à l'épreuve du seul indice disponible — une hauteur de fenêtre usuelle — et cet indice est faillible dans les deux sens : une page réellement haute de 900 px serait signalée à tort, une fenêtre de 901 px passerait. Fermer l'écart demanderait que l'outil de capture ÉCRIVE la hauteur de page mesurée à côté de l'image, ce qui est un travail chez le producteur de captures, pas chez le juge. Deuxième manque, chez le produit et non ici : ses scripts de capture cadrent toujours par fenêtre — la capture de vérification du lot a été faite à la main.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-044",
+   "item": "TF-0670",
+   "domaine": "L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute",
+   "enonce": "T1 NE JUGE PAS LA QUALITÉ D'UNE RELECTURE, et rien ne le fera : personne ne remplace un locuteur natif. Elle rend l'ABSENCE bruyante, rien de plus — le filet mécanique va AVANT lui, jamais à sa place. Deuxième manque : elle ne vérifie pas que la personne nommée a réellement relu, ni que la date est vraie. Une déclaration fausse passe. C'est la limite de tout aveu écrit, et elle est déclarée au `non_juge` plutôt que masquée par une règle qui ferait semblant.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-27"
+  },
+  {
+   "id": "dette-pilot-045",
+   "item": "TF-0671",
+   "domaine": "Le critère de réussite de la chaîne de traduction est écrit en prose et aucun script ne le mesure",
+   "enonce": "LA SECONDE MOITIÉ DU CRITÈRE DE RÉUSSITE N'EST PAS MESURÉE, et elle ne peut pas l'être ici : « les tours de classe DÉFAUT tombent à 0 ET les tours de DÉCISION restent ≥ 1 » se compte sur une SESSION, pas sur un document — aucun artefact ne porte cette donnée. T3 en tient l'esprit sur ce que le document sait dire, et le `non_juge` l'écrit. Deuxième manque : T4 vérifie qu'un verdict est RAPPORTÉ, jamais qu'il est VRAI. Troisième, et c'est un choix : T2 confronte l'ancre au fichier À L'INSTANT DE LA MESURE — un fichier modifié après la remise fera rougir une remise qui était juste, et c'est ce qui distingue une ancre d'une citation.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-27"
+  },
+  {
+   "id": "dette-pilot-046",
+   "item": "TF-0673",
+   "domaine": "Le canal pilot → produit ne savait confier QU'UNE classe de travail : les artefacts d'héritage manquants",
+   "enonce": "LE CÂBLAGE DE L'AVERTISSEMENT N'EST PAS COUVERT PAR LA RECETTE. `orphelins()` est jouée dans les deux sens, mais le fait que l'émetteur SORTE EN ÉCHEC quand elle rend quelque chose n'est vérifié par aucun cas : l'exécuter demanderait d'écrire un orphelin dans le registre réel, qui est append-only. Le rendre testable supposerait d'injecter le chemin du registre jusque dans le bloc d'exécution, ce qui ouvrirait une porte dérobée sur la source de vérité du pilot. Le manque est déclaré plutôt que comblé par une porte — et par N-39, l'écrire ne le couvre pas.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-047",
+   "item": "TF-0678",
+   "domaine": "La regle S3 juge le VOCABULAIRE de la mesure et non sa presence : un verdict qui compte des pages est declare non mesurable",
+   "enonce": "LE MOTIF RESTE UN MOTIF : il voit la FORME d'un compte, jamais sa VÉRITÉ. « 70 pages modifiées » passe que le chiffre soit juste ou inventé — S3 juge qu'une mesure est ANNONCÉE, et rien d'autre. Deuxième borne, plus étroite : une durée passe désormais pour un compte (« remis en 2 jours », « 12 heures de calcul »). C'est délibéré — un fait chiffré reste un fait — mais cela rapproche S3 de S10, qui interdit de CHIFFRER L'EFFORT en jours ; les deux règles ne se contredisent pas, l'une juge une preuve, l'autre une estimation, et la distinction n'est écrite nulle part ailleurs qu'ici.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-048",
+   "item": "TF-0688",
+   "domaine": "factory : la destination des documents produits n est declaree nulle part",
+   "enonce": "Le controle EXECUTABLE (« un producteur qui ecrit sous input\\ peut etre refuse ») reste une option non cablee — l'item le proposait sans le prescrire ; a instruire si la regle ecrite se re-viole.",
+   "statut": "assume",
+   "date_cloture_item": "2026-08-31"
+  },
+  {
+   "id": "dette-pilot-049",
+   "item": "TF-0689",
+   "domaine": "factory : une correction marquee `corrige` n est jamais suivie jusqu au produit",
+   "enonce": "Trois bornes declarees, aucune cachee : (1) aucun item clos ne porte ENCORE de criteres — la convention vaut pour les clotures a venir, et la premiere cloture de famille l'armera ; (2) aucun produit ne tient encore de manifeste — le message de P1 leur en apprend le format au premier avertissement ; (3) les 600+ items archives avant la convention restent de la prose, non retrofites (ecrire une structure qu'on invente retroactivement vaudrait moins que la prose d'origine).",
+   "statut": "assume",
+   "date_cloture_item": "2026-09-01"
+  },
+  {
+   "id": "dette-pilot-050",
+   "item": "TF-0324",
+   "domaine": "Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices",
+   "enonce": "Les quatre artefacts a jugement (risques, compte rendu, retour d'experience, benefices) n'ont pas d'exemplaire rempli, et ils n'en auront pas par la main du pilot : c'est au premier produit qui ouvre une mission longue de les remplir depuis les gabarits, sur son propre run. Second reste, mecanisable celui-la : le controle de FORME de ces quatre gabarits (proprietaire nomme, date de releve, date butoir d'hypothese, dependance non relancee) — la mecanique existe pour les restitutions (S12, S19, S21) et reste a appliquer ici.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-051",
+   "item": "TF-0483",
+   "domaine": "forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la di",
+   "enonce": "L'oracle ne juge NI la pertinence du panel (cinq references bien choisies valent mieux que quinze au hasard, et aucun script ne sait faire la difference), NI l'atteinte de la barre (le releve dit ou est le niveau, il ne prouve pas qu'on s'y hisse), NI la sincerite du gate (une ligne d'arbitrage peut etre ecrite sans que personne n'ait regarde les captures). Les trois sont ecrits a son non_juge. Et l'etape 0 n'est pas encore exigee par l'etape 3 du run cote pilot : le skill la porte, le mode operatoire du run reste a aligner.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-052",
+   "item": "TF-0607",
+   "domaine": "forge-ops : le gabarit ops fait nommer la COMMANDE de deploiement et jamais son JUSTIFICATIF ni sa voie de repli — et laisse declarer source",
+   "enonce": "UN EFFET DE BORD DE MON PROPRE CORRECTIF D'HIER, constaté une minute après l'avoir poussé et corrigé à chaud : le scellement de TF-0579 écrit un journal à côté de la cible jugée, donc jouer l'oracle sur des fichiers du dépôt y crée des traces — et un `git add -A` les a versionnées. Trois fichiers retirés, effacés, et désormais ignorés avec leur motif écrit dans le `.gitignore`. Vérifié : aucune fuite équivalente dans les trois autres dépôts. Reste non traité : le volet (1) de l'item, les trois champs au gabarit du socle produit.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-053",
+   "item": "TF-0648",
+   "domaine": "Un oracle dont l'echec d'environnement est indiscernable d'un defaut",
+   "enonce": "CI3 juge la PRESENCE du contrat, jamais qu'il soit TENU a l'execution — c'est ecrit. Et le cas fondateur vit chez un produit : son oracle de consentement doit encore employer l'exit 2 et nommer la condition ; le pilot ne l'ecrit pas a sa place.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-054",
+   "item": "TF-0654",
+   "domaine": "La sonde d'heritage suppose que la racine web est la racine du depot",
+   "enonce": "La sonde ne LIT PAS la declaration : elle la DEMANDE. Tant qu'un produit n'a pas declare sa racine web, l'artefact reste `hors_racine` — indecis, et dit comme tel. Fermer la boucle demandera de lire `racine_web:` chez le produit, ce qui suppose qu'au moins un produit l'ait ecrite.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-055",
+   "item": "TF-0658",
+   "domaine": "Aucun oracle ne verifie qu'une URL DECLAREE par le site repond 200",
+   "enonce": "Les liens de llms.txt ne sont pas juges : ils ne figurent pas dans l'artefact de crawl. C'est le noeud des directives IA qui lit ce fichier, et il exige desormais que son contenu soit LU (TF-0636).",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-056",
+   "item": "TF-0659",
+   "domaine": "Le journal quality-oracles perd la raison de l'echec : FAIL avec detail vide sur un hook bloquant",
+   "enonce": "L'OBSERVATION ANNEXE DE L'ITEM N'EST PAS TRAITEE, et elle est juste : le message de M10 ne dit pas qu'une phrase de mode d'emploi doit etre un PARAGRAPHE AUTONOME — placee dans une puce, elle est comptee absente. Je l'ai constate moi-meme en soldant 20 constats de lisibilite ce jour. A instruire chez le skill qui porte M10.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-057",
+   "item": "TF-0638",
+   "domaine": "forge-seo-geo ne porte aucun noeud d'analyse lexicale par langue",
+   "enonce": "Le noeud est INSTRUMENTE AU SENS DE LA GRILLE (question, source, methode, critere), pas encore par un script : sa mesure reste manuelle comme celle de la majorite des noeuds `SD`. Le dire vaut mieux que de laisser croire a un controle automatique.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-058",
+   "item": "TF-0651",
+   "domaine": "La route MEP n'a pas de variante deploiement continu, et l'infrastructure n'a ni description ni reverification",
+   "enonce": "LE VOLET (1) N'EST PAS LIVRE ET C'EST UNE DECISION A PRENDRE : la route MEP decrit un deploiement manuel a porte (staging, qualif populee, GO humain, DOSSIER-MEP.md), et un produit qui fait du deploiement continu — controles en CI, deploiement conditionne au vert, verification de la production placee sur le COMMIT DECLENCHEUR — fabrique une NON-CONFORMITE PERMANENTE en faisant MIEUX que ce que la regle exige. Le GO humain existe : c'est le push. Trancher change ce que « pret client » veut dire. SOUS-POINT NON TRAITE, replie ici par l'item : une reponse vide de l'API d'une console de recherche est AMBIGUE entre « zero impression » et « propriete verifiee trop recemment pour avoir collecte » ; tout noeud qui la lit doit d'abord recuperer la fenetre de disponibilite, faute de quoi il prononce un negatif qu'il n'a pas mesure.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-059",
+   "item": "TF-0667",
+   "domaine": "Les cinq pans qui regardent une page rendue sont declares SANS OBJET sur un projet qui n'est que des pages",
+   "enonce": "LA DOCTRINE N'EST APPLIQUÉE QU'À CE SANS-OBJET-LÀ. « Un motif d'inférence doit être falsifiable au rapport » vaut pour TOUS les sans-objet de tous les pans ; un seul a été repris. Recenser les autres et distinguer ceux qui reposent sur un fait déclaré par le produit — légitimes en l'état — de ceux qui reposent sur une inférence, est un travail non fait. Deuxième manque, chez le produit : ses cinq pans réveillés vont désormais s'exécuter sur 203 pages, et rien ne dit ce qu'ils y trouveront — le rapport du prochain audit est la seule mesure de ce que ce correctif ouvre.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-26"
+  },
+  {
+   "id": "dette-pilot-060",
+   "item": "TF-0692",
+   "domaine": "pilot : le sceau ne couvre pas les PDF, alors que des familles declarent deux formats - la paire se desynchronise sans que rien ne le dise",
+   "enonce": "L'absence d'un format d'un jeu declare (html present, pdf manquant) n'est toujours pas signalee — borne declaree, pas comblee.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-31"
+  },
+  {
+   "id": "dette-pilot-061",
+   "item": "TF-0712",
+   "domaine": "pilot : R-32 n'a pas de forme de journal pour un livrable qui porte des donnees personnelles",
+   "enonce": "L'option --sans-extraits de check_html.py (les memes constats sans citer la page) appartient au socle de forge-agents — demandee et tracee ici, non livree ce tour.",
+   "statut": "todo",
+   "date_cloture_item": "2026-09-01"
+  },
+  {
+   "id": "dette-pilot-062",
+   "item": "TF-0578",
+   "domaine": "forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos",
+   "enonce": "TROIS DÉFAUTS DE MON PROPRE TRAVAIL, trouvés en le jouant et corrigés : le module s'EXÉCUTAIT à l'import et rendait « page introuvable » — un oracle qui s'exécute quand on le lit n'est pas testable unitairement ; seize caractères BACKSPACE s'étaient glissés dans les expressions régulières à la place des limites de mots, qui cherchaient donc un caractère de contrôle et ne matchaient jamais ; et un cas de test était faux, pas l'oracle. Reste non couvert et déclaré : la liste des services vendus, troisième côté du triangle, vit dans le code du produit et n'est pas lue.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-25"
+  },
+  {
+   "id": "dette-pilot-063",
+   "item": "TF-0524",
+   "domaine": "pilot : la bibliotheque de gabarits et le skill de schemas ne se rencontrent nulle part — un projet qui suit le gabarit produit un DAT SANS ",
+   "enonce": "Le DEX n'a qu'UN emplacement de schema, dans sa premiere section. Le lot notait qu'un dossier d'exploitation gagnerait a montrer aussi l'endroit ou se place le retour arriere : cela demande de choisir la section et le contenu type, ce qui se decide avec un exploitant plutot qu'en bibliotheque.",
+   "statut": "todo",
+   "date_cloture_item": "2026-08-23"
+  },
+  {
+   "id": "dette-pilot-064",
+   "item": "TF-0735",
+   "domaine": "pilot : le principe de connexion a Railway par jeton n'est un artefact d'aucun referentiel de la route MEP — chaque session le reperd, deux ",
+   "enonce": "Le controle EXECUTE d'entree d'etape (verifier le jeton avant le premier railway up) appartient a l'outillage forge-ops — prescrit ici, non livre.",
+   "statut": "todo",
+   "date_cloture_item": "2026-09-01"
+  }
+ ]
+}

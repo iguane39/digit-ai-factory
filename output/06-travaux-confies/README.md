@@ -7,7 +7,7 @@
 ## Rôle
 
 <!-- ROLE:DEBUT -->
-Originaux des lots de travaux confiés par le pilot à une forge ou à un produit (`pilot - TRAVAUX - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl`, format `gabarits\TRAVAUX-PILOT.md`, jugés par `gabarits\oracle-travaux-pilot.mjs` avant dépôt). Le pilot y écrit à chaque dépôt, sur mandat humain ; la copie déposée chez le destinataire (`input\00-travaux\`) est la seule qui change de statut. Un fichier déposé ne se modifie jamais — le lot suivant est un nouveau fichier daté.
+Originaux des lots de travaux confiés par le Produit-67 à une forge ou à un produit (`Produit-67 - TRAVAUX - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl`, format `gabarits\TRAVAUX-Produit-67.md`, jugés par `gabarits\oracle-travaux-Produit-67.mjs` avant dépôt). Le Produit-67 y écrit à chaque dépôt, sur mandat humain ; la copie déposée chez le destinataire (`input\00-travaux\`) est la seule qui change de statut. Un fichier déposé ne se modifie jamais — le lot suivant est un nouveau fichier daté.
 <!-- ROLE:FIN -->
 
 ## Contenu

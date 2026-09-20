@@ -91,6 +91,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` | fichier | 18,7 Ko | Étude d'opportunité — revue hebdomadaire de l'existant — 20260917a |
 | `20260917-L99-gestion-reseaux-sociaux.md` | fichier | 45,7 Ko | Analyse L99 — « Lance une étude d'opportunités sur une forge pour la gestion de réseaux so |
 | `20260917-L99-revue-hebdomadaire-amelioration-continue.md` | fichier | 36,5 Ko | Analyse L99 — « Un process hebdomadaire d'analyse de l'existant pour l'amélioration contin |
+| `20260917-releve-autres-reseaux-sociaux.md` | fichier | 8,3 Ko | Relevé — les autres réseaux sociaux et les étapes non traitées (17/09/2026) |
 | `20260917-revue-hebdomadaire-mesure-pas0.md` | fichier | 21,2 Ko | Annexe de mesure — pas 0 de l'étude « revue hebdomadaire de l'existant » |
 
-_76 fichier(s), 0 sous-dossier(s)_
+_77 fichier(s), 0 sous-dossier(s)_

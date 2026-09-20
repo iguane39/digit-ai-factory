@@ -22,6 +22,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `ci-hebergee-rouge-environnement-non-rejoue-forge-audit-20260910a.tf.jsonl` | fichier | 4,0 Ko | 1 ligne(s) JSONL |
 | `cliquet-recettes-date-lue-comme-compte-20260917a.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `conception-documentaire-amont-20260914a.tf.jsonl` | fichier | 3,9 Ko | 2 ligne(s) JSONL |
+| `constats-campagnes-todos-retours-20260919a.tf.jsonl` | fichier | 7,9 Ko | 7 ligne(s) JSONL |
+| `constats-mandat-todos-retours-20260917c.tf.jsonl` | fichier | 5,2 Ko | 4 ligne(s) JSONL |
 | `coquille-page-etude-slop-tokens-20260917b.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `decision-humaine-restituee-sans-geste-pilot-20260911a.tf.jsonl` | fichier | 3,8 Ko | 1 ligne(s) JSONL |
 | `decision-sans-designateur-20260916a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
@@ -49,6 +51,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `referentiel-audit-contenu-21-08-20260910a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `registre-oracles-edite-en-copie-installee-20260910a.tf.jsonl` | fichier | 4,6 Ko | 1 ligne(s) JSONL |
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
+| `reseaux-sociaux-elargir-perimetre-20260917d.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
 | `restes-archives-classes-neuves-20260914b.tf.jsonl` | fichier | 8,6 Ko | 7 ligne(s) JSONL |
 | `restes-archives-p2-20260914a.tf.jsonl` | fichier | 6,0 Ko | 5 ligne(s) JSONL |
 | `revue-classes-20260903a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
@@ -58,4 +61,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_40 fichier(s), 1 sous-dossier(s)_ · 9 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_43 fichier(s), 1 sous-dossier(s)_ · 9 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

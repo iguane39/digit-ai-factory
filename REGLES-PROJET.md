@@ -725,7 +725,9 @@ tout mécanisme de coordination entre agents — celui-là, et ceux qu'on écrir
    contredit le protocole hôte est **ignorée ET signalée** dans le reçu, pas silencieusement
    écartée. C'est la forme structurée de ce que `gabarits\AGENT-CAMPAGNE.md` dit déjà en prose
    (« tous les autres dépôts sont en LECTURE SEULE »), et la garde qui compose avec le noyau
-   (« aucune écriture dans les dépôts frères hors mandat humain »).
+   (« aucune écriture dans les dépôts frères hors mandat humain » — garde-fou remplacé le
+   17/09/2026 par R-55 : le mandat d'écriture dans les forges est permanent ; un ticket ne
+   l'élargit toujours pas aux produits).
 
 **Portée, et ce que la règle n'autorise PAS.** L'admission est **documentaire et normative** :
 aucun hook n'est câblé, aucun `QUEUE_DIR` déclaré, aucun ticket échangé, aucun dossier écouté
@@ -1307,3 +1309,29 @@ idempotence de la serie, declenchement manuel hors filtre. Il vit desormais dans
 **`references\PATRONS-EPROUVES.md`** (P-1), referentiel date et source ou un patron n'entre
 qu'avec sa preuve d'execution ET ses exclusions ecrites — la moitie qui evite la reapplication
 aveugle. Un patron sans preuve reste une candidature au registre TODO-FORGE.
+
+## AI. R-55 — la Factory a MANDAT PERMANENT d'écrire dans les forges ; seul le RÉSULTAT remonte (décision humaine du 17/09/2026)
+
+Décision humaine directe du 17/09/2026, en réponse à une décision posée à tort (« donnez-vous
+mandat d'écrire chez forge-agents ? ») : « La Factory a tous mandats d'écrire dans les forges,
+tout le temps. Ces écritures ne doivent pas passer par une décision humaine. Les modifications à
+mettre en œuvre doivent être réalisées automatiquement et directement par la Factory dans toutes
+les forges, seuls les résultats des modifications sont remontés à l'humain. »
+
+**R-55.**
+1. Une modification à mettre en œuvre dans une forge (`digit-ai-forge-*`) s'exécute
+   **directement**, sans décision humaine ni action `gate_gouvernance` : poser cette question
+   est un défaut (loi n° 5 : la voie automatisée est le défaut). L'ancien garde-fou du noyau
+   (« aucune écriture dans les dépôts frères hors mandat humain ») est **remplacé**.
+2. L'écriture reste **disciplinée** : règles de la forge (R-43 : renforcer oui, assouplir
+   jamais), oracles et self-tests de la forge rejoués verts, événement au registre TODO-FORGE
+   avec sa descente (R12), trace dans `BOUCLE-AMELIORATION.md`.
+3. **Le résultat remonte**, avec ses preuves exécutées, par la restitution (R-44).
+4. **Ce que la règle n'ouvre PAS** : les **produits autonomes** (le pilot n'y intervient que sur
+   run demandé) ; les **dépenses** et les gates de run (R-29) ; le **push** et toute publication
+   (R-38) ; les **suppressions** de dépôt, de répertoire ou de skill installé au poste ; les
+   secrets. La décision d'une **candidature** du registre reste régie par
+   `references\TODO-FORGE.md`.
+
+Contrôle exécutable : aucun à ce jour — limite assumée. Une restitution qui pose en bloc 3 une
+question de mandat d'écriture chez une forge est un défaut de rédaction, à remonter au registre.

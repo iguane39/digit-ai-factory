@@ -51,6 +51,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` | fichier | 3,4 Ko | Synthèse de mandat — option (a) : l'avancement des campagnes est câblé (TF-0252) |
 | `Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` | fichier | 10,4 Ko | Synthèse de mandat — décisions D-6 (a) et D-7 (a) exécutées : quatre barres validées et cl |
 | `Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` | fichier | 15,3 Ko | Synthèse de mandat — la forme du bloc des décisions, relevée à la source et rendue lisible |
+| `Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` | fichier | 17,3 Ko | La boîte d'entrée est vide, 15 todos sont clos, et une campagne travaille encore |
 | `Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` | fichier | 17,5 Ko | Vos trois décisions sont exécutées, et la question que vous n'avez pas pu lire est reposée |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
 | `Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` | fichier | 20,1 Ko | Synthèse de mandat — campagnes en cours : trois corrections vérifiées et closes, trois cam |
@@ -100,6 +101,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` | fichier | 12,2 Ko | Synthèse de mandat — la mutation devient une porte, et une page de doctrine cessait d'avoi |
 | `Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md` | fichier | 11,7 Ko | Synthèse de mandat — votre feu vert est exécuté, le noyau corrigé est en ligne, et l'affai |
 | `Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-12 (a) exécutée : la reconstruction d'un clone divergé est |
+| `Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` | fichier | 10,2 Ko | Vos 2 décisions sont exécutées : les outils corrigés tournent sur ce poste, et les 4 forge |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` | fichier | 20,7 Ko | Synthèse de mandat — les huit dépôts en attente sont publiés et les dix-sept du parc sont  |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
 | `Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` | fichier | 25,5 Ko | Synthèse de mandat — le plancher d'écriture de la Factory est posé, jugé et câblé chez le  |
@@ -120,7 +122,9 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md` | fichier | 17,4 Ko | Synthèse de mandat — votre règle est écrite et publiée, mais j'ai affaibli le noyau en la  |
 | `Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` | fichier | 19,2 Ko | Synthèse de mandat — remise à niveau du dépôt et renommage des lots (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
+| `Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` | fichier | 11,3 Ko | Synthèse de mandat — réseaux sociaux : la barre est validée, et votre objection est fondée |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md` | fichier | 12,8 Ko | Synthèse de mandat — réseaux sociaux : votre décision est exécutée, les sept candidatures  |
+| `Digit-AI - Synthese Mandat - Reseaux sociaux D-3 executee et mandat permanent R-55 - 20260917j.md` | fichier | 14,9 Ko | Synthèse de mandat — réseaux sociaux : votre règle de mandat permanent est écrite, et les  |
 | `Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` | fichier | 37,5 Ko | Synthèse de mandat — tous les retours sont pris et la boîte d'entrée est verte pour la pre |
 | `Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` | fichier | 17,6 Ko | Synthèse de mandat — « fais tous les retours et todos » : les neuf lots en attente sont in |
 | `Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` | fichier | 12,6 Ko | Synthèse de mandat — trois lots pris, la propagation devient mesurable, et le banc monte à |
@@ -140,6 +144,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md` | fichier | 9,0 Ko | Synthèse de mandat — troisième chantier pilot clos : un contrôle qui déclare ses codes doi |
 | `Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md` | fichier | 10,0 Ko | Synthèse de mandat — quatrième chantier pilot clos : une clé de versions malformée a une v |
 | `Digit-AI - Synthese Mandat - TF-0802 clos la 404 d office et fin du tri - 20260905d.md` | fichier | 12,3 Ko | Synthèse de mandat — cinquième chantier pilot clos : la 404 devient un standard d'office,  |
+| `Digit-AI - Synthese Mandat - Todos et retours 23 clos et troisieme vague - 20260919a.md` | fichier | 16,5 Ko | 28 todos sont clos, la boîte d'entrée est de nouveau vide, et une campagne travaille encor |
+| `Digit-AI - Synthese Mandat - Todos et retours 32 clos sur preuve rejouee - 20260919b.md` | fichier | 19,5 Ko | 32 todos sont clos, la boîte d'entrée est vide, et tout le travail attend votre mot pour ê |
 | `Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` | fichier | 5,5 Ko | Synthèse de mandat — « fais toute la todo avec le a » (21 items, 4 campagnes, 1 circuit) |
 | `Digit-AI - Synthese Mandat - Toutes les actions A executees - 20260905e.md` | fichier | 18,0 Ko | Synthèse de mandat — « Fais tous les A » : le poste est propre, le produit 02 est rectifié |
 | `Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` | fichier | 4,4 Ko | Synthèse de mandat — « traite les todo et retours » (14 items, 3 campagnes) |
@@ -161,4 +167,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_144 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_150 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

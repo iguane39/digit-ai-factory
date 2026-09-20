@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 309 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 333 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -211,6 +211,13 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260914-releve-restes-archives.md | — | 6.5 Ko | `03-etudes/20260914-releve-restes-archives.md` |
 | 20260915-etude-opportunite-inventaire-des-composants.html | — | 72.7 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.html` |
 | 20260915-etude-opportunite-inventaire-des-composants.md | — | 21 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.md` |
+| 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 91.9 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
+| 20260917-etude-opportunite-gestion-reseaux-sociaux.md | — | 37 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.md` |
+| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md | — | 18.7 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` |
+| 20260917-L99-gestion-reseaux-sociaux.md | — | 45.7 Ko | `03-etudes/20260917-L99-gestion-reseaux-sociaux.md` |
+| 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.5 Ko | `03-etudes/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
+| 20260917-releve-autres-reseaux-sociaux.md | — | 8.3 Ko | `03-etudes/20260917-releve-autres-reseaux-sociaux.md` |
+| 20260917-revue-hebdomadaire-mesure-pas0.md | — | 21.2 Ko | `03-etudes/20260917-revue-hebdomadaire-mesure-pas0.md` |
 
 ### 04-plans
 
@@ -224,7 +231,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.2 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json` |
 | Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 33.3 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |
-| Digit-AI - Specification Produit - Produit-66 - 20260911a.md | 20260911a | 36.6 Ko | `04-plans/Digit-AI - Specification Produit - Produit-66 - 20260911a.md` |
+| Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md | 20260911a | 36.6 Ko | `04-plans/Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` |
 | Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md | 20260901i | 5.8 Ko | `04-plans/Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` |
 | Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md | 20260901j | 5.3 Ko | `04-plans/Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` |
 | Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md | 20260901h | 10.5 Ko | `04-plans/Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` |
@@ -237,10 +244,14 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Etude - Communication marketing AO verdict O3 huit candidatures - 20260911g.md | 20260911g | 22.2 Ko | `04-plans/Digit-AI - Synthese Etude - Communication marketing AO verdict O3 huit candidatures - 20260911g.md` |
+| Digit-AI - Synthese Etude - Gestion reseaux sociaux verdict O2 sans forge - 20260917c.md | 20260917c | 14 Ko | `04-plans/Digit-AI - Synthese Etude - Gestion reseaux sociaux verdict O2 sans forge - 20260917c.md` |
 | Digit-AI - Synthese Etude - Personas par phase verdict statu quo banc rejouable - 20260914b.md | 20260914b | 16.9 Ko | `04-plans/Digit-AI - Synthese Etude - Personas par phase verdict statu quo banc rejouable - 20260914b.md` |
+| Digit-AI - Synthese Etude - Revue hebdomadaire de l existant verdict sondes etendues - 20260917d.md | 20260917d | 13.7 Ko | `04-plans/Digit-AI - Synthese Etude - Revue hebdomadaire de l existant verdict sondes etendues - 20260917d.md` |
 | Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md | 20260911f | 19.9 Ko | `04-plans/Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md` |
+| Digit-AI - Synthese L99 - Gestion reseaux sociaux prompt reecrit - 20260917a.md | 20260917a | 14.7 Ko | `04-plans/Digit-AI - Synthese L99 - Gestion reseaux sociaux prompt reecrit - 20260917a.md` |
 | Digit-AI - Synthese L99 - Personas par phase prompt reecrit - 20260914a.md | 20260914a | 12.7 Ko | `04-plans/Digit-AI - Synthese L99 - Personas par phase prompt reecrit - 20260914a.md` |
 | Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md | 20260911j | 21.5 Ko | `04-plans/Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md` |
+| Digit-AI - Synthese L99 - Revue hebdomadaire de l existant prompt reecrit - 20260917b.md | 20260917b | 14 Ko | `04-plans/Digit-AI - Synthese L99 - Revue hebdomadaire de l existant prompt reecrit - 20260917b.md` |
 | Digit-AI - Synthese Mandat - 115 valeurs passees en chiffres chez les producteurs - 20260916e.md | 20260916e | 8.4 Ko | `04-plans/Digit-AI - Synthese Mandat - 115 valeurs passees en chiffres chez les producteurs - 20260916e.md` |
 | Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
 | Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md | 20260905k | 23.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` |
@@ -255,7 +266,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md | 20260907e | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` |
 | Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md | 20260830f | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` |
-| Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md | 20260916e | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` |
+| Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md | 20260917k | 17.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` |
+| Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md | 20260916e | 17.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` |
 | Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md | 20260901b | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` |
 | Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md | 20260908d | 20.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` |
 | Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md | 20260907m | 25.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` |
@@ -263,7 +275,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md | 20260911b | 21.7 Ko | `04-plans/Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` |
 | Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md | 20260911c | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` |
 | Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md | 20260911e | 13.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` |
-| Digit-AI - Synthese Mandat - D-3 a executee spec Produit-66 RUN-AO lots lances - 20260911h.md | 20260911h | 25.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-3 a executee spec Produit-66 RUN-AO lots lances - 20260911h.md` |
+| Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md | 20260911h | 25.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md` |
 | Digit-AI - Synthese Mandat - D-4 executee marque a deux supports produit en naissance - 20260911i.md | 20260911i | 27.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-4 executee marque a deux supports produit en naissance - 20260911i.md` |
 | Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md | 20260914d | 21.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md` |
 | Digit-AI - Synthese Mandat - D-6 D-9 D-7 D-8 executees - 20260914e.md | 20260914e | 15.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-6 D-9 D-7 D-8 executees - 20260914e.md` |
@@ -283,6 +295,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md | 20260907b | 18.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
+| Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md | 20260917g | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` |
+| Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md | 20260917h | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` |
 | Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md | 20260915d | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md | 20260831a | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` |
 | Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md | 20260905g | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` |
@@ -302,7 +316,10 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md | 20260901c | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` |
 | Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md | 20260910d | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md` |
 | Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md | 20260907j | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` |
+| Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md | 20260919c | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` |
+| Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md | 20260913a | 20.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` |
+| Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md | 20260917i | 9.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` |
 | Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md | 20260912a | 25.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` |
 | Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md | 20260905f | 12.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` |
 | Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md | 20260830d | 16.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` |
@@ -323,6 +340,9 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md | 20260910c | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md` |
 | Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md | 20260830b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` |
 | Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md | 20260830j | 16.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` |
+| Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md | 20260917l | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` |
+| Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md | 20260917e | 12.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md` |
+| Digit-AI - Synthese Mandat - Reseaux sociaux D-3 executee et mandat permanent R-55 - 20260917j.md | 20260917j | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux D-3 executee et mandat permanent R-55 - 20260917j.md` |
 | Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md | 20260908g | 37.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` |
 | Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md | 20260908b | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` |
 | Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md | 20260901a | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` |
@@ -331,6 +351,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md | 20260908h | 45.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` |
 | Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md | 20260901f | 12.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` |
 | Digit-AI - Synthese Mandat - Six actions retenues cinq faites la derniere a une erreur structurelle pres - 20260910e.md | 20260910e | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Six actions retenues cinq faites la derniere a une erreur structurelle pres - 20260910e.md` |
+| Digit-AI - Synthese Mandat - Sondes etendues descente par produit et controles instruits - 20260917f.md | 20260917f | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Sondes etendues descente par produit et controles instruits - 20260917f.md` |
 | Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md | 20260903c | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` |
 | Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md | 20260907k | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md | 20260822a | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` |
@@ -342,6 +363,9 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md | 20260905b | 9.1 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md` |
 | Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md | 20260905c | 10.1 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md` |
 | Digit-AI - Synthese Mandat - TF-0802 clos la 404 d office et fin du tri - 20260905d.md | 20260905d | 12.4 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0802 clos la 404 d office et fin du tri - 20260905d.md` |
+| Digit-AI - Synthese Mandat - Todos et retours 23 clos et troisieme vague - 20260919a.md | 20260919a | 16.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours 23 clos et troisieme vague - 20260919a.md` |
+| Digit-AI - Synthese Mandat - Todos et retours 32 clos sur preuve rejouee - 20260919b.md | 20260919b | 19.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours 32 clos sur preuve rejouee - 20260919b.md` |
+| Digit-AI - Synthese Mandat - Todos et retours 32 clos sur preuve rejouee - 20260919b.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours 32 clos sur preuve rejouee - 20260919b.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md | 20260815a | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` |
 | Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Toutes les actions A executees - 20260905e.md | 20260905e | 18.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Toutes les actions A executees - 20260905e.md` |

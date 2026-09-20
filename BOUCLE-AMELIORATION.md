@@ -2238,3 +2238,57 @@ Registre PASS, porte de publication PASS (historique compris), banc du pilot rej
 **Rapport final de l agent forge-agents (11:45)** : second constat en passant entré en candidat, **TF-0789** — l exemple de référence de digit-ai-schemas déborde à 390 px (16 constats v1_overflow, antérieurs, mesurés identiques avant et après TF-0784) et n a pas de verdict de lecture tierce (T1/T2 du 02/09). Registre : 8 actifs (2 candidats, 6 décidés).
 
 **Incident de clôture (11:35)** : une seconde session (mandat d'amélioration continue du 03/09) écrit dans ce dépôt en parallèle ; `git add -A` a emporté quatre de ses fichiers en cours dans fb9a560 et faa288b (`todo/CLASSES.json`, `oracles/hook-lexique.mjs` + test, `todo/generer-recidives.mjs`, `todo/ingerer-classe.test.mjs`), non relus ici. Classe du 22/08 (2 sessions qui se croisent) : parade appliquée dès cet enregistrement — `git add` par chemins nommés ; l'autre session ré-enregistre son travail par-dessus. Le banc 86/86 de clôture a été joué avant leur apparition.
+
+## 17/09/2026 — « 3a », et le mandat d'écriture dans les forges devient permanent (R-55) : quatre candidatures closes chez forge-agents
+
+Décision humaine du jour : la Factory écrit dans les forges sans décision humaine, seul le
+résultat remonte (R-55, `REGLES-PROJET.md` §AI ; noyau et `references\ACCUEIL.md` alignés).
+Première campagne sous cette règle, issue de l'étude
+`output\03-etudes\20260917-etude-opportunite-gestion-reseaux-sociaux.md` (verdict O2) : trois
+agents en parallèle chez `digit-ai-forge-agents`, chemins d'écriture disjoints, départ `11da7be`.
+
+| Item | Commit local | Preuve |
+|---|---|---|
+| TF-1155 — modèle « publication réseau » à deux écritures (`digit-ai-communication`) | `677be41` | self-test du skill PASS, contrôle C3 et deux fixtures rouges ; 7 → 8 modèles |
+| TF-1157 — reprise agnostique du skill de publication installé (structures, mise en forme Unicode) | `87e354f` | auto-test PASS sous cp1252 (l'original : UnicodeEncodeError) ; 0 nom propre sur 16 termes |
+| TF-1028 — barre externe « publication réseau » au registre de `la-barre` (part de l'item) | `0f73b46` | `test_existence.py` PASS, 4 références sur 4 ; entrée en `todo` : la validation humaine en un tour du protocole reste due |
+| TF-1030 — `oracle-transparence.mjs` (`quality-oracles`), échéance en donnée | `fc84225` | banc 269 → 289 contrôles, PASS avant et après |
+
+Côté pilot : `references\PLATEFORME-LINKEDIN.md`, `references\RUN-RESEAU.md` et
+`oracles\oracle-run-reseau.mjs`, dont l'autotest est la semaine à blanc (2/2 PASS, double sens).
+Reste mesuré : `oracle-skills` rend K2 FAIL sur le parc — les sources de forge-agents sont en
+avance sur les copies installées ; la propagation suit la publication (TF-1099), geste humain.
+Leçon : une question de mandat posée à l'humain a coûté un aller-retour entier ; R-55 la ferme.
+
+## 17, 19 et 20/09/2026 — « Traite les todos et retours », « continue », « 1a, 2a », « Synchronise avec github » : 33 todos clos sur preuve rejouée, le parc publié
+
+Mandat global en quatre messages. **13 lots** de retours accueillis et ingérés, boîte d'entrée
+prouvée vide deux fois ; **33 candidats décidés**, **33 todos clos**, chacun sur une vérification
+native REJOUÉE par le pilot après la campagne qui l'a corrigé ; file ouverte de 45 à 42 alors que 30
+y sont entrés. **11 campagnes** déléguées (9 Opus 5, 2 Sonnet 5), une par dépôt et par vague, sous
+`gabarits\AGENT-CAMPAGNE.md` ; une s'est arrêtée sur un blocage de flux après 6 enregistrements, le
+pilot a vérifié, enregistré et fini son travail.
+
+| Dépôt | Todos clos | Preuve rejouée |
+|---|---|---|
+| pilot | TF-1172, TF-1154, TF-1168, TF-1169, TF-1171, TF-1177, TF-1181, TF-1182, TF-0791, TF-1047, TF-1088, TF-1150, TF-1184, TF-1136, TF-1187, TF-1189, TF-1081, TF-1198 | `oracle-synthese` 28 → 39 cas, `hook-restitution` 23 → 34, boîte d'entrée 35 → 39, harnais 124/125 → 125/125 |
+| `digit-ai-forge-data` | TF-1176, TF-1180, TF-1188, TF-1186, TF-1190 | self-test 273 → 356 PASS, 0 FAIL |
+| `digit-ai-forge-agents` | TF-1173, TF-1174, TF-1087, TF-0836, TF-1191, TF-1192, TF-1185 | socle des pages 366 → 406 cas, `quality-oracles` 289 → 301 contrôles, banc du hook 37 → 50 |
+| `digit-ai-forge-audit`, `digit-ai-forge-development` | TF-1175, TF-1020, TF-1042 | `verifier.mjs` 12/12 étapes, recette locale 5/5, run hébergé 35454372211 success |
+
+Décisions humaines exécutées : **D-1 (a)** du 19/09 — `oracle-skills --appliquer`, 8 skills et 1 hook
+remis à niveau, FAIL sur 9 écarts → PASS ; **D-2 (a)** du 19/09 — les 4 forges publiées après la
+porte des noms, PASS 4 fois sur 4 ; **« Synchronise avec github »** du 20/09 — `digit-ai-forge-design`,
+le canal confidentiel et le pilot publiés, et le travail fini mais jamais enregistré des sessions des
+14, 15, 16 et 17/09 (78 chemins, dont R-55 et `todo\registre-dette.json`) enregistré puis publié.
+
+Leçons. (1) **Une correction du mandat a créé une régression** chez un produit (TF-1184 → TF-1187,
+un fichier relu du disque passait devant la synthèse écrite dans le tour) : elle a été fermée dans
+le mandat, par un cas de banc posé ROUGE avant le correctif et qui ne dépend pas des dates. (2) **Un
+vert lu trop vite** : le test Linux visé par TF-1020 était déjà vert trois jours avant le correctif ;
+la clôture tient sur une autre preuve, plus étroite (la police résolue est la police embarquée), et
+la restitution le dit. (3) **Le sas d'arrivée était hors de tout contrôle** : six lots y ont attendu
+deux jours sous un « boîte à jour » ; règle B9, lue par le relevé d'ouverture (TF-1198). (4) **Des
+heures écrites sans relever l'horloge**, quatre fois, toutes rattrapées avant l'affichage final.
+(5) **Du travail fini est resté quatre jours hors de l'histoire du dépôt** parce que chaque session
+enregistrait par chemins nommés sans que rien ne dise ce qui restait indexé derrière elle.

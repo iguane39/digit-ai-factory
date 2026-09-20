@@ -19,8 +19,8 @@
   "vu_le": "2026-08-26"
  },
  "./bootstrap.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-08-26"
+  "cas": 15,
+  "vu_le": "2026-09-17"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
   "cas": 31,
@@ -51,8 +51,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-boite-entree.mjs": {
-  "cas": 35,
-  "vu_le": "2026-09-08"
+  "cas": 39,
+  "vu_le": "2026-09-19"
  },
  "oracle-cadence.mjs": {
   "cas": 16,
@@ -76,8 +76,8 @@
   "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 81,
-  "vu_le": "2026-09-15"
+  "cas": 84,
+  "vu_le": "2026-09-17"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -158,8 +158,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-portee-doctrine.mjs": {
-  "cas": 9,
-  "vu_le": "2026-09-09"
+  "cas": 12,
+  "vu_le": "2026-09-17"
  },
  "oracle-portee-doctrine.mjs (parc réel)": {
   "non_lu": true,
@@ -196,6 +196,10 @@
   "cas": 11,
   "vu_le": "2026-08-27"
  },
+ "oracle-run-reseau.mjs": {
+  "cas": 2,
+  "vu_le": "2026-09-17"
+ },
  "oracle-secrets-hors-perimetre.mjs": {
   "cas": 13,
   "vu_le": "2026-08-26"
@@ -219,8 +223,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 28,
-  "vu_le": "2026-09-17"
+  "cas": 39,
+  "vu_le": "2026-09-19"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 8,
@@ -255,12 +259,12 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 23,
-  "vu_le": "2026-09-17"
+  "cas": 34,
+  "vu_le": "2026-09-19"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
-  "cas": 16,
-  "vu_le": "2026-09-15"
+  "cas": 17,
+  "vu_le": "2026-09-17"
  },
  "oracles/oracle-controles-injoignables.test.mjs": {
   "cas": 22,
@@ -335,8 +339,8 @@
   "vu_le": "2026-09-15"
  },
  "scripts/recopier-heritage.test.mjs": {
-  "cas": 12,
-  "vu_le": "2026-09-08"
+  "cas": 14,
+  "vu_le": "2026-09-17"
  },
  "scripts/relever-appelants.test.mjs": {
   "cas": 5,
@@ -387,8 +391,8 @@
   "vu_le": "2026-09-15"
  },
  "todo/accueillir-lot.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-15"
+  "cas": 6,
+  "vu_le": "2026-09-17"
  },
  "todo/adresses-ip.test.mjs": {
   "cas": 14,

@@ -7,7 +7,7 @@
 ## Rôle
 
 <!-- ROLE:DEBUT -->
-Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) — aucun sidecar exigé du remettant, notice `LISEZMOI.md` ; le pilot écrit le sidecar de rattachement en traitant.
+Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) — aucun sidecar exigé du remettant, notice `LISEZMOI.md` ; le Produit-67 écrit le sidecar de rattachement en traitant.
 <!-- ROLE:FIN -->
 
 ## Contenu

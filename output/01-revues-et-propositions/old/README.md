@@ -12,7 +12,7 @@ que pour une raison, et jamais pour être corrigé : *une nouvelle version est u
 jamais un écrasement* (R-5). Son **sceau de jugement l'accompagne** — le `.jugement.json` voyage avec
 l'artefact, sinon la preuve se détacherait de ce qu'elle prouve.
 
-**Qui y écrit** : le pilot, sur décision humaine, quand un livrable cesse d'être la référence — soit
+**Qui y écrit** : le Produit-67, sur décision humaine, quand un livrable cesse d'être la référence — soit
 qu'une version datée le remplace, soit qu'il ne soit plus lu. **Quand** : au moment de la décision, et
 l'ancien chemin s'inscrit alors dans la table de correspondance de `output\LISEZMOI.md` (D-15 al. e) —
 un livrable déplacé sans trace est un lien mort dans tous les documents qui le citaient.
