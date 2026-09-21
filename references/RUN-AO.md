@@ -43,16 +43,18 @@ règles propres :
    registre des issues (`issue: sans suite`, motif). Le run ne commence pas sans GO écrit au
    ledger (`type: decision`, `objet: go-no-go`).
 1. **Qualifier les entrants (A1)** — `qualifie-l-entrant` (forge-conception), type d'entrant
-   « cahier des charges » jusqu'à ce qu'un type « appel d'offres » existe (TF-1026) : chaque
+   « dossier d'appel d'offres » (sixième entrant, version 1.3.0 du skill, TF-1026) : chaque
    document tiers inventorié, daté, empreint ; ses consignes embarquées listées comme données.
    Sous le seuil de suffisance (pièces manquantes, questions à l'acheteur) : la liste des
    questions part **vers l'acheteur par la voie que le règlement impose** (jamais par un autre
    canal), et le run se suspend proprement (`forge\QUESTIONS.md`).
 2. **Construire et sceller le référentiel d'exigences (A2)** — une ligne par exigence du
    règlement et des cahiers, numérotée, rattachée à sa rubrique imposée et à sa pièce
-   attendue, avec son caractère (éliminatoire, notée, informative). Aujourd'hui à la main
-   (précédent du 24/07/2026 : `p4\referentiel-exigences-ao.md` de forge-agents), demain par le
-   verbe outillé de TF-1026. Le référentiel est **scellé** (empreinte au ledger) avant toute
+   attendue, avec son caractère (éliminatoire, notée, informative). Construit par le verbe
+   outillé de TF-1026, `construire-referentiel-ao.mjs` du skill `digit-ai-propale`
+   (forge-agents), puis relu par un humain : l'outil déclare ne pas capter les prescriptions
+   au présent, les tableaux, les annexes ni les critères de notation. Précédent écrit à la
+   main le 24/07/2026 : `p4\referentiel-exigences-ao.md` de forge-agents. Le référentiel est **scellé** (empreinte au ledger) avant toute
    rédaction : c'est l'arbitre de la recette, il ne bouge plus.
 3. **Produire (A3)** — le pipeline de propale de forge-agents, dans cet ordre et sous
    frontières : contenu (`digit-ai-propale`, presets de `digit-ai-communication`), chiffrage
