@@ -19,6 +19,13 @@
 > par section : la section 7 était la seule sans source, et plutôt que de la garder sur la
 > foi d'un raisonnement d'expert, le corpus a été rebalayé. `DAT-complements.md` la couvre.
 
+## 1.1.1 (21/09/2026) — la largeur de page se déclare
+
+Le squelette et l'instance portent `<body data-largeur="lecture">` (règle D10, TF-1038) : leurs
+douze chapitres sont bridés depuis les corrections du 15/09/2026, et la page le dit désormais.
+Ces corrections — douze chapitres bridés, sommaire collant sous 900 px — étaient
+restées sous le numéro 1.1.0 ; la 1.1.1 les couvre.
+
 ## Verdict de non-recouvrement — et pourquoi ce gabarit ASSEMBLE au lieu de décrire
 
 C'est la pièce la plus importante de ce fichier. Le recouvrement avec l'existant est **fort**,
@@ -49,7 +56,7 @@ role_destinataire: comité d'architecture / client / repreneur
 sources_de_verite: ["docs\projet\ARCHITECTURE.md", "docs\projet\COMPOSANTS-OPS.md", "{registre ADR}"]
 verifie_le: {AAAA-MM-JJ}
 gabarit: gd-dossier-architecture
-version_du_gabarit: 1.1.0
+version_du_gabarit: 1.1.1
 etat_decrit: {existant | cible | existant et cible}
 ---
 

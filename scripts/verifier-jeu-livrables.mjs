@@ -24,6 +24,9 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, dirname, basename, extname } from "node:path";
 import { fileURLToPath } from "node:url";
+// TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
+// il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
+import { livrablesPorteurs } from "./lib-extensions-jugees.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -34,8 +37,9 @@ const CATALOGUE = iC > -1 ? args[iC + 1] : join(PILOT, "gabarits", "documents", 
 const cible = args.find((a, i) => !a.startsWith("--") && (iC === -1 || i !== iC + 1)) || null;
 
 const ID_GABARIT = /gabarit\s*:\s*(gd-[a-z0-9-]+)/i;
-/** Seuls les fichiers porteurs du marqueur de famille sont jugés — un texte libre ne l'est pas. */
-const PORTEURS = new Set([".html", ".htm", ".md"]);
+/** Seuls les fichiers porteurs du marqueur de famille sont jugés — un texte libre ne l'est pas.
+ *  La liste des extensions vient du référentiel, jamais d'ici (TF-1266). */
+const PORTEURS = livrablesPorteurs();
 
 const sortir = (verdict, code, findings, motif = null) => {
   console.log(JSON.stringify({

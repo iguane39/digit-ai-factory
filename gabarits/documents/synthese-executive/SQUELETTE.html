@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- A3 (TF-0303, 17/08) — charset PUIS viewport en TOUTE PREMIÈRE position : la
+     déclaration d'encodage doit tomber dans les 1024 premiers octets, sinon l'analyseur
+     devine. Le commentaire S-G1 ci-dessous et son script la repoussaient au 1613e octet :
+     mesuré par check_html.py, sur ce gabarit même. L'ordre compte, la position aussi. -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="destinataire" content="humain">
+<!-- TF-0504 (22/08/2026) — MARQUE DE DESTINATAIRE. R-2 d'oracle-conformite-projet ne juge
+     la localisation que des artefacts MARQUÉS : sans cette balise, un document né de ce
+     squelette échappe au contrôle par CONSTRUCTION, pas par oubli du producteur. Mesuré le
+     22/08 : 7 gabarits `ok` sur 7 sans marque lisible par R-2. Valeur fermée : `humain`
+     pour un livrable, `aucun` pour un document normatif (précision D-06). -->
+<!-- S-G1 (1/4, R-30 amendé TF-0158 le 13/08) — initialisation AVANT le <style> : pose
+     data-theme avant la première peinture (zéro flash). CLAIR PAR DÉFAUT, STRICTEMENT :
+     un livrable circule et s'ouvre identique chez tous ses lecteurs — l'auto-sombre
+     hérité de l'OS (prefers-color-scheme) est retiré (il a valu un retour humain réel
+     le 13/08 : « thème sombre par défaut »). Le sombre reste un CHOIX du lecteur,
+     persisté. Volontairement SANS defer/async : un script différé peindrait d'abord le
+     thème par défaut du CSS puis re-peindrait, c'est le flash que ce script évite
+     (déclenche le WARN générique « script bloquant en head » de check_html.py —
+     exception assumée, documentée ici). -->
+<script>
+(function () {
+  var stocke = null;
+  try { stocke = localStorage.getItem('digitai-theme'); } catch (e) {}
+  var theme = stocke === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  /* RV-9 (14/08) : `color-scheme` SUIT le thème effectif. Laissé à « light dark », le
+     navigateur peignait ses propres surfaces (ascenseurs, contrôles de formulaire) en
+     sombre dès que le poste l'était — un corps clair bordé de chrome sombre, alors même
+     que la règle dit « clair par défaut ». Le figer à « light » aurait produit l'inverse
+     après bascule. Il suit donc, et reste juste dans les deux états. */
+  var meta = document.querySelector('meta[name="color-scheme"]');
+  if (meta) { meta.setAttribute('content', theme); }
+})();
+</script>
+  <!-- A4 : marque — objet · client — indice de version DATÉ ({YYYYMMDD}{a,b,c…}, le même
+       que le nom de fichier). Sans lui, deux révisions du même jour portent le même nom à
+       l'écran ; « V1 » ne les distingue pas (défaut du 17/08, lot Produit-01). -->
+  <!--
+  SQUELETTE — Synthèse exécutive · bibliothèque de gabarits de documents du pilot.
+  Dérivé de assets/boilerplate.html du socle digit-ai-page-html (forge-agents), auquel il
+  AJOUTE ce que la famille exige et que le socle ne fournit pas encore :
+    · le repli des tableaux en cartes sous 900 px (doctrine D3) — un conteneur
+      `overflow-x: auto` rend un tableau consultable, il ne le rend pas lisible et ne fait pas
+      passer le contrôle de débordement. Mesuré le 21/08 : 26 défauts à 390 px sur une page
+      dont TOUS les tableaux étaient déjà dans un conteneur scrollable, 0 après repli.
+      Versé au socle en candidat (TF-0442) ; tant qu'il n'y est pas, il vit ici.
+    · l'état vide d'une table filtrée (doctrine D4), écrit en toutes lettres.
+  Ce qui vient du socle n'est PAS recopié en doctrine : largeur de lecture (.chap.lire),
+  thème, print, favicon, bascule sombre restent la propriété du socle et suivent ses correctifs.
+-->
+<title>Digit-AI — Synthèse exécutive — 20260914a</title>
+  <meta name="description" content="{Résumé clair du livrable en une phrase.}">
+  <meta name="theme-color" content="#2563EB">
+  <!-- « light » à l'écriture : le script d'initialisation ci-dessus le passe à « dark » si,
+       et seulement si, le lecteur a explicitement choisi le sombre (RV-9, 14/08). -->
+  <meta name="color-scheme" content="light">
+  <!-- Favicon-lettre (systématisation du 13/08, loi transverse n°3 : la surface implicite
+       se propose d'office) : remplacer {L} par la PREMIÈRE LETTRE du client ou du projet. -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3E{L}%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices : AUCUN chargement réseau (A1/D-10 — confidentialité, durabilité,
+       lecture hors ligne). Roboto/DM Sans s'affichent si installées localement,
+       sinon les replis système des tokens --head/--sans/--mono prennent le relais. -->
+
+  <style>
+    :root {
+      /* Couleurs — marque & surfaces */
+      --blue: #2563EB;
+      --bg: #FAFBFF;
+      --surface: #FFFFFF;
+      --card: #FFFFFF;
+      /* Focus — PRESCRIT par token, consomme par toute affordance (RGAA 10.7, WCAG 2.4.7) :
+         un anneau improvise par chaque auteur n'est pas une charte. */
+      --focus-anneau: 2px solid var(--blue);
+      --focus-decalage: 2px;
+      /* Couleurs — encres */
+      --ink: #0F172A;
+      --muted: #64748B;
+      --faint: #94A3B8;
+      --line: #E6EAF2;
+      /* Accents sémantiques */
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      /* Rouge — quatrieme accent semantique, AJOUT de la bibliotheque (14/09) : le
+         boilerplate du socle n en porte pas, et les familles affichent des etats
+         DEFAVORABLES (bloquant, ecarte, probabilite forte) que ok/part/info ne disent pas.
+         Meme grammaire que les trois autres : encre pleine, fond tres clair, filet.
+         Verse en candidat au socle ; tant qu il n y est pas, il vit ici. */
+      --red:   #B91C1C; --red-fill:   #FEF2F2; --red-line:   #F7D4D4;
+      /* Fonds PLEINS des badges — encre blanche dessus. Valeurs reprises de la fixture
+         verte du socle ; elles ne changent pas entre clair et sombre : un etat garde sa
+         couleur quel que soit le theme, et le contraste de l encre blanche est tenu par
+         la clarte du fond, pas par celle de la page. */
+      --green-solid: #166534; --teal-solid: #0F5F8F;
+      --amber-solid: #92400E; --red-solid:  #B91C1C;
+      /* Rayons */
+      --r: 12px; --r-sm: 8px;
+      /* Largeur du conteneur et largeur de lecture — cf. regle L2.
+         Le conteneur occupe 75-100 % de la fenetre A TOUTE TAILLE (decision 13/08) :
+         92vw sous ~1826px, plafond confort 1680px, plancher 75vw au-dela. */
+      --w: clamp(75vw, 1680px, 92vw); --prose: 75ch;
+      /* Familles (repli système obligatoire) */
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      /* Année de référence (token isolé) */
+      --annee-ref: "2026";
+    }
+
+    /* S-G1 (2/4, R-30) — tokens sombres : une source, deux projections. bg/surface
+       s'assombrissent vers une base marine ; ink/muted/faint s'éclaircissent en
+       dégradé inverse ; line reste un filet proche du fond ; chaque accent
+       sémantique éclaircit sa teinte de base (lisible sur fond sombre) et assombrit
+       son -fill/-line en griffe basse de la même teinte. */
+    :root[data-theme="dark"] {
+      --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
+      --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
+      --blue: #7DA2F5;
+      --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
+      --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
+      --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+      --red:   #F59B9B; --red-fill:   #2C1414; --red-line:   #4E2323;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.55;
+      font-size: 16px;
+    }
+    /* Regle L2 (corrigee, TF-0421 — lot Produit-05 20260820a) : la mesure de lecture est portee
+       par le CONTENEUR, jamais par le paragraphe. L'ancienne doctrine (« conteneur relatif,
+       prose bornee en ch ») bridait chaque <p> a 75ch : a 1 800 px, 60 % de la fenetre vide,
+       livre vert, refuse par le client. Deux gabarits de chapitre NOMMES remplacent la bride :
+         .chap.lire  — conteneur de lecture (~1 080 px centres) : le texte le remplit ;
+         .chap.duo   — grille 7/5 texte + encart utile (KPI, legende, figure), repli < 1 100 px.
+       Un <p> seul sur une largeur de 1 680 px reste illisible : c'est le CHAPITRE qu'on
+       retrecit (.chap.lire), pas la ligne. render_page.py L2 juge quelle que soit la propriete. */
+    .wrap { max-width: var(--w); margin: 0 auto; padding: 32px 24px 64px; }
+    .chap.lire { max-width: 1080px; margin-left: auto; margin-right: auto; }
+    .chap.duo { display: grid; grid-template-columns: 7fr 5fr; gap: 32px; align-items: start; }
+    @media (max-width: 1100px) { .chap.duo { grid-template-columns: 1fr; } }
+
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .5em; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin: 1.5em 0 .4em; }
+    p, li { margin: 0 0 1em; }
+    a { color: var(--blue); }
+    code, pre { font-family: var(--mono); }
+
+    header.doc {
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 16px; margin-bottom: 24px;
+    }
+    .eyebrow { color: var(--muted); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
+
+    /* S-G1 (3/4, R-30) — bouton de bascule, en-tête, haut à droite */
+    .theme-toggle { appearance: none; border: 1px solid var(--line); background: var(--surface);
+      color: var(--ink); border-radius: 999px; width: 36px; height: 36px; flex: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; }
+    .theme-toggle:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 20px 24px;
+      margin: 16px 0;
+    }
+
+    footer.doc {
+      margin-top: 48px; padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted); font-size: .85rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .wrap { padding: 24px 16px 48px; }
+      h1 { font-size: 1.6rem; }
+    }
+
+    /* Respect du mouvement réduit (a11y) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+
+    /* Export PDF / impression */
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      /* S-G1 (2/4 suite, R-30.2) — impression toujours claire, quel que soit le
+         thème affiché à l'écran au moment d'imprimer. */
+      :root, :root[data-theme="dark"] {
+        --bg:#FFFFFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
+        --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2; --blue:#2563EB;
+        --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
+        --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
+        --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+        --red:#B91C1C;   --red-fill:#FEF2F2;   --red-line:#F7D4D4;
+      }
+      body { background: var(--surface); }
+      .wrap { max-width: none; padding: 0; }
+      .card { break-inside: avoid; page-break-inside: avoid; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+      .theme-toggle { display: none; }
+    }
+
+    /* ── D3 · repli des tableaux en cartes sous 900 px ────────────────────────
+       Chaque <td> porte data-label="<en-tête de sa colonne>". Sous 900 px, la ligne
+       devient une carte et l'en-tête de colonne devient l'étiquette de la valeur. Le
+       tableau reste dans un conteneur .table-hote (overflow-x: auto) AU-DESSUS de 900 px,
+       pour les écrans intermédiaires — les deux se complètent, le conteneur ne remplace
+       pas le repli. */
+    /* La légende de table reste VISIBLE : le socle ne définit aucune classe de masquage
+       accessible, et une classe qui ne masque rien serait un mensonge de plus dans le CSS.
+       Une légende lue par tous vaut mieux qu une légende réservée aux lecteurs d écran. */
+    caption { text-align: left; font-weight: 700; padding: 0 0 8px; }
+    .table-hote { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-weight: 700; }
+    /* TF-0558 (24/08/2026) — LE SEUIL ETAIT FIGE A 900 px, ET TOUT PROJET QUI INSTANCIE CETTE
+       FAMILLE LE REPRODUISAIT. Mesure sur un livrable reel : un tableau de huit colonnes debordait
+       jusque vers 1 400 px (bord droit a 1 308 px pour un viewport de 1 280) — SEIZE debordements
+       bloquants, invisibles cinq jours. Le seuil ne depend pas d'un pixel choisi mais du NOMBRE DE
+       COLONNES : ~165 px de largeur utile par colonne de prose, mesure et non regle du pouce.
+
+       Les paliers ci-dessous LISENT ce nombre dans le marquage — aucun emetteur n'a plus rien a
+       calibrer, et un tableau qui gagne une colonne se replie plus tot sans qu'une ligne de CSS
+       bouge. Le palier de base (900 px) reste pour les tableaux de quatre colonnes ou moins. */
+    @media (max-width: 1400px) {
+      .table-hote:has(th:nth-child(7)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 1020px) {
+      .table-hote:has(th:nth-child(5)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 900px) {
+      .table-hote { overflow-x: visible; }
+      /* thead retiré du flux en mode carte. Le masquage « hors écran » (position absolue +
+         clip) a été essayé D ABORD et REFUSÉ par render_page : les <th> gardent leur largeur
+         naturelle et débordent — 3 BLOQUANTS V1 mesurés à 390 px sur ce squelette même. Le
+         libellé de colonne n est pas perdu : il est rendu par td::before à partir de
+         data-label, et <caption> décrit la table. */
+      table.repli-cartes thead { display: none; }
+      table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; }
+      table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+      table.repli-cartes td[data-label=""]::before { content: none; }
+    }
+
+    /* ── D4 · état vide : une table qui ne laisse rien le DIT ──────────────── */
+    .etat-vide { display: none; padding: 16px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
+    .table-hote[data-vide="oui"] table { display: none; }
+    .table-hote[data-vide="oui"] .etat-vide { display: block; }
+    /* Sommaire (L6) — le `nav.toc` était déclaré sans jamais être stylé : il se rendait en
+       liste numérotée nue, ce qu'aucun livrable Digit-AI ne fait. Forme alignée sur les
+       livrables réels du parc : deux colonnes, titre souligné en bloc, annonce en gris dessous.
+       Marquage attendu par entrée : <a href="#id"><span class="toc-t">…</span><span class="toc-d">…</span></a> */
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
+    .toc h2 { margin-top: 0; }
+    .toc ol, .toc ul { columns: 2; column-gap: 32px; padding-left: 20px; }
+    .toc li { break-inside: avoid; max-width: none; margin-bottom: .6em; }
+    .toc a { text-decoration: none; }
+    .ch-apprend { color: var(--muted); margin: .2em 0 1.1em; }
+
+    /* TF-0787 (03/09/2026) — au-delà de trois chapitres, le sommaire est LATÉRAL et COLLANT sur
+       bureau (L25 du socle, famille de rendu sommaire_perdu) : un sommaire posé en tête d'un
+       document de quatre écrans disparaît au premier tiers de la lecture et ne navigue plus rien.
+       Grille deux colonnes, sommaire collé au bord haut, une colonne d'entrées ; sous 900 px, le
+       sommaire redevient un bloc statique en tête. */
+    .doc-grille { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .doc-grille > nav.toc { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; margin: 0; padding: 16px 18px; }
+    .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
+    .doc-grille > nav.toc h2 { font-size: 1.05rem; margin: 0 0 .5em; }
+    .doc-grille > .doc-corps { min-width: 0; }
+    /* Le geste canonique du socle (L25) pose `position: static` sous 900 px et ANNONCE en
+       commentaire une « bande repliable sur mobile » que son CSS ne fournit pas : mesure le
+       15/09 sur les cinq familles, `sommaire_perdu` BLOQUANT a 768 px et a 390 px, sur des
+       pages de 3 a 4 ecrans. La bande existe ici — le sommaire reste colle en tete, borne au
+       tiers de la fenetre et defilable : atteignable sans manger l ecran. */
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      .doc-grille > nav.toc { position: sticky; top: 0; max-height: 33vh; overflow: auto; z-index: 5; }
+    }
+    .toc .toc-t { display: block; text-decoration: underline; }
+    .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
+
+    /* ── Encre secondaire et badges de statut ─────────────────────────────────
+       Loi transverse n°1 : toute affordance est cablee ou n existe pas. `muted` et
+       `badge` etaient EMPLOYEES par ces gabarits sans aucune regle CSS — mesure le
+       15/09 sur les cinq familles : un `<span class="badge ok">` se rendait en texte
+       nu, sans pastille ni fond, et l etat qu il annonce ne se voyait pas.
+       Forme reprise TELLE QUELLE de references/composants.md du socle (§2) : le texte
+       reste en --ink (contraste garanti), la couleur semantique est portee par la
+       pastille, le fond et le filet — jamais par le texte colore seul, qui echoue le
+       contraste AA et viole WCAG 1.4.1 (couleur seule). */
+    .muted { color: var(--muted); }
+    /* L identification du document est de la PROSE, et se borne comme telle : mesure le
+       15/09, 105 caracteres par ligne a 3840 px des que l objet du document est long (V18
+       bloquant). Le header est en flex, rien ne le bornait. */
+    /* La bride est portee par le BLOC qui porte le texte, jamais par le texte : L2 refuse
+       `max-width` pose sur un <p> (mesure le 15/09, ratio 0.80 pour un seuil de 0.85) et
+       l attribut de declaration ne vaut que pour V18. La doctrine du socle est la meme des
+       deux cotes — la mesure de lecture se pose sur le CONTENEUR. */
+    /* 84ch et non 90 : `ch` mesure le zero, la police de corps est plus etroite, et 90ch
+       laissait passer 103 caracteres par ligne — mesure le 15/09, V18 bloquant a 2560 px. */
+    .doc-ident { max-width: 84ch; }
+    /* Une chaine technique ne deborde pas : mesure le 15/09, une URL et un motif de format
+       en monospace poussaient une table a 465 px dans une fenetre de 390 (V1 bloquant, 33
+       descendants entraines). Les mots ordinaires ne se coupent PAS — `break-word` n agit
+       que si le mot ne tient pas dans sa colonne ; `anywhere` est reserve au monospace, ou
+       la chaine n a pas de cesure naturelle. */
+    th, td { overflow-wrap: break-word; }
+    code { overflow-wrap: anywhere; }
+    /* Fonds PLEINS et non pastel : mesure le 15/09, la forme pastel de composants.md §2 du
+       socle rend 18 a 36 constats V16 « etats indiscernables » par page — ses quatre teintes
+       de fond vivent toutes entre L* 93 et 97, et V16 du meme socle les refuse. Forme reprise
+       de la fixture VERTE du socle (v16-etats-pleins.html) : fond plein, encre blanche,
+       GLYPHE par palier — la distinction ne repose jamais sur la seule couleur (WCAG 1.4.1). */
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 700;
+      color: #FFFFFF; padding: 2px 10px; border-radius: 999px; border: 1px solid transparent; }
+    .badge.ok   { background: var(--green-solid); }
+    .badge.part { background: var(--amber-solid); }
+    .badge.info { background: var(--teal-solid); }
+    .badge.ko   { background: var(--red-solid); }
+    .badge.ok::before   { content: "\2713"; }
+    .badge.part::before { content: "\2192"; }
+    .badge.info::before { content: "\2194"; }
+    .badge.ko::before   { content: "\2717"; }
+  </style>
+</head>
+<body data-largeur="lecture">
+  <div class="wrap">
+    <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div class="doc-ident">
+        <p class="eyebrow">{Client} · Synthèse exécutive</p>
+        <h1>Synthèse exécutive</h1>
+        <p class="muted">Objet : {ce sur quoi porte l'audit} · Établi le {JJ/MM/AAAA} · Indice : {AAAAMMJJ}{i}<br>Destinataire : {instance de décision} · Périmètre : {ce qui est couvert}<br>Gabarit : gd-synthese-executive · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+      </div>
+      <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
+      <button id="theme-toggle" class="theme-toggle" type="button"
+              aria-label="Bascule thème sombre" aria-pressed="false">
+        <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+        </svg>
+        <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="4.5"/>
+          <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <div class="doc-grille">
+      <nav class="toc" aria-label="Sommaire">
+        <h2>Sommaire</h2>
+        <ol>
+          <li><a href="#verdict"><span class="toc-t">Verdict</span><span class="toc-d">le verdict et le score global, en une page</span></a></li>
+          <li><a href="#risques"><span class="toc-t">Les trois risques majeurs</span><span class="toc-d">trois risques, en impact métier</span></a></li>
+          <li><a href="#decisions"><span class="toc-t">Les décisions attendues</span><span class="toc-d">ce qui est demandé à l'instance de décision</span></a></li>
+          <li><a href="#cout"><span class="toc-t">Coût et délai de remédiation</span><span class="toc-d">l'ordre de grandeur, jamais en jours</span></a></li>
+          <li><a href="#echeance"><span class="toc-t">La prochaine échéance</span><span class="toc-d">la date et ce qui y sera mesuré</span></a></li>
+          <li><a href="#pouraller"><span class="toc-t">Pour aller plus loin</span><span class="toc-d">où lire le détail, document par document</span></a></li>
+        </ol>
+      </nav>
+      <div class="doc-corps">
+      <!-- UNE SEULE LARGEUR DE CONTENU (V19) : aucune section ne porte `.lire`.
+           UN MEME ENSEMBLE N EST ENUMERE QU UNE FOIS (L32) : le detail vit dans la ligne. -->
+
+      <section class="chap lire" id="verdict">
+        <h2>Verdict</h2>
+        <p class="chapo ch-apprend">{Le verdict de l'audit et son score global, en trois à cinq lignes. Ce chapitre se rédige en dernier et se lit en premier.}</p>
+        <p class="contenu">Ce chapitre contient le verdict, le score global et la date de l'audit. Il ne contient ni risque ni décision : ils ont leur chapitre.</p>
+<p>Verdict : {verdict} · Score global : {n} sur {m} · Audit mené du {date} au {date}.</p>
+      </section>
+
+      <section class="chap lire" id="risques">
+        <h2>Les trois risques majeurs</h2>
+        <p class="chapo ch-apprend">{Ce que les trois risques ont en commun, avant leur détail. Ils sont énoncés en impact MÉTIER, jamais en vocabulaire technique.}</p>
+        <p class="contenu">Ce chapitre contient trois risques au plus, chacun avec son impact métier, sa probabilité et sa parade. Il ne contient pas le plan de remédiation complet.</p>
+        <table class="repli-cartes">
+          <caption>Les trois risques majeurs, en impact métier</caption>
+          <thead><tr>
+            <th data-definition="Le risque énoncé en impact métier, jamais en vocabulaire technique.">Risque</th>
+            <th data-definition="Ce que l'organisation perd concrètement — un service, un délai, une conformité.">Impact si réalisé</th>
+            <th data-definition="Probabilité déclarée. Valeurs : forte, moyenne, faible.">Probabilité</th>
+            <th data-definition="Le geste qui le réduit, et le rôle qui le porte.">Parade</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>{le risque, en impact métier}</td><td>{ce qui est perdu}</td><td><span class="badge part" title="Probabilité : moyenne — plausible sans être attendue.">{moyenne}</span></td><td>{la parade} — {rôle}</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chap lire" id="decisions">
+        <h2>Les décisions attendues</h2>
+        <p class="chapo ch-apprend">{Ce qui est demandé, et à qui. Une synthèse exécutive qui ne demande rien est un rapport de plus.}</p>
+        <p class="contenu">Ce chapitre contient les décisions demandées, le rôle qui les prend et l'échéance de chacune.</p>
+        <table class="repli-cartes">
+          <caption>Les décisions attendues de l'instance de décision</caption>
+          <thead><tr>
+            <th data-definition="Ce qui doit être tranché, formulé en choix et non en question ouverte.">Décision</th>
+            <th data-definition="Un RÔLE, jamais un nom de personne.">Attendue de</th>
+            <th data-definition="L'échéance, au format ISO, et ce qui la commande.">Avant le</th>
+            <th data-definition="Ce qui se produit par défaut. Une décision sans option par défaut n'en est pas une.">Si rien n'est décidé</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>{la décision}</td><td>{rôle}</td><td>{2026-10-15}</td><td>{ce qui se produit}</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chap lire" id="cout">
+        <h2>Coût et délai de remédiation</h2>
+        <p class="chapo ch-apprend">{L'ordre de grandeur de la remédiation, en complexité et en durée. Un chiffre en jours n'a pas de sens ici et n'y figure pas.}</p>
+        <p class="contenu">Ce chapitre contient l'ordre de grandeur de l'effort et de la durée, par lot de remédiation. Il ne contient aucun montant.</p>
+<p>Remédiation : complexité {simple | moyen | complexe | très complexe} × durée {court | moyen | long | très long}. Le détail par lot vit au plan de remédiation.</p>
+      </section>
+
+      <section class="chap lire" id="echeance">
+        <h2>La prochaine échéance</h2>
+        <p class="chapo ch-apprend">{La prochaine échéance et ce qui y sera confronté aux faits. Une synthèse sans rendez-vous ne se corrige jamais.}</p>
+        <p class="contenu">Ce chapitre contient la date de la prochaine revue et les mesures qui y seront rejouées.</p>
+<p>Prochaine échéance : {AAAA-MM-JJ}. Ce qui y sera mesuré : {les indicateurs, avec leur source}.</p>
+      </section>
+
+      <section class="chap lire" id="pouraller">
+        <h2>Pour aller plus loin</h2>
+        <p class="chapo ch-apprend">{Où trouver le détail. Ce chapitre renvoie, il ne résume pas : un résumé de plus ferait un troisième document à tenir à jour.}</p>
+        <p class="contenu">Ce chapitre contient les renvois vers le rapport complet, le registre des risques et le plan de remédiation.</p>
+<p>Rapport complet : {chemin} · Registre des risques : {chemin} · Plan de remédiation : {chemin}.</p>
+      </section>
+      </div>
+      </div>
+    </main>
+
+    <footer class="doc">
+      {Client} · Synthèse exécutive · {AAAAMMJJindice}
+    </footer>
+  </div>
+
+  <!-- S-G1 (4/4, R-30) — câblage : persistance + aria-pressed, aucune bascule muette -->
+  <script>
+  (function () {
+    var bouton = document.getElementById('theme-toggle');
+    var racine = document.documentElement;
+    function appliquer(theme) {
+      racine.setAttribute('data-theme', theme);
+      localStorage.setItem('digitai-theme', theme);
+      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    }
+    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    bouton.addEventListener('click', function () {
+      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  })();
+  </script>
+</body>
+</html>
