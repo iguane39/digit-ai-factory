@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "genere": "2026-09-17",
   "ecrivain": "humain (édition directe)",
-  "regle": "SOURCE UNIQUE des extensions qu'un contrôle du pilot juge. Née le 17/09/2026 de la décision humaine D-15 (a), sur le constat TF-1087 : quatre contrôles énuméraient chacun leur liste et elles divergeaient — `.pdf` n'était jugé que par un sur quatre, et aucune source ne tranchait. Ce fichier est une DONNÉE, pas du code (loi transverse n° 4) : une famille de livrable neuve s'ajoute ici, datée et motivée, sans toucher à un seul contrôle. Lecteur : scripts/lib-extensions-jugees.mjs. Une extension absente de ce fichier n'est jugée par AUCUN contrôle qui le lit — c'est le prix de la source unique, et c'est pourquoi tout ajout de famille passe par ici.",
+  "regle": "SOURCE UNIQUE des extensions qu'un contrôle du pilot juge. Née le 17/09/2026 de la décision humaine D-15 (a), sur le constat TF-1266 : quatre contrôles énuméraient chacun leur liste et elles divergeaient — `.pdf` n'était jugé que par un sur quatre, et aucune source ne tranchait. Ce fichier est une DONNÉE, pas du code (loi transverse n° 4) : une famille de livrable neuve s'ajoute ici, datée et motivée, sans toucher à un seul contrôle. Lecteur : scripts/lib-extensions-jugees.mjs. Une extension absente de ce fichier n'est jugée par AUCUN contrôle qui le lit — c'est le prix de la source unique, et c'est pourquoi tout ajout de famille passe par ici.",
   "roles": {
     "livrables_porteurs": {
       "quoi": "Ce qui, rendu à un humain, est un livrable — et donc ce qu'un contrôle de jeu, de jugement ou de propagation doit voir.",

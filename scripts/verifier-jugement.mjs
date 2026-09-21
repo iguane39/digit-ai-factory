@@ -30,7 +30,7 @@
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
 import { join, extname, basename } from "node:path";
 import { createHash } from "node:crypto";
-// TF-1087 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
+// TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
 // il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
 import { livrablesPorteurs } from "./lib-extensions-jugees.mjs";
 

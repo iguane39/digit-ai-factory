@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * lib-extensions-jugees.test.mjs — recette de `lib-extensions-jugees.mjs` (TF-1087, D-15 (a)).
+ * lib-extensions-jugees.test.mjs — recette de `lib-extensions-jugees.mjs` (TF-1266, D-15 (a)).
  *
  * Les deux sens sur chaque promesse. Le sens ROUGE compte plus que le vert ici : une source unique
  * qui rend une liste VIDE quand son référentiel est illisible est pire que quatre listes en dur —

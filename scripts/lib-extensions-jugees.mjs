@@ -1,5 +1,5 @@
 /**
- * LE PÉRIMÈTRE DES EXTENSIONS SE LIT, IL NE SE RECOPIE PAS (TF-1087, décision D-15 (a) du
+ * LE PÉRIMÈTRE DES EXTENSIONS SE LIT, IL NE SE RECOPIE PAS (TF-1266, décision D-15 (a) du
  * 17/09/2026).
  *
  * Le fait mesuré : quatre contrôles du pilot énuméraient chacun leur propre liste de « ce qui est

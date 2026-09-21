@@ -56,7 +56,7 @@ const IGNORES = new Set(["node_modules", ".git", ".venv", "venv", "__pycache__",
 
 /**
  * Les dossiers de MEP d'un produit, cherchés sur QUATRE niveaux — et la borne se DÉCLARE
- * (TF-1088, décision D-15 (a) du 17/09/2026).
+ * (TF-1267, décision D-15 (a) du 17/09/2026).
  *
  * Ce commentaire disait « où qu'ils vivent — la doctrine n'impose pas leur place » au-dessus d'un
  * `profondeur = 4`. Un dossier au cinquième niveau échappait donc au contrôle, et RIEN ne le
@@ -118,7 +118,7 @@ export function juger(racine) {
   const sansObjet = (regle, ou, message) => findings.push({ regle, statut: "SANS_OBJET", ou, message });
 
   const dossiers = dossiersMep(racine);
-  // TF-1088 — LA BORNE DE RECHERCHE SE DÉCLARE. Un dossier de MEP posé plus profond que la borne
+  // TF-1267 — LA BORNE DE RECHERCHE SE DÉCLARE. Un dossier de MEP posé plus profond que la borne
   // échappait à ce contrôle sans qu'aucune ligne du verdict ne le dise, et le silence se lisait
   // comme « rien à signaler ». Il se lit désormais comme ce qu'il est : « non regardé ».
   if (dossiers.bornesAtteintes?.length) {

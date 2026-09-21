@@ -57,7 +57,7 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, mkdirSy
 import { join, dirname, extname, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-// TF-1087 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
+// TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
 // il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
 import { livrablesPorteurs } from "../scripts/lib-extensions-jugees.mjs";
 const PORTEURS = livrablesPorteurs();

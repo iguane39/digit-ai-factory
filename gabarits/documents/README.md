@@ -50,7 +50,7 @@ recommandée :
 
 | Pièce | Où | Ce qu'elle fait |
 |---|---|---|
-| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G4** — et cette ligne a annoncé un « G8 » que rien n'implémentait jusqu'au 14/09/2026 (TF-1077) |
+| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G4** — et cette ligne a annoncé un « G8 » que rien n'implémentait jusqu'au 14/09/2026 (TF-1256) |
 | **La demande** | `gabarits\RETOURS-FORGES.md`, section « Retours sur les documents produits » | quatre colonnes, par ordre d'utilité : ce qui a été **ajouté à la main**, ce qui a **gêné le lecteur**, ce qui a **manqué**, la **portée** |
 | **Le refus** | `ingerer-lot.mjs` et **B7** de `oracle-boite-entree` | un lot du 22/08 ou après qui ne porte pas la section est refusé à l'ingestion, registre intact (R-46) |
 
