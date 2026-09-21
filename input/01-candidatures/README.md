@@ -29,6 +29,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `constat-rendu-tableau-de-bord-20260914g.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `constats-boite-entree-20260914a.tf.jsonl` | fichier | 6,8 Ko | 3 ligne(s) JSONL |
 | `constats-campagne-20260914b.tf.jsonl` | fichier | 14,6 Ko | 11 ligne(s) JSONL |
+| `constats-campagne-20260920c.tf.jsonl` | fichier | 15,0 Ko | 8 ligne(s) JSONL |
 | `constats-campagnes-mandat-20260914c.tf.jsonl` | fichier | 7,5 Ko | 4 ligne(s) JSONL |
 | `constats-campagnes-todos-retours-20260919a.tf.jsonl` | fichier | 7,9 Ko | 7 ligne(s) JSONL |
 | `constats-ci-et-confidentialite-20260915b.tf.jsonl` | fichier | 5,5 Ko | 2 ligne(s) JSONL |
@@ -82,4 +83,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_64 fichier(s), 1 sous-dossier(s)_
+_65 fichier(s), 1 sous-dossier(s)_

@@ -58,6 +58,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` | fichier | 17,3 Ko | La boîte d'entrée est vide, 15 todos sont clos, et une campagne travaille encore |
 | `Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` | fichier | 17,5 Ko | Vos trois décisions sont exécutées, et la question que vous n'avez pas pu lire est reposée |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` | fichier | 22,6 Ko | Synthèse de mandat — les retours en attente sont entrés au registre et la campagne des cin |
+| `Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md` | fichier | 30,0 Ko | Campagne des todos et retours du 20/09/2026 : 18 items décidés clos sur preuve rejouée, 18 |
+| `Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md` | fichier | 17,6 Ko | Point d'étape — campagne des todos et retours : 17 items clos au registre, 8 constats entr |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
 | `Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` | fichier | 20,1 Ko | Synthèse de mandat — campagnes en cours : trois corrections vérifiées et closes, trois cam |
 | `Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` | fichier | 25,4 Ko | Synthèse de mandat — le canal confidentiel existe et les tables y vivent, la forge des out |
@@ -177,4 +179,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_160 fichier(s), 0 sous-dossier(s)_
+_162 fichier(s), 0 sous-dossier(s)_
