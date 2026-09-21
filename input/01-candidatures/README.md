@@ -57,6 +57,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `oracle-fidelite-de-traduction-absent-du-registre-20260916a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `page-registre-octets-nuls-20260912a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `personas-banc-defauts-echappes-20260914a.tf.jsonl` | fichier | 2,9 Ko | 1 ligne(s) JSONL |
+| `pilot-constat-empreintes-site-produit-20260921a.tf.jsonl` | fichier | 1,9 Ko | 1 ligne(s) JSONL |
 | `plan-d-amelioration-post-audit-20260919a.tf.jsonl` | fichier | 14,7 Ko | 7 ligne(s) JSONL |
 | `porte-publication-faux-positif-20260909a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `preflight-ingestion-histoire-reecrite-20260909a.tf.jsonl` | fichier | 4,3 Ko | 1 ligne(s) JSONL |
@@ -85,4 +86,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_67 fichier(s), 1 sous-dossier(s)_
+_68 fichier(s), 1 sous-dossier(s)_

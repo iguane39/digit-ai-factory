@@ -1,6 +1,6 @@
 ---
 role: référentiel périssable des règles de la plateforme LinkedIn qui conditionnent une présence tenue sous la discipline de la factory — ce que le contrat interdit, par où viennent les chiffres, ce que la loi exige d'un contenu généré, ce que la mesure dit de la portée
-sources_de_verite: [output/03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.md §2 quater et §3 (sept sources ouvertes et vérifiées le 17/09/2026), linkedin.com/legal/user-agreement (en vigueur le 2025-11-03), learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview (2026-03-31), learn.microsoft.com/en-us/linkedin/marketing/integrations/recent-changes (version 2026-03), linkedin.com/help/linkedin/answer/a701208 et a551206, digital-strategy.ec.europa.eu/en/policies/guidelines-transparency-ai-generated-content (2026-08-06), datamatters.sidley.com/2026/06/22/, writtenlyhub.com/news/linkedin-engagement-down-50-algorithm-insights-report-2025 (2026-08-22)]
+sources_de_verite: [output/03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.md §2 quater et §3 (sept sources ouvertes et vérifiées le 17/09/2026), linkedin.com/legal/user-agreement (en vigueur le 2025-11-03), learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview (2026-03-31), learn.microsoft.com/en-us/linkedin/marketing/integrations/recent-changes (version 2026-03), linkedin.com/help/linkedin/answer/a701208 et a551206, linkedin.com/help/linkedin/answer/a1347212 et a548192 (programmation, consultées le 2026-09-21), digital-strategy.ec.europa.eu/en/policies/guidelines-transparency-ai-generated-content (2026-08-06), datamatters.sidley.com/2026/06/22/, writtenlyhub.com/news/linkedin-engagement-down-50-algorithm-insights-report-2025 (2026-08-22)]
 verifie_le: 2026-09-17
 perime_le: 2026-12-02
 ---
@@ -48,9 +48,18 @@ dépense.
 | Page d'une organisation × export manuel | Aide LinkedIn (mise à jour vers 2025-09) : export XLS des vues « Content, Visitors, Followers, and Competitors » depuis la vue d'administration | **ouverte**, gratuite ; profondeur d'historique à relever au premier export |
 | Profil d'une personne × export manuel | Aide LinkedIn (mise à jour vers 2026-06) : « from the past seven days up to the past 365 days. […] Export your analytics to an .XLSX file » | **ouverte**, gratuite, 365 jours glissants |
 
-Un outil tiers agréé par LinkedIn est la seule voie conforme pour programmer une publication ou
-lire les chiffres sans export. C'est une **dépense** récurrente : décision humaine (R-29), jamais
-un choix de run.
+**Programmer une publication est gratuit, dans LinkedIn même** (corrigé le 21/09/2026, TF-1274).
+Aide LinkedIn, consultée le 2026-09-21, `linkedin.com/help/linkedin/answer/a1347212`, profil d'une
+personne : « The time selected must be within 10 minutes to 3 months from the current time » ;
+aucun abonnement n'y est mentionné. Page d'une organisation, `answer/a548192`, rapportée par un
+agent de recherche le même jour : de 1 heure à 3 mois, pour les administrateurs de contenu. Ce
+document écrivait jusqu'au 21/09 qu'un outil tiers était « la seule voie conforme pour programmer
+une publication » : c'était faux, la fonction n'avait pas été vérifiée le 17/09. « Publier à
+l'heure » n'est donc pas un geste humain contraint : l'humain programme son lot de la semaine en
+une fois.
+
+Un outil tiers agréé par LinkedIn reste la seule voie conforme pour **lire les chiffres sans
+export**. C'est une **dépense** récurrente : décision humaine (R-29), jamais un choix de run.
 
 **Données personnelles.** L'export est agrégé : aucune donnée nominative d'abonné n'est collectée
 ni stockée. LinkedIn se déclare responsable conjoint des statistiques de page (addendum « Page

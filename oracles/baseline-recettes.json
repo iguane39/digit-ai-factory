@@ -197,8 +197,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-run-reseau.mjs": {
-  "cas": 2,
-  "vu_le": "2026-09-17"
+  "cas": 9,
+  "vu_le": "2026-09-21"
  },
  "oracle-secrets-hors-perimetre.mjs": {
   "cas": 13,
