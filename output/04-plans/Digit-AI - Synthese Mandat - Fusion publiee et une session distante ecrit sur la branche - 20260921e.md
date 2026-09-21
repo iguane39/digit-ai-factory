@@ -188,5 +188,7 @@ ligne `claude/html-quality-new-formats-qhfgvj`.
 - Branche locale non publiée : `report/complement-20260921` à `9d96605` ; fusions `e5b5591` et
   `9d96605` ; préparation `9abf4b6`.
 - Branche distante : `origin/claude/html-quality-new-formats-qhfgvj` à `d8c8e56`.
+- Restitution de la session distante, sur la branche locale :
+  `output\04-plans\Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md`.
 - `todo/TODO.jsonl` — sur main : TF-1271 en candidat ; sur la branche locale : TF-1272 et TF-1273.
 - Aucune page HTML livrée dans ce tour.
