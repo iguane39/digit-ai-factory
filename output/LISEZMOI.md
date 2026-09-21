@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 353 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 354 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -331,6 +331,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md | 20260907j | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` |
 | Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md | 20260919c | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` |
 | Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md | 20260921a | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md | 20260913a | 20.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md | 20260920a | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md.jugement.json` |

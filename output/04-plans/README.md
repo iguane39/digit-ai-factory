@@ -111,6 +111,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md` | fichier | 11,7 Ko | Synthèse de mandat — votre feu vert est exécuté, le noyau corrigé est en ligne, et l'affai |
 | `Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-12 (a) exécutée : la reconstruction d'un clone divergé est |
 | `Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` | fichier | 10,2 Ko | Vos 2 décisions sont exécutées : les outils corrigés tournent sur ce poste, et les 4 forge |
+| `Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md` | fichier | 13,8 Ko | Le parc est aligné sur GitHub, et 2 branches n'ont jamais été fusionnées dans main : 1 au  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` | fichier | 20,7 Ko | Synthèse de mandat — les huit dépôts en attente sont publiés et les dix-sept du parc sont  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` | fichier | 9,4 Ko | Le parc est synchronisé avec GitHub : 16 dépôts alignés, et 4 jours de travail fini enfin  |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
@@ -179,4 +180,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_162 fichier(s), 0 sous-dossier(s)_
+_163 fichier(s), 0 sous-dossier(s)_
