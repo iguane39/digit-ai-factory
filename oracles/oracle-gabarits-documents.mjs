@@ -22,6 +22,25 @@
  *        et elle diffère de son squelette. Une instance qui recopie le squelette ne prouve rien ;
  *   G3 · squelette ET instance passent le contrôle de MARQUAGE du socle (`check_html.py`). C'est
  *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait ;
+ *   G11 · toute famille du CATALOGUE qui déclare produire du `html` porte son `point_de_depart` :
+ *        son TYPE (`squelette` · `generateur` · `canevas` · `aucun`) et, sauf pour `aucun`, le
+ *        CHEMIN qui le porte, vérifié sur disque. Née le 14/09/2026 d'une mesure qui s'est
+ *        trompée : un balayage qui ne cherchait qu'un `SQUELETTE.html` comptait 17 familles sans
+ *        point de départ alors qu'il y en a 14 — deux étaient servies par un générateur de
+ *        `digit-ai-forge-audit`, une par les canevas d'un skill. *Un point de départ qui vit en
+ *        prose dans un champ `sources` n'est trouvable par aucune requête, donc il n'existe pas
+ *        pour la machine — et la question « cette famille a-t-elle de quoi démarrer » restait
+ *        indécidable.* La règle ne juge pas la QUALITÉ du point de départ, seulement qu'il soit
+ *        déclaré et qu'il existe là où il est dit ;
+ *   G12 · toute famille SANS point de départ dit ce qui l'EMPÊCHE, dans un vocabulaire fermé
+ *        (`poste-porteur` · `arbitrage` · `reclassement` · `aucun`), et un `poste-porteur` dit OÙ
+ *        vivent ses sources. Née le 15/09/2026 de la décision humaine D-11 (b). *Sans elle, une
+ *        DÉPENDANCE D'ENVIRONNEMENT — les sources existent, elles ne sont pas sur ce poste — se lit
+ *        exactement comme une DETTE DE TRAVAIL, et le compte des familles démunies envoie le
+ *        travail au mauvais endroit.* La règle rend AUSSI la répartition à chaque passage : c'est
+ *        la mesure que la décision demandait, et une classification qui ne se compte pas ne se
+ *        pilote pas. Elle ne juge pas la SINCÉRITÉ d'un empêchement — un `poste-porteur` apposé
+ *        sur une famille que ce poste pourrait servir la satisfait, et seul un lecteur le voit ;
  *   G4 · le document REND son gabarit et sa version (`Gabarit : gd-… · version du gabarit x.y.z`),
  *        visiblement — jamais seulement en commentaire. Une instance périmée est invisible sur
  *        l'artefact, et la section R-46 des lots devient impossible à remplir sans lui (TF-0690).
@@ -392,6 +411,119 @@ export function jugerFiche(cheminFiche, cheminDocument = null) {
           `le document tient sa fiche : les ${parties.length} partie(s) conçue(s) s'y retrouvent` });
   }
   return f;
+}
+
+const TYPES_DEPART = new Set(["squelette", "generateur", "canevas", "aucun"]);
+
+// G12 — vocabulaire FERMÉ des empêchements. Un ensemble ouvert produirait autant de motifs que de
+// rédacteurs, et la répartition ne se compterait plus.
+const EMPECHEMENTS = new Set(["poste-porteur", "arbitrage", "reclassement", "aucun"]);
+
+/**
+ * G11 — LE POINT DE DÉPART D'UNE FAMILLE SE DÉCLARE, ET SON CHEMIN EXISTE.
+ *
+ * Pourquoi le chemin est VÉRIFIÉ et pas seulement exigé : une déclaration qu'on ne teste pas est
+ * une affirmation, et c'est exactement ce que le champ `sources` était déjà — de la prose vraie le
+ * jour où elle a été écrite. Le test d'existence est ce qui fait la différence entre un champ et
+ * un commentaire.
+ *
+ * Pourquoi un SKIP et pas un FAIL quand le dépôt porteur est absent : un contrôle qui échoue sur
+ * ce que le poste ne peut pas réparer apprend à être contourné. Un point de départ porté par un
+ * dépôt frère absent est DÉCLARÉ non mesuré, jamais supposé bon.
+ */
+export function jugerCatalogue(chemin, racineParc) {
+  const findings = [];
+  if (!existsSync(chemin)) {
+    findings.push({ regle: "G11", statut: "SKIP", ou: chemin, message: "catalogue introuvable — le contrôle n'a PAS tourné" });
+    return findings;
+  }
+  const lignes = readFileSync(chemin, "utf8").split(/\r?\n/).filter((l) => l.trim());
+  let familles;
+  try { familles = lignes.slice(1).map((l) => JSON.parse(l)); }
+  catch (e) { findings.push({ regle: "G11", statut: "FAIL", ou: chemin, message: `ligne de catalogue illisible : ${e.message}` }); return findings; }
+
+  const html = familles.filter((f) => (f.formats || []).includes("html"));
+  if (!html.length) { findings.push({ regle: "G11", statut: "SKIP", ou: chemin, message: "aucune famille ne déclare produire du html" }); return findings; }
+
+  for (const f of html) {
+    const ou = `catalogue/${f.famille}`;
+    const d = f.point_de_depart;
+    if (!d || typeof d !== "object") {
+      findings.push({ regle: "G11", statut: "FAIL", ou, message:
+        "aucun `point_de_depart` déclaré — la question « cette famille a-t-elle de quoi démarrer » " +
+        "reste indécidable à la machine, et un balayage la tranchera de travers" });
+      continue;
+    }
+    if (!TYPES_DEPART.has(d.type)) {
+      findings.push({ regle: "G11", statut: "FAIL", ou, message:
+        `type de point de départ inconnu : « ${d.type} » — attendus : ${[...TYPES_DEPART].join(", ")}` });
+      continue;
+    }
+    if (d.type === "aucun") {
+      d.chemin
+        ? findings.push({ regle: "G11", statut: "FAIL", ou, message:
+            `type « aucun » ET un chemin (« ${d.chemin} ») : la déclaration se contredit, l'un des deux est faux` })
+        : findings.push({ regle: "G11", statut: "PASS", ou, message: "aucun point de départ — déclaré, donc comptable" });
+      // G12 — CE QUI EMPÊCHE se déclare, dans un vocabulaire fermé. Sans lui, une dépendance
+      // d'environnement (les sources existent, elles sont ailleurs) se lit comme une dette de
+      // travail (personne ne l'a fait) : deux choses qui ne se traitent pas au même endroit,
+      // et un compte qui les mélange envoie le travail au mauvais poste.
+      if (!EMPECHEMENTS.has(d.empechement)) {
+        findings.push({ regle: "G12", statut: "FAIL", ou, message:
+          `famille sans point de départ et sans \`empechement\` reconnu (« ${d.empechement} ») — ` +
+          `attendus : ${[...EMPECHEMENTS].join(", ")}. Un « aucun » non classé mélange la dette de ` +
+          `travail et la dépendance d'environnement` });
+      } else if (d.empechement === "poste-porteur" && !(d.sources_attendues_sur || "").trim()) {
+        findings.push({ regle: "G12", statut: "FAIL", ou, message:
+          "empêchement « poste-porteur » sans `sources_attendues_sur` — dire que les sources sont " +
+          "ailleurs sans dire OÙ ne permet à personne d'aller les chercher" });
+      } else {
+        findings.push({ regle: "G12", statut: "PASS", ou, message:
+          `empêchement « ${d.empechement} » déclaré${d.sources_attendues_sur ? ` — sources sur : ${d.sources_attendues_sur}` : ""}` });
+      }
+      continue;
+    }
+    if (!d.chemin) {
+      findings.push({ regle: "G11", statut: "FAIL", ou, message:
+        `type « ${d.type} » sans chemin — un point de départ qu'on ne peut pas ouvrir n'en est pas un` });
+      continue;
+    }
+    // CONVENTION DE CHEMIN, écrite ici parce qu'elle a mordu à son premier passage : un chemin
+    // est relatif à la RACINE DU PARC et son premier segment nomme son porteur — un dépôt
+    // (`digit-ai-factory/…`, `digit-ai-forge-audit/…`) ou le préfixe `skills/` pour un skill
+    // installé, dont l'emplacement varie d'un poste à l'autre. Les trois squelettes du pilot
+    // avaient été déclarés en chemin relatif au PILOT et la règle les a rendus introuvables :
+    // c'est le sens rouge joué sur pièce, et la raison pour laquelle la convention est écrite.
+    const versSkills = d.chemin.startsWith("skills/");
+    const porteur = versSkills ? cheminSkillsInstalles() : join(racineParc, d.chemin.split("/")[0]);
+    const cible = versSkills
+      ? join(cheminSkillsInstalles(), d.chemin.slice("skills/".length))
+      : join(racineParc, d.chemin);
+    if (existsSync(cible)) {
+      findings.push({ regle: "G11", statut: "PASS", ou, message: `point de départ « ${d.type} » vérifié : ${d.chemin}` });
+    } else if (!existsSync(porteur)) {
+      findings.push({ regle: "G11", statut: "SKIP", ou, message:
+        `point de départ porté par « ${d.chemin.split("/")[0]} », absent de ce poste — le contrôle n'a PAS tourné` });
+    } else {
+      findings.push({ regle: "G11", statut: "FAIL", ou, message:
+        `point de départ déclaré et INTROUVABLE : ${d.chemin} — une déclaration non vérifiée est une affirmation` });
+    }
+  }
+
+  // G12, second sens — la RÉPARTITION, rendue à chaque passage. Une classification qui ne se
+  // compte pas ne se pilote pas : le nombre de familles démunies ne dit rien tant qu'il mélange
+  // ce qui attend un poste et ce que personne n'a fait.
+  const nus = html.filter((f) => (f.point_de_depart || {}).type === "aucun");
+  const par = {};
+  for (const f of nus) { const e = f.point_de_depart.empechement || "non classé"; par[e] = (par[e] || 0) + 1; }
+  const environnement = par["poste-porteur"] || 0;
+  const travail = (par["aucun"] || 0) + (par["reclassement"] || 0) + (par["arbitrage"] || 0);
+  findings.push({ regle: "G12", statut: "PASS", ou: chemin, message:
+    `couverture : ${html.length - nus.length} famille(s) html outillée(s), ${nus.length} sans point de départ — ` +
+    `dont ${environnement} dépendance(s) d'environnement et ${travail} dette(s) de travail` +
+    (nus.length ? ` (${Object.entries(par).map(([k, v]) => `${k}: ${v}`).join(", ")})` : "") });
+
+  return findings;
 }
 
 export function juger(dossier, catalogue = lireCatalogue()) {
@@ -805,14 +937,77 @@ if (args[0] === "--self-test") {
     casse.push("G6 : un document qui a PERDU une partie conçue passe — la fiche devient un rite, " +
       "et une conception qu'on n'exécute pas coûte sans rien rendre");
 
+  // --- G11, LES DEUX SENS, sur un catalogue fabriqué : la seule forme qui prouve qu'une règle
+  // juge ce qu'elle prétend juger et non le reste de la ligne (doctrine du banc rouge/vert).
+  const catDir = mkdtempSync(join(tmpdir(), "gab-cat-"));
+  const parc = join(catDir, "parc");
+  mkdirSync(join(parc, "depot-pilot", "gabarits", "documents", "fam-ok"), { recursive: true });
+  writeFileSync(join(parc, "depot-pilot", "gabarits", "documents", "fam-ok", "SQUELETTE.html"), "<p>vide</p>", "utf8");
+  const META = JSON.stringify({ schema: "pilot/gabarits-documents@1", version: "test" });
+  const ecrireCat = (nom, familles) => {
+    const f = join(catDir, nom);
+    writeFileSync(f, [META, ...familles.map((x) => JSON.stringify(x))].join("\n") + "\n", "utf8");
+    return f;
+  };
+  const verdictsG5 = (f) => jugerCatalogue(f, parc).map((x) => x.statut);
+
+  // VERT : les quatre types déclarés, chacun conforme.
+  const catVert = ecrireCat("vert.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "squelette", chemin: "depot-pilot/gabarits/documents/fam-ok/SQUELETTE.html" } },
+    { famille: "b", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "aucun" } },
+    { famille: "d", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "poste-porteur", sources_attendues_sur: "un poste qui porte les livrables" } },
+    { famille: "c", formats: ["md"] },
+  ]);
+  if (verdictsG5(catVert).some((v) => v !== "PASS")) casse.push("G11 accuse un catalogue conforme : " + JSON.stringify(jugerCatalogue(catVert, parc)));
+
+  // ROUGE 1 : une famille html SANS le champ — le trou que la règle existe pour voir.
+  const catSansChamp = ecrireCat("r1.jsonl", [{ famille: "a", formats: ["html"] }]);
+  if (!verdictsG5(catSansChamp).includes("FAIL")) casse.push("G11 laisse passer une famille html sans point_de_depart");
+
+  // ROUGE 2 : un chemin DÉCLARÉ et introuvable, dans un dépôt PRÉSENT — une affirmation.
+  const catFantome = ecrireCat("r2.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "squelette", chemin: "depot-pilot/gabarits/documents/fam-ok/ABSENT.html" } }]);
+  if (!verdictsG5(catFantome).includes("FAIL")) casse.push("G11 laisse passer un point de départ déclaré et introuvable");
+
+  // --- G12, LES DEUX SENS ROUGES. Une classification qu'aucun contrôle ne tient redevient de la
+  // prose en trois semaines : c'est ce qui était arrivé au champ `sources`, et la raison pour
+  // laquelle `empechement` naît avec sa fixture rouge plutôt que sans.
+  const verdictsG6 = (f) => jugerCatalogue(f, parc).filter((x) => x.regle === "G12").map((x) => x.statut);
+
+  // ROUGE G12-1 : « aucun » sans empêchement — une dépendance d'environnement et une dette de
+  // travail se lisent alors pareil, et le compte des familles démunies mélange les deux.
+  const catSansEmp = ecrireCat("r6a.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "aucun", chemin: null } }]);
+  if (!verdictsG6(catSansEmp).includes("FAIL")) casse.push("G12 laisse passer un « aucun » sans empêchement classé");
+
+  // ROUGE G12-2 : « poste-porteur » sans dire OÙ — personne ne peut aller chercher les sources.
+  const catSansOu = ecrireCat("r6b.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "poste-porteur" } }]);
+  if (!verdictsG6(catSansOu).includes("FAIL")) casse.push("G12 laisse passer « poste-porteur » sans sources_attendues_sur");
+
+  // ROUGE 3 : « aucun » ET un chemin — la déclaration se contredit.
+  const catContradictoire = ecrireCat("r3.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "aucun", chemin: "depot-pilot/gabarits/documents/fam-ok/SQUELETTE.html" } }]);
+  if (!verdictsG5(catContradictoire).includes("FAIL")) casse.push("G11 laisse passer « aucun » accompagné d'un chemin");
+
+  // VERT 2 : un dépôt porteur ABSENT du poste rend SKIP, jamais PASS ni FAIL — un contrôle qui
+  // échoue sur ce qu'on ne peut pas réparer apprend à être contourné.
+  const catHorsPoste = ecrireCat("v2.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "generateur", chemin: "depot-absent/tools/build.mjs" } }]);
+  if (!verdictsG5(catHorsPoste).includes("SKIP")) casse.push("G11 ne SKIP pas sur un dépôt porteur absent du poste");
+
+  rmSync(catDir, { recursive: true, force: true, maxRetries: 5 });
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 29/29 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 36/36 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
-      "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain)");
+      "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain ; " +
+      "G12 dans ses DEUX sens rouges — « aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; " +
+      "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
+      "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -872,7 +1067,16 @@ if (args.includes("--fiche")) {
   process.exit(v6 === "FAIL" ? 1 : 0);
 }
 
-const findings = juger(args[0] || join(PILOT, "gabarits", "documents"));
+
+const dossierJuge = args[0] || join(PILOT, "gabarits", "documents");
+// G11 ne se joue que sur le catalogue du pilot : quand l'oracle est pointé sur un dossier
+// arbitraire (self-test, périmètre restreint), il n'y a pas de catalogue à juger et le dire
+// vaut mieux que de le supposer.
+const catalogue = join(PILOT, "gabarits", "documents", "catalogue.jsonl");
+const findings = [
+  ...juger(dossierJuge),
+  ...(dossierJuge === join(PILOT, "gabarits", "documents") ? jugerCatalogue(catalogue, join(PILOT, "..")) : []),
+];
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-gabarits-documents",

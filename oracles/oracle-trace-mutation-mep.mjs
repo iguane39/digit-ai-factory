@@ -72,20 +72,39 @@ import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const IGNORES = new Set(["node_modules", ".git", ".venv", "venv", "__pycache__", "dist", "build", ".next"]);
 
-/** Les dossiers de MEP d'un produit, où qu'ils vivent — la doctrine n'impose pas leur place. */
+/**
+ * Les dossiers de MEP d'un produit, cherchés sur QUATRE niveaux — et la borne se DÉCLARE
+ * (TF-1267, décision D-15 (a) du 17/09/2026).
+ *
+ * Ce commentaire disait « où qu'ils vivent — la doctrine n'impose pas leur place » au-dessus d'un
+ * `profondeur = 4`. Un dossier au cinquième niveau échappait donc au contrôle, et RIEN ne le
+ * disait : ni constat, ni non-jugé, ni avertissement. Un lecteur y lisait une garantie de
+ * couverture que le code ne donnait pas — la même classe que la recette de sommaire du socle, où
+ * un commentaire promettait une bande repliable que son CSS ne fournissait pas.
+ *
+ * La borne reste : un parcours sans borne sur un parc de quatorze dépôts ne revient pas. Ce qui
+ * change, c'est qu'elle rend désormais les dossiers ATTEINTS **et** les branches coupées, pour que
+ * l'appelant puisse le déclarer. Conséquence mesurée au 17/09 : zéro fichier `DOSSIER-MEP*.md`
+ * dans le parc, donc zéro branche coupée — la borne n'a encore rien caché, et c'est le moment le
+ * moins cher pour la rendre visible.
+ */
 function dossiersMep(racine, profondeur = 4) {
   const trouves = [];
+  const coupees = [];
   const parcourir = (dir, reste) => {
     let entrees;
     try { entrees = readdirSync(dir, { withFileTypes: true }); } catch { return; }
     for (const e of entrees) {
       if (e.isFile() && /^DOSSIER-MEP.*\.md$/i.test(e.name)) trouves.push(join(dir, e.name));
-      else if (e.isDirectory() && reste > 0 && !IGNORES.has(e.name) && !e.name.startsWith(".")) {
-        parcourir(join(dir, e.name), reste - 1);
+      else if (e.isDirectory() && !IGNORES.has(e.name) && !e.name.startsWith(".")) {
+        if (reste > 0) parcourir(join(dir, e.name), reste - 1);
+        else coupees.push(join(dir, e.name));
       }
     }
   };
   parcourir(racine, profondeur);
+  trouves.bornesAtteintes = coupees;
+  trouves.profondeur = profondeur;
   return trouves;
 }
 
@@ -150,6 +169,16 @@ export function juger(racine) {
   const sansObjet = (regle, ou, message) => findings.push({ regle, statut: "SANS_OBJET", ou, message });
 
   const dossiers = dossiersMep(racine);
+  // TF-1267 — LA BORNE DE RECHERCHE SE DÉCLARE. Un dossier de MEP posé plus profond que la borne
+  // échappait à ce contrôle sans qu'aucune ligne du verdict ne le dise, et le silence se lisait
+  // comme « rien à signaler ». Il se lit désormais comme ce qu'il est : « non regardé ».
+  if (dossiers.bornesAtteintes?.length) {
+    findings.push({ regle: "TM0", statut: "NON_JUGE", ou: racine, message:
+      `recherche bornée à ${dossiers.profondeur} niveaux : ${dossiers.bornesAtteintes.length} branche(s) `
+      + `non descendue(s) — ${dossiers.bornesAtteintes.slice(0, 4).join(", ")}`
+      + `${dossiers.bornesAtteintes.length > 4 ? ", …" : ""}. Un DOSSIER-MEP plus profond n'est PAS jugé, `
+      + `et ce silence-là est déclaré plutôt que tu` });
+  }
   if (!dossiers.length) {
     sansObjet("TM1", racine, "aucun DOSSIER-MEP.md sous ce produit — l'étape de mise en production "
       + "n'a pas été atteinte. Ce n'est pas un défaut : c'est une absence d'événement, et juger une "

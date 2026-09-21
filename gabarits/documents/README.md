@@ -14,7 +14,7 @@ minoritaire**, et c'est voulu : le doublon coûte plus cher que le renvoi.
 Source unique : **`catalogue.jsonl`** — une ligne par famille, avec sa **provenance** (le ou
 les livrables réels d'où la forme est tirée) et son **statut**. Les vues, s'il y en a un jour,
 s'en dérivent ; ce fichier ne se recopie pas à la main. Oracle : `oracles\oracle-gabarits-documents.mjs`
-(G1-G5 et G7-G10 sur le parc, joué par la recette du pilot ; **G6** sur appel, voir ci-dessous).
+(G1-G5 et G7-G12 sur le parc, joué par la recette du pilot ; **G6** sur appel, voir ci-dessous).
 
 **`lecteur` et `type_de_contenu` (TF-1097, 20/09/2026)** — chaque famille déclare **qui la lit**,
 par quatre sous-champs et jamais par un personnage (`decisions_attendues`, `savoir_prealable`,
@@ -45,6 +45,16 @@ instrumenté, et cela se déclare plutôt que de s'estimer.
 sections que sa doctrine DOIT porter ; **G7** vérifie qu'elles y sont. La règle ne juge que ce
 qu'une famille a déclaré : celle qui ne déclare rien n'est jamais accusée. C'est ce qui la rend
 adoptable — écrite en dur, elle aurait accusé les trente-huit familles le jour de sa naissance.
+
+**`point_de_depart` (14/09/2026)** — **G11** : toute famille déclarant `html` porte son
+`point_de_depart` — son TYPE (`squelette` · `generateur` · `canevas` · `aucun`) et, sauf pour `aucun`,
+le CHEMIN qui le porte, vérifié sur disque. *Relevé du 14/09 : sur 20 familles déclarant `html`, 3 ont
+un squelette, 2 un générateur, 1 les canevas d'un skill, et 14 n'ont aucun point de départ.* Le champ
+existe parce qu'un balayage qui ne cherchait qu'un `SQUELETTE.html` en comptait 17 — la question n'était
+décidable par aucune requête. **G12** : une famille sans point de départ dit ce qui l'empêche, dans
+un vocabulaire fermé. *Ces deux règles sont nées G5 et G6 sur la branche du 14/09 ; main ayant donné
+ces numéros à la largeur de page et à la fiche de conception, le report du 21/09/2026 les a
+renommées. Les synthèses datées du 14 au 17/09 gardent les numéros d'origine.*
 
 *Pourquoi cette bibliothèque existe.* Chaque projet réinventait la forme de ses livrables, et
 les défauts de forme se rejouaient d'un projet à l'autre — largeur de lecture, tableaux
@@ -90,7 +100,7 @@ recommandée :
 
 | Pièce | Où | Ce qu'elle fait |
 |---|---|---|
-| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G8** |
+| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G4** — et cette ligne a annoncé un « G8 » que rien n'implémentait jusqu'au 14/09/2026 (TF-1256) |
 | **La demande** | `gabarits\RETOURS-FORGES.md`, section « Retours sur les documents produits » | quatre colonnes, par ordre d'utilité : ce qui a été **ajouté à la main**, ce qui a **gêné le lecteur**, ce qui a **manqué**, la **portée** |
 | **Le refus** | `ingerer-lot.mjs` et **B7** de `oracle-boite-entree` | un lot du 22/08 ou après qui ne porte pas la section est refusé à l'ingestion, registre intact (R-46) |
 

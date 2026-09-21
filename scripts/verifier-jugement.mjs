@@ -30,6 +30,9 @@
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
 import { join, extname, basename } from "node:path";
 import { createHash } from "node:crypto";
+// TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
+// il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
+import { livrablesPorteurs } from "./lib-extensions-jugees.mjs";
 
 const args = process.argv.slice(2);
 const SCELLER = args.includes("--sceller");
@@ -47,7 +50,7 @@ const cibles = args.filter((a) => !a.startsWith("--"));
 // premiere variante coutait deux lignes, pas un dispositif. Et l'effet de bord a ete mesure avant
 // d'etre suppose : ZERO fichier PDF dans ce depot, donc aucun livrable existant ne bascule sous
 // controle par surprise.
-const JUGES = new Set([".html", ".htm", ".md", ".pdf"]);
+const JUGES = livrablesPorteurs();
 // Le nom d'un livrable porte sa date et son indice (règle 4) : c'est cela qui doit changer quand le
 // contenu change. Un fichier hors convention n'est pas jugé — les README, notices et registres
 // générés ne sont pas des livrables datés.

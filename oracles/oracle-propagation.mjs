@@ -57,6 +57,10 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, mkdirSy
 import { join, dirname, extname, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
+// TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
+// il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
+import { livrablesPorteurs } from "../scripts/lib-extensions-jugees.mjs";
+const PORTEURS = livrablesPorteurs();
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -98,7 +102,7 @@ export function productionDe(dossier) {
         const type = normal(m[2].split(" ")[0]);
         if (type && !types.has(type)) types.set(type, c);
       }
-      if ([".html", ".htm", ".md"].includes(extname(e.name).toLowerCase())) {
+      if (PORTEURS.has(extname(e.name).toLowerCase())) {
         let taille; try { taille = statSync(c).size; } catch { continue; }
         if (taille > 4 * 1024 * 1024) continue;   // un document lisible par un humain ; au-delà, une donnée
         let texte; try { texte = readFileSync(c, "utf8"); } catch { continue; }

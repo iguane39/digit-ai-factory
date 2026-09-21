@@ -125,8 +125,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 29,
-  "vu_le": "2026-09-20"
+  "cas": 36,
+  "vu_le": "2026-09-21"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -325,6 +325,10 @@
  "scripts/generer-remplacements-historique.test.mjs": {
   "cas": 11,
   "vu_le": "2026-09-09"
+ },
+ "scripts/lib-extensions-jugees.test.mjs": {
+  "cas": 11,
+  "vu_le": "2026-09-17"
  },
  "scripts/lib-pseudonyme-produit.test.mjs": {
   "cas": 7,

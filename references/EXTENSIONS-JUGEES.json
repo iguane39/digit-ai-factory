@@ -1,0 +1,29 @@
+{
+  "schema": "pilot/extensions-jugees@1",
+  "version": "1.0.0",
+  "genere": "2026-09-17",
+  "ecrivain": "humain (édition directe)",
+  "regle": "SOURCE UNIQUE des extensions qu'un contrôle du pilot juge. Née le 17/09/2026 de la décision humaine D-15 (a), sur le constat TF-1266 : quatre contrôles énuméraient chacun leur liste et elles divergeaient — `.pdf` n'était jugé que par un sur quatre, et aucune source ne tranchait. Ce fichier est une DONNÉE, pas du code (loi transverse n° 4) : une famille de livrable neuve s'ajoute ici, datée et motivée, sans toucher à un seul contrôle. Lecteur : scripts/lib-extensions-jugees.mjs. Une extension absente de ce fichier n'est jugée par AUCUN contrôle qui le lit — c'est le prix de la source unique, et c'est pourquoi tout ajout de famille passe par ici.",
+  "roles": {
+    "livrables_porteurs": {
+      "quoi": "Ce qui, rendu à un humain, est un livrable — et donc ce qu'un contrôle de jeu, de jugement ou de propagation doit voir.",
+      "extensions": [".html", ".htm", ".md", ".pdf"],
+      "motif_par_extension": {
+        ".html": "le format de livrable chartée du parc",
+        ".htm": "la même chose, sous sa graphie ancienne",
+        ".md": "le format des notes, doctrines et synthèses remises",
+        ".pdf": "un livrable figé remis à un tiers ; zéro fichier de ce type dans le parc au 17/09/2026, l'extension est déclarée AVANT d'être employée, pour qu'une première remise ne passe pas sous les contrôles"
+      },
+      "absents_et_pourquoi": {
+        ".pptx": "produit par le skill digit-ai-pptx, hors de ce dépôt à ce jour ; à ajouter ici le jour où un .pptx entre sous output/, et le contrôle de jeu le verra sans être touché",
+        ".png": "une capture d'oracle n'est pas un livrable ; 10 fichiers sous output/ au 17/09, tous produits par render_page",
+        ".json/.jsonl": "des données et des registres, jugés par leurs propres oracles"
+      }
+    },
+    "texte_balaye": {
+      "quoi": "Ce dont le contenu se lit comme du texte pour un balayage de motif — périmètre plus large que les livrables, et qui ne dit rien de ce qu'est un livrable.",
+      "extensions": [".html", ".htm", ".md", ".json", ".txt", ".mjs", ".js", ".py"],
+      "motif": "un balayage de motif cherche une chaîne, pas un livrable : il lit donc aussi le code et les registres"
+    }
+  }
+}

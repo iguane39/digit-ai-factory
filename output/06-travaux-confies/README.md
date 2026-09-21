@@ -44,5 +44,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `pilot - TRAVAUX - 20260912b.tf.jsonl` | fichier | 1,5 Ko | 2 ligne(s) JSONL |
 | `pilot - TRAVAUX - 20260912c.md` | fichier | 7,7 Ko | Travaux confiés par le pilot — digit-ai-forge-development — 20260912c |
 | `pilot - TRAVAUX - 20260912c.tf.jsonl` | fichier | 1,4 Ko | 2 ligne(s) JSONL |
+| `pilot - TRAVAUX - 20260914a.md` | fichier | 12,9 Ko | Travaux confiés par le pilot — digit-ai-forge-agents (socle `digit-ai-page-html`) — 202609 |
+| `pilot - TRAVAUX - 20260914a.tf.jsonl` | fichier | 2,2 Ko | 3 ligne(s) JSONL |
 
-_28 fichier(s), 0 sous-dossier(s)_
+_30 fichier(s), 0 sous-dossier(s)_

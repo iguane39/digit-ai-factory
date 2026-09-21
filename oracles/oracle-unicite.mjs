@@ -53,6 +53,9 @@ import { join, extname, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+// TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
+// il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
+import { texteBalaye } from "../scripts/lib-extensions-jugees.mjs";
 
 /**
  * Les RELEVÉS connus. Chacun déclare son extracteur, les extensions qu'il sait lire, et — le
@@ -135,7 +138,7 @@ export function juger(cible, { releve = "titre-html", motif = null, perimetre = 
     }
     spec = {
       quoi: `le groupe capturant de /${motif}/`,
-      exts: [".html", ".htm", ".md", ".json", ".txt", ".mjs", ".js", ".py"],
+      exts: [...texteBalaye()],
       extraire: (t) => [...t.matchAll(re)].map((m) => (m[1] !== undefined ? m[1] : m[0])),
       axes: { U1: true, U2: true },
       motif_hors_axe: null,

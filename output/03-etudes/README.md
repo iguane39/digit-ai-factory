@@ -76,8 +76,10 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260914-etude-opportunite-conception-documentaire-amont.md` | fichier | 24,9 Ko | Étude d'opportunité — conception documentaire en amont — 20260914b |
 | `20260914-etude-opportunite-personas-par-phase.html` | fichier | 76,7 Ko | Étude d'opportunité — personas par phase de run — 20260914a |
 | `20260914-etude-opportunite-personas-par-phase.md` | fichier | 24,1 Ko | Étude d'opportunité — personas par phase de run — 20260914a |
+| `20260914-etude-opportunite-premiers-html-nouveaux-formats.md` | fichier | 31,2 Ko | Étude d'opportunité — réduire le coût du premier rendu HTML dans un format non encore outi |
 | `20260914-L99-conception-documentaire-amont.md` | fichier | 36,8 Ko | Analyse L99 — « Concevoir en amont les documents HTML par type de document, de contenu et  |
 | `20260914-L99-personas-par-phase.md` | fichier | 34,9 Ko | Analyse L99 — « Des personas pour apporter des points de vue différents à chaque phase d'u |
+| `20260914-L99-qualite-premiers-html-nouveaux-formats.md` | fichier | 57,9 Ko | Analyse L99 — « La qualité des premiers HTMLs générés dans de nouveaux formats est de pièt |
 | `20260914-personas-mesure-baseline.md` | fichier | 19,5 Ko | Relecture de référence sans persona — sortie brute (14/09/2026) |
 | `20260914-personas-mesure-echantillon.md` | fichier | 5,8 Ko | Échantillon — dix défauts échappés (14/09/2026) |
 | `20260914-personas-mesure-fiches.md` | fichier | 5,5 Ko | Fiches de persona — exploitant, utilisateur final, mainteneur (14/09/2026) |
@@ -97,4 +99,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260919-etude-opportunite-plan-d-amelioration-post-audit.md` | fichier | 31,2 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
 | `20260919-L99-audit-et-plan-d-amelioration-plateforme.md` | fichier | 43,3 Ko | Analyse L99 — « Un audit, et en plus un plan d'amélioration complet de la plateforme » |
 
-_80 fichier(s), 0 sous-dossier(s)_
+_82 fichier(s), 0 sous-dossier(s)_
