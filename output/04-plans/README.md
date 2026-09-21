@@ -100,6 +100,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
 | `Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` | fichier | 19,1 Ko | Synthèse de mandat — la forge d'audit est publiée et vérifiée sur ce qui est en ligne, mai |
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
+| `Digit-AI - Synthese Mandat - Fusion de la branche du pilot publiee sur GitHub - 20260921c.md` | fichier | 8,2 Ko | La fusion est publiée : main porte le travail du 14 au 17/09, et plus aucune branche du pi |
 | `Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md` | fichier | 14,4 Ko | Les 2 postes sont fusionnés : 7 dépôts réconciliés au cas par cas, publiés, et le parc ent |
 | `Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` | fichier | 16,0 Ko | Synthèse de mandat — le contrôle d'héritage joué à chaque ouverture, et la fin d'un faux r |
 | `Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` | fichier | 20,3 Ko | Synthèse de mandat — l'histoire publiée du pilot est réécrite, republiée, et ne porte plus |
@@ -191,4 +192,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_174 fichier(s), 0 sous-dossier(s)_
+_175 fichier(s), 0 sous-dossier(s)_

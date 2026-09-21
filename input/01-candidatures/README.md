@@ -47,6 +47,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `gestion-reseaux-sociaux-verdict-o2-20260917a.tf.jsonl` | fichier | 12,5 Ko | 7 ligne(s) JSONL |
 | `hook-restitution-gabarit-juge-a-la-place-20260917a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `journal-de-versions-dormant-forge-audit-20260910a.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
+| `lecteur-des-sept-familles-reportees-20260921a.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
 | `lisezmoi-output-depend-du-poste-20260920b.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
 | `mandat-permanent-ecriture-forges-20260917c.tf.jsonl` | fichier | 1,8 Ko | 1 ligne(s) JSONL |
 | `nom-client-dans-message-de-commit-20260913a.tf.jsonl` | fichier | 2,9 Ko | 1 ligne(s) JSONL |
@@ -83,4 +84,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_65 fichier(s), 1 sous-dossier(s)_
+_66 fichier(s), 1 sous-dossier(s)_
