@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 373 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 375 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -291,6 +291,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Cinq familles de cadence et le controle aveugle - 20260915a.md | 20260915a | 25.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Cinq familles de cadence et le controle aveugle - 20260915a.md` |
 | Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md | 20260915c | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md` |
+| Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md | 20260921f | 22.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md` |
 | Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md | 20260911b | 21.7 Ko | `04-plans/Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` |
 | Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md | 20260911c | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` |
 | Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md | 20260911e | 13.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` |
@@ -326,6 +327,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md | 20260920b | 14.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md` |
 | Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md | 20260921d | 15.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md` |
 | Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md | 20260921e | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md` |
+| Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md | 20260830g | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` |
 | Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md | 20260909a | 20.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` |
 | Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md | 20260911a | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md` |
