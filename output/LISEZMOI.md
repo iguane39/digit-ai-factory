@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 291 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 292 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -266,6 +266,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md | 20260905g | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` |
 | Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md | 20260910g | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` |
 | Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md | 20260830c | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` |
+| Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921a.md | 20260921a | 15.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921a.md` |
 | Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md | 20260830g | 16 Ko | `04-plans/Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` |
 | Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md | 20260909a | 20.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` |
 | Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md | 20260911a | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md` |
