@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 375 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 376 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -223,6 +223,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 110.6 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
 | 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 31.5 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
 | 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.9 Ko | `03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
+| 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.1 Ko | `03-etudes/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
 
 ### 04-plans
 

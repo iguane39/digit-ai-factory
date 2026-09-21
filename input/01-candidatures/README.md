@@ -71,6 +71,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `referentiel-audit-contenu-21-08-20260910a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `registre-oracles-edite-en-copie-installee-20260910a.tf.jsonl` | fichier | 4,6 Ko | 1 ligne(s) JSONL |
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
+| `reseaux-sociaux-complement-verdict-o2-20260921a.tf.jsonl` | fichier | 9,6 Ko | 6 ligne(s) JSONL |
 | `reseaux-sociaux-elargir-perimetre-20260917d.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
 | `restes-archives-classes-neuves-20260914b.tf.jsonl` | fichier | 8,6 Ko | 7 ligne(s) JSONL |
 | `restes-archives-p2-20260914a.tf.jsonl` | fichier | 6,0 Ko | 5 ligne(s) JSONL |
@@ -84,4 +85,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_66 fichier(s), 1 sous-dossier(s)_
+_67 fichier(s), 1 sous-dossier(s)_
