@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 369 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 370 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -280,6 +280,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md | 20260917k | 17.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` |
 | Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md | 20260916e | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` |
 | Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md | 20260921b | 13.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md` |
+| Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md | 20260915a | 22.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md | 20260920e | 30.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md | 20260920d | 17.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md` |

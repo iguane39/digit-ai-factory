@@ -1,0 +1,7 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md",
+ "empreinte": "5d11f15218d6d35a4d18152884589dad2b4ea23add254fa919cc09972c08fe4c",
+ "scelle_le": "2026-09-21T13:09:31.662Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
