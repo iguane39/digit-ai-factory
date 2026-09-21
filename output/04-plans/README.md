@@ -59,6 +59,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` | fichier | 15,3 Ko | Synthèse de mandat — la forme du bloc des décisions, relevée à la source et rendue lisible |
 | `Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` | fichier | 17,3 Ko | La boîte d'entrée est vide, 15 todos sont clos, et une campagne travaille encore |
 | `Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` | fichier | 17,5 Ko | Vos trois décisions sont exécutées, et la question que vous n'avez pas pu lire est reposée |
+| `Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md` | fichier | 13,7 Ko | La branche du pilot est fusionnée dans une branche locale, harnais vert : il reste votre a |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` | fichier | 22,6 Ko | Synthèse de mandat — les retours en attente sont entrés au registre et la campagne des cin |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md` | fichier | 30,0 Ko | Campagne des todos et retours du 20/09/2026 : 18 items décidés clos sur preuve rejouée, 18 |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md` | fichier | 17,6 Ko | Point d'étape — campagne des todos et retours : 17 items clos au registre, 8 constats entr |
@@ -190,4 +191,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_173 fichier(s), 0 sous-dossier(s)_
+_174 fichier(s), 0 sous-dossier(s)_
