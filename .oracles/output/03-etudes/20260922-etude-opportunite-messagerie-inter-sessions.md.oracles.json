@@ -1,19 +1,19 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
-  "date_iso": "2026-09-22T18:10:42.492Z",
+  "cible": "C:\\dev\\digit-ai-factory\\output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
+  "date_iso": "2026-09-22T19:43:54.278Z",
   "registre_version": "2.25.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
   "resume": {
-    "pass": 4,
+    "pass": 3,
     "fail": 0,
-    "skip": 3,
+    "skip": 4,
     "cache": 0
   },
   "bilan_fichiers": {
     "jugé": [
-      "gabarits\\AGENT-CAMPAGNE.md"
+      "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,43 +24,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
-      "verdict": "PASS",
-      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; nombre « 1 024 » non sourcé"
+      "file": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
+      "verdict": "SKIP",
+      "detail": ""
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -68,10 +68,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "gabarits\\AGENT-CAMPAGNE.md",
-    "ts": "2026-09-22T18:10:42.492Z",
+    "release": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
+    "ts": "2026-09-22T19:43:54.277Z",
     "fichiers": {
-      "gabarits\\AGENT-CAMPAGNE.md": "d2495006d0adece69cae01751424b7ac95abdd1b8c43eb1c7d2b751cbdfaca8a"
+      "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md": "c339bfb912362fe425a102b99201973df22929594e549f5479d1693dec4093cc"
     }
   },
   "empreinte_motif": null,
