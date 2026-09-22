@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.18.0",
+ "version": "1.20.0",
  "date": "2026-09-22",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -756,7 +756,7 @@
    "creee_le": "2026-09-08",
    "fondee_par": [],
    "regle": "tout controle en service porte un banc de fixtures double sens, sur artefact jetable ; une affirmation d en-tete sur l existence d un banc est verifiee par le banc lui-meme, jamais crue sur parole ; et aucune regle neuve ne s ajoute a un controle qui n en a pas avant que le harnais existe",
-   "oracle": "a creer pour oracle-conformite-projet ; candidature du 08/09",
+   "oracle": "pilot, oracles/oracle-banc-double-sens.mjs (BD1 un en-tete qui AFFIRME un banc est confronte a ce qui existe, BD2 tout banc porte au moins un cas ecrit pour echouer, BD3 un `--self-test` annonce est lu) — recette a double sens oracles/oracle-banc-double-sens.test.mjs, 15 cas. Il ne rejoue PAS l'invariant I1 du harnais (l'existence d'un banc) : il juge l'ecart entre l'affirmation d'en-tete et le fait, et le sens rouge sur la SOURCE du banc, de facon bloquante",
    "voisines": [
     "fixture-jugee-par-son-seul-oracle",
     "regle-neuve-sans-mesure-de-bruit"
@@ -829,7 +829,7 @@
    "creee_le": "2026-09-09",
    "fondee_par": [],
    "regle": "tout controle qui juge une copie INSTALLEE resout sa racine par la variable de la plateforme d'abord (CLAUDE_CONFIG_DIR), le defaut ensuite, via UNE fonction partagee ; et son verdict NOMME le repertoire mesure et la variable qui l'a decide, en PASS comme en FAIL — un verdict qui ne dit pas ou il a regarde ne se conteste pas",
-   "oracle": "a creer : oracle-skills K10 — fixture a deux repertoires de configuration, l'un peuplé l'autre vide, CLAUDE_CONFIG_DIR pointant sur le vide ; l'oracle doit ECHOUER la ou il rend PASS aujourd'hui",
+   "oracle": "pilot, oracles/oracle-chemin-ancre.mjs (CA1 toute racine de configuration passe par scripts/lib-config-installee.mjs, CA2 aucune resolution du repertoire personnel au NIVEAU MODULE, CA3 la fonction partagee rend le chemin ET la variable decidante) — recette a double sens oracles/oracle-chemin-ancre.test.mjs, 14 cas. CA2 nomme a la ligne le defaut de TF-1297, l'une des deux causes du rouge de la simulation hebergee",
    "voisines": [
     "regle-balaie-prose-et-identifiants",
     "recette-verdict-non-prononcable"
@@ -842,7 +842,7 @@
    "creee_le": "2026-09-09",
    "fondee_par": [],
    "regle": "un controle mesure l INVARIANT qu il protege, enonce en une phrase dans son propre code (« aucun identifiant deja frappe ailleurs »), et jamais une grandeur qui lui est seulement correlee ; quand la grandeur mesuree et l invariant divergent, le message NOMME la divergence, ne propose aucun remede derive de la grandeur, et l echappatoire eventuelle fait declarer un FAIT VERIFIE, jamais un etat suppose",
-   "oracle": "a creer : fixture a double sens ou la correlation est ROMPUE — deux etats qui different sur la grandeur mesuree mais partagent l invariant doivent PASSER, deux etats identiques sur la grandeur mais divergents sur l invariant doivent ECHOUER",
+   "oracle": "pilot, oracles/oracle-invariant-mesure.mjs (IN1 aucun identifiant derive d'un COMPTE, IN2 toute echappatoire est expliquee, IN3 aucune echappatoire ne fait declarer une supposition) — recette a double sens oracles/oracle-invariant-mesure.test.mjs, 16 cas. Il juge la forme FONDATRICE et les deux aggravations que la classe nomme, et DECLARE qu'il ne mesure pas la famille entiere : reconnaitre une grandeur seulement correlee demanderait de savoir ce que l'auteur protegeait",
    "voisines": [
     "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
     "controle-sans-fixture-double-sens",
@@ -886,7 +886,7 @@
    "creee_le": "2026-09-10",
    "fondee_par": [],
    "regle": "toute regle qui pose une CONDITION verifiable — une liste de chemins, une nature de fichier, une valeur, un ordre — nomme l oracle qui la joue ou porte, le jour ou elle est ecrite, une candidature pour cet oracle ; une regle sans juge ni candidature n entre pas dans un texte opposable",
-   "oracle": "a creer par cas ; pour R-38 §4 : oracle-nature-enregistrement (candidature du 10/09), fixture a double sens — commit de restitution seule PASS, le meme plus une ligne du noyau FAIL",
+   "oracle": "pilot, oracles/oracle-regle-sans-juge.mjs (RJ1 toute regle declaree est nommee par un executable, RJ2 toute regle nommee par du code est declaree, RJ3 un numero designe UNE regle) — recette a double sens oracles/oracle-regle-sans-juge.test.mjs, 14 cas. Ce qui manquait n'etait pas un oracle PAR REGLE mais un oracle sur la RELATION entre le corpus opposable et le code : « a creer par cas » est ce qui a laisse cette classe sans juge pendant 12 candidatures",
    "voisines": [
     "controle-sans-fixture-double-sens",
     "controle-vrai-sur-le-mauvais-invariant",
@@ -1316,6 +1316,21 @@
    "oracle": "pilot, oracles/oracle-amorcage-poste.mjs (AP1, AP2, AP3) — recette a double sens oracles/oracle-amorcage-poste.test.mjs, 23 cas ; lu au releve d ouverture, non bloquant (classe constat-non-bloquant-jamais-lu)",
    "voisines": [
     "skill-non-invoque-lexique",
+    "controle-ecrit-non-cable-a-son-etape",
+    "constat-non-bloquant-jamais-lu"
+   ]
+  },
+  {
+   "cle": "site-de-scellement-hors-table-d-empreintes",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un depot du parc acquiert un SITE DE SCELLEMENT — un script qui pose ou verifie une empreinte — sans que la table des empreintes du pilot le declare. Le site arrive par une mise a jour du parc, pas par le travail du poste : personne ne le voit naitre, et le controle qui le decouvre rend rouge chez quelqu un qui n y est pour rien. Mesure du 17/09/2026 : oracle-empreintes E2 rend FAIL sur un sixieme site apparu dans une forge avec un enregistrement du 15/09, tire par l amorcage du matin. Le rouge reste ouvert tant qu un humain n a pas tranche si le site se declare ou se retire.",
+   "creee_le": "2026-09-22",
+   "fondee_par": [
+    "TF-1270"
+   ],
+   "regle": "toute table d empreintes du pilot declare les sites de scellement du parc qu elle couvre ; un site qui apparait par une mise a jour du parc se declare ou se retire, et le verdict nomme le depot d ou il vient",
+   "oracle": "pilot, oracles/oracle-empreintes.mjs regle E2 — c est lui qui a trouve le cas fondateur ; joue sur le parc reel par oracles/self-tests.mjs (invariant I4)",
+   "voisines": [
     "controle-ecrit-non-cable-a-son-etape",
     "constat-non-bloquant-jamais-lu"
    ]
