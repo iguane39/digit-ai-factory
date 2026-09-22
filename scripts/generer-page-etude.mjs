@@ -126,8 +126,22 @@ function cheminDesAssets(env = process.env) {
   return join(r.racine, "skills", "digit-ai-page-html", "assets");
 }
 
-/** Lit un asset du socle. Absent : chaîne vide, et l'appelant le DIT — jamais un échec muet. */
-export function lireAsset(nom, racine = ASSETS) {
+/**
+ * Lit un asset du socle. Absent : chaîne vide, et l'appelant le DIT — jamais un échec muet.
+ *
+ * LA RÉSOLUTION SE FAIT ICI, ET PAS DANS LA VALEUR PAR DÉFAUT D'UN PARAMÈTRE. L'action A-21 du
+ * 22/09 (TF-1297) a remplacé la constante de module `ASSETS` par `cheminDesAssets()`, appelée à
+ * l'usage, pour qu'un poste sans répertoire personnel puisse DIRE ce qui lui manque au lieu de
+ * lever au chargement. La signature, elle, a gardé `racine = ASSETS` : un symbole qui n'existait
+ * plus. Le générateur levait donc `ReferenceError: ASSETS is not defined` au PREMIER appel, sur
+ * tous les postes — y compris ceux dont le socle était parfaitement installé. Mesuré le 22/09 :
+ * `node scripts\generer-page-etude.mjs <étude>.md` ne produisait aucune page.
+ * *Une valeur par défaut est évaluée à chaque appel, mais elle est RÉSOLUE dans la portée du
+ * module : déplacer une constante vers une fonction sans toucher la signature laisse une
+ * référence morte que rien ne relit tant qu'un appel ne la traverse pas.*
+ */
+export function lireAsset(nom, racine = cheminDesAssets()) {
+  if (!racine) return "";
   try { return readFileSync(join(racine, nom), "utf8"); } catch { return ""; }
 }
 
@@ -331,6 +345,38 @@ Audience : le pilote de l'écosystème, qui décide des mandats.
 > Une citation de référence.
 `;
 
+// LA SOURCE QUI TRAVERSE LES ASSETS DU SOCLE, ET POURQUOI IL EN FAUT UNE SECONDE (22/09/2026).
+// `SOURCE_ESSAI` ne porte qu'UNE ligne de données : `armerTableaux` n'arme donc aucune table,
+// `cablerComposants` sort à sa première ligne, et `lireAsset` n'est JAMAIS appelé. Le self-test
+// rendait 7/7 pendant que la ligne de commande levait `ReferenceError` au premier appel réel, sur
+// tous les postes. *Une recette qui ne traverse pas la seule ligne capable d'échouer ne mesure
+// pas le programme : elle mesure le chemin qu'on avait déjà en tête.* Ce second essai franchit
+// `SEUIL_FILTRE`, donc il câble les trois assets du socle et il échoue si leur lecture casse.
+const SOURCE_ESSAI_TABLE_LONGUE = `---
+role: essai
+---
+
+# Étude d'opportunité — un tableau long — 20260916b
+
+Audience : le pilote de l'écosystème, qui décide des mandats.
+
+## Ce que le tableau porte
+
+Ce chapitre existe pour franchir le seuil de filtrage et câbler les composants du socle.
+
+| Ligne | Valeur |
+|---|---|
+| une | 1 |
+| deux | 2 |
+| trois | 3 |
+| quatre | 4 |
+| cinq | 5 |
+| six | 6 |
+| sept | 7 |
+| huit | 8 |
+| neuf | 9 |
+`;
+
 function selfTest() {
   const dir = mkdtempSync(join(tmpdir(), "page-etude-"));
   const casse = [];
@@ -363,14 +409,25 @@ function selfTest() {
     casse.push("l'indice n'est pas lu sur la forme datée en tête, réservée aux études");
   if (indiceDuNom("Digit-AI - Note Revue - Sujet - 20260818b.md") !== "20260818b")
     casse.push("l'indice n'est pas lu sur la forme R-4");
+  // 8. LES ASSETS DU SOCLE SONT RÉELLEMENT LUS — le seul cas qui franchit `SEUIL_FILTRE`, donc le
+  //    seul qui appelle `lireAsset`. Sans lui, une référence morte dans la signature de cette
+  //    fonction passait sept contrôles verts et cassait la ligne de commande (22/09/2026).
+  const fLong = join(dir, "20260916-etude-opportunite-table-longue.md");
+  writeFileSync(fLong, SOURCE_ESSAI_TABLE_LONGUE, "utf8");
+  const htmlLong = readFileSync(ecrirePage(fLong), "utf8");
+  if (!/data-filterable/.test(htmlLong))
+    casse.push("une table de neuf lignes n'est pas armée pour le filtrage — le seuil du socle n'est pas appliqué");
+  if (!/\.tf-btn/.test(htmlLong) || !/find-bar/.test(htmlLong))
+    casse.push("les assets du socle ne sont pas embarqués dans une page qui porte une table longue — `lireAsset` n'a rien rendu (socle absent, ou référence morte dans la résolution du chemin)");
 
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test generer-page-etude : 7/7 PASS (page écrite à côté de sa source ; autoportante, " +
+    : "Self-test generer-page-etude : 9/9 PASS (page écrite à côté de sa source ; autoportante, " +
       "aucune ressource distante ; titre portant l'indice DATÉ de la source et non celui du jour ; " +
       "corps rendu — tableau, liste et citation ; un seul titre principal ; deux générations de la " +
-      "même source identiques à l'octet ; indice lu sur les DEUX formes de nom admises)");
+      "même source identiques à l'octet ; indice lu sur les DEUX formes de nom admises ; table longue " +
+      "armée pour le filtrage ; assets du socle réellement lus et embarqués)");
   return casse.length ? 1 : 0;
 }
 

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 398 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 400 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -220,10 +220,11 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.9 Ko | `03-etudes/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
 | 20260917-releve-autres-reseaux-sociaux.md | — | 8.4 Ko | `03-etudes/20260917-releve-autres-reseaux-sociaux.md` |
 | 20260917-revue-hebdomadaire-mesure-pas0.md | — | 21.5 Ko | `03-etudes/20260917-revue-hebdomadaire-mesure-pas0.md` |
-| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 109.3 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 85.6 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
 | 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 31.2 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
 | 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.3 Ko | `03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
 | 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.4 Ko | `03-etudes/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
+| 20260922-etude-opportunite-messagerie-inter-sessions.md | — | 35.6 Ko | `03-etudes/20260922-etude-opportunite-messagerie-inter-sessions.md` |
 | 20260922-L99-echanges-inter-session.md | — | 28.3 Ko | `03-etudes/20260922-L99-echanges-inter-session.md` |
 | 20260922-revue-des-candidatures-par-famille.md | — | 11.8 Ko | `03-etudes/20260922-revue-des-candidatures-par-famille.md` |
 
@@ -236,6 +237,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json` |
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md | 20260818a | 4.2 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` |
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json` |
+| Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 18.8 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json` |
 | Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 33.3 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |

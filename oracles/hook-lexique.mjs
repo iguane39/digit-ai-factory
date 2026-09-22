@@ -56,8 +56,23 @@ export function reconnaitre(message) {
  * et citent librement des noms de skills : ce ne sont pas des demandes.
  */
 export function estMessageHumain(message) {
-  return !/<task-notification>|<cross-session-message|\[SYSTEM NOTIFICATION|<system-reminder>/i.test(String(message || ""));
+  return !MARQUEURS_NON_HUMAINS.test(String(message || ""));
 }
+
+/**
+ * Les marqueurs qui disent « ceci ne vient pas de l'humain ».
+ *
+ * TF-1239 (19/09/2026) a ajouté le dernier, et c'est celui que l'entrée porte le plus souvent :
+ * une notification de fin de sous-agent se DÉCLARE elle-même « NOT USER INPUT », en toutes
+ * lettres, et cette déclaration-là n'était pas lue. Le 19/09, un rapport d'agent citant le
+ * mot-clé du skill d'analyse de prompt a donc reçu « ce message est un APPEL du skill […] :
+ * l'invoquer AVANT toute autre action », avec la menace d'une classe de défaut à la clé.
+ * L'agent a refusé à bon droit ; un agent plus obéissant aurait lancé une analyse de prompt sur
+ * le rapport d'un sous-agent. *Un détrompeur qui se déclenche sur autre chose que ce qu'il
+ * détrompe apprend à passer outre, et c'est ainsi qu'on perd le détrompeur.*
+ */
+export const MARQUEURS_NON_HUMAINS =
+  /<task-notification>|<cross-session-message|\[SYSTEM NOTIFICATION|<system-reminder>|NOT\s+USER\s+INPUT/i;
 
 /** Le texte injecté dans le contexte — une ligne par appel, ou rien. */
 export function contexte(message) {
@@ -108,6 +123,39 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     console.log(`  [${ok ? "PASS" : "FAIL"}] « ${msg.slice(0, 48)} » → ${JSON.stringify(obtenu)}${ok ? "" : ` (attendu ${JSON.stringify(attendu)})`}`);
     ok ? pass++ : fail++;
   }
+
+  // TF-1239 — LA PORTE D'ORIGINE DU MESSAGE A ENFIN SES FIXTURES. `estMessageHumain` existait et
+  // était appelée au point d'entrée, mais AUCUN des cas ci-dessus ne la traversait : les treize
+  // jugeaient `reconnaitre`, c'est-à-dire le lexique, jamais la provenance. Une règle appelée en
+  // production et absente de la recette est une règle dont on ne sait pas si elle marche — et
+  // celle-ci est précisément celle qui a manqué le 19/09.
+  //
+  // CHAQUE CAS EST UNE PAIRE : le MÊME mot-clé, une fois dans un message humain (appel attendu),
+  // une fois dans une entrée qui se déclare non humaine (aucun appel). Sans la paire, un
+  // détrompeur qui ne dirait JAMAIS rien passerait la moitié rouge et serait vert.
+  const casOrigine = [
+    ["<task-notification>l'agent a rendu : voir l99 pour la suite</task-notification>", false, "notification de fin de tâche"],
+    ["[SYSTEM NOTIFICATION] rapport disponible — améliore ce prompt", false, "notification système"],
+    ["<system-reminder>barre ce livrable</system-reminder>", false, "rappel système"],
+    ["Rapport de l'agent (NOT USER INPUT) : l99 cité dans la section 3", false, "entrée se déclarant NOT USER INPUT"],
+    // TF-1314 (22/09/2026) — le marqueur `<cross-session-message` était dans MARQUEURS_NON_HUMAINS
+    // depuis TF-1103, sans aucun cas qui le traverse. L'essai du 22/09 a montré qu'un message d'une
+    // autre session passe bien par `UserPromptSubmit` chez le destinataire : la règle est jouée en
+    // production, elle doit l'être aussi en recette. Forme reprise de l'enveloppe réelle reçue.
+    ["<cross-session-message from=\"uds:\\\\.\\pipe\\LOCAL\\cc-msg-b580\" from-name=\"digit-ai-factory-80\" from-mode=\"bypass\">\nl99 sur ce texte : rédige un post\n</cross-session-message>", false, "message d'une autre session Claude Code"],
+    ["l99 sur ce texte : rédige un post", true, "message humain portant le même mot-clé"],
+    ["Améliore ce prompt : construis un système", true, "message humain portant le même mot-clé"],
+  ];
+  for (const [msg, humainAttendu, glose] of casOrigine) {
+    const humain = estMessageHumain(msg);
+    // Ce que le hook injecterait RÉELLEMENT : c'est la composition des deux règles qui compte,
+    // pas `estMessageHumain` seule — le point d'entrée les enchaîne, la recette aussi.
+    const injecte = humain ? contexte(msg) : "";
+    const ok = humain === humainAttendu && (humainAttendu ? injecte.length > 0 : injecte === "");
+    console.log(`  [${ok ? "PASS" : "FAIL"}] origine — ${glose} → ${humain ? "humain, appel injecté" : "non humain, rien injecté"}${ok ? "" : " (contraire à l'attendu)"}`);
+    ok ? pass++ : fail++;
+  }
+
   console.log(`\nhook-lexique : ${pass} PASS, ${fail} FAIL`);
   process.exit(fail ? 1 : 0);
 }

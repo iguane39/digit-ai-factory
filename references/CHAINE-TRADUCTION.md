@@ -2,7 +2,7 @@
 role: les deux chaînes déclarées de la traduction — « traduire un produit », « auditer ses traductions »
 destinataire: orchestrateur (pilot) et forges mobilisées
 sources_de_verite: ["retour Produit-02 20260826f (TF-0664)", "todo/TODO.jsonl — TF-0660, TF-0663, TF-0661", "gabarits/GLOSSAIRE.md", "forge_tests/adaptateurs/i18n.py"]
-verifie_le: 2026-08-27
+verifie_le: 2026-09-22
 ---
 
 # Traduire, auditer : deux chaînes déclarées
@@ -74,15 +74,27 @@ sa place.
 
 ## Chaîne B — « audite les traductions »
 
-**Le retour annonce dix étapes et n'en NOMME que trois.** Elles sont déclarées ici telles
-quelles ; **les sept autres ne sont pas inventées** — une séquence devinée aurait exactement le
-défaut qu'elle prétend corriger, celui d'une méthode écrite que rien ne tient.
+**Le retour nomme ses dix étapes, B1 à B10** — tableau de la section « Chaîne B » du lot
+`Produit-02 - RETOURS - 20260826f`, avec le tour de session où chacune a eu lieu. **RECTIFICATION
+du 22/09/2026 (TF-1094)** : cette fiche écrivait jusqu'ici que le retour « annonce dix étapes et
+n'en NOMME que trois », et ne déclarait que B2, B7 et B8. C'était une erreur de lecture : le lot
+dit « dix étapes, **dont** trois ont été écrites à la main par l'exploitant » — les trois étaient
+celles que la session avait INVENTÉES, pas les seules nommées. Les sept autres sont transcrites
+ci-dessous depuis le lot, mot pour mot quant à leur libellé ; rien n'y est deviné. La colonne
+« porteur » dit ce qui, dans le parc, tient réellement l'étape au 22/09 — ou qu'il n'y a rien.
 
-| # | étape nommée | ce qu'elle produit | état |
-|---|---|---|---|
-| B2 | **carte des sources de vérité**, distinguant la SOURCE de l'ARTEFACT | pour chaque fait servi, d'où il vient et ce qui le régénère | écrite à la main pendant la session — **à outiller** |
-| B7 | **axe GEO** : entités, citabilité, directives IA | ce qu'un moteur génératif peut citer, et ce qu'on lui interdit | écrite à la main — recoupe `forge-seo-geo` |
-| B8 | **plan applicable à ancres verbatim** + sidecar machine | un plan dont chaque ancre existe littéralement dans le fichier visé | écrite à la main — **à outiller** |
+| # | étape (libellé du lot) | ce qu'elle produit | porteur au 22/09/2026 | état |
+|---|---|---|---|---|
+| B1 | ligne de base mécanique : jouer les contrôleurs existants | les constats de ce qui existe déjà, avant tout jugement neuf | pan i18n de forge-tests (`forge_tests/adaptateurs/i18n.py`) ; chez le produit, `check-glossaire` et `check-traductions` (étape A5) | **porté** |
+| B2 | **carte des sources de vérité**, distinguant la SOURCE de l'ARTEFACT | pour chaque fait servi, d'où il vient et ce qui le régénère | aucun — écrite à la main pendant la session | **à outiller** |
+| B3 | confrontation glossaire ↔ emploi réel, par langue | les termes retenus absents, les proscrits employés | `oracles\oracle-glossaire.mjs` (G1–G8) juge le glossaire lui-même ; la confrontation à l'emploi est faite par `check-glossaire` chez le produit | **porté en partie** — la chaîne ne l'appelle pas encore comme étape |
+| B4 | preuve de marché rejouée, et sa péremption vérifiée | la preuve qu'une locale vaut d'être servie, datée et encore valide | aucun | **à écrire** |
+| B5 | cohérence interne, interlangue, et contre les sources de données | les contradictions d'une locale avec elle-même, entre locales, et avec les données qu'elle cite | pan i18n de forge-tests, contrôles (i) cohérence interne d'une locale (TF-0663) et (j) genre du déterminant (TF-0660) ; l'interlangue y est comparée | **porté en partie** — le volet « contre les sources de données » n'a aucun porteur |
+| B6 | dimensionnement SERP | l'ampleur de la recherche par locale, qui dit ce que la traduction doit couvrir | relève de `forge-seo-geo` ; aucun appel de la chaîne ne la mobilise | **à brancher** |
+| B7 | **axe GEO** : entités, citabilité, directives IA | ce qu'un moteur génératif peut citer, et ce qu'on lui interdit | aucun dans la chaîne — écrite à la main, recoupe `forge-seo-geo` | **à outiller** |
+| B8 | **plan applicable à ancres verbatim** + sidecar machine | un plan dont chaque ancre existe littéralement dans le fichier visé | la fiche de remise, règle T2 d'`oracles\oracle-remise-traduction.mjs` (100 % des ancres existent) | **jugé à la remise** — sa PRODUCTION reste à outiller |
+| B9 | arbitrages isolés et **posés à l'humain**, jamais tranchés seuls | la liste des décisions laissées à l'humain | règle T3 d'`oracles\oracle-remise-traduction.mjs` (liste des arbitrages non vide) | **porté** — c'est la seule étape qui a bien fonctionné du premier coup, sans outil |
+| B10 | critère d'arrêt et déclaration explicite de ce qui n'est pas couvert | quand l'audit s'arrête, et ce qu'il n'a pas regardé | la fiche de remise juge la déclaration de relecture native (T1) et la citation des verdicts (T4) ; **aucun critère d'arrêt n'est jugé** | **à écrire** |
 
 *Ce sont des étapes DE MÉTHODE, identiques d'un produit à l'autre.* Les faire réécrire à la main
 au produit suivant est exactement le coût que cette fiche existe pour supprimer.

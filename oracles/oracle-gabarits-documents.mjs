@@ -68,7 +68,7 @@
 // vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
 // d'environnement (TF-0648).
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -826,6 +826,37 @@ if (args[0] === "--self-test") {
     casse.push("G7 : une famille qui ne déclare AUCUNE section obligatoire est jugée — la règle accuserait " +
       "les 38 familles du parc le jour de sa naissance, et se ferait désactiver le lendemain");
 
+  // G10 (TF-1142, fixtures posées le 22/09/2026 sous TF-1256) — LE LECTEUR DÉCLARÉ ET LA FRONTIÈRE
+  // LECTEUR/AUTEUR, DANS SES TROIS SENS. La règle était en service depuis le 16/09 SANS AUCUN CAS : la
+  // recette ne la traversait ni en vert ni en rouge, et la famille « verte » ci-dessus — un GABARIT.md
+  // réduit à « # doctrine » — y ÉCHOUAIT en silence, parce que chaque fixture ne regarde que ses
+  // propres règles. Une règle annoncée opposable dont personne n'a vu le refus n'est pas prouvée
+  // (TF-1256 : un README annonçait des règles que l'oracle ne jouait pas ; ici l'oracle la joue, et
+  // c'est la recette qui ne l'avait jamais vue échouer). Les trois familles ne diffèrent que par UNE
+  // des deux pièces que la règle exige.
+  const LECTEUR_G10 = "role_destinataire: les développeurs de l'équipe, pour décider quoi appliquer\n";
+  const FRONTIERE_G10 = "\n## Document d'auteur\n\nLe registre d'arbitrages et l'historique des versions vivent là.\n";
+  // Une INSTANCE est due : G1 écarte une famille qui n'en porte pas AVANT toute autre règle, et une
+  // fixture sans elle ne mesurerait donc que G1 — le premier jet de ces cas l'a appris à ses dépens.
+  const poserG10 = (nom, corps) => {
+    mkdirSync(join(dir, nom), { recursive: true });
+    writeFileSync(join(dir, nom, "GABARIT.md"), corps, "utf8");
+    writeFileSync(join(dir, nom, "INSTANCE.md"), "# instance\n\nRemplie le 22 septembre 2026.\n" +
+      "\nGabarit : gd-g10 · version du gabarit 1.0.0\n", "utf8");
+  };
+  poserG10("g10-tenue", `# doctrine\n\n${LECTEUR_G10}${FRONTIERE_G10}`);
+  poserG10("g10-sans-frontiere", `# doctrine\n\n${LECTEUR_G10}`);
+  poserG10("g10-sans-lecteur", `# doctrine\n${FRONTIERE_G10}`);
+  const f10 = juger(dir);
+  const g10 = (ou) => f10.filter((x) => x.regle === "G10" && x.ou.startsWith(ou));
+  if (!g10("g10-tenue").length || !g10("g10-tenue").every((x) => x.statut === "PASS"))
+    casse.push("G10 : un gabarit qui déclare son lecteur ET écrit la frontière lecteur/auteur est accusé — la règle accuse ce qu'elle prescrit");
+  if (!g10("g10-sans-frontiere").some((x) => x.statut === "FAIL" && /Document d'auteur/.test(x.message)))
+    casse.push("G10 : un gabarit sans section « Document d'auteur » passe — c'est le trou par lequel le registre " +
+      "d'arbitrages et l'historique des versions partent au lecteur (refus humain du 15/09/2026)");
+  if (!g10("g10-sans-lecteur").some((x) => x.statut === "FAIL" && /role_destinataire/.test(x.message)))
+    casse.push("G10 : un gabarit qui ne déclare pas son lecteur passe — la frontière n'a alors aucun lecteur à protéger");
+
   // G3, sens rouge : une classe posée sans règle CSS — le défaut exact du 24/08, en modèle réduit.
   mkdirSync(join(dir, "classe-nue"), { recursive: true });
   writeFileSync(join(dir, "classe-nue", "GABARIT.md"), "# doctrine\n", "utf8");
@@ -1000,11 +1031,11 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 36/36 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 39/39 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
-      "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain ; " +
+      "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G10 dans ses TROIS sens (TF-1142, fixtures du 22/09 sous TF-1256) : lecteur déclaré et frontière lecteur/auteur écrite → PASS, frontière absente → FAIL, lecteur absent → FAIL ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain ; " +
       "G12 dans ses DEUX sens rouges — « aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; " +
       "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
       "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS)");
@@ -1073,9 +1104,16 @@ const dossierJuge = args[0] || join(PILOT, "gabarits", "documents");
 // arbitraire (self-test, périmètre restreint), il n'y a pas de catalogue à juger et le dire
 // vaut mieux que de le supposer.
 const catalogue = join(PILOT, "gabarits", "documents", "catalogue.jsonl");
+// TF-1254 (22/09/2026) — LE MÊME DOSSIER, ÉCRIT AUTREMENT, NE PERD PLUS LE CATALOGUE. La garde
+// comparait des CHAÎNES : `node oracles\oracle-gabarits-documents.mjs gabarits/documents`, lancé
+// depuis le pilot, désigne exactement la bibliothèque, mais ne valait pas le chemin absolu construit
+// ici — G11 et G12 étaient alors sautés, rien ne l'écrivait au non_juge, et le verdict restait PASS.
+// Mesuré le 22/09 : 7 règles rendues sur le chemin relatif, 9 sur le chemin par défaut. Le
+// commentaire ci-dessus promettait de « le dire plutôt que le supposer » ; le code ne le disait pas.
+const catalogueJuge = resolve(dossierJuge) === resolve(join(PILOT, "gabarits", "documents"));
 const findings = [
   ...juger(dossierJuge),
-  ...(dossierJuge === join(PILOT, "gabarits", "documents") ? jugerCatalogue(catalogue, join(PILOT, "..")) : []),
+  ...(catalogueJuge ? jugerCatalogue(catalogue, join(PILOT, "..")) : []),
 ];
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
@@ -1084,6 +1122,10 @@ console.log(JSON.stringify({
   verdict,
   findings,
   non_juge: [
+    ...(catalogueJuge ? [] : [
+      `le CATALOGUE — règles G11 (point de départ de toute famille html) et G12 (empêchement déclaré) : ` +
+      `le dossier jugé, ${dossierJuge}, n'est pas la bibliothèque du pilot, et le catalogue ne se juge ` +
+      "que sur elle. Relancer sans argument pour le juger ; un PASS rendu ici ne dit RIEN du catalogue"]),
     "le RENDU des pages : il a son propre contrôle (scripts\\verifier-rendu-instances.mjs) et le " +
     "dupliquer créerait deux vérités sur les familles bloquantes",
     "la justesse du CONTENU d'une instance : un texte d'exemple faux est un défaut de relecture",

@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\INVENTAIRE.md",
+  "date_iso": "2026-09-22T18:38:40.606Z",
+  "registre_version": "2.25.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 3,
+    "fail": 1,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "INVENTAIRE.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "INVENTAIRE.md",
+      "verdict": "FAIL",
+      "detail": "2 constat(s) · M7 chapitre sans ouverture : « Lecture transverse pour le pilot » (ligne 339) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond. ; M10 chapitre de données sans mode d'emploi : « Lecture transverse pour le pilot » (ligne 339) porte 15 lignes de tableau et aucune phrase ne dit COMMENT le lire — ce que vaut une colonne, ce qui est trié, ce qui est exclu. Un tableau de plus de 12 lignes ne se lit pas d'un coup d'œil."
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "INVENTAIRE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "INVENTAIRE.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "INVENTAIRE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "INVENTAIRE.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 29148 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "INVENTAIRE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "INVENTAIRE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "INVENTAIRE.md",
+    "ts": "2026-09-22T18:38:40.606Z",
+    "fichiers": {
+      "INVENTAIRE.md": "9e3722aef94113572bbb2ff6931fb47ffd449d57e5ef9753bfa4f2e7f3d9470a"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}

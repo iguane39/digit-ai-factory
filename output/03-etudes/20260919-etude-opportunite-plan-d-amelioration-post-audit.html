@@ -1,377 +1,113 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- A3 (TF-0303, 17/08) — charset PUIS viewport en TOUTE PREMIÈRE position : la
-     déclaration d'encodage doit tomber dans les 1024 premiers octets, sinon l'analyseur
-     devine. Le commentaire S-G1 ci-dessous et son script la repoussaient au 1613e octet :
-     mesuré par check_html.py, sur ce gabarit même. L'ordre compte, la position aussi. -->
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- S-G1 (1/4, R-30 amendé TF-0158 le 13/08) — initialisation AVANT la balise de style : pose
-     data-theme avant la première peinture (zéro flash). CLAIR PAR DÉFAUT, STRICTEMENT :
-     un livrable circule et s'ouvre identique chez tous ses lecteurs — l'auto-sombre
-     hérité de l'OS (prefers-color-scheme) est retiré (il a valu un retour humain réel
-     le 13/08 : « thème sombre par défaut »). Le sombre reste un CHOIX du lecteur,
-     persisté. Volontairement SANS defer/async : un script différé peindrait d'abord le
-     thème par défaut du CSS puis re-peindrait, c'est le flash que ce script évite
-     (déclenche le WARN générique « script bloquant en head » de check_html.py —
-     exception assumée, documentée ici). -->
-<script>
-(function () {
-  var stocke = null;
-  try { stocke = localStorage.getItem('digitai-theme'); } catch (e) {}
-  var theme = stocke === 'dark' ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', theme);
-  /* RV-9 (14/08) : `color-scheme` SUIT le thème effectif. Laissé à « light dark », le
-     navigateur peignait ses propres surfaces (ascenseurs, contrôles de formulaire) en
-     sombre dès que le poste l'était — un corps clair bordé de chrome sombre, alors même
-     que la règle dit « clair par défaut ». Le figer à « light » aurait produit l'inverse
-     après bascule. Il suit donc, et reste juste dans les deux états. */
-  var meta = document.querySelector('meta[name="color-scheme"]');
-  if (meta) { meta.setAttribute('content', theme); }
-})();
-</script>
-  <!-- A4 : marque — objet · client — indice de version DATÉ ({YYYYMMDD}{a,b,c…}, le même
-       que le nom de fichier). Sans lui, deux révisions du même jour portent le même nom à
-       l'écran ; « V1 » ne les distingue pas (défaut du 17/08, lot Produit-01). -->
-  <title>Digit-AI — Étude d'opportunité : plan d'amélioration après audit · Pilot — 20260919a</title>
-  <meta name="description" content="Étude d'opportunité du 19/09/2026 : faut-il un skill pour produire, après un audit, un plan d'amélioration rendu en page HTML, et quelles forges le porteraient.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTML complète — 20260919a</title>
+  <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict, qui">
   <meta name="theme-color" content="#2563EB">
-  <!-- « light » à l'écriture : le script d'initialisation ci-dessus le passe à « dark » si,
-       et seulement si, le lecteur a explicitement choisi le sombre (RV-9, 14/08). -->
   <meta name="color-scheme" content="light">
-  <!-- Favicon-lettre (systématisation du 13/08, loi transverse n°3 : la surface implicite
-       se propose d'office) : remplacer P par la PREMIÈRE LETTRE du client ou du projet. -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
-
-  <!-- Polices : AUCUN chargement réseau (A1/D-10 — confidentialité, durabilité,
-       lecture hors ligne). Roboto/DM Sans s'affichent si installées localement,
-       sinon les replis système des tokens --head/--sans/--mono prennent le relais. -->
-
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
   <style>
-    :root {
-      /* Couleurs — marque & surfaces */
-      --blue: #2563EB;
-      --bg: #FAFBFF;
-      --surface: #FFFFFF;
-      --card: #FFFFFF;
-      /* Focus — PRESCRIT par token, consomme par toute affordance (RGAA 10.7, WCAG 2.4.7) :
-         un anneau improvise par chaque auteur n'est pas une charte. */
-      --focus-anneau: 2px solid var(--blue);
-      --focus-decalage: 2px;
-      /* Couleurs — encres */
-      --ink: #0F172A;
-      --muted: #64748B;
-      --faint: #94A3B8;
-      --line: #E6EAF2;
-      /* Accents sémantiques */
-      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
-      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
-      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
-      /* TF-0755 (02/09) : le QUATRIEME registre, employe par les livrables de la maison et
-         documente nulle part. Un rapport de conformite qui a eu besoin d'un « refus / non
-         declare » ne l'a pas trouve dans le socle et l'a INVENTE — alors que le livrable
-         conforme de reference portait deja ces trois valeurs exactes. Une palette dont un
-         registre entier n'est ecrit nulle part se fait reinventer, et deux reinventions donnent
-         deux rouges dans deux livrables de la meme maison. */
-      --red:   #B91C1C; --red-fill:   #FEF2F2; --red-line:   #F6CFCF;
-      /* TF-0754 (02/09) : hauteur de l'EN-TETE COLLANT. Le socle a tranche — l'en-tete garde le
-         bord haut, le thead collant et le sommaire lateral se decalent de var(--hh). Un token
-         consomme sans etre pose vaudrait 0 et ramenerait la collision (controle L29). */
-      --hh: 64px;
-      /* TF-0929 (08/09, troisieme retour humain sur l'en-tete collant en deux jours) — `--hh`
-         est un TOKEN, et un token ne suit pas une hauteur qui change avec la largeur. Des que
-         l'en-tete passe sur deux lignes, ou qu'une bande de sommaire colle SOUS lui, ce qui
-         colle au-dessus du thead est plus haut que 64 px, et le thead se range DERRIERE eux —
-         mesure a 1 370 px : 115 px d'en-tete masques ; a 1 600 px, aucun defaut. Les deux
-         valeurs sont donc MESUREES au chargement, au redimensionnement et aux polices chargees
-         (voir poserHauteurs() en pied de page) ; ce qui est ecrit ici est le REPLI, celui qui
-         sert avant la premiere mesure et si le script ne s'execute pas.
-         --hh     : bas de l'en-tete collant — ce qui colle directement sous lui l'emploie ;
-         --hh-tab : bas du DERNIER collant au-dessus d'un tableau (en-tete + bande de sommaire
-                    collante s'il y en a une) — le thead collant emploie celui-la. */
-      --hh-tab: 64px;
-      /* Rayons */
-      --r: 12px; --r-sm: 8px;
-      /* Largeur du conteneur et largeur de lecture — cf. regle L2.
-         Le conteneur occupe 75-100 % de la fenetre A TOUTE TAILLE (decision 13/08) :
-         92vw sous ~1826px, plafond confort 1680px, plancher 75vw au-dela. */
-      /* TF-0450 : `--prose: 75ch` retire. Il n'etait plus consomme nulle part depuis que
-         TF-0421 a retire la bride `p, li { max-width: var(--prose) }` — un token declare et
-         jamais lu n'est pas neutre, c'est la trace visible d'une doctrine abandonnee, en tete
-         du fichier que tout auteur de page copie. Le prochain le rebrancherait. */
-      --w: clamp(75vw, 1680px, 92vw);
-      /* Familles (repli système obligatoire) */
-      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
-      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
-      /* Année de référence (token isolé) */
-      --annee-ref: "2026";
-    }
-
-    /* S-G1 (2/4, R-30) — tokens sombres : une source, deux projections. bg/surface
-       s'assombrissent vers une base marine ; ink/muted/faint s'éclaircissent en
-       dégradé inverse ; line reste un filet proche du fond ; chaque accent
-       sémantique éclaircit sa teinte de base (lisible sur fond sombre) et assombrit
-       son -fill/-line en griffe basse de la même teinte. */
-    :root[data-theme="dark"] {
-      --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
-      --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
-      --blue: #7DA2F5;
-      --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
-      --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
-      --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
-      --red:   #F5A3A3; --red-fill:   #2C1416; --red-line:   #4C1F22;
-    }
-
-    * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--sans);
-      line-height: 1.55;
-      font-size: 16px;
-    }
-    /* TF-0733 (31/08, lot produit) — LE VOILE INVISIBLE AUX SEIZE ORACLES. Un panneau masque
-       par l'attribut `hidden` mais style par un `display: flex` explicite : la regle CSS
-       l'emporte sur le display:none que l'attribut tient de la feuille de l'agent utilisateur,
-       et un rectangle TRANSPARENT couvre l'ecran en interceptant chaque clic — invisible en
-       capture (transparent), invisible a la lecture (syntaxiquement correct), trouve par
-       document.elementFromPoint. Cette ligne rend l'attribut SOUVERAIN : un composant masque
-       le reste, quel que soit le display que sa classe pose. Elle est OBLIGATOIRE de charte
-       sur toute page qui emploie `hidden` (controle L23 de check_html.py). */
-    [hidden] { display: none !important; }
-
-    /* Regle L2 (corrigee, TF-0421 — lot Produit-05 20260820a) : la mesure de lecture est portee
-       par le CONTENEUR, jamais par le paragraphe. L'ancienne doctrine (« conteneur relatif,
-       prose bornee en ch ») bridait chaque <p> a 75ch : a 1 800 px, 60 % de la fenetre vide,
-       livre vert, refuse par le client. Deux gabarits de chapitre NOMMES remplacent la bride :
-         .chap.lire  — un PASSAGE de lecture (~1 080 px centres) INSERE dans une mise en page
-                       large — JAMAIS l'enveloppe d'un chapitre entier : employe comme
-                       enveloppe, il place tout le document a 56 % d'une fenetre de 1 920 px,
-                       sous le plancher de largeur que ce squelette enonce, et render_page L2
-                       le refuse a bon droit (TF-0724 D2, constate par le destinataire humain) ;
-         .chap.duo   — grille 7/5 texte + encart utile (KPI, legende, figure), repli < 1 100 px.
-       Un <p> seul sur une largeur de 1 680 px reste illisible : c'est le CHAPITRE qu'on
-       retrecit (.chap.lire), pas la ligne. render_page.py L2 juge quelle que soit la propriete. */
-    .wrap { max-width: var(--w); margin: 0 auto; padding: 32px 24px 64px; }
-    /* TF-0930 (retour humain du 08/09, « augmente la largeur complete du document ») — une
-       page qui se DECLARE page de donnees echappe au plafond de confort : `--w` la bridait a
-       1 260 px dans une fenetre de 1 370 et a 1 680 dans une fenetre de 1 920, alors que I1 et
-       L26 disent « pleine largeur adaptative ». Sept colonnes de mapping n'entrent pas dans
-       1 260 px ; la place existe, la page doit la prendre. La colonne de lecture reste
-       accessible a la PROSE par `.chap.lire`, qui n'est pas touche ici.
-       Mesure : .wrap 1 370/1 370 px et 1 920/1 920 px apres, contre 1 260 et 1 680 avant.
-       Controle : famille `conteneur_bride_donnees` de render_page.py (>= 96 % a >= 1 280 px). */
-    [data-page="donnees"] .wrap,
-    .wrap[data-page="donnees"] { max-width: none; padding: 20px 28px 48px; }
-    /* TF-0932 — l'entrée en matière d'un chapitre : ce qu'il contient, puis ses termes. */
-    .contenu { margin: .2em 0 .8em; color: var(--muted); }
-    .termes { margin: 0 0 1em; font-size: .92em; color: var(--muted); }
-    .termes dfn { font-style: normal; font-weight: 600; color: var(--ink); }
-    .chap.lire { max-width: 1080px; margin-left: auto; margin-right: auto; }
-    .chap.duo { display: grid; grid-template-columns: 7fr 5fr; gap: 32px; align-items: start; }
-    @media (max-width: 1100px) { .chap.duo { grid-template-columns: 1fr; } }
-
-    /* ── Tableaux, et leur repli en cartes (TF-0442, composants.md §6) ──────────────────
-       Le socle ne portait AUCUN style de tableau : chaque page en reinventait, et le repli en
-       cartes — seule parade reelle au debordement — n'existait qu'en exemple dans un
-       referentiel. Mesure du 21/08 sur une page dont TOUS les tableaux etaient deja dans un
-       conteneur `overflow-x: auto` : 26 defauts V1 BLOQUANTS a 390 px (25 causes, 935
-       elements), 4 a 768 px, et ZERO apres repli. Un conteneur qui defile rend un tableau
-       CONSULTABLE ; il ne le rend pas lisible et ne fait pas passer V1, qui compare le bord
-       droit au viewport sans regarder si un ancetre defile.
-
-       Seuil a 900 px et non 640 : le calibrage de composants.md (~130 px de largeur utile par
-       colonne de prose) place le repli d'un tableau de 4 colonnes textuelles au-dessus de
-       640 px. Verifie au rendu sur le squelette de rapport de donnees du pilot — PASS a
-       1280 / 768 / 390.
-
-       `thead { display: none }` et non un masquage hors ecran : la version « position
-       absolue + clip » a ete essayee D'ABORD et REFUSEE par render_page — les `<th>` gardent
-       leur largeur naturelle et debordent (3 BLOQUANTS mesures a 390 px). Le libelle de colonne
-       n'est pas perdu, il est rendu par `td::before` depuis `data-label`.
-
-       Chaque `<td>` porte `data-label="<en-tete de sa colonne>"`. Un tableau qui n'en porte
-       pas ne se replie pas — c'est voulu : le repli sans etiquette rendrait des valeurs nues. */
-    /* ── TF-0900 (08/09/2026) : LE CONTENEUR DEFILANT NE VIT QUE SOUS 900 px ────────────
-       Un ancetre dont l'`overflow` n'est pas `visible` DEVIENT la boite de defilement de tout
-       `position: sticky` de son sous-arbre. `.table-hote { overflow-x: auto }` pose partout
-       DEFAISAIT donc, a lui seul, le geste L29 pose vingt lignes plus bas : le thead se figeait
-       sous le haut de SON TABLEAU au lieu de l'en-tete de page. Mesure du 07/09 sur quatre
-       tableaux sans filtres : th a 404 px au repos pour 337 attendus (+67), une ligne recouverte
-       en permanence, -96 px apres 200 px de defilement — le thead quittait l'ecran avec son
-       tableau. Deux lignes du MEME gabarit se contredisaient, et un produit a du trancher seul.
-
-       ARBITRAGE : au-dessus de 900 px le conteneur ne defile PAS. Il n'y servait a rien — la
-       regle « tableau rogne » (render_page, famille rognage_donnees) refuse deja qu'un tableau
-       soit coupe dans un conteneur defilant sur une page de donnees, et V1 ne regarde pas si un
-       ancetre defile. Sous 900 px il reprend son role : c'est la que le repli en cartes masque
-       le thead (`table.repli-cartes thead { display: none }`), donc plus aucun sticky a casser,
-       et qu'un tableau NON repliable a besoin d'etre consultable a defaut d'etre lisible.
-       Reste declare : un tableau sans `data-label` (donc sans repli) ET porteur de `thead.colle`
-       perd son collage sous 900 px — c'est la seule largeur ou le socle prefere la consultation
-       au collage, et lisibilite.md L29 le dit. */
-    .table-hote { overflow-x: visible; }
-    table { width: 100%; border-collapse: collapse; }
-    caption { text-align: left; color: var(--muted); font-size: .85rem; padding: 8px 0; }
-    /* TF-0724 D1 (31/08, lot produit) — `overflow-wrap: anywhere` NE VIT PLUS sur `th, td` :
-       pose la, la coupure s'appliquait a TOUTE cellule de prose, et L19 — le controle qui
-       accompagne ce squelette — refusait precisement cela. Tout document bati sur le socle et
-       portant un tableau de texte echouait SANS QUE SON AUTEUR AIT RIEN ECRIT (deux echecs
-       mesures sur un livrable, imputables au seul CSS du socle ; la surcharge ne suffisait
-       pas, l'oracle lisant la declaration et non la cascade). La coupure vit desormais aux
-       DEUX seuls endroits legitimes : le repli en cartes (composants.md §6, palier oblige,
-       tolere par L19 depuis TF-0554) et la classe explicite `.cellule-code` pour les cellules
-       d'identifiants techniques — une classe qui DIT son usage, comme L19 le demande. */
-    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th { font-family: var(--head); font-weight: 700; }
-    td.cellule-code, th.cellule-code { font-family: var(--mono); overflow-wrap: anywhere; }
-    @media (max-width: 900px) {
-      /* TF-0900 : c'est ICI que le conteneur defilant sert — le thead est masque par le repli
-         en cartes (ligne suivante), donc aucun sticky ne peut etre casse, et un tableau non
-         repliable reste consultable au doigt. */
-      .table-hote { overflow-x: auto; }
-      table.repli-cartes thead { display: none; }
-      table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
-      table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; }
-      table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
-      table.repli-cartes td:not([data-label])::before { content: none; }
-    }
-
-    h1, h2, h3, h4 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
-    h1 { font-size: 2rem; margin: 0 0 .25em; }
-    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .5em; }
-    h3 { font-size: 1.1rem; font-weight: 700; margin: 1.5em 0 .4em; }
-    /* TF-0724 D3 : le socle s'arretait a h3 — un document au quatrieme niveau devait le styler
-       lui-meme, et declenchait « saut de hierarchie » s'il n'intercalait pas un h3. Le niveau 4
-       existe ; au-dela, c'est un composant, pas un titre. */
-    h4 { font-size: 1rem; font-weight: 700; margin: 1.2em 0 .3em; }
-    p, li { margin: 0 0 1em; }
-    a { color: var(--blue); }
-    code, pre { font-family: var(--mono); }
-
-    header.doc {
-      border-bottom: 2px solid var(--blue);
-      padding-bottom: 16px; margin-bottom: 24px;
-    }
-    /* ── B1 contre B6 : l'ARBITRAGE, en deux lignes (TF-0754, 02/09) ──────────────────
-       « header sticky » et « thead sticky » se superposaient sur toute page longue a
-       tableaux : le thead se collait au bord haut DERRIERE l'en-tete et devenait illisible,
-       ou bien on lui donnait un decalage au jugé et il flottait au-dessus des premieres
-       lignes de son propre tableau. Aucun des deux textes du socle ne disait lequel cede, ni
-       ne fournissait le decalage — un PRODUIT a fini par trancher, apres deux cycles de
-       rendu. L'en-tete garde le bord haut (c'est lui qui porte l'identite du livrable) ; ce
-       qui colle SOUS lui consomme --hh. Le sommaire lateral (L25) prend le meme repere. */
-    header.doc.colle { position: sticky; top: 0; z-index: 20; background: var(--bg); }
-    thead.colle th   { position: sticky; top: var(--hh-tab, var(--hh)); z-index: 10; background: var(--surface); }
-    nav.toc.colle    { position: sticky; top: var(--hh); z-index: 10; }
-    @media (max-width: 900px) { nav.toc.colle { position: static; } }
-    .eyebrow { color: var(--muted); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
-
-    /* S-G1 (3/4, R-30) — bouton de bascule, en-tête, haut à droite */
-    .theme-toggle { appearance: none; border: 1px solid var(--line); background: var(--surface);
-      color: var(--ink); border-radius: 999px; width: 36px; height: 36px; flex: none; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; }
-    .theme-toggle:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
-    .theme-toggle .icon-sun { display: none; }
-    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
-    :root[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--r);
-      padding: 20px 24px;
-      margin: 16px 0;
-    }
-
-    footer.doc {
-      margin-top: 48px; padding-top: 16px;
-      border-top: 1px solid var(--line);
-      color: var(--muted); font-size: .85rem;
-    }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-      .wrap { padding: 24px 16px 48px; }
-      h1 { font-size: 1.6rem; }
-    }
-
-    /* Respect du mouvement réduit (a11y) */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-    }
-
-    /* Export PDF / impression */
-    @page { size: A4; margin: 18mm 16mm; }
-    @page :first { margin-top: 22mm; }
-    @media print {
-      /* S-G1 (2/4 suite, R-30.2) — impression toujours claire, quel que soit le
-         thème affiché à l'écran au moment d'imprimer. */
-      :root, :root[data-theme="dark"] {
-        --bg:#FFFFFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
-        --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2; --blue:#2563EB;
-        --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
-        --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
-        --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
-        --red:#B91C1C;   --red-fill:#FEF2F2;    --red-line:#F6CFCF;
-      }
-      body { background: var(--surface); }
-      .wrap { max-width: none; padding: 0; }
-      .card { break-inside: avoid; page-break-inside: avoid; }
-      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
-      .theme-toggle { display: none; }
-    }
-
-    /* Page : sommaire permanent à gauche (L25), contenu à droite ; repli sous 900 px. */
-    .page { display: grid; grid-template-columns: minmax(230px, 280px) minmax(0, 1fr); gap: 40px; align-items: start; }
-    @media (max-width: 900px) { .page { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
-    nav.toc ol { list-style: none; margin: 0; padding: 0; }
-    nav.toc li { margin: 0 0 4px; }
-    nav.toc a { display: block; padding: 8px 12px; border-radius: var(--r-sm); text-decoration: none; color: var(--ink); border: 1px solid transparent; }
-    nav.toc a:hover { border-color: var(--line); background: var(--surface); }
-    nav.toc a:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
-    nav.toc .toc-t { display: block; font-family: var(--head); font-weight: 700; font-size: .92rem; }
-    nav.toc .toc-d { display: block; color: var(--muted); font-size: .8rem; line-height: 1.35; }
-    nav.toc.colle { max-height: calc(100vh - var(--hh) - 16px); overflow-y: auto; }
-    main section { scroll-margin-top: calc(var(--hh) + 12px); }
-    main section:first-child h2 { margin-top: 0; }
-    .ch-apprend { font-size: 1.1rem; font-weight: 600; color: var(--ink); margin: 0 0 12px; }
-    .exemple-lecture, .mode-emploi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 16px; font-size: .92rem; }
-    td code, li code, p code { font-size: .88em; overflow-wrap: anywhere; }
-    table { font-size: .92rem; }
-    thead.colle th { background: var(--surface); }
-    .piece { color: var(--muted); font-size: .85rem; }
-    /* Mesure de lecture portee par le CONTENEUR (E4) : la prose est tenue, les tableaux prennent la largeur. */
-    .lire { max-width: 1080px; margin-left: auto; margin-right: auto; }
-    .table-hote + .tf-count { margin-bottom: 16px; }
-    section > .table-hote, section > .toolbar { margin-top: 16px; margin-bottom: 16px; }
-    .table-hote + .tf-count { margin-top: 12px; }
-    .toc-bande > summary { font-family: var(--head); font-weight: 700; cursor: pointer; padding: 8px 12px; list-style-position: inside; }
-    @media (min-width: 901px) { .toc-bande > summary { display: none; } }
-    @media (max-width: 900px) {
-      /* Sous 900 px l'en-tete ne colle plus : c'est la bande de sommaire qui tient le bord haut (L25). */
-      header.doc.colle { position: static; }
-      nav.toc.colle { position: sticky; top: 0; z-index: 15; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm); max-height: 80vh; }
-      .toc-bande > ol { padding: 0 8px 8px; }
-    }
-    @media print { .toc-bande > summary { display: none; } }
-    .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
-    .toolbar input[type="search"] { font-family: var(--sans); font-size: 1rem; padding: 8px 12px; min-width: min(320px, 100%); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); }
-    .toolbar input:focus-visible, .toolbar .raz:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
-    .toolbar .raz { font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); cursor: pointer; }
-    .count { color: var(--muted); font-size: .85rem; }
-    .count.zero { color: var(--red); font-weight: 700; }
-    tr[data-recherche-masque] { display: none; }
-    @media print { .toolbar { display: none; } tr[data-recherche-masque] { display: table-row; } }
+    /* L'ECHELLE 4 PT EST UN JETON, PAS UNE HABITUDE (TF-1162, 20/09/2026). Les espacements de
+       cette coquille etaient ecrits a la main — 14, 10, 9, 7 px — et oracle-tokens de forge-design
+       les comptait un par un : ONZE ecarts T3 sur CHAQUE page produite par le generateur, plus
+       deux couleurs en dur (T1). Un defaut de coquille n'est pas un defaut de page : il se compte
+       autant de fois qu'il y a de pages, et aucune relecture de page ne le corrige.
+       Les jetons --e1..--e10 portent l'echelle ; T3 ne juge jamais une valeur passee par var(). */
+    :root{--blue:#2563EB;--bg:#FAFBFF;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;
+      --faint:#94A3B8;--line:#E6EAF2;--teal:#0E9488;--teal-fill:#EFFDFB;--amber:#B45309;
+      --amber-fill:#FFFBEB;--alerte:#B42318;--r:12px;--r-sm:8px;
+      --e1:4px;--e2:8px;--e3:12px;--e4:16px;--e5:20px;--e6:24px;--e8:32px;--e10:40px;
+      --head:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace}
+    *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+    /* 75-100 % de la fenêtre, toujours : 92vw en dessous de 1826px, plafond confort 1680px, plancher 75vw au-delà */
+    .wrap{max-width:clamp(75vw,1680px,92vw);margin:0 auto;padding:32px 24px 64px}
+    /* page de DONNEES (I1 / L26) : le contenu prend toute la largeur du .wrap (>= 75 vw) — une colonne
+       de 75ch laissait 34 % de l'ecran a 1920 px, mesure Playwright du 07/09 (646 px sur 1920). La classe
+       s'appelle desormais defile et non scroll : le depot ecrit ses noms en francais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript — aucun accent grave ici. */
+    .colonne{max-width:none;margin:0}
+    h1,h2,h3{font-family:var(--head);font-weight:800;line-height:1.2}
+    h1{font-size:1.7rem;margin:0 0 .2em} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
+    h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
+    code{font-family:var(--mono);font-size:.9em}
+    /* L19 autorise nommement la coupure sur un lien : une URL est un identifiant, pas un mot. */
+    a{color:var(--blue);overflow-wrap:anywhere}
+    /* LA MESURE DE LECTURE SE POSE SUR LE CONTENEUR, JAMAIS SUR LE TEXTE (16/09/2026).
+       Mesure de l'oracle de rendu sur une page d'etude : 221 caracteres par ligne a 3840 px
+       pour un plafond de 135 (V18) — l'oeil perd le debut de la ligne suivante. Un premier
+       remede a borne le PARAGRAPHE par max-width : L2 l'a refuse aussitot, et son message
+       dit le remede juste — « poser la mesure de lecture sur le CONTENEUR (.chap.lire), pas
+       sur le texte, ET la declarer par data-mesure-lecture des lors qu'il a des freres plus
+       larges ». *Les deux regles ne se contredisent pas : ensemble, elles decrivent une
+       seule construction*, celle du gabarit de chapitre du socle (E4, token a 1 080 px).
+       Les tableaux restent FRERES du chapitre et gardent toute la largeur offerte. */
+    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
+    /* CENTRE, ET D'UN SEUL RYTHME. Deux mesures de l'oracle de rendu, le meme jour :
+       · L2 (conteneur) — la colonne de lecture calee A GAUCHE laissait 1 752 px de vide a droite
+         et 0 a gauche, sans voisin : le remede qu'il nomme est de la CENTRER, ou de lui donner un
+         voisin utile. Ici elle a des freres — les tableaux — mais pas a sa hauteur : on centre.
+       · V7 (rythme) — les espaces entre paragraphes mesuraient 85 / 57 / 57 / 54 px : un rythme
+         vertical qui varie sans raison se lit comme un defaut de mise en page. Les marges sont
+         posees une fois, en bas seulement, pour que deux blocs voisins ne cumulent jamais. */
+    .chap.lire{max-width:1080px;margin-inline:auto}
+    .chap.lire>*{margin-top:0;margin-bottom:16px}
+    .chap.lire>h2{margin-top:28px} .chap.lire>h3{margin-top:20px}
+    .chap.lire>*:first-child{margin-top:0}
+    /* PAS DE BANDEAU LATERAL DECORATIF (S1, oracle-slop). La citation portait un border-left de
+       3 px en couleur de marque — « le design touch le plus recycle des UI d'admin », dit la regle,
+       et elle est BLOQUANTE. La citation se distingue par son encadrement complet et son fond,
+       comme les autres blocs de surface de cette coquille : un seul vocabulaire, pas un accent. */
+    blockquote{margin:var(--e4) 0;padding:var(--e3) var(--e4);border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);color:var(--muted)}
+    blockquote p{margin:0}
+    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:var(--e3) 0}
+    table{border-collapse:collapse;width:100%;font-size:.92rem}
+    th{font-family:var(--head);font-weight:700;text-align:left;padding:var(--e3);border-bottom:2px solid var(--line)}
+    td{padding:var(--e2) var(--e3);border-bottom:1px solid var(--line);vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    ul{margin:.4em 0;padding-left:1.3em}
+    figure{margin:var(--e4) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--e4);overflow-x:auto}
+    figcaption{color:var(--muted);font-size:.85rem;margin-top:var(--e2)}
+    svg{max-width:100%;height:auto}
+    footer{margin-top:var(--e10);color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:var(--e4)}
+    /* L19 (TF-0556, 24/08) — LA COUPURE DE MOT QUITTE LA PROSE. La propriete overflow-wrap:anywhere
+       etait posee sur .meta, td et footer : ravageuse sur du texte courant, ou un mot se casse en
+       deux au milieu d'une ligne sans cesure ni trait d'union. Elle ne reste QUE sur les cellules,
+       et seulement sous le palier de repli, la ou le socle l'EXIGE (composants.md section 6) — un
+       identifiant long dans une cellule etroite doit pouvoir se couper, une phrase jamais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript. Aucun accent grave ici, il
+       fermerait la chaine et casserait tout ce qui suit — defaut commis en ecrivant ce commentaire. */
+    /* SUR MOBILE, L'EN-TETE AUSSI PASSE EN BLOC (16/09/2026). La regle ne convertissait que les
+       cellules de donnees : la ligne d'EN-TETE, restee en cellules de tableau, continuait d'imposer
+       sa largeur, et l'oracle mesurait un tableau a 441 px de bord droit pour une fenetre de
+       390 px (V1). Un conteneur defilant ne suffit pas a eteindre V1 — la regle mesure le bord
+       droit de chaque element, defilant ou non, et elle a raison : une page qui se lit en poussant
+       le doigt de cote se lit mal. */
+    /* CE QUI NE SE COUPE PAS POUSSE LA PAGE — ET LA COUPURE A UN PERIMETRE (16/09/2026).
+       Deux mesures sur une etude qui cite beaucoup de chemins : a 768 px un tableau sortait a
+       799 px, et a 390 px le DOCUMENT mesurait 419 px de large. La cause est un jeton insecable
+       qui impose sa longueur a sa cellule, donc au tableau, donc a la page.
+       PREMIER REMEDE, REFUSE DANS LA MINUTE : autoriser la coupure sur les cellules. L19 l'a
+       rejete, et elle a raison — un mot francais s'y casse n'importe ou (« Utilisabl/e »), et la
+       regle reserve nommement la coupure a code, pre, aux liens et aux cellules d'IDENTIFIANTS.
+       REMEDE TENU : la coupure ne touche que les fragments de CODE, ou vivent justement les
+       chemins et les identifiants qui poussaient la page. La prose n'est jamais touchee. */
+    code{overflow-wrap:anywhere}
+    @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}
+      .defile td,.defile th{display:block;overflow-wrap:anywhere}
+      .defile table{width:100%} .chap.lire{max-width:none}}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    @page{margin:14mm}
+    /* Le fond d'impression passe par le JETON de surface : un « #fff » ecrit ici est a la fois un
+       T1 bloquant (couleur en dur hors bloc de jetons) et un S4 majeur (blanc pur non teinte),
+       alors que --surface porte deja la valeur que la charte prescrit. */
+    @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:var(--surface)}}
   </style>
-<!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
-     posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
-     La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<style data-composant="table-filters.css" data-empreinte="sha256:62a4ed4ce94409b65d0afadafdde619f2fd18f625011c93841bebd02eef0a8f9">
+  <style>
 /* table-filters.css — habillage charté du composant de filtres de colonne (D-12).
    TF-0176 (13/08) : un composant se livre AVEC son CSS — livré nu, il sort en rendu brut
    navigateur chez tous ses hôtes (constaté sur le dashboard forge-tests du 13/08, refusé
@@ -379,18 +115,21 @@
    composant — JAMAIS de balise écrite en toutes lettres dans ce commentaire (même famille
    de piège que RA-1 : un « script » ouvrant en commentaire fausse toute lecture paresseuse
    du document). Ne consomme que les tokens :root du socle (--surface, --ink, --muted,
-   --line, --blue, --r-sm) : aucune couleur en dur, les deux thèmes sont servis. */
+   --line, --blue, --r-sm) : aucune couleur en dur, les deux thèmes sont servis. TF-1059
+   (11/09) : deux couleurs en dur restaient (texte du bouton actif, repli du survol), treize
+   espacements sortaient de l'échelle 4pt et quatre anneaux de focus n'étaient pas prescrits —
+   corrigés ici, à la source, plutôt que dans chaque produit. */
 
 .tf-btn {
   font: inherit; font-size: .72rem; line-height: 1;
   color: var(--blue); background: var(--surface);
   border: 1px solid var(--line); border-radius: var(--r-sm);
-  padding: 3px 7px; margin-left: 6px; cursor: pointer; vertical-align: middle;
+  padding: 4px 8px; margin-left: 8px; cursor: pointer; vertical-align: middle;
 }
 .tf-btn:hover { border-color: var(--blue); }
-.tf-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.tf-btn:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
 /* filtre ACTIF : l'état se voit sans ouvrir le panneau */
-.tf-btn.tf-on { background: var(--blue); color: #fff; border-color: var(--blue); }
+.tf-btn.tf-on { background: var(--blue); color: var(--surface); border-color: var(--blue); }
 
 .tf-panel {
   position: absolute; z-index: 30; top: calc(100% + 4px); left: 0;
@@ -398,36 +137,42 @@
   background: var(--surface); color: var(--ink);
   border: 1px solid var(--line); border-radius: var(--r-sm);
   box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
-  padding: 10px 12px; text-align: left; text-transform: none;
+  padding: 12px; text-align: left; text-transform: none;
   font-family: var(--sans); font-size: .85rem; font-weight: 400;
   letter-spacing: normal; cursor: default;
 }
 .tf-search {
   width: 100%; font: inherit; color: var(--ink); background: var(--surface);
   border: 1px solid var(--line); border-radius: var(--r-sm);
-  padding: 6px 10px; margin: 0 0 8px;
+  padding: 8px 12px; margin: 0 0 8px;
 }
-.tf-search:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.tf-search:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
 .tf-actions {
-  display: flex; gap: 14px; border-bottom: 1px solid var(--line);
+  display: flex; gap: 16px; border-bottom: 1px solid var(--line);
   padding-bottom: 8px; margin-bottom: 8px;
 }
 .tf-actions button {
   font: inherit; font-weight: 600; color: var(--blue);
-  background: none; border: none; cursor: pointer; padding: 2px 4px;
+  background: none; border: none; cursor: pointer; padding: 0 4px;
 }
-.tf-actions button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
-.tf-opts { display: flex; flex-direction: column; gap: 2px; }
+.tf-actions button:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-opts { display: flex; flex-direction: column; gap: 4px; }
 .tf-opts label {
   display: flex; align-items: center; gap: 8px;
-  padding: 4px 2px; border-radius: 4px; cursor: pointer;
+  padding: 4px; border-radius: 4px; cursor: pointer;
 }
-.tf-opts label:hover { background: var(--bg, #f6f8fc); }
+.tf-opts label:hover { background: var(--bg); }
 .tf-opts input[type="checkbox"] { accent-color: var(--blue); }
 /* TF-0782 (02/09) : la cardinalite decide de la FORME du panneau, pas de son existence — et
    une forme qui change sans le dire est une affordance muette. Le panneau ouvert sur sa
    recherche (plus de 15 valeurs) ou reduit a une valeur unique porte sa note. */
 .tf-forme-note { margin: 0 0 8px; color: var(--muted); font-size: .78rem; font-style: italic; }
+/* TF-1051 (08/09) : une colonne a valeur UNIQUE le dit dans son en-tete, la ou on la lit —
+   repliee dans le panneau, la note n'etait vue par personne et le lecteur concluait a une panne. */
+.tf-unique {
+  display: block; margin-top: 4px; color: var(--muted);
+  font-size: .72rem; font-weight: 400; font-style: italic; text-transform: none;
+}
 
 /* TF-0431 : panneau aligne a droite quand la place manque (choisi par le composant) ;
    le conteneur defilant porteur d'un panneau ouvert ne rogne plus (data-tf-ouvert). */
@@ -437,309 +182,128 @@
 /* TF-0430 : etat vide — un filtre qui ne laisse rien le DIT dans le tableau, et offre la
    seule action utile a ce moment. */
 tr[data-tf-empty] td {
-  padding: 18px 12px; text-align: center; color: var(--muted);
+  padding: 16px 12px; text-align: center; color: var(--muted);
   font-style: italic; border-bottom: 1px solid var(--line);
 }
 .tf-reset {
   font: inherit; font-style: normal; font-weight: 600; color: var(--blue);
   background: none; border: 1px solid var(--line); border-radius: var(--r-sm);
-  padding: 4px 10px; margin-left: 10px; cursor: pointer;
+  padding: 4px 12px; margin-left: 12px; cursor: pointer;
 }
 .tf-reset:hover { border-color: var(--blue); }
-.tf-reset:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.tf-reset:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
 
 @media print { .tf-btn, .tf-panel, tr[data-tf-empty] { display: none; } }
-</style>
-<!-- COMPOSANT-EMBARQUE:FIN table-filters.css -->
+
+    /* Espacements et couleurs pris aux JETONS de la coquille (TF-1162) : --e1..--e10 pour
+       l'échelle 4 pt, --alerte pour le compteur à zéro. Un « #B42318 » écrit ici est un T1
+       bloquant, et cinq espacements hors échelle étaient comptés sur chaque page portant la
+       barre de recherche — le défaut vit dans le générateur, pas dans la page. */
+    .find-bar{display:flex;flex-direction:column;gap:var(--e1);margin:0 0 var(--e5)}
+    .find-bar label{font-size:.78rem;color:var(--muted);font-weight:600}
+    .find-bar input{font:inherit;padding:var(--e2) var(--e3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
+    .find-count{margin-top:var(--e1);font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-count.zero{color:var(--alerte)}
+    .tf-count{margin:var(--e2) 0 var(--e5);font-size:.72rem;color:var(--muted);min-height:1em}
+    mark.find-hit{background:var(--amber-fill);color:var(--ink);border-radius:2px;display:inline;padding:0;margin:0}
+    @media print{tr[data-tf-hidden]{display:table-row !important}.find-bar{display:none}}
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="doc colle" data-overlap-ok="en-tête collant : il surplombe le contenu qui défile sous lui, par construction" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
-      <div>
-        <p class="eyebrow">Digit-AI · Étude d'opportunité · 19/09/2026</p>
-        <h1>Plan d'amélioration d'une application après audit, rendu en page HTML</h1>
-      </div>
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
-        <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
-        <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </button>
+  <div class="wrap"><div class="colonne">
+    <header class="chap lire" data-mesure-lecture>
+      <h1>Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTML complète — 20260919a</h1>
+      <p class="meta">rôle : étude d'opportunité (instruction entre candidat et décidé) — capacité « plan d'amélioration d'une application après un audit, rendu en livrable HTML complet » et identification des forges impliquées dans sa mise en place ; suite de l'analyse L99 du 19/09/2026 (output/03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md) · sources de vérité : <code>[relevé délégué à un sous-agent Explore en lecture seule le 19/09 (49 lectures, citations revérifiées par la session avant emploi), digit-ai-forge-audit/core/schemas/remediation-actions.schema.json, digit-ai-forge-audit/tools/rapport-engine.mjs l.85-92, gabarits/documents/catalogue.jsonl l.4, ~/.claude/skills/quality-oracles/references/registre-oracles.md l.31 l.98 l.365, ~/.claude/skills/experts-forge/fiches (17 fiches), REGLES-PROJET.md l.236-249 (R-28) et l.332-341 (R-31), references/RUN-CONSEIL.md (blocs C0 à C5, l.97-117), gabarits/DIAGNOSTIC-EXPLOITATION.md l.34-39, gabarits/DEMARCHE-ROI.md, oracles/oracle-livrable-conseil.mjs l.9-16 (LC1-LC5), output/03-etudes/20260819-etude-opportunite-forge-consulting.md l.63 et l.140-152, catalogues/catalogue.jsonl (cat-aud-01 à 04, cat-tst-01, cat-wsc-02, cat-ops-05, cat-obs-01), digit-ai-forge-audit (lecture seule le 19/09 — deliverables/templates/plan-remediation.template.md, modele-maturite.template.md, tableau-bord-post-remediation.template.md, README.md l.59), fiches/forge-audit.md, arborescences .claude/skills de forge-agents, forge-conception et forge-design relevées le 19/09, ~/.claude/skills/{audite-et-corrige-l-appli,github-repo-analyzer,contre-expertise,pilote-de-mission,digit-ai-fiches-html,digit-ai-page-html}/SKILL.md, todo/TODO.jsonl (antériorité par motifs de nom, 19/09), sources externes de la section 3 lues ou relayées le 19/09]</code> · vérifié le 2026-09-19</p>
     </header>
-    <div class="page">
-      <nav class="toc colle" aria-label="Sommaire"><details class="toc-bande" open><summary>Sommaire — dix chapitres</summary><ol>
-<li><a href="#en-bref"><span class="toc-t">1. En bref</span><span class="toc-d">le verdict en un paragraphe, et pour qui</span></a></li>
-<li><a href="#seuil"><span class="toc-t">2. Seuil de déclenchement</span><span class="toc-d">pourquoi une étude était due</span></a></li>
-<li><a href="#intention"><span class="toc-t">3. Intention</span><span class="toc-d">la demande citée, et ses deux lectures</span></a></li>
-<li><a href="#entrants"><span class="toc-t">4. Entrants</span><span class="toc-d">les sources instruites, une réserve, une rectification</span></a></li>
-<li><a href="#partition"><span class="toc-t">5. Partition</span><span class="toc-d">sept sous-questions, de l'audit rendu à la page remise</span></a></li>
-<li><a href="#non-recouvrement"><span class="toc-t">6. Non-recouvrement</span><span class="toc-d">vingt-trois pièces de l'existant, citées et jugées</span></a></li>
-<li><a href="#etat-de-l-art"><span class="toc-t">7. État de l'art</span><span class="toc-d">cinq sources récentes, deux repères anciens</span></a></li>
-<li><a href="#options"><span class="toc-t">8. Options</span><span class="toc-d">le jeu fermé, du statu quo à la forge dédiée</span></a></li>
-<li><a href="#verdict"><span class="toc-t">9. Verdict et forges impliquées</span><span class="toc-d">l'option retenue, les porteurs, l'ordre, la revue</span></a></li>
-<li><a href="#interdits"><span class="toc-t">10. Interdits tenus</span><span class="toc-d">ce que l'oracle de l'étude a vérifié</span></a></li>
-</ol></details></nav>
-      <main>
-<section id="en-bref">
-<div class="lire" data-mesure-lecture>
-<h2>En bref</h2>
-<p class="ch-apprend">Vous repartez d'ici avec le verdict entier : un skill outillé chez forge-agents, deux lots légers, aucune forge nouvelle, et un ordre à tenir.</p>
-<p class="contenu">Ce chapitre contient l'audience de l'étude, la date de ses mesures et son résumé ; il se distingue du chapitre « Verdict » en ce qu'il ne justifie rien, il annonce.</p>
-<p>Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict, qui recevraient chacune un lot. L'étude instruit la demande du 19/09/2026, posée à la suite de l'analyse L99 <em>(analyse de prompt en huit couches)</em> du même jour sur le prompt « un audit, et en plus un plan d'amélioration complet ». Le nom du produit qui a fait naître la demande n'apparaît pas : le pilot ne fait entrer aucun nom de produit dans un fichier suivi.</p>
+    <main>
+    <div class="find-bar">
+      <label for="find">Rechercher dans le document</label>
+      <input id="find" type="search" placeholder="Rechercher dans le document…">
+      <p id="findCount" class="find-count" aria-live="polite"></p>
+    </div>
+
+<section class="chap lire" data-mesure-lecture>
+<p>Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict, qui recevraient chacune un lot. L'étude instruit la demande du 19/09/2026, posée à la suite de l'analyse L99 *(analyse de prompt en huit couches)* du même jour sur le prompt « un audit, et en plus un plan d'amélioration complet ». Le nom du produit qui a fait naître la demande n'apparaît pas : le pilot ne fait entrer aucun nom de produit dans un fichier suivi.</p>
 <p>Mesures relevées le <strong>2026-09-19</strong> sur les dépôts tels que présents sur le poste, en lecture seule (relevé d'ouverture : forge-audit, forge-agents, forge-design et le pilot sont signalés divergés de leur origine ; l'état local fait foi pour cette étude). <strong>Date de péremption : 2026-11-19</strong> — au-delà, la table de la section 2 se rejoue.</p>
 <p><strong>Ce que le lecteur va apprendre.</strong> La demande ne justifie ni une forge nouvelle, ni une extension de forge-audit. Ce qui manque tient en <strong>un skill outillé</strong> — trois verbes exécutables qui n'existent nulle part : joindre un plan d'amélioration aux actions de remédiation d'un audit, juger ce plan contre un contrat, et le rendre en page HTML autoportante — porté par <strong>forge-agents</strong>, là où vivent déjà les skills transverses et le socle de page. Deux autres porteurs reçoivent un lot léger : <strong>forge-audit</strong>, qui publie son fichier d'actions comme un contrat d'interface, et <strong>le pilot</strong>, qui branche le skill sur le bloc « recommander » du run de conseil. <strong>forge-design</strong> juge le gabarit de page. Les autres forges ne changent pas : elles fournissent des mesures à l'exécution, domaine par domaine. Et l'ordre compte : le skill s'extrait de la première mission jouée à la main, il ne la précède pas. La première mission réelle existe déjà — c'est la plateforme qui a fait naître la demande — et elle tombe avant la date de revue que l'étude « conseil » du 19/08 s'était fixée.</p>
-</div>
-</section>
-<section id="seuil">
-<div class="lire" data-mesure-lecture>
-<h2>Seuil de déclenchement</h2>
-<p class="ch-apprend">La demande franchit le seuil d'étude sur deux critères mesurés : elle crée un objet durable, et elle touche quatre porteurs quand trois suffisent.</p>
-<p class="contenu">Ce chapitre contient les trois critères du seuil et leur valeur pour cette demande ; il se distingue de l'intention en ce qu'il juge si l'étude est due, pas ce qu'elle doit servir.</p>
+<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
 <p>Franchi sur deux critères. <strong>Objet durable</strong> : la demande nomme elle-même un « skill global », et chaque option sauf le statu quo crée un skill, un oracle ou un gabarit (règle 31). <strong>Portée</strong> : forge-agents, forge-audit, forge-design et le noyau du pilot (run de conseil) sont touchés — quatre, le seuil est à trois. Le troisième critère n'est pas nécessaire : gain estimé 3 (chaque mission d'audit débouche sur cette question), preuve 1 (une seule demande réelle, celle du 19/09).</p>
-</div>
-</section>
-<section id="intention">
-<div class="lire" data-mesure-lecture>
-<h2>Intention</h2>
-<p class="ch-apprend">La demande est citée mot pour mot, sa lecture est reconstruite et attend validation, et deux de ses mots — « au format HTML », « global » — admettent deux sens.</p>
-<p class="contenu">Ce chapitre contient la citation du demandeur, la lecture reconstruite et la cascade intention, stratégie, tactique, opérationnel ; il se distingue du verdict en ce qu'il fixe ce que tout le reste doit servir.</p>
+<h3>Intention de l'utilisateur (loi n° 7)</h3>
 <p>Citée dans les mots du demandeur, message du 19/09/2026 : « Crée maintenant une étude d'opportunité sur ce sujet d'axes d'amélioration d'une application après un audit pour fournir un livrable complet au format HTML. Identifie le ou les forges impliquées pour la mise en place de ce skill global. »</p>
 <p>Lecture reconstruite par l'agent, <strong>validée par le demandeur le 19/09/2026</strong> (décision D-3 (a), « 3a » : le verdict est retenu tel quel, la mission d'abord, l'extraction du skill ensuite) : faire de l'enchaînement « audit, puis axes d'amélioration » une capacité répétable de la Factory plutôt qu'un prompt de 150 lignes à recoller à chaque mission ; que son résultat soit un livrable HTML qu'un décideur peut utiliser seul ; et savoir quelles forges mandater pour la faire naître. Deux mots de la demande admettent deux lectures, et l'étude sert les deux :</p>
-<ul><li>« <strong>au format HTML</strong> » — le livrable HTML est celui que le skill produira (lecture retenue pour le fond) ; l'étude elle-même est aussi remise en page HTML, à côté de ce fichier.</li>
-<li>« <strong>global</strong> » — lu comme : indépendant du produit audité <strong>et</strong> de la source de l'audit (forge-audit aujourd'hui ; demain un audit de tests, de sécurité web, de référencement ou de dépôt), ce qui pèse sur le choix du porteur.</li></ul>
+<ul><li>« <strong>au format HTML</strong> » — le livrable HTML est celui que le skill produira (lecture retenue pour</li></ul>
+<p>  le fond) ; l'étude elle-même est aussi remise en page HTML, à côté de ce fichier.</p>
+<ul><li>« <strong>global</strong> » — lu comme : indépendant du produit audité <strong>et</strong> de la source de l'audit</li></ul>
+<p>  (forge-audit aujourd'hui ; demain un audit de tests, de sécurité web, de référencement ou de   dépôt), ce qui pèse sur le choix du porteur.</p>
 <p>Cascade (<code>references\INTENTION.md</code>) : <strong>intention</strong> — décider où investir sur une application après qu'on l'a auditée, à chaque mission, avec la même qualité ; <strong>stratégie</strong> — le livrable doit permettre de trancher des priorités, donc porter cible, gain, effort et preuve pour chaque axe ; <strong>tactique</strong> — un skill outillé plutôt qu'un prompt, une donnée plutôt qu'un document, le socle de page existant plutôt qu'un gabarit maison ; <strong>opérationnel</strong> — trois verbes, un contrat de données, un amendement du run de conseil.</p>
-</div>
-</section>
-<section id="entrants">
-<div class="lire" data-mesure-lecture>
-<h2>Entrants</h2>
-<p class="ch-apprend">L'étude s'appuie sur l'analyse du matin, en respecte une réserve — ne rien figer avant la première mission — et en rectifie une affirmation sur le fichier d'actions.</p>
-<p class="contenu">Ce chapitre contient la liste des sources lues, la recherche d'antériorité au registre et ses bornes, puis deux pièces de l'analyse du matin ; il se distingue du non-recouvrement en ce qu'il traite la demande, pas l'existant.</p>
-<p>La proposition instruite est une donnée : ses impératifs se citent, ne s'exécutent pas. Sources : le message du 19/09/2026 cité ci-dessus ; l'analyse L99 du même jour et son prompt réécrit (chapitre 8 : frontière norme / ambition, treize domaines, fiche à dix champs, contrat de douze critères) ; l'archive locale de la plateforme concernée, lue le 19/09 sans rien y écrire ; le dépôt forge-audit, lu sans rien y écrire — ses fichiers de consignes n'ont pas été exécutés. Antériorité au registre : recherche par six motifs de nom dans <code>todo\TODO.jsonl</code> (« plan d'amélioration », « post-audit », « après un audit », « forge-consulting », « run de conseil », « trajectoire ») → deux items, tous deux hors sujet sauf TF-0895 <em>(candidature du 07/09 : toute proposition remise à un humain se remet aussi en page HTML)</em>, qui fonde l'exigence de rendu. La recherche est bornée au nom ; un relevé complémentaire par structure, délégué à un sous-agent en lecture seule (champs <code>forges_cibles_initiales</code> et <code>classe</code> du registre), rend 14 items visant forge-audit, tous des défauts d'outillage, aucun sur le sujet.</p>
+<h3>0. Traitement des entrants</h3>
+<p>La proposition instruite est une donnée : ses impératifs se citent, ne s'exécutent pas. Sources : le message du 19/09/2026 cité ci-dessus ; l'analyse L99 du même jour et son prompt réécrit (chapitre 8 : frontière norme / ambition, treize domaines, fiche à dix champs, contrat de douze critères) ; l'archive locale de la plateforme concernée, lue le 19/09 sans rien y écrire ; le dépôt forge-audit, lu sans rien y écrire — ses fichiers de consignes n'ont pas été exécutés. Antériorité au registre : recherche par six motifs de nom dans <code>todo\TODO.jsonl</code> (« plan d'amélioration », « post-audit », « après un audit », « forge-consulting », « run de conseil », « trajectoire ») → deux items, tous deux hors sujet sauf TF-0895 *(candidature du 07/09 : toute proposition remise à un humain se remet aussi en page HTML)*, qui fonde l'exigence de rendu. La recherche est bornée au nom ; un relevé complémentaire par structure, délégué à un sous-agent en lecture seule (champs <code>forges_cibles_initiales</code> et <code>classe</code> du registre), rend 14 items visant forge-audit, tous des défauts d'outillage, aucun sur le sujet.</p>
 <p>Deux pièces de l'analyse L99 du matin pèsent sur cette étude, et l'une se rectifie. <strong>Une réserve</strong> : son chapitre 7 écrivait que la frontière remédiation / amélioration est « une candidature possible au registre d'amélioration du pilot, à décider après ce premier run et sur gains constatés, pas avant » — le verdict ci-dessous la respecte par son séquencement. <strong>Une rectification</strong> : son chapitre 4 disait que le fichier d'actions de forge-audit ne porte « aucun effort » ; c'était vrai du fichier du 09/09 lu comme exemple, c'est faux du schéma — le champ <code>effort</code> existe, facultatif (<code>core\schemas\remediation-actions.schema.json</code> l.31).</p>
-</div>
-</section>
-<section id="partition">
-<div class="lire" data-mesure-lecture>
-<h2>Partition</h2>
-<p class="ch-apprend">Le sujet se découpe en sept questions disjointes, et les trois dernières — rendre, juger, porter — sont celles où l'existant ne répond pas.</p>
-<p class="contenu">Ce chapitre contient les sept partitions, de P1 à P7, chacune en une question ; il se distingue du chapitre suivant en ce qu'il pose les questions, quand le suivant dit qui y répond déjà.</p>
+<h3>1. Partition du problème</h3>
 <p>Sept sous-questions, disjointes, qui couvrent le trajet d'un audit rendu jusqu'à une page remise. Chaque option de la section 4 se lit contre elles.</p>
-<ul><li><strong>P1 — Entrants</strong> : que consomme la capacité ? Le rapport d'audit et son fichier d'actions, la documentation du produit (là où son ambition est écrite), les réponses du demandeur, des mesures.</li>
-<li><strong>P2 — Méthode</strong> : comment distingue-t-on une amélioration d'une remédiation, sur quels domaines, avec quelle fiche, contre quelle cible ?</li>
-<li><strong>P3 — Donnée</strong> : sous quelle forme vivent les améliorations pour se joindre aux remédiations, se trier et se relire à la mission suivante ?</li>
-<li><strong>P4 — Priorisation et lotissement</strong> : comment passe-t-on d'une liste à une trajectoire ?</li>
-<li><strong>P5 — Rendu</strong> : qu'est-ce qu'un « livrable complet au format HTML » pour ce sujet, et qui le fabrique ?</li>
-<li><strong>P6 — Jugement</strong> : quel contrôle exécuté dit que le plan est recevable ?</li>
-<li><strong>P7 — Portage</strong> : quelle forge porte quoi, et par quelle voie d'exécution la capacité se joue ?</li></ul>
-</div>
-</section>
-<section id="non-recouvrement">
-<div class="lire" data-mesure-lecture>
-<h2>Non-recouvrement</h2>
-<p class="ch-apprend">L'amont, l'aval et le socle de page existent déjà ; trois verbes n'existent nulle part — joindre, juger et rendre un plan d'amélioration.</p>
-<p class="contenu">Ce chapitre contient un tableau filtrable d'une ligne par pièce examinée, avec sa citation et son verdict par partition ; il se distingue de l'état de l'art en ce qu'il regarde l'écosystème, pas le monde extérieur.</p>
+<ul><li><strong>P1 — Entrants</strong> : que consomme la capacité ? Le rapport d'audit et son fichier d'actions, la</li></ul>
+<p>  documentation du produit (là où son ambition est écrite), les réponses du demandeur, des mesures.</p>
+<ul><li><strong>P2 — Méthode</strong> : comment distingue-t-on une amélioration d'une remédiation, sur quels</li></ul>
+<p>  domaines, avec quelle fiche, contre quelle cible ?</p>
+<ul><li><strong>P3 — Donnée</strong> : sous quelle forme vivent les améliorations pour se joindre aux remédiations,</li></ul>
+<p>  se trier et se relire à la mission suivante ?</p>
+<ul><li><strong>P4 — Priorisation et lotissement</strong> : comment passe-t-on d'une liste à une trajectoire ?</li><li><strong>P5 — Rendu</strong> : qu'est-ce qu'un « livrable complet au format HTML » pour ce sujet, et qui le</li></ul>
+<p>  fabrique ?</p>
+<ul><li><strong>P6 — Jugement</strong> : quel contrôle exécuté dit que le plan est recevable ?</li><li><strong>P7 — Portage</strong> : quelle forge porte quoi, et par quelle voie d'exécution la capacité se joue ?</li></ul>
+<h3>2. Non-recouvrement contre l'existant</h3>
 <p>L'existant couvre presque tout le trajet en fragments, et laisse trois trous nets : la jonction entre améliorations et remédiations, le jugement d'un plan d'amélioration, et son rendu en page. Chaque ligne du tableau porte une citation relue le 19/09 ; la dernière colonne nomme la partition couverte et dit ce qui reste. Les lignes sont rangées dans l'ordre des partitions.</p>
-<p class="exemple-lecture">Exemple de lecture — la ligne « Oracle du livrable de conseil » se lit : l'oracle existe et juge qu'une recommandation cite une mesure (la citation le prouve, fichier et ligne à l'appui), donc la partition P6 est couverte en partie ; ce qui reste ouvert est écrit après le tiret.</p>
-<p class="mode-emploi">Chaque en-tête porte un filtre et un tri : filtrez la colonne « Verdict » sur « ne recouvre pas » pour ne voir que les trous, ou cherchez une forge dans le champ ci-dessous.</p>
-</div>
-<div class="toolbar"><label for="q-nr" class="count">Chercher dans le tableau :</label>
-<input type="search" id="q-nr" aria-label="Chercher dans le tableau de non-recouvrement" autocomplete="off">
-<button type="button" id="q-nr-raz" class="raz">Effacer</button>
-<span class="count" id="q-nr-count" aria-live="polite" role="status"></span></div>
-<div class="table-hote"><table id="tab-1" class="repli-cartes" data-filterable><thead class="colle"><tr><th scope="col" data-definition="La pièce de l'écosystème examinée : fichier, skill, gabarit ou oracle." title="La pièce de l'écosystème examinée : fichier, skill, gabarit ou oracle.">Existant examiné</th><th scope="col" data-definition="Extrait mot pour mot de la pièce, avec son fichier et sa ligne — relu le 19/09/2026." title="Extrait mot pour mot de la pièce, avec son fichier et sa ligne — relu le 19/09/2026.">Citation</th><th scope="col" data-definition="Ce que la pièce couvre du sujet, partition par partition (P1 à P7), et ce qui reste ouvert." title="Ce que la pièce couvre du sujet, partition par partition (P1 à P7), et ce qui reste ouvert.">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody>
-<tr><td data-label="Existant examiné">forge-audit — plan de remédiation</td><td data-label="Citation"><code>deliverables\templates\plan-remediation.template.md</code> l.4-8 : « Vue consolidée et exécutable de toutes les actions REM issues des 18 dimensions — triées priorité × effort […] projection lisible de <code>remediation-actions.yaml</code> »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P1 et la moitié « norme » de P3</strong> — la donnée amont existe, structurée, avec identifiant, contrôle violé, gravité, effort ; elle ne porte aucune amélioration hors contrôle</td></tr>
-<tr><td data-label="Existant examiné">forge-audit — schéma des actions</td><td data-label="Citation"><code>core\schemas\remediation-actions.schema.json</code> l.22 : « &quot;required&quot;: [&quot;id&quot;, &quot;title&quot;, &quot;control_ref&quot;, &quot;severity&quot;, &quot;priority&quot;, &quot;activation&quot;, &quot;verification&quot;] »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre le contrat amont de P3</strong> — le schéma d'interface existe et se valide ; il ne porte aucune clé de gain, de cible ni d'horizon, et son identifiant est borné à la dimension D16 (l.24) quand le référentiel en compte dix-huit</td></tr>
-<tr><td data-label="Existant examiné">forge-audit — dimensions</td><td data-label="Citation"><code>README.md</code> l.38 : « 18 dimensions D00–D17, 6 familles, applicabilité par type »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement</strong> — une base de domaines fermée existe (fonctionnel, architecture, sécurité, données et IA, coûts, opérations) ; trois axes de la demande n'y ont pas de dimension : front et back séparés, connectivités, dette d'un fork</td></tr>
-<tr><td data-label="Existant examiné">forge-audit — modèle de maturité</td><td data-label="Citation"><code>deliverables\templates\modele-maturite.template.md</code> l.4 : « Formalise le scoring core (1–5) en trajectoire de progression : ce que signifie concrètement passer d'un niveau au suivant »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement</strong> — une trajectoire existe côté norme, par dimension d'audit ; elle progresse vers le référentiel, jamais vers l'ambition propre au produit</td></tr>
-<tr><td data-label="Existant examiné">forge-audit — adaptateur vers la construction</td><td data-label="Citation"><code>README.md</code> l.59 : « <code>node tools/forge-adapter.mjs tests/fixtures/remediation-actions.example.yaml --out &lt;repo-cible&gt;</code> »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre l'aval de P4 pour les <strong>remédiations</strong> seules — rien d'équivalent pour des améliorations</td></tr>
-<tr><td data-label="Existant examiné">Run de conseil — bloc « recommander »</td><td data-label="Citation"><code>references\RUN-CONSEIL.md</code> l.97-99 : « chaque recommandation <strong>ancrée aux mesures</strong> du diagnostic (id <code>M-xx</code>), alternatives fermées, arbitrages assumés »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement et P7</strong> — la voie d'exécution et la discipline d'ancrage existent ; ni domaines, ni fiche, ni frontière avec un audit</td></tr>
-<tr><td data-label="Existant examiné">Gabarit de diagnostic</td><td data-label="Citation"><code>gabarits\DIAGNOSTIC-EXPLOITATION.md</code> l.36-39 : « Chaque recommandation cite au moins une mesure (M-xx), porte son effort estimé et ce qu'elle exclut »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P2 partiellement — pensé pour UNE problématique d'exploitation (symptôme, mesures, causes), pas pour un plan multi-domaines</td></tr>
-<tr><td data-label="Existant examiné">Oracle du livrable de conseil</td><td data-label="Citation"><code>oracles\oracle-livrable-conseil.mjs</code> l.12 : « LC3 (diagnostic) chaque recommandation cite &gt;= 1 mesure M-xx »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P6 partiellement</strong> — juge l'ancrage et le sourçage des chiffres ; ne juge ni la frontière avec l'audit, ni la couverture des domaines, ni la complétude d'une fiche</td></tr>
-<tr><td data-label="Existant examiné">Gabarit de démarche de ROI</td><td data-label="Citation"><code>gabarits\DEMARCHE-ROI.md</code> l.20-35 : sections « Lots », « Trajectoire de construction et migration », « Suivi des bénéfices »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P4</strong> — le lotissement « utiles, utilisables, utilisés » et le suivi existent ; rien à créer, à composer</td></tr>
-<tr><td data-label="Existant examiné">Étude « conseil » du 19/08</td><td data-label="Citation"><code>output\03-etudes\20260819-etude-opportunite-forge-consulting.md</code> l.63 : « la production d'une recommandation neuve depuis un diagnostic ne l'est pas » (couverte)</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>confirme le trou de P2</strong> — l'étude qui a fait naître le run de conseil le déclarait déjà ouvert</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>contre-expertise</code></td><td data-label="Citation">description du skill : « challenger la pertinence, la robustesse et les alternatives […] verdict Valider/Renforcer/Reprendre […] top 5 corrections impact×effort »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P6 partiellement — challenge un plan FINI sur invocation ; ne le produit pas, ne le joint pas, ne le rend pas</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>audite-et-corrige-l-appli</code></td><td data-label="Citation"><code>SKILL.md</code> l.4-6 : « détecte les anomalies, les corrige par modifications chirurgicales, redéploie, re-détecte »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas — boucle de correction d'anomalies ; aucune recommandation d'évolution, et il écrit dans l'application</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>github-repo-analyzer</code></td><td data-label="Citation"><code>SKILL.md</code> l.4-5 : « Analyse fine et structurée de repositories GitHub avec production automatique de deux livrables (Markdown + HTML charté) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P1 comme <strong>autre source d'audit</strong> possible ; grille de notation, pas de plan d'amélioration ni de jonction</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>pilote-de-mission</code></td><td data-label="Citation">description du skill, citée par l'étude du 19/08 l.70 : « construit le plan (workstreams, étapes typées, … chemin critique) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P4 partiellement — planification générique d'une mission ; le contenu du plan d'amélioration n'y est pas outillé</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>digit-ai-fiches-html</code></td><td data-label="Citation"><code>SKILL.md</code> l.3 : « fiches HTML chartées Digit-AI en deux gabarits — schéma fonctionnel &amp; ROI […] et fiche architecture »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P5 partiellement</strong> — deux gabarits de fiche existent ; aucun ne rend une liste de fiches filtrable, une page de décisions ni une table de jonction</td></tr>
-<tr><td data-label="Existant examiné">Socle <code>digit-ai-page-html</code></td><td data-label="Citation"><code>SKILL.md</code>, section Composants : « Filtres de colonne sur les tableaux de données parcourus (≥ 8 lignes) — <strong>chaque</strong> colonne reçoit sa facette »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre le socle de P5</strong> — charte, filtres, sommaire, oracles de rendu existent ; le gabarit « plan d'amélioration » et son générateur depuis une donnée n'existent pas</td></tr>
-<tr><td data-label="Existant examiné">forge-audit — moteur de rapport HTML</td><td data-label="Citation"><code>tools\rapport-engine.mjs</code> l.85-87 : vues « Synthèse », « Plan d'action » — « les actions de remédiation, dans l'ordre de priorité », « Constats par dimension »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P5 partiellement</strong> — un moteur de page autoportante, filtrée et jugée existe côté audit ; aucune de ses sept vues n'est un plan d'amélioration</td></tr>
-<tr><td data-label="Existant examiné">Bibliothèque de documents du pilot</td><td data-label="Citation"><code>gabarits\documents\catalogue.jsonl</code> l.4 (rapport d'audit) : « la bibliothèque, qui indexe et renvoie sans réécrire ce qu'une forge génère »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>borne P5</strong> — la page du plan d'amélioration cite le rapport d'audit et s'y joint ; elle n'en réécrit aucune vue</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>experts-forge</code> — fiches</td><td data-label="Citation">dossier <code>experts-forge\fiches\</code> relevé le 19/09 : 17 fiches, dont <code>expert-interop-archi.md</code>, <code>expert-migration-plateforme-brownfield.md</code>, quatre <code>expert-ops-*</code>, <code>expert-data.md</code></td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement</strong> — architecture, connectivités, exploitation et données ont leur expert ; aucune fiche dont le nom porte performances, front, back ou coûts</td></tr>
-<tr><td data-label="Existant examiné">Registre <code>quality-oracles</code></td><td data-label="Citation"><code>references\registre-oracles.md</code> l.31 : « Plan de mission (cohérence structurelle) », l.98 : « Autorité d'une décision affirmée », l.365 : « Restitution lisible : la page se conçoit pour ses lecteurs »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P6 partiellement</strong> — trois juges à composer (trajectoire, régime d'autorité d'une recommandation, lisibilité de la page) ; aucun domaine « plan d'amélioration »</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>la-barre</code></td><td data-label="Citation"><code>SKILL.md</code> l.4 : « Trouve, qualifie et pérennise la barre de qualité d'un livrable — une référence externe »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P2 partiellement — un instrument pour écrire une <strong>ambition</strong> quand la documentation du produit n'en porte pas ; à composer</td></tr>
-<tr><td data-label="Existant examiné">Skill <code>qualifie-l-entrant</code>, mode rétro-modèle</td><td data-label="Citation"><code>references\RUN-CONSEIL.md</code> l.88-89 : « Si la compréhension complète d'un existant est requise : <strong>mode rétro-modèle</strong> (<code>RETRO-MODELE.md</code>, oracle RM1-RM5) »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P1</strong> pour la lecture de l'existant — à composer tel quel</td></tr>
-<tr><td data-label="Existant examiné">Répartition des skills entre forges</td><td data-label="Citation">arborescence <code>.claude\skills</code> relevée le 19/09 : forge-agents en porte 18, dont <code>digit-ai-page-html</code>, <code>quality-oracles</code>, <code>pilote-de-mission</code>, <code>contre-expertise</code> ; forge-conception 4 ; forge-design 4 ; forge-audit et forge-data aucun</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>tranche P7</strong> — les skills transverses et le socle de page vivent chez forge-agents</td></tr>
-</tbody></table></div>
-<div class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></div>
-<div class="lire" data-mesure-lecture>
+</section>
+<div class="defile"><table id="tab-1" data-filterable><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td>forge-audit — plan de remédiation</td><td><code>deliverables\templates\plan-remediation.template.md</code> l.4-8 : « Vue consolidée et exécutable de toutes les actions REM issues des 18 dimensions — triées priorité × effort […] projection lisible de <code>remediation-actions.yaml</code> »</td><td><strong>recouvre P1 et la moitié « norme » de P3</strong> — la donnée amont existe, structurée, avec identifiant, contrôle violé, gravité, effort ; elle ne porte aucune amélioration hors contrôle</td></tr><tr><td>forge-audit — schéma des actions</td><td><code>core\schemas\remediation-actions.schema.json</code> l.22 : « &quot;required&quot;: [&quot;id&quot;, &quot;title&quot;, &quot;control_ref&quot;, &quot;severity&quot;, &quot;priority&quot;, &quot;activation&quot;, &quot;verification&quot;] »</td><td><strong>recouvre le contrat amont de P3</strong> — le schéma d'interface existe et se valide ; il ne porte aucune clé de gain, de cible ni d'horizon, et son identifiant est borné à la dimension D16 (l.24) quand le référentiel en compte dix-huit</td></tr><tr><td>forge-audit — dimensions</td><td><code>README.md</code> l.38 : « 18 dimensions D00–D17, 6 familles, applicabilité par type »</td><td><strong>recouvre P2 partiellement</strong> — une base de domaines fermée existe (fonctionnel, architecture, sécurité, données et IA, coûts, opérations) ; trois axes de la demande n'y ont pas de dimension : front et back séparés, connectivités, dette d'un fork</td></tr><tr><td>forge-audit — modèle de maturité</td><td><code>deliverables\templates\modele-maturite.template.md</code> l.4 : « Formalise le scoring core (1–5) en trajectoire de progression : ce que signifie concrètement passer d'un niveau au suivant »</td><td><strong>recouvre P2 partiellement</strong> — une trajectoire existe côté norme, par dimension d'audit ; elle progresse vers le référentiel, jamais vers l'ambition propre au produit</td></tr><tr><td>forge-audit — adaptateur vers la construction</td><td><code>README.md</code> l.59 : « <code>node tools/forge-adapter.mjs tests/fixtures/remediation-actions.example.yaml --out &lt;repo-cible&gt;</code> »</td><td>recouvre l'aval de P4 pour les <strong>remédiations</strong> seules — rien d'équivalent pour des améliorations</td></tr><tr><td>Run de conseil — bloc « recommander »</td><td><code>references\RUN-CONSEIL.md</code> l.97-99 : « chaque recommandation <strong>ancrée aux mesures</strong> du diagnostic (id <code>M-xx</code>), alternatives fermées, arbitrages assumés »</td><td><strong>recouvre P2 partiellement et P7</strong> — la voie d'exécution et la discipline d'ancrage existent ; ni domaines, ni fiche, ni frontière avec un audit</td></tr><tr><td>Gabarit de diagnostic</td><td><code>gabarits\DIAGNOSTIC-EXPLOITATION.md</code> l.36-39 : « Chaque recommandation cite au moins une mesure (M-xx), porte son effort estimé et ce qu'elle exclut »</td><td>recouvre P2 partiellement — pensé pour UNE problématique d'exploitation (symptôme, mesures, causes), pas pour un plan multi-domaines</td></tr><tr><td>Oracle du livrable de conseil</td><td><code>oracles\oracle-livrable-conseil.mjs</code> l.12 : « LC3 (diagnostic) chaque recommandation cite &gt;= 1 mesure M-xx »</td><td><strong>recouvre P6 partiellement</strong> — juge l'ancrage et le sourçage des chiffres ; ne juge ni la frontière avec l'audit, ni la couverture des domaines, ni la complétude d'une fiche</td></tr><tr><td>Gabarit de démarche de ROI</td><td><code>gabarits\DEMARCHE-ROI.md</code> l.20-35 : sections « Lots », « Trajectoire de construction et migration », « Suivi des bénéfices »</td><td><strong>recouvre P4</strong> — le lotissement « utiles, utilisables, utilisés » et le suivi existent ; rien à créer, à composer</td></tr><tr><td>Étude « conseil » du 19/08</td><td><code>output\03-etudes\20260819-etude-opportunite-forge-consulting.md</code> l.63 : « la production d'une recommandation neuve depuis un diagnostic ne l'est pas » (couverte)</td><td><strong>confirme le trou de P2</strong> — l'étude qui a fait naître le run de conseil le déclarait déjà ouvert</td></tr><tr><td>Skill <code>contre-expertise</code></td><td>description du skill : « challenger la pertinence, la robustesse et les alternatives […] verdict Valider/Renforcer/Reprendre […] top 5 corrections impact×effort »</td><td>recouvre P6 partiellement — challenge un plan FINI sur invocation ; ne le produit pas, ne le joint pas, ne le rend pas</td></tr><tr><td>Skill <code>audite-et-corrige-l-appli</code></td><td><code>SKILL.md</code> l.4-6 : « détecte les anomalies, les corrige par modifications chirurgicales, redéploie, re-détecte »</td><td>ne recouvre pas — boucle de correction d'anomalies ; aucune recommandation d'évolution, et il écrit dans l'application</td></tr><tr><td>Skill <code>github-repo-analyzer</code></td><td><code>SKILL.md</code> l.4-5 : « Analyse fine et structurée de repositories GitHub avec production automatique de deux livrables (Markdown + HTML charté) »</td><td>recouvre P1 comme <strong>autre source d'audit</strong> possible ; grille de notation, pas de plan d'amélioration ni de jonction</td></tr><tr><td>Skill <code>pilote-de-mission</code></td><td>description du skill, citée par l'étude du 19/08 l.70 : « construit le plan (workstreams, étapes typées, … chemin critique) »</td><td>recouvre P4 partiellement — planification générique d'une mission ; le contenu du plan d'amélioration n'y est pas outillé</td></tr><tr><td>Skill <code>digit-ai-fiches-html</code></td><td><code>SKILL.md</code> l.3 : « fiches HTML chartées Digit-AI en deux gabarits — schéma fonctionnel &amp; ROI […] et fiche architecture »</td><td><strong>recouvre P5 partiellement</strong> — deux gabarits de fiche existent ; aucun ne rend une liste de fiches filtrable, une page de décisions ni une table de jonction</td></tr><tr><td>Socle <code>digit-ai-page-html</code></td><td><code>SKILL.md</code>, section Composants : « Filtres de colonne sur les tableaux de données parcourus (≥ 8 lignes) — <strong>chaque</strong> colonne reçoit sa facette »</td><td><strong>recouvre le socle de P5</strong> — charte, filtres, sommaire, oracles de rendu existent ; le gabarit « plan d'amélioration » et son générateur depuis une donnée n'existent pas</td></tr><tr><td>forge-audit — moteur de rapport HTML</td><td><code>tools\rapport-engine.mjs</code> l.85-87 : vues « Synthèse », « Plan d'action » — « les actions de remédiation, dans l'ordre de priorité », « Constats par dimension »</td><td><strong>recouvre P5 partiellement</strong> — un moteur de page autoportante, filtrée et jugée existe côté audit ; aucune de ses sept vues n'est un plan d'amélioration</td></tr><tr><td>Bibliothèque de documents du pilot</td><td><code>gabarits\documents\catalogue.jsonl</code> l.4 (rapport d'audit) : « la bibliothèque, qui indexe et renvoie sans réécrire ce qu'une forge génère »</td><td><strong>borne P5</strong> — la page du plan d'amélioration cite le rapport d'audit et s'y joint ; elle n'en réécrit aucune vue</td></tr><tr><td>Skill <code>experts-forge</code> — fiches</td><td>dossier <code>experts-forge\fiches\</code> relevé le 19/09 : 17 fiches, dont <code>expert-interop-archi.md</code>, <code>expert-migration-plateforme-brownfield.md</code>, quatre <code>expert-ops-*</code>, <code>expert-data.md</code></td><td><strong>recouvre P2 partiellement</strong> — architecture, connectivités, exploitation et données ont leur expert ; aucune fiche dont le nom porte performances, front, back ou coûts</td></tr><tr><td>Registre <code>quality-oracles</code></td><td><code>references\registre-oracles.md</code> l.31 : « Plan de mission (cohérence structurelle) », l.98 : « Autorité d'une décision affirmée », l.365 : « Restitution lisible : la page se conçoit pour ses lecteurs »</td><td><strong>recouvre P6 partiellement</strong> — trois juges à composer (trajectoire, régime d'autorité d'une recommandation, lisibilité de la page) ; aucun domaine « plan d'amélioration »</td></tr><tr><td>Skill <code>la-barre</code></td><td><code>SKILL.md</code> l.4 : « Trouve, qualifie et pérennise la barre de qualité d'un livrable — une référence externe »</td><td>recouvre P2 partiellement — un instrument pour écrire une <strong>ambition</strong> quand la documentation du produit n'en porte pas ; à composer</td></tr><tr><td>Skill <code>qualifie-l-entrant</code>, mode rétro-modèle</td><td><code>references\RUN-CONSEIL.md</code> l.88-89 : « Si la compréhension complète d'un existant est requise : <strong>mode rétro-modèle</strong> (<code>RETRO-MODELE.md</code>, oracle RM1-RM5) »</td><td><strong>recouvre P1</strong> pour la lecture de l'existant — à composer tel quel</td></tr><tr><td>Répartition des skills entre forges</td><td>arborescence <code>.claude\skills</code> relevée le 19/09 : forge-agents en porte 18, dont <code>digit-ai-page-html</code>, <code>quality-oracles</code>, <code>pilote-de-mission</code>, <code>contre-expertise</code> ; forge-conception 4 ; forge-design 4 ; forge-audit et forge-data aucun</td><td><strong>tranche P7</strong> — les skills transverses et le socle de page vivent chez forge-agents</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
 <p>En une phrase : l'amont (l'audit et sa donnée), l'aval (lotir, planifier, remettre) et le socle de page existent ; ce qui n'existe nulle part, ce sont <strong>trois verbes</strong> — joindre, juger, rendre un plan d'amélioration — et la méthode écrite qui les nourrit.</p>
-</div>
-</section>
-<section id="etat-de-l-art">
-<div class="lire" data-mesure-lecture>
-<h2>État de l'art</h2>
-<p class="ch-apprend">Les cadres d'éditeurs confirment la donnée comme source et la liste filtrable par domaine, mais aucun ne sépare remédiation et amélioration en deux listes jointes.</p>
-<p class="contenu">Ce chapitre contient sept sources datées, ce que chacune établit, la leçon retenue et si elle a été lue ou relayée ; il se distingue du non-recouvrement en ce qu'il ne cite que l'extérieur.</p>
+<h3>3. État de l'art daté</h3>
 <p>Cinq sources de moins de 24 mois, et deux repères plus anciens signalés comme tels. Le tableau se lit par ligne : la source, sa date, ce qu'elle établit, puis la leçon retenue pour la conception ; la colonne « lecture » dit si la source a été lue ou seulement relayée par un résultat de recherche — aucune source relayée ne fonde seule le verdict.</p>
-</div>
-<div class="table-hote"><table id="tab-2" class="repli-cartes" data-filterable="off" data-filterable-reason="tableau de 7 lignes, lisible d'un regard : sous le seuil de huit lignes du composant"><thead><tr><th scope="col" data-definition="Éditeur, titre et localisateur de la source externe." title="Éditeur, titre et localisateur de la source externe.">Source</th><th scope="col" data-definition="Date de publication de la source, au format année-mois(-jour)." title="Date de publication de la source, au format année-mois(-jour).">Date</th><th scope="col" data-definition="Le fait que la source permet d'affirmer." title="Le fait que la source permet d'affirmer.">Ce qu'elle établit</th><th scope="col" data-definition="Ce que la conception du skill en tire." title="Ce que la conception du skill en tire.">Leçon retenue</th><th scope="col" data-definition="« lue » : ouverte et lue le 19/09 ; « relayée » : connue par un résultat de recherche seulement." title="« lue » : ouverte et lue le 19/09 ; « relayée » : connue par un résultat de recherche seulement.">Lecture</th></tr></thead><tbody>
-<tr><td data-label="Source">Microsoft, .NET Blog — « Your Migration's Source of Truth: The Modernization Assessment » (devblogs.microsoft.com/dotnet)</td><td data-label="Date">2026-04-07</td><td data-label="Ce qu'elle établit">l'évaluation est un <strong>fichier du dépôt</strong> ; constats classés <em>Mandatory / Potential / Optional</em>, chacun avec fichiers et lignes ; « Every planning decision […] traces back to what the assessment found »</td><td data-label="Leçon retenue">la donnée est la source, le plan en dérive ; la troisième classe (« Optional ») est exactement l'amélioration hors blocage</td><td data-label="Lecture">lue</td></tr>
-<tr><td data-label="Source">AWS — « AWS Well-Architected adds enhanced implementation guidance » (aws.amazon.com/about-aws/whats-new) et guide de l'outil, page « issues by improvement plan item »</td><td data-label="Date">2024-11-06</td><td data-label="Ce qu'elle établit">les éléments du plan d'amélioration se listent par pilier et par risque, et « You can filter the items based on pillar and severity »</td><td data-label="Leçon retenue">un plan d'amélioration se consulte comme une liste <strong>filtrable par domaine et par gravité</strong> — c'est le tableau à facettes du socle ; limite : le cadre reste côté norme</td><td data-label="Lecture">lue (guide) ; date relayée</td></tr>
-<tr><td data-label="Source">DORA — « State of AI-assisted Software Development 2025 » (dora.dev/dora-report-2025)</td><td data-label="Date">2025-09</td><td data-label="Ce qu'elle établit">« AI's primary role is as an amplifier, magnifying an organization's existing strengths and weaknesses »</td><td data-label="Leçon retenue">les axes d'amélioration ne sont pas que du code : exploitation, qualité, documentation et flux de travail sont des domaines à part entière</td><td data-label="Lecture">lue (page d'accueil du rapport)</td></tr>
-<tr><td data-label="Source">OWASP — Application Security Verification Standard 5.0.0 (github.com/OWASP/ASVS)</td><td data-label="Date">2025-05</td><td data-label="Ce qu'elle établit">environ 350 exigences en 17 chapitres, niveaux 1 à 3</td><td data-label="Leçon retenue">le côté <strong>norme</strong> est fermé et versionné (forge-audit y est alignée, <code>fiches\forge-audit.md</code> l.29) : le test « rattachable à un contrôle » qui trace la frontière est donc décidable</td><td data-label="Lecture">relayée</td></tr>
-<tr><td data-label="Source">ACM EASE 2025 — « Assessing Software Product Quality in DevOps: An ISO 25010:2023 Perspective » (doi 10.1145/3727967.3756847)</td><td data-label="Date">2025-06</td><td data-label="Ce qu'elle établit">usage du modèle de qualité ISO/IEC 25010:2023 (neuf caractéristiques) pour évaluer un produit</td><td data-label="Leçon retenue">une liste de domaines se défend mieux adossée à un modèle fermé : la compatibilité répond aux connectivités, la capacité d'interaction au front, puis efficacité de performance, maintenabilité, flexibilité</td><td data-label="Lecture">relayée (page refusée à la lecture, erreur 403)</td></tr>
-<tr><td data-label="Source">Repère ancien — arc42, « ISO 25010:2023 Update » (quality.arc42.org)</td><td data-label="Date">2023-11</td><td data-label="Ce qu'elle établit">les neuf caractéristiques et ce qui change depuis 2011 (sûreté ajoutée, portabilité devenue flexibilité)</td><td data-label="Leçon retenue">hors fenêtre de 24 mois : cité pour la définition, ne compte pas parmi les cinq</td><td data-label="Lecture">lue</td></tr>
-<tr><td data-label="Source">Repère ancien — InfoQ, « Getting Technical Debt on the Roadmap »</td><td data-label="Date">2024-03-27</td><td data-label="Ce qu'elle établit">« Align technical debt resolution with business priorities to ensure it's incorporated into the roadmap »</td><td data-label="Leçon retenue">hors fenêtre : confirme que chaque axe doit nommer l'effet métier visé — le champ « cible servie » de la fiche</td><td data-label="Lecture">lue</td></tr>
-</tbody></table></div>
-<div class="lire" data-mesure-lecture>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Source</th><th scope="col">Date</th><th scope="col">Ce qu'elle établit</th><th scope="col">Leçon retenue</th><th scope="col">Lecture</th></tr></thead><tbody><tr><td>Microsoft, .NET Blog — « Your Migration's Source of Truth: The Modernization Assessment » (devblogs.microsoft.com/dotnet)</td><td>2026-04-07</td><td>l'évaluation est un <strong>fichier du dépôt</strong> ; constats classés *Mandatory / Potential / Optional*, chacun avec fichiers et lignes ; « Every planning decision […] traces back to what the assessment found »</td><td>la donnée est la source, le plan en dérive ; la troisième classe (« Optional ») est exactement l'amélioration hors blocage</td><td>lue</td></tr><tr><td>AWS — « AWS Well-Architected adds enhanced implementation guidance » (aws.amazon.com/about-aws/whats-new) et guide de l'outil, page « issues by improvement plan item »</td><td>2024-11-06</td><td>les éléments du plan d'amélioration se listent par pilier et par risque, et « You can filter the items based on pillar and severity »</td><td>un plan d'amélioration se consulte comme une liste <strong>filtrable par domaine et par gravité</strong> — c'est le tableau à facettes du socle ; limite : le cadre reste côté norme</td><td>lue (guide) ; date relayée</td></tr><tr><td>DORA — « State of AI-assisted Software Development 2025 » (dora.dev/dora-report-2025)</td><td>2025-09</td><td>« AI's primary role is as an amplifier, magnifying an organization's existing strengths and weaknesses »</td><td>les axes d'amélioration ne sont pas que du code : exploitation, qualité, documentation et flux de travail sont des domaines à part entière</td><td>lue (page d'accueil du rapport)</td></tr><tr><td>OWASP — Application Security Verification Standard 5.0.0 (github.com/OWASP/ASVS)</td><td>2025-05</td><td>environ 350 exigences en 17 chapitres, niveaux 1 à 3</td><td>le côté <strong>norme</strong> est fermé et versionné (forge-audit y est alignée, <code>fiches\forge-audit.md</code> l.29) : le test « rattachable à un contrôle » qui trace la frontière est donc décidable</td><td>relayée</td></tr><tr><td>ACM EASE 2025 — « Assessing Software Product Quality in DevOps: An ISO 25010:2023 Perspective » (doi 10.1145/3727967.3756847)</td><td>2025-06</td><td>usage du modèle de qualité ISO/IEC 25010:2023 (neuf caractéristiques) pour évaluer un produit</td><td>une liste de domaines se défend mieux adossée à un modèle fermé : la compatibilité répond aux connectivités, la capacité d'interaction au front, puis efficacité de performance, maintenabilité, flexibilité</td><td>relayée (page refusée à la lecture, erreur 403)</td></tr><tr><td>Repère ancien — arc42, « ISO 25010:2023 Update » (quality.arc42.org)</td><td>2023-11</td><td>les neuf caractéristiques et ce qui change depuis 2011 (sûreté ajoutée, portabilité devenue flexibilité)</td><td>hors fenêtre de 24 mois : cité pour la définition, ne compte pas parmi les cinq</td><td>lue</td></tr><tr><td>Repère ancien — InfoQ, « Getting Technical Debt on the Roadmap »</td><td>2024-03-27</td><td>« Align technical debt resolution with business priorities to ensure it's incorporated into the roadmap »</td><td>hors fenêtre : confirme que chaque axe doit nommer l'effet métier visé — le champ « cible servie » de la fiche</td><td>lue</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
 <p>Ce que l'état de l'art ne fournit pas : aucune des sources lues ne sépare explicitement <strong>remédiation</strong> et <strong>amélioration</strong> en deux listes jointes ; les cadres d'éditeurs restent côté norme. La frontière norme / ambition est un apport de l'analyse L99 du 19/09, à éprouver sur la première mission.</p>
-</div>
+<h3>4. Options — jeu fermé O0-O4</h3>
+<p>Cinq options *(O0 : ne rien faire ; O1 à O4 : options réelles)*, chacune avec son contenu, son coût en complexité × durée, et ce qu'elle exclut.</p>
+<ul><li><strong>O0 — ne rien faire</strong> : garder le prompt réécrit du 19/09 comme modèle à recoller. <strong>Réfutée.</strong></li></ul>
+<p>  Coût du statu quo, cité : le prompt d'origine valait 20 sur 100 avec 3 défauts bloquants   (synthèse L99 du 19/09, bloc 2) — toute mission future qui repart d'une phrase repaie cette   analyse ; le contrat de douze critères se vérifierait à la main, alors que le noyau n'accepte un   livrable « que sur le seul verdict d'un oracle exécuté » ; la page HTML se referait à chaque   fois ; et l'étude du 19/08 déclarait déjà non couverte « la production d'une recommandation neuve   depuis un diagnostic » (l.63).</p>
+<ul><li><strong>O1 — un référentiel de méthode seul</strong> : écrire la frontière, les domaines et la fiche dans</li></ul>
+<p>  <code>references\</code> du pilot, avec un prompt type. Coût : simple × court. Exclut P3, P5 et P6 : rien ne   joint, ne juge ni ne rend. C'est ce que la règle 31 prescrit pour un savoir <strong>sans verbe   outillé</strong> (« un référentiel versionné […] jamais une forge NI un skill », <code>REGLES-PROJET.md</code>   l.340-341) — donc la bonne forme si l'on renonçait aux verbes, pas si on les veut.</p>
+<ul><li>**O2 — un skill outillé chez forge-agents, un contrat de données avec forge-audit, un</li></ul>
+<p>  amendement du run de conseil** : détaillée à la section 5. Coût : complexe × moyen. Exclut une   forge nouvelle et toute modification du référentiel d'audit.</p>
+<ul><li><strong>O3 — étendre forge-audit</strong> d'un livrable « plan d'amélioration ». Coût : moyen × moyen. Son</li></ul>
+<p>  meilleur argument est réel : forge-audit possède déjà le schéma d'actions, un moteur de page à   sept vues et l'oracle de ce rendu — une huitième vue coûterait moins qu'un skill. <strong>Exclue</strong>   malgré cela, pour trois raisons citées : le produit forge-audit est public et agnostique du client   (<code>fiches\forge-audit.md</code> l.13 : « 0 mention tenant dans le produit »), alors qu'une ambition est   propre à un client par nature ; son invariant est « aucun score n'est affecté sans preuve »   (<code>modele-maturite.template.md</code> l.5-6), quand une amélioration est un pari sur un gain ; et la   lecture « global » de la demande exige d'accepter d'autres sources d'audit que forge-audit, ce   qu'un livrable interne à forge-audit interdit.</p>
+<ul><li><strong>O4 — une forge dédiée</strong> (« amélioration » ou « conseil »). Coût : très complexe × long.</li></ul>
+<p>  <strong>Exclue</strong> par la règle 28 : les trois verbes existent bien nulle part ailleurs (critère 1), mais   la capacité n'a ni cadence ni mandat propres (critère 3) — son mandat est celui du run de   conseil, qui existe ; et l'étude du 19/08 a déjà tranché « aucune nouvelle forge » (l.140-141)   pour le même périmètre.</p>
+<h3>5. Verdict</h3>
+<ul><li><strong>Option retenue</strong> : O2.</li><li><strong>Contenu, objet par objet.</strong> Le skill, de nom de travail <code>plan-d-amelioration</code>, porte une</li></ul>
+<p>  méthode et trois verbes. *La méthode* (référentiel interne au skill, daté et éditable) : la   frontière « écart à une norme = remédiation, écart à une ambition = amélioration » ; une base de   domaines qui reprend les dix-huit dimensions de forge-audit là où elles existent, y ajoute ce   qu'elles ne séparent pas (front, back, connectivités, dette d'un fork), s'adosse au modèle   ISO/IEC 25010:2023 et s'ajuste au produit avec motif ; la   fiche à dix champs ; les cinq questions d'ouverture ; les trois statuts d'un chiffre (mesuré, lu,   hypothèse). *Verbe 1 — joindre* : lit le fichier des améliorations et le fichier d'actions d'un   audit, refuse toute amélioration rattachable à un contrôle évalué (zéro doublon), résout les   renvois croisés, produit la table de jonction. *Verbe 2 — juger* : un oracle qui joue le contrat   de sortie (complétude des fiches, constats sourcés, chiffres à statut, domaines couverts,   horizon et rang, aucun effort en jours), né avec ses fixtures rouge et verte. *Verbe 3 —   rendre* : du fichier de données vers la page HTML autoportante au socle, et vers une vue   Markdown.</p>
+<ul><li><strong>Le « livrable complet au format HTML », défini.</strong> Une page de données au socle</li></ul>
+<p>  <code>digit-ai-page-html</code>, en huit chapitres sous sommaire permanent : (1) les dix premières   décisions, en choix fermés ; (2) la synthèse par domaine et par horizon, en indicateurs ;   (3) le tableau de toutes les fiches, filtrable et triable par le composant du socle ; (4) le   détail de chaque fiche, en ligne dépliable ; (5) la table de jonction avec les remédiations de   l'audit ; (6) la trajectoire en lots et horizons, en schéma de flux temporel ; (7) le plan de   mesure, là où aucune instance n'a pu être mesurée ; (8) la méthode, les sources et le statut des   chiffres. Imprimable, sans requête réseau, jugée par <code>check_html.py</code>, <code>render_page.py</code> et   l'oracle de filtres, puis par la critique d'implémentation de forge-design.</p>
+<ul><li><strong>Forges impliquées dans la mise en place.</strong> Le tableau donne une ligne par porteur, dans</li></ul>
+<p>  l'ordre de dépendance des lots ; la troisième colonne dit pourquoi ce porteur et pas un autre.</p>
 </section>
-<section id="options">
-<div class="lire" data-mesure-lecture>
-<h2>Options</h2>
-<p class="ch-apprend">Cinq options sont pesées ; le statu quo est réfuté sur coûts cités, l'extension de forge-audit et la forge dédiée sont exclues par des règles écrites.</p>
-<p class="contenu">Ce chapitre contient les options O0 à O4, chacune avec son contenu, son coût en complexité et durée, et ce qu'elle exclut ; il se distingue du verdict en ce qu'il compare sans trancher.</p>
-<p>Cinq options <em>(O0 : ne rien faire ; O1 à O4 : options réelles)</em>, chacune avec son contenu, son coût en complexité × durée, et ce qu'elle exclut.</p>
-<ul><li><strong>O0 — ne rien faire</strong> : garder le prompt réécrit du 19/09 comme modèle à recoller. <strong>Réfutée.</strong> Coût du statu quo, cité : le prompt d'origine valait 20 sur 100 avec 3 défauts bloquants (synthèse L99 du 19/09, bloc 2) — toute mission future qui repart d'une phrase repaie cette analyse ; le contrat de douze critères se vérifierait à la main, alors que le noyau n'accepte un livrable « que sur le seul verdict d'un oracle exécuté » ; la page HTML se referait à chaque fois ; et l'étude du 19/08 déclarait déjà non couverte « la production d'une recommandation neuve depuis un diagnostic » (l.63).</li>
-<li><strong>O1 — un référentiel de méthode seul</strong> : écrire la frontière, les domaines et la fiche dans <code>references\</code> du pilot, avec un prompt type. Coût : simple × court. Exclut P3, P5 et P6 : rien ne joint, ne juge ni ne rend. C'est ce que la règle 31 prescrit pour un savoir <strong>sans verbe outillé</strong> (« un référentiel versionné […] jamais une forge NI un skill », <code>REGLES-PROJET.md</code> l.340-341) — donc la bonne forme si l'on renonçait aux verbes, pas si on les veut.</li>
-<li><strong>O2 — un skill outillé chez forge-agents, un contrat de données avec forge-audit, un amendement du run de conseil</strong> : détaillée à la section 5. Coût : complexe × moyen. Exclut une forge nouvelle et toute modification du référentiel d'audit.</li>
-<li><strong>O3 — étendre forge-audit</strong> d'un livrable « plan d'amélioration ». Coût : moyen × moyen. Son meilleur argument est réel : forge-audit possède déjà le schéma d'actions, un moteur de page à sept vues et l'oracle de ce rendu — une huitième vue coûterait moins qu'un skill. <strong>Exclue</strong> malgré cela, pour trois raisons citées : le produit forge-audit est public et agnostique du client (<code>fiches\forge-audit.md</code> l.13 : « 0 mention tenant dans le produit »), alors qu'une ambition est propre à un client par nature ; son invariant est « aucun score n'est affecté sans preuve » (<code>modele-maturite.template.md</code> l.5-6), quand une amélioration est un pari sur un gain ; et la lecture « global » de la demande exige d'accepter d'autres sources d'audit que forge-audit, ce qu'un livrable interne à forge-audit interdit.</li>
-<li><strong>O4 — une forge dédiée</strong> (« amélioration » ou « conseil »). Coût : très complexe × long. <strong>Exclue</strong> par la règle 28 : les trois verbes existent bien nulle part ailleurs (critère 1), mais la capacité n'a ni cadence ni mandat propres (critère 3) — son mandat est celui du run de conseil, qui existe ; et l'étude du 19/08 a déjà tranché « aucune nouvelle forge » (l.140-141) pour le même périmètre.</li></ul>
-</div>
-</section>
-<section id="verdict">
-<div class="lire" data-mesure-lecture>
-<h2>Verdict et forges impliquées</h2>
-<p class="ch-apprend">L'option retenue tient en un skill à trois verbes, quatre porteurs nommés avec leur lot, et un ordre : la mission réelle d'abord, l'extraction du skill ensuite.</p>
-<p class="contenu">Ce chapitre contient l'option retenue, la définition du livrable HTML en huit chapitres, le tableau des porteurs, les forges mobilisées sans modification, le séquencement, le coût, la date de revue et le test rétro ; il se distingue des options en ce qu'il engage.</p>
-<ul><li><strong>Option retenue</strong> : O2.</li>
-<li><strong>Contenu, objet par objet.</strong> Le skill, de nom de travail <code>plan-d-amelioration</code>, porte une méthode et trois verbes. <em>La méthode</em> (référentiel interne au skill, daté et éditable) : la frontière « écart à une norme = remédiation, écart à une ambition = amélioration » ; une base de domaines qui reprend les dix-huit dimensions de forge-audit là où elles existent, y ajoute ce qu'elles ne séparent pas (front, back, connectivités, dette d'un fork), s'adosse au modèle ISO/IEC 25010:2023 et s'ajuste au produit avec motif ; la fiche à dix champs ; les cinq questions d'ouverture ; les trois statuts d'un chiffre (mesuré, lu, hypothèse). <em>Verbe 1 — joindre</em> : lit le fichier des améliorations et le fichier d'actions d'un audit, refuse toute amélioration rattachable à un contrôle évalué (zéro doublon), résout les renvois croisés, produit la table de jonction. <em>Verbe 2 — juger</em> : un oracle qui joue le contrat de sortie (complétude des fiches, constats sourcés, chiffres à statut, domaines couverts, horizon et rang, aucun effort en jours), né avec ses fixtures rouge et verte. <em>Verbe 3 — rendre</em> : du fichier de données vers la page HTML autoportante au socle, et vers une vue Markdown.</li>
-<li><strong>Le « livrable complet au format HTML », défini.</strong> Une page de données au socle <code>digit-ai-page-html</code>, en huit chapitres sous sommaire permanent : (1) les dix premières décisions, en choix fermés ; (2) la synthèse par domaine et par horizon, en indicateurs ; (3) le tableau de toutes les fiches, filtrable et triable par le composant du socle ; (4) le détail de chaque fiche, en ligne dépliable ; (5) la table de jonction avec les remédiations de l'audit ; (6) la trajectoire en lots et horizons, en schéma de flux temporel ; (7) le plan de mesure, là où aucune instance n'a pu être mesurée ; (8) la méthode, les sources et le statut des chiffres. Imprimable, sans requête réseau, jugée par <code>check_html.py</code>, <code>render_page.py</code> et l'oracle de filtres, puis par la critique d'implémentation de forge-design.</li>
-<li><strong>Forges impliquées dans la mise en place.</strong> Le tableau donne une ligne par porteur, dans l'ordre de dépendance des lots ; la troisième colonne dit pourquoi ce porteur et pas un autre.</li></ul>
-</div>
-<div class="table-hote"><table id="tab-3" class="repli-cartes" data-filterable="off" data-filterable-reason="tableau de 4 lignes, lisible d'un regard : sous le seuil de huit lignes du composant"><thead><tr><th scope="col" data-definition="La forge, ou le pilot, qui recevrait le lot." title="La forge, ou le pilot, qui recevrait le lot.">Porteur</th><th scope="col" data-definition="Le contenu du lot à livrer par ce porteur." title="Le contenu du lot à livrer par ce porteur.">Ce qu'il reçoit</th><th scope="col" data-definition="Le fait qui désigne ce porteur plutôt qu'un autre." title="Le fait qui désigne ce porteur plutôt qu'un autre.">Pourquoi lui</th></tr></thead><tbody>
-<tr><td data-label="Porteur"><strong>forge-audit</strong></td><td data-label="Ce qu'il reçoit">déclarer son schéma d'actions existant comme contrat d'interface versionné (clé de jonction : le contrôle violé et le constat), exporter la liste des contrôles évalués, et lever la borne de l'identifiant à la dimension D16 (défaut déjà au registre du pilot)</td><td data-label="Pourquoi lui">la frontière ne se vérifie que si l'on sait quels contrôles ont été joués ; la donnée et son schéma lui appartiennent</td></tr>
-<tr><td data-label="Porteur"><strong>forge-agents</strong></td><td data-label="Ce qu'il reçoit">le skill <code>plan-d-amelioration</code> (méthode, verbes joindre et rendre), son oracle enregistré au registre <code>quality-oracles</code> et composant les trois juges existants, le gabarit de page posé sur le socle <code>digit-ai-page-html</code>, et quatre fiches d'expert manquantes (performances, front, back, coûts)</td><td data-label="Pourquoi lui">les 18 skills transverses, le socle de page, le registre des oracles et les fiches d'expert y vivent ; <code>write-a-skill</code>, <code>write-an-oracle</code> et <code>write-an-expert</code> y sont l'outillage de naissance</td></tr>
-<tr><td data-label="Porteur"><strong>forge-design</strong></td><td data-label="Ce qu'il reçoit">la critique d'implémentation du gabarit de page, et le contrôle de généricité</td><td data-label="Pourquoi lui">toute page HTML livrée porte son verdict ; un plan d'amélioration générique dans sa forme trahirait son fond</td></tr>
-<tr><td data-label="Porteur"><strong>le pilot</strong> (porteur, pas une forge)</td><td data-label="Ce qu'il reçoit">l'amendement du bloc « recommander » du run de conseil pour appeler le skill, l'entrée au catalogue de services, la situation « audit puis amélioration » au protocole d'accueil</td><td data-label="Pourquoi lui">le run de conseil et le routage des intentions lui appartiennent</td></tr>
-</tbody></table></div>
-<div class="lire" data-mesure-lecture>
-<ul><li><strong>Forges mobilisées à l'exécution, sans modification.</strong> forge-conception (lecture de l'existant par le mode rétro-modèle), puis, selon les domaines instruits : forge-tests (audit de la suite de tests), forge-websec (dépendances vulnérables), forge-ops (plans et dérive), forge-observability (sondes), forge-data (mesures de base en lecture seule). Elles fournissent des <strong>mesures</strong> aux fiches ; aucune ne reçoit de lot.</li>
-<li><strong>Séquencement — le skill naît de la première mission, pas avant elle.</strong> La règle 31 exige qu'un objet durable naisse exercé, et l'analyse du matin demandait d'attendre « ce premier run » et des « gains constatés ». D'où trois temps : (1) jouer la mission réelle avec le prompt réécrit du 19/09, à la main, en tenant le fichier de données et la page ; (2) extraire le skill de ce qui a tenu — la mission fournit les fixtures réelles, vertes et rouges ; (3) seulement alors, les lots de forge-audit, de forge-design et du pilot. Construire le skill avant la mission reviendrait à figer treize domaines et dix champs que personne n'a encore éprouvés.</li>
-<li><strong>Coût</strong> : complexité : complexe · durée : moyen. Dette assumée : la base de treize domaines et la frontière norme / ambition naissent d'une seule analyse et n'ont pas encore été éprouvées ; la première mission les corrigera.</li>
-<li><strong>Candidature(s) émise(s)</strong> : <code>input\01-candidatures\plan-d-amelioration-post-audit-20260919a.tf.jsonl</code> — quatre candidatures de lot et trois constats en passant, ingérés en candidat sur décision humaine du 19/09/2026 (D-4 (a)) ; chaque item attend sa propre décision.</li>
-<li><strong>Plan de revue</strong> : 2026-10-19. À cette date, confronter le verdict à la première mission réelle — la plateforme qui a fait naître la demande : le prompt réécrit du 19/09 y aura-t-il été joué, la frontière aura-t-elle tenu, combien de fiches auront été retirées faute de cible ? Cette mission répond aussi à la clause de revue de l'étude du 19/08 (2026-10-01 : « si aucune mission de conseil réelle n'a exercé le run type, requalifier »).</li>
-<li><strong>Test rétro</strong> : <em>joindre</em> → une donnée plutôt qu'un document → permettre de trancher des priorités sans payer deux fois → décider où investir : la chaîne tient. <em>Juger</em> → un oracle plutôt qu'une relecture → même qualité à chaque mission : tient. <em>Rendre</em> → le socle plutôt qu'un gabarit maison → un livrable qu'un décideur utilise seul : tient. <em>Contrat d'interface chez forge-audit</em> → sert « global » seulement à moitié : il ouvre la jonction avec forge-audit, pas avec les autres sources d'audit ; <strong>rupture assumée</strong> — le verbe joindre naît avec un seul adaptateur, et l'étude le dit plutôt que de promettre cinq adaptateurs non exercés. Questions du demandeur rejouées : « une étude d'opportunité sur ce sujet » → ce document ; « un livrable complet au format HTML » → défini ci-dessus en huit chapitres, et l'étude est remise en page ; « le ou les forges impliquées » → le tableau des porteurs, quatre lignes, et la liste des forges mobilisées sans modification ; « ce skill global » → un skill, chez forge-agents, avec la limite dite sur « global ».</li></ul>
-</div>
-</section>
-<section id="interdits">
-<div class="lire" data-mesure-lecture>
-<h2>Interdits tenus</h2>
-<p class="ch-apprend">Les six interdits du gabarit d'étude sont tenus, et c'est un oracle exécuté qui le dit, pas cette page.</p>
-<p class="contenu">Ce chapitre contient la liste des interdits du gabarit et leur tenue ; il se distingue de tous les autres en ce qu'il ne porte aucun fond, seulement la conformité de l'étude.</p>
+<div class="defile"><table><thead><tr><th scope="col">Porteur</th><th scope="col">Ce qu'il reçoit</th><th scope="col">Pourquoi lui</th></tr></thead><tbody><tr><td><strong>forge-audit</strong></td><td>déclarer son schéma d'actions existant comme contrat d'interface versionné (clé de jonction : le contrôle violé et le constat), exporter la liste des contrôles évalués, et lever la borne de l'identifiant à la dimension D16 (défaut déjà au registre du pilot)</td><td>la frontière ne se vérifie que si l'on sait quels contrôles ont été joués ; la donnée et son schéma lui appartiennent</td></tr><tr><td><strong>forge-agents</strong></td><td>le skill <code>plan-d-amelioration</code> (méthode, verbes joindre et rendre), son oracle enregistré au registre <code>quality-oracles</code> et composant les trois juges existants, le gabarit de page posé sur le socle <code>digit-ai-page-html</code>, et quatre fiches d'expert manquantes (performances, front, back, coûts)</td><td>les 18 skills transverses, le socle de page, le registre des oracles et les fiches d'expert y vivent ; <code>write-a-skill</code>, <code>write-an-oracle</code> et <code>write-an-expert</code> y sont l'outillage de naissance</td></tr><tr><td><strong>forge-design</strong></td><td>la critique d'implémentation du gabarit de page, et le contrôle de généricité</td><td>toute page HTML livrée porte son verdict ; un plan d'amélioration générique dans sa forme trahirait son fond</td></tr><tr><td><strong>le pilot</strong> (porteur, pas une forge)</td><td>l'amendement du bloc « recommander » du run de conseil pour appeler le skill, l'entrée au catalogue de services, la situation « audit puis amélioration » au protocole d'accueil</td><td>le run de conseil et le routage des intentions lui appartiennent</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<ul><li><strong>Forges mobilisées à l'exécution, sans modification.</strong> forge-conception (lecture de l'existant</li></ul>
+<p>  par le mode rétro-modèle), puis, selon les domaines instruits : forge-tests (audit de la suite   de tests), forge-websec (dépendances vulnérables), forge-ops (plans et dérive), forge-observability   (sondes), forge-data (mesures de base en lecture seule). Elles fournissent des <strong>mesures</strong> aux   fiches ; aucune ne reçoit de lot.</p>
+<ul><li><strong>Séquencement — le skill naît de la première mission, pas avant elle.</strong> La règle 31 exige</li></ul>
+<p>  qu'un objet durable naisse exercé, et l'analyse du matin demandait d'attendre « ce premier run »   et des « gains constatés ». D'où trois temps : (1) jouer la mission réelle avec le prompt réécrit   du 19/09, à la main, en tenant le fichier de données et la page ; (2) extraire le skill de ce qui   a tenu — la mission fournit les fixtures réelles, vertes et rouges ; (3) seulement alors, les lots   de forge-audit, de forge-design et du pilot. Construire le skill avant la mission reviendrait à   figer treize domaines et dix champs que personne n'a encore éprouvés.</p>
+<ul><li><strong>Coût</strong> : complexité : complexe · durée : moyen. Dette assumée : la base de treize domaines et</li></ul>
+<p>  la frontière norme / ambition naissent d'une seule analyse et n'ont pas encore été éprouvées ;   la première mission les corrigera.</p>
+<ul><li><strong>Candidature(s) émise(s)</strong> : <code>input\01-candidatures\plan-d-amelioration-post-audit-20260919a.tf.jsonl</code></li></ul>
+<p>  — quatre candidatures de lot et trois constats en passant, ingérés en candidat sur décision   humaine du 19/09/2026 (D-4 (a)) ; chaque item attend sa propre décision.</p>
+<ul><li><strong>Plan de revue</strong> : 2026-10-19. À cette date, confronter le verdict à la première mission réelle</li></ul>
+<p>  — la plateforme qui a fait naître la demande : le prompt réécrit du 19/09 y aura-t-il été joué,   la frontière aura-t-elle tenu, combien de fiches auront été retirées faute de cible ? Cette   mission répond aussi à la clause de revue de l'étude du 19/08 (2026-10-01 : « si aucune mission   de conseil réelle n'a exercé le run type, requalifier »).</p>
+<ul><li><strong>Test rétro</strong> : *joindre* → une donnée plutôt qu'un document → permettre de trancher des</li></ul>
+<p>  priorités sans payer deux fois → décider où investir : la chaîne tient. *Juger* → un oracle   plutôt qu'une relecture → même qualité à chaque mission : tient. *Rendre* → le socle plutôt   qu'un gabarit maison → un livrable qu'un décideur utilise seul : tient. *Contrat d'interface   chez forge-audit* → sert « global » seulement à moitié : il ouvre la jonction avec forge-audit,   pas avec les autres sources d'audit ; <strong>rupture assumée</strong> — le verbe joindre naît avec un seul   adaptateur, et l'étude le dit plutôt que de promettre cinq adaptateurs non exercés. Questions du   demandeur rejouées : « une étude d'opportunité sur ce sujet » → ce document ; « un livrable   complet au format HTML » → défini ci-dessus en huit chapitres, et l'étude est remise en page ;   « le ou les forges impliquées » → le tableau des porteurs, quatre lignes, et la liste des forges   mobilisées sans modification ; « ce skill global » → un skill, chez forge-agents, avec la limite   dite sur « global ».</p>
+<h3>Interdits (tenus)</h3>
 <p>Aucun critère subjectif ; jeu fermé tenu ; chaque ligne de non-recouvrement citée ; sources datées, et marquées « lue » ou « relayée » ; O0 réfutée sur coûts cités ; aucun effort en jours.</p>
-</div>
 </section>
-
-      </main>
-    </div>
-    <footer class="doc">
-      Digit-AI — Pilot · Étude d'opportunité « plan d'amélioration après audit » · 2026 ·
-      <span class="piece">vue dérivée du fichier source de l'étude ; le Markdown fait foi, jugé par l'oracle des études (dix règles, toutes tenues).</span>
-    </footer>
-  </div>
-  <!-- S-G1 (4/4, R-30) — câblage : persistance + aria-pressed, aucune bascule muette -->
+    </main>
+    <footer>Vue générée — NE PAS ÉDITER (la source Markdown fait foi ; la régénérer via le script du pilot). Sceau source <code>99b4dff674b4</code>.</footer>
+  </div></div>
   <script>
-  (function () {
-    var bouton = document.getElementById('theme-toggle');
-    var racine = document.documentElement;
-    function appliquer(theme) {
-      racine.setAttribute('data-theme', theme);
-      localStorage.setItem('digitai-theme', theme);
-      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
-    }
-    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
-    bouton.addEventListener('click', function () {
-      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    });
-  })();
-  </script>
-  <!-- TF-0929 — LES HAUTEURS DE COLLAGE SE MESURENT, ELLES NE SE DECLARENT PAS.
-       Le token de `:root` reste le repli ; ce script le remplace par la hauteur REELLE de ce
-       qui colle, a chaque evenement qui peut la changer : chargement, redimensionnement, et
-       POLICES CHARGEES — une police de titre qui arrive apres coup fait passer un en-tete de
-       une a deux lignes, et c'est exactement le cas qui a produit le defaut.
-       Controle : famille `entete_masque_par_collants` de render_page.py, qui mesure le `th`
-       colle contre le bas du dernier collant au-dessus de lui, a chaque largeur. -->
-  <script>
-  (function () {
-    function poserHauteurs() {
-      var racine = document.documentElement;
-      var enTete = document.querySelector('header.doc.colle');
-      var hh = enTete ? Math.ceil(enTete.getBoundingClientRect().height) : 0;
-      if (hh > 0) racine.style.setProperty('--hh', hh + 'px');
-      /* Ce qui colle SOUS l'en-tete et surplombe les tableaux : la bande de sommaire, quand
-         elle est effectivement collante a cette largeur (sous 900 px elle repasse `static`,
-         et elle ne masque alors plus rien). */
-      var bas = hh;
-      var toc = document.querySelector('nav.toc.colle');
-      if (toc && getComputedStyle(toc).position === 'sticky') {
-        var r = toc.getBoundingClientRect();
-        if (r.height > 0 && r.width > 0) bas = Math.max(bas, hh + Math.ceil(r.height));
-      }
-      racine.style.setProperty('--hh-tab', bas + 'px');
-    }
-    window.addEventListener('resize', poserHauteurs);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(poserHauteurs);
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', poserHauteurs);
-    } else {
-      poserHauteurs();
-    }
-    window.addEventListener('load', poserHauteurs);
-    window.poserHauteurs = poserHauteurs;
-  })();
-  </script>
-
-  <script>
-  (function () {
-    var champ = document.getElementById('q-nr'), raz = document.getElementById('q-nr-raz'), compte = document.getElementById('q-nr-count');
-    var table = document.querySelector('#non-recouvrement table');
-    if (!champ || !table) return;
-    var lignes = Array.prototype.slice.call(table.tBodies[0].rows);
-    function plat(t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
-    function appliquer() {
-      var q = plat(champ.value.trim()), vues = 0;
-      lignes.forEach(function (tr) {
-        var ok = !q || plat(tr.textContent).indexOf(q) !== -1;
-        if (ok) { tr.removeAttribute('data-recherche-masque'); vues++; } else { tr.setAttribute('data-recherche-masque', ''); }
-      });
-      compte.textContent = q ? (vues ? vues + ' ligne(s) sur ' + lignes.length + ' correspondent' : 'Aucune des ' + lignes.length + ' lignes ne correspond — effacez la recherche pour tout revoir') : lignes.length + ' lignes';
-      compte.classList.toggle('zero', !!q && vues === 0);
-    }
-    champ.addEventListener('input', appliquer);
-    raz.addEventListener('click', function () { champ.value = ''; appliquer(); champ.focus(); });
-    appliquer();
-  })();
-  (function () {
-    var bande = document.querySelector('.toc-bande');
-    if (!bande || !window.matchMedia) return;
-    var etroit = window.matchMedia('(max-width: 900px)');
-    function regler() { if (etroit.matches) bande.removeAttribute('open'); else bande.setAttribute('open', ''); }
-    regler();
-    if (etroit.addEventListener) etroit.addEventListener('change', regler);
-    bande.addEventListener('click', function (e) { if (etroit.matches && e.target.closest('a')) bande.removeAttribute('open'); });
-  })();
-  window.addEventListener('load', function () {
-    if (!window.DigitAITableFilters) return;
-    DigitAITableFilters.initAll();
-  });
-  </script>
-<!-- COMPOSANT-EMBARQUE:DEBUT table-filters.js — copie du socle digit-ai-page-html/assets/table-filters.js,
-     posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
-     La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="table-filters.js" data-empreinte="sha256:7720228fcc8649c1faa33c55954b17b65ffcb7f8dfdeda27833f7dcbd0dc076b">
 /* Digit-AI — Filtres de colonne sur tableaux de données.
    Socle commun : voir references/composant-filtres-tableau.md (checklist G1-G9).
    Viewer-only : le JS ne s'exécute pas à l'export WeasyPrint, la regle @media print
@@ -1156,6 +720,11 @@ tr[data-tf-empty] td {
         if (e.bouton && e.bouton.parentNode) e.bouton.parentNode.removeChild(e.bouton);
         var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
         if (p && p.parentNode) p.parentNode.removeChild(p);
+        var th = e.col && e.col.th;
+        if (th) {
+          th.removeAttribute('data-tf-forme');
+          var u = th.querySelector('.tf-unique'); if (u) u.parentNode.removeChild(u);
+        }
       });
       etats.length = 0;
     }
@@ -1189,6 +758,17 @@ tr[data-tf-empty] td {
           posThCalculee = (window.getComputedStyle(col.th).position || 'static');
         } catch (e) { posThCalculee = col.th.style.position || 'static'; }
         if (posThCalculee === 'static') col.th.style.position = 'relative';
+        /* TF-1052 (08/09) : la forme se publie AUSSI sur le `<th>`, la ou un oracle et un test
+           cherchent la colonne — posee sur le seul panneau, une sonde de l'en-tete lisait `null`
+           sur 9 colonnes sur 9. TF-1051 : une colonne a valeur UNIQUE le dit dans l'en-tete,
+           sans clic — un destinataire a lu vingt fois la meme chaine et conclu a une panne. */
+        col.th.setAttribute('data-tf-forme', col.forme);
+        if (col.forme === 'unique') {
+          var u = document.createElement('span');
+          u.className = 'tf-unique';
+          u.textContent = 'une seule valeur';
+          col.th.appendChild(u);
+        }
         col.th.appendChild(b);
         col.th.appendChild(ui.panneau);
         Array.prototype.forEach.call(ui.options.querySelectorAll('.tf-opt'), function (cb) {
@@ -1347,7 +927,131 @@ tr[data-tf-empty] td {
                                SEUIL_RECHERCHE: SEUIL_RECHERCHE, nombre: nombre,
                                comparer: comparer };
 })(typeof window !== 'undefined' ? window : this);
-</script>
-<!-- COMPOSANT-EMBARQUE:FIN table-filters.js -->
+
+  </script>
+  <script>
+/* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
+ *
+ * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
+ * un compteur d'occurrences mis à jour à chaque frappe. Insensible aux accents.
+ *
+ * ⚠️ La classe du surlignage est `find-hit`, JAMAIS `find`. `find` est le nom que prend
+ * naturellement le conteneur du champ de recherche dans un livrable ; quand les deux
+ * partagent la classe, une règle `.find { display: flex }` écrite pour le conteneur
+ * s'applique aussi au <mark> et casse le mot surligné (défaut mesuré en production :
+ * le « s » de « clics » rejeté à 606 px du mot). Les trois classes du composant sont
+ * disjointes : `find-hit` (surlignage), `find-count` (compteur), et ce que le livrable
+ * veut pour son conteneur.
+ *
+ * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
+ * vise aussi le PDF, prévoir un équivalent statique de l'information.
+ *
+ * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
+ * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
+ * fermerait la balise hôte au milieu du fichier : composant tronqué, silencieusement).
+ * TF-1062 (11/09) : ce commentaire l'écrivait lui-même EN CLAIR. Une copie inlinée à la main
+ * était coupée ici, et le câblage ci-dessous devenait du vrai DOM — trois identifiants
+ * dupliqués, que oracle-a11y a comptés à juste titre. Cette explication ne cite plus la
+ * séquence ; self_test.py vérifie qu'aucun asset inlinable ne la porte :
+ *   <input id="find" type="text" placeholder="Rechercher…">
+ *   <div id="findCount" class="find-count" aria-live="polite"></div>
+ *   <div id="content"> … contenu à fouiller … </div>
+ *   <script src="find-in-page.js"><\/script>
+ *   <script>
+ *     DigitAIFindInPage.init(
+ *       document.getElementById('find'),
+ *       document.getElementById('content'),
+ *       document.getElementById('findCount')
+ *     );
+ *   <\/script>
+ *
+ * CSS attendu (à adapter aux tokens du livrable) :
+ *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
+ *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
+ *   .find-count.zero { color: #c0392b; }
+ */
+(function (global) {
+  'use strict';
+
+  // Regex insensible aux accents et à la casse à partir d'une saisie libre.
+  function buildRegex(q) {
+    q = (q || '').trim();
+    if (!q) return null;
+    var map = { a: 'aàâäá', e: 'eéèêëế', i: 'iîïí', o: 'oôöó', u: 'uùûüú', c: 'cç', n: 'nñ', y: 'yÿ' };
+    var pat = '';
+    for (var i = 0; i < q.length; i++) {
+      var ch = q[i], low = ch.toLowerCase();
+      if (map[low]) pat += '[' + map[low] + map[low].toUpperCase() + ']';
+      else if (/[a-z0-9]/i.test(ch)) pat += ch;
+      else pat += '\\' + ch; // échappe les caractères spéciaux regex
+    }
+    try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
+  }
+
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
+  function highlight(root, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n, count = 0;
+    while ((n = walker.nextNode())) nodes.push(n);
+    for (var k = 0; k < nodes.length; k++) {
+      var tn = nodes[k];
+      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
+      var txt = tn.nodeValue; re.lastIndex = 0;
+      if (!re.test(txt)) continue; re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = document.createElement('mark');
+        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        count++;
+        last = m.index + m[0].length;
+        if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
+      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      tn.parentNode.replaceChild(frag, tn);
+    }
+    return count;
+  }
+
+  /* Branche la recherche live sur un champ.
+   * input, container, counter : éléments DOM (counter optionnel).
+   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
+   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
+   *   Sinon, le HTML initial est capturé une fois à l'init.
+   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
+   *   le HTML pristine (mode sans getHTML). */
+  function init(input, container, counter, getHTML) {
+    if (!input || !container) return null;
+    var pristine = getHTML ? null : container.innerHTML;
+    function run() {
+      container.innerHTML = getHTML ? getHTML() : pristine;
+      var re = buildRegex(input.value);
+      if (!re) {
+        if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
+        return;
+      }
+      var nb = highlight(container, re);
+      if (counter) {
+        counter.textContent = nb === 0 ? 'Aucune occurrence' : (nb + ' occurrence' + (nb > 1 ? 's' : ''));
+        counter.classList.toggle('zero', nb === 0);
+      }
+    }
+    input.addEventListener('input', run);
+    return {
+      run: run,
+      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
+    };
+  }
+
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
+})(window);
+
+  </script>
+  <script>
+    DigitAITableFilters.initAll(document);
+    DigitAIFindInPage.init(document.getElementById('find'), document.querySelector('main'), document.getElementById('findCount'));
+  </script>
 </body>
 </html>

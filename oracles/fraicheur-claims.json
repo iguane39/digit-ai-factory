@@ -37,6 +37,30 @@
       "doc": "INVENTAIRE.md",
       "interdit": "aucune option `?--sortie`?",
       "sonde": { "type": "grep_sources", "depot": "digit-ai-forge-tests", "dossier": "forge_tests", "motif": "\"--sortie\"" }
+    },
+    {
+      "id": "fiche-audit-adr",
+      "doc": "fiches/forge-audit.md",
+      "extraire": "(\\d+)\\s+ADRs,\\s+\\d+\\s+contr.les",
+      "sonde": { "type": "compter_fichiers_recursif", "depot": "digit-ai-forge-audit", "dossier": "core/adr", "suffixe": ".md" }
+    },
+    {
+      "id": "fiche-audit-controles",
+      "doc": "fiches/forge-audit.md",
+      "extraire": "\\d+\\s+ADRs,\\s+(\\d+)\\s+contr.les",
+      "sonde": { "type": "sommer_json", "depot": "digit-ai-forge-audit", "dossier": "core/controls", "prefixe": "D", "suffixe": ".json", "cle": "controls" }
+    },
+    {
+      "id": "fiche-audit-dimensions",
+      "doc": "fiches/forge-audit.md",
+      "extraire": "\\d+\\s+contr.les,\\s+(\\d+)\\s+dimensions",
+      "sonde": { "type": "compter_fichiers", "depot": "digit-ai-forge-audit", "dossier": "core/controls", "prefixe": "D", "suffixe": ".json" }
+    },
+    {
+      "id": "produits-connus-du-registre",
+      "doc": "references/PRODUITS.md",
+      "extraire": "\\*\\*(\\d+) produits connus du registre\\*\\*",
+      "sonde": { "type": "compter_distincts_jsonl", "depot": "digit-ai-factory", "fichiers": ["todo/TODO.jsonl", "todo/TODO-ARCHIVE.jsonl"], "ev": "creation", "champs": ["demandeur", "source"], "motif": "Produit-\\d{2}(?!\\d)" }
     }
   ]
 }

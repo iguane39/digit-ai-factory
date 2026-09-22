@@ -35,8 +35,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 13,
-  "vu_le": "2026-09-14"
+  "cas": 20,
+  "vu_le": "2026-09-22"
  },
  "hook-page-html.mjs": {
   "cas": 11,
@@ -141,12 +141,12 @@
   "vu_le": "2026-08-26"
  },
  "oracle-fraicheur-doc.mjs": {
-  "cas": 4,
-  "vu_le": "2026-08-27"
+  "cas": 10,
+  "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 36,
-  "vu_le": "2026-09-21"
+  "cas": 39,
+  "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -167,6 +167,10 @@
  },
  "oracle-invariant-mesure.mjs": {
   "cas": 16,
+  "vu_le": "2026-09-22"
+ },
+ "oracle-invariants-traduction.mjs": {
+  "cas": 8,
   "vu_le": "2026-09-22"
  },
  "oracle-livrable-conseil.mjs": {
@@ -291,8 +295,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 6,
-  "vu_le": "2026-09-14"
+  "cas": 7,
+  "vu_le": "2026-09-22"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 5,
@@ -399,8 +403,8 @@
   "vu_le": "2026-09-14"
  },
  "scripts/generer-page-etude.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-16"
+  "cas": 9,
+  "vu_le": "2026-09-22"
  },
  "scripts/generer-remplacements-historique.test.mjs": {
   "cas": 11,
@@ -475,8 +479,8 @@
   "vu_le": "2026-08-31"
  },
  "scripts/verifier-jugement.test.mjs": {
-  "cas": 10,
-  "vu_le": "2026-08-31"
+  "cas": 14,
+  "vu_le": "2026-09-22"
  },
  "scripts/verifier-ooxml.test.mjs": {
   "cas": 3,

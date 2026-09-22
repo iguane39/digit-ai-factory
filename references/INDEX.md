@@ -25,6 +25,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\PLATEFORME-LINKEDIN.md` | Plateforme LinkedIn — règles datées (contrat, accès aux chiffres, transparence, portée), péremption déclarée |
 | `references\PLATEFORMES-RESEAUX.md` | Plateformes de réseaux sociaux — 9 réseaux, 5 faits chacun (publier, programmer, exporter, déclarer un contenu généré, automatisation), solidité ligne à ligne, péremption déclarée |
 | `references\PRODUCTION-OOXML.md` | Production d'un document OOXML depuis une référence client — relevé de charte et gates |
+| `references\PRODUITS.md` | Référentiel déclaré des produits suivis — pseudonymes, faits du registre, état déclaré ; compte jugé par `oracle-fraicheur-doc` (TF-1313) |
 | `references\REGLES-DE-NON-REPETITION.md` | Règles de non-répétition |
 | `references\RUN-AO.md` | Run de réponse à appel d'offres — quand le livrable est une offre à échéance, construite sur des documents tiers |
 | `references\RUN-CONSEIL.md` | Run de conseil — quand le livrable est une trajectoire, pas un logiciel ni un seul document |

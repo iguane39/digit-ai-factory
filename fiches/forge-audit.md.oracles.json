@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\fiches\\forge-audit.md",
+  "date_iso": "2026-09-22T18:37:55.133Z",
+  "registre_version": "2.25.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "fiches\\forge-audit.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "fiches\\forge-audit.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "fiches\\forge-audit.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "fiches\\forge-audit.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "fiches\\forge-audit.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "fiches\\forge-audit.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 20260819 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "fiches\\forge-audit.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "fiches\\forge-audit.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "fiches\\forge-audit.md",
+    "ts": "2026-09-22T18:37:55.133Z",
+    "fichiers": {
+      "fiches\\forge-audit.md": "9c6d6e09220aa3396f2d0f6497dd04f8c76bd2305c9aab73482f3dfeddedb3d6"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

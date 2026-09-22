@@ -16,6 +16,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
+| `_arrivee\` | dossier ignoré par git (absent d'un clone) | — | Sas d'arrivée des lots, IGNORÉ par git (absent d'un clone frais) : le producteur y dépose son lot tel qu'il est, nom réel compris ; `node todo\accueillir-lot.mj… |
 | [`old\`](old/README.md) | dossier (150 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
 | `digit-ai-forge-agents - RETOURS - 20260905a.md` | fichier | 13,6 Ko | Retours forges — digit-ai-forge-agents — 20260905a |
 | `digit-ai-forge-agents - RETOURS - 20260905a.tf.jsonl` | fichier | 4,8 Ko | 2 ligne(s) JSONL |
@@ -192,6 +193,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-12 - RETOURS - 20260906a.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20260906b.md` | fichier | 24,5 Ko | Retours forges — Produit-12 — 20260906b |
 | `Produit-12 - RETOURS - 20260906b.tf.jsonl` | fichier | 9,0 Ko | 3 ligne(s) JSONL |
+| `Produit-61 - Rapport d'audit - 20260909a.html` | fichier | 359,8 Ko | Digit-AI — Rapport d'audit — Rapport d'audit — Produit-61 |
+| `Produit-61 - Rapport d'audit - 20260909a.remediation-actions.yaml` | fichier | 57,2 Ko | YAML |
 | `Produit-61 - RETOURS - 20260905a.md` | fichier | 11,6 Ko | Retours forges — Produit-61 — 20260905a |
 | `Produit-61 - RETOURS - 20260905a.tf.jsonl` | fichier | 10,6 Ko | 17 ligne(s) JSONL |
 | `Produit-61 - RETOURS - 20260906a.md` | fichier | 3,6 Ko | Retours forges — Produit-61 — 20260906a |
@@ -320,4 +323,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 
-_302 fichier(s), 1 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_304 fichier(s), 2 sous-dossier(s)_

@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+  "date_iso": "2026-09-22T20:23:45.803Z",
+  "registre_version": "2.25.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
+    "ts": "2026-09-22T20:23:45.803Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md": "cf65d4a562971b9844feab061c7641172986c6d81d2c5dbdb7c1ae9ec47c67f6"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

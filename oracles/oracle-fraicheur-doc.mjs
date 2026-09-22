@@ -31,10 +31,60 @@ function chercherDansSources(dossier, motif) {
   return false;
 }
 
+/** Compte récursivement les fichiers d'un sous-arbre dont le nom finit par `suffixe`. */
+function compterRecursif(dossier, suffixe) {
+  const pile = [dossier];
+  let n = 0;
+  while (pile.length) {
+    const d = pile.pop();
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      if (e.isDirectory()) {
+        if (!/^(\.|node_modules|\.venv|dist|build|__pycache__)/.test(e.name)) pile.push(join(d, e.name));
+      } else if (e.name.endsWith(suffixe)) n += 1;
+    }
+  }
+  return n;
+}
+
 export function executerSonde(sonde, racineForges) {
   const depot = join(racineForges, sonde.depot);
   if (sonde.type === "compter_fichiers")
     return readdirSync(join(depot, sonde.dossier)).filter((n) => n.startsWith(sonde.prefixe) && n.endsWith(sonde.suffixe)).length;
+  // TF-1240 (22/09/2026) — DEUX SONDES DE PLUS, PARCE QUE LA SOURCE D'UN COMPTEUR EST UN ARTEFACT,
+  // PAS UNE PHRASE. Les claims d'audit existants confrontaient un document de pilotage au README
+  // d'une forge : de la prose contre de la prose. Les deux pouvaient donc dériver ENSEMBLE, et le
+  // 22/09 la fiche annonçait 65 / 162 / 17 quand le dépôt portait 84 / 184 / 18. Ces deux sondes
+  // comptent les artefacts eux-mêmes — les fichiers d'un sous-arbre, les entrées d'un jeu de
+  // fichiers JSON —, ce qu'aucune relecture ne peut contredire.
+  if (sonde.type === "compter_fichiers_recursif")
+    return compterRecursif(join(depot, sonde.dossier), sonde.suffixe);
+  // TF-1313 (22/09/2026) — les VALEURS DISTINCTES d'un motif dans des champs choisis d'un journal
+  // JSONL. Sert le référentiel de produits : « le registre connaît N produits par leurs lots » se
+  // compte sur les champs `demandeur` et `source` des créations, jamais sur tout le texte — un
+  // produit cité en passant dans le contenu d'un item n'a remonté aucun lot.
+  if (sonde.type === "compter_distincts_jsonl") {
+    const motif = new RegExp(sonde.motif, "g");
+    const vus = new Set();
+    for (const f of sonde.fichiers) {
+      for (const ligne of readFileSync(join(depot, f), "utf8").split("\n")) {
+        if (!ligne.trim()) continue;
+        let o; try { o = JSON.parse(ligne); } catch { continue; }
+        if (sonde.ev && o.ev !== sonde.ev) continue;
+        for (const champ of sonde.champs) for (const m of String(o[champ] ?? "").matchAll(motif)) vus.add(m[0]);
+      }
+    }
+    return vus.size;
+  }
+  if (sonde.type === "sommer_json") {
+    const cle = sonde.cle || "controls";
+    return readdirSync(join(depot, sonde.dossier))
+      .filter((n) => n.startsWith(sonde.prefixe || "") && n.endsWith(sonde.suffixe || ".json"))
+      .reduce((total, n) => {
+        const j = JSON.parse(readFileSync(join(depot, sonde.dossier, n), "utf8"));
+        const liste = Array.isArray(j) ? j : (Array.isArray(j[cle]) ? j[cle] : []);
+        return total + liste.length;
+      }, 0);
+  }
   if (sonde.type === "extraire_doc") {
     const m = readFileSync(join(depot, sonde.fichier), "utf8").match(new RegExp(sonde.motif));
     return m ? Number(m[1]) : null;
@@ -187,6 +237,32 @@ function selfTest() {
   const C1 = { id: "x-oracles", doc: "INV.md", extraire: "(\\d+) oracles", sonde: { type: "compter_fichiers", depot: "forge-x", dossier: "oracles", prefixe: "oracle-", suffixe: ".mjs" } };
   const C2 = { id: "x-controles", doc: "INV.md", extraire: "(\\d+) contrôles", sonde: { type: "extraire_doc", depot: "forge-x", fichier: "README.md", motif: "(\\d+) contrôles" } };
   const C3 = { id: "x-sortie", doc: "INV.md", interdit: "aucune option --sortie", sonde: { type: "grep_sources", depot: "forge-x", dossier: "src", motif: '"--sortie"' } };
+  // TF-1240 — LES DEUX SONDES NEUVES ONT LEUR FIXTURE, ET ELLE EST À DOUBLE SENS. Une sonde livrée
+  // sans cas rouge ne prouve pas qu'elle sait compter : elle prouve qu'elle sait rendre un nombre.
+  // L'arbre ci-dessous porte 3 fichiers `.md` sur DEUX niveaux — une sonde non récursive en
+  // compterait 1 — et deux jeux JSON de 2 et 3 entrées, soit 5.
+  mkdirSync(join(forges, "forge-x", "adr", "domaine-a"), { recursive: true });
+  mkdirSync(join(forges, "forge-x", "jeux"), { recursive: true });
+  writeFileSync(join(forges, "forge-x", "adr", "racine.md"), "# adr");
+  writeFileSync(join(forges, "forge-x", "adr", "domaine-a", "un.md"), "# adr");
+  writeFileSync(join(forges, "forge-x", "adr", "domaine-a", "deux.md"), "# adr");
+  writeFileSync(join(forges, "forge-x", "adr", "domaine-a", "note.txt"), "pas un adr");
+  writeFileSync(join(forges, "forge-x", "jeux", "D00.json"), JSON.stringify({ controls: [1, 2] }));
+  writeFileSync(join(forges, "forge-x", "jeux", "D01.json"), JSON.stringify({ controls: [1, 2, 3] }));
+  writeFileSync(join(forges, "forge-x", "jeux", "autre.json"), JSON.stringify({ controls: [9, 9, 9, 9] }));
+  const C4 = { id: "x-adr", doc: "INV.md", extraire: "(\\d+) ADR", sonde: { type: "compter_fichiers_recursif", depot: "forge-x", dossier: "adr", suffixe: ".md" } };
+  const C5 = { id: "x-entrees", doc: "INV.md", extraire: "(\\d+) items", sonde: { type: "sommer_json", depot: "forge-x", dossier: "jeux", prefixe: "D", suffixe: ".json", cle: "controls" } };
+  // TF-1313 — le journal porte TROIS produits distincts dans les champs lus (P-01 deux fois, P-02,
+  // P-03), un QUATRIÈME cité seulement dans le contenu (P-09, qui ne doit pas compter), et une
+  // ligne d'un autre type d'événement (P-08, qui ne doit pas compter non plus). Compter tout le
+  // texte rendrait 5 : c'est précisément l'erreur que le choix des champs évite.
+  writeFileSync(join(forges, "forge-x", "journal.jsonl"), [
+    { ev: "creation", demandeur: "produit P-01", source: "lot P-01", contenu: "voir aussi P-09" },
+    { ev: "creation", demandeur: "produit P-01", source: "lot P-02" },
+    { ev: "creation", demandeur: "pilot", source: "lot P-03" },
+    { ev: "maj", demandeur: "produit P-08", source: "lot P-08" },
+  ].map((o) => JSON.stringify(o)).join("\n") + "\n");
+  const C6 = { id: "x-produits", doc: "INV.md", extraire: "(\\d+) produits", sonde: { type: "compter_distincts_jsonl", depot: "forge-x", fichiers: ["journal.jsonl"], ev: "creation", champs: ["demandeur", "source"], motif: "P-\\d{2}" } };
   const resultats = [];
   const attendre = (nom, attendu, findings) =>
     resultats.push({ fixture: nom, attendu, obtenu: findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS" });
@@ -194,6 +270,13 @@ function selfTest() {
   attendre("rouge/compte-fichiers", "FAIL", claims("3 oracles ici, 7 contrôles là", [C1, C2]));
   attendre("rouge/compte-doc", "FAIL", claims("2 oracles ici, 9 contrôles là", [C1, C2]));
   attendre("rouge/negation-refutee", "FAIL", claims("2 oracles ici, 7 contrôles là, aucune option --sortie", [C1, C2, C3]));
+  // Les deux sens de chaque sonde neuve : le compte juste passe, le compte faux échoue.
+  attendre("verte/compte-recursif", "PASS", claims("3 ADR au dossier", [C4]));
+  attendre("rouge/compte-recursif", "FAIL", claims("1 ADR au dossier", [C4]));
+  attendre("verte/somme-json", "PASS", claims("5 items en tout", [C5]));
+  attendre("rouge/somme-json", "FAIL", claims("9 items en tout", [C5]));
+  attendre("verte/distincts-jsonl", "PASS", claims("3 produits connus", [C6]));
+  attendre("rouge/distincts-jsonl", "FAIL", claims("5 produits connus", [C6]));
   rmSync(dossier, { recursive: true, force: true });
   const rates = resultats.filter((r) => r.attendu !== r.obtenu);
   for (const r of ratesBalayage) resultats.push({ fixture: `balayage/${r}`, attendu: "0", obtenu: "écart" });

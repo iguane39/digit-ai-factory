@@ -95,10 +95,12 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260917-L99-revue-hebdomadaire-amelioration-continue.md` | fichier | 36,5 Ko | Analyse L99 — « Un process hebdomadaire d'analyse de l'existant pour l'amélioration contin |
 | `20260917-releve-autres-reseaux-sociaux.md` | fichier | 8,3 Ko | Relevé — les autres réseaux sociaux et les étapes non traitées (17/09/2026) |
 | `20260917-revue-hebdomadaire-mesure-pas0.md` | fichier | 21,2 Ko | Annexe de mesure — pas 0 de l'étude « revue hebdomadaire de l'existant » |
-| `20260919-etude-opportunite-plan-d-amelioration-post-audit.html` | fichier | 109,3 Ko | Digit-AI — Étude d'opportunité : plan d'amélioration après audit · Pilot — 20260919a |
+| `20260919-etude-opportunite-plan-d-amelioration-post-audit.html` | fichier | 85,6 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
 | `20260919-etude-opportunite-plan-d-amelioration-post-audit.md` | fichier | 31,2 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
 | `20260919-L99-audit-et-plan-d-amelioration-plateforme.md` | fichier | 43,3 Ko | Analyse L99 — « Un audit, et en plus un plan d'amélioration complet de la plateforme » |
 | `20260921-etude-opportunite-reseaux-sociaux-complement.md` | fichier | 26,1 Ko | Étude d'opportunité — réseaux sociaux au-delà de LinkedIn : réseaux, étapes et types d'éme |
+| `20260922-etude-opportunite-messagerie-inter-sessions.md` | fichier | 35,6 Ko | Étude d'opportunité — messagerie entre sessions Claude Code — 20260922a |
+| `20260922-L99-echanges-inter-session.md` | fichier | 28,3 Ko | Analyse L99 — « Une étude d'opportunité sur les échanges inter-session Claude Code » |
 | `20260922-revue-des-candidatures-par-famille.md` | fichier | 11,7 Ko | Revue des candidatures du registre, par famille de défaut |
 
-_84 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_86 fichier(s), 0 sous-dossier(s)_
