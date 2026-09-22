@@ -224,6 +224,10 @@
   "cas": 11,
   "vu_le": "2026-08-27"
  },
+ "oracle-repere-externe.mjs": {
+  "cas": 13,
+  "vu_le": "2026-09-22"
+ },
  "oracle-run-reseau.mjs": {
   "cas": 9,
   "vu_le": "2026-09-21"
@@ -344,6 +348,10 @@
  },
  "oracles/oracle-regle-sans-juge.test.mjs": {
   "cas": 17,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-repere-externe.test.mjs": {
+  "cas": 13,
   "vu_le": "2026-09-22"
  },
  "oracles/oracle-verrou-unique.test.mjs": {

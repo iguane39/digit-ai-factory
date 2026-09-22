@@ -38,8 +38,9 @@ posées sont celles qui attendaient déjà.
 
 97 dossiers ouverts dont 0 sans classe, proposition ni nature — contre 5 avant ce tour —, 3 classes
 créées portant le référentiel de 90 à 93, 1 contrôle neuf à 13 cas d'épreuve à double sens qui rend
-rouge sur son cas fondateur, 1 faux positif mesuré et corrigé, et le cliquet des classes rend PASS
-avec 69 familles portées par un contrôle existant.
+rouge sur son cas fondateur, 1 faux positif mesuré et corrigé, le cliquet des classes rend PASS
+avec 69 familles portées par un contrôle existant, et le harnais passe de 150 à 152 contrôles
+dont 151 verts.
 
 ## 3. Décisions attendues de l'humain
 
@@ -182,5 +183,8 @@ vient en dernier parce qu'il traite des cas quand les précédents traitent ce q
 - Contrôle né ce tour : [oracle-repere-externe.mjs](oracles/oracle-repere-externe.mjs) et sa
   recette, inscrits à [lib-recettes-dediees.mjs](oracles/lib-recettes-dediees.mjs) ; 13 cas verts,
   verdict FAIL sur le parc, sur son cas fondateur.
+- Harnais complet : 152 contrôles, 151 verts ; seul rouge, le contrôle des empreintes sur le parc
+  réel, qui attend une décision humaine depuis le 17/09. Le cliquet des recettes enregistre les
+  13 cas neufs du contrôle né ce tour.
 - Remontée à la factory : sans objet — ce tour s'est joué au pilotage, et l'écriture chez la forge
   d'outils relève du mandat permanent.

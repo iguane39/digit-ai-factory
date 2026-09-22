@@ -343,7 +343,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md | 20260831c | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` |
 | Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md | 20260830k | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` |
 | Digit-AI - Synthese Mandat - Le corpus corrige et 9 arbitrages poses - 20260922d.md | 20260922d | 33.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Le corpus corrige et 9 arbitrages poses - 20260922d.md` |
-| Digit-AI - Synthese Mandat - Le registre est entierement classe - 20260922f.md | 20260922f | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Le registre est entierement classe - 20260922f.md` |
+| Digit-AI - Synthese Mandat - Le registre est entierement classe - 20260922f.md | 20260922f | 15.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Le registre est entierement classe - 20260922f.md` |
 | Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md | 20260922c | 30.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md` |
 | Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md | 20260922b | 30.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` |

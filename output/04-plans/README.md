@@ -115,6 +115,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` | fichier | 13,8 Ko | Synthèse de mandat — l'ingestion rouverte, deux journées enregistrées, et le banc entièrem |
 | `Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` | fichier | 15,1 Ko | Synthèse de mandat — le juste milieu entre les deux voies de remontée, et pourquoi ce n'es |
 | `Digit-AI - Synthese Mandat - Le corpus corrige et 9 arbitrages poses - 20260922d.md` | fichier | 33,7 Ko | Digit-AI — Synthèse de mandat — le corpus corrigé et 9 arbitrages posés — 22/09/2026 |
+| `Digit-AI - Synthese Mandat - Le registre est entierement classe - 20260922f.md` | fichier | 15,7 Ko | Digit-AI — Synthèse de mandat — le registre est entièrement classé — 22/09/2026 |
 | `Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md` | fichier | 30,6 Ko | Digit-AI — Synthèse de mandat — les 3 décisions exécutées et la branche publiée — 22/09/20 |
 | `Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` | fichier | 30,5 Ko | Digit-AI — Synthèse de mandat — Les 4 décisions exécutées et 3 nouvelles posées — 20260922 |
 | `Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` | fichier | 14,4 Ko | Synthèse de mandat — pourquoi « Améliore le prompt » ne déclenche rien, et depuis quand (3 |
@@ -202,4 +203,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_185 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_186 fichier(s), 0 sous-dossier(s)_
