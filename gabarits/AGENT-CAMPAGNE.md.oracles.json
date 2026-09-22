@@ -1,6 +1,6 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
-  "date_iso": "2026-09-22T18:10:42.492Z",
+  "date_iso": "2026-09-22T19:55:52.410Z",
   "registre_version": "2.25.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -50,7 +50,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "PASS",
-      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; nombre « 1 024 » non sourcé"
+      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; nombre « 1 024 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\AGENT-CAMPAGNE.md",
-    "ts": "2026-09-22T18:10:42.492Z",
+    "ts": "2026-09-22T19:55:52.410Z",
     "fichiers": {
-      "gabarits\\AGENT-CAMPAGNE.md": "d2495006d0adece69cae01751424b7ac95abdd1b8c43eb1c7d2b751cbdfaca8a"
+      "gabarits\\AGENT-CAMPAGNE.md": "b17289bbf7639d0fe212b304d41116053e4e09de0104c595b28a5e638ea1fd21"
     }
   },
   "empreinte_motif": null,

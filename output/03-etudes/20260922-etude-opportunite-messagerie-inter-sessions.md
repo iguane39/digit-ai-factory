@@ -304,7 +304,7 @@ heures de transcription sont en UTC ; 19:40:59Z vaut 21:40:59 à l'heure du post
 | Coût dans la session destinataire | 3 appels de modèle consacrés au message, chacun relisant environ 465 000 jetons en cache : **1 397 740** jetons relus en cache, **5 636** écrits en cache, **1 428** produits. Le premier appel aurait eu lieu de toute façon pour traiter le résultat de l'outil en cours : le coût marginal est de 2 à 3 appels, soit **0,93 à 1,40 million** de jetons relus | champs `usage` de la transcription du destinataire |
 | Trace laissée | deux enregistrements de file et une pièce jointe dans la transcription du destinataire, un message dans celle de l'émetteur ; **rien** au ledger ni au registre | lecture des deux transcriptions |
 | Application de la règle | le destinataire a **relu la section du gabarit** avant de répondre, n'a rien fait d'autre, et l'a écrit | appel du destinataire à 19:41:47Z, lecture de `gabarits\AGENT-CAMPAGNE.md` |
-| Effet de bord | le message a déclenché les hameçons `UserPromptSubmit` du destinataire : celui de la mémoire persistante a échoué à l'arrivée du message (19:41:39Z). Par construction, le hameçon du lexique d'invocation, inscrit sur le même événement, l'a lu aussi | pièce jointe `hook_non_blocking_error` de la transcription du destinataire |
+| Effet de bord | le message a déclenché les hameçons `UserPromptSubmit` du destinataire : celui de la mémoire persistante a échoué à l'arrivée du message (19:41:39Z), et le hameçon du lexique d'invocation, inscrit sur le même événement, l'a lu aussi. **Rectification du 22/09, 21:55** : ce dernier **ignorait déjà** les messages entre sessions — le marqueur `<cross-session-message` figure dans ses marqueurs non humains depuis TF-1103 (14/09) —, mais aucun cas de sa recette ne le couvrait ; la première version de cette section en concluait à tort un risque d'invocation de skill | pièce jointe `hook_non_blocking_error` de la transcription du destinataire ; `oracles\hook-lexique.mjs`, constante `MARQUEURS_NON_HUMAINS` |
 | Valeur non prévue | la réponse portait une coordination réelle : la session destinataire avait pris TF-1313 et TF-1315, et son premier essai d'écriture avait heurté TF-1314 avant d'être décalé | message reçu à 21:41:56 |
 | Avis d'inactivité | abonnement **accepté** ; l'avis n'était pas encore arrivé à la rédaction de cette section, la session destinataire étant toujours occupée | retour de l'outil `SendMessage` |
 
@@ -334,11 +334,15 @@ sort proposé.
 **Les deux corrections préalables.**
 
 1. **Les hameçons d'invite ne doivent pas lire un message entre sessions comme une invite humaine.**
-   Aujourd'hui, un message commençant par « Améliore le prompt » ferait injecter chez le
-   destinataire la consigne d'invoquer un skill, et la mémoire persistante enregistrerait le message
-   comme un propos de l'utilisateur. La correction côté pilot : `oracles\hook-lexique.mjs` ignore une
-   invite qui commence par `<cross-session-message`. Le plugin de mémoire est tiers : il se signale,
-   il ne se modifie pas.
+   *Rectifiée le 22/09 à 21:55, en exécutant la décision D-7 (a).* Le hameçon du lexique ignorait
+   déjà ces messages (TF-1103, 14/09), mais sans aucun cas de recette pour le prouver. Une règle
+   jouée en production et absente de la recette peut disparaître sans que personne le voie. La
+   correction est donc un **cas de recette** et non un changement de comportement. Un mutant privé
+   du marqueur la fait passer au rouge : 2 échecs sur 7. Le vrai hameçon la tient au vert : 7 sur 7
+   et 20 sur 20. Le cas vise le mot « l99 » isolé, seule règle du lexique qui se déclenche n'importe
+   où dans le texte ; un corps « Améliore ce prompt » restait vert même sans le marqueur, et ne
+   jugeait donc rien. Le plugin de mémoire est tiers : il reçoit le message comme une invite, il se
+   signale, il ne se modifie pas.
 2. **Une règle de sobriété écrite** : un message par événement, aucun accusé d'accusé, l'abonnement
    plutôt que la question « as-tu fini ? », et `isolatePeerMachines: true` dans les réglages du pilot
    avant toute liaison entre postes — un réglage que la documentation permet d'imposer depuis un

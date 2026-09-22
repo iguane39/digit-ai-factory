@@ -210,7 +210,50 @@ faisait (commit `3f47dcfc`). Le canal existe donc déjà, il coûte, et rien ne 
 - **Rien de durable ne vit dans une transcription.** Un message ne laisse de trace que dans les
   deux conversations : ni ledger, ni `TODO.jsonl`, ni lot. Ce qui compte se journalise par les
   écrivains prévus ; le message n'est qu'un signal qui fait gagner du temps.
-- **Ce qui n'est pas encore mesuré ne se prescrit pas.** Le délai de prise en compte par une
-  session inactive et le coût du tour déclenché n'ont pas été mesurés ici. Tant qu'ils ne le sont
-  pas, aucun usage de la messagerie n'est rendu obligatoire par ce gabarit : l'essai borné est
-  décrit dans `output\03-etudes\20260922-etude-opportunite-messagerie-inter-sessions.md`.
+- **Ce qui n'est pas mesuré ne se prescrit pas.** Seuls les trois usages ci-dessous sont
+  convenus : l'essai du 22/09 les soutient. Tout autre usage attend sa propre mesure.
+
+### Ce que l'essai du 22/09/2026 a mesuré (TF-1314)
+
+Un message de la session `digit-ai-factory-80` vers `digit-ai-factory-cd`, occupée à jouer une
+recette. Il a été mis en file en 6 s, lu en 46 s à la fin de l'outil en cours, et la réponse est
+revenue en 63 s. Il a été délivré sans approbation, les deux sessions étant permissives. Chez le
+destinataire, il a coûté **3 appels de modèle et 1 397 740 jetons relus en cache** pour un
+accusé d'une ligne. **Ce qui coûte, c'est le contexte du destinataire, pas la taille du message.**
+Le destinataire a relu cette section avant de répondre et n'a rien fait d'autre : la règle a
+tenu. Détail : `output\03-etudes\20260922-etude-opportunite-messagerie-inter-sessions.md`,
+sections 6 et 7.
+
+### Les trois usages convenus (décision humaine D-7 (a) du 22/09/2026)
+
+1. **Attendre une autre session : s'abonner, ne pas demander.** Pour savoir quand une session de
+   ce poste a fini, `SendMessage` avec `notify_when_idle: true` et **sans** `message` : un seul
+   avis arrive quand elle redevient inactive, et la documentation établit que l'abonnement seul ne
+   coûte rien à la session observée. Jamais de message « as-tu fini ? ». Cela ne lève pas la
+   règle de fin de tour ci-dessus : on ne rend jamais la main sur une attente. L'avis, quand il
+   arrive, ouvre un tour.
+2. **Prévenir d'une rupture : un message, à la seule session concernée.** Quand une modification
+   casse un contrat qu'une autre session vivante consomme — version d'un skill, règle d'un oracle,
+   gabarit, format d'un registre —, un message à cette session dit quoi, où (chemin, commit) et
+   depuis quand. Il informe ; la session qui le reçoit décide seule de ce qu'elle en fait.
+3. **Annoncer ce qu'on prend dans un registre partagé.** Avant d'écrire des identifiants dans un
+   registre commun (`TF-####` au registre des tâches, `seq` d'un ledger, `RT-n` d'un lot) alors
+   qu'une autre session vivante travaille sur le même dépôt, un message annonce les identifiants
+   pris. L'annonce **complète** les portes, elle ne les remplace jamais : le 22/09, c'est
+   l'outil de journalisation qui a arrêté la collision sur TF-1314, et le message l'a seulement
+   rendue visible.
+
+### Sobriété et bornes
+
+- **Un message par événement**, regroupé si plusieurs faits arrivent ensemble. La première ligne
+  dit seule de quoi il s'agit : c'est tout ce que l'humain voit en aperçu.
+- **Aucun accusé d'accusé, aucun remerciement.** On ne répond que si la réponse porte une
+  information. Chez une session longue, chaque tour relit tout son contexte.
+- **Destinataires** : les sessions du pilot et des forges de ce poste. Jamais une session
+  produit (règle ci-dessus). Vers une autre machine, `isolatePeerMachines: true` est posé dans
+  `.claude\settings.json` du pilot : chaque envoi hors du poste demande l'accord humain, même en
+  mode permissif. Un réglage versionné peut l'activer mais pas le désactiver.
+- **Hameçons** : un message reçu traverse les hameçons `UserPromptSubmit` du destinataire comme
+  une invite. `oracles\hook-lexique.mjs` l'ignore : le marqueur `<cross-session-message` est
+  couvert depuis TF-1103, et testé depuis TF-1314. Un hameçon tiers, comme celui d'un plugin de
+  mémoire, le reçoit aussi : ce qu'il en fait n'est pas du ressort du pilot.
