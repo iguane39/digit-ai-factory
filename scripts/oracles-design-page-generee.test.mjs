@@ -43,6 +43,7 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { pageEtude } from "./generer-page-etude.mjs";
+import { lireSource, mdVersHtml, coquille } from "./lib-vue-html.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -101,18 +102,35 @@ Audience : le pilote de l'ecosysteme, qui decide des mandats. Cette source ne se
 `;
 
 /**
- * Les declarations d'AVANT le remede, telles qu'elles vivaient dans la coquille au matin du 20/09.
- * Chacune porte la regle qui la denonce : le sens rouge ne se contente pas d'un FAIL, il verifie
- * que c'est bien CETTE regle qui parle.
+ * DEUX TÉMOINS DEPUIS LE 22/09/2026 (TF-1317, décision humaine D-6 (b)).
+ *
+ * La page d'étude ne porte plus la coquille partagée de `lib-vue-html.mjs` : elle DÉRIVE la sienne
+ * du gabarit installé du socle, et en reçoit la bascule de thème, le repli des tableaux et les
+ * composants posés sous sceau. La coquille partagée, elle, sert toujours les pages d'architecture
+ * et de modèle de données. Juger la seule page d'étude aurait retiré son juge à cette coquille —
+ * le banc s'en est aperçu lui-même le 22/09, en déclarant « introuvable » chacune de ses mutations.
+ * Chaque témoin garde donc ses deux sens.
+ *
+ * Les déclarations d'AVANT le remède du 20/09, telles qu'elles vivaient dans la coquille PARTAGÉE.
+ * Chacune porte la règle qui la dénonce : le sens rouge ne se contente pas d'un FAIL, il vérifie
+ * que c'est bien CETTE règle qui parle.
  */
-const AVANT_LE_REMEDE = [
+const AVANT_LE_REMEDE_COQUILLE = [
   ["S1", "border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);color:var(--muted)}\n    blockquote p",
     "border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}\n    blockquote p"],
   ["S4/T1", "body{background:var(--surface)}}", "body{background:#fff}}"],
-  ["T1", ".find-count.zero{color:var(--alerte)}", ".find-count.zero{color:#B42318}"],
   ["T3", "th{font-family:var(--head);font-weight:700;text-align:left;padding:var(--e3);",
     "th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;"],
   ["T3", "td{padding:var(--e2) var(--e3);", "td{padding:7px 12px;"],
+];
+
+/**
+ * Les règles PROPRES au générateur de pages d'étude — sa barre de recherche —, qui vivent dans son
+ * style et non dans une coquille. Ramenées à l'état d'avant le remède, T1 et T3 doivent les refuser.
+ */
+const AVANT_LE_REMEDE_ETUDE = [
+  ["T1", ".find-count.zero{color:var(--red)}", ".find-count.zero{color:#B42318}"],
+  ["T3", ".find-bar input{font:inherit;padding:8px 12px;", ".find-bar input{font:inherit;padding:7px 13px;"],
 ];
 
 /** Joue le point d'entrée des oracles design sur un fichier. Rend le JSON agrégé. */
@@ -142,84 +160,102 @@ if (!racine) {
 
 const echecs = [];
 const dossier = mkdtempSync(join(tmpdir(), "banc-coquille-"));
-try {
-  const html = pageEtude(SOURCE_TEMOIN, join(dossier, "20260920-etude-temoin.md"));
-
-  // Cas 1 — la page témoin exerce bien les règles du GÉNÉRATEUR, pas seulement celles du socle.
-  if (!/class="find-bar"/.test(html)) {
-    echecs.push("la page temoin ne porte pas la barre de recherche : les regles CSS de "
-      + "generer-page-etude.mjs ne sont pas exercees, et cinq des treize ecarts mesures le 20/09 "
-      + "resteraient hors de ce banc");
-  }
-
-  const vert = join(dossier, "temoin.html");
-  writeFileSync(vert, html, "utf8");
-  const jVert = jugerLaPage(racine, vert);
-  if (!jVert) {
-    echecs.push("run-oracles-design.mjs n'a rendu aucun JSON lisible sur la page temoin : le banc "
-      + "ne peut rien affirmer (ni vert ni rouge)");
-  } else {
-    // Cas 2 — oracle-slop PASS : aucun marqueur de design généré dans la coquille.
-    const slop = lire(jVert, "oracle-slop");
-    if (slop.verdict !== "PASS") {
-      echecs.push(`VERT — oracle-slop rend ${slop.verdict} sur la page produite (${slop.durs} ecart(s) `
-        + `dur(s) : ${slop.regles.join(", ") || "aucune regle nommee"})`);
-    }
-    // Cas 3 — oracle-tokens sans écart dur : jetons tracés et échelle 4 pt tenue.
-    const tok = lire(jVert, "oracle-tokens");
-    if (tok.verdict !== "PASS" || tok.durs !== 0) {
-      echecs.push(`VERT — oracle-tokens rend ${tok.verdict} avec ${tok.durs} ecart(s) dur(s) sur la `
-        + `page produite (${tok.regles.join(", ") || "aucune regle nommee"}) — attendu : PASS, 0 ecart`);
-    }
-  }
-
-  // ── SENS ROUGE ────────────────────────────────────────────────────────────────────────────
-  // La MÊME page, ramenée déclaration par déclaration à son état d'avant le remède. Chaque
-  // réinjection doit être ATTRAPÉE, et par la règle qui la nomme.
-  let rouge = html;
-  for (const [, neuf, ancien] of AVANT_LE_REMEDE) {
-    if (!rouge.includes(neuf)) {
-      echecs.push(`ROUGE — la declaration corrigee « ${neuf.slice(0, 48)}… » est INTROUVABLE dans la `
-        + "page produite : la fixture rouge ne mute plus rien et ne prouve donc plus rien "
-        + "(coquille modifiee sans mettre ce banc a jour)");
+const juger = (html, nom) => { const f = join(dossier, nom); writeFileSync(f, html, "utf8"); return jugerLaPage(racine, f); };
+/** Réinjecte les déclarations d'avant le remède ; une déclaration introuvable est un échec du banc. */
+const muter = (html, mutations, temoin) => {
+  let r = html;
+  for (const [, neuf, ancien] of mutations) {
+    if (!r.includes(neuf)) {
+      echecs.push(`ROUGE (${temoin}) — la declaration corrigee « ${neuf.slice(0, 48)}… » est INTROUVABLE : la `
+        + "fixture rouge ne mute plus rien et ne prouve donc plus rien (coquille modifiee sans mettre ce banc a jour)");
       continue;
     }
-    rouge = rouge.replace(neuf, ancien);
+    r = r.replace(neuf, ancien);
   }
-  const fRouge = join(dossier, "temoin-avant-remede.html");
-  writeFileSync(fRouge, rouge, "utf8");
-  const jRouge = jugerLaPage(racine, fRouge);
-  if (!jRouge) {
-    echecs.push("run-oracles-design.mjs n'a rendu aucun JSON lisible sur la page d'avant le remede");
+  return r;
+};
+/** Vérifie que chaque règle attendue est dénoncée par l'oracle nommé. */
+const denonce = (j, oracle, regles, temoin) => {
+  const l = lire(j, oracle);
+  for (const regle of regles) {
+    if (!l.regles.includes(regle)) {
+      echecs.push(`ROUGE (${temoin}) — ${oracle} ne denonce PAS ${regle} (verdict ${l.verdict}, regles vues : `
+        + `${l.regles.join(", ") || "aucune"}) — une assertion qui passe des deux cotes ne prouve rien`);
+    }
+  }
+};
+/** Vérifie qu'un oracle nommé rend PASS sans écart dur. */
+const vert = (j, oracle, temoin) => {
+  const l = lire(j, oracle);
+  if (l.verdict !== "PASS" || l.durs !== 0) {
+    echecs.push(`VERT (${temoin}) — ${oracle} rend ${l.verdict} avec ${l.durs} ecart(s) dur(s) `
+      + `(${l.regles.join(", ") || "aucune regle nommee"}) — attendu : PASS, 0 ecart`);
+  }
+};
+
+try {
+  // ── TÉMOIN 1 — LA PAGE D'ÉTUDE, DÉRIVÉE DU SOCLE ───────────────────────────────────────────
+  const page = pageEtude(SOURCE_TEMOIN, join(dossier, "20260920-etude-temoin.md"));
+  // Cas 1 — la page exerce les règles du GÉNÉRATEUR : sa barre de recherche est câblée.
+  if (!/class="find-bar"/.test(page)) {
+    echecs.push("la page d'etude ne porte pas la barre de recherche : les regles CSS du generateur ne sont pas exercees");
+  }
+  const j1 = juger(page, "etude-temoin.html");
+  if (!j1) {
+    echecs.push("run-oracles-design.mjs n'a rendu aucun JSON lisible sur la page d'etude : le banc ne peut rien affirmer");
   } else {
-    const slopR = lire(jRouge, "oracle-slop");
-    const tokR = lire(jRouge, "oracle-tokens");
-    // Cas 4 — S1 et S4 dénoncent le bandeau latéral et le blanc pur.
-    for (const regle of ["S1", "S4"]) {
-      if (!slopR.regles.includes(regle)) {
-        echecs.push(`ROUGE — oracle-slop ne denonce PAS ${regle} sur la page d'avant le remede `
-          + `(verdict ${slopR.verdict}, regles vues : ${slopR.regles.join(", ") || "aucune"}) — `
-          + "une assertion qui passe des deux cotes ne prouve rien");
-      }
+    vert(j1, "oracle-slop", "page d'etude");            // Cas 2
+    vert(j1, "oracle-tokens", "page d'etude");          // Cas 3
+    vert(j1, "oracle-bascule", "page d'etude");         // Cas 4 — TF-1244 : la bascule du socle est là
+    // Cas 5 — TF-1315 : les trois composants sont posés sous sceau et VÉRIFIÉS contre le socle.
+    const verifies = ((j1.socle_exempte || {}).verifies || []).length;
+    if (verifies < 3) {
+      echecs.push(`VERT (page d'etude) — ${verifies} composant(s) embarque(s) verifie(s) contre le socle, 3 attendus `
+        + "(table-filters.css, table-filters.js, find-in-page.js) : la passe d'imputation n'aurait rien a exempter");
     }
-    // Cas 5 — T1 et T3 dénoncent les couleurs en dur et les espacements hors échelle.
-    for (const regle of ["T1", "T3"]) {
-      if (!tokR.regles.includes(regle)) {
-        echecs.push(`ROUGE — oracle-tokens ne denonce PAS ${regle} sur la page d'avant le remede `
-          + `(verdict ${tokR.verdict}, regles vues : ${tokR.regles.join(", ") || "aucune"})`);
-      }
-    }
+  }
+  // Cas 6 — les règles propres au générateur, ramenées à leur état d'avant : T1 et T3 les refusent.
+  const j1r = juger(muter(page, AVANT_LE_REMEDE_ETUDE, "page d'etude"), "etude-avant-remede.html");
+  if (!j1r) echecs.push("aucun JSON lisible sur la page d'etude d'avant le remede");
+  else denonce(j1r, "oracle-tokens", ["T1", "T3"], "page d'etude");
+  // Cas 7 — la même page privée de son bouton de bascule : oracle-bascule la refuse.
+  const sansBascule = page.replace(/<button id="theme-toggle"[\s\S]*?<\/button>/, "");
+  if (sansBascule === page) echecs.push("ROUGE (page d'etude) — le bouton de bascule est introuvable : la fixture ne mute rien");
+  else {
+    const j1b = juger(sansBascule, "etude-sans-bascule.html");
+    const b = lire(j1b, "oracle-bascule");
+    if (b.verdict !== "FAIL") echecs.push(`ROUGE (page d'etude) — privee de son bouton de bascule, la page rend ${b.verdict} a oracle-bascule`);
+  }
+
+  // ── TÉMOIN 2 — LA COQUILLE PARTAGÉE (pages d'architecture et de modèle de données) ──────────
+  // Elle ne porte pas de bascule — c'est le reste déclaré de la classe, ouvert au registre — et ce
+  // témoin ne l'affirme donc pas : il tient le remède du 20/09, et lui seul.
+  const { front, corps } = lireSource(SOURCE_TEMOIN);
+  const partagee = coquille({ titre: "Etude temoin du banc de coquille", description: "Temoin du banc de coquille.",
+    front, corpsHtml: mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, "")), source: SOURCE_TEMOIN, lettre: "D" });
+  const j2 = juger(partagee, "coquille-temoin.html");
+  if (!j2) echecs.push("run-oracles-design.mjs n'a rendu aucun JSON lisible sur le temoin de la coquille partagee");
+  else {
+    vert(j2, "oracle-slop", "coquille partagee");       // Cas 8
+    vert(j2, "oracle-tokens", "coquille partagee");     // Cas 9
+  }
+  const j2r = juger(muter(partagee, AVANT_LE_REMEDE_COQUILLE, "coquille partagee"), "coquille-avant-remede.html");
+  if (!j2r) echecs.push("aucun JSON lisible sur la coquille partagee d'avant le remede");
+  else {
+    denonce(j2r, "oracle-slop", ["S1", "S4"], "coquille partagee");      // Cas 10
+    denonce(j2r, "oracle-tokens", ["T1", "T3"], "coquille partagee");    // Cas 11
   }
 } finally {
   rmSync(dossier, { recursive: true, force: true, maxRetries: 5 });
 }
 
 if (echecs.length) {
-  console.error("banc de coquille (TF-1162) : FAIL\n  - " + echecs.join("\n  - "));
+  console.error("banc de coquille (TF-1162, TF-1317) : FAIL\n  - " + echecs.join("\n  - "));
   process.exit(1);
 }
-console.log("banc de coquille (TF-1162) : 7 PASS, 0 FAIL — page d'etude generee jugee par "
-  + "run-oracles-design.mjs : barre de recherche cablee (regles du generateur exercees), "
-  + "oracle-slop PASS et oracle-tokens PASS sans ecart dur sur la page produite ; et sur la MEME "
-  + "page ramenee a son etat d'avant le 20/09, S1, S4, T1 et T3 la refusent — chaque regle prouvee "
-  + "dans ses DEUX sens");
+console.log("banc de coquille (TF-1162, TF-1317) : 11 PASS, 0 FAIL — deux temoins juges par "
+  + "run-oracles-design.mjs. PAGE D'ETUDE derivee du socle : barre de recherche cablee, oracle-slop, "
+  + "oracle-tokens et oracle-bascule PASS, trois composants verifies sous sceau ; ses regles propres "
+  + "ramenees a leur etat d'avant refusees par T1 et T3, et privee de sa bascule refusee par "
+  + "oracle-bascule. COQUILLE PARTAGEE : oracle-slop et oracle-tokens PASS, et ramenee a son etat "
+  + "d'avant le 20/09 refusee par S1, S4, T1 et T3 — chaque regle prouvee dans ses DEUX sens");

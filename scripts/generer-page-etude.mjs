@@ -39,8 +39,8 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdtempSync, rmSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
 import { tmpdir, homedir } from "node:os";
-import { fileURLToPath } from "node:url";
-import { lireSource, mdVersHtml, coquille } from "./lib-vue-html.mjs";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { lireSource, mdVersHtml, esc } from "./lib-vue-html.mjs";
 import { racineConfigInstallee } from "./lib-config-installee.mjs";
 
 /** L'indice R-4 d'un nom de fichier : « …- AAAAMMJJx.md » ou « AAAAMMJJ-objet.md ». */
@@ -249,70 +249,153 @@ export function decrireColonnes(html) {
   });
 }
 
+// ── LA COQUILLE SE DÉRIVE DU SOCLE, ELLE NE S'ÉCRIT PLUS (TF-1317, décision humaine D-6 (b)) ──────
+//
+// LE FAIT. Jusqu'au 22/09/2026, cette page était bâtie sur la coquille ÉCRITE À LA MAIN de
+// `lib-vue-html.mjs` — une copie des jetons du socle, sans le reste. Le même jour, trois juges
+// différents ont trouvé trois conventions du socle absentes de chaque page d'étude : aucune bascule
+// de thème (R-30 point 2, `oracle-bascule` rouge — TF-1244), aucun repli des tableaux en cartes
+// (trois tables défilant à l'horizontale sous 768 px, `oracle-mobile` M4 — TF-1317), et des
+// composants embarqués SANS leur marqueur, donc jamais exemptables par la passe d'imputation au
+// socle (TF-1315). *Trois symptômes, une cause : une coquille qui n'est pas celle du socle rate
+// chaque convention que le socle ajoute, en silence, et les juges les découvrent une par une.*
+//
+// LE REMÈDE. La coquille est LUE dans le gabarit installé du socle (`boilerplate.html`) et ses
+// emplacements sont remplis ; les composants sont posés par le poseur OFFICIEL du socle
+// (`embarquer-composants.mjs`, `poserComposants`), sous leur marqueur et scellés par l'empreinte de
+// leur source — jamais par une seconde implémentation du format (TF-0890 : un second poseur est une
+// fourche). Ce que le socle fixera demain, cette page l'aura sans qu'on y touche.
+//
+// CE QUI N'A PAS SUIVI, et c'est dit : les générateurs d'architecture et de modèle de données
+// gardent la coquille partagée de `lib-vue-html.mjs`. Ils relèvent de la même classe, et leur
+// candidature est ouverte au registre ; le banc `oracles-design-page-generee.test.mjs` continue de
+// juger cette coquille partagée pour eux, sur un témoin à part.
+
+/** Le poseur de composants DU SOCLE, chargé une fois. `null` si le socle n'est pas installé. */
+async function chargerPoseur(env = process.env) {
+  const assets = cheminDesAssets(env);
+  if (!assets) return null;
+  const script = join(assets, "..", "scripts", "embarquer-composants.mjs");
+  if (!existsSync(script)) return null;
+  try { return (await import(pathToFileURL(script).href)).poserComposants || null; } catch { return null; }
+}
+const POSEUR = await chargerPoseur();
+
+/** L'indice R-4 de la page : celui du nom, sinon `verifie_le` de la source, sinon le jour. */
+function indiceDeLaPage(front, version) {
+  const d = String((front && (front.verifie_le || front.date)) || "").match(/(\d{4})-(\d{2})-(\d{2})/);
+  return version || (d ? `${d[1]}${d[2]}${d[3]}a` : new Date().toISOString().slice(0, 10).replaceAll("-", "") + "a");
+}
+
+/**
+ * Remplit les emplacements du gabarit du socle. Les notes d'auteur du gabarit (commentaires HTML)
+ * ne partent pas au lecteur (D11) ; un emplacement introuvable ou laissé vide est une ERREUR, jamais
+ * un repli silencieux sur une autre coquille — une page qui ne sait pas qu'elle a raté son gabarit
+ * est exactement le défaut que ce remède ferme.
+ */
+export function coquilleDuSocle({ gabarit, titre, description, indice, corpsHtml }) {
+  let h = String(gabarit || "");
+  if (!h) throw new Error("gabarit du socle introuvable (digit-ai-page-html/assets/boilerplate.html) : la page ne peut pas être dérivée du socle");
+  h = h.replace(/<!--[\s\S]*?-->/g, "");
+  const remplir = (motif, par, nom) => {
+    if (!motif.test(h)) throw new Error(`gabarit du socle : emplacement « ${nom} » introuvable — le socle a changé de forme`);
+    h = h.replace(motif, () => par);
+  };
+  remplir(/<title>[\s\S]*?<\/title>/, `<title>${esc(`Digit-AI — ${titre} — ${indice}`)}</title>`, "titre du document");
+  remplir(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(description)}">`, "description");
+  remplir(/<p class="eyebrow">[^<]*<\/p>/, `<p class="eyebrow">Digit-AI · Étude</p>`, "surtitre");
+  remplir(/<h1>[^<]*<\/h1>/, `<h1>${esc(titre)}</h1>`, "titre principal");
+  remplir(/<main>[\s\S]*?<\/main>/, `<main>\n${corpsHtml}\n    </main>`, "corps");
+  remplir(/<footer class="doc">[\s\S]*?<\/footer>/, `<footer class="doc">\n      Digit-AI — ${esc(titre)} — ${indice}\n    </footer>`, "pied de page");
+  h = h.replaceAll("{L}", "D");
+  const reste = h.match(/\{[A-ZÉ][^{}<>\n]{0,60}\}/);
+  if (reste) throw new Error(`gabarit du socle : l'emplacement ${reste[0]} n'a pas été rempli`);
+  return h;
+}
+
+/**
+ * LE REPLI EN CARTES DU SOCLE, SUR CHAQUE TABLEAU (TF-1317). Le socle replie en cartes tout
+ * `table.repli-cartes` sous 900 px et restitue l'en-tête de chaque cellule par `data-label`. Sans
+ * la classe et les étiquettes, une table de quatre colonnes défile à l'horizontale sur un
+ * téléphone — mesuré le 22/09 sur trois tables d'une page d'étude.
+ */
+export function replierTableaux(html) {
+  return html.replace(/<table\b([^>]*)>([\s\S]*?)<\/table>/g, (tout, attrs, dedans) => {
+    const tetes = [...dedans.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/g)].map((m) => m[1].replace(/<[^>]+>/g, "").trim());
+    if (!tetes.length) return tout;
+    const corps = dedans.replace(/<tr>([\s\S]*?)<\/tr>/g, (ligne, cellules) => {
+      let i = 0;
+      return `<tr>${cellules.replace(/<td>/g, () => `<td data-label="${esc(tetes[i++] ?? "")}">`)}</tr>`;
+    });
+    const classes = /\bclass="/.test(attrs) ? attrs.replace(/\bclass="/, 'class="repli-cartes ') : `${attrs} class="repli-cartes"`;
+    return `<table${classes}>${corps}</table>`;
+  });
+}
+
 /**
  * Pose la barre de recherche, les composants du socle et la règle d'impression. La règle G6 est
  * la moins intuitive et la plus utile : le JS ne s'exécute pas à l'export PDF, donc sans la règle
  * `@media print` un document exporté APRÈS un filtrage sortirait tronqué, en silence.
+ *
+ * Les composants sont posés par le poseur DU SOCLE (TF-1315) : chacun entre ses marqueurs
+ * COMPOSANT-EMBARQUE, scellé par l'empreinte de sa source, ce qui permet à la passe d'imputation de
+ * forge-design de les mettre au compte du socle au lieu de l'auteur de la page. L'initialisation
+ * vient APRÈS eux, le poseur les insérant avant `</body>`.
  */
-export function cablerComposants(html, ids, assets = {}) {
+export function cablerComposants(html, ids, poseur = POSEUR) {
   if (!ids.length) return html;
-  const css = assets.css ?? lireAsset("table-filters.css");
-  const jsFiltres = assets.jsFiltres ?? lireAsset("table-filters.js");
-  const jsRecherche = assets.jsRecherche ?? lireAsset("find-in-page.js");
+  if (!poseur) throw new Error("poseur de composants du socle introuvable (digit-ai-page-html/scripts/embarquer-composants.mjs) : les composants ne peuvent pas être embarqués sous sceau");
+  const { html: pose, manquants } = poseur(html, ["table-filters.css", "table-filters.js", "find-in-page.js"]);
+  if (manquants.length) throw new Error(`composants du socle absents : ${manquants.join(", ")}`);
   const barre = `    <div class="find-bar">
       <label for="find">Rechercher dans le document</label>
       <input id="find" type="search" placeholder="Rechercher dans le document…">
       <p id="findCount" class="find-count" aria-live="polite"></p>
     </div>
 `;
+  // Les règles PROPRES à la barre de recherche, aux jetons du SOCLE : l'échelle y est écrite en
+  // multiples de 4 px (T3 les admet) et l'alerte s'appelle --red. Les jetons --e1..--e10 et --alerte
+  // de l'ancienne coquille n'existent pas au socle : les garder aurait rendu des variables vides.
   const style = `  <style>
-${css}
-    /* Espacements et couleurs pris aux JETONS de la coquille (TF-1162) : --e1..--e10 pour
-       l'échelle 4 pt, --alerte pour le compteur à zéro. Un « #B42318 » écrit ici est un T1
-       bloquant, et cinq espacements hors échelle étaient comptés sur chaque page portant la
-       barre de recherche — le défaut vit dans le générateur, pas dans la page. */
-    .find-bar{display:flex;flex-direction:column;gap:var(--e1);margin:0 0 var(--e5)}
+    .find-bar{display:flex;flex-direction:column;gap:4px;margin:0 0 20px}
     .find-bar label{font-size:.78rem;color:var(--muted);font-weight:600}
-    .find-bar input{font:inherit;padding:var(--e2) var(--e3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
-    .find-count{margin-top:var(--e1);font-size:.72rem;color:var(--muted);min-height:1em}
-    .find-count.zero{color:var(--alerte)}
-    .tf-count{margin:var(--e2) 0 var(--e5);font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-bar input{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
+    .find-count{margin-top:4px;font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-count.zero{color:var(--red)}
+    .tf-count{margin:8px 0 20px;font-size:.72rem;color:var(--muted);min-height:1em}
     mark.find-hit{background:var(--amber-fill);color:var(--ink);border-radius:2px;display:inline;padding:0;margin:0}
     @media print{tr[data-tf-hidden]{display:table-row !important}.find-bar{display:none}}
+    /* Un IDENTIFIANT se coupe, un mot jamais (L19 du socle réserve la coupure à « code »). Mesuré le
+       22/09 à 390 px : un tableau replié en cartes débordait à 442 px, porté par des chemins de 44 à
+       95 caractères sans aucun point de coupure ; la prose, elle, ne se coupe pas. */
+    main code{overflow-wrap:anywhere}
   </style>
 `;
-  const scripts = `  <script>
-${jsFiltres}
-  </script>
-  <script>
-${jsRecherche}
-  </script>
-  <script>
+  const init = `  <script>
     DigitAITableFilters.initAll(document);
     DigitAIFindInPage.init(document.getElementById('find'), document.querySelector('main'), document.getElementById('findCount'));
   </script>
 `;
-  return html
+  const fin = pose.lastIndexOf("</body>");
+  const avecInit = `${pose.slice(0, fin)}${init}${pose.slice(fin)}`;
+  return avecInit
     .replace("</head>", `${style}</head>`)
-    .replace("    <main>\n", `    <main>\n${barre}`)
-    .replace("</body>", `${scripts}</body>`);
+    .replace(/<main>\n/, `<main>\n${barre}`);
 }
 
-/** Rend le HTML d'une étude. Pur : aucune écriture, aucune horloge. */
-export function pageEtude(texteSource, nomSource, assets = {}) {
+/** Rend le HTML d'une étude. Pur : aucune écriture ; l'heure n'intervient que si la source n'est pas datée. */
+export function pageEtude(texteSource, nomSource, { gabarit = lireAsset("boilerplate.html"), poseur = POSEUR } = {}) {
   const { front, corps } = lireSource(texteSource);
   const { titre, description } = enTete(corps);
-  const brut = coquille({
+  const brut = coquilleDuSocle({
+    gabarit,
     titre,
     description,
-    front,
+    indice: indiceDeLaPage(front, indiceDuNom(nomSource) || undefined),
     corpsHtml: enChapitres(mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, ""))),
-    source: texteSource,
-    lettre: "D",
-    version: indiceDuNom(nomSource) || undefined,
   });
   const { html, ids } = armerTableaux(decrireColonnes(brut));
-  return cablerComposants(html, ids, assets);
+  return cablerComposants(replierTableaux(html), ids, poseur);
 }
 
 /** Écrit la page homonyme d'une source. Rend le chemin écrit. */
@@ -395,7 +478,8 @@ function selfTest() {
   if (!/<title>[^<]*20260916a[^<]*<\/title>/.test(html))
     casse.push("le titre de la page ne porte pas l'indice daté de sa source — deux révisions du même jour seraient indiscernables");
   // 3. LE CONTENU EST RENDU, pas recopié en bloc : le tableau devient un tableau, la puce une puce.
-  if (!/<table>/.test(html) || !/<li>/.test(html) || !/<blockquote>/.test(html))
+  // Le tableau porte désormais la classe de repli du socle : on cherche la balise, pas `<table>` nu.
+  if (!/<table\b/.test(html) || !/<li>/.test(html) || !/<blockquote>/.test(html))
     casse.push("le corps de l'étude n'est pas rendu (tableau, liste ou citation manquants)");
   // 4. LE TITRE DE NIVEAU 1 N'EST PAS DOUBLÉ — la coquille le pose, le corps ne doit pas le répéter.
   if ((html.match(/<h1[ >]/g) || []).length !== 1)
@@ -419,15 +503,31 @@ function selfTest() {
     casse.push("une table de neuf lignes n'est pas armée pour le filtrage — le seuil du socle n'est pas appliqué");
   if (!/\.tf-btn/.test(htmlLong) || !/find-bar/.test(htmlLong))
     casse.push("les assets du socle ne sont pas embarqués dans une page qui porte une table longue — `lireAsset` n'a rien rendu (socle absent, ou référence morte dans la résolution du chemin)");
+  // 9 à 11 — CE QUE LA COQUILLE DÉRIVÉE DU SOCLE DOIT APPORTER (TF-1317, TF-1244, TF-1315 ; décision
+  // humaine D-6 (b) du 22/09/2026). Chacune de ces trois propriétés manquait à la coquille écrite à
+  // la main, et chacune a été trouvée par un juge différent le même jour.
+  if (!/id="theme-toggle"/.test(html) || !/localStorage\.setItem\(\s*'digitai-theme'/.test(html))
+    casse.push("la page ne porte pas la bascule de thème câblée et persistée du socle (R-30 point 2)");
+  // Le contrôle juge les tableaux DU DOCUMENT, dans `<main>` : le script embarqué du composant de
+  // filtres contient lui-même la chaîne « <td> », et le compter reviendrait à juger le code du socle.
+  const principal = htmlLong.slice(htmlLong.indexOf("<main>"), htmlLong.indexOf("</main>"));
+  const tables = principal.match(/<table\b[^>]*>/g) || [];
+  const cellules = principal.match(/<td\b[^>]*>/g) || [];
+  if (!tables.length || !tables.every((t) => /repli-cartes/.test(t)) || !cellules.every((c) => /data-label="/.test(c)))
+    casse.push("un tableau n'est pas repliable en cartes : classe repli-cartes ou étiquette data-label manquante");
+  const blocs = htmlLong.match(/<!--\s*COMPOSANT-EMBARQUE:DEBUT\s+[\w.-]+/g) || [];
+  if (blocs.length < 3 || !/data-composant="table-filters\.css" data-empreinte="sha256:[0-9a-f]{64}"/.test(htmlLong))
+    casse.push(`les composants ne sont pas embarqués sous marqueur scellé (${blocs.length} bloc(s) marqué(s), 3 attendus)`);
 
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test generer-page-etude : 9/9 PASS (page écrite à côté de sa source ; autoportante, " +
+    : "Self-test generer-page-etude : 12/12 PASS (page écrite à côté de sa source ; autoportante, " +
       "aucune ressource distante ; titre portant l'indice DATÉ de la source et non celui du jour ; " +
       "corps rendu — tableau, liste et citation ; un seul titre principal ; deux générations de la " +
       "même source identiques à l'octet ; indice lu sur les DEUX formes de nom admises ; table longue " +
-      "armée pour le filtrage ; assets du socle réellement lus et embarqués)");
+      "armée pour le filtrage ; assets du socle réellement lus et embarqués ; bascule de thème câblée " +
+      "et persistée ; chaque tableau repliable en cartes ; composants embarqués sous marqueur scellé)");
   return casse.length ? 1 : 0;
 }
 

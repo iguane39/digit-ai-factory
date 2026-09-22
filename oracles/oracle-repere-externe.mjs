@@ -175,13 +175,20 @@ export function juger(racineDuParc) {
 
   // ---- BR3 -------------------------------------------------------------------------------------
   if (!RE_SECTION_COUVERTURE.test(texte)) {
+    // Le décompte est CALCULÉ à chaque passage, jamais recopié. Rédigé le 22/09 au matin, ce
+    // message affirmait « les mots propale, communication et marketing rendent zéro » : vrai à
+    // l'heure de sa mesure, faux le soir même, quand les barres de la propale et du mémoire
+    // technique ont été validées (décision humaine D-8 (a)). Une valeur courante écrite dans un
+    // message devient un second domicile qui dérive en silence (règle de TF-0477).
+    const compte = (mot) => (texte.match(new RegExp(mot, "gi")) || []).length;
+    const releve = ["propale", "communication", "marketing"].map((m) => `« ${m} » ${compte(m)}`).join(", ");
     ko("BR3", CHEMIN_REGISTRE,
       "le registre ne PUBLIE PAS ce qu'il ne couvre pas : aucune section ne nomme les familles de "
       + "livrables sans repère externe, ni pourquoi. Une famille sans repère devient alors "
-      + "indiscernable d'un oubli — mesuré le 22/09/2026 : les livrables de communication n'ont "
-      + "aucune entrée, les mots « propale », « communication » et « marketing » rendent zéro, et "
-      + "rien nulle part ne dit si c'est un choix. Une machine ne peut pas décider quelle famille "
-      + "MÉRITE un repère ; elle peut exiger que la liste des non-couvertes soit écrite");
+      + `indiscernable d'un oubli. Relevé de ce passage, occurrences au registre : ${releve} — `
+      + "un compte n'est pas une couverture, et rien ne dit si une famille absente l'est par choix. "
+      + "Une machine ne peut pas décider quelle famille MÉRITE un repère ; elle peut exiger que la "
+      + "liste des non-couvertes soit écrite");
   } else {
     ok("BR3", "le registre publie la liste des familles qu'il ne couvre pas — une absence déclarée n'est plus un oubli");
   }

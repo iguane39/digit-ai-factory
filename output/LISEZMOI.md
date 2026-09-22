@@ -189,17 +189,17 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260902-etude-opportunite-dataforseo-produit-02.md | — | 44.3 Ko | `03-etudes/20260902-etude-opportunite-dataforseo-produit-02.md` |
 | 20260903-L99-amelioration-continue.md | — | 42.9 Ko | `03-etudes/20260903-L99-amelioration-continue.md` |
 | 20260903-recidives-mesure.md | — | 7.4 Ko | `03-etudes/20260903-recidives-mesure.md` |
-| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.html | — | 99.2 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` |
+| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.html | — | 118.7 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` |
 | 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 43.8 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
 | 20260907-L99-mission-data-silver-gold-powerbi.md | — | 48 Ko | `03-etudes/20260907-L99-mission-data-silver-gold-powerbi.md` |
 | 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 11.1 Ko | `03-etudes/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
-| 20260911-etude-opportunite-communication-marketing-ao.html | — | 103.3 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.html` |
+| 20260911-etude-opportunite-communication-marketing-ao.html | — | 124.6 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.html` |
 | 20260911-etude-opportunite-communication-marketing-ao.md | — | 46.3 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.md` |
 | 20260911-L99-forge-communication-marketing.md | — | 53 Ko | `03-etudes/20260911-L99-forge-communication-marketing.md` |
 | 20260911-L99-regles-d-ecriture-factory.md | — | 59.2 Ko | `03-etudes/20260911-L99-regles-d-ecriture-factory.md` |
-| 20260914-etude-opportunite-conception-documentaire-amont.html | — | 79 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.html` |
+| 20260914-etude-opportunite-conception-documentaire-amont.html | — | 98.6 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.html` |
 | 20260914-etude-opportunite-conception-documentaire-amont.md | — | 25.2 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.md` |
-| 20260914-etude-opportunite-personas-par-phase.html | — | 77.7 Ko | `03-etudes/20260914-etude-opportunite-personas-par-phase.html` |
+| 20260914-etude-opportunite-personas-par-phase.html | — | 96.3 Ko | `03-etudes/20260914-etude-opportunite-personas-par-phase.html` |
 | 20260914-etude-opportunite-personas-par-phase.md | — | 24.3 Ko | `03-etudes/20260914-etude-opportunite-personas-par-phase.md` |
 | 20260914-etude-opportunite-premiers-html-nouveaux-formats.md | — | 31.6 Ko | `03-etudes/20260914-etude-opportunite-premiers-html-nouveaux-formats.md` |
 | 20260914-L99-conception-documentaire-amont.md | — | 37.3 Ko | `03-etudes/20260914-L99-conception-documentaire-amont.md` |
@@ -211,16 +211,16 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260914-personas-mesure-passes.md | — | 55.2 Ko | `03-etudes/20260914-personas-mesure-passes.md` |
 | 20260914-personas-mesure-protocole.md | — | 4.5 Ko | `03-etudes/20260914-personas-mesure-protocole.md` |
 | 20260914-releve-restes-archives.md | — | 6.6 Ko | `03-etudes/20260914-releve-restes-archives.md` |
-| 20260915-etude-opportunite-inventaire-des-composants.html | — | 73.7 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.html` |
+| 20260915-etude-opportunite-inventaire-des-composants.html | — | 90.1 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.html` |
 | 20260915-etude-opportunite-inventaire-des-composants.md | — | 21.2 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.md` |
-| 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 92.9 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
+| 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 113.1 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
 | 20260917-etude-opportunite-gestion-reseaux-sociaux.md | — | 37.4 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.md` |
 | 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md | — | 18.9 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` |
 | 20260917-L99-gestion-reseaux-sociaux.md | — | 46.3 Ko | `03-etudes/20260917-L99-gestion-reseaux-sociaux.md` |
 | 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.9 Ko | `03-etudes/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
 | 20260917-releve-autres-reseaux-sociaux.md | — | 8.4 Ko | `03-etudes/20260917-releve-autres-reseaux-sociaux.md` |
 | 20260917-revue-hebdomadaire-mesure-pas0.md | — | 21.5 Ko | `03-etudes/20260917-revue-hebdomadaire-mesure-pas0.md` |
-| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 85.6 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 102.3 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
 | 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 31.2 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
 | 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.3 Ko | `03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
 | 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.4 Ko | `03-etudes/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
@@ -237,7 +237,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json` |
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md | 20260818a | 4.2 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` |
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json` |
-| Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 18.8 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
+| Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 20.2 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json` |
 | Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 33.3 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |

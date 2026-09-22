@@ -1,6 +1,6 @@
 {
   "cible": "C:/dev/digit-ai-factory/output/03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
-  "date_iso": "2026-09-22T20:15:51.798Z",
+  "date_iso": "2026-09-22T21:07:35.669Z",
   "registre_version": "2.26.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -44,7 +44,7 @@
       "domaine": "Performance / poids",
       "file": "..\\..\\..\\..\\digit-ai-factory\\output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
       "verdict": "PASS",
-      "detail": "1 constat(s) · poids/DOM dans les budgets (86 Ko, 458 nœuds)"
+      "detail": "1 constat(s) · poids/DOM dans les budgets (102 Ko, 471 nœuds)"
     },
     {
       "domaine": "Format / livraison / versioning",
@@ -98,13 +98,13 @@
       "domaine": "Système de marque : traçabilité des tokens",
       "file": "..\\..\\..\\..\\digit-ai-factory\\output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
       "verdict": "PASS",
-      "detail": "4 constat(s) · contraste non textuel 1.21:1 < 3:1 — --line (#E6EAF2) sur --surface (#FFFFFF), thème clair [trait et fond posés par la même règle] — si cette frontière identifie un composant ou son état, la déclarer par --paires-interface : WCAG 1.4.11 l'exige alors à 3:1 ; contraste non textuel 1.17:1 < 3:1 — --line (#E6EAF2) sur --bg (#FAFBFF), thème clair [fond hérité de l'ambiance] — si cette frontière identifie un composant ou son état, la déclarer par --paires-interface : WCAG 1.4.11 l'exige alors à 3:1"
+      "detail": "4 constat(s) · contraste non textuel 1.17:1 < 3:1 — --line (#E6EAF2) sur --bg (#FAFBFF), thème clair [fond hérité de l'ambiance] — si cette frontière identifie un composant ou son état, la déclarer par --paires-interface : WCAG 1.4.11 l'exige alors à 3:1 ; contraste non textuel 1.21:1 < 3:1 — --line (#E6EAF2) sur --surface (#FFFFFF), thème clair [fond hérité de l'ambiance] — si cette frontière identifie un composant ou son état, la déclarer par --paires-interface : WCAG 1.4.11 l'exige alors à 3:1"
     },
     {
       "domaine": "Cible mobile : contrat d'usage tactile",
       "file": "..\\..\\..\\..\\digit-ai-factory\\output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
       "verdict": "FAIL",
-      "detail": "2 constat(s) · 3 table(s) sans reflow en cartes sous 768 px : défilement horizontal forcé ; aucune règle @media (orientation: landscape) : le rendu paysage n'est pas traité explicitement"
+      "detail": "3 constat(s) · barre fixe collée à un bord sans env(safe-area-inset-*) : passage sous l'encoche ou l'indicateur de home ; aucune règle @media (orientation: landscape) : le rendu paysage n'est pas traité explicitement"
     },
     {
       "domaine": "Visuels générés : traçabilité et budget",
@@ -135,9 +135,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "..\\..\\..\\..\\digit-ai-factory\\output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
-    "ts": "2026-09-22T20:15:51.797Z",
+    "ts": "2026-09-22T21:07:35.669Z",
     "fichiers": {
-      "..\\..\\..\\..\\digit-ai-factory\\output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html": "b2dc2d4cfe9cbd6dbcc2857691716740fd7d0eb6afac4f8d8fecd1bcf0adda40"
+      "..\\..\\..\\..\\digit-ai-factory\\output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html": "0a4642bcfca0f38707f8e119c8981450ca0e0cce2c9e5bb85e7ec996af30730a"
     }
   },
   "empreinte_motif": null,

@@ -239,3 +239,9 @@ dans la colonne du geste. Aucune ligne n'est retirée quand la situation change 
 | 7 | TF-1094 — les dix étapes de la chaîne B transcrites depuis le lot source ; TF-1318 ouvert pour les étapes sans porteur | chaîne B : 3 → 10 étapes déclarées | 2026-09-22 |
 | 7 | TF-1232 — `oracle-invariants-traduction` (F1-F5), indexé | self-test **8/8** ; CLI : prix changé → FAIL F1 | 2026-09-22 |
 | 8 | TF-1319 ouvert — porteur des temps 2 et 3 du méta-oracle | — | 2026-09-22 |
+| — | D-9 (a) — travail des deux tours enregistré localement, quatre dépôts, sans publication ; le journal des relevés et l'étude de l'autre session laissés hors du commit | commits `5c58d0ec`, `310bcf8`, `dc065d6`, `4d0b762` ; pre-commit du pilot PASS | 2026-09-22 |
+| — | TF-1323 ouvert — le nom réel d'un produit client est dans l'histoire publiée du dépôt public, écrit par le relevé d'ouverture | mesure : 4 lignes dans HEAD, 3 de plus non enregistrées, présent sur `origin/main` | 2026-09-22 |
+| 6 | D-8 (a) — deux barres validées (propale privée ; mémoire technique, deux dimensions), pré-vol et en ligne branchés dans trois skills (TF-1028) | test d'existence rejoué : 4 PASS ; `oracle-repere-externe` recette 13/13 | 2026-09-22 |
+| 4 | D-6 (b) — la coquille des pages d'étude dérive du socle (TF-1317, TF-1315, TF-1244) ; sept pages régénérées | point d'entrée forge-design PASS dont bascule ; `render_page` PASS 6 largeurs ; recette 12/12 ; banc 11/11 | 2026-09-22 |
+| 4 | TF-1320 — la passe d'imputation effaçait une faute de l'auteur placée après un composant du socle : corrigé | recette forge-design : rouge (« PASS, au socle ») puis vert (« FAIL, à l'auteur ») | 2026-09-22 |
+| 4 | TF-1321 et TF-1322 ouverts — deux générateurs restent hors socle ; le contrat mobile appliqué à toute page par le lanceur | mesures du 22/09 | 2026-09-22 |
