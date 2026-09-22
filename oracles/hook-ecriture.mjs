@@ -107,11 +107,17 @@ export function jouerFamille(fichier, oracle = ORACLE_FAMILLES) {
 const ORACLE_CONTROLE = join(ICI, "oracle-controle-maison.mjs");
 
 /** Joue CM-1 sur un fichier de contrôle ; rend les lignes à imprimer (vide si hors portée). */
-export function jouerControleMaison(fichier, oracle = ORACLE_CONTROLE) {
+export function jouerControleMaison(fichier, oracle = ORACLE_CONTROLE, registre = null) {
   const lignes = [];
   if (!fichier || !existsSync(oracle)) return lignes;
   const nom = basename(fichier);
-  const r = spawnSync(process.execPath, [oracle, fichier], { encoding: "utf8", timeout: 30000 });
+  // Le REGISTRE est passable, et c'est ce qui rend ce cas jouable AILLEURS QUE SUR CE POSTE
+  // (TF-1297, A-21 du 22/09/2026). Sans lui, le banc dépendait du registre INSTALLÉ : sur un
+  // serveur d'intégration sans répertoire personnel, l'oracle rend SKIP à bon droit et le cas
+  // échouait — non parce que la règle était cassée, mais parce que le banc n'avait pas de quoi
+  // la jouer. Un banc pose ses propres fixtures.
+  const argv = registre ? [oracle, fichier, "--registre", registre] : [oracle, fichier];
+  const r = spawnSync(process.execPath, argv, { encoding: "utf8", timeout: 30000 });
   let j = null;
   try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
   const f = j?.findings?.[0];
@@ -210,12 +216,17 @@ function selfTest() {
   // désactive, et ce dépôt a payé la leçon assez souvent pour ne pas la réapprendre.
   const controle = join(dir, "verifier-securite-secrets.mjs");
   writeFileSync(controle, "// Cherche les secrets et les tokens du depot.\n", "utf8");
-  const lignesControle = jouerControleMaison(controle);
+  // Le banc pose SON registre : le cas joue la règle, jamais l'environnement du poste.
+  const registreJetable = join(dir, "registre-oracles.json");
+  writeFileSync(registreJetable, JSON.stringify({
+    oracles: [{ domaine: "Sécurité / secrets", ext: "any", type: "cli", cmd: ["node", "oracle-secrets.mjs"], statut: "ok" }],
+  }, null, 1), "utf8");
+  const lignesControle = jouerControleMaison(controle, ORACLE_CONTROLE, registreJetable);
   if (!lignesControle.some((l) => /CM-1/.test(l)))
     casse.push(`un contrôle de sécurité écrit à la main n'est pas signalé à l'écriture — c'est le cas de TF-1046, « faute d'avoir cherché l'oracle du domaine » (${lignesControle.join(" | ") || "aucune ligne"})`);
   const ordinaire = join(dir, "generer-vue.mjs");
   writeFileSync(ordinaire, "// Genere une vue.\n", "utf8");
-  if (jouerControleMaison(ordinaire).length)
+  if (jouerControleMaison(ordinaire, ORACLE_CONTROLE, registreJetable).length)
     casse.push("un fichier qui n'annonce aucun contrôle fait parler le hook — un hook bavard se désactive");
 
   const lignesVertes = jouer(verte);
