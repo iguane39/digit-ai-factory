@@ -31,13 +31,15 @@ la branche locale du pilotage se publie.
 - **quoi** — exécution des 4 décisions humaines du 22/09/2026, puis revue du registre.
 - **sur quoi** — le pilotage `digit-ai-factory`, la forge d'outils `digit-ai-forge-agents`, le
   produit de communication `digit-ai-marketing`, et les 2 profils de configuration de ce poste.
-- **quand** — fin le 22/09/2026 à 12:33 (UTC+02:00), durée 2 h 16 depuis l'ouverture de la session.
+- **quand** — fin le 22/09/2026 à 12:54 (UTC+02:00), durée 2 h 37 depuis l’ouverture de la session.
 - **qui** — session du pilotage, `v1.17.30-697-g830f698`.
 - **intention** — vous avez répondu par 4 sélecteurs seuls, « 1a, 2b, 3a, 4b » : cela commande la
   PREUVE EXÉCUTÉE des gestes que ces options portaient, pas une nouvelle analyse. **Test rétro** :
   servie — les 4 sont exécutées, chacune avec son contrôle rejoué au bloc 4, et aucune des
   4 décisions n'est reposée. L'écart à la lettre est écrit au bloc 6 : la publication d'un
-  quatrième enregistrement, que l'option retenue rendait nécessaire sans le nommer.
+  quatrième enregistrement, que l'option retenue rendait nécessaire sans le nommer. La
+  simulation du circuit hébergé, que l'exécution de la troisième décision débloquait, a été jouée
+  dans le même tour : son verdict est au bloc 4, et ce qu'il laisse fermé au bloc 5.
 
 ## 2. Verdict en une ligne
 
