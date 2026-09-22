@@ -114,7 +114,20 @@ puis rattache le retour (recette : `todo\ingerer-classe.test.mjs`, 13 cas). Un r
 avec l'oracle censé l'avoir attrapé : la récidive est la mesure de la descente, la refuser la
 cacherait. Une classe créée SANS clôture fondatrice moins de 30 jours après un retour d'une classe
 voisine est signalée `classe_suspecte` — la façon la moins chère de faire baisser un compteur est
-d'inventer des clés. (3) **R13** de l'oracle : une classe hors référentiel est un FAIL ; une
+d'inventer des clés. (2 bis) **UN ITEM QUI N'EST PAS UN DÉFAUT PORTE `nature: "opportunite"` ET AUCUNE CLASSE**
+(décision humaine D-16 (a) du 22/09/2026). La classe est une classe de DÉFAUT : les 18 familles du
+référentiel n'en décrivent pas d'autre, et le compteur des récidives repose là-dessus. Or le
+registre reçoit aussi des items d'ÉTUDE D'OPPORTUNITÉ, qui demandent de CONSTRUIRE — un registre
+daté à tenir, un plan de mesure à poser, un palier à ouvrir. Leur attribuer une classe reviendrait
+à écrire qu'un manque de fonctionnalité est une faute, et à gonfler un compteur qui sert à mesurer
+la descente des corrections. Mesuré le 22/09 : sur 8 items ouverts sans classe, 3 étaient de cette
+nature. Le champ `nature` est donc DISTINCT de `classe` et mutuellement exclusif avec elle : un
+item porte l'une ou l'autre, jamais les deux, jamais aucune. `todo\journaliser.mjs` admet une
+création sans classe si et seulement si elle porte `nature: "opportunite"`, et refuse celle qui
+porte les deux. Ce qui n'est PAS ouvert par là : une opportunité reste une candidature ordinaire,
+elle se décide, elle se clôt, et sa clôture porte sa descente comme toute autre.
+
+(3) **R13** de l'oracle : une classe hors référentiel est un FAIL ; une
 récidive marquée est AVERTISSANTE (doctrine v2.5.0 de la restitution : elle se durcira sur corpus
 propre). (4) **Le DOUBLON STRICT est refusé à la porte** (TF-0956, 14/09) : une candidature dont
 le titre ET le contenu, après anonymisation et aux espaces et à la casse près, sont ceux d'une

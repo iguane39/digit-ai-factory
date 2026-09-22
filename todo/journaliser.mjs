@@ -149,8 +149,30 @@ export function octetsFautifs(evenement) {
 const CLE_A_CREER = "classe-a-creer";
 const CLASSES_PATH = valeur("--classes") || join(ICI, "CLASSES.json");
 
+/** Les natures reconnues, hors classe de défaut (décision humaine D-16 (a) du 22/09/2026). */
+export const NATURES = new Set(["opportunite"]);
+
 export function classeFautive(evenement, referentiel) {
   if (!evenement || evenement.ev !== "creation") return null;
+
+  // UN ITEM QUI N'EST PAS UN DÉFAUT NE PORTE PAS DE CLASSE DE DÉFAUT. La classe est une classe de
+  // défaut — les 18 familles du référentiel n'en décrivent pas d'autre — et le compteur des
+  // récidives repose là-dessus. Un item d'étude d'opportunité demande de CONSTRUIRE ; lui donner
+  // une classe reviendrait à écrire qu'un manque de fonctionnalité est une faute. Les deux champs
+  // sont donc mutuellement exclusifs : l'un ou l'autre, jamais les deux, jamais aucun.
+  if (evenement.nature !== undefined && evenement.nature !== null && String(evenement.nature).trim() !== "") {
+    const nature = String(evenement.nature).trim();
+    if (!NATURES.has(nature)) {
+      return `création ${evenement.id || "(sans id)"} : nature « ${nature} » inconnue — natures admises : ` +
+        `${[...NATURES].join(", ")}. Une nature nouvelle se pose en doctrine (references/TODO-FORGE.md), jamais au fil d'un événement`;
+    }
+    if (evenement.classe !== undefined && evenement.classe !== null && String(evenement.classe).trim() !== "") {
+      return `création ${evenement.id || "(sans id)"} porte À LA FOIS une nature « ${nature} » et une classe ` +
+        `« ${evenement.classe} » — les deux s'excluent : la classe désigne un DÉFAUT, la nature désigne ce qui n'en est pas un`;
+    }
+    return null;
+  }
+
   if (!referentiel) {
     return `référentiel de classes illisible (${CLASSES_PATH}) — une création ne s'écrit pas sans lui, ` +
       "pas plus qu'un lot ne s'ingère sans lui";
@@ -163,7 +185,8 @@ export function classeFautive(evenement, referentiel) {
     return `création ${evenement.id || "(sans id)"} SANS classe — toute création désigne une clé de ` +
       `${CLASSES_PATH} (${cles.size} clés ; familles : ${[...familles].join(", ")}). Si aucune ne ` +
       `convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"} — ` +
-      "la classe se crée dans le référentiel, datée et sourcée, jamais au fil d'un événement";
+      "la classe se crée dans le référentiel, datée et sourcée, jamais au fil d'un événement. Et si l'item " +
+      `n'est PAS un défaut — une opportunité à construire —, porter "nature": "opportunite" et aucune classe`;
   }
 
   const cle = String(brute);

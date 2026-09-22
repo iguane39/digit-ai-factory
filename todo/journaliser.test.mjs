@@ -241,6 +241,36 @@ check("la cle reservee est refusee quand la FAMILLE proposee est inconnue", () =
   if (!/famille/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
 });
 
+// -- 9. D-16 (a) du 22/09/2026 -- une opportunite n'est pas un defaut ------------------------
+check("une creation qui porte une NATURE d'opportunite passe SANS classe", () => {
+  const sans = creation({ id: "TF-9920", titre: "opportunite", contenu: "un registre a tenir", nature: "opportunite" });
+  delete sans.classe;
+  const r = lancer([sans], r8);
+  if (r.code !== 0) throw new Error(`exit ${r.code} — une opportunite n'a pas de classe de defaut : ${r.corps.message}`);
+});
+
+check("une creation qui porte une nature ET une classe est refusee — les deux s'excluent", () => {
+  const r = lancer([creation({ id: "TF-9921", titre: "les deux", nature: "opportunite" })], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — un item est un defaut ou n'en est pas un`);
+  if (!/exclue|s.excluent/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+});
+
+check("une NATURE inconnue est refusee — elle se pose en doctrine, pas au fil d'un evenement", () => {
+  const sans = creation({ id: "TF-9922", titre: "nature inventee", nature: "idee-en-l-air" });
+  delete sans.classe;
+  const r = lancer([sans], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — une nature inventee echappe au compteur`);
+  if (!/nature/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+});
+
+check("le refus d'une creation sans classe NOMME aussi la sortie par la nature", () => {
+  const sans = creation({ id: "TF-9923", titre: "ni l un ni l autre" });
+  delete sans.classe;
+  const r = lancer([sans], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+  if (!/opportunite/.test(r.corps.message || "")) throw new Error("le refus ne dit pas qu'une opportunite a sa voie");
+});
+
 check("une MAJ sans classe passe — la porte ne juge que les creations", () => {
   const r = lancer([{ ev: "maj", id: "TF-9910", statut: "candidat", note: "mesure de recette" }], r8);
   if (r.code !== 0) throw new Error(`exit ${r.code} — un maj ne porte pas de classe : ${r.corps.message}`);
