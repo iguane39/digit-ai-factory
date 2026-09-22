@@ -1,6 +1,6 @@
 {
   "cible": "output/04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md",
-  "date_iso": "2026-09-22T10:36:06.823Z",
+  "date_iso": "2026-09-22T10:49:23.334Z",
   "registre_version": "2.25.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md",
-    "ts": "2026-09-22T10:36:06.821Z",
+    "ts": "2026-09-22T10:49:23.333Z",
     "fichiers": {
-      "output\\04-plans\\Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md": "61d2472640cb209e5f6cd2e369ec0bc6518f682485b6d3d4fab252728ae82e25"
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md": "ce8b16baad9fcd5157b4553e62bca73d95b22694f4b1344d17a6a648e84f42f5"
     }
   },
   "empreinte_motif": null,

@@ -17,7 +17,10 @@ pas pu se propager. Chez le produit de communication, la règle de transparence 
 contrôle qui existe vraiment, et 2 des 3 sujets qui l'attendaient sont retombés à leur vraie
 mesure : l'un était déjà fait par la session du produit, l'autre bute sur 3 valeurs que vous seul
 connaissez. La revue complète du registre est déposée, et elle dit une chose nette : ce qui
-s'accumule n'est pas du travail en retard, ce sont des juges manquants. En exécutant, 6 défauts
+s'accumule n'est pas du travail en retard, ce sont des juges manquants. La simulation du circuit
+d'intégration hébergé, que la publication venait de débloquer, a été jouée : elle rend ROUGE et
+nomme ses 2 causes à la ligne, de sorte que l'activation reste fermée à bon droit — 4 minutes de
+mesure contre une première exécution hébergée rouge. En exécutant, 6 défauts
 neufs ont été trouvés et consignés, dont un dans un fichier de la marque que le pilotage a lui-même
 abîmé en l'enregistrant. Ce qui est attendu de vous : lancer les 2 actions que la revue désigne
 comme le levier, trancher le sort du domaine de la marque dans la table des pseudonymes, et dire si
@@ -41,7 +44,8 @@ la branche locale du pilotage se publie.
 4 décisions exécutées, 3 items du registre clos, 4 enregistrements publiés, le contrôle d'amorçage
 du poste passé de 2 règles rouges à 3 règles vertes sur 2 profils, 3 recettes neuves à 49 cas à
 double sens dans ce tour et 5 à 96 cas sur la journée, harnais du pilotage à 137 verts sur 138, et
-9 défauts consignés dont 6 trouvés en exécutant.
+11 défauts consignés dont 8 trouvés en exécutant, et la simulation du circuit hébergé rendue ROUGE
+avec ses 2 causes isolées à la ligne.
 
 ## 3. Décisions attendues de l'humain
 
@@ -52,7 +56,7 @@ est une option — la colonne « Coût » donne la complexité et la durée, jam
 ligne citée donne ce qui s'applique si vous ne tranchez pas. Pour répondre, un sélecteur suffit —
 le numéro de la décision suivi de la lettre de l'option, comme « D-5 b ».
 
-Les 3 bloquants qui restent, chacun énoncé sur place :
+Les 4 bloquants qui restent, chacun énoncé sur place :
 
 - **Le référentiel de marque du produit de communication porte 2 lignes non réenregistrables.**
   Le hameçon d'anonymisation du pilotage a remplacé, dans la mention de couverture des propositions
@@ -64,6 +68,13 @@ Les 3 bloquants qui restent, chacun énoncé sur place :
 - **La branche locale du pilotage porte 16 enregistrements que rien ne publie.** Elle n'a aucune
   branche amont, donc sa fraîcheur n'est même pas mesurable, et l'autre poste de travail n'a rien
   de ce qui a été fait depuis le 21/09.
+- **Le circuit d'intégration hébergé du pilotage ne peut pas s'activer : sa simulation rend ROUGE.**
+  Elle a été jouée ce tour, et elle nomme 2 causes. Un oracle du pilotage résout le répertoire
+  personnel au chargement de son module et plante sans lui, au lieu de se déclarer sans objet — il
+  ne rend alors ni succès, ni échec, ni abstention, et fait échouer la recette d'un tiers. Et la
+  recette du registre juge une vue générée que git ignore depuis le 16/09, donc absente de tout
+  clone frais. Le mode opératoire d'activation pose un verdict vert en condition, et il avait prévu
+  ce cas mot pour mot.
 - **Le palier de publication du produit de communication attend 3 valeurs que seul l'humain
   détient** : la gouvernance des comptes de réseau — qui tient quel rôle, double facteur activé ou
   non, ce qui se passe au départ d'une personne —, l'export manuel de l'état de départ, et le relevé
@@ -209,10 +220,20 @@ portent leur mesure d'avant et leur mesure d'après ; aucune ligne ne s'appuie s
   moment de mon enregistrement, sont restaurées sur le disque.** Preuve : 0 occurrence du pseudonyme
   dans le fichier, la correction de transparence intacte, et rien n'est indexé — de sorte qu'aucun
   enregistrement d'une autre session ne les emporte.
-- **9 défauts sont consignés au registre**, dont 6 trouvés en exécutant vos décisions : la garde de
+- **La simulation du circuit hébergé est jouée, et elle rend ROUGE — c'est ce qu'elle existe pour
+  faire.** La publication a rendu le contrôle des skills vert, donc le harnais mesurable, donc la
+  simulation jouable : c'est l'action que la synthèse précédente laissait en attente. Preuve :
+  verdict ROUGE, 5 défauts, 2 causes isolées chacune à sa ligne. La première, un oracle qui résout
+  le répertoire personnel au chargement de son module et plante sans lui au lieu de se déclarer sans
+  objet — reproduit à la main, et sa recette rend pourtant 14 cas verts sur 14 sur ce poste. La
+  seconde, la recette du registre qui juge une vue générée que git ignore depuis le 16/09, donc
+  absente de tout clone frais : 3 cas en échec sur 58, tous la même cause. L'activation reste
+  fermée, et son mode opératoire l'avait prévu mot pour mot.
+- **11 défauts sont consignés au registre**, dont 8 trouvés en exécutant vos décisions : la garde de
   recette d'un module qui détourne le banc de celui qui l'importe, le second profil de poste couvert
   par un simple lien symbolique que rien ne déclare, le domaine de la marque dans la table des
-  pseudonymes, et les 3 que la revue désigne. Preuve : le contrôle du registre rend PASS, exit 0.
+  pseudonymes, les 3 que la revue désigne, et les 2 causes du rouge de la simulation. Preuve : le
+  contrôle du registre rend PASS, exit 0.
 
 ## 5. Non traité — avec son motif
 
@@ -230,6 +251,9 @@ portent leur mesure d'avant et leur mesure d'après ; aucune ligne ne s'appuie s
   un service hébergé, et cela attend D-7.
 - Les 62 candidatures restantes de valeur inférieure à 15 : motif `borne_atteinte` — la revue pose
   qu'elles se traitent au fil, et que le registre les tient sans coût.
+- L'activation du circuit d'intégration hébergé : motif `dependance_bloc_3` — la simulation qu'elle
+  exige est jouée et rend ROUGE ; ses 2 causes attendent l'arbitrage des candidatures, et le geste
+  d'activation n'est pas encore à poser.
 - L'édition d'un README du produit, faite sur disque : motif `hors_mandat` — le fichier porte aussi
   du travail non enregistré d'une autre session du produit, et l'index d'un dépôt partagé ne se
   prend pas pour le sien.
@@ -299,6 +323,8 @@ la dernière colonne dit ce qu'il coûte de le laisser tomber.
 | **A-17** | Trancher le sort du domaine de la marque — répondre « D-6 (a) », « D-6 (b) » ou « D-6 (c) » | `manuelle_utilisateur` | TF-1293 | `decision` — retirer une clé d'une table de pseudonymisation est un acte de gouvernance | 2 lignes restent justes sur le disque et fausses dans l'enregistrement |
 | **A-18** | Fournir les 3 valeurs du palier de publication du produit : gouvernance des comptes de réseau, export manuel de l'état de départ sous `output\06-mesures\`, relevé du temps humain hebdomadaire en minutes | `manuelle_utilisateur` | TF-1160 | `acces` — la gouvernance porte des faits sur des personnes et sur l'état réel de leurs comptes ; mesure de ce tour : le contrôle du run de réseau rend 3 règles rouges, toutes des entrées humaines | le palier reste ouvert sans pouvoir publier, et la publication de la semaine 1 attend indéfiniment |
 | **A-19** | Dire si la branche de rapport du pilotage doit rejoindre la branche principale, ou rester une branche de travail | `manuelle_utilisateur` | neuve | `decision` — arbitrage de gouvernance du dépôt, que la publication ne tranche pas | la branche sans amont rend la fraîcheur du pilotage non mesurable à chaque ouverture |
+| **A-21** | Résoudre le registre des oracles PARESSEUSEMENT dans `oracle-controle-maison.mjs`, par la bibliothèque qui rend le chemin et la variable qui l'a décidé, et poser au banc un cas qui le joue sans répertoire personnel | `auto_ia` | TF-1297 | `dependance_bloc_3` — attend l'arbitrage des candidatures | un oracle continue de planter sans rendre de verdict sur tout runner, et fait échouer la recette d'un tiers |
+| **A-22** | Faire que la recette du registre régénère la vue avant de la juger, plutôt que de juger un fichier absent de tout clone | `auto_ia` | TF-1298 | `dependance_bloc_3` — attend l'arbitrage des candidatures | le circuit hébergé resterait rouge à sa première exécution, et son activation restera fermée |
 | **A-20** | Arbitrer les 10 candidatures de valeur 15 ou plus, que je vous déroule une par une — la troisième action que la revue propose, et que l'option (a) de D-5 laisse dehors | `manuelle_utilisateur` | TF-1288 | `decision` — faire passer une candidature en décidé vous revient | les contrôles qui rendent aujourd'hui un verdict faux continuent de le rendre, dont un périmètre de mesure annoncé sans le dire et une surveillance qui efface sa propre dérive |
 
 L'ordre suit l'effet de levier : `A-11` et `A-12` suppriment à la source la moitié du flux de
@@ -315,5 +341,8 @@ précédents traitent ce qui les produit.
 - Skill d'accueil : `digit-ai-forge-agents/.claude/skills/accueil-factory/SKILL.md`, enregistrement `47590ee`, publié.
 - Publiés sur votre feu vert : canal confidentiel `f6a6cad`, forge d'audit `06801a1`, forge d'outils `f6d7d90`.
 - Chez le produit de communication : enregistrement `a0b8c2c`, local.
-- Registre : [TODO.jsonl](todo/TODO.jsonl) — 22 items touchés ce jour, contrôle du registre PASS.
+- Registre : [TODO.jsonl](todo/TODO.jsonl) — 25 items touchés ce jour, contrôle du registre PASS.
+- Simulation du circuit hébergé : verdict ROUGE, 5 défauts, 2 causes — `TF-1297` et `TF-1298`,
+  enregistrement `a49c9ea`. Porte de publication : PASS, 0 constat bloquant ; harnais du pilotage :
+  137 verts sur 138.
 - Remontée à la factory : sans objet — ce tour s'est joué au pilotage, pas chez un produit.
