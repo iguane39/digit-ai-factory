@@ -12,7 +12,9 @@ Vous avez tranché les 13 décisions en un seul message, et les gestes qu'elles 
 faits. 8 dossiers sont clos avec leur preuve rejouée, 3 restent ouverts et disent pourquoi. Le
 plus important pour vous : le sceau des livrables est désormais portable d'un poste à l'autre, ce
 qui était la dernière cause connue du circuit d'intégration fermé, et la forge de tests ne porte
-plus aucun test rouge — elle redevient opposable à ce qu'elle juge. Deux remèdes que je croyais
+plus aucun test rouge — elle redevient opposable à ce qu'elle juge. La simulation du circuit
+d'intégration rend VERT pour la première fois, sans aucun défaut : le sceau était bien la
+dernière cause de son blocage. Deux remèdes que je croyais
 justes ont été écartés par la mesure avant d'être retenus, et chacun a coûté un rejeu : c'est la
 mesure qui a tranché, pas mon idée de départ. J'ai aussi trouvé et corrigé un défaut que j'avais
 introduit moi-même ce matin, et que le harnais a attrapé le jour même : une constante supprimée
@@ -35,10 +37,10 @@ le reste.
 
 ## 2. Verdict en une ligne
 
-8 dossiers passent de décidé à corrigé sur preuve rejouée, le vérificateur de sceaux rend PASS
-sur 44 scellés et 0 écart, la suite de la forge de tests passe de 1 échec à 0, 3 recettes gagnent
-12 cas, le harnais tient 153 contrôles avec son seul rouge connu, et 1 défaut que j'avais
-introduit ce matin est corrigé.
+8 dossiers passent de décidé à corrigé sur preuve rejouée, la simulation du circuit
+d'intégration passe de 1 défaut à 0 et rend VERT, le vérificateur de sceaux rend PASS sur 44
+scellés et 0 écart, la suite de la forge de tests passe de 1 échec à 0, 3 recettes gagnent 12
+cas, et 1 défaut que j'avais introduit ce matin est corrigé.
 
 ## 3. Décisions attendues de l'humain
 
@@ -62,6 +64,11 @@ connaissez, et chacun est énoncé ici sur place.
 
 ## 4. Traité — chaque point avec sa preuve exécutée
 
+- **La simulation du circuit d'intégration rend VERT, et c'est la première fois.** Preuve : les 2
+  pas qu'elle rejoue sur un clone frais rendent 0, aucun défaut, aucune écriture des recettes dans
+  le clone — là où elle rendait ROUGE avec 1 défaut il y a 3 heures, et 2 défauts ce matin. Le pas
+  qui échouait était le vérificateur de sceaux sur le parc réel : c'est bien la portabilité du
+  sceau qui tenait ce circuit fermé.
 - **Le sceau des livrables est portable d'un poste à l'autre.** Il empreintait les octets de
   l'arbre de travail, que git réécrit à chaque extraction. Preuve mesurée sur un même livrable :
   octets du disque `e7d248ac56987055`, octets du dépôt `e7758dc3f2dc1284`, contenu normalisé
@@ -205,5 +212,7 @@ des corrections déjà prouvées ici.
   [observer-recidives.mjs](todo/observer-recidives.mjs).
 - Forges corrigées, enregistrées en local : `digit-ai-forge-audit` (13 étapes vertes sur 13),
   `digit-ai-forge-agents` (32 cas verts sur 32), `digit-ai-forge-tests` (suite entière verte).
+- Simulation du circuit d'intégration : [simuler-recette-hebergee.mjs](scripts/simuler-recette-hebergee.mjs)
+  — verdict VERT, 2 pas à 0 défaut, jouée sur un clone du dépôt à l'enregistrement `5c86b6c`.
 - Remontée à la factory : sans objet — ce tour s'est joué au pilotage et dans 3 forges, jamais
   chez un produit.
