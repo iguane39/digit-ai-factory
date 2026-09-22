@@ -403,7 +403,7 @@
   "vu_le": "2026-09-14"
  },
  "scripts/generer-page-etude.mjs": {
-  "cas": 9,
+  "cas": 12,
   "vu_le": "2026-09-22"
  },
  "scripts/generer-remplacements-historique.test.mjs": {
@@ -423,8 +423,8 @@
   "vu_le": "2026-09-16"
  },
  "scripts/oracles-design-page-generee.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-20"
+  "cas": 11,
+  "vu_le": "2026-09-22"
  },
  "scripts/readme-dossiers.test.mjs": {
   "cas": 17,
