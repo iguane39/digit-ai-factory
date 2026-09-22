@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>digit-ai-factory — brag</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/audio-data.js"></script>
+    <style>
+      @font-face { font-family: "Roboto"; font-weight: 500; font-style: normal; src: url("assets/fonts/roboto-latin-500-normal.woff2") format("woff2"); }
+      @font-face { font-family: "Roboto"; font-weight: 800; font-style: normal; src: url("assets/fonts/roboto-latin-800-normal.woff2") format("woff2"); }
+      @font-face { font-family: "Roboto"; font-weight: 900; font-style: normal; src: url("assets/fonts/roboto-latin-900-normal.woff2") format("woff2"); }
+      @font-face { font-family: "DM Sans"; font-weight: 400; font-style: normal; src: url("assets/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
+      @font-face { font-family: "DM Sans"; font-weight: 500; font-style: normal; src: url("assets/fonts/dm-sans-latin-500-normal.woff2") format("woff2"); }
+      @font-face { font-family: "DM Sans"; font-weight: 700; font-style: normal; src: url("assets/fonts/dm-sans-latin-700-normal.woff2") format("woff2"); }
+      @font-face { font-family: "JetBrains Mono"; font-weight: 400; font-style: normal; src: url("assets/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2"); }
+      @font-face { font-family: "JetBrains Mono"; font-weight: 700; font-style: normal; src: url("assets/fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2"); }
+
+      :root {
+        /* Charte Digit-AI, thème sombre (socle digit-ai-page-html) */
+        --bg: #0B1220; --surface: #121B2E; --line: #263248;
+        --ink: #EEF2F8; --muted: #A9B4C4;
+        --blue: #7DA2F5; --brand: #2563EB;
+        --green: #7BE0A0; --amber: #FBBF6D; --red: #F5A3A3;
+        --head: "Roboto", sans-serif;
+        --sans: "DM Sans", sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+
+      /* Couches persistantes */
+      #glow-a { position: absolute; left: -420px; top: -520px; width: 1500px; height: 1500px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(37, 99, 235, 0.55) 0%, rgba(37, 99, 235, 0.16) 38%, rgba(37, 99, 235, 0) 68%); }
+      #glow-b { position: absolute; right: -380px; bottom: -480px; width: 1200px; height: 1200px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(125, 162, 245, 0.30) 0%, rgba(125, 162, 245, 0.08) 42%, rgba(125, 162, 245, 0) 70%); }
+      #grid { position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(125, 162, 245, 0.13) 2px, transparent 2px), linear-gradient(90deg, rgba(125, 162, 245, 0.13) 2px, transparent 2px);
+        background-size: 120px 120px; background-position: 0 30px; }
+      #topbar { position: absolute; left: 120px; right: 120px; top: 64px; display: flex; align-items: center; gap: 18px;
+        font-family: var(--mono); font-size: 24px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink); }
+      #topbar .sq { display: block; width: 22px; height: 22px; border-radius: 5px; background: var(--brand); }
+      #topbar .rule { display: block; flex: 1; height: 2px; background: var(--line); }
+      #topbar .where { font-weight: 400; color: var(--muted); letter-spacing: 0.02em; }
+      #progress { position: absolute; left: 0; bottom: 0; width: 100%; height: 8px; background: var(--blue); transform-origin: left center; }
+
+      /* Scènes */
+      .clip { position: absolute; inset: 0; }
+      .inner { position: absolute; inset: 0; padding: 170px 120px 110px; display: flex; flex-direction: column; }
+      .meta { font-family: var(--mono); font-size: 24px; font-weight: 700; letter-spacing: 0.1em; color: var(--blue); margin: 0 0 34px; }
+      h1, h2, p { margin: 0; }
+      .w { display: inline-block; }
+
+      /* S1 */
+      .hook { font-family: var(--head); font-weight: 900; font-size: 148px; line-height: 1.06; letter-spacing: -0.02em; }
+      .hook .ln { display: block; }
+      .strike-wrap { position: relative; }
+      .strike { position: absolute; display: block; left: -8px; top: 54%; width: calc(100% + 16px); height: 14px; border-radius: 7px; background: var(--red); transform-origin: left center; }
+      .answer { font-family: var(--head); font-weight: 900; font-size: 148px; line-height: 1.06; letter-spacing: -0.02em; color: var(--blue); margin-top: 44px; transform-origin: left center; display: block; width: 1500px; }
+
+      /* S2 + S5 */
+      .wordmark { font-family: var(--head); font-weight: 900; font-size: 156px; line-height: 1; letter-spacing: -0.03em; }
+      .wordmark .dim { color: var(--blue); }
+      .sub { font-size: 46px; font-weight: 500; color: var(--muted); margin-top: 30px; display: flex; gap: 22px; }
+      .sub .w { color: var(--ink); }
+      .term { position: absolute; left: 120px; right: 120px; bottom: 120px; background: var(--surface); border: 3px solid var(--line); border-radius: 22px; overflow: hidden; }
+      .term-head { display: flex; align-items: center; gap: 12px; padding: 20px 28px; border-bottom: 3px solid var(--line); font-family: var(--mono); font-size: 24px; color: var(--muted); }
+      .dot { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--line); }
+      .term-head .lbl { margin-left: 14px; }
+      .term-body { padding: 34px 36px 40px; font-family: var(--mono); font-size: 38px; line-height: 1.5; height: 196px; }
+      .term-line { display: flex; align-items: center; height: 58px; white-space: pre; }
+      .chev { color: var(--blue); font-weight: 700; margin-right: 20px; }
+      .pad { display: block; width: 43px; }
+      .caret { display: block; width: 20px; height: 42px; background: var(--blue); margin-left: 6px; }
+
+      /* S3 */
+      .h2 { font-family: var(--head); font-weight: 800; font-size: 72px; line-height: 1.12; letter-spacing: -0.015em; }
+      .h2 .acc { color: var(--blue); }
+      .rail { display: block; width: 100%; height: 5px; border-radius: 3px; background: var(--brand); margin: 60px 0 32px; transform-origin: left center; }
+      .pipe { display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px; }
+      .step { background: var(--surface); border: 3px solid var(--line); border-radius: 20px; padding: 34px 30px 38px; }
+      .step .num { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--blue); }
+      .step .name { font-family: var(--head); font-weight: 800; font-size: 46px; margin-top: 18px; letter-spacing: -0.01em; }
+      .step .art { font-family: var(--mono); font-size: 26px; color: var(--muted); margin-top: 14px; white-space: nowrap; }
+      .badge { display: inline-block; margin-top: 34px; padding: 10px 22px; border-radius: 999px; font-family: var(--mono); font-weight: 700; font-size: 28px; color: #0B1220; background: var(--green); transform-origin: left center; }
+      .badge.human { background: var(--amber); }
+      .law { font-family: var(--head); font-weight: 900; font-size: 116px; line-height: 1.05; letter-spacing: -0.02em; margin-top: 76px; display: flex; gap: 34px; }
+      .law .hum { color: var(--amber); }
+
+      /* S4 */
+      .proof-title { font-family: var(--head); font-weight: 900; font-size: 112px; line-height: 1.04; letter-spacing: -0.02em; }
+      .ctx { font-family: var(--mono); font-size: 28px; color: var(--muted); margin-top: 18px; }
+      .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px; margin-top: 56px; }
+      .stat { background: var(--surface); border: 3px solid var(--line); border-radius: 22px; padding: 40px 40px 46px; }
+      .stat .fig { font-family: var(--head); font-weight: 900; font-size: 168px; line-height: 1; letter-spacing: -0.03em; color: var(--green); white-space: nowrap; }
+      .stat .lab { font-size: 40px; font-weight: 500; line-height: 1.25; margin-top: 22px; color: var(--ink); }
+      .stat .lab small { display: block; font-family: var(--mono); font-size: 26px; color: var(--muted); margin-top: 10px; }
+      .foot { font-family: var(--mono); font-size: 26px; color: var(--muted); margin-top: 40px; }
+
+      /* S5 */
+      #s5-in { justify-content: center; padding-top: 110px; }
+      #s5-in .wordmark { font-size: 200px; }
+      .punch { font-family: var(--head); font-weight: 900; font-size: 136px; line-height: 1.05; letter-spacing: -0.02em; color: var(--blue); margin-top: 34px; transform-origin: left center; display: block; width: 1600px; }
+      .url { align-self: flex-start; margin-top: 64px; padding: 22px 40px; border: 3px solid var(--blue); border-radius: 999px; font-family: var(--mono); font-size: 44px; font-weight: 700; color: var(--ink); background: var(--surface); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="25">
+      <div id="glow-a"></div>
+      <div id="glow-b"></div>
+      <div id="grid"></div>
+      <div id="topbar"><span class="sq"></span><span>DIGIT-AI · FACTORY</span><span class="rule"></span><span class="where">github.com/iguane39</span></div>
+
+      <!-- S1 — Accroche -->
+      <section id="s1" class="clip" data-start="0" data-duration="3.7" data-track-index="1">
+        <div class="inner" id="s1-in">
+          <p class="meta">01 / 05 — LE PROPOS</p>
+          <h1 class="hook">
+            <span class="ln"><span class="w hw">La</span> <span class="w hw">qualité</span></span>
+            <span class="ln"><span class="w hw">ne</span> <span class="w hw">se</span> <span class="w hw strike-wrap">proclame<i class="strike" id="strike"></i></span> <span class="w hw">pas.</span></span>
+          </h1>
+          <p class="answer" id="answer">Elle se mesure.</p>
+        </div>
+      </section>
+
+      <!-- S2 — Révélation et entrée -->
+      <section id="s2" class="clip" data-start="3.7" data-duration="5.26" data-track-index="1">
+        <div class="inner" id="s2-in">
+          <p class="meta">02 / 05 — L'ENTRÉE</p>
+          <h1 class="wordmark" id="wm">digit-ai<span class="dim">-factory</span></h1>
+          <p class="sub"><span class="w seg">Un seul point de démarrage.</span><span class="w seg">Treize forges.</span><span class="w seg">Bout en bout.</span></p>
+          <div class="term" id="term">
+            <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="lbl">Claude Code — dans le dossier du produit</span></div>
+            <div class="term-body">
+              <div class="term-line"><span class="chev">›</span><span id="t1"></span><span class="caret" id="c1"></span></div>
+              <div class="term-line"><span class="pad"></span><span id="t2"></span><span class="caret" id="c2"></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S3 — Le flux jugé -->
+      <section id="s3" class="clip" data-start="8.96" data-duration="8.95" data-track-index="1">
+        <div class="inner" id="s3-in">
+          <p class="meta">03 / 05 — LE FLUX</p>
+          <h2 class="h2" id="s3-h">Cinq étapes. <span class="acc">Chacune jugée par un oracle exécuté.</span></h2>
+          <span class="rail" id="rail"></span>
+          <div class="pipe">
+            <div class="step"><div class="num">01</div><div class="name">conception</div><div class="art">EXIGENCES.json</div><span class="badge">PASS</span></div>
+            <div class="step"><div class="num">02</div><div class="name">design</div><div class="art">tokens.css</div><span class="badge">PASS</span></div>
+            <div class="step"><div class="num">03</div><div class="name">development</div><div class="art">ruff + pytest</div><span class="badge">PASS</span></div>
+            <div class="step"><div class="num">04</div><div class="name">tests</div><div class="art">forge_tests</div><span class="badge">PASS</span></div>
+            <div class="step"><div class="num">05</div><div class="name">MEP</div><div class="art">staging autonome</div><span class="badge human">GO humain</span></div>
+          </div>
+          <p class="law"><span class="w lw">L'IA fait.</span><span class="w lw hum">L'humain décide.</span></p>
+        </div>
+      </section>
+
+      <!-- S4 — La preuve -->
+      <section id="s4" class="clip" data-start="17.91" data-duration="4.74" data-track-index="1">
+        <div class="inner" id="s4-in">
+          <p class="meta">04 / 05 — LA PREUVE</p>
+          <h2 class="proof-title" id="s4-h">Ce qui est prouvé.</h2>
+          <p class="ctx" id="s4-ctx">Run pilote · 04/08/2026 · produit-test MiniVeille</p>
+          <div class="stats">
+            <div class="stat"><div class="fig">0</div><p class="lab">intervention humaine<small>du brief au rapport d'audit</small></p></div>
+            <div class="stat"><div class="fig"><span id="n1">11</span>/11</div><p class="lab">exigences tracées<small>jusqu'aux tests</small></p></div>
+            <div class="stat"><div class="fig" id="n2">0,714</div><p class="lab">score de mutation<small>seuil 0,70</small></p></div>
+          </div>
+          <p class="foot" id="s4-foot">ledger de 23 entrées vérifié · source : README, « Ce qui est prouvé aujourd'hui »</p>
+        </div>
+      </section>
+
+      <!-- S5 — Signature -->
+      <section id="s5" class="clip" data-start="22.65" data-duration="2.35" data-track-index="1">
+        <div class="inner" id="s5-in">
+          <p class="meta">05 / 05 — JUGÉ PAR ORACLE EXÉCUTÉ</p>
+          <h1 class="wordmark" id="wm5">digit-ai<span class="dim">-factory</span></h1>
+          <p class="punch" id="punch">Jamais par confiance.</p>
+          <p class="url" id="url">github.com/iguane39/digit-ai-factory</p>
+        </div>
+      </section>
+
+      <div id="progress"></div>
+
+      <!-- Audio -->
+      <audio id="music" src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3" data-start="0" data-duration="25" data-track-index="10" data-volume="0.78"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.3,"v":0.78},{"t":22.4,"v":0.78},{"t":22.9,"v":0.55},{"t":23.6,"v":0.55},{"t":25,"v":0}]}]}'></audio>
+
+      <audio id="sfx-hook" src="assets/sfx/impactSoft_medium_001.ogg" data-start="1.6" data-duration="0.18" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-name" src="assets/sfx/impactSoft_medium_004.ogg" data-start="3.7" data-duration="0.14" data-track-index="11" data-volume="0.6"></audio>
+
+      <audio id="key-01" src="assets/sfx/keys/keypress-001.wav" data-start="5.47" data-duration="0.25" data-track-index="12" data-volume="0.32"></audio>
+      <audio id="key-02" src="assets/sfx/keys/keypress-004.wav" data-start="5.63" data-duration="0.25" data-track-index="13" data-volume="0.28"></audio>
+      <audio id="key-03" src="assets/sfx/keys/keypress-002.wav" data-start="5.8" data-duration="0.25" data-track-index="12" data-volume="0.32"></audio>
+      <audio id="key-04" src="assets/sfx/keys/keypress-006.wav" data-start="5.96" data-duration="0.25" data-track-index="13" data-volume="0.26"></audio>
+      <audio id="key-05" src="assets/sfx/keys/keypress-003.wav" data-start="6.12" data-duration="0.25" data-track-index="12" data-volume="0.32"></audio>
+      <audio id="key-06" src="assets/sfx/keys/keypress-008.wav" data-start="6.26" data-duration="0.25" data-track-index="13" data-volume="0.28"></audio>
+      <audio id="key-07" src="assets/sfx/keys/keypress-005.wav" data-start="6.42" data-duration="0.25" data-track-index="12" data-volume="0.32"></audio>
+      <audio id="key-08" src="assets/sfx/keys/keypress-007.wav" data-start="6.58" data-duration="0.25" data-track-index="13" data-volume="0.26"></audio>
+      <audio id="key-09" src="assets/sfx/keys/keypress-001.wav" data-start="6.75" data-duration="0.25" data-track-index="12" data-volume="0.32"></audio>
+      <audio id="key-10" src="assets/sfx/keys/keypress-004.wav" data-start="6.92" data-duration="0.25" data-track-index="13" data-volume="0.28"></audio>
+      <audio id="key-11" src="assets/sfx/keys/keypress-002.wav" data-start="7.08" data-duration="0.25" data-track-index="12" data-volume="0.34"></audio>
+
+      <audio id="card-1" src="assets/sfx/card-slide-1.ogg" data-start="9.5" data-duration="0.6" data-track-index="11" data-volume="0.42"></audio>
+      <audio id="card-2" src="assets/sfx/card-slide-1.ogg" data-start="10.54" data-duration="0.6" data-track-index="11" data-volume="0.42"></audio>
+      <audio id="card-3" src="assets/sfx/card-slide-1.ogg" data-start="11.6" data-duration="0.6" data-track-index="11" data-volume="0.42"></audio>
+      <audio id="card-4" src="assets/sfx/card-slide-1.ogg" data-start="12.65" data-duration="0.6" data-track-index="11" data-volume="0.42"></audio>
+      <audio id="card-5" src="assets/sfx/card-slide-1.ogg" data-start="13.7" data-duration="0.6" data-track-index="11" data-volume="0.42"></audio>
+      <audio id="pass-1" src="assets/sfx/click2.ogg" data-start="10.01" data-duration="0.06" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="pass-2" src="assets/sfx/click2.ogg" data-start="11.06" data-duration="0.06" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="pass-3" src="assets/sfx/click2.ogg" data-start="12.12" data-duration="0.06" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="pass-4" src="assets/sfx/click2.ogg" data-start="13.18" data-duration="0.06" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="gate" src="assets/sfx/switch_007.ogg" data-start="14.76" data-duration="0.61" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="sfx-law" src="assets/sfx/impactSoft_medium_001.ogg" data-start="15.28" data-duration="0.18" data-track-index="11" data-volume="0.55"></audio>
+
+      <audio id="sfx-proof" src="assets/sfx/impactSoft_medium_004.ogg" data-start="17.91" data-duration="0.14" data-track-index="11" data-volume="0.6"></audio>
+      <audio id="stat-2" src="assets/sfx/click2.ogg" data-start="18.96" data-duration="0.06" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="stat-3" src="assets/sfx/click2.ogg" data-start="20.02" data-duration="0.06" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="bell" src="assets/sfx/impactBell_heavy_003.ogg" data-start="22.65" data-duration="0.65" data-track-index="13" data-volume="0.6"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const DUR = 25;
+
+      // Couches persistantes : progression + dérive lente du second halo
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: "none" }, 0);
+      tl.fromTo("#glow-b", { x: 0, y: 0 }, { x: -140, y: -90, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo("#grid", { backgroundPosition: "0px 30px" }, { backgroundPosition: "-120px 30px", duration: DUR, ease: "none" }, 0);
+
+      // Audio-réactif (subtil) : RMS et basses pré-extraits font respirer le halo principal.
+      // Lecture par la position de la timeline : chaque image se recalcule depuis son seul temps.
+      const glowA = document.getElementById("glow-a");
+      const probe = { t: 0 };
+      tl.fromTo(probe, { t: 0 }, {
+        t: DUR, duration: DUR, ease: "none",
+        onUpdate: function () {
+          const f = Math.min(AUDIO_DATA.totalFrames - 1, Math.max(0, Math.round(probe.t * AUDIO_DATA.fps)));
+          glowA.style.opacity = (0.62 + 0.38 * AUDIO_DATA.rms[f]).toFixed(3);
+          glowA.style.transform = "scale(" + (1 + 0.1 * AUDIO_DATA.bass[f]).toFixed(4) + ")";
+        },
+      }, 0);
+
+      function out(id, at) {
+        tl.to(id, { opacity: 0, x: -50, duration: 0.3, ease: "power2.in" }, at);
+      }
+      function type(sel, text, start, dur) {
+        const el = document.querySelector(sel);
+        const p = { n: 0 };
+        tl.fromTo(p, { n: 0 }, { n: text.length, duration: dur, ease: "none",
+          onUpdate: function () { el.textContent = text.slice(0, Math.round(p.n)); } }, start);
+      }
+      function count(sel, to, start, dur, fmt) {
+        const el = document.querySelector(sel);
+        const p = { v: 0 };
+        tl.fromTo(p, { v: 0 }, { v: to, duration: dur, ease: "power2.out",
+          onUpdate: function () { el.textContent = fmt(p.v); } }, start);
+      }
+
+      // ── S1 — Accroche (0 → 3,70)
+      tl.fromTo("#s1 .meta", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 0.1);
+      tl.fromTo("#s1 .hw", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.5, ease: "power4.out", stagger: 0.08 }, 0.2);
+      // beat-locked: 1.60s — le mot est barré, la réponse arrive
+      tl.fromTo("#strike", { scaleX: 0 }, { scaleX: 1, duration: 0.28, ease: "power3.inOut" }, 1.5);
+      tl.fromTo("#answer", { opacity: 0, scale: 1.14, x: -30 }, { opacity: 1, scale: 1, x: 0, duration: 0.42, ease: "expo.out" }, 1.6);
+      tl.to("#s1 .hw", { opacity: 0.42, duration: 0.5, ease: "power1.out" }, 1.75);
+      out("#s1-in", 3.38);
+
+      // ── S2 — Révélation et entrée (3,70 → 8,96)
+      // beat-locked: 3.70s — le nom
+      tl.fromTo("#s2 .meta", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.7);
+      tl.fromTo("#wm", { opacity: 0, x: -90 }, { opacity: 1, x: 0, duration: 0.55, ease: "expo.out" }, 3.7);
+      tl.fromTo("#s2 .seg", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out", stagger: 0.18 }, 4.05);
+      tl.fromTo("#term", { opacity: 0, y: 120 }, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.2)" }, 4.95);
+      tl.fromTo("#c2", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 4.95);
+      type("#t1", "Utilise https://github.com/iguane39/digit-ai-factory", 5.45, 0.85);
+      // beat-locked: 6.34s — la seconde ligne démarre
+      tl.to("#c1", { opacity: 0, duration: 0.01 }, 6.33);
+      tl.to("#c2", { opacity: 1, duration: 0.01 }, 6.34);
+      type("#t2", "pour créer un site de réservation.", 6.34, 0.8);
+      tl.to("#c2", { opacity: 0, duration: 0.01, repeat: 3, yoyo: true, repeatDelay: 0.26 }, 7.4);
+      out("#s2-in", 8.64);
+
+      // ── S3 — Le flux jugé (8,96 → 17,91)
+      // beat-locked: 8.96s — le titre
+      tl.fromTo("#s3 .meta", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 8.96);
+      tl.fromTo("#s3-h", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 8.96);
+      tl.fromTo("#rail", { scaleX: 0 }, { scaleX: 1, duration: 4.5, ease: "none" }, 9.4);
+      // beat-grid: carte 1 à 9.50s, 2 à 10.54s, 3 à 11.60s, 4 à 12.65s, 5 à 13.70s (un temps sur deux : texte lisible)
+      const cardAt = [9.5, 10.54, 11.6, 12.65, 13.7];
+      // beat-grid: verdict 1 à 10.01s, 2 à 11.06s, 3 à 12.12s, 4 à 13.18s ; gate humain à 14.76s
+      const badgeAt = [10.01, 11.06, 12.12, 13.18, 14.76];
+      const steps = document.querySelectorAll("#s3 .step");
+      steps.forEach(function (el, i) {
+        tl.fromTo(el, { opacity: 0, y: 90, rotation: i % 2 ? 2.5 : -2.5 }, { opacity: 1, y: 0, rotation: 0, duration: 0.45, ease: "back.out(1.4)" }, cardAt[i]);
+        tl.fromTo(el.querySelector(".badge"), { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.32, ease: "back.out(2.4)" }, badgeAt[i]);
+      });
+      tl.to(steps[4], { borderColor: "#FBBF6D", duration: 0.3, ease: "power1.out" }, 14.76);
+      tl.to("#s3 .step:not(:last-child)", { opacity: 0.5, duration: 0.4 }, 15.2);
+      tl.fromTo("#s3 .lw", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out", stagger: 0.5 }, 15.28);
+      out("#s3-in", 17.58);
+
+      // ── S4 — La preuve (17,91 → 22,65)
+      // beat-locked: 17.91s — le titre et le premier chiffre
+      tl.fromTo("#s4 .meta", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 17.91);
+      tl.fromTo("#s4-h", { opacity: 0, y: -50 }, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }, 17.91);
+      tl.fromTo("#s4-ctx", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 18.15);
+      // beat-grid: chiffre 1 à 17.91s (+0.12), 2 à 18.96s, 3 à 20.02s
+      const statAt = [18.03, 18.96, 20.02];
+      document.querySelectorAll("#s4 .stat").forEach(function (el, i) {
+        tl.fromTo(el, { opacity: 0, y: 70, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power4.out" }, statAt[i]);
+      });
+      count("#n1", 11, 19.0, 0.36, function (v) { return String(Math.round(v)); });
+      count("#n2", 0.714, 20.06, 0.45, function (v) { return v.toFixed(3).replace(".", ","); });
+      tl.fromTo("#s4-foot", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 20.6);
+      out("#s4-in", 22.33);
+
+      // ── S5 — Signature (22,65 → 25,00)
+      // beat-locked: 22.65s — la signature et la cloche
+      tl.fromTo("#s5 .meta", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 22.65);
+      tl.fromTo("#wm5", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, 22.65);
+      tl.fromTo("#punch", { opacity: 0, x: -70 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, 22.95);
+      tl.fromTo("#url", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.6)" }, 23.3);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

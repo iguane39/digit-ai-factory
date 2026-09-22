@@ -101,4 +101,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260921-etude-opportunite-reseaux-sociaux-complement.md` | fichier | 26,1 Ko | Étude d'opportunité — réseaux sociaux au-delà de LinkedIn : réseaux, étapes et types d'éme |
 | `20260922-revue-des-candidatures-par-famille.md` | fichier | 11,7 Ko | Revue des candidatures du registre, par famille de défaut |
 
-_84 fichier(s), 0 sous-dossier(s)_
+_84 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

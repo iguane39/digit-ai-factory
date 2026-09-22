@@ -1,0 +1,1404 @@
+audit_ref: Rapport d'audit — Produit-61 —
+core_version: 1.0.x
+project:
+  repo: non renseigné
+  stack_profile: none
+actions:
+  - id: REM-D01-002
+    title: >-
+      déclarer le point de défaillance unique et son délai de reprise accepté, ou ajouter une
+      seconde instance
+    control_ref: CTL-D01-05
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        le point de défaillance unique est déclaré avec son délai de reprise accepté, ou une seconde
+        instance sert le trafic
+  - id: REM-D02-005
+    title: >-
+      ne journaliser qu'un identifiant de demande, jamais le lien ; ou rendre le serveur de courrier
+      obligatoire hors développ
+    control_ref: CTL-D02-07
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une demande de réinitialisation ne laisse aucun lien exploitable dans la sortie du service
+  - id: REM-D03-001
+    title: >-
+      déléguer l'authentification des restaurateurs à un fournisseur d'identité, ou ajouter un
+      second facteur
+    control_ref: CTL-D03-01
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une connexion restaurateur exige un second facteur ou passe par le fournisseur d'identité
+  - id: REM-D04-002
+    title: écrire la qualification du risque et sa conclusion, même négative
+    control_ref: CTL-D04-02
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la qualification du risque est écrite, datée et conclut explicitement
+  - id: REM-D04-003
+    title: >-
+      classer la lecture d'ardoise selon la grille de risque et tracer les obligations
+      correspondantes
+    control_ref: CTL-D04-03
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le niveau de risque du système est déclaré avec sa justification et les obligations tracées
+  - id: REM-D05-004
+    title: activer la sauvegarde périodique de la base et déclarer la perte tolérée
+    control_ref: CTL-D05-09
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        une restauration est jouée depuis une sauvegarde, avec le contenu retrouvé et le délai
+        constaté
+  - id: REM-D09-001
+    title: faire passer tout déploiement par un pipeline produisant un journal horodaté
+    control_ref: CTL-D09-01
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un déploiement produit un journal horodaté reliant une version du dépôt à l'instance servie
+  - id: REM-D10-009
+    title: masquer le lien à la source et ne tracer qu'un identifiant de demande
+    control_ref: CTL-D10-09
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: aucun jeton ni lien exploitable n'apparaît dans la télémétrie, vérifié par recherche
+  - id: REM-D12-005
+    title: chiffrer le délai de remise en service acceptable et le prouver par un exercice chronométré
+    control_ref: CTL-D12-06
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les deux objectifs sont déclarés et une restauration prouve leur tenue
+  - id: REM-D15-004
+    title: classifier les données et rattacher les mesures à leur niveau
+    control_ref: CTL-D15-04
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les données sont classifiées et chaque mesure est rattachée à son niveau
+  - id: REM-D16-002
+    title: classifier chaque colonne et déclarer la mesure associée
+    control_ref: CTL-D16-04
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque colonne sensible porte sa classification et la mesure associée
+  - id: REM-D16-004
+    title: planifier la sauvegarde du moteur et vérifier l'intégrité du jeu restauré
+    control_ref: CTL-D16-09
+    severity: Fatal
+    priority: urgent
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une restauration de la base est jouée avec preuve du délai constaté
+  - id: REM-D00-001
+    title: rédiger un persona par profil d'usage, avec contexte de service et contraintes
+    control_ref: CTL-D00-02
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        un persona par profil est publié dans la documentation projet et cité par au moins une
+        exigence
+  - id: REM-D00-002
+    title: chiffrer trois indicateurs métier avec leur valeur de départ et leur objectif à terme
+    control_ref: CTL-D00-04
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        trois indicateurs métier portent une valeur de référence datée et une cible, relevées sur
+        l'instance servie
+  - id: REM-D00-004
+    title: mesurer l'adoption après la première mise en service réelle
+    control_ref: CTL-D00-07
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un relevé d'adoption sur un mois d'exploitation réelle est publié
+  - id: REM-D00-005
+    title: faire jouer les parcours par un restaurateur et consigner les frictions
+    control_ref: CTL-D00-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un restaurateur a joué les parcours critiques et ses frictions sont consignées
+  - id: REM-D01-001
+    title: créer l'environnement de production et tracer le transfert de responsabilité
+    control_ref: CTL-D01-04
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: l'environnement de production existe et le transfert de responsabilité est tracé
+  - id: REM-D01-003
+    title: qualifier chaque écart (coût, risque) et le prioriser
+    control_ref: CTL-D01-06
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque écart de dette porte un coût, un risque et un rang de priorité
+  - id: REM-D01-004
+    title: ajouter criticité et conduite à tenir en cas d'indisponibilité pour chaque dépendance
+    control_ref: CTL-D01-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque dépendance externe porte sa criticité et sa conduite à tenir en cas d'indisponibilité
+  - id: REM-D01-007
+    title: écrire et jouer une fois un export complet (base et variables) dans un format ouvert
+    control_ref: CTL-D01-15
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        un export complet est produit puis rechargé dans un environnement vierge, avec relevé du
+        résultat
+  - id: REM-D02-001
+    title: cartographier les dix catégories et rattacher chacune à une mesure vérifiée du produit
+    control_ref: CTL-D02-01
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        les dix catégories de risque sont couvertes, chacune par une mesure du produit et sa preuve
+        exécutée
+  - id: REM-D02-002
+    title: brancher un scanner de dépendances qui refuse la fusion dès une faille connue exploitable
+    control_ref: CTL-D02-03
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une dépendance vulnérable introduite volontairement fait échouer la vérification automatisée
+  - id: REM-D02-003
+    title: poser une limitation de débit sur les routes publiques de commande
+    control_ref: CTL-D02-04
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        un appel répété au-delà du seuil déclaré est refusé sur les routes publiques, prouvé par un
+        test
+  - id: REM-D02-004
+    title: ajouter un jeton anti-falsification aux formulaires modifiant un état
+    control_ref: CTL-D02-05
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une requête forgée sans jeton valide est refusée sur chaque formulaire modifiant un état
+  - id: REM-D02-006
+    title: ajouter analyse statique et dynamique au pipeline, bloquantes sur vulnérabilité critique
+    control_ref: CTL-D02-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        les deux analyses tournent sur un changement et bloquent sur une vulnérabilité critique
+        injectée
+  - id: REM-D02-007
+    title: >-
+      produire un modèle de menaces couvrant le paiement hors application, la lecture d'ardoise et
+      le cloisonnement multi-rest
+    control_ref: CTL-D02-09
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le modèle de menaces est publié et revu à la dernière évolution d'architecture
+  - id: REM-D02-008
+    title: >-
+      confirmer au premier déploiement de production que le drapeau de démonstration et les comptes
+      associés sont absents
+    control_ref: CTL-D02-10
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        le premier déploiement de production sert sans drapeau de démonstration ni compte associé,
+        vérifié sur l'instance
+  - id: REM-D02-009
+    title: >-
+      déclarer les destinations légitimes (interface du modèle, base) et refuser le reste si la
+      plateforme le permet
+    control_ref: CTL-D02-11
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une tentative de sortie vers une destination non déclarée est refusée
+  - id: REM-D02-010
+    title: automatiser ce relevé à chaque changement avec un délai de correction déclaré
+    control_ref: CTL-D02-12
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        le relevé des dépendances est produit automatiquement à chaque changement, avec délai de
+        correction déclaré
+  - id: REM-D02-011
+    title: nommer un responsable sécurité et suivre au moins une métrique par revue
+    control_ref: CTL-D02-13
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un responsable est nommé et une métrique de sécurité est présentée en revue
+  - id: REM-D03-002
+    title: poser les secrets dans un coffre avec rotation déclarée et journal d'accès
+    control_ref: CTL-D03-03
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les secrets sont lus depuis le coffre au démarrage et une rotation est tracée
+  - id: REM-D03-003
+    title: employer une identité d'exécution si la plateforme et le fournisseur le permettent
+    control_ref: CTL-D03-04
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le service appelle le modèle sans secret statique, ou l'impossibilité est déclarée par écrit
+  - id: REM-D03-004
+    title: planifier une revue des accès et la consigner
+    control_ref: CTL-D03-05
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une revue des accès est consignée avec sa date et ses suites
+  - id: REM-D03-005
+    title: créer un compte technique dédié au produit, distinct du compte humain
+    control_ref: CTL-D03-06
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le déploiement emploie un compte technique dédié au produit, distinct du compte humain
+  - id: REM-D03-006
+    title: journaliser les opérations sensibles vers un référentiel dont l'écriture ne peut être réécrite
+    control_ref: CTL-D03-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        les opérations sensibles sont relues dans un référentiel dont les entrées ne peuvent être
+        réécrites
+  - id: REM-D04-001
+    title: 'inscrire le traitement au registre : finalité, base légale, catégories, durée'
+    control_ref: CTL-D04-01
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la fiche de traitement est publiée avec finalité, base légale, catégories et durée
+  - id: REM-D04-004
+    title: mentionner explicitement le recours à un modèle sur l'écran de lecture et dans l'aide
+    control_ref: CTL-D04-04
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        l'écran de lecture et l'aide mentionnent le recours à un modèle, vérifié sur l'instance
+        servie
+  - id: REM-D04-005
+    title: outiller au moins l'accès et l'effacement, depuis le numéro de commande
+    control_ref: CTL-D04-06
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une demande d'effacement est jouée de bout en bout dans le délai déclaré
+  - id: REM-D04-006
+    title: encadrer le transfert vers le fournisseur du modèle par un mécanisme cité
+    control_ref: CTL-D04-07
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        la région d'hébergement est déclarée et le transfert vers le fournisseur du modèle repose
+        sur un mécanisme cité
+  - id: REM-D04-007
+    title: déclarer une durée pour chaque catégorie, pas seulement pour le téléphone
+    control_ref: CTL-D04-08
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque table porte une durée de conservation appliquée, vérifiée par une purge datée
+  - id: REM-D04-008
+    title: désigner un référent et publier son point de contact dans les mentions
+    control_ref: CTL-D04-09
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un référent est désigné et son point de contact figure dans les mentions servies
+  - id: REM-D04-009
+    title: documenter les limites connues de la lecture d'ardoise et les métriques retenues
+    control_ref: CTL-D04-10
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les limites connues et les métriques du modèle sont publiées avec le jeu d'essai
+  - id: REM-D04-010
+    title: instruire les obligations du déployeur avant toute ouverture au public
+    control_ref: CTL-D04-11
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les obligations du déployeur sont instruites et la supervision humaine est nommée
+  - id: REM-D04-011
+    title: >-
+      répéter une fois la notification de violation, de la qualification à l'information des
+      personnes
+    control_ref: CTL-D04-12
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la procédure de notification est écrite et répétée une fois, avec compte rendu
+  - id: REM-D05-001
+    title: inscrire la base et ses domaines au dossier de reprise avec leur propriétaire
+    control_ref: CTL-D05-01
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque source porte un propriétaire nommé dans le dossier de reprise
+  - id: REM-D05-002
+    title: poser un contrôle de complétude sur les lignes de commande, avec seuil déclaré
+    control_ref: CTL-D05-04
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un contrôle de complétude et un seuil de fraîcheur tournent et alertent sur écart
+  - id: REM-D05-003
+    title: déclarer une rétention par table et l'appliquer
+    control_ref: CTL-D05-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque table porte sa rétention et sa purge, vérifiées par un relevé daté
+  - id: REM-D05-005
+    title: déclarer la région d'hébergement dans le dossier des composants
+    control_ref: CTL-D05-16
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la localisation des données est déclarée par catégorie et vérifiable sur la plateforme
+  - id: REM-D06-001
+    title: borner la reprise de la purge et tracer ses échecs
+    control_ref: CTL-D06-01
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la reprise de la tâche différée est bornée et ses échecs sont tracés
+  - id: REM-D06-002
+    title: surveiller la consommation réelle du fournisseur et déclarer le plan de dégradation
+    control_ref: CTL-D06-02
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la consommation du quota du fournisseur est relevée et le plan de dégradation est écrit
+  - id: REM-D06-003
+    title: déclarer une cible de latence sur la carte publique et la page de commande, et la mesurer
+    control_ref: CTL-D06-03
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une cible de latence est déclarée par parcours critique et comparée à la mesure en service
+  - id: REM-D06-004
+    title: jouer un test de charge représentatif avant la mise en service réelle
+    control_ref: CTL-D06-04
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un test de charge à la cible déclarée est joué avec son relevé
+  - id: REM-D06-006
+    title: borner ces collections par une pagination
+    control_ref: CTL-D06-06
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une base de mille commandes rend la première page de l'historique sans dégradation mesurée
+  - id: REM-D06-007
+    title: fixer la taille du pool au regard de la charge cible
+    control_ref: CTL-D06-07
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la taille du pool est fixée et justifiée au regard de la charge cible
+  - id: REM-D06-008
+    title: documenter le mécanisme de montée en charge de la plateforme et le valider une fois
+    control_ref: CTL-D06-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le mécanisme de montée en charge est documenté et validé par un essai
+  - id: REM-D07-001
+    title: définir quatre marqueurs minimaux et les appliquer aux ressources de la plateforme
+    control_ref: CTL-D07-01
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les quatre marqueurs minimaux sont posés sur chaque ressource facturable
+  - id: REM-D07-002
+    title: mesurer le marquage à chaque création de ressource
+    control_ref: CTL-D07-02
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une ressource non marquée déclenche une alerte au relevé périodique
+  - id: REM-D07-003
+    title: poser un marqueur applicatif univoque
+    control_ref: CTL-D07-03
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque ressource porte un marqueur applicatif résolu sans reconstruction manuelle
+  - id: REM-D07-004
+    title: déclarer un budget mensuel et une alerte de seuil
+    control_ref: CTL-D07-04
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une alerte se déclenche au seuil déclaré sur un budget d'essai
+  - id: REM-D07-005
+    title: tenir une revue de dépense datée dont les arbitrages sont écrits
+    control_ref: CTL-D07-05
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: deux revues de coûts consécutives sont consignées avec leurs arbitrages
+  - id: REM-D07-006
+    title: relever la dépense courante par ressource et projeter son évolution à l'usage visé
+    control_ref: CTL-D07-06
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le coût courant est ventilé par service et une projection à la charge cible est publiée
+  - id: REM-D08-001
+    title: poser la porte en intégration continue et faire relire les changements structurants
+    control_ref: CTL-D08-01
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        un changement non conforme aux conventions est refusé avant fusion, sans intervention
+        manuelle
+  - id: REM-D08-002
+    title: archiver le résultat de chaque analyse avec la version qui l'a produite
+    control_ref: CTL-D08-02
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les résultats des scans sont retrouvés par version dans le journal du pipeline
+  - id: REM-D08-003
+    title: faire échouer l'intégration quand la couverture passe sous le seuil
+    control_ref: CTL-D08-03
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une baisse de couverture sous le seuil fait échouer la vérification automatisée
+  - id: REM-D08-005
+    title: exécuter la suite complète à chaque changement proposé, en porte bloquante
+    control_ref: CTL-D08-06
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un test rendu volontairement rouge bloque la fusion
+  - id: REM-D09-002
+    title: décrire l'environnement en code et verrouiller son état
+    control_ref: CTL-D09-02
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: l'environnement est recréé depuis le code seul, dans un projet vierge
+  - id: REM-D09-003
+    title: intégrer les scans au pipeline en porte bloquante
+    control_ref: CTL-D09-03
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un secret introduit volontairement fait échouer le pipeline
+  - id: REM-D09-004
+    title: documenter et outiller la promotion, avec approbation tracée
+    control_ref: CTL-D09-04
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la promotion d'un environnement au suivant laisse une approbation tracée
+  - id: REM-D09-006
+    title: activer la protection de branche et exiger un statut de vérification
+    control_ref: CTL-D09-06
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un poussage direct sur la branche de référence est refusé par la plateforme
+  - id: REM-D10-001
+    title: émettre des journaux structurés avec niveau et identifiant de composant
+    control_ref: CTL-D10-01
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les journaux sont exploitables par une machine, avec niveau et composant sur chaque ligne
+  - id: REM-D10-002
+    title: attribuer un identifiant par requête et le propager
+    control_ref: CTL-D10-02
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une requête est reconstituée de bout en bout depuis son identifiant
+  - id: REM-D10-003
+    title: exposer latence, taux d'erreur et saturation
+    control_ref: CTL-D10-03
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: latence, taux d'erreur et saturation sont consultables sur un historique suffisant
+  - id: REM-D10-006
+    title: poser un objectif de disponibilité et alerter sur l'épuisement de son budget d'erreur
+    control_ref: CTL-D10-06
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une alerte se déclenche sur la consommation du budget d'erreur déclaré
+  - id: REM-D10-007
+    title: geler les changements quand la marge de panne tolérée est consommée
+    control_ref: CTL-D10-07
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le budget d'erreur est suivi et déclenche l'action prévue avant épuisement
+  - id: REM-D10-008
+    title: fixer la durée de garde des journaux et prouver la purge
+    control_ref: CTL-D10-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la purge des journaux est prouvée par un relevé daté
+  - id: REM-D10-010
+    title: superviser la disponibilité et la latence des deux dépendances
+    control_ref: CTL-D10-10
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la latence et la disponibilité des deux dépendances déclenchent une alerte avant impact
+  - id: REM-D10-011
+    title: rejouer périodiquement le jeu d'essai et comparer au résultat de référence
+    control_ref: CTL-D10-11
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le jeu d'essai est rejoué périodiquement et son écart au résultat de référence est relevé
+  - id: REM-D10-012
+    title: centraliser les événements de sécurité et restreindre l'accès au référentiel
+    control_ref: CTL-D10-12
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les événements de sécurité sont centralisés et l'accès au référentiel est restreint et tracé
+  - id: REM-D11-001
+    title: jouer un audit d'accessibilité complet et ouvrir un plan pour les critères non satisfaits
+    control_ref: CTL-D11-01
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un audit complet des critères de succès est publié avec un plan pour chaque écart
+  - id: REM-D11-002
+    title: mesurer la navigation au clavier sur les parcours critiques
+    control_ref: CTL-D11-02
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque parcours critique est franchi au clavier seul, sans piège de focus
+  - id: REM-D11-004
+    title: confier un essai libre à un professionnel du métier avant l'ouverture élargie
+    control_ref: CTL-D11-06
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un restaurateur a joué les parcours et le plan de correction des frictions est ouvert
+  - id: REM-D12-001
+    title: écrire une procédure d'incident avec un délai de prise en charge, même large
+    control_ref: CTL-D12-02
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une panne simulée est prise en charge dans le délai déclaré
+  - id: REM-D12-002
+    title: classer la criticité et déclarer l'engagement correspondant
+    control_ref: CTL-D12-03
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la criticité et l'engagement de service sont déclarés et cohérents
+  - id: REM-D12-003
+    title: ouvrir un suivi d'incidents, même minimal, et y consigner les retours
+    control_ref: CTL-D12-04
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un incident est suivi dans l'outil, avec analyse a posteriori sans blâme
+  - id: REM-D12-004
+    title: documenter la matrice de responsabilité et former une seconde personne
+    control_ref: CTL-D12-05
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une seconde personne joue le retour arrière sans assistance
+  - id: REM-D12-006
+    title: écrire un plan de continuité couvrant l'indisponibilité prolongée de la plateforme
+    control_ref: CTL-D12-07
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le plan de continuité est écrit et son scénario principal est répété
+  - id: REM-D12-007
+    title: rendre l'accès de déploiement nominatif et documenter l'accès de secours
+    control_ref: CTL-D12-08
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: l'accès de déploiement est nominatif et l'accès de secours est documenté et journalisé
+  - id: REM-D12-008
+    title: formaliser la passation quand une exploitation distincte existera
+    control_ref: CTL-D12-09
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la passation vers l'exploitation est tracée avec le dossier de reprise
+  - id: REM-D12-009
+    title: >-
+      outiller la réponse aux atteintes de sécurité : confinement, préservation des traces, retour
+      d'expérience
+    control_ref: CTL-D12-10
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la procédure de réponse à incident de sécurité est répétée avec préservation de la preuve
+  - id: REM-D13-001
+    title: confronter le contrat d'interface à l'implémentation servie, en porte automatisée
+    control_ref: CTL-D13-02
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: une divergence entre le contrat d'interface et l'implémentation fait échouer la vérification
+  - id: REM-D13-003
+    title: publier le dictionnaire dans un catalogue interrogeable par sens métier
+    control_ref: CTL-D13-07
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le dictionnaire est interrogeable par sens métier depuis un catalogue
+  - id: REM-D13-004
+    title: centraliser la documentation de conformité et la référencer depuis la documentation du projet
+    control_ref: CTL-D13-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la documentation de conformité est centralisée et référencée depuis la documentation projet
+  - id: REM-D14-002
+    title: sortir le prompt du code applicatif vers un registre versionné
+    control_ref: CTL-D14-02
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le prompt vit dans un registre versionné hors du code applicatif, avec historique
+  - id: REM-D14-003
+    title: déclarer un seuil et rejouer le corpus à chaque changement de modèle ou de prompt
+    control_ref: CTL-D14-03
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le corpus est rejoué à chaque changement de modèle ou de prompt, contre un seuil déclaré
+  - id: REM-D14-004
+    title: borner le taux d'erreur toléré et écrire le plan de réduction associé
+    control_ref: CTL-D14-05
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un seuil d'acceptabilité est déclaré et son dépassement déclenche le plan prévu
+  - id: REM-D14-006
+    title: conserver de quoi rejouer une réponse contestée, sans donnée personnelle
+    control_ref: CTL-D14-09
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        une réponse contestée est rejouée depuis la journalisation, sans donnée personnelle
+        conservée
+  - id: REM-D15-001
+    title: adopter un pack de principes et nommer le propriétaire par domaine
+    control_ref: CTL-D15-01
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un pack de principes est adopté et chaque domaine porte son propriétaire
+  - id: REM-D15-002
+    title: faire valider le modèle par une autorité désignée avant chaque évolution
+    control_ref: CTL-D15-02
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque évolution de modèle est validée par l'autorité désignée avant mise en service
+  - id: REM-D15-003
+    title: déclarer les règles et leurs seuils
+    control_ref: CTL-D15-03
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les règles de qualité et leurs seuils sont déclarés et contrôlés en continu
+  - id: REM-D15-005
+    title: surveiller la fraîcheur et le volume des domaines critiques
+    control_ref: CTL-D15-06
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la fraîcheur et la volumétrie des domaines critiques sont supervisées
+  - id: REM-D15-007
+    title: tracer et revoir les habilitations
+    control_ref: CTL-D15-08
+    severity: Bloquant
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les habilitations sont tracées et revues à échéance déclarée
+  - id: REM-D15-008
+    title: compléter le cycle de vie par la sauvegarde et la preuve de restauration
+    control_ref: CTL-D15-09
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le cycle de vie est complet, restauration prouvée comprise
+  - id: REM-D16-003
+    title: mesurer la taille des tables significatives et projeter leur croissance
+    control_ref: CTL-D16-08
+    severity: Majeur
+    priority: prio
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la volumétrie des tables significatives est relevée et sa croissance projetée
+  - id: REM-D00-003
+    title: inscrire au journal du produit un rendez-vous d'arbitrage du backlog, avec sa cadence
+    control_ref: CTL-D00-06
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: deux revues consécutives sont consignées avec leurs arbitrages
+  - id: REM-D00-006
+    title: tenir un registre de risques avec mitigation, distinct des hypothèses
+    control_ref: CTL-D00-09
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque risque du registre porte une mitigation nommée et une date de revue
+  - id: REM-D01-005
+    title: déclarer une charge cible (commandes par service, restaurants) et le dimensionnement retenu
+    control_ref: CTL-D01-09
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        une charge cible chiffrée et le dimensionnement retenu figurent dans la documentation
+        d'architecture
+  - id: REM-D01-006
+    title: tracer chaque décision structurante avec ses options écartées et ses conséquences
+    control_ref: CTL-D01-10
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        les décisions structurantes sont relues dans un registre où chacune porte contexte, options
+        et conséquences
+  - id: REM-D06-005
+    title: poser un cache sur le catalogue publié, avec invalidation à l'enregistrement
+    control_ref: CTL-D06-05
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le catalogue publié est servi depuis un cache, invalidé à l'enregistrement d'un plat
+  - id: REM-D07-007
+    title: >-
+      identifier les optimisations, à commencer par l'extinction de l'environnement de qualification
+      hors essai
+    control_ref: CTL-D07-07
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le plan d'optimisation est chiffré et son premier poste est appliqué
+  - id: REM-D07-008
+    title: déclarer la maturité capacité par capacité, même au premier palier
+    control_ref: CTL-D07-08
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la maturité est déclarée capacité par capacité, sans score global unique
+  - id: REM-D07-009
+    title: documenter au moins le choix de région et le dimensionnement au besoin réel
+    control_ref: CTL-D07-09
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le choix de région et le dimensionnement au besoin réel sont documentés
+  - id: REM-D08-004
+    title: mesurer la complexité et suivre les marqueurs de dette
+    control_ref: CTL-D08-05
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: la complexité et les marqueurs de dette sont relevés avec un seuil d'alerte déclaré
+  - id: REM-D09-005
+    title: versionner les images et publier des notes de version
+    control_ref: CTL-D09-05
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: chaque image porte une version sémantique et ses notes de version sont publiées
+  - id: REM-D10-004
+    title: exposer les indicateurs d'activité à l'exploitation, avec un propriétaire nommé
+    control_ref: CTL-D10-04
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les indicateurs d'activité sont exposés à l'exploitation avec un propriétaire nommé
+  - id: REM-D10-005
+    title: construire un tableau de bord d'exploitation minimal
+    control_ref: CTL-D10-05
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un tableau de bord d'exploitation est consultable sans solliciter le développement
+  - id: REM-D11-003
+    title: relever le temps d'affichage initial et la stabilité visuelle des écrans clients
+    control_ref: CTL-D11-05
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le chargement initial et la stabilité visuelle sont mesurés sur la carte publique
+  - id: REM-D11-005
+    title: ajouter un point de collecte de retours dans l'aide
+    control_ref: CTL-D11-08
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: un point de collecte de retours est servi dans l'application et alimente un suivi
+  - id: REM-D13-002
+    title: tenir un registre de décisions conforme au schéma du corpus
+    control_ref: CTL-D13-03
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les décisions sont relues dans un registre conforme au schéma, avec identifiants stables
+  - id: REM-D14-001
+    title: écrire les critères qui fondent le choix du modèle et tracer son approbation
+    control_ref: CTL-D14-01
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les critères du choix de modèle sont écrits et la validation est tracée
+  - id: REM-D14-005
+    title: rapprocher le compteur d'appels d'un coût et alerter sur dérive
+    control_ref: CTL-D14-07
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: le coût d'inférence est rapproché du compteur d'appels et alerte sur dérive
+  - id: REM-D15-006
+    title: rendre les actifs découvrables
+    control_ref: CTL-D15-07
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: les actifs en production sont découvrables depuis un catalogue
+  - id: REM-D16-001
+    title: vérifier les plans sur les requêtes de l'historique et du tableau de bord
+    control_ref: CTL-D16-03
+    severity: Standard
+    priority: norm
+    activation:
+      mode: manual
+      reason: mode d'activation non déclaré par le rapport d'audit — à qualifier avant bascule forge
+      owner_role: à désigner
+    verification:
+      evidence_expected: >-
+        les plans d'exécution des requêtes de l'historique et du tableau de bord justifient les
+        index en place
