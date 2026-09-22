@@ -29,10 +29,13 @@ const lancer = (evenements, registre, extra = []) => {
   return { code: r.status, corps, brut: r.stdout || r.stderr || "" };
 };
 
+// La classe par défaut est une clé RÉELLE du référentiel : depuis A-11 (22/09/2026) une création
+// sans classe est refusée au chemin d'écriture, et un fixtures qui contournerait la porte qu'on
+// vient de poser rendrait vert ce qu'elle existe pour arrêter.
 const creation = (sur = {}) => ({
   ev: "creation", id: "TF-9900", titre: "t", contenu: "c", demandeur: "humain — recette",
   source: "recette", date_demande: "2026-08-20", statut: "candidat",
-  forges_cibles_initiales: ["digit-ai-factory"],
+  forges_cibles_initiales: ["digit-ai-factory"], classe: "oracle-faux-positif",
   score: { gain: 1, preuve: 1, effort: 1, valeur: 1 }, ...sur,
 });
 
@@ -160,6 +163,94 @@ check("le garde visite les valeurs IMBRIQUEES, pas seulement le premier niveau",
   const r = lancer([creation({ forges_cibles_initiales: [`digit-ai${String.fromCharCode(9)}odo`] })], r7);
   if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — un octet dans un tableau de valeurs echappe au garde`);
   if (!MSG_CHAMP.test(r.corps.message || "")) throw new Error("le constat ne NOMME pas le champ fautif");
+});
+
+// -- 8. A-11 (D-5 (a), 22/09/2026) -- la porte de la classe, DANS LES DEUX SENS -------------
+// Le pilot etait le seul producteur exempte de la regle qu'il impose aux lots entrants. Le sens
+// VERT compte autant que le rouge : une porte qui refuse aussi les creations bien formees ne
+// ferme pas une asymetrie, elle arrete la consignation.
+const r8 = join(T, "registre-8.jsonl");
+writeFileSync(r8, "", "utf8");
+
+check("une creation SANS classe est refusee, et rien n'est ecrit", () => {
+  const sans = creation();
+  delete sans.classe;
+  const avant = readFileSync(r8, "utf8").length;
+  const r = lancer([sans], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — le pilot resterait exempte de sa propre regle`);
+  if (!/SANS classe/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+  if (readFileSync(r8, "utf8").length !== avant) throw new Error("le refus a laisse une ecriture derriere lui");
+});
+
+check("le refus NOMME la sortie prevue, sinon le producteur n'a aucune voie qui passe", () => {
+  const sans = creation();
+  delete sans.classe;
+  const r = lancer([sans], r8);
+  if (!/classe-a-creer/.test(r.corps.message || "")) throw new Error("le refus ne nomme pas la cle reservee");
+  if (!/classe_proposee/.test(r.corps.message || "")) throw new Error("le refus ne dit pas ce que la cle reservee exige");
+});
+
+check("une creation dont la classe est INCONNUE est refusee, avec les cles proches", () => {
+  const r = lancer([creation({ classe: "oracle-faux-negatif-invente" })], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — une classe inventee fausse le compte des recidives`);
+  if (!/inconnue du r/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+  if (!/oracle-faux-positif/.test(r.corps.message || "")) throw new Error("le refus ne propose aucune cle proche");
+});
+
+check("une creation dont la classe EXISTE passe — le sens vert de la porte", () => {
+  const r = lancer([creation({ id: "TF-9910", titre: "classe reelle", contenu: "sens vert de la porte" })], r8);
+  if (r.code !== 0) throw new Error(`exit ${r.code} — une creation bien formee doit passer : ${r.corps.message}`);
+});
+
+check("la cle reservee passe quand classe_proposee est COMPLETE et sa famille connue", () => {
+  const r = lancer([creation({
+    id: "TF-9911", titre: "cle reservee", contenu: "sortie prevue quand aucune cle ne convient", classe: "classe-a-creer",
+    classe_proposee: { cle: "classe-de-recette-qui-n-existe-pas", famille: "regle-morte", libelle: "cas de recette" },
+  })], r8);
+  if (r.code !== 0) throw new Error(`exit ${r.code} — la sortie prevue doit passer : ${r.corps.message}`);
+  const ecrit = readFileSync(r8, "utf8").trim().split(SL).map((l) => JSON.parse(l)).find((o) => o.id === "TF-9911");
+  if (!ecrit) throw new Error("l'evenement n'a pas ete ecrit");
+  if (ecrit.classe !== null) throw new Error(`classe ecrite « ${ecrit.classe} » — la cle reservee doit sortir en null, comme chez l'ingesteur`);
+  if (!ecrit.classe_a_creer || ecrit.classe_a_creer.cle !== "classe-de-recette-qui-n-existe-pas") {
+    throw new Error("la proposition n'est pas portee par classe_a_creer — les deux ecrivains divergeraient");
+  }
+  if (ecrit.classe_proposee !== undefined) throw new Error("classe_proposee subsiste : deux champs pour la meme chose");
+});
+
+check("la cle reservee SANS classe_proposee complete est refusee", () => {
+  const r = lancer([creation({ id: "TF-9912", classe: "classe-a-creer", classe_proposee: { cle: "x" } })], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — une classe proposee vide ne propose rien`);
+  if (!/manque famille, libelle/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+});
+
+check("la cle reservee est refusee quand la classe proposee EXISTE deja", () => {
+  const r = lancer([creation({
+    id: "TF-9913", classe: "classe-a-creer",
+    classe_proposee: { cle: "oracle-faux-positif", famille: "regle-morte", libelle: "deja la" },
+  })], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — proposer une classe qui existe cree un doublon`);
+  if (!/EXISTE d/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+});
+
+check("la cle reservee est refusee quand la FAMILLE proposee est inconnue", () => {
+  const r = lancer([creation({
+    id: "TF-9914", classe: "classe-a-creer",
+    classe_proposee: { cle: "classe-de-recette-hors-famille", famille: "famille-qui-n-existe-pas", libelle: "l" },
+  })], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — une famille inventee sort du referentiel`);
+  if (!/famille/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+});
+
+check("une MAJ sans classe passe — la porte ne juge que les creations", () => {
+  const r = lancer([{ ev: "maj", id: "TF-9910", statut: "candidat", note: "mesure de recette" }], r8);
+  if (r.code !== 0) throw new Error(`exit ${r.code} — un maj ne porte pas de classe : ${r.corps.message}`);
+});
+
+check("un referentiel de classes ILLISIBLE refuse, il ne laisse pas passer en silence", () => {
+  const faux = join(T, "classes-absentes.json");
+  const r = lancer([creation({ id: "TF-9915" })], r8, ["--classes", faux]);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — sans referentiel, on ne juge aucune cle`);
+  if (!/illisible/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
 });
 
 console.log(`\njournaliser (TF-0413) : ${pass} PASS, ${fail} FAIL`);

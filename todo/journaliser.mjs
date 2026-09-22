@@ -121,6 +121,80 @@ export function octetsFautifs(evenement) {
   return constats;
 }
 
+/**
+ * A-11 (décision humaine D-5 (a), 22/09/2026) — UNE CRÉATION DÉSIGNE SA CLASSE, ICI COMME AILLEURS.
+ *
+ * L'ASYMÉTRIE MESURÉE. `ingerer-lot.mjs` REFUSE, depuis le 03/09, tout retour d'un lot qui ne
+ * nomme pas une classe de `todo\CLASSES.json` — rejet atomique, registre intact. Ce script-ci,
+ * lui, écrivait une création sans classe sans rien dire. Or c'est le script du PILOT : le pilot
+ * était donc le seul producteur exempté de la règle qu'il impose à tous les autres. La revue des
+ * candidatures du 22/09 a chiffré le résultat — 8 candidatures ouvertes sans aucune classe, toutes
+ * écrites par cette porte, et invisibles au compteur des classes sans juge qui sert d'indicateur.
+ *
+ * POURQUOI LA PORTE PLUTÔT QU'UN CONTRÔLE DE PLUS. Un constat a posteriori laisse le trou se
+ * recreuser entre deux passages ; une porte fermée ne se recreuse pas. C'est le même raisonnement
+ * qui a mis le garde des octets sur le chemin d'écriture plutôt que dans un oracle (TF-0621) :
+ * le chemin d'écriture est le seul endroit qu'on ne peut pas oublier de traverser.
+ *
+ * LA MÊME SORTIE QUE POUR UN LOT, ET C'EST VOULU. Quand aucune clé ne convient, la clé réservée
+ * `classe-a-creer` est admise à la condition que l'événement porte `classe_proposee`
+ * {cle, famille, libelle} — famille du référentiel, clé qui n'existe pas encore. Sans cette
+ * sortie, la porte n'aurait eu que deux issues : inventer une classe qui fausse le compte des
+ * récidives, ou ne rien consigner. Les deux sont pires que le défaut qu'elle ferme (TF-1128).
+ *
+ * CE QU'ELLE NE JUGE PAS : les événements `maj` et `ingestion`, qui n'ouvrent pas d'item et dont
+ * la classe est portée par la création ; et la JUSTESSE de la classe déclarée — cette porte
+ * vérifie qu'une clé existe, elle ne relit pas le fond.
+ */
+const CLE_A_CREER = "classe-a-creer";
+const CLASSES_PATH = valeur("--classes") || join(ICI, "CLASSES.json");
+
+export function classeFautive(evenement, referentiel) {
+  if (!evenement || evenement.ev !== "creation") return null;
+  if (!referentiel) {
+    return `référentiel de classes illisible (${CLASSES_PATH}) — une création ne s'écrit pas sans lui, ` +
+      "pas plus qu'un lot ne s'ingère sans lui";
+  }
+  const cles = new Set((referentiel.classes || []).map((c) => String(c.cle)));
+  const familles = new Set((referentiel.familles || []).map((f) => String(f.cle)));
+  const brute = evenement.classe;
+
+  if (brute === undefined || brute === null || String(brute).trim() === "") {
+    return `création ${evenement.id || "(sans id)"} SANS classe — toute création désigne une clé de ` +
+      `${CLASSES_PATH} (${cles.size} clés ; familles : ${[...familles].join(", ")}). Si aucune ne ` +
+      `convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"} — ` +
+      "la classe se crée dans le référentiel, datée et sourcée, jamais au fil d'un événement";
+  }
+
+  const cle = String(brute);
+  if (cle === CLE_A_CREER) {
+    const p = evenement.classe_proposee && typeof evenement.classe_proposee === "object" ? evenement.classe_proposee : {};
+    const manque = ["cle", "famille", "libelle"].filter((k) => !p[k] || !String(p[k]).trim());
+    if (manque.length) {
+      return `création ${evenement.id || "(sans id)"} porte « ${CLE_A_CREER} » sans classe_proposee complète — ` +
+        `manque ${manque.join(", ")}`;
+    }
+    if (cles.has(String(p.cle))) {
+      return `création ${evenement.id || "(sans id)"} : la classe proposée « ${p.cle} » EXISTE déjà au ` +
+        `référentiel — la porter directement dans "classe", sans passer par « ${CLE_A_CREER} »`;
+    }
+    if (!familles.has(String(p.famille))) {
+      return `création ${evenement.id || "(sans id)"} : famille « ${p.famille} » inconnue — familles du ` +
+        `référentiel : ${[...familles].join(", ")}`;
+    }
+    return null;
+  }
+
+  if (!cles.has(cle)) {
+    const mots = cle.split("-").filter((m) => m.length > 3);
+    const proches = [...cles].filter((k) => mots.some((m) => k.includes(m))).slice(0, 5);
+    return `création ${evenement.id || "(sans id)"} : classe « ${cle} » inconnue du référentiel — ` +
+      `clés proches : ${proches.length ? proches.join(", ") : "(aucune)"} ; si aucune ne convient, porter ` +
+      `"classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"}`;
+  }
+  return null;
+}
+
 // Le garde des octets est EXPORTÉ pour être joué sur le corpus réel avant livraison (N-23), et un
 // module dont l'import déclenche la ligne de commande n'est pas importable. La partie CLI ne
 // s'exécute donc que si ce fichier est le point d'entrée — même idiome que les oracles du dépôt.
@@ -130,7 +204,7 @@ const lanceEnDirect = process.argv[1]
 if (!lanceEnDirect) { /* importé pour `octetsFautifs` : rien d'autre ne doit se produire */ }
 else {
 
-if (!fichier) sortir(1, { message: "usage : node journaliser.mjs --fichier <evenements.json> [--registre <f>] [--essai]" });
+if (!fichier) sortir(1, { message: "usage : node journaliser.mjs --fichier <evenements.json> [--registre <f>] [--classes <f>] [--essai]" });
 if (!existsSync(fichier)) sortir(1, { message: `fichier d'événements introuvable : ${fichier}` });
 
 let entrants;
@@ -161,14 +235,45 @@ if (fautifs.length) {
   });
 }
 
+// Refus AVANT toute écriture, troisième du même ordre : une création sans classe reconnue ferme
+// la porte que `ingerer-lot.mjs` ferme déjà pour les lots (A-11, D-5 (a) du 22/09/2026).
+let REF_CLASSES = null;
+try { REF_CLASSES = JSON.parse(readFileSync(CLASSES_PATH, "utf8")); }
+catch { /* laissé null : `classeFautive` le dit, avec le chemin, plutôt que de le taire */ }
+const sansClasse = entrants
+  .map((e, i) => { const c = classeFautive(e, REF_CLASSES); return c ? `rang ${i} — ${c}` : null; })
+  .filter(Boolean);
+if (sansClasse.length) {
+  sortir(1, {
+    message: `${sansClasse.length} création(s) sans classe reconnue — refusé, aucune écriture. Un lot entrant ` +
+      "ne s'ingère pas sans classe depuis le 03/09 ; le pilot s'en exemptait, et la revue du 22/09 a " +
+      "compté 8 candidatures ouvertes sans aucune classe, invisibles au compteur des classes sans juge. " +
+      `Constats : ${sansClasse.join(" · ")}`,
+  });
+}
+
 const verdict = (f) => {
   const r = spawnSync(process.execPath, [ORACLE, f], { encoding: "utf8" });
   try { return JSON.parse(r.stdout || "{}").verdict || "ILLISIBLE"; } catch { return "ILLISIBLE"; }
 };
 
+/**
+ * La clé réservée est NORMALISÉE à l'écriture, dans la forme que `ingerer-lot.mjs` écrit déjà :
+ * `classe: null` plus `classe_a_creer` {cle, famille, libelle}. Écrire la clé réservée telle
+ * quelle produirait une classe hors référentiel, et `oracle-todo` R13 la refuserait — mesuré :
+ * l'écriture partait, l'oracle la rejetait, le registre était repris à l'octet près. Les deux
+ * écrivains produisent donc la MÊME forme, ce qui est tout l'objet de cette porte.
+ */
+const normaliser = (e) => {
+  if (!e || e.ev !== "creation" || String(e.classe) !== CLE_A_CREER) return e;
+  const { classe_proposee: p, ...reste } = e;
+  return { ...reste, classe: null, classe_a_creer: { cle: p.cle, famille: p.famille, libelle: p.libelle } };
+};
+
 // Horodatages stampés, strictement croissants au sein du lot.
 let dernier = 0;
-const lignes = entrants.map((e) => {
+const lignes = entrants.map((brut) => {
+  const e = normaliser(brut);
   let t = Date.now();
   if (t <= dernier) t = dernier + 1;
   dernier = t;
