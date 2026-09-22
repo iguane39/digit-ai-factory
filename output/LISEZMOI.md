@@ -342,7 +342,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md | 20260830i | 16.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` |
 | Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md | 20260831c | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` |
 | Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md | 20260830k | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` |
-| Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md | 20260922b | 30.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` |
+| Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md | 20260922b | 30.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` |
 | Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md | 20260830l | 14.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` |
 | Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md | 20260830m | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` |
