@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 385 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 387 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -281,7 +281,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md | 20260815a | 3.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md` |
 | Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md | 20260815a | 3.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` |
-| Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Banc elargi source unique et deux lignees fusionnees - 20260917a.md | 20260917a | 22 Ko | `04-plans/Digit-AI - Synthese Mandat - Banc elargi source unique et deux lignees fusionnees - 20260917a.md` |
 | Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md | 20260907e | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` |
 | Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md | 20260830f | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` |
@@ -342,6 +342,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md | 20260830i | 16.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` |
 | Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md | 20260831c | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` |
 | Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md | 20260830k | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` |
+| Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md | 20260922c | 30.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md` |
+| Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md | 20260922b | 30.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` |
 | Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md | 20260830l | 14.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` |
@@ -439,7 +441,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md | 20260901d | 9 Ko | `04-plans/Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` |
 | Digit-AI - Synthese Mandat - Verification des deux arbitrages deja executes - 20260915b.md | 20260915b | 15.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Verification des deux arbitrages deja executes - 20260915b.md` |
 | Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md | 20260815a | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` |
-| Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md | 20260910a | 20 Ko | `04-plans/Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` |
 | Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md | 20260916d | 12 Ko | `04-plans/Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` |
 
