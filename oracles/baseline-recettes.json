@@ -258,6 +258,10 @@
   "cas": 6,
   "vu_le": "2026-08-27"
  },
+ "oracles/hook-amorcage.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-09-22"
+ },
  "oracles/hook-lexique.test.mjs": {
   "cas": 6,
   "vu_le": "2026-09-14"
@@ -317,6 +321,10 @@
  "outillage-tests-e2e/preparer-environnement.test.mjs": {
   "cas": 8,
   "vu_le": "2026-08-26"
+ },
+ "scripts/adopter-projet-existant.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-09-22"
  },
  "scripts/allouer-indice.test.mjs": {
   "cas": 9,
@@ -397,6 +405,10 @@
  "scripts/verifier-familles-mesure.mjs": {
   "cas": 11,
   "vu_le": "2026-09-15"
+ },
+ "scripts/verifier-hook-poste.test.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-22"
  },
  "scripts/verifier-hooks-git.test.mjs": {
   "cas": 6,

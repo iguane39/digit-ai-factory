@@ -10,7 +10,13 @@ humain ; C3 = le nommage daté ne s'applique jamais au code ; C4 = journaux d'or
 **versionnés** dans `forge\`.
 Application : phase 0 du prompt produit (P0), vérifications pilot (S), et l'oracle
 exécutable `oracles\oracle-conformite-projet.mjs` (O) — chaque n° de règle est un n° de finding.
-Rattrapage des projets existants : au prochain run de version de chacun.
+Rattrapage des projets existants : **par le geste nommé** `PROMPT-PRODUIT-EXISTANT.md`, dont la
+phase 0 bis est idempotente et non destructive — elle pose ce qui manque, laisse intact tout
+fichier préexistant et consigne l'écart de départ au carnet des écarts assumés du projet
+(`scripts\adopter-projet-existant.mjs`, recette à 17 cas). *Cette ligne renvoyait auparavant « au
+prochain run de version de chacun » — c'est-à-dire, pour un projet jamais instrumenté, à un run qui
+n'arrive jamais de lui-même ; il n'existait aucun geste entre « je n'ai rien » et « je repars d'un
+dossier vide »* (TF-1286, décision humaine D-2 (b) du 22/09/2026).
 
 Sources : inventaire exécuté sur 11 dépôts (6 forges, produit pilote MiniVeille, Produit-12
 — produit forge réel —, ASDMailManager, Produit-02.com, Transcript, BeefProject).

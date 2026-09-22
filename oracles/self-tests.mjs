@@ -66,6 +66,9 @@ const DEDIES = {
   "oracle-controles-injoignables.mjs": "oracle-controles-injoignables.test.mjs",
   "oracle-amorcage-poste.mjs": "oracle-amorcage-poste.test.mjs",
   "oracle-chemin-prescrit.mjs": "oracle-chemin-prescrit.test.mjs",
+  // `hook-amorcage.mjs` importe `hook-lexique.mjs`, qui lit `process.argv` à son CHARGEMENT : un
+  // `--self-test` interne partirait jouer le banc de l'importé. Forme dédiée, donc (TF-1285).
+  "hook-amorcage.mjs": "hook-amorcage.test.mjs",
 };
 
 // Un fichier de RECETTE n'est pas un oracle : le motif `oracle-*.mjs` attrapait

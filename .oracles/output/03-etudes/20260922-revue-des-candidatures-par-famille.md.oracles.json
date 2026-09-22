@@ -1,0 +1,79 @@
+{
+  "cible": "output/03-etudes/20260922-revue-des-candidatures-par-famille.md",
+  "date_iso": "2026-09-22T10:21:50.334Z",
+  "registre_version": "2.25.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+      "verdict": "PASS",
+      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; pourcentage « 54 % » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md",
+    "ts": "2026-09-22T10:21:50.333Z",
+    "fichiers": {
+      "output\\03-etudes\\20260922-revue-des-candidatures-par-famille.md": "faf34bdd9be628678b80deec4af45d59dcdea1d94502cb63e8ce18c8d5196b5e"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

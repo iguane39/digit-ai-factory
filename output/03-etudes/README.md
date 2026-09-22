@@ -99,5 +99,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260919-etude-opportunite-plan-d-amelioration-post-audit.md` | fichier | 31,2 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
 | `20260919-L99-audit-et-plan-d-amelioration-plateforme.md` | fichier | 43,3 Ko | Analyse L99 — « Un audit, et en plus un plan d'amélioration complet de la plateforme » |
 | `20260921-etude-opportunite-reseaux-sociaux-complement.md` | fichier | 26,1 Ko | Étude d'opportunité — réseaux sociaux au-delà de LinkedIn : réseaux, étapes et types d'éme |
+| `20260922-revue-des-candidatures-par-famille.md` | fichier | 11,7 Ko | Revue des candidatures du registre, par famille de défaut |
 
-_83 fichier(s), 0 sous-dossier(s)_
+_84 fichier(s), 0 sous-dossier(s)_

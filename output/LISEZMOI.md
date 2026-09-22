@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 381 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 384 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -224,6 +224,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 31.5 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
 | 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.9 Ko | `03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
 | 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.1 Ko | `03-etudes/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
+| 20260922-revue-des-candidatures-par-famille.md | — | 11.7 Ko | `03-etudes/20260922-revue-des-candidatures-par-famille.md` |
 
 ### 04-plans
 
@@ -266,6 +267,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - 4 decisions executees et etude des reseaux sociaux elargie - 20260921g.md | 20260921g | 13.5 Ko | `04-plans/Digit-AI - Synthese Mandat - 4 decisions executees et etude des reseaux sociaux elargie - 20260921g.md` |
 | Digit-AI - Synthese Mandat - 4 decisions executees et etude des reseaux sociaux elargie - 20260921g.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - 4 decisions executees et etude des reseaux sociaux elargie - 20260921g.md.jugement.json` |
 | Digit-AI - Synthese Mandat - 6 lots ingeres et 2 oracles nes de leurs classes - 20260922a.md | 20260922a | 30.1 Ko | `04-plans/Digit-AI - Synthese Mandat - 6 lots ingeres et 2 oracles nes de leurs classes - 20260922a.md` |
+| Digit-AI - Synthese Mandat - 6 lots ingeres et 2 oracles nes de leurs classes - 20260922a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - 6 lots ingeres et 2 oracles nes de leurs classes - 20260922a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md | 20260921h | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md` |
 | Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
@@ -340,6 +342,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md | 20260830i | 16.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` |
 | Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md | 20260831c | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` |
 | Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md | 20260830k | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` |
+| Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md | 20260922b | 27.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` |
 | Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md | 20260830l | 14.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` |
 | Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md | 20260830m | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` |
 | Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md | 20260907d | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md` |
