@@ -2,6 +2,13 @@
 /**
  * oracle-glossaire — la terminologie d'un projet multilingue tient sa FORME opposable.
  *
+ * C'EST LE CONTRÔLE DE **R-53** — « un projet multilingue tient un GLOSSAIRE, et toute traduction
+ * en part », section AF des règles de projet. Le lien n'était écrit nulle part
+ * jusqu'au 22/09/2026, alors que la règle et cet oracle sont nés des MÊMES lots — TF-0639 à
+ * TF-0643, 25 et 26/08. `oracle-regle-sans-juge` RJ1 comptait donc R-53 parmi les règles que rien
+ * ne joue, et il avait raison au sens strict : une règle jouée par un contrôle qui ne la nomme pas
+ * est indiscernable d'une règle abandonnée. Le nom manquait, pas le contrôle.
+ *
  * ============================================================================================
  * POURQUOI (TF-0639 à TF-0643 et TF-0637, lots des 25 et 26/08/2026)
  * ============================================================================================
