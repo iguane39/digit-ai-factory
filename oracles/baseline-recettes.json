@@ -111,6 +111,10 @@
   "cas": 7,
   "vu_le": "2026-08-26"
  },
+ "oracle-depense-voie-par-defaut.mjs": {
+  "cas": 13,
+  "vu_le": "2026-09-22"
+ },
  "oracle-domaines-declares.mjs": {
   "cas": 10,
   "vu_le": "2026-08-26"
@@ -213,7 +217,7 @@
   "vu_le": "2026-08-26"
  },
  "oracle-regle-sans-juge.mjs": {
-  "cas": 14,
+  "cas": 17,
   "vu_le": "2026-09-22"
  },
  "oracle-remise-traduction.mjs": {
@@ -261,6 +265,10 @@
  "oracle-verdict-visuel.mjs": {
   "cas": 9,
   "vu_le": "2026-09-02"
+ },
+ "oracle-verrou-unique.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-22"
  },
  "oracles/banc-defauts-echappes/banc.test.mjs": {
   "cas": 3,
@@ -322,6 +330,10 @@
   "cas": 22,
   "vu_le": "2026-09-05"
  },
+ "oracles/oracle-depense-voie-par-defaut.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-09-22"
+ },
  "oracles/oracle-invariant-mesure.test.mjs": {
   "cas": 16,
   "vu_le": "2026-09-22"
@@ -331,7 +343,11 @@
   "vu_le": "2026-08-26"
  },
  "oracles/oracle-regle-sans-juge.test.mjs": {
-  "cas": 14,
+  "cas": 17,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-verrou-unique.test.mjs": {
+  "cas": 15,
   "vu_le": "2026-09-22"
  },
  "oracles/pre-commit-quantificateurs.test.mjs": {
@@ -547,7 +563,7 @@
   "vu_le": "2026-08-31"
  },
  "todo/journaliser.test.mjs": {
-  "cas": 25,
+  "cas": 29,
   "vu_le": "2026-09-22"
  },
  "todo/localiser-produit.test.mjs": {

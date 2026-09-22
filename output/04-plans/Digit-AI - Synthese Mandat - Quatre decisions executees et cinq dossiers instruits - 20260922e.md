@@ -40,8 +40,8 @@ les éléments sous les yeux.
 Le juge des règles passe de FAIL à PASS — 56 règles déclarées, 55 nommées par un exécutable, 1
 exemptée et nommée au verdict —, 2 contrôles neufs portent 28 cas d'épreuve à double sens, la
 porte d'écriture du registre passe de 25 à 29 cas, 3 dossiers reçoivent une nature distincte de la
-classe de défaut, 5 calibrations sont mesurées sur les oracles eux-mêmes, et 1 recommandation
-fausse est retirée.
+classe de défaut, 5 calibrations sont mesurées sur les oracles eux-mêmes, 1 recommandation
+fausse est retirée, et le harnais passe de 146 à 150 contrôles dont 149 verts.
 
 ## 3. Décisions attendues de l'humain
 
@@ -347,5 +347,9 @@ produit.
 - Porte d'écriture du registre : [journaliser.mjs](todo/journaliser.mjs) — 29 cas, exit 0 ; la
   nature d'opportunité est posée en doctrine dans [TODO-FORGE.md](references/TODO-FORGE.md).
 - Registre : [TODO.jsonl](todo/TODO.jsonl) — contrôle du registre PASS.
-- Enregistrements du tour : `91abed2`, `25f3ce3`, et celui des 2 contrôles neufs.
+- Harnais complet : 150 contrôles, 149 verts ; seul rouge, le contrôle des empreintes sur le parc
+  réel, qui attend une décision humaine depuis le 17/09. Le cliquet des recettes enregistre les
+  28 cas neufs des 2 contrôles nés ce tour.
+- Enregistrements du tour : `91abed2`, `25f3ce3`, celui des 2 contrôles neufs et celui de cette
+  synthèse.
 - Remontée à la factory : sans objet — ce tour s'est joué au pilotage seul.
