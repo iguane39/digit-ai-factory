@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.20.0",
+ "version": "1.21.0",
  "date": "2026-09-22",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -1333,6 +1333,54 @@
    "voisines": [
     "controle-ecrit-non-cable-a-son-etape",
     "constat-non-bloquant-jamais-lu"
+   ]
+  },
+  {
+   "cle": "produit-instancie-a-moitie-hors-de-tout-depot",
+   "famille": "heritage-produit",
+   "libelle": "Un produit porte les SIGNES d une instanciation commencee — un dossier de retours, parfois un dossier de travail — sans avoir recu les artefacts herites du pilot, et sans etre sous aucun depot. Rien de ce qui s y fait n est suivi, versionne ni remontable : ce n est pas un produit en retard, c est un produit invisible. Le defaut se distingue de ses 2 voisines, et c est cette distinction qui a fonde la classe : la boucle de retour sans descente parle d une CORRECTION qui ne redescend pas chez un producteur qui existe, et l avertissement tardif parle du MOMENT ou l alerte arrive. Ici l avertissement a eu lieu a sa date, et il n y a personne pour le recevoir. Mesure du 24/08/2026 : sur les 3 produits localisables du poste, un porte un dossier de retours, aucun des 4 artefacts herites, et git rev-parse n y rend rien.",
+   "creee_le": "2026-09-22",
+   "fondee_par": [
+    "TF-0549"
+   ],
+   "regle": "un produit qui porte le moindre signe d instanciation est sous depot des sa naissance et a recu les artefacts herites ; a defaut il est DECLARE non instancie, et le releve d ouverture le nomme plutot que de le compter comme un produit",
+   "oracle": "pilot, oracle-conformite-projet regle R-47 (heritage present ET a jour), joue par oracles/self-test.mjs ; c est ce controle qui a produit la mesure fondatrice du 24/08/2026",
+   "voisines": [
+    "boucle-retour-sans-descente",
+    "heritage-avertissement-tardif",
+    "releve-heritage-juge-arbre-pas-histoire"
+   ]
+  },
+  {
+   "cle": "depot-sans-harnais-qui-exerce-ses-controles",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un depot porte des fichiers qui se presentent comme des CONTROLES et n a aucun harnais qui les exerce : aucune recette ne les joue, et aucun en-tete ne promet le contraire. Le defaut se distingue de la classe du controle sans fixture a double sens, et la distinction a fonde cette classe : celle-la vise UN controle et l ECART entre ce qu il promet et ce qu il tient ; ici il ne s agit pas d un controle mais d un depot entier, et rien ne promet rien. Mesure du 26/08/2026 : sur un produit, 15 fichiers sur 15 se presentent comme des controles — contraste, glossaire, liens, referencement, traductions, audit de navigateur, verification de pages — et AUCUN n est exerce par une recette ; le meme releve sur le pilot rend 39 sur 39 exerces et zero accusation. La regle est donc muette la ou la discipline existe, et elle mord ici.",
+   "creee_le": "2026-09-22",
+   "fondee_par": [
+    "TF-0682"
+   ],
+   "regle": "tout depot qui porte des controles porte le harnais qui les exerce ; un controle cite par une chaine d integration ou par une documentation, et joue par aucune recette, pourrit sans bruit",
+   "oracle": "pilot, oracles/oracle-controles-injoignables.mjs regle CI4 (tout controle est exerce par une recette, ou porte la sienne) ; c est elle qui a produit le releve des 15",
+   "voisines": [
+    "controle-sans-fixture-double-sens",
+    "controle-ecrit-non-cable-a-son-etape",
+    "regle-ecrite-sans-oracle-qui-la-joue"
+   ]
+  },
+  {
+   "cle": "famille-de-livrables-sans-repere-externe",
+   "famille": "gabarit-document",
+   "libelle": "Une famille de livrables n a aucun REPERE EXTERNE au registre des barres, et rien ne dit si c est un choix. Ses controles jugent alors sa forme et sa tracabilite — gabarit tenu, sources citees, regles de socle vertes — jamais son NIVEAU. Le precedent est mesure : une direction artistique VERTE A TOUS SES CONTROLES a ete rejetee en bloc faute d un repere exterieur auquel la situer. Le defaut se distingue de la lecture par un tiers non jugee, et la distinction a fonde cette classe : celle-la demande si un lecteur sans contexte COMPREND le livrable ; ici la question est s il est BON compare a ce qui se fait ailleurs. Mesure du 22/09/2026 : le registre ne porte aucune entree pour un livrable de communication, les mots propale, communication et marketing y rendent zero, et aucune section ne declare cette absence.",
+   "creee_le": "2026-09-22",
+   "fondee_par": [
+    "TF-1028"
+   ],
+   "regle": "le registre des reperes PUBLIE les familles de livrables qu il ne couvre pas, et pourquoi ; une machine ne peut pas decider quelle famille merite un repere, mais une absence declaree cesse d etre un oubli",
+   "oracle": "pilot, oracles/oracle-repere-externe.mjs (BR1 un repere ok porte sa validation datee, BR2 un reservoir reste en todo, BR3 le registre publie ce qu il ne couvre pas) — recette a double sens oracles/oracle-repere-externe.test.mjs, 13 cas ; il rend ROUGE sur BR3 au jour de sa naissance, sur le cas fondateur lui-meme",
+   "voisines": [
+    "lecture-tiers-non-jugee",
+    "auteur-juge-son-contrat",
+    "gabarit-conception-non-jugee"
    ]
   }
  ],

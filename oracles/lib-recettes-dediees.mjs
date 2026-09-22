@@ -34,4 +34,7 @@ export const DEDIES = {
   // les précédents : leurs fixtures écrivent à dessein le défaut que l'oracle refuse.
   "oracle-depense-voie-par-defaut.mjs": "oracle-depense-voie-par-defaut.test.mjs",
   "oracle-verrou-unique.mjs": "oracle-verrou-unique.test.mjs",
+  // Né de la décision humaine D-15 (a) du 22/09/2026, qui a tranché l'ordre : le contrôle
+  // D'ABORD, la classe ensuite. Le cliquet R15 refuse une classe neuve sans juge existant.
+  "oracle-repere-externe.mjs": "oracle-repere-externe.test.mjs",
 };
