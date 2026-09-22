@@ -19,8 +19,8 @@
   "vu_le": "2026-08-26"
  },
  "./bootstrap.test.mjs": {
-  "cas": 15,
-  "vu_le": "2026-09-17"
+  "cas": 17,
+  "vu_le": "2026-09-22"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
   "cas": 31,
@@ -50,6 +50,10 @@
   "cas": 12,
   "vu_le": "2026-08-26"
  },
+ "oracle-amorcage-poste.mjs": {
+  "cas": 23,
+  "vu_le": "2026-09-22"
+ },
  "oracle-boite-entree.mjs": {
   "cas": 39,
   "vu_le": "2026-09-19"
@@ -70,6 +74,10 @@
  "oracle-catalogues.mjs": {
   "cas": 5,
   "vu_le": "2026-08-27"
+ },
+ "oracle-chemin-prescrit.mjs": {
+  "cas": 24,
+  "vu_le": "2026-09-22"
  },
  "oracle-claude-md.mjs": {
   "cas": 14,
@@ -273,6 +281,14 @@
  "oracles/lib-sens-rouge.test.mjs": {
   "cas": 15,
   "vu_le": "2026-09-20"
+ },
+ "oracles/oracle-amorcage-poste.test.mjs": {
+  "cas": 23,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-chemin-prescrit.test.mjs": {
+  "cas": 24,
+  "vu_le": "2026-09-22"
  },
  "oracles/oracle-controles-injoignables.test.mjs": {
   "cas": 22,

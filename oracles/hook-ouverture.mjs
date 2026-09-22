@@ -352,6 +352,50 @@ if (iPilot < 0) {
   }
 }
 
+// TF-1285 / TF-1282 (22/09/2026) — LES DEUX CONSTATS NÉS DES LOTS DU 21-22/09 SE LISENT ICI, et
+// nulle part ailleurs. Le premier juge le POSTE : un point d'entrée installé par le geste qu'il est
+// censé déclencher n'existe pas (loi n° 1). Le second juge les PRESCRIPTIONS du dépôt : une commande
+// mise devant un producteur résout, ses options existent, et la recette les a jouées.
+//
+// POURQUOI ICI et pas à un hameçon bloquant : les deux rendent des CONSTATS que le pilot ne peut
+// pas toujours réparer seul — installer un hook au poste et propager un skill d'accueil sont des
+// gestes de `bootstrap.mjs`, décidés par l'humain (R-29). Un contrôle câblé à un hameçon qui
+// n'affiche qu'en cas de blocage rend un échec que personne ne lit : c'est exactement la classe
+// `constat-non-bloquant-jamais-lu`, mesurée le 14/09, et la raison pour laquelle la section
+// « Secrets hors périmètre » ci-dessus vit ici plutôt qu'au hook Stop.
+//
+// L'amorçage se dit MÊME hors du pilot : le poste est le poste, quelle que soit la racine ouverte.
+{
+  const oa = join(PILOT, "oracles", "oracle-amorcage-poste.mjs");
+  if (existsSync(oa)) {
+    lignes.push("", "## Amorçage au poste (TF-1285, classe amorcage-factory-sans-declencheur-au-poste)");
+    const r = spawnSync(process.execPath, [oa, "--json"], { encoding: "utf8", timeout: 60000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur le poste : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else if (j.verdict === "SANS_OBJET") lignes.push(`- sans objet — ${(j.findings || [])[0]?.message?.slice(0, 200) || "aucun poste à juger"}`);
+    else if (j.verdict === "PASS") lignes.push("- le poste porte l'entrée du dispositif : skill d'accueil propagé et hook UserPromptSubmit de portée poste.");
+    else {
+      for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) lignes.push(`- **${f.regle} — ${String(f.message).split(". Remède")[0].slice(0, 320)}**`);
+      lignes.push("- À DÉCIDER (geste humain, R-29) : faire propager par `bootstrap.mjs` un skill d'accueil et installer le hook `UserPromptSubmit` au poste en fusion non destructive ; détail : node oracles/oracle-amorcage-poste.mjs");
+    }
+  }
+}
+
+if (iPilot < 0) {
+  const oc = join(PILOT, "oracles", "oracle-chemin-prescrit.mjs");
+  if (existsSync(oc)) {
+    lignes.push("", "## Chemins d'usage prescrits par les documents (TF-1282)");
+    const r = spawnSync(process.execPath, [oc, PILOT, "--json"], { encoding: "utf8", cwd: PILOT, timeout: 90000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur les prescriptions : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else if (j.verdict === "PASS") lignes.push(`- ${j.jugeables ?? "?"} prescription(s) jugée(s) : toutes résolvent, leurs options existent et la recette les joue.`);
+    else if (j.verdict === "SANS_OBJET") lignes.push("- sans objet — aucun document ne prescrit de commande.");
+    else for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) lignes.push(`- **${f.regle} — ${String(f.message).slice(0, 320)}**`);
+  }
+}
+
 // TF-0790 (décision D-2 (a), 03/09/2026) — LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI
 // L'INVOQUE. forge-observability le dit elle-même : « la cadence est documentaire en v0 ». Sans
 // invocateur, le plan des récidives serait une intention de plus (N-1). L'ouverture du pilot joue

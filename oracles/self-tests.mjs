@@ -64,6 +64,8 @@ const DEDIES = {
   "oracle-ecosysteme.mjs": "self-test-ecosysteme.mjs",
   "oracle-parite-configuration.mjs": "oracle-parite-configuration.test.mjs",
   "oracle-controles-injoignables.mjs": "oracle-controles-injoignables.test.mjs",
+  "oracle-amorcage-poste.mjs": "oracle-amorcage-poste.test.mjs",
+  "oracle-chemin-prescrit.mjs": "oracle-chemin-prescrit.test.mjs",
 };
 
 // Un fichier de RECETTE n'est pas un oracle : le motif `oracle-*.mjs` attrapait

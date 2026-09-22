@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.17.0",
- "date": "2026-09-16",
+ "version": "1.18.0",
+ "date": "2026-09-22",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -1290,6 +1290,34 @@
     "lecture-tiers-non-jugee",
     "restitution-forme-bloc-3",
     "annonce-nominalisee"
+   ]
+  },
+  {
+   "cle": "oracle-chemin-prescrit-inoperant-sur-sa-cible",
+   "famille": "contrat-interface-forge",
+   "libelle": "Le chemin d usage PRESCRIT par un oracle pour produire sa matiere echoue sur la cible meme qu il nomme, et son message d echec prescrit un remede sans effet : l auteur de bonne foi fabrique un contournement pour obeir, et ce contournement n est pas le livrable. Mesure le 21/09/2026 chez Produit-64 : les options --sections et --selector de la capture prescrite par le socle page HTML rendent TimeoutError et aucune image sur un panneau masque, et la capture de page est perdue au passage, alors que ce geste est celui que le socle prescrit pour la revue de lecture obligatoire. Source : lot Produit-64 - RETOURS - 20260921b, retour rattache TF-1282",
+   "creee_le": "2026-09-22",
+   "fondee_par": [],
+   "regle": "tout chemin d usage prescrit par un oracle ou un socle est joue, dans sa recette, sur la cible qu il nomme — un panneau masque compris ; et le remede propose par un message d echec porte, au meme banc, un cas qui le joue et qui PASSE",
+   "oracle": "pilot, oracles/oracle-chemin-prescrit.mjs (CP1, CP2, CP3) — recette a double sens oracles/oracle-chemin-prescrit.test.mjs, 24 cas ; lu au releve d ouverture",
+   "voisines": [
+    "exemption-hors-atteinte-par-le-chemin-prescrit",
+    "regle-qui-interdit-son-propre-remede",
+    "controle-joue-sur-fichier-pas-sur-instance-servie"
+   ]
+  },
+  {
+   "cle": "amorcage-factory-sans-declencheur-au-poste",
+   "famille": "hook-ou-gate",
+   "libelle": "Le point d entree d un dispositif n existe qu en portee PRODUIT et n est pose qu a l ouverture du run : le declencheur est installe par le geste qu il est cense declencher. Une session qui nomme le dispositif, sur un poste ou il est pourtant installe, n enclenche rien. Mesure du poste le 22/09/2026 : 30 skills propages vers ~/.claude/skills dont AUCUN ne porte le protocole d accueil, AUCUN settings.json au poste donc aucun hook UserPromptSubmit, factory presente dans le dossier parent et jamais cherchee, un livrable produit hors output/ sans ledger ni oracle. Couvre aussi l absence de geste nomme pour un projet EXISTANT qui adopte le dispositif. Source : lot Produit-67 - RETOURS - 20260922a, retours rattaches TF-1285 et TF-1286",
+   "creee_le": "2026-09-22",
+   "fondee_par": [],
+   "regle": "le point d entree d un dispositif est porte par un canal AMBIANT qui existe avant le premier geste — skill propage, hook de portee poste — et jamais par un artefact que le geste d ouverture installe ; un projet DEJA existant a son geste d adoption nomme, idempotent et non destructif",
+   "oracle": "pilot, oracles/oracle-amorcage-poste.mjs (AP1, AP2, AP3) — recette a double sens oracles/oracle-amorcage-poste.test.mjs, 23 cas ; lu au releve d ouverture, non bloquant (classe constat-non-bloquant-jamais-lu)",
+   "voisines": [
+    "skill-non-invoque-lexique",
+    "controle-ecrit-non-cable-a-son-etape",
+    "constat-non-bloquant-jamais-lu"
    ]
   }
  ],
