@@ -59,17 +59,10 @@ import { confronterSensRouge } from "./lib-sens-rouge.mjs";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
 // Oracles couverts par un fichier de recette dédié plutôt que par `--self-test`.
-const DEDIES = {
-  "oracle-conformite-projet.mjs": "self-test.mjs",
-  "oracle-ecosysteme.mjs": "self-test-ecosysteme.mjs",
-  "oracle-parite-configuration.mjs": "oracle-parite-configuration.test.mjs",
-  "oracle-controles-injoignables.mjs": "oracle-controles-injoignables.test.mjs",
-  "oracle-amorcage-poste.mjs": "oracle-amorcage-poste.test.mjs",
-  "oracle-chemin-prescrit.mjs": "oracle-chemin-prescrit.test.mjs",
-  // `hook-amorcage.mjs` importe `hook-lexique.mjs`, qui lit `process.argv` à son CHARGEMENT : un
-  // `--self-test` interne partirait jouer le banc de l'importé. Forme dédiée, donc (TF-1285).
-  "hook-amorcage.mjs": "hook-amorcage.test.mjs",
-};
+// La table des recettes dediees vit dans `lib-recettes-dediees.mjs` depuis le 22/09/2026 :
+// `oracle-banc-double-sens.mjs` en a besoin pour ne pas accuser un controle d'etre sans banc la
+// ou le harnais sait ou est le sien, et deux tables auraient diverge au premier ajout.
+import { DEDIES } from "./lib-recettes-dediees.mjs";
 
 // Un fichier de RECETTE n'est pas un oracle : le motif `oracle-*.mjs` attrapait
 // `oracle-parite-configuration.test.mjs` et exigeait de lui sa propre recette — une regression
