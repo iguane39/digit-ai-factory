@@ -929,7 +929,7 @@ actions. Aucune n'avait d'exécutant : le pilot n'avait pas un seul hook.
 Un gate qui ne peut pas jouer (pilot absent du poste, transcript illisible) le DIT et
 laisse passer — jamais en silence, jamais en bloquant le produit.
 
-## Y. Un artefact hérité du pilot est présent ET à jour (règle 47 — 23/08, mandat humain)
+## Y. R-47 — un artefact hérité du pilot est présent ET à jour (23/08, mandat humain)
 
 **Le constat.** 2 produits en 3 jours, quinze candidatures refusées à la porte pour une
 forme que le produit ne pouvait pas connaître. `Produit-02` possède un `forge\retours\`
@@ -1145,7 +1145,15 @@ dont le contrôle ne vérifiait que le dossier.
 GABARIT du pilot lui-même est reconnu comme vide et non comme un contrat). Un produit sans le fichier
 rend **SANS_OBJET** : le contrat s'instaure, il ne se réclame pas rétroactivement.
 
-## AE. R-52 — une sonde mesure sur le canal REEL de son destinataire (TF-0585 — 25/08)
+## AE bis. R-56 — une sonde mesure sur le canal REEL de son destinataire (TF-0585 — 25/08)
+
+> **Renumérotée le 22/09/2026, décision humaine D-9 (a).** Cette règle portait le numéro 52, déjà
+> pris par « une doctrine opposable NOMME ses consommateurs » écrite la veille. Le même numéro
+> désignait donc DEUX règles, à 178 lignes d'écart, et un verdict qui citait « R-52 » ne disait pas
+> laquelle il opposait. Le défaut a été trouvé par `oracle-regle-sans-juge` RJ3 à sa première
+> exécution. Aucun fichier exécutable du dépôt ne jouait l'une ou l'autre : la renumérotation ne
+> casse aucune citation, et elle est faite dans le sens qui préserve l'antériorité — la plus
+> ancienne des deux garde son numéro.
 
 **Le fait, et il a ete presente comme une preuve.** Le 23/08, un tableau de 8 lignes a ete
 publie a un exploitant, avec des coches vertes, affirmant que quatre domaines convergeaient vers
@@ -1348,3 +1356,46 @@ les forges, seuls les résultats des modifications sont remontés à l'humain. �
 
 Contrôle exécutable : aucun à ce jour — limite assumée. Une restitution qui pose en bloc 3 une
 question de mandat d'écriture chez une forge est un défaut de rédaction, à remonter au registre.
+
+## AJ. R-19 — les versions des forges mobilisées sont inscrites au ledger (06-10/08 ; texte RECONSTITUÉ le 22/09/2026)
+
+**Pourquoi ce texte est écrit aujourd'hui alors que la règle est d'août.** `oracle-regle-sans-juge`,
+né le 22/09/2026 de la décision humaine D-5 (a), a mesuré l'écart entre le corpus opposable et le
+code : **R-19.** est OPPOSÉE par trois fichiers exécutables du dépôt et n'était DÉCLARÉE nulle part.
+Le noyau la cite — « versions au ledger (R-19) » — mais une citation n'est pas une déclaration : le
+producteur à qui on l'oppose n'avait aucun texte à lire, donc rien à contester ni à appliquer par
+avance. Le texte ci-dessous est reconstitué **des contrôles qui la jouent**, nommés à la ligne, et
+non de mémoire ; il ne l'étend pas et ne l'assouplit pas.
+
+**R-19.**
+Tout run inscrit au ledger la **version de chaque forge mobilisée**, sous la clé
+`versions_forges`. Les clés portent le **nom de dépôt COMPLET** (`digit-ai-forge-design`, jamais
+`design`) — cette forme a été fixée par TF-0320 après qu'un nom court eut rendu deux forges
+indiscernables. La règle se lit avec celle de la fraîcheur (R-44) : l'amorçage rapproche les
+versions du poste de celles du parc, et le ledger garde ce qui a RÉELLEMENT servi au run. Un ledger
+sans `versions_forges` rend un run non reproductible : on sait ce qui a été produit, jamais avec
+quoi.
+
+*Sources de la reconstitution, toutes exécutables.* `oracles\hook-ouverture.mjs` — « Poste NON
+prêt : appliquer les remèdes ci-dessus AVANT tout run (règle Fraîcheur, R-19) » ;
+`oracles\oracle-conformite-projet.mjs` — inventaire « 29 règles — R-1..R-19 du 06-10/08 » ;
+`oracles\self-test.mjs` — « R-19 gagne la FORME des clés `versions_forges` (TF-0320) : noms de dépôt
+COMPLETS, jugés ».
+
+Contrôle exécutable : `oracle-conformite-projet` R-19, joué par `oracles\self-test.mjs`.
+
+## AK. R-99 — numéro RÉSERVÉ : il ne désigne aucune règle, il désigne leur ABSENCE
+
+**Le fait.** `R-99` est employé par quatre fichiers exécutables du dépôt comme une **sentinelle** —
+`controle: "R-99 / nulle part"` dans la couverture des exigences, `--regles R-99` pour forcer un
+passage sans aucune règle applicable. Ce n'est donc pas une règle non écrite : c'est un marqueur qui
+dit « aucune règle ne couvre ce point ». Faute d'être déclaré, il était lu comme une règle opposée
+au producteur et introuvable au corpus.
+
+**R-99.**
+Le numéro 99 est **réservé** et ne sera jamais attribué à une règle. Un contrôle qui le
+rend déclare que **rien ne couvre** le point mesuré ; un contrôle qui le rend là où une règle existe
+est un défaut, parce qu'il fait passer une couverture réelle pour une absence.
+
+Contrôle exécutable : `oracle-regle-sans-juge` RJ2, qui accepte ce numéro depuis qu'il est déclaré
+ici et continue de refuser tout autre numéro opposé par du code et absent du corpus.
