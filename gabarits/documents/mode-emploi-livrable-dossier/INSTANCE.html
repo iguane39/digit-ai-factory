@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<!-- viewport-fit=cover (M3 d'oracle-mobile) : sans lui les env(safe-area-inset-*) valent 0. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="destinataire" content="humain">
+<script>
+(function () {
+  var stocke = null;
+  try { stocke = localStorage.getItem('digitai-theme'); } catch (e) {}
+  var theme = stocke === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  var meta = document.querySelector('meta[name="color-scheme"]');
+  if (meta) { meta.setAttribute('content', theme); }
+})();
+</script>
+  <!--
+  INSTANCE — Mode d'emploi d'un livrable-dossier · preuve que le squelette de cette famille
+  a été REMPLI une fois (G1/G2). Le client, le produit, les identifiants de décision et les
+  dates sont FICTIFS et pseudonymisés (Client-A) ; le dossier décrit n'existe pas. La
+  section 2 rejoue en modèle réduit le cas RF-18 du 16/09/2026.
+-->
+<title>Modèle décisionnel « Production et ventes » · Mode d'emploi — 20260920a</title>
+  <meta name="description" content="Mode d'emploi du dossier remis à Client-A : point d'entrée, choix d'architecture rattachés à leurs décisions au ledger, contenu, prérequis et limites.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root:has(table th:nth-child(7)) { --w: clamp(85vw, 2100px, 96vw); }
+    :root {
+      --blue: #2563EB;
+      --bg: #FAFBFF;
+      --surface: #FFFFFF;
+      --card: #FFFFFF;
+      --focus-anneau: 2px solid var(--blue);
+      --focus-decalage: 2px;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --faint: #94A3B8;
+      --line: #E6EAF2;
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      --r: 12px; --r-sm: 8px;
+      --w: clamp(75vw, 1680px, 92vw); --prose: 75ch;
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      --annee-ref: "2026";
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
+      --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
+      --blue: #7DA2F5;
+      --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
+      --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
+      --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+      line-height: 1.55; font-size: 16px; }
+    .wrap { max-width: var(--w); margin: 0 auto; padding: 32px 24px 64px; }
+    .chap.lire { max-width: 1080px; margin-left: auto; margin-right: auto; }
+    .chap.duo { display: grid; grid-template-columns: 7fr 5fr; gap: 32px; align-items: start; }
+    @media (max-width: 1100px) { .chap.duo { grid-template-columns: 1fr; } }
+
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .5em; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin: 1.5em 0 .4em; }
+    p, li { margin: 0 0 1em; }
+    a { color: var(--blue); }
+    code, pre { font-family: var(--mono); }
+
+    header.doc { border-bottom: 2px solid var(--blue); padding-bottom: 16px; margin-bottom: 24px; }
+    .eyebrow { color: var(--muted); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
+    .muted { color: var(--muted); }
+
+    .theme-toggle { appearance: none; border: 1px solid var(--line); background: var(--surface);
+      color: var(--ink); border-radius: 999px; width: 36px; height: 36px; flex: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; }
+    .theme-toggle:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+      padding: 20px 24px; margin: 16px 0; }
+
+    .entete-texte, .tete { max-width: 1080px; }
+    .tete { margin-left: auto; margin-right: auto; }
+    .tete > * + * { margin-top: 24px; }
+    .doc-intro { margin: 0; }
+
+    .refs { border: 1px solid var(--line); border-left: 1px solid var(--blue);
+      background: var(--surface); border-radius: var(--r-sm); padding: 12px 16px; }
+    .refs dl { margin: 0; display: grid; grid-template-columns: minmax(10ch, 18%) 1fr; gap: 8px 16px; }
+    .refs dt { color: var(--muted); font-weight: 700; }
+    .refs dd { margin: 0; }
+    @media (max-width: 640px) { .refs dl { grid-template-columns: 1fr; gap: 4px 0; }
+      .refs dd { margin: 0 0 .6em; } }
+
+    .entree { border: 1px solid var(--teal); background: var(--teal-fill);
+      border-radius: var(--r-sm); padding: 16px 20px; margin: 20px 0; }
+    .entree p { margin: 0; }
+
+    /* Texte à l'encre --ink : --amber sur --amber-fill mesure 3,07:1, sous le seuil WCAG
+       de 4,5:1. L'accent vit dans le filet. */
+    .limite { border: 1px solid var(--amber); background: var(--amber-fill);
+      border-radius: var(--r-sm); padding: 16px 20px; margin: 20px 0; }
+    .limite p:last-child { margin-bottom: 0; }
+
+    footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 640px) { .wrap { padding: 24px 16px 48px; } h1 { font-size: 1.6rem; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+
+    /* ── Impression — un LISEZMOI s'imprime pour être lu à côté de l'écran ──── */
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      :root, :root[data-theme="dark"] {
+        --bg:#FFFFFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
+        --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2; --blue:#2563EB;
+        --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
+        --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
+        --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+      }
+      body { background: var(--surface); font-size: 11pt; }
+      .wrap { max-width: none; padding: 0; }
+      .chap.lire, .tete, .entete-texte { max-width: none; }
+      .card { break-inside: avoid; page-break-inside: avoid; }
+      nav.toc, .theme-toggle { display: none; }
+      .doc-grille { display: block; }
+      section, .refs, .entree, .limite, tr { break-inside: avoid; page-break-inside: avoid; }
+      h2 { break-after: avoid; page-break-after: avoid; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+      a[href^="#"]::after { content: none; }
+    }
+
+    /* ── D3 · repli des tableaux en cartes ──────────────────────────────────── */
+    caption { text-align: left; font-weight: 700; padding: 0 0 8px; }
+    .table-hote { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-weight: 700; }
+    @media (max-width: 1400px) {
+      .table-hote:has(th:nth-child(7)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 1020px) {
+      .table-hote:has(th:nth-child(5)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 900px) {
+      .table-hote { overflow-x: visible; }
+      table.repli-cartes thead { display: none; }
+      table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; }
+      table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+      table.repli-cartes td[data-label=""]::before { content: none; }
+    }
+
+    /* ── D4 · état vide ─────────────────────────────────────────────────────── */
+    .etat-vide { display: none; padding: 16px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
+    .table-hote[data-vide="oui"] table { display: none; }
+    .table-hote[data-vide="oui"] .etat-vide { display: block; }
+
+    /* ── Sommaire (L6, L25) ─────────────────────────────────────────────────── */
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
+    .toc ol, .toc ul { columns: 2; column-gap: 32px; padding-left: 20px; margin: 0; }
+    .toc li { break-inside: avoid; max-width: none; margin-bottom: .6em; }
+    .toc a { text-decoration: none; }
+    .toc summary { font-family: var(--head); font-weight: 700; font-size: 1.05rem;
+      cursor: pointer; padding: 4px 0; margin: 0 0 .4em; }
+    .toc summary:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .ch-apprend { color: var(--muted); margin: .2em 0 1.1em; }
+
+    .doc-grille { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .doc-grille > nav.toc { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; margin: 0; padding: 16px 20px; }
+    .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
+    .doc-grille > .doc-corps { min-width: 0; }
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      .doc-grille > nav.toc { position: sticky; top: env(safe-area-inset-top, 0px);
+        z-index: 5; max-height: 60vh; margin: 0 0 16px; border-radius: 0 0 12px 12px;
+        padding-top: 8px; padding-bottom: 8px;
+        padding-left: calc(16px + env(safe-area-inset-left, 0px));
+        padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
+    }
+    @media (orientation: landscape) and (max-height: 520px) {
+      .doc-grille > nav.toc { max-height: 40vh; }
+      .wrap { padding-top: 16px; padding-bottom: 32px; }
+    }
+    .toc .toc-t { display: block; text-decoration: underline; }
+    .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
+  </style>
+</head>
+<body data-largeur="lecture">
+  <div class="wrap">
+    <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div class="entete-texte" data-mesure-lecture>
+        <p class="eyebrow">Client-A · Mode d'emploi du livrable</p>
+        <h1>Mode d'emploi — modèle décisionnel « Production et ventes »</h1>
+        <p class="muted">Version de l'artefact : paquet v2.1.0, horodaté du 19/09/2026 · Indice 20260920a<br>Gabarit : gd-mode-emploi-dossier · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button"
+              aria-label="Bascule thème sombre" aria-pressed="false">
+        <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+        </svg>
+        <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="4.5"/>
+          <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <div class="tete" data-mesure-lecture>
+
+      <div class="card doc-intro">
+        <p><strong>Instance de démonstration de la famille.</strong> Le client, le produit, les
+        identifiants de décision et les dates sont <strong>fictifs et pseudonymisés</strong>
+        (Client-A) ; le dossier décrit n'existe pas. Ce document prouve une <em>forme</em> — et
+        en particulier sa section 2, qui rejoue en modèle réduit le cas RF-18 du 16/09/2026 : un
+        commanditaire dénonçant comme un défaut les quatre tables de faits qui appliquaient sa
+        propre décision, tranchée neuf jours plus tôt.</p>
+      </div>
+
+      <div class="refs">
+        <dl>
+          <dt>Livrable</dt>
+          <dd>Dossier <code>modele-production-ventes/</code></dd>
+          <dt>Ledger</dt>
+          <dd><code>forge\ledger.jsonl</code> — source des décisions citées en section 2, qui les rend vérifiables</dd>
+          <dt>Destiné à</dt>
+          <dd>Le commanditaire de Client-A, qui recette le modèle et décide de sa mise à disposition aux contrôleurs de gestion</dd>
+        </dl>
+      </div>
+      </div><!-- /.tete -->
+
+      <div class="doc-grille">
+      <nav class="toc" aria-label="Sommaire">
+        <details open>
+          <summary>Sommaire</summary>
+          <ol>
+            <li><a href="#tenez"><span class="toc-t">Ce que vous tenez</span><span class="toc-d">et par où commencer</span></a></li>
+            <li><a href="#choix"><span class="toc-t">Choix d'architecture et décisions qui les fondent</span><span class="toc-d">pourquoi c'est fait ainsi</span></a></li>
+            <li><a href="#contenu"><span class="toc-t">Le contenu du dossier</span><span class="toc-d">répertoire par répertoire</span></a></li>
+            <li><a href="#prerequis"><span class="toc-t">Ce qu'il faut pour s'en servir</span><span class="toc-d">et comment le constater</span></a></li>
+            <li><a href="#limites"><span class="toc-t">Limites connues</span><span class="toc-d">ce qui n'est pas dans ce dossier</span></a></li>
+            <li><a href="#contact"><span class="toc-t">À qui s'adresser</span><span class="toc-d">et quoi recueillir avant de signaler</span></a></li>
+          </ol>
+        </details>
+      </nav>
+      <div class="doc-corps">
+
+      <section class="chap lire" id="tenez">
+        <h2>Ce que vous tenez, et par où commencer</h2>
+        <p class="ch-apprend">Ce chapitre dit ce que contient le dossier, à qui il s'adresse et quel fichier ouvrir en premier — le lecteur y apprend par où entrer plutôt que de parcourir au hasard.</p>
+        <p>Vous tenez le modèle décisionnel « Production et ventes » de Client-A : un modèle
+           sémantique, ses quatre tables de faits, ses neuf dimensions conformes, et les scripts
+           qui alimentent la couche Gold depuis l'entrepôt. Le dossier est destiné au
+           <strong>commanditaire et aux contrôleurs de gestion</strong> qui vont l'utiliser, et
+           suppose connus les indicateurs du comité de direction — il ne suppose aucune
+           compétence en modélisation.</p>
+        <div class="entree">
+          <p><strong>Point d'entrée :</strong> ouvrir <code>rapports/Production-et-ventes.pbix</code>.
+             Tout le reste du dossier sert ce fichier ; aucun autre n'est à ouvrir pour une
+             première lecture.</p>
+        </div>
+        <p class="muted">Un fichier <dfn>PBIX</dfn> est le classeur de l'outil de rapport : il
+          contient à la fois le modèle de données et les pages que vous voyez à l'écran. Il
+          s'ouvre depuis l'outil, jamais depuis un tableur.</p>
+      </section>
+
+      <section class="chap lire" id="choix">
+        <h2>Choix d'architecture et décisions qui les fondent</h2>
+        <p class="ch-apprend">Ce chapitre rattache chaque choix que vous allez rencontrer dans le dossier à la décision qui le fonde — le lecteur y apprend pourquoi ce qu'il voit est fait ainsi, et cesse de prendre un arbitrage pour un défaut.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Choix rencontrés dans le dossier, et décisions qui les fondent</caption>
+            <thead><tr><th scope="col">Choix</th><th scope="col">La décision</th><th scope="col">Qui l'a prise</th><th scope="col">Quand</th><th scope="col">Pourquoi — ce que cela apporte au lecteur</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Choix"><strong>Quatre tables de faits</strong> et non une seule</td>
+                <td data-label="La décision">Séparer les faits par processus métier : production, ventes, stocks, retours</td>
+                <td data-label="Qui l'a prise"><strong>Le commanditaire</strong>, en comité de modélisation</td>
+                <td data-label="Quand">2026-09-07</td>
+                <td data-label="Pourquoi — ce que cela apporte au lecteur">Chaque processus a sa propre granularité et son propre calendrier de disponibilité. Une table unique aurait obligé à porter des mesures nulles sur les trois quarts des lignes, et un écart de stock aurait été impossible à distinguer d'un retour. Les quatre tables partagent les mêmes dimensions : un filtre posé une fois vaut pour les quatre.</td>
+              </tr>
+              <tr>
+                <td data-label="Choix">Pas de vue matérialisée sur les agrégats mensuels</td>
+                <td data-label="La décision">Calculer les agrégats à la volée dans le modèle sémantique</td>
+                <td data-label="Qui l'a prise">Architecte de données du produit</td>
+                <td data-label="Quand">2026-09-09</td>
+                <td data-label="Pourquoi — ce que cela apporte au lecteur">Les volumes mesurés restent sous le seuil où la matérialisation apporte quelque chose. Vous gagnez la fraîcheur : un correctif passé dans l'entrepôt se voit au rafraîchissement suivant, sans chaîne intermédiaire à relancer.</td>
+              </tr>
+              <tr>
+                <td data-label="Choix">Dimension temps commençant en 2023 et non en 2019</td>
+                <td data-label="La décision">Borner l'historique à 36 mois glissants</td>
+                <td data-label="Qui l'a prise"><strong>Le commanditaire</strong></td>
+                <td data-label="Quand">2026-08-28</td>
+                <td data-label="Pourquoi — ce que cela apporte au lecteur">Les données antérieures à 2023 proviennent de l'ancien système de production et ne sont pas réconciliées. Les inclure aurait fait apparaître des ruptures de série que personne n'aurait pu expliquer en comité. La borne se relève quand la reprise d'historique sera faite.</td>
+              </tr>
+              <tr>
+                <td data-label="Choix">Deux fichiers de rapport et non un seul</td>
+                <td data-label="La décision">Séparer le rapport de pilotage du rapport d'analyse détaillée</td>
+                <td data-label="Qui l'a prise">Responsable du contrôle de gestion, sur proposition du produit</td>
+                <td data-label="Quand">2026-09-11</td>
+                <td data-label="Pourquoi — ce que cela apporte au lecteur">Le rapport de pilotage s'ouvre rapidement parce qu'il ne charge pas les détails ligne à ligne. L'analyse détaillée reste disponible, dans son propre fichier, pour qui en a besoin.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun choix d'architecture n'a fait l'objet d'un arbitrage ; le dossier suit les conventions par défaut du référentiel.</p>
+        </div>
+        <p><strong>Références au ledger.</strong> Décisions <code>DEC-2026-09-07-a</code> (quatre
+           tables de faits), <code>DEC-2026-09-09-b</code> (agrégats à la volée),
+           <code>DEC-2026-08-28-a</code> (borne d'historique) et <code>DEC-2026-09-11-c</code>
+           (séparation des rapports), toutes relisibles dans <code>forge\ledger.jsonl</code> aux
+           entrées <code>type: decision</code> correspondantes.</p>
+        <p class="muted">Ces décisions ne sont pas rouvertes ici : cette section les rend
+          retrouvables à l'endroit où vous rencontrez leur effet. Une décision que vous
+          souhaitez changer se rouvre au ledger, par la voie du comité, et non dans ce mode
+          d'emploi.</p>
+      </section>
+
+      <section class="chap lire" id="contenu">
+        <h2>Le contenu du dossier, répertoire par répertoire</h2>
+        <p class="ch-apprend">Ce chapitre dit ce qu'on trouve dans chaque répertoire et ce qu'on en fait — le lecteur y apprend lequel ouvrir pour sa question, ce qu'une simple arborescence ne lui donnerait pas.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Répertoires, contenu et moment d'usage</caption>
+            <thead><tr><th scope="col">Répertoire</th><th scope="col">Ce que c'est</th><th scope="col">Quand l'ouvrir</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Répertoire"><code>rapports/</code></td>
+                <td data-label="Ce que c'est">Les deux fichiers de rapport : pilotage et analyse détaillée</td>
+                <td data-label="Quand l'ouvrir">Vous voulez voir les chiffres. C'est le point d'entrée</td>
+              </tr>
+              <tr>
+                <td data-label="Répertoire"><code>modele/</code></td>
+                <td data-label="Ce que c'est">Le modèle dimensionnel déclaré et sa matrice en bus</td>
+                <td data-label="Quand l'ouvrir">Vous vous demandez quelles dimensions filtrent quel fait, ou quelle est la granularité d'une table</td>
+              </tr>
+              <tr>
+                <td data-label="Répertoire"><code>sql/</code></td>
+                <td data-label="Ce que c'est">Les requêtes qui construisent la couche Gold depuis l'entrepôt</td>
+                <td data-label="Quand l'ouvrir">Un chiffre vous surprend et vous voulez remonter à sa source</td>
+              </tr>
+              <tr>
+                <td data-label="Répertoire"><code>controles/</code></td>
+                <td data-label="Ce que c'est">Les jeux de contrôle de qualité et leurs derniers verdicts</td>
+                <td data-label="Quand l'ouvrir">Vous voulez savoir ce qui a été vérifié, et ce qui ne l'a pas été</td>
+              </tr>
+              <tr>
+                <td data-label="Répertoire"><code>exports/</code></td>
+                <td data-label="Ce que c'est">Les extraits plats livrés à la demande du contrôle de gestion</td>
+                <td data-label="Quand l'ouvrir">Un outil tiers doit consommer les données sans passer par le rapport</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun répertoire décrit — une liste de noms n'apprend rien, et sans elle le dossier se parcourt au hasard.</p>
+        </div>
+      </section>
+
+      <section class="chap lire" id="prerequis">
+        <h2>Ce qu'il faut pour s'en servir</h2>
+        <p class="ch-apprend">Ce chapitre donne les prérequis réels et la manière de constater qu'on les a — le lecteur y apprend ce qui bloquera son premier essai, avant de le tenter.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Prérequis et moyen de les constater</caption>
+            <thead><tr><th scope="col">Prérequis</th><th scope="col">Comment vérifier qu'on l'a</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Prérequis">Outil de rapport, version 2026.08 ou ultérieure</td>
+                <td data-label="Comment vérifier qu'on l'a">Menu Aide, « À propos » : la version s'affiche</td>
+              </tr>
+              <tr>
+                <td data-label="Prérequis">Droit de lecture sur le schéma <code>gold_production</code> de l'entrepôt</td>
+                <td data-label="Comment vérifier qu'on l'a">Ouvrir le rapport de pilotage et lancer un rafraîchissement : il échoue explicitement sur un refus de droits</td>
+              </tr>
+              <tr>
+                <td data-label="Prérequis">Connexion réseau à l'entrepôt depuis le poste</td>
+                <td data-label="Comment vérifier qu'on l'a">Le rafraîchissement aboutit ; à défaut, le message cite le nom du serveur</td>
+              </tr>
+              <tr>
+                <td data-label="Prérequis">Jeu de données de référence du mois clos</td>
+                <td data-label="Comment vérifier qu'on l'a">Le fichier <code>controles/dernier-verdict.json</code> porte la date du dernier mois validé</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun prérequis déclaré — un dossier sans prérequis annoncés échoue au premier essai, sans dire pourquoi.</p>
+        </div>
+        <p><strong>Ce qui a été testé, et où.</strong> Le dossier a été ouvert et rafraîchi
+           intégralement le 19/09/2026 sur l'outil de rapport version 2026.08, depuis un poste du
+           réseau interne, avec les droits de lecture ci-dessus. Aucun autre environnement n'a
+           été éprouvé, et aucune promesse de compatibilité n'est faite au-delà.</p>
+      </section>
+
+      <section class="chap lire" id="limites">
+        <h2>Limites connues, et ce qui n'est pas dans ce dossier</h2>
+        <p class="ch-apprend">Ce chapitre nomme les manques et les écarts assumés avec leur motif — le lecteur y apprend à distinguer un manque vu d'un oubli, et s'épargne d'ouvrir un incident sur ce que nous savons déjà.</p>
+        <div class="limite">
+          <p>Si vous trouvez ici ce que vous venez de constater, c'est que nous l'avons vu :
+             inutile d'ouvrir un incident.</p>
+          <p><strong>L'historique s'arrête à janvier 2023</strong> — conséquence de la décision
+             <code>DEC-2026-08-28-a</code> citée en section 2, non une perte de données. La
+             reprise des années antérieures est un chantier distinct, non engagé.</p>
+          <p><strong>Les retours fournisseurs ne sont pas dans le fait « retours »</strong> —
+             seuls les retours clients y figurent. La source fournisseur n'est pas encore
+             alimentée dans l'entrepôt.</p>
+          <p><strong>Trois indicateurs du comité ne sont pas couverts</strong> — marge par gamme,
+             taux de service fournisseur, coût de non-qualité : leurs définitions ne sont pas
+             arbitrées, faute de propriétaire métier désigné.</p>
+          <p><strong>Aucune sécurité au niveau des lignes n'est posée</strong> — tout lecteur du
+             rapport voit tous les sites. Si un cloisonnement est requis, il fait l'objet d'une
+             demande séparée.</p>
+        </div>
+      </section>
+
+      <section class="chap lire" id="contact">
+        <h2>À qui s'adresser</h2>
+        <p class="ch-apprend">Ce chapitre donne le contact et ce qu'il faut recueillir avant de signaler — le lecteur y apprend comment faire un signalement qui n'exige pas d'aller-retour.</p>
+        <p>Le contact est le <strong>responsable de produit data</strong> de Client-A, par le
+           canal de support habituel. Avant tout signalement, recueillir les trois éléments qui
+           évitent un aller-retour :</p>
+        <ol>
+          <li>la <strong>version de l'artefact</strong>, visible en tête de ce document et dans le pied du rapport ;</li>
+          <li><strong>ce qui a été fait</strong>, geste par geste, jusqu'à l'anomalie ;</li>
+          <li><strong>ce qui était attendu</strong>, et ce qui s'est produit à la place.</li>
+        </ol>
+        <p>Un écart de chiffre se signale toujours avec la <strong>période</strong> et le
+           <strong>filtre actif</strong> : sans eux, il n'est pas reproductible.</p>
+      </section>
+      </div>
+      </div>
+    </main>
+
+    <footer class="doc">
+      Client-A · Mode d'emploi du livrable · 20260920a · Gabarit gd-mode-emploi-dossier v1.0.0 — instance fictive et pseudonymisée
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    var bouton = document.getElementById('theme-toggle');
+    var racine = document.documentElement;
+    function appliquer(theme) {
+      racine.setAttribute('data-theme', theme);
+      try { localStorage.setItem('digitai-theme', theme); } catch (e) {}
+      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    }
+    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    bouton.addEventListener('click', function () {
+      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+    var pli = document.querySelector('nav.toc details');
+    if (pli && window.matchMedia && !window.matchMedia('(min-width: 901px)').matches) {
+      pli.open = false;
+    }
+  })();
+  </script>
+</body>
+</html>

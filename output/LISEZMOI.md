@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 390 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 393 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -297,6 +297,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md | 20260907m | 25.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` |
 | Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md | 20260920c | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md` |
 | Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Cinq decisions executees publication a decider - 20260920g.md | 20260920g | 18.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Cinq decisions executees publication a decider - 20260920g.md` |
 | Digit-AI - Synthese Mandat - Cinq familles de cadence et le controle aveugle - 20260915a.md | 20260915a | 25.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Cinq familles de cadence et le controle aveugle - 20260915a.md` |
 | Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md | 20260915c | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md` |
 | Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md | 20260921f | 22.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md` |
@@ -321,6 +322,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 1b et 3a executees et cout des vues mesure - 20260916c.md | 20260916c | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1b et 3a executees et cout des vues mesure - 20260916c.md` |
 | Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md | 20260906n | 24.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md` |
 | Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md | 20260907b | 18.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` |
+| Digit-AI - Synthese Mandat - Decisions 2a 3a 5a executees 4b et 6b en cours - 20260920f.md | 20260920f | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 2a 3a 5a executees 4b et 6b en cours - 20260920f.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
 | Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md | 20260917g | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` |
@@ -362,6 +364,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md | 20260914c | 22.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md` |
 | Digit-AI - Synthese Mandat - Paliers 2 et 3 des premiers HTML de nouveaux formats - 20260914d.md | 20260914d | 23.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Paliers 2 et 3 des premiers HTML de nouveaux formats - 20260914d.md` |
 | Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md | 20260921a | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md` |
+| Digit-AI - Synthese Mandat - Parc synchronise apres fusion du pilot avec l autre poste - 20260921d.md | 20260921d | 11.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise apres fusion du pilot avec l autre poste - 20260921d.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md | 20260913a | 20.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md | 20260920a | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md.jugement.json` |

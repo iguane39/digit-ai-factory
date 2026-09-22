@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<!-- viewport-fit=cover (M3 d'oracle-mobile) : sans lui les env(safe-area-inset-*) valent 0. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="destinataire" content="humain">
+<script>
+(function () {
+  var stocke = null;
+  try { stocke = localStorage.getItem('digitai-theme'); } catch (e) {}
+  var theme = stocke === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  var meta = document.querySelector('meta[name="color-scheme"]');
+  if (meta) { meta.setAttribute('content', theme); }
+})();
+</script>
+  <!--
+  INSTANCE — Étude de cas client · preuve que le squelette de cette famille a été REMPLI une
+  fois (G1/G2). Le client, les chiffres, les dates et l'accord de publication sont FICTIFS et
+  pseudonymisés (Client-A, Émetteur-A) : aucune mission réelle n'est décrite. Ce fichier
+  prouve une FORME, jamais une référence opposable.
+-->
+<title>Onze semaines pour savoir lesquels de ses 63 rapports étaient justes · Étude de cas — 20260920a</title>
+  <meta name="description" content="Étude de cas fictive : reconstruction du lineage de 63 rapports décisionnels, 41 déclarés justes, 9 retirés, chaque chiffre avec sa formule.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root:has(table th:nth-child(7)) { --w: clamp(85vw, 2100px, 96vw); }
+    :root {
+      --blue: #2563EB;
+      --bg: #FAFBFF;
+      --surface: #FFFFFF;
+      --card: #FFFFFF;
+      --focus-anneau: 2px solid var(--blue);
+      --focus-decalage: 2px;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --faint: #94A3B8;
+      --line: #E6EAF2;
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      --r: 12px; --r-sm: 8px;
+      --w: clamp(75vw, 1680px, 92vw); --prose: 75ch;
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      --annee-ref: "2026";
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
+      --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
+      --blue: #7DA2F5;
+      --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
+      --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
+      --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+      line-height: 1.55; font-size: 16px; }
+    .wrap { max-width: var(--w); margin: 0 auto; padding: 32px 24px 64px; }
+    .chap.lire { max-width: 1080px; margin-left: auto; margin-right: auto; }
+    .chap.duo { display: grid; grid-template-columns: 7fr 5fr; gap: 32px; align-items: start; }
+    @media (max-width: 1100px) { .chap.duo { grid-template-columns: 1fr; } }
+
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .5em; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin: 1.5em 0 .4em; }
+    p, li { margin: 0 0 1em; }
+    a { color: var(--blue); }
+    code, pre { font-family: var(--mono); }
+    blockquote { margin: 0 0 1em; padding: 12px 20px; border-left: 1px solid var(--blue);
+      background: var(--surface); border-radius: var(--r-sm); }
+    blockquote p:last-child { margin-bottom: 0; }
+
+    header.doc { border-bottom: 2px solid var(--blue); padding-bottom: 16px; margin-bottom: 24px; }
+    .eyebrow { color: var(--muted); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
+    .muted { color: var(--muted); }
+
+    .theme-toggle { appearance: none; border: 1px solid var(--line); background: var(--surface);
+      color: var(--ink); border-radius: 999px; width: 36px; height: 36px; flex: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; }
+    .theme-toggle:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+      padding: 20px 24px; margin: 16px 0; }
+
+    .entete-texte, .tete { max-width: 1080px; }
+    .tete { margin-left: auto; margin-right: auto; }
+    .tete > * + * { margin-top: 24px; }
+    .doc-intro { margin: 0; }
+
+    .refs { border: 1px solid var(--line); border-left: 1px solid var(--blue);
+      background: var(--surface); border-radius: var(--r-sm); padding: 12px 16px; }
+    .refs dl { margin: 0; display: grid; grid-template-columns: minmax(10ch, 18%) 1fr; gap: 8px 16px; }
+    .refs dt { color: var(--muted); font-weight: 700; }
+    .refs dd { margin: 0; }
+    @media (max-width: 640px) { .refs dl { grid-template-columns: 1fr; gap: 4px 0; }
+      .refs dd { margin: 0 0 .6em; } }
+
+    /* L'accent vit dans le filet, jamais dans le texte : --amber sur --amber-fill mesure
+       3,07:1, sous le seuil WCAG de 4,5:1. */
+    .limite { border: 1px solid var(--amber); background: var(--amber-fill);
+      border-radius: var(--r-sm); padding: 16px 20px; margin: 20px 0; }
+    .limite p:last-child { margin-bottom: 0; }
+    .citation { border: 1px solid var(--teal); background: var(--teal-fill);
+      border-radius: var(--r-sm); padding: 16px 20px; margin: 20px 0; }
+    .citation p:last-child { margin-bottom: 0; }
+    .citation .source { color: var(--muted); font-size: .9rem; }
+
+    footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 640px) { .wrap { padding: 24px 16px 48px; } h1 { font-size: 1.6rem; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+
+    /* ── Impression — une étude de cas se remet aussi en PDF à un prospect ──── */
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      :root, :root[data-theme="dark"] {
+        --bg:#FFFFFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
+        --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2; --blue:#2563EB;
+        --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
+        --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
+        --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+      }
+      body { background: var(--surface); font-size: 11pt; }
+      .wrap { max-width: none; padding: 0; }
+      .chap.lire, .tete, .entete-texte { max-width: none; }
+      .card { break-inside: avoid; page-break-inside: avoid; }
+      nav.toc, .theme-toggle { display: none; }
+      .doc-grille { display: block; }
+      section, .refs, .limite, .citation, tr, blockquote { break-inside: avoid; page-break-inside: avoid; }
+      h2 { break-after: avoid; page-break-after: avoid; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+      a[href^="#"]::after { content: none; }
+    }
+
+    /* ── D3 · repli des tableaux en cartes ──────────────────────────────────── */
+    caption { text-align: left; font-weight: 700; padding: 0 0 8px; }
+    .table-hote { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-weight: 700; }
+    @media (max-width: 1400px) {
+      .table-hote:has(th:nth-child(7)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 1020px) {
+      .table-hote:has(th:nth-child(5)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 900px) {
+      .table-hote { overflow-x: visible; }
+      table.repli-cartes thead { display: none; }
+      table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; }
+      table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+      table.repli-cartes td[data-label=""]::before { content: none; }
+    }
+
+    /* ── D4 · état vide ─────────────────────────────────────────────────────── */
+    .etat-vide { display: none; padding: 16px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
+    .table-hote[data-vide="oui"] table { display: none; }
+    .table-hote[data-vide="oui"] .etat-vide { display: block; }
+
+    /* ── Sommaire (L6, L25) ─────────────────────────────────────────────────── */
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
+    .toc ol, .toc ul { columns: 2; column-gap: 32px; padding-left: 20px; margin: 0; }
+    .toc li { break-inside: avoid; max-width: none; margin-bottom: .6em; }
+    .toc a { text-decoration: none; }
+    .toc summary { font-family: var(--head); font-weight: 700; font-size: 1.05rem;
+      cursor: pointer; padding: 4px 0; margin: 0 0 .4em; }
+    .toc summary:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .ch-apprend { color: var(--muted); margin: .2em 0 1.1em; }
+
+    .doc-grille { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .doc-grille > nav.toc { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; margin: 0; padding: 16px 20px; }
+    .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
+    .doc-grille > .doc-corps { min-width: 0; }
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      .doc-grille > nav.toc { position: sticky; top: env(safe-area-inset-top, 0px);
+        z-index: 5; max-height: 60vh; margin: 0 0 16px; border-radius: 0 0 12px 12px;
+        padding-top: 8px; padding-bottom: 8px;
+        padding-left: calc(16px + env(safe-area-inset-left, 0px));
+        padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
+    }
+    @media (orientation: landscape) and (max-height: 520px) {
+      .doc-grille > nav.toc { max-height: 40vh; }
+      .wrap { padding-top: 16px; padding-bottom: 32px; }
+    }
+    .toc .toc-t { display: block; text-decoration: underline; }
+    .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
+  </style>
+</head>
+<body data-largeur="lecture">
+  <div class="wrap">
+    <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div class="entete-texte" data-mesure-lecture>
+        <p class="eyebrow">Émetteur-A · Étude de cas</p>
+        <h1>Onze semaines pour savoir lesquels de ses 63 rapports étaient justes</h1>
+        <p class="muted">Client : Client-A, groupe industriel (désignation pseudonymisée) · Mission du 05/05/2026 au 21/07/2026 · Indice 20260920a<br>Gabarit : gd-etude-de-cas-client · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button"
+              aria-label="Bascule thème sombre" aria-pressed="false">
+        <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+        </svg>
+        <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="4.5"/>
+          <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <div class="tete" data-mesure-lecture>
+
+      <div class="card doc-intro">
+        <p><strong>Instance de démonstration de la famille.</strong> Le client, les chiffres, les
+        dates et l'accord de publication sont <strong>fictifs et pseudonymisés</strong>
+        (Client-A, Émetteur-A) : aucune mission réelle n'est décrite. Ce document prouve une
+        <em>forme</em> — accord daté en tête, problème du client d'abord, ce qui avait déjà été
+        tenté, résultats avec leur dénominateur, limites dites, transparence de l'article 50 —,
+        jamais une référence opposable.</p>
+      </div>
+
+      <div class="refs">
+        <dl>
+          <dt>Accord</dt>
+          <dd>Référence AP-2026-07, signé le 12/09/2026 par le directeur financier de Client-A — <strong>valide jusqu'au 2027-09-12</strong>, au-delà cette étude est retirée ou renégociée</dd>
+          <dt>Mission</dt>
+          <dd>Du 05/05/2026 au 21/07/2026</dd>
+          <dt>Périmètre</dt>
+          <dd>Les 63 rapports du tableau de bord du comité de direction ; hors périmètre : les rapports opérationnels de site et les extractions ponctuelles</dd>
+        </dl>
+      </div>
+      </div><!-- /.tete -->
+
+      <div class="doc-grille">
+      <nav class="toc" aria-label="Sommaire">
+        <details open>
+          <summary>Sommaire</summary>
+          <ol>
+            <li><a href="#depart"><span class="toc-t">La situation de départ</span><span class="toc-d">le problème du client, dans ses mots</span></a></li>
+            <li><a href="#tente"><span class="toc-t">Ce qui avait déjà été tenté</span><span class="toc-d">et pourquoi cela n'avait pas suffi</span></a></li>
+            <li><a href="#demarche"><span class="toc-t">La démarche</span><span class="toc-d">les étapes, et la charge côté client</span></a></li>
+            <li><a href="#resultats"><span class="toc-t">Les résultats</span><span class="toc-d">chiffrés, chacun avec son dénominateur</span></a></li>
+            <li><a href="#parole"><span class="toc-t">Ce que le client en dit</span><span class="toc-d">citation validée par écrit</span></a></li>
+            <li><a href="#transposition"><span class="toc-t">Ce que cela dit pour un autre</span><span class="toc-d">où cela se transpose, et où non</span></a></li>
+            <li><a href="#transparence"><span class="toc-t">Transparence et mentions</span><span class="toc-d">article 50, accord, validité</span></a></li>
+          </ol>
+        </details>
+      </nav>
+      <div class="doc-corps">
+
+      <section class="chap lire" id="depart">
+        <h2>La situation de départ</h2>
+        <p class="ch-apprend">Ce chapitre décrit le problème tel qu'il se posait avant notre arrivée — le lecteur y apprend s'il reconnaît sa propre situation, et s'il ne s'y reconnaît pas en cinq lignes, il ne lira pas le reste.</p>
+        <p>Le comité de direction de Client-A recevait chaque mois un tableau de bord de 63
+           rapports, construits sur douze ans par quatre équipes successives. Deux sites
+           publiaient des volumes de production différents pour le même mois, à 4 % près, et
+           personne ne savait lequel des deux chiffres était le bon.</p>
+        <p>La question qui a déclenché la mission n'était pas technique : le commissaire aux
+           comptes avait formulé une réserve sur la traçabilité d'un agrégat financier, et la
+           direction financière ne pouvait pas dire d'où venait le chiffre. Le coût de ce doute
+           n'était pas dans les outils — il était dans les trois jours passés chaque mois, par
+           deux contrôleurs de gestion, à rapprocher à la main des chiffres qui auraient dû
+           concorder.</p>
+      </section>
+
+      <section class="chap lire" id="tente">
+        <h2>Ce qui avait déjà été tenté, et pourquoi cela n'avait pas suffi</h2>
+        <p class="ch-apprend">Ce chapitre dit ce que le client avait déjà essayé et pourquoi cela n'avait pas suffi — le lecteur y apprend que la solution évidente avait été tentée, ce qui distingue une étude de cas d'une plaquette.</p>
+        <p>Deux tentatives avaient précédé la mission, l'une et l'autre raisonnables.</p>
+        <p>Un <strong>catalogue de données</strong> avait été déployé dix-huit mois plus tôt. Il
+           inventoriait correctement les tables, mais pas les rapports : il disait ce qui
+           existait, jamais ce qui alimentait quoi. Le rapprochement entre deux chiffres
+           divergents restait manuel.</p>
+        <p>Une <strong>reprise partielle</strong> avait reconstruit six rapports jugés critiques.
+           Elle avait réussi sur ces six, et n'avait rien dit des cinquante-sept autres — dont
+           l'agrégat qui portait la réserve du commissaire aux comptes.</p>
+        <p>Ces deux travaux n'étaient pas des erreurs, et la mission s'est appuyée sur le
+           catalogue existant plutôt que d'en construire un second.</p>
+      </section>
+
+      <section class="chap lire" id="demarche">
+        <h2>La démarche</h2>
+        <p class="ch-apprend">Ce chapitre donne les étapes, leur durée et ce qu'elles ont demandé aux équipes du client — le lecteur y apprend ce qu'une telle mission exigerait de lui.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Étapes, durées et charge côté client</caption>
+            <thead><tr><th scope="col">Étape</th><th scope="col">Durée</th><th scope="col">Charge côté Client-A</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Étape">Reconstruction du lineage des 63 rapports jusqu'aux systèmes sources</td>
+                <td data-label="Durée">4 semaines</td>
+                <td data-label="Charge côté Client-A">2 demi-journées d'un architecte, pour les accès et les zones d'ombre</td>
+              </tr>
+              <tr>
+                <td data-label="Étape">Contrôles de qualité outillés sur les 17 indicateurs du comité</td>
+                <td data-label="Durée">3 semaines</td>
+                <td data-label="Charge côté Client-A">1 atelier de 3 heures par domaine, 4 domaines, avec les propriétaires métier</td>
+              </tr>
+              <tr>
+                <td data-label="Étape">Arbitrage des divergences avec les propriétaires métier</td>
+                <td data-label="Durée">2 semaines</td>
+                <td data-label="Charge côté Client-A">4 ateliers de 2 heures, décideurs présents</td>
+              </tr>
+              <tr>
+                <td data-label="Étape">Transfert aux équipes data de Client-A</td>
+                <td data-label="Durée">2 semaines</td>
+                <td data-label="Charge côté Client-A">3 jours de 2 personnes</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucune étape déclarée — une démarche sans étapes ni charge annoncée ne se projette pas.</p>
+        </div>
+        <p>Le principe de la démarche tient en une phrase : <strong>remonter chaque chiffre du
+           comité de direction jusqu'à son système source, et faire trancher chaque divergence
+           par un propriétaire métier nommé</strong> — jamais par nous. Les détails
+           d'implémentation appartiennent à Client-A et ne sont pas décrits ici.</p>
+      </section>
+
+      <section class="chap lire" id="resultats">
+        <h2>Les résultats</h2>
+        <p class="ch-apprend">Ce chapitre donne les résultats obtenus, chacun avec la population sur laquelle il se calcule et la date de sa mesure — le lecteur y apprend ce qui est établi, et ce qui ne l'est pas.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Résultats, avec leur formule et leur population</caption>
+            <thead><tr><th scope="col">Résultat</th><th scope="col">Chiffre</th><th scope="col">Formule et population</th><th scope="col">Mesuré le</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Résultat">Rapports dont le lineage est reconstruit jusqu'aux systèmes sources</td>
+                <td data-label="Chiffre"><strong>58 sur 63</strong></td>
+                <td data-label="Formule et population">Rapports tracés de bout en bout ÷ rapports du périmètre initial (63)</td>
+                <td data-label="Mesuré le">2026-07-21</td>
+              </tr>
+              <tr>
+                <td data-label="Résultat">Rapports déclarés justes après arbitrage</td>
+                <td data-label="Chiffre"><strong>41 sur 63</strong></td>
+                <td data-label="Formule et population">Rapports dont tous les indicateurs passent les contrôles ET dont un propriétaire métier a validé la définition ÷ 63</td>
+                <td data-label="Mesuré le">2026-07-21</td>
+              </tr>
+              <tr>
+                <td data-label="Résultat">Rapports déclarés faux, et retirés du tableau de bord</td>
+                <td data-label="Chiffre"><strong>9 sur 63</strong></td>
+                <td data-label="Formule et population">Rapports dont au moins un indicateur est contredit par le système source ÷ 63</td>
+                <td data-label="Mesuré le">2026-07-21</td>
+              </tr>
+              <tr>
+                <td data-label="Résultat">Divergences entre sites tranchées</td>
+                <td data-label="Chiffre"><strong>11 sur 14</strong></td>
+                <td data-label="Formule et population">Divergences arbitrées par un propriétaire nommé ÷ divergences relevées (14)</td>
+                <td data-label="Mesuré le">2026-07-21</td>
+              </tr>
+              <tr>
+                <td data-label="Résultat">Temps mensuel de rapprochement manuel</td>
+                <td data-label="Chiffre"><strong>de 6 à 1 jour-homme</strong></td>
+                <td data-label="Formule et population">Relevé déclaratif des 2 contrôleurs de gestion, moyenne des 3 mois précédents contre le mois de septembre 2026</td>
+                <td data-label="Mesuré le">2026-09-15</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun résultat chiffré — une étude de cas sans chiffre sourcé est une plaquette.</p>
+        </div>
+        <div class="limite">
+          <p><strong>Ce qui n'a pas été atteint, et qui compte autant.</strong> Cinq rapports sur
+             63 n'ont pas pu être tracés : leurs sources sont un tableur alimenté à la main
+             depuis 2019, sans historique. La mission l'a constaté et n'a pas pu le résoudre —
+             la reprise de ces cinq rapports est un chantier distinct, non engagé à ce jour.
+             Trois divergences sur quatorze restent ouvertes, faute de propriétaire métier
+             désigné sur le domaine concerné : c'est une décision d'organisation, hors de notre
+             portée.</p>
+          <p><strong>Valeur de preuve inégale, et il faut le dire.</strong> Le gain de temps de
+             rapprochement est <strong>déclaratif</strong>, relevé auprès de deux personnes sur
+             un seul mois de comparaison. Il n'est pas instrumenté et n'a pas la même valeur de
+             preuve que les quatre premières lignes, qui se recomptent sur les artefacts.</p>
+        </div>
+      </section>
+
+      <section class="chap lire" id="parole">
+        <h2>Ce que le client en dit</h2>
+        <p class="ch-apprend">Ce chapitre porte la parole du client, validée par écrit par son auteur — le lecteur y apprend ce que le client retient, dans ses mots et non dans les nôtres.</p>
+        <div class="citation">
+          <p>« Nous ne cherchions pas un outil de plus. Nous voulions pouvoir dire, devant notre
+             commissaire aux comptes, d'où vient un chiffre. Aujourd'hui nous le pouvons pour 41
+             rapports sur 63, et nous savons précisément pourquoi pas pour les 22 autres. »</p>
+          <p class="source">— Directeur financier de Client-A, citation validée par écrit le 2026-09-12.</p>
+        </div>
+      </section>
+
+      <section class="chap lire" id="transposition">
+        <h2>Ce que cela dit pour un lecteur qui n'est pas ce client</h2>
+        <p class="ch-apprend">Ce chapitre généralise honnêtement le cas — le lecteur y apprend si sa propre situation s'en rapproche, et surtout dans quels cas elle ne s'en rapproche pas.</p>
+        <p>Ce cas se transpose à une organisation qui a <strong>un patrimoine décisionnel ancien,
+           plusieurs équipes successives, et une contrainte externe</strong> — certification,
+           réserve d'un auditeur, fusion — qui oblige à trancher. C'est la contrainte externe
+           qui rend les arbitrages possibles : sans elle, les divergences se discutent sans se
+           décider.</p>
+        <p>Il ne se transpose <strong>pas</strong> à une organisation qui n'a pas de propriétaires
+           métier identifiables pour ses indicateurs. Sur ce cas, trois divergences sur quatorze
+           sont restées ouvertes pour cette seule raison, et aucune démarche technique ne
+           l'aurait évité. Il ne se transpose pas davantage à un périmètre d'une quinzaine de
+           rapports ou moins, où la reconstruction coûte plus cher que la refonte.</p>
+      </section>
+
+      <section class="chap lire" id="transparence">
+        <h2>Transparence des contenus générés, et mentions</h2>
+        <p class="ch-apprend">Ce chapitre porte la conformité due sur toute étude publiée et les mentions ordinaires — le lecteur y apprend comment ce document a été produit et jusqu'à quand il est valide.</p>
+        <p>La règle applicable est celle du dépôt (<code>references\PLATEFORME-LINKEDIN.md</code>,
+           section 3 « Ce qu'un contenu généré doit dire »), citée et non réécrite :</p>
+        <blockquote>
+          <ul>
+            <li><strong>Information du lecteur</strong> : due depuis le <strong>2026-08-02</strong>
+              (règlement européen sur l'IA, article 50 ; lignes directrices de la Commission mises
+              à jour le 2026-08-06). La règle de marque de l'émetteur porte la formule ; le
+              contrôle exécutable est la candidature TF-1030.</li>
+            <li><strong>Marquage lisible par machine</strong> : reporté au <strong>2026-12-02</strong>
+              pour les systèmes déjà sur le marché, sous un accord qualifié de provisoire le
+              2026-06-22. Adoption finale non vérifiée : à relire à la péremption.</li>
+          </ul>
+        </blockquote>
+        <p><strong>Pour cette instance de démonstration, la mention n'est pas reprise d'un
+           <code>MARQUE.md</code> : Émetteur-A est fictif et n'en possède pas.</strong> C'est
+           précisément le cas que le gabarit interdit de publier — sans règle de marque portant
+           la formule, une étude de cas réelle ne sort pas. L'instance le montre plutôt que de
+           fabriquer une formule maison, qui créerait une seconde vérité sur une obligation
+           réglementaire.</p>
+        <p><strong>Mentions.</strong> Accord de publication AP-2026-07, valide jusqu'au
+           <strong>2027-09-12</strong> ; au-delà, cette étude est retirée ou renégociée. Les
+           marques citées appartiennent à leurs détenteurs. Les chiffres des résultats portent
+           chacun leur formule et leur date de mesure ; aucun n'est extrapolé.</p>
+      </section>
+      </div>
+      </div>
+    </main>
+
+    <footer class="doc">
+      Émetteur-A · Étude de cas · 20260920a · Gabarit gd-etude-de-cas-client v1.0.0 — instance fictive et pseudonymisée
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    var bouton = document.getElementById('theme-toggle');
+    var racine = document.documentElement;
+    function appliquer(theme) {
+      racine.setAttribute('data-theme', theme);
+      try { localStorage.setItem('digitai-theme', theme); } catch (e) {}
+      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    }
+    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    bouton.addEventListener('click', function () {
+      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+    var pli = document.querySelector('nav.toc details');
+    if (pli && window.matchMedia && !window.matchMedia('(min-width: 901px)').matches) {
+      pli.open = false;
+    }
+  })();
+  </script>
+</body>
+</html>

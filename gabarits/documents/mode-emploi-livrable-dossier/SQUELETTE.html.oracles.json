@@ -1,0 +1,139 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+  "date_iso": "2026-09-20T20:36:51.775Z",
+  "registre_version": "2.25.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 11,
+    "fail": 0,
+    "skip": 6,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Rendu HTML / visuel",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Conformité charte HTML (charte, sémantique, print)",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Accessibilité (WCAG structurel)",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · controles WCAG structurels OK"
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Régression visuelle (golden diff)",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Design généré : marqueurs de slop",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucune des règles S1–S10 déclenchée"
+    },
+    {
+      "domaine": "Système de marque : traçabilité des tokens",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "4 constat(s) · contraste non textuel 1.21:1 < 3:1 — --line (#E6EAF2) sur --surface (#FFFFFF), thème clair [trait et fond posés par la même règle] — si cette frontière identifie un composant ou son état, la déclarer par --paires-interface : WCAG 1.4.11 l'exige alors à 3:1 ; contraste non textuel 1.17:1 < 3:1 — --line (#E6EAF2) sur --bg (#FAFBFF), thème clair [fond hérité de l'ambiance] — si cette frontière identifie un composant ou son état, la déclarer par --paires-interface : WCAG 1.4.11 l'exige alors à 3:1"
+    },
+    {
+      "domaine": "Cible mobile : contrat d'usage tactile",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · thead masqué sous le seuil, mais les étiquettes sont restituées cellule par cellule (content: attr(data-label)) : c'est le repli en cartes prescrit par le socle digit-ai, pas une amputation (TF-0857)"
+    },
+    {
+      "domaine": "Visuels générés : traçabilité et budget",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · I1–I7 sans écart"
+    },
+    {
+      "domaine": "Mouvement : craft de l'animation",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · R1–R7 sans écart"
+    },
+    {
+      "domaine": "Filtres de colonne sur tableaux de donnees",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Autorité d'une décision affirmée",
+      "file": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html",
+    "ts": "2026-09-20T20:36:51.775Z",
+    "fichiers": {
+      "gabarits\\documents\\mode-emploi-livrable-dossier\\SQUELETTE.html": "107e4a9188422fda48d98f555b729101adaa47fb8290d849c86269d806d0b863"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

@@ -279,7 +279,7 @@
   "vu_le": "2026-09-16"
  },
  "oracles/consommateurs-skills.test.mjs": {
-  "cas": 14,
+  "cas": 22,
   "vu_le": "2026-09-20"
  },
  "oracles/familles-numerotees.test.mjs": {

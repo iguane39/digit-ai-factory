@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- A3 (TF-0303, 17/08) — charset PUIS viewport en TOUTE PREMIÈRE position. -->
+<meta charset="UTF-8">
+<!-- viewport-fit=cover (M3 d'oracle-mobile) : sans lui les env(safe-area-inset-*) valent 0. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="destinataire" content="humain">
+<!-- S-G1 (1/4, R-30) — initialisation AVANT le <style> : zéro flash, clair par défaut. -->
+<script>
+(function () {
+  var stocke = null;
+  try { stocke = localStorage.getItem('digitai-theme'); } catch (e) {}
+  var theme = stocke === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  var meta = document.querySelector('meta[name="color-scheme"]');
+  if (meta) { meta.setAttribute('content', theme); }
+})();
+</script>
+  <!--
+  INSTANCE — Courrier fournisseur · preuve que le squelette de cette famille a été REMPLI
+  une fois (G1/G2 d'oracle-gabarits-documents : un squelette jamais instancié n'a jamais
+  été éprouvé). Organisations, références contractuelles, numéros et dates FICTIFS et
+  pseudonymisés (Émetteur-A, Fournisseur-A) ; aucune clause n'a été relue par un juriste.
+  Ce fichier prouve une FORME, jamais une pièce opposable.
+-->
+<title>Non-conformité des livraisons du 02 au 12/09/2026 · Fournisseur-A — 20260920a</title>
+  <meta name="description" content="Mise en demeure adressée à Fournisseur-A : taux de service constaté à 54,5 % contre 95 % contractuels, plan de reprise exigé au 06/10/2026.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices : AUCUN chargement réseau (A1/D-10). Replis système par les tokens. -->
+
+  <style>
+    :root:has(table th:nth-child(7)) { --w: clamp(85vw, 2100px, 96vw); }
+    :root {
+      --blue: #2563EB;
+      --bg: #FAFBFF;
+      --surface: #FFFFFF;
+      --card: #FFFFFF;
+      --focus-anneau: 2px solid var(--blue);
+      --focus-decalage: 2px;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --faint: #94A3B8;
+      --line: #E6EAF2;
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      --r: 12px; --r-sm: 8px;
+      --w: clamp(75vw, 1680px, 92vw); --prose: 75ch;
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      --annee-ref: "2026";
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
+      --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
+      --blue: #7DA2F5;
+      --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
+      --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
+      --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+      line-height: 1.55; font-size: 16px; }
+    .wrap { max-width: var(--w); margin: 0 auto; padding: 32px 24px 64px; }
+    .chap.lire { max-width: 1080px; margin-left: auto; margin-right: auto; }
+    .chap.duo { display: grid; grid-template-columns: 7fr 5fr; gap: 32px; align-items: start; }
+    @media (max-width: 1100px) { .chap.duo { grid-template-columns: 1fr; } }
+
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .5em; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin: 1.5em 0 .4em; }
+    p, li { margin: 0 0 1em; }
+    a { color: var(--blue); }
+    code, pre { font-family: var(--mono); }
+
+    header.doc { border-bottom: 2px solid var(--blue); padding-bottom: 16px; margin-bottom: 24px; }
+    .eyebrow { color: var(--muted); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
+    .muted { color: var(--muted); }
+
+    .theme-toggle { appearance: none; border: 1px solid var(--line); background: var(--surface);
+      color: var(--ink); border-radius: 999px; width: 36px; height: 36px; flex: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; }
+    .theme-toggle:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+      padding: 20px 24px; margin: 16px 0; }
+    /* V18 / L2 — LA MESURE DE LECTURE SE POSE SUR LE CONTENEUR, jamais sur le paragraphe.
+       Mesuré sur ce fichier : à 2560 px, le chapeau d'en-tête et le cartouche d'introduction
+       peignaient 198 caractères par ligne pour un plafond de 135. Ils ne sont dans aucun
+       `.chap.lire` — ce sont des blocs de tête —, ils reçoivent donc la même mesure.
+       V7 — les blocs de tête de `main` s'espaçaient de 16 / 24 / 24 px ; le rythme est unifié. */
+    /* La mesure se pose sur le CONTENEUR, jamais sur le texte — et la colonne se CENTRE,
+       sinon elle laisse un vide à droite et rien à sa gauche (l2_width, l2_conteneur). */
+    .entete-texte, .tete { max-width: 1080px; }
+    .tete { margin-left: auto; margin-right: auto; }
+    .doc-intro { margin: 0 0 24px; }
+    .tete > * + * { margin-top: 24px; }
+
+    .adressage { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 0 0 24px; }
+    .adressage .bloc { background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--r-sm); padding: 12px 16px; }
+    .adressage .bloc p { margin: 0 0 .3em; }
+    .adressage .bloc .role { color: var(--muted); font-size: .82rem; text-transform: uppercase;
+      letter-spacing: .04em; margin-bottom: .5em; }
+    @media (max-width: 760px) { .adressage { grid-template-columns: 1fr; } }
+
+    .refs { border: 1px solid var(--line); border-left: 1px solid var(--blue);
+      background: var(--surface); border-radius: var(--r-sm);
+      padding: 12px 16px; margin: 0 0 24px; }
+    /* L2 gouttière — la colonne d'étiquettes reste sous 20 % de la largeur du bloc. Mesurée
+       ici à 22 % (241 px sur 1096), elle mettait « Références » en face de 124 caractères. */
+    .refs dl { margin: 0; display: grid; grid-template-columns: minmax(10ch, 18%) 1fr; gap: 8px 16px; }
+    .refs dt { color: var(--muted); font-weight: 700; }
+    .refs dd { margin: 0; }
+    @media (max-width: 640px) { .refs dl { grid-template-columns: 1fr; gap: 4px 0; }
+      .refs dd { margin: 0 0 .6em; } }
+
+    /* L'accent vit dans le filet, jamais dans le texte : --amber sur --amber-fill mesure
+       3,07:1 et tombe sous le seuil WCAG de 4,5:1 (render_page V2, oracle-tokens T5). */
+    .qualification { border: 1px solid var(--amber); background: var(--amber-fill);
+      border-radius: var(--r-sm); padding: 16px 20px; margin: 20px 0; }
+    .qualification p { margin: 0; }
+
+    footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 640px) { .wrap { padding: 24px 16px 48px; } h1 { font-size: 1.6rem; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+
+    /* ── Impression : la pièce se signe et s'archive sur papier ─────────────── */
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      :root, :root[data-theme="dark"] {
+        --bg:#FFFFFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
+        --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2; --blue:#2563EB;
+        --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
+        --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
+        --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+      }
+      body { background: var(--surface); font-size: 11pt; }
+      .wrap { max-width: none; padding: 0; }
+      .chap.lire { max-width: none; }
+      .card { break-inside: avoid; page-break-inside: avoid; }
+      nav.toc, .theme-toggle { display: none; }
+      .doc-grille { display: block; }
+      section, .refs, .adressage, .qualification, tr { break-inside: avoid; page-break-inside: avoid; }
+      h2 { break-after: avoid; page-break-after: avoid; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+      a[href^="#"]::after { content: none; }
+      .adressage { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── D3 · repli des tableaux en cartes ──────────────────────────────────── */
+    caption { text-align: left; font-weight: 700; padding: 0 0 8px; }
+    .table-hote { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-weight: 700; }
+    @media (max-width: 1400px) {
+      .table-hote:has(th:nth-child(7)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 1020px) {
+      .table-hote:has(th:nth-child(5)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 900px) {
+      .table-hote { overflow-x: visible; }
+      table.repli-cartes thead { display: none; }
+      table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; }
+      table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+      table.repli-cartes td[data-label=""]::before { content: none; }
+    }
+
+    /* ── D4 · état vide ─────────────────────────────────────────────────────── */
+    .etat-vide { display: none; padding: 16px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
+    .table-hote[data-vide="oui"] table { display: none; }
+    .table-hote[data-vide="oui"] .etat-vide { display: block; }
+
+    /* ── Sommaire (L6, L25) ─────────────────────────────────────────────────── */
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
+    .toc ol, .toc ul { columns: 2; column-gap: 32px; padding-left: 20px; margin: 0; }
+    .toc li { break-inside: avoid; max-width: none; margin-bottom: .6em; }
+    .toc a { text-decoration: none; }
+    .toc summary { font-family: var(--head); font-weight: 700; font-size: 1.05rem;
+      cursor: pointer; padding: 4px 0; margin: 0 0 .4em; }
+    .toc summary:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .ch-apprend { color: var(--muted); margin: .2em 0 1.1em; }
+
+    .doc-grille { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .doc-grille > nav.toc { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; margin: 0; padding: 16px 20px; }
+    .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
+    .doc-grille > .doc-corps { min-width: 0; }
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      .doc-grille > nav.toc { position: sticky; top: env(safe-area-inset-top, 0px);
+        z-index: 5; max-height: 60vh; margin: 0 0 16px; border-radius: 0 0 12px 12px;
+        padding-top: 8px; padding-bottom: 8px;
+        padding-left: calc(16px + env(safe-area-inset-left, 0px));
+        padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
+    }
+    @media (orientation: landscape) and (max-height: 520px) {
+      .doc-grille > nav.toc { max-height: 40vh; }
+      .wrap { padding-top: 16px; padding-bottom: 32px; }
+    }
+    .toc .toc-t { display: block; text-decoration: underline; }
+    .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
+  </style>
+</head>
+<body data-largeur="lecture">
+  <div class="wrap">
+    <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div class="entete-texte" data-mesure-lecture>
+        <p class="eyebrow">Émetteur-A · Courrier fournisseur</p>
+        <h1>Non-conformité des livraisons du 02 au 12/09/2026 — demande de plan de reprise</h1>
+        <p class="muted">Établi le 20/09/2026 · Indice 20260920a<br>Gabarit : gd-courrier-fournisseur · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button"
+              aria-label="Bascule thème sombre" aria-pressed="false">
+        <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+        </svg>
+        <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="4.5"/>
+          <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <!-- LES BLOCS DE TÊTE PARTAGENT UNE SEULE MESURE DE LECTURE, DÉCLARÉE. Mesuré sur ce
+           fichier à 2560 px : brider un seul d'entre eux créait la rupture d'alignement que
+           la règle nomme (« 1080px de texte contre 1872px pour le bloc voisin »). Ils vivent
+           donc dans un conteneur unique, et `data-mesure-lecture` déclare que cette colonne
+           est étroite À DESSEIN face à ses frères plus larges. -->
+      <div class="tete" data-mesure-lecture>
+      <div class="card doc-intro">
+        <p><strong>Instance de démonstration de la famille.</strong> Les organisations, références
+        contractuelles, numéros et dates sont <strong>fictifs et pseudonymisés</strong>
+        (Émetteur-A, Fournisseur-A) ; aucune clause n'a été relue par un juriste. Ce document
+        prouve une <em>forme</em> — fait mesuré sans adjectif, fondement cité par son article,
+        demande unique datée, conséquences que l'on est décidé à appliquer —, jamais une pièce
+        opposable.</p>
+      </div>
+
+      <div class="adressage">
+        <div class="bloc">
+          <p class="role">Émetteur</p>
+          <p><strong>Émetteur-A</strong></p>
+          <p>Direction des achats · Directeur des achats</p>
+          <p>Siège social — adresse de correspondance</p>
+        </div>
+        <div class="bloc">
+          <p class="role">Destinataire</p>
+          <p><strong>Fournisseur-A</strong></p>
+          <p>Direction commerciale</p>
+          <p>Siège social — adresse de correspondance</p>
+        </div>
+      </div>
+
+      <div class="refs">
+        <dl>
+          <dt>Références</dt>
+          <dd>Contrat-cadre de fourniture n° CF-2025-014 · commandes n° C-8842, C-8857, C-8861 · bons de livraison n° BL-11204 et BL-11219</dd>
+          <dt>Voie d'acheminement</dt>
+          <dd>Lettre recommandée avec accusé de réception, doublée d'un envoi électronique — voie imposée par l'article 14.2 du contrat-cadre pour toute notification de non-conformité</dd>
+          <dt>Pièces jointes</dt>
+          <dd>Quatre pièces, détaillées en fin de document ; chaque fait du § 1 est adossé à l'une d'elles</dd>
+        </dl>
+      </div>
+      </div><!-- /.tete -->
+
+      <div class="doc-grille">
+      <nav class="toc" aria-label="Sommaire">
+        <details open>
+          <summary>Sommaire</summary>
+          <ol>
+            <li><a href="#fait"><span class="toc-t">Le fait, daté et mesuré</span><span class="toc-d">ce qui est constaté, sans adjectif</span></a></li>
+            <li><a href="#fondement"><span class="toc-t">Le fondement</span><span class="toc-d">l'article qui rend la demande opposable</span></a></li>
+            <li><a href="#demande"><span class="toc-t">La demande</span><span class="toc-d">ce qui est attendu, et pour quand</span></a></li>
+            <li><a href="#consequences"><span class="toc-t">Les conséquences à défaut</span><span class="toc-d">ce que l'émetteur fera à l'échéance</span></a></li>
+            <li><a href="#signature"><span class="toc-t">Signature et suites</span><span class="toc-d">qui signe, et par quelle voie répondre</span></a></li>
+            <li><a href="#pieces"><span class="toc-t">Pièces jointes</span><span class="toc-d">ce qui adosse chaque fait</span></a></li>
+          </ol>
+        </details>
+      </nav>
+      <div class="doc-corps">
+
+      <section class="chap lire" id="fait">
+        <h2>Le fait, daté et mesuré</h2>
+        <p class="ch-apprend">Ce chapitre dit ce qui a été constaté, avec ses dates, ses chiffres et les pièces qui l'établissent — le lecteur y apprend exactement ce qui lui est reproché et sur quoi le constat s'appuie.</p>
+        <p>Sur les onze livraisons prévues entre le 02 et le 12/09/2026 au titre des commandes
+           n° C-8842, C-8857 et C-8861, quatre sont parvenues hors délai, de 3 à 9 jours, deux
+           étaient incomplètes, et une a été refusée à la réception pour non-conformité de
+           référence.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Faits constatés et pièces qui les établissent</caption>
+            <thead><tr><th scope="col">Fait constaté</th><th scope="col">Date</th><th scope="col">Mesure</th><th scope="col">Pièce</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Fait constaté">Livraisons parvenues hors délai</td>
+                <td data-label="Date">04, 05, 09 et 11/09/2026</td>
+                <td data-label="Mesure">4 livraisons, retard de 3 à 9 jours</td>
+                <td data-label="Pièce">Relevé des livraisons du 02 au 12/09/2026</td>
+              </tr>
+              <tr>
+                <td data-label="Fait constaté">Livraison incomplète</td>
+                <td data-label="Date">07/09/2026</td>
+                <td data-label="Mesure">42 unités reçues pour 60 commandées</td>
+                <td data-label="Pièce">Bon de livraison n° BL-11204</td>
+              </tr>
+              <tr>
+                <td data-label="Fait constaté">Livraison incomplète</td>
+                <td data-label="Date">11/09/2026</td>
+                <td data-label="Mesure">18 unités reçues pour 25 commandées</td>
+                <td data-label="Pièce">Bon de livraison n° BL-11219</td>
+              </tr>
+              <tr>
+                <td data-label="Fait constaté">Livraison refusée à la réception</td>
+                <td data-label="Date">10/09/2026</td>
+                <td data-label="Mesure">1 livraison, non-conformité de référence</td>
+                <td data-label="Pièce">Procès-verbal de réception du 10/09/2026</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun fait n'est retenu à ce jour. Un courrier sans fait constaté n'est pas une demande.</p>
+        </div>
+        <p>Le taux de service constaté sur la période est de <strong>6 livraisons conformes sur
+           11, soit 54,5 %</strong>. Formule appliquée, écrite ici à côté du chiffre comme la
+           règle D9 l'exige : livraisons conformes en quantité, en référence et en délai ÷
+           livraisons prévues au calendrier d'approvisionnement de la période.</p>
+      </section>
+
+      <section class="chap lire" id="fondement">
+        <h2>Le fondement</h2>
+        <p class="ch-apprend">Ce chapitre cite l'article, la clause ou le niveau de service qui fonde la demande — le lecteur y apprend pourquoi ce qui suit lui est opposable.</p>
+        <p>L'article 7.1 du contrat-cadre n° CF-2025-014 stipule un <strong>taux de service
+           mensuel minimal de 95 %</strong>, défini au même article comme « le rapport des
+           livraisons conformes en quantité, en référence et en délai aux livraisons prévues au
+           calendrier d'approvisionnement ». Le taux constaté au § 1, soit 54,5 %, est inférieur
+           de plus de quarante points à cet engagement.</p>
+        <p>L'article 7.3 ouvre, en cas de taux mensuel inférieur à 95 %, la faculté pour
+           l'acheteur d'exiger un plan de reprise sous quinze jours. L'article 7.4 prévoit
+           l'application d'une pénalité de 2 % du montant des commandes de la période concernée
+           par mois de non-conformité persistante, et l'article 7.5 la suspension des commandes
+           nouvelles jusqu'au retour au taux contractuel.</p>
+      </section>
+
+      <section class="chap lire" id="demande">
+        <h2>La demande</h2>
+        <p class="ch-apprend">Ce chapitre dit ce que l'émetteur demande et pour quand — le lecteur y apprend ce qu'il doit produire, dans quel ordre d'importance, et à quelle date.</p>
+        <ol>
+          <li><strong>Produire un plan de reprise daté et chiffré</strong>, couvrant la cause des
+            retards, les mesures correctives et la date de retour au taux de service contractuel.
+            <strong>Échéance : 06/10/2026.</strong></li>
+          <li>Compléter les livraisons incomplètes des bons n° BL-11204 et BL-11219.
+            <strong>Échéance : 30/09/2026.</strong></li>
+          <li>Désigner un interlocuteur unique pour le suivi du plan de reprise, avec sa qualité.
+            <strong>Échéance : 30/09/2026.</strong></li>
+        </ol>
+        <p class="muted">La première demande est la principale ; les deux suivantes lui sont
+          accessoires. Cette hiérarchie est écrite volontairement : un courrier qui aligne six
+          demandes de même rang n'en obtient aucune.</p>
+      </section>
+
+      <section class="chap lire" id="consequences">
+        <h2>Les conséquences à défaut</h2>
+        <p class="ch-apprend">Ce chapitre dit ce que l'émetteur fera si la demande reste sans effet à l'échéance — le lecteur y apprend ce qui est engagé, et sous quel fondement.</p>
+        <p>À défaut de plan de reprise reçu au <strong>06/10/2026</strong>, Émetteur-A appliquera
+           la pénalité prévue à l'article 7.4 du contrat-cadre, soit 2 % du montant des commandes
+           n° C-8842, C-8857 et C-8861 par mois de non-conformité persistante, et suspendra le
+           passage de nouvelles commandes jusqu'au retour au taux contractuel, conformément à
+           l'article 7.5. Chacune de ces deux conséquences renvoie à l'article qui l'autorise, et
+           Émetteur-A est décidé à les appliquer.</p>
+        <div class="qualification">
+          <p><strong>Qualification de la pièce.</strong> Le présent courrier vaut <strong>mise en
+             demeure</strong> au sens de l'article 14.2 du contrat-cadre n° CF-2025-014.</p>
+        </div>
+      </section>
+
+      <section class="chap lire" id="signature">
+        <h2>Signature et suites</h2>
+        <p class="ch-apprend">Ce chapitre dit qui signe, avec quelle qualité, et par quelle voie la réponse est attendue — le lecteur y apprend comment répondre pour que sa réponse soit réputée reçue.</p>
+        <p>La réponse est attendue par <strong>écrit recommandé</strong> à l'adresse du siège
+           d'Émetteur-A, à l'attention de la direction des achats, avec copie électronique à
+           l'adresse du service. Une réponse adressée par une autre voie ne sera pas réputée
+           reçue au sens de l'article 14.2.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Signataire</caption>
+            <thead><tr><th scope="col">Signataire</th><th scope="col">Qualité</th><th scope="col">Date</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Signataire">Signature manuscrite à apposer avant envoi</td>
+                <td data-label="Qualité">Directeur des achats, habilité à notifier au titre de l'article 14.1</td>
+                <td data-label="Date">20/09/2026</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun signataire désigné — une pièce opposable ne se remet pas non signée.</p>
+        </div>
+      </section>
+
+      <section class="chap lire" id="pieces">
+        <h2>Pièces jointes</h2>
+        <p class="ch-apprend">Ce chapitre liste les pièces qui adossent chaque fait du § 1 — le lecteur y apprend ce qu'il peut vérifier, pièce par pièce, sans nous le demander.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Pièces annexées au présent courrier</caption>
+            <thead><tr><th scope="col">Pièce</th><th scope="col">Objet</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Pièce">Relevé des livraisons du 02 au 12/09/2026</td>
+                <td data-label="Objet">Dates prévues, dates constatées, écarts</td>
+              </tr>
+              <tr>
+                <td data-label="Pièce">Bons de livraison n° BL-11204 et BL-11219</td>
+                <td data-label="Objet">Quantités reçues contre quantités commandées</td>
+              </tr>
+              <tr>
+                <td data-label="Pièce">Procès-verbal de réception du 10/09/2026</td>
+                <td data-label="Objet">Refus pour non-conformité de référence</td>
+              </tr>
+              <tr>
+                <td data-label="Pièce">Calcul du taux de service de la période</td>
+                <td data-label="Objet">Formule et détail ligne à ligne</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucune pièce annexée — un fait affirmé sans sa pièce ne s'établit pas.</p>
+        </div>
+      </section>
+      </div>
+      </div>
+    </main>
+
+    <footer class="doc">
+      Émetteur-A · Courrier fournisseur · 20260920a · Gabarit gd-courrier-fournisseur v1.0.0 — instance fictive et pseudonymisée
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    var bouton = document.getElementById('theme-toggle');
+    var racine = document.documentElement;
+    function appliquer(theme) {
+      racine.setAttribute('data-theme', theme);
+      try { localStorage.setItem('digitai-theme', theme); } catch (e) {}
+      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    }
+    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    bouton.addEventListener('click', function () {
+      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+    var pli = document.querySelector('nav.toc details');
+    if (pli && window.matchMedia && !window.matchMedia('(min-width: 901px)').matches) {
+      pli.open = false;
+    }
+  })();
+  </script>
+</body>
+</html>
