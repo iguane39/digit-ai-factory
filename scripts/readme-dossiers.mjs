@@ -41,8 +41,34 @@ import { anonymiser } from "../todo/anonymiser-entrant.mjs";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const lireArg = (nom, defaut) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : defaut; };
+// `--check` n ecrit rien : le garde de depot ne le concerne pas, et il est lu avant lui.
+const CHECK_TOT = args.includes("--check");
 const BASE = resolve(lireArg("--base", join(ICI, "..")));
 const RACINES = lireArg("--racines", "input,output").split(",").map((s) => s.trim()).filter(Boolean);
+
+// TF-1201 / D-24 (22/09/2026) — UN GENERATEUR N ECRIT PAS DANS UN DEPOT OU L ON N EST PAS,
+// SANS LE DIRE.
+//
+// LE FAIT : le 12/09, lance depuis le depot d un produit, ce script a regenere cinq index du
+// pilot, et son voisin l index general de 269 livrables. Six fichiers SUIVIS du pilot modifies
+// depuis ailleurs, annules a la main. `--base` existait ; rien ne l exigeait, et la sortie ne
+// nommait pas le depot sur lequel elle avait ecrit — on ne voyait donc le degat qu au `git status`
+// de l autre depot.
+//
+// LE REMEDE EST EN DEUX TEMPS, et les deux comptent :
+//   · la sortie NOMME toujours le depot ecrit, meme quand il n y a rien a regenerer ;
+//   · ecrire dans un depot dont on n est pas se DECLARE par `--base`. Sans lui, refus : le
+//     defaut de cette classe n est pas qu on ecrive ailleurs, c est qu on l ignore.
+const BASE_DECLAREE = args.includes("--base");
+const DEDANS = resolve(process.cwd()) === BASE || resolve(process.cwd()).startsWith(BASE + sep);
+if (!CHECK_TOT && !DEDANS && !BASE_DECLAREE) {
+  console.error(
+    `refus : lance depuis ${process.cwd()}, ce generateur ecrirait dans ${BASE} — un autre depot. ` +
+    "Ecrire dans un depot ou l on n est pas se declare : relancer avec `--base <depot>` si c est " +
+    "bien le geste voulu, ou depuis le depot a regenerer. Le 12/09, six fichiers suivis du pilot " +
+    "ont ete modifies depuis un depot produit sans que rien ne le dise.");
+  process.exit(2);
+}
 // TF-0590 (25/08) : la comparaison normalise LES DEUX COTES, pas un seul. Le cote `courant`
 // l'etait deja ; l'ATTENDU ne l'etait pas, et ce n'est pas un oubli anodin : le bloc ROLE est
 // REPRIS du fichier existant pour etre preserve, donc il ramene les CRLF que git y a mis. Un
@@ -335,8 +361,8 @@ for (const racine of RACINES) {
   }
 }
 
-if (!SILENCIEUX && ecrits.length) console.log(`README régénérés (${ecrits.length}) : ${ecrits.join(" · ")}`);
-if (!SILENCIEUX && !ecrits.length && !CHECK) console.log("README à jour, rien à régénérer");
+if (!SILENCIEUX && ecrits.length) console.log(`README régénérés dans ${BASE} (${ecrits.length}) : ${ecrits.join(" · ")}`);
+if (!SILENCIEUX && !ecrits.length && !CHECK) console.log(`README à jour dans ${BASE}, rien à régénérer`);
 if (defauts.length) {
   console.error(`[readme-dossiers] ${defauts.length} défaut(s) :\n  - ${defauts.join("\n  - ")}`);
   process.exit(1);

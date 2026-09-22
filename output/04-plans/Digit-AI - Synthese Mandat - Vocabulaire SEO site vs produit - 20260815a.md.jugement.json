@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md",
- "empreinte": "fd0bb2621c226f031ed5f92891f7997e2c2350587a49e1ab1217e4a606ede134",
- "scelle_le": "2026-08-23T08:27:09.796Z",
+ "empreinte": "f9a75e962468d7b7a0d3ef3908b6b63de28f5b6c92a097fe6c5b8f50faa3f7be",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.432Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

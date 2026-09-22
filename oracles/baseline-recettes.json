@@ -84,7 +84,7 @@
   "vu_le": "2026-09-22"
  },
  "oracle-chemin-prescrit.mjs": {
-  "cas": 24,
+  "cas": 29,
   "vu_le": "2026-09-22"
  },
  "oracle-claude-md.mjs": {
@@ -331,7 +331,7 @@
   "vu_le": "2026-09-22"
  },
  "oracles/oracle-chemin-prescrit.test.mjs": {
-  "cas": 24,
+  "cas": 29,
   "vu_le": "2026-09-22"
  },
  "oracles/oracle-controles-injoignables.test.mjs": {
@@ -479,7 +479,7 @@
   "vu_le": "2026-08-31"
  },
  "scripts/verifier-jugement.test.mjs": {
-  "cas": 14,
+  "cas": 19,
   "vu_le": "2026-09-22"
  },
  "scripts/verifier-ooxml.test.mjs": {
@@ -587,8 +587,8 @@
   "vu_le": "2026-09-01"
  },
  "todo/observer-recidives.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-03"
+  "cas": 6,
+  "vu_le": "2026-09-22"
  },
  "todo/pre-commit-anonymise.test.mjs": {
   "cas": 10,

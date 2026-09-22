@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Revue Forge - Écosystème - 20260819a.md",
- "empreinte": "6ddec67ca90760154b7a06b042e54ebe75f8e244f33cb79a3e56546bafecad45",
- "scelle_le": "2026-09-22T15:02:05.353Z",
+ "empreinte": "7ab0b98d071525b31c97045ca57c853156f2784599eca78a77f16648f8286aad",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.426Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

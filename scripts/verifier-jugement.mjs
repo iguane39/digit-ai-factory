@@ -97,6 +97,27 @@ const NON_JUGE = [
 
 const sha = (b) => createHash("sha256").update(b).digest("hex");
 
+// TF-1312 / D-32 (22/09/2026) — L EMPREINTE PORTE SUR LE CONTENU NORMALISE, PAS SUR LES OCTETS
+// DU POSTE.
+//
+// LE FAIT MESURE : ce sceau hachait les octets de l ARBRE DE TRAVAIL, que git reecrit a chaque
+// extraction selon `core.autocrlf` du poste. Le meme livrable rendait `af16115…` sur ce disque
+// (CRLF) et `8dbe037…` au depot (LF). Un sceau pose ici etait donc vert ici et rouge partout
+// ailleurs — c est ce qui tenait la recette hebergee fermee, et c est la vraie cause des 31
+// ecarts que j avais d abord attribues a la reecriture d histoire du 09/09.
+//
+// CE QUI EST NORMALISE, ET CE QUI NE L EST PAS. Les formats TEXTUELS voient leurs fins de ligne
+// ramenees a un seul saut avant le calcul : ce sont eux, et eux seuls, que git reecrit. Un PDF
+// reste hache octet pour octet — normaliser un binaire ferait collisionner deux contenus
+// reellement differents, et git ne le touche pas. La frontiere du sceau est donc celle de git,
+// la seule qui le rende portable sans mentir sur ce qu il protege.
+const TEXTUELS = new Set([".md", ".html", ".htm"]);
+export const METHODE = "sha256/lf";
+const normaliser = (buffer, fichier) => (TEXTUELS.has(extname(fichier).toLowerCase())
+  ? Buffer.from(buffer.toString("utf8").replace(/\r\n/g, "\n"), "utf8")
+  : buffer);
+export const empreinteDe = (fichier) => sha(normaliser(readFileSync(fichier), fichier));
+
 function fichiers(cible) {
   if (!existsSync(cible)) return [];
   if (statSync(cible).isFile()) return [cible];
@@ -113,6 +134,35 @@ function fichiers(cible) {
   return out;
 }
 
+// TF-1306 / D-29 (22/09/2026) — UN SCELLEMENT REEL NE PREND QUE DES FICHIERS NOMMES.
+//
+// LE FAIT, COMMIS DEUX FOIS DANS LA MEME JOURNEE : le garde de masse fait DECLARER l intention
+// (`--en-masse`), il ne fait pas VERIFIER la PORTEE. Le 22/09 l intention a ete declaree pour 31
+// livrables identifies, la cible est restee le dossier `output`, et 213 ont ete scelles. Une
+// declaration ne mesure rien : seule la cible dit sur quoi le geste tombe.
+//
+// LA PORTEE SE VERIFIE DONC A LA SOURCE : ecrire un sceau exige que chaque cible soit un FICHIER.
+// La mesure et l essai gardent le dossier — ils n ecrivent rien, et c est par eux qu on obtient
+// justement la liste a nommer. C est la seule forme ou la commande qui mesure et la commande qui
+// ecrit ne different pas que d un mot sur la meme cible.
+if (SCELLER && !ESSAI) {
+  const dossiers = cibles.filter((c) => existsSync(c) && statSync(c).isDirectory());
+  if (dossiers.length) {
+    process.stdout.write(JSON.stringify({
+      outil: "verifier-jugement", version: "1.0.0", cibles, verdict: "REFUSE",
+      mesure: { cibles_dossier: dossiers.length },
+      message:
+        `${dossiers.length} cible(s) sont des DOSSIERS, et un scellement reel ne prend que des ` +
+        "fichiers nommes. Sceller est la declaration « ce livrable est repute bon » : elle se pose " +
+        "sur des livrables qu on a lus, pas sur une arborescence dont on ignore la taille. Jouer " +
+        "d abord `--sceller --essai` sur le dossier pour obtenir la liste, puis rejouer en nommant " +
+        "les fichiers retenus.",
+      dossiers,
+    }, null, 1) + "\n");
+    process.exit(2);
+  }
+}
+
 if (!cibles.length) {
   process.stdout.write(JSON.stringify({
     outil: "verifier-jugement", verdict: "ERREUR",
@@ -126,7 +176,7 @@ const aSceller = [], ecrases = [];
 for (const cible of cibles) {
   for (const f of fichiers(cible)) {
     if (!NOMME_LIVRABLE.test(basename(f))) continue;
-    const empreinte = sha(readFileSync(f));
+    const empreinte = empreinteDe(f);
     const sceau = f + SCEAU;
     if (SCELLER) {
       // UN LIVRABLE EN ECART DIT SON ECART AVANT D ETRE ECRASE : c est le cas ou le sceau ment,
@@ -153,7 +203,15 @@ for (const cible of cibles) {
       continue;
     }
     verifies++;
-    if (j.empreinte !== empreinte) {
+    if (j.empreinte !== empreinte && !j.methode) {
+      // UN SCEAU SANS METHODE PRECEDE LA NORMALISATION : il a ete calcule sur les octets du poste
+      // qui l a pose, et son ecart ne prouve rien sur le contenu du livrable. Le dire, plutot que
+      // d accuser le livrable d une modification qui n a peut-etre pas eu lieu.
+      add("J-2", "majeur", f,
+        "sceau anterieur a la normalisation des fins de ligne (champ `methode` absent) : son " +
+        "empreinte porte les octets du poste qui l a pose, pas le contenu portable. Rejouer " +
+        "`--sceller` sur ce livrable une fois son contenu relu — c est le geste prevu par D-32.");
+    } else if (j.empreinte !== empreinte) {
       add("J-1", "bloquant", f,
         `livrable MODIFIÉ après avoir été jugé, à indice INCHANGÉ. Le sceau porte ` +
         `${j.empreinte.slice(0, 12)}…, le fichier porte ${empreinte.slice(0, 12)}… — scellé le ` +
@@ -189,7 +247,7 @@ if (SCELLER && !ESSAI && !EN_MASSE && aSceller.length > SEUIL_DE_MASSE) {
 if (SCELLER && !ESSAI) {
   for (const { sceau, fichier, empreinte } of aSceller) {
     writeFileSync(sceau, JSON.stringify({
-      format: "pilot/jugement@1", fichier: basename(fichier), empreinte,
+      format: "pilot/jugement@1", fichier: basename(fichier), empreinte, methode: METHODE,
       scelle_le: new Date().toISOString(),
       regle: "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)",
     }, null, 1) + "\n", "utf8");
@@ -202,6 +260,10 @@ const verdict = SCELLER ? (ESSAI ? "ESSAI" : "SCELLE") : durs.length ? "FAIL" : 
 process.stdout.write(JSON.stringify({
   outil: "verifier-jugement", version: "1.0.0", cibles, verdict,
   mesure: SCELLER ? { scelles, ecraserait: ecrases.length } : { verifies, non_scelles: nonScelles, ecarts: durs.length },
+  // L ESSAI REND LA LISTE A NOMMER. Depuis D-29 un scellement reel refuse un dossier : l essai
+  // est donc la voie par laquelle on obtient les chemins a passer en clair. Une voie prescrite
+  // qui ne rend pas ce qu elle prescrit de reutiliser n est pas une voie.
+  ...(SCELLER && ESSAI ? { a_sceller: aSceller.map((x) => x.fichier), ecraserait: ecrases } : {}),
   findings: findings.length ? findings : [{
     regle: "J-1", severite: "info", ou: cibles.join(" "),
     message: SCELLER ? `${scelles} livrable(s) scellé(s)` :

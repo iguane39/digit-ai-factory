@@ -6,7 +6,7 @@
  * un vert. Joué par `oracles\self-tests.mjs` (I2). La forge est résolue comme en production ; si elle
  * est absente du poste, la recette le DIT et rend SANS_OBJET — pas un PASS.
  */
-import { mkdtempSync, writeFileSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -36,6 +36,9 @@ writeFileSync(planPath, JSON.stringify({
   ],
 }), "utf8");
 const snap = join(T, "snapshots.jsonl");
+// Le nombre de releves du ledger est la MESURE de ce que l outil ecrit : c est par lui que se
+// prouve qu une relecture ne pose rien (TF-1308).
+const lignes = (p) => { try { return readFileSync(p, "utf8").trim().split("\n").filter(Boolean).length; } catch { return 0; } };
 
 check("premier passage — un seul relevé : données insuffisantes (exit 2), dit, jamais un vert", () => {
   ecrire(0);
@@ -57,6 +60,31 @@ check("forge absente — SANS_OBJET dit, exit 2, jamais un PASS", () => {
   const r = jouer({ planPath, snapPath: snap, forgePath: null, cwd: T });
   if (r.verdict !== "SANS_OBJET" || r.exit !== 2) throw new Error(`verdict ${r.verdict}`);
 });
+// ---- TF-1308 / D-22 (22/09/2026) : LIRE UNE DERIVE NE LA DEPLACE PAS ------------------------
+//
+// LE FAIT, trouve en le commettant : le releve d ouverture du 21/09 rendait une derive bloquante ;
+// en rejouant l outil pour en LIRE le detail, le verdict est passe au vert, parce que l appel
+// avait pose un snapshot DE PLUS et que la derive comparait desormais deux points rapproches.
+// Les 2 cas tiennent les 2 sens : la forme qui OBSERVE deplace la reference (c est son travail),
+// la forme qui RELIT ne la deplace pas (c est ce qui manquait).
+check("ROUGE — la forme qui OBSERVE pose un releve : deux appels de suite EFFACENT la derive", () => {
+  const avant = lignes(snap);
+  const un = jouer({ planPath, snapPath: snap, forgePath: FORGE, cwd: T });
+  const deux = jouer({ planPath, snapPath: snap, forgePath: FORGE, cwd: T });
+  if (lignes(snap) !== avant + 2) throw new Error(`${lignes(snap) - avant} releve(s) pose(s), 2 attendus`);
+  if (un.verdict === deux.verdict && un.verdict === "FAIL") throw new Error("le second appel rend encore FAIL : le cas fondateur n est plus reproduit, ce banc ne prouve plus rien");
+});
+
+check("VERT — --relire rejoue la derive SANS rien poser, et deux relectures rendent le MEME verdict", () => {
+  const avant = lignes(snap);
+  const a = jouer({ planPath, snapPath: snap, forgePath: FORGE, cwd: T, relire: true });
+  const b = jouer({ planPath, snapPath: snap, forgePath: FORGE, cwd: T, relire: true });
+  if (lignes(snap) !== avant) throw new Error(`la relecture a pose ${lignes(snap) - avant} releve(s) — elle deplace la reference qu elle lit`);
+  if (a.verdict !== b.verdict) throw new Error(`deux relectures rendent ${a.verdict} puis ${b.verdict}`);
+  if (a.relu !== true) throw new Error("la relecture ne se declare pas dans sa sortie");
+  if (a.observer !== null) throw new Error("la relecture a joue l observateur");
+});
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\nobserver-recidives : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

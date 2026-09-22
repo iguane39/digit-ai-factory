@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html",
- "empreinte": "67958ef27693e17e912493494f87b11424d1c89c80977e7350bb6e4cbf6e4dec",
- "scelle_le": "2026-09-22T15:02:05.437Z",
+ "empreinte": "45f7c346dba30e31cd35c02af7fe82fd969d91de7770b6eb42168b2cf0bed35d",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.426Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

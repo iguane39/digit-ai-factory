@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md",
- "empreinte": "87acd4feebedfbc3769b23f65e977a36be82c8e32f0d5a7e671ec4d5bbf109db",
- "scelle_le": "2026-08-23T08:27:09.789Z",
+ "empreinte": "84cc41776dcbe3b1c9c565250ec47411651677b60e54bc38b3a2148025b051e0",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.428Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

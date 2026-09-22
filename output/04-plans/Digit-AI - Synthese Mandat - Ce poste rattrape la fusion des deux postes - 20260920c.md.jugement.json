@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Ce poste rattrape la fusion des deux postes - 20260920c.md",
- "empreinte": "9640fe13bcb46ea7cac2ec6098d54a755eba9b00d94c82aa33da1e30e9714d9b",
- "scelle_le": "2026-09-22T15:02:06.347Z",
+ "empreinte": "38853df545f17e110d1b605e0f16d7a8ef09127ff72e2be3cf8c3367f2166958",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.429Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

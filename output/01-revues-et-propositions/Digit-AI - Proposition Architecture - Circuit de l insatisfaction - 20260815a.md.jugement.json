@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md",
- "empreinte": "c20ac43a09de1bd4fc5bc95c73aa17dd58cf61bcd763d92716bf51f11ada8005",
- "scelle_le": "2026-09-22T15:02:05.089Z",
+ "empreinte": "416121f063d02cf386d5575951f251fb359c58940db603ffae2ce61ce1492ef0",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.420Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

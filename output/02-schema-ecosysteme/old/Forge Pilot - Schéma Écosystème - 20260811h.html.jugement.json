@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Forge Pilot - Schéma Écosystème - 20260811h.html",
- "empreinte": "40b791617155f578882638c62e2fd777a7d805d7dd9b906dbf6d2256c93730c1",
- "scelle_le": "2026-09-22T15:02:05.679Z",
+ "empreinte": "eb5fc7c3fa86ba89aa1c9421018fdfc62b56a15e4696cb30d71daa1cc79b07c0",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.427Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

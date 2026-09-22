@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md",
- "empreinte": "dabbe20f83bd109f9461412a4f7ee049c168fae91fcac3f819678848b1005176",
- "scelle_le": "2026-09-22T15:02:07.179Z",
+ "empreinte": "ee42cfb055f01128af35d640155efbcd39f2c8eb2e42eb5be35146cee6721af5",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.432Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

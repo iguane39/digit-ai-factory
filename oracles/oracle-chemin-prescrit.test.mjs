@@ -52,7 +52,7 @@ const parc = (depots) => {
       mkdirSync(join(p, ".."), { recursive: true });
       writeFileSync(p, contenu, "utf8");
     }
-    for (const [rel, contenu] of Object.entries({ ...scripts, ...bancs })) {
+    for (const [rel, contenu] of Object.entries({ ...scripts, ...bancs, ...(depots[nom].referentiels || {}) })) {
       const p = join(d, rel);
       mkdirSync(join(p, ".."), { recursive: true });
       writeFileSync(p, contenu, "utf8");
@@ -242,6 +242,60 @@ try {
     att(NON_JUGE.some((l) => /PROSE/.test(l)), "la borne de la prose n'est pas déclarée");
   });
 
+  // ── CP4 (TF-1287) : le point d'entrée d'un service « prouvé » résout dans SA forge ────────
+  //
+  // Le fait fondateur : deux services « prouvés » prescrivaient un chemin qui avait perdu un
+  // segment. Les scripts existaient, chez la forge qui les porte, un segment plus bas. CP1 ne
+  // les voyait pas — elle ne lit que les documents, et la vue générée depuis ce référentiel est
+  // écartée à juste titre. Les quatre cas tiennent les quatre sens qui comptent.
+  const catalogue = (entrees) => ({ "catalogues/catalogue.jsonl": entrees.map((e) => JSON.stringify(e)).join("\n") + "\n" });
+
+  check("CP4 ROUGE — un service « prouvé » dont le point d'entrée a perdu un segment : DOIT ÉCHOUER", () => {
+    const r = jugerParc({
+      pilot: { docs: { "R.md": "node scripts\\s.mjs\n" }, scripts: { "scripts/s.mjs": "// s\n" },
+        referentiels: catalogue([{ id: "cat-x-01", forge: "organization", statut: "prouve", point_entree: "node output\\compo\\o.mjs" }]) },
+      "digit-ai-forge-organization": { scripts: { "output/02-composants/compo/o.mjs": "// le vrai chemin, un segment plus bas\n" } },
+    });
+    att(echoue(r, "CP4"), "un point d'entrée injoignable passe — c'est le défaut fondateur");
+    att(/cat-x-01/.test(regle(r, "CP4").message), "le constat ne nomme pas le service en cause");
+  });
+
+  check("CP4 VERT — le MÊME service, chemin complet : passe, et la résolution se fait dans SA forge", () => {
+    const r = jugerParc({
+      pilot: { docs: { "R.md": "node scripts\\s.mjs\n" }, scripts: { "scripts/s.mjs": "// s\n" },
+        referentiels: catalogue([{ id: "cat-x-01", forge: "organization", statut: "prouve", point_entree: "node output\\02-composants\\compo\\o.mjs" }]) },
+      "digit-ai-forge-organization": { scripts: { "output/02-composants/compo/o.mjs": "// le vrai chemin\n" } },
+    });
+    att(passe(r, "CP4"), `CP4 accuse un chemin juste : ${JSON.stringify(regle(r, "CP4"))}`);
+  });
+
+  check("CP4 ROUGE — un OCTET DE CONTRÔLE dans le chemin est accusé, et se dit comme tel", () => {
+    const r = jugerParc({
+      pilot: { docs: { "R.md": "node scripts\\s.mjs\n" }, scripts: { "scripts/s.mjs": "// s\n" },
+        referentiels: catalogue([{ id: "cat-y-01", forge: "tests", statut: "prouve", point_entree: "forge_tests\noyau.py" }]) },
+      "digit-ai-forge-tests": { scripts: { "forge_tests/noyau.py": "# noyau\n" } },
+    });
+    att(echoue(r, "CP4"), "un saut de ligne dans un chemin passe — il ne se voit pas à la lecture");
+    att(/octet de contrôle/.test(regle(r, "CP4").message), "le motif ne distingue pas l'octet de contrôle du segment oublié");
+  });
+
+  check("CP4 — un service qui n'est PAS « prouvé » n'est pas accusé : la règle protège le mot", () => {
+    const r = jugerParc({
+      pilot: { docs: { "R.md": "node scripts\\s.mjs\n" }, scripts: { "scripts/s.mjs": "// s\n" },
+        referentiels: catalogue([{ id: "cat-z-01", forge: "organization", statut: "en cours", point_entree: "node output\\nulle-part\\o.mjs" }]) },
+      "digit-ai-forge-organization": { scripts: { "README.md": "# rien\n" } },
+    });
+    att(!echoue(r, "CP4"), "un service en cours de preuve est accusé — la règle déborde de ce qu'elle protège");
+  });
+
+  check("CP4 — une forge ABSENTE du parc n'est pas un défaut du catalogue", () => {
+    const r = jugerParc({
+      pilot: { docs: { "R.md": "node scripts\\s.mjs\n" }, scripts: { "scripts/s.mjs": "// s\n" },
+        referentiels: catalogue([{ id: "cat-w-01", forge: "jamais-clonee", statut: "prouve", point_entree: "node oracles\\o.mjs" }]) },
+    });
+    att(!echoue(r, "CP4"), "un poste qui n'a cloné que la moitié de l'écosystème se fait crier dessus");
+  });
+
   check("un dépôt ENTIÈREMENT conforme rend PASS sur les trois règles — le sens vert de bout en bout", () => {
     const r = jugerParc({ pilot: {
       docs: { "R.md": "node oracles\\o.mjs --connue\n\nnode scripts\\s.mjs\n" },
@@ -254,5 +308,5 @@ try {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }
 
-console.log(`\nchemin-prescrit (TF-1282) : ${pass} PASS, ${fail} FAIL — couverture à double sens sur CP1, CP2, CP3, plus les 5 calibrages payés sur le dépôt réel`);
+console.log(`\nchemin-prescrit (TF-1282) : ${pass} PASS, ${fail} FAIL — couverture à double sens sur CP1, CP2, CP3, CP4, plus les 5 calibrages payés sur le dépôt réel`);
 process.exit(fail ? 1 : 0);

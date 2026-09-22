@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md",
- "empreinte": "1eba37b660c2affc07f03b7f13f126dc8acbeeb0028fddc6c72a6f817d6d2bff",
- "scelle_le": "2026-09-22T15:02:06.653Z",
+ "empreinte": "5c82d49373a0401b731e37916e950ea027ab7dc96a86a9e4e6bdedc4fc67cd94",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.430Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

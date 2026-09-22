@@ -214,6 +214,65 @@ export function prescriptions(depot, racineParc) {
   return out;
 }
 
+// ── CP4 (TF-1287, décision humaine D-31 (a) du 22/09/2026) ─────────────────────────────────
+//
+// LE FAIT : deux services du catalogue portaient le statut « prouvé » et prescrivaient un point
+// d'entrée dont le chemin avait perdu un segment. Les scripts existent, chez la forge qui les
+// porte, mais un segment plus bas. Un consommateur du catalogue qui joue la commande obtient
+// « module introuvable », pas un verdict — et la colonne Preuve lui a dit « oracle vérifié dans
+// les deux sens ». Un service ne peut pas rester « prouvé » avec un point d'entrée injoignable.
+//
+// POURQUOI CP1 NE LE VOYAIT PAS : elle ne lit que les documents `.md`, et la vue générée depuis
+// ce référentiel est écartée à juste titre — accuser la dérivation au lieu de sa source compterait
+// le défaut deux fois. La source, elle, est un `.jsonl`, et personne ne la lisait.
+//
+// CE QUI FAIT LA RÈGLE JUSTE : la résolution se fait dans LA FORGE QUE L'ENTRÉE DÉCLARE, jamais
+// dans le pilot. Sans cela, 44 points d'entrée sur 44 paraîtraient morts, et la règle serait
+// désactivée dans la semaine.
+export const REFERENTIELS_A_POINT_D_ENTREE = ["catalogues/catalogue.jsonl"];
+
+/** Chemins de fichier cités dans une prescription, antislash ou barre, hors motifs à trous. */
+export const RE_CHEMIN_CITE = /[A-Za-z0-9_.-]+(?:[\\/][A-Za-z0-9_.{},*-]+)+\.(?:mjs|cjs|js|py|md|yml|sh)/g;
+
+/** Le dépôt de la forge nommée par une entrée — « design » se lit `digit-ai-forge-design`. */
+export function depotDeLaForge(nom, racineParc, depotPilot) {
+  if (!nom || nom === "pilot" || /factory/.test(String(nom))) return depotPilot;
+  const noms = String(nom).startsWith("digit-ai") ? [nom] : [`digit-ai-forge-${nom}`, `digit-ai-${nom}`];
+  for (const n of noms) { const c = resolve(racineParc, n); if (existsSync(c)) return c; }
+  return null;
+}
+
+export function pointsDEntree(depot, racineParc) {
+  const out = [];
+  for (const rel of REFERENTIELS_A_POINT_D_ENTREE) {
+    const fichier = resolve(depot, rel);
+    if (!existsSync(fichier)) continue;
+    const lignes = readFileSync(fichier, "utf8").split(/\r?\n/).filter((l) => l.trim());
+    lignes.forEach((l, i) => {
+      let e = null;
+      try { e = JSON.parse(l); } catch { return; }
+      if (!e || !/prouv/i.test(String(e.statut || ""))) return;
+      const pe = String(e.point_entree || "");
+      const racineForge = depotDeLaForge(e.forge, racineParc, depot);
+      // UN OCTET DE CONTROLE DANS UN CHEMIN N EST PAS UN CHEMIN. Il se dit à part, parce que son
+      // remède n'est pas le même : c'est un antislash avalé par un échappement, pas un segment
+      // oublié — et il ne se voit pas à la lecture.
+      if (/[\x00-\x1f]/.test(pe)) {
+        out.push({ referentiel: rel, ligne: i + 1, id: e.id, forge: e.forge || null, chemin: JSON.stringify(pe.slice(0, 60)), resolu: null, octetDeControle: true });
+        return;
+      }
+      for (const c of pe.match(RE_CHEMIN_CITE) || []) {
+        if (/[{}*]/.test(c)) continue;
+        const relatif = c.split("\\").join("/");
+        const candidats = [racineForge && resolve(racineForge, relatif), resolve(depot, relatif)].filter(Boolean);
+        const resolu = candidats.find((x) => { try { return existsSync(x) && statSync(x).isFile(); } catch { return false; } }) || null;
+        out.push({ referentiel: rel, ligne: i + 1, id: e.id, forge: e.forge || null, chemin: c, resolu, octetDeControle: false, forgeIntrouvable: !racineForge });
+      }
+    });
+  }
+  return out;
+}
+
 export function juger(depot, { racineParc = null } = {}) {
   const racine = racineParc || racineDuParc(depot);
   const F = [];
@@ -286,6 +345,22 @@ export function juger(depot, { racineParc = null } = {}) {
       + "ne joue jamais n'a jamais été vue fonctionner, et le producteur est le premier à l'essayer (TF-1282)");
   }
 
+  // ── CP4 — le point d'entrée d'un service « prouvé » résout dans SA forge ───────────────────
+  const entrees = pointsDEntree(depot, racine);
+  const injoignables = entrees.filter((e) => !e.resolu && !e.forgeIntrouvable);
+  if (!entrees.length) {
+    F.push({ regle: "CP4", statut: "SANS_OBJET", ou: "-",
+      message: "aucun référentiel à point d'entrée dans ce dépôt — CP4 n'a rien à mesurer ici, et ne le maquille pas en PASS" });
+  } else if (!injoignables.length) {
+    ok("CP4", `${entrees.length} point(s) d'entrée de service « prouvé » résolvent tous dans la forge que leur entrée déclare`);
+  } else {
+    ko("CP4", injoignables.map((e) => `${e.referentiel}:${e.ligne}`).join(", "),
+      `${injoignables.length} service(s) annoncé(s) « prouvé » prescrivent un point d'entrée INJOIGNABLE : ` +
+      injoignables.slice(0, 8).map((e) => `${e.id} (${e.forge || "?"}) → ${e.octetDeControle ? "octet de contrôle dans le chemin " : ""}${e.chemin}`).join(" · ") +
+      ". Un consommateur qui joue la commande obtient « module introuvable », pas un verdict, et la colonne " +
+      "Preuve lui a dit le contraire. Remède : corriger le chemin dans le référentiel, puis régénérer la vue.");
+  }
+
   return {
     verdict: F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings: F,
     prescriptions: toutes.length, jugeables: jugeables.length, horsPortee: toutes.length - jugeables.length,
@@ -293,6 +368,9 @@ export function juger(depot, { racineParc = null } = {}) {
 }
 
 export const NON_JUGE = [
+  "CP4 ne lit QUE les référentiels nommés par `REFERENTIELS_A_POINT_D_ENTREE`, et seulement leurs entrées au statut « prouvé » : un service en cours de preuve peut prescrire un chemin mort sans être accusé, et c'est voulu — la promesse que CP4 protège est celle du mot « prouvé »",
+  "CP4 constate qu'un fichier EXISTE à l'endroit prescrit, jamais que la commande complète s'exécute : un script présent mais cassé passe CP4. Exécuter chaque point d'entrée du catalogue demanderait les environnements de onze forges, et c'est déclaré plutôt que faussement promis",
+  "CP4 ne juge PAS une entrée dont le dépôt de forge est absent du parc : l'absence d'un dépôt frère n'est pas un défaut du catalogue, et l'accuser ferait crier la règle sur un poste qui n'a cloné que la moitié de l'écosystème",
   "la prescription en PROSE (« lancez le script de capture », « relancez l'oracle ») : seule la forme `node <script>` est reconnue, parce que deviner une prescription accuserait la doctrine qui décrit un défaut pour l'interdire — le faux positif le plus cher de tous",
   "les chemins de CONVENTION D'ACCUEIL (`forge\\…`, `.claude\\…`, `~\\…`) et les chemins sous PLACEHOLDER (`<racine>`, `$FORGE_ROOT`) sont écartés par construction : un gabarit prescrit un chemin qui n'a de sens que chez son hôte futur, et résoudre un paramètre serait l'inventer",
   "les documents de `output\\` et `input\\` : livrables et entrants datés, jamais des prescriptions. Un plan du 30/08 cite l'outillage du 30/08, et le corriger réécrirait l'histoire au lieu de cesser d'en produire (R-42)",

@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md",
- "empreinte": "5642e5065ed7e7e42c07bc2cb512271ec4e7cdff91ef4a9a26853774931f9750",
- "scelle_le": "2026-08-23T08:27:09.789Z",
+ "empreinte": "bc52dcb9e66add6b0d733ab10b7648d4b13a40a7eba5efbaa0faaec47a61d9d9",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.428Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

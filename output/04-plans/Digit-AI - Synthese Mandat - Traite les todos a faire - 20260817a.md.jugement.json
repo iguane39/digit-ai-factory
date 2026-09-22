@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md",
- "empreinte": "05a4ebab625cb5c2883d53a03e268fa86764bb5c7d5ca3fd9cc02b7f2b6442a2",
- "scelle_le": "2026-09-22T15:02:07.107Z",
+ "empreinte": "740c557fc717bab0cbcd4012fc5259a1f0fa77858f000f42bb95cb66d2677f13",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.431Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

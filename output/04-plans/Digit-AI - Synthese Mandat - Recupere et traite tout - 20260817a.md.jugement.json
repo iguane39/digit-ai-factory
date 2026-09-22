@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md",
- "empreinte": "5d63e89fd30b69e7da4dae1e920d974a4ca3e8d99bb09b2b62d2defacaa6db68",
- "scelle_le": "2026-09-22T15:02:06.803Z",
+ "empreinte": "eccc3b90e6a611b2316026b8d3164a1d563e6ddb1119d106f5eb731d2a317ab9",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.430Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

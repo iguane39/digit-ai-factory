@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Todos et retours 32 clos sur preuve rejouee - 20260919b.md",
- "empreinte": "7c789d29fd96096b22134c30b0d75d68f965cb32ecb2a3fa230bf15d420c0447",
- "scelle_le": "2026-09-22T15:02:06.950Z",
+ "empreinte": "6fcd2adc4c8e7a64102079639792bd49243897b6ed7bce226c5f85d35a67312a",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.430Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

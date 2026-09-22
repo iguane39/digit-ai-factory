@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md",
- "empreinte": "af1611512de5b9eea8fc4f7e9bc76ff2149e53617934dfbaa74ae9548bd3bfff",
- "scelle_le": "2026-09-22T15:02:07.023Z",
+ "empreinte": "8dbe037731200688662d7d2aeb089d5054b03df23c7704b9c10b1cb37fddfa82",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-22T16:19:01.431Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

@@ -36,6 +36,14 @@ const lancer = (...a) => {
   try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
   return { code: r.status, j };
 };
+// Depuis D-29 (TF-1306), un scellement REEL ne prend que des fichiers nommes : le banc scelle
+// donc comme on scelle vraiment, en nommant. La mesure, elle, garde le dossier.
+const sceller = (...cibles) => {
+  const r = spawnSync(process.execPath, [OUTIL, ...cibles, "--sceller"], { encoding: "utf8" });
+  let j = null;
+  try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+  return { code: r.status, j };
+};
 
 writeFileSync(LIVRABLE, page("v1"), "utf8");
 writeFileSync(join(T, "README.md"), "# notice ordinaire\n", "utf8");
@@ -53,7 +61,7 @@ check("un fichier HORS convention de nommage daté n'est pas jugé", () => {
 });
 
 check("`--sceller` pose l'empreinte, et le fichier inchangé passe ensuite", () => {
-  const s = lancer("--sceller");
+  const s = sceller(LIVRABLE);
   if (s.j.verdict !== "SCELLE" || s.j.mesure.scelles !== 1) throw new Error(`sceau non posé : ${JSON.stringify(s.j.mesure)}`);
   if (!existsSync(LIVRABLE + ".jugement.json")) throw new Error("le sceau n'est pas écrit à côté du fichier");
   const r = lancer();
@@ -116,10 +124,16 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
     try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
     return { code: r.status, j };
   };
+  const scellerP = (cible) => {
+    const r = spawnSync(process.execPath, [OUTIL, cible, "--sceller"], { encoding: "utf8" });
+    let j = null;
+    try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+    return { code: r.status, j };
+  };
 
   check("un PDF scellé puis laissé intact ne déclenche rien", () => {
     writeFileSync(PDF, Buffer.from("contenu initial du livrable imprimable"));
-    const s = jouerP("--sceller");
+    const s = scellerP(PDF);
     if (!existsSync(PDF + ".jugement.json")) throw new Error("le sceau n'est pas posé sur un PDF — l'extension ne sert à rien");
     if (s.j.mesure.scelles !== 1) throw new Error(`${s.j.mesure.scelles} scellé(s), 1 attendu`);
     const r = jouerP();
@@ -160,8 +174,16 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
   const sceauDe = (n) => join(M, `Client - Rapport - 2026082${n}a.html.jugement.json`);
   for (const n of [1, 2, 3]) writeFileSync(join(M, `Client - Rapport - 2026082${n}a.html`), page(`v${n}`), "utf8");
 
+  const NOMS = [1, 2, 3].map((n) => join(M, `Client - Rapport - 2026082${n}a.html`));
+  const scellerM = (...a) => {
+    const r = spawnSync(process.execPath, [OUTIL, ...NOMS, ...a], { encoding: "utf8" });
+    let j = null;
+    try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+    return { code: r.status, j };
+  };
+
   check("ROUGE — sceller PLUS D UN livrable sans le declarer est REFUSE, et rien n est ecrit", () => {
-    const r = lancerM("--sceller");
+    const r = scellerM("--sceller");
     if (r.code !== 2) throw new Error(`exit ${r.code} attendu 2 — un geste de masse passe sans se declarer`);
     if (r.j.verdict !== "REFUSE") throw new Error(`verdict ${r.j && r.j.verdict}`);
     for (const n of [1, 2, 3]) {
@@ -170,7 +192,7 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
   });
 
   check("VERT — le meme geste declare par --en-masse passe et ecrit", () => {
-    const r = lancerM("--sceller", "--en-masse");
+    const r = scellerM("--sceller", "--en-masse");
     if (r.code !== 0) throw new Error(`exit ${r.code} — le geste declare doit passer`);
     for (const n of [1, 2, 3]) {
       if (!existsSync(sceauDe(n))) throw new Error(`le sceau ${n} n a pas ete pose`);
@@ -189,7 +211,7 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
   check("VERT — sceller UN SEUL livrable reste le geste ordinaire, sans drapeau de plus", () => {
     const U = mkdtempSync(join(tmpdir(), "jugement-un-"));
     writeFileSync(join(U, "Client - Rapport - 20260824a.html"), page("seul"), "utf8");
-    const r = spawnSync(process.execPath, [OUTIL, U, "--sceller"], { encoding: "utf8" });
+    const r = spawnSync(process.execPath, [OUTIL, join(U, "Client - Rapport - 20260824a.html"), "--sceller"], { encoding: "utf8" });
     if (r.status !== 0) throw new Error(`exit ${r.status} — le geste qu on fait UNE FOIS ne doit pas se declarer`);
     if (!existsSync(join(U, "Client - Rapport - 20260824a.html.jugement.json"))) throw new Error("le sceau unique n a pas ete pose");
     rmSync(U, { recursive: true, force: true });
@@ -197,6 +219,79 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
 
   rmSync(M, { recursive: true, force: true });
 }
+// ---- D-29 (TF-1306) : LA PORTEE SE VERIFIE, elle ne se declare pas ---------------------------
+// Le garde de masse fait DECLARER une intention ; il ne mesure pas sur quoi le geste tombe. Le
+// 22/09/2026 l intention portait sur 31 livrables nommes, la cible est restee le dossier, et 213
+// ont ete scelles. Les 2 cas ci-dessous tiennent les 2 sens du garde de portee.
+{
+  const D = mkdtempSync(join(tmpdir(), "jugement-portee-"));
+  for (const n of [1, 2]) writeFileSync(join(D, `Client - Rapport - 2026090${n}a.html`), page(`p${n}`), "utf8");
+
+  check("ROUGE — un scellement REEL vise un DOSSIER : REFUSE, et aucun sceau n est ecrit", () => {
+    const r = spawnSync(process.execPath, [OUTIL, D, "--sceller", "--en-masse"], { encoding: "utf8" });
+    if (r.status !== 2) throw new Error(`exit ${r.status} attendu 2 — declarer une intention ne verifie pas une portee`);
+    if (!/DOSSIERS/.test(r.stdout)) throw new Error("le refus ne dit pas que la cible est un dossier");
+    for (const n of [1, 2]) {
+      if (existsSync(join(D, `Client - Rapport - 2026090${n}a.html.jugement.json`))) throw new Error("un refus qui arrive apres l ecriture n est pas un refus");
+    }
+  });
+
+  check("VERT — la MESURE et l ESSAI gardent le dossier : c est par eux qu on obtient la liste", () => {
+    const e = spawnSync(process.execPath, [OUTIL, D, "--sceller", "--en-masse", "--essai"], { encoding: "utf8" });
+    if (e.status !== 0) throw new Error(`exit ${e.status} — l essai sur un dossier doit rester jouable`);
+    const j = JSON.parse(e.stdout);
+    if (j.verdict !== "ESSAI") throw new Error(`verdict ${j.verdict}`);
+    if (!j.a_sceller || j.a_sceller.length !== 2) throw new Error("l essai ne rend pas la liste a nommer");
+    const m = spawnSync(process.execPath, [OUTIL, D], { encoding: "utf8" });
+    if (m.status !== 0) throw new Error(`exit ${m.status} — la mesure sur un dossier doit rester jouable`);
+  });
+
+  rmSync(D, { recursive: true, force: true });
+}
+
+// ---- D-32 (TF-1312) : LE SCEAU EST PORTABLE D UN POSTE A L AUTRE ----------------------------
+// Le sceau hachait les octets de l arbre de travail, que git reecrit selon la politique de fins
+// de ligne du poste : vert ici, rouge partout ailleurs. Les 3 cas tiennent la normalisation, sa
+// frontiere, et le sort des sceaux poses AVANT elle.
+{
+  const N = mkdtempSync(join(tmpdir(), "jugement-fins-"));
+  const CRLF = join(N, "Client - Rapport - 20260910a.md");
+  const corps = "# titre\n\nune ligne\nune autre\n";
+
+  check("VERT — le MEME contenu en CRLF et en LF rend la MEME empreinte", () => {
+    writeFileSync(CRLF, corps.replace(/\n/g, "\r\n"), "utf8");
+    const s = spawnSync(process.execPath, [OUTIL, CRLF, "--sceller"], { encoding: "utf8" });
+    if (s.status !== 0) throw new Error(`exit ${s.status} au scellement`);
+    const pose = JSON.parse(readFileSync(CRLF + ".jugement.json", "utf8"));
+    if (pose.methode !== "sha256/lf") throw new Error(`le sceau ne declare pas sa methode : ${pose.methode}`);
+    writeFileSync(CRLF, corps, "utf8");
+    const r = spawnSync(process.execPath, [OUTIL, N], { encoding: "utf8" });
+    if (r.status !== 0) throw new Error("le meme contenu en LF est accuse d avoir change — le sceau n est pas portable");
+  });
+
+  check("ROUGE — un contenu REELLEMENT modifie reste accuse, fins de ligne ou pas", () => {
+    writeFileSync(CRLF, corps + "une ligne de plus\n", "utf8");
+    const r = spawnSync(process.execPath, [OUTIL, N], { encoding: "utf8" });
+    if (r.status !== 1) throw new Error(`exit ${r.status} attendu 1 — la normalisation ne doit pas amnistier une vraie modification`);
+    if (!/indice INCHANG/.test(r.stdout)) throw new Error("le motif ne nomme pas l indice inchange");
+  });
+
+  check("ROUGE — un sceau POSE AVANT la normalisation se dit tel, il n accuse pas le livrable", () => {
+    writeFileSync(CRLF, corps, "utf8");
+    // Un sceau d avant D-32 : pas de champ `methode`, et une empreinte qui ne correspond plus.
+    writeFileSync(CRLF + ".jugement.json", JSON.stringify({
+      format: "pilot/jugement@1", fichier: "Client - Rapport - 20260910a.md",
+      empreinte: "0".repeat(64), scelle_le: "2026-09-01T10:00:00.000Z",
+    }, null, 1) + "\n", "utf8");
+    const r = spawnSync(process.execPath, [OUTIL, N], { encoding: "utf8" });
+    if (r.status !== 1) throw new Error(`exit ${r.status} attendu 1`);
+    if (!/anterieur a la normalisation/.test(r.stdout)) throw new Error("un sceau d avant D-32 est presente comme un livrable modifie — on accuse le mauvais");
+    if (/indice INCHANG/.test(r.stdout)) throw new Error("le motif J-1 est prononce sur un sceau qui ne prouve rien");
+  });
+
+  rmSync(N, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
-console.log(`\nverifier-jugement (TF-0523, TF-0692) : ${pass} PASS, ${fail} FAIL`);
+console.log(`\nverifier-jugement (TF-0523, TF-0692, TF-1303, TF-1306, TF-1312) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
