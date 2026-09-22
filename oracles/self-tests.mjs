@@ -59,12 +59,10 @@ import { confronterSensRouge } from "./lib-sens-rouge.mjs";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
 // Oracles couverts par un fichier de recette dédié plutôt que par `--self-test`.
-const DEDIES = {
-  "oracle-conformite-projet.mjs": "self-test.mjs",
-  "oracle-ecosysteme.mjs": "self-test-ecosysteme.mjs",
-  "oracle-parite-configuration.mjs": "oracle-parite-configuration.test.mjs",
-  "oracle-controles-injoignables.mjs": "oracle-controles-injoignables.test.mjs",
-};
+// La table des recettes dediees vit dans `lib-recettes-dediees.mjs` depuis le 22/09/2026 :
+// `oracle-banc-double-sens.mjs` en a besoin pour ne pas accuser un controle d'etre sans banc la
+// ou le harnais sait ou est le sien, et deux tables auraient diverge au premier ajout.
+import { DEDIES } from "./lib-recettes-dediees.mjs";
 
 // Un fichier de RECETTE n'est pas un oracle : le motif `oracle-*.mjs` attrapait
 // `oracle-parite-configuration.test.mjs` et exigeait de lui sa propre recette — une regression
@@ -196,6 +194,17 @@ for (const zone of zonesTests) {
 // non un état permanent. Chaque entrée dit son motif et le geste de remise en état — un
 // verdict rouge qui n'indique pas quoi faire se contourne au lieu de se corriger.
 const ETAT_DU_PARC = [
+  {
+    // TF-1304 (A-31, 22/09/2026) : ce controle existait depuis le 23/08 et AUCUNE etape ne le
+    // jouait sur le depot du pilot. Resultat mesure le 22/09 : 30 livrables ont change apres
+    // avoir ete scelles, a indice inchange, sans qu aucun verdict ne le dise — c est-a-dire
+    // exactement la classe qu il existe pour fermer, appliquee a lui-meme. Il est joue ici sur
+    // `output\`, le seul dossier du pilot qui porte des livrables a indice date.
+    nom: "../scripts/verifier-jugement.mjs",
+    args: ["output"],
+    motif: "livrable modifie apres avoir ete juge, a indice INCHANGE — le meme nom designe deux contenus",
+    remede: "trancher par lot d origine : re-sceller ce qui a ete modifie a dessein et non diffuse (`--sceller --en-masse`, geste humain), corriger le reste par un nouvel indice date (regle 5)",
+  },
   {
     nom: "oracle-skills.mjs",
     motif: "dérive versionné↔installé des skills",

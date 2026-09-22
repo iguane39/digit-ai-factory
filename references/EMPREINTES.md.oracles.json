@@ -1,13 +1,13 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\references\\EMPREINTES.md",
-  "date_iso": "2026-09-20T19:45:42.232Z",
+  "cible": "references/EMPREINTES.md",
+  "date_iso": "2026-09-22T09:09:17.347Z",
   "registre_version": "2.25.0",
   "profil": "digit-ai",
-  "niveau": "note",
-  "verdict": "FAIL",
+  "niveau": "diffuse",
+  "verdict": "PASS",
   "resume": {
-    "pass": 4,
-    "fail": 1,
+    "pass": 5,
+    "fail": 0,
     "skip": 2,
     "cache": 0
   },
@@ -25,8 +25,8 @@
     {
       "domaine": "Lisibilité d'un document (Markdown)",
       "file": "references\\EMPREINTES.md",
-      "verdict": "FAIL",
-      "detail": "1 constat(s) · M18 identifiant muet : « RA-1 » employé sans son sens (ligne 126) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
+      "verdict": "PASS",
+      "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
@@ -69,11 +69,11 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\EMPREINTES.md",
-    "ts": "2026-09-20T19:45:42.232Z",
+    "ts": "2026-09-22T09:09:17.346Z",
     "fichiers": {
-      "references\\EMPREINTES.md": "e6474ff2977ccd37d81c0839e50121b461bdde17053d0867a8368c17080e3aea"
+      "references\\EMPREINTES.md": "fc4a9bee270951f9e4c452b6e4259bafb472c34bd44f306a9c9d8f448f8912b3"
     }
   },
   "empreinte_motif": null,
-  "verdict_oracles": "FAIL"
+  "verdict_oracles": "PASS"
 }

@@ -36,6 +36,17 @@ seuil ou neutraliser un test pour faire passer : un échec résistant = item non
 diagnostic au rapport. Si la vérification native est elle-même défaillante, le prouver
 (sortie à l'appui) et le rapporter — ne pas la contourner.
 
+**Skill touché : la recette de l'agrégateur en plus du self-test (TF-1224).** Le self-test
+d'un skill ne juge que ce skill. La recette de `quality-oracles` juge tous les skills
+ensemble : longueur des descriptions (limite 1 024 caractères), parité des copies du socle,
+fins de ligne. Dès qu'un fichier sous `.claude\skills\` ou `skills\` est modifié, joue AVANT
+chaque commit, dans cet ordre : 1) le self-test du skill touché ; 2)
+`node .claude\skills\quality-oracles\scripts\self-test.mjs` depuis `digit-ai-forge-agents` ;
+3) le self-test de chaque skill qui consomme le fichier modifié. Les trois verts, sinon pas
+de commit. Le défaut a été payé 2 fois : le 14/09/2026, une description de 1 026 caractères
+vue en fin de campagne seulement ; le 20/09/2026, 8 copies réécrites avec de mauvaises fins
+de ligne et 3 échecs trouvés au seul rejeu du pilot.
+
 **Fixtures à double sens.** Toute nouvelle règle d'oracle ou de contrôle embarque sa
 preuve : une fixture verte qui PASSE et une fixture rouge qui ÉCHOUE pour la bonne
 raison. Une règle sans fixture rouge n'est pas prouvée.

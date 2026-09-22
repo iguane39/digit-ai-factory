@@ -1,7 +1,7 @@
 ---
 role: les faits MESURÉS sur les interfaces de fournisseurs tiers — ceux qu'aucune documentation officielle ne dit là où on les cherche, et dont l'ignorance a coûté un aller-retour au moins une fois
 sources_de_verite: [todo/TODO.jsonl (les items qui les ont mesurés, avec leur coût), gabarits/.env.example du projet concerné (les clés et leurs portées)]
-verifie_le: 2026-09-17
+verifie_le: 2026-09-21
 ---
 
 # Faits mesurés sur les interfaces de fournisseurs
@@ -136,7 +136,28 @@ son verdict en laissant la question ouverte ; elle est tranchée ici.*
 | **Un outil tiers agréé est une dépense récurrente** | décision humaine (R-29), jamais un choix de run ; prix non relevé | — |
 
 Le détail daté, avec sa péremption, vit dans `references\PLATEFORME-LINKEDIN.md` ; le type de run
-qui en dépend est `references\RUN-RESEAU.md`.
+qui en dépend est `references\RUN-RESEAU.md`. **Corrigé le 21/09/2026 (TF-1274)** : un outil
+tiers n'est pas nécessaire pour programmer une publication, LinkedIn le fait gratuitement de 10
+minutes à 3 mois ; il ne reste une dépense que pour lire les chiffres sans export.
+
+## Les 8 autres réseaux — aucun connecteur non plus, et c'est un choix
+
+*Établi le 21/09/2026 par l'étude `output\03-etudes\20260921-etude-opportunite-reseaux-sociaux-complement.md`
+(TF-1276, décision humaine D-12 (a)). Sur LinkedIn, l'absence de connecteur est imposée par le
+contrat. Ici elle est choisie : 5 de ces 8 réseaux ouvrent gratuitement leur interface de
+publication, et la tentation d'un outil maison est réelle.*
+
+| Fait établi | Ce que ça coûte si on l'ignore | Comment le rejouer |
+|---|---|---|
+| **Aucun connecteur n'est construit, sur aucun des 9 réseaux.** Instagram, Facebook, Threads, YouTube et Bluesky ouvrent leur interface de publication à un compte propre, sans dépense | un run qui « branche un réseau » construit un outil de diffusion que personne n'a décidé, et contourne l'accord humain par lot de la règle 38 | `references\PLATEFORMES-RESEAUX.md`, ligne « Publier par interface officielle » de chaque réseau |
+| **La programmation se fait dans l'outil gratuit de la plateforme, par l'humain** : LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube et la fiche d'établissement Google l'offrent, relevé sur source officielle le 21/09/2026 | construire ce que la plateforme offre déjà ; le seul gain d'un outil maison serait un geste hebdomadaire que personne n'a mesuré | même référentiel, ligne « Programmer » |
+| **X est payant à l'usage** : 0,015 $ par publication créée, aucun palier gratuit sur la page de tarification | une dépense récurrente engagée sans décision humaine (R-29) | `docs.x.com/x-api/getting-started/pricing`, relu le 21/09/2026 |
+| **TikTok exige un audit, la fiche Google une liste blanche** : sans audit, toute publication par interface reste privée ; sans fiche vérifiée depuis 60 jours, le quota est nul | une semaine perdue à attendre une publication qui ne sortira jamais | même référentiel, sections TikTok et fiche d'établissement |
+| **Répondre à un avis de façon automatisée exige le consentement exprès et préalable du gérant** | une réponse publiée sans lui engage le commerce et enfreint la politique de l'interface | `developers.google.com/my-business/content/policies`, page du 2026-08-28 |
+| **Les chiffres viennent de l'export manuel**, là où il existe ; il n'a été trouvé ni sur Threads, ni sur Bluesky | promettre une mesure sur un réseau qui n'exporte rien | même référentiel, ligne « Exporter ses chiffres » |
+
+Le détail daté, avec sa solidité ligne à ligne et sa péremption, vit dans
+`references\PLATEFORMES-RESEAUX.md` ; le type de run qui en dépend est `references\RUN-RESEAU.md`.
 
 ---
 

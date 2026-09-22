@@ -631,6 +631,32 @@ else {
       defaut(`skills installés en écart avec les forges (${v.echecs.length} règle(s) : ${regles})`, "node bootstrap.mjs --pull");
     }
   }
+
+  // TF-1285 (22/09/2026, décision humaine D-2 (b)) — L'ENTRÉE DU DISPOSITIF EST POSÉE AU POSTE,
+  // et pas seulement dans le produit. Le 22/09 à 10:16, un projet neuf dont le premier message
+  // citait le dépôt du dispositif n'a rien enclenché : le hameçon `UserPromptSubmit` de la bonne
+  // forme n'existait qu'en portée PRODUIT, posé par l'ouverture du run — le déclencheur était
+  // installé par le geste qu'il devait déclencher. Même patron que les gardes de pré-commit
+  // (TF-1041) : on MESURE à chaque ouverture, on n'INSTALLE que sous --pull, et la fusion est non
+  // destructive (la recette du poseur porte 15 cas, dont toute la non-destruction).
+  //
+  // POURQUOI CE BLOC VIT SOUS LA MÊME GARDE QUE LES SKILLS. Le poste et la copie installée des
+  // skills sont le MÊME objet, résolu par `lib-config-installee` : une recette qui isole l'un doit
+  // isoler l'autre. Sans cette garde, un banc joué sur des dépôts factices écrirait dans le
+  // `settings.json` réel de l'humain.
+  {
+    const poseur = join(ICI, "scripts", "verifier-hook-poste.mjs");
+    if (!existsSync(poseur)) ligne("avert", "scripts/verifier-hook-poste.mjs absent — entrée du dispositif au poste non jugée");
+    else {
+      const r = run(process.execPath, [poseur, ...(pull ? ["--installer"] : [])], ICI);
+      const lignes = (r.stdout || "").trim().split(/\r?\n/).filter(Boolean);
+      for (const l of lignes.filter((x) => /^\[INSTALLÉ\]/.test(x))) ligne("ok", `amorçage au poste — ${l.replace(/^\[INSTALLÉ\]\s*/, "")}`);
+      if (r.status === 0) ligne("ok", "amorçage au poste — l'entrée du dispositif est déclarée sur le message humain, et son script existe");
+      else if (r.status === 2) ligne("avert", `amorçage au poste — ${lignes.join(" · ").slice(0, 200)}`);
+      else defaut(`amorçage au poste — ${lignes.filter((x) => x.startsWith("[FAIL]")).join(" · ").slice(0, 300)}`,
+        pull ? "corriger le settings.json du poste à la main, puis rejouer" : "node bootstrap.mjs --pull (pose l'entrée si elle manque)");
+    }
+  }
 }
 
 // 7. Bilan : versions, puis verdict ----------------------------------------------------------

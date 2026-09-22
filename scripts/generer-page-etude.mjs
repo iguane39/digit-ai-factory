@@ -41,6 +41,7 @@ import { join, dirname, basename } from "node:path";
 import { tmpdir, homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { lireSource, mdVersHtml, coquille } from "./lib-vue-html.mjs";
+import { racineConfigInstallee } from "./lib-config-installee.mjs";
 
 /** L'indice R-4 d'un nom de fichier : « …- AAAAMMJJx.md » ou « AAAAMMJJ-objet.md ». */
 export function indiceDuNom(nom) {
@@ -116,7 +117,14 @@ export function enTete(corps) {
 // document. Le coût est de 48 Ko par page ; c'est le prix d'un fichier qu'on peut envoyer par
 // courriel et ouvrir sans réseau, et c'est la propriété que la doctrine exige en premier.
 const SEUIL_FILTRE = 8;
-const ASSETS = join(homedir(), ".claude", "skills", "digit-ai-page-html", "assets");
+// Les assets du socle se resolvent a l'APPEL et par la bibliotheque partagee (TF-1297, A-21
+// du 22/09/2026) : resolus au chargement, ils faisaient lever ce generateur sur un serveur
+// sans repertoire personnel, avant qu'il ait pu dire ce qui lui manquait.
+function cheminDesAssets(env = process.env) {
+  const r = racineConfigInstallee(env);
+  if (!r.racine) return null;
+  return join(r.racine, "skills", "digit-ai-page-html", "assets");
+}
 
 /** Lit un asset du socle. Absent : chaîne vide, et l'appelant le DIT — jamais un échec muet. */
 export function lireAsset(nom, racine = ASSETS) {

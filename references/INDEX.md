@@ -23,6 +23,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\INTENTION.md` | La cascade de l'intention — Intention → Stratégie → Tactique → Opérationnel |
 | `references\PATRONS-EPROUVES.md` | Patrons éprouvés — mécanismes payés une fois, réutilisables tels quels |
 | `references\PLATEFORME-LINKEDIN.md` | Plateforme LinkedIn — règles datées (contrat, accès aux chiffres, transparence, portée), péremption déclarée |
+| `references\PLATEFORMES-RESEAUX.md` | Plateformes de réseaux sociaux — 9 réseaux, 5 faits chacun (publier, programmer, exporter, déclarer un contenu généré, automatisation), solidité ligne à ligne, péremption déclarée |
 | `references\PRODUCTION-OOXML.md` | Production d'un document OOXML depuis une référence client — relevé de charte et gates |
 | `references\REGLES-DE-NON-REPETITION.md` | Règles de non-répétition |
 | `references\RUN-AO.md` | Run de réponse à appel d'offres — quand le livrable est une offre à échéance, construite sur des documents tiers |

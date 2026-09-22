@@ -19,8 +19,8 @@
   "vu_le": "2026-08-26"
  },
  "./bootstrap.test.mjs": {
-  "cas": 15,
-  "vu_le": "2026-09-17"
+  "cas": 17,
+  "vu_le": "2026-09-22"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
   "cas": 31,
@@ -50,6 +50,14 @@
   "cas": 12,
   "vu_le": "2026-08-26"
  },
+ "oracle-amorcage-poste.mjs": {
+  "cas": 23,
+  "vu_le": "2026-09-22"
+ },
+ "oracle-banc-double-sens.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-22"
+ },
  "oracle-boite-entree.mjs": {
   "cas": 39,
   "vu_le": "2026-09-19"
@@ -70,6 +78,14 @@
  "oracle-catalogues.mjs": {
   "cas": 5,
   "vu_le": "2026-08-27"
+ },
+ "oracle-chemin-ancre.mjs": {
+  "cas": 14,
+  "vu_le": "2026-09-22"
+ },
+ "oracle-chemin-prescrit.mjs": {
+  "cas": 24,
+  "vu_le": "2026-09-22"
  },
  "oracle-claude-md.mjs": {
   "cas": 14,
@@ -94,6 +110,10 @@
  "oracle-couverture-exigences.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
+ },
+ "oracle-depense-voie-par-defaut.mjs": {
+  "cas": 13,
+  "vu_le": "2026-09-22"
  },
  "oracle-domaines-declares.mjs": {
   "cas": 10,
@@ -145,6 +165,10 @@
   "cas": 9,
   "vu_le": "2026-08-26"
  },
+ "oracle-invariant-mesure.mjs": {
+  "cas": 16,
+  "vu_le": "2026-09-22"
+ },
  "oracle-livrable-conseil.mjs": {
   "cas": 4,
   "vu_le": "2026-08-26"
@@ -192,13 +216,21 @@
   "cas": 12,
   "vu_le": "2026-08-26"
  },
+ "oracle-regle-sans-juge.mjs": {
+  "cas": 17,
+  "vu_le": "2026-09-22"
+ },
  "oracle-remise-traduction.mjs": {
   "cas": 11,
   "vu_le": "2026-08-27"
  },
+ "oracle-repere-externe.mjs": {
+  "cas": 13,
+  "vu_le": "2026-09-22"
+ },
  "oracle-run-reseau.mjs": {
-  "cas": 2,
-  "vu_le": "2026-09-17"
+  "cas": 9,
+  "vu_le": "2026-09-21"
  },
  "oracle-secrets-hors-perimetre.mjs": {
   "cas": 13,
@@ -238,6 +270,10 @@
   "cas": 9,
   "vu_le": "2026-09-02"
  },
+ "oracle-verrou-unique.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-22"
+ },
  "oracles/banc-defauts-echappes/banc.test.mjs": {
   "cas": 3,
   "vu_le": "2026-09-16"
@@ -249,6 +285,10 @@
  "oracles/familles-numerotees.test.mjs": {
   "cas": 6,
   "vu_le": "2026-08-27"
+ },
+ "oracles/hook-amorcage.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-09-22"
  },
  "oracles/hook-lexique.test.mjs": {
   "cas": 6,
@@ -274,13 +314,49 @@
   "cas": 15,
   "vu_le": "2026-09-20"
  },
+ "oracles/oracle-amorcage-poste.test.mjs": {
+  "cas": 23,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-banc-double-sens.test.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-chemin-ancre.test.mjs": {
+  "cas": 14,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-chemin-prescrit.test.mjs": {
+  "cas": 24,
+  "vu_le": "2026-09-22"
+ },
  "oracles/oracle-controles-injoignables.test.mjs": {
   "cas": 22,
   "vu_le": "2026-09-05"
  },
+ "oracles/oracle-depense-voie-par-defaut.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-invariant-mesure.test.mjs": {
+  "cas": 16,
+  "vu_le": "2026-09-22"
+ },
  "oracles/oracle-parite-configuration.test.mjs": {
   "cas": 18,
   "vu_le": "2026-08-26"
+ },
+ "oracles/oracle-regle-sans-juge.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-repere-externe.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-verrou-unique.test.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-22"
  },
  "oracles/pre-commit-quantificateurs.test.mjs": {
   "cas": 8,
@@ -301,6 +377,10 @@
  "outillage-tests-e2e/preparer-environnement.test.mjs": {
   "cas": 8,
   "vu_le": "2026-08-26"
+ },
+ "scripts/adopter-projet-existant.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-09-22"
  },
  "scripts/allouer-indice.test.mjs": {
   "cas": 9,
@@ -381,6 +461,10 @@
  "scripts/verifier-familles-mesure.mjs": {
   "cas": 11,
   "vu_le": "2026-09-15"
+ },
+ "scripts/verifier-hook-poste.test.mjs": {
+  "cas": 15,
+  "vu_le": "2026-09-22"
  },
  "scripts/verifier-hooks-git.test.mjs": {
   "cas": 6,
@@ -487,8 +571,8 @@
   "vu_le": "2026-08-31"
  },
  "todo/journaliser.test.mjs": {
-  "cas": 15,
-  "vu_le": "2026-08-26"
+  "cas": 29,
+  "vu_le": "2026-09-22"
  },
  "todo/localiser-produit.test.mjs": {
   "cas": 11,

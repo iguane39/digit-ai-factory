@@ -20,7 +20,7 @@
  * Joué par oracles/self-tests.mjs (invariant I2 : tout *.test.mjs du dépôt est joué).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync, renameSync, unlinkSync, readdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -221,6 +221,35 @@ try {
     if (existsSync(join(inst, "skill-non-publie"))) echecs.push("TF-1099 : un skill aux commits NON PUBLIÉS a été propagé vers la copie installée");
     if (existsSync(join(inst, "skill-sale"))) echecs.push("TF-1099 : un skill d'un arbre MODIFIÉ a été propagé vers la copie installée");
     if ((sortie.match(/NON propagés/g) || []).length < 2) echecs.push(`TF-1099 : les deux dépôts épargnés ne sont pas DITS sur une ligne [avert] — ${sortie.split("\n").filter((l) => /avert/.test(l)).join(" | ").slice(0, 300)}`);
+  }
+
+  // ── TF-1282 — LE MODE `--rebatir` EST PRESCRIT PAR UN DOCUMENT, DONC IL SE JOUE ─────────────
+  //
+  // `references\TODO-FORGE.md` prescrit `node bootstrap.mjs --rebatir <dépôt> [--essai]` depuis le
+  // 07/09/2026 (D-12 a, TF-0877). `oracle-chemin-prescrit` l'a relevé à son PREMIER passage, le
+  // 22/09 : l'option est DÉCLARÉE par bootstrap.mjs et jouée par AUCUN cas de cette recette. La
+  // logique de `scripts\rebatir-clone.mjs` a bien sa propre recette — c'est l'AIGUILLAGE qui
+  // n'était vu par personne, et un aiguillage muet renvoie l'usage prescrit vers rien.
+  // *La fixture du remède est aussi obligatoire que la fixture du défaut.*
+  {
+    // ROUGE — sans nom de dépôt, l'aiguillage REFUSE en exit 2 et DIT son usage. Ce cas DOIT
+    // échouer côté fixture : il prouve que la branche est atteinte, pas seulement déclarée.
+    const r = spawnSync(process.execPath, [BOOTSTRAP, "--rebatir"], { encoding: "utf8", env: { ...process.env, BOOTSTRAP_RELANCE: "1" } });
+    joues += 1;
+    if (r.status !== 2) echecs.push(`TF-1282 : \`--rebatir\` sans dépôt rend exit ${r.status}, attendu 2 — l'aiguillage prescrit n'est pas atteint`);
+    else if (!/usage : node bootstrap\.mjs --rebatir/.test(r.stderr || "")) echecs.push("TF-1282 : `--rebatir` sans dépôt refuse sans DIRE son usage");
+  }
+  {
+    // VERT — avec un dépôt réel et `--essai`, l'aiguillage DÉLÈGUE : la sortie porte le nom du
+    // délégué, et rien n'est écrit. Le verdict du délégué ne nous regarde pas ici — c'est sa
+    // recette qui le juge ; ce cas mesure que l'aiguillage arrive jusqu'à lui.
+    const presents = FORGES.map((f) => join(racine, f.nom)).filter((d) => existsSync(join(d, ".git")));
+    const r = spawnSync(process.execPath, [BOOTSTRAP, "--racine", racine, "--rebatir", basename(presents[0]), "--essai"],
+      { encoding: "utf8", env: { ...process.env, BOOTSTRAP_RELANCE: "1" } });
+    joues += 1;
+    const sortie = (r.stdout || "") + (r.stderr || "");
+    if (r.status === 2 && /usage : node bootstrap\.mjs --rebatir/.test(r.stderr || "")) echecs.push("TF-1282 : un dépôt RÉEL est pris pour un nom manquant — l'aiguillage refuse ce qu'il doit déléguer");
+    else if (!/rebatir|rebâtir|clone|sauvegarde/i.test(sortie)) echecs.push(`TF-1282 : \`--rebatir <dépôt> --essai\` ne montre aucune trace du délégué scripts\\rebatir-clone.mjs — ${sortie.split("\n").slice(0, 3).join(" | ").slice(0, 300)}`);
   }
 } catch (err) {
   echecs.push(`harnais : ${String(err).slice(0, 300)}`);

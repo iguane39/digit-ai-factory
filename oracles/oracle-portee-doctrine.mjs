@@ -45,6 +45,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, mkdtem
 import { join, dirname, isAbsolute } from "node:path";
 import { tmpdir, homedir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -249,7 +250,7 @@ export function jugerHamecons(cwd, { pilot = join(ICI, ".."), utilisateur = unde
       "le gabarit de réglages ne déclare AUCUN hameçon — rien à comparer" };
   }
   const dossierUtilisateur = utilisateur === undefined
-    ? (process.env.CLAUDE_CONFIG_DIR || join(homedir(), ".claude"))
+    ? racineConfigInstallee().racine
     : utilisateur;
   const sources = [join(cwd, ".claude", "settings.json"), join(cwd, ".claude", "settings.local.json")];
   if (dossierUtilisateur) sources.push(join(dossierUtilisateur, "settings.json"));

@@ -69,7 +69,22 @@ export function contexte(message) {
     `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`).join("\n");
 }
 
-if (process.argv.includes("--self-test")) {
+/**
+ * LA GARDE DE RECETTE EST ANCRÉE SUR LE POINT D'ENTRÉE (TF-1291, décision humaine A-14 du
+ * 22/09/2026).
+ *
+ * Elle lisait `process.argv` SEUL, au chargement du module. Conséquence mesurée le 22/09 : un
+ * banc écrit pour un AUTRE contrôle, qui importe ce module, partait jouer la recette de
+ * l'importé et affichait « hook-lexique : 13 PASS » — un vert qui n'était pas le sien, et pas un
+ * seul cas du module testé n'était joué. Un banc neuf peut ainsi rendre le vert d'un autre, et
+ * c'est la pire forme du faux vert : il est ACTIF, il compte, et il ne mesure rien.
+ *
+ * Le remède est l'idiome du dépôt : la recette ne part que si CE fichier est le point d'entrée.
+ * Deux autres modules du dépôt l'importent, et ils sont donc protégés par la même ligne.
+ */
+const ESTLE_POINT_D_ENTREE = Boolean(process.argv[1]) && /hook-lexique\.mjs$/i.test(process.argv[1]);
+
+if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
   let pass = 0, fail = 0;
   const cas = [
     ["Améliore ce prompt : Concois et construis un système…", ["prompt-analyzer-l99"]],

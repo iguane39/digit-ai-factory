@@ -47,10 +47,33 @@
  */
 import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
-import { tmpdir, homedir } from "node:os";
+import { tmpdir } from "node:os";
+import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
 import { fileURLToPath } from "node:url";
 
-const REGISTRE_PAR_DEFAUT = join(homedir(), ".claude", "skills", "quality-oracles", "references", "registre-oracles.json");
+/**
+ * LE REGISTRE SE RÉSOUT PARESSEUSEMENT, ET C'EST TF-1297 QUI L'A EXIGÉ (décision humaine A-21 du
+ * 22/09/2026).
+ *
+ * Cette ligne était `const REGISTRE_PAR_DEFAUT = join(homedir(), …)` AU NIVEAU MODULE. Sur un
+ * serveur d'intégration sans répertoire personnel, `homedir()` lève `SystemError:
+ * uv_os_homedir returned ENOENT` — et le module plante AVANT d'avoir produit le moindre verdict.
+ * Il ne rend alors ni PASS, ni FAIL, ni SKIP : il ne rend RIEN, et son consommateur, la règle CM-1
+ * de `hook-ecriture.mjs`, lit cette absence comme un échec de sa propre règle. Le défaut se paie
+ * donc chez un TIERS et reste invisible ici : la même recette rend 14 cas verts sur 14 sur ce
+ * poste, et échoue en isolement. C'est la simulation du circuit hébergé du 22/09 qui l'a trouvé.
+ *
+ * La résolution passe désormais par `scripts\lib-config-installee.mjs`, qui rend la racine ET la
+ * variable qui l'a décidée, et qui rend `null` plutôt que de lever quand rien n'est résolvable.
+ */
+export function registreParDefaut(env = process.env) {
+  const r = racineConfigInstallee(env);
+  if (!r.racine) return { chemin: null, decide_par: r.decidee_par };
+  return {
+    chemin: join(r.racine, "skills", "quality-oracles", "references", "registre-oracles.json"),
+    decide_par: r.decidee_par,
+  };
+}
 
 /** Un fichier dont le NOM annonce un contrôle. La convention est celle du parc, pas une devinette. */
 const NOM_DE_CONTROLE = /^(oracle|verifier|verificateur|controle|controler|check|checker|valider|validateur|audit|auditer)[-_.]/i;
@@ -73,9 +96,11 @@ export function signature(libelle) {
 }
 
 /** Lit le registre. Rend `[]` si absent ou illisible — l'appelant le DIT, il ne le suppose pas. */
-export function lireRegistre(chemin = REGISTRE_PAR_DEFAUT) {
+export function lireRegistre(chemin = null) {
+  const cible = chemin || registreParDefaut().chemin;
+  if (!cible) return [];
   try {
-    const j = JSON.parse(readFileSync(chemin, "utf8"));
+    const j = JSON.parse(readFileSync(cible, "utf8"));
     return (j.oracles || []).filter((o) => o && o.domaine);
   } catch { return []; }
 }
@@ -92,7 +117,7 @@ export function jugerControle(chemin, registre, texte = null) {
   }
   if (!registre.length) {
     return { regle: "CM-1", statut: "SKIP", ou: nom,
-      message: `registre des oracles absent ou illisible (${REGISTRE_PAR_DEFAUT}) — le domaine n'est pas jugé, il est DIT non jugé` };
+      message: `registre des oracles absent ou illisible (${registreParDefaut().chemin || registreParDefaut().decide_par}) — le domaine n'est pas jugé, il est DIT non jugé` };
   }
   let contenu = texte;
   if (contenu === null) {
@@ -213,7 +238,7 @@ if (lanceEnDirect || process.argv[1]?.endsWith("oracle-controle-maison.mjs")) {
   const args = process.argv.slice(2);
   if (args.includes("--self-test")) process.exit(selfTest());
   const i = args.indexOf("--registre");
-  const registre = lireRegistre(i >= 0 ? args[i + 1] : REGISTRE_PAR_DEFAUT);
+  const registre = lireRegistre(i >= 0 ? args[i + 1] : null);
   const cibles = args.filter((a, k) => !a.startsWith("--") && args[k - 1] !== "--registre");
   if (!cibles.length) {
     console.log(JSON.stringify({ oracle: "oracle-controle-maison", verdict: "ERREUR",

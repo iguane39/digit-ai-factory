@@ -21,6 +21,8 @@
  * Usage :
  *   node scripts\verifier-jugement.mjs <dossier|fichier> [...]      → verdict JSON, exit 0/1
  *   node scripts\verifier-jugement.mjs output --sceller             → (re)pose l'empreinte courante
+ *   node scripts\verifier-jugement.mjs output --sceller --essai     → ANNONCE sans rien écrire
+ *   node scripts\verifier-jugement.mjs output --sceller --en-masse  → au-delà d'un livrable, se déclare
  *
  * `--sceller` est le geste qu'on fait UNE FOIS, quand le fichier est réputé bon : il écrit
  * l'empreinte à côté de lui. Sans ce geste, un livrable est « non scellé » — ce n'est pas un défaut,
@@ -36,6 +38,25 @@ import { livrablesPorteurs } from "./lib-extensions-jugees.mjs";
 
 const args = process.argv.slice(2);
 const SCELLER = args.includes("--sceller");
+const ESSAI = args.includes("--essai");
+const EN_MASSE = args.includes("--en-masse");
+
+/**
+ * LE SEUIL DE MASSE, ET POURQUOI IL EST A UN (TF-1303, decision humaine A-30 du 22/09/2026).
+ *
+ * `--sceller` est le geste qu on fait UNE FOIS, quand un fichier est repute bon. Il vivait a UN
+ * MOT de la forme qui MESURE, sur la meme commande et la meme cible. Le 22/09/2026 la forme
+ * ecrivante a ete lancee a la place de la mesurante : 166 sceaux poses et 42 modifies, c est-a-
+ * dire « ce livrable est repute bon » ecrit sur tout un dossier sans qu aucun ait ete relu.
+ *
+ * CE QUE CE GESTE AURAIT EFFACE est le vrai cout : une fois les sceaux rendus, le verificateur
+ * rend FAIL sur 30 ECARTS reels. Le re-scellement les aurait remplaces par 30 verts, sans trace,
+ * puisque l empreinte d origine aurait ete perdue.
+ *
+ * Sceller PLUS D UN livrable exige donc `--en-masse`, en toutes lettres. Un geste qu on fait une
+ * fois se nomme au singulier ; celui qui porte sur un dossier entier se declare.
+ */
+const SEUIL_DE_MASSE = 1;
 const cibles = args.filter((a) => !a.startsWith("--"));
 // TF-0692 (31/08/2026) — LE PDF ENTRE DANS LE CHAMP DU SCEAU.
 //
@@ -95,24 +116,33 @@ function fichiers(cible) {
 if (!cibles.length) {
   process.stdout.write(JSON.stringify({
     outil: "verifier-jugement", verdict: "ERREUR",
-    message: "usage : node scripts\\verifier-jugement.mjs <dossier|fichier> [...] [--sceller]",
+    message: "usage : node scripts\\verifier-jugement.mjs <dossier|fichier> [...] [--sceller [--essai|--en-masse]]",
   }, null, 1) + "\n");
   process.exit(2);
 }
 
 let scelles = 0, verifies = 0, nonScelles = 0;
+const aSceller = [], ecrases = [];
 for (const cible of cibles) {
   for (const f of fichiers(cible)) {
     if (!NOMME_LIVRABLE.test(basename(f))) continue;
     const empreinte = sha(readFileSync(f));
     const sceau = f + SCEAU;
     if (SCELLER) {
-      writeFileSync(sceau, JSON.stringify({
-        format: "pilot/jugement@1", fichier: basename(f), empreinte,
-        scelle_le: new Date().toISOString(),
-        regle: "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)",
-      }, null, 1) + "\n", "utf8");
-      scelles++;
+      // UN LIVRABLE EN ECART DIT SON ECART AVANT D ETRE ECRASE : c est le cas ou le sceau ment,
+      // et l ecraser en silence supprime la seule trace de la divergence.
+      if (existsSync(sceau)) {
+        try {
+          const ancien = JSON.parse(readFileSync(sceau, "utf8"));
+          if (ancien && ancien.empreinte && ancien.empreinte !== empreinte) {
+            ecrases.push({ fichier: f, avant: ancien.empreinte.slice(0, 12), apres: empreinte.slice(0, 12), scelle_le: (ancien.scelle_le || "?").slice(0, 19) });
+          }
+        } catch { /* sceau illisible : il sera remplace, et le compte le dit */ }
+      }
+      // PREMIERE PASSE : on COLLECTE, on n écrit rien. Le garde de masse tombe après la boucle,
+      // et un refus qui arrive après l'écriture n'est pas un refus — mesuré le 22/09/2026 :
+      // 169 sceaux posés malgré un verdict REFUSE.
+      aSceller.push({ fichier: f, sceau, empreinte });
       continue;
     }
     if (!existsSync(sceau)) { nonScelles++; continue; }
@@ -135,11 +165,43 @@ for (const cible of cibles) {
   }
 }
 
+// LE REFUS D UN SCELLEMENT EN MASSE NON DECLARE. Il tombe APRES le parcours, parce que le
+// nombre de livrables concernes ne se connait qu une fois la cible lue — et il n ecrit rien
+// quand il refuse : en mode essai, la boucle n a touche aucun fichier.
+if (SCELLER && !ESSAI && !EN_MASSE && aSceller.length > SEUIL_DE_MASSE) {
+  process.stdout.write(JSON.stringify({
+    outil: "verifier-jugement", version: "1.0.0", cibles, verdict: "REFUSE",
+    mesure: { a_sceller: aSceller.length, deja_en_ecart: ecrases.length },
+    message:
+      `${aSceller.length} livrable(s) seraient scelles d un coup, et le seuil est de ${SEUIL_DE_MASSE}. ` +
+      "Sceller est la declaration « ce livrable est repute bon » : la poser sur un dossier entier " +
+      "se declare en toutes lettres. Relancer avec `--essai` pour voir la liste sans rien ecrire, " +
+      "ou avec `--en-masse` si c est bien le geste voulu." +
+      (ecrases.length ? ` ATTENTION : ${ecrases.length} de ces livrables sont DEJA EN ECART avec leur sceau — les re-sceller effacerait la seule trace de la divergence.` : ""),
+    a_sceller: aSceller.slice(0, 40).map((x) => x.fichier),
+    ecraserait: ecrases.slice(0, 40),
+  }, null, 1) + "\n");
+  process.exit(2);
+}
+
+// SECONDE PASSE : l'écriture, une fois le garde franchi. `--essai` s'arrête ici, et c'est tout
+// ce qui le distingue d'un scellement réel : il a vu exactement la même liste.
+if (SCELLER && !ESSAI) {
+  for (const { sceau, fichier, empreinte } of aSceller) {
+    writeFileSync(sceau, JSON.stringify({
+      format: "pilot/jugement@1", fichier: basename(fichier), empreinte,
+      scelle_le: new Date().toISOString(),
+      regle: "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)",
+    }, null, 1) + "\n", "utf8");
+  }
+}
+scelles = aSceller.length;
+
 const durs = findings.filter((f) => f.severite === "bloquant" || f.severite === "majeur");
-const verdict = SCELLER ? "SCELLE" : durs.length ? "FAIL" : "PASS";
+const verdict = SCELLER ? (ESSAI ? "ESSAI" : "SCELLE") : durs.length ? "FAIL" : "PASS";
 process.stdout.write(JSON.stringify({
   outil: "verifier-jugement", version: "1.0.0", cibles, verdict,
-  mesure: SCELLER ? { scelles } : { verifies, non_scelles: nonScelles, ecarts: durs.length },
+  mesure: SCELLER ? { scelles, ecraserait: ecrases.length } : { verifies, non_scelles: nonScelles, ecarts: durs.length },
   findings: findings.length ? findings : [{
     regle: "J-1", severite: "info", ou: cibles.join(" "),
     message: SCELLER ? `${scelles} livrable(s) scellé(s)` :

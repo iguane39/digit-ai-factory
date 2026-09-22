@@ -58,6 +58,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `oracle-fidelite-de-traduction-absent-du-registre-20260916a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `page-registre-octets-nuls-20260912a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `personas-banc-defauts-echappes-20260914a.tf.jsonl` | fichier | 2,9 Ko | 1 ligne(s) JSONL |
+| `pilot-constat-empreintes-site-produit-20260921a.tf.jsonl` | fichier | 1,9 Ko | 1 ligne(s) JSONL |
 | `plan-d-amelioration-post-audit-20260919a.tf.jsonl` | fichier | 14,7 Ko | 7 ligne(s) JSONL |
 | `porte-publication-faux-positif-20260909a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `preflight-ingestion-histoire-reecrite-20260909a.tf.jsonl` | fichier | 4,3 Ko | 1 ligne(s) JSONL |
@@ -72,6 +73,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `referentiel-audit-contenu-21-08-20260910a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `registre-oracles-edite-en-copie-installee-20260910a.tf.jsonl` | fichier | 4,6 Ko | 1 ligne(s) JSONL |
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
+| `reseaux-sociaux-complement-verdict-o2-20260921a.tf.jsonl` | fichier | 9,6 Ko | 6 ligne(s) JSONL |
 | `reseaux-sociaux-elargir-perimetre-20260917d.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
 | `restes-archives-classes-neuves-20260914b.tf.jsonl` | fichier | 8,6 Ko | 7 ligne(s) JSONL |
 | `restes-archives-p2-20260914a.tf.jsonl` | fichier | 6,0 Ko | 5 ligne(s) JSONL |
@@ -85,4 +87,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_67 fichier(s), 1 sous-dossier(s)_
+_69 fichier(s), 1 sous-dossier(s)_
