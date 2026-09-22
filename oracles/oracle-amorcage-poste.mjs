@@ -79,6 +79,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -88,7 +89,19 @@ const args = process.argv.slice(2);
  * est le second profil que `bootstrap.mjs` tient identique au premier (il propage vers les deux).
  * `--poste` les remplace — c'est par là que la recette fabrique ses postes rouges et verts.
  */
-export const POSTES_PAR_DEFAUT = [join(homedir(), ".claude"), join(homedir(), ".claude-b")];
+// La liste se CALCULE, elle ne se fige plus au chargement du module (TF-1297, A-21 du
+// 22/09/2026). Figee, elle resolvait le repertoire personnel a l import : sans lui, le module
+// levait avant d'avoir produit un verdict, et son consommateur lisait cette absence comme un
+// echec de sa propre regle. `postesParDefaut()` rend une liste VIDE quand rien n'est
+// resolvable, et l'appelant se declare alors sans objet.
+export function postesParDefaut(env = process.env) {
+  const r = racineConfigInstallee(env);
+  if (!r.racine) return [];
+  return [r.racine, `${r.racine}-b`];
+}
+
+/** Compatibilite : les appelants qui lisaient la constante lisent desormais la fonction. */
+export const POSTES_PAR_DEFAUT = postesParDefaut();
 
 function postesDemandes(argv) {
   const out = [];

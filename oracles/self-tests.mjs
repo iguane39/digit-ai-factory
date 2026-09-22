@@ -195,6 +195,17 @@ for (const zone of zonesTests) {
 // verdict rouge qui n'indique pas quoi faire se contourne au lieu de se corriger.
 const ETAT_DU_PARC = [
   {
+    // TF-1304 (A-31, 22/09/2026) : ce controle existait depuis le 23/08 et AUCUNE etape ne le
+    // jouait sur le depot du pilot. Resultat mesure le 22/09 : 30 livrables ont change apres
+    // avoir ete scelles, a indice inchange, sans qu aucun verdict ne le dise — c est-a-dire
+    // exactement la classe qu il existe pour fermer, appliquee a lui-meme. Il est joue ici sur
+    // `output\`, le seul dossier du pilot qui porte des livrables a indice date.
+    nom: "../scripts/verifier-jugement.mjs",
+    args: ["output"],
+    motif: "livrable modifie apres avoir ete juge, a indice INCHANGE — le meme nom designe deux contenus",
+    remede: "trancher par lot d origine : re-sceller ce qui a ete modifie a dessein et non diffuse (`--sceller --en-masse`, geste humain), corriger le reste par un nouvel indice date (regle 5)",
+  },
+  {
     nom: "oracle-skills.mjs",
     motif: "dérive versionné↔installé des skills",
     remede: "node oracles\\oracle-skills.mjs --appliquer (décision humaine, TF-0391)",

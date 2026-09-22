@@ -66,7 +66,21 @@ function posee(env, nom) {
 export function racineConfigInstallee(env = process.env) {
   const v = posee(env, "CLAUDE_CONFIG_DIR");
   if (v) return { racine: resolve(v), decidee_par: `CLAUDE_CONFIG_DIR=${v}`, variable: "CLAUDE_CONFIG_DIR" };
-  return { racine: join(homedir(), ".claude"), decidee_par: "défaut ~/.claude (aucune variable posée)", variable: null };
+  // LE RÉPERTOIRE PERSONNEL PEUT NE PAS EXISTER, et cette fonction ne doit pas LEVER pour autant
+  // (TF-1297, décision humaine A-21 du 22/09/2026). Sur un serveur d'intégration sans `HOME`,
+  // `homedir()` lève `SystemError: uv_os_homedir returned ENOENT` ; un appelant qui résout sa
+  // racine au chargement de son module plante alors AVANT d'avoir produit le moindre verdict —
+  // ni PASS, ni FAIL, ni SKIP, rien —, et son consommateur lit cette absence comme un échec de sa
+  // propre règle. La panne se paie donc chez un TIERS, et elle est invisible sur le poste où
+  // tout le monde la joue. Rendre `racine: null` laisse l'appelant se déclarer SANS OBJET.
+  try {
+    return { racine: join(homedir(), ".claude"), decidee_par: "défaut ~/.claude (aucune variable posée)", variable: null };
+  } catch (e) {
+    return {
+      racine: null, variable: null,
+      decidee_par: `répertoire personnel IRRÉSOLVABLE (${e.code || e.message}) et CLAUDE_CONFIG_DIR non posée — aucune racine de configuration`,
+    };
+  }
 }
 
 /**
@@ -78,18 +92,21 @@ export function skillsInstalles(env = process.env) {
   const v = posee(env, "FORGE_SKILLS_INSTALLES");
   if (v) return { chemin: resolve(v), decide_par: `FORGE_SKILLS_INSTALLES=${v}`, variable: "FORGE_SKILLS_INSTALLES" };
   const r = racineConfigInstallee(env);
+  if (!r.racine) return { chemin: null, decide_par: r.decidee_par, variable: r.variable };
   return { chemin: join(r.racine, "skills"), decide_par: r.decidee_par, variable: r.variable };
 }
 
 /** Le dossier des HOOKS installés — frère des skills sous la racine de configuration. */
 export function hooksInstalles(env = process.env) {
   const r = racineConfigInstallee(env);
+  if (!r.racine) return { chemin: null, decide_par: r.decidee_par, variable: r.variable };
   return { chemin: join(r.racine, "hooks"), decide_par: r.decidee_par, variable: r.variable };
 }
 
 /** Le fichier de CÂBLAGE installé — celui que le harnais exécute, pas celui qu'une forge décrit. */
 export function settingsInstalle(env = process.env) {
   const r = racineConfigInstallee(env);
+  if (!r.racine) return { chemin: null, decide_par: r.decidee_par, variable: r.variable };
   return { chemin: join(r.racine, "settings.json"), decide_par: r.decidee_par, variable: r.variable };
 }
 

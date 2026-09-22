@@ -144,6 +144,59 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
   rmSync(P, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 }
 
+
+// ---- A-30 (TF-1303) : la forme qui ECRIT n est plus a un mot de celle qui MESURE -------------
+// Le 22/09/2026, `--sceller` a ete lance a la place de la forme mesurante : 166 sceaux poses sur
+// des livrables que personne n avait relus, et 30 ecarts reels qui auraient ete remplaces par 30
+// verts sans trace. Les 4 cas ci-dessous tiennent les deux sens des 2 gardes qui en sont nes.
+{
+  const M = mkdtempSync(join(tmpdir(), "jugement-masse-"));
+  const lancerM = (...a) => {
+    const r = spawnSync(process.execPath, [OUTIL, M, ...a], { encoding: "utf8" });
+    let j = null;
+    try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+    return { code: r.status, j };
+  };
+  const sceauDe = (n) => join(M, `Client - Rapport - 2026082${n}a.html.jugement.json`);
+  for (const n of [1, 2, 3]) writeFileSync(join(M, `Client - Rapport - 2026082${n}a.html`), page(`v${n}`), "utf8");
+
+  check("ROUGE — sceller PLUS D UN livrable sans le declarer est REFUSE, et rien n est ecrit", () => {
+    const r = lancerM("--sceller");
+    if (r.code !== 2) throw new Error(`exit ${r.code} attendu 2 — un geste de masse passe sans se declarer`);
+    if (r.j.verdict !== "REFUSE") throw new Error(`verdict ${r.j && r.j.verdict}`);
+    for (const n of [1, 2, 3]) {
+      if (existsSync(sceauDe(n))) throw new Error("un refus qui arrive APRES l ecriture n est pas un refus");
+    }
+  });
+
+  check("VERT — le meme geste declare par --en-masse passe et ecrit", () => {
+    const r = lancerM("--sceller", "--en-masse");
+    if (r.code !== 0) throw new Error(`exit ${r.code} — le geste declare doit passer`);
+    for (const n of [1, 2, 3]) {
+      if (!existsSync(sceauDe(n))) throw new Error(`le sceau ${n} n a pas ete pose`);
+    }
+  });
+
+  check("ROUGE — --essai ANNONCE ce qu il ecraserait, et n ecrit rien", () => {
+    writeFileSync(join(M, "Client - Rapport - 20260821a.html"), page("v1 MODIFIE"), "utf8");
+    const avant = readFileSync(sceauDe(1), "utf8");
+    const r = lancerM("--sceller", "--en-masse", "--essai");
+    if (r.j.verdict !== "ESSAI") throw new Error(`verdict ${r.j && r.j.verdict} — l essai doit se nommer`);
+    if (!r.j.mesure || r.j.mesure.ecraserait !== 1) throw new Error(`ecraserait ${r.j.mesure && r.j.mesure.ecraserait}, 1 attendu`);
+    if (readFileSync(sceauDe(1), "utf8") !== avant) throw new Error("l essai a ecrit");
+  });
+
+  check("VERT — sceller UN SEUL livrable reste le geste ordinaire, sans drapeau de plus", () => {
+    const U = mkdtempSync(join(tmpdir(), "jugement-un-"));
+    writeFileSync(join(U, "Client - Rapport - 20260824a.html"), page("seul"), "utf8");
+    const r = spawnSync(process.execPath, [OUTIL, U, "--sceller"], { encoding: "utf8" });
+    if (r.status !== 0) throw new Error(`exit ${r.status} — le geste qu on fait UNE FOIS ne doit pas se declarer`);
+    if (!existsSync(join(U, "Client - Rapport - 20260824a.html.jugement.json"))) throw new Error("le sceau unique n a pas ete pose");
+    rmSync(U, { recursive: true, force: true });
+  });
+
+  rmSync(M, { recursive: true, force: true });
+}
 rmSync(T, { recursive: true, force: true });
 console.log(`\nverifier-jugement (TF-0523, TF-0692) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

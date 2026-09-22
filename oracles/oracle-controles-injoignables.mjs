@@ -218,7 +218,15 @@ export function juger(racine) {
   // ligne et rejetait les trois, parce que la maison l'écrit après « Sortie : » ou « Contrat : ».
   // Une règle qui impose une forme que le dépôt n'emploie pas ne mesure pas la conformité : elle
   // mesure l'écart à son auteur.
-  const DECLARE_SES_CODES = /\bexit\b[^\n]{0,50}?\b0\b[^\n]{0,50}?\b1\b|codes? de sortie[^\n]{0,50}?\b0\b/i;
+  // LA FENÊTRE ÉTAIT TROP COURTE DE SIX CARACTÈRES, et elle a produit un faux positif qui a vécu
+  // (TF-1299, décision humaine A-25 du 22/09/2026). `oracle-caracteres-controle.mjs` écrit
+  // « Exit : 0 = aucun caractère de contrôle dans le périmètre jugé · 1 = au moins un · 2 =
+  // illisible. » — un contrat COMPLET, et le plus lisible du dépôt. Mais 56 caractères séparent
+  // le « 0 » du « 1 », et la fenêtre en admettait 50 : l'oracle accusait donc un fichier qui
+  // obéissait, et l'action ouverte pour le corriger aurait fait RÉÉCRIRE un en-tête juste.
+  // La fenêtre passe à 90 : elle laisse tenir une glose en français entre deux codes, ce que
+  // les en-têtes de ce dépôt font systématiquement, sans pour autant relier deux lignes.
+  const DECLARE_SES_CODES = /\bexit\b[^\n]{0,90}?\b0\b[^\n]{0,90}?\b1\b|codes? de sortie[^\n]{0,90}?\b0\b/i;
   const SANS_CONTRAT = controles
     .filter((p) => /oracles[\\/]oracle-[^\\/]*\.mjs$/.test(p) && !/\.test\.mjs$/.test(p))
         // LE FICHIER ENTIER, ET NON SES 4 000 PREMIERS CARACTERES. Premier jet : la fenetre coupait

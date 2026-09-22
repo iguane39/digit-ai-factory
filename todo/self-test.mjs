@@ -521,12 +521,35 @@ check("archive : charte R-30 tenue et défaut RV-9 non recopié", () => {
 // vert seul ne prouverait que l'absence de littéral dans le registre du jour, pas le contrôle.
 const RACINE = process.env.FORGE_ROOT ?? join(ICI, "..", "..");
 const checkHtml = join(RACINE, "digit-ai-forge-agents", ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py");
+/**
+ * LA VUE EST REGENEREE AVANT D ETRE JUGEE (TF-1298, decision humaine A-22 du 22/09/2026).
+ *
+ * `TODO.html` est une vue GENEREE, et git l ignore depuis la decision humaine D-4 (a) du 16/09 :
+ * elle est donc ABSENTE de tout clone frais. Les 3 cas ci-dessous la jugeaient telle qu elle
+ * traine sur le poste, si bien qu ils rendaient 3 echecs sur 58 dans un clone isole — tous le
+ * meme ENOENT — et que le circuit d integration heberge aurait ete rouge a sa toute premiere
+ * execution. Le defaut etait invisible ici, ou la vue existe toujours.
+ *
+ * Regenerer plutot que declarer les cas sans objet est le choix le plus fort : la vue jugee
+ * devient celle que le GENERATEUR produit aujourd hui, et non un reste de la derniere fois.
+ */
+function regenererLaVue() {
+  try {
+    execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8", stdio: "pipe" });
+    execFileSync("node", [join(ICI, "generer-page.mjs")], { encoding: "utf8", stdio: "pipe" });
+    return null;
+  } catch (e) {
+    return String(e.stdout || "") + String(e.stderr || "") || String(e.message);
+  }
+}
+const echecDeRegeneration = regenererLaVue();
 const jouerCheckHtml = (fichier) => {
   try { execFileSync("python", [checkHtml, fichier], { encoding: "utf8", stdio: "pipe" }); return { code: 0, sortie: "" }; }
   catch (e) { return { code: e.status ?? -1, sortie: String(e.stdout || "") + String(e.stderr || "") }; }
 };
 
 check("page courante : TODO.html passe check_html (socle HTML)", () => {
+  if (echecDeRegeneration) throw new Error(`la vue n a pas pu etre regeneree : ${echecDeRegeneration.trim().slice(0, 200)}`);
   // Absence = FAIL, jamais SKIP : un gate qu'on ne sait pas jouer n'en est pas un (R-35).
   if (!existsSync(checkHtml)) throw new Error(`check_html introuvable (${checkHtml}) — gate injouable, donc en défaut`);
   const r = jouerCheckHtml(join(ICI, "TODO.html"));
@@ -534,6 +557,7 @@ check("page courante : TODO.html passe check_html (socle HTML)", () => {
 });
 
 check("page rouge : un littéral nu réinjecté dans un titre est bien dénoncé par L11", () => {
+  if (echecDeRegeneration) throw new Error(`la vue n a pas pu etre regeneree : ${echecDeRegeneration.trim().slice(0, 200)}`);
   if (!existsSync(checkHtml)) throw new Error(`check_html introuvable (${checkHtml}) — gate injouable, donc en défaut`);
   const html = readFileSync(join(ICI, "TODO.html"), "utf8");
   const injecte = html.replace(/<h3 class="card-titre">/, '<h3 class="card-titre">valeur None non traitée — ');
@@ -550,6 +574,7 @@ check("page rouge : un littéral nu réinjecté dans un titre est bien dénoncé
 // `<meta name="color-scheme">` que RV-9 déclare fautif pendant 4 jours sans que rien ne le
 // dise, pendant que le cadet, lui, était jugé. Symétrie posée ici.
 check("page courante : R-30 tenue (clair strict, color-scheme dans les tokens, pas de <meta>)", () => {
+  if (echecDeRegeneration) throw new Error(`la vue n a pas pu etre regeneree : ${echecDeRegeneration.trim().slice(0, 200)}`);
   const html = readFileSync(join(ICI, "TODO.html"), "utf8");
   if (/prefers-color-scheme:\s*dark/.test(html))
     throw new Error("auto-sombre hérité de l'OS — retiré par l'amendement TF-0158");
