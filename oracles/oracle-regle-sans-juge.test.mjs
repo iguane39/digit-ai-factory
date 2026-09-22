@@ -48,16 +48,41 @@ check("VERT — la même règle citée par un exécutable passe RJ1", () => {
 });
 
 check("VERT — une règle qui se DIT non mécanisable est exemptée, et NOMMÉE au verdict", () => {
-  const f = constat(juger(depot(regleDe(71, "supprimer un fichier est un geste humain"), "// rien\n")), "RJ1");
+  const f = constat(juger(depot(regleDe(71, "ceci n'est pas mécanisable, et voici pourquoi"), "// rien\n")), "RJ1");
   if (f.statut !== "PASS") throw new Error(`RJ1 ${f.statut} — l'exemption écrite n'a pas été lue`);
   if (!/R-71/.test(f.message)) throw new Error("l'exemptée disparaît du verdict au lieu d'y être nommée");
 });
 
 check("ROUGE — l'exemption ne vaut que pour la règle qui la PORTE, pas pour sa voisine", () => {
-  const doc = regleDe(71, "supprimer un fichier est un geste humain") + regleDe(72, "une autre condition");
+  const doc = regleDe(71, "ceci n'est pas mécanisable, et voici pourquoi") + regleDe(72, "une autre condition");
   const f = constat(juger(depot(doc, "// rien\n")), "RJ1");
   if (f.statut !== "FAIL") throw new Error("la voisine a hérité d'une exemption qu'elle ne porte pas");
   if (/R-71/.test(f.message)) throw new Error("l'exemptée est accusée avec sa voisine");
+});
+
+check("VERT — une exemption écrite EN FIN DE SECTION est lue (calibration mesurée le 22/09)", () => {
+  // La borne était à 12 lignes après le titre. Une exemption écrite à sa place naturelle — après
+  // les volets de la règle — n'était pas vue, et l'oracle accusait une règle qui avait obéi.
+  const loin = regleDe(74, "une condition") + "texte\n".repeat(30)
+    + "Contrôle exécutable : AUCUN — cette règle n'est pas mécanisable, son objet est la qualité\nd'un raisonnement.\n";
+  const f = constat(juger(depot(loin, "// rien\n")), "RJ1");
+  if (f.statut !== "PASS") throw new Error(`l'exemption écrite loin du titre n'est pas lue : ${f.message}`);
+  if (!/R-74/.test(f.message)) throw new Error("l'exemptée disparaît du verdict au lieu d'y être nommée");
+});
+
+check("ROUGE — l'exemption ne franchit pas la frontière de section", () => {
+  // Une exemption écrite dans la section SUIVANTE ne couvre pas la règle précédente.
+  const doc = regleDe(75, "une condition") + "## AZ. autre section\nnon mécanisable, dit-on ici\n";
+  const f = constat(juger(depot(doc, "// rien\n")), "RJ1");
+  if (f.statut !== "FAIL") throw new Error("une exemption d'une autre section a été prise pour la sienne");
+});
+
+check("ROUGE — citer la décision humaine qui a fondé une règle ne l'exempte PAS (calibration mesurée)", () => {
+  // Le motif reconnaissait « décision humaine » et « geste humain ». Presque toute section de ce
+  // corpus les porte en citant son origine : une règle entière pouvait s'exempter par ce seul mot.
+  const doc = regleDe(76, "née de la décision humaine du 17/09, un geste humain la clôt");
+  const f = constat(juger(depot(doc, "// rien\n")), "RJ1");
+  if (f.statut !== "FAIL") throw new Error("l'origine d'une règle lui sert d'exemption");
 });
 
 check("VERT — une règle nommée par une RECETTE seulement compte comme nommée (RJ1)", () => {

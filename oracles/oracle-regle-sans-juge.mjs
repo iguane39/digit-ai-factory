@@ -59,8 +59,16 @@ export const CORPUS_OPPOSABLE = ["REGLES-PROJET.md", "CLAUDE.md"];
 export const REPERTOIRES_EXECUTABLES = ["oracles", "todo", "scripts"];
 export const FICHIERS_EXECUTABLES = ["bootstrap.mjs"];
 
-/** Une règle qui déclare elle-même son impossibilité de mécanisation sort de RJ1, en étant nommée. */
-export const RE_NON_MECANISABLE = /geste\s+humain|d[ée]cision\s+humaine|non\s+m[ée]canisable|GO\s+humain|arbitrage\s+humain/i;
+/**
+ * Une règle qui déclare elle-même son impossibilité de mécanisation sort de RJ1, en étant nommée.
+ *
+ * LE MOTIF ÉTAIT TROP LARGE, et son banc l'a montré le 22/09/2026 : il reconnaissait « décision
+ * humaine » et « geste humain ». Or ces mots disent QUI TRANCHE, jamais si la règle est
+ * mécanisable — presque toute section de ce corpus les porte, ne serait-ce qu'en citant la
+ * décision qui l'a fondée. Une règle entière pouvait donc s'exempter par la seule mention de son
+ * origine. Le motif exige désormais une déclaration portant sur LE CONTRÔLE lui-même.
+ */
+export const RE_NON_MECANISABLE = /contr[ôo]le\s+ex[ée]cutable\s*:?\s*aucun|n[e']?\s*(?:est|sont)\s+pas\s+m[ée]canisables?|(?:^|[^a-z])(?:pas|non)\s+m[ée]canisables?\b|non\s+m[ée]canis[ée]e?s?\b/i;
 
 /**
  * Les trois formes sous lesquelles une règle se DÉCLARE dans ce corpus, relevées sur le texte réel :
@@ -78,9 +86,29 @@ export function declarations(texte, nomDuDocument) {
   return trouvees;
 }
 
-/** Le paragraphe d'une déclaration : sa ligne et les 12 suivantes, de quoi lire une exemption écrite. */
+/**
+ * LA SECTION d'une déclaration : de sa ligne jusqu'au prochain titre ou à la prochaine règle en
+ * prose. C'est là que se lit une exemption écrite.
+ *
+ * LA BORNE ÉTAIT À 12 LIGNES, ET ELLE A COÛTÉ UN FAUX POSITIF LE MÊME JOUR. La décision humaine
+ * D-19 (b) du 22/09/2026 a fait écrire, dans le texte de la règle de l'écart déclaré, le motif
+ * pour lequel elle n'est pas mécanisable. Le motif a été écrit à sa place NATURELLE — en fin de
+ * section, après les deux volets de la règle — et l'oracle ne l'a pas vu : il s'arrêtait 12 lignes
+ * après le titre. Il accusait donc une règle dont l'exemption était écrite noir sur blanc, ce qui
+ * est la pire forme du faux positif : elle punit exactement le remède qu'elle recommande.
+ *
+ * Le plafond de 400 lignes n'est pas une borne de sens, c'est une garde contre un document sans
+ * titres, où la « section » avalerait tout le fichier.
+ */
 export function paragraphe(texte, ligne) {
-  return String(texte).split(/\r?\n/).slice(ligne - 1, ligne + 12).join("\n");
+  const lignes = String(texte).split(/\r?\n/);
+  const debut = ligne - 1;
+  let fin = debut + 1;
+  while (fin < lignes.length && fin - debut < 400) {
+    if (/^#+\s/.test(lignes[fin]) || /^\*\*R-\d+(?:\s*bis)?\.\*\*/.test(lignes[fin])) break;
+    fin += 1;
+  }
+  return lignes.slice(debut, fin).join("\n");
 }
 
 /**

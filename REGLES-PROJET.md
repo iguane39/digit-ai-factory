@@ -1331,6 +1331,21 @@ idempotence de la serie, declenchement manuel hors filtre. Il vit desormais dans
 qu'avec sa preuve d'execution ET ses exclusions ecrites — la moitie qui evite la reapplication
 aveugle. Un patron sans preuve reste une candidature au registre TODO-FORGE.
 
+**Contrôle exécutable : AUCUN — cette règle n'est PAS MÉCANISABLE, et le motif est écrit ici
+plutôt que laissé à deviner (décision humaine D-19 (b) du 22/09/2026).** Son objet n'est pas une
+forme mais la QUALITÉ D'UN RAISONNEMENT : *les deux questions ont-elles été réellement posées, et
+leur réponse a-t-elle été instruite ?* Un contrôle ne peut lire que la trace — une section
+« écarts » qui porte deux paragraphes. Il rendrait donc vert sur un écart mal déclaré dès lors que
+la trace est bien formée, c'est-à-dire exactement sur le cas fondateur : la justification chiffrée
+du 01/09 était PRÉSENTÉE comme dissuasive, écrite, structurée, et fausse. Un contrôle qui rend vert
+sur le fait qui l'a fondé est pire que pas de contrôle, parce qu'il fait cesser de chercher.
+
+*Ce que cela n'excuse pas.* La règle reste OPPOSABLE en revue humaine, et le second volet, lui, est
+mécanisable et l'est : un patron entre au référentiel avec sa preuve d'exécution et ses exclusions,
+ce que le format du référentiel impose. `oracle-regle-sans-juge` RJ1 lit la mention de non-mécanisation
+ci-dessus et exempte la règle en la NOMMANT au verdict — elle ne disparaît pas du compte, elle y
+figure comme exemptée, et c'est la différence entre une limite déclarée et un oubli.
+
 ## AI. R-55 — la Factory a MANDAT PERMANENT d'écrire dans les forges ; seul le RÉSULTAT remonte (décision humaine du 17/09/2026)
 
 Décision humaine directe du 17/09/2026, en réponse à une décision posée à tort (« donnez-vous
