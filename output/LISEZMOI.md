@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 402 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 404 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -355,6 +355,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md | 20260922b | 30.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` |
 | Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Les cinq decisions en attente detaillees - 20260922i.md | 20260922i | 21.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Les cinq decisions en attente detaillees - 20260922i.md` |
 | Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md | 20260830l | 14.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` |
 | Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md | 20260830m | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` |
 | Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md | 20260907d | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md` |
@@ -447,6 +448,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md | 20260823a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` |
 | Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Traite tous les todos et retours registre de 87 candidats a 3 - 20260914f.md | 20260914f | 20.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les todos et retours registre de 87 candidats a 3 - 20260914f.md` |
+| Digit-AI - Synthese Mandat - Treize decisions executees et le sceau rendu portable - 20260922h.md | 20260922h | 18.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Treize decisions executees et le sceau rendu portable - 20260922h.md` |
 | Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md | 20260915c | 23 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md` |
 | Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md | 20260910f | 25.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md` |
 | Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md | 20260912b | 26.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md` |

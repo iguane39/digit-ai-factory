@@ -121,6 +121,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Le registre est entierement classe - 20260922f.md` | fichier | 15,7 Ko | Digit-AI — Synthèse de mandat — le registre est entièrement classé — 22/09/2026 |
 | `Digit-AI - Synthese Mandat - Les 3 decisions executees et la branche publiee - 20260922c.md` | fichier | 30,6 Ko | Digit-AI — Synthèse de mandat — les 3 décisions exécutées et la branche publiée — 22/09/20 |
 | `Digit-AI - Synthese Mandat - Les 4 decisions executees et 3 nouvelles posees - 20260922b.md` | fichier | 30,5 Ko | Digit-AI — Synthèse de mandat — Les 4 décisions exécutées et 3 nouvelles posées — 20260922 |
+| `Digit-AI - Synthese Mandat - Les cinq decisions en attente detaillees - 20260922i.md` | fichier | 20,9 Ko | Digit-AI — Synthèse de mandat — Les 5 décisions en attente détaillées — 22/09/2026 |
 | `Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` | fichier | 14,4 Ko | Synthèse de mandat — pourquoi « Améliore le prompt » ne déclenche rien, et depuis quand (3 |
 | `Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` | fichier | 14,0 Ko | Synthèse de mandat — le lexique d'invocation redevient actif, à la prochaine session (30/0 |
 | `Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md` | fichier | 14,9 Ko | Synthèse de mandat — décision D-5 (a) exécutée : le lot L1 livré chez la forge des données |
@@ -138,6 +139,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Parc synchronise apres fusion du pilot avec l autre poste - 20260921d.md` | fichier | 11,2 Ko | Le parc est synchronisé : le pilot a fusionné les 30 enregistrements de l'autre poste, et  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` | fichier | 20,7 Ko | Synthèse de mandat — les huit dépôts en attente sont publiés et les dix-sept du parc sont  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` | fichier | 9,4 Ko | Le parc est synchronisé avec GitHub : 16 dépôts alignés, et 4 jours de travail fini enfin  |
+| `Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md` | fichier | 16,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et 4 dépôts publiés — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
 | `Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` | fichier | 25,5 Ko | Synthèse de mandat — le plancher d'écriture de la Factory est posé, jugé et câblé chez le  |
 | `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 12,3 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
@@ -198,6 +200,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md` | fichier | 27,7 Ko | Synthèse de mandat — tous les retours pris, la boîte prouvée vide, et vingt-quatre chantie |
 | `Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` | fichier | 9,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a |
 | `Digit-AI - Synthese Mandat - Traite tous les todos et retours registre de 87 candidats a 3 - 20260914f.md` | fichier | 20,4 Ko | Synthèse de mandat — les retours sont tous pris, et le registre passe de 87 candidatures à |
+| `Digit-AI - Synthese Mandat - Treize decisions executees et le sceau rendu portable - 20260922h.md` | fichier | 18,0 Ko | Digit-AI — Synthèse de mandat — 13 décisions exécutées et le sceau rendu portable — 22/09/ |
 | `Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md` | fichier | 22,8 Ko | Synthèse de mandat — le socle est corrigé sur ses trois défauts, et le balayage a trouvé l |
 | `Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md` | fichier | 25,4 Ko | Synthèse de mandat — vos trois décisions sont exécutées : le moteur d'audit sait couvrir,  |
 | `Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md` | fichier | 26,9 Ko | Synthèse de mandat — les trois runs de forge sont joués et enregistrés, le plancher d'écri |
@@ -210,4 +213,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_193 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_196 fichier(s), 0 sous-dossier(s)_
