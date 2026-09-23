@@ -19,7 +19,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260813-plan-strategie-tests-e2e.md` | fichier | 13,3 Ko | Plan de mise en œuvre — stratégie de tests de bout en bout, complète et autonome-sous-gate |
 | `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
-| `Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` | fichier | 20,2 Ko | Plan de mise en œuvre — les huit rangs d'opportunités à verdict favorable non traité |
+| `Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` | fichier | 20,8 Ko | Plan de mise en œuvre — les huit rangs d'opportunités à verdict favorable non traité |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
 | `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 33,1 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
 | `Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` | fichier | 36,6 Ko | Spécification de création — produit `digit-ai-marketing` — 20260911a |
@@ -209,4 +209,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_192 fichier(s), 0 sous-dossier(s)_
+_192 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

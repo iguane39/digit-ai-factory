@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 400 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 401 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -237,7 +237,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json` |
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md | 20260818a | 4.2 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` |
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json` |
-| Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 20.2 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
+| Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 20.8 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json` |
 | Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 33.3 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |
@@ -386,6 +386,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md | 20260831d | 23.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` |
 | Digit-AI - Synthese Mandat - Publication faite et verifiee sur clone frais zero anteriorite - 20260910b.md | 20260910b | 12 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication faite et verifiee sur clone frais zero anteriorite - 20260910b.md` |
 | Digit-AI - Synthese Mandat - Quatre decisions executees et cinq dossiers instruits - 20260922e.md | 20260922e | 30.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees et cinq dossiers instruits - 20260922e.md` |
+| Digit-AI - Synthese Mandat - Quatre decisions executees et quatre nouvelles posees - 20260923a.md | 20260923a | 29.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees et quatre nouvelles posees - 20260923a.md` |
 | Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md | 20260908f | 14.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` |
 | Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md | 20260911d | 22.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md` |
 | Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md | 20260916b | 17.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md` |

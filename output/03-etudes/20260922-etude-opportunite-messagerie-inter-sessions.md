@@ -306,7 +306,12 @@ heures de transcription sont en UTC ; 19:40:59Z vaut 21:40:59 à l'heure du post
 | Application de la règle | le destinataire a **relu la section du gabarit** avant de répondre, n'a rien fait d'autre, et l'a écrit | appel du destinataire à 19:41:47Z, lecture de `gabarits\AGENT-CAMPAGNE.md` |
 | Effet de bord | le message a déclenché les hameçons `UserPromptSubmit` du destinataire : celui de la mémoire persistante a échoué à l'arrivée du message (19:41:39Z), et le hameçon du lexique d'invocation, inscrit sur le même événement, l'a lu aussi. **Rectification du 22/09, 21:55** : ce dernier **ignorait déjà** les messages entre sessions — le marqueur `<cross-session-message` figure dans ses marqueurs non humains depuis TF-1103 (14/09) —, mais aucun cas de sa recette ne le couvrait ; la première version de cette section en concluait à tort un risque d'invocation de skill | pièce jointe `hook_non_blocking_error` de la transcription du destinataire ; `oracles\hook-lexique.mjs`, constante `MARQUEURS_NON_HUMAINS` |
 | Valeur non prévue | la réponse portait une coordination réelle : la session destinataire avait pris TF-1313 et TF-1315, et son premier essai d'écriture avait heurté TF-1314 avant d'être décalé | message reçu à 21:41:56 |
-| Avis d'inactivité | abonnement **accepté** ; l'avis n'était pas encore arrivé à la rédaction de cette section, la session destinataire étant toujours occupée | retour de l'outil `SendMessage` |
+| Avis d'inactivité | abonnement **accepté** à 21:40:53 ; avis **reçu à 22:34:35**, la session observée ayant fini un tour à 22:34, soit 53 min d'abonnement. **Coût nul côté observé, confirmé** : aucun enregistrement d'abonnement ni aucun tour déclenché dans sa transcription | avis reçu dans la session émettrice ; transcription de la session observée, relue à 22:34:46 |
+| Second message, **sans réponse demandée** (annonce de prise du 22/09, 21:57) | mis en file à 21:57:17, lu **2 s** plus tard entre deux outils ; **aucun appel de modèle dédié**, aucune réponse. Son coût se réduit à sa taille dans le contexte du destinataire. Le premier message, qui demandait un accusé, avait coûté 2 à 3 appels dédiés | transcription de la session observée, enregistrements de file du 19:57:17Z et 19:57:19Z |
+
+**Ce que le second message change.** Le coût d'un message tient d'abord à **ce qu'il demande**.
+Une information reçue par une session occupée, sans réponse attendue, ne coûte presque rien ; une
+demande de réponse coûte un tour complet, relu sur tout le contexte du destinataire.
 
 **La réponse n'a pas été remerciée.** Un accusé de l'accusé aurait coûté au destinataire un nouveau
 tour et près d'un demi-million de jetons relus, pour zéro information.

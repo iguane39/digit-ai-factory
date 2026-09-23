@@ -1,7 +1,7 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
-  "date_iso": "2026-09-22T21:17:45.954Z",
-  "registre_version": "2.25.0",
+  "date_iso": "2026-09-22T21:58:08.182Z",
+  "registre_version": "2.26.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md",
-    "ts": "2026-09-22T21:17:45.954Z",
+    "ts": "2026-09-22T21:58:08.181Z",
     "fichiers": {
-      "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md": "bcfa53809d1b4cbdb14a4a9574af3ba215942c0671838b4713375a694943496f"
+      "output\\04-plans\\Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md": "20a0531b279dc6ffbe73015f2e15a10d0ff1834a00b07c6eee8d4e15a7eff16e"
     }
   },
   "empreinte_motif": null,

@@ -1,6 +1,6 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
-  "date_iso": "2026-09-22T19:56:05.051Z",
+  "date_iso": "2026-09-22T20:35:12.115Z",
   "registre_version": "2.25.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md",
-    "ts": "2026-09-22T19:56:05.051Z",
+    "ts": "2026-09-22T20:35:12.114Z",
     "fichiers": {
-      "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md": "fcc3742ddcc2a5390de8bee75cbe32604f911b643cc7e6ff0291be120fb6c249"
+      "output\\03-etudes\\20260922-etude-opportunite-messagerie-inter-sessions.md": "f63319bd6f510897cb491af464d4471e66caf880a21c72ab0b06c219a0d626e0"
     }
   },
   "empreinte_motif": null,
