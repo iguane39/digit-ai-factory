@@ -22,8 +22,8 @@ comme ce matin. Ce qui est attendu de vous : 5 décisions, dont une neuve sur ce
 - **sur quoi** — les 16 dépôts git de `c:\dev` que le pilotage gouverne : `digit-ai-factory`, les
   13 forges `digit-ai-forge-*`, `digit-ai-queue` et le canal privé `c:\dev\_confidentiel`. Les dépôts
   de produits n'en font pas partie.
-- **quand** — le 23/09/2026, de 21:12 à 21:25 (UTC+02:00), heures relevées par `date` ; environ
-  13 minutes au mur, après le relevé d'ouverture de la session.
+- **quand** — le 23/09/2026, de 21:12 à 21:21 (UTC+02:00), heures relevées par `date` ; environ
+  9 minutes au mur, après le relevé d'ouverture de la session.
 - **qui** — session de pilotage Claude Opus 5.5 ; pilotage passé de `a3b40b45` à `cb4ec57b` par
   avance rapide ; aucun agent délégué, escalade de modèle : aucune.
 - **intention** — que ce poste reparte du même état que GitHub, avec le travail publié ce matin par
@@ -36,7 +36,7 @@ comme ce matin. Ce qui est attendu de vous : 5 décisions, dont une neuve sur ce
 
 **16 dépôts sur 16 alignés**, avance 0, retard 0 · pilotage rapatrié `a3b40b45..cb4ec57b`
 (6 enregistrements de l'autre poste, 45 fichiers) · 15 dépôts déjà alignés, **rien à publier** hors
-ce compte rendu · relevé de fraîcheur : **Poste prêt**, skills installés = skills versionnés ·
+ce compte rendu, publié `cb4ec57b..823ba69f` · relevé de fraîcheur : **Poste prêt**, skills installés = skills versionnés ·
 **1 candidature neuve** au registre, `oracle-todo` **PASS** avant et après.
 
 ## 3. Décisions attendues de l'humain
@@ -200,9 +200,17 @@ sélecteur suffit, par exemple « D-15 a ».
   - preuve : `node todo/journaliser.mjs --fichier tf-1325.json` rend « 1 événement(s)
     journalisé(s) », `verdict_avant` PASS et `verdict_apres` PASS ; TF-1325 entre en candidature,
     avec une classe proposée, `index-genere-avant-l-enregistrement-qu-il-decrit`.
+- **Ce compte rendu publié, avec TF-1325 et les 3 index.** Les index ont été régénérés après
+  l'indexation de la synthèse, ce qui évite le défaut qu'ils portaient.
+  - preuve : `git diff --cached` montre l'index des plans nommant cette synthèse, sans fichier « non
+    suivi » ; sur les 22 noms de produits du journal des relevés, cherchés dans les 474 lignes
+    ajoutées, 1 seul apparaît, et c'est un pseudonyme déjà publié ; la porte
+    `scripts/verifier-avance-publication.mjs --plage origin/main..HEAD` rend `"verdict": "PASS"` ;
+    `git push origin main` rend `cb4ec57b..823ba69f` ; après l'enregistrement, seul le journal des
+    relevés reste modifié.
 - **Le relevé final du parc.**
-  - preuve : `git rev-list --left-right --count HEAD...@{u}` rend 0 et 0 sur les 16 dépôts, et
-    aucun fichier suivi n'est modifié hors du pilotage.
+  - preuve : `git fetch` puis `git rev-list --left-right --count HEAD...@{u}` rend 0 et 0 sur les
+    16 dépôts, et aucun fichier suivi n'est modifié hors du journal des relevés du pilotage.
 
 ## 5. Non traité — avec son motif
 
@@ -259,7 +267,8 @@ Il ne reste qu'une action. Elle vous revient parce qu'elle tranche 5 décisions.
 ## 9. Traces
 
 - Fichier jugé : ce document — verdict d'`oracle-synthese` au journal homonyme.
-- Pilotage `digit-ai-factory` à `cb4ec57b` avant cette synthèse, par avance rapide depuis
-  `a3b40b45` ; les 15 autres dépôts inchangés.
+- Pilotage `digit-ai-factory` : `a3b40b45` → `cb4ec57b` par avance rapide, puis `823ba69f`
+  (ce compte rendu, TF-1325, index) publié le 23/09/2026 ; la correction de l'heure de fin et de
+  ce bloc suit dans un enregistrement de plus. Les 15 autres dépôts sont inchangés.
 - `todo/TODO.jsonl` : 1 création (TF-1325) ce tour.
 - Aucune page HTML livrée dans ce tour.
