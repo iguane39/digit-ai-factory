@@ -136,6 +136,10 @@
   "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
   "vu_le": "2026-08-27"
  },
+ "oracle-enclenchement.mjs": {
+  "cas": 23,
+  "vu_le": "2026-09-23"
+ },
  "oracle-etude-opportunite.mjs": {
   "cas": 2,
   "vu_le": "2026-08-26"
@@ -286,6 +290,10 @@
   "cas": 22,
   "vu_le": "2026-09-20"
  },
+ "oracles/decouvrir-oracles.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-09-23"
+ },
  "oracles/familles-numerotees.test.mjs": {
   "cas": 6,
   "vu_le": "2026-08-27"
@@ -342,6 +350,10 @@
   "cas": 13,
   "vu_le": "2026-09-22"
  },
+ "oracles/oracle-enclenchement.test.mjs": {
+  "cas": 23,
+  "vu_le": "2026-09-23"
+ },
  "oracles/oracle-invariant-mesure.test.mjs": {
   "cas": 16,
   "vu_le": "2026-09-22"
@@ -353,6 +365,10 @@
  "oracles/oracle-regle-sans-juge.test.mjs": {
   "cas": 17,
   "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-remise-traduction.test.mjs": {
+  "cas": 24,
+  "vu_le": "2026-09-23"
  },
  "oracles/oracle-repere-externe.test.mjs": {
   "cas": 13,
@@ -415,8 +431,8 @@
   "vu_le": "2026-09-17"
  },
  "scripts/lib-pseudonyme-produit.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-03"
+  "cas": 8,
+  "vu_le": "2026-09-23"
  },
  "scripts/lib-vue-html.test.mjs": {
   "cas": 17,
@@ -424,6 +440,10 @@
  },
  "scripts/oracles-design-page-generee.test.mjs": {
   "cas": 13,
+  "vu_le": "2026-09-23"
+ },
+ "scripts/produire-plan-ancres.test.mjs": {
+  "cas": 19,
   "vu_le": "2026-09-23"
  },
  "scripts/readme-dossiers.test.mjs": {
@@ -491,8 +511,8 @@
   "vu_le": "2026-08-26"
  },
  "scripts/verifier-sonde-glossaire.test.mjs": {
-  "cas": 12,
-  "vu_le": "2026-09-20"
+  "cas": 21,
+  "vu_le": "2026-09-23"
  },
  "scripts/verifier-verdict-archive.test.mjs": {
   "cas": 8,
