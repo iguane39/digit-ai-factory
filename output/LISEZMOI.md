@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 404 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 405 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -371,6 +371,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md | 20260914c | 22.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md` |
 | Digit-AI - Synthese Mandat - Paliers 2 et 3 des premiers HTML de nouveaux formats - 20260914d.md | 20260914d | 23.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Paliers 2 et 3 des premiers HTML de nouveaux formats - 20260914d.md` |
 | Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md | 20260921a | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md` |
+| Digit-AI - Synthese Mandat - Parc resynchronise apres le travail des deux postes - 20260923c.md | 20260923c | 18.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc resynchronise apres le travail des deux postes - 20260923c.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise apres fusion du pilot avec l autre poste - 20260921d.md | 20260921d | 11.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise apres fusion du pilot avec l autre poste - 20260921d.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md | 20260913a | 20.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md | 20260920a | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` |
