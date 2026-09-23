@@ -1,7 +1,7 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\GLOSSAIRE.md",
-  "date_iso": "2026-09-20T17:24:54.840Z",
-  "registre_version": "2.24.0",
+  "cible": "gabarits/GLOSSAIRE.md",
+  "date_iso": "2026-09-23T09:55:52.903Z",
+  "registre_version": "2.25.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\GLOSSAIRE.md",
-    "ts": "2026-09-20T17:24:54.840Z",
+    "ts": "2026-09-23T09:55:52.903Z",
     "fichiers": {
-      "gabarits\\GLOSSAIRE.md": "773c30dc672cbe957e0e50e39961d96426b7fb18eb241300334098bc37b79939"
+      "gabarits\\GLOSSAIRE.md": "817aef0c22759b6828e122d8231c9f74663d6ebf9c77c2b42a705c758d853923"
     }
   },
   "empreinte_motif": null,

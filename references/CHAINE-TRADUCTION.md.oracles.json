@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\references\\CHAINE-TRADUCTION.md",
-  "date_iso": "2026-09-22T20:19:55.241Z",
+  "cible": "references/CHAINE-TRADUCTION.md",
+  "date_iso": "2026-09-23T09:59:27.399Z",
   "registre_version": "2.25.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -50,7 +50,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "references\\CHAINE-TRADUCTION.md",
       "verdict": "PASS",
-      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "detail": "2 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -75,9 +75,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\CHAINE-TRADUCTION.md",
-    "ts": "2026-09-22T20:19:55.241Z",
+    "ts": "2026-09-23T09:59:27.399Z",
     "fichiers": {
-      "references\\CHAINE-TRADUCTION.md": "266a32e54c27d62d19a56df7598206f208fe47281c0311398463543f729c12b5"
+      "references\\CHAINE-TRADUCTION.md": "0221089f00fb7cafcd4fbcf5d5cd58c60a0d22dcd701b4f3964b3e6c47dc29e6"
     }
   },
   "empreinte_motif": null,

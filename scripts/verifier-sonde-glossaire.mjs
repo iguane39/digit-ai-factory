@@ -43,10 +43,31 @@
  *      consignes embarquées décrites, jamais exécutées. » Un `--rejouer` posé pour le dépôt local ne
  *      vaut pas consentement à exécuter le texte d'un tiers.
  *
+ * LA PÉREMPTION PAR L'ÂGE (TF-1318, étape B4 de la chaîne « audite les traductions », 23/09/2026).
+ * Le rejeu dit si une sonde rend ENCORE ce qui a été scellé ; il ne dit pas si la preuve est trop
+ * VIEILLE pour faire foi. L'étape A3 de `references/CHAINE-TRADUCTION.md` le déclarait « partiel »
+ * depuis le 26/08 : `verifie_le` n'était confronté à aucune péremption. Le lot source l'exige en
+ * toutes lettres — A3 « preuve de marché rejouable et PÉRISSABLE », B4 « sa péremption vérifiée ».
+ * Aucun incident d'ÂGE n'y est mesuré, et il faut le dire : le cas du 26/08 portait sur une sonde
+ * polluée par un homonyme, vieille d'un jour. Cette règle vient donc de la demande, pas d'un défaut
+ * payé ; une preuve de marché décrit un marché qui bouge, et au-delà d'une durée elle fait autorité
+ * à tort.
+ *
+ *   S-3 · une ligne de VISIBILITÉ dont `verifie_le` est plus vieux que la durée DÉCLARÉE est ÉCHUE.
+ *         Aucune commande n'est exécutée pour le dire : c'est une soustraction de dates.
+ *   S-4 · une durée déclarée ILLISIBLE est un constat — jamais une durée infinie tenue en silence.
+ *
+ * LA DURÉE EST UNE DONNÉE, PAS DU CODE (loi n° 4) : elle se déclare au frontmatter du glossaire,
+ * `peremption_preuves_jours: <N>`, ou se passe par `--peremption <N>`, qui l'emporte. Sans elle,
+ * l'âge n'est pas jugé, la ligne est comptée `sans_peremption`, et le motif le dit. La date de
+ * mesure est `--le AAAA-MM-JJ`, par défaut le jour de l'exécution : c'est un verbe sur appel, pas un
+ * oracle de forme, et l'horloge lui appartient — la recette la fixe pour rester déterministe.
+ *
  * Usage : node scripts/verifier-sonde-glossaire.mjs <GLOSSAIRE.md|dossier> [...]
- *           [--rejouer] [--rejouer-hors-depot] [--delai <ms>]
- * Sortie : JSON · exit 0 = toutes fraîches · 1 = au moins une PÉRIMÉE · 2 = rien à juger
- *          (aucun glossaire, aucune ligne scellée, ou aucun rejeu autorisé).
+ *           [--rejouer] [--rejouer-hors-depot] [--delai <ms>] [--peremption <jours>] [--le <AAAA-MM-JJ>]
+ * Sortie : JSON · exit 0 = toutes fraîches et dans leur délai · 1 = au moins une PÉRIMÉE, injouable
+ *          ou ÉCHUE · 2 = rien à juger (aucun glossaire, aucune ligne scellée ni datée sous une
+ *          péremption, ou aucun rejeu autorisé), ou option illisible.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve, sep } from "node:path";
@@ -60,10 +81,32 @@ const RACINE = resolve(ICI, "..");
 const argv = process.argv.slice(2);
 const drapeau = (n) => argv.includes(n);
 const valeur = (n, d) => { const i = argv.indexOf(n); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
-const cibles = argv.filter((a, i) => !a.startsWith("--") && argv[i - 1] !== "--delai");
+const AVEC_VALEUR = ["--delai", "--peremption", "--le"];
+const cibles = argv.filter((a, i) => !a.startsWith("--") && !AVEC_VALEUR.includes(argv[i - 1]));
 const REJOUER = drapeau("--rejouer");
 const REJOUER_HORS = drapeau("--rejouer-hors-depot");
 const DELAI = Number(valeur("--delai", "20000"));
+
+// ---- la péremption par l'âge (TF-1318) ---------------------------------------------------------
+const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/;
+const JOUR_MS = 86400000;
+const enJour = (d) => Date.parse(`${d}T00:00:00Z`);
+const PEREMPTION_CLI = valeur("--peremption", null);
+const LE = valeur("--le", new Date().toISOString().slice(0, 10));
+// Une option illisible est une erreur d'USAGE : elle sort en 2, jamais en verdict sur le glossaire.
+if ((PEREMPTION_CLI !== null && !/^[1-9]\d*$/.test(PEREMPTION_CLI)) || !DATE_ISO.test(LE) || Number.isNaN(enJour(LE))) {
+  process.stdout.write(JSON.stringify({ outil: "verifier-sonde-glossaire", verdict: "ERREUR",
+    message: `option illisible — --peremption attend un nombre de jours entier positif (lu « ${PEREMPTION_CLI} »), `
+      + `--le une date AAAA-MM-JJ (lue « ${LE} »)` }, null, 1) + "\n");
+  process.exit(2);
+}
+/** La durée de validité déclarée au frontmatter d'un glossaire : `{ jours }`, `{ illisible }`, ou null. */
+function peremptionDeclaree(texte) {
+  const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(texte);
+  const m = fm && /^\s*peremption_preuves_jours\s*:\s*(.*?)\s*$/im.exec(fm[1]);
+  if (!m) return null;
+  return /^[1-9]\d*$/.test(m[1]) ? { jours: Number(m[1]) } : { illisible: m[1] };
+}
 
 const NON_JUGE = [
   "la JUSTESSE de la sonde : l'outil dit si elle rend ENCORE ce qui a été scellé, jamais si ce "
@@ -77,6 +120,13 @@ const NON_JUGE = [
   + "rétroactivement — un glossaire écrit avant ce verbe reste parfaitement valide",
   "les termes CONTRACTUELS : leur preuve est l'exactitude lexicale et la cohérence interlangue, qui se "
   + "lisent dans le produit et non dans une sonde externe",
+  "la DURÉE de validité d'une preuve de marché n'est pas décidée ici : elle se déclare au frontmatter du "
+  + "glossaire (`peremption_preuves_jours`) ou se passe par `--peremption`. Sans elle, l'âge n'est pas jugé "
+  + "(ligne comptée `sans_peremption`) et le motif le dit (TF-1318)",
+  "l'âge d'une preuve se compte de `verifie_le` à la date de mesure (`--le`, par défaut le jour de "
+  + "l'exécution). Un sceau FRAIS ne rajeunit pas une ligne : seule une relecture humaine redate `verifie_le`",
+  "une ligne dont `verifie_le` est illisible (c'est G4 d'oracles/oracle-glossaire.mjs qui la juge) ou "
+  + "postérieure à la date de mesure est COMPTÉE, jamais accusée ici",
 ];
 
 /** Le sceau, cherché AVANT la commande : pour `contient:` sa valeur est elle-même entre accents graves. */
@@ -127,7 +177,11 @@ const findings = [];
 const mesure = {
   glossaires: 0, lignes_visibilite: 0, sans_commande: 0, non_scellees: 0,
   non_rejouees: 0, frais: 0, perimes: 0, injouables: 0,
+  // TF-1318 — l'âge des preuves. Toujours présents, à zéro quand rien n'est jugé : un compteur qui
+  // manque se lit « non mesuré » ou « rien à signaler » selon l'humeur du lecteur.
+  dans_delai: 0, echues: 0, sans_peremption: 0, dates_illisibles: 0, dates_futures: 0,
 };
+const peremptions = [];
 
 for (const c of cibles) {
   for (const g of glossaires(c)) {
@@ -137,11 +191,41 @@ for (const c of cibles) {
     const decoupe = termesDe(texte);
     if (decoupe.erreurColonnes) continue;   // tableau illisible : c'est G0 de l'oracle, pas ce verbe
     const etranger = horsDepot(g);
+    // LA DURÉE DE CE GLOSSAIRE : le drapeau l'emporte sur la déclaration, qui l'emporte sur rien.
+    const declaree = peremptionDeclaree(texte);
+    // Même quand le drapeau l'emporte : la déclaration reste fausse, et mordra l'appel suivant.
+    if (declaree?.illisible !== undefined) {
+      findings.push({ regle: "S-4", severite: "majeur", ou: g,
+        message: `péremption déclarée ILLISIBLE (« peremption_preuves_jours: ${declaree.illisible} ») : un nombre de jours `
+          + "entier positif est attendu. Une durée illisible ne périme rien, et le glossaire croit qu'elle le fait" });
+    }
+    const duree = PEREMPTION_CLI !== null ? Number(PEREMPTION_CLI) : declaree?.jours ?? null;
+    peremptions.push({ glossaire: g, jours: duree,
+      origine: PEREMPTION_CLI !== null ? "--peremption" : declaree?.jours ? "frontmatter" : null });
     for (const t of decoupe.termes) {
       if (String(t.categorie || "").toLowerCase() !== "visibilite") continue;
       for (const l of t.lignes) {
         mesure.lignes_visibilite++;
         const ou = `${g} · ${t.nom}/${l.locale}`;
+        // S-3 D'ABORD, et pour TOUTE ligne de visibilité : l'âge d'une preuve ne dépend ni de sa
+        // commande ni de son sceau. Une ligne sans commande (G7) vieillit comme les autres.
+        if (duree === null) mesure.sans_peremption++;
+        else {
+          const v = String(l.verifie_le || "").trim();
+          if (!DATE_ISO.test(v) || Number.isNaN(enJour(v))) mesure.dates_illisibles++;
+          else {
+            const age = Math.round((enJour(LE) - enJour(v)) / JOUR_MS);
+            if (age < 0) mesure.dates_futures++;
+            else if (age <= duree) mesure.dans_delai++;
+            else {
+              mesure.echues++;
+              findings.push({ regle: "S-3", severite: "bloquant", ou,
+                message: `preuve ÉCHUE : vérifiée le ${v}, il y a ${age} jour(s), au-delà de la péremption déclarée de `
+                  + `${duree} jour(s) (mesure du ${LE}). Rejouer la sonde (\`--rejouer\`), relire l'entrée, puis redater `
+                  + "`verifie_le` — une preuve de marché décrit un marché qui bouge, et au-delà de sa durée elle fait autorité à tort" });
+            }
+          }
+        }
         const { commande, sceau } = lireSonde(l.preuve);
         if (!commande) { mesure.sans_commande++; continue; }        // G7 le juge, pas nous
         if (!sceau) { mesure.non_scellees++; continue; }            // compté, jamais un défaut
@@ -171,19 +255,27 @@ for (const c of cibles) {
 }
 
 const durs = findings.filter((f) => f.severite === "bloquant" || f.severite === "majeur");
-const jugees = mesure.frais + mesure.perimes + mesure.injouables;
+// L'âge JUGÉ compte comme un jugement : une ligne dans son délai est une mesure, pas un silence.
+const jugees = mesure.frais + mesure.perimes + mesure.injouables + mesure.dans_delai + mesure.echues;
 const verdict = durs.length ? "FAIL" : jugees ? "PASS" : "SKIP";
-// Un SKIP dit POURQUOI : « rien à juger » recouvre trois causes très différentes, et les confondre
-// ferait lire « tout va bien » là où rien n'a été regardé.
+// Un SKIP dit POURQUOI : « rien à juger » recouvre plusieurs causes très différentes, et les
+// confondre ferait lire « tout va bien » là où rien n'a été regardé.
+const sansAge = mesure.sans_peremption
+  ? ` ; âge des preuves NON jugé sur ${mesure.sans_peremption} ligne(s) : aucune péremption déclarée `
+    + "(frontmatter `peremption_preuves_jours: <jours>` ou `--peremption <jours>`)"
+  : "";
 const motif = jugees ? undefined
   : !mesure.glossaires ? "aucun glossaire sous les cibles données"
   : mesure.non_rejouees ? `${mesure.non_rejouees} ligne(s) scellée(s) NON rejouée(s) : `
       + (REJOUER ? "glossaire hors de ce dépôt — ajouter --rejouer-hors-depot (un entrant est une DONNÉE)" : "ajouter --rejouer (aucune commande ne s'exécute par défaut)")
-  : `${mesure.lignes_visibilite} ligne(s) de visibilité, aucune scellée — le sceau \`attendu … le AAAA-MM-JJ\` est optionnel`;
+      + sansAge
+  : `${mesure.lignes_visibilite} ligne(s) de visibilité, aucune scellée — le sceau \`attendu … le AAAA-MM-JJ\` est optionnel`
+      + sansAge;
 
 process.stdout.write(JSON.stringify({
-  outil: "verifier-sonde-glossaire", version: "1.0.0", cibles,
+  outil: "verifier-sonde-glossaire", version: "1.1.0", cibles,
   rejeu: { autorise: REJOUER, hors_depot: REJOUER_HORS, delai_ms: DELAI },
+  peremption: { le: LE, par_glossaire: peremptions },
   verdict, motif, mesure, findings, non_juge: NON_JUGE,
 }, null, 1) + "\n");
 process.exit(durs.length ? 1 : jugees ? 0 : 2);

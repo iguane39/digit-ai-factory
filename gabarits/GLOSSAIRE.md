@@ -85,6 +85,12 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
   *Aucune ligne de l'exemple ci-dessous n'en porte* : leurs sondes interrogent un service tiers
   qu'on ne joue pas pour illustrer un gabarit, et un sceau recopié sans avoir été mesuré serait
   exactement la preuve de complaisance que ce champ existe pour refuser.
+- **La PÉREMPTION des preuves** *(frontmatter, optionnel, TF-1318)* — `peremption_preuves_jours: <N>`
+  déclare au-delà de combien de jours une preuve de **visibilité** est échue. Le même verbe compte
+  l'âge de chaque ligne depuis son `verifie_le` et rend **ÉCHUE** celle qui dépasse, sans exécuter
+  aucune commande ; `--peremption <N>` l'emporte sur la déclaration. Sans elle, l'âge n'est pas
+  jugé, et le verbe le dit. La durée est une donnée du projet : ce gabarit n'en impose aucune, et
+  une valeur par défaut est une décision proposée à l'humain (D-B4, `references\CHAINE-TRADUCTION.md`).
 - **`verifie_le`** — la date de la dernière vérification de CETTE ligne, `AAAA-MM-JJ`. C'est le seul
   champ qui distingue une entrée éprouvée d'une entrée plausible.
 - **`genre`** *(colonne OPTIONNELLE, TF-0660)* — le genre grammatical du terme retenu dans CETTE
