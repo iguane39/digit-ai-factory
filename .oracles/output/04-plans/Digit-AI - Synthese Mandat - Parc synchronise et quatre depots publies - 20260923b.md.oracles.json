@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+  "date_iso": "2026-09-23T05:11:31.266Z",
+  "registre_version": "2.26.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+      "verdict": "PASS",
+      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; nombre « 5 495 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md",
+    "ts": "2026-09-23T05:11:31.265Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md": "61a50886aa98f9ef0cec7a9709f9a2795226475674f6cb5143f90bc9e7e90335"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

@@ -149,6 +149,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` | fichier | 22,9 Ko | Synthèse de mandat — publié, neuf chantiers décidés menés à fond, et les travaux partis ch |
 | `Digit-AI - Synthese Mandat - Publication faite et verifiee sur clone frais zero anteriorite - 20260910b.md` | fichier | 12,0 Ko | Synthèse de mandat — votre feu vert est exécuté, le travail est publié, et la vérification |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees et cinq dossiers instruits - 20260922e.md` | fichier | 30,4 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 5 dossiers instruits — 22/09/2026 |
+| `Digit-AI - Synthese Mandat - Quatre decisions executees et quatre nouvelles posees - 20260923a.md` | fichier | 29,6 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 4 nouvelles posées — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` | fichier | 14,1 Ko | Synthèse de mandat — vos quatre décisions et vos quatre actions exécutées : le parc entier |
 | `Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md` | fichier | 22,7 Ko | Synthèse de mandat — les quinze actions du tableau sont traitées : six chantiers livrés et |
 | `Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md` | fichier | 17,6 Ko | Quinze items du registre traités, et trois contrôles posés là où l'on produit |
@@ -209,4 +210,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_192 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_193 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
