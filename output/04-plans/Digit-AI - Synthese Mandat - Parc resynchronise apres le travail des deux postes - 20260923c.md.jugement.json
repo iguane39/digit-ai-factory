@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Parc resynchronise apres le travail des deux postes - 20260923c.md",
+ "empreinte": "bbd8c55a2db31d5c7301edc84fb5ee65f44721e9f8f5e637c6dad5fc3780e78b",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-23T07:03:49.089Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
