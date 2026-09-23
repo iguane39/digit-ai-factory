@@ -159,6 +159,39 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   désactiver (R-33 bis) : **on ne juge que ce qui s'est déclaré jugeable, et on ne réécrit jamais
   un ledger existant**.
 
+- **Ce qui AURAIT DÛ tourner se DÉCOUVRE, et un juge le confronte au ledger (TF-1319 — 23/09,
+  temps 2 et 3 du verdict O3 de l'étude du 19/08).** La forme canonique ci-dessus rend calculable
+  ce qui A tourné. Il manquait la liste des oracles de chaque forge mobilisée, lue sur son disque.
+
+  **Le contrat de découverte, `digit-ai/decouverte-oracles@1`, est le même dans chaque dépôt qui
+  porte des oracles** : `node <dépôt>\oracles\decouvrir-oracles.mjs [--racine <dossier>]` rend sur
+  stdout `{contrat, forge, racine, regle, oracles: [{nom, chemin}], non_juge: []}`. Exit 0 : la
+  découverte est faite, et une liste vide est un résultat. Exit 2 : la racine est illisible, motif
+  dit. Jamais 1, car découvrir n'est pas juger. L'entrée se trouve par son **chemin**, jamais par une
+  table des forges. Chaque dépôt garde **sa** règle (un nom `oracle-*`, un dossier, un point
+  d'entrée `__main__`), la dit dans `regle`, et nomme dans `non_juge` ce qu'elle laisse dehors. Une
+  déclaration écrite à la main peut **ajouter** à la découverte, jamais en retirer (le registre de
+  quality-oracles, chez forge-agents). Mesuré le 23/09 : 11 forges et le pilot le servent, 174
+  oracles découverts. forge-tests et forge-observability n'ont pas d'oracle propre et n'exposent
+  pas d'entrée, ce qui n'est pas un oubli.
+
+  **Le juge** : `node oracles\oracle-enclenchement.mjs <ledger.jsonl> [--forges a,b] [--run <id>]
+  [--racine <parc>]`. **EN1** : chaque oracle découvert d'une forge mobilisée a au moins une entrée
+  `oracles_verdict` canonique sur le run. Un verdict SKIP ou NA compte, car « a tourné sans pouvoir
+  juger » n'est pas « n'a pas tourné ». FAIL nomme chaque promesse non servie, et l'entrée qui la
+  cite sans la servir. **EN2** : un verdict consigné pour un oracle qu'aucune forge mobilisée ne
+  découvre est signalé (hors mobilisation, ou inconnu du parc), jamais accusé. La promesse se lit à
+  la version que le run a consignée dans `versions_forges` : un oracle absent de cette version n'a
+  pas pu tourner, son jugement est suspendu et le motif est dit. La confrontation est celle de
+  forge-tests (`forge_tests/confrontation.py`, TF-0371), appelée et non recopiée. Les forges
+  mobilisées se lisent dans `--forges`, sinon au champ `forges_mobilisees` du `run_open` ; une
+  annotation après le nom de forge est ignorée. `versions_forges` porte le parc, pas la
+  mobilisation. SKIP motivé, jamais PASS par défaut, quand le run ne déclare pas `schema_ledger`,
+  quand ses forges mobilisées sont inconnues, ou quand le mécanisme de forge-tests ou Python
+  manquent. Une forge non clonée ou sans entrée sort seule en SKIP, et les autres sont jugées.
+  Recettes : `oracles\oracle-enclenchement.test.mjs`, `oracles\decouvrir-oracles.test.mjs`, et
+  celle de chaque forge.
+
 - **`run_open` porte aussi les RÉFÉRENTIELS DISPONIBLES (`referentiels`, TF-0373 — 18/08)**, et
   c'est une déclaration, pas une option : pour chacun — `exigences`, `anomalies`,
   `contrat_interface` — soit son **chemin**, soit `absent` avec son motif. Rien de plus.

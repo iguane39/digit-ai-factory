@@ -37,4 +37,8 @@ export const DEDIES = {
   // Né de la décision humaine D-15 (a) du 22/09/2026, qui a tranché l'ordre : le contrôle
   // D'ABORD, la classe ensuite. Le cliquet R15 refuse une classe neuve sans juge existant.
   "oracle-repere-externe.mjs": "oracle-repere-externe.test.mjs",
+  // Le juge d'enclenchement (TF-1319, décision humaine D-13 (a) du 23/09/2026). Banc dédié : ses
+  // fixtures bâtissent un parc jetable de fausses forges et y copient le VRAI mécanisme de
+  // confrontation de forge-tests — embarquées dans l'oracle, elles le feraient se juger lui-même.
+  "oracle-enclenchement.mjs": "oracle-enclenchement.test.mjs",
 };
