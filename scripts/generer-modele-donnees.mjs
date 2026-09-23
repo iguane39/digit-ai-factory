@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 // generer-modele-donnees.mjs — projette docs\projet\MODELE-DONNEES.md en MODELE-DONNEES.html
 // (TF-0091). La source Markdown fait foi ; la vue est régénérée, jamais éditée.
-// Déterministe, autonome (A1), chartée. Usage :
+// Déterministe, autonome (A1). La coquille est LUE dans le socle digit-ai-page-html par
+// scripts/lib-socle-page.mjs (TF-1321, décision humaine D-13 (a) du 23/09/2026) : bascule de
+// thème, repli des tableaux en cartes et composants du socle viennent avec elle. Socle
+// introuvable : la vue n'est pas écrite, le script dit où il a cherché et sort en 2. Usage :
 //   node scripts/generer-modele-donnees.mjs <chemin>\MODELE-DONNEES.md
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { lireSource, mdVersHtml, coquille, svgBoites } from "./lib-vue-html.mjs";
+import { lireSource, mdVersHtml, svgBoites } from "./lib-vue-html.mjs";
+import { rendreVue } from "./lib-socle-page.mjs";
 
 const src = process.argv[2];
 if (!src) { console.error("usage : generer-modele-donnees.mjs <MODELE-DONNEES.md>"); process.exit(2); }
@@ -67,10 +71,13 @@ const svg = !sansObjet && tables.length >= 2 ? {
   corps: svgBoites(tables, liens),
 } : null;
 
-const html = coquille({
+const rendu = await rendreVue({
   titre, description: "Modèle de données — vue générée depuis MODELE-DONNEES.md, ancrée au schéma réel (R-26).",
   front, svg, corpsHtml: mdVersHtml(corps.replace(/^# .+$\r?\n/m, "")), source: texte,
+  surtitre: "Digit-AI · Modèle de données",
 });
+if (rendu.absent) { console.error(`[SOCLE ABSENT] MODELE-DONNEES.html non écrite — ${rendu.absent}`); process.exit(2); }
+const html = rendu.html;
 const cible = join(dirname(src), "MODELE-DONNEES.html");
 writeFileSync(cible, html);
 console.log(`MODELE-DONNEES.html générée — ${tables.length} table(s), ${liens.length} lien(s)${sansObjet ? " (sans objet)" : ""}`);

@@ -43,7 +43,8 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { pageEtude } from "./generer-page-etude.mjs";
-import { lireSource, mdVersHtml, coquille } from "./lib-vue-html.mjs";
+import { lireSource, mdVersHtml, svgBoites } from "./lib-vue-html.mjs";
+import { socleDePage, socleAbsent, lireAsset, chargerPoseur, pageDeVue } from "./lib-socle-page.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -102,27 +103,54 @@ Audience : le pilote de l'ecosysteme, qui decide des mandats. Cette source ne se
 `;
 
 /**
- * DEUX TÉMOINS DEPUIS LE 22/09/2026 (TF-1317, décision humaine D-6 (b)).
+ * DEUX TÉMOINS, TOUS DEUX DÉRIVÉS DU SOCLE DEPUIS LE 23/09/2026 (TF-1317 puis TF-1321, décisions
+ * humaines D-6 (b) du 22/09 et D-13 (a) du 23/09).
  *
- * La page d'étude ne porte plus la coquille partagée de `lib-vue-html.mjs` : elle DÉRIVE la sienne
- * du gabarit installé du socle, et en reçoit la bascule de thème, le repli des tableaux et les
- * composants posés sous sceau. La coquille partagée, elle, sert toujours les pages d'architecture
- * et de modèle de données. Juger la seule page d'étude aurait retiré son juge à cette coquille —
- * le banc s'en est aperçu lui-même le 22/09, en déclarant « introuvable » chacune de ses mutations.
- * Chaque témoin garde donc ses deux sens.
+ * Le 22/09, la page d'étude a quitté la coquille écrite à la main de `lib-vue-html.mjs` pour
+ * DÉRIVER la sienne du gabarit du socle ; les vues d'architecture et de modèle de données l'ont
+ * suivie le 23/09, par `scripts\lib-socle-page.mjs`, et la coquille écrite à la main n'existe plus.
+ * Le témoin 2 jugeait cette coquille partagée ; il juge désormais une VUE D'ARCHITECTURE telle que
+ * le générateur la produit, et il affirme ce que TF-1321 lui demandait : la bascule de thème.
  *
- * Les déclarations d'AVANT le remède du 20/09, telles qu'elles vivaient dans la coquille PARTAGÉE.
- * Chacune porte la règle qui la dénonce : le sens rouge ne se contente pas d'un FAIL, il vérifie
- * que c'est bien CETTE règle qui parle.
+ * Les règles PROPRES à la vue — la ligne de métadonnées et la figure du schéma, écrites dans son
+ * bloc de style — ramenées à des valeurs en dur. Chacune porte la règle qui la dénonce : le sens
+ * rouge ne se contente pas d'un FAIL, il vérifie que c'est bien CETTE règle qui parle.
  */
-const AVANT_LE_REMEDE_COQUILLE = [
-  ["S1", "border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);color:var(--muted)}\n    blockquote p",
-    "border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}\n    blockquote p"],
-  ["S4/T1", "body{background:var(--surface)}}", "body{background:#fff}}"],
-  ["T3", "th{font-family:var(--head);font-weight:700;text-align:left;padding:var(--e3);",
-    "th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;"],
-  ["T3", "td{padding:var(--e2) var(--e3);", "td{padding:7px 12px;"],
+const AVANT_LE_REMEDE_VUE = [
+  ["T1", ".meta{color:var(--muted);font-size:.85rem;margin:4px 0 0}", ".meta{color:#64748B;font-size:.85rem;margin:4px 0 0}"],
+  ["T3", "figure.schema{margin:16px 0;", "figure.schema{margin:14px 0;"],
 ];
+
+/**
+ * La source témoin de la VUE. Sa table de flux porte HUIT lignes : le seuil à partir duquel les
+ * composants du socle sont câblés — sans elle, le témoin ne jugerait ni la barre de recherche ni les
+ * composants posés sous sceau d'une vue.
+ */
+const SOURCE_TEMOIN_VUE = `---
+role: architecture technique
+sources_de_verite: banc de recette
+verifie_le: 2026-09-23
+---
+
+# Architecture temoin du banc de coquille
+
+## Vue d'ensemble
+
+Un front parle a une api, qui persiste en base et publie des evenements. Cette source ne sert qu'au banc.
+
+## Flux
+
+| De | Vers | Protocole | Mode | Donnee portee |
+|---|---|---|---|---|
+| front | api | HTTPS | synchrone | requetes |
+| api | bdd | SQL | synchrone | objets metier |
+| api | file | AMQP | asynchrone | evenements |
+| file | worker | AMQP | asynchrone | evenements |
+| worker | bdd | SQL | synchrone | agregats |
+| worker | stockage | S3 | asynchrone | exports |
+| api | cache | RESP | synchrone | sessions |
+| front | cdn | HTTPS | synchrone | ressources |
+`;
 
 /**
  * Les règles PROPRES au générateur de pages d'étude — sa barre de recherche —, qui vivent dans son
@@ -157,6 +185,14 @@ if (!racine) {
     + "aucun oracle joue, aucun cas compte — le harnais rend ce banc NON JUGE plutot que vert");
   process.exit(0);
 }
+// Les deux témoins DÉRIVENT du socle : sans lui, aucune page ne peut être produite, donc rien à juger.
+const socle = socleDePage();
+const gabarit = lireAsset("boilerplate.html", socle.assets);
+if (!gabarit) {
+  console.log(`banc de coquille (TF-1162, TF-1321) : SKIP declare — ${socleAbsent(socle)} ; aucun oracle joue, aucun cas compte`);
+  process.exit(0);
+}
+const poseur = await chargerPoseur(socle.assets);
 
 const echecs = [];
 const dossier = mkdtempSync(join(tmpdir(), "banc-coquille-"));
@@ -227,23 +263,41 @@ try {
     if (b.verdict !== "FAIL") echecs.push(`ROUGE (page d'etude) — privee de son bouton de bascule, la page rend ${b.verdict} a oracle-bascule`);
   }
 
-  // ── TÉMOIN 2 — LA COQUILLE PARTAGÉE (pages d'architecture et de modèle de données) ──────────
-  // Elle ne porte pas de bascule — c'est le reste déclaré de la classe, ouvert au registre — et ce
-  // témoin ne l'affirme donc pas : il tient le remède du 20/09, et lui seul.
-  const { front, corps } = lireSource(SOURCE_TEMOIN);
-  const partagee = coquille({ titre: "Etude temoin du banc de coquille", description: "Temoin du banc de coquille.",
-    front, corpsHtml: mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, "")), source: SOURCE_TEMOIN, lettre: "D" });
-  const j2 = juger(partagee, "coquille-temoin.html");
-  if (!j2) echecs.push("run-oracles-design.mjs n'a rendu aucun JSON lisible sur le temoin de la coquille partagee");
+  // ── TÉMOIN 2 — LA VUE D'ARCHITECTURE, DÉRIVÉE DU SOCLE (TF-1321) ────────────────────────────
+  // La même construction que `generer-architecture.mjs` : `pageDeVue`, avec un schéma en figure et
+  // une table de flux de huit lignes. Ce témoin affirme la bascule, que l'ancienne coquille partagée
+  // n'avait pas — c'était le reste déclaré de la classe, fermé ce jour.
+  const { front, corps } = lireSource(SOURCE_TEMOIN_VUE);
+  const vue = pageDeVue({
+    gabarit, poseur, titre: "Architecture temoin du banc de coquille", description: "Temoin du banc de coquille, vue d'architecture.",
+    front, corpsHtml: mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, "")), source: SOURCE_TEMOIN_VUE,
+    svg: { label: "Diagramme d'architecture : 3 composants, 2 flux", legende: "3 composant(s), 2 flux.",
+      corps: svgBoites([{ id: "front", sous: "navigateur" }, { id: "api", sous: "services" }, { id: "bdd", sous: "base" }],
+        [{ de: "front", vers: "api", titre: "HTTPS" }, { de: "api", vers: "bdd", titre: "SQL" }]) },
+    surtitre: "Digit-AI · Architecture technique",
+  });
+  const j2 = juger(vue, "vue-temoin.html");
+  if (!j2) echecs.push("run-oracles-design.mjs n'a rendu aucun JSON lisible sur le temoin de la vue d'architecture");
   else {
-    vert(j2, "oracle-slop", "coquille partagee");       // Cas 8
-    vert(j2, "oracle-tokens", "coquille partagee");     // Cas 9
+    vert(j2, "oracle-slop", "vue d'architecture");       // Cas 8
+    vert(j2, "oracle-tokens", "vue d'architecture");     // Cas 9
+    vert(j2, "oracle-bascule", "vue d'architecture");    // Cas 10 — TF-1321 : la bascule du socle est là
+    // Cas 11 — la table de flux franchit le seuil : les trois composants sont posés sous sceau.
+    const verifies = ((j2.socle_exempte || {}).verifies || []).length;
+    if (verifies < 3) {
+      echecs.push(`VERT (vue d'architecture) — ${verifies} composant(s) embarque(s) verifie(s) contre le socle, 3 attendus`);
+    }
   }
-  const j2r = juger(muter(partagee, AVANT_LE_REMEDE_COQUILLE, "coquille partagee"), "coquille-avant-remede.html");
-  if (!j2r) echecs.push("aucun JSON lisible sur la coquille partagee d'avant le remede");
+  // Cas 12 — les règles propres à la vue, ramenées à des valeurs en dur : T1 et T3 les refusent.
+  const j2r = juger(muter(vue, AVANT_LE_REMEDE_VUE, "vue d'architecture"), "vue-avant-remede.html");
+  if (!j2r) echecs.push("aucun JSON lisible sur la vue d'architecture ramenee a des valeurs en dur");
+  else denonce(j2r, "oracle-tokens", ["T1", "T3"], "vue d'architecture");
+  // Cas 13 — la même vue privée de son bouton de bascule : oracle-bascule la refuse.
+  const vueSansBascule = vue.replace(/<button id="theme-toggle"[\s\S]*?<\/button>/, "");
+  if (vueSansBascule === vue) echecs.push("ROUGE (vue d'architecture) — le bouton de bascule est introuvable : la fixture ne mute rien");
   else {
-    denonce(j2r, "oracle-slop", ["S1", "S4"], "coquille partagee");      // Cas 10
-    denonce(j2r, "oracle-tokens", ["T1", "T3"], "coquille partagee");    // Cas 11
+    const b2 = lire(juger(vueSansBascule, "vue-sans-bascule.html"), "oracle-bascule");
+    if (b2.verdict !== "FAIL") echecs.push(`ROUGE (vue d'architecture) — privee de son bouton de bascule, la vue rend ${b2.verdict} a oracle-bascule`);
   }
 } finally {
   rmSync(dossier, { recursive: true, force: true, maxRetries: 5 });
@@ -253,9 +307,9 @@ if (echecs.length) {
   console.error("banc de coquille (TF-1162, TF-1317) : FAIL\n  - " + echecs.join("\n  - "));
   process.exit(1);
 }
-console.log("banc de coquille (TF-1162, TF-1317) : 11 PASS, 0 FAIL — deux temoins juges par "
-  + "run-oracles-design.mjs. PAGE D'ETUDE derivee du socle : barre de recherche cablee, oracle-slop, "
-  + "oracle-tokens et oracle-bascule PASS, trois composants verifies sous sceau ; ses regles propres "
-  + "ramenees a leur etat d'avant refusees par T1 et T3, et privee de sa bascule refusee par "
-  + "oracle-bascule. COQUILLE PARTAGEE : oracle-slop et oracle-tokens PASS, et ramenee a son etat "
-  + "d'avant le 20/09 refusee par S1, S4, T1 et T3 — chaque regle prouvee dans ses DEUX sens");
+console.log("banc de coquille (TF-1162, TF-1317, TF-1321) : 13 PASS, 0 FAIL — deux temoins derives du socle, juges par "
+  + "run-oracles-design.mjs. PAGE D'ETUDE : barre de recherche cablee, oracle-slop, oracle-tokens et oracle-bascule "
+  + "PASS, trois composants verifies sous sceau ; ses regles propres ramenees a leur etat d'avant refusees par T1 "
+  + "et T3, et privee de sa bascule refusee par oracle-bascule. VUE D'ARCHITECTURE : oracle-slop, oracle-tokens et "
+  + "oracle-bascule PASS, trois composants verifies sous sceau ; ses regles propres ramenees a des valeurs en dur "
+  + "refusees par T1 et T3, et privee de sa bascule refusee par oracle-bascule — chaque regle prouvee dans ses DEUX sens");

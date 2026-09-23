@@ -21,13 +21,30 @@
  * `render_page.py`. Elle tient les propriétés de MARQUAGE du socle dans le HTML produit ; le
  * verdict de rendu appartient aux oracles du socle, qui demandent python et un navigateur.
  *
+ * DEPUIS LE 23/09/2026 (TF-1321, décision humaine D-13 (a)), la page jugée est celle de la coquille
+ * DÉRIVÉE DU SOCLE (`scripts\lib-socle-page.mjs`, `pageDeVue`) : la coquille écrite à la main a
+ * quitté `lib-vue-html.mjs`. Les quatre propriétés de TF-0907 restent jugées sur elle, et deux s'y
+ * ajoutent, chacune à double sens : la bascule de thème que le socle apporte (R-30), et le sceau de
+ * la source dans le pied, que R-26 bis relit pour juger la parité d'une vue. Sans socle trouvable,
+ * la recette se déclare SANS OBJET, chemins cherchés compris, et ne compte aucun cas.
+ *
  * Joué par `oracles\self-tests.mjs` (I2 : tout `*.test.mjs` du dépôt est joué).
  */
-import { coquille, mdVersHtml, svgBoites } from "./lib-vue-html.mjs";
+import { mdVersHtml, svgBoites } from "./lib-vue-html.mjs";
+import { socleDePage, socleAbsent, lireAsset, chargerPoseur, pageDeVue } from "./lib-socle-page.mjs";
 
 const echecs = [];
 
-const page = coquille({
+const socle = socleDePage();
+const gabarit = lireAsset("boilerplate.html", socle.assets);
+if (!gabarit) {
+  console.log(`lib-vue-html (TF-0907, TF-1321) : SANS OBJET — ${socleAbsent(socle)} ; aucun cas joué, aucun cas compté`);
+  process.exit(0);
+}
+
+const page = pageDeVue({
+  gabarit,
+  poseur: await chargerPoseur(socle.assets),
   titre: "Modèle de données",
   description: "vue de recette",
   front: { role: "modèle", sources_de_verite: "schema.sql", verifie_le: "2026-09-08" },
@@ -35,11 +52,13 @@ const page = coquille({
   corpsHtml: mdVersHtml("| colonne | type |\n|---|---|\n| id | entier |\n"),
   source: "# source\n",
   lettre: "M",
+  surtitre: "Digit-AI · Modèle de données",
 });
 
-// Les quatre propriétés du remède, chacune avec la mesure qui l'a imposée.
+// Les propriétés du remède, chacune avec la mesure qui l'a imposée. La largeur se lit désormais dans
+// le jeton du socle (`--w`, 75 à 92 % de la fenêtre) : la colonne de 75ch n'existe plus nulle part.
 const REGLES = [
-  ["I1/L26 — la colonne de lecture ne bride plus la page", (h) => /\.colonne\{max-width:none/.test(h),
+  ["I1/L26 — la colonne de lecture ne bride plus la page", (h) => /--w:\s*clamp\(75vw/.test(h) && !/max-width:\s*75ch/.test(h),
     "la colonne restait à 75ch : 646 px, soit 34 % de la fenêtre à 1920 px"],
   ["L26 — le schéma SVG suit la largeur disponible", (h) => /<svg[^>]*width="100%"/.test(h),
     "le SVG sortait à largeur FIXE, 32 % de la fenêtre à 1920 px"],
@@ -47,6 +66,10 @@ const REGLES = [
     "la classe s'appelait `scroll`, seul nom anglais du rendu"],
   ["A4 — le titre porte son indice daté, dérivé de `verifie_le`", (h) => /<title>[^<]*20260908a<\/title>/.test(h),
     "le titre sortait nu : deux révisions du même jour portaient le même nom à l'écran"],
+  ["R-30 — la bascule de thème du socle est câblée et persistée", (h) => /id="theme-toggle"/.test(h) && /localStorage\.setItem\(\s*'digitai-theme'/.test(h),
+    "la coquille écrite à la main n'avait aucune bascule : les vues des produits restaient claires, sans choix du lecteur (TF-1321)"],
+  ["R-26 bis — le pied porte le sceau de la source", (h) => /Sceau source <code>[0-9a-f]{12}<\/code>/.test(h),
+    "sans sceau, une vue se lit « antérieure au mécanisme de sceau » et sa parité avec la source n'est plus jugeable"],
 ];
 
 for (const [nom, tenue, cout] of REGLES) {
@@ -56,10 +79,12 @@ for (const [nom, tenue, cout] of REGLES) {
 // SENS ROUGE — la page ramenée à l'état d'avant le 07/09. Chaque assertion DOIT y échouer :
 // une assertion qui passe des deux côtés ne prouve rien.
 const avant = page
-  .replace(".colonne{max-width:none;margin:0}", ".colonne{max-width:75ch;margin:0 auto}")
+  .replace(/--w:\s*clamp\([^)]*\)/, "--w: 75ch")
   .replaceAll('class="defile"', 'class="scroll"')
   .replace(/<svg([^>]*)width="100%" style="max-width:\d+px"/, '<svg$1width="820"')
-  .replace(/<title>[^<]*<\/title>/, "<title>Modèle de données</title>");
+  .replace(/<title>[^<]*<\/title>/, "<title>Modèle de données</title>")
+  .replace(/<button id="theme-toggle"[\s\S]*?<\/button>/, "")
+  .replace(/Sceau source <code>[0-9a-f]{12}<\/code>/, "");
 for (const [nom, tenue] of REGLES) {
   if (tenue(avant)) echecs.push(`ROUGE — ${nom} : l'assertion passe AUSSI sur la page d'avant le remède, elle ne prouve rien`);
 }
@@ -91,4 +116,4 @@ for (const [libelle, source] of [
 }
 
 if (echecs.length) { console.error("lib-vue-html : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`lib-vue-html (TF-0907) : ${REGLES.length * 2 + 5}/${REGLES.length * 2 + 5} — colonne pleine largeur, SVG à 100 %, classe defile, titre daté ; chaque règle prouvée dans ses DEUX sens (page produite / page d'avant le remède) ; liens markdown rendus pour http, chemin relatif et mailto, et REFUSÉS — syntaxe laissée visible — pour javascript: et data:`);
+console.log(`lib-vue-html (TF-0907, TF-1321) : ${REGLES.length * 2 + 5}/${REGLES.length * 2 + 5} — sur la coquille dérivée du socle : colonne pleine largeur, SVG à 100 %, classe defile, titre daté, bascule de thème câblée, sceau de la source au pied ; chaque règle prouvée dans ses DEUX sens (page produite / page d'avant le remède) ; liens markdown rendus pour http, chemin relatif et mailto, et REFUSÉS — syntaxe laissée visible — pour javascript: et data:`);

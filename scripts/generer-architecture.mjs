@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 // generer-architecture.mjs — projette docs\projet\ARCHITECTURE.md en ARCHITECTURE.html
 // (TF-0091). La source Markdown fait foi ; la vue est régénérée, jamais éditée.
-// Déterministe, autonome (A1), chartée. Usage :
+// Déterministe, autonome (A1). La coquille est LUE dans le socle digit-ai-page-html par
+// scripts/lib-socle-page.mjs (TF-1321, décision humaine D-13 (a) du 23/09/2026) : bascule de
+// thème, repli des tableaux en cartes et composants du socle viennent avec elle. Socle
+// introuvable : la vue n'est pas écrite, le script dit où il a cherché et sort en 2. Usage :
 //   node scripts/generer-architecture.mjs <chemin>\ARCHITECTURE.md
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { lireSource, mdVersHtml, coquille, svgBoites, esc } from "./lib-vue-html.mjs";
+import { lireSource, mdVersHtml, svgBoites, esc } from "./lib-vue-html.mjs";
+import { rendreVue } from "./lib-socle-page.mjs";
 
 const src = process.argv[2];
 if (!src) { console.error("usage : generer-architecture.mjs <ARCHITECTURE.md>"); process.exit(2); }
@@ -63,10 +67,13 @@ const svg = composants.length >= 2 ? {
   corps: svgBoites(composants, liens),
 } : null;
 
-const html = coquille({
+const rendu = await rendreVue({
   titre, description: "Architecture technique — vue générée depuis ARCHITECTURE.md (la source fait foi).",
   front, svg, corpsHtml: mdVersHtml(corps.replace(/^# .+$\r?\n/m, "")), source: texte,
+  surtitre: "Digit-AI · Architecture technique",
 });
+if (rendu.absent) { console.error(`[SOCLE ABSENT] ARCHITECTURE.html non écrite — ${rendu.absent}`); process.exit(2); }
+const html = rendu.html;
 const cible = join(dirname(src), "ARCHITECTURE.html");
 writeFileSync(cible, html);
 console.log(`ARCHITECTURE.html générée — ${composants.length} composant(s), ${liens.length} flux (${esc(front.verifie_le || "?")})`);

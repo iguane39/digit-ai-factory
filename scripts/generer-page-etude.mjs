@@ -21,8 +21,9 @@
  * POURQUOI UN GÉNÉRATEUR ET PAS CINQ PAGES ÉCRITES À LA MAIN. Cinq pages écrites à la main sont
  * cinq dettes : la sixième étude repartirait sans page, et chaque correction de la source ferait
  * diverger sa page en silence. Le générateur rend la règle TENABLE — une commande, et la page suit
- * sa source. Il ne porte aucune valeur de marque : la coquille chartée, les jetons du socle et le
- * rendu markdown viennent de `scripts\lib-vue-html.mjs`, déjà éprouvé par trois générateurs.
+ * sa source. Il ne porte aucune valeur de marque : la coquille et les jetons sont LUS dans le socle
+ * `digit-ai-page-html` par `scripts\lib-socle-page.mjs` (TF-1317, TF-1324), et le rendu markdown
+ * vient de `scripts\lib-vue-html.mjs`.
  *
  * DÉTERMINISTE : même source, même page, octet pour octet. Aucune date générée — l'indice vient du
  * nom du fichier source, et le sceau est l'empreinte de la source normalisée. Une page régénérée
@@ -38,10 +39,12 @@
  */
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdtempSync, rmSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
-import { tmpdir, homedir } from "node:os";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { tmpdir } from "node:os";
 import { lireSource, mdVersHtml, esc } from "./lib-vue-html.mjs";
-import { racineConfigInstallee } from "./lib-config-installee.mjs";
+import {
+  socleDePage, socleAbsent, lireAsset as lireAssetDuSocle, chargerPoseur,
+  armerTableaux, enChapitres, coquilleDuSocle, replierTableaux, cablerComposants as cablerComposantsDuSocle,
+} from "./lib-socle-page.mjs";
 
 /** L'indice R-4 d'un nom de fichier : « …- AAAAMMJJx.md » ou « AAAAMMJJ-objet.md ». */
 export function indiceDuNom(nom) {
@@ -101,110 +104,6 @@ export function enTete(corps) {
   return { titre, description: phrase.slice(0, 180) || titre.slice(0, 180) };
 }
 
-// ── LES TABLEAUX LONGS SE FILTRENT, ET LE DOCUMENT SE CHERCHE ────────────────────────────────
-//
-// LE SOCLE L'EXIGE, ET LA DÉCISION HUMAINE DU 16/09 L'A CONFIRMÉ EN TENANT LA RÈGLE « TELLE
-// QU'ELLE EST ÉCRITE » : une page remise à un humain passe le socle `digit-ai-page-html` EN ENTIER
-// (R-32). Ses règles L4 et L13 disent qu'une table de huit lignes ou plus se filtre, et qu'un
-// document qui en porte une se cherche — « une liste longue se cherche » (standard H2).
-//
-// LA SORTIE PARESSEUSE EXISTAIT ET A ÉTÉ ÉCARTÉE. Le socle admet `data-filterable="off"` avec un
-// motif écrit ; un générateur qui stamperait le même motif sur chaque table produirait exactement
-// ce que le socle nomme lui-même comme le pire cas — *une exemption de routine ne se lit plus*.
-// Les composants existent et sont éprouvés : on les CÂBLE (loi n° 1), on ne les exempte pas.
-//
-// INLINÉS, JAMAIS RÉFÉRENCÉS : la page est autoportante (A1), donc les deux assets entrent dans le
-// document. Le coût est de 48 Ko par page ; c'est le prix d'un fichier qu'on peut envoyer par
-// courriel et ouvrir sans réseau, et c'est la propriété que la doctrine exige en premier.
-const SEUIL_FILTRE = 8;
-// Les assets du socle se resolvent a l'APPEL et par la bibliotheque partagee (TF-1297, A-21
-// du 22/09/2026) : resolus au chargement, ils faisaient lever ce generateur sur un serveur
-// sans repertoire personnel, avant qu'il ait pu dire ce qui lui manquait.
-function cheminDesAssets(env = process.env) {
-  const r = racineConfigInstallee(env);
-  if (!r.racine) return null;
-  return join(r.racine, "skills", "digit-ai-page-html", "assets");
-}
-
-/**
- * Lit un asset du socle. Absent : chaîne vide, et l'appelant le DIT — jamais un échec muet.
- *
- * LA RÉSOLUTION SE FAIT ICI, ET PAS DANS LA VALEUR PAR DÉFAUT D'UN PARAMÈTRE. L'action A-21 du
- * 22/09 (TF-1297) a remplacé la constante de module `ASSETS` par `cheminDesAssets()`, appelée à
- * l'usage, pour qu'un poste sans répertoire personnel puisse DIRE ce qui lui manque au lieu de
- * lever au chargement. La signature, elle, a gardé `racine = ASSETS` : un symbole qui n'existait
- * plus. Le générateur levait donc `ReferenceError: ASSETS is not defined` au PREMIER appel, sur
- * tous les postes — y compris ceux dont le socle était parfaitement installé. Mesuré le 22/09 :
- * `node scripts\generer-page-etude.mjs <étude>.md` ne produisait aucune page.
- * *Une valeur par défaut est évaluée à chaque appel, mais elle est RÉSOLUE dans la portée du
- * module : déplacer une constante vers une fonction sans toucher la signature laisse une
- * référence morte que rien ne relit tant qu'un appel ne la traverse pas.*
- */
-export function lireAsset(nom, racine = cheminDesAssets()) {
-  if (!racine) return "";
-  try { return readFileSync(join(racine, nom), "utf8"); } catch { return ""; }
-}
-
-/**
- * Marque les tables de `SEUIL_FILTRE` lignes ou plus : un `id` stable, `data-filterable`, et le
- * compteur `aria-live` que la règle G5 réclame — sans lui, le lecteur ne sait pas combien de
- * lignes un filtre vient de masquer. Rend `{ html, ids }`.
- */
-export function armerTableaux(html) {
-  const ids = [];
-  let n = 0;
-  const sortie = html.replace(/<div class="defile"><table>([\s\S]*?)<\/table><\/div>/g, (bloc, dedans) => {
-    const lignes = (dedans.match(/<tr>/g) || []).length - 1;   // l'en-tête ne compte pas
-    if (lignes < SEUIL_FILTRE) return bloc;
-    n += 1;
-    const id = `tab-${n}`;
-    ids.push(id);
-    return `<div class="defile"><table id="${id}" data-filterable>${dedans}</table></div>`
-      + `\n<p class="tf-count" data-tf-count-for="${id}" aria-live="polite"></p>`;
-  });
-  return { html: sortie, ids };
-}
-
-/**
- * LA PROSE EN CHAPITRES, LES TABLEAUX EN FRÈRES (16/09/2026).
- *
- * POURQUOI CETTE MISE EN FORME PLUTÔT QU'UNE BORNE SUR LE TEXTE. Le rendu markdown produit un flux
- * plat — titre, paragraphe, liste, tableau, titre… — et à 3840 px ce flux étire la prose à plus de
- * deux cents caractères par ligne : l'œil perd le début de la ligne suivante, et l'oracle de rendu
- * le refuse (V18). Le premier remède essayé a borné les paragraphes par `max-width` ; L2 l'a refusé
- * dans la seconde qui a suivi, et son message porte le remède juste — *la mesure de lecture se pose
- * sur le CONTENEUR, pas sur le texte*. Les deux règles ne se contredisent pas : prises ensemble,
- * elles décrivent une seule construction, celle du gabarit de chapitre du socle.
- *
- * CE QUE FAIT LA TRANSFORMATION : toute suite de blocs de PROSE devient un `section.chap.lire`
- * (1 080 px, le token du socle, mesuré à 134 caractères par ligne — sous le plafond) ; les
- * tableaux, leurs compteurs et les figures restent SES FRÈRES, à pleine largeur. Le conteneur
- * DÉCLARE sa mesure (`data-mesure-lecture`), comme le socle l'exige dès qu'un chapitre de lecture
- * côtoie des frères plus larges — sans quoi la correction crée une rupture d'alignement, défaut
- * mesuré deux fois le 24/08 chez un produit.
- */
-export function enChapitres(html) {
-  const lignes = html.split("\n");
-  const sortie = [];
-  let chapitre = [];
-  const fermer = () => {
-    if (!chapitre.length) return;
-    sortie.push('<section class="chap lire" data-mesure-lecture>', ...chapitre, "</section>");
-    chapitre = [];
-  };
-  for (const l of lignes) {
-    // Un tableau, son compteur et une figure sont des FRÈRES du chapitre : ils prennent la largeur.
-    if (/^<div class="defile">/.test(l) || /^<p class="tf-count"/.test(l) || /^<figure/.test(l)) {
-      fermer();
-      sortie.push(l);
-      continue;
-    }
-    chapitre.push(l);
-  }
-  fermer();
-  return sortie.join("\n");
-}
-
 /**
  * UNE NOTE D'AUTEUR DÉCRIT UNE COLONNE, ET C'EST L'AUTEUR QUI L'ÉCRIT (16/09/2026).
  *
@@ -249,37 +148,35 @@ export function decrireColonnes(html) {
   });
 }
 
-// ── LA COQUILLE SE DÉRIVE DU SOCLE, ELLE NE S'ÉCRIT PLUS (TF-1317, décision humaine D-6 (b)) ──────
+// ── LA COQUILLE SE DÉRIVE DU SOCLE, ET LE SOCLE SE CHERCHE LÀ OÙ IL EST ─────────────────────────
 //
-// LE FAIT. Jusqu'au 22/09/2026, cette page était bâtie sur la coquille ÉCRITE À LA MAIN de
-// `lib-vue-html.mjs` — une copie des jetons du socle, sans le reste. Le même jour, trois juges
-// différents ont trouvé trois conventions du socle absentes de chaque page d'étude : aucune bascule
-// de thème (R-30 point 2, `oracle-bascule` rouge — TF-1244), aucun repli des tableaux en cartes
-// (trois tables défilant à l'horizontale sous 768 px, `oracle-mobile` M4 — TF-1317), et des
-// composants embarqués SANS leur marqueur, donc jamais exemptables par la passe d'imputation au
-// socle (TF-1315). *Trois symptômes, une cause : une coquille qui n'est pas celle du socle rate
-// chaque convention que le socle ajoute, en silence, et les juges les découvrent une par une.*
+// TF-1317 (décision humaine D-6 (b) du 22/09/2026) a fait dériver cette page du gabarit du socle
+// `digit-ai-page-html` : trois conventions du socle manquaient à la coquille écrite à la main — la
+// bascule de thème, le repli des tableaux en cartes, les composants posés sous marqueur scellé.
 //
-// LE REMÈDE. La coquille est LUE dans le gabarit installé du socle (`boilerplate.html`) et ses
-// emplacements sont remplis ; les composants sont posés par le poseur OFFICIEL du socle
-// (`embarquer-composants.mjs`, `poserComposants`), sous leur marqueur et scellés par l'empreinte de
-// leur source — jamais par une seconde implémentation du format (TF-0890 : un second poseur est une
-// fourche). Ce que le socle fixera demain, cette page l'aura sans qu'on y touche.
-//
-// CE QUI N'A PAS SUIVI, et c'est dit : les générateurs d'architecture et de modèle de données
-// gardent la coquille partagée de `lib-vue-html.mjs`. Ils relèvent de la même classe, et leur
-// candidature est ouverte au registre ; le banc `oracles-design-page-generee.test.mjs` continue de
-// juger cette coquille partagée pour eux, sur un témoin à part.
+// Le 23/09/2026 (TF-1324 et TF-1321, décisions humaines D-14 (a) et D-13 (a)), la coquille et ses
+// pièces ont quitté ce fichier pour `scripts\lib-socle-page.mjs`, que les générateurs d'architecture
+// et de modèle de données emploient aussi. Deux choses y ont changé, et elles se lisent là-bas :
+//   · le socle se cherche dans la copie INSTALLÉE, puis dans sa SOURCE sous FORGE_ROOT, puis dans le
+//     dépôt frère du pilot — le circuit d'intégration hébergé ne porte que la source, et ce
+//     générateur y levait « gabarit du socle introuvable » ;
+//   · un socle introuvable se DIT, chemins cherchés compris : le self-test se déclare SANS OBJET et
+//     la ligne de commande sort en 2, au lieu d'une trace de pile.
+// Les fonctions déplacées restent exportées d'ici : leurs consommateurs n'ont rien à changer.
+export { SEUIL_FILTRE, armerTableaux, enChapitres, coquilleDuSocle, replierTableaux } from "./lib-socle-page.mjs";
 
-/** Le poseur de composants DU SOCLE, chargé une fois. `null` si le socle n'est pas installé. */
-async function chargerPoseur(env = process.env) {
-  const assets = cheminDesAssets(env);
-  if (!assets) return null;
-  const script = join(assets, "..", "scripts", "embarquer-composants.mjs");
-  if (!existsSync(script)) return null;
-  try { return (await import(pathToFileURL(script).href)).poserComposants || null; } catch { return null; }
+/** Lit un asset du socle, résolu À L'APPEL (TF-1297) : absent, chaîne vide, et l'appelant le DIT. */
+export function lireAsset(nom, racine = socleDePage().assets) {
+  return lireAssetDuSocle(nom, racine);
 }
-const POSEUR = await chargerPoseur();
+
+/** Le poseur de composants DU SOCLE, chargé une fois. `null` si le socle est introuvable. */
+const POSEUR = await chargerPoseur(socleDePage().assets);
+
+/** Pose la barre de recherche et les composants du socle, avec le poseur chargé par défaut. */
+export function cablerComposants(html, ids, poseur = POSEUR) {
+  return cablerComposantsDuSocle(html, ids, poseur);
+}
 
 /** L'indice R-4 de la page : celui du nom, sinon `verifie_le` de la source, sinon le jour. */
 function indiceDeLaPage(front, version) {
@@ -287,101 +184,6 @@ function indiceDeLaPage(front, version) {
   return version || (d ? `${d[1]}${d[2]}${d[3]}a` : new Date().toISOString().slice(0, 10).replaceAll("-", "") + "a");
 }
 
-/**
- * Remplit les emplacements du gabarit du socle. Les notes d'auteur du gabarit (commentaires HTML)
- * ne partent pas au lecteur (D11) ; un emplacement introuvable ou laissé vide est une ERREUR, jamais
- * un repli silencieux sur une autre coquille — une page qui ne sait pas qu'elle a raté son gabarit
- * est exactement le défaut que ce remède ferme.
- */
-export function coquilleDuSocle({ gabarit, titre, description, indice, corpsHtml }) {
-  let h = String(gabarit || "");
-  if (!h) throw new Error("gabarit du socle introuvable (digit-ai-page-html/assets/boilerplate.html) : la page ne peut pas être dérivée du socle");
-  h = h.replace(/<!--[\s\S]*?-->/g, "");
-  const remplir = (motif, par, nom) => {
-    if (!motif.test(h)) throw new Error(`gabarit du socle : emplacement « ${nom} » introuvable — le socle a changé de forme`);
-    h = h.replace(motif, () => par);
-  };
-  remplir(/<title>[\s\S]*?<\/title>/, `<title>${esc(`Digit-AI — ${titre} — ${indice}`)}</title>`, "titre du document");
-  remplir(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(description)}">`, "description");
-  remplir(/<p class="eyebrow">[^<]*<\/p>/, `<p class="eyebrow">Digit-AI · Étude</p>`, "surtitre");
-  remplir(/<h1>[^<]*<\/h1>/, `<h1>${esc(titre)}</h1>`, "titre principal");
-  remplir(/<main>[\s\S]*?<\/main>/, `<main>\n${corpsHtml}\n    </main>`, "corps");
-  remplir(/<footer class="doc">[\s\S]*?<\/footer>/, `<footer class="doc">\n      Digit-AI — ${esc(titre)} — ${indice}\n    </footer>`, "pied de page");
-  h = h.replaceAll("{L}", "D");
-  const reste = h.match(/\{[A-ZÉ][^{}<>\n]{0,60}\}/);
-  if (reste) throw new Error(`gabarit du socle : l'emplacement ${reste[0]} n'a pas été rempli`);
-  return h;
-}
-
-/**
- * LE REPLI EN CARTES DU SOCLE, SUR CHAQUE TABLEAU (TF-1317). Le socle replie en cartes tout
- * `table.repli-cartes` sous 900 px et restitue l'en-tête de chaque cellule par `data-label`. Sans
- * la classe et les étiquettes, une table de quatre colonnes défile à l'horizontale sur un
- * téléphone — mesuré le 22/09 sur trois tables d'une page d'étude.
- */
-export function replierTableaux(html) {
-  return html.replace(/<table\b([^>]*)>([\s\S]*?)<\/table>/g, (tout, attrs, dedans) => {
-    const tetes = [...dedans.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/g)].map((m) => m[1].replace(/<[^>]+>/g, "").trim());
-    if (!tetes.length) return tout;
-    const corps = dedans.replace(/<tr>([\s\S]*?)<\/tr>/g, (ligne, cellules) => {
-      let i = 0;
-      return `<tr>${cellules.replace(/<td>/g, () => `<td data-label="${esc(tetes[i++] ?? "")}">`)}</tr>`;
-    });
-    const classes = /\bclass="/.test(attrs) ? attrs.replace(/\bclass="/, 'class="repli-cartes ') : `${attrs} class="repli-cartes"`;
-    return `<table${classes}>${corps}</table>`;
-  });
-}
-
-/**
- * Pose la barre de recherche, les composants du socle et la règle d'impression. La règle G6 est
- * la moins intuitive et la plus utile : le JS ne s'exécute pas à l'export PDF, donc sans la règle
- * `@media print` un document exporté APRÈS un filtrage sortirait tronqué, en silence.
- *
- * Les composants sont posés par le poseur DU SOCLE (TF-1315) : chacun entre ses marqueurs
- * COMPOSANT-EMBARQUE, scellé par l'empreinte de sa source, ce qui permet à la passe d'imputation de
- * forge-design de les mettre au compte du socle au lieu de l'auteur de la page. L'initialisation
- * vient APRÈS eux, le poseur les insérant avant `</body>`.
- */
-export function cablerComposants(html, ids, poseur = POSEUR) {
-  if (!ids.length) return html;
-  if (!poseur) throw new Error("poseur de composants du socle introuvable (digit-ai-page-html/scripts/embarquer-composants.mjs) : les composants ne peuvent pas être embarqués sous sceau");
-  const { html: pose, manquants } = poseur(html, ["table-filters.css", "table-filters.js", "find-in-page.js"]);
-  if (manquants.length) throw new Error(`composants du socle absents : ${manquants.join(", ")}`);
-  const barre = `    <div class="find-bar">
-      <label for="find">Rechercher dans le document</label>
-      <input id="find" type="search" placeholder="Rechercher dans le document…">
-      <p id="findCount" class="find-count" aria-live="polite"></p>
-    </div>
-`;
-  // Les règles PROPRES à la barre de recherche, aux jetons du SOCLE : l'échelle y est écrite en
-  // multiples de 4 px (T3 les admet) et l'alerte s'appelle --red. Les jetons --e1..--e10 et --alerte
-  // de l'ancienne coquille n'existent pas au socle : les garder aurait rendu des variables vides.
-  const style = `  <style>
-    .find-bar{display:flex;flex-direction:column;gap:4px;margin:0 0 20px}
-    .find-bar label{font-size:.78rem;color:var(--muted);font-weight:600}
-    .find-bar input{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
-    .find-count{margin-top:4px;font-size:.72rem;color:var(--muted);min-height:1em}
-    .find-count.zero{color:var(--red)}
-    .tf-count{margin:8px 0 20px;font-size:.72rem;color:var(--muted);min-height:1em}
-    mark.find-hit{background:var(--amber-fill);color:var(--ink);border-radius:2px;display:inline;padding:0;margin:0}
-    @media print{tr[data-tf-hidden]{display:table-row !important}.find-bar{display:none}}
-    /* Un IDENTIFIANT se coupe, un mot jamais (L19 du socle réserve la coupure à « code »). Mesuré le
-       22/09 à 390 px : un tableau replié en cartes débordait à 442 px, porté par des chemins de 44 à
-       95 caractères sans aucun point de coupure ; la prose, elle, ne se coupe pas. */
-    main code{overflow-wrap:anywhere}
-  </style>
-`;
-  const init = `  <script>
-    DigitAITableFilters.initAll(document);
-    DigitAIFindInPage.init(document.getElementById('find'), document.querySelector('main'), document.getElementById('findCount'));
-  </script>
-`;
-  const fin = pose.lastIndexOf("</body>");
-  const avecInit = `${pose.slice(0, fin)}${init}${pose.slice(fin)}`;
-  return avecInit
-    .replace("</head>", `${style}</head>`)
-    .replace(/<main>\n/, `<main>\n${barre}`);
-}
 
 /** Rend le HTML d'une étude. Pur : aucune écriture ; l'heure n'intervient que si la source n'est pas datée. */
 export function pageEtude(texteSource, nomSource, { gabarit = lireAsset("boilerplate.html"), poseur = POSEUR } = {}) {
@@ -461,6 +263,16 @@ Ce chapitre existe pour franchir le seuil de filtrage et câbler les composants 
 `;
 
 function selfTest() {
+  // SANS OBJET DÉCLARÉ, JAMAIS UNE TRACE DE PILE (TF-1324, D-14 (a) du 23/09/2026). Sans socle, la
+  // page ne peut pas être dérivée, donc rien de ce qui suit ne peut être jugé. Le résumé NOMME
+  // l'absence et les chemins cherchés, sort en 0, et ne porte aucun compte de cas : le cliquet du
+  // harnais le rend alors NON JUGÉ plutôt que de voir des cas disparaître — même contrat que le
+  // banc de coquille. Un faux vert serait pire : il affirmerait des cas qui n'ont pas été joués.
+  const socle = socleDePage();
+  if (!socle.assets || !POSEUR) {
+    console.log(`Self-test generer-page-etude : SANS OBJET — ${socle.assets ? "poseur de composants du socle introuvable sous " + socle.assets : socleAbsent(socle)} ; aucun cas joué, aucun cas compté`);
+    return 0;
+  }
   const dir = mkdtempSync(join(tmpdir(), "page-etude-"));
   const casse = [];
   const f = join(dir, "20260916-etude-opportunite-essai.md");
@@ -571,6 +383,11 @@ if (lance) {
     console.error("cible absente — usage : node scripts\\generer-page-etude.mjs <source.md>… | --dossier <chemin> | --self-test");
     process.exit(2);
   }
+  // Sans socle, aucune page ne peut être dérivée : le dire, chemins cherchés compris, AVANT la
+  // première écriture (TF-1324). Une trace de pile levée au milieu d'un lot laisserait des pages
+  // écrites et d'autres non, sans que le lecteur sache lesquelles.
+  const socle = socleDePage();
+  if (!socle.assets) { console.error(socleAbsent(socle)); process.exit(2); }
   for (const c of cibles) {
     if (!existsSync(c)) { console.error(`source introuvable : ${c}`); process.exit(2); }
     console.log(`page écrite : ${ecrirePage(c)}`);
