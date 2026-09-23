@@ -136,11 +136,13 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md` | fichier | 22,7 Ko | Synthèse de mandat — le premier palier est fait et prouvé, le deuxième est écrit et bute s |
 | `Digit-AI - Synthese Mandat - Paliers 2 et 3 des premiers HTML de nouveaux formats - 20260914d.md` | fichier | 23,0 Ko | Synthèse de mandat — les trois règles sont écrites au socle, le premier format démuni a so |
 | `Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md` | fichier | 13,8 Ko | Le parc est aligné sur GitHub, et 2 branches n'ont jamais été fusionnées dans main : 1 au  |
+| `Digit-AI - Synthese Mandat - Parc resynchronise apres le travail des deux postes - 20260923c.md` | fichier | 18,6 Ko | Digit-AI — Synthèse de mandat — Parc resynchronisé après le travail des 2 postes — 23/09/2 |
 | `Digit-AI - Synthese Mandat - Parc synchronise apres fusion du pilot avec l autre poste - 20260921d.md` | fichier | 11,2 Ko | Le parc est synchronisé : le pilot a fusionné les 30 enregistrements de l'autre poste, et  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` | fichier | 20,7 Ko | Synthèse de mandat — les huit dépôts en attente sont publiés et les dix-sept du parc sont  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` | fichier | 9,4 Ko | Le parc est synchronisé avec GitHub : 16 dépôts alignés, et 4 jours de travail fini enfin  |
 | `Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md` | fichier | 16,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et 4 dépôts publiés — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
+| `Digit-AI - Synthese Mandat - Pilot rattrape sur l autre poste et index en retard consigne - 20260923d.md` | fichier | 20,7 Ko | Digit-AI — Synthèse de mandat — Pilotage rattrapé sur l'autre poste, index en retard consi |
 | `Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` | fichier | 25,5 Ko | Synthèse de mandat — le plancher d'écriture de la Factory est posé, jugé et câblé chez le  |
 | `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 12,3 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
 | `Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` | fichier | 16,1 Ko | Synthèse de mandat — pourquoi le bloc des décisions dérive d'un rendu à l'autre (30/08/202 |
@@ -213,4 +215,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_196 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_198 fichier(s), 0 sous-dossier(s)_
