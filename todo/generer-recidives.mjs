@@ -30,6 +30,10 @@ import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
+// TF-1323 (D-10 (a), 23/09/2026) : un produit inconnu de la table des pseudonymes est journalisé sous
+// ce marqueur, jamais sous son nom. Il n'identifie AUCUN produit : l'attribuer ferait d'une foule de
+// produits différents un seul faux produit, en retard de toutes leurs classes à la fois.
+import { MARQUEUR_PRODUIT_HORS_TABLE } from "../scripts/lib-pseudonyme-produit.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
@@ -116,6 +120,7 @@ for (const [k, c] of classes) {
   if (!apres.length) { delais.push({ classe: k, correction: dateCorrection, artefact: art.cible, constat: "non mesurable encore : aucun relevé d'héritage postérieur à la correction" }); continue; }
   const produits = new Map();
   for (const r of apres) for (const p of (r.produits || [])) {
+    if (p.produit === MARQUEUR_PRODUIT_HORS_TABLE) continue;   // compté à part, section 5
     const a = (p.artefacts || []).find((x) => x.cible === art.cible);
     if (!a) continue;
     if (CONFORME(a.etat) && !produits.has(p.produit)) produits.set(p.produit, Math.round((Date.parse(r.ts) - Date.parse(dateCorrection)) / 86400000));
@@ -134,6 +139,10 @@ for (const [k, c] of classes) {
 
 // ---- 3. taux d'héritage par artefact (dernier relevé) ---------------------------------------
 const dernier = releves[releves.length - 1] || null;
+/** Le nombre de produits du dernier relevé journalisés sous le marqueur hors table (TF-1323). */
+function dernierReleveHorsTable() {
+  return dernier ? (dernier.produits || []).filter((p) => p.produit === MARQUEUR_PRODUIT_HORS_TABLE).length : 0;
+}
 const tauxHeritage = [];
 if (dernier) for (const a of (heritage.artefacts || [])) {
   const lignes = (dernier.produits || []).map((p) => (p.artefacts || []).find((x) => x.cible === a.cible)).filter(Boolean);
@@ -233,6 +242,10 @@ L.push(``, `- Classes sans clôture fondatrice : ${sansFondateur.length ? sansFo
   `- Retours entrés sous une classe suspecte : ${suspectes.length ? suspectes.join(", ") : "aucun"}`, ``);
 
 L.push(`## 5. Descente par produit — quel produit ouvrir en premier`, ``);
+// Les produits hors table ne s'attribuent pas : leur nombre se DIT, pour que leur absence du tableau
+// ne se lise pas comme une descente réussie.
+const horsTable = dernierReleveHorsTable();
+if (horsTable) L.push(`Au dernier relevé, ${horsTable} produit(s) sont inconnus de la table des pseudonymes : journalisés sous le marqueur \`${MARQUEUR_PRODUIT_HORS_TABLE}\`, ils n'entrent pas dans ce tableau (TF-1323). Leur descente se mesurera quand l'ingestion de leur premier lot les aura inscrits.`, ``);
 if (!lignesProduits.length) L.push(`Non mesurable encore : aucune classe ne porte à la fois une clôture fondatrice, un artefact hérité et un relevé d'héritage postérieur à sa correction.`, ``);
 else {
   L.push(`Comment lire : la section 2 retournée par produit. Une ligne par produit relevé, triée par retard décroissant ; *en retard* compte les classes corrigées au pilot dont l'artefact porteur n'est pas conforme chez ce produit ; le *retard* est l'âge en jours de la plus ancienne de ces corrections, mesuré contre l'état des sources. La recopie de l'héritage se fait à l'ouverture d'une session chez le produit : cette liste dit lequel ouvrir.`, ``,

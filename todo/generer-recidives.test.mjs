@@ -115,6 +115,22 @@ check("tranchée — un item sorti de candidat compte dans la semaine de sa déc
   if (!/\| 2026-S36 \| 2 \| 1 \|/.test(md)) throw new Error("débit : la décision n'est pas comptée tranchée");
   if (!/Stock : 1 candidat\(s\) en attente de décision, 1 item\(s\) décidé/.test(md)) throw new Error("stock : le décidé non clos n'est pas compté");
 });
+// TF-1323 (D-10 (a), 23/09/2026) — un produit inconnu de la table est journalisé sous un MARQUEUR.
+// Double sens : le marqueur n'entre JAMAIS dans la descente par produit (il n'identifie personne), et
+// son nombre est DIT — sans cette phrase, un relevé plein de produits hors table se lirait comme vide.
+check("hors table — le marqueur n'est pas un produit : absent du tableau de descente, compté à part", () => {
+  const rel = w("RELEVES-HT.jsonl", JSON.stringify({ ts: "2026-09-03T08:00:00.000Z", contrat: "1.8.0", produits: [
+    { produit: "Produit-12", artefacts: [{ cible: "forge/RESTITUTION.md", etat: "conforme" }] },
+    { produit: "(produit hors table)", artefacts: [{ cible: "forge/RESTITUTION.md", etat: "absent" }] },
+    { produit: "(produit hors table)", artefacts: [{ cible: "forge/RESTITUTION.md", etat: "absent" }] },
+  ] }) + "\n");
+  const out = join(T, "R6.md"); const r = generer(rel, out);
+  if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stderr}`);
+  const md = readFileSync(out, "utf8");
+  if (/\| \(produit hors table\) \|/.test(md)) throw new Error("le marqueur a une ligne au tableau de descente : il y serait lu comme un produit en retard");
+  if (!/Au dernier relevé, 2 produit\(s\) sont inconnus de la table des pseudonymes/.test(md)) throw new Error("le nombre de produits hors table n'est pas dit");
+  if (!/\| Produit-12 \|/.test(md)) throw new Error("le produit connu a disparu du tableau");
+});
 rmSync(T, { recursive: true, force: true });
 console.log(`\ngenerer-recidives : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
