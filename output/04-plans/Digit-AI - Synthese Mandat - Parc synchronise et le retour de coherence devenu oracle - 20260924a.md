@@ -204,7 +204,7 @@ synchronisation d'abord, puis les lots, puis la prise en compte du retour.
   GitHub 2 venus de l'autre poste. Les 8 sont rebasés sur les 2 : union au registre, index
   régénérés, jamais arbitrés.
   - preuve : `git rev-list --left-right --count main...origin/main` rendait `8 2` avant ; après
-    l'envoi de 13:51 et un nouveau `git fetch`, les 13 dépôts rendaient `0/0`.
+    l'envoi de 13:49 et un nouveau `git fetch`, les 13 dépôts rendaient `0/0`.
 - **Les 2 postes avaient pris le même numéro de candidature le 23/09.** Le numéro publié garde
   TF-1325 ; celle de ce poste devient TF-1337 par `todo/renumeroter.mjs`, motif écrit dans sa source.
   - preuve : `oracle-todo` rendait FAIL R2 (seconde création pour TF-1325) avant, PASS après.
