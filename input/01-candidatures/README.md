@@ -46,6 +46,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `forge-communication-lot-skills-constats-20260911a.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `forge-communication-verdict-o3-20260911a.tf.jsonl` | fichier | 13,8 Ko | 8 ligne(s) JSONL |
 | `forge-design-marque-digit-ai-constats-20260911a.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
+| `garde-contournee-par-sortie-rompue-20260924a.md` | fichier | 2,5 Ko | Candidature — une garde de publication contournée par une sortie rompue — 20260924a |
+| `garde-contournee-par-sortie-rompue-20260924a.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
 | `gestion-reseaux-sociaux-verdict-o2-20260917a.tf.jsonl` | fichier | 12,5 Ko | 7 ligne(s) JSONL |
 | `hook-restitution-gabarit-juge-a-la-place-20260917a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `journal-de-versions-dormant-forge-audit-20260910a.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
@@ -88,4 +90,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_70 fichier(s), 1 sous-dossier(s)_
+_72 fichier(s), 1 sous-dossier(s)_
