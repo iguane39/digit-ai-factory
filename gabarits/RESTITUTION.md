@@ -907,7 +907,7 @@ run demandé au produit.
 instancié. Une session qui y travaille ne recevra ni consigne ni juge — et doit le savoir avant de
 rendre son premier message, pas après onze décisions.
 
-### Quels messages sont jugés, et les TROIS seules exemptions (TF-0904, 08/09/2026)
+### Quels messages sont jugés, et les CINQ seules exemptions (TF-0904, 08/09/2026 ; TF-0990 et TF-1182 en ont ajouté deux)
 
 Cette page régit « tout message de fin de traitement ». Le hook, lui, ne jugeait qu'un
 sous-ensemble défini par le nombre d'outils appelés — **au moins une écriture, ou au moins quatre
@@ -935,7 +935,7 @@ texte le disait dans une phrase d'ouverture que le tableau, seul élément à st
 section, faisait oublier. Sur un tour de travail dont le résultat n'est pas encore mesurable, la
 forme n'est pas l'exemption : c'est le **point d'étape** (§ dédié).
 
-**Les quatre exemptions, et rien d'autre** — écrites ici pour qu'on ne les élargisse pas en
+**Les cinq exemptions, et rien d'autre** — écrites ici pour qu'on ne les élargisse pas en
 silence, et tenues par `oracles\hook-restitution.mjs` (fonction `jugeable`, recette double sens) :
 
 | Exemption | Ce que c'est | Borne |

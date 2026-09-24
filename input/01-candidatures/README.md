@@ -35,6 +35,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `constats-ci-et-confidentialite-20260915b.tf.jsonl` | fichier | 5,5 Ko | 2 ligne(s) JSONL |
 | `constats-execution-decisions-20260920d.tf.jsonl` | fichier | 10,0 Ko | 5 ligne(s) JSONL |
 | `constats-mandat-todos-retours-20260917c.tf.jsonl` | fichier | 5,2 Ko | 4 ligne(s) JSONL |
+| `constats-reception-et-synchronisation-20260924a.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
 | `constats-sondages-mandat-20260914d.tf.jsonl` | fichier | 7,5 Ko | 5 ligne(s) JSONL |
 | `coquille-page-etude-slop-tokens-20260917b.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `decision-humaine-restituee-sans-geste-pilot-20260911a.tf.jsonl` | fichier | 3,8 Ko | 1 ligne(s) JSONL |
@@ -87,4 +88,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_69 fichier(s), 1 sous-dossier(s)_
+_70 fichier(s), 1 sous-dossier(s)_
