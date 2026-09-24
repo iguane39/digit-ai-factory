@@ -142,7 +142,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` | fichier | 9,4 Ko | Le parc est synchronisé avec GitHub : 16 dépôts alignés, et 4 jours de travail fini enfin  |
 | `Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md` | fichier | 16,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et 4 dépôts publiés — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
-| `Digit-AI - Synthese Mandat - Pilot rattrape sur l autre poste et index en retard consigne - 20260923d.md` | fichier | 21,6 Ko | Digit-AI — Synthèse de mandat — Pilotage rattrapé sur l'autre poste, index en retard consi |
+| `Digit-AI - Synthese Mandat - Pilot rattrape sur l autre poste et index en retard consigne - 20260923e.md` | fichier | 21,6 Ko | Digit-AI — Synthèse de mandat — Pilotage rattrapé sur l'autre poste, index en retard consi |
 | `Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` | fichier | 25,5 Ko | Synthèse de mandat — le plancher d'écriture de la Factory est posé, jugé et câblé chez le  |
 | `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 12,3 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
 | `Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` | fichier | 16,1 Ko | Synthèse de mandat — pourquoi le bloc des décisions dérive d'un rendu à l'autre (30/08/202 |

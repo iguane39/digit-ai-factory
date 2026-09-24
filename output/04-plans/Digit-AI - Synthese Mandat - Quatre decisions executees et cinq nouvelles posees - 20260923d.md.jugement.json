@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md",
+ "empreinte": "e8aee3adede3302006f3eb89fcb9924448aa84e09158be8d49f9f165e2e4aff4",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-23T10:59:15.187Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
