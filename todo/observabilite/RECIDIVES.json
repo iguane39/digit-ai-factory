@@ -1,21 +1,124 @@
 {
  "outil": "generer-recidives",
- "etat_au": "2026-09-17T07:52:11.269Z",
- "items": 1165,
- "items_classes": 329,
- "recidives": 182,
- "classes": 87,
+ "etat_au": "2026-09-23T10:51:41.190Z",
+ "items": 1335,
+ "items_classes": 475,
+ "recidives": 257,
+ "classes": 93,
  "familles": 18,
- "classes_sans_fondateur": 18,
- "retours_classe_suspecte": 49,
- "releves": 31,
- "produits_releves": 11,
- "produits_non_equipes": 0,
- "manques_heritage": 59,
- "couples_non_atteints": 88,
- "produits_en_retard": 13,
- "stock_candidats": 2,
- "stock_decides_non_clos": 46,
- "items_ouverts_vieux": 12,
- "sources_silencieuses": 21
+ "classes_sans_fondateur": 20,
+ "retours_classe_suspecte": 66,
+ "releves": 64,
+ "produits_releves": 14,
+ "produits_non_equipes": 1,
+ "manques_heritage": 91,
+ "couples_non_atteints": 69,
+ "produits_en_retard": 9,
+ "stock_candidats": 68,
+ "stock_decides_non_clos": 23,
+ "items_ouverts_vieux": 40,
+ "sources_silencieuses": 25,
+ "sources_muettes": [
+  {
+   "source": "pilot-campagne-fiches-html",
+   "silence": 45
+  },
+  {
+   "source": "COMPTA - Ventilation de facture Fournisseur-A",
+   "silence": 40
+  },
+  {
+   "source": "BdL",
+   "silence": 39
+  },
+  {
+   "source": "digit-desk.fr",
+   "silence": 39
+  },
+  {
+   "source": "forge-digit-ai-fr",
+   "silence": 39
+  },
+  {
+   "source": "client-a-cockpit-ia",
+   "silence": 34
+  },
+  {
+   "source": "Produit-09",
+   "silence": 34
+  },
+  {
+   "source": "digit-ai-fr",
+   "silence": 32
+  },
+  {
+   "source": "Produit-03",
+   "silence": 30
+  },
+  {
+   "source": "Produit-10",
+   "silence": 30
+  },
+  {
+   "source": "factory-digit-ai-fr",
+   "silence": 29
+  },
+  {
+   "source": "Produit-01",
+   "silence": 27
+  },
+  {
+   "source": "Produit-04",
+   "silence": 27
+  },
+  {
+   "source": "Produit-05",
+   "silence": 23
+  },
+  {
+   "source": "Produit-65",
+   "silence": 20
+  },
+  {
+   "source": "digit-ai-forge-tests",
+   "silence": 18
+  },
+  {
+   "source": "digit-ai-forge-conception",
+   "silence": 17
+  },
+  {
+   "source": "Produit-12",
+   "silence": 17
+  },
+  {
+   "source": "produits-anciens",
+   "silence": 17
+  },
+  {
+   "source": "Produit-61",
+   "silence": 14
+  },
+  {
+   "source": "digit-ai-forge-agents",
+   "silence": 11
+  },
+  {
+   "source": "digit-ai-forge-design",
+   "silence": 11
+  },
+  {
+   "source": "digit-ai-forge-development",
+   "silence": 11
+  },
+  {
+   "source": "Produit-02",
+   "silence": 10
+  },
+  {
+   "source": "Produit-11",
+   "silence": 9
+  }
+ ],
+ "seuil_jours": 7
 }
