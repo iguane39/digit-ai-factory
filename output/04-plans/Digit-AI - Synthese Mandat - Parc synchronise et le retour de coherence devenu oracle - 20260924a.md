@@ -26,7 +26,7 @@ sa parade tient en une ligne. J'attends 6 décisions.
 - **sur quoi** — le pilot `digit-ai-factory`, les 12 forges qui portaient des enregistrements non
   publiés, `digit-ai-forge-agents` pour l'oracle, et le canal confidentiel `digit-ai-confidentiel`
   pour 3 noms de produits.
-- **quand** — le 24/09/2026, de 13:39 à 16:26 (UTC+02:00), heures relevées par `date`.
+- **quand** — le 24/09/2026, de 13:39 à 16:35 (UTC+02:00), heures relevées par `date`.
 - **qui** — session de pilotage Claude Opus 5.5, sans agent délégué ; escalade de modèle : aucune.
 - **intention** — que ce poste et GitHub portent le même état, et que la leçon du retour serve à
   toute session future : ne plus répondre « cohérent » sur un contrôle qui ne vérifie pas le fond.
@@ -375,7 +375,9 @@ Les actions ci-dessous sont triées, celles de l'IA d'abord ; chacune porte son 
   `digit-ai-forge-design` `0ee5706`.
 - Publiés ensuite, garde jouée : `digit-ai-forge-agents` `01b4805..1f40504` (oracle-coherence v2),
   canal confidentiel `f69f31d..006d962` (Produit-70 à Produit-72), pilot `4b3b758..3fbd6ba` ; puis
-  l'enregistrement de cette synthèse, avec la candidature TF-1360.
+  cette synthèse avec la candidature TF-1360, pilot `3fbd6ba..debba7c` à 16:34, après quoi les 14
+  dépôts rendaient `0/0`. Cette mise à jour de l'heure de fin et de la preuve d'envoi part par un
+  dernier envoi du pilot, garde jouée.
 - `todo/TODO.jsonl` : TF-1325 de ce poste renumérotée TF-1337 ; 23 créations, TF-1338 à TF-1360 ;
   TF-1352 décidée, ouverte et close.
 - Lots reçus : `input/00-retours/`, 9 lots ; original du lot remis gardé hors dépôt sous

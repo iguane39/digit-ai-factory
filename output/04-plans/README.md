@@ -140,7 +140,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Parc synchronise apres fusion du pilot avec l autre poste - 20260921d.md` | fichier | 11,2 Ko | Le parc est synchronisé : le pilot a fusionné les 30 enregistrements de l'autre poste, et  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` | fichier | 20,7 Ko | Synthèse de mandat — les huit dépôts en attente sont publiés et les dix-sept du parc sont  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` | fichier | 9,4 Ko | Le parc est synchronisé avec GitHub : 16 dépôts alignés, et 4 jours de travail fini enfin  |
-| `Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md` | fichier | 30,0 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et le retour de cohérence devenu oracle — |
+| `Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md` | fichier | 30,1 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et le retour de cohérence devenu oracle — |
 | `Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md` | fichier | 16,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et 4 dépôts publiés — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
 | `Digit-AI - Synthese Mandat - Pilot rattrape sur l autre poste et index en retard consigne - 20260923e.md` | fichier | 21,6 Ko | Digit-AI — Synthèse de mandat — Pilotage rattrapé sur l'autre poste, index en retard consi |
