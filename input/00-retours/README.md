@@ -133,6 +133,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260912a.tf.jsonl` | fichier | 2,9 Ko | 3 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260913a.md` | fichier | 5,3 Ko | Retours forges — Produit-02 — 20260913a |
 | `Produit-02 - RETOURS - 20260913a.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260922a.md` | fichier | 29,7 Ko | Retours forges — Produit-02 — 20260922a |
+| `Produit-02 - RETOURS - 20260922a.tf.jsonl` | fichier | 12,4 Ko | 7 ligne(s) JSONL |
 | `Produit-04 - RETOURS - 20260827a.md` | fichier | 12,3 Ko | Retours forges — Produit-04 — 20260827a |
 | `Produit-04 - RETOURS - 20260827a.tf.jsonl` | fichier | 7,2 Ko | 3 ligne(s) JSONL |
 | `Produit-04 - RETOURS - 20260827b.md` | fichier | 12,2 Ko | Retours forges — Produit-04 — 20260827b |
@@ -341,4 +343,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `UIA - RETOURS - 20260924a.md` | fichier | 1,9 Ko | Retours forges — UIA (Produit-71) — 20260924a |
 | `UIA - RETOURS - 20260924a.tf.jsonl` | fichier | 724 o | 1 ligne(s) JSONL |
 
-_322 fichier(s), 2 sous-dossier(s)_
+_324 fichier(s), 2 sous-dossier(s)_
