@@ -212,9 +212,22 @@ export function pseudoProduit(nom) {
   // substituée par inclusion réécrit « PRODUCTION » en « Produit-13UCTION ». Le refus est dit.
   if (nom.length < 5) { console.error(`[ANONYMISÉ] « ${nom} » n'est pas inscrit : un nom de produit fait au moins 5 caractères (une clé courte mordrait sur les mots qui la contiennent)`); return null; }
   if (!d.produits[nom]) {
-    const n = Object.keys(d.produits).length + 1;
+    // TF-1329 (26/09/2026) : l'indice suit le plus grand déjà attribué ou RÉSERVÉ, jamais le NOMBRE
+    // de clés. Compter les clés ré-attribue un indice retiré sans réservation dès que la table porte
+    // moins de clés que d'indices : 61 et 62, pris le 05/09 par deux forges puis retirés (TF-0807),
+    // désignent aujourd'hui aussi deux produits.
+    const indices = Object.values(d.produits).map((v) => Number(String(v).replace(/^Produit-/, ""))).filter((x) => Number.isInteger(x) && x > 0);
+    const n = (indices.length ? Math.max(...indices) : 0) + 1;
     d.produits[nom] = `Produit-${String(n).padStart(2, "0")}`;
-    d.date_derniere_extension = new Date().toISOString().slice(0, 10);
+    // TF-1328 (26/09/2026) : l'écrivain pose la date d'inscription au bloc `depuis` (D-31 (a) du
+    // 08/09). Sans elle, la porte de publication juge toute l'histoire du nom SANS borne — la
+    // rétroactivité que la date supprimait : Produit-66 et Produit-67 en ont été privés. Le jour est
+    // LOCAL, comme les dates d'enregistrement auxquelles la porte le compare.
+    const j = new Date();
+    const jour = `${j.getFullYear()}-${String(j.getMonth() + 1).padStart(2, "0")}-${String(j.getDate()).padStart(2, "0")}`;
+    d.depuis = d.depuis && typeof d.depuis === "object" ? d.depuis : {};
+    d.depuis[nom] = jour;
+    d.date_derniere_extension = jour;
     writeFileSync(p, JSON.stringify(d, null, 1), "utf8");
   }
   return d.produits[nom];
@@ -478,6 +491,24 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     casse.push("hors contexte de code, la garde s'arme quand même : " + r2f.texte);
   if (r2f.refuses.length)
     casse.push("hors contexte de code, un refus est remonté : " + JSON.stringify(r2f.refuses));
+
+  // 3 octies) TF-1328 et TF-1329 (26/09) — l'inscription porte sa DATE, et l'indice ne réutilise
+  //           jamais un indice retiré. Sens vert de la date : « un-produit-neuf », inscrit au cas 3,
+  //           est daté au bloc depuis. Sens rouge de l'indice, rejoué : la clé de Produit-02 est
+  //           retirée SANS réservation (table à 2 clés, plus grand indice 3) ; un produit neuf doit
+  //           recevoir Produit-04 — compter les clés lui aurait redonné Produit-03, déjà pris.
+  {
+    const t = JSON.parse(readFileSync(process.env.FORGE_PRODUITS_PSEUDO, "utf8"));
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String((t.depuis || {})["un-produit-neuf"] || "")))
+      casse.push("TF-1328 : un produit inscrit par l'écrivain n'a pas de date au bloc depuis — la porte jugerait son histoire sans borne");
+    delete t.produits["Gribouille-ai.fr"];
+    writeFileSync(process.env.FORGE_PRODUITS_PSEUDO, JSON.stringify(t), "utf8");
+    const p4 = pseudoProduit("encore-un-produit");
+    if (p4 !== "Produit-04") casse.push(`TF-1329 : après un retrait sans réservation, un produit neuf reçoit ${p4} au lieu de Produit-04 — un indice déjà pris est ré-attribué`);
+    const t2 = JSON.parse(readFileSync(process.env.FORGE_PRODUITS_PSEUDO, "utf8"));
+    t2.produits["Gribouille-ai.fr"] = "Produit-02";
+    writeFileSync(process.env.FORGE_PRODUITS_PSEUDO, JSON.stringify(t2), "utf8");
+  }
 
   // 3 bis) un nom qui EST déjà un pseudonyme n'est jamais réinscrit ni décalé (02/09)
   const p3 = pseudoProduit("Produit-01");

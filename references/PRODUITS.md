@@ -52,6 +52,17 @@ Les trois états admis sont ceux de l'étude : **vivant**, **mis de côté**, **
 qualifier » n'en est pas un quatrième : c'est l'aveu qu'aucune déclaration n'a encore été faite,
 écrit plutôt que remplacé par une supposition tirée de la dernière date de remontée.
 
+**Trois pseudonymes ont désigné une forge avant un produit** (TF-1329, vérifié le 26/09/2026). Le
+05/09, trois lots de forges ont été inscrits à la table comme des produits : Produit-60 pour la forge
+de développement, Produit-61 pour la forge de tests, Produit-62 pour la forge de conception
+(enregistrements `30f7cf9a`, `8a6b3ab4` et `6dda71f3` du pilot), puis retirés, une forge n'étant pas un
+produit (TF-0807). L'écrivain de la table comptait alors les clés : il a rendu 61 et 62 à deux
+produits. Les lignes de Produit-61 et Produit-62 ci-dessus mélangent donc deux émetteurs — la
+création TF-0811, par exemple, a pour demandeur la forge de conception sous « Produit-62 » —, et leurs
+dates comme leurs comptes en héritent. La ligne de Produit-60 ne désigne qu'un lot de forge. Depuis le
+26/09, l'indice 60 est réservé à la table, et l'écrivain prend l'indice qui suit le plus grand,
+attribué ou réservé : un indice retiré ne se ré-attribue plus.
+
 ## Pourquoi quatre sources rendent quatre comptes
 
 Le parc compte ses produits de quatre façons, et elles ne mesurent pas la même chose. Les confondre
