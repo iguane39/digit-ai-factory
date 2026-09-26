@@ -419,11 +419,29 @@ const RE_TETE_CITATION = /^>\s*\**\s*(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?(?:D\s*
 // puce, ou titre de section. Retiré avant de lire le numéro et avant de compter le chapeau.
 const TETE_DECISION = /^\s*(?:>\s*)?(?:[-*+]\s+|#{2,6}\s*)?/;
 
+// TF-1338 (26/09/2026, lot Produit-64 du 22/09) — UNE TÊTE DE DÉCISION CITÉE COMMENCE UN PARAGRAPHE.
+// Le fait : dans un bloc 3 conforme, « > **171** paragraphes ; s'arrêter au CSS… », simple REPLI
+// de la phrase ouverte deux lignes plus haut, a ouvert un segment ; portant le tableau et son (a),
+// il est devenu la seule décision jugée, et la vraie a disparu : S30 et S16 rouges sur une décision
+// numérotée, recommandée et sourcée. Le 25/09, le même mécanisme a découpé une recommandation à la
+// ligne « > décision D-3 (c) du 16/09) », prise pour la tête d'une dixième décision. La seule issue
+// était de replier le texte autrement. Une ligne citée qui SUIT une ligne citée non vide continue
+// son paragraphe : elle n'ouvre rien. Une tête ouvre après une ligne vide, un chevron seul, un
+// tableau, de la prose non citée, ou en tête de bloc.
+// La règle vit UNE SEULE FOIS : `decisionsDuBloc` et `lignesDeDecisions` (S31, S32) en portaient
+// chacune une copie, et le correctif posé sur la première seule laissait S32 compter la décision
+// fantôme — la recette l'a mesuré avant l'enregistrement.
+function ouvreDecision(ligne, precedente) {
+  const suiteDeCitation = precedente !== null && /^\s*>\s*\S/.test(precedente);
+  return (/^[-*+]\s+\S/.test(ligne) || /^\s*#{2,6}\s/.test(ligne) || (RE_TETE_CITATION.test(ligne) && !suiteDeCitation))
+    && !RE_LIGNE_OPTION.test(ligne) && !/^\s*\|/.test(ligne);
+}
 function decisionsDuBloc(texte) {
   const segs = [];
+  let precedente = null;
   for (const ligne of texte.split("\n")) {
-    const ouvre = (/^[-*+]\s+\S/.test(ligne) || /^\s*#{2,6}\s/.test(ligne) || RE_TETE_CITATION.test(ligne))
-      && !RE_LIGNE_OPTION.test(ligne) && !/^\s*\|/.test(ligne);
+    const ouvre = ouvreDecision(ligne, precedente);
+    precedente = ligne;
     if (ouvre) { segs.push(ligne); continue; }
     if (!segs.length) { if (ligne.trim()) segs.push(ligne); continue; }
     if (ligne.trim()) segs[segs.length - 1] += " " + ligne.trim();
@@ -1777,8 +1795,13 @@ function juger(texte, cheminJuge = null) {
     occurrences.get(cle).push(m.index);
   }
   /** Glosé : le token est suivi d'un ouvreur de glose, puis d'au moins quatre mots. */
+  // TF-1339 (26/09/2026, lot Produit-64 du 22/09) : un désignateur écrit entre accents graves — la
+  // forme que le socle prescrit pour un identifiant — présente son accent de FERMETURE avant la
+  // parenthèse. Il n'était pas vu glosé, et le seul remède trouvé était de retirer les accents
+  // graves : dégrader la citation pour satisfaire la règle qui la juge. L'accent de fermeture et le
+  // gras se sautent donc avant de chercher l'amorce, comme TF-0992 l'a établi pour S37.
   const estGlose = (i, brut) => {
-    const apres = texte.slice(i + brut.length, i + brut.length + 200).replace(/^\*\*/, "");
+    const apres = texte.slice(i + brut.length, i + brut.length + 200).replace(/^(?:\*\*|`)+/, "");
     const m = /^\s*([(—–:|=§]|\bpour\b|\bdésigne\b|\bc'est\b)\s*([^)|\n.]{4,})/.exec(apres);
     return Boolean(m) && m[2].split(/\s+/).filter(Boolean).length >= 4;
   };
@@ -2282,9 +2305,10 @@ function juger(texte, cheminJuge = null) {
   // l'arbitrage moins sûr, elle ne le rend pas impossible.
   const lignesDeDecisions = (t) => {
     const segs = [];
+    let precedente = null;
     for (const ligne of t.split("\n")) {
-      const ouvre = (/^[-*+]\s+\S/.test(ligne) || /^\s*#{2,6}\s/.test(ligne) || RE_TETE_CITATION.test(ligne))
-        && !RE_LIGNE_OPTION.test(ligne) && !/^\s*\|/.test(ligne);
+      const ouvre = ouvreDecision(ligne, precedente); // TF-1338 : la règle commune, jamais une copie
+      precedente = ligne;
       if (ouvre) { segs.push([ligne]); continue; }
       if (!segs.length) { if (ligne.trim()) segs.push([ligne]); continue; }
       if (ligne.trim()) segs[segs.length - 1].push(ligne);
@@ -3153,6 +3177,51 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S45"[\s\S]{0,200}/.exec(r45v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S45"[^}]*PASS/.test(rv.stdout))
     casse.push("S45 accuse la fixture VERTE, dont le bloc 5 ne porte aucun motif d'obstacle : la règle crie sur un travail juste");
+  // 26/09 — TF-1338 : une ligne CITÉE qui continue un paragraphe cité n'ouvre pas de décision, même
+  // quand elle commence par un nombre (« > **171** paragraphes ») ou par « décision D-3 » — les deux
+  // formes réellement repliées ainsi, le 22/09 chez un produit et le 25/09 au pilot. Vert : S30, S16
+  // et S32 PASS sur la décision réelle. Rouge : LA MÊME, sa tête privée de numéro — la segmentation
+  // la trouve toujours, et S30 l'accuse toujours.
+  const B3cite = (tete) => "## 3. Décisions attendues\n\n" +
+    `> **${tete}Jusqu'où pousse-t-on la hiérarchie de lecture du guide de développement ?**\n>\n` +
+    "> Le guide se lit mal : la prose court sur toute la largeur de l'écran, et le défaut le plus fréquent du relevé touche\n" +
+    "> **171** paragraphes ; s'arrêter au CSS laisserait intact le défaut le plus fréquent du guide.\n>\n" +
+    "> **Recommandation : (a).** Source consultée : le relevé `mesure-lisibilite.json` du 22/09, et la règle posée par votre\n" +
+    "> décision D-3 (c) du 16/09, qui fait de la largeur de lecture une exigence du socle.\n\n" +
+    "| Option | Coût | Exclusions |\n|---|---|---|\n" +
+    "| **(a)** *(recommandée)* Reprendre les 171 paragraphes | moyen × court | aucune |\n" +
+    "| **(b)** S'arrêter au CSS | simple × court | le défaut le plus fréquent reste |\n\n" +
+    "> **Si rien n'est décidé** : (b).\n\n## 4. Traité";
+  const s1338v = verte.replace(/## 3\. Décisions attendues[\s\S]*?## 4\. Traité/, B3cite("D-1 — "));
+  const s1338r = verte.replace(/## 3\. Décisions attendues[\s\S]*?## 4\. Traité/, B3cite(""));
+  const f1338v = join(dir, "tf1338-suite-citee-numerotee.md");
+  const f1338r = join(dir, "tf1338-tete-sans-numero.md");
+  writeFileSync(f1338v, s1338v, "utf8");
+  writeFileSync(f1338r, s1338r, "utf8");
+  const r1338v = spawnSync(process.execPath, [moi, f1338v], { encoding: "utf8" });
+  const r1338r = spawnSync(process.execPath, [moi, f1338r], { encoding: "utf8" });
+  for (const regle of ["S30", "S16", "S32"])
+    if (!new RegExp(`"${regle}"[^}]*PASS`).test(r1338v.stdout))
+      casse.push(`TF-1338 : une ligne citée qui CONTINUE son paragraphe (« > **171** paragraphes », « > décision D-3 ») ouvre encore ` +
+        `une décision, et ${regle} accuse la décision réelle : ` + (new RegExp(`"${regle}"[\\s\\S]{0,160}`).exec(r1338v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S30"[^}]*FAIL/.test(r1338r.stdout))
+    casse.push("TF-1338 : la MÊME décision citée, sa tête privée de numéro, passe S30 — la correction a fait perdre la décision au lieu de la trouver");
+  // 26/09 — TF-1339 : un désignateur ENTRE ACCENTS GRAVES, glosé à son premier emploi, est glosé.
+  // Vert : S23 PASS. Rouge : le MÊME désignateur, deux emplois, sans glose — S23 l'accuse toujours.
+  const T4 = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
+  const s1339v = verte.replace(T4, T4 + "\n- Reprise `RAF-073` (entrée du registre des reprises qui tient cette décision ouverte) close — preuve : 18 tests rejoués.\n- Reprise `RAF-073` rejouée sur la version publiée — preuve : 0 finding.");
+  const s1339r = verte.replace(T4, T4 + "\n- Reprise `RAF-073` close — preuve : 18 tests rejoués.\n- Reprise `RAF-073` rejouée sur la version publiée — preuve : 0 finding.");
+  const f1339v = join(dir, "tf1339-designateur-cite-glose.md");
+  const f1339r = join(dir, "tf1339-designateur-cite-muet.md");
+  writeFileSync(f1339v, s1339v, "utf8");
+  writeFileSync(f1339r, s1339r, "utf8");
+  const r1339v = spawnSync(process.execPath, [moi, f1339v], { encoding: "utf8" });
+  const r1339r = spawnSync(process.execPath, [moi, f1339r], { encoding: "utf8" });
+  if (!/"S23"[^}]*PASS/.test(r1339v.stdout))
+    casse.push("TF-1339 : un désignateur écrit entre accents graves et glosé à son premier emploi est accusé par S23 : " +
+      (/"S23"[\s\S]{0,160}/.exec(r1339v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S23"[^}]*FAIL/.test(r1339r.stdout))
+    casse.push("TF-1339 : le MÊME désignateur entre accents graves, employé deux fois SANS glose, passe S23 — l'accent de fermeture a emporté la règle");
   // 16/09 — S46 DANS SES TROIS SENS (TF-1045). Le lexique est celui du PRODUIT : les fixtures
   // vivent donc sous un faux socle de produit, avec son `forge\LEXIQUE.json`. Sans lexique — le cas
   // de toutes les autres fixtures et du pilot lui-même —, la règle rend SANS_OBJET et le DIT.
@@ -3348,7 +3417,9 @@ Aucun écart : la demande a été suivie à la lettre.
       "second chemin ni appel cité — passe : le durcissement du 19/09 a emporté la règle d'origine");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 39/39 PASS (verte PASS ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    // 26/09 : le compte « 39/39 » écrit ici en dur ne comptait rien — il n'a pas bougé quand deux
+    // paires se sont ajoutées (classe de TF-1332, un compte de doctrine périmé) : il est retiré.
+    : "Self-test restitution : PASS (verte PASS ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
