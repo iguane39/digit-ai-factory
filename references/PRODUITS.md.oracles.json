@@ -1,7 +1,7 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\references\\PRODUITS.md",
-  "date_iso": "2026-09-22T20:00:25.178Z",
-  "registre_version": "2.25.0",
+  "date_iso": "2026-09-26T06:57:24.431Z",
+  "registre_version": "2.26.1",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\PRODUITS.md",
-    "ts": "2026-09-22T20:00:25.177Z",
+    "ts": "2026-09-26T06:57:24.430Z",
     "fichiers": {
-      "references\\PRODUITS.md": "85b1b18d88c0e45893b2bb3b7c9abbc8c778fff0dab185a3550637c9e02e94f7"
+      "references\\PRODUITS.md": "102b331da0336788fc2725e197e3fd141607627a7926de96da6d868e40186cc3"
     }
   },
   "empreinte_motif": null,
