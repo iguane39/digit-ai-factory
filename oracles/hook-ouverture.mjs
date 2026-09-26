@@ -15,7 +15,7 @@
  */
 import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, dirname, sep } from "node:path";
+import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -34,6 +34,41 @@ if (!args.includes("--sans-bootstrap")) {
     lignes.push(`## Fraîcheur (bootstrap --pull, exit ${r.status ?? "?"})`, ...utiles.map((l) => l.trimEnd()));
     if (r.status !== 0) lignes.push("→ Poste NON prêt : appliquer les remèdes ci-dessus AVANT tout run (règle Fraîcheur, R-19).");
   } else lignes.push("## Fraîcheur : bootstrap.mjs introuvable dans le pilot — mise à jour NON jouée.");
+  indicesApresRapatriement();
+}
+
+// TF-1359 (D-21 (b), 26/09/2026) — L'UNICITÉ DES INDICES SE REJOUE APRÈS TOUT CE QUI A PU AMENER UN
+// LIVRABLE : tirage de ce relevé, rebase ou fusion d'une session depuis l'ouverture précédente. Le
+// 23/09, deux synthèses ont pris l'indice « d » sur les deux postes, et seul un passage à la main de
+// R-4 l'a vu, seize heures plus tard. La tête relevée à chaque ouverture est gardée dans les
+// métadonnées LOCALES de git (rien de suivi, rien de publié) ; seules les collisions qui touchent un
+// livrable arrivé depuis sont rejugées — le passif ancien se compte, il ne s'accuse pas à chaque
+// ouverture. Tant qu'une collision neuve reste, la tête n'avance pas : elle est redite à l'ouverture
+// suivante au lieu de glisser dans le passif.
+function indicesApresRapatriement() {
+  const outil = join(PILOT, "scripts", "indices-uniques.mjs");
+  const g = (...a) => spawnSync("git", ["-C", PILOT, ...a], { encoding: "utf8" });
+  const tete = g("rev-parse", "HEAD").stdout.trim();
+  const cheminEtat = (() => { const p = g("rev-parse", "--git-path", "digit-ai-derniere-ouverture.json").stdout.trim(); return p ? (isAbsolute(p) ? p : join(PILOT, p)) : null; })();
+  if (!existsSync(outil) || !tete || !cheminEtat) return;
+  let precedente = null;
+  try { precedente = JSON.parse(readFileSync(cheminEtat, "utf8")).tete || null; } catch { /* première ouverture sur ce poste */ }
+  const jouer = (...extra) => { const r = spawnSync(process.execPath, [outil, PILOT, "--json", ...extra], { encoding: "utf8", cwd: PILOT }); try { return JSON.parse(r.stdout); } catch { return null; } };
+  const o = precedente && precedente !== tete ? jouer("--depuis", precedente) : jouer("--depuis", tete);
+  if (!o || !Array.isArray(o.collisions)) { lignes.push("", "## Indices des livrables (R-4, TF-1359) : NON JUGÉ — R-4 illisible, ou tête de l'ouverture précédente introuvable."); return; }
+  const passif = `passif : ${o.passif} indice(s) partagé(s) antérieur(s), non rejugé(s)`;
+  if (o.collisions.length) {
+    lignes.push("", `## Indices des livrables (R-4, TF-1359) : DÉFAUT — ${o.collisions.length} indice(s) partagé(s) par un livrable arrivé depuis l'ouverture précédente`,
+      ...o.collisions.map((c) => `- ${c.ou} ${String(c.message).split(" : l'indice existe")[0]}`),
+      "→ réindexer le plus récent : `node scripts\\allouer-indice.mjs`, puis renommer ; la tête relevée n'avance pas avant.");
+    return;
+  }
+  lignes.push("", !precedente
+    ? `## Indices des livrables (R-4, TF-1359) : tête de référence posée (${tete.slice(0, 8)}) ; ${passif}.`
+    : precedente === tete
+      ? `## Indices des livrables (R-4, TF-1359) : aucun enregistrement depuis l'ouverture précédente ; ${passif}.`
+      : `## Indices des livrables (R-4, TF-1359) : uniques pour ce qui est arrivé depuis ${precedente.slice(0, 8)} ; ${passif}.`);
+  try { writeFileSync(cheminEtat, JSON.stringify({ tete, releve_le: new Date().toISOString() }), "utf8"); } catch { /* état non écrit : la prochaine ouverture repartira de la référence */ }
 }
 
 // ---- L'HÉRITAGE SE VÉRIFIE À L'OUVERTURE, ET PLUS SEULEMENT QUAND UN LOT REMONTE (30/08/2026) --
