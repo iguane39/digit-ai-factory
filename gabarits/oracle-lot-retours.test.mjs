@@ -39,6 +39,18 @@ check("verte — les deux DÉCLARATIONS d'absence valent réponse (loi n° 3)", 
   if (r.verdict !== "PASS") throw new Error(`une section qui déclare « rien à dire » doit PASSER — ${JSON.stringify(r.constats)}`);
 });
 
+// TF-1358 (26/09/2026) — LOT-DATE : le lot du 24/09 nommé « 20260925a », à la date d'un jour à venir.
+check("rouge LOT-DATE — un lot nommé d'un jour À VENIR est refusé, et le remède nomme le jour qui juge", () => {
+  const r = verifier(lot("20260925a"), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20260924" });
+  const c = r.constats.find((x) => x.regle === "LOT-DATE");
+  if (r.verdict !== "FAIL" || !c || c.statut !== "FAIL") throw new Error(`verdict ${r.verdict}, LOT-DATE ${c && c.statut}`);
+  if (!/20260924/.test(c.remede)) throw new Error("le remède ne nomme pas le jour d'écriture");
+});
+check("verte LOT-DATE — le même lot, nommé du jour qui le juge, passe", () => {
+  const r = verifier(lot("20260924a"), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20260924" });
+  const c = r.constats.find((x) => x.regle === "LOT-DATE");
+  if (r.verdict !== "PASS" || !c || c.statut !== "PASS") throw new Error(`verdict ${r.verdict}, LOT-DATE ${c && c.statut}`);
+});
 check("rouge — section R-45 absente : FAIL, et le remède nomme LE TITRE de la section", () => {
   const r = verifier(lot("20260824a"), `# lot\n\n${R46}`);
   const c = constat(r, "R-45");

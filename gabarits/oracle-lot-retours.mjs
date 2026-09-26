@@ -80,7 +80,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.2.0";
+export const VERSION = "1.3.0"; // 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 // LOT-SAS (TF-1054) juge un NOM avec le MÊME juge que `todo\accueillir-lot.mjs` — deux juges des
 // noms qui ne s'accordent pas donnent le pire des deux mondes (leçon de la casse, 01/09). Import
@@ -176,7 +176,12 @@ const corpsDeSection = (texte, re) => (texte.split(re)[1] || "").split(/^## /m)[
  * droit à une seconde violation (leçon TF-0552), et un contrôle dont on ne sait pas quoi faire
  * se contourne au lieu de se corriger (R-33 bis).
  */
-export function verifier(cheminLot, texteFourni) {
+/** Le jour LOCAL de l'horloge qui juge, au format du nom d'un lot (AAAAMMJJ). */
+export function jourLocal(d = new Date()) {
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = {}) {
   const constats = [];
   const ajouter = (regle, statut, message, remede) => constats.push({ regle, statut, message, remede });
   const date = dateDuLot(cheminLot);
@@ -196,6 +201,20 @@ export function verifier(cheminLot, texteFourni) {
       "nommer le lot « <projet> - RETOURS - AAAAMMJJ<lettre>.md » (R-4)");
     return { verdict: "SANS_OBJET", date, constats };
   }
+
+  // ---- LOT-DATE · UN LOT N'EST PAS DATÉ D'UN JOUR À VENIR (TF-1358, D-21 (b) du 26/09/2026) --------
+  //
+  // Le fait, mesuré le 24/09 : un lot nommé « … - RETOURS - 20260925a » avait été écrit le 24/09 à
+  // 11:59 à l'horloge de son poste. Cet oracle a rendu « verdict : FAIL (lot du 20260925) » sur R-45 et
+  // R-46 seulement : la date elle-même n'était jugée par aucune règle. Or la date du NOM gouverne
+  // l'application de R-45, de R-46 et de la classe obligatoire, et l'indice ordonne les lots d'un même
+  // jour (R-49, TF-0750) : un lot daté de demain passe devant ceux qu'on écrira demain. La date se
+  // compare au jour LOCAL de l'horloge qui juge — celle du poste qui remet, et celle du pilot qui reçoit.
+  if (date > aujourdhui) {
+    ajouter("LOT-DATE", "FAIL",
+      `lot nommé du ${date}, jour À VENIR à l'horloge qui le juge (${aujourdhui}) — la date du nom gouverne R-45, R-46 et la classe obligatoire, et son indice ordonne les lots d'un même jour : daté de demain, il passe devant des lots écrits après lui`,
+      `renommer le lot et son sidecar à la date du jour d'écriture, « <projet> - RETOURS - ${aujourdhui}<indice>.md », en prenant le premier indice libre de ce jour`);
+  } else ajouter("LOT-DATE", "PASS", `lot du ${date}, pas postérieur au jour qui le juge (${aujourdhui})`, null);
 
   // Une table NOMMÉE plutôt qu'un tableau positionnel, et le motif est une mesure et non un goût :
   // le premier jet destructurait huit positions dans le mauvais ordre, et le message affiché
