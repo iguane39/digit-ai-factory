@@ -31,6 +31,7 @@ import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
 import { anonymiserCandidature, pseudoProduit, anonymiser, EST_EMETTEUR_FORGE } from "./anonymiser-entrant.mjs";
 import { aQualifier } from "./identifiants-techniques.mjs";
 import { aQualifier as adressesIpAQualifier, messageAQualifier as messageAdressesIp } from "./adresses-ip.mjs";
+import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -547,6 +548,10 @@ if (identifiantsAQualifier.length) {
 // l'événement d'ingestion, jamais écrite dans ce dernier ; avertissement, pas refus.
 const adressesIp = adressesIpAQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""}`));
 if (adressesIp.length) console.error(messageAdressesIp(adressesIp, "le lot"));
+// TF-1357 (26/09/2026) — UN NOM DE PERSONNE N'EST DANS AUCUNE TABLE non plus : même modèle, nommé à
+// l'écran, compté à l'événement d'ingestion, jamais écrit dans ce dernier.
+const personnes = personnesAQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""} ${c.source || ""}`));
+if (personnes.length) console.error(messagePersonnes(personnes, "le lot"));
 // ---- récidive : la classe est-elle déjà close en corrige ? --------------------------------
 // Deux sources, réunies : les items que la classe déclare l'avoir FONDÉE (todo/CLASSES.json,
 // `fondee_par`) et tout item du registre portant déjà cette `classe`. La date de correction se
@@ -651,6 +656,7 @@ if (nbRectifications) evIngestion.rectifications = nbRectifications;
 if (nbRecidives) evIngestion.recidives = nbRecidives;
 if (identifiantsAQualifier.length) evIngestion.identifiants_a_qualifier = identifiantsAQualifier.length;
 if (adressesIp.length) evIngestion.adresses_ip_a_qualifier = adressesIp.length;
+if (personnes.length) evIngestion.noms_de_personnes_a_qualifier = personnes.length;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
 }

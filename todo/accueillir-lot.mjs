@@ -46,6 +46,11 @@
  * bouclage) ; chaque adresse trouvée est NOMMÉE à l'écran pour qualification. Avertissement et non
  * refus, comme TF-0966 : un humain seul sait si l'adresse désigne une machine réelle.
  *
+ * TF-1357, 26/09/2026 — IL NOMME AUSSI LES NOMS DE PERSONNES, sur le même modèle : le 24/09, un lot
+ * nommait la personne qui avait mené un contrôle croisé, et aucune table ne couvre les personnes.
+ * `noms-de-personnes.mjs` relève « Prénom NOM », civilités et adresses électroniques nominatives ;
+ * chaque forme est NOMMÉE à l'écran pour qualification, jamais refusée.
+ *
  * Usage : node todo/accueillir-lot.mjs [--essai]   ·   exit 0 si rien à faire ou tout accueilli.
  */
 import { readdirSync, existsSync, mkdirSync, renameSync, writeFileSync, readFileSync, rmSync } from "node:fs";
@@ -53,6 +58,7 @@ import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { anonymiser } from "./anonymiser-entrant.mjs";
 import { aQualifier as adressesAQualifier, messageAQualifier } from "./adresses-ip.mjs";
+import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const BOITE = join(ICI, "..", "input", "00-retours");
@@ -79,6 +85,8 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false } =
     const cible = join(boite, nomPropre.texte);
     // TF-1134 (a) : ce qui sera DÉPOSÉ, nom et contenu, après pseudonymisation.
     const adresses = adressesAQualifier([nomPropre.texte, contenu.texte]);
+    // TF-1357 (26/09/2026) : les noms de personnes, même modèle — nommés, jamais refusés.
+    const personnes = personnesAQualifier([nomPropre.texte, contenu.texte]);
 
     if (existsSync(cible)) {
       refuses.push({ fichier: nom, motif: "un lot du même nom existe déjà dans la boîte suivie — "
@@ -87,14 +95,14 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false } =
     }
     if (essai) {
       faits.push({ de: nom, vers: nomPropre.texte, nom_reecrit: nomPropre.texte !== nom,
-        contenu_reecrit: contenu.texte !== brut, ecrit: false, adresses_ip_a_qualifier: adresses });
+        contenu_reecrit: contenu.texte !== brut, ecrit: false, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes });
       continue;
     }
     mkdirSync(boite, { recursive: true });
     writeFileSync(cible, contenu.texte, "utf8");
     rmSync(source);
     faits.push({ de: nom, vers: nomPropre.texte, nom_reecrit: nomPropre.texte !== nom,
-      contenu_reecrit: contenu.texte !== brut, ecrit: true, adresses_ip_a_qualifier: adresses });
+      contenu_reecrit: contenu.texte !== brut, ecrit: true, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes });
   }
   return { arrivee, boite, en_attente: entrants.length, faits, refuses };
 }
@@ -215,6 +223,8 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   const r = accueillir({ essai: process.argv.includes("--essai") });
   // TF-1134 (a) : les adresses sont NOMMÉES à l'écran, lot par lot — jamais écrites ailleurs.
   for (const f of r.faits) { const m = messageAQualifier(f.adresses_ip_a_qualifier || [], f.vers); if (m) console.error(m); }
+  // TF-1357 : les noms de personnes, de même — nommés à l'écran, lot par lot, jamais écrits ailleurs.
+  for (const f of r.faits) { const m = messagePersonnes(f.noms_de_personnes_a_qualifier || [], f.vers); if (m) console.error(m); }
   console.log(JSON.stringify({ ...r, message: r.en_attente
     ? `${r.faits.length} lot(s) accueilli(s), ${r.refuses.length} refusé(s)`
     : "rien n'attend dans l'arrivée" }, null, 1));
