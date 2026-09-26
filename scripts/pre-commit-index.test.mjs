@@ -20,6 +20,13 @@ import { spawnSync } from "node:child_process";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const GARDE = join(ICI, "pre-commit-index.mjs").split("\\").join("/");
+// Banc isolé (TF-0957) : le générateur d'index pseudonymise ce qu'il écrit, il touche donc la chaîne ;
+// il lit des tables JETABLES, héritées par chaque sous-processus, jamais le référentiel réel.
+const _iso = mkdtempSync(join(tmpdir(), "index-precommit-tables-"));
+writeFileSync(join(_iso, "_noms-interdits.json"), JSON.stringify({ noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+writeFileSync(join(_iso, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+process.env.FORGE_NOMS_INTERDITS = join(_iso, "_noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(_iso, "_produits-pseudonymes.json");
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
   try { fn(); console.log(`  [PASS] ${nom}`); pass++; }
