@@ -33,7 +33,10 @@ const jour = new Date().toISOString().slice(0, 10);
 const rapport = { canal, essai, tables: {}, conflits: [], ajouts: 0 };
 const normal = (k) => k.toLowerCase().replace(/[^a-z0-9]/g, "");
 // TF-0959 : une clé de la FORME d'un pseudonyme, ou déjà attribuée comme valeur, n'est pas un nom réel.
-const FORME_PSEUDONYME = /^(Produit-\d{2,}|Client-[A-Z]{1,3})$/i;
+// TF-1333 (26/09/2026) : la forme se lit SENSIBLE à la casse, comme dans l'écrivain de la table
+// (`pseudoProduit`). Le drapeau `i` annulait la classe de majuscules (piège P2 d'oracle-pieges-regex) :
+// « Client-abc » passait pour un pseudonyme, donc un nom réel de cette forme était écarté de la fusion.
+const FORME_PSEUDONYME = /^(Produit-\d{2,}|Client-[A-Z]{1,3})$/;
 const estPseudonyme = (k, valeurs) => FORME_PSEUDONYME.test(String(k).trim()) || valeurs.has(k);
 
 // Passe 1 : évaluer, sans écrire.

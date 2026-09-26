@@ -84,6 +84,15 @@ try {
     const p = JSON.parse(readFileSync(join(r, "_confidentiel", "tables", "produits-pseudonymes.json"), "utf8"));
     att(p.produits["delta-quatre"] === "Produit-04", "le nom réel n'est pas entré au canal");
   });
+  // TF-1333 : la forme d'un pseudonyme se lit sensible à la casse — un nom réel écrit « Client-abc »
+  // n'a pas la forme « Client-ABC » et doit entrer au canal (le drapeau i l'écartait en silence).
+  check("VERT TF-1333 — un nom réel de forme « Client-abc » (minuscules) n'est pas pris pour un pseudonyme", () => {
+    const r = parcPseudo({}, ["Client-abc"]);
+    const { status, j } = jouer(r);
+    att(status === 0, `exit ${status} attendu 0 — ${JSON.stringify(j && j.conflits)}`);
+    const c = JSON.parse(readFileSync(join(r, "_confidentiel", "tables", "noms-interdits.json"), "utf8"));
+    att(c.noms.includes("Client-abc"), "le nom réel de forme Client-abc n'est pas entré au canal");
+  });
   check("VERT — sans ancien fichier, rien à faire, exit 0", () => {
     const r = parc({ anciens: false });
     const { status, j } = jouer(r);
