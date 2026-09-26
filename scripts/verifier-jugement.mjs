@@ -117,6 +117,18 @@ const normaliser = (buffer, fichier) => (TEXTUELS.has(extname(fichier).toLowerCa
   ? Buffer.from(buffer.toString("utf8").replace(/\r\n/g, "\n"), "utf8")
   : buffer);
 export const empreinteDe = (fichier) => sha(normaliser(readFileSync(fichier), fichier));
+// TF-1330 (D-19 (a), 26/09/2026) — UN SCEAU D'AVANT LA NORMALISATION SE RECALCULE AVANT DE PARLER.
+// J-2 mesurait l'ABSENCE du champ `methode`, une grandeur seulement corrélée, au lieu de l'invariant
+// « le contenu jugé est le contenu présent ». Rejoué le 23/09 sur les deux synthèses qu'il accusait :
+// leur empreinte d'origine ne retombait ni sous LF ni sous CRLF — le contenu avait donc changé, et le
+// remède prescrit, re-sceller, en aurait effacé la trace. Les empreintes que le livrable a pu avoir
+// sur un poste : contenu normalisé LF, même contenu en CRLF, et octets tels qu'ils sont sur le disque.
+const empreintesDePoste = (fichier) => {
+  const brut = readFileSync(fichier);
+  if (!TEXTUELS.has(extname(fichier).toLowerCase())) return [sha(brut)];
+  const lf = brut.toString("utf8").replace(/\r\n/g, "\n");
+  return [sha(Buffer.from(lf, "utf8")), sha(Buffer.from(lf.replace(/\n/g, "\r\n"), "utf8")), sha(brut)];
+};
 
 function fichiers(cible) {
   if (!existsSync(cible)) return [];
@@ -203,14 +215,15 @@ for (const cible of cibles) {
       continue;
     }
     verifies++;
-    if (j.empreinte !== empreinte && !j.methode) {
-      // UN SCEAU SANS METHODE PRECEDE LA NORMALISATION : il a ete calcule sur les octets du poste
-      // qui l a pose, et son ecart ne prouve rien sur le contenu du livrable. Le dire, plutot que
-      // d accuser le livrable d une modification qui n a peut-etre pas eu lieu.
+    if (j.empreinte !== empreinte && !j.methode && empreintesDePoste(f).includes(j.empreinte)) {
+      // UN SCEAU SANS METHODE PRECEDE LA NORMALISATION, ET SON EMPREINTE RETOMBE sous une autre
+      // convention de fins de ligne : le contenu est celui qui a ete juge, seul le codage des fins
+      // de ligne differe. Le dire, sans accuser le livrable — et prescrire le sceau portable.
       add("J-2", "majeur", f,
-        "sceau anterieur a la normalisation des fins de ligne (champ `methode` absent) : son " +
-        "empreinte porte les octets du poste qui l a pose, pas le contenu portable. Rejouer " +
-        "`--sceller` sur ce livrable une fois son contenu relu — c est le geste prevu par D-32.");
+        "sceau anterieur a la normalisation des fins de ligne (champ `methode` absent), et son " +
+        "empreinte RETOMBE sous une autre convention de fins de ligne : le contenu juge est le " +
+        "contenu present, seul le codage des fins de ligne differe. Rejouer `--sceller` sur ce " +
+        "livrable pour poser un sceau portable — c est le geste prevu par D-32.");
     } else if (j.empreinte !== empreinte) {
       add("J-1", "bloquant", f,
         `livrable MODIFIÉ après avoir été jugé, à indice INCHANGÉ. Le sceau porte ` +
@@ -218,7 +231,10 @@ for (const cible of cibles) {
         `${(j.scelle_le || "?").slice(0, 19)}. Le même nom désigne donc deux contenus, et l'état ` +
         "précédent est perdu. Règle 5 : une nouvelle version = un NOUVEAU fichier daté, avec l'indice " +
         "suivant. Si la modification est délibérée et le fichier pas encore diffusé, rejouer " +
-        "`--sceller` — mais alors c'est un choix, pas un oubli.");
+        "`--sceller` — mais alors c'est un choix, pas un oubli." +
+        (j.methode ? "" : " Le sceau précède la normalisation des fins de ligne, mais AUCUNE convention " +
+          "(LF, CRLF, octets du disque) ne retombe sur son empreinte : le contenu a réellement changé " +
+          "depuis le jugement, et re-sceller en effacerait la trace (TF-1330)."));
     }
   }
 }

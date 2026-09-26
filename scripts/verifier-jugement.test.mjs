@@ -18,6 +18,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const OUTIL = join(ICI, "verifier-jugement.mjs");
@@ -276,17 +277,27 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
     if (!/indice INCHANG/.test(r.stdout)) throw new Error("le motif ne nomme pas l indice inchange");
   });
 
-  check("ROUGE — un sceau POSE AVANT la normalisation se dit tel, il n accuse pas le livrable", () => {
+  // TF-1330 (26/09/2026) : ce cas attendait J-2 pour un sceau sans `methode` quelle que soit son
+  // empreinte. La décision D-19 (a) durcit la règle : J-2 seulement si une convention de fins de
+  // ligne RETOMBE sur l'empreinte ; sinon le contenu a changé, et c'est J-1. D'où la paire.
+  const posePerimee = (empreinte) => writeFileSync(CRLF + ".jugement.json", JSON.stringify({
+    format: "pilot/jugement@1", fichier: "Client - Rapport - 20260910a.md",
+    empreinte, scelle_le: "2026-09-01T10:00:00.000Z",
+  }, null, 1) + "\n", "utf8");
+  check("VERT TF-1330 — un sceau d avant la normalisation dont l empreinte RETOMBE en CRLF se dit tel (J-2), il n accuse pas le livrable", () => {
     writeFileSync(CRLF, corps, "utf8");
-    // Un sceau d avant D-32 : pas de champ `methode`, et une empreinte qui ne correspond plus.
-    writeFileSync(CRLF + ".jugement.json", JSON.stringify({
-      format: "pilot/jugement@1", fichier: "Client - Rapport - 20260910a.md",
-      empreinte: "0".repeat(64), scelle_le: "2026-09-01T10:00:00.000Z",
-    }, null, 1) + "\n", "utf8");
+    posePerimee(createHash("sha256").update(Buffer.from(corps.replace(/\n/g, "\r\n"), "utf8")).digest("hex"));
     const r = spawnSync(process.execPath, [OUTIL, N], { encoding: "utf8" });
     if (r.status !== 1) throw new Error(`exit ${r.status} attendu 1`);
-    if (!/anterieur a la normalisation/.test(r.stdout)) throw new Error("un sceau d avant D-32 est presente comme un livrable modifie — on accuse le mauvais");
-    if (/indice INCHANG/.test(r.stdout)) throw new Error("le motif J-1 est prononce sur un sceau qui ne prouve rien");
+    if (!/anterieur a la normalisation/.test(r.stdout) || !/RETOMBE/.test(r.stdout)) throw new Error("un sceau d avant D-32 dont le contenu est intact n est pas dit tel");
+    if (/indice INCHANG/.test(r.stdout)) throw new Error("le motif J-1 est prononce sur un contenu identique aux fins de ligne pres");
+  });
+  check("ROUGE TF-1330 — un sceau d avant la normalisation qu AUCUNE convention ne reproduit est une modification REELLE (J-1)", () => {
+    writeFileSync(CRLF, corps, "utf8");
+    posePerimee("0".repeat(64));
+    const r = spawnSync(process.execPath, [OUTIL, N], { encoding: "utf8" });
+    if (r.status !== 1) throw new Error(`exit ${r.status} attendu 1`);
+    if (!/indice INCHANG/.test(r.stdout) || !/AUCUNE convention/.test(r.stdout)) throw new Error("une modification réelle sous un sceau d avant D-32 est présentée comme un écart de fins de ligne — re-sceller en effacerait la trace");
   });
 
   rmSync(N, { recursive: true, force: true });
