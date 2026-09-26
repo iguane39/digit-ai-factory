@@ -33,13 +33,26 @@
  * que personne ne remettra.* L'index vit donc ENTRE DEUX BALISES, et tout ce qui l'entoure est
  * préservé intact — ce qui est aussi la seule façon qu'un humain puisse écrire ici sans être écrasé.
  *
+ * TF-1243 (D-20 (a), 26/09/2026) — L'INDEX NE DÉPEND PLUS DU POSTE QUI LE RÉGÉNÈRE. Mesuré le
+ * 20/09 : 389 lignes réécrites dans un enregistrement de synchronisation, sans qu'aucun livrable ait
+ * changé, puis 316 et 318 lignes aux synchronisations suivantes. Deux causes, lues dans ce fichier :
+ * le poids venait de `statSync` — le fichier SUR LE DISQUE, gonflé d'un octet par ligne sur un poste
+ * dont git a réécrit le livrable en CRLF — et la liste venait de `readdirSync`, qui compte aussi les
+ * fichiers non suivis du poste. `readme-dossiers.mjs` était corrigé des deux (TF-0615, TF-0914) ;
+ * celui-ci ne l'était pas. Désormais : seuls les fichiers que git suit sont indexés (hors dépôt git,
+ * rien n'est caché : un relevé vide ferait disparaître tout l'index), et le poids est celui du
+ * contenu normalisé (`tailleNormalisee`, la primitive de readme-dossiers). Le nombre de fichiers non
+ * suivis n'est PAS écrit : il dépend du poste, et c'est précisément ce qu'un index publié ne porte pas.
+ *
  * Usage : node scripts/generer-lisezmoi-output.mjs [<dossier output>] [--verifier]
  *   --verifier : ne réécrit rien, rend un verdict (exit 1 si l'index manque ou a dérivé).
  * Exit : 0 = écrit ou conforme · 1 = dérive constatée en mode --verifier · 2 = dossier introuvable.
  */
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
+import { tailleNormalisee } from "./lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -56,9 +69,18 @@ const RE_DATE = /(\d{8})([a-z])?(?=\.[a-z0-9]+$|$)/i;
 const BALISE_DEBUT = "<!-- index-livrables:debut — genere par scripts/generer-lisezmoi-output.mjs, NE PAS EDITER A LA MAIN -->";
 const BALISE_FIN = "<!-- index-livrables:fin -->";
 
+/** Les fichiers que git suit sous `racine` (chemins relatifs à elle), ou null hors dépôt git. */
+function suivisDe(racine) {
+  const r = spawnSync("git", ["-C", racine, "-c", "core.quotepath=false", "ls-files", "-z", "--", "."], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (r.status !== 0) return null;
+  const s = new Set(r.stdout.split("\0").filter(Boolean));
+  return s.size ? s : null;
+}
+
 /** Les familles numérotées de `output\` (D-15), et les livrables de chacune. */
 function familles(racine) {
   const out = [];
+  const suivis = suivisDe(racine);
   for (const e of readdirSync(racine, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!e.isDirectory() || IGNORES.has(e.name)) continue;
     const livrables = [];
@@ -70,12 +92,13 @@ function familles(racine) {
         if (f.isDirectory()) { marche(p, prof + 1); continue; }
         if (!/\.(md|html|pdf|json|jsonl|csv|xlsx|pptx|docx)$/i.test(f.name)) continue;
         const rel = relative(racine, p);
+        if (suivis && !suivis.has(rel.replaceAll("\\", "/"))) continue; // TF-1243 : non suivi, non indexé
         livrables.push({
           nom: f.name,
           chemin: rel.replaceAll("\\", "/"),
           date: (RE_DATE.exec(f.name) || [])[1] || null,
           indice: (RE_DATE.exec(f.name) || [])[2] || null,
-          ko: Math.round(statSync(p).size / 102.4) / 10,
+          ko: Math.round(tailleNormalisee(p) / 102.4) / 10, // TF-1243 : poids du contenu normalisé
           archive: /(^|[\\/])old([\\/]|$)/i.test(rel),
         });
       }

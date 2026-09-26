@@ -6,7 +6,9 @@
  * Rouges : aucun hook (le clone frais) ; un hook qui n'appelle qu'une garde (l'état qu'aurait
  * posé l'installeur de la forge des outils) ; une copie versionnée qui a dérivé. Remède JOUÉ
  * (TF-1013) : `--installer` sur un hook absent, puis PASS. Borne : `--installer` n'écrase jamais
- * un hook existant. Hors dépôt : non jugeable (exit 2), jamais un vert.
+ * un hook étranger. TF-1325 : il remplace une copie versionnée ANTÉRIEURE (fins de ligne du poste
+ * comprises), et conserve un hook étranger même quand l'histoire porte plusieurs versions.
+ * Hors dépôt : non jugeable (exit 2), jamais un vert.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
@@ -74,6 +76,31 @@ check("borne — `--installer` n'écrase JAMAIS un hook existant, même incomple
   const r = lancer(D, "--installer");
   if (r.code !== 1 || !/CONSERVÉ/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
   if (readFileSync(HOOK(D), "utf8") !== etranger) throw new Error("le hook existant a été écrasé");
+  rmSync(D, { recursive: true, force: true });
+});
+check("remède joué (TF-1325) — une copie versionnée ANTÉRIEURE est remplacée par `--installer`, puis PASS", () => {
+  const D = depot();
+  const g = (...a) => spawnSync("git", ["-C", D, "-c", "user.name=recette", "-c", "user.email=recette@exemple.invalid", ...a], { encoding: "utf8" });
+  const ancienne = "#!/bin/sh\nnode \"$R/todo/pre-commit-a.mjs\" || exit $?\n";
+  writeFileSync(join(D, "scripts", "hooks-git", "pre-commit"), ancienne, "utf8");
+  g("add", "."); g("commit", "-q", "-m", "version 1 de la copie versionnee");
+  writeFileSync(join(D, "scripts", "hooks-git", "pre-commit"), SOURCE, "utf8");
+  g("add", "."); g("commit", "-q", "-m", "version 2 : une garde de plus");
+  writeFileSync(HOOK(D), ancienne.split("\n").join("\r\n"), "utf8"); // posée sur un poste en CRLF
+  const r = lancer(D, "--installer");
+  if (r.code !== 0 || !/\[MIS À JOUR\]/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  if (readFileSync(HOOK(D), "utf8") !== SOURCE) throw new Error("le hook n'est pas la version courante");
+  rmSync(D, { recursive: true, force: true });
+});
+check("borne (TF-1325) — un hook ÉTRANGER reste conservé même quand l'histoire porte plusieurs versions", () => {
+  const D = depot();
+  const g = (...a) => spawnSync("git", ["-C", D, "-c", "user.name=recette", "-c", "user.email=recette@exemple.invalid", ...a], { encoding: "utf8" });
+  g("commit", "-q", "-m", "version 1");
+  const etranger = "#!/bin/sh\nnode \"$R/todo/pre-commit-a.mjs\" || exit $?\necho ajout local\n";
+  writeFileSync(HOOK(D), etranger, "utf8");
+  const r = lancer(D, "--installer");
+  if (r.code !== 1 || !/CONSERVÉ/.test(r.sortie) || /MIS À JOUR/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  if (readFileSync(HOOK(D), "utf8") !== etranger) throw new Error("le hook étranger a été écrasé");
   rmSync(D, { recursive: true, force: true });
 });
 check("rouge — copie versionnée qui a dérivé (une garde en moins) : H2 la nomme", () => {

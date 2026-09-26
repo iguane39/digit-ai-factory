@@ -18,7 +18,12 @@
  *   H2 · la copie versionnée `scripts/hooks-git/pre-commit` appelle, elle aussi, chaque garde — sinon
  *        la remise à niveau poserait un hook déjà incomplet.
  * `--installer` pose la copie versionnée quand le hook MANQUE, et jamais par-dessus un hook
- * existant : un hook étranger ou périmé se fusionne à la main, et c'est dit.
+ * étranger : un hook écrit ou modifié à la main se fusionne à la main, et c'est dit.
+ * TF-1325 (D-20 (a), 26/09/2026) : une copie versionnée ANTÉRIEURE — un hook identique, aux fins
+ * de ligne près, à une version de l'histoire de `scripts/hooks-git/pre-commit` — n'est pas un hook
+ * étranger : `--installer` la remplace par la version courante. Sans cela, chaque garde ajoutée à
+ * la copie versionnée exigeait une fusion à la main sur chaque poste, pour un fichier que personne
+ * n'avait écrit.
  *
  * NON JUGÉ : `core.hooksPath` pointé ailleurs (le chemin est résolu par git, pas deviné) ; ce que
  * font les gardes ; le `pre-push` et le `commit-msg`, posés par l'installeur de la forge des outils.
@@ -58,6 +63,24 @@ if (INSTALLER && !existsSync(cheminHook) && existsSync(SOURCE)) {
   writeFileSync(cheminHook, readFileSync(SOURCE, "utf8"));
   try { chmodSync(cheminHook, 0o755); } catch { /* système sans bits d'exécution : git lit le fichier */ }
   constats.push(`[INSTALLÉ] hook pre-commit posé depuis scripts/hooks-git/pre-commit`);
+}
+// TF-1325 : la copie antérieure se reconnaît à son CONTENU, confronté à chaque version que l'histoire
+// du dépôt a portée — jamais à une date ni à un en-tête, qu'un hook recopié à la main garderait aussi.
+const sansCr = (t) => String(t).split("\r\n").join("\n");
+if (INSTALLER && existsSync(cheminHook) && existsSync(SOURCE)) {
+  const installe = sansCr(readFileSync(cheminHook, "utf8"));
+  if (installe !== sansCr(readFileSync(SOURCE, "utf8"))) {
+    const shas = git("log", "--format=%H", "--", "scripts/hooks-git/pre-commit").stdout.split(/\r?\n/).filter(Boolean);
+    const connue = shas.find((sha) => {
+      const v = git("show", `${sha}:scripts/hooks-git/pre-commit`);
+      return v.status === 0 && sansCr(v.stdout) === installe;
+    });
+    if (connue) {
+      writeFileSync(cheminHook, readFileSync(SOURCE, "utf8"));
+      try { chmodSync(cheminHook, 0o755); } catch { /* système sans bits d'exécution : git lit le fichier */ }
+      constats.push(`[MIS À JOUR] hook pre-commit : copie versionnée du commit ${connue.slice(0, 8)}, périmée, remplacée par la version courante de scripts/hooks-git/pre-commit`);
+    }
+  }
 }
 
 if (!gardes.length) ok("H1", "aucune garde de pré-commit déclarée par ce dépôt");
