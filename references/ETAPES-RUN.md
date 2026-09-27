@@ -35,11 +35,22 @@ strictement aucun effet. `--appliquer` remet à niveau ; il **refuse** d'écrase
 récente que sa source (K5) — le jour de son écriture, `prompt-analyzer-l99` installé était en
 2.2.0 quand le dépôt en était à 2.1.0, et une synchronisation naïve aurait détruit une version.
 
-**DÉCLARER LE SCHÉMA DU LEDGER (TF-0385, 19/08)** — un champ au `run_open`, et il commande la
-suite : `schema_ledger: "1.0"`. Sans lui, le ledger est réputé **antérieur au schéma** et
+**DÉCLARER LE SCHÉMA DU LEDGER (TF-0385, 19/08 ; schéma 1.1 le 27/09)** — un champ au `run_open`,
+et il commande la suite : `schema_ledger: "1.1"`, avec **`forges_mobilisees`**, la liste des forges
+que le run mobilise (`["design", "tests"]`, noms courts ou complets), obligatoire depuis ce schéma
+(D-18 (a) du 26/09/2026) : c'est elle que le juge de l'enclenchement confronte aux verdicts
+consignés (étape 7). Sans `schema_ledger`, le ledger est réputé **antérieur au schéma** et
 `ledger.mjs verify` ne juge pas la forme de ses entrées — il le DIT (`[NON VÉRIFIÉ]`), il ne le
 tait pas, et il ne met rien en échec. Avec lui, chaque `oracles_verdict` doit porter son `oracle`
-et son `verdict` (forme canonique : `CONTRAT-INTERFACE.md` §3).
+et son `verdict` (forme canonique : `CONTRAT-INTERFACE.md` §3). Un ledger qui déclare `1.0` reste
+jugé selon les règles de `1.0`, sans rien de neuf.
+
+*Ce que `ledger.mjs append` refuse depuis le 27/09 (TF-1366, TF-1367)*, sans rien écrire et en le
+nommant : un argument qu'il ne reconnaît pas, une entrée sans `type` ou réduite à son `type`, une
+entrée d'un type contraint à laquelle manque un champ dû sous le schéma déclaré, et un `seq` fourni
+par le payload — le numéro est attribué par l'outil, sous verrou. Le 21/09, chez un produit, un
+script de journal réécrit sur place avait écrit onze entrées vides, ensuite citées comme preuves :
+**un produit écrit son ledger par `ledger.mjs`, jamais par une copie réécrite.**
 
 *Pourquoi ce champ existe* : le 19/08, **huit** entrées `oracles_verdict` d'un même ledger réel
 portaient **six formes de champs différentes**. La liste des oracles qui avaient tourné n'était

@@ -128,7 +128,9 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
   guetté + ts — TF-0173, §4 ter), `run_close`.
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
-  quelle version le ledger est écrit (`schema_ledger: "1.0"`). L'entrée porte au minimum :
+  quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
+  jugé selon ses propres règles). Sous `1.1`, `run_open` porte aussi **`forges_mobilisees`**, un
+  tableau non vide de noms de forges, courts ou complets (D-18 (a)). L'entrée porte au minimum :
 
   | Champ | Contenu |
   |---|---|
@@ -159,6 +161,18 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   désactiver — c'est le motif que R-33 bis donne pour ne pas armer d'office le verdict websec :
   « armer un gate que personne n'a exercé le ferait désarmer au premier faux positif ». **On ne
   juge que ce qui s'est déclaré jugeable, et on ne réécrit jamais un ledger existant**.
+
+  **Ce que l'écriture refuse, et ce que la vérification nomme (TF-1366, TF-1367 — 27/09).**
+  `ledger.mjs append` refuse, sans rien écrire et en le nommant : un argument non reconnu, une
+  entrée sans `type` ou réduite à son `type`, une entrée d'un type contraint à laquelle manque un
+  champ dû sous le schéma déclaré, et un `seq` fourni par le payload. L'écho nomme le type et les
+  champs écrits. `verify` nomme EN TÊTE un numéro porté par plusieurs entrées (deux écrivains
+  sans verrou commun), et relève les entrées sans contenu : `[SANS CONTENU]` non bloquant avant
+  `1.1`, FAIL sous `1.1`. *Le coût du silence, mesuré le 21/09 chez un produit* : un script de
+  journal réécrit sur place ignorait tout argument mal formé et a écrit onze entrées réduites à
+  `{seq, ts, type}`, citées ensuite comme preuves dans sept restitutions ; deux sessions
+  simultanées y ont porté quatre numéros deux fois. Sur les huit ledgers du parc relevés le 27/09,
+  douze entrées sans contenu, toutes dans un ledger sans schéma déclaré : aucun ne passe au rouge.
 
 - **Ce qui AURAIT DÛ tourner se DÉCOUVRE, et un juge le confronte au ledger (TF-1319 — 23/09,
   temps 2 et 3 du verdict O3 de l'étude du 19/08).** La forme canonique ci-dessus rend calculable

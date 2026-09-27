@@ -1,6 +1,6 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\CONTRAT-INTERFACE.md",
-  "date_iso": "2026-09-27T06:40:18.476Z",
+  "date_iso": "2026-09-27T08:43:46.412Z",
   "registre_version": "2.28.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "CONTRAT-INTERFACE.md",
-    "ts": "2026-09-27T06:40:18.476Z",
+    "ts": "2026-09-27T08:43:46.411Z",
     "fichiers": {
-      "CONTRAT-INTERFACE.md": "5c3eb586845d837909daa6b4d42aaf25a850c1e56989877776794cefe1f9f457"
+      "CONTRAT-INTERFACE.md": "db7adaf72866888c06d4e3fd47d010954739fe3ff174ab3d49828cc255ece05a"
     }
   },
   "empreinte_motif": null,
