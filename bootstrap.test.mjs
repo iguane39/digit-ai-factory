@@ -224,6 +224,55 @@ try {
     if ((sortie.match(/NON propagés/g) || []).length < 2) echecs.push(`TF-1099 : les deux dépôts épargnés ne sont pas DITS sur une ligne [avert] — ${sortie.split("\n").filter((l) => /avert/.test(l)).join(" | ").slice(0, 300)}`);
   }
 
+  // 5 bis. TF-1337 — LE FRONTMATTER D'UN SKILL SE JUGE AVANT QU'IL SE PROPAGE. Le contrôle est celui
+  // de forge-agents, recopié tel quel dans le clone jetable (lecture seule du vrai dépôt voisin du
+  // pilot) : un skill dont la description dépasse 1 024 caractères n'est PAS propagé et son dépôt est
+  // NOMMÉ (rouge) ; la MÊME source corrigée se propage (vert). Sans le vrai contrôle sur ce poste, le
+  // cas se déclare non joué plutôt que de prouver une absence.
+  {
+    const reel = join(ICI, "..", "digit-ai-forge-agents", ".claude", "skills", "quality-oracles", "scripts");
+    const controle = join(reel, "frontmatter-skills-index.mjs"), lecteur = join(reel, "lib", "frontmatter.mjs");
+    if (!existsSync(controle) || !existsSync(lecteur)) {
+      console.log("bootstrap 5 bis (TF-1337) : NON JOUÉ — le contrôle de frontmatter de forge-agents est absent de ce poste");
+    } else {
+      const fs = await import("node:fs");
+      const agents = join(racine, "digit-ai-forge-agents");
+      const cible = join(agents, ".claude", "skills", "quality-oracles", "scripts");
+      mkdirSync(join(cible, "lib"), { recursive: true });
+      fs.copyFileSync(controle, join(cible, "frontmatter-skills-index.mjs"));
+      fs.copyFileSync(lecteur, join(cible, "lib", "frontmatter.mjs"));
+      // La preuve de forge-agents est un SKILL.md sans frontmatter : elle en reçoit un, sans quoi
+      // le dépôt qui porte le contrôle serait lui-même refusé et le cas prouverait autre chose.
+      writeFileSync(join(agents, ".claude", "skills", "forge-agents", "SKILL.md"), "---\nname: forge-agents\ndescription: preuve de la recette\n---\npreuve digit-ai-forge-agents\n");
+      git(agents, "add", "-A"); git(agents, "commit", "--quiet", "-m", "controle de frontmatter"); git(agents, "push", "--quiet", "origin", "main");
+      const source = join(racine, FORGES[0].nom);
+      const poser = (nom, description) => {
+        mkdirSync(join(source, ".claude", "skills", nom), { recursive: true });
+        writeFileSync(join(source, ".claude", "skills", nom, "SKILL.md"), `---\nname: ${nom}\ndescription: ${description}\n---\n# ${nom}\n`);
+      };
+      const config = join(base, "config-1337"), inst = join(config, "skills");
+      mkdirSync(inst, { recursive: true });
+      const jouer = () => spawnSync(process.execPath, [BOOTSTRAP, "--racine", racine, "--sans-pilot", "--pull"],
+        { encoding: "utf8", env: { ...process.env, BOOTSTRAP_SOURCE: bare, BOOTSTRAP_RELANCE: "1", FORGE_SKILLS_INSTALLES: inst, CLAUDE_CONFIG_DIR: config } });
+      // Le skill du cas 5 posé dans ce dépôt n'a pas de frontmatter : il en reçoit un recevable, pour
+      // que le rouge ne tienne qu'à la longueur de la description.
+      poser("skill-propre", "un skill recevable");
+      poser("skill-trop-long", "x".repeat(1100));
+      git(source, "add", "-A"); git(source, "commit", "--quiet", "-m", "description trop longue"); git(source, "push", "--quiet", "origin", "main");
+      const rouge = jouer(); joues += 1;
+      const sRouge = (rouge.stdout || "") + (rouge.stderr || "");
+      if (existsSync(join(inst, "skill-trop-long"))) echecs.push("TF-1337 : un skill à description de 1 100 caractères a été PROPAGÉ vers la copie installée");
+      if (!/frontmatter refusé/.test(sRouge) || !sRouge.includes(FORGES[0].nom) || !/1100 > 1024/.test(sRouge))
+        echecs.push(`TF-1337 : le refus ne nomme pas le dépôt, le skill et la longueur — ${sRouge.split("\n").filter((l) => /frontmatter|DEFAUT/.test(l)).join(" | ").slice(0, 300)}`);
+      poser("skill-trop-long", "la meme source, sous la limite");
+      git(source, "add", "-A"); git(source, "commit", "--quiet", "-m", "description corrigee"); git(source, "push", "--quiet", "origin", "main");
+      const vert = jouer(); joues += 1;
+      const sVert = (vert.stdout || "") + (vert.stderr || "");
+      if (!existsSync(join(inst, "skill-trop-long", "SKILL.md"))) echecs.push(`TF-1337 : la même source corrigée n'est pas propagée — ${sVert.split("\n").filter((l) => /skills|frontmatter/.test(l)).join(" | ").slice(0, 300)}`);
+      if (/frontmatter refusé/.test(sVert)) echecs.push("TF-1337 : un frontmatter recevable est encore refusé");
+    }
+  }
+
   // ── TF-1282 — LE MODE `--rebatir` EST PRESCRIT PAR UN DOCUMENT, DONC IL SE JOUE ─────────────
   //
   // `references\TODO-FORGE.md` prescrit `node bootstrap.mjs --rebatir <dépôt> [--essai]` depuis le
@@ -259,4 +308,4 @@ try {
 }
 
 if (echecs.length) { console.error("bootstrap : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), puits de redirection raté déclaré avec sa CAUSE et un fichier ordinaire muet (TF-0598), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);
+console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), puits de redirection raté déclaré avec sa CAUSE et un fichier ordinaire muet (TF-0598), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée, frontmatter d'un skill jugé avant sa propagation (TF-1337 : une description de 1 100 caractères refusée, son dépôt nommé, la même source corrigée propagée)`);

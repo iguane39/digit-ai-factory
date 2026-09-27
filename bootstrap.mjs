@@ -513,6 +513,7 @@ else {
     // `--sauf-sources`, et déclare ce qu'il a épargné (K12).
     const SOUS = [".claude/skills", "skills", ".claude/hooks", "hooks"];
     const enCours = [];
+    const sourcesDeSkills = [];
     for (const e of readdirSync(racine, { withFileTypes: true })) {
       if (!e.isDirectory()) continue;
       const d = join(racine, e.name);
@@ -523,11 +524,50 @@ else {
       const amont = git(d, "rev-list", "--count", "@{u}..HEAD", "--", ...presents);
       const nonPublies = amont.status === 0 ? Number(sortie(amont)) || 0 : 0;
       if (sale || nonPublies) enCours.push({ nom: e.name, chemin: d, sale, nonPublies });
+      else if (presents.some((s) => /skills$/.test(s))) sourcesDeSkills.push({ nom: e.name, chemin: d });
     }
     for (const x of enCours) {
       ligne("avert", `skills de ${x.nom} NON propagés : ${x.sale} fichier(s) modifié(s) et ${x.nonPublies} commit(s) non publié(s) sous ses skills ou hooks — état intermédiaire ; ils le seront au prochain --pull sur un état propre et publié (TF-1099)`);
       averts.push(`skills de ${x.nom} épargnés (TF-1099)`);
     }
+    // TF-1337 (27/09/2026, décision humaine D-19 (a)) — LE FRONTMATTER D'UN SKILL SE JUGE AVANT QU'IL
+    // SE PROPAGE. Le 22/09, un skill est entré dans forge-agents avec une description de 1 244
+    // caractères, au-delà des 1 024 que la copie installée peut porter : la recette de quality-oracles
+    // l'aurait refusé, mais personne ne la joue avant l'enregistrement, et le hameçon livré le 26/09
+    // ne se pose que sur demande — il n'est posé sur aucun poste. La propagation, elle, passe par ICI
+    // à chaque `--pull` : c'est le seul chemin qu'on ne peut pas oublier de traverser. Le contrôle est
+    // celui de forge-agents (`frontmatter-skills-index.mjs --tous`, même lecteur et même barème que
+    // la recette), joué sur chaque dépôt source propre et publié ; un dépôt refusé est ÉPARGNÉ et
+    // NOMMÉ comme un dépôt en cours de campagne, les autres se propagent. Au premier passage sur le
+    // parc réel, il a trouvé un skill de forge-conception à 1 048 caractères depuis le 08/09.
+    // Contrôle absent (forge-agents antérieur au 26/09, ou non cloné) : DIT, jamais tu, et la
+    // propagation n'est pas bloquée par l'absence de son juge.
+    const refusesFrontmatter = [];
+    if (pull) {
+      const controleFm = join(racine, "digit-ai-forge-agents", ".claude", "skills", "quality-oracles", "scripts", "frontmatter-skills-index.mjs");
+      if (!existsSync(controleFm)) {
+        ligne("avert", "frontmatter des skills NON jugé avant propagation : contrôle absent de digit-ai-forge-agents (TF-1337)");
+        averts.push("frontmatter des skills non jugé (TF-1337)");
+      } else {
+        for (const s of sourcesDeSkills) {
+          const r = run(process.execPath, [controleFm, s.chemin, "--tous", "--json"], ICI);
+          let rapport = null;
+          try { rapport = JSON.parse(r.stdout); } catch { /* sortie illisible : dite ci-dessous */ }
+          if (r.status === 1 && rapport && (rapport.defauts || []).length) {
+            refusesFrontmatter.push({ ...s, defauts: rapport.defauts });
+          } else if (r.status !== 0) {
+            ligne("avert", `frontmatter des skills de ${s.nom} NON jugé : le contrôle rend ${r.status} (TF-1337)`);
+            averts.push(`frontmatter de ${s.nom} non jugé (TF-1337)`);
+          }
+        }
+        for (const x of refusesFrontmatter) {
+          const detail = x.defauts.slice(0, 3).map((d) => `${String(d.skill).split("/").pop()} : ${d.defaut}`).join(" · ");
+          defaut(`skills de ${x.nom} NON propagés : frontmatter refusé — ${detail} (TF-1337)`,
+            `corriger le SKILL.md dans ${x.nom}, publier, puis node bootstrap.mjs --pull ; contrôle : node "${controleFm}" "${x.chemin}" --tous`);
+        }
+      }
+    }
+    const epargnes = [...enCours, ...refusesFrontmatter];
     // TF-0965 (20/09/2026) — LA PROPAGATION SAIT DÉSORMAIS REJOUER LES DÉPÔTS QUI CONSOMMENT LA
     // COPIE INSTALLÉE, avant et après. Ce bloc-ci ne le lui demande PAS, et le dit : il tourne à
     // CHAQUE ouverture de session, et les suites concernées vont jusqu'à vingt minutes chez
@@ -539,7 +579,7 @@ else {
     const juger = (appliquer) => {
       const argv = [oracle, "--racine", racine, "--installes", SKILLS_INSTALLES];
       if (appliquer) argv.push("--appliquer", "--sans-consommateurs");
-      if (enCours.length) argv.push("--sauf-sources", enCours.map((x) => x.chemin).join(","));
+      if (epargnes.length) argv.push("--sauf-sources", epargnes.map((x) => x.chemin).join(","));
       const r = run(process.execPath, argv, ICI);
       let rapport = {};
       try { rapport = JSON.parse(r.stdout); } catch { /* sortie non JSON : jugée par le code de retour */ }
