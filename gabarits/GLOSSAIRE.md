@@ -89,8 +89,9 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
   déclare au-delà de combien de jours une preuve de **visibilité** est échue. Le même verbe compte
   l'âge de chaque ligne depuis son `verifie_le` et rend **ÉCHUE** celle qui dépasse, sans exécuter
   aucune commande ; `--peremption <N>` l'emporte sur la déclaration. Sans elle, l'âge n'est pas
-  jugé, et le verbe le dit. La durée est une donnée du projet : ce gabarit n'en impose aucune, et
-  une valeur par défaut est une décision proposée à l'humain (D-B4, `references\CHAINE-TRADUCTION.md`).
+  jugé, et le verbe le dit. La durée est une donnée du projet : ce gabarit n'en impose aucune.
+  L'humain l'a tranché le 26/09/2026 : aucune durée par défaut, chaque glossaire déclare la sienne
+  (D-B4, `references\CHAINE-TRADUCTION.md`).
 - **`verifie_le`** — la date de la dernière vérification de CETTE ligne, `AAAA-MM-JJ`. C'est le seul
   champ qui distingue une entrée éprouvée d'une entrée plausible.
 - **`genre`** *(colonne OPTIONNELLE, TF-0660)* — le genre grammatical du terme retenu dans CETTE

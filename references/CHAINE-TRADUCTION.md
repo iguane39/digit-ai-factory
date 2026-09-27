@@ -2,7 +2,7 @@
 role: les deux chaînes déclarées de la traduction — « traduire un produit », « auditer ses traductions »
 destinataire: orchestrateur (pilot) et forges mobilisées
 sources_de_verite: ["retour Produit-02 20260826f (TF-0664)", "todo/TODO.jsonl — TF-0660, TF-0663, TF-0661, TF-1318", "gabarits/GLOSSAIRE.md", "forge_tests/adaptateurs/i18n.py", "oracles/oracle-remise-traduction.mjs", "scripts/verifier-sonde-glossaire.mjs", "scripts/produire-plan-ancres.mjs"]
-verifie_le: 2026-09-23
+verifie_le: 2026-09-27
 ---
 
 # Traduire, auditer : deux chaînes déclarées
@@ -99,12 +99,12 @@ son porteur, ou une décision proposée avec son motif. 2 gloses et 2 lignes de 
 | # | étape (libellé du lot) | sortant | porteur au 23/09/2026 | état |
 |---|---|---|---|---|
 | B1 | ligne de base mécanique : jouer les contrôleurs existants | les constats de ce qui existe déjà, avant tout jugement neuf | pan i18n de forge-tests (`forge_tests/adaptateurs/i18n.py`) ; chez le produit, `check-glossaire` et `check-traductions` (étape A5) | **porté** |
-| B2 | **carte des sources de vérité**, distinguant la SOURCE de l'ARTEFACT | pour chaque fichier visé par le plan, s'il est source ou artefact, et ce qui le régénère | section `## Sources de vérité` de la fiche d'audit, jugée par **T7** d'`oracles\oracle-remise-traduction.mjs` (C1–C4) ; rendue depuis le sidecar `plan-ancres@1` par `scripts\produire-plan-ancres.mjs` | **porté** — écrire la carte reste à l'auditeur : décision proposée D-B2 |
+| B2 | **carte des sources de vérité**, distinguant la SOURCE de l'ARTEFACT | pour chaque fichier visé par le plan, s'il est source ou artefact, et ce qui le régénère | section `## Sources de vérité` de la fiche d'audit, jugée par **T7** d'`oracles\oracle-remise-traduction.mjs` (C1–C4) ; rendue depuis le sidecar `plan-ancres@1` par `scripts\produire-plan-ancres.mjs` | **porté** — écrire la carte reste à l'auditeur, tranché le 26/09 : D-B2 |
 | B3 | confrontation glossaire ↔ emploi réel, par langue | les termes retenus absents, les proscrits employés | `oracles\oracle-glossaire.mjs` (G1–G8) juge le glossaire lui-même ; le contrôle **(h)** du pan i18n accuse un retenu à zéro emploi quand un proscrit est employé (TF-0656) ; `check-glossaire` chez le produit | **porté en partie** — un proscrit employé à côté d'un retenu employé n'est pas accusé, borne déclarée de (h) |
-| B4 | preuve de marché rejouée, et sa péremption vérifiée | la preuve de marché de chaque terme de visibilité, rejouée et encore valide | `scripts\verifier-sonde-glossaire.mjs` : rejeu par `--rejouer` (S-1, S-2, TF-1084) ; péremption par l'âge de `verifie_le`, déclarée au glossaire ou passée par `--peremption` (S-3, S-4, TF-1318) ; G7 exige la commande ; la méthode de la preuve est le nœud 21 de forge-seo-geo | **porté** — la durée par défaut est une décision proposée : D-B4 |
+| B4 | preuve de marché rejouée, et sa péremption vérifiée | la preuve de marché de chaque terme de visibilité, rejouée et encore valide | `scripts\verifier-sonde-glossaire.mjs` : rejeu par `--rejouer` (S-1, S-2, TF-1084) ; péremption par l'âge de `verifie_le`, déclarée au glossaire ou passée par `--peremption` (S-3, S-4, TF-1318) ; G7 exige la commande ; la méthode de la preuve est le nœud 21 de forge-seo-geo | **porté** — aucune durée par défaut, chaque glossaire déclare la sienne, tranché le 26/09 : D-B4 |
 | B5 | cohérence interne, interlangue, et contre les sources de données | les contradictions d'une locale avec elle-même, entre locales, et avec les données qu'elle cite | interne : contrôle **(i)** (TF-0663) ; genre : **(j)** (TF-0660) ; interlangue : **(d)–(f)** du catalogue et `oracles\oracle-invariants-traduction.mjs` F1–F4 ; données : **(g)** (TF-0644), nombres rapprochés de `FAITS.json`, et **(k)** (TF-0665), éteint par défaut ; **T8** exige la citation | **porté** — seuls les NOMBRES sont confrontés à la donnée |
 | B6 | dimensionnement SERP | la longueur des titres et descriptions servis, par locale, contre la borne de troncature | contrôle **(l)** du pan i18n de forge-tests (TF-1318), contre des bornes déclarées, sourcées et datées (`FORGE_TESTS_SERP_BORNES`) ; chez le produit, `check-seo` (A10) | **porté** |
-| B7 | **axe GEO** : entités, citabilité, directives IA | ce qu'un moteur génératif peut citer, et ce qu'on lui interdit | directives IA : règle **R-27** d'`oracles\oracle-conformite-projet.mjs` (agent IA bloqué sans décision consignée, `llms.txt` absent) ; le périmètre de `llms.txt` par locale est un ARBITRAGE, posé en B9 ; T5 exige le verdict de l'axe | **porté en partie** — entités et citabilité : décision proposée D-B7 |
+| B7 | **axe GEO** : entités, citabilité, directives IA | ce qu'un moteur génératif peut citer, et ce qu'on lui interdit | directives IA : règle **R-27** d'`oracles\oracle-conformite-projet.mjs` (agent IA bloqué sans décision consignée, `llms.txt` absent) ; le périmètre de `llms.txt` par locale est un ARBITRAGE, posé en B9 ; T5 exige le verdict de l'axe | **porté en partie** — entités et citabilité restent manuelles, tranché le 26/09 : D-B7 |
 | B8 | **plan applicable à ancres verbatim** + sidecar machine | un plan dont chaque ancre existe littéralement dans le fichier visé | production : `scripts\produire-plan-ancres.mjs` depuis le sidecar `plan-ancres@1` (P1–P5 : ancre présente, unique ou dénombrée, remplacement effectif, format de fiche, aucun chevauchement) ; remise : **T2** | **porté** |
 | B9 | arbitrages isolés et **posés à l'humain**, jamais tranchés seuls | la liste des décisions laissées à l'humain | règle T3 d'`oracles\oracle-remise-traduction.mjs` (liste des arbitrages non vide) | **porté** — c'est la seule étape qui a bien fonctionné du premier coup, sans outil |
 | B10 | critère d'arrêt et déclaration explicite de ce qui n'est pas couvert | quand l'audit s'arrête, et ce qu'il n'a pas regardé | **T5** : chaque étape B1–B10 porte son verdict, et une étape non jouée dit son motif ; **T6** : chaque locale servie est couverte ou déclarée non couverte, et `--catalogue` confronte la liste au catalogue réel | **porté** — l'audit s'arrête quand T1 à T8 rendent PASS |
@@ -157,19 +157,22 @@ Le plan vit dans un sidecar `plan-ancres@1` : la liste des modifications et la c
 `## Ancres verbatim` et `## Plan applicable`. Le format vit dans `scripts\lib-plan-ancres.mjs`,
 que le producteur et T7 partagent : un format, un seul lecteur.
 
-### Les décisions proposées, non tranchées
+### Les trois résidus manuels, tranchés le 26/09/2026
 
-3 résidus restent manuels. Ils sont proposés à l'humain avec leur motif ; aucun n'est tranché ici,
-et l'outil livré ne présume pas de la réponse.
+3 résidus restent manuels. Ils ont été proposés à l'humain avec leur motif le 23/09 ; l'humain les
+a tranchés le 26/09/2026 (décision D-17 (a) de la synthèse du 25/09). B2 et B7 restent manuels,
+avec le motif écrit ci-dessous. B4 n'a pas de durée par défaut : chaque glossaire déclare la
+sienne. L'outil appliquait déjà cette option et n'a pas changé. B2 et B7 gardent la condition de
+réouverture écrite avec leur motif.
 
 - **D-B2 — écrire la carte des sources de vérité reste à l'auditeur.** Motif : savoir quel fichier
   régénère lequel exige de connaître le build du produit, et le pilot n'exécute pas le build d'un
   produit autonome. T7 juge la forme de la carte et sa conséquence sur les ancres ; il ne la devine
   pas. Réouverture : un gabarit de build commun au parc, qui déclare ses sorties.
-- **D-B4 — la durée de validité d'une preuve de marché.** Option (a) : aucune durée par défaut ;
-  chaque glossaire déclare `peremption_preuves_jours`, et sans elle l'âge n'est pas jugé, ce que la
-  fiche dit en B4. Option (b) : 365 jours par défaut, d'après la cadence « re-ratisser une fois par
-  an » de forge-seo-geo (`referentiel/recherche-multilingue.md` §3). L'outil applique (a) aujourd'hui.
+- **D-B4 — la durée de validité d'une preuve de marché : option (a), tranchée.** Aucune durée par
+  défaut. Chaque glossaire déclare `peremption_preuves_jours`, et sans elle l'âge n'est pas jugé, ce
+  que la fiche dit en B4. L'option (b) écartée était 365 jours par défaut, d'après la cadence
+  « re-ratisser une fois par an » de forge-seo-geo (`referentiel/recherche-multilingue.md` §3).
 - **D-B7 — entités et citabilité, laissées manuelles.** Motif : leur jugement demande le site en
   ligne et une recherche web — nœuds 54 à 58 de forge-seo-geo, preuves `[T3]`, résultat du nœud 58
   « non reproductible et non stable ». Aucun corpus du parc ne permet de mesurer la précision d'un
