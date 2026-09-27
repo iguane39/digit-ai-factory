@@ -122,6 +122,59 @@ ce fait au plus haut.
 
 ---
 
+## Google Ads — import web, accès en lecture par l'API, et ce que l'import ne règle pas
+
+*Mesuré les 21 et 22/09/2026 par le run `produit-02`, pendant la mise en ligne de cinq campagnes
+(lot `Produit-02 - RETOURS - 20260922a`, annexe B ; TF-1364). Aucun identifiant de compte, de
+projet ni de propriété n'y figure.*
+
+### Ce qui coûte si on l'ignore
+
+Quatorze faits, dont le premier a coûté un dépôt refusé en entier. Le tableau se lit ligne à
+ligne : la première colonne dit le fait mesuré, la deuxième ce que son ignorance a coûté pendant
+ces deux soirées, la troisième comment le rejouer. Les lignes sont classées dans l'ordre du
+déploiement : l'import web, puis le logiciel de bureau Google Ads Editor, puis l'API et les
+réglages d'après import.
+
+| Fait mesuré | Ce que ça coûte | Comment le rejouer |
+|---|---|---|
+| L'import en masse du web (Outils → Actions groupées → Importations) n'accepte PAS le format de Google Ads Editor, et ses en-têtes ne sont publiés nulle part en ligne | premier dépôt refusé en entier : 201 lignes d'erreurs | lien « Télécharger un exemple de modèle » de l'écran Importations, un modèle par type d'objet |
+| Chaque ligne de campagne exige la colonne `EU political ads` (valeur `No` pour une location saisonnière) | `Missing value in "EU political ads"` sur chaque campagne | modèle `campaign_template.csv`, 33 colonnes |
+| Les réglages de campagne vont sur la ligne de campagne elle-même — type, réseaux, budget, stratégie, langue, zone ; la ligne de continuation d'Editor est refusée | `Missing value in "Campaign type"`, `Missing value in "Budget"` | dépôt d'un fichier au format Editor |
+| Un mot-clé à exclure au niveau campagne s'écrit `Row Type = Negative keyword`, `Level = Campaign`, `Type = Broad match` ; `Campaign Negative Broad` est refusé | `The value 'Campaign Negative Broad' in column 'Criterion Type' is invalid` | modèle `ad_group_negative_keyword_template.csv` |
+| Une campagne refusée fait échouer tous ses enfants : 181 erreurs sur 201 étaient des cascades | on cherche 181 causes là où il y en a 5 | lire les causes distinctes, pas le compte des lignes |
+| Un fichier UNIQUE mêlant 5 types de lignes (`Row Type` : Campaign, Ad group, Keyword, Negative keyword, Ad ; `Action = Add`) est accepté | aucun ; évite cinq dépôts et cinq aperçus | 191 lignes sur 191 acceptées, 22/09 |
+| Le bouton de contrôle avant écriture s'appelle « Aperçu », à côté d'« Appliquer » ; il compte les modifications acceptées et les erreurs sans rien écrire | un parcours qui nomme « Prévisualiser » égare l'humain | écran Importations, après le choix du fichier |
+| Aucune des 33 colonnes du modèle de campagne ne règle l'option de zone : l'import laisse « Présence ou intérêt » | des annonces montrées hors du pays visé | `campaign.geo_target_type_setting.positive_geo_target_type` en lecture : 5 campagnes sur 5 le 22/09 ; correction à la main, Paramètres → Zones → options |
+| La ligne de commande d'Editor (`-importFile`) démarre l'import puis attend une validation à l'écran, même avec `-forceAcceptChanges` ; aucune de ses 70 options ne publie | Editor ne s'automatise pas : 2 essais, 0 campagne importée | `google_ads_editor.exe --help`, puis essai sur une copie de la base locale |
+| Editor n'a pas résolu la colonne `Location` écrite en noms de pays anglais (`Location need resolve`, identifiant de zone à 0) ; l'import web a résolu les mêmes noms | 5 campagnes sans pays valide avant publication, dans Editor | relecture de la table des zones dans une copie de la base locale d'Editor ; relecture des zones par l'API après l'import web |
+| API : v17 à v21 rendent `404` en page HTML (versions retirées) ; v22 à v25 rendent `403 SERVICE_DISABLED` tant que l'API n'est pas activée dans le projet Cloud | un 404 lu comme « accès manquant » fait prescrire des étapes inutiles | `googleads.googleapis.com/v25/customers:listAccessibleCustomers` avec le jeton d'un compte de service |
+| Depuis le 09/09/2026, plus de jeton de développeur ni de compte administrateur : inscription dans la console Google Cloud ; le niveau « Explorer » lit un compte réel ; la bibliothèque `google-ads` 32.0.0 construit son client sans jeton | trois actions prescrites de mémoire, puis retirées | pages officielles « Developer token » et « Access levels » de la documentation de l'API ; `uv run --with google-ads` |
+| Un compte de service s'ajoute comme utilisateur du compte publicitaire (Admin → Accès et sécurité → Utilisateurs), niveau « Lecture seule », et la lecture fonctionne sans étape d'acceptation | aucun, mais personne ne le savait | lecture réussie le 22/09 à 21:49 |
+| Après import : annonces en cours d'examen ; les actions de conversion héritées d'une ancienne campagne intelligente restent PRINCIPALES, et l'une peut viser un événement que le site n'envoie jamais | campagnes activées avec une colonne « Conversions » à zéro quoi qu'il arrive | `conversion_action.primary_for_goal` et `ad_group_ad.policy_summary.review_status` en lecture seule |
+
+### Ce qui se demande, ou se relit, avant d'agir
+
+- **Deux pièces ne se téléchargent que depuis le compte**, par l'humain qui y est connecté. Elles
+  se demandent dans le tour qui prépare le dépôt, jamais après l'échec (TF-1361, TF-1363) : les
+  **modèles d'import** de l'écran Importations, un par type d'objet, sur lesquels tout générateur
+  se bâtit et contre lesquels il confronte ses colonnes et ses valeurs à chaque génération ; et le
+  **rapport d'erreurs** d'un dépôt refusé, qui nomme les causes distinctes.
+- **Une sonde d'accès cite la version d'API en service** le jour de la sonde, relue dans la
+  documentation officielle (TF-1362) : une sonde sur une version retirée mesure un `404` qui ne dit
+  rien de l'accès.
+
+### Ce que ce référentiel ne porte pas encore
+
+Le kit éprouvé chez le produit compte cinq pièces (annexe C du lot) : le générateur de l'import web
+confronté aux modèles (191 lignes sur 191 acceptées), le relevé en lecture seule qui compare le
+compte au plan, le fichier des changements calculé depuis l'état lu du compte, le plan de campagnes
+qui les alimente, et les commandes documentées. Il reste chez le produit à ce jour. En faire un kit
+de la factory, rangé et recetté hors de tout produit, est une construction à part, déclarée
+restante sous TF-1364.
+
+---
+
 ## LinkedIn — aucun connecteur, et c'est une déclaration
 
 *Établi le 17/09/2026 par l'étude `output\03-etudes\20260917-etude-opportunite-gestion-reseaux-sociaux.md`
@@ -163,7 +216,7 @@ Le détail daté, avec sa solidité ligne à ligne et sa péremption, vit dans
 
 ## Ce que ce document ne garantit pas
 
-- **Il vieillit, et vite.** Les faits ci-dessus sont datés des 24 et 25/08/2026. Une interface de
+- **Il vieillit, et vite.** Chaque section porte la date de sa mesure, du 24/08 au 22/09/2026. Une interface de
   fournisseur change sans avertir : chaque ligne porte donc **comment la rejouer**, et une ligne
   qu'on ne sait plus rejouer doit être **retirée** plutôt que conservée par prudence.
 - **Il ne couvre que ce qui a été payé.** Aucun fait n'y figure « au cas où » : un fait sans coût
