@@ -23,8 +23,8 @@
   "vu_le": "2026-09-22"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 31,
-  "vu_le": "2026-09-14"
+  "cas": 33,
+  "vu_le": "2026-09-27"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
   "cas": 27,
@@ -263,8 +263,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 39,
-  "vu_le": "2026-09-19"
+  "cas": 68,
+  "vu_le": "2026-09-27"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 12,
@@ -415,8 +415,12 @@
   "vu_le": "2026-09-16"
  },
  "scripts/fusionner-tables-confidentielles.test.mjs": {
-  "cas": 6,
-  "vu_le": "2026-09-14"
+  "cas": 7,
+  "vu_le": "2026-09-27"
+ },
+ "scripts/generer-lisezmoi-output.test.mjs": {
+  "cas": 2,
+  "vu_le": "2026-09-27"
  },
  "scripts/generer-page-etude.mjs": {
   "cas": 12,
@@ -426,9 +430,17 @@
   "cas": 11,
   "vu_le": "2026-09-09"
  },
+ "scripts/indices-uniques.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-09-27"
+ },
  "scripts/lib-extensions-jugees.test.mjs": {
   "cas": 11,
   "vu_le": "2026-09-17"
+ },
+ "scripts/lib-parc.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-27"
  },
  "scripts/lib-pseudonyme-produit.test.mjs": {
   "cas": 8,
@@ -441,6 +453,10 @@
  "scripts/oracles-design-page-generee.test.mjs": {
   "cas": 13,
   "vu_le": "2026-09-23"
+ },
+ "scripts/pre-commit-index.test.mjs": {
+  "cas": 2,
+  "vu_le": "2026-09-27"
  },
  "scripts/produire-plan-ancres.test.mjs": {
   "cas": 19,
@@ -491,16 +507,16 @@
   "vu_le": "2026-09-22"
  },
  "scripts/verifier-hooks-git.test.mjs": {
-  "cas": 6,
-  "vu_le": "2026-09-15"
+  "cas": 8,
+  "vu_le": "2026-09-27"
  },
  "scripts/verifier-jeu-livrables.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-31"
  },
  "scripts/verifier-jugement.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-09-22"
+  "cas": 20,
+  "vu_le": "2026-09-27"
  },
  "scripts/verifier-ooxml.test.mjs": {
   "cas": 3,
@@ -601,6 +617,10 @@
  "todo/localiser-produit.test.mjs": {
   "cas": 11,
   "vu_le": "2026-08-26"
+ },
+ "todo/noms-de-personnes.test.mjs": {
+  "cas": 9,
+  "vu_le": "2026-09-27"
  },
  "todo/normaliser-lot.test.mjs": {
   "cas": 9,
