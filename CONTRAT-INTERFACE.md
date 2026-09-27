@@ -156,8 +156,9 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   porte `schema_ledger` — sans ce champ, le ledger précède le schéma, ses entrées sortent
   `[NON VÉRIFIÉ]` avec le remède, et **ne sont jamais mises en échec**. Les trois ledgers du parc
   mesurés le 19/08 échoueraient tous, et un contrôle qui met en échec tout l'existant se fait
-  désactiver (R-33 bis) : **on ne juge que ce qui s'est déclaré jugeable, et on ne réécrit jamais
-  un ledger existant**.
+  désactiver — c'est le motif que R-33 bis donne pour ne pas armer d'office le verdict websec :
+  « armer un gate que personne n'a exercé le ferait désarmer au premier faux positif ». **On ne
+  juge que ce qui s'est déclaré jugeable, et on ne réécrit jamais un ledger existant**.
 
 - **Ce qui AURAIT DÛ tourner se DÉCOUVRE, et un juge le confronte au ledger (TF-1319 — 23/09,
   temps 2 et 3 du verdict O3 de l'étude du 19/08).** La forme canonique ci-dessus rend calculable

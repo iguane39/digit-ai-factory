@@ -1,7 +1,7 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\CONTRAT-INTERFACE.md",
-  "date_iso": "2026-09-05T07:47:20.536Z",
-  "registre_version": "2.16.0",
+  "cible": "C:\\dev\\digit-ai-factory\\CONTRAT-INTERFACE.md",
+  "date_iso": "2026-09-27T06:40:18.476Z",
+  "registre_version": "2.28.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -38,7 +38,7 @@
       "domaine": "Sécurité / secrets",
       "file": "CONTRAT-INTERFACE.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
@@ -50,7 +50,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "CONTRAT-INTERFACE.md",
       "verdict": "PASS",
-      "detail": "1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "CONTRAT-INTERFACE.md",
-    "ts": "2026-09-05T07:47:20.535Z",
+    "ts": "2026-09-27T06:40:18.476Z",
     "fichiers": {
-      "CONTRAT-INTERFACE.md": "ae099bf9ac3169eb82b3e27ee032d8585fbdbd9bb4281a006c84162b9f0151c3"
+      "CONTRAT-INTERFACE.md": "5c3eb586845d837909daa6b4d42aaf25a850c1e56989877776794cefe1f9f457"
     }
   },
   "empreinte_motif": null,
