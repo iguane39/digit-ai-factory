@@ -43,6 +43,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { estDepotEcosysteme } from "../scripts/lib-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -227,7 +228,8 @@ if (lanceEnDirect) {
       // `_` couvre les suffixes d'archive (`_old`, `_vide`) ET les espaces d'engagement
       // client (`…_<engagement>`, privés) : aucune forge du parc ne porte d'underscore. Le
       // motif nommé qui vivait ici portait le nom d'un client (retiré le 27/08).
-      .filter((e) => e.isDirectory() && /^digit-ai/.test(e.name) && !/\.bundle$|_/.test(e.name))
+      // TF-1327 (27/09/2026) : les produits déclarés de l'écosystème sortent du balayage des forges.
+      .filter((e) => e.isDirectory() && estDepotEcosysteme(e.name) && !/\.bundle$|_/.test(e.name))
       .map((e) => e.name);
     let lus = 0;
     const trouves = [];

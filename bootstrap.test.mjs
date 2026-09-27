@@ -32,9 +32,10 @@ const echecs = [];
 let joues = 0;
 const git = (dir, ...a) => execFileSync("git", ["-C", dir, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 
-// Les noms et preuves sont LUS dans bootstrap.mjs : la recette ne tient pas sa
-// propre liste — une forge ajoutée là-bas est couverte ici sans un geste.
-const src = (await import("node:fs")).readFileSync(BOOTSTRAP, "utf8");
+// Les noms et preuves sont LUS dans la source que bootstrap.mjs importe — `scripts/lib-parc.mjs`
+// depuis le 27/09/2026 (TF-1327) : la recette ne tient pas sa propre liste, une forge ajoutée
+// là-bas est couverte ici sans un geste.
+const src = (await import("node:fs")).readFileSync(join(ICI, "scripts", "lib-parc.mjs"), "utf8");
 // Les ALIAS sont lus ici aussi (TF-0533) : le cas 3 bis (d) en a besoin, et une recette qui
 // tiendrait sa propre liste d'alias divergerait de bootstrap.mjs au premier renommage.
 const FORGES = [...src.matchAll(/\{\s*nom:\s*"([^"]+)",\s*preuve:\s*"([^"]+)"(?:,\s*alias:\s*\[([^\]]*)\])?/g)]

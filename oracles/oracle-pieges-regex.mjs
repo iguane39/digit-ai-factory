@@ -38,6 +38,7 @@ import { existsSync, readFileSync, readdirSync, mkdtempSync, writeFileSync, mkdi
 import { join, dirname, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { estDepotEcosysteme } from "../scripts/lib-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -271,7 +272,8 @@ const depots = readdirSync(racine, { withFileTypes: true })
   // qui donne l'illusion d'une protection. La convention qui les remplace est le PRÉFIXE
   // `_archive-` (voir references/CONVENTION-DEPOTS-MIS-DE-COTE.md) : un dépôt mis de côté
   // sort du motif `^digit-ai` par son NOM, une fois, au lieu d'être exclu dans chaque oracle.
-  .filter((e) => e.isDirectory() && /^digit-ai/.test(e.name) && !/_/.test(e.name))
+  // TF-1327 (27/09/2026) : les produits déclarés de l'écosystème sortent du balayage des forges.
+  .filter((e) => e.isDirectory() && estDepotEcosysteme(e.name) && !/_/.test(e.name))
   .map((e) => e.name);
 
 let lus = 0;

@@ -34,6 +34,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, dirname, relative, basename } from "node:path";
 import { fileURLToPath } from "node:url";
+import { estDepotEcosysteme } from "../scripts/lib-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -241,7 +242,10 @@ if (!declares.size) {
 // ---- balayage du parc ----------------------------------------------------------------------
 const depots = existsSync(racine)
   ? readdirSync(racine, { withFileTypes: true })
-      .filter((e) => e.isDirectory() && /^digit-ai/.test(e.name)
+      // TF-1327 (27/09/2026) : un PRODUIT déclaré de l'écosystème (`digit-ai-marketing`) n'est pas une
+      // forge — son script était compté site de scellement non déclaré, et la recette complète du
+      // pilot restait rouge. La lecture est commune (`scripts/lib-parc.mjs`), celle de bootstrap.
+      .filter((e) => e.isDirectory() && estDepotEcosysteme(e.name)
         // L'EXCLUSION NOMMÉE « digit-ai-forge-seo » A DISPARU D'ICI LE 23/08, ET C'EST LA LEÇON
         // (TF-0533) : ce dépôt était un CLONE PÉRIMÉ du dépôt renommé en forge-seo-geo, et il
         // avait été contourné ICI, nommément, plutôt que traité à la racine. Un contournement

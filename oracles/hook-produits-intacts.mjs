@@ -53,13 +53,16 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { estDepotEcosysteme } from "../scripts/lib-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
 const args = process.argv.slice(2);
 
 /** Un dépôt du parc qui n'est ni le pilot ni une forge est un PRODUIT. */
-const EST_FORGE = (nom) => /^digit-ai/.test(nom);
+// TF-1327 (27/09/2026) : un produit déclaré de l'écosystème (`digit-ai-marketing`) porte le préfixe et
+// reste un PRODUIT — il était exclu d'ici comme une forge, donc jamais protégé. Lecture commune.
+const EST_FORGE = (nom) => estDepotEcosysteme(nom);
 const IGNORES = new Set([".git", "node_modules", ".venv", "__pycache__", "dist", "build"]);
 
 function depotsProduits(racine) {
