@@ -38,7 +38,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `candidature-produit-a-moitie-instancie-20260824.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `candidature-propagation-regles-produits-20260822.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `candidature-qualite-graphique-par-defaut.tf.jsonl` | fichier | 3,9 Ko | 3 ligne(s) JSONL |
-| `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
+| `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
 | `candidature-r21-lockfiles.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `candidature-r45-anteriorite.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
 | `candidature-rattrapage-pilot.tf.jsonl` | fichier | 777 o | 1 ligne(s) JSONL |
