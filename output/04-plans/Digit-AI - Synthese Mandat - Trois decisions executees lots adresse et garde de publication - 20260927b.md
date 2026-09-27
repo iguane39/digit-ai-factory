@@ -43,8 +43,8 @@ confidentiel, le seul dépôt où la garde ne peut pas se poser.
 **3 décisions exécutées sur 3** · 16 candidatures ingérées, 1 item clos au registre sur preuve,
 1 point d'étape, **3 candidatures neuves** · **44 hameçons posés** sur 15 dépôts, canal exclu ·
 envoi réel du pilot **refusé** par sa garde, 4 bloquants tous dans le remisage · porte des noms
-**PASS** (0 bloquant) sur tout ce qui est parti · 15 dépôts sur 16 à égalité avec GitHub, le
-pilot retenant 3 enregistrements, cette synthèse comprise.
+**PASS** (0 bloquant) sur tout ce qui est parti · 15 dépôts sur 16 à égalité avec GitHub ; le
+pilot retient les enregistrements de ce travail, cette synthèse comprise.
 
 ## 3. Décisions attendues de l'humain
 
@@ -193,7 +193,7 @@ puis le remisage, qui retient la publication de ce travail.
 
 | Sél. | Action | Acteur | Id | Motif | Si rien n'est fait |
 |---|---|---|---|---|---|
-| **A-1** | Publier le pilot dès le remisage retiré : `FORGE_PUSH_GO="D-27 (a) et D-28 (a) du 27/09" git push origin main`, lancé en tâche de fond, sortie vers un fichier ; preuve : l'origine porte cette synthèse | `auto_ia` | TF-1360 | `dependance_bloc_3` — attend le retrait du remisage | 3 enregistrements restent sur ce poste, et le registre public ne porte pas la pose de la garde |
+| **A-1** | Publier le pilot dès le remisage retiré : `FORGE_PUSH_GO="D-27 (a) et D-28 (a) du 27/09" git push origin main`, lancé en tâche de fond, sortie vers un fichier ; preuve : l'origine porte cette synthèse | `auto_ia` | TF-1360 | `dependance_bloc_3` — attend le retrait du remisage | les enregistrements de ce travail restent sur ce poste, et le registre public ne porte pas la pose de la garde |
 | **A-2** | Exécuter D-30 selon votre réponse : écrire la garde d'envoi du canal, qui joue `node oracle-confidentiel.mjs .` et refuse sur un échec, l'éprouver dans les 2 sens sur un dépôt jetable, puis la poser | `auto_ia` | neuve | `dependance_bloc_3` — attend D-30 | le canal reste jugé à l'ouverture seulement |
 | **A-3** | À la prochaine ouverture de l'autre poste : `node <forge-agents>\.claude\skills\quality-oracles\scripts\installer-hamecon-publication.mjs <dépôts> --verifier`, puis la repose des hameçons manquants ou antérieurs à la parade du 26/09, et la section de contrôle d'avance du pilot | `auto_ia` | TF-1360 | `dependance_externe` — l'autre poste n'est pas visible de cette session | un envoi refusé peut encore y partir |
 | **A-4** | Capitaliser le kit Google Ads dans une forge : générateur de l'import web confronté aux modèles, relevé en lecture seule, fichier des changements, rangés dans une forge hors de tout produit | `auto_ia` | TF-1364 | `borne_atteinte` — construction complexe × long, hors de ce tour qui exécute 3 décisions | le kit reste chez le produit et se réécrit au prochain |
@@ -206,7 +206,8 @@ puis le remisage, qui retient la publication de ce travail.
 
 - Fichier jugé : ce document — verdict d'`oracle-synthese` au journal homonyme.
 - Pilot : `1daea0af` (D-29), `8afb5626` (D-28) et `a464cb94` (registre) publiés à 17:47:37 ;
-  `462a7add` et `6d30f2b7` (registre), puis cette synthèse, retenus par la garde.
+  `462a7add` et `6d30f2b7` (registre), puis cette synthèse et son journal d'oracle, retenus par
+  la garde.
 - Forge-agents `e53bd20` publié à 17:41:07 ; canal `5699efc` et `580319e` à 17:41:10.
 - Hameçons : 42 posés à 17:45 sur les 13 forges et `digit-ai-queue`, 2 au pilot à 17:47:48, sa
   section de contrôle d'avance insérée à 17:47:56 ; ils vivent dans le dossier des hameçons de
