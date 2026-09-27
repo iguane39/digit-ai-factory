@@ -1,13 +1,13 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\BOUCLE-AMELIORATION.md",
-  "date_iso": "2026-08-20T18:41:25.066Z",
-  "registre_version": "2.13.0",
+  "cible": "C:\\dev\\digit-ai-factory\\BOUCLE-AMELIORATION.md",
+  "date_iso": "2026-09-27T08:45:56.410Z",
+  "registre_version": "2.28.0",
   "profil": "digit-ai",
   "niveau": "note",
-  "verdict": "PASS",
+  "verdict": "FAIL",
   "resume": {
-    "pass": 3,
-    "fail": 0,
+    "pass": 4,
+    "fail": 1,
     "skip": 3,
     "cache": 0
   },
@@ -23,6 +23,12 @@
   "exemptions_actives": [],
   "resultats": [
     {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "BOUCLE-AMELIORATION.md",
+      "verdict": "FAIL",
+      "detail": "12 constat(s) · M7 chapitre sans ouverture : « forge-tests (les plus urgents — bloquent l'étape 4 en condit » (ligne 400) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond. ; M7 chapitre sans ouverture : « forge-conception » (ligne 417) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond."
+    },
+    {
       "domaine": "Format / livraison / versioning",
       "file": "BOUCLE-AMELIORATION.md",
       "verdict": "PASS",
@@ -32,7 +38,7 @@
       "domaine": "Sécurité / secrets",
       "file": "BOUCLE-AMELIORATION.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
@@ -44,7 +50,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "BOUCLE-AMELIORATION.md",
       "verdict": "PASS",
-      "detail": "38 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (38 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "detail": "49 constat(s) · 48 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (48 avertissement(s)) ; nombre « 1 920 959 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -55,9 +61,25 @@
     {
       "domaine": "Cohérence inter-documents",
       "file": "BOUCLE-AMELIORATION.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 26 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 3 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    },
+    {
+      "domaine": "Autorité d'une décision affirmée",
+      "file": "BOUCLE-AMELIORATION.md",
       "verdict": "SKIP",
       "detail": ""
     }
   ],
-  "actions_couverture": []
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "BOUCLE-AMELIORATION.md",
+    "ts": "2026-09-27T08:45:56.409Z",
+    "fichiers": {
+      "BOUCLE-AMELIORATION.md": "df44fcf381c6c1371479bfad917274392230f173f98a791e1dd8602423acc27e"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
 }

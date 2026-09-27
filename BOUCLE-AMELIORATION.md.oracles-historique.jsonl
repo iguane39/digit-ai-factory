@@ -1,2 +1,3 @@
 {"date_iso":"2026-08-19T17:28:40.880Z","verdict":"PASS","profil":"digit-ai","niveau":"note","resume":{"pass":3,"fail":0,"skip":3,"cache":0},"fails":[]}
 {"date_iso":"2026-08-20T18:41:25.066Z","verdict":"PASS","profil":"digit-ai","niveau":"note","resume":{"pass":3,"fail":0,"skip":3,"cache":0},"fails":[]}
+{"date_iso":"2026-09-27T08:45:56.410Z","verdict":"FAIL","profil":"digit-ai","niveau":"note","resume":{"pass":4,"fail":1,"skip":3,"cache":0},"fails":["Lisibilité d'un document (Markdown):BOUCLE-AMELIORATION.md"],"empreinte":{"format":"forge-ops/empreinte@1","release":"BOUCLE-AMELIORATION.md","ts":"2026-09-27T08:45:56.409Z","fichiers":{"BOUCLE-AMELIORATION.md":"df44fcf381c6c1371479bfad917274392230f173f98a791e1dd8602423acc27e"}},"empreinte_motif":null}

@@ -2319,3 +2319,37 @@ cinq fois (68 cas pour 84, 117 espacements pour 124, 43 couleurs pour 11, 6 clas
 31, 1430 tests pour 1379) : la consigne « remesurer plutôt que reprendre » du gabarit d'agent a payé.
 (5) **Le harnais du pilot est en défaut sur ce poste depuis avant la campagne** (2 recettes sur 130) :
 chaque agent l'a relevé à l'identique avant d'écrire, aucun n'en a ajouté.
+
+## 26 et 27/09/2026 — « 26a, 25a, 24b, 15b, 17a, 18a, 19a, 20a, 21b » : neuf décisions exécutées, trente items clos sur preuve, deux règles de restitution mesurées avant leur mise en service
+
+Neuf décisions reçues le 26/09 à 08:27 : accueillir le lot du sas (D-26), décider et traiter les sept
+candidatures du lot Google Ads d'un produit (D-25), construire le contrôle qu'il propose avant de créer
+sa classe (D-24 (b)), pseudonymiser trois noms de produits jusque dans l'archive du registre (D-15 (b)),
+trancher les résidus de la chaîne de traduction (D-17), brancher le juge de l'enclenchement (D-18),
+traiter les candidatures du 23/09 (D-19) et du 24/09 (D-21), rendre les index indépendants du poste
+(D-20). Sept agents de campagne, un par dépôt : six forges le 26/09 (agents, audit, conception, design,
+organization, tests), forge-agents de nouveau le 27/09 pour le journal de run et la parité des filtres.
+Au registre : 30 items clos en corrige avec leurs gains, TF-1360, TF-1364 et TF-1319 en cours, six
+candidatures neuves (TF-1373 à TF-1378). Publié : six forges, le canal et le pilot le 27/09 au matin,
+puis un second envoi en fin de tour ; skills propagés, consommateurs rejoués. Synthèse :
+`output\04-plans\`, mandat du 20260927.
+
+Leçons. (1) **La borne d'antériorité de la porte des noms a une conséquence de méthode** : un nom
+inscrit à la table un jour J rend bloquant tout arbre du jour J qui le porte encore. Deux
+enregistrements du matin même, antérieurs à la correction D-15, ont fait refuser l'envoi ; la
+correction a été réordonnée localement avant eux, contenu final identique octet pour octet. Corriger
+les occurrences AVANT tout enregistrement du jour d'inscription évite le détour. (2) **La mesure avant
+mise en service a changé le prédicat de S52** : « la plateforme est nommée » aurait accusé la moitié
+des 59 lignes qui en nomment une, toutes des décisions ou des commandes ; « une adresse d'écran, ou le
+nom hors code avec un marqueur d'écran » en accuse 17, toutes à raison. La reconnaissance d'une
+demande de procédure a de même perdu un mot, « descriptif », sur 130 messages réels. (3) **Le premier
+passage d'un contrôle neuf trouve un défaut ancien** : un skill à 1 048 caractères depuis le 08/09, une
+adresse nominative publiée depuis le 22/08, une copie vendorisée qui dérive depuis le 23/09. (4)
+**L'agent a trouvé ce que la consigne ne demandait pas** — un `seq` de payload qui écrasait le numéro
+calculé sous verrou, une parité qui confondait fins de ligne et contenu — et le rejeu du pilot a
+confirmé les deux avant de les corriger. (5) **Deux outils ont rendu un vert sans rien juger** : le
+contrôle d'avance sur un chemin mal échappé (« hors dépôt git : rien à juger », exit 0, TF-1373) et
+une porte des noms lancée sur un paquet inexistant (exit 2, lue à temps). Relire le verdict avant
+d'enchaîner a tenu les deux fois. (6) **Un compte écrit à la main a menti dans un message
+d'enregistrement du pilot** — « 25 clos, 3 en cours » pour 26 et 2 —, corrigé avant publication sur
+le fichier d'événements recompté : la classe de TF-1332 et de TF-1376 touche aussi le pilot.
