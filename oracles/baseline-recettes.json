@@ -19,8 +19,8 @@
   "vu_le": "2026-08-26"
  },
  "./bootstrap.test.mjs": {
-  "cas": 17,
-  "vu_le": "2026-09-22"
+  "cas": 19,
+  "vu_le": "2026-09-27"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
   "cas": 33,
@@ -263,7 +263,7 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 68,
+  "cas": 71,
   "vu_le": "2026-09-27"
  },
  "oracle-trace-mutation-mep.mjs": {
@@ -315,8 +315,8 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 34,
-  "vu_le": "2026-09-19"
+  "cas": 37,
+  "vu_le": "2026-09-27"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 17,
