@@ -336,6 +336,12 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-67 - RETOURS - 20260922a.tf.jsonl` | fichier | 5,9 Ko | 2 ligne(s) JSONL |
 | `Produit-68 - RETOURS - 20260924a.md` | fichier | 10,0 Ko | Retours forges — Produit-68 — 20260924a |
 | `Produit-68 - RETOURS - 20260924a.tf.jsonl` | fichier | 5,7 Ko | 5 ligne(s) JSONL |
+| `Produit-68 - RETOURS - 20260926a.md` | fichier | 19,1 Ko | Retours forges — Produit-68 — 20260926a |
+| `Produit-68 - RETOURS - 20260926a.tf.jsonl` | fichier | 15,6 Ko | 11 ligne(s) JSONL |
+| `Produit-68 - RETOURS - 20260926b.md` | fichier | 10,9 Ko | Retours forges — Produit-68 — 20260926b |
+| `Produit-68 - RETOURS - 20260926b.tf.jsonl` | fichier | 6,3 Ko | 4 ligne(s) JSONL |
+| `Produit-68 - RETOURS - 20260927a.md` | fichier | 6,0 Ko | Retours forges — Produit-68 — 20260927a |
+| `Produit-68 - RETOURS - 20260927a.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `Produit-70 - RETOURS - 20260924a.md` | fichier | 5,8 Ko | Retour — déclarer « cohérent » sans vérifier l'invariant qui compte |
 | `Produit-70 - RETOURS - 20260924a.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
@@ -345,4 +351,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `UIA - RETOURS - 20260924a.md` | fichier | 1,9 Ko | Retours forges — UIA (Produit-71) — 20260924a |
 | `UIA - RETOURS - 20260924a.tf.jsonl` | fichier | 724 o | 1 ligne(s) JSONL |
 
-_326 fichier(s), 2 sous-dossier(s)_
+_332 fichier(s), 2 sous-dossier(s)_
