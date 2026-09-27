@@ -353,6 +353,17 @@ lecture — alors que **trois livrables de même nature existaient déjà** dans
 un gabarit complet et barré produit par un autre projet le 13/08. Sans canal sortant, le
 quatrième le referait.
 
+**Juger l'enclenchement, à titre INFORMATIF (D-18 (a), 26/09/2026 ; TF-1319).** Avant `run_close`,
+jouer `node <pilot>\oracles\oracle-enclenchement.mjs forge\ledger.jsonl` depuis la racine du produit :
+il confronte les oracles que chaque forge mobilisée découvre sur son disque aux verdicts consignés
+au ledger (`CONTRAT-INTERFACE.md` §3). Les forges mobilisées se lisent au champ
+`forges_mobilisees` du `run_open`, sinon `--forges`. Son verdict se consigne au ledger en
+`oracles_verdict` et se cite dans la synthèse de clôture ; il **ne bloque pas** la clôture. *Pourquoi
+pas bloquant* : jugé sur les deux seuls runs réels qui déclarent leur schéma et leurs forges, il rend
+FAIL parce que ces runs consignent tous les verdicts d'un lanceur en UNE entrée, et l'outil qui
+consignerait un verdict par oracle n'existe pas encore ; un FAIL sur un regroupement n'est pas un
+oubli. Il deviendra bloquant à la livraison de cet outil, et c'est TF-1319 qui porte ce passage.
+
 Compiler les entrées `type: retour` du ledger en un **lot de retours** —
 `forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** homonyme
 (candidatures SANS id, gabarit `gabarits\RETOURS-FORGES.md` ; le préfixe projet est
