@@ -21,7 +21,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { comparerAffiche, controlerGeste, syntheseDuTour } from "./hook-restitution.mjs";
+import { comparerAffiche, controlerGeste, controlerProcedure, demandeProcedure, syntheseDuTour } from "./hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "hook-restitution.mjs");
@@ -551,8 +551,89 @@ try {
     if (r34.status === 0)
       echecs.push("34 : après le tour de relecture, verifier-jugement ne voit plus la retouche du cas 33");
   }
+
+  // 35 — LA DEMANDE DE PROCÉDURE, RECONNUE SUR LA SOIRÉE RÉELLE (TF-1361). Les neuf messages de
+  // l'annexe A du lot « Produit-02 - RETOURS - 20260922a », mot pour mot : les cinq demandes de
+  // procédure sont reconnues, et aucun des quatre autres messages de la même soirée.
+  for (const m of [
+    "Détaille à partir de ma page Google Ads comment j'importe les campagnes pour les lancer.",
+    "Fournis le descriptif pas à pas dans Google Ads sur le web pour poster les campagnes",
+    "66a, 67 oublie le Google Ads local, on passe uniquement par le web, donne la procédure détaillée",
+    "J'ai tout supprimé sur Google Ads local, est-ce que je peux maintenant avoir la procédure détaillée pour les campagnes sur le web ?",
+    "Fournis les étapes pour la configuration de Google Ads sur le projet Google Cloud. Pourquoi est-ce que tu ne proposes pas d'office les étapes de configuration ?",
+  ]) if (!demandeProcedure(m)) echecs.push(`35 : demande de procédure NON reconnue : « ${m.slice(0, 70)} »`);
+  for (const m of [
+    "Je ne comprends pas, il faut que je ferme Google Ads Web pour que tu puisses poster dessus ? C'est fermé.",
+    "je n'ai pas de bouton prévisualiser, uniquement appliquer",
+    "J'ai mis les modèles Google Ads et les retours d'erreurs dans le dossier. Adapte et corrige pour t'assurer que tout est ok au prochain import.",
+    "ok, j'ai mis l'accès lecture, vérifie",
+    "fais la mise à jour", "26a, 25a, 24b", "synchronise avec github",
+  ]) if (demandeProcedure(m)) echecs.push(`35 bis : message pris à tort pour une demande de procédure : « ${m.slice(0, 70)} »`);
+
+  // 36 — LE CONTRÔLE SEUL, DANS SES TROIS SENS : demande + S53 en échec → FAIL ; demande + S53
+  // tenue → PASS ; aucune demande → hors contrôle, même avec S53 en échec (elle reste avertissante).
+  {
+    const demande = "Fournis le descriptif pas à pas dans Google Ads sur le web pour poster les campagnes";
+    const s53 = [{ regle: "S53", statut: "FAIL", message: "1 action(s) manuelle_utilisateur visent l'interface de Google Ads" }];
+    const a = controlerProcedure({ dernierHumain: demande, fails: s53 });
+    if (a.verdict !== "FAIL") echecs.push(`36 : procédure demandée et guide absent → attendu FAIL, obtenu ${a.verdict}`);
+    const b = controlerProcedure({ dernierHumain: demande, fails: [] });
+    if (b.verdict !== "PASS") echecs.push(`36 bis : procédure demandée et guide servi → attendu PASS, obtenu ${b.verdict}`);
+    const c = controlerProcedure({ dernierHumain: "fais la mise à jour", fails: s53 });
+    if (c.applicable) echecs.push("36 ter : un message qui ne demande aucune procédure rend S53 bloquante");
+  }
+
+  // 37 — DE BOUT EN BOUT, PAR LE HOOK. Le message final est la restitution BON plus UNE action
+  // d'import dans l'écran de Google Ads : sans guide, il est refusé quand le dernier message humain
+  // demande la procédure (rouge) ; le MÊME message, avec sa source datée et un guide en tête, passe
+  // (vert) ; le rouge, sous un message humain qui ne demande rien, n'est qu'averti (borne).
+  {
+    const ACTION_ADS = "- **A-3** — manuelle_utilisateur : neuve — importer les campagnes dans Google Ads : écran « Importations », "
+      + "bouton « Aperçu » puis « Appliquer », sur `https://ads.google.com`.\n"
+      + "  - pourquoi pas l'IA : acces — import TENTÉ le 22/09, `HTTP 403 PERMISSION_DENIED` ; seul le titulaire du compte y est connecté.\n"
+      + "  - si rien n'est fait : les campagnes ne sont pas publiées.\n";
+    const GUIDE = "## Guide — importer les campagnes dans Google Ads\n\n"
+      + "Source : `support.google.com/google-ads`, lue le 27/09/2026.\n\n"
+      + "1. Ouvrez Outils, puis Actions groupées, puis Importations. Ce que vous devez voir : la liste des importations passées.\n"
+      + "2. Déposez le fichier et cliquez sur « Aperçu ». Ce que vous devez voir : les modifications acceptées, et zéro erreur.\n"
+      + "3. Cliquez sur « Appliquer ». Ce que vous devez voir : l'importation marquée terminée.\n\n"
+      + "## 0. Synthèse d'ouverture\n\n";
+    const rougeTexte = BON + ACTION_ADS;
+    const verteTexte = GUIDE + BON + ACTION_ADS + "  - source : `support.google.com/google-ads`, lue le 27/09/2026.\n";
+    const tourAvec = (humain, texteFinal) => [
+      { type: "user", message: { role: "user", content: humain } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: {} }, { type: "tool_use", name: "Bash", input: {} }] } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const jouer = (nom, humain, texteFinal) => {
+      const p = join(base, nom + ".jsonl");
+      writeFileSync(p, tourAvec(humain, texteFinal), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
+        input: JSON.stringify({ session_id: "test-procedure", transcript_path: p, stop_hook_active: false }) });
+      try { return JSON.parse(r.stdout || "null"); } catch { return null; }
+    };
+    // Le rouge n'est rouge que par S52 et S53 : sans cette garde, un autre défaut de forme ferait le
+    // travail et la recette prouverait autre chose que ce qu'elle dit.
+    const fr = join(base, "procedure-rouge.md"); writeFileSync(fr, rougeTexte, "utf8");
+    const or = spawnSync(process.execPath, [ORACLE, fr], { encoding: "utf8" });
+    const autres = (JSON.parse(or.stdout || "{}").findings || []).filter((f) => f.statut === "FAIL" && !["S52", "S53"].includes(f.regle));
+    if (autres.length) echecs.push(`37 : le texte rouge échoue aussi sur ${autres.map((f) => f.regle).join(", ")} — le rouge ne prouverait pas la procédure`);
+    const fv = join(base, "procedure-verte.md"); writeFileSync(fv, verteTexte, "utf8");
+    const ov = spawnSync(process.execPath, [ORACLE, fv], { encoding: "utf8" });
+    if (ov.status !== 0) echecs.push(`37 bis : le texte guidé et sourcé n'est pas PASS pour oracle-synthese : ${(ov.stdout.match(/"regle": "(S\d+)",\s*"statut": "FAIL"/g) || []).join(" ")}`);
+    const demande = "Fournis le descriptif pas à pas dans Google Ads sur le web pour poster les campagnes";
+    const d37 = jouer("procedure-rouge", demande, rougeTexte);
+    if (d37?.decision !== "block" || !/PROCÉDURE — procédure demandée/.test(String(d37.reason || "")))
+      echecs.push(`37 ter : procédure demandée, gestes en lignes d'action sans guide → attendu block PROCÉDURE, obtenu ${JSON.stringify(d37).slice(0, 220)}`);
+    const d37v = jouer("procedure-verte", demande, verteTexte);
+    if (d37v !== null) echecs.push(`37 quater : procédure demandée et guide servi en tête → attendu laisser passer, obtenu ${JSON.stringify(d37v).slice(0, 220)}`);
+    const d37b = jouer("procedure-borne", "fais la mise à jour", rougeTexte);
+    if (d37b?.decision === "block")
+      echecs.push(`37 quinquies : aucune procédure demandée → S53 doit rester avertissante, obtenu un refus : ${String(d37b.reason).slice(0, 200)}`);
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 34/34 — le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 37/37 — une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");

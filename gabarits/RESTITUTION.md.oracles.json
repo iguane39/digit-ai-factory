@@ -1,14 +1,14 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\RESTITUTION.md",
-  "date_iso": "2026-08-30T07:34:29.227Z",
-  "registre_version": "2.13.0",
+  "cible": "C:\\dev\\digit-ai-factory\\gabarits\\RESTITUTION.md",
+  "date_iso": "2026-09-27T07:00:21.536Z",
+  "registre_version": "2.28.0",
   "profil": "digit-ai",
   "niveau": "note",
-  "verdict": "PASS",
+  "verdict": "FAIL",
   "resume": {
-    "pass": 3,
-    "fail": 0,
-    "skip": 4,
+    "pass": 5,
+    "fail": 1,
+    "skip": 2,
     "cache": 0
   },
   "bilan_fichiers": {
@@ -38,19 +38,19 @@
       "domaine": "Sécurité / secrets",
       "file": "gabarits\\RESTITUTION.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
       "file": "gabarits\\RESTITUTION.md",
-      "verdict": "SKIP",
-      "detail": ""
+      "verdict": "FAIL",
+      "detail": "1 constat(s) · N2 — compte contradictoire dans le même document : « Deux points » alors que le cardinal réel mesuré est 5"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "gabarits\\RESTITUTION.md",
-      "verdict": "SKIP",
-      "detail": ""
+      "verdict": "PASS",
+      "detail": "4 constat(s) · 4 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; pourcentage « 94,6 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -61,6 +61,12 @@
     {
       "domaine": "Cohérence inter-documents",
       "file": "gabarits\\RESTITUTION.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 0 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 1 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    },
+    {
+      "domaine": "Livrabilité d'une conséquence déclarée",
+      "file": "gabarits\\RESTITUTION.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -69,11 +75,11 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\RESTITUTION.md",
-    "ts": "2026-08-30T07:34:29.227Z",
+    "ts": "2026-09-27T07:00:21.536Z",
     "fichiers": {
-      "gabarits\\RESTITUTION.md": "fa4504acaa78375ed15cddae65cf4f8e7ce099cf948c9e7eb412c71c279cb8e7"
+      "gabarits\\RESTITUTION.md": "d9176847c25130fc22f553c3466d03378e8537a4bb88b148a90b261c377bebef"
     }
   },
   "empreinte_motif": null,
-  "verdict_oracles": "PASS"
+  "verdict_oracles": "FAIL"
 }

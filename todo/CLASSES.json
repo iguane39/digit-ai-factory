@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.21.0",
- "date": "2026-09-22",
+ "version": "1.22.0",
+ "date": "2026-09-27",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -1381,6 +1381,21 @@
     "lecture-tiers-non-jugee",
     "auteur-juge-son-contrat",
     "gabarit-conception-non-jugee"
+   ]
+  },
+  {
+   "cle": "interface-tierce-ecrite-de-memoire",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un parcours d interface tierce, un format d import ou une sonde d acces ecrits de memoire au lieu d etre lus dans la documentation officielle du jour : un bouton qui n existe pas, des gestes que la plateforme a supprimes, un fichier refuse en entier, une version d API retiree prise pour un refus d acces. Mesure le 22/09/2026 chez un produit (lot Produit-02 - RETOURS - 20260922a) : bouton « Previsualiser » prescrit la ou l ecran offre « Apercu », trois actions d acces supprimees par la plateforme le 09/09/2026 et prescrites quand meme, premier depot d import refuse en entier (201 erreurs, 5 causes), diagnostic d acces fait sur des versions d API retirees. Les restitutions etaient PASS : S13 exigeait un libelle d ecran, et un libelle ecrit de memoire en est un.",
+   "creee_le": "2026-09-27",
+   "fondee_par": [
+    "TF-1362"
+   ],
+   "regle": "toute action laissee a l humain qui vise l ecran d une plateforme tierce cite sa source officielle et la date ou elle a ete lue ; ce que seule la plateforme fournit (modele d import, rapport d erreurs) se demande dans le tour qui prepare le depot, et un fichier destine a la plateforme part de son modele officiel",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S52 (source officielle datee, referentiel gabarits/PLATEFORMES-TIERCES.json) et S53 (guide en tete pour manuelle_utilisateur) — fixtures a double sens au self-test (interface-sans-source, interface-avec-source, plateforme-sans-ecran) ; oracles/hook-restitution.mjs rend S53 bloquante quand le dernier message humain demande la procedure (recette hook-restitution.test.mjs, cas 35 a 37). Mesure du 27/09/2026 sur les 195 restitutions a bloc 8 du pilot : 16 accusees, 17 actions, 0 fausse accusation.",
+   "voisines": [
+    "restitution-bloquants-disperses",
+    "restitution-action-humaine-geste-agent"
    ]
   }
  ],

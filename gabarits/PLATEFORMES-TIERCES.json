@@ -1,0 +1,152 @@
+{
+  "format": "pilot/plateformes-tierces@1",
+  "version": "1.0.0",
+  "date": "2026-09-27",
+  "source": "D-24 (b) du 26/09/2026, TF-1362 — lot « Produit-02 - RETOURS - 20260922a » : le 22/09, un parcours d'import web nommait un bouton « Prévisualiser » que l'écran n'offre pas (il offre « Aperçu »), trois actions d'accès à l'API prescrites de mémoire avaient été supprimées par la plateforme le 09/09/2026, et un diagnostic d'accès avait été fait sur des versions d'API retirées. Chaque fois, la documentation officielle relue après la plainte disait autre chose que la mémoire.",
+  "pourquoi_une_donnee_et_pas_du_code": "Loi transverse n° 4 — une donnée volatile est une donnée, pas du code. Les plateformes, les adresses de leurs écrans et celles de leur documentation changent sans prévenir ; en ajouter une ne doit pas exiger une version de l'oracle.",
+  "pourquoi_une_liste_FERMEE_et_un_marqueur_d_ecran": "Mesuré le 27/09/2026 sur les restitutions du pilot (output\\04-plans, output\\03-etudes, output\\01-revues-et-propositions) : 195 portent un bloc 8, 537 lignes d'action y sont laissées à l'humain, et 59 de ces lignes nomment une plateforme. Une bonne moitié de ces 59 ne visent AUCUNE interface : une décision à trancher dont le motif dit « publier sur GitHub vous revient », une commande git sur l'autre poste, un chemin `.github/workflows` entre accents graves. Nommer la plateforme ne suffit donc pas : une action vise son interface quand elle en cite une adresse d'écran, ou quand elle la nomme HORS de tout fragment de code ET porte un marqueur d'écran (cliquer, bouton, écran, onglet, menu, réglages, paramètres, console, tableau de bord, éditeur, se connecter, formulaire, cocher, activer, désactiver, autoriser).",
+  "regle": "S52 d'oracle-synthese : une action du bloc 8 laissée à l'humain (manuelle_dev ou manuelle_utilisateur) qui vise l'interface d'une plateforme de cette liste cite, dans son propre groupe, une SOURCE OFFICIELLE de cette plateforme et la DATE où elle a été lue (« lue le 22/09/2026 », « relue le 21/09 », « page du 2026-03-31 »). Est officielle une adresse qui commence par l'un des préfixes de `sources_officielles`, ou une adresse de l'un des `domaines` de la plateforme dont l'hôte commence par docs., support., help., developers., developer. ou learn., ou dont le chemin commence par /docs, /help, /support, /answer, /legal ou /policies. S53 : la même action, laissée à manuelle_utilisateur, est guidée écran par écran dans une section « Guide » placée avant le bloc 0.",
+  "plateformes": [
+    {
+      "nom": "Google Ads",
+      "reperes": ["Google Ads", "Ads Editor"],
+      "hotes_interface": ["ads.google.com"],
+      "domaines": ["google.com"],
+      "sources_officielles": ["support.google.com", "developers.google.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "lot Produit-02 20260922a, annexe B (pages officielles « Developer token » et « Access levels » de la documentation de l'API) ; adresse d'écran citée par les synthèses 20260901h et 20260901i"
+    },
+    {
+      "nom": "Google Cloud",
+      "reperes": ["Google Cloud", "console Cloud"],
+      "hotes_interface": ["console.cloud.google.com"],
+      "domaines": ["google.com"],
+      "sources_officielles": ["developers.google.com", "support.google.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "lot Produit-02 20260922a, annexe B : l'accès à l'API Google Ads s'inscrit dans la console Google Cloud depuis le 09/09/2026"
+    },
+    {
+      "nom": "Google Search Console",
+      "reperes": ["Search Console"],
+      "hotes_interface": ["search.google.com"],
+      "domaines": ["google.com"],
+      "sources_officielles": ["support.google.com", "developers.google.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\SEO-RECHERCHE.md et les études SEO du pilot, qui la nomment ; sources Google citées par references\\PLATEFORMES-RESEAUX.md"
+    },
+    {
+      "nom": "Fiche d'établissement Google",
+      "reperes": ["fiche d'établissement", "Google Business Profile"],
+      "hotes_interface": ["business.google.com"],
+      "domaines": ["google.com"],
+      "sources_officielles": ["support.google.com/business", "developers.google.com/my-business"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\PLATEFORMES-RESEAUX.md et references\\INTEGRATIONS-FOURNISSEURS.md (developers.google.com/my-business/content/policies)"
+    },
+    {
+      "nom": "Bing Webmaster Tools",
+      "reperes": ["Bing Webmaster"],
+      "hotes_interface": ["www.bing.com/webmasters", "bing.com/webmasters"],
+      "domaines": ["bing.com", "microsoft.com"],
+      "sources_officielles": ["learn.microsoft.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "adresse d'écran citée par les synthèses 20260901h et 20260901i"
+    },
+    {
+      "nom": "GitHub",
+      "reperes": ["GitHub"],
+      "hotes_interface": ["github.com"],
+      "domaines": ["github.com"],
+      "sources_officielles": ["docs.github.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "docs.github.com cité par les études 20260817 (renommage et séquencement de la factory) ; écrans des demandes de fusion et des branches cités par les synthèses du 14 au 21/09"
+    },
+    {
+      "nom": "LinkedIn",
+      "reperes": ["LinkedIn"],
+      "hotes_interface": ["www.linkedin.com", "linkedin.com"],
+      "domaines": ["linkedin.com", "microsoft.com"],
+      "sources_officielles": ["learn.microsoft.com/en-us/linkedin", "www.linkedin.com/help", "linkedin.com/help", "linkedin.com/legal", "www.linkedin.com/legal"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\INTEGRATIONS-FOURNISSEURS.md §LinkedIn et references\\PLATEFORME-LINKEDIN.md"
+    },
+    {
+      "nom": "Meta (Facebook, Instagram, Threads)",
+      "reperes": ["Facebook", "Instagram", "Meta Business"],
+      "hotes_interface": ["www.facebook.com", "business.facebook.com", "www.instagram.com"],
+      "domaines": ["facebook.com", "instagram.com", "threads.com", "meta.com"],
+      "sources_officielles": ["developers.facebook.com", "www.facebook.com/help", "help.instagram.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\PLATEFORMES-RESEAUX.md (developers.facebook.com, facebook.com/help, help.instagram.com)"
+    },
+    {
+      "nom": "TikTok",
+      "reperes": ["TikTok"],
+      "hotes_interface": ["www.tiktok.com"],
+      "domaines": ["tiktok.com"],
+      "sources_officielles": ["developers.tiktok.com", "support.tiktok.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\PLATEFORMES-RESEAUX.md (developers.tiktok.com/docs)"
+    },
+    {
+      "nom": "YouTube",
+      "reperes": ["YouTube"],
+      "hotes_interface": ["studio.youtube.com", "www.youtube.com"],
+      "domaines": ["youtube.com", "google.com"],
+      "sources_officielles": ["support.google.com/youtube", "developers.google.com/youtube"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\PLATEFORMES-RESEAUX.md (developers.google.com/youtube/v3/getting-started)"
+    },
+    {
+      "nom": "X",
+      "reperes": ["Twitter"],
+      "hotes_interface": ["x.com", "twitter.com"],
+      "domaines": ["x.com", "twitter.com"],
+      "sources_officielles": ["docs.x.com", "help.x.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\INTEGRATIONS-FOURNISSEURS.md (docs.x.com, relu le 21/09/2026) et references\\PLATEFORMES-RESEAUX.md (help.x.com)"
+    },
+    {
+      "nom": "OVH",
+      "reperes": ["OVH", "OVHcloud"],
+      "hotes_interface": ["www.ovh.com/manager", "www.ovh.com/auth", "eu.api.ovh.com"],
+      "domaines": ["ovh.com", "ovhcloud.com"],
+      "sources_officielles": [],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\INTEGRATIONS-FOURNISSEURS.md §OVH (page de création de jeton, point d'accès EU) ; aucune adresse de documentation n'y est citée : la source officielle se reconnaît par la règle des domaines"
+    },
+    {
+      "nom": "Cloudflare",
+      "reperes": ["Cloudflare"],
+      "hotes_interface": ["dash.cloudflare.com"],
+      "domaines": ["cloudflare.com"],
+      "sources_officielles": [],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "references\\INTEGRATIONS-FOURNISSEURS.md §Cloudflare, qui ne cite aucune adresse : la source officielle se reconnaît par la règle des domaines"
+    },
+    {
+      "nom": "Claude (claude.ai)",
+      "reperes": ["claude.ai"],
+      "hotes_interface": ["claude.ai"],
+      "domaines": ["claude.ai", "claude.com", "anthropic.com"],
+      "sources_officielles": ["code.claude.com/docs", "docs.claude.com", "support.claude.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "étude 20260922 sur la messagerie entre sessions (code.claude.com/docs/en/cross-session-messaging.md) ; réglages de skills de claude.ai cités par la synthèse 20260917j"
+    },
+    {
+      "nom": "Azure DevOps",
+      "reperes": ["Azure DevOps"],
+      "hotes_interface": ["dev.azure.com"],
+      "domaines": ["azure.com", "microsoft.com"],
+      "sources_officielles": ["learn.microsoft.com"],
+      "releve_le": "2026-09-27",
+      "source_du_releve": "synthèse 20260911d (dépôts clients hébergés sur Azure DevOps et GitHub)"
+    }
+  ],
+  "non_juge": [
+    "une plateforme ABSENTE de cette liste n'est pas jugée : la liste grossit par les retours, comme celle du jargon",
+    "une action qui nomme une plateforme SANS marqueur d'écran ni adresse d'écran n'est pas jugée — c'est le prix de zéro accusation sur une décision ou une commande",
+    "le CONTENU de la source citée n'est pas relu : la règle exige qu'une source officielle soit citée et datée, elle ne vérifie pas que la page dit ce que l'action dit",
+    "l'ÂGE de la date de lecture n'est pas borné : une page lue il y a trois mois reste recevable, et c'est à l'auteur de la relire le jour même quand la plateforme vient de changer"
+  ]
+}
