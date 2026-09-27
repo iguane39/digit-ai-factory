@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 413 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 414 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -343,6 +343,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md | 20260921d | 15.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md` |
 | Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md | 20260921e | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md` |
 | Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Garde d envoi du canal confidentiel posee et eprouvee - 20260927c.md | 20260927c | 12.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Garde d envoi du canal confidentiel posee et eprouvee - 20260927c.md` |
 | Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md | 20260830g | 16 Ko | `04-plans/Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` |
 | Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md | 20260909a | 20.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` |
 | Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md | 20260911a | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md` |

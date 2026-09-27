@@ -111,6 +111,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md` | fichier | 14,4 Ko | Les 2 postes sont fusionnés : 7 dépôts réconciliés au cas par cas, publiés, et le parc ent |
 | `Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md` | fichier | 15,6 Ko | Synthèse de mandat — la fusion est passée, et j'ai effacé une alerte en cherchant à la lir |
 | `Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md` | fichier | 14,1 Ko | La fusion est publiée, mais une session Claude distante écrit encore sur la branche : ne l |
+| `Digit-AI - Synthese Mandat - Garde d envoi du canal confidentiel posee et eprouvee - 20260927c.md` | fichier | 12,7 Ko | Digit-AI — Synthèse de mandat — La garde d'envoi du canal confidentiel posée et éprouvée — |
 | `Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` | fichier | 16,0 Ko | Synthèse de mandat — le contrôle d'héritage joué à chaque ouverture, et la fin d'un faux r |
 | `Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` | fichier | 20,3 Ko | Synthèse de mandat — l'histoire publiée du pilot est réécrite, republiée, et ne porte plus |
 | `Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md` | fichier | 12,5 Ko | Synthèse de mandat — votre feu vert est exécuté : huit enregistrements publiés, le registr |
@@ -220,4 +221,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_203 fichier(s), 0 sous-dossier(s)_
+_204 fichier(s), 0 sous-dossier(s)_
