@@ -208,6 +208,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Traite tous les todos et retours registre de 87 candidats a 3 - 20260914f.md` | fichier | 20,4 Ko | Synthèse de mandat — les retours sont tous pris, et le registre passe de 87 candidatures à |
 | `Digit-AI - Synthese Mandat - Treize decisions executees et le sceau rendu portable - 20260922h.md` | fichier | 18,0 Ko | Digit-AI — Synthèse de mandat — 13 décisions exécutées et le sceau rendu portable — 22/09/ |
 | `Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md` | fichier | 22,8 Ko | Synthèse de mandat — le socle est corrigé sur ses trois défauts, et le balayage a trouvé l |
+| `Digit-AI - Synthese Mandat - Trois decisions executees lots adresse et garde de publication - 20260927b.md` | fichier | 17,7 Ko | Digit-AI — Synthèse de mandat — Trois décisions exécutées : lots accueillis, adresse retir |
 | `Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md` | fichier | 25,4 Ko | Synthèse de mandat — vos trois décisions sont exécutées : le moteur d'audit sait couvrir,  |
 | `Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md` | fichier | 26,9 Ko | Synthèse de mandat — les trois runs de forge sont joués et enregistrés, le plancher d'écri |
 | `Digit-AI - Synthese Mandat - Trois lots ingeres et quatre defauts du pilot corriges - 20260909b.md` | fichier | 23,2 Ko | Synthèse de mandat — la boîte de retours est vide, quatre défauts du pilot sont corrigés e |
@@ -219,4 +220,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_202 fichier(s), 0 sous-dossier(s)_
+_203 fichier(s), 0 sous-dossier(s)_

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 412 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 413 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -458,6 +458,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Traite tous les todos et retours registre de 87 candidats a 3 - 20260914f.md | 20260914f | 20.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les todos et retours registre de 87 candidats a 3 - 20260914f.md` |
 | Digit-AI - Synthese Mandat - Treize decisions executees et le sceau rendu portable - 20260922h.md | 20260922h | 18 Ko | `04-plans/Digit-AI - Synthese Mandat - Treize decisions executees et le sceau rendu portable - 20260922h.md` |
 | Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md | 20260915c | 22.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md` |
+| Digit-AI - Synthese Mandat - Trois decisions executees lots adresse et garde de publication - 20260927b.md | 20260927b | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois decisions executees lots adresse et garde de publication - 20260927b.md` |
 | Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md | 20260910f | 25.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md` |
 | Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md | 20260912b | 26.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md` |
 | Digit-AI - Synthese Mandat - Trois lots ingeres et quatre defauts du pilot corriges - 20260909b.md | 20260909b | 23.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois lots ingeres et quatre defauts du pilot corriges - 20260909b.md` |
