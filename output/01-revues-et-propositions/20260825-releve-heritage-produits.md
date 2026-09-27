@@ -39,7 +39,7 @@ correction rend possible.
 | `_Client-A/Plateforme_video_IA_complet` | 7 | 0 | 1/8 | gabarit de retours, outil de vérification, hook de fin de tour, gabarit de restitution, configuration d'agent, robots.txt, llms.txt |
 | `_Client-A/Produit-01` | 6 | 0 | 2/8 | gabarit de retours, outil de vérification, hook de fin de tour, gabarit de restitution, robots.txt, llms.txt |
 | `_Client-A/BourseAuxVacants2/Produit-11` | 6 | 0 | 2/8 | hook de fin de tour, gabarit de restitution, configuration d'agent, consignes, robots.txt, llms.txt |
-| `_Client-A/COMPTA---Ventillation-de-facture-Fournisseur-A` | 2 | 0 | 6/8 | robots.txt, llms.txt |
+| `_Client-A/Produit-73` | 2 | 0 | 6/8 | robots.txt, llms.txt |
 | `_Client-A/Produit-10` | 2 | 0 | 6/8 | robots.txt, llms.txt |
 
 **7 produits relevés · 38 manques sur 56 possibles · contrat v1.2.0.**

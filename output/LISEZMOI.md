@@ -80,7 +80,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 
 | Livrable | Version | Poids | Chemin à copier |
 |---|---|---|---|
-| 20260825-releve-heritage-produits.md | — | 5.8 Ko | `01-revues-et-propositions/20260825-releve-heritage-produits.md` |
+| 20260825-releve-heritage-produits.md | — | 5.7 Ko | `01-revues-et-propositions/20260825-releve-heritage-produits.md` |
 | Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md | 20260815a | 5.4 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` |
 | Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md.jugement.json | — | 0.4 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md.jugement.json` |
 | Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md | 20260815a | 11 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` |
@@ -154,7 +154,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260817-etude-opportunite-rangement-output.md | — | 18.3 Ko | `03-etudes/20260817-etude-opportunite-rangement-output.md` |
 | 20260817-etude-opportunite-renommage-factory.md | — | 22.8 Ko | `03-etudes/20260817-etude-opportunite-renommage-factory.md` |
 | 20260817-etude-opportunite-sequencement-factory.md | — | 44.8 Ko | `03-etudes/20260817-etude-opportunite-sequencement-factory.md` |
-| 20260817-etude-opportunite-tests-bout-en-bout.md | — | 27.3 Ko | `03-etudes/20260817-etude-opportunite-tests-bout-en-bout.md` |
+| 20260817-etude-opportunite-tests-bout-en-bout.md | — | 27.2 Ko | `03-etudes/20260817-etude-opportunite-tests-bout-en-bout.md` |
 | 20260817-etude-opportunite-todo-produit.md | — | 27.4 Ko | `03-etudes/20260817-etude-opportunite-todo-produit.md` |
 | 20260818-cartographie-oracles-cadence-de-mission.md | — | 5.7 Ko | `03-etudes/20260818-cartographie-oracles-cadence-de-mission.md` |
 | 20260818-etude-opportunite-admission-digit-ai-queue.md | — | 14.8 Ko | `03-etudes/20260818-etude-opportunite-admission-digit-ai-queue.md` |

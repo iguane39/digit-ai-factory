@@ -24,7 +24,7 @@ aller-retour ou une découverte par lecture de code) · **mineur** (confort/pré
 ## Le fait mesuré, avant toute interprétation
 
 Session ouverte à la racine **englobante** `c:\dev\_Client-A\BourseAuxVacants2`, config active
-`CLAUDE_CONFIG_DIR=.claude-b`. Le produit instancié vit dans `bav-dev\` (et `Produit-11\`),
+`CLAUDE_CONFIG_DIR=.claude-b`. Le produit instancié vit dans `Produit-75\` (et `Produit-11\`),
 dont le `.claude\settings.json` câble **quatre** hooks de la doctrine : `SessionStart` (fraîcheur),
 `Stop` (**restitution jugée à la fin de chaque tour**), `PostToolUse` (page-html), `UserPromptSubmit`
 (lexique). Le `.claude\settings.json` posé le 09/09 à la racine englobante ne reprend **que**
@@ -64,7 +64,7 @@ Ce que le produit a corrigé chez lui sur ce mandat, avec son verdict de génér
 
 | Remarque (chez le produit) | Corrigée comment | Généralisable ? | Verdict |
 |---|---|---|---|
-| Le plan de tests de sécurité était déposé dans `proposition-tests\livrables\` (sortie de la forge de tests), pas dans le produit | Déplacé en `bav-dev\docs\projet\PLAN-TESTS-SECURITE.md`, nommé à la convention du dossier | **oui** | Classe existante `emplacement-livrable-hors-convention` (R-4). Corrigé localement ; le défaut a été commis, il vaut d'être compté |
+| Le plan de tests de sécurité était déposé dans `proposition-tests\livrables\` (sortie de la forge de tests), pas dans le produit | Déplacé en `Produit-75\docs\projet\PLAN-TESTS-SECURITE.md`, nommé à la convention du dossier | **oui** | Classe existante `emplacement-livrable-hors-convention` (R-4). Corrigé localement ; le défaut a été commis, il vaut d'être compté |
 | L'en-tête du plan revendiquait une rédaction « à la main, distincte des cahiers à sceau Forge » — un habillage du contournement de l'outillage | Réécrit pour pointer la provenance réelle : forge websec, référentiels ASVS/WSTG, oracles, dont `oracle-sca` déjà exécuté | non | Correction de formulation propre à ce livrable |
 | Le réflexe « chercher l'oracle du domaine avant d'écrire un contrôle » n'a pas joué | Deux mémoires de travail écrites (forge websec pour la sécurité ; livrable produit hors dossier Factory) | **oui** | C'est RT-50 et RT-52 ci-dessus ; la mémoire locale ne remplace pas la règle de socle |
 

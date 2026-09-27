@@ -38,7 +38,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260817-etude-opportunite-rangement-output.md` | fichier | 18,3 Ko | Étude d'opportunité — rangement des livrables destinés à l'humain dans `output\` (TF-0319) |
 | `20260817-etude-opportunite-renommage-factory.md` | fichier | 22,8 Ko | Étude d'opportunité — renommage du pilot en « factory » — 20260817h |
 | `20260817-etude-opportunite-sequencement-factory.md` | fichier | 44,8 Ko | Étude d'opportunité — séquencement du renommage `digit-ai-forge-pilot` → `digit-ai-factory |
-| `20260817-etude-opportunite-tests-bout-en-bout.md` | fichier | 27,3 Ko | Étude d'opportunité — fermeture de la voie « proposition de tests » (TF-0349) — 20260817j |
+| `20260817-etude-opportunite-tests-bout-en-bout.md` | fichier | 27,2 Ko | Étude d'opportunité — fermeture de la voie « proposition de tests » (TF-0349) — 20260817j |
 | `20260817-etude-opportunite-todo-produit.md` | fichier | 27,4 Ko | Étude d'opportunité — la todo de chaque produit en page HTML — 20260817i |
 | `20260818-cartographie-oracles-cadence-de-mission.md` | fichier | 5,7 Ko | Digit-AI — Cartographie des oracles : les cinq artefacts de cadence — 20260818a |
 | `20260818-etude-opportunite-admission-digit-ai-queue.md` | fichier | 14,8 Ko | Étude d'opportunité — admission de `digit-ai-queue` au corpus du pilot — 20260818a |

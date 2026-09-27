@@ -17,7 +17,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (1 fichier) | — | Les revues et propositions REMISES qui ne sont plus la référence courante. Un livrable n'entre ici que pour une raison, et jamais pour être corrigé : *une nouve… |
-| `20260825-releve-heritage-produits.md` | fichier | 5,8 Ko | Relevé de l'héritage chez les produits — 25/08/2026 |
+| `20260825-releve-heritage-produits.md` | fichier | 5,7 Ko | Relevé de l'héritage chez les produits — 25/08/2026 |
 | `Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` | fichier | 5,4 Ko | Proposition d'architecture — le circuit de l'insatisfaction |
 | `Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` | fichier | 11,0 Ko | Proposition — Doctrine « restitution lisible » pour forge-design |
 | `Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md` | fichier | 9,4 Ko | Digit-AI — Proposition : optimisation de la tuyauterie cognitive — 2026-08-09 |

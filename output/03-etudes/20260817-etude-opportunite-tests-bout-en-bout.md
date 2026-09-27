@@ -44,7 +44,7 @@ PROPOSITIONS déposées dans un dossier … »). Exemplaires réels, mesurés le
 | `C:\dev\_Client-A\BourseAuxVacants2\proposition-tests\livrables\Produit-11 - Cahier de tests fonctionnels - 20260817b.md` | 2026-08-17 | 160 éléments inventoriés · **971 cas dérivés · 0 cas adoptés** · 4 non couverts |
 | `…\Produit-11 - Cahier de tests techniques - 20260817b.md` | 2026-08-17 | 102 inventoriés · **94 cas · 0 adoptés** · 8 non couverts |
 | `C:\dev\_Client-A\Produit-01-livrables\Produit-01 - Cahier de tests fonctionnels - 20260812a.md` | 2026-08-12 | 120 inventoriés · **176 cas dérivés** |
-| `C:\dev\_Client-A\COMPTA---Ventillation-de-facture-Fournisseur-A\forge\etapes\tests\livrables\COMPTA … Cahier de tests fonctionnels - 20260814b.md` | 2026-08-14 | 389 inventoriés · **680 cas · 0 adoptés** |
+| `C:\dev\_Client-A\Produit-73\forge\etapes\tests\livrables\COMPTA … Cahier de tests fonctionnels - 20260814b.md` | 2026-08-14 | 389 inventoriés · **680 cas · 0 adoptés** |
 | `C:\dev\_Client-A\Cockpit IA\client-a-cockpit-ia\forge\etapes\tests\client-a-cockpit-ia - Cahier de tests fonctionnels - 20260814a.md` | 2026-08-14 | proposition, noyée parmi ~20 rapports d'exécution du même dossier |
 | `C:\dev\digit-ai-forge-pilot\output\04-plans\20260813-plan-strategie-tests-e2e.md` | 2026-08-13 | « **Livrable = ce plan** (document), pas l'implémentation » — feuille de route = candidatures |
 | `C:\dev\CoproPulse\docs\TEST_STRATEGY.md` | 2026-05-22 | en-tête « Statut Proposition » (produit hors écosystème forgé) |
