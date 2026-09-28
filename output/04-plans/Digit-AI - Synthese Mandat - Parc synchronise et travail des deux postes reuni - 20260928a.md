@@ -26,8 +26,8 @@ la question que je préparais n'a plus lieu d'être. Ce qui vous attend : 1 déc
 - **sur quoi** — les 16 dépôts gouvernés de `c:\dev` : le pilot `digit-ai-factory`, les 13 forges
   `digit-ai-forge-*`, `digit-ai-queue` et le canal confidentiel cloné sous `_confidentiel` ; aucun
   dépôt de produit n'a été modifié.
-- **quand** — le 28/09/2026, de 08:54 à 10:54 puis de 14:30 à 14:38 (UTC+02:00) après une
-  interruption de la session, soit 2 h 08 de travail ; heures relevées par `date`, la fin est
+- **quand** — le 28/09/2026, de 08:54 à 10:54 puis de 14:30 à 14:55 (UTC+02:00) après une
+  interruption de la session, soit 2 h 25 de travail ; heures relevées par `date`, la fin est
   l'heure de dépôt de cette synthèse, son envoi suit.
 - **qui** — session de pilotage Claude Opus 5.5 ; 2 agents d'analyse en lecture seule sur Claude
   Sonnet 5, le défaut du routage, l'un pour `digit-ai-forge-agents`, l'autre pour 4 petits dépôts ;
@@ -43,7 +43,7 @@ la question que je préparais n'a plus lieu d'être. Ce qui vous attend : 1 déc
 
 ## 2. Verdict en une ligne
 
-**16 dépôts sur 16 à égalité avec GitHub** (`0 0` à 14:34, après `git fetch`) ·
+**16 dépôts sur 16 à égalité avec GitHub** (`0 0` à 14:55, après `git fetch`) ·
 **pilot** : 11 enregistrements et le travail non enregistré des 24 et 25/09 reportés en
 4 enregistrements, publiés à 11:59:53 · **27 candidatures renumérotées** TF-1395 à TF-1421 ·
 **3 enregistrements de forge** publiés (`digit-ai-forge-agents` 2, `digit-ai-forge-design` 1),
@@ -181,7 +181,10 @@ réécriture d'histoire mais un même travail fait 2 fois, et c'est ce qui a fix
   registre, avec une note qui constate l'intégration du gabarit.
   - preuve : `todo/journaliser.mjs`, 3 événements écrits, `oracle-todo` PASS avant et après.
 - **Le relevé final.**
-  - preuve : après un nouveau `git fetch`, les 16 dépôts rendent `0 0` à 14:34:01 ; à 14:37:51, le pilot porte 1 enregistrement de plus, les notes du registre et les relevés du jour, qui part avec cette synthèse. Restent hors enregistrement : la table du canal et sa copie du 22/09, et le dossier de références créé aujourd'hui dans `digit-ai-forge-design` par une autre session.
+  - preuve : le dernier envoi du pilot rend `80c126f..02ffd8c` à 14:54:32, sortie 0, après
+    15 minutes 30 de porte des noms ; après un nouveau `git fetch`, les 16 dépôts rendent `0 0` à
+    14:55:15. Restent hors enregistrement : la table du canal et sa copie du 22/09, et le dossier de
+    références créé aujourd'hui dans `digit-ai-forge-design` par une autre session.
 
 ## 5. Non traité — avec son motif
 
@@ -253,9 +256,9 @@ réécriture d'histoire mais un même travail fait 2 fois, et c'est ce qui a fix
   - signal : une synchronisation qui trouve des créations des 2 côtés sous le même numéro.
   - parade : cette synthèse publie la numérotation jusqu'à TF-1421 et D-31 ; tout tour qui écrit au
     registre commence par `git fetch`.
-- **La porte des noms du pilot dure désormais plus de 25 minutes**, contre 3 le 25/09 sur l'autre
-  poste : elle relit aussi les 2 branches locales du gabarit.
-  - signal : un envoi du pilot qui attend sa porte plus de 25 minutes.
+- **La porte des noms du pilot a duré aujourd'hui de 15 à plus de 25 minutes**, contre 3 le 25/09
+  sur l'autre poste : elle relit aussi les 2 branches locales du gabarit.
+  - signal : un envoi du pilot qui attend sa porte plus de 15 minutes.
   - parade : l'action A-7 retire ces 2 branches, intégrées à `main` et sauvegardées.
 
 ## 8. Prochaines actions
@@ -278,9 +281,9 @@ première action de l'IA en dépend.
 
 - Fichier jugé : ce document — verdict d'`oracle-synthese` au journal homonyme.
 - Publiés : `digit-ai-forge-design` `37f0ade..5172b81` ; `digit-ai-forge-agents` `e3da518..6a64883` ;
-  pilot `a464cb9..80c126f`, dont mes 4 enregistrements `f2ba873` à `73aca64` ; cette synthèse, les
-  3 notes du registre, le relevé d'héritage du jour et les index régénérés partent par un dernier
-  envoi.
+  pilot `a464cb9..80c126f`, dont mes 4 enregistrements `f2ba873` à `73aca64`, puis
+  `80c126f..02ffd8c` à 14:54:32 : les 3 notes du registre, les relevés d'héritage du jour et cette
+  synthèse ; cette mise à jour de la synthèse part par un dernier envoi.
 - Sauvegardes, hors dépôt : `c:\dev\_sauvegardes\synchro-20260928\` — 7 paquets git, le
   différentiel et l'archive des fichiers non suivis du pilot, son hook d'enregistrement d'avant,
   les copies installées de 4 skills d'avant réalignement, les sorties d'`oracle-skills`.

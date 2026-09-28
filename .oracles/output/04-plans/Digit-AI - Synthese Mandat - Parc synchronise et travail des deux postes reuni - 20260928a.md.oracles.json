@@ -1,6 +1,6 @@
 {
   "cible": "output/04-plans/Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md",
-  "date_iso": "2026-09-28T12:38:34.965Z",
+  "date_iso": "2026-09-28T12:55:59.948Z",
   "registre_version": "2.28.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md",
-    "ts": "2026-09-28T12:38:34.963Z",
+    "ts": "2026-09-28T12:55:59.947Z",
     "fichiers": {
-      "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md": "a4819f8ff6ac4f1648e35145c94cc72da89eacfaa40d37d872772d123a37622f"
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md": "97e41d307f3e072017f4aaf159774fa2347de9d49cb8369ad61b9a42cec60064"
     }
   },
   "empreinte_motif": null,
