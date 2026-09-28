@@ -26,8 +26,9 @@
 #    garde regenere puis re-indexe les index quand l enregistrement touche input\ ou output\. Elle
 #    ne refuse JAMAIS : un generateur qui echoue se dit, et l enregistrement passe.
 #
-# Les trois ne coutent que quelques secondes, la ou la porte de publication prend trois a cinq
-# minutes -- c'est pour cela qu'elles vivent ici et non au push.
+# Les trois ne coutent que quelques secondes, la ou la porte de publication prenait de 15 a 27
+# minutes sur le pilot (mesure du 28/09/2026, TF-1448), et en prend encore plusieurs depuis qu'elle
+# juge chaque blob une fois -- c'est pour cela qu'elles vivent ici et non au push.
 #
 # Contournement explicite si vous savez ce que vous faites : git commit --no-verify
 RACINE="$(git rev-parse --show-toplevel)"
