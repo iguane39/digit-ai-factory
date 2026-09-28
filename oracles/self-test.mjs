@@ -1755,5 +1755,86 @@ check("TF-0923 (b) borne : sans run_open DATÉ au ledger, la comparaison n'a pas
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1439 (28/09) — R-13 et R-27 LISENT le type « documentaire » que l'adoption POSE -------
+// De bout en bout : la verte est adoptée par le vrai `adopter-projet-existant.mjs --type
+// documentaire`, jamais écrite à la main. Les rouges sont des produits qui se DISENT documentaires
+// et ne le sont pas (l'adoption les refuse, la déclaration est donc écrite à la main dans
+// l'en-tête du carnet) : un produit web qui s'exempterait de R-13 par une ligne doit rester vu.
+const { adopter: adopter1439, TYPE_DOCUMENTAIRE: DOC1439, CARNET: CARNET1439, declarerType: declarer1439 } =
+  await import(new URL("../scripts/adopter-projet-existant.mjs", import.meta.url).href);
+const projet1439 = (fichiers) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1439-"));
+  for (const [rel, contenu] of Object.entries(fichiers)) { mkdirSync(dirname(join(d, rel)), { recursive: true }); writeFileSync(join(d, rel), contenu, "utf8"); }
+  return d;
+};
+/** Un produit adopté SANS type (l'adoption refuse le type à qui porte du code), puis déclaré à la main. */
+const seDitDocumentaire = (fichiers) => {
+  const d = projet1439(fichiers);
+  if (adopter1439(d).verdict !== "ADOPTE") throw new Error("l'adoption de la fixture a échoué");
+  const carnet = join(d, ...CARNET1439.split("/"));
+  writeFileSync(carnet, declarer1439(readFileSync(carnet, "utf8")), "utf8");
+  return d;
+};
+const r1439 = (d) => (lanceArgs(d, "--regles", "R-13,R-27").rapport.findings || []);
+check("TF-1439 vert : un projet adopté `--type documentaire` → R-13 et R-27 SANS_OBJET qui NOMMENT la déclaration, aucun FAIL", () => {
+  const d = projet1439({ "notes/etude.md": "# Étude\n", "README.md": "# Dossier\n" });
+  try {
+    const a = adopter1439(d, { type: DOC1439 });
+    if (a.verdict !== "ADOPTE") throw new Error(`adoption : ${a.verdict} — ${a.motif}`);
+    const f = r1439(d);
+    const f13 = f.filter((x) => x.regle === "R-13"), f27 = f.find((x) => x.regle === "R-27");
+    if (f13.some((x) => x.statut === "FAIL")) throw new Error(`R-13 rougit un projet documentaire : ${JSON.stringify(f13)}`);
+    if (!f13.some((x) => x.statut === "SANS_OBJET" && /documentaire/.test(x.message) && /ECARTS-ASSUMES/.test(x.message))) throw new Error(`R-13 ne dit pas pourquoi elle est sans objet : ${JSON.stringify(f13)}`);
+    if (!f27 || f27.statut !== "SANS_OBJET" || !/documentaire/.test(f27.message)) throw new Error(`R-27 ne lit pas la déclaration : ${JSON.stringify(f27)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1439 rouge : un produit WEB (manifeste, code, robots.txt, llms.txt) qui se dit documentaire → R-13 FAIL qui nomme la déclaration et ses signaux", () => {
+  const d = seDitDocumentaire({ "package.json": "{}\n", "src/server.js": "console.log(1)\n", "robots.txt": "User-agent: *\nAllow: /\n", "llms.txt": "# site\n" });
+  try {
+    const f13 = r1439(d).filter((x) => x.regle === "R-13");
+    const contredit = f13.find((x) => x.statut === "FAIL" && /déclaré « documentaire »/.test(x.message));
+    if (!contredit) throw new Error(`la déclaration fausse n'est pas refusée : ${JSON.stringify(f13)}`);
+    if (!/package\.json/.test(contredit.message) || !/src\/server\.js/.test(contredit.message) || !/robots\.txt/.test(contredit.message)) throw new Error(`les signaux ne sont pas nommés : ${contredit.message}`);
+    if (f13.some((x) => x.statut === "SANS_OBJET")) throw new Error("le produit web a obtenu l'exemption documentaire");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1439 rouge : un seul script suffit (scripts/export.py) — la déclaration ne couvre pas un logiciel, même sans site", () => {
+  const d = seDitDocumentaire({ "notes/a.md": "# a\n", "scripts/export.py": "print(1)\n" });
+  try {
+    const f13 = r1439(d).filter((x) => x.regle === "R-13");
+    if (!f13.some((x) => x.statut === "FAIL" && /scripts\/export\.py \(code\)/.test(x.message))) throw new Error(`le script ne contredit pas la déclaration : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1439 borne : `type_projet` écrit dans le CORPS du carnet n'est pas une déclaration → R-13 jugée comme partout", () => {
+  const d = projet1439({ "notes/a.md": "# a\n" });
+  try {
+    adopter1439(d);
+    const carnet = join(d, ...CARNET1439.split("/"));
+    writeFileSync(carnet, readFileSync(carnet, "utf8") + "\ntype_projet: documentaire\n", "utf8");
+    const f13 = r1439(d).filter((x) => x.regle === "R-13");
+    if (!f13.some((x) => x.statut === "FAIL" && /absent/.test(x.message)) || f13.some((x) => x.statut === "SANS_OBJET")) throw new Error(`une ligne de corps a exempté R-13 : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1439 borne : un type inconnu (« docu ») est nommé et n'exempte de rien", () => {
+  const d = projet1439({ "notes/a.md": "# a\n" });
+  try {
+    adopter1439(d);
+    const carnet = join(d, ...CARNET1439.split("/"));
+    writeFileSync(carnet, declarer1439(readFileSync(carnet, "utf8"), "docu"), "utf8");
+    const f13 = r1439(d).filter((x) => x.regle === "R-13");
+    if (!f13.some((x) => x.statut === "FAIL" && /« docu » inconnu/.test(x.message)) || f13.some((x) => x.statut === "SANS_OBJET")) throw new Error(JSON.stringify(f13));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1439 remède joué : la ligne retirée de l'en-tête et `.env.example` déclaré → R-13 PASS (TF-1013)", () => {
+  const d = seDitDocumentaire({ "package.json": "{}\n", "src/server.js": "console.log(1)\n" });
+  try {
+    const carnet = join(d, ...CARNET1439.split("/"));
+    writeFileSync(carnet, readFileSync(carnet, "utf8").replace(/^type_projet: documentaire\r?\n/m, ""), "utf8");
+    writeFileSync(join(d, ".env.example"), "# ne jamais renseigner de secret ici\nPORT=8000\n", "utf8");
+    const f13 = r1439(d).filter((x) => x.regle === "R-13");
+    if (f13.some((x) => x.statut === "FAIL") || !f13.some((x) => x.statut === "PASS")) throw new Error(`le remède prescrit ne rend pas R-13 verte : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

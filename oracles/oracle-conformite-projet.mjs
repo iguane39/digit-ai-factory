@@ -39,6 +39,9 @@ import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge } from "
 // sont DÉCLARÉS chez le générateur qui les applique, et LUS ici. Une copie se périmerait au
 // premier rôle ajouté là-bas, en silence.
 import { rolePageHomonyme, DOCTRINE_PAGE_HOMONYME } from "../scripts/generer-page-etude.mjs";
+// TF-1439 : le type « documentaire » est POSÉ par l'adoption et LU ici par le même lecteur — deux
+// lectures de la même déclaration qui divergeraient rendraient deux verdicts sur un même dépôt.
+import { typeProjetDeclare, signauxLogicielOuSite, TYPE_DOCUMENTAIRE } from "../scripts/adopter-projet-existant.mjs";
 
 // TF-0898 (08/09/2026) — R-4 DOIT ÊTRE JOUABLE SEULE, SUR UN `output\` ET RIEN D'AUTRE.
 // Le fait : onze livrables d'un mandat sont sortis en « AAAAMMJJ-objet.ext » parce que la FORME
@@ -481,7 +484,10 @@ else {
 {
   const AGENTS_IA = ["GPTBot", "OAI-SearchBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "ChatGPT-User", "Claude-Web"];
   const robots = [...fichiers(cible)].filter((f) => basename(f).toLowerCase() === "robots.txt");
-  if (!robots.length) so("R-27", "aucun robots.txt — surface web non déclarée, agents IA non jugeables");
+  const type27 = typeProjetDeclare(cible);   // TF-1439 : le projet documentaire DIT pourquoi il n'a pas de robots.txt
+  if (!robots.length) so("R-27", type27 && type27.type === TYPE_DOCUMENTAIRE
+    ? `aucun robots.txt — projet déclaré documentaire (${type27.ou}, type_projet) : aucune surface web à ouvrir aux agents IA, l'écart est consigné au carnet (TF-1439)`
+    : "aucun robots.txt — surface web non déclarée, agents IA non jugeables");
   else {
     let ok27 = true;
     for (const rb of robots) {
@@ -1062,7 +1068,28 @@ existsSync(p("README.md")) ? ok("R-12", "README.md", "présent") : ko("R-12", "R
 // n'apparaissait même pas en `??` : rien ne signalait qu'il ne serait pas commité. Un
 // `.env.example` ignoré est indiscernable d'un `.env.example` absent pour quiconque clone.
 const envEx = [".env.example", ".env.exemple"].map((n) => p(n)).find((f) => existsSync(f));
-if (!envEx) ko("R-13", ".env.example", "absent — toutes les variables attendues (applicatives + infra) doivent y être déclarées");
+// R-13 (TF-1439, 28/09/2026) — UN PROJET DOCUMENTAIRE N'A AUCUNE VARIABLE À INVENTER. Le fait,
+// remonté par le lot Produit-78 20260928a (RP-5) : sur un projet sans logiciel ni site, R-13
+// exigeait une variable, et la session a déclaré FORGE_ROOT pour passer — une variable que le
+// projet ne lit pas. Le type se DÉCLARE (`type_projet: documentaire` en en-tête du carnet des
+// écarts assumés, posé par `adopter-projet-existant.mjs --type documentaire`) et se CONFRONTE au
+// dépôt : le moindre signal de logiciel ou de site (code, manifeste de dépendances, fichier de
+// site, racine web déclarée) fait rougir la déclaration, et R-13 se juge alors comme partout.
+// Un produit web qui se dirait documentaire pour échapper à R-13 reste donc vu.
+const type13 = typeProjetDeclare(cible);
+const signaux13 = type13 ? signauxLogicielOuSite(cible) : [];
+if (type13 && type13.type !== TYPE_DOCUMENTAIRE) {
+  ko("R-13", type13.ou, `type_projet « ${type13.type} » inconnu — seul « ${TYPE_DOCUMENTAIRE} » est lu, et une déclaration illisible n'exempte de rien (TF-1439)`);
+} else if (type13 && signaux13.length) {
+  ko("R-13", type13.ou, `projet déclaré « ${TYPE_DOCUMENTAIRE} », mais le dépôt porte ${signaux13.length} signal(aux) de logiciel ou de site : `
+    + `${signaux13.slice(0, 5).join(", ")}${signaux13.length > 5 ? `, et ${signaux13.length - 5} autre(s)` : ""} — `
+    + `la déclaration ne vaut que pour un projet sans code ni site. Retirer la ligne « type_projet: ${TYPE_DOCUMENTAIRE} » de l'en-tête du carnet `
+    + "et déclarer les variables au `.env.example` ; ou retirer du dépôt ce qui n'appartient pas au projet (TF-1439)");
+}
+const exempte13 = type13 && type13.type === TYPE_DOCUMENTAIRE && !signaux13.length
+  && (!envEx || !/^[A-Z][A-Z0-9_]*=/m.test(readFileSync(envEx, "utf8")));
+if (exempte13) so("R-13", `projet déclaré documentaire (${type13.ou}, type_projet) et aucun signal de logiciel ni de site relevé : aucune variable à déclarer, \`.env.example\` non exigé (TF-1439)`);
+else if (!envEx) ko("R-13", ".env.example", "absent — toutes les variables attendues (applicatives + infra) doivent y être déclarées");
 else if (!/^[A-Z][A-Z0-9_]*=/m.test(readFileSync(envEx, "utf8"))) ko("R-13", basename(envEx), "présent mais aucune variable déclarée");
 else if ((() => {
   // `check-ignore` sort 0 quand le fichier EST ignoré ; 1 quand il ne l'est pas ; 128 hors
@@ -2172,6 +2199,7 @@ const nonJuge = [
   "R-24 (TF-0267) : la prose d'écart n'est détectée que sur un vocabulaire explicite (écart, dérogation, exception, non conforme, à renommer) croisé avec R-24/nommage/suffixe — un écart raconté en d'autres mots ne sera pas vu ; c'est le champ structuré `ecarts_r24` qui fait foi, pas la détection de prose",
   "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML EST jugée depuis le 18/08 (R-26 bis, sceau de source, TF-0338) — ce qui reste hors jugement est la fraîcheur d'une page ANTÉRIEURE au mécanisme de sceau : elle est déclarée, jamais mise en échec",
   "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo-geo au run)",
+  "R-13 (TF-1439) : la déclaration « documentaire » se confronte à des SIGNAUX — fichiers de code par extension, manifestes de dépendances, robots.txt / llms.txt / sitemap.xml, racine web déclarée — relevés hors forge\\, input\\ (entrants = données) et répertoires d'outillage, sur 6 niveaux ; un logiciel ou un site qui n'en porte aucun (site statique fait de seuls .html, classeur à macros, script sans extension) passerait pour documentaire : limite déclarée",
   "R-2 localisation (TF-0319) : seul ce qui est MARQUÉ est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ, mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ; la JUSTESSE du marquage relève de la relecture, pas d'un contrôle de forme ; `input\\`, `gabarits\\`, `fixtures\\`, `old\\` et `.oracles\\` sont hors jugement par motif déclaré ; la marque est attendue sur la COPIE remise, pas sur l'original de travail de `forge\\etapes\\` (règle 16) — l'oracle ne rapproche pas un original de sa copie",
   "R-2 localisation (TF-0319) : la structure INTERNE d'`output\\` (familles numérotées uniques, une seule version courante par famille, graphie `old\\`, LISEZMOI.md de correspondance — D-15 al. a à e) n'est PAS jugée ici : sa mécanisation vit chez `oracle-conventions.mjs` d'organization et reste suspendue à un mandat humain d'écriture dans ce dépôt frère",
   "R-20 nature des lignes (TF-0528) : les lignes dont l'Id reste un gabarit (`{A-01}`) ne sont pas jugées — juger l'exemple que le gabarit prescrit mettrait le gabarit en défaut, jamais l'auteur ; un produit qui garde ses placeholders échappe donc au contrôle",
