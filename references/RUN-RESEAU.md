@@ -65,6 +65,14 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
    déposé sous `output\06-mesures\`. S'y ajoute le relevé du **temps humain hebdomadaire actuel**,
    en minutes : sans lui, aucun gain ne se démontre. Gate humain : validation de la fiche, des
    objectifs et des personas.
+
+   **Le `run_open` de cette ouverture porte `versions_forges`, et, si ce parcours s'ouvre APRÈS
+   un autre run déjà tenu par ce produit (mandat, version, conseil…), `run_precedent` qui le
+   nomme** (R-19 : « les runs se chaînent » — cas mesuré le 28/09/2026, un parcours d'animation
+   ouvert après un run de mandat, TF-1454). Omis à l'ouverture, `run_precedent` ne se corrige
+   jamais en réécrivant l'entrée (R-42) : il se rectifie PAR AJOUT, comme `versions_forges`
+   (TF-0709, TF-0801) — `{type: "rectification_run_open", seq_vise, champ: "run_precedent",
+   valeur, cause}`.
 1. **Planifier (N1), chaque semaine.** Le calendrier tient un horizon de 4 semaines : sujet,
    pilier, réseau, date visée, statut. L'IA le tient, l'humain arbitre. La veille des sujets se
    fait par recherche ouverte, sans compte.

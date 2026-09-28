@@ -14,8 +14,10 @@ livre une **trajectoire multi-lots** dont chaque lot devient l'entrant d'un run 
 ## Ce que le socle exige quand même (invariant, jamais négocié)
 
 Identique au run de mandat (`RUN-MANDAT.md` §« Ce que le socle exige ») : socle du run
-complet, ledger dès l'ouverture (`run_open`, `invocation` par service mobilisé,
-`oracles_verdict`, `retour`, `run_close`), fraîcheur (`--ff-only` + `bootstrap --pull`),
+complet, ledger dès l'ouverture (`run_open` avec `versions_forges` et, si ce conseil s'ouvre
+après un autre run du même produit, `run_precedent` qui le nomme — R-19, rectifiable par
+ajout si omis, TF-1454 ; `invocation` par service mobilisé, `oracles_verdict`, `retour`,
+`run_close`), fraîcheur (`--ff-only` + `bootstrap --pull`),
 routage et mesure (CONTRAT-INTERFACE §4/§4 bis). S'y ajoute : **lecture seule absolue
 sur le SI étudié** — un run de conseil ne modifie jamais le système qu'il instruit.
 

@@ -42,9 +42,14 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    le garde-fou « le pilot n'intervient jamais dans un produit hors d'un run demandé »
    (constaté le 15/08 : 206 constats R-4 sur des fichiers antérieurs, un renommage de
    28 fichiers imposé pour un mandat d'audit SEO).
-2. **Ledger dès l'ouverture** : `run_open` avec `versions_forges` (R-19), une entrée
-   `invocation` par service de forge mobilisé, `oracles_verdict` pour chaque oracle
-   exécuté, `retour` pour chaque friction, `run_close` au bilan.
+2. **Ledger dès l'ouverture** : `run_open` avec `versions_forges` (objet non vide, R-19) et,
+   si ce mandat s'ouvre APRÈS un autre run déjà tenu par ce produit (mandat, version, conseil
+   ou réseau — la voie n'importe pas), `run_precedent` qui le nomme (R-19 : « les runs se
+   chaînent ») ; une entrée `invocation` par service de forge mobilisé, `oracles_verdict` pour
+   chaque oracle exécuté, `retour` pour chaque friction, `run_close` au bilan. Un `run_precedent`
+   omis à l'ouverture ne se corrige jamais en réécrivant l'entrée (R-42) : il se rectifie PAR
+   AJOUT, comme `versions_forges` (TF-0709, TF-0801, TF-1454) — `{type:
+   "rectification_run_open", seq_vise, champ: "run_precedent", valeur, cause}`.
 3. **Fraîcheur** : pull pilot `--ff-only` + `node bootstrap.mjs --pull` avant tout.
 4. **Routage et mesure** : CONTRAT-INTERFACE §4/§4 bis, escalades consignées
    (« aucune » compris).
