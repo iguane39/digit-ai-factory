@@ -3963,6 +3963,8 @@ console.log(JSON.stringify({
     "S20 ne juge pas la JUSTESSE d'une glose : la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
     "S21 ne juge pas la SINCÉRITÉ d'une trace : un code de réponse recopié sans avoir été obtenu la satisfait. Elle rend le mensonge PLUS COÛTEUX — il faut inventer un code plausible — mais elle ne le rend pas impossible",
     "S21 ne couvre PAS `decision`, `depense` ni `irreversible` : ces trois motifs relèvent d'un arbitrage, pas d'un fait du monde, et exiger d'« essayer » une décision n'aurait aucun sens. Une attribution abusive sous `decision` reste donc invisible — c'est la limite assumée, et c'est exactement le cas fautif qui a fait naître la règle",
+    "S4 (TF-1429) ne vérifie pas qu'une décision RAPPELÉE « inchangée » a réellement été posée à l'heure dite, ni qu'aucune réponse ne l'a tranchée depuis : une décision nouvelle écrite comme un rappel échappe à son choix fermé. Seul un contrôle qui lit les messages précédents peut le voir, et le contrôle GESTE du hook de restitution ne lit une décision reposée qu'en forme citée",
+    "S14 (TF-1428) ne lit pas un « A-18 » NU comme l'identifiant du registre produit, même quand c'en est un : il ne se distingue pas d'un sélecteur ou d'un renvoi à une autre action. La forme qualifiée « registre A-18 » ou la colonne Registre est exigée, et l'existence de l'identifiant au registre n'est jamais vérifiée",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);
