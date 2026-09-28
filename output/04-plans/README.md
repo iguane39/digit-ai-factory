@@ -29,18 +29,23 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md` | fichier | 7,3 Ko | Synthèse — L'expertise « données de recherche » capitalisée dans la factory — 20260901k |
 | `Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` | fichier | 13,1 Ko | Digit-AI — Synthèse de boucle : les 17 restants du registre — 20260818a |
 | `Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` | fichier | 3,6 Ko | Synthèse de campagne — 4e mandat global « ok, fais tout » |
+| `Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md` | fichier | 17,3 Ko | Synthèse de conseil : les agents suivent déjà Fable 5.1 et Opus 5.5 par héritage, mais le  |
 | `Digit-AI - Synthese Conseil - Qualite sans personas cinq propositions mesurees - 20260914c.md` | fichier | 15,8 Ko | Synthèse Conseil — améliorer la qualité sans personas : vos deux décisions sont exécutées, |
 | `Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` | fichier | 3,7 Ko | Synthèse de diagnostic — pourquoi aucun avancement toutes les 3 minutes (TF-0252) |
 | `Digit-AI - Synthese Etude - Communication marketing AO verdict O3 huit candidatures - 20260911g.md` | fichier | 22,2 Ko | Synthèse d'étude — l'étude d'opportunité « communication, marketing et appels d'offres » e |
+| `Digit-AI - Synthese Etude - Decision 5a executee etape 1 des niveaux enregistree - 20260925e.md` | fichier | 5,3 Ko | Synthèse Étude — décision 5a exécutée : les 5 fichiers de l'étape 1 des niveaux sont enreg |
 | `Digit-AI - Synthese Etude - Decisions 3a 4a 2a executees sept candidatures au registre - 20260919d.md` | fichier | 16,6 Ko | Synthèse d'exécution — vos trois décisions sont jouées : le verdict de l'étude est retenu  |
+| `Digit-AI - Synthese Etude - Decisions 3a 4a executees etape 1 des niveaux en essai - 20260925d.md` | fichier | 11,0 Ko | Synthèse Étude — décisions 3a et 4a exécutées : l'étape 1 des niveaux est en place au pilo |
 | `Digit-AI - Synthese Etude - Decisions 5a 6a executees deux restes au registre - 20260919e.md` | fichier | 10,5 Ko | Synthèse d'exécution — vos deux décisions sont jouées : la candidature rectifiée est gardé |
 | `Digit-AI - Synthese Etude - Gestion reseaux sociaux verdict O2 sans forge - 20260917c.md` | fichier | 14,0 Ko | Synthèse d'étude — gestion de réseaux sociaux : ni forge ni logiciel, un rendez-vous hebdo |
+| `Digit-AI - Synthese Etude - Niveaux d intervention verdict O3 en 3 etapes - 20260925c.md` | fichier | 14,9 Ko | Synthèse Étude — niveaux d'intervention : l'étude est menée et passe ses 3 contrôles, le v |
 | `Digit-AI - Synthese Etude - Personas par phase verdict statu quo banc rejouable - 20260914b.md` | fichier | 16,9 Ko | Synthèse Étude — personas par phase : aucun persona ne franchit le seuil fixé d'avance, si |
 | `Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md` | fichier | 20,4 Ko | Synthèse d'étude — « plan d'amélioration après audit, rendu en page HTML » : l'étude d'opp |
 | `Digit-AI - Synthese Etude - Revue hebdomadaire de l existant verdict sondes etendues - 20260917d.md` | fichier | 13,7 Ko | Synthèse d'étude — votre « 1a » est exécuté : l'étude est jouée, elle écarte la revue hebd |
 | `Digit-AI - Synthese L99 - Audit et plan d amelioration plateforme prompt reecrit - 20260919b.md` | fichier | 17,2 Ko | Synthèse L99 — le prompt « audit, et en plus un plan d'amélioration complet » est analysé  |
 | `Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md` | fichier | 19,9 Ko | Synthèse L99 — le prompt « forge communication & marketing » est réécrit et jugé, trois co |
 | `Digit-AI - Synthese L99 - Gestion reseaux sociaux prompt reecrit - 20260917a.md` | fichier | 14,7 Ko | Synthèse L99 — le prompt « forge pour la gestion de réseaux sociaux » est analysé et réécr |
+| `Digit-AI - Synthese L99 - Niveaux d intervention prompt reecrit - 20260925b.md` | fichier | 26,1 Ko | Synthèse L99 — le prompt « 3 niveaux d'intervention : Simple, Moyen, Complexe » est analys |
 | `Digit-AI - Synthese L99 - Personas par phase prompt reecrit - 20260914a.md` | fichier | 12,7 Ko | Synthèse L99 — le prompt « personas par phase » est analysé et réécrit : il part de l'étud |
 | `Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md` | fichier | 21,5 Ko | Synthèse L99 — le prompt « règles d'écriture de la Factory » est analysé et réécrit, une e |
 | `Digit-AI - Synthese L99 - Revue hebdomadaire de l existant prompt reecrit - 20260917b.md` | fichier | 14,0 Ko | Synthèse L99 — le prompt « revue hebdomadaire de l'existant » est analysé et réécrit : il  |
@@ -93,12 +98,14 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md` | fichier | 24,3 Ko | Synthèse de mandat — décisions 19 et 20, actions 44 à 48 exécutées : trois forges publiées |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md` | fichier | 16,4 Ko | Synthèse — décisions 1a, 2a, 3a, 4a du 03/09/2026 |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` | fichier | 16,1 Ko | Synthèse de mandat — exécution des décisions 1a, 2a, 3b et 4a de la synchronisation (03/09 |
+| `Digit-AI - Synthese Mandat - Decisions 1a 2a executees modeles suivis par famille - 20260925f.md` | fichier | 14,6 Ko | Synthèse de mandat : vos décisions D-1 (a) et D-2 (a) sont exécutées, la Factory suit les  |
 | `Digit-AI - Synthese Mandat - Decisions 1b et 3a executees et cout des vues mesure - 20260916c.md` | fichier | 13,6 Ko | Vos deux décisions sont exécutées, et la troisième question a maintenant ses chiffres |
 | `Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md` | fichier | 24,8 Ko | Synthèse de mandat — décisions 21, 22 et 23, actions 49 à 52 exécutées : neuf histoires ré |
 | `Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` | fichier | 18,1 Ko | Synthèse de mandat — décisions 27 et 28 exécutées : les dix forges rebâties sur leur histo |
 | `Digit-AI - Synthese Mandat - Decisions 2a 3a 5a executees 4b et 6b en cours - 20260920f.md` | fichier | 15,9 Ko | Point d'étape — vos 5 décisions : 4 sont exécutées et rejouées, dont la bascule du rapport |
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
 | `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,5 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
+| `Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` | fichier | 26,7 Ko | Digit-AI — Synthèse de mandat — Décisions du 24/09 exécutées et candidatures reproposées — |
 | `Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` | fichier | 13,8 Ko | Synthèse de mandat — votre « 3a » est exécuté : un produit doit désormais dire ce qu'il re |
 | `Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` | fichier | 11,7 Ko | Synthèse de mandat — votre « 4b » est exécuté à moitié : l'enregistrement est fait, la pub |
 | `Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` | fichier | 9,8 Ko | Synthèse de mandat — tout n'est pas encore commité, et une branche ancienne n'est pas fusi |
@@ -219,4 +226,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_202 fichier(s), 0 sous-dossier(s)_ · 7 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_209 fichier(s), 0 sous-dossier(s)_

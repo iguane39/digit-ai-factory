@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md",
+ "empreinte": "1b62acc7d90b5682a0850ee1eb674ffe1c10e2eb0636b02ea43f30679d017039",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-24T14:46:14.731Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

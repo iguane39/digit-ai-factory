@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md",
+ "empreinte": "b4910fd9eb9bec7211e18a46771fc0125f7a1bddcd389948a12a0038c7fcbd81",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-09-24T17:04:37.463Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
