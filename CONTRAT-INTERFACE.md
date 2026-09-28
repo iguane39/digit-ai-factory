@@ -136,7 +136,8 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
   quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
   jugé selon ses propres règles). Sous `1.1`, `run_open` porte aussi **`forges_mobilisees`**, un
-  tableau non vide de noms de forges, courts ou complets (D-18 (a)). L'entrée porte au minimum :
+  tableau non vide de noms de forges, courts ou complets (D-18 (a)) ; le pilot n'y figure jamais
+  (TF-1444, règle écrite au juge ci-dessous). L'entrée porte au minimum :
 
   | Champ | Contenu |
   |---|---|
@@ -206,8 +207,13 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   pas pu tourner, son jugement est suspendu et le motif est dit. La confrontation est celle de
   forge-tests (`forge_tests/confrontation.py`, TF-0371), appelée et non recopiée. Les forges
   mobilisées se lisent dans `--forges`, sinon au champ `forges_mobilisees` du `run_open` ; une
-  annotation après le nom de forge est ignorée. `versions_forges` porte le parc, pas la
-  mobilisation. SKIP motivé, jamais PASS par défaut, quand le run ne déclare pas `schema_ledger`,
+  annotation après le nom de forge est ignorée. **Le pilot ne se déclare pas mobilisé (TF-1444,
+  28/09/2026)** : il orchestre tout run, aucun ne le mobilise. Le déclarer ferait réclamer par EN1
+  un verdict pour chacun de ses oracles découverts, 53 le 28/09, dont la plupart jugent le pilot
+  lui-même. Les verdicts de ses oracles que tout run consigne, la conformité et le contrôle du lot
+  au moins, sont le cadre du run : EN2 range à part, en `SANS_OBJET` et sans avertissement, un nom
+  que seul le pilot découvre. Un nom qu'une forge non mobilisée découvre aussi reste signalé hors
+  mobilisation. `versions_forges` porte le parc, pas la mobilisation. SKIP motivé, jamais PASS par défaut, quand le run ne déclare pas `schema_ledger`,
   quand ses forges mobilisées sont inconnues, ou quand le mécanisme de forge-tests ou Python
   manquent. Une forge non clonée ou sans entrée sort seule en SKIP, et les autres sont jugées.
   Recettes : `oracles\oracle-enclenchement.test.mjs`, `oracles\decouvrir-oracles.test.mjs`, et
