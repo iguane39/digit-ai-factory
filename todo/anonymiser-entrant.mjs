@@ -165,6 +165,21 @@ function sousRepertoireTemporaire(chemin) {
  */
 export const extensionInterdite = (chemin) => estUnBanc() && !sousRepertoireTemporaire(chemin);
 
+/**
+ * TF-1431 (28/09/2026) — UN ESSAI SUR REGISTRE JETABLE N'ÉTEND PAS LA TABLE RÉELLE.
+ *
+ * Le fait : ce matin-là à 07:45:43Z, un essai d'ingestion joué avec `--registre` sur une COPIE du
+ * registre, sans `FORGE_PRODUITS_PSEUDO`, a inscrit un produit dans la table du canal. Le registre
+ * réel est resté intact, la table non. La garde de banc ci-dessus ne pouvait pas le voir : un essai
+ * lancé à la main n'a ni le point d'entrée d'un banc ni son marqueur.
+ *
+ * `ingerer-lot.mjs` pose donc ce marqueur dès que son registre n'est pas celui par défaut ; hérité
+ * comme celui des bancs, il vaut pour toute la descendance. Marqueur posé, l'écrivain n'étend que
+ * la table DÉSIGNÉE par `FORGE_PRODUITS_PSEUDO`. Il lit toujours la table du canal : un produit
+ * déjà connu passe, seule l'inscription d'un produit neuf est refusée, avant toute écriture.
+ */
+export const MARQUEUR_REGISTRE_JETABLE = "FORGE_REGISTRE_JETABLE";
+
 /** Pseudonyme STABLE d'un produit ; l'inscrit s'il est inconnu. */
 export function pseudoProduit(nom) {
   const p = CHEMIN_PRODUITS();
@@ -212,6 +227,13 @@ export function pseudoProduit(nom) {
   // substituée par inclusion réécrit « PRODUCTION » en « Produit-13UCTION ». Le refus est dit.
   if (nom.length < 5) { console.error(`[ANONYMISÉ] « ${nom} » n'est pas inscrit : un nom de produit fait au moins 5 caractères (une clé courte mordrait sur les mots qui la contiennent)`); return null; }
   if (!d.produits[nom]) {
+    // TF-1431 : un registre jetable n'étend que la table qu'on lui désigne — refus avant l'écriture.
+    if (process.env[MARQUEUR_REGISTRE_JETABLE] && !process.env.FORGE_PRODUITS_PSEUDO) {
+      throw new Error(
+        `un essai sur registre jetable (${process.env[MARQUEUR_REGISTRE_JETABLE]}) ne peut pas étendre la table réelle `
+        + `des produits (${p}) : poser des tables jetables et les désigner par FORGE_NOMS_INTERDITS et `
+        + "FORGE_PRODUITS_PSEUDO, ou ingérer dans le registre par défaut (TF-1431)");
+    }
     // TF-1329 (26/09/2026) : l'indice suit le plus grand déjà attribué ou RÉSERVÉ, jamais le NOMBRE
     // de clés. Compter les clés ré-attribue un indice retiré sans réservation dès que la table porte
     // moins de clés que d'indices : 61 et 62, pris le 05/09 par deux forges puis retirés (TF-0807),
