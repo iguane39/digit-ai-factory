@@ -107,6 +107,13 @@ décision, l'omettre est un oubli (loi n° 3).
   s'il est corrigé sur place, à la section « Remarques restées au produit »), sans attendre le hook
   de fin de tour ni une relance humaine. C'est une obligation de l'agent, pas du hook : le hook peut
   être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais.
+- **L'horodatage (`ts`) d'une entrée de ledger se RELÈVE au moment même d'écrire l'entrée, jamais
+  ne se compose ni ne s'estime après coup** (TF-1424) — un `ts` POSTÉRIEUR au commit qui l'a
+  introduite dans l'histoire est impossible, donc composé : six entrées mesurées chez un produit
+  portaient une heure de 2 à 90 minutes après leur propre commit, l'une masquant un recul réel de
+  la suivante (`oracle-conformite-projet`, R-42). L'écrivain de ledger hérité pose l'heure machine ;
+  une entrée écrite à la main relève l'horloge au même instant, jamais une heure prévue ou
+  reconstituée.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)
