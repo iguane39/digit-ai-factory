@@ -24,7 +24,9 @@
  *
  * Usage : stdin JSON → stdout (contexte ajouté) ; `--self-test` : 4 cas positifs, 3 négatifs.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 /** Le lexique, dans l'ordre du noyau. Chaque règle : motif sur le message ENTIER, skill, glose. */
 export const LEXIQUE = [
@@ -82,6 +84,52 @@ export function contexte(message) {
     `[LEXIQUE RV-6 — hook-lexique] Ce message est un APPEL du skill \`${a.skill}\` (${a.forme}) : ` +
     `l'invoquer par l'outil Skill AVANT toute autre action ou réponse ; retirer le mot-clé, le reste du message est l'entrant. ` +
     `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`).join("\n");
+}
+
+/**
+ * NIVEAUX D'INTERVENTION — étape 1 (TF-1418, décision humaine D-3 (a) du 25/09/2026 ; étude
+ * `output/03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md`, verdict O3).
+ *
+ * LE FAIT. Mesuré sur 165 tours du pilot : une question courte attendait 6,3 minutes en médiane et
+ * recevait 1 813 mots, parce qu'elle finissait presque toujours en restitution complète, alors que
+ * l'exemption « réponse courte » existait. « vite : » en tête du message humain demande donc le
+ * niveau Simple, la réponse directe de `references/NIVEAUX.md` ; « complet : » demande le niveau
+ * Complexe. Mêmes bornes que le lexique : en tête seulement, message humain seulement.
+ *
+ * LA PORTÉE EST LE PILOT SEUL, et elle est tenue ici plutôt que promise. Ce hook est hérité par les
+ * produits (lanceur `forge/hooks/factory.mjs lexique`), alors que l'étape 1 ne vise que le pilot et
+ * qu'un produit n'a pas le référentiel que la ligne injectée cite. La ligne ne s'injecte donc que si
+ * le dossier de la session porte `references/NIVEAUX.md` ; ailleurs, le mot-clé ne produit rien.
+ */
+export const NIVEAUX = [
+  { niveau: "Simple", motif: /^\s*vite\s*:/iu, forme: "« vite : » en tête de message" },
+  { niveau: "Complexe", motif: /^\s*complet\s*:/iu, forme: "« complet : » en tête de message" },
+];
+
+/** Le niveau demandé par le message, ou null. Une seule demande : la première qui matche. */
+export function reconnaitreNiveau(message) {
+  const brut = String(message || "");
+  const r = NIVEAUX.find((n) => n.motif.test(brut));
+  return r ? { niveau: r.niveau, forme: r.forme } : null;
+}
+
+/** La doctrine des niveaux est-elle en service dans ce dossier ? Au pilot seul pendant l'étape 1. */
+export function niveauxEnService(dossier) {
+  try { return Boolean(dossier) && existsSync(join(dossier, "references", "NIVEAUX.md")); }
+  catch { return false; }
+}
+
+/** Le texte injecté pour un niveau demandé — une ligne, ou rien. */
+export function contexteNiveau(message) {
+  const n = reconnaitreNiveau(message);
+  if (!n) return "";
+  if (n.niveau === "Simple") return `[NIVEAU — hook-lexique] L'humain demande le niveau Simple (${n.forme}) : ` +
+    `retirer le mot-clé et répondre selon references\\NIVEAUX.md — première ligne « Niveau : Simple », 150 mots au plus, ` +
+    `lectures libres, 3 commandes au plus, aucune écriture, aucun mot de verdict ni décision ou action numérotée ; ` +
+    `source citée, « Non vérifié » s'il le faut. Si la question dépasse ces bornes, le dire en une phrase et restituer ` +
+    `en entier : le niveau ne descend jamais.`;
+  return `[NIVEAU — hook-lexique] L'humain demande le niveau Complexe (${n.forme}) : retirer le mot-clé ; ` +
+    `process complet et restitution de gabarits\\RESTITUTION.md, quelle que soit la longueur de la question.`;
 }
 
 /**
@@ -156,6 +204,45 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ok ? pass++ : fail++;
   }
 
+  // TF-1418 — LES NIVEAUX. Chaque mot-clé a sa paire : le même mot en tête avec ses deux-points
+  // (niveau reconnu), puis ailleurs dans la phrase ou sans ses deux-points (rien). Sans la moitié
+  // négative, un motif qui matcherait « vite » partout serait vert.
+  const casNiveau = [
+    ["vite : où est la liste des éléments ?", "Simple"],
+    ["Vite: le parc est-il à jour ?", "Simple"],
+    ["complet : pourquoi le hook a-t-il refusé ma synthèse ?", "Complexe"],
+    ["c'est vite fait : corrige la page d'accueil", null],
+    ["vite, où est la liste ?", null],
+    ["la liste au complet : 12 lignes", null],
+  ];
+  for (const [msg, attendu] of casNiveau) {
+    const obtenu = reconnaitreNiveau(msg)?.niveau ?? null;
+    const ok = obtenu === attendu;
+    console.log(`  [${ok ? "PASS" : "FAIL"}] niveau — « ${msg.slice(0, 44)} » → ${obtenu}${ok ? "" : ` (attendu ${attendu})`}`);
+    ok ? pass++ : fail++;
+  }
+
+  // La PORTÉE : en service là où le référentiel existe, muette ailleurs. La paire joue le même
+  // dossier temporaire, sans puis avec `references/NIVEAUX.md` — c'est la garde qui tient les
+  // produits hors de l'étape 1.
+  const dossier = mkdtempSync(join(tmpdir(), "niveaux-"));
+  const horsService = niveauxEnService(dossier) === false;
+  mkdirSync(join(dossier, "references"), { recursive: true });
+  writeFileSync(join(dossier, "references", "NIVEAUX.md"), "# fixture\n");
+  const enService = niveauxEnService(dossier) === true;
+  for (const [ok, glose] of [[horsService, "dossier sans references/NIVEAUX.md → hors service"],
+    [enService, "même dossier portant references/NIVEAUX.md → en service"]]) {
+    console.log(`  [${ok ? "PASS" : "FAIL"}] portée — ${glose}`);
+    ok ? pass++ : fail++;
+  }
+
+  // L'ORIGINE vaut aussi pour les niveaux : « vite : » dans une entrée qui se déclare non humaine ne
+  // demande rien, alors que le même texte, humain, demanderait le niveau Simple.
+  const notification = "<task-notification>vite : l'agent a fini</task-notification>";
+  const okOrigine = !estMessageHumain(notification) && reconnaitreNiveau("vite : l'agent a fini")?.niveau === "Simple";
+  console.log(`  [${okOrigine ? "PASS" : "FAIL"}] niveau — notification portant « vite : » → non humaine, rien injecté`);
+  okOrigine ? pass++ : fail++;
+
   console.log(`\nhook-lexique : ${pass} PASS, ${fail} FAIL`);
   process.exit(fail ? 1 : 0);
 }
@@ -163,10 +250,22 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
 if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.argv.includes("--self-test")) {
   let entree = "";
   try { entree = readFileSync(0, "utf8"); } catch { entree = ""; }
-  let message = "";
-  try { const j = JSON.parse(entree); message = typeof j.prompt === "string" ? j.prompt : String(j.user_prompt || j.message || ""); }
-  catch { message = entree; }
-  const texte = estMessageHumain(message) ? contexte(message) : "";
-  if (texte) process.stdout.write(texte + "\n");
+  let message = "", dossier = "";
+  try {
+    const j = JSON.parse(entree);
+    message = typeof j.prompt === "string" ? j.prompt : String(j.user_prompt || j.message || "");
+    dossier = typeof j.cwd === "string" ? j.cwd : "";
+  } catch { message = entree; }
+  // Le dossier de la session décide si les niveaux sont en service (TF-1418) ; à défaut du champ
+  // `cwd`, celui où Claude Code lance le hook, qui est le même.
+  if (!dossier) dossier = process.cwd();
+  const lignes = [];
+  if (estMessageHumain(message)) {
+    const appels = contexte(message);
+    if (appels) lignes.push(appels);
+    const niveau = niveauxEnService(dossier) ? contexteNiveau(message) : "";
+    if (niveau) lignes.push(niveau);
+  }
+  if (lignes.length) process.stdout.write(lignes.join("\n") + "\n");
   process.exit(0);
 }

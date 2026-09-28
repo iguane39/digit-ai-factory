@@ -35,8 +35,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 20,
-  "vu_le": "2026-09-22"
+  "cas": 29,
+  "vu_le": "2026-09-25"
  },
  "hook-page-html.mjs": {
   "cas": 11,
@@ -303,8 +303,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-22"
+  "cas": 10,
+  "vu_le": "2026-09-25"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 5,

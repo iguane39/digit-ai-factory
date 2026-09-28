@@ -18,7 +18,7 @@ versions au ledger (R-19).
 **Précédence (R-43)** : la factory impliquée, ses règles priment (renforcer oui,
 assouplir jamais) ; conflit → factory, consigné au ledger.
 **Restitution (R-44)** : toute fin de tour de travail suit `gabarits\RESTITUTION.md` (bloc 0 +
-8 blocs, options (a)/(b)/(c), actions par acteur) — hook Stop bloquant (`oracle-synthese`).
+8 blocs), hook Stop bloquant (`oracle-synthese`) ; question simple : `references\NIVEAUX.md`.
 `input\`/`output\` : un README.md par dossier, régénéré par hook.
 
 **Lois transverses** :
