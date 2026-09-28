@@ -23,8 +23,8 @@
   "vu_le": "2026-09-27"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 33,
-  "vu_le": "2026-09-27"
+  "cas": 42,
+  "vu_le": "2026-09-28"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
   "cas": 27,
@@ -35,8 +35,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 29,
-  "vu_le": "2026-09-25"
+  "cas": 39,
+  "vu_le": "2026-09-28"
  },
  "hook-page-html.mjs": {
   "cas": 11,
@@ -307,8 +307,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 10,
-  "vu_le": "2026-09-25"
+  "cas": 11,
+  "vu_le": "2026-09-28"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 5,

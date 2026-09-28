@@ -40,6 +40,47 @@ export const LEXIQUE = [
   { skill: "ameliore-un-skill", motif: /^\s*(?:am[ée]liore[rz]?|audite[rz]?|durcis|fiabilise[rz]?|score[rz]?|r[ée]vise[rz]?|optimise[rz]?)\s+(?:ce|le|mon|ton|un|une|cette|la)?\s*skill\b/iu, forme: "« améliore/audite ce skill »" },
 ];
 
+/**
+ * LES CONSIGNES DE RÈGLE (R-57, décision humaine du 24/09/2026) — un message peut appeler une RÈGLE
+ * et non un skill. Le fait : un lecteur juge la forme d'un document (« le format du guide […] et
+ * l'usage des composants […] sont vraiment tops ») et demande qu'elle serve ailleurs. Sans détrompeur,
+ * la remontée tenait à la mémoire de l'agent qui recevait le message — c'est-à-dire, un jour sur
+ * deux, à rien. Deux formes reconnues : la DEMANDE (« en gabarit », « comme gabarit ») et le VERDICT
+ * DE FORME (un mot de forme suivi, dans la même phrase, d'un adjectif d'éloge) — sauf si la phrase le
+ * nie (« le format n'est pas top » ne déclare rien de mûr).
+ */
+const DEMANDE_GABARIT = /\b(?:en|comme)\s+(?:un\s+|une\s+)?gabarits?\b|\bgabarits?\s+(?:pour|à|a)\s+la\s+factory\b/iu;
+const MOT_DE_FORME = /\b(?:format|forme|mise\s+en\s+(?:forme|page)|pr[ée]sentation|composants?|design)\b/giu;
+const ELOGE = /\b(?:vraiment\s+|tr[èe]s\s+|super\s+|trop\s+|hyper\s+)?(?:tops?|parfaite?s?|excellente?s?|g[ée]niale?s?|superbes?|impeccables?|r[ée]ussie?s?|remarquables?)(?![\p{L}])/iu;
+const NEGATION = /\b(?:pas|plus|jamais|gu[èe]re)\b|\bn['’]|\bne\s/iu;
+
+/** Un verdict de forme : un mot de forme, puis un éloge dans la MÊME phrase, sans négation entre eux. */
+export function verdictDeForme(message) {
+  const texte = String(message || "");
+  for (const m of texte.matchAll(MOT_DE_FORME)) {
+    const suite = texte.slice(m.index, m.index + 200).split(/[.!?\n]/)[0];
+    const e = ELOGE.exec(suite);
+    if (e && !NEGATION.test(suite.slice(0, e.index + e[0].length))) return true;
+  }
+  return false;
+}
+
+export const CONSIGNES = [
+  { regle: "R-57", forme: "verdict de forme ou demande de gabarit",
+    reconnait: (m) => DEMANDE_GABARIT.test(m) || verdictDeForme(m),
+    texte: "Ce message porte un verdict humain sur la FORME d'un document, ou demande d'en faire un gabarit : " +
+      "le document est MÛR DÉCLARÉ (REGLES-PROJET.md, R-57). Le remonter DANS CE TOUR : sa forme — une famille " +
+      "de `gabarits\\documents\\` ou des composants —, jamais sa matière ; citer le verdict mot pour mot et daté " +
+      "sous « ## Documents mûrs » du lot de retours. Ne pas le faire est un défaut de classe " +
+      "« document-mur-non-remonte » (todo/CLASSES.json)." },
+];
+
+/** Rend les consignes de règle reconnues dans un message (hors code cité) : [{regle, forme, texte}]. */
+export function reconnaitreConsignes(message) {
+  const sansCode = String(message || "").replace(/`[^`]*`/g, " ");
+  return CONSIGNES.filter((c) => c.reconnait(sansCode));
+}
+
 /** Rend les appels reconnus dans un message : [{skill, forme}], sans doublon de skill. */
 export function reconnaitre(message) {
   const vus = new Set(); const appels = [];
@@ -76,14 +117,14 @@ export function estMessageHumain(message) {
 export const MARQUEURS_NON_HUMAINS =
   /<task-notification>|<cross-session-message|\[SYSTEM NOTIFICATION|<system-reminder>|NOT\s+USER\s+INPUT/i;
 
-/** Le texte injecté dans le contexte — une ligne par appel, ou rien. */
+/** Le texte injecté dans le contexte — une ligne par appel de skill, puis par consigne de règle, ou rien. */
 export function contexte(message) {
-  const appels = reconnaitre(message);
-  if (!appels.length) return "";
-  return appels.map((a) =>
+  const appels = reconnaitre(message).map((a) =>
     `[LEXIQUE RV-6 — hook-lexique] Ce message est un APPEL du skill \`${a.skill}\` (${a.forme}) : ` +
     `l'invoquer par l'outil Skill AVANT toute autre action ou réponse ; retirer le mot-clé, le reste du message est l'entrant. ` +
-    `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`).join("\n");
+    `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`);
+  const consignes = reconnaitreConsignes(message).map((c) => `[${c.regle} — hook-lexique] ${c.texte}`);
+  return [...appels, ...consignes].join("\n");
 }
 
 /**
@@ -201,6 +242,36 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     const injecte = humain ? contexte(msg) : "";
     const ok = humain === humainAttendu && (humainAttendu ? injecte.length > 0 : injecte === "");
     console.log(`  [${ok ? "PASS" : "FAIL"}] origine — ${glose} → ${humain ? "humain, appel injecté" : "non humain, rien injecté"}${ok ? "" : " (contraire à l'attendu)"}`);
+    ok ? pass++ : fail++;
+  }
+
+  // R-57 (24/09/2026) — LA CONSIGNE DE RÈGLE, dans ses deux sens. Le premier cas est le message
+  // humain qui a fondé la règle, mot pour mot ; les rouges sont les phrases voisines qu'un détrompeur
+  // trop large prendrait pour un éloge — une négation, un gabarit qu'on corrige, un « top » de liste.
+  const casConsignes = [
+    ["Le format du guide du développeur et l'usage des composants utilisés, comme la recherche, les onglets, les menus sur le côté, la popup pour les fichiers MD, les chapitres, sous-chapitres sont vraiment tops. Enregistre ce document en gabarit pour la Factory", ["R-57"]],
+    ["Enregistre ce rapport comme gabarit, on le réutilisera", ["R-57"]],
+    ["La mise en page de ce rapport est excellente, garde-la", ["R-57"]],
+    ["Les composants de ce tableau de bord sont parfaits", ["R-57"]],
+    ["Le format n'est pas top, reprends les marges", []],
+    ["Corrige le gabarit de restitution, il manque le bloc 3", []],
+    ["Top 5 des corrections à faire avant l'envoi", []],
+    ["Le prompt réécrit est bon, on le garde tel quel", []],
+    ["le composant `format top` est cité dans le code", []],
+  ];
+  for (const [msg, attendu] of casConsignes) {
+    const obtenu = reconnaitreConsignes(msg).map((c) => c.regle);
+    const ok = JSON.stringify(obtenu) === JSON.stringify(attendu);
+    console.log(`  [${ok ? "PASS" : "FAIL"}] consigne « ${msg.slice(0, 48)} » → ${JSON.stringify(obtenu)}${ok ? "" : ` (attendu ${JSON.stringify(attendu)})`}`);
+    ok ? pass++ : fail++;
+  }
+  // La porte d'origine vaut pour les consignes comme pour les skills : une notification qui cite un
+  // éloge de forme n'est pas un verdict humain.
+  {
+    const note = "<task-notification>le format est vraiment top, en gabarit</task-notification>";
+    const injecte = estMessageHumain(note) ? contexte(note) : "";
+    const ok = injecte === "" && /R-57 — hook-lexique/.test(contexte(casConsignes[0][0]));
+    console.log(`  [${ok ? "PASS" : "FAIL"}] consigne — une notification non humaine n'injecte rien, le message humain injecte R-57`);
     ok ? pass++ : fail++;
   }
 

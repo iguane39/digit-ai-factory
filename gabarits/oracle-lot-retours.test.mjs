@@ -316,5 +316,88 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
+// ---- R-57 et LOT-MURS (24/09/2026, au main le 28/09) : UN DOCUMENT MÛR REMONTE, OU SON MAINTIEN S'ÉCRIT
+//
+// La section se juge comme R-45 et R-46, dans les deux sens. La MESURE se rejoue sur un produit
+// jetable : un `output\` où un objet compte cinq versions datées (dont une en `old\`) et un autre
+// deux. Le lot est daté après l'entrée en vigueur : le verdict d'ensemble y porte aussi LOT-DATE
+// tant que l'horloge n'a pas rejoint la date du nom — les cas lisent donc LEUR constat, jamais le
+// verdict d'ensemble.
+{
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { SEUIL_MUR, documentsMurs } = await import("./oracle-lot-retours.mjs");
+  const P = mkdtempSync(join(tmpdir(), "lot-murs-"));
+  const retours = join(P, "forge", "retours");
+  mkdirSync(retours, { recursive: true });
+  mkdirSync(join(P, "output", "05-Kits"), { recursive: true });
+  mkdirSync(join(P, "output", "old"), { recursive: true });
+  for (const i of ["a", "b", "c", "d"]) writeFileSync(join(P, "output", "old", `Marque - Guide développeur - 2026090${i === "a" ? 1 : i === "b" ? 2 : i === "c" ? 3 : 4}${i}.html`), "<p>v</p>");
+  writeFileSync(join(P, "output", "05-Kits", "Marque - Guide développeur - 20260910a.html"), "<p>v</p>");
+  for (const d of ["20260901a", "20260902a"]) writeFileSync(join(P, "output", "05-Kits", `Marque - Note brève - ${d}.html`), "<p>v</p>");
+  const R57 = (corps) => `## Documents mûrs\n\n${corps}\n`;
+  const CORPS = (r57) => "# lot\n\n" + R45 + "\n" + R46 + "\n" + r57;
+  const apres = join(retours, "PROD - RETOURS - 20260930a.md");
+
+  check("R-57 rouge — section absente d'un lot postérieur au seuil : FAIL, le remède donne le TITRE exact", () => {
+    const c = constat(verifier(apres, CORPS("")), "R-57");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"}`);
+    if (!/## Documents mûrs/.test(c.remede || "")) throw new Error("le remède ne donne pas le titre à écrire");
+    if (!/aucun document mûr/i.test(c.remede)) throw new Error("le remède ne dit pas quoi écrire quand il n'y a rien");
+  });
+
+  check("R-57 rouge — section présente mais VIDE : l'omission ne vaut pas décision", () => {
+    const c = constat(verifier(apres, CORPS(R57("(à voir)"))), "R-57");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  check("R-57 vert — la déclaration d'absence vaut réponse (loi n° 3)", () => {
+    const c = constat(verifier(join(tmpdir(), "PROD - RETOURS - 20260930b.md"), CORPS(R57("Aucun document mûr sur ce lot."))), "R-57");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  check("mesure — 5 versions datées (dont une en old\\) font un document mûr, 2 n'en font pas", () => {
+    const m = documentsMurs(P);
+    if (SEUIL_MUR !== 5) throw new Error(`seuil dérivé : ${SEUIL_MUR}`);
+    if (!m || m.length !== 1 || m[0].versions !== 5 || !/Guide développeur/.test(m[0].objet)) throw new Error(JSON.stringify(m));
+  });
+
+  check("LOT-MURS rouge — chez le produit, un document mûr que le lot TAIT : FAIL, et il est nommé", () => {
+    const c = constat(verifier(apres, CORPS(R57("Aucun document mûr."))), "LOT-MURS");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — la déclaration d'absence ne couvre pas un document mesuré`);
+    if (!/Guide développeur/.test(c.message) || /Note brève/.test(c.message)) throw new Error(`nomme mal : ${c.message}`);
+  });
+
+  check("LOT-MURS vert — le même document NOMMÉ avec son verdict, graphie sans accents : PASS", () => {
+    const r = verifier(apres, CORPS(R57("| guide developpeur | 5 versions | remonté : famille gd-guide-de-reference |")));
+    const c = constat(r, "LOT-MURS"), s = constat(r, "R-57");
+    if (!c || c.statut !== "PASS") throw new Error(`LOT-MURS ${c ? c.statut : "absent"} — ${c && c.message}`);
+    if (!s || s.statut !== "PASS") throw new Error(`R-57 ${s ? s.statut : "absent"}`);
+  });
+
+  check("LOT-MURS vert — déclaré par un lot ANTÉRIEUR du même produit : la déclaration se fait une fois", () => {
+    writeFileSync(join(retours, "PROD - RETOURS - 20260929a.md"), CORPS(R57("Guide développeur — reste au produit, parce que sa forme est celle de gd-guide-de-reference.")), "utf8");
+    const c = constat(verifier(apres, CORPS(R57("Aucun document mûr nouveau."))), "LOT-MURS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+
+  check("LOT-MURS borne — à la porte du pilot (lot hors d'un produit) : SANS_OBJET, et dit", () => {
+    const c = constat(verifier(join(tmpdir(), "00-retours", "PROD - RETOURS - 20260930a.md"), CORPS(R57("Aucun document mûr."))), "LOT-MURS");
+    if (!c || c.statut !== "SANS_OBJET" || !/chez le produit/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  check("R-57 borne — un lot du 28/09, jour où la règle entre au main, n'est pas accusé : antériorité déclarée", () => {
+    const r = verifier(join(retours, "PROD - RETOURS - 20260928a.md"), "# lot\n\n" + R45 + "\n" + R46);
+    for (const regle of ["R-57", "LOT-MURS"]) {
+      const c = constat(r, regle);
+      if (!c || c.statut !== "SANS_OBJET" || !/antériorité/.test(c.message)) throw new Error(`${regle} ${c ? c.statut : "absent"}`);
+    }
+    if (SEUILS["R-57"] !== "20260929") throw new Error("seuil R-57 dérivé");
+  });
+
+  try { rmSync(P, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
 console.log(`\noracle-lot-retours (TF-0597) : ${pass} PASS, ${echec} FAIL`);
 process.exit(echec ? 1 : 0);

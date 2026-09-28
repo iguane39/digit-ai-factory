@@ -19,11 +19,23 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // façon la moins chère de faire passer une recette. Il se relève donc à chaque ajout — ici de 13 à
 // 19 le 22/09 (TF-1239), les six cas neufs jugeant la PROVENANCE du message et non le lexique ;
 // puis de 19 à 20 le même jour (TF-1314), le message d'une autre session Claude Code ; puis de 20 à
-// 29 le 25/09 (TF-1418), les 9 cas neufs jugeant les NIVEAUX : 6 mots-clés, 2 de portée, 1 d'origine.
-check("self-test du hook : 29 cas verts", () => {
+// 29 le 25/09 (TF-1418), les 9 cas neufs jugeant les NIVEAUX : 6 mots-clés, 2 de portée, 1 d'origine ;
+// puis de 29 à 39 le 28/09 (R-57, cas écrits le 24/09) : neuf cas de la CONSIGNE de règle — quatre
+// éloges de forme ou demandes de gabarit, cinq phrases voisines qui ne doivent rien déclencher — et
+// un cas de provenance.
+check("self-test du hook : 39 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/29 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/39 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+});
+
+// R-57 — le point d'entrée RÉEL injecte la consigne sur le message qui a fondé la règle, et rien sur
+// sa négation : la recette interne juge les fonctions, celle-ci juge ce que le hook ÉCRIT.
+check("hook — un verdict de forme injecte la consigne R-57, sa négation n'injecte rien", () => {
+  const oui = jouer("Le format du guide est vraiment top. Enregistre ce document en gabarit pour la Factory");
+  const non = jouer("Le format n'est pas top, reprends les marges");
+  if (oui.status !== 0 || !/\[R-57 — hook-lexique\]/.test(oui.stdout)) throw new Error(`rien injecté : ${oui.stdout}`);
+  if (non.stdout.trim() !== "") throw new Error(`la négation injecte : ${non.stdout}`);
 });
 // TF-1314 — l'enveloppe RÉELLE d'un message entre sessions, telle que reçue le 22/09. Le corps porte
 // « l99 » en mot isolé, et c'est voulu : les règles ANCRÉES en tête (« Améliore ce prompt… ») ne se

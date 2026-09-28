@@ -1,0 +1,66 @@
+/* gd-guide-de-reference · tableaux.css — les TABLEAUX : largeurs tenues, repli en cartes, lignes dépliables.
+ *
+ * Complète les composants du socle sans les recopier : les filtres (table-filters.js, dès 8 lignes,
+ * règle L4) et les lignes dépliables (table-detail.js, règle L17) sont POSÉS depuis le socle ; cette
+ * feuille ne porte que la mise en page que le générateur leur prépare.
+ *
+ * Trois faits payés sur le document source : 61 colonnes sur 126 sans largeur, sous une mise en page
+ * fixe, faisaient absorber tout le reste par les colonnes libres — les grands vides (15/09/2026) ;
+ * d'où une largeur par colonne, calculée par le générateur sur le CONTENU. Un identifiant coupé en
+ * cellule (`ABC0601-R02` scindé entre `-R` et `02`, mesuré à 1 920 px) se recopie faux : il passe
+ * entier à la ligne (`code.ident`). Et un conteneur défilant ne rend pas un tableau large lisible :
+ * sous 900 px, le repli en cartes est dû (règle D3 de la bibliothèque).
+ */
+.table-hote { overflow-x: auto; margin: 16px 0; }
+.tf-count { font-size: .76rem; color: var(--muted); margin: 0 0 16px; }
+table { border-collapse: collapse; font-size: .88rem; table-layout: fixed; max-width: 100%; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top;
+  overflow-wrap: break-word; }
+th { font-family: var(--head); font-weight: 700; background: var(--surface); }
+tbody tr:hover { background: var(--code-fill); }
+td code.ident { white-space: nowrap; }
+/* Ligne dépliable : le chevron est U+203A, présent dans toute pile de repli ; il pivote d'un quart
+   de tour quand la ligne est ouverte. */
+.td-btn { font: inherit; font-weight: 700; line-height: 1; color: var(--accent-fonce);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); width: 24px;
+  height: 24px; padding: 0; margin-right: 4px; cursor: pointer; vertical-align: middle;
+  transition: transform var(--dur-etat) var(--ease-deplacement); }
+.td-btn:hover { border-color: var(--accent-fonce); }
+.td-btn[aria-expanded="true"] { transform: rotate(90deg); border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .td-btn { transition: none; } }
+tr.td-ouverte > td { background: var(--accent-voile); }
+tr[data-detail] > td { background: var(--bg); padding: 16px 20px 24px calc(var(--retrait-detail, 32px) + 12px); }
+tbody tr[data-detail]:hover { background: none; }
+tr[data-detail] { scroll-margin-top: calc(var(--hh, 128px) + 64px); }
+/* Sans script, rien ne se replie : le détail se lit en place et le chevron, qui ne pourrait rien
+   ouvrir, disparaît. */
+html:not(.js) .td-btn { display: none; }
+html:not(.js) tr[data-detail][hidden] { display: table-row !important; }
+@media (max-width: 900px) {
+  .table-hote { overflow-x: visible; }
+  table { table-layout: auto; width: 100% !important; }
+  table.repli-cartes, table.repli-cartes tbody, table.repli-cartes tr, table.repli-cartes td { display: block; }
+  table.repli-cartes thead, table.repli-cartes colgroup { display: none; }
+  table.repli-cartes tr { border: 1px solid var(--line); border-radius: var(--r-sm); margin: 0 0 12px;
+    padding: 8px 12px; break-inside: avoid; background: var(--surface); }
+  table.repli-cartes td { border-bottom: 0; padding: 4px 0; width: auto !important; }
+  table.repli-cartes td::before { content: attr(data-label); display: block; font-family: var(--head);
+    font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--faint); }
+  table.repli-cartes td:empty { display: none; }
+  td code.ident { white-space: normal; }
+  /* En cartes, la ligne ouverte et son détail forment UNE carte. */
+  table.repli-cartes tr.td-ouverte { margin-bottom: 0; background: var(--accent-voile);
+    border-radius: var(--r-sm) var(--r-sm) 0 0; }
+  table.repli-cartes tr.td-ouverte > td { background: none; }
+  table.repli-cartes tr[data-detail] { border-top: 0; background: var(--bg); border-radius: 0 0 var(--r-sm) var(--r-sm); }
+  table.repli-cartes tr[data-detail] > td { padding: 8px 0 4px; background: none; }
+  table.repli-cartes tr[data-detail] > td::before { content: none; }
+  html:not(.js) table.repli-cartes tr[data-detail][hidden] { display: block !important; }
+}
+@media print {
+  .tf-count { display: none; }
+  tr[data-tf-hidden] { display: table-row !important; }
+  tr[data-detail][hidden] { display: table-row !important; }
+  .td-btn { display: none; }
+  table { break-inside: avoid; page-break-inside: avoid; }
+}

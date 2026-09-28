@@ -1,0 +1,98 @@
+/* gd-guide-de-reference · hierarchie-chapitres.css — CHAPITRES et SOUS-CHAPITRES (les « pas »).
+ *
+ * Quatre niveaux de structure, rendus tous les quatre : la VUE (titre-vue), le CHAPITRE (tête
+ * derrière sa gouttière), le PAS (tiré d'une amorce en gras de la source) et la PIÈCE (tableau,
+ * bloc de code, encadré). Un seul principe : tout ce qui appartient à un chapitre est décalé
+ * derrière une gouttière de 3 rem, où vit sa pastille. Le titre déborde dans la gouttière, son
+ * corps non — c'est ce décalage, et lui seul, qui rend l'appartenance visible sans encadrer le
+ * contenu. Deux retraits, jamais trois : 3 rem + 1,25 rem, moins de 7 % d'une colonne de 1 000 px.
+ *
+ * Contrat de marquage :
+ *   <section class="ch" id="…">
+ *     <div class="ch-tete"><div class="ch-pastille" aria-hidden="true">1</div>
+ *       <div class="ch-titres"><h3>Titre</h3> [<p class="regle-meta">…</p>]</div></div>
+ *     <div class="ch-corps"><div class="ch-rail" aria-hidden="true"></div>
+ *       <div class="chap lire"><p class="ch-apprend">Le chapeau : ce que le chapitre apprend.</p></div>
+ *       <section class="pas-bloc" id="…" data-type="verification|attention|exemple">
+ *         <h4 class="pas"><span class="puce" aria-hidden="true">▸</span>Titre du pas</h4> …
+ *       </section>
+ *     </div>
+ *   </section>
+ * `.ch-pastille.code` porte un code (« R07 ») au lieu d'un rang. Le bandeau `.regle-meta` réunit
+ * l'anatomie d'une règle (niveau, source, exceptions) : 60 chapitres sur 104 la portaient dans le
+ * document source, et la lire d'un coup libère le corps, qui ne porte plus que la règle.
+ */
+main { --gouttiere: 3rem; --pas-retrait: 1.25rem; }
+/* La prose remplit la colonne de contenu (règle D1) ; la classe `.lire` reste, et c'est elle qui
+   fait PUBLIER la mesure de lecture par le socle au lieu de la compter en défaut. */
+.chap.lire { max-width: none; }
+.chap.lire > :first-child { margin-top: 0; }
+.chap.lire > :last-child { margin-bottom: 0; }
+/* Le RYTHME entre blocs : un bloc de lecture perd la marge de ses bords (ci-dessus), il la reçoit
+   donc de son voisin. Sans ces deux règles, l'inventaire collait au chapeau, et la pastille du
+   premier chapitre touchait la dernière ligne du chapeau de la vue — au téléphone, elle la
+   chevauchait (revue de lecture des captures, 24/09/2026 ; aucun oracle ne l'avait vu). */
+.chap.lire + .chap.lire { margin-top: 16px; }
+.chap.lire + section.ch { margin-top: 32px; }
+p.ch-apprend { font-size: 1.02rem; }
+p.exemple-lecture { border-left: 1px solid var(--line); padding-left: 12px; }
+section.ch { position: relative; padding: 0 0 8px; }
+section.ch + section.ch { margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--line); }
+.ch-tete { display: grid; grid-template-columns: var(--gouttiere) minmax(0, 1fr); align-items: start;
+  margin: 0 0 12px; }
+.ch-pastille { grid-column: 1; margin-top: -.26rem; width: 2.2rem; height: 2.2rem;
+  border-radius: 999px; background: var(--accent); color: var(--sur-accent); display: flex;
+  align-items: center; justify-content: center; font-family: var(--head); font-weight: 800;
+  font-size: 1rem; flex: none; }
+.ch-pastille.code { width: auto; min-width: 2.2rem; padding: 0 8px; font-family: var(--mono);
+  font-size: .78rem; }
+.ch-titres { grid-column: 2; min-width: 0; }
+.ch-titres h3 { font-size: 1.35rem; font-weight: 800; margin: 0; }
+.ch-titres h3 code { font-size: .8em; }
+/* Le rail tient la colonne du chapitre : teinté sous la pastille, il s'éteint vers le gris — il
+   dit où le chapitre commence, il ne barre pas la page. C'est un ÉLÉMENT FRÈRE du texte
+   (`<div class="ch-rail" aria-hidden="true">`), jamais un `::before` de `.ch-corps` : peint en
+   dégradé sur l'ANCÊTRE du texte, il rendait le contraste de tout le chapitre non mesurable par
+   la sonde du socle — 440 éléments « à vérifier à l'œil » sur l'instance, mesuré le 24/09/2026. */
+.ch-corps { position: relative; padding-left: var(--gouttiere); }
+.ch-rail { position: absolute; left: calc(1.1rem - 1px); top: 0; bottom: 6px; width: 2px;
+  border-radius: 2px; background: linear-gradient(to bottom, var(--accent) 0 32px, var(--line) 120px); }
+.ch-corps > .ch-rail + * { margin-top: 0; }
+.ch-corps > :last-child { margin-bottom: 0; }
+.regle-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; margin: 12px 0 0;
+  padding: 8px 12px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm);
+  font-size: .84rem; }
+.regle-meta .meta-i b { font-family: var(--head); font-size: .68rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--faint); display: block; }
+.regle-meta .badge { font-family: var(--head); font-weight: 700; font-size: .72rem; letter-spacing: .04em;
+  text-transform: uppercase; border-radius: 999px; padding: 4px 12px; border: 1px solid var(--accent);
+  color: var(--accent-fonce); background: var(--accent-voile); display: inline-block; }
+.pas-bloc { position: relative; margin: 20px 0; padding: 0 0 0 var(--pas-retrait);
+  border-left: 1px solid var(--line); }
+.pas-bloc > :first-child { margin-top: 0; }
+.pas-bloc > :last-child { margin-bottom: 0; }
+.pas-bloc p.exemple-lecture { border-left: 0; padding-left: 0; }
+h4.pas { font-family: var(--head); font-weight: 700; font-size: 1rem; line-height: 1.3; margin: 0 0 8px;
+  display: flex; align-items: baseline; gap: 8px; scroll-margin-top: calc(var(--hh, 128px) + 16px); }
+h4.pas .puce { font-family: var(--mono); font-size: .78rem; font-weight: 700; color: var(--accent-fonce);
+  flex: none; }
+h4.pas strong { font-weight: inherit; }
+.pas-bloc[data-type="verification"] { border-left-color: var(--accent); }
+.pas-bloc[data-type="verification"] h4.pas { color: var(--accent-fonce); }
+.pas-bloc[data-type="attention"] { border-left-color: var(--amber); }
+.pas-bloc[data-type="attention"] h4.pas, .pas-bloc[data-type="attention"] h4.pas .puce { color: var(--amber); }
+/* Une PIÈCE graphique (schéma en SVG en ligne) : rendue à sa taille NATURELLE, jamais étirée. */
+figure.schema { margin: 24px 0; padding: 16px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); display: inline-block; max-width: 100%; }
+figure.schema svg { display: block; max-width: 100%; height: auto; }
+figure.schema figcaption { margin-top: 8px; color: var(--muted); font-size: .82rem; max-width: 52ch; }
+@media (max-width: 760px) {
+  main { --gouttiere: 2rem; --pas-retrait: .75rem; }
+  .ch-pastille { width: 1.8rem; height: 1.8rem; font-size: .86rem; }
+  .ch-rail { left: calc(.9rem - 1px); }
+  .ch-titres h3 { font-size: 1.15rem; }
+}
+@media print {
+  .chap.lire { max-width: none; }
+  section.ch { break-inside: auto; }
+}

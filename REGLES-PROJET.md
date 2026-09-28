@@ -1414,3 +1414,71 @@ est un défaut, parce qu'il fait passer une couverture réelle pour une absence.
 
 Contrôle exécutable : `oracle-regle-sans-juge` RJ2, qui accepte ce numéro depuis qu'il est déclaré
 ici et continue de refuser tout autre numéro opposé par du code et absent du corpus.
+
+## AL. R-57 — un document MÛR remonte à la bibliothèque : sa FORME, jamais sa matière (décision humaine du 24/09/2026)
+
+Décision humaine directe du 24/09/2026, rendue dans l'espace d'engagement `Produit-64`, mot pour
+mot : « Crées en également une règle pour la Factory afin que les documents matures comme celui-ci
+remonte automatiquement en gabarit à la Factory, pour être réutilisé entièrement ou en partie. »
+Elle suit, dans le même message, le verdict de forme qui l'a fait naître : « Le format du guide du
+développeur et l'usage des composants utilisés, comme la recherche, les onglets, les menus sur le
+côté, la popup pour les fichiers MD, les chapitres, sous-chapitres sont vraiment tops. »
+
+**Le fait.** R-46 fait remonter ce qu'un document produit DEPUIS un gabarit a coûté à ce gabarit.
+Rien ne faisait remonter un document produit SANS gabarit — ou qui a dépassé le sien — quand sa
+forme mûrit. Le document qui fonde la règle comptait vingt-trois versions datées en dix jours,
+des oracles verts et un verdict de lecteur ; il était invisible à tout autre projet. Ce n'est pas un
+cas isolé : la bibliothèque est née d'un gabarit de rapport barré et documenté par un projet, resté
+chez lui (13/08), et ses quatre premières familles n'ont été extraites que parce qu'on est allé
+chercher la matière, une fois, à la main.
+
+**R-57.**
+1. **Un document est MÛR par l'une de deux voies, toutes deux constatables.**
+   - **Mûr déclaré** : l'humain qui le lit juge sa FORME (« vraiment top », « excellente mise en
+     page ») ou demande d'en faire un gabarit. Son verdict, cité mot pour mot et daté, **vaut
+     décision de remontée** : aucune autre décision n'est demandée (loi n° 5 — elle est prise).
+   - **Mûr mesuré** : un livrable d'`output\` dont l'objet compte **cinq versions datées ou plus**
+     (courante et `old\` comprises) — sa forme a été reprise quatre fois. Seuil mesuré le 24/09/2026
+     sur le produit qui fonde la règle : 31 objets HTML, 8 à cinq versions ou plus. Le compte est
+     une borne basse assumée : il ne dit rien de la qualité d'une forme, il empêche qu'un document
+     repris cinq fois reste tu.
+2. **Le canal est le lot de retours** : section « Documents mûrs » (`gabarits\RETOURS-FORGES.md`).
+   Pour chaque document mûr, son chemin CHEZ LE PRODUIT, ses versions, le verdict des oracles, le
+   verdict humain cité s'il existe, les composants qu'il porte, et le **verdict de remontée** —
+   *remonté* ou *reste au produit, parce que…* (même exigence d'écrit que R-45). Un document
+   déclaré une fois n'a pas à l'être de nouveau. Un lot sans document mûr le déclare.
+3. **La forme, jamais la matière.** Remonter, c'est ouvrir ou enrichir une famille de
+   `gabarits\documents\` — `GABARIT.md`, un point de départ (squelette, générateur), une INSTANCE
+   FICTIVE — et/ou des composants. Aucun livrable client n'entre dans ce dépôt, qui est publié
+   (note de provenance d'`input\02-entrants-html\`, 27/08/2026) ; le produit est cité par son
+   pseudonyme. La famille naît jugée comme toute autre (G1-G12, oracles du socle, recette
+   d'interactions quand elle en porte une) : un oracle vert ne décide pas de la VALEUR d'une forme,
+   et la remontée n'ouvre aucune dérogation aux contrôles.
+4. **Les composants montent au socle quand ils sont PARTAGÉS.** Un composant neuf naît dans la
+   famille qui l'a remonté, avec sa source unique, son poseur et sa parité ; il monte au socle
+   `digit-ai-page-html` dès qu'une SECONDE famille l'emploie — écriture directe dans la forge
+   (R-55), résultat restitué. Un composant servi par une seule famille reste chez elle.
+5. **Câblée aux deux bouts, comme R-45 et R-46.**
+   - Le déclencheur HUMAIN : `oracles\hook-lexique.mjs` reconnaît, dans le message de l'humain, un
+     verdict de forme ou une demande de gabarit, et injecte la consigne R-57 dans le tour — chez le
+     pilot comme chez tout produit, par le hook `UserPromptSubmit` hérité. Une négation (« le
+     format n'est pas top ») n'injecte rien.
+   - Le déclencheur MESURÉ : `gabarits\oracle-lot-retours.mjs` exige la section (règle `R-57`) et,
+     chez le produit, balaie son `output\` et refuse le lot qui tait un document mûr mesuré
+     (constat `LOT-MURS`). La porte du pilot l'importe : `todo\ingerer-lot.mjs` refuse le lot
+     incomplet, registre intact. À cette porte, le lot est pseudonymisé et la mesure ne se rejoue
+     plus : elle se joue AVANT la remise, et le constat le dit.
+6. **Ce que R-57 n'exige PAS.** Elle ne juge pas la valeur d'une forme ; elle ne hisse rien sans
+   l'extraire — un document mûr devient une famille par le travail du pilot, pas par une copie ;
+   elle ne s'applique qu'aux lots datés du **29/09/2026 ou après** (R-33 bis : décidée le 24/09,
+   la règle n'entre au `main` du pilot que le 28/09 — les lots écrits jusque-là, sans elle sous la
+   main, ne sont pas accusés).
+
+**Première application, le jour même.** Le guide qui fonde la règle est remonté en famille
+`gd-guide-de-reference` (générateur, squelette, instance fictive, huit composants posables un à un,
+sonde d'interactions) ; le lot du produit le déclare en premier.
+
+Contrôle exécutable : `oracle-lot-retours` règles `R-57` et `LOT-MURS` (recette à double sens,
+`gabarits\oracle-lot-retours.test.mjs`) ; consigne R-57 de `oracles\hook-lexique.mjs` (recette
+`--self-test` et `oracles\hook-lexique.test.mjs`) ; la famille remontée, par
+`oracles\oracle-gabarits-documents.mjs`. Classe : `document-mur-non-remonte` (`todo\CLASSES.json`).

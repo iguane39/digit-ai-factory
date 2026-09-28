@@ -1,0 +1,53 @@
+/* gd-guide-de-reference · modale.css — la FENÊTRE MODALE à onglets.
+ *
+ * Deux emplois dans le document source, une seule mécanique : le FICHIER SOURCE Markdown
+ * (onglets « Mise en forme » et « Sans formatage ») et la FICHE d'un code cité (un onglet par
+ * panneau de la fiche). Les titres rendus DANS la fenêtre sont dégradés en paragraphes stylés
+ * (`.md-h1` … `.md-h6`) : un titre de plus dans l'arbre du document ferait croire à un chapitre.
+ */
+.modale { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center;
+  justify-content: center; padding: 3vh 3vw; }
+.modale[hidden], .modale-corps[hidden] { display: none; }
+.modale-fond { position: absolute; inset: 0; background: var(--voile); }
+.modale-boite { position: relative; display: flex; flex-direction: column; width: min(1100px, 94vw);
+  max-height: 94vh; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, .28); overflow: hidden; }
+.modale-tete { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px 16px;
+  border-bottom: 1px solid var(--line); background: var(--bg); }
+.modale-titre { margin: 0; font-family: var(--mono); font-size: .86rem; color: var(--muted); flex: 1 1 auto; }
+.modale-onglets { display: flex; gap: 8px; flex-wrap: wrap; }
+.modale-onglets button, .modale-fermer { font-family: var(--sans); font-size: .86rem; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 16px; }
+.modale-onglets button[aria-selected="true"] { background: var(--accent); border-color: var(--accent-fonce);
+  color: var(--sur-accent); font-weight: 700; }
+.modale-fermer:hover, .modale-onglets button:hover { border-color: var(--accent-fonce); }
+.modale-corps { overflow: auto; padding: 20px 24px; }
+.modale-corps .md-h1 { font-family: var(--head); font-weight: 800; font-size: 1.5rem; margin: 16px 0 8px; }
+.modale-corps .md-h2 { font-family: var(--head); font-weight: 800; font-size: 1.2rem; margin: 24px 0 8px;
+  padding-top: 8px; border-top: 2px solid var(--accent); }
+.modale-corps .md-h3 { font-family: var(--head); font-weight: 700; font-size: 1.02rem; margin: 16px 0 8px; }
+.modale-corps .md-h4, .modale-corps .md-h5, .modale-corps .md-h6 { font-family: var(--head);
+  font-weight: 700; font-size: .94rem; margin: 16px 0 8px; color: var(--muted); }
+.modale-corps table { table-layout: auto; width: 100%; }
+.modale-brut pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .78rem; }
+.fiche-meta { margin: 0; padding: 8px 24px; font-size: .84rem; color: var(--muted);
+  border-bottom: 1px solid var(--line); background: var(--bg); }
+.fiche-panneaux { overflow: auto; }
+.fiche-panneaux .modale-corps { overflow: visible; }
+/* Le bouton qui OUVRE le fichier source : il se lit comme un chemin, pas comme une action. */
+.lien-source { font-family: var(--mono); font-size: .82rem; cursor: pointer; background: none; border: 0;
+  padding: 0; color: var(--accent-fonce); text-decoration: underline; text-underline-offset: 2px; }
+.lien-source:hover { color: var(--ink); }
+/* Un code cité qui ouvre sa fiche : souligné en pointillé, jamais confondu avec un lien de
+   navigation. Sans script, il reste un code lisible, et son title l'explique. */
+a.code-fiche { text-decoration: none; color: inherit; }
+a.code-fiche code { border-bottom: 2px dotted var(--accent); cursor: pointer; color: var(--accent-fonce); }
+a.code-fiche:hover code, a.code-fiche:focus-visible code { background: var(--accent-voile);
+  border-bottom-style: solid; }
+/* Au téléphone, un bouton de la fenêtre est une cible tactile : 44 px au moins (oracle-mobile M2). */
+@media (max-width: 760px) { .modale-onglets button, .modale-fermer { min-height: 44px; } }
+@media print {
+  .modale { display: none; }
+  .modale-corps[role="tabpanel"][hidden] { display: block; }
+}
