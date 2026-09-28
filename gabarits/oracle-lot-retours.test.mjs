@@ -67,6 +67,40 @@ check("rouge — section R-46 absente : FAIL, et le remède nomme LE TITRE de la
   if (!/## Retours sur les documents produits/.test(c.remede || "")) throw new Error("le remède ne donne pas le titre EXACT à écrire");
 });
 
+// TF-1430 (28/09/2026) — LE REMÈDE NOMME LE GABARIT CANONIQUE, JAMAIS L'ALIAS DE TRANSITION. Il
+// nommait `forge\retours\RETOURS-FORGES.md`, alias périmé chez tout produit qui porte aussi la cible
+// canonique (TF-0881) : le lot du 28/09 rédigé d'après lui est parti sans classe et hors du sas. Le
+// nom attendu se LIT au contrat d'héritage, jamais recopié ici : un renommage futur y fera rougir.
+{
+  const { readFileSync, existsSync } = await import("node:fs");
+  const { join, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const PILOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+  const contrat = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
+  const gabarit = contrat.artefacts.find((a) => a.source === "gabarits/RETOURS-FORGES.md");
+  const cheminDuRemede = (remede) => ((/Gabarit : (\S+)/.exec(remede || "") || [])[1] || "").split("\\").join("/");
+
+  check("rouge TF-1430 — le remède de R-45 nomme la cible CANONIQUE du contrat d'héritage, jamais son alias de transition", () => {
+    const c = constat(verifier(lot("20260928a"), `# lot\n\n${R46}`), "R-45");
+    if (!gabarit || !gabarit.alias_accepte) throw new Error("le contrat ne déclare plus le gabarit et son alias : la recette ne sait plus quoi comparer");
+    const nomme = cheminDuRemede(c.remede);
+    if (nomme === gabarit.alias_accepte) throw new Error(`le remède envoie encore vers l'alias périmé ${nomme}`);
+    if (nomme !== gabarit.cible) throw new Error(`le remède nomme « ${nomme} », le contrat déclare « ${gabarit.cible} »`);
+  });
+
+  check("remède joué TF-1430 — le gabarit nommé porte la section demandée, et le lot qui l'ajoute comme le remède le dit PASSE", () => {
+    const c = constat(verifier(lot("20260928a"), `# lot\n\n${R46}`), "R-45");
+    const source = contrat.artefacts.find((a) => a.cible === cheminDuRemede(c.remede));
+    if (!source) throw new Error("le chemin nommé par le remède n'est la cible d'aucun artefact du contrat");
+    const texteGabarit = readFileSync(join(PILOT, source.source), "utf8");
+    const titre = (/« (## [^»]+?) »/.exec(c.remede) || [])[1];
+    const rien = (/L'écrire : « ([^»]+?) »/.exec(c.remede) || [])[1];
+    if (!titre || !existsSync(join(PILOT, source.source)) || !texteGabarit.split(/\r?\n/).includes(titre)) throw new Error(`le gabarit ${source.source} ne porte pas le titre « ${titre} » que le remède fait écrire`);
+    const r = verifier(lot("20260928a"), `# lot\n\n${titre}\n\n${rien}.\n\n${R46}`);
+    if (constat(r, "R-45").statut !== "PASS") throw new Error(`le lot corrigé selon le remède reste en défaut : ${JSON.stringify(constat(r, "R-45"))}`);
+  });
+}
+
 check("rouge — section R-45 PRÉSENTE mais vide : une section vide se lit comme un oubli", () => {
   const r = verifier(lot("20260824a"), `# lot\n\n## Remarques restées au produit\n\n(rien)\n\n${R46}`);
   const c = constat(r, "R-45");

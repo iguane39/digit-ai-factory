@@ -97,7 +97,16 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.4.0"; // 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.4.1"; // 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+
+/**
+ * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
+ * produit (`gabarits\HERITAGE.json`, TF-0710). Le remède nommait encore l'alias de transition
+ * `forge\retours\RETOURS-FORGES.md` : un produit qui porte les deux ouvrait la copie périmée, et
+ * le lot qu'il en tirait arrivait sans classe et hors du sas (TF-1430, lot Produit-76 du 28/09).
+ * Non exporté, à dessein : la porte du pilot importe ce module, et ses exports ne bougent pas.
+ */
+const GABARIT_LOT = "forge\\retours\\GABARIT-LOT-RETOURS.md";
 
 // LOT-SAS (TF-1054) juge un NOM avec le MÊME juge que `todo\accueillir-lot.mjs` — deux juges des
 // noms qui ne s'accordent pas donnent le pire des deux mondes (leçon de la casse, 01/09). Import
@@ -332,7 +341,7 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
     if (!section.test(texte)) {
       ajouter(regle, "FAIL",
         `section « ${quoi} » absente — ${pourquoi}`,
-        `ajouter la section « ## ${quoi} » au lot. Rien à y mettre ? L'écrire : « ${rienADire} ». La forme se déclare, elle ne se devine pas (loi n° 3). Gabarit : forge\\retours\\RETOURS-FORGES.md`);
+        `ajouter la section « ## ${quoi} » au lot. Rien à y mettre ? L'écrire : « ${rienADire} ». La forme se déclare, elle ne se devine pas (loi n° 3). Gabarit : ${GABARIT_LOT}`);
       continue;
     }
     const suite = corpsDeSection(texte, section);

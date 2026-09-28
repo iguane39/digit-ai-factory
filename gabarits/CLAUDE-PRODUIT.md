@@ -36,11 +36,16 @@ elle s'arrête et le dit.
 **Remontée automatique vers le pilot** : toute friction forge observée en session
 (convention découverte en lisant du code, faux positif d'oracle, aller-retour subi) se
 consigne immédiatement au ledger. À la clôture de tout run : compilation ledger → lot `.md`
-+ **sidecar `.tf.jsonl`** (gabarit dans `forge\retours\`) avec contrôle de complétude — tout
-retour du ledger a sa candidature, sinon le run le déclare — puis **copie automatique des
-deux fichiers dans `<pilot>\input\00-retours\`** (nommés `<projet> - RETOURS - …`, le préfixe
-projet est obligatoire). Le geste humain de remise disparaît ; la décision
-humaine demeure (tout entre en candidat au registre TODO-FORGE).
++ **sidecar `.tf.jsonl`**, avec contrôle de complétude — tout retour du ledger a sa
+candidature, sinon le run le déclare. Le gabarit du lot est `forge\retours\GABARIT-LOT-RETOURS.md`.
+L'ancien `forge\retours\RETOURS-FORGES.md` est un alias de transition, périmé dès que le gabarit
+canonique existe : il ne se lit plus et se retire par `git rm` (TF-0710, TF-0881). Les 2 fichiers
+se nomment `<projet> - RETOURS - …`, le préfixe projet est obligatoire. Ils sont **copiés
+automatiquement dans le sas `<pilot>\input\00-retours\_arrivee\`** (ignoré par git), **jamais à
+la racine d'`input\00-retours\`**. Un lot posé à la racine sous un nom réel est refusé (LOT-SAS,
+TF-1054) ; le pilot le dépose lui-même après pseudonymisation (`todo\accueillir-lot.mjs`). Le
+geste humain de remise disparaît ; la décision humaine demeure (tout entre en candidat au
+registre TODO-FORGE).
 
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
