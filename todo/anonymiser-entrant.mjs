@@ -180,8 +180,29 @@ export const extensionInterdite = (chemin) => estUnBanc() && !sousRepertoireTemp
  */
 export const MARQUEUR_REGISTRE_JETABLE = "FORGE_REGISTRE_JETABLE";
 
-/** Pseudonyme STABLE d'un produit ; l'inscrit s'il est inconnu. */
-export function pseudoProduit(nom) {
+/**
+ * TF-1432 (28/09/2026) — le pseudonyme EXISTANT du dossier d'une racine déclarée, sinon `null`.
+ * Lecture seule : rien n'est inscrit. Deux passes, comme `scripts/lib-pseudonyme-produit.mjs` : une
+ * clé qui porte déjà le pseudonyme d'un client ne se rejoint qu'après la substitution du client. Le
+ * pseudonyme trouvé doit être une VALEUR de la table : un segment « Produit-NN » qu'elle ne connaît
+ * pas ne désigne aucun de ses produits.
+ */
+export function pseudonymeDeRacine(racine) {
+  if (typeof racine !== "string" || !racine.trim()) return null;
+  const dossier = racine.trim().replaceAll("\\", "/").replace(/\/+$/, "").split("/").pop();
+  const d = lireProduits();
+  if (!dossier || !d || !d.produits) return null;
+  let propre;
+  try { propre = anonymiser(anonymiser(dossier).texte).texte; } catch { return null; }
+  const m = String(propre).match(/Produit-\d{2,}/);
+  return m && Object.values(d.produits).includes(m[0]) ? m[0] : null;
+}
+
+/**
+ * Pseudonyme STABLE d'un produit ; l'inscrit s'il est inconnu. `racine` : la racine que le lot
+ * déclare (`racine_produit`) — un nom neuf dont le dossier a déjà un pseudonyme le rejoint (TF-1432).
+ */
+export function pseudoProduit(nom, { racine = null } = {}) {
   const p = CHEMIN_PRODUITS();
   // UN BANC DE TEST N'ÉTEND JAMAIS LE RÉFÉRENTIEL RÉEL (08/09/2026), et c'est la TROISIÈME fois
   // que la même classe se paie ici : la garde du dessus — « un nom de moins de 5 caractères ne
@@ -234,6 +255,32 @@ export function pseudoProduit(nom) {
         + `des produits (${p}) : poser des tables jetables et les désigner par FORGE_NOMS_INTERDITS et `
         + "FORGE_PRODUITS_PSEUDO, ou ingérer dans le registre par défaut (TF-1431)");
     }
+    // TF-1328 (26/09/2026) : l'écrivain pose la date d'inscription au bloc `depuis` (D-31 (a) du
+    // 08/09). Sans elle, la porte de publication juge toute l'histoire du nom SANS borne — la
+    // rétroactivité que la date supprimait : Produit-66 et Produit-67 en ont été privés. Le jour est
+    // LOCAL, comme les dates d'enregistrement auxquelles la porte le compare.
+    const j = new Date();
+    const jour = `${j.getFullYear()}-${String(j.getMonth() + 1).padStart(2, "0")}-${String(j.getDate()).padStart(2, "0")}`;
+    // TF-1432 (28/09/2026) — UN PRODUIT CONNU PAR SA RACINE NE REÇOIT PAS UN SECOND PSEUDONYME. Le
+    // même produit était Produit-73 sous la forme de son nom de dossier (27/09), puis Produit-76 sous
+    // celle de son préfixe de lot (28/09) : les règles qui comparent les lots d'un produit n'en
+    // voyaient plus aucun. Le lot déclarait sa racine, dont le dossier avait déjà son pseudonyme : le
+    // nom neuf en est une autre graphie, et il le rejoint. Le rattachement se DÉCLARE au bloc
+    // `rattachements`, que la règle K5 du canal (« un pseudonyme, une clé ») doit lire pour tolérer
+    // l'alias. Une table qui ne porte pas ce bloc n'en reçoit pas en silence : le pseudonyme neuf est
+    // alloué comme avant, et l'ingestion DIT le dédoublement.
+    const duDossier = racine ? pseudonymeDeRacine(racine) : null;
+    const rattachements = d.rattachements && typeof d.rattachements === "object" && !Array.isArray(d.rattachements) ? d.rattachements : null;
+    if (duDossier && rattachements) {
+      d.produits[nom] = duDossier;
+      rattachements[nom] = { pseudonyme: duDossier, depuis: jour, motif: "racine déclarée par le lot (racine_produit) : dossier déjà inscrit sous ce pseudonyme (TF-1432)" };
+      d.depuis = d.depuis && typeof d.depuis === "object" ? d.depuis : {};
+      d.depuis[nom] = jour;
+      d.date_derniere_extension = jour;
+      writeFileSync(p, JSON.stringify(d, null, 1), "utf8");
+      console.error(`[RATTACHÉ] un nom de produit neuf rejoint ${duDossier}, le pseudonyme du dossier de sa racine déclarée : aucun pseudonyme neuf (TF-1432)`);
+      return duDossier;
+    }
     // TF-1329 (26/09/2026) : l'indice suit le plus grand déjà attribué ou RÉSERVÉ, jamais le NOMBRE
     // de clés. Compter les clés ré-attribue un indice retiré sans réservation dès que la table porte
     // moins de clés que d'indices : 61 et 62, pris le 05/09 par deux forges puis retirés (TF-0807),
@@ -241,12 +288,6 @@ export function pseudoProduit(nom) {
     const indices = Object.values(d.produits).map((v) => Number(String(v).replace(/^Produit-/, ""))).filter((x) => Number.isInteger(x) && x > 0);
     const n = (indices.length ? Math.max(...indices) : 0) + 1;
     d.produits[nom] = `Produit-${String(n).padStart(2, "0")}`;
-    // TF-1328 (26/09/2026) : l'écrivain pose la date d'inscription au bloc `depuis` (D-31 (a) du
-    // 08/09). Sans elle, la porte de publication juge toute l'histoire du nom SANS borne — la
-    // rétroactivité que la date supprimait : Produit-66 et Produit-67 en ont été privés. Le jour est
-    // LOCAL, comme les dates d'enregistrement auxquelles la porte le compare.
-    const j = new Date();
-    const jour = `${j.getFullYear()}-${String(j.getMonth() + 1).padStart(2, "0")}-${String(j.getDate()).padStart(2, "0")}`;
     d.depuis = d.depuis && typeof d.depuis === "object" ? d.depuis : {};
     d.depuis[nom] = jour;
     d.date_derniere_extension = jour;
