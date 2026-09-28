@@ -14,8 +14,10 @@ Trois usages :
   python construire-guide.py --poser <page.html> --composants coquille-vues.css,coquille-vues.js
       pose UN OU PLUSIEURS composants de la famille dans une page QUELCONQUE (réemploi à la carte) ;
       un bloc déjà posé est remis à sa source.
-  python construire-guide.py --constat <page.html>
-      rejoue la parité des blocs posés contre leurs sources (exit 1 si une copie a dérivé).
+  python construire-guide.py --constat <page.html> [--socle <dossier>]
+      rejoue la parité des blocs posés contre leurs sources : ceux de la famille ET les 4 du socle
+      qu'elle embarque (exit 1 si une copie a dérivé, 2 si un bloc n'a pas pu être comparé — le
+      verdict dit lesquels et pourquoi). `--self-test` rejoue sa recette à double sens.
 
 La source (format complet dans ../GABARIT.md) :
   - un en-tête `---` de lignes `cle: valeur` : marque, objet, sous_titre, description, version,
@@ -778,6 +780,73 @@ def constat(page):
     return etats
 
 
+# TF-1433 (28/09/2026) — LA PARITÉ NE VOYAIT PAS LE SOCLE QUE LA PAGE EMBARQUE. `constat` ne lit que
+# les blocs COMPOSANT-GABARIT de la famille ; toute page du générateur porte AUSSI les 4 blocs
+# COMPOSANT-EMBARQUE du socle (COMPOSANTS_SOCLE). Mesuré en intégrant la famille au pilot : le
+# squelette du commit 3941463 embarquait find-in-page.js à l'empreinte sha256:108b35a7313c quand le
+# socle installé était à sha256:c12d95c744a5, et `--constat` rendait « 13 bloc(s), 0 écart(s) »
+# sans un mot des 4 autres. Ces blocs sont désormais confrontés au socle RÉSOLU, par le juge du
+# socle lui-même : sa fonction pure `confronterBlocs`, importée par son chemin réel. Aucun format de
+# bloc n'est réécrit ici — un second poseur est le défaut même que le socle existe pour éteindre
+# (TF-0890). La page lui arrive fins de ligne normalisées, comme aux blocs de la famille : son propre
+# `--constat` compare octet pour octet et déclare PÉRIMÉE toute copie d'une page extraite en CRLF.
+RE_BLOC_SOCLE = re.compile(r"<!--\s*COMPOSANT-EMBARQUE:DEBUT\s+([A-Za-z0-9._-]+)")
+PONT_SOCLE = ("const { confronterBlocs } = await import(process.env.JUGE_DU_SOCLE);"
+              "const morceaux = []; for await (const m of process.stdin) morceaux.push(m);"
+              "const html = Buffer.concat(morceaux).toString('utf8').split('\\r\\n').join('\\n');"
+              "const r = confronterBlocs(html, 'page');"
+              "process.stdout.write(JSON.stringify({ ecarts: r.ecarts, ajour: r.ajour }));")
+RE_ETAT_SOCLE = ((re.compile(r"^page · ([A-Za-z0-9._-]+)$"), "à jour"),
+                 (re.compile(r"^page · ([A-Za-z0-9._-]+) : copie PÉRIMÉE"), "PÉRIMÉ"),
+                 (re.compile(r"^page : composant « ([A-Za-z0-9._-]+) » introuvable"), "inconnu"),
+                 (re.compile(r"^page : marqueur DEBUT ([A-Za-z0-9._-]+) sans marqueur FIN"), "sans FIN"))
+
+
+def constat_socle(page, socle):
+    """Les blocs du SOCLE embarqués dans la page, confrontés au socle résolu par SON juge.
+
+    Rend (etats, non_compares, motif) : `etats` = [(nom, 'à jour' | 'PÉRIMÉ' | 'inconnu' | 'sans FIN')],
+    `non_compares` = les blocs qu'on n'a PAS pu comparer, et pourquoi — jamais tus, jamais comptés à jour.
+    """
+    page = page.replace("\r\n", "\n")
+    noms = RE_BLOC_SOCLE.findall(page)
+    if not noms:
+        return [], [], ""
+    if socle is None:
+        return [], noms, "socle digit-ai-page-html introuvable (--socle <dossier>, ou skill installé)"
+    juge = Path(os.path.realpath(socle / "scripts" / "embarquer-composants.mjs"))
+    # En OCTETS, pas en texte : un tube ouvert en mode texte réécrit chaque saut de ligne en CRLF sous
+    # Windows, et le juge du socle déclarait alors PÉRIMÉE une page qu'il venait de poser (mesuré ici).
+    try:
+        r = subprocess.run(["node", "--input-type=module", "-e", PONT_SOCLE], input=page.encode("utf-8"),
+                           capture_output=True, env=dict(os.environ, JUGE_DU_SOCLE=juge.as_uri()))
+    except OSError as e:
+        return [], noms, "node injoignable, le juge du socle n'a pas été appelé : %s" % e
+    try:
+        rendu = json.loads(r.stdout.decode("utf-8", errors="replace"))
+    except ValueError:
+        rendu = None
+    if not isinstance(rendu, dict):
+        derniere = (r.stderr.decode("utf-8", errors="replace").strip().splitlines() or ["aucune sortie"])[-1]
+        return [], noms, "le juge du socle (%s) n'a rien rendu de lisible (exit %s) : %s" % (juge, r.returncode,
+                                                                                          derniere[:160])
+    restants = {}
+    for texte in rendu.get("ajour", []) + rendu.get("ecarts", []):
+        for motif, etat in RE_ETAT_SOCLE:
+            m = motif.match(texte)
+            if m:
+                restants.setdefault(m.group(1), []).append(etat)
+                break
+    etats, non_compares = [], []
+    for nom in noms:
+        if restants.get(nom):
+            etats.append((nom, restants[nom].pop(0)))
+        else:
+            non_compares.append(nom)
+    return etats, non_compares, ("le juge du socle (%s) ne rend aucun état lisible pour ce bloc" % juge
+                                 if non_compares else "")
+
+
 def socle_page_html(explicite=None):
     candidats = [Path(explicite)] if explicite else []
     for racine in (os.environ.get("CLAUDE_CONFIG_DIR"), str(Path.home() / ".claude")):
@@ -809,6 +878,32 @@ def poser_socle(cible, socle):
         print("le poseur du socle a rendu 0 sans poser : %s — page non autoportante, construction refusée"
               % ", ".join(manquants), file=sys.stderr)
         raise SystemExit(3)
+
+
+def rendre_constat(page, socle):
+    """Le verdict de --constat : (lignes, code). Il dit ce qu'il a comparé ET ce qu'il n'a pas pu comparer.
+
+    Code : 1 si un bloc comparé a dérivé de sa source ; sinon 2 si un bloc n'a pas pu être comparé
+    (socle introuvable, juge du socle muet) — « je n'ai pas tout regardé » a son code, il ne passe
+    jamais pour un vert ; 0 si tous les blocs posés sont à la parité de leur source.
+    """
+    famille = constat(page)
+    socle_etats, non_compares, motif = constat_socle(page, socle)
+    lignes = ["  [%s] %s" % (etat, nom) for nom, etat in famille]
+    lignes += ["  [%s] %s (socle)" % (etat, nom) for nom, etat in socle_etats]
+    lignes += ["  [NON COMPARÉ] %s (socle) — %s" % (nom, motif) for nom in non_compares]
+    ecarts = sum(1 for _, etat in famille + socle_etats if etat != "à jour")
+    poses = len(famille) + len(socle_etats) + len(non_compares)
+    parts = ["%d de la famille %s (sources : composants/)" % (len(famille), GABARIT_ID)]
+    if socle_etats:
+        parts.append("%d du socle digit-ai-page-html (socle résolu : %s)" % (len(socle_etats),
+                                                                          Path(os.path.realpath(socle))))
+    if non_compares:
+        parts.append("%d du socle NON comparé(s) : %s" % (len(non_compares), motif))
+    lignes.append("constat : %d bloc(s) posé(s), %d comparé(s) — %s — %d écart(s)%s"
+                  % (poses, len(famille) + len(socle_etats), " ; ".join(parts), ecarts,
+                     " sur les blocs comparés" if non_compares else ""))
+    return lignes, (1 if ecarts else 2 if non_compares else 0)
 
 
 # --------------------------------------------------------------------------- complétude
@@ -947,6 +1042,88 @@ def construire(chemin_source, sortie=None, version=None, retenues=None, chemin_f
     return cible, len(vues), mots_rendus, mots_source, len(cites)
 
 
+# --------------------------------------------------------------------------- recette de --constat
+
+def _alterer(page, marqueur, ligne):
+    """Insère `ligne` en tête du corps du bloc que `marqueur` ouvre : la copie d'une autre version."""
+    debut = page.index(marqueur)
+    corps = page.index(">\n", debut) + 2
+    return page[:corps] + ligne + "\n" + page[corps:]
+
+
+def self_test(socle_explicite=None):
+    """La parité de --constat dans ses deux sens, sur des pages jetables (TF-1433).
+
+    Rouge : des blocs du socle qu'aucun socle ne juge sont DITS non comparés (exit 2) ; un bloc de la
+    famille qui a dérivé reste PÉRIMÉ ; un find-in-page.js d'une autre version que le socle installé
+    est PÉRIMÉ (exit 1). Vert : la page posée par le poseur du socle passe, la même en CRLF aussi, et
+    la page périmée reposée par ce poseur repasse (exit 0). Sans socle installé, les quatre cas qui le
+    posent se déclarent NON JOUÉS dans la forme que lit le cliquet du harnais du pilot (TF-1434).
+    """
+    import tempfile
+    casse, joues, non_joues = [], [0], 0
+
+    def attendre(nom, lignes, code, code_attendu, motif):
+        joues[0] += 1
+        if code != code_attendu or not re.search(motif, SAUT.join(lignes)):
+            casse.append("%s : exit %s (attendu %s), motif « %s » absent — %s"
+                         % (nom, code, code_attendu, motif, lignes[-1] if lignes else "aucune ligne"))
+
+    base = poser("<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n<title>recette</title>\n</head>\n"
+                 "<body>\n<p>recette</p>\n</body>\n</html>\n", ["jetons.css"])
+    # 1. ROUGE, jouable partout : des blocs du socle, et aucun socle pour les juger.
+    marque = ("<!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js -->\n<script>//</script>\n"
+              "<!-- COMPOSANT-EMBARQUE:FIN find-in-page.js -->\n")
+    lignes, code = rendre_constat(base.replace("</body>", marque + "</body>"), None)
+    attendre("socle introuvable", lignes, code, 2,
+             r"\[NON COMPARÉ\] find-in-page\.js \(socle\)[\s\S]*1 du socle NON comparé")
+    # 2. ROUGE, jouable partout : un bloc de la famille qui a dérivé reste PÉRIMÉ.
+    lignes, code = rendre_constat(_alterer(base, 'data-composant-gabarit="', "/* autre version */"), None)
+    attendre("bloc de la famille dérivé", lignes, code, 1, r"\[PÉRIMÉ\] jetons\.css[\s\S]*1 écart")
+    socle = socle_page_html(socle_explicite)
+    if socle is None:
+        non_joues = 4
+        print("[NON JOUÉ] %d cas — construire-guide 3 à 6 (TF-1433) : socle digit-ai-page-html introuvable, "
+              "aucun bloc du socle ne peut être posé ni jugé sur ce poste" % non_joues)
+    else:
+        with tempfile.TemporaryDirectory() as d:
+            cible = Path(d) / "page.html"
+            cible.write_text(base, encoding="utf-8", newline="\n")
+            try:
+                poser_socle(cible, socle)
+                posee = cible.read_text(encoding="utf-8")
+                # 3. VERT : les blocs posés, famille ET socle, sont tous comparés, et à jour.
+                lignes, code = rendre_constat(posee, socle)
+                attendre("page posée", lignes, code, 0,
+                         r"5 bloc\(s\) posé\(s\), 5 comparé\(s\) — 1 de la famille[^;]*; 4 du socle "
+                         r"digit-ai-page-html[\s\S]*0 écart")
+                # 4. VERT : la même page extraite en CRLF n'est pas un faux rouge.
+                lignes, code = rendre_constat(posee.replace("\n", "\r\n"), socle)
+                attendre("page en CRLF", lignes, code, 0, r"5 comparé\(s\)[\s\S]*0 écart")
+                # 5. ROUGE : un find-in-page.js d'une autre version que le socle installé est PÉRIMÉ.
+                ancienne = _alterer(posee, 'data-composant="find-in-page.js"', "// version antérieure au socle")
+                lignes, code = rendre_constat(ancienne, socle)
+                attendre("bloc du socle d'une autre version", lignes, code, 1,
+                         r"\[PÉRIMÉ\] find-in-page\.js \(socle\)[\s\S]*1 écart")
+                # 6. VERT : la même page, reposée par le poseur du socle, repasse la parité.
+                cible.write_text(ancienne, encoding="utf-8", newline="\n")
+                poser_socle(cible, socle)
+                lignes, code = rendre_constat(cible.read_text(encoding="utf-8"), socle)
+                attendre("page reposée", lignes, code, 0, r"5 comparé\(s\)[\s\S]*0 écart")
+            except SystemExit as e:
+                casse.append("le poseur du socle a refusé la page de recette (exit %s)" % e.code)
+    if casse:
+        print("construire-guide --self-test : FAIL" + SAUT + SAUT.join("  - " + c for c in casse))
+        return 1
+    print("construire-guide --self-test (TF-1433) : %d/%d%s — la parité de --constat dans ses DEUX sens : "
+          "blocs du socle non jugés DITS non comparés (exit 2), bloc de la famille dérivé PÉRIMÉ, page posée "
+          "par le poseur du socle à jour, en LF comme en CRLF, find-in-page.js d'une autre version PÉRIMÉ "
+          "(exit 1) puis à jour une fois reposé"
+          % (joues[0], joues[0], (" (+%d NON JOUÉ(S) sur ce poste, déclaré(s) plus haut)" % non_joues)
+                                  if non_joues else ""))
+    return 0
+
+
 def main():
     a = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     a.add_argument("source", nargs="?", help="le Markdown tenu à jour")
@@ -957,14 +1134,15 @@ def main():
     a.add_argument("--socle", help="dossier du skill digit-ai-page-html (défaut : skill installé)")
     a.add_argument("--poser", help="page où poser des composants de la famille")
     a.add_argument("--composants", default="", help="composants à poser, séparés par des virgules")
-    a.add_argument("--constat", help="page dont les blocs posés sont confrontés à leurs sources")
+    a.add_argument("--constat", help="page dont les blocs posés, famille et socle, sont confrontés à leurs sources")
+    a.add_argument("--self-test", action="store_true", help="rejoue la recette de --constat (fixtures à double sens)")
     args = a.parse_args()
+    if args.self_test:
+        return self_test(args.socle)
     if args.constat:
-        etats = constat(Path(args.constat).read_text(encoding="utf-8"))
-        for nom, etat in etats:
-            print("  [%s] %s" % (etat, nom))
-        print("constat : %d bloc(s), %d écart(s)" % (len(etats), sum(1 for _, e in etats if e != "à jour")))
-        return 1 if any(e != "à jour" for _, e in etats) else 0
+        lignes, code = rendre_constat(Path(args.constat).read_text(encoding="utf-8"), socle_page_html(args.socle))
+        print(SAUT.join(lignes))
+        return code
     if args.poser:
         noms = [n.strip() for n in args.composants.split(",") if n.strip()]
         if not noms:

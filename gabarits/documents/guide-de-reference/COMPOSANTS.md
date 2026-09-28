@@ -7,8 +7,12 @@ l'a payé sept fois sur un seul composant (TF-0784).
 
 ```
 python generateur/construire-guide.py --poser <page.html> --composants jetons.css,modale.css,modale.js
-python generateur/construire-guide.py --constat <page.html>      # exit 1 si une copie a dérivé
+python generateur/construire-guide.py --constat <page.html>      # exit 1 si une copie a dérivé, famille ou socle ; 2 si un bloc n'a pas pu être comparé
 ```
+
+`--constat` juge aussi les 4 blocs du socle que la page embarque, par le juge du socle lui-même
+(TF-1433). Son verdict compte les blocs posés et ceux qu'il a comparés ; il nomme ceux qu'il n'a pas
+pu comparer.
 
 Une feuille se pose avant `</head>`, un script avant `</body>` ; un bloc déjà posé est remis à sa
 source. Le bloc porte `<!-- COMPOSANT-GABARIT:DEBUT <nom> … -->` et `data-composant-gabarit` :

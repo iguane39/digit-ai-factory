@@ -166,7 +166,8 @@ Ce que la machine juge sur une page de cette famille, et ce qui reste une lectur
 | `run-oracles-design.mjs` de forge-design | slop, jetons, mobile, bascule, goût, saisie, déclencheurs, surcouche |
 | `check_completude.py` du socle, et la garde du générateur | la page porte au moins les mots de sa source |
 | `generateur/sonde-interactions.py` | les composants MARCHENT : onglets, adresse profonde, menu latéral en fin de page, recherche et résultats, filtres après une recherche effacée, fenêtre source et retour du focus, fiche d'un code, thème, téléphone |
-| `construire-guide.py --constat` | chaque composant posé est la copie exacte de sa source |
+| `construire-guide.py --constat` | chaque composant posé, ceux de la famille et les 4 du socle qu'elle embarque, est la copie exacte de sa source ; un bloc non comparé est nommé, exit 2 (TF-1433) |
+| `construire-guide.py --self-test` | la parité sait refuser : un bloc du socle d'une autre version est PÉRIMÉ, et reposé par le poseur du socle il repasse |
 | `oracle-gabarits-documents.mjs` (G1-G5, G7, G10-G12) | doctrine et instance, fil gabarit + version rendu, largeur de page déclarée, lecteur et frontière |
 | relecture humaine — **due, et non mécanisable** | que chaque chapitre serve le lecteur déclaré, et que chaque règle citée soit à jour à sa source |
 
