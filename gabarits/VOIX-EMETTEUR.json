@@ -1,0 +1,69 @@
+{
+ "schema": "pilot/voix-emetteur@1",
+ "version": "1.0.0",
+ "date": "<AAAA-MM-JJ de la dernière revue de ces règles>",
+ "source": "<la ligne éditoriale d'où viennent ces règles : chemin chez le produit, et la décision humaine qui l'a validée>",
+ "role": "Gabarit des RÈGLES DE VOIX d'un émetteur, pour le parcours réseau (references/RUN-RESEAU.md, étape N2, porte « voix »). Le produit le copie à la racine de son run sous le nom voix.json, à côté de emetteur.json, et remplace chaque <…>. Lu par oracles/oracle-run-reseau.mjs, règle RR8 (TF-1455, décision humaine D-32 (a) du 28/09/2026).",
+ "regle": "Une donnée, pas du code (loi n° 4) : datée, sourcée, revue à chaque revue mensuelle N6. Chaque règle vérifiable s'écrit ici avec son type et sa portée ; une règle qu'aucun calcul ne juge (ton, registre) se déclare lecture_humaine : elle est nommée à chaque verdict, jamais jugée. Un <…> resté dans le fichier le fait refuser : une règle qui porte encore son trou n'est pas une règle.",
+ "champs": {
+  "id": "identifiant stable de la règle, unique dans le fichier (V1, V2…)",
+  "type": "mots_ecartes | formules_imposees | plafond | motif_interdit | lecture_humaine",
+  "libelle": "la règle en une phrase, telle que la ligne éditoriale l'écrit ; c'est elle que le verdict cite",
+  "portee": "corps (défaut) | accroche (première ligne non vide) | cloture (dernière ligne qui n'est pas faite de hashtags)",
+  "reseaux": "facultatif : les réseaux où la règle s'applique ; absent = tous",
+  "modeles": "facultatif : les modèles de publication où la règle s'applique ; absent = tous",
+  "valeurs": "mots_ecartes et formules_imposees : les mots ou expressions ; comparés sans casse ni accents, en mots entiers",
+  "exige": "formules_imposees : toutes (défaut) ou une",
+  "objet": "plafond : emojis | hashtags",
+  "min": "plafond : nombre minimal, facultatif",
+  "max": "plafond : nombre maximal, facultatif ; au moins l'un des deux",
+  "motif": "motif_interdit : expression régulière JavaScript, jouée sans casse ; motif illisible = règle refusée, jamais ignorée",
+  "motif_non_juge": "lecture_humaine : pourquoi aucun calcul ne la juge",
+  "sans_regle_mecanisable": "au niveau du fichier, si aucune règle n'est mécanisable : le motif, écrit ; un fichier sans règle et sans motif est refusé"
+ },
+ "regles": [
+  {
+   "id": "V1",
+   "type": "mots_ecartes",
+   "libelle": "<les mots que la marque n'emploie jamais>",
+   "valeurs": ["<mot ou expression écartée>"]
+  },
+  {
+   "id": "V2",
+   "type": "formules_imposees",
+   "libelle": "<la formule que la marque exige, et où>",
+   "valeurs": ["<formule exigée, mot pour mot>"],
+   "exige": "toutes",
+   "portee": "corps"
+  },
+  {
+   "id": "V3",
+   "type": "plafond",
+   "libelle": "2 émojis au plus",
+   "objet": "emojis",
+   "max": 2
+  },
+  {
+   "id": "V4",
+   "type": "plafond",
+   "libelle": "3 à 5 hashtags",
+   "objet": "hashtags",
+   "min": 3,
+   "max": 5,
+   "modeles": ["publication-reseau", "legende-image"]
+  },
+  {
+   "id": "V5",
+   "type": "motif_interdit",
+   "libelle": "aucun taux en accroche",
+   "motif": "\\d+(?:[.,]\\d+)?\\s*%",
+   "portee": "accroche"
+  },
+  {
+   "id": "V6",
+   "type": "lecture_humaine",
+   "libelle": "<une règle de ton ou de registre>",
+   "motif_non_juge": "le registre se lit, il ne se compte pas"
+  }
+ ]
+}

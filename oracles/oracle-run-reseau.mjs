@@ -24,7 +24,8 @@
  *                       `genere: true|false`, et la pièce que le contrat exige — `visuel: <fichier>`
  *                       ou `avis: <fichier>`, présent dans le dossier ;
  *   accord.json         N3 : { accord, date, par, lot:[fichiers], fictif } — l'accord HUMAIN (R-38) ;
- *   mesures.json        N5 : { export, temps_humain_minutes, indicateurs:[{nom,valeur,seuil}] }.
+ *   mesures.json        N5 : { export, temps_humain_minutes, indicateurs:[{nom,valeur,seuil}] } ;
+ *   voix.json           N0, jouée en N2 : les règles de voix de l'émetteur, à côté de emetteur.json.
  *
  * Règles (chacune binaire) :
  *   RR1 calendrier présent, ≥ 4 lignes de publication datées (horizon de 4 semaines) ;
@@ -40,6 +41,10 @@
  *   RR7 fiche « émetteur et réseaux » : type d'émetteur, réseaux retenus, un modèle par réseau
  *       qui le sert, gouvernance de chaque compte (au moins un rôle, double facteur déclaré,
  *       reprise prévue), AUCUN secret ; chaque publication vise un réseau de la fiche.
+ *   RR8 voix de l'émetteur (TF-1455) : `voix.json`, dans la semaine ou dans son parent, au format
+ *       `gabarits\VOIX-EMETTEUR.json` — daté, sourcé, sans marqueur de gabarit ; chaque publication
+ *       tient les règles de sa portée : mots écartés, formules imposées, plafonds d'émojis et de
+ *       hashtags, motifs interdits par position. Une règle `lecture_humaine` est nommée, jamais jugée.
  *
  * Ce qu'il ne juge PAS, et ne jugera jamais : la qualité du texte contre sa barre externe (lecture
  * humaine, `la-barre`), la sincérité d'un accord, la véracité d'un export, le fait que la
@@ -65,6 +70,8 @@ const CONTRATS = join(SKILLS, "digit-ai-communication", "references", "contrats-
 const TYPES_EMETTEUR = ["A1", "A2"]; // A1 société de conseil · A2 commerce de proximité (étude 20260921a, axe A)
 const MODELE_PAR_DEFAUT = "publication-reseau";
 const RESEAU_PAR_DEFAUT = "linkedin";
+/** Un hashtag, pour RR2 comme pour RR8 : deux comptes d'un même objet ne doivent pas diverger. */
+const RE_HASHTAG = /(^|\s)#[\p{L}\p{N}_]+/gu;
 
 /** Joue un oracle de forge-agents et rend son verdict ; absent ou illisible → SKIP motivé. */
 function jouer(script, args) {
@@ -97,7 +104,7 @@ export function defautsDuContrat(texte, contrat, dossier) {
   const corps = corpsSansFrontmatter(texte).trim();
   const mots = corps.split(/\s+/).filter((m) => /[\p{L}\p{N}]/u.test(m) && !m.startsWith("#")).length;
   const lignes = corps.split(/\r?\n/).filter((l) => l.trim());
-  const hashtags = (corps.match(/(^|\s)#[\p{L}\p{N}_]+/gu) || []).length;
+  const hashtags = (corps.match(RE_HASHTAG) || []).length;
   const sansHashtags = lignes.filter((l) => !/^(\s*#[\p{L}\p{N}_]+)+\s*$/u.test(l));
   const cloture = sansHashtags[sansHashtags.length - 1] || "";
   const defauts = [];
@@ -113,6 +120,127 @@ export function defautsDuContrat(texte, contrat, dossier) {
     else if (!existsSync(join(dossier, nom)) || !readFileSync(join(dossier, nom)).length) defauts.push(`pièce « ${contrat.piece_requise} » déclarée (${nom}) mais absente ou vide dans le dossier`);
   }
   return { defauts, mots, hashtags };
+}
+
+// ---- RR8 · LA VOIX DE L'ÉMETTEUR (TF-1455, décision humaine D-32 (a) du 28/09/2026) ------------
+//
+// Le fait, remonté par le lot Produit-78 20260928g (RP-15) : l'étape N2 de RUN-RESEAU.md annonçait
+// trois portes, dont « voix par la règle de marque », et aucun contrôle ne jouait celle-ci. Les
+// règles vérifiables d'une ligne éditoriale (mots écartés, formules imposées, 2 émojis au plus,
+// 3 à 5 hashtags, aucun taux en accroche) n'avaient ni format ni lecteur : relues à l'œil à chaque
+// lot. Le format est une DONNÉE par émetteur (`voix.json`, gabarit `gabarits\VOIX-EMETTEUR.json`,
+// loi n° 4) ; aucune règle de voix n'est écrite dans ce code, et aucun modèle n'est appelé.
+export const SCHEMA_VOIX = "pilot/voix-emetteur@1";
+const TYPES_VOIX = ["mots_ecartes", "formules_imposees", "plafond", "motif_interdit", "lecture_humaine"];
+const PORTEES_VOIX = { corps: "dans le corps", accroche: "en accroche", cloture: "en clôture" };
+const OBJETS_PLAFOND = ["emojis", "hashtags"];
+const MARQUEUR_GABARIT = /<[^<>\n]{2,160}>/;
+
+/** Minuscules, sans accents ni apostrophe typographique, blancs simples : « N’hésitez » = « n'hesitez ». */
+const aplatir = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’ʼ]/g, "'")
+  .toLowerCase().replace(/\s+/g, " ");
+
+/** L'expression figure-t-elle dans le texte en MOTS ENTIERS, sans casse ni accents ? */
+export function contientExpression(texte, expression) {
+  const e = aplatir(expression).trim();
+  if (!e) return false;
+  const motif = e.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+");
+  return new RegExp(`(?<![\\p{L}\\p{N}])${motif}(?![\\p{L}\\p{N}])`, "u").test(aplatir(texte));
+}
+
+/** Les émojis d'un texte, comptés par graphème : un drapeau, une famille, un pouce teinté = 1. */
+export function compterEmojis(texte) {
+  let n = 0;
+  for (const { segment } of new Intl.Segmenter("fr", { granularity: "grapheme" }).segment(String(texte)))
+    if (/\p{Extended_Pictographic}|\p{Regional_Indicator}|\u20E3/u.test(segment) && !["©", "®", "™"].includes(segment)) n++;
+  return n;
+}
+
+/** Les trois portées d'une publication, lues comme RR2 les lit : corps, accroche, clôture. */
+function portees(texte) {
+  const corps = corpsSansFrontmatter(texte).trim();
+  const lignes = corps.split(/\r?\n/).filter((l) => l.trim());
+  const sansHashtags = lignes.filter((l) => !/^(\s*#[\p{L}\p{N}_]+)+\s*$/u.test(l));
+  return { corps, accroche: lignes[0] || "", cloture: sansHashtags[sansHashtags.length - 1] || "" };
+}
+
+/**
+ * Lit et valide un fichier de voix. Rend { regles, date, erreurs[] } : toute erreur de format fait
+ * rougir RR8, parce qu'une règle illisible ignorée en silence serait une porte ouverte qui se dit fermée.
+ */
+export function chargerVoix(brut) {
+  let v;
+  try { v = JSON.parse(brut); } catch { return { regles: [], erreurs: ["voix.json illisible : JSON invalide"] }; }
+  const erreurs = [];
+  if (!v || v.schema !== SCHEMA_VOIX) erreurs.push(`schéma « ${v && v.schema} » inconnu, ${SCHEMA_VOIX} attendu`);
+  if (!/^20\d{2}-\d{2}-\d{2}$/.test(String(v && v.date))) erreurs.push("`date` absente ou hors de la forme AAAA-MM-JJ : une règle de voix est datée (loi n° 4)");
+  if (!String((v && v.source) || "").trim()) erreurs.push("`source` absente : une règle de voix dit de quelle ligne éditoriale elle vient (loi n° 4)");
+  const regles = Array.isArray(v && v.regles) ? v.regles : [];
+  if (!Array.isArray(v && v.regles)) erreurs.push("`regles` absente ou hors tableau");
+  // Les marqueurs se cherchent dans la DONNÉE écrite par l'émetteur, et là seulement : `role`,
+  // `regle` et `champs` documentent le format, et un `motif` d'expression régulière peut porter
+  // `(?<!…)` ou un groupe nommé `(?<nom>…)` sans être un trou.
+  const marqueur = MARQUEUR_GABARIT.exec([v && v.date, v && v.source, v && v.sans_regle_mecanisable,
+    ...regles.flatMap((r) => (r ? [r.libelle, ...(Array.isArray(r.valeurs) ? r.valeurs : []), r.motif_non_juge] : []))]
+    .filter((x) => x !== undefined && x !== null).map(String).join("\n"));
+  if (marqueur) erreurs.push(`marqueur du gabarit non instancié : ${marqueur[0]} — une règle qui porte encore son trou n'est pas une règle`);
+  const ids = new Set();
+  for (const r of regles) {
+    const nom = (r && r.id) || "(sans id)";
+    if (!r || !r.id || ids.has(r.id)) erreurs.push(`règle ${nom} : \`id\` absent ou répété`);
+    else ids.add(r.id);
+    if (!r || !TYPES_VOIX.includes(r.type)) { erreurs.push(`règle ${nom} : type « ${r && r.type} » inconnu (${TYPES_VOIX.join(" | ")})`); continue; }
+    if (!String(r.libelle || "").trim()) erreurs.push(`règle ${nom} : \`libelle\` absent — le verdict cite la règle telle que la ligne éditoriale l'écrit`);
+    if (r.portee !== undefined && !PORTEES_VOIX[r.portee]) erreurs.push(`règle ${nom} : portée « ${r.portee} » inconnue (${Object.keys(PORTEES_VOIX).join(" | ")})`);
+    if (["mots_ecartes", "formules_imposees"].includes(r.type)
+      && (!Array.isArray(r.valeurs) || !r.valeurs.length || r.valeurs.some((x) => !String(x).trim()))) erreurs.push(`règle ${nom} : \`valeurs\` vide`);
+    if (r.type === "formules_imposees" && r.exige !== undefined && !["toutes", "une"].includes(r.exige)) erreurs.push(`règle ${nom} : \`exige\` vaut « toutes » ou « une »`);
+    if (r.type === "plafond") {
+      if (!OBJETS_PLAFOND.includes(r.objet)) erreurs.push(`règle ${nom} : objet « ${r.objet} » que ce contrôle ne compte pas (${OBJETS_PLAFOND.join(" | ")})`);
+      const bornes = [r.min, r.max].filter((x) => x !== undefined);
+      if (!bornes.length || bornes.some((x) => !Number.isInteger(x) || x < 0)) erreurs.push(`règle ${nom} : \`min\` ou \`max\`, entier positif, attendu`);
+    }
+    if (r.type === "motif_interdit") {
+      try { if (!String(r.motif || "")) throw new Error("motif vide"); new RegExp(String(r.motif), "iu"); }
+      catch (e) { erreurs.push(`règle ${nom} : motif illisible (${String(e.message).slice(0, 60)}) — une règle illisible n'est jamais ignorée`); }
+    }
+    if (r.type === "lecture_humaine" && !String(r.motif_non_juge || "").trim()) erreurs.push(`règle ${nom} : \`motif_non_juge\` absent — dire pourquoi aucun calcul ne la juge`);
+  }
+  if (!regles.some((r) => r && TYPES_VOIX.includes(r.type) && r.type !== "lecture_humaine") && !String((v && v.sans_regle_mecanisable) || "").trim())
+    erreurs.push("aucune règle mécanisable, et `sans_regle_mecanisable` n'en écrit pas le motif — l'omission ne vaut pas déclaration (loi n° 3)");
+  return { regles, date: v && v.date, erreurs };
+}
+
+/** Écarts d'UNE publication aux règles de voix de sa portée ; [] quand elle les tient toutes. */
+export function ecartsDeVoix(texte, { reseau, modele }, regles, contrats) {
+  const p = portees(texte);
+  const ecarts = [];
+  for (const r of regles) {
+    if (r.type === "lecture_humaine") continue;
+    if ((Array.isArray(r.reseaux) && !r.reseaux.includes(reseau)) || (Array.isArray(r.modeles) && !r.modeles.includes(modele))) continue;
+    const zone = r.portee || "corps", ou = PORTEES_VOIX[zone], t = p[zone];
+    if (r.type === "mots_ecartes") {
+      const vus = r.valeurs.filter((x) => contientExpression(t, x));
+      if (vus.length) ecarts.push(`${r.id} « ${r.libelle} » : ${vus.map((x) => `« ${x} »`).join(", ")} ${ou} — le retirer ou le remplacer`);
+    } else if (r.type === "formules_imposees") {
+      const manquent = r.valeurs.filter((x) => !contientExpression(t, x));
+      if ((r.exige || "toutes") === "une" ? manquent.length === r.valeurs.length : manquent.length)
+        ecarts.push(`${r.id} « ${r.libelle} » : ${manquent.map((x) => `« ${x} »`).join(", ")} absente(s) ${ou} — l'écrire`);
+    } else if (r.type === "plafond") {
+      const contrat = contrats && contrats[modele];
+      if (r.objet === "hashtags" && r.min !== undefined && contrat && r.min > contrat.hashtags_max) {
+        ecarts.push(`${r.id} « ${r.libelle} » inapplicable au modèle « ${modele} », dont le contrat admet ${contrat.hashtags_max} hashtag(s) au plus — restreindre la portée de la règle (\`modeles\`)`);
+        continue;
+      }
+      const n = r.objet === "emojis" ? compterEmojis(t) : (t.match(RE_HASHTAG) || []).length;
+      if ((r.min !== undefined && n < r.min) || (r.max !== undefined && n > r.max))
+        ecarts.push(`${r.id} « ${r.libelle} » : ${n} ${r.objet === "emojis" ? "émoji(s)" : "hashtag(s)"} ${ou}, ${r.min ?? 0} à ${r.max ?? "sans plafond"} attendu(s)`);
+    } else if (r.type === "motif_interdit") {
+      const m = new RegExp(String(r.motif), "iu").exec(t);
+      if (m) ecarts.push(`${r.id} « ${r.libelle} » : « ${m[0]} » ${ou} — ${zone === "corps" ? "le retirer" : `le déplacer hors de ${zone === "accroche" ? "l'accroche" : "la clôture"}, ou le retirer`}`);
+    }
+  }
+  return ecarts;
 }
 
 export function juger(dossier, { mentions, contrats = chargerContrats() } = {}) {
@@ -206,6 +334,26 @@ export function juger(dossier, { mentions, contrats = chargerContrats() } = {}) 
     fautes.length ? ko("RR7", `fiche « émetteur et réseaux » en défaut — ${fautes.join(" | ")}`) : ok("RR7", `émetteur ${fiche.type_emetteur}, ${reseaux.length} réseau(x) : ${reseaux.join(", ")}`);
   }
 
+  // RR8 — voix de l'émetteur, dans la semaine ou dans son parent (TF-1455)
+  const brutVoix = lire("voix.json") ?? lire("voix.json", dirname(resolve(dossier)));
+  if (brutVoix === null) ko("RR8", "voix.json absent, ni dans le dossier de la semaine, ni dans son parent : la porte « voix » n'a aucune règle à jouer — copier gabarits\\VOIX-EMETTEUR.json du pilot à la racine du run sous ce nom, et le remplir d'après la ligne éditoriale");
+  else {
+    const voix = chargerVoix(brutVoix);
+    const humaines = voix.regles.filter((r) => r && r.type === "lecture_humaine").map((r) => `${r.id} « ${r.libelle} »`);
+    const dites = humaines.length ? ` ; en lecture humaine, nommée(s) et jamais jugée(s) ici : ${humaines.join(", ")}` : "";
+    if (voix.erreurs.length) ko("RR8", `voix.json refusé — ${voix.erreurs.join(" | ")}`);
+    else {
+      const fautes = [];
+      for (const d of declarations) {
+        const e = ecartsDeVoix(lire(d.fichier), d, voix.regles, contrats);
+        if (e.length) fautes.push(`${d.fichier} [${d.modele}] : ${e.join(" · ")}`);
+      }
+      fautes.length
+        ? ko("RR8", `voix de l'émetteur non tenue — ${fautes.join(" | ")}${dites}`)
+        : ok("RR8", `voix de l'émetteur tenue : ${voix.regles.length - humaines.length} règle(s) jouée(s) sur ${declarations.length} publication(s), voix.json du ${voix.date}${dites}`);
+    }
+  }
+
   return findings;
 }
 
@@ -215,6 +363,7 @@ const NON_JUGE = [
   "la sincérité de l'accord et la véracité de l'export",
   "le fait que la publication ait eu lieu ou ait été programmée : geste humain, dans l'outil de la plateforme",
   "la réalité du double facteur et des rôles déclarés à la fiche : ils se déclarent, ils ne se sondent pas",
+  "RR8 : une règle de voix `lecture_humaine` (ton, registre) — nommée à chaque verdict, jamais jugée ; et la JUSTESSE des règles de voix.json, qui appartient à la ligne éditoriale de l'émetteur",
 ];
 
 function rendre(cible, findings) {
@@ -231,6 +380,21 @@ const FICHE_VERTE = {
   modeles: { linkedin: "publication-reseau", instagram: "legende-image", "fiche-etablissement": "reponse-avis" },
   gouvernance: ["linkedin", "instagram", "fiche-etablissement"].map((reseau) => ({ reseau, roles: ["propriétaire : le gérant", "rédacteur : un salarié désigné"], double_facteur: true, reprise: "le gérant garde le rôle propriétaire ; un départ retire le rôle le jour même" })),
 };
+const ACCROCHE_VERTE = "Une étude faite en une matinée peut éviter de construire ce qu'il ne fallait pas construire.";
+/** RR8 : une accroche qui ouvre sur un taux, sourcé pour que RR3 reste verte et que seule la voix rougisse. */
+const TAUX_EN_TETE = "72 % des acheteurs vérifient un contenu généré avant de le croire (source : enquête citée par une étude fictive du 2026-09-11, section 3).";
+// RR8 (TF-1455) : les règles de voix de la semaine verte — une par type, chacune tenue par le lot.
+const VOIX_VERTE = {
+  schema: SCHEMA_VOIX, version: "1.0.0", date: "2026-09-28", source: "ligne éditoriale fictive de la semaine à blanc, revue le 2026-09-28",
+  regles: [
+    { id: "V1", type: "mots_ecartes", libelle: "jamais de superlatif creux ni d'injonction molle", valeurs: ["révolutionnaire", "incroyable", "n'hésitez pas"] },
+    { id: "V2", type: "formules_imposees", libelle: "une réponse à un avis s'ouvre par un remerciement", valeurs: ["merci"], exige: "une", portee: "accroche", modeles: ["reponse-avis"] },
+    { id: "V3", type: "plafond", libelle: "2 émojis au plus", objet: "emojis", max: 2 },
+    { id: "V4", type: "plafond", libelle: "3 à 5 hashtags", objet: "hashtags", min: 3, max: 5, modeles: ["publication-reseau"] },
+    { id: "V5", type: "motif_interdit", libelle: "aucun taux en accroche", motif: "\\d+(?:[.,]\\d+)?\\s*%", portee: "accroche" },
+    { id: "V6", type: "lecture_humaine", libelle: "un ton chaleureux, jamais familier", motif_non_juge: "le registre se lit, il ne se compte pas" },
+  ],
+};
 
 function semaine(dir, { rouge }) {
   mkdirSync(dir, { recursive: true });
@@ -238,7 +402,7 @@ function semaine(dir, { rouge }) {
   writeFileSync(join(dir, "calendrier.md"), "| Date | Réseau | Pilier | Sujet | Statut |\n|---|---|---|---|---|\n" +
     (rouge ? dates.slice(0, 2) : dates).map((d) => `| ${d} | linkedin | méthode | sujet fictif | prévu |`).join("\n") + "\n");
   const phrase = "Nous avons mesuré avant de conclure, et la mesure a contredit notre première lecture du dossier. ";
-  const corpsVert = "Une étude faite en une matinée peut éviter de construire ce qu'il ne fallait pas construire.\n\n" +
+  const corpsVert = ACCROCHE_VERTE + "\n\n" +
     phrase.repeat(9) + "\n\nEn 2025, 72 % des acheteurs vérifiaient un contenu généré (source : enquête citée par une étude fictive du 2026-09-11, section 3).\n\n" +
     MENTION + "\n\nEt vous, quelle question posez-vous avant de lancer un chantier ?\n\n#méthode #décision #conseil\n";
   const corpsRouge = "Notre offre fait gagner 45 000 € par an à chaque client.\n\n#a #b #c #d #e #f #g\n";
@@ -259,6 +423,7 @@ function semaine(dir, { rouge }) {
       "Depuis lundi, une personne de plus prend les commandes en salle le samedi soir. " +
       "Si vous revenez, dites-le à l'accueil : nous aimerions vous montrer la différence.\n\n" + MENTION + "\n");
     writeFileSync(join(dir, "emetteur.json"), JSON.stringify(FICHE_VERTE, null, 1));
+    writeFileSync(join(dir, "voix.json"), JSON.stringify(VOIX_VERTE, null, 1));
     writeFileSync(join(dir, "accord.json"), JSON.stringify({ accord: true, date: "2026-09-22", par: "émetteur fictif", lot: ["publication-avis.md", "publication-instagram.md", "publication-linkedin.md"], fictif: true }));
   }
   writeFileSync(join(dir, "mesures.json"), JSON.stringify(rouge ? { indicateurs: [] } : {
@@ -281,10 +446,13 @@ if (arg === "--self-test") {
     const r = juger(join(base, "rouge"));
     cas += 2;
     if (enEchec(v).length) casse.push(`la semaine verte échoue sur ${enEchec(v).join(", ")} : ${v.filter((x) => x.statut === "FAIL").map((x) => x.message).join(" | ")}`);
-    for (const regle of ["RR1", "RR2", "RR3", "RR4", "RR5", "RR6", "RR7"])
+    for (const regle of ["RR1", "RR2", "RR3", "RR4", "RR5", "RR6", "RR7", "RR8"])
       if (!enEchec(r).includes(regle)) casse.push(`la semaine rouge n'échoue pas sur ${regle}`);
     const joues = v.filter((x) => /^RR[34]$/.test(x.regle) && /introuvable|illisible/.test(x.message)).map((x) => x.regle);
     if (joues.length) casse.push(`oracle(s) de forge-agents non joué(s) (${joues.join(", ")}) — la semaine à blanc ne prouve rien sans eux`);
+    const voixVerte = v.find((x) => x.regle === "RR8");
+    if (!voixVerte || !/5 règle\(s\) jouée\(s\) sur 3 publication/.test(voixVerte.message) || !/V6 « un ton chaleureux, jamais familier »/.test(voixVerte.message))
+      casse.push(`RR8 verte ne dit pas ce qu'elle a joué ni la règle laissée à la lecture humaine : ${voixVerte && voixVerte.message}`);
 
     // 3 à 8 — UNE altération de la semaine verte, UNE règle rouge, et elle NOMME ce qu'elle voit.
     // Une semaine rouge qui échoue partout ne prouve pas qu'une règle discrimine.
@@ -311,9 +479,80 @@ if (arg === "--self-test") {
     const sc = juger(join(base, "sans-contrats"), { contrats: null });
     cas++;
     if (!enEchec(sc).includes("RR2")) casse.push("contrats absents : RR2 ne rougit pas — un contrat absent rendrait PASS");
+
+    // 10 à 22 — RR8, la voix de l'émetteur (TF-1455) : chaque altération ne rougit QUE la voix, et
+    // nomme ce qu'elle voit. Les textes changent d'un mot, d'un émoji ou d'une ligne : RR2 à RR4 restent vertes.
+    const remplacer = (d, fichier, avant, apres) => {
+      const t = readFileSync(join(d, fichier), "utf8");
+      if (!t.includes(avant)) throw new Error(`altération impossible : « ${avant.slice(0, 40)} » absent de ${fichier}`);
+      writeFileSync(join(d, fichier), t.replace(avant, apres));
+    };
+    const voix = (d, geste) => { const x = JSON.parse(readFileSync(join(d, "voix.json"), "utf8")); geste(x); writeFileSync(join(d, "voix.json"), JSON.stringify(x, null, 1)); };
+    alterer("voix-absente", (d) => rmSync(join(d, "voix.json")), "RR8", "voix.json absent");
+    alterer("mot-ecarte", (d) => remplacer(d, "publication-instagram.md", "La terrasse rouvre", "La terrasse incroyable rouvre"), "RR8", "« incroyable »");
+    // Sans casse ni accents, apostrophe typographique comprise : la graphie ne fait pas passer un mot écarté.
+    alterer("mot-ecarte-sans-accent", (d) => remplacer(d, "publication-instagram.md", "La terrasse rouvre", "La terrasse REVOLUTIONNAIRE rouvre"), "RR8", "« révolutionnaire »");
+    alterer("mot-ecarte-typographie", (d) => remplacer(d, "publication-avis.md", "Si vous revenez", "N’hésitez pas : si vous revenez"), "RR8", "« n'hésitez pas »");
+    alterer("taux-en-accroche", (d) => remplacer(d, "publication-linkedin.md", ACCROCHE_VERTE, TAUX_EN_TETE), "RR8", "« 72 % » en accroche");
+    alterer("trop-d-emojis", (d) => remplacer(d, "publication-instagram.md", "Le chef a gardé", "Le chef 🍂🍁🍂 a gardé"), "RR8", "3 émoji(s)");
+    alterer("hashtags-manquants", (d) => remplacer(d, "publication-linkedin.md", "#méthode #décision #conseil", "#méthode #décision"), "RR8", "2 hashtag(s)");
+    alterer("formule-absente", (d) => remplacer(d, "publication-avis.md", "Merci pour votre retour sur le repas.", "Votre retour sur le repas nous aide."), "RR8", "« merci » absente(s) en accroche");
+    alterer("portee-incompatible", (d) => voix(d, (x) => { delete x.regles[3].modeles; }), "RR8", "inapplicable au modèle « reponse-avis »");
+    alterer("marqueur-restant", (d) => voix(d, (x) => { x.regles[0].valeurs.push("<mot ou expression écartée>"); }), "RR8", "marqueur du gabarit");
+    alterer("motif-illisible", (d) => voix(d, (x) => { x.regles[4].motif = "(taux"; }), "RR8", "motif illisible");
+    alterer("voix-non-datee", (d) => voix(d, (x) => { delete x.date; }), "RR8", "datée");
+    alterer("sans-regle-sans-motif", (d) => voix(d, (x) => { x.regles = x.regles.filter((y) => y.type === "lecture_humaine"); }), "RR8", "sans_regle_mecanisable");
+
+    // 23 — borne : sans règle mécanisable mais avec son motif écrit, la porte passe et nomme la règle lue à l'humain
+    {
+      const d = join(base, "sans-regle-avec-motif");
+      semaine(d, { rouge: false });
+      voix(d, (x) => { x.regles = x.regles.filter((y) => y.type === "lecture_humaine"); x.sans_regle_mecanisable = "la ligne éditoriale fictive ne porte encore que des règles de ton"; });
+      const f = juger(d);
+      cas++;
+      const m = (f.find((x) => x.regle === "RR8") || {}).message || "";
+      if (enEchec(f).length || !/V6/.test(m)) casse.push(`sans règle mécanisable, motif écrit : attendu PASS nommant V6, obtenu ${enEchec(f).join(", ") || "PASS"} — ${m}`);
+    }
+
+    // 24 — borne : un mot écarté se cherche en MOT ENTIER ; « incroyablement » n'est pas « incroyable »
+    {
+      const d = join(base, "mot-entier");
+      semaine(d, { rouge: false });
+      remplacer(d, "publication-instagram.md", "La terrasse rouvre ce vendredi", "La terrasse rouvre incroyablement tôt ce vendredi");
+      const f = juger(d);
+      cas++;
+      if (enEchec(f).length) casse.push(`mot entier : « incroyablement » accusé comme « incroyable » — ${enEchec(f).join(", ")} : ${(f.find((x) => x.regle === "RR8") || {}).message}`);
+    }
+
+    // 25 et 26 — le GABARIT du pilot et son lecteur ne divergent pas : brut, il est refusé pour ses
+    // trous (marqueurs, date à écrire) et pour eux seuls ; instancié, il est lu sans une erreur.
+    {
+      const brut = readFileSync(join(ICI, "..", "gabarits", "VOIX-EMETTEUR.json"), "utf8");
+      const g = chargerVoix(brut);
+      cas++;
+      if (!g.erreurs.some((e) => /marqueur du gabarit/.test(e)) || g.erreurs.some((e) => !/marqueur du gabarit|`date`/.test(e)))
+        casse.push(`gabarit brut : attendu le seul refus de ses trous, obtenu ${JSON.stringify(g.erreurs)}`);
+      const gi = chargerVoix(brut.replace(/<AAAA-MM-JJ[^<>]*>/, "2026-09-28").replace(/<[^<>\n"]{2,160}>/g, "valeur instanciée"));
+      cas++;
+      if (gi.erreurs.length) casse.push(`gabarit instancié refusé par son propre lecteur : ${gi.erreurs.join(" | ")}`);
+    }
+
+    // 27 — remède joué (TF-1013) : RR8 prescrit de déplacer le taux hors de l'accroche ; déplacé, tout passe
+    {
+      const d = join(base, "taux-remede");
+      semaine(d, { rouge: false });
+      remplacer(d, "publication-linkedin.md", ACCROCHE_VERTE, TAUX_EN_TETE);
+      const prescrit = (juger(d).find((x) => x.regle === "RR8") || {}).message || "";
+      remplacer(d, "publication-linkedin.md", TAUX_EN_TETE + "\n\n", "");
+      remplacer(d, "publication-linkedin.md", "\n\nEn 2025", "\n\n" + TAUX_EN_TETE + "\n\nEn 2025");
+      const f = juger(d);
+      cas++;
+      if (!/le déplacer hors de l'accroche/.test(prescrit)) casse.push(`remède RR8 : le message ne prescrit pas le déplacement — ${prescrit}`);
+      else if (enEchec(f).length) casse.push(`remède RR8 joué : le taux déplacé hors de l'accroche laisse ${enEchec(f).join(", ")} rouge(s)`);
+    }
   } finally { rmSync(base, { recursive: true, force: true }); }
-  console.log(JSON.stringify({ outil: "oracle-run-reseau --self-test", verdict: casse.length ? "FAIL" : "PASS", cas, regles: 7, casse }, null, 1));
-  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR7 ; 6 altérations à une règle ; contrats absents)`);
+  console.log(JSON.stringify({ outil: "oracle-run-reseau --self-test", verdict: casse.length ? "FAIL" : "PASS", cas, regles: 8, casse }, null, 1));
+  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR8 ; 19 altérations à une règle ; contrats absents ; voix sans règle mécanisable mais motivée PASS ; mot entier PASS ; gabarit brut refusé et instancié lu ; remède RR8 joué)`);
   process.exit(casse.length ? 1 : 0);
 }
 if (!arg || !existsSync(arg)) { console.log(JSON.stringify({ oracle: "oracle-run-reseau", verdict: "SKIP", motif: "dossier de semaine absent" })); process.exit(2); }
