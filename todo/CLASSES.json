@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.22.0",
- "date": "2026-09-27",
+ "version": "1.23.0",
+ "date": "2026-09-28",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -1396,6 +1396,63 @@
    "voisines": [
     "restitution-bloquants-disperses",
     "restitution-action-humaine-geste-agent"
+   ]
+  },
+  {
+   "cle": "composant-qui-reecrit-le-dom-de-ses-voisins",
+   "famille": "page-html-socle",
+   "libelle": "Un composant du socle reecrit le HTML de son conteneur pour se remettre a zero et detruit en silence ce que les autres composants y tiennent : les ecouteurs poses par le filtre, les lignes depliables ou l infobulle, et l etat d affichage de la page. Apres son premier usage, ces composants ne repondent plus et la vue active revient a celle du chargement. Mesure le 23/09/2026 dans Chromium sur une page livree d un produit : le panneau de filtre s ouvre avant une recherche et plus apres (compte 1 puis 0) ; le 24/09, la vue active redevient celle du chargement apres une frappe. Source : lots Produit-64 - RETOURS - 20260923a et 20260924b, retours rattaches TF-1340 et TF-1354",
+   "creee_le": "2026-09-24",
+   "fondee_par": [
+    "TF-1340"
+   ],
+   "regle": "un composant ne reecrit jamais le HTML d une zone qu il partage : il enveloppe et desenveloppe ce qu il marque, et laisse intacts les noeuds, les ecouteurs et l etat que les autres composants y tiennent",
+   "oracle": "digit-ai-forge-agents, digit-ai-page-html scripts/self_test.py, run_recherche_composants (b010251 du 26/09/2026) : fixture recherche-composants.html, trois sequences chacune sur une page neuve (recherche effacee puis filtre, recherche active puis filtre, recherche puis chevron d une ligne depliable)",
+   "voisines": [
+    "surlignage-html-pose-dans-un-schema-svg"
+   ]
+  },
+  {
+   "cle": "contrainte-de-saisie-ignoree-en-silence",
+   "famille": "regle-morte",
+   "libelle": "Un motif de saisie (attribut pattern) qui ne se compile pas sous le drapeau v est ignore par le navigateur : le champ accepte toute valeur, la console seule le dit, et la page promettait une contrainte qui n existe pas. Mesure le 23/09/2026 dans Chromium 148 sur la copie d une page livree : « --!!-- » et « a b » rendus valides par un champ qui promettait lettres et chiffres, pendant que le controle de saisie rendait PASS. Source : lot Produit-64 - RETOURS - 20260923b, retour rattache TF-1343",
+   "creee_le": "2026-09-24",
+   "fondee_par": [
+    "TF-1343"
+   ],
+   "regle": "tout motif de saisie se compile sous le drapeau v, celui que le navigateur applique pour juger la validite ; faute de quoi la contrainte declaree n existe pas, et le controle le dit",
+   "oracle": "digit-ai-forge-design, oracles/oracle-saisie.mjs regle SA7 (37f0ade du 26/09/2026) : fixtures oracles/fixtures/saisie-sa7-rouge.html et saisie-sa7-verte.html, jouees par oracles/self-test.mjs",
+   "voisines": [
+    "regle-ecrite-sans-oracle-qui-la-joue"
+   ]
+  },
+  {
+   "cle": "surlignage-html-pose-dans-un-schema-svg",
+   "famille": "page-html-socle",
+   "libelle": "La recherche dans la page pose un element HTML (mark) dans le texte d un schema SVG : SVG ne le peint pas, et le mot trouve disparait du schema pendant la recherche. Mesure le 24/09/2026 dans Chromium sur une page livree d un produit : 93 caracteres peints avant la recherche, 87 pendant, et le titre de bande se lit amputé de son mot. Source : lot Produit-64 - RETOURS - 20260924b, retour rattache TF-1353",
+   "creee_le": "2026-09-24",
+   "fondee_par": [
+    "TF-1353"
+   ],
+   "regle": "un marquage pose dans un arbre SVG est un element de l espace de noms SVG (tspan), jamais un element HTML ; le nombre de caracteres peints ne change pas pendant la recherche",
+   "oracle": "digit-ai-forge-agents, digit-ai-page-html scripts/self_test.py, run_recherche_composants (b010251 du 26/09/2026) : quatrieme sequence, nombre de caracteres peints dans le schema SVG avant et pendant la recherche, fixture recherche-composants.html",
+   "voisines": [
+    "composant-qui-reecrit-le-dom-de-ses-voisins"
+   ]
+  },
+  {
+   "cle": "garde-contournee-par-sortie-rompue",
+   "famille": "hook-ou-gate",
+   "libelle": "Un hamecon qui refuse ecrit son motif sur la sortie d erreur puis sort en 1 ; si cette sortie est un tuyau deja ferme, il meurt au premier echo et git publie quand meme. La garde protege contre l accident, et c est un accident qui la contourne. Mesure le 24/09/2026 : 13 depots publies a 13:49 sans que la porte des noms ni la borne de R-38 ne jugent, la sortie de l envoi etant passee dans un filtre qui s etait arrete. Source : constat du pilot, retour rattache TF-1360",
+   "creee_le": "2026-09-24",
+   "fondee_par": [
+    "TF-1360"
+   ],
+   "regle": "tout hamecon qui peut refuser ignore SIGPIPE (trap '' PIPE en tete), pour que son code de sortie survive a une sortie fermee ; un envoi se verifie par l etat du distant, jamais par sa sortie filtree",
+   "oracle": "digit-ai-forge-agents, quality-oracles scripts/self-test-hamecon-publication.mjs, cas 9 (eb5799f du 26/09/2026) : un vrai git push dont la sortie part dans un filtre deja fini ; sens rouge, le meme hameçon prive de sa ligne trap '' PIPE publie malgre le refus",
+   "voisines": [
+    "gate-cout-invite-au-contournement",
+    "constat-non-bloquant-jamais-lu"
    ]
   }
  ],

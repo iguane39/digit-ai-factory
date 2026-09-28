@@ -330,6 +330,10 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-64 - RETOURS - 20260924b.tf.jsonl` | fichier | 5,7 Ko | 3 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20260924c.md` | fichier | 6,4 Ko | Lot de retours — Produit-64 → digit-ai-page-html — 2026-09-24, indice c |
 | `Produit-64 - RETOURS - 20260924c.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20260924d.md` | fichier | 7,0 Ko | Lot de retours — Produit-64 → digit-ai-factory — 2026-09-24, indice d |
+| `Produit-64 - RETOURS - 20260924d.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20260924e.md` | fichier | 19,4 Ko | Lot de retours — Produit-64 → digit-ai-factory, digit-ai-page-html — 2026-09-24, indice e |
+| `Produit-64 - RETOURS - 20260924e.tf.jsonl` | fichier | 11,2 Ko | 5 ligne(s) JSONL |
 | `Produit-65 - RETOURS - 20260903a.md` | fichier | 15,9 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260903a |
 | `Produit-65 - RETOURS - 20260903a.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
 | `Produit-67 - RETOURS - 20260922a.md` | fichier | 10,1 Ko | Retours forges — Produit-67 — 20260922a |
@@ -350,5 +354,9 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `UIA - RETOURS - 20260923a.tf.jsonl` | fichier | 3,5 Ko | 6 ligne(s) JSONL |
 | `UIA - RETOURS - 20260924a.md` | fichier | 1,9 Ko | Retours forges — UIA (Produit-71) — 20260924a |
 | `UIA - RETOURS - 20260924a.tf.jsonl` | fichier | 724 o | 1 ligne(s) JSONL |
+| `UIA - RETOURS - 20260924b.md` | fichier | 7,1 Ko | Retours forges — UIA (Produit-72) — 20260924b |
+| `UIA - RETOURS - 20260924b.tf.jsonl` | fichier | 3,6 Ko | 4 ligne(s) JSONL |
+| `UIA - RETOURS - 20260924c.md` | fichier | 3,7 Ko | Retours forges — UIA (Produit-72) — 20260924c |
+| `UIA - RETOURS - 20260924c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_332 fichier(s), 2 sous-dossier(s)_
+_340 fichier(s), 2 sous-dossier(s)_
