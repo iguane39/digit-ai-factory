@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 431 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 432 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -326,6 +326,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - D-6 D-9 D-7 D-8 executees - 20260914e.md | 20260914e | 15.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-6 D-9 D-7 D-8 executees - 20260914e.md` |
 | Digit-AI - Synthese Mandat - Decision 31a executee quatorze lots accueillis et ingeres - 20260928b.md | 20260928b | 14.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 31a executee quatorze lots accueillis et ingeres - 20260928b.md` |
 | Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md | 20260908a | 14.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md` |
+| Digit-AI - Synthese Mandat - Decision 32a executee trente quatre candidatures traitees - 20260928c.md | 20260928c | 23.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 32a executee trente quatre candidatures traitees - 20260928c.md` |
 | Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md | 20260903f | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` |
 | Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md | 20260904a | 19.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` |
 | Digit-AI - Synthese Mandat - Decisions 10a a 13a executees et retours du 15 septembre traites - 20260915a.md | 20260915a | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 10a a 13a executees et retours du 15 septembre traites - 20260915a.md` |
