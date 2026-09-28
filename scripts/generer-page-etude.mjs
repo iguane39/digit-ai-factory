@@ -132,7 +132,13 @@ export function decrireColonnes(html) {
   let n = 0;
   const notes = [];
   // Les citations qui ouvrent sur un nom en gras : elles deviennent les descriptions candidates.
-  const avecId = html.replace(/<blockquote><p><strong>([^<]{2,40})<\/strong>\s*(:|&nbsp;:)/g, (tout, nom, sep) => {
+  // TF-1443 (28/09/2026, retour Produit-78 20260928b RP-7) : le motif exigeait 2 caractères au
+  // moins entre les balises `strong` — une colonne dont le nom tient en UNE lettre (« X », un
+  // réseau) gardait sa note sous le tableau, mais son en-tête ne recevait jamais `aria-describedby`,
+  // contrairement aux 39 autres en-têtes de la même page. Rien dans la convention (une citation
+  // ouverte par le nom en gras d'une colonne) n'exige une longueur minimale : le nom est celui que
+  // l'auteur a choisi, pas celui que le motif tolère.
+  const avecId = html.replace(/<blockquote><p><strong>([^<]{1,40})<\/strong>\s*(:|&nbsp;:)/g, (tout, nom, sep) => {
     n += 1;
     const id = `col-${n}`;
     notes.push({ id, nom: nom.trim() });
@@ -146,6 +152,67 @@ export function decrireColonnes(html) {
     const note = notes.find((x) => x.nom.toLowerCase() === libelle.trim().toLowerCase());
     return note ? `<th scope="col" aria-describedby="${note.id}">${libelle}</th>` : tout;
   });
+}
+
+/**
+ * UNE ÉTUDE LONGUE POSE SON SOMMAIRE, ET LE SOMMAIRE POINTE VERS DE VRAIS CHAPITRES (TF-1437,
+ * 28/09/2026, retour Produit-78 20260928a RP-3).
+ *
+ * LE FAIT : `check_html.py` du socle avertit L6 (« aucun sommaire détecté ») sur une étude de 17
+ * chapitres, et sa règle L25 exige, au-delà de trois `<h2>`, un `<nav aria-label="Sommaire">` (ou
+ * `nav.toc`) listant CHAQUE chapitre, chacun avec une ancre vers un `id` réel et une annonce
+ * `.toc-d` d'au moins 12 caractères (L6). Le socle fournit déjà la position collante
+ * (`nav.toc.colle`, `boilerplate.html`) ; personne ne posait le MARQUAGE qui l'active.
+ *
+ * L'ANNONCE `.toc-d` NE PEUT PAS SE CONTENTER DU TITRE : le gabarit d'étude porte des titres
+ * courts et réels (« 5. Verdict » ne fait que 10 caractères) — les tronquer serait inventer une
+ * contrainte de longueur sur la PROSE de l'auteur pour satisfaire un contrôle de forme, exactement
+ * le contournement que ce fichier refuse ailleurs (cf. `decrireColonnes`). L'annonce porte donc la
+ * position du chapitre dans le sommaire (« Chapitre 2 sur 5 »), toujours ≥ 15 caractères dès que le
+ * sommaire existe (il ne s'affiche qu'à partir de 4 chapitres) : un fait vrai, pas un remplissage.
+ */
+export function identifierChapitres(html) {
+  const pris = new Set();
+  const chapitres = [];
+  const dote = html.replace(/<h2>([\s\S]*?)<\/h2>/g, (tout, dedans) => {
+    // Le texte affiché est déjà échappé par inline() (esc() puis balises) : on ne le rééchappe
+    // jamais, et on retire les balises inline (code, strong, lien) pour n'en garder que le texte,
+    // qui sert À LA FOIS d'ancre (normalisée) et de libellé affiché dans le sommaire.
+    const texte = dedans.replace(/<[^>]+>/g, "").trim();
+    const base = (texte || "chapitre").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "chapitre";
+    let id = base, suffixe = 2;
+    while (pris.has(id)) { id = `${base}-${suffixe}`; suffixe += 1; }
+    pris.add(id);
+    chapitres.push({ id, texte });
+    return `<h2 id="${id}">${dedans}</h2>`;
+  });
+  return { html: dote, chapitres };
+}
+
+/** L25 du socle : « au-delà de trois chapitres », donc le sommaire se pose DÈS le 4e. */
+export const SEUIL_SOMMAIRE = 4;
+
+/** Le style du sommaire latéral collant, posé UNE fois, seulement quand il est câblé. */
+const STYLE_SOMMAIRE = `  <style>
+    nav.toc{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
+    nav.toc a{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink)}
+    nav.toc a:hover{text-decoration:underline}
+    nav.toc a strong{font-size:.85rem;font-weight:600}
+    .toc-d{color:var(--muted);font-size:.72rem;font-weight:400}
+  </style>
+`;
+
+/**
+ * Le sommaire latéral collant du socle, prêt à insérer en tête de `<main>` — chaîne vide sous le
+ * seuil (page courte, un sommaire y serait du bruit, cf. commentaire de `identifierChapitres`).
+ */
+export function sommaireLateral(chapitres) {
+  if (chapitres.length < SEUIL_SOMMAIRE) return "";
+  const total = chapitres.length;
+  const entrees = chapitres.map(({ id, texte }, i) =>
+    `<a href="#${id}"><strong>${texte}</strong> <span class="toc-d">Chapitre ${i + 1} sur ${total}</span></a>`).join("\n      ");
+  return `<nav class="toc colle" aria-label="Sommaire">\n      ${entrees}\n    </nav>\n`;
 }
 
 // ── LA COQUILLE SE DÉRIVE DU SOCLE, ET LE SOCLE SE CHERCHE LÀ OÙ IL EST ─────────────────────────
@@ -189,14 +256,22 @@ function indiceDeLaPage(front, version) {
 export function pageEtude(texteSource, nomSource, { gabarit = lireAsset("boilerplate.html"), poseur = POSEUR } = {}) {
   const { front, corps } = lireSource(texteSource);
   const { titre, description } = enTete(corps);
+  // TF-1437 : les id des <h2> se posent AVANT enChapitres (qui ne touche pas les titres, seulement
+  // la prose autour) — le sommaire, lui, reste HORS du découpage en chapitres, comme les tableaux
+  // et les figures : c'est un frère du texte, pas un paragraphe de lecture (cf. lib-socle-page.mjs).
+  const { html: corpsDote, chapitres } = identifierChapitres(mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, "")));
+  const sommaire = sommaireLateral(chapitres);
   const brut = coquilleDuSocle({
     gabarit,
     titre,
     description,
     indice: indiceDeLaPage(front, indiceDuNom(nomSource) || undefined),
-    corpsHtml: enChapitres(mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, ""))),
+    corpsHtml: sommaire + enChapitres(corpsDote),
+    // TF-1442 : le contenu du marquage TR2 est LU dans le frontmatter de la source, jamais câblé ici.
+    marqueurIA: front.assistant,
   });
-  const { html, ids } = armerTableaux(decrireColonnes(brut));
+  const avecStyleSommaire = sommaire ? brut.replace("</head>", `${STYLE_SOMMAIRE}</head>`) : brut;
+  const { html, ids } = armerTableaux(decrireColonnes(avecStyleSommaire));
   return cablerComposants(replierTableaux(html), ids, poseur);
 }
 
@@ -226,6 +301,9 @@ Audience : le pilote de l'écosystème, qui décide des mandats.
 
 - un point mesuré ;
 - un second point, avec \`un identifiant\` cité.
+
+1. un geste numéroté ;
+2. un second geste numéroté.
 
 > Une citation de référence.
 `;
@@ -262,6 +340,51 @@ Ce chapitre existe pour franchir le seuil de filtrage et câbler les composants 
 | neuf | 9 |
 `;
 
+// TF-1437 — LE SEUIL SE PROUVE AUX DEUX BORDS : trois chapitres et quatre, jamais un seul côté.
+// Une recette qui ne joue QUE le côté « avec sommaire » ne prouverait rien : une règle sans
+// condition (toujours vrai) la passerait aussi. `SOURCE_ESSAI_SOMMAIRE` porte quatre `##` de
+// premier niveau — le seuil exact du socle (L25 : « au-delà de trois ») — et l'un d'eux, « 5.
+// Verdict », est volontairement COURT (10 caractères) : l'annonce .toc-d ne peut donc pas se
+// contenter du texte du titre (cf. commentaire de `sommaireLateral`).
+const SOURCE_ESSAI_SOMMAIRE = `---
+role: essai
+---
+
+# Étude d'opportunité — un sommaire d'essai — 20260916c
+
+Audience : le pilote de l'écosystème, qui décide des mandats.
+
+## 1. Partition du problème
+Contenu du premier chapitre.
+
+## 2. Non-recouvrement
+Contenu du deuxième chapitre.
+
+## 3. État de l'art
+Contenu du troisième chapitre.
+
+## 5. Verdict
+Contenu du quatrième chapitre, au titre volontairement court.
+`;
+
+const SOURCE_ESSAI_SANS_SOMMAIRE = `---
+role: essai
+---
+
+# Étude d'opportunité — sans sommaire — 20260916d
+
+Audience : le pilote de l'écosystème, qui décide des mandats.
+
+## 1. Partition du problème
+Contenu.
+
+## 2. Non-recouvrement
+Contenu.
+
+## 3. État de l'art
+Contenu.
+`;
+
 function selfTest() {
   // SANS OBJET DÉCLARÉ, JAMAIS UNE TRACE DE PILE (TF-1324, D-14 (a) du 23/09/2026). Sans socle, la
   // page ne peut pas être dérivée, donc rien de ce qui suit ne peut être jugé. Le résumé NOMME
@@ -291,8 +414,10 @@ function selfTest() {
     casse.push("le titre de la page ne porte pas l'indice daté de sa source — deux révisions du même jour seraient indiscernables");
   // 3. LE CONTENU EST RENDU, pas recopié en bloc : le tableau devient un tableau, la puce une puce.
   // Le tableau porte désormais la classe de repli du socle : on cherche la balise, pas `<table>` nu.
-  if (!/<table\b/.test(html) || !/<li>/.test(html) || !/<blockquote>/.test(html))
-    casse.push("le corps de l'étude n'est pas rendu (tableau, liste ou citation manquants)");
+  // TF-1436 : une liste NUMÉROTÉE (`<ol>`) est de la même famille — sans ce cas, une liste à puces
+  // verte n'aurait rien dit d'une liste numérotée sortie en un seul paragraphe.
+  if (!/<table\b/.test(html) || !/<li>/.test(html) || !/<blockquote>/.test(html) || !/<ol>/.test(html))
+    casse.push("le corps de l'étude n'est pas rendu (tableau, liste à puces, liste numérotée ou citation manquants)");
   // 4. LE TITRE DE NIVEAU 1 N'EST PAS DOUBLÉ — la coquille le pose, le corps ne doit pas le répéter.
   if ((html.match(/<h1[ >]/g) || []).length !== 1)
     casse.push(`${(html.match(/<h1[ >]/g) || []).length} balises de titre principal — le socle en exige exactement une`);
@@ -331,15 +456,54 @@ function selfTest() {
   if (blocs.length < 3 || !/data-composant="table-filters\.css" data-empreinte="sha256:[0-9a-f]{64}"/.test(htmlLong))
     casse.push(`les composants ne sont pas embarqués sous marqueur scellé (${blocs.length} bloc(s) marqué(s), 3 attendus)`);
 
+  // 12. TF-1442 — LA COQUILLE PORTE LE MARQUAGE MACHINE D'ASSISTANCE IA (oracle-transparence TR2).
+  // Non vide, sans quoi TR2 le rendrait invisible (« content="[^"]*" » que TR2 exige NON VIDE).
+  const marquageIA = /<meta name="ai-generated" content="([^"]*)">/.exec(html);
+  if (!marquageIA || !marquageIA[1].trim())
+    casse.push("la page ne porte pas <meta name=\"ai-generated\"> à contenu non vide — TR2 resterait en défaut au 2026-12-03");
+
+  // 13. TF-1443 — UNE NOTE DE COLONNE D'UNE SEULE LETTRE (« X ») SE RELIE AUSSI À SON EN-TÊTE, et
+  // le cas déjà couvert (nom de plusieurs lettres) ne régresse pas — double sens sur le MÊME appel.
+  const HTML_COLONNES = '<table><thead><tr><th scope="col">X</th><th scope="col">Reseau detaille</th></tr></thead></table>'
+    + "<blockquote><p><strong>X</strong> : le réseau, une étiquette posée par l'auteur, pas un calcul.</p></blockquote>"
+    + '<blockquote><p><strong>Reseau detaille</strong> : le nom complet du réseau étudié.</p></blockquote>';
+  const rduColonnes = decrireColonnes(HTML_COLONNES);
+  if (!/<th scope="col" aria-describedby="col-1">X<\/th>/.test(rduColonnes))
+    casse.push("une colonne d'UNE lettre (« X ») ne reçoit plus aria-describedby — sa note reste orpheline (TF-1443)");
+  if (!/<th scope="col" aria-describedby="col-2">Reseau detaille<\/th>/.test(rduColonnes))
+    casse.push("une colonne de plusieurs lettres régresse après le geste TF-1443 — elle ne reçoit plus aria-describedby");
+
+  // 14 à 16. TF-1437 — LE SOMMAIRE LATÉRAL COLLANT, POSÉ DÈS LE SEUIL, PAS AVANT (L25 du socle).
+  const fSommaire = join(dir, "20260916-etude-opportunite-sommaire.md");
+  writeFileSync(fSommaire, SOURCE_ESSAI_SOMMAIRE, "utf8");
+  const htmlSommaire = readFileSync(ecrirePage(fSommaire), "utf8");
+  if (!/<nav class="toc colle" aria-label="Sommaire">/.test(htmlSommaire))
+    casse.push("une étude à 4 chapitres ne porte aucun sommaire latéral collant — L25 du socle resterait en FAIL");
+  const blocSommaire = (htmlSommaire.match(/<nav class="toc colle"[\s\S]*?<\/nav>/) || [""])[0];
+  const ancresSommaire = [...blocSommaire.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
+  if (ancresSommaire.length !== 4 || !ancresSommaire.every((id) => htmlSommaire.includes(`<h2 id="${id}">`)))
+    casse.push(`le sommaire porte ${ancresSommaire.length} entrée(s) valide(s), 4 attendues — chacune vers un <h2 id> réel (L25 « sommaire incomplet » sinon)`);
+  const annoncesSommaire = [...blocSommaire.matchAll(/<span class="toc-d">([^<]*)<\/span>/g)].map((m) => m[1]);
+  if (annoncesSommaire.length !== 4 || annoncesSommaire.some((a) => a.length < 12))
+    casse.push(`annonce(s) .toc-d absente(s) ou < 12 caractères : ${JSON.stringify(annoncesSommaire)} — L6 exige ≥ 12 caractères, y compris pour un titre COURT (« 5. Verdict »)`);
+  const fSansSommaire = join(dir, "20260916-etude-opportunite-sans-sommaire.md");
+  writeFileSync(fSansSommaire, SOURCE_ESSAI_SANS_SOMMAIRE, "utf8");
+  const htmlSansSommaire = readFileSync(ecrirePage(fSansSommaire), "utf8");
+  if (/<nav class="toc colle"/.test(htmlSansSommaire))
+    casse.push("une étude à SEULEMENT 3 chapitres porte déjà un sommaire — le seuil L25 (strictement plus de trois) n'est pas respecté, du bruit sur un document court");
+
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test generer-page-etude : 12/12 PASS (page écrite à côté de sa source ; autoportante, " +
+    : "Self-test generer-page-etude : 15/15 PASS (page écrite à côté de sa source ; autoportante, " +
       "aucune ressource distante ; titre portant l'indice DATÉ de la source et non celui du jour ; " +
-      "corps rendu — tableau, liste et citation ; un seul titre principal ; deux générations de la " +
-      "même source identiques à l'octet ; indice lu sur les DEUX formes de nom admises ; table longue " +
-      "armée pour le filtrage ; assets du socle réellement lus et embarqués ; bascule de thème câblée " +
-      "et persistée ; chaque tableau repliable en cartes ; composants embarqués sous marqueur scellé)");
+      "corps rendu — tableau, liste à puces, liste NUMÉROTÉE et citation ; un seul titre principal ; " +
+      "deux générations de la même source identiques à l'octet ; indice lu sur les DEUX formes de " +
+      "nom admises ; table longue armée pour le filtrage ; assets du socle réellement lus et " +
+      "embarqués ; bascule de thème câblée et persistée ; chaque tableau repliable en cartes ; " +
+      "composants embarqués sous marqueur scellé ; marquage machine d'assistance IA posé (TR2) ; " +
+      "note de colonne d'une lettre reliée par aria-describedby, sans régresser le cas déjà couvert ; " +
+      "sommaire latéral collant posé et ancré DÈS quatre chapitres, absent à trois)");
   return casse.length ? 1 : 0;
 }
 

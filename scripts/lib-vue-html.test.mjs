@@ -115,5 +115,32 @@ for (const [libelle, source] of [
   if (!rendu.includes("[")) echecs.push(`${libelle} : la syntaxe brute a DISPARU au lieu de rester visible — un refus silencieux ne s'apprend pas`);
 }
 
+// 28/09/2026 (TF-1436) — LA STRUCTURE DE LA SOURCE SURVIT AU RENDU.
+//
+// LE FAIT, retour Produit-78 (lot 20260928a, RP-2) : une liste numérotée de 8 éléments sortait en
+// UN SEUL <p>, la numérotation perdue avec les retours à la ligne — aucun cas du rendu ne
+// reconnaissait « 1. » en tête de ligne, et la garde du paragraphe générique ne s'arrêtait pas
+// dessus. Au même endroit, un « ## » du corps sortait en <h3> : la coquille pose déjà le <h1> du
+// document, donc le premier niveau du corps doit être <h2> — le décalage « + 1 » sautait ce
+// niveau, saut signalé par check_html (avertissement « Saut de hiérarchie ») et par oracle-a11y,
+// et il cassait aussi L25 (sommaire) qui ne compte que les <h2> (TF-1437, même run, même cause).
+for (const [libelle, source, attendu] of [
+  ["titre « ## » rendu h2, pas h3", "## Un titre", "<h2>Un titre</h2>"],
+  ["sous-titre « ### » rendu h3", "### Un sous-titre", "<h3>Un sous-titre</h3>"],
+  ["liste numérotée à point rendue <ol>", "1. un\n2. deux\n3. trois", "<ol><li>un</li><li>deux</li><li>trois</li></ol>"],
+  ["liste numérotée à parenthèse rendue <ol>", "1) un\n2) deux", "<ol><li>un</li><li>deux</li></ol>"],
+]) {
+  const rendu = mdVersHtml(source);
+  if (rendu !== attendu) echecs.push(`${libelle} : « ${source.replace(/\n/g, "\\n")} » rend « ${rendu} », attendu « ${attendu} »`);
+}
+// Sens ROUGE local : une liste numérotée directement suivie d'un paragraphe, ou l'inverse, ne doit
+// PAS fusionner les deux blocs — c'était la seconde moitié du défaut mesuré (les items « avalaient »
+// la phrase suivante faute de garde dans le paragraphe générique).
+if (mdVersHtml("1. un\n2. deux\n\nSuite.") !== "<ol><li>un</li><li>deux</li></ol>\n<p>Suite.</p>")
+  echecs.push("une liste numérotée suivie d'un paragraphe fusionne les deux blocs");
+if (mdVersHtml("Avant.\n\n1. un\n2. deux") !== "<p>Avant.</p>\n<ol><li>un</li><li>deux</li></ol>")
+  echecs.push("un paragraphe suivi d'une liste numérotée fusionne les deux blocs");
+
+const N = REGLES.length * 2 + 5 + 6;
 if (echecs.length) { console.error("lib-vue-html : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`lib-vue-html (TF-0907, TF-1321) : ${REGLES.length * 2 + 5}/${REGLES.length * 2 + 5} — sur la coquille dérivée du socle : colonne pleine largeur, SVG à 100 %, classe defile, titre daté, bascule de thème câblée, sceau de la source au pied ; chaque règle prouvée dans ses DEUX sens (page produite / page d'avant le remède) ; liens markdown rendus pour http, chemin relatif et mailto, et REFUSÉS — syntaxe laissée visible — pour javascript: et data:`);
+console.log(`lib-vue-html (TF-0907, TF-1321, TF-1436) : ${N}/${N} — sur la coquille dérivée du socle : colonne pleine largeur, SVG à 100 %, classe defile, titre daté, bascule de thème câblée, sceau de la source au pied ; chaque règle prouvée dans ses DEUX sens (page produite / page d'avant le remède) ; liens markdown rendus pour http, chemin relatif et mailto, et REFUSÉS — syntaxe laissée visible — pour javascript: et data: ; un « ## » rend <h2> (plus de saut de hiérarchie sous le <h1>) et une liste numérotée (point ou parenthèse) rend <ol><li>, sans fusionner avec le bloc voisin`);

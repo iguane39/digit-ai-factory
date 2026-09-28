@@ -169,10 +169,20 @@ export function enChapitres(html) {
  *
  * Les paramètres propres à chaque famille de page ont leur défaut, celui des études : le surtitre,
  * le pied, la lettre du favicon, et ce qui suit le titre principal (la ligne de métadonnées des vues).
+ *
+ * `marqueurIA` (TF-1442, 28/09/2026, retour Produit-78 20260928b RP-6) : AUCUNE page générée par ce
+ * socle ne portait de marquage lisible par MACHINE de l'assistance par IA — `oracle-transparence`
+ * TR2 avertit, et bloquera CHAQUE page du parc à partir du lendemain de son échéance
+ * (`references/echeances.json`, clé `marquage_machine_absent`). La convention que TR2 reconnaît en
+ * premier est la plus robuste : `<meta name="ai-generated" content="…">` à contenu NON VIDE, sans
+ * exiger un mot-clé précis (contrairement à l'équivalent `generator`). Le CONTENU est une DONNÉE,
+ * jamais un nom câblé ici (loi transverse n° 4) : chaque appelant le lit dans le frontmatter de SA
+ * source (`front.assistant`) et ne retombe sur le défaut que si la source ne le déclare pas.
  */
 export function coquilleDuSocle({
   gabarit, titre, description, indice, corpsHtml,
   surtitre = "Digit-AI · Étude", pied = null, lettre = "D", apresTitre = "", titreDocument = null,
+  marqueurIA = "Claude Code",
 }) {
   let h = String(gabarit || "");
   if (!h) throw new Error("gabarit du socle introuvable (digit-ai-page-html/assets/boilerplate.html) : la page ne peut pas être dérivée du socle");
@@ -183,6 +193,10 @@ export function coquilleDuSocle({
   };
   remplir(/<title>[\s\S]*?<\/title>/, `<title>${esc(titreDocument || `Digit-AI — ${titre} — ${indice}`)}</title>`, "titre du document");
   remplir(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(description)}">`, "description");
+  if (!/<meta name="description" content="[^"]*">/.test(h))
+    throw new Error("gabarit du socle : emplacement « marquage machine d'assistance IA (TR2) » introuvable — le socle a changé de forme");
+  h = h.replace(/<meta name="description" content="[^"]*">/,
+    (trouve) => `${trouve}\n  <meta name="ai-generated" content="${esc(marqueurIA || "Claude Code")}">`);
   remplir(/<p class="eyebrow">[^<]*<\/p>/, `<p class="eyebrow">${esc(surtitre)}</p>`, "surtitre");
   remplir(/<h1>[^<]*<\/h1>/, `<h1>${esc(titre)}</h1>${apresTitre ? `\n        ${apresTitre}` : ""}`, "titre principal");
   remplir(/<main>[\s\S]*?<\/main>/, `<main>\n${corpsHtml}\n    </main>`, "corps");
@@ -317,6 +331,9 @@ export function pageDeVue({ gabarit, poseur, titre, description, front = {}, svg
     corpsHtml: figure + enChapitres(corpsHtml),
     surtitre, lettre: initiale, apresTitre: meta,
     pied: `Vue générée — NE PAS ÉDITER (la source Markdown fait foi ; la régénérer via le script du pilot). Sceau source <code>${sceau}</code>.`,
+    // TF-1442 : le contenu du marquage TR2 est LU dans le frontmatter de la source de la vue,
+    // jamais câblé ici — cf. le commentaire de `coquilleDuSocle`.
+    marqueurIA: front.assistant,
   });
   const { html, ids } = armerTableaux(brut);
   return cablerComposants(replierTableaux(html), ids, poseur).replace("</head>", `${STYLE_VUE}</head>`);

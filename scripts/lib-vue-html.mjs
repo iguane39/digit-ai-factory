@@ -44,8 +44,24 @@ export function mdVersHtml(corps) {
   while (i < lignes.length) {
     const l = lignes[i];
     if (!l.trim()) { i++; continue; }
+    // UN « ## » EST UN h2, PAS UN h3 (TF-1436, 28/09/2026). Le décalage « + 1 » faisait sauter un
+    // niveau : la coquille pose déjà le h1 (titre du document), donc le premier niveau du CORPS —
+    // « ## » — doit être le niveau suivant immédiat, h2. Mesuré sur une étude à 17 chapitres :
+    // chaque « ## » sortait en <h3> sous le <h1>, saut signalé par check_html (avertissement
+    // « Saut de hiérarchie ») et oracle-a11y, et L25 (sommaire au-delà de trois chapitres) ne
+    // pouvait plus compter aucun <h2> — la même cause cassait TF-1437 en silence.
     const h = l.match(/^(#{1,4})\s+(.*)$/);
-    if (h) { const n = h[1].length + 1; out.push(`<h${n}>${inline(h[2])}</h${n}>`); i++; continue; }
+    if (h) { const n = h[1].length; out.push(`<h${n}>${inline(h[2])}</h${n}>`); i++; continue; }
+    // UNE LISTE NUMÉROTÉE EST UNE LISTE (TF-1436, 28/09/2026). Sans cette branche, ses lignes ne
+    // correspondaient à AUCUN cas ci-dessous (ni titre, ni tableau, ni puce, ni citation) et
+    // tombaient dans le paragraphe générique : huit éléments numérotés sortaient en un seul <p>,
+    // la numérotation perdue avec les retours à la ligne. Le marqueur admet « 1. » et « 1) ».
+    if (/^\s*\d+[.)]\s+/.test(l)) {
+      const items = [];
+      while (i < lignes.length && /^\s*\d+[.)]\s+/.test(lignes[i])) { items.push(lignes[i].replace(/^\s*\d+[.)]\s+/, "")); i++; }
+      out.push(`<ol>${items.map((x) => `<li>${inline(x)}</li>`).join("")}</ol>`);
+      continue;
+    }
     if (/^\s*\|/.test(l)) {
       const rangs = [];
       while (i < lignes.length && /^\s*\|/.test(lignes[i])) { rangs.push(lignes[i]); i++; }
@@ -81,7 +97,7 @@ export function mdVersHtml(corps) {
       continue;
     }
     const par = [];
-    while (i < lignes.length && lignes[i].trim() && !/^(#{1,4}\s|\s*\||\s*[-*]\s|\s*>)/.test(lignes[i])) { par.push(lignes[i]); i++; }
+    while (i < lignes.length && lignes[i].trim() && !/^(#{1,4}\s|\s*\||\s*[-*]\s|\s*>|\s*\d+[.)]\s)/.test(lignes[i])) { par.push(lignes[i]); i++; }
     out.push(`<p>${inline(par.join(" "))}</p>`);
   }
   return out.join("\n");
