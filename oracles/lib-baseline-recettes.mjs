@@ -121,6 +121,42 @@ export function compteDe(resume, sortie = null) {
   return null;
 }
 
+/**
+ * TF-1434 (28/09/2026) — UN CAS NON JOUÉ POUR UN MOTIF DÉCLARÉ N'EST PAS UN CAS PERDU.
+ *
+ * LE FAIT. `bootstrap.test.mjs` joue ses deux cas 5 bis (TF-1337) avec le contrôle de frontmatter
+ * de forge-agents, et les déclare NON JOUÉS sur un poste où ce contrôle manque. Le cliquet a été
+ * relevé de 17 à 19 le 27/09 sur le poste qui les joue (aa0f5f2) ; sur l'autre, la même recette
+ * rendait 17/17 et le harnais accusait « 19 → 17 cas, 2 DISPARU(S) » à CHAQUE passage, alors
+ * qu'aucun commit n'avait retiré un cas. Le cliquet protège « aucun cas retiré » et mesurait
+ * « combien de cas ont été joués », grandeur qui varie aussi avec le poste. Un harnais toujours
+ * rouge apprend à ne plus lire ses CAS PERDUS, y compris le jour où un cas disparaît vraiment.
+ *
+ * LA FORME DÉCLARÉE, FERMÉE. Une recette qui ne joue pas des cas sur ce poste l'écrit sur une ligne
+ * de sa sortie qui s'ouvre par `[NON JOUÉ] <n> cas`, suivie de ce qui n'est pas joué et pourquoi :
+ *   [NON JOUÉ] 2 cas — bootstrap 5 bis (TF-1337) : le contrôle de frontmatter de forge-agents est absent de ce poste
+ * Le cliquet compte alors les cas JOUÉS plus les cas DÉCLARÉS non joués : le relevé est le même
+ * d'un poste à l'autre pour un même code, et le harnais nomme chaque déclaration à chaque passage.
+ *
+ * CE QUE ÇA NE FERME PAS, ET C'EST DÉCLARÉ. La déclaration est auto-déclarée, comme le compte : une
+ * recette pourrait déclarer non joué un cas qu'elle a supprimé. La borne est celle du cliquet (en
+ * tête de ce fichier), et le harnais PUBLIE chaque déclaration : un non-jeu permanent se lit, il ne
+ * se cache pas. Une ligne qui dit « NON JOUÉ » hors de cette forme (sans crochets, sans « <n> cas »)
+ * n'est PAS lue : le cas manquant reste accusé, ce qui est le sens sûr.
+ */
+export const RE_NON_JOUE = /^\s*\[NON JOU[ÉE]S?\]\s+(\d{1,4})\s+cas\b[\s—:-]*(.*)$/;
+
+/** Les déclarations de cas non joués lues dans la sortie ENTIÈRE d'une recette : `[{ cas, motif }]`. */
+export function nonJouesDe(sortie) {
+  if (typeof sortie !== "string") return [];
+  const declarations = [];
+  for (const ligne of sortie.split(/\r?\n/)) {
+    const m = RE_NON_JOUE.exec(ligne);
+    if (m) declarations.push({ cas: Number(m[1]), motif: m[2].trim() });
+  }
+  return declarations;
+}
+
 /** La baseline sur disque. Un fichier absent n'est pas une erreur : c'est un premier passage. */
 export function lire(chemin) {
   if (!existsSync(chemin)) return {};
@@ -139,18 +175,21 @@ export function lire(chemin) {
  * une recette en échec a déjà son verdict, et lire son compte partiel ferait baisser la baseline
  * pour une raison qui n'a rien à voir avec la disparition d'un cas.
  *
- * Rend `{ baisses, montees, nonLus, baseline }`. La décision d'écrire appartient à l'appelant.
+ * Rend `{ baisses, montees, nonLus, disparues, nonJoues, baseline }`. Le compte confronté est celui
+ * des cas JOUÉS plus celui des cas DÉCLARÉS non joués (`nonJouesDe`, TF-1434) ; `nonJoues` nomme
+ * chaque recette qui en déclare. La décision d'écrire appartient à l'appelant.
  */
 export function confronter(resultats, baseline, jour) {
   const baisses = [];
   const montees = [];
   const nonLus = [];
+  const nonJoues = [];
   const suivante = { ...baseline };
 
   for (const r of resultats) {
     if (r.statut !== "OK") continue;
-    const vu = compteDe(r.resume, r.sortie);
-    if (vu === null) {
+    const joues = compteDe(r.resume, r.sortie);
+    if (joues === null) {
       // UNE EXEMPTION SE DÉCLARE, ET ELLE SE VERSIONNE. Certaines entrées ne portent AUCUN
       // compte de cas et n'en porteront jamais : un oracle d'état joué sur le parc réel rend
       // « PASS sur le parc », pas un nombre de cas. Les compter à zéro ferait échouer le cliquet
@@ -165,16 +204,23 @@ export function confronter(resultats, baseline, jour) {
       else nonLus.push(r.nom);
       continue;
     }
+    // TF-1434 : les cas DÉCLARÉS non joués sur ce poste comptent, et chaque déclaration est rendue
+    // à l'appelant pour être nommée. Un cas non joué SANS déclaration lisible ne compte pas : il
+    // reste une baisse, et c'est voulu.
+    const declarations = nonJouesDe(r.sortie);
+    const declares = declarations.reduce((n, d) => n + d.cas, 0);
+    if (declares) nonJoues.push({ nom: r.nom, joues, nonJoues: declares, declarations });
+    const vu = joues + declares;
     const connu = baseline[r.nom];
     const avant = connu && Number.isInteger(connu.cas) ? connu.cas : null;
     if (avant === null) {
       suivante[r.nom] = { cas: vu, vu_le: jour };
-      montees.push({ nom: r.nom, avant: null, vu });
+      montees.push({ nom: r.nom, avant: null, vu, nonJoues: declares });
     } else if (vu > avant) {
       suivante[r.nom] = { cas: vu, vu_le: jour };
-      montees.push({ nom: r.nom, avant, vu });
+      montees.push({ nom: r.nom, avant, vu, nonJoues: declares });
     } else if (vu < avant) {
-      baisses.push({ nom: r.nom, avant, vu, perdus: avant - vu });
+      baisses.push({ nom: r.nom, avant, vu, perdus: avant - vu, nonJoues: declares });
     }
   }
   // TF-1082 (15/09/2026) — LE CLIQUET COMPTE AUSSI LES FICHIERS. Il comptait des CAS : une recette
@@ -187,7 +233,7 @@ export function confronter(resultats, baseline, jour) {
   const vus = new Set(resultats.map((r) => r.nom));
   const disparues = Object.keys(baseline).filter((nom) => !vus.has(nom))
     .map((nom) => ({ nom, exemption: Boolean(baseline[nom] && baseline[nom].non_lu), cas: baseline[nom] && Number.isInteger(baseline[nom].cas) ? baseline[nom].cas : null }));
-  return { baisses, montees, nonLus, disparues, baseline: suivante };
+  return { baisses, montees, nonLus, disparues, nonJoues, baseline: suivante };
 }
 
 /** Écrit la baseline, triée par nom — un fichier versionné dont l'ordre bouge est illisible. */

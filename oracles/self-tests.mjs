@@ -377,13 +377,24 @@ if (bilan.nonLus.length) {
     + " déclarée — les nommer est la seule façon d'en sortir :");
   for (const n of bilan.nonLus) console.log(`             · ${n}`);
 }
+// TF-1434 — UN CAS NON JOUÉ SUR CE POSTE, POUR UN MOTIF QUE SA RECETTE DÉCLARE, N'EST PAS UN CAS
+// PERDU. Le cliquet le compte (la forme fermée « [NON JOUÉ] <n> cas — … » est lue par
+// `nonJouesDe`), et chaque déclaration est NOMMÉE ici, avec son motif, à chaque passage : un
+// non-jeu permanent se lit, il ne se cache pas. Le 28/09, le harnais accusait « 19 → 17 cas » sur
+// l'un des deux postes du porteur pour deux cas qu'aucun commit n'avait retirés.
+for (const nj of bilan.nonJoues) {
+  console.log(`  [NON JOUÉ] ${nj.nom} : ${nj.nonJoues} cas déclaré(s) non joué(s) sur ce poste, comptés au cliquet `
+    + `(${nj.joues} joué(s) + ${nj.nonJoues}) — ${nj.declarations.map((d) => d.motif || "motif non écrit").join(" · ")}`);
+}
+const dontNonJoues = (n) => (n ? ` (dont ${n} déclaré(s) NON JOUÉ(S) sur ce poste)` : "");
 for (const m of bilan.montees) {
-  console.log(`  [CLIQUET] ${m.nom} : ${m.avant === null ? "première mesure" : `${m.avant} →`} ${m.vu} cas`);
+  console.log(`  [CLIQUET] ${m.nom} : ${m.avant === null ? "première mesure" : `${m.avant} →`} ${m.vu} cas${dontNonJoues(m.nonJoues)}`);
 }
 for (const b of bilan.baisses) {
-  console.error(`  [CAS PERDUS] ${b.nom} : ${b.avant} → ${b.vu} cas, ${b.perdus} DISPARU(S). `
+  console.error(`  [CAS PERDUS] ${b.nom} : ${b.avant} → ${b.vu} cas${dontNonJoues(b.nonJoues)}, ${b.perdus} DISPARU(S). `
     + "Une recette qui perd des cas rend un harnais vert — retirer un cas est un geste ÉCRIT : "
-    + "rejouer avec `--appliquer` après avoir dit POURQUOI, ou restaurer les cas.");
+    + "rejouer avec `--appliquer` après avoir dit POURQUOI, ou restaurer les cas. Un cas que la recette ne "
+    + "joue pas sur ce poste se DÉCLARE par une ligne « [NON JOUÉ] <n> cas — <motif> » (TF-1434).");
 }
 // TF-1082 — une recette de la baseline ABSENTE du passage est nommée et fait échouer, exemption
 // comprise : le cliquet des cas ne voyait pas la disparition d'un fichier entier.
@@ -433,11 +444,13 @@ if (sensRouge.sansRouge.length) {
 
 const echecs = resultats.filter((r) => r.statut !== "OK");
 const perdus = APPLIQUER ? [] : [...bilan.baisses, ...bilan.disparues];
+const casNonJoues = bilan.nonJoues.reduce((n, x) => n + x.nonJoues, 0);
 console.log("=".repeat(78));
 console.log(
   echecs.length || perdus.length
     ? `  ${echecs.length}/${resultats.length} oracle(s) en défaut${echecs.length ? ` : ${echecs.map((r) => r.nom).join(", ")}` : ""}`
       + `${perdus.length ? ` · ${perdus.length} recette(s) ont PERDU des cas` : ""}`
-    : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles, fichiers de test du dépôt, état du parc — I1, I2 et I4) · cliquet des cas tenu (I5)`,
+    : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles, fichiers de test du dépôt, état du parc — I1, I2 et I4) · cliquet des cas tenu (I5)`
+      + (casNonJoues ? `, dont ${casNonJoues} cas déclaré(s) NON JOUÉ(S) sur ce poste dans ${bilan.nonJoues.length} recette(s)` : ""),
 );
 process.exit(echecs.length || perdus.length ? 1 : 0);
