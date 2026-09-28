@@ -260,6 +260,47 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   rmSync(B, { recursive: true, force: true });
 }
 
+// TF-1451 et TF-1452 (28/09/2026) — CHEZ UN PRODUIT, LE GÉNÉRATEUR N'ÉCRIT NI PSEUDONYME NI RÔLE DU
+// PILOT. Le fait : relancé chez un produit, il remplaçait le nom du produit par son pseudonyme dans le
+// bloc Rôle écrit à la main et dans les titres de la table ; à l'adoption, il posait en rôle d'input\ et
+// d'output\ les entrants et les livrables du pilot. Un dépôt de produit se reconnaît à `forge\`, comme
+// à l'ingestion (R-47) ; le même arbre sans `forge\` reste un dépôt publiable, pseudonymisé (D-37).
+{
+  const arbre = (avecForge) => {
+    const B = mkdtempSync(join(tmpdir(), avecForge ? "readme-produit-" : "readme-publiable-"));
+    if (avecForge) mkdirSync(join(B, "forge"), { recursive: true });
+    mkdirSync(join(B, "input"), { recursive: true });
+    mkdirSync(join(B, "output"), { recursive: true });
+    // « Zorglub » est le client des tables jetables de cette recette ; chez le produit, c'est son nom.
+    writeFileSync(join(B, "input", "cahier.md"), "# Cahier des charges de Zorglub\n", "utf8");
+    spawnSync(process.execPath, [OUTIL, "--base", B, "--racines", "input,output"], { encoding: "utf8" });
+    return B;
+  };
+  const P = arbre(true);
+  check("TF-1452 — chez un produit, input\\ et output\\ reçoivent un rôle vide qui le demande, jamais celui du pilot", () => {
+    const t = readFileSync(join(P, "input", "README.md"), "utf8") + readFileSync(join(P, "output", "README.md"), "utf8");
+    if (/Entrants du pilot|Livrables du pilot|familles `05-`/.test(t)) throw new Error("un rôle du pilot est posé chez le produit");
+    if ((t.match(/rôle à rédiger/g) || []).length !== 2) throw new Error("les deux README ne portent pas le rôle vide qui demande sa rédaction");
+  });
+  writeFileSync(join(P, "input", "README.md"), readFileSync(join(P, "input", "README.md"), "utf8")
+    .replace(/<!-- ROLE:DEBUT -->[\s\S]*?<!-- ROLE:FIN -->/, "<!-- ROLE:DEBUT -->\nEntrants du projet Zorglub : cahiers et notes.\n<!-- ROLE:FIN -->"), "utf8");
+  spawnSync(process.execPath, [OUTIL, "--base", P, "--racines", "input,output"], { encoding: "utf8" });
+  check("TF-1451 — chez un produit, ni le rôle écrit à la main ni les titres de la table ne sont pseudonymisés", () => {
+    const t = readFileSync(join(P, "input", "README.md"), "utf8");
+    if (!t.includes("Entrants du projet Zorglub")) throw new Error(`le rôle écrit à la main a été réécrit : ${(t.match(/<!-- ROLE:DEBUT -->[\s\S]*?<!-- ROLE:FIN -->/) || [""])[0]}`);
+    if (!t.includes("Cahier des charges de Zorglub")) throw new Error("le titre du document a été réécrit dans la table");
+    if (/Client-A/.test(t)) throw new Error("un pseudonyme est écrit dans le dépôt du produit");
+  });
+  const B = arbre(false);
+  check("TF-1451 second sens — le même arbre SANS forge\\ reste pseudonymisé : un index publiable ne porte pas le nom", () => {
+    const t = readFileSync(join(B, "input", "README.md"), "utf8");
+    if (/Zorglub/.test(t)) throw new Error("un nom de client est écrit dans l'index d'un dépôt publiable");
+    if (!/Cahier des charges de Client-A/.test(t)) throw new Error("le titre n'est pas pseudonymisé dans un dépôt publiable");
+  });
+  rmSync(P, { recursive: true, force: true });
+  rmSync(B, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
 rmSync(TABLES, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);

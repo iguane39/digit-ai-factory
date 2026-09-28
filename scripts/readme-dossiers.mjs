@@ -45,6 +45,16 @@ const lireArg = (nom, defaut) => { const i = args.indexOf(nom); return i >= 0 ? 
 const CHECK_TOT = args.includes("--check");
 const BASE = resolve(lireArg("--base", join(ICI, "..")));
 const RACINES = lireArg("--racines", "input,output").split(",").map((s) => s.trim()).filter(Boolean);
+// TF-1451 et TF-1452 (28/09/2026) — UN DÉPÔT DE PRODUIT N'EST NI LE PILOT NI UN DÉPÔT PUBLIABLE.
+// Relancé chez un produit (`--base .`), ce générateur y posait les rôles du pilot (« Entrants du
+// pilot », familles `05-`) et pseudonymisait son dépôt privé jusque dans le bloc Rôle écrit à la main :
+// le produit lisait un pseudonyme à la place de son propre nom. Un dépôt de produit se reconnaît à
+// `forge\`, comme à l'ingestion (R-47). On n'y pseudonymise rien, et la table des rôles ne vaut qu'au
+// pilot : ailleurs, un dossier sans rôle reçoit le rôle vide qui demande sa rédaction.
+const PILOT = resolve(join(ICI, ".."));
+const sansCasse = (c) => (process.platform === "win32" ? c.toLowerCase() : c);
+const EST_LE_PILOT = sansCasse(BASE) === sansCasse(PILOT);
+const DEPOT_PRODUIT = !EST_LE_PILOT && existsSync(join(BASE, "forge"));
 
 // TF-1201 / D-24 (22/09/2026) — UN GENERATEUR N ECRIT PAS DANS UN DEPOT OU L ON N EST PAS,
 // SANS LE DIRE.
@@ -110,6 +120,8 @@ const ROLES = {
   "output/05-insatisfactions": "Dossiers d'instruction des insatisfactions (TF-0287) : un dossier `INS-XXXX\\` par insatisfaction, chemins portés par `insatisfactions\\REGISTRE.jsonl` (registre à événements figés — ne jamais déplacer).",
   "output/05-insatisfactions/INS-0001": "Instruction de l'insatisfaction INS-0001 (menus de produit-07) — `INSTRUCTION.md` à six blocs (`gabarits\\AGENT-INSATISFACTION.md`) : reproduction, cause racine, gates en défaut.",
 };
+// TF-1452 : ces rôles décrivent les dossiers DU PILOT ; ailleurs, ils seraient faux.
+const roleConnu = (rel) => (EST_LE_PILOT ? ROLES[rel] : undefined);
 
 // Dossiers MACHINE : journaux d'oracles (`.oracles\`, `_oracles\` — TF-0428) — régénérés à
 // chaque exécution, jamais lus par un humain. Comptés au README du parent, sans README propre.
@@ -236,7 +248,7 @@ function attendu(dir, rel) {
     .filter((e) => e.isDirectory() || estSuivi(rel + "/" + e.name))
     .sort((x, y) => (x.isDirectory() === y.isDirectory() ? x.name.localeCompare(y.name, "fr") : x.isDirectory() ? -1 : 1));
   const caches = readdirSync(dir, { withFileTypes: true }).filter((e) => EST_MACHINE(e.name) && e.isDirectory()).map((e) => e.name);
-  const role = roleExistant(join(dir, "README.md")) || ROLES[rel] || PLACEHOLDER;
+  const role = roleExistant(join(dir, "README.md")) || roleConnu(rel) || PLACEHOLDER;
   const lignes = [];
   lignes.push(`# ${affiche(rel)}`, "",
     "<!-- Généré par scripts\\readme-dossiers.mjs : seul le bloc RÔLE se rédige à la main ; la table",
@@ -256,7 +268,7 @@ function attendu(dir, rel) {
       // mort), et un rôle tiré de la table des rôles versionnée — jamais du README local, qui ne
       // voyage pas : une projection commitée ne parle que de ce que le dépôt porte (TF-0615).
       nd++;
-      const roleIgnore = (ROLES[relE] || "rôle à déclarer dans la table ROLES de scripts\\readme-dossiers.mjs").replace(/\s+/g, " ").replace(/\*\*/g, "");
+      const roleIgnore = (roleConnu(relE) || "rôle à déclarer dans la table ROLES de scripts\\readme-dossiers.mjs").replace(/\s+/g, " ").replace(/\*\*/g, "");
       lignes.push(`| \`${e.name}\\\` | dossier ignoré par git (absent d'un clone) | — | ${roleIgnore.slice(0, 160).replace(/\|/g, "/")}${roleIgnore.length > 160 ? "…" : ""} |`);
     } else if (e.isDirectory() && EST_CLOS(chemin)) {
       nd++;
@@ -267,7 +279,7 @@ function attendu(dir, rel) {
       const n = compter(chemin);
       // Le rôle du sous-dossier (son README, sinon la table des rôles) : une ligne qui dit ce
       // qu'il contient — « sous-dossier, voir son README » n'informait personne.
-      const roleSous = (roleExistant(join(chemin, "README.md")) || ROLES[relE] || "").replace(/\s+/g, " ");
+      const roleSous = (roleExistant(join(chemin, "README.md")) || roleConnu(relE) || "").replace(/\s+/g, " ");
       const resume = roleSous && roleSous !== PLACEHOLDER ? roleSous.replace(/\*\*/g, "").slice(0, 160) + (roleSous.length > 160 ? "…" : "") : "rôle à rédiger dans son README";
       lignes.push(`| [\`${e.name}\\\`](${e.name}/README.md) | dossier (${n} fichier${n > 1 ? "s" : ""}) | — | ${resume.replace(/\|/g, "/")} |`);
     } else {
@@ -334,6 +346,8 @@ for (const racine of RACINES) {
   // un index publié avec un nom de client ne se rattrape pas. Même règle que l'anonymiseur
   // d'entrants — « un anonymiseur qui ne peut pas anonymiser doit arrêter le convoi ».
   const pseudonymise = (brut) => {
+    // TF-1451 : le dépôt privé d'un produit porte son propre nom ; rien n'y est substitué.
+    if (DEPOT_PRODUIT) return { texte: brut, ok: true };
     try { return { texte: anonymiser(brut).texte, ok: true }; }
     catch (e) { return { texte: null, ok: false, motif: e.message }; }
   };
@@ -361,8 +375,10 @@ for (const racine of RACINES) {
   }
 }
 
-if (!SILENCIEUX && ecrits.length) console.log(`README régénérés dans ${BASE} (${ecrits.length}) : ${ecrits.join(" · ")}`);
-if (!SILENCIEUX && !ecrits.length && !CHECK) console.log(`README à jour dans ${BASE}, rien à régénérer`);
+// Loi n° 3 : ce qui est écarté d'office se dit — chez un produit, ni pseudonyme ni rôle du pilot.
+const MODE = DEPOT_PRODUIT ? " — dépôt de produit (`forge\\`) : ni pseudonymisation ni rôle du pilot (TF-1451, TF-1452)" : "";
+if (!SILENCIEUX && ecrits.length) console.log(`README régénérés dans ${BASE}${MODE} (${ecrits.length}) : ${ecrits.join(" · ")}`);
+if (!SILENCIEUX && !ecrits.length && !CHECK) console.log(`README à jour dans ${BASE}${MODE}, rien à régénérer`);
 if (defauts.length) {
   console.error(`[readme-dossiers] ${defauts.length} défaut(s) :\n  - ${defauts.join("\n  - ")}`);
   process.exit(1);
