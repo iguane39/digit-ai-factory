@@ -257,7 +257,10 @@ function attendu(dir, rel) {
     "## Rôle", "", MARQUE_DEBUT, role, MARQUE_FIN, "", "## Contenu", "",
     // Un chapitre qui commence par des données force le lecteur à deviner la question à
     // laquelle il répond (règle M7 du juge de lisibilité — mesuré sur ce fichier même).
-    "Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec " +
+    // TF-1453 (28/09/2026) : l'ouverture NOMME le contenu. « Ce que le dossier contient… » est une
+    // annonce nominalisée : sur un README court (0 fichier, 150 mots), oracle-ecriture la refusait
+    // (EC-1, 6,67 ‰ pour un seuil de 6,50 ‰). Les deux-points remplacent le tiret d'incise.
+    "Contenu du dossier à la dernière régénération : chaque élément avec " +
     "son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.", "",
     "| Élément | Type | Taille | Titre / nature |", "|---|---|---|---|");
   let nf = 0, nd = 0;

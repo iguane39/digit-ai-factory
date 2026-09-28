@@ -12,7 +12,7 @@ Originaux des lots de travaux confiés par le Produit-67 à une forge ou à un p
 
 ## Contenu
 
-Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+Contenu du dossier à la dernière régénération : chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|

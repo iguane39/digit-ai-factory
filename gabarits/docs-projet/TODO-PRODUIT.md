@@ -42,16 +42,16 @@ tranchée quitte la table et rejoint le journal du run.
 **TROIS NATURES, TROIS EMPLACEMENTS** — ce document en a trois, et la séparation n'est pas un
 rangement : c'est la condition pour qu'il reste lu.
 
-| Nature | Où elle vit | Ce qu'elle attend |
+| Nature | Où elle vit | Suite attendue |
 |---|---|---|
 | Un reste à faire | « Améliorations », ci-dessous | qu'on le fasse |
 | Une décision déjà prise de ne PAS faire | « Écarts assumés » | qu'on la **redéclare** au prochain audit |
 | Une action suspendue à un événement extérieur | « Contraintes connues » | que la condition se produise — peut-être jamais |
 
-*Mesure du 23/08/2026 qui a créé la troisième section* : sur neuf lignes remises, le lecteur en a
+*Mesure du 23/08/2026 qui a créé la troisième section* : sur 9 lignes remises, le lecteur en a
 contesté **deux**, mot pour mot — « Oubli, sujet déjà évoqué et traité. Revois pourquoi tu le
-ressors encore » et « Non sujet, pourquoi cela sort ? ». Les deux lignes étaient correctement
-rédigées ; elles étaient **au mauvais endroit**. L'une était un écart décidé et consigné cinq jours
+ressors encore » et « Non sujet, pourquoi cela sort ? ». Les 2 lignes étaient correctement
+rédigées ; elles étaient **au mauvais endroit**. L'une était un écart décidé et consigné 5 jours
 plus tôt, qui portait encore le statut « à décider » — *un écart assumé est une décision prise : il
 se redéclare, il ne se re-propose pas*. L'autre attendait un changement d'origine des médias qui
 n'arrivera peut-être jamais. Sans les trois emplacements, un relevé grossit d'un tiers à chaque
@@ -65,7 +65,7 @@ pilot (`forge\retours\`), qui est l'écrivain unique de TODO-FORGE.
 |---|---|---|---|---|---|---|---|
 | {A-01} | {ce qui manque et l'effet attendu} | {retour utilisateur du 17/08 · audit forge-tests · constat de run} | {auto_ia \| manuelle_dev \| manuelle_utilisateur} | {acces \| decision \| depense \| presence \| irreversible — vide si auto_ia} | {1 — parce qu'il supprime N constats à la source} | {à décider / décidée / en cours} | {ce qui a été payé en réel, ou « aucune »} |
 
-**Trois colonnes ajoutées le 22/08/2026 (TF-0461), et pourquoi** — ce document était le seul que
+**3 colonnes ajoutées le 22/08/2026 (TF-0461), et pourquoi** — ce document était le seul que
 le développeur lit **hors session**, et c'était précisément celui qui perdait les deux
 informations qui lui servent : *qui peut le faire*, et *pourquoi dans cet ordre*.
 
@@ -105,7 +105,7 @@ Une ligne d'ici n'a pas de statut, et c'est volontaire : un statut appelle une d
 pas de décision à prendre sur un événement qui ne s'est pas produit. Ce qu'elle porte à la place,
 c'est **la condition** — écrite assez précisément pour qu'on reconnaisse le jour où elle survient.
 
-| Contrainte | Condition de déclenchement | Ce qu'il faudra faire alors | Décision en vigueur |
+| Contrainte | Condition de déclenchement | Geste prévu au déclenchement | Décision en vigueur |
 |---|---|---|---|
 | {ce qui est borné aujourd'hui} | {le fait du monde qui changerait la donne — observable, pas supposé} | {l'action, en une phrase} | {la décision close qui rend la contrainte acceptable, avec sa date} |
 
