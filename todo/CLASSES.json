@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.24.0",
+ "version": "1.25.0",
  "date": "2026-09-28",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -1465,6 +1465,30 @@
    "oracle": "oracle-lot-retours R-57 et LOT-MURS ; hook-lexique (consigne R-57)",
    "voisines": [
     "gabarit-famille-manquante"
+   ]
+  },
+  {
+   "cle": "horodatage-de-ledger-compose-a-la-main",
+   "famille": "horodatage-invente",
+   "libelle": "Une session écrit l'heure d'une entrée de ledger en la composant au moment de rédiger, au lieu de la relever : l'heure suit ou précède son propre commit, et le recul apparaît chez l'entrée suivante. Mesuré le 25/09/2026 chez Produit-77 : six entrées postérieures à leur propre commit, de 2 à 90 minutes, sur deux sessions et deux jours (TF-1424).",
+   "creee_le": "2026-09-28",
+   "fondee_par": [
+    "TF-1424"
+   ],
+   "regle": "gabarits/CLAUDE-PRODUIT.md, Conventions locales : relever l'heure au moment d'écrire l'entrée, jamais la composer (commit f2160b3)",
+   "oracle": "pilot, oracles/oracle-conformite-projet.mjs R-42 bis (avertissement) : rejoue l'histoire git du ledger commit par commit et nomme toute entrée dont le ts dépasse de plus de 60 s la date du commit qui l'a écrite ; fixtures verte et rouge à oracles/self-test.mjs (commit aaa058a)",
+   "voisines": []
+  },
+  {
+   "cle": "compte-cite-en-dur-perime",
+   "famille": "donnees-perissables-en-dur",
+   "libelle": "Un document de référence cite en dur un compte (produits connus, règles, dépôts) que sa source a dépassé depuis : le lecteur prend un chiffre périmé pour un état mesuré. Mesuré le 28/09/2026 : references/PRODUITS.md annonce 17 produits connus du registre, la sonde en compte 23.",
+   "creee_le": "2026-09-28",
+   "fondee_par": [],
+   "regle": "loi transverse n° 4 du pilot : une donnée volatile est une donnée, datée et sourcée, pas un chiffre écrit en dur",
+   "oracle": "pilot, oracles/oracle-fraicheur-doc.mjs : chaque claim de oracles/fraicheur-claims.json confronte le compte cité à sa sonde (claim produits-connus-du-registre)",
+   "voisines": [
+    "marque-emettrice-portee-par-deux-chartes"
    ]
   }
  ],
