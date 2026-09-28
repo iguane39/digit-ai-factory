@@ -91,6 +91,33 @@ try {
       "les parenthèses du préfixe ont été lues comme de la syntaxe regex");
   });
 
+  // ---- TF-1450 (28/09/2026, RP-10) : R-4 juge l'indice par JOUR ET PAR DOSSIER, tous radicaux
+  // confondus (TF-0750) ; la portée par défaut ne voit que SON préfixe et a rendu un indice déjà
+  // pris par un AUTRE radical du même jour — cas réel : l'étude du jour portait déjà « a », la
+  // restitution en a reçu un autre, renommée à la main après coup. Double sens : la portée par
+  // défaut REPRODUIT la collision (rouge) ; « dossier » l'évite (vert). --------------------------
+  check("TF-1450 rouge (portée par défaut) : un AUTRE radical du même jour, même dossier, n'est pas vu — la collision se reproduit", () => {
+    const d = join(T, "collision-defaut");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, `Produit - Etude - ${JOUR}a.md`), "etude du jour", "utf8");
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "rapport du jour" });
+    att(indice === "a", `indice ${indice} au lieu de « a » — si ce test casse, la portée par défaut a cessé de reproduire la collision de TF-1450`);
+  });
+  check("TF-1450 vert (portée « dossier ») : le même cas voit l'indice pris par l'AUTRE radical et rend « b », sans collision", () => {
+    const d = join(T, "collision-dossier");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, `Produit - Etude - ${JOUR}a.md`), "etude du jour", "utf8");
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "rapport du jour", porte: "dossier" });
+    att(indice === "b", `indice ${indice} au lieu de « b » — la portée dossier ne voit pas l'indice pris par « Produit - Etude - »`);
+  });
+  check("TF-1450 borne : la portée « dossier » relit le fichier sous son NOM COMPLET, pas le seul fragment capturé par le motif", () => {
+    const d = join(T, "collision-nom-complet");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, `Produit - Etude - ${JOUR}a.md`), "contenu identique", "utf8");
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Etude - ", jour: JOUR, contenu: "contenu identique", porte: "dossier" });
+    att(indice === "a", `indice ${indice} au lieu de « a » — la relecture du contenu sous la portée dossier a échoué (nom de fichier mal reconstruit)`);
+  });
+
   check("un jour hors format AAAAMMJJ est REFUSÉ — il fabriquerait un motif faux en silence", () => {
     let leve = false;
     try { allouerIndice({ dossier: T, prefixe: PREFIXE, jour: "31/08/2026", contenu: "x" }); }

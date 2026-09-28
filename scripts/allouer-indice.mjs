@@ -30,6 +30,17 @@
  *                                  jour: "20260831", contenu, extension: ".html" });
  *   const nom = `${prefixe}${jour}${indice}${extension}`;
  *
+ * PORTÉE DE LA RECHERCHE D'INDICES PRIS (TF-1450, 28/09/2026). Par défaut (`porte: "prefixe"`),
+ * la fonction ne voit QUE les fichiers de son propre `prefixe` — or R-4 (`oracle-conformite-
+ * projet.mjs`) juge l'indice unique PAR JOUR ET PAR DOSSIER, tous radicaux confondus (TF-0750).
+ * Mesuré le 28/09 : dans un dossier où « <Marque> - Étude - 20260928a » existait déjà, un appel
+ * pour un AUTRE radical (« <Marque> - Rapport - 20260928… ») avec la portée par défaut a rendu
+ * « a » — collision immédiate avec le livrable existant, renommage manuel après coup. Passer
+ * `porte: "dossier"` compte tous les fichiers du dossier qui portent CE jour, quel que soit leur
+ * préfixe ou leur extension — le même repérage que R-4 — et c'est la portée à employer pour
+ * RÉINDEXER un livrable que R-4 vient de signaler en collision :
+ *   const indice = allouerIndice({ dossier, prefixe, jour, contenu, extension, porte: "dossier" });
+ *
  * Ce que ce module NE fait PAS, et c'est déclaré :
  *   · il n'écrit RIEN — il rend une lettre, le générateur écrit ;
  *   · il ne juge pas le contenu — `verifier-jugement.mjs` reste le juge de l'édition manuelle ;
@@ -49,13 +60,18 @@ export const canonique = (texte, jour) =>
  * Rend l'indice à employer pour écrire `${prefixe}${jour}<indice>${extension}` dans `dossier`.
  * Voir le contrat en tête de fichier.
  */
-export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".html" }) {
+export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".html", porte = "prefixe" }) {
   if (!/^\d{8}$/.test(String(jour))) throw new Error(`jour attendu AAAAMMJJ, reçu « ${jour} »`);
-  const motif = new RegExp(
-    `^${String(prefixe).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}${jour}([a-z])${String(extension).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`);
+  // TF-1450 : portée « dossier » — tous les radicaux du jour, quel que soit leur préfixe ou leur
+  // extension (même repérage que R-4, ` - AAAAMMJJ<lettre>.<ext>` en fin de nom). Portée « prefixe »
+  // (par défaut, inchangée) : uniquement CE préfixe, la seule que R-4 ne peut pas voir en collision.
+  const motif = porte === "dossier"
+    ? new RegExp(` - ${jour}([a-z])\\.[\\w.]+$`)
+    : new RegExp(
+      `^${String(prefixe).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}${jour}([a-z])${String(extension).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`);
   const pris = existsSync(dossier)
-    ? readdirSync(dossier).map((f) => f.match(motif)).filter(Boolean)
-      .map((m) => ({ lettre: m[1], nom: m[0] }))
+    ? readdirSync(dossier).map((f) => ({ f, m: f.match(motif) })).filter((x) => x.m)
+      .map(({ f, m }) => ({ lettre: m[1], nom: f }))
       .sort((a, b) => a.lettre.localeCompare(b.lettre))
     : [];
   if (!pris.length) return "a";
