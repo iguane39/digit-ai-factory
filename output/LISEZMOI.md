@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 429 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 430 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -398,6 +398,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md | 20260924a | 30.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md` |
 | Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md | 20260923b | 16.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md` |
+| Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md | 20260928a | 23.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md` |
 | Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md | 20260917i | 9.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` |
 | Digit-AI - Synthese Mandat - Pilot rattrape sur l autre poste et index en retard consigne - 20260923e.md | 20260923e | 21.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot rattrape sur l autre poste et index en retard consigne - 20260923e.md` |
 | Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md | 20260912a | 25.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` |

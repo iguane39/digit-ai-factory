@@ -151,6 +151,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Parc synchronise et decisions des deux postes - 20260925a.md` | fichier | 33,9 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et décisions des deux postes réunies — 25 |
 | `Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md` | fichier | 30,1 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et le retour de cohérence devenu oracle — |
 | `Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md` | fichier | 16,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et 4 dépôts publiés — 23/09/2026 |
+| `Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md` | fichier | 23,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et travail des deux postes réuni — 28/09/ |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
 | `Digit-AI - Synthese Mandat - Pilot rattrape sur l autre poste et index en retard consigne - 20260923e.md` | fichier | 21,6 Ko | Digit-AI — Synthèse de mandat — Pilotage rattrapé sur l'autre poste, index en retard consi |
 | `Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` | fichier | 25,5 Ko | Synthèse de mandat — le plancher d'écriture de la Factory est posé, jugé et câblé chez le  |
@@ -226,4 +227,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_209 fichier(s), 0 sous-dossier(s)_
+_210 fichier(s), 0 sous-dossier(s)_
