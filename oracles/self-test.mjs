@@ -979,6 +979,58 @@ check("TF-0801 borne : sans rectification, la clé malformée reste un FAIL — 
   if (!/rectification_versions_forges/.test(f.message)) throw new Error("le message ne dit pas la voie par ajout — le produit réécrira l'entrée faute de mieux");
 });
 
+// ---- TF-1438 (28/09/2026, RP-4) — R-19 : `digit-ai-confidentiel` est une exception NOMMÉE, comme
+// `digit-ai-queue` (TF-0801) : ni une forge, ni un nom court, son nom réel est le seul qu'un
+// run_open puisse consigner. --------------------------------------------------------------------
+const confidentielR19 = mkdtempSync(join(tmpdir(), "conf-confidentiel-r19-"));
+ecrireDans(confidentielR19, "forge/ledger.jsonl",
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001", "digit-ai-confidentiel": "a2c8dc4" } }) + "\n");
+check("TF-1438 : la clé « digit-ai-confidentiel » est acceptée telle quelle — exception nommée, pas un nom court", () => {
+  const { rapport } = lance(confidentielR19);
+  const fails = rapport.findings.filter((f) => f.regle === "R-19" && f.statut === "FAIL");
+  if (fails.length) throw new Error(`R-19 refuse le nom réel du canal confidentiel : ${JSON.stringify(fails.map((f) => f.message))}`);
+});
+const confidentielCourtR19 = mkdtempSync(join(tmpdir(), "conf-confidentiel-court-r19-"));
+ecrireDans(confidentielCourtR19, "forge/ledger.jsonl",
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001", "confidentiel": "a2c8dc4" } }) + "\n");
+check("TF-1438 borne : la forme COURTE « confidentiel » reste un nom court refusé — l'exception ne couvre que le nom RÉEL", () => {
+  const { exit, rapport } = lance(confidentielCourtR19);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-19" && x.statut === "FAIL" && /clé « confidentiel »/.test(x.message));
+  if (!f) throw new Error("la forme courte « confidentiel » n'est plus dénoncée — l'exception a été élargie au-delà du nom réel");
+});
+
+// ---- TF-1454 (28/09/2026, RP-14) — R-19 : `run_precedent` omis se rectifie PAR AJOUT, comme
+// `versions_forges` (TF-0709, TF-0801) — sans quoi un oubli de session devient un FAIL DÉFINITIF,
+// puisque R-42 interdit de réécrire l'entrée. -----------------------------------------------------
+const omisR19 = mkdtempSync(join(tmpdir(), "conf-omis-run-precedent-r19-"));
+ecrireDans(omisR19, "forge/ledger.jsonl", [
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001" } }),
+  JSON.stringify({ seq: 2, type: "run_open", ts: "2026-09-05T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0002" } }), // run_precedent omis par oubli
+].join("\n") + "\n");
+check("TF-1454 rouge : run_precedent omis, SANS rectification → FAIL, et le message donne la forme exacte de rectification_run_open", () => {
+  const { exit, rapport } = lance(omisR19);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-19" && x.statut === "FAIL" && /sans run_precedent/.test(x.message));
+  if (!f) throw new Error("l'omission n'est plus dénoncée");
+  if (!/rectification_run_open/.test(f.message) || !/champ: "run_precedent"/.test(f.message))
+    throw new Error(`le message ne dit pas la voie par ajout ni le champ à rectifier : ${f.message}`);
+});
+const rectifieOmisR19 = mkdtempSync(join(tmpdir(), "conf-rectifie-run-precedent-r19-"));
+ecrireDans(rectifieOmisR19, "forge/ledger.jsonl", [
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001" } }),
+  JSON.stringify({ seq: 2, type: "run_open", ts: "2026-09-05T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0002" } }),
+  JSON.stringify({ seq: 3, type: "rectification_run_open", ts: "2026-09-06T08:00:00Z", seq_vise: 2, champ: "run_precedent", valeur: "run-20260901",
+    cause: "run_precedent omis à l'ouverture, chaînage retrouvé par lecture du ledger précédent" }),
+].join("\n") + "\n");
+check("TF-1454 vert : run_precedent omis, rectifié PAR AJOUT (seq_vise + champ + cause ≥ 20 car.) → PASS, imprimé [RECTIFIÉ]", () => {
+  const { rapport } = lance(rectifieOmisR19);
+  const r19 = rapport.findings.filter((f) => f.regle === "R-19");
+  if (r19.some((f) => f.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r19.filter((f) => f.statut === "FAIL").map((f) => f.message))}`);
+  const f = r19.find((x) => x.statut === "PASS" && /run_precedent omis, déclaré par ajout/.test(x.message));
+  if (!f) throw new Error("la rectification de run_precedent n'est pas imprimée au verdict PASS");
+});
+
 // ---- fixtures R-42 INTÉGRITÉ du ledger (TF-0411, 20/08) : le contrôle existait dans
 // `ledger.mjs verify` et n'était joué nulle part. Trois états à prouver — dont le fail-fast :
 // un vérificateur qui s'arrête au premier écart a laissé un second défaut invisible trois
@@ -1079,6 +1131,78 @@ check("TF-0794 borne : sans rectification, les DEUX seq en collision sont des é
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
   if (!f || !/seq 3 là où 5/.test(f.message) || !/seq 4 là où 5/.test(f.message)) throw new Error(`un des deux seq en collision n'est pas dénoncé : ${f && f.message}`);
+});
+
+// ---- fixtures R-42 INSTANTS (TF-1422/TF-1423, 25/09/2026, RA-1/RS-2) : comparer des CHAÎNES ISO
+// mêle heure locale à décalage et heure UTC — la paire exacte mesurée au lot, jouée dans les DEUX
+// sens sur un ledger jetable. ----------------------------------------------------------------------
+const LEDGER_FUSEAUX_A = [
+  { seq: 1, ts: "2026-09-25T09:30:00+02:00", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } }, // 07:30 UTC
+  { seq: 2, ts: "2026-09-25T07:45:00.000Z", type: "retour" }, // 07:45 UTC : +15 min RÉELLES
+].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST;
+const verteFuseauxR42 = mkdtempSync(join(tmpdir(), "conf-verte-fuseaux-r42-"));
+ecrireDans(verteFuseauxR42, "forge/ledger.jsonl", LEDGER_FUSEAUX_A);
+check("TF-1423 vert (cas a du lot) : +15 min réelles écrites en fuseau puis en UTC → PASS (comparaison de CHAÎNES accusait un recul à tort)", () => {
+  const { rapport } = lance(verteFuseauxR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+});
+const LEDGER_FUSEAUX_B = [
+  { seq: 1, ts: "2026-09-25T07:45:00.000Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } }, // 07:45 UTC
+  { seq: 2, ts: "2026-09-25T09:30:00+02:00", type: "retour" }, // 07:30 UTC : -15 min RÉELLES, un vrai recul
+].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST;
+const rougeFuseauxR42 = mkdtempSync(join(tmpdir(), "conf-rouge-fuseaux-r42-"));
+ecrireDans(rougeFuseauxR42, "forge/ledger.jsonl", LEDGER_FUSEAUX_B);
+check("TF-1423 rouge (cas b du lot) : -15 min réelles masquées par une écriture en fuseau après UTC → FAIL (comparaison de CHAÎNES laissait passer)", () => {
+  const { exit, rapport } = lance(rougeFuseauxR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — un vrai recul de 15 min doit rester détecté`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/horodatage décroissant/.test(f.message)) throw new Error(`le recul réel n'est plus détecté : ${f && f.message}`);
+});
+const LEDGER_TS_ILLISIBLE = [
+  { seq: 1, ts: "2026-09-25T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "pas-une-date", type: "retour" },
+].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST;
+const illisibleR42 = mkdtempSync(join(tmpdir(), "conf-illisible-r42-"));
+ecrireDans(illisibleR42, "forge/ledger.jsonl", LEDGER_TS_ILLISIBLE);
+check("TF-1423 : un ts qui ne se résout pas en instant est nommé comme écart, jamais comparé en silence", () => {
+  const { exit, rapport } = lance(illisibleR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL" && /horodatage illisible/.test(x.message));
+  if (!f) throw new Error("un ts illisible n'est plus nommé comme écart");
+});
+
+// ---- fixture R-42 bis (TF-1424, 25/09/2026, RS-3) : un ts POSTÉRIEUR au commit qui l'a introduite
+// est composé, pas relevé — double sens sur un dépôt git JETABLE, la date du commit FIXÉE par
+// `--date`, comme `projetAnteriorite` plus bas (même idiome, TF-0923). --------------------------
+const projetLedgerCommit = (tsEntree, dateCommit) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r42bis-"));
+  mkdirSync(join(d, "forge"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"),
+    JSON.stringify({ seq: 1, type: "run_open", ts: tsEntree, versions_forges: { "digit-ai-factory": "abc1234" } }) + "\n", "utf8");
+  writeFileSync(join(d, "README.md"), "# produit\n", "utf8");
+  sh("git", ["init", "-q", "-b", "main"], d);
+  const env = ["-c", "user.email=t@t", "-c", "user.name=t"];
+  sh("git", [...env, "add", "-A"], d);
+  sh("git", [...env, "-c", "commit.gpgsign=false", "commit", "-q", "--date", dateCommit, "-m", "feat: ledger initial"], d);
+  return d;
+};
+check("TF-1424 rouge : un ts POSTÉRIEUR de 37 min au commit qui l'a introduite est nommé COMPOSÉ (R-42 bis, avertissement non bloquant)", () => {
+  const d = projetLedgerCommit("2026-09-25T19:35:00.000Z", "2026-09-25T18:57:16+00:00");
+  try {
+    const f = (lance(d).rapport.findings || []).find((x) => x.regle === "R-42 bis");
+    if (!f) throw new Error("aucun finding R-42 bis");
+    if (!/seq 1/.test(f.message) || !/COMPOSÉ/.test(f.message)) throw new Error(`l'écart n'est pas nommé : ${f.message}`);
+    if (f.statut !== "PASS") throw new Error(`règle neuve : doit rester en PASS (avertissement), pas ${f.statut} — même doctrine que R-20 ter`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1424 vert : un ts ANTÉRIEUR (ou proche) du commit qui l'a introduite n'est jamais nommé composé", () => {
+  const d = projetLedgerCommit("2026-09-25T18:57:16.000Z", "2026-09-25T18:58:00+00:00");
+  try {
+    const f = (lance(d).rapport.findings || []).find((x) => x.regle === "R-42 bis");
+    if (!f) throw new Error("aucun finding R-42 bis");
+    if (/COMPOSÉ/.test(f.message)) throw new Error(`faux positif sur un ts honnêtement relevé : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
 // ---- fixtures R-20 TODO-PRODUIT (TF-0318, verdict O3 du 17/08 — volet LECTURE seul) : le
@@ -1370,7 +1494,37 @@ check("TF-0793 : R-47 compte un artefact conditionnel trouvé SOUS la racine web
   } finally { rmSync(avec, { recursive: true, force: true }); rmSync(sans, { recursive: true, force: true }); }
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, collisionR42, proseR42, nueR42, queueR19, malformeeR19, malformeeNueR19, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+// ---- TF-1426 (25/09/2026, RS-4) — R-47 SECRETS SUR LE CONTENU, PAS LE SEUL CHEMIN. Le motif
+// mot-clé accusait tout chemin qui le PORTE, dossier compris : un `.gitkeep` de 0 octet sous un
+// dossier « … Sécurité & secrets », un rapport de scan à 0 constat, une preuve de tests au nom
+// voisin — trois faux positifs mesurés au lot. Double sens sur un dépôt git JETABLE : les trois
+// preuves sans valeur restent MUETTES ; un fichier qui porte réellement une valeur secrète reste
+// dénoncé — c'est la garantie « aucun vrai secret ne passe » exigée par la correction. ------------
+const secretsR47 = mkdtempSync(join(tmpdir(), "conf-secrets-r47-"));
+ecrireDans(secretsR47, "forge/etapes/audit/input/03 - Securite et secrets/.gitkeep", "");
+ecrireDans(secretsR47, "forge/etapes/audit/Rapport - Scan secrets gitleaks - 20260821a.json",
+  JSON.stringify({ outil: "gitleaks", constats: [], resume: "0 constat" }));
+ecrireDans(secretsR47, "forge/etapes/tests/preuve-secrets-20260817a.json",
+  JSON.stringify({ suite: "scan-secrets", resultat: "0 constat", champs_de_valeur: 0 }));
+// Le vrai risque, celui que la règle doit continuer d'attraper : une VALEUR posée sur une clé de
+// forme secrète, dans un fichier suivi sous forge\.
+ecrireDans(secretsR47, "forge/etapes/audit/mdp-admin-prod.txt", "motdepasse_admin=Sup3rS3cr3t2026!\n");
+sh("git", ["init", "-q", "-b", "main"], secretsR47);
+sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], secretsR47);
+sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "feat: fixture secrets R-47"], secretsR47);
+check("TF-1426 vert : un .gitkeep de 0 octet et deux rapports de scan à 0 constat, tous sous un chemin « secrets », restent MUETS", () => {
+  const r47 = (lance(secretsR47).rapport.findings || []).filter((f) => f.regle === "R-47" && f.ou === "forge\\ (secrets)");
+  const faux = r47.filter((f) => f.statut === "FAIL" && /(gitkeep|Scan secrets gitleaks|preuve-secrets)/.test(f.message));
+  if (faux.length) throw new Error(`faux positif sur une preuve sans valeur : ${JSON.stringify(faux.map((f) => f.message))}`);
+});
+check("TF-1426 rouge : une valeur RÉELLE posée sur une clé de forme secrète reste dénoncée — le remède ne laisse rien passer", () => {
+  const { exit, rapport } = lance(secretsR47);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — un vrai secret ne peut pas laisser le projet PASS`);
+  const f = rapport.findings.find((x) => x.regle === "R-47" && x.statut === "FAIL" && /mdp-admin-prod\.txt/.test(x.message));
+  if (!f) throw new Error("le fichier qui porte une vraie valeur secrète n'est plus dénoncé — la correction du faux positif a désarmé la règle");
+});
+
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, collisionR42, proseR42, nueR42, queueR19, malformeeR19, malformeeNueR19, confidentielR19, confidentielCourtR19, omisR19, rectifieOmisR19, verteFuseauxR42, rougeFuseauxR42, illisibleR42, secretsR47, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 // TF-0541 (24/08) — un ledger ecrit AILLEURS etait indiscernable d'un run jamais ouvert. Le
 // produit ecrivait dans `runs\\<run>\\ledger.jsonl` et l'oracle rendait SANS_OBJET : un run REEL
 // passait pour inexistant. Les deux sens se jouent sur le meme projet, seule la place du fichier

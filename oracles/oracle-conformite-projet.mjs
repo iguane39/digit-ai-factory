@@ -107,6 +107,10 @@ const MOTIF_DATE = / - \d{8}[a-z]?\.[\w.]+$/;
 // export multi-fichiers, un site statique se remettent en dossier ; leurs parties sont imposées par
 // le format et ne se renomment pas.
 const MOTIF_DOSSIER_DATE = / - \d{8}[a-z]?$/;
+// Motif de SECRET RÉEL (clé AWS, jeton GitHub/Slack, clé `sk-…`, en-tête de clé privée PEM) — un
+// FORMAT, jamais un simple mot. Partagé R-13 (.env.example) et R-47 (forge\, TF-1426) : hissé ici
+// (il vivait local au bloc R-13) pour que R-47, plus haut dans le fichier, puisse aussi le lire.
+const MOTIF_SECRET_EX = /AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}|BEGIN [A-Z ]*PRIVATE KEY|xox[bpors]-[A-Za-z0-9-]{10,}/;
 const EXT_CODE = new Set(["py", "js", "mjs", "cjs", "ts", "tsx", "jsx", "go", "rs", "java", "rb", "php", "cs"]);
 const EXT_LIVRABLE = new Set(["md", "pdf", "html", "pptx", "docx", "xlsx", "zip", "png", "svg"]);
 // LISEZMOI.md : index de dossier, pas un livrable daté (convention des familles numérotées
@@ -358,7 +362,9 @@ for (const [dossier, parCle] of indicesParDossier) {
     r4 = false;
     ko("R-4", `${dossier}/`, `indice « ${cle} » porté par ${radicaux.size} livrables de radical distinct — ` +
       `${[...radicaux].map((r) => `« ${r} »`).join(", ")} : l'indice existe pour ORDONNER les traitements d'un même jour, ` +
-      "deux livrables qui le partagent ne s'ordonnent pas (TF-0750) ; réindexer le plus récent (`scripts\\allouer-indice.mjs`)");
+      "deux livrables qui le partagent ne s'ordonnent pas (TF-0750) ; réindexer le plus récent — " +
+      "`allouerIndice({ …, porte: \"dossier\" })` (`scripts\\allouer-indice.mjs`) : la portée par défaut " +
+      "ne voit que son propre préfixe et peut rendre un indice déjà pris par un AUTRE radical (TF-1450)");
   }
 }
 // R-4 · PLAFOND DE LONGUEUR DU CHEMIN (TF-1015, décidé le 11/09/2026 — alinéa de la règle 4).
@@ -984,14 +990,36 @@ else {
     // ce contrôle juge l'EFFET, pas le motif : ce que `git ls-files` rend est ce qui partira.
     const lsf = git("ls-files", "--", "forge");
     if (lsf.status === 0) {
-      const SECRET = /(^|\/)\.env(?!\.example$|\.exemple$|\..*\.exemple$)|mdp|motdepasse|secret|password/i;
-      const suivis = (lsf.stdout || "").split(/\r?\n/).filter((f) => f && SECRET.test(f));
+      // TF-1426 (25/09/2026, RS-4) — LE CHEMIN SEUL ACCUSAIT À TORT. Le motif mot-clé (mdp,
+      // motdepasse, secret, password) matchait tout CHEMIN qui le porte, dossier compris : un
+      // `.gitkeep` de 0 octet sous un dossier « … Sécurité & secrets », un rapport de scan à 0
+      // constat (« Scan secrets gitleaks »), une preuve de tests au nom voisin (« preuve-secrets »)
+      // — trois FAIL mesurés sur des fichiers SANS AUCUNE valeur secrète, et le remède prescrit
+      // (`git rm --cached`) retire une PREUVE de conformité au lieu d'un risque. `.env` reste jugé
+      // sur le seul chemin (un dotenv suivi est un risque par construction, contenu ou non — TF-0713
+      // n'y change rien) ; le motif mot-clé se rejuge désormais sur le CONTENU, même distinction que
+      // R-13 : un nom qui ÉVOQUE un secret n'est un défaut que s'il en PORTE un — une valeur posée
+      // sur une clé de forme secrète, ou le motif de secret fort (MOTIF_SECRET_EX, TF-0869). Un
+      // fichier de 0 octet ne porte jamais de valeur ; un fichier illisible n'est PAS exonéré (silence
+      // prudent, jamais un verdict inventé côté sécurité).
+      const RE_ENV_SUIVI = /(^|\/)\.env(?!\.example$|\.exemple$|\..*\.exemple$)/i;
+      const RE_MOTCLE_SECRET = /mdp|motdepasse|secret|password/i;
+      const VALEUR_SUR_CLE_SECRETE = /(mdp|motdepasse|secret|password)[\w "'.-]{0,20}[:=]\s*"?[^"\s,}\]]{3,}/i;
+      const suivis = (lsf.stdout || "").split(/\r?\n/).filter((f) => {
+        if (!f) return false;
+        if (RE_ENV_SUIVI.test(f)) return true;
+        if (!RE_MOTCLE_SECRET.test(f)) return false;
+        let texte;
+        try { texte = readFileSync(p(f), "utf8"); } catch { return true; } // illisible : jugé par prudence
+        if (!texte.length) return false; // 0 octet — aucune valeur possible (TF-1426)
+        return VALEUR_SUR_CLE_SECRETE.test(texte) || MOTIF_SECRET_EX.test(texte);
+      });
       suivis.length
-        ? ko("R-47", "forge\\ (secrets)", `${suivis.length} fichier(s) d'apparence secrète SUIVI(S) par git sous forge\\ : `
+        ? ko("R-47", "forge\\ (secrets)", `${suivis.length} fichier(s) SUIVI(S) par git sous forge\\ portant une VALEUR de forme secrète : `
             + suivis.slice(0, 5).join(", ")
             + " — `!forge/**` les ré-inclut, et un secret entré dans l'histoire ne s'en retire pas : "
             + "re-exclure APRÈS la négation (bloc « ce que la négation ne doit pas rouvrir » du gabarit) puis `git rm --cached` (TF-0713)")
-        : ok("R-47", "forge\\ (secrets)", "aucun fichier d'apparence secrète suivi sous forge\\ — la négation du socle ne rouvre rien");
+        : ok("R-47", "forge\\ (secrets)", "aucun fichier suivi sous forge\\ ne porte de valeur de forme secrète ni de motif de secret fort — la négation du socle ne rouvre rien (TF-1426)");
     }
     // Hors dépôt git (status ≠ 0) : rien à juger ici — l'absence de dépôt est jugée ailleurs,
     // et un silence sur un sous-contrôle inapplicable vaut mieux qu'un verdict inventé.
@@ -1052,7 +1080,7 @@ else {
   // ligne même que « # à fournir : » désignait comme à renseigner ailleurs. Un commit de plus et
   // le secret partait au dépôt public. Deux constats distincts : la valeur posée sur une variable
   // explicitement déléguée à l'humain (R-15), et le motif de secret fort où qu'il soit.
-  const MOTIF_SECRET_EX = /AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}|BEGIN [A-Z ]*PRIVATE KEY|xox[bpors]-[A-Za-z0-9-]{10,}/;
+  // MOTIF_SECRET_EX est désormais un partagé de module (TF-1426) — plus de copie locale ici.
   let sainEx = true;
   readFileSync(envEx, "utf8").split(/\r?\n/).forEach((ligne, i) => {
     const m = /^([A-Z][A-Z0-9_]*)=(.*)$/.exec(ligne);
@@ -1139,7 +1167,11 @@ const DOCTRINE_CLES_COMPLETES = "2026-08-17";
 // au parc par bootstrap.mjs sous ce nom — est une EXCEPTION NOMMÉE : ce n'est pas une forge, son nom
 // réel est le seul qu'un run_open puisse consigner, et R-19 le refusait comme « nom court ». Le
 // produit a réécrit sa clé en forme canonique inexistante, geste que R-42 réprouve, faute de voie.
-const RE_CLE_DEPOT = /^(digit-ai-forge-[a-z0-9_-]+|digit-ai-factory|digit-ai-queue)$/;
+// TF-1438 (28/09/2026, RP-4) : même défaut, même classe — `digit-ai-confidentiel`, le canal
+// confidentiel PRIVÉ déclaré au parc par `scripts\lib-parc.mjs` (`CANAL`, D-28 (a) du 07/09/2026),
+// n'est pas non plus une forge ; son nom réel était refusé, et la forme canonique proposée par le
+// message, « digit-ai-forge-confidentiel », ne désigne aucun dépôt.
+const RE_CLE_DEPOT = /^(digit-ai-forge-[a-z0-9_-]+|digit-ai-factory|digit-ai-queue|digit-ai-confidentiel)$/;
 /** Nom de dépôt complet attendu pour une clé courte (« conception » → « digit-ai-forge-conception »,
  *  « pilot »/« factory » → « digit-ai-factory ») ; les préfixes partiels ne sont pas redoublés. */
 const cleCanonique = (cle) => {
@@ -1185,6 +1217,12 @@ else {
   // `{type: "rectification_versions_forges", seq_vise: <seq du run_open>, cause: "…"}` déclare
   // l'écart au lieu de le réécrire, et R-19 le lit comme une antériorité déclarée, imprimée.
   const rectifsVF = entreesLedger.filter((e) => (e.type || e.ev) === "rectification_versions_forges");
+  // TF-1454 (28/09/2026, RP-14) — MÊME VOIE POUR `run_precedent` QUE POUR `versions_forges`. Le
+  // fait : un `run_open` écrit sans `run_precedent` par oubli de la session est un FAIL DÉFINITIF —
+  // R-42 interdit de réécrire l'entrée, et jusqu'ici aucune rectification par ajout n'était lue
+  // pour CE champ, alors que la même règle en lit une pour `versions_forges` depuis TF-0709 et
+  // TF-0801. Un chaînage déclaré par ajout (ex. seq 156) restait donc SANS EFFET sur le verdict.
+  const rectifsRO = entreesLedger.filter((e) => (e.type || e.ev) === "rectification_run_open");
   if (!opens.length) ko("R-19", "forge/ledger.jsonl", "ledger présent mais aucun run_open — le ledger s'ouvre par run_open");
   else {
     let r19 = true, anteriorites = 0, jugesSurForme = 0;
@@ -1225,13 +1263,23 @@ else {
         }
       } else anteriorites++;
       if (i > 0 && !o.run_precedent) {
-        ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run de version sans run_precedent — les runs se chaînent"); r19 = false;
+        // Rectification par ajout, même contrat que pour versions_forges : `champ` distingue le
+        // champ rectifié (`rectification_run_open` peut un jour en porter d'autres que celui-ci).
+        const rectRO = rectifsRO.find((x) => x.seq_vise === o.seq && x.champ === "run_precedent" && String(x.cause || "").trim().length >= 20);
+        if (rectRO) {
+          rectifies.push(`run_open #${i + 1} (seq ${o.seq}) — run_precedent omis, déclaré par ajout` +
+            (rectRO.valeur ? ` (« ${rectRO.valeur} »)` : "") + ` : ${String(rectRO.cause).slice(0, 90)}`);
+        } else {
+          ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run de version sans run_precedent — les runs se chaînent. " +
+            "Si le chaînage n'a pas été noté à l'ouverture (R-42 interdit de réécrire l'entrée), déclarer l'écart PAR AJOUT : " +
+            `{type: "rectification_run_open", seq_vise: ${o.seq ?? "<seq>"}, champ: "run_precedent", valeur: "<run précédent>", cause: "…"} (TF-1454)`); r19 = false;
+        }
       }
     });
     if (r19) ok("R-19", "forge/ledger.jsonl", `${opens.length} run_open ${rectifies.length ? "conformes ou couverts" : "avec versions_forges"}${opens.length > 1 ? " et chaînage run_precedent" : ""}` +
       (jugesSurForme ? `, dont ${jugesSurForme} au nom de dépôt complet (TF-0320)` : "") +
       (anteriorites ? ` — ${anteriorites} run_open antérieur(s) au ${DOCTRINE_CLES_COMPLETES} en antériorité déclarée sur la forme des clés (jamais réécrits)` : "") +
-      (rectifies.length ? ` — [RECTIFIÉ] ${rectifies.length} run_open couvert(s) par rectification déclarée (champ absent ou clé malformée) : ${rectifies.join(" · ")}` : ""));
+      (rectifies.length ? ` — [RECTIFIÉ] ${rectifies.length} run_open couvert(s) par rectification déclarée (champ absent, clé malformée ou run_precedent omis) : ${rectifies.join(" · ")}` : ""));
   }
 }
 
@@ -1284,7 +1332,7 @@ else {
   if (lues.length) {
     const premier = lues[0];
     if ((premier.type || premier.ev) !== "run_open") ecarts.push(`première entrée de type « ${premier.type || premier.ev || "?"} » — run_open exigé (contrat §3)`);
-    let seqAttendu = 1, tsMax = "";
+    let seqAttendu = 1, tsMax = "", tsMaxInstant = NaN;
     for (const e of lues) {
       const seq = Number(e.seq);
       if (Number.isFinite(seq)) {
@@ -1298,13 +1346,27 @@ else {
         }
         seqAttendu = Math.max(seqAttendu, seq + 1);
       }
+      // TF-1422/TF-1423 (25/09/2026, RA-1/RS-2) : COMPARER DES CHAÎNES ISO MÊLE FUSEAU ET UTC.
+      // `ts < tsMax` en comparaison lexicographique traite « +02:00 » comme LEXICALEMENT plus
+      // grand que « Z » (le chiffre du décalage l'emporte sur la lettre) — sans rapport avec
+      // l'INSTANT réel. Mesuré sur la paire du lot (25/09) : (a) 09:30+02:00 (=07:30 UTC) suivi de
+      // 07:45Z (07:45 UTC, +15 min réelles) → chaîne décroissante, FAIL à tort ; (b) 07:45Z suivi
+      // de 09:30+02:00 (=07:30 UTC, -15 min réelles) → chaîne croissante, PASS à tort, un vrai
+      // recul masqué. On compare des INSTANTS (`Date.parse`) ; un `ts` non vide qui ne s'y résout
+      // pas (NaN) est lui-même nommé comme écart plutôt que de couler dans une comparaison NaN
+      // toujours fausse — un horodatage qui ne se lit pas n'est pas un horodatage tenu.
       const ts = String(e.ts || "");
-      if (ts && tsMax && ts < tsMax) {
+      const instant = ts ? Date.parse(ts) : NaN;
+      if (ts && !Number.isFinite(instant)) {
+        const quoi = `seq ${Number.isFinite(seq) ? seq : "?"} : horodatage illisible (${ts}) — ne se résout pas en instant (Date.parse)`;
+        if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} — ${rectifies.get(seq)}`);
+        else ecarts.push(quoi);
+      } else if (ts && Number.isFinite(tsMaxInstant) && instant < tsMaxInstant) {
         const quoi = `seq ${Number.isFinite(seq) ? seq : "?"} : horodatage décroissant (${ts} après ${tsMax})`;
         if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} — ${rectifies.get(seq)}`);
         else ecarts.push(quoi);
       }
-      if (ts > tsMax) tsMax = ts;
+      if (ts && Number.isFinite(instant) && (!Number.isFinite(tsMaxInstant) || instant > tsMaxInstant)) { tsMax = ts; tsMaxInstant = instant; }
     }
   }
   if (lues.length && !avecSeq) notes.push("aucune entree ne porte SEQ — la continuite d append n est PAS jugeable sur ce ledger (le contrat 3 l exige ; anteriorite, jamais reecrite) : seuls les horodatages et l ouverture le sont");
@@ -1319,6 +1381,54 @@ else {
   } else {
     ok("R-42", "forge/ledger.jsonl", `intégrité tenue sur ${lues.length} entrée(s) — seq continu, horodatages non décroissants, ouverture par run_open` +
       (notes.length ? ` ; ${notes.join(" · ")}` : ""));
+  }
+
+  // R-42 bis — UN HORODATAGE DE LEDGER NE PEUT PAS ÊTRE POSTÉRIEUR AU COMMIT QUI L'A ÉCRIT
+  // (TF-1424, 25/09/2026, RS-3). Mesuré chez un produit par `git log -S` : six entrées portaient
+  // une heure POSTÉRIEURE à leur propre commit — seq 127 (commit 18:57:16, ts 19:35), 128
+  // (19:23:04, ts 19:25), 132/133 (15:38:37, ts 16:30/16:35), 134 (16:15:39, ts 17:05), 135
+  // (16:24:58, ts 17:30). Un `ts` RELEVÉ au moment d'écrire ne peut précéder le commit qui le fixe
+  // dans l'histoire que de quelques secondes ; un `ts` POSTÉRIEUR au commit est COMPOSÉ (estimé,
+  // copié, calculé) plutôt que lu sur l'horloge — le contrat §3 veut un horodatage machine. Le
+  // contrôle rejoue l'histoire du ledger commit par commit (un `git log` + un `git show` par
+  // commit qui le touche — coût raisonnable sur un historique de produit ordinaire) et compare
+  // chaque entrée AJOUTÉE par un commit à la date de CE commit, avec 60 s de grâce (sous le plus
+  // petit écart réel mesuré, 1 min 56 s, seq 128). RÈGLE NEUVE, même doctrine que R-20 ter : le
+  // parc n'a jamais été lu sous cet angle — AVERTISSEMENT en PASS, jamais un FAIL, elle se
+  // durcira sur un corpus lu, pas sur sa première mesure. Une histoire réécrite (les lignes d'un
+  // commit ne sont plus un PRÉFIXE du suivant — append-only rompu) rend le rejeu impossible : le
+  // sous-contrôle se tait plutôt que de rendre un verdict inventé.
+  if (aGit) {
+    const TOLERANCE_MS = 60_000;
+    const histo = git("log", "--reverse", "--format=%H%x1f%aI", "--", "forge/ledger.jsonl");
+    if (histo.status === 0 && histo.stdout.trim()) {
+      const commits = histo.stdout.split(/\r?\n/).filter(Boolean).map((l) => {
+        const [hash, date] = l.split("\x1f"); return { hash, date };
+      });
+      const composes = [];
+      let lignesPrecedentes = [], rejouable = true;
+      for (const { hash, date } of commits) {
+        const contenu = git("show", `${hash}:forge/ledger.jsonl`);
+        if (contenu.status !== 0) continue; // fichier absent à ce commit — rien à comparer ici
+        const lignesActuelles = contenu.stdout.split(/\r?\n/).filter((l) => l.trim());
+        const prefixeIntact = lignesPrecedentes.every((l, i) => lignesActuelles[i] === l);
+        if (!prefixeIntact) { rejouable = false; break; }
+        const instantCommit = Date.parse(date);
+        for (const ligne of lignesActuelles.slice(lignesPrecedentes.length)) {
+          let entree; try { entree = JSON.parse(ligne); } catch { continue; }
+          const instantTs = entree && entree.ts ? Date.parse(entree.ts) : NaN;
+          if (Number.isFinite(instantTs) && Number.isFinite(instantCommit) && instantTs > instantCommit + TOLERANCE_MS) {
+            composes.push(`seq ${entree.seq ?? "?"} : ts ${entree.ts} postérieur de ${Math.round((instantTs - instantCommit) / 60000)} min au commit ${hash.slice(0, 7)} (${date}) qui l'a introduite`);
+          }
+        }
+        lignesPrecedentes = lignesActuelles;
+      }
+      if (rejouable) {
+        composes.length
+          ? ok("R-42 bis", "forge/ledger.jsonl", `AVERTISSEMENT, non bloquant : ${composes.length} entrée(s) dont l'horodatage dépasse le commit qui l'a introduite — horodatage COMPOSÉ plutôt que relevé (TF-1424) : ${composes.slice(0, 6).join(" · ")}${composes.length > 6 ? " …" : ""}. Relever l'heure au moment d'écrire l'entrée, jamais après coup`)
+          : ok("R-42 bis", "forge/ledger.jsonl", "aucune entrée dont l'horodatage dépasse le commit qui l'a introduite (TF-1424)");
+      }
+    }
   }
 }
 
@@ -2079,7 +2189,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-27, R-32, « R-32 bis », « R-32 ter », R-35, R-42, R-43, R-47)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-27, R-32, « R-32 bis », « R-32 ter », R-35, R-42, « R-42 bis », R-43, R-47)" });
     }
   }
 }
