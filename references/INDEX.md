@@ -21,6 +21,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\ETAPES-RUN.md` | Étapes d'un run produit — détail opérationnel |
 | `references\INTEGRATIONS-FOURNISSEURS.md` | Faits mesurés sur les interfaces de fournisseurs |
 | `references\INTENTION.md` | La cascade de l'intention — Intention → Stratégie → Tactique → Opérationnel |
+| `references\MODELES-EN-SERVICE.json` | Donnée datée et sourcée de la génération de modèles en service, une version par famille, et du re-test de la règle de challenge qu'une nouvelle version déclenche ; jouée à chaque ouverture par `oracles\oracle-modeles-en-service.mjs` (D-1 (a) du 25/09/2026) |
 | `references\PATRONS-EPROUVES.md` | Patrons éprouvés — mécanismes payés une fois, réutilisables tels quels |
 | `references\PLATEFORME-LINKEDIN.md` | Plateforme LinkedIn — règles datées (contrat, accès aux chiffres, transparence, portée), péremption déclarée |
 | `references\PLATEFORMES-RESEAUX.md` | Plateformes de réseaux sociaux — 9 réseaux, 5 faits chacun (publier, programmer, exporter, déclarer un contenu généré, automatisation), solidité ligne à ligne, péremption déclarée |

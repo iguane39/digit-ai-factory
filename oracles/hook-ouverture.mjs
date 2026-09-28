@@ -472,6 +472,29 @@ if (iPilot < 0) {
   }
 }
 
+// D-1 (a) du 25/09/2026 (synthèse 20260924b) — UNE NOUVELLE VERSION DE MODÈLE SE VOIT À
+// L'OUVERTURE, pas au changement de famille. Le §4 de CONTRAT-INTERFACE.md ne se révisait qu'au
+// changement de famille : Fable 5.1 (dès le 02/09) et Opus 5.5 (depuis le 23/09) ont été servies
+// sans que rien ne le dise. L'oracle lit les versions réellement servies dans les transcripts du
+// poste et les situe par rapport au référentiel daté `references\MODELES-EN-SERVICE.json` : une
+// version plus récente que la génération courante déclenche le re-test de la règle de challenge.
+// Il ne bloque jamais l'ouverture : son FAIL est le signal, comme la surveillance des récidives.
+if (iPilot < 0) {
+  const om = join(ICI, "oracle-modeles-en-service.mjs");
+  if (existsSync(om)) {
+    lignes.push("", "## Modèles en service (D-1 (a) du 25/09/2026, référentiel references\\MODELES-EN-SERVICE.json)");
+    const r = spawnSync(process.execPath, [om, "--json"], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur les modèles : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else {
+      lignes.push(`- ${j.resume}`);
+      for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) lignes.push(`- **DÉCLENCHEUR ${f.regle} — ${String(f.message).slice(0, 320)}**`);
+      for (const f of (j.findings || []).filter((x) => x.statut === "AVERT")) lignes.push(`- ${f.regle} — ${String(f.message).slice(0, 320)}`);
+    }
+  }
+}
+
 lignes.push("",
   "## Gates actifs dans cette session (R-44)",
   "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. v2.28.0 (27/09) : UNE ACTION SUR L'ÉCRAN D'UNE PLATEFORME TIERCE CITE SA SOURCE OFFICIELLE ET LA DATE OÙ ELLE A ÉTÉ LUE (S52), ET, LAISSÉE À manuelle_utilisateur, ELLE SE GUIDE EN TÊTE — une section « ## Guide — … » avant le bloc 0 alors titré, des étapes numérotées closes par « Ce que vous devez voir : … » (S53, bloquante quand le dernier message humain demande la procédure ; TF-1362, TF-1361). v2.27.0 (19/09) : UN REFUS PROUVE QU'UNE PORTE EST FERMÉE, JAMAIS QU'IL N'Y EN A QU'UNE — une incapacité d'accès déclarée porte les codes de retour de DEUX FAMILLES de chemins au moins (un préfixe d'URL ou un scope distinct, pas une variante du même), ou cite la source qui établit qu'un seul chemin existe ; « seule voie » ne vaut plus preuve (S25 durcie, TF-1189). v2.26.0 (17/09) : LE BLOC 1 DIT L'INTENTION DE LA DEMANDE — une phrase pour l'intention initiale, puis « Test rétro : » qui dit si le résultat la sert ou n'en sert que la lettre (S51, loi transverse n° 7). v2.25.0 (17/09) : UN TOUR DE TRAVAIL DONT LE RÉSULTAT N'EST PAS ENCORE MESURABLE SE DÉCLARE « POINT D'ÉTAPE » AU BLOC 1 — bloc 2 remplacé par « ce qui reste à mesurer, et par quoi » (la mesure attendue ET l'outil qui la rendra), blocs 1, 4 et 8 PLEINS (S50), les autres admis en une ligne ; et un RELAIS d'avancement de trois lignes, quand rien n'a été écrit depuis ton dernier affichage, ne se rejuge pas et ne reprend pas la synthèse déposée en entier (TF-1182). v2.24.0 (17/09) : UNE OPTION DU BLOC 3 QUI COMMANDE UN GESTE HUMAIN (se connecter, saisir, coller, installer, ouvrir un terminal, lancer une commande, valider un second facteur, publier soi-même) porte SUR PLACE de quoi l'exécuter — la commande entre accents graves, l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » (S49). v2.23.0 (17/09) : CHEZ UN PRODUIT, le bloc 9 porte une ligne « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » — « rien à remonter » est une réponse valide, le silence ne l'est pas (S48 ; sans objet au pilot et dans une forge). Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Coût | Exclusions` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",

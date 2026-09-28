@@ -181,6 +181,10 @@
   "cas": 4,
   "vu_le": "2026-08-26"
  },
+ "oracle-modeles-en-service.mjs": {
+  "cas": 16,
+  "vu_le": "2026-09-28"
+ },
  "oracle-parite-configuration.mjs": {
   "cas": 18,
   "vu_le": "2026-08-26"

@@ -23,6 +23,7 @@ d'exécuter, puis complète **après** :
     "entrees": ["<chemins absolus des artefacts fournis>"],
     "sorties_attendues": ["<chemins absolus attendus>"],
     "modele": "haiku | sonnet | opus | fable",
+    "modele_version": "<identifiant servi, lu dans le harnais : ex. claude-sonnet-5>",
     "substrat": "cli | skill-par-chemin | session-agent"
   },
   "resultat": {
@@ -45,6 +46,11 @@ Règles :
   suspend le run, pose les questions à l'humain, et reprend sur réponse. Ce n'est pas un échec.
 - Un artefact d'étape n'est **accepté** que si les oracles de la forge concernée ont été exécutés
   et sont au vert (ou `SKIP`/`SANS_OBJET` avec raison consignée). Jamais de validation par confiance.
+- `modele` dit la FAMILLE affectée par le routage (§4) ; `modele_version` dit la version réellement
+  servie, telle que le harnais l'a rendue (décision humaine D-1 (a) du 25/09/2026). `ledger.mjs
+  append` la relève lui-même dans le transcript de la session quand l'entrée porte `modele` sans
+  elle ; faute de transcript lisible, il écrit l'entrée sans, et le dit. Sans version, une escalade
+  mesurée sur Opus 5 et une autre sur Opus 5.5 se confondent au §4 bis.
 
 ## 2. Emplacements
 
@@ -323,17 +329,28 @@ symétriques — déléguer un arbitrage, et facturer un travail mécanique au p
 
 | Rôle | Modèle | Règle |
 |---|---|---|
-| Pilotage, arbitrage, synthèse inter-étapes | Fable (session orchestrateur) | jamais délégué |
+| Pilotage, arbitrage, synthèse inter-étapes | Opus (session orchestrateur, nom de famille `opus[1m]` au réglage du poste) | jamais délégué |
 | Construction complexe (code, architecture, maquette complète) | Opus | sur escalade ou complexité manifeste |
 | Production standard (documents d'étape, exigences, tokens, tests simples) | Sonnet | **défaut** |
 | Tâches mécaniques (extraction, reformatage, vérifications simples) | Haiku | quand la tâche est purement mécanique |
 
-**Génération courante** (épinglée le 2026-08-10, à réviser à chaque changement de famille) :
-les rôles ci-dessus se résolvent sur la **famille Claude 5** — Fable 5 (`claude-fable-5`),
-Opus 5 (`claude-opus-5`), Sonnet 5 (`claude-sonnet-5`) — et Haiku 4.5 (`claude-haiku-4-5`).
-Un saut de génération **renforce la règle de challenge** : les capacités montent, donc les
-tâches jadis « Opus » redeviennent candidates Sonnet — re-tester l'a priori au premier run
-(§4 bis), ne jamais reconduire l'ancienne table par habitude.
+**Le modèle se désigne par son NOM DE FAMILLE, jamais par un identifiant** (décisions humaines
+D-1 (a) et D-2 (a) du 25/09/2026). `opus`, `sonnet`, `haiku` et `fable` suivent la dernière
+version sans qu'aucun fichier ne bouge : à l'appel d'un agent, dans la définition d'un agent
+compilé (`agent.def`, champ `modele`), au réglage du poste. Un identifiant complet épingle une
+version, et une session épinglée ne voit pas la suivante.
+
+**Génération courante** : elle vit dans le référentiel daté et sourcé
+`references\MODELES-EN-SERVICE.json` (loi n° 4), jamais recopiée ici (§3 quater). Jusqu'au
+25/09/2026, ce paragraphe l'épinglait lui-même au 2026-08-10 et ne se révisait qu'« à chaque
+changement de famille » : Fable 5.1 et Opus 5.5, versions de la même famille, sont entrées en
+service sans rien déclencher. **Toute nouvelle version d'un modèle du tableau renforce la règle de
+challenge** : les capacités montent, donc les tâches jadis « Opus » redeviennent candidates
+Sonnet — re-tester l'a priori au premier run (§4 bis), ne jamais reconduire l'ancienne table par
+habitude. Le déclencheur est exécuté : `node oracles\oracle-modeles-en-service.mjs` lit à chaque
+ouverture de session du pilot les versions servies dans les transcripts du poste, et une version
+plus récente que la génération courante le fait échouer. Le re-test dû s'inscrit au référentiel
+(`re_test_regle_de_challenge`) et se dit à chaque ouverture jusqu'à la mesure qui le clôt.
 
 **Règle de challenge** : toute tâche part sur le modèle le moins cher plausible. Escalade vers le
 modèle supérieur **uniquement** sur échec d'un oracle ou d'un critère d'acceptation, consignée au
@@ -347,8 +364,9 @@ Constat fondateur : ~25 affectations de modèle en 2 produits réels, zéro esca
 comparative — un a priori jamais confronté. Protocole, appliqué à toute campagne ou run :
 
 1. **Consignation systématique** : chaque tranche déléguée porte au journal de campagne (ou au
-   ledger) : modèle affecté, raison de l'affectation, tokens consommés (relevés du harnais),
-   nombre de passes, verdict des vérifications natives. `escalade_modele` se consigne **même
+   ledger) : modèle affecté (famille), version servie (`modele_version`, §1), raison de
+   l'affectation, tokens consommés (relevés du harnais), nombre de passes, verdict des
+   vérifications natives. `escalade_modele` se consigne **même
    « aucune »** — l'absence d'escalade est une donnée, pas un silence.
 2. **Tranches comparables** : dès qu'une campagne comporte ≥ 2 tranches de nature équivalente
    (même type de correctif, dépôts différents), affecter A→Sonnet et B→Opus et comparer coût
