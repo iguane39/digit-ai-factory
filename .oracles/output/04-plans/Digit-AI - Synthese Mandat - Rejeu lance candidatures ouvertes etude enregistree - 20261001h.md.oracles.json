@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+  "date_iso": "2026-10-01T18:58:58.191Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md",
+    "ts": "2026-10-01T18:58:58.190Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md": "a275797a5efba2a0da03053f5231a23f3fb31539b2ce521e18a532216552837d"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

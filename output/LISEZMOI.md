@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 447 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 449 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -437,6 +437,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md | 20260907h | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` |
 | Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md | 20260910c | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md` |
+| Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md | 20261001i | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md` |
+| Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md | 20261001h | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md` |
 | Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md | 20260830b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` |
 | Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md | 20260830j | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` |
 | Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md | 20260917l | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` |
