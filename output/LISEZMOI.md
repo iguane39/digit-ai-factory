@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 440 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 450 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -230,7 +230,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260925-etude-opportunite-niveaux-d-intervention.md | — | 47.9 Ko | `03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md` |
 | 20260925-L99-niveaux-d-intervention.md | — | 51 Ko | `03-etudes/20260925-L99-niveaux-d-intervention.md` |
 | 20261001-etude-opportunite-rsi-et-ssl.md | — | 30 Ko | `03-etudes/20261001-etude-opportunite-rsi-et-ssl.md` |
-| 20261001-etude-opportunite-textes-affiches.md | — | 16.5 Ko | `03-etudes/20261001-etude-opportunite-textes-affiches.md` |
+| 20261001-etude-opportunite-textes-affiches.md | — | 18.2 Ko | `03-etudes/20261001-etude-opportunite-textes-affiches.md` |
 | 20261001-L99-etude-textes-relance.md | — | 13.8 Ko | `03-etudes/20261001-L99-etude-textes-relance.md` |
 | 20261001-L99-textes-affiches-en-session.md | — | 14.2 Ko | `03-etudes/20261001-L99-textes-affiches-en-session.md` |
 
@@ -292,6 +292,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
 | Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md | 20260905k | 23.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` |
+| Digit-AI - Synthese Mandat - Affichage double corrige et revue hebdomadaire - 20261001e.md | 20261001e | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Affichage double corrige et revue hebdomadaire - 20261001e.md` |
+| Digit-AI - Synthese Mandat - Affichage double corrige et revue hebdomadaire - 20261001e.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Affichage double corrige et revue hebdomadaire - 20261001e.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md | 20260903b | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md | 20260903a | 15.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md` |
 | Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md | 20260830n | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md` |
@@ -354,11 +356,14 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
 | Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md | 20260925g | 26.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` |
 | Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md | 20261001h | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md` |
+| Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md | 20260917g | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` |
 | Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md | 20260917h | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` |
 | Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md | 20260915d | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md | 20260831a | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite premiers HTML nouveaux formats - 20260914b.md | 20260914b | 19.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite premiers HTML nouveaux formats - 20260914b.md` |
+| Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md | 20261001d | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` |
 | Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md | 20260905g | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` |
 | Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md | 20260910g | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` |
 | Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md | 20260830c | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` |
@@ -390,6 +395,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Neuf decisions executees publiees et propagees - 20260927a.md | 20260927a | 23.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Neuf decisions executees publiees et propagees - 20260927a.md` |
 | Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md | 20260910d | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md` |
 | Digit-AI - Synthese Mandat - Onze actions executees et la fusion validee - 20260922g.md | 20260922g | 33.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Onze actions executees et la fusion validee - 20260922g.md` |
+| Digit-AI - Synthese Mandat - Opus 5.5 Medium par defaut prouve sur les 2 profils - 20261001a.md | 20261001a | 8.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Opus 5.5 Medium par defaut prouve sur les 2 profils - 20261001a.md` |
+| Digit-AI - Synthese Mandat - Opus 5.5 Medium par defaut prouve sur les 2 profils - 20261001a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Opus 5.5 Medium par defaut prouve sur les 2 profils - 20261001a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md | 20260907j | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` |
 | Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md | 20260919c | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` |
 | Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md.jugement.json` |
@@ -414,6 +421,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md | 20260830d | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` |
 | Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Publication 48a du pilot et de forge-agents - 20261001i.md | 20261001i | 4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et de forge-agents - 20261001i.md` |
+| Digit-AI - Synthese Mandat - Publication 48a du pilot et de forge-agents - 20261001i.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et de forge-agents - 20261001i.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Publication de forge-development actions A39 A37 - 20260907l.md | 20260907l | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication de forge-development actions A39 A37 - 20260907l.md` |
 | Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md | 20260907g | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md` |
 | Digit-AI - Synthese Mandat - Publication du parc et branche ancienne retiree - 20260916a.md | 20260916a | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du parc et branche ancienne retiree - 20260916a.md` |
@@ -424,6 +433,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Quatre decisions executees et quatre nouvelles posees - 20260923a.md | 20260923a | 29.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees et quatre nouvelles posees - 20260923a.md` |
 | Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md | 20260908f | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` |
+| Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001g.md | 20261001g | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001g.md` |
 | Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md | 20260911d | 22.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md` |
 | Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md | 20260916b | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md` |
 | Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md | 20260830h | 14.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` |
