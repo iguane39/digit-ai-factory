@@ -45,21 +45,29 @@ Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte s
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé 4 fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
 | 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
-**Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026).** La règle 4
+**Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026 ; constante du
+sidecar corrigée le 01/10/2026, TF-1500).** La règle 4
 fixe la FORME du nom et rien n'y bornait sa LONGUEUR. Désormais : le chemin **relatif** (depuis la
-racine du dépôt) d'un livrable **cité ou déposé sous `output\`**, augmenté des **26 caractères du
+racine du dépôt) d'un livrable **cité ou déposé sous `output\`**, augmenté des **34 caractères du
 sidecar d'oracle** (`.oracles\` en tête, `.oracles-historique.jsonl` en queue), ne dépasse pas
-**150 caractères**. Pourquoi : sous `MAX_PATH` = 260 sans `core.longpaths`, un chemin suivi de 146
+**150 caractères**. Le livrable lui-même tient donc en 116. Pourquoi : sous `MAX_PATH` = 260 sans
+`core.longpaths`, un chemin suivi de 146
 caractères ne laisse que **113 caractères** de préfixe de clone, et le 10/09/2026 un clone de
 vérification a refusé 22 fichiers au checkout — dépôt sans arbre de travail, vérification avant
 push impossible. Et le défaut ne se voit pas chez celui qui ÉCRIT (dépôt à `c:\dev\…`, préfixe
-court) : il ne se voit que chez celui qui **vérifie**. Câblé, jamais seulement écrit :
-`oracle-synthese` règle **S42** (fichier jugé + chemins cités, fixture à double sens 150/151),
+court) : il ne se voit que chez celui qui **vérifie**. La constante du sidecar a valu 26 jusqu'au
+01/10/2026 : c'était une erreur de calcul. Mesurés sur le disque, les sidecars suivis du pilot
+ajoutent tous 34 caractères à leur livrable, et plusieurs dépassaient 150 alors que leurs livrables
+passaient. La constante se calcule désormais sur les deux noms, et la recette de
+`oracle-conformite-projet` la compare aux sidecars suivis du pilot. Câblé, jamais seulement écrit :
+`oracle-synthese` règle **S42** (fichier jugé + chemins cités),
 `oracle-conformite-projet` règle **4** (fichiers réels d'`output\`), et
 `git clone -c core.longpaths=true` déclaré partout où l'on clone (`bootstrap.mjs`,
-`references\TODO-FORGE.md`).
+`references\TODO-FORGE.md`). Depuis le 01/10/2026, S42 mesure aussi les synthèses sous le `forge\`
+d'un produit, avec une fixture à double sens 116/117, soit 150/151 avec le sidecar.
 Les fichiers antérieurs au-dessus de la borne ne sont pas renommés : ils sont **nommés** par
-l'oracle, un renommage cassant les liens déjà restitués.
+l'oracle, un renommage cassant les liens déjà restitués. Le passage de 26 à 34 nomme de la même
+façon la bande de 117 à 124 caractères, que la constante erronée laissait passer.
 
 **Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
 instruit d'un système de paramètres).** 3 classes de conventions ne se négocient pas,

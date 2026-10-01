@@ -380,23 +380,40 @@ for (const [dossier, parCle] of indicesParDossier) {
 //
 // R-4 jugeait la FORME du nom et jamais sa LONGUEUR — un nom parfaitement conforme suffit à
 // rendre le dépôt inclonable. L'arithmétique : le plus long chemin suivi faisait 146 caractères,
-// le sidecar d'oracle en ajoute 26 (`.oracles\` en tête, `.oracles-historique.jsonl` en queue), et
-// sous MAX_PATH = 260 sans `core.longpaths` il ne restait que 260 − 146 − 1 = 113 caractères de
-// préfixe. D'où la borne : chemin relatif + 26 ≤ 150, qui laisse 110 caractères de préfixe.
+// et sous MAX_PATH = 260 sans `core.longpaths` il ne restait que 260 − 146 − 1 = 113 caractères
+// de préfixe. Le sidecar d'oracle double chaque livrable (`.oracles\` en tête,
+// `.oracles-historique.jsonl` en queue) : c'est lui, le plus long chemin du dépôt. D'où la borne :
+// chemin relatif + sidecar ≤ 150, qui laisse 110 caractères de préfixe.
+//
+// TF-1500 (01/10/2026, lot Produit-03 du 30/09, RA-56 ; classe TF-1015) — LE SIDECAR FAIT 34
+// CARACTÈRES, ET LA CONSTANTE EN VALAIT 26. Mesure du 01/10 sur le pilot, recalculée ici et non
+// reprise d'un tiers : les 93 sidecars `.oracles/<chemin>.oracles-historique.jsonl` SUIVIS mesurent
+// tous 34 de plus que leur livrable (`.oracles/` 9, `.oracles-historique.jsonl` 25), et 7 d'entre
+// eux dépassent 150, de 151 à 154, alors que leurs livrables passaient ici. Le plafond ne gardait
+// donc pas ce qu'il disait garder : le chemin du SIDECAR. La constante se CALCULE maintenant sur les
+// deux noms, comme S42 de `oracle-synthese` (314350fe) ; recopiée à la main, elle s'est trompée trois
+// semaines sans que personne la mesure. Le livrable admis passe de 124 à 116 caractères. Jouée en
+// lecture seule sur les 15 projets du parc relevés le 01/10, la nouvelle borne ne fait basculer aucun
+// verdict de PASS à FAIL : elle nomme 38 chemins de plus sur 3 projets, déjà en FAIL.
 //
 // Ici, ce sont les fichiers RÉELS du disque qui sont mesurés — symétrique de S42 dans
 // `oracle-synthese`, qui mesure les chemins CITÉS et le fichier jugé. Les sidecars eux-mêmes ne
-// sont pas parcourus : ils sont comptés par les 26 caractères ajoutés à leur livrable.
-const SIDECAR_ORACLE = 26, PLAFOND_CHEMIN = 150;
+// sont pas parcourus : ils sont comptés par les 34 caractères ajoutés à leur livrable.
+const SIDECAR_ORACLE = ".oracles/".length + ".oracles-historique.jsonl".length, PLAFOND_CHEMIN = 150;
+// L'ancienne valeur n'est gardée que pour DIRE pourquoi un chemin qui passait hier est nommé aujourd'hui.
+const SIDECAR_AVANT_TF1500 = 26;
 for (const f of fichiers(p("output"))) {
   const r = rel(f);
-  if (/(^|\/)\.oracles\//.test(r)) continue;      // comptés dans les 26 caractères de leur livrable
+  if (/(^|\/)\.oracles\//.test(r)) continue;      // comptés dans les 34 caractères de leur livrable
   if (estExcluDuDepot(r)) continue;               // TF-0853 : jamais versionné = jamais cloné
   if (r.length + SIDECAR_ORACLE <= PLAFOND_CHEMIN) continue;
   r4 = false;
   ko("R-4", r, `chemin de ${r.length} caractères, soit ${r.length + SIDECAR_ORACLE} avec les ${SIDECAR_ORACLE} du sidecar d'oracle — ` +
     `${r.length + SIDECAR_ORACLE - PLAFOND_CHEMIN} au-dessus du plafond de ${PLAFOND_CHEMIN} (R-4, alinéa TF-1015 du 11/09/2026). ` +
-    `Préfixe de clone admissible qui en résulte : ${260 - r.length - 27} caractères — sous MAX_PATH = 260 sans \`core.longpaths\`, ` +
+    (r.length + SIDECAR_AVANT_TF1500 <= PLAFOND_CHEMIN
+      ? `Ce chemin passait jusqu'au 01/10/2026 : la constante du sidecar valait ${SIDECAR_AVANT_TF1500}, une erreur de calcul (TF-1500) — son sidecar d'oracle fait bien ${r.length + SIDECAR_ORACLE} caractères. `
+      : "") +
+    `Préfixe de clone admissible qui en résulte : ${260 - r.length - SIDECAR_ORACLE - 1} caractères — sous MAX_PATH = 260 sans \`core.longpaths\`, ` +
     "le checkout d'un clone de vérification échoue sur ce fichier (10/09/2026 : 22 fichiers refusés, dépôt sans arbre de travail). " +
     "Raccourcir l'<Objet> du nom, la forme du nommage étant tenue par ailleurs");
 }
@@ -2240,6 +2257,7 @@ const nonJuge = [
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
   "R-7 bis (TF-1503) : l'oracle lit la CONSIGNATION d'un déplacement en attente au ledger, il n'ouvre ni ne teste le fichier — que l'ancienne version soit réellement tenue ouverte n'est pas jugé, et une attente consignée à tort tolère donc deux versions. La DURÉE de l'attente n'est pas bornée : le constat la dit par la date de consignation, aucun seuil n'étant fondé sur une mesure. Que la session n'ait posé aucune question ni fermé l'application de l'utilisateur n'est pas jugé non plus : seule la consignation l'est",
+  "R-4 plafond de chemin (TF-1015, TF-1500) : seuls les fichiers réels d'`output\\` sont mesurés ici — un chemin sous `docs\\` ou sous le `forge\\` d'un produit ne l'est pas ; S42 d'`oracle-synthese` mesure les synthèses à leur écriture, sous `output\\` comme sous `forge\\` (01/10/2026). Le sidecar est compté par la CONSTANTE de 34 caractères (`.oracles/` + `.oracles-historique.jsonl`), pas lu sur le disque : un suffixe de sidecar plus long que `.oracles-historique.jsonl` ne serait pas vu — aucun n'existe parmi les 278 sidecars suivis à la racine `.oracles/` du pilot (le plus long suffixe est celui-là), mesuré le 01/10/2026",
   "R-2, R-4, R-7 bis et R-25 (TF-0853) : un chemin que  declare EXCLU du depot n est pas juge — le depot a ecrit que ce fichier n entrera jamais dans son histoire, donc ce n est pas un livrable mais un artefact d atelier. Mesure du 06/09 : 242 constats sur 247 portaient les fichiers d un seul dossier exclu, dont 41 dossiers au nom REEL d un tiers du client recopie dans le message. Hors depot git, aucune exclusion n est deduite",
   "R-15 : seule une variable SANS valeur est jugée (R-15.1, TF-1080) ; une variable AVEC valeur par défaut qui serait en réalité tierce n'est pas vue — l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",

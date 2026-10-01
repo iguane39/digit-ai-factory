@@ -671,13 +671,17 @@ check("TF-0853 — un chemin que `git check-ignore` déclare EXCLU n'est jamais 
     throw new Error("le voisin NON exclu n'est plus jugé — l'exclusion a désarmé R-4 au-delà de sa portée");
 });
 
-// ---- fixture LONGUEUR DE CHEMIN (TF-1015, 11/09) : R-4 jugeait la FORME du nom et jamais sa
-// LONGUEUR. Le 10/09, un clone de vérification a rendu « Filename too long » sur 22 fichiers puis
-// « checkout failed » : le dépôt est arrivé sans arbre de travail, et la vérification prescrite
-// avant tout push n'a pas pu se jouer. Les DEUX SENS sur la MÊME fixture, à UN caractère près :
-// un chemin de 124 caractères (150 avec les 26 du sidecar d'oracle — le plafond, tenu) est muet,
-// son jumeau de 125 (151) est dénoncé. Sans le sens vert, la règle pourrait accuser tout livrable
-// un peu descriptif, ce qui la ferait désarmer au premier remaniement. ---------------------------
+// ---- fixture LONGUEUR DE CHEMIN (TF-1015, 11/09 ; recalée par TF-1500, 01/10) : R-4 jugeait la
+// FORME du nom et jamais sa LONGUEUR. Le 10/09, un clone de vérification a rendu « Filename too
+// long » sur 22 fichiers puis « checkout failed » : le dépôt est arrivé sans arbre de travail, et la
+// vérification prescrite avant tout push n'a pas pu se jouer. Les DEUX SENS sur la MÊME fixture, à
+// UN caractère près : un chemin de 116 caractères (150 avec les 34 du sidecar d'oracle — le
+// plafond, tenu) est muet, son jumeau de 117 (151) est dénoncé. La paire valait 124/125 tant que la
+// constante du sidecar valait 26 : une erreur de calcul, relevée le 01/10 sur les sidecars SUIVIS du
+// pilot (7 au-dessus de 150, jusqu'à 154, alors que leurs livrables passaient). Un troisième chemin,
+// de 125, dit que l'ancien refus tient toujours et ne se présente pas comme une nouveauté. Sans le
+// sens vert, la règle pourrait accuser tout livrable un peu descriptif, ce qui la ferait désarmer au
+// premier remaniement. --------------------------------------------------------------------------
 const rougeLong = mkdtempSync(join(tmpdir(), "conf-long-"));
 mkdirSync(join(rougeLong, "output", "04-plans"), { recursive: true });
 const cheminDeLongueur = (n) => {
@@ -685,24 +689,89 @@ const cheminDeLongueur = (n) => {
   const queue = " - 20260911a.md";
   return tete + "x".repeat(n - tete.length - queue.length) + queue;
 };
-const CHEMIN_PILE = cheminDeLongueur(124);        // 150 avec le sidecar : le plafond, TENU
-const CHEMIN_TROP = cheminDeLongueur(125);        // 151 : un caractère de trop
+const CHEMIN_PILE = cheminDeLongueur(116);        // 150 avec le sidecar : le plafond, TENU
+const CHEMIN_TROP = cheminDeLongueur(117);        // 151 : un caractère de trop — et un chemin ADMIS jusqu'au 01/10/2026
+const CHEMIN_ANCIEN = cheminDeLongueur(125);      // 159 : refusé aussi avec l'ancienne constante, jamais admis
 writeFileSync(join(rougeLong, CHEMIN_PILE), "x" + NL_TEST);
 writeFileSync(join(rougeLong, CHEMIN_TROP), "x" + NL_TEST);
+writeFileSync(join(rougeLong, CHEMIN_ANCIEN), "x" + NL_TEST);
 sh("git", ["init", "-q", "-b", "main"], rougeLong);
 
-check("TF-1015 — R-4 dénonce un chemin d'output\\ qui dépasse 150 caractères sidecar compris, et se tait sur son jumeau à exactement 150", () => {
-  if (CHEMIN_PILE.length !== 124 || CHEMIN_TROP.length !== 125)
-    throw new Error(`fixture invalide : ${CHEMIN_PILE.length} et ${CHEMIN_TROP.length} caractères attendus 124 et 125`);
+check("TF-1015, recalée TF-1500 — R-4 dénonce un chemin d'output\\ qui dépasse 150 caractères avec ses 34 de sidecar, et se tait sur son jumeau à exactement 150", () => {
+  if (CHEMIN_PILE.length !== 116 || CHEMIN_TROP.length !== 117 || CHEMIN_ANCIEN.length !== 125)
+    throw new Error(`fixture invalide : ${CHEMIN_PILE.length}, ${CHEMIN_TROP.length} et ${CHEMIN_ANCIEN.length} caractères attendus 116, 117 et 125`);
   const { rapport } = lance(rougeLong);
   const r4 = rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
   const surTrop = r4.find((f) => f.ou === CHEMIN_TROP && /plafond/.test(f.message));
   if (!surTrop)
-    throw new Error(`aucun constat R-4 de longueur sur le chemin de 151 caractères — c'est celui-là qui a fait échouer le checkout le 10/09 : ${JSON.stringify(r4.map((f) => f.ou))}`);
-  if (!/113|110|\b\d{2,3} caractères\b/.test(surTrop.message) || !/préfixe de clone admissible/i.test(surTrop.message))
-    throw new Error(`le constat ne dit pas le préfixe de clone admissible, donc il n'est pas actionnable : « ${surTrop.message.slice(0, 160)} »`);
+    throw new Error(`aucun constat R-4 de longueur sur le chemin de 117 caractères (151 avec son sidecar) — c'est le sidecar de ce livrable qui ferait échouer le checkout : ${JSON.stringify(r4.map((f) => f.ou))}`);
+  if (!/soit 151 avec les 34 du sidecar/.test(surTrop.message) || !/préfixe de clone admissible qui en résulte : 108 caractères/i.test(surTrop.message))
+    throw new Error(`le constat ne dit pas le sidecar de 34 ni le préfixe de clone admissible (108), donc il n'est pas actionnable : « ${surTrop.message.slice(0, 240)} »`);
+  if (!/passait jusqu'au 01\/10\/2026/.test(surTrop.message))
+    throw new Error(`le constat ne dit pas pourquoi un chemin qui passait hier est nommé aujourd'hui : « ${surTrop.message.slice(0, 240)} »`);
   if (r4.some((f) => f.ou === CHEMIN_PILE))
     throw new Error("le jumeau à EXACTEMENT 150 caractères sidecar compris est accusé — la règle mord sur un nom conforme");
+  const surAncien = r4.find((f) => f.ou === CHEMIN_ANCIEN && /plafond/.test(f.message));
+  if (!surAncien)
+    throw new Error("le chemin de 125 caractères, déjà refusé avec l'ancienne constante, n'est plus accusé");
+  if (/passait jusqu'au/.test(surAncien.message))
+    throw new Error(`le chemin de 125 caractères est présenté comme une nouveauté, il était refusé avant le 01/10/2026 : « ${surAncien.message.slice(0, 240)} »`);
+});
+// TF-1500 — LA CONSTANTE SE MESURE SUR LE DISQUE, ELLE NE SE RECOPIE PAS. Elle valait 26 pendant trois
+// semaines : personne ne l'avait comparée à un sidecar réel. La mesure est une FONCTION PURE, jouée
+// sur des listes fabriquées dans les deux sens, puis sur les fichiers SUIVIS du pilot (`git ls-files`,
+// rien n'est écrit). Pour chaque `.oracles/<reste>` de la racine, le livrable est le plus long chemin
+// suivi qui préfixe <reste>, et ce qui reste est le SUFFIXE du sidecar : découvert, jamais listé — une
+// liste de suffixes connus rendrait la mesure tautologique, l'ajout d'un nom donné étant toujours la
+// somme de ses deux longueurs. Le suffixe observé le plus long doit être celui que R-4 nomme,
+// `.oracles-historique.jsonl`, et son ajout fixe le plafond admis : 150 − 34 = 116, la longueur du
+// jumeau vert de la fixture ci-dessus. Si les outils émettent un sidecar plus long, ce cas tombe avant
+// les clones ; il tombe aussi, bruyamment, quand il n'a rien à mesurer.
+const suffixesDeSidecars = (suivis) => {
+  const tous = new Set(suivis);
+  const parSuffixe = new Map();
+  for (const s of suivis) {
+    if (!s.startsWith(".oracles/")) continue;
+    const reste = s.slice(".oracles/".length);
+    for (let i = reste.length - 1; i > 0; i--) {
+      if (!tous.has(reste.slice(0, i))) continue;
+      const suffixe = reste.slice(i);
+      parSuffixe.set(suffixe, (parSuffixe.get(suffixe) || 0) + 1);
+      break;
+    }
+  }
+  return parSuffixe;
+};
+const jugerMesureSidecar = (parSuffixe, ajoutAdmis) => {
+  if (!parSuffixe.size) throw new Error("aucun sidecar apparié à un livrable suivi : la mesure n'a rien mesuré");
+  const plusLong = [...parSuffixe.keys()].reduce((a, b) => (b.length > a.length ? b : a));
+  const ajout = ".oracles/".length + plusLong.length;
+  if (plusLong !== ".oracles-historique.jsonl")
+    throw new Error(`le suffixe de sidecar le plus long est « ${plusLong} » (${ajout} caractères ajoutés), non « .oracles-historique.jsonl » que R-4 nomme : la constante est dépassée`);
+  if (ajout !== ajoutAdmis)
+    throw new Error(`le sidecar le plus long ajoute ${ajout} caractères, le jumeau vert de la fixture en suppose ${ajoutAdmis}`);
+  return ajout;
+};
+const LIVRABLE_MESURE = "output/04-plans/Produit - Synthese - 20261001a.md";
+const LISTE_VERTE = [LIVRABLE_MESURE, ...[".oracles-historique.jsonl", ".oracles-cache.json", ".oracles.json"].map((s) => ".oracles/" + LIVRABLE_MESURE + s)];
+check("TF-1500 mesure, sens vert (liste fabriquée) — le suffixe le plus long est `.oracles-historique.jsonl`, 34 caractères ajoutés : le plafond de la fixture", () => {
+  const ajout = jugerMesureSidecar(suffixesDeSidecars(LISTE_VERTE), 150 - CHEMIN_PILE.length);
+  if (ajout !== 34) throw new Error(`ajout mesuré ${ajout}, attendu 34`);
+});
+check("TF-1500 mesure, sens rouge (liste fabriquée) — un sidecar au suffixe plus long fait tomber la mesure et le nomme", () => {
+  let message = "";
+  try { jugerMesureSidecar(suffixesDeSidecars([...LISTE_VERTE, ".oracles/" + LIVRABLE_MESURE + ".oracles-historique-detaille.jsonl"]), 34); } catch (e) { message = e.message; }
+  if (!/oracles-historique-detaille\.jsonl/.test(message)) throw new Error(`la mesure ne tombe pas sur un suffixe plus long, ou ne le nomme pas : « ${message} »`);
+});
+check("TF-1500 mesure, sens rouge (rien à mesurer) — un sidecar sans livrable suivi ne fait pas un vert", () => {
+  let message = "";
+  try { jugerMesureSidecar(suffixesDeSidecars([".oracles/output/orphelin.md.oracles.json"]), 34); } catch (e) { message = e.message; }
+  if (!/n'a rien mesuré/.test(message)) throw new Error(`une mesure vide passe : « ${message} »`);
+});
+check("TF-1500 mesure sur le DISQUE — les sidecars d'oracle suivis du pilot : le suffixe le plus long est `.oracles-historique.jsonl`, 34 caractères ajoutés", () => {
+  const racinePilot = join(dirname(fileURLToPath(import.meta.url)), "..");
+  const suivis = execFileSync("git", ["-C", racinePilot, "ls-files", "-z"], { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 }).split("\0").filter(Boolean);
+  jugerMesureSidecar(suffixesDeSidecars(suivis), 150 - CHEMIN_PILE.length);
 });
 
 // ---- fixture LIVRABLE-DOSSIER (TF-1177, 17/09) : R-4 jugeait au nommage daté les fichiers
