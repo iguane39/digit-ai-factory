@@ -28,7 +28,8 @@ import { fileURLToPath } from "node:url";
 // format commun et où la même classe de défaut a été redécouverte forge par forge.
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
-import { anonymiserCandidature, pseudoProduit, anonymiser, EST_EMETTEUR_FORGE } from "./anonymiser-entrant.mjs";
+import { anonymiserCandidature, pseudoProduit, pseudonymeDeRacine, anonymiser, EST_EMETTEUR_FORGE, MARQUEUR_REGISTRE_JETABLE } from "./anonymiser-entrant.mjs";
+import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 import { aQualifier } from "./identifiants-techniques.mjs";
 import { aQualifier as adressesIpAQualifier, messageAQualifier as messageAdressesIp } from "./adresses-ip.mjs";
 import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
@@ -37,6 +38,12 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
 const iReg = process.argv.indexOf("--registre");
 const registre = resolve(iReg > 0 ? process.argv[iReg + 1] : join(ICI, "TODO.jsonl"));
+// TF-1431 (28/09/2026) : un registre autre que celui par défaut est un ESSAI, et un essai n'étend pas
+// la table réelle des pseudonymes — l'écrivain (`pseudoProduit`) lit ce marqueur. Comparaison sans
+// casse sous Windows : le registre par défaut nommé explicitement reste le registre par défaut.
+const REGISTRE_PAR_DEFAUT = resolve(join(ICI, "TODO.jsonl"));
+const casse = (c) => (process.platform === "win32" ? c.toLowerCase() : c);
+if (casse(registre) !== casse(REGISTRE_PAR_DEFAUT)) process.env[MARQUEUR_REGISTRE_JETABLE] = registre;
 const archive = join(dirname(registre), "TODO-ARCHIVE.jsonl");
 // LA CLASSE D'UN RETOUR (mandat du 03/09/2026, pas 1 — mesure au pas 0 : 50 items du registre
 // déclaraient une récidive en toutes lettres et AUCUN champ ne permettait de les compter ; un
@@ -512,11 +519,23 @@ const ts = new Date().toISOString();
 const nomDuLot = String(sidecarPath).split(/[\\/]/).pop() || "";
 if (nomDuLot.includes(" - RETOURS - ")) {
   const nomProduit = nomDuLot.split(" - RETOURS - ")[0];
-  const pseudo = pseudoProduit(nomProduit);
+  // TF-1432 : la racine que le lot DÉCLARE (TF-0555) rattache un nom neuf au pseudonyme de son dossier.
+  const racineDeclaree = candidatures.map((c) => c && c.racine_produit).find(Boolean);
+  const pseudo = pseudoProduit(nomProduit, { racine: racineDeclaree ? String(racineDeclaree) : null });
   // La sortie ne répète pas le nom réel : elle finit dans des journaux que rien ne relit.
   // TF-0807 : un émetteur forge est public, son nom se dit et ne s'inscrit pas.
   if (EST_EMETTEUR_FORGE.test(nomProduit)) console.log(`[ÉMETTEUR FORGE] lot remis par « ${nomProduit} » — nom public, conservé tel quel, jamais inscrit à la table des pseudonymes (TF-0807)`);
+  // TF-1505 : un produit privé déclaré de l'écosystème garde son nom ; le dire « anonymisé » serait faux.
+  else if (PRODUITS_DE_L_ECOSYSTEME.has(nomProduit)) console.log(`[ÉCOSYSTÈME] lot remis par « ${nomProduit} » — produit privé déclaré de l'écosystème, nom conservé tel quel, jamais inscrit à la table des pseudonymes (TF-1505)`);
   else if (pseudo) console.log(`[ANONYMISÉ] produit du lot → ${pseudo} (table hors dépôt)`);
+  // TF-1432 : un produit qui porte DEUX pseudonymes se dit à chaque lot, tant que la table n'a pas
+  // tranché — le lot sous l'un, son dossier sous l'autre. Avertissement : rattacher se décide à la table.
+  const duDossier = pseudo && racineDeclaree ? pseudonymeDeRacine(String(racineDeclaree)) : null;
+  if (duDossier && duDossier !== pseudo) {
+    console.error(`[DEUX PSEUDONYMES] le lot est ${pseudo} et sa racine déclarée est ${duDossier} : un même produit, deux pseudonymes, `
+      + "et les règles qui comparent ses lots n'en voient qu'une part (TF-1432). Rattacher se décide à la table : "
+      + "bloc « rattachements », que la règle K5 du canal doit lire.");
+  }
 }
 let remplacesTotal = [];
 candidatures = candidatures.map((c) => {

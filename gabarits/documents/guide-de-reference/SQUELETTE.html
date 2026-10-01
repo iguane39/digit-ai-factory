@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="fr" data-cle-theme="{nom-du-guide}-theme">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>(function(){var c=document.documentElement,cleTheme=c.getAttribute('data-cle-theme')||'guide-theme',s=null;try{s=localStorage.getItem(cleTheme);}catch(e){}c.setAttribute('data-theme',s==='dark'?'dark':'light');c.className+=' js';})();</script>
+<title>Digit-AI — {Objet du guide — « Guide du développeur », « Guide d&#x27;exploitation »…} · {Périmètre — le produit, la plateforme ou le programme couvert} — 20260924a</title>
+<meta name="description" content="{Une phrase pour les moteurs et les onglets : ce que le guide couvre, en combien de vues, et ce qui s&#x27;y ouvre en fenêtre.}">
+<meta name="theme-color" content="#2563EB">
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='45' font-family='Segoe UI,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3E{%3C/text%3E%3C/svg%3E">
+<!-- COMPOSANT-GABARIT:DEBUT jetons.css — copie de gd-guide-de-reference/composants/jetons.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/jetons.css" data-empreinte="sha256:6c4954c3204ff2a7c7d69c5dca0c3943634381678a193fcc60f5dce7f3791876">
+/* gd-guide-de-reference · jetons.css — les JETONS et la BASE typographique des composants.
+ *
+ * Tous les composants de la famille ne lisent QUE ces jetons : aucune couleur, aucune police,
+ * aucun rayon en dur dans leurs feuilles. Pour employer un composant seul dans une page qui a
+ * déjà sa charte, poser ce fichier PUIS redéfinir les jetons voulus sur `:root` — ou, sans ce
+ * fichier, aliaser chaque jeton sur ceux de la page hôte (`--accent: var(--blue)`, etc.).
+ *
+ * Marque par défaut : la charte du socle `digit-ai-page-html` (primaire, surfaces, encres,
+ * familles `--head` / `--sans` / `--mono`, règle C8). Une marque cliente se pose par les
+ * jetons de l'en-tête du document source (`accent`, `accent_fonce`, `accent_sombre`,
+ * `accent_fonce_sombre`), jamais en éditant les feuilles des composants.
+ *
+ * Contrastes MESURÉS avant écriture (WCAG 2.x, 24/09/2026) — tous les couples texte/fond
+ * tiennent 4,5:1 : accent sur blanc 5,17 · accent-fonce sur fond 6,48 · muted sur surface 5,95 ·
+ * faint sur surface 5,74 (le `--faint` du socle, #94A3B8, ne tient que 2,56:1 : il est ici
+ * assombri, parce que les composants l'emploient sur de PETITS libellés en capitales) ·
+ * sombre : faint sur surface 6,97 · sur-accent sur accent 7,45.
+ */
+:root {
+  --accent: #2563EB; --accent-fonce: #1D4ED8; --accent-voile: #EAF0FD;
+  --sur-accent: #FFFFFF;
+  --bg: #FAFBFF; --surface: #FFFFFF; --ink: #0F172A; --muted: #55657A; --faint: #5B6778;
+  --line: #E6EAF2; --code-fill: #EEF2FA;
+  --amber: #B45309; --amber-fill: #FFFBEB; --red: #B91C1C;
+  --voile: rgba(15, 23, 42, .55);
+  --focus-anneau: 2px solid var(--accent); --focus-decalage: 2px;
+  --r: 12px; --r-sm: 8px;
+  /* Hauteur du bandeau collant : MESURÉE et republiée par coquille-vues.js. Cette valeur n'est
+     que le repli sans script — un décalage qui vaut 0 ramène la collision qu'il doit éviter. */
+  --hh: 128px;
+  --largeur-page: 96vw;
+  --head: "Montserrat", "Roboto", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --sans: "Inter", "DM Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Consolas", "Courier New", monospace;
+  --annee-ref: "2026";
+  /* Mouvement (noms du contrat systeme-de-marque) : le seul geste animé est le chevron d'une
+     ligne dépliable, un état de contrôle qui pivote sans naître. */
+  --dur-etat: 120ms; --ease-deplacement: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Alias pour les composants POSÉS depuis le socle (filtres, infobulles), qui lisent `--blue` :
+     ils suivent ainsi l'accent de la marque, en clair comme en sombre. */
+  --blue: var(--accent-fonce);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0B1220; --surface: #121B2E; --ink: #EEF2F8; --muted: #A9B4C4; --faint: #9AA6B8;
+  --line: #263248; --code-fill: #17223A;
+  --accent: #7DA2F5; --accent-fonce: #A9C1F8; --accent-voile: #16233F; --sur-accent: #0B1220;
+  --amber: #FBBF6D; --amber-fill: #2B2210; --red: #F5A3A3;
+  --voile: rgba(3, 6, 12, .66);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--sans); line-height: 1.6; font-size: 16px; }
+[hidden] { display: none !important; }
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+a { color: var(--accent-fonce); }
+h1, h2, h3, h4 { font-family: var(--head); line-height: 1.22; letter-spacing: -.01em; }
+p, li { overflow-wrap: break-word; }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+blockquote { margin: 16px 0; padding: 12px 16px; border-left: 1px solid var(--amber);
+  background: var(--amber-fill); border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+blockquote p { margin: 0 0 8px; }
+blockquote p:last-child { margin: 0; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+/* Les ligatures sont coupées sur tout ce qui est code : une police à chasse fixe soude `--`,
+   `-<` et `==` en un seul glyphe, et un lecteur qui RECOPIE une commande à la main se trompe.
+   Aucun oracle ne voit ce défaut — il a été trouvé en lisant une capture (22/09/2026). */
+code { font-family: var(--mono); font-size: .86em; background: var(--code-fill);
+  border: 1px solid var(--line); border-radius: 4px; padding: 0 4px;
+  overflow-wrap: anywhere; font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "calt" 0; }
+pre { background: var(--code-fill); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 12px 16px; overflow-x: auto; font-size: .82rem; line-height: 1.5; }
+pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+/* Un bloc de PROSE (un prompt à coller) se replie quand la place manque ; une arborescence ou
+   une commande défile — une ligne coupée y change de sens. */
+pre.prose, pre.prose code { white-space: pre-wrap; overflow-wrap: break-word; }
+@media (max-width: 760px) {
+  body { font-size: 15px; }
+  pre, pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+@media print {
+  :root { --bg: #FFFFFF; --surface: #FFFFFF; --code-fill: #FFFFFF; }
+  body { font-size: 10.5pt; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+  pre, blockquote { break-inside: avoid; page-break-inside: avoid; }
+  a { text-decoration: none; color: inherit; }
+}
+</style>
+<!-- COMPOSANT-GABARIT:FIN jetons.css -->
+<!-- COMPOSANT-GABARIT:DEBUT bascule-theme.css — copie de gd-guide-de-reference/composants/bascule-theme.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/bascule-theme.css" data-empreinte="sha256:4f1ae641391833524bb58ea46dbb869fe7ba50d2db406320741c21f8d5eb400f">
+/* gd-guide-de-reference · bascule-theme.css — le bouton de la bascule clair / sombre (règle R-30).
+ * Le thème clair reste le défaut ; le choix du lecteur est retenu d'une visite à l'autre. */
+.theme-toggle { font-family: var(--sans); font-size: .88rem; cursor: pointer; white-space: nowrap;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 999px; padding: 8px 16px; }
+.theme-toggle:hover { border-color: var(--accent-fonce); color: var(--accent-fonce); }
+@media (max-width: 760px) { .theme-toggle { min-height: 44px; } }
+@media print { .theme-toggle { display: none; } }
+</style>
+<!-- COMPOSANT-GABARIT:FIN bascule-theme.css -->
+<!-- COMPOSANT-GABARIT:DEBUT coquille-vues.css — copie de gd-guide-de-reference/composants/coquille-vues.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/coquille-vues.css" data-empreinte="sha256:175ef98c5876cb4330411b6c13b5d03394edcf3f9e09b5d0e827c0b4f2eda36a">
+/* gd-guide-de-reference · coquille-vues.css — UN fichier, N VUES, une seule peinte à la fois.
+ *
+ * Le bandeau collant (marque, outils), la barre des vues, la vue et ses repères, la pagination
+ * et le sommaire en cartes de la vue d'entrée. Lit les jetons de jetons.css.
+ *
+ * Pourquoi des VUES et non des fichiers (règle D11) : un document long partagé en onze
+ * fichiers est un coût pour son lecteur, jamais pour son auteur. Pourquoi des vues et non des
+ * onglets ARIA (composant 9 du socle) : une vue est une PAGE — elle a son adresse (#vue-…),
+ * son sommaire, sa pagination, et une adresse profonde vers un chapitre ouvre la bonne vue.
+ */
+header.bandeau {
+  padding-top: env(safe-area-inset-top, 0px); padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 40; }
+.bandeau-haut { max-width: var(--largeur-page); margin: 0 auto; padding: 8px 20px; width: 100%;
+  display: flex; align-items: center; gap: 16px; justify-content: space-between; }
+.marque { font-family: var(--head); font-weight: 800; letter-spacing: -.02em; font-size: 1.05rem;
+  margin: 0; }
+.marque em { color: var(--accent-fonce); font-style: normal; }
+.marque small { display: block; font-family: var(--sans); font-weight: 400; font-size: .78rem;
+  color: var(--muted); letter-spacing: 0; }
+/* Les contrôles du bandeau s'ÉTIRENT à la même hauteur : le champ de recherche et la bascule
+   de thème n'ont ni la même police ni le même rembourrage, et 5 px d'écart suffisent à les
+   désaligner (render_page, famille controles_desalignes, bloquante à 2 px — 24/09/2026). */
+.outils { display: flex; align-items: stretch; gap: 12px; }
+nav.vues { border-top: 1px solid var(--line); background: var(--bg); }
+nav.vues ol { max-width: var(--largeur-page); margin: 0 auto; padding: 8px 20px; display: flex;
+  flex-wrap: wrap; gap: 8px; list-style: none; }
+nav.vues li { margin: 0; }
+nav.vues a { display: block; text-decoration: none; color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r); padding: 8px 16px;
+  background: var(--surface); }
+nav.vues .toc-t { display: block; font-family: var(--head); font-weight: 700; font-size: .98rem;
+  line-height: 1.2; }
+nav.vues a:hover { border-color: var(--accent-fonce); }
+nav.vues a:hover .toc-t { color: var(--accent-fonce); }
+nav.vues a[aria-current="page"] { background: var(--accent); border-color: var(--accent);
+  color: var(--sur-accent); }
+nav.vues a[aria-current="page"] .toc-t { color: var(--sur-accent); }
+.wrap { max-width: var(--largeur-page); margin: 0 auto; padding: 24px 20px 64px; }
+main { min-width: 0; }
+/* Sans script, TOUTES les vues se lisent l'une après l'autre : c'est le repli complet. */
+.js .vue { display: none; }
+.js .vue.active { display: block; }
+section[id] { scroll-margin-top: calc(var(--hh, 128px) + 16px); }
+h2.titre-vue { font-size: 2.1rem; font-weight: 800; margin: 4px 0 16px; }
+/* L'inventaire de la vue : ce qu'elle PORTE, et ce qui la distingue de sa voisine. */
+p.contenu { margin: 0 0 24px; color: var(--muted); font-size: .95rem;
+  border-left: 1px solid var(--accent); padding: 8px 16px; background: var(--bg);
+  border-radius: var(--r-sm); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0 0 24px; padding: 12px 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  font-size: .84rem; }
+.meta b { font-family: var(--head); display: block; color: var(--faint); font-size: .7rem;
+  text-transform: uppercase; letter-spacing: .05em; }
+/* Le sommaire du document vit sur la vue d'ENTRÉE, là où un lecteur arrive et où la place
+   existe. Les menus ne portent que des titres ; la carte porte aussi l'annonce, et c'est ce
+   qui fait choisir. Le `.toc-d` est DESCENDANT du lien (règle L6 du socle). */
+nav.toc { margin: 44px 0 8px; }
+nav.toc .toc-titre { margin: 0 0 16px; padding-top: 16px; font-family: var(--head);
+  font-weight: 800; font-size: 1.24rem; border-top: 3px solid var(--accent); }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(276px, 100%), 1fr)); }
+nav.toc li { margin: 0; }
+nav.toc a { display: block; height: 100%; text-decoration: none; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 16px; }
+nav.toc a:hover { border-color: var(--accent-fonce); }
+nav.toc a:hover .toc-t { color: var(--accent-fonce); }
+nav.toc .toc-n { display: block; font-family: var(--mono); font-size: .72rem; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--muted); }
+nav.toc .toc-t { display: block; font-family: var(--head); font-weight: 700; font-size: 1.04rem;
+  margin: 4px 0 8px; }
+nav.toc .toc-d { display: block; font-size: .88rem; line-height: 1.45; color: var(--muted); }
+.pagination { display: flex; justify-content: space-between; gap: 16px; margin: 48px 0 0;
+  padding-top: 16px; border-top: 1px solid var(--line); font-size: .92rem; }
+.pagination a { text-decoration: none; }
+footer.pied { max-width: var(--largeur-page); margin: 0 auto; padding: 20px;
+  border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+footer.pied p { margin: 0 0 4px; }
+/* En paysage sur un écran court, le bandeau mangeait la moitié de la hauteur utile. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .bandeau-haut { padding-top: 4px; padding-bottom: 4px; }
+  nav.vues ol { padding-top: 4px; padding-bottom: 4px; }
+  nav.vues .toc-t { font-size: .82rem; }
+}
+@media (max-width: 760px) {
+  h2.titre-vue { font-size: 1.6rem; }
+  .wrap { padding: 16px 12px 48px; }
+  .bandeau-haut { padding: 8px 12px; flex-wrap: wrap; }
+  /* Les outils prennent la rangée entière : à 190 px, le champ de recherche coupait son propre
+     libellé (« Rechercher dans le d », capture à 390 px du 24/09/2026). */
+  .outils { width: 100%; }
+  nav.vues ol { padding: 8px 12px; }
+}
+@media print {
+  header.bandeau, nav.vues, nav.toc, .pagination { display: none; }
+  .js .vue, .vue { display: block !important; }
+  .meta { max-width: none; }
+}
+@page { size: A4 landscape; margin: 12mm; }
+</style>
+<!-- COMPOSANT-GABARIT:FIN coquille-vues.css -->
+<!-- COMPOSANT-GABARIT:DEBUT sommaire-chapitres.css — copie de gd-guide-de-reference/composants/sommaire-chapitres.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/sommaire-chapitres.css" data-empreinte="sha256:b6dfd6fbbb1072149d9358f7578a970a4711b3ee612c18a925a578f719d3422e">
+/* gd-guide-de-reference · sommaire-chapitres.css — le MENU LATÉRAL des chapitres, à deux niveaux.
+ *
+ * La page se met en deux colonnes : le menu collant à gauche, le contenu à droite. Le second
+ * niveau (les pas d'un chapitre) est ÉCRIT pour tous les chapitres et REPLIÉ par le script :
+ * seul le chapitre courant le déplie — déplier cent chapitres ferait trois cents entrées. Sans
+ * script, tout reste déplié et le plan complet se lit.
+ *
+ * La mise en deux colonnes cesse à 1 360 px et non à 1 100 : en dessous, la colonne de contenu
+ * descend sous 900 px et un tableau à cinq colonnes y coupe ses identifiants (huit coupures
+ * mesurées à 1 280 px sur le document source, 16/09/2026). Le menu passe alors en bande de
+ * pastilles au-dessus du contenu, qui reprend toute la largeur.
+ */
+.page { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 36px; align-items: start; }
+nav.chapitres { position: sticky; top: calc(var(--hh, 128px) + 12px);
+  max-height: calc(100vh - var(--hh, 128px) - 32px); overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+nav.chapitres .toc-titre { margin: 0 0 8px; font-size: .95rem; font-family: var(--head); font-weight: 700; }
+nav.chapitres ol { list-style: none; margin: 0; padding: 0; }
+nav.chapitres li { margin: 0 0 8px; }
+nav.chapitres li + li { margin-top: 8px; }
+nav.chapitres a { text-decoration: none; color: var(--ink); display: block; padding-left: 8px;
+  border-left: 1px solid var(--line); }
+nav.chapitres a:hover .toc-t { color: var(--accent-fonce); }
+nav.chapitres .toc-t { display: block; font-size: .9rem; line-height: 1.3; }
+nav.chapitres ol.toc-n2 { list-style: none; margin: 8px 0 0 12px; padding: 0 0 0 12px;
+  border-left: 1px solid var(--line); }
+nav.chapitres ol.toc-n2 li { margin: 0 0 4px; }
+nav.chapitres ol.toc-n2 a { border-left: 0; padding-left: 0; }
+nav.chapitres ol.toc-n2 .toc-t { font-size: .82rem; color: var(--muted); }
+.js nav.chapitres li.toc-s:not(.actif) > ol.toc-n2 { display: none; }
+nav.chapitres li.toc-s.actif > a { border-left: 1px solid var(--accent); }
+nav.chapitres li.toc-s.actif > a .toc-t { color: var(--accent-fonce); font-weight: 700; }
+nav.chapitres ol.toc-n2 li.actif .toc-t { color: var(--accent-fonce); font-weight: 700; }
+@media (max-width: 1360px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  nav.chapitres { position: static; max-height: none; }
+  nav.chapitres ol { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.chapitres li, nav.chapitres li + li { margin: 0; }
+  nav.chapitres a { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+  nav.chapitres li.toc-s.actif > a { border: 1px solid var(--accent); }
+  .js nav.chapitres ol.toc-n2 { display: none; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  nav.chapitres { position: static; max-height: none; }
+}
+@media print {
+  nav.chapitres { display: none; }
+  .page { display: block; }
+}
+</style>
+<!-- COMPOSANT-GABARIT:FIN sommaire-chapitres.css -->
+<!-- COMPOSANT-GABARIT:DEBUT hierarchie-chapitres.css — copie de gd-guide-de-reference/composants/hierarchie-chapitres.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/hierarchie-chapitres.css" data-empreinte="sha256:02b965e413651dafa181246969b87f6d1a5f6d21ef09443e949d63ad0c3dc450">
+/* gd-guide-de-reference · hierarchie-chapitres.css — CHAPITRES et SOUS-CHAPITRES (les « pas »).
+ *
+ * Quatre niveaux de structure, rendus tous les quatre : la VUE (titre-vue), le CHAPITRE (tête
+ * derrière sa gouttière), le PAS (tiré d'une amorce en gras de la source) et la PIÈCE (tableau,
+ * bloc de code, encadré). Un seul principe : tout ce qui appartient à un chapitre est décalé
+ * derrière une gouttière de 3 rem, où vit sa pastille. Le titre déborde dans la gouttière, son
+ * corps non — c'est ce décalage, et lui seul, qui rend l'appartenance visible sans encadrer le
+ * contenu. Deux retraits, jamais trois : 3 rem + 1,25 rem, moins de 7 % d'une colonne de 1 000 px.
+ *
+ * Contrat de marquage :
+ *   <section class="ch" id="…">
+ *     <div class="ch-tete"><div class="ch-pastille" aria-hidden="true">1</div>
+ *       <div class="ch-titres"><h3>Titre</h3> [<p class="regle-meta">…</p>]</div></div>
+ *     <div class="ch-corps"><div class="ch-rail" aria-hidden="true"></div>
+ *       <div class="chap lire"><p class="ch-apprend">Le chapeau : ce que le chapitre apprend.</p></div>
+ *       <section class="pas-bloc" id="…" data-type="verification|attention|exemple">
+ *         <h4 class="pas"><span class="puce" aria-hidden="true">▸</span>Titre du pas</h4> …
+ *       </section>
+ *     </div>
+ *   </section>
+ * `.ch-pastille.code` porte un code (« R07 ») au lieu d'un rang. Le bandeau `.regle-meta` réunit
+ * l'anatomie d'une règle (niveau, source, exceptions) : 60 chapitres sur 104 la portaient dans le
+ * document source, et la lire d'un coup libère le corps, qui ne porte plus que la règle.
+ */
+main { --gouttiere: 3rem; --pas-retrait: 1.25rem; }
+/* La prose remplit la colonne de contenu (règle D1) ; la classe `.lire` reste, et c'est elle qui
+   fait PUBLIER la mesure de lecture par le socle au lieu de la compter en défaut. */
+.chap.lire { max-width: none; }
+.chap.lire > :first-child { margin-top: 0; }
+.chap.lire > :last-child { margin-bottom: 0; }
+/* Le RYTHME entre blocs : un bloc de lecture perd la marge de ses bords (ci-dessus), il la reçoit
+   donc de son voisin. Sans ces deux règles, l'inventaire collait au chapeau, et la pastille du
+   premier chapitre touchait la dernière ligne du chapeau de la vue — au téléphone, elle la
+   chevauchait (revue de lecture des captures, 24/09/2026 ; aucun oracle ne l'avait vu). */
+.chap.lire + .chap.lire { margin-top: 16px; }
+.chap.lire + section.ch { margin-top: 32px; }
+p.ch-apprend { font-size: 1.02rem; }
+p.exemple-lecture { border-left: 1px solid var(--line); padding-left: 12px; }
+section.ch { position: relative; padding: 0 0 8px; }
+section.ch + section.ch { margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--line); }
+.ch-tete { display: grid; grid-template-columns: var(--gouttiere) minmax(0, 1fr); align-items: start;
+  margin: 0 0 12px; }
+.ch-pastille { grid-column: 1; margin-top: -.26rem; width: 2.2rem; height: 2.2rem;
+  border-radius: 999px; background: var(--accent); color: var(--sur-accent); display: flex;
+  align-items: center; justify-content: center; font-family: var(--head); font-weight: 800;
+  font-size: 1rem; flex: none; }
+.ch-pastille.code { width: auto; min-width: 2.2rem; padding: 0 8px; font-family: var(--mono);
+  font-size: .78rem; }
+.ch-titres { grid-column: 2; min-width: 0; }
+.ch-titres h3 { font-size: 1.35rem; font-weight: 800; margin: 0; }
+.ch-titres h3 code { font-size: .8em; }
+/* Le rail tient la colonne du chapitre : teinté sous la pastille, il s'éteint vers le gris — il
+   dit où le chapitre commence, il ne barre pas la page. C'est un ÉLÉMENT FRÈRE du texte
+   (`<div class="ch-rail" aria-hidden="true">`), jamais un `::before` de `.ch-corps` : peint en
+   dégradé sur l'ANCÊTRE du texte, il rendait le contraste de tout le chapitre non mesurable par
+   la sonde du socle — 440 éléments « à vérifier à l'œil » sur l'instance, mesuré le 24/09/2026. */
+.ch-corps { position: relative; padding-left: var(--gouttiere); }
+.ch-rail { position: absolute; left: calc(1.1rem - 1px); top: 0; bottom: 6px; width: 2px;
+  border-radius: 2px; background: linear-gradient(to bottom, var(--accent) 0 32px, var(--line) 120px); }
+.ch-corps > .ch-rail + * { margin-top: 0; }
+.ch-corps > :last-child { margin-bottom: 0; }
+.regle-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; margin: 12px 0 0;
+  padding: 8px 12px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm);
+  font-size: .84rem; }
+.regle-meta .meta-i b { font-family: var(--head); font-size: .68rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--faint); display: block; }
+.regle-meta .badge { font-family: var(--head); font-weight: 700; font-size: .72rem; letter-spacing: .04em;
+  text-transform: uppercase; border-radius: 999px; padding: 4px 12px; border: 1px solid var(--accent);
+  color: var(--accent-fonce); background: var(--accent-voile); display: inline-block; }
+.pas-bloc { position: relative; margin: 20px 0; padding: 0 0 0 var(--pas-retrait);
+  border-left: 1px solid var(--line); }
+.pas-bloc > :first-child { margin-top: 0; }
+.pas-bloc > :last-child { margin-bottom: 0; }
+.pas-bloc p.exemple-lecture { border-left: 0; padding-left: 0; }
+h4.pas { font-family: var(--head); font-weight: 700; font-size: 1rem; line-height: 1.3; margin: 0 0 8px;
+  display: flex; align-items: baseline; gap: 8px; scroll-margin-top: calc(var(--hh, 128px) + 16px); }
+h4.pas .puce { font-family: var(--mono); font-size: .78rem; font-weight: 700; color: var(--accent-fonce);
+  flex: none; }
+h4.pas strong { font-weight: inherit; }
+.pas-bloc[data-type="verification"] { border-left-color: var(--accent); }
+.pas-bloc[data-type="verification"] h4.pas { color: var(--accent-fonce); }
+.pas-bloc[data-type="attention"] { border-left-color: var(--amber); }
+.pas-bloc[data-type="attention"] h4.pas, .pas-bloc[data-type="attention"] h4.pas .puce { color: var(--amber); }
+/* Une PIÈCE graphique (schéma en SVG en ligne) : rendue à sa taille NATURELLE, jamais étirée. */
+figure.schema { margin: 24px 0; padding: 16px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); display: inline-block; max-width: 100%; }
+figure.schema svg { display: block; max-width: 100%; height: auto; }
+figure.schema figcaption { margin-top: 8px; color: var(--muted); font-size: .82rem; max-width: 52ch; }
+@media (max-width: 760px) {
+  main { --gouttiere: 2rem; --pas-retrait: .75rem; }
+  .ch-pastille { width: 1.8rem; height: 1.8rem; font-size: .86rem; }
+  .ch-rail { left: calc(.9rem - 1px); }
+  .ch-titres h3 { font-size: 1.15rem; }
+}
+@media print {
+  .chap.lire { max-width: none; }
+  section.ch { break-inside: auto; }
+}
+</style>
+<!-- COMPOSANT-GABARIT:FIN hierarchie-chapitres.css -->
+<!-- COMPOSANT-GABARIT:DEBUT tableaux.css — copie de gd-guide-de-reference/composants/tableaux.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/tableaux.css" data-empreinte="sha256:c07fd3e27044d0fc69c5aabce39e1598e47e493efc2244bf5c408874514455df">
+/* gd-guide-de-reference · tableaux.css — les TABLEAUX : largeurs tenues, repli en cartes, lignes dépliables.
+ *
+ * Complète les composants du socle sans les recopier : les filtres (table-filters.js, dès 8 lignes,
+ * règle L4) et les lignes dépliables (table-detail.js, règle L17) sont POSÉS depuis le socle ; cette
+ * feuille ne porte que la mise en page que le générateur leur prépare.
+ *
+ * Trois faits payés sur le document source : 61 colonnes sur 126 sans largeur, sous une mise en page
+ * fixe, faisaient absorber tout le reste par les colonnes libres — les grands vides (15/09/2026) ;
+ * d'où une largeur par colonne, calculée par le générateur sur le CONTENU. Un identifiant coupé en
+ * cellule (`ABC0601-R02` scindé entre `-R` et `02`, mesuré à 1 920 px) se recopie faux : il passe
+ * entier à la ligne (`code.ident`). Et un conteneur défilant ne rend pas un tableau large lisible :
+ * sous 900 px, le repli en cartes est dû (règle D3 de la bibliothèque).
+ */
+.table-hote { overflow-x: auto; margin: 16px 0; }
+.tf-count { font-size: .76rem; color: var(--muted); margin: 0 0 16px; }
+table { border-collapse: collapse; font-size: .88rem; table-layout: fixed; max-width: 100%; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top;
+  overflow-wrap: break-word; }
+th { font-family: var(--head); font-weight: 700; background: var(--surface); }
+tbody tr:hover { background: var(--code-fill); }
+td code.ident { white-space: nowrap; }
+/* Ligne dépliable : le chevron est U+203A, présent dans toute pile de repli ; il pivote d'un quart
+   de tour quand la ligne est ouverte. */
+.td-btn { font: inherit; font-weight: 700; line-height: 1; color: var(--accent-fonce);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); width: 24px;
+  height: 24px; padding: 0; margin-right: 4px; cursor: pointer; vertical-align: middle;
+  transition: transform var(--dur-etat) var(--ease-deplacement); }
+.td-btn:hover { border-color: var(--accent-fonce); }
+.td-btn[aria-expanded="true"] { transform: rotate(90deg); border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .td-btn { transition: none; } }
+tr.td-ouverte > td { background: var(--accent-voile); }
+tr[data-detail] > td { background: var(--bg); padding: 16px 20px 24px calc(var(--retrait-detail, 32px) + 12px); }
+tbody tr[data-detail]:hover { background: none; }
+tr[data-detail] { scroll-margin-top: calc(var(--hh, 128px) + 64px); }
+/* Sans script, rien ne se replie : le détail se lit en place et le chevron, qui ne pourrait rien
+   ouvrir, disparaît. */
+html:not(.js) .td-btn { display: none; }
+html:not(.js) tr[data-detail][hidden] { display: table-row !important; }
+@media (max-width: 900px) {
+  .table-hote { overflow-x: visible; }
+  table { table-layout: auto; width: 100% !important; }
+  table.repli-cartes, table.repli-cartes tbody, table.repli-cartes tr, table.repli-cartes td { display: block; }
+  table.repli-cartes thead, table.repli-cartes colgroup { display: none; }
+  table.repli-cartes tr { border: 1px solid var(--line); border-radius: var(--r-sm); margin: 0 0 12px;
+    padding: 8px 12px; break-inside: avoid; background: var(--surface); }
+  table.repli-cartes td { border-bottom: 0; padding: 4px 0; width: auto !important; }
+  table.repli-cartes td::before { content: attr(data-label); display: block; font-family: var(--head);
+    font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--faint); }
+  table.repli-cartes td:empty { display: none; }
+  td code.ident { white-space: normal; }
+  /* En cartes, la ligne ouverte et son détail forment UNE carte. */
+  table.repli-cartes tr.td-ouverte { margin-bottom: 0; background: var(--accent-voile);
+    border-radius: var(--r-sm) var(--r-sm) 0 0; }
+  table.repli-cartes tr.td-ouverte > td { background: none; }
+  table.repli-cartes tr[data-detail] { border-top: 0; background: var(--bg); border-radius: 0 0 var(--r-sm) var(--r-sm); }
+  table.repli-cartes tr[data-detail] > td { padding: 8px 0 4px; background: none; }
+  table.repli-cartes tr[data-detail] > td::before { content: none; }
+  html:not(.js) table.repli-cartes tr[data-detail][hidden] { display: block !important; }
+}
+@media print {
+  .tf-count { display: none; }
+  tr[data-tf-hidden] { display: table-row !important; }
+  tr[data-detail][hidden] { display: table-row !important; }
+  .td-btn { display: none; }
+  table { break-inside: avoid; page-break-inside: avoid; }
+}
+</style>
+<!-- COMPOSANT-GABARIT:FIN tableaux.css -->
+<!-- COMPOSANT-GABARIT:DEBUT modale.css — copie de gd-guide-de-reference/composants/modale.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/modale.css" data-empreinte="sha256:d79b9c8e958c44c92b22bdece11cc587c03c937ae0bb206aa2c8c7ef6a204822">
+/* gd-guide-de-reference · modale.css — la FENÊTRE MODALE à onglets.
+ *
+ * Deux emplois dans le document source, une seule mécanique : le FICHIER SOURCE Markdown
+ * (onglets « Mise en forme » et « Sans formatage ») et la FICHE d'un code cité (un onglet par
+ * panneau de la fiche). Les titres rendus DANS la fenêtre sont dégradés en paragraphes stylés
+ * (`.md-h1` … `.md-h6`) : un titre de plus dans l'arbre du document ferait croire à un chapitre.
+ */
+.modale { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center;
+  justify-content: center; padding: 3vh 3vw; }
+.modale[hidden], .modale-corps[hidden] { display: none; }
+.modale-fond { position: absolute; inset: 0; background: var(--voile); }
+.modale-boite { position: relative; display: flex; flex-direction: column; width: min(1100px, 94vw);
+  max-height: 94vh; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, .28); overflow: hidden; }
+.modale-tete { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px 16px;
+  border-bottom: 1px solid var(--line); background: var(--bg); }
+.modale-titre { margin: 0; font-family: var(--mono); font-size: .86rem; color: var(--muted); flex: 1 1 auto; }
+.modale-onglets { display: flex; gap: 8px; flex-wrap: wrap; }
+.modale-onglets button, .modale-fermer { font-family: var(--sans); font-size: .86rem; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 16px; }
+.modale-onglets button[aria-selected="true"] { background: var(--accent); border-color: var(--accent-fonce);
+  color: var(--sur-accent); font-weight: 700; }
+.modale-fermer:hover, .modale-onglets button:hover { border-color: var(--accent-fonce); }
+.modale-corps { overflow: auto; padding: 20px 24px; }
+.modale-corps .md-h1 { font-family: var(--head); font-weight: 800; font-size: 1.5rem; margin: 16px 0 8px; }
+.modale-corps .md-h2 { font-family: var(--head); font-weight: 800; font-size: 1.2rem; margin: 24px 0 8px;
+  padding-top: 8px; border-top: 2px solid var(--accent); }
+.modale-corps .md-h3 { font-family: var(--head); font-weight: 700; font-size: 1.02rem; margin: 16px 0 8px; }
+.modale-corps .md-h4, .modale-corps .md-h5, .modale-corps .md-h6 { font-family: var(--head);
+  font-weight: 700; font-size: .94rem; margin: 16px 0 8px; color: var(--muted); }
+.modale-corps table { table-layout: auto; width: 100%; }
+.modale-brut pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .78rem; }
+.fiche-meta { margin: 0; padding: 8px 24px; font-size: .84rem; color: var(--muted);
+  border-bottom: 1px solid var(--line); background: var(--bg); }
+.fiche-panneaux { overflow: auto; }
+.fiche-panneaux .modale-corps { overflow: visible; }
+/* Le bouton qui OUVRE le fichier source : il se lit comme un chemin, pas comme une action. */
+.lien-source { font-family: var(--mono); font-size: .82rem; cursor: pointer; background: none; border: 0;
+  padding: 0; color: var(--accent-fonce); text-decoration: underline; text-underline-offset: 2px; }
+.lien-source:hover { color: var(--ink); }
+/* Un code cité qui ouvre sa fiche : souligné en pointillé, jamais confondu avec un lien de
+   navigation. Sans script, il reste un code lisible, et son title l'explique. */
+a.code-fiche { text-decoration: none; color: inherit; }
+a.code-fiche code { border-bottom: 2px dotted var(--accent); cursor: pointer; color: var(--accent-fonce); }
+a.code-fiche:hover code, a.code-fiche:focus-visible code { background: var(--accent-voile);
+  border-bottom-style: solid; }
+/* Au téléphone, un bouton de la fenêtre est une cible tactile : 44 px au moins (oracle-mobile M2). */
+@media (max-width: 760px) { .modale-onglets button, .modale-fermer { min-height: 44px; } }
+@media print {
+  .modale { display: none; }
+  .modale-corps[role="tabpanel"][hidden] { display: block; }
+}
+</style>
+<!-- COMPOSANT-GABARIT:FIN modale.css -->
+<!-- COMPOSANT-GABARIT:DEBUT recherche-resultats.css — copie de gd-guide-de-reference/composants/recherche-resultats.css,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<style data-composant-gabarit="gd-guide-de-reference/recherche-resultats.css" data-empreinte="sha256:b45ae1d9ba6e172c7545bedc7382ac77b4d95b108cc57fdf9fef827db98de2bf">
+/* gd-guide-de-reference · recherche-resultats.css — la RECHERCHE et le tableau de ses résultats.
+ *
+ * S'appuie sur find-in-page.js du socle (surlignage, compteur, insensible aux accents). Le
+ * compteur dit COMBIEN ; ce panneau dit OÙ : une ligne par occurrence, sa vue, son chapitre et le
+ * passage qui la porte. Il descend sous la barre des vues, aligné sur le bord droit de la page,
+ * et recouvre le contenu sans le pousser. Au téléphone, il s'ouvre en surimpression fixe, du
+ * champ jusqu'au bas de l'écran : sous un bandeau de 717 px sur 844, il n'avait plus qu'une bande
+ * visible (sonde du 24/09/2026 sur le document source).
+ */
+.barre-recherche { position: relative; display: flex; align-items: stretch; }
+.barre-recherche input { width: 280px; font-family: var(--sans); font-size: .9rem; padding: 8px 16px;
+  border: 1px solid var(--faint); border-radius: 999px; background: var(--bg); color: var(--ink); }
+.find-count { position: absolute; top: 100%; left: 14px; font-size: .72rem; color: var(--muted);
+  white-space: nowrap; }
+.find-count.zero { color: var(--red); }
+mark.find-hit { background: var(--amber-fill); color: var(--ink); border-radius: 2px; padding: 0; margin: 0; }
+mark.find-hit.courant { outline: 2px solid var(--accent-fonce); outline-offset: 1px; }
+/* Dans un schéma, le surlignage est un <tspan> : SVG ne peint pas un <mark> HTML, et le mot
+   trouvé DISPARAISSAIT du schéma pendant la recherche (87 caractères peints sur 93, 24/09/2026). */
+tspan.find-hit { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; }
+tspan.find-hit.courant { fill: var(--accent-fonce); }
+.resultats { position: absolute; top: 100%; right: max(12px, calc(2vw + 20px));
+  width: min(52rem, calc(100vw - 24px)); max-height: min(62vh, 34rem); overflow: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, .28); padding: 12px 16px 16px; z-index: 45; }
+.resultats[hidden] { display: none; }
+.res-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.res-resume { margin: 0; font-size: .86rem; font-weight: 600; color: var(--ink); }
+.res-fermer { font-family: var(--sans); font-size: .82rem; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 999px;
+  padding: 8px 16px; }
+.res-fermer:hover { border-color: var(--accent-fonce); color: var(--accent-fonce); }
+table.res-table { width: 100%; font-size: .84rem; margin: 0; border-collapse: collapse; table-layout: fixed; }
+.res-table th, .res-table td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line);
+  vertical-align: top; overflow-wrap: break-word; }
+.res-table col.res-c1 { width: 30%; }
+.res-table col.res-c2 { width: 70%; }
+.res-table tbody tr { cursor: pointer; }
+.res-table tbody tr:hover, .res-table tbody tr:focus-within { background: var(--bg); }
+.res-aller { font-weight: 600; }
+.res-ch { display: block; margin-top: 4px; font-size: .78rem; color: var(--muted); }
+.res-extrait mark { background: var(--amber-fill); color: var(--ink); border-radius: 2px; padding: 0; margin: 0; }
+@media (max-width: 1360px) { .barre-recherche input { width: 190px; } }
+@media (max-width: 760px) {
+  .barre-recherche { flex: 1 1 auto; min-width: 0; }
+  .barre-recherche input { width: 100%; }
+  .resultats { position: fixed; top: var(--res-haut, 140px); bottom: 12px; left: 12px; right: 12px;
+    width: auto; max-height: none; }
+  .res-fermer { min-height: 44px; }
+}
+@media print { .barre-recherche, .resultats { display: none; } }
+</style>
+<!-- COMPOSANT-GABARIT:FIN recherche-resultats.css -->
+
+<!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
+     posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
+     La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
+<style data-composant="table-filters.css" data-empreinte="sha256:36a64400e5c944a5dbbdfbed124f8cd27baee82db16795997024bbc6bc8e84aa">
+/* table-filters.css — habillage charté du composant de filtres de colonne (D-12).
+   TF-0176 (13/08) : un composant se livre AVEC son CSS — livré nu, il sort en rendu brut
+   navigateur chez tous ses hôtes (constaté sur le dashboard forge-tests du 13/08, refusé
+   par son destinataire). À inliner dans le bloc de style de la page, à côté du script du
+   composant — JAMAIS de balise écrite en toutes lettres dans ce commentaire (même famille
+   de piège que RA-1 : un « script » ouvrant en commentaire fausse toute lecture paresseuse
+   du document). Ne consomme que les tokens :root du socle (--surface, --ink, --muted,
+   --line, --blue, --r-sm) : aucune couleur en dur, les deux thèmes sont servis. TF-1059
+   (11/09) : deux couleurs en dur restaient (texte du bouton actif, repli du survol), treize
+   espacements sortaient de l'échelle 4pt et quatre anneaux de focus n'étaient pas prescrits —
+   corrigés ici, à la source, plutôt que dans chaque produit. */
+
+.tf-btn {
+  font: inherit; font-size: .72rem; line-height: 1;
+  color: var(--blue); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 8px; margin-left: 8px; cursor: pointer; vertical-align: middle;
+}
+.tf-btn:hover { border-color: var(--blue); }
+.tf-btn:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+/* filtre ACTIF : l'état se voit sans ouvrir le panneau */
+.tf-btn.tf-on { background: var(--blue); color: var(--surface); border-color: var(--blue); }
+
+.tf-panel {
+  position: absolute; z-index: 30; top: calc(100% + 4px); left: 0;
+  min-width: 230px; max-width: 320px; max-height: 320px; overflow: auto;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
+  padding: 12px; text-align: left; text-transform: none;
+  font-family: var(--sans); font-size: .85rem; font-weight: 400;
+  letter-spacing: normal; cursor: default;
+}
+.tf-search {
+  width: 100%; font: inherit; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 8px 12px; margin: 0 0 8px;
+}
+.tf-search:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-actions {
+  display: flex; gap: 16px; border-bottom: 1px solid var(--line);
+  padding-bottom: 8px; margin-bottom: 8px;
+}
+.tf-actions button {
+  font: inherit; font-weight: 600; color: var(--blue);
+  background: none; border: none; cursor: pointer; padding: 0 4px;
+}
+.tf-actions button:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-opts { display: flex; flex-direction: column; gap: 4px; }
+.tf-opts label {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px; border-radius: 4px; cursor: pointer;
+}
+.tf-opts label:hover { background: var(--bg); }
+.tf-opts input[type="checkbox"] { accent-color: var(--blue); }
+/* TF-0782 (02/09) : la cardinalite decide de la FORME du panneau, pas de son existence — et
+   une forme qui change sans le dire est une affordance muette. Le panneau ouvert sur sa
+   recherche (plus de 15 valeurs) ou reduit a une valeur unique porte sa note. */
+.tf-forme-note { margin: 0 0 8px; color: var(--muted); font-size: .78rem; font-style: italic; }
+/* TF-1051 (08/09) : une colonne a valeur UNIQUE le dit dans son en-tete, la ou on la lit —
+   repliee dans le panneau, la note n'etait vue par personne et le lecteur concluait a une panne. */
+.tf-unique {
+  display: block; margin-top: 4px; color: var(--muted);
+  font-size: .72rem; font-weight: 400; font-style: italic; text-transform: none;
+}
+
+/* TF-0431 : panneau aligne a droite quand la place manque (choisi par le composant) ;
+   le conteneur defilant porteur d'un panneau ouvert ne rogne plus (data-tf-ouvert). */
+.tf-panel.tf-droite { left: auto; right: 0; }
+[data-tf-ouvert] { overflow: visible !important; }
+
+/* TF-0430 : etat vide — un filtre qui ne laisse rien le DIT dans le tableau, et offre la
+   seule action utile a ce moment. */
+tr[data-tf-empty] td {
+  padding: 16px 12px; text-align: center; color: var(--muted);
+  font-style: italic; border-bottom: 1px solid var(--line);
+}
+.tf-reset {
+  font: inherit; font-style: normal; font-weight: 600; color: var(--blue);
+  background: none; border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 12px; margin-left: 12px; cursor: pointer;
+}
+.tf-reset:hover { border-color: var(--blue); }
+.tf-reset:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+
+@media print { .tf-btn, .tf-panel, tr[data-tf-empty] { display: none; } }
+</style>
+<!-- COMPOSANT-EMBARQUE:FIN table-filters.css -->
+</head>
+<body data-largeur="lecture">
+<header class="bandeau">
+  <div class="bandeau-haut" data-colonne-ok>
+    <h1 class="marque">Digit<em>-</em>AI<small>{Objet du guide — « Guide du développeur », « Guide d&#x27;exploitation »…} · {Périmètre — le produit, la plateforme ou le programme couvert}</small></h1>
+    <div class="outils">
+      <div class="barre-recherche">
+        <label for="recherche" hidden>Rechercher dans le document</label>
+        <input id="recherche" type="search" placeholder="Rechercher dans le document…" aria-controls="recherche-resultats" aria-expanded="false">
+        <div id="rechercheCompte" class="find-count" aria-live="polite"></div>
+      </div>
+      <button type="button" class="theme-toggle" aria-pressed="false">Thème sombre</button>
+    </div>
+  </div>
+  <nav class="vues" aria-label="Vues du document"><ol><li><a href="#vue-demarrer" title="{le parcours et les questions fréquentes}"><span class="toc-t">Démarrer</span></a></li><li><a href="#vue-chapitre-type" title="{une règle, ses pas, ses vérifications}"><span class="toc-t">Chapitre type</span></a></li><li><a href="#vue-reference" title="{le vocabulaire du guide et à qui s&#x27;adresser}"><span class="toc-t">Référence</span></a></li></ol></nav>
+  <div id="recherche-resultats" class="resultats" role="region" aria-label="Résultats de la recherche" hidden>
+    <div class="res-tete"><p class="res-resume" id="res-resume"></p><button type="button" class="res-fermer">Fermer</button></div>
+    <div class="res-corps"></div>
+  </div>
+</header>
+<div class="wrap">
+  <div id="contenu">
+<div class="vue" data-vue="demarrer">
+  <div class="page">
+    <nav class="chapitres" aria-label="Chapitres de cette vue"><p class="toc-titre">Dans cette vue</p><ol>
+<li class="toc-s"><a href="#demarrer-1-le-parcours-en-n-etapes" title="{Le chapeau du chapitre : ce qu&#x27;il apprend au lecteur, en une phrase qui ne répète pas son titre.}"><span class="toc-t">1 — {Le parcours en N étapes}</span></a></li>
+<li class="toc-s"><a href="#demarrer-2-les-questions-les-plus-frequentes" title="{Le chapeau : quelles questions, posées par qui, et comment la table se parcourt — elle se filtre et se trie dès huit lignes.}"><span class="toc-t">2 — {Les questions les plus fréquentes}</span></a></li>
+</ol></nav>
+    <main>
+      <div class="meta"><div><b>Vue</b>1 sur 3</div><div><b>Source tenue à jour</b><button type="button" class="lien-source" data-ouvre-modale="modale-source" aria-label="Ouvrir le fichier source {docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}">{docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}</button></div></div>
+      <section class="vue-corps" id="vue-demarrer"><h2 class="titre-vue">Démarrer — {ce que la vue d&#x27;entrée promet, en une ligne}</h2><div class="chap lire" data-colonne-ok><p class="contenu">{Cette vue porte… — ce qu&#x27;elle contient, et ce qui la distingue de la vue suivante.}</p></div><div class="chap lire" data-colonne-ok><p class="ch-apprend">{La phrase d'ouverture de la vue : ce que le lecteur saura faire en la quittant, et par où il commence.}</p>
+</div><section class="ch" id="demarrer-1-le-parcours-en-n-etapes">
+<div class="ch-tete"><div class="ch-pastille" aria-hidden="true">1</div><div class="ch-titres"><h3>{Le parcours en N étapes}</h3></div></div><div class="ch-corps"><div class="ch-rail" aria-hidden="true"></div><div class="chap lire" data-colonne-ok>
+<p class="ch-apprend">{Le chapeau du chapitre : ce qu'il apprend au lecteur, en une phrase qui ne répète pas son titre.}</p>
+</div><div class="table-hote"><table id="demarrer-t01" class="repli-cartes" style="width:100%">
+<colgroup><col style="width:16.12%"><col style="width:41.03%"><col style="width:42.86%"></colgroup><thead>
+<tr>
+<th>Étape</th>
+<th>Ce que vous faites</th>
+<th>Vue qui le détaille</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td data-label="Étape">1</td>
+<td data-label="Ce que vous faites">{geste}</td>
+<td data-label="Vue qui le détaille"><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+</tr>
+<tr>
+<td data-label="Étape">2</td>
+<td data-label="Ce que vous faites">{geste}</td>
+<td data-label="Vue qui le détaille"><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+</tr>
+</tbody>
+</table></div>
+<section class="pas-bloc" id="demarrer-1-le-parcours-en-n-etapes-pas-exemple-de-lecture" data-type="exemple"><h4 class="pas"><span class="puce" aria-hidden="true">▸</span>Exemple de lecture</h4><div class="chap lire" data-colonne-ok><p class="exemple-lecture">{La ligne N se lit : … — ce qu'il faut voir dans CE tableau, en une phrase.}</p>
+</div></section></div></section>
+<section class="ch" id="demarrer-2-les-questions-les-plus-frequentes">
+<div class="ch-tete"><div class="ch-pastille" aria-hidden="true">2</div><div class="ch-titres"><h3>{Les questions les plus fréquentes}</h3></div></div><div class="ch-corps"><div class="ch-rail" aria-hidden="true"></div><div class="chap lire" data-colonne-ok>
+<p class="ch-apprend">{Le chapeau : quelles questions, posées par qui, et comment la table se parcourt — elle se filtre et se trie dès huit lignes.}</p>
+</div><div class="table-hote"><table id="demarrer-t02" class="repli-cartes" style="width:100%" data-filterable>
+<colgroup><col style="width:35.56%"><col style="width:40.44%"><col style="width:24%"></colgroup><thead>
+<tr>
+<th>Question</th>
+<th>Vue qui répond</th>
+<th>Thème</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td data-label="Question">{question 1}</td>
+<td data-label="Vue qui répond"><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+<tr>
+<td data-label="Question">{question 2}</td>
+<td data-label="Vue qui répond"><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+<tr>
+<td data-label="Question">{question 3}</td>
+<td data-label="Vue qui répond"><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+<tr>
+<td data-label="Question">{question 4}</td>
+<td data-label="Vue qui répond"><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+<tr>
+<td data-label="Question">{question 5}</td>
+<td data-label="Vue qui répond"><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+<tr>
+<td data-label="Question">{question 6}</td>
+<td data-label="Vue qui répond"><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+<tr>
+<td data-label="Question">{question 7}</td>
+<td data-label="Vue qui répond"><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+<tr>
+<td data-label="Question">{question 8}</td>
+<td data-label="Vue qui répond"><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td data-label="Thème">{thème}</td>
+</tr>
+</tbody>
+</table></div><div class="tf-count" data-tf-count-for="demarrer-t02" aria-live="polite"></div>
+<section class="pas-bloc" id="demarrer-2-les-questions-les-plus-frequentes-pas-exemple-de-lecture" data-type="exemple"><h4 class="pas"><span class="puce" aria-hidden="true">▸</span>Exemple de lecture</h4><div class="chap lire" data-colonne-ok><p class="exemple-lecture">{La ligne N se lit : la question … trouve sa réponse dans la vue …}</p></div></section></div></section>
+</section>
+<nav class="toc" aria-label="Sommaire du document"><p class="toc-titre">Le document en 3 vues</p><ol><li><a href="#vue-demarrer"><span class="toc-n">1</span><span class="toc-t">Démarrer</span><span class="toc-d">{le parcours et les questions fréquentes}</span></a></li><li><a href="#vue-chapitre-type"><span class="toc-n">2</span><span class="toc-t">Chapitre type</span><span class="toc-d">{une règle, ses pas, ses vérifications}</span></a></li><li><a href="#vue-reference"><span class="toc-n">3</span><span class="toc-t">Référence</span><span class="toc-d">{le vocabulaire du guide et à qui s&#x27;adresser}</span></a></li></ol></nav>      <nav class="pagination" aria-label="Vue précédente et suivante"><span></span><a href="#vue-chapitre-type">Chapitre type →</a></nav>
+    </main>
+  </div>
+</div>
+<div class="vue" data-vue="chapitre-type">
+  <div class="page">
+    <nav class="chapitres" aria-label="Chapitres de cette vue"><p class="toc-titre">Dans cette vue</p><ol>
+<li class="toc-s"><a href="#chapitre-type-code-r01-titre-de-la-regle" title="{Le chapeau : la règle elle-même, en une phrase opposable.}"><span class="toc-t">{CODE-R01} — {Titre de la règle}</span></a><ol class="toc-n2"><li><a href="#chapitre-type-code-r01-titre-de-la-regle-pas-verification"><span class="toc-t">Vérification</span></a></li><li><a href="#chapitre-type-code-r01-titre-de-la-regle-pas-attention"><span class="toc-t">Attention</span></a></li></ol></li>
+<li class="toc-s"><a href="#chapitre-type-2-un-geste-en-etapes" title="2 — {Un geste en étapes}"><span class="toc-t">2 — {Un geste en étapes}</span></a><ol class="toc-n2"><li><a href="#chapitre-type-2-un-geste-en-etapes-pas-verification"><span class="toc-t">Vérification</span></a></li></ol></li>
+</ol></nav>
+    <main>
+      <div class="meta"><div><b>Vue</b>2 sur 3</div><div><b>Source tenue à jour</b><button type="button" class="lien-source" data-ouvre-modale="modale-source" aria-label="Ouvrir le fichier source {docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}">{docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}</button></div></div>
+      <section class="vue-corps" id="vue-chapitre-type"><h2 class="titre-vue">Chapitre type — {une vue de règles, de gestes ou de procédures}</h2><div class="chap lire" data-colonne-ok><p class="contenu">{Cette vue porte… — les règles ou les gestes qu&#x27;elle réunit, et leurs contrôles.}</p></div><div class="chap lire" data-colonne-ok><p class="ch-apprend">{La phrase d'ouverture : ce que cette vue engage, et ce qui se passe si on ne l'applique pas.}</p>
+</div><section class="ch" id="chapitre-type-code-r01-titre-de-la-regle">
+<div class="ch-tete"><div class="ch-pastille code" aria-hidden="true">R01}</div><div class="ch-titres"><h3><code>{CODE-R01}</code> — {Titre de la règle}</h3><p class="regle-meta"><span class="meta-i"><b>Niveau</b> <span class="badge" title="Niveau de la règle">{obligatoire | recommandé}</span></span><span class="meta-i"><b>Source</b> {le document ou le fait qui fonde la règle, daté}.</span><span class="meta-i"><b>Exceptions</b> {les cas où elle ne s'applique pas, ou « aucune »}.</span></p></div></div><div class="ch-corps"><div class="ch-rail" aria-hidden="true"></div><div class="chap lire" data-colonne-ok>
+
+
+
+<p class="ch-apprend">{Le chapeau : la règle elle-même, en une phrase opposable.}</p>
+<p><strong>{Premier geste de la règle, en titre de quatre mots ou plus.}</strong> {Ce qu'on fait, et pourquoi c'est ainsi.}</p>
+</div><section class="pas-bloc" id="chapitre-type-code-r01-titre-de-la-regle-pas-verification" data-type="verification"><h4 class="pas"><span class="puce" aria-hidden="true">✓</span>Vérification</h4><div class="chap lire" data-colonne-ok><p>{La commande ou le constat qui prouve que la règle est tenue.}</p>
+</div></section><section class="pas-bloc" id="chapitre-type-code-r01-titre-de-la-regle-pas-attention" data-type="attention"><h4 class="pas"><span class="puce" aria-hidden="true">!</span>Attention</h4><div class="chap lire" data-colonne-ok><p>{Le piège qu'un lecteur pressé rencontre, et comment l'éviter.}</p>
+</div></section></div></section>
+<section class="ch" id="chapitre-type-2-un-geste-en-etapes">
+<div class="ch-tete"><div class="ch-pastille" aria-hidden="true">2</div><div class="ch-titres"><h3>{Un geste en étapes}</h3></div></div><div class="ch-corps"><div class="ch-rail" aria-hidden="true"></div><div class="chap lire" data-colonne-ok>
+<p>{Le chapeau : le geste, et ce qui le clôt.}</p>
+<pre><code>{commande 1}
+{commande 2}
+</code></pre>
+</div><section class="pas-bloc" id="chapitre-type-2-un-geste-en-etapes-pas-verification" data-type="verification"><h4 class="pas"><span class="puce" aria-hidden="true">✓</span>Vérification</h4><div class="chap lire" data-colonne-ok><p>{Ce que la dernière commande doit répondre ; une citation de <a class="code-fiche" href="#chapitre-type-code-r01-titre-de-la-regle" data-fiche="{CODE-R01}" title="Ouvrir la fiche de {CODE-R01}"><code>{CODE-R01}</code></a> ouvre sa fiche.}</p></div></section></div></section>
+</section>
+      <nav class="pagination" aria-label="Vue précédente et suivante"><a href="#vue-demarrer">← Démarrer</a><a href="#vue-reference">Référence →</a></nav>
+    </main>
+  </div>
+</div>
+<div class="vue" data-vue="reference">
+  <div class="page">
+    <nav class="chapitres" aria-label="Chapitres de cette vue"><p class="toc-titre">Dans cette vue</p><ol>
+<li class="toc-s"><a href="#reference-1-vocabulaire" title="{Le chapeau : chaque terme, le sens qu&#x27;il prend dans ce guide, et la vue où il sert.}"><span class="toc-t">1 — {Vocabulaire}</span></a></li>
+</ol></nav>
+    <main>
+      <div class="meta"><div><b>Vue</b>3 sur 3</div><div><b>Source tenue à jour</b><button type="button" class="lien-source" data-ouvre-modale="modale-source" aria-label="Ouvrir le fichier source {docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}">{docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}</button></div></div>
+      <section class="vue-corps" id="vue-reference"><h2 class="titre-vue">Référence — {vocabulaire et contacts}</h2><div class="chap lire" data-colonne-ok><p class="contenu">{Cette vue porte… — les termes définis une fois, et les contacts par sujet.}</p></div><div class="chap lire" data-colonne-ok><p class="ch-apprend">{La phrase d'ouverture : les mots du guide ont un sens précis, défini ici une seule fois.}</p>
+</div><section class="ch" id="reference-1-vocabulaire">
+<div class="ch-tete"><div class="ch-pastille" aria-hidden="true">1</div><div class="ch-titres"><h3>{Vocabulaire}</h3></div></div><div class="ch-corps"><div class="ch-rail" aria-hidden="true"></div><div class="chap lire" data-colonne-ok>
+<p class="ch-apprend">{Le chapeau : chaque terme, le sens qu'il prend dans ce guide, et la vue où il sert.}</p>
+</div><div class="table-hote"><table id="reference-t03" class="repli-cartes" style="width:100%">
+<colgroup><col style="width:18.12%"><col style="width:51.34%"><col style="width:30.54%"></colgroup><thead>
+<tr>
+<th>Terme</th>
+<th>Sens dans ce guide</th>
+<th>Vue où il sert</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td data-label="Terme">{terme}</td>
+<td data-label="Sens dans ce guide">{définition en une phrase}</td>
+<td data-label="Vue où il sert">{vue}</td>
+</tr>
+<tr>
+<td data-label="Terme">{terme}</td>
+<td data-label="Sens dans ce guide">{définition en une phrase}</td>
+<td data-label="Vue où il sert">{vue}</td>
+</tr>
+</tbody>
+</table></div>
+<section class="pas-bloc" id="reference-1-vocabulaire-pas-exemple-de-lecture" data-type="exemple"><h4 class="pas"><span class="puce" aria-hidden="true">▸</span>Exemple de lecture</h4><div class="chap lire" data-colonne-ok><p class="exemple-lecture">{La ligne N se lit : le terme … veut dire … dans ce guide.}</p></div></section></div></section>
+</section>
+      <nav class="pagination" aria-label="Vue précédente et suivante"><a href="#vue-chapitre-type">← Chapitre type</a><span></span></nav>
+    </main>
+  </div>
+</div>
+  </div>
+</div>
+<div class="modale" id="modale-source" hidden><div class="modale-fond" data-fermer></div><div class="modale-boite" role="dialog" aria-modal="true" aria-label="Fichier source {docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}"><div class="modale-tete"><p class="modale-titre">{docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}</p><div class="modale-onglets" role="tablist" aria-label="Présentation du fichier source"><button type="button" role="tab" id="md-onglet-forme" data-onglet="forme" aria-controls="md-panneau-forme" aria-selected="true">Mise en forme</button><button type="button" role="tab" id="md-onglet-brut" data-onglet="brut" aria-controls="md-panneau-brut" aria-selected="false">Sans formatage</button></div><button type="button" class="modale-fermer" data-fermer>Fermer</button></div><div class="modale-corps" id="md-panneau-forme" role="tabpanel" aria-labelledby="md-onglet-forme" data-panneau="forme"><p class="md-h1">{Objet du guide} — {Périmètre}</p>
+<p class="md-h2">Démarrer — {ce que la vue d'entrée promet, en une ligne}</p>
+<p>{La phrase d'ouverture de la vue : ce que le lecteur saura faire en la quittant, et par où il commence.}</p>
+<p class="md-h3">1 — {Le parcours en N étapes}</p>
+<p>{Le chapeau du chapitre : ce qu'il apprend au lecteur, en une phrase qui ne répète pas son titre.}</p>
+<table data-filterable="off" data-filterable-reason="aperçu du fichier source, non parcouru">
+<thead>
+<tr>
+<th>Étape</th>
+<th>Ce que vous faites</th>
+<th>Vue qui le détaille</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>{geste}</td>
+<td><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>{geste}</td>
+<td><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exemple de lecture.</strong> {La ligne N se lit : … — ce qu'il faut voir dans CE tableau, en une phrase.}</p>
+<p class="md-h3">2 — {Les questions les plus fréquentes}</p>
+<p>{Le chapeau : quelles questions, posées par qui, et comment la table se parcourt — elle se filtre et se trie dès huit lignes.}</p>
+<table data-filterable="off" data-filterable-reason="aperçu du fichier source, non parcouru">
+<thead>
+<tr>
+<th>Question</th>
+<th>Vue qui répond</th>
+<th>Thème</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{question 1}</td>
+<td><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+<tr>
+<td>{question 2}</td>
+<td><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+<tr>
+<td>{question 3}</td>
+<td><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+<tr>
+<td>{question 4}</td>
+<td><a href="#vue-chapitre-type" title="Aller à la vue « Chapitre type »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+<tr>
+<td>{question 5}</td>
+<td><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+<tr>
+<td>{question 6}</td>
+<td><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+<tr>
+<td>{question 7}</td>
+<td><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+<tr>
+<td>{question 8}</td>
+<td><a href="#vue-reference" title="Aller à la vue « Référence »">{vue}</a></td>
+<td>{thème}</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exemple de lecture.</strong> {La ligne N se lit : la question … trouve sa réponse dans la vue …}</p>
+<p class="md-h2">Chapitre type — {une vue de règles, de gestes ou de procédures}</p>
+<p>{La phrase d'ouverture : ce que cette vue engage, et ce qui se passe si on ne l'applique pas.}</p>
+<p class="md-h3"><code>{CODE-R01}</code> — {Titre de la règle}</p>
+<p><strong>Niveau : {obligatoire | recommandé}</strong></p>
+<p><strong>Source</strong> : {le document ou le fait qui fonde la règle, daté}.</p>
+<p><strong>Exceptions</strong> : {les cas où elle ne s'applique pas, ou « aucune »}.</p>
+<p>{Le chapeau : la règle elle-même, en une phrase opposable.}</p>
+<p><strong>{Premier geste de la règle, en titre de quatre mots ou plus.}</strong> {Ce qu'on fait, et pourquoi c'est ainsi.}</p>
+<p><strong>Vérification.</strong> {La commande ou le constat qui prouve que la règle est tenue.}</p>
+<p><strong>Attention.</strong> {Le piège qu'un lecteur pressé rencontre, et comment l'éviter.}</p>
+<p class="md-h3">2 — {Un geste en étapes}</p>
+<p>{Le chapeau : le geste, et ce qui le clôt.}</p>
+<pre><code>{commande 1}
+{commande 2}
+</code></pre>
+<p><strong>Vérification.</strong> {Ce que la dernière commande doit répondre ; une citation de <code>{CODE-R01}</code> ouvre sa fiche.}</p>
+<p class="md-h2">Référence — {vocabulaire et contacts}</p>
+<p>{La phrase d'ouverture : les mots du guide ont un sens précis, défini ici une seule fois.}</p>
+<p class="md-h3">1 — {Vocabulaire}</p>
+<p>{Le chapeau : chaque terme, le sens qu'il prend dans ce guide, et la vue où il sert.}</p>
+<table data-filterable="off" data-filterable-reason="aperçu du fichier source, non parcouru">
+<thead>
+<tr>
+<th>Terme</th>
+<th>Sens dans ce guide</th>
+<th>Vue où il sert</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{terme}</td>
+<td>{définition en une phrase}</td>
+<td>{vue}</td>
+</tr>
+<tr>
+<td>{terme}</td>
+<td>{définition en une phrase}</td>
+<td>{vue}</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exemple de lecture.</strong> {La ligne N se lit : le terme … veut dire … dans ce guide.}</p></div><div class="modale-corps modale-brut" id="md-panneau-brut" role="tabpanel" aria-labelledby="md-onglet-brut" data-panneau="brut" hidden><pre>---
+marque: Digit-AI
+marque_html: Digit&lt;em&gt;-&lt;/em&gt;AI
+objet: {Objet du guide — « Guide du développeur », « Guide d&#x27;exploitation »…}
+sous_titre: {Périmètre — le produit, la plateforme ou le programme couvert}
+description: {Une phrase pour les moteurs et les onglets : ce que le guide couvre, en combien de vues, et ce qui s&#x27;y ouvre en fenêtre.}
+role_destinataire: {qui lit ce guide, et ce qu&#x27;il DÉCIDE ou FAIT avec — installer, appliquer une règle, livrer, exploiter}
+version: 20260924a
+source_affichee: {docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}
+cle_theme: {nom-du-guide}-theme
+favicon_lettre: {une lettre}
+gabarit: gd-guide-de-reference
+version_du_gabarit: 1.0.0
+---
+
+# {Objet du guide} — {Périmètre}
+
+## Démarrer — {ce que la vue d&#x27;entrée promet, en une ligne}
+&lt;!-- vue: cle=&quot;demarrer&quot; libelle=&quot;Démarrer&quot; annonce=&quot;{le parcours et les questions fréquentes}&quot; inventaire=&quot;{Cette vue porte… — ce qu&#x27;elle contient, et ce qui la distingue de la vue suivante.}&quot; --&gt;
+
+{La phrase d&#x27;ouverture de la vue : ce que le lecteur saura faire en la quittant, et par où il commence.}
+
+### 1 — {Le parcours en N étapes}
+
+{Le chapeau du chapitre : ce qu&#x27;il apprend au lecteur, en une phrase qui ne répète pas son titre.}
+
+| Étape | Ce que vous faites | Vue qui le détaille |
+|---|---|---|
+| 1 | {geste} | [{vue}](#chapitre-type) |
+| 2 | {geste} | [{vue}](#reference) |
+
+**Exemple de lecture.** {La ligne N se lit : … — ce qu&#x27;il faut voir dans CE tableau, en une phrase.}
+
+### 2 — {Les questions les plus fréquentes}
+
+{Le chapeau : quelles questions, posées par qui, et comment la table se parcourt — elle se filtre et se trie dès huit lignes.}
+
+| Question | Vue qui répond | Thème |
+|---|---|---|
+| {question 1} | [{vue}](#chapitre-type) | {thème} |
+| {question 2} | [{vue}](#chapitre-type) | {thème} |
+| {question 3} | [{vue}](#chapitre-type) | {thème} |
+| {question 4} | [{vue}](#chapitre-type) | {thème} |
+| {question 5} | [{vue}](#reference) | {thème} |
+| {question 6} | [{vue}](#reference) | {thème} |
+| {question 7} | [{vue}](#reference) | {thème} |
+| {question 8} | [{vue}](#reference) | {thème} |
+
+**Exemple de lecture.** {La ligne N se lit : la question … trouve sa réponse dans la vue …}
+
+## Chapitre type — {une vue de règles, de gestes ou de procédures}
+&lt;!-- vue: cle=&quot;chapitre-type&quot; libelle=&quot;Chapitre type&quot; annonce=&quot;{une règle, ses pas, ses vérifications}&quot; inventaire=&quot;{Cette vue porte… — les règles ou les gestes qu&#x27;elle réunit, et leurs contrôles.}&quot; --&gt;
+
+{La phrase d&#x27;ouverture : ce que cette vue engage, et ce qui se passe si on ne l&#x27;applique pas.}
+
+### `{CODE-R01}` — {Titre de la règle}
+
+**Niveau : {obligatoire | recommandé}**
+
+**Source** : {le document ou le fait qui fonde la règle, daté}.
+
+**Exceptions** : {les cas où elle ne s&#x27;applique pas, ou « aucune »}.
+
+{Le chapeau : la règle elle-même, en une phrase opposable.}
+
+**{Premier geste de la règle, en titre de quatre mots ou plus.}** {Ce qu&#x27;on fait, et pourquoi c&#x27;est ainsi.}
+
+**Vérification.** {La commande ou le constat qui prouve que la règle est tenue.}
+
+**Attention.** {Le piège qu&#x27;un lecteur pressé rencontre, et comment l&#x27;éviter.}
+
+### 2 — {Un geste en étapes}
+
+{Le chapeau : le geste, et ce qui le clôt.}
+
+```
+{commande 1}
+{commande 2}
+```
+
+**Vérification.** {Ce que la dernière commande doit répondre ; une citation de `{CODE-R01}` ouvre sa fiche.}
+
+## Référence — {vocabulaire et contacts}
+&lt;!-- vue: cle=&quot;reference&quot; libelle=&quot;Référence&quot; annonce=&quot;{le vocabulaire du guide et à qui s&#x27;adresser}&quot; inventaire=&quot;{Cette vue porte… — les termes définis une fois, et les contacts par sujet.}&quot; --&gt;
+
+{La phrase d&#x27;ouverture : les mots du guide ont un sens précis, défini ici une seule fois.}
+
+### 1 — {Vocabulaire}
+
+{Le chapeau : chaque terme, le sens qu&#x27;il prend dans ce guide, et la vue où il sert.}
+
+| Terme | Sens dans ce guide | Vue où il sert |
+|---|---|---|
+| {terme} | {définition en une phrase} | {vue} |
+| {terme} | {définition en une phrase} | {vue} |
+
+**Exemple de lecture.** {La ligne N se lit : le terme … veut dire … dans ce guide.}
+</pre></div></div></div>
+<div class="modale" id="modale-fiche" hidden><div class="modale-fond" data-fermer></div><div class="modale-boite" role="dialog" aria-modal="true" aria-label="Fiche d'un code cité"><div class="modale-tete"><p class="modale-titre">Fiche</p><div class="modale-onglets" role="tablist" aria-label="Panneaux de la fiche"></div><button type="button" class="modale-fermer" data-fermer>Fermer</button></div><p class="fiche-meta" hidden></p><div class="fiche-panneaux"></div></div></div>
+<script type="application/json" id="fiches-donnees">{"{CODE-R01}": {"titre": "{CODE-R01} — {Titre de la règle}", "meta": "Vue « Chapitre type » · \u003cp class=\"regle-meta\">\u003cspan class=\"meta-i\">\u003cb>Niveau\u003c/b> \u003cspan class=\"badge\" title=\"Niveau de la règle\">{obligatoire | recommandé}\u003c/span>\u003c/span>\u003cspan class=\"meta-i\">\u003cb>Source\u003c/b> {le document ou le fait qui fonde la règle, daté}.\u003c/span>\u003cspan class=\"meta-i\">\u003cb>Exceptions\u003c/b> {les cas où elle ne s'applique pas, ou « aucune »}.\u003c/span>\u003c/p>", "panneaux": [{"nom": "Chapitre", "html": "\u003cdiv class=\"chap lire\" data-colonne-ok>\n\n\n\n\u003cp class=\"ch-apprend\">{Le chapeau : la règle elle-même, en une phrase opposable.}\u003c/p>\n\u003cp>\u003cstrong>{Premier geste de la règle, en titre de quatre mots ou plus.}\u003c/strong> {Ce qu'on fait, et pourquoi c'est ainsi.}\u003c/p>\n\u003c/div>\u003csection class=\"pas-bloc\" id=\"chapitre-type-code-r01-titre-de-la-regle-pas-verification\" data-type=\"verification\">\u003ch4 class=\"pas\">\u003cspan class=\"puce\" aria-hidden=\"true\">✓\u003c/span>Vérification\u003c/h4>\u003cdiv class=\"chap lire\" data-colonne-ok>\u003cp>{La commande ou le constat qui prouve que la règle est tenue.}\u003c/p>\n\u003c/div>\u003c/section>\u003csection class=\"pas-bloc\" id=\"chapitre-type-code-r01-titre-de-la-regle-pas-attention\" data-type=\"attention\">\u003ch4 class=\"pas\">\u003cspan class=\"puce\" aria-hidden=\"true\">!\u003c/span>Attention\u003c/h4>\u003cdiv class=\"chap lire\" data-colonne-ok>\u003cp>{Le piège qu'un lecteur pressé rencontre, et comment l'éviter.}\u003c/p>\n\u003c/div>\u003c/section>\u003cp class=\"fiche-aller\">\u003ca href=\"#chapitre-type-code-r01-titre-de-la-regle\">Lire ce chapitre dans le document\u003c/a>\u003c/p>"}]}}</script>
+<footer class="pied"><p>Digit-AI · {Objet du guide — « Guide du développeur », « Guide d&#x27;exploitation »…}, version 20260924a. Source tenue à jour : <code>{docs/NOM-DU-GUIDE.md — le chemin du Markdown tenu à jour, que les prompts citent}</code>.</p><p>Gabarit : gd-guide-de-reference · version du gabarit 1.0.0</p></footer>
+<!-- COMPOSANT-GABARIT:DEBUT bascule-theme.js — copie de gd-guide-de-reference/composants/bascule-theme.js,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<script data-composant-gabarit="gd-guide-de-reference/bascule-theme.js" data-empreinte="sha256:4155d6f6a8a69c18e0bba4d11718efc2987cd6fe08942b06aed685133c463b08">
+/* gd-guide-de-reference · bascule-theme.js — la bascule clair / sombre (règle R-30).
+ *
+ * Contrat de marquage : <button type="button" class="theme-toggle" aria-pressed="false">Thème sombre</button>
+ * et, dans le <head>, l'AMORCE qui applique le thème retenu avant la première peinture et pose
+ * la classe `js` (sans elle, la page clignote en clair puis en sombre, et toutes les vues d'un
+ * document à vues se peignent une fois) — une ligne, à recopier telle quelle :
+ *   (function(){var c=document.documentElement,cleTheme=c.getAttribute('data-cle-theme')||'guide-theme',s=null;
+ *    try{s=localStorage.getItem(cleTheme);}catch(e){}c.setAttribute('data-theme',s==='dark'?'dark':'light');
+ *    c.className+=' js';})();
+ * La clé de mémorisation se déclare sur <html data-cle-theme="…"> : deux documents d'un même
+ * domaine ne se partagent pas leur choix par accident.
+ */
+(function (global) {
+  'use strict';
+  function cle() { return document.documentElement.getAttribute('data-cle-theme') || 'guide-theme'; }
+  function sombre() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+  function init() {
+    var bouton = document.querySelector('.theme-toggle');
+    if (!bouton) { return; }
+    function libeller() {
+      bouton.textContent = sombre() ? 'Thème clair' : 'Thème sombre';
+      bouton.setAttribute('aria-pressed', sombre() ? 'true' : 'false');
+    }
+    libeller();
+    bouton.addEventListener('click', function () {
+      var suivant = sombre() ? 'light' : 'dark';
+      var cleTheme = cle();
+      document.documentElement.setAttribute('data-theme', suivant);
+      try { localStorage.setItem(cleTheme, suivant); } catch (e) { /* stockage refusé : le choix vaut pour la visite */ }
+      var meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) { meta.setAttribute('content', suivant); }
+      libeller();
+    });
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})(window);
+</script>
+<!-- COMPOSANT-GABARIT:FIN bascule-theme.js -->
+<!-- COMPOSANT-GABARIT:DEBUT coquille-vues.js — copie de gd-guide-de-reference/composants/coquille-vues.js,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<script data-composant-gabarit="gd-guide-de-reference/coquille-vues.js" data-empreinte="sha256:4e0d0be1fa1cfa3098112a7a5f57412cce95f2f368d9cafd1bd1991eba2907fa">
+/* gd-guide-de-reference · coquille-vues.js — UN fichier, N VUES, une seule peinte à la fois.
+ *
+ * Contrat de marquage (le générateur le produit ; à la main, le recopier tel quel) :
+ *   <nav class="vues" aria-label="Vues du document"><ol>
+ *     <li><a href="#vue-a" title="annonce"><span class="toc-t">Libellé A</span></a></li> …
+ *   </ol></nav>
+ *   <div id="contenu">
+ *     <div class="vue" data-vue="a"> … <section class="vue-corps" id="vue-a"> … </section> … </div>
+ *   </div>
+ * et, dans le <head>, l'amorce qui pose la classe `js` AVANT la première peinture (sans elle,
+ * toutes les vues clignotent une fois) — bascule-theme.js en fournit une.
+ *
+ * Comportement : l'adresse fait foi (#vue-a ouvre la vue a ; #un-chapitre ouvre la vue qui le
+ * porte, puis y défile) ; l'onglet courant porte aria-current="page" ; la hauteur du bandeau
+ * collant est MESURÉE et publiée dans --hh ; les composants du socle (filtres, lignes
+ * dépliables) sont câblés au PREMIER affichage de leur vue — un composant qui mesure un tableau
+ * non peint lit des dimensions nulles. Sans script : toutes les vues se lisent à la suite.
+ *
+ * API (window.GuideVues) : afficher(cle, remonter) · courante() · vues() · cleDe(vue) ·
+ * surAffichage(fn) — fn(cle, vue) après chaque affichage · reappliquer() — après une
+ * réécriture du contenu (la recherche remplace #contenu à chaque frappe), oublie les câblages
+ * et rend la vue courante, recâblée sur le contenu neuf.
+ *
+ * Faits payés sur le document source (24/09/2026) : une liste de vues relevée au chargement
+ * devient une liste de nœuds DÉTACHÉS dès que la recherche réécrit le contenu — depuis la
+ * dernière vue, une recherche ramenait la première, puis plus aucun onglet ne répondait. Les
+ * vues se relisent donc à chaque usage, et la vue courante est retenue. Et une marge de
+ * défilement figée à 142 px pour un bandeau de 194 px envoyait cinq liens de chapitre sur dix
+ * derrière lui (16/09/2026) : la hauteur se mesure, elle ne se devine pas.
+ */
+(function (global) {
+  'use strict';
+  var ecouteurs = [];
+  var etat = { courante: '', cablees: {} };
+
+  function lesVues() { return [].slice.call(document.querySelectorAll('#contenu [data-vue]')); }
+  function cleDe(vue) { return vue ? vue.getAttribute('data-vue') : ''; }
+  function lesOnglets() { return [].slice.call(document.querySelectorAll('nav.vues a[href^="#vue-"]')); }
+
+  function publierHauteur() {
+    var bandeau = document.querySelector('header.bandeau');
+    if (!bandeau) { return; }
+    var h = Math.round(bandeau.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--hh', h + 'px');
+  }
+
+  function cabler(vue) {
+    var cle = cleDe(vue);
+    if (!vue || etat.cablees[cle]) { return; }
+    etat.cablees[cle] = true;
+    if (global.DigitAITableDetail && global.DigitAITableDetail.initAll) {
+      global.DigitAITableDetail.initAll(vue);
+      // Un chevron câblé par le composant ne doit pas l'être une seconde fois par le relais que
+      // recherche-resultats.js pose sur le document pour les chevrons que la recherche a tués.
+      [].slice.call(vue.querySelectorAll('button.td-btn[aria-controls]')).forEach(function (b) {
+        b.__tdCable = true;
+      });
+    }
+    if (global.DigitAITableFilters && global.DigitAITableFilters.initAll) {
+      global.DigitAITableFilters.initAll(vue);
+    }
+  }
+
+  function afficher(cle, remonter) {
+    var cible = null;
+    var vues = lesVues();
+    vues.forEach(function (v) {
+      var actif = cleDe(v) === cle;
+      v.classList.toggle('active', actif);
+      if (actif) { cible = v; }
+    });
+    if (!cible && vues.length) { cible = vues[0]; cible.classList.add('active'); }
+    lesOnglets().forEach(function (a) {
+      if (cible && a.getAttribute('href') === '#vue-' + cleDe(cible)) {
+        a.setAttribute('aria-current', 'page');
+      } else { a.removeAttribute('aria-current'); }
+    });
+    etat.courante = cleDe(cible);
+    cabler(cible);
+    if (remonter) { global.scrollTo(0, 0); }
+    ecouteurs.forEach(function (fn) { try { fn(etat.courante, cible); } catch (e) { /* un écouteur ne casse pas les autres */ } });
+    return cible;
+  }
+
+  function depuisAdresse(remonter) {
+    var vues = lesVues();
+    var premiere = vues.length ? cleDe(vues[0]) : '';
+    var brut = decodeURIComponent((location.hash || '').replace('#', ''));
+    if (!brut) { afficher(premiere, remonter); return; }
+    var noeud = document.getElementById(brut);
+    var vue = noeud && noeud.closest ? noeud.closest('[data-vue]') : null;
+    if (vue) {
+      afficher(cleDe(vue), false);
+      if (!/^vue-/.test(brut)) { noeud.scrollIntoView(); } else { global.scrollTo(0, 0); }
+      return;
+    }
+    afficher(premiere, remonter);
+  }
+
+  function init() {
+    if (!document.querySelector('#contenu [data-vue]')) { return; }
+    document.documentElement.classList.add('js');
+    publierHauteur();
+    global.addEventListener('resize', publierHauteur);
+    var bandeau = document.querySelector('header.bandeau');
+    if (global.ResizeObserver && bandeau) { new ResizeObserver(publierHauteur).observe(bandeau); }
+    depuisAdresse(false);
+    global.addEventListener('hashchange', function () { depuisAdresse(true); });
+  }
+
+  global.GuideVues = {
+    afficher: afficher,
+    courante: function () { return etat.courante; },
+    vues: lesVues,
+    cleDe: cleDe,
+    surAffichage: function (fn) { if (typeof fn === 'function') { ecouteurs.push(fn); } },
+    // Le contenu vient d'être RÉÉCRIT (recherche) : les câblages d'avant visent des nœuds
+    // détachés. On les oublie, et la vue courante est rendue et recâblée sur le contenu neuf.
+    reappliquer: function () { etat.cablees = {}; if (etat.courante) { afficher(etat.courante, false); } },
+    publierHauteur: publierHauteur
+  };
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})(window);
+</script>
+<!-- COMPOSANT-GABARIT:FIN coquille-vues.js -->
+<!-- COMPOSANT-GABARIT:DEBUT sommaire-chapitres.js — copie de gd-guide-de-reference/composants/sommaire-chapitres.js,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<script data-composant-gabarit="gd-guide-de-reference/sommaire-chapitres.js" data-empreinte="sha256:b1f132a0bba06a7ed290c606bee032ea55b5d38691aa5dee5607fbf5c87a437b">
+/* gd-guide-de-reference · sommaire-chapitres.js — le REPÈRE DE POSITION du menu latéral.
+ *
+ * Contrat de marquage :
+ *   <div class="page">
+ *     <nav class="chapitres" aria-label="Chapitres de cette vue"><p class="toc-titre">Dans cette vue</p><ol>
+ *       <li class="toc-s"><a href="#chapitre-id"><span class="toc-t">Titre</span></a>
+ *         <ol class="toc-n2"><li><a href="#pas-id"><span class="toc-t">Pas</span></a></li></ol></li>
+ *     </ol></nav>
+ *     <main> … <section class="ch" id="chapitre-id"> … <section class="pas-bloc" id="pas-id"> … </main>
+ *   </div>
+ *
+ * Il répond à « où en suis-je dans ce chapitre », ce qu'un sommaire à un seul niveau ne peut pas
+ * dire : le chapitre dont le haut a passé le bandeau devient courant (li.toc-s.actif) et déplie
+ * ses pas ; le pas courant est marqué à son tour. Dans une page à vues (coquille-vues.js), seule
+ * la vue affichée est suivie ; sans coquille, le document entier.
+ *
+ * Un pas rangé DANS une ligne de tableau dépliable (tr[data-detail]) n'a pas d'entrée propre :
+ * sa ligne en a une, et une ligne repliée ou filtrée n'a pas de position — elle ne compte pas.
+ */
+(function (global) {
+  'use strict';
+  function racine() { return document.querySelector('.vue.active') || document; }
+
+  function suivre() {
+    var vue = racine();
+    var menu = vue.querySelector ? vue.querySelector('nav.chapitres') : null;
+    if (!menu) { return; }
+    var seuil = (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hh'), 10) || 128) + 24;
+    var chapitres = [].slice.call(vue.querySelectorAll('section.ch'));
+    var courant = null;
+    chapitres.forEach(function (c) { if (c.getBoundingClientRect().top <= seuil) { courant = c; } });
+    // AU BAS DE LA PAGE, le dernier chapitre ne peut plus monter jusqu'au bandeau : il ne serait
+    // jamais courant, et le lien qui y mène marquerait son voisin (sonde du 24/09/2026 : chapitre
+    // atteint par son adresse, arrêté à 532 px, menu resté sur le précédent). Le dernier chapitre
+    // VISIBLE devient alors le courant.
+    var racineDefil = document.scrollingElement || document.documentElement;
+    if (global.innerHeight + global.scrollY >= racineDefil.scrollHeight - 2) {
+      chapitres.forEach(function (c) { if (c.getBoundingClientRect().top < global.innerHeight) { courant = c; } });
+    }
+    if (!courant && chapitres.length) { courant = chapitres[0]; }
+    [].slice.call(menu.querySelectorAll('li.toc-s')).forEach(function (li) {
+      var a = li.querySelector('a');
+      li.classList.toggle('actif', !!(courant && a && a.getAttribute('href') === '#' + courant.id));
+    });
+    [].slice.call(menu.querySelectorAll('ol.toc-n2 li')).forEach(function (li) { li.classList.remove('actif'); });
+    if (!courant) { return; }
+    var pas = [].slice.call(courant.querySelectorAll('.pas-bloc, tr[data-detail]')).filter(function (b) {
+      return !(b.parentElement && b.parentElement.closest('tr[data-detail]'));
+    });
+    var pasCourant = null;
+    pas.forEach(function (b) {
+      var repere = b.hasAttribute('data-detail') ? b.previousElementSibling : b;
+      if (repere && repere.getClientRects().length && repere.getBoundingClientRect().top <= seuil) { pasCourant = b; }
+    });
+    if (!pasCourant) { return; }
+    var lien = menu.querySelector('ol.toc-n2 a[href="#' + pasCourant.id + '"]');
+    if (lien && lien.parentNode) { lien.parentNode.classList.add('actif'); }
+  }
+
+  function init() {
+    if (!document.querySelector('nav.chapitres')) { return; }
+    document.documentElement.classList.add('js');
+    suivre();
+    global.addEventListener('scroll', suivre, { passive: true });
+    global.addEventListener('resize', suivre);
+    if (global.GuideVues && global.GuideVues.surAffichage) { global.GuideVues.surAffichage(suivre); }
+  }
+  global.GuideSommaire = { suivre: suivre };
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})(window);
+</script>
+<!-- COMPOSANT-GABARIT:FIN sommaire-chapitres.js -->
+<!-- COMPOSANT-GABARIT:DEBUT modale.js — copie de gd-guide-de-reference/composants/modale.js,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<script data-composant-gabarit="gd-guide-de-reference/modale.js" data-empreinte="sha256:153bfd7eb49ae93fdfab34677b32f4b39ae6f125b484f4b39f0ee9f5fe3d864b">
+/* gd-guide-de-reference · modale.js — la FENÊTRE MODALE à onglets, et les FICHES de codes cités.
+ *
+ * Contrat de marquage :
+ *   <button type="button" class="lien-source" data-ouvre-modale="modale-source">docs/SOURCE.md</button>
+ *   <div class="modale" id="modale-source" hidden>
+ *     <div class="modale-fond" data-fermer></div>
+ *     <div class="modale-boite" role="dialog" aria-modal="true" aria-label="…">
+ *       <div class="modale-tete"><p class="modale-titre">…</p>
+ *         <div class="modale-onglets" role="tablist">
+ *           <button type="button" role="tab" id="t-a" data-onglet="a" aria-controls="p-a" aria-selected="true">A</button> …
+ *         </div><button type="button" class="modale-fermer" data-fermer>Fermer</button></div>
+ *       <div class="modale-corps" id="p-a" role="tabpanel" aria-labelledby="t-a" data-panneau="a">…</div> …
+ *     </div>
+ *   </div>
+ * FICHES (facultatif) : un code cité `<a class="code-fiche" href="#…" data-fiche="R07"><code>R07</code></a>`
+ * ouvre la fenêtre `#modale-fiche` remplie depuis le bloc
+ * `<script type="application/json" id="fiches-donnees">{"R07": {"titre": "…", "meta": "…",
+ * "panneaux": [{"nom": "Règle", "html": "…"}]}}` — rendu à la demande : cent fiches rendues d'avance
+ * pèseraient sur le DOM de la page entière.
+ *
+ * Comportement : une seule fenêtre ouverte à la fois ; Échap, le fond, [data-fermer] et tout lien
+ * de navigation interne la ferment ; à l'ouverture le focus va au premier onglet, à la fermeture
+ * il REVIENT au bouton qui l'a ouverte. Écouteurs posés au niveau du DOCUMENT : la recherche
+ * réécrit le contenu à chaque frappe et emporterait tout écouteur posé bouton par bouton.
+ */
+(function (global) {
+  'use strict';
+  var ouvreur = null;
+
+  function modales() { return [].slice.call(document.querySelectorAll('.modale')); }
+  function fermerTout() {
+    var ouverte = modales().some(function (m) { return !m.hidden; });
+    modales().forEach(function (m) { m.hidden = true; });
+    if (ouverte && ouvreur && document.body.contains(ouvreur)) { ouvreur.focus(); }
+    ouvreur = null;
+  }
+  function ouvrir(m, depuis) {
+    if (!m) { return; }
+    modales().forEach(function (x) { x.hidden = true; });
+    ouvreur = depuis || document.activeElement;
+    m.hidden = false;
+    var premier = m.querySelector('.modale-onglets button[aria-selected="true"]')
+      || m.querySelector('.modale-onglets button') || m.querySelector('.modale-fermer');
+    if (premier) { premier.focus(); }
+  }
+  function choisirOnglet(bouton) {
+    var m = bouton.closest('.modale');
+    if (!m) { return; }
+    var voulu = bouton.getAttribute('data-onglet');
+    [].slice.call(m.querySelectorAll('.modale-onglets button')).forEach(function (o) {
+      o.setAttribute('aria-selected', o === bouton ? 'true' : 'false');
+    });
+    [].slice.call(m.querySelectorAll('.modale-corps[data-panneau]')).forEach(function (c) {
+      c.hidden = c.getAttribute('data-panneau') !== voulu;
+    });
+  }
+
+  var donnees = null;
+  function fiches() {
+    if (donnees) { return donnees; }
+    var bloc = document.getElementById('fiches-donnees');
+    try { donnees = bloc ? JSON.parse(bloc.textContent) : {}; } catch (e) { donnees = {}; }
+    return donnees;
+  }
+  function ouvrirFiche(id, depuis) {
+    var f = fiches()[id];
+    var m = document.getElementById('modale-fiche');
+    if (!f || !m) { return false; }
+    m.querySelector('.modale-titre').textContent = f.titre || id;
+    var meta = m.querySelector('.fiche-meta');
+    if (meta) { meta.innerHTML = f.meta || ''; meta.hidden = !f.meta; }
+    var onglets = m.querySelector('.modale-onglets');
+    var panneaux = m.querySelector('.fiche-panneaux');
+    onglets.innerHTML = '';
+    panneaux.innerHTML = '';
+    (f.panneaux || []).forEach(function (p, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.setAttribute('role', 'tab'); b.id = 'fiche-onglet-' + i;
+      b.setAttribute('data-onglet', 'p' + i); b.setAttribute('aria-controls', 'fiche-panneau-' + i);
+      b.setAttribute('aria-selected', i === 0 ? 'true' : 'false'); b.textContent = p.nom;
+      onglets.appendChild(b);
+      var c = document.createElement('div');
+      c.className = 'modale-corps'; c.id = 'fiche-panneau-' + i; c.setAttribute('role', 'tabpanel');
+      c.setAttribute('aria-labelledby', b.id); c.setAttribute('data-panneau', 'p' + i);
+      c.hidden = i !== 0; c.innerHTML = p.html;
+      panneaux.appendChild(c);
+    });
+    onglets.hidden = (f.panneaux || []).length < 2;
+    ouvrir(m, depuis);
+    return true;
+  }
+
+  function init() {
+    if (!document.querySelector('.modale')) { return; }
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t.closest) { return; }
+      var fiche = t.closest('a.code-fiche[data-fiche]');
+      if (fiche) { if (ouvrirFiche(fiche.getAttribute('data-fiche'), fiche)) { e.preventDefault(); } return; }
+      var declencheur = t.closest('[data-ouvre-modale]');
+      if (declencheur) { ouvrir(document.getElementById(declencheur.getAttribute('data-ouvre-modale')), declencheur); return; }
+      var onglet = t.closest('.modale .modale-onglets button[data-onglet]');
+      if (onglet) { choisirOnglet(onglet); return; }
+      if (t.closest('.modale [data-fermer]')) { fermerTout(); return; }
+      var lien = t.closest('.modale a[href^="#"]');
+      if (lien && !lien.classList.contains('code-fiche')) { fermerTout(); }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { fermerTout(); } });
+  }
+  global.GuideModale = { ouvrir: ouvrir, fermer: fermerTout, ouvrirFiche: ouvrirFiche };
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})(window);
+</script>
+<!-- COMPOSANT-GABARIT:FIN modale.js -->
+<!-- COMPOSANT-GABARIT:DEBUT recherche-resultats.js — copie de gd-guide-de-reference/composants/recherche-resultats.js,
+     posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
+<script data-composant-gabarit="gd-guide-de-reference/recherche-resultats.js" data-empreinte="sha256:b7b4eea6d4e100def41e6aeac5eab5bef8a2aeb0b7c37d59a72d325f0a9c8f6d">
+/* gd-guide-de-reference · recherche-resultats.js — la RECHERCHE et le tableau de ses résultats.
+ *
+ * Dépend de find-in-page.js du SOCLE (posé par embarquer-composants.mjs) : ce composant ne
+ * réécrit pas le surlignage, il dit OÙ sont les occurrences.
+ *
+ * Contrat de marquage (le panneau vit HORS de #contenu, que la recherche réécrit à chaque frappe) :
+ *   <div class="barre-recherche"><label for="recherche" hidden>Rechercher</label>
+ *     <input id="recherche" type="search" aria-controls="recherche-resultats" aria-expanded="false">
+ *     <div id="rechercheCompte" class="find-count" aria-live="polite"></div></div>
+ *   <div id="recherche-resultats" class="resultats" role="region" aria-label="Résultats de la recherche" hidden>
+ *     <div class="res-tete"><p class="res-resume" id="res-resume"></p>
+ *       <button type="button" class="res-fermer">Fermer</button></div>
+ *     <div class="res-corps"></div></div>
+ *   <div id="contenu"> … </div>
+ * Ce script se pose APRÈS #contenu : il en prend le relevé BRUT au moment où il s'exécute.
+ *
+ * LE RELEVÉ BRUT, et c'est la correction que ce composant apportait. Jusqu'au socle du 26/09/2026,
+ * find-in-page remettait à chaque frappe le HTML qu'il avait relevé ; relevé APRÈS le câblage des
+ * autres composants, il remettait des filtres de tableau DESSINÉS mais SANS écouteurs — mesuré le
+ * 23/09/2026 sur le document source : panneau de filtre ouvert au clic 1, puis 0 après une recherche
+ * effacée. Ici le relevé est pris AVANT tout câblage (mode `getHTML` du socle), et chaque frappe se
+ * termine par un recâblage de la vue courante. Depuis le socle du 26/09 (TF-1340), find-in-page ne
+ * réécrit plus le conteneur et ignore `getHTML` : le relevé ne sert plus qu'avec un socle antérieur,
+ * et le recâblage retrouve les composants déjà posés. Ce que la recherche coûte avec un socle
+ * antérieur, et c'est dit : l'état d'un filtre posé avant la frappe est perdu.
+ *
+ * Comportement : une ligne par occurrence (200 au plus, et le résumé le dit) — la vue, le
+ * chapitre, un extrait de 70 caractères de part et d'autre coupé entre deux mots ; un clic ouvre
+ * la vue, déplie la ligne de tableau qui porte l'occurrence et l'amène au milieu de l'écran,
+ * cerclée. Le texte s'écrit par nœuds de texte, jamais par innerHTML : rien de la page n'est
+ * réinterprété. Échap ferme le panneau (un second Échap vide le champ, comportement natif) ;
+ * Flèche bas entre dans les résultats. Événement émis après chaque frappe : `guide:recherche`.
+ */
+(function (global) {
+  'use strict';
+  var contenu = document.getElementById('contenu');
+  var brut = contenu ? contenu.innerHTML : '';
+  var MAX_RESULTATS = 200, BORD_EXTRAIT = 70;
+  var BLOCS = 'p, li, td, th, dd, dt, pre, h2, h3, h4, figcaption, caption, blockquote, summary, label, text, title';
+  var marques = [];
+
+  function net(t) { return (t || '').replace(/\s+/g, ' '); }
+  function cleDe(v) { return v ? v.getAttribute('data-vue') : ''; }
+
+  function recabler() {
+    if (global.GuideVues && global.GuideVues.reappliquer) { global.GuideVues.reappliquer(); return; }
+    if (!contenu) { return; }
+    if (global.DigitAITableDetail && global.DigitAITableDetail.initAll) { global.DigitAITableDetail.initAll(contenu); }
+    if (global.DigitAITableFilters && global.DigitAITableFilters.initAll) { global.DigitAITableFilters.initAll(contenu); }
+  }
+
+  function basculerLigne(btn, ouvrir) {
+    var det = document.getElementById(btn.getAttribute('aria-controls') || '');
+    if (!det || !det.hasAttribute('data-detail')) { return; }
+    var etat = typeof ouvrir === 'boolean' ? ouvrir : btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', etat ? 'true' : 'false');
+    det.hidden = !etat;
+    var mere = btn.closest('tr');
+    if (mere) { mere.classList.toggle('td-ouverte', etat); }
+  }
+
+  function reparerSchemas() {
+    if (!contenu) { return; }
+    [].slice.call(contenu.querySelectorAll('svg mark.find-hit')).forEach(function (mk) {
+      var ts = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      ts.setAttribute('class', 'find-hit');
+      ts.textContent = mk.textContent;
+      mk.parentNode.replaceChild(ts, mk);
+    });
+  }
+
+  function libelles() {
+    var l = {};
+    [].slice.call(document.querySelectorAll('nav.vues a[href^="#vue-"]')).forEach(function (a) {
+      l[(a.getAttribute('href') || '').replace('#vue-', '')] = a.textContent.trim();
+    });
+    return l;
+  }
+  function ouSeTrouve(mk) {
+    if (mk.closest('nav.chapitres')) { return 'sommaire de la vue'; }
+    if (mk.closest('nav.toc')) { return 'sommaire du document'; }
+    if (mk.closest('nav.pagination')) { return 'vue précédente ou suivante'; }
+    if (mk.closest('.meta')) { return 'repères de la vue'; }
+    var ch = mk.closest('section.ch');
+    var h3 = ch ? ch.querySelector('.ch-titres h3') : null;
+    if (!h3) { return 'ouverture de la vue'; }
+    var t = net(h3.textContent).trim();
+    return t.length > 90 ? t.slice(0, 88).replace(/\s\S*$/, '') + ' …' : t;
+  }
+  function extrait(mk) {
+    var bloc = mk.closest(BLOCS) || mk.parentNode;
+    var r = document.createRange();
+    r.setStart(bloc, 0); r.setEndBefore(mk);
+    var avant = net(r.toString()).replace(/^\s+/, '');
+    r.setStartAfter(mk); r.setEnd(bloc, bloc.childNodes.length);
+    var apres = net(r.toString()).replace(/\s+$/, '');
+    if (avant.length > BORD_EXTRAIT) { avant = '… ' + avant.slice(-BORD_EXTRAIT).replace(/^\S*\s/, ''); }
+    if (apres.length > BORD_EXTRAIT) { apres = apres.slice(0, BORD_EXTRAIT).replace(/\s\S*$/, '') + ' …'; }
+    return [avant, mk.textContent, apres];
+  }
+
+  function init() {
+    var champ = document.getElementById('recherche');
+    var compte = document.getElementById('rechercheCompte');
+    var panneau = document.getElementById('recherche-resultats');
+    if (!champ || !contenu || !global.DigitAIFindInPage || !global.DigitAIFindInPage.init) { return; }
+    global.DigitAIFindInPage.init(champ, contenu, compte, function () { return brut; });
+
+    function placer() {
+      var barre = document.querySelector('.barre-recherche');
+      if (panneau && barre) { panneau.style.setProperty('--res-haut', Math.round(barre.getBoundingClientRect().bottom + 20) + 'px'); }
+    }
+    function ouvrirPanneau() {
+      if (!panneau || !marques.length) { return; }
+      placer(); panneau.hidden = false; champ.setAttribute('aria-expanded', 'true');
+    }
+    function fermerPanneau() {
+      if (!panneau) { return; }
+      panneau.hidden = true; champ.setAttribute('aria-expanded', 'false');
+    }
+    var focusRendu = false;
+    function rendreFocus() { focusRendu = true; champ.focus(); focusRendu = false; }
+
+    function lister() {
+      if (!panneau) { return; }
+      var corps = panneau.querySelector('.res-corps');
+      var resume = panneau.querySelector('.res-resume');
+      marques = champ.value.trim() ? [].slice.call(contenu.querySelectorAll('mark.find-hit, tspan.find-hit')) : [];
+      corps.textContent = '';
+      if (!marques.length) { resume.textContent = ''; fermerPanneau(); return; }
+      var noms = libelles(), touchees = {}, nbVues = 0;
+      marques.forEach(function (mk) {
+        var cle = cleDe(mk.closest('[data-vue]'));
+        if (!touchees[cle]) { touchees[cle] = true; nbVues++; }
+      });
+      var n = marques.length;
+      resume.textContent = n + (n > 1 ? ' occurrences' : ' occurrence') + ' dans ' + nbVues
+        + (nbVues > 1 ? ' vues' : ' vue')
+        + (n > MAX_RESULTATS ? ' — les ' + MAX_RESULTATS + ' premières sont listées : précisez la recherche' : '');
+      var table = document.createElement('table');
+      table.className = 'res-table';
+      table.setAttribute('data-filterable', 'off');
+      table.setAttribute('data-filterable-reason', 'résultats d\'une recherche, déjà filtrés par la saisie');
+      table.setAttribute('aria-describedby', 'res-resume');
+      table.innerHTML = '<colgroup><col class="res-c1"><col class="res-c2"></colgroup>'
+        + '<thead><tr><th scope="col">Vue</th><th scope="col">Extrait</th></tr></thead>';
+      var tbody = document.createElement('tbody');
+      marques.slice(0, MAX_RESULTATS).forEach(function (mk, k) {
+        var cle = cleDe(mk.closest('[data-vue]'));
+        var tr = document.createElement('tr');
+        tr.setAttribute('data-occ', String(k));
+        var td1 = document.createElement('td');
+        var a = document.createElement('a');
+        a.href = cle ? '#vue-' + cle : '#contenu';
+        a.className = 'res-aller';
+        a.setAttribute('data-occ', String(k));
+        a.textContent = noms[cle] || cle || 'Document';
+        var ch = document.createElement('span');
+        ch.className = 'res-ch';
+        ch.textContent = ouSeTrouve(mk);
+        td1.appendChild(a); td1.appendChild(ch);
+        var td2 = document.createElement('td');
+        td2.className = 'res-extrait';
+        var e = extrait(mk);
+        td2.appendChild(document.createTextNode(e[0]));
+        var m = document.createElement('mark'); m.textContent = e[1]; td2.appendChild(m);
+        td2.appendChild(document.createTextNode(e[2]));
+        tr.appendChild(td1); tr.appendChild(td2);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      corps.appendChild(table);
+      ouvrirPanneau();
+    }
+
+    function allerA(k) {
+      var mk = marques[k];
+      if (!mk || !document.body.contains(mk)) { return; }
+      var vue = mk.closest('[data-vue]');
+      if (vue && global.GuideVues) {
+        var cle = cleDe(vue);
+        if (!vue.classList.contains('active')) { global.GuideVues.afficher(cle, false); }
+        if (location.hash !== '#vue-' + cle && history.pushState) { history.pushState(null, '', '#vue-' + cle); }
+      }
+      var det = mk.closest('tr[data-detail][hidden]');
+      if (det) {
+        var btn = document.querySelector('button.td-btn[aria-controls="' + det.id + '"]');
+        if (btn) { basculerLigne(btn, true); }
+      }
+      [].slice.call(contenu.querySelectorAll('.find-hit.courant')).forEach(function (x) { x.classList.remove('courant'); });
+      mk.classList.add('courant');
+      fermerPanneau();
+      var cible = mk;
+      while (cible && cible.getClientRects && !cible.getClientRects().length) { cible = cible.parentElement; }
+      if (cible && cible.scrollIntoView) { cible.scrollIntoView({ block: 'center' }); }
+    }
+
+    // Posé APRÈS celui de find-in-page : il passe donc après le surlignage et après la
+    // réécriture du contenu, qu'il répare.
+    champ.addEventListener('input', function () {
+      recabler();
+      [].slice.call(contenu.querySelectorAll('tr[data-detail][hidden]')).forEach(function (det) {
+        if (!det.querySelector('mark.find-hit')) { return; }
+        var btn = document.querySelector('button.td-btn[aria-controls="' + det.id + '"]');
+        if (btn) { basculerLigne(btn, true); }
+      });
+      reparerSchemas();
+      document.dispatchEvent(new CustomEvent('guide:recherche', { detail: { terme: champ.value } }));
+      lister();
+    });
+    global.addEventListener('resize', placer);
+    if (panneau) {
+      panneau.addEventListener('click', function (e) {
+        if (e.target.closest('.res-fermer')) { fermerPanneau(); rendreFocus(); return; }
+        var ligne = e.target.closest('[data-occ]');
+        if (!ligne) { return; }
+        e.preventDefault();
+        allerA(parseInt(ligne.getAttribute('data-occ'), 10));
+      });
+      panneau.addEventListener('keydown', function (e) { if (e.key === 'Escape') { fermerPanneau(); rendreFocus(); } });
+      document.addEventListener('click', function (e) {
+        if (panneau.hidden) { return; }
+        if (panneau.contains(e.target) || (e.target.closest && e.target.closest('.barre-recherche'))) { return; }
+        fermerPanneau();
+      });
+    }
+    // Le focus seul ne suffit pas : après Échap, le champ garde le focus, et le cliquer ne
+    // rouvrait rien (sonde du 24/09/2026).
+    champ.addEventListener('focus', function () { if (!focusRendu) { ouvrirPanneau(); } });
+    champ.addEventListener('click', ouvrirPanneau);
+    champ.addEventListener('keydown', function (e) {
+      if (!panneau || panneau.hidden) { return; }
+      if (e.key === 'Escape') { e.preventDefault(); fermerPanneau(); }
+      if (e.key === 'ArrowDown') {
+        var premier = panneau.querySelector('a.res-aller');
+        if (premier) { e.preventDefault(); premier.focus(); }
+      }
+    });
+  }
+
+  // Relais des chevrons de lignes dépliables : un chevron que le composant du socle n'a pas
+  // câblé — ou plus — se bascule quand même. Posé sur le DOCUMENT, il survit aux réécritures.
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('button.td-btn[aria-controls]') : null;
+    if (btn && !btn.__tdCable) { basculerLigne(btn); }
+  });
+
+  global.GuideRecherche = {
+    // Une page qui change LÉGITIMEMENT son contenu après le chargement donne le nouveau relevé.
+    definirReleve: function (html) { brut = String(html); }
+  };
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})(window);
+</script>
+<!-- COMPOSANT-GABARIT:FIN recherche-resultats.js -->
+<!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js — copie du socle digit-ai-page-html/assets/find-in-page.js,
+     posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
+     La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
+<script data-composant="find-in-page.js" data-empreinte="sha256:c12d95c744a55817895314f71685d960ff1da00adfedbaf7ce4de305ea3956c6">
+/* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
+ *
+ * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
+ * un compteur d'occurrences mis à jour à chaque frappe. Insensible aux accents.
+ *
+ * ⚠️ La classe du surlignage est `find-hit`, JAMAIS `find`. `find` est le nom que prend
+ * naturellement le conteneur du champ de recherche dans un livrable ; quand les deux
+ * partagent la classe, une règle `.find { display: flex }` écrite pour le conteneur
+ * s'applique aussi au <mark> et casse le mot surligné (défaut mesuré en production :
+ * le « s » de « clics » rejeté à 606 px du mot). Les trois classes du composant sont
+ * disjointes : `find-hit` (surlignage), `find-count` (compteur), et ce que le livrable
+ * veut pour son conteneur.
+ *
+ * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
+ * vise aussi le PDF, prévoir un équivalent statique de l'information.
+ *
+ * ⚠️ LE CONTENEUR N'EST JAMAIS RÉÉCRIT (TF-1340, 23/09/2026). La recherche réaffectait
+ * `container.innerHTML` à chaque frappe : les attributs survivaient, les écouteurs posés par
+ * les autres composants du socle (table-filters.js, table-detail.js, infobulle.js) non. Mesuré
+ * au navigateur : après une recherche puis son effacement, un bouton de filtre n'ouvrait plus
+ * son panneau (0 au lieu de 1). Le surlignage ENVELOPPE désormais les nœuds texte trouvés, et
+ * la frappe suivante les DÉSENVELOPPE : aucun élément du conteneur n'est remplacé. `getHTML`
+ * et `refresh()` ne sont plus nécessaires (la recherche lit le contenu vivant) ; ils restent
+ * acceptés, sans effet, pour les pages déjà câblées.
+ *
+ * ⚠️ DANS UN SCHÉMA SVG, LE SURLIGNAGE EST UN <tspan> (TF-1353, 24/09/2026). SVG ne peint pas
+ * un <mark> HTML : le mot trouvé DISPARAISSAIT du schéma pendant la recherche (mesuré le 24/09
+ * dans Chromium : getNumberOfChars() de 93 à 87 ; rejoué sur la fixture du banc : de 74 à 67).
+ * Un nœud texte dont le parent est dans l'espace de noms SVG reçoit un <tspan class="find-hit"> ;
+ * le HTML d'un <foreignObject> garde son <mark>.
+ *
+ * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
+ * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
+ * fermerait la balise hôte au milieu du fichier : composant tronqué, silencieusement).
+ * TF-1062 (11/09) : ce commentaire l'écrivait lui-même EN CLAIR. Une copie inlinée à la main
+ * était coupée ici, et le câblage ci-dessous devenait du vrai DOM — trois identifiants
+ * dupliqués, que oracle-a11y a comptés à juste titre. Cette explication ne cite plus la
+ * séquence ; self_test.py vérifie qu'aucun asset inlinable ne la porte :
+ *   <input id="find" type="text" placeholder="Rechercher…">
+ *   <div id="findCount" class="find-count" aria-live="polite"></div>
+ *   <div id="content"> … contenu à fouiller … </div>
+ *   <script src="find-in-page.js"><\/script>
+ *   <script>
+ *     DigitAIFindInPage.init(
+ *       document.getElementById('find'),
+ *       document.getElementById('content'),
+ *       document.getElementById('findCount')
+ *     );
+ *   <\/script>
+ *
+ * CSS attendu (à adapter aux tokens du livrable) :
+ *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
+ *   tspan.find-hit { fill: #9a3412; text-decoration: underline; }   (texte d'un schéma SVG)
+ *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
+ *   .find-count.zero { color: #c0392b; }
+ */
+(function (global) {
+  'use strict';
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  // Regex insensible aux accents et à la casse à partir d'une saisie libre.
+  function buildRegex(q) {
+    q = (q || '').trim();
+    if (!q) return null;
+    var map = { a: 'aàâäá', e: 'eéèêëế', i: 'iîïí', o: 'oôöó', u: 'uùûüú', c: 'cç', n: 'nñ', y: 'yÿ' };
+    var pat = '';
+    for (var i = 0; i < q.length; i++) {
+      var ch = q[i], low = ch.toLowerCase();
+      if (map[low]) pat += '[' + map[low] + map[low].toUpperCase() + ']';
+      else if (/[a-z0-9]/i.test(ch)) pat += ch;
+      else pat += '\\' + ch; // échappe les caractères spéciaux regex
+    }
+    try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
+  }
+
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences. Enveloppe les
+  // nœuds texte trouvés, sans remplacer aucun élément (TF-1340) ; dans un texte SVG, l'enveloppe
+  // est un <tspan>, que SVG peint, et non un <mark>, qu'il ignore (TF-1353). Les noms d'éléments
+  // se comparent sans casse : le <style> et le <script> d'un SVG s'écrivent en minuscules.
+  function highlight(root, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n, count = 0;
+    while ((n = walker.nextNode())) nodes.push(n);
+    for (var k = 0; k < nodes.length; k++) {
+      var tn = nodes[k], parent = tn.parentNode;
+      if (!parent || /^(MARK|SCRIPT|STYLE)$/i.test(parent.nodeName)
+          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) continue;
+      var txt = tn.nodeValue; re.lastIndex = 0;
+      if (!re.test(txt)) continue; re.lastIndex = 0;
+      var svg = parent.namespaceURI === SVG_NS;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
+        mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        count++;
+        last = m.index + m[0].length;
+        if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
+      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      parent.replaceChild(frag, tn);
+    }
+    return count;
+  }
+
+  // Retire le surlignage : chaque enveloppe redevient son texte, et les textes voisins se
+  // RECOLLENT (normalize) — sans quoi un terme à cheval sur une ancienne coupure ne serait plus
+  // trouvé à la frappe suivante. Seuls les nœuds texte bougent : les éléments, et les écouteurs
+  // que d'autres composants y ont posés, restent en place (TF-1340).
+  function unhighlight(root) {
+    var hits = root.querySelectorAll('mark.find-hit, tspan.find-hit');
+    var parents = [];
+    for (var i = 0; i < hits.length; i++) {
+      var h = hits[i], p = h.parentNode;
+      if (!p) continue;
+      p.replaceChild(document.createTextNode(h.textContent), h);
+      if (parents.indexOf(p) === -1) parents.push(p);
+    }
+    for (var j = 0; j < parents.length; j++) parents[j].normalize();
+  }
+
+  /* Branche la recherche live sur un champ.
+   * input, container, counter : éléments DOM (counter optionnel).
+   * getHTML (optionnel) : n'est plus nécessaire depuis TF-1340 — la recherche lit le contenu
+   *   VIVANT du conteneur, qui n'est jamais réécrit. Accepté, sans effet, pour les pages câblées.
+   * Retourne { run, refresh } : run() relance la recherche ; refresh() est conservé, sans
+   *   effet (il n'y a plus de HTML capturé à rafraîchir). */
+  function init(input, container, counter, getHTML) {
+    if (!input || !container) return null;
+    function run() {
+      unhighlight(container);
+      var re = buildRegex(input.value);
+      if (!re) {
+        if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
+        return;
+      }
+      var nb = highlight(container, re);
+      if (counter) {
+        counter.textContent = nb === 0 ? 'Aucune occurrence' : (nb + ' occurrence' + (nb > 1 ? 's' : ''));
+        counter.classList.toggle('zero', nb === 0);
+      }
+    }
+    input.addEventListener('input', run);
+    return {
+      run: run,
+      refresh: function () {}
+    };
+  }
+
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight,
+                               unhighlight: unhighlight };
+})(window);
+</script>
+<!-- COMPOSANT-EMBARQUE:FIN find-in-page.js -->
+<!-- COMPOSANT-EMBARQUE:DEBUT table-filters.js — copie du socle digit-ai-page-html/assets/table-filters.js,
+     posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
+     La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
+<script data-composant="table-filters.js" data-empreinte="sha256:9af4ae15d11d04634690232aa93e99aa8ab8c68545144f65f3386404a9cbacf9">
+/* Digit-AI — Filtres de colonne sur tableaux de données.
+   Socle commun : voir references/composant-filtres-tableau.md (checklist G1-G9).
+   Viewer-only : le JS ne s'exécute pas à l'export WeasyPrint, la regle @media print
+   du livrable doit reafficher tr[data-tf-hidden].
+   Lot Produit-05 20260820b (TF-0429/0430/0431, 21/08) : rappel apresFiltrage et instance
+   enveloppable, etat vide avec « tout reafficher », panneau qui choisit son cote et
+   neutralise le rognage de son conteneur defilant tant qu'il est ouvert.
+
+   Lot Produit-02 20260902b/d (TF-0768/0769/0781/0782, 02/09) — L'ORDRE ET L'EXISTENCE.
+   Quatre defauts d'une meme famille : le composant lisait le TEXTE RENDU la ou il fallait lire
+   une VALEUR, et decidait de l'existence d'une facette la ou il ne devait decider que de sa
+   forme. Une console de donnees livree a du rearmer son propre tri et relire ses cases dans le
+   DOM pour compenser :
+     · TF-0768 — `parseFloat` sur « 1 000 » vaut 1 : les separateurs de milliers fr-FR (espace,
+       insecable, insecable etroite) arretent l'analyse au premier caractere non chiffre, et
+       TOUTE page en francais triait faux, en silence. Le tri et l'ordre des facettes lisent
+       desormais `data-v` / `data-sort` quand la cellule en porte, sinon le nombre se lit APRES
+       retrait des espaces et des signes.
+     · TF-0781 — `Object.keys(valeurs).sort()` rangeait les mois par ordre alphabetique
+       (« aout 2025, avr. 2026, dec. 2025 »). Une facette s'ordonne sur sa CLE, donc
+       chronologiquement des que la cellule porte un `data-v` ISO.
+     · TF-0782 — l'heuristique `1 < n < lignes` privait de facette la colonne CLE (huit marches
+       distincts sur huit lignes : aucun filtre la ou le lecteur en attendait un). La
+       cardinalite decide desormais de la FORME du panneau, jamais de son EXISTENCE ; la seule
+       sortie est une exemption DECLAREE (`data-filter-col="off"` + `data-filter-reason`).
+     · TF-0769 — `data-tf-ready` bloquait tout second `init` en rendant `null`, et la selection
+       vivait dans une fermeture inaccessible : une page qui re-rend ses tableaux perdait ses
+       filtres et devait les relire dans le DOM. L'etat est desormais LISIBLE et REJOUABLE —
+       `api.etat()`, `init(table, { etat })`, `api.rafraichir()`. */
+(function (root) {
+  'use strict';
+
+  /* ARBITRAGE PARTAGE DE LA VISIBILITE (TF-0953, 08/09/2026) — optionnel, jamais obligatoire :
+     un composant du socle ne cesse pas de fonctionner parce qu'un autre fichier manque. */
+  function arbitrage() { return root.DigitAIRowVisibility || null; }
+
+  var SEUIL_LIGNES = 8;
+  /* Au-dela de ce nombre de valeurs distinctes, la liste de cases n'est plus parcourable a
+     l'oeil : le panneau s'ouvre SUR SA RECHERCHE et le dit. C'est la FORME qui change — la
+     facette, elle, existe toujours (TF-0782). */
+  var SEUIL_RECHERCHE = 15;
+  var LIBELLE_VIDE = 'Aucune ligne ne correspond aux filtres.';
+  var LIBELLE_TOUT = 'Tout réafficher';
+
+  /* Les espaces qui separent les milliers en fr-FR : espace, insecable (U+00A0), insecable
+     etroite (U+202F), fine (U+2009), figure (U+2007). parseFloat s'arrete au premier. */
+  var RE_ESPACES = /\s/g;   /* \s couvre l'insecable U+00A0 et l'insecable etroite U+202F */
+  var RE_SIGNES = /[%€$£]/g;
+  var RE_NOMBRE = /^[+-]?\d+(?:[.,]\d+)?$/;
+
+  function norm(s) {
+    return String(s == null ? '' : s)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  }
+
+  /* TF-0768 : un nombre affiche a un habillage (milliers, unite, pourcentage). On le retire
+     AVANT l'analyse, et on n'accepte que ce qui est ENTIEREMENT numerique — « 12 mars » n'est
+     pas 12, et le laisser passer trierait une colonne de dates comme une colonne de nombres. */
+  function nombre(v) {
+    var s = String(v == null ? '' : v).replace(RE_ESPACES, '').replace(RE_SIGNES, '');
+    if (s.indexOf(',') !== -1 && s.indexOf('.') === -1) s = s.replace(',', '.');
+    return RE_NOMBRE.test(s) ? parseFloat(s) : NaN;
+  }
+
+  function corps(table) {
+    var tb = table.tBodies && table.tBodies[0];
+    /* TF-0175 : une ligne [data-detail] est le DÉPLIANT pleine largeur de la ligne qui la
+       précède — elle ne porte pas de données de colonnes et ne compte ni ne se filtre.
+       TF-0430 : la ligne d'état vide [data-tf-empty] est un message du composant, pas une donnée. */
+    return tb ? Array.prototype.slice.call(tb.rows).filter(function (tr) {
+      return !tr.hasAttribute('data-detail') && !tr.hasAttribute('data-tf-empty');
+    }) : [];
+  }
+
+  /* Le LIBELLE d'une cellule : ce que le lecteur voit, et ce qu'il coche. */
+  function valeur(tr, i) {
+    var td = tr.cells[i];
+    return td ? td.textContent.trim() : '';
+  }
+
+  /* La CLE D'ORDRE d'une cellule (TF-0768/0781) : `data-v`, sinon `data-sort`, sinon le texte
+     rendu. C'est la seule facon de dire « aout 2025 se range avant avr. 2026 » — un libelle de
+     mois n'a aucun ordre lisible, et une valeur formatee n'a pas d'ordre numerique. */
+  function cle(tr, i) {
+    var td = tr.cells[i];
+    if (!td) return '';
+    var d = td.getAttribute('data-v');
+    if (d === null) d = td.getAttribute('data-sort');
+    return d === null ? td.textContent.trim() : String(d).trim();
+  }
+
+  /* Comparateur unique du composant — tri de lignes ET ordre des valeurs de facette.
+     Deux nombres se comparent en nombres ; une date ISO (`2025-08`, `2025-08-14`) se compare en
+     texte, ce qui EST son ordre chronologique ; le vide passe en fin de liste. */
+  function comparer(a, b) {
+    var na = nombre(a), nb = nombre(b);
+    if (!isNaN(na) && !isNaN(nb)) return na < nb ? -1 : (na > nb ? 1 : 0);
+    if (a === '') return b === '' ? 0 : 1;
+    if (b === '') return -1;
+    var xa = norm(a), xb = norm(b);
+    return xa < xb ? -1 : (xa > xb ? 1 : 0);
+  }
+
+  function nbColonnes(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var n = 0;
+    ths.forEach(function (th) { n += th.colSpan || 1; });
+    if (!n) { var l = corps(table)[0]; n = l ? l.cells.length : 1; }
+    return n;
+  }
+
+  /* TF-0782 — CHAQUE en-tete recoit sa facette. L'heuristique de cardinalite ne decide plus que
+     de la FORME du panneau (`liste`, `recherche` quand les valeurs sont trop nombreuses pour
+     etre parcourues, `unique` quand la colonne n'en porte qu'une). La seule sortie est une
+     exemption DECLAREE sur le `<th>` : `data-filter-col="off"` + `data-filter-reason="…"`.
+     Sans motif, l'exemption est rendue au journal (`api.exemptions`) et l'oracle la refuse. */
+  function colonnes(table, lignes) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var cols = [], exemptions = [];
+    ths.forEach(function (th, i) {
+      /* L'INTITULE SE FIGE AU PREMIER PASSAGE (TF-0769). Apres `init`, le `<th>` contient le
+         declencheur ET le panneau : son `textContent` vaut alors « Statut›TousAucun livre en
+         cours… ». Relire l'intitule apres coup donnait une AUTRE cle de colonne, et la
+         selection conservee se retrouvait rangee sous un nom que plus personne ne demandait —
+         le rafraichissement perdait les filtres qu'il devait sauver. `data-col` rend
+         l'identite de la colonne stable, et lisible par un oracle. */
+      var libelle = (th.getAttribute('data-col') || th.textContent || '').trim();
+      if (!th.hasAttribute('data-col')) th.setAttribute('data-col', libelle);
+      if (th.getAttribute('data-filter-col') === 'off') {
+        exemptions.push({ colonne: libelle, index: i,
+                          motif: (th.getAttribute('data-filter-reason') || '').trim() });
+        return;
+      }
+      var ordres = {}, n = 0;
+      lignes.forEach(function (tr) {
+        var v = valeur(tr, i);
+        if (!(v in ordres)) { ordres[v] = cle(tr, i); n++; }
+      });
+      var valeurs = Object.keys(ordres).sort(function (x, y) {
+        return comparer(ordres[x], ordres[y]);
+      });
+      var forme = n <= 1 ? 'unique' : (n > SEUIL_RECHERCHE ? 'recherche' : 'liste');
+      cols.push({ th: th, index: i, libelle: libelle, valeurs: valeurs,
+                  ordres: ordres, forme: forme });
+    });
+    return { cols: cols, exemptions: exemptions };
+  }
+
+  function bouton(col, id) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tf-btn';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', id);
+    b.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    b.textContent = '›';               /* chevron simple (TF-0435) : present dans toute pile de repli */
+    return b;
+  }
+
+  function panneau(col, id) {
+    var p = document.createElement('div');
+    p.className = 'tf-panel';
+    p.id = id;
+    p.hidden = true;
+    p.setAttribute('role', 'group');
+    p.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    /* La forme est LISIBLE dans le marquage : un oracle de rendu et un test d'interactions
+       peuvent dire laquelle a ete choisie, et pourquoi (TF-0782). */
+    p.setAttribute('data-tf-forme', col.forme);
+
+    var rech = document.createElement('input');
+    rech.type = 'search';
+    rech.className = 'tf-search';
+    rech.placeholder = 'Rechercher…';
+    rech.setAttribute('aria-label', 'Rechercher une valeur');
+
+    var actions = document.createElement('div');
+    actions.className = 'tf-actions';
+    var tous = document.createElement('button');
+    tous.type = 'button'; tous.className = 'tf-all'; tous.textContent = 'Tous';
+    var aucun = document.createElement('button');
+    aucun.type = 'button'; aucun.className = 'tf-none'; aucun.textContent = 'Aucun';
+    actions.appendChild(tous); actions.appendChild(aucun);
+
+    var opts = document.createElement('div');
+    opts.className = 'tf-opts';
+    col.valeurs.forEach(function (v) {
+      var lab = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'tf-opt';
+      cb.value = v;
+      cb.checked = true;                    /* etat initial : tout coche, aucun filtre actif */
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' ' + (v === '' ? '(vide)' : v)));
+      opts.appendChild(lab);
+    });
+
+    p.appendChild(rech); p.appendChild(actions); p.appendChild(opts);
+    /* Une forme qui change sans le dire est une affordance muette (loi n° 3) : le panneau
+       ANNONCE pourquoi il s'ouvre sur sa recherche, ou pourquoi il n'offre qu'une valeur. */
+    if (col.forme !== 'liste') {
+      var note = document.createElement('p');
+      note.className = 'tf-forme-note';
+      note.textContent = col.forme === 'recherche'
+        ? col.valeurs.length + ' valeurs distinctes — chercher puis « Tous ».'
+        : 'Une seule valeur dans cette colonne.';
+      p.insertBefore(note, opts);
+    }
+    return { panneau: p, recherche: rech, tous: tous, aucun: aucun, options: opts };
+  }
+
+  /* TF-0431 : le conteneur defilant le plus proche (overflow-x auto|scroll) rogne un panneau
+     absolu et gagne un ascenseur horizontal des qu'il s'ouvre. Tant qu'un panneau est ouvert,
+     son rognage est neutralise ; a la fermeture, l'etat inline d'origine est retabli. */
+  function conteneurDefilant(el) {
+    var p = el.parentElement;
+    while (p && p !== document.body) {
+      var o = getComputedStyle(p).overflowX;
+      if (o === 'auto' || o === 'scroll') return p;
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  /* RA-5 (14/08, revu TF-0768/0782 le 02/09) : le tri est ARME PAR DEFAUT — la règle L4 exige
+     « filtre, tri et recherche », et une page qui arme le sien le declare (`{ tri: false }` ou
+     `data-tf-tri="off"` sur la table). La cle de tri est celle de `cle()` : `data-v`/`data-sort`
+     d'abord, sinon le texte, lu comme un nombre APRES retrait des espaces de milliers. Les clics
+     sur .tf-btn/.tf-panel sont ignores, les lignes [data-detail] voyagent avec leur ligne mere.
+     Rend une fonction de DESARMEMENT : sans elle, un second init empilerait ses ecouteurs. */
+  function armerTri(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    corps(table).forEach(function (tr) {
+      var d = tr.nextElementSibling;
+      tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : null;
+    });
+    var poses = [];
+    ths.forEach(function (th, i) {
+      if (th.getAttribute('data-sort-col') === 'off') return;
+      if (!th.style.cursor) th.style.cursor = 'pointer';
+      var handler = function (ev) {
+        if (ev.target.closest && ev.target.closest('.tf-btn, .tf-panel')) return;
+        var sens = th.getAttribute('aria-sort') === 'ascending' ? -1 : 1;
+        ths.forEach(function (t) {
+          t.removeAttribute('aria-sort');
+          var m = t.querySelector('.tf-tri'); if (m) m.remove();
+        });
+        th.setAttribute('aria-sort', sens === 1 ? 'ascending' : 'descending');
+        var marque = document.createElement('span');
+        marque.className = 'tf-tri';
+        marque.textContent = sens === 1 ? ' ↑' : ' ↓';
+        th.appendChild(marque);
+        var tb = table.tBodies[0];
+        var tris = corps(table).slice();
+        tris.forEach(function (tr) {
+          var d = tr.nextElementSibling;
+          tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : tr.__tfDetail;
+        });
+        tris.sort(function (a, b) { return comparer(cle(a, i), cle(b, i)) * sens; });
+        tris.forEach(function (tr) {
+          tb.appendChild(tr);
+          if (tr.__tfDetail) tb.appendChild(tr.__tfDetail);
+        });
+      };
+      th.addEventListener('click', handler);
+      poses.push({ th: th, handler: handler });
+    });
+    return function desarmer() {
+      poses.forEach(function (p) {
+        p.th.removeEventListener('click', p.handler);
+        var m = p.th.querySelector('.tf-tri'); if (m) m.remove();
+        p.th.removeAttribute('aria-sort');
+      });
+    };
+  }
+
+  /* init(table, opts) — opts.tri (bool, defaut VRAI) · opts.etat (etat rendu par api.etat())
+     · opts.reinit (bool) · opts.apresFiltrage(table, visibles, total) : rappel appele a la fin
+     de CHAQUE filtrage, y compris ceux declenches par les cases, Tous/Aucun et la recherche
+     (TF-0429 : avant, seul l'appel manuel a instance.appliquer etait observable, envelopper
+     l'instance etait silencieusement sans effet). Les gestionnaires internes passent par
+     api.appliquer : remplacer instance.appliquer est desormais honore.
+
+     TF-0769 — un second appel n'est plus un NON-EVENEMENT : sans `etat` ni `reinit`, il rend
+     l'instance deja construite (l'appelant peut donc la piloter sans l'avoir gardee) ; avec, il
+     detruit l'ancienne et reconstruit. */
+  function init(table, opts) {
+    opts = opts || {};
+    if (!table) return null;
+    if (table.getAttribute('data-filterable') === 'off') return null;
+    if (table.getAttribute('data-tf-ready') === '1') {
+      var deja = table.__tfApi || null;
+      if (!opts.etat && !opts.reinit) return deja;
+      if (deja && deja.detruire) deja.detruire();
+    }
+
+    /* DECLARER SON ATTRIBUT a l'arbitrage partage, jamais deviner ceux des autres. */
+    var V = arbitrage();
+    if (V) { V.register('data-tf-hidden'); }
+
+    var lignes = corps(table);
+    var scan = colonnes(table, lignes);
+    var cols = scan.cols;
+    if (!cols.length) return null;
+
+    var id = table.id || ('tf-' + Math.random().toString(36).slice(2, 8));
+    table.id = id;
+    var compteur = document.querySelector('[data-tf-count-for="' + id + '"]');
+    var etats = [];
+    var api = {};
+    var defilant = conteneurDefilant(table);
+    var overflowOrigine = null;
+    /* La selection vit HORS des fermetures de colonne (TF-0769) : elle survit a un
+       rafraichissement, se lit par api.etat() et se rejoue par init(table, { etat }). */
+    var selections = {};
+    var desarmerTri = null;
+    var surDocument = function (ev) { if (!table.contains(ev.target)) fermerTout(); };
+
+    /* TF-0430 : etat vide — une ligne de message pleine largeur et la seule action utile a ce
+       moment, « tout reafficher ». Libelle surchargeable par data-tf-vide sur la table. */
+    function ligneVide() {
+      var tb = table.tBodies[0];
+      var tr = tb.querySelector('tr[data-tf-empty]');
+      if (tr) return tr;
+      tr = document.createElement('tr');
+      tr.setAttribute('data-tf-empty', '');
+      tr.className = 'tf-vide';
+      var td = document.createElement('td');
+      td.colSpan = nbColonnes(table);
+      var msg = document.createElement('span');
+      msg.className = 'tf-vide-msg';
+      msg.textContent = table.getAttribute('data-tf-vide') || LIBELLE_VIDE;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tf-reset';
+      b.textContent = LIBELLE_TOUT;
+      b.addEventListener('click', function () { toutReafficher(); });
+      td.appendChild(msg); td.appendChild(document.createTextNode(' ')); td.appendChild(b);
+      tr.appendChild(td);
+      tb.appendChild(tr);
+      return tr;
+    }
+
+    function toutReafficher() {
+      etats.forEach(function (e) {
+        Object.keys(e.selection).forEach(function (k) { e.selection[k] = true; });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) { cb.checked = true; });
+      });
+      api.appliquer();
+    }
+
+    function appliquer() {
+      var visibles = 0;
+      lignes.forEach(function (tr) {
+        var ok = etats.every(function (e) {
+          return e.selection[valeur(tr, e.col.index)] !== false;
+        });
+        if (ok) {
+          tr.removeAttribute('data-tf-hidden');
+          /* LA VISIBILITE EST UNE DISJONCTION (TF-0953, 08/09/2026). Passer CE filtre ne suffit
+             pas a rendre une ligne visible : un autre mecanisme DECLARE a l'arbitrage peut
+             encore la masquer. Forcer `display: ''` ici ecrasait ce mecanisme sans un mot — et
+             c'est ce qui a oblige un produit a poser un MutationObserver sur `hidden` pour
+             reappliquer son pliage d'arbre apres chaque passage des filtres, puis a deplier
+             tout l'arbre a chaque changement de filtre pour ne jamais cacher un resultat.
+             Sans arbitrage charge, `masquee` n'est pas consultee et le comportement est
+             exactement celui d'avant. */
+          var autre = V ? V.masquee(tr, 'data-tf-hidden') : false;
+          tr.style.display = autre ? 'none' : '';
+          if (!autre) { visibles++; }
+        }
+        else {
+          tr.setAttribute('data-tf-hidden', ''); tr.style.display = 'none';
+          /* la ligne de détail suit le sort de sa ligne mère : masquée ET repliée */
+          var det = tr.nextElementSibling;
+          if (det && det.hasAttribute('data-detail')) { det.hidden = true; }
+        }
+        if (V) { V.apply(tr); }
+      });
+      etats.forEach(function (e) {
+        var actif = Object.keys(e.selection).some(function (k) { return !e.selection[k]; });
+        e.bouton.classList.toggle('tf-on', actif);
+      });
+      if (compteur) {
+        compteur.textContent = visibles + ' ligne' + (visibles > 1 ? 's' : '') +
+          ' sur ' + lignes.length;
+        compteur.classList.toggle('zero', visibles === 0);
+      }
+      var vide = table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (visibles === 0 && lignes.length) { ligneVide().hidden = false; }
+      else if (vide) { vide.hidden = true; }
+      if (typeof opts.apresFiltrage === 'function') opts.apresFiltrage(table, visibles, lignes.length);
+    }
+
+    function placer(b, p) {
+      /* TF-0431 : cote d'ouverture selon la place mesuree — a droite du bouton par defaut,
+         aligne sur le bord droit quand le panneau sortirait de la fenetre ou du conteneur. */
+      p.classList.remove('tf-droite');
+      var limite = defilant ? defilant.getBoundingClientRect().right : (window.innerWidth || document.documentElement.clientWidth);
+      var r = b.getBoundingClientRect();
+      var largeur = p.offsetWidth || 240;
+      if (r.left + largeur > limite - 8) p.classList.add('tf-droite');
+      if (defilant && overflowOrigine === null) {
+        overflowOrigine = defilant.style.overflow || '';
+        defilant.setAttribute('data-tf-ouvert', '');
+        defilant.style.overflow = 'visible';
+      }
+    }
+
+    function retirerUI() {
+      etats.forEach(function (e) {
+        if (e.bouton && e.bouton.parentNode) e.bouton.parentNode.removeChild(e.bouton);
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p && p.parentNode) p.parentNode.removeChild(p);
+        var th = e.col && e.col.th;
+        if (th) {
+          th.removeAttribute('data-tf-forme');
+          var u = th.querySelector('.tf-unique'); if (u) u.parentNode.removeChild(u);
+        }
+      });
+      etats.length = 0;
+    }
+
+    function construireColonnes() {
+      cols.forEach(function (col, k) {
+        var pid = id + '-tf-' + k;
+        var b = bouton(col, pid);
+        var ui = panneau(col, pid);
+        var selection = selections[col.libelle] || (selections[col.libelle] = {});
+        /* une valeur neuve entre COCHEE (aucun filtre implicite) ; une valeur disparue du
+           tableau sort de la selection, sinon elle masquerait des lignes sans etre visible. */
+        col.valeurs.forEach(function (v) { if (!(v in selection)) selection[v] = true; });
+        Object.keys(selection).forEach(function (v) {
+          if (col.valeurs.indexOf(v) === -1) delete selection[v];
+        });
+        var etat = { col: col, bouton: b, selection: selection };
+        etats.push(etat);
+
+        /* TF-0899 (08/09/2026) — LE PANNEAU A BESOIN D UN ANCETRE POSITIONNE, PAS DE `relative`.
+           `.tf-panel` est un `position:absolute` : il lui faut un ancetre positionne, et le
+           `<th>` est le bon. Mais poser `relative` EN LIGNE ecrasait le geste L29 du socle
+           (`thead.colle th { position: sticky; top: var(--hh) }`) : le `top` restait, applique
+           a un `relative` — donc un DECALAGE PERMANENT de --hh. Mesure Playwright du 07/09 sur
+           quatre tableaux filtrables : `<th>` a 441 px pour 337 attendus (+104 = --hh), une a
+           deux lignes recouvertes a tout defilement, `<th>` a -59 px apres 200 px de
+           defilement — l en-tete ne collait JAMAIS. Un `<th>` deja positionne (sticky, relative,
+           absolute, fixed) ancre DEJA un absolu : on ne pose donc que sur un `<th>` `static`. */
+        var posThCalculee = 'static';
+        try {
+          posThCalculee = (window.getComputedStyle(col.th).position || 'static');
+        } catch (e) { posThCalculee = col.th.style.position || 'static'; }
+        if (posThCalculee === 'static') col.th.style.position = 'relative';
+        /* TF-1052 (08/09) : la forme se publie AUSSI sur le `<th>`, la ou un oracle et un test
+           cherchent la colonne — posee sur le seul panneau, une sonde de l'en-tete lisait `null`
+           sur 9 colonnes sur 9. TF-1051 : une colonne a valeur UNIQUE le dit dans l'en-tete,
+           sans clic — un destinataire a lu vingt fois la meme chaine et conclu a une panne. */
+        col.th.setAttribute('data-tf-forme', col.forme);
+        if (col.forme === 'unique') {
+          var u = document.createElement('span');
+          u.className = 'tf-unique';
+          u.textContent = 'une seule valeur';
+          col.th.appendChild(u);
+        }
+        col.th.appendChild(b);
+        col.th.appendChild(ui.panneau);
+        Array.prototype.forEach.call(ui.options.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = selection[cb.value] !== false;
+        });
+
+        b.addEventListener('click', function () {
+          var ouvert = b.getAttribute('aria-expanded') === 'true';
+          fermerTout();
+          if (!ouvert) {
+            b.setAttribute('aria-expanded', 'true'); ui.panneau.hidden = false;
+            placer(b, ui.panneau);
+            ui.recherche.focus();
+          }
+        });
+
+        ui.recherche.addEventListener('input', function () {
+          var q = norm(ui.recherche.value);
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            lab.hidden = q !== '' && norm(lab.textContent).indexOf(q) === -1;
+          });
+        });
+
+        /* Tous / Aucun portent sur les valeurs actuellement visibles dans la liste. */
+        function masse(valeurCible) {
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            if (lab.hidden) return;
+            var cb = lab.querySelector('.tf-opt');
+            cb.checked = valeurCible;
+            selection[cb.value] = valeurCible;
+          });
+          api.appliquer();
+        }
+        ui.tous.addEventListener('click', function () { masse(true); });
+        ui.aucun.addEventListener('click', function () { masse(false); });
+
+        ui.options.addEventListener('change', function (ev) {
+          var cb = ev.target;
+          if (!cb.classList.contains('tf-opt')) return;
+          selection[cb.value] = cb.checked;
+          api.appliquer();
+        });
+
+        ui.panneau.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape') { fermerTout(); b.focus(); }
+        });
+      });
+    }
+
+    function fermerTout() {
+      etats.forEach(function (e) {
+        e.bouton.setAttribute('aria-expanded', 'false');
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) { p.hidden = true; p.classList.remove('tf-droite'); }
+      });
+      if (defilant && overflowOrigine !== null) {
+        defilant.style.overflow = overflowOrigine;
+        defilant.removeAttribute('data-tf-ouvert');
+        overflowOrigine = null;
+      }
+    }
+
+    if (opts.tri !== false && table.getAttribute('data-tf-tri') !== 'off') {
+      desarmerTri = armerTri(table);
+    }
+    construireColonnes();
+    document.addEventListener('click', surDocument);
+
+    table.setAttribute('data-tf-ready', '1');
+    table.__tfApi = api;
+    api.table = table;
+    api.appliquer = appliquer;
+    api.fermerTout = fermerTout;
+    api.toutReafficher = toutReafficher;
+    api.exemptions = scan.exemptions;
+
+    /* TF-0769 — L'ETAT SE LIT ET SE REJOUE. Il est nomme par LIBELLE de colonne, pas par
+       index : une colonne peut se deplacer entre deux rendus, son intitule reste le meme.
+       Ne sont listees que les valeurs EXCLUES — un etat vide veut dire « aucun filtre », ce
+       qui reste vrai si le tableau gagne des valeurs entre deux rendus. */
+    api.etat = function () {
+      var out = { version: 1, colonnes: {} };
+      etats.forEach(function (e) {
+        var exclues = Object.keys(e.selection).filter(function (v) { return e.selection[v] === false; });
+        if (exclues.length) out.colonnes[e.col.libelle] = { exclues: exclues };
+      });
+      return out;
+    };
+
+    api.restaurer = function (etat) {
+      if (!etat || !etat.colonnes) return api;
+      etats.forEach(function (e) {
+        var voulu = etat.colonnes[e.col.libelle];
+        var exclues = (voulu && voulu.exclues) || [];
+        Object.keys(e.selection).forEach(function (v) {
+          e.selection[v] = exclues.indexOf(v) === -1;
+        });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = e.selection[cb.value] !== false;
+        });
+      });
+      api.appliquer();
+      return api;
+    };
+
+    /* La page a re-rendu son tableau : on relit ses lignes et ses valeurs, on retire les
+       panneaux devenus faux et on reconstruit SUR LA SELECTION CONSERVEE. Sans cette
+       fonction, la seule voie etait de relire les cases dans le DOM et de les rejouer par
+       des evenements `change` — ce qu'une console livree a effectivement du ecrire. */
+    api.rafraichir = function () {
+      /* Les panneaux partent AVANT le re-balayage : sans cela, le scan relirait ses propres
+         injections comme du contenu de colonne. */
+      retirerUI();
+      lignes = corps(table);
+      var neuf = colonnes(table, lignes);
+      cols = neuf.cols;
+      api.exemptions = neuf.exemptions;
+      construireColonnes();
+      api.appliquer();
+      return api;
+    };
+
+    api.detruire = function () {
+      retirerUI();
+      document.removeEventListener('click', surDocument);
+      if (desarmerTri) { desarmerTri(); desarmerTri = null; }
+      var vide = table.tBodies[0] && table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (vide && vide.parentNode) vide.parentNode.removeChild(vide);
+      lignes.forEach(function (tr) {
+        tr.removeAttribute('data-tf-hidden');
+        /* Detruire CE composant ne demasque que CE qu'il masquait : une ligne cachee par un
+           autre mecanisme declare le reste. */
+        var encore = V ? V.masquee(tr, 'data-tf-hidden') : false;
+        tr.style.display = encore ? 'none' : '';
+        if (V) { V.apply(tr); }
+      });
+      table.removeAttribute('data-tf-ready');
+      try { delete table.__tfApi; } catch (e) { table.__tfApi = null; }
+    };
+
+    if (opts.etat) api.restaurer(opts.etat);
+    else api.appliquer();
+    return api;
+  }
+
+  function initAll(racine, opts) {
+    var scope = racine || document;
+    return Array.prototype.map.call(
+      scope.querySelectorAll('table[data-filterable]'),
+      function (t) { return init(t, opts); }
+    );
+  }
+
+  root.DigitAITableFilters = { init: init, initAll: initAll, SEUIL_LIGNES: SEUIL_LIGNES,
+                               SEUIL_RECHERCHE: SEUIL_RECHERCHE, nombre: nombre,
+                               comparer: comparer };
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<!-- COMPOSANT-EMBARQUE:FIN table-filters.js -->
+<!-- COMPOSANT-EMBARQUE:DEBUT table-detail.js — copie du socle digit-ai-page-html/assets/table-detail.js,
+     posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
+     La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
+<script data-composant="table-detail.js" data-empreinte="sha256:01c776363c9e69b148089ba2a20f1fa9b83b3498fb76281f17be0a54c0d97a5d">
+/* Digit-AI — Ligne de tableau depliable (TF-0432, lot Produit-05 20260820b, 21/08).
+   La convention data-detail existait cote CONSOMMATEUR (table-filters exclut tr[data-detail]
+   du comptage et la fait voyager avec sa ligne mere) ; ce composant la PRODUIT.
+   Contrat de marquage :
+     <tr><td><button type="button" class="td-btn" aria-expanded="false" aria-controls="det-1">›</button> Libelle</td>…</tr>
+     <tr data-detail id="det-1" hidden><td colspan="N">… detail …</td></tr>
+   Comportement : clic = bascule aria-expanded + hidden ; a l'impression TOUTES les lignes de
+   detail sont visibles (regle @media print du livrable — L17 la juge) ; un #hash qui vise un
+   element dans une ligne de detail fermee l'ouvre ; le filtrage (table-filters) masque la ligne
+   de detail avec sa ligne mere. Le chevron est U+203A, present dans toute pile de repli (TF-0435). */
+(function (root) {
+  'use strict';
+
+  function detailDe(btn) { return document.getElementById(btn.getAttribute('aria-controls') || ''); }
+
+  function basculer(btn, ouvrir) {
+    var det = detailDe(btn);
+    if (!det) return;
+    var etat = typeof ouvrir === 'boolean' ? ouvrir : btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', etat ? 'true' : 'false');
+    det.hidden = !etat;
+    var mere = btn.closest ? btn.closest('tr') : null;
+    if (mere) mere.classList.toggle('td-ouverte', etat);
+  }
+
+  function init(table) {
+    if (!table || table.getAttribute('data-td-ready') === '1') return null;
+    var boutons = Array.prototype.slice.call(table.querySelectorAll('button[aria-controls]')).filter(function (b) {
+      var d = detailDe(b);
+      return d && d.hasAttribute('data-detail');
+    });
+    if (!boutons.length) return null;
+    boutons.forEach(function (b) {
+      if (!b.classList.contains('td-btn')) b.classList.add('td-btn');
+      if (!b.textContent.trim()) b.textContent = '›';
+      b.addEventListener('click', function () { basculer(b); });
+      var det = detailDe(b);
+      det.hidden = b.getAttribute('aria-expanded') !== 'true';
+    });
+
+    function ouvrirDepuisHash() {
+      var h = location.hash ? location.hash.slice(1) : '';
+      if (!h) return;
+      var cible = document.getElementById(h);
+      if (!cible) return;
+      var det = cible.closest ? cible.closest('tr[data-detail]') : null;
+      if (!det || !table.contains(det)) return;
+      var b = boutons.filter(function (x) { return detailDe(x) === det; })[0];
+      if (b) { basculer(b, true); if (cible.scrollIntoView) cible.scrollIntoView(); }
+    }
+    window.addEventListener('hashchange', ouvrirDepuisHash);
+    ouvrirDepuisHash();
+
+    table.setAttribute('data-td-ready', '1');
+    return { ouvrirTout: function () { boutons.forEach(function (b) { basculer(b, true); }); },
+             fermerTout: function () { boutons.forEach(function (b) { basculer(b, false); }); } };
+  }
+
+  function initAll(racine) {
+    var scope = racine || document;
+    return Array.prototype.map.call(scope.querySelectorAll('table'), init).filter(Boolean);
+  }
+
+  root.DigitAITableDetail = { init: init, initAll: initAll };
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<!-- COMPOSANT-EMBARQUE:FIN table-detail.js -->
+</body>
+</html>

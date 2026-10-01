@@ -18,7 +18,7 @@ versions au ledger (R-19).
 **Précédence (R-43)** : la factory impliquée, ses règles priment (renforcer oui,
 assouplir jamais) ; conflit → factory, consigné au ledger.
 **Restitution (R-44)** : toute fin de tour de travail suit `gabarits\RESTITUTION.md` (bloc 0 +
-8 blocs, options (a)/(b)/(c), actions par acteur) — hook Stop bloquant (`oracle-synthese`).
+8 blocs), hook Stop bloquant (`oracle-synthese`) ; question simple : `references\NIVEAUX.md`.
 `input\`/`output\` : un README.md par dossier, régénéré par hook.
 
 **Lois transverses** :
@@ -76,7 +76,7 @@ exigences→tests 100 % · ledger vérifié.
 
 Étapes séquentielles ; parallélisme seulement entre tâches indépendantes d'une même
 étape. Routage et mesure : `CONTRAT-INTERFACE.md` §4 et §4 bis — défaut Sonnet, mécanique
-Haiku, construction complexe Opus, pilotage Fable ; escalades consignées, « aucune »
+Haiku, construction complexe Opus, pilotage Opus ; escalades consignées, « aucune »
 compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050).
 
 ## Garde-fous (détail : `references\ACCUEIL.md`)

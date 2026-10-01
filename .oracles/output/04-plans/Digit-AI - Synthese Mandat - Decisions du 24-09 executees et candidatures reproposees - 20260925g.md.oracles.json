@@ -1,0 +1,79 @@
+{
+  "cible": "output/04-plans/Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+  "date_iso": "2026-09-25T06:38:29.269Z",
+  "registre_version": "2.27.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 1 409 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
+    "ts": "2026-09-25T06:38:29.268Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md": "e6a2659e75438010124267d7d07858458248f23af7f9a3219f0933c31bc158c6"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

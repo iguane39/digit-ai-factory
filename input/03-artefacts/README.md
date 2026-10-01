@@ -12,7 +12,7 @@ Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) �
 
 ## Contenu
 
-Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+Contenu du dossier à la dernière régénération : chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|

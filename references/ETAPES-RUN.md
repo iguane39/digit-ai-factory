@@ -39,7 +39,10 @@ récente que sa source (K5) — le jour de son écriture, `prompt-analyzer-l99` 
 et il commande la suite : `schema_ledger: "1.1"`, avec **`forges_mobilisees`**, la liste des forges
 que le run mobilise (`["design", "tests"]`, noms courts ou complets), obligatoire depuis ce schéma
 (D-18 (a) du 26/09/2026) : c'est elle que le juge de l'enclenchement confronte aux verdicts
-consignés (étape 7). Sans `schema_ledger`, le ledger est réputé **antérieur au schéma** et
+consignés (étape 7). **Le pilot n'y figure jamais**, ni dans `--forges` (TF-1444) : il orchestre le
+run, et ses oracles que tout run joue, la conformité et le contrôle du lot au moins, en sont le cadre.
+Le juge les range à part, sans avertir (`CONTRAT-INTERFACE.md` §3). Sans `schema_ledger`, le
+ledger est réputé **antérieur au schéma** et
 `ledger.mjs verify` ne juge pas la forme de ses entrées — il le DIT (`[NON VÉRIFIÉ]`), il ne le
 tait pas, et il ne met rien en échec. Avec lui, chaque `oracles_verdict` doit porter son `oracle`
 et son `verdict` (forme canonique : `CONTRAT-INTERFACE.md` §3). Un ledger qui déclare `1.0` reste
@@ -138,7 +141,8 @@ clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal). Nomm
 `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
 sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre dans `old\`
 du même dossier — **versionné** (C1 tranché le 13/08, TF-0150 ; l'ancien libellé « jamais
-versionné » est caduc) ; le code, lui, n'est jamais daté — git est son seul magasin.
+versionné » est caduc), et, tenu ouvert par une application, il attend un tour pendant que la
+nouvelle version sort (alinéa de la règle 7, TF-1503) ; le code, lui, n'est jamais daté — git est son seul magasin.
 
 ## 2. Étape conception (mode dégradé, cf. contrat §5)
 

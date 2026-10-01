@@ -60,7 +60,12 @@ export const FORGES = [
 // un nom à cacher : la porte de publication a refusé le pilot sur 40 occurrences dans 11 fichiers.
 // Il n'entre PAS dans `FORGES` : un produit ne se clone ni ne se tire à l'ouverture du poste, le pilot
 // n'y intervient que sur run demandé. Il se DÉCLARE ici, et le balayage cesse de poser la question.
-export const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing"]);
+// `digit-ai-prospection` y entre le 01/10/2026 (D-36 (a), réponse « 36a ») : un dépôt de l'écosystème
+// sans dépôt distant, dont 2 lots de retours attendaient au sas. Règle humaine du même jour, mot pour
+// mot : « Les dépôts privés peuvent conserver des données de type nom. Ces 2 projets sont privés, donc
+// pas de problème. » Les noms de cette liste se citent donc en clair, pilot public compris, et
+// l'écrivain de la table des pseudonymes ne les y inscrit jamais (TF-1505, `todo/anonymiser-entrant.mjs`).
+export const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing", "digit-ai-prospection"]);
 
 // LE PILOT ET SES NOMS D'HIER (TF-0525, mesuré le 25/08/2026). Le pilot n'est pas une forge et ne
 // figure pas dans `FORGES` : son nom s'écrivait donc en littéral à chaque endroit qui en avait

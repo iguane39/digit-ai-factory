@@ -1,0 +1,51 @@
+/* gd-guide-de-reference · recherche-resultats.css — la RECHERCHE et le tableau de ses résultats.
+ *
+ * S'appuie sur find-in-page.js du socle (surlignage, compteur, insensible aux accents). Le
+ * compteur dit COMBIEN ; ce panneau dit OÙ : une ligne par occurrence, sa vue, son chapitre et le
+ * passage qui la porte. Il descend sous la barre des vues, aligné sur le bord droit de la page,
+ * et recouvre le contenu sans le pousser. Au téléphone, il s'ouvre en surimpression fixe, du
+ * champ jusqu'au bas de l'écran : sous un bandeau de 717 px sur 844, il n'avait plus qu'une bande
+ * visible (sonde du 24/09/2026 sur le document source).
+ */
+.barre-recherche { position: relative; display: flex; align-items: stretch; }
+.barre-recherche input { width: 280px; font-family: var(--sans); font-size: .9rem; padding: 8px 16px;
+  border: 1px solid var(--faint); border-radius: 999px; background: var(--bg); color: var(--ink); }
+.find-count { position: absolute; top: 100%; left: 14px; font-size: .72rem; color: var(--muted);
+  white-space: nowrap; }
+.find-count.zero { color: var(--red); }
+mark.find-hit { background: var(--amber-fill); color: var(--ink); border-radius: 2px; padding: 0; margin: 0; }
+mark.find-hit.courant { outline: 2px solid var(--accent-fonce); outline-offset: 1px; }
+/* Dans un schéma, le surlignage est un <tspan> : SVG ne peint pas un <mark> HTML, et le mot
+   trouvé DISPARAISSAIT du schéma pendant la recherche (87 caractères peints sur 93, 24/09/2026). */
+tspan.find-hit { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; }
+tspan.find-hit.courant { fill: var(--accent-fonce); }
+.resultats { position: absolute; top: 100%; right: max(12px, calc(2vw + 20px));
+  width: min(52rem, calc(100vw - 24px)); max-height: min(62vh, 34rem); overflow: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, .28); padding: 12px 16px 16px; z-index: 45; }
+.resultats[hidden] { display: none; }
+.res-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.res-resume { margin: 0; font-size: .86rem; font-weight: 600; color: var(--ink); }
+.res-fermer { font-family: var(--sans); font-size: .82rem; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 999px;
+  padding: 8px 16px; }
+.res-fermer:hover { border-color: var(--accent-fonce); color: var(--accent-fonce); }
+table.res-table { width: 100%; font-size: .84rem; margin: 0; border-collapse: collapse; table-layout: fixed; }
+.res-table th, .res-table td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line);
+  vertical-align: top; overflow-wrap: break-word; }
+.res-table col.res-c1 { width: 30%; }
+.res-table col.res-c2 { width: 70%; }
+.res-table tbody tr { cursor: pointer; }
+.res-table tbody tr:hover, .res-table tbody tr:focus-within { background: var(--bg); }
+.res-aller { font-weight: 600; }
+.res-ch { display: block; margin-top: 4px; font-size: .78rem; color: var(--muted); }
+.res-extrait mark { background: var(--amber-fill); color: var(--ink); border-radius: 2px; padding: 0; margin: 0; }
+@media (max-width: 1360px) { .barre-recherche input { width: 190px; } }
+@media (max-width: 760px) {
+  .barre-recherche { flex: 1 1 auto; min-width: 0; }
+  .barre-recherche input { width: 100%; }
+  .resultats { position: fixed; top: var(--res-haut, 140px); bottom: 12px; left: 12px; right: 12px;
+    width: auto; max-height: none; }
+  .res-fermer { min-height: 44px; }
+}
+@media print { .barre-recherche, .resultats { display: none; } }

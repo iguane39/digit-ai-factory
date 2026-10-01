@@ -12,13 +12,15 @@
  *     cliquet toutes les recettes existantes le jour de sa publication ;
  *   · un résumé ILLISIBLE est déclaré non jugé, jamais tenu pour conforme ;
  *   · une recette EN ÉCHEC ne fait pas baisser la baseline — son compte partiel n'a rien à voir
- *     avec la disparition d'un cas.
+ *     avec la disparition d'un cas ;
+ *   · un cas NON JOUÉ sur ce poste pour un motif DÉCLARÉ n'est pas perdu, et un cas manquant sans
+ *     déclaration lisible l'est toujours (TF-1434).
  */
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { compteDe, confronter, ecrire, lire } from "./lib-baseline-recettes.mjs";
+import { compteDe, confronter, ecrire, lire, nonJouesDe } from "./lib-baseline-recettes.mjs";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -188,6 +190,61 @@ check("TF-1082 rouge — une EXEMPTION disparue est nommée aussi : sans compte,
 check("TF-1082 borne — une recette présente et EN ÉCHEC n'est PAS une disparition", () => {
   const b = confronter([{ nom: "oracles/a.test.mjs", statut: "ECHEC", resume: "a : 1 PASS, 2 FAIL" }], { "oracles/a.test.mjs": { cas: 3 } }, JOUR);
   att(b.disparues.length === 0, "une recette en échec est prise pour une disparition");
+});
+
+// ── TF-1434 : un cas NON JOUÉ pour un motif déclaré n'est pas un cas PERDU ──────────────────────
+//
+// Le fait du 28/09 : le cliquet relevé à 19 sur le poste qui joue le cas 5 bis de bootstrap, 17/17
+// sur l'autre, et « 19 → 17 cas, 2 DISPARU(S) » à chaque passage sans qu'aucun cas ait été retiré.
+// La recette est construite comme le harnais la voit : sa sortie ENTIÈRE, et sa dernière ligne.
+const recette = (nom, ...lignes) => ({ nom, statut: "OK", sortie: lignes.join("\n") + "\n", resume: lignes[lignes.length - 1] });
+const DECLARATION = "[NON JOUÉ] 2 cas — bootstrap 5 bis (TF-1337) : le contrôle de frontmatter de forge-agents est absent de ce poste";
+const CLIQUET_19 = { "./bootstrap.test.mjs": { cas: 19, vu_le: "2026-09-27" } };
+
+check("TF-1434 vert — 17 cas joués et 2 DÉCLARÉS non joués face à un cliquet de 19 : pas accusé, et nommé", () => {
+  const b = confronter([recette("./bootstrap.test.mjs", DECLARATION, "bootstrap : 17/17 — vierge clone 14/14")], CLIQUET_19, JOUR);
+  att(b.baisses.length === 0, `un cas non joué pour un motif déclaré est accusé comme perdu : ${JSON.stringify(b.baisses)}`);
+  att(b.nonJoues.length === 1 && b.nonJoues[0].nom === "./bootstrap.test.mjs" && b.nonJoues[0].joues === 17 && b.nonJoues[0].nonJoues === 2,
+    `la déclaration n'est pas rendue pour être nommée : ${JSON.stringify(b.nonJoues)}`);
+  att(/5 bis \(TF-1337\)/.test(b.nonJoues[0].declarations[0].motif), "le motif de la déclaration est perdu : le harnais ne pourrait pas dire POURQUOI");
+  att(b.baseline["./bootstrap.test.mjs"].cas === 19 && b.baseline["./bootstrap.test.mjs"].vu_le === "2026-09-27", "le cliquet a bougé sur un compte égal");
+});
+
+check("TF-1434 rouge — 17 cas joués SANS déclaration face à un cliquet de 19 : toujours accusé, 2 perdus", () => {
+  const b = confronter([recette("./bootstrap.test.mjs", "bootstrap : 17/17 — vierge clone 14/14")], CLIQUET_19, JOUR);
+  att(b.baisses.length === 1 && b.baisses[0].perdus === 2, `une vraie disparition passe : ${JSON.stringify(b.baisses)}`);
+  att(b.nonJoues.length === 0, "un non-jeu a été inventé");
+});
+
+check("TF-1434 rouge — un cas VRAIMENT disparu reste accusé même quand d'autres sont déclarés non joués", () => {
+  // 16 joués + 2 déclarés = 18 : la déclaration ne couvre que ce qu'elle déclare.
+  const b = confronter([recette("./bootstrap.test.mjs", DECLARATION, "bootstrap : 16/16 — vierge clone 14/14")], CLIQUET_19, JOUR);
+  att(b.baisses.length === 1 && b.baisses[0].perdus === 1 && b.baisses[0].vu === 18 && b.baisses[0].nonJoues === 2,
+    `la déclaration a masqué un cas disparu : ${JSON.stringify(b.baisses)}`);
+});
+
+check("TF-1434 rouge — un « NON JOUÉ » hors de la forme fermée n'est pas lu : le cas manquant reste accusé", () => {
+  // La ligne que le banc écrivait avant ce correctif : sans crochets ni compte, elle ne dit pas COMBIEN.
+  const b = confronter([recette("./bootstrap.test.mjs",
+    "bootstrap 5 bis (TF-1337) : NON JOUÉ — le contrôle de frontmatter de forge-agents est absent de ce poste",
+    "bootstrap : 17/17 — vierge clone 14/14")], CLIQUET_19, JOUR);
+  att(b.baisses.length === 1 && b.baisses[0].perdus === 2, `une déclaration sans compte a été créditée : ${JSON.stringify(b.baisses)}`);
+});
+
+check("TF-1434 — le RELEVÉ est le même d'un poste à l'autre pour un même code : première mesure 19 des deux côtés", () => {
+  const joue = confronter([recette("./bootstrap.test.mjs", "bootstrap : 19/19 — vierge clone 14/14")], {}, JOUR);
+  const nonJoue = confronter([recette("./bootstrap.test.mjs", DECLARATION, "bootstrap : 17/17 — vierge clone 14/14")], {}, JOUR);
+  att(joue.baseline["./bootstrap.test.mjs"].cas === 19 && nonJoue.baseline["./bootstrap.test.mjs"].cas === 19,
+    `le cliquet dépend du poste : ${joue.baseline["./bootstrap.test.mjs"].cas} là où le cas est joué, ${nonJoue.baseline["./bootstrap.test.mjs"].cas} ailleurs`);
+  att(Object.keys(nonJoue.baseline["./bootstrap.test.mjs"]).sort().join() === "cas,vu_le", "le poste a laissé une trace dans le relevé");
+});
+
+check("TF-1434 — la lecture : plusieurs déclarations s'additionnent, fins de ligne CRLF comprises, et rien n'est lu ailleurs", () => {
+  const d = nonJouesDe("  [PASS] a\r\n[NON JOUÉ] 2 cas — x : absent\r\n  [NON JOUE] 1 cas : y absent\r\nrésumé : 3/3\r\n");
+  att(d.length === 2 && d[0].cas === 2 && d[1].cas === 1 && d[0].motif === "x : absent" && d[1].motif === "y absent", JSON.stringify(d));
+  att(nonJouesDe("un texte qui cite [NON JOUÉ] 2 cas au milieu d'une phrase").length === 0, "une citation en milieu de ligne a été lue comme une déclaration");
+  att(nonJouesDe("[NON JOUÉ] deux cas — sans chiffre").length === 0, "une déclaration sans compte a été lue");
+  att(nonJouesDe(undefined).length === 0 && nonJouesDe(null).length === 0, "une sortie absente a levé ou rendu une déclaration");
 });
 
 console.log(`\nbaseline-recettes (TF-0681) : ${pass} PASS, ${fail} FAIL`);

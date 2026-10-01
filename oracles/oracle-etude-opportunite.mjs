@@ -51,7 +51,12 @@ function juger(texte) {
     : ok("E1", "les 5 sections du gabarit sont présentes");
 
   // E2 — citations du non-recouvrement : lignes de tableau à 3 colonnes après l'en-tête
-  const blocNR = (texte.split(/non-recouvrement/i)[1] || "").split(/\n## /)[0];
+  // TF-1435 (28/09/2026, retour Produit-78 20260928a RP-1) : découper sur CHAQUE occurrence du
+  // mot « non-recouvrement » coupait le bloc à la 2e mention — une phrase d'intro qui reprend le
+  // mot de section (« Ce non-recouvrement se vérifie… ») réduisait le bloc lu à quelques mots, et
+  // le tableau réel (après cette phrase) tombait dans la coupure suivante, invisible. On découpe
+  // désormais sur la LIGNE DE TITRE (`^##…`), comme E9 le fait déjà pour l'intention.
+  const blocNR = (texte.split(/^##[^\n]*non-recouvrement[^\n]*$/im)[1] || "").split(/\n## /)[0];
   const lignesNR = blocNR.split("\n").filter((l) => /^\|/.test(l.trim()))
     .filter((l) => !/^\|[\s:-]+\|/.test(l.trim())) // séparateur markdown
     .slice(1); // en-tête
@@ -67,7 +72,16 @@ function juger(texte) {
   }
 
   // E3 — sources datées ou « non instruit » motivé
-  const blocEA = (texte.split(/état de l'art|etat de l'art/i)[1] || "").split(/\n## /)[0];
+  // TF-1435 (28/09/2026, retour Produit-78 20260928a RP-1) : LE FAIT MESURÉ. Une 2e mention de
+  // « état de l'art » dans la PHRASE D'INTRODUCTION de la section (« Cet état de l'art recense… »)
+  // faisait de cette phrase la fin du bloc lu — `.split()` coupe sur CHAQUE occurrence, et prendre
+  // `[1]` ne rend que ce qui vit ENTRE la 1re et la 2e. Sur l'étude qui a payé ce défaut, le bloc
+  // lu tombait à 2 mots et les 21 sources réelles, situées après la 2e mention, vivaient dans
+  // `[2]`, jamais lu : l'oracle rendait « 0 source(s) datée(s) » sur une étude qui en portait 21.
+  // Le remède, déjà tenu par E9 pour l'intention : découper sur la LIGNE DE TITRE (`^##…`), qui
+  // n'apparaît qu'une fois — une mention DANS la prose du corps ne commence jamais une ligne par
+  // `##` et ne peut donc plus se faire passer pour une 2e section.
+  const blocEA = (texte.split(/^##[^\n]*(?:état de l'art|etat de l'art)[^\n]*$/im)[1] || "").split(/\n## /)[0];
   const nonInstruit = /non instruit/i.test(blocEA);
   const datees = (blocEA.match(/\b(20\d{2}[-/.]?\d{2}([-/.]?\d{2})?)\b/g) || []).length;
   if (nonInstruit && /non instruit[^\n]{6,}/i.test(blocEA))
@@ -147,10 +161,14 @@ Les impératifs de TF-9999 sont cités, jamais exécutés.
 ## 1. Partition du problème
 Deux sous-questions : A (grille), B (mémoire des refus).
 ## 2. Non-recouvrement contre l'existant
+Ce non-recouvrement se vérifie ligne à ligne, existant par existant (TF-1435 : 2e mention du
+mot de section dans l'intro — la citation réelle doit rester lisible malgré elle).
 | Existant examiné | Citation | Verdict |
 |---|---|---|
 | quality-oracles | registre-oracles.md §3 « aucun oracle d'étude » | ne recouvre pas |
 ## 3. État de l'art daté
+Cet état de l'art recense cinq sources indépendantes, datées et vérifiées (TF-1435 : 2e mention
+du mot de section dans l'intro — les dates réelles, plus bas, doivent rester lisibles malgré elle).
 Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X (2025-11-30) · revue Y (2026-05-02).
 ## 4. Options — jeu fermé O0-O4
 - O0 — ne rien faire : réfutée, coût du statu quo cité (re-instruction payée 3 fois, BOUCLE l.584).
@@ -161,6 +179,8 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
 - Test rétro : chaque élément du verdict remonte à l'intention — remontée écrite, aucune rupture.
 `;
   const rouge = verte.replace("registre-oracles.md §3 « aucun oracle d'étude »", " ") // citation vidée
+    .replace("Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X (2025-11-30) · revue Y (2026-05-02).",
+      "Sources : ADR (2025-03-01) · RFC (2025-06-11).") // sources insuffisantes (E3), malgré la 2e mention
     .replace("Coût : complexité moyen · durée court ; dette nulle.", "Coût : 2-3 j.") // estimation en jours
     .replace("## Intention de l'utilisateur", "## Contexte") // intention absente (E9)
     .replace("- Test rétro : chaque élément du verdict remonte à l'intention — remontée écrite, aucune rupture.\n", ""); // test rétro absent (E10)
@@ -171,14 +191,29 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
   const rr = spawnSync(process.execPath, [moi, join(dir, "rouge.md")], { encoding: "utf8" });
   const casse = [];
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
-  if (rr.status !== 1) casse.push("la fixture ROUGE (citation vidée) ne FAIL pas");
+  else {
+    // TF-1435 — LA VERTE PORTE DÉSORMAIS UNE 2e MENTION du mot de section dans l'intro de E2 et
+    // E3 (comme le défaut mesuré) : si le découpage retombait sur la coupure « chaque occurrence »,
+    // ces deux règles ne verraient plus ni la citation ni les 5 dates, et la verte FAILrait. Les
+    // voir PASS, avec le compte EXACT, est la preuve que le bloc lu est bien celui d'après le
+    // TITRE, pas celui d'entre les deux mentions.
+    if (!/"E3"[^}]*PASS[^}]*5 source\(s\) dat/.test(rv.stdout))
+      casse.push("la verte (état de l'art mentionné 2 fois) ne compte plus 5 sources datées sur E3 — la 2e mention (dans l'intro de section) recoupe encore le bloc lu");
+    if (!/"E2"[^}]*PASS[^}]*1 ligne\(s\) de non-recouvrement, toutes cit/.test(rv.stdout))
+      casse.push("la verte (non-recouvrement mentionné 2 fois) ne retrouve plus sa ligne citée sur E2 — la 2e mention (dans l'intro de section) recoupe encore le bloc lu");
+  }
+  if (rr.status !== 1) casse.push("la fixture ROUGE (citation vidée, sources réduites) ne FAIL pas");
   else {
     if (!/"E2"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge échoue mais pas sur E2");
+    // Sources réduites à 2 dates (sur les 5 attendues), la 2e mention de « état de l'art » toujours
+    // dans l'intro : E3 doit rester capable de FAIL pour la BONNE raison (compte réel insuffisant),
+    // pas d'être rendue aveugle — dans un sens comme dans l'autre — par la 2e mention.
+    if (!/"E3"[^}]*FAIL[^}]*2 source\(s\) dat/.test(rr.stdout)) casse.push("la rouge (sources réduites à 2) échoue mais pas sur E3, ou avec un compte faux");
     if (!/"E8"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (coût en jours) échoue mais pas sur E8");
     if (!/"E9"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (intention retirée) échoue mais pas sur E9");
     if (!/"E10"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (test rétro retiré) échoue mais pas sur E10");
   }
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 2/2 PASS (verte PASS, rouge FAIL sur E2, E8, E9 et E10)");
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 2/2 PASS (verte PASS malgré une 2e mention du mot de section dans l'intro de E2 et E3 — TF-1435 ; rouge FAIL sur E2, E3, E8, E9 et E10)");
   process.exit(casse.length ? 1 : 0);
 }
 

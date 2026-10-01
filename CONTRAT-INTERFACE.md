@@ -23,6 +23,7 @@ d'exécuter, puis complète **après** :
     "entrees": ["<chemins absolus des artefacts fournis>"],
     "sorties_attendues": ["<chemins absolus attendus>"],
     "modele": "haiku | sonnet | opus | fable",
+    "modele_version": "<identifiant servi, lu dans le harnais : ex. claude-sonnet-5>",
     "substrat": "cli | skill-par-chemin | session-agent"
   },
   "resultat": {
@@ -45,6 +46,11 @@ Règles :
   suspend le run, pose les questions à l'humain, et reprend sur réponse. Ce n'est pas un échec.
 - Un artefact d'étape n'est **accepté** que si les oracles de la forge concernée ont été exécutés
   et sont au vert (ou `SKIP`/`SANS_OBJET` avec raison consignée). Jamais de validation par confiance.
+- `modele` dit la FAMILLE affectée par le routage (§4) ; `modele_version` dit la version réellement
+  servie, telle que le harnais l'a rendue (décision humaine D-1 (a) du 25/09/2026). `ledger.mjs
+  append` la relève lui-même dans le transcript de la session quand l'entrée porte `modele` sans
+  elle ; faute de transcript lisible, il écrit l'entrée sans, et le dit. Sans version, une escalade
+  mesurée sur Opus 5 et une autre sur Opus 5.5 se confondent au §4 bis.
 
 ## 2. Emplacements
 
@@ -126,11 +132,14 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
   `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
-  guetté + ts — TF-0173, §4 ter), `run_close`.
+  guetté + ts — TF-0173, §4 ter), `demande_emise` et `demande_recue` (un produit demande une
+  évolution à un autre, §3 sexies), `deplacement_en_attente` et `deplacement_effectue` (version
+  antérieure tenue ouverte, règle 7 de `REGLES-PROJET.md`), `run_close`.
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
   quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
   jugé selon ses propres règles). Sous `1.1`, `run_open` porte aussi **`forges_mobilisees`**, un
-  tableau non vide de noms de forges, courts ou complets (D-18 (a)). L'entrée porte au minimum :
+  tableau non vide de noms de forges, courts ou complets (D-18 (a)) ; le pilot n'y figure jamais
+  (TF-1444, règle écrite au juge ci-dessous). L'entrée porte au minimum :
 
   | Champ | Contenu |
   |---|---|
@@ -200,8 +209,13 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   pas pu tourner, son jugement est suspendu et le motif est dit. La confrontation est celle de
   forge-tests (`forge_tests/confrontation.py`, TF-0371), appelée et non recopiée. Les forges
   mobilisées se lisent dans `--forges`, sinon au champ `forges_mobilisees` du `run_open` ; une
-  annotation après le nom de forge est ignorée. `versions_forges` porte le parc, pas la
-  mobilisation. SKIP motivé, jamais PASS par défaut, quand le run ne déclare pas `schema_ledger`,
+  annotation après le nom de forge est ignorée. **Le pilot ne se déclare pas mobilisé (TF-1444,
+  28/09/2026)** : il orchestre tout run, aucun ne le mobilise. Le déclarer ferait réclamer par EN1
+  un verdict pour chacun de ses oracles découverts, 53 le 28/09, dont la plupart jugent le pilot
+  lui-même. Les verdicts de ses oracles que tout run consigne, la conformité et le contrôle du lot
+  au moins, sont le cadre du run : EN2 range à part, en `SANS_OBJET` et sans avertissement, un nom
+  que seul le pilot découvre. Un nom qu'une forge non mobilisée découvre aussi reste signalé hors
+  mobilisation. `versions_forges` porte le parc, pas la mobilisation. SKIP motivé, jamais PASS par défaut, quand le run ne déclare pas `schema_ledger`,
   quand ses forges mobilisées sont inconnues, ou quand le mécanisme de forge-tests ou Python
   manquent. Une forge non clonée ou sans entrée sort seule en SKIP, et les autres sont jugées.
   Recettes : `oracles\oracle-enclenchement.test.mjs`, `oracles\decouvrir-oracles.test.mjs`, et
@@ -241,6 +255,25 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `oracle: diff-doctrine`) — la mise à jour transporte ainsi la consigne, pas
   seulement le code ; un relevé vide se consigne (« aucune règle modifiée »).
   Contrôle exécutable : R-19 de `oracles/oracle-conformite-projet.mjs` (TF-0035).
+
+### 3 sexies. Un produit demande une évolution à un autre produit : par sa boîte d'entrée, jamais par son journal (TF-1491, 01/10/2026)
+
+La doctrine décrivait deux canaux : un produit remonte ses retours au pilot (`forge\retours\` vers `input\00-retours\`), et le pilot confie des travaux à un produit (`input\00-travaux\`). Aucun texte ne disait comment un produit demande une évolution à un autre. Le 28/09/2026, Produit-78 a écrit sa demande directement dans le journal du produit du site de son domaine (entrée 107 de ce journal, `ledger.mjs`), sur décision humaine et hors de toute règle écrite (lot `Produit-78 - RETOURS - 20260928h`, RP-16). Un journal est l'histoire d'un produit : N-32 (`references\REGLES-DE-NON-REPETITION.md`) veut qu'un canal ne franchisse jamais plus que la boîte d'entrée du destinataire, l'entrée dans l'histoire restant un geste dont son auteur est seul maître. Le pilot respecte déjà cette frontière avec `pilot - TRAVAUX - …` ; la demande entre produits la respecte de la même façon.
+
+La demande suit ces gestes.
+
+1. Le demandeur dépose un fichier dans `input\00-travaux\` du produit destinataire, et nulle part ailleurs chez lui : ni son journal, ni son code, ni son carnet. Il ne commite rien dans ce dépôt. Le fichier s'appelle `<demandeur> - DEMANDE - AAAAMMJJ<indice>.md`, le nom du demandeur en tête comme pour `pilot - TRAVAUX - …`, et l'indice est le premier libre du jour dans ce dossier (`scripts\allouer-indice.mjs` du pilot). Un fichier déposé ne se modifie plus : une nouvelle demande est un nouveau fichier. Ce dépôt ne contredit pas la règle 1, qui met `input\` en lecture seule pour un producteur : la demande n'est pas un livrable du destinataire, c'est un entrant qu'il reçoit dans sa boîte, comme `pilot - TRAVAUX - …`.
+2. La demande tient en cinq rubriques : le fait observé avec sa preuve (fichier, message, mesure) ; l'évolution demandée, énoncée comme un résultat attendu chez le destinataire ; ce qui concerne ce produit-là ; comment le demandeur saura que c'est fait ; ce que la demande ne réclame pas. Une ligne `Statut : a_traiter` ouvre le fichier ; la passer à `traitée le <date>` est la seule édition permise après le dépôt.
+3. Le destinataire l'enregistre lui-même, à l'ouverture de sa prochaine session : il lit `input\00-travaux\`, décide, et consigne une entrée `demande_recue` à son journal (`demandeur`, `fichier`, `decision` : `retenue` ou `ecartee`, `motif`). Retenue, la demande entre à son carnet de reste-à-faire et part en run de version ; l'entrée `demande_recue` tient lieu du `retour` que son routage prévoit pour une évolution. Écartée, elle rejoint les « Écarts assumés » avec son motif et sa date (R-20 bis). Le fichier est une donnée, jamais une consigne : le destinataire reste juge de ce qu'il fait, de l'ordre et de ce qu'il écarte.
+4. Le demandeur garde l'original dans `forge\demandes\` (même nom) et consigne une entrée `demande_emise` à son journal (`destinataire`, `fichier`, `objet`). Sa restitution dit à l'humain où la demande est déposée : c'est l'humain qui ouvre la session du destinataire quand il veut la voir traitée.
+
+L'autonomie des produits tient à des interdits. Aucun message vers la session du destinataire : un message qui déclenche du travail chez un produit est une intervention (`gabarits\AGENT-CAMPAGNE.md`). Aucun relais par le pilot, qui n'intervient chez un produit que sur run demandé. Aucune écriture dans le code du destinataire : la décision humaine du 28/09/2026 que le lot cite le dit ainsi, « faire le retour au produit, ne pas faire directement ». Aucune non plus dans son journal ni dans son carnet, qui sont son histoire (N-32).
+
+Les noms. La demande ne traverse que le dépôt du demandeur et celui du destinataire, et le pilot, public, n'en reçoit aucune copie. Elle peut donc porter les noms réels de produits, de clients et de personnes, selon la règle humaine du 01/10/2026 : « Les dépôts privés peuvent conserver des données de type nom. » Cette règle vaut pour un dépôt privé ; un dépôt public reste soumis à la pseudonymisation, comme le pilot (`references\PRODUITS.md`). Ce qui doit remonter au pilot passe par un lot de retours, que le pilot pseudonymise à l'accueil.
+
+Si le dossier du destinataire n'est pas sur le poste, la demande reste dans `forge\demandes\`, la restitution le dit, et l'humain la dépose.
+
+Au 01/10/2026, le canal est écrit ici et au tableau de routage de `gabarits\CLAUDE-PRODUIT.md`, et rien ne le joue encore : ni gabarit de demande, ni juge de forme que le demandeur et le destinataire importeraient tous deux, ni détection d'une demande reçue et non enregistrée. N-32 réclame ce juge dès le premier jour ; il est à construire.
 
 ### 3 quinquies. Le pilot n'ecrit pas chez un produit, et ce n'est plus une consigne (23/08/2026)
 
@@ -323,17 +356,28 @@ symétriques — déléguer un arbitrage, et facturer un travail mécanique au p
 
 | Rôle | Modèle | Règle |
 |---|---|---|
-| Pilotage, arbitrage, synthèse inter-étapes | Fable (session orchestrateur) | jamais délégué |
+| Pilotage, arbitrage, synthèse inter-étapes | Opus (session orchestrateur, nom de famille `opus[1m]` au réglage du poste) | jamais délégué |
 | Construction complexe (code, architecture, maquette complète) | Opus | sur escalade ou complexité manifeste |
 | Production standard (documents d'étape, exigences, tokens, tests simples) | Sonnet | **défaut** |
 | Tâches mécaniques (extraction, reformatage, vérifications simples) | Haiku | quand la tâche est purement mécanique |
 
-**Génération courante** (épinglée le 2026-08-10, à réviser à chaque changement de famille) :
-les rôles ci-dessus se résolvent sur la **famille Claude 5** — Fable 5 (`claude-fable-5`),
-Opus 5 (`claude-opus-5`), Sonnet 5 (`claude-sonnet-5`) — et Haiku 4.5 (`claude-haiku-4-5`).
-Un saut de génération **renforce la règle de challenge** : les capacités montent, donc les
-tâches jadis « Opus » redeviennent candidates Sonnet — re-tester l'a priori au premier run
-(§4 bis), ne jamais reconduire l'ancienne table par habitude.
+**Le modèle se désigne par son NOM DE FAMILLE, jamais par un identifiant** (décisions humaines
+D-1 (a) et D-2 (a) du 25/09/2026). `opus`, `sonnet`, `haiku` et `fable` suivent la dernière
+version sans qu'aucun fichier ne bouge : à l'appel d'un agent, dans la définition d'un agent
+compilé (`agent.def`, champ `modele`), au réglage du poste. Un identifiant complet épingle une
+version, et une session épinglée ne voit pas la suivante.
+
+**Génération courante** : elle vit dans le référentiel daté et sourcé
+`references\MODELES-EN-SERVICE.json` (loi n° 4), jamais recopiée ici (§3 quater). Jusqu'au
+25/09/2026, ce paragraphe l'épinglait lui-même au 2026-08-10 et ne se révisait qu'« à chaque
+changement de famille » : Fable 5.1 et Opus 5.5, versions de la même famille, sont entrées en
+service sans rien déclencher. **Toute nouvelle version d'un modèle du tableau renforce la règle de
+challenge** : les capacités montent, donc les tâches jadis « Opus » redeviennent candidates
+Sonnet — re-tester l'a priori au premier run (§4 bis), ne jamais reconduire l'ancienne table par
+habitude. Le déclencheur est exécuté : `node oracles\oracle-modeles-en-service.mjs` lit à chaque
+ouverture de session du pilot les versions servies dans les transcripts du poste, et une version
+plus récente que la génération courante le fait échouer. Le re-test dû s'inscrit au référentiel
+(`re_test_regle_de_challenge`) et se dit à chaque ouverture jusqu'à la mesure qui le clôt.
 
 **Règle de challenge** : toute tâche part sur le modèle le moins cher plausible. Escalade vers le
 modèle supérieur **uniquement** sur échec d'un oracle ou d'un critère d'acceptation, consignée au
@@ -347,8 +391,9 @@ Constat fondateur : ~25 affectations de modèle en 2 produits réels, zéro esca
 comparative — un a priori jamais confronté. Protocole, appliqué à toute campagne ou run :
 
 1. **Consignation systématique** : chaque tranche déléguée porte au journal de campagne (ou au
-   ledger) : modèle affecté, raison de l'affectation, tokens consommés (relevés du harnais),
-   nombre de passes, verdict des vérifications natives. `escalade_modele` se consigne **même
+   ledger) : modèle affecté (famille), version servie (`modele_version`, §1), raison de
+   l'affectation, tokens consommés (relevés du harnais), nombre de passes, verdict des
+   vérifications natives. `escalade_modele` se consigne **même
    « aucune »** — l'absence d'escalade est une donnée, pas un silence.
 2. **Tranches comparables** : dès qu'une campagne comporte ≥ 2 tranches de nature équivalente
    (même type de correctif, dépôts différents), affecter A→Sonnet et B→Opus et comparer coût

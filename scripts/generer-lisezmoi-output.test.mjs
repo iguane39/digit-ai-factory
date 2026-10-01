@@ -66,5 +66,24 @@ check("vert — un fichier NON suivi du poste n'entre pas dans l'index publié",
   if (!/Synthese de recette/.test(ib)) throw new Error("le livrable suivi manque à l'index");
 });
 
+// TF-1414 (01/10/2026) — un commit fait depuis un ARBRE DE TRAVAIL LIÉ lance le garde de
+// pré-enregistrement avec GIT_DIR exporté par git vers `.git/worktrees/<nom>`. Le relevé
+// `git -C output ls-files` héritait de cette variable et ne listait plus les livrables de l'arbre :
+// l'index publié se vidait sans alerte (410 livrables à 0, mesuré le 24/09).
+check("rouge → vert — lancé comme un crochet d'arbre de travail lié (GIT_DIR exporté), l'index garde ses livrables", () => {
+  const D = depot("lf", false);
+  const g = (...a) => spawnSync("git", ["-C", D, ...a], { encoding: "utf8" });
+  g("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "init");
+  const W = D + "-lie";
+  const r0 = g("worktree", "add", "-q", W, "-b", "lie");
+  try {
+    if (r0.status !== 0) throw new Error(`worktree add exit ${r0.status} : ${r0.stderr}`);
+    const env = { ...process.env, GIT_DIR: join(D, ".git", "worktrees", W.split(/[\\/]/).pop()) };
+    const r = spawnSync(process.execPath, [OUTIL, join(W, "output"), "--silencieux"], { encoding: "utf8", env });
+    if (r.status !== 0) throw new Error(`générateur exit ${r.status} : ${r.stderr}`);
+    if (!/Synthese de recette/.test(readFileSync(join(W, "output", "LISEZMOI.md"), "utf8"))) throw new Error("le livrable suivi manque à l'index lancé avec GIT_DIR exporté");
+  } finally { rmSync(W, { recursive: true, force: true }); rmSync(D, { recursive: true, force: true }); }
+});
+
 console.log(`\ngenerer-lisezmoi-output (TF-1243) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

@@ -24,7 +24,9 @@
  *
  * Usage : stdin JSON → stdout (contexte ajouté) ; `--self-test` : 4 cas positifs, 3 négatifs.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 /** Le lexique, dans l'ordre du noyau. Chaque règle : motif sur le message ENTIER, skill, glose. */
 export const LEXIQUE = [
@@ -37,6 +39,68 @@ export const LEXIQUE = [
   { skill: "la-barre", motif: /^\s*\/?barre\b/iu, forme: "« barre… » en tête de message" },
   { skill: "ameliore-un-skill", motif: /^\s*(?:am[ée]liore[rz]?|audite[rz]?|durcis|fiabilise[rz]?|score[rz]?|r[ée]vise[rz]?|optimise[rz]?)\s+(?:ce|le|mon|ton|un|une|cette|la)?\s*skill\b/iu, forme: "« améliore/audite ce skill »" },
 ];
+
+/**
+ * LES CONSIGNES DE RÈGLE (R-57, décision humaine du 24/09/2026) — un message peut appeler une RÈGLE
+ * et non un skill. Le fait : un lecteur juge la forme d'un document (« le format du guide […] et
+ * l'usage des composants […] sont vraiment tops ») et demande qu'elle serve ailleurs. Sans détrompeur,
+ * la remontée tenait à la mémoire de l'agent qui recevait le message — c'est-à-dire, un jour sur
+ * deux, à rien. Deux formes reconnues : la DEMANDE (« en gabarit », « comme gabarit ») et le VERDICT
+ * DE FORME (un mot de forme suivi, dans la même phrase, d'un adjectif d'éloge) — sauf si la phrase le
+ * nie (« le format n'est pas top » ne déclare rien de mûr).
+ */
+const DEMANDE_GABARIT = /\b(?:en|comme)\s+(?:un\s+|une\s+)?gabarits?\b|\bgabarits?\s+(?:pour|à|a)\s+la\s+factory\b/iu;
+const MOT_DE_FORME = /\b(?:format|forme|mise\s+en\s+(?:forme|page)|pr[ée]sentation|composants?|design)\b/giu;
+const ELOGE = /\b(?:vraiment\s+|tr[èe]s\s+|super\s+|trop\s+|hyper\s+)?(?:tops?|parfaite?s?|excellente?s?|g[ée]niale?s?|superbes?|impeccables?|r[ée]ussie?s?|remarquables?)(?![\p{L}])/iu;
+const NEGATION = /\b(?:pas|plus|jamais|gu[èe]re)\b|\bn['’]|\bne\s/iu;
+
+/** Un verdict de forme : un mot de forme, puis un éloge dans la MÊME phrase, sans négation entre eux. */
+export function verdictDeForme(message) {
+  const texte = String(message || "");
+  for (const m of texte.matchAll(MOT_DE_FORME)) {
+    const suite = texte.slice(m.index, m.index + 200).split(/[.!?\n]/)[0];
+    const e = ELOGE.exec(suite);
+    if (e && !NEGATION.test(suite.slice(0, e.index + e[0].length))) return true;
+  }
+  return false;
+}
+
+/**
+ * LA CONSIGNE DU PROCESSUS (décision humaine du 01/10/2026, réponse « 42a ») — un message humain qui
+ * DÉCRIT ou CORRIGE un processus fixe ses étapes autant que ses acteurs. Le fait : chez un produit,
+ * 7 retours humains en 4 heures, parce qu'une étape absente du processus avait été ajoutée 2 fois
+ * (« Logiquement tu ne devrais rien demander à l'administrateur Entra avant que l'appli soit
+ * déployée », puis « Non, cette étape doit être dans le pipeline »). Reconnu : dans une même
+ * phrase, un mot d'ordre ou d'étape et une tournure de correction ou de prescription.
+ */
+const MOT_DE_PROCESSUS = /\b(?:processus|[ée]tapes?|pipeline|cha[îi]ne\s+de\s+(?:livraison|d[ée]ploiement))\b|\ben\s+amont\b|\bavant\s+(?:que|de|d['’])/iu;
+const CORRECTION_DE_PROCESSUS = /(?:^|[\s:])non\s*,|\bne\s+(?:devrais|devrait|dois|doit|faut)\b|\bdoit\s+[êe]tre\b|\blogiquement\b|\bpas\s+de\s+\p{L}+[^.!?\n]*\ben\s+amont\b/iu;
+export function correctionDeProcessus(message) {
+  return String(message || "").split(/[.!?\n]/).some((p) => MOT_DE_PROCESSUS.test(p) && CORRECTION_DE_PROCESSUS.test(p));
+}
+
+export const CONSIGNES = [
+  { regle: "R-57", forme: "verdict de forme ou demande de gabarit",
+    reconnait: (m) => DEMANDE_GABARIT.test(m) || verdictDeForme(m),
+    texte: "Ce message porte un verdict humain sur la FORME d'un document, ou demande d'en faire un gabarit : " +
+      "le document est MÛR DÉCLARÉ (REGLES-PROJET.md, R-57). Le remonter DANS CE TOUR : sa forme — une famille " +
+      "de `gabarits\\documents\\` ou des composants —, jamais sa matière ; citer le verdict mot pour mot et daté " +
+      "sous « ## Documents mûrs » du lot de retours. Ne pas le faire est un défaut de classe " +
+      "« document-mur-non-remonte » (todo/CLASSES.json)." },
+  { regle: "processus", forme: "processus décrit ou corrigé par l'humain",
+    reconnait: correctionDeProcessus,
+    texte: "Ce message décrit ou corrige un PROCESSUS — qui fait quoi, et dans quel ordre. Toute voie proposée " +
+      "se relit contre lui ÉTAPE PAR ÉTAPE et ACTEUR PAR ACTEUR : une option qui ajoute une étape qu'il ne contient " +
+      "pas, ou confie une étape à un autre acteur, est exclue. Si un fait technique semble l'exiger, mesurer d'abord " +
+      "les voies automatiques (loi n° 5), puis poser UNE décision qui porte la voie tenant le processus tel quel et " +
+      "son risque mesuré (gabarits\\RESTITUTION.md, bloc 3). Classe « processus-du-commanditaire-reattribue »." },
+];
+
+/** Rend les consignes de règle reconnues dans un message (hors code cité) : [{regle, forme, texte}]. */
+export function reconnaitreConsignes(message) {
+  const sansCode = String(message || "").replace(/`[^`]*`/g, " ");
+  return CONSIGNES.filter((c) => c.reconnait(sansCode));
+}
 
 /** Rend les appels reconnus dans un message : [{skill, forme}], sans doublon de skill. */
 export function reconnaitre(message) {
@@ -74,14 +138,60 @@ export function estMessageHumain(message) {
 export const MARQUEURS_NON_HUMAINS =
   /<task-notification>|<cross-session-message|\[SYSTEM NOTIFICATION|<system-reminder>|NOT\s+USER\s+INPUT/i;
 
-/** Le texte injecté dans le contexte — une ligne par appel, ou rien. */
+/** Le texte injecté dans le contexte — une ligne par appel de skill, puis par consigne de règle, ou rien. */
 export function contexte(message) {
-  const appels = reconnaitre(message);
-  if (!appels.length) return "";
-  return appels.map((a) =>
+  const appels = reconnaitre(message).map((a) =>
     `[LEXIQUE RV-6 — hook-lexique] Ce message est un APPEL du skill \`${a.skill}\` (${a.forme}) : ` +
     `l'invoquer par l'outil Skill AVANT toute autre action ou réponse ; retirer le mot-clé, le reste du message est l'entrant. ` +
-    `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`).join("\n");
+    `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`);
+  const consignes = reconnaitreConsignes(message).map((c) => `[${c.regle} — hook-lexique] ${c.texte}`);
+  return [...appels, ...consignes].join("\n");
+}
+
+/**
+ * NIVEAUX D'INTERVENTION — étape 1 (TF-1418, décision humaine D-3 (a) du 25/09/2026 ; étude
+ * `output/03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md`, verdict O3).
+ *
+ * LE FAIT. Mesuré sur 165 tours du pilot : une question courte attendait 6,3 minutes en médiane et
+ * recevait 1 813 mots, parce qu'elle finissait presque toujours en restitution complète, alors que
+ * l'exemption « réponse courte » existait. « vite : » en tête du message humain demande donc le
+ * niveau Simple, la réponse directe de `references/NIVEAUX.md` ; « complet : » demande le niveau
+ * Complexe. Mêmes bornes que le lexique : en tête seulement, message humain seulement.
+ *
+ * LA PORTÉE EST LE PILOT SEUL, et elle est tenue ici plutôt que promise. Ce hook est hérité par les
+ * produits (lanceur `forge/hooks/factory.mjs lexique`), alors que l'étape 1 ne vise que le pilot et
+ * qu'un produit n'a pas le référentiel que la ligne injectée cite. La ligne ne s'injecte donc que si
+ * le dossier de la session porte `references/NIVEAUX.md` ; ailleurs, le mot-clé ne produit rien.
+ */
+export const NIVEAUX = [
+  { niveau: "Simple", motif: /^\s*vite\s*:/iu, forme: "« vite : » en tête de message" },
+  { niveau: "Complexe", motif: /^\s*complet\s*:/iu, forme: "« complet : » en tête de message" },
+];
+
+/** Le niveau demandé par le message, ou null. Une seule demande : la première qui matche. */
+export function reconnaitreNiveau(message) {
+  const brut = String(message || "");
+  const r = NIVEAUX.find((n) => n.motif.test(brut));
+  return r ? { niveau: r.niveau, forme: r.forme } : null;
+}
+
+/** La doctrine des niveaux est-elle en service dans ce dossier ? Au pilot seul pendant l'étape 1. */
+export function niveauxEnService(dossier) {
+  try { return Boolean(dossier) && existsSync(join(dossier, "references", "NIVEAUX.md")); }
+  catch { return false; }
+}
+
+/** Le texte injecté pour un niveau demandé — une ligne, ou rien. */
+export function contexteNiveau(message) {
+  const n = reconnaitreNiveau(message);
+  if (!n) return "";
+  if (n.niveau === "Simple") return `[NIVEAU — hook-lexique] L'humain demande le niveau Simple (${n.forme}) : ` +
+    `retirer le mot-clé et répondre selon references\\NIVEAUX.md — première ligne « Niveau : Simple », 150 mots au plus, ` +
+    `lectures libres, 3 commandes au plus, aucune écriture, aucun mot de verdict ni décision ou action numérotée ; ` +
+    `source citée, « Non vérifié » s'il le faut. Si la question dépasse ces bornes, le dire en une phrase et restituer ` +
+    `en entier : le niveau ne descend jamais.`;
+  return `[NIVEAU — hook-lexique] L'humain demande le niveau Complexe (${n.forme}) : retirer le mot-clé ; ` +
+    `process complet et restitution de gabarits\\RESTITUTION.md, quelle que soit la longueur de la question.`;
 }
 
 /**
@@ -156,6 +266,81 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ok ? pass++ : fail++;
   }
 
+  // R-57 (24/09/2026) — LA CONSIGNE DE RÈGLE, dans ses deux sens. Le premier cas est le message
+  // humain qui a fondé la règle, mot pour mot ; les rouges sont les phrases voisines qu'un détrompeur
+  // trop large prendrait pour un éloge — une négation, un gabarit qu'on corrige, un « top » de liste.
+  const casConsignes = [
+    ["Le format du guide du développeur et l'usage des composants utilisés, comme la recherche, les onglets, les menus sur le côté, la popup pour les fichiers MD, les chapitres, sous-chapitres sont vraiment tops. Enregistre ce document en gabarit pour la Factory", ["R-57"]],
+    ["Enregistre ce rapport comme gabarit, on le réutilisera", ["R-57"]],
+    ["La mise en page de ce rapport est excellente, garde-la", ["R-57"]],
+    ["Les composants de ce tableau de bord sont parfaits", ["R-57"]],
+    ["Le format n'est pas top, reprends les marges", []],
+    ["Corrige le gabarit de restitution, il manque le bloc 3", []],
+    ["Top 5 des corrections à faire avant l'envoi", []],
+    ["Le prompt réécrit est bon, on le garde tel quel", []],
+    ["le composant `format top` est cité dans le code", []],
+    ["Logiquement tu ne devrais rien demander à l'administrateur Entra avant que l'appli soit déployée, que l'on arrive sur la page de l'application", ["processus"]],
+    ["66 : Non, cette étape doit être dans le pipeline. Ajoute là au pipeline de prod", ["processus"]],
+    ["Pas de demande d'inscription de l'appli en amont.", ["processus"]],
+    ["Ajoute une étape de tests au run", []],
+    ["Tu ne devrais pas utiliser ce mot dans le titre", []],
+    ["Non, garde la version précédente", []],
+  ];
+  for (const [msg, attendu] of casConsignes) {
+    const obtenu = reconnaitreConsignes(msg).map((c) => c.regle);
+    const ok = JSON.stringify(obtenu) === JSON.stringify(attendu);
+    console.log(`  [${ok ? "PASS" : "FAIL"}] consigne « ${msg.slice(0, 48)} » → ${JSON.stringify(obtenu)}${ok ? "" : ` (attendu ${JSON.stringify(attendu)})`}`);
+    ok ? pass++ : fail++;
+  }
+  // La porte d'origine vaut pour les consignes comme pour les skills : une notification qui cite un
+  // éloge de forme n'est pas un verdict humain.
+  {
+    const note = "<task-notification>le format est vraiment top, en gabarit</task-notification>";
+    const injecte = estMessageHumain(note) ? contexte(note) : "";
+    const ok = injecte === "" && /R-57 — hook-lexique/.test(contexte(casConsignes[0][0]));
+    console.log(`  [${ok ? "PASS" : "FAIL"}] consigne — une notification non humaine n'injecte rien, le message humain injecte R-57`);
+    ok ? pass++ : fail++;
+  }
+
+  // TF-1418 — LES NIVEAUX. Chaque mot-clé a sa paire : le même mot en tête avec ses deux-points
+  // (niveau reconnu), puis ailleurs dans la phrase ou sans ses deux-points (rien). Sans la moitié
+  // négative, un motif qui matcherait « vite » partout serait vert.
+  const casNiveau = [
+    ["vite : où est la liste des éléments ?", "Simple"],
+    ["Vite: le parc est-il à jour ?", "Simple"],
+    ["complet : pourquoi le hook a-t-il refusé ma synthèse ?", "Complexe"],
+    ["c'est vite fait : corrige la page d'accueil", null],
+    ["vite, où est la liste ?", null],
+    ["la liste au complet : 12 lignes", null],
+  ];
+  for (const [msg, attendu] of casNiveau) {
+    const obtenu = reconnaitreNiveau(msg)?.niveau ?? null;
+    const ok = obtenu === attendu;
+    console.log(`  [${ok ? "PASS" : "FAIL"}] niveau — « ${msg.slice(0, 44)} » → ${obtenu}${ok ? "" : ` (attendu ${attendu})`}`);
+    ok ? pass++ : fail++;
+  }
+
+  // La PORTÉE : en service là où le référentiel existe, muette ailleurs. La paire joue le même
+  // dossier temporaire, sans puis avec `references/NIVEAUX.md` — c'est la garde qui tient les
+  // produits hors de l'étape 1.
+  const dossier = mkdtempSync(join(tmpdir(), "niveaux-"));
+  const horsService = niveauxEnService(dossier) === false;
+  mkdirSync(join(dossier, "references"), { recursive: true });
+  writeFileSync(join(dossier, "references", "NIVEAUX.md"), "# fixture\n");
+  const enService = niveauxEnService(dossier) === true;
+  for (const [ok, glose] of [[horsService, "dossier sans references/NIVEAUX.md → hors service"],
+    [enService, "même dossier portant references/NIVEAUX.md → en service"]]) {
+    console.log(`  [${ok ? "PASS" : "FAIL"}] portée — ${glose}`);
+    ok ? pass++ : fail++;
+  }
+
+  // L'ORIGINE vaut aussi pour les niveaux : « vite : » dans une entrée qui se déclare non humaine ne
+  // demande rien, alors que le même texte, humain, demanderait le niveau Simple.
+  const notification = "<task-notification>vite : l'agent a fini</task-notification>";
+  const okOrigine = !estMessageHumain(notification) && reconnaitreNiveau("vite : l'agent a fini")?.niveau === "Simple";
+  console.log(`  [${okOrigine ? "PASS" : "FAIL"}] niveau — notification portant « vite : » → non humaine, rien injecté`);
+  okOrigine ? pass++ : fail++;
+
   console.log(`\nhook-lexique : ${pass} PASS, ${fail} FAIL`);
   process.exit(fail ? 1 : 0);
 }
@@ -163,10 +348,22 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
 if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.argv.includes("--self-test")) {
   let entree = "";
   try { entree = readFileSync(0, "utf8"); } catch { entree = ""; }
-  let message = "";
-  try { const j = JSON.parse(entree); message = typeof j.prompt === "string" ? j.prompt : String(j.user_prompt || j.message || ""); }
-  catch { message = entree; }
-  const texte = estMessageHumain(message) ? contexte(message) : "";
-  if (texte) process.stdout.write(texte + "\n");
+  let message = "", dossier = "";
+  try {
+    const j = JSON.parse(entree);
+    message = typeof j.prompt === "string" ? j.prompt : String(j.user_prompt || j.message || "");
+    dossier = typeof j.cwd === "string" ? j.cwd : "";
+  } catch { message = entree; }
+  // Le dossier de la session décide si les niveaux sont en service (TF-1418) ; à défaut du champ
+  // `cwd`, celui où Claude Code lance le hook, qui est le même.
+  if (!dossier) dossier = process.cwd();
+  const lignes = [];
+  if (estMessageHumain(message)) {
+    const appels = contexte(message);
+    if (appels) lignes.push(appels);
+    const niveau = niveauxEnService(dossier) ? contexteNiveau(message) : "";
+    if (niveau) lignes.push(niveau);
+  }
+  if (lignes.length) process.stdout.write(lignes.join("\n") + "\n");
   process.exit(0);
 }

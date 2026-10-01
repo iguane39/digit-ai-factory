@@ -6,7 +6,15 @@
 > **Provenance** extrait du livrable `Client-A - Ordonnancement des etapes de MEP -
 > Produit-03 - 20260903a` (48 étapes, 7 lots), jugé PASS par `check_html.py` (36/36),
 > `render_page.py` (4 largeurs, fermé et états ouverts) et `oracle-filtres-tableau.mjs`.
-> **Gabarit : gd-ordonnancement-mep** · **Version du gabarit : 1.0.0**
+> **Gabarit : gd-ordonnancement-mep** · **Version du gabarit : 1.1.0**
+
+## 1.1.0 (01/10/2026) — le jour J rejoue ses portes, et un garde-fou de la plateforme se cite
+
+Le lot du jour J porte une étape « Exécuter » qui rejoue, sur l'artefact visé, les portes de la
+chaîne qui jugent une base externe ; le lancement en dépend (section 2, TF-1498). Lancer avant ce
+rejeu devient une inversion à écrire d'office (section 4). Un ordre qu'un garde-fou de la
+plateforme interdit se cite en section 4 avec son identifiant (TF-1495, TF-1496). Le squelette
+porte la version 1.1.0 ; sa structure ne change pas.
 
 **Ce que ce document est, et ce qu'aucun autre ne fait.** Le dossier de MEP (`ETAPE-MEP.md`)
 dit ce qu'il faut PROUVER ; la checklist de GO production (forge-audit) dit ce qu'il faut
@@ -38,7 +46,7 @@ role_destinataire: {qui décide sur ce document — comité de changement, porte
 **Projet** : {nom} · **Indice** : {AAAAMMJJ<i>} · **Date** : {JJ/MM/AAAA}
 **Commit de référence de ce document** : {branche @ date} · **Artefact visé** : {tag, commit}
 **Sources** : {dossier de changement, constats d'audit, état du dépôt vérifié le …}
-**Gabarit : gd-ordonnancement-mep** · **Version du gabarit : 1.0.0**
+**Gabarit : gd-ordonnancement-mep** · **Version du gabarit : 1.1.0**
 ```
 
 Le **commit de référence** et l'**artefact visé** sont dus, et ils ne sont pas décoratifs : un
@@ -108,6 +116,14 @@ Les colonnes sont **fixes, dans cet ordre, pour tous les lots** :
 portent une date ou une fenêtre portent `data-v` avec la valeur triable, sinon le tri du
 tableau range `J-1` après `J`.
 
+**Le lot du jour J rejoue les portes à base externe** (1.1.0, TF-1498). Une étape « Exécuter »
+y précède le lancement. Elle rejoue sur l'artefact visé chaque porte de la chaîne qui juge une
+base externe : avis de dépendances, base de vulnérabilités, dépôt de paquets. Sa preuve de fin est
+la sortie de chaque porte, datée du jour J, et l'étape de lancement en dépend. Le 30/09/2026, un
+fichier de verrouillage vert en qualification la veille a été refusé en production. 3 avis
+publiés dans la nuit l'ont arrêté, et le lancement de l'exploitant a été perdu (`ETAPE-MEP.md`,
+M-10).
+
 ### 3 · Écarts déclarés, maintenus hors du chemin
 
 > **Exclus, pas oubliés.** Un lecteur qui ne trouve pas un sujet connu dans le tableau doit le
@@ -126,6 +142,16 @@ présente bien : la colonne du motif porte le chiffre, ou le statut redescend.
 **Le reste du tableau se réordonne sans dommage ; celles-là, non.** Une par entrée numérotée,
 et chacune dit les TROIS choses : quelles étapes, dans quel ordre, **et ce qui casse si on les
 inverse** — en toutes lettres, jamais « cela peut poser problème ».
+
+**Une inversion s'écrit d'office dès que la chaîne juge une base externe** : lancer avant le
+rejeu des portes du jour J. Elle se cite avec les numéros des 2 étapes, comme les autres.
+
+**Un ordre qu'un garde-fou de la plateforme interdit se cite ici, avec son identifiant**. Les
+garde-fous viennent du relevé des stratégies de la portée cible, fait avant d'ordonner, et des
+contraintes déjà connues du produit (`ETAPE-MEP.md` § 1 ter). Un tel ordre n'est pas risqué : la
+plateforme le refuse à l'écriture. Le 29/09/2026, un amorçage de production « sans
+authentification au premier passage » a été refusé par une stratégie posée depuis le 03/07, que
+le produit avait déjà heurtée en qualification.
 
 *C'est la section qui justifie le document.* Sans elle, un ordonnancement est un planning de
 plus ; avec elle, il porte l'information que personne d'autre ne détient. Sur le livrable

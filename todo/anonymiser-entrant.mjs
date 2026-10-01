@@ -51,6 +51,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { cheminsTables } from "../scripts/lib-confidentiel.mjs";
+import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = process.env.FORGE_ROOT || join(ICI, "..", "..");
@@ -165,8 +166,44 @@ function sousRepertoireTemporaire(chemin) {
  */
 export const extensionInterdite = (chemin) => estUnBanc() && !sousRepertoireTemporaire(chemin);
 
-/** Pseudonyme STABLE d'un produit ; l'inscrit s'il est inconnu. */
-export function pseudoProduit(nom) {
+/**
+ * TF-1431 (28/09/2026) — UN ESSAI SUR REGISTRE JETABLE N'ÉTEND PAS LA TABLE RÉELLE.
+ *
+ * Le fait : ce matin-là à 07:45:43Z, un essai d'ingestion joué avec `--registre` sur une COPIE du
+ * registre, sans `FORGE_PRODUITS_PSEUDO`, a inscrit un produit dans la table du canal. Le registre
+ * réel est resté intact, la table non. La garde de banc ci-dessus ne pouvait pas le voir : un essai
+ * lancé à la main n'a ni le point d'entrée d'un banc ni son marqueur.
+ *
+ * `ingerer-lot.mjs` pose donc ce marqueur dès que son registre n'est pas celui par défaut ; hérité
+ * comme celui des bancs, il vaut pour toute la descendance. Marqueur posé, l'écrivain n'étend que
+ * la table DÉSIGNÉE par `FORGE_PRODUITS_PSEUDO`. Il lit toujours la table du canal : un produit
+ * déjà connu passe, seule l'inscription d'un produit neuf est refusée, avant toute écriture.
+ */
+export const MARQUEUR_REGISTRE_JETABLE = "FORGE_REGISTRE_JETABLE";
+
+/**
+ * TF-1432 (28/09/2026) — le pseudonyme EXISTANT du dossier d'une racine déclarée, sinon `null`.
+ * Lecture seule : rien n'est inscrit. Deux passes, comme `scripts/lib-pseudonyme-produit.mjs` : une
+ * clé qui porte déjà le pseudonyme d'un client ne se rejoint qu'après la substitution du client. Le
+ * pseudonyme trouvé doit être une VALEUR de la table : un segment « Produit-NN » qu'elle ne connaît
+ * pas ne désigne aucun de ses produits.
+ */
+export function pseudonymeDeRacine(racine) {
+  if (typeof racine !== "string" || !racine.trim()) return null;
+  const dossier = racine.trim().replaceAll("\\", "/").replace(/\/+$/, "").split("/").pop();
+  const d = lireProduits();
+  if (!dossier || !d || !d.produits) return null;
+  let propre;
+  try { propre = anonymiser(anonymiser(dossier).texte).texte; } catch { return null; }
+  const m = String(propre).match(/Produit-\d{2,}/);
+  return m && Object.values(d.produits).includes(m[0]) ? m[0] : null;
+}
+
+/**
+ * Pseudonyme STABLE d'un produit ; l'inscrit s'il est inconnu. `racine` : la racine que le lot
+ * déclare (`racine_produit`) — un nom neuf dont le dossier a déjà un pseudonyme le rejoint (TF-1432).
+ */
+export function pseudoProduit(nom, { racine = null } = {}) {
   const p = CHEMIN_PRODUITS();
   // UN BANC DE TEST N'ÉTEND JAMAIS LE RÉFÉRENTIEL RÉEL (08/09/2026), et c'est la TROISIÈME fois
   // que la même classe se paie ici : la garde du dessus — « un nom de moins de 5 caractères ne
@@ -207,11 +244,51 @@ export function pseudoProduit(nom) {
   // à la table et rendu le registre illisible (« demandeur : Produit-60 » pour un constat de la forge
   // de développement). Un émetteur forge garde son nom et n'entre jamais à la table.
   if (EST_EMETTEUR_FORGE.test(nom)) return nom;
+  // UN PRODUIT PRIVÉ DE L'ÉCOSYSTÈME N'EST PAS UN NOM À CACHER (TF-1505, 01/10/2026). D-5 (a) du 17/09
+  // a déclaré `digit-ai-marketing` nom public, et la seule liste qui le disait, `PRODUITS_DE_L_ECOSYSTEME`,
+  // n'était lue que par les balayages du parc : mesuré sur une copie jetable de la table, cet écrivain
+  // l'aurait réinscrit sous Produit-79, et la porte de publication aurait rendu bloquante chacune de ses
+  // occurrences suivies. Règle humaine du 01/10, mot pour mot : « Les dépôts privés peuvent conserver
+  // des données de type nom. » La liste se lit donc ICI, au point de passage, comme les forges.
+  if (PRODUITS_DE_L_ECOSYSTEME.has(nom)) return nom;
   // UN NOM TROP COURT NE S'INSCRIT PAS NON PLUS (02/09, second cas payé le même jour) : « PROD »,
   // nom de fixture d'une recette non isolée, inscrit comme produit — et une clé de quatre lettres
   // substituée par inclusion réécrit « PRODUCTION » en « Produit-13UCTION ». Le refus est dit.
   if (nom.length < 5) { console.error(`[ANONYMISÉ] « ${nom} » n'est pas inscrit : un nom de produit fait au moins 5 caractères (une clé courte mordrait sur les mots qui la contiennent)`); return null; }
   if (!d.produits[nom]) {
+    // TF-1431 : un registre jetable n'étend que la table qu'on lui désigne — refus avant l'écriture.
+    if (process.env[MARQUEUR_REGISTRE_JETABLE] && !process.env.FORGE_PRODUITS_PSEUDO) {
+      throw new Error(
+        `un essai sur registre jetable (${process.env[MARQUEUR_REGISTRE_JETABLE]}) ne peut pas étendre la table réelle `
+        + `des produits (${p}) : poser des tables jetables et les désigner par FORGE_NOMS_INTERDITS et `
+        + "FORGE_PRODUITS_PSEUDO, ou ingérer dans le registre par défaut (TF-1431)");
+    }
+    // TF-1328 (26/09/2026) : l'écrivain pose la date d'inscription au bloc `depuis` (D-31 (a) du
+    // 08/09). Sans elle, la porte de publication juge toute l'histoire du nom SANS borne — la
+    // rétroactivité que la date supprimait : Produit-66 et Produit-67 en ont été privés. Le jour est
+    // LOCAL, comme les dates d'enregistrement auxquelles la porte le compare.
+    const j = new Date();
+    const jour = `${j.getFullYear()}-${String(j.getMonth() + 1).padStart(2, "0")}-${String(j.getDate()).padStart(2, "0")}`;
+    // TF-1432 (28/09/2026) — UN PRODUIT CONNU PAR SA RACINE NE REÇOIT PAS UN SECOND PSEUDONYME. Le
+    // même produit était Produit-73 sous la forme de son nom de dossier (27/09), puis Produit-76 sous
+    // celle de son préfixe de lot (28/09) : les règles qui comparent les lots d'un produit n'en
+    // voyaient plus aucun. Le lot déclarait sa racine, dont le dossier avait déjà son pseudonyme : le
+    // nom neuf en est une autre graphie, et il le rejoint. Le rattachement se DÉCLARE au bloc
+    // `rattachements`, que la règle K5 du canal (« un pseudonyme, une clé ») doit lire pour tolérer
+    // l'alias. Une table qui ne porte pas ce bloc n'en reçoit pas en silence : le pseudonyme neuf est
+    // alloué comme avant, et l'ingestion DIT le dédoublement.
+    const duDossier = racine ? pseudonymeDeRacine(racine) : null;
+    const rattachements = d.rattachements && typeof d.rattachements === "object" && !Array.isArray(d.rattachements) ? d.rattachements : null;
+    if (duDossier && rattachements) {
+      d.produits[nom] = duDossier;
+      rattachements[nom] = { pseudonyme: duDossier, depuis: jour, motif: "racine déclarée par le lot (racine_produit) : dossier déjà inscrit sous ce pseudonyme (TF-1432)" };
+      d.depuis = d.depuis && typeof d.depuis === "object" ? d.depuis : {};
+      d.depuis[nom] = jour;
+      d.date_derniere_extension = jour;
+      writeFileSync(p, JSON.stringify(d, null, 1), "utf8");
+      console.error(`[RATTACHÉ] un nom de produit neuf rejoint ${duDossier}, le pseudonyme du dossier de sa racine déclarée : aucun pseudonyme neuf (TF-1432)`);
+      return duDossier;
+    }
     // TF-1329 (26/09/2026) : l'indice suit le plus grand déjà attribué ou RÉSERVÉ, jamais le NOMBRE
     // de clés. Compter les clés ré-attribue un indice retiré sans réservation dès que la table porte
     // moins de clés que d'indices : 61 et 62, pris le 05/09 par deux forges puis retirés (TF-0807),
@@ -219,12 +296,6 @@ export function pseudoProduit(nom) {
     const indices = Object.values(d.produits).map((v) => Number(String(v).replace(/^Produit-/, ""))).filter((x) => Number.isInteger(x) && x > 0);
     const n = (indices.length ? Math.max(...indices) : 0) + 1;
     d.produits[nom] = `Produit-${String(n).padStart(2, "0")}`;
-    // TF-1328 (26/09/2026) : l'écrivain pose la date d'inscription au bloc `depuis` (D-31 (a) du
-    // 08/09). Sans elle, la porte de publication juge toute l'histoire du nom SANS borne — la
-    // rétroactivité que la date supprimait : Produit-66 et Produit-67 en ont été privés. Le jour est
-    // LOCAL, comme les dates d'enregistrement auxquelles la porte le compare.
-    const j = new Date();
-    const jour = `${j.getFullYear()}-${String(j.getMonth() + 1).padStart(2, "0")}-${String(j.getDate()).padStart(2, "0")}`;
     d.depuis = d.depuis && typeof d.depuis === "object" ? d.depuis : {};
     d.depuis[nom] = jour;
     d.date_derniere_extension = jour;
@@ -510,6 +581,22 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     writeFileSync(process.env.FORGE_PRODUITS_PSEUDO, JSON.stringify(t2), "utf8");
   }
 
+  // 3 nonies) TF-1505 (01/10/2026) — UN PRODUIT PRIVÉ DE L'ÉCOSYSTÈME GARDE SON NOM. Sens vert : un
+  //           nom de `PRODUITS_DE_L_ECOSYSTEME` revient tel quel, et la table n'en reçoit aucune clé.
+  //           Sens rouge : un nom de même forme que la liste ne déclare PAS reçoit toujours son
+  //           pseudonyme, sans quoi la liste ouvrirait la table à tout préfixe `digit-ai-`. Le défaut
+  //           d'origine : D-5 (a) du 17/09 déclarait `digit-ai-marketing` nom public, et cet écrivain,
+  //           qui ne lisait pas la liste, l'aurait réinscrit sous Produit-79 le 01/10.
+  {
+    const [declare] = [...PRODUITS_DE_L_ECOSYSTEME];
+    const avant = readFileSync(process.env.FORGE_PRODUITS_PSEUDO, "utf8");
+    const p5 = pseudoProduit(declare);
+    if (p5 !== declare) casse.push(`TF-1505 : le produit déclaré de l'écosystème « ${declare} » reçoit ${p5} — un nom public décidé par l'humain serait réinscrit`);
+    if (readFileSync(process.env.FORGE_PRODUITS_PSEUDO, "utf8") !== avant) casse.push("TF-1505 : la table s'est étendue pour un produit déclaré de l'écosystème");
+    const p6 = pseudoProduit("digit-ai-produit-non-declare");
+    if (!/^Produit-\d{2,}$/.test(String(p6))) casse.push(`TF-1505 : un nom en digit-ai- que la liste ne déclare pas n'est plus pseudonymisé (${p6}) — la liste ouvrirait la table à tout préfixe`);
+  }
+
   // 3 bis) un nom qui EST déjà un pseudonyme n'est jamais réinscrit ni décalé (02/09)
   const p3 = pseudoProduit("Produit-01");
   if (p3 !== "Produit-01") casse.push(`un pseudonyme réinscrit comme produit neuf : Produit-01 → ${p3}`);
@@ -567,6 +654,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${10 - casse.length}/10 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${11 - casse.length}/11 cas, ${casse.length} FAIL`);
   process.exit(casse.length ? 1 : 0);
 }

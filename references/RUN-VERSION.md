@@ -8,6 +8,15 @@ premier produit réel). Entrant : les retours consignés au ledger du run préc�
 l'entrée du run N+1 — même projet, nouveau `run_open` chaîné (champ `run_precedent`,
 contrôle R-19 de l'oracle de conformité).
 
+**Champs du `run_open` d'un parcours ouvert après un autre run** (tout `run_open` qui n'est pas
+le premier du produit, quelle que soit la voie qui l'ouvre) : `versions_forges` (objet non vide,
+clés en nom de dépôt complet, R-19) et **`run_precedent`** (l'identifiant du run qui précède —
+R-19 refuse un run de version qui ne le porte pas : « les runs se chaînent »). Un `run_precedent`
+omis à l'ouverture ne se répare JAMAIS en réécrivant l'entrée (R-42 l'interdit) : il se rectifie
+PAR AJOUT, comme `versions_forges` (TF-0709, TF-0801) — `{type: "rectification_run_open",
+seq_vise: <seq du run_open>, champ: "run_precedent", valeur: "<run précédent>", cause: "…"}`
+(TF-1454).
+
 Au rattrapage, corriger aussi les **références au nom courant du pilot** dans les chemins
 absolus de PROMPT-PRODUIT/CLAUDE.md — fait d'époque : le renommage `forge-steering` →
 `forge-pilot` du 09/08 (TF-0062) prescrivait une jonction de compatibilité « à ne supprimer

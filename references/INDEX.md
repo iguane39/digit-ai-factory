@@ -19,9 +19,12 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\tics-redactionnels.json` | Donnée fermée des familles de tournures creuses (seuils de densité, antériorité), jouée par `oracles\oracle-ecriture.mjs` |
 | `references\EMPREINTES.md` | Empreintes — un seul format, et un registre qui le fait tenir |
 | `references\ETAPES-RUN.md` | Étapes d'un run produit — détail opérationnel |
+| `references\GARDE-FOUS-PLATEFORME.json` | Donnée datée et sourcée des garde-fous de plateforme relevés chez les produits, par client sous pseudonyme ; lue avant de concevoir un déploiement (`ETAPE-MEP.md` § 1 ter, porte M-11) et jugée par `scripts\verifier-garde-fous.mjs` |
 | `references\INTEGRATIONS-FOURNISSEURS.md` | Faits mesurés sur les interfaces de fournisseurs |
 | `references\INTENTION.md` | La cascade de l'intention — Intention → Stratégie → Tactique → Opérationnel |
+| `references\MODELES-EN-SERVICE.json` | Donnée datée et sourcée de la génération de modèles en service, une version par famille, et du re-test de la règle de challenge qu'une nouvelle version déclenche ; jouée à chaque ouverture par `oracles\oracle-modeles-en-service.mjs` (D-1 (a) du 25/09/2026) |
 | `references\PATRONS-EPROUVES.md` | Patrons éprouvés — mécanismes payés une fois, réutilisables tels quels |
+| `references\PERMISSIONS-GRAPH.json` | Table officielle datée des permissions Microsoft Graph et de leurs identifiants, relevée sur la page publiée de la documentation ; lue hors ligne par `scripts\verifier-droits-accordes.mjs` (porte M-12), rafraîchie par son option `--rafraichir` |
 | `references\PLATEFORME-LINKEDIN.md` | Plateforme LinkedIn — règles datées (contrat, accès aux chiffres, transparence, portée), péremption déclarée |
 | `references\PLATEFORMES-RESEAUX.md` | Plateformes de réseaux sociaux — 9 réseaux, 5 faits chacun (publier, programmer, exporter, déclarer un contenu généré, automatisation), solidité ligne à ligne, péremption déclarée |
 | `references\PRODUCTION-OOXML.md` | Production d'un document OOXML depuis une référence client — relevé de charte et gates |

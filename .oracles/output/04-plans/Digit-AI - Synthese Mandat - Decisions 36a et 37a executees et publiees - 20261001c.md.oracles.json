@@ -1,0 +1,79 @@
+{
+  "cible": "output/04-plans/Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+  "date_iso": "2026-10-01T12:13:03.070Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+      "verdict": "PASS",
+      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; nombre « 2 378 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md",
+    "ts": "2026-10-01T12:13:03.068Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md": "8d2a0dd369b5c3592f28bd82feda47560aa05f8eb7378c43c2414b0d706352ea"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

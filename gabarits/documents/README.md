@@ -4,9 +4,10 @@ Les gabarits de **livrables** que la factory propose à un projet, quel que soit
 un projet qui doit rendre un rapport de données, un diagnostic, un rapport d'audit ou une
 fiche de sécurité prend le gabarit de sa famille plutôt que d'inventer une forme.
 
-La bibliothèque est autant un **index** qu'un atelier. Sur ses **trente-huit** familles (recomptées
-sur `catalogue.jsonl` le 20/09/2026 : 9 `ok`, 18 `porte_ailleurs`, 11 `a_extraire` — le compte
-annoncé ici était resté à trente-deux alors que la source en portait trente-quatre), **dix-huit**
+La bibliothèque est autant un **index** qu'un atelier. Sur ses **quarante** familles (recomptées
+sur `catalogue.jsonl` le 24/09/2026 : 16 `ok`, 17 `porte_ailleurs`, 7 `a_extraire` — le compte
+annoncé ici était resté à celui du 20/09, trente-huit familles dont 9 `ok`, alors que des familles
+avaient été extraites depuis), **dix-sept**
 sont des formes qu'une forge produit déjà : pour celles-là elle ne réécrit rien — elle dit où elles
 vivent, par quel outil les obtenir, et quel oracle les juge. **Écrire un gabarit est le cas
 minoritaire**, et c'est voulu : le doublon coûte plus cher que le renvoi.
@@ -91,6 +92,14 @@ documents rouges est un squelette défectueux, et seule l'instance le dit.
 **Aucune donnée client** dans un gabarit. La forme se hisse, le contenu reste chez le projet —
 c'est aussi ce que l'oracle vérifie (G5).
 
+**Une famille peut porter son GÉNÉRATEUR et ses COMPOSANTS** (24/09/2026, première famille à le
+faire : `guide-de-reference`). Quand le document est long et vit d'une source tenue à jour, le point
+de départ n'est plus une page à remplir mais un générateur (`generateur\`) qui construit la page
+depuis sa source Markdown, et les composants de la page vivent en fichiers séparés (`composants\`,
+catalogue `COMPOSANTS.md`) — chacun posable SEUL dans une autre page, scellé par l'empreinte de sa
+source, sa parité rejouable (`--poser`, `--constat`). Squelette et instance restent dus (G1) : ils
+sont alors GÉNÉRÉS, et c'est ce qui prouve le générateur.
+
 ## S'en servir
 ### La boucle de retour — comment cette bibliothèque s'améliore
 
@@ -113,6 +122,25 @@ arrive avec chaque lot.
 Ce que la boucle NE fait pas : décider. Un manque signalé devient un candidat au registre, et
 c'est un humain qui tranche s'il change le gabarit — un oracle mesure une présence, jamais une
 valeur.
+
+### La remontée des documents mûrs — comment cette bibliothèque s'agrandit (R-57, 24/09/2026)
+
+La boucle ci-dessus fait remonter ce qu'un gabarit a COÛTÉ. La remontée fait monter ce qui en
+MÉRITE un : un document de projet dont la forme a mûri devient une famille, ou des composants.
+Décision humaine du 24/09/2026, mot pour mot : « afin que les documents matures comme celui-ci
+remonte automatiquement en gabarit à la Factory, pour être réutilisé entièrement ou en partie ».
+
+| Pièce | Où | Ce qu'elle fait |
+|---|---|---|
+| **Le déclencheur humain** | `oracles\hook-lexique.mjs`, hook `UserPromptSubmit` du pilot et de tout produit | un verdict de FORME (« le format […] est vraiment top ») ou une demande de gabarit injecte la consigne R-57 dans le tour : le document est **mûr déclaré**, et le verdict cité vaut décision |
+| **Le déclencheur mesuré** | `gabarits\oracle-lot-retours.mjs`, constat `LOT-MURS`, chez le produit | tout objet d'`output\` repris **cinq fois et plus** est **mûr mesuré** ; le lot qui le tait est refusé (`--murs <racine>` les liste avant d'écrire le lot) |
+| **La demande** | `gabarits\RETOURS-FORGES.md`, section « Documents mûrs » | chemin chez le produit, versions, oracles, verdict humain cité, composants, **verdict de remontée** — remonté, ou resté au produit « parce que… » |
+| **Le refus** | `todo\ingerer-lot.mjs`, qui importe le même juge | un lot du 29/09 ou après sans la section est refusé à l'ingestion, registre intact |
+
+**La forme, jamais la matière** : ce dépôt est publié, et aucun livrable client n'y entre (note de
+provenance d'`input\02-entrants-html\`). La famille remontée porte une instance FICTIVE et cite son
+produit d'origine par son pseudonyme. **Les composants** naissent dans leur famille et montent au
+socle `digit-ai-page-html` dès qu'une seconde famille les emploie.
 
 
 

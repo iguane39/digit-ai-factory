@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux en attente de decision - 20261001b.md",
+ "empreinte": "873d59a3db9af3c7419c97e235c432fa53cd783b377bb6f7a5b75ee0ba1e34b6",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-01T08:25:28.563Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

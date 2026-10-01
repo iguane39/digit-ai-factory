@@ -178,6 +178,39 @@ sans lui, un retour dit « il manquait une section » et personne ne sait à quo
 « Aucun document produit depuis un gabarit de la bibliothèque sur ce lot. » Une section vide se
 lit comme un oubli, et l'omission ne vaut pas décision.
 
+## Documents mûrs
+
+<!-- SECTION OBLIGATOIRE depuis le 29/09/2026 (règle R-57, décision humaine du 24/09, entrée au
+     pilot le 28/09). Vérifiée par `oracle-lot-retours` (R-57 : la section et son verdict ; LOT-MURS : chez le produit, tout
+     document de `output\` repris cinq fois et plus est NOMMÉ) — et refusée à l'ingestion. -->
+
+Les documents du produit dont la **forme** a mûri : ceux que leur lecteur a jugés réussis
+(**mûr déclaré** — son verdict, cité mot pour mot et daté, vaut décision de remontée), et ceux que
+le produit a repris **cinq fois et plus** (**mûr mesuré** — `node forge\retours\oracle-lot.mjs --murs .`
+les liste). Chacun porte son **verdict de remontée** : *remonté* — sa forme devient une famille de
+`gabarits\documents\` ou des composants —, ou *reste au produit, parce que…*.
+
+*Pourquoi cette section existe.* Un gabarit barré et documenté par un projet est resté chez lui,
+invisible aux autres (13/08) ; les quatre premières familles de la bibliothèque n'ont été extraites
+que parce qu'on est allé chercher la matière, une fois, à la main. R-46 fait remonter ce qu'un
+gabarit a COÛTÉ ; rien ne faisait remonter un document qui en MÉRITAIT un. Le guide qui a fondé la
+règle comptait vingt-trois versions et un verdict de lecteur « vraiment tops » quand il est remonté.
+
+| Document (chemin CHEZ LE PRODUIT, jamais une copie) | Versions | Oracles du dernier indice | Verdict humain cité | Composants qu'il porte | Verdict de remontée |
+|---|---|---|---|---|---|
+| <`output\…\<Marque> - <Objet> - AAAAMMJJ<i>.html`> | <n> | <check_html · render_page · design> | <« … », le JJ/MM/AAAA — ou « aucun »> | <recherche, onglets…> | <remonté : gd-… — ou — reste au produit, parce que…> |
+
+**Forme, jamais matière.** La remontée hisse une structure et des composants, avec une instance
+FICTIVE : aucun livrable client n'entre dans le dépôt du pilot, qui est publié (note de provenance
+de `input\02-entrants-html\`, 27/08/2026). Le lot cite le document par son chemin chez le
+produit ; c'est le pilot qui extrait la forme, en lisant ce chemin comme une donnée.
+
+**Une déclaration vaut pour la suite** : un document nommé ici, avec son verdict, n'a pas à l'être
+de nouveau dans les lots suivants du même produit.
+
+**Si aucun document n'a mûri**, l'écrire : « Aucun document mûr sur ce lot. » Une section vide se
+lit comme un oubli, et l'omission ne vaut pas décision.
+
 ## Confirmations positives
 
 <Ce qui a TENU en conditions réelles — aussi précieux que les défauts : permet de clore les

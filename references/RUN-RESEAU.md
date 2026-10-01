@@ -63,8 +63,20 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
    **personas**, dérivés d'entrants réels, marqués hypothèse sinon ; la **ligne éditoriale** depuis
    `MARQUE.md` de l'émetteur, écrite pour le type de compte ; l'**état de départ**, export manuel
    déposé sous `output\06-mesures\`. S'y ajoute le relevé du **temps humain hebdomadaire actuel**,
-   en minutes : sans lui, aucun gain ne se démontre. Gate humain : validation de la fiche, des
-   objectifs et des personas.
+   en minutes : sans lui, aucun gain ne se démontre. Les règles vérifiables de la ligne éditoriale
+   s'écrivent dans **`voix.json`**, à côté de la fiche, au format du gabarit
+   `gabarits\VOIX-EMETTEUR.json` du pilot. Elles y prennent 4 formes, chacune avec sa portée :
+   mots écartés, formules imposées, plafonds d'émojis et de hashtags, motifs interdits par position.
+   Une règle qu'aucun calcul ne juge, le ton par exemple, s'y déclare `lecture_humaine` (TF-1455).
+   Gate humain : validation de la fiche, des objectifs et des personas.
+
+   **Le `run_open` de cette ouverture porte `versions_forges`, et, si ce parcours s'ouvre APRÈS
+   un autre run déjà tenu par ce produit (mandat, version, conseil…), `run_precedent` qui le
+   nomme** (R-19 : « les runs se chaînent » — cas mesuré le 28/09/2026, un parcours d'animation
+   ouvert après un run de mandat, TF-1454). Omis à l'ouverture, `run_precedent` ne se corrige
+   jamais en réécrivant l'entrée (R-42) : il se rectifie PAR AJOUT, comme `versions_forges`
+   (TF-0709, TF-0801) — `{type: "rectification_run_open", seq_vise, champ: "run_precedent",
+   valeur, cause}`.
 1. **Planifier (N1), chaque semaine.** Le calendrier tient un horizon de 4 semaines : sujet,
    pilier, réseau, date visée, statut. L'IA le tient, l'humain arbitre. La veille des sujets se
    fait par recherche ouverte, sans compte.
@@ -73,8 +85,8 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
    contre la barre externe du livrable quand elle existe (`la-barre`, TF-1028 : LinkedIn seul au
    21/09). Trois portes, chacune un oracle exécuté et son verdict au ledger : faits chiffrés par
    `oracle-claims` ; transparence par `oracle-transparence` (une publication générée sans mention
-   fait FAIL) ; voix par la règle de marque. Une légende d'image joint son visuel ; une réponse à
-   un avis joint l'avis, tel que collé par l'humain, avec sa date.
+   fait FAIL) ; voix par les règles de l'émetteur (`voix.json`, RR8). Une légende d'image joint son
+   visuel ; une réponse à un avis joint l'avis, tel que collé par l'humain, avec sa date.
 3. **Accorder et programmer (N3).** Accord humain consigné au ledger (R-38), **un par lot**, qui
    nomme chaque fichier couvert. Puis programmation ou publication **par l'humain**, dans l'outil
    de la plateforme. Chaque publication est archivée chez le produit, avec sa date réelle.
@@ -123,11 +135,14 @@ verdicts des trois portes au ledger, exports sous `output\06-mesures\`, synthès
 format `gabarits\RESTITUTION.md`.
 
 **Le contrôle de chaque semaine** : `node oracles\oracle-run-reseau.mjs <dossier-semaine>
-[--mentions <formules de la marque>]`. Il lit `emetteur.json` (dans la semaine ou dans son
-parent), `calendrier.md`, chaque `publication*.md`, `accord.json` et `mesures.json`, et juge 7
-règles : calendrier à 4 semaines ; contrat de sortie du modèle que chaque publication déclare ;
-faits sourcés (`oracle-claims`) ; transparence (`oracle-transparence`) ; accord humain couvrant
-tout le lot ; mesure avec temps humain ; fiche de l'émetteur complète et sans secret. Les contrats
+[--mentions <formules de la marque>]`. Il lit `emetteur.json` et `voix.json` (dans la semaine ou
+dans son parent), `calendrier.md`, chaque `publication*.md`, `accord.json` et `mesures.json`, et
+juge 8 règles : calendrier à 4 semaines ; contrat de sortie du modèle que chaque publication
+déclare ; faits sourcés (`oracle-claims`) ; transparence (`oracle-transparence`) ; accord humain
+couvrant tout le lot ; mesure avec temps humain ; fiche de l'émetteur complète et sans secret ;
+voix de l'émetteur tenue par chaque publication de sa portée. Un `voix.json` absent, non daté, non
+sourcé ou qui porte encore un trou du gabarit rend FAIL ; une règle `lecture_humaine` est nommée à
+chaque verdict, jamais jugée. Les contrats
 de sortie sont une donnée publiée par forge-agents
 (`digit-ai-communication\references\contrats-publication.json`) : le contrôle les lit, il n'en
 porte aucun en dur, et un contrat introuvable rend FAIL, jamais PASS. Il ne juge ni la qualité du
@@ -135,10 +150,13 @@ texte contre sa barre, ni la part non mécanisable d'un contrat, ni le fait que 
 eu lieu. Une semaine écrite avant le 21/09, à un seul `publication.md` sans réseau ni modèle, se
 lit comme LinkedIn et `publication-reseau`.
 
-**Fixture de ce type de run** : les semaines à blanc, jouées par `--self-test` le 21/09/2026 dans
-les deux sens, 9 cas : une semaine verte à 3 publications (LinkedIn, Instagram, réponse à un avis)
-PASS ; une semaine rouge FAIL sur les 7 règles ; 6 altérations de la semaine verte qui
-rougissent chacune une seule règle et nomment ce qu'elles voient ; des contrats absents qui
-rougissent RR2. Aucun accord ni publication réels. La séquence est donc prouvée **à blanc**. Elle
+**Fixture de ce type de run** : les semaines à blanc, jouées par `--self-test` dans les deux sens,
+9 cas le 21/09/2026 et 27 depuis le 28/09/2026 : une semaine verte à 3 publications (LinkedIn,
+Instagram, réponse à un avis) PASS ; une semaine rouge FAIL sur les 8 règles ; 19 altérations de
+la semaine verte qui rougissent chacune une seule règle et nomment ce qu'elles voient ; des
+contrats absents qui rougissent RR2. Pour la voix, 5 cas de plus : un mot qui en contient un
+écarté sans l'être passe, et une voix sans règle mécanisable mais motivée aussi. Le gabarit brut
+est refusé, puis lu une fois instancié ; le remède d'un taux en accroche est joué. Aucun accord ni
+publication réels. La séquence est donc prouvée **à blanc**. Elle
 ne l'est pas encore **en vrai** : tant que le premier cas réel de 4 semaines n'est pas mesuré
 (TF-1160), rien ne dit que le rendez-vous tient dans un agenda.

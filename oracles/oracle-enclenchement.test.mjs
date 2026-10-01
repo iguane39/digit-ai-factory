@@ -224,12 +224,52 @@ try {
   check("VERT EN2 — un verdict servi sans promesse ne fait JAMAIS échouer : hors mobilisation et inconnu sont SIGNALÉS", () => {
     const r = juger({ ledger: ledger(P, [ouvrir({ forges_mobilisees: ["alpha"] }), v("oracle-a1"), v("oracle-a2"), v("oracle-b1"), v("oracle-p1"), v("pytest"), clore]), racine: P });
     if (r.verdict !== "PASS") throw new Error(`${r.verdict} — l'asymétrie est rompue`);
-    const f = r.findings.find((x) => x.regle === "EN2");
+    const f = r.findings.find((x) => x.regle === "EN2" && x.statut === "AVERTISSEMENT");
     if (f?.statut !== "AVERTISSEMENT") throw new Error(`EN2 ${f?.statut}`);
     const hors = Object.fromEntries(f.hors_mobilisation.map((x) => [x.nom, x.depots.join("/")]));
-    if (hors["oracle-b1"] !== "digit-ai-forge-beta" || hors["oracle-p1"] !== "digit-ai-factory") throw new Error(JSON.stringify(hors));
+    if (hors["oracle-b1"] !== "digit-ai-forge-beta") throw new Error(JSON.stringify(hors));
+    // TF-1444 (D-32 a, 28/09/2026) : l'oracle que SEUL le pilot découvre n'est plus « hors
+    // mobilisation » — il est le cadre du run, et les cas qui suivent le jouent dans ses deux sens.
+    if ("oracle-p1" in hors) throw new Error(`le cadre du pilot est encore signalé hors mobilisation : ${JSON.stringify(hors)}`);
     if (JSON.stringify(f.inconnus.map((x) => x.nom)) !== JSON.stringify(["pytest"])) throw new Error(JSON.stringify(f.inconnus));
     if (!r.non_juge.some((x) => /digit-ai-forge-gamma/.test(x) && /inconnu/.test(x))) throw new Error("les dépôts sans découverte ne sont pas dits");
+  });
+
+  // ---- EN2 et le CADRE du pilot (TF-1444) : le pilot ne se déclare pas mobilisé ----------------------
+  // Le fait du 28/09 : chaque run de produit jouait la conformité, le contrôle du lot, l'étude
+  // d'opportunité et l'écriture, oracles du pilot, et EN2 les rangeait « hors mobilisation » à chaque run.
+  check("VERT TF-1444 — des oracles que SEUL le pilot découvre, pilot non déclaré : aucun avertissement, et le cadre est DIT", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ forges_mobilisees: ["alpha"] }), v("oracle-a1"), v("oracle-a2"), v("oracle-p1"), clore]), racine: P });
+    if (r.verdict !== "PASS") throw new Error(r.verdict);
+    const avert = r.findings.filter((x) => x.regle === "EN2" && x.statut === "AVERTISSEMENT");
+    if (avert.length) throw new Error(`le cadre du pilot fait encore avertir : ${avert.map((x) => x.message).join(" | ")}`);
+    const cadre = r.findings.find((x) => x.regle === "EN2" && x.statut === "SANS_OBJET");
+    if (JSON.stringify(cadre?.cadre_pilot?.map((x) => x.nom)) !== JSON.stringify(["oracle-p1"]) || !/forges_mobilisees/.test(cadre.message)) {
+      throw new Error(`le cadre n'est pas dit : ${JSON.stringify(cadre)}`);
+    }
+  });
+
+  check("ROUGE TF-1444 — le même run qui sert aussi l'oracle d'une FORGE non mobilisée avertit toujours, pour elle seule", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ forges_mobilisees: ["alpha"] }), v("oracle-a1"), v("oracle-a2"), v("oracle-p1"), v("oracle-b1"), clore]), racine: P });
+    const f = r.findings.find((x) => x.regle === "EN2" && x.statut === "AVERTISSEMENT");
+    if (!f || JSON.stringify(f.hors_mobilisation.map((x) => x.nom)) !== JSON.stringify(["oracle-b1"]) || !/^1 nom\(s\) servi\(s\)/.test(f.message)) {
+      throw new Error(`une forge non mobilisée n'est plus signalée, ou le pilot l'est encore : ${JSON.stringify(f)}`);
+    }
+  });
+
+  check("ROUGE TF-1444 — un nom que le pilot ET une forge non mobilisée découvrent reste hors mobilisation", () => {
+    const Q = parc({ "digit-ai-forge-alpha": ["oracle-a1"], "digit-ai-forge-beta": ["oracle-commun"], "digit-ai-factory": ["oracle-p1", "oracle-commun"] });
+    const r = juger({ ledger: ledger(Q, [ouvrir({ forges_mobilisees: ["alpha"] }), v("oracle-a1"), v("oracle-p1"), v("oracle-commun"), clore]), racine: Q });
+    const f = r.findings.find((x) => x.regle === "EN2" && x.statut === "AVERTISSEMENT");
+    const hors = Object.fromEntries((f?.hors_mobilisation || []).map((x) => [x.nom, x.depots.join("/")]));
+    if (hors["oracle-commun"] !== "digit-ai-factory/digit-ai-forge-beta" || "oracle-p1" in hors) throw new Error(JSON.stringify(hors));
+  });
+
+  check("TF-1444 borne — un pilot DÉCLARÉ malgré la règle est confronté comme une forge (EN1), et rien n'est rangé au cadre", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ forges_mobilisees: ["alpha", "digit-ai-factory"] }), v("oracle-a1"), v("oracle-a2"), clore]), racine: P });
+    const f = en1(r, "digit-ai-factory");
+    if (r.verdict !== "FAIL" || JSON.stringify(f?.manquants) !== JSON.stringify(["oracle-p1"])) throw new Error(`${r.verdict} ${JSON.stringify(f)}`);
+    if (r.findings.some((x) => x.regle === "EN2" && x.statut === "SANS_OBJET")) throw new Error("un pilot déclaré a encore un cadre");
   });
 
   check("VERT — un nom découvert par deux forges mobilisées sert les deux, et l'ambiguïté est DITE", () => {

@@ -1,0 +1,8 @@
+/* gd-guide-de-reference · bascule-theme.css — le bouton de la bascule clair / sombre (règle R-30).
+ * Le thème clair reste le défaut ; le choix du lecteur est retenu d'une visite à l'autre. */
+.theme-toggle { font-family: var(--sans); font-size: .88rem; cursor: pointer; white-space: nowrap;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 999px; padding: 8px 16px; }
+.theme-toggle:hover { border-color: var(--accent-fonce); color: var(--accent-fonce); }
+@media (max-width: 760px) { .theme-toggle { min-height: 44px; } }
+@media print { .theme-toggle { display: none; } }

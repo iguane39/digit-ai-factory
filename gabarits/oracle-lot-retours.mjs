@@ -71,8 +71,25 @@
  * après. La date se lit dans le NOM du fichier (`… - AAAAMMJJ<lettre>.md`), jamais sur le
  * disque : une copie change la date de fichier, pas la date du lot.
  *
+ * R-57 (24/09/2026, décision humaine) — UN DOCUMENT MÛR REMONTE À LA BIBLIOTHÈQUE, SA FORME JAMAIS
+ * SA MATIÈRE. Deux constats. `R-57` : le lot porte la section « Documents mûrs », et sous elle un
+ * verdict de remontée (« remonté » / « reste au produit, parce que… ») ou la déclaration qu'il n'y
+ * a aucun document mûr — même forme que R-45 et R-46. `LOT-MURS` : chez le PRODUIT (lot posé sous
+ * `<racine>\forge\retours\`), l'oracle balaie `<racine>\output\` et compte les versions datées de
+ * chaque objet ; un objet d'au moins SEUIL_MUR versions est MÛR MESURÉ, et le lot qui ne le nomme
+ * ni dans sa section ni dans celle d'un lot antérieur du même produit est refusé — la remontée
+ * cesse de dépendre de la mémoire de celui qui écrit le lot. À la porte du pilot, le lot a été
+ * pseudonymisé et l'`output\` réel n'est plus comparable : LOT-MURS y rend SANS_OBJET, et le dit.
+ * Seuil mesuré le 24/09/2026 sur le produit qui fonde la règle : 31 objets HTML, 12 à 3 versions
+ * ou plus, 8 à 5 ou plus, 6 à 8 ou plus — à 5, une déclaration unique de 8 documents, que
+ * l'historique des lots couvre ensuite. Le compte est une BORNE BASSE assumée : il ne dit rien de
+ * la qualité d'une forme, il empêche seulement qu'un document repris cinq fois reste invisible
+ * (seuil confirmé par le porteur le 28/09/2026). En vigueur le 29/09 : la règle entre au main le
+ * 28/09 (TF-1413), et les lots écrits jusque-là, sans elle, ne sont pas accusés (R-33 bis).
+ *
  * Usage :
  *   node oracle-lot-retours.mjs <lot.md> [--json]
+ *   node oracle-lot-retours.mjs --murs <racine-produit>   (liste les documents mûrs mesurés)
  * Exit : 0 = forme tenue (ou lot antérieur aux règles) · 1 = forme en défaut · 2 = lot illisible.
  */
 import { readFileSync, existsSync, readdirSync } from "node:fs";
@@ -80,7 +97,16 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.3.0"; // 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.4.1"; // 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+
+/**
+ * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
+ * produit (`gabarits\HERITAGE.json`, TF-0710). Le remède nommait encore l'alias de transition
+ * `forge\retours\RETOURS-FORGES.md` : un produit qui porte les deux ouvrait la copie périmée, et
+ * le lot qu'il en tirait arrivait sans classe et hors du sas (TF-1430, lot Produit-76 du 28/09).
+ * Non exporté, à dessein : la porte du pilot importe ce module, et ses exports ne bougent pas.
+ */
+const GABARIT_LOT = "forge\\retours\\GABARIT-LOT-RETOURS.md";
 
 // LOT-SAS (TF-1054) juge un NOM avec le MÊME juge que `todo\accueillir-lot.mjs` — deux juges des
 // noms qui ne s'accordent pas donnent le pire des deux mondes (leçon de la casse, 01/09). Import
@@ -91,11 +117,21 @@ try {
   ({ anonymiser: anonymiserPilot } = await import(new URL("../todo/anonymiser-entrant.mjs", import.meta.url).href));
 } catch { /* copie héritée chez un produit : la règle y rend SANS_OBJET et le dit */ }
 
-/** R-45 depuis le 21/08/2026, R-46 depuis le 22/08 — antériorité déclarée, jamais devinée. */
-export const SEUILS = { "R-45": "20260821", "R-46": "20260822" };
+/** R-45 depuis le 21/08/2026, R-46 depuis le 22/08, R-57 depuis le 29/09 — antériorité déclarée,
+ *  jamais devinée. R-57 est décidée le 24/09 et entre au main le 28/09 : les lots écrits jusque-là,
+ *  sans la règle sous la main, ne sont pas accusés. */
+export const SEUILS = { "R-45": "20260821", "R-46": "20260822", "R-57": "20260929" };
 
 const SECTION_R45 = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
 const SECTION_R46 = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
+const SECTION_R57 = /^##\s+Documents\s+m[ûu]rs\b[^\n]*$/im;
+//: Le verdict de remontée d'un document mûr, ou la déclaration qu'il n'y en a aucun. Pas de `\b`
+//: APRÈS la lettre accentuée : sans drapeau Unicode, « remonté » suivi d'une espace n'a pas de
+//: frontière de mot, et le verdict le plus naturel n'était pas reconnu (recette du 24/09/2026).
+const VERDICT_R57 = /\bremont[ée]|\brest[ée]e?s?\s+au\s+produit\b/i;
+const AUCUN_R57 = /aucun\s+document\s+m[ûu]r/i;
+/** R-57 : un objet est MÛR MESURÉ à partir de ce nombre de versions datées (mesure du 24/09/2026). */
+export const SEUIL_MUR = 5;
 //: Le verdict de généralisation, ou la déclaration qu'il n'y a rien à généraliser.
 const VERDICT_R45 = /g[ée]n[ée]ralisab/i;
 const AUCUNE_R45 = /aucune\s+remarque\s+n['’]est\s+rest[ée]e?\s+au\s+produit/i;
@@ -169,6 +205,61 @@ export function idsEnDouble(cheminLot, texte) {
 /** Le corps d'une section, jusqu'au prochain titre de niveau 2. */
 const corpsDeSection = (texte, re) => (texte.split(re)[1] || "").split(/^## /m)[0] || "";
 
+// ---- R-57 · les documents MÛRS d'un produit, mesurés sur son `output\` -------------------------
+const LIVRABLE_DATE = /^(.+?) - (\d{8})([a-z]?)\.html?$/i;
+/** Minuscules, sans accents ni blancs répétés : « Guide développeur » = « guide  developpeur ». */
+export const normaliser = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase().replace(/\s+/g, " ").trim();
+/** L'objet d'un livrable sans sa MARQUE : ce qui suit le premier « - » (convention R-4). Un lot
+ *  pseudonymisé à la porte du pilot garde ainsi l'objet qu'il nomme, même si la marque change. */
+export const objetSansMarque = (objet) => objet.includes(" - ") ? objet.slice(objet.indexOf(" - ") + 3) : objet;
+
+/**
+ * Les objets de `<racine>\output\` qui comptent au moins `seuil` versions datées, quel que soit le
+ * sous-dossier (famille, `old\`) où elles vivent. Rend [{ objet, versions, derniere }], triés par
+ * nombre de versions décroissant. Lecture de répertoire seule — aucun fichier n'est ouvert.
+ */
+export function documentsMurs(racine, seuil = SEUIL_MUR) {
+  const sortie = join(String(racine), "output");
+  if (!existsSync(sortie)) return null;
+  const parObjet = new Map();
+  const parcourir = (d) => {
+    let entrees = [];
+    try { entrees = readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const e of entrees) {
+      if (e.isDirectory()) { if (!/^(node_modules|\.git|\.oracles)$/.test(e.name)) parcourir(join(d, e.name)); continue; }
+      const m = LIVRABLE_DATE.exec(e.name);
+      if (!m) continue;
+      const cle = normaliser(m[1]);
+      const v = parObjet.get(cle) || { objet: m[1].trim(), versions: 0, derniere: "" };
+      v.versions++;
+      if (`${m[2]}${m[3]}` > v.derniere) v.derniere = `${m[2]}${m[3]}`;
+      parObjet.set(cle, v);
+    }
+  };
+  parcourir(sortie);
+  return [...parObjet.values()].filter((v) => v.versions >= seuil).sort((a, b) => b.versions - a.versions);
+}
+
+/** Le texte des sections « Documents mûrs » des lots ANTÉRIEURS du même produit, même dossier et `old\`. */
+function murDesLotsAnterieurs(cheminLot) {
+  const nom = basename(String(cheminLot).split("\\").join("/"));
+  const m = NOM_DE_LOT.exec(nom);
+  if (!m) return "";
+  const [, prefixe, cle] = m;
+  const dossier = dirname(resolve(String(cheminLot)));
+  let cumul = "";
+  for (const d of [dossier, join(dossier, "old")]) {
+    if (!existsSync(d)) continue;
+    for (const n of readdirSync(d)) {
+      const v = NOM_DE_LOT.exec(n);
+      if (!v || n === nom || v[1].toLowerCase() !== prefixe.toLowerCase() || v[2] >= cle) continue;
+      try { cumul += "\n" + corpsDeSection(readFileSync(join(d, n), "utf8"), SECTION_R57); } catch { /* illisible : ignoré */ }
+    }
+  }
+  return cumul;
+}
+
 /**
  * Juge un lot. Rend { verdict, date, constats[] } — chaque constat porte SON REMÈDE.
  *
@@ -233,6 +324,12 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
       substance: "rattachement d'un retour à son gabarit (id `gd-…` ou version affichée en en-tête du document) — elle ne rattache aucun retour",
       pourquoi: "ce qu'un document a coûté au gabarit — section manquante, champ non prévu, ajout à la main — est le SEUL canal par lequel la bibliothèque s'améliore",
       rienADire: "aucun document produit depuis un gabarit" },
+    { regle: "R-57", seuil: SEUILS["R-57"], section: SECTION_R57,
+      quoi: "Documents mûrs",
+      present: VERDICT_R57, absent: AUCUN_R57,
+      substance: "verdict de remontée (« remonté » ou « reste au produit, parce que… ») par document mûr",
+      pourquoi: "un document que son lecteur a jugé réussi, ou que le produit a repris cinq fois, reste sinon invisible aux autres projets — sa FORME monte à la bibliothèque (famille ou composants), jamais sa matière",
+      rienADire: "aucun document mûr" },
   ];
   for (const { regle, seuil, section, quoi, present, absent, substance, pourquoi, rienADire } of REGLES) {
     if (date < seuil) {
@@ -244,7 +341,7 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
     if (!section.test(texte)) {
       ajouter(regle, "FAIL",
         `section « ${quoi} » absente — ${pourquoi}`,
-        `ajouter la section « ## ${quoi} » au lot. Rien à y mettre ? L'écrire : « ${rienADire} ». La forme se déclare, elle ne se devine pas (loi n° 3). Gabarit : forge\\retours\\RETOURS-FORGES.md`);
+        `ajouter la section « ## ${quoi} » au lot. Rien à y mettre ? L'écrire : « ${rienADire} ». La forme se déclare, elle ne se devine pas (loi n° 3). Gabarit : ${GABARIT_LOT}`);
       continue;
     }
     const suite = corpsDeSection(texte, section);
@@ -255,6 +352,39 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
       continue;
     }
     ajouter(regle, "PASS", `section « ${quoi} » présente et substantielle`, null);
+  }
+
+  // ---- LOT-MURS · UN DOCUMENT MÛR MESURÉ NE SE TAIT PAS (R-57, 24/09/2026) --------------------
+  //
+  // La section R-57 se juge partout ; la MESURE ne se joue que là où l'`output\` réel est à portée :
+  // chez le produit, lot posé sous `<racine>\forge\retours\`. Un objet d'au moins SEUIL_MUR versions
+  // datées doit être NOMMÉ — par son objet sans la marque — dans la section de ce lot ou d'un lot
+  // antérieur du même produit : la déclaration se fait une fois, l'historique des lots la garde.
+  if (date >= SEUILS["R-57"]) {
+    const dossierLot = dirname(resolve(String(cheminLot)));
+    const chezLeProduit = /^retours$/i.test(basename(dossierLot)) && /^forge$/i.test(basename(dirname(dossierLot)));
+    const racine = chezLeProduit ? dirname(dirname(dossierLot)) : null;
+    const murs = racine ? documentsMurs(racine) : null;
+    if (!racine) {
+      ajouter("LOT-MURS", "SANS_OBJET",
+        "lot hors d'un produit (boîte du pilot, sas, copie) — la mesure des documents mûrs se joue chez le produit, AVANT la remise : la copie pseudonymisée ne se compare plus à son `output\\` réel", null);
+    } else if (murs === null) {
+      ajouter("LOT-MURS", "SANS_OBJET", `aucun dossier \`output\\\` sous ${racine} — rien à mesurer`, null);
+    } else {
+      const declare = normaliser(corpsDeSection(texte, SECTION_R57) + "\n" + murDesLotsAnterieurs(cheminLot));
+      const tus = murs.filter((d) => !declare.includes(normaliser(objetSansMarque(d.objet))));
+      if (tus.length) {
+        ajouter("LOT-MURS", "FAIL",
+          `${tus.length} document(s) MÛR(S) mesuré(s) (${SEUIL_MUR} versions datées ou plus) que ni ce lot ni un lot antérieur ne nomment : `
+          + tus.slice(0, 6).map((d) => `« ${objetSansMarque(d.objet)} » (${d.versions} versions)`).join(", ")
+          + (tus.length > 6 ? `, et ${tus.length - 6} autre(s)` : "") + " — un document repris autant de fois porte une forme que la bibliothèque n'a pas, ou une raison de la garder chez soi, et l'une comme l'autre s'écrit",
+          "nommer chacun sous « ## Documents mûrs », avec son verdict : « remonté » (sa forme devient une famille de gabarits\\documents\\ ou des composants) ou « reste au produit, parce que… » — une fois suffit, les lots suivants héritent de la déclaration (R-57)");
+      } else {
+        ajouter("LOT-MURS", "PASS", `${murs.length} document(s) mûr(s) mesuré(s) sous output\\, tous déclarés par ce lot ou un lot antérieur`, null);
+      }
+    }
+  } else {
+    ajouter("LOT-MURS", "SANS_OBJET", `lot du ${date}, antérieur à l'entrée en vigueur de R-57 (${SEUILS["R-57"]}) — antériorité déclarée`, null);
   }
 
   // ---- R-49 · UN LOT REMIS ET INGÉRÉ NE SE RÉÉCRIT JAMAIS (TF-0884, 08/09/2026) --------------
@@ -372,6 +502,15 @@ if (import.meta.url === `file://${process.argv[1]?.split("\\").join("/")}`
   const args = process.argv.slice(2);
   const cible = args.find((a) => !a.startsWith("--"));
   const jsonSeul = args.includes("--json");
+  if (args.includes("--murs")) {
+    // R-57 : ce que le lot devra déclarer, mesuré AVANT de l'écrire.
+    const racine = cible || ".";
+    const murs = documentsMurs(racine);
+    if (murs === null) { console.error(`aucun dossier output\\ sous ${racine}`); process.exit(2); }
+    console.log(`documents mûrs mesurés sous ${racine}\\output\\ (${SEUIL_MUR} versions datées ou plus) : ${murs.length}`);
+    for (const d of murs) console.log(`  ${String(d.versions).padStart(3)} versions · dernière ${d.derniere} · ${objetSansMarque(d.objet)}`);
+    process.exit(0);
+  }
   if (!cible) {
     console.error("usage : node oracle-lot-retours.mjs <lot.md> [--json]");
     process.exit(2);

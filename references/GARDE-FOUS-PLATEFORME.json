@@ -1,0 +1,57 @@
+{
+  "format": "pilot/garde-fous-plateforme@1",
+  "version": "1.0.0",
+  "date": "2026-10-01",
+  "source": "Décision humaine D-37 (a) du 01/10/2026, TF-1495 et TF-1496 — lots « Produit-03 - RETOURS - 20260929d » (RA-51) et « Produit-03 - RETOURS - 20260929e » (RA-52). Le 29/09/2026, une stratégie Deny de la souscription d'un client a refusé la première livraison de production d'un produit. Le même produit l'avait heurtée en qualification le 23/07 et l'avait écrite en commentaire ; un produit voisin du même client l'avait heurtée le 31/08. La leçon n'a circulé ni vers la production, ni vers la factory.",
+  "pourquoi_une_donnee": "Loi transverse n° 4 : une contrainte de plateforme est une donnée volatile. Le client la pose, la change ou la retire sans prévenir. Elle vit ici, datée et sourcée, et se confirme par le relevé du jour (ETAPE-MEP.md § 1 ter) : une entrée de ce registre est une piste à vérifier, jamais une preuve.",
+  "pourquoi_ici": "Le pilot reçoit les lots de retours de tous les produits : c'est le seul endroit où une contrainte trouvée par un produit peut servir au suivant. Un fichier tenu par chaque produit ne circulerait pas, et un fichier tenu chez le client ne serait lu par aucun produit.",
+  "confidentialite": "Dépôt PUBLIC. Client et produits sous pseudonyme seulement (Client-A, Produit-03). Aucun nom de souscription, de groupe de ressources ni de stratégie propre au client, aucun identifiant. La règle d'une stratégie se décrit par son effet et par ce qu'elle vise, dans le vocabulaire public de la plateforme ; son nom réel reste chez le produit. Juge : node scripts/verifier-garde-fous.mjs --registre.",
+  "alimentation": "Le pilot inscrit une entrée à la réception d'un lot dont un retour décrit un garde-fou de plateforme ou un processus du client qui contraint un déploiement. Un produit qui relève un garde-fou absent de ce registre le remonte dans le lot de clôture de son run, avec la date du relevé et ce que la règle refuse. Une entrée qu'un relevé contredit se met à jour, datée, jamais en silence.",
+  "regle": "ETAPE-MEP.md § 1 ter et porte M-11 : avant de concevoir un déploiement chez un client, le produit lit les entrées de ce client, puis relève les stratégies de la portée cible ; chaque garde-fou se cite au dossier de MEP avec son verdict contre la séquence retenue.",
+  "garde_fous": [
+    {
+      "id": "GFP-001",
+      "client": "Client-A",
+      "plateforme": "azure",
+      "mecanisme": "Azure Policy, affectation à la souscription",
+      "effet": "Deny",
+      "portee": "souscription applicative du client ; son identifiant reste chez les produits",
+      "vise": "Microsoft.Web/sites/config, configuration nommée « web » d'une Web App",
+      "refuse": "toute écriture de la configuration « web » d'une Web App dont l'authentification intégrée n'est pas active (siteAuthEnabled différent de true)",
+      "consequence": "une Web App ne se déploie pas authentification désactivée, même au premier passage : un amorçage « sans authentification, puis activation » est refusé à l'écriture (RequestDisallowedByPolicy)",
+      "remede_eprouve": "la Web App naît fermée, authentification active dès la création et dans chaque environnement (décision D-59 (a) du commanditaire de Produit-03, appliquée le 29/09/2026)",
+      "posee_le": "2026-07-03",
+      "constatee": [
+        { "produit": "Produit-03", "le": "2026-07-23", "environnement": "qualification", "trace": "commentaire « Obligatoire ici » du fichier de variables de qualification, commit du même jour" },
+        { "produit": "produit voisin du même client, non nommé au lot", "le": "2026-08-31", "environnement": "non précisé au lot", "trace": "documentée dans sa chaîne d'infrastructure" },
+        { "produit": "Produit-03", "le": "2026-09-29", "environnement": "production", "trace": "livraison 15504 refusée, RequestDisallowedByPolicy" }
+      ],
+      "pratique_du_client": "retour humain du 29/09/2026, mot pour mot : « Pourquoi cela n'a pas été vu précédemment ? Puisque c'est ce que nous faisons sur toutes les applications Client-A. »",
+      "source": "lots « Produit-03 - RETOURS - 20260929d » (RA-51) et « Produit-03 - RETOURS - 20260929e » (RA-52)",
+      "inscrite_le": "2026-10-01",
+      "verifiee_le": "2026-09-29",
+      "verifiee_par": "relevé du produit par l'API de la plateforme : siteAuthEnabled vrai en développement et en qualification, faux en production avant correction"
+    },
+    {
+      "id": "GFP-002",
+      "client": "Client-A",
+      "plateforme": "azure",
+      "mecanisme": "processus du client, décrit par l'humain",
+      "effet": "aucun compte de produit ne crée d'inscription d'application dans l'annuaire Entra du client",
+      "portee": "annuaire Entra du client",
+      "vise": "inscription d'application Entra",
+      "refuse": "la création d'une inscription d'application par un compte de déploiement du produit",
+      "consequence": "une identité d'application de production se demande par le formulaire du client et se planifie comme une attente ; une séquence qui la crée elle-même est impossible",
+      "remede_eprouve": "le commanditaire de Produit-03 demande l'inscription par le formulaire Entra, demande préparée sans secret (lot RA-52, remarque restée au produit)",
+      "posee_le": null,
+      "constatee": [
+        { "produit": "Produit-03", "le": "2026-09-21", "environnement": "production", "trace": "processus décrit par le commanditaire, réinterprété puis écarté par l'agent (restitution 20260921j)" }
+      ],
+      "pratique_du_client": "rapportée par le lot, sans citation mot pour mot : « un formulaire Entra traité par l'administrateur Entra »",
+      "source": "lot « Produit-03 - RETOURS - 20260929e » (RA-52)",
+      "inscrite_le": "2026-10-01",
+      "verifiee_le": "2026-09-29",
+      "verifiee_par": "constat du produit : l'inscription de production n'existe pas, et aucun compte du produit ne peut la créer"
+    }
+  ]
+}

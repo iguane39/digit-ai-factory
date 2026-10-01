@@ -12,7 +12,7 @@
 
 ## Contenu
 
-Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+Contenu du dossier à la dernière régénération : chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
@@ -102,5 +102,11 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260922-etude-opportunite-messagerie-inter-sessions.md` | fichier | 35,6 Ko | Étude d'opportunité — messagerie entre sessions Claude Code — 20260922a |
 | `20260922-L99-echanges-inter-session.md` | fichier | 28,3 Ko | Analyse L99 — « Une étude d'opportunité sur les échanges inter-session Claude Code » |
 | `20260922-revue-des-candidatures-par-famille.md` | fichier | 11,7 Ko | Revue des candidatures du registre, par famille de défaut |
+| `20260925-etude-opportunite-niveaux-d-intervention.md` | fichier | 47,9 Ko | Étude d'opportunité — proportionner la réponse à la question : niveaux Simple, Moyen, Comp |
+| `20260925-L99-niveaux-d-intervention.md` | fichier | 51,0 Ko | Analyse L99 — « Adapter le modèle, le process et le format de réponse à la complexité de l |
+| `20261001-etude-opportunite-rsi-et-ssl.md` | fichier | 30,0 Ko | Étude d'opportunité — auto-amélioration récursive (RSI) et apprentissage auto-supervisé (S |
+| `20261001-etude-opportunite-textes-affiches.md` | fichier | 16,5 Ko | Étude d'opportunité — textes affichés en session Claude Code — 20261001b |
+| `20261001-L99-etude-textes-relance.md` | fichier | 13,8 Ko | Analyse L99 — relance de l'étude sur les textes affichés en session |
+| `20261001-L99-textes-affiches-en-session.md` | fichier | 14,2 Ko | Analyse L99 — étude d'opportunité sur les textes affichés en session Claude Code |
 
-_86 fichier(s), 0 sous-dossier(s)_
+_92 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

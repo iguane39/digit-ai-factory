@@ -12,7 +12,7 @@ Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.
 
 ## Contenu
 
-Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+Contenu du dossier à la dernière régénération : chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
@@ -56,6 +56,12 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `digit-ai-forge-tests - RETOURS - 20260905a.tf.jsonl` | fichier | 3,2 Ko | 2 ligne(s) JSONL |
 | `digit-ai-marketing - RETOURS - 20260916a.md` | fichier | 8,0 Ko | Retours forges — digit-ai-marketing — 20260916a |
 | `digit-ai-marketing - RETOURS - 20260916a.tf.jsonl` | fichier | 3,8 Ko | 4 ligne(s) JSONL |
+| `digit-ai-marketing - RETOURS - 20260930a.md` | fichier | 11,3 Ko | Retours forges — digit-ai-marketing — 20260930a |
+| `digit-ai-marketing - RETOURS - 20260930a.tf.jsonl` | fichier | 6,9 Ko | 4 ligne(s) JSONL |
+| `digit-ai-prospection - RETOURS - 20260928a.md` | fichier | 9,0 Ko | Retours forges — digit-ai-prospection — 20260928a |
+| `digit-ai-prospection - RETOURS - 20260928a.tf.jsonl` | fichier | 5,0 Ko | 4 ligne(s) JSONL |
+| `digit-ai-prospection - RETOURS - 20260928b.md` | fichier | 3,4 Ko | Retours forges — digit-ai-prospection — 20260928b |
+| `digit-ai-prospection - RETOURS - 20260928b.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
 | `INSATISFACTION - command-manager - 20260906a.md` | fichier | 672 o | Insatisfaction — les login et mots de passe sont affichés sur la page d'accueil |
 | `INSATISFACTION - command-manager - 20260906b.md` | fichier | 592 o | Insatisfaction — il manque des comptes de démo prêts à l'emploi |
 | `INSATISFACTION - command-manager - 20260906c.md` | fichier | 543 o | Insatisfaction — le lien vers la page client n'est pas accessible depuis l'administration |
@@ -135,6 +141,40 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260913a.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260922a.md` | fichier | 29,7 Ko | Retours forges — Produit-02 — 20260922a |
 | `Produit-02 - RETOURS - 20260922a.tf.jsonl` | fichier | 12,4 Ko | 7 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260928a.md` | fichier | 5,7 Ko | Retours forges — Produit-03 — 20260928a |
+| `Produit-03 - RETOURS - 20260928a.tf.jsonl` | fichier | 2,8 Ko | 2 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260929a.md` | fichier | 6,3 Ko | Retours forges — Produit-03 — 20260929a |
+| `Produit-03 - RETOURS - 20260929a.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260929b.md` | fichier | 6,2 Ko | Retours forges — Produit-03 — 20260929b |
+| `Produit-03 - RETOURS - 20260929b.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260929c.md` | fichier | 5,6 Ko | Retours forges — Produit-03 — 20260929c |
+| `Produit-03 - RETOURS - 20260929c.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260929d.md` | fichier | 6,0 Ko | Retours forges — Produit-03 — 20260929d |
+| `Produit-03 - RETOURS - 20260929d.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260929e.md` | fichier | 7,4 Ko | Retours forges — Produit-03 — 20260929e |
+| `Produit-03 - RETOURS - 20260929e.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260930a.md` | fichier | 5,6 Ko | Retours forges — Produit-03 — 20260930a |
+| `Produit-03 - RETOURS - 20260930a.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20260930b.md` | fichier | 10,1 Ko | Retours forges — Produit-03 — 20260930b |
+| `Produit-03 - RETOURS - 20260930b.tf.jsonl` | fichier | 5,8 Ko | 3 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001a.md` | fichier | 6,3 Ko | Retours forges — Produit-03 — 20261001a |
+| `Produit-03 - RETOURS - 20261001a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001b.md` | fichier | 5,9 Ko | Retours forges — Produit-03 — 20261001b |
+| `Produit-03 - RETOURS - 20261001b.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001c.md` | fichier | 6,2 Ko | Retours forges — Produit-03 — 20261001c |
+| `Produit-03 - RETOURS - 20261001c.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001d.md` | fichier | 7,9 Ko | Retours forges — Produit-03 — 20261001d |
+| `Produit-03 - RETOURS - 20261001d.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001e.md` | fichier | 5,7 Ko | Retours forges — Produit-03 — 20261001e |
+| `Produit-03 - RETOURS - 20261001e.tf.jsonl` | fichier | 2,7 Ko | 2 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001f.md` | fichier | 5,7 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001f |
+| `Produit-03 - RETOURS - 20261001f.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001g.md` | fichier | 5,0 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001g |
+| `Produit-03 - RETOURS - 20261001g.tf.jsonl` | fichier | 1,8 Ko | 1 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001h.md` | fichier | 6,5 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001h |
+| `Produit-03 - RETOURS - 20261001h.tf.jsonl` | fichier | 3,3 Ko | 2 ligne(s) JSONL |
+| `Produit-03 - RETOURS - 20261001i.md` | fichier | 9,3 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001i |
+| `Produit-03 - RETOURS - 20261001i.tf.jsonl` | fichier | 6,0 Ko | 4 ligne(s) JSONL |
 | `Produit-04 - RETOURS - 20260827a.md` | fichier | 12,3 Ko | Retours forges — Produit-04 — 20260827a |
 | `Produit-04 - RETOURS - 20260827a.tf.jsonl` | fichier | 7,2 Ko | 3 ligne(s) JSONL |
 | `Produit-04 - RETOURS - 20260827b.md` | fichier | 12,2 Ko | Retours forges — Produit-04 — 20260827b |
@@ -330,6 +370,22 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-64 - RETOURS - 20260924b.tf.jsonl` | fichier | 5,7 Ko | 3 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20260924c.md` | fichier | 6,4 Ko | Lot de retours — Produit-64 → digit-ai-page-html — 2026-09-24, indice c |
 | `Produit-64 - RETOURS - 20260924c.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20260924d.md` | fichier | 7,0 Ko | Lot de retours — Produit-64 → digit-ai-factory — 2026-09-24, indice d |
+| `Produit-64 - RETOURS - 20260924d.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20260924e.md` | fichier | 19,4 Ko | Lot de retours — Produit-64 → digit-ai-factory, digit-ai-page-html — 2026-09-24, indice e |
+| `Produit-64 - RETOURS - 20260924e.tf.jsonl` | fichier | 11,2 Ko | 5 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20260928a.md` | fichier | 9,2 Ko | Lot de retours — Produit-64 → digit-ai-factory — 2026-09-28, indice a |
+| `Produit-64 - RETOURS - 20260928a.tf.jsonl` | fichier | 3,8 Ko | 2 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20260928b.md` | fichier | 4,6 Ko | Lot de retours — Produit-64 → digit-ai-factory — 2026-09-28, indice b |
+| `Produit-64 - RETOURS - 20260928b.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20260928c.md` | fichier | 5,9 Ko | Lot de retours — Produit-64 → digit-ai-forge-agents — 2026-09-28, indice c |
+| `Produit-64 - RETOURS - 20260928c.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261001a.md` | fichier | 5,7 Ko | Lot de retours — Produit-64 → digit-ai-forge-agents — 2026-10-01, indice a |
+| `Produit-64 - RETOURS - 20261001a.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261001b.md` | fichier | 7,6 Ko | Lot de retours — Produit-64 → digit-ai-factory — 2026-10-01, indice b |
+| `Produit-64 - RETOURS - 20261001b.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261001c.md` | fichier | 9,2 Ko | Lot de retours — Produit-64 → digit-ai-factory — 2026-10-01, indice c |
+| `Produit-64 - RETOURS - 20261001c.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `Produit-65 - RETOURS - 20260903a.md` | fichier | 15,9 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260903a |
 | `Produit-65 - RETOURS - 20260903a.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
 | `Produit-67 - RETOURS - 20260922a.md` | fichier | 10,1 Ko | Retours forges — Produit-67 — 20260922a |
@@ -344,11 +400,41 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-68 - RETOURS - 20260927a.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `Produit-70 - RETOURS - 20260924a.md` | fichier | 5,8 Ko | Retour — déclarer « cohérent » sans vérifier l'invariant qui compte |
 | `Produit-70 - RETOURS - 20260924a.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
+| `Produit-76 - RETOURS - 20260928a.md` | fichier | 10,9 Ko | Retours forges — COMPTA · Ventilation de facture Fournisseur-A — 20260928a |
+| `Produit-76 - RETOURS - 20260928a.tf.jsonl` | fichier | 5,4 Ko | 4 ligne(s) JSONL |
+| `Produit-76 - RETOURS - 20260928b.md` | fichier | 5,1 Ko | Retours forges — COMPTA · Ventilation de facture Fournisseur-A — 20260928b |
+| `Produit-76 - RETOURS - 20260928b.tf.jsonl` | fichier | 2,5 Ko | 2 ligne(s) JSONL |
+| `Produit-77 - RETOURS - 20260925a.md` | fichier | 7,6 Ko | Retours forges : Produit-77, 20260925a |
+| `Produit-77 - RETOURS - 20260925a.tf.jsonl` | fichier | 4,4 Ko | 3 ligne(s) JSONL |
+| `Produit-77 - RETOURS - 20260925b.md` | fichier | 5,0 Ko | Retours forges : Produit-77, 20260925b |
+| `Produit-77 - RETOURS - 20260925b.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
+| `Produit-77 - RETOURS - 20260925c.md` | fichier | 3,5 Ko | Retours forges : Produit-77, 20260925c |
+| `Produit-77 - RETOURS - 20260925c.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928a.md` | fichier | 8,2 Ko | Retours forges — Produit-78 — 20260928a |
+| `Produit-78 - RETOURS - 20260928a.tf.jsonl` | fichier | 6,1 Ko | 7 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928b.md` | fichier | 8,2 Ko | Retours forges — Produit-78 — 20260928b |
+| `Produit-78 - RETOURS - 20260928b.tf.jsonl` | fichier | 5,7 Ko | 6 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928c.md` | fichier | 3,7 Ko | Retours forges — Produit-78 — 20260928c |
+| `Produit-78 - RETOURS - 20260928c.tf.jsonl` | fichier | 1017 o | 1 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928d.md` | fichier | 3,1 Ko | Retours forges — Produit-78 — 20260928d |
+| `Produit-78 - RETOURS - 20260928d.tf.jsonl` | fichier | 841 o | 1 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928e.md` | fichier | 5,1 Ko | Retours forges — Produit-78 — 20260928e |
+| `Produit-78 - RETOURS - 20260928e.tf.jsonl` | fichier | 2,8 Ko | 3 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928f.md` | fichier | 3,7 Ko | Retours forges — Produit-78 — 20260928f |
+| `Produit-78 - RETOURS - 20260928f.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928g.md` | fichier | 3,7 Ko | Retours forges — Produit-78 — 20260928g |
+| `Produit-78 - RETOURS - 20260928g.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
+| `Produit-78 - RETOURS - 20260928h.md` | fichier | 3,4 Ko | Retours forges — Produit-78 — 20260928h |
+| `Produit-78 - RETOURS - 20260928h.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `UIA - RETOURS - 20260923a.md` | fichier | 4,4 Ko | Retours forges — UIA (Produit-71) — 20260923a |
 | `UIA - RETOURS - 20260923a.tf.jsonl` | fichier | 3,5 Ko | 6 ligne(s) JSONL |
 | `UIA - RETOURS - 20260924a.md` | fichier | 1,9 Ko | Retours forges — UIA (Produit-71) — 20260924a |
 | `UIA - RETOURS - 20260924a.tf.jsonl` | fichier | 724 o | 1 ligne(s) JSONL |
+| `UIA - RETOURS - 20260924b.md` | fichier | 7,1 Ko | Retours forges — UIA (Produit-72) — 20260924b |
+| `UIA - RETOURS - 20260924b.tf.jsonl` | fichier | 3,6 Ko | 4 ligne(s) JSONL |
+| `UIA - RETOURS - 20260924c.md` | fichier | 3,7 Ko | Retours forges — UIA (Produit-72) — 20260924c |
+| `UIA - RETOURS - 20260924c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_332 fichier(s), 2 sous-dossier(s)_
+_418 fichier(s), 2 sous-dossier(s)_

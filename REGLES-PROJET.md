@@ -45,21 +45,29 @@ Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte s
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé 4 fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
 | 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
-**Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026).** La règle 4
+**Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026 ; constante du
+sidecar corrigée le 01/10/2026, TF-1500).** La règle 4
 fixe la FORME du nom et rien n'y bornait sa LONGUEUR. Désormais : le chemin **relatif** (depuis la
-racine du dépôt) d'un livrable **cité ou déposé sous `output\`**, augmenté des **26 caractères du
+racine du dépôt) d'un livrable **cité ou déposé sous `output\`**, augmenté des **34 caractères du
 sidecar d'oracle** (`.oracles\` en tête, `.oracles-historique.jsonl` en queue), ne dépasse pas
-**150 caractères**. Pourquoi : sous `MAX_PATH` = 260 sans `core.longpaths`, un chemin suivi de 146
+**150 caractères**. Le livrable lui-même tient donc en 116. Pourquoi : sous `MAX_PATH` = 260 sans
+`core.longpaths`, un chemin suivi de 146
 caractères ne laisse que **113 caractères** de préfixe de clone, et le 10/09/2026 un clone de
 vérification a refusé 22 fichiers au checkout — dépôt sans arbre de travail, vérification avant
 push impossible. Et le défaut ne se voit pas chez celui qui ÉCRIT (dépôt à `c:\dev\…`, préfixe
-court) : il ne se voit que chez celui qui **vérifie**. Câblé, jamais seulement écrit :
-`oracle-synthese` règle **S42** (fichier jugé + chemins cités, fixture à double sens 150/151),
+court) : il ne se voit que chez celui qui **vérifie**. La constante du sidecar a valu 26 jusqu'au
+01/10/2026 : c'était une erreur de calcul. Mesurés sur le disque, les sidecars suivis du pilot
+ajoutent tous 34 caractères à leur livrable, et plusieurs dépassaient 150 alors que leurs livrables
+passaient. La constante se calcule désormais sur les deux noms, et la recette de
+`oracle-conformite-projet` la compare aux sidecars suivis du pilot. Câblé, jamais seulement écrit :
+`oracle-synthese` règle **S42** (fichier jugé + chemins cités),
 `oracle-conformite-projet` règle **4** (fichiers réels d'`output\`), et
 `git clone -c core.longpaths=true` déclaré partout où l'on clone (`bootstrap.mjs`,
-`references\TODO-FORGE.md`).
+`references\TODO-FORGE.md`). Depuis le 01/10/2026, S42 mesure aussi les synthèses sous le `forge\`
+d'un produit, avec une fixture à double sens 116/117, soit 150/151 avec le sidecar.
 Les fichiers antérieurs au-dessus de la borne ne sont pas renommés : ils sont **nommés** par
-l'oracle, un renommage cassant les liens déjà restitués.
+l'oracle, un renommage cassant les liens déjà restitués. Le passage de 26 à 34 nomme de la même
+façon la bande de 117 à 124 caractères, que la constante erronée laissait passer.
 
 **Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
 instruit d'un système de paramètres).** 3 classes de conventions ne se négocient pas,
@@ -98,10 +106,23 @@ Ce qui est versionné, quand, et sous quelle forme. Le tableau ne dit pas commen
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 6 | Le code n'a qu'un magasin de versions : git. Aucune copie datée ni dossier `Old\` pour du code | générique (standard) + état de l'écosystème (6 dépôts git) | tous | O | nul | **défaut** |
-| 7 | Quand un livrable documentaire est remplacé par une version plus récente, l'ancien migre dans `old\` du même dossier — **versionné** (lisibilité du dossier courant — pas un magasin de versions) | **citée par toi** ; observée 1/30+ (`OptimAssur/old`) | livrables uniquement | S+O | faible | **défaut** (C1 tranché le 13/08, TF-0150) |
+| 7 | Quand un livrable documentaire est remplacé par une version plus récente, l'ancien migre dans `old\` du même dossier — **versionné** (lisibilité du dossier courant — pas un magasin de versions) ; si une application tient l'ancienne version ouverte, la nouvelle sort quand même et le déplacement se consigne puis se rejoue au tour suivant (alinéa ci-dessous) | **citée par toi** ; observée 1/30+ (`OptimAssur/old`) ; alinéa du verrou : décision humaine du 30/09/2026 | livrables uniquement | S+O | faible | **défaut** (C1 tranché le 13/08, TF-0150 ; alinéa du verrou, TF-1503) |
 | 8 | Tout nouveau produit est `git init` à l'ouverture du run, avec commit initial + commits par étape (le **push/remote reste sur ton GO**) | gap constaté : Produit-12 sans git | produits, nouveaux | P0 | nul | **défaut** (conflit C2) |
 | 9 | Commits en Conventional Commits français | observée (development 116 commits, campagnes forges) | tous dépôts git | S | nul | **défaut** |
 | 10 | `.gitignore` socle dès la création : `.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`, artefacts de build, **sidecars d'oracles** `*.oracles.json` / `*.oracles-cache.json` / `*.oracles-historique.jsonl` (TF-0065 — les preuves VOULUES restent versionnées sous `forge\`, exception `!forge/**`, décision C4) | observée (9/11) ; sidecars : 3 campagnes polluées | tous | P0+O | nul | **défaut** |
+
+**Alinéa VERSION ANTÉRIEURE TENUE OUVERTE (TF-1503, décision humaine du 30/09/2026, retenue le 01/10/2026 par D-37 (a)).** La règle 7 dit où va l'ancienne version. Elle ne disait pas quoi faire quand une application la tient ouverte et que le déplacement échoue. Le 30/09/2026, un renommage est resté en attente parce qu'un CV était ouvert dans Word, puis une décision a demandé à l'humain que faire d'un PowerPoint resté ouvert : deux allers-retours le même jour (lot `digit-ai-marketing - RETOURS - 20260930a`). La réponse de l'humain, mot pour mot : « Ne pose plus la question sur les documents ouverts. Regénère dans tous les cas une nouvelle version et informe l'utilisateur que le document ouvert n'a pas pu être déplacé, qu'il le sera au prochain tour. »
+
+Une version est tenue ouverte quand son déplacement échoue pour cause de verrou (sous Windows : « le fichier est utilisé par un autre processus »). Le geste tient en quatre temps.
+
+1. La nouvelle version sort quand même, à l'indice suivant (règle 5). L'ancienne n'est ni écrasée ni attendue.
+2. Le déplacement qui a échoué se consigne au ledger du produit : une entrée `deplacement_en_attente` qui porte `ancien` (chemin de la version restée en place, relatif à la racine du produit), `nouveau` (chemin de la nouvelle) et `motif`.
+3. La restitution informe l'utilisateur sans lui poser de question : l'ancienne version n'a pas pu être déplacée, elle le sera au tour suivant. Son libellé vit dans `gabarits\RESTITUTION.md`.
+4. À l'ouverture du tour suivant, la session rejoue le déplacement : `git mv` vers `old\` du même dossier, avec le sceau `.jugement.json` de la version quand il existe, puis une entrée `deplacement_effectue` au ledger. Si le verrou tient encore, l'attente reste consignée et la restitution le redit.
+
+La session ne pose aucune question sur le document ouvert et ne laisse aucune action à l'utilisateur, « fermer le document » comprise. Elle ne quitte ni ne tue l'application : elle ne l'a pas lancée, l'utilisateur en reste propriétaire.
+
+Au 01/10/2026, `oracle-conformite-projet` (règle R-7 bis) tolère deux versions d'un même livrable dans un même dossier tant que chaque version autre que la plus récente porte une entrée `deplacement_en_attente` non close au ledger ; il nomme alors l'attente et le geste de sortie. Il refuse une consignation qui nomme un autre fichier, une consignation déjà close et une consignation de la version la plus récente. Sa verte et ses rouges sont à `oracles\self-test.mjs`. Il ne juge pas que le fichier soit vraiment tenu ouvert, ni la durée de l'attente (aucun seuil ne repose sur une mesure), ni l'absence de question à l'humain. Le rejeu du tour suivant est un geste de la session, que ce texte et le `CLAUDE.md` des produits prescrivent : aucun hook ne le joue encore.
 
 ## D. Documentation du produit
 
@@ -1414,3 +1435,105 @@ est un défaut, parce qu'il fait passer une couverture réelle pour une absence.
 
 Contrôle exécutable : `oracle-regle-sans-juge` RJ2, qui accepte ce numéro depuis qu'il est déclaré
 ici et continue de refuser tout autre numéro opposé par du code et absent du corpus.
+
+## AL. R-57 — un document MÛR remonte à la bibliothèque : sa FORME, jamais sa matière (décision humaine du 24/09/2026)
+
+Décision humaine directe du 24/09/2026, rendue dans l'espace d'engagement `Produit-64`, mot pour
+mot : « Crées en également une règle pour la Factory afin que les documents matures comme celui-ci
+remonte automatiquement en gabarit à la Factory, pour être réutilisé entièrement ou en partie. »
+Elle suit, dans le même message, le verdict de forme qui l'a fait naître : « Le format du guide du
+développeur et l'usage des composants utilisés, comme la recherche, les onglets, les menus sur le
+côté, la popup pour les fichiers MD, les chapitres, sous-chapitres sont vraiment tops. »
+
+**Le fait.** R-46 fait remonter ce qu'un document produit DEPUIS un gabarit a coûté à ce gabarit.
+Rien ne faisait remonter un document produit SANS gabarit — ou qui a dépassé le sien — quand sa
+forme mûrit. Le document qui fonde la règle comptait vingt-trois versions datées en dix jours,
+des oracles verts et un verdict de lecteur ; il était invisible à tout autre projet. Ce n'est pas un
+cas isolé : la bibliothèque est née d'un gabarit de rapport barré et documenté par un projet, resté
+chez lui (13/08), et ses quatre premières familles n'ont été extraites que parce qu'on est allé
+chercher la matière, une fois, à la main.
+
+**R-57.**
+1. **Un document est MÛR par l'une de deux voies, toutes deux constatables.**
+   - **Mûr déclaré** : l'humain qui le lit juge sa FORME (« vraiment top », « excellente mise en
+     page ») ou demande d'en faire un gabarit. Son verdict, cité mot pour mot et daté, **vaut
+     décision de remontée** : aucune autre décision n'est demandée (loi n° 5 — elle est prise).
+   - **Mûr mesuré** : un livrable d'`output\` dont l'objet compte **cinq versions datées ou plus**
+     (courante et `old\` comprises) — sa forme a été reprise quatre fois. Seuil mesuré le 24/09/2026
+     sur le produit qui fonde la règle : 31 objets HTML, 8 à cinq versions ou plus. Le compte est
+     une borne basse assumée : il ne dit rien de la qualité d'une forme, il empêche qu'un document
+     repris cinq fois reste tu.
+2. **Le canal est le lot de retours** : section « Documents mûrs » (`gabarits\RETOURS-FORGES.md`).
+   Pour chaque document mûr, son chemin CHEZ LE PRODUIT, ses versions, le verdict des oracles, le
+   verdict humain cité s'il existe, les composants qu'il porte, et le **verdict de remontée** —
+   *remonté* ou *reste au produit, parce que…* (même exigence d'écrit que R-45). Un document
+   déclaré une fois n'a pas à l'être de nouveau. Un lot sans document mûr le déclare.
+3. **La forme, jamais la matière.** Remonter, c'est ouvrir ou enrichir une famille de
+   `gabarits\documents\` — `GABARIT.md`, un point de départ (squelette, générateur), une INSTANCE
+   FICTIVE — et/ou des composants. Aucun livrable client n'entre dans ce dépôt, qui est publié
+   (note de provenance d'`input\02-entrants-html\`, 27/08/2026) ; le produit est cité par son
+   pseudonyme. La famille naît jugée comme toute autre (G1-G12, oracles du socle, recette
+   d'interactions quand elle en porte une) : un oracle vert ne décide pas de la VALEUR d'une forme,
+   et la remontée n'ouvre aucune dérogation aux contrôles.
+4. **Les composants montent au socle quand ils sont PARTAGÉS.** Un composant neuf naît dans la
+   famille qui l'a remonté, avec sa source unique, son poseur et sa parité ; il monte au socle
+   `digit-ai-page-html` dès qu'une SECONDE famille l'emploie — écriture directe dans la forge
+   (R-55), résultat restitué. Un composant servi par une seule famille reste chez elle.
+5. **Câblée aux deux bouts, comme R-45 et R-46.**
+   - Le déclencheur HUMAIN : `oracles\hook-lexique.mjs` reconnaît, dans le message de l'humain, un
+     verdict de forme ou une demande de gabarit, et injecte la consigne R-57 dans le tour — chez le
+     pilot comme chez tout produit, par le hook `UserPromptSubmit` hérité. Une négation (« le
+     format n'est pas top ») n'injecte rien.
+   - Le déclencheur MESURÉ : `gabarits\oracle-lot-retours.mjs` exige la section (règle `R-57`) et,
+     chez le produit, balaie son `output\` et refuse le lot qui tait un document mûr mesuré
+     (constat `LOT-MURS`). La porte du pilot l'importe : `todo\ingerer-lot.mjs` refuse le lot
+     incomplet, registre intact. À cette porte, le lot est pseudonymisé et la mesure ne se rejoue
+     plus : elle se joue AVANT la remise, et le constat le dit.
+6. **Ce que R-57 n'exige PAS.** Elle ne juge pas la valeur d'une forme ; elle ne hisse rien sans
+   l'extraire — un document mûr devient une famille par le travail du pilot, pas par une copie ;
+   elle ne s'applique qu'aux lots datés du **29/09/2026 ou après** (R-33 bis : décidée le 24/09,
+   la règle n'entre au `main` du pilot que le 28/09 — les lots écrits jusque-là, sans elle sous la
+   main, ne sont pas accusés).
+
+**Première application, le jour même.** Le guide qui fonde la règle est remonté en famille
+`gd-guide-de-reference` (générateur, squelette, instance fictive, huit composants posables un à un,
+sonde d'interactions) ; le lot du produit le déclare en premier.
+
+Contrôle exécutable : `oracle-lot-retours` règles `R-57` et `LOT-MURS` (recette à double sens,
+`gabarits\oracle-lot-retours.test.mjs`) ; consigne R-57 de `oracles\hook-lexique.mjs` (recette
+`--self-test` et `oracles\hook-lexique.test.mjs`) ; la famille remontée, par
+`oracles\oracle-gabarits-documents.mjs`. Classe : `document-mur-non-remonte` (`todo\CLASSES.json`).
+
+## AM. R-58 — seules les décisions qui reviennent à l'humain lui sont posées ; les autres s'exécutent et se rendent pour information (décision humaine du 01/10/2026)
+
+Décision humaine directe du 01/10/2026, mot pour mot : « Je souhaite que les décisions soient
+analysées à chaque fois pour s'assurer que seules celles où je dois répondre me soient posées. Les
+autres doivent être mises en oeuvre sans mon intervention, je dois juste être informé des traitements
+/ décisions qui vont être réalisés ou qui ont été réalisés, pour information. je reviendrai dessus si
+besoin. » Elle répond à la question « parmi les décisions proposées, il n'y a pas des décisions qui
+pourraient être prises automatiquement, par logique ? », posée sur la première revue hebdomadaire du
+même jour : 6 décisions sur 7 n'avaient pas à l'être (2 clôtures sur preuve, 2 corrections de forge
+que R-55 rendait déjà automatiques, 2 corrections du pilot réversibles et sans dépense).
+
+**R-58.**
+1. **Toute décision envisagée s'analyse avant d'être posée.** Elle revient à l'humain si, et
+   seulement si, elle porte au moins un de ces motifs : `depense` (elle engage une dépense),
+   `publication` (elle publie ou pousse hors du poste, R-38), `irreversible` (elle supprime ou fait
+   un geste qu'on ne défait pas), `doctrine` (elle crée ou change une règle opposable aux produits, au
+   noyau ou à la gouvernance), `arbitrage` (elle choisit entre des options réellement concurrentes sur
+   une préférence du porteur et non sur un fait), `produit` (elle écrit chez un produit autonome hors
+   run demandé).
+2. **Sans aucun de ces motifs, la session exécute l'option recommandée** sans attendre, sous les
+   règles ordinaires (oracles rejoués verts, registre, descente R12), et le rend **pour information** :
+   ce qui a été fait au bloc 4, ce qui va l'être au bloc 8 en `auto_ia`. Une option (b) ou (c) écrite
+   pour la forme ne fait pas d'une correction un arbitrage.
+3. **Au registre**, une candidature ainsi tranchée passe en `decide` avec pour décideur « R-58 » et
+   le motif d'absence de ressort humain ; la fiche de décision porte `ressort` ({humain, motif} ou
+   {humain: false, pourquoi}), et la revue hebdomadaire ne pose que les premières.
+4. **Ce que R-58 n'ouvre PAS** : elle ne lève ni R-38 (publication), ni R-29 (dépenses et gates), ni
+   la règle des produits autonomes ; elle ne change pas les décisions déjà rendues ; l'humain revient
+   sur toute décision prise sans lui, et sa réponse prime.
+
+Contrôle exécutable : `todo\revue-hebdo.mjs`, tri par le champ `ressort` (recette `--self-test`, à
+double sens : une proposition hors du ressort humain n'est pas posée, une fiche sans ressort est
+listée à instruire). Classe : `decision-posee-hors-du-ressort-humain` (`todo\CLASSES.json`).

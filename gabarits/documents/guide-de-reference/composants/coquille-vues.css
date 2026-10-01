@@ -1,0 +1,102 @@
+/* gd-guide-de-reference · coquille-vues.css — UN fichier, N VUES, une seule peinte à la fois.
+ *
+ * Le bandeau collant (marque, outils), la barre des vues, la vue et ses repères, la pagination
+ * et le sommaire en cartes de la vue d'entrée. Lit les jetons de jetons.css.
+ *
+ * Pourquoi des VUES et non des fichiers (règle D11) : un document long partagé en onze
+ * fichiers est un coût pour son lecteur, jamais pour son auteur. Pourquoi des vues et non des
+ * onglets ARIA (composant 9 du socle) : une vue est une PAGE — elle a son adresse (#vue-…),
+ * son sommaire, sa pagination, et une adresse profonde vers un chapitre ouvre la bonne vue.
+ */
+header.bandeau {
+  padding-top: env(safe-area-inset-top, 0px); padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 40; }
+.bandeau-haut { max-width: var(--largeur-page); margin: 0 auto; padding: 8px 20px; width: 100%;
+  display: flex; align-items: center; gap: 16px; justify-content: space-between; }
+.marque { font-family: var(--head); font-weight: 800; letter-spacing: -.02em; font-size: 1.05rem;
+  margin: 0; }
+.marque em { color: var(--accent-fonce); font-style: normal; }
+.marque small { display: block; font-family: var(--sans); font-weight: 400; font-size: .78rem;
+  color: var(--muted); letter-spacing: 0; }
+/* Les contrôles du bandeau s'ÉTIRENT à la même hauteur : le champ de recherche et la bascule
+   de thème n'ont ni la même police ni le même rembourrage, et 5 px d'écart suffisent à les
+   désaligner (render_page, famille controles_desalignes, bloquante à 2 px — 24/09/2026). */
+.outils { display: flex; align-items: stretch; gap: 12px; }
+nav.vues { border-top: 1px solid var(--line); background: var(--bg); }
+nav.vues ol { max-width: var(--largeur-page); margin: 0 auto; padding: 8px 20px; display: flex;
+  flex-wrap: wrap; gap: 8px; list-style: none; }
+nav.vues li { margin: 0; }
+nav.vues a { display: block; text-decoration: none; color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r); padding: 8px 16px;
+  background: var(--surface); }
+nav.vues .toc-t { display: block; font-family: var(--head); font-weight: 700; font-size: .98rem;
+  line-height: 1.2; }
+nav.vues a:hover { border-color: var(--accent-fonce); }
+nav.vues a:hover .toc-t { color: var(--accent-fonce); }
+nav.vues a[aria-current="page"] { background: var(--accent); border-color: var(--accent);
+  color: var(--sur-accent); }
+nav.vues a[aria-current="page"] .toc-t { color: var(--sur-accent); }
+.wrap { max-width: var(--largeur-page); margin: 0 auto; padding: 24px 20px 64px; }
+main { min-width: 0; }
+/* Sans script, TOUTES les vues se lisent l'une après l'autre : c'est le repli complet. */
+.js .vue { display: none; }
+.js .vue.active { display: block; }
+section[id] { scroll-margin-top: calc(var(--hh, 128px) + 16px); }
+h2.titre-vue { font-size: 2.1rem; font-weight: 800; margin: 4px 0 16px; }
+/* L'inventaire de la vue : ce qu'elle PORTE, et ce qui la distingue de sa voisine. */
+p.contenu { margin: 0 0 24px; color: var(--muted); font-size: .95rem;
+  border-left: 1px solid var(--accent); padding: 8px 16px; background: var(--bg);
+  border-radius: var(--r-sm); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0 0 24px; padding: 12px 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  font-size: .84rem; }
+.meta b { font-family: var(--head); display: block; color: var(--faint); font-size: .7rem;
+  text-transform: uppercase; letter-spacing: .05em; }
+/* Le sommaire du document vit sur la vue d'ENTRÉE, là où un lecteur arrive et où la place
+   existe. Les menus ne portent que des titres ; la carte porte aussi l'annonce, et c'est ce
+   qui fait choisir. Le `.toc-d` est DESCENDANT du lien (règle L6 du socle). */
+nav.toc { margin: 44px 0 8px; }
+nav.toc .toc-titre { margin: 0 0 16px; padding-top: 16px; font-family: var(--head);
+  font-weight: 800; font-size: 1.24rem; border-top: 3px solid var(--accent); }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(276px, 100%), 1fr)); }
+nav.toc li { margin: 0; }
+nav.toc a { display: block; height: 100%; text-decoration: none; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 16px; }
+nav.toc a:hover { border-color: var(--accent-fonce); }
+nav.toc a:hover .toc-t { color: var(--accent-fonce); }
+nav.toc .toc-n { display: block; font-family: var(--mono); font-size: .72rem; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--muted); }
+nav.toc .toc-t { display: block; font-family: var(--head); font-weight: 700; font-size: 1.04rem;
+  margin: 4px 0 8px; }
+nav.toc .toc-d { display: block; font-size: .88rem; line-height: 1.45; color: var(--muted); }
+.pagination { display: flex; justify-content: space-between; gap: 16px; margin: 48px 0 0;
+  padding-top: 16px; border-top: 1px solid var(--line); font-size: .92rem; }
+.pagination a { text-decoration: none; }
+footer.pied { max-width: var(--largeur-page); margin: 0 auto; padding: 20px;
+  border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+footer.pied p { margin: 0 0 4px; }
+/* En paysage sur un écran court, le bandeau mangeait la moitié de la hauteur utile. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .bandeau-haut { padding-top: 4px; padding-bottom: 4px; }
+  nav.vues ol { padding-top: 4px; padding-bottom: 4px; }
+  nav.vues .toc-t { font-size: .82rem; }
+}
+@media (max-width: 760px) {
+  h2.titre-vue { font-size: 1.6rem; }
+  .wrap { padding: 16px 12px 48px; }
+  .bandeau-haut { padding: 8px 12px; flex-wrap: wrap; }
+  /* Les outils prennent la rangée entière : à 190 px, le champ de recherche coupait son propre
+     libellé (« Rechercher dans le d », capture à 390 px du 24/09/2026). */
+  .outils { width: 100%; }
+  nav.vues ol { padding: 8px 12px; }
+}
+@media print {
+  header.bandeau, nav.vues, nav.toc, .pagination { display: none; }
+  .js .vue, .vue { display: block !important; }
+  .meta { max-width: none; }
+}
+@page { size: A4 landscape; margin: 12mm; }

@@ -14,7 +14,8 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { adopter, relever, estVivant, blocEcartInitial, contratHeritage, REPERTOIRES } from "./adopter-projet-existant.mjs";
+import { adopter, relever, estVivant, blocEcartInitial, contratHeritage, REPERTOIRES,
+  TYPE_DOCUMENTAIRE, CONDITION_SITE, CARNET, signauxLogicielOuSite, typeProjetDeclare, declarerType } from "./adopter-projet-existant.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -182,6 +183,99 @@ try {
     att(r.non_juge.some((l) => /CONVENTION de nommage/.test(l)), "le nommage des livrables déjà présents n'est pas déclaré");
     att(r.non_juge.some((l) => /CODE du projet/.test(l)), "le code non touché n'est pas déclaré");
     att(r.non_juge.some((l) => /readme-dossiers/.test(l)), "le geste suivant n'est pas nommé");
+  });
+
+  // ── TF-1439 : le type « documentaire » — posé, déclaré, et refusé à un projet qui a du code ─
+  // Le fait (lot Produit-78 20260928a, RP-5) : sur un projet sans logiciel ni site, l'adoption posait
+  // robots.txt et llms.txt, que le contrat ne doit qu'au « produit à surface web », et R-13 a fait
+  // déclarer une variable que le projet ne lit pas. Les artefacts écartés se LISENT au contrat.
+  const conditionnels = contratHeritage(PILOT).filter((a) => a.conditionnel === CONDITION_SITE).map((a) => a.cible);
+
+  check("VERT documentaire — les artefacts dus au seul « produit à surface web » ne sont PAS posés, et sont nommés ÉCARTÉS", () => {
+    const d = projet({ "notes/etude.md": "# Étude\n", "README.md": "# Dossier documentaire\n" });
+    const r = adopter(d, { pilot: PILOT, type: TYPE_DOCUMENTAIRE, quand: "2026-09-28" });
+    att(r.verdict === "ADOPTE" && r.type === TYPE_DOCUMENTAIRE, `verdict ${r.verdict}, type ${r.type} — ${r.motif || ""}`);
+    att(conditionnels.length >= 2, `le contrat ne déclare plus d'artefact conditionnel « ${CONDITION_SITE} » : ${conditionnels.join(", ")}`);
+    for (const c of conditionnels) {
+      att(!existsSync(join(d, c)), `${c} a été posé sur un projet documentaire`);
+      const f = r.faits.find((x) => x.cible === c);
+      att(f && /ÉCARTÉ/.test(f.action), `${c} n'est pas nommé écarté : ${JSON.stringify(f)}`);
+    }
+    for (const a of contratHeritage(PILOT).filter((x) => !x.conditionnel)) att(existsSync(join(d, a.cible)), `artefact non conditionnel absent : ${a.cible}`);
+    att(r.ecartes === conditionnels.length, `compte des écartés : ${r.ecartes}`);
+  });
+
+  check("VERT documentaire — le carnet porte `type_projet: documentaire` en EN-TÊTE et l'écart avec ses 4 champs ; le lecteur le relit", () => {
+    const d = projet({ "notes/etude.md": "# Étude\n" });
+    adopter(d, { pilot: PILOT, type: TYPE_DOCUMENTAIRE, quand: "2026-09-28" });
+    const t = readFileSync(join(d, ...CARNET.split("/")), "utf8");
+    const entete = (/^---\r?\n([\s\S]*?)\r?\n---/.exec(t) || [])[1] || "";
+    att(/^type_projet: documentaire\s*$/m.test(entete), "la déclaration n'est pas dans l'en-tête du carnet");
+    att((t.match(/^type_projet\s*:/gm) || []).length === 1, "la déclaration est écrite plus d'une fois");
+    att(/^## Type de projet : documentaire/m.test(t), "l'écart « Type de projet : documentaire » n'est pas consigné");
+    for (const champ of ["objet", "motif", "date", "reouverture"]) att(new RegExp(`\\*\\*${champ}\\*\\* :`).test(t), `champ « ${champ} » absent de l'écart`);
+    for (const c of conditionnels) att(t.includes(`\`${c}\``), `l'écart ne nomme pas ${c}`);
+    const lu = typeProjetDeclare(d);
+    att(lu && lu.type === TYPE_DOCUMENTAIRE && lu.ou === CARNET, `relu : ${JSON.stringify(lu)}`);
+  });
+
+  check("REFUS documentaire — un projet qui porte du code et un manifeste ne se déclare pas documentaire, et RIEN n'est écrit", () => {
+    const d = projet({ "src/server.js": "console.log(1)\n", "package.json": "{}\n", "notes/a.md": "# a\n" });
+    const avant = readdirSync(d).sort().join(",");
+    const r = adopter(d, { pilot: PILOT, type: TYPE_DOCUMENTAIRE });
+    att(r.verdict === "REFUS", `verdict ${r.verdict}`);
+    att(/src\/server\.js \(code\)/.test(r.motif) && /package\.json \(manifeste\)/.test(r.motif), `le motif ne nomme pas les signaux : ${r.motif}`);
+    att(/sans `--type`/.test(r.motif), "le remède n'est pas nommé");
+    att(readdirSync(d).sort().join(",") === avant, "le refus a écrit sur le disque");
+  });
+
+  check("REFUS documentaire — un fichier de SITE suffit : robots.txt préexistant contredit la déclaration", () => {
+    const r = adopter(projet({ "robots.txt": "User-agent: *\n", "notes/a.md": "# a\n" }), { pilot: PILOT, type: TYPE_DOCUMENTAIRE });
+    att(r.verdict === "REFUS" && /robots\.txt \(fichier de site\)/.test(r.motif), `verdict ${r.verdict} — ${r.motif}`);
+  });
+
+  check("REFUS — un type inconnu est refusé, jamais deviné", () => {
+    const r = adopter(projet({ "notes/a.md": "# a\n" }), { pilot: PILOT, type: "docu" });
+    att(r.verdict === "REFUS" && /« docu » inconnu/.test(r.motif), `verdict ${r.verdict} — ${r.motif}`);
+  });
+
+  check("ESSAI documentaire — rien n'est écrit, et les écartés sont déjà nommés", () => {
+    const d = projet({ "notes/a.md": "# a\n" });
+    const avant = readdirSync(d).sort().join(",");
+    const r = adopter(d, { pilot: PILOT, type: TYPE_DOCUMENTAIRE, essai: true });
+    att(r.verdict === "ESSAI" && r.ecartes === conditionnels.length, `verdict ${r.verdict}, écartés ${r.ecartes}`);
+    att(readdirSync(d).sort().join(",") === avant, "l'essai a écrit sur le disque");
+  });
+
+  check("borne — sans type, rien ne change : les conditionnels sont posés et aucun type n'est déclaré", () => {
+    const d = projet({ "notes/a.md": "# a\n" });
+    const r = adopter(d, { pilot: PILOT });
+    att(r.type === null && r.ecartes === 0, `type ${r.type}, écartés ${r.ecartes}`);
+    for (const c of conditionnels) att(existsSync(join(d, c)), `${c} n'est plus posé sans type`);
+    att(typeProjetDeclare(d) === null, "un type est déclaré alors qu'aucun n'a été demandé");
+  });
+
+  check("signaux — forge\\ et input\\ ne comptent pas ; un fichier de site, un manifeste et une racine web déclarée comptent", () => {
+    const neutre = projet({ "forge/hooks/factory.mjs": "x\n", "input/client/script.py": "x\n", "docs/a.md": "# a\n", "output/Doc - Etude - 20260928a.html": "<p>x</p>\n" });
+    att(signauxLogicielOuSite(neutre).length === 0, `faux signaux : ${signauxLogicielOuSite(neutre).join(", ")}`);
+    const web = projet({ "site/sitemap.xml": "<urlset/>\n", "Dockerfile": "FROM x\n",
+      "docs/projet/PARAMETRAGE.md": "---\nrole: parametrage\nracine_web: site\n---\n# P\n" });
+    const s = signauxLogicielOuSite(web);
+    att(s.some((x) => /sitemap\.xml \(fichier de site\)/.test(x)) && s.some((x) => /Dockerfile \(manifeste\)/.test(x))
+      && s.some((x) => /racine web déclarée : site/.test(x)), `signaux manqués : ${s.join(", ")}`);
+  });
+
+  check("typeProjetDeclare ne lit que l'EN-TÊTE du carnet — une mention dans le corps n'est pas une déclaration", () => {
+    const d = projet({ [CARNET]: "---\nrole: carnet\n---\n\n# Carnet\n\ntype_projet: documentaire\n" });
+    att(typeProjetDeclare(d) === null, "une ligne du corps est lue comme une déclaration");
+  });
+
+  check("declarerType garde les fins de ligne du carnet et ne double jamais la déclaration", () => {
+    const crlf = "---\r\nrole: carnet\r\nverifie_le: 2026-08-26\r\n---\r\n# C\r\n";
+    const une = declarerType(crlf);
+    att(/verifie_le: 2026-08-26\r\ntype_projet: documentaire\r\n---\r\n/.test(une), `en-tête CRLF mal écrit : ${JSON.stringify(une)}`);
+    att((declarerType(une).match(/type_projet/g) || []).length === 1, "une seconde déclaration a été ajoutée");
+    att(/^---\ntype_projet: documentaire\n---\n# sans/.test(declarerType("# sans en-tête\n")), "un carnet sans en-tête n'en reçoit pas");
   });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }

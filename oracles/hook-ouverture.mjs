@@ -17,7 +17,7 @@ import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writ
 import { tmpdir } from "node:os";
 import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -431,6 +431,27 @@ if (iPilot < 0) {
   }
 }
 
+// 01/10/2026 (demande humaine : « validation accélérée, plus fréquente, toutes les semaines ») — LA
+// REVUE HEBDOMADAIRE DES PROPOSITIONS EST RAPPELÉE PAR L'OUVERTURE. Même raison que la cadence des
+// récidives ci-dessous : sans invocateur, une cadence écrite reste une intention. L'ouverture compte
+// les candidatures munies d'une fiche de décision complète et, quand la dernière revue a 7 jours ou
+// plus, dit la commande qui rend le dossier. Elle ne l'écrit pas : le rendu est un geste du tour.
+if (iPilot < 0) {
+  try {
+    const { etatCourant, manques } = await import(pathToFileURL(join(PILOT, "todo", "revue-hebdo.mjs")).href);
+    const etat = [...etatCourant(readFileSync(join(PILOT, "todo", "TODO.jsonl"), "utf8")).values()].filter((e) => e.statut === "candidat");
+    const pretes = etat.filter((e) => !manques(e.fiche_decision).length).length;
+    const aInstruire = etat.filter((e) => e.fiche_decision && manques(e.fiche_decision).length).length;
+    let derniere = null;
+    try { const l = readFileSync(join(PILOT, "todo", "observabilite", "revues-hebdo.jsonl"), "utf8").trim().split("\n").filter(Boolean); derniere = l.length ? JSON.parse(l[l.length - 1]).ts : null; } catch { derniere = null; }
+    const age = derniere ? (Date.now() - Date.parse(derniere)) / 86400000 : Infinity;
+    lignes.push("", "## Revue hebdomadaire des propositions (references/TODO-FORGE.md, « Revue hebdomadaire accélérée »)");
+    if (age < 7) lignes.push(`- dernière revue le ${derniere} (${age.toFixed(1)} j) — prochaine dans ${(7 - age).toFixed(1)} j ; ${pretes} proposition(s) prête(s), ${aInstruire} à instruire`);
+    else if (!pretes) lignes.push(`- revue due, mais aucune proposition n'a de fiche de décision complète (${aInstruire} à instruire) : rien à trancher`);
+    else lignes.push(`- **revue DUE** (${derniere ? `dernière le ${derniere}` : "jamais jouée"}) : ${pretes} proposition(s) prête(s), ${aInstruire} à instruire — rendre le dossier par node todo/revue-hebdo.mjs --depuis <prochain D-N> --sortie <dossier>, puis en reprendre les décisions au bloc 3 de la restitution`);
+  } catch (e) { lignes.push("", `- revue hebdomadaire des propositions : NON mesurée (${String(e.message).slice(0, 160)})`); }
+}
+
 // TF-0790 (décision D-2 (a), 03/09/2026) — LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI
 // L'INVOQUE. forge-observability le dit elle-même : « la cadence est documentaire en v0 ». Sans
 // invocateur, le plan des récidives serait une intention de plus (N-1). L'ouverture du pilot joue
@@ -469,6 +490,29 @@ if (iPilot < 0) {
       else if (!c.sources_muettes.length) lignes.push(`- sources de retours : aucune muette depuis plus de ${c.seuil_jours} j`);
       else lignes.push(`- ${c.sources_muettes.length} source(s) de retours muette(s) depuis plus de ${c.seuil_jours} j : ${c.sources_muettes.slice(0, 8).map((s) => `${s.source} (${s.silence} j)`).join(", ")}${c.sources_muettes.length > 8 ? ", …" : ""} — une source sans activité n'a rien à remonter ; détail et descente par produit : todo/RECIDIVES.md sections 5 et 7`);
     } catch (e) { lignes.push(`- sources muettes : NON mesurées (${String(e.message || e).slice(0, 120)})`); }
+  }
+}
+
+// D-1 (a) du 25/09/2026 (synthèse 20260924b) — UNE NOUVELLE VERSION DE MODÈLE SE VOIT À
+// L'OUVERTURE, pas au changement de famille. Le §4 de CONTRAT-INTERFACE.md ne se révisait qu'au
+// changement de famille : Fable 5.1 (dès le 02/09) et Opus 5.5 (depuis le 23/09) ont été servies
+// sans que rien ne le dise. L'oracle lit les versions réellement servies dans les transcripts du
+// poste et les situe par rapport au référentiel daté `references\MODELES-EN-SERVICE.json` : une
+// version plus récente que la génération courante déclenche le re-test de la règle de challenge.
+// Il ne bloque jamais l'ouverture : son FAIL est le signal, comme la surveillance des récidives.
+if (iPilot < 0) {
+  const om = join(ICI, "oracle-modeles-en-service.mjs");
+  if (existsSync(om)) {
+    lignes.push("", "## Modèles en service (D-1 (a) du 25/09/2026, référentiel references\\MODELES-EN-SERVICE.json)");
+    const r = spawnSync(process.execPath, [om, "--json"], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur les modèles : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else {
+      lignes.push(`- ${j.resume}`);
+      for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) lignes.push(`- **DÉCLENCHEUR ${f.regle} — ${String(f.message).slice(0, 320)}**`);
+      for (const f of (j.findings || []).filter((x) => x.statut === "AVERT")) lignes.push(`- ${f.regle} — ${String(f.message).slice(0, 320)}`);
+    }
   }
 }
 

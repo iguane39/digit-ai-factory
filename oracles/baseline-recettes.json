@@ -23,8 +23,8 @@
   "vu_le": "2026-09-27"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 33,
-  "vu_le": "2026-09-27"
+  "cas": 44,
+  "vu_le": "2026-09-28"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
   "cas": 27,
@@ -35,8 +35,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 20,
-  "vu_le": "2026-09-22"
+  "cas": 39,
+  "vu_le": "2026-09-28"
  },
  "hook-page-html.mjs": {
   "cas": 11,
@@ -92,8 +92,8 @@
   "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 93,
-  "vu_le": "2026-09-20"
+  "cas": 122,
+  "vu_le": "2026-10-01"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -124,8 +124,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 17,
-  "vu_le": "2026-09-16"
+  "cas": 20,
+  "vu_le": "2026-10-01"
  },
  "oracle-empreintes.mjs": {
   "cas": 9,
@@ -137,8 +137,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-enclenchement.mjs": {
-  "cas": 23,
-  "vu_le": "2026-09-23"
+  "cas": 27,
+  "vu_le": "2026-09-28"
  },
  "oracle-etude-opportunite.mjs": {
   "cas": 2,
@@ -180,6 +180,10 @@
  "oracle-livrable-conseil.mjs": {
   "cas": 4,
   "vu_le": "2026-08-26"
+ },
+ "oracle-modeles-en-service.mjs": {
+  "cas": 16,
+  "vu_le": "2026-09-28"
  },
  "oracle-parite-configuration.mjs": {
   "cas": 18,
@@ -237,8 +241,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-run-reseau.mjs": {
-  "cas": 9,
-  "vu_le": "2026-09-21"
+  "cas": 27,
+  "vu_le": "2026-09-28"
  },
  "oracle-secrets-hors-perimetre.mjs": {
   "cas": 13,
@@ -263,12 +267,12 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 71,
-  "vu_le": "2026-09-27"
+  "cas": 104,
+  "vu_le": "2026-10-01"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 12,
-  "vu_le": "2026-09-20"
+  "cas": 24,
+  "vu_le": "2026-10-01"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -303,8 +307,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-22"
+  "cas": 11,
+  "vu_le": "2026-09-28"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 5,
@@ -319,8 +323,8 @@
   "vu_le": "2026-09-27"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
-  "cas": 17,
-  "vu_le": "2026-09-17"
+  "cas": 23,
+  "vu_le": "2026-09-28"
  },
  "oracles/lib-sens-rouge.test.mjs": {
   "cas": 15,
@@ -351,8 +355,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/oracle-enclenchement.test.mjs": {
-  "cas": 23,
-  "vu_le": "2026-09-23"
+  "cas": 27,
+  "vu_le": "2026-09-28"
  },
  "oracles/oracle-invariant-mesure.test.mjs": {
   "cas": 16,
@@ -399,12 +403,12 @@
   "vu_le": "2026-08-26"
  },
  "scripts/adopter-projet-existant.test.mjs": {
-  "cas": 17,
-  "vu_le": "2026-09-22"
+  "cas": 27,
+  "vu_le": "2026-09-28"
  },
  "scripts/allouer-indice.test.mjs": {
-  "cas": 9,
-  "vu_le": "2026-08-31"
+  "cas": 12,
+  "vu_le": "2026-09-28"
  },
  "scripts/balayer-motifs-numeriques.test.mjs": {
   "cas": 9,
@@ -423,8 +427,8 @@
   "vu_le": "2026-09-27"
  },
  "scripts/generer-page-etude.mjs": {
-  "cas": 12,
-  "vu_le": "2026-09-22"
+  "cas": 15,
+  "vu_le": "2026-09-28"
  },
  "scripts/generer-remplacements-historique.test.mjs": {
   "cas": 11,
@@ -439,16 +443,16 @@
   "vu_le": "2026-09-17"
  },
  "scripts/lib-parc.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-27"
+  "cas": 5,
+  "vu_le": "2026-10-01"
  },
  "scripts/lib-pseudonyme-produit.test.mjs": {
   "cas": 8,
   "vu_le": "2026-09-23"
  },
  "scripts/lib-vue-html.test.mjs": {
-  "cas": 17,
-  "vu_le": "2026-09-23"
+  "cas": 23,
+  "vu_le": "2026-09-28"
  },
  "scripts/oracles-design-page-generee.test.mjs": {
   "cas": 13,
@@ -463,8 +467,8 @@
   "vu_le": "2026-09-23"
  },
  "scripts/readme-dossiers.test.mjs": {
-  "cas": 17,
-  "vu_le": "2026-09-15"
+  "cas": 20,
+  "vu_le": "2026-09-28"
  },
  "scripts/rebatir-clone.test.mjs": {
   "cas": 7,
@@ -498,9 +502,17 @@
   "cas": 8,
   "vu_le": "2026-08-26"
  },
+ "scripts/verifier-droits-accordes.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-10-01"
+ },
  "scripts/verifier-familles-mesure.mjs": {
   "cas": 11,
   "vu_le": "2026-09-15"
+ },
+ "scripts/verifier-garde-fous.test.mjs": {
+  "cas": 14,
+  "vu_le": "2026-10-01"
  },
  "scripts/verifier-hook-poste.test.mjs": {
   "cas": 15,
@@ -521,6 +533,10 @@
  "scripts/verifier-ooxml.test.mjs": {
   "cas": 3,
   "vu_le": "2026-08-31"
+ },
+ "scripts/verifier-portes-du-jour.test.mjs": {
+  "cas": 12,
+  "vu_le": "2026-10-01"
  },
  "scripts/verifier-secours.test.mjs": {
   "cas": 7,
@@ -543,8 +559,8 @@
   "vu_le": "2026-09-15"
  },
  "todo/anonymiser-entrant.mjs": {
-  "cas": 10,
-  "vu_le": "2026-09-15"
+  "cas": 11,
+  "vu_le": "2026-10-01"
  },
  "todo/anonymiser-suivis.mjs": {
   "cas": 10,
@@ -587,8 +603,8 @@
   "vu_le": "2026-09-14"
  },
  "todo/ingerer-emetteur-forge.test.mjs": {
-  "cas": 2,
-  "vu_le": "2026-09-05"
+  "cas": 3,
+  "vu_le": "2026-10-01"
  },
  "todo/ingerer-identifiants.test.mjs": {
   "cas": 3,
@@ -606,9 +622,17 @@
   "cas": 10,
   "vu_le": "2026-09-01"
  },
+ "todo/ingerer-rattachement.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-28"
+ },
  "todo/ingerer-rectification.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-31"
+ },
+ "todo/ingerer-registre-jetable.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-28"
  },
  "todo/journaliser.test.mjs": {
   "cas": 29,

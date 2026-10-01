@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-7 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-12 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -94,6 +94,93 @@ se redécide. Verdict `FAIL` : il reste éteint, et l'écart mesuré est consign
 endroit où les deux passes portent sur du code qui compte. La jouer sur un banc d'essai
 prouverait que le mécanisme tourne, pas qu'il ne perd rien.
 
+## 1 ter. Avant de concevoir un déploiement : relever les garde-fous, relire les contraintes connues (M-11, TF-1495, TF-1496)
+
+**Le fait, du 29/09/2026 chez Produit-03.** La première livraison de production est refusée :
+`RequestDisallowedByPolicy`. Une stratégie `Deny` de la souscription, posée le 03/07, refuse
+d'écrire la configuration d'une Web App dont l'authentification n'est pas active. L'amorçage avait
+été conçu le 21/09 « sans authentification au premier passage », et aucune étape n'avait interrogé
+les stratégies de la portée cible. La contrainte était pourtant connue 3 fois :
+
+- le produit l'avait heurtée en qualification le 23/07, et l'avait écrite dans un commentaire
+  « Obligatoire ici » de son fichier de variables, qui ne gouvernait que la qualification ;
+- le commanditaire avait décrit le 21/09 le processus de son organisation, que l'agent a
+  reformulé puis écarté ;
+- un produit voisin du même client l'avait heurtée le 31/08, et la leçon n'a pas circulé.
+
+Le retour humain, mot pour mot : « Pourquoi cela n'a pas été vu précédemment ? Puisque c'est ce
+que nous faisons sur toutes les applications Client-A. »
+
+**Avant de proposer un ordre de déploiement, 4 gestes, dans cet ordre.**
+
+1. **Lire le registre des garde-fous de la factory** (`references\GARDE-FOUS-PLATEFORME.json`)
+   pour le client du produit. Une entrée est une piste, jamais une preuve : un client pose ou
+   retire une stratégie sans prévenir. « Aucune entrée pour ce client » est une réponse complète.
+2. **Relever les stratégies de la portée cible**, sur Azure par 2 commandes en lecture seule.
+   `az policy assignment list --scope <portée> --disable-scope-strict-match` rend les
+   affectations de la portée, avec celles héritées des portées parentes et celles des portées
+   enfants. `az policy definition show --name <définition>` rend la règle de chacune, et
+   `az policy set-definition show` celle d'une initiative. Une affectation refuse quand son effet
+   effectif est `Deny`, ou `denyAction` pour une suppression, et que son mode d'application est
+   `Default`. L'effet effectif se lit dans le bloc `then` de la règle, dans la valeur que
+   l'affectation donne à un effet paramétré, ou dans ses `overrides`. Pour une ressource précise,
+   l'API `checkPolicyRestrictions` dit quelles restrictions Azure Policy placera sur elle
+   (`POST …/subscriptions/<id>/providers/Microsoft.PolicyInsights/checkPolicyRestrictions?api-version=2024-10-01`).
+   Commandes et propriétés vérifiées à la documentation officielle, lue le 01/10/2026.
+3. **Relire les contraintes connues du produit** : les commentaires « Obligatoire ici » de ses
+   fichiers d'environnement, ses décisions, et les processus que l'humain a décrits pour son
+   organisation. Une contrainte apprise dans un environnement vaut pour la portée entière,
+   jusqu'à preuve du contraire. Elle se promeut en règle du produit : un identifiant porté par
+   le commentaire (`# Obligatoire ici (GF-01) : …`) et une ligne au tableau du dossier. Si le
+   registre de la factory ne la connaît pas, elle remonte au lot de retours.
+4. **Juger chaque option contre ces garde-fous.** Une option qu'un garde-fou interdit est
+   IMPOSSIBLE, pas plus chère. Elle se présente avec le garde-fou qui l'exclut, jamais comme une
+   option à arbitrer sur son coût.
+
+**La parole de l'humain se cite avec ses mots.** Un processus que l'humain décrit pour son
+organisation s'inscrit comme une contrainte, mot pour mot. S'il semble contredire une doctrine du
+produit, la contradiction se pose en décision : le processus ne s'écarte jamais au nom de la
+doctrine. Le 21/09/2026, le formulaire du client, traité par son administrateur d'annuaire, a été
+rapporté à l'assistant du portail, qui crée un mot de passe. Il a alors été écarté comme contraire
+à la doctrine sans secret. Ce processus était la contrainte.
+
+**Une identité de déploiement qui change garde ses droits d'annuaire.** Quand un compte de
+déploiement en remplace un autre, ses permissions d'annuaire se comparent à celles de l'ancien, et
+pas seulement ses rôles Azure. Pour un principal de service, elles se lisent par
+`GET /servicePrincipals/{id}/appRoleAssignments` (Microsoft Graph). Le 16/09/2026, 3 comptes
+dédiés ont remplacé un compte partagé qui portait une permission Graph : aucun ne la portait, et
+le contrôle du standard des comptes ne regardait que 4 rôles Azure.
+
+**La forme, au dossier de MEP** :
+
+```
+## Garde-fous de la plateforme et contraintes connues
+
+Relevé du 2026-09-21 : az policy assignment list --scope <portée> --disable-scope-strict-match
+Registre des garde-fous de la factory lu le 2026-09-21 : GFP-001, GFP-002
+
+| Id | Garde-fou ou contrainte | Source | Étape de la séquence | Verdict |
+|---|---|---|---|---|
+| GF-01 | une Web App sans authentification ne s'écrit pas (Deny) | relevé du 2026-09-21 ; infra/hpr.tfvars ; GFP-001 | S-04 amorçage | rend impossible l'amorçage sans authentification |
+| GF-02 | une inscription d'application se demande par le formulaire du client | parole du commanditaire, 21/09/2026 : « … » | S-07 | compatible : demandée par le formulaire |
+```
+
+**Le contrôle exécutable** : `node scripts\verifier-garde-fous.mjs <produit>`. Il refuse 4 manques :
+
+- un produit qui déploie sur Azure sans relevé daté des stratégies de la portée cible (GF-1) ;
+- un commentaire « Obligatoire ici » que le dossier ne cite ni par son identifiant ni par son
+  fichier (GF-2) ;
+- une section qui ne dit pas avoir lu le registre de la factory (GF-3) ;
+- une contrainte venue de l'humain, citée sans ses mots (GF-4).
+
+L'oracle de l'étape le joue en TM6, et son refus bloque. `node scripts\verifier-garde-fous.mjs --registre`
+juge le registre lui-même : champs, dates, lot source, aucun identifiant ni nom de client.
+
+**Hors jugement, et c'est dit.** La justesse d'un verdict écrit au tableau : le contrôle ne rejoue
+pas le relevé. Les plateformes autres qu'Azure : leur mécanisme de stratégie n'a pas encore de
+commande vérifiée à sa source. Une option impossible encore proposée à l'humain : les options
+vivent dans la restitution, que ce contrôle ne lit pas.
+
 ## 2. Ce que l'étape produit (staging, autonome)
 
 Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fichiers de build) :
@@ -141,7 +228,7 @@ et elle grossit par les incidents, pas par la devinette.
 
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
 
-Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
+12 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
@@ -153,8 +240,10 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
 | M-7 | Travail planifié | **si et seulement si** le produit embarque une définition planifiée (cron) : elle porte un mode d'exercice à la demande CÂBLÉ, distinct de sa cadence, et elle a été EXERCÉE une fois — verdict O-8 de forge-ops, § 3 quinquies, TF-0527 |
 | M-8 | **Jalon de fraîcheur DÉRIVÉ DE TOUT L'ENSEMBLE DÉPLOYÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est une **fonction de l'ENSEMBLE déployé** — empreinte du **manifeste de l'arbre de sortie** (chemins triés + hachages, condensés), ou **identifiant de commit injecté à la génération**. Jamais un numéro tenu à la main ; **jamais non plus l'empreinte d'un artefact échantillonné**. Le critère tient en une phrase : *si on ne sait pas dire « elle change dès que N'IMPORTE QUOI change », le jalon échantillonne.* Preuve exigée : un **test négatif joué sur un fichier QUELCONQUE de l'arbre**, pas sur celui que la porte regarde — §3 sexies, TF-0666 et TF-0672. **Contrôle exécutable : la règle O-7 de forge-ops** (`node <ops>\oracles\oracle-ops.mjs <cible> --empreinte`, empreinte de l'ensemble déployé confrontée au scellé) ; sa preuve par perturbation — une page hors accueil modifiée, qu'un critère sur une seule page ne voit pas et qu'O-7 nomme — est jouée au self-test de forge-ops depuis 2fe5f3d (TF-1075) |
-
 | M-9 | **404 personnalisée, par langue, statut conservé** | **si et seulement si** le produit a une surface web : sur l'instance staging servie, (a) une adresse inconnue sous chaque préfixe de langue rend **404** (jamais 200) avec une page du MÊME gabarit que les autres — menu, charte, liens de secours — dans la langue du préfixe, **et une adresse inconnue SANS préfixe rend le même 404 dans la langue par défaut** (TF-0809) ; (b) la page porte `noindex` et l'exclusion du sitemap est **déclarée** dans l'oracle SEO du produit ; (c) une ressource non-HTML inconnue rend un 404 **nu**. Preuve : la sortie JSON de la **recette générique de forge-tests** `recette\quatre_cent_quatre.py` (paramètres : URL de staging, préfixes de langue, langue par défaut, sitemap — TF-0803, 05/09/2026) jouée contre l'instance staging ; un contrôle propre au produit n'est admis que s'il joue les mêmes cas et le dit (TF-0808). Patron **P-2**, `references\PATRONS-EPROUVES.md` — TF-0802. |
+| M-10 | **Portes à base externe, rejouées le jour du lancement** | **si et seulement si** la chaîne du produit joue une porte qui juge une base externe (avis de dépendances, base de vulnérabilités, dépôt de paquets). Le feu vert du dossier de MEP porte la sortie de chacune, rejouée le jour même du lancement sur l'objet lancé, jamais le verdict de la qualification. Contrôle exécutable : `node scripts\verifier-portes-du-jour.mjs <produit>`, joué en TM5 par `oracle-trace-mutation-mep` — § 3 nonies, TF-1498 |
+| M-11 | **Garde-fous de la plateforme relevés, contraintes connues relues** | **si et seulement si** le produit déploie sur une plateforme à stratégies (Azure Policy) ou porte une contrainte « Obligatoire ici ». Le dossier de MEP porte le relevé daté des stratégies de la portée cible, fait AVANT de concevoir l'ordre de déploiement. Il cite chaque contrainte connue avec son verdict contre la séquence retenue : commentaire d'un environnement, entrée du registre de la factory, parole de l'humain mot pour mot. Contrôle exécutable : `node scripts\verifier-garde-fous.mjs <produit>`, joué en TM6 par `oracle-trace-mutation-mep` — § 1 ter, TF-1495 et TF-1496 |
+| M-12 | **Scripts qui accordent un droit** | **si et seulement si** le produit porte un script ou une chaîne qui accorde un droit, ou qui nomme une permission Microsoft Graph. Chaque identifiant de permission Graph est celui de la table officielle datée, sous son nom et son type ; l'échec d'un octroi reste visible ; l'effet est relu dans la plateforme avant d'être annoncé. Contrôle exécutable : `node scripts\verifier-droits-accordes.mjs <produit>`, joué en TM7 par `oracle-trace-mutation-mep` — § 3 octies, TF-1497 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -318,6 +407,107 @@ réel manquaient au document (TF-1114).
 l'export) attend un vocabulaire de statut au document, en étude avec TF-1113 ; la justesse d'une
 mesure de non-régression n'est pas jugée, seulement sa présence.
 
+### § 3 octies — Un script qui accorde un droit nomme des identifiants résolus, et relit son effet (M-12, TF-1497)
+
+**Le fait, relevé le 30/09/2026 chez Produit-03.** Un script de mise en place de la connexion de
+production portait depuis le 16/09 un identifiant de permission Microsoft Graph faux. Graph et sa
+documentation donnent `18a4783c-866b-4cc7-a460-3d5e5662c884` pour `Application.ReadWrite.OwnedBy` ;
+le script écrivait `18a4783c-866b-4cc7-a460-3d0e455740fd`. Les 2 identifiants partagent leurs 26
+premiers caractères : le second avait été écrit de mémoire. L'étape qui devait accorder la
+permission ajoutait l'identifiant faux en masquant son échec (`2>/dev/null || true`), puis écrivait
+« consentie » sans relire l'annuaire. Un tiers a trouvé le défaut à la relecture, avant que
+l'administrateur d'annuaire ne joue le script.
+
+**3 règles, pour tout script que la MEP joue ou remet à un humain.**
+
+1. **Un identifiant de plateforme écrit en dur se résout contre la plateforme, dans le tour qui
+   l'écrit** : permission, rôle, application first-party. La commande qui le résout se porte en
+   commentaire, avec sa date. Pour une permission Graph, la documentation officielle donne la
+   requête `GET https://graph.microsoft.com/v1.0/servicePrincipals(appId='00000003-0000-0000-c000-000000000000')?$select=appRoles,oauth2PermissionScopes`,
+   que `az rest --method get --url "<requête>"` joue.
+2. **Une étape qui accorde un droit relit son effet dans la plateforme avant d'écrire « ok »**, et
+   compare ce qu'elle lit à ce qu'elle voulait accorder. L'échec d'un ajout ne se masque pas : ni
+   `|| true`, ni `2>/dev/null`, ni `-ErrorAction SilentlyContinue`.
+3. **Un identifiant de permission Graph se juge hors ligne contre la table officielle datée**,
+   `references\PERMISSIONS-GRAPH.json`, relevée sur la page « Microsoft Graph permissions
+   reference » de learn.microsoft.com. Son en-tête dit la date du relevé, celle de la page et ses
+   comptes. `node scripts\verifier-droits-accordes.mjs --rafraichir` la relit et la redate.
+
+**Le contrôle exécutable** : `node scripts\verifier-droits-accordes.mjs <fichier|produit>`. Il
+refuse 3 défauts :
+
+- un identifiant de permission Graph absent de la table, quasi-homonyme d'un identifiant connu,
+  attribué à un autre nom ou employé avec le mauvais type (DA-1) ;
+- une commande d'octroi qui masque son échec (DA-2) ;
+- un succès annoncé après un octroi, sans commande de relecture entre les deux (DA-3).
+
+L'oracle de l'étape le joue en TM7 sur les scripts du produit, et son refus bloque. Joué le
+01/10/2026, hors ligne, sur la version du 16/09 du script en cause, il rend les 3 défauts du
+constat à leurs lignes.
+
+**Hors jugement, et c'est dit.** Les identifiants d'autres ressources que Graph et ceux des rôles :
+la table ne porte que Graph, et la règle 1 les couvre en doctrine. Une permission publiée après la
+date de la table se lit « inconnue » : le message donne la commande qui la résout et celle qui
+rafraîchit la table. La justesse de la relecture : DA-3 exige qu'une commande de lecture précède
+l'annonce, pas qu'elle compare.
+
+### § 3 nonies — Un feu vert de lancement rejoue le jour même les portes qui jugent une base externe (M-10, TF-1498)
+
+**Le fait, du 30/09/2026 chez Produit-03.** À 11h26, une restitution remet à l'exploitant le
+message de lancement de la production. Ses vérifications d'avant lancement portent sur le gabarit
+commun, la connexion de production et la stratégie d'authentification ; ni `npm audit` ni le scan
+d'image n'y figurent. Or 3 avis de sécurité sur une dépendance ont été publiés la nuit précédente,
+entre 23h44 et 23h45 UTC. Le même fichier de verrouillage avait passé la validation de la branche
+principale et la livraison de qualification la veille. La livraison de production s'arrête à
+`npm audit --audit-level=high`, et le lancement de l'exploitant est perdu. Rejouées le matin sur le
+commit à lancer, les 2 portes ont pris moins de 5 minutes.
+
+**La règle.** Une porte qui juge une base externe rend un verdict sur l'état du monde, pas sur le
+code : avis de dépendances, base de vulnérabilités, dépôt de paquets. Cet état change la nuit, sans
+aucun commit. Avant tout feu vert de lancement, chacune de ces portes se rejoue donc le jour même,
+sur l'objet qui sera lancé. Le verdict de la qualification ne se recopie pas, même sur un fichier
+de verrouillage identique.
+
+**La forme, au dossier de MEP.** Une section de feu vert déclare le jour du lancement et l'objet
+lancé, puis donne une ligne par porte :
+
+```
+## Feu vert de lancement
+
+Lancement : 2026-09-30 · Objet lancé : 630f874 (env/prd)
+
+| Porte | Base externe jugée | Rejouée le | Objet jugé | Verdict |
+|---|---|---|---|---|
+| npm audit --audit-level=high | avis de sécurité du registre npm | 2026-09-30 09:12 | 630f874 | 0 vulnérabilité haute |
+| trivy image --severity HIGH,CRITICAL | base de vulnérabilités | 2026-09-30 09:20 | image construite sans cache depuis 630f874 | 0 |
+```
+
+L'objet se nomme : « idem » ou « même commit » ne désignent rien. Un lancement qui glisse au
+lendemain rejoue ses portes ce jour-là, et le dossier change de date. Dans la variante de
+déploiement continu (§ 4 bis), la condition 1 tient M-10 par construction : la chaîne joue ses
+portes sur le commit déclencheur, au moment même du déploiement.
+
+**Le contrôle exécutable** : `node scripts\verifier-portes-du-jour.mjs <produit> [--lancement AAAA-MM-JJ]`.
+Il relève les portes à base externe que la chaîne du produit joue (fichiers d'intégration
+continue, scripts de `package.json`), puis lit le feu vert de chaque `DOSSIER-MEP*.md`. Il refuse
+4 manques :
+
+- un feu vert sans date de lancement ou sans objet lancé (PJ-0) ;
+- une porte de la chaîne absente du tableau (PJ-1) ;
+- une porte datée d'un autre jour que le lancement (PJ-2) ;
+- une porte qui a jugé un autre objet que l'objet lancé (PJ-3).
+
+**Le même fait se juge à la restitution.** La restitution qui remet le guide de lancement porte ces sorties, datées du jour et chiffrées : règle S56 d'`oracles\oracle-synthese.mjs`, décrite dans `gabarits\RESTITUTION.md` (2.32.0). Une porte et une règle jugent ici un seul fait : la mise à jour de l'une se reporte dans l'autre.
+
+L'oracle de l'étape le joue en TM5 (`oracles\oracle-trace-mutation-mep.mjs`), et son refus bloque :
+le remède tient en 5 minutes et appartient à qui donne le feu vert.
+
+**Hors jugement, et c'est dit.** L'heure du rejeu : une base qui change entre le rejeu du matin et
+un lancement du soir n'est pas vue, la règle est le jour. La justesse du verdict recopié au
+tableau : le contrôle lit la date et l'objet, il ne rejoue aucune porte. Une porte que la chaîne
+appelle sans la nommer, par un script ou par un gabarit tiré d'un autre dépôt : ce dernier cas est
+signalé, jamais tenu pour une absence de porte.
+
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
 Entre le staging technique et le GO, une **version de qualification populée de données** est
@@ -389,6 +579,10 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
 - le verdict de la revue graphique d'implémentation (étape 5 bis, écarts soldés ou acceptés) ;
 - le résultat des smoke tests staging (M-3), du test de rollback (M-4) et de l'audit qualif
   populée (§3 bis — non-testables soldés ou listés avec leur raison) ;
+- le feu vert de lancement : les portes qui jugent une base externe, rejouées le jour du
+  lancement sur l'objet lancé, avec leur sortie datée (M-10, § 3 nonies) ;
+- les garde-fous de la plateforme et les contraintes connues : le relevé daté des stratégies de
+  la portée cible, et chaque contrainte avec son verdict contre la séquence retenue (M-11, § 1 ter) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - la commande exacte de mise en production et la procédure de rollback.
 
@@ -419,7 +613,7 @@ qu'elle.** Un dispositif dont la porte est un dossier rédigé et relu ne prouve
 poussée est servie ; celui-ci le prouve à chaque déploiement. *Une règle qui déclare non conforme
 ce qui la dépasse s'apprend à être contournée.*
 
-### Ce que le GO devient, et pourquoi ce n'est pas une autonomie sans porte
+### Le GO devient la poussée d'un commit nommé, jamais une autonomie sans porte
 
 **Le GO humain reste incompressible — il change de forme, pas de nature.** Dans cette variante,
 c'est **la poussée sur un commit nommé** : un acte humain, délibéré, daté, attribué et

@@ -44,7 +44,9 @@
  *   EN2 · un verdict consigné pour un oracle qu'aucune forge mobilisée ne découvre est SIGNALÉ,
  *         jamais accusé — l'asymétrie du mécanisme : « hors mobilisation » s'il appartient à un
  *         autre dépôt du parc (la liste des forges mobilisées est peut-être incomplète),
- *         « inconnu » sinon (un nom libre, un contrôle ad hoc, une commande).
+ *         « inconnu » sinon (un nom libre, un contrôle ad hoc, une commande). Un oracle que SEUL
+ *         le pilot découvre n'est ni l'un ni l'autre : le pilot ne se déclare pas mobilisé, ses
+ *         oracles sont le CADRE de tout run, rangés à part et sans avertissement (TF-1444).
  *
  * LA PROMESSE SE LIT À LA VERSION QUE LE RUN A CONSIGNÉE. La découverte lit le disque d'aujourd'hui ;
  * un oracle absent de la version de la forge que le run a inscrite dans `versions_forges` (R-19)
@@ -110,6 +112,8 @@ export const MECANISME = join("digit-ai-forge-tests", "forge_tests", "confrontat
 //: Les dépôts du parc au sens de ce juge : les forges et le pilot, sous leur nom complet (R-19).
 //: Un produit n'y entre jamais — ce juge n'exécute rien chez un produit, il n'y lit qu'un ledger.
 export const RE_DEPOT_DU_PARC = /^digit-ai-(?:forge-[a-z0-9-]+|factory)$/;
+//: Le pilot n'est pas une forge mobilisée (TF-1444, CONTRAT-INTERFACE.md §3) : il orchestre tout run.
+export const PILOT = "digit-ai-factory";
 
 export const NON_JUGE = [
   "la QUALITÉ des verdicts consignés : ce juge constate qu'un oracle a rendu un verdict, jamais que ce verdict est juste — un ledger complet n'est pas un produit conforme",
@@ -427,19 +431,35 @@ export function juger({ ledger, forges = null, run = null, racine = racineParDef
         ailleurs.set(nom, [...new Set([...(ailleurs.get(nom) || []), depot])]);
       }
     }
-    const horsMobilisation = horsPromesse.filter((nom) => ailleurs.has(nom))
+    // TF-1444 (28/09/2026) — LE CADRE DU PILOT N'EST PAS UNE MOBILISATION INCOMPLÈTE. Tout run de
+    // produit joue au moins la conformité et le contrôle du lot, oracles du PILOT ; EN2 les rangeait
+    // « hors mobilisation » et avertissait à chaque run. Le pilot ne se déclare pas dans
+    // `forges_mobilisees` (CONTRAT-INTERFACE.md §3) : un nom que SEUL le pilot découvre est le cadre
+    // du run, classé à part et sans avertissement. Un nom qu'une forge non mobilisée découvre AUSSI
+    // reste hors mobilisation : la liste des forges peut toujours être incomplète. Un pilot déclaré
+    // malgré la règle est confronté comme une forge (EN1), et rien n'est rangé au cadre.
+    const cadre = horsPromesse.filter((nom) => (ailleurs.get(nom) || []).join() === PILOT)
+      .map((nom) => ({ nom, seqs: servis.get(nom) }));
+    const horsMobilisation = horsPromesse.filter((nom) => ailleurs.has(nom) && !cadre.some((x) => x.nom === nom))
       .map((nom) => ({ nom, depots: ailleurs.get(nom), seqs: servis.get(nom) }));
     const inconnus = horsPromesse.filter((nom) => !ailleurs.has(nom)).map((nom) => ({ nom, seqs: servis.get(nom) }));
-    findings.push({
+    if (horsMobilisation.length || inconnus.length) findings.push({
       regle: "EN2",
       statut: "AVERTISSEMENT",
-      message: `${horsPromesse.length} nom(s) servi(s) au run ${runId} sans être promis par une forge mobilisée — signalé(s), jamais accusé(s) : `
+      message: `${horsMobilisation.length + inconnus.length} nom(s) servi(s) au run ${runId} sans être promis par une forge mobilisée — signalé(s), jamais accusé(s) : `
         + [
           horsMobilisation.length ? `${horsMobilisation.length} hors mobilisation (${horsMobilisation.map((x) => `${x.nom} ← ${x.depots.join("/")}`).join(", ")}) — la liste des forges mobilisées est peut-être incomplète` : "",
           inconnus.length ? `${inconnus.length} inconnu(s) du parc (${inconnus.map((x) => x.nom).join(", ")}) — nom libre, contrôle ad hoc ou commande` : "",
         ].filter(Boolean).join(" ; "),
       hors_mobilisation: horsMobilisation,
       inconnus,
+    });
+    if (cadre.length) findings.push({
+      regle: "EN2",
+      statut: "SANS_OBJET",
+      message: `${cadre.length} oracle(s) du pilot consigné(s) au run ${runId} (${cadre.map((x) => x.nom).join(", ")}) : le cadre de tout run, `
+        + "jamais la promesse d'une forge — le pilot ne se déclare pas dans `forges_mobilisees` (CONTRAT-INTERFACE §3), aucun avertissement",
+      cadre_pilot: cadre,
     });
     if (sansDecouverte.length) {
       nonJuge.push(`le classement « inconnu » ne connaît que les dépôts qui servent la découverte : ${sansDecouverte.join(", ")} n'en servent pas — un nom classé inconnu peut leur appartenir`);

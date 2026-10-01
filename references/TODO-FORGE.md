@@ -177,6 +177,12 @@ ne voyage donc pas, et un clone frais n'a pas le dossier : la règle vit ici.
   l'ingestion, un lot posé à la racine sous un nom réel, en nommant le sas.
 - Un sas **vide est l'état normal**. Un lot DÉJÀ suivi sous un nom réel ne relève pas du sas mais
   de `todo\anonymiser-suivis.mjs`.
+- **Un produit privé déclaré de l'écosystème garde son nom** (règle humaine du 01/10/2026, mot pour
+  mot : « Les dépôts privés peuvent conserver des données de type nom » ; D-5 (a) du 17/09, D-36 (a)
+  du 01/10). `PRODUITS_DE_L_ECOSYSTEME` de `scripts\lib-parc.mjs` les déclare : l'accueil ne les
+  pseudonymise pas, puisqu'aucune table ne les porte, et l'écrivain de la table ne les y inscrit
+  jamais (TF-1505). La protection des noms vise les dépôts publics : le pilot et les 13 forges,
+  publics au 01/10/2026.
 
 **Ce qu’un lot n'a PAS remonté se déclare (R-45, 21/08).** Tout lot daté du 21/08 ou après
 porte une section « Remarques restées au produit » : chaque remarque que le produit a corrigée
@@ -255,7 +261,7 @@ restent humaines : la publication forcée (`git push --force`, R-38) et toute au
 dépôt, devenue incompatible avec la nouvelle histoire (à recloner, pas à fusionner). **Ce que la troisième passe a appris (05/09, forge-development, TF-0813)** : la mesure qui DÉCIDE une réécriture se fait sur un clone à BRANCHE UNIQUE de ce qui est publié — 89 constats vivaient dans une branche locale jamais poussée, l'histoire publiée était verte ; et une branche protégée sur GitHub refuse tout push forcé — vérifier la protection AVANT de réécrire, sinon la passe ne se publie pas. **Ce que la quatrième passe a appris (07/09, forge-design, forge-tests, forge-development, D-10)** : hors de `c:\dev`, la porte ne trouve pas les deux tables et rend SKIP, jamais PASS — les désigner par `FORGE_NOMS_INTERDITS` et `FORGE_PRODUITS_PSEUDO` avant de juger un clone frais ; et la porte lit `git log --all`, qui compte les **arborescences de travail liées** (`git worktree list`) : une arborescence d'une session antérieure, détachée sur l'ancienne histoire, a gardé 79 commits atteignables sur un clone local pourtant réaligné (262 commits vus pour 183) — retirer son enregistrement (`git worktree prune` après suppression de `.git\worktrees\<nom>`) fait partie du diagnostic d'un clone rebâti ; enfin `git filter-repo` se lance par `python -m git_filter_repo` sur un poste où `git filter-repo` répond « Function not implemented ». **Et la copie locale de l'AUTRE poste se rebâtit par l'outil, plus à la main (D-12 a, 07/09, TF-0877)** : `node bootstrap.mjs --rebatir <dépôt> [--essai]` (`scripts\rebatir-clone.mjs`, recette `scripts\rebatir-clone.test.mjs`) refuse un arbre sale, sauvegarde le clone entier en paquet vérifié sous `<racine>\_sauvegardes\`, exporte le delta propre au poste en patches, retire l'enregistrement des arborescences liées, réaligne sur `origin/main`, rejoue les patches (`git am --3way`, arrêt en exit 1 au premier conflit, patch conservé), joue la porte de publication avec les deux tables de la racine — et ne pousse jamais. **Le diagnostic d'un clone rebâti ÉNUMÈRE les références, il ne récite plus une liste de vecteurs (TF-1008, 14/09)** : après l'arborescence liée et la branche de sauvegarde, le remisage (`refs/stash`) a gardé le 10/09 306 commits de l'ancienne histoire dans un clone déclaré rebâti — la porte rendait PASS en les classant antériorités, ce qui ne veut pas dire qu'ils avaient disparu. `rebatir-clone` rend donc `references_divergentes` : chaque référence qui n'est pas un ancêtre de HEAD, avec ses commits propres ; il n'en supprime aucune (R-29). Ce que git ne synchronise pas entre deux postes se copie à la main : les deux tables (`_noms-interdits.json`, `_produits-pseudonymes.json`) et, après `--pull`, la copie installée des skills (`oracle-skills --appliquer`, joué par `--pull`).
 
 **Tout clone de vérification porte `git clone --single-branch -c core.longpaths=true` (TF-1015, 10/09/2026)** : sans l'option, le checkout a refusé 22 fichiers — 19 sidecars d'oracle et 3 synthèses — et le dépôt est arrivé sans arbre de travail.
-Et il se pose sur un **préfixe court** : le plafond de R-4 (chemin relatif + 26 de sidecar ≤ 150) laisse 110 caractères de préfixe admissible, un bac à sable de session en consomme couramment 130.
+Et il se pose sur un **préfixe court** : le plafond de R-4 (chemin relatif + 34 de sidecar ≤ 150, `.oracles/` et `.oracles-historique.jsonl` mesurés le 01/10/2026 ; 26 avant TF-1500) laisse 110 caractères de préfixe admissible, un bac à sable de session en consomme couramment 130.
 
 **Le canal confidentiel (D-28 (a), 07/09/2026).** Ce qui ne doit jamais entrer dans un dépôt publié et
 doit pourtant voyager entre les postes et remonter des produits et des forges vit dans UN dépôt privé,
@@ -306,6 +312,51 @@ et TF-0318 a été instruit dessus ; TF-0328). Le self-test
 
 Consulter le registre à l'ouverture de tout run. `BOUCLE-AMELIORATION.md` reste le journal
 narratif : il référence les ids TF, il ne duplique plus les listes.
+
+## Revue hebdomadaire accélérée (demande humaine du 01/10/2026)
+
+**Ce qui change pour le porteur** : les propositions ne lui arrivent plus une à une. Une fois par
+semaine, il reçoit 7 propositions au plus, chacune en une décision au format du bloc 3 de
+`gabarits\RESTITUTION.md`, et il les tranche en une ligne (« D-40 a, D-41 c »). La demande, mot pour
+mot : « validation accélérée, plus fréquent, toutes les semaines, mais avec un affichage des
+propositions claires, simples, précis, sur les avantages/inconvénients et impacts + choix de
+décisions, type a, b, & c ». Elle répond à l'étape récurrente de l'étude
+`output\03-etudes\20261001-etude-opportunite-rsi-et-ssl.md`, où chaque amélioration proposée attend
+une décision humaine.
+
+1. **La fiche.** Une candidature n'est présentée que si elle porte un champ `fiche_decision` complet,
+   écrit par `todo\journaliser.mjs` en `creation` ou en `maj` : `question` (sans le point
+   d'interrogation, ajouté au rendu), `avantages`, `inconvenients`, `impacts` (listes de phrases
+   courtes et chiffrées), `options.a`, `options.b`, `options.c` (chacune `libelle`, `cout` en
+   complexité × durée, `exclusions`), `recommandation` (`a`, `b` ou `c`), `source`, et `pourquoi`
+   en option. L'option (c) est le repli : elle s'applique si rien n'est décidé. Une fiche ne
+   s'invente pas : un avantage ou un impact non mesuré se dit « non mesuré ». Le champ `rappel`,
+   facultatif, remplace au rendu le titre de la candidature : le juge de la restitution refuse un
+   identifiant nu (« TF-1413 », « R-57 ») avant les options, et beaucoup de titres en portent
+   (mesuré le 01/10/2026 sur la première revue : 5 décisions sur 7 refusées). La question et les
+   listes de la fiche s'écrivent de même, sans identifiant ni renvoi à un numéro de ligne.
+2. **Le rappel.** `oracles\hook-ouverture.mjs` dit à chaque ouverture du pilot combien de
+   propositions sont prêtes et si la revue est due, c'est-à-dire si la dernière a 7 jours ou plus.
+3. **Le dossier.** `node todo\revue-hebdo.mjs --depuis <prochain D-N> --sortie <dossier>` rend les
+   propositions prêtes par valeur décroissante, 7 au plus, reporte les suivantes, et liste « à
+   instruire » celles dont la fiche est incomplète, avec les champs manquants. Le dossier se range
+   dans `output\04-plans\` au nommage de la règle R-4 ; la correspondance D-N → TF-#### s'ajoute à
+   `todo\observabilite\revues-hebdo.jsonl`, qui date la revue.
+4. **L'affichage.** La restitution du tour reprend les décisions du dossier EN ENTIER à son bloc 3,
+   comme toute décision : c'est là que le porteur les lit.
+5. **La réponse.** Chaque sélecteur reçu se consigne par `todo\journaliser.mjs` : (a) ou (b) font
+   passer la candidature en `decide` avec l'option retenue, (c) la laisse `candidat`, et elle
+   revient à la revue suivante.
+6. **Le tri, avant tout (R-58, décision humaine du 01/10/2026).** La fiche porte `ressort` :
+   `{humain: true, motif}` quand la décision revient au porteur (`depense`, `publication`,
+   `irreversible`, `doctrine`, `arbitrage`, `produit`), `{humain: false, pourquoi}` sinon. Le dossier
+   ne pose que les premières ; les secondes y figurent sous « Mises en œuvre sans vous, pour
+   information », et la session les exécute dans le même tour : `decide` avec pour décideur « R-58 »,
+   puis la clôture ordinaire. Une fiche sans `ressort` est listée à instruire. Mesuré sur la première
+   revue : 6 décisions sur 7 n'avaient pas à être posées.
+
+Contrôle : `node todo\revue-hebdo.mjs --self-test` (rendu au format du bloc 3, candidature décidée
+écartée, fiche incomplète listée avec ses manques).
 
 ## Insatisfactions — l'autre registre, et pourquoi il est séparé (TF-0287, 15/08)
 

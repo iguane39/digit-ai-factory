@@ -30,6 +30,7 @@ const BOOTSTRAP = join(ICI, "bootstrap.mjs");
 const base = mkdtempSync(join(tmpdir(), "bootstrap-"));
 const echecs = [];
 let joues = 0;
+let nonJoues = 0;   // cas déclarés NON JOUÉS sur ce poste, avec leur motif (TF-1434)
 const git = (dir, ...a) => execFileSync("git", ["-C", dir, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 
 // Les noms et preuves sont LUS dans la source que bootstrap.mjs importe — `scripts/lib-parc.mjs`
@@ -229,12 +230,21 @@ try {
   // pilot) : un skill dont la description dépasse 1 024 caractères n'est PAS propagé et son dépôt est
   // NOMMÉ (rouge) ; la MÊME source corrigée se propage (vert). Sans le vrai contrôle sur ce poste, le
   // cas se déclare non joué plutôt que de prouver une absence.
+  //
+  // TF-1434 (28/09/2026) — LA DÉCLARATION PORTE SON COMPTE, dans la forme fermée que lit le cliquet
+  // du harnais (`oracles\lib-baseline-recettes.mjs`, `nonJouesDe`) : « [NON JOUÉ] 2 cas — … ». Sans
+  // compte, le harnais lisait 17 cas là où l'autre poste en jouait 19, et accusait deux cas perdus
+  // à chaque passage. Le compte déclaré est VÉRIFIÉ là où le cas est joué : un cas ajouté ici sans
+  // relever `CAS_5_BIS` ferait dépendre le relevé du poste, et la recette le refuse.
   {
+    const CAS_5_BIS = 2;
     const reel = join(ICI, "..", "digit-ai-forge-agents", ".claude", "skills", "quality-oracles", "scripts");
     const controle = join(reel, "frontmatter-skills-index.mjs"), lecteur = join(reel, "lib", "frontmatter.mjs");
     if (!existsSync(controle) || !existsSync(lecteur)) {
-      console.log("bootstrap 5 bis (TF-1337) : NON JOUÉ — le contrôle de frontmatter de forge-agents est absent de ce poste");
+      nonJoues += CAS_5_BIS;
+      console.log(`[NON JOUÉ] ${CAS_5_BIS} cas — bootstrap 5 bis (TF-1337) : le contrôle de frontmatter de forge-agents est absent de ce poste`);
     } else {
+      const avant5bis = joues;
       const fs = await import("node:fs");
       const agents = join(racine, "digit-ai-forge-agents");
       const cible = join(agents, ".claude", "skills", "quality-oracles", "scripts");
@@ -270,6 +280,7 @@ try {
       const sVert = (vert.stdout || "") + (vert.stderr || "");
       if (!existsSync(join(inst, "skill-trop-long", "SKILL.md"))) echecs.push(`TF-1337 : la même source corrigée n'est pas propagée — ${sVert.split("\n").filter((l) => /skills|frontmatter/.test(l)).join(" | ").slice(0, 300)}`);
       if (/frontmatter refusé/.test(sVert)) echecs.push("TF-1337 : un frontmatter recevable est encore refusé");
+      if (joues - avant5bis !== CAS_5_BIS) echecs.push(`TF-1434 : 5 bis joue ${joues - avant5bis} cas et en déclare ${CAS_5_BIS} quand il n'est pas joué — le relevé du cliquet dépendrait du poste`);
     }
   }
 
@@ -308,4 +319,6 @@ try {
 }
 
 if (echecs.length) { console.error("bootstrap : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), puits de redirection raté déclaré avec sa CAUSE et un fichier ordinaire muet (TF-0598), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée, frontmatter d'un skill jugé avant sa propagation (TF-1337 : une description de 1 100 caractères refusée, son dépôt nommé, la même source corrigée propagée)`);
+// La ligne de résumé ne dit JAMAIS avoir joué ce qu'elle n'a pas joué (TF-1434) : sur un poste sans
+// le contrôle de forge-agents, elle annonçait encore le frontmatter « jugé avant sa propagation ».
+console.log(`bootstrap : ${joues}/${joues}${nonJoues ? ` (+${nonJoues} NON JOUÉ(S) sur ce poste, déclaré(s) plus haut)` : ""} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), puits de redirection raté déclaré avec sa CAUSE et un fichier ordinaire muet (TF-0598), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée, ${nonJoues ? "frontmatter d'un skill NON jugé sur ce poste (TF-1337, 5 bis non joué : contrôle de forge-agents absent)" : "frontmatter d'un skill jugé avant sa propagation (TF-1337 : une description de 1 100 caractères refusée, son dépôt nommé, la même source corrigée propagée)"}`);

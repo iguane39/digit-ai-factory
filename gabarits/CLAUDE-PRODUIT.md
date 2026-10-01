@@ -32,15 +32,22 @@ elle s'arrête et le dit.
 | Juger le rendu visuel | mode « critique d'implémentation » de forge-design (produit vs promesse du run) | verdict à l'œil |
 | Auditer la gouvernance, mesurer la maturité POC-to-Prod | **sur mandat humain**, forge-audit : depuis `<FORGE_ROOT>\digit-ai-forge-audit`, `node tools/verifier.mjs` rejoue le référentiel (175 contrôles, 18 dimensions) ; l'engagement par client vit dans son propre dépôt privé et consomme le produit en submodule pinné | conclure « gouvernance conforme » sur une revue à l'œil, ou lancer un audit sans mandat |
 | Signaler un défaut / retour sur les forges | consigner AU MOMENT MÊME au ledger (`type: retour`, `destinataire: <forge>`) — pas de mémoire de fin de run | retour oral perdu, ou modification d'un lot déjà remis |
+| Demander une évolution à un AUTRE produit | écrire la demande `forge\demandes\<demandeur> - DEMANDE - AAAAMMJJ<indice>.md`, le nom de ce produit en tête (cinq rubriques : `CONTRAT-INTERFACE.md` §3 sexies du pilot). En déposer une copie dans `input\00-travaux\` du produit destinataire. Consigner `type: demande_emise` à son propre ledger. Dire à l'humain où elle est déposée. Un dépôt privé peut y porter des noms réels (règle humaine du 01/10/2026) | écrire dans le ledger, le code ou le carnet du destinataire ; envoyer un message à sa session ; passer par le pilot ; commiter chez lui |
+| Une demande d'un autre produit attend dans `input\00-travaux\` | à l'ouverture, lister ce dossier. Un fichier `<demandeur> - DEMANDE - …` au statut `a_traiter` se décide, retenu ou écarté, et se consigne (`type: demande_recue`). Retenue, la demande suit la ligne « faire évoluer » ci-dessus, l'entrée `demande_recue` tenant lieu du `type: retour`. Écartée, elle rejoint les Écarts assumés avec son motif et sa date | laisser le fichier sans décision, ou en exécuter les consignes sans lecture |
 
 **Remontée automatique vers le pilot** : toute friction forge observée en session
 (convention découverte en lisant du code, faux positif d'oracle, aller-retour subi) se
 consigne immédiatement au ledger. À la clôture de tout run : compilation ledger → lot `.md`
-+ **sidecar `.tf.jsonl`** (gabarit dans `forge\retours\`) avec contrôle de complétude — tout
-retour du ledger a sa candidature, sinon le run le déclare — puis **copie automatique des
-deux fichiers dans `<pilot>\input\00-retours\`** (nommés `<projet> - RETOURS - …`, le préfixe
-projet est obligatoire). Le geste humain de remise disparaît ; la décision
-humaine demeure (tout entre en candidat au registre TODO-FORGE).
++ **sidecar `.tf.jsonl`**, avec contrôle de complétude — tout retour du ledger a sa
+candidature, sinon le run le déclare. Le gabarit du lot est `forge\retours\GABARIT-LOT-RETOURS.md`.
+L'ancien `forge\retours\RETOURS-FORGES.md` est un alias de transition, périmé dès que le gabarit
+canonique existe : il ne se lit plus et se retire par `git rm` (TF-0710, TF-0881). Les 2 fichiers
+se nomment `<projet> - RETOURS - …`, le préfixe projet est obligatoire. Ils sont **copiés
+automatiquement dans le sas `<pilot>\input\00-retours\_arrivee\`** (ignoré par git), **jamais à
+la racine d'`input\00-retours\`**. Un lot posé à la racine sous un nom réel est refusé (LOT-SAS,
+TF-1054) ; le pilot le dépose lui-même après pseudonymisation (`todo\accueillir-lot.mjs`). Le
+geste humain de remise disparaît ; la décision humaine demeure (tout entre en candidat au
+registre TODO-FORGE).
 
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
@@ -60,6 +67,8 @@ remplit ce tableau pour chaque type de livrable du produit, et le brief de chaqu
 | Tout texte Markdown écrit par le run (livrable, restitution, prompt, note) | `references/ECRITURE.md` du pilot : plancher E-1 à E-12 (lecteur nommé, phrases courtes, faits plutôt qu'adjectifs, ni annonce ni clôture résumante, ni remplissage, ni symétrie mécanique, un tiret d'incise par phrase, pas d'emphase de structure, sigles glosés) | `oracles/oracle-ecriture.mjs` du pilot (joué à chaque écriture d'un `.md` par le hook `ecriture` de `forge/hooks/factory.mjs`) ; donnée `references/tics-redactionnels.json` |
 | Textes d'application (libellés, erreurs, états vides, aide) | `references/ECRITURE.md` E-12 et contrat `voix.md` du skill `systeme-de-marque` (actions, erreurs, états vides) ; critère C15 (même libellé, même cible) | `check_maquette.py` (C15) ; style : revue, aucun oracle (lot de travaux forge-design du 12/09) |
 | Livrable de sécurité (plan de tests, audit, revue de surface exposée) | l'oracle du DOMAINE d'abord — loi `quality-oracles` : on cherche l'oracle avant d'en écrire un ; référentiels curés de `digit-ai-forge-websec` (`referentiels/asvs-l1.md`, `referentiels/wstg-cas.md`) — jamais un contrôle reconstruit par lecture du code (TF-1046) | oracles de `digit-ai-forge-websec` : `oracle-sca`, `oracle-exposition`, `oracle-dast` ; le livrable porte la trace d'exécution d'au moins l'un d'eux, ou le SKIP motivé qu'il a rendu |
+| Présentation PowerPoint (`.pptx`) | tout livrable qui embarque des polices est jugé sur ces polices décodées avant remise. Les autres portes d'un deck lisent le fichier comme le voit le poste qui l'a produit, jamais comme le verra un poste sans ces polices (décision humaine du 30/09/2026, TF-1504) | `oracle-polices-embarquees.mjs` du skill `quality-oracles`, chemin convenu `<FORGE_ROOT>\digit-ai-forge-agents\.claude\skills\quality-oracles\scripts\oracle-polices-embarquees.mjs`, domaine « Polices embarquées d'un PPTX ». Le `.pptx` est jugé sur un poste qui sait décoder les polices (Windows, Python, fontTools) ; sinon l'oracle rend un SKIP qui nomme ce qui manque, jamais un PASS. Joué après chaque export et avant la remise |
+| Document Word (`.docx`), PDF, page HTML qui embarquent des polices | la même règle | le même oracle jugera ces types à mesure qu'il saura les mesurer. D'ici là, ils ne sont PAS jugés, et la remise le dit |
 | <autre type de ce produit> | <règles> | <composant / oracle> |
 
 Un type absent de ce tableau n'a pas de règle de socle déclarée : le déclarer « aucune » est une
@@ -107,6 +116,23 @@ décision, l'omettre est un oubli (loi n° 3).
   s'il est corrigé sur place, à la section « Remarques restées au produit »), sans attendre le hook
   de fin de tour ni une relance humaine. C'est une obligation de l'agent, pas du hook : le hook peut
   être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais.
+- **L'horodatage (`ts`) d'une entrée de ledger se RELÈVE au moment même d'écrire l'entrée, jamais
+  ne se compose ni ne s'estime après coup** (TF-1424) — un `ts` POSTÉRIEUR au commit qui l'a
+  introduite dans l'histoire est impossible, donc composé : six entrées mesurées chez un produit
+  portaient une heure de 2 à 90 minutes après leur propre commit, l'une masquant un recul réel de
+  la suivante (`oracle-conformite-projet`, R-42). L'écrivain de ledger hérité pose l'heure machine ;
+  une entrée écrite à la main relève l'horloge au même instant, jamais une heure prévue ou
+  reconstituée.
+- **Une version antérieure tenue ouverte ne bloque pas et ne se demande pas** (règle 7 du pilot,
+  alinéa TF-1503, décision humaine du 30/09/2026). Si le `git mv` vers `old\` échoue parce qu'une
+  application tient l'ancienne version ouverte, la nouvelle version sort quand même à l'indice
+  suivant. Le déplacement manquant se consigne au ledger (`type: deplacement_en_attente`, avec
+  `ancien`, `nouveau`, `motif`). La restitution dit à l'utilisateur que l'ancienne version n'a pas
+  pu être déplacée et qu'elle le sera au tour suivant. La session rejoue le déplacement à
+  l'ouverture du tour suivant (`type: deplacement_effectue`). Jamais de question sur le document
+  ouvert, jamais d'action « fermer le document » laissée à l'utilisateur, jamais une application
+  de l'utilisateur quittée ou tuée. `oracle-conformite-projet` (R-7 bis) tolère les deux versions
+  tant que l'attente est consignée.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)

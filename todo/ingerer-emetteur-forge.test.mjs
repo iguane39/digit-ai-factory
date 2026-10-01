@@ -75,6 +75,20 @@ try {
     att(!/dossier introuvable/.test(sortie), "R-47 a encore cherché un produit pour une forge");
   });
 
+  // TF-1505 (01/10/2026) : un produit PRIVÉ déclaré de l'écosystème garde son nom comme une forge
+  // (D-5 (a) du 17/09, D-36 (a) du 01/10). Avant le correctif, ce lot inscrivait son nom à la table.
+  check("VERTE TF-1505 — un lot d'un produit déclaré de l'écosystème garde son nom : pas d'entrée à la table, demandeur conservé", () => {
+    const p = parc();
+    const { sortie, status, table, lignes } = ingerer("digit-ai-marketing", p);
+    att(status === 0, `ingestion refusée (exit ${status}) : ${sortie.slice(0, 400)}`);
+    att(Object.keys(table.produits).length === 0, `le produit de l'écosystème a été inscrit à la table : ${JSON.stringify(table.produits)}`);
+    const creations = lignes.filter((l) => l.ev === "creation");
+    att(creations.length === 2, `2 créations attendues, ${creations.length}`);
+    att(creations.every((c) => c.demandeur === "digit-ai-marketing"), `demandeur réécrit : ${creations.map((c) => c.demandeur).join(", ")}`);
+    att(/\[ÉCOSYSTÈME\]/.test(sortie), "la sortie ne dit pas que le lot vient d'un produit déclaré de l'écosystème");
+    att(!/ANONYMISÉ\] produit du lot/.test(sortie), "la sortie annonce une pseudonymisation qui n'a pas eu lieu");
+  });
+
   check("ROUGE — un lot remis par un PRODUIT est toujours pseudonymisé : entrée à la table, demandeur substitué", () => {
     const p = parc();
     const { sortie, status, table, lignes } = ingerer("ProduitEssai", p);
