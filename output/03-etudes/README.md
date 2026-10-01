@@ -104,6 +104,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260922-revue-des-candidatures-par-famille.md` | fichier | 11,7 Ko | Revue des candidatures du registre, par famille de défaut |
 | `20260925-etude-opportunite-niveaux-d-intervention.md` | fichier | 47,9 Ko | Étude d'opportunité — proportionner la réponse à la question : niveaux Simple, Moyen, Comp |
 | `20260925-L99-niveaux-d-intervention.md` | fichier | 51,0 Ko | Analyse L99 — « Adapter le modèle, le process et le format de réponse à la complexité de l |
-| `20261001-etude-opportunite-rsi-et-ssl.md` | fichier | 29,7 Ko | Étude d'opportunité — auto-amélioration récursive (RSI) et apprentissage auto-supervisé (S |
+| `20261001-etude-opportunite-rsi-et-ssl.md` | fichier | 30,0 Ko | Étude d'opportunité — auto-amélioration récursive (RSI) et apprentissage auto-supervisé (S |
 
-_89 fichier(s), 0 sous-dossier(s)_
+_89 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

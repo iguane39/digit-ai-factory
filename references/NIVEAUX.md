@@ -29,6 +29,11 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
   (un chemin et sa ligne, ou une commande et sa sortie) ; une ligne « Non vérifié : … » s'il le faut.
   Aucun bloc, aucune décision ni action numérotée, aucun mot de verdict (PASS, FAIL, conforme,
   garanti, exhaustif, verdict).
+- **Contrôle avant affichage** (01/10/2026) : la réponse se joue avant d'être rendue, par
+  `node oracles/hook-restitution.mjs --pre-vol` qui lit son texte sur l'entrée standard (une des 3
+  commandes). Exit 1 = le juge de fin de tour la refuserait : raccourcir, ou retirer la décision posée.
+  Une décision se cite dans la prose (« la décision de départ, D-39 »), elle ne se pose jamais. *Le
+  fait* : le 01/10, une réponse de 158 mots a été refusée après affichage, et l'humain l'a lue 2 fois.
 - **Escalade** : dès qu'il faut écrire, lancer une 4e commande, rendre un verdict ou poser une décision,
   le tour quitte le niveau Simple. Il le dit en une phrase et se restitue en entier. Le niveau ne
   descend jamais en cours de tour.

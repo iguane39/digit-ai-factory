@@ -284,7 +284,9 @@ qu'elle traite, son coût en complexité × durée et ce qu'elle exclut.
   consigne de restitution, parce qu'elle a le banc le plus riche (514 refus). Critère de réussite :
   une proposition qui baisse le taux de refus sur la part tenue à part, sans hausse sur les autres
   règles, et aucune empreinte d'oracle modifiée. Retour arrière : la proposition reste `candidat`,
-  rien n'est en service sans décision humaine.
+  rien n'est en service sans décision humaine. Les propositions se tranchent en revue hebdomadaire
+  accélérée, 7 au plus, chacune avec ses avantages, inconvénients, impacts et options (a), (b), (c)
+  (demande humaine du 01/10/2026 ; `references\TODO-FORGE.md`, `todo\revue-hebdo.mjs`).
 - **Étape 3, après la revue de l'étape 2** : niveau N3 et diffusion aux forges, puis aux produits par
   l'héritage.
 - **Candidature(s) émise(s)** : 2 candidatures proposées plus bas, non inscrites ; l'inscription

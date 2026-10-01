@@ -313,6 +313,40 @@ et TF-0318 a été instruit dessus ; TF-0328). Le self-test
 Consulter le registre à l'ouverture de tout run. `BOUCLE-AMELIORATION.md` reste le journal
 narratif : il référence les ids TF, il ne duplique plus les listes.
 
+## Revue hebdomadaire accélérée (demande humaine du 01/10/2026)
+
+**Ce qui change pour le porteur** : les propositions ne lui arrivent plus une à une. Une fois par
+semaine, il reçoit 7 propositions au plus, chacune en une décision au format du bloc 3 de
+`gabarits\RESTITUTION.md`, et il les tranche en une ligne (« D-40 a, D-41 c »). La demande, mot pour
+mot : « validation accélérée, plus fréquent, toutes les semaines, mais avec un affichage des
+propositions claires, simples, précis, sur les avantages/inconvénients et impacts + choix de
+décisions, type a, b, & c ». Elle répond à l'étape récurrente de l'étude
+`output\03-etudes\20261001-etude-opportunite-rsi-et-ssl.md`, où chaque amélioration proposée attend
+une décision humaine.
+
+1. **La fiche.** Une candidature n'est présentée que si elle porte un champ `fiche_decision` complet,
+   écrit par `todo\journaliser.mjs` en `creation` ou en `maj` : `question` (sans le point
+   d'interrogation, ajouté au rendu), `avantages`, `inconvenients`, `impacts` (listes de phrases
+   courtes et chiffrées), `options.a`, `options.b`, `options.c` (chacune `libelle`, `cout` en
+   complexité × durée, `exclusions`), `recommandation` (`a`, `b` ou `c`), `source`, et `pourquoi`
+   en option. L'option (c) est le repli : elle s'applique si rien n'est décidé. Une fiche ne
+   s'invente pas : un avantage ou un impact non mesuré se dit « non mesuré ».
+2. **Le rappel.** `oracles\hook-ouverture.mjs` dit à chaque ouverture du pilot combien de
+   propositions sont prêtes et si la revue est due, c'est-à-dire si la dernière a 7 jours ou plus.
+3. **Le dossier.** `node todo\revue-hebdo.mjs --depuis <prochain D-N> --sortie <dossier>` rend les
+   propositions prêtes par valeur décroissante, 7 au plus, reporte les suivantes, et liste « à
+   instruire » celles dont la fiche est incomplète, avec les champs manquants. Le dossier se range
+   dans `output\04-plans\` au nommage de la règle R-4 ; la correspondance D-N → TF-#### s'ajoute à
+   `todo\observabilite\revues-hebdo.jsonl`, qui date la revue.
+4. **L'affichage.** La restitution du tour reprend les décisions du dossier EN ENTIER à son bloc 3,
+   comme toute décision : c'est là que le porteur les lit.
+5. **La réponse.** Chaque sélecteur reçu se consigne par `todo\journaliser.mjs` : (a) ou (b) font
+   passer la candidature en `decide` avec l'option retenue, (c) la laisse `candidat`, et elle
+   revient à la revue suivante.
+
+Contrôle : `node todo\revue-hebdo.mjs --self-test` (rendu au format du bloc 3, candidature décidée
+écartée, fiche incomplète listée avec ses manques).
+
 ## Insatisfactions — l'autre registre, et pourquoi il est séparé (TF-0287, 15/08)
 
 Une **insatisfaction** n'est pas une amélioration : elle se **rouvre** (« ça ne va

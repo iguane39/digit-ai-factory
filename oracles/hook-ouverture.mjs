@@ -17,7 +17,7 @@ import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writ
 import { tmpdir } from "node:os";
 import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -429,6 +429,27 @@ if (iPilot < 0) {
     else if (j.verdict === "SANS_OBJET") lignes.push("- sans objet — aucun document ne prescrit de commande.");
     else for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) lignes.push(`- **${f.regle} — ${String(f.message).slice(0, 320)}**`);
   }
+}
+
+// 01/10/2026 (demande humaine : « validation accélérée, plus fréquente, toutes les semaines ») — LA
+// REVUE HEBDOMADAIRE DES PROPOSITIONS EST RAPPELÉE PAR L'OUVERTURE. Même raison que la cadence des
+// récidives ci-dessous : sans invocateur, une cadence écrite reste une intention. L'ouverture compte
+// les candidatures munies d'une fiche de décision complète et, quand la dernière revue a 7 jours ou
+// plus, dit la commande qui rend le dossier. Elle ne l'écrit pas : le rendu est un geste du tour.
+if (iPilot < 0) {
+  try {
+    const { etatCourant, manques } = await import(pathToFileURL(join(PILOT, "todo", "revue-hebdo.mjs")).href);
+    const etat = [...etatCourant(readFileSync(join(PILOT, "todo", "TODO.jsonl"), "utf8")).values()].filter((e) => e.statut === "candidat");
+    const pretes = etat.filter((e) => !manques(e.fiche_decision).length).length;
+    const aInstruire = etat.filter((e) => e.fiche_decision && manques(e.fiche_decision).length).length;
+    let derniere = null;
+    try { const l = readFileSync(join(PILOT, "todo", "observabilite", "revues-hebdo.jsonl"), "utf8").trim().split("\n").filter(Boolean); derniere = l.length ? JSON.parse(l[l.length - 1]).ts : null; } catch { derniere = null; }
+    const age = derniere ? (Date.now() - Date.parse(derniere)) / 86400000 : Infinity;
+    lignes.push("", "## Revue hebdomadaire des propositions (references/TODO-FORGE.md, « Revue hebdomadaire accélérée »)");
+    if (age < 7) lignes.push(`- dernière revue le ${derniere} (${age.toFixed(1)} j) — prochaine dans ${(7 - age).toFixed(1)} j ; ${pretes} proposition(s) prête(s), ${aInstruire} à instruire`);
+    else if (!pretes) lignes.push(`- revue due, mais aucune proposition n'a de fiche de décision complète (${aInstruire} à instruire) : rien à trancher`);
+    else lignes.push(`- **revue DUE** (${derniere ? `dernière le ${derniere}` : "jamais jouée"}) : ${pretes} proposition(s) prête(s), ${aInstruire} à instruire — rendre le dossier par node todo/revue-hebdo.mjs --depuis <prochain D-N> --sortie <dossier>, puis en reprendre les décisions au bloc 3 de la restitution`);
+  } catch (e) { lignes.push("", `- revue hebdomadaire des propositions : NON mesurée (${String(e.message).slice(0, 160)})`); }
 }
 
 // TF-0790 (décision D-2 (a), 03/09/2026) — LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI
