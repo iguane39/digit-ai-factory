@@ -333,8 +333,14 @@ export function juger(texte, options = {}) {
   // bloc 2, la question d'une décision D-N en bloc de citation — et le gabarit prime sur le
   // plancher (ECRITURE.md, précédence 1). Seul le gras qui porte une phrase À L'INTÉRIEUR d'un
   // paragraphe est compté : c'est lui qui souligne au lieu de structurer.
+  // TF-1488 (01/10/2026, lot Produit-03 du 28/09, RA-46) — LE GRAS D'UN SEUL CARACTÈRE EST UN GRAS.
+  // Le motif exigeait 2 caractères au moins entre les étoiles : « **0** » n'était pas reconnu, et
+  // son second « ** » s'appariait avec l'ouverture du gras suivant de la même ligne. Le texte
+  // ordinaire qui les sépare devenait un passage en gras (un faux de 125 mots, règle passée de PASS
+  // à FAIL), et un VRAI passage en gras placé après « **0** » glissait hors du compte. Un caractère
+  // suffit : l'appariement ne glisse plus, chaque gras se ferme sur son propre délimiteur.
   const gras = [];
-  for (const x of texteProse.matchAll(/\*\*([^*\n]{2,})\*\*/g)) {
+  for (const x of texteProse.matchAll(/\*\*([^*\n]+)\*\*/g)) {
     const n = compterMots(x[1]);
     if (n < 12) continue;
     const debutLigne = texteProse.lastIndexOf("\n", x.index) + 1;
@@ -969,10 +975,34 @@ function selfTest() {
       + "ne sont pas des valeurs, et un oracle qui crie sur l'usage legitime se fait desactiver dans la "
       + `semaine (lecon N4) : ${JSON.stringify(g9(r9p))}`);
 
+  // 18, 19 et 20 (TF-1488, lot Produit-03 du 28/09, RA-46) — EC-4-gras ET LE GRAS D'UN SEUL
+  // CARACTERE, DANS SES TROIS SENS. La paire du lot, mot pour mot : cinq lignes portant « **0** »
+  // puis un statut en gras rendaient FAIL (un faux passage de 18 mots, « ressource, puis un
+  // texte… ») ; sans le gras du « 0 », PASS. Les deux doivent rendre le MEME verdict, PASS. Le
+  // troisieme sens est le rouge que le meme glissement CACHAIT : de vrais passages de 12 mots en
+  // gras, places apres « **0** », doivent echouer, et le premier compte est le vrai passage.
+  const ligneGras1 = (n, avecGras0, avecVraiGras) => `Ligne ${n} : un compte de ${avecGras0 ? "**0**" : "0"} ressource, puis `
+    + (avecVraiGras ? "**un texte ordinaire de plus de douze mots sans aucune emphase ici**" : "un texte ordinaire de plus de douze mots sans aucune emphase ici")
+    + ", et enfin un statut **transmis**.";
+  const texteGras1 = (avecGras0, avecVraiGras) => "# Registre\n\n"
+    + [1, 2, 3, 4, 5].map((n) => ligneGras1(n, avecGras0, avecVraiGras)).join("\n") + "\n";
+  const g4 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-4-gras");
+  const r4a = jouer("ec4-gras-un-caractere.md", texteGras1(true, false));
+  const r4b = jouer("ec4-gras-sans-gras-du-zero.md", texteGras1(false, false));
+  const r4c = jouer("ec4-gras-vrais-passages.md", texteGras1(true, true));
+  if (g4(r4a)?.statut !== "PASS")
+    casse.push("EC-4-gras : un gras d'UN caractere (« **0** ») fait encore glisser l'appariement — le texte ordinaire "
+      + `jusqu'au gras suivant est compte comme un passage en gras, c'est le faux FAIL du 28/09 (TF-1488) : ${JSON.stringify(g4(r4a))}`);
+  if (g4(r4b)?.statut !== "PASS")
+    casse.push(`EC-4-gras : les memes lignes SANS le gras du « 0 » sont accusees : ${JSON.stringify(g4(r4b))}`);
+  if (g4(r4c)?.statut !== "FAIL" || !/1er de 12 mots : « un texte ordinaire/.test(g4(r4c)?.message || ""))
+    casse.push("EC-4-gras : de VRAIS passages de 12 mots en gras, places apres « **0** », ne sont pas comptes pour "
+      + `eux-memes — l'appariement glisse et cache le rouge (TF-1488) : ${JSON.stringify(g4(r4c))}`);
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 17 cas, 0 défaut (17/17 PASS — rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138))`);
+    : `Self-test ${NOM} : 20 cas, 0 défaut (20/20 PASS — rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes)`);
   return casse.length ? 1 : 0;
 }
 
