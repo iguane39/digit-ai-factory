@@ -1,7 +1,7 @@
 # Niveaux d'intervention — proportionner la réponse à la question
 
-Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.0.0,
-25/09/2026**. Source : l'étude `output\03-etudes\20260925-etude-opportunite-niveaux-d-intervention.md`,
+Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.1.0,
+01/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple). Source : l'étude `output\03-etudes\20260925-etude-opportunite-niveaux-d-intervention.md`,
 verdict O3 (3 niveaux fixés par les effets du tour, déployés en 3 étapes), validé par la décision
 humaine D-3 (a) du 25/09/2026. Candidature au registre : TF-1418 (niveaux d'intervention, étape 1).
 
@@ -29,6 +29,22 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
   (un chemin et sa ligne, ou une commande et sa sortie) ; une ligne « Non vérifié : … » s'il le faut.
   Aucun bloc, aucune décision ni action numérotée, aucun mot de verdict (PASS, FAIL, conforme,
   garanti, exhaustif, verdict).
+- **Mise en page** (01/10/2026, choix humain « b » entre 3 formats montrés, D-48) : une phrase qui
+  répond, ouverte sur le oui, le non ou le fait demandé ; puis 2 à 4 puces d'une idée chacune, une
+  phrase courte par puce ; puis la ligne de source. Pas de paragraphe dense, pas de titre, pas de
+  tableau. *Le fait* : la réponse de référence tenait en 2 paragraphes de 130 mots, jugée « beaucoup
+  de texte pour pas grand chose » ; la forme retenue dit la même chose en 50 mots. Exemple :
+
+  > Non, le rappel vient seulement à l'ouverture d'une session.
+  > - Après 7 jours sans revue, elle affiche « revue DUE ».
+  > - Sans session ouverte, rien ne se passe.
+  > - Le planificateur Windows peut préparer le dossier le lundi.
+  >
+  > Source : `oracles/hook-ouverture.mjs:448`.
+- **Brouillon** : la réponse se joue par `--pre-vol` depuis un heredoc, jamais depuis un fichier écrit
+  par Write ou Edit, même temporaire. *Le fait* : le 01/10, 3 brouillons écrits dans le dossier
+  temporaire ont fait du tour un tour de travail ; `--pre-vol` a rendu exit 0, puis le juge de fin de
+  tour a exigé la restitution complète.
 - **Contrôle avant affichage** (01/10/2026) : la réponse se joue avant d'être rendue, par
   `node oracles/hook-restitution.mjs --pre-vol` qui lit son texte sur l'entrée standard (une des 3
   commandes). Exit 1 = le juge de fin de tour la refuserait : raccourcir, ou retirer la décision posée.
