@@ -57,6 +57,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md` | fichier | 13,8 Ko | Les 6 objets du verdict des réseaux sociaux sont construits et vérifiés ; il reste à publi |
 | `Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` | fichier | 15,3 Ko | Synthèse de mandat — actions 31, 32 et 33 achevées : la forge de développement est publiée |
 | `Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` | fichier | 23,3 Ko | Synthèse de mandat — actions 36 à 40 achevées : deux lots instruits et publiés, les branch |
+| `Digit-AI - Synthese Mandat - Affichage double corrige et revue hebdomadaire - 20261001e.md` | fichier | 9,9 Ko | Synthèse Mandat — affichage double de la réponse corrigé, et revue hebdomadaire accélérée  |
 | `Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md` | fichier | 19,1 Ko | Synthèse de mandat — amélioration continue, du pas 0 au pas 4 (03/09/2026, après validatio |
 | `Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md` | fichier | 15,5 Ko | Synthèse de mandat — analyse L99 (le niveau complet du skill d'analyse de prompt, 8 couche |
 | `Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md` | fichier | 15,3 Ko | Synthèse de mandat — analyse L99 (le niveau complet du skill d'analyse de prompt, 8 couche |
@@ -111,12 +112,14 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
 | `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,5 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
 | `Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` | fichier | 26,7 Ko | Digit-AI — Synthèse de mandat — Décisions du 24/09 exécutées et candidatures reproposées — |
+| `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |
 | `Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` | fichier | 13,8 Ko | Synthèse de mandat — votre « 3a » est exécuté : un produit doit désormais dire ce qu'il re |
 | `Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` | fichier | 11,7 Ko | Synthèse de mandat — votre « 4b » est exécuté à moitié : l'enregistrement est fait, la pub |
 | `Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` | fichier | 9,8 Ko | Synthèse de mandat — tout n'est pas encore commité, et une branche ancienne n'est pas fusi |
 | `Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` | fichier | 15,2 Ko | Synthèse de mandat — l'étude d'opportunité conclut de ne rien construire, et signale une f |
 | `Digit-AI - Synthese Mandat - Etude opportunite premiers HTML nouveaux formats - 20260914b.md` | fichier | 19,9 Ko | Synthèse de mandat — vos trois arbitrages sont exécutés, l'étude est rendue, et elle vous  |
 | `Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee et enregistrement local - 20261001g.md` | fichier | 17,9 Ko | Synthèse de mandat : vos décisions D-1 (a), D-2 (a) et D-3 (a) sont exécutées, l'étude du  |
+| `Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` | fichier | 10,8 Ko | Synthèse Mandat — étude d'opportunité sur l'auto-amélioration récursive et l'apprentissage |
 | `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
 | `Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` | fichier | 19,1 Ko | Synthèse de mandat — la forge d'audit est publiée et vérifiée sur ce qui est en ligne, mai |
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
@@ -146,6 +149,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Neuf decisions executees publiees et propagees - 20260927a.md` | fichier | 23,6 Ko | Digit-AI — Synthèse de mandat — Neuf décisions exécutées, publiées et propagées — 27/09/20 |
 | `Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md` | fichier | 11,7 Ko | Synthèse de mandat — votre feu vert est exécuté, le noyau corrigé est en ligne, et l'affai |
 | `Digit-AI - Synthese Mandat - Onze actions executees et la fusion validee - 20260922g.md` | fichier | 33,5 Ko | Digit-AI — Synthèse de mandat — 11 actions exécutées et la fusion validée — 22/09/2026 |
+| `Digit-AI - Synthese Mandat - Opus 5.5 Medium par defaut prouve sur les 2 profils - 20261001a.md` | fichier | 8,6 Ko | Synthèse Mandat — Opus 5.5 en effort medium est le défaut des conversations neuves, prouvé |
 | `Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-12 (a) exécutée : la reconstruction d'un clone divergé est |
 | `Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` | fichier | 10,2 Ko | Vos 2 décisions sont exécutées : les outils corrigés tournent sur ce poste, et les 4 forge |
 | `Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md` | fichier | 22,7 Ko | Synthèse de mandat — le premier palier est fait et prouvé, le deuxième est écrit et bute s |
@@ -165,6 +169,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 12,3 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
 | `Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` | fichier | 16,1 Ko | Synthèse de mandat — pourquoi le bloc des décisions dérive d'un rendu à l'autre (30/08/202 |
 | `Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` | fichier | 7,2 Ko | Synthèse de mandat — le prompt réécrit L99 exécuté (5 postes, 6 agents, 3 lots avalés) |
+| `Digit-AI - Synthese Mandat - Publication 48a du pilot et de forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
 | `Digit-AI - Synthese Mandat - Publication de forge-development actions A39 A37 - 20260907l.md` | fichier | 10,7 Ko | Synthèse de mandat — actions A-39 puis A-37 exécutées : la protection levée puis remise à  |
 | `Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-9 (a) exécutée : quatre dépôts publiés, trois forges reten |
 | `Digit-AI - Synthese Mandat - Publication du parc et branche ancienne retiree - 20260916a.md` | fichier | 8,1 Ko | Synthèse de mandat — le parc est publié, et la branche ancienne a disparu de GitHub (16/09 |
@@ -174,6 +179,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md` | fichier | 23,6 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 5 nouvelles posées — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees et quatre nouvelles posees - 20260923a.md` | fichier | 29,6 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 4 nouvelles posées — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` | fichier | 14,1 Ko | Synthèse de mandat — vos quatre décisions et vos quatre actions exécutées : le parc entier |
+| `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001g.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
 | `Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md` | fichier | 22,7 Ko | Synthèse de mandat — les quinze actions du tableau sont traitées : six chantiers livrés et |
 | `Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md` | fichier | 17,6 Ko | Quinze items du registre traités, et trois contrôles posés là où l'on produit |
 | `Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` | fichier | 14,6 Ko | Synthèse de mandat — la Factory se recopie chez les produits, et un contrôle de configurat |
@@ -238,4 +244,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_221 fichier(s), 0 sous-dossier(s)_
+_227 fichier(s), 0 sous-dossier(s)_

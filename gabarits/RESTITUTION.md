@@ -1031,8 +1031,9 @@ texte le disait dans une phrase d'ouverture que le tableau, seul élément à st
 section, faisait oublier. Sur un tour de travail dont le résultat n'est pas encore mesurable, la
 forme n'est pas l'exemption : c'est le **point d'étape** (§ dédié).
 
-**Les cinq exemptions, et rien d'autre** — écrites ici pour qu'on ne les élargisse pas en
-silence, et tenues par `oracles\hook-restitution.mjs` (fonction `jugeable`, recette double sens) :
+**Les six exemptions, et rien d'autre** — écrites ici pour qu'on ne les élargisse pas en
+silence, et tenues par `oracles\hook-restitution.mjs` (fonctions `jugeable` et `jugerFormeMoyen`,
+recettes double sens) :
 
 | Exemption | Ce que c'est | Borne |
 |---|---|---|
@@ -1041,6 +1042,7 @@ silence, et tenues par `oracles\hook-restitution.mjs` (fonction `jugeable`, rece
 | question rendue à l'humain | `bloque_question` — la session s'arrête pour demander | le texte finit par « ? » ET fait 60 mots au plus |
 | rien de neuf | une notification de tâche de fond, un rapport reçu et rien d'autre | les TROIS absences : aucun mot de verdict, aucune décision `D-N`, aucune action `A-N` — et moins de 150 mots |
 | relais d'avancement | l'émission d'un agent de campagne répercutée à l'humain (TF-0252), au fil d'un tour déjà restitué | les TROIS absences, moins de 150 mots, ET rien d'écrit depuis le dernier affichage : zéro écriture, moins de quatre commandes |
+| réponse outillée (niveau Moyen, en essai depuis le 01/10/2026) | une recherche de diagnostic ou d'explication, déclarée « Niveau : Moyen » en première ligne (`references\NIVEAUX.md`) | AUCUN EFFET dans le tour (écriture hors du dossier temporaire, commit, commande à effet, outil connecté qui écrit, agent qui peut écrire, fichier du dépôt modifié) ; 4 pièces dans l'ordre, 400 mots au plus ; au premier effet, le tour est jugé ici en entier |
 
 **Le relais d'avancement, et pourquoi la borne n'est pas la longueur** (TF-1182, 17/09/2026). Une
 notification de tâche de fond n'est pas un message humain : le segment ne se referme pas, et les

@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Affichage double corrige et revue hebdomadaire - 20261001e.md",
+ "empreinte": "c11d4957be5e620fc3730915f69953033f1ee7782dc6db1178b8a7231a3e145c",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-01T14:03:27.624Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

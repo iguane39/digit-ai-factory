@@ -35,8 +35,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 39,
-  "vu_le": "2026-09-28"
+  "cas": 47,
+  "vu_le": "2026-10-01"
  },
  "hook-page-html.mjs": {
   "cas": 11,
@@ -92,7 +92,7 @@
   "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 122,
+  "cas": 124,
   "vu_le": "2026-10-01"
  },
  "oracle-constantes-externes.mjs": {
@@ -314,13 +314,17 @@
   "cas": 5,
   "vu_le": "2026-09-08"
  },
+ "oracles/hook-restitution-moyen.test.mjs": {
+  "cas": 18,
+  "vu_le": "2026-10-01"
+ },
  "oracles/hook-restitution-selection.test.mjs": {
   "cas": 4,
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 37,
-  "vu_le": "2026-09-27"
+  "cas": 39,
+  "vu_le": "2026-10-01"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 23,
@@ -423,8 +427,8 @@
   "vu_le": "2026-09-27"
  },
  "scripts/generer-lisezmoi-output.test.mjs": {
-  "cas": 2,
-  "vu_le": "2026-09-27"
+  "cas": 3,
+  "vu_le": "2026-10-01"
  },
  "scripts/generer-page-etude.mjs": {
   "cas": 15,

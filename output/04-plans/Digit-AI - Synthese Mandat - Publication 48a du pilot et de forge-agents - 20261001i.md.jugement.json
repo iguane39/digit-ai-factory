@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Publication 48a du pilot et de forge-agents - 20261001i.md",
+ "empreinte": "2f3d1f3b4a82ff0e387e9aa6b14b350d294d88e821b20f85636206f147250ef1",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-01T17:20:42.471Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

@@ -135,8 +135,147 @@ function mesurerSegment(segment) {
     ? { ecritures: ecrituresIdx.filter((i) => i >= precedent.outilsAvant).length,
       commandes: commandesIdx.filter((i) => i >= precedent.outilsAvant).length }
     : null;
-  return { ecritures, commandes, dernierTexte, textes: tousLesTextes.length, finaux: finaux.length, fichiersMd, depuisDernierAffichage };
+  return { ecritures, commandes, dernierTexte, textes: tousLesTextes.length, finaux: finaux.length, fichiersMd, depuisDernierAffichage,
+    effets: detecterEffets(segment) };
 }
+
+// ---- NIVEAU MOYEN (étape 2 des niveaux d'intervention, en essai depuis le 01/10/2026) ----------
+//
+// LE FAIT. Une question de diagnostic (« pourquoi… », « où en est… ») part en recherche : dix
+// commandes de lecture, aucune écriture. Le compte d'outils (4 commandes = tour de travail) la juge
+// comme un tour de travail et lui impose 8 blocs. Mesuré le 21/09 : 1 683 mots rendus là où 124
+// suffisaient (étude `output/03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md`).
+//
+// LE REMÈDE, ET CE QUI EMPÊCHE LE RACCOURCI. Le niveau Moyen remplace le compte d'outils par un
+// relevé d'EFFETS. Un tour qui se déclare « Niveau : Moyen » et n'a aucun effet est jugé sur sa
+// forme propre (4 pièces, 400 mots) ; le moindre effet le fait juger Complexe, quelle que soit la
+// déclaration. L'escalade va toujours vers le haut (TF-0978 reste fermé).
+//
+// CE QUE LE RELEVÉ NE VOIT PAS, dit plutôt que promis : un programme lancé par une commande
+// (`node x.mjs`) qui écrit lui-même. La comparaison de l'arbre de travail (`effetsGit`) le rattrape
+// dans le dépôt ouvert, au prix d'un faux positif quand une autre session écrit pendant le tour :
+// l'erreur tombe alors du côté sûr, elle coûte une restitution, pas une faute.
+const TEMPORAIRE = (p) => {
+  const n = String(p || "").replace(/\\/g, "/").toLowerCase();
+  const t = tmpdir().replace(/\\/g, "/").toLowerCase();
+  return Boolean(n) && (n.startsWith(t + "/") || /\/appdata\/local\/temp\//.test(n) || /^\/tmp\//.test(n));
+};
+const VERBES_EFFET = new RegExp([
+  String.raw`\bgit\s+(?:commit|push|reset|rebase|merge|restore|clean|stash|tag|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))\b`,
+  String.raw`(?:^|[\s;&|(])(?:rm|del|mv|cp|rmdir|mkdir|touch|tee|Remove-Item|Move-Item|Copy-Item|Set-Content|Add-Content|Out-File|New-Item|Rename-Item|Clear-Content)(?=\s|$)`,
+  String.raw`\bsed\s+-i\b`,
+  String.raw`\b(?:npm|pnpm|yarn)\s+(?:install|i|ci|add|remove|update|publish)\b`,
+  String.raw`\bgh\s+(?:pr\s+(?:create|merge|close|edit|comment)|release|issue\s+(?:create|close|edit|comment)|repo\s+(?:create|delete|edit))\b`,
+  String.raw`\b(?:curl|gh\s+api)\b[^|;&\n]*(?:-X\s*(?:POST|PUT|PATCH|DELETE)|--data\b|-d\s)`,
+  String.raw`\b(?:deploy|publish)\b`,
+].join("|"), "i");
+// Une redirection vers un fichier écrit ; vers le néant, un descripteur ou le dossier temporaire, non.
+const REDIRECTION = /(?<![=\-<>])(\d?)>>?\s*("?)([^\s"&|;)]+)/g;
+const OUTILS_LECTURE = new Set(["Explore", "Plan", "claude-code-guide"]);
+const ECRIT_CONNECTE = /(?:^|[_-])(?:send|create|update|delete|trash|share|publish|batch|forward|reply|apply|label|unlabel|move|upload|copy|duplicate|edit|merge|generate|respond|mark|untrash|remove|resize|import|spawn|stop)(?:[_-]|$)/i;
+
+export function detecterEffets(segment) {
+  const effets = [];
+  for (const e of segment) {
+    if (e.type !== "assistant") continue;
+    for (const b of contenuDe(e)) {
+      if (b.type !== "tool_use") continue;
+      const nom = String(b.name || "");
+      if (ECRITURES.has(nom)) {
+        const p = b.input?.file_path || b.input?.notebook_path;
+        if (!TEMPORAIRE(p)) effets.push(`écriture de ${p || "chemin inconnu"}`);
+      } else if (COMMANDES.has(nom)) {
+        const cmd = String(b.input?.command || "");
+        const v = cmd.match(VERBES_EFFET);
+        if (v) effets.push(`commande à effet « ${v[0].trim()} »`);
+        // Le contenu d'une chaîne entre guillemets (un `node -e "x > 2"`) n'est pas une redirection ;
+        // une cible de redirection entre guillemets (`> "f.txt"`) en reste une.
+        const horsChaines = cmd.replace(/(?<!>\s*)(["'])(?:\\.|(?!\1)[^\\])*\1/g, "''");
+        for (const [, , , cible] of horsChaines.matchAll(REDIRECTION)) {
+          if (/^&\d?$|^\/dev\/null$|^\$null$|^nul$/i.test(cible) || TEMPORAIRE(cible) || /^\$/.test(cible)) continue;
+          effets.push(`redirection vers ${cible}`);
+        }
+      } else if (nom === "Workflow" || (nom === "Agent" && !OUTILS_LECTURE.has(b.input?.subagent_type))) {
+        effets.push(`${nom} lancé (${b.input?.subagent_type || "agent qui peut écrire"})`);
+      } else if (nom.startsWith("mcp__") && ECRIT_CONNECTE.test(nom.split("__").pop())) {
+        effets.push(`outil connecté qui écrit : ${nom}`);
+      }
+    }
+  }
+  return effets;
+}
+
+// L'état du dépôt ouvert depuis le message humain : un commit plus récent, ou un fichier modifié
+// après lui. `depuis` est l'horodatage ISO du message humain lu au transcript.
+export function effetsGit(cwd, depuis) {
+  const t0 = Date.parse(depuis || "");
+  if (!cwd || !Number.isFinite(t0)) return [];
+  const effets = [];
+  try {
+    const head = spawnSync("git", ["log", "-1", "--format=%ct"], { cwd, encoding: "utf8" });
+    if (head.status === 0 && Number(head.stdout.trim()) * 1000 > t0) effets.push("commit fait pendant le tour");
+    const st = spawnSync("git", ["status", "--porcelain", "-uall"], { cwd, encoding: "utf8" });
+    if (st.status === 0) {
+      for (const l of st.stdout.split(/\r?\n/).filter(Boolean)) {
+        const p = l.slice(3).replace(/^"|"$/g, "").split(" -> ").pop();
+        try { if (statSync(join(cwd, p)).mtimeMs > t0) { effets.push(`fichier modifié pendant le tour : ${p}`); break; } } catch { /* supprimé */ }
+      }
+    }
+  } catch { /* git absent : le relevé des outils reste */ }
+  return effets;
+}
+
+const DECLARE_MOYEN = /^\s*Niveau\s*:\s*Moyen\b/i;
+const PIECES_MOYEN = [
+  ["La réponse", /\*\*\s*La réponse\s*[.:]\s*\*\*/i],
+  ["Preuves", /\*\*\s*Preuves\s*[.:]\s*\*\*/i],
+  ["Non vérifié", /\*\*\s*Non vérifié\s*[.:]\s*\*\*/i],
+  ["Décision attendue", /\*\*\s*Décision attendue\s*[.:]\s*\*\*/i],
+];
+const SEUIL_MOYEN = 400, SEUIL_REPONSE_MOYEN = 150;
+const compterMots = (s) => String(s || "").trim().split(/\s+/).filter(Boolean).length;
+
+export const declareMoyen = (texte) => DECLARE_MOYEN.test(String(texte || ""));
+
+/** La forme Moyen : 4 pièces dans l'ordre, 400 mots, réponse en 150, preuves sourcées, décision complète. */
+export function jugerFormeMoyen(texte) {
+  const ecarts = [];
+  const t = String(texte || "");
+  const mots = compterMots(t);
+  if (mots > SEUIL_MOYEN) ecarts.push(`${mots} mots, au-delà des ${SEUIL_MOYEN} du niveau Moyen`);
+  const positions = PIECES_MOYEN.map(([nom, re]) => ({ nom, i: t.search(re) }));
+  const manquantes = positions.filter((p) => p.i < 0).map((p) => p.nom);
+  if (manquantes.length) ecarts.push(`pièce(s) absente(s) : ${manquantes.join(", ")}`);
+  const presentes = positions.filter((p) => p.i >= 0);
+  if (presentes.some((p, k) => k && p.i < presentes[k - 1].i)) ecarts.push("pièces dans le désordre : réponse, preuves, non vérifié, décision");
+  const piece = (k) => {
+    const p = positions[k];
+    if (p.i < 0) return "";
+    const suite = positions.filter((q) => q.i > p.i).map((q) => q.i);
+    return t.slice(p.i, suite.length ? Math.min(...suite) : t.length).replace(PIECES_MOYEN[k][1], "");
+  };
+  const rep = piece(0);
+  if (positions[0].i >= 0 && compterMots(rep) > SEUIL_REPONSE_MOYEN)
+    ecarts.push(`la réponse fait ${compterMots(rep)} mots, au-delà des ${SEUIL_REPONSE_MOYEN}`);
+  const preuves = piece(1);
+  if (positions[1].i >= 0 && !/`[^`]+`|[\w./\\-]+\.\w{1,5}(?::\d+)?/.test(preuves))
+    ecarts.push("les preuves ne citent ni commande ni chemin");
+  const decision = piece(3);
+  if (positions[3].i >= 0) {
+    const aucune = /^\s*aucune\b/i.test(decision);
+    const posee = /\bD\s*-\s*\d{1,3}\b/.test(decision);
+    if (!aucune && !posee) ecarts.push("décision attendue ni « Aucune. » ni D-N");
+    if (posee && !(/Recommandation\s*:/i.test(decision) && /\|\s*Option\s*\|/i.test(decision)))
+      ecarts.push("une D-N posée au niveau Moyen porte sa recommandation et son tableau « | Option | Coût | Exclusions | »");
+  }
+  return { mots, ecarts };
+}
+
+const RAPPEL_MOYEN = "Réécris ta réponse au niveau Moyen (references\\NIVEAUX.md) : première ligne « Niveau : Moyen », "
+  + "puis 4 pièces dans cet ordre, chacune ouverte par son titre en gras : **La réponse.** (150 mots au plus, ouverte sur "
+  + "le oui, le non ou le fait demandé) ; **Preuves.** (3 à 6 lignes, une commande et sa sortie, ou un chemin et sa ligne) ; "
+  + "**Non vérifié.** ; **Décision attendue.** (« Aucune. » ou une D-N complète, recommandation et tableau d'options). "
+  + "400 mots au plus. Pas de blocs numérotés.";
 
 export function analyserTranscript(texte) {
   const entrees = texte.split(/\r?\n/).filter((l) => l.trim()).map((l) => { try { return JSON.parse(l); } catch { return null; } })
@@ -152,7 +291,8 @@ export function analyserTranscript(texte) {
   const avant = humains.length >= 2 ? humains[humains.length - 2] : -1;
   const textePrecedent = debut >= 0 ? mesurerSegment(entrees.slice(avant + 1, debut)).dernierTexte : "";
   const dernierHumain = debut >= 0 ? texteDe(entrees[debut]) : "";
-  return { travail: m.ecritures >= 1 || m.commandes >= 4, ...m, dernierHumain, textePrecedent };
+  const depuis = debut >= 0 ? entrees[debut].timestamp || null : null;
+  return { travail: m.ecritures >= 1 || m.commandes >= 4, ...m, dernierHumain, textePrecedent, depuis };
 }
 
 export function juger(texte) {
@@ -661,6 +801,13 @@ const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md 
 // standard et dit si le juge la refuserait, et pourquoi (mots comptés, verdict, D-N posée).
 if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes("--pre-vol")) {
   const texte = readFileSync(0, "utf8");
+  if (declareMoyen(texte)) {
+    // Le pré-vol ne voit pas le tour : il juge la forme. Les effets se relèvent à la fin du tour.
+    const { mots, ecarts } = jugerFormeMoyen(texte);
+    console.log(JSON.stringify({ outil: "hook-restitution --pre-vol", niveau: "Moyen", mots, rendable_au_niveau_moyen: !ecarts.length,
+      ecarts, non_juge: "les effets du tour (écriture, commit, commande à effet) : le hook de fin de tour les relève" }));
+    process.exit(ecarts.length ? 1 : 0);
+  }
   const r = jugeable({ travail: false, dernierTexte: texte });
   console.log(JSON.stringify({ outil: "hook-restitution --pre-vol", mots: texte.trim().split(/\s+/).filter(Boolean).length,
     rendable_sans_restitution: !r.juge, motif: r.motif }));
@@ -672,8 +819,29 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage } = analyserTranscript(readFileSync(chemin, "utf8"));
-  const portee = jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage });
+    depuisDernierAffichage, effets, depuis } = analyserTranscript(readFileSync(chemin, "utf8"));
+  const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
+  const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
+  // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
+  let escaladeMoyen = null;
+  if (declareMoyen(dernierTexte)) {
+    const tousEffets = [...effets, ...effetsGit(entree.cwd || process.cwd(), depuis)];
+    if (tousEffets.length) {
+      escaladeMoyen = `NIVEAU — réponse déclarée « Niveau : Moyen » dans un tour qui a eu ${tousEffets.length} effet(s) `
+        + `(${tousEffets.slice(0, 3).join(" ; ")}) : le tour est jugé Complexe, restitution complète.`;
+    } else {
+      const { mots, ecarts } = jugerFormeMoyen(dernierTexte);
+      journaliser({ ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
+        portee: `niveau Moyen déclaré, aucun effet (${mots} mots)`, verdict: ecarts.length ? "FAIL" : "PASS", niveau: "Moyen",
+        ecarts_moyen: ecarts, deja_refuse: !!entree.stop_hook_active });
+      if (!ecarts.length || entree.stop_hook_active) process.exit(0);
+      console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — niveau Moyen] forme en défaut :\n`
+        + ecarts.map((e) => `MOYEN — ${e}`).join("\n") + `\n\n${RAPPEL_MOYEN}` }));
+      process.exit(0);
+    }
+  }
+  const portee = escaladeMoyen ? { juge: true, motif: escaladeMoyen }
+    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage });
   if (!portee.juge) process.exit(0);
   const { code, fails } = juger(dernierTexte);
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
@@ -697,7 +865,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
   const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL";
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
-  const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   try {
     mkdirSync(dirname(journal), { recursive: true });
     appendFileSync(journal, JSON.stringify({
@@ -725,6 +892,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
   if (entree.stop_hook_active) process.exit(0); // déjà refusé une fois : on ne boucle pas, le verdict est journalisé
   const motifs = [
+    ...(escaladeMoyen ? [escaladeMoyen] : []),
     ...bloquants.map((f) => `${f.regle} — ${f.message}`),
     ...ecartsAffichage.map((e) => `AFFICHAGE — ton message affiché ne dit pas ce que la synthèse déposée disait : ${e}. `
       + `Le document jugé est ${fichierSynthese} : reprends-en le bloc 3 en entier plutôt qu'une version abrégée.`),

@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md",
+ "empreinte": "a4ed25859346749982b13e72936badfa83e5670309a10680d22a886f4286cf16",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-01T17:07:56.110Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

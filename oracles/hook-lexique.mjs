@@ -156,7 +156,8 @@ export function contexte(message) {
  * recevait 1 813 mots, parce qu'elle finissait presque toujours en restitution complète, alors que
  * l'exemption « réponse courte » existait. « vite : » en tête du message humain demande donc le
  * niveau Simple, la réponse directe de `references/NIVEAUX.md` ; « complet : » demande le niveau
- * Complexe. Mêmes bornes que le lexique : en tête seulement, message humain seulement.
+ * Complexe ; « moyen : » demande le niveau Moyen, la réponse outillée en 4 pièces (étape 2, en
+ * essai depuis le 01/10/2026 à la demande humaine). Mêmes bornes que le lexique : en tête seulement, message humain seulement.
  *
  * LA PORTÉE EST LE PILOT SEUL, et elle est tenue ici plutôt que promise. Ce hook est hérité par les
  * produits (lanceur `forge/hooks/factory.mjs lexique`), alors que l'étape 1 ne vise que le pilot et
@@ -165,6 +166,7 @@ export function contexte(message) {
  */
 export const NIVEAUX = [
   { niveau: "Simple", motif: /^\s*vite\s*:/iu, forme: "« vite : » en tête de message" },
+  { niveau: "Moyen", motif: /^\s*moyen\s*:/iu, forme: "« moyen : » en tête de message" },
   { niveau: "Complexe", motif: /^\s*complet\s*:/iu, forme: "« complet : » en tête de message" },
 ];
 
@@ -190,6 +192,12 @@ export function contexteNiveau(message) {
     `lectures libres, 3 commandes au plus, aucune écriture, aucun mot de verdict ni décision ou action numérotée ; ` +
     `source citée, « Non vérifié » s'il le faut. Si la question dépasse ces bornes, le dire en une phrase et restituer ` +
     `en entier : le niveau ne descend jamais.`;
+  if (n.niveau === "Moyen") return `[NIVEAU — hook-lexique] L'humain demande le niveau Moyen (${n.forme}) : ` +
+    `retirer le mot-clé et répondre selon references\\NIVEAUX.md — première ligne « Niveau : Moyen », puis 4 pièces dans ` +
+    `cet ordre : **La réponse.** (150 mots au plus), **Preuves.** (une commande et sa sortie, ou un chemin et sa ligne), ` +
+    `**Non vérifié.**, **Décision attendue.** (« Aucune. » ou une D-N complète) ; 400 mots au plus ; lectures et commandes ` +
+    `de lecture libres, écriture seulement dans le dossier temporaire. Le premier effet (écriture du dépôt, commit, push, ` +
+    `outil connecté qui écrit) fait monter le tour en Complexe : le dire en une phrase et restituer en entier.`;
   return `[NIVEAU — hook-lexique] L'humain demande le niveau Complexe (${n.forme}) : retirer le mot-clé ; ` +
     `process complet et restitution de gabarits\\RESTITUTION.md, quelle que soit la longueur de la question.`;
 }
@@ -308,6 +316,8 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
   const casNiveau = [
     ["vite : où est la liste des éléments ?", "Simple"],
     ["Vite: le parc est-il à jour ?", "Simple"],
+    ["moyen : pourquoi le hook a-t-il refusé ma synthèse ?", "Moyen"],
+    ["un niveau moyen : à voir", null],
     ["complet : pourquoi le hook a-t-il refusé ma synthèse ?", "Complexe"],
     ["c'est vite fait : corrige la page d'accueil", null],
     ["vite, où est la liste ?", null],
