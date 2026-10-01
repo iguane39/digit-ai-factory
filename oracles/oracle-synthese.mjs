@@ -105,6 +105,10 @@
  *   S54 un paragraphe de PROSE tient sur une seule ligne source : le chat de l'extension VS Code
  *       rend chaque saut de ligne, et un paragraphe coupé à la main s'y affiche en colonne étroite
  *       (01/10, TF-1494) ; listes, tableaux, citations et code exclus ; avertissante ;
+ *   S55 un feu vert de production DONNÉ (verdict, guide de lancement) porte une ligne « Ne vérifie
+ *       pas : … » là où il est donné (01/10, TF-1493) ; avertissante ;
+ *   S56 le même feu vert porte la sortie des portes qui jugent une base externe (audit des
+ *       dépendances, scan d'image), datée du jour et chiffrée (01/10, TF-1498) ; avertissante ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -2912,6 +2916,105 @@ function juger(texte, cheminJuge = null) {
       : ok("S54", "aucun paragraphe de prose coupé à la main : chaque paragraphe tient sur une ligne source");
   }
 
+  // ---- S55 (01/10/2026, TF-1493) ET S56 (01/10/2026, TF-1498) — UN FEU VERT DE PRODUCTION DIT CE
+  // QU'IL NE VÉRIFIE PAS, ET IL REPOSE SUR LES PORTES DU JOUR --------------------------------------
+  //
+  // LES FAITS, deux lots du même produit (Produit-03).
+  // (1) Le 28/09, une restitution a donné le feu vert d'une mise en production sur trois contrôles, et
+  // son guide disait à l'exploitant d'approuver « si le plan est bien 11 / 1 / 0 ». Aucun des deux
+  // textes ne disait ce que ces contrôles ne mesuraient pas : les valeurs que le plan envoie, ni leur
+  // validité à la date d'application. Le plan approuvé portait une date de début refusée à
+  // l'application (400), et la livraison s'est arrêtée (lot 20260929b, RA-49).
+  // (2) Le 30/09, la restitution qui a remis le message de lancement s'appuyait sur des contrôles qui
+  // ne rejouaient ni l'audit des dépendances ni le scan d'image. Trois avis de sécurité publiés dans la
+  // nuit ont arrêté la livraison sur `npm audit` ; le même fichier de verrouillage avait passé la
+  // qualification la veille (lot 20260930b, RA-54).
+  //
+  // CE QUI DÉCLENCHE : un guide de LANCEMENT en tête (son titre dit lancer, relancer, mise en
+  // production ou débloquer, ET production, livraison ou prd), ou un feu vert de production DONNÉ au
+  // bloc 0, au bloc 2 ou dans le guide (« le feu vert peut être donné », « mise en production
+  // possible »…). Le feu vert que l'agent ATTEND de l'humain n'en est pas un : c'est l'usage courant du
+  // pilot, et il est laissé tranquille.
+  // S55 : chaque zone où le feu vert est donné — le guide, le verdict — porte une ligne « Ne vérifie
+  // pas : … » qui nomme, en trois mots au moins, ce que les contrôles n'ont pas mesuré.
+  // S56 : la restitution porte la sortie d'au moins une porte qui juge une base externe (audit des
+  // dépendances, scan d'image, base de vulnérabilités), datée du jour de la restitution et chiffrée ;
+  // ou elle déclare qu'aucune porte de la chaîne ne juge une base externe.
+  //
+  // AVERTISSANTES à leur entrée, hors de `BLOQUANTES` du hook. Mesurées avant mise en service : aucun
+  // déclenchement sur les 215 synthèses d'`output\04-plans\` ; sur les 142 restitutions des produits
+  // du poste, 10 déclenchent, S55 en accuse 10 et S56 9. La dixième de S56 est celle écrite le 30/09
+  // après l'incident : elle porte ses portes datées.
+  {
+    const RE_FEU_VERT = /(?<![\p{L}])(?<!votre\s)(?<!ton\s)(?:feu vert (?:peut (?:[êe]tre )?(?:donn[ée]|accord[ée])|possible|(?:de|pour) (?:la )?(?:mise en production|lancement|production|MEP|relance))|mise en production (?:possible|autoris[ée]e|peut (?:[êe]tre )?(?:lanc[ée]e|relanc[ée]e|faite|partir))|(?:peut|pouvez) (?:[êe]tre )?(?:lanc[ée]e?|relanc[ée]e?|approuv[ée]e?|d[ée]ploy[ée]e?|mise?) en production|pr[êe]te?s? (?:pour|[àa]) (?:la )?(?:mise en )?production|message de lancement de la production)/iu;
+    const RE_LANCE = /(?<![\p{L}])(?:(?:re)?lanc(?:er|ement|e|[ée]e?s?)|mise en production|MEP|d[ée]bloquer)(?![\p{L}])/iu;
+    const RE_PROD = /(?<![\p{L}])(?:production|livraison|prd)(?![\p{L}])/iu;
+    const zoneApres = (m) => {
+      if (!m) return "";
+      const d = m.index + m[0].length;
+      const f = texte.slice(d).search(/\n#{1,4}\s/);
+      return texte.slice(d, f === -1 ? undefined : d + f);
+    };
+    const mGuide = /(^|\n)(#{1,4}[ \t]*Guide\b[^\n]*)\n/i.exec(texte);
+    const guideTitre = mGuide ? mGuide[2] : "";
+    const guide = guideTitre + "\n" + zoneApres(mGuide);
+    const mOuv = RE_TITRE_OUVERTURE.exec(texte);
+    const premier = texte.search(/(^|\n)#{2,4}\s/);
+    const b0 = mOuv ? zoneApres(mOuv) : (premier > 0 ? texte.slice(0, premier) : "");
+    const verdict = b0 + "\n" + (bloc(texte, BLOCS[1][0]) || "");
+    const guideLancement = !!mGuide && RE_LANCE.test(guideTitre) && RE_PROD.test(guideTitre);
+    const zones = [];
+    if (guideLancement || (mGuide && RE_FEU_VERT.test(guide))) zones.push(["le guide", guide]);
+    if (RE_FEU_VERT.test(verdict)) zones.push(["le verdict (bloc 0 ou bloc 2)", verdict]);
+
+    const RE_NE_VERIFIE = /ne\s+(?:v[ée]rifie(?:nt)?|mesure(?:nt)?)\s+pas\s*:\s*\S+(?:\s+\S+){2,}/i;
+    if (!zones.length) {
+      ok("S55", "aucun feu vert de production donné, aucun guide de lancement : rien à borner");
+    } else {
+      const muettes = zones.filter(([, z]) => !RE_NE_VERIFIE.test(z)).map(([nom]) => nom);
+      muettes.length
+        ? ko("S55", `un feu vert de production est donné, et ${muettes.length > 1 ? `ni ${muettes.join(" ni ")} ne portent` : `${muettes[0]} ne porte`} aucune ligne « Ne vérifie pas : … ». `
+          + "Un vert qui ne dit pas ce qu'il ne mesure pas se lit comme une absence de limite : le 28/09/2026, un plan de "
+          + "production a été approuvé sur son seul compte « 11 / 1 / 0 », et sa date de début, lisible dans le plan, a été "
+          + "refusée à l'application (TF-1493). Écris sous le feu vert : « Ne vérifie pas : <ce que les contrôles n'ont pas "
+          + "mesuré, par exemple les valeurs envoyées et leur validité à la date d'application> »")
+        : ok("S55", `feu vert de production donné, et ${zones.map(([nom]) => nom).join(" comme ")} nomme ce qu'il ne vérifie pas`);
+    }
+
+    // S56 — la sortie des portes à base externe, datée du jour de la restitution (bloc 1) et chiffrée.
+    const MOIS56 = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+    const RE_DATE = /(\d{4})-(\d{2})-(\d{2})|(?<!\d)(\d{1,2})\/(\d{1,2})(?:\/\d{2,4})?(?!\d)|(?<!\d)(\d{1,2})(?:er)?\s+(janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[ûu]t|septembre|octobre|novembre|d[ée]cembre)/giu;
+    const datesDe = (s) => [...String(s).matchAll(RE_DATE)].map((x) => (x[1]
+      ? { j: Number(x[3]), m: Number(x[2]) }
+      : x[4] ? { j: Number(x[4]), m: Number(x[5]) }
+        : { j: Number(x[6]), m: 1 + MOIS56.findIndex((n) => n.normalize("NFD").replace(/\p{M}/gu, "") === x[7].toLowerCase().normalize("NFD").replace(/\p{M}/gu, "")) }));
+    const RE_PORTE = /(?<![\p{L}\p{N}_-])(?:npm audit|yarn audit|pnpm audit|pip-audit|safety check|cargo audit|bundler? audit|composer audit|osv-scanner|trivy|grype|snyk|dependabot|audit des d[ée]pendances|scan d['’]image|scan de l['’]image|base de vuln[ée]rabilit[ée]s|avis de s[ée]curit[ée])(?![\p{L}\p{N}_])/iu;
+    const RE_SANS_PORTE = /aucune porte (?:de la cha[îi]ne )?ne juge une base externe/i;
+    const chiffree = (l) => /(?<![\p{L}])(?:PASS|FAIL)(?![\p{L}])|exit\s*\d|\d/u.test(String(l)
+      .replace(new RegExp(RE_DATE.source, "giu"), " ").replace(/(?<!\d)\d{1,2}\s*[h:]\s*\d{2}(?!\d)/g, " ")
+      .replace(/\bv?\d+(?:\.\d+)+\b/g, " "));
+    if (!zones.length) {
+      ok("S56", "aucun feu vert de production donné, aucun guide de lancement : aucune porte à dater");
+    } else if (RE_SANS_PORTE.test(texte)) {
+      ok("S56", "feu vert de production : la restitution déclare qu'aucune porte de la chaîne ne juge une base externe");
+    } else {
+      const jour = datesDe(bloc(texte, BLOCS[0][0]) || "")[0] || null;
+      const lignes = texte.replace(/\r\n?/g, "\n").split("\n").filter((l) => RE_PORTE.test(l));
+      const duJour = lignes.filter((l) => chiffree(l)
+        && (jour ? datesDe(l).some((d) => d.j === jour.j && d.m === jour.m) : datesDe(l).length > 0));
+      const quand = jour ? `du ${String(jour.j).padStart(2, "0")}/${String(jour.m).padStart(2, "0")}` : "du jour";
+      duJour.length
+        ? ok("S56", `feu vert de production : ${duJour.length} sortie(s) de porte à base externe datée(s) ${quand} et chiffrée(s)`)
+        : ko("S56", (lignes.length
+          ? `un feu vert de production est donné, et aucune des ${lignes.length} ligne(s) qui citent une porte à base externe ne porte sa sortie datée ${quand} et chiffrée`
+          : "un feu vert de production est donné, et aucune sortie de porte qui juge une base externe (audit des dépendances, scan d'image) n'est rapportée")
+          + ". Ces portes jugent des bases qui changent la nuit : le 30/09/2026, trois avis publiés dans la nuit ont arrêté la "
+          + "livraison de production sur `npm audit`, alors que le même verrou avait passé la qualification la veille (TF-1498). "
+          + "Rejoue-les le jour du lancement, sur ce qui sera lancé, et écris leur sortie : « `npm audit` rejoué le JJ/MM à "
+          + "HHhMM : 0 vulnérabilité élevée » ; ou déclare « aucune porte de la chaîne ne juge une base externe »");
+    }
+  }
+
   return findings;
 }
 
@@ -3680,6 +3783,67 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S54"[^}]*PASS/.test(r54f.stdout))
     casse.push("S54 accuse une liste continuée, un bloc de code ou une citation — ce ne sont pas des paragraphes de prose : "
       + (/"S54"[\s\S]{0,200}/.exec(r54f.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 01/10 — S55 ET S56 (TF-1493, TF-1498), LE FEU VERT DE PRODUCTION. Quatre fixtures bâties sur la
+  // verte (datée du 14/08), qui reçoit un guide de LANCEMENT en tête et « le feu vert peut être
+  // donné » au bloc 2. Rouge : aucune ligne « Ne vérifie pas », et l'audit des dépendances daté de la
+  // veille — la forme du 28/09 et du 30/09. Verte : la MÊME, la ligne « Ne vérifie pas » sous le
+  // guide et sous le verdict, et les portes rejouées le 14/08, chiffrées ; elle passe EN ENTIER. Le
+  // feu vert que l'agent ATTEND de l'humain, l'usage courant du pilot, ne déclenche rien. Et la
+  // chaîne sans porte à base externe se DÉCLARE, ce qui tient S56.
+  const NE_VERIFIE = "Ne vérifie pas : les valeurs que le plan envoie à la plateforme, ni leur validité à la date d'application.";
+  const GUIDE_LANCEMENT = (avecLimite) => "## Guide — Relancer la production de la version 1.12.0" + saut + saut
+    + "Source officielle lue le 14/08/2026 : `learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals`." + saut + saut
+    + "1. Ouvrir la chaîne de livraison, choisir la branche de production et lancer l'exécution. Ce que vous devez voir : une exécution arrêtée sur le bouton « Review »." + saut
+    + "2. Cliquer sur « Approve » si le plan compte 11 créations, 1 modification et 0 destruction. Ce que vous devez voir : l'étape d'application en vert." + saut + saut
+    + (avecLimite ? NE_VERIFIE + saut + saut : "")
+    + "## 0. Synthèse d'ouverture" + saut + saut;
+  const VERDICT_VERTE = "Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
+  const PORTES_VEILLE = "- Portes de la chaîne — preuve : `npm audit` : 0 vulnérabilité élevée, en qualification le 13/08.";
+  const PORTES_JOUR = "- Portes du jour rejouées sur ce qui sera lancé — preuve : `npm audit` rejoué le 14/08 à 09h12 : 0 vulnérabilité élevée ; `trivy` le 14/08 : 0 faille HIGH ou CRITICAL.";
+  const feuVert = (avecLimite, portes) => verte
+    .replace("# Restitution — campagne de test" + saut + saut, "# Restitution — campagne de test" + saut + saut + GUIDE_LANCEMENT(avecLimite))
+    .replace(VERDICT_VERTE, VERDICT_VERTE.replace(/\.$/, " ; le feu vert peut être donné.") + (avecLimite ? saut + saut + NE_VERIFIE : ""))
+    .replace("## 4. Traité" + saut, "## 4. Traité" + saut + portes + saut);
+  const s55r = feuVert(false, PORTES_VEILLE);
+  const s55v = feuVert(true, PORTES_JOUR);
+  const s55a = verte.replace(VERDICT_VERTE, VERDICT_VERTE.replace(/\.$/, " ; la publication attend votre feu vert."));
+  const s56d = feuVert(true, "- Chaîne d'infrastructure seule — preuve : `plan.txt`, 11 créations ; aucune porte de la chaîne ne juge une base externe.");
+  const f55r = join(dir, "s55-s56-feu-vert-muet-et-portes-de-la-veille.md");
+  const f55v = join(dir, "s55-s56-feu-vert-borne-et-portes-du-jour.md");
+  const f55a = join(dir, "s55-s56-feu-vert-attendu-de-l-humain.md");
+  const f56d = join(dir, "s56-chaine-sans-porte-declaree.md");
+  writeFileSync(f55r, s55r, "utf8");
+  writeFileSync(f55v, s55v, "utf8");
+  writeFileSync(f55a, s55a, "utf8");
+  writeFileSync(f56d, s56d, "utf8");
+  const r55r = spawnSync(process.execPath, [moi, f55r], { encoding: "utf8" });
+  const r55v = spawnSync(process.execPath, [moi, f55v], { encoding: "utf8" });
+  const r55a = spawnSync(process.execPath, [moi, f55a], { encoding: "utf8" });
+  const r56d = spawnSync(process.execPath, [moi, f56d], { encoding: "utf8" });
+  if (s55r === verte || s55v === s55r || !s55v.includes(NE_VERIFIE) || !s55r.includes("Guide — Relancer"))
+    casse.push("fixtures S55/S56 : un remplacement n'a pas pris — la paire ne prouve plus rien");
+  if (!/"S55"[^}]*FAIL[^}]*ni le guide ni le verdict/.test(r55r.stdout))
+    casse.push("S55 (TF-1493) : un feu vert de production donné, au guide de lancement comme au verdict, sans ligne « Ne vérifie "
+      + "pas » passe — c'est le vert du 28/09 qui s'est lu comme une absence de limite : "
+      + (/"S55"[\s\S]{0,200}/.exec(r55r.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S56"[^}]*FAIL[^}]*datée du 14\/08/.test(r55r.stdout))
+    casse.push("S56 (TF-1498) : un feu vert donné sur un audit des dépendances daté de la VEILLE passe — c'est le lancement du "
+      + "30/09 arrêté par trois avis publiés dans la nuit : " + (/"S56"[\s\S]{0,200}/.exec(r55r.stdout) || [""])[0].replace(/\s+/g, " "));
+  for (const regle of ["S55", "S56"])
+    if (!new RegExp(`"${regle}"[^}]*PASS`).test(r55v.stdout))
+      casse.push(`${regle} : la MÊME restitution, bornée par « Ne vérifie pas » et portant ses portes du jour, est accusée : `
+        + (new RegExp(`"${regle}"[\\s\\S]{0,200}`).exec(r55v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (r55v.status !== 0)
+    casse.push("S55/S56 : la restitution au feu vert borné et aux portes du jour n'est pas PASS en entier : "
+      + (() => { try { return JSON.parse(r55v.stdout).findings.filter((f) => f.statut === "FAIL").map((f) => `${f.regle} ${String(f.message).slice(0, 90)}`).join(" · "); } catch { return "sortie illisible"; } })());
+  for (const regle of ["S55", "S56"])
+    if (!new RegExp(`"${regle}"[^}]*PASS[^}]*aucun feu vert`).test(r55a.stdout))
+      casse.push(`${regle} : le feu vert que l'agent ATTEND de l'humain est lu comme un feu vert de production DONNÉ — `
+        + "c'est l'usage courant du pilot, et la règle crierait sur tout le corpus : "
+        + (new RegExp(`"${regle}"[\\s\\S]{0,200}`).exec(r55a.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S56"[^}]*PASS[^}]*déclare qu'aucune porte/.test(r56d.stdout))
+    casse.push("S56 : une chaîne qui DÉCLARE n'avoir aucune porte à base externe est accusée : "
+      + (/"S56"[\s\S]{0,200}/.exec(r56d.stdout) || [""])[0].replace(/\s+/g, " "));
   // S45 — le bloc 5 porte un élément bloqué par `dependance_externe`. Rouge : le bloc 3 ouvre
   // droit sur sa décision. Vert : LE MÊME, un inventaire d'un bloquant énoncé sur place en tête.
   const B5 = "- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.";
@@ -4084,7 +4248,7 @@ Aucun écart : la demande a été suivie à la lettre.
   const nCas = compterFixtures(dir);
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S55 et S56 dans leurs QUATRE sens (TF-1493, TF-1498 : un guide de LANCEMENT et un feu vert au verdict sans ligne « Ne vérifie pas » et sur un audit des dependances date de la VEILLE FAIL sur les deux regles, la MEME bornee aux deux endroits et portant ses portes du jour chiffrees PASS en entier, le feu vert que l agent ATTEND de l humain ne declenche rien, et une chaine qui DECLARE n avoir aucune porte a base externe PASS — taux mesure a la mise en service : 0 sur les 215 syntheses d output\\04-plans\\, 10 et 9 sur les 142 restitutions des produits du poste : avertissantes) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -4112,6 +4276,9 @@ console.log(JSON.stringify({
     "S21 ne couvre PAS `decision`, `depense` ni `irreversible` : ces trois motifs relèvent d'un arbitrage, pas d'un fait du monde, et exiger d'« essayer » une décision n'aurait aucun sens. Une attribution abusive sous `decision` reste donc invisible — c'est la limite assumée, et c'est exactement le cas fautif qui a fait naître la règle",
     "S4 (TF-1429) ne vérifie pas qu'une décision RAPPELÉE « inchangée » a réellement été posée à l'heure dite, ni qu'aucune réponse ne l'a tranchée depuis : une décision nouvelle écrite comme un rappel échappe à son choix fermé. Seul un contrôle qui lit les messages précédents peut le voir, et le contrôle GESTE du hook de restitution ne lit une décision reposée qu'en forme citée",
     "S14 (TF-1428) ne lit pas un « A-18 » NU comme l'identifiant du registre produit, même quand c'en est un : il ne se distingue pas d'un sélecteur ou d'un renvoi à une autre action. La forme qualifiée « registre A-18 » ou la colonne Registre est exigée, et l'existence de l'identifiant au registre n'est jamais vérifiée",
+    "S54 (TF-1494) juge la SOURCE, pas le rendu : une ligne coupée par un retour à la ligne forcé (deux espaces en fin de ligne) compte comme une coupure, et un élément de liste coupé à la main n'est pas accusé, alors que le chat l'affiche aussi en colonne",
+    "S55 (TF-1493) juge la PRÉSENCE de la ligne « Ne vérifie pas : … » là où le feu vert est donné, jamais sa justesse : qu'elle nomme la limite qui compte, aucun oracle ne le voit. Le feu vert se reconnaît à un vocabulaire fermé et à un guide de LANCEMENT ; un feu vert de production écrit autrement passe sans être vu",
+    "S56 (TF-1498) ne vérifie pas que la porte citée a réellement été rejouée, ni sur ce qui sera lancé : il lit une ligne qui la nomme, datée du jour de la restitution et chiffrée. La déclaration « aucune porte de la chaîne ne juge une base externe » n'est pas vérifiée non plus",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);
