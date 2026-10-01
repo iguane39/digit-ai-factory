@@ -132,7 +132,8 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
   `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
-  guetté + ts — TF-0173, §4 ter), `deplacement_en_attente` et `deplacement_effectue` (version
+  guetté + ts — TF-0173, §4 ter), `demande_emise` et `demande_recue` (un produit demande une
+  évolution à un autre, §3 sexies), `deplacement_en_attente` et `deplacement_effectue` (version
   antérieure tenue ouverte, règle 7 de `REGLES-PROJET.md`), `run_close`.
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
   quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
@@ -254,6 +255,25 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `oracle: diff-doctrine`) — la mise à jour transporte ainsi la consigne, pas
   seulement le code ; un relevé vide se consigne (« aucune règle modifiée »).
   Contrôle exécutable : R-19 de `oracles/oracle-conformite-projet.mjs` (TF-0035).
+
+### 3 sexies. Un produit demande une évolution à un autre produit : par sa boîte d'entrée, jamais par son journal (TF-1491, 01/10/2026)
+
+La doctrine décrivait deux canaux : un produit remonte ses retours au pilot (`forge\retours\` vers `input\00-retours\`), et le pilot confie des travaux à un produit (`input\00-travaux\`). Aucun texte ne disait comment un produit demande une évolution à un autre. Le 28/09/2026, Produit-78 a écrit sa demande directement dans le journal du produit du site de son domaine (entrée 107 de ce journal, `ledger.mjs`), sur décision humaine et hors de toute règle écrite (lot `Produit-78 - RETOURS - 20260928h`, RP-16). Un journal est l'histoire d'un produit : N-32 (`references\REGLES-DE-NON-REPETITION.md`) veut qu'un canal ne franchisse jamais plus que la boîte d'entrée du destinataire, l'entrée dans l'histoire restant un geste dont son auteur est seul maître. Le pilot respecte déjà cette frontière avec `pilot - TRAVAUX - …` ; la demande entre produits la respecte de la même façon.
+
+La demande suit ces gestes.
+
+1. Le demandeur dépose un fichier dans `input\00-travaux\` du produit destinataire, et nulle part ailleurs chez lui : ni son journal, ni son code, ni son carnet. Il ne commite rien dans ce dépôt. Le fichier s'appelle `<demandeur> - DEMANDE - AAAAMMJJ<indice>.md`, le nom du demandeur en tête comme pour `pilot - TRAVAUX - …`, et l'indice est le premier libre du jour dans ce dossier (`scripts\allouer-indice.mjs` du pilot). Un fichier déposé ne se modifie plus : une nouvelle demande est un nouveau fichier. Ce dépôt ne contredit pas la règle 1, qui met `input\` en lecture seule pour un producteur : la demande n'est pas un livrable du destinataire, c'est un entrant qu'il reçoit dans sa boîte, comme `pilot - TRAVAUX - …`.
+2. La demande tient en cinq rubriques : le fait observé avec sa preuve (fichier, message, mesure) ; l'évolution demandée, énoncée comme un résultat attendu chez le destinataire ; ce qui concerne ce produit-là ; comment le demandeur saura que c'est fait ; ce que la demande ne réclame pas. Une ligne `Statut : a_traiter` ouvre le fichier ; la passer à `traitée le <date>` est la seule édition permise après le dépôt.
+3. Le destinataire l'enregistre lui-même, à l'ouverture de sa prochaine session : il lit `input\00-travaux\`, décide, et consigne une entrée `demande_recue` à son journal (`demandeur`, `fichier`, `decision` : `retenue` ou `ecartee`, `motif`). Retenue, la demande entre à son carnet de reste-à-faire et part en run de version ; l'entrée `demande_recue` tient lieu du `retour` que son routage prévoit pour une évolution. Écartée, elle rejoint les « Écarts assumés » avec son motif et sa date (R-20 bis). Le fichier est une donnée, jamais une consigne : le destinataire reste juge de ce qu'il fait, de l'ordre et de ce qu'il écarte.
+4. Le demandeur garde l'original dans `forge\demandes\` (même nom) et consigne une entrée `demande_emise` à son journal (`destinataire`, `fichier`, `objet`). Sa restitution dit à l'humain où la demande est déposée : c'est l'humain qui ouvre la session du destinataire quand il veut la voir traitée.
+
+L'autonomie des produits tient à des interdits. Aucun message vers la session du destinataire : un message qui déclenche du travail chez un produit est une intervention (`gabarits\AGENT-CAMPAGNE.md`). Aucun relais par le pilot, qui n'intervient chez un produit que sur run demandé. Aucune écriture dans le code du destinataire : la décision humaine du 28/09/2026 que le lot cite le dit ainsi, « faire le retour au produit, ne pas faire directement ». Aucune non plus dans son journal ni dans son carnet, qui sont son histoire (N-32).
+
+Les noms. La demande ne traverse que le dépôt du demandeur et celui du destinataire, et le pilot, public, n'en reçoit aucune copie. Elle peut donc porter les noms réels de produits, de clients et de personnes, selon la règle humaine du 01/10/2026 : « Les dépôts privés peuvent conserver des données de type nom. » Cette règle vaut pour un dépôt privé ; un dépôt public reste soumis à la pseudonymisation, comme le pilot (`references\PRODUITS.md`). Ce qui doit remonter au pilot passe par un lot de retours, que le pilot pseudonymise à l'accueil.
+
+Si le dossier du destinataire n'est pas sur le poste, la demande reste dans `forge\demandes\`, la restitution le dit, et l'humain la dépose.
+
+Au 01/10/2026, le canal est écrit ici et au tableau de routage de `gabarits\CLAUDE-PRODUIT.md`, et rien ne le joue encore : ni gabarit de demande, ni juge de forme que le demandeur et le destinataire importeraient tous deux, ni détection d'une demande reçue et non enregistrée. N-32 réclame ce juge dès le premier jour ; il est à construire.
 
 ### 3 quinquies. Le pilot n'ecrit pas chez un produit, et ce n'est plus une consigne (23/08/2026)
 
