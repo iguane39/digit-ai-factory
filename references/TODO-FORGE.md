@@ -177,6 +177,12 @@ ne voyage donc pas, et un clone frais n'a pas le dossier : la règle vit ici.
   l'ingestion, un lot posé à la racine sous un nom réel, en nommant le sas.
 - Un sas **vide est l'état normal**. Un lot DÉJÀ suivi sous un nom réel ne relève pas du sas mais
   de `todo\anonymiser-suivis.mjs`.
+- **Un produit privé déclaré de l'écosystème garde son nom** (règle humaine du 01/10/2026, mot pour
+  mot : « Les dépôts privés peuvent conserver des données de type nom » ; D-5 (a) du 17/09, D-36 (a)
+  du 01/10). `PRODUITS_DE_L_ECOSYSTEME` de `scripts\lib-parc.mjs` les déclare : l'accueil ne les
+  pseudonymise pas, puisqu'aucune table ne les porte, et l'écrivain de la table ne les y inscrit
+  jamais (TF-1505). La protection des noms vise les dépôts publics : le pilot et les 13 forges,
+  publics au 01/10/2026.
 
 **Ce qu’un lot n'a PAS remonté se déclare (R-45, 21/08).** Tout lot daté du 21/08 ou après
 porte une section « Remarques restées au produit » : chaque remarque que le produit a corrigée

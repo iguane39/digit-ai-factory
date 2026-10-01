@@ -14,6 +14,10 @@ check("rouge d'origine — un PRODUIT déclaré de l'écosystème n'est pas bala
   if (!PRODUITS_DE_L_ECOSYSTEME.has("digit-ai-marketing")) throw new Error("le produit de marque n'est plus déclaré");
   if (estDepotEcosysteme("digit-ai-marketing")) throw new Error("digit-ai-marketing est pris pour une forge");
 });
+check("D-36 (a) du 01/10/2026 — le dépôt de prospection est un produit déclaré de l'écosystème, pas une forge", () => {
+  if (!PRODUITS_DE_L_ECOSYSTEME.has("digit-ai-prospection")) throw new Error("digit-ai-prospection n'est pas déclaré");
+  if (estDepotEcosysteme("digit-ai-prospection")) throw new Error("digit-ai-prospection est pris pour une forge");
+});
 check("vert — le pilot et chaque forge déclarée restent balayés", () => {
   for (const nom of [PILOT, ...FORGES.map((f) => f.nom)]) if (!estDepotEcosysteme(nom)) throw new Error(`${nom} sort du balayage`);
 });
