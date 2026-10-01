@@ -39,6 +39,16 @@ relecture du contexte, pas la génération, et ce levier ne dépend pas du modè
 désigne aucun de ces instruments, et sa demande « globale » en 5 axes se heurte au verdict unique
 qu'exige le gabarit d'étude de la Factory.
 
+**Note de correction du 01/10/2026.** Les « 1 829 verdicts » du journal du hook de fin de tour cités
+dans cette analyse (introduction, Ch3 #6, Ch6) comptaient aussi les entrées écrites par les recettes
+automatiques du hook, dont les sessions se nomment « test ». Au 2026-09-27 à 16:44 UTC, le journal
+portait 1 832 entrées, dont 1 391 de test et 441 de vraies sessions ; ces dernières comptent 96
+refus, 152 acceptations et 193 avertissements (source : journal du hook, recalcul du 2026-10-01).
+Le chiffre « 708 refus sur 1 829 verdicts » du Ch6 ne se lit donc pas comme un taux de refus. Le
+constat de fond, le coût des refus en tours de réécriture, tient avec 96 refus. La correction vient
+de l'étude `output\03-etudes\20261001-etude-opportunite-saut-opus-5-5.md`, section « Facteurs de
+confusion » ; le texte d'origine est laissé tel quel ci-dessous.
+
 ---
 
 ## Chapitre 1 — OODA · Cadrage stratégique et étalon noté
@@ -309,6 +319,8 @@ ce que coûte de ne rien changer : O0 se réfute par un coût constaté, pas par
   de se supposer : 708 refus sur 1 829 verdicts du hook de fin de tour depuis le 20/08 (source :
   `.claude\hooks-journal.jsonl`), chaque refus coûtant une réécriture ; une garde avant envoi notée à
   environ 9 minutes sur le pilot (source : mémoire de session du 27/09, à vérifier par une mesure).
+  Correction du 01/10/2026 : sur les seules vraies sessions, 96 refus sur 441 entrées au 2026-09-27
+  (source : journal du hook, recalcul du 2026-10-01) ; détail dans la note de correction du même jour.
 - **Le volume dominant est la relecture du contexte.** Sous Opus 5.5, 755 millions de jetons relus en
   cache pour 2,1 millions générés (source : journaux, relevé du 27/09/2026). À ce mélange, le prix
   de la relecture compte plus que celui de la sortie (source : page des prix officielle, lue le

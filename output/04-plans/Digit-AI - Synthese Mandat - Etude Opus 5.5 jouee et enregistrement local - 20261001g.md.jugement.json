@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee et enregistrement local - 20261001g.md",
+ "empreinte": "303debab7e916fd867e19dfc56f61fd0e8c6753a35d3b2b1f79b24527e54f00a",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-01T18:19:51.250Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

@@ -1,7 +1,7 @@
 {
   "cible": "output/03-etudes/20260927-L99-saut-opus-5-vers-opus-5-5.md",
-  "date_iso": "2026-09-27T17:02:01.686Z",
-  "registre_version": "2.28.0",
+  "date_iso": "2026-10-01T18:44:29.909Z",
+  "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -50,7 +50,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "output\\03-etudes\\20260927-L99-saut-opus-5-vers-opus-5-5.md",
       "verdict": "PASS",
-      "detail": "1 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes"
+      "detail": "2 constat(s) · 6 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 1 829 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -81,9 +81,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\03-etudes\\20260927-L99-saut-opus-5-vers-opus-5-5.md",
-    "ts": "2026-09-27T17:02:01.686Z",
+    "ts": "2026-10-01T18:44:29.909Z",
     "fichiers": {
-      "output\\03-etudes\\20260927-L99-saut-opus-5-vers-opus-5-5.md": "2a1fd45de4fafc7339e3f11773dd77524270027acc9518420899046430811565"
+      "output\\03-etudes\\20260927-L99-saut-opus-5-vers-opus-5-5.md": "d0abcddfaa7967dd8c1cecf25f17c98b1cd703f983d1c976a2f4febe8e831bb7"
     }
   },
   "empreinte_motif": null,

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 444 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 447 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -229,8 +229,9 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260922-revue-des-candidatures-par-famille.md | — | 11.7 Ko | `03-etudes/20260922-revue-des-candidatures-par-famille.md` |
 | 20260925-etude-opportunite-niveaux-d-intervention.md | — | 47.9 Ko | `03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md` |
 | 20260925-L99-niveaux-d-intervention.md | — | 51 Ko | `03-etudes/20260925-L99-niveaux-d-intervention.md` |
-| 20260927-L99-saut-opus-5-vers-opus-5-5.md | — | 53.1 Ko | `03-etudes/20260927-L99-saut-opus-5-vers-opus-5-5.md` |
+| 20260927-L99-saut-opus-5-vers-opus-5-5.md | — | 54.1 Ko | `03-etudes/20260927-L99-saut-opus-5-vers-opus-5-5.md` |
 | 20261001-etude-opportunite-rsi-et-ssl.md | — | 30 Ko | `03-etudes/20261001-etude-opportunite-rsi-et-ssl.md` |
+| 20261001-etude-opportunite-saut-opus-5-5.md | — | 37.1 Ko | `03-etudes/20261001-etude-opportunite-saut-opus-5-5.md` |
 | 20261001-etude-opportunite-textes-affiches.md | — | 16.5 Ko | `03-etudes/20261001-etude-opportunite-textes-affiches.md` |
 | 20261001-L99-etude-textes-relance.md | — | 13.8 Ko | `03-etudes/20261001-L99-etude-textes-relance.md` |
 | 20261001-L99-textes-affiches-en-session.md | — | 14.2 Ko | `03-etudes/20261001-L99-textes-affiches-en-session.md` |
@@ -361,6 +362,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md | 20260915d | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md | 20260831a | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite premiers HTML nouveaux formats - 20260914b.md | 20260914b | 19.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite premiers HTML nouveaux formats - 20260914b.md` |
+| Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee et enregistrement local - 20261001g.md | 20261001g | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee et enregistrement local - 20261001g.md` |
+| Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee et enregistrement local - 20261001g.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee et enregistrement local - 20261001g.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md | 20260905g | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` |
 | Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md | 20260910g | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` |
 | Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md | 20260830c | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` |

@@ -104,10 +104,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260922-revue-des-candidatures-par-famille.md` | fichier | 11,7 Ko | Revue des candidatures du registre, par famille de défaut |
 | `20260925-etude-opportunite-niveaux-d-intervention.md` | fichier | 47,9 Ko | Étude d'opportunité — proportionner la réponse à la question : niveaux Simple, Moyen, Comp |
 | `20260925-L99-niveaux-d-intervention.md` | fichier | 51,0 Ko | Analyse L99 — « Adapter le modèle, le process et le format de réponse à la complexité de l |
-| `20260927-L99-saut-opus-5-vers-opus-5-5.md` | fichier | 53,1 Ko | Analyse L99 : « une étude d'opportunités pour revoir la Factory après le passage d'Opus 5  |
+| `20260927-L99-saut-opus-5-vers-opus-5-5.md` | fichier | 54,1 Ko | Analyse L99 : « une étude d'opportunités pour revoir la Factory après le passage d'Opus 5  |
 | `20261001-etude-opportunite-rsi-et-ssl.md` | fichier | 30,0 Ko | Étude d'opportunité — auto-amélioration récursive (RSI) et apprentissage auto-supervisé (S |
+| `20261001-etude-opportunite-saut-opus-5-5.md` | fichier | 37,1 Ko | Étude d'opportunité — Le passage d'Opus 5 à Opus 5.5 : que changer dans la Factory et ses  |
 | `20261001-etude-opportunite-textes-affiches.md` | fichier | 16,5 Ko | Étude d'opportunité — textes affichés en session Claude Code — 20261001b |
 | `20261001-L99-etude-textes-relance.md` | fichier | 13,8 Ko | Analyse L99 — relance de l'étude sur les textes affichés en session |
 | `20261001-L99-textes-affiches-en-session.md` | fichier | 14,2 Ko | Analyse L99 — étude d'opportunité sur les textes affichés en session Claude Code |
 
-_93 fichier(s), 0 sous-dossier(s)_
+_94 fichier(s), 0 sous-dossier(s)_
