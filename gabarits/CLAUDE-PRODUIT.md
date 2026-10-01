@@ -119,6 +119,16 @@ décision, l'omettre est un oubli (loi n° 3).
   la suivante (`oracle-conformite-projet`, R-42). L'écrivain de ledger hérité pose l'heure machine ;
   une entrée écrite à la main relève l'horloge au même instant, jamais une heure prévue ou
   reconstituée.
+- **Une version antérieure tenue ouverte ne bloque pas et ne se demande pas** (règle 7 du pilot,
+  alinéa TF-1503, décision humaine du 30/09/2026). Si le `git mv` vers `old\` échoue parce qu'une
+  application tient l'ancienne version ouverte, la nouvelle version sort quand même à l'indice
+  suivant. Le déplacement manquant se consigne au ledger (`type: deplacement_en_attente`, avec
+  `ancien`, `nouveau`, `motif`). La restitution dit à l'utilisateur que l'ancienne version n'a pas
+  pu être déplacée et qu'elle le sera au tour suivant. La session rejoue le déplacement à
+  l'ouverture du tour suivant (`type: deplacement_effectue`). Jamais de question sur le document
+  ouvert, jamais d'action « fermer le document » laissée à l'utilisateur, jamais une application
+  de l'utilisateur quittée ou tuée. `oracle-conformite-projet` (R-7 bis) tolère les deux versions
+  tant que l'attente est consignée.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)

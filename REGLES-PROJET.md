@@ -98,10 +98,23 @@ Ce qui est versionné, quand, et sous quelle forme. Le tableau ne dit pas commen
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 6 | Le code n'a qu'un magasin de versions : git. Aucune copie datée ni dossier `Old\` pour du code | générique (standard) + état de l'écosystème (6 dépôts git) | tous | O | nul | **défaut** |
-| 7 | Quand un livrable documentaire est remplacé par une version plus récente, l'ancien migre dans `old\` du même dossier — **versionné** (lisibilité du dossier courant — pas un magasin de versions) | **citée par toi** ; observée 1/30+ (`OptimAssur/old`) | livrables uniquement | S+O | faible | **défaut** (C1 tranché le 13/08, TF-0150) |
+| 7 | Quand un livrable documentaire est remplacé par une version plus récente, l'ancien migre dans `old\` du même dossier — **versionné** (lisibilité du dossier courant — pas un magasin de versions) ; si une application tient l'ancienne version ouverte, la nouvelle sort quand même et le déplacement se consigne puis se rejoue au tour suivant (alinéa ci-dessous) | **citée par toi** ; observée 1/30+ (`OptimAssur/old`) ; alinéa du verrou : décision humaine du 30/09/2026 | livrables uniquement | S+O | faible | **défaut** (C1 tranché le 13/08, TF-0150 ; alinéa du verrou, TF-1503) |
 | 8 | Tout nouveau produit est `git init` à l'ouverture du run, avec commit initial + commits par étape (le **push/remote reste sur ton GO**) | gap constaté : Produit-12 sans git | produits, nouveaux | P0 | nul | **défaut** (conflit C2) |
 | 9 | Commits en Conventional Commits français | observée (development 116 commits, campagnes forges) | tous dépôts git | S | nul | **défaut** |
 | 10 | `.gitignore` socle dès la création : `.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`, artefacts de build, **sidecars d'oracles** `*.oracles.json` / `*.oracles-cache.json` / `*.oracles-historique.jsonl` (TF-0065 — les preuves VOULUES restent versionnées sous `forge\`, exception `!forge/**`, décision C4) | observée (9/11) ; sidecars : 3 campagnes polluées | tous | P0+O | nul | **défaut** |
+
+**Alinéa VERSION ANTÉRIEURE TENUE OUVERTE (TF-1503, décision humaine du 30/09/2026, retenue le 01/10/2026 par D-37 (a)).** La règle 7 dit où va l'ancienne version. Elle ne disait pas quoi faire quand une application la tient ouverte et que le déplacement échoue. Le 30/09/2026, un renommage est resté en attente parce qu'un CV était ouvert dans Word, puis une décision a demandé à l'humain que faire d'un PowerPoint resté ouvert : deux allers-retours le même jour (lot `digit-ai-marketing - RETOURS - 20260930a`). La réponse de l'humain, mot pour mot : « Ne pose plus la question sur les documents ouverts. Regénère dans tous les cas une nouvelle version et informe l'utilisateur que le document ouvert n'a pas pu être déplacé, qu'il le sera au prochain tour. »
+
+Une version est tenue ouverte quand son déplacement échoue pour cause de verrou (sous Windows : « le fichier est utilisé par un autre processus »). Le geste tient en quatre temps.
+
+1. La nouvelle version sort quand même, à l'indice suivant (règle 5). L'ancienne n'est ni écrasée ni attendue.
+2. Le déplacement qui a échoué se consigne au ledger du produit : une entrée `deplacement_en_attente` qui porte `ancien` (chemin de la version restée en place, relatif à la racine du produit), `nouveau` (chemin de la nouvelle) et `motif`.
+3. La restitution informe l'utilisateur sans lui poser de question : l'ancienne version n'a pas pu être déplacée, elle le sera au tour suivant. Son libellé vit dans `gabarits\RESTITUTION.md`.
+4. À l'ouverture du tour suivant, la session rejoue le déplacement : `git mv` vers `old\` du même dossier, avec le sceau `.jugement.json` de la version quand il existe, puis une entrée `deplacement_effectue` au ledger. Si le verrou tient encore, l'attente reste consignée et la restitution le redit.
+
+La session ne pose aucune question sur le document ouvert et ne laisse aucune action à l'utilisateur, « fermer le document » comprise. Elle ne quitte ni ne tue l'application : elle ne l'a pas lancée, l'utilisateur en reste propriétaire.
+
+Au 01/10/2026, `oracle-conformite-projet` (règle R-7 bis) tolère deux versions d'un même livrable dans un même dossier tant que chaque version autre que la plus récente porte une entrée `deplacement_en_attente` non close au ledger ; il nomme alors l'attente et le geste de sortie. Il refuse une consignation qui nomme un autre fichier, une consignation déjà close et une consignation de la version la plus récente. Sa verte et ses rouges sont à `oracles\self-test.mjs`. Il ne juge pas que le fichier soit vraiment tenu ouvert, ni la durée de l'attente (aucun seuil ne repose sur une mesure), ni l'absence de question à l'humain. Le rejeu du tour suivant est un geste de la session, que ce texte et le `CLAUDE.md` des produits prescrivent : aucun hook ne le joue encore.
 
 ## D. Documentation du produit
 

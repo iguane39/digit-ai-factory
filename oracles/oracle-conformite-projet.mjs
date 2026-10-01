@@ -552,6 +552,21 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
 //
 // CE QUI N'EST PAS JUGÉ, et c'est déclaré au `non_juge` : LAQUELLE des deux est la courante. Le
 // constat nomme les fichiers et le geste ; il ne choisit pas à la place de l'auteur.
+//
+// LA VERSION ANTÉRIEURE TENUE OUVERTE (TF-1503, décision humaine du 30/09/2026, retenue le 01/10
+// par D-37 (a)). Le `git mv` de la règle 7 échoue quand une application tient l'ancienne version
+// ouverte. Deux issues étaient ouvertes, et les deux coûtaient un tour humain : arrêter le tour, ou
+// poser la question. L'humain a tranché : la nouvelle version sort QUAND MÊME à l'indice suivant, le
+// déplacement manquant se CONSIGNE au ledger (`deplacement_en_attente`), puis se rejoue à l'ouverture
+// du tour suivant (`deplacement_effectue`). Tant que la consignation couvre chaque version autre que
+// la plus récente, deux versions ne sont plus un défaut : elles sont un état déclaré, nommé au
+// constat avec son geste de sortie. La plus récente est lue à l'INDICE (règle 5 : il ne fait que
+// croître) ; une consignation qui la nommerait ne couvre rien.
+//
+// DEUX BORNES, chacune contre un contournement précis. Une consignation déjà CLOSE
+// (`deplacement_effectue`) ne tolère plus rien : l'ancienne version est revenue, ou la clôture était
+// prématurée, et c'est un défaut. Une version sans consignation reste un défaut même si sa voisine en
+// porte une : la tolérance est par version, jamais par dossier.
 {
   const versions = new Map();
   for (const d of ["output", "docs"]) {
@@ -568,7 +583,25 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
       // séparateur de fortune rendrait le dossier faux au message — un message faux se corrige de travers.
       const cle = JSON.stringify([dirname(rel(f)), m[1], m[3].toLowerCase()]);
       if (!versions.has(cle)) versions.set(cle, []);
-      versions.get(cle).push({ nom, indice: m[2] });
+      versions.get(cle).push({ nom, indice: m[2], chemin: rel(f) });
+    }
+  }
+  // TF-1503 — les déplacements consignés au ledger. L'ÉTAT d'un chemin est celui de son DERNIER
+  // événement : le ledger est en ajout seul, la clôture d'une attente est une ligne de plus. Le
+  // chemin se compare en minuscules et en barres obliques, la graphie d'un chemin Windows écrit à
+  // la main n'étant pas celle de `rel()`.
+  const cheminNorme = (s) => String(s || "").replaceAll("\\", "/").replace(/^\.\//, "").toLowerCase();
+  const deplacements = new Map();
+  const ledgerDeplacements = p("forge", "ledger.jsonl");
+  if (existsSync(ledgerDeplacements)) {
+    for (const ligne of readFileSync(ledgerDeplacements, "utf8").split("\n")) {
+      if (!ligne.trim()) continue;
+      let e;
+      try { e = JSON.parse(ligne); } catch { continue; }
+      const t = String(e.type || e.ev || "");
+      if (t !== "deplacement_en_attente" && t !== "deplacement_effectue") continue;
+      if (!cheminNorme(e.ancien)) continue;
+      deplacements.set(cheminNorme(e.ancien), { attente: t === "deplacement_en_attente", ts: e.ts || null, motif: e.motif || null });
     }
   }
   const doublons = [...versions.entries()].filter(([, v]) => new Set(v.map((x) => x.indice)).size > 1);
@@ -576,9 +609,29 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
   else for (const [cle, v] of doublons) {
     const [dossier, radical] = JSON.parse(cle);
     const tries = v.map((x) => x.indice).sort();
+    const courante = tries[tries.length - 1];
+    const anterieures = v.filter((x) => x.indice !== courante);
+    const etat = (x) => deplacements.get(cheminNorme(x.chemin));
+    const enAttente = anterieures.filter((x) => etat(x) && etat(x).attente);
+    const sansAttente = anterieures.filter((x) => !enAttente.includes(x));
+    if (!sansAttente.length) {
+      ok("R-7 bis", `${dossier}/`, `« ${radical} » : version courante ${courante}, ${enAttente.length} version(s) antérieure(s) ` +
+        `avec un déplacement EN ATTENTE consigné au ledger — ` +
+        `${enAttente.map((x) => `${x.indice}${etat(x).ts ? ` (consigné le ${etat(x).ts})` : ""}${etat(x).motif ? ` : ${etat(x).motif}` : ""}`).join(" ; ")}. ` +
+        `Toléré (règle 7, alinéa TF-1503, décision humaine du 30/09/2026) : l'ancienne version est tenue ouverte, la nouvelle est sortie quand même. ` +
+        `À l'ouverture du tour suivant : \`git mv\` vers \`${dossier}/old/\`, puis consigner \`deplacement_effectue\` au ledger. ` +
+        "Ni question à l'humain, ni application de l'utilisateur fermée");
+      continue;
+    }
     ko("R-7 bis", `${dossier}/`, `« ${radical} » vit en ${tries.length} versions dans le MÊME dossier hors old\\ ` +
       `(${tries.join(", ")}) — règle 7 + C1 tranché le 13/08 (TF-0150) : la version remplacée migre par ` +
-      `\`git mv\` dans \`${dossier}/old/\`, versionnée. Ce n'est pas une question à poser à l'humain, la doctrine y répond`);
+      `\`git mv\` dans \`${dossier}/old/\`, versionnée. Ce n'est pas une question à poser à l'humain, la doctrine y répond. ` +
+      `Sans déplacement en attente consigné : ${sansAttente.map((x) => `${x.indice} (${etat(x)
+        ? "consignation CLOSE par `deplacement_effectue`, et le fichier est encore là : refaire le `git mv`"
+        : "aucune consignation"})`).join(", ")}. ` +
+      "Si le `git mv` échoue parce qu'une application tient l'ancienne version OUVERTE : ne rien demander, ne fermer ni tuer " +
+      "l'application, consigner au ledger une entrée `deplacement_en_attente` (`ancien` = chemin de la version non déplacée, relatif " +
+      "à la racine du produit, `nouveau`, `motif`) par version concernée — l'oracle tolère alors les deux versions jusqu'au tour suivant (règle 7, alinéa TF-1503)");
   }
 }
 
@@ -2186,6 +2239,7 @@ const nonJuge = [
   ...antecedences,
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
+  "R-7 bis (TF-1503) : l'oracle lit la CONSIGNATION d'un déplacement en attente au ledger, il n'ouvre ni ne teste le fichier — que l'ancienne version soit réellement tenue ouverte n'est pas jugé, et une attente consignée à tort tolère donc deux versions. La DURÉE de l'attente n'est pas bornée : le constat la dit par la date de consignation, aucun seuil n'étant fondé sur une mesure. Que la session n'ait posé aucune question ni fermé l'application de l'utilisateur n'est pas jugé non plus : seule la consignation l'est",
   "R-2, R-4, R-7 bis et R-25 (TF-0853) : un chemin que  declare EXCLU du depot n est pas juge — le depot a ecrit que ce fichier n entrera jamais dans son histoire, donc ce n est pas un livrable mais un artefact d atelier. Mesure du 06/09 : 242 constats sur 247 portaient les fichiers d un seul dossier exclu, dont 41 dossiers au nom REEL d un tiers du client recopie dans le message. Hors depot git, aucune exclusion n est deduite",
   "R-15 : seule une variable SANS valeur est jugée (R-15.1, TF-1080) ; une variable AVEC valeur par défaut qui serait en réalité tierce n'est pas vue — l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",

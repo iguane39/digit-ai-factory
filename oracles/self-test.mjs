@@ -6,7 +6,7 @@
  * dossier temporaire (git réel inclus) — rien n'est écrit dans le dépôt.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, cpSync, renameSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, cpSync, renameSync, appendFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -1631,6 +1631,101 @@ check("TF-0902 borne : deux FORMATS d'un même livrable (.html et .pdf) ne sont 
   try {
     const f = r7bis(d);
     if (!f || f.statut === "FAIL") throw new Error(`un livrable en deux formats est pris pour deux versions : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1503 (01/10) — R-7 bis : la version antérieure TENUE OUVERTE est un état déclaré -------
+// Décision humaine du 30/09, citée mot pour mot au lot source : « Ne pose plus la question sur les
+// documents ouverts. Regénère dans tous les cas une nouvelle version et informe l'utilisateur que le
+// document ouvert n'a pas pu être déplacé, qu'il le sera au prochain tour. » Le déplacement manquant
+// se CONSIGNE au ledger (`deplacement_en_attente`) et se clôt par `deplacement_effectue`. Sept cas :
+// la verte (consigné → toléré), trois rouges (la consignation vise un autre fichier ; elle est déjà
+// CLOSE ; elle nomme la version la plus récente), deux bornes (la tolérance est par version, et le
+// chemin écrit à la main à la graphie Windows reste reconnu), et le REMÈDE que le constat prescrit,
+// joué : le FAIL, puis l'entrée qu'il demande, puis PASS (TF-1013).
+const J_A = "Client-A - Journal du mandat - 20260930a.md";
+const J_B = "Client-A - Journal du mandat - 20260930b.md";
+const J_C = "Client-A - Journal du mandat - 20261001a.md";
+const projetVersionsLedger = (fichiersOutput, entrees, dansOld = []) => {
+  const d = projetVersions(fichiersOutput, dansOld);
+  mkdirSync(join(d, "forge"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"),
+    [{ seq: 1, ts: "2026-09-30T08:00:00.000Z", type: "run_open" }, ...entrees.map((e, i) => ({ seq: i + 2, ...e }))]
+      .map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  return d;
+};
+const enAttente = (ancien, nouveau, ts = "2026-09-30T09:00:00.000Z") =>
+  ({ ts, type: "deplacement_en_attente", ancien, nouveau, motif: "ancienne version ouverte dans Word : déplacement refusé, fichier utilisé par un autre processus" });
+const effectue = (ancien, ts = "2026-10-01T09:00:00.000Z") => ({ ts, type: "deplacement_effectue", ancien });
+check("TF-1503 verte : l'ancienne version est tenue ouverte, son déplacement est CONSIGNÉ en attente → R-7 bis PASS, geste de sortie nommé", () => {
+  const d = projetVersionsLedger([J_A, J_B], [enAttente(`output/${J_A}`, `output/${J_B}`)]);
+  try {
+    const r = lanceArgs(d, "--regles", "R-7 bis");
+    const f = (r.rapport.findings || []).find((x) => x.regle === "R-7 bis");
+    if (r.exit !== 0 || !f || f.statut !== "PASS") throw new Error(`l'état déclaré est accusé : exit ${r.exit}, ${JSON.stringify(f)}`);
+    if (!/EN ATTENTE/.test(f.message) || !/2026-09-30T09:00/.test(f.message)) throw new Error(`le constat ne dit pas l'attente ni sa date : ${f.message}`);
+    if (!/git mv/.test(f.message) || !/deplacement_effectue/.test(f.message)) throw new Error(`le constat ne nomme pas le geste de sortie du tour suivant : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1503 rouge : la consignation vise un AUTRE fichier → FAIL R-7 bis, la version non couverte est nommée", () => {
+  const d = projetVersionsLedger([J_A, J_B], [enAttente("output/Client-A - Autre livrable - 20260930a.md", "output/Client-A - Autre livrable - 20260930b.md")]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`une consignation qui ne couvre pas la version tolère quand même : ${JSON.stringify(f)}`);
+    if (!/20260930a \(aucune consignation\)/.test(f.message)) throw new Error(`le constat ne nomme pas la version sans consignation : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1503 rouge : consignation déjà CLOSE (deplacement_effectue) alors que le fichier est encore là → FAIL R-7 bis", () => {
+  const d = projetVersionsLedger([J_A, J_B], [enAttente(`output/${J_A}`, `output/${J_B}`), effectue(`output/${J_A}`)]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`une attente close tolère encore deux versions : ${JSON.stringify(f)}`);
+    if (!/CLOSE/.test(f.message) || !/refaire le `git mv`/.test(f.message)) throw new Error(`le constat ne dit pas que la clôture est contredite par le fichier : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1503 rouge : une consignation qui nomme la version la plus RÉCENTE ne couvre pas l'ancienne → FAIL R-7 bis", () => {
+  const d = projetVersionsLedger([J_A, J_B], [enAttente(`output/${J_B}`, `output/${J_A}`)]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`la consignation à l'envers excuse l'ancienne version : ${JSON.stringify(f)}`);
+    if (!/20260930a \(aucune consignation\)/.test(f.message)) throw new Error(`le constat ne nomme pas la version laissée sans consignation : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1503 borne : trois versions, une seule consignée → FAIL, la tolérance est par VERSION et non par dossier", () => {
+  const d = projetVersionsLedger([J_A, J_B, J_C], [enAttente(`output/${J_B}`, `output/${J_C}`)]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`une version sans consignation passe parce que sa voisine en porte une : ${JSON.stringify(f)}`);
+    if (!/20260930a \(aucune consignation\)/.test(f.message) || /20260930b \(/.test(f.message)) throw new Error(`le constat ne désigne pas exactement la seule version non couverte : ${f.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1503 borne : le chemin consigné à la main (barres inverses, casse différente) reste reconnu → R-7 bis PASS", () => {
+  const d = projetVersionsLedger([J_A, J_B], [enAttente(`Output\\${J_A.toUpperCase().replace(/\.MD$/, ".md")}`, `output\\${J_B}`)]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut !== "PASS") throw new Error(`une graphie Windows du chemin n'est pas reconnue : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1503 verte : le déplacement rejoué au tour suivant (fichier dans old\\, consignation close) → plus de constat", () => {
+  const d = projetVersionsLedger([J_B], [enAttente(`output/${J_A}`, `output/${J_B}`), effectue(`output/${J_A}`)], [J_A]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut === "FAIL") throw new Error(`le rangement rejoué est accusé : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1503 remède joué : le FAIL sans consignation, puis l'entrée que son message prescrit → R-7 bis PASS", () => {
+  const d = projetVersionsLedger([J_A, J_B], []);
+  try {
+    const avant = r7bis(d);
+    if (!avant || avant.statut !== "FAIL") throw new Error(`le point de départ n'est pas un FAIL : ${JSON.stringify(avant)}`);
+    if (!/`deplacement_en_attente`/.test(avant.message) || !/`ancien`/.test(avant.message) || !/`nouveau`/.test(avant.message) || !/`motif`/.test(avant.message))
+      throw new Error(`le constat ne prescrit pas l'entrée à consigner, ni ses champs : ${avant.message}`);
+    // L'entrée est écrite telle que le constat la décrit — les trois champs nommés, rien d'autre —
+    // à la suite du ledger, comme le ferait `ledger.mjs append`.
+    appendFileSync(join(d, "forge", "ledger.jsonl"), JSON.stringify({ seq: 2, ts: "2026-09-30T09:00:00.000Z", type: "deplacement_en_attente",
+      ancien: `output/${J_A}`, nouveau: `output/${J_B}`, motif: "ancienne version ouverte dans PowerPoint" }) + "\n", "utf8");
+    const apres = r7bis(d);
+    if (!apres || apres.statut !== "PASS") throw new Error(`le remède prescrit ne rend pas R-7 bis verte : ${JSON.stringify(apres)}`);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 

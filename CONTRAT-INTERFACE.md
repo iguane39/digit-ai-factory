@@ -132,7 +132,8 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
   `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
-  guetté + ts — TF-0173, §4 ter), `run_close`.
+  guetté + ts — TF-0173, §4 ter), `deplacement_en_attente` et `deplacement_effectue` (version
+  antérieure tenue ouverte, règle 7 de `REGLES-PROJET.md`), `run_close`.
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
   quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
   jugé selon ses propres règles). Sous `1.1`, `run_open` porte aussi **`forges_mobilisees`**, un
