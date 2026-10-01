@@ -183,6 +183,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` | fichier | 37,5 Ko | Synthèse de mandat — tous les retours sont pris et la boîte d'entrée est verte pour la pre |
 | `Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` | fichier | 17,6 Ko | Synthèse de mandat — « fais tous les retours et todos » : les neuf lots en attente sont in |
 | `Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` | fichier | 12,6 Ko | Synthèse de mandat — trois lots pris, la propagation devient mesurable, et le banc monte à |
+| `Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux en attente de decision - 20261001b.md` | fichier | 18,6 Ko | Digit-AI — Synthèse de mandat — Sas traité, 11 lots ingérés, 2 en attente de décision — 01 |
 | `Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md` | fichier | 13,8 Ko | Synthèse de mandat — les sélecteurs de familles, et le premier palier de la stratégie de t |
 | `Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md` | fichier | 22,8 Ko | Synthèse de mandat — les sept campagnes sont closes et vérifiées une par une, et le défaut |
 | `Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` | fichier | 45,1 Ko | Synthèse de mandat — vos sept décisions sont exécutées, le parc est publié, la porte le bl |
@@ -229,4 +230,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_212 fichier(s), 0 sous-dossier(s)_
+_213 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

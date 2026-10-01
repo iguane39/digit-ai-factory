@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 432 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 433 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -433,6 +433,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md | 20260908g | 37.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` |
 | Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md | 20260908b | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` |
 | Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md | 20260901a | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` |
+| Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux en attente de decision - 20261001b.md | 20261001b | 18.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux en attente de decision - 20261001b.md` |
 | Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md | 20260901e | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md` |
 | Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md | 20260908e | 22.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md` |
 | Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md | 20260908h | 45.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` |
