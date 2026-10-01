@@ -2151,7 +2151,7 @@ function juger(texte, cheminJuge = null) {
     // TF-1500 (01/10/2026, lot Produit-03 du 30/09, RA-56) — LE SIDECAR FAIT 34 CARACTÈRES, ET LES
     // SYNTHÈSES DES PRODUITS VIVENT SOUS `forge\`. Deux mesures du 01/10 sur le parc. (1) La constante
     // valait 26 ; le sidecar le plus long, `.oracles/` + `.oracles-historique.jsonl`, en ajoute 34 :
-    // 6 sidecars suivis du pilot dépassaient 150 (jusqu'à 154), leurs synthèses passant la règle. Elle
+    // 7 sidecars suivis du pilot dépassaient 150 (de 151 à 154), leurs synthèses passant la règle. Elle
     // se CALCULE désormais sur ces deux noms, et le chemin admis passe de 124 à 116 caractères. (2) La
     // règle ne lisait que `output\` : une synthèse de produit, sous `forge\`, n'était jamais mesurée —
     // le hook juge le message dans un fichier temporaire, et 17 des 107 synthèses suivies des produits
