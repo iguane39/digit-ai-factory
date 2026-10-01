@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-10 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-11 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -94,6 +94,93 @@ se redécide. Verdict `FAIL` : il reste éteint, et l'écart mesuré est consign
 endroit où les deux passes portent sur du code qui compte. La jouer sur un banc d'essai
 prouverait que le mécanisme tourne, pas qu'il ne perd rien.
 
+## 1 ter. Avant de concevoir un déploiement : relever les garde-fous, relire les contraintes connues (M-11, TF-1495, TF-1496)
+
+**Le fait, du 29/09/2026 chez Produit-03.** La première livraison de production est refusée :
+`RequestDisallowedByPolicy`. Une stratégie `Deny` de la souscription, posée le 03/07, refuse
+d'écrire la configuration d'une Web App dont l'authentification n'est pas active. L'amorçage avait
+été conçu le 21/09 « sans authentification au premier passage », et aucune étape n'avait interrogé
+les stratégies de la portée cible. La contrainte était pourtant connue 3 fois :
+
+- le produit l'avait heurtée en qualification le 23/07, et l'avait écrite dans un commentaire
+  « Obligatoire ici » de son fichier de variables, qui ne gouvernait que la qualification ;
+- le commanditaire avait décrit le 21/09 le processus de son organisation, que l'agent a
+  reformulé puis écarté ;
+- un produit voisin du même client l'avait heurtée le 31/08, et la leçon n'a pas circulé.
+
+Le retour humain, mot pour mot : « Pourquoi cela n'a pas été vu précédemment ? Puisque c'est ce
+que nous faisons sur toutes les applications Client-A. »
+
+**Avant de proposer un ordre de déploiement, 4 gestes, dans cet ordre.**
+
+1. **Lire le registre des garde-fous de la factory** (`references\GARDE-FOUS-PLATEFORME.json`)
+   pour le client du produit. Une entrée est une piste, jamais une preuve : un client pose ou
+   retire une stratégie sans prévenir. « Aucune entrée pour ce client » est une réponse complète.
+2. **Relever les stratégies de la portée cible**, sur Azure par 2 commandes en lecture seule.
+   `az policy assignment list --scope <portée> --disable-scope-strict-match` rend les
+   affectations de la portée, avec celles héritées des portées parentes et celles des portées
+   enfants. `az policy definition show --name <définition>` rend la règle de chacune, et
+   `az policy set-definition show` celle d'une initiative. Une affectation refuse quand son effet
+   effectif est `Deny`, ou `denyAction` pour une suppression, et que son mode d'application est
+   `Default`. L'effet effectif se lit dans le bloc `then` de la règle, dans la valeur que
+   l'affectation donne à un effet paramétré, ou dans ses `overrides`. Pour une ressource précise,
+   l'API `checkPolicyRestrictions` dit quelles restrictions Azure Policy placera sur elle
+   (`POST …/subscriptions/<id>/providers/Microsoft.PolicyInsights/checkPolicyRestrictions?api-version=2024-10-01`).
+   Commandes et propriétés vérifiées à la documentation officielle, lue le 01/10/2026.
+3. **Relire les contraintes connues du produit** : les commentaires « Obligatoire ici » de ses
+   fichiers d'environnement, ses décisions, et les processus que l'humain a décrits pour son
+   organisation. Une contrainte apprise dans un environnement vaut pour la portée entière,
+   jusqu'à preuve du contraire. Elle se promeut en règle du produit : un identifiant porté par
+   le commentaire (`# Obligatoire ici (GF-01) : …`) et une ligne au tableau du dossier. Si le
+   registre de la factory ne la connaît pas, elle remonte au lot de retours.
+4. **Juger chaque option contre ces garde-fous.** Une option qu'un garde-fou interdit est
+   IMPOSSIBLE, pas plus chère. Elle se présente avec le garde-fou qui l'exclut, jamais comme une
+   option à arbitrer sur son coût.
+
+**La parole de l'humain se cite avec ses mots.** Un processus que l'humain décrit pour son
+organisation s'inscrit comme une contrainte, mot pour mot. S'il semble contredire une doctrine du
+produit, la contradiction se pose en décision : le processus ne s'écarte jamais au nom de la
+doctrine. Le 21/09/2026, le formulaire du client, traité par son administrateur d'annuaire, a été
+rapporté à l'assistant du portail, qui crée un mot de passe. Il a alors été écarté comme contraire
+à la doctrine sans secret. Ce processus était la contrainte.
+
+**Une identité de déploiement qui change garde ses droits d'annuaire.** Quand un compte de
+déploiement en remplace un autre, ses permissions d'annuaire se comparent à celles de l'ancien, et
+pas seulement ses rôles Azure. Pour un principal de service, elles se lisent par
+`GET /servicePrincipals/{id}/appRoleAssignments` (Microsoft Graph). Le 16/09/2026, 3 comptes
+dédiés ont remplacé un compte partagé qui portait une permission Graph : aucun ne la portait, et
+le contrôle du standard des comptes ne regardait que 4 rôles Azure.
+
+**La forme, au dossier de MEP** :
+
+```
+## Garde-fous de la plateforme et contraintes connues
+
+Relevé du 2026-09-21 : az policy assignment list --scope <portée> --disable-scope-strict-match
+Registre des garde-fous de la factory lu le 2026-09-21 : GFP-001, GFP-002
+
+| Id | Garde-fou ou contrainte | Source | Étape de la séquence | Verdict |
+|---|---|---|---|---|
+| GF-01 | une Web App sans authentification ne s'écrit pas (Deny) | relevé du 2026-09-21 ; infra/hpr.tfvars ; GFP-001 | S-04 amorçage | rend impossible l'amorçage sans authentification |
+| GF-02 | une inscription d'application se demande par le formulaire du client | parole du commanditaire, 21/09/2026 : « … » | S-07 | compatible : demandée par le formulaire |
+```
+
+**Le contrôle exécutable** : `node scripts\verifier-garde-fous.mjs <produit>`. Il refuse 4 manques :
+
+- un produit qui déploie sur Azure sans relevé daté des stratégies de la portée cible (GF-1) ;
+- un commentaire « Obligatoire ici » que le dossier ne cite ni par son identifiant ni par son
+  fichier (GF-2) ;
+- une section qui ne dit pas avoir lu le registre de la factory (GF-3) ;
+- une contrainte venue de l'humain, citée sans ses mots (GF-4).
+
+L'oracle de l'étape le joue en TM6, et son refus bloque. `node scripts\verifier-garde-fous.mjs --registre`
+juge le registre lui-même : champs, dates, lot source, aucun identifiant ni nom de client.
+
+**Hors jugement, et c'est dit.** La justesse d'un verdict écrit au tableau : le contrôle ne rejoue
+pas le relevé. Les plateformes autres qu'Azure : leur mécanisme de stratégie n'a pas encore de
+commande vérifiée à sa source. Une option impossible encore proposée à l'humain : les options
+vivent dans la restitution, que ce contrôle ne lit pas.
+
 ## 2. Ce que l'étape produit (staging, autonome)
 
 Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fichiers de build) :
@@ -141,7 +228,7 @@ et elle grossit par les incidents, pas par la devinette.
 
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
 
-10 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
+11 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
@@ -155,6 +242,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-8 | **Jalon de fraîcheur DÉRIVÉ DE TOUT L'ENSEMBLE DÉPLOYÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est une **fonction de l'ENSEMBLE déployé** — empreinte du **manifeste de l'arbre de sortie** (chemins triés + hachages, condensés), ou **identifiant de commit injecté à la génération**. Jamais un numéro tenu à la main ; **jamais non plus l'empreinte d'un artefact échantillonné**. Le critère tient en une phrase : *si on ne sait pas dire « elle change dès que N'IMPORTE QUOI change », le jalon échantillonne.* Preuve exigée : un **test négatif joué sur un fichier QUELCONQUE de l'arbre**, pas sur celui que la porte regarde — §3 sexies, TF-0666 et TF-0672. **Contrôle exécutable : la règle O-7 de forge-ops** (`node <ops>\oracles\oracle-ops.mjs <cible> --empreinte`, empreinte de l'ensemble déployé confrontée au scellé) ; sa preuve par perturbation — une page hors accueil modifiée, qu'un critère sur une seule page ne voit pas et qu'O-7 nomme — est jouée au self-test de forge-ops depuis 2fe5f3d (TF-1075) |
 | M-9 | **404 personnalisée, par langue, statut conservé** | **si et seulement si** le produit a une surface web : sur l'instance staging servie, (a) une adresse inconnue sous chaque préfixe de langue rend **404** (jamais 200) avec une page du MÊME gabarit que les autres — menu, charte, liens de secours — dans la langue du préfixe, **et une adresse inconnue SANS préfixe rend le même 404 dans la langue par défaut** (TF-0809) ; (b) la page porte `noindex` et l'exclusion du sitemap est **déclarée** dans l'oracle SEO du produit ; (c) une ressource non-HTML inconnue rend un 404 **nu**. Preuve : la sortie JSON de la **recette générique de forge-tests** `recette\quatre_cent_quatre.py` (paramètres : URL de staging, préfixes de langue, langue par défaut, sitemap — TF-0803, 05/09/2026) jouée contre l'instance staging ; un contrôle propre au produit n'est admis que s'il joue les mêmes cas et le dit (TF-0808). Patron **P-2**, `references\PATRONS-EPROUVES.md` — TF-0802. |
 | M-10 | **Portes à base externe, rejouées le jour du lancement** | **si et seulement si** la chaîne du produit joue une porte qui juge une base externe (avis de dépendances, base de vulnérabilités, dépôt de paquets). Le feu vert du dossier de MEP porte la sortie de chacune, rejouée le jour même du lancement sur l'objet lancé, jamais le verdict de la qualification. Contrôle exécutable : `node scripts\verifier-portes-du-jour.mjs <produit>`, joué en TM5 par `oracle-trace-mutation-mep` — § 3 nonies, TF-1498 |
+| M-11 | **Garde-fous de la plateforme relevés, contraintes connues relues** | **si et seulement si** le produit déploie sur une plateforme à stratégies (Azure Policy) ou porte une contrainte « Obligatoire ici ». Le dossier de MEP porte le relevé daté des stratégies de la portée cible, fait AVANT de concevoir l'ordre de déploiement. Il cite chaque contrainte connue avec son verdict contre la séquence retenue : commentaire d'un environnement, entrée du registre de la factory, parole de l'humain mot pour mot. Contrôle exécutable : `node scripts\verifier-garde-fous.mjs <produit>`, joué en TM6 par `oracle-trace-mutation-mep` — § 1 ter, TF-1495 et TF-1496 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -446,6 +534,8 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   populée (§3 bis — non-testables soldés ou listés avec leur raison) ;
 - le feu vert de lancement : les portes qui jugent une base externe, rejouées le jour du
   lancement sur l'objet lancé, avec leur sortie datée (M-10, § 3 nonies) ;
+- les garde-fous de la plateforme et les contraintes connues : le relevé daté des stratégies de
+  la portée cible, et chaque contrainte avec son verdict contre la séquence retenue (M-11, § 1 ter) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - la commande exacte de mise en production et la procédure de rollback.
 

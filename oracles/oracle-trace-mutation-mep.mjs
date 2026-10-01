@@ -36,6 +36,9 @@
  *   TM5  les portes qui jugent une base externe (avis de dépendances, base de vulnérabilités) sont
  *        rejouées le JOUR du lancement, sur l'objet lancé, et le feu vert du dossier le prouve —
  *        BLOQUANT (M-10, TF-1498).
+ *   TM6  le dossier porte le relevé daté des garde-fous de la plateforme cible, relit chaque
+ *        contrainte « Obligatoire ici » du produit et dit avoir lu le registre de la factory —
+ *        BLOQUANT (M-11, TF-1495 et TF-1496), câblé comme TM5 sur `scripts\verifier-garde-fous.mjs`.
  *
  * TM5 EST UN CÂBLAGE BLOQUANT, ET LA DIFFÉRENCE AVEC TM4 EST VOULUE (TF-1498, 01/10/2026). Le
  * 30/09/2026, un feu vert de lancement reposait sur les portes de la veille : 3 avis de sécurité
@@ -174,14 +177,14 @@ function confronterVerdictsArchives(racine) {
 }
 
 /**
- * TM5 — les portes à base externe du feu vert, rejouées le jour du lancement (M-10, TF-1498).
- * Délègue au verbe, comme TM4 : la règle vit en un seul endroit, et son banc la prouve.
+ * Un verbe BLOQUANT du pilot, joué sur le produit : TM5 et TM6 le délèguent ainsi, comme TM4 le
+ * sien. La règle vit en un seul endroit, et son banc la prouve. `porte` nomme la règle de l'étape,
+ * `pass` dit le vert à partir de la mesure du verbe.
  */
-function confronterPortesDuJour(racine) {
-  const verbe = join(ICI, "..", "scripts", "verifier-portes-du-jour.mjs");
+function confronterVerbe(racine, script, porte, pass) {
+  const verbe = join(ICI, "..", "scripts", script);
   if (!existsSync(verbe)) {
-    return { statut: "NON_JUGE", message: "scripts\\verifier-portes-du-jour.mjs absent du pilot — l'âge des portes du feu "
-      + "vert n'est jugé par rien, et c'est dit plutôt que tu (ETAPE-MEP.md M-10)" };
+    return { statut: "NON_JUGE", message: `scripts\\${script} absent du pilot — ${porte} n'est jugé par rien, et c'est dit plutôt que tu` };
   }
   const r = spawnSync(process.execPath, [verbe, racine], { encoding: "utf8", timeout: 120000 });
   let j = null;
@@ -190,16 +193,21 @@ function confronterPortesDuJour(racine) {
     return { statut: "NON_JUGE", message: `le verbe n'a pas rendu de verdict lisible (exit ${r.status}) — `
       + `ce n'est PAS un constat sur ce produit : ${(r.stderr || "").trim().slice(0, 160)}` };
   }
-  const m = j.mesure || {};
-  if (r.status === 2) return { statut: "SANS_OBJET", message: j.motif || j.message || "M-10 sans objet" };
-  if (r.status === 0) {
-    return { statut: "PASS", message: `${m.portes_feu_vert || 0} porte(s) à base externe rejouée(s) le jour du lancement `
-      + `(${j.lancement}), sur l'objet lancé` };
-  }
-  return { statut: "FAIL", message: `${m.refus || 0} refus au feu vert de lancement : `
+  if (r.status === 2) return { statut: "SANS_OBJET", message: j.motif || j.message || `${porte} sans objet` };
+  if (r.status === 0) return { statut: "PASS", message: pass(j) };
+  return { statut: "FAIL", message: `${(j.mesure || {}).refus || 0} refus (${porte}) : `
     + (j.findings || []).filter((f) => f.statut === "FAIL").slice(0, 4).map((f) => `${f.regle} ${f.message}`).join(" · ")
-    + " · détail : node scripts\\verifier-portes-du-jour.mjs <produit> (ETAPE-MEP.md M-10, TF-1498)" };
+    + ` · détail : node scripts\\${script} <produit> (ETAPE-MEP.md ${porte})` };
 }
+
+/** TM5 — les portes à base externe du feu vert, rejouées le jour du lancement (M-10, TF-1498). */
+const confronterPortesDuJour = (racine) => confronterVerbe(racine, "verifier-portes-du-jour.mjs", "M-10",
+  (j) => `${(j.mesure || {}).portes_feu_vert || 0} porte(s) à base externe rejouée(s) le jour du lancement (${j.lancement}), sur l'objet lancé`);
+
+/** TM6 — les garde-fous de la plateforme relevés, les contraintes connues relues (M-11, TF-1495, TF-1496). */
+const confronterGardeFous = (racine) => confronterVerbe(racine, "verifier-garde-fous.mjs", "M-11",
+  (j) => `garde-fous relevés et contraintes connues relues (${(j.mesure || {}).contraintes_connues || 0} contrainte(s) « Obligatoire ici », `
+    + `cible Azure : ${(j.mesure || {}).cible_azure ? "oui" : "non"})`);
 
 export function juger(racine) {
   const findings = [];
@@ -284,6 +292,9 @@ export function juger(racine) {
   // TM5 — une fois par produit aussi : le verbe lit ensemble la chaîne et tous les dossiers.
   const pj = confronterPortesDuJour(racine);
   findings.push({ regle: "TM5", statut: pj.statut, ou: racine, message: pj.message });
+  // TM6 — de même : le verbe lit ensemble l'infrastructure du produit et tous ses dossiers.
+  const gf = confronterGardeFous(racine);
+  findings.push({ regle: "TM6", statut: gf.statut, ou: racine, message: gf.message });
   return findings;
 }
 
@@ -409,6 +420,31 @@ function selfTest() {
     if (r.status !== 1) casse.push("un feu vert sur les portes de la VEILLE ne met pas l'oracle en échec — TM5 devait bloquer");
   }
 
+  // ---- TM6 : LES GARDE-FOUS DE LA PLATEFORME ET LES CONTRAINTES CONNUES (M-11, TF-1495, TF-1496) ----
+  // Une infrastructure Azure, et la contrainte apprise en qualification, écrite en commentaire.
+  const avecInfra = (racine) => {
+    mkdirSync(join(racine, "infra"), { recursive: true });
+    writeFileSync(join(racine, "infra", "main.tf"), "provider \"azurerm\" {\n  features {}\n}\n", "utf8");
+    writeFileSync(join(racine, "infra", "hpr.tfvars"), "# Obligatoire ici : stratégie de la souscription, authentification exigée\n", "utf8");
+    return racine;
+  };
+  const GARDE_FOUS = `${DOSSIER_OK}\n## Garde-fous de la plateforme et contraintes connues\n\n`
+    + "Relevé du 2026-09-21 : `az policy assignment list --scope <portée> --disable-scope-strict-match`.\n"
+    + "Registre des garde-fous de la factory lu le 2026-09-21 : GFP-001.\n\n"
+    + "| Id | Garde-fou | Source | Verdict |\n|---|---|---|---|\n"
+    + "| GF-01 | une Web App sans authentification ne s'écrit pas | infra/hpr.tfvars ; GFP-001 | amorçage sans authentification impossible |\n";
+  // SANS OBJET : ni infrastructure Azure, ni contrainte connue — les fixtures ci-dessus.
+  attendre("tm6-sans-objet", join(dir, "vert"), "TM6", "SANS_OBJET");
+  // VERT : relevé daté, contrainte de la qualification relue, registre lu.
+  attendre("tm6-releve", avecInfra(produit("tm6-releve", GARDE_FOUS, MARQUEUR)), "TM6", "PASS");
+  // ROUGE : le cas fondateur du 21/09/2026 — un dossier conçu sans relevé, la contrainte jamais relue.
+  const sansReleve = avecInfra(produit("tm6-sans-releve", DOSSIER_OK, MARQUEUR));
+  attendre("tm6-sans-releve", sansReleve, "TM6", "FAIL");
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), sansReleve], { encoding: "utf8" });
+    if (r.status !== 1) casse.push("un dossier conçu sans relevé des garde-fous ne met pas l'oracle en échec — TM6 devait bloquer");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -418,7 +454,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 16/16 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 20/20 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -426,7 +462,9 @@ function selfTest() {
       + "forge-ops SANS_OBJET ; TM4 verdict archivé FRAIS PASS ; TM4 cas rouge — verdict PÉRIMÉ — rendu "
       + "en AVERTISSEMENT ; TM4 un verdict périmé ne met PAS l'oracle en échec, code de sortie 0 vérifié ; "
       + "TM5 sans porte à base externe SANS_OBJET ; TM5 porte rejouée le jour du lancement PASS ; TM5 porte "
-      + "datée de la VEILLE FAIL — le cas fondateur du 30/09/2026 ; TM5 bloque, code de sortie 1 vérifié)");
+      + "datée de la VEILLE FAIL — le cas fondateur du 30/09/2026 ; TM5 bloque, code de sortie 1 vérifié ; "
+      + "TM6 sans infrastructure Azure ni contrainte SANS_OBJET ; TM6 relevé daté et contrainte relue PASS ; TM6 "
+      + "dossier conçu sans relevé FAIL — le cas fondateur du 21/09/2026 ; TM6 bloque, code de sortie 1 vérifié)");
   return casse.length ? 1 : 0;
 }
 
