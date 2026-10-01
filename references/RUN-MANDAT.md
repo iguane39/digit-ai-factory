@@ -104,8 +104,11 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    REGLES-PROJET règle 7, C1 tranché le 13/08 par TF-0150) : `git mv`, une commande,
    pas une question. *Mesuré le 07/09* : une synthèse a posé à l'humain la décision
    « garder ou supprimer la version remplacée ? » — la doctrine y répondait depuis
-   trois semaines, et un tour humain y est passé. Contrôle :
-   `--regles "R-7 bis"` (deux versions du même radical dans un même dossier hors `old\`).
+   trois semaines, et un tour humain y est passé. Tenu ouvert par une application, il attend
+   un tour : la nouvelle version sort quand même, et le déplacement se consigne puis se rejoue
+   au tour suivant (alinéa de la règle 7, TF-1503). Contrôle :
+   `--regles "R-7 bis"` (deux versions du même radical dans un même dossier hors `old\`, sauf
+   déplacement consigné en attente).
    Puis : lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
    sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse **au format
    `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-synthese.mjs`).

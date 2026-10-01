@@ -497,6 +497,8 @@ continue, scripts de `package.json`), puis lit le feu vert de chaque `DOSSIER-ME
 - une porte datée d'un autre jour que le lancement (PJ-2) ;
 - une porte qui a jugé un autre objet que l'objet lancé (PJ-3).
 
+**Le même fait se juge à la restitution.** La restitution qui remet le guide de lancement porte ces sorties, datées du jour et chiffrées : règle S56 d'`oracles\oracle-synthese.mjs`, décrite dans `gabarits\RESTITUTION.md` (2.32.0). Une porte et une règle jugent ici un seul fait : la mise à jour de l'une se reporte dans l'autre.
+
 L'oracle de l'étape le joue en TM5 (`oracles\oracle-trace-mutation-mep.mjs`), et son refus bloque :
 le remède tient en 5 minutes et appartient à qui donne le feu vert.
 

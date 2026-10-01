@@ -141,7 +141,8 @@ clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal). Nomm
 `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
 sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre dans `old\`
 du même dossier — **versionné** (C1 tranché le 13/08, TF-0150 ; l'ancien libellé « jamais
-versionné » est caduc) ; le code, lui, n'est jamais daté — git est son seul magasin.
+versionné » est caduc), et, tenu ouvert par une application, il attend un tour pendant que la
+nouvelle version sort (alinéa de la règle 7, TF-1503) ; le code, lui, n'est jamais daté — git est son seul magasin.
 
 ## 2. Étape conception (mode dégradé, cf. contrat §5)
 
