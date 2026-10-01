@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 435 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 436 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -229,6 +229,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260922-revue-des-candidatures-par-famille.md | — | 11.7 Ko | `03-etudes/20260922-revue-des-candidatures-par-famille.md` |
 | 20260925-etude-opportunite-niveaux-d-intervention.md | — | 47.9 Ko | `03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md` |
 | 20260925-L99-niveaux-d-intervention.md | — | 51 Ko | `03-etudes/20260925-L99-niveaux-d-intervention.md` |
+| 20261001-etude-opportunite-rsi-et-ssl.md | — | 29.7 Ko | `03-etudes/20261001-etude-opportunite-rsi-et-ssl.md` |
 
 ### 04-plans
 
