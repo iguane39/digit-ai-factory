@@ -23,11 +23,12 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // puis de 29 à 39 le 28/09 (R-57, cas écrits le 24/09) : neuf cas de la CONSIGNE de règle — quatre
 // éloges de forme ou demandes de gabarit, cinq phrases voisines qui ne doivent rien déclencher — et
 // un cas de provenance ; puis de 39 à 45 le 01/10 (réponse humaine « 42a ») : la consigne du
-// PROCESSUS, 3 messages humains réels qui corrigent un processus et 3 phrases voisines épargnées.
-check("self-test du hook : 45 cas verts", () => {
+// PROCESSUS, 3 messages humains réels qui corrigent un processus et 3 phrases voisines épargnées ;
+// puis de 45 à 47 le 01/10 (niveau Moyen en essai) : « moyen : » reconnu en tête, et ailleurs non.
+check("self-test du hook : 47 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/45 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/47 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
 });
 
 // R-57 — le point d'entrée RÉEL injecte la consigne sur le message qui a fondé la règle, et rien sur
