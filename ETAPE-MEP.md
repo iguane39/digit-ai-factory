@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-11 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-12 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -228,7 +228,7 @@ et elle grossit par les incidents, pas par la devinette.
 
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
 
-11 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
+12 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
@@ -243,6 +243,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-9 | **404 personnalisée, par langue, statut conservé** | **si et seulement si** le produit a une surface web : sur l'instance staging servie, (a) une adresse inconnue sous chaque préfixe de langue rend **404** (jamais 200) avec une page du MÊME gabarit que les autres — menu, charte, liens de secours — dans la langue du préfixe, **et une adresse inconnue SANS préfixe rend le même 404 dans la langue par défaut** (TF-0809) ; (b) la page porte `noindex` et l'exclusion du sitemap est **déclarée** dans l'oracle SEO du produit ; (c) une ressource non-HTML inconnue rend un 404 **nu**. Preuve : la sortie JSON de la **recette générique de forge-tests** `recette\quatre_cent_quatre.py` (paramètres : URL de staging, préfixes de langue, langue par défaut, sitemap — TF-0803, 05/09/2026) jouée contre l'instance staging ; un contrôle propre au produit n'est admis que s'il joue les mêmes cas et le dit (TF-0808). Patron **P-2**, `references\PATRONS-EPROUVES.md` — TF-0802. |
 | M-10 | **Portes à base externe, rejouées le jour du lancement** | **si et seulement si** la chaîne du produit joue une porte qui juge une base externe (avis de dépendances, base de vulnérabilités, dépôt de paquets). Le feu vert du dossier de MEP porte la sortie de chacune, rejouée le jour même du lancement sur l'objet lancé, jamais le verdict de la qualification. Contrôle exécutable : `node scripts\verifier-portes-du-jour.mjs <produit>`, joué en TM5 par `oracle-trace-mutation-mep` — § 3 nonies, TF-1498 |
 | M-11 | **Garde-fous de la plateforme relevés, contraintes connues relues** | **si et seulement si** le produit déploie sur une plateforme à stratégies (Azure Policy) ou porte une contrainte « Obligatoire ici ». Le dossier de MEP porte le relevé daté des stratégies de la portée cible, fait AVANT de concevoir l'ordre de déploiement. Il cite chaque contrainte connue avec son verdict contre la séquence retenue : commentaire d'un environnement, entrée du registre de la factory, parole de l'humain mot pour mot. Contrôle exécutable : `node scripts\verifier-garde-fous.mjs <produit>`, joué en TM6 par `oracle-trace-mutation-mep` — § 1 ter, TF-1495 et TF-1496 |
+| M-12 | **Scripts qui accordent un droit** | **si et seulement si** le produit porte un script ou une chaîne qui accorde un droit, ou qui nomme une permission Microsoft Graph. Chaque identifiant de permission Graph est celui de la table officielle datée, sous son nom et son type ; l'échec d'un octroi reste visible ; l'effet est relu dans la plateforme avant d'être annoncé. Contrôle exécutable : `node scripts\verifier-droits-accordes.mjs <produit>`, joué en TM7 par `oracle-trace-mutation-mep` — § 3 octies, TF-1497 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -405,6 +406,50 @@ réel manquaient au document (TF-1114).
 **Ce qui n'est pas jugé ici** : le sens inverse d'O-14 (un composant déclaré actif existe dans
 l'export) attend un vocabulaire de statut au document, en étude avec TF-1113 ; la justesse d'une
 mesure de non-régression n'est pas jugée, seulement sa présence.
+
+### § 3 octies — Un script qui accorde un droit nomme des identifiants résolus, et relit son effet (M-12, TF-1497)
+
+**Le fait, relevé le 30/09/2026 chez Produit-03.** Un script de mise en place de la connexion de
+production portait depuis le 16/09 un identifiant de permission Microsoft Graph faux. Graph et sa
+documentation donnent `18a4783c-866b-4cc7-a460-3d5e5662c884` pour `Application.ReadWrite.OwnedBy` ;
+le script écrivait `18a4783c-866b-4cc7-a460-3d0e455740fd`. Les 2 identifiants partagent leurs 26
+premiers caractères : le second avait été écrit de mémoire. L'étape qui devait accorder la
+permission ajoutait l'identifiant faux en masquant son échec (`2>/dev/null || true`), puis écrivait
+« consentie » sans relire l'annuaire. Un tiers a trouvé le défaut à la relecture, avant que
+l'administrateur d'annuaire ne joue le script.
+
+**3 règles, pour tout script que la MEP joue ou remet à un humain.**
+
+1. **Un identifiant de plateforme écrit en dur se résout contre la plateforme, dans le tour qui
+   l'écrit** : permission, rôle, application first-party. La commande qui le résout se porte en
+   commentaire, avec sa date. Pour une permission Graph, la documentation officielle donne la
+   requête `GET https://graph.microsoft.com/v1.0/servicePrincipals(appId='00000003-0000-0000-c000-000000000000')?$select=appRoles,oauth2PermissionScopes`,
+   que `az rest --method get --url "<requête>"` joue.
+2. **Une étape qui accorde un droit relit son effet dans la plateforme avant d'écrire « ok »**, et
+   compare ce qu'elle lit à ce qu'elle voulait accorder. L'échec d'un ajout ne se masque pas : ni
+   `|| true`, ni `2>/dev/null`, ni `-ErrorAction SilentlyContinue`.
+3. **Un identifiant de permission Graph se juge hors ligne contre la table officielle datée**,
+   `references\PERMISSIONS-GRAPH.json`, relevée sur la page « Microsoft Graph permissions
+   reference » de learn.microsoft.com. Son en-tête dit la date du relevé, celle de la page et ses
+   comptes. `node scripts\verifier-droits-accordes.mjs --rafraichir` la relit et la redate.
+
+**Le contrôle exécutable** : `node scripts\verifier-droits-accordes.mjs <fichier|produit>`. Il
+refuse 3 défauts :
+
+- un identifiant de permission Graph absent de la table, quasi-homonyme d'un identifiant connu,
+  attribué à un autre nom ou employé avec le mauvais type (DA-1) ;
+- une commande d'octroi qui masque son échec (DA-2) ;
+- un succès annoncé après un octroi, sans commande de relecture entre les deux (DA-3).
+
+L'oracle de l'étape le joue en TM7 sur les scripts du produit, et son refus bloque. Joué le
+01/10/2026, hors ligne, sur la version du 16/09 du script en cause, il rend les 3 défauts du
+constat à leurs lignes.
+
+**Hors jugement, et c'est dit.** Les identifiants d'autres ressources que Graph et ceux des rôles :
+la table ne porte que Graph, et la règle 1 les couvre en doctrine. Une permission publiée après la
+date de la table se lit « inconnue » : le message donne la commande qui la résout et celle qui
+rafraîchit la table. La justesse de la relecture : DA-3 exige qu'une commande de lecture précède
+l'annonce, pas qu'elle compare.
 
 ### § 3 nonies — Un feu vert de lancement rejoue le jour même les portes qui jugent une base externe (M-10, TF-1498)
 

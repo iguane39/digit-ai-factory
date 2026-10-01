@@ -39,6 +39,9 @@
  *   TM6  le dossier porte le relevé daté des garde-fous de la plateforme cible, relit chaque
  *        contrainte « Obligatoire ici » du produit et dit avoir lu le registre de la factory —
  *        BLOQUANT (M-11, TF-1495 et TF-1496), câblé comme TM5 sur `scripts\verifier-garde-fous.mjs`.
+ *   TM7  les scripts du produit qui accordent un droit nomment des identifiants de permission
+ *        Graph justes, ne masquent pas l'échec de l'octroi et relisent l'effet avant de l'annoncer
+ *        — BLOQUANT (M-12, TF-1497), câblé sur `scripts\verifier-droits-accordes.mjs`.
  *
  * TM5 EST UN CÂBLAGE BLOQUANT, ET LA DIFFÉRENCE AVEC TM4 EST VOULUE (TF-1498, 01/10/2026). Le
  * 30/09/2026, un feu vert de lancement reposait sur les portes de la veille : 3 avis de sécurité
@@ -209,6 +212,11 @@ const confronterGardeFous = (racine) => confronterVerbe(racine, "verifier-garde-
   (j) => `garde-fous relevés et contraintes connues relues (${(j.mesure || {}).contraintes_connues || 0} contrainte(s) « Obligatoire ici », `
     + `cible Azure : ${(j.mesure || {}).cible_azure ? "oui" : "non"})`);
 
+/** TM7 — les scripts qui accordent un droit : identifiants Graph justes, échec visible, effet relu (M-12, TF-1497). */
+const confronterDroitsAccordes = (racine) => confronterVerbe(racine, "verifier-droits-accordes.mjs", "M-12",
+  (j) => `${(j.mesure || {}).resolus || 0} identifiant(s) de permission Graph conforme(s) à la table du ${(j.table || {}).date}, `
+    + `${(j.mesure || {}).octrois || 0} octroi(s) à l'échec visible et à l'effet relu`);
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -295,6 +303,9 @@ export function juger(racine) {
   // TM6 — de même : le verbe lit ensemble l'infrastructure du produit et tous ses dossiers.
   const gf = confronterGardeFous(racine);
   findings.push({ regle: "TM6", statut: gf.statut, ou: racine, message: gf.message });
+  // TM7 — les scripts du produit, jugés hors ligne contre la table officielle datée.
+  const da = confronterDroitsAccordes(racine);
+  findings.push({ regle: "TM7", statut: da.statut, ou: racine, message: da.message });
   return findings;
 }
 
@@ -445,6 +456,31 @@ function selfTest() {
     if (r.status !== 1) casse.push("un dossier conçu sans relevé des garde-fous ne met pas l'oracle en échec — TM6 devait bloquer");
   }
 
+  // ---- TM7 : LES SCRIPTS QUI ACCORDENT UN DROIT (M-12, TF-1497) ----------------------------------
+  // Le script du cas fondateur, réduit à ses 3 défauts, et son remède.
+  const avecScript = (racine, identifiant, remede) => {
+    mkdirSync(join(racine, "infra"), { recursive: true });
+    writeFileSync(join(racine, "infra", "creer-connexion.sh"), [
+      `GRAPH_APP_RW_OWNEDBY="${identifiant}"`,
+      `az ad app permission add --id "$APP" --api 00000003-0000-0000-c000-000000000000 --api-permissions "$GRAPH_APP_RW_OWNEDBY=Role"${remede ? "" : " 2>/dev/null || true"}`,
+      ...(remede ? ["az ad app permission list --id \"$APP\" -o tsv | grep -q \"$GRAPH_APP_RW_OWNEDBY\""] : []),
+      "echo \"Application.ReadWrite.OwnedBy consentie\"",
+      "",
+    ].join("\n"), "utf8");
+    return racine;
+  };
+  // SANS OBJET : aucun identifiant Graph ni commande d'octroi.
+  attendre("tm7-sans-objet", join(dir, "vert"), "TM7", "SANS_OBJET");
+  // VERT : l'identifiant officiel, l'échec visible, l'effet relu avant l'annonce.
+  attendre("tm7-remede", avecScript(produit("tm7-remede", DOSSIER_OK, MARQUEUR), "18a4783c-866b-4cc7-a460-3d5e5662c884", true), "TM7", "PASS");
+  // ROUGE : le cas fondateur du 16/09/2026 — identifiant de mémoire, ajout masqué, « consentie » sans relecture.
+  const memoire = avecScript(produit("tm7-memoire", DOSSIER_OK, MARQUEUR), "18a4783c-866b-4cc7-a460-3d0e455740fd", false);
+  attendre("tm7-memoire", memoire, "TM7", "FAIL");
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), memoire], { encoding: "utf8" });
+    if (r.status !== 1) casse.push("un script qui accorde un droit sur un identifiant de mémoire ne met pas l'oracle en échec — TM7 devait bloquer");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -454,7 +490,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 20/20 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 24/24 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -464,7 +500,10 @@ function selfTest() {
       + "TM5 sans porte à base externe SANS_OBJET ; TM5 porte rejouée le jour du lancement PASS ; TM5 porte "
       + "datée de la VEILLE FAIL — le cas fondateur du 30/09/2026 ; TM5 bloque, code de sortie 1 vérifié ; "
       + "TM6 sans infrastructure Azure ni contrainte SANS_OBJET ; TM6 relevé daté et contrainte relue PASS ; TM6 "
-      + "dossier conçu sans relevé FAIL — le cas fondateur du 21/09/2026 ; TM6 bloque, code de sortie 1 vérifié)");
+      + "dossier conçu sans relevé FAIL — le cas fondateur du 21/09/2026 ; TM6 bloque, code de sortie 1 vérifié ; "
+      + "TM7 sans identifiant Graph ni octroi SANS_OBJET ; TM7 identifiant officiel, échec visible et effet relu "
+      + "PASS ; TM7 identifiant de mémoire, ajout masqué et « consentie » sans relecture FAIL — le cas fondateur "
+      + "du 16/09/2026 ; TM7 bloque, code de sortie 1 vérifié)");
   return casse.length ? 1 : 0;
 }
 
