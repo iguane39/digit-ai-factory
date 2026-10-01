@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.25.0",
- "date": "2026-09-28",
+ "version": "1.26.0",
+ "date": "2026-10-01",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -926,13 +926,14 @@
   {
    "cle": "chemin-de-livrable-au-dela-du-plafond-de-la-plateforme",
    "famille": "emplacement-livrable",
-   "libelle": "Un nom de livrable conforme a R-4 depasse, avec les sidecars d oracle qui le doublent (.oracles/<chemin>.oracles-historique.jsonl, 26 caracteres de plus), le plafond de chemin de la plateforme — 260 caracteres sous Windows — des que le depot est clone a plus d une centaine de caracteres de profondeur : le checkout echoue, et avec lui la verification sur clone frais que la doctrine prescrit avant tout push. La regle de nommage juge la FORME du nom, jamais sa LONGUEUR, et la procedure de clone ne declare pas core.longpaths. Le defaut ne se voit pas sur le poste de travail (chemin court) : il ne se voit qu au premier clone profond, c est-a-dire chez celui qui verifie",
+   "libelle": "Un nom de livrable conforme a R-4 depasse, avec les sidecars d oracle qui le doublent (.oracles/<chemin>.oracles-historique.jsonl, 34 caracteres de plus, mesure du 01/10/2026 ; 26 avant TF-1500), le plafond de chemin de la plateforme — 260 caracteres sous Windows — des que le depot est clone a plus d une centaine de caracteres de profondeur : le checkout echoue, et avec lui la verification sur clone frais que la doctrine prescrit avant tout push. La regle de nommage juge la FORME du nom, jamais sa LONGUEUR, et la procedure de clone ne declare pas core.longpaths. Le defaut ne se voit pas sur le poste de travail (chemin court) : il ne se voit qu au premier clone profond, c est-a-dire chez celui qui verifie",
    "creee_le": "2026-09-10",
    "fondee_par": [
-    "TF-1015"
+    "TF-1015",
+    "TF-1500"
    ],
    "regle": "REGLES-PROJET.md R-4 (forme du nom) — a completer d un plafond de longueur du chemin relatif, sidecars d oracle compris ; procedure de verification sur clone frais et bootstrap.mjs --rebatir : `git clone -c core.longpaths=true` declare, jamais suppose",
-   "oracle": "a creer : oracle-synthese — longueur du chemin relatif du fichier juge, plus 26 caracteres de sidecar, sous le plafond ; mesure de reference : `git clone` dans un chemin de 130 caracteres, 22 fichiers refuses le 10/09/2026",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S42 (chemin relatif du fichier jugé et chemins forge/ cités, plus 34 caractères de sidecar, sous le plafond ; 314350fe) et oracles/oracle-conformite-projet.mjs R-4 (même constante, calculée sur les 2 noms du sidecar ; 1649e884)",
    "voisines": [
     "emplacement-livrable-hors-convention",
     "porte-sans-chemin-des-tables"
@@ -1489,6 +1490,91 @@
    "oracle": "pilot, oracles/oracle-fraicheur-doc.mjs : chaque claim de oracles/fraicheur-claims.json confronte le compte cité à sa sonde (claim produits-connus-du-registre)",
    "voisines": [
     "marque-emettrice-portee-par-deux-chartes"
+   ]
+  },
+  {
+   "cle": "restitution-prose-coupee-en-dur",
+   "famille": "restitution-forme",
+   "libelle": "La prose d'une restitution est coupée à la main en lignes courtes : le chat de l'extension VS Code rend chaque saut de ligne, et le paragraphe s'affiche en colonne étroite au lieu d'occuper la largeur. Mesuré le 29/09/2026 chez Produit-03 (lot 20260929c) ; le 01/10/2026, 91 synthèses du pilot sur 215 étaient coupées.",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1494"
+   ],
+   "regle": "gabarits/RESTITUTION.md 2.32.0, règle de forme n° 9 : un paragraphe de prose s'écrit sur une seule ligne source (59379783)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S54, avertissante et hors des règles bloquantes du hook : accuse un paragraphe de prose écrit sur 2 lignes source ou plus ; paire rouge et verte au banc d'oracle-synthese",
+   "voisines": []
+  },
+  {
+   "cle": "garde-fou-de-plateforme-non-releve",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une contrainte imposée par la plateforme cible, une stratégie Deny par exemple, n'est relevée par aucune étape avant la conception d'un déploiement, et la séquence retenue se heurte à elle à l'exécution ; une contrainte déjà trouvée par un produit voisin ne circule pas. Mesuré le 29/09/2026 chez Produit-03 (lot 20260929d) : la livraison de production refusée par une stratégie de la souscription posée le 03/07.",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1495"
+   ],
+   "regle": "ETAPE-MEP.md § 1 ter et porte M-11 : relever les stratégies de la portée cible et lire le registre references/GARDE-FOUS-PLATEFORME.json avant de concevoir un déploiement (5da8a71c)",
+   "oracle": "pilot, scripts/verifier-garde-fous.mjs (GF-1 relevé daté, GF-3 registre lu ; GR-1 à GR-3 sur le registre), câblé en TM6 bloquant d'oracles/oracle-trace-mutation-mep.mjs ; banc scripts/verifier-garde-fous.test.mjs",
+   "voisines": [
+    "contrainte-client-connue-non-consultee"
+   ]
+  },
+  {
+   "cle": "contrainte-client-connue-non-consultee",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une contrainte du client ou de sa plateforme, déjà connue du produit, écrite en commentaire d'un environnement ou décrite par l'humain, n'est pas consultée quand on conçoit le déploiement suivant, et l'option retenue se heurte à elle. Mesuré le 29/09/2026 chez Produit-03 (lot 20260929e) : un commentaire « Obligatoire ici » de la qualification et le processus décrit par l'humain le 21/09, ignorés par l'ordre de déploiement retenu.",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1496"
+   ],
+   "regle": "ETAPE-MEP.md § 1 ter : relire les contraintes connues avant toute option d'ordre de déploiement, promouvoir le commentaire « Obligatoire ici », inscrire mot pour mot la parole de l'humain (5da8a71c) ; gabarits/RESTITUTION.md : une option impossible le dit en Exclusions (54ac8120)",
+   "oracle": "pilot, scripts/verifier-garde-fous.mjs (GF-2 commentaire « Obligatoire ici » relu, GF-4 parole citée), câblé en TM6 d'oracles/oracle-trace-mutation-mep.mjs ; banc scripts/verifier-garde-fous.test.mjs",
+   "voisines": [
+    "garde-fou-de-plateforme-non-releve",
+    "regle-ecrite-sans-oracle-qui-la-joue"
+   ]
+  },
+  {
+   "cle": "identifiant-de-plateforme-en-dur-jamais-resolu",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un identifiant de plateforme (permission, rôle, application first-party) est écrit en dur dans le code sans être résolu contre la plateforme, et l'étape qui l'emploie annonce son effet sans le relire. Mesuré le 30/09/2026 chez Produit-03 (lot 20260930a) : un identifiant de permission Graph faux sur ses 10 derniers caractères, ajouté en masquant l'échec, puis annoncé « consentie ».",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1497"
+   ],
+   "regle": "ETAPE-MEP.md § 3 octies et porte M-12 : un identifiant se résout dans le tour qui l'écrit, une étape d'octroi relit son effet et ne masque pas l'échec (939c3d9a)",
+   "oracle": "pilot, scripts/verifier-droits-accordes.mjs (DA-1 identifiant inconnu ou quasi-homonyme, DA-2 échec masqué, DA-3 succès annoncé sans relecture) sur la table datée references/PERMISSIONS-GRAPH.json, câblé en TM7 d'oracles/oracle-trace-mutation-mep.mjs ; banc scripts/verifier-droits-accordes.test.mjs",
+   "voisines": [
+    "interface-tierce-ecrite-de-memoire"
+   ]
+  },
+  {
+   "cle": "verdict-de-porte-perime-au-lancement",
+   "famille": "hook-ou-gate",
+   "libelle": "Un feu vert de lancement repose sur le verdict passé des portes qui jugent une base externe mouvante (avis de sécurité, base de vulnérabilités, dépôt de paquets) : le même commit, vert en qualification, est refusé le lendemain en production, et le lancement de l'exploitant est perdu. Mesuré le 30/09/2026 chez Produit-03 (lot 20260930b) : 3 avis publiés dans la nuit ont arrêté la livraison à npm audit.",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1498"
+   ],
+   "regle": "ETAPE-MEP.md porte M-10 et § 3 nonies : les portes à base externe se rejouent le jour du lancement, sur l'objet lancé (4924bb89) ; gabarits/RESTITUTION.md 2.32.0 : le guide de lancement porte leur sortie datée du jour (71b878b8)",
+   "oracle": "pilot, scripts/verifier-portes-du-jour.mjs (PJ-0 à PJ-3), câblé en TM5 bloquant d'oracles/oracle-trace-mutation-mep.mjs, banc scripts/verifier-portes-du-jour.test.mjs ; et oracles/oracle-synthese.mjs S56, avertissante",
+   "voisines": [
+    "recette-locale-ne-rejoue-pas-l-environnement-de-la-ci",
+    "compte-cite-en-dur-perime"
+   ]
+  },
+  {
+   "cle": "livrable-juge-sur-le-seul-poste-producteur",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un livrable n'est jugé que sur le poste qui l'a produit : ses ressources embarquées ne sont jamais décodées, et un défaut invisible au producteur part chez le destinataire. Mesuré le 30/09/2026 chez digit-ai-marketing : 5 versions d'un deck aux 8 polices embarquées fausses, PASS à toutes les portes.",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1501",
+    "TF-1504"
+   ],
+   "regle": "gabarits/CLAUDE-PRODUIT.md, tableau des règles de socle : tout livrable qui embarque des polices est jugé sur ces polices décodées avant remise (7e920a6c)",
+   "oracle": "digit-ai-forge-agents, .claude/skills/quality-oracles/scripts/oracle-polices-embarquees.mjs (E0 décodage, E1 contours, E2 boîte englobante ; PPTX, DOCX, PDF et page HTML), routé par run-oracles (efca58a, c58d1c1)",
+   "voisines": [
+    "oracle-remplace-par-controle-maison"
    ]
   }
  ],
