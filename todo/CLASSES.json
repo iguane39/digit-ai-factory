@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.27.0",
+ "version": "1.28.0",
  "date": "2026-10-01",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -1589,6 +1589,35 @@
    "oracle": "digit-ai-forge-agents, .claude/skills/quality-oracles/scripts/oracle-terraform.mjs, règle maison D1 (date écrite en dur dont le mois précède le mois d'application, --date-application), après les standards terraform fmt -check et validate ; fixtures terraform-green et terraform-red",
    "voisines": [
     "compte-cite-en-dur-perime"
+   ]
+  },
+  {
+   "cle": "processus-du-commanditaire-reattribue",
+   "famille": "restitution-forme",
+   "libelle": "Une voie proposée à l'humain confie une étape à un autre acteur que celui que son processus, déjà décrit, nomme, ou y AJOUTE une étape qu'il ne contient pas (une demande en amont, une autorisation préalable, un script joué par la session à la place d'un étage de la chaîne). Mesuré le 01/10/2026 chez Produit-03 : 7 retours humains en 4 heures, une étape absente ajoutée 2 fois.",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1518",
+    "TF-1542"
+   ],
+   "regle": "gabarits/RESTITUTION.md 2.33.0, bloc 3 : une voie proposée se relit contre le processus du commanditaire étape par étape et acteur par acteur (décision humaine « 42a » du 01/10/2026)",
+   "oracle": "pilot, oracles/hook-lexique.mjs, consigne « processus » injectée sur le message humain qui décrit ou corrige un processus ; recette --self-test (3 messages réels reconnus, 3 phrases voisines épargnées) et oracles/hook-lexique.test.mjs",
+   "voisines": [
+    "voie-automatique-non-cherchee-avant-geste-humain"
+   ]
+  },
+  {
+   "cle": "decision-posee-hors-du-ressort-humain",
+   "famille": "restitution-forme",
+   "libelle": "Une décision est posée à l'humain alors qu'elle ne porte aucun motif qui lui revienne (dépense, publication, geste irréversible, doctrine, arbitrage de préférence, écriture chez un produit) : une clôture sur preuve ou un correctif réversible attend une réponse qu'il suffisait d'exécuter. Mesuré le 01/10/2026 sur la première revue hebdomadaire : 6 décisions sur 7.",
+   "creee_le": "2026-10-01",
+   "fondee_par": [
+    "TF-1550"
+   ],
+   "regle": "REGLES-PROJET.md R-58 (décision humaine du 01/10/2026) ; gabarits/RESTITUTION.md 2.33.0, bloc 3 ; references/TODO-FORGE.md, revue hebdomadaire, point 6",
+   "oracle": "pilot, todo/revue-hebdo.mjs, tri par le champ ressort de la fiche de décision : une proposition hors du ressort humain n'est pas posée, une fiche sans ressort est listée à instruire ; recette --self-test à double sens",
+   "voisines": [
+    "decision-humaine-rendue-restituee-sans-geste"
    ]
   }
  ],
