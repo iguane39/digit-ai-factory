@@ -312,7 +312,7 @@ Chaque élément opérationnel du verdict remonte à l'intention citée plus hau
 
 - « intégration avancée » : 4 niveaux de récursion identifiés, les 4 atteints par O2 à son étape 3.
 - « RSI » : transposé à l'échafaudage (Transposition ; options O2 à O4).
-- « SSL » : transposé à l'évaluation, 6 gisements mesurés (Gisements).
+- « SSL » : transposé à l'évaluation, 7 gisements inventoriés, dont 6 mesurés (Gisements).
 - « dans la Factory, ses forges et les produits qui les utilisent » : section Portée.
 - « étude d'opportunités » : options O0 à O4, verdict O2, essais bornés.
 
