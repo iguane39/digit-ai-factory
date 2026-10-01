@@ -148,6 +148,7 @@ un signal nommé ouvre un travail.
 | forge-agents | `skills/digit-ai-page-html/scripts/check_html.py` | empreinte du JEU DE RÈGLES, citée au journal d'oracle (R-32) | empreinte de règles, pas de contenu |
 | forge-agents | `skills/forge-agents/scripts/otlp-project.mjs` | identifiant de trace d'un envoi de télémétrie | usage interne, déclaré |
 | forge-agents | `skills/digit-ai-propale/scripts/construire-referentiel-ao.mjs` | référentiel d'exigences d'une réponse à appel d'offres construit depuis RC/CCTP (TF-1026, 14/09) : un sha256 par source (RC modifié → PÉRIMÉ) et un pour le corps du référentiel (clé `referentiel.md#corps` : ligne retirée → AMPUTÉ), vérifiés par `--verifier` ; recette `--self-test` | `forge-ops/empreinte@1` — texte normalisé LF, empreinte en commentaire HTML en tête du référentiel |
+| forge-agents | `skills/quality-oracles/scripts/oracle-image-conteneur.mjs` | ne scelle AUCUN fichier : nomme l'image TEMPORAIRE que son mode Dockerfile construit pour le scan trivy (TF-1499, 01/10/2026), d'après le chemin du Dockerfile et l'heure ; l'étiquette n'est jamais consignée, et l'image est retirée après le scan | usage interne, déclaré — 12 hex de sha256 dans l'étiquette `qo-scan-…` |
 
 **Contrôlé** : `node oracles\oracle-empreintes.mjs [racine]` — E1 les sites déclarés existent
 encore · E2 aucun site de scellement non déclaré · E3 une empreinte au format `@1` est complète et
