@@ -347,6 +347,13 @@ une décision humaine.
 5. **La réponse.** Chaque sélecteur reçu se consigne par `todo\journaliser.mjs` : (a) ou (b) font
    passer la candidature en `decide` avec l'option retenue, (c) la laisse `candidat`, et elle
    revient à la revue suivante.
+6. **Le tri, avant tout (R-58, décision humaine du 01/10/2026).** La fiche porte `ressort` :
+   `{humain: true, motif}` quand la décision revient au porteur (`depense`, `publication`,
+   `irreversible`, `doctrine`, `arbitrage`, `produit`), `{humain: false, pourquoi}` sinon. Le dossier
+   ne pose que les premières ; les secondes y figurent sous « Mises en œuvre sans vous, pour
+   information », et la session les exécute dans le même tour : `decide` avec pour décideur « R-58 »,
+   puis la clôture ordinaire. Une fiche sans `ressort` est listée à instruire. Mesuré sur la première
+   revue : 6 décisions sur 7 n'avaient pas à être posées.
 
 Contrôle : `node todo\revue-hebdo.mjs --self-test` (rendu au format du bloc 3, candidature décidée
 écartée, fiche incomplète listée avec ses manques).

@@ -501,6 +501,23 @@ check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
 });
 
+// R-23 (TF-1464, 01/10/2026) — LA FICHE D'ACCÈS JUGÉE PAR LE MOTIF PARTAGÉ. R-23 portait une copie
+// plus étroite du motif de secret fort : une clé d'API à tirets internes (forme sk-ant-api03-…) et
+// les jetons GitHub ghs_ lui échappaient, quand MOTIF_SECRET_EX (R-13, R-47) les reconnaissait. Les
+// valeurs se composent à l'exécution : écrites en clair, elles feraient sonner les portes de secrets.
+for (const [nom, valeur] of [["clé à tirets internes", "sk-" + "ant-api03-" + "a".repeat(12) + "-" + "b".repeat(10)], ["jeton ghs_", "gh" + "s_" + "c".repeat(24)]]) {
+  check(`rouge R-23 : une fiche d'accès qui porte ce secret est refusée (${nom})`, () => {
+    const d = mkdtempSync(join(tmpdir(), "conf-r23-"));
+    mkdirSync(join(d, "docs", "projet"), { recursive: true });
+    writeFileSync(join(d, "docs", "projet", "ACCES-TEST.md"),
+      "---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-10-01\n---\n# Accès\n\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n\ncle = " + valeur + "\n");
+    const { rapport } = lance(d);
+    rmSync(d, { recursive: true, force: true });
+    if (!rapport.findings.some((f) => f.regle === "R-23" && f.statut === "FAIL" && /motif de secret réel/.test(f.message)))
+      throw new Error(`le secret passe R-23 (${nom})`);
+  });
+}
+
 // ---- R-23, SECOND VOLET (TF-1088) — LA PAGE SERVIE, PAS SEULEMENT LA FICHE ----------------
 //
 // La paire sort du banc des défauts échappés, cas E-01 (phase MEP) : « des identifiants de

@@ -1503,3 +1503,37 @@ Contrôle exécutable : `oracle-lot-retours` règles `R-57` et `LOT-MURS` (recet
 `gabarits\oracle-lot-retours.test.mjs`) ; consigne R-57 de `oracles\hook-lexique.mjs` (recette
 `--self-test` et `oracles\hook-lexique.test.mjs`) ; la famille remontée, par
 `oracles\oracle-gabarits-documents.mjs`. Classe : `document-mur-non-remonte` (`todo\CLASSES.json`).
+
+## AM. R-58 — seules les décisions qui reviennent à l'humain lui sont posées ; les autres s'exécutent et se rendent pour information (décision humaine du 01/10/2026)
+
+Décision humaine directe du 01/10/2026, mot pour mot : « Je souhaite que les décisions soient
+analysées à chaque fois pour s'assurer que seules celles où je dois répondre me soient posées. Les
+autres doivent être mises en oeuvre sans mon intervention, je dois juste être informé des traitements
+/ décisions qui vont être réalisés ou qui ont été réalisés, pour information. je reviendrai dessus si
+besoin. » Elle répond à la question « parmi les décisions proposées, il n'y a pas des décisions qui
+pourraient être prises automatiquement, par logique ? », posée sur la première revue hebdomadaire du
+même jour : 6 décisions sur 7 n'avaient pas à l'être (2 clôtures sur preuve, 2 corrections de forge
+que R-55 rendait déjà automatiques, 2 corrections du pilot réversibles et sans dépense).
+
+**R-58.**
+1. **Toute décision envisagée s'analyse avant d'être posée.** Elle revient à l'humain si, et
+   seulement si, elle porte au moins un de ces motifs : `depense` (elle engage une dépense),
+   `publication` (elle publie ou pousse hors du poste, R-38), `irreversible` (elle supprime ou fait
+   un geste qu'on ne défait pas), `doctrine` (elle crée ou change une règle opposable aux produits, au
+   noyau ou à la gouvernance), `arbitrage` (elle choisit entre des options réellement concurrentes sur
+   une préférence du porteur et non sur un fait), `produit` (elle écrit chez un produit autonome hors
+   run demandé).
+2. **Sans aucun de ces motifs, la session exécute l'option recommandée** sans attendre, sous les
+   règles ordinaires (oracles rejoués verts, registre, descente R12), et le rend **pour information** :
+   ce qui a été fait au bloc 4, ce qui va l'être au bloc 8 en `auto_ia`. Une option (b) ou (c) écrite
+   pour la forme ne fait pas d'une correction un arbitrage.
+3. **Au registre**, une candidature ainsi tranchée passe en `decide` avec pour décideur « R-58 » et
+   le motif d'absence de ressort humain ; la fiche de décision porte `ressort` ({humain, motif} ou
+   {humain: false, pourquoi}), et la revue hebdomadaire ne pose que les premières.
+4. **Ce que R-58 n'ouvre PAS** : elle ne lève ni R-38 (publication), ni R-29 (dépenses et gates), ni
+   la règle des produits autonomes ; elle ne change pas les décisions déjà rendues ; l'humain revient
+   sur toute décision prise sans lui, et sa réponse prime.
+
+Contrôle exécutable : `todo\revue-hebdo.mjs`, tri par le champ `ressort` (recette `--self-test`, à
+double sens : une proposition hors du ressort humain n'est pas posée, une fiche sans ressort est
+listée à instruire). Classe : `decision-posee-hors-du-ressort-humain` (`todo\CLASSES.json`).

@@ -34,7 +34,24 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const valeur = (nom, defaut = null) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : defaut; };
 
-const CHAMPS = ["question", "avantages", "inconvenients", "impacts", "options", "recommandation", "source"];
+const CHAMPS = ["question", "avantages", "inconvenients", "impacts", "options", "recommandation", "source", "ressort"];
+
+/**
+ * LE TRI AVANT LA REVUE (règle humaine du 01/10/2026, R-58) : « Je souhaite que les décisions soient
+ * analysées à chaque fois pour s'assurer que seules celles où je dois répondre me soient posées. Les
+ * autres doivent être mises en oeuvre sans mon intervention, je dois juste être informé des traitements
+ * / décisions qui vont être réalisés ou qui ont été réalisés, pour information. » La fiche porte donc
+ * `ressort` : {humain: true, motif} quand la décision revient au porteur, {humain: false, pourquoi}
+ * sinon. Mesuré sur la première revue du même jour : 6 décisions sur 7 n'avaient pas à être posées.
+ */
+export const MOTIFS_HUMAINS = {
+  depense: "engage une dépense",
+  publication: "publie ou pousse hors du poste (R-38)",
+  irreversible: "supprime ou fait un geste qu'on ne défait pas",
+  doctrine: "crée ou change une règle opposable aux produits, au noyau ou à la gouvernance",
+  arbitrage: "choisit entre des options réellement concurrentes, sur une préférence du porteur et non sur un fait",
+  produit: "écrit chez un produit autonome, hors run demandé",
+};
 
 /** État courant de chaque id : la création, puis chaque `maj` fusionnée dans l'ordre. */
 export function etatCourant(texte) {
@@ -58,6 +75,11 @@ export function manques(f) {
     if (!opt?.libelle || !opt?.cout || !opt?.exclusions) m.push(`options.${o}`);
   }
   if (f.recommandation && !["a", "b", "c"].includes(f.recommandation)) m.push("recommandation (a, b ou c)");
+  if (f.ressort && typeof f.ressort === "object") {
+    if (f.ressort.humain === true && !MOTIFS_HUMAINS[f.ressort.motif]) m.push(`ressort.motif (${Object.keys(MOTIFS_HUMAINS).join(", ")})`);
+    else if (f.ressort.humain === false && !String(f.ressort.pourquoi || "").trim()) m.push("ressort.pourquoi");
+    else if (f.ressort.humain !== true && f.ressort.humain !== false) m.push("ressort.humain (true ou false)");
+  }
   return [...new Set(m)];
 }
 
@@ -92,8 +114,14 @@ export function rendreDecision(n, e) {
 export function construire({ texteRegistre, depuis, max = 7, jour }) {
   const candidats = [...etatCourant(texteRegistre).values()].filter((e) => e.statut === "candidat");
   const prets = candidats.filter((e) => !manques(e.fiche_decision).length).sort((x, y) => valeurDe(y) - valeurDe(x));
-  const retenus = prets.slice(0, max);
-  const reportes = prets.slice(max);
+  const automatiques = prets.filter((e) => e.fiche_decision.ressort.humain === false);
+  const humains = prets.filter((e) => e.fiche_decision.ressort.humain === true);
+  const retenus = humains.slice(0, max);
+  const reportes = humains.slice(max);
+  const ligneAuto = (e) => {
+    const f = e.fiche_decision;
+    return `- ${f.rappel || e.titre} Option appliquée : ${f.options[f.recommandation].libelle}. Pourquoi sans vous : ${f.ressort.pourquoi}.`;
+  };
   const aInstruire = candidats.filter((e) => e.fiche_decision && manques(e.fiche_decision).length)
     .map((e) => ({ id: e.id, titre: e.titre, manques: manques(e.fiche_decision) }));
   const decisions = retenus.map((e, i) => ({ d: `D-${depuis + i}`, id: e.id }));
@@ -101,15 +129,23 @@ export function construire({ texteRegistre, depuis, max = 7, jour }) {
   const corps = [
     `# Revue hebdomadaire des propositions — ${jour}`,
     "",
-    `${retenus.length} proposition(s) à trancher cette semaine, classées par valeur au registre. Chacune dit ses avantages, ses inconvénients et ses impacts, puis ses 3 options ; la colonne Coût dit la complexité et la durée, la colonne Exclusions ce que retenir l'option ferme.`,
+    `${retenus.length} proposition(s) vous reviennent cette semaine, classées par valeur au registre. Chacune dit ses avantages, ses inconvénients et ses impacts, puis ses 3 options ; la colonne Coût dit la complexité et la durée, la colonne Exclusions ce que retenir l'option ferme.`,
     "",
-    retenus.length ? `Pour répondre, une ligne suffit, par exemple : « ${reponse} ». Une décision sans réponse prend son option (c).` : "Aucune proposition n'a de fiche complète cette semaine : rien n'est à trancher.",
+    retenus.length ? `Pour répondre, une ligne suffit, par exemple : « ${reponse} ». Une décision sans réponse prend son option (c).` : "Aucune proposition ne vous revient cette semaine : rien n'est à trancher.",
     "",
+    automatiques.length ? [
+      "## Mises en œuvre sans vous, pour information",
+      "",
+      "Ces propositions ne relèvent d'aucun motif qui vous revienne (dépense, publication, geste irréversible, doctrine, arbitrage de préférence, écriture chez un produit) : la session applique l'option recommandée et vous en rend compte. Vous pouvez revenir sur chacune.",
+      "",
+      ...automatiques.map(ligneAuto),
+      "",
+    ].join("\n") : "",
     ...retenus.map((e, i) => rendreDecision(depuis + i, e)),
     reportes.length ? `## Reportées à la semaine suivante\n\n${reportes.map((e) => `- ${e.titre}, valeur ${valeurDe(e)}`).join("\n")}\n` : "",
     aInstruire.length ? `## À instruire avant d'être présentées\n\n${aInstruire.map((x) => `- ${x.titre} — manque : ${x.manques.join(", ")}`).join("\n")}\n` : "",
   ].join("\n").replace(/\n{3,}/g, "\n\n");
-  return { corps, decisions, reportes: reportes.map((e) => e.id), aInstruire };
+  return { corps, decisions, automatiques: automatiques.map((e) => ({ id: e.id, option: e.fiche_decision.recommandation })), reportes: reportes.map((e) => e.id), aInstruire };
 }
 
 function selfTest() {
@@ -121,13 +157,16 @@ function selfTest() {
     options: { a: { libelle: "Lancer le banc", cout: "moyen × court", exclusions: "aucune" },
       b: { libelle: "Le limiter à 3 oracles", cout: "simple × court", exclusions: "7 oracles non mesurés" },
       c: { libelle: "Reporter", cout: "nul", exclusions: "les défauts restent découverts après coup" } },
-    recommandation: "a", source: "l'étude du 01/10/2026",
+    recommandation: "a", source: "l'étude du 01/10/2026", ressort: { humain: true, motif: "arbitrage" },
   };
+  const ficheAuto = { ...fiche, question: "Faut-il corriger le motif local", ressort: { humain: false, pourquoi: "défaut reproduit, correction réversible, sans dépense ni doctrine" } };
   const reg = [
     { ev: "creation", id: "TF-9001", titre: "Banc de mutation des oracles", score: { valeur: 6 }, fiche_decision: fiche },
     { ev: "creation", id: "TF-9002", titre: "Proposition sans fiche complète", score: { valeur: 9 }, fiche_decision: { question: "Faut-il ?" } },
     { ev: "creation", id: "TF-9003", titre: "Déjà décidée", score: { valeur: 9 }, fiche_decision: fiche },
     { ev: "maj", id: "TF-9003", statut: "decide" },
+    { ev: "creation", id: "TF-9004", titre: "Correctif sans arbitrage", score: { valeur: 20 }, fiche_decision: ficheAuto },
+    { ev: "creation", id: "TF-9005", titre: "Fiche sans ressort", score: { valeur: 9 }, fiche_decision: { ...fiche, ressort: undefined } },
   ].map((e) => JSON.stringify(e)).join("\n");
   const r = construire({ texteRegistre: reg, depuis: 40, max: 7, jour: "2026-10-01" });
   const casse = [];
@@ -138,8 +177,11 @@ function selfTest() {
     if (!r.corps.includes(m)) casse.push(`le dossier ne porte pas « ${m} »`);
   if (r.corps.includes("Déjà décidée")) casse.push("une candidature déjà décidée est représentée");
   if (!/Proposition sans fiche complète — manque : avantages/.test(r.corps)) casse.push("la fiche incomplète n'est pas listée à instruire avec ses manques");
+  if (r.decisions.some((x) => x.id === "TF-9004")) casse.push("une proposition qui ne relève pas de l'humain lui est posée");
+  if (!/## Mises en œuvre sans vous, pour information[\s\S]*Option appliquée : Lancer le banc/.test(r.corps) || r.automatiques[0]?.id !== "TF-9004") casse.push("la proposition hors du ressort humain n'est pas rendue pour information");
+  if (!/Fiche sans ressort — manque : ressort/.test(r.corps)) casse.push("une fiche sans ressort n'est pas listée à instruire");
   writeFileSync(join(dir, "r.jsonl"), reg);
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — 1 décision rendue au format du bloc 3 (avantages, inconvénients, impacts, recommandation, tableau, repli), la décidée écartée, l'incomplète listée à instruire avec ses manques");
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — 1 décision rendue au format du bloc 3 (avantages, inconvénients, impacts, recommandation, tableau, repli), 1 proposition hors du ressort humain rendue pour information et non posée, la décidée écartée, l'incomplète et celle sans ressort listées à instruire");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -157,6 +199,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const sortie = valeur("--sortie");
   if (sortie) writeFileSync(sortie, r.corps + "\n", "utf8");
   else process.stdout.write(r.corps + "\n\n");
-  appendFileSync(journal, JSON.stringify({ ts: new Date().toISOString(), dossier: sortie, decisions: r.decisions, reportes: r.reportes }) + "\n");
-  console.log(JSON.stringify({ outil: "revue-hebdo", dossier: sortie, decisions: r.decisions, a_instruire: r.aInstruire.map((x) => x.id) }));
+  appendFileSync(journal, JSON.stringify({ ts: new Date().toISOString(), dossier: sortie, decisions: r.decisions, automatiques: r.automatiques, reportes: r.reportes }) + "\n");
+  console.log(JSON.stringify({ outil: "revue-hebdo", dossier: sortie, decisions: r.decisions, automatiques: r.automatiques, a_instruire: r.aInstruire.map((x) => x.id) }));
 }

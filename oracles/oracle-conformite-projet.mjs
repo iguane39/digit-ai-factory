@@ -2099,7 +2099,8 @@ else {
     if (!t.includes("comptes de démonstration locale — jamais valides hors MODE_DEMO")) {
       ko("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête dur absent : « comptes de démonstration locale — jamais valides hors MODE_DEMO »"); ok23 = false;
     }
-    if (/AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|gho_[A-Za-z0-9]{20,}|sk-[a-zA-Z0-9]{20,}|BEGIN [A-Z ]*PRIVATE KEY|xox[bpors]-/.test(t)) {
+    // TF-1464 : le motif partagé, et non une copie plus étroite (clé à tirets internes, jetons ghs_, ghu_, ghr_).
+    if (MOTIF_SECRET_EX.test(t)) {
       ko("R-23", "docs\\projet\\ACCES-TEST.md", "motif de secret réel détecté — aucun secret, jamais (R-14) ; les accès réels sont des références « # à fournir : »"); ok23 = false;
     }
     // R-23 (TF-0871) — UNE FICHE D'ACCÈS NOMME DES VARIABLES, JAMAIS DES VALEURS.

@@ -65,6 +65,20 @@ export function verdictDeForme(message) {
   return false;
 }
 
+/**
+ * LA CONSIGNE DU PROCESSUS (décision humaine du 01/10/2026, réponse « 42a ») — un message humain qui
+ * DÉCRIT ou CORRIGE un processus fixe ses étapes autant que ses acteurs. Le fait : chez un produit,
+ * 7 retours humains en 4 heures, parce qu'une étape absente du processus avait été ajoutée 2 fois
+ * (« Logiquement tu ne devrais rien demander à l'administrateur Entra avant que l'appli soit
+ * déployée », puis « Non, cette étape doit être dans le pipeline »). Reconnu : dans une même
+ * phrase, un mot d'ordre ou d'étape et une tournure de correction ou de prescription.
+ */
+const MOT_DE_PROCESSUS = /\b(?:processus|[ée]tapes?|pipeline|cha[îi]ne\s+de\s+(?:livraison|d[ée]ploiement))\b|\ben\s+amont\b|\bavant\s+(?:que|de|d['’])/iu;
+const CORRECTION_DE_PROCESSUS = /(?:^|[\s:])non\s*,|\bne\s+(?:devrais|devrait|dois|doit|faut)\b|\bdoit\s+[êe]tre\b|\blogiquement\b|\bpas\s+de\s+\p{L}+[^.!?\n]*\ben\s+amont\b/iu;
+export function correctionDeProcessus(message) {
+  return String(message || "").split(/[.!?\n]/).some((p) => MOT_DE_PROCESSUS.test(p) && CORRECTION_DE_PROCESSUS.test(p));
+}
+
 export const CONSIGNES = [
   { regle: "R-57", forme: "verdict de forme ou demande de gabarit",
     reconnait: (m) => DEMANDE_GABARIT.test(m) || verdictDeForme(m),
@@ -73,6 +87,13 @@ export const CONSIGNES = [
       "de `gabarits\\documents\\` ou des composants —, jamais sa matière ; citer le verdict mot pour mot et daté " +
       "sous « ## Documents mûrs » du lot de retours. Ne pas le faire est un défaut de classe " +
       "« document-mur-non-remonte » (todo/CLASSES.json)." },
+  { regle: "processus", forme: "processus décrit ou corrigé par l'humain",
+    reconnait: correctionDeProcessus,
+    texte: "Ce message décrit ou corrige un PROCESSUS — qui fait quoi, et dans quel ordre. Toute voie proposée " +
+      "se relit contre lui ÉTAPE PAR ÉTAPE et ACTEUR PAR ACTEUR : une option qui ajoute une étape qu'il ne contient " +
+      "pas, ou confie une étape à un autre acteur, est exclue. Si un fait technique semble l'exiger, mesurer d'abord " +
+      "les voies automatiques (loi n° 5), puis poser UNE décision qui porte la voie tenant le processus tel quel et " +
+      "son risque mesuré (gabarits\\RESTITUTION.md, bloc 3). Classe « processus-du-commanditaire-reattribue »." },
 ];
 
 /** Rend les consignes de règle reconnues dans un message (hors code cité) : [{regle, forme, texte}]. */
@@ -258,6 +279,12 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ["Top 5 des corrections à faire avant l'envoi", []],
     ["Le prompt réécrit est bon, on le garde tel quel", []],
     ["le composant `format top` est cité dans le code", []],
+    ["Logiquement tu ne devrais rien demander à l'administrateur Entra avant que l'appli soit déployée, que l'on arrive sur la page de l'application", ["processus"]],
+    ["66 : Non, cette étape doit être dans le pipeline. Ajoute là au pipeline de prod", ["processus"]],
+    ["Pas de demande d'inscription de l'appli en amont.", ["processus"]],
+    ["Ajoute une étape de tests au run", []],
+    ["Tu ne devrais pas utiliser ce mot dans le titre", []],
+    ["Non, garde la version précédente", []],
   ];
   for (const [msg, attendu] of casConsignes) {
     const obtenu = reconnaitreConsignes(msg).map((c) => c.regle);

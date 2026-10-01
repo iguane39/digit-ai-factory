@@ -71,7 +71,11 @@ const BALISE_FIN = "<!-- index-livrables:fin -->";
 
 /** Les fichiers que git suit sous `racine` (chemins relatifs à elle), ou null hors dépôt git. */
 function suivisDe(racine) {
-  const r = spawnSync("git", ["-C", racine, "-c", "core.quotepath=false", "ls-files", "-z", "--", "."], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  // TF-1414 : git exporte GIT_DIR aux crochets d'un arbre de travail lié ; hérité, il fait lister le
+  // mauvais arbre et l'index publié se vidait. `-C racine` suffit à trouver le dépôt.
+  const env = { ...process.env };
+  delete env.GIT_DIR; delete env.GIT_WORK_TREE;
+  const r = spawnSync("git", ["-C", racine, "-c", "core.quotepath=false", "ls-files", "-z", "--", "."], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, env });
   if (r.status !== 0) return null;
   const s = new Set(r.stdout.split("\0").filter(Boolean));
   return s.size ? s : null;
