@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-7 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-10 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -141,7 +141,7 @@ et elle grossit par les incidents, pas par la devinette.
 
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
 
-Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
+10 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
@@ -153,8 +153,8 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
 | M-7 | Travail planifié | **si et seulement si** le produit embarque une définition planifiée (cron) : elle porte un mode d'exercice à la demande CÂBLÉ, distinct de sa cadence, et elle a été EXERCÉE une fois — verdict O-8 de forge-ops, § 3 quinquies, TF-0527 |
 | M-8 | **Jalon de fraîcheur DÉRIVÉ DE TOUT L'ENSEMBLE DÉPLOYÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est une **fonction de l'ENSEMBLE déployé** — empreinte du **manifeste de l'arbre de sortie** (chemins triés + hachages, condensés), ou **identifiant de commit injecté à la génération**. Jamais un numéro tenu à la main ; **jamais non plus l'empreinte d'un artefact échantillonné**. Le critère tient en une phrase : *si on ne sait pas dire « elle change dès que N'IMPORTE QUOI change », le jalon échantillonne.* Preuve exigée : un **test négatif joué sur un fichier QUELCONQUE de l'arbre**, pas sur celui que la porte regarde — §3 sexies, TF-0666 et TF-0672. **Contrôle exécutable : la règle O-7 de forge-ops** (`node <ops>\oracles\oracle-ops.mjs <cible> --empreinte`, empreinte de l'ensemble déployé confrontée au scellé) ; sa preuve par perturbation — une page hors accueil modifiée, qu'un critère sur une seule page ne voit pas et qu'O-7 nomme — est jouée au self-test de forge-ops depuis 2fe5f3d (TF-1075) |
-
 | M-9 | **404 personnalisée, par langue, statut conservé** | **si et seulement si** le produit a une surface web : sur l'instance staging servie, (a) une adresse inconnue sous chaque préfixe de langue rend **404** (jamais 200) avec une page du MÊME gabarit que les autres — menu, charte, liens de secours — dans la langue du préfixe, **et une adresse inconnue SANS préfixe rend le même 404 dans la langue par défaut** (TF-0809) ; (b) la page porte `noindex` et l'exclusion du sitemap est **déclarée** dans l'oracle SEO du produit ; (c) une ressource non-HTML inconnue rend un 404 **nu**. Preuve : la sortie JSON de la **recette générique de forge-tests** `recette\quatre_cent_quatre.py` (paramètres : URL de staging, préfixes de langue, langue par défaut, sitemap — TF-0803, 05/09/2026) jouée contre l'instance staging ; un contrôle propre au produit n'est admis que s'il joue les mêmes cas et le dit (TF-0808). Patron **P-2**, `references\PATRONS-EPROUVES.md` — TF-0802. |
+| M-10 | **Portes à base externe, rejouées le jour du lancement** | **si et seulement si** la chaîne du produit joue une porte qui juge une base externe (avis de dépendances, base de vulnérabilités, dépôt de paquets). Le feu vert du dossier de MEP porte la sortie de chacune, rejouée le jour même du lancement sur l'objet lancé, jamais le verdict de la qualification. Contrôle exécutable : `node scripts\verifier-portes-du-jour.mjs <produit>`, joué en TM5 par `oracle-trace-mutation-mep` — § 3 nonies, TF-1498 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -318,6 +318,61 @@ réel manquaient au document (TF-1114).
 l'export) attend un vocabulaire de statut au document, en étude avec TF-1113 ; la justesse d'une
 mesure de non-régression n'est pas jugée, seulement sa présence.
 
+### § 3 nonies — Un feu vert de lancement rejoue le jour même les portes qui jugent une base externe (M-10, TF-1498)
+
+**Le fait, du 30/09/2026 chez Produit-03.** À 11h26, une restitution remet à l'exploitant le
+message de lancement de la production. Ses vérifications d'avant lancement portent sur le gabarit
+commun, la connexion de production et la stratégie d'authentification ; ni `npm audit` ni le scan
+d'image n'y figurent. Or 3 avis de sécurité sur une dépendance ont été publiés la nuit précédente,
+entre 23h44 et 23h45 UTC. Le même fichier de verrouillage avait passé la validation de la branche
+principale et la livraison de qualification la veille. La livraison de production s'arrête à
+`npm audit --audit-level=high`, et le lancement de l'exploitant est perdu. Rejouées le matin sur le
+commit à lancer, les 2 portes ont pris moins de 5 minutes.
+
+**La règle.** Une porte qui juge une base externe rend un verdict sur l'état du monde, pas sur le
+code : avis de dépendances, base de vulnérabilités, dépôt de paquets. Cet état change la nuit, sans
+aucun commit. Avant tout feu vert de lancement, chacune de ces portes se rejoue donc le jour même,
+sur l'objet qui sera lancé. Le verdict de la qualification ne se recopie pas, même sur un fichier
+de verrouillage identique.
+
+**La forme, au dossier de MEP.** Une section de feu vert déclare le jour du lancement et l'objet
+lancé, puis donne une ligne par porte :
+
+```
+## Feu vert de lancement
+
+Lancement : 2026-09-30 · Objet lancé : 630f874 (env/prd)
+
+| Porte | Base externe jugée | Rejouée le | Objet jugé | Verdict |
+|---|---|---|---|---|
+| npm audit --audit-level=high | avis de sécurité du registre npm | 2026-09-30 09:12 | 630f874 | 0 vulnérabilité haute |
+| trivy image --severity HIGH,CRITICAL | base de vulnérabilités | 2026-09-30 09:20 | image construite sans cache depuis 630f874 | 0 |
+```
+
+L'objet se nomme : « idem » ou « même commit » ne désignent rien. Un lancement qui glisse au
+lendemain rejoue ses portes ce jour-là, et le dossier change de date. Dans la variante de
+déploiement continu (§ 4 bis), la condition 1 tient M-10 par construction : la chaîne joue ses
+portes sur le commit déclencheur, au moment même du déploiement.
+
+**Le contrôle exécutable** : `node scripts\verifier-portes-du-jour.mjs <produit> [--lancement AAAA-MM-JJ]`.
+Il relève les portes à base externe que la chaîne du produit joue (fichiers d'intégration
+continue, scripts de `package.json`), puis lit le feu vert de chaque `DOSSIER-MEP*.md`. Il refuse
+4 manques :
+
+- un feu vert sans date de lancement ou sans objet lancé (PJ-0) ;
+- une porte de la chaîne absente du tableau (PJ-1) ;
+- une porte datée d'un autre jour que le lancement (PJ-2) ;
+- une porte qui a jugé un autre objet que l'objet lancé (PJ-3).
+
+L'oracle de l'étape le joue en TM5 (`oracles\oracle-trace-mutation-mep.mjs`), et son refus bloque :
+le remède tient en 5 minutes et appartient à qui donne le feu vert.
+
+**Hors jugement, et c'est dit.** L'heure du rejeu : une base qui change entre le rejeu du matin et
+un lancement du soir n'est pas vue, la règle est le jour. La justesse du verdict recopié au
+tableau : le contrôle lit la date et l'objet, il ne rejoue aucune porte. Une porte que la chaîne
+appelle sans la nommer, par un script ou par un gabarit tiré d'un autre dépôt : ce dernier cas est
+signalé, jamais tenu pour une absence de porte.
+
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
 Entre le staging technique et le GO, une **version de qualification populée de données** est
@@ -389,6 +444,8 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
 - le verdict de la revue graphique d'implémentation (étape 5 bis, écarts soldés ou acceptés) ;
 - le résultat des smoke tests staging (M-3), du test de rollback (M-4) et de l'audit qualif
   populée (§3 bis — non-testables soldés ou listés avec leur raison) ;
+- le feu vert de lancement : les portes qui jugent une base externe, rejouées le jour du
+  lancement sur l'objet lancé, avec leur sortie datée (M-10, § 3 nonies) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - la commande exacte de mise en production et la procédure de rollback.
 
@@ -419,7 +476,7 @@ qu'elle.** Un dispositif dont la porte est un dossier rédigé et relu ne prouve
 poussée est servie ; celui-ci le prouve à chaque déploiement. *Une règle qui déclare non conforme
 ce qui la dépasse s'apprend à être contournée.*
 
-### Ce que le GO devient, et pourquoi ce n'est pas une autonomie sans porte
+### Le GO devient la poussée d'un commit nommé, jamais une autonomie sans porte
 
 **Le GO humain reste incompressible — il change de forme, pas de nature.** Dans cette variante,
 c'est **la poussée sur un commit nommé** : un acte humain, délibéré, daté, attribué et

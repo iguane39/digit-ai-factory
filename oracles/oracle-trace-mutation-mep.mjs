@@ -33,6 +33,17 @@
  *        la seule des trois règles qu'une phrase bien tournée ne peut pas satisfaire.
  *   TM4  les verdicts de forge-ops ARCHIVÉS sous ce produit (`.ops-journal.jsonl`) sont confrontés
  *        à l'état PRÉSENT de leur cible — AVERTISSEMENT, jamais un échec.
+ *   TM5  les portes qui jugent une base externe (avis de dépendances, base de vulnérabilités) sont
+ *        rejouées le JOUR du lancement, sur l'objet lancé, et le feu vert du dossier le prouve —
+ *        BLOQUANT (M-10, TF-1498).
+ *
+ * TM5 EST UN CÂBLAGE BLOQUANT, ET LA DIFFÉRENCE AVEC TM4 EST VOULUE (TF-1498, 01/10/2026). Le
+ * 30/09/2026, un feu vert de lancement reposait sur les portes de la veille : 3 avis de sécurité
+ * publiés dans la nuit ont arrêté la livraison de production à `npm audit`, et le lancement de
+ * l'exploitant a été perdu. La règle vit dans le verbe `scripts\verifier-portes-du-jour.mjs`, appelé
+ * ici comme TM4 appelle le sien. Elle BLOQUE parce que son remède appartient à qui donne le feu
+ * vert et tient en 5 minutes : rejouer la porte ce jour-là. TM4 avertit parce que le sien appartient
+ * à un autre dépôt.
  *
  * TM4 EST UN CÂBLAGE, PAS UNE RÈGLE DE PLUS (TF-1084, 20/09/2026). `ETAPE-MEP.md` §4 prescrit depuis
  * le 15/09 qu'« un verdict de forge-ops ARCHIVÉ ne se cite qu'après confrontation à l'état présent de
@@ -162,6 +173,34 @@ function confronterVerdictsArchives(racine) {
     + " · détail : node scripts\\verifier-verdict-archive.mjs <produit> (ETAPE-MEP.md §4, TF-1084)" };
 }
 
+/**
+ * TM5 — les portes à base externe du feu vert, rejouées le jour du lancement (M-10, TF-1498).
+ * Délègue au verbe, comme TM4 : la règle vit en un seul endroit, et son banc la prouve.
+ */
+function confronterPortesDuJour(racine) {
+  const verbe = join(ICI, "..", "scripts", "verifier-portes-du-jour.mjs");
+  if (!existsSync(verbe)) {
+    return { statut: "NON_JUGE", message: "scripts\\verifier-portes-du-jour.mjs absent du pilot — l'âge des portes du feu "
+      + "vert n'est jugé par rien, et c'est dit plutôt que tu (ETAPE-MEP.md M-10)" };
+  }
+  const r = spawnSync(process.execPath, [verbe, racine], { encoding: "utf8", timeout: 120000 });
+  let j = null;
+  try { j = JSON.parse(r.stdout || ""); } catch { /* dit ci-dessous */ }
+  if (!j) {
+    return { statut: "NON_JUGE", message: `le verbe n'a pas rendu de verdict lisible (exit ${r.status}) — `
+      + `ce n'est PAS un constat sur ce produit : ${(r.stderr || "").trim().slice(0, 160)}` };
+  }
+  const m = j.mesure || {};
+  if (r.status === 2) return { statut: "SANS_OBJET", message: j.motif || j.message || "M-10 sans objet" };
+  if (r.status === 0) {
+    return { statut: "PASS", message: `${m.portes_feu_vert || 0} porte(s) à base externe rejouée(s) le jour du lancement `
+      + `(${j.lancement}), sur l'objet lancé` };
+  }
+  return { statut: "FAIL", message: `${m.refus || 0} refus au feu vert de lancement : `
+    + (j.findings || []).filter((f) => f.statut === "FAIL").slice(0, 4).map((f) => `${f.regle} ${f.message}`).join(" · ")
+    + " · détail : node scripts\\verifier-portes-du-jour.mjs <produit> (ETAPE-MEP.md M-10, TF-1498)" };
+}
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -242,6 +281,9 @@ export function juger(racine) {
   // TM4 — une fois par produit, pas une fois par dossier : les journaux sont les mêmes.
   const va = confronterVerdictsArchives(racine);
   findings.push({ regle: "TM4", statut: va.statut, ou: racine, message: va.message });
+  // TM5 — une fois par produit aussi : le verbe lit ensemble la chaîne et tous les dossiers.
+  const pj = confronterPortesDuJour(racine);
+  findings.push({ regle: "TM5", statut: pj.statut, ou: racine, message: pj.message });
   return findings;
 }
 
@@ -260,6 +302,8 @@ const NON_JUGE = [
   + "présente, jamais s'il était juste — et TM4 AVERTIT sans jamais bloquer, parce que le remède "
   + "(rejouer l'oracle) appartient à forge-ops et qu'un contrôle qui bloque sur ce qu'il ne peut pas "
   + "faire réparer apprend à être contourné",
+  "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
+  + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
 ];
 
 // --- Banc a double sens ------------------------------------------------------------------------
@@ -343,6 +387,28 @@ function selfTest() {
     if (!/TM4/.test(r.stdout) || !/PÉRIMÉ/.test(r.stdout)) casse.push("TM4 n'apparaît pas au verdict JSON — un avertissement que personne ne lit n'est pas un avertissement");
   }
 
+  // ---- TM5 : LES PORTES DU JOUR (M-10, TF-1498) ------------------------------------------------
+  // Une chaîne qui joue `npm audit`, et un feu vert au format de ETAPE-MEP.md § 3 nonies.
+  const avecChaine = (racine) => {
+    writeFileSync(join(racine, "azure-pipelines.yml"), "steps:\n  - script: npm audit --audit-level=high\n", "utf8");
+    return racine;
+  };
+  const FEU_VERT = (jour) => `${DOSSIER_OK}\n## Feu vert de lancement\n\nLancement : 2026-09-30 · Objet lancé : 630f874\n\n`
+    + "| Porte | Rejouée le | Objet jugé | Verdict |\n|---|---|---|---|\n"
+    + `| \`npm audit --audit-level=high\` | ${jour} 09:12 | 630f874 | 0 vulnérabilité haute |\n`;
+  // SANS OBJET : ni porte à base externe dans la chaîne, ni au dossier.
+  attendre("tm5-sans-porte", produit("tm5-sans-porte", DOSSIER_OK, MARQUEUR), "TM5", "SANS_OBJET");
+  // VERT : la porte de la chaîne rejouée le jour du lancement, sur l'objet lancé.
+  attendre("tm5-du-jour", avecChaine(produit("tm5-du-jour", FEU_VERT("2026-09-30"), MARQUEUR)), "TM5", "PASS");
+  // ROUGE : le cas fondateur du 30/09/2026 — la porte datée de la veille.
+  const veille = avecChaine(produit("tm5-veille", FEU_VERT("2026-09-29"), MARQUEUR));
+  attendre("tm5-veille", veille, "TM5", "FAIL");
+  // ET IL BLOQUE : un feu vert sur le verdict de la veille met l'oracle en échec, à la différence de TM4.
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), veille], { encoding: "utf8" });
+    if (r.status !== 1) casse.push("un feu vert sur les portes de la VEILLE ne met pas l'oracle en échec — TM5 devait bloquer");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -352,13 +418,15 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 12/12 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 16/16 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
       + "dossier de MEP SANS_OBJET et jamais FAIL ; codes de sortie 0 et 1 vérifiés ; TM4 sans journal "
       + "forge-ops SANS_OBJET ; TM4 verdict archivé FRAIS PASS ; TM4 cas rouge — verdict PÉRIMÉ — rendu "
-      + "en AVERTISSEMENT ; TM4 un verdict périmé ne met PAS l'oracle en échec, code de sortie 0 vérifié)");
+      + "en AVERTISSEMENT ; TM4 un verdict périmé ne met PAS l'oracle en échec, code de sortie 0 vérifié ; "
+      + "TM5 sans porte à base externe SANS_OBJET ; TM5 porte rejouée le jour du lancement PASS ; TM5 porte "
+      + "datée de la VEILLE FAIL — le cas fondateur du 30/09/2026 ; TM5 bloque, code de sortie 1 vérifié)");
   return casse.length ? 1 : 0;
 }
 
