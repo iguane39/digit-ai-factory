@@ -106,4 +106,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260925-L99-niveaux-d-intervention.md` | fichier | 51,0 Ko | Analyse L99 — « Adapter le modèle, le process et le format de réponse à la complexité de l |
 | `20261001-etude-opportunite-rsi-et-ssl.md` | fichier | 30,0 Ko | Étude d'opportunité — auto-amélioration récursive (RSI) et apprentissage auto-supervisé (S |
 
-_89 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_89 fichier(s), 0 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
