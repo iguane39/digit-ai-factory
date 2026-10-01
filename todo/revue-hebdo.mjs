@@ -72,7 +72,7 @@ export function rendreDecision(n, e) {
   return [
     `> **D-${n} — ${q}**`,
     ">",
-    `> ${e.titre}`,
+    `> ${f.rappel || e.titre}`,
     ">",
     `> **Avantages** : ${liste(f.avantages)}.`,
     `> **Inconvénients** : ${liste(f.inconvenients)}.`,

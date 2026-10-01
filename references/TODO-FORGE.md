@@ -330,7 +330,11 @@ une décision humaine.
    courtes et chiffrées), `options.a`, `options.b`, `options.c` (chacune `libelle`, `cout` en
    complexité × durée, `exclusions`), `recommandation` (`a`, `b` ou `c`), `source`, et `pourquoi`
    en option. L'option (c) est le repli : elle s'applique si rien n'est décidé. Une fiche ne
-   s'invente pas : un avantage ou un impact non mesuré se dit « non mesuré ».
+   s'invente pas : un avantage ou un impact non mesuré se dit « non mesuré ». Le champ `rappel`,
+   facultatif, remplace au rendu le titre de la candidature : le juge de la restitution refuse un
+   identifiant nu (« TF-1413 », « R-57 ») avant les options, et beaucoup de titres en portent
+   (mesuré le 01/10/2026 sur la première revue : 5 décisions sur 7 refusées). La question et les
+   listes de la fiche s'écrivent de même, sans identifiant ni renvoi à un numéro de ligne.
 2. **Le rappel.** `oracles\hook-ouverture.mjs` dit à chaque ouverture du pilot combien de
    propositions sont prêtes et si la revue est due, c'est-à-dire si la dernière a 7 jours ou plus.
 3. **Le dossier.** `node todo\revue-hebdo.mjs --depuis <prochain D-N> --sortie <dossier>` rend les
