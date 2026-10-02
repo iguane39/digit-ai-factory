@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+  "date_iso": "2026-10-02T07:54:03.911Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 3,
+    "fail": 1,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+      "verdict": "FAIL",
+      "detail": "3 constat(s) · M7 chapitre sans ouverture : « 1. Lot L0 — Décisions et arbitrages (T-5 → T-2 jours) » (ligne 49) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond. ; M7 chapitre sans ouverture : « 2. Lot L1 — Dépôt : construire et corriger (T-4 → T-2 jours) » (ligne 59) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond."
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 4 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 0 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md",
+    "ts": "2026-10-02T07:54:03.910Z",
+    "fichiers": {
+      "gabarits\\documents\\ordonnancement-mep\\INSTANCE.md": "e4ac2f461635ee28c7491a31b26015f3bcfce073cca22683dee683a684e5e943"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}
