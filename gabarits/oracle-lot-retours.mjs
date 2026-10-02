@@ -158,6 +158,23 @@ const ID_EN_TETE_DE_LIGNE = /^\s*\|\s*\**\s*(R[A-Z])-0*(\d+)\b[^|\n]*\|(?:[^|\n]
 const ID_EN_TITRE = /^#{2,4}\s+\**\s*(R[A-Z])-0*(\d+)\b/gm;
 const NOM_DE_LOT = /^(.*) - RETOURS - (\d{8}[a-z]?)\.md$/i;
 
+/**
+ * TF-1458 (28/09/2026) — LE PRÉFIXE DE COMPARAISON, PAS LE PRÉFIXE BRUT. Au sas d'arrivée
+ * (`_arrivee\`), un lot porte encore le NOM RÉEL de son produit ; la boîte d'entrée (`00-retours\`
+ * et son `old\`) ne porte que des pseudonymes. Comparer les préfixes TELS QUELS ne trouve donc
+ * JAMAIS de voisin — les deux graphies ne concordent par construction pour AUCUN produit, et
+ * LOT-IDS comme le cumul des « documents mûrs » (R-57) rendaient leur verdict sur un ensemble
+ * vide. Le préfixe du lot JUGÉ se pseudonymise comme les autres avant la comparaison ; un lot déjà
+ * pseudonymisé (hors sas) traverse `anonymiser()` sans y changer quoi que ce soit.
+ */
+function prefixeComparable(nom, prefixe) {
+  if (!anonymiserPilot) return prefixe;
+  try {
+    const m = NOM_DE_LOT.exec(anonymiserPilot(nom).texte);
+    return m ? m[1] : prefixe;
+  } catch { return prefixe; }
+}
+
 /** Les identifiants qu'un lot DÉFINIT, numéros normalisés (`RT-050` = `RT-50`). */
 export function idsDefinis(texte) {
   const ids = new Set();
@@ -175,7 +192,8 @@ export function idsEnDouble(cheminLot, texte) {
   const nom = basename(String(cheminLot).split("\\").join("/"));
   const m = NOM_DE_LOT.exec(nom);
   if (!m) return null;
-  const [, prefixe, cle] = m;
+  const [, prefixeBrut, cle] = m;
+  const prefixe = prefixeComparable(nom, prefixeBrut);
   const dossier = dirname(resolve(String(cheminLot)));
   const dossiers = [dossier, join(dossier, "old")];
   if (/^_arrivee$/i.test(basename(dossier))) dossiers.push(join(dossier, ".."), join(dossier, "..", "old"));
@@ -246,7 +264,8 @@ function murDesLotsAnterieurs(cheminLot) {
   const nom = basename(String(cheminLot).split("\\").join("/"));
   const m = NOM_DE_LOT.exec(nom);
   if (!m) return "";
-  const [, prefixe, cle] = m;
+  const [, prefixeBrut, cle] = m;
+  const prefixe = prefixeComparable(nom, prefixeBrut);
   const dossier = dirname(resolve(String(cheminLot)));
   let cumul = "";
   for (const d of [dossier, join(dossier, "old")]) {
