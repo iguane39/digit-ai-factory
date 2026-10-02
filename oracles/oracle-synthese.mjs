@@ -701,8 +701,36 @@ function juger(texte, cheminJuge = null) {
   // un rappel (TF-1429) NI elle-même une courte déclaration d'absence compte désormais comme du
   // contenu substantiel, même quand le bloc OUVRE par « aucune » : c'est TOUT le passage après le
   // mot d'ouverture qui est vérifié, pas seulement son tout début.
-  const autreContenu = lignesCorps.filter((l) => /[\p{L}\p{N}]/u.test(l) && !rappels.includes(l) && !declareSonVide(l));
-  const ouvreParAbsence = MOTIFS_ABSENCE.test(bDecisions.split("\n")[0] || "") || declareSonVide(bDecisions);
+  // 02/10/2026 (TF-1571, régression de TF-1467 mesurée le jour de sa fusion) — L'INVENTAIRE DES
+  // BLOQUANTS N'EST PAS UNE DÉCISION. S45 EXIGE cet inventaire au bloc 3 quand un traitement est
+  // arrêté ; S4 durci le comptait comme « contenu substantiel » après « Aucune décision », si bien
+  // qu'une restitution sans décision mais avec bloquants était refusée par l'une OU l'autre règle.
+  // Sont exemptés la ligne d'en-tête qui nomme les bloquants et les puces qui la suivent — sauf une
+  // puce qui porte un sélecteur D-N ou une question : celle-là reste une décision, et S4 la juge.
+  const inventaire = new Set();
+  // La ligne qui OUVRE le bloc par l'absence se couvre elle-même, quelle que soit sa longueur : elle
+  // peut dire en plus où iront les décisions (« … posées à la revue hebdomadaire »).
+  const premiere = lignesCorps.find((l) => l.trim());
+  if (premiere && MOTIFS_ABSENCE.test(premiere.trim().slice(0, 40)) && !RE_SELECTEUR_DECISION.test(premiere) && !/\?/.test(premiere))
+    inventaire.add(premiere);
+  for (let i = 0; i < lignesCorps.length; i++) {
+    if (!/\bbloquants?\b/i.test(lignesCorps[i])) continue;
+    inventaire.add(lignesCorps[i]);
+    for (let j = i + 1; j < lignesCorps.length; j++) {
+      const l = lignesCorps[j];
+      if (!l.trim()) continue;
+      if (!/^\s*[-*]\s+/.test(l)) break;
+      if (RE_SELECTEUR_DECISION.test(l) || /\?/.test(l)) break;
+      inventaire.add(l);
+    }
+  }
+  const autreContenu = lignesCorps.filter((l) => /[\p{L}\p{N}]/u.test(l) && !rappels.includes(l) && !declareSonVide(l)
+    && !inventaire.has(l));
+  // La 1re ligne de `bDecisions` est la FIN de la ligne de titre, vide dans la forme prescrite
+  // (« ## 3. … », ligne vide, « Aucune décision… ») : l'ouverture se lit donc sur la première ligne
+  // NON VIDE du corps, sans quoi la forme du gabarit n'était plus jamais reconnue (02/10/2026).
+  const ouvreParAbsence = MOTIFS_ABSENCE.test(bDecisions.split("\n")[0] || "") || declareSonVide(bDecisions)
+    || Boolean(premiere && MOTIFS_ABSENCE.test(premiere.trim().slice(0, 40)));
   if (options >= 2) ok("S4", `décisions en choix fermé (${options} option(s) étiquetée(s))${annonceRappels}`);
   else if (ouvreParAbsence && !autreContenu.length) {
     ok("S4", rappels.length ? `aucune décision nouvelle — déclaré explicitement${annonceRappels}`
@@ -4429,6 +4457,20 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c4(rRapNeuve).statut !== "FAIL")
     casse.push("S4 (TF-1429) : une décision NOUVELLE sans choix fermé passe parce qu'un rappel l'accompagne — la voie du rappel "
       + "exempterait ce qui n'est pas rappel");
+  // 02/10/2026 — l'inventaire des bloquants que S45 exige ne fait pas échouer S4 ; une décision
+  // glissée en puce après lui reste jugée.
+  const rAbsenceInventaire = jouerPe("s4-absence-et-inventaire-bloquants.md", bloc3Rappel("Aucune décision attendue de l'humain dans ce tour." + nl + nl
+    + "Inventaire des bloquants — ce qui est bloqué, ce qui le lève, et ce qui se passe sinon :" + nl + nl
+    + "- la clôture des décisions restantes : la fin des agents en cours ; sans elle, elles restent ouvertes."));
+  if (c4(rAbsenceInventaire).statut !== "PASS")
+    casse.push("S4 : un bloc 3 qui déclare « aucune décision » puis porte l'inventaire des bloquants EXIGÉ par S45 est refusé — "
+      + "les deux règles ne laissent alors aucune forme admise : " + String(c4(rAbsenceInventaire).message || "").slice(0, 160));
+  const rInventaireDecision = jouerPe("s4-inventaire-puis-decision.md", bloc3Rappel("Aucune décision attendue de l'humain dans ce tour." + nl + nl
+    + "Inventaire des bloquants :" + nl + nl
+    + "- la clôture des décisions restantes : la fin des agents en cours ; sans elle, elles restent ouvertes." + nl
+    + "- **D-7 —** Faut-il renommer le dépôt de la forge de tests maintenant ?"));
+  if (c4(rInventaireDecision).statut !== "FAIL")
+    casse.push("S4 : une décision sans choix fermé glissée en puce sous l'inventaire des bloquants passe — l'exemption de l'inventaire couvrirait une vraie décision");
   if (c4(rAbsenceNeuve).statut !== "FAIL")
     casse.push("S4 (TF-1467) : un bloc 3 qui OUVRE par « Aucune décision nouvelle » passe en entier même quand une VRAIE "
       + "décision sans choix fermé suit — le contrôle ne lisait que la 1re ligne ou les 120 premiers caractères du bloc, "
