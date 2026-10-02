@@ -51,6 +51,15 @@ de ligne et 3 échecs trouvés au seul rejeu du pilot.
 preuve : une fixture verte qui PASSE et une fixture rouge qui ÉCHOUE pour la bonne
 raison. Une règle sans fixture rouge n'est pas prouvée.
 
+**Espace de travail git isolé (TF-1532, 01/10/2026).** Si tu crées un dépôt ou un
+`git worktree` jetable pour isoler une recette (clone, `git init`, worktree annexe), pose-le
+HORS du répertoire de session — un chemin court (scratchpad de session, racine courte type
+`C:\tmp\`), jamais sous le répertoire de session lui-même, dont le chemin fait déjà ~90
+caractères plus celui du projet. Si tu dois malgré tout l'y créer, déclare
+`core.longpaths=true` sur ce dépôt dès sa création. Mesuré le 01/10/2026 : le répertoire de
+session mesure 110 à 139 caractères sur un poste observé, et un dépôt du pilot compte 38
+fichiers suivis (jusqu'à 65 chez un produit) — plusieurs dépasseraient alors 260 caractères.
+
 **Registres dérivés (TF-0151).** Si tu as modifié une SOURCE d'un registre ou d'une vue
 généré(e), relance son régénérateur et commite le régénéré DANS LE MÊME COMMIT — un
 registre qui dérive de sa source ment silencieusement pendant toute une campagne
