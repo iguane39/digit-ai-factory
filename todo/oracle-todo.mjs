@@ -334,7 +334,7 @@ console.log(JSON.stringify({
     "la pertinence des scores (gain/effort) est un jugement humain, pas une règle",
     "la véracité des gains_constates n'est pas vérifiée dans le monde — seule leur présence l'est",
     "R11 ne juge que l'AVANCE sur l'heure d'exécution : un ts en RETARD (antidaté) reste hors de portée, comme un ts faux mais plausible — seul l'impossible est refusé",
-    `R11 : les événements antérieurs au ${SEUIL_R11} ne sont pas jugés (antériorité mesurée par TF-0413) ; un ts inventé DANS cette fenêtre lui échappe, et c'est assumé plutôt que de mettre en échec un registre entier (R-33 bis)`,
+    `R11 : les événements antérieurs au ${SEUIL_R11} ne sont pas jugés (antériorité mesurée par TF-0413) ; un ts inventé DANS cette fenêtre lui échappe, et c'est assumé plutôt que de mettre en échec un registre entier — c'est le motif que R-33 bis donne pour ne pas armer d'office le verdict websec : « armer un gate que personne n'a exercé le ferait désarmer au premier faux positif »`,
     ...(SEUIL_R11 === SEUIL_R11_DEFAUT ? [] : [`R11 : seuil SURCHARGÉ par TODO_SEUIL_R11 (${SEUIL_R11} au lieu de ${SEUIL_R11_DEFAUT}) — verdict rendu sous un seuil qui n'est pas celui du registre`]),
   ],
 }, null, 1));
