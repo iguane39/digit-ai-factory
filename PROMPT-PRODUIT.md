@@ -48,7 +48,7 @@ chaque étape validée par les oracles de sa forge. Suspends-toi proprement (for
 si une décision me revient. Consigne tes hypothèses. Aucune écriture dans les dépôts
 digit-ai-forge-* ; améliorations en proposition seulement.
 
-Promesse : autonome du brief jusqu'au staging vérifié (oracle MEP 5/5).
+Promesse : autonome du brief jusqu'au staging vérifié (oracle MEP au complet, `ETAPE-MEP.md`).
 La production attend mon GO, donné sur le forge\DOSSIER-MEP.md que tu me présenteras.
 
 À la fin : synthèse — livrables, verdicts d'oracles, escalades de modèle, retours collectés.

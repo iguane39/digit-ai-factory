@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\references\\ETAPES-RUN.md",
-  "date_iso": "2026-10-02T07:19:55.010Z",
+  "cible": "c:\\dev\\digit-ai-factory\\references\\ETAPES-RUN.md",
+  "date_iso": "2026-10-02T08:44:30.985Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\ETAPES-RUN.md",
-    "ts": "2026-10-02T07:19:55.009Z",
+    "ts": "2026-10-02T08:44:30.984Z",
     "fichiers": {
-      "references\\ETAPES-RUN.md": "a5cac7f27eca7551963030f60226dffbe327f5f7e60467b9c2e5c8c005335c81"
+      "references\\ETAPES-RUN.md": "8c3e137ca596dbb13ed0e813ef0fbe4e02f066ad71d88d129f0712a77b764038"
     }
   },
   "empreinte_motif": null,

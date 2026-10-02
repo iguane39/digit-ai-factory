@@ -11,7 +11,7 @@ Delta : dépôt neuf (v0, commit initial). Forces : **preuve par le geste dès l
 (self-test = déploiement réel local v1→v2 + rollback prouvé + 4 défauts types refusés) ·
 règle dure tenue par construction (healthcheck AVANT bascule, jamais de bascule sur release
 malade) · journal au contrat ledger (seq croissant, append-only) · frontières écrites
-(outille la MEP, ne décide pas ; M-1…M-5 jamais dupliqué ; GO humain incompressible ;
+(outille la MEP, ne décide pas ; les portes M (`ETAPE-MEP.md`, liste à jour) jamais dupliquées ; GO humain incompressible ;
 invocation pilot uniquement). Faiblesses / dettes : **D-P1** — v0 ne connaît que la cible
 locale/staging fichiers (`releases/` + `COURANT` + `journal.jsonl`) ; les cibles cloud
 (Railway, VPS, conteneur distant) restent à outiller — le trou TF-0040 « déploiement Railway

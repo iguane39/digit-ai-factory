@@ -228,8 +228,8 @@ obligatoire dès qu'une URL de production ou de staging est déclarée au produi
 Constat qui l'impose, et il est net : le run `20260814-tests-fournisseur-a` s'est conclu « boucle close,
 pans mesurables au vert » **pendant que le login de production était en impasse totale** —
 `GET /` → 303 vers `/.auth/login/aad` → 404. Mort depuis le premier déploiement, vu par aucun
-test, découvert par l'humain **en cliquant, minutes après la clôture**. L'oracle MEP (M-1…M-7)
-porte ce regard *à la mise en production* ; rien ne le portait en cycle de tests
+test, découvert par l'humain **en cliquant, minutes après la clôture**. L'oracle MEP
+(`ETAPE-MEP.md`, liste à jour) porte ce regard *à la mise en production* ; rien ne le portait en cycle de tests
 post-déploiement. Un produit déjà en ligne était donc audité **sans que personne ne regarde ce
 que voit son visiteur**.
 
@@ -344,7 +344,7 @@ implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la base
 ## 6. Étape MEP (portée par le pilot — `ETAPE-MEP.md`)
 
 Dockerfile/compose dans le produit, déploiement **staging** réel, `ROLLBACK.md` testé une
-fois, oracle MEP M-1…M-7 exécuté (build, healthcheck ×3, smoke tests des exigences critiques
+fois, oracle MEP exécuté (`ETAPE-MEP.md`, liste à jour ; build, healthcheck ×3, smoke tests des exigences critiques
 contre l'instance servie, rollback prouvé, scan secrets de l'image). Puis générer
 `DOSSIER-MEP.md` et demander le **GO humain** — la production n'est jamais lancée sans lui ;
 sans GO, clore en `pret_production_en_attente_GO` (état de succès).
@@ -396,7 +396,7 @@ oracle + vue régénérée.
 
 Les seuls critères — tous mesurables, aucun « optimal »/« confiance » : oracles des étapes
 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation tenus sur les
-pans mesurés · oracle MEP 5/5 en staging · `DOSSIER-MEP.md` complet · traçabilité exigences
+pans mesurés · oracle MEP au complet en staging (`ETAPE-MEP.md`) · `DOSSIER-MEP.md` complet · traçabilité exigences
 MVP → tests 100 % · ledger vérifié par `ledger.mjs verify`.
 
 *L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
