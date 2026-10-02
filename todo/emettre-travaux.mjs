@@ -198,6 +198,14 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // un absent ferait deposer un fichier mort a la racine du depot, et le relevé passerait au
   // vert sur une question restee ouverte.
   const horsRacine = ligne.artefacts.filter((a) => a.etat === "hors_racine");
+  // TF-1461 (28/09/2026, campagne D-32 (a)) — L'ALIAS PÉRIMÉ N'EST PAS UN ÉTAT, C'EST UN CHAMP
+  // SUR UN ARTEFACT par ailleurs CONFORME (la cible canonique existe, `etat` vaut "ok") : le
+  // relevé (scripts\relever-heritage.mjs, TF-0881) pose `alias_perime` et `geste_alias` à côté,
+  // il ne les remplace pas dans `etat`. Les trois filtres ci-dessus ne lisent que `etat` et ne le
+  // voient donc jamais — mesuré sur un parc jetable : le relevé nomme l'alias et son geste git rm,
+  // l'émetteur rend « RIEN À CONFIER ». Même défaut que TF-0654 pour le hors-racine : un
+  // TROISIÈME cas qui demande AUTRE CHOSE que recopier ou mettre à jour — ici, SUPPRIMER.
+  const aliasPerimes = ligne.artefacts.filter((a) => a.alias_perime);
   // TF-0730 (01/09) — LES CONSTATS SE CALCULENT AVANT LE RETOUR ANTICIPÉ. L'ordre inverse
   // faisait rendre [RIEN À CONFIER] à un produit dont l'héritage est conforme mais que des
   // constats DÉCIDÉS attendaient au registre : le message « héritage conforme » était vrai, et
@@ -206,7 +214,7 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // avait AUSSI des défauts d'héritage, ce qui a masqué la voie jusqu'à sa lecture.
   const constats = cheminRegistre === undefined
     ? constatsDuRegistre(ligne.produit) : constatsDuRegistre(ligne.produit, cheminRegistre);
-  const aHeritage = absents.length || perimes.length || horsRacine.length;
+  const aHeritage = absents.length || perimes.length || horsRacine.length || aliasPerimes.length;
   if (!aHeritage && !constats.length) return null;
 
   // L'EMPREINTE D'IDEMPOTENCE PORTE CE QUI EST CONFIE, PAS L'ENVELOPPE QUI LE PORTE.
@@ -218,6 +226,7 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   const sceauConfie = empreinteTexte([
     ...[...perimes, ...absents, ...horsRacine]
       .map((a) => `${a.cible}|${a.etat}|${a.empreinte_pilot || ""}|${a.empreinte_produit || ""}`),
+    ...aliasPerimes.map((a) => `${a.cible}|alias_perime|${a.alias_perime}|${a.geste_alias || ""}`),
     // LES CONSTATS ENTRENT DANS LE SCEAU, et leur CONTENU avec eux. Sceller le seul identifiant
     // ferait qu'un constat reformulé garderait l'empreinte de l'ancien : le lot corrigé serait
     // tenu pour déjà déposé et ne partirait jamais. C'est la classe de défaut de N-39 —
@@ -253,6 +262,19 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
 - **Si ce n'est pas fait** : le relevé continue de signaler un écart qui n'en est peut-être pas un, et personne ne peut trancher depuis le pilot.
 `;
 
+  // TF-0881 / TF-1461 — L'ALIAS DE TRANSITION PÉRIMÉ : la cible canonique existe ET l'ancien
+  // fichier aussi, lu à sa place avant l'arrivée de la cible. Rien ne le recopie ni ne le met à
+  // jour — il se SUPPRIME, c'est le troisième geste après « recopier » et « déclarer ».
+  const blocAliasPerime = (a, jour) => `### TF-0881 — ALIAS DE TRANSITION PÉRIMÉ à côté de la cible canonique : \`${a.alias_perime}\` · gravité mineur
+
+- **Le fait**, mesuré le ${jour.slice(6, 8)}/${jour.slice(4, 6)}/${jour.slice(0, 4)} : votre dépôt porte à la fois \`${a.cible}\` (la cible canonique, conforme) et \`${a.alias_perime}\` (l'ancien alias de transition) — le second survit à côté du premier.
+- **Pourquoi cela vous concerne** : un gabarit périmé qu'aucun contrôle ne regarde reste lu et cité — rien ne garantit qu'un humain ou un agent n'ouvre pas l'ancien fichier par habitude ou par un lien non mis à jour.
+- **Ce qui est demandé** : \`${a.geste_alias}\` — supprimer l'alias, jamais le réécrire : la cible canonique porte déjà la forme à jour.
+- **Effort estimé** : simple × court
+- **Comment vous saurez que c'est fait** : \`node c:\\dev\\digit-ai-factory\\scripts\\relever-heritage.mjs\` ne nomme plus cet alias pour votre projet.
+- **Si ce n'est pas fait** : l'ancien fichier reste lisible et citable à côté de la version à jour, et rien ne distingue les deux pour qui tombe dessus.
+`;
+
   const bloc = (a, gravite) => {
     const g = glose[a.cible] || "artefact du contrat d'héritage";
     return `### TF-0626 — ${a.etat === "absent" ? "artefact d'héritage ABSENT" : "artefact d'héritage PÉRIMÉ"} : \`${a.cible}\` · gravité ${gravite}
@@ -276,10 +298,12 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // et rend la remontée de son avancement impossible à rattacher.
   const refsRegistre = [
     ...(perimes.length || absents.length || horsRacine.length ? ["TF-0626"] : []),
+    ...(aliasPerimes.length ? ["TF-0881"] : []),
     ...constats.map((e) => e.id),
   ].map((i) => `\`${i}\``).join(", ") || "\`aucun\`";
   const items = [...perimes.map((a) => bloc(a, "majeur")), ...absents.map((a) => bloc(a, absents.length > 4 ? "majeur" : "mineur")),
                  ...horsRacine.map((a) => blocHorsRacine(a, jour)),
+                 ...aliasPerimes.map((a) => blocAliasPerime(a, jour)),
                  ...constats.map(blocConstat)];
 
   // TF-0730 : les sections de prose parlaient d'HÉRITAGE même quand le lot n'en portait pas —
