@@ -69,7 +69,7 @@ produits sont autonomes.
 
 ## Bloc f — Retours aux forges, par le canal standard
 
-Lot `<projet> - RETOURS - AAAAMMJJ<i>` + sidecar, remis à `<pilot>\input\00-retours\`
+Lot `<projet> - RETOURS - AAAAMMJJ<i>` + sidecar, remis au sas `<pilot>\input\00-retours\_arrivee\`
 (règle 18) — jamais d'écriture directe dans une forge, jamais de correction spontanée.
 Les constats en passant deviennent des candidats TF ; la décision reste humaine.
 

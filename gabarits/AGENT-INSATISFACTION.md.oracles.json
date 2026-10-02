@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\CLAUDE.md",
-  "date_iso": "2026-10-02T07:19:25.614Z",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\gabarits\\AGENT-INSATISFACTION.md",
+  "date_iso": "2026-10-02T07:19:39.113Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -13,7 +13,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "CLAUDE.md"
+      "gabarits\\AGENT-INSATISFACTION.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,54 +24,54 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\AGENT-INSATISFACTION.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\AGENT-INSATISFACTION.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\AGENT-INSATISFACTION.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\AGENT-INSATISFACTION.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "CLAUDE.md",
-      "verdict": "PASS",
-      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "file": "gabarits\\AGENT-INSATISFACTION.md",
+      "verdict": "SKIP",
+      "detail": ""
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\AGENT-INSATISFACTION.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "CLAUDE.md",
-      "verdict": "SKIP",
-      "detail": ""
+      "file": "gabarits\\AGENT-INSATISFACTION.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 0 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 1 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "CLAUDE.md",
-    "ts": "2026-10-02T07:19:25.614Z",
+    "release": "gabarits\\AGENT-INSATISFACTION.md",
+    "ts": "2026-10-02T07:19:39.112Z",
     "fichiers": {
-      "CLAUDE.md": "ee04632acbff8123247537228d918bbe21e61a9626024f3c3eb6a4b931a63030"
+      "gabarits\\AGENT-INSATISFACTION.md": "7ae7e24c4d586a41afa6f871553478c1105e078657b4159ed606cd30bc0525b9"
     }
   },
   "empreinte_motif": null,

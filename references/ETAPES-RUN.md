@@ -383,7 +383,7 @@ Compiler les entrées `type: retour` du ledger en un **lot de retours** —
 `forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** homonyme
 (candidatures SANS id, gabarit `gabarits\RETOURS-FORGES.md` ; le préfixe projet est
 obligatoire, décision 13/08) avec contrôle de complétude ledger↔lot — puis
-**remise automatique** : copie des deux fichiers dans `<pilot>\input\00-retours\`. Ensuite `run_close`
+**remise automatique** : copie des deux fichiers dans le sas `<pilot>\input\00-retours\_arrivee\`. Ensuite `run_close`
 au ledger avec le bilan, et synthèse à l'humain. Hors run, toute inspection/incident produit
 son propre lot — un fichier par lot, jamais modifié après remise. **À réception d'un sidecar
 dans `input\00-retours\`** (côté pilot) : le confronter d'abord au registre ET à l'archive

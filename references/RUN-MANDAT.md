@@ -110,7 +110,7 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    `--regles "R-7 bis"` (deux versions du même radical dans un même dossier hors `old\`, sauf
    déplacement consigné en attente).
    Puis : lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
-   sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse **au format
+   sidecar remis au sas `<pilot>\input\00-retours\_arrivee\`, `run_close`, synthèse **au format
    `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-synthese.mjs`).
 
 ## Ce qui ne s'applique PAS (et ne se singe pas)

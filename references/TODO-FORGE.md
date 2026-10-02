@@ -153,8 +153,8 @@ et la date sont tracés (R6). Transitions : candidat→decide→en_cours→corri
 Clôture `corrige` : `gains_constates`, `corrections_realisees`, `date_correction` exigés (R7).
 
 **Intake** : lots des produits (règle 18), **lots des forges** (toute forge peut déposer un
-lot ciblant n'importe quelle forge — même gabarit, remise dans `input\00-retours\`, préfixé
-du projet ou de la forge émettrice), demandes humaines directes ; candidatures hors lot :
+lot ciblant n'importe quelle forge — même gabarit, remise au sas `input\00-retours\_arrivee\`,
+préfixé du projet ou de la forge émettrice), demandes humaines directes ; candidatures hors lot :
 `input\01-candidatures\`. **Avant toute ingestion, confronter le lot au registre ET à
 l'archive** : un lot déjà traité par un autre canal part en `old\` sans ingestion (incident
 du 13/08 : 32 doublons créés puis retirés pour l'avoir omis). L'écriture DIRECTE dans
