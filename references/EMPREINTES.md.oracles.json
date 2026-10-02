@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a576abdf8d21a41a4\\references\\EMPREINTES.md",
-  "date_iso": "2026-10-02T06:57:56.696Z",
+  "cible": "c:\\dev\\digit-ai-factory\\references\\EMPREINTES.md",
+  "date_iso": "2026-10-02T08:37:49.823Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\EMPREINTES.md",
-    "ts": "2026-10-02T06:57:56.696Z",
+    "ts": "2026-10-02T08:37:49.822Z",
     "fichiers": {
-      "references\\EMPREINTES.md": "367f3997b4ea4bf76588fb60afed4d18f4184855aa3a6fd60a3a9c6ce471314a"
+      "references\\EMPREINTES.md": "3d79f3a579bbed1c4c25832b0aa3d28eb815f38df0bb8e0a9a05381487b262ca"
     }
   },
   "empreinte_motif": null,
