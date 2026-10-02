@@ -182,6 +182,35 @@ try {
       "le fichier modifié a été écrasé malgré la garde");
   });
 
+  // ── TF-1202 : une cible alternative déclarée fait SAUTER l'artefact racine ─────────────────
+  // Un produit qui sert `robots.txt` et `llms.txt` depuis `site/` (généré par son propre build)
+  // recevait quand même la racine au placeholder du gabarit : deux fichiers du même nom, un seul
+  // servi. Le contrat déclare `cible_alternative` ; si elle existe déjà, la racine n'est pas créée.
+  check("TF-1202 — robots.txt racine n'est pas instancié quand site/robots.txt (cible_alternative) existe déjà", () => {
+    const produit = join(T, "produit-site");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    mkdirSync(join(produit, "site"), { recursive: true });
+    writeFileSync(join(produit, "site", "robots.txt"), "User-agent: *\nAllow: /\n", "utf8");
+    writeFileSync(join(produit, "site", "llms.txt"), "# llms du produit\n", "utf8");
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code} : ${r.sortie.slice(0, 200)}`);
+    att(!existsSync(join(produit, "robots.txt")),
+      "robots.txt a été instancié à la racine alors que site/robots.txt (cible alternative) existait déjà");
+    att(!existsSync(join(produit, "llms.txt")),
+      "llms.txt a été instancié à la racine alors que site/llms.txt (cible alternative) existait déjà");
+    att(/\[SAUTÉ\s*\] robots\.txt/.test(r.sortie), "le saut n'est pas dit pour robots.txt");
+    att(/\[SAUTÉ\s*\] llms\.txt/.test(r.sortie), "le saut n'est pas dit pour llms.txt");
+  });
+
+  check("TF-1202 borne — sans cible alternative sur le disque, robots.txt est instancié à la racine comme avant", () => {
+    const produit = join(T, "produit-sans-site");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(existsSync(join(produit, "robots.txt")), "robots.txt n'a pas été instancié alors qu'aucune cible alternative n'existe");
+    att(existsSync(join(produit, "llms.txt")), "llms.txt n'a pas été instancié alors qu'aucune cible alternative n'existe");
+  });
+
   // ── TF-0851 (2) : le geste rend compte de ce qu'il laisse au dépôt ─────────────────────────
   check("TF-0851 — le geste imprime la ligne `git add` des fichiers qu'il vient d'écrire", () => {
     const produit = join(T, "produit-add");

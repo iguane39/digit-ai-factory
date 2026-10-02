@@ -96,18 +96,20 @@
     {
       "source": "gabarits/web/robots.txt",
       "cible": "robots.txt",
+      "cible_alternative": "site/robots.txt",
       "mode": "presence",
       "conditionnel": "produit à surface web",
-      "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms.",
+      "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms. Un produit qui sert sa surface depuis `site/` (TF-1202, 02/10/2026) déclare sa cible réelle par `cible_alternative` : quand elle existe déjà, l'artefact racine, qui ne serait jamais servi, n'est pas instancié.",
       "depuis": "2026-08-23",
       "familles_protegees": []
     },
     {
       "source": "gabarits/web/llms.txt",
       "cible": "llms.txt",
+      "cible_alternative": "site/llms.txt",
       "mode": "presence",
       "conditionnel": "produit à surface web",
-      "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt.",
+      "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt. Même cible alternative que robots.txt (TF-1202, 02/10/2026) : `site/llms.txt`.",
       "depuis": "2026-08-23",
       "familles_protegees": []
     },
