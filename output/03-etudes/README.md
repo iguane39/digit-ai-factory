@@ -96,8 +96,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260917-L99-revue-hebdomadaire-amelioration-continue.md` | fichier | 36,5 Ko | Analyse L99 — « Un process hebdomadaire d'analyse de l'existant pour l'amélioration contin |
 | `20260917-releve-autres-reseaux-sociaux.md` | fichier | 8,3 Ko | Relevé — les autres réseaux sociaux et les étapes non traitées (17/09/2026) |
 | `20260917-revue-hebdomadaire-mesure-pas0.md` | fichier | 21,2 Ko | Annexe de mesure — pas 0 de l'étude « revue hebdomadaire de l'existant » |
-| `20260919-etude-opportunite-plan-d-amelioration-post-audit.html` | fichier | 102,3 Ko | Digit-AI — Étude d'opportunité — plan d'amélioration d'une application après audit, rendu |
-| `20260919-etude-opportunite-plan-d-amelioration-post-audit.md` | fichier | 31,2 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
+| `20260919-etude-opportunite-plan-d-amelioration-post-audit.html` | fichier | 110,5 Ko | Digit-AI — Étude d'opportunité — plan d'amélioration d'une application après audit, rendu |
+| `20260919-etude-opportunite-plan-d-amelioration-post-audit.md` | fichier | 32,8 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
 | `20260919-L99-audit-et-plan-d-amelioration-plateforme.md` | fichier | 43,3 Ko | Analyse L99 — « Un audit, et en plus un plan d'amélioration complet de la plateforme » |
 | `20260921-etude-opportunite-reseaux-sociaux-complement.md` | fichier | 26,1 Ko | Étude d'opportunité — réseaux sociaux au-delà de LinkedIn : réseaux, étapes et types d'éme |
 | `20260922-etude-opportunite-messagerie-inter-sessions.md` | fichier | 35,6 Ko | Étude d'opportunité — messagerie entre sessions Claude Code — 20260922a |

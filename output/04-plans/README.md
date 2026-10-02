@@ -110,7 +110,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions 2a 3a 5a executees 4b et 6b en cours - 20260920f.md` | fichier | 15,9 Ko | Point d'étape — vos 5 décisions : 4 sont exécutées et rejouées, dont la bascule du rapport |
 | `Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` | fichier | 21,3 Ko | Digit-AI — Synthèse de mandat — D-36 et D-37 exécutées, 18 candidatures closes — 01/10/202 |
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
-| `Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` | fichier | 15,9 Ko | Synthèse Mandat — vos décisions D-49, D-50 et D-51 sont exécutées ou en cours ; la campagn |
+| `Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` | fichier | 18,8 Ko | Synthèse Mandat — vos décisions D-49, D-50 et D-51 sont exécutées ou en cours ; la campagn |
 | `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,5 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
 | `Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` | fichier | 26,7 Ko | Digit-AI — Synthèse de mandat — Décisions du 24/09 exécutées et candidatures reproposées — |
 | `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |

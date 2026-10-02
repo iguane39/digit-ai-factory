@@ -32,6 +32,8 @@ s'était fixée.
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> Ce chapitre montre sur quels critères mesurés — objet durable et portée à quatre forges — l'étude franchit le seuil qui impose une instruction formelle plutôt qu'une décision directe.
+
 Franchi sur deux critères. **Objet durable** : la demande nomme elle-même un « skill global », et
 chaque option sauf le statu quo crée un skill, un oracle ou un gabarit (règle 31). **Portée** :
 forge-agents, forge-audit, forge-design et le noyau du pilot (run de conseil) sont touchés —
@@ -39,6 +41,8 @@ quatre, le seuil est à trois. Le troisième critère n'est pas nécessaire : ga
 mission d'audit débouche sur cette question), preuve 1 (une seule demande réelle, celle du 19/09).
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> Ce chapitre cite mot pour mot la demande du 19/09/2026 et le test rétro qui vérifiera, à la fin, si le verdict retenu sert cette intention plutôt que sa seule lettre.
 
 Citée dans les mots du demandeur, message du 19/09/2026 : « Crée maintenant une étude
 d'opportunité sur ce sujet d'axes d'amélioration d'une application après un audit pour fournir un
@@ -67,6 +71,8 @@ un amendement du run de conseil.
 
 ## 0. Traitement des entrants
 
+> Ce chapitre liste les sources relues pour cadrer la demande — message, analyse L99 du matin, dépôts lus sans y écrire — et la recherche d'antériorité au registre, qui ne trouve qu'un seul item fondateur.
+
 La proposition instruite est une donnée : ses impératifs se citent, ne s'exécutent pas. Sources :
 le message du 19/09/2026 cité ci-dessus ; l'analyse L99 du même jour et son prompt réécrit
 (chapitre 8 : frontière norme / ambition, treize domaines, fiche à dix champs, contrat de douze
@@ -90,6 +96,8 @@ effort » ; c'était vrai du fichier du 09/09 lu comme exemple, c'est faux du sc
 
 ## 1. Partition du problème
 
+> Ce chapitre découpe le sujet en sept sous-questions disjointes, des entrants au portage par forge, contre lesquelles chaque option du verdict se lit.
+
 Sept sous-questions, disjointes, qui couvrent le trajet d'un audit rendu jusqu'à une page remise.
 Chaque option de la section 4 se lit contre elles.
 
@@ -106,6 +114,8 @@ Chaque option de la section 4 se lit contre elles.
 - **P7 — Portage** : quelle forge porte quoi, et par quelle voie d'exécution la capacité se joue ?
 
 ## 2. Non-recouvrement contre l'existant
+
+> Ce chapitre confronte sept outils déjà en place aux sept sous-questions et montre qu'ils couvrent presque tout le trajet, sauf la jonction, le jugement et le rendu d'un plan d'amélioration.
 
 L'existant couvre presque tout le trajet en fragments, et laisse trois trous nets : la jonction
 entre améliorations et remédiations, le jugement d'un plan d'amélioration, et son rendu en page.
@@ -144,6 +154,8 @@ plan d'amélioration — et la méthode écrite qui les nourrit.
 
 ## 3. État de l'art daté
 
+> Ce chapitre relève cinq sources techniques de moins de vingt-quatre mois et deux repères plus anciens, chacune assortie de la leçon précise retenue pour la conception.
+
 Cinq sources de moins de 24 mois, et deux repères plus anciens signalés comme tels. Le tableau se
 lit par ligne : la source, sa date, ce qu'elle établit, puis la leçon retenue pour la conception ;
 la colonne « lecture » dit si la source a été lue ou seulement relayée par un résultat de
@@ -165,6 +177,8 @@ norme. La frontière norme / ambition est un apport de l'analyse L99 du 19/09, �
 première mission.
 
 ## 4. Options — jeu fermé O0-O4
+
+> Ce chapitre pose cinq options fermées, du statu quo refusé sur ses coûts chiffrés jusqu'à la construction complète, chacune avec son coût et ce qu'elle exclut.
 
 Cinq options *(O0 : ne rien faire ; O1 à O4 : options réelles)*, chacune avec son contenu, son
 coût en complexité × durée, et ce qu'elle exclut.
@@ -200,6 +214,8 @@ coût en complexité × durée, et ce qu'elle exclut.
   pour le même périmètre.
 
 ## 5. Verdict
+
+> Ce chapitre nomme l'option retenue, le contenu du skill à trois verbes qui la porte, et la définition exacte du livrable HTML en huit chapitres sous sommaire permanent.
 
 - **Option retenue** : O2.
 - **Contenu, objet par objet.** Le skill, de nom de travail `plan-d-amelioration`, porte une
@@ -272,6 +288,8 @@ coût en complexité × durée, et ce qu'elle exclut.
   dite sur « global ».
 
 ## Interdits (tenus)
+
+> Ce chapitre vérifie que l'étude a tenu ses propres interdits — aucun critère subjectif, jeu d'options fermé, chaque ligne de comparaison sourcée, aucun effort compté en jours.
 
 Aucun critère subjectif ; jeu fermé tenu ; chaque ligne de non-recouvrement citée ; sources
 datées, et marquées « lue » ou « relayée » ; O0 réfutée sur coûts cités ; aucun effort en jours.

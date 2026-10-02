@@ -23,6 +23,7 @@
   
   <title>Digit-AI — Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTML complète — 20260919a — 20260919a</title>
   <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict, qui">
+  <meta name="ai-generated" content="Claude Code">
   <meta name="theme-color" content="#2563EB">
   
   <meta name="color-scheme" content="light">
@@ -84,9 +85,9 @@
          jamais lu n'est pas neutre, c'est la trace visible d'une doctrine abandonnee, en tete
          du fichier que tout auteur de page copie. Le prochain le rebrancherait. */
       --w: clamp(75vw, 1680px, 92vw);
-      /* Familles (repli système obligatoire) */
-      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
-      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      /* Familles (repli système obligatoire) — charte des présentations (D-5 (a), D-11 (a)) */
+      --head: "Montserrat", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "Inter", "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
       /* Année de référence (token isolé) */
       --annee-ref: "2026";
@@ -316,6 +317,20 @@
       .theme-toggle { display: none; }
     }
   </style>
+  <style>
+    nav.toc{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
+    nav.toc a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink)}
+    nav.toc a:hover{text-decoration:underline}
+    nav.toc a strong{font-size:.85rem;font-weight:600}
+    .toc-d{color:var(--muted);font-size:.72rem;font-weight:400}
+    .ch-apprend{margin:0 0 16px;color:var(--muted)}
+    nav.barre{display:none}
+    @media (max-width:900px){
+      nav.barre{display:flex;gap:16px;overflow-x:auto;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
+      nav.barre a{flex:0 0 auto;white-space:nowrap;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
+      nav.barre a:hover{text-decoration:underline}
+    }
+  </style>
 <!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
@@ -450,13 +465,34 @@ tr[data-tf-empty] td {
       <input id="find" type="search" placeholder="Rechercher dans le document…">
       <p id="findCount" class="find-count" aria-live="polite"></p>
     </div>
+<nav class="toc colle" aria-label="Sommaire">
+      <a href="#seuil-de-declenchement-verifie-avant-ecriture"><strong>Seuil de déclenchement (vérifié avant écriture)</strong> <span class="toc-d">Chapitre 1 sur 9</span></a>
+      <a href="#intention-de-l-utilisateur-loi-n-7"><strong>Intention de l'utilisateur (loi n° 7)</strong> <span class="toc-d">Chapitre 2 sur 9</span></a>
+      <a href="#0-traitement-des-entrants"><strong>0. Traitement des entrants</strong> <span class="toc-d">Chapitre 3 sur 9</span></a>
+      <a href="#1-partition-du-probleme"><strong>1. Partition du problème</strong> <span class="toc-d">Chapitre 4 sur 9</span></a>
+      <a href="#2-non-recouvrement-contre-l-existant"><strong>2. Non-recouvrement contre l'existant</strong> <span class="toc-d">Chapitre 5 sur 9</span></a>
+      <a href="#3-etat-de-l-art-date"><strong>3. État de l'art daté</strong> <span class="toc-d">Chapitre 6 sur 9</span></a>
+      <a href="#4-options-jeu-ferme-o0-o4"><strong>4. Options — jeu fermé O0-O4</strong> <span class="toc-d">Chapitre 7 sur 9</span></a>
+      <a href="#5-verdict"><strong>5. Verdict</strong> <span class="toc-d">Chapitre 8 sur 9</span></a>
+      <a href="#interdits-tenus"><strong>Interdits (tenus)</strong> <span class="toc-d">Chapitre 9 sur 9</span></a>
+    </nav>
+<nav class="barre" aria-label="Sommaire permanent"><a href="#seuil-de-declenchement-verifie-avant-ecriture">Seuil de déclenchement (vérifié avant écriture)</a><a href="#intention-de-l-utilisateur-loi-n-7">Intention de l'utilisateur (loi n° 7)</a><a href="#0-traitement-des-entrants">0. Traitement des entrants</a><a href="#1-partition-du-probleme">1. Partition du problème</a><a href="#2-non-recouvrement-contre-l-existant">2. Non-recouvrement contre l'existant</a><a href="#3-etat-de-l-art-date">3. État de l'art daté</a><a href="#4-options-jeu-ferme-o0-o4">4. Options — jeu fermé O0-O4</a><a href="#5-verdict">5. Verdict</a><a href="#interdits-tenus">Interdits (tenus)</a></nav>
 <section class="chap lire" data-mesure-lecture>
 <p>Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict, qui recevraient chacune un lot. L'étude instruit la demande du 19/09/2026, posée à la suite de l'analyse L99 *(analyse de prompt en huit couches)* du même jour sur le prompt « un audit, et en plus un plan d'amélioration complet ». Le nom du produit qui a fait naître la demande n'apparaît pas : le pilot ne fait entrer aucun nom de produit dans un fichier suivi.</p>
 <p>Mesures relevées le <strong>2026-09-19</strong> sur les dépôts tels que présents sur le poste, en lecture seule (relevé d'ouverture : forge-audit, forge-agents, forge-design et le pilot sont signalés divergés de leur origine ; l'état local fait foi pour cette étude). <strong>Date de péremption : 2026-11-19</strong> — au-delà, la table de la section 2 se rejoue.</p>
 <p><strong>Ce que le lecteur va apprendre.</strong> La demande ne justifie ni une forge nouvelle, ni une extension de forge-audit. Ce qui manque tient en <strong>un skill outillé</strong> — trois verbes exécutables qui n'existent nulle part : joindre un plan d'amélioration aux actions de remédiation d'un audit, juger ce plan contre un contrat, et le rendre en page HTML autoportante — porté par <strong>forge-agents</strong>, là où vivent déjà les skills transverses et le socle de page. Deux autres porteurs reçoivent un lot léger : <strong>forge-audit</strong>, qui publie son fichier d'actions comme un contrat d'interface, et <strong>le pilot</strong>, qui branche le skill sur le bloc « recommander » du run de conseil. <strong>forge-design</strong> juge le gabarit de page. Les autres forges ne changent pas : elles fournissent des mesures à l'exécution, domaine par domaine. Et l'ordre compte : le skill s'extrait de la première mission jouée à la main, il ne la précède pas. La première mission réelle existe déjà — c'est la plateforme qui a fait naître la demande — et elle tombe avant la date de revue que l'étude « conseil » du 19/08 s'était fixée.</p>
-<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
+</section>
+<section id="seuil-de-declenchement-verifie-avant-ecriture">
+<h2>Seuil de déclenchement (vérifié avant écriture)</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre montre sur quels critères mesurés — objet durable et portée à quatre forges — l'étude franchit le seuil qui impose une instruction formelle plutôt qu'une décision directe.</p>
 <p>Franchi sur deux critères. <strong>Objet durable</strong> : la demande nomme elle-même un « skill global », et chaque option sauf le statu quo crée un skill, un oracle ou un gabarit (règle 31). <strong>Portée</strong> : forge-agents, forge-audit, forge-design et le noyau du pilot (run de conseil) sont touchés — quatre, le seuil est à trois. Le troisième critère n'est pas nécessaire : gain estimé 3 (chaque mission d'audit débouche sur cette question), preuve 1 (une seule demande réelle, celle du 19/09).</p>
-<h3>Intention de l'utilisateur (loi n° 7)</h3>
+</section>
+</section>
+<section id="intention-de-l-utilisateur-loi-n-7">
+<h2>Intention de l'utilisateur (loi n° 7)</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre cite mot pour mot la demande du 19/09/2026 et le test rétro qui vérifiera, à la fin, si le verdict retenu sert cette intention plutôt que sa seule lettre.</p>
 <p>Citée dans les mots du demandeur, message du 19/09/2026 : « Crée maintenant une étude d'opportunité sur ce sujet d'axes d'amélioration d'une application après un audit pour fournir un livrable complet au format HTML. Identifie le ou les forges impliquées pour la mise en place de ce skill global. »</p>
 <p>Lecture reconstruite par l'agent, <strong>validée par le demandeur le 19/09/2026</strong> (décision D-3 (a), « 3a » : le verdict est retenu tel quel, la mission d'abord, l'extraction du skill ensuite) : faire de l'enchaînement « audit, puis axes d'amélioration » une capacité répétable de la Factory plutôt qu'un prompt de 150 lignes à recoller à chaque mission ; que son résultat soit un livrable HTML qu'un décideur peut utiliser seul ; et savoir quelles forges mandater pour la faire naître. Deux mots de la demande admettent deux lectures, et l'étude sert les deux :</p>
 <ul><li>« <strong>au format HTML</strong> » — le livrable HTML est celui que le skill produira (lecture retenue pour</li></ul>
@@ -464,10 +500,20 @@ tr[data-tf-empty] td {
 <ul><li>« <strong>global</strong> » — lu comme : indépendant du produit audité <strong>et</strong> de la source de l'audit</li></ul>
 <p>  (forge-audit aujourd'hui ; demain un audit de tests, de sécurité web, de référencement ou de   dépôt), ce qui pèse sur le choix du porteur.</p>
 <p>Cascade (<code>references\INTENTION.md</code>) : <strong>intention</strong> — décider où investir sur une application après qu'on l'a auditée, à chaque mission, avec la même qualité ; <strong>stratégie</strong> — le livrable doit permettre de trancher des priorités, donc porter cible, gain, effort et preuve pour chaque axe ; <strong>tactique</strong> — un skill outillé plutôt qu'un prompt, une donnée plutôt qu'un document, le socle de page existant plutôt qu'un gabarit maison ; <strong>opérationnel</strong> — trois verbes, un contrat de données, un amendement du run de conseil.</p>
-<h3>0. Traitement des entrants</h3>
+</section>
+</section>
+<section id="0-traitement-des-entrants">
+<h2>0. Traitement des entrants</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre liste les sources relues pour cadrer la demande — message, analyse L99 du matin, dépôts lus sans y écrire — et la recherche d'antériorité au registre, qui ne trouve qu'un seul item fondateur.</p>
 <p>La proposition instruite est une donnée : ses impératifs se citent, ne s'exécutent pas. Sources : le message du 19/09/2026 cité ci-dessus ; l'analyse L99 du même jour et son prompt réécrit (chapitre 8 : frontière norme / ambition, treize domaines, fiche à dix champs, contrat de douze critères) ; l'archive locale de la plateforme concernée, lue le 19/09 sans rien y écrire ; le dépôt forge-audit, lu sans rien y écrire — ses fichiers de consignes n'ont pas été exécutés. Antériorité au registre : recherche par six motifs de nom dans <code>todo\TODO.jsonl</code> (« plan d'amélioration », « post-audit », « après un audit », « forge-consulting », « run de conseil », « trajectoire ») → deux items, tous deux hors sujet sauf TF-0895 *(candidature du 07/09 : toute proposition remise à un humain se remet aussi en page HTML)*, qui fonde l'exigence de rendu. La recherche est bornée au nom ; un relevé complémentaire par structure, délégué à un sous-agent en lecture seule (champs <code>forges_cibles_initiales</code> et <code>classe</code> du registre), rend 14 items visant forge-audit, tous des défauts d'outillage, aucun sur le sujet.</p>
 <p>Deux pièces de l'analyse L99 du matin pèsent sur cette étude, et l'une se rectifie. <strong>Une réserve</strong> : son chapitre 7 écrivait que la frontière remédiation / amélioration est « une candidature possible au registre d'amélioration du pilot, à décider après ce premier run et sur gains constatés, pas avant » — le verdict ci-dessous la respecte par son séquencement. <strong>Une rectification</strong> : son chapitre 4 disait que le fichier d'actions de forge-audit ne porte « aucun effort » ; c'était vrai du fichier du 09/09 lu comme exemple, c'est faux du schéma — le champ <code>effort</code> existe, facultatif (<code>core\schemas\remediation-actions.schema.json</code> l.31).</p>
-<h3>1. Partition du problème</h3>
+</section>
+</section>
+<section id="1-partition-du-probleme">
+<h2>1. Partition du problème</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre découpe le sujet en sept sous-questions disjointes, des entrants au portage par forge, contre lesquelles chaque option du verdict se lit.</p>
 <p>Sept sous-questions, disjointes, qui couvrent le trajet d'un audit rendu jusqu'à une page remise. Chaque option de la section 4 se lit contre elles.</p>
 <ul><li><strong>P1 — Entrants</strong> : que consomme la capacité ? Le rapport d'audit et son fichier d'actions, la</li></ul>
 <p>  documentation du produit (là où son ambition est écrite), les réponses du demandeur, des mesures.</p>
@@ -478,20 +524,35 @@ tr[data-tf-empty] td {
 <ul><li><strong>P4 — Priorisation et lotissement</strong> : comment passe-t-on d'une liste à une trajectoire ?</li><li><strong>P5 — Rendu</strong> : qu'est-ce qu'un « livrable complet au format HTML » pour ce sujet, et qui le</li></ul>
 <p>  fabrique ?</p>
 <ul><li><strong>P6 — Jugement</strong> : quel contrôle exécuté dit que le plan est recevable ?</li><li><strong>P7 — Portage</strong> : quelle forge porte quoi, et par quelle voie d'exécution la capacité se joue ?</li></ul>
-<h3>2. Non-recouvrement contre l'existant</h3>
+</section>
+</section>
+<section id="2-non-recouvrement-contre-l-existant">
+<h2>2. Non-recouvrement contre l'existant</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre confronte sept outils déjà en place aux sept sous-questions et montre qu'ils couvrent presque tout le trajet, sauf la jonction, le jugement et le rendu d'un plan d'amélioration.</p>
 <p>L'existant couvre presque tout le trajet en fragments, et laisse trois trous nets : la jonction entre améliorations et remédiations, le jugement d'un plan d'amélioration, et son rendu en page. Chaque ligne du tableau porte une citation relue le 19/09 ; la dernière colonne nomme la partition couverte et dit ce qui reste. Les lignes sont rangées dans l'ordre des partitions.</p>
 </section>
 <div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">forge-audit — plan de remédiation</td><td data-label="Citation"><code>deliverables\templates\plan-remediation.template.md</code> l.4-8 : « Vue consolidée et exécutable de toutes les actions REM issues des 18 dimensions — triées priorité × effort […] projection lisible de <code>remediation-actions.yaml</code> »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P1 et la moitié « norme » de P3</strong> — la donnée amont existe, structurée, avec identifiant, contrôle violé, gravité, effort ; elle ne porte aucune amélioration hors contrôle</td></tr><tr><td data-label="Existant examiné">forge-audit — schéma des actions</td><td data-label="Citation"><code>core\schemas\remediation-actions.schema.json</code> l.22 : « &quot;required&quot;: [&quot;id&quot;, &quot;title&quot;, &quot;control_ref&quot;, &quot;severity&quot;, &quot;priority&quot;, &quot;activation&quot;, &quot;verification&quot;] »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre le contrat amont de P3</strong> — le schéma d'interface existe et se valide ; il ne porte aucune clé de gain, de cible ni d'horizon, et son identifiant est borné à la dimension D16 (l.24) quand le référentiel en compte dix-huit</td></tr><tr><td data-label="Existant examiné">forge-audit — dimensions</td><td data-label="Citation"><code>README.md</code> l.38 : « 18 dimensions D00–D17, 6 familles, applicabilité par type »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement</strong> — une base de domaines fermée existe (fonctionnel, architecture, sécurité, données et IA, coûts, opérations) ; trois axes de la demande n'y ont pas de dimension : front et back séparés, connectivités, dette d'un fork</td></tr><tr><td data-label="Existant examiné">forge-audit — modèle de maturité</td><td data-label="Citation"><code>deliverables\templates\modele-maturite.template.md</code> l.4 : « Formalise le scoring core (1–5) en trajectoire de progression : ce que signifie concrètement passer d'un niveau au suivant »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement</strong> — une trajectoire existe côté norme, par dimension d'audit ; elle progresse vers le référentiel, jamais vers l'ambition propre au produit</td></tr><tr><td data-label="Existant examiné">forge-audit — adaptateur vers la construction</td><td data-label="Citation"><code>README.md</code> l.59 : « <code>node tools/forge-adapter.mjs tests/fixtures/remediation-actions.example.yaml --out &lt;repo-cible&gt;</code> »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre l'aval de P4 pour les <strong>remédiations</strong> seules — rien d'équivalent pour des améliorations</td></tr><tr><td data-label="Existant examiné">Run de conseil — bloc « recommander »</td><td data-label="Citation"><code>references\RUN-CONSEIL.md</code> l.97-99 : « chaque recommandation <strong>ancrée aux mesures</strong> du diagnostic (id <code>M-xx</code>), alternatives fermées, arbitrages assumés »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement et P7</strong> — la voie d'exécution et la discipline d'ancrage existent ; ni domaines, ni fiche, ni frontière avec un audit</td></tr><tr><td data-label="Existant examiné">Gabarit de diagnostic</td><td data-label="Citation"><code>gabarits\DIAGNOSTIC-EXPLOITATION.md</code> l.36-39 : « Chaque recommandation cite au moins une mesure (M-xx), porte son effort estimé et ce qu'elle exclut »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P2 partiellement — pensé pour UNE problématique d'exploitation (symptôme, mesures, causes), pas pour un plan multi-domaines</td></tr><tr><td data-label="Existant examiné">Oracle du livrable de conseil</td><td data-label="Citation"><code>oracles\oracle-livrable-conseil.mjs</code> l.12 : « LC3 (diagnostic) chaque recommandation cite &gt;= 1 mesure M-xx »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P6 partiellement</strong> — juge l'ancrage et le sourçage des chiffres ; ne juge ni la frontière avec l'audit, ni la couverture des domaines, ni la complétude d'une fiche</td></tr><tr><td data-label="Existant examiné">Gabarit de démarche de ROI</td><td data-label="Citation"><code>gabarits\DEMARCHE-ROI.md</code> l.20-35 : sections « Lots », « Trajectoire de construction et migration », « Suivi des bénéfices »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P4</strong> — le lotissement « utiles, utilisables, utilisés » et le suivi existent ; rien à créer, à composer</td></tr><tr><td data-label="Existant examiné">Étude « conseil » du 19/08</td><td data-label="Citation"><code>output\03-etudes\20260819-etude-opportunite-forge-consulting.md</code> l.63 : « la production d'une recommandation neuve depuis un diagnostic ne l'est pas » (couverte)</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>confirme le trou de P2</strong> — l'étude qui a fait naître le run de conseil le déclarait déjà ouvert</td></tr><tr><td data-label="Existant examiné">Skill <code>contre-expertise</code></td><td data-label="Citation">description du skill : « challenger la pertinence, la robustesse et les alternatives […] verdict Valider/Renforcer/Reprendre […] top 5 corrections impact×effort »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P6 partiellement — challenge un plan FINI sur invocation ; ne le produit pas, ne le joint pas, ne le rend pas</td></tr><tr><td data-label="Existant examiné">Skill <code>audite-et-corrige-l-appli</code></td><td data-label="Citation"><code>SKILL.md</code> l.4-6 : « détecte les anomalies, les corrige par modifications chirurgicales, redéploie, re-détecte »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas — boucle de correction d'anomalies ; aucune recommandation d'évolution, et il écrit dans l'application</td></tr><tr><td data-label="Existant examiné">Skill <code>github-repo-analyzer</code></td><td data-label="Citation"><code>SKILL.md</code> l.4-5 : « Analyse fine et structurée de repositories GitHub avec production automatique de deux livrables (Markdown + HTML charté) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P1 comme <strong>autre source d'audit</strong> possible ; grille de notation, pas de plan d'amélioration ni de jonction</td></tr><tr><td data-label="Existant examiné">Skill <code>pilote-de-mission</code></td><td data-label="Citation">description du skill, citée par l'étude du 19/08 l.70 : « construit le plan (workstreams, étapes typées, … chemin critique) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P4 partiellement — planification générique d'une mission ; le contenu du plan d'amélioration n'y est pas outillé</td></tr><tr><td data-label="Existant examiné">Skill <code>digit-ai-fiches-html</code></td><td data-label="Citation"><code>SKILL.md</code> l.3 : « fiches HTML chartées Digit-AI en deux gabarits — schéma fonctionnel &amp; ROI […] et fiche architecture »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P5 partiellement</strong> — deux gabarits de fiche existent ; aucun ne rend une liste de fiches filtrable, une page de décisions ni une table de jonction</td></tr><tr><td data-label="Existant examiné">Socle <code>digit-ai-page-html</code></td><td data-label="Citation"><code>SKILL.md</code>, section Composants : « Filtres de colonne sur les tableaux de données parcourus (≥ 8 lignes) — <strong>chaque</strong> colonne reçoit sa facette »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre le socle de P5</strong> — charte, filtres, sommaire, oracles de rendu existent ; le gabarit « plan d'amélioration » et son générateur depuis une donnée n'existent pas</td></tr><tr><td data-label="Existant examiné">forge-audit — moteur de rapport HTML</td><td data-label="Citation"><code>tools\rapport-engine.mjs</code> l.85-87 : vues « Synthèse », « Plan d'action » — « les actions de remédiation, dans l'ordre de priorité », « Constats par dimension »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P5 partiellement</strong> — un moteur de page autoportante, filtrée et jugée existe côté audit ; aucune de ses sept vues n'est un plan d'amélioration</td></tr><tr><td data-label="Existant examiné">Bibliothèque de documents du pilot</td><td data-label="Citation"><code>gabarits\documents\catalogue.jsonl</code> l.4 (rapport d'audit) : « la bibliothèque, qui indexe et renvoie sans réécrire ce qu'une forge génère »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>borne P5</strong> — la page du plan d'amélioration cite le rapport d'audit et s'y joint ; elle n'en réécrit aucune vue</td></tr><tr><td data-label="Existant examiné">Skill <code>experts-forge</code> — fiches</td><td data-label="Citation">dossier <code>experts-forge\fiches\</code> relevé le 19/09 : 17 fiches, dont <code>expert-interop-archi.md</code>, <code>expert-migration-plateforme-brownfield.md</code>, quatre <code>expert-ops-*</code>, <code>expert-data.md</code></td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P2 partiellement</strong> — architecture, connectivités, exploitation et données ont leur expert ; aucune fiche dont le nom porte performances, front, back ou coûts</td></tr><tr><td data-label="Existant examiné">Registre <code>quality-oracles</code></td><td data-label="Citation"><code>references\registre-oracles.md</code> l.31 : « Plan de mission (cohérence structurelle) », l.98 : « Autorité d'une décision affirmée », l.365 : « Restitution lisible : la page se conçoit pour ses lecteurs »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P6 partiellement</strong> — trois juges à composer (trajectoire, régime d'autorité d'une recommandation, lisibilité de la page) ; aucun domaine « plan d'amélioration »</td></tr><tr><td data-label="Existant examiné">Skill <code>la-barre</code></td><td data-label="Citation"><code>SKILL.md</code> l.4 : « Trouve, qualifie et pérennise la barre de qualité d'un livrable — une référence externe »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P2 partiellement — un instrument pour écrire une <strong>ambition</strong> quand la documentation du produit n'en porte pas ; à composer</td></tr><tr><td data-label="Existant examiné">Skill <code>qualifie-l-entrant</code>, mode rétro-modèle</td><td data-label="Citation"><code>references\RUN-CONSEIL.md</code> l.88-89 : « Si la compréhension complète d'un existant est requise : <strong>mode rétro-modèle</strong> (<code>RETRO-MODELE.md</code>, oracle RM1-RM5) »</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>recouvre P1</strong> pour la lecture de l'existant — à composer tel quel</td></tr><tr><td data-label="Existant examiné">Répartition des skills entre forges</td><td data-label="Citation">arborescence <code>.claude\skills</code> relevée le 19/09 : forge-agents en porte 18, dont <code>digit-ai-page-html</code>, <code>quality-oracles</code>, <code>pilote-de-mission</code>, <code>contre-expertise</code> ; forge-conception 4 ; forge-design 4 ; forge-audit et forge-data aucun</td><td data-label="Verdict (recouvre / ne recouvre pas)"><strong>tranche P7</strong> — les skills transverses et le socle de page vivent chez forge-agents</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
 <section class="chap lire" data-mesure-lecture>
 <p>En une phrase : l'amont (l'audit et sa donnée), l'aval (lotir, planifier, remettre) et le socle de page existent ; ce qui n'existe nulle part, ce sont <strong>trois verbes</strong> — joindre, juger, rendre un plan d'amélioration — et la méthode écrite qui les nourrit.</p>
-<h3>3. État de l'art daté</h3>
+</section>
+</section>
+<section id="3-etat-de-l-art-date">
+<h2>3. État de l'art daté</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre relève cinq sources techniques de moins de vingt-quatre mois et deux repères plus anciens, chacune assortie de la leçon précise retenue pour la conception.</p>
 <p>Cinq sources de moins de 24 mois, et deux repères plus anciens signalés comme tels. Le tableau se lit par ligne : la source, sa date, ce qu'elle établit, puis la leçon retenue pour la conception ; la colonne « lecture » dit si la source a été lue ou seulement relayée par un résultat de recherche — aucune source relayée ne fonde seule le verdict.</p>
 </section>
 <div class="defile"><table class="repli-cartes"><thead><tr><th scope="col">Source</th><th scope="col">Date</th><th scope="col">Ce qu'elle établit</th><th scope="col">Leçon retenue</th><th scope="col">Lecture</th></tr></thead><tbody><tr><td data-label="Source">Microsoft, .NET Blog — « Your Migration's Source of Truth: The Modernization Assessment » (devblogs.microsoft.com/dotnet)</td><td data-label="Date">2026-04-07</td><td data-label="Ce qu'elle établit">l'évaluation est un <strong>fichier du dépôt</strong> ; constats classés *Mandatory / Potential / Optional*, chacun avec fichiers et lignes ; « Every planning decision […] traces back to what the assessment found »</td><td data-label="Leçon retenue">la donnée est la source, le plan en dérive ; la troisième classe (« Optional ») est exactement l'amélioration hors blocage</td><td data-label="Lecture">lue</td></tr><tr><td data-label="Source">AWS — « AWS Well-Architected adds enhanced implementation guidance » (aws.amazon.com/about-aws/whats-new) et guide de l'outil, page « issues by improvement plan item »</td><td data-label="Date">2024-11-06</td><td data-label="Ce qu'elle établit">les éléments du plan d'amélioration se listent par pilier et par risque, et « You can filter the items based on pillar and severity »</td><td data-label="Leçon retenue">un plan d'amélioration se consulte comme une liste <strong>filtrable par domaine et par gravité</strong> — c'est le tableau à facettes du socle ; limite : le cadre reste côté norme</td><td data-label="Lecture">lue (guide) ; date relayée</td></tr><tr><td data-label="Source">DORA — « State of AI-assisted Software Development 2025 » (dora.dev/dora-report-2025)</td><td data-label="Date">2025-09</td><td data-label="Ce qu'elle établit">« AI's primary role is as an amplifier, magnifying an organization's existing strengths and weaknesses »</td><td data-label="Leçon retenue">les axes d'amélioration ne sont pas que du code : exploitation, qualité, documentation et flux de travail sont des domaines à part entière</td><td data-label="Lecture">lue (page d'accueil du rapport)</td></tr><tr><td data-label="Source">OWASP — Application Security Verification Standard 5.0.0 (github.com/OWASP/ASVS)</td><td data-label="Date">2025-05</td><td data-label="Ce qu'elle établit">environ 350 exigences en 17 chapitres, niveaux 1 à 3</td><td data-label="Leçon retenue">le côté <strong>norme</strong> est fermé et versionné (forge-audit y est alignée, <code>fiches\forge-audit.md</code> l.29) : le test « rattachable à un contrôle » qui trace la frontière est donc décidable</td><td data-label="Lecture">relayée</td></tr><tr><td data-label="Source">ACM EASE 2025 — « Assessing Software Product Quality in DevOps: An ISO 25010:2023 Perspective » (doi 10.1145/3727967.3756847)</td><td data-label="Date">2025-06</td><td data-label="Ce qu'elle établit">usage du modèle de qualité ISO/IEC 25010:2023 (neuf caractéristiques) pour évaluer un produit</td><td data-label="Leçon retenue">une liste de domaines se défend mieux adossée à un modèle fermé : la compatibilité répond aux connectivités, la capacité d'interaction au front, puis efficacité de performance, maintenabilité, flexibilité</td><td data-label="Lecture">relayée (page refusée à la lecture, erreur 403)</td></tr><tr><td data-label="Source">Repère ancien — arc42, « ISO 25010:2023 Update » (quality.arc42.org)</td><td data-label="Date">2023-11</td><td data-label="Ce qu'elle établit">les neuf caractéristiques et ce qui change depuis 2011 (sûreté ajoutée, portabilité devenue flexibilité)</td><td data-label="Leçon retenue">hors fenêtre de 24 mois : cité pour la définition, ne compte pas parmi les cinq</td><td data-label="Lecture">lue</td></tr><tr><td data-label="Source">Repère ancien — InfoQ, « Getting Technical Debt on the Roadmap »</td><td data-label="Date">2024-03-27</td><td data-label="Ce qu'elle établit">« Align technical debt resolution with business priorities to ensure it's incorporated into the roadmap »</td><td data-label="Leçon retenue">hors fenêtre : confirme que chaque axe doit nommer l'effet métier visé — le champ « cible servie » de la fiche</td><td data-label="Lecture">lue</td></tr></tbody></table></div>
 <section class="chap lire" data-mesure-lecture>
 <p>Ce que l'état de l'art ne fournit pas : aucune des sources lues ne sépare explicitement <strong>remédiation</strong> et <strong>amélioration</strong> en deux listes jointes ; les cadres d'éditeurs restent côté norme. La frontière norme / ambition est un apport de l'analyse L99 du 19/09, à éprouver sur la première mission.</p>
-<h3>4. Options — jeu fermé O0-O4</h3>
+</section>
+</section>
+<section id="4-options-jeu-ferme-o0-o4">
+<h2>4. Options — jeu fermé O0-O4</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre pose cinq options fermées, du statu quo refusé sur ses coûts chiffrés jusqu'à la construction complète, chacune avec son coût et ce qu'elle exclut.</p>
 <p>Cinq options *(O0 : ne rien faire ; O1 à O4 : options réelles)*, chacune avec son contenu, son coût en complexité × durée, et ce qu'elle exclut.</p>
 <ul><li><strong>O0 — ne rien faire</strong> : garder le prompt réécrit du 19/09 comme modèle à recoller. <strong>Réfutée.</strong></li></ul>
 <p>  Coût du statu quo, cité : le prompt d'origine valait 20 sur 100 avec 3 défauts bloquants   (synthèse L99 du 19/09, bloc 2) — toute mission future qui repart d'une phrase repaie cette   analyse ; le contrat de douze critères se vérifierait à la main, alors que le noyau n'accepte un   livrable « que sur le seul verdict d'un oracle exécuté » ; la page HTML se referait à chaque   fois ; et l'étude du 19/08 déclarait déjà non couverte « la production d'une recommandation neuve   depuis un diagnostic » (l.63).</p>
@@ -503,7 +564,12 @@ tr[data-tf-empty] td {
 <p>  meilleur argument est réel : forge-audit possède déjà le schéma d'actions, un moteur de page à   sept vues et l'oracle de ce rendu — une huitième vue coûterait moins qu'un skill. <strong>Exclue</strong>   malgré cela, pour trois raisons citées : le produit forge-audit est public et agnostique du client   (<code>fiches\forge-audit.md</code> l.13 : « 0 mention tenant dans le produit »), alors qu'une ambition est   propre à un client par nature ; son invariant est « aucun score n'est affecté sans preuve »   (<code>modele-maturite.template.md</code> l.5-6), quand une amélioration est un pari sur un gain ; et la   lecture « global » de la demande exige d'accepter d'autres sources d'audit que forge-audit, ce   qu'un livrable interne à forge-audit interdit.</p>
 <ul><li><strong>O4 — une forge dédiée</strong> (« amélioration » ou « conseil »). Coût : très complexe × long.</li></ul>
 <p>  <strong>Exclue</strong> par la règle 28 : les trois verbes existent bien nulle part ailleurs (critère 1), mais   la capacité n'a ni cadence ni mandat propres (critère 3) — son mandat est celui du run de   conseil, qui existe ; et l'étude du 19/08 a déjà tranché « aucune nouvelle forge » (l.140-141)   pour le même périmètre.</p>
-<h3>5. Verdict</h3>
+</section>
+</section>
+<section id="5-verdict">
+<h2>5. Verdict</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre nomme l'option retenue, le contenu du skill à trois verbes qui la porte, et la définition exacte du livrable HTML en huit chapitres sous sommaire permanent.</p>
 <ul><li><strong>Option retenue</strong> : O2.</li><li><strong>Contenu, objet par objet.</strong> Le skill, de nom de travail <code>plan-d-amelioration</code>, porte une</li></ul>
 <p>  méthode et trois verbes. *La méthode* (référentiel interne au skill, daté et éditable) : la   frontière « écart à une norme = remédiation, écart à une ambition = amélioration » ; une base de   domaines qui reprend les dix-huit dimensions de forge-audit là où elles existent, y ajoute ce   qu'elles ne séparent pas (front, back, connectivités, dette d'un fork), s'adosse au modèle   ISO/IEC 25010:2023 et s'ajuste au produit avec motif ; la   fiche à dix champs ; les cinq questions d'ouverture ; les trois statuts d'un chiffre (mesuré, lu,   hypothèse). *Verbe 1 — joindre* : lit le fichier des améliorations et le fichier d'actions d'un   audit, refuse toute amélioration rattachable à un contrôle évalué (zéro doublon), résout les   renvois croisés, produit la table de jonction. *Verbe 2 — juger* : un oracle qui joue le contrat   de sortie (complétude des fiches, constats sourcés, chiffres à statut, domaines couverts,   horizon et rang, aucun effort en jours), né avec ses fixtures rouge et verte. *Verbe 3 —   rendre* : du fichier de données vers la page HTML autoportante au socle, et vers une vue   Markdown.</p>
 <ul><li><strong>Le « livrable complet au format HTML », défini.</strong> Une page de données au socle</li></ul>
@@ -525,8 +591,14 @@ tr[data-tf-empty] td {
 <p>  — la plateforme qui a fait naître la demande : le prompt réécrit du 19/09 y aura-t-il été joué,   la frontière aura-t-elle tenu, combien de fiches auront été retirées faute de cible ? Cette   mission répond aussi à la clause de revue de l'étude du 19/08 (2026-10-01 : « si aucune mission   de conseil réelle n'a exercé le run type, requalifier »).</p>
 <ul><li><strong>Test rétro</strong> : *joindre* → une donnée plutôt qu'un document → permettre de trancher des</li></ul>
 <p>  priorités sans payer deux fois → décider où investir : la chaîne tient. *Juger* → un oracle   plutôt qu'une relecture → même qualité à chaque mission : tient. *Rendre* → le socle plutôt   qu'un gabarit maison → un livrable qu'un décideur utilise seul : tient. *Contrat d'interface   chez forge-audit* → sert « global » seulement à moitié : il ouvre la jonction avec forge-audit,   pas avec les autres sources d'audit ; <strong>rupture assumée</strong> — le verbe joindre naît avec un seul   adaptateur, et l'étude le dit plutôt que de promettre cinq adaptateurs non exercés. Questions du   demandeur rejouées : « une étude d'opportunité sur ce sujet » → ce document ; « un livrable   complet au format HTML » → défini ci-dessus en huit chapitres, et l'étude est remise en page ;   « le ou les forges impliquées » → le tableau des porteurs, quatre lignes, et la liste des forges   mobilisées sans modification ; « ce skill global » → un skill, chez forge-agents, avec la limite   dite sur « global ».</p>
-<h3>Interdits (tenus)</h3>
+</section>
+</section>
+<section id="interdits-tenus">
+<h2>Interdits (tenus)</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Ce chapitre vérifie que l'étude a tenu ses propres interdits — aucun critère subjectif, jeu d'options fermé, chaque ligne de comparaison sourcée, aucun effort compté en jours.</p>
 <p>Aucun critère subjectif ; jeu fermé tenu ; chaque ligne de non-recouvrement citée ; sources datées, et marquées « lue » ou « relayée » ; O0 réfutée sur coûts cités ; aucun effort en jours.</p>
+</section>
 </section>
     </main>
 
@@ -1213,7 +1285,7 @@ tr[data-tf-empty] td {
 <!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js — copie du socle digit-ai-page-html/assets/find-in-page.js,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="find-in-page.js" data-empreinte="sha256:108b35a7313c8a214dc846c1957d8c88902204496f5cf151f0d10564e25c8d17">
+<script data-composant="find-in-page.js" data-empreinte="sha256:c12d95c744a55817895314f71685d960ff1da00adfedbaf7ce4de305ea3956c6">
 /* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
  *
  * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
@@ -1229,6 +1301,21 @@ tr[data-tf-empty] td {
  *
  * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
  * vise aussi le PDF, prévoir un équivalent statique de l'information.
+ *
+ * ⚠️ LE CONTENEUR N'EST JAMAIS RÉÉCRIT (TF-1340, 23/09/2026). La recherche réaffectait
+ * `container.innerHTML` à chaque frappe : les attributs survivaient, les écouteurs posés par
+ * les autres composants du socle (table-filters.js, table-detail.js, infobulle.js) non. Mesuré
+ * au navigateur : après une recherche puis son effacement, un bouton de filtre n'ouvrait plus
+ * son panneau (0 au lieu de 1). Le surlignage ENVELOPPE désormais les nœuds texte trouvés, et
+ * la frappe suivante les DÉSENVELOPPE : aucun élément du conteneur n'est remplacé. `getHTML`
+ * et `refresh()` ne sont plus nécessaires (la recherche lit le contenu vivant) ; ils restent
+ * acceptés, sans effet, pour les pages déjà câblées.
+ *
+ * ⚠️ DANS UN SCHÉMA SVG, LE SURLIGNAGE EST UN <tspan> (TF-1353, 24/09/2026). SVG ne peint pas
+ * un <mark> HTML : le mot trouvé DISPARAISSAIT du schéma pendant la recherche (mesuré le 24/09
+ * dans Chromium : getNumberOfChars() de 93 à 87 ; rejoué sur la fixture du banc : de 74 à 67).
+ * Un nœud texte dont le parent est dans l'espace de noms SVG reçoit un <tspan class="find-hit"> ;
+ * le HTML d'un <foreignObject> garde son <mark>.
  *
  * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
  * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
@@ -1251,11 +1338,14 @@ tr[data-tf-empty] td {
  *
  * CSS attendu (à adapter aux tokens du livrable) :
  *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
+ *   tspan.find-hit { fill: #9a3412; text-decoration: underline; }   (texte d'un schéma SVG)
  *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
  *   .find-count.zero { color: #c0392b; }
  */
 (function (global) {
   'use strict';
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
 
   // Regex insensible aux accents et à la casse à partir d'une saisie libre.
   function buildRegex(q) {
@@ -1272,21 +1362,26 @@ tr[data-tf-empty] td {
     try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
   }
 
-  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences. Enveloppe les
+  // nœuds texte trouvés, sans remplacer aucun élément (TF-1340) ; dans un texte SVG, l'enveloppe
+  // est un <tspan>, que SVG peint, et non un <mark>, qu'il ignore (TF-1353). Les noms d'éléments
+  // se comparent sans casse : le <style> et le <script> d'un SVG s'écrivent en minuscules.
   function highlight(root, re) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     var nodes = [], n, count = 0;
     while ((n = walker.nextNode())) nodes.push(n);
     for (var k = 0; k < nodes.length; k++) {
-      var tn = nodes[k];
-      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
+      var tn = nodes[k], parent = tn.parentNode;
+      if (!parent || /^(MARK|SCRIPT|STYLE)$/i.test(parent.nodeName)
+          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) continue;
       var txt = tn.nodeValue; re.lastIndex = 0;
       if (!re.test(txt)) continue; re.lastIndex = 0;
+      var svg = parent.namespaceURI === SVG_NS;
       var frag = document.createDocumentFragment(), last = 0, m;
       while ((m = re.exec(txt))) {
         if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
-        var mk = document.createElement('mark');
-        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
+        var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
+        mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
         mk.textContent = m[0];
         frag.appendChild(mk);
         count++;
@@ -1294,23 +1389,37 @@ tr[data-tf-empty] td {
         if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
       }
       if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
-      tn.parentNode.replaceChild(frag, tn);
+      parent.replaceChild(frag, tn);
     }
     return count;
   }
 
+  // Retire le surlignage : chaque enveloppe redevient son texte, et les textes voisins se
+  // RECOLLENT (normalize) — sans quoi un terme à cheval sur une ancienne coupure ne serait plus
+  // trouvé à la frappe suivante. Seuls les nœuds texte bougent : les éléments, et les écouteurs
+  // que d'autres composants y ont posés, restent en place (TF-1340).
+  function unhighlight(root) {
+    var hits = root.querySelectorAll('mark.find-hit, tspan.find-hit');
+    var parents = [];
+    for (var i = 0; i < hits.length; i++) {
+      var h = hits[i], p = h.parentNode;
+      if (!p) continue;
+      p.replaceChild(document.createTextNode(h.textContent), h);
+      if (parents.indexOf(p) === -1) parents.push(p);
+    }
+    for (var j = 0; j < parents.length; j++) parents[j].normalize();
+  }
+
   /* Branche la recherche live sur un champ.
    * input, container, counter : éléments DOM (counter optionnel).
-   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
-   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
-   *   Sinon, le HTML initial est capturé une fois à l'init.
-   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
-   *   le HTML pristine (mode sans getHTML). */
+   * getHTML (optionnel) : n'est plus nécessaire depuis TF-1340 — la recherche lit le contenu
+   *   VIVANT du conteneur, qui n'est jamais réécrit. Accepté, sans effet, pour les pages câblées.
+   * Retourne { run, refresh } : run() relance la recherche ; refresh() est conservé, sans
+   *   effet (il n'y a plus de HTML capturé à rafraîchir). */
   function init(input, container, counter, getHTML) {
     if (!input || !container) return null;
-    var pristine = getHTML ? null : container.innerHTML;
     function run() {
-      container.innerHTML = getHTML ? getHTML() : pristine;
+      unhighlight(container);
       var re = buildRegex(input.value);
       if (!re) {
         if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
@@ -1325,11 +1434,12 @@ tr[data-tf-empty] td {
     input.addEventListener('input', run);
     return {
       run: run,
-      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
+      refresh: function () {}
     };
   }
 
-  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight,
+                               unhighlight: unhighlight };
 })(window);
 </script>
 <!-- COMPOSANT-EMBARQUE:FIN find-in-page.js -->
