@@ -15,7 +15,7 @@ diffère des trois autres comptes du parc, et comment elle se tient à jour.
 
 ## Les produits
 
-Le registre connaît **17 produits connus du registre** par leurs lots — c'est-à-dire cités dans les
+Le registre connaît **23 produits connus du registre** par leurs lots — c'est-à-dire cités dans les
 champs `demandeur` ou `source` d'au moins une création, sous la forme `Produit-NN`. Ce compte est
 jugé par le claim `produits-connus-du-registre` d'`oracles\fraicheur-claims.json` : le jour où un
 produit neuf remet son premier lot, l'oracle de fraîcheur échoue jusqu'à ce que sa ligne soit
