@@ -66,6 +66,15 @@ const cible = args.find((a) => !a.startsWith("--")) || join(ICI, "..", "output")
 const NOM = "LISEZMOI.md";
 const IGNORES = new Set([NOM, "README.md", ".gitkeep", ".oracles"]);
 const RE_DATE = /(\d{8})([a-z])?(?=\.[a-z0-9]+$|$)/i;
+// TF-1404 (02/10/2026) — UN SIDECAR N'EST PAS UN LIVRABLE. Mesuré le 24/09 : LISEZMOI.md portait
+// 48 lignes de `*.jugement.json`, à côté de `*.oracles-cache.json` et `*.oracles-historique.jsonl`
+// — tous des fichiers d'ACCOMPAGNEMENT d'un livrable, pas des livrables. Le filtre d'extension
+// (`.json`, `.jsonl`) les laissait passer sans distinction. Même prédicat que `EST_SIDECAR` de
+// `readme-dossiers.mjs` (TF-0615, TF-0914) — dupliqué plutôt qu'importé : ce fichier-là n'a pas de
+// garde `lanceEnDirect` et exécute sa CLI dès le chargement du module (jusqu'à `process.exit(1)`),
+// l'importer ferait tourner un autre outil au lieu de lire un prédicat.
+const EST_SIDECAR = (nom) => /\.(jugement|oracles|oracles-cache)\.json$/i.test(nom)
+  || /\.oracles-historique\.jsonl$/i.test(nom);
 const BALISE_DEBUT = "<!-- index-livrables:debut — genere par scripts/generer-lisezmoi-output.mjs, NE PAS EDITER A LA MAIN -->";
 const BALISE_FIN = "<!-- index-livrables:fin -->";
 
@@ -94,6 +103,7 @@ function familles(racine) {
         if (IGNORES.has(f.name)) continue;
         const p = join(d, f.name);
         if (f.isDirectory()) { marche(p, prof + 1); continue; }
+        if (EST_SIDECAR(f.name)) continue; // TF-1404 : un sidecar accompagne un livrable, il n'en est pas un
         if (!/\.(md|html|pdf|json|jsonl|csv|xlsx|pptx|docx)$/i.test(f.name)) continue;
         const rel = relative(racine, p);
         if (suivis && !suivis.has(rel.replaceAll("\\", "/"))) continue; // TF-1243 : non suivi, non indexé

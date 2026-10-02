@@ -16,7 +16,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| `_arrivee\` | dossier ignoré par git (absent d'un clone) | — | Sas d'arrivée des lots, IGNORÉ par git (absent d'un clone frais) : le producteur y dépose son lot tel qu'il est, nom réel compris ; `node todo\accueillir-lot.mj… |
 | [`old\`](old/README.md) | dossier (150 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
 | `digit-ai-forge-agents - RETOURS - 20260905a.md` | fichier | 13,6 Ko | Retours forges — digit-ai-forge-agents — 20260905a |
 | `digit-ai-forge-agents - RETOURS - 20260905a.tf.jsonl` | fichier | 4,8 Ko | 2 ligne(s) JSONL |
@@ -441,4 +440,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `UIA - RETOURS - 20260924c.md` | fichier | 3,7 Ko | Retours forges — UIA (Produit-72) — 20260924c |
 | `UIA - RETOURS - 20260924c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_422 fichier(s), 2 sous-dossier(s)_
+_422 fichier(s), 1 sous-dossier(s)_
