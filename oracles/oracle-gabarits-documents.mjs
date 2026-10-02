@@ -865,8 +865,17 @@ if (args[0] === "--self-test") {
   f = juger(dir);
   const g3 = g("G3", "classe-nue");
   if (g3.every((x) => x.statut === "SKIP")) {
-    console.log("Self-test gabarits-documents : 8/9 PASS, G3 non joué (socle de marquage ou python absent — " +
-      "il est déclaré, pas supposé)" + (casse.length ? " · CASSE : " + casse.join(" · ") : ""));
+    // TF-1476 (28/09/2026) — LE COMPTE SE CALCULE, IL NE S'ÉCRIT PLUS EN DUR. « 8/9 » datait d'avant
+    // G7, G8, G10, G11 et G12 : un cliquet de 39 cas en aurait accusé 30 perdus au premier passage
+    // sans python. `dir` porte déjà toutes les fixtures posées AVANT ce point (G1 à G10 compris, G3
+    // lui-même) : le nombre de règles DISTINCTES jugées par le dernier `juger(dir)` est le compte réel.
+    const reglesJugees = new Set(f.map((x) => x.regle));
+    reglesJugees.delete("G3"); // G3 n'a pas tourné (SKIP) : il ne compte pas comme jugé
+    console.log(`Self-test gabarits-documents : ${reglesJugees.size} règle(s) jugée(s) avant l'arrêt, ` +
+      "G3 non joué (socle de marquage ou python absent — il est déclaré, pas supposé). Les règles " +
+      "posées plus loin dans ce fichier (G8 et après) ne sont pas rejouées sur ce chemin : arrêt " +
+      "anticipé, pas un compte partiel qui se fait passer pour le total" +
+      (casse.length ? " · CASSE : " + casse.join(" · ") : ""));
     rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
     process.exit(casse.length ? 1 : 0);
   }
