@@ -689,27 +689,34 @@ function juger(texte, cheminJuge = null) {
     [...l.matchAll(RE_SELECTEUR_DECISION_G)].map((m) => "D-" + m[0].match(/\d{1,3}$/)[0])))];
   const annonceRappels = rappels.length
     ? ` ; ${rappels.length} décision(s) déjà posée(s), rappelée(s) inchangée(s) (${selecteursRappeles.join(", ")})` : "";
-  if (MOTIFS_ABSENCE.test(bDecisions.split("\n")[0] || "") || MOTIFS_ABSENCE.test(bDecisions.trim().slice(0, 120))) {
+  const options = (bDecisions.match(/\((?:a|b|c|d)\)|^\s*[-*]\s*\*\*\(?[a-d]\)?\*\*/gim) || []).length;
+  // TF-1467 (28/09/2026, campagne D-32 (a)) — L'OUVERTURE PAR « AUCUNE » NE COUVRE QUE CE QU'ELLE
+  // COUVRE. Le contrôle ne regardait que la 1re ligne ou les 120 premiers caractères DU BLOC : un
+  // bloc qui OUVRAIT par « Aucune décision nouvelle » passait S4 EN ENTIER même quand une VRAIE
+  // décision, sans choix fermé, suivait plus loin — mesuré : 55 des 204 synthèses du corpus
+  // passaient S4 par cette seule voie, et aucune ne cachait ce cas précis. Une ligne qui n'est NI
+  // un rappel (TF-1429) NI elle-même une courte déclaration d'absence compte désormais comme du
+  // contenu substantiel, même quand le bloc OUVRE par « aucune » : c'est TOUT le passage après le
+  // mot d'ouverture qui est vérifié, pas seulement son tout début.
+  const autreContenu = lignesCorps.filter((l) => /[\p{L}\p{N}]/u.test(l) && !rappels.includes(l) && !declareSonVide(l));
+  const ouvreParAbsence = MOTIFS_ABSENCE.test(bDecisions.split("\n")[0] || "") || declareSonVide(bDecisions);
+  if (options >= 2) ok("S4", `décisions en choix fermé (${options} option(s) étiquetée(s))${annonceRappels}`);
+  else if (ouvreParAbsence && !autreContenu.length) {
     ok("S4", rappels.length ? `aucune décision nouvelle — déclaré explicitement${annonceRappels}`
       : "aucune décision en attente — déclaré explicitement");
-  } else {
-    const options = (bDecisions.match(/\((?:a|b|c|d)\)|^\s*[-*]\s*\*\*\(?[a-d]\)?\*\*/gim) || []).length;
-    const autreContenu = lignesCorps.filter((l) => /[\p{L}\p{N}]/u.test(l) && !rappels.includes(l));
-    if (options >= 2) ok("S4", `décisions en choix fermé (${options} option(s) étiquetée(s))${annonceRappels}`);
-    else if (rappels.length && !autreContenu.length)
-      ok("S4", `aucune décision nouvelle${annonceRappels} — rappelée(s), pas redemandée(s) (TF-1429)`);
-    else {
-      // Le remède se dit quand l'auteur a manifestement voulu RAPPELER : une ligne qui porte un
-      // sélecteur et un repère de rappel (une heure, « posée », « inchangée ») sans le reste.
-      const tentative = autreContenu.find((l) => RE_SELECTEUR_DECISION.test(l)
-        && /\d{1,2}\s*[h:]\s*\d{2}|pos[ée]e|inchang/i.test(l) && !/\?/.test(l));
-      ko("S4", "décision demandée sans choix fermé — l'humain tranche entre des options, il ne rédige pas la solution"
-        + (tentative
-          ? `. Si cette décision a DÉJÀ été posée et n'a pas changé, elle se rappelle en une ligne, « D-N : <son sujet>, `
-            + `posée le JJ/MM à HH:MM, inchangée », sans option ni question ; il manque ici : ${manqueAuRappel(tentative).join(", ")} `
-            + `— « ${tentative.trim().slice(0, 90)} » (TF-1429). Une décision nouvelle garde son choix fermé.`
-          : ""));
-    }
+  } else if (rappels.length && !autreContenu.length)
+    ok("S4", `aucune décision nouvelle${annonceRappels} — rappelée(s), pas redemandée(s) (TF-1429)`);
+  else {
+    // Le remède se dit quand l'auteur a manifestement voulu RAPPELER : une ligne qui porte un
+    // sélecteur et un repère de rappel (une heure, « posée », « inchangée ») sans le reste.
+    const tentative = autreContenu.find((l) => RE_SELECTEUR_DECISION.test(l)
+      && /\d{1,2}\s*[h:]\s*\d{2}|pos[ée]e|inchang/i.test(l) && !/\?/.test(l));
+    ko("S4", "décision demandée sans choix fermé — l'humain tranche entre des options, il ne rédige pas la solution"
+      + (tentative
+        ? `. Si cette décision a DÉJÀ été posée et n'a pas changé, elle se rappelle en une ligne, « D-N : <son sujet>, `
+          + `posée le JJ/MM à HH:MM, inchangée », sans option ni question ; il manque ici : ${manqueAuRappel(tentative).join(", ")} `
+          + `— « ${tentative.trim().slice(0, 90)} » (TF-1429). Une décision nouvelle garde son choix fermé.`
+        : ""));
   }
 
   // S5 — chaque non-traité porte un motif
@@ -4269,6 +4276,12 @@ Aucun écart : la demande a été suivie à la lettre.
   const rRapMuet = jouerPe("tf1429-rappel-sans-sujet.md", bloc3Rappel("- **D-6** : posée le 25/09 à 14:20, inchangée."));
   const rRapNeuve = jouerPe("tf1429-rappel-et-decision-nouvelle.md", bloc3Rappel(RAPPEL_D6 + nl
     + "- **D-7 —** Faut-il renommer le dépôt de la forge de tests maintenant ? Le nom actuel porte encore le préfixe retiré le 20/09."));
+  // TF-1467 (28/09/2026, campagne D-32 (a)) — L'OUVERTURE PAR « AUCUNE » NE COUVRE QUE CE QU'ELLE
+  // COUVRE. Distinct de rRapNeuve ci-dessus (un RAPPEL suivi d'une décision nouvelle) : ici le bloc
+  // n'ouvre par AUCUN rappel, il ouvre par une déclaration d'absence, et une vraie décision suit —
+  // mesuré sur le corpus : 55 des 204 synthèses passaient S4 par cette seule voie.
+  const rAbsenceNeuve = jouerPe("tf1467-absence-et-decision-nouvelle.md", bloc3Rappel("Aucune décision nouvelle." + nl + nl
+    + "- **D-7 —** Faut-il renommer le dépôt de la forge de tests maintenant ? Le nom actuel porte encore le préfixe retiré le 20/09."));
   const c4 = (r) => constatDe(r, "S4");
   if (c4(rRap).statut !== "PASS" || !/rappel/.test(c4(rRap).message || ""))
     casse.push("S4 (TF-1429) : un bloc 3 qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — "
@@ -4288,6 +4301,10 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c4(rRapNeuve).statut !== "FAIL")
     casse.push("S4 (TF-1429) : une décision NOUVELLE sans choix fermé passe parce qu'un rappel l'accompagne — la voie du rappel "
       + "exempterait ce qui n'est pas rappel");
+  if (c4(rAbsenceNeuve).statut !== "FAIL")
+    casse.push("S4 (TF-1467) : un bloc 3 qui OUVRE par « Aucune décision nouvelle » passe en entier même quand une VRAIE "
+      + "décision sans choix fermé suit — le contrôle ne lisait que la 1re ligne ou les 120 premiers caractères du bloc, "
+      + "jamais ce qui vient après le mot d'ouverture");
   // 27/09 — LE COMPTE DE CAS SE MESURE. Le bilan portait « 39/39 » écrit à la main ; le harnais le lit
   // comme un CLIQUET (I5, `lib-baseline-recettes.mjs` : premier « N PASS », sinon le ratio N/N), et il
   // n'avait pas bougé quand deux paires se sont ajoutées le 26/09. Retiré seul, il a laissé le
