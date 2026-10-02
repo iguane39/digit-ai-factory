@@ -10,6 +10,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
@@ -114,6 +115,45 @@ check("le mode essai n'écrit rien — le fichier porteur est intact après la p
   const f = poser("essai.md", "Lot de Zorglub.\n");
   passer({ fichiers: [f], ecrire: false, racine: DEPOT });
   att(readFileSync(join(DEPOT, f), "utf8").includes("Zorglub"), "le mode essai a réécrit le fichier");
+});
+
+// TF-1213 — FIXTURE DOUBLE SENS : la ré-empreinte d'un sidecar `*.tf.jsonl` RÉÉCRIT ici (passer()
+// transmet désormais le contenu d'AVANT à `reempreinter-lot.mjs`, comme `anonymiser-suivis.mjs` le
+// fait déjà). Un registre todo/TODO.jsonl jetable, SOUS LE DÉPÔT jetable lui-même (jamais le
+// registre réel), porte une seule ingestion consignée.
+mkdirSync(join(DEPOT, "todo"), { recursive: true });
+const registreDepot = join(DEPOT, "todo", "TODO.jsonl");
+const AVANT_INGERE = '{"ev":"creation","titre":"Lot de Zorglub"}\n';
+const shaIngere = createHash("sha256").update(Buffer.from(AVANT_INGERE, "utf8")).digest("hex");
+
+check("ROUGE sans le correctif / VERT avec : un sidecar DÉJÀ INGÉRÉ, réécrit par la passe, se RÉ-EMPREINT (reempreintes rendu, verdict CONSIGNE)", () => {
+  writeFileSync(registreDepot, JSON.stringify({
+    ev: "ingestion", ts: "2026-09-11T12:47:00.000Z",
+    fichier: "Produit-09 - RETOURS - 20260911a.tf.jsonl", lot_sha: shaIngere,
+  }) + "\n", "utf8");
+  const f = poser("Produit-09 - RETOURS - 20260911a.tf.jsonl", AVANT_INGERE);
+  const r = passer({ fichiers: [f], ecrire: true, racine: DEPOT });
+  att(Array.isArray(r.reempreintes), "passer() ne rend pas `reempreintes` — le correctif TF-1213 n'est pas câblé");
+  const rp = r.reempreintes.find((x) => x.fichier === f);
+  att(rp, `aucune ré-empreinte rendue pour ${f} : ${JSON.stringify(r.reempreintes)}`);
+  att(rp.verdict === "CONSIGNE", `verdict ${rp.verdict} attendu CONSIGNE — ${rp.message}`);
+  const lignesRegistre = readFileSync(registreDepot, "utf8").trim().split("\n");
+  att(lignesRegistre.length === 2, `le registre ne porte pas la ré-empreinte consignée : ${lignesRegistre.length} ligne(s)`);
+  const evReempreinte = JSON.parse(lignesRegistre[1]);
+  att(evReempreinte.reempreinte && evReempreinte.reempreinte.lot_sha_avant === shaIngere,
+    "l'événement consigné ne porte pas l'empreinte d'avant attendue");
+});
+
+const nbLignes = (chemin) => readFileSync(chemin, "utf8").trim().split("\n").length;
+
+check("SECOND SENS — un sidecar JAMAIS INGÉRÉ, réécrit par la passe, ne consigne RIEN (verdict REFUS, registre inchangé)", () => {
+  const avant = nbLignes(registreDepot);
+  const f = poser("Produit-77 - RETOURS - 20260911a.tf.jsonl", '{"ev":"creation","titre":"Lot de Zorglub"}\n');
+  const r = passer({ fichiers: [f], ecrire: true, racine: DEPOT });
+  const rp = r.reempreintes.find((x) => x.fichier === f);
+  att(rp, `aucune ré-empreinte rendue pour ${f}`);
+  att(rp.verdict !== "CONSIGNE", `verdict ${rp.verdict} — un sidecar jamais ingéré ne doit rien consigner`);
+  att(nbLignes(registreDepot) === avant, "le registre a grossi alors qu'aucune ingestion ne couvrait ce sidecar");
 });
 
 rmSync(T, { recursive: true, force: true });

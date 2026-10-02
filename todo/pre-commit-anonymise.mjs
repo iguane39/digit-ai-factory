@@ -49,6 +49,7 @@ import { readFileSync, writeFileSync, existsSync, appendFileSync } from "node:fs
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { anonymiser } from "./anonymiser-entrant.mjs";
+import { reempreinter } from "./anonymiser-suivis.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
@@ -70,7 +71,7 @@ export function fichiersIndexes() {
  * Le geste : pour chaque fichier indexé, pseudonymise son CONTENU et le ré-indexe si besoin ;
  * relève à part les fichiers dont le NOM est porteur, qui se renomment à la main.
  */
-export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
+export function passer({ fichiers, ecrire = true, racine = RACINE, reempreindre = reempreinter } = {}) {
   // La RACINE est un parametre, et c'est ce qui rend ce geste eprouvable : le banc lui donne un
   // depot jetable au lieu de celui-ci. Un module qui ne sait travailler que sur son propre depot
   // ne se teste que sur son propre depot, donc jamais dans les deux sens.
@@ -79,6 +80,13 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
   // un identifiant, TF-0927). Le hook annonçait « pseudonymisé » sans jamais dire ce qui avait
   // résisté ; le 09/09, un nom est ainsi resté dans un commentaire du pilot, vu par la seule relecture.
   const corriges = [], nomsPorteurs = [], refuses = [], tautologies = [];
+  // TF-1213 (14/09/2026) — les sidecars `*.tf.jsonl` RÉÉCRITS ici gardent leur contenu d'AVANT,
+  // pour la même raison qu'`anonymiser-suivis.mjs` les garde déjà (fonction `reempreinter`) :
+  // cette porte réécrit l'index (writeFileSync + git add) SANS jamais passer par
+  // `reempreinter-lot.mjs`, et un sidecar déjà ingéré ressort donc en B2 (« édité après
+  // ingestion ») au premier poste qui le lit, pour zéro édition réelle — cinq occurrences le
+  // 11/09, réparées à la main par `--par-rapprochement`.
+  const sidecarsReecrits = [];
   for (const f of liste) {
     const abs = join(racine, f);
     if (!existsSync(abs)) continue;
@@ -99,8 +107,15 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
       gitDans(racine, "add", "--", f);
     }
     corriges.push({ fichier: f, termes: remplaces.length });
+    if (f.endsWith(".tf.jsonl")) sidecarsReecrits.push({ fichier: f, avant: brut });
   }
-  return { corriges, nomsPorteurs, refuses, tautologies };
+  // La ré-empreinte n'a de sens QUE si le fichier a réellement été écrit sur disque : en mode
+  // `--essai` (ecrire: false), le contenu courant est encore celui d'avant, et reempreinter-lot
+  // dirait « rien à faire » sans jamais rien prouver.
+  const reempreintes = ecrire && sidecarsReecrits.length
+    ? reempreindre(racine, { contenus: sidecarsReecrits, renommages: [] })
+    : [];
+  return { corriges, nomsPorteurs, refuses, tautologies, reempreintes };
 }
 
 /**
@@ -146,6 +161,14 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     try {
       appendFileSync(JOURNAL, JSON.stringify({ ts: new Date().toISOString(), ...c }) + "\n", "utf8");
     } catch { /* le journal ne doit jamais bloquer un commit */ }
+  }
+
+  // TF-1213 — un sidecar déjà ingéré qui vient d'être réécrit se ré-empreinte ici même, pour ne
+  // jamais ressortir en B2 (« édité après ingestion ») chez le poste suivant. Un sidecar jamais
+  // ingéré n'a rien à ré-empreindre : `reempreinter-lot` le dit (REFUS), et ce n'est qu'informatif
+  // — ce n'est pas la porte qui ingère un lot neuf (`ingerer-lot.mjs`).
+  for (const rp of r.reempreintes || []) {
+    console.error(`  [ré-empreinte ${rp.verdict}] ${rp.fichier} — ${rp.message}`);
   }
 
   // TF-0993 — CE QUI A RÉSISTÉ SE DIT, EN AVERTISSANT : la non-substitution est voulue (couper un
