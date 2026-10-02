@@ -5,7 +5,7 @@
  * LE FAIT. La règle LOT-SAS (`gabarits\oracle-lot-retours.mjs`, TF-0981 puis TF-1055, 14/09/2026)
  * refuse, à l'ingestion, un lot posé à la RACINE d'`input\00-retours\` sous son nom réel : la
  * remise d'un produit ou d'une forge doit atterrir dans le sas `input\00-retours\_arrivee\`
- * (ignoré par git), que `todo\accueillir-lot.mjs` pseudonymise puis déplace à la racine suivie.
+ * (ignoré par git), que l'outil d'accueil du pilot (`todo\accueillir-lot`) pseudonymise puis déplace à la racine suivie.
  * L'agent « adoption » de la campagne D-32 (a) du 28/09/2026 a relevé SEPT textes de doctrine qui
  * continuaient de prescrire la racine comme lieu de REMISE — une consigne lue par un producteur
  * aurait fait écrire son lot directement là où LOT-SAS le refuse.

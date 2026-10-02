@@ -22,8 +22,24 @@
   "cas": 19,
   "vu_le": "2026-09-27"
  },
+ "gabarits/documents/construire-guide-socle.test.mjs": {
+  "cas": 3,
+  "vu_le": "2026-10-02"
+ },
+ "gabarits/documents/coquille-vues-plafond.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-10-02"
+ },
  "gabarits/documents/espacement-4pt-herite.test.mjs": {
   "cas": 24,
+  "vu_le": "2026-10-02"
+ },
+ "gabarits/documents/ordonnancement-mep-ecriture.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-10-02"
+ },
+ "gabarits/oracle-demande-produit.test.mjs": {
+  "cas": 10,
   "vu_le": "2026-10-02"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
@@ -33,6 +49,10 @@
  "gabarits/oracle-travaux-pilot.test.mjs": {
   "cas": 27,
   "vu_le": "2026-09-09"
+ },
+ "gabarits/verifier-paragraphes-coupes.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-10-02"
  },
  "hook-ecriture.mjs": {
   "cas": 14,
@@ -410,9 +430,13 @@
   "cas": 8,
   "vu_le": "2026-08-26"
  },
+ "references/generer-compte-produits.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-10-02"
+ },
  "scripts/adopter-projet-existant.test.mjs": {
-  "cas": 27,
-  "vu_le": "2026-09-28"
+  "cas": 28,
+  "vu_le": "2026-10-02"
  },
  "scripts/allouer-indice.test.mjs": {
   "cas": 12,
@@ -426,13 +450,17 @@
   "cas": 11,
   "vu_le": "2026-09-16"
  },
+ "scripts/detecter-demandes-recues.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-10-02"
+ },
  "scripts/fusionner-tables-confidentielles.test.mjs": {
   "cas": 7,
   "vu_le": "2026-09-27"
  },
  "scripts/generer-lisezmoi-output.test.mjs": {
-  "cas": 3,
-  "vu_le": "2026-10-01"
+  "cas": 4,
+  "vu_le": "2026-10-02"
  },
  "scripts/generer-page-etude.mjs": {
   "cas": 15,
@@ -487,7 +515,7 @@
   "vu_le": "2026-09-15"
  },
  "scripts/recopier-heritage.test.mjs": {
-  "cas": 16,
+  "cas": 17,
   "vu_le": "2026-10-02"
  },
  "scripts/relever-appelants.test.mjs": {
@@ -501,6 +529,10 @@
  "scripts/relever-heritage.test.mjs": {
   "cas": 31,
   "vu_le": "2026-09-08"
+ },
+ "scripts/sas-retours-doctrine.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-10-02"
  },
  "scripts/verifier-avance-publication.test.mjs": {
   "cas": 10,

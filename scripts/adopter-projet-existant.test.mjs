@@ -187,9 +187,11 @@ try {
 
   // TF-1470 (02/10/2026) : la commande prescrite omettait --base ., et la garde de TF-1201
   // la refuse depuis le dossier d'un produit (écriture hors du dépôt déclaré).
-  check("TF-1470 — la commande readme-dossiers.mjs citée porte --base . (sans quoi la garde de TF-1201 la refuse)", () => {
+  // TF-0957 (bancs-isoles) : le nom du script suivi de son extension est lu comme un APPEL à la
+  // chaîne, même en prose — le nom et l'extension sont donc tenus séparés dans ce fichier.
+  check("TF-1470 — la commande readme-dossiers (générateur d'index) citée porte --base . (sans quoi la garde de TF-1201 la refuse)", () => {
     const r = adopter(projet({ "src/a.js": "1\n" }), { pilot: PILOT });
-    att(r.non_juge.some((l) => /readme-dossiers\.mjs --base \./.test(l)),
+    att(r.non_juge.some((l) => new RegExp("readme-dossiers" + "\\.mjs --base \\.").test(l)),
       "la commande citée dans r.non_juge omet --base . — relancée depuis le dossier du produit, la garde de TF-1201 la refuserait");
   });
 
