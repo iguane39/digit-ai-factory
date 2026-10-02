@@ -1,6 +1,6 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\references\\TODO-FORGE.md",
-  "date_iso": "2026-10-02T05:39:46.163Z",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\references\\TODO-FORGE.md",
+  "date_iso": "2026-10-02T07:21:50.773Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -75,9 +75,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\TODO-FORGE.md",
-    "ts": "2026-10-02T05:39:46.162Z",
+    "ts": "2026-10-02T07:21:50.773Z",
     "fichiers": {
-      "references\\TODO-FORGE.md": "5a654101e019b35147e7eec5a2c9ee3bdd88536b5be8dff196f60815f50ba62c"
+      "references\\TODO-FORGE.md": "be8f6208405165a2866712e2aa397531eceaffcbb62ec3ddd7091d26992647a7"
     }
   },
   "empreinte_motif": null,

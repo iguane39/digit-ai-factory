@@ -38,7 +38,7 @@
 })();
 </script>
   <!-- A4 : marque — objet · client — indice de version DATÉ ({YYYYMMDD}{a,b,c…}, le même
-       que le nom de fichier). Sans lui, deux révisions du même jour portent le même nom à
+       que le nom de fichier). Sans lui, 2 révisions du même jour portent le même nom à
        l'écran ; « V1 » ne les distingue pas (défaut du 17/08, lot Produit-01). -->
   <!--
   SQUELETTE — Ordonnancement de mise en production · bibliothèque de gabarits de documents du pilot.
@@ -235,14 +235,14 @@
     th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { font-weight: 700; }
     /* TF-0558 (24/08/2026) — LE SEUIL ETAIT FIGE A 900 px, ET TOUT PROJET QUI INSTANCIE CETTE
-       FAMILLE LE REPRODUISAIT. Mesure sur un livrable reel : un tableau de huit colonnes debordait
-       jusque vers 1 400 px (bord droit a 1 308 px pour un viewport de 1 280) — SEIZE debordements
-       bloquants, invisibles cinq jours. Le seuil ne depend pas d'un pixel choisi mais du NOMBRE DE
+       FAMILLE LE REPRODUISAIT. Mesure sur un livrable reel : un tableau de 8 colonnes debordait
+       jusque vers 1 400 px (bord droit a 1 308 px pour un viewport de 1 280) — 16 debordements
+       bloquants, invisibles 5 jours. Le seuil ne depend pas d'un pixel choisi mais du NOMBRE DE
        COLONNES : ~165 px de largeur utile par colonne de prose, mesure et non regle du pouce.
 
        Les paliers ci-dessous LISENT ce nombre dans le marquage — aucun emetteur n'a plus rien a
        calibrer, et un tableau qui gagne une colonne se replie plus tot sans qu'une ligne de CSS
-       bouge. Le palier de base (900 px) reste pour les tableaux de quatre colonnes ou moins. */
+       bouge. Le palier de base (900 px) reste pour les tableaux de 4 colonnes ou moins. */
     @media (max-width: 1400px) {
       .table-hote:has(th:nth-child(7)) { overflow-x: visible; }
       .table-hote:has(th:nth-child(7)) table.repli-cartes thead { display: none; }
@@ -277,7 +277,7 @@
     .table-hote[data-vide="oui"] .etat-vide { display: block; }
     /* Sommaire (L6) — le `nav.toc` était déclaré sans jamais être stylé : il se rendait en
        liste numérotée nue, ce qu'aucun livrable Digit-AI ne fait. Forme alignée sur les
-       livrables réels du parc : deux colonnes, titre souligné en bloc, annonce en gris dessous.
+       livrables réels du parc : 2 colonnes, titre souligné en bloc, annonce en gris dessous.
        Marquage attendu par entrée : <a href="#id"><span class="toc-t">…</span><span class="toc-d">…</span></a> */
     .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
     .toc h2 { margin-top: 0; }
@@ -289,7 +289,7 @@
     /* TF-0787 (03/09/2026) — au-delà de trois chapitres, le sommaire est LATÉRAL et COLLANT sur
        bureau (L25 du socle, famille de rendu sommaire_perdu) : un sommaire posé en tête d'un
        document de quatre écrans disparaît au premier tiers de la lecture et ne navigue plus rien.
-       Grille deux colonnes, sommaire collé au bord haut, une colonne d'entrées ; sous 900 px, le
+       Grille 2 colonnes, sommaire collé au bord haut, une colonne d'entrées ; sous 900 px, le
        sommaire redevient un bloc statique en tête. */
     .doc-grille { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
     .doc-grille > nav.toc { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; margin: 0; padding: 16px 18px; }
@@ -401,7 +401,7 @@
       <section class="chap lire" id="comite">
         <h2>La lecture pour le comité</h2>
         <p class="contenu">Ce chapitre contient le compte des étapes par famille — code, objets de plateforme, décisions, mode opératoire — et la phrase qui tranche. Il ne contient aucune étape : elles vivent au chapitre des lots.</p>
-        <p class="chapo ch-apprend">{Cinq à dix lignes en langage de décideur, qui répondent à une seule question : qu'est-ce qui manque vraiment ?}</p>
+        <p class="chapo ch-apprend">{De 5 à 10 lignes en langage de décideur, qui répondent à une seule question : qu'est-ce qui manque vraiment ?}</p>
         <p>Sur {N} étapes : {a} relèvent du code, {b} d'objets de plateforme absents, {c} de décisions ou de signatures, {d} de mode opératoire déjà écrit. {La phrase qui tranche — par exemple : « le produit est prêt ; ce qui manque est essentiellement de l'autorité et deux objets de plateforme ».}</p>
       </section>
 

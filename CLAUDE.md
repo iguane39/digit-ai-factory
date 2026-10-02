@@ -61,7 +61,7 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
    **5 bis** en parallèle : revue graphique d'implémentation (forge-design, mode aval) ;
 6. **MEP** — staging outillé par **forge-ops** (O-1…O-4), oracle M-1…M-7,
    `DOSSIER-MEP.md`, **GO humain** ;
-7. **Clore** — lot `<projet> - RETOURS - …` + sidecar remis à `<pilot>\input\00-retours\`,
+7. **Clore** — lot `<projet> - RETOURS - …` + sidecar remis au sas `<pilot>\input\00-retours\_arrivee\`,
    `run_close`, synthèse (`gabarits\RESTITUTION.md`).
 
 **Mode opératoire : `references\ETAPES-RUN.md`**. Contrat « prêt client » : oracles 1-3 verts ·
@@ -91,7 +91,7 @@ compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050).
 - **Aucun livrable publié sur un service hébergé** sans GO humain (R-38) : un livrable =
   fichier autoportant sur disque, chez le produit ; retrait = geste humain consigné.
 
-**Lexique d'invocation (RV-6)** — certaines demandes sont des APPELS de skill :
+**Lexique (RV-6)** — certaines demandes sont des APPELS de skill :
 « Améliore le prompt… » / « l99 » → `prompt-analyzer-l99` · « barre… » en tête de message
 → `la-barre` · « améliore/audite ce skill » → `ameliore-un-skill`. Retirer le mot-clé ; le
 reste = l'entrant. À l'ouverture d'un run : lister `.claude\skills\` des forges mobilisées.

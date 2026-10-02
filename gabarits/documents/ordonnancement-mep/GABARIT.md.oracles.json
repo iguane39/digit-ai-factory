@@ -1,0 +1,85 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+  "date_iso": "2026-10-02T07:46:40.472Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 2,
+    "fail": 1,
+    "skip": 5,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\documents\\ordonnancement-mep\\GABARIT.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "FAIL",
+      "detail": "1 constat(s) · M7 chapitre sans ouverture : « Oracles » (ligne 183) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond."
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Autorité d'une décision affirmée",
+      "file": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\documents\\ordonnancement-mep\\GABARIT.md",
+    "ts": "2026-10-02T07:46:40.471Z",
+    "fichiers": {
+      "gabarits\\documents\\ordonnancement-mep\\GABARIT.md": "a544e25d56056da46d3dcb5a06feca5fc88f603aae68b0c8ec13996e220816c5"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}

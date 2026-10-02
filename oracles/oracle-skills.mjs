@@ -135,14 +135,15 @@
 // vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
 // d'environnement (TF-0648).
 import {
-  existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync,
-  mkdtempSync, renameSync, rmSync, appendFileSync, utimesSync,
+  existsSync, readFileSync, readdirSync, statSync, lstatSync, mkdirSync, copyFileSync, writeFileSync,
+  mkdtempSync, renameSync, rmSync, appendFileSync, utimesSync, symlinkSync,
 } from "node:fs";
 import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
 import { racineConfigInstallee, skillsInstalles, hooksInstalles, settingsInstalle as settingsInstalleDe } from "../scripts/lib-config-installee.mjs";
+import { postesParDefaut } from "./oracle-amorcage-poste.mjs";
 // TF-0965 — la table des dépôts consommateurs (DONNÉE datée) et le geste avant/après.
 import { encadrer } from "./consommateurs-skills.mjs";
 
@@ -819,7 +820,8 @@ function relevePreambule(par_nom, findings) {
 function juger(racine, installes, appliquer = false, purger = false,
                installesHooks = join(dirname(installes), "hooks"),
                settingsInstalle = join(dirname(installes), "settings.json"),
-               config = racineConfigInstallee()) {
+               config = racineConfigInstallee(),
+               env = process.env) {
   const findings = [];
   const par_nom = sources(racine);
   if (par_nom.size === 0) {
@@ -963,6 +965,43 @@ function juger(racine, installes, appliquer = false, purger = false,
           + `Les autres règles de cet oracle peuvent être VERTES sur un parc que la session ne charge pas : c'est le défaut du 09/09 (24 skills alignés, 0 invocable). `
           + `Remède : node bootstrap.mjs --pull propage les skills vers cette racine (oracle-skills --appliquer) ; le CLAUDE.md de niveau poste s'y copie depuis ${join(homedir(), ".claude", "CLAUDE.md")}`
           + `${config.variable ? ` ; ou retirer ${config.variable} pour revenir au défaut ~/.claude` : ""}`,
+    });
+  }
+
+  // K13 (TF-1292, 02/10/2026) · CHAQUE PROFIL DE POSTE CONNU EST ÉNUMÉRÉ, ET SA NATURE DITE.
+  //
+  // LE FAIT, mesuré le 22/09/2026 : ce poste porte deux profils (~/.claude, ~/.claude-b), chacun
+  // avec son propre settings.json et son propre CLAUDE.md. `~/.claude/skills` est un répertoire
+  // RÉEL ; `~/.claude-b/skills` est un LIEN SYMBOLIQUE vers lui. La propagation des skills n'écrit
+  // QU'UNE FOIS, dans la racine que K10 mesure — c'est le lien qui fait paraître le second profil
+  // peuplé, pas le mécanisme. Si le lien était retiré, ou si un profil neuf naissait sans lien, ce
+  // profil perdrait TOUS ses skills en silence et K1/K10 continueraient de rendre PASS : ils ne
+  // regardent que la racine résolue, jamais combien de profils existent.
+  //
+  // DÉCLARATIF, comme K10 : cette règle ne juge pas qu'un lien soit un défaut (il peut être la
+  // convention retenue, loi transverse n°3 — alors déclarée), elle dit ce qu'il y a, sur chaque
+  // profil CONNU (`oracle-amorcage-poste::postesParDefaut`, la même source que
+  // `verifier-hook-poste.mjs`, pour qu'un poseur et son juge ne divergent jamais).
+  {
+    const profils = postesParDefaut(env);
+    const etats = profils.map((profil) => {
+      const cheminSkills = join(profil, "skills");
+      let nature;
+      try {
+        const st = lstatSync(cheminSkills);
+        nature = st.isSymbolicLink() ? "LIEN SYMBOLIQUE"
+          : st.isDirectory() ? "répertoire réel"
+          : "ni répertoire ni lien (chemin occupé autrement)";
+      } catch { nature = "absent"; }
+      return `${profil} : ${nature}`;
+    });
+    findings.push({
+      regle: "K13", statut: "PASS", ou: profils.join(" ; ") || "(aucun profil résolu)",
+      message: profils.length
+        ? `${profils.length} profil(s) de poste connu(s) — ${etats.join(" · ")}. Un lien symbolique n'est pas la ` +
+          "propagation : il peut MASQUER qu'elle n'a écrit qu'une fois (TF-1292, 22/09/2026) — un profil neuf créé " +
+          "sans ce lien perdrait ses skills en silence, et K1/K10 ne le verraient pas."
+        : "aucun profil de poste résolu — rien à énumérer",
     });
   }
 
@@ -1624,6 +1663,39 @@ function selfTest() {
             skillsInstalles({ CLAUDE_CONFIG_DIR: vide, FORGE_SKILLS_INSTALLES: instP }).chemin === resolve(instP)]);
   cas.push(["K10   — une variable posée à la chaîne VIDE est traitée comme absente",
             racineConfigInstallee({ CLAUDE_CONFIG_DIR: "   " }).variable === null]);
+
+  // ---- K13 (TF-1292, 02/10/2026) · le LIEN SYMBOLIQUE qui masque une propagation partielle ------
+  // Deux profils de poste fabriqués : le premier porte un RÉPERTOIRE RÉEL de skills, le second un
+  // LIEN SYMBOLIQUE vers lui — exactement la forme mesurée le 22/09. `postesParDefaut` est piloté
+  // par l'environnement injecté (CLAUDE_CONFIG_DIR), donc le second profil « -b » se fabrique à côté
+  // du premier pour correspondre à la convention `${racine}-b` de la fonction partagée.
+  const base12 = mkdtempSync(join(tmpdir(), "skills-k13-"));
+  const profilA = join(base12, "poste-a");
+  const profilB = `${profilA}-b`;
+  poser(join(profilA, "skills", "alpha", "SKILL.md"), "# alpha\n");
+  mkdirSync(profilB, { recursive: true });
+  symlinkSync(join(profilA, "skills"), join(profilB, "skills"), "junction");
+  const cfg12 = racineConfigInstallee({ CLAUDE_CONFIG_DIR: profilA });
+  const r13 = juger(racine10, skillsInstalles({ CLAUDE_CONFIG_DIR: profilA }).chemin, false, false,
+    join(profilA, "hooks"), join(profilA, "settings.json"), cfg12, { CLAUDE_CONFIG_DIR: profilA });
+  const k13 = r13.findings.find((f) => f.regle === "K13");
+  cas.push(["K13   — les DEUX profils connus sont énumérés, le premier nommé « répertoire réel »",
+            Boolean(k13) && k13.statut === "PASS" && k13.message.includes(`${profilA} : répertoire réel`)]);
+  cas.push(["K13   — le second profil, dont skills n'est qu'un LIEN vers le premier, est nommé « LIEN SYMBOLIQUE »",
+            Boolean(k13) && k13.message.includes(`${profilB} : LIEN SYMBOLIQUE`)]);
+  cas.push(["K13   — le message dit ce que le lien MASQUE, sans quoi l'énumération ne se contesterait pas",
+            Boolean(k13) && /MASQUER/.test(k13.message)]);
+  // Sens rouge sur l'ANCIEN comportement : avant TF-1292, aucune règle ne distinguait un profil
+  // réel d'un profil lié — l'absence de K13 dans les findings EST le défaut mesuré le 22/09.
+  const base12b = mkdtempSync(join(tmpdir(), "skills-k13b-"));
+  const seul = join(base12b, "poste-seul");
+  poser(join(seul, "skills", "alpha", "SKILL.md"), "# alpha\n");
+  const cfgSeul = racineConfigInstallee({ CLAUDE_CONFIG_DIR: seul });
+  const rSeul = juger(racine10, skillsInstalles({ CLAUDE_CONFIG_DIR: seul }).chemin, false, false,
+    join(seul, "hooks"), join(seul, "settings.json"), cfgSeul, { CLAUDE_CONFIG_DIR: seul });
+  const kSeul = rSeul.findings.find((f) => f.regle === "K13");
+  cas.push(["K13   — un profil ABSENT (ni répertoire ni lien) est nommé « absent », pas confondu avec un lien",
+            Boolean(kSeul) && kSeul.message.includes(`${seul}-b : absent`)]);
 
   // ---- TF-1133 · CRITÈRE « PARC ABSENT » : aucune installation à comparer ------------------------
   // Vert : racine PAR DÉFAUT inexistante, rien d'imposé — un runner hébergé ; l'oracle se déclare

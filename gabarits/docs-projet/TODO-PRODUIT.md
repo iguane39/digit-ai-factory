@@ -23,8 +23,8 @@ verifie_le: {AAAA-MM-JJ}
 > d'injection indirecte LLM01 dont l'oracle de l'écosystème déclare la couverture partielle.
 >
 > **Le retour d'une décision humaine emprunte la voie déjà éprouvée**, en sens produit → pilot :
-> un lot `<projet> - RETOURS - <AAAAMMJJ><indice>` + son sidecar `.tf.jsonl`, remis à
-> `<pilot>\input\00-retours\` et ingéré par `ingerer-lot.mjs` (règle R10). Rien à réinventer.
+> un lot `<projet> - RETOURS - <AAAAMMJJ><indice>` + son sidecar `.tf.jsonl`, remis au sas
+> `<pilot>\input\00-retours\_arrivee\` et ingéré par `ingerer-lot.mjs` (règle R10). Rien à réinventer.
 
 ## Décisions attendues
 

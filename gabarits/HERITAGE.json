@@ -1,8 +1,9 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "date": "2026-10-02",
   "evolution_1_14_0": "TF-1399 (02/10/2026) : le canal « un produit demande une évolution à un autre » (CONTRAT-INTERFACE.md §3 sexies, TF-1491 du 01/10) décrivait le mécanisme sans le câbler — « rien ne le joue encore », mot pour mot. Deux artefacts neufs : le gabarit de la demande et son juge de forme (DEM-1 à DEM-3, même raisonnement double-sens que pour les lots de retours, TF-0597). Sans classe existante : `familles_protegees` reste vide plutôt que de rattacher ce mécanisme neuf à une classe qui ne le décrit pas.",
+  "evolution_1_15_0": "TF-1563, 02/10/2026 (retour Produit-12 du 01/10, RS-25) — INTENTION.md et FICHE-CONCEPTION.md entrent au contrat, en COPIE CONFORME. Ce qui change pour celui qui produit : `references/INTENTION.md` (la loi transverse n° 7, que S51 juge au bloc 1 des restitutions) et le gabarit `gabarits/documents/FICHE-CONCEPTION.md` (que G6 juge rempli avant tout document à enjeu) descendent désormais sous `forge/INTENTION.md` et `forge/documents/FICHE-CONCEPTION.md`. Le fait : une consigne écrite le 01/09 (« à appliquer sur tous types de demande ») n'avait jamais atteint aucun produit — un produit a reproduit la même reprise de forme sur 4 pages, et les tests rétro de ses restitutions, pourtant présents, n'ont rien vu : ils jugent qu'une intention est DITE, jamais si le document en aval l'a réellement tenue.",
   "evolution_1_10_0": "TF-1119 (15/09/2026) : un artefact personnalisable (modes `presence*`) peut déclarer `marqueurs_a_instancier` — les trous que le produit DOIT remplir. `oracle-conformite-projet` (R-20 ter étendu) refuse une copie qui en garde un, quel que soit son dossier, et signale une `verifie_le` restée celle du gabarit. Déclarés et non devinés : mesuré sur les onze produits du parc le 15/09, un relevé de tous les chevrons rendait 30 échecs neufs dont 18 faux positifs (conventions de chemin, exemple commenté de robots.txt, rapport de rapprochement pris pour un carnet) ; déclarés, 12 échecs neufs et aucun faux positif relevé. Le carnet d'écarts hérité doit aussi citer tout autre carnet d'écarts du produit.",
   "evolution_1_7_0": "TF-0765 (02/09/2026) : le lanceur de hooks (copie identique) connaît un troisième hook, `page-html` — PostToolUse sur Write|Edit, joue les règles de socle d'une page HTML (filtres de tableau L4 / G1-G6) chez le produit au moment où il écrit ; `settings-produit.json` (présence et motif) le câble ; `CLAUDE-PRODUIT.md` porte une section « Règles de socle applicables » remplie à l'ouverture. Les produits dont la copie du lanceur est périmée la reçoivent à leur prochaine ouverture (hook-ouverture, recopie des copies identiques).",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
@@ -113,18 +114,20 @@
     {
       "source": "gabarits/web/robots.txt",
       "cible": "robots.txt",
+      "cible_alternative": "site/robots.txt",
       "mode": "presence",
       "conditionnel": "produit à surface web",
-      "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms.",
+      "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms. Un produit qui sert sa surface depuis `site/` (TF-1202, 02/10/2026) déclare sa cible réelle par `cible_alternative` : quand elle existe déjà, l'artefact racine, qui ne serait jamais servi, n'est pas instancié.",
       "depuis": "2026-08-23",
       "familles_protegees": []
     },
     {
       "source": "gabarits/web/llms.txt",
       "cible": "llms.txt",
+      "cible_alternative": "site/llms.txt",
       "mode": "presence",
       "conditionnel": "produit à surface web",
-      "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt.",
+      "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt. Même cible alternative que robots.txt (TF-1202, 02/10/2026) : `site/llms.txt`.",
       "depuis": "2026-08-23",
       "familles_protegees": []
     },
@@ -221,6 +224,22 @@
       "motif": "les termes que l'HUMAIN a proscrits pour TOUS les produits, et non pour un seul destinataire. Copie identique, à la différence du lexique de client : son contenu n'est pas propre au produit, c'est une décision du décideur, et un produit qui l'adapterait casserait le jugement rendu partout ailleurs. Il ne remplace pas forge/LEXIQUE.json : lib-lexique.mjs CUMULE les deux listes, le lexique du produit l'emportant quand un mot figure des deux côtés (son lecteur est nommé, il a pu retenir un autre remplacement).",
       "depuis": "2026-09-17",
       "pourquoi": "TF-1150, retour RP-02 du lot « digit-ai-marketing - RETOURS - 20260916a » : « Le lexique du destinataire est borné au produit, alors que le retour humain vise la Data entière. » Le terme avait été corrigé chez un produit (TF-1045) ; le lexique recopié chez un second le 16/09 est arrivé VIDE, parce qu'il ne porte que le vocabulaire de SON client, et le même humain a redemandé le mot une troisième fois sur un troisième livrable. Une règle dont la portée est le produit ne protège aucun autre produit, et c'est mécanique.",
+      "familles_protegees": []
+    },
+    {
+      "source": "references/INTENTION.md",
+      "cible": "forge/INTENTION.md",
+      "mode": "copie_conforme",
+      "motif": "LE TEXTE de la loi transverse n° 7 (cascade intention → stratégie → tactique → opérationnel, test rétro), à côté du juge qui la joue (S51 d'oracle-synthese sur le bloc 1 des restitutions). Même raisonnement que RESTITUTION.md et ECRITURE.md : un juge sans son texte force à deviner ; un texte sans juge décore. La consigne du 01/09 (« à appliquer sur tous types de demande », INTENTION.md l. 21-23) n'était descendue dans aucun produit — un produit a reproduit la même forme sur 4 pages avant qu'un test rétro, présent mais sans le texte qu'il est censé appliquer, ne la voie (TF-1563, retour Produit-12 du 01/10/2026, RS-25).",
+      "depuis": "2026-10-02",
+      "familles_protegees": []
+    },
+    {
+      "source": "gabarits/documents/FICHE-CONCEPTION.md",
+      "cible": "forge/documents/FICHE-CONCEPTION.md",
+      "mode": "copie_conforme",
+      "motif": "LE GABARIT de la fiche de conception amont (D8), que chaque document à enjeu remplit et nomme AVANT d'être écrit — `oracle-gabarits-documents.mjs` (G6) juge la fiche remplie (chemin propre au document, ex. forge/etapes/.../fiche-conception-<objet>.md), pas ce gabarit vierge lui-même, mais un produit qui ne l'a pas sous la main la réinvente ou la saute. TF-1563 (retour Produit-12 du 01/10/2026, RS-25) : `gabarits\\HERITAGE.json` ne portait ni INTENTION.md ni FICHE-CONCEPTION.md — 4 reprises de forme sur 2 pages et 1 sur une 3e, produites sans fiche, invisibles aux tests rétro des restitutions qui ne couvrent que l'intention, pas le cadrage document par document.",
+      "depuis": "2026-10-02",
       "familles_protegees": []
     }
   ],

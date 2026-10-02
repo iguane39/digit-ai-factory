@@ -148,6 +148,7 @@ export function octetsFautifs(evenement) {
  */
 const CLE_A_CREER = "classe-a-creer";
 const CLASSES_PATH = valeur("--classes") || join(ICI, "CLASSES.json");
+const RACINE = valeur("--racine") || join(ICI, "..");
 
 /** Les natures reconnues, hors classe de défaut (décision humaine D-16 (a) du 22/09/2026). */
 export const NATURES = new Set(["opportunite"]);
@@ -218,6 +219,45 @@ export function classeFautive(evenement, referentiel) {
   return null;
 }
 
+/**
+ * TF-1248 (02/10/2026) — UNE ÉTUDE CITÉE PAR UNE DÉCISION EXISTE AU MOMENT OÙ LA DÉCISION S'ÉCRIT.
+ *
+ * LE FAIT, mesuré le 20/09/2026 : quatre événements de décision du 14/09 (TF-1018, TF-1084,
+ * TF-1070, TF-1079) citent chacun une étude sous `output\03-etudes\`, chaque fois avec la mention
+ * « oracle-etude-opportunite PASS » — et aucun des quatre fichiers n'existe sur le disque ni dans
+ * l'historique git, sous aucune des deux histoires fusionnées. Deux agents de campagne ont dû
+ * travailler sur le TEXTE de la décision, faute de pouvoir lire la pièce qui la fonde.
+ *
+ * CE QUE CE GARDE VÉRIFIE, ET CE QU'IL NE VÉRIFIE PAS : une décision (`maj`, `statut: "decide"`)
+ * dont un champ cite un chemin `output[/\]03-etudes[/\]….md` doit, AU MOMENT OÙ ELLE S'ÉCRIT,
+ * désigner un fichier qui EXISTE sur le disque ET qui est SUIVI par git — sans quoi la pièce
+ * pourrait n'avoir jamais été commise, ou avoir disparu entre l'instruction et la décision. Il ne
+ * rejuge jamais la JUSTESSE de l'étude, seulement sa présence opposable.
+ */
+export function etudeCiteeIntrouvable(evenement, racine = RACINE) {
+  if (!evenement || evenement.ev !== "maj" || evenement.statut !== "decide") return null;
+  const motifs = [];
+  for (const [champ, v] of Object.entries(evenement)) {
+    if (typeof v !== "string") continue;
+    for (const m of v.matchAll(/output[\\/]03-etudes[\\/][^\s)"'»]+\.md/g)) {
+      motifs.push({ champ, chemin: m[0].replaceAll("\\", "/") });
+    }
+  }
+  const constats = [];
+  for (const { champ, chemin } of motifs) {
+    const abs = join(racine, chemin);
+    if (!existsSync(abs)) {
+      constats.push(`${champ} cite ${chemin} — introuvable sur le disque (racine : ${racine})`);
+      continue;
+    }
+    const suivi = spawnSync("git", ["-C", racine, "ls-files", "--error-unmatch", "--", chemin], { encoding: "utf8" });
+    if (suivi.status !== 0) {
+      constats.push(`${champ} cite ${chemin} — présent sur le disque mais NON SUIVI par git : rien ne le garantirait après ce commit`);
+    }
+  }
+  return constats.length ? constats : null;
+}
+
 // Le garde des octets est EXPORTÉ pour être joué sur le corpus réel avant livraison (N-23), et un
 // module dont l'import déclenche la ligne de commande n'est pas importable. La partie CLI ne
 // s'exécute donc que si ce fichier est le point d'entrée — même idiome que les oracles du dépôt.
@@ -272,6 +312,19 @@ if (sansClasse.length) {
       "ne s'ingère pas sans classe depuis le 03/09 ; le pilot s'en exemptait, et la revue du 22/09 a " +
       "compté 8 candidatures ouvertes sans aucune classe, invisibles au compteur des classes sans juge. " +
       `Constats : ${sansClasse.join(" · ")}`,
+  });
+}
+
+// Refus AVANT toute écriture, quatrième du même ordre : une décision qui cite une étude
+// introuvable ou non suivie ne s'écrit pas — le lecteur qui la rouvrira n'aurait rien à lire
+// (TF-1248, 02/10/2026 : quatre décisions du 14/09 citant une étude disparue sans aucun constat).
+const etudesIntrouvables = entrants
+  .flatMap((e, i) => (etudeCiteeIntrouvable(e) || []).map((c) => `rang ${i} — ${c}`));
+if (etudesIntrouvables.length) {
+  sortir(1, {
+    message: `${etudesIntrouvables.length} étude(s) citée(s) introuvable(s) ou non suivie(s) — refusé, aucune ` +
+      "écriture. Une décision qui s'appuie sur une étude ne s'écrit pas sans elle : retrouver le fichier, le " +
+      `commettre, ou retirer la citation si l'étude n'a jamais existé. Constats : ${etudesIntrouvables.join(" · ")}`,
   });
 }
 

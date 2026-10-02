@@ -213,6 +213,35 @@ try {
       "le fichier modifié a été écrasé malgré la garde");
   });
 
+  // ── TF-1202 : une cible alternative déclarée fait SAUTER l'artefact racine ─────────────────
+  // Un produit qui sert `robots.txt` et `llms.txt` depuis `site/` (généré par son propre build)
+  // recevait quand même la racine au placeholder du gabarit : deux fichiers du même nom, un seul
+  // servi. Le contrat déclare `cible_alternative` ; si elle existe déjà, la racine n'est pas créée.
+  check("TF-1202 — robots.txt racine n'est pas instancié quand site/robots.txt (cible_alternative) existe déjà", () => {
+    const produit = join(T, "produit-site");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    mkdirSync(join(produit, "site"), { recursive: true });
+    writeFileSync(join(produit, "site", "robots.txt"), "User-agent: *\nAllow: /\n", "utf8");
+    writeFileSync(join(produit, "site", "llms.txt"), "# llms du produit\n", "utf8");
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code} : ${r.sortie.slice(0, 200)}`);
+    att(!existsSync(join(produit, "robots.txt")),
+      "robots.txt a été instancié à la racine alors que site/robots.txt (cible alternative) existait déjà");
+    att(!existsSync(join(produit, "llms.txt")),
+      "llms.txt a été instancié à la racine alors que site/llms.txt (cible alternative) existait déjà");
+    att(/\[SAUTÉ\s*\] robots\.txt/.test(r.sortie), "le saut n'est pas dit pour robots.txt");
+    att(/\[SAUTÉ\s*\] llms\.txt/.test(r.sortie), "le saut n'est pas dit pour llms.txt");
+  });
+
+  check("TF-1202 borne — sans cible alternative sur le disque, robots.txt est instancié à la racine comme avant", () => {
+    const produit = join(T, "produit-sans-site");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(existsSync(join(produit, "robots.txt")), "robots.txt n'a pas été instancié alors qu'aucune cible alternative n'existe");
+    att(existsSync(join(produit, "llms.txt")), "llms.txt n'a pas été instancié alors qu'aucune cible alternative n'existe");
+  });
+
   // ── TF-0851 (2) : le geste rend compte de ce qu'il laisse au dépôt ─────────────────────────
   // ── TF-1459 : un antislash suivi de « r » écrit dans le gabarit, devenu un retour à la ligne ──
   // le 18/08 (commit 5ab0cd4) — le chemin de `resoudre-pilot.mjs` arrivait coupé en deux lignes
@@ -225,6 +254,24 @@ try {
     const claude = readFileSync(join(produit, "CLAUDE.md"), "utf8");
     att(/oracles\\resoudre-pilot\.mjs/.test(claude),
       "le chemin `oracles\\resoudre-pilot.mjs` n'apparaît pas intact dans CLAUDE.md — il est coupé par un retour à la ligne");
+  });
+
+  // ── TF-1563 : la cascade de l'intention et la fiche de conception amont descendent au produit ─
+  // Avant le 02/10/2026, gabarits\HERITAGE.json ne portait ni INTENTION.md ni FICHE-CONCEPTION.md
+  // (0 occurrence, releve du 01/10) : aucun produit ne les recevait, et un produit a reproduit la
+  // meme reprise de forme sur 4 pages sans jamais avoir la fiche sous la main (TF-1563, RS-25).
+  check("TF-1563 — forge/INTENTION.md et forge/documents/FICHE-CONCEPTION.md sont desormais herites en copie conforme", () => {
+    const produit = join(T, "produit-intention-fiche");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(existsSync(join(produit, "forge", "INTENTION.md")), "forge/INTENTION.md n'a pas ete copie — la cascade de l'intention ne descend toujours pas au produit");
+    att(existsSync(join(produit, "forge", "documents", "FICHE-CONCEPTION.md")), "forge/documents/FICHE-CONCEPTION.md n'a pas ete copie — la fiche de conception amont ne descend toujours pas au produit");
+    const normE = (s) => String(s).split("\r\n").join("\n").trimEnd();
+    att(normE(readFileSync(join(produit, "forge", "INTENTION.md"), "utf8")) === normE(readFileSync(join(PILOT, "references", "INTENTION.md"), "utf8")),
+      "forge/INTENTION.md copie mais different de sa source");
+    att(normE(readFileSync(join(produit, "forge", "documents", "FICHE-CONCEPTION.md"), "utf8")) === normE(readFileSync(join(PILOT, "gabarits", "documents", "FICHE-CONCEPTION.md"), "utf8")),
+      "forge/documents/FICHE-CONCEPTION.md copie mais different de sa source");
   });
 
   check("TF-0851 — le geste imprime la ligne `git add` des fichiers qu'il vient d'écrire", () => {

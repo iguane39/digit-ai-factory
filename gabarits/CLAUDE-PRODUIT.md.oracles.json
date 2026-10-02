@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a576abdf8d21a41a4\\gabarits\\CLAUDE-PRODUIT.md",
-  "date_iso": "2026-10-02T06:33:39.435Z",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\gabarits\\CLAUDE-PRODUIT.md",
+  "date_iso": "2026-10-02T07:36:05.155Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\CLAUDE-PRODUIT.md",
-    "ts": "2026-10-02T06:33:39.434Z",
+    "ts": "2026-10-02T07:36:05.154Z",
     "fichiers": {
-      "gabarits\\CLAUDE-PRODUIT.md": "abed83c8c3cec09fb7a143a972d5740b6df83bd62afdc361ed5c66be38a24891"
+      "gabarits\\CLAUDE-PRODUIT.md": "66c9a213c9216f19871571599892a01d1477ab2fbf978f3309c20b5b0496f706"
     }
   },
   "empreinte_motif": null,

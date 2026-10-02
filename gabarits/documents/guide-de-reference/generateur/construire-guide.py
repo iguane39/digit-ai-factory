@@ -854,6 +854,18 @@ def constat_socle(page, socle):
 
 
 def socle_page_html(explicite=None):
+    # TF-1478 (02/10/2026) — UN --socle INVALIDE NE RETOMBE PLUS EN SILENCE SUR LE SOCLE INSTALLÉ.
+    # Avant : un emplacement explicite qui ne portait pas scripts\embarquer-composants.mjs était
+    # simplement écarté de la liste des candidats, et la fonction essayait les emplacements par
+    # défaut sans rien dire — l'appelant croyait son --socle honoré alors qu'un autre socle,
+    # potentiellement d'une autre version, avait été utilisé à son insu. Désormais, un --socle
+    # explicite et invalide est signalé sur stderr avant tout repli.
+    if explicite:
+        c = Path(explicite)
+        if not (c / "scripts" / "embarquer-composants.mjs").is_file():
+            print("[AVERTISSEMENT] --socle %s ne porte pas scripts\\embarquer-composants.mjs — "
+                  "ignoré, repli sur le socle installé (CLAUDE_CONFIG_DIR ou ~/.claude)" % c,
+                  file=sys.stderr)
     candidats = [Path(explicite)] if explicite else []
     for racine in (os.environ.get("CLAUDE_CONFIG_DIR"), str(Path.home() / ".claude")):
         if racine:

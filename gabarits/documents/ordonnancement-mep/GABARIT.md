@@ -68,7 +68,7 @@ Trois choses, et rien d'autre :
   d'inversions cassent la MEP (renvoi à la section 4) ;
 - **la légende des NATURES**, en tableau, vocabulaire FERMÉ à cinq valeurs :
 
-  | Nature | Ce que cela veut dire |
+  | Nature | Signification |
   |---|---|
   | **Décider** | Un arbitrage ou une signature. Ne produit aucun artefact technique, mais débloque ceux qui suivent. N'appartient pas au projet. |
   | **Construire** | Un objet qui n'existe pas — code, pipeline, objet de plateforme, attestation. |
@@ -96,7 +96,7 @@ absolue tant que le créneau n'est pas attribué — c'est une étape « Décide
 
 Les colonnes sont **fixes, dans cet ordre, pour tous les lots** :
 
-| # | Objet | Nature | Ce qu'il y a à faire | Dépend de | Propriétaire | Bloquant | Preuve de fin |
+| # | Objet | Nature | Action attendue | Dépend de | Propriétaire | Bloquant | Preuve de fin |
 |---|---|---|---|---|---|---|---|
 
 - **#** — identifiant stable et continu sur tout le document (`S-01`, `S-02`, …). Continu
@@ -112,7 +112,7 @@ Les colonnes sont **fixes, dans cet ordre, pour tous les lots** :
 - **Preuve de fin** — ce qu'on doit VOIR pour dire que c'est fini : une sortie de commande, un
   objet visible dans une console, un document signé. « Fait » n'est pas une preuve de fin.
 
-**D3 s'applique** : huit colonnes, donc repli en cartes sous 900 px. **D4** : les colonnes qui
+**D3 s'applique** : 8 colonnes, donc repli en cartes sous 900 px. **D4** : les colonnes qui
 portent une date ou une fenêtre portent `data-v` avec la valeur triable, sinon le tri du
 tableau range `J-1` après `J`.
 
@@ -160,7 +160,7 @@ d'origine, sur 48 étapes, exactement **trois** inversions étaient destructrice
 
 ### 5 · La lecture pour le comité
 
-Cinq à dix lignes, en langage de décideur, qui répondent à une seule question : **qu'est-ce
+De 5 à 10 lignes, en langage de décideur, qui répondent à une seule question : **qu'est-ce
 qui manque vraiment ?** On y compte, sur le total des étapes, combien relèvent du code, combien
 d'objets de plateforme absents, combien de décisions ou de signatures, et combien de mode
 opératoire déjà écrit. Puis la phrase qui tranche — sur le livrable d'origine : « le produit
@@ -171,7 +171,7 @@ constat lui-même de 48 lignes de tableau ne le dérivera pas.
 
 ---
 
-## Ce que ce document ne fait JAMAIS
+## Hors périmètre, toujours
 
 - **il ne remplace pas le mode opératoire** : une étape « Exécuter » renvoie au runbook, elle
   ne le recopie pas — deux copies d'une commande divergent au premier correctif ;
@@ -216,6 +216,6 @@ encore obtenir part au document d'auteur. Le doute utile au lecteur se dit à l'
 concerne ; le doute de l'auteur ne le suit pas.
 
 **Un document long se découpe en VUES d'un fichier unique, pas en fichiers**, sauf demande
-contraire de son lecteur : onze fichiers à partager sont un coût pour lui, jamais pour son auteur.
+contraire de son lecteur : 11 fichiers à partager sont un coût pour lui, jamais pour son auteur.
 
 *Règle D11 (`gabarits\documents\README.md`), jugée par G10 d'`oracle-gabarits-documents.mjs`.*

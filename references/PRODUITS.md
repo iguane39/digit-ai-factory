@@ -15,7 +15,7 @@ diffère des trois autres comptes du parc, et comment elle se tient à jour.
 
 ## Les produits
 
-Le registre connaît **17 produits connus du registre** par leurs lots — c'est-à-dire cités dans les
+Le registre connaît **23 produits connus du registre** par leurs lots — c'est-à-dire cités dans les
 champs `demandeur` ou `source` d'au moins une création, sous la forme `Produit-NN`. Ce compte est
 jugé par le claim `produits-connus-du-registre` d'`oracles\fraicheur-claims.json` : le jour où un
 produit neuf remet son premier lot, l'oracle de fraîcheur échoue jusqu'à ce que sa ligne soit
@@ -71,7 +71,7 @@ est précisément ce qui rendait la question insoluble.
 - **Le registre** : 17, par les lots remontés. C'est le seul compte qui prouve une activité sous la
   doctrine, et c'est celui que ce référentiel prend pour base.
 - **La table des pseudonymes** du canal confidentiel (`scripts\lib-confidentiel.mjs`, hors dépôt) :
-  environ quatre fois plus d'entrées. Elle pseudonymise tout nom de produit rencontré dans un texte,
+  environ 4 fois plus d'entrées. Elle pseudonymise tout nom de produit rencontré dans un texte,
   y compris ceux qui n'ont jamais été instrumentés ; elle n'est pas une liste de produits suivis.
 - **Le relevé d'ouverture** (`oracles\hook-produits-intacts.mjs`) : un scan du disque, qui dit ce
   qu'un poste porte à l'instant, jamais ce que la Factory suit.
@@ -80,7 +80,7 @@ est précisément ce qui rendait la question insoluble.
   PAS recopié ici : un fait qui dépend du poste, écrit dans un fichier suivi, réécrit ce fichier à
   chaque changement de poste — défaut déjà payé par l'index de `output\` (TF-1243).
 
-## Ce que ce référentiel ne dit pas
+## Hors du périmètre de ce référentiel
 
 Il ne donne aucun chemin ni aucun nom réel : le pilot ne fait entrer aucun nom de produit dans un
 fichier suivi (`scripts\lib-pseudonyme-produit.mjs`, décision du 03/09). Pour atteindre le dépôt

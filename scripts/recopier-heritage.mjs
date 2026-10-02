@@ -126,6 +126,19 @@ const ecrits = [];   // TF-0851 : ce que ce geste laisse au dépôt, nommé pour
 for (const a of contrat.artefacts) {
   const src = join(PILOT, String(a.source));
   const dst = join(cible, String(a.cible));
+  // ---- TF-1202 · UNE CIBLE ALTERNATIVE DÉCLARÉE REND L'ARTEFACT RACINE INUTILE --------------
+  //
+  // Un produit qui sert sa surface web depuis `site/` (généré par son propre build) a vu ce
+  // geste déposer un `robots.txt` et un `llms.txt` à la racine, au placeholder, à côté de ceux
+  // réellement servis sous `site/` — deux fichiers du même nom dont un seul est joignable. La
+  // cible alternative est DÉCLARÉE dans le contrat (`cible_alternative`), jamais devinée : si
+  // elle existe déjà chez le produit, l'artefact racine n'a rien à protéger ni rien à servir, et
+  // ce geste SAUTE sa création.
+  if (a.cible_alternative && !existsSync(dst)
+    && existsSync(join(cible, String(a.cible_alternative)))) {
+    console.log(`[SAUTÉ  ] ${a.cible} — cible alternative déclarée ${a.cible_alternative} déjà présente : c'est elle qui est servie`);
+    continue;
+  }
   if (a.mode !== "copie_conforme") {
     // ---- TF-0850 · UN ARTEFACT PERSONNALISABLE **ABSENT** N'A RIEN À PROTÉGER --------------
     //

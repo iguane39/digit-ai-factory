@@ -30,7 +30,13 @@
  *   node scripts\verifier-avance-publication.mjs [--depot <chemin>] [--plage origin/main..HEAD]
  *                                                 [--go "<motif>"]
  * Exit : 0 PASS (aucun enregistrement `explicite`, ou `--go` donné) · 1 FAIL (au moins un
- * enregistrement `explicite`, listé) · 2 argument invalide (`--go` sans motif non vide).
+ * enregistrement `explicite`, listé) · 2 argument invalide (`--go` sans motif non vide, ou
+ * `--depot` DÉSIGNÉ explicitement et qui n'est pas un dépôt git — TF-1373, 02/10/2026 : un chemin
+ * mal formé par l'échappement du shell rendait PASS/0 sur six dépôts, « hors dépôt git : rien à
+ * juger » — un envoi enchaîné sur ce code de sortie serait parti sans qu'aucun enregistrement
+ * n'ait été classé. SANS `--depot` — la session tourne dans un dossier qui n'est simplement pas un
+ * dépôt (un produit non versionné, par exemple) —, c'est toujours PASS/0 : rien n'a été DEMANDÉ
+ * à tort, il n'y a rien à juger (point 4 du contrat).
  *
  * CE QU'IL NE FAIT PAS, et c'est délibéré : il ne juge pas si le GO explicite donné est le BON
  * GO — `--go` est une déclaration humaine prise telle quelle, jamais vérifiée contre un ticket ou
@@ -46,7 +52,8 @@ import { execFileSync } from "node:child_process";
 const args = process.argv.slice(2);
 const val = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };
 
-const DEPOT = val("--depot") || process.cwd();
+const DEPOT_DESIGNE = val("--depot");
+const DEPOT = DEPOT_DESIGNE || process.cwd();
 const PLAGE = val("--plage") || "origin/main..HEAD";
 
 // Le garde d'argument sort AVANT tout appel git : aucune ressource ouverte, `process.exit()` y
@@ -150,9 +157,27 @@ function classifier(sha) {
   return { classe: "candidature", fichiers_hors_classe: [] };
 }
 
-// --- Hors dépôt git : rien à juger, PASS non_juge (point 4 du contrat). ---
+// --- Hors dépôt git : deux cas, et ils ne sont plus confondus (TF-1373, 02/10/2026). ---
+//
+// SANS `--depot` : la session tourne dans un dossier qui n'est simplement pas un dépôt (un
+// produit non versionné, par exemple) — rien n'a été DEMANDÉ à tort, PASS non_juge (point 4 du
+// contrat, inchangé).
+//
+// AVEC `--depot` : le chemin a été explicitement DÉSIGNÉ par l'appelant. Le 27/09, un chemin mal
+// formé par l'échappement du shell (« C:\dev$d ») a rendu PASS, exit 0, « hors dépôt git : rien à
+// juger » sur six forges — seule la relecture du JSON l'a montré. Un appelant qui lit le code de
+// sortie (hameçon pre-push, `&&`) aurait publié sans qu'aucun enregistrement ait été classé. Un
+// `--depot` invalide est donc une ERREUR D'ARGUMENT (exit 2), symétrique de `--go` sans motif.
 try { sh(["rev-parse", "--is-inside-work-tree"]); }
 catch {
+  if (DEPOT_DESIGNE) {
+    process.stdout.write(JSON.stringify({
+      outil: "verifier-avance-publication",
+      erreur: `--depot « ${DEPOT_DESIGNE} » ne désigne pas un dépôt git (chemin inexistant, ou git inatteignable) — ` +
+        "rien n'a été jugé ; un enchaînement sur ce code de sortie se serait poursuivi sans classement",
+    }, null, 1) + "\n");
+    process.exit(2);
+  }
   sortir({
     outil: "verifier-avance-publication", plage: PLAGE, enregistrements: [], verdict: "PASS",
     motif: "hors dépôt git : rien à juger",

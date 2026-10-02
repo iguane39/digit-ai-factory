@@ -1,0 +1,139 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+  "date_iso": "2026-10-02T07:53:29.236Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 9,
+    "fail": 2,
+    "skip": 6,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Rendu HTML / visuel",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Conformité charte HTML (charte, sémantique, print)",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Accessibilité (WCAG structurel)",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · controles WCAG structurels OK"
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 1 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 0 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    },
+    {
+      "domaine": "Régression visuelle (golden diff)",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Design généré : marqueurs de slop",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucune des règles S1–S10 déclenchée"
+    },
+    {
+      "domaine": "Système de marque : traçabilité des tokens",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "FAIL",
+      "detail": "18 constat(s) · couleur en dur « #FFFFFF » sur color : passer par var(--token) ; token de couleur « --green-solid » défini en clair mais absent du thème sombre"
+    },
+    {
+      "domaine": "Cible mobile : contrat d'usage tactile",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "SKIP",
+      "detail": "1 constat(s) · SANS OBJET — cible non mobile (ni --mobile, ni marqueur de châssis détecté)"
+    },
+    {
+      "domaine": "Visuels générés : traçabilité et budget",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · I1–I7 sans écart"
+    },
+    {
+      "domaine": "Mouvement : craft de l'animation",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · R1–R7 sans écart"
+    },
+    {
+      "domaine": "Filtres de colonne sur tableaux de donnees",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "FAIL",
+      "detail": "3 constat(s) · Tableau data-filterable sans attribut id : le composant ne peut ni etre initialise ni relie a son compteur. ; Aucune reference a table-filters.js ni a DigitAITableFilters : le composant est declare mais absent."
+    },
+    {
+      "domaine": "Autorité d'une décision affirmée",
+      "file": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html",
+    "ts": "2026-10-02T07:53:29.235Z",
+    "fichiers": {
+      "gabarits\\documents\\ordonnancement-mep\\INSTANCE.html": "5c387eb4d025b65aeb29436b6bb366434b42034832b54960171b7051d5331312"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}

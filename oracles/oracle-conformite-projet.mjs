@@ -1447,14 +1447,35 @@ else {
   });
   const illisibles = entrees.filter((x) => !x.e).map((x) => x.n);
   // Les seq rectifiés : déclarés par une entrée de rectification, et seulement en amont d'elle.
+  //
+  // TF-1466 (02/10/2026, A-?) — DEUX ACCEPTATIONS QUE `ledger.mjs verify` (forge-agents, TF-1425)
+  // REFUSE DÉJÀ ET QUE R-42 LAISSAIT PASSER, mesuré le 28/09 par l'agent « forge-agents » : 2
+  // fixtures sur 8 rendaient PASS ici et FAIL chez `ledger.mjs verify`. Une rectification qui ne
+  // CITE PAS SON TS (`ts_consigne` ou `ts_reel_estime` absents de l'élément `entrees[]`) n'est pas
+  // opposable — rien ne distingue alors une correction honnête d'une réécriture non datée. Une
+  // rectification dont le ts PROPRE (`e.ts`, l'horodatage de l'entrée de rectification elle-même)
+  // n'est pas POSTÉRIEUR au ts cité de la collision ne peut pas l'avoir constatée après coup : elle
+  // aurait été écrite avant le fait qu'elle prétend corriger. Les deux cas restent des ÉCARTS
+  // (ecarts, pas notes) — une rectification invalide ne rectifie rien.
   const rectifies = new Map();
+  const rectificationsInvalides = [];
   for (const { e } of entrees) {
     if (!e || (e.type || e.ev) !== "rectification_horodatage") continue;
     for (const d of (Array.isArray(e.entrees) ? e.entrees : [])) {
       const seq = Number(d && d.seq);
-      if (Number.isFinite(seq) && (!Number.isFinite(Number(e.seq)) || seq < Number(e.seq))) {
-        rectifies.set(seq, String((d && d.cause) || "cause non dite"));
+      if (!Number.isFinite(seq) || (Number.isFinite(Number(e.seq)) && seq >= Number(e.seq))) continue;
+      const tsCollision = String((d && (d.ts_consigne || d.ts_reel_estime)) || "");
+      if (!tsCollision) {
+        rectificationsInvalides.push(`seq ${seq} : rectification sans ts_consigne ni ts_reel_estime — non opposable (TF-1466)`);
+        continue;
       }
+      const instantRectif = Date.parse(String(e.ts || ""));
+      const instantCollision = Date.parse(tsCollision);
+      if (Number.isFinite(instantRectif) && Number.isFinite(instantCollision) && instantRectif <= instantCollision) {
+        rectificationsInvalides.push(`seq ${seq} : rectification datée ${e.ts || "(ts absent)"} pas postérieure à la collision qu'elle corrige (${tsCollision}) — TF-1466`);
+        continue;
+      }
+      rectifies.set(seq, String((d && d.cause) || "cause non dite"));
     }
   }
   // TF-1203 (14/09/2026, campagne D-51 (a)) — R-42 NE PORTAIT QU'UNE VOIE NOMMÉE SEQ PAR SEQ
@@ -1482,6 +1503,7 @@ else {
   const ecarts = [], notes = [];
   let avecSeq = 0;
   if (illisibles.length) ecarts.push(`ligne(s) JSON illisible(s) : ${illisibles.slice(0, 5).join(", ")}${illisibles.length > 5 ? " …" : ""}`);
+  if (rectificationsInvalides.length) ecarts.push(...rectificationsInvalides); // TF-1466
   const lues = entrees.filter((x) => x.e).map((x) => x.e);
   if (lues.length) {
     const premier = lues[0];

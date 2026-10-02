@@ -1,7 +1,7 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\CLAUDE.md",
-  "date_iso": "2026-09-01T20:48:08.196Z",
-  "registre_version": "2.13.0",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\CLAUDE.md",
+  "date_iso": "2026-10-02T07:19:25.614Z",
+  "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -38,7 +38,7 @@
       "domaine": "Sécurité / secrets",
       "file": "CLAUDE.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
@@ -50,7 +50,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "CLAUDE.md",
       "verdict": "PASS",
-      "detail": "1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "CLAUDE.md",
-    "ts": "2026-09-01T20:48:08.195Z",
+    "ts": "2026-10-02T07:19:25.614Z",
     "fichiers": {
-      "CLAUDE.md": "5d71bc8da8ee2252cf00f7776c3ff49636c739f48e9b5502d3e8c51c01b9c295"
+      "CLAUDE.md": "ee04632acbff8123247537228d918bbe21e61a9626024f3c3eb6a4b931a63030"
     }
   },
   "empreinte_motif": null,

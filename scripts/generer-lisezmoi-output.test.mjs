@@ -66,6 +66,32 @@ check("vert — un fichier NON suivi du poste n'entre pas dans l'index publié",
   if (!/Synthese de recette/.test(ib)) throw new Error("le livrable suivi manque à l'index");
 });
 
+// TF-1404 (02/10/2026) — UN SIDECAR N'EST PAS UN LIVRABLE. Mesuré le 24/09 : LISEZMOI.md portait
+// 48 lignes de `*.jugement.json` à côté de `*.oracles-cache.json` et `*.oracles-historique.jsonl`
+// dans sa table « Livrable » — le filtre d'extension (`.json`, `.jsonl`) ne les distinguait pas
+// d'un vrai livrable. Les trois formes de sidecar sont fabriquées, suivies par git, à côté du
+// livrable réel : seul ce dernier doit entrer dans la table.
+check("vert — les sidecars (.jugement.json, .oracles-cache.json, .oracles-historique.jsonl) n'entrent pas dans la table des livrables", () => {
+  const D = depot("lf", false);
+  const g = (...a) => spawnSync("git", ["-C", D, ...a], { encoding: "utf8" });
+  const dir = join(D, dirname(LIVRABLE));
+  const sidecars = [
+    `${LIVRABLE}.jugement.json`,
+    `${LIVRABLE}.oracles-cache.json`,
+    `${LIVRABLE}.oracles-historique.jsonl`,
+    `${LIVRABLE}.oracles.json`,
+  ];
+  for (const s of sidecars) writeFileSync(join(D, s), "{}", "utf8");
+  g("add", "-A");
+  const ib = indexDe(D);
+  rmSync(D, { recursive: true, force: true });
+  if (!/Synthese de recette/.test(ib)) throw new Error("le livrable réel manque à l'index");
+  for (const s of sidecars) {
+    const base = s.split("/").pop();
+    if (ib.includes(base)) throw new Error(`le sidecar ${base} est entré dans la table des livrables`);
+  }
+});
+
 // TF-1414 (01/10/2026) — un commit fait depuis un ARBRE DE TRAVAIL LIÉ lance le garde de
 // pré-enregistrement avec GIT_DIR exporté par git vers `.git/worktrees/<nom>`. Le relevé
 // `git -C output ls-files` héritait de cette variable et ne listait plus les livrables de l'arbre :

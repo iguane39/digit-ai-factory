@@ -167,12 +167,45 @@ test("(e) plage vide (origin/main == HEAD) → PASS, enregistrements vides", () 
 });
 
 
+// TF-1373 (02/10/2026) — un `--depot` DÉSIGNÉ qui n'est pas un dépôt git est une ERREUR
+// D'ARGUMENT, pas un PASS silencieux. Le 27/09, un chemin mal formé par l'échappement du shell a
+// rendu PASS/exit 0 sur six forges, « hors dépôt git : rien à juger » — seule la relecture du JSON
+// l'a montré ; un appelant qui lit le code de sortie (hameçon pre-push, `&&`) aurait publié sans
+// qu'aucun enregistrement n'ait été classé.
+test("(f) --depot désignant un chemin qui n'est PAS un dépôt git → exit 2, erreur nommée", () => {
+  const faux = mkdtempSync(join(tmpdir(), "verif-avance-pub-pas-un-depot-"));
+  try {
+    const r = lancer(faux);
+    assert.equal(r.code, 2, JSON.stringify(r.j));
+    assert.ok(r.j && typeof r.j.erreur === "string" && /--depot/.test(r.j.erreur) && /dépôt git/.test(r.j.erreur),
+      `l'erreur ne nomme pas --depot ni le défaut de dépôt git : ${JSON.stringify(r.j)}`);
+  } finally { rmSync(faux, { recursive: true, force: true }); }
+});
+
+test("(f2) --depot désignant un chemin INEXISTANT → exit 2, comme pour un chemin non-git", () => {
+  const faux = join(mkdtempSync(join(tmpdir(), "verif-avance-pub-inexistant-")), "n-existe-pas");
+  const r = lancer(faux);
+  assert.equal(r.code, 2, JSON.stringify(r.j));
+});
+
+test("(f3) borne — SANS --depot, un dossier qui n'est pas un dépôt git reste PASS/0 (point 4 du contrat)", () => {
+  const faux = mkdtempSync(join(tmpdir(), "verif-avance-pub-sans-depot-"));
+  try {
+    const r = execFileSync(process.execPath, [OUTIL], { cwd: faux, encoding: "utf8" });
+    const j = JSON.parse(r);
+    assert.equal(j.verdict, "PASS");
+    assert.equal(j.motif, "hors dépôt git : rien à juger");
+  } finally { rmSync(faux, { recursive: true, force: true }); }
+});
+
 // I5 — LE CLIQUET LIT LA DERNIÈRE LIGNE, et `node:test` la termine par une durée. Une recette sans
 // compte lisible sort du cliquet EN SILENCE : elle pourrait perdre des cas sans que rien ne crie,
 // et c'est exactement le défaut que le cliquet existe pour éteindre (TF-0681). Le compte est donc
 // imprimé À LA SORTIE, après le rapport du coureur de tests (TF-1011, 16/09/2026).
 process.on("exit", () => {
-  console.log("Banc verifier-avance-publication : 7/7 PASS (R-38 par. 4-5 — un enregistrement de "
+  console.log("Banc verifier-avance-publication : 10/10 PASS (R-38 par. 4-5 — un enregistrement de "
     + "restitution seule passe, une candidature pure passe, un enregistrement portant une regle, une "
-    + "cloture ou un contenu de produit exige le GO explicite et est NOMME fichier par fichier)");
+    + "cloture ou un contenu de produit exige le GO explicite et est NOMME fichier par fichier ; "
+    + "TF-1373 : un --depot designe qui n'est pas un depot git est une erreur d'argument (exit 2), "
+    + "jamais un PASS silencieux, et le cas SANS --depot garde son PASS/0 — point 4 du contrat)");
 });
