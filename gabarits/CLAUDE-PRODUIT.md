@@ -199,5 +199,4 @@ process.exit(c.length?2:1)}console.log(c[0])"
 
 Deux candidats indiscernables ne se tranchent **jamais en silence** : la commande sort en
 échec et demande `PILOT_ROOT`. Référence exécutable et son `non_juge` :
-`<PILOT_ROOT>\oracles
-esoudre-pilot.mjs [--json]`.
+`<PILOT_ROOT>\oracles\resoudre-pilot.mjs [--json]`.

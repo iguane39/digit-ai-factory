@@ -1,7 +1,7 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\RETOURS-FORGES.md",
-  "date_iso": "2026-08-31T20:22:14.485Z",
-  "registre_version": "2.13.0",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a576abdf8d21a41a4\\gabarits\\RETOURS-FORGES.md",
+  "date_iso": "2026-10-02T07:12:27.636Z",
+  "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -38,7 +38,7 @@
       "domaine": "Sécurité / secrets",
       "file": "gabarits\\RETOURS-FORGES.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\RETOURS-FORGES.md",
-    "ts": "2026-08-31T20:22:14.485Z",
+    "ts": "2026-10-02T07:12:27.635Z",
     "fichiers": {
-      "gabarits\\RETOURS-FORGES.md": "2d68549003b8e0fac3986c316322efe86a00899afb6a149ce4aedad3944d66b8"
+      "gabarits\\RETOURS-FORGES.md": "bf31e628d679a0f646bc2e5a539c7b064fc8bb462eee83bed350f09ab05c8115"
     }
   },
   "empreinte_motif": null,

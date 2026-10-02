@@ -30,9 +30,12 @@ const PARC_REEL = process.env.FORGE_ROOT ? resolve(process.env.FORGE_ROOT) : res
 const MECANISME_REEL = join(PARC_REEL, MECANISME);
 
 if (!existsSync(MECANISME_REEL) || !interpretePython()) {
-  console.log(`oracle-enclenchement : SANS OBJET sur ce poste — ${existsSync(MECANISME_REEL)
+  // TF-1477 — la forme comptée (TF-1434), lue par `nonJouesDe` : sans elle, le cliquet du harnais
+  // (oracles\self-tests.mjs) range cette recette parmi les « sans compte lisible » au lieu de
+  // compter ses 27 cas comme déclarés non joués sur ce poste.
+  console.log(`  [NON JOUÉ] 27 cas — ${existsSync(MECANISME_REEL)
     ? "aucun interpréteur Python"
-    : `forge-tests absente (${MECANISME_REEL})`} : le mécanisme de confrontation réel n'est pas joignable, aucun cas n'est joué et aucun n'est compté`);
+    : `forge-tests absente (${MECANISME_REEL})`} : le mécanisme de confrontation réel n'est pas joignable`);
   process.exit(0);
 }
 

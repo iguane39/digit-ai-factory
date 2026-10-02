@@ -48,6 +48,13 @@ const OUT = arg("--sortie", join(ICI, "RECIDIVES.md"));
 // d'une source se mesure contre l'état des sources (ts max), jamais contre l'horloge.
 const RET = arg("--retours", join(ICI, "..", "input", "00-retours"));
 const SEUIL_JOURS = 7; // seuil commun des sections 5 à 7 — à régler après deux passages (TF-1163)
+// `--semis <fichier>` (TF-1251, 02/10/2026) : le rapport de `node todo\semer-defauts.mjs --json
+// <fichier>` — la MESURE de ce que le référentiel des classes sait réellement prouver. TF-1079
+// l'a produite une première fois (87 classes, 5 couvertures prouvées, 0 fausse, 2 non concluantes,
+// 31 sans contrôle déclaré) et elle n'était affichée NULLE PART : « sans affichage elle ne sera
+// relue par personne ». Chemin canonique par défaut, à régénérer à chaque campagne comme les
+// autres vues ; absent, la section le DIT plutôt que de l'omettre (loi n° 3 de ce tableau de bord).
+const SEMIS = arg("--semis", join(ICI, "observabilite", "semis-defauts.json"));
 // `--json <fichier>` (TF-0790, 03/09/2026) : les compteurs du tableau de bord dans un JSON que la sonde
 // `rapport_json` de forge-observability sait lire — et sur stdout, pour la sonde `commande`. La vue
 // Markdown reste générée dans le même passage : un seul calcul, deux formes.
@@ -135,6 +142,12 @@ for (const [k, c] of classes) {
   const enAttente = [...produits.entries()].filter(([, v]) => v === null).map(([p]) => p);
   delais.push({ classe: k, correction: dateCorrection, artefact: art.cible,
     constat: `${mesures.length} produit(s) atteint(s)${mesures.length ? ` en ${Math.min(...mesures)}–${Math.max(...mesures)} j` : ""} ; ${enAttente.length} non atteint(s)${enAttente.length ? ` (${enAttente.join(", ")})` : ""}` });
+}
+
+// ---- 8. semis de défauts : ce que le référentiel des classes sait PROUVER (TF-1251) ------------
+let semis = null;
+if (existsSync(SEMIS)) {
+  try { semis = JSON.parse(readFileSync(SEMIS, "utf8")); } catch { semis = null; }
 }
 
 // ---- 3. taux d'héritage par artefact (dernier relevé) ---------------------------------------
@@ -276,6 +289,17 @@ else {
   L.push(``, `- Sources muettes depuis plus de ${SEUIL_JOURS} jours : ${sourcesSilencieuses.length} sur ${silences.length}.`, ``);
 }
 
+L.push(`## 8. Semis de défauts — ce que le référentiel des classes sait PROUVER`, ``);
+if (!semis || !semis.mesure) {
+  L.push(`Jamais mesuré encore (ou rapport introuvable sous \`${SEMIS}\`). Mesurer : \`node todo\\semer-defauts.mjs --json ${SEMIS}\`, puis régénérer cette vue — un référentiel qui déclare un contrôle pour une classe ne prouve rien tant que ce verbe n'a pas été joué (TF-1251).`, ``);
+} else {
+  const m = semis.mesure;
+  L.push(`Comment lire : pour chaque classe du référentiel (\`todo\\CLASSES.json\`), ce verbe sème une INSTANCE fidèle au défaut fondateur et un TÉMOIN sain devant le contrôle déclaré — *couverte* : le contrôle refuse l'instance et accepte le témoin (couverture PROUVÉE) ; *déclarée et fausse* : le contrôle accepte l'instance (une couverture qui n'en est pas une) ; *non concluante* : le contrôle ne discrimine pas les deux. Référentiel ${semis.referentiel?.version || "?"}, table de générateurs du ${semis.generateurs_date || "?"}.`, ``,
+    `| Couvertes (prouvées) | Déclarées et FAUSSES | Non concluantes | Sans contrôle déclaré | Sans générateur | Non jouées |`,
+    `|---|---|---|---|---|---|`,
+    `| ${m.couvertes} | ${m.accusees} | ${m.non_concluantes} | ${m.sans_controle} | ${m.sans_generateur} | ${m.non_jouees} |`, ``);
+  if (m.accusees > 0) L.push(`- **${m.accusees} couverture(s) déclarée(s) et FAUSSE(s)** — le contrôle cité au référentiel accepte l'instance fidèle au défaut : ${(semis.accusees || []).map((a) => `\`${a.cle}\``).join(", ") || "(détail au rapport JSON)"}.`, ``);
+}
 L.push(`## Ce que cette vue ne juge pas`, ``,
   `- qu'un produit en retard soit FAUTIF : un produit que personne n'a ouvert depuis la correction n'a pas pu la recevoir — la section 5 nomme, elle ne condamne pas ;`,
   `- qu'une source muette ait quelque chose à remonter : la section 7 lit des noms de fichiers, pas l'activité du produit ;`,
@@ -302,6 +326,13 @@ if (JSON_OUT) {
     // TF-1166 (D-3 (a), 17/09/2026) : les noms, pour la ligne du relevé d'ouverture du pilot — la sonde ne lit que le compte.
     sources_muettes: retoursLus ? sourcesSilencieuses.map((s) => ({ source: s.source, silence: s.silence })) : null,
     seuil_jours: SEUIL_JOURS,
+    // TF-1251 (02/10/2026) : ce que `semer-defauts` a mesuré, jamais null si silencieusement absent
+    // — `semis_defauts: null` DIT « jamais mesuré », il ne vaut pas zéro couverture.
+    semis_defauts: semis && semis.mesure ? {
+      mesure_le: semis.referentiel?.date || null, referentiel_version: semis.referentiel?.version || null,
+      couvertes: semis.mesure.couvertes, accusees: semis.mesure.accusees, non_concluantes: semis.mesure.non_concluantes,
+      sans_controle: semis.mesure.sans_controle, sans_generateur: semis.mesure.sans_generateur, non_jouees: semis.mesure.non_jouees,
+    } : null,
   };
   writeFileSync(JSON_OUT, JSON.stringify(compteurs, null, 1) + "\n", "utf8");
   console.log(JSON.stringify(compteurs));

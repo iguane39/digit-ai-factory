@@ -54,21 +54,82 @@
  * Usage : node todo/accueillir-lot.mjs [--essai]   ·   exit 0 si rien à faire ou tout accueilli.
  */
 import { readdirSync, existsSync, mkdirSync, renameSync, writeFileSync, readFileSync, rmSync } from "node:fs";
-import { dirname, join, basename } from "node:path";
+import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { anonymiser } from "./anonymiser-entrant.mjs";
+import { spawnSync } from "node:child_process";
+import { anonymiser, pseudoProduit, EST_EMETTEUR_FORGE } from "./anonymiser-entrant.mjs";
+import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 import { aQualifier as adressesAQualifier, messageAQualifier } from "./adresses-ip.mjs";
 import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const BOITE = join(ICI, "..", "input", "00-retours");
 export const ARRIVEE = join(BOITE, "_arrivee");
+/** La racine du PARC (frère du pilot), pour la vérification du premier lot d'un produit (TF-1289). */
+const RACINE_PARC_PAR_DEFAUT = process.env.FORGE_ROOT ? resolve(process.env.FORGE_ROOT) : join(ICI, "..", "..");
+
+// ============================================================================================
+// TF-1289 (02/10/2026) — LE SAS NE PROTÈGE PAS LE PREMIER LOT D'UN PRODUIT NEUF
+// ============================================================================================
+//
+// LE FAIT, mesuré le 22/09/2026 sur un cas réel. `pseudonymeProduit` (lecture seule) et ce module
+// (écriture) partagent la même loi — « aucun des deux n'inscrit, l'inscription appartient à
+// l'ingestion » — sauf que l'ingestion vient TOUJOURS après l'accueil. Un produit dont le nom est
+// neuf pour la table traverse donc l'accueil SANS être pseudonymisé : `anonymiser()` ne substitue
+// que ce que la table connaît déjà. Le sas protège tous les lots SAUF exactement celui où le nom
+// est neuf — la seule fois où la protection sert à quelque chose.
+//
+// CE QUI FERME LE TROU, ET POURQUOI CE N'EST PAS UNE INSCRIPTION AVEUGLE. Inscrire tout nom neuf
+// sans vérifier casserait un cas réel : un nom déjà cité ailleurs dans le parc (une étude datée, un
+// script, une archive) qui recevrait ICI un pseudonyme concurrent de celui qu'il porte peut-être
+// déjà par un autre chemin. La vérification que `lib-pseudonyme-produit.mjs` pose pour son
+// appelant — « git grep sur HEAD ne trouve ce nom dans AUCUN fichier suivi du parc » — est donc
+// jouée ICI, avant toute inscription, sur les dépôts clonés sous la racine du parc :
+//   · le nom n'apparaît NULLE PART → inscription sûre (`pseudoProduit`), le lot est accueilli
+//     pseudonymisé comme n'importe quel autre ;
+//   · le nom apparaît DÉJÀ quelque part → le lot est REFUSÉ, nommant le nom et où il a été trouvé :
+//     un arbitrage humain tranche (inscription manuelle après vérification, ou rapprochement d'un
+//     pseudonyme existant), plutôt que de déplacer le nom réel en clair dans la boîte suivie.
+
+/** Les dépôts clonés sous une racine de parc : tout dossier qui porte un `.git`. */
+function depotsDuParc(racine) {
+  let entrees = [];
+  try { entrees = readdirSync(racine, { withFileTypes: true }); } catch { return []; }
+  return entrees.filter((e) => e.isDirectory() && existsSync(join(racine, e.name, ".git"))).map((e) => join(racine, e.name));
+}
+
+/**
+ * Un nom, déjà présent dans un fichier SUIVI d'un dépôt du parc (HEAD, insensible à la casse) ?
+ * Rend la liste des dépôts et du premier fichier porteur, jamais plus — c'est à l'arbitrage humain
+ * de regarder le reste.
+ */
+export function nomCiteDansLeParc(nom, racine = RACINE_PARC_PAR_DEFAUT) {
+  const trouves = [];
+  for (const depot of depotsDuParc(racine)) {
+    const r = spawnSync("git", ["-C", depot, "grep", "--quiet", "-i", "-F", "-e", nom, "HEAD", "--"], { encoding: "utf8" });
+    // exit 0 = trouvé · 1 = rien trouvé · >1 = dépôt sans HEAD, grep illisible… silencieusement passé :
+    // un dépôt qu'on ne sait pas interroger n'est pas un dépôt où le nom est absent, mais l'arrêter
+    // sur ce cas précis punirait l'accueil d'un défaut d'un dépôt tiers sans rapport avec le lot.
+    if (r.status === 0) {
+      const detail = spawnSync("git", ["-C", depot, "grep", "-i", "-F", "-l", "-e", nom, "HEAD", "--"], { encoding: "utf8" });
+      trouves.push({ depot: basename(depot), fichier: (detail.stdout || "").trim().split(/\r?\n/)[0] || "(fichier non résolu)" });
+    }
+  }
+  return trouves;
+}
+
+/** Vocabulaire fermé des noms que la table n'inscrit jamais — mêmes exemptions que `pseudoProduit`. */
+function possiblementInconnuDesTables(nom) {
+  if (!nom || nom.length < 5) return false;
+  if (/^Produit-\d{2,}$/.test(nom) || EST_EMETTEUR_FORGE.test(nom) || PRODUITS_DE_L_ECOSYSTEME.has(nom)) return false;
+  try { return anonymiser(nom).texte === nom; } catch { return false; }
+}
 
 /**
  * Accueille tout ce qui attend dans l'arrivée : pseudonymise le NOM et le CONTENU, puis dépose
  * dans la boîte suivie. Rend la liste de ce qui a été fait, sans jamais écrire si `essai`.
  */
-export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false } = {}) {
+export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false, racineParc = RACINE_PARC_PAR_DEFAUT } = {}) {
   const faits = [], refuses = [];
   if (!existsSync(arrivee)) return { arrivee, boite, en_attente: 0, faits, refuses };
 
@@ -79,7 +140,25 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false } =
     try { brut = readFileSync(source, "utf8"); }
     catch (e) { refuses.push({ fichier: nom, motif: `illisible en texte (${e.code || e.message})` }); continue; }
 
-    // Le NOM d'abord : c'est lui qui a fait entrer un nom réel dans un commit le 08/09.
+    // TF-1289 — LE PREMIER LOT D'UN PRODUIT NEUF : la table ne le connaît pas, et l'inscrire sans
+    // vérifier casserait un nom déjà cité ailleurs dans le parc par un autre chemin.
+    const prefixeProduit = (/^(.+) - RETOURS - /.exec(nom) || [])[1] || null;
+    let produitInscrit = false;
+    if (prefixeProduit && possiblementInconnuDesTables(prefixeProduit)) {
+      const cites = nomCiteDansLeParc(prefixeProduit, racineParc);
+      if (cites.length) {
+        refuses.push({ fichier: nom, motif: `nom de produit « ${prefixeProduit} » inconnu de la table des pseudonymes ET déjà cité dans un `
+          + `fichier suivi du parc (${cites.map((c) => `${c.depot} : ${c.fichier}`).join(" ; ")}) — l'inscription n'est pas sûre : un arbitrage `
+          + "humain tranche (rapprochement d'un pseudonyme existant, ou inscription manuelle après vérification) avant de rejouer l'accueil" });
+        continue;
+      }
+      // Le nom n'apparaît nulle part : l'inscription est sûre. `--essai` ne l'écrit pas — rien
+      // n'écrit en essai —, et le reste du passage le traite alors comme toujours inconnu.
+      if (!essai) { pseudoProduit(prefixeProduit); produitInscrit = true; }
+    }
+
+    // Le NOM d'abord : c'est lui qui a fait entrer un nom réel dans un commit le 08/09. Si le
+    // produit vient d'être inscrit ci-dessus, cette passe le trouve désormais dans la table.
     const nomPropre = anonymiser(nom);
     const contenu = anonymiser(brut, { code: /\.(m?js|py|json|ya?ml)$/i.test(nom) });
     const cible = join(boite, nomPropre.texte);
@@ -95,14 +174,17 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false } =
     }
     if (essai) {
       faits.push({ de: nom, vers: nomPropre.texte, nom_reecrit: nomPropre.texte !== nom,
-        contenu_reecrit: contenu.texte !== brut, ecrit: false, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes });
+        contenu_reecrit: contenu.texte !== brut, ecrit: false, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes,
+        // TF-1289 : en essai, rien n'est inscrit — ce drapeau dit seulement qu'un geste réel le ferait.
+        produit_neuf_a_inscrire: Boolean(prefixeProduit && possiblementInconnuDesTables(prefixeProduit)) });
       continue;
     }
     mkdirSync(boite, { recursive: true });
     writeFileSync(cible, contenu.texte, "utf8");
     rmSync(source);
     faits.push({ de: nom, vers: nomPropre.texte, nom_reecrit: nomPropre.texte !== nom,
-      contenu_reecrit: contenu.texte !== brut, ecrit: true, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes });
+      contenu_reecrit: contenu.texte !== brut, ecrit: true, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes,
+      produit_neuf_inscrit: produitInscrit });
   }
   return { arrivee, boite, en_attente: entrants.length, faits, refuses };
 }
@@ -156,12 +238,41 @@ async function selfTest() {
   if (readdirSync(arr).length !== avant) casse.push("le mode essai a vidé l'arrivée");
   if (r4.faits.some((x) => x.ecrit)) casse.push("le mode essai déclare avoir écrit");
 
+  // 7) et 8) TF-1289 (02/10/2026) — LE PREMIER LOT D'UN PRODUIT NEUF, DANS LES DEUX SENS. Un parc
+  // jetable d'un seul dépôt cloné, avec un fichier suivi qui cite un nom par avance.
+  const parc = join(T, "parc");
+  const depotA = join(parc, "digit-ai-exemple");
+  mkdirSync(depotA, { recursive: true });
+  const gitParc = (...a) => spawnSync("git", ["-C", depotA, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+  gitParc("init", "-q", "-b", "main");
+  writeFileSync(join(depotA, "note.md"), "une étude qui cite ProduitDejaCiteAilleurs en passant\n", "utf8");
+  gitParc("add", "-A"); gitParc("commit", "-q", "-m", "init");
+
+  // 7) INCONNU des tables ET déjà cité ailleurs dans le parc : REFUSÉ, nommé, rien déplacé.
+  writeFileSync(join(arr, "ProduitDejaCiteAilleurs - RETOURS - 20260922a.md"), "lot\n", "utf8");
+  const r7 = accueillir({ arrivee: arr, boite: bo, racineParc: parc });
+  const ref7 = r7.refuses.find((x) => x.fichier.startsWith("ProduitDejaCiteAilleurs"));
+  if (!ref7) casse.push("un nom inconnu mais déjà cité ailleurs dans le parc n'est pas refusé — c'est exactement le trou du 22/09 (TF-1289)");
+  else if (!/digit-ai-exemple/.test(ref7.motif) || !/note\.md/.test(ref7.motif)) casse.push("le refus ne nomme pas le dépôt et le fichier porteurs : " + ref7.motif);
+  if (!readdirSync(arr).some((n) => n.startsWith("ProduitDejaCiteAilleurs"))) casse.push("le lot refusé a disparu de l'arrivée — il doit y rester pour l'arbitrage humain");
+  if (readdirSync(bo).some((n) => n.startsWith("ProduitDejaCiteAilleurs"))) casse.push("le lot refusé a quand même été déposé dans la boîte suivie, nom réel compris");
+
+  // 8) INCONNU des tables ET absent de tout le parc : INSCRIT, puis accueilli PSEUDONYMISÉ.
+  writeFileSync(join(arr, "ProduitNeufIntrouvable - RETOURS - 20260922b.md"), "lot de ProduitNeufIntrouvable\n", "utf8");
+  const r8 = accueillir({ arrivee: arr, boite: bo, racineParc: parc });
+  const fait8 = r8.faits.find((x) => x.de.startsWith("ProduitNeufIntrouvable"));
+  if (!fait8) casse.push("un nom inconnu et absent du parc n'est pas accueilli — le sas refuse le seul lot qu'il devrait inscrire");
+  else {
+    if (!fait8.produit_neuf_inscrit) casse.push("l'inscription du produit neuf n'est pas déclarée au compte rendu");
+    if (/ProduitNeufIntrouvable/i.test(fait8.vers)) casse.push("le nom déposé porte encore le nom réel : " + fait8.vers);
+    if (!/^Produit-\d+/.test(fait8.vers)) casse.push("le nom déposé n'est pas devenu un pseudonyme : " + fait8.vers);
+  }
+
   // 5) et 6) L'ANALYSE DES ARGUMENTS, DANS SES DEUX SENS (17/09/2026). Le défaut s'est produit
   // DANS LA COUCHE CLI, pas dans `accueillir()` : le banc doit donc lancer le module comme un
   // outil. Les deux cas ne diffèrent que par l'argument — `--zzz` refuse, `--aide` explique — et
   // aucun des deux n'a le droit d'écrire quoi que ce soit. La preuve que rien n'a été accueilli est
   // l'ABSENCE du rapport JSON de l'accueil, que le cas nominal imprime toujours.
-  const { spawnSync } = await import("node:child_process");
   const moi = fileURLToPath(import.meta.url);
   const jouer = (...a) => spawnSync(process.execPath, [moi, ...a], { encoding: "utf8" });
   const rInconnu = jouer("--zzz");
@@ -177,7 +288,7 @@ async function selfTest() {
 
   rmSync(T, { recursive: true, force: true });
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test accueillir-lot (TF-0981) : ${6 - casse.length}/6 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289) : ${8 - casse.length}/8 cas, ${casse.length} FAIL`);
   return casse.length ? 1 : 0;
 }
 

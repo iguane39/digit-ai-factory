@@ -433,5 +433,65 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   try { rmSync(P, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
+// ---- GFP-LOT (TF-1526) : LE GARDE-FOU DE PLATEFORME RELEVÉ, MÊME FORME QUE R-45/R-46/R-57 -------
+{
+  const GFP = (corps) => `## Garde-fou de plateforme relevé\n\n${corps}\n`;
+  const CORPS_GFP = (gfp) => "# lot\n\n" + R45 + "\n" + R46 + "\n" + GFP(gfp);
+  const AUJOURDHUI = "20261002";
+
+  check("GFP-LOT rouge — section absente d'un lot du jour d'entrée en vigueur : FAIL, le remède donne le TITRE exact", () => {
+    const c = constat(verifier(lot("20261002a"), "# lot\n\n" + R45 + "\n" + R46, { aujourdhui: AUJOURDHUI }), "GFP-LOT");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"}`);
+    if (!/## Garde-fou de plateforme relevé/.test(c.remede || "")) throw new Error("le remède ne donne pas le titre à écrire");
+    if (!/aucun garde-fou de plateforme relevé/i.test(c.remede)) throw new Error("le remède ne dit pas quoi écrire quand il n'y a rien");
+  });
+
+  check("GFP-LOT rouge — section présente mais VIDE : l'omission ne vaut pas décision", () => {
+    const c = constat(verifier(lot("20261002a"), CORPS_GFP("(à voir)"), { aujourdhui: AUJOURDHUI }), "GFP-LOT");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  check("GFP-LOT vert — la déclaration d'absence vaut réponse (loi n° 3)", () => {
+    const c = constat(verifier(lot("20261002a"), CORPS_GFP("Aucun garde-fou de plateforme relevé sur ce lot."), { aujourdhui: AUJOURDHUI }), "GFP-LOT");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  check("GFP-LOT vert — un identifiant GFP-nnn CONFIRMÉ du registre : PASS", () => {
+    const c = constat(verifier(lot("20261002a"), CORPS_GFP("GFP-001 confirmé par ce relevé, le 2026-10-02."), { aujourdhui: AUJOURDHUI }), "GFP-LOT");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+
+  check("GFP-LOT vert — un garde-fou NOUVEAU décrit par ses champs : PASS", () => {
+    const c = constat(verifier(lot("20261002a"),
+      CORPS_GFP("nouveau garde-fou — plateforme azure, mécanisme Azure Policy, effet Deny, portée souscription, "
+        + "vise Microsoft.Web/sites/config, refuse l'écriture sans authentification active, relevé le 2026-10-01."),
+      { aujourdhui: AUJOURDHUI }), "GFP-LOT");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+
+  check("GFP-LOT borne — un lot du 01/10, jour d'AVANT l'entrée en vigueur, n'est pas accusé : antériorité déclarée", () => {
+    const c = constat(verifier(lot("20261001a"), "# lot\n\n" + R45 + "\n" + R46, { aujourdhui: AUJOURDHUI }), "GFP-LOT");
+    if (!c || c.statut !== "SANS_OBJET" || !/antériorité/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"}`);
+    if (SEUILS["GFP-LOT"] !== "20261002") throw new Error("seuil GFP-LOT dérivé");
+  });
+}
+
+// ---- TF-1473 : un IMPORT sans fichier de script (node -e) ne doit pas exécuter la CLI ---------
+// La garde d'exécution directe comparait import.meta.url à endsWith(process.argv[1] || "") : un
+// argv[1] VIDE (cas de `node -e "import(...)"`, où aucun fichier n'est passé en argument) rend
+// endsWith("") toujours vrai, donc la CLI s'exécutait quand même, affichait l'usage et sortait en 2.
+{
+  const { spawnSync } = await import("node:child_process");
+  const { dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const ICI = dirname(fileURLToPath(import.meta.url));
+  check("TF-1473 — importé depuis `node -e` (argv[1] vide), le module ne se prend plus pour la CLI", () => {
+    const code = `import(${JSON.stringify("file://" + ICI.split("\\").join("/") + "/oracle-lot-retours.mjs")}).then(m => { console.log("IMPORT_OK", typeof m.verifier); });`;
+    const r = spawnSync(process.execPath, ["-e", code], { encoding: "utf8" });
+    if (r.status !== 0) throw new Error(`exit ${r.status} — l'import seul déclenche la CLI (usage + exit 2) : ${(r.stdout || "") + (r.stderr || "")}`);
+    if (!/IMPORT_OK function/.test(r.stdout || "")) throw new Error(`sortie inattendue : ${r.stdout}`);
+  });
+}
+
 console.log(`\noracle-lot-retours (TF-0597) : ${pass} PASS, ${echec} FAIL`);
 process.exit(echec ? 1 : 0);

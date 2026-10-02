@@ -76,6 +76,23 @@ const DOSSIERS_LUS = ["scripts", "oracles", "tools", "todo", "skills"];
 const EXT = /\.(mjs|cjs|js|py)$/i;
 const IGNORES = new Set([".git", "node_modules", ".venv", "__pycache__", "dist", "build", "generated", "fixtures", "tests", "test"]);
 
+/**
+ * TF-1415 (02/10/2026) — LA BIBLIOTHÈQUE DE GABARITS A SES PROPRES SITES DE SCELLEMENT, SOUS UN
+ * CHEMIN QUE `DOSSIERS_LUS` NE COUVRE PAS. `gabarits\documents\guide-de-reference\generateur\
+ * construire-guide.py` hache la source de chaque composant posé, et déclaré dans
+ * `references\EMPREINTES.md`, il se faisait accuser « ne hache plus ou n'existe plus » — invisible
+ * au balayage, il ne pouvait être vu que PÉRIMÉ. Chaque famille de `gabarits\documents\<famille>\`
+ * peut porter son `generateur\` : on les énumère plutôt que d'en figer la liste, pour qu'une
+ * famille neuve qui en gagne un entre au balayage sans toucher à ce fichier (loi n° 4).
+ */
+function generateursDeFamilles(base) {
+  const racineDocs = join(base, "gabarits", "documents");
+  let familles = [];
+  try { familles = readdirSync(racineDocs, { withFileTypes: true }).filter((e) => e.isDirectory()); }
+  catch { return []; }
+  return familles.map((f) => join(racineDocs, f.name, "generateur")).filter((d) => existsSync(d));
+}
+
 /** Fichiers de code d'un dossier, profondeur bornée (3 niveaux : un skill vit à `.claude/skills/<nom>/scripts/`). */
 function* fichiers(dossier, prof = 0) {
   if (prof > 3 || !existsSync(dossier)) return;
@@ -195,6 +212,24 @@ if (args.includes("--self-test")) {
   casE1("E1 — un site d'un dépôt NON CLONÉ sous la racine est nommé hors parc, jamais compté mort (TF-1133)",
     cl.horsParc.some((h) => h.nom === "ailleurs.mjs" && h.depots.includes("forge-exemple")) && !cl.vraimentMorts.includes("ailleurs.mjs"));
 
+  // TF-1415 (02/10/2026) — LE BALAYAGE ATTEINT UN GÉNÉRATEUR DE FAMILLE DE GABARITS. Un dépôt
+  // jetable, avec un site de scellement sous `gabarits\documents\<famille>\generateur\`, exactement
+  // la forme qui restait invisible à `DOSSIERS_LUS` (`scripts`, `oracles`, `tools`, `todo`, skills).
+  const { mkdirSync: mkdirpArbre } = await import("node:fs");
+  const depotTF1415 = join(base, "depot-tf1415");
+  const generateurTF1415 = join(depotTF1415, "gabarits", "documents", "une-famille", "generateur");
+  mkdirpArbre(generateurTF1415, { recursive: true });
+  writeFileSync(join(generateurTF1415, "construire.py"), "import hashlib\nhashlib.sha256(b'x').hexdigest()\n", "utf8");
+  const sitesTrouvesTF1415 = generateursDeFamilles(depotTF1415).flatMap((d) => [...fichiers(d)]);
+  casE1("E1/E2 — un générateur sous gabarits\\documents\\<famille>\\generateur\\ est découvert par le balayage (TF-1415)",
+    sitesTrouvesTF1415.some((f) => basename(f) === "construire.py"));
+  casE1("TF-1415 borne — une famille SANS dossier generateur\\ ne produit aucune cible fantôme",
+    (() => {
+      const depotSansGenerateur = join(base, "depot-tf1415-sans-generateur");
+      mkdirpArbre(join(depotSansGenerateur, "gabarits", "documents", "une-autre-famille"), { recursive: true });
+      return generateursDeFamilles(depotSansGenerateur).length === 0;
+    })());
+
   rmSync(base, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   console.log(`\nRecette empreintes : ${pass}/${pass + echecs.length} cas`);
   process.exit(echecs.length ? 1 : 0);
@@ -277,7 +312,7 @@ if (!depots.length) {
 const trouves = new Map();   // nom de fichier -> chemins relatifs
 for (const depot of depots) {
   const base = join(racine, depot);
-  const cibles = [...DOSSIERS_LUS.map((d) => join(base, d)), join(base, ".claude", "skills")];
+  const cibles = [...DOSSIERS_LUS.map((d) => join(base, d)), join(base, ".claude", "skills"), ...generateursDeFamilles(base)];
   // La RACINE du dépôt, sans descendre : `bootstrap.mjs` et quelques outils y vivent. Oubli du
   // premier jet, et il ne se contentait pas de rater des sites — il ACCUSAIT le registre d'être
   // périmé sur deux sites parfaitement vivants.

@@ -25,7 +25,10 @@ const python = ["python", "python3", "py"].find((bin) => {
   return !r.error && r.status === 0;
 });
 if (!python) {
-  console.log("verifier-ooxml : NON JOUÉ (aucun interpréteur python sur ce poste) — déclaré, pas supposé vert");
+  // TF-1477 — la forme comptée (TF-1434), lue par `nonJouesDe` : sans elle, le cliquet du harnais
+  // (oracles\self-tests.mjs) range cette recette parmi les « sans compte lisible » au lieu de
+  // compter ses 3 cas comme déclarés non joués sur ce poste.
+  console.log("  [NON JOUÉ] 3 cas — aucun interpréteur python sur ce poste : déclaré, pas supposé vert");
   process.exit(0);
 }
 

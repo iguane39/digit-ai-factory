@@ -255,6 +255,43 @@ if (iPilot < 0) {
       }
       if (enDefaut.length > 12) lignes.push(`  - … et ${enDefaut.length - 12} autre(s) — détail : node scripts/relever-heritage.mjs --md <fichier>`);
       if (!enDefaut.length) lignes.push("- tous les produits relevés portent leur héritage à jour");
+
+      // TF-1521 (02/10/2026) — LE REJEU D'UN DÉPLACEMENT EN ATTENTE N'ÉTAIT CÂBLÉ NULLE PART. La
+      // règle 7 bis (TF-1503) tolère qu'une version antérieure reste en place tant que le ledger du
+      // produit porte un `deplacement_en_attente` non clos — mais rien ne RAPPELAIT cette attente
+      // au tour suivant : une consignation oubliée garde deux versions côte à côte sans aucune
+      // limite de durée (ce que le `non_juge` de l'oracle de conformité déclare déjà). Même algèbre
+      // d'état que `oracle-conformite-projet.mjs` (R-7 bis) : le DERNIER événement du ledger pour un
+      // chemin `ancien` donné fait foi, le ledger étant en ajout seul.
+      const cheminNorme = (s) => String(s || "").replaceAll("\\", "/").replace(/^\.\//, "").toLowerCase();
+      const attentesParProduit = [];
+      for (const l of j.lignes || []) {
+        const ledgerProduit = join(l.dossier, "forge", "ledger.jsonl");
+        if (!existsSync(ledgerProduit)) continue;
+        const deplacements = new Map();
+        let brut = "";
+        try { brut = readFileSync(ledgerProduit, "utf8"); } catch { continue; }
+        for (const ligne of brut.split(/\r?\n/)) {
+          if (!ligne.trim()) continue;
+          let e; try { e = JSON.parse(ligne); } catch { continue; }
+          const t = String(e.type || e.ev || "");
+          if (t !== "deplacement_en_attente" && t !== "deplacement_effectue") continue;
+          if (!cheminNorme(e.ancien)) continue;
+          deplacements.set(cheminNorme(e.ancien), { attente: t === "deplacement_en_attente", ancien: e.ancien, nouveau: e.nouveau, ts: e.ts || null, motif: e.motif || null });
+        }
+        const enAttente = [...deplacements.values()].filter((d) => d.attente);
+        if (enAttente.length) attentesParProduit.push({ produit: l.produit, dossier: l.dossier, enAttente });
+      }
+      if (attentesParProduit.length) {
+        lignes.push("", "## Déplacements de version en attente (règle 7 bis, TF-1503) — à rejouer ce tour");
+        for (const { produit, enAttente } of attentesParProduit) {
+          for (const d of enAttente) {
+            lignes.push(`  - ${produit} : \`${d.ancien}\`${d.ts ? ` (en attente depuis le ${d.ts})` : ""}` +
+              `${d.motif ? ` — ${d.motif}` : ""} → rejouer : \`git mv "${d.ancien}" "${dirname(d.ancien)}/old/"\` chez le produit, ` +
+              "puis consigner `deplacement_effectue` à son ledger (`forge/ledger.jsonl`)");
+          }
+        }
+      }
     }
   }
 }

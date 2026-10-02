@@ -914,6 +914,17 @@ function selfTest() {
     casse.push("EC-8 : les 2 ANCIENS libelles du tableau d'options passent encore — l'exemption du "
       + `16/09 devait etre LEVEE par D-2 (a), et un banc qui ne teste que la forme neuve ne le voit pas : ${JSON.stringify(f8a)}`);
 
+  // TF-1507 (02/10/2026) — LE GABARIT RÉEL, PAS UNE FIXTURE. `gabarits\docs-projet\FONCTIONNEL.md`
+  // portait, en-tête de colonne, « Ce qu'il peut faire » et « Ce qu'il ne peut pas » : EC-8 les
+  // refusait chez le produit qui l'instancie (FAIL mesuré le 28/09/2026). Lire le fichier réel,
+  // plutôt qu'une fixture qui le recopie, protège contre un gabarit réécrit sans que le banc suive.
+  const cheminFonctionnel = join(RACINE, "gabarits", "docs-projet", "FONCTIONNEL.md");
+  const rFonctionnel = jouer("tf1507-fonctionnel-reel.md", readFileSync(cheminFonctionnel, "utf8"));
+  const f8fonctionnel = (rFonctionnel.j?.findings || []).filter((f) => f.regle === "EC-8" && f.statut === "FAIL");
+  if (f8fonctionnel.some((f) => /Ce qu'il peut faire|Ce qu'il ne peut pas/.test(f.message || "")))
+    casse.push("TF-1507 : gabarits\\docs-projet\\FONCTIONNEL.md porte encore, en en-tête de colonne, un des deux "
+      + `libellés refusés par EC-8 — le produit qui l'instancie serait de nouveau refusé : ${JSON.stringify(f8fonctionnel)}`);
+
   // 11, 12 et 13 (TF-1138) — EC-10, LE LECTEUR DECLARE. Trois sens : la commande REFUSEE quand le
   // lecteur n'execute pas, ADMISE quand il execute, et le document sans lecteur declare qui rend
   // SKIP en le DISANT — jamais PASS par silence. Le bloc qui se RECOPIE n'est compte dans aucun

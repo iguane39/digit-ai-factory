@@ -18,7 +18,7 @@ verifie_le: {AAAA-MM-JJ}
 
 ## Utilisateurs & rôles
 
-| Rôle | Qui | Ce qu'il peut faire | Ce qu'il ne peut pas |
+| Rôle | Qui | Droits | Limites |
 |---|---|---|---|
 | {admin} | {…} | {…} | {…} |
 | {utilisateur} | {…} | {…} | {…} |

@@ -57,6 +57,13 @@ import {
 import { confronterSensRouge } from "./lib-sens-rouge.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
+// TF-1465 (02/10/2026) : l'interpréteur Python du poste, cherché UNE fois — même ordre que
+// `scripts\verifier-ooxml.test.mjs`. `null` si absent : les recettes `.py` se déclarent alors
+// « [NON JOUÉ] » plutôt que d'être tues ou de faire échouer le pas sur un poste sans Python.
+const PYTHON = ["python", "python3", "py"].find((bin) => {
+  const r = spawnSync(bin, ["--version"], { encoding: "utf8" });
+  return !r.error && r.status === 0;
+}) || null;
 
 // Oracles couverts par un fichier de recette dédié plutôt que par `--self-test`.
 // La table des recettes dediees vit dans `lib-recettes-dediees.mjs` depuis le 22/09/2026 :
@@ -136,20 +143,28 @@ const RACINE = join(ICI, "..");
 // relecture avant son adoption — verte, et jouée par PERSONNE. *Un contrôle qui parcourt une liste
 // ne voit jamais ce qui n'y est pas*, et une liste a autant de bords qu'on lui en laisse.
 //
-// DEUX NIVEAUX, pas davantage, et la borne est un choix : au-delà, on parcourrait les dépôts
-// clonés et les arbres de sortie que `HORS_ZONE` ne nomme pas un par un. Un banc rangé trois
-// niveaux plus bas resterait invisible — c'est déclaré ici plutôt que promis.
-const HORS_ZONE = new Set([".git", "node_modules", ".venv", "__pycache__", ".oracles", "old", "input", "output"]);
+// CINQ NIVEAUX depuis le 02/10/2026 (TF-1465) — DEUX ne suffisaient plus. Le cas : le générateur
+// de la famille gd-guide-de-reference, `gabarits\documents\guide-de-reference\generateur\
+// construire-guide.py --self-test` (6 cas), rangé à QUATRE niveaux sous la racine — invisible à
+// l'ancienne borne, verte et jouée par PERSONNE, exactement la classe que I2 quater fermait déjà
+// pour `oracles\banc-defauts-echappes\`. `.claude` est exclu nommément : les copies INSTALLÉES de
+// skills y vivent, et ce sont les dépôts qui les VERSIONNENT (forge-agents et les autres) qui
+// jouent leurs propres recettes — en rejouer la copie ici doublerait un verdict déjà rendu
+// ailleurs, sur un fichier que ce dépôt ne possède pas.
+const HORS_ZONE = new Set([".git", "node_modules", ".venv", "__pycache__", ".oracles", "old", "input", "output", ".claude"]);
+const PROFONDEUR_ZONES = 5;
 const zonesTests = ["."];
-for (const d of readdirSync(RACINE, { withFileTypes: true })) {
-  if (!d.isDirectory() || HORS_ZONE.has(d.name)) continue;
-  zonesTests.push(d.name);
-  let sous = [];
-  try { sous = readdirSync(join(RACINE, d.name), { withFileTypes: true }); } catch { sous = []; }
-  for (const f of sous) {
-    if (f.isDirectory() && !HORS_ZONE.has(f.name)) zonesTests.push(`${d.name}/${f.name}`);
+(function descendre(dossier, prefixe, reste) {
+  if (reste <= 0) return;
+  let entrees = [];
+  try { entrees = readdirSync(dossier, { withFileTypes: true }); } catch { return; }
+  for (const d of entrees) {
+    if (!d.isDirectory() || HORS_ZONE.has(d.name)) continue;
+    const zone = prefixe ? `${prefixe}/${d.name}` : d.name;
+    zonesTests.push(zone);
+    descendre(join(dossier, d.name), zone, reste - 1);
   }
-}
+})(RACINE, "", PROFONDEUR_ZONES);
 for (const zone of zonesTests) {
   let fichiers = [];
   try {
@@ -172,10 +187,30 @@ for (const zone of zonesTests) {
         try { source = readFileSync(join(RACINE, zone, nom), "utf8"); } catch { continue; }
         if (/\b(?:process\.argv|argv|args)(?:\.slice\(\d+\))?\.includes\(\s*["']--self-test["']\s*\)/.test(source)) fichiers.push({ nom, args: ["--self-test"] });
       }
+      // TF-1465 (02/10/2026) — UNE RECETTE EN PYTHON PORTE `--self-test` DE LA MÊME FAÇON, ET
+      // CE HARNAIS NE JOUAIT QU'UN SEUL LANGAGE. Le cas : `construire-guide.py` (générateur de la
+      // famille gd-guide-de-reference), recette à double sens (6 cas) jamais appelée par ce pas.
+      // Même lecture du CODE que pour les `.mjs` ci-dessus (le drapeau analysé, jamais seulement
+      // cité), adaptée au vocabulaire Python (`argparse`, `sys.argv`).
+      for (const nom of readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".py")).sort()) {
+        let source = "";
+        try { source = readFileSync(join(RACINE, zone, nom), "utf8"); } catch { continue; }
+        if (/["']--self-test["']/.test(source)) fichiers.push({ nom, args: ["--self-test"], python: true });
+      }
     }
   } catch { continue; }
-  for (const { nom, args } of fichiers) {
-    const r = spawnSync(process.execPath, [join(RACINE, zone, nom), ...args], { encoding: "utf8" });
+  for (const { nom, args, python: estPython } of fichiers) {
+    if (estPython && !PYTHON) {
+      // Déclaré, jamais tu (même forme que TF-1434, « [NON JOUÉ] <n> cas ») : sans interpréteur
+      // sur ce poste, la recette ne peut pas être jouée, et ce n'est pas un défaut du dépôt.
+      resultats.push({
+        nom: `${zone}/${nom}`, statut: "OK",
+        detail: "[NON JOUÉ] 1 cas — aucun interpréteur python sur ce poste", resume: "[NON JOUÉ] 1 cas — aucun interpréteur python sur ce poste",
+        sortie: "", via: "I2 (recette Python du dépôt)",
+      });
+      continue;
+    }
+    const r = spawnSync(estPython ? PYTHON : process.execPath, [join(RACINE, zone, nom), ...args], { encoding: "utf8" });
     const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
     const resume = lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie";
     resultats.push({

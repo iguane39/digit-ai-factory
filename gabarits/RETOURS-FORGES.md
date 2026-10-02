@@ -211,6 +211,30 @@ de nouveau dans les lots suivants du même produit.
 **Si aucun document n'a mûri**, l'écrire : « Aucun document mûr sur ce lot. » Une section vide se
 lit comme un oubli, et l'omission ne vaut pas décision.
 
+## Garde-fou de plateforme relevé
+
+<!-- SECTION OBLIGATOIRE depuis le 02/10/2026 (règle GFP-LOT, TF-1526). Vérifiée par
+     `oracle-lot-retours` et refusée à l'ingestion si elle manque. -->
+
+Une contrainte de plateforme (stratégie Azure Policy, processus du client décrit par l'humain…)
+qui a REFUSÉ ou CONTRAINT un déploiement se remonte ici : c'est le seul canal par lequel un
+garde-fou heurté par ce produit peut servir au suivant (`references\GARDE-FOUS-PLATEFORME.json`,
+D-37 (a) du 01/10/2026).
+
+Deux cas :
+
+- **Garde-fou déjà au registre, confirmé par ce relevé** : citer son identifiant `GFP-nnn` et la
+  date du relevé qui le confirme.
+- **Garde-fou NOUVEAU**, absent du registre : décrire « nouveau garde-fou » suivi de ses champs —
+  plateforme, mécanisme, effet (Deny, process bloquant…), portée, ce qu'il VISE, ce qu'il REFUSE,
+  et la date à laquelle il a été heurté. Le pilot l'inscrit au registre après vérification
+  (`node scripts\verifier-garde-fous.mjs --registre`) ; cette section ne juge que la remontée, pas
+  la justesse du garde-fou décrit.
+
+**Si aucun garde-fou de plateforme n'a été relevé sur ce lot**, l'écrire : « Aucun garde-fou de
+plateforme relevé sur ce lot. » Une section vide se lit comme un oubli, et l'omission ne vaut pas
+décision.
+
 ## Confirmations positives
 
 <Ce qui a TENU en conditions réelles — aussi précieux que les défauts : permet de clore les

@@ -393,7 +393,10 @@ function zoneMotif(groupe) {
     if (jonction) {
       const entete = cellulesDeLigne(jonction.entete);
       const donnees = cellulesDeLigne(jonction.ligne);
-      const i = entete.findIndex((c) => /motif|raison/i.test(c));
+      // TF-1469 (02/10/2026) : le gabarit TODO-PRODUIT prescrit la colonne « Pourquoi pas IA »
+      // (gabarits\docs-projet\TODO-PRODUIT.md l.64, et « Pourquoi pas l'IA » de
+      // gabarits\cadence\COMPTE-RENDU.md) — aucune des deux ne porte « motif » ni « raison ».
+      const i = entete.findIndex((c) => /motif|raison|pourquoi/i.test(c));
       if (i >= 0 && donnees[i] !== undefined) return donnees[i];
     }
   }
@@ -3035,6 +3038,66 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // S57 (TF-1503, 02/10/2026) — UN DOCUMENT TENU OUVERT N'EST NI UNE DÉCISION NI UN BLOQUANT.
+  // AVERTISSANTE à son entrée (hors de BLOQUANTES du hook), comme toute règle neuve depuis la
+  // v2.5.0 : le gabarit (ligne 249, TF-1503) prescrit la forme depuis le 30/09/2026 et aucune règle
+  // ne la jugeait — « non mécanisé » y est écrit en toutes lettres. La règle 7 de REGLES-PROJET.md
+  // tolère la version antérieure tenue ouverte SI ET SEULEMENT SI le déplacement est consigné
+  // `dependance_externe` au bloc 8, jamais posé à l'humain ni compté bloquant (ce qui déclencherait
+  // S45). La VÉRITÉ du déplacement (vraiment verrouillé ?) n'est pas jugée — comme R-7 bis de
+  // `oracle-conformite-projet.mjs`, ce juge lit la FORME de la déclaration, jamais le fichier.
+  {
+    const SIGNE_TENU_OUVERT = /\b(?:tenue?\s+ouverte?|rest[ée]e?\s+ouverte?|n['’]a\s+pas\s+p[ue]\s+[êe]tre\s+d[ée]plac[ée]e?|verrouill[ée]e?)\b/iu;
+    if (!SIGNE_TENU_OUVERT.test(texte)) {
+      findings.push({ regle: "S57", statut: "SANS_OBJET", message: "aucune mention d'une version antérieure tenue ouverte — rien à juger" });
+    } else {
+      const b3_57 = bloc(texte, BLOCS[2][0]) || "";
+      const b5_57 = bloc(texte, BLOCS[4][0]) || "";
+      // Posé comme DÉCISION : le bloc 3 demande de fermer le document ou l'application.
+      const poseEnDecision = /ferme(?:r|z)?\s+(?:le\s+)?(?:document|fichier|l['’]application|le\s+logiciel)/i.test(b3_57);
+      // Compté BLOQUANT : le bloc 5 (non traité) le cite sous un motif de famille bloquante — même
+      // vocabulaire que S45 (dependance_bloc_3, gate_gouvernance, garde_fou, dependance_externe).
+      const compteBloquant = SIGNE_TENU_OUVERT.test(b5_57)
+        && /`(?:dependance_bloc_3|gate_gouvernance|garde_fou|dependance_externe)`/.test(b5_57);
+      if (poseEnDecision || compteBloquant) {
+        findings.push({ regle: "S57", statut: "FAIL",
+          message: `une version tenue ouverte est ${poseEnDecision ? "posée comme une décision au bloc 3" : "comptée bloquante au bloc 5"} — `
+            + "la règle 7 (alinéa TF-1503, décision humaine du 30/09/2026) prescrit la sortie SANS poser de question ni compter de bloquant : "
+            + "bloc 8, en `auto_ia`, motif `dependance_externe` nommant l'application, rejoué au tour suivant" });
+      } else {
+        findings.push({ regle: "S57", statut: "PASS", message: "version tenue ouverte déclarée, ni posée en décision ni comptée bloquante" });
+      }
+    }
+  }
+
+  // S58 (TF-1496, 02/10/2026) — UNE OPTION IMPOSSIBLE SE DIT EN `EXCLUSIONS`, PAS EN COÛT SEUL.
+  // AVERTISSANTE à son entrée, même raisonnement que S57. Le gabarit (ligne 875, TF-1496) exige
+  // qu'une option qu'un garde-fou connu interdit CITE ce garde-fou dans sa cellule `Exclusions`.
+  // NON JUGÉ, et le gabarit le dit : que l'option HEURTE VRAIMENT la contrainte citée — lire une
+  // stratégie de plateforme et la confronter à une option demande un jugement humain. Ce qui est
+  // mécanisable, et rien de plus, et BORNÉ pour rester sûr sur les DEUX formes d'options que ce
+  // juge admet (bloc 3 en puces ou en tableau, TF-1137) : un garde-fou DOCUMENTÉ ailleurs dans la
+  // restitution (bloc 4 ou bloc 5 — c'est là qu'une contrainte connue se consigne) et JAMAIS CITÉ
+  // nulle part dans le bloc 3 des décisions — le cas exact du 21/09/2026 (TF-1495) : la stratégie
+  // était écrite en qualification depuis le 23/07, aucune des deux options du bloc 3 ne la citait.
+  {
+    const SIGNE_GARDE_FOU = /GFP-\d{3}|garde-fou\s+de\s+plateforme|strat[ée]gie\s+[^.\n]{0,40}\b(?:deny|refuse|interdit)/iu;
+    const b3_58 = bloc(texte, BLOCS[2][0]) || "";
+    const b4_58 = bloc(texte, BLOCS[3][0]) || "";
+    const b5_58 = bloc(texte, BLOCS[4][0]) || "";
+    const documenteAilleurs = SIGNE_GARDE_FOU.test(b4_58) || SIGNE_GARDE_FOU.test(b5_58);
+    if (!documenteAilleurs) {
+      findings.push({ regle: "S58", statut: "SANS_OBJET", message: "aucun garde-fou de plateforme documenté (bloc 4 ou bloc 5) — rien à confronter aux options du bloc 3" });
+    } else if (SIGNE_GARDE_FOU.test(b3_58)) {
+      findings.push({ regle: "S58", statut: "PASS", message: "garde-fou de plateforme documenté, et repris dans les décisions du bloc 3" });
+    } else {
+      findings.push({ regle: "S58", statut: "FAIL",
+        message: "un garde-fou de plateforme est documenté (bloc 4 ou bloc 5), et aucune option du bloc 3 ne le cite — "
+          + "le 21/09/2026, aucune des 2 options d'un ordre de déploiement ne citait la stratégie qui l'interdisait, écrite en qualification depuis le 23/07 (TF-1495, TF-1496) ; "
+          + "citer le garde-fou dans `Exclusions` (ou son équivalent en puce) plutôt que de présenter l'option comme seulement plus chère" });
+    }
+  }
+
   return findings;
 }
 
@@ -4202,6 +4265,71 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c18manque.statut !== "FAIL" || !/il en manque/.test(c18manque.message || ""))
     casse.push("TF-1427 : une ligne à qui manque une cellule — ce qui suit glisse sous l'en-tête voisin — passe S18 : "
       + String(c18manque.message || c18manque.statut || "").slice(0, 200));
+  // 02/10 — TF-1469 : LA MÊME LIGNE, SOUS L'EN-TÊTE QUE PRESCRIT LE GABARIT TODO-PRODUIT. La
+  // colonne « Motif » de TF-1427 devient « Pourquoi pas IA » (gabarits\docs-projet\TODO-PRODUIT.md
+  // l.64) : la cellule et son vocabulaire fermé entre accents graves ne changent pas. Sans la
+  // colonne retrouvée par son en-tête, la lecture retombe sur `horsCode` du groupe ENTIER — qui
+  // ÔTE les citations entre accents graves — et le mot du vocabulaire fermé disparaît avec elles.
+  const ENTETE_1469 = "| Sél. | Action | Acteur | Id | Pourquoi pas IA | Comment | Si rien n'est fait |" + nl + "|---|---|---|---|---|---|---|";
+  const bloc8Tableau1469 = (a1) => verte.replace(/## 8\. Prochaines actions[\s\S]*$/, "## 8. Prochaines actions" + nl + nl
+    + "Les actions sont triées, celles de l'IA d'abord, parce qu'elles n'attendent personne." + nl + nl
+    + [ENTETE_1469, a1, A2_1427, A3_1427].join(nl) + nl);
+  const r1469 = jouerPe("tf1469-colonne-pourquoi-pas-ia.md",
+    bloc8Tableau1469(ligneA1_1427(RELEVER, "`az pipelines runs list --top 1`")));
+  const c12_1469 = constatDe(r1469, "S12");
+  if (c12_1469.statut !== "PASS")
+    casse.push("TF-1469 : la MÊME action, motif `acces` entre accents graves, passe sous l'en-tête « Motif » et échoue "
+      + "sous l'en-tête « Pourquoi pas IA » prescrit par gabarits\\docs-projet\\TODO-PRODUIT.md l.64 — S12 ne lit pas la "
+      + "colonne : " + String(c12_1469.message || c12_1469.statut || "sortie illisible").slice(0, 200));
+
+  // 02/10 — TF-1503 : S57, LE DOCUMENT TENU OUVERT, DANS SES TROIS SENS.
+  const r57sansObjet = jouerPe("tf1503-sans-objet.md", verte);
+  const c57so = constatDe(r57sansObjet, "S57");
+  if (c57so.statut !== "SANS_OBJET")
+    casse.push("TF-1503 : S57 devrait rendre SANS_OBJET hors de toute mention d'un document tenu ouvert, et le dire : "
+      + String(c57so.message || c57so.statut || "").slice(0, 200));
+  const r57decision = jouerPe("tf1503-pose-en-decision.md", verte.replace(
+    "  - sans décision : rien n'est publié.",
+    "  - sans décision : rien n'est publié.\n"
+    + "- **Décision 2 —** Le CV, tenu ouvert sur le poste, doit-il être fermé pour que la version précédente parte sous `old\\` ?\n"
+    + "  - (a) fermer le document maintenant — recommandé.\n"
+    + "  - (b) attendre le prochain tour.\n"));
+  const c57d = constatDe(r57decision, "S57");
+  if (c57d.statut !== "FAIL" || !/bloc 3/.test(c57d.message || ""))
+    casse.push("TF-1503 : un document tenu ouvert POSÉ COMME DÉCISION au bloc 3 passe — la règle 7 (TF-1503) prescrit la "
+      + "sortie SANS poser de question à l'humain : " + String(c57d.message || c57d.statut || "").slice(0, 200));
+  const r57forme = jouerPe("tf1503-forme-prescrite.md", verte.replace(
+    "- **A-3** — enfin TF-0222 (auto_ia) — regrouper les constats par cause racine.",
+    "- **A-4** — redéplacer le CV une fois libéré (auto_ia) — la version précédente, tenue ouverte dans l'éditeur, n'a pas pu être déplacée sous `old\\`.\n"
+    + "  - motif de non-exécution : dependance_externe — éditeur de CV ouvert sur le poste, rejoué au tour suivant.\n"
+    + "  - si rien n'est fait : deux versions cohabitent sans limite de durée.\n"
+    + "- **A-3** — enfin TF-0222 (auto_ia) — regrouper les constats par cause racine."));
+  const c57f = constatDe(r57forme, "S57");
+  if (c57f.statut !== "PASS")
+    casse.push("TF-1503 : la forme PRESCRITE (bloc 8, auto_ia, dependance_externe, application nommée, rejoué au tour "
+      + "suivant), ni posée en décision ni comptée bloquante, est accusée : " + String(c57f.message || c57f.statut || "").slice(0, 200));
+
+  // 02/10 — TF-1496 : S58, LE GARDE-FOU DE PLATEFORME EN EXCLUSIONS, DANS SES TROIS SENS.
+  const r58sansObjet = jouerPe("tf1496-sans-objet.md", verte);
+  const c58so = constatDe(r58sansObjet, "S58");
+  if (c58so.statut !== "SANS_OBJET")
+    casse.push("TF-1496 : S58 devrait rendre SANS_OBJET hors de toute mention d'un garde-fou de plateforme, et le dire : "
+      + String(c58so.message || c58so.statut || "").slice(0, 200));
+  const AJOUT_GFP_B4 = "\n- GFP-001 (Azure Policy, Deny) relevé en qualification le 2026-07-23 — la souscription du client refuse l'écriture sans authentification active.";
+  const r58muet = jouerPe("tf1496-exclusions-muettes.md", verte.replace(
+    "## 5. Non traité", AJOUT_GFP_B4 + "\n\n## 5. Non traité"));
+  const c58m = constatDe(r58muet, "S58");
+  if (c58m.statut !== "FAIL" || !/aucune option/.test(c58m.message || ""))
+    casse.push("TF-1496 : un garde-fou documenté au bloc 4, qu'aucune option du bloc 3 ne cite, passe — c'est le trou mesuré "
+      + "le 21/09/2026 (TF-1495) : " + String(c58m.message || c58m.statut || "").slice(0, 200));
+  const r58cite = jouerPe("tf1496-exclusions-citees.md", verte
+    .replace("## 5. Non traité", AJOUT_GFP_B4 + "\n\n## 5. Non traité")
+    .replace("exclut de grouper cette sortie avec le prochain lot",
+      "exclut de grouper cette sortie avec le prochain lot ; respecte GFP-001 (authentification déjà active)"));
+  const c58c = constatDe(r58cite, "S58");
+  if (c58c.statut !== "PASS")
+    casse.push("TF-1496 : la MÊME restitution, l'option du bloc 3 citant désormais GFP-001, est encore accusée : "
+      + String(c58c.message || c58c.statut || "").slice(0, 200));
   // 28/09 — TF-1428 ET TF-1449. Registre produit, en tableau : la MÊME ligne avec « A-18 » dans sa
   // colonne Registre (PASS), avec un tiret (FAIL), avec un tiret et un RENVOI « après A-12 » dans
   // son texte (FAIL : un renvoi n'est pas un registre), et dans un tableau dont la colonne « Id »
