@@ -100,7 +100,15 @@ function risqueDEcrasement(dst, src) {
   }
   return null;
 }
+// TF-1393 (26/09/2026) — LE RISQUE NE SE CALCULE QUE SUR CE QUE LE GESTE ÉCRIT RÉELLEMENT. Les
+// trois modes `presence`, `presence_et_motif(s)` ne RECOPIENT jamais un fichier présent : au pire
+// `presence_et_motifs` AJOUTE des motifs manquants EN FIN de fichier (ligne 148 et suivantes),
+// sans toucher au contenu existant — rien n'y est perdu, qu'il soit commis ou non. Seul
+// `copie_conforme` écrase un fichier présent et divergent (writeFileSync plus bas). Mesuré chez
+// Produit-68 : un CLAUDE.md en mode `presence_et_motif`, modifié et non commis, faisait basculer
+// le geste entier en essai pour un artefact qu'il n'écrirait jamais.
 const risques = contrat.artefacts
+  .filter((a) => a.mode === "copie_conforme")
   .map((a) => risqueDEcrasement(join(cible, String(a.cible).replaceAll("/", "\\")),
     join(PILOT, String(a.source).replaceAll("/", "\\"))))
   .filter(Boolean);
