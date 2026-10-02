@@ -41,7 +41,7 @@ Phase 0 bis — ADOPTION, et c'est la phase propre à ce cas :
    Lis-moi son relevé : ce qui manque et serait posé, ce qui existe et serait laissé intact.
 6. Attends mon accord. Puis joue-le pour de vrai, sans --essai, et rends-moi son verdict.
 7. Pose ensuite les README d'input\ et output\ :
-     node <FORGE_ROOT>\digit-ai-factory\scripts\readme-dossiers.mjs
+     node <FORGE_ROOT>\digit-ai-factory\scripts\readme-dossiers.mjs --base .
 8. Relis-moi la section « Écart initial à l'adoption » que l'outil a écrite dans
    forge\travaux\ECARTS-ASSUMES.md. Ne tranche AUCUN de ces écarts maintenant : ils se
    décident au premier run de version, et je veux les avoir lus avant.

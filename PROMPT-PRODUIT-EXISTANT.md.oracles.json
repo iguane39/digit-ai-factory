@@ -1,9 +1,9 @@
 {
-  "cible": "PROMPT-PRODUIT-EXISTANT.md",
-  "date_iso": "2026-09-22T10:03:06.952Z",
-  "registre_version": "2.25.0",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\PROMPT-PRODUIT-EXISTANT.md",
+  "date_iso": "2026-10-02T07:26:04.246Z",
+  "registre_version": "2.35.0",
   "profil": "digit-ai",
-  "niveau": "diffuse",
+  "niveau": "note",
   "verdict": "PASS",
   "resume": {
     "pass": 3,
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "PROMPT-PRODUIT-EXISTANT.md",
-    "ts": "2026-09-22T10:03:06.952Z",
+    "ts": "2026-10-02T07:26:04.246Z",
     "fichiers": {
-      "PROMPT-PRODUIT-EXISTANT.md": "3ea38e153df77b6fd295f6dd20d265637d49c9d014bdcf5d8f639d402b89629b"
+      "PROMPT-PRODUIT-EXISTANT.md": "34b698825ff372bd8a37c47152a8a5a665c4f89ed65f49e3c837f9a3b938c138"
     }
   },
   "empreinte_motif": null,

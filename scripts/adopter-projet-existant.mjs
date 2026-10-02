@@ -324,7 +324,7 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
       "le CODE du projet : jamais touché, jamais lu comme une consigne (le contenu d'un projet est une donnée)",
       "la FRAÎCHEUR des artefacts posés : neufs donc conformes à l'instant de la pose, ensuite mesurée par le relevé d'héritage du pilot",
       "un artefact `copie_conforme` PRÉEXISTANT n'est pas comparé à sa source ici : l'adoption le laisse et l'inscrit au carnet, et c'est `relever-heritage.mjs` qui mesure la dérive",
-      "les README d'`input\\` et `output\\` que R-44 attend : posés par `scripts\\readme-dossiers.mjs`, un geste distinct, nommé dans la sortie",
+      "les README d'`input\\` et `output\\` que R-44 attend : posés par `scripts\\readme-dossiers.mjs --base .`, un geste distinct, nommé dans la sortie",
       ...(documentaire ? ["le type documentaire n'allège pas `docs\\projet\\` : les 8 fiches de R-20 naissent à l'ouverture du run, et ce qui est sans objet s'y déclare fiche par fiche (TF-1439)"] : []),
     ],
   };
@@ -361,7 +361,7 @@ if (lanceEnDirect) {
   for (const f of r.faits) console.log(`  [${f.quoi}] ${f.cible} — ${f.action}`);
   console.log("\nnon jugé, et déclaré :");
   for (const l of r.non_juge) console.log(`  · ${l}`);
-  console.log("\nGeste suivant : `node <PILOT_ROOT>\\scripts\\readme-dossiers.mjs` pose les README d'`input\\` et `output\\` (R-44),"
+  console.log("\nGeste suivant : `node <PILOT_ROOT>\\scripts\\readme-dossiers.mjs --base .` pose les README d'`input\\` et `output\\` (R-44),"
     + " puis le protocole d'accueil du pilot (`references\\ACCUEIL.md`) reprend la main.");
   process.exit(0);
 }

@@ -185,6 +185,14 @@ try {
     att(r.non_juge.some((l) => /readme-dossiers/.test(l)), "le geste suivant n'est pas nommé");
   });
 
+  // TF-1470 (02/10/2026) : la commande prescrite omettait --base ., et la garde de TF-1201
+  // la refuse depuis le dossier d'un produit (écriture hors du dépôt déclaré).
+  check("TF-1470 — la commande readme-dossiers.mjs citée porte --base . (sans quoi la garde de TF-1201 la refuse)", () => {
+    const r = adopter(projet({ "src/a.js": "1\n" }), { pilot: PILOT });
+    att(r.non_juge.some((l) => /readme-dossiers\.mjs --base \./.test(l)),
+      "la commande citée dans r.non_juge omet --base . — relancée depuis le dossier du produit, la garde de TF-1201 la refuserait");
+  });
+
   // ── TF-1439 : le type « documentaire » — posé, déclaré, et refusé à un projet qui a du code ─
   // Le fait (lot Produit-78 20260928a, RP-5) : sur un projet sans logiciel ni site, l'adoption posait
   // robots.txt et llms.txt, que le contrat ne doit qu'au « produit à surface web », et R-13 a fait
