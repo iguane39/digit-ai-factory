@@ -1,7 +1,7 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\CLAUDE-PRODUIT.md",
-  "date_iso": "2026-09-01T05:13:13.044Z",
-  "registre_version": "2.13.0",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\gabarits\\CLAUDE-PRODUIT.md",
+  "date_iso": "2026-10-02T07:36:05.155Z",
+  "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -38,7 +38,7 @@
       "domaine": "Sécurité / secrets",
       "file": "gabarits\\CLAUDE-PRODUIT.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\CLAUDE-PRODUIT.md",
-    "ts": "2026-09-01T05:13:13.044Z",
+    "ts": "2026-10-02T07:36:05.154Z",
     "fichiers": {
-      "gabarits\\CLAUDE-PRODUIT.md": "c2476c599f9ee6e27f152bbcc525d27965aa9fca9b8d382e372ffa6f1de10bef"
+      "gabarits\\CLAUDE-PRODUIT.md": "66c9a213c9216f19871571599892a01d1477ab2fbf978f3309c20b5b0496f706"
     }
   },
   "empreinte_motif": null,

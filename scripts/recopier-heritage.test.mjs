@@ -212,6 +212,24 @@ try {
   });
 
   // ── TF-0851 (2) : le geste rend compte de ce qu'il laisse au dépôt ─────────────────────────
+  // ── TF-1563 : la cascade de l'intention et la fiche de conception amont descendent au produit ─
+  // Avant le 02/10/2026, gabarits\HERITAGE.json ne portait ni INTENTION.md ni FICHE-CONCEPTION.md
+  // (0 occurrence, releve du 01/10) : aucun produit ne les recevait, et un produit a reproduit la
+  // meme reprise de forme sur 4 pages sans jamais avoir la fiche sous la main (TF-1563, RS-25).
+  check("TF-1563 — forge/INTENTION.md et forge/documents/FICHE-CONCEPTION.md sont desormais herites en copie conforme", () => {
+    const produit = join(T, "produit-intention-fiche");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(existsSync(join(produit, "forge", "INTENTION.md")), "forge/INTENTION.md n'a pas ete copie — la cascade de l'intention ne descend toujours pas au produit");
+    att(existsSync(join(produit, "forge", "documents", "FICHE-CONCEPTION.md")), "forge/documents/FICHE-CONCEPTION.md n'a pas ete copie — la fiche de conception amont ne descend toujours pas au produit");
+    const normE = (s) => String(s).split("\r\n").join("\n").trimEnd();
+    att(normE(readFileSync(join(produit, "forge", "INTENTION.md"), "utf8")) === normE(readFileSync(join(PILOT, "references", "INTENTION.md"), "utf8")),
+      "forge/INTENTION.md copie mais different de sa source");
+    att(normE(readFileSync(join(produit, "forge", "documents", "FICHE-CONCEPTION.md"), "utf8")) === normE(readFileSync(join(PILOT, "gabarits", "documents", "FICHE-CONCEPTION.md"), "utf8")),
+      "forge/documents/FICHE-CONCEPTION.md copie mais different de sa source");
+  });
+
   check("TF-0851 — le geste imprime la ligne `git add` des fichiers qu'il vient d'écrire", () => {
     const produit = join(T, "produit-add");
     mkdirSync(join(produit, "forge"), { recursive: true });
