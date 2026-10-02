@@ -893,6 +893,29 @@ if (args[0] === "--self-test") {
     if (!(plusLong.statut === "PASS" && plusLong.message.includes("synthese-executive")))
       casse.push("G8 : « Synthese Executive » retombe sur la famille des restitutions — le préfixe le plus LONG ne gagne " +
         `pas, et la règle désigne la mauvaise famille en rendant PASS : ${plusLong.message.slice(0, 120)}`);
+
+    // TF-1230 (campagne D-51 (a), 02/10/2026) — LES HUIT FICHIERS docs-projet SONT UNE FAMILLE DU
+    // CATALOGUE RÉEL, PAS UN ANGLE MORT. Avant ce correctif, aucune ligne de
+    // gabarits/documents/catalogue.jsonl ne les déclarait : ils vivaient sous gabarits/docs-projet/,
+    // leur CONTENU était déjà jugé fichier par fichier par R-20 (oracle-conformite-projet.mjs), mais
+    // ils n'étaient ni instanciés depuis un gabarit versionné au sens de ce catalogue, ni comptables
+    // par lui (G4). Le contrôle lit le catalogue RÉEL (lireCatalogue(), pas une fixture fabriquée) :
+    // sans la correction, aucune famille « docs-projet » n'existe et ce bloc casse ; avec elle, la
+    // famille existe, cite les huit fichiers réels, et chacun d'eux existe sur le disque — un
+    // chemin cité qui n'existerait pas serait une seconde invention.
+    const DOCS_PROJET_FICHIERS = ["ARCHITECTURE.md", "FONCTIONNEL.md", "TECHNOS.md", "MODELE-DONNEES.md",
+      "PARAMETRAGE.md", "COMMANDES.md", "ACCES-TEST.md", "COMPOSANTS-OPS.md"];
+    const famDocsProjet = cat8.find((f) => f.famille === "docs-projet");
+    if (!famDocsProjet) {
+      casse.push("TF-1230 : aucune famille « docs-projet » au catalogue réel — les huit fichiers de gabarits/docs-projet/ restent sans famille");
+    } else {
+      const citees = JSON.stringify(famDocsProjet.sources || []);
+      const nonCitee = DOCS_PROJET_FICHIERS.filter((n) => !citees.includes(n));
+      if (nonCitee.length) casse.push(`TF-1230 : la famille docs-projet ne cite pas ${nonCitee.join(", ")}`);
+      const racineDocsProjet = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "docs-projet");
+      const absents = DOCS_PROJET_FICHIERS.filter((n) => !existsSync(join(racineDocsProjet, n)));
+      if (absents.length) casse.push(`TF-1230 : fichier(s) cité(s) par la famille docs-projet introuvable(s) sur le disque : ${absents.join(", ")}`);
+    }
   }
 
   // G9 (TF-0923 volet 3) — LA PAGE HOMONYME, DANS SES QUATRE SENS. Les quatre cas ne diffèrent que
@@ -1031,14 +1054,15 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 39/39 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 40/40 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
       "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G10 dans ses TROIS sens (TF-1142, fixtures du 22/09 sous TF-1256) : lecteur déclaré et frontière lecteur/auteur écrite → PASS, frontière absente → FAIL, lecteur absent → FAIL ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain ; " +
       "G12 dans ses DEUX sens rouges — « aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; " +
       "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
-      "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS)");
+      "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS) ; " +
+      "TF-1230 : la famille docs-projet existe au catalogue réel, cite les huit fichiers de gabarits/docs-projet/, tous présents sur le disque)");
   process.exit(casse.length ? 1 : 0);
 }
 
