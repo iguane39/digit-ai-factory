@@ -52,7 +52,9 @@ const depot = (avecGarde) => {
   regenerer(D);
   g("add", "."); g("commit", "-q", "-m", "etat initial");
   if (avecGarde) {
-    writeFileSync(join(D, ".git", "hooks", "pre-commit"), `#!/bin/sh\nnode "${GARDE}" --depot "$(git rev-parse --show-toplevel)" || exit $?\n`, "utf8");
+    // `mode` 0o755 : sous Linux, git n'exécute qu'un crochet exécutable (Windows l'ignore). Sans lui,
+    // la recette hébergée sautait le crochet en silence et rendait FAIL (02/10/2026, TF-1018).
+    writeFileSync(join(D, ".git", "hooks", "pre-commit"), `#!/bin/sh\nnode "${GARDE}" --depot "$(git rev-parse --show-toplevel)" || exit $?\n`, { encoding: "utf8", mode: 0o755 });
   }
   // Le scénario : écriture, régénération immédiate par le hook d'écriture, indexage de la seule
   // synthèse, enregistrement.

@@ -228,7 +228,7 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
 }
 
 function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
-  let cible = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
+  let cible = join(dossierProduit, String(artefact.cible));
   // TF-0793 — LA DÉCLARATION SE LIT. Quand la cible manque à la racine du dépôt et que le produit
   // a déclaré sa racine web, l'artefact se cherche SOUS cette racine, et c'est là qu'il se juge
   // (présence, motifs ou conformité, comme à la racine). Le chemin déclaré est nommé au relevé.
@@ -236,7 +236,7 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
   if (!existsSync(cible)) {
     const racineWeb = racineWebDeclaree(dossierProduit);
     if (racineWeb) {
-      const sous = join(dossierProduit, racineWeb.replaceAll("/", "\\"), String(artefact.cible).replaceAll("/", "\\"));
+      const sous = join(dossierProduit, racineWeb, String(artefact.cible));
       if (existsSync(sous)) { cible = sous; sousRacineWeb = racineWeb; }
     }
   }
@@ -245,7 +245,7 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
   // produit : le juger absent forcerait tout le parc à migrer le jour de la publication, et
   // c'est exactement le renommage en cascade que l'item corrige.
   if (!existsSync(cible) && artefact.alias_accepte) {
-    const alias = join(dossierProduit, String(artefact.alias_accepte).replaceAll("/", "\\"));
+    const alias = join(dossierProduit, String(artefact.alias_accepte));
     if (existsSync(alias)) cible = alias;
   }
   // TF-0881 (08/09) — L'ALIAS DE TRANSITION SURVIT À CÔTÉ DE LA CIBLE CANONIQUE, ET R-47 CESSE DE
@@ -260,9 +260,9 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
   // La comparaison porte sur le chemin CANONIQUE du contrat, jamais sur `cible` — qui vient
   // justement d'être réassignée à l'alias quand la cible canonique manque (TF-0710). Les
   // confondre ferait relever « alias périmé » sur le cas exact que TF-0710 déclare LÉGITIME.
-  const canonique = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
+  const canonique = join(dossierProduit, String(artefact.cible));
   if (artefact.alias_accepte && existsSync(canonique)) {
-    const alias = join(dossierProduit, String(artefact.alias_accepte).replaceAll("/", "\\"));
+    const alias = join(dossierProduit, String(artefact.alias_accepte));
     if (existsSync(alias)) {
       sortie.alias_perime = String(artefact.alias_accepte);
       sortie.geste_alias = `git rm "${artefact.alias_accepte}"`;
@@ -312,7 +312,7 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
     return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
   }
   if (artefact.mode !== "copie_conforme") return sousRacineWeb ? { etat: "present", sous_racine_web: sousRacineWeb } : { etat: "present" };
-  const source = join(racinePilot, String(artefact.source).replaceAll("/", "\\"));
+  const source = join(racinePilot, String(artefact.source));
   if (!existsSync(source)) return { etat: "present", note: "source introuvable au pilot — non comparable" };
   const a = empreinteFichier(source, 12);
   const b = empreinteFichier(cible, 12);

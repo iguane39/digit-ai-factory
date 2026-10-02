@@ -101,8 +101,8 @@ function risqueDEcrasement(dst, src) {
   return null;
 }
 const risques = contrat.artefacts
-  .map((a) => risqueDEcrasement(join(cible, String(a.cible).replaceAll("/", "\\")),
-    join(PILOT, String(a.source).replaceAll("/", "\\"))))
+  .map((a) => risqueDEcrasement(join(cible, String(a.cible)),
+    join(PILOT, String(a.source))))
   .filter(Boolean);
 let ESSAI_FORCE = false;
 if (risques.length && !FORCER && !ESSAI) {
@@ -116,8 +116,8 @@ const SANS_ECRITURE = ESSAI || ESSAI_FORCE;
 let copies = 0, dejaConformes = 0, laisses = 0, instancies = 0, completes = 0;
 const ecrits = [];   // TF-0851 : ce que ce geste laisse au dépôt, nommé pour être commis
 for (const a of contrat.artefacts) {
-  const src = join(PILOT, String(a.source).replaceAll("/", "\\"));
-  const dst = join(cible, String(a.cible).replaceAll("/", "\\"));
+  const src = join(PILOT, String(a.source));
+  const dst = join(cible, String(a.cible));
   if (a.mode !== "copie_conforme") {
     // ---- TF-0850 · UN ARTEFACT PERSONNALISABLE **ABSENT** N'A RIEN À PROTÉGER --------------
     //
@@ -175,7 +175,7 @@ for (const a of contrat.artefacts) {
   // dite, et la migration vers le nom canonique reste le choix du produit (retirer l'ancien
   // fichier est un geste git qui lui appartient).
   if (!existsSync(dst) && a.alias_accepte) {
-    const alias = join(cible, String(a.alias_accepte).replaceAll("/", "\\"));
+    const alias = join(cible, String(a.alias_accepte));
     if (existsSync(alias) && norm(readFileSync(alias, "utf8")) === norm(contenu)) {
       dejaConformes += 1;
       console.log(`[CONFORME] ${a.alias_accepte} (alias de transition de ${a.cible} — migrer vers le nom canonique quand vous le déciderez)`);
@@ -205,7 +205,7 @@ if (ecrits.length && !SANS_ECRITURE) {
   console.log(`\nUNE RECOPIE N'EST TENUE QU'UNE FOIS COMMISE — ce geste a écrit ${ecrits.length} fichier(s) sur le disque ;`);
   console.log(`votre dépôt ne les porte pas encore :\n  git add ${rels}\n  git commit -m "Heritage du pilot remis a niveau (HERITAGE.json v${contrat.version})"`);
   if (aGitProduit) {
-    const etat = gitProduit("status", "--porcelain", "--", ...ecrits.map((c) => c.replaceAll("/", "\\")));
+    const etat = gitProduit("status", "--porcelain", "--", ...ecrits.map((c) => c));
     const lignes = (etat.stdout || "").split(/\r?\n/).filter(Boolean);
     if (lignes.length) console.log(`  état git des cibles écrites :\n    ${lignes.join("\n    ")}`);
   }

@@ -175,6 +175,19 @@ ne voyage donc pas, et un clone frais n'a pas le dossier : la règle vit ici.
   contenu et DÉPLACE le lot à la racine suivie ; puis `node todo\ingerer-lot.mjs <sidecar>` l'ingère.
 - **Ce qui le garde** : la règle LOT-SAS de `gabarits\oracle-lot-retours.mjs` refuse, à
   l'ingestion, un lot posé à la racine sous un nom réel, en nommant le sas.
+- **Un lot refusé à la porte se REMONTE aussi au produit (demande humaine du 02/10/2026).** Mot pour
+  mot : « remonter aux produits pour qu'ils améliorent leurs retours la prochaine. A proposer dans une
+  réponse supplémentaire la prochaine fois que ça arrive, et expliquer pourquoi les produits n'ont pas
+  bien remontés leurs éléments, sachant qu'ils ont les bons formats fournis ». La restitution qui
+  pose la décision sur un lot refusé (dérogation ou renvoi) y joint donc deux choses. La première :
+  l'option de remonter le constat au produit, par un item portant `destinataire_produit` puis
+  `todo\emettre-travaux.mjs`. La seconde : la CAUSE mesurée en lecture seule chez le produit, jamais
+  supposée — version ENREGISTRÉE (`git show HEAD:`) et version sur disque de
+  `forge\retours\oracle-lot.mjs` et du gabarit, leurs dates comparées à l'heure de la remise, et le
+  verdict du contrôle de remise consigné au journal du produit avec ses règles jouées. Cas fondateur
+  (TF-1568 à TF-1570) : deux produits ont remis le 01/10 sous un contrôle en 1.0.0 et en 1.1.0,
+  antérieur à R-57, qui rendait PASS honnêtement ; les copies à jour ne sont arrivées sur leur disque
+  qu'après la remise.
 - Un sas **vide est l'état normal**. Un lot DÉJÀ suivi sous un nom réel ne relève pas du sas mais
   de `todo\anonymiser-suivis.mjs`.
 - **Un produit privé déclaré de l'écosystème garde son nom** (règle humaine du 01/10/2026, mot pour

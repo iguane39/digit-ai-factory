@@ -44,9 +44,9 @@ const CONTRAT47 = JSON.parse(readFileSync(join(GAB47, "HERITAGE.json"), "utf8"))
 const CONTENU_JUGE = new Set([".claude/settings.json", "CLAUDE.md", "robots.txt", "llms.txt"]);
 for (const a of CONTRAT47.artefacts) {
   if (CONTENU_JUGE.has(a.cible)) continue;
-  const cible47 = join(verte, String(a.cible).replaceAll("/", "\\\\"));
+  const cible47 = join(verte, String(a.cible));
   mkdirSync(dirname(cible47), { recursive: true });
-  const source47 = join(GAB47, "..", String(a.source).replaceAll("/", "\\\\"));
+  const source47 = join(GAB47, "..", String(a.source));
   writeFileSync(cible47, existsSync(source47) ? readFileSync(source47, "utf8") : "");
 }
 // TF-1119 : un carnet hérité se REMPLIT. La verte l'instancie comme le ferait un produit — titre

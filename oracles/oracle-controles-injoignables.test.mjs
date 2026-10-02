@@ -24,7 +24,7 @@ let n = 0;
 const depot = (fichiers) => {
   const d = join(T, `d${++n}`);
   for (const [chemin, contenu] of Object.entries(fichiers)) {
-    const p = join(d, chemin.replaceAll("/", "\\"));
+    const p = join(d, chemin);
     mkdirSync(join(p, ".."), { recursive: true });
     writeFileSync(p, contenu, "utf8");
   }

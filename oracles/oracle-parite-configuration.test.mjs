@@ -34,7 +34,7 @@ const depot = ({ gabarit = null, env = null, code = {}, nomGabarit = ".env.examp
   if (gabarit !== null) writeFileSync(join(d, nomGabarit), gabarit, "utf8");
   if (env !== null) writeFileSync(join(d, ".env"), env, "utf8");
   for (const [chemin, contenu] of Object.entries(code)) {
-    const p = join(d, chemin.replaceAll("/", "\\"));
+    const p = join(d, chemin);
     mkdirSync(join(p, ".."), { recursive: true });
     writeFileSync(p, contenu, "utf8");
   }

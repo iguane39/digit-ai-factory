@@ -36,7 +36,7 @@ try {
     att(r.code === 0, `exit ${r.code} : ${r.sortie.slice(0, 200)}`);
     const contrat = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
     for (const a of contrat.artefacts.filter((x) => x.mode === "copie_conforme")) {
-      const dst = join(produit, String(a.cible).replaceAll("/", "\\"));
+      const dst = join(produit, String(a.cible));
       att(existsSync(dst), `${a.cible} non copié`);
       const norm = (s) => String(s).split("\r\n").join("\n").trimEnd();
       att(norm(readFileSync(dst, "utf8")) === norm(readFileSync(join(PILOT, a.source), "utf8")),

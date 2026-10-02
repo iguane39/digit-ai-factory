@@ -579,8 +579,8 @@
   "vu_le": "2026-09-14"
  },
  "todo/generer-page.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-14"
+  "cas": 5,
+  "vu_le": "2026-10-02"
  },
  "todo/generer-recidives.test.mjs": {
   "cas": 10,

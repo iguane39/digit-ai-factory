@@ -105,7 +105,7 @@ export function artefactsAbsents(dossier, contrat) {
   if (!dossier || !contrat || !Array.isArray(contrat.artefacts)) return null;
   return contrat.artefacts
     .map((a) => a.cible)
-    .filter((cible) => cible && !existsSync(join(dossier, String(cible).replaceAll("/", "\\"))));
+    .filter((cible) => cible && !existsSync(join(dossier, String(cible))));
 }
 
 /**

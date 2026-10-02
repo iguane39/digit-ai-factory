@@ -101,9 +101,9 @@ const poste = (nomProjet, { herite, sousDossier = null }) => {
     // avertissement, et c'est la recette qui a paye, pas le produit. Derivee, elle suit le contrat.
     const contrat = JSON.parse(readFileSync(join(GAB, "HERITAGE.json"), "utf8"));
     for (const a of contrat.artefacts) {
-      const cible = join(projet, String(a.cible).replaceAll("/", "\\"));
+      const cible = join(projet, String(a.cible));
       mkdirSync(dirname(cible), { recursive: true });
-      const source = join(GAB, "..", String(a.source).replaceAll("/", "\\"));
+      const source = join(GAB, "..", String(a.source));
       // Deux artefacts ont un CONTENU juge, pas seulement une presence : les recopier depuis le
       // gabarit ne suffirait pas, l'oracle y cherche des marqueurs precis. Ils restent explicites.
       if (a.cible === ".claude/settings.json") {
