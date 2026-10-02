@@ -1,5 +1,5 @@
 ---
-produit:        command-manager
+produit:        Produit-61
 urls:           # à fournir : URL de la page client
 langue:         fr
 largeur:

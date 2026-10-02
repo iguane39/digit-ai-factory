@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a02b36b293d32cca1\\input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+  "date_iso": "2026-10-02T07:50:27.612Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md",
+    "ts": "2026-10-02T07:50:27.611Z",
+    "fichiers": {
+      "input\\00-retours\\INSATISFACTION - Produit-61 - 20260906d.md": "62c43bf67485054e9e192d07b60e6298fd4f5669e353ec18489086c2ae517507"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
