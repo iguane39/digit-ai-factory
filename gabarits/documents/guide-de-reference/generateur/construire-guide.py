@@ -217,9 +217,15 @@ def promouvoir_pas(corps, cle_chapitre, vus):
     motif = re.compile(r"<p>\s*<strong>(.*?)</strong>(.*?)</p>", flags=re.S)
 
     def suite_continue(reste):
-        # Une amorce que la suite CONTINUE par une virgule ou une minuscule est un début de phrase.
+        # Une amorce que la suite CONTINUE par une virgule, un deux-points ou une minuscule est un
+        # début de phrase. TF-1516 (01/10/2026) — le deux-points manquait : la garde ne testait que
+        # les signes DÉJÀ VUS (virgule, 22/09), pas l'INVARIANT qu'elle protège (le corps d'un pas
+        # ne s'ouvre jamais sur une ponctuation). Une amorce en gras suivie d'un deux-points — « **Ce
+        # qui…** : les noms, … » — devenait un titre de pas, et son paragraphe s'ouvrait sur
+        # « : les noms… » : 6 paragraphes dans le guide servi 20261001b, invisibles de check_html,
+        # render_page et des neuf oracles de forge-design, aucun des trois ne jugeant la PROSE.
         net = sans_balises(reste).lstrip()
-        return bool(net) and (net[0] in ",;" or net[0].islower())
+        return bool(net) and (net[0] in ",;:" or net[0].islower())
 
     # Une amorce DANS un encadré n'ouvre pas de pas : l'encadré est une unité (5 cas le 22/09).
     encadres = [(m.start(), m.end()) for m in re.finditer(r"<blockquote>.*?</blockquote>", corps, flags=re.S)]
@@ -1069,6 +1075,28 @@ def self_test(socle_explicite=None):
             casse.append("%s : exit %s (attendu %s), motif « %s » absent — %s"
                          % (nom, code, code_attendu, motif, lignes[-1] if lignes else "aucune ligne"))
 
+    # 0. TF-1516 (01/10/2026) — UNE AMORCE SUIVIE D'UN DEUX-POINTS NE DEVIENT PAS UN PAS, DANS LES
+    #    DEUX SENS. Rouge (défaut d'origine, fait reproduit le 01/10) : « **Ce qui differe...** :
+    #    les noms, ... » devenait un titre de pas, et son paragraphe s'ouvrait sur « : les noms… »
+    #    — 6 cas dans le guide servi du produit, vus par aucun des trois oracles qui le jugent
+    #    (check_html, render_page, les neuf oracles de forge-design : aucun ne juge la PROSE). Vert,
+    #    la borne : la MÊME forme, sans deux-points, dont la suite commence par une MAJUSCULE, reste
+    #    un vrai titre de pas — la garde ne doit pas sur-corriger au point d'avaler les pas réels.
+    joues[0] += 2
+    corps_deux_points = ('<p><strong>Ce qui differe d un environnement a l autre</strong> : les noms, '
+                         'les secrets, et l approbation avant deploiement.</p>')
+    corps_apres, pas_deux_points = promouvoir_pas(corps_deux_points, "ch-tf1516", set())
+    if pas_deux_points:
+        casse.append("TF-1516 : une amorce en gras suivie d'un deux-points devient un titre de pas — %s"
+                     % corps_apres[:160])
+    if re.search(r"<p>\s*:", corps_apres):
+        casse.append("TF-1516 : le paragraphe s'ouvre encore sur un deux-points résiduel — %s" % corps_apres[:160])
+    _, pas_reel = promouvoir_pas(
+        '<p><strong>Premier geste a faire</strong> Ouvrez le terminal du poste.</p>', "ch-tf1516", set())
+    if not pas_reel:
+        casse.append("TF-1516 borne : la garde du deux-points empêche aussi un VRAI titre de pas "
+                     "(amorce suivie d'une majuscule) de se promouvoir")
+
     base = poser("<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n<title>recette</title>\n</head>\n"
                  "<body>\n<p>recette</p>\n</body>\n</html>\n", ["jetons.css"])
     # 1. ROUGE, jouable partout : des blocs du socle, et aucun socle pour les juger.
@@ -1115,7 +1143,9 @@ def self_test(socle_explicite=None):
     if casse:
         print("construire-guide --self-test : FAIL" + SAUT + SAUT.join("  - " + c for c in casse))
         return 1
-    print("construire-guide --self-test (TF-1433) : %d/%d%s — la parité de --constat dans ses DEUX sens : "
+    print("construire-guide --self-test (TF-1433) : %d/%d%s — TF-1516 : une amorce suivie d'un deux-points "
+          "ne devient pas un pas et ne laisse pas de deux-points résiduel, la MÊME suivie d'une majuscule "
+          "reste un vrai pas ; la parité de --constat dans ses DEUX sens : "
           "blocs du socle non jugés DITS non comparés (exit 2), bloc de la famille dérivé PÉRIMÉ, page posée "
           "par le poseur du socle à jour, en LF comme en CRLF, find-in-page.js d'une autre version PÉRIMÉ "
           "(exit 1) puis à jour une fois reposé"

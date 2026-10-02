@@ -1457,6 +1457,28 @@ else {
       }
     }
   }
+  // TF-1203 (14/09/2026, campagne D-51 (a)) — R-42 NE PORTAIT QU'UNE VOIE NOMMÉE SEQ PAR SEQ
+  // (TF-0794, ci-dessus) ; R-19, sa règle voisine, tient DÉJÀ une antériorité bornée par une
+  // DATE (DOCTRINE_CLES_COMPLETES) qui couvre tout un passé sans le nommer entrée par entrée.
+  // Mesuré sur Produit-02 le 12/09 : 5 écarts de seq et d'horodatage entre les seq 118 et 133
+  // (05/09), antérieurs à la session qui les révélait, jamais nommés un par un — le produit
+  // restait en FAIL permanent faute d'une voie du même modèle. Une entrée `type:
+  // anteriorite_ledger` portant `avant` (date ISO) et `cause` (≥20 car.) déclare UNE FOIS :
+  // tout écart dont l'horodatage est STRICTEMENT ANTÉRIEUR à `avant` est une antériorité
+  // déclarée, imprimé [ANTÉRIORITÉ], jamais nommé seq par seq. Un écart SANS horodatage
+  // lisible n'est pas borné par cette voie : la date ne couvre que ce qu'elle peut dater,
+  // TF-0794 (nommer le seq) reste la seule voie pour lui.
+  let anterioriteBorneInstant = NaN, anterioriteBorneCause = "";
+  for (const { e } of entrees) {
+    if (!e || (e.type || e.ev) !== "anteriorite_ledger") continue;
+    const avant = Date.parse(String(e.avant || ""));
+    const cause = String(e.cause || "");
+    if (Number.isFinite(avant) && cause.trim().length >= 20 &&
+      (!Number.isFinite(anterioriteBorneInstant) || avant > anterioriteBorneInstant)) {
+      anterioriteBorneInstant = avant; anterioriteBorneCause = cause;
+    }
+  }
+  const avantBorne = (instant) => Number.isFinite(instant) && Number.isFinite(anterioriteBorneInstant) && instant < anterioriteBorneInstant;
   const ecarts = [], notes = [];
   let avecSeq = 0;
   if (illisibles.length) ecarts.push(`ligne(s) JSON illisible(s) : ${illisibles.slice(0, 5).join(", ")}${illisibles.length > 5 ? " …" : ""}`);
@@ -1467,17 +1489,6 @@ else {
     let seqAttendu = 1, tsMax = "", tsMaxInstant = NaN;
     for (const e of lues) {
       const seq = Number(e.seq);
-      if (Number.isFinite(seq)) {
-        avecSeq++;
-        if (seq !== seqAttendu) {
-          const quoi = `seq ${seq} là où ${seqAttendu} était attendu`;
-          // TF-0794 : un seq en double ou en recul NOMMÉ par une rectification ultérieure est
-          // déclaré, pas fautif ; un saut en avant ou un seq non nommé reste un écart.
-          if (seq < seqAttendu && rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : seq en collision — ${rectifies.get(seq)}`);
-          else ecarts.push(`${quoi} — append-only rompu`);
-        }
-        seqAttendu = Math.max(seqAttendu, seq + 1);
-      }
       // TF-1422/TF-1423 (25/09/2026, RA-1/RS-2) : COMPARER DES CHAÎNES ISO MÊLE FUSEAU ET UTC.
       // `ts < tsMax` en comparaison lexicographique traite « +02:00 » comme LEXICALEMENT plus
       // grand que « Z » (le chiffre du décalage l'emporte sur la lettre) — sans rapport avec
@@ -1487,8 +1498,24 @@ else {
       // recul masqué. On compare des INSTANTS (`Date.parse`) ; un `ts` non vide qui ne s'y résout
       // pas (NaN) est lui-même nommé comme écart plutôt que de couler dans une comparaison NaN
       // toujours fausse — un horodatage qui ne se lit pas n'est pas un horodatage tenu.
+      // Calculé AVANT le contrôle de seq (TF-1203) : la voie bornée par une date s'applique
+      // aussi à un écart de seq, pas seulement à un écart d'horodatage.
       const ts = String(e.ts || "");
       const instant = ts ? Date.parse(ts) : NaN;
+      if (Number.isFinite(seq)) {
+        avecSeq++;
+        if (seq !== seqAttendu) {
+          const quoi = `seq ${seq} là où ${seqAttendu} était attendu`;
+          // TF-0794 : un seq en double ou en recul NOMMÉ par une rectification ultérieure est
+          // déclaré, pas fautif ; un saut en avant ou un seq non nommé reste un écart. TF-1203 :
+          // à défaut d'être nommé, un écart dont l'horodatage précède une antériorité bornée
+          // déclarée (anteriorite_ledger) est tout autant couvert.
+          if (seq < seqAttendu && rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : seq en collision — ${rectifies.get(seq)}`);
+          else if (seq < seqAttendu && avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} : seq en collision — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
+          else ecarts.push(`${quoi} — append-only rompu`);
+        }
+        seqAttendu = Math.max(seqAttendu, seq + 1);
+      }
       if (ts && !Number.isFinite(instant)) {
         const quoi = `seq ${Number.isFinite(seq) ? seq : "?"} : horodatage illisible (${ts}) — ne se résout pas en instant (Date.parse)`;
         if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} — ${rectifies.get(seq)}`);
@@ -1496,6 +1523,7 @@ else {
       } else if (ts && Number.isFinite(tsMaxInstant) && instant < tsMaxInstant) {
         const quoi = `seq ${Number.isFinite(seq) ? seq : "?"} : horodatage décroissant (${ts} après ${tsMax})`;
         if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} — ${rectifies.get(seq)}`);
+        else if (avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
         else ecarts.push(quoi);
       }
       if (ts && Number.isFinite(instant) && (!Number.isFinite(tsMaxInstant) || instant > tsMaxInstant)) { tsMax = ts; tsMaxInstant = instant; }
@@ -1509,7 +1537,8 @@ else {
   if (ecarts.length) {
     ko("R-42", "forge/ledger.jsonl", `intégrité rompue — ${ecarts.length} écart(s) : ${ecarts.slice(0, 6).join(" · ")}${ecarts.length > 6 ? " …" : ""}` +
       (notes.length ? ` (par ailleurs : ${notes.join(" · ")})` : "") +
-      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ], un saut en avant reste un écart");
+      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ], un saut en avant reste un écart. " +
+      "Pour un lot d'écarts anciens sans les nommer un par un : une entrée `type: anteriorite_ledger` portant `avant` (date ISO) et `cause` (≥20 car.) couvre, en [ANTÉRIORITÉ], tout écart dont l'horodatage précède `avant` (TF-1203) — seuls les écarts sans horodatage lisible restent hors de sa portée");
   } else {
     ok("R-42", "forge/ledger.jsonl", `intégrité tenue sur ${lues.length} entrée(s) — seq continu, horodatages non décroissants, ouverture par run_open` +
       (notes.length ? ` ; ${notes.join(" · ")}` : ""));

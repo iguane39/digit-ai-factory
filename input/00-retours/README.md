@@ -62,10 +62,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `digit-ai-prospection - RETOURS - 20260928a.tf.jsonl` | fichier | 5,0 Ko | 4 ligne(s) JSONL |
 | `digit-ai-prospection - RETOURS - 20260928b.md` | fichier | 3,4 Ko | Retours forges — digit-ai-prospection — 20260928b |
 | `digit-ai-prospection - RETOURS - 20260928b.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
-| `INSATISFACTION - command-manager - 20260906a.md` | fichier | 672 o | Insatisfaction — les login et mots de passe sont affichés sur la page d'accueil |
-| `INSATISFACTION - command-manager - 20260906b.md` | fichier | 592 o | Insatisfaction — il manque des comptes de démo prêts à l'emploi |
-| `INSATISFACTION - command-manager - 20260906c.md` | fichier | 543 o | Insatisfaction — le lien vers la page client n'est pas accessible depuis l'administration |
-| `INSATISFACTION - command-manager - 20260906d.md` | fichier | 545 o | Insatisfaction — sur la page client, panier et commande sont inactifs et l'aide vide le pa |
+| `INSATISFACTION - Produit-61 - 20260906a.md` | fichier | 667 o | Insatisfaction — les login et mots de passe sont affichés sur la page d'accueil |
+| `INSATISFACTION - Produit-61 - 20260906b.md` | fichier | 587 o | Insatisfaction — il manque des comptes de démo prêts à l'emploi |
+| `INSATISFACTION - Produit-61 - 20260906c.md` | fichier | 538 o | Insatisfaction — le lien vers la page client n'est pas accessible depuis l'administration |
+| `INSATISFACTION - Produit-61 - 20260906d.md` | fichier | 540 o | Insatisfaction — sur la page client, panier et commande sont inactifs et l'aide vide le pa |
 | `Produit-01 - RETOURS - 20260827a.md` | fichier | 8,3 Ko | Retours forges — Produit-01 — 20260827a |
 | `Produit-01 - RETOURS - 20260827a.tf.jsonl` | fichier | 4,9 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260823a.md` | fichier | 13,0 Ko | Retours forges — retrait du domaine breton & audit forge-tests — 20260823a |

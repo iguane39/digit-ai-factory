@@ -91,6 +91,10 @@
   "cas": 14,
   "vu_le": "2026-09-10"
  },
+ "oracle-coherence-restitution.mjs": {
+  "cas": 4,
+  "vu_le": "2026-10-02"
+ },
  "oracle-conformite-projet.mjs": {
   "cas": 127,
   "vu_le": "2026-10-02"
@@ -149,8 +153,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 39,
-  "vu_le": "2026-09-22"
+  "cas": 44,
+  "vu_le": "2026-10-02"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -267,8 +271,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 104,
-  "vu_le": "2026-10-01"
+  "cas": 105,
+  "vu_le": "2026-10-02"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 24,
@@ -495,8 +499,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 31,
-  "vu_le": "2026-09-08"
+  "cas": 35,
+  "vu_le": "2026-10-02"
  },
  "scripts/verifier-avance-publication.test.mjs": {
   "cas": 7,
@@ -563,8 +567,8 @@
   "vu_le": "2026-09-15"
  },
  "todo/anonymiser-entrant.mjs": {
-  "cas": 11,
-  "vu_le": "2026-10-01"
+  "cas": 12,
+  "vu_le": "2026-10-02"
  },
  "todo/anonymiser-suivis.mjs": {
   "cas": 10,
@@ -575,8 +579,8 @@
   "vu_le": "2026-09-15"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 33,
-  "vu_le": "2026-09-14"
+  "cas": 34,
+  "vu_le": "2026-10-02"
  },
  "todo/generer-page.test.mjs": {
   "cas": 5,

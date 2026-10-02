@@ -1,5 +1,5 @@
 ---
-produit:        command-manager
+produit:        Produit-61
 urls:           # à fournir : URL publique de l'application
 langue:         fr
 largeur:

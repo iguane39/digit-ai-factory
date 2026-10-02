@@ -14,6 +14,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence, racineWebDeclaree } from "./relever-heritage.mjs";
+import { CARNET, CONDITION_SITE } from "./adopter-projet-existant.mjs";
 
 // TF-0957 — LES TABLES DE CE BANC SONT JETABLES, ET C'EST LUI QUI LES POSE.
 //
@@ -203,6 +204,57 @@ try {
     mkdirSync(join(produit, "forge"), { recursive: true });
     const etat = etatArtefact(produit, { cible: "robots.txt", source: "gabarits/web/robots.txt", mode: "presence" }, pilot);
     att(etat.etat === "absent", `état « ${etat.etat} » au lieu de absent`);
+  });
+
+  // ---- TF-1471 (28/09/2026, campagne D-32 (a)) — LE `conditionnel` DU CONTRAT, ENFIN LU --------
+  //
+  // `robots.txt` et `llms.txt` portent `conditionnel: "produit à surface web"` dans
+  // gabarits\HERITAGE.json depuis l'origine ; ce relevé ne le lisait pas, et comptait les deux
+  // ABSENT, gravité majeur, même chez un projet DÉCLARÉ documentaire (type_projet, TF-1439) —
+  // alors que R-27 (oracle-conformite-projet.mjs) les tient déjà pour SANS_OBJET au même endroit.
+  const ARTEFACT_SITE = { cible: "robots.txt", source: "gabarits/web/robots.txt", mode: "presence", conditionnel: CONDITION_SITE };
+  const ecrireCarnetDocumentaire = (produit) => {
+    mkdirSync(join(produit, "forge", "travaux"), { recursive: true });
+    writeFileSync(join(produit, ...CARNET.split("/")),
+      "---\ntype_projet: documentaire\n---\n\n## Type de projet : documentaire\n", "utf8");
+  };
+
+  check("TF-1471 — un artefact `conditionnel` est SANS_OBJET chez un projet DÉCLARÉ documentaire, sans signal de code ni de site", () => {
+    const produit = join(T, "_ClientDocumentaire");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    ecrireCarnetDocumentaire(produit);
+    const etat = etatArtefact(produit, ARTEFACT_SITE, pilot);
+    att(etat.etat === "sans_objet", `état « ${etat.etat} » au lieu de sans_objet — le type_projet déclaré n'est pas lu`);
+    att(/documentaire/.test(etat.motif || ""), "le motif ne dit pas pourquoi l'artefact n'est pas dû");
+  });
+
+  check("TF-1471 borne — la déclaration documentaire ne vaut que CONFRONTÉE : un signal de code la contredit, l'artefact reste ABSENT", () => {
+    const produit = join(T, "_ClientFauxDocumentaire");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    ecrireCarnetDocumentaire(produit);
+    writeFileSync(join(produit, "app.js"), "// du code réel\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_SITE, pilot);
+    att(etat.etat === "absent", `état « ${etat.etat} » : une déclaration documentaire contredite par du code ne doit RIEN exempter`);
+  });
+
+  check("TF-1471 borne — sans `conditionnel` déclaré au contrat, un projet documentaire reste jugé comme avant", () => {
+    const produit = join(T, "_ClientDocumentaireSansConditionnel");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    ecrireCarnetDocumentaire(produit);
+    const etat = etatArtefact(produit, { cible: "forge/MODELE.md", source: "gabarits/MODELE.md", mode: "copie_conforme" }, pilot);
+    att(etat.etat === "absent", `état « ${etat.etat} » : un artefact SANS conditionnel ne doit jamais être exempté par type_projet`);
+  });
+
+  check("le relevé compte les exemptions à part, ni manque ni conforme", () => {
+    const produit = join(T, "_ClientDocumentaireCompte");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    ecrireCarnetDocumentaire(produit);
+    const CONTRAT_SITE = { version: "9.9.9", artefacts: [ARTEFACT_SITE] };
+    const lignes = relever(T, CONTRAT_SITE, pilot);
+    const l = lignes.find((x) => x.produit === "_ClientDocumentaireCompte");
+    att(l.exemptes === 1, `${l.exemptes} exempté(s) au lieu de 1`);
+    att(l.absents === 0, "une exemption est comptée en défaut (absents)");
+    att(l.conformes === 0, "une exemption est comptée conforme — elle ne l'est pas, rien n'est présent");
   });
 
   // ---- UN SOCLE SE VERIFIE, IL NE SE SUPPOSE PAS (TF-0649) -----------------------------------

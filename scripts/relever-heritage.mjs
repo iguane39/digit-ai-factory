@@ -46,6 +46,10 @@ import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "./lib-empreinte.mjs";
 import { PROFONDEUR_MAX, SAUTES } from "../todo/localiser-produit.mjs";
+// TF-1471 (28/09/2026, campagne D-32 (a)) — mêmes helpers que R-13/R-27 d'oracle-conformite-projet.mjs
+// (TF-1439) : un seul endroit sait lire `type_projet: documentaire` et confronter la déclaration
+// au dépôt réel, et c'est lui, jamais une seconde lecture maison du même en-tête.
+import { typeProjetDeclare, signauxLogicielOuSite, TYPE_DOCUMENTAIRE, CONDITION_SITE } from "./adopter-projet-existant.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -291,6 +295,23 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
     // le produit doit faire est donc DECLARER sa racine web, pas recopier un fichier qu'il a deja.
     const ailleurs = trouverAilleurs(dossierProduit, artefact.cible);
     if (ailleurs) return { etat: "hors_racine", trouve_a: ailleurs };
+    // TF-1471 (28/09/2026, campagne D-32 (a)) — LE CONTRAT DÉCLARE UN `conditionnel`, LE RELEVÉ
+    // NE LE LISAIT PAS. `robots.txt` et `llms.txt` (gabarits\HERITAGE.json) portent `conditionnel:
+    // "produit à surface web"` ; un projet DÉCLARÉ documentaire (`type_projet`, même mécanisme que
+    // R-13/R-27 dans oracle-conformite-projet.mjs, TF-1439) n'a par construction aucune surface web
+    // à ouvrir. Mesuré le 28/09 sur un parc jetable : les deux fichiers restaient « absent » chez
+    // un tel projet, alors que R-27 les tient déjà pour SANS_OBJET — deux consommateurs du même
+    // contrat rendaient deux verdicts différents sur le même fichier, ce que TF-0649 interdit déjà
+    // pour le mode `presence_et_motifs`. La confrontation au dépôt (signaux de code ou de site)
+    // est la MÊME que R-13/R-27 : une déclaration non confrontée exempterait un produit web qui se
+    // dirait documentaire pour échapper au contrat.
+    if (artefact.conditionnel === CONDITION_SITE) {
+      const type = typeProjetDeclare(dossierProduit);
+      if (type && type.type === TYPE_DOCUMENTAIRE && !signauxLogicielOuSite(dossierProduit).length) {
+        return { etat: "sans_objet",
+          motif: `projet déclaré documentaire (${type.ou}, type_projet) : ${artefact.conditionnel} non dû (TF-1439, TF-1471)` };
+      }
+    }
     return { etat: "absent" };
   }
   // TF-0649 — LE RELEVE ET R-47 DOIVENT DIRE LA MEME CHOSE. Ce module rendait « present » pour
@@ -436,6 +457,11 @@ export function relever(base, contrat, racinePilot) {
       non_commis: artefacts.filter((x) => x.histoire === "non_commis").length,
       // TF-0881 : l'alias de transition PÉRIMÉ (la cible canonique existe, l'ancien fichier aussi).
       alias_perimes: artefacts.filter((x) => x.alias_perime).length,
+      // TF-1471 : un artefact `conditionnel` exempté par un `type_projet` déclaré et confronté —
+      // ni un manque (rien n'est dû), ni un conforme (rien n'est présent). Sa propre colonne,
+      // comme `hors_racine` et `alias_perimes` : le noyer dans un autre compte fausserait l'un
+      // des deux.
+      exemptes: compte("sans_objet"),
       conformes: compte("conforme") + compte("present"),
       total: artefacts.length,
       artefacts,
@@ -464,7 +490,8 @@ if (lanceEnDirect) {
       // TF-0851 : l'état dans l'HISTOIRE se dit à côté du verdict de contenu, jamais à sa place.
       const histoire = (l.hors_histoire ? ` · ${l.hors_histoire} HORS HISTOIRE (présents, non suivis par git)` : "")
         + (l.non_commis ? ` · ${l.non_commis} NON COMMIS (conformes sur le disque, divergents de HEAD)` : "")
-        + (l.alias_perimes ? ` · ${l.alias_perimes} ALIAS PÉRIMÉ(S) à côté de la cible canonique (le produit supprime : git rm)` : "");
+        + (l.alias_perimes ? ` · ${l.alias_perimes} ALIAS PÉRIMÉ(S) à côté de la cible canonique (le produit supprime : git rm)` : "")
+        + (l.exemptes ? ` · ${l.exemptes} EXEMPTÉ(S) (type_projet documentaire, TF-1471)` : "");
       console.log(`${l.produit.padEnd(50)} ${drapeau}${histoire}`);
     }
     console.log(`\n${lignes.length} produit(s) relevé(s), ${totalManques} manque(s) au total — contrat v${contrat.version}`);

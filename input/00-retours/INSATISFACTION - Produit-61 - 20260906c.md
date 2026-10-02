@@ -1,5 +1,5 @@
 ---
-produit:        command-manager
+produit:        Produit-61
 urls:           # à fournir : URL de l'interface d'administration
 langue:         fr
 largeur:

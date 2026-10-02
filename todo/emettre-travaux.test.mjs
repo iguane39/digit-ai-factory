@@ -97,6 +97,23 @@ try {
       "le lot ne cite pas le chemin source DÉCLARÉ par le contrat — s'il le déduit de la cible, il invente (TF-0645)");
   });
 
+  check("un ALIAS DE TRANSITION PÉRIMÉ (TF-0881) est confié — pas seulement nommé par le relevé (TF-1461)", () => {
+    // Le fait mesuré le 28/09 (campagne D-32 (a)) : le relevé pose `alias_perime` et `geste_alias`
+    // SUR un artefact par ailleurs conforme (`etat` reste celui de la cible canonique, pas un des
+    // trois états que ce fichier filtrait) — les filtres `absents`/`perimes`/`horsRacine` ne lisent
+    // que `etat` et ne le voient donc jamais. Avant le correctif, ce lot rendait `null` (« RIEN À
+    // CONFIER ») malgré l'alias périmé ; il doit désormais le confier, avec le geste git rm exact.
+    const lot = lotHeritage(LIGNE([{ cible: "gabarits/RESTITUTION.md", mode: "copie_conforme", etat: "conforme",
+      alias_perime: "gabarits/RETOURS-FORGES.md", geste_alias: 'git rm "gabarits/RETOURS-FORGES.md"' }]), "20260928", "a");
+    att(lot, "aucun lot produit pour un alias de transition périmé — TF-1461 : le relevé le voit, l'émetteur le tait");
+    att(lot.md.includes("gabarits/RETOURS-FORGES.md"), "le lot ne nomme pas l'alias périmé");
+    att(lot.md.includes('git rm "gabarits/RETOURS-FORGES.md"'), "le lot ne porte pas le geste exact rendu par le relevé");
+    att(/TF-0881/.test(lot.md), "le lot ne cite pas l'item d'origine de la voie alias_perime");
+    const r = verifier(lot.md);
+    att(r.verdict === "PASS", "le lot à alias périmé ne tient pas sa propre forme : "
+      + r.constats.filter((c) => c.statut === "FAIL").map((c) => c.regle + " " + c.message).join(" · ").slice(0, 200));
+  });
+
   check("le sidecar porte une ligne JSON par élément, avec son moyen de vérification", () => {
     const lot = lotHeritage(LIGNE([ABSENT("forge/RESTITUTION.md"), ABSENT("robots.txt", "presence")]), "20260825", "a");
     const lignes = lot.sidecar.split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
