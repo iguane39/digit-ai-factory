@@ -122,7 +122,7 @@ pre.prose, pre.prose code { white-space: pre-wrap; overflow-wrap: break-word; }
 <!-- COMPOSANT-GABARIT:FIN bascule-theme.css -->
 <!-- COMPOSANT-GABARIT:DEBUT coquille-vues.css — copie de gd-guide-de-reference/composants/coquille-vues.css,
      posée par generateur/construire-guide.py. NE PAS ÉDITER ICI : la SOURCE fait foi (--constat). -->
-<style data-composant-gabarit="gd-guide-de-reference/coquille-vues.css" data-empreinte="sha256:175ef98c5876cb4330411b6c13b5d03394edcf3f9e09b5d0e827c0b4f2eda36a">
+<style data-composant-gabarit="gd-guide-de-reference/coquille-vues.css" data-empreinte="sha256:0dcceea96a5052c3f5b752002fa12459e4dd54600a0572a730862f7781d19a61">
 /* gd-guide-de-reference · coquille-vues.css — UN fichier, N VUES, une seule peinte à la fois.
  *
  * Le bandeau collant (marque, outils), la barre des vues, la vue et ses repères, la pagination
@@ -218,6 +218,16 @@ footer.pied p { margin: 0 0 4px; }
      libellé (« Rechercher dans le d », capture à 390 px du 24/09/2026). */
   .outils { width: 100%; }
   nav.vues ol { padding: 8px 12px; }
+  /* TF-1515 (02/10/2026) — LE BANDEAU COLLANT N'AVAIT PAS DE PLAFOND DE HAUTEUR. `header.bandeau`
+     est `position: sticky` à toutes les largeurs ; `nav.vues`, qu'il enveloppe, replie sa barre
+     en rangs SANS BORNE à mesure que les vues s'ajoutent — mesuré le 01/10 sur ce générateur même :
+     256 px sur 844 avec 5 vues (30 % de l'écran), 615 px avec 14 (73 %, 229 px de lecture restants).
+     La barre des vues, seule partie qui CROÎT avec le contenu, devient défilante dans SA PROPRE
+     boîte au-delà d'un plafond : le bandeau haut (marque, outils) reste toujours entier visible, et
+     la vue en cours reste accessible au clavier et au lecteur d'écran (scroll interne, pas de
+     `display: none`). Les captures d'élément ne l'auraient jamais montré : `render_page` neutralise
+     les éléments collants le temps d'une capture (règle V9, TF-1192). */
+  nav.vues { max-height: 35vh; overflow-y: auto; }
 }
 @media print {
   header.bandeau, nav.vues, nav.toc, .pagination { display: none; }
