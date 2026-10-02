@@ -1258,6 +1258,62 @@ check("TF-1423 : un ts qui ne se résout pas en instant est nommé comme écart,
   if (!f) throw new Error("un ts illisible n'est plus nommé comme écart");
 });
 
+// ---- fixtures R-42 ANTÉRIORITÉ BORNÉE PAR UNE DATE (TF-1203, campagne D-51 (a) du 02/10/2026) —
+// R-42 ne portait qu'une voie NOMMÉE seq par seq (TF-0794, ci-dessus) ; R-19, sa règle voisine,
+// tient déjà une antériorité bornée par une DATE sans rien nommer. Cas mesuré sur Produit-02 le
+// 12/09 : des écarts de seq ANCIENS (05/08 ici), antérieurs à la session qui les révèle, restaient
+// en FAIL permanent faute d'être nommés un par un. Une entrée `type: anteriorite_ledger` portant
+// `avant` et `cause` doit désormais les couvrir en bloc, SANS les nommer — et seulement eux,
+// jamais un écart plus récent que la date déclarée (double sens prouvé ci-dessous). ------------
+const LEDGER_ANTERIORITE_ANCIEN = [
+  { seq: 1, ts: "2026-08-01T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "2026-08-05T09:00:00Z", type: "retour" },
+  { seq: 3, ts: "2026-08-05T09:05:00Z", type: "retour" },        // session A, ANCIEN (05/08)
+  { seq: 4, ts: "2026-08-05T09:10:00Z", type: "etape_close" },   // session A, ANCIEN
+  { seq: 3, ts: "2026-08-05T09:15:00Z", type: "etape_close" },   // session B — collision ANCIENNE
+  { seq: 4, ts: "2026-08-05T09:20:00Z", type: "etape_close" },   // session B — collision ANCIENNE
+];
+const DECL_ANTERIORITE = { seq: 5, ts: "2026-09-12T10:00:00Z", type: "anteriorite_ledger",
+  avant: "2026-08-10T00:00:00Z", cause: "mesure du 12/09/2026 : écarts du 05/08 antérieurs à la session révélatrice (TF-1203)" };
+
+const rougeAnterioriteR42 = mkdtempSync(join(tmpdir(), "conf-rouge-anteriorite-r42-"));
+ecrireDans(rougeAnterioriteR42, "forge/ledger.jsonl", LEDGER_ANTERIORITE_ANCIEN.map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-1203 rouge : deux écarts de seq ANCIENS (05/08), non nommés et non bornés par une date → FAIL (R-42 sans voie)", () => {
+  const { exit, rapport } = lance(rougeAnterioriteR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 3 là où 5/.test(f.message) || !/seq 4 là où 5/.test(f.message))
+    throw new Error(`les deux écarts anciens ne sont pas dénoncés : ${f && f.message}`);
+});
+
+const verteAnterioriteR42 = mkdtempSync(join(tmpdir(), "conf-verte-anteriorite-r42-"));
+ecrireDans(verteAnterioriteR42, "forge/ledger.jsonl",
+  [...LEDGER_ANTERIORITE_ANCIEN, DECL_ANTERIORITE].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-1203 vert : les DEUX MÊMES écarts, couverts par une antériorité bornée par une date (anteriorite_ledger, sans les nommer) → PASS, imprimés [ANTÉRIORITÉ]", () => {
+  const { rapport } = lance(verteAnterioriteR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+  const f = r42.find((x) => x.statut === "PASS");
+  if (!f) throw new Error("aucun PASS R-42 après antériorité bornée déclarée");
+  if ((f.message.match(/\[ANTÉRIORITÉ\] seq [34] là où/g) || []).length !== 2)
+    throw new Error(`les deux écarts anciens ne sont pas imprimés [ANTÉRIORITÉ] : ${f.message} — une antériorité silencieuse serait une réécriture`);
+});
+
+const borneeAnterioriteR42 = mkdtempSync(join(tmpdir(), "conf-bornee-anteriorite-r42-"));
+ecrireDans(borneeAnterioriteR42, "forge/ledger.jsonl",
+  [...LEDGER_ANTERIORITE_ANCIEN, DECL_ANTERIORITE,
+    { seq: 6, ts: "2026-09-20T09:00:00Z", type: "retour" },
+    { seq: 6, ts: "2026-09-25T09:00:00Z", type: "retour" }, // collision RÉCENTE, postérieure à `avant` — jamais couverte
+  ].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-1203 borne : une antériorité déclarée ne pardonne QUE ce qui précède sa date — un écart récent reste un écart", () => {
+  const { exit, rapport } = lance(borneeAnterioriteR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — une antériorité datée ne doit pas blanchir un écart postérieur à sa borne`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 6 là où 7/.test(f.message)) throw new Error(`l'écart récent n'est plus dénoncé : ${f && f.message}`);
+  if ((f.message.match(/\[ANTÉRIORITÉ\] seq [34] là où/g) || []).length !== 2)
+    throw new Error(`les deux écarts anciens, par ailleurs toujours couverts, ne sont plus imprimés : ${f.message}`);
+});
+
 // ---- fixture R-42 bis (TF-1424, 25/09/2026, RS-3) : un ts POSTÉRIEUR au commit qui l'a introduite
 // est composé, pas relevé — double sens sur un dépôt git JETABLE, la date du commit FIXÉE par
 // `--date`, comme `projetAnteriorite` plus bas (même idiome, TF-0923). --------------------------
