@@ -29,7 +29,7 @@
  * Exit : 0 = PASS · 1 = FAIL · 2 = l'oracle n'a pas pu juger.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, basename, relative, dirname } from "node:path";
+import { join, basename, relative, dirname, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -454,7 +454,22 @@ function plusProche(type, typesAffiches) {
   return meilleur && meilleureDist <= seuil ? { type: meilleur, distance: meilleureDist } : null;
 }
 
-const racineForges = process.env.FORGE_ROOT || join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+// TF-1231 (14/09/2026) — dans un worktree lié (`.claude\worktrees\<agent>`), `dirname(import.meta.url)`
+// pointe sous ce worktree, et "../.." y reste encore : le parc (les dépôts frères du pilot) n'y
+// vit pas, et registre-types.json devient introuvable (R-25 rendait SANS_OBJET au lieu de juger).
+// On remonte par le RATTACHEMENT git, qui connaît le dépôt principal même depuis un worktree lié
+// (`--git-common-dir` y pointe vers son `.git`, jamais vers celui du worktree) ; son parent est
+// le parc. Hors dépôt git ou sans l'exécutable, on retombe sur l'ancien calcul (poste non équipé).
+function racineDuParcParDefaut(ici) {
+  const r = spawnSync("git", ["-C", ici, "rev-parse", "--git-common-dir"], { encoding: "utf8" });
+  if (r.status === 0 && r.stdout && r.stdout.trim()) {
+    const gitCommonDir = resolve(ici, r.stdout.trim());
+    const depotPrincipal = dirname(gitCommonDir);
+    return dirname(depotPrincipal);
+  }
+  return join(ici, "..", "..");
+}
+const racineForges = process.env.FORGE_ROOT || racineDuParcParDefaut(dirname(fileURLToPath(import.meta.url)));
 const registreTypes = join(racineForges, "digit-ai-forge-organization", "registre-types.json");
 if (!existsSync(registreTypes)) so("R-25", "registre-types.json d'organization introuvable — types non jugeables (poste non équipé ? node bootstrap.mjs)");
 else {
