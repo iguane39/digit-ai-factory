@@ -33,7 +33,8 @@ const item = (id, contenu) => JSON.stringify({ ev: "creation", ts: "2026-09-10T1
 const NUL = String.fromCharCode(0);
 const source = join(T, "TODO.jsonl"), sortie = join(T, "TODO.html");
 writeFileSync(source, [item("TF-9001", `un sas d'arrivee input${NUL}-retours_arrivee, ignore par git`),
-  item("TF-9002", "un contenu ordinaire, sans rien de particulier")].join("\n") + "\n", "utf8");
+  item("TF-9002", "un contenu ordinaire, sans rien de particulier"),
+  item("TF-9003", "le lot porte lot_sha 7eb55384… et la phrase finit coupée au milie…")].join("\n") + "\n", "utf8");
 const r = spawnSync(process.execPath, [join(ICI, "generer-page.mjs")], { encoding: "utf8",
   env: { ...process.env, TODO_PAGE_SOURCE: source, TODO_PAGE_ARCHIVE: join(T, "vide.jsonl"), TODO_PAGE_SORTIE: sortie } });
 
@@ -49,6 +50,10 @@ try {
   });
   check("VERT — un contenu ordinaire garde son texte", () => {
     if (!html.includes("un contenu ordinaire, sans rien de particulier")) throw new Error("le texte d'un item ordinaire a changé");
+  });
+  check("L1 — une empreinte abrégée est marquée data-ellipse-ok, une phrase coupée ne l'est pas", () => {
+    if (!html.includes('<code data-ellipse-ok title="empreinte abrégée">7eb55384…</code>')) throw new Error("l'empreinte abrégée n'est pas marquée : check_html la prendra pour un texte coupé");
+    if (/data-ellipse-ok[^>]*>[^<]*milie…/.test(html)) throw new Error("une phrase coupée est exemptée : L1 ne la dénoncerait plus");
   });
   check("la page réelle n'est pas touchée par la recette", () => {
     if (sortie === join(ICI, "TODO.html")) throw new Error("la recette écrit la page réelle");

@@ -216,6 +216,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TF-0802 clos la 404 d office et fin du tri - 20260905d.md` | fichier | 12,3 Ko | Synthèse de mandat — cinquième chantier pilot clos : la 404 devient un standard d'office,  |
 | `Digit-AI - Synthese Mandat - Todos et retours 23 clos et troisieme vague - 20260919a.md` | fichier | 16,5 Ko | 28 todos sont clos, la boîte d'entrée est de nouveau vide, et une campagne travaille encor |
 | `Digit-AI - Synthese Mandat - Todos et retours 32 clos sur preuve rejouee - 20260919b.md` | fichier | 19,5 Ko | 32 todos sont clos, la boîte d'entrée est vide, et tout le travail attend votre mot pour ê |
+| `Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` | fichier | 16,1 Ko | Synthèse Mandat — la recette hébergée du pilot repasse au vert, les 2 lots du jour attende |
 | `Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` | fichier | 5,5 Ko | Synthèse de mandat — « fais toute la todo avec le a » (21 items, 4 campagnes, 1 circuit) |
 | `Digit-AI - Synthese Mandat - Toutes les actions A executees - 20260905e.md` | fichier | 18,0 Ko | Synthèse de mandat — « Fais tous les A » : le poste est propre, le produit 02 est rectifié |
 | `Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` | fichier | 4,4 Ko | Synthèse de mandat — « traite les todo et retours » (14 items, 3 campagnes) |
@@ -244,4 +245,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_227 fichier(s), 0 sous-dossier(s)_
+_228 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

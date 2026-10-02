@@ -111,4 +111,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261001-L99-etude-textes-relance.md` | fichier | 13,8 Ko | Analyse L99 — relance de l'étude sur les textes affichés en session |
 | `20261001-L99-textes-affiches-en-session.md` | fichier | 14,2 Ko | Analyse L99 — étude d'opportunité sur les textes affichés en session Claude Code |
 
-_94 fichier(s), 0 sous-dossier(s)_
+_94 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

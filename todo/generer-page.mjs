@@ -68,7 +68,11 @@ const escLit = (s) => esc(s)
     "$1<code>$2</code>")
   .replace(
     /(^|[\s(«:;,—–-])(\[[a-zA-Z]{1,6}:[^\]\s]{1,48}\]|\{\{[^}\n]{0,40}\}\}|\$\{[^}\n]{0,40}\}|%\([\w-]{1,24}\)[sdifr]|%[sdifr]|lorem ipsum)(?=$|[\s)».;,:!?—–-])/gi,
-    "$1<code>$2</code>");
+    "$1<code>$2</code>")
+  // L1 (01/10/2026) : une EMPREINTE abrégée (« lot_sha 7eb55384… ») n'est pas un texte coupé — le
+  // registre l'écrit ainsi, la page ne tronque rien. Seule une suite hexadécimale de 7 à 64 signes
+  // suivie de « … » est marquée, jamais une phrase : une vraie coupe reste dénoncée par L1.
+  .replace(/(^|[^0-9A-Za-z])([0-9a-f]{7,64})…/g, '$1<code data-ellipse-ok title="empreinte abrégée">$2…</code>');
 
 // Détail en puces (mandat 12/08) : sépare le constat de la proposition, puis découpe la
 // proposition en vraies puces — énumération (a)/(1) d'abord, sinon points-virgules, sinon

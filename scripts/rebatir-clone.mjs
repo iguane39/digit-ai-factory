@@ -126,7 +126,9 @@ if (R.avant.retard === 0) { if (ESSAI) finirEssai(); sortir(0, R.avant.avance ==
 // 3 · arborescences liées
 const wt = (git("worktree", "list", "--porcelain").stdout || "").split(/\n\n+/).map((b) => b.trim()).filter(Boolean)
   .map((b) => Object.fromEntries(b.split("\n").map((l) => { const i = l.indexOf(" "); return i < 0 ? [l, true] : [l.slice(0, i), l.slice(i + 1)]; })))
-  .filter((w) => w.worktree && resolve(w.worktree) !== resolve(depot));
+  // La première entrée est TOUJOURS l'arbre principal (contrat de `git worktree list`) : comparer des
+  // chemins ne suffit pas, un même dossier s'écrit `SBASTI~1` côté appelant et `Sébastien` côté git.
+  .filter((w, i) => i > 0 && w.worktree && resolve(w.worktree) !== resolve(depot));
 for (const w of wt) R.worktrees_retires.push({ chemin: w.worktree, head: String(w.HEAD || "").slice(0, 7), detachee: "detached" in w });
 if (wt.length && !ESSAI) {
   // L'enregistrement vit sous .git/worktrees/<nom>/gitdir, qui pointe vers le dossier lié. On retire
