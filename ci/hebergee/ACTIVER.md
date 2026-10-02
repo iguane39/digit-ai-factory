@@ -10,3 +10,5 @@ Ce geste est humain (R-38) : il engage un compte tiers hébergé de façon durab
 Le circuit rejoue exactement `node oracles/self-tests.mjs` et `node todo/self-test.mjs` sur push et pull request vers `main`, sous Node 20+ et Python 3, sans secret ni API tierce payante.
 Il récupère le pilot avec son historique complet et les dépôts frères publics `digit-ai-forge-organization` et `digit-ai-forge-agents` à côté de lui, et pose `FORGE_ROOT` sur leur parent commun.
 Les contrôles du parc réel dont la matière n'est pas sur le runner (canal confidentiel, forges non clonées, `~/.claude`) s'y déclarent sans objet, motif écrit ; le critère est écrit dans `oracles/self-tests.mjs` (I4).
+
+**Activé le 02/10/2026** sur la décision humaine D-50 (a) : le circuit vit désormais à `.github/workflows/recette-pilot.yml`, après une simulation VERTE sur le HEAD `0988b7fa` (0 défaut). Le banc `scripts/recette-pilot-hebergee.test.mjs` et `scripts/simuler-recette-hebergee.mjs` lisent ce nouvel emplacement.

@@ -42,7 +42,7 @@ import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = resolve(ICI, "..");
-export const CHEMIN_CIRCUIT = join("ci", "hebergee", "recette-pilot.yml");
+export const CHEMIN_CIRCUIT = join(".github", "workflows", "recette-pilot.yml"); // activé le 02/10/2026 (D-50 a)
 
 /**
  * Ce que le circuit demande, lu ligne à ligne (aucun parseur YAML dans ce dépôt, même limite que le

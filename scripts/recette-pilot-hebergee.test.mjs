@@ -34,7 +34,7 @@ import { lireCircuit, defautsDeSortie, verdictDesPas } from "./simuler-recette-h
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
-const CHEMIN_WORKFLOW = join(RACINE, "ci", "hebergee", "recette-pilot.yml");
+const CHEMIN_WORKFLOW = join(RACINE, ".github", "workflows", "recette-pilot.yml"); // activé le 02/10/2026 (D-50 a) : ci/hebergee/ en était le séjour inactif
 const CHEMIN_ACTIVER = join(RACINE, "ci", "hebergee", "ACTIVER.md");
 const SIMULATEUR = join(RACINE, "scripts", "simuler-recette-hebergee.mjs");
 // TF-1133 : ce que la recette lit HORS du pilot. Le registre des types d'organization (R-25) et le
@@ -114,17 +114,20 @@ function simulationAvantGeste(texte) {
 }
 
 // ── Fixture VERTE : le fichier réel ───────────────────────────────────────────────────────────
-check("ci/hebergee/recette-pilot.yml existe et est lisible", () => { readFileSync(CHEMIN_WORKFLOW, "utf8"); });
+check(".github/workflows/recette-pilot.yml existe et est lisible", () => { readFileSync(CHEMIN_WORKFLOW, "utf8"); });
 
-check("recette-pilot.yml n'est PAS sous .github/workflows/ (posé en ci/hebergee/, R-38)", () => {
-  if (!CHEMIN_WORKFLOW.replace(/\\/g, "/").includes("/ci/hebergee/")) {
-    throw new Error("le fichier attendu n'est pas sous ci/hebergee/");
+// ACTIVÉ le 02/10/2026 (décision humaine D-50 a, R-38) : les deux cas gardaient l'état INACTIF ;
+// ils gardent désormais l'état ACTIF — un seul circuit, sous .github/workflows/, et aucune copie
+// restée en ci/hebergee/ qui divergerait en silence de celle qui s'exécute.
+check("recette-pilot.yml est sous .github/workflows/ (activé sur GO humain D-50 a, R-38)", () => {
+  if (!CHEMIN_WORKFLOW.replace(/\\/g, "/").includes("/.github/workflows/")) {
+    throw new Error("le fichier attendu n'est pas sous .github/workflows/");
   }
 });
 
-check(".github/workflows/ n'existe pas encore (aucune copie active posée sans GO humain)", () => {
-  const cheminActif = join(RACINE, ".github", "workflows");
-  if (existsSync(cheminActif)) throw new Error(`${cheminActif} existe déjà — vérifier qu'aucun geste d'activation n'a été fait ici`);
+check("aucune copie inactive restée en ci/hebergee/ (une seule source du circuit)", () => {
+  const ancien = join(RACINE, "ci", "hebergee", "recette-pilot.yml");
+  if (existsSync(ancien)) throw new Error(`${ancien} existe encore — deux copies du circuit divergeraient`);
 });
 
 check("YAML structurellement valide (lecture ligne à ligne — sans parseur, limite déclarée en en-tête)", () => {
@@ -251,5 +254,5 @@ check("(vert) une sortie verte à code 0 ne rend aucun défaut, et le verdict es
   if (verdictDesPas([{ nom: "p1", code: 0, defauts: [] }, { nom: "p2", code: 0, defauts: [] }]).verdict !== "VERT") throw new Error("deux pas verts ne rendent pas VERT");
 });
 
-console.log(`\nBanc recette-pilot-hebergee (ci/hebergee) : ${pass} PASS, ${fail} FAIL`);
+console.log(`\nBanc recette-pilot-hebergee (.github/workflows) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
