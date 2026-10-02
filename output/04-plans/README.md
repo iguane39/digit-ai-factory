@@ -188,6 +188,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` | fichier | 13,3 Ko | Synthèse de mandat — décision D-10 (a) exécutée : deux histoires réécrites et publiées ave |
 | `Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md` | fichier | 17,4 Ko | Synthèse de mandat — votre règle est écrite et publiée, mais j'ai affaibli le noyau en la  |
 | `Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md` | fichier | 9,6 Ko | Point d'étape : le rejeu tourne en version 2 ; un défaut de mon banc, vu sur les 7 premièr |
+| `Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` | fichier | 18,3 Ko | Synthèse de mandat : le rejeu est joué en entier ; Opus 5.5 à l'effort high réussit les 6  |
 | `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
 | `Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` | fichier | 19,2 Ko | Synthèse de mandat — remise à niveau du dépôt et renommage des lots (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
@@ -246,4 +247,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_229 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_230 fichier(s), 0 sous-dossier(s)_

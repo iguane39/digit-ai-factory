@@ -350,6 +350,45 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
+// ---- TF-1458 (28/09/2026) : LOT-IDS AU SAS, OÙ LE LOT PORTE ENCORE SON NOM RÉEL -----------------
+//
+// Au sas d'arrivée, le lot porte le nom RÉEL de son produit ; la boîte d'entrée (`00-retours\` et
+// son `old\`) ne porte que des pseudonymes. Comparer les préfixes TELS QUELS ne trouvait donc
+// JAMAIS de voisin, pour aucun produit — `idsEnDouble` pseudonymise désormais le préfixe du lot
+// jugé avant de le comparer.
+{
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const T = mkdtempSync(join(tmpdir(), "lot-ids-sas-"));
+  const avant = { c: process.env.FORGE_NOMS_INTERDITS, p: process.env.FORGE_PRODUITS_PSEUDO };
+  writeFileSync(join(T, "_noms.json"), JSON.stringify({ noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+  writeFileSync(join(T, "_prod.json"), JSON.stringify({ produits: { "CalculatriceZorglubZAP": "Produit-01" } }), "utf8");
+  process.env.FORGE_NOMS_INTERDITS = join(T, "_noms.json");
+  process.env.FORGE_PRODUITS_PSEUDO = join(T, "_prod.json");
+  const boite = join(T, "input", "00-retours"), arrivee = join(boite, "_arrivee");
+  mkdirSync(arrivee, { recursive: true });
+  const CORPS = (lignes) => "# lot\n\n| Réf | gravité | retour |\n|---|---|---|\n" + lignes + "\n" + R45 + "\n" + R46;
+  // Le voisin PSEUDONYMISÉ, déjà ingéré, vit à la racine de la boîte — jamais au sas.
+  writeFileSync(join(boite, "Produit-01 - RETOURS - 20260913a.md"), CORPS("| RT-50 | mineur | deux |"), "utf8");
+
+  check("TF-1458 rouge — au sas, le lot au nom RÉEL qui reprend RT-50 d'un voisin PSEUDONYMISÉ est attrapé : FAIL", () => {
+    const chemin = join(arrivee, "CalculatriceZorglubZAP - RETOURS - 20260914a.md");
+    const c = constat(verifier(chemin, CORPS("| RT-50 | majeur | reprise |")), "LOT-IDS");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — au sas, aucun voisin n'était jamais retrouvé`);
+    if (!/Produit-01 - RETOURS - 20260913a\.md/.test(c.message)) throw new Error(`le voisin pseudonymisé n'est pas nommé : ${c && c.message}`);
+  });
+
+  check("TF-1458 vert — au sas, un identifiant NEUF ne reprend rien : PASS", () => {
+    const chemin = join(arrivee, "CalculatriceZorglubZAP - RETOURS - 20260914a.md");
+    const c = constat(verifier(chemin, CORPS("| RT-51 | majeur | neuf |")), "LOT-IDS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  for (const [k, v] of [["FORGE_NOMS_INTERDITS", avant.c], ["FORGE_PRODUITS_PSEUDO", avant.p]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
 // ---- R-57 et LOT-MURS (24/09/2026, au main le 28/09) : UN DOCUMENT MÛR REMONTE, OU SON MAINTIEN S'ÉCRIT
 //
 // La section se juge comme R-45 et R-46, dans les deux sens. La MESURE se rejoue sur un produit

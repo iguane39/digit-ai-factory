@@ -90,6 +90,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260915-etude-opportunite-inventaire-des-composants.md` | fichier | 21,0 Ko | Étude d'opportunité — inventaire des composants et prérequis d’environnement — 20260915a |
 | `20260917-etude-opportunite-gestion-reseaux-sociaux.html` | fichier | 113,1 Ko | Digit-AI — Étude d'opportunité — gestion dans la durée de la présence de Digit-AI sur les |
 | `20260917-etude-opportunite-gestion-reseaux-sociaux.md` | fichier | 37,0 Ko | Étude d'opportunité — gestion dans la durée de la présence de Digit-AI sur les réseaux soc |
+| `20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html` | fichier | 90,6 Ko | Digit-AI — Étude d'opportunité — revue hebdomadaire de l'existant — 20260917a — 20260917a |
 | `20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` | fichier | 18,7 Ko | Étude d'opportunité — revue hebdomadaire de l'existant — 20260917a |
 | `20260917-L99-gestion-reseaux-sociaux.md` | fichier | 45,7 Ko | Analyse L99 — « Lance une étude d'opportunités sur une forge pour la gestion de réseaux so |
 | `20260917-L99-revue-hebdomadaire-amelioration-continue.md` | fichier | 36,5 Ko | Analyse L99 — « Un process hebdomadaire d'analyse de l'existant pour l'amélioration contin |
@@ -108,7 +109,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261001-etude-opportunite-rsi-et-ssl.md` | fichier | 30,0 Ko | Étude d'opportunité — auto-amélioration récursive (RSI) et apprentissage auto-supervisé (S |
 | `20261001-etude-opportunite-saut-opus-5-5.md` | fichier | 37,1 Ko | Étude d'opportunité — Le passage d'Opus 5 à Opus 5.5 : que changer dans la Factory et ses  |
 | `20261001-etude-opportunite-textes-affiches.md` | fichier | 18,2 Ko | Étude d'opportunité — grammaire d'écran des textes affichés en session — 20261001c |
+| `20261001-etude-resultats-rejeu-opus-5-5.md` | fichier | 13,7 Ko | Résultats du rejeu figé du passage à Opus 5.5 : effort et modèle par classe de tâche (2026 |
 | `20261001-L99-etude-textes-relance.md` | fichier | 13,8 Ko | Analyse L99 — relance de l'étude sur les textes affichés en session |
 | `20261001-L99-textes-affiches-en-session.md` | fichier | 14,2 Ko | Analyse L99 — étude d'opportunité sur les textes affichés en session Claude Code |
 
-_94 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_96 fichier(s), 0 sous-dossier(s)_

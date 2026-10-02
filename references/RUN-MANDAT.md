@@ -10,7 +10,9 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 
 1. **Socle du RUN complet** : `input\`/`output\`/`docs\`/`forge\`, git local dès
    l'ouverture — et TOUT ce que le mandat produit est conforme (nommage R-4 des
-   livrables, journaux d'oracles R-32, ledger).
+   livrables, journaux d'oracles R-32, ledger). Le `run_open` porte `schema_ledger: "1.1"`
+   et `forges_mobilisees`, comme tout run (`references\ETAPES-RUN.md`, D-18 (a) du
+   26/09/2026) — un mandat n'est pas une exception au schéma du journal.
    **Et l'héritage s'installe AVANT la première écriture, existant compris** (TF-0892) :
    `node <pilot>\scripts\recopier-heritage.mjs .` puis `.claude\settings.json` câblant
    `forge\hooks\factory.mjs`. R-35/TF-0266 borne les FAIL portant sur des fichiers
@@ -120,7 +122,11 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
   (TF-0895, pas 5) : toute proposition remise à un humain en porte une, et le socle
   `digit-ai-page-html` s'y applique alors en entier (charte, G1 clair strict,
   favicon-lettre, E4, standard H). Ce qui reste facultatif est le TRAVAIL de design,
-  pas le LIVRABLE.
+  pas le LIVRABLE — sauf écart déclaré au ledger avec son motif. **La forme de l'écart**
+  (R-32 ter, TF-0923 (a)) : une entrée dont le `type` porte « ecart » (ex.
+  `ecart_page_homonyme`), une `cause` d'au moins vingt caractères, et qui cite le radical
+  du livrable — `{type: "ecart_page_homonyme", livrable: "…", cause: "…"}` ; un écart
+  raconté en prose ailleurs qu'au ledger n'est pas vu.
 - Pas de MEP ni de GO production — la remise du livrable EST la fin du run ; le seul
   gate humain est celui que le mandat déclare.
 - Pas de boucle de fermeture forge-tests — les oracles du domaine tiennent ce rôle.

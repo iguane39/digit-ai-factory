@@ -1,14 +1,14 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\REGLES-PROJET.md",
-  "date_iso": "2026-09-20T15:48:28.487Z",
-  "registre_version": "2.24.0",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a30d86c0476355e71\\REGLES-PROJET.md",
+  "date_iso": "2026-10-02T07:23:33.942Z",
+  "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
   "resume": {
     "pass": 4,
     "fail": 0,
-    "skip": 4,
+    "skip": 5,
     "cache": 0
   },
   "bilan_fichiers": {
@@ -65,6 +65,12 @@
       "detail": ""
     },
     {
+      "domaine": "Autorité d'une décision affirmée",
+      "file": "REGLES-PROJET.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
       "domaine": "Livrabilité d'une conséquence déclarée",
       "file": "REGLES-PROJET.md",
       "verdict": "SKIP",
@@ -75,9 +81,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "REGLES-PROJET.md",
-    "ts": "2026-09-20T15:48:28.487Z",
+    "ts": "2026-10-02T07:23:33.942Z",
     "fichiers": {
-      "REGLES-PROJET.md": "2de75caa6c8f53bccaef5308e7dd6fafed100a64e03c2984886a81df7c943ce8"
+      "REGLES-PROJET.md": "e5ecbe703bcc14466d5c5dc9969ff9603efd7641488287006773c1d1ff99dfde"
     }
   },
   "empreinte_motif": null,

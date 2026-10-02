@@ -39,9 +39,14 @@ Phase 0 bis — ADOPTION, et c'est la phase propre à ce cas :
 5. Montre-moi d'abord ce qui serait fait, sans rien écrire :
      node <FORGE_ROOT>\digit-ai-factory\scripts\adopter-projet-existant.mjs . --essai
    Lis-moi son relevé : ce qui manque et serait posé, ce qui existe et serait laissé intact.
+   Si ce projet n'a NI code NI site (aucun fichier de code, aucun manifeste de dépendances,
+   aucun robots.txt/llms.txt/sitemap.xml) — un projet purement documentaire — ajoute
+   `--type documentaire` à la commande : l'adoption écarte alors la surface web et les
+   variables d'environnement, avec l'écart consigné au carnet (TF-1439, R-13 exempte ce type
+   tant qu'aucun signal de code ou de site n'entre au dépôt).
 6. Attends mon accord. Puis joue-le pour de vrai, sans --essai, et rends-moi son verdict.
 7. Pose ensuite les README d'input\ et output\ :
-     node <FORGE_ROOT>\digit-ai-factory\scripts\readme-dossiers.mjs
+     node <FORGE_ROOT>\digit-ai-factory\scripts\readme-dossiers.mjs --base .
 8. Relis-moi la section « Écart initial à l'adoption » que l'outil a écrite dans
    forge\travaux\ECARTS-ASSUMES.md. Ne tranche AUCUN de ces écarts maintenant : ils se
    décident au premier run de version, et je veux les avoir lus avant.

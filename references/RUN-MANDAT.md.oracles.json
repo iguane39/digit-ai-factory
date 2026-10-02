@@ -1,19 +1,19 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a30d86c0476355e71\\references\\RUN-CONSEIL.md",
-  "date_iso": "2026-10-02T07:38:49.871Z",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a30d86c0476355e71\\references\\RUN-MANDAT.md",
+  "date_iso": "2026-10-02T07:38:56.307Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
   "resume": {
-    "pass": 3,
+    "pass": 4,
     "fail": 0,
-    "skip": 4,
+    "skip": 3,
     "cache": 0
   },
   "bilan_fichiers": {
     "jugé": [
-      "references\\RUN-CONSEIL.md"
+      "references\\RUN-MANDAT.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,43 +24,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-MANDAT.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-MANDAT.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-MANDAT.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-MANDAT.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "references\\RUN-CONSEIL.md",
-      "verdict": "SKIP",
-      "detail": ""
+      "file": "references\\RUN-MANDAT.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-MANDAT.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-MANDAT.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -68,10 +68,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "references\\RUN-CONSEIL.md",
-    "ts": "2026-10-02T07:38:49.870Z",
+    "release": "references\\RUN-MANDAT.md",
+    "ts": "2026-10-02T07:38:56.306Z",
     "fichiers": {
-      "references\\RUN-CONSEIL.md": "1e117ef327482e3fad2aaaaa8c2b55b10454ebbf5e4557e92de4dd48fffaad09"
+      "references\\RUN-MANDAT.md": "f2a930013cbe0165be49c091d58bf7a2918669fa04ffcc189294c03c9d0b5e9c"
     }
   },
   "empreinte_motif": null,

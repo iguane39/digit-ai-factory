@@ -134,16 +134,40 @@ const dossiersDuDepot = (base) => {
   } catch { return []; }
 };
 
-function* fichiers(dossier, prof = 0, ext = EXT) {
-  if (prof > 3 || !existsSync(dossier)) return;
+function* fichiers(dossier, prof = 0, ext = EXT, profMax = 3) {
+  if (prof > profMax || !existsSync(dossier)) return;
   let entrees = [];
   try { entrees = readdirSync(dossier, { withFileTypes: true }); } catch { return; }
   for (const e of entrees) {
     if (IGNORES.has(e.name)) continue;
     const p = join(dossier, e.name);
-    if (e.isDirectory()) yield* fichiers(p, prof + 1, ext);
+    if (e.isDirectory()) yield* fichiers(p, prof + 1, ext, profMax);
     else if (ext.test(e.name)) yield p;
   }
+}
+
+// TF-1300 (22/09/2026) — P3 ÉTENDU AU DOSSIER DE TRAVAIL TEMPORAIRE. Le défaut fondateur de ce
+// volet n'a corrompu AUCUN fichier du dépôt : un script de mesure écrit par heredoc de shell dans
+// le scratchpad de session (`tmpdir()/claude/<dépôt>/<session>/scratchpad/…`, hors de tout dépôt
+// git — gabarits/AGENT-CAMPAGNE.md) a vu son antislash doublé avalé, et a rendu un CHIFFRE faux
+// sans jamais planter ni corrompre quoi que ce soit de visible. Le balayage du parc ci-dessus ne
+// l'aurait jamais vu : il ne lit que des dépôts de l'écosystème, jamais le répertoire temporaire
+// du système. Même garde (P3, octets de contrôle accidentels), portée élargie — la profondeur
+// passe de 3 à 6 (`claude/<dépôt>/<session>/scratchpad/…` compte déjà 4 niveaux).
+export const RACINE_TEMP = join(tmpdir(), "claude");
+
+/** Le même P3, sur le scratchpad de session plutôt que sur un dépôt. Rend `[]` sans lever si le
+ *  dossier est absent (poste qui n'a encore rien écrit en scratchpad) ou illisible. */
+export function jugerDossierTemporaire(racineTemp = RACINE_TEMP) {
+  const trouves = [];
+  if (!existsSync(racineTemp)) return trouves;
+  for (const f of fichiers(racineTemp, 0, EXT_P3, 6)) {
+    let texte = "";
+    try { texte = readFileSync(f, "utf8"); } catch { continue; }
+    const constats = EXT.test(f) ? [...juger(texte), ...jugerOctets(texte)] : jugerOctets(texte);
+    for (const c of constats) trouves.push({ ...c, ou: `${relative(racineTemp, f).replaceAll("\\", "/")}:${c.ligne}` });
+  }
+  return trouves;
 }
 
 /** Les littéraux d'expression régulière d'un source, avec leur ligne et leurs drapeaux. */
@@ -241,6 +265,25 @@ if (args.includes("--self-test")) {
   att("P3 — le constat MASQUE l'octet dans son extrait, sinon il corromprait le rapport",
     p3.every((c) => !c.corps.includes(BS)));
 
+  // TF-1300 (22/09/2026) — P3 ÉTENDU AU SCRATCHPAD DE SESSION : le défaut fondateur de ce volet
+  // n'a corrompu AUCUN fichier d'un dépôt, et le balayage du parc ne l'aurait jamais vu. Le banc
+  // pose un scratchpad JETABLE (jamais le vrai `tmpdir()/claude` du poste) et prouve les deux
+  // sens : un script corrompu y est attrapé, un scratchpad sain ou absent ne déclenche rien.
+  const tempJetable = mkdtempSync(join(tmpdir(), "piege-regex-temp-"));
+  const session = join(tempJetable, "claude", "digit-ai-factory", "session-1", "scratchpad");
+  mkdirSync(session, { recursive: true });
+  writeFileSync(join(session, "mesure.mjs"), 'new RegExp(cle + "' + BS + '")', "utf8");
+  att("TF-1300 — un script corrompu dans le scratchpad de session (hors de tout dépôt) est attrapé",
+    jugerDossierTemporaire(join(tempJetable, "claude")).some((c) => c.piege === "P3"));
+  att("TF-1300 — l'emplacement rendu NOMME le chemin relatif au scratchpad, pas le dépôt",
+    jugerDossierTemporaire(join(tempJetable, "claude")).some((c) => /digit-ai-factory.{1,3}session-1.{1,3}scratchpad.{1,3}mesure\.mjs/.test(c.ou)));
+  writeFileSync(join(session, "propre.mjs"), 'new RegExp(cle + "\\\\b")', "utf8");
+  att("TF-1300 — un script SAIN du scratchpad ne déclenche rien",
+    jugerDossierTemporaire(join(tempJetable, "claude")).filter((c) => /propre\.mjs/.test(c.ou)).length === 0);
+  att("TF-1300 — un scratchpad ABSENT (poste qui n'a encore rien écrit) ne lève pas, rend []",
+    jugerDossierTemporaire(join(tempJetable, "jamais-cree")).length === 0);
+  rmSync(tempJetable, { recursive: true, force: true });
+
   console.log(`\nRecette pieges-regex : ${pass}/${pass + echecs.length} cas`);
   process.exit(echecs.length ? 1 : 0);
 }
@@ -299,8 +342,13 @@ for (const depot of depots) {
     }
   }
 }
+// TF-1300 — le scratchpad de session, hors de tout dépôt : même famille P3, lu à part parce
+// qu'il n'appartient à aucun `depot` du parc (SKIP silencieux s'il n'existe pas encore).
+const trouvesTemp = jugerDossierTemporaire();
+for (const t of trouvesTemp) trouves.push(t);
+
 for (const t of trouves) ko(t.piege, t.ou, `${t.message} — expression : /${t.corps.slice(0, 90)}/`);
-if (!trouves.length) ok("P1+P2+P3", String(racine), `${lus} fichier(s) de code lus dans ${depots.length} dépôt(s) : aucune expression atteinte par les trois pièges connus, et aucun octet de contrôle accidentel`);
+if (!trouves.length) ok("P1+P2+P3", String(racine), `${lus} fichier(s) de code lus dans ${depots.length} dépôt(s) (parc) + scratchpad de session : aucune expression atteinte par les trois pièges connus, et aucun octet de contrôle accidentel`);
 
 console.log(JSON.stringify({ oracle: "oracle-pieges-regex", version: "1.0.0", racine: String(racine),
   verdict: trouves.length ? "FAIL" : "PASS", findings: F, non_juge: NON_JUGE }, null, jsonOnly ? 0 : 1));

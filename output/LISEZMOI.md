@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 461 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 464 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -215,6 +215,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260915-etude-opportunite-inventaire-des-composants.md | — | 21 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.md` |
 | 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 113.1 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
 | 20260917-etude-opportunite-gestion-reseaux-sociaux.md | — | 37 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.md` |
+| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html | — | 90.6 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html` |
 | 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md | — | 18.7 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` |
 | 20260917-L99-gestion-reseaux-sociaux.md | — | 45.7 Ko | `03-etudes/20260917-L99-gestion-reseaux-sociaux.md` |
 | 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.5 Ko | `03-etudes/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
@@ -233,6 +234,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261001-etude-opportunite-rsi-et-ssl.md | — | 30 Ko | `03-etudes/20261001-etude-opportunite-rsi-et-ssl.md` |
 | 20261001-etude-opportunite-saut-opus-5-5.md | — | 37.1 Ko | `03-etudes/20261001-etude-opportunite-saut-opus-5-5.md` |
 | 20261001-etude-opportunite-textes-affiches.md | — | 18.2 Ko | `03-etudes/20261001-etude-opportunite-textes-affiches.md` |
+| 20261001-etude-resultats-rejeu-opus-5-5.md | — | 13.7 Ko | `03-etudes/20261001-etude-resultats-rejeu-opus-5-5.md` |
 | 20261001-L99-etude-textes-relance.md | — | 13.8 Ko | `03-etudes/20261001-L99-etude-textes-relance.md` |
 | 20261001-L99-textes-affiches-en-session.md | — | 14.2 Ko | `03-etudes/20261001-L99-textes-affiches-en-session.md` |
 
@@ -449,6 +451,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md | 20260907h | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` |
 | Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md | 20260910c | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md` |
 | Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md | 20261001i | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md` |
+| Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md | 20261001k | 18.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` |
 | Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md | 20261001h | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md` |
 | Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md | 20260830b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` |
 | Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md | 20260830j | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` |

@@ -148,6 +148,37 @@ try {
       "--forcer n'écrase pas — la porte de sortie n'existe pas");
   });
 
+  // ── TF-1393 (26/09/2026) : le risque ne se calcule que sur ce que le geste écrit réellement ──
+  // Mesuré chez Produit-68 : un CLAUDE.md en mode `presence_et_motif`, modifié et non commis,
+  // faisait basculer le geste entier en essai — alors que ce mode n'écrase JAMAIS un fichier
+  // présent (`laisses`, ligne [LAISSÉ]). Les deux cas ne diffèrent que par le MODE de la cible
+  // modifiée : personnalisé (rien à perdre, le geste ne l'écrit pas) ou copie_conforme (le geste
+  // l'écraserait, et c'est ce que la garde protège).
+  check("TF-1393 — un CLAUDE.md (presence_et_motif) MODIFIÉ et non commis ne fait PLUS basculer le geste en essai", () => {
+    const produit = join(T, "produit-presence-motif");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const g = (...a) => spawnSync("git", ["-C", produit, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+    g("init", "-q", "-b", "main");
+    lancer(produit);
+    g("add", "-A"); g("commit", "-q", "-m", "socle");
+    writeFileSync(join(produit, "CLAUDE.md"), "# consignes du produit, non commises\n", "utf8");
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code} : ${r.sortie.slice(0, 200)}`);
+    att(!/\[GARDE\]/.test(r.sortie),
+      `la garde bloque encore sur un mode qu'elle n'écrit jamais : ${r.sortie.slice(0, 300)}`);
+    att(readFileSync(join(produit, "CLAUDE.md"), "utf8") === "# consignes du produit, non commises\n",
+      "CLAUDE.md a été touché — ce mode ne devait rien écrire");
+  });
+
+  check("TF-1393 borne — une cible copie_conforme MODIFIÉE et non commise reste protégée : le geste bascule toujours en essai", () => {
+    const produit = join(T, "produit-presence-motif");
+    writeFileSync(join(produit, "forge", "travaux", "TRAVAUX-PILOT.md"), "# travail local non commis\n", "utf8");
+    const r = lancer(produit);
+    att(/\[GARDE\]/.test(r.sortie), "une cible copie_conforme réellement à risque n'est plus protégée");
+    att(readFileSync(join(produit, "forge", "travaux", "TRAVAUX-PILOT.md"), "utf8") === "# travail local non commis\n",
+      "le fichier copie_conforme modifié a été écrasé malgré la garde");
+  });
+
   // ── TF-1171 : la garde protégeait la sortie du pilot contre le pilot ───────────────────────
   // Le fait du 16/09 : R-47 FAIL prescrit ce script « EN UN GESTE » ; joué, il rend GARDE, exit 2,
   // à cause de trois cibles que le hook d'ouverture de la MÊME session venait de recopier depuis le

@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a30d86c0476355e71\\references\\RUN-CONSEIL.md",
-  "date_iso": "2026-10-02T07:38:49.871Z",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a30d86c0476355e71\\references\\RUN-VERSION.md",
+  "date_iso": "2026-10-02T07:27:50.250Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -13,7 +13,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "references\\RUN-CONSEIL.md"
+      "references\\RUN-VERSION.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,43 +24,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "references\\RUN-CONSEIL.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -68,10 +68,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "references\\RUN-CONSEIL.md",
-    "ts": "2026-10-02T07:38:49.870Z",
+    "release": "references\\RUN-VERSION.md",
+    "ts": "2026-10-02T07:27:50.250Z",
     "fichiers": {
-      "references\\RUN-CONSEIL.md": "1e117ef327482e3fad2aaaaa8c2b55b10454ebbf5e4557e92de4dd48fffaad09"
+      "references\\RUN-VERSION.md": "7438c5954bb3b8acfb71a2b3f18fadeab365b4eddcf73597bcdf0bea8443008b"
     }
   },
   "empreinte_motif": null,

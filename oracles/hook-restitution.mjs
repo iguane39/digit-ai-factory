@@ -583,12 +583,20 @@ export function comparerAffiche(message, fichier) {
 const SELECTEUR_UN = "(?:D\\s*-?\\s*)?\\d{1,2}\\s*\\(?\\s*[a-c]\\s*\\)?";
 const SELECTEURS_SEULS = new RegExp(`^\\s*${SELECTEUR_UN}(?:(?:\\s*[,;]\\s*|\\s+)(?:et\\s+)?${SELECTEUR_UN})*\\s*[.!]?\\s*$`, "i");
 const SELECTEUR_GLOBAL = /(?:D\s*-?\s*)?(\d{1,2})\s*\(?\s*([a-c])\s*\)?/gi;
-// La décision REPOSÉE se lit à la forme que le gabarit prescrit depuis la v2.14.0 : le bloc de
-// citation « > **D-N — <question>** ». On ne lit pas le mot « décision » en prose — une
-// restitution a le droit de PARLER d'une décision déjà prise (« D-11 (a) exécutée ») ; ce qui est
-// refusé, c'est de la REPOSER, et c'est la forme du bloc 3 qui le dit.
+// La décision REPOSÉE se lit à la forme que le gabarit prescrit depuis la v2.14.0 : identifiant,
+// tiret, LA QUESTION ELLE-MÊME, posée comme une question — « D-N — <…> ? ». On ne lit pas le mot
+// « décision » en prose — une restitution a le droit de PARLER d'une décision déjà prise
+// (« D-11 (a) exécutée ») ; ce qui est refusé, c'est de la REPOSER.
+// TF-1468 (28/09/2026) — LE MARQUEUR N'EST PAS LA FORME. La reconnaissance exigeait le SEUL
+// marqueur de bloc de citation (`>`) : un rappel de D-N en PUCE (`- D-6 — <la même question> ?`)
+// passait donc, quand la même ligne en citation était refusée — alors que les deux posent À
+// L'IDENTIQUE la question tranchée. Inversement, une citation qui ne porte que l'identifiant et un
+// tiret (« > D-6 — exécutée ») n'est PAS une question reposée. Ce qui compte est la FORME COMPLÈTE
+// — identifiant, tiret, question qui se termine par un point d'interrogation — qu'elle vive sous
+// `>` ou sous une puce (`-`, `*`, `•`), jamais le seul marqueur de tête de ligne.
 const decisionsReposees = (t) => [...new Set([...String(t || "")
-  .matchAll(/(?:^|\n)\s*>\s*\*{0,2}\s*D\s*-?\s*(\d{1,2})\s*\*{0,2}\s*[—–-]/g)].map((x) => x[1]))];
+  .matchAll(/(?:^|\n)[ \t]*(?:>|[-*•])\s*\*{0,2}\s*D\s*-?\s*(\d{1,2})\s*\*{0,2}\s*[—–-][^\n]*\?/g)]
+  .map((x) => x[1]))];
 const normaliserTexte = (t) => String(t || "").replace(/\s+/g, " ").trim();
 
 export function selecteursDecision(messageHumain) {
