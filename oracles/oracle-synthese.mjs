@@ -709,9 +709,10 @@ function juger(texte, cheminJuge = null) {
   // puce qui porte un sélecteur D-N ou une question : celle-là reste une décision, et S4 la juge.
   const inventaire = new Set();
   // La ligne qui OUVRE le bloc par l'absence se couvre elle-même, quelle que soit sa longueur : elle
-  // peut dire en plus où iront les décisions (« … posées à la revue hebdomadaire »).
+  // peut dire en plus où iront les décisions (« … posées à la revue hebdomadaire ») ou citer une
+  // décision déjà EXÉCUTÉE (« D-48 est exécutée ») ; seule une question en fait une décision posée.
   const premiere = lignesCorps.find((l) => l.trim());
-  if (premiere && MOTIFS_ABSENCE.test(premiere.trim().slice(0, 40)) && !RE_SELECTEUR_DECISION.test(premiere) && !/\?/.test(premiere))
+  if (premiere && MOTIFS_ABSENCE.test(premiere.trim().slice(0, 40)) && !/\?/.test(premiere))
     inventaire.add(premiere);
   for (let i = 0; i < lignesCorps.length; i++) {
     if (!/\bbloquants?\b/i.test(lignesCorps[i])) continue;
