@@ -111,6 +111,10 @@ y trouve*.
 5. **Remettre aux forges (C5)** — **toute proposition remise à un humain se remet AUSSI
    en page HTML autoportante** (TF-0895, socle `digit-ai-page-html`, R-32), sauf écart
    déclaré au ledger avec son motif : le Markdown est la source, la page est le livrable.
+   **La forme de l'écart** (R-32 ter, TF-0923 (a)) : une entrée au ledger dont le `type`
+   porte « ecart » (ex. `ecart_page_homonyme`), une `cause` d'au moins vingt caractères, et
+   qui cite le radical du livrable — `{type: "ecart_page_homonyme", livrable: "…",
+   cause: "…"}` ; un écart raconté en prose ailleurs qu'au ledger n'est pas vu.
    Un mandat voisin a rendu le 07/09 huit artefacts jugés PASS et zéro page ; le
    destinataire l'attendait « partie intégrante de la proposition ». Puis
    le contrat d'interface : chaque lot GO sort comme

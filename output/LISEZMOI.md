@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 460 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 461 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -215,6 +215,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260915-etude-opportunite-inventaire-des-composants.md | — | 21 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.md` |
 | 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 113.1 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
 | 20260917-etude-opportunite-gestion-reseaux-sociaux.md | — | 37 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.md` |
+| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html | — | 90.6 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html` |
 | 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md | — | 18.7 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` |
 | 20260917-L99-gestion-reseaux-sociaux.md | — | 45.7 Ko | `03-etudes/20260917-L99-gestion-reseaux-sociaux.md` |
 | 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.5 Ko | `03-etudes/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |

@@ -122,7 +122,11 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
   (TF-0895, pas 5) : toute proposition remise à un humain en porte une, et le socle
   `digit-ai-page-html` s'y applique alors en entier (charte, G1 clair strict,
   favicon-lettre, E4, standard H). Ce qui reste facultatif est le TRAVAIL de design,
-  pas le LIVRABLE.
+  pas le LIVRABLE — sauf écart déclaré au ledger avec son motif. **La forme de l'écart**
+  (R-32 ter, TF-0923 (a)) : une entrée dont le `type` porte « ecart » (ex.
+  `ecart_page_homonyme`), une `cause` d'au moins vingt caractères, et qui cite le radical
+  du livrable — `{type: "ecart_page_homonyme", livrable: "…", cause: "…"}` ; un écart
+  raconté en prose ailleurs qu'au ledger n'est pas vu.
 - Pas de MEP ni de GO production — la remise du livrable EST la fin du run ; le seul
   gate humain est celui que le mandat déclare.
 - Pas de boucle de fermeture forge-tests — les oracles du domaine tiennent ce rôle.
