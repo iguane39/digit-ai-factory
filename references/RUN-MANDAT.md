@@ -10,7 +10,9 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 
 1. **Socle du RUN complet** : `input\`/`output\`/`docs\`/`forge\`, git local dès
    l'ouverture — et TOUT ce que le mandat produit est conforme (nommage R-4 des
-   livrables, journaux d'oracles R-32, ledger).
+   livrables, journaux d'oracles R-32, ledger). Le `run_open` porte `schema_ledger: "1.1"`
+   et `forges_mobilisees`, comme tout run (`references\ETAPES-RUN.md`, D-18 (a) du
+   26/09/2026) — un mandat n'est pas une exception au schéma du journal.
    **Et l'héritage s'installe AVANT la première écriture, existant compris** (TF-0892) :
    `node <pilot>\scripts\recopier-heritage.mjs .` puis `.claude\settings.json` câblant
    `forge\hooks\factory.mjs`. R-35/TF-0266 borne les FAIL portant sur des fichiers

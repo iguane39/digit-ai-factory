@@ -8,6 +8,10 @@ premier produit réel). Entrant : les retours consignés au ledger du run préc�
 l'entrée du run N+1 — même projet, nouveau `run_open` chaîné (champ `run_precedent`,
 contrôle R-19 de l'oracle de conformité).
 
+Le `run_open` porte `schema_ledger: "1.1"` et `forges_mobilisees`, comme tout run
+(`references\ETAPES-RUN.md`, D-18 (a) du 26/09/2026) — un run de version n'est pas une
+exception au schéma du journal.
+
 **Champs du `run_open` d'un parcours ouvert après un autre run** (tout `run_open` qui n'est pas
 le premier du produit, quelle que soit la voie qui l'ouvre) : `versions_forges` (objet non vide,
 clés en nom de dépôt complet, R-19) et **`run_precedent`** (l'identifiant du run qui précède —
