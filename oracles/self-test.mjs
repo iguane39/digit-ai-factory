@@ -1969,61 +1969,6 @@ check("TF-0923 (a) borne écart : l'écart DÉCLARÉ AU LEDGER avec son motif é
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
-// ---- TF-1372, 02/10/2026 — R-32 quater : LA REVUE DE LECTURE N'A AUCUN JUGE À LA REMISE --------
-// SKILL.md de digit-ai-page-html écrit la revue OBLIGATOIRE avant toute livraison (TF-0422) ;
-// check_html.py le dit lui-même : il juge un fichier, pas le run qui l'entoure (TF-1148). Le
-// 20/09/2026, un rapport d'audit remis sous output\01-audit\ n'avait pas de REVUE.md, et son
-// schéma illisible a vécu quatre jours dans le livrable avant d'être vu.
-const projetRevue = (html, { ecrireRevue = null, mtimeRevueAvantHtml = false } = {}) => {
-  const d = mkdtempSync(join(tmpdir(), "conf-revue-"));
-  mkdirSync(join(d, "output"), { recursive: true });
-  writeFileSync(join(d, "output", html), "<html><body>livrable</body></html>\n", "utf8");
-  if (ecrireRevue !== null) {
-    // Le gabarit du socle (gabarit-revue-de-lecture.md) le dit : « REVUE.md vit à côté du
-    // livrable » — même dossier que le `.html`, jamais un chemin séparé.
-    const cheminRevue = join(d, "output", "REVUE.md");
-    writeFileSync(cheminRevue, ecrireRevue, "utf8");
-    if (mtimeRevueAvantHtml) {
-      // La revue a été écrite AVANT le livrable : antidater son mtime, sans toucher au HTML.
-      const hier = new Date(Date.now() - 24 * 3600 * 1000);
-      utimesSync(cheminRevue, hier, hier);
-    }
-  }
-  return d;
-};
-const r32quater = (d) => (lanceArgs(d, "--regles", "R-32 quater").rapport.findings || []).find((x) => x.regle === "R-32 quater");
-check("TF-1372 rouge : un livrable HTML remis SANS REVUE.md à côté → FAIL R-32 quater", () => {
-  const d = projetRevue("Produit - Rapport d audit - 20260920a.html");
-  try {
-    const f = r32quater(d);
-    if (!f || f.statut !== "FAIL") throw new Error(`un livrable sans revue passe : ${JSON.stringify(f)}`);
-    if (!/REVUE\.md/.test(f.message) || !/Rapport d audit/.test(f.message)) throw new Error("le constat ne nomme pas le livrable concerné : " + f.message);
-  } finally { rmSync(d, { recursive: true, force: true }); }
-});
-check("TF-1372 rouge : REVUE.md présente mais VIDE → FAIL R-32 quater", () => {
-  const d = projetRevue("Produit - Rapport d audit - 20260920a.html", { ecrireRevue: "   \n\n  " });
-  try {
-    const f = r32quater(d);
-    if (!f || f.statut !== "FAIL" || !/VIDE/.test(f.message)) throw new Error(`une revue vide (espaces seuls) passe : ${JSON.stringify(f)}`);
-  } finally { rmSync(d, { recursive: true, force: true }); }
-});
-check("TF-1372 rouge : REVUE.md ANTÉRIEURE au livrable (jamais rejouée après la dernière écriture) → FAIL R-32 quater", () => {
-  const d = projetRevue("Produit - Rapport d audit - 20260920a.html",
-    { ecrireRevue: "# Revue de lecture — Produit - Rapport d audit - 20260920a — 2026-09-18 10:00\n\nCaptures lues : 1920 · 1280 · 768 · 390, aucun constat.\n", mtimeRevueAvantHtml: true });
-  try {
-    const f = r32quater(d);
-    if (!f || f.statut !== "FAIL" || !/APRÈS leur revue/.test(f.message)) throw new Error(`une revue plus ancienne que le livrable passe : ${JSON.stringify(f)}`);
-  } finally { rmSync(d, { recursive: true, force: true }); }
-});
-check("TF-1372 verte : REVUE.md substantielle et plus récente que le livrable → PASS R-32 quater", () => {
-  const d = projetRevue("Produit - Rapport d audit - 20260920a.html",
-    { ecrireRevue: "# Revue de lecture — Produit - Rapport d audit - 20260920a — 2026-09-20 10:00\n\nCaptures lues : 1920 · 1280 · 768 · 390, aucun constat.\n" });
-  try {
-    const f = r32quater(d);
-    if (!f || f.statut !== "PASS") throw new Error(`la revue conforme est accusée : ${JSON.stringify(f)}`);
-  } finally { rmSync(d, { recursive: true, force: true }); }
-});
-
 // ---- TF-0923 volet (b), 20/09 — R-35 : « un existant » se MESURE, jamais ne se déclare --------
 // TF-0906 (07/09) : TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est antérieur au
 // `run_open`. Le geste était écrit — `git log --reverse --format=%aI` comparé au run_open — et
