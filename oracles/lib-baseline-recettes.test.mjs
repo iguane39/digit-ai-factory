@@ -247,5 +247,40 @@ check("TF-1434 — la lecture : plusieurs déclarations s'additionnent, fins de 
   att(nonJouesDe(undefined).length === 0 && nonJouesDe(null).length === 0, "une sortie absente a levé ou rendu une déclaration");
 });
 
+// ── TF-1477 : DEUX recettes réelles du dépôt se déclaraient NON JOUÉES hors de la forme fermée ──
+// (sans crochets, sans compte) quand leur environnement d'exécution manque sur ce poste. Lues par
+// CE cliquet, une telle ligne ne vaut RIEN (cf. ci-dessus, « hors de la forme fermée ») : la
+// recette sort alors des « sans compte lisible » (`nonLus`, affiché « [NON JUGÉ] ») plutôt que
+// d'être comptée. Les deux fallbacks sont forcés ici par l'environnement, réellement rejoués.
+{
+  const { spawnSync } = await import("node:child_process");
+  const { dirname, join: jn } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const RACINE = jn(dirname(fileURLToPath(import.meta.url)), "..");
+
+  check("TF-1477 — verifier-ooxml.test.mjs sans python déclare ses 3 cas dans la forme comptée", () => {
+    // PATH vidé : les trois binaires (python, python3, py) deviennent introuvables, sans toucher
+    // au poste — c'est la MÊME branche que « aucun interpréteur python sur ce poste ».
+    const r = spawnSync(process.execPath, [jn(RACINE, "scripts", "verifier-ooxml.test.mjs")],
+      { encoding: "utf8", env: { ...process.env, PATH: "", Path: "" } });
+    att(r.status === 0, `exit ${r.status} attendu 0 (déclaré, pas supposé vert) : ${(r.stdout || "") + (r.stderr || "")}`);
+    const d = nonJouesDe(r.stdout || "");
+    att(d.length === 1 && d[0].cas === 3,
+      `le fallback sans python n'est pas lu par le cliquet (forme hors de « [NON JOUÉ] <n> cas ») : ${JSON.stringify(d)} — sortie : ${r.stdout}`);
+  });
+
+  check("TF-1477 — oracle-enclenchement.test.mjs sans mécanisme joignable déclare ses 27 cas dans la forme comptée", () => {
+    // FORGE_ROOT pointé vers un dossier vide : forge-tests n'y existe pas, MECANISME_REEL est
+    // introuvable — même branche que sur un poste sans le clone.
+    const T = mkdtempSync(join(tmpdir(), "enclenchement-vide-"));
+    const r = spawnSync(process.execPath, [jn(RACINE, "oracles", "oracle-enclenchement.test.mjs")],
+      { encoding: "utf8", env: { ...process.env, FORGE_ROOT: T } });
+    att(r.status === 0, `exit ${r.status} attendu 0 : ${(r.stdout || "") + (r.stderr || "")}`);
+    const d = nonJouesDe(r.stdout || "");
+    att(d.length === 1 && d[0].cas === 27,
+      `le fallback sans mécanisme n'est pas lu par le cliquet : ${JSON.stringify(d)} — sortie : ${r.stdout}`);
+  });
+}
+
 console.log(`\nbaseline-recettes (TF-0681) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

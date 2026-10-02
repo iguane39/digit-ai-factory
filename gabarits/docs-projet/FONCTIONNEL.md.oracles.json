@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a576abdf8d21a41a4\\gabarits\\docs-projet\\FONCTIONNEL.md",
+  "date_iso": "2026-10-02T06:44:18.847Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 2,
+    "fail": 1,
+    "skip": 4,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\docs-projet\\FONCTIONNEL.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\docs-projet\\FONCTIONNEL.md",
+      "verdict": "FAIL",
+      "detail": "2 constat(s) · M7 chapitre sans ouverture : « Utilisateurs & rôles » (ligne 19) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond. ; M7 chapitre sans ouverture : « Objets métier & cycle de vie » (ligne 26) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond."
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\docs-projet\\FONCTIONNEL.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\docs-projet\\FONCTIONNEL.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\docs-projet\\FONCTIONNEL.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\docs-projet\\FONCTIONNEL.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\docs-projet\\FONCTIONNEL.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\docs-projet\\FONCTIONNEL.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\docs-projet\\FONCTIONNEL.md",
+    "ts": "2026-10-02T06:44:18.846Z",
+    "fichiers": {
+      "gabarits\\docs-projet\\FONCTIONNEL.md": "ac2d40f225d77b856c39e062884a29f9f75551d2df3e967e51ad3ad1e50a1fab"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}

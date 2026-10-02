@@ -37,7 +37,7 @@ const retours = join(T, "retours"); mkdirSync(join(retours, "old"), { recursive:
 writeFileSync(join(retours, "Produit-12 - RETOURS - 20260901a.md"), "x", "utf8");
 writeFileSync(join(retours, "old", "Produit-12 - RETOURS - 20260825a.md"), "x", "utf8");
 writeFileSync(join(retours, "README.md"), "x", "utf8");
-const generer = (releves, sortie, { reg = registre, ret = retours, json = null } = {}) => spawnSync(process.execPath, [OUTIL, "--registre", reg, "--archive", vide, "--classes", classes, "--heritage", heritage, "--releves", releves, "--retours", ret, "--sortie", sortie, ...(json ? ["--json", json] : [])], { encoding: "utf8" });
+const generer = (releves, sortie, { reg = registre, ret = retours, json = null, semis = null } = {}) => spawnSync(process.execPath, [OUTIL, "--registre", reg, "--archive", vide, "--classes", classes, "--heritage", heritage, "--releves", releves, "--retours", ret, "--sortie", sortie, ...(json ? ["--json", json] : []), ...(semis ? ["--semis", semis] : [])], { encoding: "utf8" });
 
 check("verte — la récidive marquée apparaît sur sa classe, avec son produit et son compte", () => {
   const out = join(T, "R1.md"); const r = generer(join(T, "aucun-releve.jsonl"), out);
@@ -130,6 +130,46 @@ check("hors table — le marqueur n'est pas un produit : absent du tableau de de
   if (/\| \(produit hors table\) \|/.test(md)) throw new Error("le marqueur a une ligne au tableau de descente : il y serait lu comme un produit en retard");
   if (!/Au dernier relevé, 2 produit\(s\) sont inconnus de la table des pseudonymes/.test(md)) throw new Error("le nombre de produits hors table n'est pas dit");
   if (!/\| Produit-12 \|/.test(md)) throw new Error("le produit connu a disparu du tableau");
+});
+// TF-1251 (02/10/2026) — LE SEMIS DE DÉFAUTS, JAMAIS AFFICHÉ, REJOINT LE TABLEAU DE BORD.
+// Deux sens : un rapport ABSENT se DIT (jamais 0/0 de complaisance) ; un rapport PRÉSENT publie
+// ses compteurs en section 8 ET dans le JSON, à côté de ceux déjà publiés.
+check("semis ABSENT — section 8 dit « jamais mesuré » et le compteur JSON est null, jamais zéro", () => {
+  const out = join(T, "R7.md"), js = join(T, "R7.json");
+  const r = generer(join(T, "aucun-releve.jsonl"), out, { json: js, semis: join(T, "introuvable.json") });
+  if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stderr}`);
+  const md = readFileSync(out, "utf8");
+  if (!/## 8\. Semis de défauts[^\n]*\n\nJamais mesuré encore/.test(md)) throw new Error("section 8 muette :\n" + md.split("\n").find((l) => l.includes("Semis")));
+  const c = JSON.parse(readFileSync(js, "utf8"));
+  if (c.semis_defauts !== null) throw new Error(`semis_defauts = ${JSON.stringify(c.semis_defauts)}, attendu null`);
+});
+check("semis PRÉSENT — section 8 publie ses compteurs, et le JSON les porte à côté des autres déjà publiés", () => {
+  const rapport = w("semis.json", JSON.stringify({
+    outil: "semer-defauts", referentiel: { version: "1.17.0", date: "2026-09-20" }, generateurs_date: "2026-09-20",
+    mesure: { couvertes: 5, accusees: 0, non_concluantes: 2, non_jouees: 0, sans_controle: 31, sans_generateur: 49 },
+    accusees: [],
+  }));
+  const out = join(T, "R8.md"), js = join(T, "R8.json");
+  const r = generer(join(T, "aucun-releve.jsonl"), out, { json: js, semis: rapport });
+  if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stderr}`);
+  const md = readFileSync(out, "utf8");
+  if (!/\| 5 \| 0 \| 2 \| 31 \| 49 \| 0 \|/.test(md)) throw new Error("section 8 : ligne de compteurs inattendue :\n" + md.split("\n").find((l) => l.startsWith("| 5")));
+  const c = JSON.parse(readFileSync(js, "utf8"));
+  if (!c.semis_defauts || c.semis_defauts.couvertes !== 5 || c.semis_defauts.sans_controle !== 31)
+    throw new Error(`semis_defauts JSON inattendu : ${JSON.stringify(c.semis_defauts)}`);
+});
+check("semis PRÉSENT avec couvertures FAUSSES — la ligne d'alerte nomme chaque classe accusée", () => {
+  const rapport = w("semis-accuse.json", JSON.stringify({
+    outil: "semer-defauts", referentiel: { version: "1.17.0", date: "2026-09-20" }, generateurs_date: "2026-09-20",
+    mesure: { couvertes: 4, accusees: 1, non_concluantes: 2, non_jouees: 0, sans_controle: 31, sans_generateur: 49 },
+    accusees: [{ cle: "page-html-polices-distantes", regle: "check_html A1", motif: "accepte l'instance" }],
+  }));
+  const out = join(T, "R9.md");
+  const r = generer(join(T, "aucun-releve.jsonl"), out, { semis: rapport });
+  if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stderr}`);
+  const md = readFileSync(out, "utf8");
+  if (!/1 couverture\(s\) déclarée\(s\) et FAUSSE\(s\)[^\n]*`page-html-polices-distantes`/.test(md))
+    throw new Error("la classe à couverture fausse n'est pas nommée :\n" + md.split("\n").find((l) => l.includes("FAUSSE")));
 });
 rmSync(T, { recursive: true, force: true });
 console.log(`\ngenerer-recidives : ${pass} PASS, ${fail} FAIL`);

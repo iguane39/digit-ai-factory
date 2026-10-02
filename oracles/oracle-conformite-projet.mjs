@@ -751,6 +751,45 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
         so("R-32 bis", "aucun journal d'oracles à dater en jeu de règles — R-32 l'a déjà dit");
       }
     }
+
+    // R-32 quater (TF-1372, 02/10/2026) — LA REVUE DE LECTURE EST OBLIGATOIRE (SKILL.md de
+    // digit-ai-page-html, TF-0422) ET N'AVAIT AUCUN JUGE CHEZ UN PRODUIT AU MOMENT DE LA REMISE.
+    // check_html.py le dit lui-même (TF-1148, 16/09) : « ce script juge un fichier, il ne connaît
+    // pas le run qui l'entoure » — il publie la limite, il ne la ferme pas. R-32 ferme déjà le
+    // même trou pour check_html.py/render_page.py (journal JSON) ; R-32 quater fait de même pour
+    // la revue HUMAINE, que ni check_html.py ni run-oracles (que le produit ne lance pas) ne
+    // peuvent prouver. Le 20/09/2026, un rapport d'audit remis sous output\01-audit\ n'en avait
+    // pas, et son schéma illisible, visible dès la première capture, a vécu quatre jours dans le
+    // livrable. Emplacement, repris du gabarit lui-même (`gabarit-revue-de-lecture.md` de
+    // digit-ai-page-html) : « REVUE.md vit à côté du livrable » — un fichier `REVUE.md` dans le
+    // MÊME dossier que chaque `.html` remis. NON JUGÉ : la JUSTESSE de la revue — qu'elle ait
+    // vraiment regardé chaque capture — seule la PRÉSENCE, la DATE et le CONTENU NON VIDE se
+    // vérifient, exactement ce que le gabarit promet (« fichier présent, daté, non vide »).
+    {
+      const dossiersSansRevue = [];
+      const perimees = [];
+      const videsOuAbsentes = [];
+      for (const f of htmls) {
+        const revue = join(dirname(f), "REVUE.md");
+        if (!existsSync(revue)) { dossiersSansRevue.push(rel(f)); continue; }
+        if (!readFileSync(revue, "utf8").trim().length) { videsOuAbsentes.push(rel(f)); continue; }
+        if (statSync(f).mtimeMs > statSync(revue).mtimeMs) perimees.push(rel(f));
+      }
+      if (dossiersSansRevue.length) {
+        ko("R-32 quater", "*/REVUE.md",
+          `${dossiersSansRevue.length} livrable(s) HTML sans REVUE.md À CÔTÉ : ${dossiersSansRevue.join(" · ")} — ` +
+          "la revue de lecture est OBLIGATOIRE avant toute livraison (SKILL.md de digit-ai-page-html, TF-0422) : " +
+          "capturer (render_page.py), ouvrir et lire chaque capture, consigner le constat ou « aucun constat » daté dans un REVUE.md du même dossier");
+      } else if (videsOuAbsentes.length) {
+        ko("R-32 quater", "*/REVUE.md", `${videsOuAbsentes.length} REVUE.md présente(s) mais VIDE(s) : ${videsOuAbsentes.join(" · ")} — une revue vide se lit comme un oubli, jamais comme une décision (loi n° 3)`);
+      } else if (perimees.length) {
+        ko("R-32 quater", "*/REVUE.md",
+          `${perimees.length} livrable(s) HTML remis APRÈS leur revue de lecture, donc jamais relus : ${perimees.join(" · ")} — ` +
+          "rejouer la revue (render_page.py, ouvrir et lire les captures) après la dernière écriture de la page, puis mettre à jour REVUE.md");
+      } else {
+        ok("R-32 quater", "*/REVUE.md", `revue de lecture présente, non vide et plus récente que chacun des ${htmls.length} livrable(s) HTML remis`);
+      }
+    }
   }
 }
 

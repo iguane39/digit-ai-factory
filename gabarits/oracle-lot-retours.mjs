@@ -97,7 +97,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.4.1"; // 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.5.0"; // 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 /**
  * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
@@ -117,14 +117,22 @@ try {
   ({ anonymiser: anonymiserPilot } = await import(new URL("../todo/anonymiser-entrant.mjs", import.meta.url).href));
 } catch { /* copie héritée chez un produit : la règle y rend SANS_OBJET et le dit */ }
 
-/** R-45 depuis le 21/08/2026, R-46 depuis le 22/08, R-57 depuis le 29/09 — antériorité déclarée,
- *  jamais devinée. R-57 est décidée le 24/09 et entre au main le 28/09 : les lots écrits jusque-là,
- *  sans la règle sous la main, ne sont pas accusés. */
-export const SEUILS = { "R-45": "20260821", "R-46": "20260822", "R-57": "20260929" };
+/** R-45 depuis le 21/08/2026, R-46 depuis le 22/08, R-57 depuis le 29/09, GFP-LOT depuis le 02/10 —
+ *  antériorité déclarée, jamais devinée. R-57 est décidée le 24/09 et entre au main le 28/09 : les
+ *  lots écrits jusque-là, sans la règle sous la main, ne sont pas accusés. Même chose pour GFP-LOT,
+ *  entrée en vigueur le jour où elle rejoint le gabarit (TF-1526). */
+export const SEUILS = { "R-45": "20260821", "R-46": "20260822", "R-57": "20260929", "GFP-LOT": "20261002" };
 
 const SECTION_R45 = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
 const SECTION_R46 = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
 const SECTION_R57 = /^##\s+Documents\s+m[ûu]rs\b[^\n]*$/im;
+// Pas de `\b` juste après la lettre accentuée : sans drapeau Unicode, elle n'a pas de frontière de
+// mot et la section ne serait jamais reconnue (même piège que VERDICT_R57, TF-0805).
+const SECTION_GFP = /^##\s+Garde-fou\s+de\s+plateforme\s+relev[ée][^\n]*$/im;
+//: Un identifiant du registre CONFIRMÉ (GFP-nnn), ou un garde-fou NOUVEAU décrit par ses champs —
+//: jamais une simple mention du mot, que le vocabulaire fermé du registre rend reconnaissable.
+const GARDE_FOU_GFP = /GFP-\d{3}|nouveau\s+garde-fou/i;
+const AUCUN_GFP = /aucun\s+garde-fou\s+(?:de\s+plateforme\s+)?relev[ée]/i;
 //: Le verdict de remontée d'un document mûr, ou la déclaration qu'il n'y en a aucun. Pas de `\b`
 //: APRÈS la lettre accentuée : sans drapeau Unicode, « remonté » suivi d'une espace n'a pas de
 //: frontière de mot, et le verdict le plus naturel n'était pas reconnu (recette du 24/09/2026).
@@ -349,6 +357,22 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
       substance: "verdict de remontée (« remonté » ou « reste au produit, parce que… ») par document mûr",
       pourquoi: "un document que son lecteur a jugé réussi, ou que le produit a repris cinq fois, reste sinon invisible aux autres projets — sa FORME monte à la bibliothèque (famille ou composants), jamais sa matière",
       rienADire: "aucun document mûr" },
+    // GFP-LOT (TF-1526, 02/10/2026) — LE REGISTRE DES GARDE-FOUS DE PLATEFORME (TF-1495) SE DIT
+    // ALIMENTÉ PAR LES LOTS DES PRODUITS (champ `alimentation` de references/GARDE-FOUS-PLATEFORME.json),
+    // ET LE GABARIT DES LOTS N'AVAIT AUCUNE PLACE POUR UN GARDE-FOU RELEVÉ : la chaîne déclarée
+    // (« un produit remonte et le suivant en profite ») n'avait pas son étape d'entrée. Même forme
+    // que R-45/R-46/R-57 : section présente, verdict ou déclaration d'absence sous elle. Un garde-fou
+    // CONFIRMÉ cite son identifiant GFP-nnn du registre ; un garde-fou NOUVEAU se décrit par ses
+    // champs (client pseudonyme, plateforme, mécanisme, effet, portée, ce qu'il vise, ce qu'il
+    // refuse, la date du relevé) — c'est au pilot, à l'ingestion, de l'inscrire au registre après
+    // vérification (GR-1/GR-2/GR-3, scripts/verifier-garde-fous.mjs) ; cette règle ne juge que la
+    // FORME de la remontée, jamais la justesse du garde-fou décrit.
+    { regle: "GFP-LOT", seuil: SEUILS["GFP-LOT"], section: SECTION_GFP,
+      quoi: "Garde-fou de plateforme relevé",
+      present: GARDE_FOU_GFP, absent: AUCUN_GFP,
+      substance: "un identifiant GFP-nnn confirmé du registre, ou un garde-fou NOUVEAU décrit par ses champs",
+      pourquoi: "un garde-fou heurté par un produit (stratégie de plateforme, processus du client) et jamais remonté ne sert à aucun autre — c'est exactement le trou mesuré le 29/09/2026 sur une stratégie Deny heurtée trois fois sans circuler",
+      rienADire: "aucun garde-fou de plateforme relevé" },
   ];
   for (const { regle, seuil, section, quoi, present, absent, substance, pourquoi, rienADire } of REGLES) {
     if (date < seuil) {
@@ -517,7 +541,7 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
 // C'est CE geste que le gabarit de retours nomme. Il coûte une seconde au produit et lui évite
 // un refus à la porte du pilot — ou, pire, une dérogation qui lui épargne le refus ET la leçon.
 if (import.meta.url === `file://${process.argv[1]?.split("\\").join("/")}`
-    || import.meta.url.endsWith(encodeURI(String(process.argv[1] || "").split("\\").join("/")))) {
+    || (process.argv[1] && import.meta.url.endsWith(encodeURI(process.argv[1].split("\\").join("/"))))) {
   const args = process.argv.slice(2);
   const cible = args.find((a) => !a.startsWith("--"));
   const jsonSeul = args.includes("--json");

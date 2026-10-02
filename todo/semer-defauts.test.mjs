@@ -124,6 +124,17 @@ check("la TABLE des générateurs est DATÉE, et chaque entrée porte instance, 
   }
 });
 
+check("TF-1251 — la classe « registre-doublon-non-detecte » cite R14, qui existe, pas une règle « à créer »", () => {
+  const ref = JSON.parse(readFileSync(join(ICI, "CLASSES.json"), "utf8"));
+  const classe = ref.classes.find((c) => c.cle === "registre-doublon-non-detecte");
+  if (!classe) throw new Error("classe absente du référentiel");
+  if (/\b(à\s*créer|a\s*creer)\b/i.test(classe.oracle))
+    throw new Error(`le champ « oracle » déclare encore une règle à créer, alors que R14 existe : ${classe.oracle}`);
+  if (!/\bR14\b/.test(classe.oracle)) throw new Error(`le champ « oracle » ne cite pas R14 : ${classe.oracle}`);
+  const oracleTodo = readFileSync(join(ICI, "oracle-todo.mjs"), "utf8");
+  if (!/\bR14\b/.test(oracleTodo)) throw new Error("R14 cité par la classe n'existe pas dans todo/oracle-todo.mjs");
+});
+
 check("chaque classe du référentiel tombe dans une case et une seule", () => {
   const ref = JSON.parse(readFileSync(join(ICI, "CLASSES.json"), "utf8"));
   const gen2 = JSON.parse(readFileSync(join(ICI, "generateurs-defauts.json"), "utf8"));

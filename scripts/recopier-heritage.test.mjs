@@ -214,6 +214,19 @@ try {
   });
 
   // ── TF-0851 (2) : le geste rend compte de ce qu'il laisse au dépôt ─────────────────────────
+  // ── TF-1459 : un antislash suivi de « r » écrit dans le gabarit, devenu un retour à la ligne ──
+  // le 18/08 (commit 5ab0cd4) — le chemin de `resoudre-pilot.mjs` arrivait coupé en deux lignes
+  // chez chaque produit qui recopiait CLAUDE-PRODUIT.md en CLAUDE.md.
+  check("TF-1459 — le chemin de resoudre-pilot.mjs n'arrive pas coupé dans le CLAUDE.md recopié", () => {
+    const produit = join(T, "produit-chemin-pilot");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    const claude = readFileSync(join(produit, "CLAUDE.md"), "utf8");
+    att(/oracles\\resoudre-pilot\.mjs/.test(claude),
+      "le chemin `oracles\\resoudre-pilot.mjs` n'apparaît pas intact dans CLAUDE.md — il est coupé par un retour à la ligne");
+  });
+
   check("TF-0851 — le geste imprime la ligne `git add` des fichiers qu'il vient d'écrire", () => {
     const produit = join(T, "produit-add");
     mkdirSync(join(produit, "forge"), { recursive: true });
