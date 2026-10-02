@@ -1101,9 +1101,10 @@ jamais celui de l'auteur :
 - **S8 ignore la tournure conditionnelle de S19.** « si rien n'est fait » contient le mot
   « fait », que S8 lisait comme une affirmation de complétion sans preuve.
 
-**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S41 binaires,
-fixtures double sens au self-test, 18 cas (la fixture rouge échoue sur 29 règles distinctes ; S29,
-S30, S31, S32, S33, S38, S39, S40 et S41 portent en plus leur propre paire, rouge ET verte).
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S56 binaires,
+fixtures double sens au self-test, 105 cas (compte tenu sur le disque du banc, pas recopié à la
+main — TF-0681 ; la fixture rouge échoue sur plusieurs dizaines de règles distinctes, et les
+règles nées après S29 portent chacune en plus leur propre paire, rouge ET verte).
 
 **Calibration mesurée d'une règle neuve (08/09/2026)** — une règle entre au gabarit avec son TAUX
 d'accusation relevé sur le corpus réel, jamais supposé. Les quatre règles du 08/09 ont été jouées
