@@ -4,7 +4,7 @@
  * Double sens sur les trois promesses de l'outil : il STAMPE, il REFUSE un `ts` fourni, il
  * ANNULE une écriture qui casserait le registre. Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, writeFileSync, readFileSync, existsSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -281,6 +281,50 @@ check("un referentiel de classes ILLISIBLE refuse, il ne laisse pas passer en si
   const r = lancer([creation({ id: "TF-9915" })], r8, ["--classes", faux]);
   if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — sans referentiel, on ne juge aucune cle`);
   if (!/illisible/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+});
+
+// ── TF-1248 (02/10/2026) : une décision qui cite une étude INTROUVABLE ou NON SUIVIE est refusée ─
+// Le 14/09, quatre décisions ont cité une étude sous output\03-etudes\ qui n'a jamais existé sur
+// le disque ni dans l'historique git — aucun constat ne l'a montré avant que des agents de
+// campagne travaillent sans elle. Ce garde vérifie, AU MOMENT où la décision s'écrit, que le
+// fichier cité existe ET qu'il est suivi par git, sur une racine de test injectée par --racine.
+const r9 = join(T, "registre-9.jsonl");
+const racine = join(T, "racine-etude");
+const git = (...a) => spawnSync("git", ["-C", racine, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+mkdirSync(join(racine, "output", "03-etudes"), { recursive: true });
+git("init", "-q", "-b", "main");
+
+const decision = (sur = {}) => ({
+  ev: "maj", id: "TF-9920", statut: "decide", date_decision: "2026-10-02",
+  decideur: "humain (recette)", ...sur,
+});
+
+check("TF-1248 — une décision citant une étude ABSENTE DU DISQUE est refusée, rien n'est écrit", () => {
+  const r = lancer([decision({ decision: "Décidé sur l'étude output/03-etudes/20261002-etude-absente.md, oracle PASS." })], r9, ["--racine", racine]);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+  if (!/introuvable/.test(r.corps.message || "")) throw new Error(`le refus ne nomme pas l'introuvabilité : ${r.corps.message}`);
+  if (existsSync(r9)) throw new Error("le registre a été créé malgré le refus");
+});
+
+check("TF-1248 — une décision citant une étude PRÉSENTE MAIS NON SUIVIE par git est refusée", () => {
+  writeFileSync(join(racine, "output", "03-etudes", "20261002-etude-non-suivie.md"), "# étude\n", "utf8");
+  const r = lancer([decision({ id: "TF-9921", decision: "Décidé sur l'étude output/03-etudes/20261002-etude-non-suivie.md." })], r9, ["--racine", racine]);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+  if (!/NON SUIVI/.test(r.corps.message || "")) throw new Error(`le refus ne nomme pas le défaut de suivi git : ${r.corps.message}`);
+});
+
+check("TF-1248 borne — une décision citant une étude PRÉSENTE ET SUIVIE par git passe", () => {
+  git("add", "-A"); git("commit", "-q", "-m", "étude de recette");
+  const r = lancer([
+    creation({ id: "TF-9922" }),
+    decision({ id: "TF-9922", decision: "Décidé sur l'étude output/03-etudes/20261002-etude-non-suivie.md." }),
+  ], r9, ["--racine", racine]);
+  if (r.code !== 0) throw new Error(`exit ${r.code} attendu 0 — étude présente et suivie : ${r.corps.message}`);
+});
+
+check("TF-1248 borne — une création (pas une décision) qui cite une étude n'est jamais jugée par ce garde", () => {
+  const r = lancer([creation({ id: "TF-9923", contenu: "Suite de l'étude output/03-etudes/20260101-inexistante.md" })], r9, ["--racine", racine]);
+  if (r.code !== 0) throw new Error(`exit ${r.code} attendu 0 — une création n'est pas une décision : ${r.corps.message}`);
 });
 
 console.log(`\njournaliser (TF-0413) : ${pass} PASS, ${fail} FAIL`);
