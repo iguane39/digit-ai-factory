@@ -251,10 +251,14 @@ export function pseudoProduit(nom, { racine = null } = {}) {
   // occurrences suivies. Règle humaine du 01/10, mot pour mot : « Les dépôts privés peuvent conserver
   // des données de type nom. » La liste se lit donc ICI, au point de passage, comme les forges.
   if (PRODUITS_DE_L_ECOSYSTEME.has(nom)) return nom;
-  // UN NOM TROP COURT NE S'INSCRIT PAS NON PLUS (02/09, second cas payé le même jour) : « PROD »,
-  // nom de fixture d'une recette non isolée, inscrit comme produit — et une clé de quatre lettres
-  // substituée par inclusion réécrit « PRODUCTION » en « Produit-13UCTION ». Le refus est dit.
-  if (nom.length < 5) { console.error(`[ANONYMISÉ] « ${nom} » n'est pas inscrit : un nom de produit fait au moins 5 caractères (une clé courte mordrait sur les mots qui la contiennent)`); return null; }
+  // UN NOM COURT NE SE REFUSE PLUS (TF-1457, 28/09/2026) : « PROD », nom de fixture d'une recette
+  // non isolée, inscrit comme produit, substitué par INCLUSION réécrivait « PRODUCTION » en
+  // « Produit-13UCTION » (02/09) — le refus traitait alors la LONGUEUR comme si elle était la
+  // CAUSE. La cause réelle est la VOIE DE SUBSTITUTION : en dessous de `SEUIL_MOT`, `anonymiser()`
+  // n'emploie plus que la voie BORNÉE (`bordé`), jamais la voie littérale qui mord sur un mot plus
+  // long. Un nom d'UN seul caractère reste refusé : même borné, il mordrait sur des initiales et
+  // des sigles ordinaires de la prose, ce qu'aucune frontière ne protège.
+  if (nom.length < 2) { console.error(`[ANONYMISÉ] « ${nom} » n'est pas inscrit : un nom de produit fait au moins 2 caractères`); return null; }
   if (!d.produits[nom]) {
     // TF-1431 : un registre jetable n'étend que la table qu'on lui désigne — refus avant l'écriture.
     if (process.env[MARQUEUR_REGISTRE_JETABLE] && !process.env.FORGE_PRODUITS_PSEUDO) {
@@ -306,6 +310,14 @@ export function pseudoProduit(nom, { racine = null } = {}) {
 
 // Les caractères dont est fait un identifiant de code, dans à peu près tous les langages.
 const IDENT = /[A-Za-z0-9_]/;
+
+// TF-1457 (28/09/2026, campagne D-32 (a)) — LE SEUIL EN DESSOUS DUQUEL UN NOM NE PASSE PLUS PAR
+// LA VOIE LITTÉRALE (substituerHorsIdentifiant) : une sous-chaîne de moins de 5 caractères mord
+// trop souvent sur un mot plus long qui la contient (« PROD » dans « PRODUCTION »), et la garde de
+// cette voie contre les identifiants ne s'arme qu'en code (`code: true`) — en prose, rien ne
+// l'arrête. En dessous du seuil, seule la voie BORNÉE (`bordé`, `variantes`) agit : un nom court
+// s'inscrit désormais comme un MOT ENTIER plutôt que de ne pas s'inscrire du tout.
+const SEUIL_MOT = 5;
 
 /**
  * Substitution LITTÉRALE d'un nom, occurrence par occurrence, qui REFUSE de couper un
@@ -414,8 +426,14 @@ export function anonymiser(texte, { code = false } = {}) {
   // recouvrement existe (un sigle contenu dans un nom).
   const parLongueur = (a, b) => String(b[0]).length - String(a[0]).length;
   for (const [nom, pseudo] of Object.entries(produits.produits || {}).sort(parLongueur)) {
-    const litt = substituerHorsIdentifiant(out, nom, pseudo, refuses, code);
-    if (litt.fait) { out = litt.texte; remplaces.push(nom); } else out = litt.texte;
+    // TF-1457 : en dessous de SEUIL_MOT, la voie littérale est SAUTÉE — elle mordrait sur un mot
+    // plus long qui contient le nom court, et sa garde contre les identifiants ne s'arme qu'en
+    // code. Le nom court n'est substitué que par les voies déjà bornées, plus bas (`variantes`,
+    // `bordé`) — jamais au milieu d'un mot.
+    if (nom.length >= SEUIL_MOT) {
+      const litt = substituerHorsIdentifiant(out, nom, pseudo, refuses, code);
+      if (litt.fait) { out = litt.texte; remplaces.push(nom); } else out = litt.texte;
+    }
     // TF-0742 (02/09/2026) : UNE table qui n'énumère qu'une graphie ne protège que cette graphie.
     // Mesuré le 01/09 : la clé concaténée était substituée, la forme ESPACÉE du même nom — écrite
     // en toutes lettres dans le titre et le contenu — traversait, et deux occurrences sont entrées
@@ -647,6 +665,24 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
       casse.push("une ingestion RÉELLE, hors banc, se voit refuser l'extension de la table — la garde mordrait sur le seul usage légitime");
   }
 
+  // 3 decies) TF-1457 (28/09/2026, campagne D-32 (a)) — UN NOM COURT S'INSCRIT COMME UN MOT
+  //           ENTIER. Sens vert : un nom de 3 caractères (« PRD », le préfixe de lot réel du
+  //           constat) s'inscrit désormais — il recevait `null` avant le correctif — et son
+  //           occurrence ISOLÉE est substituée. Sens rouge, le défaut d'origine du 02/09 : la MÊME
+  //           clé, COLLÉE des deux côtés à un mot plus long qui la contient, reste INTACTE — en
+  //           dessous de SEUIL_MOT, la voie littérale est sautée, seule la voie BORNÉE agit.
+  {
+    const pCourt = pseudoProduit("PRD");
+    if (!pCourt || !/^Produit-\d{2,}$/.test(pCourt))
+      casse.push(`TF-1457 : un nom court de 3 caractères (« PRD ») n'est plus inscrit — ${pCourt}`);
+    const rCourt = anonymiser("Le produit PRD est livré ce soir, jamais au milieu de xPRDx, de PRDx, ni de xPRD.");
+    if (!rCourt.texte.includes(`Le produit ${pCourt} est livré`))
+      casse.push("TF-1457 : l'occurrence ISOLÉE du nom court n'est pas substituée : " + rCourt.texte);
+    if (!rCourt.texte.includes("xPRDx") || !rCourt.texte.includes("PRDx") || !rCourt.texte.includes("xPRD."))
+      casse.push("TF-1457 : un nom court mord sur un mot plus long qui le contient (la voie littérale "
+        + "a quand même agi) : " + rCourt.texte);
+  }
+
   // 4) référentiel ABSENT → refus, jamais un passage silencieux
   process.env.FORGE_NOMS_INTERDITS = join(dir, "absent.json");
   let refuse = false;
@@ -654,6 +690,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${11 - casse.length}/11 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${12 - casse.length}/12 cas, ${casse.length} FAIL`);
   process.exit(casse.length ? 1 : 0);
 }
