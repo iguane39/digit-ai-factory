@@ -22,6 +22,10 @@
   "cas": 19,
   "vu_le": "2026-09-27"
  },
+ "gabarits/documents/espacement-4pt-herite.test.mjs": {
+  "cas": 24,
+  "vu_le": "2026-10-02"
+ },
  "gabarits/oracle-lot-retours.test.mjs": {
   "cas": 44,
   "vu_le": "2026-09-28"
@@ -254,8 +258,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-skills.mjs": {
-  "cas": 90,
-  "vu_le": "2026-09-15"
+  "cas": 94,
+  "vu_le": "2026-10-02"
  },
  "oracle-skills.mjs (parc réel)": {
   "non_lu": true,
@@ -323,8 +327,8 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 39,
-  "vu_le": "2026-10-01"
+  "cas": 40,
+  "vu_le": "2026-10-02"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 23,
@@ -483,8 +487,8 @@
   "vu_le": "2026-09-15"
  },
  "scripts/recopier-heritage.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-09-17"
+  "cas": 16,
+  "vu_le": "2026-10-02"
  },
  "scripts/relever-appelants.test.mjs": {
   "cas": 5,
@@ -499,8 +503,8 @@
   "vu_le": "2026-09-08"
  },
  "scripts/verifier-avance-publication.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-16"
+  "cas": 10,
+  "vu_le": "2026-10-02"
  },
  "scripts/verifier-bascule.test.mjs": {
   "cas": 8,
@@ -579,8 +583,8 @@
   "vu_le": "2026-09-14"
  },
  "todo/generer-page.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-14"
+  "cas": 5,
+  "vu_le": "2026-10-02"
  },
  "todo/generer-recidives.test.mjs": {
   "cas": 10,
@@ -639,8 +643,8 @@
   "vu_le": "2026-09-28"
  },
  "todo/journaliser.test.mjs": {
-  "cas": 29,
-  "vu_le": "2026-09-22"
+  "cas": 33,
+  "vu_le": "2026-10-02"
  },
  "todo/localiser-produit.test.mjs": {
   "cas": 11,
