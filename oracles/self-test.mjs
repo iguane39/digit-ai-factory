@@ -1720,6 +1720,43 @@ check("TF-0902 borne : deux FORMATS d'un même livrable (.html et .pdf) ne sont 
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// TF-1525 (01/10/2026) — DES FAMILLES DE LIVRABLES DISTINCTS, DÉCLARÉES, JAMAIS DES VERSIONS D'UN
+// MÊME DOCUMENT. Mesuré sur le dépôt réel : 15 lots « pilot - TRAVAUX » (un envoi distinct par
+// jour, jamais remplacé) et 3 synthèses de même titre écrites à des jours différents, accusés à
+// tort par R-7 bis. Chaque famille est déclarée — un dossier entier pour les travaux confiés, un
+// radical exact pour les synthèses — et le troisième cas tient la borne : un radical VOISIN,
+// non déclaré, reste jugé normalement.
+check("TF-1525 verte : un dossier déclaré multi-instance (output/06-travaux-confies\\) n'accuse pas deux radicaux identiques à des jours différents", () => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r7bis-travaux-"));
+  mkdirSync(join(d, "output", "06-travaux-confies"), { recursive: true });
+  writeFileSync(join(d, "output", "06-travaux-confies", "pilot - TRAVAUX - 20260905c.md"), "# lot\n", "utf8");
+  writeFileSync(join(d, "output", "06-travaux-confies", "pilot - TRAVAUX - 20260914a.md"), "# lot\n", "utf8");
+  try {
+    const f = r7bis(d);
+    if (f && f.statut === "FAIL") throw new Error(`un dossier de travaux confiés déclaré multi-instance est quand même accusé : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1525 verte : un radical de synthèse déclaré (« Synthese Mandat - Traite todos et retours ») n'accuse pas deux indices à des jours différents", () => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r7bis-synth-"));
+  mkdirSync(join(d, "output", "04-plans"), { recursive: true });
+  writeFileSync(join(d, "output", "04-plans", "Digit-AI - Synthese Mandat - Traite todos et retours - 20260822b.md"), "# synthèse\n", "utf8");
+  writeFileSync(join(d, "output", "04-plans", "Digit-AI - Synthese Mandat - Traite todos et retours - 20260831b.md"), "# synthèse\n", "utf8");
+  try {
+    const f = r7bis(d);
+    if (f && f.statut === "FAIL") throw new Error(`un radical de synthèse déclaré multi-instance est quand même accusé : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1525 borne : un radical VOISIN, non déclaré, reste jugé — la déclaration ne couvre pas tout « Synthese Mandat »", () => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r7bis-synth-voisin-"));
+  mkdirSync(join(d, "output", "04-plans"), { recursive: true });
+  writeFileSync(join(d, "output", "04-plans", "Digit-AI - Synthese Mandat - Un titre jamais declare - 20260907j.md"), "# synthèse\n", "utf8");
+  writeFileSync(join(d, "output", "04-plans", "Digit-AI - Synthese Mandat - Un titre jamais declare - 20260907m.md"), "# synthèse\n", "utf8");
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`un radical non déclaré, vraie version remplacée, n'est plus jugé : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- TF-1503 (01/10) — R-7 bis : la version antérieure TENUE OUVERTE est un état déclaré -------
 // Décision humaine du 30/09, citée mot pour mot au lot source : « Ne pose plus la question sur les
 // documents ouverts. Regénère dans tous les cas une nouvelle version et informe l'utilisateur que le

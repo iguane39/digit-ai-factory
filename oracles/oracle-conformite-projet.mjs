@@ -599,6 +599,23 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
 // (`deplacement_effectue`) ne tolère plus rien : l'ancienne version est revenue, ou la clôture était
 // prématurée, et c'est un défaut. Une version sans consignation reste un défaut même si sa voisine en
 // porte une : la tolérance est par version, jamais par dossier.
+// TF-1525 (01/10/2026, campagne D-37 (a)) — DES FAMILLES DE LIVRABLES DISTINCTS, JAMAIS DES
+// VERSIONS D'UN MÊME DOCUMENT. R-7 bis suppose qu'un radical identique dans le même dossier
+// désigne UN livrable qui évolue, l'ancien indice migrant vers `old\`. Deux familles ne tiennent
+// pas cette hypothèse, mesurées le 01/10/2026 par l'agent « doctrine des produits » sur le dépôt
+// réel : un LOT DE TRAVAUX confié (`output/06-travaux-confies/`, chaque fichier est un envoi
+// distinct à un produit différent, jamais remplacé par le suivant — 15 indices accusés à tort) et
+// deux titres de synthèse de mandat qui REVIENNENT d'une session à l'autre sans qu'aucune ne
+// remplace l'autre (3 indices accusés à tort). Chaque famille est DÉCLARÉE, jamais devinée par un
+// motif large : un dossier ENTIER pour les travaux confiés, par construction multi-instance ; un
+// radical EXACT pour les deux synthèses, pour ne pas couvrir en silence un titre voisin qui, lui,
+// serait une vraie version remplacée.
+const DOSSIERS_LIVRABLES_DISTINCTS = new Set(["output/06-travaux-confies"]);
+const RADICAUX_LIVRABLES_DISTINCTS = new Set([
+  JSON.stringify(["output/01-revues-et-propositions", "Digit-AI - Revue Forge - Écosystème"]),
+  JSON.stringify(["output/04-plans", "Digit-AI - Synthese Mandat - Parc synchronise avec GitHub"]),
+  JSON.stringify(["output/04-plans", "Digit-AI - Synthese Mandat - Traite todos et retours"]),
+]);
 {
   const versions = new Map();
   for (const d of ["output", "docs"]) {
@@ -611,9 +628,12 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
       if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
       const m = nom.match(/^(.*) - (\d{8}[a-z]?)\.([\w.]+)$/);
       if (!m) continue;
+      const dossierRel = dirname(rel(f));
+      if (DOSSIERS_LIVRABLES_DISTINCTS.has(dossierRel)) continue;
+      if (RADICAUX_LIVRABLES_DISTINCTS.has(JSON.stringify([dossierRel, m[1]]))) continue;
       // Clé COMPOSÉE, jamais concaténée : un radical porte des espaces et des tirets, et un
       // séparateur de fortune rendrait le dossier faux au message — un message faux se corrige de travers.
-      const cle = JSON.stringify([dirname(rel(f)), m[1], m[3].toLowerCase()]);
+      const cle = JSON.stringify([dossierRel, m[1], m[3].toLowerCase()]);
       if (!versions.has(cle)) versions.set(cle, []);
       versions.get(cle).push({ nom, indice: m[2], chemin: rel(f) });
     }
