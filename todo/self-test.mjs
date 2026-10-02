@@ -8,7 +8,7 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
@@ -519,7 +519,19 @@ check("archive : charte R-30 tenue et défaut RV-9 non recopié", () => {
 // forge-agents et personne ne le jouait sur TODO.html. La vue d'archive, née la veille, passait
 // déjà : le cadet avait dépassé l'aîné sans que rien ne le dise. Double sens obligatoire — un
 // vert seul ne prouverait que l'absence de littéral dans le registre du jour, pas le contrôle.
-const RACINE = process.env.FORGE_ROOT ?? join(ICI, "..", "..");
+// TF-1231 (récidive, 02/10/2026) — même défaut que celui corrigé dans
+// `oracles/oracle-conformite-projet.mjs` : dans un worktree lié, `join(ICI, "..", "..")` reste
+// SOUS `.claude/worktrees`, jamais au parc (`C:/dev`). On remonte par le rattachement git
+// (`--git-common-dir`), qui pointe vers le dépôt PRINCIPAL même depuis un worktree lié.
+function racineDuParcParDefaut(ici) {
+  const r = spawnSync("git", ["-C", ici, "rev-parse", "--git-common-dir"], { encoding: "utf8" });
+  if (r.status === 0 && r.stdout && r.stdout.trim()) {
+    const depotPrincipal = dirname(resolve(ici, r.stdout.trim()));
+    return dirname(depotPrincipal);
+  }
+  return join(ici, "..", "..");
+}
+const RACINE = process.env.FORGE_ROOT ?? racineDuParcParDefaut(ICI);
 const checkHtml = join(RACINE, "digit-ai-forge-agents", ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py");
 /**
  * LA VUE EST REGENEREE AVANT D ETRE JUGEE (TF-1298, decision humaine A-22 du 22/09/2026).
