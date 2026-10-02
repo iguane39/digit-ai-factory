@@ -443,8 +443,13 @@ export function jugerCatalogue(chemin, racineParc) {
   catch (e) { findings.push({ regle: "G11", statut: "FAIL", ou: chemin, message: `ligne de catalogue illisible : ${e.message}` }); return findings; }
 
   const html = familles.filter((f) => (f.formats || []).includes("html"));
-  if (!html.length) { findings.push({ regle: "G11", statut: "SKIP", ou: chemin, message: "aucune famille ne déclare produire du html" }); return findings; }
-
+  // TF-1249 (campagne D-51 (a)) : un RETOUR ANTICIPÉ ici privait G13 de tout catalogue sans
+  // famille html — y compris son propre banc rouge, en formats `["md"]` seul. G11/G12 restent
+  // bornés au html (ce qu'ils jugent n'existe que pour lui) ; G13, plus bas, juge TOUTES les
+  // familles et doit survivre à ce cas.
+  if (!html.length) {
+    findings.push({ regle: "G11", statut: "SKIP", ou: chemin, message: "aucune famille ne déclare produire du html" });
+  } else {
   for (const f of html) {
     const ou = `catalogue/${f.famille}`;
     const d = f.point_de_depart;
@@ -522,6 +527,46 @@ export function jugerCatalogue(chemin, racineParc) {
     `couverture : ${html.length - nus.length} famille(s) html outillée(s), ${nus.length} sans point de départ — ` +
     `dont ${environnement} dépendance(s) d'environnement et ${travail} dette(s) de travail` +
     (nus.length ? ` (${Object.entries(par).map(([k, v]) => `${k}: ${v}`).join(", ")})` : "") });
+  }
+
+  // G13 (TF-1249, campagne D-51 (a) du 02/10/2026) — LES CHAMPS `lecteur` ET `type_de_contenu`
+  // DU CATALOGUE SONT JUGÉS, PAS SEULEMENT ÉCRITS. TF-1097 (20/09/2026) a ajouté ces deux champs —
+  // quatre sous-champs pour le lecteur, un type par partie dans un vocabulaire FERMÉ — remplis
+  // pour les familles au statut `ok`, déclarés vides EN PROSE pour les autres ; mais G6 ne juge
+  // qu'une FICHE DE CONCEPTION prise à part, jamais le catalogue lui-même. Mesuré le 20/09 : sur
+  // 16 familles au statut `ok`, 5 (revue-raid, rapport-avancement, compte-rendu, rex,
+  // suivi-benefices) portaient encore le vide déclaré en prose plutôt que la structure attendue,
+  // sans qu'aucun contrôle ne le voie — et rien ne dirait si une famille `ok` RETOMBE un jour en
+  // vide, ou si une valeur sort du vocabulaire fermé. Le vide déclaré reste ADMIS pour tout AUTRE
+  // statut (`a_extraire`, `porte_ailleurs`) : la règle n'accuse jamais une famille qui n'a pas
+  // encore de gabarit écrit.
+  const SOUS_CHAMPS_LECTEUR = ["decisions_attendues", "savoir_prealable", "vocabulaire_absent", "contexte_de_lecture"];
+  for (const f of familles) {
+    if (f.statut !== "ok") continue;
+    const ou = `catalogue/${f.famille}`;
+    if (!f.lecteur || typeof f.lecteur !== "object" || Array.isArray(f.lecteur)) {
+      findings.push({ regle: "G13", statut: "FAIL", ou, message:
+        `famille au statut ok sans lecteur STRUCTURÉ (quatre sous-champs attendus : ${SOUS_CHAMPS_LECTEUR.join(", ")}) — ` +
+        `${typeof f.lecteur === "string" ? "vide déclaré en prose, admis pour a_extraire/porte_ailleurs, jamais pour ok" : "champ absent"}` });
+    } else {
+      const manquants = SOUS_CHAMPS_LECTEUR.filter((c) => !String(f.lecteur[c] || "").trim());
+      findings.push(manquants.length
+        ? { regle: "G13", statut: "FAIL", ou, message: `lecteur structuré mais incomplet — sous-champ(s) vide(s) : ${manquants.join(", ")}` }
+        : { regle: "G13", statut: "PASS", ou, message: "lecteur structuré, quatre sous-champs renseignés" });
+    }
+    if (!f.type_de_contenu || typeof f.type_de_contenu !== "object" || Array.isArray(f.type_de_contenu)) {
+      findings.push({ regle: "G13", statut: "FAIL", ou, message:
+        `famille au statut ok sans type_de_contenu STRUCTURÉ (une valeur par partie, vocabulaire fermé : ${TYPES_CONTENU.join(", ")}) — ` +
+        `${typeof f.type_de_contenu === "string" ? "vide déclaré en prose, admis pour a_extraire/porte_ailleurs, jamais pour ok" : "champ absent"}` });
+    } else {
+      const parties = Object.entries(f.type_de_contenu);
+      const horsVocab = parties.filter(([, v]) => !TYPES_CONTENU.includes(v));
+      if (!parties.length) findings.push({ regle: "G13", statut: "FAIL", ou, message: "type_de_contenu structuré mais sans aucune partie déclarée" });
+      else if (horsVocab.length) findings.push({ regle: "G13", statut: "FAIL", ou, message:
+        `type_de_contenu hors du vocabulaire FERMÉ : ${horsVocab.map(([k, v]) => `${k}: « ${v} »`).join(", ")}` });
+      else findings.push({ regle: "G13", statut: "PASS", ou, message: `type_de_contenu structuré, ${parties.length} partie(s) dans le vocabulaire fermé` });
+    }
+  }
 
   return findings;
 }
@@ -1050,11 +1095,35 @@ if (args[0] === "--self-test") {
     { famille: "a", formats: ["html"], point_de_depart: { type: "generateur", chemin: "depot-absent/tools/build.mjs" } }]);
   if (!verdictsG5(catHorsPoste).includes("SKIP")) casse.push("G11 ne SKIP pas sur un dépôt porteur absent du poste");
 
+  // --- G13 (TF-1249), QUATRE SENS : le vide déclaré EN PROSE sur une famille `ok` est un FAIL ;
+  // la structure complète est un PASS ; une valeur hors du vocabulaire fermé est un FAIL nommé ;
+  // et une famille hors statut `ok` n'est jamais jugée (vide déclaré admis, jamais un défaut).
+  const catG13 = ecrireCat("g13.jsonl", [
+    { famille: "x-vide-prose", statut: "ok", formats: ["md"], lecteur: "non renseigne", type_de_contenu: "non renseigne" },
+    { famille: "y-complete", statut: "ok", formats: ["md"],
+      lecteur: { decisions_attendues: "d", savoir_prealable: "s", vocabulaire_absent: "v", contexte_de_lecture: "c" },
+      type_de_contenu: { partie1: "fait" } },
+    { famille: "z-hors-vocab", statut: "ok", formats: ["md"],
+      lecteur: { decisions_attendues: "d", savoir_prealable: "s", vocabulaire_absent: "v", contexte_de_lecture: "c" },
+      type_de_contenu: { partie1: "presentation" } },
+    { famille: "w-a-extraire", statut: "a_extraire", formats: ["md"], lecteur: "non renseigne", type_de_contenu: "non renseigne" },
+  ]);
+  const g13 = jugerCatalogue(catG13, parc).filter((x) => x.regle === "G13");
+  const g13Pour = (fam) => g13.filter((x) => x.ou === `catalogue/${fam}`);
+  if (!g13Pour("x-vide-prose").length || !g13Pour("x-vide-prose").every((x) => x.statut === "FAIL"))
+    casse.push("G13 laisse passer une famille ok avec lecteur/type_de_contenu en prose (vide déclaré)");
+  if (!g13Pour("y-complete").length || !g13Pour("y-complete").every((x) => x.statut === "PASS"))
+    casse.push("G13 accuse une famille ok correctement structurée");
+  if (!g13Pour("z-hors-vocab").some((x) => x.statut === "FAIL" && /vocabulaire FERMÉ/.test(x.message)))
+    casse.push("G13 laisse passer un type_de_contenu hors du vocabulaire fermé");
+  if (g13Pour("w-a-extraire").length)
+    casse.push("G13 juge une famille hors statut ok — elle doit rester hors de sa portée (vide déclaré admis)");
+
   rmSync(catDir, { recursive: true, force: true, maxRetries: 5 });
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 40/40 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 44/44 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
@@ -1062,7 +1131,8 @@ if (args[0] === "--self-test") {
       "G12 dans ses DEUX sens rouges — « aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; " +
       "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
       "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS) ; " +
-      "TF-1230 : la famille docs-projet existe au catalogue réel, cite les huit fichiers de gabarits/docs-projet/, tous présents sur le disque)");
+      "TF-1230 : la famille docs-projet existe au catalogue réel, cite les huit fichiers de gabarits/docs-projet/, tous présents sur le disque ; " +
+      "G13 dans ses QUATRE sens (TF-1249) : lecteur/type_de_contenu en prose sur une famille ok → FAIL, structure complète → PASS, valeur hors vocabulaire fermé → FAIL, famille hors statut ok → jamais jugée)");
   process.exit(casse.length ? 1 : 0);
 }
 
