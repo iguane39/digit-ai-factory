@@ -12,7 +12,7 @@ verifie_le: 2026-09-27
 **Dix-sept tours** ont été nécessaires, sur la session du 26/08, avant que le résultat soit de
 qualité. Chaque tour a été classé par son **motif**, une seule classe retenue par tour :
 
-| classe | tours | ce que la classe dit |
+| classe | tours | explication de la classe |
 |---|---|---|
 | **DÉFAUT** | 11 | une étape, un format ou une règle manquait |
 | **DÉCISION** | 5 | l'arbitrage appartient à l'exploitant |
@@ -209,7 +209,7 @@ La fiche déclare `role:` … *remise* … *traduction* dans son frontmatter —
 réclame pas n'est pas jugé, sans quoi l'oracle accuserait n'importe quel markdown du dépôt. Elle
 porte **quatre sections**, et chacune empêche une chose précise :
 
-| Section | Ce qu'elle doit porter | Ce que son absence laisserait passer |
+| Section | Contenu dû | Risque si absente |
 |---|---|---|
 | `## Relecture native` | « Faite par *<nom>*, *AAAA-MM-JJ* » **ou** « Refusée — *<motif>* » | onze fautes d'accord parties en production, la relecture ayant eu lieu APRÈS la mise en ligne |
 | `## Ancres verbatim` | une ligne par ancre : ``- `le texte exact` → chemin/du/fichier`` | un plan **inapplicable** : celui qui l'applique cherche un texte qui n'existe pas et ne peut pas trancher entre un plan faux et un fichier modifié |
@@ -227,7 +227,7 @@ qu'il exige de citer : T4 vérifie qu'un verdict est **rapporté**, pas qu'il es
 mesure pas la seconde moitié du critère de réussite — « les tours de DÉCISION restent ≥ 1 » se
 compte sur une session, pas sur un document.
 
-## Ce que cette fiche NE couvre PAS
+## Hors périmètre de cette fiche
 
 - **Les deux chaînes sont dérivées d'UNE session, sur UN produit, dans UN domaine** — un site
   touristique multilingue. Elles sont **une proposition à confronter, pas un standard.** Le

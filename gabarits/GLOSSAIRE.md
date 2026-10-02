@@ -200,7 +200,7 @@ et JUSTE sur tout le reste.
 attrape la classe qui est passee ici ; il ne lit pas une phrase. Une substitution qui change le
 genre reste une operation qui merite une relecture declaree.
 
-## Ce que ce gabarit n'apporte PAS, et qui se traite ailleurs
+## Hors périmètre de ce gabarit, traité ailleurs
 
 - **Le remplissage.** Un glossaire se remplit par **balayage systématique du vocabulaire servi**,
   jamais au fil des défauts rencontrés : un glossaire constitué par accident porte un terme là où
