@@ -273,7 +273,7 @@ Les noms. La demande ne traverse que le dépôt du demandeur et celui du destina
 
 Si le dossier du destinataire n'est pas sur le poste, la demande reste dans `forge\demandes\`, la restitution le dit, et l'humain la dépose.
 
-Au 01/10/2026, le canal est écrit ici et au tableau de routage de `gabarits\CLAUDE-PRODUIT.md`, et rien ne le joue encore : ni gabarit de demande, ni juge de forme que le demandeur et le destinataire importeraient tous deux, ni détection d'une demande reçue et non enregistrée. N-32 réclame ce juge dès le premier jour ; il est à construire.
+Au 01/10/2026, le canal était écrit ici et au tableau de routage de `gabarits\CLAUDE-PRODUIT.md`, et rien ne le jouait : ni gabarit de demande, ni juge de forme que le demandeur et le destinataire importeraient tous deux, ni détection d'une demande reçue et non enregistrée. Les trois sont construits le 02/10/2026 (TF-1522), sur le modèle du canal comparable déjà outillé (`gabarits\TRAVAUX-PILOT.md` et `gabarits\oracle-travaux-pilot.mjs`) : le gabarit (`gabarits\DEMANDE-PRODUIT.md`), le juge de forme importé des deux côtés (`gabarits\oracle-demande-produit.mjs`, règles D1-D3), et la détection d'une demande reçue sans entrée `demande_recue` au ledger (`scripts\detecter-demandes-recues.mjs`, à jouer par le destinataire à l'ouverture de sa session). Ce que ces trois outils ne font PAS encore : aucun n'est câblé dans `hooks-factory.mjs` ni hérité par `HERITAGE.json` — un produit qui veut la détection automatique à l'ouverture l'appelle lui-même pour l'instant ; le câblage en hook et sa propagation au parc restent une décision de rollout séparée, non tranchée ici.
 
 ### 3 quinquies. Le pilot n'ecrit pas chez un produit, et ce n'est plus une consigne (23/08/2026)
 
