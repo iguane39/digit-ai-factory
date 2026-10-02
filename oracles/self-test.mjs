@@ -1191,7 +1191,10 @@ const LEDGER_COLLISION = [
 const collisionR42 = mkdtempSync(join(tmpdir(), "conf-collision-r42-"));
 ecrireDans(collisionR42, "forge/ledger.jsonl", LEDGER_COLLISION +
   JSON.stringify({ seq: 5, ts: "2026-09-01T20:57:22Z", type: "rectification_horodatage", resume: "collision de seq par sessions concurrentes",
-    entrees: [{ seq: 3, cause: "deux sessions, même queue (2) — seq attribué sans verrou" }, { seq: 4, cause: "même collision, même fenêtre" }] }) + NL_TEST);
+    entrees: [
+      { seq: 3, ts_consigne: "2026-09-01T20:52:00Z", cause: "deux sessions, même queue (2) — seq attribué sans verrou" },
+      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
+    ] }) + NL_TEST);
 check("TF-0794 : une collision de seq NOMMÉE dans entrees[] est [RECTIFIÉ] → PASS, la suite reprend au plus haut seq", () => {
   const { rapport } = lance(collisionR42);
   const r42 = rapport.findings.filter((x) => x.regle === "R-42");
@@ -1217,6 +1220,41 @@ check("TF-0794 borne : sans rectification, les DEUX seq en collision sont des é
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
   if (!f || !/seq 3 là où 5/.test(f.message) || !/seq 4 là où 5/.test(f.message)) throw new Error(`un des deux seq en collision n'est pas dénoncé : ${f && f.message}`);
+});
+
+// ---- TF-1466 (02/10/2026) — DEUX ACCEPTATIONS QUE `ledger.mjs verify` (forge-agents, TF-1425)
+// REFUSE DÉJÀ ET QUE R-42 LAISSAIT PASSER : une rectification SANS ts cité, et une rectification
+// écrite AVANT la collision qu'elle prétend corriger. Mesuré le 28/09 par l'agent « forge-agents » :
+// 2 fixtures sur 8 rendaient PASS ici et FAIL chez `ledger.mjs verify`. --------------------------
+const sansTsR42 = mkdtempSync(join(tmpdir(), "conf-sans-ts-r42-"));
+ecrireDans(sansTsR42, "forge/ledger.jsonl", LEDGER_COLLISION +
+  JSON.stringify({ seq: 5, ts: "2026-09-01T20:57:22Z", type: "rectification_horodatage", resume: "collision de seq par sessions concurrentes",
+    entrees: [
+      { seq: 3, cause: "deux sessions, même queue (2) — seq attribué sans verrou" }, // ts_consigne absent
+      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
+    ] }) + NL_TEST);
+check("TF-1466 rouge : une rectification SANS ts_consigne ni ts_reel_estime n'est pas opposable → FAIL, non [RECTIFIÉ]", () => {
+  const { exit, rapport } = lance(sansTsR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — une rectification sans ts ne doit pas suffire`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 3.*rectification sans ts_consigne ni ts_reel_estime/.test(f.message)) throw new Error(`le défaut de ts n'est pas nommé : ${f && f.message}`);
+  if (/\[RECTIFIÉ\] seq 3 là où/.test(f.message)) throw new Error("la seq 3 est quand même imprimée [RECTIFIÉ] malgré l'absence de ts");
+});
+const avantCollisionR42 = mkdtempSync(join(tmpdir(), "conf-avant-collision-r42-"));
+ecrireDans(avantCollisionR42, "forge/ledger.jsonl", LEDGER_COLLISION +
+  JSON.stringify({ seq: 5, ts: "2026-09-01T20:57:22Z", type: "rectification_horodatage", resume: "collision de seq par sessions concurrentes",
+    entrees: [
+      // ts_consigne POSTÉRIEUR au ts de la rectification elle-même (20:57:22Z) : la rectification
+      // aurait été écrite AVANT le fait qu'elle prétend corriger.
+      { seq: 3, ts_consigne: "2026-09-01T21:30:00Z", cause: "deux sessions, même queue (2) — seq attribué sans verrou" },
+      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
+    ] }) + NL_TEST);
+check("TF-1466 rouge : une rectification datée AVANT la collision qu'elle corrige → FAIL, non [RECTIFIÉ]", () => {
+  const { exit, rapport } = lance(avantCollisionR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — une rectification antérieure à son fait ne doit pas suffire`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 3.*pas postérieure à la collision/.test(f.message)) throw new Error(`l'antériorité n'est pas nommée : ${f && f.message}`);
+  if (/\[RECTIFIÉ\] seq 3 là où/.test(f.message)) throw new Error("la seq 3 est quand même imprimée [RECTIFIÉ] malgré une rectification antérieure à son fait");
 });
 
 // ---- fixtures R-42 INSTANTS (TF-1422/TF-1423, 25/09/2026, RA-1/RS-2) : comparer des CHAÎNES ISO
