@@ -72,6 +72,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` | fichier | 17,3 Ko | La boîte d'entrée est vide, 15 todos sont clos, et une campagne travaille encore |
 | `Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` | fichier | 17,5 Ko | Vos trois décisions sont exécutées, et la question que vous n'avez pas pu lire est reposée |
 | `Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md` | fichier | 13,7 Ko | La branche du pilot est fusionnée dans une branche locale, harnais vert : il reste votre a |
+| `Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` | fichier | 11,7 Ko | Synthèse Mandat — votre décision D-55 (a) est exécutée : les 8 améliorations des pages de  |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` | fichier | 22,6 Ko | Synthèse de mandat — les retours en attente sont entrés au registre et la campagne des cin |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md` | fichier | 30,0 Ko | Campagne des todos et retours du 20/09/2026 : 18 items décidés clos sur preuve rejouée, 18 |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md` | fichier | 17,6 Ko | Point d'étape — campagne des todos et retours : 17 items clos au registre, 8 constats entr |
@@ -248,4 +249,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_231 fichier(s), 0 sous-dossier(s)_
+_232 fichier(s), 0 sous-dossier(s)_
