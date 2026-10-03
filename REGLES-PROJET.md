@@ -650,6 +650,17 @@ exactement le défaut**. Étude : `output\03-etudes\20260817-etude-opportunite-p
    `explicite`) et rend FAIL dès qu'un enregistrement `explicite` est présent, sauf GO
    déclaré (`--go "<motif>"`) ; le hook `pre-push` du pilot le joue avant la porte des
    noms, le GO se déclare par `FORGE_PUSH_GO="D-N (x) du JJ/MM"`.
+6. **GO permanent de push pour les forges (D-53 (b), 03/10/2026).** Le dépôt d'une
+   **forge** (les 13 `digit-ai-forge-*`) se pousse sans GO humain par envoi : la session
+   déclare `FORGE_PUSH_GO="D-53 (b) du 03/10"` et la garde pre-push du dépôt juge seule.
+   Restent exigés : la garde rend PASS (porte des noms comprise), et seul part ce qui est
+   déjà committé — le travail non committé d'une autre session ne se committe pas pour
+   pousser. Hors de ce paragraphe, inchangés : le pilot, le canal `_confidentiel`,
+   `digit-ai-queue` et les produits (GO par envoi) ; le §1 (services hébergés). *Pourquoi* :
+   le 03/10, une demande humaine « synchronise avec github » a été lue comme couvrant le
+   seul pilot, et forge-design a été reposée en décision (D-52) ; réponse humaine à la
+   question « pourquoi ce genre de décisions me revient encore ? » : 53b. Le noyau
+   (§Garde-fous) porte la même extension du mandat permanent des forges (17/09).
 
 **Appelants (R-35)** : le garde-fou du noyau (`CLAUDE.md` §Garde-fous) et
 `gabarits\CLAUDE-PRODUIT.md` §Conventions (toute session produit le charge) ; la FORME
