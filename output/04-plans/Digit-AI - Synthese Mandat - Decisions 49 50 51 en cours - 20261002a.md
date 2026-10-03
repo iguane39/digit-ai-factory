@@ -6,19 +6,19 @@ destinataire: humain
 
 ## 0. Synthèse d'ouverture
 
-Vos trois décisions sont en œuvre. Les 5 retours des deux lots refusés sont entrés au registre, et la cause de leur refus est remontée aux 2 produits, comme vous l'avez demandé. Le circuit de recette hébergée du pilot est actif et publié. Sa première exécution a révélé 9 recettes en défaut, propres à Linux ; elles sont corrigées et vertes dans un conteneur Linux, et la correction attend sa publication, que vous avez demandée en fin de travail. La campagne sur les candidatures a donné une fiche de décision à chacune des 201 : 46 vous reviennent, les 155 autres s'exécutent sans vous, et 9 agents y travaillent. À 10:20, 6 forges, une partie de la septième et 3 des 4 lots du pilot ont rendu leur travail : 73 décisions corrigées, chacune avec son contrôle rouge puis vert. Un agent a supprimé par erreur un remisage temporaire d'un autre agent ; vos deux remisages sont intacts, et la consigne d'arrêt a été donnée. Rien n'est attendu de vous avant la fin de la campagne.
+Vos trois décisions sont en œuvre. Les 5 retours des deux lots refusés sont entrés au registre, et la cause de leur refus est remontée aux 2 produits, comme vous l'avez demandé. Le circuit de recette hébergée du pilot est actif et publié. Sa première exécution a révélé 9 recettes en défaut, propres à Linux ; elles sont corrigées et vertes dans un conteneur Linux, et la correction attend sa publication, que vous avez demandée en fin de travail. La campagne sur les candidatures a donné une fiche de décision à chacune des 201 : 46 vous reviennent, les 155 autres s'exécutent sans vous, et 9 agents y travaillent. À 11:28, 86 décisions sont closes au registre, chacune avec son contrôle rouge puis vert ; les 4 lots du pilot sont fusionnés dans la branche principale, et une règle bloquante neuve qu'un agent avait écrite en a été retirée, parce qu'une règle neuve vous revient. Un agent a supprimé par erreur un remisage temporaire d'un autre agent ; vos deux remisages sont intacts, et la consigne d'arrêt a été donnée. Rien n'est attendu de vous avant la fin de la campagne.
 
 ## 1. En-tête d'identification
 
 - **quoi** — point d'étape : exécution de vos réponses « 49a, 50a, 51a », de votre demande de remonter la cause du refus aux produits, et première vague de la campagne sur les candidatures ; son résultat n'est pas encore mesurable.
 - **sur quoi** — le pilot `digit-ai-factory` ; les forges `digit-ai-forge-ops`, `-conception`, `-data`, `-design`, `-tests` et `-audit` (commits locaux) ; les boîtes de travaux de 2 produits (Produit-12 et Produit-02, `input/00-travaux/`) ; GitHub Actions du pilot.
-- **quand** — 2026-10-02 10:20 UTC+02:00 (Europe/Paris), heure relevée par `date` ; début à 07:22, à la réception de votre réponse ; durée mesurée depuis 07:22.
+- **quand** — 2026-10-02 11:28 UTC+02:00 (Europe/Paris), heure relevée par `date` ; début à 07:22, à la réception de votre réponse ; durée mesurée depuis 07:22.
 - **qui** — session de pilotage Claude Opus 5.5 (`claude-opus-5-5[1m]`) ; pilot de `f82270f2` à `9299a170` ; 8 agents de fiches et 9 agents d'exécution Sonnet 5 (routage par défaut, escalade : aucune) ; oracles joués : `ingerer-lot`, `oracle-boite-entree`, `simuler-recette-hebergee`, `oracles/self-tests.mjs`, `todo/self-test.mjs`, `oracle-todo`, `revue-hebdo --self-test`, `oracle-synthese`.
 - **intention** — que vos trois décisions produisent leur effet, que les produits apprennent pourquoi leurs lots ont été refusés, et que le stock de candidatures se réduise sans vous poser ce qui ne vous revient pas. **Test rétro** : servie pour les deux premières décisions et pour la remontée aux produits, en cours pour la campagne, dont le résultat se mesurera aux clôtures.
 
 ## 2. Ce qui reste à mesurer, et par quoi
 
-Le nombre des 153 décisions de la campagne effectivement closes, chacune avec son contrôle rouge puis vert, mesuré par `node todo/oracle-todo.mjs` après l'écriture des résultats des agents ; et le verdict de la recette hébergée sur la correction Linux, mesuré par `gh run watch` après la publication de fin de travail.
+Le nombre des 67 décisions de la campagne encore ouvertes qui seront closes, chacune avec son contrôle rouge puis vert, mesuré par `node todo/oracle-todo.mjs` après l'écriture des résultats des agents ; et le verdict de la recette hébergée sur la correction Linux, mesuré par `gh run watch` après la publication de fin de travail.
 
 ## 3. Décisions attendues de l'humain
 
@@ -26,8 +26,9 @@ Aucune décision attendue de l'humain dans ce tour. Les 46 propositions qui vous
 
 Inventaire des bloquants — ce qui est bloqué, ce qui le lève, et ce qui se passe sinon :
 
-- la clôture des 153 décisions de la campagne : la fin des 9 agents en cours, puis d'une seconde vague sur la moitié restante de forge-agents ; sans elle, elles restent décidées et ouvertes au registre ;
+- la clôture des 67 décisions restantes : la fin des 2 agents en cours, puis d'une seconde vague sur la moitié restante de forge-agents ; sans elle, elles restent décidées et ouvertes au registre ;
 - le verdict de la recette hébergée sur la correction Linux : la publication que vous avez demandée en fin de travail ; sans elle, le circuit public reste rouge sur sa dernière exécution.
+- la resynchronisation de la copie installée des skills : la fin des agents qui écrivent dans forge-agents ; sans elle, le contrôle des skills reste rouge sur ce poste.
 
 ## 4. Traité — avec sa preuve
 
@@ -61,6 +62,18 @@ Inventaire des bloquants — ce qui est bloqué, ce qui le lève, et ce qui se p
   - preuve : branche `worktree-agent-a576abdf8d21a41a4` à `c3c2d8ec` ; `todo/self-test.mjs` 58 PASS 0 FAIL ; `oracles/self-tests.mjs` sans défaut hors `oracle-skills`, qui constate la copie locale des skills désynchronisée, état antérieur.
 - **Pilot, deuxième lot, contrôle rouge → vert par item** : 14 décisions corrigées sur sa branche, 4 bloquées avec leur motif (2 visent une forge, 1 un produit, 1 non reproduit en 20 rejeux).
   - preuve : branche `worktree-agent-a02b36b293d32cca1` à `f9a80766` ; dans son arbre, `oracles/self-tests.mjs` rend 3 défauts sur 173 et `todo/self-test.mjs` 56 PASS 2 FAIL, que l'agent attribue au dépôt frère introuvable depuis un arbre imbriqué ; ces harnais rendaient exit 0 dans l'arbre principal, je les y rejouerai après fusion.
+- **Fusion des 4 lots du pilot** : 4 branches fusionnées une à une après relecture de leur diff ; conflits résolus sur le script de recopie d'héritage, le contrat d'héritage (passé en version 1.15.0 pour porter les 2 évolutions concurrentes), le catalogue des gabarits, le crochet de restitution et leurs recettes.
+  - preuve : commits `286603c7`, `e3baf419`, `eca622a8`, `fe5e92d2` ; `recopier-heritage.test` 20 PASS, `hook-restitution.test` 42/42, `oracle-gabarits-documents --self-test` 44/44, `oracle-empreintes` PASS, `todo/self-test.mjs` 58 PASS 0 FAIL, `oracle-todo` PASS.
+- **Écarts de doctrine retirés à la fusion** : la règle bloquante de revue de lecture (TF-1372) est retirée, le reformatage du gabarit de restitution (TF-1534) écarté de la fusion, puis rejoué par la seconde vague sur le texte fusionné.
+  - preuve : commit `3a38e453` ; `oracles/self-test.mjs` 130 PASS 0 FAIL après retrait.
+- **78 clôtures au registre**, chacune avec ses gains mesurés et sa descente : forges audit (9), tests (7), ops (1), conception (1), data (1), design (2), et les 4 lots du pilot (57).
+  - preuve : `node todo/journaliser.mjs` → « 163 événement(s) » puis « 12 événement(s) », verdict PASS avant et après ; commit `76d166ce`.
+- **Seconde vague, forge-audit et forge-tests, contrôle rouge → vert par item** : 4 décisions corrigées (TF-1345, TF-1346, TF-1351, TF-1347) — la veille des dépendances lit les espaces de travail et nomme le bon remplaçant, la fiche du pack de conformité est livrée au format que son imprimeur accepte, et les routes imbriquées ne produisent plus 3 faux liens cassés.
+  - preuve : forge-audit `0b76c7d4`, recettes 196 PASS et 1 cas non joué motivé, harnais 13/13 ; forge-tests `722cda5a`, 1 451 tests verts, recette du corpus tenue ; registre « 8 événement(s) », verdict PASS.
+- **Seconde vague au pilot, contrôle rouge → vert par item** : 4 décisions corrigées — les 4 textes qui citaient un compte de portes de mise en production périmé renvoient au document de référence (TF-1527), la citation de règle erronée est corrigée (TF-1410), le gabarit de restitution tient un paragraphe par ligne à contenu identique (TF-1534), et le générateur de pages d'étude rend une page que le socle accepte (TF-1566).
+  - preuve : commits `574a6641`, `3b7e75f7`, `6c8267d0`, `5beb038b` ; noyau sous plafond, `oracle-claude-md` PASS ; gabarit 1 150 → 553 lignes, 0 différence de contenu sur 115 248 caractères ; page d'étude : 9 → 0 échecs au contrôle de page et 3 → 0 sommaires perdus, self-test du générateur 15 → 22 cas ; `todo/self-test.mjs` 58 PASS ; registre « 8 événement(s) », PASS, commit `634cf601`.
+- **Régression du juge des restitutions corrigée, contrôle rouge → vert** : le durcissement d'une règle par un agent refusait toute restitution sans décision qui portait l'inventaire des bloquants, pourtant exigé par une autre règle, et ne reconnaissait plus l'ouverture « Aucune décision » de la forme prescrite (TF-1571).
+  - preuve : commits `4b9da686` et `3f16275f` ; self-test du juge 114/114, dont 2 cas neufs dans les deux sens ; 12 synthèses récentes rejugées, 12 PASS, dont une que le juge fusionné refusait et que le juge d'avant acceptait.
 - **Incident maîtrisé** : un agent a supprimé un remisage temporaire d'un autre agent, la pile étant commune aux arbres du pilot.
   - preuve : `git stash list` → vos 2 remisages intacts ; consigne d'arrêt envoyée aux 3 agents du pilot encore actifs ; la fusion de chaque branche contrôlera qu'elle ne porte que ses propres changements.
 - **Vérifications de clôture déjà rendues** : 12 clôtures prouvées par rejeu de leur oracle ; 3 fiches réfutées, qui restent ouvertes (TF-1410, TF-1530, TF-1487).
@@ -68,7 +81,9 @@ Inventaire des bloquants — ce qui est bloqué, ce qui le lève, et ce qui se p
 
 ## 5. Non traité — avec son motif
 
-- La clôture des 153 décisions de la campagne — motif : `dependance_externe`, 9 agents en cours, puis une seconde vague sur forge-agents.
+- La clôture des 67 décisions restantes de la campagne — motif : `dependance_externe`, 2 agents de la première vague tournent encore (forge-agents, clôtures sur preuve) ; la seconde moitié de forge-agents suivra.
+- La décision sur la règle bloquante de revue de lecture — motif : `decision`, elle sera posée à la revue hebdomadaire, motif doctrine.
+- La resynchronisation de la copie installée des skills — motif : `dependance_externe`, après la fin des agents de forge-agents.
 - La publication de la correction Linux et des commits de la campagne — motif : `dependance_externe`, vous l'avez demandée en fin de travail.
 - La création des 3 classes proposées par les lots du jour — motif : `decision`, elles figurent parmi les 46 propositions de la revue hebdomadaire.
 - Les 4 décisions bloquées du troisième lot du pilot — motif : `hors_mandat`, elles visent une forge ou un produit ; elles seront réaffectées à leur dépôt à la fin de la vague.
@@ -99,7 +114,7 @@ Les actions sont triées dans l'ordre où elles deviennent possibles ; aucune n'
 
 | Sél. | Action | Acteur | Id | Motif | Si rien n'est fait |
 |---|---|---|---|---|---|
-| **A-1** | Relire les résultats des agents restants, fusionner les branches du pilot une à une après contrôle de leur diff, puis écrire leurs clôtures au registre par `todo/journaliser.mjs` | `auto_ia` | neuve | `dependance_externe` — les agents tournent | les décisions restent ouvertes |
+| **A-1** | Relire les résultats des 2 agents en cours et écrire leurs clôtures au registre par `todo/journaliser.mjs` | `auto_ia` | neuve | `dependance_externe` — les agents tournent | 67 décisions restent ouvertes |
 | **A-2** | Lancer la seconde vague sur la moitié restante de forge-agents, TF-1487 compris | `auto_ia` | neuve | `dependance_externe` — après la première moitié, même dépôt | 20 décisions restent ouvertes |
 | **A-3** | Rejouer les harnais du pilot et des forges touchées, puis publier le pilot et les forges, enfin suivre la recette hébergée par `gh run watch` | `auto_ia` | TF-1571 | `dependance_externe` — votre demande de publier en fin de travail | le circuit public reste rouge |
 | **A-4** | Rendre la restitution complète de la campagne, et le dossier de revue des 46 propositions qui vous reviennent | `auto_ia` | neuve | `dependance_externe` — après les clôtures | la revue de la semaine prochaine part sans dossier |
@@ -108,7 +123,7 @@ Les actions sont triées dans l'ordre où elles deviennent possibles ; aucune n'
 
 - Commits du pilot : `0988b7fa`, `0ab55f68` (publiés), `287e1710`, `9299a170` (locaux).
 - Forges : `digit-ai-forge-ops` `a1cc64a`, `1e1390f` ; `digit-ai-forge-conception` `cf00fc5` ; `digit-ai-forge-data` `50f141c` ; `digit-ai-forge-design` `2f99611`, `117d1f8` ; `digit-ai-forge-tests` `6c095ce` à `81377c9` ; `digit-ai-forge-audit` `fcc0272` à `ea3d646` (locaux).
-- Branches du pilot : `worktree-agent-a30d86c0476355e71` (`693c2d48`), `worktree-agent-a576abdf8d21a41a4` (`c3c2d8ec`) et `worktree-agent-a02b36b293d32cca1` (`f9a80766`), non fusionnées.
+- Fusions au pilot : `286603c7`, `e3baf419`, `eca622a8`, `fe5e92d2` ; retrait de règle `3a38e453` ; clôtures `76d166ce` (locaux).
 - Forge-agents : `dc64465`, `cafa2d5`, `9fdb71d` (locaux).
 - Registre : `todo/TODO.jsonl`, TF-1563 à TF-1571 créées, 201 fiches et 157 décisions consignées.
 - Lots de travaux : `input/00-travaux/pilot - TRAVAUX - 20261002a.md`, chez les 2 produits.

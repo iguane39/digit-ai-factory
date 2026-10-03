@@ -299,7 +299,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 2a 3a 5a executees 4b et 6b en cours - 20260920f.md | 20260920f | 15.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 2a 3a 5a executees 4b et 6b en cours - 20260920f.md` |
 | Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md | 20261001c | 21.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |
-| Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md | 20261002a | 18.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` |
+| Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md | 20261002a | 19.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` |
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
 | Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md | 20260925g | 26.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` |
 | Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md | 20261001h | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md` |
