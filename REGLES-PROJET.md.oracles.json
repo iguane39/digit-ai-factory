@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\REGLES-PROJET.md",
-  "date_iso": "2026-10-02T07:20:10.840Z",
+  "cible": "c:\\dev\\digit-ai-factory\\REGLES-PROJET.md",
+  "date_iso": "2026-10-03T10:25:24.046Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -81,9 +81,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "REGLES-PROJET.md",
-    "ts": "2026-10-02T07:20:10.840Z",
+    "ts": "2026-10-03T10:25:24.044Z",
     "fichiers": {
-      "REGLES-PROJET.md": "c62fde7cebcac98c65d0881212068da288c74eaae2f5f4523c29f87a6cb12979"
+      "REGLES-PROJET.md": "8ffcf34becd90e4d173429c831051c3672740fca202c7888f32c4a438bdd89f4"
     }
   },
   "empreinte_motif": null,
