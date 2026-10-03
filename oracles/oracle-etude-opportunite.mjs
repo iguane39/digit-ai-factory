@@ -71,6 +71,16 @@ function juger(texte) {
       : ok("E2", `${lignesNR.length} ligne(s) de non-recouvrement, toutes citées`);
   }
 
+  // DATES RECONNUES (D-55 (a) du 03/10/2026, Produit-02 RT-125). LE FAIT : une étude datait ses 5
+  // sources « 13/03/2026 », « 23/09/2026 »… et son plan de revue « le 15/10/2026 », la convention
+  // de date française des livrables. E3 rendait « 0 source(s) datée(s) » et E7 « plan de revue
+  // absent ou non daté » : les deux motifs n'acceptaient que l'année EN TÊTE, et le produit a
+  // réécrit ses dates en AAAA-MM-JJ pour passer, contre sa propre convention. Les deux formes sont
+  // reconnues par une seule alternative : une date n'est comptée qu'une fois.
+  const DATE_SRC = String.raw`(?:\b20\d{2}[-/.]?\d{2}(?:[-/.]?\d{2})?\b|\b(?:0?[1-9]|[12]\d|3[01])/(?:0?[1-9]|1[0-2])/20\d{2}\b)`;
+  const RE_DATE_G = new RegExp(DATE_SRC, "g");
+  const RE_PLAN_DATE = new RegExp(String.raw`plan de revue[^\n]*` + DATE_SRC, "i");
+
   // E3 — sources datées ou « non instruit » motivé
   // TF-1435 (28/09/2026, retour Produit-78 20260928a RP-1) : LE FAIT MESURÉ. Une 2e mention de
   // « état de l'art » dans la PHRASE D'INTRODUCTION de la section (« Cet état de l'art recense… »)
@@ -83,7 +93,7 @@ function juger(texte) {
   // `##` et ne peut donc plus se faire passer pour une 2e section.
   const blocEA = (texte.split(/^##[^\n]*(?:état de l'art|etat de l'art)[^\n]*$/im)[1] || "").split(/\n## /)[0];
   const nonInstruit = /non instruit/i.test(blocEA);
-  const datees = (blocEA.match(/\b(20\d{2}[-/.]?\d{2}([-/.]?\d{2})?)\b/g) || []).length;
+  const datees = (blocEA.match(RE_DATE_G) || []).length;
   if (nonInstruit && /non instruit[^\n]{6,}/i.test(blocEA))
     ok("E3", "état de l'art déclaré « non instruit », motivé — jamais d'entre-deux");
   else if (nonInstruit) ko("E3", "« non instruit » sans motif");
@@ -113,7 +123,7 @@ function juger(texte) {
     : ok("E6", "aucun critère subjectif nu");
 
   // E7 — plan de revue daté
-  /plan de revue[^\n]*\b20\d{2}[-/.]?\d{2}[-/.]?\d{2}\b/i.test(texte)
+  RE_PLAN_DATE.test(texte)
     ? ok("E7", "plan de revue daté")
     : ko("E7", "plan de revue absent ou non daté — un verdict sans rendez-vous avec les faits ne se corrige jamais");
 
@@ -184,6 +194,12 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
     .replace("Coût : complexité moyen · durée court ; dette nulle.", "Coût : 2-3 j.") // estimation en jours
     .replace("## Intention de l'utilisateur", "## Contexte") // intention absente (E9)
     .replace("- Test rétro : chaque élément du verdict remonte à l'intention — remontée écrite, aucune rupture.\n", ""); // test rétro absent (E10)
+  // RT-125 : la même verte, dates écrites JJ/MM/AAAA ; E3 compte toujours 5 sources, E7 voit le plan.
+  const verteFr = verte
+    .replace("Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X (2025-11-30) · revue Y (2026-05-02).",
+      "Sources : ADR (01/03/2025) · RFC (11/06/2025) · DACI (08/01/2026) · gabarit X (30/11/2025) · revue Y (02/05/2026).")
+    .replace("- Plan de revue : 2026-09-13.", "- Plan de revue : le 13/09/2026.");
+  writeFileSync(join(dir, "verte-fr.md"), verteFr, "utf8");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   const moi = fileURLToPath(import.meta.url);
@@ -202,6 +218,9 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
     if (!/"E2"[^}]*PASS[^}]*1 ligne\(s\) de non-recouvrement, toutes cit/.test(rv.stdout))
       casse.push("la verte (non-recouvrement mentionné 2 fois) ne retrouve plus sa ligne citée sur E2 — la 2e mention (dans l'intro de section) recoupe encore le bloc lu");
   }
+  const rf = spawnSync(process.execPath, [moi, join(dir, "verte-fr.md")], { encoding: "utf8" });
+  if (rf.status !== 0 || !/"E3"[^}]*PASS[^}]*5 source\(s\) dat/.test(rf.stdout) || !/"E7"[^}]*PASS/.test(rf.stdout))
+    casse.push("la verte aux dates JJ/MM/AAAA (RT-125) ne passe pas E3 à 5 sources et E7 : " + rf.stdout.slice(0, 300));
   if (rr.status !== 1) casse.push("la fixture ROUGE (citation vidée, sources réduites) ne FAIL pas");
   else {
     if (!/"E2"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge échoue mais pas sur E2");
@@ -213,7 +232,7 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
     if (!/"E9"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (intention retirée) échoue mais pas sur E9");
     if (!/"E10"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (test rétro retiré) échoue mais pas sur E10");
   }
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 2/2 PASS (verte PASS malgré une 2e mention du mot de section dans l'intro de E2 et E3 — TF-1435 ; rouge FAIL sur E2, E3, E8, E9 et E10)");
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 3/3 PASS (verte aux dates JJ/MM/AAAA PASS — RT-125 ; verte PASS malgré une 2e mention du mot de section dans l'intro de E2 et E3 — TF-1435 ; rouge FAIL sur E2, E3, E8, E9 et E10)");
   process.exit(casse.length ? 1 : 0);
 }
 

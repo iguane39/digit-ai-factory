@@ -112,5 +112,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261001-etude-resultats-rejeu-opus-5-5.md` | fichier | 13,7 Ko | Résultats du rejeu figé du passage à Opus 5.5 : effort et modèle par classe de tâche (2026 |
 | `20261001-L99-etude-textes-relance.md` | fichier | 13,8 Ko | Analyse L99 — relance de l'étude sur les textes affichés en session |
 | `20261001-L99-textes-affiches-en-session.md` | fichier | 14,2 Ko | Analyse L99 — étude d'opportunité sur les textes affichés en session Claude Code |
+| `20261003-etude-opportunite-pages-html-indicateurs.md` | fichier | 16,3 Ko | Étude d'opportunité — pages HTML de données : indicateurs, graphiques, infobulles et juste |
 
-_96 fichier(s), 0 sous-dossier(s)_
+_97 fichier(s), 0 sous-dossier(s)_
