@@ -1,6 +1,6 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\CLAUDE.md",
-  "date_iso": "2026-10-02T08:44:19.907Z",
+  "date_iso": "2026-10-03T10:25:42.222Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "CLAUDE.md",
-    "ts": "2026-10-02T08:44:19.907Z",
+    "ts": "2026-10-03T10:25:42.222Z",
     "fichiers": {
-      "CLAUDE.md": "f091d54f52f6a908811ccb17f5b2449c7747b6a829cb99583d334ef04b2575d5"
+      "CLAUDE.md": "fa51e3450055f907d04263c188a2ba5e2dc63aa684f43fca08bc798e5961d61e"
     }
   },
   "empreinte_motif": null,
