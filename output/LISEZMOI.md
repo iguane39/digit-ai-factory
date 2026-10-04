@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 387 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 388 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -337,6 +337,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md | 20260830m | 14 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` |
 | Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md | 20260907d | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md` |
 | Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md | 20260907f | 16 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md` |
+| Digit-AI - Synthese Mandat - Lots refuses traites et huit corrections closes - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites et huit corrections closes - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md | 20260907c | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md` |
 | Digit-AI - Synthese Mandat - Modele corrige et familles outillees - 20260914e.md | 20260914e | 20.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Modele corrige et familles outillees - 20260914e.md` |
 | Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md | 20260901c | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` |

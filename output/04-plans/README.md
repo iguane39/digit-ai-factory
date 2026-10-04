@@ -147,6 +147,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` | fichier | 14,0 Ko | Synthèse de mandat — le lexique d'invocation redevient actif, à la prochaine session (30/0 |
 | `Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md` | fichier | 14,9 Ko | Synthèse de mandat — décision D-5 (a) exécutée : le lot L1 livré chez la forge des données |
 | `Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md` | fichier | 16,0 Ko | Synthèse de mandat — décision D-8 (a) et GO A-24 à A-26 exécutés : la forge des données pu |
+| `Digit-AI - Synthese Mandat - Lots refuses traites et huit corrections closes - 20261004b.md` | fichier | 7,4 Ko | Synthèse Mandat — votre décision D-57 (a) est exécutée : les 2 lots de Produit-02 sont ent |
 | `Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md` | fichier | 9,5 Ko | Synthèse de mandat — décisions D-3 (a) et D-4 (b) exécutées : les huit candidatures de la  |
 | `Digit-AI - Synthese Mandat - Modele corrige et familles outillees - 20260914e.md` | fichier | 20,6 Ko | Synthèse de mandat — le modèle de référence est corrigé et prouvé, trois familles sont out |
 | `Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` | fichier | 12,2 Ko | Synthèse de mandat — la mutation devient une porte, et une page de doctrine cessait d'avoi |
@@ -250,4 +251,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_233 fichier(s), 0 sous-dossier(s)_
+_234 fichier(s), 0 sous-dossier(s)_
