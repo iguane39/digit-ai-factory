@@ -143,6 +143,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-02 - RETOURS - 20260922a.tf.jsonl` | fichier | 12,4 Ko | 7 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261001a.md` | fichier | 8,8 Ko | Retours forges — Produit-02 — 20261001a |
 | `Produit-02 - RETOURS - 20261001a.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261001b.md` | fichier | 35,2 Ko | Retours forges — Produit-02 — 20261001b |
+| `Produit-02 - RETOURS - 20261001b.tf.jsonl` | fichier | 26,6 Ko | 16 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261003a.md` | fichier | 5,7 Ko | Retours forges — Produit-02 — 20261003a |
+| `Produit-02 - RETOURS - 20261003a.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261003b.md` | fichier | 14,5 Ko | Retours forges — Produit-02 — 20261003b |
+| `Produit-02 - RETOURS - 20261003b.tf.jsonl` | fichier | 12,1 Ko | 8 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20260928a.md` | fichier | 5,7 Ko | Retours forges — Produit-03 — 20260928a |
 | `Produit-03 - RETOURS - 20260928a.tf.jsonl` | fichier | 2,8 Ko | 2 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20260929a.md` | fichier | 6,3 Ko | Retours forges — Produit-03 — 20260929a |
@@ -239,6 +245,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-12 - RETOURS - 20260906b.tf.jsonl` | fichier | 9,0 Ko | 3 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261001a.md` | fichier | 10,2 Ko | Retours forges — Produit-12 — 20261001a |
 | `Produit-12 - RETOURS - 20261001a.tf.jsonl` | fichier | 6,1 Ko | 4 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261001b.md` | fichier | 7,0 Ko | Retours forges — Produit-12 — 20261001b |
+| `Produit-12 - RETOURS - 20261001b.tf.jsonl` | fichier | 2,7 Ko | 2 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261002a.md` | fichier | 9,3 Ko | Retours forges — Produit-12 — 20261002a |
+| `Produit-12 - RETOURS - 20261002a.tf.jsonl` | fichier | 4,6 Ko | 3 ligne(s) JSONL |
 | `Produit-61 - Rapport d'audit - 20260909a.html` | fichier | 359,8 Ko | Digit-AI — Rapport d'audit — Rapport d'audit — Produit-61 |
 | `Produit-61 - Rapport d'audit - 20260909a.remediation-actions.yaml` | fichier | 57,2 Ko | YAML |
 | `Produit-61 - RETOURS - 20260905a.md` | fichier | 11,6 Ko | Retours forges — Produit-61 — 20260905a |
@@ -441,4 +451,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `UIA - RETOURS - 20260924c.md` | fichier | 3,7 Ko | Retours forges — UIA (Produit-72) — 20260924c |
 | `UIA - RETOURS - 20260924c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_422 fichier(s), 2 sous-dossier(s)_
+_432 fichier(s), 2 sous-dossier(s)_
