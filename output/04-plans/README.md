@@ -55,6 +55,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - 4 decisions executees et etude des reseaux sociaux elargie - 20260921g.md` | fichier | 13,5 Ko | Vos 4 décisions sont exécutées : 2 forges publiées, 2 travaux clos, et l'étude des réseaux |
 | `Digit-AI - Synthese Mandat - 6 lots ingeres et 2 oracles nes de leurs classes - 20260922a.md` | fichier | 30,1 Ko | Digit-AI — Synthèse de mandat — 6 lots de retours ingérés et 2 oracles nés de leurs classe |
 | `Digit-AI - Synthese Mandat - 6 objets des reseaux sociaux construits et 1 decision - 20260921h.md` | fichier | 13,8 Ko | Les 6 objets du verdict des réseaux sociaux sont construits et vérifiés ; il reste à publi |
+| `Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` | fichier | 9,9 Ko | Synthèse Mandat — votre décision D-56 est exécutée : le sas est vide, 1 lot sur 5 est entr |
 | `Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` | fichier | 15,3 Ko | Synthèse de mandat — actions 31, 32 et 33 achevées : la forge de développement est publiée |
 | `Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` | fichier | 23,3 Ko | Synthèse de mandat — actions 36 à 40 achevées : deux lots instruits et publiés, les branch |
 | `Digit-AI - Synthese Mandat - Affichage double corrige et revue hebdomadaire - 20261001e.md` | fichier | 9,9 Ko | Synthèse Mandat — affichage double de la réponse corrigé, et revue hebdomadaire accélérée  |
@@ -249,4 +250,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_232 fichier(s), 0 sous-dossier(s)_
+_233 fichier(s), 0 sous-dossier(s)_
