@@ -45,6 +45,7 @@ import { spawnSync } from "node:child_process";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "./lib-empreinte.mjs";
+import { estDepotEcosysteme } from "./lib-parc.mjs";
 import { PROFONDEUR_MAX, SAUTES } from "../todo/localiser-produit.mjs";
 // TF-1471 (28/09/2026, campagne D-32 (a)) — mêmes helpers que R-13/R-27 d'oracle-conformite-projet.mjs
 // (TF-1439) : un seul endroit sait lire `type_projet: documentaire` et confronter la déclaration
@@ -56,8 +57,13 @@ const PILOT = join(ICI, "..");
 const args = process.argv.slice(2);
 const racine = process.env.FORGE_ROOT || join(PILOT, "..");
 
-/** Les dépôts du pilot et des forges ne sont pas des produits : ils ne reçoivent pas l'héritage. */
-const PAS_UN_PRODUIT = /^(digit-ai|_archive-)/i;
+/**
+ * Les dépôts du pilot et des forges ne sont pas des produits : ils ne reçoivent pas l'héritage.
+ * Les produits de l'écosystème (`PRODUITS_DE_L_ECOSYSTEME` de lib-parc) en sont, malgré leur
+ * préfixe : le 12/10/2026, le préfixe seul tenait digit-ai-marketing hors du parc, et un constat
+ * qui lui était confié (TF-1023) sortait orphelin à l'émission des travaux.
+ */
+const PAS_UN_PRODUIT = { test: (nom) => /^_archive-/i.test(nom) || estDepotEcosysteme(nom) };
 
 const enfants = (d) => {
   try { return readdirSync(d, { withFileTypes: true }).filter((x) => x.isDirectory()); }

@@ -133,6 +133,18 @@ try {
     att(!p.some((x) => x.includes("digit-ai-forge-tests")), "une forge figure au relevé");
   });
 
+  check("un PRODUIT de l'écosystème (digit-ai-marketing) est relevé : le préfixe digit-ai ne fait pas une forge", () => {
+    const P = mkdtempSync(join(tmpdir(), "heritage-eco-"));
+    try {
+      mkdirSync(join(P, "digit-ai-marketing", "forge"), { recursive: true });
+      mkdirSync(join(P, "digit-ai-factory", "forge"), { recursive: true });
+      mkdirSync(join(P, "digit-ai-forge-tests", "forge"), { recursive: true });
+      const p = produitsDuParc(P);
+      att(p.some((x) => x.endsWith("digit-ai-marketing")), "le produit digit-ai-marketing n'est pas relevé");
+      att(p.length === 1, `le pilot ou une forge figure au relevé (${p.length} trouvés)`);
+    } finally { rmSync(P, { recursive: true, force: true }); }
+  });
+
   check("on ne descend pas SOUS un produit : ses sous-dossiers ne sont pas des produits", () => {
     const dedans = join(conforme, "sous-module");
     mkdirSync(join(dedans, "forge"), { recursive: true });
