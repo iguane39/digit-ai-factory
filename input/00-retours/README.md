@@ -450,6 +450,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-78 - RETOURS - 20260928g.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
 | `Produit-78 - RETOURS - 20260928h.md` | fichier | 3,4 Ko | Retours forges — Produit-78 — 20260928h |
 | `Produit-78 - RETOURS - 20260928h.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-79 - RETOURS - 20261007a.md` | fichier | 8,5 Ko | Retours forges — Produit-79 — 20261007a |
+| `Produit-79 - RETOURS - 20261007a.tf.jsonl` | fichier | 10,4 Ko | 10 ligne(s) JSONL |
+| `Produit-79 - RETOURS - 20261007e.md` | fichier | 6,4 Ko | Retours forges — Produit-79 — 20261007e |
+| `Produit-79 - RETOURS - 20261007e.tf.jsonl` | fichier | 8,1 Ko | 7 ligne(s) JSONL |
+| `Produit-79 - RETOURS - 20261007f.md` | fichier | 3,7 Ko | Retours forges — Produit-79 — 20261007f |
+| `Produit-79 - RETOURS - 20261007f.tf.jsonl` | fichier | 2,8 Ko | 3 ligne(s) JSONL |
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `UIA - RETOURS - 20260923a.md` | fichier | 4,4 Ko | Retours forges — UIA (Produit-71) — 20260923a |
@@ -461,4 +467,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `UIA - RETOURS - 20260924c.md` | fichier | 3,7 Ko | Retours forges — UIA (Produit-72) — 20260924c |
 | `UIA - RETOURS - 20260924c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_442 fichier(s), 2 sous-dossier(s)_ · 6 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_448 fichier(s), 2 sous-dossier(s)_
