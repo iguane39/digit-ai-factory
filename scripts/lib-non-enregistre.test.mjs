@@ -17,6 +17,9 @@ const check = (nom, fn) => {
   catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; }
 };
 const T = mkdtempSync(join(tmpdir(), "non-enregistre-"));
+// Le `git commit` du dépôt éphémère passe par les hameçons du poste : tables jetables (TF-0957).
+process.env.FORGE_NOMS_INTERDITS = join(T, "_noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(T, "_produits-pseudonymes.json");
 const git = (...a) => spawnSync("git", ["-C", T, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8" });
 git("init", "-q", "-b", "main");
 writeFileSync(join(T, "suivi.md"), "a\n");
