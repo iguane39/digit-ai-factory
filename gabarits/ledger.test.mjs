@@ -17,7 +17,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
-const GABARIT = readFileSync(join(ICI, "ledger.py"), "utf8");
+// Fins de ligne normalisées : un poste qui extrait le gabarit en CRLF faisait manquer la chirurgie du
+// rouge, écrite en LF (12/10/2026, harnais du pilot 2 FAIL sur ce seul motif).
+const GABARIT = readFileSync(join(ICI, "ledger.py"), "utf8").replace(/\r\n/g, "\n");
 const PYTHON = ["python", "python3", "py"].find((bin) => {
   const r = spawnSync(bin, ["--version"], { encoding: "utf8" });
   return !r.error && r.status === 0;

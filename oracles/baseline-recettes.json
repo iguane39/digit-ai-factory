@@ -136,7 +136,7 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 136,
+  "cas": 137,
   "vu_le": "2026-10-12"
  },
  "oracle-constantes-externes.mjs": {
@@ -583,8 +583,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 35,
-  "vu_le": "2026-10-02"
+  "cas": 36,
+  "vu_le": "2026-10-12"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
   "cas": 7,
@@ -679,8 +679,8 @@
   "vu_le": "2026-10-12"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 34,
-  "vu_le": "2026-10-02"
+  "cas": 35,
+  "vu_le": "2026-10-12"
  },
  "todo/generer-page.test.mjs": {
   "cas": 6,
