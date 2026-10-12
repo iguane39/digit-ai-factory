@@ -771,6 +771,10 @@ function selfTest() {
 
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   const nbCas = casseControleReel ? 23 : 22;
+  // TF-1018 (12/10/2026) : le cas non joué se DÉCLARE dans la forme fermée que lit le cliquet du
+  // harnais (TF-1434) ; écrit seulement dans le résumé, il était compté PERDU (23 → 22) et rendait
+  // le circuit hébergé ROUGE, faute de playwright sur le runner.
+  if (!casse.length && nonJuge.length) console.log(`[NON JOUÉ] 1 cas — ${nonJuge.join(" · ")}`);
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
     : `Self-test generer-page-etude : ${nbCas}/${nbCas} PASS (page écrite à côté de sa source ; autoportante, ` +

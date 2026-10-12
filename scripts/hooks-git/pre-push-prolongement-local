@@ -1,0 +1,46 @@
+# pre-push du pilot — SECTION PROPRE, copie versionnée (TF-1400, 12/10/2026).
+# Ces lignes vivent entre « # >>> prolongement local >>> » et « # <<< prolongement local <<< » du
+# pre-push posé par installer-hamecon-publication.mjs (forge des outils), qui les recopie à chaque
+# repose (TF-1402). `node scripts/verifier-hooks-git.mjs --installer` les y écrit quand la section
+# est vide (règle H4) ; bootstrap.mjs --pull le joue à l'ouverture.
+#
+# --- R-38 par. 4-5 (11/09/2026, action A-2 de la synthese pilot 20260911c) : la BORNE du GO ---------
+# Avant la porte des noms de client, classer ce qui est en avance sur l'origine : restitution et
+# candidatures en `candidat` passent d'office ; tout enregistrement portant une decision, une cloture,
+# une regle ou un contenu de produit exige le GO humain explicite, declare par FORGE_PUSH_GO="<motif>".
+DEPOT_PILOT="$(git rev-parse --show-toplevel)"
+if [ -f "$DEPOT_PILOT/scripts/verifier-avance-publication.mjs" ]; then
+  if [ -n "$FORGE_PUSH_GO" ]; then
+    node "$DEPOT_PILOT/scripts/verifier-avance-publication.mjs" --go "$FORGE_PUSH_GO" >/dev/null 2>&1 || { echo "PUBLICATION REFUSEE - verifier-avance-publication : motif de GO invalide." >&2; exit 1; }
+  else
+    SORTIE_AVANCE="$(node "$DEPOT_PILOT/scripts/verifier-avance-publication.mjs" 2>&1)" || {
+      echo "PUBLICATION REFUSEE - un enregistrement en avance exige le GO humain explicite (R-38 par. 4-5) :" >&2
+      printf '%s\n' "$SORTIE_AVANCE" | node -e 'let t="";process.stdin.on("data",d=>t+=d).on("end",()=>{try{const o=JSON.parse(t);for(const e of (o.enregistrements||[]).filter(x=>x.classe==="explicite"))console.error("  - "+e.sha+" "+(e.sujet||"").slice(0,80)+" : "+(e.fichiers_hors_classe||[]).join(", "))}catch{console.error(t.slice(0,800))}})'
+      echo "  Avec le GO humain en main : FORGE_PUSH_GO=\"D-N (x) du JJ/MM\" git push ..." >&2
+      exit 1
+    }
+  fi
+fi
+#
+# --- TF-1400 (12/10/2026) : un verdict CITE dans un message de commit est REJOUE sur une copie propre
+# Chaque ligne `Verdict: <commande> => exit <N>` des commits envoyes est rejouee sur un worktree
+# detache du commit, environnement de runner (scripts/rejouer-verdicts-cites.mjs). Un ecart (exit 1)
+# ou une plage illisible (exit 2, rien n'a ete juge) refuse l'envoi. Sans ligne `Verdict:`, rien a
+# rejouer : le script rend PASS en quelques dixiemes de seconde.
+if [ -f "$DEPOT_PILOT/scripts/rejouer-verdicts-cites.mjs" ]; then
+  ZERO="0000000000000000000000000000000000000000"
+  while read REF_LOCALE SHA_LOCAL REF_DISTANTE SHA_DISTANT; do
+    [ -z "$SHA_LOCAL" ] && continue
+    [ "$SHA_LOCAL" = "$ZERO" ] && continue
+    if [ "$SHA_DISTANT" != "$ZERO" ]; then PLAGE="$SHA_DISTANT..$SHA_LOCAL"
+    elif git rev-parse -q --verify origin/main >/dev/null; then PLAGE="origin/main..$SHA_LOCAL"
+    else PLAGE="$SHA_LOCAL"
+    fi
+    SORTIE_VERDICTS="$(node "$DEPOT_PILOT/scripts/rejouer-verdicts-cites.mjs" --depot "$DEPOT_PILOT" --plage "$PLAGE" 2>&1)" || {
+      echo "PUBLICATION REFUSEE - un verdict cite dans un message de commit ne se confirme pas sur une copie propre (TF-1400) :" >&2
+      printf '%s\n' "$SORTIE_VERDICTS" >&2
+      echo "  Corriger le commit ou sa ligne Verdict:, ou contourner EXPLICITEMENT : git push --no-verify" >&2
+      exit 1
+    }
+  done
+fi

@@ -850,7 +850,9 @@ défaut de ce livrable-là ». Ce qui se perd dans un tri silencieux n'est pas l
 **Ce que R-45 n'exige PAS.** Elle ne juge pas la JUSTESSE du verdict — qu'une remarque soit
 vraiment non généralisable est un jugement, pas une mesure. Elle exige que le raisonnement soit
 ÉCRIT : un raisonnement écrit peut être faux et se corrige ; un raisonnement absent est perdu
-pour tout le monde. Deux bornes l'empêchent de mettre l'existant en échec (R-33 bis) : elle ne
+pour tout le monde. Deux bornes l'empêchent de mettre l'existant en échec (motif que R-33 bis
+donne pour le verdict websec : « armer un gate que personne n'a exercé le ferait désarmer au
+premier faux positif ») : elle ne
 s'applique qu'aux lots datés du **21/08/2026 ou après**, et qu'aux sidecars flanqués d'un `.md`
 homonyme — une candidature hors lot n'a pas de lot, donc rien à déclarer.
 
@@ -876,7 +878,8 @@ projets le dépasse et que personne ne le dit.
 changer le gabarit est une décision humaine au registre, jamais une mesure d'oracle. Elle
 n'impose rien aux familles `porte_ailleurs` — leur forme appartient à une autre forge, qui a ses
 propres conventions, et la leur imposer recréerait le doublon que ce statut évite (TF-0453). Deux
-bornes contre R-33 bis : elle ne s'applique qu'aux lots datés du **22/08/2026 ou après**, et
+bornes l'empêchent de mettre l'existant en échec (même motif que R-33 bis donne pour le verdict
+websec, cité en R-45) : elle ne s'applique qu'aux lots datés du **22/08/2026 ou après**, et
 qu'aux sidecars flanqués d'un `.md` homonyme.
 
 ## Conflits à trancher (ta décision explicite)
@@ -1522,7 +1525,7 @@ chercher la matière, une fois, à la main.
      plus : elle se joue AVANT la remise, et le constat le dit.
 6. **Ce que R-57 n'exige PAS.** Elle ne juge pas la valeur d'une forme ; elle ne hisse rien sans
    l'extraire — un document mûr devient une famille par le travail du pilot, pas par une copie ;
-   elle ne s'applique qu'aux lots datés du **29/09/2026 ou après** (R-33 bis : décidée le 24/09,
+   elle ne s'applique qu'aux lots datés du **29/09/2026 ou après** (antériorité déclarée, comme en R-45 : décidée le 24/09,
    la règle n'entre au `main` du pilot que le 28/09 — les lots écrits jusque-là, sans elle sous la
    main, ne sont pas accusés).
 

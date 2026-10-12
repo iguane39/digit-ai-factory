@@ -90,8 +90,10 @@ writeFileSync(join(verte, "app.py"), "print('produit')\n");
 writeFileSync(join(verte, "CLAUDE.md"), readFileSync(join(verte, "CLAUDE.md"), "utf8") +
   "\n## Précédence (R-43)\nQuand la factory est impliquée, ses règles priment sur celles du projet.\n");
 mkdirSync(join(verte, ".claude"), { recursive: true });
+// TF-1592 (HERITAGE 1.16.1) : le câblage PreToolUse sur Artifact est exigé par R-47 ; la verte le porte.
 writeFileSync(join(verte, ".claude", "settings.json"),
-  JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
+  JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
+    PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
@@ -168,6 +170,19 @@ check("verte : projet conforme → PASS exit 0", () => {
   if (exit !== 0) throw new Error(`exit ${exit}, findings FAIL : ${JSON.stringify(rapport.findings.filter((f) => f.statut === "FAIL"))}`);
   if (rapport.verdict !== "PASS") throw new Error("verdict != PASS");
   if (!rapport.non_juge.length) throw new Error("non_juge vide — un oracle sans limites déclarées ne juge rien");
+});
+
+// TF-1592 (HERITAGE 1.16.1) — rouge : un settings câblé pour la factory mais SANS le PreToolUse sur
+// Artifact (l'état mesuré chez 7 produits sur 7 le 12/10/2026) est un héritage non tenu, nommé.
+check("TF-1592 rouge — settings sans le hook publication-hebergee : R-47 FAIL qui le nomme", () => {
+  const f = join(verte, ".claude", "settings.json");
+  const avant = readFileSync(f, "utf8");
+  try {
+    writeFileSync(f, JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
+    const { exit, rapport } = lance(verte);
+    const r47 = rapport.findings.filter((x) => x.regle === "R-47" && x.statut === "FAIL");
+    if (exit !== 1 || !r47.some((x) => /publication-hebergee/.test(x.message))) throw new Error(`exit ${exit}, R-47 : ${JSON.stringify(r47)}`);
+  } finally { writeFileSync(f, avant); }
 });
 
 // TF-0330 — `forge\QUESTIONS.md` était prescrit par le contrat et jugé par RIEN. Double sens :

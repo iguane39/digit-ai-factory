@@ -32,6 +32,12 @@
  * depuis son gabarit). H3 rend ce silence audible : absence nommée, jamais réparée ici (la pose du
  * pre-push reste à l'installeur, qui doit porter la section — décision du 02/10/2026, option a).
  *
+ * TF-1400 (12/10/2026) : H4 — quand le dépôt suit `scripts/rejouer-verdicts-cites.mjs`, le `pre-push`
+ * installé l'appelle. Sa section (avec celle de H3) est versionnée dans
+ * `scripts/hooks-git/pre-push-prolongement-local` ; `--installer` l'écrit entre les marqueurs de section
+ * propre du gabarit de l'installeur de la forge des outils (TF-1402) quand cette section est VIDE, et ne
+ * touche jamais une section remplie ni un pre-push sans marqueurs.
+ *
  * NON JUGÉ : `core.hooksPath` pointé ailleurs (le chemin est résolu par git, pas deviné) ; ce que
  * font les gardes ; le `commit-msg`, posé par l'installeur de la forge des outils ; la POSE du
  * `pre-push` (H3 la constate, elle ne la fait pas).
@@ -116,13 +122,38 @@ if (gardes.length) {
   }
 }
 
+const prePush = (() => {
+  const p = git("rev-parse", "--git-path", "hooks/pre-push").stdout.trim();
+  return isAbsolute(p) ? p : join(DEPOT, p);
+})();
+
+// TF-1400 — H4 : le pre-push rejoue les verdicts cités au commit (scripts/rejouer-verdicts-cites.mjs).
+// Sa section vit dans la copie versionnée `scripts/hooks-git/pre-push-prolongement-local`, écrite
+// entre les deux marqueurs que le gabarit de l'installeur de la forge des outils réserve à la section
+// propre d'un dépôt (TF-1402) : il la recopie à chaque repose. `--installer` ne l'écrit que dans une
+// section VIDE ; une section déjà remplie se fusionne à la main, jamais par-dessus.
+const GARDE_VERDICTS = "scripts/rejouer-verdicts-cites.mjs";
+const SOURCE_PROLONGEMENT = join(DEPOT, "scripts", "hooks-git", "pre-push-prolongement-local");
+const DEBUT_PROLONGEMENT = "# >>> prolongement local >>>";
+const FIN_PROLONGEMENT = "# <<< prolongement local <<<";
+const suitVerdicts = git("ls-files", "--", GARDE_VERDICTS).stdout.trim() === GARDE_VERDICTS;
+if (INSTALLER && suitVerdicts && existsSync(prePush) && existsSync(SOURCE_PROLONGEMENT)
+    && !readFileSync(prePush, "utf8").includes("rejouer-verdicts-cites.mjs")) {
+  const brut = readFileSync(prePush, "utf8");
+  const fin = brut.includes("\r\n") ? "\r\n" : "\n";
+  const L = sansCr(brut).split("\n");
+  const i = L.findIndex((l) => l.trim() === DEBUT_PROLONGEMENT);
+  const j = L.findIndex((l, k) => k > i && l.trim() === FIN_PROLONGEMENT);
+  if (i >= 0 && j > i && L.slice(i + 1, j).every((l) => !l.trim())) {
+    const section = sansCr(readFileSync(SOURCE_PROLONGEMENT, "utf8")).replace(/\n+$/, "").split("\n");
+    writeFileSync(prePush, [...L.slice(0, i + 1), ...section, ...L.slice(j)].join(fin));
+    constats.push("[INSTALLÉ] section propre du pre-push posée depuis scripts/hooks-git/pre-push-prolongement-local");
+  }
+}
+
 // TF-1275 — H3 : le pre-push qui joue le contrôle d'avance (R-38 par. 4-6) est posé ET l'appelle.
 const GARDE_AVANCE = "scripts/verifier-avance-publication.mjs";
 if (git("ls-files", "--", GARDE_AVANCE).stdout.trim() === GARDE_AVANCE) {
-  const prePush = (() => {
-    const p = git("rev-parse", "--git-path", "hooks/pre-push").stdout.trim();
-    return isAbsolute(p) ? p : join(DEPOT, p);
-  })();
   if (!existsSync(prePush)) {
     ko("H3", "AUCUN hook pre-push installé alors que R-38 par. 5 dit qu'il joue " + GARDE_AVANCE
       + " : une publication part sans contrôle d'avance ni porte des noms. Remède : poser le pre-push par "
@@ -131,6 +162,22 @@ if (git("ls-files", "--", GARDE_AVANCE).stdout.trim() === GARDE_AVANCE) {
     ko("H3", "hook pre-push installé qui n'appelle pas " + GARDE_AVANCE + " — la section R-38 par. 4-6 a été effacée "
       + "(repose de l'installeur, qui réécrit le fichier depuis son gabarit). Remède : la rétablir avant la porte des noms");
   } else ok("H3", "le hook pre-push installé appelle " + GARDE_AVANCE);
+}
+
+if (suitVerdicts) {
+  const remede = "Remède : poser le pre-push par l'installeur de la forge des outils (installer-hamecon-publication.mjs "
+    + "<dépôt> --seul=pre-push, gabarit à section propre TF-1402), puis `node scripts/verifier-hooks-git.mjs --installer`";
+  if (!existsSync(prePush)) ko("H4", "AUCUN hook pre-push installé : un verdict cité au commit part sans être rejoué sur une copie propre. " + remede);
+  else if (!readFileSync(prePush, "utf8").includes("rejouer-verdicts-cites.mjs")) {
+    const L = sansCr(readFileSync(prePush, "utf8")).split("\n");
+    const i = L.findIndex((l) => l.trim() === DEBUT_PROLONGEMENT);
+    const j = L.findIndex((l, k) => k > i && l.trim() === FIN_PROLONGEMENT);
+    ko("H4", "hook pre-push installé qui n'appelle pas " + GARDE_VERDICTS + " — "
+      + (i < 0 || j < 0 ? "il n'a pas les marqueurs de section propre. " + remede
+        : L.slice(i + 1, j).every((l) => !l.trim()) ? "sa section propre est vide. Remède : `node scripts/verifier-hooks-git.mjs --installer`"
+          : (INSTALLER ? "hook existant CONSERVÉ (jamais écrasé) ; " : "")
+            + "sa section propre est déjà remplie : y fusionner à la main scripts/hooks-git/pre-push-prolongement-local"));
+  } else ok("H4", "le hook pre-push installé appelle " + GARDE_VERDICTS);
 }
 
 for (const c of constats) console.log(c);
