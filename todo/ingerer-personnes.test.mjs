@@ -62,6 +62,19 @@ check("vert — un sidecar sans personne ne déclenche aucun relevé", () => {
   if (r.ing && r.ing.noms_de_personnes_a_qualifier) throw new Error("le compteur est posé à tort");
 });
 
+// TF-1540 (12/10/2026) — même chemin pour la forme par laquelle un lot désigne son projet (nom inventé).
+check("rouge — une désignation de projet inconnue des tables est nommée à l'écran et comptée à l'événement", () => {
+  const r = ingerer("**Numérotation** : ZQX7 tient une séquence `RT-nn` ; RT-1 à RT-42 sont consommés.");
+  if (r.code !== 0) throw new Error(`exit ${r.code} attendu 0 : ${r.sortie.slice(0, 300)}`);
+  if (!/\[DÉSIGNATION DE PROJET À QUALIFIER\] 1 forme\(s\) dans le lot : ZQX7/.test(r.sortie)) throw new Error(`relevé absent : ${r.sortie.slice(0, 400)}`);
+  if (!r.ing || r.ing.designations_de_projet_a_qualifier !== 1) throw new Error(`événement d'ingestion : ${JSON.stringify(r.ing)}`);
+  if (JSON.stringify(r.ing).includes("ZQX7")) throw new Error("l'événement d'ingestion porte la FORME — il ne doit porter que le nombre");
+});
+check("vert — un pseudonyme qui tient une séquence ne déclenche rien", () => {
+  const r = ingerer("**Numérotation** : Produit-11 tient une séquence `RT-nn`.");
+  if (/DÉSIGNATION DE PROJET/.test(r.sortie)) throw new Error(`faux positif : ${r.sortie.slice(0, 300)}`);
+});
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\ningerer-personnes (TF-1405) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

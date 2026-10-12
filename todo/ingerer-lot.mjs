@@ -33,6 +33,7 @@ import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 import { aQualifier } from "./identifiants-techniques.mjs";
 import { aQualifier as adressesIpAQualifier, messageAQualifier as messageAdressesIp } from "./adresses-ip.mjs";
 import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
+import { aQualifier as designationsAQualifier, messageAQualifier as messageDesignations } from "./designation-projet.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -571,6 +572,10 @@ if (adressesIp.length) console.error(messageAdressesIp(adressesIp, "le lot"));
 // l'écran, compté à l'événement d'ingestion, jamais écrit dans ce dernier.
 const personnes = personnesAQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""} ${c.source || ""}`));
 if (personnes.length) console.error(messagePersonnes(personnes, "le lot"));
+// TF-1540 (12/10/2026) — LA FORME PAR LAQUELLE UN LOT DÉSIGNE SON PROJET N'EST DANS AUCUNE TABLE non plus :
+// même modèle, nommée à l'écran, comptée à l'événement d'ingestion, jamais écrite dans ce dernier.
+const designations = designationsAQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""} ${c.source || ""}`));
+if (designations.length) console.error(messageDesignations(designations, "le lot"));
 // ---- récidive : la classe est-elle déjà close en corrige ? --------------------------------
 // Deux sources, réunies : les items que la classe déclare l'avoir FONDÉE (todo/CLASSES.json,
 // `fondee_par`) et tout item du registre portant déjà cette `classe`. La date de correction se
@@ -676,6 +681,7 @@ if (nbRecidives) evIngestion.recidives = nbRecidives;
 if (identifiantsAQualifier.length) evIngestion.identifiants_a_qualifier = identifiantsAQualifier.length;
 if (adressesIp.length) evIngestion.adresses_ip_a_qualifier = adressesIp.length;
 if (personnes.length) evIngestion.noms_de_personnes_a_qualifier = personnes.length;
+if (designations.length) evIngestion.designations_de_projet_a_qualifier = designations.length;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
 }
