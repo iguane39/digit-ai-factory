@@ -157,6 +157,16 @@ const motifClos = (dir) => {
   return m ? `manifeste tiers \`${m}\`, TF-1126` : null;
 };
 const EST_CLOS = (dir) => motifClos(dir) !== null;
+// TF-1610 (12/10/2026) — `input\` EST EN LECTURE SEULE POUR TOUT PRODUCTEUR (REGLES-PROJET). Relancé
+// chez un produit (`--base .`), ce générateur a créé 458 README dans une arborescence de médias que
+// l'humain avait déposée sous `input\` (5 187 fichiers). Chez un produit, on ne descend donc sous
+// `input\` que dans un sous-dossier qui porte DÉJÀ un README.md (un geste délibéré) : tout autre est
+// compté au parent, sans README propre. Le README de `input\` lui-même reste le seul posé d'office.
+const NON_INDEXE = (dir) => {
+  if (!DEPOT_PRODUIT) return false;
+  const rel = posix(relative(BASE, dir));
+  return rel.startsWith("input/") && !existsSync(join(dir, "README.md"));
+};
 const posix = (p) => p.split(sep).join("/");
 const affiche = (p) => p.split("/").join("\\") + "\\";
 
@@ -273,6 +283,10 @@ function attendu(dir, rel) {
       nd++;
       const roleIgnore = (roleConnu(relE) || "rôle à déclarer dans la table ROLES de scripts\\readme-dossiers.mjs").replace(/\s+/g, " ").replace(/\*\*/g, "");
       lignes.push(`| \`${e.name}\\\` | dossier ignoré par git (absent d'un clone) | — | ${roleIgnore.slice(0, 160).replace(/\|/g, "/")}${roleIgnore.length > 160 ? "…" : ""} |`);
+    } else if (e.isDirectory() && NON_INDEXE(chemin)) {
+      nd++;
+      const n = compter(chemin);
+      lignes.push(`| \`${e.name}\\\` | dossier d'entrants non indexé (${n} fichier${n > 1 ? "s" : ""}) | — | \`input\\\` est en lecture seule pour un produit : aucun README n'y est posé d'office (TF-1610) |`);
     } else if (e.isDirectory() && EST_CLOS(chemin)) {
       nd++;
       const n = compter(chemin);
@@ -315,7 +329,7 @@ function attendu(dir, rel) {
 function* dossiers(dir) {
   yield dir;
   for (const e of readdirSync(dir, { withFileTypes: true }))
-    if (e.isDirectory() && !EST_MACHINE(e.name) && !EST_CLOS(join(dir, e.name))) yield* dossiers(join(dir, e.name));
+    if (e.isDirectory() && !EST_MACHINE(e.name) && !EST_CLOS(join(dir, e.name)) && !NON_INDEXE(join(dir, e.name))) yield* dossiers(join(dir, e.name));
 }
 
 const defauts = [];
