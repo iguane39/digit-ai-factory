@@ -10,6 +10,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { socleDePage } from "../scripts/lib-socle-page.mjs";
 
 const oracle = join(dirname(fileURLToPath(import.meta.url)), "oracle-conformite-projet.mjs");
 // Pas de shell : sous Windows, shell:true re-découpe les arguments contenant des espaces
@@ -208,14 +209,52 @@ check("R-18 bis : forge/QUESTIONS.md présent → constaté PASS (TF-0330)", () 
   }
 });
 
-check("verte : générateurs déterministes (2 exécutions = HTML identiques)", () => {
+// TF-1475 (12/10/2026) — LE CAS ÉTAIT INSTABLE PARCE QUE SES DEUX GÉNÉRATIONS ÉTAIENT SÉPARÉES PAR
+// TOUTE LA SUITE. Il comparait le HTML écrit à la construction de la fixture (début de la recette)
+// à celui d'un second passage joué ~2 minutes plus tard, après 50 cas. Or les générateurs lisent le
+// socle `digit-ai-page-html` (boilerplate, composants) EN DIRECT à chaque passage, dans la copie
+// installée ou la source du dépôt frère : un socle mis à jour dans cette fenêtre — bootstrap --pull,
+// ou une autre session qui édite le socle, comme pendant la campagne du 28/09 — change le HTML sans
+// que le moindre générateur soit non déterministe. Rejeu du 12/10 : 4 recettes complètes et 20
+// générations isolées successives, 0 écart ; le mécanisme, lui, est reproduit par le cas ci-dessous.
+// Les deux générations se jouent donc maintenant l'une après l'autre (quelques secondes), et un cas
+// à part prouve que le détecteur voit bien un socle qui bouge, sur un socle GELÉ en copie.
+check("verte : générateurs déterministes (2 exécutions CONSÉCUTIVES = HTML identiques)", () => {
   const lireHtml = (n) => readFileSync(join(verte, "docs", "projet", n), "utf8");
-  const avant = [lireHtml("ARCHITECTURE.html"), lireHtml("MODELE-DONNEES.html")];
-  genere("generer-architecture.mjs", "ARCHITECTURE.md");
-  genere("generer-modele-donnees.mjs", "MODELE-DONNEES.md");
-  const apres = [lireHtml("ARCHITECTURE.html"), lireHtml("MODELE-DONNEES.html")];
-  if (avant[0] !== apres[0] || avant[1] !== apres[1]) throw new Error("HTML différents entre deux générations sur la même source");
+  const jouer = () => {
+    genere("generer-architecture.mjs", "ARCHITECTURE.md");
+    genere("generer-modele-donnees.mjs", "MODELE-DONNEES.md");
+    return [lireHtml("ARCHITECTURE.html"), lireHtml("MODELE-DONNEES.html")];
+  };
+  const avant = jouer();
+  const apres = jouer();
+  if (avant[0] !== apres[0] || avant[1] !== apres[1]) throw new Error("HTML différents entre deux générations consécutives sur la même source");
   if (/https?:\/\/(?!www\.w3\.org)/.test(apres[0] + apres[1])) throw new Error("URL réseau détectée dans une vue générée (A1)");
+});
+
+// TF-1475 — LA CAUSE, REJOUÉE SUR UN SOCLE GELÉ EN COPIE (jamais sur le socle réel, en lecture seule).
+// Double sens : socle immobile → deux générations identiques (le cas ci-dessus n'est pas toujours
+// rouge) ; un octet du gabarit du socle change entre les deux → le HTML diffère (le cas ne juge pas
+// dans le vide, et l'instabilité observée le 28/09 a un mécanisme reproductible).
+check("verte : le HTML suit le socle qui bouge entre deux générations (cause de l'instabilité TF-1475)", () => {
+  const socle = socleDePage();
+  if (!socle.assets) return; // socle absent de ce poste : les générateurs se déclarent sans objet
+  const gele = mkdtempSync(join(tmpdir(), "socle-gele-"));
+  try {
+    const dest = join(gele, "digit-ai-page-html");
+    cpSync(join(socle.assets, ".."), dest, { recursive: true, filter: (s) => !/[\\/](?:\.oracles|__pycache__|node_modules|\.git)(?:[\\/]|$)/.test(s) });
+    const env = { ...process.env, FORGE_SKILLS_INSTALLES: gele };
+    const cible = join(verte, "docs", "projet", "ARCHITECTURE.md");
+    const jouer = () => { execFileSync("node", [join(scripts, "generer-architecture.mjs"), cible], { cwd: verte, encoding: "utf8", env }); return readFileSync(join(verte, "docs", "projet", "ARCHITECTURE.html"), "utf8"); };
+    const un = jouer(), deux = jouer();
+    if (un !== deux) throw new Error("socle immobile : deux générations diffèrent — un générateur est réellement non déterministe");
+    const gabarit = join(dest, "assets", "boilerplate.html");
+    writeFileSync(gabarit, readFileSync(gabarit, "utf8").replace("</head>", '<meta name="socle-modifie" content="entre deux generations"></head>'));
+    if (jouer() === un) throw new Error("le gabarit du socle a changé et le HTML ne bouge pas : le socle n'est pas lu à chaque génération, ou ce cas ne juge rien");
+  } finally {
+    rmSync(gele, { recursive: true, force: true });
+    genere("generer-architecture.mjs", "ARCHITECTURE.md"); // la vue de la fixture revient à l'état du socle réel
+  }
 });
 
 // TF-0338 — la FRAÎCHEUR des deux projections sœurs. Double sens strict : la fixture verte

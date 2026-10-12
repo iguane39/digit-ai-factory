@@ -7,10 +7,12 @@
  * est joué et doit PASSER. Les deux fichiers de `oracles\fixtures\demande-tierce-*.md` servent de
  * témoins : la verte passe, la rouge reprend les défauts du 01/10/2026 et en relève au moins quinze.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { verifier, mesurerStatut, VERSION, EXCLUS, BORNE_PHRASES, BORNE_MOTS } from "./oracle-demande-tierce.mjs";
+import { verifier, mesurerStatut, lireNoms, enContrat, ORACLE, VERSION, EXCLUS, BORNE_PHRASES, BORNE_MOTS } from "./oracle-demande-tierce.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const VERTE = readFileSync(join(ICI, "..", "oracles", "fixtures", "demande-tierce-verte.md"), "utf8").replace(/\r\n/g, "\n");
@@ -131,6 +133,67 @@ try {
     const sans = VERTE.replace(/```text\n/, "").replace(/```\n?$/, "");
     att(verifier(sans).verdict === "PASS", "le jugement du fichier entier échoue");
   });
+
+  // ---- TF-1520 : les deux écarts du contrôle repris du produit (liste de noms, contrat commun) ----
+  const dossier = mkdtempSync(join(tmpdir(), "demande-tierce-"));
+  const CLI = join(ICI, "oracle-demande-tierce.mjs");
+  const cli = (...args) => spawnSync(process.execPath, [CLI, ...args], { encoding: "utf8", env: { ...process.env, FORGE_NOMS_PERSONNES: "" } });
+  const fVerte = join(dossier, "verte.md"), fRouge = join(dossier, "rouge.md"), fNom = join(dossier, "avec-nom.md");
+  writeFileSync(fVerte, VERTE); writeFileSync(fRouge, ROUGE); writeFileSync(fNom, avec("Prévenir Dupont à la fin."));
+  try {
+    check("noms — les trois sources se cumulent sans doublon (ligne de commande, fichier JSON ou texte, variable)", () => {
+      const json = join(dossier, "noms.json"), txt = join(dossier, "noms.txt"), objet = join(dossier, "objet.json");
+      writeFileSync(json, JSON.stringify(["Dupont", "Martin"]));
+      writeFileSync(txt, "﻿Dupont\nDurand; Petit, Camille\n\n");
+      writeFileSync(objet, JSON.stringify({ noms: ["Leroy"] }));
+      att(JSON.stringify(lireNoms({ fichier: json })) === '["Dupont","Martin"]', "tableau JSON mal lu");
+      att(JSON.stringify(lireNoms({ fichier: txt })) === '["Dupont","Durand","Petit","Camille"]', "texte mal lu (BOM, sauts de ligne, ; et ,)");
+      att(JSON.stringify(lireNoms({ fichier: objet })) === '["Leroy"]', "objet { noms } mal lu");
+      const tous = lireNoms({ noms: ["Dupont"], fichier: json, env: { FORGE_NOMS_PERSONNES: "Roux,Martin" } });
+      att(JSON.stringify(tous) === '["Dupont","Martin","Roux"]', `cumul/doublon : ${JSON.stringify(tous)}`);
+      att(lireNoms({ env: {} }).length === 0, "sans source, la liste doit être vide");
+    });
+    check("noms — une liste illisible ou absente lève : jamais un nom cru refusé qui ne l'est pas", () => {
+      const casse = join(dossier, "casse.json"); writeFileSync(casse, "[ pas du json");
+      const mauvais = join(dossier, "mauvais.json"); writeFileSync(mauvais, JSON.stringify({ autre: 1 }));
+      for (const f of [casse, mauvais, join(dossier, "absent.json")]) {
+        let leve = false; try { lireNoms({ fichier: f }); } catch { leve = true; }
+        att(leve, `${f} n'a pas levé`);
+      }
+    });
+    check("noms CLI — sans liste le nom passe ; avec --noms-fichier ou FORGE_NOMS_PERSONNES il est refusé (exit 1)", () => {
+      const liste = join(dossier, "liste.json"); writeFileSync(liste, JSON.stringify(["Dupont"]));
+      att(cli(fNom).status === 0, "sans liste, le nom ne doit pas échouer");
+      const parFichier = cli(fNom, "--noms-fichier", liste);
+      att(parFichier.status === 1 && /nom de personne/.test(parFichier.stdout), `--noms-fichier : exit ${parFichier.status}`);
+      const parEnv = spawnSync(process.execPath, [CLI, fNom], { encoding: "utf8", env: { ...process.env, FORGE_NOMS_PERSONNES: "Dupont" } });
+      att(parEnv.status === 1, `FORGE_NOMS_PERSONNES : exit ${parEnv.status}`);
+      att(cli(fNom, "--noms-fichier", join(dossier, "absent.json")).status === 2, "une liste absente doit sortir en 2");
+      att(cli(fVerte, "--noms-fichier", liste).status === 0, "la verte doit passer avec la liste");
+    });
+    check("contrat — la verte rend un JSON commun PASS (exit 0), localisant, avec non_juge et la limite des noms dite", () => {
+      const p = cli(fVerte, "--json");
+      att(p.status === 0, `exit ${p.status}`);
+      const j = JSON.parse(p.stdout);
+      att(j.oracle === ORACLE && j.verdict === "PASS" && j.artefact === fVerte, "en-tête du contrat");
+      att(typeof j.domaine === "string" && j.domaine.length > 5, "domaine absent");
+      att(j.findings.length >= 5 && j.findings.every((f) => f.sev === "info" && f.regle && f.msg && f.where), "findings de la verte");
+      att(j.non_juge.some((l) => /aucune liste fournie/.test(l)), "la limite « noms non jugés » n'est pas dite sans liste");
+    });
+    check("contrat — la rouge rend FAIL (exit 1) avec des findings bloquants localisants portant leur remède", () => {
+      const p = cli(fRouge, "--json");
+      att(p.status === 1, `exit ${p.status}`);
+      const j = JSON.parse(p.stdout);
+      att(j.verdict === "FAIL", "verdict");
+      const bloquants = j.findings.filter((f) => f.sev === "bloquant");
+      att(bloquants.length >= 10 && bloquants.every((f) => f.regle && f.where === fRouge), `${bloquants.length} bloquants`);
+      att(bloquants.some((f) => /remède :/.test(f.msg)), "aucun remède dans les messages");
+    });
+    check("contrat — avec une liste, la limite « aucune liste » n'est plus dite ; un fichier absent sort en 2", () => {
+      att(!enContrat("x", verifier(VERTE, { noms: ["Dupont"] }), 1).non_juge.some((l) => /aucune liste fournie/.test(l)), "limite dite à tort");
+      att(cli(join(dossier, "inexistant.md"), "--json").status === 2, "fichier absent");
+    });
+  } finally { rmSync(dossier, { recursive: true, force: true }); }
 
   check("VERSION exportée et NON_JUGE déclaré", () => {
     att(/^\d+\.\d+\.\d+$/.test(VERSION), VERSION);

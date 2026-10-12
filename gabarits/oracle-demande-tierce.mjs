@@ -25,11 +25,18 @@
  * personne absent de la liste `noms`. L'heuristique de T2 est lexicale : elle accepte un statut qui
  * emploie un des mots attendus sans garantir qu'il dise la bonne chose.
  *
- * Usage : node oracle-demande-tierce.mjs <fichier> [--noms Prénom,Nom,...] [--json]
+ * Usage : node oracle-demande-tierce.mjs <fichier> [--noms Prénom,Nom,...] [--noms-fichier <liste>] [--json]
+ *         --noms-fichier : un tableau JSON de noms (ou un objet portant `noms`), ou un texte à un nom par ligne
+ *         (virgules et points-virgules admis) ; la variable FORGE_NOMS_PERSONNES (noms séparés par des virgules)
+ *         s'ajoute aux deux. Les trois sources se cumulent.
+ *         --json : le contrat JSON commun des oracles (oracle, domaine, artefact, verdict, findings, non_juge).
  *         Juge le premier bloc ```text du fichier, ou le fichier entier s'il n'en a pas.
  * Exit  : 0 = forme tenue · 1 = au moins un écart · 2 = fichier absent ou illisible.
  */
 import { readFileSync, existsSync } from "node:fs";
+
+export const ORACLE = "oracle-demande-tierce";
+export const DOMAINE = "Forme d'une demande remise à une équipe tierce";
 
 export const VERSION = "1.0.0";
 
@@ -158,19 +165,65 @@ export function verifier(source, { noms = [] } = {}) {
   return { version: VERSION, constats, verdict: constats.some((c) => c.statut === "FAIL") ? "FAIL" : "PASS", non_juge: NON_JUGE };
 }
 
+// ---- LES NOMS DE PERSONNES ET LE CONTRAT COMMUN (TF-1520, décision du 02/10/2026 : combler les deux écarts du contrôle repris du produit) ----
+
+/**
+ * Les noms de personnes à refuser dans une demande, de trois sources cumulées : la ligne de commande,
+ * un fichier de liste, la variable FORGE_NOMS_PERSONNES. Le contrôle du produit ne connaissait que la
+ * première : sans liste passée à la main, T5 ne jugeait aucun nom, et personne ne tenait la liste.
+ * Une liste illisible LÈVE : un nom qu'on croit refusé et qui ne l'est pas est pire qu'une liste absente.
+ */
+export function lireNoms({ noms = [], fichier = null, env = process.env } = {}) {
+  const decoupe = (t) => String(t).split(/[\n,;]/).map((n) => n.trim()).filter(Boolean);
+  let deFichier = [];
+  if (fichier) {
+    if (!existsSync(fichier)) throw new Error(`liste de noms introuvable : ${fichier}`);
+    const brut = readFileSync(fichier, "utf8").replace(/^\uFEFF/, "");
+    if (/^\s*[\[{]/.test(brut)) {
+      const j = JSON.parse(brut);
+      const liste = Array.isArray(j) ? j : j && Array.isArray(j.noms) ? j.noms : null;
+      if (!liste) throw new Error(`liste de noms illisible : ${fichier} (attendu : un tableau, ou un objet portant « noms »)`);
+      deFichier = liste.map(String).map((n) => n.trim()).filter(Boolean);
+    } else deFichier = decoupe(brut);
+  }
+  const deEnv = env && env.FORGE_NOMS_PERSONNES ? decoupe(env.FORGE_NOMS_PERSONNES) : [];
+  return [...new Set([...noms, ...deFichier, ...deEnv])];
+}
+
+/** Le verdict de `verifier` au contrat JSON commun des oracles (verdict, findings localisants, non_juge). */
+export function enContrat(fichier, r, nbNoms = 0) {
+  const findings = r.constats.map((c) => ({
+    sev: c.statut === "FAIL" ? "bloquant" : "info",
+    regle: c.regle,
+    msg: c.statut === "SANS_OBJET" ? `non jugé — ${c.message}` : c.remede ? `${c.message} — remède : ${c.remede}` : c.message,
+    where: fichier,
+  }));
+  const nonJuge = nbNoms
+    ? r.non_juge
+    : [...r.non_juge, "les noms de personnes : aucune liste fournie (--noms, --noms-fichier ou FORGE_NOMS_PERSONNES), T5 n'en refuse aucun"];
+  return { oracle: ORACLE, domaine: DOMAINE, artefact: fichier, verdict: r.verdict, findings, non_juge: nonJuge };
+}
+
 // ---- CLI --------------------------------------------------------------------------------
 const lanceEnDirect = process.argv[1] && process.argv[1].replaceAll("\\", "/").endsWith("oracle-demande-tierce.mjs");
 if (lanceEnDirect) {
   const args = process.argv.slice(2);
-  const fichier = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--noms");
-  const iNoms = args.indexOf("--noms");
-  const noms = iNoms >= 0 && args[iNoms + 1] ? args[iNoms + 1].split(",").map((n) => n.trim()).filter(Boolean) : [];
+  const valeurDe = (opt) => { const i = args.indexOf(opt); return i >= 0 && args[i + 1] && !args[i + 1].startsWith("--") ? args[i + 1] : null; };
+  const fichier = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--noms" && args[i - 1] !== "--noms-fichier");
+  const usage = "usage : node oracle-demande-tierce.mjs <fichier> [--noms Prénom,Nom,...] [--noms-fichier <liste>] [--json]";
   if (!fichier || !existsSync(fichier)) {
-    console.error("usage : node oracle-demande-tierce.mjs <fichier> [--noms Prénom,Nom,...] [--json]");
+    console.error(usage);
+    process.exit(2);
+  }
+  let noms;
+  try {
+    noms = lireNoms({ noms: (valeurDe("--noms") || "").split(",").map((n) => n.trim()).filter(Boolean), fichier: valeurDe("--noms-fichier") });
+  } catch (e) {
+    console.error(e.message);
     process.exit(2);
   }
   const r = verifier(readFileSync(fichier, "utf8"), { noms });
-  if (args.includes("--json")) console.log(JSON.stringify({ fichier, ...r }, null, 1));
+  if (args.includes("--json")) console.log(JSON.stringify(enContrat(fichier, r, noms.length), null, 1));
   else {
     console.log(`oracle-demande-tierce ${VERSION} — ${fichier}`);
     for (const c of r.constats) {
