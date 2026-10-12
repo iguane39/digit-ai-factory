@@ -112,7 +112,7 @@
  *       dépendances, scan d'image), datée du jour et chiffrée (01/10, TF-1498) ; avertissante ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
- *   S59 une action humaine de motif `decision` qui commande un geste d'EXÉCUTION sans nommer de
+ *   S61 une action humaine de motif `decision` qui commande un geste d'EXÉCUTION sans nommer de
  *       choix ouvert porte la trace de la voie automatique essayée (12/10, TF-1567, R-29 point 4) ;
  *       avertissante ;
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -3137,7 +3137,7 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
-  // S59 (TF-1567, 12/10/2026) — `decision` NE VAUT QUE POUR UN CHOIX OUVERT, JAMAIS POUR L'EXÉCUTER.
+  // S61 (TF-1567, 12/10/2026) — `decision` NE VAUT QUE POUR UN CHOIX OUVERT, JAMAIS POUR L'EXÉCUTER.
   // AVERTISSANTE à son entrée (hors de BLOQUANTES du hook), comme toute règle neuve depuis la v2.5.0.
   // LE FAIT, lot Produit-02 du 01/10/2026 : trois restitutions PASS de suite (28/09, 29/09, 01/10)
   // ont laissé à l'exploitant le DÉPÔT de 56 puis 92 exclusions et 2 plafonds, raison `decision`,
@@ -3160,7 +3160,7 @@ function juger(texte, cheminJuge = null) {
     const CHOIX = uni(/\b(choisir|choix|trancher|tranche|arbitrer|arbitrage|d[ée]cid(?:er|ez|e|é)|valider|approuver|retenir|opter|r[ée]pondre|accord|autoriser|GO|feu vert|mandat|R-38|publier|publication|pousser|push)\b/i);
     const executionDeChoixRendu = { test: (g) => HUMAINS.test(g) && /\bdecision\b/.test(zoneMotif(g))
       && EXECUTION.test(horsCode(g)) && !CHOIX.test(horsCode(g)) };
-    juger8("S59", executionDeChoixRendu, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
+    juger8("S61", executionDeChoixRendu, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
       "une action laissée à l'humain sous le motif `decision` commande un geste d'EXÉCUTION (déposer, appliquer, " +
       "importer, saisir…) et ne nomme aucun choix encore ouvert : `decision` vaut pour un arbitrage, jamais pour " +
       "l'exécution d'un choix rendu (R-29 point 4, voie automatique d'abord). Essayer la voie automatique et écrire " +
@@ -3168,7 +3168,7 @@ function juger(texte, cheminJuge = null) {
       "chaque action humaine de motif `decision` arbitre un choix ouvert, ou porte la trace de la voie automatique essayée");
   }
 
-  // S60 (TF-1262, 12/10/2026) — UN VERDICT CITÉ SUR UN PÉRIMÈTRE RÉDUIT DIT SA RESTRICTION.
+  // S62 (TF-1262, 12/10/2026) — UN VERDICT CITÉ SUR UN PÉRIMÈTRE RÉDUIT DIT SA RESTRICTION.
   // AVERTISSANTE à son entrée (hors de BLOQUANTES du hook). LE FAIT, restitution du 14/09/2026 :
   // « render_page.py rend Verdict : PASS à 1920 px » sur dix pages. Rejoué le 15/09 au périmètre
   // PAR DÉFAUT de l'oracle — six largeurs, de 3840 à 390 px —, les dix rendaient FAIL : V18 ne
@@ -3190,12 +3190,12 @@ function juger(texte, cheminJuge = null) {
     // Les six largeurs ÉNUMÉRÉES sont le périmètre par défaut de render_page, dit en chiffres.
     const sixLargeurs = (x) => (x.match(/\b\d{3,4}\b/g) || []).length >= 6;
     const muettes = concernees.filter((x) => !PERIMETRE_DIT.test(x) && !sixLargeurs(x));
-    if (!concernees.length) ok("S60", "aucun verdict vert cité sur une restriction de mesure — rien à juger");
-    else if (muettes.length) ko("S60", `${muettes.length} verdict(s) vert(s) sur ${concernees.length} cité(s) sur une RESTRICTION de mesure ` +
+    if (!concernees.length) ok("S62", "aucun verdict vert cité sur une restriction de mesure — rien à juger");
+    else if (muettes.length) ko("S62", `${muettes.length} verdict(s) vert(s) sur ${concernees.length} cité(s) sur une RESTRICTION de mesure ` +
       "(une largeur, une option qui borne l'oracle) sans dire le périmètre : le 14/09/2026, « PASS à 1920 px » valait FAIL au périmètre par " +
       "défaut de render_page, qui juge six largeurs (TF-1262). Dire « périmètre restreint à … — le périmètre par défaut juge N largeurs », " +
       `ou citer le verdict au périmètre par défaut. Ex. : ${muettes[0].replace(/\s+/g, " ").slice(0, 110)}`);
-    else ok("S60", `${concernees.length} verdict(s) cité(s) sur une restriction de mesure, chacun avec son périmètre dit`);
+    else ok("S62", `${concernees.length} verdict(s) cité(s) sur une restriction de mesure, chacun avec son périmètre dit`);
   }
 
   return findings;
@@ -4431,7 +4431,7 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("TF-1496 : la MÊME restitution, l'option du bloc 3 citant désormais GFP-001, est encore accusée : "
       + String(c58c.message || c58c.statut || "").slice(0, 200));
 
-  // 12/10 — TF-1567 : S59, `decision` POUR L'EXÉCUTION D'UN CHOIX RENDU, DANS SES QUATRE SENS. Le
+  // 12/10 — TF-1567 : S61, `decision` POUR L'EXÉCUTION D'UN CHOIX RENDU, DANS SES QUATRE SENS. Le
   // cas fondateur (lot Produit-02 du 01/10) : déposer des exclusions déjà arrêtées au plan, sous
   // `decision`, sans que la voie automatique ait été essayée. Les quatre lignes ne diffèrent que
   // par la trace, par le choix nommé ou par le gate : c'est ce qui prouve que la règle juge ce
@@ -4442,58 +4442,58 @@ Aucun écart : la demande a été suivie à la lettre.
     + "  - si rien n'est fait : les clics hors cible continuent d'être payés.\n";
   const avecA4_1567 = (pourquoi) => verte.replace("- **A-3** — enfin TF-0222 (auto_ia)", A4_1567(pourquoi) + "- **A-3** — enfin TF-0222 (auto_ia)");
   const r59rouge = jouerPe("tf1567-execution-sans-trace.md", avecA4_1567("le compte appartient à l'exploitant"));
-  const c59r = constatDe(r59rouge, "S59");
+  const c59r = constatDe(r59rouge, "S61");
   if (c59r.statut !== "FAIL" || !/voie automatique/.test(c59r.message || ""))
     casse.push("TF-1567 : une action humaine de motif `decision` qui EXÉCUTE un choix rendu (déposer des exclusions arrêtées) "
-      + "sans trace de la voie automatique passe S59 : " + String(c59r.message || c59r.statut || "").slice(0, 200));
+      + "sans trace de la voie automatique passe S61 : " + String(c59r.message || c59r.statut || "").slice(0, 200));
   const r59trace = jouerPe("tf1567-execution-tracee.md", avecA4_1567(
     "voie automatique ESSAYÉE le 01/10, essai à blanc refusé `HTTP 403 Forbidden`, l'accès de l'agent est en lecture seule"));
-  const c59t = constatDe(r59trace, "S59");
+  const c59t = constatDe(r59trace, "S61");
   if (c59t.statut !== "PASS")
     casse.push("TF-1567 : la MÊME action portant la trace de la voie automatique essayée (code de retour) est accusée : "
       + String(c59t.message || c59t.statut || "").slice(0, 200));
   const r59choix = jouerPe("tf1567-choix-ouvert.md", avecA4_1567(
     "choisir entre les deux listes d'exclusions du plan reste ouvert"));
-  const c59c = constatDe(r59choix, "S59");
+  const c59c = constatDe(r59choix, "S61");
   if (c59c.statut !== "PASS")
     casse.push("TF-1567 : la MÊME action dont le motif nomme un CHOIX encore ouvert est accusée — `decision` vaut pour un "
       + "arbitrage : " + String(c59c.message || c59c.statut || "").slice(0, 200));
   const r59gate = jouerPe("tf1567-gate.md", avecA4_1567(
     "R-38, la publication attend votre feu vert"));
-  const c59g = constatDe(r59gate, "S59");
+  const c59g = constatDe(r59gate, "S61");
   if (c59g.statut !== "PASS")
     casse.push("TF-1567 : la MÊME action dont le motif nomme un GATE (R-38, feu vert) est accusée — un gate reste humain "
       + "par doctrine : " + String(c59g.message || c59g.statut || "").slice(0, 200));
 
-  // 12/10 — TF-1262 : S60, LE VERDICT CITÉ SUR UN PÉRIMÈTRE RÉDUIT, DANS SES QUATRE SENS. La phrase
+  // 12/10 — TF-1262 : S62, LE VERDICT CITÉ SUR UN PÉRIMÈTRE RÉDUIT, DANS SES QUATRE SENS. La phrase
   // fondatrice du 14/09 (« PASS à 1920 px »), la MÊME qui dit son périmètre, la MÊME CITÉE entre
   // guillemets dans un constat, et le verdict au périmètre par défaut énuméré en six largeurs.
   const avecB4_1262 = (puce) => verte.replace("## 5. Non traité", "- " + puce + "\n\n## 5. Non traité");
   const r60so = jouerPe("tf1262-sans-objet.md", verte);
-  if (constatDe(r60so, "S60").statut !== "PASS")
-    casse.push("TF-1262 : la verte, qui ne cite aucun verdict sur une restriction de mesure, est accusée par S60 : "
-      + String(constatDe(r60so, "S60").message || "").slice(0, 200));
+  if (constatDe(r60so, "S62").statut !== "PASS")
+    casse.push("TF-1262 : la verte, qui ne cite aucun verdict sur une restriction de mesure, est accusée par S62 : "
+      + String(constatDe(r60so, "S62").message || "").slice(0, 200));
   const r60muet = jouerPe("tf1262-perimetre-tu.md", avecB4_1262(
     "Dix pages de la bibliothèque — preuve : `render_page.py` rend `Verdict : PASS` à 1920 px sur les dix."));
-  const c60m = constatDe(r60muet, "S60");
+  const c60m = constatDe(r60muet, "S62");
   if (c60m.statut !== "FAIL" || !/périmètre/.test(c60m.message || ""))
-    casse.push("TF-1262 : « PASS à 1920 px » sans dire le périmètre passe S60 — c'est la phrase du 14/09 qui valait FAIL "
+    casse.push("TF-1262 : « PASS à 1920 px » sans dire le périmètre passe S62 — c'est la phrase du 14/09 qui valait FAIL "
       + "au périmètre par défaut : " + String(c60m.message || c60m.statut || "").slice(0, 200));
   const r60dit = jouerPe("tf1262-perimetre-dit.md", avecB4_1262(
     "Dix pages de la bibliothèque — preuve : `render_page.py` rend `Verdict : PASS` à 1920 px, périmètre restreint à une largeur quand le défaut en juge six."));
-  if (constatDe(r60dit, "S60").statut !== "PASS")
+  if (constatDe(r60dit, "S62").statut !== "PASS")
     casse.push("TF-1262 : la MÊME phrase qui dit son périmètre restreint est accusée : "
-      + String(constatDe(r60dit, "S60").message || "").slice(0, 200));
+      + String(constatDe(r60dit, "S62").message || "").slice(0, 200));
   const r60cite = jouerPe("tf1262-citation.md", avecB4_1262(
     "Erreur du 14/09 reconnue — preuve : j'avais écrit « render_page rend PASS à 1920 px », rejoué FAIL sur 10 pages."));
-  if (constatDe(r60cite, "S60").statut !== "PASS")
+  if (constatDe(r60cite, "S62").statut !== "PASS")
     casse.push("TF-1262 : la phrase fautive CITÉE entre guillemets dans un constat est accusée — une citation ne se juge pas : "
-      + String(constatDe(r60cite, "S60").message || "").slice(0, 200));
+      + String(constatDe(r60cite, "S62").message || "").slice(0, 200));
   const r60six = jouerPe("tf1262-six-largeurs.md", avecB4_1262(
     "Dix pages de la bibliothèque — preuve : `render_page.py` PASS à 3840, 2560, 1920, 1280, 768 et 390 px."));
-  if (constatDe(r60six, "S60").statut !== "PASS")
+  if (constatDe(r60six, "S62").statut !== "PASS")
     casse.push("TF-1262 : un verdict cité sur les six largeurs ÉNUMÉRÉES — le périmètre par défaut — est accusé : "
-      + String(constatDe(r60six, "S60").message || "").slice(0, 200));
+      + String(constatDe(r60six, "S62").message || "").slice(0, 200));
   // 28/09 — TF-1428 ET TF-1449. Registre produit, en tableau : la MÊME ligne avec « A-18 » dans sa
   // colonne Registre (PASS), avec un tiret (FAIL), avec un tiret et un RENVOI « après A-12 » dans
   // son texte (FAIL : un renvoi n'est pas un registre), et dans un tableau dont la colonne « Id »

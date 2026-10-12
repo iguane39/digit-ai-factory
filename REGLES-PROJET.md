@@ -321,7 +321,7 @@ Surfaces d'application encodées : `references\ACCUEIL.md` étape 5 (démarche p
 Mécanisme : S (vérification pilot à l'ouverture de run). Contrôle exécutable : hors
 `oracle-conformite-projet` (portée transverse aux prompts et rapports, pas au socle
 d'un projet produit) — reste de TF-0131, à mécaniser si un gap se constate en run réel.
-Le gap s'est constaté le 01/10/2026 (TF-1567) : le point 4 est joué par la règle S59 de
+Le gap s'est constaté le 01/10/2026 (TF-1567) : le point 4 est joué par la règle S61 de
 `oracles\oracle-synthese.mjs` (une action humaine de motif `decision` qui commande une
 exécution sans nommer de choix porte la trace de la voie automatique essayée), avec S21 pour
 les motifs `acces` et `presence` ; avertissante.
