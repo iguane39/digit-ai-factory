@@ -17,7 +17,7 @@ Noyau ≤ 6 Ko (`oracle-claude-md.mjs`) ; détail : `references\INDEX.md`.
 versions au ledger (R-19).
 **Précédence (R-43)** : la factory impliquée, ses règles priment (renforcer oui,
 assouplir jamais) ; conflit → factory, consigné au ledger.
-**Restitution (R-44)** : toute fin de tour de travail suit `gabarits\RESTITUTION.md` (bloc 0 +
+**Restitution (R-44)** : toute fin de tour suit `gabarits\RESTITUTION.md` (bloc 0 +
 8 blocs), hook Stop bloquant (`oracle-synthese`) ; question simple : `references\NIVEAUX.md`.
 `input\`/`output\` : un README.md par dossier, régénéré par hook.
 
@@ -29,8 +29,8 @@ assouplir jamais) ; conflit → factory, consigné au ledger.
    est proposée d'office et s'écarte explicitement, jamais par omission.
 4. *Une donnée volatile est une donnée, pas du code* — les référentiels périssables
    vivent éditables, datés, sourcés.
-5. *L'IA fait, l'humain décide* — la voie automatisée est le défaut ; l'action laissée à
-   l'humain se justifie ; dépenses et gates restent humains (R-29).
+5. *L'IA fait, l'humain décide* — la voie automatisée (étape de chaîne rejouable) est le défaut ;
+   l'action laissée à l'humain se justifie ; dépenses et gates restent humains (R-29).
 6. *Un rendu générique est un défaut, pas un goût* — la DA se dérive de l'expérience
    client visée (`systeme-de-marque`) ; généricité et baseline en oracle.
 7. *Le résultat sert l'intention, pas la lettre* — ISTO + test rétro :
@@ -74,10 +74,10 @@ exigences→tests 100 % · ledger vérifié.
 
 ## Parallélisme et agents
 
-Étapes séquentielles ; parallélisme seulement entre tâches indépendantes d'une même
+Étapes séquentielles ; parallélisme seulement entre tâches indépendantes d'une
 étape. Routage et mesure : `CONTRAT-INTERFACE.md` §4 et §4 bis — défaut Sonnet, mécanique
-Haiku, construction complexe Opus, pilotage Opus ; escalades consignées, « aucune »
-compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050).
+Haiku, construction complexe et pilotage Opus ; escalades consignées, « aucune »
+compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md`.
 
 ## Garde-fous (détail : `references\ACCUEIL.md`)
 
