@@ -182,6 +182,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-9 (a) exécutée : quatre dépôts publiés, trois forges reten |
 | `Digit-AI - Synthese Mandat - Publication du parc et branche ancienne retiree - 20260916a.md` | fichier | 8,1 Ko | Synthèse de mandat — le parc est publié, et la branche ancienne a disparu de GitHub (16/09 |
 | `Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` | fichier | 22,9 Ko | Synthèse de mandat — publié, neuf chantiers décidés menés à fond, et les travaux partis ch |
+| `Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` | fichier | 5,3 Ko | Synthèse Mandat — vos décisions D-61 (a), D-62 (a) et D-63 sont exécutées : 3 dépôts publi |
 | `Digit-AI - Synthese Mandat - Publication faite et verifiee sur clone frais zero anteriorite - 20260910b.md` | fichier | 12,0 Ko | Synthèse de mandat — votre feu vert est exécuté, le travail est publié, et la vérification |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees et cinq dossiers instruits - 20260922e.md` | fichier | 30,4 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 5 dossiers instruits — 22/09/2026 |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md` | fichier | 23,6 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 5 nouvelles posées — 23/09/2026 |
@@ -254,4 +255,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_237 fichier(s), 0 sous-dossier(s)_
+_238 fichier(s), 0 sous-dossier(s)_

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 391 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 392 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -372,6 +372,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md | 20260907g | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md` |
 | Digit-AI - Synthese Mandat - Publication du parc et branche ancienne retiree - 20260916a.md | 20260916a | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du parc et branche ancienne retiree - 20260916a.md` |
 | Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md | 20260831d | 22.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` |
+| Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md | 20261012d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` |
 | Digit-AI - Synthese Mandat - Publication faite et verifiee sur clone frais zero anteriorite - 20260910b.md | 20260910b | 12 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication faite et verifiee sur clone frais zero anteriorite - 20260910b.md` |
 | Digit-AI - Synthese Mandat - Quatre decisions executees et cinq dossiers instruits - 20260922e.md | 20260922e | 30.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees et cinq dossiers instruits - 20260922e.md` |
 | Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md | 20260923d | 23.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md` |
