@@ -3158,6 +3158,98 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // S59 (TF-1607, 12/10/2026) — UNE ACTION LAISSÉE À UN HUMAIN DONNE SES GESTES, ELLE NE RENVOIE PAS
+  // AILLEURS. LE FAIT, chez un produit le 01/10/2026 (lot « Produit-03 - RETOURS - 20261001k »,
+  // RA-75) : la ligne d'action de l'exploitant disait « exécuter les 8 gestes du message publié à
+  // 17h41 », message qui renvoyait lui-même à une relance antérieure. Le commanditaire, mot pour
+  // mot : « on ne s'en sort pas ». Le contrôle écrit le jour même chez le produit comptait 10 et 9
+  // renvois dans les 2 restitutions du soir, que ce juge avait rendues PASS. Ses motifs sont repris
+  // ici, bornés aux lignes qu'un humain exécute : les actions `manuelle_*` du bloc 8 et les étapes du
+  // guide. Un renvoi à ce que la MÊME restitution affiche reste admis (voir plus bas).
+  // AVERTISSANTE à son entrée, hors de BLOQUANTES du hook, comme toute règle neuve.
+  {
+    const RENVOIS = [
+      ["des gestes désignés par le message qui les porte", uni(/\b(?:gestes|étapes|instructions|actions)\s+(?:du|de la|des)\s+(?:message|demande|relance|procédure|fil)\b/i)],
+      ["un geste qui renvoie à un message ou à une procédure", uni(/\b(?:suivre|exécuter|appliquer|reprendre)\s+(?:le|la|les)\s+(?:\d+\s+)?(?:message|demande|procédure|gestes|étapes)\s+(?:du|de la|de|publiée?s?|envoyée?s?)\b(?!\s+guide\b)/i)],
+      ["un message désigné par son heure", uni(/\b(?:message|demande|relance|version)s?\s+(?:de|du)\s+\d{1,2}h\d{2}\b|\b(?:relance|demande|message)\s+(?:demandée?|envoyée?|publiée?)\s+à\s+\d{1,2}h\d{2}\b/i)],
+      ["« comme demandé »", uni(/\bcomme (?:demandé|indiqué|prévu|convenu)\b/i)],
+    ];
+    // « ci-dessus », « ci-dessous » ne sont PAS repris du contrôle du produit : ils désignent ce que
+    // la même restitution affiche (le guide, la décision du bloc 3, le message à coller), et c'est la
+    // forme que S60 demande. Mesuré le 12/10/2026 avant mise en service : avec eux, 5 restitutions du
+    // pilot sur 237 et 16 sur 134 chez le produit, presque toutes pour « la décision ci-dessus » ou
+    // « le message ci-dessous » ; sans eux (et « le message du guide » admis), 0 au pilot et 3 chez
+    // le produit, les 3 restitutions du soir du 01/10 qui renvoyaient à « la demande de 16h38 ».
+    const aJuger = actionsAvecLeurLigne(bActions)
+      .map((a) => (/^\s*\|/.test(a.ligne) ? a.ligne : a.groupe))
+      .filter((g) => HUMAINS.test(g) && !MOTIFS_ABSENCE.test(g.replace(/^\s*[-*|]\s*/, "").slice(0, 40)));
+    const mGuide59 = /(^|\n)#{1,4}[ \t]*Guide\b[^\n]*\n/i.exec(texte);
+    if (mGuide59) {
+      const debut = mGuide59.index + mGuide59[0].length;
+      const fin = texte.slice(debut).search(/\n#{1,4}\s/);
+      const corps = texte.slice(debut, fin === -1 ? undefined : debut + fin);
+      for (const l of corps.split("\n")) if (/^\s*\d{1,2}[.)]\s+\S/.test(l)) aJuger.push(l);
+    }
+    if (!aJuger.length) {
+      findings.push({ regle: "S59", statut: "SANS_OBJET", message: "aucune action manuelle_* au bloc 8 ni étape de guide — aucun geste humain à lire" });
+    } else {
+      const renvois = [];
+      for (const g of aJuger) {
+        const nu = horsCode(g);
+        const m = RENVOIS.find(([, re]) => re.test(nu));
+        if (m) renvois.push({ g, quoi: m[0], extrait: nu.match(m[1])[0] });
+      }
+      renvois.length
+        ? findings.push({ regle: "S59", statut: "FAIL",
+          message: `${renvois.length} geste(s) humain(s) sur ${aJuger.length} renvoient ailleurs au lieu de donner le contenu `
+            + `(${renvois[0].quoi} : « ${renvois[0].extrait} ») — le 01/10/2026, une action renvoyait à un message qui renvoyait `
+            + "à une relance, et le commanditaire « ne s'en sortait pas » (TF-1607). Écris les gestes en entier dans la ligne, "
+            + `ou dans le guide en tête. Ex. : ${renvois[0].g.replace(/\s+/g, " ").trim().slice(0, 110)}` })
+        : findings.push({ regle: "S59", statut: "PASS", message: `${aJuger.length} geste(s) humain(s), chacun écrit sur place, sans renvoi` });
+    }
+  }
+
+  // S60 (TF-1606, 12/10/2026) — UN MESSAGE ENVOYÉ AU NOM DU COMMANDITAIRE S'AFFICHE EN ENTIER. LE
+  // FAIT, même soirée, même produit (RA-74) : la restitution disait le message réécrit et publié à
+  // l'exploitant, et le décrivait (« 8 gestes, écran par écran ») sans l'afficher. Le commanditaire :
+  // « pourquoi le prompt […] n'est pas affiché ? » — il ne pouvait ni le vérifier ni le reprendre.
+  // La restitution du tour suivant l'affichait dans un bloc de code, et c'est cette forme qui est
+  // lue : un bloc de code, ou une citation qui n'est pas une décision, de 20 mots au moins. Le
+  // déclencheur est BORNÉ à un message, un courriel, une relance, un commentaire ou un complément
+  // déclaré envoyé, publié, posté ou transmis — jamais un commit, une demande de fusion ni une
+  // publication de dépôt, ni un message d'une session à une autre, qui n'est pas écrit au nom du
+  // commanditaire, ni un message d'enregistrement ; une négation (« non publié ») ne déclare aucun
+  // envoi. Mesuré le 12/10/2026 : avant ce bornage, 5 restitutions du pilot sur 237 accusées, toutes
+  // à tort (3 messages entre sessions, 1 négation, 1 message d'enregistrement) ; après, 0 au pilot,
+  // et 1 sur 134 chez le produit, celle du soir du 01/10. AVERTISSANTE à son entrée.
+  {
+    const RE_ENVOI = uni(/\b(?:message|courriel|e-mail|mail|relance|commentaire|complément|prompt)\b(?![^.\n|]{0,15}\bde commit\b)[^.\n|]{0,80}?\b(?:publiée?|envoyée?|postée?|transmise?)\b/i);
+    const sansCode60 = texte.replace(/```[\s\S]*?```/g, " ").replace(/`[^`\n]*`/g, " ");
+    const lignesEnvoi = sansCode60.split("\n").filter((l) => RE_ENVOI.test(l)
+      && !/\b(?:n['’]|ne\s+)(?:est|a|ont|sont)\s+(?:pas|jamais)\b|\bnon\s+(?:publi|envoy|post|transmi)|\bcommit\b|\bsessions?\b|d['’]enregistrement/i.test(l));
+    if (!lignesEnvoi.length) {
+      findings.push({ regle: "S60", statut: "SANS_OBJET", message: "aucun message déclaré envoyé ou publié — rien à afficher" });
+    } else {
+      const mots = (t) => t.split(/\s+/).filter((m) => /[\p{L}\d]/u.test(m)).length;
+      const blocsCode = [...texte.matchAll(/```[^\n]*\n([\s\S]*?)```/g)].map((m) => m[1]);
+      const citations = [];
+      let courante = null;
+      for (const l of texte.split("\n")) {
+        if (/^\s*>/.test(l)) courante = (courante === null ? "" : courante + "\n") + l.replace(/^\s*>\s?/, "");
+        else if (courante !== null) { citations.push(courante); courante = null; }
+      }
+      if (courante !== null) citations.push(courante);
+      const affiche = blocsCode.some((b) => mots(b) >= 20)
+        || citations.some((c) => mots(c) >= 20 && !RE_SELECTEUR_DECISION.test(c.slice(0, 40)));
+      affiche
+        ? findings.push({ regle: "S60", statut: "PASS", message: "message déclaré envoyé, et affiché en entier (bloc de code ou citation)" })
+        : findings.push({ regle: "S60", statut: "FAIL",
+          message: "un message est déclaré envoyé ou publié, et la restitution ne l'affiche pas — le 01/10/2026, le commanditaire "
+            + "n'a pu ni vérifier ni reprendre le message envoyé en son nom (TF-1606). Affiche le texte envoyé en entier, dans un "
+            + `bloc de code ou une citation. Ex. : ${lignesEnvoi[0].replace(/\s+/g, " ").trim().slice(0, 110)}` });
+    }
+  }
+
   return findings;
 }
 
@@ -3522,6 +3614,24 @@ Aucun écart : la demande a été suivie à la lettre.
     "Depuis 3 jours, la colonne « Coût » des options reste remplie en complexité × durée." + nl + nl + "## 5. Non traité" + nl), "utf8");
   writeFileSync(join(dir, "s10-cout-en-jours.md"), verte.replace("## 5. Non traité" + nl,
     "La colonne « Coût » des options porte 3 jours pour la reprise." + nl + nl + "## 5. Non traité" + nl), "utf8");
+  // 12/10/2026 (TF-1607) — S59 DANS SES TROIS SENS. L'action humaine A-2 de la verte donne son écran
+  // et son bouton : PASS. La MÊME, ses gestes remplacés par « les 8 gestes du message publié à
+  // 17h41 » : FAIL. La MÊME, renvoyant au message affiché « ci-dessous » dans la même restitution :
+  // PASS — c'est la forme que S60 demande, et le corpus l'écrit souvent.
+  const OU_A2 = "  - où : écran « Publier la version », bouton `Publier`.";
+  if (!verte.includes(OU_A2)) throw new Error("fixture S59 : la ligne « où » de A-2 a changé dans la verte");
+  writeFileSync(join(dir, "s59-renvoi.md"), verte.replace(OU_A2,
+    "  - où : exécuter les 8 gestes du message publié à 17h41 dans le fil de la demande."), "utf8");
+  writeFileSync(join(dir, "s59-ci-dessous.md"), verte.replace(OU_A2,
+    "  - où : écran « Publier la version », coller le message ci-dessous puis cliquer sur `Publier`."), "utf8");
+  // 12/10/2026 (TF-1606) — S60 DANS SES TROIS SENS. Un message déclaré publié à l'exploitant, sans son
+  // texte : FAIL. Le MÊME, son texte affiché dans un bloc de code : PASS. La verte, qui n'envoie
+  // rien : SANS_OBJET.
+  const ENVOI = "- Message réécrit publié à l'exploitant dans le fil de la demande — preuve : commentaire 3 du fil, 17h41." + nl;
+  const TEXTE_ENVOYE = nl + "```text" + nl + "Bonjour, voici les gestes de la relance : ouvrir la chaîne de livraison, choisir la branche"
+    + " de production, cocher la case de la fiche seulement, lancer, puis approuver l'étape quand l'écran la demande." + nl + "```" + nl;
+  writeFileSync(join(dir, "s60-decrit.md"), verte.replace("## 5. Non traité" + nl, ENVOI + nl + "## 5. Non traité" + nl), "utf8");
+  writeFileSync(join(dir, "s60-affiche.md"), verte.replace("## 5. Non traité" + nl, ENVOI + TEXTE_ENVOYE + nl + "## 5. Non traité" + nl), "utf8");
   // Sens ROUGE : une VRAIE recherche par nom qui ne trouve rien, au bloc 7. Elle emploie le mot
   // « motif » dans son sens de RECHERCHE (« les motifs de nom joués sur… ») — c'est ce qui prouve
   // que le mot a été BORNÉ et non supprimé : la correction devait retirer une collision, pas
@@ -3685,6 +3795,24 @@ Aucun écart : la demande a été suivie à la lettre.
       + "colonne « Coût » — écrite en lettres, EC-9 la refuse : le fait n'a plus d'écriture admise");
   if (!/"S10"[^}]*FAIL/.test(rs10c.stdout))
     casse.push("S10 (TF-1578) : la colonne « Coût » qui porte 3 jours passe — borner la règle l'a éteinte");
+  // TF-1607 — S59 dans ses TROIS sens ; TF-1606 — S60 dans ses TROIS sens.
+  const jugeS = (nom) => spawnSync(process.execPath, [moi, join(dir, nom)], { encoding: "utf8" }).stdout;
+  const statutDe = (sortie, regle) => ((JSON.parse(sortie || "{}").findings || []).find((f) => f.regle === regle) || {}).statut;
+  const s59r = jugeS("s59-renvoi.md"), s59c = jugeS("s59-ci-dessous.md");
+  if (statutDe(rv.stdout, "S59") !== "PASS")
+    casse.push("S59 (TF-1607) : la verte, dont l'action humaine donne son écran et son bouton, n'est pas PASS — " + statutDe(rv.stdout, "S59"));
+  if (statutDe(s59r, "S59") !== "FAIL" || !/heure|gestes/.test(s59r))
+    casse.push("S59 (TF-1607) : une action humaine qui renvoie aux « 8 gestes du message publié à 17h41 » passe — le soir du 01/10/2026");
+  if (statutDe(s59c, "S59") !== "PASS")
+    casse.push("S59 (TF-1607) : une action qui renvoie au message affiché « ci-dessous » dans la même restitution est accusée — "
+      + "c'est la forme que S60 demande");
+  const s60d = jugeS("s60-decrit.md"), s60a = jugeS("s60-affiche.md");
+  if (statutDe(s60d, "S60") !== "FAIL")
+    casse.push("S60 (TF-1606) : un message déclaré publié à l'exploitant, sans son texte, passe — " + statutDe(s60d, "S60"));
+  if (statutDe(s60a, "S60") !== "PASS")
+    casse.push("S60 (TF-1606) : le MÊME message, affiché dans un bloc de code, est accusé — " + statutDe(s60a, "S60"));
+  if (statutDe(rv.stdout, "S60") !== "SANS_OBJET")
+    casse.push("S60 (TF-1606) : la verte, qui n'envoie aucun message, n'est pas SANS_OBJET — " + statutDe(rv.stdout, "S60"));
   // TF-1577 — S5 dans ses DEUX sens sur la forme du gabarit (motif en sous-puce).
   const rs5m = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-motif.md")], { encoding: "utf8" });
   const rs5n = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-nue.md")], { encoding: "utf8" });
