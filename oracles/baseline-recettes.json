@@ -607,7 +607,7 @@
   "vu_le": "2026-09-22"
  },
  "scripts/verifier-hooks-git.test.mjs": {
-  "cas": 13,
+  "cas": 17,
   "vu_le": "2026-10-12"
  },
  "scripts/verifier-jeu-livrables.test.mjs": {

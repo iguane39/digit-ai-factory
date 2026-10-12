@@ -167,5 +167,52 @@ check("vert (TF-1275) — dépôt SANS contrôle d'avance suivi et sans pre-push
   rmSync(D, { recursive: true, force: true });
 });
 
+// TF-1400 (12/10/2026) — H4 : le pre-push rejoue les verdicts cités au commit ; sa section propre
+// versionnée est posée par `--installer` dans une section VIDE du gabarit, jamais ailleurs.
+const MARQUES = (milieu) => "#!/bin/sh\ntrap '' PIPE\n# >>> prolongement local >>>\n" + milieu + "# <<< prolongement local <<<\nnode porte-des-noms.mjs\n";
+const SECTION = "node \"$D/scripts/verifier-avance-publication.mjs\" || exit 1\nnode \"$D/scripts/rejouer-verdicts-cites.mjs\" || exit 1\n";
+const depotVerdicts = () => {
+  const D = depotAvance();
+  writeFileSync(join(D, "scripts", "rejouer-verdicts-cites.mjs"), "// rejeu jouet\n", "utf8");
+  writeFileSync(join(D, "scripts", "hooks-git", "pre-push-prolongement-local"), SECTION, "utf8");
+  spawnSync("git", ["-C", D, "add", "."], { encoding: "utf8" });
+  return D;
+};
+check("rouge (TF-1400) — pre-push sans l'appel du rejeu ni marqueurs (le pre-push actuel du pilot) : H4 le nomme, exit 1", () => {
+  const D = depotVerdicts();
+  writeFileSync(PRE_PUSH(D), PRE_PUSH_COMPLET, "utf8");
+  const r = lancer(D);
+  if (r.code !== 1 || !/\[FAIL\] H4/.test(r.sortie) || !/pas les marqueurs/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  rmSync(D, { recursive: true, force: true });
+});
+check("remède joué (TF-1400) — gabarit à section VIDE : `--installer` y pose la section versionnée, puis H3 et H4 PASS sans option", () => {
+  const D = depotVerdicts();
+  writeFileSync(PRE_PUSH(D), MARQUES(""), "utf8");
+  const r0 = lancer(D);
+  if (r0.code !== 1 || !/\[FAIL\] H4/.test(r0.sortie) || !/section propre est vide/.test(r0.sortie)) throw new Error(`état rouge : exit ${r0.code} : ${r0.sortie}`);
+  const r1 = lancer(D, "--installer");
+  if (r1.code !== 0 || !/\[INSTALLÉ\] section propre du pre-push/.test(r1.sortie)) throw new Error(`exit ${r1.code} : ${r1.sortie}`);
+  if (readFileSync(PRE_PUSH(D), "utf8") !== MARQUES(SECTION)) throw new Error("la section n'est pas posée entre les marqueurs, ou le reste du hook a changé");
+  const r2 = lancer(D);
+  if (r2.code !== 0 || !/\[PASS\] H3/.test(r2.sortie) || !/\[PASS\] H4/.test(r2.sortie)) throw new Error(`après pose, exit ${r2.code} : ${r2.sortie}`);
+  rmSync(D, { recursive: true, force: true });
+});
+check("borne (TF-1400) — section propre déjà REMPLIE sans le rejeu : `--installer` la conserve, H4 reste rouge", () => {
+  const D = depotVerdicts();
+  const rempli = MARQUES("echo section locale\n");
+  writeFileSync(PRE_PUSH(D), rempli, "utf8");
+  const r = lancer(D, "--installer");
+  if (r.code !== 1 || !/\[FAIL\] H4/.test(r.sortie) || !/CONSERVÉ/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  if (readFileSync(PRE_PUSH(D), "utf8") !== rempli) throw new Error("la section remplie a été écrasée");
+  rmSync(D, { recursive: true, force: true });
+});
+check("vert (TF-1400) — dépôt qui ne suit pas le rejeu : aucune ligne H4", () => {
+  const D = depotAvance();
+  writeFileSync(PRE_PUSH(D), PRE_PUSH_COMPLET, "utf8");
+  const r = lancer(D);
+  if (r.code !== 0 || /H4/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  rmSync(D, { recursive: true, force: true });
+});
+
 console.log(`\nverifier-hooks-git (TF-1041) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

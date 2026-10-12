@@ -237,6 +237,7 @@ if (!sansPilot) {
     if (h.status === 0) ligne("ok", "digit-ai-factory (pilot) — gardes de pré-commit appelées par le hook installé");
     else if (h.status === 1) defaut(`digit-ai-factory (pilot) — ${lignes.filter((x) => x.startsWith("[FAIL]")).join(" · ").slice(0, 300)}`,
       lignes.some((x) => x.startsWith("[FAIL] H3")) ? "rétablir le pre-push R-38 (H3, TF-1275) : installeur de la forge des outils, puis la section d'avance avant la porte des noms"
+        : lignes.some((x) => x.startsWith("[FAIL] H4")) ? "poser la section TF-1400 du pre-push : installeur de la forge des outils --seul=pre-push, puis node scripts/verifier-hooks-git.mjs --installer"
         : pull ? "fusionner à la main depuis scripts/hooks-git/pre-commit" : "node bootstrap.mjs --pull (pose le hook s'il manque)");
   }
   const empreinteApres = createHash("sha256").update(readFileSync(MOI)).digest("hex");
