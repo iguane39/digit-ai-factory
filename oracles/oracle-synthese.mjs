@@ -753,7 +753,17 @@ function juger(texte, cheminJuge = null) {
 
   // S5 — chaque non-traité porte un motif
   const bNonTraite = bloc(texte, BLOCS[4][0]) || "";
-  const lignesNonTraite = puces(bNonTraite);
+  // 12/10/2026 (TF-1577, RT-103) : un élément se juge AVEC ses sous-puces, comme une action du
+  // bloc 8. Le gabarit prescrit « - élément non traité ; » puis une sous-puce « - motif : … » ;
+  // lue ligne à ligne, cette forme exacte comptait 6 éléments sur 6 sans motif le 24/09/2026. Une
+  // puce plus indentée que l'élément qui la précède lui appartient.
+  const indent = (l) => /^\s*/.exec(l)[0].length;
+  const lignesNonTraite = [];
+  for (const p of puces(bNonTraite)) {
+    const tete = lignesNonTraite[lignesNonTraite.length - 1];
+    if (tete !== undefined && indent(p) > indent(tete)) lignesNonTraite[lignesNonTraite.length - 1] += " " + p.trim();
+    else lignesNonTraite.push(p);
+  }
   if (!lignesNonTraite.length) {
     MOTIFS_ABSENCE.test(bNonTraite)
       ? ok("S5", "rien de non traité — déclaré explicitement")
@@ -3485,6 +3495,17 @@ Aucun écart : la demande a été suivie à la lettre.
   const ligneGabarit = "- Publier, actualiser ou interroger quoi que ce soit dans l'espace de travail — motif : `garde_fou` (R-38, aucune publication sur un service hébergé sans GO humain consigné).";
   const motifGabarit = verte.replace("## 5. Non traité" + nl, "## 5. Non traité" + nl + ligneGabarit + nl);
   writeFileSync(join(dir, "motif-gabarit.md"), motifGabarit, "utf8");
+  // 12/10/2026 (TF-1577, RT-103) — S5 DANS SES DEUX SENS SUR LA FORME DU GABARIT. Verte : l'élément
+  // écrit « - élément ; » et son motif en SOUS-PUCE « - motif : … », mot pour mot la forme que le
+  // gabarit prescrit au bloc 5. Rouge : le MÊME élément, sa sous-puce ne portant qu'un détail sans
+  // motif. Les deux ne diffèrent que par la sous-puce.
+  const S5_ELEMENT = "- Relecture native des 180 chaînes du pack anglais ;" + nl;
+  const s5SousPuceMotif = verte.replace("## 5. Non traité" + nl, "## 5. Non traité" + nl + S5_ELEMENT
+    + "  - motif : hors mandat, la relecture se tranche à l'oreille d'un natif." + nl);
+  const s5SousPuceNue = verte.replace("## 5. Non traité" + nl, "## 5. Non traité" + nl + S5_ELEMENT
+    + "  - les chaînes vivent dans le dossier des traductions." + nl);
+  writeFileSync(join(dir, "s5-sous-puce-motif.md"), s5SousPuceMotif, "utf8");
+  writeFileSync(join(dir, "s5-sous-puce-nue.md"), s5SousPuceNue, "utf8");
   // Sens ROUGE : une VRAIE recherche par nom qui ne trouve rien, au bloc 7. Elle emploie le mot
   // « motif » dans son sens de RECHERCHE (« les motifs de nom joués sur… ») — c'est ce qui prouve
   // que le mot a été BORNÉ et non supprimé : la correction devait retirer une collision, pas
@@ -3639,6 +3660,14 @@ Aucun écart : la demande a été suivie à la lettre.
         (new RegExp(`"${regle}"[\\s\\S]{0,180}`).exec(rct.stdout) || [""])[0].replace(/\s+/g, " "));
     }
   }
+  // TF-1577 — S5 dans ses DEUX sens sur la forme du gabarit (motif en sous-puce).
+  const rs5m = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-motif.md")], { encoding: "utf8" });
+  const rs5n = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-nue.md")], { encoding: "utf8" });
+  if (!/"S5"[^}]*PASS/.test(rs5m.stdout))
+    casse.push("S5 (TF-1577) : un élément du bloc 5 dont le motif vit en SOUS-PUCE, la forme exacte du gabarit, est accusé "
+      + "sans motif : " + (/"S5"[\s\S]{0,200}/.exec(rs5m.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S5"[^}]*FAIL/.test(rs5n.stdout))
+    casse.push("S5 (TF-1577) : le MÊME élément, sa sous-puce ne portant aucun motif, passe — lire la sous-puce a éteint la règle");
   // TF-0998 — S24 dans ses DEUX sens.
   const rmg = spawnSync(process.execPath, [moi, join(dir, "motif-gabarit.md")], { encoding: "utf8" });
   if (!/"S24"[^}]*PASS/.test(rmg.stdout))
