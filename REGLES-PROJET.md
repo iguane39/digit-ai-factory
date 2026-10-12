@@ -650,6 +650,12 @@ exactement le défaut**. Étude : `output\03-etudes\20260817-etude-opportunite-p
    `explicite`) et rend FAIL dès qu'un enregistrement `explicite` est présent, sauf GO
    déclaré (`--go "<motif>"`) ; le hook `pre-push` du pilot le joue avant la porte des
    noms, le GO se déclare par `FORGE_PUSH_GO="D-N (x) du JJ/MM"`.
+   *Où vivent les pièces (TF-1275, 12/10/2026)* : la porte des noms n'est PAS sous `oracles\` du pilot ;
+   elle vit dans le skill `quality-oracles` (source `digit-ai-forge-agents\.claude\skills\quality-oracles\scripts\oracle-nom-client-publie.mjs`,
+   copie installée sous `~\.claude\skills\`), et le hook la cherche d'abord dans la copie installée. Le hook
+   `pre-push` est un fichier de `.git\hooks\` qui ne voyage pas ; la section du contrôle d'avance y est
+   insérée à la main, et `scripts\verifier-hooks-git.mjs` (règle H3, jouée par `bootstrap.mjs` à l'ouverture)
+   déclare en DÉFAUT un pre-push absent ou sans cette section.
 6. **GO permanent de push pour les forges et le pilot (D-53 (b) et D-54 (b), 03/10/2026).**
    Le dépôt d'une **forge** (les 13 `digit-ai-forge-*`) et celui du **pilot**
    (`digit-ai-factory`) se poussent sans GO humain par envoi : la session déclare

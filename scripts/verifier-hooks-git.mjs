@@ -25,8 +25,16 @@
  * la copie versionnée exigeait une fusion à la main sur chaque poste, pour un fichier que personne
  * n'avait écrit.
  *
+ * TF-1275 (12/10/2026) : H3 — quand le dépôt porte `scripts/verifier-avance-publication.mjs`, le hook
+ * `pre-push` installé EXISTE et l'appelle. R-38 par. 5 écrit que « le hook pre-push du pilot le joue » ;
+ * la section qui l'appelle est insérée à la main dans un fichier de `.git/hooks/` qui ne voyage pas, et
+ * une repose de l'installeur de la forge des outils l'efface sans rien dire (il réécrit le fichier
+ * depuis son gabarit). H3 rend ce silence audible : absence nommée, jamais réparée ici (la pose du
+ * pre-push reste à l'installeur, qui doit porter la section — décision du 02/10/2026, option a).
+ *
  * NON JUGÉ : `core.hooksPath` pointé ailleurs (le chemin est résolu par git, pas deviné) ; ce que
- * font les gardes ; le `pre-push` et le `commit-msg`, posés par l'installeur de la forge des outils.
+ * font les gardes ; le `commit-msg`, posé par l'installeur de la forge des outils ; la POSE du
+ * `pre-push` (H3 la constate, elle ne la fait pas).
  *
  * Usage : node scripts/verifier-hooks-git.mjs [--depot <dossier>] [--installer]
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable (hors dépôt git).
@@ -106,6 +114,23 @@ if (gardes.length) {
       ? ko("H2", `la copie versionnée n'appelle pas ${manquantes.join(", ")} — elle poserait un hook déjà incomplet`)
       : ok("H2", "la copie versionnée appelle chaque garde déclarée");
   }
+}
+
+// TF-1275 — H3 : le pre-push qui joue le contrôle d'avance (R-38 par. 4-6) est posé ET l'appelle.
+const GARDE_AVANCE = "scripts/verifier-avance-publication.mjs";
+if (git("ls-files", "--", GARDE_AVANCE).stdout.trim() === GARDE_AVANCE) {
+  const prePush = (() => {
+    const p = git("rev-parse", "--git-path", "hooks/pre-push").stdout.trim();
+    return isAbsolute(p) ? p : join(DEPOT, p);
+  })();
+  if (!existsSync(prePush)) {
+    ko("H3", "AUCUN hook pre-push installé alors que R-38 par. 5 dit qu'il joue " + GARDE_AVANCE
+      + " : une publication part sans contrôle d'avance ni porte des noms. Remède : poser le pre-push par "
+      + "l'installeur de la forge des outils (installer-hamecon-publication.mjs), puis y rétablir la section R-38 par. 4-6");
+  } else if (!readFileSync(prePush, "utf8").includes("verifier-avance-publication.mjs")) {
+    ko("H3", "hook pre-push installé qui n'appelle pas " + GARDE_AVANCE + " — la section R-38 par. 4-6 a été effacée "
+      + "(repose de l'installeur, qui réécrit le fichier depuis son gabarit). Remède : la rétablir avant la porte des noms");
+  } else ok("H3", "le hook pre-push installé appelle " + GARDE_AVANCE);
 }
 
 for (const c of constats) console.log(c);

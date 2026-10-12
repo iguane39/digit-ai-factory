@@ -119,5 +119,53 @@ check("borne — hors dépôt git : non jugeable (exit 2), jamais un vert", () =
   rmSync(D, { recursive: true, force: true });
 });
 
+// TF-1275 (12/10/2026) — H3 : le pre-push qui joue le contrôle d'avance (R-38 par. 5) est posé et l'appelle.
+const PRE_COMMIT_OK = SOURCE;
+const PRE_PUSH = (D) => join(D, ".git", "hooks", "pre-push");
+const depotAvance = () => {
+  const D = depot();
+  writeFileSync(join(D, "scripts", "verifier-avance-publication.mjs"), "// contrôle d'avance jouet\n", "utf8");
+  spawnSync("git", ["-C", D, "add", "."], { encoding: "utf8" });
+  writeFileSync(HOOK(D), PRE_COMMIT_OK, "utf8"); // H1 et H2 vertes : seul H3 est en jeu
+  return D;
+};
+const PRE_PUSH_COMPLET = "#!/bin/sh\ntrap '' PIPE\nnode \"$D/scripts/verifier-avance-publication.mjs\" || exit 1\nnode porte-des-noms.mjs\n";
+check("rouge (TF-1275) — dépôt qui porte le contrôle d'avance, AUCUN pre-push : H3 le nomme, exit 1", () => {
+  const D = depotAvance();
+  const r = lancer(D);
+  if (r.code !== 1 || !/\[FAIL\] H3/.test(r.sortie) || !/AUCUN hook pre-push/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  rmSync(D, { recursive: true, force: true });
+});
+check("rouge (TF-1275) — pre-push posé par l'installeur SANS la section d'avance (repose qui l'efface) : H3 le nomme", () => {
+  const D = depotAvance();
+  writeFileSync(PRE_PUSH(D), "#!/bin/sh\nnode porte-des-noms.mjs\n", "utf8");
+  const r = lancer(D);
+  if (r.code !== 1 || !/\[FAIL\] H3/.test(r.sortie) || !/n'appelle pas scripts\/verifier-avance-publication\.mjs/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  rmSync(D, { recursive: true, force: true });
+});
+check("remède joué (TF-1275) — la section d'avance rétablie dans le pre-push : H3 PASS, exit 0", () => {
+  const D = depotAvance();
+  writeFileSync(PRE_PUSH(D), "#!/bin/sh\nnode porte-des-noms.mjs\n", "utf8");
+  if (lancer(D).code !== 1) throw new Error("l'état rouge n'est pas rouge");
+  writeFileSync(PRE_PUSH(D), PRE_PUSH_COMPLET, "utf8");
+  const r = lancer(D);
+  if (r.code !== 0 || !/\[PASS\] H3/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  rmSync(D, { recursive: true, force: true });
+});
+check("borne (TF-1275) — `--installer` ne pose JAMAIS de pre-push (c'est l'installeur externe) : H3 reste rouge", () => {
+  const D = depotAvance();
+  const r = lancer(D, "--installer");
+  if (r.code !== 1 || !/\[FAIL\] H3/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  if (existsSync(PRE_PUSH(D))) throw new Error("un pre-push a été écrit");
+  rmSync(D, { recursive: true, force: true });
+});
+check("vert (TF-1275) — dépôt SANS contrôle d'avance suivi et sans pre-push : aucune ligne H3, exit 0", () => {
+  const D = depot();
+  writeFileSync(HOOK(D), SOURCE, "utf8");
+  const r = lancer(D);
+  if (r.code !== 0 || /H3/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie}`);
+  rmSync(D, { recursive: true, force: true });
+});
+
 console.log(`\nverifier-hooks-git (TF-1041) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
