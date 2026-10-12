@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 91 services · 77 prouvés · 14 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 92 services · 77 prouvés · 15 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -57,7 +57,7 @@
 | cat-tst-07 | **Rapport exhaustif test-par-test** | obtenir le verdict et le pourquoi de CHAQUE test, pas seulement un agrégat par pan | `forge_tests\noyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, self-test noyau vert, pytest 154 rejoué pilot ; v0 — branchement des adaptateurs (--junitxml → essais réels) = jalon d'intégration | prouve | experimental |
 | cat-tst-08 | **Juger un catalogue de traductions** | savoir si mes traductions sont COMPLÈTES, si leurs paramètres sont intacts et si mes libellés d'action sont constants — sans attendre un build servi | `forge_tests\catalogue_i18n.py, câblé au pan `i18n` (aucun modèle appelé)` | TF-0383 (19/08) : sur un produit client livré, le pan rendait SKIP / 0 finding et rend FAIL / 5 findings nommés — 150 clés manquantes sur 245 pour 5 des 7 locales déclarées, servies par le repli sans le dire. 19 tests double sens ; la JUSTESSE d'une traduction est déclarée non jugée | prouve | experimental |
 
-## forge-agents (transverse) — 11 services
+## forge-agents (transverse) — 12 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -72,6 +72,7 @@
 | cat-agt-09 | **Contre-expertise d'un livrable** | faire contre-expertiser un livrable par un second regard indépendant du producteur | `skill contre-expertise` | déclaré au catalogue le 14/08 (RV-7) — usage réel à consigner | declare | experimental |
 | cat-agt-10 | **Fiches expert du domaine** | mobiliser ou rédiger une fiche d'expertise versionnée (experts-forge / write-an-expert) | `skills experts-forge et write-an-expert` | déclaré au catalogue le 14/08 (RV-7) — fiches\ du pilot en sont les consommatrices | declare | experimental |
 | cat-agt-11 | **Fixer la barre d'un livrable** | trouver, prouver (test d'existence exécuté) et décomposer la référence externe qui fixe le niveau d'un livrable — pré-vol d'un prompt ou en ligne d'une boucle | `skill la-barre — invocation : « barre… » en tête de message ; registre : .claude\skills\la-barre\references\registre-barres.md` | usages réels : pré-vol TF-0083 (11/08, 3 barres data), campagne catalogues (12/08), TF-0153 (13/08, barre Allure), run Produit-10 (13/08 : protocole tenu intégralement, arrêt au pas 5, garde anti-gameable exercé) | prouve | production |
+| cat-agt-13 | **Construire un plan d'amélioration post-audit** | recevoir un plan d'amélioration multi-domaines joint aux actions de remédiation d'un audit, jugé contre son contrat et rendu en page | `skill plan-d-amelioration — node .claude\skills\plan-d-amelioration\scripts\joindre.mjs plan.json --actions <yaml> --controles <json>, puis oracle-plan-d-amelioration.mjs et rendre.mjs` | TF-1234 (12/10/2026) : recette du skill 36/36, paire rouge/verte au manifeste de quality-oracles (434 contrôles PASS) ; gabarit de page jugé par forge-design (TF-1236, verdict « Livrer »). Aucune mission réelle encore : statut declare | declare | experimental |
 
 ## forge-ops (transverse) — 6 services
 

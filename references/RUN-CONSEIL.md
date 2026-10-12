@@ -102,7 +102,12 @@ y trouve*.
    fermées, arbitrages assumés. **Un constat juste sans sa conclusion opérationnelle ne
    produit rien** : « ce qui manque est un déploiement, pas une conception » était écrit et exact,
    et il a fallu une objection humaine pour qu'il change une décision de périmètre. Une solution existante à challenger passe par
-   `contre-expertise` ; un avis sans mesure n'entre pas au livrable.
+   `contre-expertise` ; un avis sans mesure n'entre pas au livrable. Quand le conseil
+   suit un **audit** et que ses recommandations couvrent plusieurs domaines (TF-1237,
+   12/10/2026), elles prennent la forme d'un plan d'amélioration joint aux actions de
+   remédiation de l'audit : skill `plan-d-amelioration` de forge-agents (`joindre.mjs`,
+   puis `rendre.mjs`), jugé par `oracle-plan-d-amelioration.mjs` (PA1-PA14) en plus de
+   `oracle-livrable-conseil.mjs`. Le plan ne recopie aucun constat d'audit : il y renvoie.
 4. **Lotir et planifier (C4)** — `gabarits\DEMARCHE-ROI.md` : lots « utiles,
    utilisables, utilisés » (les trois critères par lot, binaires), trajectoire de
    construction et de migration (applications ET bases — plans forge-ops `plan <cible>`
