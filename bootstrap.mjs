@@ -36,9 +36,10 @@
 // Contrat de sortie : rapport sur stdout, exit 0 = poste prêt, 1 = au moins un défaut.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, renameSync, readdirSync, statSync, readlinkSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, renameSync, readdirSync, statSync, readlinkSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { skillsInstalles } from "./scripts/lib-config-installee.mjs";
+import { releverNonEnregistres, dire } from "./scripts/lib-non-enregistre.mjs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -137,13 +138,60 @@ const decrire = (e) => {
   return `en avance de ${e.avance} commit(s) (travail local non poussé)`;
 };
 
+// TF-1612 (12/10/2026) — UN JOURNAL ÉCRIT PAR UN ORACLE ET VERSIONNÉ NE BLOQUE PLUS LA MISE À JOUR.
+// Le 07/10, le pilot restait « en retard de 83 commits » : `todo/HERITAGE-RELEVES.jsonl` (journal
+// append-only du relevé d'héritage) portait une ligne locale, `git pull --ff-only` refusait, et le
+// message ne nommait pas le fichier. Deux remèdes : le message nomme les fichiers qui bloquent
+// (`fichiersBloquants`), et un journal append-only SEUL en cause est réconcilié sans perte — ses
+// lignes locales sont gardées, le fichier est remis à l'état publié, le pull se joue, puis les lignes
+// locales absentes du publié sont ré-ajoutées. Tout autre fichier bloquant reste un geste humain.
+const JOURNAUX_APPEND_ONLY = ["todo/HERITAGE-RELEVES.jsonl"];
+const fichiersBloquants = (stderr) => {
+  const lignes = String(stderr || "").split(/\r?\n/);
+  const out = [];
+  let dans = false;
+  for (const l of lignes) {
+    if (/would be overwritten|seraient écrasé|seraient remplacé/i.test(l)) { dans = true; continue; }
+    if (dans && /^\s+\S/.test(l)) out.push(l.trim());
+    else if (dans && !/^\s/.test(l)) dans = false;
+  }
+  return out;
+};
+function pullAvecJournaux(dest) {
+  let p = git(dest, "pull", "--ff-only", "--quiet");
+  if (p.status === 0) return { p, bloquants: [], reconcilies: [] };
+  const bloquants = fichiersBloquants(p.stderr);
+  if (!bloquants.length || !bloquants.every((f) => JOURNAUX_APPEND_ONLY.includes(f))) return { p, bloquants, reconcilies: [] };
+  const locaux = new Map(bloquants.map((f) => [f, readFileSync(join(dest, f), "utf8")]));
+  const restaurer = () => { for (const [f, t] of locaux) writeFileSync(join(dest, f), t, "utf8"); };
+  for (const f of bloquants) {
+    if (git(dest, "checkout", "--", f).status !== 0) { restaurer(); return { p, bloquants, reconcilies: [] }; }
+  }
+  p = git(dest, "pull", "--ff-only", "--quiet");
+  if (p.status !== 0) { restaurer(); return { p, bloquants, reconcilies: [] }; }
+  for (const [f, local] of locaux) {
+    const publie = readFileSync(join(dest, f), "utf8");
+    const connues = new Set(publie.split(/\r?\n/).filter(Boolean));
+    const manquantes = local.split(/\r?\n/).filter((l) => l && !connues.has(l));
+    if (manquantes.length) writeFileSync(join(dest, f), publie.replace(/\r?\n?$/, "\n") + manquantes.join("\n") + "\n", "utf8");
+  }
+  return { p, bloquants, reconcilies: bloquants };
+}
+
 // Juge un dépôt présent : le met à jour si --pull, sinon le mesure. Enregistre sa version.
 function traiterPresent(nom, dest) {
+  const estPilot = resolve(dest) === resolve(ICI);
   let e = etatDepot(dest);
   if (pull && e.fetch && e.retard > 0 && e.avance === 0) {
-    const p = git(dest, "pull", "--ff-only", "--quiet");
-    if (p.status === 0) { e = etatDepot(dest); ligne("ok", `${nom} — mis à jour (${e.version}, ${decrire(e)})`); }
-    else defaut(`${nom} — pull impossible : ${(p.stderr || "").trim().split("\n")[0].slice(0, 120)}`,
+    const { p, bloquants, reconcilies } = pullAvecJournaux(dest);
+    if (p.status === 0) {
+      e = etatDepot(dest);
+      ligne("ok", `${nom} — mis à jour (${e.version}, ${decrire(e)})`);
+      if (reconcilies.length) ligne("ok", `${nom} — journal(aux) append-only rejoué(s) après le pull : ${reconcilies.join(", ")} (TF-1612)`);
+    }
+    // TF-1612 : le message NOMME le fichier qui bloque, pas seulement la première ligne de git.
+    else defaut(`${nom} — pull impossible : ${(p.stderr || "").trim().split("\n")[0].slice(0, 120)}` +
+      (bloquants.length ? ` — fichier(s) qui bloque(nt) : ${bloquants.join(", ")}` : ""),
       "git status dans le dépôt, résoudre (stash/commit), relancer --pull");
   } else if (e.fetch && e.retard > 0 && e.avance > 0) {
     defaut(`${nom} — ${decrire(e)}`, "rebase ou merge à la main dans le dépôt (ff-only refusé par construction)");
@@ -154,7 +202,20 @@ function traiterPresent(nom, dest) {
     ligne(s, `${nom} — présent, ${decrire(e)} (${e.version})`);
     if (!e.fetch) averts.push(`${nom} hors ligne`);
   }
-  if (!e.propre) ligne("avert", `${nom} — modifications locales non committées (le pull --ff-only les tolère tant qu'elles ne touchent pas les fichiers mis à jour)`);
+  if (!e.propre) {
+    // TF-1200 : le relevé DATE ce qui n'est pas enregistré. Un avertissement sans âge se lisait comme
+    // une session en cours ; 78 chemins finis sont restés 3 à 6 jours hors de l'histoire du pilot.
+    const m = releverNonEnregistres(dest);
+    const phrase = dire(nom, m);
+    if (m.perime && estPilot) {
+      defaut(`${phrase} — au-delà du seuil de ${m.seuil} h`,
+        "enregistrer ce qui est fini (git commit --only -- <chemins>) ou le mettre de côté ; seuil : BOOTSTRAP_SEUIL_NON_ENREGISTRE_HEURES");
+    } else if (phrase) {
+      ligne("avert", `${phrase} (le pull --ff-only les tolère tant qu'elles ne touchent pas les fichiers mis à jour)`);
+    } else {
+      ligne("avert", `${nom} — modifications locales non committées, toutes générées ou sceaux (le pull --ff-only les tolère tant qu'elles ne touchent pas les fichiers mis à jour)`);
+    }
+  }
   versions.push({ nom, version: e.version, sha: e.sha, date: e.date, etat: decrire(e) });
   return e;
 }
