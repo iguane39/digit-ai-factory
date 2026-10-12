@@ -910,8 +910,18 @@ function juger(texte, cheminJuge = null) {
   // ligne portant un marqueur de coût/estimation, une unité « j / jours / j-h » chiffrée
   // est un défaut. Même règle qu'E8 côté études — la restitution est l'autre surface où
   // une estimation se glisse.
+  //
+  // 12/10/2026 (TF-1578, RT-104) : seule une ESTIMATION est un coût. Le 26/09, « Depuis 3 jours… »
+  // était accusé parce que la même ligne nommait la colonne « Coût » ; écrite en lettres, la même
+  // durée mesurée tombait sous EC-9 : il ne restait qu'à retirer le fait. Une quantité en jours
+  // n'est donc accusée que si elle SUIT un marqueur de coût dans la même proposition (« coût : 3 j »,
+  // « effort estimé à 2 jours ») ou si elle se dit en jours-hommes ; une durée passée (« depuis »,
+  // « il y a ») reste un fait, jamais un coût.
   const lignesCout = texte.split("\n").filter((l) => /co[uû]t|estimation|effort estimé|charge estimée/i.test(l));
-  const enJours = lignesCout.filter((l) => /(?:\d+(?:[.,]\d+)?|½)\s*(?:à\s*\d+(?:[.,]\d+)?\s*)?j(?:ours?)?\b|jours?[- ]hommes?/i.test(l));
+  const JOURS = String.raw`(?:\d+(?:[.,]\d+)?|½)\s*(?:à\s*\d+(?:[.,]\d+)?\s*)?j(?:ours?)?\b`;
+  const RE_ESTIME = new RegExp(String.raw`(?:co[uû]t|estimation|effort|charge)[^.;|\n]{0,60}?(?<!depuis\s|il y a\s)(?<![\d.,½])` + JOURS
+    + String.raw`|jours?[- ]hommes?`, "i");
+  const enJours = lignesCout.filter((l) => RE_ESTIME.test(l));
   enJours.length
     ? ko("S10", `${enJours.length} ligne(s) de coût chiffrée(s) en JOURS — complexité (simple|moyen|complexe|très complexe) × durée (court|moyen|long|très long). Ex. : ${enJours[0].trim().slice(0, 90)}`)
     : ok("S10", "aucune estimation en jours — l effort parle en complexité × durée");
@@ -3506,6 +3516,12 @@ Aucun écart : la demande a été suivie à la lettre.
     + "  - les chaînes vivent dans le dossier des traductions." + nl);
   writeFileSync(join(dir, "s5-sous-puce-motif.md"), s5SousPuceMotif, "utf8");
   writeFileSync(join(dir, "s5-sous-puce-nue.md"), s5SousPuceNue, "utf8");
+  // 12/10/2026 (TF-1578, RT-104) — S10 : une durée mesurée n'est pas un coût. Les deux fixtures ne
+  // diffèrent que par la place de la quantité : un fait passé en tête, ou la valeur de la colonne.
+  writeFileSync(join(dir, "s10-duree-mesuree.md"), verte.replace("## 5. Non traité" + nl,
+    "Depuis 3 jours, la colonne « Coût » des options reste remplie en complexité × durée." + nl + nl + "## 5. Non traité" + nl), "utf8");
+  writeFileSync(join(dir, "s10-cout-en-jours.md"), verte.replace("## 5. Non traité" + nl,
+    "La colonne « Coût » des options porte 3 jours pour la reprise." + nl + nl + "## 5. Non traité" + nl), "utf8");
   // Sens ROUGE : une VRAIE recherche par nom qui ne trouve rien, au bloc 7. Elle emploie le mot
   // « motif » dans son sens de RECHERCHE (« les motifs de nom joués sur… ») — c'est ce qui prouve
   // que le mot a été BORNÉ et non supprimé : la correction devait retirer une collision, pas
@@ -3660,6 +3676,15 @@ Aucun écart : la demande a été suivie à la lettre.
         (new RegExp(`"${regle}"[\\s\\S]{0,180}`).exec(rct.stdout) || [""])[0].replace(/\s+/g, " "));
     }
   }
+  // TF-1578 — S10 dans ses DEUX sens : une durée MESURÉE sur une ligne qui nomme la colonne « Coût »
+  // passe ; la MÊME ligne, la quantité en jours portée par la colonne, est accusée.
+  const rs10m = spawnSync(process.execPath, [moi, join(dir, "s10-duree-mesuree.md")], { encoding: "utf8" });
+  const rs10c = spawnSync(process.execPath, [moi, join(dir, "s10-cout-en-jours.md")], { encoding: "utf8" });
+  if (!/"S10"[^}]*PASS/.test(rs10m.stdout))
+    casse.push("S10 (TF-1578) : une durée mesurée (« Depuis 3 jours ») est lue comme un coût parce que sa ligne nomme la "
+      + "colonne « Coût » — écrite en lettres, EC-9 la refuse : le fait n'a plus d'écriture admise");
+  if (!/"S10"[^}]*FAIL/.test(rs10c.stdout))
+    casse.push("S10 (TF-1578) : la colonne « Coût » qui porte 3 jours passe — borner la règle l'a éteinte");
   // TF-1577 — S5 dans ses DEUX sens sur la forme du gabarit (motif en sous-puce).
   const rs5m = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-motif.md")], { encoding: "utf8" });
   const rs5n = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-nue.md")], { encoding: "utf8" });
