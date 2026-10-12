@@ -3168,6 +3168,36 @@ function juger(texte, cheminJuge = null) {
       "chaque action humaine de motif `decision` arbitre un choix ouvert, ou porte la trace de la voie automatique essayée");
   }
 
+  // S60 (TF-1262, 12/10/2026) — UN VERDICT CITÉ SUR UN PÉRIMÈTRE RÉDUIT DIT SA RESTRICTION.
+  // AVERTISSANTE à son entrée (hors de BLOQUANTES du hook). LE FAIT, restitution du 14/09/2026 :
+  // « render_page.py rend Verdict : PASS à 1920 px » sur dix pages. Rejoué le 15/09 au périmètre
+  // PAR DÉFAUT de l'oracle — six largeurs, de 3840 à 390 px —, les dix rendaient FAIL : V18 ne
+  // parle qu'à partir de 2560 px, `sommaire_perdu` qu'à 768 et 390. 1920 px était la fenêtre exacte
+  // où aucune des deux familles ne parle. Ce juge lit la FORME : une phrase qui cite un verdict vert
+  // ET une restriction de mesure (une largeur en px, une option `--widths`, `--sections`,
+  // `--regles`, `--only`) nomme le PÉRIMÈTRE — « périmètre », « par défaut », « restreint », « N
+  // largeurs », « seule largeur ». Il ne juge pas que la restriction soit justifiée.
+  // Calibré à l'écriture sur les 236 synthèses d'`output\04-plans\` : le premier jet lisait « vert »
+  // dans « feu vert » et `--only` dans `git commit --only`, 24 fichiers accusés dont 17 à tort ; le
+  // texte entre guillemets « » est une CITATION — celle de l'erreur du 14/09 dans le constat du
+  // 15/09 en est une — et ne se juge pas.
+  {
+    const VERT = uni(/\b(PASS|rend(?:ent)? verte?s?|aucun d[ée]faut)\b/);
+    const RESTRICTION = /(\b\d{3,4}\s*px\b|--(?:widths|sections|regles?|rules?)\b)/i;
+    const PERIMETRE_DIT = uni(/(p[ée]rim[èe]tre|par d[ée]faut|restreint|r[ée]duit|\bseule largeur|\b(?:\d+|deux|trois|quatre|cinq|six)\s+largeurs|toutes les largeurs)/i);
+    const phrases60 = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.replace(/«[^»]*»/g, " ").trim()).filter(Boolean);
+    const concernees = phrases60.filter((x) => VERT.test(x) && RESTRICTION.test(x));
+    // Les six largeurs ÉNUMÉRÉES sont le périmètre par défaut de render_page, dit en chiffres.
+    const sixLargeurs = (x) => (x.match(/\b\d{3,4}\b/g) || []).length >= 6;
+    const muettes = concernees.filter((x) => !PERIMETRE_DIT.test(x) && !sixLargeurs(x));
+    if (!concernees.length) ok("S60", "aucun verdict vert cité sur une restriction de mesure — rien à juger");
+    else if (muettes.length) ko("S60", `${muettes.length} verdict(s) vert(s) sur ${concernees.length} cité(s) sur une RESTRICTION de mesure ` +
+      "(une largeur, une option qui borne l'oracle) sans dire le périmètre : le 14/09/2026, « PASS à 1920 px » valait FAIL au périmètre par " +
+      "défaut de render_page, qui juge six largeurs (TF-1262). Dire « périmètre restreint à … — le périmètre par défaut juge N largeurs », " +
+      `ou citer le verdict au périmètre par défaut. Ex. : ${muettes[0].replace(/\s+/g, " ").slice(0, 110)}`);
+    else ok("S60", `${concernees.length} verdict(s) cité(s) sur une restriction de mesure, chacun avec son périmètre dit`);
+  }
+
   return findings;
 }
 
@@ -4434,6 +4464,36 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c59g.statut !== "PASS")
     casse.push("TF-1567 : la MÊME action dont le motif nomme un GATE (R-38, feu vert) est accusée — un gate reste humain "
       + "par doctrine : " + String(c59g.message || c59g.statut || "").slice(0, 200));
+
+  // 12/10 — TF-1262 : S60, LE VERDICT CITÉ SUR UN PÉRIMÈTRE RÉDUIT, DANS SES QUATRE SENS. La phrase
+  // fondatrice du 14/09 (« PASS à 1920 px »), la MÊME qui dit son périmètre, la MÊME CITÉE entre
+  // guillemets dans un constat, et le verdict au périmètre par défaut énuméré en six largeurs.
+  const avecB4_1262 = (puce) => verte.replace("## 5. Non traité", "- " + puce + "\n\n## 5. Non traité");
+  const r60so = jouerPe("tf1262-sans-objet.md", verte);
+  if (constatDe(r60so, "S60").statut !== "PASS")
+    casse.push("TF-1262 : la verte, qui ne cite aucun verdict sur une restriction de mesure, est accusée par S60 : "
+      + String(constatDe(r60so, "S60").message || "").slice(0, 200));
+  const r60muet = jouerPe("tf1262-perimetre-tu.md", avecB4_1262(
+    "Dix pages de la bibliothèque — preuve : `render_page.py` rend `Verdict : PASS` à 1920 px sur les dix."));
+  const c60m = constatDe(r60muet, "S60");
+  if (c60m.statut !== "FAIL" || !/périmètre/.test(c60m.message || ""))
+    casse.push("TF-1262 : « PASS à 1920 px » sans dire le périmètre passe S60 — c'est la phrase du 14/09 qui valait FAIL "
+      + "au périmètre par défaut : " + String(c60m.message || c60m.statut || "").slice(0, 200));
+  const r60dit = jouerPe("tf1262-perimetre-dit.md", avecB4_1262(
+    "Dix pages de la bibliothèque — preuve : `render_page.py` rend `Verdict : PASS` à 1920 px, périmètre restreint à une largeur quand le défaut en juge six."));
+  if (constatDe(r60dit, "S60").statut !== "PASS")
+    casse.push("TF-1262 : la MÊME phrase qui dit son périmètre restreint est accusée : "
+      + String(constatDe(r60dit, "S60").message || "").slice(0, 200));
+  const r60cite = jouerPe("tf1262-citation.md", avecB4_1262(
+    "Erreur du 14/09 reconnue — preuve : j'avais écrit « render_page rend PASS à 1920 px », rejoué FAIL sur 10 pages."));
+  if (constatDe(r60cite, "S60").statut !== "PASS")
+    casse.push("TF-1262 : la phrase fautive CITÉE entre guillemets dans un constat est accusée — une citation ne se juge pas : "
+      + String(constatDe(r60cite, "S60").message || "").slice(0, 200));
+  const r60six = jouerPe("tf1262-six-largeurs.md", avecB4_1262(
+    "Dix pages de la bibliothèque — preuve : `render_page.py` PASS à 3840, 2560, 1920, 1280, 768 et 390 px."));
+  if (constatDe(r60six, "S60").statut !== "PASS")
+    casse.push("TF-1262 : un verdict cité sur les six largeurs ÉNUMÉRÉES — le périmètre par défaut — est accusé : "
+      + String(constatDe(r60six, "S60").message || "").slice(0, 200));
   // 28/09 — TF-1428 ET TF-1449. Registre produit, en tableau : la MÊME ligne avec « A-18 » dans sa
   // colonne Registre (PASS), avec un tiret (FAIL), avec un tiret et un RENVOI « après A-12 » dans
   // son texte (FAIL : un renvoi n'est pas un registre), et dans un tableau dont la colonne « Id »
