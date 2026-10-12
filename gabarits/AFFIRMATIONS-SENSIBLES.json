@@ -1,0 +1,16 @@
+{
+  "format": "pilot/affirmations-sensibles@1",
+  "version": "1.0.0",
+  "date": "2026-10-12",
+  "source": "TF-1581 (RT-107, lot « Produit-02 - RETOURS - 20261001b », ledger seq 329 et 330) : la version 20260924a des livrets d'un exploitant écrivait « Studio de plain-pied : pas d'escalier […] C'est le plus accessible des cinq gîtes » ; la page du gîte sur le site de l'exploitant, relue le 27/09/2026, dit « il se trouve au 1er étage ». L'accessibilité était DÉDUITE de la composition au journal, et affirmée dans le livrable, servie deux jours au client final.",
+  "pourquoi_une_donnee_et_pas_du_code": "Loi transverse n° 4 — une donnée volatile est une donnée, pas du code. La liste des sujets où une affirmation sans source engage l'exploitant s'étend au premier incident (allergènes, sécurité, tarifs, horaires) ; l'étendre ne doit pas exiger une version de l'oracle. Ajouter un domaine = ajouter un objet à `domaines`, avec sa date et le fait qui l'a fait entrer.",
+  "regle": "oracle-source-contenu SC2 : une entrée d'une source de contenu destinée au client final qui affirme un sujet de cette liste porte sa source (champ `_source`, non vide) ou un statut `hypothese` / `question` qui la retient hors du livrable. Une affirmation sensible sans source est rouge. SC1 compte les entrées sans source, sensibles ou non. SC3 : une entrée en statut `hypothese` ou `question` dont le texte figure dans le livrable est rouge.",
+  "domaines": [
+    {
+      "nom": "accessibilite",
+      "motifs": ["plain-pied", "de plain pied", "accessible", "accessibilit", "\\bPMR\\b", "mobilit[ée] r[ée]duite", "fauteuil roulant", "escalier", "sans marche", "ascenseur", "rez-de-chauss[ée]e", "\\b[ée]tage\\b"],
+      "date_entree": "2026-10-12",
+      "fait_d_entree": "TF-1581 : « studio de plain-pied, le plus accessible des cinq gîtes » affirmé deux jours alors que le gîte est au 1er étage"
+    }
+  ]
+}

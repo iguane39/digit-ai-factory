@@ -2900,6 +2900,20 @@ function juger(texte, cheminJuge = null) {
         ok("S52", "aucune action laissée à l'humain ne vise l'interface d'une plateforme tierce de la liste");
       } else {
         const fautives = actions52.filter(({ g, p }) => !(officielle(g, p) && RE_LECTURE.test(g)));
+        // TF-1588 (RT-114, 12/10/2026) : la source officielle est dans la LANGUE de l'écran visé, et une
+        // capture de l'écran prime sur l'aide. Mécanisable en une seule forme : une adresse d'aide qui
+        // PORTE sa langue (`hl=en`) et n'est pas française, sans que la ligne dise que l'écran est en
+        // anglais ou s'appuie sur une capture. La langue réelle de l'écran n'est pas jugée (NON JUGÉ).
+        const RE_ECRAN_ANGLAIS = uni(/\b(?:[ée]cran|interface|compte)\s+(?:en\s+anglais|anglophone)|\bcapture\b/i);
+        const langueEtrangere = (g) => [...String(g).matchAll(/[?&]hl=([A-Za-z]{2}(?:[-_][A-Za-z]{2,4})?)/g)].some((m) => !/^fr/i.test(m[1]));
+        const anglaises = actions52.filter(({ g, p }) => !fautives.some((f) => f.g === g) && officielle(g, p)
+          && langueEtrangere(g) && !RE_ECRAN_ANGLAIS.test(g));
+        if (!fautives.length && anglaises.length) {
+          ko("S52", `${anglaises.length} action(s) visant une interface tierce citent une source officielle dans une langue qui n'est pas celle de l'écran `
+            + "(adresse portant `hl=` autre que `fr`) — l'aide anglaise a fait écrire « Administration → Règles → Compte » quand l'écran français disait « Admin > Règlement > Compte » "
+            + "(24/09/2026, TF-1588). Cite l'aide dans la langue de l'écran (`hl=fr`), ou dis « écran en anglais », ou appuie le parcours sur une capture de l'écran du jour, qui prime sur l'aide. "
+            + `Ex. (${anglaises[0].p.nom}) : ${anglaises[0].g.replace(/\s+/g, " ").trim().slice(0, 110)}`);
+        } else
         fautives.length
           ? ko("S52", `${fautives.length} action(s) sur ${actions52.length} visant l'interface d'une plateforme tierce ne citent pas `
             + "SA SOURCE OFFICIELLE et LA DATE où elle a été lue — un parcours écrit de mémoire nomme des boutons qui n'existent "
@@ -3314,10 +3328,50 @@ function juger(texte, cheminJuge = null) {
     else ok("S62", `${concernees.length} verdict(s) cité(s) sur une restriction de mesure, chacun avec son périmètre dit`);
   }
 
+  // S63 (R-59 point 2, TF-1582, RT-108, 12/10/2026) — UNE CITATION D'UNE PAGE TIERCE PORTE LA TRACE DE SA VÉRIFICATION.
+  // LE FAIT, mesuré le 29/09/2026 : l'outil de lecture web résumée (WebFetch) a rendu en citation
+  // « lorsque la limite de dépense mensuelle est atteinte » ; le texte brut de la même page (curl,
+  // HTTP 200, recherche exacte) dit « lorsque la limite de dépense quotidienne de 20 € est atteinte ».
+  // Un mot changé inventait une règle de la plateforme. S52 n'aurait rien dit : elle exige une source
+  // et une date de lecture, pas que la phrase figure dans la source.
+  // AVERTISSANTE à son entrée, comme toute règle neuve. Mécanisable, et rien de plus : une phrase de
+  // 8 mots ou plus entre guillemets, dans un paragraphe qui cite l'adresse d'une page tierce, sans
+  // aucune trace d'une recherche exacte dans le texte brut. NON JUGÉ : que la phrase soit VRAIMENT
+  // dans la page — seul un rejeu de la recherche le dit, et la règle ne sort pas du texte jugé.
+  // TAUX D'ACCUSATION mesuré à la mise en service (12/10/2026) sur les 327 documents de output/04-plans et output/03-etudes : 8 fichiers (2,4 %), des études qui citent des articles anglais — de vraies citations non vérifiées au texte brut, pas de faux positifs relevés ; S52, volet langue de l'écran : 0 fichier.
+  {
+    const RE_ADRESSE_TIERCE = /https?:\/\/[^\s`)>\]|]+|(?<![\w.@/-])(?:docs|support|help|developers?|learn)\.(?:[a-z0-9-]+\.)+[a-z]{2,}[^\s`)>\]|]*/i;
+    const RE_CITATION = /«\s*([^»\n]{30,}?)\s*»|“\s*([^”\n]{30,}?)\s*”|"\s*([^"\n]{30,}?)\s*"/g;
+    const RE_TRACE_BRUT = /recherche\s+exacte|texte\s+brut|\bcurl\b|HTTP\s*200|v[ée]rifi[ée]e?\s+mot\s+pour\s+mot/i;
+    const sansCode = texte.replace(/\r\n?/g, "\n").replace(/```[\s\S]*?```/g, "");
+    const paragraphes = sansCode.split(/\n\s*\n/).flatMap((p) => (/^\s*\|/.test(p) ? p.split("\n") : [p]));
+    const citees = [];
+    for (const par of paragraphes) {
+      if (!RE_ADRESSE_TIERCE.test(par)) continue;
+      for (const m of par.matchAll(RE_CITATION)) {
+        const phrase = (m[1] || m[2] || m[3] || "").trim();
+        if (phrase.split(/\s+/).length >= 8) citees.push({ phrase, tracee: RE_TRACE_BRUT.test(par) });
+      }
+    }
+    if (!citees.length) {
+      findings.push({ regle: "S63", statut: "SANS_OBJET", message: "aucune phrase d'au moins 8 mots entre guillemets attribuée à une page tierce — rien à vérifier" });
+    } else {
+      const sansTrace = citees.filter((c) => !c.tracee);
+      sansTrace.length
+        ? findings.push({ regle: "S63", statut: "FAIL",
+          message: `${sansTrace.length} citation(s) sur ${citees.length} attribuée(s) à une page tierce ne portent pas la trace d'une recherche exacte dans le texte brut — `
+            + "le 29/09/2026, l'outil de lecture résumée a rendu « limite de dépense mensuelle » là où la page dit « limite de dépense quotidienne de 20 € » : un mot changé inventait une règle de la plateforme (TF-1582). "
+            + "L'outil de lecture résumée sert à TROUVER, jamais à CITER : récupère le texte brut de la page, cherche la phrase exacte, puis écris dans le paragraphe « citation vérifiée par recherche exacte dans le texte brut (curl, HTTP 200), le JJ/MM/AAAA » ; "
+            + "sinon, reformule sans guillemets. "
+            + `Ex. : « ${sansTrace[0].phrase.slice(0, 90)} »` })
+        : findings.push({ regle: "S63", statut: "PASS", message: `${citees.length} citation(s) d'une page tierce, chacune avec la trace de sa recherche exacte dans le texte brut` });
+    }
+  }
+
   return findings;
 }
 
-const verdictDe = (f) => (f.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS");
+const verdictDe =(f) => (f.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS");
 
 const arg = process.argv[2];
 if (arg === "--self-test") {
@@ -4689,6 +4743,47 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(r60six, "S62").statut !== "PASS")
     casse.push("TF-1262 : un verdict cité sur les six largeurs ÉNUMÉRÉES — le périmètre par défaut — est accusé : "
       + String(constatDe(r60six, "S62").message || "").slice(0, 200));
+  // 12/10 — TF-1582 : S63, LA CITATION D'UNE PAGE TIERCE, DANS SES TROIS SENS. La rouge cite « mot pour
+  // mot » une page d'aide à l'adresse donnée, sans trace d'une recherche exacte dans le texte brut ; la
+  // MÊME citation portant la trace qu'indique le message (le remède joué, TF-1013) passe ; la verte, qui
+  // ne cite aucune page tierce, rend SANS_OBJET (déjà vérifié par r58sansObjet plus haut, qui joue la verte).
+  const CITATION_59 = "\n- La page d'aide https://support.google.com/google-ads/answer/6167118 dit : « lorsque la limite de dépense quotidienne de 20 € est atteinte, la diffusion s'arrête ».";
+  const r63rouge = jouerPe("tf1582-citation-sans-trace.md", verte.replace("## 5. Non traité", CITATION_59.trimStart() + "\n\n## 5. Non traité"));
+  const c63r = constatDe(r63rouge, "S63");
+  if (c63r.statut !== "FAIL" || !/texte brut/.test(c63r.message || ""))
+    casse.push("TF-1582 : une phrase « mot pour mot » attribuée à une page tierce, sans trace d'une recherche exacte dans le texte brut, passe — "
+      + "c'est le mot changé du 29/09/2026 : " + String(c63r.message || c63r.statut || "").slice(0, 200));
+  const r63verte = jouerPe("tf1582-citation-verifiee.md", verte.replace("## 5. Non traité",
+    CITATION_59.trimStart() + " Citation vérifiée par recherche exacte dans le texte brut (curl, HTTP 200), le 29/09/2026.\n\n## 5. Non traité"));
+  const c63v = constatDe(r63verte, "S63");
+  if (c63v.statut !== "PASS")
+    casse.push("TF-1582 : la MÊME citation, portant la trace de sa recherche exacte dans le texte brut, est encore accusée — le remède que le message "
+      + "recommande échoue : " + String(c63v.message || c63v.statut || "").slice(0, 200));
+  const c63so = constatDe(r58sansObjet, "S63");
+  if (c63so.statut !== "SANS_OBJET")
+    casse.push("TF-1582 : S63 devrait rendre SANS_OBJET hors de toute citation d'une page tierce, et le dire : "
+      + String(c63so.message || c63so.statut || "").slice(0, 200));
+
+  // 12/10 — TF-1588 : S52 ET LA LANGUE DE L'ÉCRAN, DANS SES TROIS SENS. Une action d'écran dont la
+  // source officielle datée porte `hl=en` est accusée ; la MÊME en `hl=fr` passe ; la MÊME en `hl=en`
+  // qui dit s'appuyer sur une capture de l'écran du jour passe (la capture prime sur l'aide).
+  const LANGUE_52 = (adresse, plus = "") => verte + ACTION_INTERFACE + saut
+    + `  - source : \`${adresse}\`, lue le 24/09/2026${plus}.` + saut;
+  const r52en = jouerPe("tf1588-source-en.md", LANGUE_52("https://support.google.com/google-ads/answer/1?hl=en"));
+  const c52en = constatDe(r52en, "S52");
+  if (c52en.statut !== "FAIL" || !/langue/.test(c52en.message || ""))
+    casse.push("TF-1588 : une source officielle datée en `hl=en` pour un écran français passe — c'est le parcours « Administration → Règles → Compte » "
+      + "du 24/09/2026, traduit de l'aide anglaise : " + String(c52en.message || c52en.statut || "").slice(0, 200));
+  const r52fr = jouerPe("tf1588-source-fr.md", LANGUE_52("https://support.google.com/google-ads/answer/1?hl=fr"));
+  const c52fr = constatDe(r52fr, "S52");
+  if (c52fr.statut !== "PASS")
+    casse.push("TF-1588 : la MÊME source en `hl=fr` est accusée — le remède du message échoue : " + String(c52fr.message || c52fr.statut || "").slice(0, 200));
+  const r52cap = jouerPe("tf1588-source-en-capture.md", LANGUE_52("https://support.google.com/google-ads/answer/1?hl=en", " et appuyée sur la capture de l'écran du jour"));
+  const c52cap = constatDe(r52cap, "S52");
+  if (c52cap.statut !== "PASS")
+    casse.push("TF-1588 : une source `hl=en` appuyée sur une capture de l'écran du jour, qui prime sur l'aide, est accusée : "
+      + String(c52cap.message || c52cap.statut || "").slice(0, 200));
+
   // 28/09 — TF-1428 ET TF-1449. Registre produit, en tableau : la MÊME ligne avec « A-18 » dans sa
   // colonne Registre (PASS), avec un tiret (FAIL), avec un tiret et un RENVOI « après A-12 » dans
   // son texte (FAIL : un renvoi n'est pas un registre), et dans un tableau dont la colonne « Id »

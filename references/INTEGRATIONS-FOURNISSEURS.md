@@ -153,6 +153,28 @@ réglages d'après import.
 | Un compte de service s'ajoute comme utilisateur du compte publicitaire (Admin → Accès et sécurité → Utilisateurs), niveau « Lecture seule », et la lecture fonctionne sans étape d'acceptation | aucun, mais personne ne le savait | lecture réussie le 22/09 à 21:49 |
 | Après import : annonces en cours d'examen ; les actions de conversion héritées d'une ancienne campagne intelligente restent PRINCIPALES, et l'une peut viser un événement que le site n'envoie jamais | campagnes activées avec une colonne « Conversions » à zéro quoi qu'il arrive | `conversion_action.primary_for_goal` et `ad_group_ad.policy_summary.review_status` en lecture seule |
 
+### Ce que l'API ne voit pas, et ce qu'un relevé vert ne dit pas
+
+*Mesuré du 24 au 29/09/2026 pendant le run `produit-02-run-t140` (lot
+`Produit-02 - RETOURS - 20261001b`, RT-111, RT-112, RT-114 ; TF-1585, TF-1586, TF-1588). Ces faits
+périment avec l'écran et l'API : chaque ligne dit comment la rejouer, et une ligne qu'on ne sait
+plus rejouer se retire.*
+
+| Fait mesuré | Ce que ça coûte | Comment le rejouer |
+|---|---|---|
+| **Un relevé de conformité au plan n'est pas un verdict de diffusion.** Le 24/09, 23 h après l'activation, le relevé du produit rendait « 0 écart » (exit 0) sur 5 campagnes à 0 impression, 0 clic, 0 € | un compte qui ne diffuse pas passe pour sain ; le premier relevé prévu le 15/10 aurait laissé passer trois semaines de diffusion nulle | lire les impressions depuis `campaign.start_date_time`, jour courant compris, et sortir en écart quand une campagne `ENABLED` et `SERVING` reste à 0 impression 24 h après l'activation ; recette à double sens : un compte conforme à 0 impression doit sortir rouge |
+| **`LAST_30_DAYS` exclut aujourd'hui** (documentation de l'API : « not including today »), et une requête de métriques n'imprime pas les lignes à 0 impression | la seule requête de métriques du relevé ne voyait ni la journée en cours ni les campagnes muettes | `segments.date DURING LAST_30_DAYS` comparé à une borne explicite `segments.date BETWEEN … AND <aujourd'hui>` sur le même compte |
+| **Des prérequis du compte ne se lisent dans aucun service de l'API.** Validation de l'annonceur (Admin → Règlement → Compte), mode de paiement, code promotionnel à saisir dans les 10 jours de la réactivation, notifications : aucun des 110 services de l'API v25 ne les lit, et `IdentityVerificationService` refuse la lecture hors facturation mensuelle | environ 24 h de diffusion nulle et 4 tours de diagnostic, pendant que l'API disait 5 campagnes sur 5 `ENABLED`, `SERVING`, `ELIGIBLE`, 17 annonces sur 17 `APPROVED`, 65 mots-clés sur 65 `ELIGIBLE` | l'écran de l'annonceur, ouvert par l'exploitant : l'écran dit « Vous devez valider votre identité pour continuer à diffuser des annonces » quand la validation manque |
+| **Tant que la validation de l'annonceur n'est pas terminée, un statut `SERVING` lu par l'API ne prouve rien.** Cause probable de l'échec relevée au registre public : nom légal et nom du dirigeant non alignés au caractère près (aucune valeur citée ici) | la même diffusion nulle, diagnostiquée en vain côté campagnes | confronter les deux noms au registre public avant l'activation |
+| **Un avis de messagerie est un événement daté, pas un état.** Un avis du 17/09 a été présenté comme bloquant (A-283) alors que l'écran de facturation montrait la carte visée déjà retirée | une action urgente prescrite sur un fait périmé | confronter tout avis à l'écran qui porte l'état avant de le dire urgent ; une recherche d'avis par expéditeur couvre deux adresses de paiement Google distinctes |
+| **Le parcours d'un écran s'écrit d'après l'écran du jour, jamais d'après l'aide.** Le 24/09, « Administration → Règles → Compte » traduisait l'aide anglaise (Admin › Policy › Account) quand l'aide française du jour dit « Admin > Règlement > Compte » ; le 26/09, l'aide donnait « Outils » → « Règles » quand l'écran capturé le même jour montre « Outils » → « Dépannage » → « Gestionnaire de règles » | deux parcours faux transmis à l'exploitant | une capture de l'écran, quand elle existe, prime sur l'aide ; sans capture, l'aide dans la LANGUE de l'écran visé, avec sa date de lecture |
+
+**Liste « avant la première dépense »**, jouée par l'exploitant et vérifiée par l'agent, avant
+d'activer une campagne : validation de l'annonceur terminée ; noms saisis alignés au caractère près
+sur le registre public ; mode de paiement valable au moins 60 jours ; codes promotionnels saisis
+avant l'activation ; notifications du compte lues. Le relevé du kit, lui, porte deux verdicts :
+conformité au plan et diffusion.
+
 ### Ce qui se demande, ou se relit, avant d'agir
 
 - **Deux pièces ne se téléchargent que depuis le compte**, par l'humain qui y est connecté. Elles
@@ -216,7 +238,7 @@ Le détail daté, avec sa solidité ligne à ligne et sa péremption, vit dans
 
 ## Ce que ce document ne garantit pas
 
-- **Il vieillit, et vite.** Chaque section porte la date de sa mesure, du 24/08 au 22/09/2026. Une interface de
+- **Il vieillit, et vite.** Chaque section porte la date de sa mesure, du 24/08 au 29/09/2026. Une interface de
   fournisseur change sans avertir : chaque ligne porte donc **comment la rejouer**, et une ligne
   qu'on ne sait plus rejouer doit être **retirée** plutôt que conservée par prudence.
 - **Il ne couvre que ce qui a été payé.** Aucun fait n'y figure « au cas où » : un fait sans coût
