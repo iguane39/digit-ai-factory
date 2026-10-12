@@ -41,4 +41,6 @@ export const DEDIES = {
   // fixtures bâtissent un parc jetable de fausses forges et y copient le VRAI mécanisme de
   // confrontation de forge-tests — embarquées dans l'oracle, elles le feraient se juger lui-même.
   "oracle-enclenchement.mjs": "oracle-enclenchement.test.mjs",
+  // L'état présenté comme normal à côté d'un code d'erreur (TF-1511, décision du 12/10/2026).
+  "oracle-ecart-normal.mjs": "oracle-ecart-normal.test.mjs",
 };
