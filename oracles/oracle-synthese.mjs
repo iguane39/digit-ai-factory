@@ -3148,7 +3148,7 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
-  // S59 (R-59 point 2, TF-1582, RT-108, 12/10/2026) — UNE CITATION D'UNE PAGE TIERCE PORTE LA TRACE DE SA VÉRIFICATION.
+  // S63 (R-59 point 2, TF-1582, RT-108, 12/10/2026) — UNE CITATION D'UNE PAGE TIERCE PORTE LA TRACE DE SA VÉRIFICATION.
   // LE FAIT, mesuré le 29/09/2026 : l'outil de lecture web résumée (WebFetch) a rendu en citation
   // « lorsque la limite de dépense mensuelle est atteinte » ; le texte brut de la même page (curl,
   // HTTP 200, recherche exacte) dit « lorsque la limite de dépense quotidienne de 20 € est atteinte ».
@@ -3174,17 +3174,17 @@ function juger(texte, cheminJuge = null) {
       }
     }
     if (!citees.length) {
-      findings.push({ regle: "S59", statut: "SANS_OBJET", message: "aucune phrase d'au moins 8 mots entre guillemets attribuée à une page tierce — rien à vérifier" });
+      findings.push({ regle: "S63", statut: "SANS_OBJET", message: "aucune phrase d'au moins 8 mots entre guillemets attribuée à une page tierce — rien à vérifier" });
     } else {
       const sansTrace = citees.filter((c) => !c.tracee);
       sansTrace.length
-        ? findings.push({ regle: "S59", statut: "FAIL",
+        ? findings.push({ regle: "S63", statut: "FAIL",
           message: `${sansTrace.length} citation(s) sur ${citees.length} attribuée(s) à une page tierce ne portent pas la trace d'une recherche exacte dans le texte brut — `
             + "le 29/09/2026, l'outil de lecture résumée a rendu « limite de dépense mensuelle » là où la page dit « limite de dépense quotidienne de 20 € » : un mot changé inventait une règle de la plateforme (TF-1582). "
             + "L'outil de lecture résumée sert à TROUVER, jamais à CITER : récupère le texte brut de la page, cherche la phrase exacte, puis écris dans le paragraphe « citation vérifiée par recherche exacte dans le texte brut (curl, HTTP 200), le JJ/MM/AAAA » ; "
             + "sinon, reformule sans guillemets. "
             + `Ex. : « ${sansTrace[0].phrase.slice(0, 90)} »` })
-        : findings.push({ regle: "S59", statut: "PASS", message: `${citees.length} citation(s) d'une page tierce, chacune avec la trace de sa recherche exacte dans le texte brut` });
+        : findings.push({ regle: "S63", statut: "PASS", message: `${citees.length} citation(s) d'une page tierce, chacune avec la trace de sa recherche exacte dans le texte brut` });
     }
   }
 
@@ -4420,25 +4420,25 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c58c.statut !== "PASS")
     casse.push("TF-1496 : la MÊME restitution, l'option du bloc 3 citant désormais GFP-001, est encore accusée : "
       + String(c58c.message || c58c.statut || "").slice(0, 200));
-  // 12/10 — TF-1582 : S59, LA CITATION D'UNE PAGE TIERCE, DANS SES TROIS SENS. La rouge cite « mot pour
+  // 12/10 — TF-1582 : S63, LA CITATION D'UNE PAGE TIERCE, DANS SES TROIS SENS. La rouge cite « mot pour
   // mot » une page d'aide à l'adresse donnée, sans trace d'une recherche exacte dans le texte brut ; la
   // MÊME citation portant la trace qu'indique le message (le remède joué, TF-1013) passe ; la verte, qui
   // ne cite aucune page tierce, rend SANS_OBJET (déjà vérifié par r58sansObjet plus haut, qui joue la verte).
   const CITATION_59 = "\n- La page d'aide https://support.google.com/google-ads/answer/6167118 dit : « lorsque la limite de dépense quotidienne de 20 € est atteinte, la diffusion s'arrête ».";
   const r59rouge = jouerPe("tf1582-citation-sans-trace.md", verte.replace("## 5. Non traité", CITATION_59.trimStart() + "\n\n## 5. Non traité"));
-  const c59r = constatDe(r59rouge, "S59");
+  const c59r = constatDe(r59rouge, "S63");
   if (c59r.statut !== "FAIL" || !/texte brut/.test(c59r.message || ""))
     casse.push("TF-1582 : une phrase « mot pour mot » attribuée à une page tierce, sans trace d'une recherche exacte dans le texte brut, passe — "
       + "c'est le mot changé du 29/09/2026 : " + String(c59r.message || c59r.statut || "").slice(0, 200));
   const r59verte = jouerPe("tf1582-citation-verifiee.md", verte.replace("## 5. Non traité",
     CITATION_59.trimStart() + " Citation vérifiée par recherche exacte dans le texte brut (curl, HTTP 200), le 29/09/2026.\n\n## 5. Non traité"));
-  const c59v = constatDe(r59verte, "S59");
+  const c59v = constatDe(r59verte, "S63");
   if (c59v.statut !== "PASS")
     casse.push("TF-1582 : la MÊME citation, portant la trace de sa recherche exacte dans le texte brut, est encore accusée — le remède que le message "
       + "recommande échoue : " + String(c59v.message || c59v.statut || "").slice(0, 200));
-  const c59so = constatDe(r58sansObjet, "S59");
+  const c59so = constatDe(r58sansObjet, "S63");
   if (c59so.statut !== "SANS_OBJET")
-    casse.push("TF-1582 : S59 devrait rendre SANS_OBJET hors de toute citation d'une page tierce, et le dire : "
+    casse.push("TF-1582 : S63 devrait rendre SANS_OBJET hors de toute citation d'une page tierce, et le dire : "
       + String(c59so.message || c59so.statut || "").slice(0, 200));
 
   // 12/10 — TF-1588 : S52 ET LA LANGUE DE L'ÉCRAN, DANS SES TROIS SENS. Une action d'écran dont la

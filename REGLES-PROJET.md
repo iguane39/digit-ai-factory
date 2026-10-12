@@ -1574,5 +1574,5 @@ parce qu'elle exige une source et une date, non que la phrase soit dans la sourc
    de la vérification se contrôlent.
 
 Contrôles exécutables : `oracles\oracle-source-contenu.mjs` (SC1 à SC3, recette
-`oracles\oracle-source-contenu.test.mjs` à double sens) pour le point 1 ; la règle S59 de
+`oracles\oracle-source-contenu.test.mjs` à double sens) pour le point 1 ; la règle S63 de
 `oracles\oracle-synthese.mjs` pour le point 2, avertissante à son entrée.
