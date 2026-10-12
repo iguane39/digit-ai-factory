@@ -526,7 +526,13 @@ export function jugerCatalogue(chemin, racineParc) {
   findings.push({ regle: "G12", statut: "PASS", ou: chemin, message:
     `couverture : ${html.length - nus.length} famille(s) html outillée(s), ${nus.length} sans point de départ — ` +
     `dont ${environnement} dépendance(s) d'environnement et ${travail} dette(s) de travail` +
-    (nus.length ? ` (${Object.entries(par).map(([k, v]) => `${k}: ${v}`).join(", ")})` : "") });
+    (nus.length ? ` (${Object.entries(par).map(([k, v]) => `${k}: ${v}`).join(", ")})` : "") +
+    // TF-1255 (12/10/2026) — LE SILENCE D'UNE FAMILLE NUE N'EST PAS UN VERT. Une famille sans point
+    // de départ ne produit aucun document de la bibliothèque, donc aucune règle G1 à G10 ne peut
+    // l'accuser : les quatre documents mis en défaut du 08 au 14/09/2026 étaient TOUS de familles
+    // outillées. Les nommer ici publie ce non-mesuré, au lieu de le laisser se lire comme un vert.
+    (nus.length ? ` — NON MESURÉES, aucune règle G1 à G10 ne peut les accuser, leur absence de constat n'est pas un vert (TF-1255) : ` +
+      nus.map((f) => f.famille).join(", ") : "") });
   }
 
   // G13 (TF-1249, campagne D-51 (a) du 02/10/2026) — LES CHAMPS `lecteur` ET `type_de_contenu`
@@ -1093,6 +1099,15 @@ if (args[0] === "--self-test") {
     { famille: "a", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "poste-porteur" } }]);
   if (!verdictsG6(catSansOu).includes("FAIL")) casse.push("G12 laisse passer « poste-porteur » sans sources_attendues_sur");
 
+  // TF-1255 : la RÉPARTITION nomme les familles nues comme NON MESURÉES, et elles seules. Une
+  // famille outillée et une famille nue au même catalogue : la seconde est nommée, la première non.
+  const catNue = ecrireCat("r6c.jsonl", [
+    { famille: "fam-outillee", formats: ["html"], point_de_depart: { type: "squelette", chemin: "depot-pilot/gabarits/documents/fam-ok/SQUELETTE.html" } },
+    { famille: "fam-nue", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "reclassement" } }]);
+  const repartition = jugerCatalogue(catNue, parc).find((x) => x.regle === "G12" && /couverture/.test(x.message)) || { message: "" };
+  if (!/NON MESURÉES[^]*fam-nue/.test(repartition.message) || /fam-outillee/.test(repartition.message))
+    casse.push("G12 ne publie pas le non-mesuré : la famille nue doit être nommée NON MESURÉE, et elle seule — " + repartition.message.slice(0, 160));
+
   // ROUGE 3 : « aucun » ET un chemin — la déclaration se contredit.
   const catContradictoire = ecrireCat("r3.jsonl", [
     { famille: "a", formats: ["html"], point_de_depart: { type: "aucun", chemin: "depot-pilot/gabarits/documents/fam-ok/SQUELETTE.html" } }]);
@@ -1132,12 +1147,12 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 44/44 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 45/45 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
       "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G10 dans ses TROIS sens (TF-1142, fixtures du 22/09 sous TF-1256) : lecteur déclaré et frontière lecteur/auteur écrite → PASS, frontière absente → FAIL, lecteur absent → FAIL ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain ; " +
-      "G12 dans ses DEUX sens rouges — « aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; " +
+      "G12 dans ses DEUX sens rouges — « aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; la répartition nomme NON MESURÉE la famille nue et elle seule (TF-1255) ; " +
       "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
       "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS) ; " +
       "TF-1230 : la famille docs-projet existe au catalogue réel, cite les huit fichiers de gabarits/docs-projet/, tous présents sur le disque ; " +

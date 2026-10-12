@@ -216,7 +216,8 @@ Ce qui distingue un environnement d'un autre, et ce qui ne doit jamais les trave
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 13 | `.env.example` versionné et **exhaustif** : toutes les variables attendues — applicatives ET infra (ports, URLs, cible de déploiement, drapeaux `*_MODE_DEMO`) — valeurs par défaut sûres ou vides, en-tête « ne jamais renseigner de secret ici ». **Aucune VALEUR sensible, jamais** (TF-0869) : une variable marquée `# à fournir :` reste VIDE dans l'exemple, et aucun motif de secret fort n'y figure — l'exemple est une liste de NOMS, la valeur vit dans le `.env` local. Le `.env` local NAÎT à l'ouverture, copié de l'exemple par le hook (jamais écrasé s'il existe) : la place où poser un secret existe avant qu'on ait besoin d'en poser un. **Exemption « documentaire »** (TF-1439, décision D-32 (a) du 28/09/2026) : un projet SANS logiciel ni site déclaré `type_projet: documentaire` à l'en-tête de son carnet des écarts assumés (`adopter-projet-existant.mjs --type documentaire`) n'a aucune variable à inventer, et R-13 ne s'applique pas tant qu'aucun signal de code ou de site n'entre au dépôt — `oracle-conformite-projet` retire l'exemption dès le premier signal relevé | observée (design, tests, ASDMailManager, Produit-02 — en-tête littéral constaté) ; TF-0869 : clé d'API de 108 caractères saisie dans un `.env.example` versionné faute de `.env` local | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
-| 14 | `.env` réel toujours gitignoré ; aucun secret committé, jamais | observée partout + loi pilot existante | tous | O | nul | **défaut** (quasi-loi déjà) |
+| 14 | `.env` réel toujours gitignoré ; aucun secret committé, jamais. **Précision TF-1284 (12/10/2026)** : aucun PROFIL D'OUTIL D'AUTHENTIFICATION versionné, reconnu à son NOM de fichier où qu'il soit (`azureProfile.json`, `msal_token_cache*`, `az.sess`, `.databrickscfg`, `accessTokens.json`, `credentials.json`) — le 15/09/2026, un profil écrit à la racine d'un produit y a été commis et ce contrôle rendait PASS | observée partout + loi pilot existante | tous | O | nul | **défaut** (quasi-loi déjà) |
+| 28 | Aucune entrée versionnée à la racine au nom d'un **artefact de shell** (lettre seule, `null`, `NUL`, `con`, `~`) : elle naît d'un chemin mal passé à un outil (TF-1284, 12/10/2026). La liste fermée des entrées attendues n'est pas jouée, mesurée trop bruyante sur 13 produits | constat 15/09/2026 chez un produit, mesuré le 12/10/2026 | produits | O | nul | **défaut** |
 | 15 | Les variables que la forge ne peut pas renseigner (clés tierces, identifiants) portent un commentaire `# à fournir :` dans `.env.example` — elles alimentent directement les `non_testables[]` de l'étape qualif (RT-6) | générique, prolonge RT-6 | produits | P0+S | faible | **défaut** |
 | 26 | **Modèle de données ancré au schéma réel** : chaque table déclarée dans `MODELE-DONNEES.md` porte une `provenance:` (fichier/dossier de schéma — migration, ORM, DDL) qui existe et contient le nom de la table ; table introuvable dans sa provenance = FAIL localisant. Exemption explicite : « sans objet — aucune persistance » (loi 3). Placeholders de squelette non jugés. Complétude inverse et exactitude des colonnes : revue de schéma (non_juge) | **TF-0091** (décision humaine du 11/08) — le REX Produit-11 : modèle reconstitué de tête en plein run | produits, nouveaux + rattrapage | O | nul | **défaut** |
 | 27 | **Surface web née ouverte aux agents IA** : tout produit à surface web copie à l'ouverture `gabarits\web\robots.txt` (agents IA de recherche AUTORISÉS par défaut — GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended… ; bloquer = décision consignée, datée et motivée DANS le fichier) et `gabarits\web\llms.txt` (carte du site pour les moteurs génératifs, ouverture reprise de FONCTIONNEL.md, tenue par development/MEP, cohérente avec le sitemap). Oracle : un `robots.txt` présent qui interdit un agent IA sans ligne de décision = FAIL ; `llms.txt` absent à côté d'un `robots.txt` = FAIL ; aucun `robots.txt` = SANS_OBJET (surface web non déclarée) | **décision humaine du 11/08 (TF-0095)** — pendant produit du nœud 58 de la grille seo | produits à surface web, nouveaux + rattrapage | P0+O | nul | **défaut** |
@@ -306,12 +307,24 @@ revient à l'utilisateur, sans critère écrit.
    L'exécution d'un service tiers payant exige un GO humain préalable — le garde-fou
    « aucune API tierce payante hors modèles Claude » prime toujours sur R-29. Les gates
    déjà en place (GO production, mandats humains) priment toujours sur R-29.
+4. **Voie automatique d'abord** (règle humaine du 01/10/2026, lot `Produit-64 - RETOURS -
+   20261001b`, RT-28 ; TF-1514, TF-1567). Avant de laisser une action à l'humain, la session énumère
+   les voies automatiques et note le code de retour mesuré de chacune : l'identité de la
+   session, les identités de service qui ont le droit sur la cible, l'automatisation déjà
+   présente dans le dépôt, l'API de la plateforme pour le geste lui-même. Le motif
+   « décision » vaut pour un choix encore ouvert, jamais pour l'exécution d'un choix déjà
+   rendu. Ne reste à l'humain que ce qui est refusé sur toutes les voies, ou ce qui relève de
+   sa décision, d'une dépense ou d'un geste irréversible.
 
 Surfaces d'application encodées : `references\ACCUEIL.md` étape 5 (démarche proposée),
 `gabarits\AGENT-CAMPAGNE.md` (rapport final des agents de campagne).
 Mécanisme : S (vérification pilot à l'ouverture de run). Contrôle exécutable : hors
 `oracle-conformite-projet` (portée transverse aux prompts et rapports, pas au socle
 d'un projet produit) — reste de TF-0131, à mécaniser si un gap se constate en run réel.
+Le gap s'est constaté le 01/10/2026 (TF-1567) : le point 4 est joué par la règle S61 de
+`oracles\oracle-synthese.mjs` (une action humaine de motif `decision` qui commande une
+exécution sans nommer de choix porte la trace de la voie automatique essayée), avec S21 pour
+les motifs `acces` et `presence` ; avertissante.
 
 ## J. Thème clair et bascule sombre câblée (règle 30 — décidée le 12/08, TF-0131)
 

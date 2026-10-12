@@ -2148,5 +2148,46 @@ check("TF-1439 remède joué : la ligne retirée de l'en-tête et `.env.example`
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1284 (12/10/2026) : le profil d'authentification commis à la racine d'un produit ------
+// Le fait fondateur, rejoué : un outil a reçu le dossier de configuration `C` au lieu d'un chemin
+// absolu et y a écrit son profil, commis trois minutes plus tard. Trois sens : le dossier `C` et
+// son profil FAIL sur R-14 et R-28 ; le MÊME profil rangé sous un dossier ordinaire FAIL sur R-14
+// seule (le motif porte sur le NOM du fichier) ; le remède prescrit, `git rm -r --cached`, PASS.
+const projet1284 = (fichiers) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1284-"));
+  for (const [rel, contenu] of Object.entries(fichiers)) { mkdirSync(dirname(join(d, rel)), { recursive: true }); writeFileSync(join(d, rel), contenu, "utf8"); }
+  sh("git", ["init", "-q"], d);
+  sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], d);
+  sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "init"], d);
+  return d;
+};
+const r1284 = (d) => (lanceArgs(d, "--regles", "R-14,R-28").rapport.findings || []);
+check("TF-1284 rouge : le dossier `C` d'un profil d'outil commis à la racine → R-14 FAIL (profil nommé) ET R-28 FAIL (artefact de shell)", () => {
+  const d = projet1284({ "README.md": "# p\n", "C/azureProfile.json": "{\"installationId\":\"x\"}\n", "C/az.sess": "{}\n", "C/logs/telemetry.log": "Configuration directory [C]\n" });
+  try {
+    const f = r1284(d);
+    if (!f.some((x) => x.regle === "R-14" && x.statut === "FAIL" && /azureProfile\.json/.test(x.message) && /az\.sess/.test(x.message))) throw new Error(`R-14 ne voit pas le profil : ${JSON.stringify(f)}`);
+    if (!f.some((x) => x.regle === "R-28" && x.statut === "FAIL" && /\bC\b/.test(x.message))) throw new Error(`R-28 ne voit pas le dossier C : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1284 rouge : le MÊME profil sous un dossier ordinaire (outils/azure/) → R-14 FAIL, R-28 PASS — le motif porte sur le NOM du fichier", () => {
+  const d = projet1284({ "README.md": "# p\n", "outils/azure/msal_token_cache.json": "{}\n" });
+  try {
+    const f = r1284(d);
+    if (!f.some((x) => x.regle === "R-14" && x.statut === "FAIL" && /msal_token_cache/.test(x.message))) throw new Error(`R-14 ne voit pas le cache de jetons : ${JSON.stringify(f)}`);
+    if (!f.some((x) => x.regle === "R-28" && x.statut === "PASS")) throw new Error(`R-28 accuse un dossier ordinaire : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1284 remède joué : `git rm -r --cached C` puis commit → R-14 et R-28 PASS (TF-1013)", () => {
+  const d = projet1284({ "README.md": "# p\n", "C/azureProfile.json": "{}\n", "C/az.sess": "{}\n" });
+  try {
+    sh("git", ["rm", "-r", "-q", "--cached", "C"], d);
+    sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "retrait du profil"], d);
+    const f = r1284(d);
+    if (f.some((x) => x.statut === "FAIL") || !f.some((x) => x.regle === "R-14" && x.statut === "PASS") || !f.some((x) => x.regle === "R-28" && x.statut === "PASS"))
+      throw new Error(`le remède prescrit ne rend pas R-14 et R-28 vertes : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

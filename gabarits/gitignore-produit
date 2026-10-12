@@ -26,6 +26,17 @@
 # dépôt divergeaient sans aucun signal. Les deux graphies sont ré-incluses.
 !.env.example
 !.env.exemple
+# TF-1284 (12/10/2026) : les PROFILS D'OUTILS D'AUTHENTIFICATION, reconnus à leur NOM de fichier
+# où qu'ils soient. Le 15/09/2026, un outil en ligne de commande a écrit son profil complet à la
+# racine d'un produit, commis trois minutes plus tard ; vide par hasard, il aurait pu porter un
+# cache de jetons. R-14 d'`oracle-conformite-projet` refuse aussi leur présence dans l'index.
+**/azureProfile.json
+**/msal_token_cache*
+**/az.sess
+**/.databrickscfg
+**/accessTokens.json
+**/credentials.json
+**/application_default_credentials.json
 
 # ---- Artefacts compilés et dépendances ---------------------------------------------------------
 # Aucun projet n'a de raison de versionner ce qu'une commande régénère.
