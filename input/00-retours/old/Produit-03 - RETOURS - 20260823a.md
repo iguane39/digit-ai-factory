@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260823a
+# Retours forges — Produit-65 — 20260823a
 
 - **Contexte** : construction des deux livrables **DAT** et **DEX** du produit à partir des
   gabarits de la bibliothèque, le 23/08/2026 — première utilisation réelle de ces deux familles

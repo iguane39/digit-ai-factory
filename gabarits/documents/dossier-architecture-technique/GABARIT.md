@@ -8,7 +8,7 @@
 > (règles de traitement, authentification et autorisation, protection des données et du réseau,
 > conformité et conservation, hypothèses, risques et mesures) ·
 > les deux instances vivantes de `docs\projet\ARCHITECTURE.md`
-> (`_Client-A/Cockpit IA/client-a-cockpit-ia/`, `_Client-A/Produit-10/`) ·
+> (`_Client-A/Cockpit IA/Produit-77/`, `_Client-A/Produit-10/`) ·
 > `_Client-A/Produit-11/bav-azure/docs/DAT-complements.md` (281 lignes, onze compléments
 > répondant chacun à une remédiation d'audit — dont performance mesurée et archivage des
 > résultats de charge, SLA et alerting SLO) ·

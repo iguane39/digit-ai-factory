@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260822a
+# Retours forges — Produit-65 — 20260822a
 
 - **Contexte** : retour humain du 22/08/2026 sur la **forme des listes de tâches remises au
   développeur**, instruit sur les fichiers du pilot et mesuré sur les synthèses réelles de

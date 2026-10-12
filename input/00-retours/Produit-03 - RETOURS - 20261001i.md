@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001i
+# Retours forges — Produit-65 — 20261001i
 
 - **Contexte** : première exécution, par l'exploitant de production, de l'étape « Fiche Entra » de la chaîne de livraison (exécution 15803, 01/10/2026, 16h29). Elle a échoué. Le commanditaire a demandé pourquoi ce plantage n'avait pas été anticipé ; la revue ligne par ligne qui a suivi a trouvé un second arrêt, qui attendait la relance. 4 leçons en sortent, valables pour tout produit qui confie une étape neuve à une chaîne.
 - **Références ledger** : sans objet — travail hors run

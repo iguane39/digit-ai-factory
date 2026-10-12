@@ -19,8 +19,8 @@
   "vu_le": "2026-08-26"
  },
  "./bootstrap.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-09-27"
+  "cas": 25,
+  "vu_le": "2026-10-12"
  },
  "gabarits/documents/construire-guide-socle.test.mjs": {
   "cas": 3,
@@ -45,6 +45,10 @@
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
   "vu_le": "2026-10-02"
+ },
+ "gabarits/oracle-demande-tierce.test.mjs": {
+  "cas": 29,
+  "vu_le": "2026-10-12"
  },
  "gabarits/oracle-demande.mjs": {
   "cas": 7,
@@ -124,7 +128,7 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 132,
+  "cas": 135,
   "vu_le": "2026-10-12"
  },
  "oracle-constantes-externes.mjs": {
@@ -150,6 +154,10 @@
  "oracle-domaines-declares.mjs": {
   "cas": 10,
   "vu_le": "2026-08-26"
+ },
+ "oracle-ecart-normal.mjs": {
+  "cas": 10,
+  "vu_le": "2026-10-12"
  },
  "oracle-ecosysteme.mjs": {
   "cas": 11,
@@ -181,8 +189,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 44,
-  "vu_le": "2026-10-02"
+  "cas": 45,
+  "vu_le": "2026-10-12"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -298,13 +306,17 @@
   "cas": 10,
   "vu_le": "2026-08-26"
  },
+ "oracle-source-contenu.mjs": {
+  "cas": 12,
+  "vu_le": "2026-10-12"
+ },
  "oracle-synthese.mjs": {
-  "cas": 114,
+  "cas": 137,
   "vu_le": "2026-10-12"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 24,
-  "vu_le": "2026-10-01"
+  "cas": 28,
+  "vu_le": "2026-10-12"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -351,8 +363,8 @@
   "vu_le": "2026-10-12"
  },
  "oracles/hook-restitution-moyen.test.mjs": {
-  "cas": 18,
-  "vu_le": "2026-10-01"
+  "cas": 21,
+  "vu_le": "2026-10-12"
  },
  "oracles/hook-restitution-selection.test.mjs": {
   "cas": 4,
@@ -394,6 +406,10 @@
   "cas": 13,
   "vu_le": "2026-09-22"
  },
+ "oracles/oracle-ecart-normal.test.mjs": {
+  "cas": 10,
+  "vu_le": "2026-10-12"
+ },
  "oracles/oracle-enclenchement.test.mjs": {
   "cas": 27,
   "vu_le": "2026-09-28"
@@ -417,6 +433,10 @@
  "oracles/oracle-repere-externe.test.mjs": {
   "cas": 13,
   "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-source-contenu.test.mjs": {
+  "cas": 12,
+  "vu_le": "2026-10-12"
  },
  "oracles/oracle-verrou-unique.test.mjs": {
   "cas": 15,
@@ -490,6 +510,10 @@
   "cas": 11,
   "vu_le": "2026-09-17"
  },
+ "scripts/lib-non-enregistre.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-10-12"
+ },
  "scripts/lib-parc.test.mjs": {
   "cas": 5,
   "vu_le": "2026-10-01"
@@ -515,8 +539,8 @@
   "vu_le": "2026-09-23"
  },
  "scripts/readme-dossiers.test.mjs": {
-  "cas": 20,
-  "vu_le": "2026-09-28"
+  "cas": 24,
+  "vu_le": "2026-10-12"
  },
  "scripts/rebatir-clone.test.mjs": {
   "cas": 7,
@@ -562,9 +586,17 @@
   "cas": 13,
   "vu_le": "2026-10-01"
  },
+ "scripts/verifier-etape-chaine.test.mjs": {
+  "cas": 21,
+  "vu_le": "2026-10-12"
+ },
  "scripts/verifier-familles-mesure.mjs": {
   "cas": 11,
   "vu_le": "2026-09-15"
+ },
+ "scripts/verifier-formulaire-entra.test.mjs": {
+  "cas": 12,
+  "vu_le": "2026-10-12"
  },
  "scripts/verifier-garde-fous.test.mjs": {
   "cas": 14,
@@ -607,8 +639,8 @@
   "vu_le": "2026-09-15"
  },
  "todo/accueillir-lot.mjs": {
-  "cas": 8,
-  "vu_le": "2026-10-02"
+  "cas": 9,
+  "vu_le": "2026-10-12"
  },
  "todo/adresses-ip.test.mjs": {
   "cas": 14,
@@ -625,6 +657,10 @@
  "todo/bancs-isoles.test.mjs": {
   "cas": 7,
   "vu_le": "2026-09-15"
+ },
+ "todo/designation-projet.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-10-12"
  },
  "todo/emettre-travaux.test.mjs": {
   "cas": 34,
@@ -665,6 +701,10 @@
  "todo/ingerer-identifiants.test.mjs": {
   "cas": 3,
   "vu_le": "2026-09-15"
+ },
+ "todo/ingerer-personnes.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-10-12"
  },
  "todo/ingerer-r45.test.mjs": {
   "cas": 8,

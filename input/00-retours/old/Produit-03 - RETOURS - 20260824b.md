@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260824b
+# Retours forges — Produit-65 — 20260824b
 
 - **Contexte** : revue documentaire du propriétaire métier sur la fiche sécurité, le DAT et le DEX,
   le 24/08/2026 — **une question de relecteur a trouvé un écart de sécurité réel** que trois

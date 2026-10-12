@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001g
+# Retours forges — Produit-65 — 20261001g
 
 - **Contexte** : sixième retour humain du 01/10/2026 sur le même sujet, en réponse à la décision `D-66`. Il complète les lots `20261001d` (`RA-60`) et `20261001f` (`RA-63`).
 - **Références ledger** : sans objet — travail hors run

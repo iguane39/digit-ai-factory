@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260823b
+# Retours forges — Produit-65 — 20260823b
 
 - **Contexte** : solde du reste-à-faire de l'audit de production du 18/08, le 23/08/2026 — sept
   passages de pipeline, cinq pull requests, deux contraintes de gouvernance levées puis remises

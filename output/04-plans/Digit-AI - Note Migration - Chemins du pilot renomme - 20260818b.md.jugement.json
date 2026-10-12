@@ -1,7 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md",
- "empreinte": "81fcefec1934485761e14d132f9b0d983e1db8c712cde08946aa96a9eaf89f3f",
- "scelle_le": "2026-09-22T15:02:05.976Z",
+ "empreinte": "67038c1b3f5b601fcd9b7e4f627fb1fbf381d884b0ed61cd268af2624333b809",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-12T13:38:40.453Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

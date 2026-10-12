@@ -17,7 +17,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | `20260813-plan-strategie-tests-e2e.md` | fichier | 13,3 Ko | Plan de mise en œuvre — stratégie de tests de bout en bout, complète et autonome-sous-gate |
-| `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
+| `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,2 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` | fichier | 20,8 Ko | Plan de mise en œuvre — les huit rangs d'opportunités à verdict favorable non traité |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |

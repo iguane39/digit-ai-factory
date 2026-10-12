@@ -181,7 +181,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-03 - RETOURS - 20261001f.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20261001g.md` | fichier | 5,0 Ko | Retours forges — Produit-65 — 20261001g |
 | `Produit-03 - RETOURS - 20261001g.tf.jsonl` | fichier | 1,8 Ko | 1 ligne(s) JSONL |
-| `Produit-03 - RETOURS - 20261001h.md` | fichier | 6,5 Ko | Retours forges — Produit-65 — 20261001h |
+| `Produit-03 - RETOURS - 20261001h.md` | fichier | 6,4 Ko | Retours forges — Produit-65 — 20261001h |
 | `Produit-03 - RETOURS - 20261001h.tf.jsonl` | fichier | 3,3 Ko | 2 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20261001i.md` | fichier | 9,3 Ko | Retours forges — Produit-65 — 20261001i |
 | `Produit-03 - RETOURS - 20261001i.tf.jsonl` | fichier | 6,0 Ko | 4 ligne(s) JSONL |

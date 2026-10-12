@@ -33,7 +33,7 @@ problème **en s'appuyant sur une jonction** — « NE PAS la supprimer avant ce
 | `digit-ai-forge-organization\CLAUDE.md` | 2 | référence au dépôt du pilot |
 | `_Client-A\Produit-10\PROMPT-PRODUIT.md` | 4 | dont `digit-ai-forge-pilot/bootstrap.mjs` |
 | `_Client-A\Produit-10\CLAUDE.md` | 1 | référence au dépôt du pilot |
-| `_Client-A\Cockpit IA\client-a-cockpit-ia\PROMPT-PRODUIT.md` | 1 | référence au dépôt du pilot |
+| `_Client-A\Cockpit IA\Produit-77\PROMPT-PRODUIT.md` | 1 | référence au dépôt du pilot |
 
 **Ces fichiers ne sont PAS corrigés par cette note**, et c'est volontaire : le garde-fou du
 noyau interdit au pilot d'intervenir dans un produit hors d'un run demandé. Chacun se rattrape

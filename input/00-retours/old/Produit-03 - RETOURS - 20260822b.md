@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260822b
+# Retours forges — Produit-65 — 20260822b
 
 - **Contexte** : session du 22/08/2026, sur la **forme des listes de tâches** remises au
   développeur. Second lot du jour ; le premier (`20260822a`) portait sur le classement par

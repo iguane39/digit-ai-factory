@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260821b
+# Retours forges — Produit-65 — 20260821b
 
 - **Contexte** : constat en passant, relevé pendant la remise du lot `20260821a` (dépôt d'un lot de retours dans `input\00-retours\` puis ingestion)
 - **Références ledger** : sans objet — run de conseil mené hors socle de ledger produit

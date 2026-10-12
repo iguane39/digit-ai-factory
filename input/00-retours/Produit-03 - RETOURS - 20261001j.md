@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001j
+# Retours forges — Produit-65 — 20261001j
 
 - **Contexte** : le commanditaire a corrigé, le 01/10/2026 vers 17h40, un complément de relance proposé à l'exploitant de production. 2 règles de forme en sortent, valables pour toute demande remise à une équipe tierce, et elles prolongent celles du même jour remises plus tôt.
 - **Références ledger** : sans objet — travail hors run

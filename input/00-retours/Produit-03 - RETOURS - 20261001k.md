@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001k
+# Retours forges — Produit-65 — 20261001k
 
 - **Contexte** : le 01/10/2026 vers 18h00, le commanditaire a dû redire une consigne donnée une heure plus tôt, et il demande que ce point remonte à la factory : « pour qu'une demande que je réalise soit réellement appliquée, que je n'ai pas à le répéter plusieurs fois et que lorsque je demande des étapes (ou autre chose), on ne fasse pas référence à d'autres références qui font référence à d'autres références, sinon on ne s'en sort pas ».
 - **Références ledger** : sans objet — travail hors run

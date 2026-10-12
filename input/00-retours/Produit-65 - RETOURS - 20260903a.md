@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260903a
+# Retours forges — Produit-65 — 20260903a
 
 - **Contexte** : mise en conformité Factory d'un livrable HTML existant (« Ordonnancement des
   étapes de MEP », indice 20260903a) — rebâti sur le socle `digit-ai-page-html` 1.18.0, jugé par

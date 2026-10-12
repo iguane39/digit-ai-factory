@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260821c
+# Retours forges — Produit-65 — 20260821c
 
 - **Contexte** : retour humain de formatage du 21/08/2026 sur le livrable HTML remis, et reprise du générateur qui l'a produit
 - **Références ledger** : sans objet — run de conseil mené hors socle de ledger produit

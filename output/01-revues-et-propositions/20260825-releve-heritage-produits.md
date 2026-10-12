@@ -35,7 +35,7 @@ correction rend possible.
 | Produit | Absents | Périmés | Conformes | Ce qui manque |
 |---|---|---|---|---|
 | `_Client-A/Produit-04` | 8 | 0 | 0/8 | tout : gabarit de retours, outil de vérification, hook de fin de tour, gabarit de restitution, configuration d'agent, consignes, robots.txt, llms.txt |
-| `_Client-A/Cockpit IA/client-a-cockpit-ia` | 7 | 0 | 1/8 | gabarit de retours, outil de vérification, hook de fin de tour, gabarit de restitution, configuration d'agent, robots.txt, llms.txt |
+| `_Client-A/Cockpit IA/Produit-77` | 7 | 0 | 1/8 | gabarit de retours, outil de vérification, hook de fin de tour, gabarit de restitution, configuration d'agent, robots.txt, llms.txt |
 | `_Client-A/Plateforme_video_IA_complet` | 7 | 0 | 1/8 | gabarit de retours, outil de vérification, hook de fin de tour, gabarit de restitution, configuration d'agent, robots.txt, llms.txt |
 | `_Client-A/Produit-01` | 6 | 0 | 2/8 | gabarit de retours, outil de vérification, hook de fin de tour, gabarit de restitution, robots.txt, llms.txt |
 | `_Client-A/BourseAuxVacants2/Produit-11` | 6 | 0 | 2/8 | hook de fin de tour, gabarit de restitution, configuration d'agent, consignes, robots.txt, llms.txt |

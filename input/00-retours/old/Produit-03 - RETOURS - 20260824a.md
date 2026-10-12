@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260824a
+# Retours forges — Produit-65 — 20260824a
 
 - **Contexte** : mise à jour de la fiche sécurité puis conversion en PDF, le 24/08/2026 — un
   défaut découvert **par la conversion**, que les deux oracles de la page HTML avaient laissé passer

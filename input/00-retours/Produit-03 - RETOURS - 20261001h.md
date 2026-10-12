@@ -1,4 +1,4 @@
-# Retours forges — Bibliothèque vidéo IA Enseigne-A — 20261001h
+# Retours forges — Produit-65 — 20261001h
 
 - **Contexte** : septième retour humain du 01/10/2026, sur le message remis à l'exploitant de production. Il refond la forme des demandes posée le matin (lot `20261001c`, `RA-59`), et rappelle une règle du porteur déjà remise à la factory le 15/09 (`RT-15`).
 - **Références ledger** : sans objet — travail hors run

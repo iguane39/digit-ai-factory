@@ -1,4 +1,4 @@
-# Retours forges — client-a-cockpit-ia — 20260820a
+# Retours forges — Produit-77 — 20260820a
 
 <!-- Gabarit du pilot (gabarits\RETOURS-FORGES.md). Un fichier = UN lot de retours.
      Un fichier remis ne se modifie JAMAIS — le lot suivant est un nouveau fichier daté. -->

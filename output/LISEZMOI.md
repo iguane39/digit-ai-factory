@@ -207,7 +207,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Livrable | Version | Poids | Chemin à copier |
 |---|---|---|---|
 | 20260813-plan-strategie-tests-e2e.md | — | 13.3 Ko | `04-plans/20260813-plan-strategie-tests-e2e.md` |
-| Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md | 20260818b | 4.3 Ko | `04-plans/Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` |
+| Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md | 20260818b | 4.2 Ko | `04-plans/Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` |
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md | 20260818a | 4.1 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` |
 | Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 20.8 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.2 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
