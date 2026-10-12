@@ -41,4 +41,7 @@ export const DEDIES = {
   // fixtures bâtissent un parc jetable de fausses forges et y copient le VRAI mécanisme de
   // confrontation de forge-tests — embarquées dans l'oracle, elles le feraient se juger lui-même.
   "oracle-enclenchement.mjs": "oracle-enclenchement.test.mjs",
+  // Le juge de la déduction publiée comme un fait (TF-1581, campagne du 12/10/2026). Banc dédié : ses
+  // fixtures écrivent à dessein l'affirmation sans source que l'oracle refuse.
+  "oracle-source-contenu.mjs": "oracle-source-contenu.test.mjs",
 };

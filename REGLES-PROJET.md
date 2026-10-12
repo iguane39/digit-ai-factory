@@ -1549,3 +1549,30 @@ que R-55 rendait déjà automatiques, 2 corrections du pilot réversibles et san
 Contrôle exécutable : `todo\revue-hebdo.mjs`, tri par le champ `ressort` (recette `--self-test`, à
 double sens : une proposition hors du ressort humain n'est pas posée, une fiche sans ressort est
 listée à instruire). Classe : `decision-posee-hors-du-ressort-humain` (`todo\CLASSES.json`).
+
+## AN. R-59 — une déduction ne se publie pas comme un fait, une citation se vérifie au texte brut (campagne du 12/10/2026, TF-1581, TF-1582)
+
+Deux faits du lot `Produit-02 - RETOURS - 20261001b` (RT-107, RT-108). Le 24/09/2026, des livrets
+remis au client final affirmaient « studio de plain-pied […] le plus accessible des cinq gîtes » : le
+journal du produit disait l'accessibilité « déduite de la composition », le livrable avait perdu cette
+marque, et le gîte est au 1er étage. Le 29/09/2026, l'outil de lecture web résumée a rendu comme
+citation « limite de dépense mensuelle » là où le texte brut de la page dit « limite de dépense
+quotidienne de 20 € » : un mot changé inventait une règle de plateforme, et S52 ne l'aurait pas vu,
+parce qu'elle exige une source et une date, non que la phrase soit dans la source.
+
+**R-59.**
+1. **Toute entrée d'un contenu destiné au client final porte sa source** (champ `_source`) **ou un
+   statut `hypothese` / `question`** qui la retient hors du livrable et la pose en question à
+   l'exploitant. Une affirmation sur un sujet de `gabarits\AFFIRMATIONS-SENSIBLES.json`
+   (l'accessibilité à ce jour) sans l'un ni l'autre est rouge.
+2. **Une phrase entre guillemets attribuée à une page tierce se vérifie par recherche exacte dans le
+   texte brut de la page** avant d'être écrite. L'outil de lecture résumée sert à trouver, jamais à
+   citer. Le paragraphe qui cite porte la trace de cette recherche, ou la phrase est reformulée sans
+   guillemets.
+3. **Ce que R-59 ne juge pas** : que la source citée dise ce que l'entrée affirme, que la phrase soit
+   vraiment dans la page, les sujets absents de la liste. Seules la présence de la source et la trace
+   de la vérification se contrôlent.
+
+Contrôles exécutables : `oracles\oracle-source-contenu.mjs` (SC1 à SC3, recette
+`oracles\oracle-source-contenu.test.mjs` à double sens) pour le point 1 ; la règle S59 de
+`oracles\oracle-synthese.mjs` pour le point 2, avertissante à son entrée.
