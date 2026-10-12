@@ -100,8 +100,8 @@
  *       sa SOURCE OFFICIELLE et la DATE où elle a été lue (27/09, D-24 (b), TF-1362) — la liste des
  *       plateformes est une donnée, `gabarits\PLATEFORMES-TIERCES.json` ;
  *   S53 la même action, laissée à `manuelle_utilisateur`, est guidée écran par écran dans une
- *       section « Guide » placée AVANT le bloc 0, chaque étape close par « ce que vous devez
- *       voir » (27/09, TF-1361) ; le hook la rend bloquante quand le dernier message humain
+ *       section « Guide » placée AVANT le bloc 0, chaque étape close par « Résultat
+ *       attendu : … » (27/09, TF-1361 ; clôture réécrite le 12/10, TF-1608) ; le hook la rend bloquante quand le dernier message humain
  *       demande la procédure ;
  *   S54 un paragraphe de PROSE tient sur une seule ligne source : le chat de l'extension VS Code
  *       rend chaque saut de ligne, et un paragraphe coupé à la main s'y affiche en colonne étroite
@@ -2909,16 +2909,20 @@ function juger(texte, cheminJuge = null) {
             if (/^\s*\d{1,2}[.)]\s+\S/.test(l)) etapes.push(l);
             else if (etapes.length && l.trim()) etapes[etapes.length - 1] += " " + l.trim();
           }
-          const sansVoir = etapes.filter((e) => !/ce que vous (?:devez|allez|devriez) voir/i.test(e));
+          // 12/10/2026 (TF-1608, TF-1545) : la clôture prescrite est « Résultat attendu : … ». Le
+          // porteur interdit la tournure « Ce que … » (RT-15 du 15/09, redite le 01/10) : aucun
+          // oracle ne la rend donc obligatoire. L'ancienne clôture reste LUE, pour ne pas accuser
+          // les restitutions écrites avant ce jour, mais aucun message ne la prescrit plus.
+          const sansVoir = etapes.filter((e) => !/r[ée]sultat attendu|ce que vous (?:devez|allez|devriez) voir/i.test(e));
           if (!etapes.length) defaut = "la section « Guide » ne porte aucune étape numérotée (« 1. », « 2. »…)";
           else if (sansVoir.length)
-            defaut = `${sansVoir.length} étape(s) sur ${etapes.length} du guide ne se closent pas par « ce que vous devez voir »`;
+            defaut = `${sansVoir.length} étape(s) sur ${etapes.length} du guide ne se closent pas par « Résultat attendu : … »`;
         }
         const noms = [...new Set(aGuider.map((x) => x.p.nom))].join(", ");
         defaut
           ? ko("S53", `${aGuider.length} action(s) manuelle_utilisateur visent l'interface de ${noms}, et ${defaut}. Le 22/09/2026, `
             + "la procédure a été redemandée cinq fois en 56 minutes tant que les gestes vivaient en cellules de tableau ; un "
-            + "guide écran par écran EN TÊTE, chaque étape close par « ce que vous devez voir », y a mis fin au tour suivant.")
+            + "guide écran par écran EN TÊTE, chaque étape close par « Résultat attendu : … », y a mis fin au tour suivant.")
           : ok("S53", `${aGuider.length} action(s) manuelle_utilisateur sur ${noms}, guidée(s) en tête, étape par étape`);
       }
     }
@@ -3353,13 +3357,18 @@ Aucun écart : la demande a été suivie à la lettre.
   const SOURCE_DATEE = saut + "  - source : `support.google.com/google-ads`, lue le 27/09/2026.";
   const GUIDE = "## Guide — importer les campagnes dans Google Ads" + saut + saut
     + "Source : `support.google.com/google-ads`, lue le 27/09/2026." + saut + saut
-    + "1. Ouvrez Outils, puis Actions groupées, puis Importations. Ce que vous devez voir : la liste des importations passées." + saut
-    + "2. Déposez le fichier et cliquez sur « Aperçu ». Ce que vous devez voir : le nombre de modifications acceptées, et zéro erreur." + saut
-    + "3. Cliquez sur « Appliquer ». Ce que vous devez voir : l'importation marquée terminée." + saut + saut
+    + "1. Ouvrez Outils, puis Actions groupées, puis Importations. Résultat attendu : la liste des importations passées." + saut
+    + "2. Déposez le fichier et cliquez sur « Aperçu ». Résultat attendu : le nombre de modifications acceptées, et zéro erreur." + saut
+    + "3. Cliquez sur « Appliquer ». Résultat attendu : l'importation marquée terminée." + saut + saut
     + "## 0. Synthèse d'ouverture" + saut + saut;
   const interfaceSansSource = verte + ACTION_INTERFACE + saut;
   const interfaceAvecSource = (verte + ACTION_INTERFACE + SOURCE_DATEE + saut)
     .replace("# Restitution — campagne de test" + saut + saut, "# Restitution — campagne de test" + saut + saut + GUIDE);
+  // 12/10/2026 (TF-1608, TF-1545) — la contre-épreuve de la clôture « Résultat attendu » : le MÊME
+  // guide, ses étapes privées de toute clôture, reste rouge sur S53. Sans elle, la verte ne
+  // prouverait pas que la clôture est lue : elle prouverait seulement qu'elle n'est plus exigée.
+  const guideSansCloture = interfaceAvecSource.replace(/ Résultat attendu : [^\n]*/g, "");
+  writeFileSync(join(dir, "guide-sans-cloture.md"), guideSansCloture, "utf8");
   const plateformeSansEcran = verte + "- **A-4** — neuve (manuelle_utilisateur) — trancher la publication : répondre « D-1 (a) »." + saut
     + "  - pourquoi pas l'IA : decision — publier sur GitHub vous revient (R-38) ;" + saut
     + "  - où : `git push origin main` une fois décidé ;" + saut
@@ -3597,6 +3606,10 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`${regle} : la verte, dont l'écran « Publier la version » n'appartient à aucune plateforme tierce, est accusée — `
         + extraitDe(rv, regle));
   }
+  const rgc = spawnSync(process.execPath, [moi, join(dir, "guide-sans-cloture.md")], { encoding: "utf8" });
+  if (!/"S53"[^}]*FAIL[^}]*Résultat attendu/.test(rgc.stdout))
+    casse.push("S53 : un guide dont les étapes ne portent aucune clôture passe, ou son constat ne prescrit pas « Résultat "
+      + "attendu » (TF-1608) — " + extraitDe(rgc, "S53"));
   if (ria.status !== 0)
     casse.push("S52/S53 : la restitution guidée en tête n'est pas PASS en entier — le guide doit être une forme RECONNUE, "
       + "et une forme que le gabarit prescrit et que son juge refuse est un piège : "
@@ -3942,8 +3955,8 @@ Aucun écart : la demande a été suivie à la lettre.
   const NE_VERIFIE = "Ne vérifie pas : les valeurs que le plan envoie à la plateforme, ni leur validité à la date d'application.";
   const GUIDE_LANCEMENT = (avecLimite) => "## Guide — Relancer la production de la version 1.12.0" + saut + saut
     + "Source officielle lue le 14/08/2026 : `learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals`." + saut + saut
-    + "1. Ouvrir la chaîne de livraison, choisir la branche de production et lancer l'exécution. Ce que vous devez voir : une exécution arrêtée sur le bouton « Review »." + saut
-    + "2. Cliquer sur « Approve » si le plan compte 11 créations, 1 modification et 0 destruction. Ce que vous devez voir : l'étape d'application en vert." + saut + saut
+    + "1. Ouvrir la chaîne de livraison, choisir la branche de production et lancer l'exécution. Résultat attendu : une exécution arrêtée sur le bouton « Review »." + saut
+    + "2. Cliquer sur « Approve » si le plan compte 11 créations, 1 modification et 0 destruction. Résultat attendu : l'étape d'application en vert." + saut + saut
     + (avecLimite ? NE_VERIFIE + saut + saut : "")
     + "## 0. Synthèse d'ouverture" + saut + saut;
   const VERDICT_VERTE = "Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
