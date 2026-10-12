@@ -1263,6 +1263,36 @@ if (!aGit) so("R-14", "pas de git");
 else {
   const suivi = git("ls-files", ".env");
   suivi.stdout.trim() ? ko("R-14", ".env", "VERSIONNÉ dans git — interdit, à retirer de l'index") : ok("R-14", ".env", "non versionné");
+  // TF-1284 (12/10/2026) — UN PROFIL D'OUTIL D'AUTHENTIFICATION SE RECONNAÎT À SON NOM, OÙ QU'IL
+  // SOIT. Le 15/09/2026, un outil en ligne de commande a reçu un dossier de configuration RELATIF
+  // et a écrit son profil complet à la racine d'un produit (17 fichiers, dont `azureProfile.json`
+  // et `az.sess`), commis trois minutes plus tard ; ce contrôle a rendu PASS sur ce commit même,
+  // parce que R-14 ne connaissait que `.env`. Le profil était vide par hasard. Le motif porte sur le
+  // NOM du fichier, indépendamment du dossier qui le porte : c'est la propriété qui manquait.
+  const PROFILS_AUTH = /(^|\/)(azureProfile\.json|msal_token_cache[^/]*|az\.sess|\.databrickscfg|accessTokens\.json|credentials\.json|application_default_credentials\.json)$/i;
+  const profils = git("ls-files").stdout.split(/\r?\n/).filter((f) => PROFILS_AUTH.test(f));
+  profils.length
+    ? ko("R-14", profils[0], `${profils.length} fichier(s) de PROFIL D'OUTIL D'AUTHENTIFICATION versionné(s) (${profils.slice(0, 4).join(", ")}${profils.length > 4 ? ", …" : ""}) — ` +
+      "un tel profil peut porter un cache de jetons ; le retirer de l'index (`git rm -r --cached <dossier>`), puis vérifier dans l'historique qu'aucun jeton n'y est entré (TF-1284)")
+    : ok("R-14", "profils d'authentification", "aucun profil d'outil d'authentification versionné (azureProfile.json, msal_token_cache, az.sess, .databrickscfg…)");
+}
+
+// R-28 — aucun ARTEFACT DE SHELL versionné à la racine (TF-1284, 12/10/2026). Les règles 1 à 3
+// jugent la PRÉSENCE des dossiers attendus, jamais ce qui s'ajoute en trop. Un chemin mal passé à
+// un outil (une variable reçue sous la forme `C` au lieu d'un chemin absolu, une redirection vers
+// `null` ou `NUL` hors de son shell) crée à la racine une entrée au nom d'une seule lettre ou d'un
+// périphérique. Mesuré le 12/10/2026 sur 13 dépôts de produits : 1 seul porte une telle entrée,
+// celui du fait fondateur, et c'est elle qui contient le profil d'authentification de R-14. La
+// liste FERMÉE des entrées attendues, proposée aussi, n'est pas jouée : sur les mêmes 13 dépôts,
+// elle accuserait des dizaines d'entrées légitimes (code, données, manifestes de paquets).
+if (!aGit) so("R-28", "pas de git");
+else {
+  const ARTEFACT_SHELL = /^([A-Za-z]|null|nul|con|prn|aux|~|\$null)$/i;
+  const racine28 = git("ls-tree", "--name-only", "HEAD").stdout.split(/\r?\n/).filter((n) => ARTEFACT_SHELL.test(n));
+  racine28.length
+    ? ko("R-28", racine28[0], `${racine28.length} entrée(s) versionnée(s) à la racine au nom d'un ARTEFACT DE SHELL (${racine28.join(", ")}) — ` +
+      "une lettre seule ou un nom de périphérique naît d'un chemin mal passé à un outil, pas d'une décision ; examiner son contenu, puis la retirer (`git rm -r --cached <entrée>`) et corriger l'appel qui l'a créée (TF-1284)")
+    : ok("R-28", "racine", "aucune entrée versionnée à la racine au nom d'un artefact de shell (lettre seule, null, NUL, ~)");
 }
 
 // R-16 — dossier de MEP copié dans output\ au nommage daté
@@ -2365,6 +2395,7 @@ const nonJuge = [
   "R-20 nature des lignes (TF-0528) : le re-service d'un écart assumé est vu par RECOUVREMENT DE MOTS (quatre mots significatifs communs au moins), pas par compréhension — une ligne intégralement reformulée passe, et c'est un faux négatif ASSUMÉ : le seuil conservateur protège de l'inverse, crier sur deux sujets réellement distincts. La détection de condition repose sur un vocabulaire nommé (si, lorsque, dès que, au cas où, tant que, le jour où) moins les tournures qui modulent sans suspendre (si possible, si besoin, même si) — une condition dite autrement ne sera pas vue",
   "R-32 ter (TF-0923 volet a) : le RÔLE d'un livrable est lu dans son NOM (R-4) — un document remis à un humain sous un objet qui ne dit pas « proposition », « étude », « trajectoire » ou « conseil » échappe au contrôle, et c'est un faux négatif ASSUMÉ : juger l'INTENTION d'un document demanderait de le lire. La PRÉSENCE de la page homonyme est jugée, jamais sa CONFORMITÉ — c'est R-32 qui exige son journal d'oracles une fois qu'elle existe. L'écart déclaré au ledger se reconnaît à un type portant « ecart », une cause d'au moins vingt caractères et la citation du radical du livrable : un écart déclaré en prose, ailleurs qu'au ledger, n'est pas vu",
   "R-35 (TF-0923 volet b) : l'exemption d'existant (TF-0266) n'est REFUSÉE que lorsqu'elle est INVOQUÉE au ledger par son identifiant `TF-0266` alors que la mesure la contredit. Une exemption racontée en d'autres mots, ou dans la prose d'une synthèse hors ledger, n'est pas vue — le vocabulaire est étroit et fermé par choix : l'élargir à « antérieur » ou « existant » accuserait toute entrée qui décrit honnêtement un fichier ancien. Ce que le contrôle ne fait PAS non plus : il ne juge aucun constat un par un comme « couvert » ou « non couvert » par l'exemption — il dit si elle est ouverte, et la déclaration nommée reste la responsabilité du run (jamais un total anonyme)",
+  "R-14 profils d'authentification et R-28 (TF-1284) : le profil se reconnaît à une liste NOMMÉE de noms de fichiers (azureProfile.json, msal_token_cache*, az.sess, .databrickscfg, accessTokens.json, credentials.json, application_default_credentials.json) — l'outil d'un autre éditeur, sous un autre nom, passera ; l'historique n'est pas fouillé, seul l'index courant est lu. R-28 ne voit que les noms d'artefact de shell (lettre seule, null, NUL, con, prn, aux, ~) : la liste FERMÉE des entrées attendues à la racine n'est pas jouée, parce que sur 13 dépôts de produits mesurés le 12/10/2026 elle accuserait des dizaines d'entrées légitimes (code, données, manifestes)",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
@@ -2376,7 +2407,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-27, R-32, « R-32 bis », « R-32 ter », R-35, R-42, « R-42 bis », R-43, R-47)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, R-42, « R-42 bis », R-43, R-47)" });
     }
   }
 }
