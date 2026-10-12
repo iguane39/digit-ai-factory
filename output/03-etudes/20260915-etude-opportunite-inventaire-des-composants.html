@@ -23,7 +23,6 @@
   
   <title>Digit-AI — Étude d'opportunité — inventaire des composants et prérequis d’environnement — 20260915a — 20260915a</title>
   <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les deux dépôts nommés au">
-  <meta name="ai-generated" content="Claude Code">
   <meta name="theme-color" content="#2563EB">
   
   <meta name="color-scheme" content="light">
@@ -85,9 +84,9 @@
          jamais lu n'est pas neutre, c'est la trace visible d'une doctrine abandonnee, en tete
          du fichier que tout auteur de page copie. Le prochain le rebrancherait. */
       --w: clamp(75vw, 1680px, 92vw);
-      /* Familles (repli système obligatoire) — charte des présentations (D-5 (a), D-11 (a)) */
-      --head: "Montserrat", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
-      --sans: "Inter", "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      /* Familles (repli système obligatoire) */
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
       /* Année de référence (token isolé) */
       --annee-ref: "2026";
@@ -317,20 +316,6 @@
       .theme-toggle { display: none; }
     }
   </style>
-  <style>
-    nav.toc{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
-    nav.toc a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink)}
-    nav.toc a:hover{text-decoration:underline}
-    nav.toc a strong{font-size:.85rem;font-weight:600}
-    .toc-d{color:var(--muted);font-size:.72rem;font-weight:400}
-    .ch-apprend{margin:0 0 16px;color:var(--muted)}
-    nav.barre{display:none}
-    @media (max-width:900px){
-      nav.barre{display:flex;gap:16px;overflow-x:auto;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
-      nav.barre a{flex:0 0 auto;white-space:nowrap;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
-      nav.barre a:hover{text-decoration:underline}
-    }
-  </style>
 <!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
@@ -465,46 +450,19 @@ tr[data-tf-empty] td {
       <input id="find" type="search" placeholder="Rechercher dans le document…">
       <p id="findCount" class="find-count" aria-live="polite"></p>
     </div>
-<p class="intention">Cette page sert à décider, pour le pilote de l'écosystème, de la suite à donner à l'étude : quatre candidats groupés du registre TODO-FORGE (TF-1113, TF-1117, TF-1120, TF-1122), nés des retours Produit-11 du 14/09/2026 et décidés le 15/09/2026 sous mandat humain global, sous le seuil d'étude.</p>
-<nav class="toc colle" aria-label="Sommaire">
-      <a href="#seuil-de-declenchement-verifie-avant-ecriture"><strong>Seuil de déclenchement (vérifié avant écriture)</strong> <span class="toc-d">Chapitre 1 sur 8</span></a>
-      <a href="#intention-de-l-utilisateur-loi-n-7"><strong>Intention de l'utilisateur (loi n° 7)</strong> <span class="toc-d">Chapitre 2 sur 8</span></a>
-      <a href="#0-traitement-des-entrants"><strong>0. Traitement des entrants</strong> <span class="toc-d">Chapitre 3 sur 8</span></a>
-      <a href="#1-partition-du-probleme"><strong>1. Partition du problème</strong> <span class="toc-d">Chapitre 4 sur 8</span></a>
-      <a href="#2-non-recouvrement-contre-l-existant"><strong>2. Non-recouvrement contre l'existant</strong> <span class="toc-d">Chapitre 5 sur 8</span></a>
-      <a href="#3-etat-de-l-art-date"><strong>3. État de l'art daté</strong> <span class="toc-d">Chapitre 6 sur 8</span></a>
-      <a href="#4-options-jeu-ferme-o0-o4"><strong>4. Options — jeu fermé O0-O4</strong> <span class="toc-d">Chapitre 7 sur 8</span></a>
-      <a href="#5-verdict"><strong>5. Verdict</strong> <span class="toc-d">Chapitre 8 sur 8</span></a>
-    </nav>
-<nav class="barre" aria-label="Sommaire permanent"><a href="#seuil-de-declenchement-verifie-avant-ecriture">Seuil de déclenchement (vérifié avant écriture)</a><a href="#intention-de-l-utilisateur-loi-n-7">Intention de l'utilisateur (loi n° 7)</a><a href="#0-traitement-des-entrants">0. Traitement des entrants</a><a href="#1-partition-du-probleme">1. Partition du problème</a><a href="#2-non-recouvrement-contre-l-existant">2. Non-recouvrement contre l'existant</a><a href="#3-etat-de-l-art-date">3. État de l'art daté</a><a href="#4-options-jeu-ferme-o0-o4">4. Options — jeu fermé O0-O4</a><a href="#5-verdict">5. Verdict</a></nav>
 <section class="chap lire" data-mesure-lecture>
 <p>Audience : le pilote de l'écosystème, qui décide des mandats, et les deux dépôts nommés au verdict — le pilot et <code>digit-ai-forge-ops</code>. L'étude instruit quatre candidats du registre TODO-FORGE, tous nés le 14/09/2026 des retours d'un même produit (Produit-11) et rangés <code>décidé</code> le 15/09/2026 sous le mandat humain global, avant d'être repassés <code>en_cours</code> le même jour parce que leur correction exige un objet durable — un oracle — que TF-0155 soumet à étude.</p>
 <p><strong>Ce que le lecteur va apprendre.</strong> Les quatre candidats ne portent pas quatre défauts indépendants : ils décrivent une seule chaîne cassée en quatre points — un inventaire qui confond présence et usage (TF-1113), un usage nul confondu avec une suppression sûre alors que cinq lignes sur dix ne l'étaient pas et qu'une aurait coupé l'accès humain à la base (TF-1117), une suppression jouée sans jamais demander ce qui recrée le composant, découvert seulement par une question humaine après coup (TF-1120), et sept ressources Terraform lues sans être créées, invisibles à toute garde de pipeline (TF-1122). Aucun des deux oracles existants qui touchent au sujet — R-20 côté pilot, O-14 côté <code>digit-ai-forge-ops</code> — ne les couvre : R-20 vérifie la PRÉSENCE du document, jamais le contenu de ses colonnes ; O-14, construit la veille sur le même produit, confronte déjà un export réel au document dans un seul sens, et son propre <code>non_juge</code> nomme TF-1113 comme la raison pour laquelle l'autre sens ne se joue pas encore. Le verdict retenu étend les deux oracles existants — trois règles ajoutées à <code>oracle-ops.mjs</code>, un bloc structurel ajouté à R-20 — plutôt que de créer un fichier neuf : le verbe qu'un oracle neuf outillerait existe déjà, en germe, dans O-11, O-13 et O-14.</p>
-</section>
-<section id="seuil-de-declenchement-verifie-avant-ecriture">
-<h2>Seuil de déclenchement (vérifié avant écriture)</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
 <p>Franchi sur un critère, suffisant seul. <strong>Objet durable (R-31)</strong> : la correction des quatre candidats exige, de leur propre aveu (<code>reste_a_faire</code> du 15/09/2026), « un oracle » — un objet que R-31 (<code>REGLES-PROJET.md</code> l. 319-329) soumet à étude avant naissance, qu'il naisse comme fichier neuf ou comme règle ajoutée à un fichier existant. <strong>Portée</strong> : deux dépôts, le pilot et <code>digit-ai-forge-ops</code>, sous le seuil de trois qui déclencherait à lui seul, mais le critère « objet durable » suffit et n'a pas besoin du second.</p>
-</section>
-</section>
-<section id="intention-de-l-utilisateur-loi-n-7">
-<h2>Intention de l'utilisateur (loi n° 7)</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>Intention de l'utilisateur (loi n° 7)</h3>
 <p>Mandat humain, cité mot pour mot, 14/09/2026 : <strong>« Traite tous les todos &amp; retours »</strong> — repris par le décideur des quatre candidats le 15/09/2026 comme « mandat global de traitement intégral, confirmé le 15/09 par les décisions 10a à 13a ». Ce mandat ne dit pas la forme de la correction ; la forme est décrite par le <code>reste_a_faire</code> du même jour, écrit par la campagne qui a constaté le besoin d'étude : « un oracle d'inventaire des composants vérifiant une colonne Statut à vocabulaire fermé, une section &quot;Composants inutilisés&quot; obligatoire et une table &quot;qui consomme quoi&quot; » (TF-1113), « dans la section des inutilisés, &quot;ce qui cesse de fonctionner si on le supprime&quot; et un statut de supprimabilité à vocabulaire fermé » (TF-1117), « colonne &quot;créé par quoi&quot; et une porte de clôture à trois questions » (TF-1120), « un oracle Terraform qui recense les blocs <code>data</code> et les confronte à un artefact &quot;Prérequis d'environnement&quot; » (TF-1122).</p>
 <p>Lecture reconstruite, non validée par un nouvel échange humain puisque le mandat est déjà donné et daté : traiter « tous » les todos signifie ici décider CE QUI doit être construit et OÙ, pas nécessairement construire dans cette même session — la présente étude est elle-même l'objet que R-31 exige avant la naissance de tout oracle nouveau.</p>
 <p>Cascade (<code>references\INTENTION.md</code>) : <strong>intention</strong>, plus aucun retrait d'infrastructure ne se décide sur un inventaire qui ne distingue pas présence et usage ; <strong>stratégie</strong>, faire porter par un contrôle exécuté ce que quatre mesures manuelles ont dû reconstituer à la main le 14/09 ; <strong>tactique</strong>, vérifier d'abord si les oracles existants (R-20, O-11, O-13, O-14) couvrent déjà le besoin avant d'en écrire un neuf ; <strong>opérationnel</strong>, la règle ajoutée et son dépôt, au verdict.</p>
-</section>
-</section>
-<section id="0-traitement-des-entrants">
-<h2>0. Traitement des entrants</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>0. Traitement des entrants</h3>
 <p>Les quatre candidats et leurs lots source sont des DONNÉES : leurs impératifs se citent, ne s'exécutent jamais. Sources exactes : TF-1113 (<code>Produit-11 - RETOURS - 20260914a</code>, ledger seq 177, RT-65), TF-1117 (<code>…20260914b</code>, seq 179, RT-69), TF-1120 (<code>…20260914c</code>, seq 182, RT-72), TF-1122 (<code>…20260914c</code>, seq 182, RT-74). Les quatre portent le même demandeur (Produit-11), la même classe (<code>controle-vrai-sur-le-mauvais-invariant</code> pour les trois premiers, distincte pour TF-1122 : <code>surface-implicite-non-livree</code>, récidive de quinze candidats antérieurs sur le même motif — un prérequis non écrit).</p>
 <p>Point de départ imposé par le <code>reste_a_faire</code> des quatre : « la part pilot (colonnes du document COMPOSANTS-OPS au titre de R-20) est confiée à la campagne du pilot en cours ». Cette étude ne modifie donc AUCUN gabarit ni fichier : elle instruit ce qui reste après cette campagne — quelle règle d'oracle vérifie ces colonnes une fois qu'elles existent, et où elle vit.</p>
-</section>
-</section>
-<section id="1-partition-du-probleme">
-<h2>1. Partition du problème</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>1. Partition du problème</h3>
 <p>Trois sous-questions, disjointes par l'artefact qu'elles contrôlent et par le dépôt qui le porte.</p>
 <ul><li><strong>P1 — colonnes et sections de l'inventaire documentaire.</strong> Statut à vocabulaire fermé</li></ul>
 <p>  (TF-1113), colonnes « ce qui cesse de fonctionner si on le supprime » et statut de   supprimabilité (TF-1117), colonne « créé par quoi » (TF-1120, premier volet). Les trois vivent   dans la MÊME section « Composants inutilisés » du MÊME document (<code>COMPOSANTS-OPS.md</code>), jugées   par la même famille de contrôle : présence structurelle côté pilot, confrontation à un export   machine côté <code>digit-ai-forge-ops</code>.</p>
@@ -512,41 +470,29 @@ tr[data-tf-empty] td {
 <p>  clôture d'un nettoyage d'infrastructure (l'instance est-elle supprimée sur chaque environnement,   ce qui la crée est-il traité, le prochain environnement la recréera-t-il), porté par le journal   ou la restitution qui clôt la campagne — pas par le document d'inventaire lui-même.</p>
 <ul><li><strong>P3 — prérequis d'environnement Terraform.</strong> TF-1122 : les blocs <code>data</code> de <code>infra-tf/*.tf</code></li></ul>
 <p>  (ressources lues, jamais créées par la pile) confrontés à un artefact neuf listant ces   dépendances externes, leur propriétaire et leur commande de vérification.</p>
-</section>
-</section>
-<section id="2-non-recouvrement-contre-l-existant">
-<h2>2. Non-recouvrement contre l'existant</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>2. Non-recouvrement contre l'existant</h3>
 <p><strong>Mode de lecture</strong> : une ligne par mécanisme existant qui pourrait déjà porter tout ou partie de P1, P2 ou P3 ; la citation localise ce qu'il fait, la dernière colonne dit ce qu'il recouvre.</p>
 </section>
-<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Existant examiné » (1 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Existant examiné</th><th scope="col" data-definition="Colonne « Citation » (2 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Citation</th><th scope="col" data-definition="Colonne « Verdict (recouvre / ne recouvre pas) » (3 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">R-20, socle <code>docs\projet\</code></td><td data-label="Citation"><code>oracle-conformite-projet.mjs</code> l. 1191-1257 : vérifie la PRÉSENCE des 8 fichiers, un frontmatter complet (<code>role</code>, <code>sources_de_verite</code>, <code>verifie_le</code>) et l'absence de marqueurs de gabarit <code>{…}</code> non instanciés</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P1 : aucune règle ne lit le CONTENU d'une colonne ou d'une section — un document avec un Statut absurde ou une section « Inutilisés » vide de sens serait déjà <code>PASS</code></td></tr><tr><td data-label="Existant examiné">R-20, historique TF-0594</td><td data-label="Citation"><code>REGLES-PROJET.md</code> l. 136-157 : <code>COMPOSANTS-OPS.md</code> porte deux inventaires (déployé + environnements de données) ; « <code>oracle-conformite-projet</code> vérifie la présence des huit fichiers et leur frontmatter, jamais la pertinence de leur contenu, et il le déclare lui-même »</td><td data-label="Verdict (recouvre / ne recouvre pas)">confirme, par l'aveu de la règle elle-même, que P1 est hors de son périmètre déclaré</td></tr><tr><td data-label="Existant examiné">Section « Infrastructure déclarée » du gabarit</td><td data-label="Citation"><code>gabarits\docs-projet\COMPOSANTS-OPS.md</code> l. 64-93 (TF-0651, 26/08/2026) : table de ce qui est posé HORS dépôt (domaines, DNS, certificats), jamais revérifié sans elle</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P3 : c'est le symétrique de SORTIE (ce que le produit CRÉE hors du dépôt) ; TF-1122 est le symétrique d'ENTRÉE (ce que le produit LIT sans le créer) — la proposition le dit elle-même</td></tr><tr><td data-label="Existant examiné">Section « Inventaire par environnement » du gabarit</td><td data-label="Citation"><code>gabarits\docs-projet\COMPOSANTS-OPS.md</code> l. 45-52 : une table Composant/Type/Environnement/ID/URL/IP, aucune colonne Statut ni section Inutilisés</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P1 : aucune des colonnes demandées n'existe dans le gabarit actuel</td></tr><tr><td data-label="Existant examiné">O-14, inventaire vs export réel</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 426-469 (TF-1114, corrigé le 15/09) : confronte un export machine (<code>az graph query</code>) au document, un seul sens — chaque nom de l'export doit figurer littéralement dans le document</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P1 au sens EXISTENCE (un composant omis se voit) ; NE recouvre PAS le sens inverse — et le dit lui-même : <code>non_juge</code> l. 448-449, « le sens inverse … dépend d'un vocabulaire de statut fermé (colonne « Statut ») que le gabarit pilot ne porte pas encore (TF-1113) »</td></tr><tr><td data-label="Existant examiné">O-11, sonde de disponibilité</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 357-424 (TF-1121) : parseur de fichiers <code>.tf</code> (marche des répertoires, regex de bloc <code>resource &quot;…&quot; &quot;…&quot; { … }</code>), limité aux types <code>web_test</code>/<code>availability</code> et à l'attribut <code>url</code></td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P3 : aucune lecture de bloc <code>data</code>, aucune confrontation à un artefact de prérequis ; fournit le patron de parcours de fichiers <code>.tf</code> réutilisable</td></tr><tr><td data-label="Existant examiné">O-13, gestes destructifs</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 718-731 (TF-1116 + TF-1118) : tout geste destructif porte sa maturité (éprouvé le AAAA-MM-JJ) ET sa mesure de non-régression, jugées sur un document <code>.md</code> quelconque</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le PRINCIPE de P2 (un geste sur l'infrastructure se clôt sur une preuve, pas sur une déclaration) ; ne recouvre pas les trois questions précises de clôture d'un nettoyage, ni leur artefact (journal/restitution)</td></tr><tr><td data-label="Existant examiné">O-7, empreinte de déploiement</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 162-215 (TF-0288/TF-0298) : compare les fichiers d'une release SERVIE à leur empreinte scellée</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : porte sur la dérive d'un contenu déjà déployé, pas sur l'usage ou la création d'un composant d'infrastructure</td></tr><tr><td data-label="Existant examiné">O-9/O-12, gouvernance de sécurité</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 697-717 : authentification déclarée des <code>sources_de_verite</code>, périmètre d'une <code>remediation_securite</code></td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : domaine sécurité documentaire, pas inventaire ni Terraform</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">R-20, socle <code>docs\projet\</code></td><td data-label="Citation"><code>oracle-conformite-projet.mjs</code> l. 1191-1257 : vérifie la PRÉSENCE des 8 fichiers, un frontmatter complet (<code>role</code>, <code>sources_de_verite</code>, <code>verifie_le</code>) et l'absence de marqueurs de gabarit <code>{…}</code> non instanciés</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P1 : aucune règle ne lit le CONTENU d'une colonne ou d'une section — un document avec un Statut absurde ou une section « Inutilisés » vide de sens serait déjà <code>PASS</code></td></tr><tr><td data-label="Existant examiné">R-20, historique TF-0594</td><td data-label="Citation"><code>REGLES-PROJET.md</code> l. 136-157 : <code>COMPOSANTS-OPS.md</code> porte deux inventaires (déployé + environnements de données) ; « <code>oracle-conformite-projet</code> vérifie la présence des huit fichiers et leur frontmatter, jamais la pertinence de leur contenu, et il le déclare lui-même »</td><td data-label="Verdict (recouvre / ne recouvre pas)">confirme, par l'aveu de la règle elle-même, que P1 est hors de son périmètre déclaré</td></tr><tr><td data-label="Existant examiné">Section « Infrastructure déclarée » du gabarit</td><td data-label="Citation"><code>gabarits\docs-projet\COMPOSANTS-OPS.md</code> l. 64-93 (TF-0651, 26/08/2026) : table de ce qui est posé HORS dépôt (domaines, DNS, certificats), jamais revérifié sans elle</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P3 : c'est le symétrique de SORTIE (ce que le produit CRÉE hors du dépôt) ; TF-1122 est le symétrique d'ENTRÉE (ce que le produit LIT sans le créer) — la proposition le dit elle-même</td></tr><tr><td data-label="Existant examiné">Section « Inventaire par environnement » du gabarit</td><td data-label="Citation"><code>gabarits\docs-projet\COMPOSANTS-OPS.md</code> l. 45-52 : une table Composant/Type/Environnement/ID/URL/IP, aucune colonne Statut ni section Inutilisés</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P1 : aucune des colonnes demandées n'existe dans le gabarit actuel</td></tr><tr><td data-label="Existant examiné">O-14, inventaire vs export réel</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 426-469 (TF-1114, corrigé le 15/09) : confronte un export machine (<code>az graph query</code>) au document, un seul sens — chaque nom de l'export doit figurer littéralement dans le document</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P1 au sens EXISTENCE (un composant omis se voit) ; NE recouvre PAS le sens inverse — et le dit lui-même : <code>non_juge</code> l. 448-449, « le sens inverse … dépend d'un vocabulaire de statut fermé (colonne « Statut ») que le gabarit pilot ne porte pas encore (TF-1113) »</td></tr><tr><td data-label="Existant examiné">O-11, sonde de disponibilité</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 357-424 (TF-1121) : parseur de fichiers <code>.tf</code> (marche des répertoires, regex de bloc <code>resource &quot;…&quot; &quot;…&quot; { … }</code>), limité aux types <code>web_test</code>/<code>availability</code> et à l'attribut <code>url</code></td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas P3 : aucune lecture de bloc <code>data</code>, aucune confrontation à un artefact de prérequis ; fournit le patron de parcours de fichiers <code>.tf</code> réutilisable</td></tr><tr><td data-label="Existant examiné">O-13, gestes destructifs</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 718-731 (TF-1116 + TF-1118) : tout geste destructif porte sa maturité (éprouvé le AAAA-MM-JJ) ET sa mesure de non-régression, jugées sur un document <code>.md</code> quelconque</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le PRINCIPE de P2 (un geste sur l'infrastructure se clôt sur une preuve, pas sur une déclaration) ; ne recouvre pas les trois questions précises de clôture d'un nettoyage, ni leur artefact (journal/restitution)</td></tr><tr><td data-label="Existant examiné">O-7, empreinte de déploiement</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 162-215 (TF-0288/TF-0298) : compare les fichiers d'une release SERVIE à leur empreinte scellée</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : porte sur la dérive d'un contenu déjà déployé, pas sur l'usage ou la création d'un composant d'infrastructure</td></tr><tr><td data-label="Existant examiné">O-9/O-12, gouvernance de sécurité</td><td data-label="Citation"><code>oracle-ops.mjs</code> l. 697-717 : authentification déclarée des <code>sources_de_verite</code>, périmètre d'une <code>remediation_securite</code></td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : domaine sécurité documentaire, pas inventaire ni Terraform</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
-</section>
-<section id="3-etat-de-l-art-date">
-<h2>3. État de l'art daté</h2>
 <section class="chap lire" data-mesure-lecture>
+<h3>3. État de l'art daté</h3>
 <p><strong>Non instruit</strong> — motif : la question n'oppose pas des choix de marché ou de méthode généralement disponibles, mais une convention d'organisation interne à deux dépôts propriétaires (le pilot et <code>digit-ai-forge-ops</code>) — étendre une règle numérotée existante ou créer un fichier neuf. Cette question est entièrement tranchée par la lecture directe du code, exhaustive à la section 2, et par la règle interne R-31 qui la gouverne depuis le 13/08/2026. Le même choix a déjà été fait cinq fois sur le même fichier <code>oracle-ops.mjs</code> dans les deux jours qui précèdent (O-10, O-11, O-12, O-13, O-14, toutes décidées et corrigées sans fichier neuf) : c'est le précédent qui fait foi, pas une source externe. Aucune littérature ne documente la convention d'un registre d'oracles propriétaire.</p>
-</section>
-</section>
-<section id="4-options-jeu-ferme-o0-o4">
-<h2>4. Options — jeu fermé O0-O4</h2>
-<section class="chap lire" data-mesure-lecture>
-<h3>Ce que la lecture directe établit</h3>
+<h3>4. Options — jeu fermé O0-O4</h3>
+<h4>Ce que la lecture directe établit</h4>
 <p>Les trois sous-questions de la partition (P1, P2, P3) demandent chacune soit une extension d'un fichier déjà mandaté et cadencé, soit un nouveau fichier. R-31 (critère 1) exige, pour qu'un objet durable naisse, qu'AUCUN verbe outillé équivalent n'existe déjà ailleurs. Or : le verbe « confronter un document déclaratif à un export machine » existe déjà (O-14) ; le verbe « parcourir des fichiers <code>.tf</code> et juger un bloc par motif » existe déjà (O-11) ; le verbe « exiger une preuve de clôture sur un geste d'infrastructure » existe déjà (O-13). Aucun des trois candidats ne demande un verbe absent : chacun demande une variante ou une extension d'un verbe déjà tenu.</p>
-<h3>Les options</h3>
+<h4>Les options</h4>
 </section>
-<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Option » (1 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Option</th><th scope="col" data-definition="Colonne « Contenu » (2 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Contenu</th><th scope="col" data-definition="Colonne « Coût » (3 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Coût</th><th scope="col" data-definition="Colonne « Ce qu'elle exclut » (4 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Ce qu'elle exclut</th><th scope="col" data-definition="Colonne « Sur la lecture directe » (5 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Sur la lecture directe</th></tr></thead><tbody><tr><td data-label="Option"><strong>O0 — ne rien faire</strong></td><td data-label="Contenu">les quatre candidats restent <code>en_cours</code> sans oracle ; chaque nettoyage futur refait la mesure manuelle du 14/09</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">toute prévention du défaut mesuré (cinq suppressions sur dix auraient été dangereuses, une aurait coupé l'accès humain)</td><td data-label="Sur la lecture directe"><strong>réfutée</strong> : le coût du statu quo est écrit dans les candidats eux-mêmes — une question humaine a dû suppléer l'absence de contrôle une fois, rien ne garantit qu'elle sera reposée la prochaine fois</td></tr><tr><td data-label="Option"><strong>O1 — étendre les oracles existants, aucun fichier neuf</strong></td><td data-label="Contenu">côté pilot : bloc structurel ajouté au sein de R-20 (<code>oracle-conformite-projet.mjs</code>), sur le modèle de R-20 ter déjà présent dans le même fichier — vérifie la PRÉSENCE du Statut à vocabulaire fermé, de la section Inutilisés (même vide, loi n° 3), des colonnes supprimabilité et créé par quoi, une fois que la campagne pilot en cours les a posées dans le gabarit. Côté <code>digit-ai-forge-ops</code> : une règle <strong>O-15</strong> dans <code>oracle-ops.mjs</code>, symétrique inverse d'O-14, qui croise le Statut déclaré à l'export réel — exactement le sens qu'O-14 déclare aujourd'hui <code>non_juge</code> en nommant TF-1113 ; une règle <strong>O-16</strong>, sur le modèle d'O-13, qui exige les trois questions de clôture sur le journal ou la restitution d'un nettoyage d'infrastructure ; une règle <strong>O-17</strong>, qui réutilise le parseur de fichiers <code>.tf</code> d'O-11 pour recenser les blocs <code>data</code> et les confronter à un artefact « Prérequis d'environnement » (référentiel versionné, loi n° 4)</td><td data-label="Coût">complexité moyen · durée court pour le bloc pilot (P1, structure) ; complexité moyen · durée court pour O-15 et O-16 chacune ; complexité moyen · durée moyen pour O-17 (nouveau parseur de blocs <code>data</code>, nouvel artefact à définir)</td><td data-label="Ce qu'elle exclut">la création d'un fichier <code>oracle-inventaire-composants.mjs</code> séparé — le contrat JSON, le harnais self-test et l'entrée de registre restent ceux d'<code>oracle-ops.mjs</code>, déjà mandatés et cadencés</td><td data-label="Sur la lecture directe"><strong>retenue</strong> : couvre P1, P2 et P3 sans dupliquer un mécanisme déjà tenu</td></tr><tr><td data-label="Option"><strong>O2 — créer un oracle neuf autonome pour l'inventaire (P1 + P2)</strong></td><td data-label="Contenu">nouveau fichier <code>oracle-inventaire-composants.mjs</code>, nouveau registre, nouveau couple de fixtures rouge/verte, nouvelle entrée de manifeste, sur le standard §3 de <code>quality-oracles</code></td><td data-label="Coût">complexité complexe · durée moyen</td><td data-label="Ce qu'elle exclut">la réutilisation du contrat JSON, du harnais self-test et du registre qu'<code>oracle-ops.mjs</code> porte déjà pour quatorze règles</td><td data-label="Sur la lecture directe"><strong>réfutée par R-31 lui-même</strong> (critère 1) : le verbe « confronter un déclaratif à un export machine » est déjà outillé par O-14 ; créer un fichier neuf duplique le harnais sans ajouter de capacité</td></tr><tr><td data-label="Option"><strong>O3 — créer un oracle Terraform neuf autonome pour P3 seul</strong></td><td data-label="Contenu">nouveau fichier dédié aux blocs <code>data</code>, hors d'<code>oracle-ops.mjs</code></td><td data-label="Coût">complexité complexe · durée moyen</td><td data-label="Ce qu'elle exclut">la réutilisation du parseur de fichiers <code>.tf</code>, du walker de répertoire et du contrat JSON qu'O-11 porte déjà dans le même fichier</td><td data-label="Sur la lecture directe"><strong>réfutée</strong> pour la même raison qu'O2 : le verbe « parcourir des <code>.tf</code> et juger un bloc par motif » existe déjà ; dupliquer coûte plus cher qu'ajouter une règle</td></tr><tr><td data-label="Option"><strong>O4 — traiter P2 et le contenu de P1 comme une consigne humaine, sans oracle exécuté</strong></td><td data-label="Contenu">les trois questions de clôture et le Statut restent une checklist dans un gabarit, jamais vérifiée mécaniquement</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">toute garantie que la checklist sera lue avant une suppression</td><td data-label="Sur la lecture directe"><strong>réfutée</strong> : la loi transverse du pilot n'accepte un livrable que sur le verdict d'un oracle exécuté, jamais sur confiance ; et la preuve du 14/09 est déjà celle d'une consigne non vérifiée qui a échoué une première fois (restitution + deux lots de retours rendus sans que la question de clôture soit posée)</td></tr></tbody></table></div>
-</section>
-<section id="5-verdict">
-<h2>5. Verdict</h2>
+<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col">Option</th><th scope="col">Contenu</th><th scope="col">Coût</th><th scope="col">Ce qu'elle exclut</th><th scope="col">Sur la lecture directe</th></tr></thead><tbody><tr><td data-label="Option"><strong>O0 — ne rien faire</strong></td><td data-label="Contenu">les quatre candidats restent <code>en_cours</code> sans oracle ; chaque nettoyage futur refait la mesure manuelle du 14/09</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">toute prévention du défaut mesuré (cinq suppressions sur dix auraient été dangereuses, une aurait coupé l'accès humain)</td><td data-label="Sur la lecture directe"><strong>réfutée</strong> : le coût du statu quo est écrit dans les candidats eux-mêmes — une question humaine a dû suppléer l'absence de contrôle une fois, rien ne garantit qu'elle sera reposée la prochaine fois</td></tr><tr><td data-label="Option"><strong>O1 — étendre les oracles existants, aucun fichier neuf</strong></td><td data-label="Contenu">côté pilot : bloc structurel ajouté au sein de R-20 (<code>oracle-conformite-projet.mjs</code>), sur le modèle de R-20 ter déjà présent dans le même fichier — vérifie la PRÉSENCE du Statut à vocabulaire fermé, de la section Inutilisés (même vide, loi n° 3), des colonnes supprimabilité et créé par quoi, une fois que la campagne pilot en cours les a posées dans le gabarit. Côté <code>digit-ai-forge-ops</code> : une règle <strong>O-15</strong> dans <code>oracle-ops.mjs</code>, symétrique inverse d'O-14, qui croise le Statut déclaré à l'export réel — exactement le sens qu'O-14 déclare aujourd'hui <code>non_juge</code> en nommant TF-1113 ; une règle <strong>O-16</strong>, sur le modèle d'O-13, qui exige les trois questions de clôture sur le journal ou la restitution d'un nettoyage d'infrastructure ; une règle <strong>O-17</strong>, qui réutilise le parseur de fichiers <code>.tf</code> d'O-11 pour recenser les blocs <code>data</code> et les confronter à un artefact « Prérequis d'environnement » (référentiel versionné, loi n° 4)</td><td data-label="Coût">complexité moyen · durée court pour le bloc pilot (P1, structure) ; complexité moyen · durée court pour O-15 et O-16 chacune ; complexité moyen · durée moyen pour O-17 (nouveau parseur de blocs <code>data</code>, nouvel artefact à définir)</td><td data-label="Ce qu'elle exclut">la création d'un fichier <code>oracle-inventaire-composants.mjs</code> séparé — le contrat JSON, le harnais self-test et l'entrée de registre restent ceux d'<code>oracle-ops.mjs</code>, déjà mandatés et cadencés</td><td data-label="Sur la lecture directe"><strong>retenue</strong> : couvre P1, P2 et P3 sans dupliquer un mécanisme déjà tenu</td></tr><tr><td data-label="Option"><strong>O2 — créer un oracle neuf autonome pour l'inventaire (P1 + P2)</strong></td><td data-label="Contenu">nouveau fichier <code>oracle-inventaire-composants.mjs</code>, nouveau registre, nouveau couple de fixtures rouge/verte, nouvelle entrée de manifeste, sur le standard §3 de <code>quality-oracles</code></td><td data-label="Coût">complexité complexe · durée moyen</td><td data-label="Ce qu'elle exclut">la réutilisation du contrat JSON, du harnais self-test et du registre qu'<code>oracle-ops.mjs</code> porte déjà pour quatorze règles</td><td data-label="Sur la lecture directe"><strong>réfutée par R-31 lui-même</strong> (critère 1) : le verbe « confronter un déclaratif à un export machine » est déjà outillé par O-14 ; créer un fichier neuf duplique le harnais sans ajouter de capacité</td></tr><tr><td data-label="Option"><strong>O3 — créer un oracle Terraform neuf autonome pour P3 seul</strong></td><td data-label="Contenu">nouveau fichier dédié aux blocs <code>data</code>, hors d'<code>oracle-ops.mjs</code></td><td data-label="Coût">complexité complexe · durée moyen</td><td data-label="Ce qu'elle exclut">la réutilisation du parseur de fichiers <code>.tf</code>, du walker de répertoire et du contrat JSON qu'O-11 porte déjà dans le même fichier</td><td data-label="Sur la lecture directe"><strong>réfutée</strong> pour la même raison qu'O2 : le verbe « parcourir des <code>.tf</code> et juger un bloc par motif » existe déjà ; dupliquer coûte plus cher qu'ajouter une règle</td></tr><tr><td data-label="Option"><strong>O4 — traiter P2 et le contenu de P1 comme une consigne humaine, sans oracle exécuté</strong></td><td data-label="Contenu">les trois questions de clôture et le Statut restent une checklist dans un gabarit, jamais vérifiée mécaniquement</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">toute garantie que la checklist sera lue avant une suppression</td><td data-label="Sur la lecture directe"><strong>réfutée</strong> : la loi transverse du pilot n'accepte un livrable que sur le verdict d'un oracle exécuté, jamais sur confiance ; et la preuve du 14/09 est déjà celle d'une consigne non vérifiée qui a échoué une première fois (restitution + deux lots de retours rendus sans que la question de clôture soit posée)</td></tr></tbody></table></div>
 <section class="chap lire" data-mesure-lecture>
+<h3>5. Verdict</h3>
 <ul><li><strong>Option retenue : O1.</strong> Étendre les deux oracles existants — R-20 côté pilot, <code>oracle-ops.mjs</code></li></ul>
 <p>  côté <code>digit-ai-forge-ops</code> (règles O-15, O-16, O-17) — sans créer de fichier neuf.</p>
 <ul><li><strong>Coût</strong> : complexité moyen · durée court pour le bloc pilot et pour O-15/O-16 ; complexité</li></ul>
 <p>  moyen · durée moyen pour O-17, seule règle qui introduit un parseur (<code>data</code>) et un artefact   (« Prérequis d'environnement ») réellement neufs. Coût de l'étude elle-même : lecture directe du   code dans la session courante, sans délégation ; le compte de tokens n'est pas mesurable depuis   cette session — valeur non vérifiable, marquée comme telle.</p>
 <p><strong>Verdict par candidat</strong></p>
 </section>
-<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Id » (1 sur 5) du tableau du chapitre « 5. Verdict »">Id</th><th scope="col" data-definition="Colonne « Verdict » (2 sur 5) du tableau du chapitre « 5. Verdict »">Verdict</th><th scope="col" data-definition="Colonne « Exécution retenue » (3 sur 5) du tableau du chapitre « 5. Verdict »">Exécution retenue</th><th scope="col" data-definition="Colonne « Dépôt cible » (4 sur 5) du tableau du chapitre « 5. Verdict »">Dépôt cible</th><th scope="col" data-definition="Colonne « Effort » (5 sur 5) du tableau du chapitre « 5. Verdict »">Effort</th></tr></thead><tbody><tr><td data-label="Id">TF-1113</td><td data-label="Verdict">décider</td><td data-label="Exécution retenue">structure (Statut à vocabulaire fermé + section Inutilisés même vide) ajoutée à R-20 dans <code>oracle-conformite-projet.mjs</code>, une fois le gabarit posé par la campagne pilot en cours ; puis règle O-15 dans <code>oracle-ops.mjs</code>, qui lève exactement le <code>non_juge</code> qu'O-14 déclare aujourd'hui en la nommant</td><td data-label="Dépôt cible">pilot, puis <code>digit-ai-forge-ops</code></td><td data-label="Effort">complexité moyen · durée court (les deux volets)</td></tr><tr><td data-label="Id">TF-1117</td><td data-label="Verdict"><strong>fusionner</strong> avec TF-1113</td><td data-label="Exécution retenue">mêmes colonnes de la même section « Composants inutilisés » (« ce qui cesse de fonctionner » + statut de supprimabilité) ; même extension R-20, un seul chantier structurel, pas de règle O-15 distincte</td><td data-label="Dépôt cible">pilot</td><td data-label="Effort">inclus dans TF-1113</td></tr><tr><td data-label="Id">TF-1120</td><td data-label="Verdict"><strong>décider sous réserve</strong></td><td data-label="Exécution retenue">colonne « créé par quoi » fusionnée à TF-1113/TF-1117 (pilot, R-20) ; porte de clôture à trois questions : règle O-16 nouvelle dans <code>oracle-ops.mjs</code>, sur le modèle d'O-13 — sous réserve tant que le journal ou la restitution qui clôt un nettoyage d'infrastructure n'a pas un format stabilisé pour porter la règle</td><td data-label="Dépôt cible">pilot (colonne) + <code>digit-ai-forge-ops</code> (O-16)</td><td data-label="Effort">complexité moyen · durée court</td></tr><tr><td data-label="Id">TF-1122</td><td data-label="Verdict">décider</td><td data-label="Exécution retenue">règle O-17 nouvelle dans <code>oracle-ops.mjs</code>, parseur de blocs <code>data</code> réutilisant le walker de fichiers <code>.tf</code> d'O-11, confrontée à un artefact neuf « Prérequis d'environnement » (référentiel versionné, loi n° 4)</td><td data-label="Dépôt cible"><code>digit-ai-forge-ops</code></td><td data-label="Effort">complexité moyen · durée moyen</td></tr></tbody></table></div>
+<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col">Id</th><th scope="col">Verdict</th><th scope="col">Exécution retenue</th><th scope="col">Dépôt cible</th><th scope="col">Effort</th></tr></thead><tbody><tr><td data-label="Id">TF-1113</td><td data-label="Verdict">décider</td><td data-label="Exécution retenue">structure (Statut à vocabulaire fermé + section Inutilisés même vide) ajoutée à R-20 dans <code>oracle-conformite-projet.mjs</code>, une fois le gabarit posé par la campagne pilot en cours ; puis règle O-15 dans <code>oracle-ops.mjs</code>, qui lève exactement le <code>non_juge</code> qu'O-14 déclare aujourd'hui en la nommant</td><td data-label="Dépôt cible">pilot, puis <code>digit-ai-forge-ops</code></td><td data-label="Effort">complexité moyen · durée court (les deux volets)</td></tr><tr><td data-label="Id">TF-1117</td><td data-label="Verdict"><strong>fusionner</strong> avec TF-1113</td><td data-label="Exécution retenue">mêmes colonnes de la même section « Composants inutilisés » (« ce qui cesse de fonctionner » + statut de supprimabilité) ; même extension R-20, un seul chantier structurel, pas de règle O-15 distincte</td><td data-label="Dépôt cible">pilot</td><td data-label="Effort">inclus dans TF-1113</td></tr><tr><td data-label="Id">TF-1120</td><td data-label="Verdict"><strong>décider sous réserve</strong></td><td data-label="Exécution retenue">colonne « créé par quoi » fusionnée à TF-1113/TF-1117 (pilot, R-20) ; porte de clôture à trois questions : règle O-16 nouvelle dans <code>oracle-ops.mjs</code>, sur le modèle d'O-13 — sous réserve tant que le journal ou la restitution qui clôt un nettoyage d'infrastructure n'a pas un format stabilisé pour porter la règle</td><td data-label="Dépôt cible">pilot (colonne) + <code>digit-ai-forge-ops</code> (O-16)</td><td data-label="Effort">complexité moyen · durée court</td></tr><tr><td data-label="Id">TF-1122</td><td data-label="Verdict">décider</td><td data-label="Exécution retenue">règle O-17 nouvelle dans <code>oracle-ops.mjs</code>, parseur de blocs <code>data</code> réutilisant le walker de fichiers <code>.tf</code> d'O-11, confrontée à un artefact neuf « Prérequis d'environnement » (référentiel versionné, loi n° 4)</td><td data-label="Dépôt cible"><code>digit-ai-forge-ops</code></td><td data-label="Effort">complexité moyen · durée moyen</td></tr></tbody></table></div>
 <section class="chap lire" data-mesure-lecture>
 <ul><li><strong>Candidature(s) émise(s)</strong> : aucune candidature neuve — le mandat humain global du 14/09</li></ul>
 <p>  (« Traite tous les todos &amp; retours ») couvre déjà la décision de construire ; cette étude   fournit l'objet que R-31 exigeait avant que l'oracle naisse. L'exécution retourne aux deux   campagnes déjà nommées par les candidats : la campagne pilot en cours (colonnes du gabarit,   bloc R-20) et la prochaine campagne <code>digit-ai-forge-ops</code> (O-15, O-16, O-17), sur le modèle des   cinq règles O-10 à O-14 déjà closes cette semaine sur le même fichier.</p>
@@ -554,7 +500,6 @@ tr[data-tf-empty] td {
 <p>  gate, vérifier qu'O-16 a fermé au moins un nettoyage d'infrastructure sans question humaine   supplétive, et confirmer qu'O-17 a été joué sur <code>infra-tf/*.tf</code> d'au moins un produit avant son   premier déploiement sur un environnement neuf.</p>
 <ul><li><strong>Test rétro</strong> : l'élément opérationnel (trois règles ajoutées à <code>oracle-ops.mjs</code>, un bloc</li></ul>
 <p>  structurel ajouté à R-20, aucun fichier neuf) remonte à la tactique (vérifier d'abord que les   oracles existants ne couvrent pas déjà le besoin : ils ne le couvrent qu'à moitié, et le disent   eux-mêmes dans leur propre <code>non_juge</code>), puis à la stratégie (faire porter par un contrôle   exécuté ce qu'une question humaine a dû suppléer une fois), puis à l'intention (plus aucun   retrait d'infrastructure décidé sur un inventaire qui confond présence et usage). Aucune   rupture. Les mots du mandat rejoués un à un : « Traite » → une décision d'exécution écrite pour   chacun, pas un report ; « tous » → les quatre candidats couverts, un fusionné, aucun écarté ;   « les todos » → TF-1113, TF-1117, TF-1120, TF-1122 ; « &amp; retours » → les trois lots Produit-11   du 14/09 cités par ledger et par RT, jamais reformulés sans source.</p>
-</section>
 </section>
     </main>
 
@@ -1241,7 +1186,7 @@ tr[data-tf-empty] td {
 <!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js — copie du socle digit-ai-page-html/assets/find-in-page.js,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="find-in-page.js" data-empreinte="sha256:721208e18a0c5de4899a498c8ebef8ebbb6677155f13a27d479988d7142ff908">
+<script data-composant="find-in-page.js" data-empreinte="sha256:108b35a7313c8a214dc846c1957d8c88902204496f5cf151f0d10564e25c8d17">
 /* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
  *
  * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
@@ -1257,21 +1202,6 @@ tr[data-tf-empty] td {
  *
  * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
  * vise aussi le PDF, prévoir un équivalent statique de l'information.
- *
- * ⚠️ LE CONTENEUR N'EST JAMAIS RÉÉCRIT (TF-1340, 23/09/2026). La recherche réaffectait
- * `container.innerHTML` à chaque frappe : les attributs survivaient, les écouteurs posés par
- * les autres composants du socle (table-filters.js, table-detail.js, infobulle.js) non. Mesuré
- * au navigateur : après une recherche puis son effacement, un bouton de filtre n'ouvrait plus
- * son panneau (0 au lieu de 1). Le surlignage ENVELOPPE désormais les nœuds texte trouvés, et
- * la frappe suivante les DÉSENVELOPPE : aucun élément du conteneur n'est remplacé. `getHTML`
- * et `refresh()` ne sont plus nécessaires (la recherche lit le contenu vivant) ; ils restent
- * acceptés, sans effet, pour les pages déjà câblées.
- *
- * ⚠️ DANS UN SCHÉMA SVG, LE SURLIGNAGE EST UN <tspan> (TF-1353, 24/09/2026). SVG ne peint pas
- * un <mark> HTML : le mot trouvé DISPARAISSAIT du schéma pendant la recherche (mesuré le 24/09
- * dans Chromium : getNumberOfChars() de 93 à 87 ; rejoué sur la fixture du banc : de 74 à 67).
- * Un nœud texte dont le parent est dans l'espace de noms SVG reçoit un <tspan class="find-hit"> ;
- * le HTML d'un <foreignObject> garde son <mark>.
  *
  * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
  * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
@@ -1294,14 +1224,11 @@ tr[data-tf-empty] td {
  *
  * CSS attendu (à adapter aux tokens du livrable) :
  *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
- *   tspan.find-hit { fill: #9a3412; text-decoration: underline; }   (texte d'un schéma SVG)
  *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
  *   .find-count.zero { color: #c0392b; }
  */
 (function (global) {
   'use strict';
-
-  var SVG_NS = 'http://www.w3.org/2000/svg';
 
   // Regex insensible aux accents et à la casse à partir d'une saisie libre.
   function buildRegex(q) {
@@ -1318,112 +1245,45 @@ tr[data-tf-empty] td {
     try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
   }
 
-  // Le BLOC d'un nœud texte : l'ancêtre le plus proche qui n'est pas un élément EN LIGNE. Dans un
-  // schéma SVG, le bloc est le <text> qui le porte (un <tspan> y est en ligne). Une phrase coupée
-  // par une mise en gras, un code ou un lien reste ainsi UN texte à fouiller (TF-1342).
-  function blocDe(el, root) {
-    if (el.namespaceURI === SVG_NS) {
-      var t = el.closest ? el.closest('text') : null;
-      return t && root.contains(t) ? t : el;
-    }
-    var b = el;
-    while (b !== root && b.parentNode && b.nodeType === 1) {
-      var d = getComputedStyle(b).display;
-      if (d !== 'inline' && d !== 'contents') break;
-      b = b.parentNode;
-    }
-    return b;
-  }
-
-  // Surligne les correspondances dans root et renvoie le nombre d'occurrences. Enveloppe les
-  // nœuds texte trouvés, sans remplacer aucun élément (TF-1340) ; dans un texte SVG, l'enveloppe
-  // est un <tspan>, que SVG peint, et non un <mark>, qu'il ignore (TF-1353). Les noms d'éléments
-  // se comparent sans casse : le <style> et le <script> d'un SVG s'écrivent en minuscules.
-  //
-  // TF-1342 (lot Produit-64 20260923b, RD-19) — LE MOTIF S'APPLIQUAIT NŒUD TEXTE PAR NŒUD TEXTE :
-  // « application <strong>laissée arrêtée</strong> » figurait dans le texte de la page et restait
-  // introuvable (3 occurrences dans le texte, 2 comptées, mesuré sur un livrable servi). Le motif
-  // se cherche désormais dans le texte CONTINU d'un bloc (les nœuds texte consécutifs d'un même
-  // paragraphe, cellule, bloc de code, titre…), puis chaque correspondance est posée par PLAGES sur
-  // les nœuds qu'elle traverse : une occurrence à cheval sur trois nœuds donne trois enveloppes
-  // et compte UNE fois.
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
   function highlight(root, re) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    var groupes = [], courant = null, n;
-    while ((n = walker.nextNode())) {
-      var parent = n.parentNode;
-      if (!parent || /^(MARK|SCRIPT|STYLE)$/i.test(parent.nodeName)
-          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) {
-        courant = null;           // un nœud écarté coupe le texte continu
-        continue;
-      }
-      var bloc = blocDe(parent, root);
-      if (!courant || courant.bloc !== bloc) { courant = { bloc: bloc, noeuds: [] }; groupes.push(courant); }
-      courant.noeuds.push(n);
-    }
-    var count = 0;
-    for (var g = 0; g < groupes.length; g++) {
-      var noeuds = groupes[g].noeuds, texte = '', debuts = [];
-      for (var k = 0; k < noeuds.length; k++) { debuts.push(texte.length); texte += noeuds[k].nodeValue; }
-      var plages = [], m;
-      re.lastIndex = 0;
-      while ((m = re.exec(texte))) {
-        if (m[0].length) plages.push([m.index, m.index + m[0].length]);
+    var nodes = [], n, count = 0;
+    while ((n = walker.nextNode())) nodes.push(n);
+    for (var k = 0; k < nodes.length; k++) {
+      var tn = nodes[k];
+      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
+      var txt = tn.nodeValue; re.lastIndex = 0;
+      if (!re.test(txt)) continue; re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = document.createElement('mark');
+        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        count++;
+        last = m.index + m[0].length;
         if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
       }
-      if (!plages.length) continue;
-      count += plages.length;
-      for (var j = 0; j < noeuds.length; j++) {
-        var tn = noeuds[j], txt = tn.nodeValue, d0 = debuts[j], d1 = d0 + txt.length;
-        var morceaux = [];
-        for (var p = 0; p < plages.length; p++) {
-          var a = Math.max(plages[p][0], d0), b = Math.min(plages[p][1], d1);
-          if (a < b) morceaux.push([a - d0, b - d0]);
-        }
-        if (!morceaux.length) continue;
-        var svg = tn.parentNode.namespaceURI === SVG_NS;
-        var frag = document.createDocumentFragment(), last = 0;
-        for (var q = 0; q < morceaux.length; q++) {
-          if (morceaux[q][0] > last) frag.appendChild(document.createTextNode(txt.slice(last, morceaux[q][0])));
-          var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
-          mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
-          mk.textContent = txt.slice(morceaux[q][0], morceaux[q][1]);
-          frag.appendChild(mk);
-          last = morceaux[q][1];
-        }
-        if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
-        tn.parentNode.replaceChild(frag, tn);
-      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      tn.parentNode.replaceChild(frag, tn);
     }
     return count;
   }
 
-  // Retire le surlignage : chaque enveloppe redevient son texte, et les textes voisins se
-  // RECOLLENT (normalize) — sans quoi un terme à cheval sur une ancienne coupure ne serait plus
-  // trouvé à la frappe suivante. Seuls les nœuds texte bougent : les éléments, et les écouteurs
-  // que d'autres composants y ont posés, restent en place (TF-1340).
-  function unhighlight(root) {
-    var hits = root.querySelectorAll('mark.find-hit, tspan.find-hit');
-    var parents = [];
-    for (var i = 0; i < hits.length; i++) {
-      var h = hits[i], p = h.parentNode;
-      if (!p) continue;
-      p.replaceChild(document.createTextNode(h.textContent), h);
-      if (parents.indexOf(p) === -1) parents.push(p);
-    }
-    for (var j = 0; j < parents.length; j++) parents[j].normalize();
-  }
-
   /* Branche la recherche live sur un champ.
    * input, container, counter : éléments DOM (counter optionnel).
-   * getHTML (optionnel) : n'est plus nécessaire depuis TF-1340 — la recherche lit le contenu
-   *   VIVANT du conteneur, qui n'est jamais réécrit. Accepté, sans effet, pour les pages câblées.
-   * Retourne { run, refresh } : run() relance la recherche ; refresh() est conservé, sans
-   *   effet (il n'y a plus de HTML capturé à rafraîchir). */
+   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
+   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
+   *   Sinon, le HTML initial est capturé une fois à l'init.
+   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
+   *   le HTML pristine (mode sans getHTML). */
   function init(input, container, counter, getHTML) {
     if (!input || !container) return null;
+    var pristine = getHTML ? null : container.innerHTML;
     function run() {
-      unhighlight(container);
+      container.innerHTML = getHTML ? getHTML() : pristine;
       var re = buildRegex(input.value);
       if (!re) {
         if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
@@ -1438,12 +1298,11 @@ tr[data-tf-empty] td {
     input.addEventListener('input', run);
     return {
       run: run,
-      refresh: function () {}
+      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
     };
   }
 
-  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight,
-                               unhighlight: unhighlight };
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
 })(window);
 </script>
 <!-- COMPOSANT-EMBARQUE:FIN find-in-page.js -->

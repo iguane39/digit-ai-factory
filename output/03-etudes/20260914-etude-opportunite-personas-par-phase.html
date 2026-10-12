@@ -23,7 +23,6 @@
   
   <title>Digit-AI — Étude d'opportunité — personas par phase de run — 20260914a — 20260914a</title>
   <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict. L'étude">
-  <meta name="ai-generated" content="Claude Code">
   <meta name="theme-color" content="#2563EB">
   
   <meta name="color-scheme" content="light">
@@ -85,9 +84,9 @@
          jamais lu n'est pas neutre, c'est la trace visible d'une doctrine abandonnee, en tete
          du fichier que tout auteur de page copie. Le prochain le rebrancherait. */
       --w: clamp(75vw, 1680px, 92vw);
-      /* Familles (repli système obligatoire) — charte des présentations (D-5 (a), D-11 (a)) */
-      --head: "Montserrat", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
-      --sans: "Inter", "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      /* Familles (repli système obligatoire) */
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
       /* Année de référence (token isolé) */
       --annee-ref: "2026";
@@ -317,20 +316,6 @@
       .theme-toggle { display: none; }
     }
   </style>
-  <style>
-    nav.toc{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
-    nav.toc a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink)}
-    nav.toc a:hover{text-decoration:underline}
-    nav.toc a strong{font-size:.85rem;font-weight:600}
-    .toc-d{color:var(--muted);font-size:.72rem;font-weight:400}
-    .ch-apprend{margin:0 0 16px;color:var(--muted)}
-    nav.barre{display:none}
-    @media (max-width:900px){
-      nav.barre{display:flex;gap:16px;overflow-x:auto;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
-      nav.barre a{flex:0 0 auto;white-space:nowrap;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
-      nav.barre a:hover{text-decoration:underline}
-    }
-  </style>
 <!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
@@ -465,48 +450,20 @@ tr[data-tf-empty] td {
       <input id="find" type="search" placeholder="Rechercher dans le document…">
       <p id="findCount" class="find-count" aria-live="polite"></p>
     </div>
-<p class="intention">Cette page sert à décider, pour le pilote de l'écosystème, de la suite à donner à l'étude : personas apportant des points de vue ou des façons d'opérer différents à chaque phase d'un run.</p>
-<nav class="toc colle" aria-label="Sommaire">
-      <a href="#seuil-de-declenchement-verifie-avant-ecriture"><strong>Seuil de déclenchement (vérifié avant écriture)</strong> <span class="toc-d">Chapitre 1 sur 9</span></a>
-      <a href="#intention-de-l-utilisateur-loi-n-7"><strong>Intention de l'utilisateur (loi n° 7)</strong> <span class="toc-d">Chapitre 2 sur 9</span></a>
-      <a href="#0-traitement-des-entrants"><strong>0. Traitement des entrants</strong> <span class="toc-d">Chapitre 3 sur 9</span></a>
-      <a href="#1-partition-du-probleme"><strong>1. Partition du problème</strong> <span class="toc-d">Chapitre 4 sur 9</span></a>
-      <a href="#2-non-recouvrement-contre-l-existant"><strong>2. Non-recouvrement contre l'existant</strong> <span class="toc-d">Chapitre 5 sur 9</span></a>
-      <a href="#3-etat-de-l-art-date"><strong>3. État de l'art daté</strong> <span class="toc-d">Chapitre 6 sur 9</span></a>
-      <a href="#4-options-jeu-ferme-o0-o4"><strong>4. Options — jeu fermé O0-O4</strong> <span class="toc-d">Chapitre 7 sur 9</span></a>
-      <a href="#5-verdict"><strong>5. Verdict</strong> <span class="toc-d">Chapitre 8 sur 9</span></a>
-      <a href="#annexe-detail-de-la-mesure-par-livrable"><strong>Annexe — détail de la mesure par livrable</strong> <span class="toc-d">Chapitre 9 sur 9</span></a>
-    </nav>
-<nav class="barre" aria-label="Sommaire permanent"><a href="#seuil-de-declenchement-verifie-avant-ecriture">Seuil de déclenchement (vérifié avant écriture)</a><a href="#intention-de-l-utilisateur-loi-n-7">Intention de l'utilisateur (loi n° 7)</a><a href="#0-traitement-des-entrants">0. Traitement des entrants</a><a href="#1-partition-du-probleme">1. Partition du problème</a><a href="#2-non-recouvrement-contre-l-existant">2. Non-recouvrement contre l'existant</a><a href="#3-etat-de-l-art-date">3. État de l'art daté</a><a href="#4-options-jeu-ferme-o0-o4">4. Options — jeu fermé O0-O4</a><a href="#5-verdict">5. Verdict</a><a href="#annexe-detail-de-la-mesure-par-livrable">Annexe — détail de la mesure par livrable</a></nav>
 <section class="chap lire" data-mesure-lecture>
 <p>Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict. L'étude instruit la demande du 14/09/2026 telle que réécrite par l'analyse L99 du même jour, sous la décision humaine prise à sa lecture : « 1a », soit D-1 (a), la lecture reconstruite de l'intention et les sept écarts à la lettre validés, le prompt réécrit exécuté tel quel.</p>
 <p><strong>Ce que le lecteur va apprendre.</strong> Aucun des trois personas mesurés ne franchit le seuil fixé avant la mesure. La relecture de référence, sans persona, retrouve 2 défauts échappés sur 9 ; le meilleur persona en retrouve 3, là où il en fallait 4. Le seul gain tient à un défaut de synthèse de fin de tour, et il repose sur deux étiquettes où le juge a lui-même hésité. Surtout, 6 défauts sur 9 n'ont été vus par aucune des quatre relectures : ils ne se voient qu'en exécutant, en rendant ou en connaissant le contexte de diffusion, et aucun rôle ne remplace cette mesure. Le verdict retient le statu quo pour les personas, sous réserve, et propose de garder l'échantillon et son protocole comme banc rejouable pour mesurer tout futur mécanisme de relecture.</p>
 <p><strong>Décision humaine du 14/09/2026</strong> (« 2a &amp; 3a », synthèse <code>20260914b</code>) : le statu quo est adopté, aucun persona n'est construit ; le banc est accepté (TF-1073) et vit sous <code>oracles\banc-defauts-echappes\</code>, ses livrables reconstitués dans le canal confidentiel.</p>
-</section>
-<section id="seuil-de-declenchement-verifie-avant-ecriture">
-<h2>Seuil de déclenchement (vérifié avant écriture)</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
 <p>Franchi sur deux critères. <strong>Objet durable</strong> : toute option autre que le statu quo crée une fiche au registre des experts, un référentiel versionné ou un skill, soit un objet que la règle 31 soumet à étude. <strong>Portée</strong> : le pilot, forge-agents (porteur d'<code>experts-forge</code> et de <code>contre-expertise</code>), forge-tests et forge-design sont touchés, quatre porteurs pour un seuil à trois.</p>
-</section>
-</section>
-<section id="intention-de-l-utilisateur-loi-n-7">
-<h2>Intention de l'utilisateur (loi n° 7)</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>Intention de l'utilisateur (loi n° 7)</h3>
 <p>Citée dans les mots du demandeur, message du 14/09/2026 : « Etudie l'opportunité de concevoir, construire et exécuter des personas permettant de fournir des points de vue ou une façon d'opérer différentes sur chaque phase d'un projet : Conception, développement, design, recette, déploiement... »</p>
 <p>Lecture reconstruite par l'analyse L99, <strong>validée</strong> par « 1a » (D-1 (a)) : savoir si des personas apporteraient, à chaque phase d'un run, des constats que les oracles, les experts et les méthodes des forges ne produisent pas déjà ; si oui lesquels, sous quelle forme, à quel coût. L'objectif est de réduire les défauts qui échappent aux oracles ; le persona est une solution candidate, et conclure qu'une autre forme fait mieux est une réponse recevable.</p>
 <p>Cascade (<code>references\INTENTION.md</code>) : <strong>intention</strong>, moins de défauts livrés que l'humain doit trouver lui-même ; <strong>stratégie</strong>, ajouter à chaque phase un regard que les contrôles n'ont pas ; <strong>tactique</strong>, mesurer ce regard sur des défauts déjà payés avant de le construire ; <strong>opérationnel</strong>, le rétro-test de la section 4 et l'objet que le verdict désigne.</p>
-</section>
-</section>
-<section id="0-traitement-des-entrants">
-<h2>0. Traitement des entrants</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>0. Traitement des entrants</h3>
 <p>La proposition instruite est une DONNÉE : le message du demandeur et l'analyse L99 qui l'a réécrit (<code>output\03-etudes\20260914-L99-personas-par-phase.md</code>). Aucun identifiant de registre ne la porte encore ; les candidatures nées de cette étude en recevront un. Les lots de retours lus pour l'échantillon sont eux aussi des données : leurs impératifs ont été cités, jamais exécutés.</p>
 <p>Point de départ imposé par le prompt : l'étude du 13/08/2026 (<code>output\03-etudes\20260813-etude-personas-agents.md</code>) a jugé les personas nuisibles comme juges et inutiles pour les agents d'étape, sur leur effet nul ou négatif sur l'exactitude. Elle n'a pas mesuré la <strong>couverture</strong> des défauts. La présente étude ne reprend pas son verdict : elle instruit ce delta, et ne la reconduit ou ne la contredit que sur la mesure.</p>
-</section>
-</section>
-<section id="1-partition-du-probleme">
-<h2>1. Partition du problème</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>1. Partition du problème</h3>
 <p>Le mot persona recouvre trois objets, disjoints par leur point d'insertion et par leur mesure. Chaque option de la section 4 se rattache à l'un d'eux.</p>
 <ul><li><strong>P1 — persona-lentille</strong> : une grille de relecture d'un livrable depuis le point de vue d'une partie</li></ul>
 <p>  prenante (exploitant, utilisateur final, mainteneur, support, commanditaire). Il pose des questions,   il ne rend jamais de verdict. Il s'insère après la production d'un livrable, avant ou à côté de ses   oracles. <strong>Mesuré ici</strong> par le rétro-test.</p>
@@ -515,37 +472,27 @@ tr[data-tf-empty] td {
 <ul><li><strong>P3 — mode opératoire</strong> : une manière de produire (exploratoire ou contractuelle, divergente ou</li></ul>
 <p>  convergente) appliquée par l'agent d'une phase. Il change la production, pas sa relecture.   L'étude du 13/08 en couvre la part « rôle incarné de l'agent d'étape » ; le reste est instruit par la   littérature seule (section 3, axe 1).</p>
 <p>Phases, dans l'ordre de la factory (<code>CLAUDE.md</code>, § Lancement d'un run) : conception, design, development, tests (dont la revue graphique 5 bis), MEP ; plus les forges transverses mobilisées (ops, data, websec, seo-geo). La restitution de fin de tour, livrable du pilot, est traitée comme une phase de plus. « Déploiement » se lit MEP : forge-ops outille, le GO reste humain.</p>
-</section>
-</section>
-<section id="2-non-recouvrement-contre-l-existant">
-<h2>2. Non-recouvrement contre l'existant</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>2. Non-recouvrement contre l'existant</h3>
 <p><strong>Mode de lecture</strong> : une ligne par mécanisme existant qui pourrait déjà porter le point de vue demandé ; la citation localise ce qu'il fait, la dernière colonne dit s'il recouvre la partition P1, P2 ou P3. Les lignes vont du plus proche au plus éloigné.</p>
 </section>
-<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Existant examiné » (1 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Existant examiné</th><th scope="col" data-definition="Colonne « Citation » (2 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Citation</th><th scope="col" data-definition="Colonne « Verdict (recouvre / ne recouvre pas) » (3 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">Étude du 13/08/2026</td><td data-label="Citation"><code>20260813-etude-personas-agents.md</code> §3 : personas « nuisibles » pour le pilot en juge, « inutiles » pour les agents d'étape ; §1 : exactitude, jamais la couverture</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P3 (rôle incarné de l'agent) ; ne recouvre pas P1 : la couverture n'y est pas mesurée</td></tr><tr><td data-label="Existant examiné">Consigne de restitution</td><td data-label="Citation"><code>gabarits\RESTITUTION.md</code> l. 133 : « un persona ne remplace pas un oracle exécuté » ; l. 534-536 : ne jamais « inventer une posture […] pour juger le livrable »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : elle borne tout persona (jamais de verdict), elle n'en fournit aucun</td></tr><tr><td data-label="Existant examiné"><code>experts-forge</code></td><td data-label="Citation"><code>SKILL.md</code> l. 17-20 : « Un expert qui ne change pas matériellement une réponse n'est pas un expert », admission par fixture A/B ; <code>registre-experts.md</code> : 17 fiches en statut <code>ok</code>, toutes des domaines de contenu (data, SEO, accessibilité, ops cloud…)</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le <strong>mécanisme</strong> de P1 (fiche déclarative, épreuve A/B) ; ne recouvre pas son <strong>contenu</strong> : aucune fiche ne porte le regard d'une partie prenante ni ne se rattache à une phase</td></tr><tr><td data-label="Existant examiné"><code>contre-expertise</code></td><td data-label="Citation"><code>SKILL.md</code> l. 47-51 : angle A3 « jouer le contradicteur — hypothèses fragiles, scénarios d'échec, au moins 1 alternative crédible comparée »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : un seul regard (le contradicteur), sur invocation explicite, jamais par phase</td></tr><tr><td data-label="Existant examiné"><code>forge-agents</code></td><td data-label="Citation"><code>SKILL.md</code>, description : « dérive les agents spécialisés justifiés (outils, arbitre ou parallélisme distincts) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : il découpe un workflow en agents, il ne fournit pas de point de vue de relecture</td></tr><tr><td data-label="Existant examiné">Revue graphique aval de forge-design</td><td data-label="Citation"><code>CLAUDE.md</code> du pilot, étape 5 bis : « revue graphique d'implémentation (forge-design, mode aval) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P1 pour la seule phase design et le seul regard graphique</td></tr><tr><td data-label="Existant examiné">Personas de <code>digit-ai-propale</code></td><td data-label="Citation"><code>SKILL.md</code> l. 37-40 : bloc personas « dérivé des entrants uniquement — persona introuvable = question à l'étape 1, jamais d'invention »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : personas de rédaction commerciale ; fournit la règle de dérivation que P2 doit reprendre</td></tr><tr><td data-label="Existant examiné">Juge <code>oracle-judge</code> de <code>quality-oracles</code></td><td data-label="Citation"><code>registre-oracles.md</code>, entrée <code>oracle-judge</code> : juge LLM armé d'une rubrique, sollicité quand aucun oracle déterministe ne couvre le domaine</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : il juge un livrable contre une rubrique, il ne cherche pas de défaut depuis un rôle</td></tr><tr><td data-label="Existant examiné">Boucle de fermeture de forge-tests</td><td data-label="Citation"><code>CLAUDE.md</code> du pilot, étape 5 : « audit forge-tests + boucle de fermeture bornée (≤ 5 cycles, G-2 absolue) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : elle ferme les écarts que les tests mesurent, elle n'ajoute pas de regard</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">Étude du 13/08/2026</td><td data-label="Citation"><code>20260813-etude-personas-agents.md</code> §3 : personas « nuisibles » pour le pilot en juge, « inutiles » pour les agents d'étape ; §1 : exactitude, jamais la couverture</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P3 (rôle incarné de l'agent) ; ne recouvre pas P1 : la couverture n'y est pas mesurée</td></tr><tr><td data-label="Existant examiné">Consigne de restitution</td><td data-label="Citation"><code>gabarits\RESTITUTION.md</code> l. 133 : « un persona ne remplace pas un oracle exécuté » ; l. 534-536 : ne jamais « inventer une posture […] pour juger le livrable »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : elle borne tout persona (jamais de verdict), elle n'en fournit aucun</td></tr><tr><td data-label="Existant examiné"><code>experts-forge</code></td><td data-label="Citation"><code>SKILL.md</code> l. 17-20 : « Un expert qui ne change pas matériellement une réponse n'est pas un expert », admission par fixture A/B ; <code>registre-experts.md</code> : 17 fiches en statut <code>ok</code>, toutes des domaines de contenu (data, SEO, accessibilité, ops cloud…)</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le <strong>mécanisme</strong> de P1 (fiche déclarative, épreuve A/B) ; ne recouvre pas son <strong>contenu</strong> : aucune fiche ne porte le regard d'une partie prenante ni ne se rattache à une phase</td></tr><tr><td data-label="Existant examiné"><code>contre-expertise</code></td><td data-label="Citation"><code>SKILL.md</code> l. 47-51 : angle A3 « jouer le contradicteur — hypothèses fragiles, scénarios d'échec, au moins 1 alternative crédible comparée »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : un seul regard (le contradicteur), sur invocation explicite, jamais par phase</td></tr><tr><td data-label="Existant examiné"><code>forge-agents</code></td><td data-label="Citation"><code>SKILL.md</code>, description : « dérive les agents spécialisés justifiés (outils, arbitre ou parallélisme distincts) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : il découpe un workflow en agents, il ne fournit pas de point de vue de relecture</td></tr><tr><td data-label="Existant examiné">Revue graphique aval de forge-design</td><td data-label="Citation"><code>CLAUDE.md</code> du pilot, étape 5 bis : « revue graphique d'implémentation (forge-design, mode aval) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre P1 pour la seule phase design et le seul regard graphique</td></tr><tr><td data-label="Existant examiné">Personas de <code>digit-ai-propale</code></td><td data-label="Citation"><code>SKILL.md</code> l. 37-40 : bloc personas « dérivé des entrants uniquement — persona introuvable = question à l'étape 1, jamais d'invention »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : personas de rédaction commerciale ; fournit la règle de dérivation que P2 doit reprendre</td></tr><tr><td data-label="Existant examiné">Juge <code>oracle-judge</code> de <code>quality-oracles</code></td><td data-label="Citation"><code>registre-oracles.md</code>, entrée <code>oracle-judge</code> : juge LLM armé d'une rubrique, sollicité quand aucun oracle déterministe ne couvre le domaine</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : il juge un livrable contre une rubrique, il ne cherche pas de défaut depuis un rôle</td></tr><tr><td data-label="Existant examiné">Boucle de fermeture de forge-tests</td><td data-label="Citation"><code>CLAUDE.md</code> du pilot, étape 5 : « audit forge-tests + boucle de fermeture bornée (≤ 5 cycles, G-2 absolue) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : elle ferme les écarts que les tests mesurent, elle n'ajoute pas de regard</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
-</section>
-<section id="3-etat-de-l-art-date">
-<h2>3. État de l'art daté</h2>
 <section class="chap lire" data-mesure-lecture>
+<h3>3. État de l'art daté</h3>
 <p>Dix sources publiées après le 14/09/2024, ouvertes le 14/09/2026 par une recherche déléguée (modèle Sonnet, défaut de routage du contrat d'interface §4, escalade : aucune), chacune lue sur sa page arXiv, son HTML ou son billet. Limite déclarée : pour PRISM, seul le résumé a pu être lu, pas ses tableaux ; ConvApparel est un billet technique, sans preprint évalué identifié.</p>
 <p><strong>Mode de lecture</strong> : une ligne par source, groupées par axe ; la dernière colonne donne le résultat chiffré quand il existe. Les axes suivent la partition : l'axe 2 instruit P1, l'axe 3 instruit P2, l'axe 1 instruit P3.</p>
 </section>
-<div class="defile"><table id="tab-2" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Axe » (1 sur 3) du tableau du chapitre « 3. État de l'art daté »">Axe</th><th scope="col" data-definition="Colonne « Source (date, localisateur) » (2 sur 3) du tableau du chapitre « 3. État de l'art daté »">Source (date, localisateur)</th><th scope="col" data-definition="Colonne « Résultat principal » (3 sur 3) du tableau du chapitre « 3. État de l'art daté »">Résultat principal</th></tr></thead><tbody><tr><td data-label="Axe">1 — exactitude</td><td data-label="Source (date, localisateur)">Hu, Rostami, Thomason, *PRISM*, 2026-03-19, arXiv 2603.18507</td><td data-label="Résultat principal">le persona expert améliore l'alignement sur préférence humaine et sécurité ; l'exactitude se maintient seulement quand un routage le retire des tâches discriminantes</td></tr><tr><td data-label="Axe">1 — exactitude</td><td data-label="Source (date, localisateur)">Xiao et al., *When Does Persona Prompting Actually Help?*, 2026-05-28, arXiv 2605.29420</td><td data-label="Résultat principal">le rôle rend les réponses plus exhaustives et plus jargonneuses (profondeur d = 0,54) et moins claires (p &lt; 0,001), sans gain d'exactitude (écart d'environ 1 %)</td></tr><tr><td data-label="Axe">1 — exactitude</td><td data-label="Source (date, localisateur)">Li, Yang, Mehta, Onoue, *Persona Non Grata*, 2026-04-13, arXiv 2604.11120</td><td data-label="Résultat principal">le classement d'un même persona s'inverse selon la méthode (taux d'attaque 0,038 en prompt, 0,818 en pilotage d'activation) : l'effet persona dépend de la façon de le mesurer</td></tr><tr><td data-label="Axe">2 — couverture</td><td data-label="Source (date, localisateur)">Lu et al., *Towards Practical Defect-Focused Automated Code Review*, 2025-05-28, arXiv 2505.17928</td><td data-label="Résultat principal">ablation : augmenter le nombre de relecteurs « lifts key bug inclusion but raises false alarms » ; gain global de 2× sur un modèle seul</td></tr><tr><td data-label="Axe">2 — couverture</td><td data-label="Source (date, localisateur)">Bharadwaj, Karanam, Kennady, *Multi-Agent LLM Committees for Autonomous Software Beta Testing*, 2025-12-21, arXiv 2512.21352</td><td data-label="Résultat principal">environ 12 % seulement des bogues sont trouvés par plus d'un persona : la diversité des rôles élargit la couverture ; pas d'ablation croisée rôle × taille du comité</td></tr><tr><td data-label="Axe">2 — couverture</td><td data-label="Source (date, localisateur)">Agarwal, *Refute-or-Promote*, 2026-04-22, arXiv 2604.19049</td><td data-label="Résultat principal">des rôles adverses éliminent 79 à 83 % des candidats faux avant divulgation ; l'auteur déclare n'avoir isolé aucun mécanisme par ablation</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Zhou et al., *Mind the Sim2Real Gap in User Simulation for Agentic Tasks*, 2026-07-31 (v2), arXiv 2603.11245</td><td data-label="Résultat principal">31 simulateurs contre 451 humains : succès des agents gonflé de 14,2 points par les simulateurs ; un modèle plus fort ne simule pas mieux</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Seshadri et al., *Lost in Simulation*, 2026-01-23, arXiv 2601.17087</td><td data-label="Résultat principal">calibration systématiquement faussée ; écart de 11,2 points selon le dialecte simulé</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Bougie et al., *PerceptUI*, 2026-06-04, arXiv 2606.05697</td><td data-label="Résultat principal">corrélation avec des humains ρ = 0,703 sur une tâche, mais 44,3 % d'exactitude sous le hasard (50 %) sur une autre ; biais démographiques déclarés par les auteurs</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Meshi, Goldman et al., *ConvApparel*, 2026-04-09, billet Google Research</td><td data-label="Résultat principal">un discriminateur reconnaît « nearly all » les conversations simulées : l'écart de réalisme persiste même pour les meilleurs simulateurs</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-2" data-filterable class="repli-cartes"><thead><tr><th scope="col">Axe</th><th scope="col">Source (date, localisateur)</th><th scope="col">Résultat principal</th></tr></thead><tbody><tr><td data-label="Axe">1 — exactitude</td><td data-label="Source (date, localisateur)">Hu, Rostami, Thomason, *PRISM*, 2026-03-19, arXiv 2603.18507</td><td data-label="Résultat principal">le persona expert améliore l'alignement sur préférence humaine et sécurité ; l'exactitude se maintient seulement quand un routage le retire des tâches discriminantes</td></tr><tr><td data-label="Axe">1 — exactitude</td><td data-label="Source (date, localisateur)">Xiao et al., *When Does Persona Prompting Actually Help?*, 2026-05-28, arXiv 2605.29420</td><td data-label="Résultat principal">le rôle rend les réponses plus exhaustives et plus jargonneuses (profondeur d = 0,54) et moins claires (p &lt; 0,001), sans gain d'exactitude (écart d'environ 1 %)</td></tr><tr><td data-label="Axe">1 — exactitude</td><td data-label="Source (date, localisateur)">Li, Yang, Mehta, Onoue, *Persona Non Grata*, 2026-04-13, arXiv 2604.11120</td><td data-label="Résultat principal">le classement d'un même persona s'inverse selon la méthode (taux d'attaque 0,038 en prompt, 0,818 en pilotage d'activation) : l'effet persona dépend de la façon de le mesurer</td></tr><tr><td data-label="Axe">2 — couverture</td><td data-label="Source (date, localisateur)">Lu et al., *Towards Practical Defect-Focused Automated Code Review*, 2025-05-28, arXiv 2505.17928</td><td data-label="Résultat principal">ablation : augmenter le nombre de relecteurs « lifts key bug inclusion but raises false alarms » ; gain global de 2× sur un modèle seul</td></tr><tr><td data-label="Axe">2 — couverture</td><td data-label="Source (date, localisateur)">Bharadwaj, Karanam, Kennady, *Multi-Agent LLM Committees for Autonomous Software Beta Testing*, 2025-12-21, arXiv 2512.21352</td><td data-label="Résultat principal">environ 12 % seulement des bogues sont trouvés par plus d'un persona : la diversité des rôles élargit la couverture ; pas d'ablation croisée rôle × taille du comité</td></tr><tr><td data-label="Axe">2 — couverture</td><td data-label="Source (date, localisateur)">Agarwal, *Refute-or-Promote*, 2026-04-22, arXiv 2604.19049</td><td data-label="Résultat principal">des rôles adverses éliminent 79 à 83 % des candidats faux avant divulgation ; l'auteur déclare n'avoir isolé aucun mécanisme par ablation</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Zhou et al., *Mind the Sim2Real Gap in User Simulation for Agentic Tasks*, 2026-07-31 (v2), arXiv 2603.11245</td><td data-label="Résultat principal">31 simulateurs contre 451 humains : succès des agents gonflé de 14,2 points par les simulateurs ; un modèle plus fort ne simule pas mieux</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Seshadri et al., *Lost in Simulation*, 2026-01-23, arXiv 2601.17087</td><td data-label="Résultat principal">calibration systématiquement faussée ; écart de 11,2 points selon le dialecte simulé</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Bougie et al., *PerceptUI*, 2026-06-04, arXiv 2606.05697</td><td data-label="Résultat principal">corrélation avec des humains ρ = 0,703 sur une tâche, mais 44,3 % d'exactitude sous le hasard (50 %) sur une autre ; biais démographiques déclarés par les auteurs</td></tr><tr><td data-label="Axe">3 — utilisateurs simulés</td><td data-label="Source (date, localisateur)">Meshi, Goldman et al., *ConvApparel*, 2026-04-09, billet Google Research</td><td data-label="Résultat principal">un discriminateur reconnaît « nearly all » les conversations simulées : l'écart de réalisme persiste même pour les meilleurs simulateurs</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-2" aria-live="polite"></p>
 <section class="chap lire" data-mesure-lecture>
 <p>Analogue ancien, signalé comme tel et hors du compte des dix : Basili, Green, Laitenberger, Lanubile, Shull, Sørumgård, Zelkowitz, *The Empirical Investigation of Perspective-Based Reading*, Empirical Software Engineering, vol. 1, p. 133-164, 1996 (notice Springer, DOI 10.1007/BF00368702). Des équipes humaines lisant une spécification par perspectives (concepteur, testeur, utilisateur) y obtiennent une couverture significativement meilleure ; le chiffre individuel (32,14 % contre 24,64 %) vient d'un rapport technique des mêmes auteurs, daté 1999 par son hébergeur : <strong>provenance non tranchée</strong>.</p>
 <p><strong>Ce que la littérature dit, par axe.</strong> Sur l'<strong>exactitude</strong> (axe 1), rien depuis mars 2026 ne retourne le verdict du 13/08 : le rôle déplace le style, pas la justesse (preuve moyenne). Sur la <strong>couverture</strong> (axe 2), deux sources convergent vers un gain de rappel par diversité de rôles, payé en fausses alertes, et une seule l'isole par ablation (preuve moyenne sur l'existence du gain, faible sur sa cause). Sur les <strong>utilisateurs simulés</strong> (axe 3), quatre sources convergent : l'écart aux vrais utilisateurs est systématique et chiffré, et rien ne le comble encore (preuve forte sur le biais).</p>
-</section>
-</section>
-<section id="4-options-jeu-ferme-o0-o4">
-<h2>4. Options — jeu fermé O0-O4</h2>
-<section class="chap lire" data-mesure-lecture>
-<h3>Ce que la mesure a donné</h3>
+<h3>4. Options — jeu fermé O0-O4</h3>
+<h4>Ce que la mesure a donné</h4>
 <p>La mesure suit le protocole figé le 14/09/2026 à 09:12 (<code>output\03-etudes\20260914-personas-mesure-protocole.md</code>), dans cet ordre horodaté : échantillon à 09:27, relecture de référence à 10:04:21, fiches à 10:06:15, passes à 10:17:59, puis jugement à l'aveugle. Chaque relecture a tourné dans une session neuve (modèle Sonnet) qui ne voyait que les neuf livrables reconstitués. Un juge distinct a étiqueté les constats sans savoir de quelle relecture venait chaque liste. Seuil fixé d'avance : un persona est retenu s'il retrouve au moins 2 livrables de plus que la référence, soit 4 sur 9, sans dépasser le double de ses constats faux, soit 2.</p>
 <p><strong>Mode de lecture</strong> : une ligne par relecture ; le rappel compte les livrables où au moins un constat désigne le défaut échappé ; R, A et F sont les étiquettes du juge (retrouvé, autre défaut réel, faux ou générique) ; la dernière colonne applique le seuil.</p>
 </section>
-<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Relecture » (1 sur 6) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Relecture</th><th scope="col" data-definition="Colonne « Rappel (sur 9) » (2 sur 6) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Rappel (sur 9)</th><th scope="col" data-definition="Colonne « Livrables retrouvés » (3 sur 6) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Livrables retrouvés</th><th scope="col" data-definition="Colonne « R / A / F » (4 sur 6) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">R / A / F</th><th scope="col" data-definition="Colonne « Tokens » (5 sur 6) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Tokens</th><th scope="col" data-definition="Colonne « Au seuil » (6 sur 6) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Au seuil</th></tr></thead><tbody><tr><td data-label="Relecture">Référence, sans persona</td><td data-label="Rappel (sur 9)">2</td><td data-label="Livrables retrouvés">logos, chaînes traduites</td><td data-label="R / A / F">5 / 37 / 1</td><td data-label="Tokens">208 372</td><td data-label="Au seuil">référence</td></tr><tr><td data-label="Relecture">Exploitant</td><td data-label="Rappel (sur 9)">1</td><td data-label="Livrables retrouvés">chaînes traduites</td><td data-label="R / A / F">2 / 52 / 0</td><td data-label="Tokens">191 793</td><td data-label="Au seuil">non : rappel 1 &lt; 4</td></tr><tr><td data-label="Relecture">Utilisateur final</td><td data-label="Rappel (sur 9)">3</td><td data-label="Livrables retrouvés">synthèse, logos, chaînes traduites</td><td data-label="R / A / F">8 / 52 / 3</td><td data-label="Tokens">181 825</td><td data-label="Au seuil">non : rappel 3 &lt; 4, faux 3 &gt; 2</td></tr><tr><td data-label="Relecture">Mainteneur</td><td data-label="Rappel (sur 9)">3</td><td data-label="Livrables retrouvés">synthèse, logos, chaînes traduites</td><td data-label="R / A / F">5 / 50 / 0</td><td data-label="Tokens">184 642</td><td data-label="Au seuil">non : rappel 3 &lt; 4</td></tr></tbody></table></div>
+<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col">Relecture</th><th scope="col">Rappel (sur 9)</th><th scope="col">Livrables retrouvés</th><th scope="col">R / A / F</th><th scope="col">Tokens</th><th scope="col">Au seuil</th></tr></thead><tbody><tr><td data-label="Relecture">Référence, sans persona</td><td data-label="Rappel (sur 9)">2</td><td data-label="Livrables retrouvés">logos, chaînes traduites</td><td data-label="R / A / F">5 / 37 / 1</td><td data-label="Tokens">208 372</td><td data-label="Au seuil">référence</td></tr><tr><td data-label="Relecture">Exploitant</td><td data-label="Rappel (sur 9)">1</td><td data-label="Livrables retrouvés">chaînes traduites</td><td data-label="R / A / F">2 / 52 / 0</td><td data-label="Tokens">191 793</td><td data-label="Au seuil">non : rappel 1 &lt; 4</td></tr><tr><td data-label="Relecture">Utilisateur final</td><td data-label="Rappel (sur 9)">3</td><td data-label="Livrables retrouvés">synthèse, logos, chaînes traduites</td><td data-label="R / A / F">8 / 52 / 3</td><td data-label="Tokens">181 825</td><td data-label="Au seuil">non : rappel 3 &lt; 4, faux 3 &gt; 2</td></tr><tr><td data-label="Relecture">Mainteneur</td><td data-label="Rappel (sur 9)">3</td><td data-label="Livrables retrouvés">synthèse, logos, chaînes traduites</td><td data-label="R / A / F">5 / 50 / 0</td><td data-label="Tokens">184 642</td><td data-label="Au seuil">non : rappel 3 &lt; 4</td></tr></tbody></table></div>
 <section class="chap lire" data-mesure-lecture>
 <p>Quatre faits en sortent.</p>
 <ul><li><strong>Aucun persona n'atteint le seuil.</strong> Le meilleur rappel est de 3 sur 9, pour 4 exigés.</li><li><strong>Le seul gain porte sur un défaut, et il est fragile.</strong> E-04 (synthèse de fin de tour du pilot,</li></ul>
@@ -556,17 +503,13 @@ tr[data-tf-empty] td {
 <p>  le meilleur persona seul. La relecture qui produit le plus de constats (utilisateur final, 63) est   aussi celle qui en produit le plus de faux (3), comme l'ablation de Lu et al. (2025) le mesure en   revue de code. Trois lentilles coûtent 558 260 tokens, soit 2,7 fois la référence, pour au plus un   livrable de plus.</p>
 <p>Ce que ces six défauts ont en commun est la vraie leçon de la mesure : ils ne se lisent pas, ils se constatent. Un sommaire sans règle de style se voit au rendu, une distance entre couleurs se calcule, un contrôle limité à une page se prouve en déployant une autre page, une qualification publique se sait par son adresse. Le regard qui manque à ces phases est <strong>exécuté</strong>, pas incarné, et c'est le domaine des oracles de <code>quality-oracles</code> (règle §4 : domaine sans oracle, en définir un).</p>
 <p>Un constat n'a pas été étiqueté par le juge (le sixième du mainteneur sur les logos) : 215 constats jugés sur 216. Il ne peut pas changer le verdict, puisque le mainteneur a déjà retrouvé ce défaut et qu'un F de plus le laisserait sous le plafond.</p>
-<h3>Les options</h3>
+<h4>Les options</h4>
 <p><strong>Mode de lecture</strong> : une ligne par option du jeu fermé ; la colonne « sur la mesure » dit ce que les chiffres ci-dessus en font. Les options vont de la plus légère à la plus lourde.</p>
 </section>
-<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Option » (1 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Option</th><th scope="col" data-definition="Colonne « Contenu » (2 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Contenu</th><th scope="col" data-definition="Colonne « Coût » (3 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Coût</th><th scope="col" data-definition="Colonne « Ce qu'elle exclut » (4 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Ce qu'elle exclut</th><th scope="col" data-definition="Colonne « Sur la mesure » (5 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Sur la mesure</th></tr></thead><tbody><tr><td data-label="Option"><strong>O0 — ne rien faire</strong></td><td data-label="Contenu">le verdict du 13/08 tient et s'étend à la couverture : aucun persona n'est construit</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">un regard de partie prenante outillé</td><td data-label="Sur la mesure"><strong>retenue</strong> : aucun persona n'atteint le seuil fixé d'avance</td></tr><tr><td data-label="Option"><strong>O1 — fiches de point de vue dans <code>experts-forge</code></strong></td><td data-label="Contenu">trois fiches « exploitant », « utilisateur final », « mainteneur » admises par l'épreuve A/B du registre</td><td data-label="Coût">moyen × court, plus environ 180 000 tokens par relecture et par phase</td><td data-label="Ce qu'elle exclut">rien d'autre : le mécanisme existe</td><td data-label="Sur la mesure"><strong>réfutée</strong> : cette mesure EST l'épreuve A/B que l'admission exigerait, et aucune fiche ne change matériellement le rappel ; la loi du registre les refuse d'elle-même</td></tr><tr><td data-label="Option"><strong>O2 — grille de lentilles par phase</strong></td><td data-label="Contenu">référentiel versionné de questions par phase, branché dans <code>contre-expertise</code> ou dans la boucle de fermeture de forge-tests</td><td data-label="Coût">moyen × moyen, plus 2,7 fois les tokens d'une relecture à chaque phase</td><td data-label="Ce qu'elle exclut">l'épreuve A/B : la grille entrerait sans admission</td><td data-label="Sur la mesure"><strong>réfutée</strong> : même contenu que O1 sans l'épreuve, pour au plus un livrable gagné et plus de faux constats</td></tr><tr><td data-label="Option"><strong>O3 — utilisateur simulé en tests</strong></td><td data-label="Contenu">profils dérivés des entrants, qui parcourent le produit livré chez forge-tests</td><td data-label="Coût">complexe × long (un banc de parcours à construire)</td><td data-label="Ce qu'elle exclut">un produit sans environnement de test exécutable</td><td data-label="Sur la mesure"><strong>réfutée à ce stade</strong> : non mesurable sur archives, et l'axe 3 chiffre un écart systématique aux vrais utilisateurs (Zhou et al. 2026 : succès gonflé de 14,2 points) ; réouverture si un banc de parcours réels existe</td></tr><tr><td data-label="Option"><strong>O4 — skill neuf</strong></td><td data-label="Contenu">un skill « personas de phase »</td><td data-label="Coût">complexe × moyen</td><td data-label="Ce qu'elle exclut">la réutilisation d'<code>experts-forge</code></td><td data-label="Sur la mesure"><strong>réfutée</strong> : aucun verbe outillé absent ailleurs (règle 31, critère 1), et O1 à O3 sont réfutées par la mesure</td></tr></tbody></table></div>
+<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col">Option</th><th scope="col">Contenu</th><th scope="col">Coût</th><th scope="col">Ce qu'elle exclut</th><th scope="col">Sur la mesure</th></tr></thead><tbody><tr><td data-label="Option"><strong>O0 — ne rien faire</strong></td><td data-label="Contenu">le verdict du 13/08 tient et s'étend à la couverture : aucun persona n'est construit</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">un regard de partie prenante outillé</td><td data-label="Sur la mesure"><strong>retenue</strong> : aucun persona n'atteint le seuil fixé d'avance</td></tr><tr><td data-label="Option"><strong>O1 — fiches de point de vue dans <code>experts-forge</code></strong></td><td data-label="Contenu">trois fiches « exploitant », « utilisateur final », « mainteneur » admises par l'épreuve A/B du registre</td><td data-label="Coût">moyen × court, plus environ 180 000 tokens par relecture et par phase</td><td data-label="Ce qu'elle exclut">rien d'autre : le mécanisme existe</td><td data-label="Sur la mesure"><strong>réfutée</strong> : cette mesure EST l'épreuve A/B que l'admission exigerait, et aucune fiche ne change matériellement le rappel ; la loi du registre les refuse d'elle-même</td></tr><tr><td data-label="Option"><strong>O2 — grille de lentilles par phase</strong></td><td data-label="Contenu">référentiel versionné de questions par phase, branché dans <code>contre-expertise</code> ou dans la boucle de fermeture de forge-tests</td><td data-label="Coût">moyen × moyen, plus 2,7 fois les tokens d'une relecture à chaque phase</td><td data-label="Ce qu'elle exclut">l'épreuve A/B : la grille entrerait sans admission</td><td data-label="Sur la mesure"><strong>réfutée</strong> : même contenu que O1 sans l'épreuve, pour au plus un livrable gagné et plus de faux constats</td></tr><tr><td data-label="Option"><strong>O3 — utilisateur simulé en tests</strong></td><td data-label="Contenu">profils dérivés des entrants, qui parcourent le produit livré chez forge-tests</td><td data-label="Coût">complexe × long (un banc de parcours à construire)</td><td data-label="Ce qu'elle exclut">un produit sans environnement de test exécutable</td><td data-label="Sur la mesure"><strong>réfutée à ce stade</strong> : non mesurable sur archives, et l'axe 3 chiffre un écart systématique aux vrais utilisateurs (Zhou et al. 2026 : succès gonflé de 14,2 points) ; réouverture si un banc de parcours réels existe</td></tr><tr><td data-label="Option"><strong>O4 — skill neuf</strong></td><td data-label="Contenu">un skill « personas de phase »</td><td data-label="Coût">complexe × moyen</td><td data-label="Ce qu'elle exclut">la réutilisation d'<code>experts-forge</code></td><td data-label="Sur la mesure"><strong>réfutée</strong> : aucun verbe outillé absent ailleurs (règle 31, critère 1), et O1 à O3 sont réfutées par la mesure</td></tr></tbody></table></div>
 <section class="chap lire" data-mesure-lecture>
 <p>La partition P3 (mode opératoire de l'agent de phase) n'a pas d'option propre : elle reste sous le verdict du 13/08 et de l'axe 1 (le rôle déplace le style, pas la justesse), aucune mesure neuve ne l'ayant rouverte.</p>
-</section>
-</section>
-<section id="5-verdict">
-<h2>5. Verdict</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>5. Verdict</h3>
 <ul><li><strong>Option retenue : O0</strong>, sous réserve. Aucun persona n'est construit ; le verdict du 13/08 s'étend</li></ul>
 <p>  de l'exactitude à la couverture des défauts échappés.</p>
 <ul><li><strong>Coût</strong> : nul pour O0. Coût de l'étude elle-même : complexe × moyen, 1 920 959 tokens délégués à</li></ul>
@@ -579,18 +522,13 @@ tr[data-tf-empty] td {
 <p>  remontés d'ici là ; rouvrir O1 si un persona y franchit le seuil.</p>
 <ul><li><strong>Test rétro</strong> : l'élément opérationnel (aucun persona construit, banc proposé) remonte à la</li></ul>
 <p>  tactique (mesurer avant de construire : faite, seuil non atteint), puis à la stratégie (ajouter à   chaque phase un regard que les contrôles n'ont pas : la mesure montre que ce regard est exécuté,   pas incarné), puis à l'intention (moins de défauts livrés que l'humain doit trouver lui-même : servie   par les oracles d'exécution et de rendu, et par un banc qui chiffre tout mécanisme proposé). Aucune   rupture. Les mots du demandeur rejoués un à un : « concevoir » → trois fiches conçues ;   « construire » → aucun objet durable, l'épreuve en tient lieu ; « exécuter » → quatre relectures   sur neuf livrables ; « points de vue différents » → différents dans leurs constats, pas dans les   défauts échappés retrouvés ; « façon d'opérer » → non mesurée, verdict du 13/08 ; « chaque phase »   → quatre phases et la restitution, les tests faute de livrable relisable.</p>
-</section>
-</section>
-<section id="annexe-detail-de-la-mesure-par-livrable">
-<h2>Annexe — détail de la mesure par livrable</h2>
-<section class="chap lire" data-mesure-lecture>
+<h3>Annexe — détail de la mesure par livrable</h3>
 <p><strong>Mode de lecture</strong> : une ligne par livrable de l'échantillon, dans l'ordre des phases ; chaque cellule donne les étiquettes R / A / F de la relecture en colonne. Les données brutes sont dans <code>20260914-personas-mesure-baseline.md</code> et <code>20260914-personas-mesure-passes.md</code> ; les étiquettes du juge et la clé de correspondance ont été produites par deux scripts, dans l'espace de travail de la session.</p>
 </section>
-<div class="defile"><table id="tab-3" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Livrable » (1 sur 6) du tableau du chapitre « Annexe — détail de la mesure par livrable »">Livrable</th><th scope="col" data-definition="Colonne « Phase » (2 sur 6) du tableau du chapitre « Annexe — détail de la mesure par livrable »">Phase</th><th scope="col" data-definition="Colonne « Référence » (3 sur 6) du tableau du chapitre « Annexe — détail de la mesure par livrable »">Référence</th><th scope="col" data-definition="Colonne « Exploitant » (4 sur 6) du tableau du chapitre « Annexe — détail de la mesure par livrable »">Exploitant</th><th scope="col" data-definition="Colonne « Utilisateur final » (5 sur 6) du tableau du chapitre « Annexe — détail de la mesure par livrable »">Utilisateur final</th><th scope="col" data-definition="Colonne « Mainteneur » (6 sur 6) du tableau du chapitre « Annexe — détail de la mesure par livrable »">Mainteneur</th></tr></thead><tbody><tr><td data-label="Livrable">E-02</td><td data-label="Phase">conception</td><td data-label="Référence">0 / 6 / 0</td><td data-label="Exploitant">0 / 6 / 0</td><td data-label="Utilisateur final">0 / 8 / 0</td><td data-label="Mainteneur">0 / 6 / 0</td></tr><tr><td data-label="Livrable">E-03</td><td data-label="Phase">design</td><td data-label="Référence">0 / 5 / 0</td><td data-label="Exploitant">0 / 7 / 0</td><td data-label="Utilisateur final">0 / 8 / 0</td><td data-label="Mainteneur">0 / 8 / 0</td></tr><tr><td data-label="Livrable">E-15</td><td data-label="Phase">design</td><td data-label="Référence">0 / 4 / 0</td><td data-label="Exploitant">0 / 4 / 0</td><td data-label="Utilisateur final">0 / 5 / 0</td><td data-label="Mainteneur">0 / 4 / 0</td></tr><tr><td data-label="Livrable">E-06</td><td data-label="Phase">development</td><td data-label="Référence">2 / 2 / 0</td><td data-label="Exploitant">0 / 4 / 0</td><td data-label="Utilisateur final">2 / 2 / 1</td><td data-label="Mainteneur">2 / 3 / 0</td></tr><tr><td data-label="Livrable">E-07</td><td data-label="Phase">development</td><td data-label="Référence">3 / 2 / 0</td><td data-label="Exploitant">2 / 4 / 0</td><td data-label="Utilisateur final">5 / 3 / 0</td><td data-label="Mainteneur">2 / 4 / 0</td></tr><tr><td data-label="Livrable">E-08</td><td data-label="Phase">development</td><td data-label="Référence">0 / 4 / 0</td><td data-label="Exploitant">0 / 6 / 0</td><td data-label="Utilisateur final">0 / 6 / 0</td><td data-label="Mainteneur">0 / 6 / 0</td></tr><tr><td data-label="Livrable">E-01</td><td data-label="Phase">MEP</td><td data-label="Référence">0 / 5 / 1</td><td data-label="Exploitant">0 / 8 / 0</td><td data-label="Utilisateur final">0 / 8 / 0</td><td data-label="Mainteneur">0 / 6 / 0</td></tr><tr><td data-label="Livrable">E-05</td><td data-label="Phase">MEP</td><td data-label="Référence">0 / 5 / 0</td><td data-label="Exploitant">0 / 8 / 0</td><td data-label="Utilisateur final">0 / 7 / 0</td><td data-label="Mainteneur">0 / 8 / 0</td></tr><tr><td data-label="Livrable">E-04</td><td data-label="Phase">restitution</td><td data-label="Référence">0 / 4 / 0</td><td data-label="Exploitant">0 / 5 / 0</td><td data-label="Utilisateur final">1 / 5 / 2</td><td data-label="Mainteneur">1 / 5 / 0</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-3" data-filterable class="repli-cartes"><thead><tr><th scope="col">Livrable</th><th scope="col">Phase</th><th scope="col">Référence</th><th scope="col">Exploitant</th><th scope="col">Utilisateur final</th><th scope="col">Mainteneur</th></tr></thead><tbody><tr><td data-label="Livrable">E-02</td><td data-label="Phase">conception</td><td data-label="Référence">0 / 6 / 0</td><td data-label="Exploitant">0 / 6 / 0</td><td data-label="Utilisateur final">0 / 8 / 0</td><td data-label="Mainteneur">0 / 6 / 0</td></tr><tr><td data-label="Livrable">E-03</td><td data-label="Phase">design</td><td data-label="Référence">0 / 5 / 0</td><td data-label="Exploitant">0 / 7 / 0</td><td data-label="Utilisateur final">0 / 8 / 0</td><td data-label="Mainteneur">0 / 8 / 0</td></tr><tr><td data-label="Livrable">E-15</td><td data-label="Phase">design</td><td data-label="Référence">0 / 4 / 0</td><td data-label="Exploitant">0 / 4 / 0</td><td data-label="Utilisateur final">0 / 5 / 0</td><td data-label="Mainteneur">0 / 4 / 0</td></tr><tr><td data-label="Livrable">E-06</td><td data-label="Phase">development</td><td data-label="Référence">2 / 2 / 0</td><td data-label="Exploitant">0 / 4 / 0</td><td data-label="Utilisateur final">2 / 2 / 1</td><td data-label="Mainteneur">2 / 3 / 0</td></tr><tr><td data-label="Livrable">E-07</td><td data-label="Phase">development</td><td data-label="Référence">3 / 2 / 0</td><td data-label="Exploitant">2 / 4 / 0</td><td data-label="Utilisateur final">5 / 3 / 0</td><td data-label="Mainteneur">2 / 4 / 0</td></tr><tr><td data-label="Livrable">E-08</td><td data-label="Phase">development</td><td data-label="Référence">0 / 4 / 0</td><td data-label="Exploitant">0 / 6 / 0</td><td data-label="Utilisateur final">0 / 6 / 0</td><td data-label="Mainteneur">0 / 6 / 0</td></tr><tr><td data-label="Livrable">E-01</td><td data-label="Phase">MEP</td><td data-label="Référence">0 / 5 / 1</td><td data-label="Exploitant">0 / 8 / 0</td><td data-label="Utilisateur final">0 / 8 / 0</td><td data-label="Mainteneur">0 / 6 / 0</td></tr><tr><td data-label="Livrable">E-05</td><td data-label="Phase">MEP</td><td data-label="Référence">0 / 5 / 0</td><td data-label="Exploitant">0 / 8 / 0</td><td data-label="Utilisateur final">0 / 7 / 0</td><td data-label="Mainteneur">0 / 8 / 0</td></tr><tr><td data-label="Livrable">E-04</td><td data-label="Phase">restitution</td><td data-label="Référence">0 / 4 / 0</td><td data-label="Exploitant">0 / 5 / 0</td><td data-label="Utilisateur final">1 / 5 / 2</td><td data-label="Mainteneur">1 / 5 / 0</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-3" aria-live="polite"></p>
 <section class="chap lire" data-mesure-lecture>
 <p>Délégations et routage : neuf sessions au modèle Sonnet, défaut du contrat d'interface §4 ; escalade de modèle : aucune.</p>
-</section>
 </section>
     </main>
 
@@ -1277,7 +1215,7 @@ tr[data-tf-empty] td {
 <!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js — copie du socle digit-ai-page-html/assets/find-in-page.js,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="find-in-page.js" data-empreinte="sha256:721208e18a0c5de4899a498c8ebef8ebbb6677155f13a27d479988d7142ff908">
+<script data-composant="find-in-page.js" data-empreinte="sha256:108b35a7313c8a214dc846c1957d8c88902204496f5cf151f0d10564e25c8d17">
 /* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
  *
  * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
@@ -1293,21 +1231,6 @@ tr[data-tf-empty] td {
  *
  * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
  * vise aussi le PDF, prévoir un équivalent statique de l'information.
- *
- * ⚠️ LE CONTENEUR N'EST JAMAIS RÉÉCRIT (TF-1340, 23/09/2026). La recherche réaffectait
- * `container.innerHTML` à chaque frappe : les attributs survivaient, les écouteurs posés par
- * les autres composants du socle (table-filters.js, table-detail.js, infobulle.js) non. Mesuré
- * au navigateur : après une recherche puis son effacement, un bouton de filtre n'ouvrait plus
- * son panneau (0 au lieu de 1). Le surlignage ENVELOPPE désormais les nœuds texte trouvés, et
- * la frappe suivante les DÉSENVELOPPE : aucun élément du conteneur n'est remplacé. `getHTML`
- * et `refresh()` ne sont plus nécessaires (la recherche lit le contenu vivant) ; ils restent
- * acceptés, sans effet, pour les pages déjà câblées.
- *
- * ⚠️ DANS UN SCHÉMA SVG, LE SURLIGNAGE EST UN <tspan> (TF-1353, 24/09/2026). SVG ne peint pas
- * un <mark> HTML : le mot trouvé DISPARAISSAIT du schéma pendant la recherche (mesuré le 24/09
- * dans Chromium : getNumberOfChars() de 93 à 87 ; rejoué sur la fixture du banc : de 74 à 67).
- * Un nœud texte dont le parent est dans l'espace de noms SVG reçoit un <tspan class="find-hit"> ;
- * le HTML d'un <foreignObject> garde son <mark>.
  *
  * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
  * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
@@ -1330,14 +1253,11 @@ tr[data-tf-empty] td {
  *
  * CSS attendu (à adapter aux tokens du livrable) :
  *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
- *   tspan.find-hit { fill: #9a3412; text-decoration: underline; }   (texte d'un schéma SVG)
  *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
  *   .find-count.zero { color: #c0392b; }
  */
 (function (global) {
   'use strict';
-
-  var SVG_NS = 'http://www.w3.org/2000/svg';
 
   // Regex insensible aux accents et à la casse à partir d'une saisie libre.
   function buildRegex(q) {
@@ -1354,112 +1274,45 @@ tr[data-tf-empty] td {
     try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
   }
 
-  // Le BLOC d'un nœud texte : l'ancêtre le plus proche qui n'est pas un élément EN LIGNE. Dans un
-  // schéma SVG, le bloc est le <text> qui le porte (un <tspan> y est en ligne). Une phrase coupée
-  // par une mise en gras, un code ou un lien reste ainsi UN texte à fouiller (TF-1342).
-  function blocDe(el, root) {
-    if (el.namespaceURI === SVG_NS) {
-      var t = el.closest ? el.closest('text') : null;
-      return t && root.contains(t) ? t : el;
-    }
-    var b = el;
-    while (b !== root && b.parentNode && b.nodeType === 1) {
-      var d = getComputedStyle(b).display;
-      if (d !== 'inline' && d !== 'contents') break;
-      b = b.parentNode;
-    }
-    return b;
-  }
-
-  // Surligne les correspondances dans root et renvoie le nombre d'occurrences. Enveloppe les
-  // nœuds texte trouvés, sans remplacer aucun élément (TF-1340) ; dans un texte SVG, l'enveloppe
-  // est un <tspan>, que SVG peint, et non un <mark>, qu'il ignore (TF-1353). Les noms d'éléments
-  // se comparent sans casse : le <style> et le <script> d'un SVG s'écrivent en minuscules.
-  //
-  // TF-1342 (lot Produit-64 20260923b, RD-19) — LE MOTIF S'APPLIQUAIT NŒUD TEXTE PAR NŒUD TEXTE :
-  // « application <strong>laissée arrêtée</strong> » figurait dans le texte de la page et restait
-  // introuvable (3 occurrences dans le texte, 2 comptées, mesuré sur un livrable servi). Le motif
-  // se cherche désormais dans le texte CONTINU d'un bloc (les nœuds texte consécutifs d'un même
-  // paragraphe, cellule, bloc de code, titre…), puis chaque correspondance est posée par PLAGES sur
-  // les nœuds qu'elle traverse : une occurrence à cheval sur trois nœuds donne trois enveloppes
-  // et compte UNE fois.
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
   function highlight(root, re) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    var groupes = [], courant = null, n;
-    while ((n = walker.nextNode())) {
-      var parent = n.parentNode;
-      if (!parent || /^(MARK|SCRIPT|STYLE)$/i.test(parent.nodeName)
-          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) {
-        courant = null;           // un nœud écarté coupe le texte continu
-        continue;
-      }
-      var bloc = blocDe(parent, root);
-      if (!courant || courant.bloc !== bloc) { courant = { bloc: bloc, noeuds: [] }; groupes.push(courant); }
-      courant.noeuds.push(n);
-    }
-    var count = 0;
-    for (var g = 0; g < groupes.length; g++) {
-      var noeuds = groupes[g].noeuds, texte = '', debuts = [];
-      for (var k = 0; k < noeuds.length; k++) { debuts.push(texte.length); texte += noeuds[k].nodeValue; }
-      var plages = [], m;
-      re.lastIndex = 0;
-      while ((m = re.exec(texte))) {
-        if (m[0].length) plages.push([m.index, m.index + m[0].length]);
+    var nodes = [], n, count = 0;
+    while ((n = walker.nextNode())) nodes.push(n);
+    for (var k = 0; k < nodes.length; k++) {
+      var tn = nodes[k];
+      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
+      var txt = tn.nodeValue; re.lastIndex = 0;
+      if (!re.test(txt)) continue; re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = document.createElement('mark');
+        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        count++;
+        last = m.index + m[0].length;
         if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
       }
-      if (!plages.length) continue;
-      count += plages.length;
-      for (var j = 0; j < noeuds.length; j++) {
-        var tn = noeuds[j], txt = tn.nodeValue, d0 = debuts[j], d1 = d0 + txt.length;
-        var morceaux = [];
-        for (var p = 0; p < plages.length; p++) {
-          var a = Math.max(plages[p][0], d0), b = Math.min(plages[p][1], d1);
-          if (a < b) morceaux.push([a - d0, b - d0]);
-        }
-        if (!morceaux.length) continue;
-        var svg = tn.parentNode.namespaceURI === SVG_NS;
-        var frag = document.createDocumentFragment(), last = 0;
-        for (var q = 0; q < morceaux.length; q++) {
-          if (morceaux[q][0] > last) frag.appendChild(document.createTextNode(txt.slice(last, morceaux[q][0])));
-          var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
-          mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
-          mk.textContent = txt.slice(morceaux[q][0], morceaux[q][1]);
-          frag.appendChild(mk);
-          last = morceaux[q][1];
-        }
-        if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
-        tn.parentNode.replaceChild(frag, tn);
-      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      tn.parentNode.replaceChild(frag, tn);
     }
     return count;
   }
 
-  // Retire le surlignage : chaque enveloppe redevient son texte, et les textes voisins se
-  // RECOLLENT (normalize) — sans quoi un terme à cheval sur une ancienne coupure ne serait plus
-  // trouvé à la frappe suivante. Seuls les nœuds texte bougent : les éléments, et les écouteurs
-  // que d'autres composants y ont posés, restent en place (TF-1340).
-  function unhighlight(root) {
-    var hits = root.querySelectorAll('mark.find-hit, tspan.find-hit');
-    var parents = [];
-    for (var i = 0; i < hits.length; i++) {
-      var h = hits[i], p = h.parentNode;
-      if (!p) continue;
-      p.replaceChild(document.createTextNode(h.textContent), h);
-      if (parents.indexOf(p) === -1) parents.push(p);
-    }
-    for (var j = 0; j < parents.length; j++) parents[j].normalize();
-  }
-
   /* Branche la recherche live sur un champ.
    * input, container, counter : éléments DOM (counter optionnel).
-   * getHTML (optionnel) : n'est plus nécessaire depuis TF-1340 — la recherche lit le contenu
-   *   VIVANT du conteneur, qui n'est jamais réécrit. Accepté, sans effet, pour les pages câblées.
-   * Retourne { run, refresh } : run() relance la recherche ; refresh() est conservé, sans
-   *   effet (il n'y a plus de HTML capturé à rafraîchir). */
+   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
+   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
+   *   Sinon, le HTML initial est capturé une fois à l'init.
+   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
+   *   le HTML pristine (mode sans getHTML). */
   function init(input, container, counter, getHTML) {
     if (!input || !container) return null;
+    var pristine = getHTML ? null : container.innerHTML;
     function run() {
-      unhighlight(container);
+      container.innerHTML = getHTML ? getHTML() : pristine;
       var re = buildRegex(input.value);
       if (!re) {
         if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
@@ -1474,12 +1327,11 @@ tr[data-tf-empty] td {
     input.addEventListener('input', run);
     return {
       run: run,
-      refresh: function () {}
+      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
     };
   }
 
-  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight,
-                               unhighlight: unhighlight };
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
 })(window);
 </script>
 <!-- COMPOSANT-EMBARQUE:FIN find-in-page.js -->
