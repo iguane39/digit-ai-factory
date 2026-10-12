@@ -160,6 +160,60 @@ export function decrireColonnes(html) {
 }
 
 /**
+ * UNE PAGE D'ÉTUDE DIT CE QU'ELLE PERMET DE DÉCIDER, ET CHAQUE EN-TÊTE DE COLONNE A UNE GLOSE
+ * ATTEIGNABLE (TF-1463, 12/10/2026).
+ *
+ * LE FAIT : `oracle-lecture-tiers` (forge-agents), routé sur `output\` depuis TF-1446, refusait les
+ * 8 pages d'étude sur 8 — T1 (aucune phrase d'intention) et T2 (21 en-têtes sur 23 sans glose, sur
+ * la page des personas). Le générateur ne posait ni l'une ni l'autre : un lecteur qui n'a pas suivi
+ * le travail devait deviner l'usage de la page et le sens de ses colonnes.
+ *
+ * AUCUNE PROSE DE SUBSTITUTION. Ni la phrase ni la glose ne sont rédigées par le générateur : elles
+ * sont COMPOSÉES de champs que l'étude porte déjà et que n'importe qui peut relire à côté — le
+ * champ `role` de son en-tête, la phrase « Audience : … » de son premier paragraphe, le titre du
+ * chapitre qui contient le tableau, le libellé et le rang de la colonne. Une phrase qui prétendrait
+ * résumer le contenu serait un résumé que l'outil n'a pas lu ; celle-ci dit seulement, de façon
+ * exacte, ce que l'en-tête de l'étude déclare. Limite assumée : elle est moins riche qu'un texte
+ * d'auteur, et l'auteur la REMPLACE quand il écrit la sienne (phrase d'intention dans le corps,
+ * note de colonne `> **Nom** : …` : `decrireColonnes` pose alors `aria-describedby`, qui prime).
+ */
+const DEJA_UNE_INTENTION = /\b(?:permet(?:tent)?\s+de\s+(?:d[ée]cider|choisir|arbitrer|trancher|comparer)|sert\s+[àa]\s+(?:d[ée]cider|choisir|arbitrer|comparer)|[àa]\s+quoi\s+sert|cette\s+page\s+(?:sert|montre|permet))/i;
+
+/** La phrase d'intention composée des champs de l'étude, ou `null` si l'auteur en a déjà écrit une. */
+export function phraseIntention(front, corps, titre) {
+  if (DEJA_UNE_INTENTION.test(corps)) return null;
+  const role = String((front && front.role) || "").trim();
+  // « étude d'opportunité (…) — <sujet> ; issue de … » : le sujet est la part après le premier tiret
+  // long et avant le premier point-virgule. Sans rôle exploitable, le titre de l'étude le remplace.
+  const apresTiret = role.includes(" — ") ? role.slice(role.indexOf(" — ") + 3) : role;
+  const sujet = (apresTiret.split(" ; ")[0] || "").trim().replace(/[.\s]+$/, "") || String(titre || "").trim();
+  if (!sujet) return null;
+  const para = (/^Audience\s*:\s*([\s\S]*?)(?:\r?\n\s*\r?\n|$)/m.exec(corps) || [, ""])[1].replace(/\s+/g, " ").trim();
+  // Le lecteur nommé : la part de la phrase d'audience avant la première virgule ou le premier point.
+  const audience = (para.split(/[,.]/)[0] || "").trim();
+  return `Cette page sert à décider${audience ? `, pour ${audience}` : ""}, de la suite à donner à l'étude : ${sujet}.`;
+}
+
+/** Pose une glose `data-definition` sur chaque en-tête de colonne qui n'est pas déjà décrit par une note d'auteur. */
+export function gloserColonnes(html) {
+  const chapitres = [...html.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)]
+    .map((m) => ({ pos: m.index, texte: m[1].replace(/<[^>]+>/g, "").trim() }));
+  return html.replace(/<thead><tr>((?:<th [^>]*>[^<]*<\/th>)+)<\/tr><\/thead>/g, (bloc, ths, pos) => {
+    const chap = chapitres.filter((c) => c.pos < pos).pop();
+    const total = (ths.match(/<th /g) || []).length;
+    let rang = 0;
+    const ou = chap ? `du tableau du chapitre « ${chap.texte} »` : "du tableau de l'étude";
+    // Les libellés et le titre du chapitre sont DÉJÀ échappés (sortie de mdVersHtml, guillemets compris) :
+    // on les recopie tels quels dans l'attribut, sans les échapper une seconde fois.
+    return bloc.replace(/<th ([^>]*)>([^<]*)<\/th>/g, (tout, attrs, libelle) => {
+      rang += 1;
+      if (/aria-describedby|data-definition/.test(attrs)) return tout;
+      return `<th ${attrs} data-definition="Colonne « ${libelle.trim()} » (${rang} sur ${total}) ${ou}">${libelle}</th>`;
+    });
+  });
+}
+
+/**
  * UNE ÉTUDE LONGUE POSE SON SOMMAIRE, ET LE SOMMAIRE POINTE VERS DE VRAIS CHAPITRES (TF-1437,
  * 28/09/2026, retour Produit-78 20260928a RP-3).
  *
@@ -366,17 +420,18 @@ export function pageEtude(texteSource, nomSource, { gabarit = lireAsset("boilerp
   // pas un paragraphe de lecture (cf. lib-socle-page.mjs).
   const { html: corpsDote, chapitres } = identifierChapitres(mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, "")));
   const sommaire = sommaireLateral(chapitres);
+  const intention = phraseIntention(front, corps, titre);
   const brut = coquilleDuSocle({
     gabarit,
     titre,
     description,
     indice: indiceDeLaPage(front, indiceDuNom(nomSource) || undefined),
-    corpsHtml: sommaire + corpsDote,
+    corpsHtml: (intention ? `<p class="intention">${esc(intention)}</p>\n` : "") + sommaire + corpsDote,
     // TF-1442 : le contenu du marquage TR2 est LU dans le frontmatter de la source, jamais câblé ici.
     marqueurIA: front.assistant,
   });
   const avecStyleSommaire = sommaire ? brut.replace("</head>", `${STYLE_SOMMAIRE}</head>`) : brut;
-  const { html, ids } = armerTableaux(decrireColonnes(avecStyleSommaire));
+  const { html, ids } = armerTableaux(gloserColonnes(decrireColonnes(avecStyleSommaire)));
   return cablerComposants(replierTableaux(html), ids, poseur);
 }
 
@@ -580,6 +635,25 @@ function jouerControlesDuSocleSurUneEtudeReelle(nonJuge) {
     casse.push(`check_html.py L7 (chapeau .ch-apprend) : ${echecsL7.length} échec(s) sur l'étude réelle — ` +
       echecsL7[0].trim().slice(0, 140));
 
+  // TF-1463 — le juge de lecture par un tiers (T1 intention, T2 glose des en-têtes) sur la même page,
+  // quand il est lisible sur ce poste : SKIP motivé sinon, jamais un vert de complaisance.
+  const JUGE_LECTURE = [
+    join(cheminSkillsInstalles(), "quality-oracles", "scripts", "oracle-lecture-tiers.mjs"),
+    join(ICI, "..", "..", "digit-ai-forge-agents", ".claude", "skills", "quality-oracles", "scripts", "oracle-lecture-tiers.mjs"),
+    process.env.FORGE_ROOT ? join(process.env.FORGE_ROOT, "digit-ai-forge-agents", ".claude", "skills", "quality-oracles", "scripts", "oracle-lecture-tiers.mjs") : "",
+  ].find((c) => c && existsSync(c));
+  if (JUGE_LECTURE) {
+    const rJuge = spawnSync(process.execPath, [JUGE_LECTURE, pageReelle], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+    let verdictJuge = null;
+    try { verdictJuge = JSON.parse(rJuge.stdout); } catch { /* traité juste après */ }
+    const bloquants = ((verdictJuge && verdictJuge.findings) || []).filter((x) => x.sev === "bloquant" && /^T[12]$/.test(x.regle));
+    if (!verdictJuge) casse.push("oracle-lecture-tiers n'a rendu aucun JSON lisible sur l'étude réelle");
+    else if (bloquants.length)
+      casse.push(`oracle-lecture-tiers ${bloquants.map((x) => x.regle).join("+")} sur l'étude réelle : ` + bloquants[0].msg.slice(0, 120));
+  } else {
+    nonJuge.push("oracle-lecture-tiers (T1, T2) sur l'étude réelle : juge introuvable sur ce poste — cette part n'a PAS tourné");
+  }
+
   const rRender = spawnSync(PYTHON, ["-X", "utf8", RENDER_PAGE, pageReelle,
     "--widths", "390,768,900", "--output", "json"],
     { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
@@ -765,12 +839,49 @@ function selfTest() {
   if (moteurDeRenduAbsent("Traceback (most recent call last):\n  KeyError: 'breakpoints'") || moteurDeRenduAbsent(""))
     casse.push("une panne qui n'est PAS l'absence du moteur de rendu est prise pour un cas non joué : un vrai défaut passerait au vert");
 
+  // 24 à 26. TF-1463 — LA PHRASE D'INTENTION ET LA GLOSE DES COLONNES, AUX DEUX BORDS.
+  // Rouge : une étude dont l'auteur n'a rien écrit reçoit une phrase composée de SES champs (rôle,
+  // audience) et une glose par en-tête, sans prose inventée. Vert : une étude dont l'auteur a écrit sa
+  // propre phrase d'intention, ou une note de colonne, n'est PAS doublée par le générateur.
+  const SOURCE_SANS_AUTEUR = `---
+role: étude d'opportunité (instruction) — un sujet d'essai précis ; issue de la décision D-1
+verifie_le: 2026-10-12
+---
+
+# Étude d'opportunité — essai d'intention — 20261012a
+
+Audience : le pilote de l'écosystème, qui décide des mandats. Le reste de la phrase ne compte pas.
+
+## 1. Mesure
+
+| Axe | Résultat |
+|---|---|
+| a | 1 |
+`;
+  const htmlSans = pageEtude(SOURCE_SANS_AUTEUR, "20261012-etude-opportunite-essai-intention.md");
+  const phrase = (/<p class="intention">([^<]*)<\/p>/.exec(htmlSans) || [, ""])[1];
+  if (!/^Cette page sert à décider, pour le pilote de l'écosystème, de la suite à donner à l'étude : un sujet d'essai précis\.$/.test(phrase))
+    casse.push(`la phrase d'intention n'est pas composée des champs de l'étude (rôle, audience) : « ${phrase} »`);
+  if (!/<th scope="col" data-definition="Colonne « Axe » \(1 sur 2\) du tableau du chapitre « 1\. Mesure »">Axe<\/th>/.test(htmlSans)
+    || !/data-definition="Colonne « Résultat » \(2 sur 2\) du tableau du chapitre « 1\. Mesure »"/.test(htmlSans))
+    casse.push("un en-tête sans note d'auteur ne reçoit pas sa glose (libellé, rang, chapitre) — T2 d'oracle-lecture-tiers l'accuserait");
+  const SOURCE_AVEC_AUTEUR = SOURCE_SANS_AUTEUR
+    .replace("## 1. Mesure\n", "## 1. Mesure\n\nCette page permet de décider si l'essai est retenu.\n")
+    + "\n> **Axe** : ce que l'auteur dit de cette colonne, de sa main.\n";
+  const htmlAvec = pageEtude(SOURCE_AVEC_AUTEUR, "20261012-etude-opportunite-essai-intention.md");
+  if (/class="intention"/.test(htmlAvec))
+    casse.push("le générateur double une phrase d'intention déjà écrite par l'auteur — l'auteur doit primer");
+  if (!/<th scope="col" aria-describedby="col-1">Axe<\/th>/.test(htmlAvec) || /data-definition="Colonne « Axe »/.test(htmlAvec))
+    casse.push("le générateur double une note de colonne écrite par l'auteur — aria-describedby doit primer sur la glose composée");
+  if (!/data-definition="Colonne « Résultat » \(2 sur 2\)/.test(htmlAvec))
+    casse.push("le rang d'une colonne glosée change quand sa voisine est décrite par l'auteur — le rang doit compter TOUTES les colonnes");
+
   const nonJuge = [];
   const casseControleReel = jouerControlesDuSocleSurUneEtudeReelle(nonJuge);
   if (casseControleReel && casseControleReel.length) casse.push(...casseControleReel);
 
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
-  const nbCas = casseControleReel ? 23 : 22;
+  const nbCas = casseControleReel ? 26 : 25;
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
     : `Self-test generer-page-etude : ${nbCas}/${nbCas} PASS (page écrite à côté de sa source ; autoportante, ` +
