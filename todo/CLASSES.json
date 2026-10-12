@@ -1633,6 +1633,62 @@
    "voisines": [
     "lot-forme"
    ]
+  },
+  {
+   "cle": "etape-de-deploiement-hors-de-la-chaine",
+   "famille": "restitution-forme",
+   "libelle": "Une restitution propose qu'une étape de déploiement ou de mise en service soit jouée par la session, par un script, au lieu d'être un étage de la chaîne que l'exploitant rejoue. Mesuré le 01/10/2026 chez Produit-03 (lot 20261001g) : 3 options qui faisaient créer la fiche Entra par un script de la session, 7e aller-retour du jour.",
+   "creee_le": "2026-10-12",
+   "fondee_par": [
+    "TF-1543"
+   ],
+   "regle": "ETAPE-MEP.md § 3 decies, règle 1 et porte M-13 : automatique veut dire dans la chaîne, rejouable par l'exploitant",
+   "oracle": "pilot, scripts/verifier-etape-chaine.mjs en mode --restitution (EC-5), joué à la main sur la restitution avant remise ; banc scripts/verifier-etape-chaine.test.mjs",
+   "voisines": [
+    "decision-humaine-rendue-restituee-sans-geste"
+   ]
+  },
+  {
+   "cle": "objet-annuaire-complete-avant-replication",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une chaîne crée un objet d'annuaire puis l'écrit aussitôt, sans attendre qu'il soit lisible : la réplication d'Entra fait échouer la seconde commande. Mesuré le 01/10/2026 chez Produit-03 (lot 20261001i) : exécution de production 15803 échouée, relance demandée à l'exploitant.",
+   "creee_le": "2026-10-12",
+   "fondee_par": [
+    "TF-1546"
+   ],
+   "regle": "ETAPE-MEP.md § 3 decies, règle 2 et porte M-13 : lire l'objet en boucle avant de le compléter",
+   "oracle": "pilot, scripts/verifier-etape-chaine.mjs (EC-1), câblé en TM8 bloquant d'oracles/oracle-trace-mutation-mep.mjs ; banc scripts/verifier-etape-chaine.test.mjs",
+   "voisines": [
+    "interface-tierce-ecrite-de-memoire"
+   ]
+  },
+  {
+   "cle": "lecon-outillage-restee-en-commentaire",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une leçon mesurée sur l'agent de chaîne reste en commentaire de script au lieu de devenir une règle : le code suivant la répète. Mesuré le 01/10/2026 chez Produit-03 (lot 20261001i) : l'extension authV2 absente de l'agent, notée le 22/08 dans un commentaire, répétée par une étape neuve.",
+   "creee_le": "2026-10-12",
+   "fondee_par": [
+    "TF-1548"
+   ],
+   "regle": "ETAPE-MEP.md § 3 decies, règle 3 : la table des leçons d'outillage mesurées sur l'agent est la mémoire commune",
+   "oracle": "pilot, scripts/verifier-etape-chaine.mjs (EC-2, az webapp auth sans extension déclarée), câblé en TM8 bloquant d'oracles/oracle-trace-mutation-mep.mjs ; banc scripts/verifier-etape-chaine.test.mjs",
+   "voisines": [
+    "identifiant-de-plateforme-en-dur-jamais-resolu"
+   ]
+  },
+  {
+   "cle": "etape-remise-sur-compilation",
+   "famille": "hook-ou-gate",
+   "libelle": "Une étape de chaîne est remise à l'exploitant sur sa compilation et sa syntaxe, sans qu'aucune de ses commandes ait tourné hors production. Mesuré le 01/10/2026 chez Produit-03 (lot 20261001i) : une exécution de production échouée et une seconde évitée de justesse par la revue.",
+   "creee_le": "2026-10-12",
+   "fondee_par": [
+    "TF-1549"
+   ],
+   "regle": "ETAPE-MEP.md § 3 decies, règle 5 et porte M-13 : section « Étapes de chaîne remises à l'exploitant » au dossier de MEP",
+   "oracle": "pilot, scripts/verifier-etape-chaine.mjs (EC-4), câblé en TM8 bloquant d'oracles/oracle-trace-mutation-mep.mjs ; banc scripts/verifier-etape-chaine.test.mjs",
+   "voisines": [
+    "verdict-de-porte-perime-au-lancement"
+   ]
   }
  ],
  "cliquet_porteur": {
