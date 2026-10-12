@@ -1,0 +1,246 @@
+{
+ "schema": "pilot/banc-mutation@1",
+ "etude": "output/03-etudes/20261001-etude-opportunite-rsi-et-ssl.md (étape 1 d'O2) · TF-1551",
+ "date": "2026-10-12",
+ "mesure_de_la_sollicitation": "nombre de fichiers du dépôt (hors l'oracle lui-même, les sidecars, le registre, input\\ et output\\) qui citent le nom de l'oracle, relevé par `git grep -l` le 12/10/2026 ; oracle-synthese est en outre joué à chaque fin de tour (4 557 lignes au journal des hooks). Mesure PROXY : elle ne compte pas les appels réels, que seul le journal des hooks de restitution trace. Les oracles qui jugent un dossier ou le registre (les plus cités) sont déclarés hors banc, et remplacés par les suivants de la liste qui jugent un fichier.",
+ "oracles": [
+  {
+   "id": "oracle-synthese",
+   "script": "oracles/oracle-synthese.mjs",
+   "args": [
+    "{FICHIER}"
+   ],
+   "vert": "output/04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 19,
+    "note": "joué à chaque fin de tour par hook-restitution"
+   },
+   "pertinentes": [
+    "section-retiree:En-tête",
+    "section-retiree:Risques",
+    "section-retiree:Écarts",
+    "section-retiree:Verdict",
+    "section-videe:Risques",
+    "section-retiree:Synthèse d'ouverture",
+    "identifiant-nu",
+    "ajout:Coût de la reprise proposée : 3 j.",
+    "puce-profondeur",
+    "verdict-vague",
+    "coche-sans-preuve"
+   ]
+  },
+  {
+   "id": "oracle-ecriture",
+   "script": "oracles/oracle-ecriture.mjs",
+   "args": [
+    "{FICHIER}",
+    "--json"
+   ],
+   "vert": "output/04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 14
+   },
+   "pertinentes": [
+    "puce-profondeur",
+    "ajout:- ✅ premier point\n- ✅ deuxième point\n- ✅ troisième point\n- ✅ quatrième point",
+    "ajout:La séance démarre à quatorze heures trente.",
+    "ajout:Il est important de noter que ce point est crucial, robuste et au cœur de tout. Il est important de noter que ce point est crucial, robuste et au cœur de tout. Il est important de noter que ce point est crucial, robuste et au cœur de tout. Il est important de noter que ce point est crucial, robuste et au cœur de tout. N'hésitez pas à revenir vers nous. En conclusion, voilà ce qu'il fallait dire.",
+    "ajout:## Dans cette section, nous allons voir ce qui change\n\nTexte."
+   ]
+  },
+  {
+   "id": "oracle-lot-retours",
+   "script": "gabarits/oracle-lot-retours.mjs",
+   "args": [
+    "{FICHIER}"
+   ],
+   "vert": "input/00-retours/produits-anciens - RETOURS - 20260906a.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 11
+   },
+   "pertinentes": [
+    "section-retiree:Remarques restées",
+    "section-retiree:Retours sur les documents",
+    "section-videe:Remarques restées",
+    "section-videe:Retours sur les documents",
+    "fin-tronquee"
+   ]
+  },
+  {
+   "id": "oracle-travaux-pilot",
+   "script": "gabarits/oracle-travaux-pilot.mjs",
+   "args": [
+    "{FICHIER}"
+   ],
+   "vert": "output/06-travaux-confies/pilot - TRAVAUX - 20260905d.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 10
+   },
+   "pertinentes": [
+    "section-retiree:Travaux confiés",
+    "section-videe:Travaux confiés",
+    "section-retiree:déjà fait",
+    "section-retiree:NE demande PAS",
+    "ligne-retiree:Comment vous saurez",
+    "ligne-retiree:Si ce n'est pas fait"
+   ]
+  },
+  {
+   "id": "oracle-etude-opportunite",
+   "script": "oracles/oracle-etude-opportunite.mjs",
+   "args": [
+    "{FICHIER}"
+   ],
+   "vert": "output/03-etudes/20260914-etude-opportunite-personas-par-phase.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 5
+   },
+   "pertinentes": [
+    "section-retiree:partition",
+    "section-retiree:recouvrement",
+    "section-retiree:état de l.art",
+    "section-retiree:Options",
+    "section-retiree:Verdict",
+    "section-retiree:Intention",
+    "ajout:Coût de la reprise : 3 jours.",
+    "ajout:- **O5 — une cinquième option.**",
+    "ajout:Cette approche est élégante et moderne.",
+    "ligne-retiree:Plan de revue"
+   ]
+  },
+  {
+   "id": "oracle-ecart-normal",
+   "script": "oracles/oracle-ecart-normal.mjs",
+   "args": [
+    "{FICHIER}",
+    "--strict"
+   ],
+   "vert": "oracles/fixtures/demande-tierce-verte.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 5
+   },
+   "pertinentes": [
+    "ajout:L'erreur AADSTS700038 est normale à ce stade.",
+    "ajout:Une réponse HTTP 404 est attendue ici.",
+    "ajout:Le code d'erreur ERR_CONNECTION_REFUSED est voulu.",
+    "ajout:Le statut 500 est prévu pour ce cas.",
+    "ajout:L'erreur 403 est habituelle."
+   ]
+  },
+  {
+   "id": "oracle-glossaire",
+   "script": "oracles/oracle-glossaire.mjs",
+   "args": [
+    "{FICHIER}"
+   ],
+   "vert": "gabarits/GLOSSAIRE.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 6
+   },
+   "pertinentes": [
+    "remplacer:\\*\\*categorie\\*\\* : visibilite=>**categorie** : autre",
+    "remplacer:\\| fr \\| gîte \\| aucun=>| fr |  | aucun",
+    "remplacer:\\| 2026-08-26 \\| m=>| 26/08/2026 | m",
+    "remplacer:\\| fr \\| gîte \\| aucun=>| fr | gîte | `gîte` — contradiction",
+    "remplacer:\\| fr \\| gîte \\| aucun \\| partout \\|=>| fr | gîte | aucun |"
+   ]
+  },
+  {
+   "id": "oracle-verdict-visuel",
+   "script": "oracles/oracle-verdict-visuel.mjs",
+   "args": [
+    "{FICHIER}",
+    "--captures",
+    "{VERT_DOSSIER}"
+   ],
+   "vert": "oracles/banc-mutation/fixtures/revue-visuelle/revue.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 4
+   },
+   "pertinentes": [
+    "remplacer:1440 × 3684=>1440 × 3000",
+    "remplacer:page-pleine\\.png — 1440 × 3684=>page-absente.png — 1440 × 3684",
+    "remplacer:— pleine page=>— fenêtre",
+    "ajout:Écart résiduel : débordement du tableau, acceptable.",
+    "remplacer:- ecran[\\s\\S]*pleine page\\n=>"
+   ]
+  },
+  {
+   "id": "oracle-revue-deck",
+   "script": "gabarits/oracle-revue-deck.mjs",
+   "args": [
+    "{FICHIER}"
+   ],
+   "vert": "oracles/fixtures/revue-deck-verte.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 3,
+    "note": "oracle neuf du 12/10 (TF-1388)"
+   },
+   "pertinentes": [
+    "titre-retire",
+    "remplacer: — 2026-10-12 14:30=>",
+    "ligne-retiree:^\\| Débordements",
+    "ligne-retiree:^\\| Typographie",
+    "ligne-retiree:^\\| Alignement",
+    "remplacer:\\| non applicable \\| deck sans texte coupé en fin de ligne \\|=>| non applicable | |",
+    "remplacer:diapo 2 : le titre est décalé=>le titre est décalé",
+    "remplacer:\\| conforme \\| aucun \\| — \\|=>| | aucun | — |"
+   ]
+  },
+  {
+   "id": "oracle-demande-tierce",
+   "script": "gabarits/oracle-demande-tierce.mjs",
+   "args": [
+    "{FICHIER}"
+   ],
+   "vert": "oracles/fixtures/demande-tierce-verte.md",
+   "sollicitation": {
+    "fichiers_qui_le_citent": 2,
+    "note": "oracle neuf du 12/10, repris du contrôle d'un produit"
+   },
+   "pertinentes": [
+    "remplacer:\nVérification finale\n=>\n",
+    "remplacer:\nStatut et impacts des actions\n=>\n",
+    "remplacer:\nÉtapes suivantes\n=>\n",
+    "remplacer:\nProchaines étapes\n=>\n",
+    "avant-ligne:^Étapes suivantes=>Demander à Camille si besoin.",
+    "avant-ligne:^Étapes suivantes=>Rien d'autre n'est demandé.",
+    "avant-ligne:^Étapes suivantes=>Noter ce que l'écran affiche.",
+    "avant-ligne:^Étapes suivantes=>Le commanditaire ouvre la chaîne.",
+    "avant-ligne:^Étapes suivantes=>Lancer l'étage de production."
+   ]
+  }
+ ],
+ "hors_banc": [
+  {
+   "oracle": "oracle-conformite-projet",
+   "fichiers_qui_le_citent": 30,
+   "raison": "juge un DOSSIER de produit (git inclus) : la matière à muter est un arbre, pas un fichier ; sa recette `oracles/self-test.mjs` construit déjà une verte et une rouge"
+  },
+  {
+   "oracle": "oracle-gabarits-documents",
+   "fichiers_qui_le_citent": 31,
+   "raison": "juge des familles de gabarits et leur catalogue, pas un livrable ; mutation par famille à construire"
+  },
+  {
+   "oracle": "oracle-todo",
+   "fichiers_qui_le_citent": 13,
+   "raison": "juge le registre TODO.jsonl entier (événements liés entre eux) ; la mutation d'une ligne se joue sur une copie du registre, à outiller à l'étape suivante"
+  },
+  {
+   "oracle": "oracle-boite-entree",
+   "fichiers_qui_le_citent": 12,
+   "raison": "juge un répertoire de lots confronté au registre"
+  },
+  {
+   "oracle": "oracle-skills",
+   "fichiers_qui_le_citent": 9,
+   "raison": "confronte les skills versionnés aux skills installés du poste : la mutation toucherait la configuration du poste"
+  },
+  {
+   "oracle": "oracle-claude-md",
+   "fichiers_qui_le_citent": 7,
+   "raison": "juge CLAUDE.md et les `references\\` qu'il cite : un fichier isolé dans un dossier jetable rend N2 et N3 faux"
+  }
+ ]
+}
