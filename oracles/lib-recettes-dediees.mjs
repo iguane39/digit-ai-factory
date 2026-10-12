@@ -44,4 +44,6 @@ export const DEDIES = {
   // Le juge de la déduction publiée comme un fait (TF-1581, campagne du 12/10/2026). Banc dédié : ses
   // fixtures écrivent à dessein l'affirmation sans source que l'oracle refuse.
   "oracle-source-contenu.mjs": "oracle-source-contenu.test.mjs",
+  // L'état présenté comme normal à côté d'un code d'erreur (TF-1511, décision du 12/10/2026).
+  "oracle-ecart-normal.mjs": "oracle-ecart-normal.test.mjs",
 };

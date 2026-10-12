@@ -1,0 +1,79 @@
+{
+  "cible": "gabarits/DEMANDE-TIERCE.md",
+  "date_iso": "2026-10-12T10:04:07.549Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 4,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\DEMANDE-TIERCE.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\DEMANDE-TIERCE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\DEMANDE-TIERCE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\DEMANDE-TIERCE.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\DEMANDE-TIERCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\DEMANDE-TIERCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\DEMANDE-TIERCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\DEMANDE-TIERCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\DEMANDE-TIERCE.md",
+    "ts": "2026-10-12T10:04:07.548Z",
+    "fichiers": {
+      "gabarits\\DEMANDE-TIERCE.md": "44d8a10001d7856035d3b69d62784db270faccbda26533063f9b0f0de190501b"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
