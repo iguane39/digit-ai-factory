@@ -64,7 +64,9 @@ const esc = (s) => String(s ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u0
 // aurait aussi couvert une vraie fuite le jour où il y en aurait une.
 const escLit = (s) => esc(s)
   .replace(
-    /(^|[\s(«:;,—–-])(null|NULL|None|NONE|undefined|NaN|nil)(?=$|[\s)».;,:!?—–-])/g,
+    // TF-1018 : « &lt; » suit le jeton quand le registre cite une balise (« <td>None</td> ») — check_html
+    // L11 lit « < » comme une fin de jeton, l'émetteur doit donc la reconnaître aussi.
+    /(^|[\s(«:;,—–-])(null|NULL|None|NONE|undefined|NaN|nil)(?=$|[\s)».;,:!?—–-]|&lt;)/g,
     "$1<code>$2</code>")
   .replace(
     /(^|[\s(«:;,—–-])(\[[a-zA-Z]{1,6}:[^\]\s]{1,48}\]|\{\{[^}\n]{0,40}\}\}|\$\{[^}\n]{0,40}\}|%\([\w-]{1,24}\)[sdifr]|%[sdifr]|lorem ipsum)(?=$|[\s)».;,:!?—–-])/gi,

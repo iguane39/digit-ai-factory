@@ -548,6 +548,15 @@ const PYTHON = ["python", "python3", "py"].find((bin) => {
 const ETUDE_REELLE = join(ICI, "..", "output", "03-etudes",
   "20260919-etude-opportunite-plan-d-amelioration-post-audit.md");
 
+/**
+ * TF-1018 (12/10/2026) : `render_page.py` sort sans JSON quand son moteur de rendu manque — le paquet
+ * `playwright` ou son navigateur absents, le cas d'un runner hébergé neuf (première exécution
+ * hébergée du 04/10 : ce seul cas faisait le circuit ROUGE). Ce n'est pas un défaut du générateur : le
+ * cas se déclare NON JOUÉ, motivé, comme l'absence de python ou du socle. Toute AUTRE sortie sans JSON
+ * reste un échec.
+ */
+const moteurDeRenduAbsent = (stderr) => /playwright non install|Executable doesn't exist|playwright install/i.test(String(stderr || ""));
+
 /** Joue `check_html.py` et `render_page.py` sur la page régénérée de l'étude réelle. */
 function jouerControlesDuSocleSurUneEtudeReelle(nonJuge) {
   if (!CHECK_HTML || !RENDER_PAGE || !PYTHON) {
@@ -576,6 +585,11 @@ function jouerControlesDuSocleSurUneEtudeReelle(nonJuge) {
     { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   let rapport = null;
   try { rapport = JSON.parse((rRender.stdout || "").trim()); } catch { /* traité juste après */ }
+  if (!rapport && moteurDeRenduAbsent(rRender.stderr)) {
+    nonJuge.push("les deux contrôles du socle sur une étude réelle : le moteur de rendu de render_page.py (playwright et son navigateur) " +
+      "est absent de ce poste — ce cas n'a PAS tourné, il ne compte ni pour ni contre le self-test");
+    return;
+  }
   if (!rapport) {
     casse.push("render_page.py n'a rendu aucun JSON lisible sur l'étude réelle — " +
       (rRender.stderr || "").split("\n")[0].slice(0, 160));
@@ -742,12 +756,21 @@ function selfTest() {
   // 22. TF-1566 — check_html.py et render_page.py, joués sur une étude RÉELLE (cf. commentaire de
   // `jouerControlesDuSocleSurUneEtudeReelle`) : SKIP motivé dans `nonJuge`, jamais un vert qui
   // affirmerait un cas non joué.
+  // 23. TF-1018 — l'absence du moteur de rendu se reconnaît à son message, et à lui seul : une autre
+  // sortie sans JSON (trace de pile) reste un échec, jamais un cas non joué.
+  if (!moteurDeRenduAbsent("ERREUR : playwright non installé.\n  pip install playwright && playwright install chromium"))
+    casse.push("l'absence du paquet playwright n'est pas reconnue : le circuit hébergé neuf resterait rouge sur ce seul cas");
+  if (!moteurDeRenduAbsent("BrowserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium"))
+    casse.push("l'absence du navigateur de playwright n'est pas reconnue");
+  if (moteurDeRenduAbsent("Traceback (most recent call last):\n  KeyError: 'breakpoints'") || moteurDeRenduAbsent(""))
+    casse.push("une panne qui n'est PAS l'absence du moteur de rendu est prise pour un cas non joué : un vrai défaut passerait au vert");
+
   const nonJuge = [];
   const casseControleReel = jouerControlesDuSocleSurUneEtudeReelle(nonJuge);
   if (casseControleReel && casseControleReel.length) casse.push(...casseControleReel);
 
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
-  const nbCas = casseControleReel ? 22 : 21;
+  const nbCas = casseControleReel ? 23 : 22;
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
     : `Self-test generer-page-etude : ${nbCas}/${nbCas} PASS (page écrite à côté de sa source ; autoportante, ` +

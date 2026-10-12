@@ -428,8 +428,11 @@ def annoter(corps_html, cle_vue, champs_anatomie):
             sous = ('<ol class="toc-n2">' + "".join('<li><a href="#' + ident + '"><span class="toc-t">'
                                                    + html.escape(t) + "</span></a></li>" for ident, t in pas)
                     + "</ol>")
-        lignes.append('<li class="toc-s"><a href="#' + cle + '" title="' + html.escape(annonce[:140], quote=True)
-                      + '"><span class="toc-t">' + html.escape(texte) + "</span></a>" + sous + "</li>")
+        # L3 bis (forge-agents 9be4cf9, 03/10/2026) : une infobulle qui répète le texte visible de son lien
+        # n'apprend rien. Un chapitre sans chapeau a pour annonce son propre titre : il n'a alors pas d'infobulle.
+        infobulle = "" if annonce.strip() == texte.strip() else ' title="' + html.escape(annonce[:140], quote=True) + '"'
+        lignes.append('<li class="toc-s"><a href="#' + cle + '"' + infobulle
+                      + '><span class="toc-t">' + html.escape(texte) + "</span></a>" + sous + "</li>")
     lignes.append("</ol></nav>")
     # Chaque chapitre rend : son ancre, l'ancre qu'un hébergeur de dépôt lui donnerait (pour les
     # liens écrits dans le Markdown), le code qui ouvre son titre s'il en a un, son anatomie et son corps.
