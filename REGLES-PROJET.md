@@ -306,12 +306,24 @@ revient à l'utilisateur, sans critère écrit.
    L'exécution d'un service tiers payant exige un GO humain préalable — le garde-fou
    « aucune API tierce payante hors modèles Claude » prime toujours sur R-29. Les gates
    déjà en place (GO production, mandats humains) priment toujours sur R-29.
+4. **Voie automatique d'abord** (règle humaine du 01/10/2026, lot `Produit-64 - RETOURS -
+   20261001b`, RT-28 ; TF-1514, TF-1567). Avant de laisser une action à l'humain, la session énumère
+   les voies automatiques et note le code de retour mesuré de chacune : l'identité de la
+   session, les identités de service qui ont le droit sur la cible, l'automatisation déjà
+   présente dans le dépôt, l'API de la plateforme pour le geste lui-même. Le motif
+   « décision » vaut pour un choix encore ouvert, jamais pour l'exécution d'un choix déjà
+   rendu. Ne reste à l'humain que ce qui est refusé sur toutes les voies, ou ce qui relève de
+   sa décision, d'une dépense ou d'un geste irréversible.
 
 Surfaces d'application encodées : `references\ACCUEIL.md` étape 5 (démarche proposée),
 `gabarits\AGENT-CAMPAGNE.md` (rapport final des agents de campagne).
 Mécanisme : S (vérification pilot à l'ouverture de run). Contrôle exécutable : hors
 `oracle-conformite-projet` (portée transverse aux prompts et rapports, pas au socle
 d'un projet produit) — reste de TF-0131, à mécaniser si un gap se constate en run réel.
+Le gap s'est constaté le 01/10/2026 (TF-1567) : le point 4 est joué par la règle S59 de
+`oracles\oracle-synthese.mjs` (une action humaine de motif `decision` qui commande une
+exécution sans nommer de choix porte la trace de la voie automatique essayée), avec S21 pour
+les motifs `acces` et `presence` ; avertissante.
 
 ## J. Thème clair et bascule sombre câblée (règle 30 — décidée le 12/08, TF-0131)
 

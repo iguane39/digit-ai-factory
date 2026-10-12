@@ -112,6 +112,9 @@
  *       dépendances, scan d'image), datée du jour et chiffrée (01/10, TF-1498) ; avertissante ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
+ *   S59 une action humaine de motif `decision` qui commande un geste d'EXÉCUTION sans nommer de
+ *       choix ouvert porte la trace de la voie automatique essayée (12/10, TF-1567, R-29 point 4) ;
+ *       avertissante ;
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
  *       depuis le 13/08 et restée sans juge ; en TABLEAU, les colonnes suffisent (borne de S19 :
  *       une ligne se juge avec son en-tête). Sans elle, une liste d'options est un menu.
@@ -3134,6 +3137,37 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // S59 (TF-1567, 12/10/2026) — `decision` NE VAUT QUE POUR UN CHOIX OUVERT, JAMAIS POUR L'EXÉCUTER.
+  // AVERTISSANTE à son entrée (hors de BLOQUANTES du hook), comme toute règle neuve depuis la v2.5.0.
+  // LE FAIT, lot Produit-02 du 01/10/2026 : trois restitutions PASS de suite (28/09, 29/09, 01/10)
+  // ont laissé à l'exploitant le DÉPÔT de 56 puis 92 exclusions et 2 plafonds, raison `decision`,
+  // alors qu'un accès en écriture existait depuis le 23/09. Essayée sur la question « Pourquoi
+  // est-ce que je dois faire des opérations manuelles ? », la voie automatique a passé en une
+  // exécution (94 opérations acceptées en validate_only, 7 écarts → 0). S21 ne voyait rien : elle
+  // exempte `decision` à dessein, puisqu'on n'« essaie » pas un arbitrage. Mais l'action n'était
+  // pas un arbitrage : le choix était RENDU, il ne restait que son EXÉCUTION. La règle humaine du
+  // 01/10/2026 (R-29 point 4, « voie automatique d'abord ») l'écrit : avant de laisser une action à
+  // l'humain, la voie automatique se mesure. Ce juge lit la FORME : une action humaine de motif
+  // `decision` dont le texte commande un geste d'EXÉCUTION et ne nomme aucun CHOIX porte la trace
+  // de la voie automatique essayée, au sens de S21 (tentative + preuve). Il ne juge pas que le
+  // choix soit réellement rendu, ni la sincérité de la trace.
+  {
+    const EXECUTION = uni(/\b(d[ée]poser|appliquer|importer|saisir|t[ée]l[ée]verser|charger|configurer|param[ée]trer|activer|d[ée]sactiver|ajouter|cr[ée]er|renseigner|r[ée]gler|ex[ée]cuter|cliquer|supprimer|installer|copier|coller|entrer)\b/i);
+    // Un GATE n'est pas l'exécution d'un choix rendu : publier (R-38), un feu vert, un mandat chez
+    // un produit restent humains par doctrine. Mesuré à l'écriture sur les 236 synthèses
+    // d'`output\04-plans\` : sans ces mots, 21 accusations, dont l'activation d'un circuit hébergé
+    // et le dépôt d'un lot chez un produit, deux gates légitimes.
+    const CHOIX = uni(/\b(choisir|choix|trancher|tranche|arbitrer|arbitrage|d[ée]cid(?:er|ez|e|é)|valider|approuver|retenir|opter|r[ée]pondre|accord|autoriser|GO|feu vert|mandat|R-38|publier|publication|pousser|push)\b/i);
+    const executionDeChoixRendu = { test: (g) => HUMAINS.test(g) && /\bdecision\b/.test(zoneMotif(g))
+      && EXECUTION.test(horsCode(g)) && !CHOIX.test(horsCode(g)) };
+    juger8("S59", executionDeChoixRendu, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
+      "une action laissée à l'humain sous le motif `decision` commande un geste d'EXÉCUTION (déposer, appliquer, " +
+      "importer, saisir…) et ne nomme aucun choix encore ouvert : `decision` vaut pour un arbitrage, jamais pour " +
+      "l'exécution d'un choix rendu (R-29 point 4, voie automatique d'abord). Essayer la voie automatique et écrire " +
+      "sa trace dans le même groupe — code de retour, essai à blanc, sortie de commande —, ou nommer le choix qui reste ouvert.",
+      "chaque action humaine de motif `decision` arbitre un choix ouvert, ou porte la trace de la voie automatique essayée");
+  }
+
   return findings;
 }
 
@@ -4366,6 +4400,40 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c58c.statut !== "PASS")
     casse.push("TF-1496 : la MÊME restitution, l'option du bloc 3 citant désormais GFP-001, est encore accusée : "
       + String(c58c.message || c58c.statut || "").slice(0, 200));
+
+  // 12/10 — TF-1567 : S59, `decision` POUR L'EXÉCUTION D'UN CHOIX RENDU, DANS SES QUATRE SENS. Le
+  // cas fondateur (lot Produit-02 du 01/10) : déposer des exclusions déjà arrêtées au plan, sous
+  // `decision`, sans que la voie automatique ait été essayée. Les quatre lignes ne diffèrent que
+  // par la trace, par le choix nommé ou par le gate : c'est ce qui prouve que la règle juge ce
+  // qu'elle prétend juger.
+  const A4_1567 = (pourquoi) => "- **A-4** — déposer les 92 exclusions et les 2 plafonds du plan dans le compte publicitaire (TF-1567) (manuelle_utilisateur).\n"
+    + `  - pourquoi pas l'IA : decision — ${pourquoi} ;\n`
+    + "  - où : `donnees\\exclusions.csv`, écran « Mots clés à exclure ».\n"
+    + "  - si rien n'est fait : les clics hors cible continuent d'être payés.\n";
+  const avecA4_1567 = (pourquoi) => verte.replace("- **A-3** — enfin TF-0222 (auto_ia)", A4_1567(pourquoi) + "- **A-3** — enfin TF-0222 (auto_ia)");
+  const r59rouge = jouerPe("tf1567-execution-sans-trace.md", avecA4_1567("le compte appartient à l'exploitant"));
+  const c59r = constatDe(r59rouge, "S59");
+  if (c59r.statut !== "FAIL" || !/voie automatique/.test(c59r.message || ""))
+    casse.push("TF-1567 : une action humaine de motif `decision` qui EXÉCUTE un choix rendu (déposer des exclusions arrêtées) "
+      + "sans trace de la voie automatique passe S59 : " + String(c59r.message || c59r.statut || "").slice(0, 200));
+  const r59trace = jouerPe("tf1567-execution-tracee.md", avecA4_1567(
+    "voie automatique ESSAYÉE le 01/10, essai à blanc refusé `HTTP 403 Forbidden`, l'accès de l'agent est en lecture seule"));
+  const c59t = constatDe(r59trace, "S59");
+  if (c59t.statut !== "PASS")
+    casse.push("TF-1567 : la MÊME action portant la trace de la voie automatique essayée (code de retour) est accusée : "
+      + String(c59t.message || c59t.statut || "").slice(0, 200));
+  const r59choix = jouerPe("tf1567-choix-ouvert.md", avecA4_1567(
+    "choisir entre les deux listes d'exclusions du plan reste ouvert"));
+  const c59c = constatDe(r59choix, "S59");
+  if (c59c.statut !== "PASS")
+    casse.push("TF-1567 : la MÊME action dont le motif nomme un CHOIX encore ouvert est accusée — `decision` vaut pour un "
+      + "arbitrage : " + String(c59c.message || c59c.statut || "").slice(0, 200));
+  const r59gate = jouerPe("tf1567-gate.md", avecA4_1567(
+    "R-38, la publication attend votre feu vert"));
+  const c59g = constatDe(r59gate, "S59");
+  if (c59g.statut !== "PASS")
+    casse.push("TF-1567 : la MÊME action dont le motif nomme un GATE (R-38, feu vert) est accusée — un gate reste humain "
+      + "par doctrine : " + String(c59g.message || c59g.statut || "").slice(0, 200));
   // 28/09 — TF-1428 ET TF-1449. Registre produit, en tableau : la MÊME ligne avec « A-18 » dans sa
   // colonne Registre (PASS), avec un tiret (FAIL), avec un tiret et un RENVOI « après A-12 » dans
   // son texte (FAIL : un renvoi n'est pas un registre), et dans un tableau dont la colonne « Id »
