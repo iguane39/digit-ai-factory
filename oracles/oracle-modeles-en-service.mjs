@@ -33,6 +33,16 @@
  *         jusqu'à ce qu'une mesure le clôture (`clos_par`). AVERT, jamais un échec : un re-test
  *         attend un run qui porte 2 tranches comparables, pas une session.
  *
+ *   MS4 · le réglage de modèle du poste se désigne par son NOM DE FAMILLE (`opus[1m]`), jamais par un
+ *         identifiant complet (`claude-opus-5-5[1m]`) — règle du 25/09/2026 (CONTRAT-INTERFACE.md §4,
+ *         D-1 (a) et D-2 (a)), contredite le 01/10/2026 par un réglage épinglé (TF-1560). Un identifiant
+ *         épinglé garde la session sur sa version quand la suivante sort, et MS2 mesure alors une
+ *         version qui ne bouge plus. Le champ `model` de `settings.json` et `settings.local.json` de
+ *         chaque racine `~/.claude*` se lit ici ; AVERT, jamais un échec (le réglage est un geste du
+ *         poste, hors dépôt : ce contrôle ne l'écrit pas). Un épinglage VOULU s'inscrit au référentiel
+ *         (`reglages_epingles_voulus`: liste d'identifiants) et passe. Remède du poste, à la main :
+ *         remplacer la valeur par le nom de famille dans le `settings.json` signalé.
+ *
  * Normalisation d'un identifiant avant comparaison : le suffixe de contexte (`[1m]`), le préfixe
  * de plateforme (`anthropic.`) et l'instantané daté (`-20251001`) sont retirés ; `<synthetic>` et
  * tout nom hors de la forme `claude-…` sont ignorés.
@@ -56,7 +66,7 @@
  * échouer, et le passage de bout en bout par la ligne de commande).
  *
  * Usage : node oracles/oracle-modeles-en-service.mjs [--referentiel <fichier>]
- *           [--transcripts <dossier>]... [--modele <identifiant>]... [--jours <N>] [--json]
+ *           [--transcripts <dossier>]... [--modele <identifiant>]... [--reglages <settings.json>]... [--jours <N>] [--json]
  *         node oracles/oracle-modeles-en-service.mjs --self-test
  * Sortie : exit 0 PASS · 1 FAIL · 2 erreur d'usage.
  */
@@ -68,7 +78,7 @@ import { spawnSync } from "node:child_process";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const NOM = "oracle-modeles-en-service";
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 const SCHEMA = "pilot/modeles-en-service@1";
 const REF_DEFAUT = join(ICI, "..", "references", "MODELES-EN-SERVICE.json");
 const FAMILLES = ["fable", "opus", "sonnet", "haiku"];
@@ -128,6 +138,29 @@ function* fichiersJsonl(dossier, profondeur = 4) {
   }
 }
 
+/** Réglages de modèle des racines de configuration : [{ fichier, modele }] pour chaque `model` lisible. */
+export function lireReglagesModele(fichiers) {
+  const sortie = [];
+  for (const f of fichiers) {
+    let j = null;
+    try { j = JSON.parse(readFileSync(f, "utf8")); } catch { continue; }
+    if (j && typeof j.model === "string" && j.model.trim()) sortie.push({ fichier: f, modele: j.model.trim() });
+  }
+  return sortie;
+}
+
+/** Fichiers de réglages candidats : `settings.json` et `settings.local.json` de chaque racine `~/.claude*`. */
+export function reglagesParDefaut() {
+  const racines = new Set();
+  if (process.env.CLAUDE_CONFIG_DIR) racines.add(process.env.CLAUDE_CONFIG_DIR);
+  let entrees = [];
+  try { entrees = readdirSync(homedir(), { withFileTypes: true }); } catch { entrees = []; }
+  for (const e of entrees) if (e.isDirectory() && /^\.claude/.test(e.name)) racines.add(join(homedir(), e.name));
+  const fichiers = [];
+  for (const r of racines) for (const n of ["settings.json", "settings.local.json"]) if (existsSync(join(r, n))) fichiers.push(join(r, n));
+  return fichiers;
+}
+
 /** Versions servies, lues par la fin des transcripts récents. Rend une Map id -> {reponses, derniere}. */
 export function lireVersionsServies(dossiers, { jours = JOURS_DEFAUT, maxFichiers = MAX_FICHIERS, maintenant = Date.now() } = {}) {
   const debut = Date.now();
@@ -165,7 +198,7 @@ export function lireVersionsServies(dossiers, { jours = JOURS_DEFAUT, maxFichier
 const jour = (ms) => (ms ? new Date(ms).toISOString().slice(0, 10) : "?");
 
 /** Le jugement, pur : un référentiel (objet) et les versions servies (Map ou null). */
-export function juger(ref, vues) {
+export function juger(ref, vues, reglages) {
   const findings = [];
   const manques = [];
   if (!ref || typeof ref !== "object") manques.push("référentiel illisible");
@@ -200,6 +233,16 @@ export function juger(ref, vues) {
     for (const [id, e, declaree] of anciennes) findings.push({ regle: "MS2", statut: "AVERT", message: `version antérieure encore servie${declaree ? "" : ", non déclarée au référentiel"} : ${id} (${e.reponses} réponse(s), fichier le plus récent du ${jour(e.derniere)}) ; une session ou un agent l'épingle par identifiant complet, là où le nom de famille suivrait la version courante` });
   }
 
+  if (Array.isArray(reglages)) {
+    if (!reglages.length) findings.push({ regle: "MS4", statut: "SANS_OBJET", message: "aucun réglage de modèle lu dans les racines de configuration" });
+    else {
+      const voulus = new Set(((ref && ref.reglages_epingles_voulus) || []).map((v) => normaliser(v)).filter(Boolean));
+      const epingles = reglages.filter((r) => { const id = normaliser(r.modele); return id && !voulus.has(id); });
+      if (!epingles.length) findings.push({ regle: "MS4", statut: "PASS", message: `${reglages.length} réglage(s) de modèle, tous au nom de famille ou épinglage déclaré au référentiel` });
+      for (const r of epingles) findings.push({ regle: "MS4", statut: "AVERT", message: `réglage de modèle épinglé par identifiant : « ${r.modele} » dans ${r.fichier} ; la règle du 25/09/2026 (CONTRAT-INTERFACE.md §4) désigne le nom de famille. Remède : mettre « "model": "${familleDe(normaliser(r.modele)) || "opus"}[1m] » dans ce fichier, ou déclarer l'épinglage voulu dans reglages_epingles_voulus du référentiel` });
+    }
+  }
+
   const rt = ref && ref.re_test_regle_de_challenge;
   if (rt && rt.statut === "du") findings.push({ regle: "MS3", statut: "AVERT", message: `re-test de la règle de challenge dû depuis le ${rt.depuis} : ${rt.declencheur} ; protocole : ${rt.protocole}` });
   else findings.push({ regle: "MS3", statut: "PASS", message: rt && rt.clos_par ? `dernier re-test clos par ${rt.clos_par}` : "aucun re-test en attente" });
@@ -208,19 +251,20 @@ export function juger(ref, vues) {
 }
 
 function lireArgs(argv) {
-  const a = { referentiel: REF_DEFAUT, transcripts: [], modeles: [], jours: JOURS_DEFAUT, json: false, selfTest: false };
+  const a = { referentiel: REF_DEFAUT, transcripts: [], reglages: [], modeles: [], jours: JOURS_DEFAUT, json: false, selfTest: false };
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
     if (x === "--referentiel") a.referentiel = argv[++i];
     else if (x === "--transcripts") a.transcripts.push(argv[++i]);
     else if (x === "--modele") a.modeles.push(argv[++i]);
     else if (x === "--jours") a.jours = Number(argv[++i]);
+    else if (x === "--reglages") a.reglages.push(argv[++i]);
     else if (x === "--json") a.json = true;
     else if (x === "--self-test") a.selfTest = true;
     else return { erreur: `option inconnue : ${x}` };
   }
   if (!Number.isFinite(a.jours) || a.jours <= 0) return { erreur: "--jours attend un nombre positif" };
-  if (a.transcripts.some((t) => !t) || a.modeles.some((m) => !m) || !a.referentiel) return { erreur: "option sans valeur" };
+  if (a.transcripts.some((t) => !t) || a.reglages.some((t) => !t) || a.modeles.some((m) => !m) || !a.referentiel) return { erreur: "option sans valeur" };
   return a;
 }
 
@@ -238,7 +282,8 @@ export function executer(argv) {
     const dossiers = a.transcripts.length ? a.transcripts : racinesParDefaut();
     lecture = { ...lireVersionsServies(dossiers, { jours: a.jours }), source: "transcripts", dossiers };
   }
-  const { verdict, findings } = juger(ref, lecture.vues);
+  const reglages = lireReglagesModele(a.reglages.length ? a.reglages : reglagesParDefaut());
+  const { verdict, findings } = juger(ref, lecture.vues, reglages);
   const versions = [...lecture.vues.entries()].sort((x, y) => y[1].derniere - x[1].derniere)
     .map(([id, e]) => ({ identifiant: id, famille: familleDe(id), reponses: e.reponses, derniere: jour(e.derniere) }));
   const resume = `${NOM} — verdict ${verdict} : ${versions.length} version(s) servie(s) lue(s) sur ${lecture.fichiers_lus} fichier(s) en ${lecture.duree_ms} ms`;
@@ -305,6 +350,19 @@ function selfTest() {
     let jVert = null; try { jVert = JSON.parse(cVert.stdout); } catch { jVert = null; }
     verifier("vert de bout en bout : --modele sur la génération courante, exit 0", cVert.status === 0 && jVert && jVert.verdict === "PASS");
     verifier("rouge d'usage : une option inconnue rend exit 2", cli(["--inconnue"]).status === 2);
+    // MS4 (TF-1560) — le réglage de modèle du poste : nom de famille attendu, identifiant épinglé signalé.
+    const reglage = (nom, modele) => { const f = join(tmp, nom + ".json"); writeFileSync(f, JSON.stringify({ model: modele })); return f; };
+    const rEp = juger(refOk, new Map(), lireReglagesModele([reglage("epingle", "claude-opus-5-5[1m]")]));
+    verifier("rouge MS4 : « claude-opus-5-5[1m] » au réglage du poste est signalé (AVERT), jamais un échec", rEp.verdict === "PASS" && statut(rEp, "MS4")[0] === "AVERT" && rEp.findings.some((f) => f.regle === "MS4" && /opus\[1m\]/.test(f.message)));
+    const rFam = juger(refOk, new Map(), lireReglagesModele([reglage("famille", "opus[1m]"), reglage("famille-nue", "sonnet")]));
+    verifier("vert MS4 : le nom de famille (opus[1m], sonnet) ne dit rien", statut(rFam, "MS4")[0] === "PASS" && statut(rFam, "MS4").length === 1);
+    const rVoulu = juger({ ...refOk, reglages_epingles_voulus: ["claude-opus-5-5"] }, new Map(), lireReglagesModele([reglage("voulu", "claude-opus-5-5[1m]")]));
+    verifier("vert MS4 : un épinglage déclaré au référentiel (remède de l'option b) passe", statut(rVoulu, "MS4")[0] === "PASS");
+    verifier("vert MS4 : aucun réglage lu rend MS4 sans objet", statut(juger(refOk, new Map(), []), "MS4")[0] === "SANS_OBJET");
+    verifier("vert MS4 : sans réglages passés au jugement (appel historique), MS4 ne produit rien", statut(juger(refOk, new Map()), "MS4").length === 0);
+    const cEp = cli(["--referentiel", fRef, "--modele", "claude-opus-5-5", "--reglages", reglage("cli", "claude-opus-5-5[1m]"), "--json"]);
+    let jEp = null; try { jEp = JSON.parse(cEp.stdout); } catch { jEp = null; }
+    verifier("rouge MS4 de bout en bout : --reglages sur un identifiant épinglé, AVERT nommant le fichier, exit 0", cEp.status === 0 && jEp && jEp.findings.some((f) => f.regle === "MS4" && f.statut === "AVERT" && /cli\.json/.test(f.message)));
   } finally { rmSync(tmp, { recursive: true, force: true }); }
   for (const c of cas) console.log(`  [${c.ok ? "PASS" : "FAIL"}] ${c.nom}`);
   const ok = cas.filter((c) => c.ok).length;

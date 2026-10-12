@@ -96,6 +96,10 @@ section « Routage forge » est obligatoire et remplie : c'est elle qui garantit
 sessions ad hoc dans le produit passent par les forges pour tout verdict — tests, évolution,
 déploiement — la boucle intérieure restant libre), le `README.md`, puis `git init -b main` +
 commit initial — commits locaux à chaque étape, **remote/push sur GO humain seulement**.
+Un verdict de porte cité dans un message de commit s'écrit en pied de message, `Verdict: <commande> => exit <N>`
+(`; contient "19/19"` pour un compte), et se rejoue AVANT l'envoi sur une copie propre du commit, jamais sur
+l'arbre de travail : `node <pilot>\scripts\rejouer-verdicts-cites.mjs --depot . --plage origin/main..HEAD`
+(TF-1400 : « 19/19 » au poste, 18/19 sur le commit propre, parce que la porte lisait un fichier que git ignore).
 Créer aussi `forge\retours\` avec une copie de `gabarits\RETOURS-FORGES.md` (le canal de
 retours du produit — règle 18) — et la **RECOPIER à chaque ouverture de run**, jamais
 seulement à la création. TF-0502 (22/08) : trois lots d'un même produit ont été refusés par

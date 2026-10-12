@@ -97,7 +97,11 @@ décision, l'omettre est un oubli (loi n° 3).
   **aucun livrable publié sur un service hébergé** — artifact, page web, partage cloud —
   **sans GO humain préalable consigné** : un livrable est un fichier autoportant sur
   disque, chez le produit, et le retrait d'une publication fautive est un geste humain
-  consigné R-38).
+  consigné R-38). **Ne jamais proposer une publication hébergée comme option d'une question de
+  livraison** (« Fichier + Artifact privé (recommandé) » a coûté une page publiée le 03/10/2026,
+  RT-117) : la livraison est le fichier sur disque. Le hook `PreToolUse` sur `Artifact` refuse
+  toute publication sans GO consigné (`FORGE_PUBLICATION_GO="D-N (x) du JJ/MM"` posé par
+  l'humain avant la session, ou une entrée `go_publication` au ledger).
 - `docs\projet\` (R-20) : TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES,
   FONCTIONNEL, ARCHITECTURE, MODELE-DONNEES (+ vues ARCHITECTURE.html et MODELE-DONNEES.html
   générées par les scripts du pilot, jamais éditées) — vues à sources de vérité déclarées
