@@ -301,6 +301,50 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   rmSync(B, { recursive: true, force: true });
 }
 
+// TF-1610 (12/10/2026) — CHEZ UN PRODUIT, `input\` EST EN LECTURE SEULE : aucun README n'est posé
+// dans un sous-dossier d'entrants que le run n'a pas lui-même doté d'un README. Le fait : 458 README
+// créés dans une arborescence de médias de l'humain (5 187 fichiers). Sens rouge : le même arbre sans
+// `forge\` reçoit ses README ; sens vert : le sous-dossier déjà doté d'un README reste indexé.
+{
+  const arbre = (avecForge) => {
+    const B = mkdtempSync(join(tmpdir(), avecForge ? "readme-ro-produit-" : "readme-ro-publiable-"));
+    if (avecForge) mkdirSync(join(B, "forge"), { recursive: true });
+    mkdirSync(join(B, "output"), { recursive: true });
+    mkdirSync(join(B, "input", "Media", "2026", "juin"), { recursive: true });
+    mkdirSync(join(B, "input", "notes", "sous"), { recursive: true });
+    writeFileSync(join(B, "input", "Media", "2026", "juin", "photo.txt"), "x\n", "utf8");
+    writeFileSync(join(B, "input", "notes", "n.md"), "# Note\n", "utf8");
+    writeFileSync(join(B, "input", "notes", "README.md"), "# input\\notes\\\n\n<!-- ROLE:DEBUT -->\nNotes du run.\n<!-- ROLE:FIN -->\n", "utf8");
+    writeFileSync(join(B, "input", "notes", "sous", "s.md"), "# S\n", "utf8");
+    spawnSync(process.execPath, [OUTIL, "--base", B, "--racines", "input,output"], { encoding: "utf8" });
+    return B;
+  };
+  const P = arbre(true);
+  check("TF-1610 vert — chez un produit, aucun README dans les sous-dossiers d'entrants sans README", () => {
+    for (const rel of [["Media"], ["Media", "2026"], ["Media", "2026", "juin"], ["notes", "sous"]])
+      if (existsSync(join(P, "input", ...rel, "README.md"))) throw new Error(`README posé dans input\\${rel.join("\\")}`);
+    if (!existsSync(join(P, "input", "README.md"))) throw new Error("le README de input\\ lui-même a disparu");
+  });
+  check("TF-1610 vert — le sous-dossier déjà doté d'un README reste indexé, et la table dit ce qui n'est pas indexé", () => {
+    const t = readFileSync(join(P, "input", "README.md"), "utf8");
+    if (!/\]\(notes\/README\.md\)/.test(t)) throw new Error("le sous-dossier doté d'un README n'est plus lié");
+    if (!/Media.*non indexé \(1 fichier\)/.test(t)) throw new Error("la table ne dit pas que Media n'est pas indexé");
+    if (/\]\(Media\/README\.md\)/.test(t)) throw new Error("lien mort vers un README de Media");
+  });
+  check("TF-1610 — un second passage ne réécrit rien (idempotence) et --check passe", () => {
+    const r = spawnSync(process.execPath, [OUTIL, "--base", P, "--racines", "input,output", "--check"], { encoding: "utf8" });
+    // le rôle de input\ et output\ est vide chez un produit : seul ce défaut-là est admis
+    const autres = (r.stderr || "").split("\n").filter((l) => /^\s*-/.test(l) && !/rôle non rédigé/.test(l));
+    if (autres.length) throw new Error(`défauts inattendus : ${autres.join(" | ")}`);
+  });
+  const B = arbre(false);
+  check("TF-1610 rouge — le même arbre SANS forge\\ reçoit ses README partout (le défaut d'origine)", () => {
+    if (!existsSync(join(B, "input", "Media", "2026", "juin", "README.md"))) throw new Error("la règle mord hors des produits");
+  });
+  rmSync(P, { recursive: true, force: true });
+  rmSync(B, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
 rmSync(TABLES, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);

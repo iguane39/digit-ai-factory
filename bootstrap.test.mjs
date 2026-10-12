@@ -85,6 +85,49 @@ try {
   attendre("retard avec --pull", lancer("--pull"), 0, /mis à jour/);
   if (!existsSync(join(racine, FORGES[0].nom, "NOUVEAU.md"))) echecs.push("--pull : le commit distant n'est pas arrivé");
 
+  // 2 bis. TF-1612 — LE FICHIER QUI BLOQUE UN PULL SE NOMME ; UN JOURNAL APPEND-ONLY SEUL EN CAUSE SE
+  // RÉCONCILIE. Rouge : une modification locale d'un fichier ordinaire que l'origin a aussi modifié
+  // refuse le pull, et le défaut NOMME ce fichier. Vert : le remède dit (remettre le fichier) se joue
+  // et le pull passe. Journal : une ligne locale non publiée dans todo/HERITAGE-RELEVES.jsonl ne
+  // bloque plus, et la ligne locale est conservée après la ligne publiée.
+  {
+    const clone = join(racine, FORGES[0].nom);
+    const poussé = (fichier, contenu, msg) => { writeFileSync(join(w, fichier), contenu); git(w, "add", "-A"); git(w, "commit", "--quiet", "-m", msg); git(w, "push", "--quiet", "origin", "main"); };
+    poussé("NOUVEAU.md", "x2\n", "v2");
+    writeFileSync(join(clone, "NOUVEAU.md"), "local\n");
+    const r = lancer("--pull");
+    attendre("TF-1612 rouge : un fichier ordinaire bloque le pull", r, 1, /pull impossible/);
+    if (!/fichier\(s\) qui bloque\(nt\) : NOUVEAU\.md/.test(r.stdout)) echecs.push("TF-1612 : le défaut ne NOMME pas le fichier qui bloque le pull");
+    git(clone, "checkout", "--", "NOUVEAU.md");
+    attendre("TF-1612 vert : le remède dit (remettre le fichier) fait passer le pull", lancer("--pull"), 0, /mis à jour/);
+    mkdirSync(join(w, "todo"), { recursive: true });
+    poussé("todo/HERITAGE-RELEVES.jsonl", '{"n":"publie-1"}\n', "journal 1");
+    attendre("TF-1612 : le journal arrive", lancer("--pull"), 0, /mis à jour/);
+    poussé("todo/HERITAGE-RELEVES.jsonl", '{"n":"publie-1"}\n{"n":"publie-2"}\n', "journal 2");
+    writeFileSync(join(clone, "todo", "HERITAGE-RELEVES.jsonl"), '{"n":"publie-1"}\n{"n":"local-3"}\n');
+    const j = lancer("--pull");
+    attendre("TF-1612 vert : un journal append-only seul en cause ne bloque plus le pull", j, 0, /journal\(aux\) append-only rejoué\(s\)/);
+    const lignes = (existsSync(join(clone, "todo", "HERITAGE-RELEVES.jsonl")) ? (await import("node:fs")).readFileSync(join(clone, "todo", "HERITAGE-RELEVES.jsonl"), "utf8") : "").split(/\r?\n/).filter(Boolean);
+    if (lignes.join("|") !== '{"n":"publie-1"}|{"n":"publie-2"}|{"n":"local-3"}') echecs.push(`TF-1612 : journal réconcilié incorrect — ${lignes.join("|")}`);
+    // Le journal local est enregistré pour que la suite de la recette retrouve un dépôt propre.
+    git(clone, "checkout", "--", "todo/HERITAGE-RELEVES.jsonl");
+
+    // 2 ter. TF-1200 — LE RELEVÉ DATE CE QUI N'EST PAS ENREGISTRÉ. Un fichier modifié il y a 5 jours est
+    // dit « 5 j » ; un README généré est compté à part, jamais daté ; un dépôt propre ne dit rien.
+    const vieux = join(clone, "NOUVEAU.md");
+    writeFileSync(vieux, "ancien travail\n");
+    const il5j = new Date(Date.now() - 5 * 24 * 3600 * 1000);
+    (await import("node:fs")).utimesSync(vieux, il5j, il5j);
+    writeFileSync(join(clone, "README.md"), "# index généré\n");
+    const d = lancer();
+    attendre("TF-1200 : un dépôt sale est daté, forge = avertissement", d, 0, /modification\(s\) locale\(s\) non enregistrée\(s\), dont 1 généré\(s\) ou sceau\(x\), non daté\(s\) ; le plus ancien fichier non généré date de 5 j \(NOUVEAU\.md\)/);
+    git(clone, "checkout", "--", "NOUVEAU.md");
+    unlinkSync(join(clone, "README.md"));
+    const propre = lancer();
+    joues += 1;
+    if (/non enregistrée/.test(propre.stdout)) echecs.push("TF-1200 : un dépôt propre est signalé non enregistré");
+  }
+
   // 3. dossier hérité à l'ancien nom
   const neuf = join(racine, "digit-ai-forge-seo-geo"), vieux = join(racine, "digit-ai-forge-seo");
   if (existsSync(neuf)) {

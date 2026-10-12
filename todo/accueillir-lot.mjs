@@ -61,6 +61,7 @@ import { anonymiser, pseudoProduit, EST_EMETTEUR_FORGE } from "./anonymiser-entr
 import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 import { aQualifier as adressesAQualifier, messageAQualifier } from "./adresses-ip.mjs";
 import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
+import { aQualifier as designationsAQualifier, messageAQualifier as messageDesignations } from "./designation-projet.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const BOITE = join(ICI, "..", "input", "00-retours");
@@ -166,6 +167,8 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false, ra
     const adresses = adressesAQualifier([nomPropre.texte, contenu.texte]);
     // TF-1357 (26/09/2026) : les noms de personnes, même modèle — nommés, jamais refusés.
     const personnes = personnesAQualifier([nomPropre.texte, contenu.texte]);
+    // TF-1540 (12/10/2026) : la forme par laquelle le lot désigne son projet et qu'aucune table ne connaît.
+    const designations = designationsAQualifier([nomPropre.texte, contenu.texte]);
 
     if (existsSync(cible)) {
       refuses.push({ fichier: nom, motif: "un lot du même nom existe déjà dans la boîte suivie — "
@@ -174,7 +177,7 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false, ra
     }
     if (essai) {
       faits.push({ de: nom, vers: nomPropre.texte, nom_reecrit: nomPropre.texte !== nom,
-        contenu_reecrit: contenu.texte !== brut, ecrit: false, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes,
+        contenu_reecrit: contenu.texte !== brut, ecrit: false, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes, designations_a_qualifier: designations,
         // TF-1289 : en essai, rien n'est inscrit — ce drapeau dit seulement qu'un geste réel le ferait.
         produit_neuf_a_inscrire: Boolean(prefixeProduit && possiblementInconnuDesTables(prefixeProduit)) });
       continue;
@@ -183,7 +186,7 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false, ra
     writeFileSync(cible, contenu.texte, "utf8");
     rmSync(source);
     faits.push({ de: nom, vers: nomPropre.texte, nom_reecrit: nomPropre.texte !== nom,
-      contenu_reecrit: contenu.texte !== brut, ecrit: true, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes,
+      contenu_reecrit: contenu.texte !== brut, ecrit: true, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes, designations_a_qualifier: designations,
       produit_neuf_inscrit: produitInscrit });
   }
   return { arrivee, boite, en_attente: entrants.length, faits, refuses };
@@ -268,6 +271,20 @@ async function selfTest() {
     if (!/^Produit-\d+/.test(fait8.vers)) casse.push("le nom déposé n'est pas devenu un pseudonyme : " + fait8.vers);
   }
 
+  // 9) TF-1540 (12/10/2026) — LA FORME PAR LAQUELLE UN LOT DÉSIGNE SON PROJET ET QU'AUCUNE TABLE NE
+  // CONNAÎT est relevée à l'accueil, dans les deux sens. Rouge : une forme inconnue (inventée) qui
+  // « tient une séquence » ressort à `designations_a_qualifier`, et le lot est quand même accueilli
+  // (avertissement, jamais un refus). Vert : un pseudonyme qui tient une séquence ne déclenche rien.
+  writeFileSync(join(arr, "Produit-12 - RETOURS - 20261012a.md"), "**Numérotation** : ZQX7 tient une séquence RT-nn.\n", "utf8");
+  writeFileSync(join(arr, "Produit-13 - RETOURS - 20261012a.md"), "**Numérotation** : Produit-13 tient une séquence RT-nn.\n", "utf8");
+  const r9 = accueillir({ arrivee: arr, boite: bo });
+  const f9a = r9.faits.find((x) => x.de.startsWith("Produit-12")), f9b = r9.faits.find((x) => x.de.startsWith("Produit-13"));
+  if (!f9a || !f9b) casse.push("TF-1540 : un lot porteur d'une désignation n'est pas accueilli — le relevé ne doit jamais refuser");
+  else {
+    if (JSON.stringify(f9a.designations_a_qualifier) !== '["ZQX7"]') casse.push("TF-1540 : la désignation inconnue n'est pas relevée : " + JSON.stringify(f9a.designations_a_qualifier));
+    if ((f9b.designations_a_qualifier || []).length) casse.push("TF-1540 : un pseudonyme qui tient une séquence est relevé à tort");
+  }
+
   // 5) et 6) L'ANALYSE DES ARGUMENTS, DANS SES DEUX SENS (17/09/2026). Le défaut s'est produit
   // DANS LA COUCHE CLI, pas dans `accueillir()` : le banc doit donc lancer le module comme un
   // outil. Les deux cas ne diffèrent que par l'argument — `--zzz` refuse, `--aide` explique — et
@@ -288,7 +305,7 @@ async function selfTest() {
 
   rmSync(T, { recursive: true, force: true });
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289) : ${8 - casse.length}/8 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289, TF-1540) : ${9 - casse.length}/9 cas, ${casse.length} FAIL`);
   return casse.length ? 1 : 0;
 }
 
@@ -336,6 +353,8 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   for (const f of r.faits) { const m = messageAQualifier(f.adresses_ip_a_qualifier || [], f.vers); if (m) console.error(m); }
   // TF-1357 : les noms de personnes, de même — nommés à l'écran, lot par lot, jamais écrits ailleurs.
   for (const f of r.faits) { const m = messagePersonnes(f.noms_de_personnes_a_qualifier || [], f.vers); if (m) console.error(m); }
+  // TF-1540 : la désignation du projet par le lot, de même — nommée à l'écran, jamais écrite ailleurs.
+  for (const f of r.faits) { const m = messageDesignations(f.designations_a_qualifier || [], f.vers); if (m) console.error(m); }
   console.log(JSON.stringify({ ...r, message: r.en_attente
     ? `${r.faits.length} lot(s) accueilli(s), ${r.refuses.length} refusé(s)`
     : "rien n'attend dans l'arrivée" }, null, 1));

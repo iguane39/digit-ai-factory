@@ -73,7 +73,21 @@ const CHEMIN_PRODUITS = () => cheminsTables(RACINE).produits;
 // le sigle en minuscules — et la porte le refusait juste après. Deux contrôles du même sujet
 // qui ne s'accordent pas sur la casse donnent le pire des deux mondes : le nettoyage se croit
 // fini, et le refus tombe à la publication, quand il coûte le plus cher à comprendre.
-const bordé = (mot) => new RegExp(`(?<![A-Za-z0-9_])${mot.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z0-9_])`, "gi");
+// TF-1456 (campagne du 12/10/2026) — LES ACCENTS NE SONT PAS UNE FRONTIÈRE ET NE DISTINGUENT PAS DEUX
+// GRAPHIES D'UN MÊME NOM. Mesuré le 01/10 : un nom de produit écrit avec ses accents traversait
+// l'accueil, l'ingestion et le hook de commit, alors que la même forme sans accent était substituée.
+// La tolérance est dans l'EXPRESSION, pas dans le texte : replier le texte changerait ses longueurs
+// et décalerait toute substitution. Chaque lettre qui porte une forme accentuée accepte la lettre
+// nue, ses formes précomposées et la forme décomposée (lettre + diacritique combinant).
+const ACCENTS = { a: "àáâãäå", c: "ç", e: "èéêë", i: "ìíîï", n: "ñ", o: "òóôõö", u: "ùúûü", y: "ýÿ" };
+const echapperRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+export const plier = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const tolerantAccents = (mot) => [...String(mot)].map((c) => {
+  const base = plier(c).toLowerCase();
+  const formes = base.length === 1 ? ACCENTS[base] : undefined;
+  return formes ? `[${base}${formes}][\\u0300-\\u036f]*` : echapperRe(c);
+}).join("");
+const bordé = (mot) => new RegExp(`(?<![A-Za-z0-9_])${tolerantAccents(mot)}(?![A-Za-z0-9_])`, "gi");
 
 function lireClients() {
   const p = CHEMIN_CLIENTS();
@@ -105,12 +119,24 @@ function lireClients() {
  * non-alphanumériques. `null` quand la clé n'a qu'un mot (rien à dériver, et un mot seul en
  * toute casse mordrait sur de la prose) ou porte un point (graphie de domaine, prise telle quelle).
  */
-export function variantes(nom) {
+export function variantes(nom, { clients = null } = {}) {
   if (typeof nom !== "string" || nom.includes(".")) return null;
+  // TF-1456 : le POINT MÉDIAN (·) est un séparateur de graphie comme l'espace ou le tiret — un nom
+  // d'affichage « produit · client » traversait toutes les gardes parce que la table ne le dérivait pas.
   const mots = nom.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
-    .split(/[\s\-_]+/).filter(Boolean);
+    .split(/[\s\-_·]+/).filter(Boolean);
   if (mots.length < 2 || mots.join("").length < 8) return null;
-  const corps = mots.map((m) => m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[\\s\\-_]*");
+  const SEP = "[\\s\\-_·]*";
+  // TF-1456 : un mot de la clé qui est un NOM DE CLIENT s'accepte aussi sous son pseudonyme. Le texte
+  // peut avoir déjà passé par la table des clients : « produit · Client-A » doit encore être reconnu
+  // comme la clé « produit · <client> ». `clients` : Map(nom replié en minuscules → pseudonyme).
+  const segment = (m) => {
+    const pseudo = clients && clients.get(plier(m).toLowerCase());
+    const brut = tolerantAccents(m);
+    if (!pseudo) return brut;
+    return `(?:${brut}|${String(pseudo).split(/[\s\-_]+/).filter(Boolean).map(tolerantAccents).join(SEP)})`;
+  };
+  const corps = mots.map(segment).join(SEP);
   // Le SOULIGNÉ est une frontière d'identifiant, pas une frontière de mot (TF-0927, 08/09) :
   // écrites `[A-Za-z0-9]`, ces bornes laissaient `calc_<nom>_total` matcher, et la substitution
   // coupait l'identifiant que la garde du dessous venait de refuser de couper. Deux gardes du
@@ -425,6 +451,9 @@ export function anonymiser(texte, { code = false } = {}) {
   // courte ne trouve plus rien à couper. Il vaut aussi pour les clients ci-dessous, où le même
   // recouvrement existe (un sigle contenu dans un nom).
   const parLongueur = (a, b) => String(b[0]).length - String(a[0]).length;
+  // TF-1456 : nom de client replié (minuscules, sans accent) → pseudonyme, pour les variantes de clé.
+  const parNom = new Map();
+  for (const [de, vers] of clients.table) { const k = plier(de).toLowerCase(); if (!parNom.has(k)) parNom.set(k, vers); }
   for (const [nom, pseudo] of Object.entries(produits.produits || {}).sort(parLongueur)) {
     // TF-1457 : en dessous de SEUIL_MOT, la voie littérale est SAUTÉE — elle mordrait sur un mot
     // plus long qui contient le nom court, et sa garde contre les identifiants ne s'arme qu'en
@@ -441,7 +470,7 @@ export function anonymiser(texte, { code = false } = {}) {
     // donc de la clé : ses mots (frontières de casse, tirets, soulignés) peuvent être séparés par
     // rien, une espace, un tiret ou un souligné, en toute casse. Une clé qui porte un point est une
     // graphie de domaine et se prend telle quelle : la dériver attraperait des liens légitimes.
-    const re = variantes(nom);
+    const re = variantes(nom, { clients: parNom });
     if (re && re.test(out)) { out = out.replace(re, pseudo); remplaces.push(nom); }
     // TF-0826 (08/09/2026) — LA CASSE, POUR LES PRODUITS AUSSI, ET ELLE A DORMI SEPT JOURS.
     //
@@ -681,6 +710,32 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     if (!rCourt.texte.includes("xPRDx") || !rCourt.texte.includes("PRDx") || !rCourt.texte.includes("xPRD."))
       casse.push("TF-1457 : un nom court mord sur un mot plus long qui le contient (la voie littérale "
         + "a quand même agi) : " + rCourt.texte);
+  }
+
+  // 3 undecies) TF-1456 (campagne du 12/10/2026) — UNE CLÉ DE PRODUIT SE RECONNAÎT SOUS TOUTES SES
+  //            GRAPHIES : avec ou sans accents (précomposés ou décomposés), séparée par un point médian,
+  //            et avec sa partie client déjà pseudonymisée. Le défaut d'origine : un nom d'affichage
+  //            « produit · client » de 45 caractères et un nom accentué ont traversé l'accueil,
+  //            l'ingestion, le hook de commit et la porte, et sont entrés dans l'histoire publiée.
+  //            Sens verts : les six graphies ci-dessous reviennent sous le pseudonyme. Sens rouges :
+  //            un mot isolé de la clé, et la clé COLLÉE à des lettres, ne bougent pas.
+  {
+    const pK = pseudoProduit("Ventilation Éléphant Zorglub");
+    const graphies = [
+      "Ventilation Éléphant Zorglub", "ventilation elephant zorglub", "Ventilation · Éléphant · Zorglub",
+      "Ventilation · Éléphant · Client-A", "Ventilation Elephant Client-A",
+      "Ventilation Éléphant Zorglub".normalize("NFD"),
+    ];
+    for (const g of graphies) {
+      const r = anonymiser(`Le produit ${g} est livré.`);
+      if (r.texte !== `Le produit ${pK} est livré.`) casse.push(`TF-1456 : la graphie « ${g.normalize("NFC").replace(/Zorglub/gi, "<client>")} » traverse : ${r.texte}`);
+    }
+    const rIso = anonymiser("Un éléphant seul, une ventilation seule, et xventilation elephant zorglubx collés.");
+    if (rIso.texte.includes(pK)) casse.push("TF-1456 : un mot isolé ou une clé collée à des lettres est pris pour le produit : " + rIso.texte);
+    const pM = pseudoProduit("Éléphantine");
+    const rM = anonymiser("L'elephantine et l'ÉLÉPHANTINE, jamais dans xelephantinex.");
+    if ((rM.texte.match(new RegExp(pM, "g")) || []).length !== 2 || !rM.texte.includes("xelephantinex"))
+      casse.push("TF-1456 : une clé à un mot, sans accent dans le texte, n'est pas substituée aux deux graphies — ou mord dans un mot : " + rM.texte);
   }
 
   // 4) référentiel ABSENT → refus, jamais un passage silencieux
