@@ -33,8 +33,11 @@ const [nom, ...options] = process.argv.slice(2);
 // (references/ECRITURE.md, E-1..E-12) se rencontre au moment où l'on écrit : densités de tournures
 // creuses par famille, phrases longues en série, puces trop profondes, emphase de structure.
 // Avertit, ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture"]);
-if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture)`); process.exit(0); }
+// `publication-hebergee` (12/10/2026, TF-1592, retour RT-117) : hook PreToolUse sur l'outil Artifact —
+// R-38 (aucun livrable publié sur un service hébergé sans GO humain consigné) cesse d'être une phrase
+// que la session lit ou non : l'outil qui publie est refusé tant qu'aucun GO n'est consigné. Bloque.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee"]);
+if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee)`); process.exit(0); }
 
 const candidats = [
   process.env.FORGE_ROOT && join(process.env.FORGE_ROOT, "digit-ai-factory"),
