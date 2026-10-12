@@ -42,6 +42,10 @@
  *   TM7  les scripts du produit qui accordent un droit nomment des identifiants de permission
  *        Graph justes, ne masquent pas l'échec de l'octroi et relisent l'effet avant de l'annoncer
  *        — BLOQUANT (M-12, TF-1497), câblé sur `scripts\verifier-droits-accordes.mjs`.
+ *   TM8  les étapes de la chaîne du produit : un objet d'annuaire créé se lit avant d'être
+ *        complété, `az webapp auth` ne s'emploie pas sans extension déclarée, et le dossier porte
+ *        la section des étapes remises à l'exploitant — BLOQUANT (M-13, TF-1546, TF-1548,
+ *        TF-1549), câblé sur `scripts\verifier-etape-chaine.mjs`.
  *
  * TM5 EST UN CÂBLAGE BLOQUANT, ET LA DIFFÉRENCE AVEC TM4 EST VOULUE (TF-1498, 01/10/2026). Le
  * 30/09/2026, un feu vert de lancement reposait sur les portes de la veille : 3 avis de sécurité
@@ -217,6 +221,11 @@ const confronterDroitsAccordes = (racine) => confronterVerbe(racine, "verifier-d
   (j) => `${(j.mesure || {}).resolus || 0} identifiant(s) de permission Graph conforme(s) à la table du ${(j.table || {}).date}, `
     + `${(j.mesure || {}).octrois || 0} octroi(s) à l'échec visible et à l'effet relu`);
 
+/** TM8 — les étapes de chaîne : annuaire lu avant d'être complété, authV2 par l'API, section du dossier (M-13, TF-1546, TF-1548, TF-1549). */
+const confronterEtapeChaine = (racine) => confronterVerbe(racine, "verifier-etape-chaine.mjs", "M-13",
+  (j) => `${(j.mesure || {}).creations_annuaire || 0} création(s) d'objet d'annuaire lue(s) avant écriture, `
+    + `${(j.mesure || {}).ecritures_de_chaine || 0} fichier(s) de chaîne qui écrivent dans la plateforme, étapes remises déclarées au dossier`);
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -306,6 +315,9 @@ export function juger(racine) {
   // TM7 — les scripts du produit, jugés hors ligne contre la table officielle datée.
   const da = confronterDroitsAccordes(racine);
   findings.push({ regle: "TM7", statut: da.statut, ou: racine, message: da.message });
+  // TM8 — la chaîne du produit et son dossier, jugés ensemble par le verbe.
+  const ec = confronterEtapeChaine(racine);
+  findings.push({ regle: "TM8", statut: ec.statut, ou: racine, message: ec.message });
   return findings;
 }
 
@@ -481,6 +493,29 @@ function selfTest() {
     if (r.status !== 1) casse.push("un script qui accorde un droit sur un identifiant de mémoire ne met pas l'oracle en échec — TM7 devait bloquer");
   }
 
+  // ---- TM8 : LES ÉTAPES DE CHAÎNE (M-13, TF-1546, TF-1548, TF-1549) ------------------------------
+  // L'étape du cas fondateur du 01/10/2026 : fiche créée puis écrite aussitôt, `az webapp auth update --set`.
+  const avecEtape = (racine, remede) => {
+    mkdirSync(join(racine, "infra"), { recursive: true });
+    writeFileSync(join(racine, "infra", "fiche-entra.sh"), remede
+      ? ["APP_ID=$(az ad app create --display-name x --query appId -o tsv)", "for i in $(seq 1 12); do az ad app show --id \"$APP_ID\" -o none && break; sleep 10; done",
+        "az ad app update --id \"$APP_ID\" --set web.redirectUris=u", ""].join("\n")
+      : ["APP_ID=$(az ad app create --display-name x --query appId -o tsv)", "az ad app update --id \"$APP_ID\" --set web.redirectUris=u",
+        "az webapp auth update -g g -n a --set identityProviders.azureActiveDirectory.enabled=true", ""].join("\n"), "utf8");
+    return racine;
+  };
+  // SANS OBJET : ni objet d'annuaire créé, ni az webapp auth, ni chaîne qui écrit.
+  attendre("tm8-sans-objet", join(dir, "vert"), "TM8", "SANS_OBJET");
+  // VERT : l'objet lu en boucle avant d'être complété.
+  attendre("tm8-remede", avecEtape(produit("tm8-remede", DOSSIER_OK, MARQUEUR), true), "TM8", "PASS");
+  // ROUGE : le cas fondateur — la fiche écrite aussitôt créée, l'authentification par az webapp auth.
+  const etape = avecEtape(produit("tm8-etape", DOSSIER_OK, MARQUEUR), false);
+  attendre("tm8-etape", etape, "TM8", "FAIL");
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), etape], { encoding: "utf8" });
+    if (r.status !== 1) casse.push("une fiche d'annuaire écrite aussitôt créée ne met pas l'oracle en échec — TM8 devait bloquer");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -490,7 +525,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 24/24 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 28/28 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -503,7 +538,9 @@ function selfTest() {
       + "dossier conçu sans relevé FAIL — le cas fondateur du 21/09/2026 ; TM6 bloque, code de sortie 1 vérifié ; "
       + "TM7 sans identifiant Graph ni octroi SANS_OBJET ; TM7 identifiant officiel, échec visible et effet relu "
       + "PASS ; TM7 identifiant de mémoire, ajout masqué et « consentie » sans relecture FAIL — le cas fondateur "
-      + "du 16/09/2026 ; TM7 bloque, code de sortie 1 vérifié)");
+      + "du 16/09/2026 ; TM7 bloque, code de sortie 1 vérifié ; TM8 sans objet SANS_OBJET ; TM8 objet lu en boucle "
+      + "avant d'être complété PASS ; TM8 fiche écrite aussitôt créée et az webapp auth FAIL — le cas fondateur "
+      + "du 01/10/2026 ; TM8 bloque, code de sortie 1 vérifié)");
   return casse.length ? 1 : 0;
 }
 

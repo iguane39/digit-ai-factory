@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-12 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-13 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -244,6 +244,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-10 | **Portes à base externe, rejouées le jour du lancement** | **si et seulement si** la chaîne du produit joue une porte qui juge une base externe (avis de dépendances, base de vulnérabilités, dépôt de paquets). Le feu vert du dossier de MEP porte la sortie de chacune, rejouée le jour même du lancement sur l'objet lancé, jamais le verdict de la qualification. Contrôle exécutable : `node scripts\verifier-portes-du-jour.mjs <produit>`, joué en TM5 par `oracle-trace-mutation-mep` — § 3 nonies, TF-1498 |
 | M-11 | **Garde-fous de la plateforme relevés, contraintes connues relues** | **si et seulement si** le produit déploie sur une plateforme à stratégies (Azure Policy) ou porte une contrainte « Obligatoire ici ». Le dossier de MEP porte le relevé daté des stratégies de la portée cible, fait AVANT de concevoir l'ordre de déploiement. Il cite chaque contrainte connue avec son verdict contre la séquence retenue : commentaire d'un environnement, entrée du registre de la factory, parole de l'humain mot pour mot. Contrôle exécutable : `node scripts\verifier-garde-fous.mjs <produit>`, joué en TM6 par `oracle-trace-mutation-mep` — § 1 ter, TF-1495 et TF-1496 |
 | M-12 | **Scripts qui accordent un droit** | **si et seulement si** le produit porte un script ou une chaîne qui accorde un droit, ou qui nomme une permission Microsoft Graph. Chaque identifiant de permission Graph est celui de la table officielle datée, sous son nom et son type ; l'échec d'un octroi reste visible ; l'effet est relu dans la plateforme avant d'être annoncé. Contrôle exécutable : `node scripts\verifier-droits-accordes.mjs <produit>`, joué en TM7 par `oracle-trace-mutation-mep` — § 3 octies, TF-1497 |
+| M-13 | **Étapes de chaîne** | **si et seulement si** la chaîne du produit crée un objet d'annuaire, touche à `az webapp auth` ou écrit dans la plateforme. Un objet créé se lit avant d'être complété ; l'authentification se lit et s'écrit par l'API `authsettingsV2` ; le dossier porte la section « Étapes de chaîne remises à l'exploitant » (exécuté hors production et daté, écritures à blanc avec leur différence, branches que seule la production exécute). Contrôle exécutable : `node scripts\verifier-etape-chaine.mjs <produit>`, joué en TM8 par `oracle-trace-mutation-mep` ; sondage du formulaire Entra : `scripts\verifier-formulaire-entra.mjs` — § 3 decies, TF-1519, TF-1543, TF-1546 à TF-1549 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -507,6 +508,90 @@ un lancement du soir n'est pas vue, la règle est le jour. La justesse du verdic
 tableau : le contrôle lit la date et l'objet, il ne rejoue aucune porte. Une porte que la chaîne
 appelle sans la nommer, par un script ou par un gabarit tiré d'un autre dépôt : ce dernier cas est
 signalé, jamais tenu pour une absence de porte.
+
+### § 3 decies — Une étape de déploiement vit dans la chaîne, se joue avant d'être remise et se referme seule (M-13, TF-1519, TF-1543, TF-1546, TF-1547, TF-1548, TF-1549)
+
+**Le fait, du 30/09 au 01/10/2026 chez Produit-03.** Une livraison de production est déclarée
+réussie sur une adresse qui répond AADSTS700038 (l'application Entra n'existe pas, aucun formulaire
+ne peut s'afficher). Le lendemain, l'étape « Fiche Entra » est conçue : la restitution propose
+3 options qui la font créer par un script que la session lance, le commanditaire répond « cette
+étape doit être dans le pipeline » (7e aller-retour du jour). Remise à l'exploitant après
+compilation par Azure DevOps, contrôle de syntaxe et relecture, aucune de ses commandes n'avait
+tourné. Elle s'arrête à l'exécution 15803 : `az ad app update` suit `az ad app create` de moins
+d'une seconde, et Entra n'a pas répliqué la fiche. La revue trouve en plus `az webapp auth update
+--set`, refusé par l'agent faute de l'extension authV2, dont l'absence était mesurée depuis le 22/08
+dans un commentaire d'un autre script. Enfin l'exploitant accorde la permission à l'écran avant le
+guetteur de la chaîne, qui ne referme que ce qu'il a ouvert : l'autorisation reste ouverte de 16h29 à
+16h32 sur une connexion à droits étendus.
+
+**6 règles, pour toute étape de déploiement ou de mise en service.**
+
+1. **Automatique veut dire dans la chaîne, rejouable par l'exploitant** (loi 5, TF-1543). Un script
+   que la session lance (ouvrir une autorisation, exécuter, refermer) n'est pas la voie
+   automatique : l'exploitant ne peut pas le rejouer. Une restitution propose d'abord un étage de la
+   chaîne, rejouable seul par un paramètre de la chaîne de livraison, et apporte la preuve que la
+   chaîne compilée sans cet étage reste identique (aperçu de la plateforme sur chaque
+   environnement). Elle ne pose pas d'option « la session lance le script ».
+2. **Un objet d'annuaire créé n'est pas complété avant d'être lisible** (TF-1546). Après `az ad app
+   create` ou `az ad group create`, la chaîne lit l'objet en boucle (12 essais, 10 s d'écart) jusqu'à
+   ce qu'il réponde, puis l'écrit. La création de l'application d'entreprise (`az ad sp create`)
+   se réessaie (6 essais). Entra réplique une fiche neuve en quelques secondes ; une chaîne qui
+   trouvait toujours la fiche déjà présente n'avait jamais heurté ce délai.
+3. **Une leçon d'outillage mesurée sur l'agent s'écrit ici, jamais en commentaire seul** (TF-1548).
+   Avant d'écrire une commande dans une étape, on la rejoue comme sur l'agent : les arguments de
+   l'étape, avec `AZURE_EXTENSION_DIR` pointé sur un dossier vide, sur une cible hors production.
+   La table ci-dessous est la mémoire commune ; une leçon nouvelle y entre le jour où elle est mesurée.
+
+   | Leçon | Mesurée | Règle |
+   |---|---|---|
+   | L'agent hébergé n'a pas l'extension authV2 : `az webapp auth` retombe sur la première génération du réglage et refuse `--set` | 22/08/2026 puis 01/10/2026, Produit-03, avec `AZURE_EXTENSION_DIR` vide | lire et écrire le réglage par l'API `Microsoft.Web/sites/config/authsettingsV2` (`az rest --method get|put`), jamais par `az webapp auth` ; une extension mesurée présente se déclare en commentaire daté au-dessus de la commande |
+
+4. **Une fenêtre d'autorisation se referme à la fin de l'exécution, quel que soit qui l'a ouverte**
+   (TF-1547). La fermeture est inconditionnelle (`condition: always()`, `finally`, `trap … EXIT`),
+   elle ne dépend pas de ce que le guetteur a ouvert lui-même, et l'état se relit ensuite, dans le
+   journal de l'exécution. Si l'exploitant accorde la permission à l'écran, la fenêtre reste à
+   refermer par la chaîne. La procédure remise à l'exploitant dit ce qu'il fait de cet écran : soit
+   il ne l'accorde pas et la chaîne ouvre sa fenêtre, soit il l'accorde et le dit dans l'exécution.
+   Le constat est à transmettre au produit concerné, qui porte le mécanisme.
+5. **Une étape de chaîne n'est pas remise sur sa compilation** (TF-1549). Le dossier de MEP porte
+   une section « Étapes de chaîne remises à l'exploitant » : les commandes exécutées hors production
+   sur un client semblable à l'agent, avec la date ; chaque écriture de production jouée à blanc
+   (`what-if`, `--dry-run`, `terraform plan`) avec sa différence ; la liste des branches que seule la
+   production exécutera, « aucune » se déclarant. Le 01/10, la branche de création de la fiche ne
+   pouvait tourner qu'en production (les fiches de développement et de qualification existaient).
+6. **Une livraison sur Easy Auth + Entra n'est pas déclarée réussie sans avoir sondé le formulaire de
+   la première visite** (TF-1519). `node scripts\verifier-formulaire-entra.mjs <adresse>` suit la
+   redirection d'Easy Auth, rejoue l'autorisation d'Entra avec `prompt=none` : Entra ne répond
+   `login_required` ou `consent_required` que si l'identifiant d'application et l'adresse de retour
+   sont reconnus, sinon il répond AADSTS et aucun formulaire n'existe. Le verdict de chaque
+   adresse livrée se cite au dossier.
+
+**La forme, au dossier de MEP** :
+
+```
+## Étapes de chaîne remises à l'exploitant
+
+Exécuté hors production le 2026-10-01 sur un client semblable à l'agent (AZURE_EXTENSION_DIR vide) : az ad app show, az rest --method get …/authsettingsV2.
+Écritures de production jouées à blanc : terraform plan, différence : 1 réglage ajouté, aucun retiré.
+Branches que seule la production exécute : création de la fiche Entra (les fiches de développement et de qualification existent).
+```
+
+**Les contrôles exécutables.** `node scripts\verifier-etape-chaine.mjs <produit>` refuse 3 défauts :
+un objet d'annuaire créé puis écrit sans lecture ni attente (EC-1) ; un `az webapp auth` sans
+extension déclarée (EC-2) ; une chaîne qui écrit dans la plateforme sans la section ci-dessus ou avec
+une section sans exécution datée, sans écriture à blanc ou sans liste des branches propres à la
+production (EC-4). L'oracle de l'étape le joue en TM8 et son refus bloque. Le même verbe, en mode
+`--restitution <fichier>`, signale une option qui fait lancer par la session un script de
+déploiement (EC-5) : il se joue à la main sur la restitution avant de la remettre. Le sondage du
+formulaire (règle 6) est `scripts\verifier-formulaire-entra.mjs`, hors TM8 parce qu'il vise une
+adresse et non un dépôt.
+
+**Hors jugement, et c'est dit.** La règle 4 (EC-3) : l'état d'une autorisation vit dans la
+plateforme, aucun contrôle hors ligne ne la lit. La création et l'écriture placées dans deux fichiers
+ou deux étages différents : EC-1 lit 30 lignes d'un même fichier. La véracité de ce que le dossier
+déclare exécuté : EC-4 exige la déclaration, pas la preuve. L'approbation du formulaire elle-même :
+la lire demande une session `az` connectée. L'en-tête de la sonde Entra (jeton Firefox mesuré par le
+produit, déclaré en plus par `X-Sonde`) n'a pu être rejoué depuis le pilot.
 
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
