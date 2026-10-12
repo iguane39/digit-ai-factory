@@ -637,9 +637,9 @@ try {
       + "  - si rien n'est fait : les campagnes ne sont pas publiées.\n";
     const GUIDE = "## Guide — importer les campagnes dans Google Ads\n\n"
       + "Source : `support.google.com/google-ads`, lue le 27/09/2026.\n\n"
-      + "1. Ouvrez Outils, puis Actions groupées, puis Importations. Ce que vous devez voir : la liste des importations passées.\n"
-      + "2. Déposez le fichier et cliquez sur « Aperçu ». Ce que vous devez voir : les modifications acceptées, et zéro erreur.\n"
-      + "3. Cliquez sur « Appliquer ». Ce que vous devez voir : l'importation marquée terminée.\n\n"
+      + "1. Ouvrez Outils, puis Actions groupées, puis Importations. Résultat attendu : la liste des importations passées.\n"
+      + "2. Déposez le fichier et cliquez sur « Aperçu ». Résultat attendu : les modifications acceptées, et zéro erreur.\n"
+      + "3. Cliquez sur « Appliquer ». Résultat attendu : l'importation marquée terminée.\n\n"
       + "## 0. Synthèse d'ouverture\n\n";
     const rougeTexte = BON + ACTION_ADS;
     const verteTexte = GUIDE + BON + ACTION_ADS + "  - source : `support.google.com/google-ads`, lue le 27/09/2026.\n";
