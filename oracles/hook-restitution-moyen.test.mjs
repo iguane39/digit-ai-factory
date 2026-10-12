@@ -93,6 +93,10 @@ try {
     outil("PowerShell", { command: "Get-ChildItem 2>$null" }),
     outil("Agent", { subagent_type: "Explore", prompt: "cherche" }),
     outil("mcp__claude_ai_Gmail__search_threads", { q: "x" }),
+    // TF-1418 (12/10/2026) : une copie vers le dossier temporaire de la session, nommé par son chemin ou sa variable.
+    outil("Bash", { command: `cp oracles/hook-restitution.mjs "$TEMP/copie.mjs"` }),
+    outil("Bash", { command: `git show HEAD:x.md > /dev/null; cp x.md ${join(tmpdir(), "x.md").replace(/\\/g, "/")}` }),
+    outil("PowerShell", { command: "Copy-Item x.md -Destination $env:TEMP\\x.md" }),
   ];
   const e0 = detecterEffets(epargnes);
   check("4 détecteur : temporaire, néant, flèche, Explore, lecture connectée → aucun effet", e0.length === 0, e0.join(" ; "));
@@ -104,6 +108,10 @@ try {
     [outil("PowerShell", { command: "Remove-Item x.md -Confirm:$false" }), /Remove-Item/],
     [outil("mcp__claude_ai_Gmail__send_message", { to: "x" }), /outil connecté/],
     [outil("Agent", { subagent_type: "general-purpose", prompt: "corrige" }), /Agent lancé/],
+    // TF-1418 : la copie hors du temporaire reste un effet, et une source temporaire ne suffit pas.
+    [outil("Bash", { command: "cp x.md references/x.md" }), /« cp »/],
+    [outil("Bash", { command: "cp /tmp/x.md references/x.md" }), /« cp »/],
+    [outil("Bash", { command: "cp x.md /tmp/x.md && git commit -m y" }), /git commit/],
   ];
   for (const [o, re] of releves) {
     const e = detecterEffets([o]);

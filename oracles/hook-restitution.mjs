@@ -160,6 +160,23 @@ const TEMPORAIRE = (p) => {
   const t = tmpdir().replace(/\\/g, "/").toLowerCase();
   return Boolean(n) && (n.startsWith(t + "/") || /\/appdata\/local\/temp\//.test(n) || /^\/tmp\//.test(n));
 };
+// Le dossier temporaire nommé par sa variable (`$TEMP`, `$env:TEMP`, `%TEMP%`, `$TMPDIR`) est
+// le même dossier que son chemin écrit en entier (TF-1418).
+const TEMPORAIRE_NOMME = (p) => TEMPORAIRE(p)
+  || /^(?:\$\{?(?:env:)?(?:TEMP|TMP|TMPDIR)\}?|%(?:TEMP|TMP)%)(?:[\\/]|$)/i.test(String(p || ""));
+// Une commande simple dont le verbe écrit des FICHIERS, et dont toutes les cibles sont temporaires :
+// pour une copie, la seule destination (le dernier argument) ; pour les autres verbes, chaque
+// argument. Une option ou une valeur non temporaire laisse l'effet relevé : l'erreur tombe du côté sûr.
+const VERBES_FICHIER = /^(?:rm|del|mv|cp|rmdir|mkdir|touch|tee|Remove-Item|Move-Item|Copy-Item|Set-Content|Add-Content|Out-File|New-Item|Rename-Item|Clear-Content)$/i;
+function versTemporaire(commande) {
+  const jetons = (commande.match(/"[^"]*"|'[^']*'|\S+/g) || []).map((j) => j.replace(/^["']|["']$/g, ""));
+  const i = jetons.findIndex((j) => VERBES_FICHIER.test(j));
+  if (i < 0) return false;
+  const args = jetons.slice(i + 1).filter((j) => !/^-/.test(j));
+  if (!args.length) return false;
+  const cibles = /^(?:cp|Copy-Item)$/i.test(jetons[i]) ? args.slice(-1) : args;
+  return cibles.every(TEMPORAIRE_NOMME);
+}
 const VERBES_EFFET = new RegExp([
   String.raw`\bgit\s+(?:commit|push|reset|rebase|merge|restore|clean|stash|tag|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))\b`,
   String.raw`(?:^|[\s;&|(])(?:rm|del|mv|cp|rmdir|mkdir|touch|tee|Remove-Item|Move-Item|Copy-Item|Set-Content|Add-Content|Out-File|New-Item|Rename-Item|Clear-Content)(?=\s|$)`,
@@ -186,7 +203,14 @@ export function detecterEffets(segment) {
         if (!TEMPORAIRE(p)) effets.push(`écriture de ${p || "chemin inconnu"}`);
       } else if (COMMANDES.has(nom)) {
         const cmd = String(b.input?.command || "");
-        const v = cmd.match(VERBES_EFFET);
+        // 12/10/2026 (TF-1418) : un `cp` vers le dossier temporaire de la session faisait juger
+        // Complexe un tour de pure lecture. La commande se juge par commande simple, et un verbe de
+        // fichier dont toutes les cibles sont temporaires n'est pas un effet.
+        const v = cmd.split(/&&|\|\||[;|\n]/).map((c) => {
+          const m = c.match(VERBES_EFFET);
+          const fichier = m && VERBES_FICHIER.test(m[0].replace(/^[\s;&|(]+/, "").trim());
+          return m && !(fichier && versTemporaire(c)) ? m : null;
+        }).find(Boolean);
         if (v) effets.push(`commande à effet « ${v[0].trim()} »`);
         // Le contenu d'une chaîne entre guillemets (un `node -e "x > 2"`) n'est pas une redirection ;
         // une cible de redirection entre guillemets (`> "f.txt"`) en reste une.
