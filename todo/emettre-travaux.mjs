@@ -105,9 +105,18 @@ export function pseudonymeDe(nomReel, chemin = cheminsTables().produits) { // ca
   return null;
 }
 
-/** Le rendez-vous complet : nom réel d'abord, pseudonyme ensuite — EXACT dans les deux cas. */
+/**
+ * Le rendez-vous complet : nom réel d'abord, pseudonyme ensuite — EXACT dans les deux cas.
+ *
+ * Le parc nomme un produit rangé sous un dossier client par son CHEMIN relatif (« _Client/Produit »),
+ * la table et le registre par le nom du dépôt seul. Comparer le chemin entier manquait tout produit
+ * rangé : le 12/10/2026, 4 constats adressés à 2 produits présents sur le poste sortaient orphelins
+ * et notés « absent de ce poste ». Le dernier segment est un nom de dépôt, comparé EXACTEMENT.
+ */
+const dernierSegment = (p) => String(p || "").split(/[\\/]/).filter(Boolean).pop() || "";
 export const designeProduit = (destinataire, produit) =>
-  memeProduit(destinataire, produit) || memeProduit(destinataire, pseudonymeDe(produit));
+  [produit, dernierSegment(produit)].some((p) =>
+    memeProduit(destinataire, p) || memeProduit(destinataire, pseudonymeDe(p)));
 
 /**
  * LE RENDU D'UN CONSTAT, et sa seule règle : **les champs manquants ne sont pas inventés.**

@@ -376,6 +376,16 @@ try {
       "le constat est dénoncé orphelin alors que son produit est dans le parc");
   }));
 
+  check("un produit RANGÉ dans un sous-dossier du parc (« _Client/MonProduit ») atteint son pseudonyme", () => avecTable(() => {
+    const f = registre([{ ev: "creation", id: "TF-9013", statut: "en_cours", destinataire_produit: "Produit-77" }], "h");
+    att(constatsDuRegistre("_Client/Sous dossier/MonProduit.com", f).length === 1,
+      "le chemin relatif du parc est comparé en entier — le constat n'atteint pas son produit rangé");
+    att(orphelins([{ produit: "_Client/Sous dossier/MonProduit.com" }], f).length === 0,
+      "le constat est dénoncé orphelin alors que son produit est rangé dans un sous-dossier du parc");
+    att(orphelins([{ produit: "_Client/AutreProduit" }], f).length === 1,
+      "un autre produit du même dossier client a capté le constat");
+  }));
+
   check("un pseudonyme que la table ne porte PAS reste orphelin — la résolution n'invente rien", () => avecTable(() => {
     const f = registre([{ ev: "creation", id: "TF-9012", statut: "decide", destinataire_produit: "Produit-99" }], "h");
     att(orphelins([{ produit: "MonProduit.com" }], f).length === 1,
