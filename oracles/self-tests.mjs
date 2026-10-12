@@ -210,7 +210,12 @@ for (const zone of zonesTests) {
       });
       continue;
     }
-    const r = spawnSync(estPython ? PYTHON : process.execPath, [join(RACINE, zone, nom), ...args], { encoding: "utf8" });
+    // TF-1018 (12/10/2026) : une recette Python écrit en UTF-8 ou le harnais ne lit rien de juste. Sous
+    // Windows, python imprime en cp1252 quand sa sortie est redirigée : « [NON JOUÉ] » devenait « JOU\ufffd »,
+    // la déclaration de TF-1434 n'était plus lue, et le cliquet comptait « 8 → 4 cas perdus » au lieu de
+    // « 4 joués + 4 non joués » (simulation du circuit hébergé sur un clone sans socle, 12/10/2026).
+    const r = spawnSync(estPython ? PYTHON : process.execPath, [join(RACINE, zone, nom), ...args],
+      { encoding: "utf8", env: estPython ? { ...process.env, PYTHONUTF8: "1", PYTHONIOENCODING: "utf-8" } : process.env });
     const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
     const resume = lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie";
     resultats.push({
