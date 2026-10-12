@@ -1,7 +1,8 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "date": "2026-10-12",
+  "evolution_1_16_1": "TF-1592, 12/10/2026 (suite) — le câblage du hook `publication-hebergee` est EXIGÉ par le contrat, plus seulement décrit : le motif exigé de `.claude/settings.json` devient `forge/hooks/factory.mjs publication-hebergee`. En 1.16.0, le motif restait `forge/hooks/factory.mjs`, que tout produit déjà câblé pour un autre hook portait : le relevé et R-47 rendaient conforme un produit dont l'outil Artifact n'était gardé par rien. Ce qui change pour celui qui produit : un `.claude/settings.json` sans le `PreToolUse` sur `Artifact` du gabarit est déclaré non tenu (R-47) ; le compléter depuis `gabarits/settings-produit.json` est un geste du produit, ce fichier étant personnalisé et jamais recopié.",
   "evolution_1_16_0": "TF-1592, 12/10/2026 (retour Produit-02 du 03/10, RT-117) — R-38 se joue sur l'outil qui publie. Ce qui change pour celui qui produit : `forge/hooks/factory.mjs` (copie conforme) reconnaît le hook `publication-hebergee`, et `.claude/settings.json` doit câbler un `PreToolUse` sur `Artifact` qui l'appelle (le gabarit `settings-produit.json` le porte). Le fait : une session produit a proposé « Fichier + Artifact privé (recommandé) », l'exploitant a coché, la page a été publiée sur claude.ai ; aucune garde ne portait l'outil. Sans GO consigné (variable `FORGE_PUBLICATION_GO` ou entrée `go_publication` au ledger), l'outil Artifact refuse toute action qui publie.",
   "evolution_1_14_0": "TF-1399 (02/10/2026) : le canal « un produit demande une évolution à un autre » (CONTRAT-INTERFACE.md §3 sexies, TF-1491 du 01/10) décrivait le mécanisme sans le câbler — « rien ne le joue encore », mot pour mot. Deux artefacts neufs : le gabarit de la demande et son juge de forme (DEM-1 à DEM-3, même raisonnement double-sens que pour les lots de retours, TF-0597). Sans classe existante : `familles_protegees` reste vide plutôt que de rattacher ce mécanisme neuf à une classe qui ne le décrit pas.",
   "evolution_1_15_0": "TF-1563, 02/10/2026 (retour Produit-12 du 01/10, RS-25) — INTENTION.md et FICHE-CONCEPTION.md entrent au contrat, en COPIE CONFORME. Ce qui change pour celui qui produit : `references/INTENTION.md` (la loi transverse n° 7, que S51 juge au bloc 1 des restitutions) et le gabarit `gabarits/documents/FICHE-CONCEPTION.md` (que G6 juge rempli avant tout document à enjeu) descendent désormais sous `forge/INTENTION.md` et `forge/documents/FICHE-CONCEPTION.md`. Le fait : une consigne écrite le 01/09 (« à appliquer sur tous types de demande ») n'avait jamais atteint aucun produit — un produit a reproduit la même reprise de forme sur 4 pages, et les tests rétro de ses restitutions, pourtant présents, n'ont rien vu : ils jugent qu'une intention est DITE, jamais si le document en aval l'a réellement tenue.",
@@ -86,7 +87,7 @@
       "source": "gabarits/settings-produit.json",
       "cible": ".claude/settings.json",
       "mode": "presence_et_motif",
-      "motif_exige": "forge/hooks/factory.mjs",
+      "motif_exige": "forge/hooks/factory.mjs publication-hebergee",
       "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
       "depuis": "2026-08-23",
       "familles_protegees": [

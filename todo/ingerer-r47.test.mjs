@@ -107,7 +107,8 @@ const poste = (nomProjet, { herite, sousDossier = null }) => {
       // Deux artefacts ont un CONTENU juge, pas seulement une presence : les recopier depuis le
       // gabarit ne suffirait pas, l'oracle y cherche des marqueurs precis. Ils restent explicites.
       if (a.cible === ".claude/settings.json") {
-        writeFileSync(cible, JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }));
+        writeFileSync(cible, JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
+          PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] }] } }));
       } else if (a.cible === "CLAUDE.md") {
         writeFileSync(cible, "# projet\n\n## Précédence (R-43)\nLes règles de la factory priment.\n");
       } else if (existsSync(source)) {
