@@ -131,14 +131,15 @@
  * <skill>\` — un déplacement, jamais une suppression sèche — et le liste au verdict (`purge`).
  */
 // Exit : 0 = conforme · 1 = defaut MESURE. Cet oracle n'a AUCUN chemin « je ne peux pas
-// mesurer » : il ne depend d'aucun outil externe et lit des fichiers du depot. Le declarer
+// mesurer » : il ne depend d'aucun outil externe (seule exception, TF-1611 : git, pour confronter une copie aux etats anterieurs de sa source ; sans git, K11 garde son verdict) et lit des fichiers du depot. Le declarer
 // vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
 // d'environnement (TF-0648).
 import {
   existsSync, readFileSync, readdirSync, statSync, lstatSync, mkdirSync, copyFileSync, writeFileSync,
   mkdtempSync, renameSync, rmSync, appendFileSync, utimesSync, symlinkSync,
 } from "node:fs";
-import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
+import { empreinteFichier, empreinteTexte } from "../scripts/lib-empreinte.mjs";
+import { spawnSync } from "node:child_process";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
@@ -397,6 +398,31 @@ function modifieeDepuisPropagation(cible, derniers) {
   const e = derniers.get(cleJournal(cible));
   if (!e || !e.sha_apres || !existsSync(cible)) return null;
   return empreinte(cible) !== e.sha_apres ? e : null;
+}
+// TF-1611 (13/10/2026) — UNE COPIE IDENTIQUE À UN ÉTAT ANTÉRIEUR DE LA SOURCE N'EST PAS UN TRAVAIL PROPRE.
+// Le 07/10, la copie installée de digit-ai-page-html (check_html.py, render_page.py) était identique
+// aux blobs de deux commits de sa source : un état périmé, sans travail propre. K11 la déclarait
+// pourtant « modifiée après sa dernière propagation » (l'empreinte journalisée n'était plus la sienne)
+// et `--appliquer` refusait de l'écraser, le poste restait non prêt à l'ouverture. Avant de conclure à
+// un travail non versionné, la copie est donc confrontée aux blobs de l'HISTORIQUE git de sa source
+// (100 derniers commits du fichier). Borne : sans git, ou hors d'un dépôt, la confrontation ne dit
+// rien et K11 garde son verdict d'origine — l'oracle ne devient pas plus permissif faute d'outil.
+function identiqueAUnEtatAnterieurDeLaSource(srcFichier, cible) {
+  try {
+    const git = (cwd, ...a) => spawnSync("git", ["-C", cwd, ...a], { encoding: "utf8", timeout: 20000, maxBuffer: 32 * 1024 * 1024 });
+    const top = git(dirname(srcFichier), "rev-parse", "--show-toplevel");
+    if (top.status !== 0) return false;
+    const racineDepot = top.stdout.trim();
+    const rel = relative(racineDepot, srcFichier).split(sep).join("/");
+    const log = git(racineDepot, "log", "--format=%H", "--max-count=100", "--", rel);
+    if (log.status !== 0) return false;
+    const present = empreinte(cible);
+    for (const sha of log.stdout.split(/\r?\n/).filter(Boolean)) {
+      const blob = git(racineDepot, "show", `${sha}:${rel}`);
+      if (blob.status === 0 && empreinteTexte(blob.stdout) === present) return true;
+    }
+  } catch { /* pas de confrontation possible : K11 garde son verdict */ }
+  return false;
 }
 /** Écrase (ou pose) une cible depuis sa source, et le JOURNALISE. Ne fait rien si le contenu est déjà là. */
 function ecraser(srcFichier, cible, trace) {
@@ -896,7 +922,8 @@ function juger(racine, installes, appliquer = false, purger = false,
       }
       // K11 (TF-1012) — une copie installée modifiée APRÈS sa dernière propagation journalisée porte
       // un travail que la source n'a pas : elle est relevée, et `--appliquer` ne l'écrase pas.
-      const modifiees = divergents.filter((f) => modifieeDepuisPropagation(join(dst, f), trace.derniers));
+      const modifiees = divergents.filter((f) => modifieeDepuisPropagation(join(dst, f), trace.derniers)
+        && !identiqueAUnEtatAnterieurDeLaSource(join(src, f), join(dst, f)));
       if (modifiees.length) {
         findings.push({
           regle: "K11", statut: "FAIL", ou: nom,
@@ -1151,6 +1178,32 @@ function selfTest() {
   // Nettoyage : les cas suivants attendent un parc sans K11 en échec.
   rmSync(join(src, "epsilon"), { recursive: true, force: true });
   rmSync(join(inst, "epsilon"), { recursive: true, force: true });
+
+  // K11 (TF-1611) — une copie IDENTIQUE à un état antérieur de sa source n'est pas un travail propre :
+  // ni relevée par K11, ni épargnée par `--appliquer`. Rouge : une copie qui diffère de TOUS les états
+  // de l'historique reste relevée et épargnée (le garde ne devient pas permissif).
+  const depotAgents = join(racine, "digit-ai-forge-agents");
+  const gitT = (...a) => spawnSync("git", ["-C", depotAgents, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+  gitT("init", "-q", "-b", "main");
+  poser(join(src, "iota", "SKILL.md"), "# iota v1\n");
+  gitT("add", "-A"); gitT("commit", "-q", "-m", "iota v1");
+  poser(join(src, "iota", "SKILL.md"), "# iota v2\n");
+  gitT("add", "-A"); gitT("commit", "-q", "-m", "iota v2");
+  juger(racine, inst, true);
+  const cibleI = join(inst, "iota", "SKILL.md");
+  writeFileSync(cibleI, "# iota v1\n"); // état périmé, identique au blob du premier commit
+  r = juger(racine, inst);
+  cas.push(["K11   — copie identique à un état ANTÉRIEUR de la source : pas de K11 (K2 la dit en retard)",
+            !echoue(r, "K11") && echoue(r, "K2")]);
+  juger(racine, inst, true);
+  cas.push(["K11 ter— --appliquer écrase une copie identique à un état antérieur", readFileSync(cibleI, "utf8") === "# iota v2\n"]);
+  writeFileSync(cibleI, "# iota v1\nlignes propres à la copie\n"); // diffère de tous les états de l'historique
+  r = juger(racine, inst);
+  cas.push(["K11   — copie qui diffère de TOUT l'historique : toujours relevée", echoue(r, "K11")]);
+  juger(racine, inst, true);
+  cas.push(["K11 ter— …et toujours épargnée par --appliquer", readFileSync(cibleI, "utf8").includes("lignes propres")]);
+  rmSync(join(src, "iota"), { recursive: true, force: true });
+  rmSync(join(inst, "iota"), { recursive: true, force: true });
 
   // K12 (TF-1099) — une source EN COURS DE MODIFICATION n'est ni comparée ni propagée, et c'est
   // déclaré. Rouge d'origine : sans l'exclusion, `--appliquer` recopiait l'état intermédiaire.
