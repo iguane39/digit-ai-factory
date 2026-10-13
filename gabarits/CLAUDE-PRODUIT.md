@@ -15,7 +15,9 @@ les **renforcer**, jamais les assouplir ni les contourner ; un conflit se tranch
 de la factory et se consigne au ledger (`type: conflit_regles`, les deux règles citées).
 Les hooks de la factory (`.claude\settings.json` ← `gabarits\settings-produit.json`,
 `forge\hooks\factory.mjs`) s'exécutent ici : fraîcheur à l'ouverture, restitution jugée à la
-fin de chaque tour de travail (`gabarits\RESTITUTION.md`).
+fin de chaque tour de travail (`gabarits\RESTITUTION.md`). Une question simple reçoit une réponse
+directe ou outillée, jugée par le même hook : `forge\NIVEAUX.md` (mots-clés « vite : », « moyen : »,
+« complet : »).
 
 ## Routage forge — obligatoire
 

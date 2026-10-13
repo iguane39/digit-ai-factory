@@ -1,7 +1,8 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.16.1",
-  "date": "2026-10-12",
+  "version": "1.17.0",
+  "date": "2026-10-13",
+  "evolution_1_17_0": "TF-1418, 13/10/2026 (décision humaine D-68 (a) : « propager les niveaux aux produits », étape 3 de l'étude des niveaux d'intervention) — `references/NIVEAUX.md` entre au contrat, en COPIE CONFORME, sous `forge/NIVEAUX.md`. Ce qui change pour celui qui produit : une question simple reçoit une réponse Simple (150 mots, aucune écriture) ou Moyen (4 pièces, 400 mots, aucun effet), jugée comme au pilot. Le juge ne voyage pas : `forge/hooks/factory.mjs` délègue déjà au hook de fin de tour du pilot, dossier du produit pour dossier courant, mêmes bornes et même escalade par les effets ; le hook de lexique, par le même lanceur, s'éveille sur « vite : », « moyen : », « complet : » dès que `forge/NIVEAUX.md` existe et cite ce chemin. Recette : `gabarits/hooks-factory.test.mjs`.",
   "evolution_1_16_1": "TF-1592, 12/10/2026 (suite) — le câblage du hook `publication-hebergee` est EXIGÉ par le contrat, plus seulement décrit : le motif exigé de `.claude/settings.json` devient `forge/hooks/factory.mjs publication-hebergee`. En 1.16.0, le motif restait `forge/hooks/factory.mjs`, que tout produit déjà câblé pour un autre hook portait : le relevé et R-47 rendaient conforme un produit dont l'outil Artifact n'était gardé par rien. Ce qui change pour celui qui produit : un `.claude/settings.json` sans le `PreToolUse` sur `Artifact` du gabarit est déclaré non tenu (R-47) ; le compléter depuis `gabarits/settings-produit.json` est un geste du produit, ce fichier étant personnalisé et jamais recopié.",
   "evolution_1_16_0": "TF-1592, 12/10/2026 (retour Produit-02 du 03/10, RT-117) — R-38 se joue sur l'outil qui publie. Ce qui change pour celui qui produit : `forge/hooks/factory.mjs` (copie conforme) reconnaît le hook `publication-hebergee`, et `.claude/settings.json` doit câbler un `PreToolUse` sur `Artifact` qui l'appelle (le gabarit `settings-produit.json` le porte). Le fait : une session produit a proposé « Fichier + Artifact privé (recommandé) », l'exploitant a coché, la page a été publiée sur claude.ai ; aucune garde ne portait l'outil. Sans GO consigné (variable `FORGE_PUBLICATION_GO` ou entrée `go_publication` au ledger), l'outil Artifact refuse toute action qui publie.",
   "evolution_1_14_0": "TF-1399 (02/10/2026) : le canal « un produit demande une évolution à un autre » (CONTRAT-INTERFACE.md §3 sexies, TF-1491 du 01/10) décrivait le mécanisme sans le câbler — « rien ne le joue encore », mot pour mot. Deux artefacts neufs : le gabarit de la demande et son juge de forme (DEM-1 à DEM-3, même raisonnement double-sens que pour les lots de retours, TF-0597). Sans classe existante : `familles_protegees` reste vide plutôt que de rattacher ce mécanisme neuf à une classe qui ne le décrit pas.",
@@ -243,6 +244,16 @@
       "motif": "LE GABARIT de la fiche de conception amont (D8), que chaque document à enjeu remplit et nomme AVANT d'être écrit — `oracle-gabarits-documents.mjs` (G6) juge la fiche remplie (chemin propre au document, ex. forge/etapes/.../fiche-conception-<objet>.md), pas ce gabarit vierge lui-même, mais un produit qui ne l'a pas sous la main la réinvente ou la saute. TF-1563 (retour Produit-12 du 01/10/2026, RS-25) : `gabarits\\HERITAGE.json` ne portait ni INTENTION.md ni FICHE-CONCEPTION.md — 4 reprises de forme sur 2 pages et 1 sur une 3e, produites sans fiche, invisibles aux tests rétro des restitutions qui ne couvrent que l'intention, pas le cadrage document par document.",
       "depuis": "2026-10-02",
       "familles_protegees": []
+    },
+    {
+      "source": "references/NIVEAUX.md",
+      "cible": "forge/NIVEAUX.md",
+      "mode": "copie_conforme",
+      "motif": "LE TEXTE des niveaux d'intervention (Simple, Moyen, Complexe), à côté du juge qui les joue : le hook de fin de tour du pilot, atteint par `forge/hooks/factory.mjs restitution` (`jugeable`, `detecterEffets`, `jugerFormeMoyen`, `--pre-vol`), et le hook de lexique pour les mots-clés. Même raisonnement que RESTITUTION.md : un juge sans son texte force à deviner ; un texte sans juge décore. Copie conforme : les chemins qu'il cite sont ceux du pilot, et sa section « Chez un produit » dit comment les lire. Le fait : sur 165 tours du pilot, une question courte attendait 6,3 minutes en médiane et recevait 1 813 mots ; la revue du 13/10/2026 mesure 21 s en médiane pour une réponse Simple acceptée (TF-1418, D-68 (a)).",
+      "depuis": "2026-10-13",
+      "familles_protegees": [
+        "restitution-forme"
+      ]
     }
   ],
   "evolution_1_8_0": "Mandat d'amélioration continue (03/09/2026) : (1) le lanceur de hooks (copie identique) connaît un quatrième hook, `lexique` — UserPromptSubmit, le lexique d'invocation RV-6 devient un détrompeur ; `settings-produit.json` le câble ; (2) `todo/CLASSES.json` est hérité en copie identique (forge/retours/CLASSES.json) — le producteur qui écrit un lot y lit les classes qu'il doit déclarer ; (3) chaque artefact déclare les FAMILLES de défaut dont il protège (`familles_protegees`), pour que le relevé d'ouverture nomme, chez un produit non équipé, ce dont il n'est pas protégé — et non seulement ce qui lui manque.",

@@ -295,7 +295,7 @@ export function jugerFormeMoyen(texte) {
   return { mots, ecarts };
 }
 
-const RAPPEL_MOYEN = "Réécris ta réponse au niveau Moyen (references\\NIVEAUX.md) : première ligne « Niveau : Moyen », "
+const RAPPEL_MOYEN = "Réécris ta réponse au niveau Moyen (references\\NIVEAUX.md au pilot, forge\\NIVEAUX.md chez un produit) : première ligne « Niveau : Moyen », "
   + "puis 4 pièces dans cet ordre, chacune ouverte par son titre en gras : **La réponse.** (150 mots au plus, ouverte sur "
   + "le oui, le non ou le fait demandé) ; **Preuves.** (3 à 6 lignes, une commande et sa sortie, ou un chemin et sa ligne) ; "
   + "**Non vérifié.** ; **Décision attendue.** (« Aucune. » ou une D-N complète, recommandation et tableau d'options). "

@@ -159,10 +159,11 @@ export function contexte(message) {
  * Complexe ; « moyen : » demande le niveau Moyen, la réponse outillée en 4 pièces (étape 2, en
  * essai depuis le 01/10/2026 à la demande humaine). Mêmes bornes que le lexique : en tête seulement, message humain seulement.
  *
- * LA PORTÉE EST LE PILOT SEUL, et elle est tenue ici plutôt que promise. Ce hook est hérité par les
- * produits (lanceur `forge/hooks/factory.mjs lexique`), alors que l'étape 1 ne vise que le pilot et
- * qu'un produit n'a pas le référentiel que la ligne injectée cite. La ligne ne s'injecte donc que si
- * le dossier de la session porte `references/NIVEAUX.md` ; ailleurs, le mot-clé ne produit rien.
+ * LA PORTÉE SUIT LE RÉFÉRENTIEL, et elle est tenue ici plutôt que promise. Ce hook est hérité par
+ * les produits (lanceur `forge/hooks/factory.mjs lexique`). La ligne ne s'injecte que si le dossier
+ * de la session porte le texte qu'elle cite : `references/NIVEAUX.md` au pilot, `forge/NIVEAUX.md`
+ * chez un produit, copie conforme reçue par l'héritage (étape 3, décision humaine D-68 (a) du
+ * 13/10/2026). Ailleurs, le mot-clé ne produit rien, et la ligne cite le chemin qui existe.
  */
 export const NIVEAUX = [
   { niveau: "Simple", motif: /^\s*vite\s*:/iu, forme: "« vite : » en tête de message" },
@@ -177,23 +178,30 @@ export function reconnaitreNiveau(message) {
   return r ? { niveau: r.niveau, forme: r.forme } : null;
 }
 
-/** La doctrine des niveaux est-elle en service dans ce dossier ? Au pilot seul pendant l'étape 1. */
-export function niveauxEnService(dossier) {
-  try { return Boolean(dossier) && existsSync(join(dossier, "references", "NIVEAUX.md")); }
-  catch { return false; }
+/** Le référentiel des niveaux que porte ce dossier : celui du pilot, celui hérité par un produit, ou null. */
+export function referentielNiveaux(dossier) {
+  for (const rel of [["references", "NIVEAUX.md"], ["forge", "NIVEAUX.md"]]) {
+    try { if (dossier && existsSync(join(dossier, ...rel))) return rel.join("\\"); } catch { /* illisible : suivant */ }
+  }
+  return null;
 }
 
-/** Le texte injecté pour un niveau demandé — une ligne, ou rien. */
-export function contexteNiveau(message) {
+/** La doctrine des niveaux est-elle en service dans ce dossier ? Là où son texte existe. */
+export function niveauxEnService(dossier) {
+  return referentielNiveaux(dossier) !== null;
+}
+
+/** Le texte injecté pour un niveau demandé — une ligne, ou rien. `ref` : le référentiel du dossier. */
+export function contexteNiveau(message, ref = "references\\NIVEAUX.md") {
   const n = reconnaitreNiveau(message);
   if (!n) return "";
   if (n.niveau === "Simple") return `[NIVEAU — hook-lexique] L'humain demande le niveau Simple (${n.forme}) : ` +
-    `retirer le mot-clé et répondre selon references\\NIVEAUX.md — première ligne « Niveau : Simple », 150 mots au plus, ` +
+    `retirer le mot-clé et répondre selon ${ref} — première ligne « Niveau : Simple », 150 mots au plus, ` +
     `lectures libres, 3 commandes au plus, aucune écriture, aucun mot de verdict ni décision ou action numérotée ; ` +
     `source citée, « Non vérifié » s'il le faut. Si la question dépasse ces bornes, le dire en une phrase et restituer ` +
     `en entier : le niveau ne descend jamais.`;
   if (n.niveau === "Moyen") return `[NIVEAU — hook-lexique] L'humain demande le niveau Moyen (${n.forme}) : ` +
-    `retirer le mot-clé et répondre selon references\\NIVEAUX.md — première ligne « Niveau : Moyen », puis 4 pièces dans ` +
+    `retirer le mot-clé et répondre selon ${ref} — première ligne « Niveau : Moyen », puis 4 pièces dans ` +
     `cet ordre : **La réponse.** (150 mots au plus), **Preuves.** (une commande et sa sortie, ou un chemin et sa ligne), ` +
     `**Non vérifié.**, **Décision attendue.** (« Aucune. » ou une D-N complète) ; 400 mots au plus ; lectures et commandes ` +
     `de lecture libres, écriture seulement dans le dossier temporaire. Le premier effet (écriture du dépôt, commit, push, ` +
@@ -343,6 +351,17 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     console.log(`  [${ok ? "PASS" : "FAIL"}] portée — ${glose}`);
     ok ? pass++ : fail++;
   }
+  // Étape 3 (D-68 (a), 13/10/2026) : un produit porte le texte hérité sous `forge/NIVEAUX.md`. Le
+  // dossier qui ne porte que lui est en service, et la ligne injectée cite CE chemin, pas celui du pilot.
+  {
+    const produit = mkdtempSync(join(tmpdir(), "niveaux-produit-"));
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, "forge", "NIVEAUX.md"), "# fixture\n");
+    const ref = referentielNiveaux(produit);
+    const ok = ref === "forge\\NIVEAUX.md" && /selon forge\\NIVEAUX\.md/.test(contexteNiveau("vite : où ?", ref));
+    console.log(`  [${ok ? "PASS" : "FAIL"}] portée — dossier produit portant forge/NIVEAUX.md → en service, la ligne cite forge\\NIVEAUX.md`);
+    ok ? pass++ : fail++;
+  }
 
   // L'ORIGINE vaut aussi pour les niveaux : « vite : » dans une entrée qui se déclare non humaine ne
   // demande rien, alors que le même texte, humain, demanderait le niveau Simple.
@@ -371,7 +390,8 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
   if (estMessageHumain(message)) {
     const appels = contexte(message);
     if (appels) lignes.push(appels);
-    const niveau = niveauxEnService(dossier) ? contexteNiveau(message) : "";
+    const ref = referentielNiveaux(dossier);
+    const niveau = ref ? contexteNiveau(message, ref) : "";
     if (niveau) lignes.push(niveau);
   }
   if (lignes.length) process.stdout.write(lignes.join("\n") + "\n");

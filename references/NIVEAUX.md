@@ -1,17 +1,18 @@
 # Niveaux d'intervention — proportionner la réponse à la question
 
-Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.4.0,
+Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.5.0,
 13/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
 Moyen en essai ; 1.3.0 ne compte plus une copie vers le dossier temporaire comme un effet ; 1.4.0
-consigne la revue de l'essai). Source : l'étude `output\03-etudes\20260925-etude-opportunite-niveaux-d-intervention.md`,
+consigne la revue de l'essai ; 1.5.0 engage l'étape 3, la propagation aux produits). Source : l'étude `output\03-etudes\20260925-etude-opportunite-niveaux-d-intervention.md`,
 verdict O3 (3 niveaux fixés par les effets du tour, déployés en 3 étapes), validé par la décision
 humaine D-3 (a) du 25/09/2026. Candidature au registre : TF-1418 (niveaux d'intervention, étape 1).
 
-**État : étapes 1 et 2 en essai au pilot seul.** Le niveau Simple est en essai du 2026-09-26 au
-2026-10-02 inclus ; le niveau Moyen, du 2026-10-01 au 2026-10-09 inclus, avec sa branche du juge de
-fin de tour. Le niveau Complexe est le fonctionnement actuel, inchangé. Rien ici ne change l'effort
-de la session. **Revue jouée le 2026-10-13** (section « Essai et revue ») : critères non tenus, essai
-à prolonger ; le dispositif reste en service au pilot seul jusqu'à la décision humaine.
+**État : étapes 1 et 2 en service au pilot, étape 3 engagée le 13/10/2026.** Le niveau Simple a été
+en essai du 2026-09-26 au 2026-10-02 inclus ; le niveau Moyen, du 2026-10-01 au 2026-10-09 inclus,
+avec sa branche du juge de fin de tour. Le niveau Complexe est le fonctionnement actuel, inchangé.
+Rien ici ne change l'effort de la session. **Revue jouée le 2026-10-13** (section « Essai et
+revue ») : critères non tenus, essai à prolonger. **Le même jour, la décision humaine D-68 (a)
+(« propager les niveaux aux produits ») engage l'étape 3** : section « Chez un produit ».
 
 ## Ce qui change pour la session
 
@@ -76,7 +77,8 @@ pas.
 ## Mots-clés du message humain
 
 Le hook de lexique (`oracles\hook-lexique.mjs`) les lit en tête du message humain seulement, et
-seulement dans une session dont le dossier porte ce référentiel. Le tableau se lit ligne par ligne :
+seulement dans une session dont le dossier porte ce référentiel : `references\NIVEAUX.md` au pilot,
+`forge\NIVEAUX.md` chez un produit. Le tableau se lit ligne par ligne :
 un mot-clé, puis le niveau qu'il demande.
 
 | Mot-clé | Niveau demandé |
@@ -133,6 +135,30 @@ Exemple, sur une question réelle du 21/09/2026 :
 > **Non vérifié.** Le résultat des oracles sur les travaux corrigés.
 >
 > **Décision attendue.** Aucune.
+
+## Chez un produit — étape 3, engagée le 13/10/2026
+
+Décision humaine D-68 (a) du 13/10/2026, « propager les niveaux aux produits » (TF-1418). Ce qui
+change pour une session produit : une question simple y reçoit une réponse Simple ou Moyen jugée
+comme au pilot, avec les mêmes bornes, la même forme et la même escalade par les effets.
+
+- **Le texte** voyage par le contrat d'héritage (`gabarits\HERITAGE.json`, version 1.17.0) : ce
+  fichier, en copie conforme, sous `forge\NIVEAUX.md`.
+- **Le juge** ne voyage pas, il est partagé. `forge\hooks\factory.mjs` délègue au hook de fin de tour
+  du pilot, le dossier du produit pour dossier courant : les effets se relèvent donc dans le dépôt
+  du produit. Une règle corrigée au pilot vaut chez le produit sans recopie.
+- **Les mots-clés** « vite : », « moyen : » et « complet : » passent par le hook de lexique, appelé
+  par le même lanceur. Il s'éveille dès que `forge\NIVEAUX.md` existe, et sa ligne cite ce chemin.
+- **Les chemins cités plus haut** (`oracles\…`, `gabarits\…`, `output\…`) sont ceux du pilot. Chez un
+  produit, le contrôle avant affichage se joue par `node forge/hooks/factory.mjs restitution
+  --pre-vol`, et le gabarit de restitution est `forge\RESTITUTION.md`.
+- **Les invariants** ne bougent pas, et chez un produit s'y ajoute la ligne « Remontée à la
+  factory » de toute restitution complète.
+- **Recette** : `gabarits\hooks-factory.test.mjs`, sur un produit jetable : une réponse Simple courte
+  passe, la même dans un tour qui écrit est jugée complète ; une réponse Moyen passe, la même dans un
+  tour qui commite est jugée Complexe.
+- **Retour arrière** : retirer l'entrée `forge/NIVEAUX.md` du contrat et la cible `forge` de la garde
+  du hook de lexique ; le juge, partagé, suit le pilot.
 
 ## Essai et revue
 

@@ -42,6 +42,10 @@
   "cas": 6,
   "vu_le": "2026-10-02"
  },
+ "gabarits/hooks-factory.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-10-13"
+ },
  "gabarits/ledger.test.mjs": {
   "cas": 7,
   "vu_le": "2026-10-12"
@@ -75,8 +79,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 47,
-  "vu_le": "2026-10-01"
+  "cas": 48,
+  "vu_le": "2026-10-13"
  },
  "hook-page-html.mjs": {
   "cas": 11,
@@ -371,8 +375,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 11,
-  "vu_le": "2026-09-28"
+  "cas": 12,
+  "vu_le": "2026-10-13"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 7,

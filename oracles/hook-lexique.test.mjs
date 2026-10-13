@@ -5,7 +5,7 @@
  * contexte nommant le skill ; un message ordinaire ne produit RIEN (stdout vide, exit 0).
  */
 import { spawnSync } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -24,11 +24,12 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // éloges de forme ou demandes de gabarit, cinq phrases voisines qui ne doivent rien déclencher — et
 // un cas de provenance ; puis de 39 à 45 le 01/10 (réponse humaine « 42a ») : la consigne du
 // PROCESSUS, 3 messages humains réels qui corrigent un processus et 3 phrases voisines épargnées ;
-// puis de 45 à 47 le 01/10 (niveau Moyen en essai) : « moyen : » reconnu en tête, et ailleurs non.
-check("self-test du hook : 47 cas verts", () => {
+// puis de 45 à 47 le 01/10 (niveau Moyen en essai) : « moyen : » reconnu en tête, et ailleurs non ;
+// puis de 47 à 48 le 13/10 (étape 3, D-68 (a)) : un produit portant `forge/NIVEAUX.md` est en service.
+check("self-test du hook : 48 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/47 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/48 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
 });
 
 // R-57 — le point d'entrée RÉEL injecte la consigne sur le message qui a fondé la règle, et rien sur
@@ -73,9 +74,9 @@ check("hook — stdin illisible (pas du JSON) → exit 0, jamais un blocage du m
   const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: "pas du json" });
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
 });
-// TF-1418 — les NIVEAUX joués en hook réel. La ligne ne sort qu'au pilot, où `references/NIVEAUX.md`
-// existe ; le même message dans un dossier qui ne le porte pas, comme celui d'un produit, ne produit
-// rien. C'est la paire qui prouve que l'étape 1 reste au pilot.
+// TF-1418 — les NIVEAUX joués en hook réel. La ligne sort au pilot, où `references/NIVEAUX.md`
+// existe, et chez un produit qui porte le texte hérité `forge/NIVEAUX.md` (étape 3, D-68 (a) du
+// 13/10/2026) ; le même message dans un dossier qui ne porte ni l'un ni l'autre ne produit rien.
 const PILOT = join(dirname(HOOK), "..");
 const jouerDans = (prompt, cwd) => spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt, cwd }) });
 check("hook — « vite : » dans une session du pilot → ligne de niveau Simple", () => {
@@ -83,7 +84,15 @@ check("hook — « vite : » dans une session du pilot → ligne de niveau Simpl
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (!/\[NIVEAU — hook-lexique\][^\n]*Simple/.test(r.stdout)) throw new Error(`niveau Simple absent : ${r.stdout}`);
 });
-check("hook — « vite : » dans un dossier sans references/NIVEAUX.md, comme un produit → stdout VIDE", () => {
+check("hook — « vite : » chez un produit portant forge/NIVEAUX.md → ligne Simple citant forge\\NIVEAUX.md", () => {
+  const produit = mkdtempSync(join(tmpdir(), "produit-"));
+  mkdirSync(join(produit, "forge"));
+  writeFileSync(join(produit, "forge", "NIVEAUX.md"), "# fixture\n");
+  const r = jouerDans("vite : où est la liste des éléments ?", produit);
+  if (r.status !== 0) throw new Error(`exit ${r.status}`);
+  if (!/\[NIVEAU — hook-lexique\][^\n]*Simple[^\n]*forge\\NIVEAUX\.md/.test(r.stdout)) throw new Error(`ligne absente ou chemin du pilot cité : ${r.stdout}`);
+});
+check("hook — « vite : » dans un dossier sans NIVEAUX.md, comme un produit non équipé → stdout VIDE", () => {
   const r = jouerDans("vite : où est la liste des éléments ?", mkdtempSync(join(tmpdir(), "produit-")));
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (r.stdout.trim() !== "") throw new Error(`un dossier hors pilot a reçu la ligne de niveau : ${r.stdout}`);
