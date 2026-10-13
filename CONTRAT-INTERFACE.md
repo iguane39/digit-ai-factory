@@ -442,6 +442,24 @@ attend et doit pouvoir abandonner. D'où :
   `{chemin_guette, ts}` au lancement de tout process long en arrière-plan — vérifiable
   comme le reste du ledger (l'option mesurable de TF-0173).
 
+### 4 quater. Une session neuve par mandat, un seuil de contexte déclaré (TF-1558, avertissement)
+
+Chaque réponse relit tout le contexte de sa session : la relecture domine le volume et allonge
+la latence, et c'est la longueur de la session qui la gonfle, le contexte d'ouverture restant
+stable (`output\03-etudes\20261001-etude-opportunite-saut-opus-5-5.md`, mesure du 2026-10-01).
+D'où deux consignes, en **avertissement** et jamais en blocage (règle neuve, précédent D-70 (b)) :
+- **un mandat humain neuf s'ouvre dans une session neuve**, qui relit la doctrine et le registre
+  plutôt que de porter le contexte du mandat précédent ; une session de pilotage qui enchaîne des
+  mandats liés reste admise, et se dit ;
+- **au-delà du seuil de contexte déclaré** (`sessions.seuil_contexte_jetons` de
+  `references\MODELES-EN-SERVICE.json`, daté et sourcé), la session finit son tour, écrit son point
+  de reprise (registre, ledger ou synthèse) et se reprend dans une session neuve.
+
+Mesure, en lecture seule : `node scripts\relever-contexte-sessions.mjs [--projet <motif>]` relit les
+transcriptions des profils du poste et rend, session par session, le contexte relu par réponse et par
+tour, et les sessions qui ont franchi le seuil (AVERT, exit 0). La revue compare ce relevé avant et
+après deux semaines d'application ; la mesure de clôture est le relu par tour.
+
 ## 5. Table de routage réelle et dette d'intégration
 
 Racine des chemins : `$FORGE_ROOT`, sinon le parent du dépôt pilot (`c:\dev` sur le poste

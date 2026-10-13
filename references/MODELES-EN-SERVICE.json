@@ -91,5 +91,13 @@
       "ou": "`modelSettings` → `claude-opus-5-5` → `effortLevel` dans settings.json de chaque profil ~/.claude*, et aucune variable CLAUDE_CODE_EFFORT_LEVEL posée au lancement, qui primerait",
       "geste": "humain : réglage du poste, hors dépôt"
     }
+  },
+  "sessions": {
+    "date": "2026-10-13",
+    "seuil_contexte_jetons": 400000,
+    "decision": "TF-1558, option (a) de la fiche du 02/10/2026 : session neuve par mandat et seuil de contexte déclaré, mesurés sur deux semaines ; décidée par le mandat global humain du 13/10/2026 ; consigne en avertissement (CONTRAT-INTERFACE.md §4 quater)",
+    "pourquoi_ce_seuil": "latence médiane d'Opus 5.5 de 4,5 s sous 200 000 jetons et de 6,3 s au-delà de 600 000 (étude du 2026-10-01) : le seuil se place entre les deux. Relevé du 2026-10-13 sur 14 jours, 2 profils : 37 sessions sur 128 l'ont franchi, et les réponses au-delà portent 73 % du contexte relu",
+    "source": "output/03-etudes/20261001-etude-opportunite-saut-opus-5-5.md, section « Ce que dit la latence selon le contexte » ; relevé : scripts/relever-contexte-sessions.mjs",
+    "juge": "scripts/relever-contexte-sessions.mjs, en avertissement"
   }
 }

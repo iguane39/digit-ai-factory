@@ -586,6 +586,10 @@
   "cas": 5,
   "vu_le": "2026-09-17"
  },
+ "scripts/relever-contexte-sessions.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-10-13"
+ },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,
   "vu_le": "2026-09-03"
