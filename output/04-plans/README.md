@@ -161,6 +161,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Opus 5.5 Medium par defaut prouve sur les 2 profils - 20261001a.md` | fichier | 8,6 Ko | Synthèse Mandat — Opus 5.5 en effort medium est le défaut des conversations neuves, prouvé |
 | `Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-12 (a) exécutée : la reconstruction d'un clone divergé est |
 | `Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` | fichier | 10,2 Ko | Vos 2 décisions sont exécutées : les outils corrigés tournent sur ce poste, et les 4 forge |
+| `Digit-AI - Synthese Mandat - Ouverture de session reparee chez les 19 produits - 20261013c.md` | fichier | 9,3 Ko | Synthèse Mandat — ouverture de session VS Code : correctif repris, propagé aux 19 produits |
 | `Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md` | fichier | 22,7 Ko | Synthèse de mandat — le premier palier est fait et prouvé, le deuxième est écrit et bute s |
 | `Digit-AI - Synthese Mandat - Paliers 2 et 3 des premiers HTML de nouveaux formats - 20260914d.md` | fichier | 23,0 Ko | Synthèse de mandat — les trois règles sont écrites au socle, le premier format démuni a so |
 | `Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md` | fichier | 13,8 Ko | Le parc est aligné sur GitHub, et 2 branches n'ont jamais été fusionnées dans main : 1 au  |
@@ -256,4 +257,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_239 fichier(s), 0 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_240 fichier(s), 0 sous-dossier(s)_ · 3 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
