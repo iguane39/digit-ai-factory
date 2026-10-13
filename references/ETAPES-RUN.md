@@ -63,6 +63,22 @@ documenter : il sert à rendre un fait **opposable**.
 *Un relevé qui porte plusieurs oracles produit plusieurs entrées*, une par oracle. C'est le prix
 de la calculabilité, et il est bas.
 
+**DÉCLARER LA COUVERTURE DES DIMENSIONS D'AUDIT (TF-1212, 13/10/2026)** — au `run_open` du ledger,
+champ `couverture_dimensions`, une valeur pour chacune des cinq dimensions du référentiel d'audit de
+la maison qu'aucune étape du run ne regardait : `performance`, `couts`, `observabilite`,
+`principes_data`, `gouvernance_ia`. La valeur nomme la forge ou le contrôle qui la tient, ou dit
+`aucune : <motif>` : « aucune » est une réponse **valide**, le silence n'en est pas une. *Pourquoi* :
+sur un produit déclaré prêt, l'audit a relevé 125 écarts (76 non conformes, 49 partiels) et 12
+contrôles fatals non tenus sur 175, dont **40 écarts sur ces cinq dimensions**, que personne ne
+regardait ; sur quatorze forges déclarées à l'ouverture, cinq n'avaient jamais été mobilisées, dont
+la forge d'audit. `oracle-conformite-projet` le juge en **R-19 ter**, en **avertissement non
+bloquant** (règle neuve, précédent D-70 (b)), sur le dernier `run_open` daté du 13/10/2026 ou après.
+*Ce que la règle ne fait pas* : elle n'ajoute pas d'étape d'audit obligatoire (l'option (b) de la
+décision n'est pas prise), elle n'est pas bloquante, et elle ne tranche pas les trois contradictions relevées entre la doctrine et le
+référentiel d'audit (route de déploiement manuelle contre pipeline exclusif, sauvegarde absente de
+l'oracle de mise en production, fournisseur d'identité sans règle) : ce sont des décisions de doctrine,
+qui reviennent à l'humain (R-58).
+
 **DÉCLARER LES RÉFÉRENTIELS DISPONIBLES (TF-0373, 18/08)** — une fois par produit, avant tout.
 Pour chacun des trois, soit son chemin, soit `absent` avec son motif ; le `run_open` du ledger le
 porte en `referentiels` :
@@ -401,7 +417,8 @@ oracle + vue régénérée.
 Les seuls critères — tous mesurables, aucun « optimal »/« confiance » : oracles des étapes
 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation tenus sur les
 pans mesurés · oracle MEP au complet en staging (`ETAPE-MEP.md`) · `DOSSIER-MEP.md` complet · traçabilité exigences
-MVP → tests 100 % · ledger vérifié par `ledger.mjs verify`.
+MVP → tests 100 % · ledger vérifié par `ledger.mjs verify` · couverture des dimensions d'audit déclarée
+à l'ouverture du run (R-19 ter, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage).
 
 *L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
 

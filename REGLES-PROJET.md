@@ -1488,6 +1488,15 @@ COMPLETS, jugés ».
 
 Contrôle exécutable : `oracle-conformite-projet` R-19, joué par `oracles\self-test.mjs`.
 
+**R-19 ter (TF-1212, 13/10/2026 — avertissement).** Le `run_open` du dernier run daté du 13/10/2026 ou
+après porte `couverture_dimensions` : pour chacune des cinq dimensions du référentiel d'audit qu'
+aucune étape du run ne regardait (`performance`, `couts`, `observabilite`, `principes_data`,
+`gouvernance_ia`), la forge ou le contrôle qui la tient, ou `aucune : <motif>`. « Aucune » est une
+réponse valide, le silence n'en est pas une. Règle neuve, opposable à tous les produits : elle entre
+en **avertissement non bloquant** (précédent D-70 (b)) ; en faire un blocage est une décision humaine.
+Détail et mesure : `references\ETAPES-RUN.md`. Contrôle exécutable : `oracle-conformite-projet`
+R-19 ter, joué par `oracles\self-test.mjs`.
+
 ## AK. R-99 — numéro RÉSERVÉ : il ne désigne aucune règle, il désigne leur ABSENCE
 
 **Le fait.** `R-99` est employé par quatre fichiers exécutables du dépôt comme une **sentinelle** —

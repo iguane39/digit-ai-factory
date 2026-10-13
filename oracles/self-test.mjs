@@ -2338,6 +2338,52 @@ check("TF-1615 vert : un llms.txt instancié (une route à paramètre {id} compr
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1212 (13/10/2026) — R-19 ter : la couverture des dimensions d'audit se déclare à l'ouverture ---
+// Le fait (Produit-61) : cinq dimensions sans propriétaire dans le run portaient 40 des 125 écarts de
+// l'audit. Règle neuve, AVERTISSEMENT non bloquant : le dernier run_open daté du 13/10/2026 ou après
+// porte `couverture_dimensions` — une forge, un contrôle, ou « aucune : <motif> ». Quatre sens : la
+// déclaration complète PASS sans avertissement, l'absence est signalée, un « aucune » nu est signalé,
+// et un run antérieur n'est pas accusé. Aucun cas ne fait échouer l'oracle.
+const projet1212 = (runOpen) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1212-"));
+  mkdirSync(join(d, "forge"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"), JSON.stringify({ seq: 1, type: "run_open", schema_ledger: "1.1", versions_forges: {}, ...runOpen }) + "\n", "utf8");
+  return d;
+};
+const f1212 = (d) => lanceArgs(d, "--regles", "R-19 ter").rapport.findings.filter((f) => f.regle === "R-19 ter");
+const COUVERTURE_COMPLETE = { performance: "forge-development : budget de performance", couts: "aucune : produit sans coût d'exploitation propre", observabilite: "digit-ai-forge-observability", principes_data: "digit-ai-forge-data", gouvernance_ia: "aucune : le produit n'embarque aucun modèle" };
+check("TF-1212 vert : un run_open qui déclare les cinq dimensions (forge ou « aucune : motif ») → PASS sans avertissement", () => {
+  const d = projet1212({ ts: "2026-10-14T08:00:00Z", couverture_dimensions: COUVERTURE_COMPLETE });
+  try {
+    const f = f1212(d);
+    if (!f.some((x) => x.statut === "PASS" && /déclarées à l'ouverture/.test(x.message)) || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1212 rouge : un run_open sans couverture_dimensions → AVERTISSEMENT qui nomme les cinq dimensions, jamais un FAIL", () => {
+  const d = projet1212({ ts: "2026-10-14T08:00:00Z" });
+  try {
+    const f = f1212(d);
+    const a = f.find((x) => /AVERTISSEMENT, non bloquant/.test(x.message));
+    if (!a || !/performance, couts, observabilite, principes_data, gouvernance_ia/.test(a.message)) throw new Error(JSON.stringify(f));
+    if (f.some((x) => x.statut === "FAIL")) throw new Error("la règle neuve bloque : elle doit rester un avertissement");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1212 rouge : « aucune » sans motif et dimension manquante → AVERTISSEMENT qui nomme les deux défauts", () => {
+  const d = projet1212({ ts: "2026-10-14T08:00:00Z", couverture_dimensions: { ...COUVERTURE_COMPLETE, couts: "aucune", observabilite: undefined } });
+  try {
+    const a = f1212(d).find((x) => /AVERTISSEMENT/.test(x.message));
+    if (!a || !/non déclarée pour observabilite/.test(a.message) || !/« aucune » sans motif pour couts/.test(a.message)) throw new Error(JSON.stringify(f1212(d)));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1212 borne : un run_open antérieur au 13/10/2026 n'est pas accusé — antériorité déclarée au non_juge", () => {
+  const d = projet1212({ ts: "2026-10-01T08:00:00Z" });
+  try {
+    const r = lanceArgs(d, "--regles", "R-19 ter").rapport;
+    if ((r.findings || []).some((x) => x.regle === "R-19 ter" && x.statut !== "SANS_OBJET")) throw new Error("un run antérieur est jugé");
+    if (!(r.non_juge || []).some((l) => /R-19 ter \(couverture des dimensions d'audit\) non jugé.*2026-10-01/.test(l))) throw new Error("l'antériorité n'est pas déclarée au non_juge");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- TF-1284 (12/10/2026) : le profil d'authentification commis à la racine d'un produit ------
 // Le fait fondateur, rejoué : un outil a reçu le dossier de configuration `C` au lieu d'un chemin
 // absolu et y a écrit son profil, commis trois minutes plus tard. Trois sens : le dossier `C` et

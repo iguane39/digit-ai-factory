@@ -1509,6 +1509,49 @@ else {
       (anteriorites ? ` — ${anteriorites} run_open antérieur(s) au ${DOCTRINE_CLES_COMPLETES} en antériorité déclarée sur la forme des clés (jamais réécrits)` : "") +
       (rectifies.length ? ` — [RECTIFIÉ] ${rectifies.length} run_open couvert(s) par rectification déclarée (champ absent, clé malformée ou run_precedent omis) : ${rectifies.join(" · ")}` : ""));
   }
+
+// R-19 ter — LA COUVERTURE DES DIMENSIONS D'AUDIT SE DÉCLARE À L'OUVERTURE DU RUN (TF-1212, 13/10/2026).
+//
+// LE FAIT (Produit-61, retour du 09/09/2026) : cinq étapes closes, oracles au vert, contrat de fin de
+// construction tenu, puis 76 contrôles non conformes, 49 partiels et 12 fatals non tenus sur 175 au
+// référentiel d'audit de la même maison. Cinq dimensions — performance, coûts, observabilité,
+// principes data, gouvernance de l'IA — n'avaient aucun propriétaire dans le run et portaient 40 des
+// 125 écarts ; sur quatorze forges déclarées à l'ouverture, cinq n'avaient jamais été mobilisées. Le
+// défaut n'est pas qu'une forge manque : c'est que son ABSENCE n'a jamais été un terme déclaré du run.
+//
+// LA RÈGLE, calquée sur R-11 bis : le `run_open` porte `couverture_dimensions`, une valeur par
+// dimension — le nom de la forge ou du contrôle qui la tient, ou « aucune : <motif> ». « Aucune » est
+// une réponse VALIDE ; ce qui est refusé est le silence. RÈGLE NEUVE, opposable à tous les produits :
+// AVERTISSEMENT non bloquant (précédent D-70 (b)), jugé sur le DERNIER `run_open` daté du 13/10/2026 ou
+// après — les runs ouverts avant n'ont pas pu la connaître, et R-42 interdit de réécrire leur entrée.
+// Elle ne tranche pas la doctrine : les trois contradictions relevées entre le contrat et le référentiel
+// d'audit (route de déploiement manuelle, sauvegarde absente de l'oracle de mise en production, fournisseur
+// d'identité) restent des décisions humaines.
+{
+  const DIMENSIONS_D_AUDIT = ["performance", "couts", "observabilite", "principes_data", "gouvernance_ia"];
+  const ENTREE_COUVERTURE = "2026-10-13";
+  const dernier = opens.length ? opens[opens.length - 1] : null;
+  if (dernier) {
+    if (String(dernier.ts || "") < ENTREE_COUVERTURE) {
+      antecedences.push(`R-19 ter (couverture des dimensions d'audit) non jugé : le dernier run_open date du ${String(dernier.ts || "?").slice(0, 10)}, avant l'entrée de la règle le ${ENTREE_COUVERTURE} (TF-1212) — antériorité déclarée, l'entrée ne se réécrit pas (R-42) ; exigée à l'ouverture du prochain run`);
+    } else {
+      const c = dernier.couverture_dimensions;
+      const objet = c && typeof c === "object" && !Array.isArray(c);
+      const absentes = DIMENSIONS_D_AUDIT.filter((d) => !objet || typeof c[d] !== "string" || !c[d].trim());
+      const sansMotif = objet ? DIMENSIONS_D_AUDIT.filter((d) => typeof c[d] === "string" && /^aucune\b/i.test(c[d].trim()) && c[d].replace(/^aucune\s*[:\-—]?\s*/i, "").trim().length < 10) : [];
+      if (absentes.length || sansMotif.length) {
+        ok("R-19 ter", `forge/ledger.jsonl (run_open seq ${dernier.seq ?? "?"})`,
+          `AVERTISSEMENT, non bloquant : ${absentes.length ? `couverture non déclarée pour ${absentes.join(", ")}` : ""}${absentes.length && sansMotif.length ? " ; " : ""}`
+          + `${sansMotif.length ? `« aucune » sans motif pour ${sansMotif.join(", ")}` : ""} — le run_open porte \`couverture_dimensions\` : `
+          + "pour chacune de ces dimensions du référentiel d'audit, la forge ou le contrôle qui la tient, ou « aucune : <motif> » ; « aucune » est une réponse valide, le silence n'en est pas une. "
+          + "Mesuré le 09/09/2026 : 40 écarts sur 125 portaient sur ces cinq dimensions, qu'aucune étape du run ne regardait (TF-1212)");
+      } else {
+        ok("R-19 ter", `forge/ledger.jsonl (run_open seq ${dernier.seq ?? "?"})`,
+          `les ${DIMENSIONS_D_AUDIT.length} dimensions d'audit sans propriétaire historique sont déclarées à l'ouverture du run (forge ou « aucune » motivé)`);
+      }
+    }
+  }
+}
 }
 
 // R-42 — INTÉGRITÉ du ledger (TF-0411, 20/08) : `seq` strictement croissant depuis 1,
