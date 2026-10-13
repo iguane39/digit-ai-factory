@@ -67,17 +67,17 @@ try {
     att(r.par === "nom", `critère « ${r.par} » au lieu de « nom »`);
   });
 
-  check("un dossier au bon nom SANS `forge` n'est pas un produit — sinon on juge un dossier d'archives", () => {
+  check("cas rouge — un dossier au bon nom SANS `forge` n'est pas un produit — sinon on juge un dossier d'archives", () => {
     const r = localiserProduit("mon-produit-archives", T);
     att(r.dossier === null, `il a retenu ${r.dossier}`);
   });
 
-  check("un produit absent rend NULL — un négatif exact, pas une devinette", () => {
+  check("cas rouge — un produit absent rend NULL — un négatif exact, pas une devinette", () => {
     const r = localiserProduit("produit-qui-n-existe-pas", T);
     att(r.dossier === null && r.par === null, "il a inventé une cible");
   });
 
-  check("la borne de profondeur est TENUE et pas seulement déclarée", () => {
+  check("cas rouge — la borne de profondeur est TENUE et pas seulement déclarée", () => {
     const trop = join(T, "a", "b", "c", "d", "trop-profond");
     mkdirSync(join(trop, "forge", "retours"), { recursive: true });
     writeFileSync(join(trop, "forge", "retours", "trop-profond - RETOURS - 20260825a.md"), "x", "utf8");
@@ -86,7 +86,7 @@ try {
       "un produit au-delà de la borne a été trouvé : la borne déclarée n'est pas celle qui s'applique");
   });
 
-  check("il ne descend PAS sous un produit déjà identifié", () => {
+  check("cas rouge — il ne descend PAS sous un produit déjà identifié", () => {
     const imbrique = join(profond, "sous-projet");
     mkdirSync(join(imbrique, "forge", "retours"), { recursive: true });
     writeFileSync(join(imbrique, "forge", "retours", "sous-projet - RETOURS - 20260825a.md"), "x", "utf8");

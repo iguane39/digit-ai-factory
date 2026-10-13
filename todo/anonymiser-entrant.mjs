@@ -745,6 +745,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${12 - casse.length}/12 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${12 - casse.length}/12 cas, ${casse.length} FAIL`
+    + (casse.length ? "" : " — cas rouges : référentiel absent REFUSÉ sans laisser passer le texte, extension de la table hors banc REFUSÉE avec la variable à poser nommée"));
   process.exit(casse.length ? 1 : 0);
 }

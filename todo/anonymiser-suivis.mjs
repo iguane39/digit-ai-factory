@@ -269,8 +269,8 @@ function selfTest() {
     ? `Self-test anonymiser-suivis : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
     : "Self-test anonymiser-suivis : 10/10 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
       + "nom de fichier porteur renommé ; destination du renommage propre ; binaire sauté et hors du "
-      + "plan d'écriture ; référentiel manquant = arrêt sans écriture ; clé la plus longue appariée avant la clé courte qui la contient, nom ET contenu, TF-0913 ; "
-      + "nom dans un identifiant de code REFUSÉ et remonté, prose du même fichier nettoyée, TF-0927)");
+      + "plan d'écriture ; cas rouge : référentiel manquant = arrêt sans écriture ; clé la plus longue appariée avant la clé courte qui la contient, nom ET contenu, TF-0913 ; "
+      + "cas rouge : nom dans un identifiant de code REFUSÉ et remonté, prose du même fichier nettoyée, TF-0927)");
   return casse.length ? 1 : 0;
 }
 

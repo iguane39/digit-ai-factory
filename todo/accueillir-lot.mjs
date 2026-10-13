@@ -305,7 +305,8 @@ async function selfTest() {
 
   rmSync(T, { recursive: true, force: true });
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289, TF-1540) : ${9 - casse.length}/9 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289, TF-1540) : ${9 - casse.length}/9 cas, ${casse.length} FAIL`
+    + (casse.length ? "" : " — cas rouges : un lot du même nom REFUSÉ sans écraser le déposé, un nom inconnu déjà cité dans le parc REFUSÉ et gardé au sas, une option inconnue REFUSÉE sans lancer l'accueil réel"));
   return casse.length ? 1 : 0;
 }
 

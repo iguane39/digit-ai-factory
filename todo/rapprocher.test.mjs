@@ -41,14 +41,14 @@ check("le doublon fondateur est trouve, et au premier rang", () => {
 });
 
 // ── 2. le sens ROUGE : le vocabulaire de métier seul ne rapproche rien ───────
-check("deux items qui ne partagent QUE du vocabulaire de metier ne sont PAS rapproches", () => {
+check("cas rouge — deux items qui ne partagent QUE du vocabulaire de metier ne sont PAS rapproches", () => {
   const entrant = `${METIER} aucune porte de mise en production ne surveille la bascule d un enregistrement dns vers un nouvel hebergeur`;
   const r = rapprochements(entrant, CORPUS, { df });
   att(r.length === 0, `${r.length} rapprochement(s) rendu(s) sur du vocabulaire partage : ${r.map((x) => x.id).join(", ")}`);
 });
 
 // ── 3. seuls les items CLOS sont rapprochés — un candidat n'est pas un travail tranché ──
-check("un item CANDIDAT n'est jamais rendu : rapprocher a un candidat n'apprend rien", () => {
+check("cas rouge — un item CANDIDAT n'est jamais rendu : rapprocher a un candidat n'apprend rien", () => {
   const entrant = "une redirection vers le puits de sortie sous un shell windows ecrit un fichier nomme null a la racine du parc, hors de tout depot";
   const r = rapprochements(entrant, CORPUS, { df });
   att(!r.some((x) => x.id === "TF-0003"), "un item candidat a ete rendu");
@@ -58,7 +58,7 @@ check("un item CANDIDAT n'est jamais rendu : rapprocher a un candidat n'apprend 
 // Le corpus réel ne l'exerce pas : ses items sont longs, donc 0.16 de recouvrement implique déjà
 // beaucoup de termes partagés. Deux items COURTS, eux, atteignent le seuil sur deux mots — et deux
 // mots ne disent rien. Sans ce cas, la clause serait morte en se croyant vivante.
-check("deux items COURTS qui partagent deux mots franchissent le seuil et sont pourtant ECARTES", () => {
+check("cas rouge — deux items COURTS qui partagent deux mots franchissent le seuil et sont pourtant ECARTES", () => {
   const court = [{ id: "TF-9001", statut: "corrige", date: "2026-08-20",
     titre: "", contenu: "gitignore depot racine" }];
   const entrant = "gitignore depot fichier";
