@@ -149,6 +149,21 @@ try {
     } finally { rmSync(P, { recursive: true, force: true }); }
   });
 
+  check("TF-1635 — une LISTE de motifs exigés : chaque motif absent est nommé, le fichier qui les porte tous est present", () => {
+    const P = mkdtempSync(join(tmpdir(), "heritage-motifs-"));
+    try {
+      mkdirSync(join(P, ".claude"), { recursive: true });
+      const A = { mode: "presence_et_motif", source: "gabarits/settings-produit.json", cible: ".claude/settings.json",
+        motif_exige: ["forge/hooks/factory.mjs publication-hebergee", "factory.mjs ouverture --sans-readme --contexte-json"] };
+      writeFileSync(join(P, ".claude", "settings.json"), '{"c":["node forge/hooks/factory.mjs publication-hebergee","node forge/hooks/factory.mjs ouverture --sans-readme"]}', "utf8");
+      const rouge = etatArtefact(P, A, P);
+      att(rouge.etat === "incomplet", `hook d'ouverture synchrone : état « ${rouge.etat} » au lieu de « incomplet »`);
+      att(JSON.stringify(rouge.motifs_absents) === JSON.stringify([A.motif_exige[1]]), `motifs absents mal nommés : ${JSON.stringify(rouge.motifs_absents)}`);
+      writeFileSync(join(P, ".claude", "settings.json"), '{"c":["node forge/hooks/factory.mjs publication-hebergee","node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json"]}', "utf8");
+      att(etatArtefact(P, A, P).etat === "present", "fichier qui porte les 2 motifs non reconnu");
+    } finally { rmSync(P, { recursive: true, force: true }); }
+  });
+
   check("un PRODUIT de l'écosystème (digit-ai-marketing) est relevé : le préfixe digit-ai ne fait pas une forge", () => {
     const P = mkdtempSync(join(tmpdir(), "heritage-eco-"));
     try {

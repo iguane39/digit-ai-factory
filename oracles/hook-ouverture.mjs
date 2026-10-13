@@ -20,12 +20,34 @@ import { tmpdir } from "node:os";
 import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { passerOuvertureEnAsync } from "./lib-ouverture-async.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const iPilot = args.indexOf("--pilot");
 const PILOT = iPilot >= 0 ? args[iPilot + 1] : join(ICI, "..");
 const lignes = [];
+
+// TF-1635 (13/10/2026) — LE PRODUIT PASSE SON HOOK D'OUVERTURE EN ASYNC, AVANT TOUT GESTE LENT.
+// Le gabarit `settings-produit.json` est corrigé, mais `.claude/settings.json` d'un produit n'est
+// jamais recopié : mesuré le 13/10, 19 produits sur 19 gardaient le hook synchrone à 240 s, que
+// l'extension VS Code coupe à 60 s. La réparation est faite ICI, en premier, parce qu'un hook
+// synchrone coupé à 60 s ne laisse rien faire à ce qu'il aurait joué ensuite. Lancé en synchrone
+// (sans `--contexte-json`), le hook rend aussitôt la main avec les seules règles de session : le
+// relevé complet attend l'ouverture suivante, déjà asynchrone, plutôt que de faire échouer celle-ci.
+if (iPilot >= 0) {
+  const r = passerOuvertureEnAsync(join(process.cwd(), ".claude", "settings.json"));
+  if (r.etat === "corrige" && !args.includes("--contexte-json")) {
+    console.log([
+      "## Ouverture de session (TF-1635)",
+      "- `.claude/settings.json` de ce produit déclarait le hook d'ouverture en synchrone, que l'extension VS Code coupe à 60 s. Il vient d'être passé en `async` avec `--contexte-json` ; le reste du fichier est intact. Le relevé complet (fraîcheur, héritage, boîte d'entrée) arrivera à la prochaine ouverture : ne pas supposer le poste à jour d'ici là. Enregistrer ce changement avec le travail du produit.",
+      ...lignesGates(),
+    ].join("\n"));
+    process.exit(0);
+  }
+  if (r.etat === "corrige") lignes.push("## Ouverture de session (TF-1635)", "- `.claude/settings.json` de ce produit : hook d'ouverture complété (`async`, `--contexte-json`) ; le reste du fichier est intact. Enregistrer ce changement avec le travail du produit.", "");
+  if (r.etat === "illisible") lignes.push("## Ouverture de session (TF-1635)", `- \`.claude/settings.json\` illisible (${r.detail}) : le hook d'ouverture n'a pas pu être vérifié en async. S'il est synchrone, l'extension VS Code coupera l'ouverture à 60 s.`, "");
+}
 
 if (!args.includes("--sans-bootstrap")) {
   const b = join(PILOT, "bootstrap.mjs");
@@ -586,11 +608,12 @@ function ligneCrochetReadme() {
   return "- ATTENTION, état MESURÉ : `.claude/settings.json` de ce projet " + (declare === false ? "ne déclare aucun crochet PostToolUse" : "est absent ou illisible") + ". Les README d'input\\ et output\\ NE se régénèrent PAS après une écriture : les rejouer à la main (`node scripts\\readme-dossiers.mjs`) avant l'enregistrement. Un rôle non rédigé est un défaut.";
 }
 
-lignes.push("",
+lignes.push(...lignesGates());
+function lignesGates() { return ["",
   "## Gates actifs dans cette session (R-44)",
   "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. v2.33.0 (01/10) : LE BLOC 3 NE PORTE QUE LES DÉCISIONS QUI REVIENNENT À L'HUMAIN — les autres s'exécutent dans le tour et se rendent pour information (R-58, décision humaine du 01/10). v2.32.0 (01/10) : UN PARAGRAPHE DE PROSE S'ÉCRIT SUR UNE SEULE LIGNE SOURCE — un paragraphe coupé à la main s'affiche en colonne étroite dans le chat de l'extension VS Code (S54, TF-1494). v2.31.0 (28/09) : UNE DÉCISION DÉJÀ POSÉE ET INCHANGÉE SE RAPPELLE EN UNE LIGNE, ELLE NE SE REPOSE PLUS — sélecteur, sujet, heure de pose, « inchangée » (S4, TF-1429). v2.30.0 (28/09) : LES IDENTIFIANTS DU REGISTRE PRODUIT ET DU LOT DE RETOURS SONT RECONNUS, ET « NEUVE » SE DÉCLARE — « registre A-18 », « RT-2 » (S14, S39, TF-1428, TF-1449). v2.29.0 (28/09) : UNE BARRE VERTICALE DANS UNE CELLULE DE TABLEAU S'ÉCHAPPE, ET LE JUGE NOMME LA COUPURE AU LIEU D'ACCUSER LA COLONNE VOISINE (S18, TF-1427). v2.28.0 (27/09) : UNE ACTION SUR L'ÉCRAN D'UNE PLATEFORME TIERCE CITE SA SOURCE OFFICIELLE ET LA DATE OÙ ELLE A ÉTÉ LUE (S52), ET, LAISSÉE À manuelle_utilisateur, ELLE SE GUIDE EN TÊTE — une section « ## Guide — … » avant le bloc 0 alors titré, des étapes numérotées closes par « Résultat attendu : … » (S53, bloquante quand le dernier message humain demande la procédure ; TF-1362, TF-1361). v2.27.0 (19/09) : UN REFUS PROUVE QU'UNE PORTE EST FERMÉE, JAMAIS QU'IL N'Y EN A QU'UNE — une incapacité d'accès déclarée porte les codes de retour de DEUX FAMILLES de chemins au moins (un préfixe d'URL ou un scope distinct, pas une variante du même), ou cite la source qui établit qu'un seul chemin existe ; « seule voie » ne vaut plus preuve (S25 durcie, TF-1189). v2.26.0 (17/09) : LE BLOC 1 DIT L'INTENTION DE LA DEMANDE — une phrase pour l'intention initiale, puis « Test rétro : » qui dit si le résultat la sert ou n'en sert que la lettre (S51, loi transverse n° 7). v2.25.0 (17/09) : UN TOUR DE TRAVAIL DONT LE RÉSULTAT N'EST PAS ENCORE MESURABLE SE DÉCLARE « POINT D'ÉTAPE » AU BLOC 1 — bloc 2 remplacé par « ce qui reste à mesurer, et par quoi » (la mesure attendue ET l'outil qui la rendra), blocs 1, 4 et 8 PLEINS (S50), les autres admis en une ligne ; et un RELAIS d'avancement de trois lignes, quand rien n'a été écrit depuis ton dernier affichage, ne se rejuge pas et ne reprend pas la synthèse déposée en entier (TF-1182). v2.24.0 (17/09) : UNE OPTION DU BLOC 3 QUI COMMANDE UN GESTE HUMAIN (se connecter, saisir, coller, installer, ouvrir un terminal, lancer une commande, valider un second facteur, publier soi-même) porte SUR PLACE de quoi l'exécuter — la commande entre accents graves, l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » (S49). v2.23.0 (17/09) : CHEZ UN PRODUIT, le bloc 9 porte une ligne « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » — « rien à remonter » est une réponse valide, le silence ne l'est pas (S48 ; sans objet au pilot et dans une forge). Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Coût | Exclusions` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
   ligneCrochetReadme(),
-  "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).");
+  "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43)."]; }
 
 // SORTIE EN JSON POUR LE MODE ASYNCHRONE (13/10/2026). L'extension VS Code abandonne une session
 // dont l'initialisation dépasse 60 s, et le CLI n'annonce sa disponibilité qu'APRÈS la fin de tous

@@ -14,7 +14,7 @@
           {
             "type": "command",
             "command": "node oracles/hook-produits-intacts.mjs --empreinte",
-            "timeout": 120
+            "timeout": 45
           }
         ]
       }

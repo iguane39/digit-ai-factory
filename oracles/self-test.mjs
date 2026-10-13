@@ -92,8 +92,10 @@ writeFileSync(join(verte, "CLAUDE.md"), readFileSync(join(verte, "CLAUDE.md"), "
   "\n## Précédence (R-43)\nQuand la factory est impliquée, ses règles priment sur celles du projet.\n");
 mkdirSync(join(verte, ".claude"), { recursive: true });
 // TF-1592 (HERITAGE 1.16.1) : le câblage PreToolUse sur Artifact est exigé par R-47 ; la verte le porte.
+// TF-1635 (HERITAGE 1.19.0) : le hook d'ouverture asynchrone aussi.
 writeFileSync(join(verte, ".claude", "settings.json"),
-  JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
+  JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true }] }],
+    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
@@ -179,10 +181,23 @@ check("TF-1592 rouge — settings sans le hook publication-hebergee : R-47 FAIL 
   const f = join(verte, ".claude", "settings.json");
   const avant = readFileSync(f, "utf8");
   try {
-    writeFileSync(f, JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
+    writeFileSync(f, JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true }] }],
+      Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
     const { exit, rapport } = lance(verte);
     const r47 = rapport.findings.filter((x) => x.regle === "R-47" && x.statut === "FAIL");
     if (exit !== 1 || !r47.some((x) => /publication-hebergee/.test(x.message))) throw new Error(`exit ${exit}, R-47 : ${JSON.stringify(r47)}`);
+  } finally { writeFileSync(f, avant); }
+});
+
+check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui nomme le motif asynchrone", () => {
+  const f = join(verte, ".claude", "settings.json");
+  const avant = readFileSync(f, "utf8");
+  try {
+    writeFileSync(f, avant.replace(" --contexte-json\",\"async\":true", "\",\"timeout\":240"));
+    if (readFileSync(f, "utf8") === avant) throw new Error("témoin rouge mal construit : réglage inchangé");
+    const { exit, rapport } = lance(verte);
+    const r47 = rapport.findings.filter((x) => x.regle === "R-47" && x.statut === "FAIL");
+    if (exit !== 1 || !r47.some((x) => /ouverture --sans-readme --contexte-json/.test(x.message))) throw new Error(`exit ${exit}, R-47 : ${JSON.stringify(r47)}`);
   } finally { writeFileSync(f, avant); }
 });
 

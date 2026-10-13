@@ -181,5 +181,71 @@ check("--contexte-json : le contexte porte TOUT le relevé texte, et l'en-tête 
   if (!/hook SessionStart asynchrone/.test(ctx)) throw new Error("l'en-tête qui dit l'asynchronie manque");
 });
 
+// TF-1635 (13/10/2026) — UN PRODUIT DONT LE HOOK D'OUVERTURE EST SYNCHRONE SE RÉPARE À L'OUVERTURE.
+// Mesuré le 13/10 : 19 produits sur 19 portaient le hook synchrone à 240 s, que l'extension VS Code
+// coupe à 60 s. Le hook, lancé sous cette forme, passe l'entrée en `async` + `--contexte-json`, garde
+// le reste du fichier (permissions, autres hooks, CRLF, indentation) et rend la main aussitôt avec
+// les règles de session. Sens rouge : sans la réparation, le réglage reste synchrone et le hook
+// joue son relevé complet.
+const { passerOuvertureEnAsync } = await import(new URL("./lib-ouverture-async.mjs", import.meta.url));
+const SETTINGS_SYNC = JSON.stringify({
+  permissions: { allow: ["Bash(npm test)"] },
+  hooks: {
+    SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme", timeout: 240 }] }],
+    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution", timeout: 60 }] }],
+  },
+}, null, 4).replace(/\n/g, "\r\n") + "\r\n";
+
+check("TF-1635 — le hook lancé en synchrone chez un produit passe son réglage en async et rend la main avec les gates", () => {
+  const P = mkdtempSync(join(tmpdir(), "ouverture-async-"));
+  mkdirSync(join(P, ".claude"), { recursive: true });
+  const f = join(P, ".claude", "settings.json");
+  writeFileSync(f, SETTINGS_SYNC, "utf8");
+  const t0 = Date.now();
+  const sortie = joue(P);
+  const duree = Date.now() - t0;
+  const apres = readFileSync(f, "utf8");
+  const j = JSON.parse(apres);
+  const h = j.hooks.SessionStart[0].hooks[0];
+  if (h.async !== true) throw new Error("le hook d'ouverture n'est pas passé en async");
+  if (!/--contexte-json/.test(h.command)) throw new Error("--contexte-json manque à la commande");
+  if (j.permissions.allow[0] !== "Bash(npm test)" || j.hooks.Stop[0].hooks[0].timeout !== 60) throw new Error("le reste du réglage a été touché");
+  if (!apres.includes("\r\n    \"hooks\"")) throw new Error("fins de ligne ou indentation du produit perdues");
+  if (!/## Gates actifs dans cette session \(R-44\)/.test(sortie)) throw new Error("les gates de session manquent à la sortie");
+  if (/## Fraîcheur|## Héritage/.test(sortie)) throw new Error("le relevé complet a été joué au lieu de rendre la main");
+  if (duree > 20000) throw new Error(`rendu en ${duree} ms, au-delà de 20 s`);
+  if (passerOuvertureEnAsync(f).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
+});
+
+check("TF-1635 — sens rouge et bords : réglage sans hook de la factory, illisible ou absent, jamais réécrit", () => {
+  const P = mkdtempSync(join(tmpdir(), "ouverture-async-bords-"));
+  const f = join(P, "settings.json");
+  if (passerOuvertureEnAsync(f).etat !== "absent") throw new Error("fichier absent non reconnu");
+  writeFileSync(f, "{ pas du json", "utf8");
+  if (passerOuvertureEnAsync(f).etat !== "illisible" || readFileSync(f, "utf8") !== "{ pas du json") throw new Error("fichier illisible réécrit");
+  const autre = JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ command: "node mon-hook.mjs", timeout: 30 }] }] } });
+  writeFileSync(f, autre, "utf8");
+  if (passerOuvertureEnAsync(f).etat !== "sans_hook" || readFileSync(f, "utf8") !== autre) throw new Error("un hook étranger à la factory a été touché");
+  writeFileSync(f, SETTINGS_SYNC, "utf8");
+  const avant = JSON.parse(readFileSync(f, "utf8")).hooks.SessionStart[0].hooks[0];
+  if (avant.async === true) throw new Error("témoin rouge mal construit : déjà async");
+});
+
+// TF-1635 — LE DÉLAI DU CLIENT EST UNE BORNE, PAS UNE CONSIGNE. Tout hook SessionStart resté
+// synchrone, au pilot comme dans le gabarit des produits, porte un délai d'au plus 45 s : coupé à
+// ce délai, il ne peut plus faire dépasser les 60 s de l'extension VS Code. Sens rouge : le même
+// prédicat sur un hook synchrone à 120 s, le délai que portait hook-produits-intacts jusqu'au 13/10.
+const BORNE_SYNC_S = 45;
+const horsBorne = (settings) => ((settings.hooks || {}).SessionStart || []).flatMap((g) => g.hooks || [])
+  .filter((h) => h.async !== true && !(Number(h.timeout) <= BORNE_SYNC_S)).map((h) => `${h.command} (${h.timeout ?? "sans délai"} s)`);
+check(`TF-1635 — tout hook SessionStart synchrone du pilot et du gabarit produit est borné à ${BORNE_SYNC_S} s`, () => {
+  for (const rel of [".claude/settings.json", "gabarits/settings-produit.json"]) {
+    const fautifs = horsBorne(JSON.parse(readFileSync(join(PILOT, rel), "utf8")));
+    if (fautifs.length) throw new Error(`${rel} : ${fautifs.join(" ; ")}`);
+  }
+  const rouge = horsBorne({ hooks: { SessionStart: [{ hooks: [{ command: "node oracles/hook-produits-intacts.mjs --empreinte", timeout: 120 }] }] } });
+  if (rouge.length !== 1) throw new Error("sens rouge : un hook synchrone à 120 s n'est pas refusé");
+});
+
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

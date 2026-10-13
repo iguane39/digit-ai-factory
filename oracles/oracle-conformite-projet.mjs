@@ -1029,9 +1029,12 @@ else {
           perimes.push(`${a.cible} diverge de ${a.source} — ${cause.detail}`);
         }
       } else if (a.mode === "presence_et_motif") {
-        new RegExp(a.motif_exige.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(readFileSync(dst, "utf8"))
-          ? ok47.push(a.cible)
-          : perimes.push(`${a.cible} ne porte pas « ${a.motif_exige} »`);
+        // TF-1635 (13/10/2026) : `motif_exige` peut être une liste, chaque motif exigé à part.
+        const texte = readFileSync(dst, "utf8");
+        const manquants = [].concat(a.motif_exige || []).filter((m) => !texte.includes(m));
+        manquants.length
+          ? perimes.push(`${a.cible} ne porte pas ${manquants.map((m) => `« ${m} »`).join(" ni ")}`)
+          : ok47.push(a.cible);
       } else if (a.mode === "presence_et_motifs") {
         // TF-0649 — UN SOCLE, PAS UN PLAFOND. Le fichier du produit doit CONTENIR les motifs que
         // le socle édicte ; il peut en porter d'autres, et c'est voulu — exiger l'identité

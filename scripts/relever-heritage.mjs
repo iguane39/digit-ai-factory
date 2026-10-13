@@ -343,8 +343,10 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
   // lisait pas, et l'émetteur de travaux ne confiait donc jamais le câblage manquant : le hook
   // publication-hebergee, exigé de 7 produits sur 7 le 12/10, n'atteignait aucun d'eux.
   if (artefact.mode === "presence_et_motif" && artefact.motif_exige) {
-    return readFileSync(cible, "utf8").includes(artefact.motif_exige)
-      ? { etat: "present" } : { etat: "incomplet", motifs_absents: [artefact.motif_exige] };
+    // TF-1635 (13/10/2026) : `motif_exige` peut être une liste, chaque motif exigé à part.
+    const texte = readFileSync(cible, "utf8");
+    const absents = [].concat(artefact.motif_exige).filter((m) => !texte.includes(m));
+    return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
   }
   if (artefact.mode !== "copie_conforme") return sousRacineWeb ? { etat: "present", sous_racine_web: sousRacineWeb } : { etat: "present" };
   const source = join(racinePilot, String(artefact.source));
