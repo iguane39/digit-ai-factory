@@ -690,6 +690,44 @@ check("borne R14 : un doublon créé AVANT le seuil n'est pas jugé, et il est C
 });
 if (avantR14 === undefined) delete process.env.TODO_SEUIL_R14; else process.env.TODO_SEUIL_R14 = avantR14;
 
+// ── R16 (13/10/2026, demande humaine « revoir les statuts avec Attente Produit, Attente Autre Poste ») ──
+// Un sujet EN COURS dit qui doit agir : le champ `attente`, vocabulaire fermé. Quatre sens : sans
+// attente → FAIL ; valeur inconnue → FAIL ; échéance sans date et dépendance sans sujet → FAIL ;
+// les formes complètes → PASS.
+const enCours = (sur) => [
+  item({}),
+  maj({ statut: "decide", decideur: "humain", date_decision: "2026-08-08" }),
+  JSON.stringify({ ev: "maj", ts: "2026-08-08T12:00:00Z", id: "TF-9001", statut: "en_cours", ...sur }),
+].join("\n") + "\n";
+const lanceR16 = (nom, contenu) => {
+  const f = join(T, nom); writeFileSync(f, contenu, "utf8");
+  const r = spawnSync("node", [oracle, f, join(T, "vide.jsonl")], { encoding: "utf8" });
+  return { code: r.status, sortie: String(r.stdout || "") };
+};
+const r16Echoue = (r) => /"regle": "R16",\s*"statut": "FAIL"/.test(r.sortie);
+check("rouge R16 : un sujet en cours SANS attente → FAIL, règle nommée", () => {
+  const r = lanceR16("R16-sans.jsonl", enCours({}));
+  if (r.code !== 1 || !r16Echoue(r)) throw new Error(`exit ${r.code}, R16 ${r16Echoue(r) ? "présente" : "absente"}`);
+});
+check("rouge R16 : une attente hors vocabulaire → FAIL", () => {
+  const r = lanceR16("R16-inconnue.jsonl", enCours({ attente: "client" }));
+  if (r.code !== 1 || !r16Echoue(r)) throw new Error(`exit ${r.code}`);
+});
+check("rouge R16 : échéance sans date, dépendance sans sujet → FAIL", () => {
+  const a = lanceR16("R16-echeance.jsonl", enCours({ attente: "echeance" }));
+  const b = lanceR16("R16-dependance.jsonl", enCours({ attente: "dependance" }));
+  if (!r16Echoue(a)) throw new Error("échéance sans attente_jusqu_au acceptée");
+  if (!r16Echoue(b)) throw new Error("dépendance sans attente_de acceptée");
+});
+check("verte R16 : attente produit, échéance datée, dépendance nommée → PASS exit 0", () => {
+  for (const [nom, sur] of [["R16-produit.jsonl", { attente: "produit" }],
+    ["R16-date.jsonl", { attente: "echeance", attente_jusqu_au: "2026-10-15" }],
+    ["R16-dep.jsonl", { attente: "dependance", attente_de: "TF-9001" }]]) {
+    const r = lanceR16(nom, enCours(sur));
+    if (r.code !== 0) throw new Error(`${nom} : exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+  }
+});
+
 rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test TODO-FORGE : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

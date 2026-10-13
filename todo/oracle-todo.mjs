@@ -324,6 +324,29 @@ if (CLASSES_BRUTES === null) {
     ok("R15", `${r15Portees} famille(s) portée(s) par un contrôle existant, ${r15Anterieures} antérieure(s) au cliquet — aucune famille neuve sans porteur`);
 }
 
+// ---- R16 (13/10/2026, demande humaine « revoir les statuts avec Attente Produit, Attente Autre
+// Poste ») — UN SUJET EN COURS DIT QUI DOIT AGIR. Le 13/10, 27 sujets en cours sur 27 attendaient
+// un acteur extérieur à la session, et rien dans le registre ne le disait : « en cours » se lisait
+// comme « la session y travaille ». Le statut garde sa machine (R5) ; le champ `attente` porte qui
+// doit agir, en vocabulaire fermé, avec son complément quand il en faut un.
+const ATTENTES = new Set(["session", "produit", "produit_absent", "autre_poste", "decision_humaine", "echeance", "dependance"]);
+let r16Juges = 0;
+for (const [id, e] of etatsActifs) {
+  if (e.attente === undefined && e.statut !== "en_cours") continue;
+  if (e.statut === "en_cours") r16Juges++;
+  if (e.statut === "en_cours" && !e.attente)
+    { ko("R16", id, "sujet en cours sans `attente` — dire qui doit agir : " + [...ATTENTES].join(" | ")); continue; }
+  if (e.attente === null) continue; // effacée à la sortie de « en cours »
+  if (!ATTENTES.has(e.attente))
+    { ko("R16", id, `attente « ${e.attente} » hors vocabulaire (${[...ATTENTES].join(", ")})`); continue; }
+  if (e.attente === "echeance" && !/^\d{4}-\d{2}-\d{2}$/.test(String(e.attente_jusqu_au || "")))
+    ko("R16", id, "attente « echeance » sans `attente_jusqu_au` au format AAAA-MM-JJ — une échéance sans date n'arrive jamais");
+  if (e.attente === "dependance" && !(etatsActifs.has(e.attente_de) || etatsArchive.has(e.attente_de)))
+    ko("R16", id, `attente « dependance » sans \`attente_de\` qui désigne un sujet du registre (lu : « ${e.attente_de || ""} »)`);
+}
+if (!findings.some((f) => f.regle === "R16" && f.statut === "FAIL"))
+  ok("R16", `${r16Juges} sujet(s) en cours, chacun avec son attente au vocabulaire fermé`);
+
 const echecs = findings.filter((f) => f.statut === "FAIL").length;
 console.log(JSON.stringify({
   oracle: "oracle-todo", version: "1.3.0", verdict: echecs ? "FAIL" : "PASS", findings,

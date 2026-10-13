@@ -152,6 +152,23 @@ par l'humain et non plus par la page (TF-0328) — ou un mandat global explicite
 et la date sont tracés (R6). Transitions : candidat→decide→en_cours→corrige|ecarte→archive.
 Clôture `corrige` : `gains_constates`, `corrections_realisees`, `date_correction` exigés (R7).
 
+**Qui doit agir sur un sujet en cours** (règle R16, 13/10/2026, demande humaine « revoir les
+statuts avec Attente Produit, Attente Autre Poste ») : tout sujet `en_cours` porte un champ
+`attente`, en vocabulaire fermé. Le statut garde sa machine (R5) ; l'attente dit qui tient la suite.
+
+| `attente` | Qui doit agir | Complément exigé |
+|---|---|---|
+| `session` | la session y travaille | aucun |
+| `produit` | le produit, dont le lot de travaux est déposé | aucun |
+| `produit_absent` | le produit, absent de ce poste | aucun |
+| `autre_poste` | une session de l'autre poste | aucun |
+| `decision_humaine` | l'humain, qui doit trancher | aucun |
+| `echeance` | personne avant une date | `attente_jusqu_au` (AAAA-MM-JJ) |
+| `dependance` | un autre sujet du registre | `attente_de` (TF-####) |
+
+Toute mise à jour qui fait entrer un sujet en `en_cours`, ou qui change son reste, porte son
+`attente`. La vue `TODO.md` l'affiche à côté du statut et compte les sujets par attente.
+
 **Intake** : lots des produits (règle 18), **lots des forges** (toute forge peut déposer un
 lot ciblant n'importe quelle forge — même gabarit, remise au sas `input\00-retours\_arrivee\`,
 préfixé du projet ou de la forge émettrice), demandes humaines directes ; candidatures hors lot :

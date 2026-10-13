@@ -36,6 +36,15 @@ for (const e of etats.values()) {
 // LF, pour un registre identique. Un sceau qui depend du checkout ne prouve rien.
 const sceau = (f) => empreinteFichier(f, 12);
 const compte = (s) => [...etats.values()].filter((e) => e.statut === s).length;
+// R16 (13/10/2026) — qui doit agir sur un sujet en cours : le champ `attente`, rendu en clair.
+const LIBELLE_ATTENTE = { session: "session", produit: "produit", produit_absent: "produit absent du poste",
+  autre_poste: "autre poste", decision_humaine: "décision humaine", echeance: "échéance", dependance: "autre sujet" };
+const attentesLigne = () => {
+  const n = {};
+  for (const e of etats.values()) if (e.statut === "en_cours") n[e.attente || "non dite"] = (n[e.attente || "non dite"] || 0) + 1;
+  const parts = Object.entries(n).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${LIBELLE_ATTENTE[k] || k} ${v}`);
+  return parts.length ? `En cours, en attente de : ${parts.join(" · ")}.` : "";
+};
 
 let md = `# TODO-FORGE — registre d'amélioration de l'écosystème
 
@@ -43,6 +52,7 @@ let md = `# TODO-FORGE — registre d'amélioration de l'écosystème
      sceaux: actifs=${sceau(SRC)} archive=${sceau(ARC)} · dernier événement: ${tsMax} -->
 
 **${etats.size} actifs** (candidat ${compte("candidat")} · décidé ${compte("decide")} · en cours ${compte("en_cours")} · corrigé ${compte("corrige")} · écarté ${compte("ecarte")}) · **${new Set(archives.map((a) => a.id)).size} archivés**.
+${attentesLigne()}
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 `;
@@ -51,7 +61,7 @@ for (const forge of [...parForge.keys()].sort()) {
     ORDRE_STATUT.indexOf(a.statut) - ORDRE_STATUT.indexOf(b.statut) || b.score.valeur - a.score.valeur);
   md += `\n## ${forge}\n\n| id | statut | score | titre | payé en réel |\n|---|---|---|---|---|\n`;
   for (const e of items)
-    md += `| ${e.id} | ${e.statut} | ${e.score.valeur} | ${e.titre} | ${e.preuve_du_cout ? "**oui** — " + e.preuve_du_cout : "non"} |\n`;
+    md += `| ${e.id} | ${e.statut === "en_cours" && e.attente ? `en_cours · attente ${LIBELLE_ATTENTE[e.attente] || e.attente}${e.attente_jusqu_au ? ` (${e.attente_jusqu_au})` : ""}${e.attente_de ? ` (${e.attente_de})` : ""}` : e.statut} | ${e.score.valeur} | ${e.titre} | ${e.preuve_du_cout ? "**oui** — " + e.preuve_du_cout : "non"} |\n`;
 }
 md += `\n---\nDétail d'un item : \`grep '"id":"TF-xxxx"' todo/TODO.jsonl\` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.\n`;
 writeFileSync(OUT, md);
