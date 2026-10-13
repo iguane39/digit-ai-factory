@@ -176,8 +176,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 20,
-  "vu_le": "2026-10-01"
+  "cas": 24,
+  "vu_le": "2026-10-13"
  },
  "oracle-empreintes.mjs": {
   "cas": 13,

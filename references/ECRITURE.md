@@ -134,6 +134,12 @@ précédent reste en prose. Découper une démonstration en puces casse le lien 
 
 ### E-12 — Le vocabulaire du lecteur, jamais celui du système
 *Types T2, T3, T4. Juge : `glossaire-restitution.json` (forge-data), contrat `voix.md` (T4). Revue.*
+*Juge (13/10/2026, TF-1392, TF-1394) : la rubrique « lecteur visé » d'`oracle-judge` (quality-oracles
+v2.17.0, `--lecteur-vise`) fait relire chaque unité par 2 relecteurs qui jouent le lecteur de la fiche
+de conception ; un constat n'est retenu que s'ils s'accordent, sa suite s'écrit dans `REVUE.md`, et la
+question qui revient d'une lecture à l'autre se montre à l'humain avant la remise. `oracle-ecriture`
+EC-11 signale une question de décision dont le paragraphe ne nomme rien. Les deux en avertissement,
+jamais bloquants (décisions D-2 (a) et D-3 (a)) ; revue le 2026-11-10.*
 Un terme de restitution est celui que le destinataire lit ; un terme machine reste dans le code.
 Avant (08/09, forge-data) : « grain » 33 fois dans un rapport. Après : « granularité »,
 zéro emploi restant. Pour T4 : un libellé nomme ce que la personne contrôle (« Enregistrer les
