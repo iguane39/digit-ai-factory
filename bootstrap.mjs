@@ -48,7 +48,7 @@ const MOI = fileURLToPath(import.meta.url);
 const SOURCE = (process.env.BOOTSTRAP_SOURCE || "https://github.com/iguane39").replace(/\/+$/, "");
 // Les dépôts déclarés du parc vivent dans scripts/lib-parc.mjs depuis le 27/09/2026 (TF-1327) : les
 // balayages du parc les lisent là, au lieu de juger un dossier à la forme de son nom.
-import { FORGES, PRODUITS_DE_L_ECOSYSTEME, PILOT, ALIAS_PILOT, CANAL } from "./scripts/lib-parc.mjs";
+import { FORGES, PRODUITS_DE_L_ECOSYSTEME, PILOT, ALIAS_PILOT, CANAL, ACCES_REFUSE } from "./scripts/lib-parc.mjs";
 
 const args = process.argv.slice(2);
 // --rebatir <dépôt> (D-12 a, 07/09/2026, TF-0877) : quand un dépôt rend « DIVERGÉ » parce que son
@@ -90,6 +90,21 @@ const averts = [];
 const versions = [];
 const ligne = (statut, msg) => console.log(`[${statut}] ${msg}`);
 const defaut = (msg, remede) => { ligne("DEFAUT", `${msg} — remède : ${remede}`); defauts.push(msg); };
+// 13/10/2026 — UN DÉPÔT PRIVÉ HORS D'ACCÈS N'EST PAS UN DÉFAUT DU POSTE. Un autre développeur a joué
+// `--pull` sur son poste : les quatorze forges publiques à jour, et pourtant « Poste NON prêt — 3
+// défaut(s) », tous dus aux deux dépôts privés du propriétaire (digit-ai-queue, digit-ai-confidentiel)
+// que son compte ne peut pas lire. Le refus d'accès se dit en [avert] avec son remède ; une autre
+// cause d'échec (réseau, disque) reste un défaut.
+const privesHorsAcces = new Set();
+const cloneRefuse = (depot, stderr) => {
+  const premiere = (stderr || "").trim().split("\n")[0].slice(0, 120);
+  if (!depot.prive || !ACCES_REFUSE.test(stderr || "")) return false;
+  privesHorsAcces.add(depot.nom);
+  ligne("avert", `${depot.nom} — dépôt PRIVÉ hors d'accès pour ce compte (${premiere}) : facultatif, le poste reste jugé sur le reste du parc. ` +
+    `Pour y accéder : le propriétaire invite ce compte (gh api -X PUT repos/<propriétaire>/${depot.nom}/collaborators/<compte>), puis relancer --pull`);
+  averts.push(`${depot.nom} privé hors d'accès`);
+  return true;
+};
 
 console.log(`Amorçage forge — racine : ${racine}\n`);
 
@@ -287,7 +302,7 @@ for (const f of FORGES) {
       const e = etatDepot(dest);
       ligne("ok", `${f.nom} — cloné (${e.version})`);
       versions.push({ nom: f.nom, version: e.version, sha: e.sha, date: e.date, etat: "cloné" });
-    } else defaut(`${f.nom} — clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`,
+    } else if (!cloneRefuse(f, r.stderr)) defaut(`${f.nom} — clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`,
       `vérifier l'accès à ${SOURCE}/${f.nom}.git`);
   }
 }
@@ -314,6 +329,7 @@ for (const f of FORGES) {
     // refusé au checkout laisse un clone SANS arbre de travail (TF-1015, 10/09/2026).
     const r = git(racine, "clone", "--quiet", "-c", "core.longpaths=true", `${SOURCE}/${CANAL.nom}.git`, dest);
     if (r.status === 0) ligne("ok", `${CANAL.nom} — canal confidentiel cloné en ${dest} ; si ce poste portait encore des tables libres, jouer scripts/fusionner-tables-confidentielles.mjs`);
+    else if (cloneRefuse(CANAL, r.stderr)) { /* dit par cloneRefuse : tables lues à l'ancien emplacement s'il existe */ }
     else if (process.env.BOOTSTRAP_SOURCE) { ligne("avert", `${CANAL.nom} — canal confidentiel absent à la source surchargée ${SOURCE} : tables lues à l'ancien emplacement s'il existe`); averts.push(`${CANAL.nom} absent à la source surchargée`); }
     else defaut(`${CANAL.nom} — canal confidentiel ABSENT et clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`, `vérifier l'accès au dépôt PRIVÉ ${SOURCE}/${CANAL.nom}.git (gh auth status), puis scripts/fusionner-tables-confidentielles.mjs si des tables libres existent`);
   }
@@ -556,7 +572,8 @@ console.log("");
 console.log("");
 for (const f of FORGES) {
   const p = join(racine, f.nom, f.preuve);
-  if (existsSync(p)) ligne("ok", `preuve ${f.nom} : ${f.preuve}`);
+  if (privesHorsAcces.has(f.nom)) ligne("avert", `preuve ${f.nom} non jugée : dépôt privé hors d'accès (dit plus haut)`);
+  else if (existsSync(p)) ligne("ok", `preuve ${f.nom} : ${f.preuve}`);
   else defaut(`preuve absente : ${f.nom}/${f.preuve}`, "dépôt incomplet ou contrat d'interface changé — relancer --pull, sinon signaler");
 }
 

@@ -50,7 +50,10 @@ export const FORGES = [
   // ledger ; c'est aussi accepter qu'un retard fasse échouer l'ouverture de poste jusqu'au --pull.
   // La preuve est le CONTRAT du protocole, pas un fichier de commodité : `protocole/` se veut
   // autoportant et clonable seul, donc son README est ce qui doit exister pour que la file serve.
-  { nom: "digit-ai-queue", preuve: "protocole/README.md" },
+  // `prive` (13/10/2026) : dépôt PRIVÉ du propriétaire du parc. Un poste dont le compte n'y a pas
+  // accès (autre développeur, 404 « Repository not found ») n'est pas un poste en défaut : le clone
+  // refusé et la preuve absente s'y disent en [avert], le reste du parc juge le poste.
+  { nom: "digit-ai-queue", preuve: "protocole/README.md", prive: true },
 ];
 
 // LES PRODUITS DE L'ÉCOSYSTÈME QUI PORTENT SON NOM (décision humaine D-5 (a) du 17/09/2026). Un dépôt
@@ -82,7 +85,13 @@ export const ALIAS_PILOT = ["digit-ai-forge-pilot", "digit-ai-forge-steering"];
 // forges. Tiré à chaque ouverture comme les forges, il est un DÉFAUT s'il est absent ou en retard —
 // deux postes qui étendent chacun leur table finissent par donner un même numéro à deux produits.
 // Son oracle (`oracle-confidentiel.mjs`, dans le dépôt) vérifie qu'il est resté privé et sans secret.
-export const CANAL = { nom: "digit-ai-confidentiel", dossier: "_confidentiel", preuve: "tables/produits-pseudonymes.json" };
+export const CANAL = { nom: "digit-ai-confidentiel", dossier: "_confidentiel", preuve: "tables/produits-pseudonymes.json", prive: true };
+
+// ACCÈS REFUSÉ À UN DÉPÔT PRIVÉ (13/10/2026). GitHub répond « Repository not found » (404) à un compte
+// qui n'a pas le droit de lire un dépôt privé, exactement comme s'il n'existait pas ; un dépôt local
+// absent rend « does not exist » ou « does not appear to be a git repository ». Ce motif distingue ce
+// refus d'une panne réseau, qui reste un défaut.
+export const ACCES_REFUSE = /repository not found|not found|error: 40[34]|permission denied|authentication failed|could not read username|does not exist|does not appear to be a git repository/i;
 
 /**
  * Un dossier de la racine que les BALAYAGES du parc jugent comme un dépôt de l'écosystème : le préfixe

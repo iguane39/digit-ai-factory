@@ -244,6 +244,32 @@ try {
   git(join(racine, FORGES[1].nom), "checkout", "--", FORGES[1].preuve);
   attendre("preuve restaurée", lancer(), 0, /Poste prêt/);
 
+  // 4 bis. 13/10/2026 — UN DÉPÔT PRIVÉ HORS D'ACCÈS N'EST PAS UN DÉFAUT DU POSTE. Un autre
+  // développeur, sans droit sur les dépôts privés du propriétaire, obtenait « Poste NON prêt — 3
+  // défaut(s) » avec toutes les forges publiques à jour. Poste neuf, source sans le dépôt privé :
+  // exit 0 et le refus DIT. Second sens : une forge PUBLIQUE introuvable reste un défaut.
+  {
+    const prive = FORGES.find((f) => /prive:\s*true/.test(src.slice(src.indexOf(`nom: "${f.nom}"`)).split("\n")[0]));
+    const publique = FORGES.find((f) => f !== prive);
+    if (!prive) echecs.push("4 bis : aucun dépôt déclaré `prive: true` dans scripts/lib-parc.mjs");
+    else {
+      const autre = join(base, "racine-autre-dev"); mkdirSync(autre);
+      const lancerAutre = () => spawnSync(process.execPath, [BOOTSTRAP, "--racine", autre, "--sans-pilot", "--sans-skills"],
+        { encoding: "utf8", env: { ...process.env, BOOTSTRAP_SOURCE: bare, BOOTSTRAP_RELANCE: "1" } });
+      const cache = join(base, "cache-prive.git");
+      renameSync(join(bare, `${prive.nom}.git`), cache);
+      const r = lancerAutre();
+      attendre("4 bis : dépôt privé hors d'accès → poste prêt, refus dit", r, 0, new RegExp(`${prive.nom} — dépôt PRIVÉ hors d'accès`));
+      if (/preuve absente/.test(r.stdout)) echecs.push("4 bis : la preuve d'un dépôt privé hors d'accès est encore jugée en défaut");
+      renameSync(join(bare, `${publique.nom}.git`), join(base, "cache-public.git"));
+      rmSync(join(autre, publique.nom), { recursive: true, force: true });
+      attendre("4 bis : forge PUBLIQUE introuvable → toujours un défaut", lancerAutre(), 1, new RegExp(`${publique.nom} — clone en échec`));
+      renameSync(join(base, "cache-public.git"), join(bare, `${publique.nom}.git`));
+      renameSync(cache, join(bare, `${prive.nom}.git`));
+      rmSync(autre, { recursive: true, force: true });
+    }
+  }
+
   // 5. TF-1099 — LA PROPAGATION AUTOMATIQUE N'EMPORTE PAS L'ÉTAT INTERMÉDIAIRE D'UNE CAMPAGNE.
   // Trois dépôts sources : un skill commité ET publié (se propage), un skill commité non publié
   // et un skill jamais commité (ne se propagent pas, et c'est DIT). Les copies installées vivent
