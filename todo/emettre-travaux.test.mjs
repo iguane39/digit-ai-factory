@@ -42,6 +42,17 @@ try {
     att(r.verdict === "PASS", `le lot émis ne tient pas sa propre forme : ${r.constats.filter((c) => c.statut === "FAIL").map((c) => c.regle).join(", ")}`);
   });
 
+  check("TF-1592 — un artefact INCOMPLET (motif exigé absent d'un fichier personnalisé) est confié, motif nommé, et le lot passe son juge", () => {
+    const motif = "forge/hooks/factory.mjs publication-hebergee";
+    const lot = lotHeritage(LIGNE([{ cible: ".claude/settings.json", source: "gabarits/settings-produit.json",
+      mode: "presence_et_motif", etat: "incomplet", motifs_absents: [motif] }]), "20261013", "a", join(T, "registre-vide.jsonl"));
+    att(lot && lot.elements === 1, `${lot && lot.elements} élément(s) au lieu de 1 — l'incomplet n'est pas confié`);
+    att(lot.md.includes(motif), "le motif manquant n'est pas nommé dans le lot");
+    att(/INCOMPLET/.test(lot.md), "le bloc ne dit pas que l'artefact est incomplet");
+    const r = verifier(lot.md);
+    att(r.verdict === "PASS", `le lot émis ne tient pas sa propre forme : ${r.constats.filter((c) => c.statut === "FAIL").map((c) => c.regle).join(", ")}`);
+  });
+
   check("un produit CONFORME ne reçoit AUCUN lot — un canal qui parle pour rien se fait taire", () => {
     const lot = lotHeritage(LIGNE([{ cible: "forge/RESTITUTION.md", mode: "copie_conforme", etat: "conforme" }]), "20260825", "a");
     att(lot === null, "un lot a été produit alors qu'il n'y a rien à confier");

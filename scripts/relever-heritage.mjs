@@ -338,6 +338,14 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
     const absents = (artefact.motifs_exiges || []).filter((m) => !lignes.has(m) && !estCouvertParPlusLarge(m, lignes));
     return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
   }
+  // TF-1592 (13/10/2026) — LE MODE AU SINGULIER, `presence_et_motif`, TOMBAIT DANS « present ».
+  // R-47 (oracle-conformite-projet) cherche le motif littéral dans le texte ; le relevé ne le
+  // lisait pas, et l'émetteur de travaux ne confiait donc jamais le câblage manquant : le hook
+  // publication-hebergee, exigé de 7 produits sur 7 le 12/10, n'atteignait aucun d'eux.
+  if (artefact.mode === "presence_et_motif" && artefact.motif_exige) {
+    return readFileSync(cible, "utf8").includes(artefact.motif_exige)
+      ? { etat: "present" } : { etat: "incomplet", motifs_absents: [artefact.motif_exige] };
+  }
   if (artefact.mode !== "copie_conforme") return sousRacineWeb ? { etat: "present", sous_racine_web: sousRacineWeb } : { etat: "present" };
   const source = join(racinePilot, String(artefact.source));
   if (!existsSync(source)) return { etat: "present", note: "source introuvable au pilot — non comparable" };

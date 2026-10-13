@@ -215,6 +215,11 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // l'émetteur rend « RIEN À CONFIER ». Même défaut que TF-0654 pour le hors-racine : un
   // TROISIÈME cas qui demande AUTRE CHOSE que recopier ou mettre à jour — ici, SUPPRIMER.
   const aliasPerimes = ligne.artefacts.filter((a) => a.alias_perime);
+  // TF-1592 (13/10/2026) — L'INCOMPLET N'ÉTAIT JAMAIS CONFIÉ. Un fichier présent à qui manquent les
+  // motifs exigés (`.gitignore`, `.claude/settings.json`) est relevé `incomplet` (TF-0649) ; aucun
+  // des filtres ci-dessus ne le lisait, et le câblage du hook publication-hebergee exigé le 12/10
+  // n'aurait atteint aucun produit. Le geste est le quatrième : AJOUTER les motifs, sans recopier.
+  const incomplets = ligne.artefacts.filter((a) => a.etat === "incomplet");
   // TF-0730 (01/09) — LES CONSTATS SE CALCULENT AVANT LE RETOUR ANTICIPÉ. L'ordre inverse
   // faisait rendre [RIEN À CONFIER] à un produit dont l'héritage est conforme mais que des
   // constats DÉCIDÉS attendaient au registre : le message « héritage conforme » était vrai, et
@@ -223,7 +228,7 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // avait AUSSI des défauts d'héritage, ce qui a masqué la voie jusqu'à sa lecture.
   const constats = cheminRegistre === undefined
     ? constatsDuRegistre(ligne.produit) : constatsDuRegistre(ligne.produit, cheminRegistre);
-  const aHeritage = absents.length || perimes.length || horsRacine.length || aliasPerimes.length;
+  const aHeritage = absents.length || perimes.length || horsRacine.length || aliasPerimes.length || incomplets.length;
   if (!aHeritage && !constats.length) return null;
 
   // L'EMPREINTE D'IDEMPOTENCE PORTE CE QUI EST CONFIE, PAS L'ENVELOPPE QUI LE PORTE.
@@ -236,6 +241,7 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
     ...[...perimes, ...absents, ...horsRacine]
       .map((a) => `${a.cible}|${a.etat}|${a.empreinte_pilot || ""}|${a.empreinte_produit || ""}`),
     ...aliasPerimes.map((a) => `${a.cible}|alias_perime|${a.alias_perime}|${a.geste_alias || ""}`),
+    ...incomplets.map((a) => `${a.cible}|incomplet|${(a.motifs_absents || []).join(",")}`),
     // LES CONSTATS ENTRENT DANS LE SCEAU, et leur CONTENU avec eux. Sceller le seul identifiant
     // ferait qu'un constat reformulé garderait l'empreinte de l'ancien : le lot corrigé serait
     // tenu pour déjà déposé et ne partirait jamais. C'est la classe de défaut de N-39 —
@@ -284,6 +290,16 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
 - **Si ce n'est pas fait** : l'ancien fichier reste lisible et citable à côté de la version à jour, et rien ne distingue les deux pour qui tombe dessus.
 `;
 
+  const blocIncomplet = (a, jour) => `### TF-0649 — artefact d'héritage INCOMPLET : \`${a.cible}\` · gravité majeur
+
+- **Le fait**, mesuré le ${jour.slice(6, 8)}/${jour.slice(4, 6)}/${jour.slice(0, 4)} : \`${a.cible}\` existe dans votre dépôt mais ne porte pas ${(a.motifs_absents || []).map((m) => `« \`${m}\` »`).join(", ")}. Contrat : \`gabarits\\HERITAGE.json\`, mode \`${a.mode}\`.
+- **Pourquoi cela vous concerne** : ${glose[a.cible] || "artefact du contrat d'héritage"} ; ce fichier vous est propre, seuls ces motifs sont exigés.
+- **Ce qui est demandé** : AJOUTER ${(a.motifs_absents || []).length > 1 ? "ces motifs" : "ce motif"} à \`${a.cible}\`, sans recopier le fichier ni toucher au reste${a.source ? ` — la forme attendue est dans \`${a.source}\` du pilot (\`c:\\dev\\digit-ai-factory\\\`)` : ""}.
+- **Effort estimé** : simple × court
+- **Comment vous saurez que c'est fait** : \`node c:\\dev\\digit-ai-factory\\scripts\\relever-heritage.mjs\` ne compte plus cet artefact « incomplet » pour votre projet.
+- **Si ce n'est pas fait** : l'automatisme que ce motif câble ne s'exécute pas chez vous, et le contrôle de conformité du pilot le rend à chaque lot que vous remettez.
+`;
+
   const bloc = (a, gravite) => {
     const g = glose[a.cible] || "artefact du contrat d'héritage";
     return `### TF-0626 — ${a.etat === "absent" ? "artefact d'héritage ABSENT" : "artefact d'héritage PÉRIMÉ"} : \`${a.cible}\` · gravité ${gravite}
@@ -307,10 +323,12 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // et rend la remontée de son avancement impossible à rattacher.
   const refsRegistre = [
     ...(perimes.length || absents.length || horsRacine.length ? ["TF-0626"] : []),
+    ...(incomplets.length ? ["TF-0649"] : []),
     ...(aliasPerimes.length ? ["TF-0881"] : []),
     ...constats.map((e) => e.id),
   ].map((i) => `\`${i}\``).join(", ") || "\`aucun\`";
   const items = [...perimes.map((a) => bloc(a, "majeur")), ...absents.map((a) => bloc(a, absents.length > 4 ? "majeur" : "mineur")),
+                 ...incomplets.map((a) => blocIncomplet(a, jour)),
                  ...horsRacine.map((a) => blocHorsRacine(a, jour)),
                  ...aliasPerimes.map((a) => blocAliasPerime(a, jour)),
                  ...constats.map(blocConstat)];

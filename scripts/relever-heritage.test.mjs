@@ -133,6 +133,22 @@ try {
     att(!p.some((x) => x.includes("digit-ai-forge-tests")), "une forge figure au relevé");
   });
 
+  check("TF-1592 — un fichier personnalisé qui ne porte pas le MOTIF exigé (mode presence_et_motif) est INCOMPLET, comme le juge R-47", () => {
+    const P = mkdtempSync(join(tmpdir(), "heritage-motif-"));
+    try {
+      mkdirSync(join(P, ".claude"), { recursive: true });
+      const A = { mode: "presence_et_motif", source: "gabarits/settings-produit.json", cible: ".claude/settings.json",
+        motif_exige: "forge/hooks/factory.mjs publication-hebergee" };
+      writeFileSync(join(P, ".claude", "settings.json"), '{"hooks":{"Stop":[{"command":"node forge/hooks/factory.mjs restitution"}]}}', "utf8");
+      const rouge = etatArtefact(P, A, P);
+      att(rouge.etat === "incomplet", `fichier sans le motif : état « ${rouge.etat} » au lieu de « incomplet »`);
+      att((rouge.motifs_absents || []).includes(A.motif_exige), "le motif manquant n'est pas nommé");
+      writeFileSync(join(P, ".claude", "settings.json"), '{"hooks":{"PreToolUse":[{"command":"node forge/hooks/factory.mjs publication-hebergee"}]}}', "utf8");
+      const vert = etatArtefact(P, A, P);
+      att(vert.etat === "present", `fichier qui porte le motif : état « ${vert.etat} » au lieu de « present »`);
+    } finally { rmSync(P, { recursive: true, force: true }); }
+  });
+
   check("un PRODUIT de l'écosystème (digit-ai-marketing) est relevé : le préfixe digit-ai ne fait pas une forge", () => {
     const P = mkdtempSync(join(tmpdir(), "heritage-eco-"));
     try {
