@@ -49,3 +49,11 @@ todo/TODO.html
 todo/TODO-ARCHIVE.html
 todo/RECIDIVES.md
 todo/AVANCEMENT.md
+
+# TF-1273 (13/10/2026) — LES CAPTURES DU CONTROLE DES PAGES NE SE VERSIONNENT PAS.
+# `render_page.py` (hook d ecriture, controle des pages) depose un PNG par largeur sous
+# `<dossier de la page>/.oracles/` : 193 fichiers et 83,5 Mo pour une campagne de 10 pages le 20/09, et
+# 384 captures deja suivies (environ 196 Mo, douze familles de gabarits). Rien ne les lit : elles se
+# regenerent par `scripts\verifier-rendu-instances.mjs --out`. Un dossier d atelier `.oracles/` ne porte que
+# des captures ignorees ; ce qui est DEJA suivi le reste (ignorer n efface rien de l historique).
+**/.oracles/*.png
