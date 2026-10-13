@@ -28,6 +28,8 @@
  * EC-7 terme proscrit par le LEXIQUE DU DESTINATAIRE, lu dans le socle du produit (TF-1045).
  * EC-8 tournure d'annonce à une POSITION qui la refuse — titre, en-tête de colonne (TF-1137).
  * EC-9 valeur, heure ou date écrite en toutes lettres (E-14, retour humain du 16/09/2026).
+ * EC-11 question de décision dont le paragraphe ne nomme rien, hors restitution (AVERT seulement,
+ * TF-1392, D-2 (a) du 13/10/2026).
  * Un AVERT n'échoue jamais : il nomme, et c'est ce qui permet à l'oracle de rester branché.
  *
  * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--json]
@@ -644,6 +646,76 @@ export function juger(texte, options = {}) {
     }
   }
 
+  // EC-11 (TF-1392, décision D-2 (a) du 13/10/2026) — UNE QUESTION POSÉE AU LECTEUR NOMME CE DONT
+  // ELLE PARLE. AVERT SEULEMENT, JAMAIS FAIL.
+  //
+  // LE FAIT. La règle S47 d'oracle-synthese est née d'une décision refusée le 16/09/2026 (« on ne
+  // comprend absolument rien au charabia ») : elle demandait de trancher le sort d'un nom de dépôt
+  // sans jamais l'écrire. Mesuré le 13/10/2026 (étude 20261013-etude-opportunite-juge-de-
+  // comprehension) : les 3 relecteurs qui jouaient le lecteur ont jugé ce texte COMPRIS ; seule la
+  // règle mécanique l'attrape, avec 0 faux refus sur 17 décisions acceptées. Mais S47 ne juge que
+  // les restitutions. Cette règle la porte hors d'elles : à tout document qui pose une question de
+  // décision à son lecteur.
+  //
+  // CE QU'ELLE MESURE. Une question de DÉCISION (« Faut-il… ? », « Publier… ? », « Doit-on… ? ») et
+  // le paragraphe qui la porte doivent contenir un DÉSIGNATEUR, comme S47 : un fragment entre accents
+  // graves, un chemin, un identifiant (TF-1234, D-3), un nom à tirets (`digit-ai-factory`), un nom
+  // entre guillemets français, ou un nom propre au milieu d'une phrase. Elle ne juge ni la justesse
+  // ni la suffisance du nom. Les questions rhétoriques et les questions citées entre guillemets ne
+  // sont pas des questions de décision : elles ne comptent pas.
+  {
+    const OUVREURS = /^(?:faut-il|doit-on|peut-on|veut-on|voulez-vous|souhaitez-vous|acceptez-vous|validez-vous|préférez-vous|garde-t-on|retient-on|lance-t-on|publie-t-on)\b/iu;
+    const INFINITIF = /^[A-ZÀ-Ý][a-zà-ÿ]{2,}(?:er|ir)$/u;
+    const designe = (t) => /`[^`]+`/.test(t)
+      || /[\w-]+[\\/][\w.-]+/.test(t)
+      || /\b[\w-]+\.(?:md|mjs|js|json|py|html|ps1|txt|csv)\b/.test(t)
+      || /\b[A-Z]{1,5}-?\d{1,5}\b/.test(t)
+      || /\b[a-z0-9]+(?:-[a-z0-9]+){2,}\b/.test(t)
+      || /«\s*[^»]{2,}»/.test(t)
+      || /[\p{Ll},'’]\s+(?!Ce\b|Cet\b|Cette\b|Il\b|Elle\b|On\b|Un\b|Une\b|Le\b|La\b|Les\b|Et\b|Mais\b|Ou\b)[A-ZÀ-Ý][\p{L}-]{2,}/u.test(t);
+    // Les blocs : paragraphes séparés par une ligne vide ; un titre, une ligne de tableau et une
+    // puce sont chacun leur propre bloc.
+    const blocs = [];
+    let cur = null;
+    for (let i = 0; i < horsCode.length; i++) {
+      const l = horsCode[i];
+      const seul = /^\s*(#{1,6}\s|\||[-*+]\s|\d+[.)]\s)/.test(l);
+      if (!l.trim() || seul) { if (cur) blocs.push(cur); cur = null; }
+      if (!l.trim()) continue;
+      if (seul) { blocs.push({ ligne: i + 1, brut: l, prose: proseLignes[i] }); continue; }
+      if (!cur) cur = { ligne: i + 1, brut: "", prose: "" };
+      cur.brut += " " + l; cur.prose += " " + proseLignes[i];
+    }
+    if (cur) blocs.push(cur);
+    // UNE RESTITUTION N'EST PAS JUGÉE ICI : ses décisions (« > **D-1 — … ? ** ») sont celles de S47,
+    // bloquante chez elle. Mesuré le 13/10/2026 : portée sur les 243 restitutions de
+    // output\04-plans, une version qui retirait le sélecteur comme S47 avertissait sur 48 fichiers,
+    // dont D-37, tranchée sans difficulté par le porteur — du bruit, que S47 ne fait pas.
+    const restitution = /^\s*>\s*\*\*D-\d{1,3}\b/m.test(texte);
+    const muettes = [];
+    let questions = 0;
+    if (!restitution) for (const b of blocs) {
+      const sansCitation = b.prose.replace(/«[^»]*»/g, " ").replace(/"[^"]*"/g, " ");
+      const qs = (sansCitation.match(/[^.!?:;]*\?/g) || [])
+        .map((q) => q.replace(/[*_]/g, " ").replace(/^\s*(?:[A-Z]{1,3}-\d+|Décision\s*\d*|Question\s*\d*)?\s*[—–:-]?\s*/u, "").trim())
+        .filter((q) => { const premier = q.split(/\s+/)[0] || ""; return OUVREURS.test(q) || INFINITIF.test(premier); });
+      if (!qs.length) continue;
+      questions += qs.length;
+      if (!designe(b.brut)) muettes.push({ ligne: b.ligne, texte: qs[0].slice(0, 90) });
+    }
+    if (restitution) pousser("EC-11", "SKIP", "restitution : ses décisions sont jugées par S47 d'oracle-synthese, bloquante chez elle");
+    else if (!questions) pousser("EC-11", "PASS", "aucune question de décision posée au lecteur");
+    else if (!muettes.length) pousser("EC-11", "PASS", `${questions} question(s) de décision, chacune dans un paragraphe qui nomme ce dont elle parle`);
+    else pousser("EC-11", "AVERT",
+      `${muettes.length} question(s) de décision dont le paragraphe ne NOMME rien — ni accents graves, ni chemin, ni identifiant, `
+      + "ni nom entre guillemets, ni nom propre : "
+      + muettes.slice(0, 4).map((m) => `l.${m.ligne} « ${m.texte} »`).join(" · ")
+      + (muettes.length > 4 ? ` · et ${muettes.length - 4} autre(s)` : "")
+      + " — un lecteur ne tranche pas une question sur « un nom de dépôt » ou « cet objet » ; le relecteur qui joue le lecteur "
+      + "ne voit pas cette périphrase (mesure du 13/10/2026). AVERTISSEMENT, jamais bloquant (D-2 (a) du 13/10/2026)",
+      muettes[0].ligne);
+  }
+
   const verdict = findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS";
   return { mots, verdict, findings, non_juge: nonJuge(donnee) };
 }
@@ -1029,10 +1101,39 @@ function selfTest() {
     casse.push("EC-4-gras : de VRAIS passages de 12 mots en gras, places apres « **0** », ne sont pas comptes pour "
       + `eux-memes — l'appariement glisse et cache le rouge (TF-1488) : ${JSON.stringify(g4(r4c))}`);
 
+  // 21, 22, 23 et 24 (TF-1392, D-2 (a) du 13/10/2026) — EC-11, LE SUJET NOMMÉ HORS DES
+  // RESTITUTIONS, EN AVERTISSEMENT. Le rouge transpose hors d'une restitution la décision refusée
+  // le 16/09/2026 (« un nom de dépôt de l'écosystème », « cet objet ») : AVERT, et JAMAIS FAIL. Le
+  // vert porte la même question avec le nom écrit. La restitution est laissée à S47 (SKIP dit). Une
+  // question citée entre guillemets ou rhétorique n'est pas une question de décision.
+  const EC11_ROUGE = "# Publication\n\nFaut-il retirer cet objet de la table des noms à masquer ? Le nom "
+    + "d'un dépôt de l'écosystème y figure, alors qu'il désigne aussi un dépôt créé par le lecteur.\n";
+  const EC11_VERTE = "# Publication\n\nFaut-il retirer le nom `depot-de-demonstration-a` de la table des noms à "
+    + "masquer ? Ce nom y figure, alors qu'il désigne aussi un dépôt créé par le lecteur.\n";
+  const EC11_RESTITUTION = "# Synthèse\n\n> **D-1 — Faut-il retirer cet objet de la table ?**\n> Le nom "
+    + "d'un dépôt de l'écosystème y figure.\n";
+  const EC11_CITEE = "# Retour\n\nLe lecteur a écrit « Faut-il vraiment tout relire ? » et la remarque a été "
+    + "notée. Pourquoi ce texte était-il si long ?\n";
+  const g11 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-11");
+  const r11r = jouer("ec11-rouge.md", EC11_ROUGE);
+  const r11v = jouer("ec11-verte.md", EC11_VERTE);
+  const r11s = jouer("ec11-restitution.md", EC11_RESTITUTION);
+  const r11c = jouer("ec11-citee.md", EC11_CITEE);
+  if (g11(r11r)?.statut !== "AVERT" || !/Faut-il retirer cet objet/.test(g11(r11r)?.message || ""))
+    casse.push(`EC-11 : une question de décision qui ne nomme rien (cas du 16/09/2026, hors restitution) n'est pas signalée : ${JSON.stringify(g11(r11r))}`);
+  if (r11r.statut !== 0 || r11r.j?.verdict === "FAIL")
+    casse.push("EC-11 : l'avertissement fait échouer le texte — la règle est en AVERTISSEMENT (D-2 (a) du 13/10/2026), jamais bloquante");
+  if (g11(r11v)?.statut !== "PASS")
+    casse.push(`EC-11 : la MÊME question, le nom écrit entre accents graves, est signalée : ${JSON.stringify(g11(r11v))}`);
+  if (g11(r11s)?.statut !== "SKIP")
+    casse.push(`EC-11 : une restitution est jugée ici alors que S47 la juge déjà : ${JSON.stringify(g11(r11s))}`);
+  if (g11(r11c)?.statut !== "PASS" || !/aucune question de décision/.test(g11(r11c)?.message || ""))
+    casse.push(`EC-11 : une question citée ou rhétorique est comptée comme question de décision : ${JSON.stringify(g11(r11c))}`);
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 20 cas, 0 défaut (20/20 PASS — rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes)`);
+    : `Self-test ${NOM} : 24 cas, 0 défaut (24/24 PASS — EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes)`);
   return casse.length ? 1 : 0;
 }
 
