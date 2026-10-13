@@ -417,6 +417,22 @@ for (const f of fichiers(p("output"))) {
     "le checkout d'un clone de vérification échoue sur ce fichier (10/09/2026 : 22 fichiers refusés, dépôt sans arbre de travail). " +
     "Raccourcir l'<Objet> du nom, la forme du nommage étant tenue par ailleurs");
 }
+// TF-1524 (13/10/2026) — LE PLAFOND S'ÉTEND À forge\ EN AVERTISSEMENT, LE BRUIT MESURÉ D'ABORD. Les synthèses
+// d'un produit vivent sous `forge\` (c'est de là qu'est parti TF-1500) : S42 d'oracle-synthese les mesure à
+// l'écriture, et une synthèse déjà écrite trop longue n'était vue par rien. Règle NEUVE opposable à tous les
+// produits : AVERTISSEMENT non bloquant (précédent D-70 (b)), jamais un FAIL, pour mesurer combien de produits
+// basculeraient avant de décider du blocage — décision distincte, humaine.
+const longsForge = [];
+for (const f of fichiers(p("forge"))) {
+  const r = rel(f);
+  if (/(^|\/)\.oracles\//.test(r) || estExcluDuDepot(r)) continue;
+  if (r.length + SIDECAR_ORACLE > PLAFOND_CHEMIN) longsForge.push(r);
+}
+if (longsForge.length) {
+  ok("R-4", "forge/", `AVERTISSEMENT, non bloquant : ${longsForge.length} chemin(s) de forge\\ au-dessus du plafond de ${PLAFOND_CHEMIN} caractères sidecar d'oracle compris (${SIDECAR_ORACLE}) : ` +
+    `${longsForge.slice(0, 5).join(" · ")}${longsForge.length > 5 ? ` · … (${longsForge.length} au total)` : ""} — ` +
+    "même arithmétique que le plafond d'output\\ (TF-1015) : sous MAX_PATH = 260 sans `core.longpaths`, le checkout d'un clone de vérification échoue sur ce fichier. Raccourcir l'<Objet> du nom (TF-1524)");
+}
 if (r4) ok("R-4", "output/, docs/", `livrables au nommage daté, indices uniques par jour et par dossier, chemins sous le plafond de ${PLAFOND_CHEMIN} caractères sidecar compris (ou aucun livrable)`);
 
 // R-25 — le <Type> de tout livrable daté figure au registre des types (D-04 organization,

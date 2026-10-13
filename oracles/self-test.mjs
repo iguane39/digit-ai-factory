@@ -845,6 +845,33 @@ check("TF-1500 mesure sur le DISQUE — les sidecars d'oracle suivis du pilot : 
   jugerMesureSidecar(suffixesDeSidecars(suivis), 150 - CHEMIN_PILE.length);
 });
 
+// ---- fixture PLAFOND SOUS forge\ (TF-1524, 13/10) : le plafond de chemin ne mesurait que output\. Les DEUX
+// SENS sur la même fixture : une synthèse de produit sous forge\ à 117 caractères (151 avec le sidecar) est
+// NOMMÉE en AVERTISSEMENT (PASS, non bloquant — règle neuve, jamais un FAIL), son jumeau à 116 (150) est
+// muet. Sans le sens vert la règle accuserait tout nom un peu descriptif ; sans le rouge elle ne mesure rien.
+const avertForge = mkdtempSync(join(tmpdir(), "conf-forge-long-"));
+mkdirSync(join(avertForge, "forge", "etapes"), { recursive: true });
+const cheminForge = (n) => {
+  const tete = "forge/etapes/Synthese Mandat - ";
+  const queue = " - 20261013a.md";
+  return tete + "y".repeat(n - tete.length - queue.length) + queue;
+};
+const FORGE_PILE = cheminForge(116), FORGE_TROP = cheminForge(117);
+writeFileSync(join(avertForge, FORGE_PILE), "x" + NL_TEST);
+writeFileSync(join(avertForge, FORGE_TROP), "x" + NL_TEST);
+sh("git", ["init", "-q", "-b", "main"], avertForge);
+check("TF-1524 — un chemin de forge\\ au-dessus de 150 (sidecar compris) est NOMMÉ en avertissement non bloquant, son jumeau à 150 reste muet", () => {
+  if (FORGE_PILE.length !== 116 || FORGE_TROP.length !== 117) throw new Error(`fixture invalide : ${FORGE_PILE.length} et ${FORGE_TROP.length} caractères attendus 116 et 117`);
+  const { rapport } = lance(avertForge);
+  const avert = rapport.findings.find((f) => f.regle === "R-4" && f.ou === "forge/" && /AVERTISSEMENT, non bloquant/.test(f.message));
+  if (!avert) throw new Error("aucun avertissement R-4 sur le chemin de forge\\ de 117 caractères");
+  if (avert.statut !== "PASS") throw new Error(`l'avertissement est un ${avert.statut} : une règle neuve entre jamais en blocage`);
+  if (!avert.message.includes(FORGE_TROP)) throw new Error("le chemin trop long n'est pas nommé");
+  if (avert.message.includes(FORGE_PILE)) throw new Error("le jumeau à EXACTEMENT 150 caractères est accusé");
+  if (rapport.findings.some((f) => f.regle === "R-4" && f.statut === "FAIL" && String(f.ou).startsWith("forge")))
+    throw new Error("un FAIL R-4 sous forge\\ : l'extension doit rester un avertissement");
+});
+
 // ---- fixture LIVRABLE-DOSSIER (TF-1177, 17/09) : R-4 jugeait au nommage daté les fichiers
 // INTERNES d'un livrable remis en DOSSIER. Le 17/09, un projet Power BI a rendu trois FAIL sur ses
 // ressources d'image — placées par le format à un emplacement imposé, référencées par leur nom dans
