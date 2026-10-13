@@ -113,6 +113,13 @@ réutilisé** — continuer la séquence des lots précédents du même produit.
 14/09/2026 (règle LOT-IDS de `forge\retours\oracle-lot.mjs`, TF-1039) : un identifiant déjà
 défini par un lot antérieur du même produit est refusé, et le premier libre est donné.
 
+**Pièce jointe d'un lot (TF-1215, 13/10/2026)** : une étude, un rapport d'audit ou toute pièce que
+le lot annonce se nomme d'après lui, `<projet> - RETOURS - AAAAMMJJ<indice> - PJ - <libellé>.<extension>`,
+et se remet avec lui dans le sas `_arrivee\`. Ainsi nommée, elle n'est ni un lot sans sidecar ni un
+lot sans sections R-45 et R-46 : la boîte d'entrée du pilot (règle B10) vérifie seulement que le lot
+dont elle porte le nom existe, dans la boîte ou dans `old\` s'il est ingéré. Un `.md` qui ne suit pas
+cette convention reste jugé comme un lot et demande son sidecar.
+
 ---
 
 ## <forge concernée> (`digit-ai-forge-<nom>`)

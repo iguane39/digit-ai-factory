@@ -341,6 +341,9 @@ if (iPilot < 0) {
     let j = null;
     try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
     const f8 = j && (j.findings || []).find((x) => x.regle === "B8");
+    // TF-1214 (13/10/2026) : le verdict vaut pour CE poste. Un dépôt non suivi par git d'un autre poste
+    // n'y est pas visible (quinze dépôts, jusqu'à 61 h d'attente le 14/09) ; la ligne le dit.
+    if (j && j.poste) lignes.push(`- jugée sur le poste **${j.poste}** : un dépôt non encore enregistré sur un AUTRE poste n'y est pas visible.`);
     if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la boîte : ${(r.stderr || "").trim().slice(0, 160)}`);
     else if (j.verdict === "SKIP") lignes.push(`- sans objet — ${j.motif || "répertoire absent"}`);
     else if (!f8) lignes.push("- l'oracle n'a pas rendu B8 — l'ancienneté des lots n'est pas mesurée sur cette ouverture.");

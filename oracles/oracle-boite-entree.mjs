@@ -32,6 +32,11 @@
  *       ancienneté que le hook d'ouverture du pilot rend bloquante. Six lots déposés le 07/09,
  *       zéro ingéré, un producteur qui écrit « remonté » — la remise est un dépôt de fichier,
  *       l'ingestion un geste de session que rien ne déclenchait.
+ *   B10 (TF-1215, 13/10) une PIÈCE JOINTE annoncée par un lot se nomme d'après lui,
+ *       `<base du lot> - PJ - <libellé>.<extension>`, et n'est alors ni un lot sans sidecar (B3), ni
+ *       un lot sans sections R-45/R-46 (B6, B7). Elle exige que son lot existe, dans la boîte ou
+ *       dans `old\` s'il est ingéré ; sans lui elle est ORPHELINE (rouge). La convention vaut pour
+ *       toute extension : la même remise n'est plus jugée selon son extension.
  *   B9  (TF-1198, 19/09) le SAS d'arrivée `_arrivee\`, ignoré par git et hors de B1-B8, est
  *       compté : un lot qui y attend se DIT (avertissement), au-delà de 24 h c'est un OUBLI (FAIL).
  *       Six lots y ont attendu deux jours sous un PASS. Le constat ne porte jamais un nom de lot :
@@ -51,7 +56,8 @@ import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync, statSync, utimesSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { tmpdir } from "node:os";
+import { tmpdir, hostname } from "node:os";
+import { spawnSync } from "node:child_process";
 import { empreinteFichier, empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 
 const VERSION = "1.0.0";
@@ -61,6 +67,8 @@ const NON_JUGE = [
   "la VALEUR des candidatures d'un lot — cet oracle dit qu'un travail est arrivé sans être pris, jamais s'il le mérite",
   "les lots remis par un canal autre que le répertoire (message, dépôt frère) — il ne voit que ce qui est déposé",
   "le contenu de `old\\`, canal d'échappement documenté pour un lot déjà traité ailleurs",
+  "les boîtes d'entrée des AUTRES postes (TF-1214) : un dépôt non suivi par git ne voyage pas, et cet oracle ne juge que le poste où il tourne — la sortie porte `poste` pour que la synthèse dise sur quel poste le constat vaut",
+  "B10 juge l'existence du lot dont la pièce jointe porte le nom, jamais que ce lot la CITE dans son texte",
   "B8 mesure l'ancienneté sur la date du FICHIER (mtime), jamais sur la date portée par son nom : un lot recopié ou renommé repart à zéro. C'est assumé — la question posée est « depuis quand attend-il À CET ENDROIT », pas « depuis quand a-t-il été écrit »",
 ];
 
@@ -183,6 +191,15 @@ const PREFIXE_INS = "INSATISFACTION - ";
 // La liste est une DONNÉE : un nom de notice de plus s'ajoute ici, pas dans une condition.
 const NOTICES_DE_DOSSIER = new Set(["LISEZMOI.md", "README.md"]);
 
+// TF-1215 (13/10/2026) — LA PIÈCE JOINTE D'UN LOT A UNE FORME NOMMÉE. Le 14/09, une étude annoncée par
+// son lot (« ce fichier, son sidecar, l'étude jointe ») a rendu quatre rouges (B3, B6, B7, B8) : l'oracle
+// ne connaissait que le lot et la notice, et la seule sortie était de la ranger dans old, loin du lot
+// qui la cite. Convention : `<base du lot> - PJ - <libellé>.<extension>`, la base étant celle du lot
+// (`<projet> - RETOURS - AAAAMMJJ<indice>`). Le nom DÉRIVE du lot : il suffit de le lire pour retrouver
+// le lot, et B10 vérifie que ce lot existe.
+const RE_PIECE_JOINTE = /^(.+ - RETOURS - \d{8}[a-z]?) - PJ - .+\.[A-Za-z0-9]+$/;
+const pieceJointe = (nom) => RE_PIECE_JOINTE.exec(nom);
+
 const CANAL_ARTEFACTS = "03-artefacts";
 const SUFFIXE_REMISE = ".remise.json";
 
@@ -248,6 +265,8 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     if (nom.startsWith(PREFIXE_INS)) continue;
     // Une notice de dossier n'est pas un lot : elle explique le canal, elle n'y est pas remise.
     if (NOTICES_DE_DOSSIER.has(nom)) continue;
+    // Une pièce jointe n'est pas un lot : B10 juge qu'elle a le sien (TF-1215).
+    if (pieceJointe(nom)) continue;
     const base = nom.slice(0, -3);
     if (sidecars.some((s) => s.startsWith(base))) continue;
     const ageMd = ageHeures(join(repertoire, nom));
@@ -307,7 +326,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   const AUCUNE_B6 = /aucune\s+remarque\s+n['’]est\s+rest[ée]e?\s+au\s+produit/i;
   let b6 = true;
   for (const nom of fichiers.filter((f) => f.endsWith(".md"))) {
-    if (nom.startsWith(PREFIXE_INS) || NOTICES_DE_DOSSIER.has(nom)) continue;
+    if (nom.startsWith(PREFIXE_INS) || NOTICES_DE_DOSSIER.has(nom) || pieceJointe(nom)) continue;
     const date = RE_DATE_LOT.exec(nom);
     if (!date || date[1] < SEUIL_B6) continue; // antériorité déclarée
     let texte = "";
@@ -372,7 +391,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   const AUCUN_B7 = /aucun\s+document\s+produit\s+depuis\s+un\s+gabarit/i;
   let b7 = true;
   for (const nom of fichiers.filter((f) => f.endsWith(".md"))) {
-    if (nom.startsWith(PREFIXE_INS) || NOTICES_DE_DOSSIER.has(nom)) continue;
+    if (nom.startsWith(PREFIXE_INS) || NOTICES_DE_DOSSIER.has(nom) || pieceJointe(nom)) continue;
     const date = RE_DATE_LOT.exec(nom);
     if (!date || date[1] < SEUIL_B7) continue; // antériorité déclarée
     let texte = "";
@@ -422,10 +441,27 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
         + `un fichier orphelin. Écrire ${nom}${SUFFIXE_REMISE} avec repond_a / provenance / date` });
   }
 
+  // B10 (TF-1215) — UNE PIÈCE JOINTE A SON LOT. Le lot existe dans la boîte, ou dans `old\` s'il est
+  // déjà ingéré (le lot part en old à l'ingestion, la pièce peut y rester en attente d'être rangée).
+  const pieces = fichiers.filter((f) => pieceJointe(f));
+  let orphelines = 0;
+  for (const nom of pieces) {
+    const lot = pieceJointe(nom)[1] + ".md";
+    if (fichiers.includes(lot) || existsSync(join(repertoire, "old", lot))) continue;
+    orphelines++;
+    const age = ageHeures(join(repertoire, nom));
+    findings.push({ regle: "B10", statut: "FAIL", ou: nom, depuis_h: age === null ? null : Number(age.toFixed(1)),
+      message: `pièce jointe ORPHELINE — son nom annonce le lot « ${lot} », qui n'est ni dans la boîte ni dans old\\ ; une pièce sans son lot ne se rattache à rien (remettre le lot, ou renommer la pièce d'après le sien : \`<base du lot> - PJ - <libellé>.<extension>\`)`
+        + (age === null ? "" : ` ; déposée depuis ${age < 1 ? "moins d'une heure" : `${age.toFixed(0)} h`}`) });
+  }
+  if (pieces.length && !orphelines) {
+    findings.push({ regle: "B10", statut: "PASS", ou: "-", message: `${pieces.length} pièce(s) jointe(s), chacune rattachée à son lot` });
+  }
+
   // B8 (TF-0908) — L'ANCIENNETÉ, la question que B1 et B3 ne posent pas. Elle se calcule sur les
   // constats DÉJÀ rendus : rien n'est relu, rien n'est jugé deux fois — B8 ne dit pas qu'un lot
   // n'est pas entré (B1/B3 le disent), elle dit qu'il attend depuis trop longtemps.
-  const oublies = findings.filter((f) => (f.regle === "B1" || f.regle === "B3")
+  const oublies = findings.filter((f) => (f.regle === "B1" || f.regle === "B3" || f.regle === "B10")
     && f.statut === "FAIL" && typeof f.depuis_h === "number" && f.depuis_h > SEUIL_OUBLI_H);
   if (!oublies.length) {
     findings.push({ regle: "B8", statut: "PASS", ou: "-",
@@ -476,6 +512,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     ["B1", `${sidecars.length} sidecar(s) présent(s), tous ingérés`],
     ["B2", "aucun sidecar édité après ingestion"],
     ["B3", "aucun lot sans sidecar"],
+    ["B10", "aucune pièce jointe à juger"],
     ["B5", existsSync(canal)
       ? "toute remise d'artefact est rattachée à son item"
       : `aucune remise à juger (canal ${CANAL_ARTEFACTS} absent)`],
@@ -807,6 +844,47 @@ function selfTest() {
   cas.push(["B9 quater— le constat ne porte JAMAIS le nom réel du lot : le sas existe pour qu'il ne sorte pas",
     !!f9 && !/NomReelDuClient/.test(JSON.stringify(r)), r.verdict]);
 
+  // B10 (TF-1215, 13/10/2026) — LA PIÈCE JOINTE D'UN LOT, dans ses DEUX sens. Le cas fondateur du 14/09 :
+  // une étude annoncée par son lot rendait B3, B6, B7 et B8 sur une remise conforme. Boîte neuve.
+  const boite10 = join(base, "b10", "00-retours");
+  mkdirSync(join(boite10, "old"), { recursive: true });
+  const reg10 = join(base, "b10", "TODO.jsonl");
+  writeFileSync(reg10, "");
+  const LOT10 = "Produit-61 - RETOURS - 20260909b";
+  writeFileSync(join(boite10, `${LOT10}.md`), "# lot\n");
+  writeFileSync(join(boite10, `${LOT10}.tf.jsonl`), '{"titre":"x"}\n');
+  writeFileSync(join(boite10, `${LOT10} - PJ - Etude.md`), "# étude jointe, sans sections de lot\n");
+  writeFileSync(join(boite10, `${LOT10} - PJ - Rapport d audit.html`), "<p>rapport</p>");
+  const surPj = (f) => /- PJ -/.test(String(f.ou));
+  r = juger(boite10, reg10, regIns);
+  cas.push(["B10   — vert : une pièce jointe (.md et .html) de son lot n'est NI un lot sans sidecar (B3), NI sans sections (B6, B7), NI orpheline",
+    !r.findings.some((f) => f.statut === "FAIL" && surPj(f)) && r.findings.some((f) => f.regle === "B10" && f.statut === "PASS" && /2 pièce/.test(f.message)), r.verdict]);
+  writeFileSync(join(boite10, "Produit-99 - RETOURS - 20260909a - PJ - Etude.md"), "# étude sans lot\n");
+  r = juger(boite10, reg10, regIns);
+  cas.push(["B10 bis— rouge : une pièce jointe dont le LOT n'existe pas est ORPHELINE, et le message nomme le lot attendu",
+    r.findings.some((f) => f.regle === "B10" && f.statut === "FAIL" && surPj(f) && /Produit-99 - RETOURS - 20260909a\.md/.test(f.message)), r.verdict]);
+  writeFileSync(join(boite10, "Produit-98 - RETOURS - 20260909a - PJ - Etude.md"), "# étude, lot déjà ingéré\n");
+  writeFileSync(join(boite10, "old", "Produit-98 - RETOURS - 20260909a.md"), "# lot ingéré\n");
+  r = juger(boite10, reg10, regIns);
+  cas.push(["B10 ter— vert : le lot est dans old\\ (ingéré), la pièce n'est pas orpheline",
+    !r.findings.some((f) => f.regle === "B10" && f.statut === "FAIL" && /Produit-98/.test(f.ou)), r.verdict]);
+  cas.push(["B10 quater— contre-épreuve : un .md SANS la convention reste un lot sans sidecar (B3)",
+    (() => { writeFileSync(join(boite10, "Etude libre - RETOURS - 20260909c.md"), "# lot sans sidecar\n"); return juger(boite10, reg10, regIns).findings.some((f) => f.regle === "B3" && f.statut === "FAIL" && f.ou === "Etude libre - RETOURS - 20260909c.md"); })(), r.verdict]);
+  const orpheline = join(boite10, "Produit-99 - RETOURS - 20260909a - PJ - Etude.md");
+  utimesSync(orpheline, vieux, vieux);
+  r = juger(boite10, reg10, regIns);
+  cas.push(["B10 quinquies— une pièce orpheline déposée il y a 30 h compte dans B8 : c'est un OUBLI, pas une file d'attente",
+    r.findings.some((f) => f.regle === "B8" && f.statut === "FAIL" && /Produit-99 - RETOURS - 20260909a - PJ - Etude\.md/.test(f.message)), r.verdict]);
+
+  // TF-1214 (13/10/2026) — LE POSTE QUI JUGE SE DIT : la sortie du CLI porte `poste`, et le non-jugé nomme
+  // les autres postes. Joué par le CLI réel, sur la boîte vide du sas (b9), comme le hook d'ouverture le lance.
+  const cli = spawnSync(process.execPath, [fileURLToPath(import.meta.url), boite9, "--registre", reg9], { encoding: "utf8" });
+  let sortieCli = null;
+  try { sortieCli = JSON.parse(cli.stdout.slice(cli.stdout.indexOf("{"))); } catch { /* vérifié ci-dessous */ }
+  cas.push(["POSTE — la sortie du CLI nomme le poste qui juge (hostname) et le non-jugé dit que les AUTRES postes ne sont pas vus",
+    !!sortieCli && sortieCli.poste === hostname() && sortieCli.poste.length > 0
+      && sortieCli.non_juge.some((m) => /AUTRES postes/.test(m)), String(cli.status)]);
+
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {
     console.log(`  [${tenu ? "OK    " : "ECHEC "}] ${nom} (verdict ${verdict})`);
@@ -825,5 +903,11 @@ const registre = resolve(iReg > 0 ? args[iReg + 1] : join(ICI, "..", "todo", "TO
 const cible = resolve(args.find((a) => !a.startsWith("--") && a !== args[iReg + 1]) ?? join(ICI, "..", "input", "00-retours"));
 
 const { verdict, findings, motif } = juger(cible, registre);
-process.stdout.write(JSON.stringify({ oracle: ORACLE, version: VERSION, cible, verdict, motif, findings, non_juge: NON_JUGE }, null, 1) + "\n");
+// TF-1214 (13/10/2026) — LE POSTE QUI JUGE SE DIT. Un fichier non suivi par git ne voyage pas : le 14/09,
+// quinze dépôts déposés sur un poste sont restés invisibles jusqu'à 61 h au pilot qui travaillait depuis
+// l'autre, et chacun des deux postes rendait un verdict sûr de lui. Le relevé croisé des boîtes de tous
+// les postes demanderait un canal que ni git ni cet oracle n'ont ; à défaut, le verdict porte le nom du
+// poste où il vaut, pour que l'ouverture et la synthèse ne le lisent pas comme celui du parc.
+const poste = hostname();
+process.stdout.write(JSON.stringify({ oracle: ORACLE, version: VERSION, poste, cible, verdict, motif, findings, non_juge: NON_JUGE }, null, 1) + "\n");
 process.exit(verdict === "FAIL" ? 1 : verdict === "SKIP" ? 2 : 0);
