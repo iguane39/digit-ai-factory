@@ -163,6 +163,28 @@ check("rouge — une copie d'avant qui n'est PAS le contenu ingéré est refusé
   if (evenements().length !== avant) throw new Error("le registre a été touché malgré le refus");
 });
 
+// ---- TF-1633 : un fichier dont l'ANCIEN nom porte un caractère accentué ----------------------------
+// Sans `-z`, git cite ce nom en style C ("...\303\251...") et `git show` ne retrouve pas le fichier :
+// la ré-empreinte refusait un lot dont la preuve était pourtant dans l'historique. Le fichier est
+// renommé vers un nom SANS rapport avec l'ancien (le second filet par blobs ne peut donc pas le
+// retrouver) et le contenu change d'une ligne (le renommage reste détecté par similarité).
+check("verte — l'ancien nom est ACCENTUÉ : la preuve par l'historique git est trouvée (TF-1633)", () => {
+  const corps = Array.from({ length: 14 }, (_, i) => `{"schema":1,"titre":"ligne ${i} du lot accentué","contenu":"corps ${i} assez long pour que la similarité tienne"}`);
+  const saleAcc = corps.concat([`{"schema":1,"titre":"ZorglubMail : un retour de Zorglub","contenu":"lot 20260830k"}`]).join("\n") + "\n";
+  const propreAcc = corps.concat([`{"schema":1,"titre":"Produit-01 : un retour de Client-A","contenu":"lot 20260830k"}`]).join("\n") + "\n";
+  const ancien = "synthèse-20260830k.tf.jsonl", nouveau = "Produit-01 - RETOURS - 20260830k.tf.jsonl";
+  writeFileSync(join(BOITE_DIR, ancien), saleAcc, "utf8");
+  git("add", "-A"); git("commit", "-q", "-m", "lot accentué reçu");
+  writeFileSync(REG, readFileSync(REG, "utf8") + evIngestion(empreinteTexte(saleAcc), `input/00-retours/${nouveau}`) + "\n", "utf8");
+  writeFileSync(join(BOITE_DIR, ancien), propreAcc, "utf8");
+  git("mv", `input/00-retours/${ancien}`, `input/00-retours/${nouveau}`);
+  git("add", "-A"); git("commit", "-q", "-m", "passe d anonymisation du lot accentué");
+  const r = lancer(join(BOITE_DIR, nouveau));
+  if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 400)}`);
+  const e = evenements().pop();
+  if (!e.reempreinte || e.lot_sha !== empreinteTexte(propreAcc)) throw new Error(`ré-empreinte non consignée : ${JSON.stringify(e).slice(0, 300)}`);
+});
+
 // ---- troisième preuve : le RAPPROCHEMENT titre à titre (sidecar entré au suivi déjà anonymisé) ----
 const nomR = "Produit-01 - RETOURS - 20260830e.tf.jsonl";
 const TS_R = "2026-08-30T12:00:00.000Z";

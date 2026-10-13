@@ -95,12 +95,15 @@ const couvre = (parSha, octets) =>
  */
 export function versionIngeree(depot, chemin, parSha) {
   const rel = relative(depot, chemin).replaceAll("\\", "/");
-  const log = spawnSync("git", ["-C", depot, "log", "--follow", "--format=%H", "--name-only", "--", rel],
+  // `-z` (TF-1633) : sans lui, git cite en style C tout chemin à octet non ASCII ("synth\303\250se.md")
+  // et `git show` ne retrouve pas le fichier. Avec `-z`, hash et chemins sont séparés par NUL, et
+  // le hash est suivi d'un saut de ligne résiduel qu'on retire sans toucher au chemin lui-même.
+  const log = spawnSync("git", ["-C", depot, "log", "-z", "--follow", "--format=%H", "--name-only", "--", rel],
     { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   if (log.status !== 0) return null;
   let commit = null;
-  for (const ligne of log.stdout.split("\n")) {
-    const l = ligne.trim();
+  for (const ligne of log.stdout.split("\0")) {
+    const l = ligne.replace(/^\r?\n/, "");
     if (!l) continue;
     if (/^[0-9a-f]{40}$/.test(l)) { commit = l; continue; }
     if (!commit) continue;
