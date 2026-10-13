@@ -1,7 +1,10 @@
 # Protocole d'accueil — de l'intention de l'utilisateur au run
 
 Référence chargée par les prompts d'usage du README (« Utilise …digit-ai-factory
-pour… »). Prérequis : la phase 0 d'AGENTS.md est passée (« Poste prêt »). Ce protocole se
+pour… »). Prérequis : la phase 0 d'AGENTS.md est passée — l'installateur a rendu « FACTORY
+DIGIT-AI OPÉRATIONNELLE ». **L'installation ne pose aucune question** (TF-1637) : ni sur
+l'intention, ni sur un outil manquant, que l'installateur pose lui-même en portée utilisateur.
+L'accord explicite de l'étape 6 porte sur la démarche du run, jamais sur l'installation. Ce protocole se
 **déroule dans l'ordre, sans improvisation** — chaque étape produit quelque chose de
 visible pour l'utilisateur. La session travaille dans le **dossier courant** (le produit) ;
 le pilot et les forges sont des dépendances en lecture.

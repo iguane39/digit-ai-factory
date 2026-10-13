@@ -277,10 +277,14 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
     return B;
   };
   const P = arbre(true);
-  check("TF-1452 — chez un produit, input\\ et output\\ reçoivent un rôle vide qui le demande, jamais celui du pilot", () => {
+  // TF-1452 proposait « un rôle de produit, ou un rôle vide qui le demande » ; TF-1637 (installation
+  // sans question) retient le rôle de produit : un rôle vide laissait deux README en défaut au premier
+  // contact. L'objet de la règle ne change pas : jamais le rôle du pilot chez un produit.
+  check("TF-1452, TF-1637 — chez un produit, input\\ et output\\ reçoivent un rôle de produit (R-1, R-2), jamais celui du pilot", () => {
     const t = readFileSync(join(P, "input", "README.md"), "utf8") + readFileSync(join(P, "output", "README.md"), "utf8");
     if (/Entrants du pilot|Livrables du pilot|familles `05-`/.test(t)) throw new Error("un rôle du pilot est posé chez le produit");
-    if ((t.match(/rôle à rédiger/g) || []).length !== 2) throw new Error("les deux README ne portent pas le rôle vide qui demande sa rédaction");
+    if (!/Entrants du projet fournis par l'humain \(R-1\)/.test(t) || !/Livrables du projet \(R-2\)/.test(t)) throw new Error("les deux README ne portent pas le rôle de produit (R-1, R-2)");
+    if (/rôle à rédiger/.test(t)) throw new Error("un README de produit garde le rôle vide alors qu'un rôle de produit existe");
   });
   writeFileSync(join(P, "input", "README.md"), readFileSync(join(P, "input", "README.md"), "utf8")
     .replace(/<!-- ROLE:DEBUT -->[\s\S]*?<!-- ROLE:FIN -->/, "<!-- ROLE:DEBUT -->\nEntrants du projet Zorglub : cahiers et notes.\n<!-- ROLE:FIN -->"), "utf8");

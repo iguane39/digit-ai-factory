@@ -22,32 +22,22 @@ session Claude Code dans ce dossier, coller le bloc rempli.
 Ce projet EXISTE déjà et il adopte la forge Digit-AI. Le run vivra ICI, dans ce projet.
 N'écrase rien, ne renomme rien, ne déplace rien : ce qui est là reste là.
 
-Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) :
-1. Vérifie les prérequis : git ; gh ; node >= 18 ; uv ; python. S'il en manque, liste-les
-   avec la commande d'installation adaptée à mon système, puis attends que je confirme.
-2. Localise la forge : $FORGE_ROOT s'il est défini, sinon cherche un dossier contenant
-   digit-ai-factory parmi : le parent de ce projet, c:\dev, ~/.digit-ai-forge.
-   Si introuvable, installe-la :
-     git clone https://github.com/iguane39/digit-ai-factory ~/.digit-ai-forge/digit-ai-factory
-     node ~/.digit-ai-forge/digit-ai-factory/bootstrap.mjs --pull
-   Dis-moi le chemin retenu avant de continuer.
-3. Si la forge était déjà installée : mets-la à jour par `node bootstrap.mjs --pull` dans le
-   pilot. Il doit finir sur « Poste prêt » ; sinon chaque défaut porte son remède, applique-le.
-4. Retiens la racine comme FORGE_ROOT pour toute la session.
-
-Phase 0 bis — ADOPTION, et c'est la phase propre à ce cas :
-5. Montre-moi d'abord ce qui serait fait, sans rien écrire :
-     node <FORGE_ROOT>\digit-ai-factory\scripts\adopter-projet-existant.mjs . --essai
-   Lis-moi son relevé : ce qui manque et serait posé, ce qui existe et serait laissé intact.
-   Si ce projet n'a NI code NI site (aucun fichier de code, aucun manifeste de dépendances,
-   aucun robots.txt/llms.txt/sitemap.xml) — un projet purement documentaire — ajoute
-   `--type documentaire` à la commande : l'adoption écarte alors la surface web et les
-   variables d'environnement, avec l'écart consigné au carnet (TF-1439, R-13 exempte ce type
-   tant qu'aucun signal de code ou de site n'entre au dépôt).
-6. Attends mon accord. Puis joue-le pour de vrai, sans --essai, et rends-moi son verdict.
-7. Pose ensuite les README d'input\ et output\ :
-     node <FORGE_ROOT>\digit-ai-factory\scripts\readme-dossiers.mjs --base .
-8. Relis-moi la section « Écart initial à l'adoption » que l'outil a écrite dans
+Phase 0 et 0 bis — installation ET adoption, sans me poser AUCUNE question :
+1. Lance l'installateur depuis ce dossier, tout de suite :
+     Windows : powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"
+     ailleurs : curl -fsSL https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.sh | sh
+   Il pose lui-même git, node >= 18 et uv en portée utilisateur (sans droit administrateur),
+   installe ou met à jour le pilot et les treize forges, puis ADOPTE ce projet par
+   `scripts\adopter-projet-existant.mjs` : idempotent, non destructif, il crée seulement ce
+   qui manque et ne modifie, ne renomme ni ne déplace aucun fichier existant.
+2. S'il finit sur « INSTALLATION INCOMPLÈTE », applique le remède de chaque contrôle rouge et
+   relance-le. Rends-moi la bannière « FACTORY DIGIT-AI OPÉRATIONNELLE » telle quelle.
+3. Si ce projet n'a NI code NI site (aucun fichier de code, aucun manifeste de dépendances,
+   aucun robots.txt/llms.txt/sitemap.xml) — un projet purement documentaire —, l'adoption
+   s'est faite au type par défaut : dis-le, et propose `--type documentaire` au premier run
+   de version (TF-1439, R-13 exempte ce type tant qu'aucun signal de code ou de site n'entre).
+4. Retiens la racine qu'il affiche comme FORGE_ROOT pour toute la session.
+5. Relis-moi la section « Écart initial à l'adoption » que l'outil a écrite dans
    forge\travaux\ECARTS-ASSUMES.md. Ne tranche AUCUN de ces écarts maintenant : ils se
    décident au premier run de version, et je veux les avoir lus avant.
 

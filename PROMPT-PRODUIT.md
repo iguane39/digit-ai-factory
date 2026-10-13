@@ -10,25 +10,16 @@ dossier, coller le bloc rempli.
 ```
 Nouveau produit via la forge Digit-AI. Le run vit ICI, dans ce projet.
 
-Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) :
-1. Vérifie les prérequis : git ; gh (les forges sont publiques sous github.com/iguane39
-   depuis le 10/08 — gh authentifié n'est requis que pour les dépôts d'engagement privés) ;
-   node ≥ 18 ; uv ; python. S'il en manque, liste-les avec la commande d'installation
-   adaptée à mon système, puis attends que je confirme.
-2. Localise la forge : $FORGE_ROOT s'il est défini, sinon cherche un dossier contenant
-   digit-ai-factory parmi : le parent de ce projet, c:\dev, ~/.digit-ai-forge.
-   Si introuvable, installe-la :
-     git clone https://github.com/iguane39/digit-ai-factory ~/.digit-ai-forge/digit-ai-factory
-     node ~/.digit-ai-forge/digit-ai-factory/bootstrap.mjs --pull
-   (bootstrap.mjs clone les treize forges à côté du pilot, installe leurs skills dans
-   ~/.claude/skills, vérifie leurs points d'entrée et affiche les versions — il doit finir
-   sur « Poste prêt », sinon chaque défaut porte son remède : applique-le avant de continuer.)
-3. Si la forge était déjà installée : mets-la à jour — `node bootstrap.mjs --pull` dans le
-   pilot (il met à jour le pilot lui-même, puis les treize forges, puis propage les skills
-   versionnés vers la copie installée ; il affiche la version de chaque dépôt et ne dit
-   « Poste prêt » que si tout est À JOUR — les correctifs arrivent en continu ; un run
-   démarre TOUJOURS sur les dernières versions, consignées au ledger).
-4. Retiens la racine comme FORGE_ROOT pour toute la session.
+Phase 0 — outillage (ne suppose RIEN d'installé, et ne me pose AUCUNE question) :
+1. Lance l'installateur depuis ce dossier, tout de suite :
+     Windows : powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"
+     ailleurs : curl -fsSL https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.sh | sh
+   Il pose lui-même git, node ≥ 18 et uv en portée utilisateur (sans droit administrateur),
+   installe ou met à jour le pilot et les treize forges, propage leurs skills, installe ce
+   projet, et vérifie le tout par des contrôles exécutés.
+2. S'il finit sur « INSTALLATION INCOMPLÈTE », applique le remède de chaque contrôle rouge et
+   relance-le. Rends-moi la bannière « FACTORY DIGIT-AI OPÉRATIONNELLE » telle quelle.
+3. Retiens la racine qu'il affiche comme FORGE_ROOT pour toute la session.
 
 Puis suis le CLAUDE.md du pilot avec ce dossier comme projet produit :
 ledger et artefacts d'étapes sous forge\, code du produit à la racine.

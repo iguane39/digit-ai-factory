@@ -3,33 +3,44 @@
 Instructions pour tout agent IA qui n'a que l'URL de ce dépôt. Suis-les dans l'ordre,
 n'improvise rien.
 
-## Phase 0 — installer ou mettre à jour (idempotente)
+## Phase 0 — installer ou mettre à jour, SANS QUESTION (idempotente)
 
-Localise `digit-ai-factory` dans cet ordre : `$FORGE_ROOT` s'il est défini, sinon le
-parent du dossier courant, sinon `c:\dev`, sinon `~/.digit-ai-forge`.
+**Lance l'installateur tout de suite, depuis le dossier du projet, sans rien demander à
+l'utilisateur** — ni son intention, ni la façon d'installer un outil manquant :
 
-- **Introuvable** → installe :
+- Windows :
   ```
-  git clone https://github.com/iguane39/digit-ai-factory ~/.digit-ai-forge/digit-ai-factory
-  cd ~/.digit-ai-forge/digit-ai-factory && node bootstrap.mjs --pull
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"
   ```
-- **Déjà présent** → mets à jour :
+- macOS, Linux :
   ```
-  node bootstrap.mjs --pull
+  curl -fsSL https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.sh | sh
   ```
 
-`bootstrap.mjs --pull` vérifie les prérequis (git, node ≥ 18 ; gh facultatif — les forges
-sont publiques), met à jour **le pilot lui-même** (et se relance s'il a changé), clone ou
-met à jour les **13 forges** en dépôts frères, renomme sur place un dossier hérité
-d'un ancien nom, **propage les skills versionnés** vers `~/.claude/skills`, contrôle les
-points d'entrée et **affiche la version de chaque dépôt** (tag, sha, date, retard). Il ne
-dit **« Poste prêt »** que si tout est présent, à jour et aligné — sinon chaque défaut
-porte son remède : applique-le avant de continuer. Sans `--pull`, il mesure seulement.
-Retiens la racine des forges qu'il affiche.
+L'installateur pose lui-même ce qui manque, **en portée utilisateur et sans droit
+administrateur** : git (MinGit portable sous Windows), node LTS portable si node ≥ 18 est
+absent, uv. Il localise le pilot (`$FORGE_ROOT`, parent du projet, `c:\dev`,
+`~/.digit-ai-forge`) ou le clone, joue `bootstrap.mjs --pull` (pilot, **13 forges**, skills
+propagés vers `~/.claude/skills`), puis **installe le projet** sans rien écraser ni
+déplacer : dépôt git local, socle `forge\`, `input\`, `output\`, `docs\`, hameçons câblés.
+Il vérifie le tout par des contrôles exécutés et finit sur l'une de ces deux bannières :
+
+- **« FACTORY DIGIT-AI OPÉRATIONNELLE — prête à être utilisée sur ce projet »** : rends cette
+  bannière à l'utilisateur telle quelle, puis passe au protocole d'accueil ;
+- **« INSTALLATION INCOMPLÈTE »** : chaque contrôle rouge porte son remède ; applique-le et
+  relance l'installateur. Ne reviens vers l'utilisateur que pour un remède qui exige un
+  secret ou un geste que tu ne peux pas faire.
+
+**Ce qui n'est jamais une question à l'utilisateur** : installer git, node, uv ou python ;
+choisir entre installation portable, winget ou manuelle (c'est toujours la portable) ; gh,
+qui n'est requis que pour des dépôts privés d'engagement ; un dépôt privé du propriétaire
+inaccessible (c'est un avertissement, pas un défaut). Une intention vague (« pour ce
+projet ») ne retarde pas l'installation : elle se demande **après** la bannière.
 
 ## Ensuite — le protocole d'accueil
 
-Ouvre et déroule [references/ACCUEIL.md](references/ACCUEIL.md) : identifier l'intention
+Une fois la bannière « OPÉRATIONNELLE » rendue, ouvre et déroule
+[references/ACCUEIL.md](references/ACCUEIL.md) : identifier l'intention
 de l'utilisateur, la reformuler simplement, montrer les catalogues de services des forges
 impliquées ([catalogues/CATALOGUES.md](catalogues/CATALOGUES.md)), proposer la démarche,
 **attendre l'accord explicite**, puis exécuter via le run standard. Le run vit dans le

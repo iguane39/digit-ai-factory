@@ -4,9 +4,11 @@ verifie_le: 2026-08-20
 
 # digit-ai-factory
 
-> **Agent IA** : suis [AGENTS.md](AGENTS.md) — installe ce dépôt s'il est absent
-> (`git clone` + `node bootstrap.mjs`, fin « Poste prêt » exigée), mets-le à jour sinon,
-> puis déroule [references/ACCUEIL.md](references/ACCUEIL.md). N'improvise pas.
+> **Agent IA** : suis [AGENTS.md](AGENTS.md) — lance l'installateur (`installer.ps1` sous
+> Windows, `installer.sh` ailleurs) **sans poser de question** : il pose lui-même git, node
+> et uv en portée utilisateur, installe ou met à jour la factory et les forges, installe le
+> projet, et finit sur « FACTORY DIGIT-AI OPÉRATIONNELLE ». Puis déroule
+> [references/ACCUEIL.md](references/ACCUEIL.md). N'improvise pas.
 
 La **factory** de l'écosystème forge Digit-AI — son projet de pilotage. **Un seul point de démarrage** pour construire
 un produit en mobilisant les 13 forges bout en bout, et pour les améliorer par itérations
@@ -36,13 +38,18 @@ rien que le ledger d'un run ne puisse prouver.
 Créer un dossier vide pour le nouveau produit, y **copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md)**
 (depuis ce dépôt GitHub — c'est le seul fichier nécessaire au départ), ouvrir une session
 Claude Code **dans ce nouveau dossier** et coller le prompt rempli. Le prompt est autonome pour
-tout nouvel utilisateur : sa phase 0 vérifie les prérequis (git, node ≥ 18, uv, python — les
-forges sont publiques depuis le 10/08, `gh` authentifié n'est requis que pour les dépôts
-d'engagement privés), localise la forge ou **l'installe depuis
-GitHub** (`~/.digit-ai-forge` par défaut, via `bootstrap.mjs`), puis le run entier — ledger,
-artefacts d'étapes, code — vit dans le projet produit.
+tout nouvel utilisateur : sa phase 0 joue l'installateur, qui pose sans question ce qui manque
+(git, node ≥ 18, uv, en portée utilisateur et sans droit administrateur ; `gh` n'est requis
+que pour les dépôts d'engagement privés), localise la forge ou **l'installe depuis GitHub**
+(`~/.digit-ai-forge` par défaut), installe le projet et finit sur « FACTORY DIGIT-AI
+OPÉRATIONNELLE ». Le run entier — ledger, artefacts d'étapes, code — vit dans le projet produit.
 
-**Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs --pull`
+**Installation en une commande**, dans le dossier du projet :
+`powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"`
+sous Windows, `curl -fsSL https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.sh | sh`
+ailleurs. Code de sortie 0 = opérationnelle, 1 = incomplète (chaque contrôle rouge porte son remède).
+
+**Amorçage manuel du poste seul** (sans projet) : cloner ce dépôt puis `node bootstrap.mjs --pull`
 — vérifie les prérequis (git, node ≥ 18 ; `gh` facultatif), met à jour **le pilot lui-même**,
 clone ou met à jour les 13 forges en dépôts frères (`core.longpaths` activé : les noms de
 fichiers des forges dépassent MAX_PATH sinon), renomme sur place un dossier hérité d'un ancien
@@ -91,8 +98,9 @@ Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [cata
 
 Chaque bloc se colle **tel quel** dans une session Claude Code ouverte **dans le dossier du
 produit** — zéro modification, zéro mécanique. Toute l'intelligence vit dans le dépôt :
-l'installation est portée par [AGENTS.md](AGENTS.md) (phase 0 idempotente : sur un poste déjà
-équipé, le même prompt met à jour), le déroulé par
+l'installation est portée par [AGENTS.md](AGENTS.md) (phase 0 idempotente et **sans question** :
+sur un poste déjà équipé, le même prompt met à jour ; elle finit sur « FACTORY DIGIT-AI
+OPÉRATIONNELLE »), le déroulé par
 [references/ACCUEIL.md](references/ACCUEIL.md) (intention reformulée, catalogues affichés,
 démarche proposée, **accord explicite avant exécution**, spécifiques demandés **en une seule
 question**). La 2e ligne est obligatoire : elle impose l'installation réelle et interdit de
