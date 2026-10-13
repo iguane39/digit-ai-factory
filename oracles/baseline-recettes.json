@@ -411,7 +411,7 @@
   "vu_le": "2026-10-02"
  },
  "oracles/lib-sens-rouge.test.mjs": {
-  "cas": 20,
+  "cas": 23,
   "vu_le": "2026-10-13"
  },
  "oracles/oracle-amorcage-poste.test.mjs": {

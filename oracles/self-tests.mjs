@@ -54,7 +54,7 @@ import { fileURLToPath } from "node:url";
 import {
   confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline,
 } from "./lib-baseline-recettes.mjs";
-import { confronterSensRouge } from "./lib-sens-rouge.mjs";
+import { confronterSensRouge, verdictSensRouge, SEUIL_I6_BLOQUANT } from "./lib-sens-rouge.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // TF-1465 (02/10/2026) : l'interpréteur Python du poste, cherché UNE fois — même ordre que
@@ -468,11 +468,16 @@ if ((bilan.baisses.length || bilan.disparues.length) && APPLIQUER) {
 // le harnais au rouge sur l'existant transformerait une mesure en dette du jour et ferait
 // contourner le contrôle avant qu'il soit compris (motif que R-33 bis donne pour le verdict websec) — le compte ci-dessous est
 // l'indicateur à faire monter, et le seuil de bascule une décision humaine.
+// Décision humaine D-4 (a) du 13/10/2026 : BLOQUANT à partir de SEUIL_I6_BLOQUANT (lib-sens-rouge.mjs),
+// après 195/195 recettes lisibles — avertissement d'ici là, et l'avertissement dit sa date de fin.
 const sensRouge = confronterSensRouge(resultats);
+const verdictI6 = verdictSensRouge(sensRouge, jour);
 if (sensRouge.sansRouge.length) {
   console.log(`  [SENS ROUGE] ${sensRouge.avecRouge}/${sensRouge.mesurees} recette(s) verte(s) déclarent au moins `
-    + `un cas ROUGE joué ; ${sensRouge.sansRouge.length} n'en déclarent AUCUN de lisible — AVERTISSEMENT, `
-    + "jamais un échec : le vocabulaire lu est fermé (cas « rouge », couverture « deux/double sens », "
+    + `un cas ROUGE joué ; ${sensRouge.sansRouge.length} n'en déclarent AUCUN de lisible — `
+    + (verdictI6.bloquant ? "ÉCHEC (I6 bloquant depuis le " + SEUIL_I6_BLOQUANT + ", décision D-4 (a) du 13/10/2026) : "
+      : "AVERTISSEMENT jusqu'au " + SEUIL_I6_BLOQUANT + ", ÉCHEC ensuite (décision D-4 (a) du 13/10/2026) : ")
+    + "le vocabulaire lu est fermé (cas « rouge », couverture « deux/double sens », "
     + "« doit échouer », cas qui passe en annonçant un REFUS), donc un cas rouge nommé autrement compte ici comme absent. Les nommer est la "
     + "seule façon d'en sortir :");
   // UN AVEU TRONQUÉ EST UN AVEU PARTIEL (même leçon que le cliquet) : toutes nommées, une par ligne.
@@ -485,12 +490,14 @@ if (sensRouge.sansRouge.length) {
 const echecs = resultats.filter((r) => r.statut !== "OK");
 const perdus = APPLIQUER ? [] : [...bilan.baisses, ...bilan.disparues];
 const casNonJoues = bilan.nonJoues.reduce((n, x) => n + x.nonJoues, 0);
+const sansRougeBloquant = verdictI6.bloquant ? sensRouge.sansRouge.length : 0;
 console.log("=".repeat(78));
 console.log(
-  echecs.length || perdus.length
+  echecs.length || perdus.length || sansRougeBloquant
     ? `  ${echecs.length}/${resultats.length} oracle(s) en défaut${echecs.length ? ` : ${echecs.map((r) => r.nom).join(", ")}` : ""}`
       + `${perdus.length ? ` · ${perdus.length} recette(s) ont PERDU des cas` : ""}`
+      + `${sansRougeBloquant ? ` · ${sansRougeBloquant} recette(s) sans cas rouge lisible (I6)` : ""}`
     : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles, fichiers de test du dépôt, état du parc — I1, I2 et I4) · cliquet des cas tenu (I5)`
       + (casNonJoues ? `, dont ${casNonJoues} cas déclaré(s) NON JOUÉ(S) sur ce poste dans ${bilan.nonJoues.length} recette(s)` : ""),
 );
-process.exit(echecs.length || perdus.length ? 1 : 0);
+process.exit(echecs.length || perdus.length || sansRougeBloquant ? 1 : 0);

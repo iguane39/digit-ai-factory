@@ -108,3 +108,16 @@ export function confronterSensRouge(resultats) {
   }
   return { mesurees: mesurees.length, avecRouge, sansRouge };
 }
+
+// I6 DEVIENT BLOQUANT (décision humaine D-4 (a) du 13/10/2026, TF-1245). Le tri du 13/10 a porté
+// le sens rouge lisible à 195 recettes vertes sur 195 ; à partir du seuil, une recette verte qui
+// n'en déclare aucun fait échouer le harnais. Les 7 jours de grâce suivent le précédent de la porte
+// des lots (TF-1570) : d'ici là, l'avertissement dit la date à laquelle il cessera d'en être un.
+export const SEUIL_I6_BLOQUANT = "2026-10-20";
+
+/** { bloquant, avertissement } — `jour` au format AAAA-MM-JJ. */
+export function verdictSensRouge(bilan, jour) {
+  const manque = (bilan?.sansRouge?.length || 0) > 0;
+  const bloquant = manque && String(jour) >= SEUIL_I6_BLOQUANT;
+  return { bloquant, avertissement: manque && !bloquant };
+}

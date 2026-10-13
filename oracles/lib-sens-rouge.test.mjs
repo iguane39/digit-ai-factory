@@ -10,7 +10,7 @@
  *
  * Joué par `oracles\self-tests.mjs` (I2 : tout `*.test.mjs` du dépôt est joué).
  */
-import { marquesSensRouge, porteUneRecette, confronterSensRouge } from "./lib-sens-rouge.mjs";
+import { marquesSensRouge, porteUneRecette, confronterSensRouge, verdictSensRouge, SEUIL_I6_BLOQUANT } from "./lib-sens-rouge.mjs";
 
 const echecs = [];
 const verifier = (nom, condition) => { if (!condition) echecs.push(nom); };
@@ -73,11 +73,23 @@ verifier("BORNE — une recette verte jouée par --self-test ou par I2 EST mesur
     !bilan.sansRouge.some((x) => x.nom.includes("parc réel")));
 }
 
+// ── I6 BLOQUANT (D-4 (a) du 13/10/2026) — la bascule datée, dans ses deux sens ──────────────
+{
+  const manque = { sansRouge: [{ nom: "b.test.mjs", via: "I2" }] };
+  const tenu = { sansRouge: [] };
+  verifier("I6 — cas rouge : une recette sans cas rouge, le jour du seuil, est BLOQUANTE",
+    verdictSensRouge(manque, SEUIL_I6_BLOQUANT).bloquant === true);
+  verifier("I6 — la veille du seuil, le même manque n'est qu'un avertissement",
+    verdictSensRouge(manque, "2026-10-19").bloquant === false && verdictSensRouge(manque, "2026-10-19").avertissement === true);
+  verifier("I6 — sans manque, rien ne bloque ni n'avertit, même après le seuil",
+    verdictSensRouge(tenu, "2027-01-01").bloquant === false && verdictSensRouge(tenu, "2027-01-01").avertissement === false);
+}
+
 if (echecs.length) {
   console.error("lib-sens-rouge : FAIL\n  - " + echecs.join("\n  - "));
   process.exit(1);
 }
-console.log("lib-sens-rouge (TF-1082) : 20/20 PASS — les quatre formes de cas ROUGE du dépôt (dont le refus joué, TF-1245) sont "
+console.log("lib-sens-rouge (TF-1082) : 23/23 PASS — I6 bloquant à partir du " + SEUIL_I6_BLOQUANT + " (cas rouge joué le jour du seuil), les quatre formes de cas ROUGE du dépôt (dont le refus joué, TF-1245) sont "
   + "reconnues, une recette qui ne joue que des fixtures conformes ne l'est PAS, le « 0 FAIL » de "
   + "fin de résumé ne vaut pas preuve, et les bornes de population tiennent (état du parc et "
   + "recette en échec hors mesure) ; chaque règle de lecture est prouvée dans ses DEUX sens");
