@@ -183,5 +183,5 @@ if (echecs.length) {
 const TOTAL = 7;
 const joues = TOTAL - nonJuge.length;
 const couvert = ["second clone par alias (avec son retard)", "mise de cote", "non versionne",
-  "hors liste", ...(nonJuge.length ? [] : ["lien symbolique"]), "puits rate", "la borne"].join(", ");
-console.log(`bootstrap - balayage du parc (TF-0629) : ${joues}/${TOTAL} - ${couvert}`);
+  "hors liste", ...(nonJuge.length ? [] : ["lien symbolique"]), "puits rate"].join(", ");
+console.log(`bootstrap - balayage du parc (TF-0629) : ${joues}/${TOTAL} - cas rouges (parc fautif déclaré) : ${couvert} ; borne verte : le dépôt normal n'est pas accusé`);

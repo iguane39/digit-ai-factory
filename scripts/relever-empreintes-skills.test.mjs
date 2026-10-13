@@ -49,7 +49,7 @@ try {
     const r = relever({ dossierSkills: SKILLS, journal: JOURNAL, avecSocle: false });
     att(r.verdict === "inchange", `verdict ${r.verdict} : ${JSON.stringify(r.changes)}`);
   });
-  check("un octet change dans un script : verdict change, le skill est nommé avec ancienne → nouvelle empreinte", () => {
+  check("cas rouge — un octet change dans un script : verdict change, le skill est nommé avec ancienne → nouvelle empreinte", () => {
     const avant = empreinteSkill(join(SKILLS, "alpha")).empreinte;
     poser("alpha", "scripts/a.py", "print(2)\n");
     const r = relever({ dossierSkills: SKILLS, journal: JOURNAL, avecSocle: false, maintenant: "2026-09-03T12:00:00.000Z" });
