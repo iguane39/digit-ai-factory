@@ -230,6 +230,29 @@ if (args.includes("--self-test")) {
       return generateursDeFamilles(depotSansGenerateur).length === 0;
     })());
 
+  // TF-1280 (13/10/2026) — UN SITE NON SUIVI D'UNE AUTRE FORGE N'EST PAS UN ROUGE DU PILOT. Parc jetable :
+  // une forge (dépôt git) porte un script de scellement inconnu du registre. Non suivi → nommé SANS_OBJET,
+  // pas de FAIL ; suivi (indexé) → E2 FAIL, le défaut qu'E2 existe pour relever reste relevé.
+  {
+    const parc = join(base, "parc-tf1280");
+    const forge = join(parc, "digit-ai-forge-exemple");
+    mkdirpArbre(join(forge, "scripts"), { recursive: true });
+    writeFileSync(join(forge, "scripts", "sceau-tf1280-inconnu.mjs"), "import { createHash } from 'node:crypto';\ncreateHash('sha256');\n", "utf8");
+    spawnSync("git", ["-C", forge, "init", "-q", "-b", "main"], { encoding: "utf8" });
+    const jouerParc = () => {
+      const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), parc, "--json"], { encoding: "utf8" });
+      try { return JSON.parse(r.stdout.trim()); } catch { return { verdict: "ILLISIBLE", findings: [] }; }
+    };
+    const avant = jouerParc();
+    casE1("E2 TF-1280 vert — un site NON SUIVI d'une autre forge est nommé SANS_OBJET, jamais un FAIL",
+      !avant.findings.some((f) => f.regle === "E2" && f.statut === "FAIL")
+      && avant.findings.some((f) => f.regle === "E2" && f.statut === "SANS_OBJET" && /sceau-tf1280-inconnu\.mjs/.test(f.message)));
+    spawnSync("git", ["-C", forge, "add", "scripts/sceau-tf1280-inconnu.mjs"], { encoding: "utf8" });
+    const apres = jouerParc();
+    casE1("E2 TF-1280 rouge — le même site, SUIVI par git, reste un site de scellement NON DÉCLARÉ (FAIL)",
+      apres.verdict === "FAIL" && apres.findings.some((f) => f.regle === "E2" && f.statut === "FAIL" && /sceau-tf1280-inconnu\.mjs/.test(f.message)));
+  }
+
   rmSync(base, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   console.log(`\nRecette empreintes : ${pass}/${pass + echecs.length} cas`);
   process.exit(echecs.length ? 1 : 0);
@@ -309,6 +332,18 @@ if (!depots.length) {
   sortir("SKIP", 2);
 }
 
+// TF-1280 (13/10/2026) — LE BALAYAGE NE JUGE QUE CE QUE LE DÉPÔT PORTE, SAUF CHEZ LE
+// PILOT. Un script de scellement NON SUIVI par git dans une AUTRE forge est le travail en cours d'une session qui
+// n'est pas celle-ci : le pilot ne peut pas le faire déclarer sans écrire chez elle, et un harnais rouge pour une
+// cause étrangère apprend à lire « rouge » comme « normal » (21/09 : rouge deux fois sur deux pour un fichier qu'aucune
+// session du pilot n'avait écrit). Il est NOMMÉ au verdict (SANS_OBJET) et il redeviendra un site à déclarer le jour
+// où le dépôt le porte. Chez le pilot lui-même, le fichier non suivi reste jugé : c'est celui de la session courante.
+// Hors dépôt git (ls-files muet), tout est jugé, comme avant.
+function suivisDe(base) {
+  const r = spawnSync("git", ["-C", base, "ls-files", "-z"], { encoding: "utf8", maxBuffer: 256 * 1024 * 1024, timeout: 60000 });
+  return r.status === 0 ? new Set((r.stdout || "").split("\0").filter(Boolean)) : null;
+}
+const nonSuivis = new Set();  // "depot/chemin" des sites trouvés mais non suivis, hors pilot
 const trouves = new Map();   // nom de fichier -> chemins relatifs
 for (const depot of depots) {
   const base = join(racine, depot);
@@ -321,6 +356,7 @@ for (const depot of depots) {
     aLaRacine = readdirSync(base, { withFileTypes: true })
       .filter((e) => e.isFile() && EXT.test(e.name)).map((e) => join(base, e.name));
   } catch { /* dépôt illisible : les dossiers connus restent balayés */ }
+  const suivis = depot === basename(PILOT) ? null : suivisDe(base);
   for (const dossier of [...cibles, null]) {
     for (const f of dossier === null ? aLaRacine : fichiers(dossier)) {
       let texte = "";
@@ -329,6 +365,7 @@ for (const depot of depots) {
       const nom = basename(f);
       const liste = trouves.get(nom) || [];
       liste.push(`${depot}/${relative(base, f).replaceAll("\\", "/")}`);
+      if (suivis && !suivis.has(relative(base, f).replaceAll("\\", "/"))) nonSuivis.add(liste[liste.length - 1]);
       trouves.set(nom, liste);
     }
   }
@@ -351,7 +388,14 @@ if (morts.length) {
 }
 
 // E2 · LA RÈGLE QUI FAIT TENIR LA CONVENTION : aucun site non déclaré.
-const inconnus = [...trouves.entries()].filter(([nom]) => !declares.has(nom));
+const inconnusTous = [...trouves.entries()].filter(([nom]) => !declares.has(nom));
+const ecartes = inconnusTous.filter(([, ou]) => ou.every((o) => nonSuivis.has(o)));
+const inconnus = inconnusTous.filter((e) => !ecartes.includes(e));
+if (ecartes.length) {
+  so("E2", String(racine), `${ecartes.length} site(s) de scellement NON SUIVI(S) par git dans une autre forge, non jugé(s) : ` +
+    ecartes.map(([nom, ou]) => `${nom} (${ou[0]})`).join(", ") +
+    ". Travail en cours d'une autre session : il devra rejoindre la table de references\\EMPREINTES.md le jour où son dépôt le porte (TF-1280)");
+}
 if (inconnus.length) {
   ko("E2", `${racine}`, `${inconnus.length} site(s) de scellement NON DÉCLARÉ(s) : ` +
     inconnus.map(([nom, ou]) => `${nom} (${ou[0]}${ou.length > 1 ? ` +${ou.length - 1}` : ""})`).join(", ") +

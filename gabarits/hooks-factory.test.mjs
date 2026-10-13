@@ -78,6 +78,11 @@ try {
       if (f.isFile() && /\.(?:mjs|json)$/.test(f.name)) copyFileSync(join(PILOT, d, f.name), join(copie, d, f.name));
   }
   copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie, "bootstrap.mjs"));
+  // TF-1528 : le hook des droits accordés rejoue `scripts/verifier-droits-accordes.mjs` et sa table datée.
+  for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json"]) {
+    mkdirSync(join(copie, dirname(f)), { recursive: true });
+    copyFileSync(join(PILOT, f), join(copie, f));
+  }
   const env = { ...process.env, FORGE_ROOT: racine };
   const P = produit("produit-niveaux", true);
   const lanceur = join(P, "forge", "hooks", "factory.mjs");
@@ -119,6 +124,20 @@ try {
   check("6 lexique : « vite : » chez un produit portant forge/NIVEAUX.md → ligne Simple citant forge\\NIVEAUX.md",
     lOui.status === 0 && /\[NIVEAU — hook-lexique\][^\n]*Simple[^\n]*forge\\NIVEAUX\.md/.test(lOui.stdout), lOui.stdout + lOui.stderr);
   check("6 bis lexique : même message chez un produit sans forge/NIVEAUX.md → rien injecté", lNon.status === 0 && lNon.stdout.trim() === "", lNon.stdout);
+
+  // 7 — TF-1528, droits accordés par le lanceur : un script d'octroi fautif écrit chez le produit est signalé
+  // à l'écriture (avertissement, exit 0) ; un script ordinaire reste muet.
+  const droits = (nom, lignes) => {
+    const f = join(P, nom);
+    writeFileSync(f, lignes.join("\n") + "\n", "utf8");
+    return spawnSync(process.execPath, [lanceur, "droits-accordes"], { encoding: "utf8", cwd: P, env,
+      input: JSON.stringify({ tool_name: "Write", tool_input: { file_path: f } }) });
+  };
+  const dFaute = droits("octroi.sh", ["az ad app permission add --id 00000003-0000-0000-c000-000000000000 --api-permissions 18a4783c-866b-4cc7-a460-3d0e455740fd=Role 2>/dev/null || true", "echo consentie"]);
+  const dOrdinaire = droits("build.sh", ["npm ci", "echo termine"]);
+  check("7 droits accordés : un script d'octroi fautif écrit chez le produit est signalé (DA-1, DA-2), sans bloquer",
+    dFaute.status === 0 && /DA-1/.test(dFaute.stdout) && /DA-2/.test(dFaute.stdout), dFaute.stdout + dFaute.stderr);
+  check("7 bis droits accordés : un script ordinaire reste muet", dOrdinaire.status === 0 && dOrdinaire.stdout.trim() === "", dOrdinaire.stdout + dOrdinaire.stderr);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 

@@ -49,6 +49,11 @@
             "type": "command",
             "command": "node forge/hooks/factory.mjs ecriture",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "node forge/hooks/factory.mjs droits-accordes",
+            "timeout": 40
           }
         ]
       }

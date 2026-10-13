@@ -51,19 +51,25 @@
  */
 
 /**
- * Le vocabulaire du SENS ROUGE, fermé et déclaré. Trois familles, toutes observées dans les
+ * Le vocabulaire du SENS ROUGE, fermé et déclaré. Quatre familles, toutes observées dans les
  * recettes de ce dépôt :
  *   · l'étiquette d'un cas — « rouge R13 : … », « archive rouge (état vide) », « TF-0923 (a) rouge » ;
  *   · la déclaration de couverture d'une ligne de résumé — « prouvée dans ses DEUX sens »,
  *     « recette à double sens » ;
- *   · l'intention écrite — « doit échouer », « doivent échouer ».
- * `fail`, `échec` et `refusé` sont volontairement ABSENTS : « 0 FAIL » clôt presque tous les
- * résumés du dépôt, et compter ce mot rendrait la mesure vraie par construction.
+ *   · l'intention écrite — « doit échouer », « doivent échouer » ;
+ *   · le REFUS joué (TF-1245, 13/10/2026) — une ligne de cas qui PASSE (`[PASS]`/`[OK]`) et dont le
+ *     libellé écrit le refus en capitales (« REFUS : motif trop court ») ou le pose en verdict d'un cas
+ *     (« le commit est refusé », « arbre sale → refus »). Un cas qui passe en annonçant un refus est
+ *     un contrôle qui a refusé. Le mot nu « refus » ne suffit pas : « le refus recommande une
+ *     reformulation » décrit un cas VERT, « il a refusé ma synthèse » cite un texte.
+ * `fail` et `échec` sont volontairement ABSENTS : « 0 FAIL » clôt presque tous les résumés du
+ * dépôt, et compter ce mot rendrait la mesure vraie par construction.
  */
 export const MOTIFS_SENS_ROUGE = [
   { nom: "cas étiqueté rouge", motif: /\brouges?\b/i },
   { nom: "couverture déclarée à double sens", motif: /\b(?:deux|double)\s+sens\b/i },
   { nom: "intention écrite « doit échouer »", motif: /\bdoi(?:t|vent)\s+échouer\b/i },
+  { nom: "refus joué (cas PASS qui annonce un REFUS)", motif: /^[ \t]*\[(?:PASS|OK)[ \t]*\].*(?:\bREFUS|(?:\b(?:est|sont|reste|restent|adoption)\s+|→\s*)refus)/m },
 ];
 
 /**

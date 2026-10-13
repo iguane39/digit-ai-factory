@@ -488,9 +488,12 @@ console.log("");
   } catch { fichiersSuspects = []; }
   for (const nom of fichiersSuspects) {
     let taille = "?";
-    try { taille = String(statSync(join(racine, nom)).size); } catch { /* taille indisponible */ }
+    let modifie = "?";
+    try { const st = statSync(join(racine, nom)); taille = String(st.size); modifie = st.mtime.toISOString().slice(0, 16).replace("T", " "); } catch { /* taille indisponible */ }
+    // TF-1584 : la taille ET la date de dernière écriture se disent, pour que deux ouvertures
+    // successives se comparent — un fichier réécrit entre elles change de taille ou de date.
     ligne("avert",
-      `${nom} — FICHIER de ${taille} octets à la racine du parc : ${PUITS_RATES.get(nom.toLowerCase())}. ` +
+      `${nom} — FICHIER de ${taille} octets (dernière écriture ${modifie} UTC) à la racine du parc :${PUITS_RATES.get(nom.toLowerCase())}. ` +
       "Ce qu'une commande croyait JETER a été ÉCRIT sur disque, hors de tout dépôt — donc hors de " +
       "tout .gitignore et de toute recherche de secret. Vérifier son contenu AVANT de l'effacer : " +
       "une réponse authentifiée y conserverait un jeton. Supprimer un fichier est un geste HUMAIN " +
