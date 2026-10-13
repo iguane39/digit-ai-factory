@@ -24,7 +24,7 @@ N'écrase rien, ne renomme rien, ne déplace rien : ce qui est là reste là.
 
 Phase 0 et 0 bis — installation ET adoption, sans me poser AUCUNE question :
 1. Lance l'installateur depuis ce dossier, tout de suite :
-     Windows : powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"
+     Windows : powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 -UseBasicParsing -OutFile ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1'); & ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1')"
      ailleurs : curl -fsSL https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.sh | sh
    Il pose lui-même git, node >= 18 et uv en portée utilisateur (sans droit administrateur),
    installe ou met à jour le pilot et les treize forges, puis ADOPTE ce projet par

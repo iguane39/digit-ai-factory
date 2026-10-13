@@ -10,7 +10,7 @@ l'utilisateur** — ni son intention, ni la façon d'installer un outil manquant
 
 - Windows :
   ```
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 -UseBasicParsing -OutFile ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1'); & ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1')"
   ```
 - macOS, Linux :
   ```

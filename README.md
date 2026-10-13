@@ -45,7 +45,7 @@ que pour les dépôts d'engagement privés), localise la forge ou **l'installe d
 OPÉRATIONNELLE ». Le run entier — ledger, artefacts d'étapes, code — vit dans le projet produit.
 
 **Installation en une commande**, dans le dossier du projet :
-`powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"`
+`powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 -UseBasicParsing -OutFile ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1'); & ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1')"`
 sous Windows, `curl -fsSL https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.sh | sh`
 ailleurs. Code de sortie 0 = opérationnelle, 1 = incomplète (chaque contrôle rouge porte son remède).
 

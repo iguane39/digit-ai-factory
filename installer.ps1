@@ -16,7 +16,7 @@
 # Les dossiers d'outils entrent au PATH UTILISATEUR (registre HKCU), jamais au PATH machine.
 #
 # Usage (dans le dossier du projet) :
-#   powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"
+#   powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 -UseBasicParsing -OutFile ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1'); & ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1')"
 # ou, pilot deja present : powershell -NoProfile -ExecutionPolicy Bypass -File <pilot>\installer.ps1
 # Exit : 0 factory operationnelle - 1 installation incomplete (chaque defaut porte son remede).
 

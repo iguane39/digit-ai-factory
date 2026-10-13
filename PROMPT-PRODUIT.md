@@ -12,7 +12,7 @@ Nouveau produit via la forge Digit-AI. Le run vit ICI, dans ce projet.
 
 Phase 0 — outillage (ne suppose RIEN d'installé, et ne me pose AUCUNE question) :
 1. Lance l'installateur depuis ce dossier, tout de suite :
-     Windows : powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 | iex"
+     Windows : powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.ps1 -UseBasicParsing -OutFile ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1'); & ([IO.Path]::GetTempPath()+'digit-ai-installer.ps1')"
      ailleurs : curl -fsSL https://raw.githubusercontent.com/iguane39/digit-ai-factory/main/installer.sh | sh
    Il pose lui-même git, node ≥ 18 et uv en portée utilisateur (sans droit administrateur),
    installe ou met à jour le pilot et les treize forges, propage leurs skills, installe ce
