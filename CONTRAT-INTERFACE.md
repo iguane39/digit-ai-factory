@@ -385,6 +385,16 @@ ledger (`escalade_modele`, avec la raison). Une affectation qui réussit du prem
 inférieur est la preuve que le routage était bon — le tableau ci-dessus est un a priori, le ledger
 accumule la vérité mesurée.
 
+**Effort par classe de tâche** (TF-1557, 13/10/2026) : l'effort de réflexion d'une tâche Opus se lit
+dans la table datée `effort_par_classe` de `references\MODELES-EN-SERVICE.json`, jamais recopiée ici.
+Elle vient du rejeu du 2026-10-01 (`output\03-etudes\20261001-etude-resultats-rejeu-opus-5-5.md`),
+et chaque ligne y porte sa classe, l'effort décidé, le plancher que le rejeu a retenu et la mesure
+qui le fonde ; une classe absente prend l'effort des classes non testées. Un agent délégué reçoit
+l'effort de sa classe (paramètre d'effort à l'appel, champ `effort` d'un `agent.def`), sans quoi il
+hérite de celui de la session. Descendre au plancher mesuré ou ajouter une classe demande une mesure
+citée (§4 bis). Juge : `oracle-modeles-en-service.mjs`, règle MS5, qui signale aussi l'écart entre
+l'effort réglé au poste et l'attendu de la table.
+
 ### 4 bis. Protocole de mesure du routage (TF-0051)
 
 Constat fondateur : ~25 affectations de modèle en 2 produits réels, zéro escalade ET zéro donnée
@@ -431,6 +441,24 @@ attend et doit pouvoir abandonner. D'où :
 - traçabilité : l'orchestrateur consigne au ledger un événement **`relais_arme`**
   `{chemin_guette, ts}` au lancement de tout process long en arrière-plan — vérifiable
   comme le reste du ledger (l'option mesurable de TF-0173).
+
+### 4 quater. Une session neuve par mandat, un seuil de contexte déclaré (TF-1558, avertissement)
+
+Chaque réponse relit tout le contexte de sa session : la relecture domine le volume et allonge
+la latence, et c'est la longueur de la session qui la gonfle, le contexte d'ouverture restant
+stable (`output\03-etudes\20261001-etude-opportunite-saut-opus-5-5.md`, mesure du 2026-10-01).
+D'où deux consignes, en **avertissement** et jamais en blocage (règle neuve, précédent D-70 (b)) :
+- **un mandat humain neuf s'ouvre dans une session neuve**, qui relit la doctrine et le registre
+  plutôt que de porter le contexte du mandat précédent ; une session de pilotage qui enchaîne des
+  mandats liés reste admise, et se dit ;
+- **au-delà du seuil de contexte déclaré** (`sessions.seuil_contexte_jetons` de
+  `references\MODELES-EN-SERVICE.json`, daté et sourcé), la session finit son tour, écrit son point
+  de reprise (registre, ledger ou synthèse) et se reprend dans une session neuve.
+
+Mesure, en lecture seule : `node scripts\relever-contexte-sessions.mjs [--projet <motif>]` relit les
+transcriptions des profils du poste et rend, session par session, le contexte relu par réponse et par
+tour, et les sessions qui ont franchi le seuil (AVERT, exit 0). La revue compare ce relevé avant et
+après deux semaines d'application ; la mesure de clôture est le relu par tour.
 
 ## 5. Table de routage réelle et dette d'intégration
 

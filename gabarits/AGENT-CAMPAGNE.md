@@ -95,6 +95,13 @@ harnais sont licites). Aucun `.env` lu, copié ou déplacé. Windows : écrire l
 via les outils du harnais (pas de heredoc shell pour du contenu accentué), `PYTHONUTF8=1`
 pour tout script Python qui imprime.
 
+**Effort de l'agent (TF-1557, 13/10/2026).** Le pilot lance chaque agent Opus à l'effort de la
+classe de sa tâche, lu dans la table `effort_par_classe` de `references\MODELES-EN-SERVICE.json`
+(paramètre d'effort de l'appel), et nomme cette classe dans le prompt. Sans paramètre, l'agent
+hérite de l'effort de la session de pilotage, qui n'est pas celui de sa classe. Un agent qui
+délègue à son tour applique la même table. L'effort servi se lit au champ `effort` de la
+transcription et se consigne au journal de campagne avec le modèle (CONTRAT-INTERFACE.md §4 bis).
+
 **Rapport final (le livrable).** Ton dernier message est un rapport structuré, par item :
 
 ```

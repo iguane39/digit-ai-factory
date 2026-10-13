@@ -1,7 +1,7 @@
 {
   "schema": "pilot/modeles-en-service@1",
-  "version": "1.0.0",
-  "date": "2026-09-25",
+  "version": "1.1.0",
+  "date": "2026-10-13",
   "pourquoi": "Loi transverse n° 4 : la génération de modèles est une donnée volatile. Elle vivait en prose au §4 de CONTRAT-INTERFACE.md, épinglée le 2026-08-10 et révisée seulement « à chaque changement de famille » : Fable 5.1, servie au pilotage dès le 02/09, et Opus 5.5, servie depuis le 23/09, n'ont déclenché aucune révision. Décision humaine D-1 (a) du 25/09/2026 : suivre par nom de famille, et mesurer la version servie.",
   "decision": "D-1 (a) du 2026-09-25, posée par la synthèse output/04-plans/Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md",
   "regle": "Un rôle se désigne par son NOM DE FAMILLE (fable, opus, sonnet, haiku), jamais par un identifiant : le nom suit la dernière version. Toute version servie absente de ce référentiel déclenche le re-test de la règle de challenge (CONTRAT-INTERFACE.md §4) et une mise à jour datée de ce fichier. Juge : oracles/oracle-modeles-en-service.mjs, joué à chaque ouverture de session du pilot par oracles/hook-ouverture.mjs.",
@@ -66,5 +66,38 @@
     "declencheur": "Fable 5 vers Fable 5.1 et Opus 5 vers Opus 5.5, servies sans révision du tableau de routage",
     "protocole": "CONTRAT-INTERFACE.md §4 bis : au premier run ou à la première campagne qui porte 2 tranches comparables, une tranche par modèle, coût comparé à qualité égale",
     "clos_par": null
+  },
+  "effort_par_classe": {
+    "version": "1.0.0",
+    "date": "2026-10-13",
+    "decision": "TF-1557, option (a) de la fiche du 02/10/2026 : effort high par défaut pour les classes couvertes par le rejeu, max gardé pour toute classe non testée ; décidée par le mandat global humain du 13/10/2026",
+    "source": "output/03-etudes/20261001-etude-resultats-rejeu-opus-5-5.md, tableaux « Résultats par classe de tâche » et « Verdict du critère figé » (38 exécutions jugées par script, calculées par analyse.mjs du banc, 2026-10-01)",
+    "famille": "opus",
+    "regle": "L'effort d'une tâche Opus se lit ici par sa classe : `effort` est la valeur décidée, `plancher_mesure` la plus basse que le rejeu a retenue. Une classe absente de la table prend `defaut_classe_non_testee`. Descendre au plancher, ou étendre la table, demande une mesure citée (CONTRAT-INTERFACE.md §4 bis). Juge : oracles/oracle-modeles-en-service.mjs, règle MS5.",
+    "defaut_classe_non_testee": "max",
+    "classes": [
+      { "classe": "restitution", "exemples": "restitution d'un tour, synthèse de fin de campagne", "tache_rejeu": "T1", "effort": "high", "plancher_mesure": "medium", "mesure": "max 2/2 en 1 155 s ; high 1/1 en 185 s (−84 %) ; medium 2/2 en 126 s (−89 %)" },
+      { "classe": "reparation-code", "exemples": "réparer un oracle, un script ou un test sur une fixture rouge", "tache_rejeu": "T2", "effort": "high", "plancher_mesure": "high", "mesure": "max 0/2 ; high 1/1 en 88 s ; medium 0/2 : medium échoue comme max, jamais en dessous de high" },
+      { "classe": "analyse-de-prompt", "exemples": "analyse en 8 couches d'un prompt", "tache_rejeu": "T3", "effort": "high", "plancher_mesure": "medium", "mesure": "max 2/2 en 1 314 s ; high 1/1 en 270 s (−79 %) ; medium 2/2 en 190 s (−86 %)" },
+      { "classe": "etude", "exemples": "étude d'opportunité, note de conseil", "tache_rejeu": "T4", "effort": "high", "plancher_mesure": "medium", "mesure": "max 2/2 en 1 027 s ; high 1/1 en 221 s (−78 %) ; medium 2/2 en 162 s (−84 %)" },
+      { "classe": "page-html", "exemples": "corriger ou produire une page HTML sous oracle", "tache_rejeu": "T5", "effort": "high", "plancher_mesure": "medium", "mesure": "max 1/1 en 231 s ; high 1/1 en 48 s (−79 %) ; medium 1/1 en 37 s (−84 %)" },
+      { "classe": "extraction", "exemples": "extraire ou compter dans un registre, un journal", "tache_rejeu": "T6", "effort": "high", "plancher_mesure": "medium", "mesure": "max 1/1 en 386 s ; high 1/1 en 61 s (−84 %) ; medium 1/1 en 39 s (−90 %)" },
+      { "classe": "pilotage-session-longue", "exemples": "session de pilotage qui enchaîne des dizaines de tours, arbitrage", "tache_rejeu": null, "effort": "max", "plancher_mesure": null, "mesure": "non rejouée : le banc ne joue que des tâches de 37 s à 24 min (section « Limites » de l'étude)" },
+      { "classe": "construction-complexe", "exemples": "architecture, code neuf d'ampleur, maquette complète", "tache_rejeu": null, "effort": "max", "plancher_mesure": null, "mesure": "non rejouée ; la réparation de code (T2) en est la plus proche et exige high au moins" }
+    ],
+    "reglage_poste": {
+      "attendu": "high",
+      "pourquoi": "les sessions et les sous-agents héritent de l'effort du poste ; high est retenu sur les 6 classes rejouées, sans un échec. Une session de pilotage longue se lance à max (`/effort max` ou CLAUDE_CODE_EFFORT_LEVEL=max), classe non testée.",
+      "ou": "`modelSettings` → `claude-opus-5-5` → `effortLevel` dans settings.json de chaque profil ~/.claude*, et aucune variable CLAUDE_CODE_EFFORT_LEVEL posée au lancement, qui primerait",
+      "geste": "humain : réglage du poste, hors dépôt"
+    }
+  },
+  "sessions": {
+    "date": "2026-10-13",
+    "seuil_contexte_jetons": 400000,
+    "decision": "TF-1558, option (a) de la fiche du 02/10/2026 : session neuve par mandat et seuil de contexte déclaré, mesurés sur deux semaines ; décidée par le mandat global humain du 13/10/2026 ; consigne en avertissement (CONTRAT-INTERFACE.md §4 quater)",
+    "pourquoi_ce_seuil": "latence médiane d'Opus 5.5 de 4,5 s sous 200 000 jetons et de 6,3 s au-delà de 600 000 (étude du 2026-10-01) : le seuil se place entre les deux. Relevé du 2026-10-13 sur 14 jours, 2 profils : 37 sessions sur 128 l'ont franchi, et les réponses au-delà portent 73 % du contexte relu",
+    "source": "output/03-etudes/20261001-etude-opportunite-saut-opus-5-5.md, section « Ce que dit la latence selon le contexte » ; relevé : scripts/relever-contexte-sessions.mjs",
+    "juge": "scripts/relever-contexte-sessions.mjs, en avertissement"
   }
 }

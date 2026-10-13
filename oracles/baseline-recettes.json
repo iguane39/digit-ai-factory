@@ -234,8 +234,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-modeles-en-service.mjs": {
-  "cas": 22,
-  "vu_le": "2026-10-12"
+  "cas": 31,
+  "vu_le": "2026-10-13"
  },
  "oracle-parite-configuration.mjs": {
   "cas": 18,
@@ -585,6 +585,10 @@
  "scripts/relever-appelants.test.mjs": {
   "cas": 5,
   "vu_le": "2026-09-17"
+ },
+ "scripts/relever-contexte-sessions.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-10-13"
  },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,

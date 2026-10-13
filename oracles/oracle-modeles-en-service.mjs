@@ -43,6 +43,16 @@
  *         (`reglages_epingles_voulus`: liste d'identifiants) et passe. Remède du poste, à la main :
  *         remplacer la valeur par le nom de famille dans le `settings.json` signalé.
  *
+ *   MS5 · l'effort par classe de tâche (TF-1557, 13/10/2026) : la table `effort_par_classe` du
+ *         référentiel, tirée du rejeu du 01/10/2026, est bien formée. Chaque effort est l'un de low,
+ *         medium, high, xhigh, max ; le plancher mesuré ne dépasse pas l'effort décidé ; une classe
+ *         sans tâche rejouée ne descend pas sous `defaut_classe_non_testee` (option (a) : le maximum
+ *         reste là où rien n'est mesuré) ; source et date présentes. Une table mal formée : FAIL.
+ *         Puis l'effort du poste (`modelSettings.<identifiant de la famille>.effortLevel` ou
+ *         `effortLevel` des mêmes fichiers que MS4, et la variable CLAUDE_CODE_EFFORT_LEVEL) se
+ *         compare à `reglage_poste.attendu` : un écart est signalé (AVERT), jamais un échec, le
+ *         réglage restant un geste humain hors dépôt.
+ *
  * Normalisation d'un identifiant avant comparaison : le suffixe de contexte (`[1m]`), le préfixe
  * de plateforme (`anthropic.`) et l'instantané daté (`-20251001`) sont retirés ; `<synthetic>` et
  * tout nom hors de la forme `claude-…` sont ignorés.
@@ -78,7 +88,7 @@ import { spawnSync } from "node:child_process";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const NOM = "oracle-modeles-en-service";
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const SCHEMA = "pilot/modeles-en-service@1";
 const REF_DEFAUT = join(ICI, "..", "references", "MODELES-EN-SERVICE.json");
 const FAMILLES = ["fable", "opus", "sonnet", "haiku"];
@@ -149,6 +159,57 @@ export function lireReglagesModele(fichiers) {
   return sortie;
 }
 
+/** Réglages d'effort : [{ ou, cle, effort }] lus dans `effortLevel` et `modelSettings.<cle>.effortLevel` de chaque fichier. */
+export function lireReglagesEffort(fichiers) {
+  const sortie = [];
+  for (const f of fichiers) {
+    let j = null;
+    try { j = JSON.parse(readFileSync(f, "utf8")); } catch { continue; }
+    if (!j || typeof j !== "object") continue;
+    if (typeof j.effortLevel === "string") sortie.push({ ou: f, cle: null, effort: j.effortLevel.trim() });
+    const ms = j.modelSettings && typeof j.modelSettings === "object" ? j.modelSettings : {};
+    for (const [cle, v] of Object.entries(ms)) if (v && typeof v.effortLevel === "string") sortie.push({ ou: f, cle, effort: v.effortLevel.trim() });
+  }
+  return sortie;
+}
+
+export const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
+
+/** MS5 : la table d'effort par classe, puis l'effort du poste comparé à l'attendu. */
+export function jugerEffort(ref, efforts) {
+  const t = ref && ref.effort_par_classe;
+  if (!t) return [{ regle: "MS5", statut: "SANS_OBJET", message: "aucune table effort_par_classe au référentiel" }];
+  const rang = (e) => EFFORTS.indexOf(e);
+  const defauts = [];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(t.date || ""))) defauts.push("date absente ou hors de la forme AAAA-MM-JJ");
+  if (!t.source) defauts.push("source absente");
+  if (rang(t.defaut_classe_non_testee) < 0) defauts.push(`defaut_classe_non_testee « ${t.defaut_classe_non_testee} » hors de ${EFFORTS.join(", ")}`);
+  const classes = Array.isArray(t.classes) ? t.classes : [];
+  if (!classes.length) defauts.push("aucune classe");
+  const vues = new Set();
+  for (const c of classes) {
+    const nom = c && c.classe;
+    if (!nom || vues.has(nom)) { defauts.push(`classe sans nom ou en double : « ${nom} »`); continue; }
+    vues.add(nom);
+    if (rang(c.effort) < 0) { defauts.push(`${nom} : effort « ${c.effort} » hors de ${EFFORTS.join(", ")}`); continue; }
+    if (c.plancher_mesure != null && (rang(c.plancher_mesure) < 0 || rang(c.plancher_mesure) > rang(c.effort))) defauts.push(`${nom} : plancher mesuré « ${c.plancher_mesure} » au-dessus de l'effort décidé ou hors de l'échelle`);
+    if (!c.tache_rejeu && rang(t.defaut_classe_non_testee) >= 0 && rang(c.effort) < rang(t.defaut_classe_non_testee)) defauts.push(`${nom} : classe sans tâche rejouée réglée à « ${c.effort} », sous le défaut des classes non testées (« ${t.defaut_classe_non_testee} ») : une baisse sans mesure`);
+  }
+  const findings = [];
+  if (defauts.length) findings.push({ regle: "MS5", statut: "FAIL", message: `table effort_par_classe mal formée : ${defauts.join(" ; ")}` });
+  else findings.push({ regle: "MS5", statut: "PASS", message: `table effort_par_classe du ${t.date} : ${classes.length} classe(s), ${classes.filter((c) => c.tache_rejeu).length} mesurée(s) au rejeu, défaut des classes non testées « ${t.defaut_classe_non_testee} »` });
+  const attendu = t.reglage_poste && t.reglage_poste.attendu;
+  if (attendu && Array.isArray(efforts)) {
+    const fam = t.famille || "opus";
+    const pertinents = efforts.filter((e) => e.cle === null || familleDe(normaliser(e.cle)) === fam || e.cle === fam);
+    if (!pertinents.length) findings.push({ regle: "MS5", statut: "AVERT", message: `aucun réglage d'effort lu pour la famille ${fam} : l'effort attendu au poste est « ${attendu} » (geste humain, ${t.reglage_poste.ou || "settings.json"})` });
+    const ecarts = pertinents.filter((e) => e.effort !== attendu);
+    for (const e of ecarts) findings.push({ regle: "MS5", statut: "AVERT", message: `effort du poste « ${e.effort} »${e.cle ? ` (modelSettings.${e.cle}.effortLevel)` : ""} dans ${e.ou}, attendu « ${attendu} » par la table effort_par_classe (TF-1557) ; geste humain : y poser « ${attendu} »` });
+    if (pertinents.length && !ecarts.length) findings.push({ regle: "MS5", statut: "PASS", message: `effort du poste à « ${attendu} » sur ${pertinents.length} réglage(s) lu(s), conforme à la table` });
+  }
+  return findings;
+}
+
 /** Fichiers de réglages candidats : `settings.json` et `settings.local.json` de chaque racine `~/.claude*`. */
 export function reglagesParDefaut() {
   const racines = new Set();
@@ -198,7 +259,7 @@ export function lireVersionsServies(dossiers, { jours = JOURS_DEFAUT, maxFichier
 const jour = (ms) => (ms ? new Date(ms).toISOString().slice(0, 10) : "?");
 
 /** Le jugement, pur : un référentiel (objet) et les versions servies (Map ou null). */
-export function juger(ref, vues, reglages) {
+export function juger(ref, vues, reglages, efforts) {
   const findings = [];
   const manques = [];
   if (!ref || typeof ref !== "object") manques.push("référentiel illisible");
@@ -243,6 +304,8 @@ export function juger(ref, vues, reglages) {
     }
   }
 
+  if (ref && typeof ref === "object") findings.push(...jugerEffort(ref, efforts));
+
   const rt = ref && ref.re_test_regle_de_challenge;
   if (rt && rt.statut === "du") findings.push({ regle: "MS3", statut: "AVERT", message: `re-test de la règle de challenge dû depuis le ${rt.depuis} : ${rt.declencheur} ; protocole : ${rt.protocole}` });
   else findings.push({ regle: "MS3", statut: "PASS", message: rt && rt.clos_par ? `dernier re-test clos par ${rt.clos_par}` : "aucun re-test en attente" });
@@ -282,8 +345,11 @@ export function executer(argv) {
     const dossiers = a.transcripts.length ? a.transcripts : racinesParDefaut();
     lecture = { ...lireVersionsServies(dossiers, { jours: a.jours }), source: "transcripts", dossiers };
   }
-  const reglages = lireReglagesModele(a.reglages.length ? a.reglages : reglagesParDefaut());
-  const { verdict, findings } = juger(ref, lecture.vues, reglages);
+  const fichiersReglages = a.reglages.length ? a.reglages : reglagesParDefaut();
+  const reglages = lireReglagesModele(fichiersReglages);
+  const efforts = lireReglagesEffort(fichiersReglages);
+  if (!a.reglages.length && process.env.CLAUDE_CODE_EFFORT_LEVEL) efforts.push({ ou: "variable CLAUDE_CODE_EFFORT_LEVEL", cle: null, effort: process.env.CLAUDE_CODE_EFFORT_LEVEL.trim() });
+  const { verdict, findings } = juger(ref, lecture.vues, reglages, efforts);
   const versions = [...lecture.vues.entries()].sort((x, y) => y[1].derniere - x[1].derniere)
     .map(([id, e]) => ({ identifiant: id, famille: familleDe(id), reponses: e.reponses, derniere: jour(e.derniere) }));
   const resume = `${NOM} — verdict ${verdict} : ${versions.length} version(s) servie(s) lue(s) sur ${lecture.fichiers_lus} fichier(s) en ${lecture.duree_ms} ms`;
@@ -363,6 +429,27 @@ function selfTest() {
     const cEp = cli(["--referentiel", fRef, "--modele", "claude-opus-5-5", "--reglages", reglage("cli", "claude-opus-5-5[1m]"), "--json"]);
     let jEp = null; try { jEp = JSON.parse(cEp.stdout); } catch { jEp = null; }
     verifier("rouge MS4 de bout en bout : --reglages sur un identifiant épinglé, AVERT nommant le fichier, exit 0", cEp.status === 0 && jEp && jEp.findings.some((f) => f.regle === "MS4" && f.statut === "AVERT" && /cli\.json/.test(f.message)));
+    // MS5 (TF-1557) — table d'effort par classe, puis effort du poste comparé à l'attendu.
+    const table = { date: "2026-10-13", source: "rejeu fixture", famille: "opus", defaut_classe_non_testee: "max",
+      classes: [{ classe: "restitution", tache_rejeu: "T1", effort: "high", plancher_mesure: "medium" }, { classe: "pilotage", tache_rejeu: null, effort: "max", plancher_mesure: null }],
+      reglage_poste: { attendu: "high", ou: "fixture" } };
+    const ms5 = (t, efforts) => juger({ ...refOk, effort_par_classe: t }, new Map(), undefined, efforts).findings.filter((f) => f.regle === "MS5");
+    verifier("vert MS5 : table bien formée, poste à l'attendu", ms5(table, [{ ou: "s.json", cle: "claude-opus-5-5", effort: "high" }]).every((f) => f.statut === "PASS"));
+    verifier("rouge MS5 : une classe non testée descendue à high sans mesure doit échouer", ms5({ ...table, classes: [...table.classes.slice(0, 1), { classe: "pilotage", tache_rejeu: null, effort: "high" }] }).some((f) => f.statut === "FAIL" && /baisse sans mesure/.test(f.message)));
+    verifier("rouge MS5 : un plancher au-dessus de l'effort décidé doit échouer", ms5({ ...table, classes: [{ classe: "restitution", tache_rejeu: "T1", effort: "medium", plancher_mesure: "high" }] }).some((f) => f.statut === "FAIL" && /plancher/.test(f.message)));
+    verifier("rouge MS5 : un effort hors de l'échelle (« maximal ») doit échouer", ms5({ ...table, classes: [{ classe: "restitution", tache_rejeu: "T1", effort: "maximal" }] }).some((f) => f.statut === "FAIL"));
+    verifier("rouge MS5 : une table sans source doit échouer", ms5({ ...table, source: "" }).some((f) => f.statut === "FAIL" && /source/.test(f.message)));
+    const ecart = ms5(table, [{ ou: "s.json", cle: "claude-opus-5-5", effort: "medium" }, { ou: "s.json", cle: "claude-sonnet-5", effort: "low" }]);
+    verifier("rouge MS5 : le poste à medium au lieu de high est signalé (AVERT), jamais un échec ; la clé d'une autre famille est ignorée", ecart.some((f) => f.statut === "AVERT" && /« medium »/.test(f.message)) && !ecart.some((f) => /low/.test(f.message)) && !ecart.some((f) => f.statut === "FAIL"));
+    verifier("vert MS5 : sans table au référentiel, sans objet", statut(juger(refOk, new Map()), "MS5")[0] === "SANS_OBJET");
+    const fEffort = join(tmp, "effort.json");
+    writeFileSync(fEffort, JSON.stringify({ model: "opus[1m]", modelSettings: { "claude-opus-5-5": { effortLevel: "medium" } } }));
+    verifier("vert MS5 : lireReglagesEffort lit modelSettings.<clé>.effortLevel", JSON.stringify(lireReglagesEffort([fEffort])) === JSON.stringify([{ ou: fEffort, cle: "claude-opus-5-5", effort: "medium" }]));
+    const fRef5 = join(tmp, "ref5.json");
+    writeFileSync(fRef5, JSON.stringify({ ...refOk, effort_par_classe: table }));
+    const c5 = cli(["--referentiel", fRef5, "--modele", "claude-opus-5-5", "--reglages", fEffort, "--json"]);
+    let j5 = null; try { j5 = JSON.parse(c5.stdout); } catch { j5 = null; }
+    verifier("rouge MS5 de bout en bout : --reglages à medium, AVERT nommant l'attendu, exit 0", c5.status === 0 && j5 && j5.findings.some((f) => f.regle === "MS5" && f.statut === "AVERT" && /attendu « high »/.test(f.message)));
   } finally { rmSync(tmp, { recursive: true, force: true }); }
   for (const c of cas) console.log(`  [${c.ok ? "PASS" : "FAIL"}] ${c.nom}`);
   const ok = cas.filter((c) => c.ok).length;
