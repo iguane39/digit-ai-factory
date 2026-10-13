@@ -416,6 +416,40 @@ pas est indiscernable d'un journal tronqué, et c'est lui le défaut. Côté out
 `--sans-extraits` de `check_html.py` (les mêmes constats sans citer la page) appartient au
 socle de la forge des skills — demandée, tracée au registre.
 
+**R-32 quater (TF-1372, décision humaine D-70 (b) du 13/10/2026) — la revue de lecture à côté
+de chaque page livrée, en AVERTISSEMENT d'abord.** Le socle de page HTML exige une revue de
+lecture avant toute livraison (TF-0422) ; `check_html.py` juge un fichier, pas le run qui
+l'entoure, et un produit ne lance pas `run-oracles`. Le 20/09/2026, un rapport d'audit remis
+sans revue a gardé quatre jours un schéma illisible. Règle : chaque `.html` de `output\` (hors
+`old\`) a, **dans le même dossier**, un `REVUE.md` non vide et plus récent que lui. Mécanisme :
+O — contrôle R-32 quater de `oracle-conformite-projet.mjs`. Non jugé : la justesse de la revue
+(qu'elle ait vraiment lu chaque capture) ; seules la présence, le contenu non vide et la date
+se vérifient.
+
+*Sévérité : AVERTISSEMENT.* Le contrôle signale (statut PASS, message `AVERTISSEMENT, non
+bloquant`), il ne bloque ni le verdict ni la remise. Une première version bloquante, écrite le
+02/10/2026, a été retirée le jour même (commit `3a38e453`) : une règle opposable neuve pour
+tous les produits est une décision humaine (R-58, motif doctrine), prise le 13/10/2026 avec
+l'ordre « avertissement, puis bloquant après mesure du bruit ».
+
+*Mesure du bruit, 13/10/2026 (lecture seule, `FORGE_ROOT=C:/dev`, oracle rejoué sur chaque
+dépôt de `C:\dev` portant un `output\`, produits sous pseudonymes de mesure A à F propres à
+cette ligne).* 6 produits livrent du HTML, 31 pages hors `old\`, **31 sans `REVUE.md`**, soit un
+bruit de 100 % : A 1/1, B 1/1, C 4/4, D 5/5, E 3/3, F 17/17 (pages sans revue / pages livrées).
+Un septième produit n'a aucune page ; quatre autres dépôts n'ont pas d'`output`.
+Le bruit est total parce que la règle n'a jamais été jouée chez un produit : l'avertissement
+mesure un manque de pratique, pas un faux positif ; la mesure ne dit rien de la qualité des
+pages.
+
+*Critère de bascule en bloquant.* Le passage de l'avertissement au FAIL se décide quand les deux
+conditions tiennent : (1) deux relevés hebdomadaires consécutifs montrent **zéro page sans
+revue parmi celles dont la dernière écriture est postérieure au 13/10/2026** (le stock antérieur
+est une antériorité déclarée, jamais jugée en bloquant) ; (2) le message de l'avertissement n'a
+produit aucun faux positif signalé par un produit (par exemple une page de référence qui n'a
+pas à être relue). À défaut, **revue de la règle le 10/11/2026**. La bascule reste une décision
+humaine : elle ajoute un FAIL opposable à tous les produits. Elle se consigne au registre
+(TF-1372) et retire l'avertissement du texte de cette règle.
+
 ## M. Sécurité offensive — sur mandat, jamais dans la voie automatique (règle 33 — 14/08, TF-0189)
 
 Constat de l'étude du 14/08 (`output\03-etudes\20260814-etude-opportunite-pentest-owasp.md`) :
