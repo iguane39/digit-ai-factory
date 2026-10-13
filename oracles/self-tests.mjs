@@ -473,7 +473,7 @@ if (sensRouge.sansRouge.length) {
   console.log(`  [SENS ROUGE] ${sensRouge.avecRouge}/${sensRouge.mesurees} recette(s) verte(s) déclarent au moins `
     + `un cas ROUGE joué ; ${sensRouge.sansRouge.length} n'en déclarent AUCUN de lisible — AVERTISSEMENT, `
     + "jamais un échec : le vocabulaire lu est fermé (cas « rouge », couverture « deux/double sens », "
-    + "« doit échouer »), donc un cas rouge nommé autrement compte ici comme absent. Les nommer est la "
+    + "« doit échouer », cas qui passe en annonçant un REFUS), donc un cas rouge nommé autrement compte ici comme absent. Les nommer est la "
     + "seule façon d'en sortir :");
   // UN AVEU TRONQUÉ EST UN AVEU PARTIEL (même leçon que le cliquet) : toutes nommées, une par ligne.
   for (const { nom, via } of sensRouge.sansRouge) console.log(`               · ${nom} (${via})`);

@@ -25,6 +25,19 @@ verifier("VERT — une recette « à double sens » est reconnue",
 verifier("VERT — l'intention écrite « doit échouer » est reconnue",
   marquesSensRouge("le cas suivant doit échouer, et il échoue").length > 0);
 
+// TF-1245 (13/10/2026) — le REFUS joué : un cas qui PASSE en annonçant un refus est un contrôle qui a refusé.
+verifier("VERT — un cas « REFUS : … » qui passe est reconnu (todo/renumeroter.test.mjs)",
+  marquesSensRouge("  [PASS] REFUS : motif trop court — une renumérotation sans raison est le défaut qu'on répare").length > 0);
+verifier("VERT — un verdict de cas « le commit est refusé » / « arbre sale → refus » est reconnu",
+  marquesSensRouge("  [PASS] le mot est retiré et INDEXÉ : le commit est refusé").length > 0
+  && marquesSensRouge("  [PASS] arbre sale → refus (exit 2), rien n'est touché").length > 0);
+verifier("ROUGE — « le refus recommande » décrit un cas VERT, il ne vaut pas cas rouge",
+  marquesSensRouge("  [PASS] la REFORMULATION que le refus recommande passe — l'exclusivité est conservée").length === 0);
+verifier("ROUGE — un texte CITÉ qui contient « refusé » (la synthèse refusée par le hook) ne vaut pas cas rouge",
+  marquesSensRouge("  [PASS] niveau — « complet : pourquoi le hook a-t-il refusé ma synthèse » → Complexe").length === 0);
+verifier("ROUGE — un cas EN ÉCHEC qui dit REFUS n'est pas un refus joué et réussi",
+  marquesSensRouge("  [FAIL] REFUS : le nouvel id est déjà pris").length === 0);
+
 // ── SENS ROUGE — ce qui NE DOIT PAS être reconnu. Sans ces cas, le compteur compterait tout ──
 verifier("ROUGE — une recette qui ne joue que des fixtures conformes n'est PAS comptée couverte",
   marquesSensRouge("  [PASS] verte : projet conforme → PASS exit 0\nSelf-test : 12 PASS").length === 0);
@@ -64,7 +77,7 @@ if (echecs.length) {
   console.error("lib-sens-rouge : FAIL\n  - " + echecs.join("\n  - "));
   process.exit(1);
 }
-console.log("lib-sens-rouge (TF-1082) : 15/15 PASS — les trois formes de cas ROUGE du dépôt sont "
+console.log("lib-sens-rouge (TF-1082) : 20/20 PASS — les quatre formes de cas ROUGE du dépôt (dont le refus joué, TF-1245) sont "
   + "reconnues, une recette qui ne joue que des fixtures conformes ne l'est PAS, le « 0 FAIL » de "
   + "fin de résumé ne vaut pas preuve, et les bornes de population tiennent (état du parc et "
   + "recette en échec hors mesure) ; chaque règle de lecture est prouvée dans ses DEUX sens");
