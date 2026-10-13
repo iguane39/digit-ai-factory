@@ -4,8 +4,9 @@ Les gabarits de **livrables** que la factory propose à un projet, quel que soit
 un projet qui doit rendre un rapport de données, un diagnostic, un rapport d'audit ou une
 fiche de sécurité prend le gabarit de sa famille plutôt que d'inventer une forme.
 
-La bibliothèque est autant un **index** qu'un atelier. Sur ses **quarante** familles (recomptées
-sur `catalogue.jsonl` le 24/09/2026 : 16 `ok`, 17 `porte_ailleurs`, 7 `a_extraire` — le compte
+La bibliothèque est autant un **index** qu'un atelier. Sur ses **quarante-trois** familles (recomptées
+sur `catalogue.jsonl` le 13/10/2026 : 19 `ok`, 17 `porte_ailleurs`, 7 `a_extraire`, dont `fiche-produit` et
+`presentation-restitution-audit` nées ce jour-là des retours RP-8 et RP-61 ; le 24/09/2026 le compte
 annoncé ici était resté à celui du 20/09, trente-huit familles dont 9 `ok`, alors que des familles
 avaient été extraites depuis), **dix-sept**
 sont des formes qu'une forge produit déjà : pour celles-là elle ne réécrit rien — elle dit où elles
