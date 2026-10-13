@@ -119,5 +119,24 @@ check("TF-1521 borne — un déplacement CLOS (`deplacement_effectue` postérieu
     throw new Error("une attente CLOSE par un événement plus récent est encore listée — le ledger est en ajout seul, le DERNIER événement fait foi");
 });
 
+// TF-1576 — l'annonce des README dit l'état MESURÉ des crochets du projet ouvert.
+{
+  const sansCrochet = mkdtempSync(join(tmpdir(), "hook-readme-sans-"));
+  mkdirSync(join(sansCrochet, ".claude"), { recursive: true });
+  writeFileSync(join(sansCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { SessionStart: [{ hooks: [] }], Stop: [{ hooks: [] }] } }), "utf8");
+  const avecCrochet = mkdtempSync(join(tmpdir(), "hook-readme-avec-"));
+  mkdirSync(join(avecCrochet, ".claude"), { recursive: true });
+  writeFileSync(join(avecCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write", hooks: [] }] } }), "utf8");
+  const sortieSans = joue(sansCrochet), sortieAvec = joue(avecCrochet);
+  check("TF-1576 rouge — un produit sans PostToolUse : l'annonce dit que les README ne se régénèrent PAS", () => {
+    if (!/ATTENTION, état MESURÉ.*ne déclare aucun crochet PostToolUse/.test(sortieSans)) throw new Error("l'annonce n'a pas mesuré l'absence du crochet");
+    if (/se régénèrent après chaque écriture par un outil/.test(sortieSans)) throw new Error("l'annonce affirme encore un crochet absent");
+  });
+  check("TF-1576 vert — un projet qui déclare PostToolUse garde l'annonce, avec sa borne (écriture par commande)", () => {
+    if (!/se régénèrent après chaque écriture par un outil/.test(sortieAvec)) throw new Error("l'annonce a disparu chez un projet qui a le crochet");
+    if (/ATTENTION, état MESURÉ/.test(sortieAvec)) throw new Error("faux avertissement chez un projet doté du crochet");
+  });
+}
+
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

@@ -345,6 +345,52 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   rmSync(B, { recursive: true, force: true });
 }
 
+// TF-1576 et TF-1620 (13/10/2026) — UN DOSSIER IGNORÉ DÉCLARÉ GARDE SA LIGNE QUAND IL EST ABSENT. Le
+// sas `_arrivee\` est ignoré par git ; dans un worktree ou un clone frais il n'existe pas, et la
+// régénération retirait la ligne versionnée qui le déclare (deux fois le 13/10). L'arbre jeté est un
+// « pilot » en miniature : le générateur et ses dépendances y sont copiés, car la table des rôles ne
+// vaut qu'au pilot.
+{
+  const P = mkdtempSync(join(tmpdir(), "readme-pilot-absent-"));
+  const SOURCE = join(ICI, "..");
+  for (const f of ["scripts/readme-dossiers.mjs", "scripts/lib-empreinte.mjs", "scripts/lib-confidentiel.mjs", "scripts/lib-parc.mjs", "todo/anonymiser-entrant.mjs"]) {
+    mkdirSync(dirname(join(P, f)), { recursive: true });
+    writeFileSync(join(P, f), readFileSync(join(SOURCE, f)));
+  }
+  const gp = (...a) => spawnSync("git", ["-C", P, ...a], { encoding: "utf8" });
+  gp("init", "-q", "-b", "main");
+  mkdirSync(join(P, "input", "00-retours", "_arrivee"), { recursive: true });
+  writeFileSync(join(P, ".gitignore"), "input/00-retours/_arrivee/\n", "utf8");
+  writeFileSync(join(P, "input", "00-retours", "doc.md"), "# doc\n", "utf8");
+  writeFileSync(join(P, "input", "00-retours", "_arrivee", "lot.md"), "# lot\n", "utf8");
+  gp("add", ".gitignore", "input/00-retours/doc.md");
+  const gen = () => spawnSync(process.execPath, [join(P, "scripts", "readme-dossiers.mjs"), "--base", P, "--racines", "input"], { encoding: "utf8" });
+  const lire = () => readFileSync(join(P, "input", "00-retours", "README.md"), "utf8");
+  gen();
+  const present = /`_arrivee\\` \| dossier ignoré par git/.test(lire());
+  check("TF-1576 vert — sas présent : la ligne du dossier ignoré déclaré est écrite", () => {
+    if (!present) throw new Error("ligne _arrivee absente alors que le dossier existe");
+  });
+  rmSync(join(P, "input", "00-retours", "_arrivee"), { recursive: true, force: true });
+  gen();
+  check("TF-1576 rouge → vert — sas absent (worktree, clone frais) : la ligne déclarée n'est PAS retirée", () => {
+    if (!/`_arrivee\\` \| dossier ignoré par git/.test(lire())) throw new Error("la ligne du sas absent a disparu de l'index (défaut d'origine)");
+  });
+  check("TF-1576 — l'index reste stable : un second passage ne réécrit rien", () => {
+    const avant = lire();
+    gen();
+    if (lire() !== avant) throw new Error("l'index change à la régénération suivante");
+  });
+  // Sens inverse : le dossier n'est plus ignoré par git (déclaration périmée) et il est absent → rien à
+  // lister, la ligne s'en va. La règle ne fabrique pas de ligne pour un dossier qui n'existe nulle part.
+  writeFileSync(join(P, ".gitignore"), "", "utf8");
+  gen();
+  check("TF-1576 sens inverse — dossier déclaré mais ni ignoré ni présent : aucune ligne fabriquée", () => {
+    if (/_arrivee/.test(lire())) throw new Error("une ligne est fabriquée pour un dossier qui n'est pas ignoré");
+  });
+  rmSync(P, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
 rmSync(TABLES, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);

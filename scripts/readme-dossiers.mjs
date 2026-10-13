@@ -254,7 +254,17 @@ function attendu(dir, rel) {
     .filter((e) => !EST_MACHINE(e.name) && !EST_SIDECAR(e.name) && e.name !== "README.md" && !estIgnore(rel + "/" + e.name));
   // TF-0914 : un fichier NON SUIVI par git ne donne pas son nom à un index suivi et publié.
   const nonSuivis = visibles.filter((e) => !e.isDirectory() && !estSuivi(rel + "/" + e.name)).length;
-  const entrees = visibles
+  // TF-1576 et TF-1620 (13/10/2026) — UN DOSSIER IGNORÉ DÉCLARÉ NE DISPARAÎT PAS PARCE QU'IL EST ABSENT.
+  // Le sas `_arrivee\` est ignoré par git : un worktree ou un clone frais ne l'a pas, et la ligne
+  // versionnée qui le déclare était retirée de l'index à la régénération (deux fois le 13/10). La table
+  // ROLES du pilot déclare ces dossiers : un dossier déclaré, ignoré par git et absent du disque
+  // garde sa ligne, comme s'il était là.
+  const presents = new Set(visibles.map((e) => e.name));
+  const declaresAbsents = !EST_LE_PILOT ? [] : Object.keys(ROLES)
+    .filter((k) => posix(dirname(k)) === rel && !presents.has(k.split("/").pop()))
+    .filter((k) => spawnSync("git", ["-C", BASE, "check-ignore", "-q", "--", k + "/"]).status === 0)
+    .map((k) => ({ name: k.split("/").pop(), isDirectory: () => true, absentDeclare: true }));
+  const entrees = [...visibles, ...declaresAbsents]
     .filter((e) => e.isDirectory() || estSuivi(rel + "/" + e.name))
     .sort((x, y) => (x.isDirectory() === y.isDirectory() ? x.name.localeCompare(y.name, "fr") : x.isDirectory() ? -1 : 1));
   const caches = readdirSync(dir, { withFileTypes: true }).filter((e) => EST_MACHINE(e.name) && e.isDirectory()).map((e) => e.name);
@@ -276,7 +286,7 @@ function attendu(dir, rel) {
   let nf = 0, nd = 0;
   for (const e of entrees) {
     const chemin = join(dir, e.name), relE = rel + "/" + e.name;
-    if (e.isDirectory() && estIgnore(relE + "/")) {
+    if (e.isDirectory() && (e.absentDeclare || estIgnore(relE + "/"))) {
       // TF-1055 : un dossier IGNORÉ par git n'existe pas sur un clone frais. Pas de lien (il serait
       // mort), et un rôle tiré de la table des rôles versionnée — jamais du README local, qui ne
       // voyage pas : une projection commitée ne parle que de ce que le dépôt porte (TF-0615).
