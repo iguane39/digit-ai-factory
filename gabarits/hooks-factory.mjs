@@ -36,8 +36,11 @@ const [nom, ...options] = process.argv.slice(2);
 // `publication-hebergee` (12/10/2026, TF-1592, retour RT-117) : hook PreToolUse sur l'outil Artifact —
 // R-38 (aucun livrable publié sur un service hébergé sans GO humain consigné) cesse d'être une phrase
 // que la session lit ou non : l'outil qui publie est refusé tant qu'aucun GO n'est consigné. Bloque.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee"]);
-if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee)`); process.exit(0); }
+// `droits-accordes` (13/10/2026, TF-1528) : hook PostToolUse joué à chaque écriture d'un script ou d'un fichier
+// d'infrastructure — le contrôle des droits accordés (identifiants Graph, échec masqué, succès sans relecture)
+// se joue quand le produit écrit le script, pas à la mise en production. Avertit, ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes"]);
+if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee | droits-accordes)`); process.exit(0); }
 
 const candidats = [
   process.env.FORGE_ROOT && join(process.env.FORGE_ROOT, "digit-ai-factory"),
