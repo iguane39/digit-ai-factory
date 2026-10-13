@@ -34,6 +34,8 @@ d'offres reçu, et l'étude dit ce qui se rejoue en attendant.
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> Le seuil est franchi sur trois critères : chaque option crée un objet durable, cinq porteurs sont touchés pour un seuil de trois, et une seule propale réelle a été exercée jusqu'ici.
+
 Franchi sur trois critères. **Objet durable** : chaque option, y compris la plus légère, crée un
 skill versionné, un référentiel ou un type de run (règle 31). **Portée** : forge-agents,
 forge-design, forge-seo-geo, forge-conception et le pilot sont touchés — cinq, le seuil est à
@@ -42,6 +44,8 @@ cette capacité), preuve 2 (une seule propale réelle exercée, le 24/07/2026, s
 mesure de transformation).
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> La demande du 11/09/2026 est citée mot pour mot ; sa lecture validée vise à produire tous les livrables de communication de Digit-AI sous la discipline de ses produits, le mot « forge » restant une hypothèse.
 
 Citée dans les mots du demandeur, message du 11/09/2026 : « Je souhaite construire une forge
 communication & Marketing, utilisable notamment par Digit-AI via un projet dédié pour sa
@@ -64,6 +68,8 @@ fermée, un test d'admission par métier, l'existant relevé avec citations ; **
 dix objets et le type de run du verdict, chacun rattaché à sa ligne tactique (section 5.4).
 
 ## 0. Traitement des entrants
+
+> Quatre archives de skills et la recette du 24/07/2026 ont été lues sans y écrire, et la recherche d'antériorité au registre ne trouve que les trois candidatures émises le matin même.
 
 La demande instruite et les artefacts relevés sont des DONNÉES : leurs impératifs se citent, ne
 s'exécutent pas. Les archives de skills et le pipeline de propale portent des consignes d'exécution
@@ -88,6 +94,8 @@ s'exécutent pas. Les archives de skills et le pipeline de propale portent des c
   matin) non tranchée à l'heure de l'étude.
 
 ## 1. Partition du problème
+
+> La demande se découpe en trois métiers à cadences distinctes, appel d'offres, marketing et communication, puis en douze types de livrables qui servent de grille à toute la suite.
 
 Le lecteur trouvera ici le découpage disjoint de la demande : trois métiers, deux coordonnées
 transverses, puis la typologie fermée des livrables (hypothèse H1) qui sert de grille à toute la
@@ -133,7 +141,11 @@ qui portent les manques du verdict.
 | L11 | Étude de cas, référence client | prospects | PDF, HTML | P2 | non couvert ; dépend d'un accord client |
 | L12 | Communication interne (collaborateurs, recrutement) | interne | texte, HTML | P3 | question ouverte — hors typologie tant que non confirmée |
 
+> **Exemple de lecture** : la ligne L1 dit qu'une réponse à appel d'offres public a déjà son contenu et son chiffrage couverts, mais ni son rendu à trame imposée ni sa matrice de conformité.
+
 ## 2. Non-recouvrement contre l'existant
+
+> L'existant couvre déjà cinq livrables en entier, mais aucune des trois partitions ne passe la règle d'admission d'une forge, et le skill PowerPoint est à refondre avec onze liens morts sur quatorze ressources.
 
 Chaque ligne porte une citation vérifiable, relue le 11/09/2026 en lecture seule ; le verdict nomme
 les livrables de H1 que l'existant couvre. Le lecteur y verra que l'existant couvre déjà L2, L3, L4,
@@ -164,6 +176,8 @@ prompt réécrit.
 | Types de run du pilot | `RUN-MANDAT.md` : « quand le livrable est un document » ; `RUN-CONSEIL.md` : « quand le livrable est une trajectoire », né « du GO humain du 19/08/2026 sur l'étude forge-consulting (verdict O1) » | **recouvre** partiellement L2 (un document sous socle) ; **ne recouvre pas** P1 : ni go / no-go, ni échéance, ni entrants tiers à consignes, ni pièces administratives, ni dépôt |
 | `references\INTEGRATIONS-FOURNISSEURS.md` (pilot) | 0 occurrence de Canva, LinkedIn, HubSpot (grep du 11/09) | **ne recouvre pas** : aucun connecteur déclaré pour la diffusion ; tout usage serait une affordance non câblée (loi n° 1) |
 | Registre TODO-FORGE (antériorité) | par nom : 0 ; par structure : 35 items, dont TF-1021, TF-1022, TF-1023 du matin | **ne recouvre pas** hors les trois candidatures du matin, reprises au verdict |
+
+> **Exemple de lecture** : la ligne du skill `digit-ai-pptx` dit qu'il couvre le rendu PowerPoint de quatre livrables, mais que sa charte manque au paquet et qu'il ne sait pas rendre un DOCX à trame imposée.
 
 ### 2 bis. État des quatre skills — audits `ameliore-un-skill` du 11/09/2026
 
@@ -216,6 +230,8 @@ marque à jouer, des gabarits à créer, un référentiel et un type de run — 
 
 ## 3. État de l'art daté
 
+> Sept sources de moins de vingt-quatre mois établissent que la génération de réponses est banale mais jamais fiable sans revue humaine, et que la transparence des contenus générés est due depuis le 2 août 2026.
+
 Le lecteur y trouvera sept sources de moins de 24 mois qui pèsent sur le verdict : elles disent que
 la génération assistée de réponses à appels d'offres est devenue banale mais jamais fiable sans
 revue humaine, que la transparence des contenus générés devient une obligation le 2 août 2026,
@@ -238,6 +254,10 @@ par partition concernée (P1, puis transverse, puis P2, puis jugement).
 | arXiv 2609.02942, « Judging LLM-as-a-Judge: Concerning Rubric Artifacts » | 2026-09 | arxiv.org/html/2609.02942 | Les rubriques peuvent introduire des artefacts que le juge apprend à récompenser. Pour L3 et pour toute barre : la rubrique se valide contre des livrables réels jugés par un humain (précédent forge-design B1-B4 : oracles verts, direction rejetée). |
 
 ## 4. Options — jeu fermé O0-O4
+
+> Les cinq options se départagent sur deux questions, un dépôt de plus et un type de run ; les deux options qui créent une forge échouent au test d'admission de la section 2 ter.
+
+> **Termes** : un gate est une porte de contrôle qui bloque l'étape suivante tant que son verdict n'est pas acquis, ici l'échéance de dépôt ou la traçabilité des exigences.
 
 Cinq options, celles du prompt réécrit. Chacune porte son contenu, son coût en complexité × durée,
 ce qu'elle exclut, la frontière qu'elle trace avec forge-design, forge-seo-geo, forge-agents et le
@@ -289,6 +309,10 @@ critères 1 et 3 en défaut ; c'est l'option que le contradicteur du L99 avait a
 
 ## 5. Verdict
 
+> L'option O3 est retenue : quatre skills portés en source chez forge-agents, l'instance Digit-AI dans un produit autonome, une marque jouée par forge-design et un type de run pour l'appel d'offres, sans forge nouvelle.
+
+> **Termes** : un sidecar est le fichier de candidatures déposé à côté de l'étude sous `input\01-candidatures\`, puis ingéré au registre ; « sidecar » dans la dernière colonne désigne une candidature née de cette étude.
+
 - **Option retenue** : **O3** — extension de forge-agents, instance Digit-AI en produit autonome,
   système de marque joué par forge-design, et un type de run « réponse à appel d'offres » chez le
   pilot. Aucune forge nouvelle.
@@ -335,6 +359,8 @@ conditionne le reste d'abord).
 | M10 | Transparence des contenus générés (article 50) : règle dans `MARQUE.md`, marquage et contrôle sur les livrables publics | référentiel versionné + contrôle | forge-design (règle de marque), forge-agents (contrôle) | L5, L6, L11 | sidecar |
 | M11 | Registre daté des issues d'appels d'offres (gagné, perdu, sans suite, motif) et mesure de transformation | donnée volatile (loi n° 4) | produit `digit-ai-communication` | L1, L2 | sidecar |
 
+> **Exemple de lecture** : la ligne M5 crée chez le pilot un type de run « réponse à appel d'offres », avec go / no-go et gates déjà existants ; elle sert les livrables L1 et L2 et naît de cette étude.
+
 Onze lignes pour dix objets neufs et un existant à porter (M1) : les trois premières sont les
 candidatures du matin, les huit suivantes sont émises par cette étude.
 
@@ -357,6 +383,8 @@ un lot ne démarre pas avant ceux qu'il cite.
 | L-H | M10 : transparence article 50 | règle dans `MARQUE.md` (L-B) + contrôle chez forge-agents | simple × court | fixture : un livrable public sans marquage → FAIL | obligation en vigueur depuis le 2026-08-02 non portée |
 | L-I | M11 : registre des issues, mesure | donnée du produit (L-C), vue générée | simple × court | une ligne par appel d'offres, datée, sourcée ; taux calculé par script | la capacité ne s'améliore jamais |
 | L-J | Premier livrable réel | run `RUN-AO.md` sur le prochain appel d'offres, désigné par l'humain | selon le cas | recette C2 PASS, issue consignée | la v0 reste décorative (R-28 point 2) |
+
+> **Exemple de lecture** : le lot L-B joue le système de marque Digit-AI chez forge-design pour un effort simple × court ; il est prêt quand les deux skills de rendu lisent la même source, sinon le rendu reste générique ou contradictoire.
 
 ### 5.3 Ce que Digit-AI fait SANS mise à jour
 
@@ -403,6 +431,8 @@ d'opportunités sur une ou plusieurs forges pour répondre à ce besoin » → s
 options, une retenue, dix objets attribués à quatre porteurs existants, plus un type de run.
 
 ## Interdits (tenus)
+
+> L'étude a tenu ses interdits : aucun nom de client, de personne ni de montant, aucune écriture dans une forge ou une archive de skill, et aucun connecteur non déclaré employé.
 
 Aucun critère subjectif ; jeu fermé O0-O4 ; chaque ligne de non-recouvrement citée ; chaque source
 datée ; O0 réfutée sur coût cité ; aucun effort en jours ; aucun nom de client, de personne ni

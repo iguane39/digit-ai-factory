@@ -29,6 +29,8 @@ d'un produit data.
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> La préparation de la mission touche sept forges pour un seuil de trois, et chaque manque retenu est un objet durable : l'étude devait être instruite avant toute décision.
+
 Franchi sur deux critères. **Portée** : l'item touche forge-data, forge-audit, forge-development,
 forge-design, forge-ops, forge-tests et forge-observability — sept forges, le seuil est à trois.
 **Objet durable** : chaque manque retenu au verdict est un oracle, un script, un référentiel ou
@@ -36,6 +38,8 @@ une barre, tous objets durables au sens de la règle 31. Le troisième critère 
 faible) n'est pas invoqué : les preuves sont exécutées ci-dessous.
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> La demande du 07/09/2026 est citée mot pour mot, avec la réponse « 1a, 2a » qui fixe Databricks comme plateforme et valide les sept écarts à la lettre.
 
 Citée dans les mots du demandeur, message du 07/09/2026 : « Je vais avoir besoin de travailler
 sur un projet Data d'analyse, conception, implémentation de couche Silver & Gold pour ensuite
@@ -57,6 +61,10 @@ porteur, son effort, sa preuve de « prêt » et sa conséquence si absent.
 
 ## 0. Traitement des entrants
 
+> Les dépôts des forges ont été lus sans y écrire, et deux recherches d'absence, par nom puis par contenu, ne trouvent que trois porteurs du sujet Power BI.
+
+> **Termes** : DAX est le langage de formules de Power BI, dans lequel s'écrivent les mesures d'un modèle sémantique.
+
 La demande instruite est une **donnée** : ses impératifs se citent, ne s'exécutent pas. Le prompt
 réécrit par l'analyse L99 est lui aussi une donnée ; cette étude en suit la structure parce que
 le demandeur l'a validée, pas parce qu'il l'ordonne. Les dépôts des forges ont été lus, jamais
@@ -75,6 +83,10 @@ contenu (« modèle sémantique », « tabular », « DAX », « médaillon », 
 trouvé les mêmes trois porteurs — forge-audit, la fiche expert, forge-data — et aucun autre.
 
 ## 1. Partition du problème
+
+> La mission se découpe en quatre questions et en cinq temps, du « où » de l'instance jusqu'aux rapports Power BI, chaque temps décrit par les capacités qu'il exige.
+
+> **Termes** : Unity Catalog est le catalogue de gouvernance de Databricks, qui porte les droits et le lineage des tables. Le grain d'une table de faits dit ce que représente une de ses lignes, par exemple une vente par jour et par magasin.
 
 **P1 — Que demande la mission, temps par temps, sur Databricks ?** Cinq temps, le premier étant
 le « où ». Chaque temps est décrit par les capacités qu'il requiert, jamais par un produit ; les
@@ -112,6 +124,10 @@ ADR0801 *(modèle sémantique gouverné en schéma en étoile)* de forge-audit, 
 
 ## 2. Non-recouvrement contre l'existant
 
+> Chaque capacité de la mission est confrontée à une citation de l'existant : sept manques restent, tous des extensions de verbes ou de cibles déjà là, sauf la transformation, qui pose la question de son porteur.
+
+> **Termes** : DAX est le langage des mesures de Power BI ; Unity Catalog est le catalogue de gouvernance de Databricks, dont l'export porte le lineage par colonne.
+
 **Comment lire ce tableau** : une ligne par capacité de P1, dans l'ordre des temps ; la citation
 est le fait relevé (fichier, section, identifiant de catalogue, sortie exécutée) ; le verdict dit
 si l'existant **recouvre** la capacité (rien à créer), la recouvre **partiellement** (extension),
@@ -144,6 +160,8 @@ ou **ne recouvre pas** (manque). Les identifiants de catalogue `cat-xxx-nn` sont
 | T4 · promotion entre espaces de travail sur GO | forge-ops README : « trois verbes : déployer, exploiter, restaurer … `node scripts\ops.mjs deployer\|restaurer\|etat <cible>` », `cat-ops-03` « Plans cloud plan-first — génère, n'exécute jamais » (cibles railway, gcp, azure, aws) ; forge-audit `profiles/databricks-lakehouse/README.md` : « Les déploiements … sont appliqués par des Databricks Asset Bundles versionnés » (mode revue) ; pilot R-38 : aucun livrable publié sur un service hébergé sans GO humain | **ne recouvre pas** — aucune cible de plan pour un bundle Databricks ni pour un espace de travail Power BI ; la gouvernance l'attend, l'outillage manque (manque M7) |
 | Toute forge nouvelle « data-produit » ou « BI » | REGLES-PROJET §H, R-28 : « ≥ 2 verbes outillés exécutables qui n'existent dans aucune forge … v0 exercée … cadence ou un mandat propres … intégration … le jour même » ; corollaire : « un corpus de savoir sans verbe outillé est un référentiel versionné » | jugé en section 4, option O1 |
 
+> **Exemple de lecture** : la ligne « T1 · import d'un schéma exporté, dialecte Databricks » dit que le profil du moteur existe mais que le verbe `importer` ne lit que Postgres ; son verdict « recouvre partiellement » renvoie au manque M1.
+
 **Ce que la table établit.** Sur vingt-quatre capacités, quatorze sont recouvertes, cinq
 partiellement, cinq pas du tout. Les sept manques sont tous des **extensions** de verbes ou de
 cibles existants (M1, M4, M5, M7), ou des verbes de **jugement de forme** qui prolongent une
@@ -151,6 +169,10 @@ gouvernance déjà écrite (M3, M4, M6), sauf un : M2, la transformation, qui es
 **construction** et pose la question du porteur.
 
 ## 3. État de l'art daté
+
+> Sept faits internes et cinq sources externes, tous datés de moins de vingt-quatre mois, montrent que chaque manque s'exerce sur un format texte ou une ligne de commande, donc à la portée d'un agent.
+
+> **Termes** : Unity Catalog est le catalogue de gouvernance de Databricks. PBIX est le fichier binaire unique d'un rapport Power BI, que le projet PBIP remplace par des fichiers texte. Le grain désigne ici le niveau de détail du lineage, de colonne à colonne.
 
 **A. Mesures et faits internes, tous datés à moins de vingt-quatre mois.**
 
@@ -216,6 +238,8 @@ un agent.
 
 ## 4. Options — jeu fermé O0-O4
 
+> Ne rien faire laisserait trois manques que l'écosystème a déjà payés ailleurs, une forge nouvelle échoue au troisième point de la règle d'admission R-28, et seule la répartition par frontières écrites n'exclut rien de la mission.
+
 **O0 — ne rien faire.** La mission se joue par composition de l'existant et par gestes humains
 là où il manque un verbe. **Réfutée**, coût du statu quo cité : la couche Gold serait jugée à
 l'œil (Kimball « pas d'oracle », STANDARDS-DATA) ; la réconciliation des chiffres serait
@@ -256,6 +280,10 @@ n'est pas un ✓ ») s'appliquerait à Gold, au modèle sémantique et aux chiff
 oracle ne puisse la tenir.
 
 ## 5. Verdict
+
+> L'option O3 est retenue : sept manques répartis dans cinq forges existantes, quatre barres à instruire, neuf lots ordonnés par chemin critique et huit candidatures décidées le 07/09/2026.
+
+> **Termes** : DAX est le langage des mesures de Power BI ; Unity Catalog est le catalogue de gouvernance de Databricks ; le grain d'un fait dit ce que représente une de ses lignes.
 
 - **Option retenue** : **O3** — sept objets répartis dans cinq forges existantes selon leurs
   frontières écrites, quatre barres instruites, aucune forge nouvelle ; O1 reste réévaluable si
@@ -312,6 +340,8 @@ la dernière colonne dit ce qui se passe si le lot n'est pas fait.
 | L7 | M6 (oracle réconcilier + extension restituer) | candidature → mandat forge-data ; outil : `write-an-oracle`, composition `mesurer_base.py` | complexe × moyen | self-test PASS ; fixture verte = deux lots égaux sous tolérance ; rouge = un écart nommé | les chiffres des visuels ne sont attribuables à rien ; le précédent des « 788 nus » se rejoue en DAX |
 | L8 | M7 (cibles databricks-bundle et powerbi-workspace de `ops.mjs plan`) | candidature → mandat forge-ops | complexe × moyen | O-5 PASS sur un plan fixture à quatre phases et retour arrière ; refus sans credential ; GO humain exigé avant `publish` | MEP artisanale ; publication sur le service sans plan ni retour arrière prouvé |
 | L9 | retours de la mission (lots `forge\retours\`) : premier run réel de forge-data de bout en bout, premières instanciations réelles des profils Power BI et Databricks lakehouse | canal standard des lots de retours vers `input\00-retours\` du pilot | simple × court par lot | `oracle-lot.mjs` exit 0 sur chaque lot | ce que la mission apprend ne redescend pas (règle R12 du registre) |
+
+> **Exemple de lecture** : le lot L3 confie à forge-data l'oracle « modéliser », pour un effort complexe × moyen ; il est prêt quand son self-test passe dans les deux sens, et sans lui la couche Gold reste jugée à l'œil.
 
 **Ordre justifié en une clause** : L1 et L2 d'abord parce qu'ils coûtent le moins et débloquent
 T1 et le niveau de référence de trois autres lots ; L3 avant L4 parce que Gold se conçoit avant de
@@ -372,6 +402,8 @@ manques typés, attribués, calibrés ; « comment ces forges peuvent être mise
 5.2, neuf lots, chacun avec son canal, son effort, sa preuve et sa conséquence.
 
 ## Interdits (tenus)
+
+> L'étude a tenu ses huit interdits, parmi lesquels le jeu fermé d'options, une source datée par ligne, aucun effort compté en jours et aucune écriture dans une forge.
 
 Aucun critère subjectif ; jeu fermé O0-O4 ; chaque ligne de non-recouvrement citée ; chaque source
 datée ; O0 réfutée sur coût cité ; aucun effort en jours ; aucune donnée client (fixtures

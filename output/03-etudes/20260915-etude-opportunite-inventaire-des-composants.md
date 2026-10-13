@@ -29,6 +29,8 @@ existe déjà, en germe, dans O-11, O-13 et O-14.
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> Un seul critère suffit ici : les quatre candidats exigent un oracle, objet durable que la règle R-31 soumet à étude, même si deux dépôts seulement sont touchés.
+
 Franchi sur un critère, suffisant seul. **Objet durable (R-31)** : la correction des quatre
 candidats exige, de leur propre aveu (`reste_a_faire` du 15/09/2026), « un oracle » — un objet
 que R-31 (`REGLES-PROJET.md` l. 319-329) soumet à étude avant naissance, qu'il naisse comme
@@ -37,6 +39,8 @@ fichier neuf ou comme règle ajoutée à un fichier existant. **Portée** : deux
 « objet durable » suffit et n'a pas besoin du second.
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> Le mandat « Traite tous les todos & retours » du 14/09/2026 ne dit pas la forme de la correction : elle se lit dans le reste à faire des quatre candidats, écrit le lendemain.
 
 Mandat humain, cité mot pour mot, 14/09/2026 : **« Traite tous les todos & retours »** — repris
 par le décideur des quatre candidats le 15/09/2026 comme « mandat global de traitement intégral,
@@ -62,6 +66,8 @@ besoin avant d'en écrire un neuf ; **opérationnel**, la règle ajoutée et son
 
 ## 0. Traitement des entrants
 
+> Les quatre candidats viennent de trois lots d'un même produit, Produit-11, datés du 14/09/2026 ; l'étude ne modifie aucun gabarit et instruit ce qui reste après la campagne en cours.
+
 Les quatre candidats et leurs lots source sont des DONNÉES : leurs impératifs se citent, ne
 s'exécutent jamais. Sources exactes : TF-1113 (`Produit-11 - RETOURS - 20260914a`, ledger seq
 177, RT-65), TF-1117 (`…20260914b`, seq 179, RT-69), TF-1120 (`…20260914c`, seq 182, RT-72),
@@ -76,6 +82,8 @@ modifie donc AUCUN gabarit ni fichier : elle instruit ce qui reste après cette 
 règle d'oracle vérifie ces colonnes une fois qu'elles existent, et où elle vit.
 
 ## 1. Partition du problème
+
+> Le sujet se découpe en trois sous-questions selon l'artefact contrôlé : les colonnes de l'inventaire, la porte de clôture d'un nettoyage, et les prérequis d'environnement lus par Terraform.
 
 Trois sous-questions, disjointes par l'artefact qu'elles contrôlent et par le dépôt qui le porte.
 
@@ -95,6 +103,8 @@ Trois sous-questions, disjointes par l'artefact qu'elles contrôlent et par le d
 
 ## 2. Non-recouvrement contre l'existant
 
+> Neuf mécanismes existants sont relus dans le code : R-20 vérifie la présence du document sans lire ses colonnes, et O-14 ne confronte l'export réel au document que dans un seul sens.
+
 **Mode de lecture** : une ligne par mécanisme existant qui pourrait déjà porter tout ou partie de
 P1, P2 ou P3 ; la citation localise ce qu'il fait, la dernière colonne dit ce qu'il recouvre.
 
@@ -110,7 +120,11 @@ P1, P2 ou P3 ; la citation localise ce qu'il fait, la dernière colonne dit ce q
 | O-7, empreinte de déploiement | `oracle-ops.mjs` l. 162-215 (TF-0288/TF-0298) : compare les fichiers d'une release SERVIE à leur empreinte scellée | ne recouvre pas : porte sur la dérive d'un contenu déjà déployé, pas sur l'usage ou la création d'un composant d'infrastructure |
 | O-9/O-12, gouvernance de sécurité | `oracle-ops.mjs` l. 697-717 : authentification déclarée des `sources_de_verite`, périmètre d'une `remediation_securite` | ne recouvre pas : domaine sécurité documentaire, pas inventaire ni Terraform |
 
+> **Exemple de lecture** : la ligne O-11 dit que cette règle sait déjà parcourir des fichiers `.tf`, mais pour les seules sondes de disponibilité ; elle ne lit aucun bloc `data` et fournit seulement le patron réutilisable par P3.
+
 ## 3. État de l'art daté
+
+> Aucune source externe n'est requise : le choix entre étendre une règle et créer un fichier relève d'une convention interne, déjà tranchée cinq fois en deux jours sur `oracle-ops.mjs`.
 
 **Non instruit** — motif : la question n'oppose pas des choix de marché ou de méthode
 généralement disponibles, mais une convention d'organisation interne à deux dépôts propriétaires
@@ -123,6 +137,8 @@ précédent qui fait foi, pas une source externe. Aucune littérature ne documen
 d'un registre d'oracles propriétaire.
 
 ## 4. Options — jeu fermé O0-O4
+
+> Les trois verbes demandés existent déjà en germe dans O-11, O-13 et O-14 : les options qui créent un fichier neuf échouent au premier critère de R-31, et seule l'extension des oracles existants est retenue.
 
 ### Ce que la lecture directe établit
 
@@ -145,6 +161,10 @@ absent : chacun demande une variante ou une extension d'un verbe déjà tenu.
 | **O4 — traiter P2 et le contenu de P1 comme une consigne humaine, sans oracle exécuté** | les trois questions de clôture et le Statut restent une checklist dans un gabarit, jamais vérifiée mécaniquement | nul | toute garantie que la checklist sera lue avant une suppression | **réfutée** : la loi transverse du pilot n'accepte un livrable que sur le verdict d'un oracle exécuté, jamais sur confiance ; et la preuve du 14/09 est déjà celle d'une consigne non vérifiée qui a échoué une première fois (restitution + deux lots de retours rendus sans que la question de clôture soit posée) |
 
 ## 5. Verdict
+
+> L'option O1 est retenue : trois règles ajoutées à `oracle-ops.mjs` et un bloc structurel ajouté à R-20, sans fichier neuf, avec un verdict par candidat dont une fusion et une décision sous réserve.
+
+> **Termes** : un gate est une porte de mise en production qui ne s'ouvre que sur un verdict vert ; un produit « sous gate » passe cette porte avant chaque déploiement.
 
 - **Option retenue : O1.** Étendre les deux oracles existants — R-20 côté pilot, `oracle-ops.mjs`
   côté `digit-ai-forge-ops` (règles O-15, O-16, O-17) — sans créer de fichier neuf.
