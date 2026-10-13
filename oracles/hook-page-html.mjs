@@ -129,7 +129,7 @@ process.exit(fail ? 1 : 0);
   if (ORACLES_DOCUMENTAIRES.length !== 2) casse.push("les deux oracles documentaires ne sont plus déclarés");
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length ? `Self-test hook-page-html : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-page-html : 11/11 PASS (page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés)");
+    : "Self-test hook-page-html : 11/11 PASS (cas rouge : page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés)");
   return casse.length ? 1 : 0;
 }
 

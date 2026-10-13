@@ -107,7 +107,7 @@ if (args.includes("--self-test")) {
     try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ }
     try { rmSync(tables, { recursive: true, force: true }); } catch { /* toléré */ }
   }
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test readme-dossiers : 7/7 (absent, non rédigé, à jour, périmé après ajout, régénéré — rôle manuel préservé ; mode réel jugé avec les tables, SANS_OBJET sans elles)");
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test readme-dossiers : 7/7 (cas rouges : absent, non rédigé, périmé après ajout ; verts : à jour, régénéré — rôle manuel préservé ; mode réel jugé avec les tables, SANS_OBJET sans elles)");
   process.exit(casse.length ? 1 : 0);
 }
 

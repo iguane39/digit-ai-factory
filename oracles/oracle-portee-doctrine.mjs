@@ -365,7 +365,7 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test portée de doctrine : 12/12 PASS (produit complet → PASS ; hook sans le texte → FAIL nommé ; " +
+    : "Self-test portée de doctrine : 12/12 PASS (produit complet → PASS ; cas rouge : hook sans le texte → FAIL nommé ; " +
       "dépôt jamais instancié → HORS_DOCTRINE ; produit absent du poste → NON_VERIFIE ; hook non câblé → FAIL ; " +
       "PD3 racine au-dessus du produit → FAIL avec son remède ; PD3 session dans le produit → PASS ; " +
       "PD3 dossier sans produit imbriqué → PASS ; PD4 jeu de hameçons complet → PASS, jeu réduit au seul " +

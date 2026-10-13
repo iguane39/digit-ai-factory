@@ -278,7 +278,7 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     // pas `estMessageHumain` seule — le point d'entrée les enchaîne, la recette aussi.
     const injecte = humain ? contexte(msg) : "";
     const ok = humain === humainAttendu && (humainAttendu ? injecte.length > 0 : injecte === "");
-    console.log(`  [${ok ? "PASS" : "FAIL"}] origine — ${glose} → ${humain ? "humain, appel injecté" : "non humain, rien injecté"}${ok ? "" : " (contraire à l'attendu)"}`);
+    console.log(`  [${ok ? "PASS" : "FAIL"}] origine — ${glose} → ${humain ? "humain, appel injecté" : "REFUS, non humain, rien injecté"}${ok ? "" : " (contraire à l'attendu)"}`);
     ok ? pass++ : fail++;
   }
 
@@ -305,7 +305,7 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
   for (const [msg, attendu] of casConsignes) {
     const obtenu = reconnaitreConsignes(msg).map((c) => c.regle);
     const ok = JSON.stringify(obtenu) === JSON.stringify(attendu);
-    console.log(`  [${ok ? "PASS" : "FAIL"}] consigne « ${msg.slice(0, 48)} » → ${JSON.stringify(obtenu)}${ok ? "" : ` (attendu ${JSON.stringify(attendu)})`}`);
+    console.log(`  [${ok ? "PASS" : "FAIL"}] consigne${attendu.length ? "" : " rouge"} « ${msg.slice(0, 48)} » → ${JSON.stringify(obtenu)}${ok ? "" : ` (attendu ${JSON.stringify(attendu)})`}`);
     ok ? pass++ : fail++;
   }
   // La porte d'origine vaut pour les consignes comme pour les skills : une notification qui cite un
@@ -334,7 +334,7 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
   for (const [msg, attendu] of casNiveau) {
     const obtenu = reconnaitreNiveau(msg)?.niveau ?? null;
     const ok = obtenu === attendu;
-    console.log(`  [${ok ? "PASS" : "FAIL"}] niveau — « ${msg.slice(0, 44)} » → ${obtenu}${ok ? "" : ` (attendu ${attendu})`}`);
+    console.log(`  [${ok ? "PASS" : "FAIL"}] niveau${attendu === null ? " rouge" : ""} — « ${msg.slice(0, 44)} » → ${obtenu}${ok ? "" : ` (attendu ${attendu})`}`);
     ok ? pass++ : fail++;
   }
 
@@ -367,7 +367,7 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
   // demande rien, alors que le même texte, humain, demanderait le niveau Simple.
   const notification = "<task-notification>vite : l'agent a fini</task-notification>";
   const okOrigine = !estMessageHumain(notification) && reconnaitreNiveau("vite : l'agent a fini")?.niveau === "Simple";
-  console.log(`  [${okOrigine ? "PASS" : "FAIL"}] niveau — notification portant « vite : » → non humaine, rien injecté`);
+  console.log(`  [${okOrigine ? "PASS" : "FAIL"}] niveau — notification portant « vite : » → REFUS, non humaine, rien injecté`);
   okOrigine ? pass++ : fail++;
 
   console.log(`\nhook-lexique : ${pass} PASS, ${fail} FAIL`);

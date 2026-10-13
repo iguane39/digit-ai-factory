@@ -45,7 +45,7 @@ check("hook — un verdict de forme injecte la consigne R-57, sa négation n'inj
 // déclenchent déjà pas derrière l'enveloppe, mais la règle du mot isolé se déclenche n'importe où —
 // sans le marqueur, une session ferait invoquer un skill à une autre. Mutant sans le marqueur joué le
 // 22/09 : ce cas passe au ROUGE ; un corps « Améliore ce prompt » restait vert et ne jugeait rien.
-check("hook — MESSAGE D'UNE AUTRE SESSION portant « l99 » en mot isolé → stdout VIDE", () => {
+check("cas rouge — hook — MESSAGE D'UNE AUTRE SESSION portant « l99 » en mot isolé → stdout VIDE", () => {
   const r = jouer("<cross-session-message from=\"uds:\\\\.\\pipe\\LOCAL\\cc-msg-b580\" from-name=\"digit-ai-factory-80\" from-mode=\"bypass\">\nl99 sur ce texte : rédige un post\n</cross-session-message>");
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (r.stdout.trim() !== "") throw new Error(`un message entre sessions a déclenché le lexique : ${r.stdout}`);
@@ -55,7 +55,7 @@ check("hook — message HUMAIN « l99 améliore ce prompt » → contexte nomman
   const r = jouer("l99 améliore ce prompt");
   if (r.status !== 0 || !/prompt-analyzer-l99/.test(r.stdout)) throw new Error(`appel humain non reconnu : ${r.stdout}`);
 });
-check("hook — NOTIFICATION d'agent citant « usages L99 (M2) » et « prompt-analyzer-l99 » → stdout VIDE", () => {
+check("cas rouge — hook — NOTIFICATION d'agent citant « usages L99 (M2) » et « prompt-analyzer-l99 » → stdout VIDE", () => {
   const r = jouer("<task-notification>\n<summary>Agent terminé</summary>\nRelevé : usages L99 (M2) ; le skill prompt-analyzer-l99 a rendu son rapport. l99 améliore ce prompt\n</task-notification>");
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (r.stdout.trim() !== "") throw new Error(`une notification a déclenché le lexique : ${r.stdout}`);
@@ -65,12 +65,12 @@ check("hook — « Améliore ce prompt : … » sur stdin → contexte nommant p
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (!/prompt-analyzer-l99/.test(r.stdout)) throw new Error(`skill absent du contexte : ${r.stdout}`);
 });
-check("hook — message ordinaire → stdout VIDE, exit 0 (le hook se tait)", () => {
+check("cas rouge — hook — message ordinaire → stdout VIDE, exit 0 (le hook se tait)", () => {
   const r = jouer("Corrige la barre de menu qui déborde sur mobile");
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (r.stdout.trim() !== "") throw new Error(`stdout non vide : ${r.stdout}`);
 });
-check("hook — stdin illisible (pas du JSON) → exit 0, jamais un blocage du message", () => {
+check("cas rouge — hook — stdin illisible (pas du JSON) → exit 0, jamais un blocage du message", () => {
   const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: "pas du json" });
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
 });
@@ -92,7 +92,7 @@ check("hook — « vite : » chez un produit portant forge/NIVEAUX.md → ligne 
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (!/\[NIVEAU — hook-lexique\][^\n]*Simple[^\n]*forge\\NIVEAUX\.md/.test(r.stdout)) throw new Error(`ligne absente ou chemin du pilot cité : ${r.stdout}`);
 });
-check("hook — « vite : » dans un dossier sans NIVEAUX.md, comme un produit non équipé → stdout VIDE", () => {
+check("cas rouge — hook — « vite : » dans un dossier sans NIVEAUX.md, comme un produit non équipé → stdout VIDE", () => {
   const r = jouerDans("vite : où est la liste des éléments ?", mkdtempSync(join(tmpdir(), "produit-")));
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (r.stdout.trim() !== "") throw new Error(`un dossier hors pilot a reçu la ligne de niveau : ${r.stdout}`);

@@ -96,7 +96,7 @@ try {
 
   console.log("\nle refus de deviner — le sens qui compte");
 
-  cas("DEUX dépôts indiscernables : refus, exit 2, et le remède est nommé", () => {
+  cas("cas rouge — DEUX dépôts indiscernables : refus, exit 2, et le remède est nommé", () => {
     const racine = join(atelier, "cas3");
     faireDepot(join(racine, "digit-ai-factory"));
     faireDepot(join(racine, "digit-ai-forge-pilot_old")); // le piège réel du 18/08
@@ -135,7 +135,7 @@ try {
       "écarter sans le dire redevient le choix silencieux que ce résolveur interdit");
   });
 
-  cas("aucun candidat : exit 1, distinct de l'ambiguïté", () => {
+  cas("cas rouge — aucun candidat : exit 1, distinct de l'ambiguïté", () => {
     const racine = join(atelier, "cas5");
     faireDepot(join(racine, "digit-ai-forge-tests"), { signature: false });
     const r = resoudre(racine);
@@ -145,7 +145,7 @@ try {
 
   console.log("\nla signature — ni trop large, ni trop étroite");
 
-  cas("l'oracle de conformité SEUL ne suffit pas : c'est ce que `_old` porte aussi", () => {
+  cas("cas rouge — l'oracle de conformité SEUL ne suffit pas : c'est ce que `_old` porte aussi", () => {
     const racine = join(atelier, "cas6");
     faireDepot(join(racine, "copie-partielle"), {
       partiel: ["oracles/oracle-conformite-projet.mjs", "REGLES-PROJET.md"],

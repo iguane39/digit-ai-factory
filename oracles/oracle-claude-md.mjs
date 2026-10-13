@@ -180,17 +180,17 @@ function selfTest() {
   // N1 : le plafond. La règle la plus utile de l'oracle, et celle qui n'avait jamais échoué
   // sous les yeux de personne — un octet de trop DOIT suffire, sinon la borne est molle.
   const trop = juger(monter("x".repeat(PLAFOND + 1), {}));
-  cas.push(["N1  — un seul octet au-dessus du plafond", echoue(trop, "N1")]);
+  cas.push(["rouge N1 — un seul octet au-dessus du plafond", echoue(trop, "N1")]);
   const pile = juger(monter("x".repeat(PLAFOND), {}));
   cas.push(["N1  — exactement au plafond (borne inclusive)", !echoue(pile, "N1")]);
 
   // N2 : une référence citée mais absente — le noyau promet une page qui n'existe pas.
   const absente = juger(monter("cite `references\\FANTOME.md`.\n", {}));
-  cas.push(["N2  — référence citée mais absente", echoue(absente, "N2")]);
+  cas.push(["rouge N2 — référence citée mais absente", echoue(absente, "N2")]);
 
   // N3 : une page de references\ que le noyau ne cite pas — donc jamais chargée par un run.
   const orpheline = juger(monter("cite `references\\ACCUEIL.md`.\n", { "ACCUEIL.md": "x", "ORPHELINE.md": "y" }));
-  cas.push(["N3  — page de references\\ non citée", echoue(orpheline, "N3")]);
+  cas.push(["rouge N3 — page de references\\ non citée", echoue(orpheline, "N3")]);
 
   // N3 transitif (D-3 (b), 03/09) : une page citée seulement par l'index, lui-même cité par le
   // noyau, est ATTEINTE ; la même page citée par un index que le noyau ne cite pas reste orpheline
@@ -198,9 +198,9 @@ function selfTest() {
   const parIndex = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\ACCUEIL.md`", "ACCUEIL.md": "x" }));
   cas.push(["N3  — page citée par l'index que le noyau cite (transitif)", !echoue(parIndex, "N3") && !echoue(parIndex, "N2")]);
   const indexOrphelin = juger(monter("rien.\n", { "INDEX.md": "cite `references\\ACCUEIL.md`", "ACCUEIL.md": "x" }));
-  cas.push(["N3  — index non cité par le noyau : lui et ce qu'il cite restent orphelins", echoue(indexOrphelin, "N3")]);
+  cas.push(["rouge N3 — index non cité par le noyau : lui et ce qu'il cite restent orphelins", echoue(indexOrphelin, "N3")]);
   const entreeMorte = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\FANTOME.md`" }));
-  cas.push(["N2  — entrée d'index vers un fichier absent", echoue(entreeMorte, "N2")]);
+  cas.push(["rouge N2 — entrée d'index vers un fichier absent", echoue(entreeMorte, "N2")]);
 
   // N4 (TF-1010) — dans ses TROIS sens, sans git : le texte commis est passé directement.
   const regle = "- Livrable accepté sur verdict d'oracle exécuté seulement ; jamais de réponse inventée.\n";
@@ -208,7 +208,7 @@ function selfTest() {
   // rouge : le mot « seulement » retiré — le cas exact du 10/09.
   const sansSeulement = juger(baseN4, regle.replace(" seulement", "") === regle ? regle : regle);
   const perdu = juger(monter(regle.replace(" seulement", "") + "Cite `references\\ACCUEIL.md`.\n", { "ACCUEIL.md": "x" }), regle);
-  cas.push(["N4  — « seulement » retiré entre la version commise et la version de travail : FAIL", echoue(perdu, "N4")
+  cas.push(["rouge N4 — « seulement » retiré entre la version commise et la version de travail : FAIL", echoue(perdu, "N4")
             && perdu.find((f) => f.regle === "N4").message.includes("seulement") && perdu.find((f) => f.regle === "N4").message.includes("1 → 0")]);
   // vert : même texte.
   cas.push(["N4  — texte identique : PASS", !echoue(sansSeulement, "N4")]);
@@ -217,7 +217,7 @@ function selfTest() {
   cas.push(["N4  — quantificateur déplacé, compte égal : PASS", !echoue(deplace, "N4")]);
   // frontière Unicode : « seule » ne compte pas dans « seulement », et sa perte n'est pas masquée.
   const accent = juger(monter("la seulement règle\nCite `references\\ACCUEIL.md`.\n", { "ACCUEIL.md": "x" }), "la seule règle seulement\n");
-  cas.push(["N4  — « seule » perdu n'est pas masqué par « seulement » (frontière Unicode)", echoue(accent, "N4")
+  cas.push(["rouge N4 — « seule » perdu n'est pas masqué par « seulement » (frontière Unicode)", echoue(accent, "N4")
             && accent.find((f) => f.regle === "N4").message.includes("« seule »")]);
   // hors dépôt git : NON_JUGE, jamais PASS.
   const horsGit = juger(monter("x\n", {}));
@@ -225,7 +225,7 @@ function selfTest() {
 
   // Noyau absent : refus franc, jamais un PASS par défaut.
   const vide = juger(mkdtempSync(join(tmpdir(), "vide-")));
-  cas.push(["N1  — CLAUDE.md absent", echoue(vide, "N1")]);
+  cas.push(["rouge N1 — CLAUDE.md absent", echoue(vide, "N1")]);
 
   let bons = 0;
   for (const [nom, tenu] of cas) {

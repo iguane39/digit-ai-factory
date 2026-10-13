@@ -149,21 +149,21 @@ function selfTest() {
 
   // I1 : deux dépôts pour le même id.
   let r = juger(ecrire("i1.jsonl", [depot, { ...depot, ts: "2026-08-15T12:00:00Z" }]));
-  cas.push(["I1    — second dépôt pour le même id", r.findings.some((f) => f.regle === "I1" && f.statut === "FAIL"), r.verdict]);
+  cas.push(["rouge I1 — second dépôt pour le même id", r.findings.some((f) => f.regle === "I1" && f.statut === "FAIL"), r.verdict]);
 
   // I2 : le défaut que le circuit vise — un « toujours pas » déposé comme dossier neuf.
   r = juger(ecrire("i2.jsonl", [depot, { ev: "reouverture", ts: "2026-08-15T12:00:00Z", id: "INS-0002", motif: "ça ne va toujours pas" }]));
-  cas.push(["I2    — réouverture sur un id jamais déposé", r.findings.some((f) => f.regle === "I2" && f.statut === "FAIL"), r.verdict]);
+  cas.push(["rouge I2 — réouverture sur un id jamais déposé", r.findings.some((f) => f.regle === "I2" && f.statut === "FAIL"), r.verdict]);
 
   // I3 : instruction à cinq blocs — le manquant doit être NOMMÉ.
   const cinq = { ...blocsPleins }; delete cinq.c_gates_en_defaut;
   r = juger(ecrire("i3.jsonl", [depot, { ev: "instruction", ts: "2026-08-15T11:00:00Z", id: "INS-0001", dossier: "d/", blocs: cinq }]));
-  cas.push(["I3    — bloc manquant nommé (c_gates_en_defaut)",
+  cas.push(["rouge I3 — bloc manquant nommé (c_gates_en_defaut)",
     r.findings.some((f) => f.regle === "I3" && f.statut === "FAIL" && f.message.includes("c_gates_en_defaut")), r.verdict]);
 
   // I4 : sans ts, la mesure meurt.
   r = juger(ecrire("i4.jsonl", [depot, { ev: "cloture", id: "INS-0001", verdict: "corrige" }]));
-  cas.push(["I4    — événement sans ts", r.findings.some((f) => f.regle === "I4" && f.statut === "FAIL"), r.verdict]);
+  cas.push(["rouge I4 — événement sans ts", r.findings.some((f) => f.regle === "I4" && f.statut === "FAIL"), r.verdict]);
 
   // Contre-épreuve : une VRAIE réouverture (même id) est verte et se compte.
   r = juger(ecrire("reouv.jsonl", [depot, { ev: "reouverture", ts: "2026-08-15T12:00:00Z", id: "INS-0001", motif: "toujours pas" }]));
