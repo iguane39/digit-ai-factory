@@ -85,7 +85,7 @@
  * l'historique des lots couvre ensuite. Le compte est une BORNE BASSE assumée : il ne dit rien de
  * la qualité d'une forme, il empêche seulement qu'un document repris cinq fois reste invisible
  * (seuil confirmé par le porteur le 28/09/2026). En vigueur le 29/09 : la règle entre au main le
- * 28/09 (TF-1413), et les lots écrits jusque-là, sans elle, ne sont pas accusés (R-33 bis).
+ * 28/09 (TF-1413), et les lots écrits jusque-là, sans elle, ne sont pas accusés (antériorité déclarée, comme en R-45).
  *
  * Usage :
  *   node oracle-lot-retours.mjs <lot.md> [--json]
@@ -292,7 +292,7 @@ function murDesLotsAnterieurs(cheminLot) {
  *
  * Le remède n'est pas une politesse : un message qui prescrit la moitié du geste conduit tout
  * droit à une seconde violation (leçon TF-0552), et un contrôle dont on ne sait pas quoi faire
- * se contourne au lieu de se corriger (R-33 bis).
+ * se contourne au lieu de se corriger (motif que R-33 bis donne pour le verdict websec).
  */
 /** Le jour LOCAL de l'horloge qui juge, au format du nom d'un lot (AAAAMMJJ). */
 export function jourLocal(d = new Date()) {

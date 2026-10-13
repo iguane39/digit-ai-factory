@@ -91,7 +91,7 @@ def verifier(run: str) -> int:
     (CONTRAT-INTERFACE §3) interdit de réécrire un ledger existant — « on ne juge que ce qui
     s'est déclaré jugeable, et on ne réécrit jamais un ledger existant ». Le déclarer et
     bloquer dessus reviendrait à exiger une correction interdite, donc à faire désactiver le
-    contrôle (R-33 bis). Il sort donc DÉCLARÉ, avec son remède, sans mise en échec.
+    contrôle (motif que R-33 bis donne pour le verdict websec). Il sort donc DÉCLARÉ, avec son remède, sans mise en échec.
 
     Le type conforme pour un arbitrage humain consigné est `reponse_humain`.
     """

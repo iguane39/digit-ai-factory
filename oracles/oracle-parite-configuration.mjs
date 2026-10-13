@@ -174,7 +174,7 @@ export const DU_SYSTEME = new Set([
  * DU CODE (`forge_tests/gabarit_env.py`), déposé chez le projet, précisément pour qu'aucune liste
  * recopiée ne se périme. Son propre gabarit écrit d'ailleurs, en tête, « deux fichiers, DEUX RÔLES
  * DISTINCTS ». Accuser cette architecture aurait fait crier l'oracle sur la bonne pratique — et un
- * contrôle bruyant se fait contourner, jamais corriger (R-33 bis).
+ * contrôle bruyant se fait contourner, jamais corriger (motif que R-33 bis donne pour le verdict websec).
  *
  * LA DÉCLARATION EST NOMMÉE ET RENDUE : le rapport dit toujours combien de clés une directive a
  * écartées et laquelle. Une exclusion silencieuse serait un angle mort ; celle-ci est un aveu.

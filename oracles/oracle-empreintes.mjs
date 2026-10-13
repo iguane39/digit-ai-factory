@@ -373,7 +373,7 @@ if (inconnus.length) {
 // CE QUI EST JUGÉ : un fichier qui hache ET qui lit un fichier doit porter, près de son hachage,
 // soit l'emploi de la fonction partagée, soit une normalisation visible. La lecture est
 // TEXTUELLE et sa limite est au `non_juge` — mieux vaut manquer un cas tordu que crier sur du
-// code sain, puisqu'un contrôle bruyant se fait contourner au lieu de se corriger (R-33 bis).
+// code sain, puisqu'un contrôle bruyant se fait contourner au lieu de se corriger (motif que R-33 bis donne pour le verdict websec).
 // CE QUI EST JUGE, ET LE RESSERRAGE QUI A ETE NECESSAIRE DES LE PREMIER USAGE REEL. Le premier
 // jet testait la presence des deux motifs DANS LE FICHIER — un hachage quelque part, une lecture
 // de fichier quelque part — sans verifier qu'ils se PARLENT. Joue sur le parc, il a rendu SIX

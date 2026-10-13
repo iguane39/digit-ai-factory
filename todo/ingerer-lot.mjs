@@ -462,7 +462,7 @@ if (rectifications.length) {
 //
 // IL N'AFFIRME PAS UN DOUBLON, il dit « ressemble a » : mesure sur les 154 items du registre, 3 des
 // 5 paires signalees ne sont pas des doublons mais deux faces d'un meme episode. Affirmer serait
-// donc faux 3 fois sur 5, et un controle qui affirme faux se fait desactiver (R-33 bis).
+// donc faux 3 fois sur 5, et un controle qui affirme faux se fait desactiver (motif que R-33 bis donne pour le verdict websec).
 try {
   const { rapprochements, itemsDuRegistre, frequences } = await import("./rapprocher.mjs");
   const itemsClos = itemsDuRegistre(evenements);

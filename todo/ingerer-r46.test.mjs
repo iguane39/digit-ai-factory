@@ -87,7 +87,7 @@ check("verte — un retour qui NOMME son gabarit et sa version", () => {
   if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 200)}`);
 });
 
-check("borne — lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (R-33 bis)", () => {
+check("borne — lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (motif que R-33 bis donne pour le verdict websec)", () => {
   // Le lot porte R-45 (en vigueur depuis le 21/08) : sans elle, c'est R-45 qui refuserait et
   // le cas mesurerait la mauvaise règle. Ici, seule la borne de R-46 est en jeu.
   const r = ingerer({ nomLot: "PROD - RETOURS - 20260821z", md: "# lot d'avant R-46\n" + R45 });

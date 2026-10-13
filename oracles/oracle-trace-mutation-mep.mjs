@@ -65,7 +65,7 @@
  * POURQUOI AVERTISSEMENT ET JAMAIS FAIL, et le choix est le point délicat. Un verdict périmé n'est
  * pas une faute du dossier : c'est un fait à relire avant de citer la pièce, et le remède
  * (« rejouer l'oracle ») appartient à forge-ops. Rendre bloquant un contrôle qui dépend de journaux
- * écrits par un autre dépôt apprendrait à le contourner (R-33 bis). Un produit sans journal rend
+ * écrits par un autre dépôt apprendrait à le contourner (motif que R-33 bis donne pour le verdict websec). Un produit sans journal rend
  * SANS_OBJET — l'absence d'un artefact d'un tiers n'est pas un défaut du produit.
  *
  * CE QU'IL NE JUGE PAS, et c'est déclaré plutôt que tu :

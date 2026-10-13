@@ -111,7 +111,7 @@ function couvert(parSha, chemin) {
 // temps**. Un lot déposé il y a dix minutes attend son tour, c'est normal ; un lot déposé il y a
 // plus de 24 heures a été OUBLIÉ, et la différence entre les deux ne se lit nulle part dans un
 // constat B1. C'est cette ancienneté que le hook d'ouverture rend BLOQUANTE — un constat qu'on
-// relit chaque matin sans jamais le traiter est un constat qui ne protège plus (R-33 bis).
+// relit chaque matin sans jamais le traiter est un constat qui ne protège plus (motif que R-33 bis donne pour le verdict websec).
 //
 // L'horloge est celle du FICHIER (mtime), pas celle du nom : un lot renommé ou recopié repart
 // à zéro, et c'est voulu — on mesure depuis quand il attend À CET ENDROIT, pas depuis quand il
@@ -299,7 +299,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   // soit ÉCRIT, jamais qu'il soit bon.
   //
   // Entrée en vigueur DATÉE, comme R10 : les lots antérieurs au seuil sont une antériorité
-  // déclarée. Un contrôle qui met en échec tout l'existant se fait désactiver (R-33 bis).
+  // déclarée. Un contrôle qui met en échec tout l'existant se fait désactiver (motif que R-33 bis donne pour le verdict websec).
   const SEUIL_B6 = "20260821";
   const RE_DATE_LOT = /(\d{8})[a-z]?\.md$/i;
   const SECTION_B6 = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
@@ -612,7 +612,7 @@ function selfTest() {
   }) + "\n");
   writeFileSync(lotAncien, "# lot ancien, sans la section\n");
   r = juger(boite, reg);
-  cas.push(["B6 quater— lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (R-33 bis)",
+  cas.push(["B6 quater— lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (motif que R-33 bis donne pour le verdict websec)",
     !r.findings.some((f) => f.regle === "B6" && f.ou === "PROD - RETOURS - 20260819a.md"), r.verdict]);
   rmSync(lotNeuf); rmSync(sidecarNeuf); rmSync(lotAncien); rmSync(sidecarAncien);
 
@@ -654,7 +654,7 @@ function selfTest() {
   }) + "\n");
   writeFileSync(lotAvant, "# lot d'avant la règle, sans aucune des deux sections\n");
   r = juger(boite, reg);
-  cas.push(["B7 quinquies— lot ANTÉRIEUR au seuil : antériorité déclarée (R-33 bis)",
+  cas.push(["B7 quinquies— lot ANTÉRIEUR au seuil : antériorité déclarée (motif que R-33 bis donne pour le verdict websec)",
     !r.findings.some((f) => (f.regle === "B7" || f.regle === "B6") && f.ou === "PROD - RETOURS - 20260820z.md"),
     r.verdict]);
   // PLACÉ APRÈS LES AUTRES CAS B7, ET CE DÉTAIL EST LA MOITIÉ DU TEST : la dérogation s'écrit

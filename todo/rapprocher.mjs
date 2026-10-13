@@ -24,7 +24,7 @@
  * ============================================================================================
  *
  * IL SIGNALE, IL NE BLOQUE JAMAIS. Un rapprochement lexical se trompe ; le faire bloquer ferait
- * refuser un lot légitime, et un contrôle qui refuse à tort se fait désactiver (R-33 bis). Le juge
+ * refuser un lot légitime, et un contrôle qui refuse à tort se fait désactiver (motif que R-33 bis donne pour le verdict websec). Le juge
  * reste humain : il lit « cet item ressemble à TF-0598, corrigé le 24/08 » AVANT de décider, au
  * lieu de le découvrir après.
  *

@@ -330,7 +330,7 @@ if (iPilot < 0) {
 // POURQUOI BLOQUANT ICI, alors que les autres sections de ce hook ne le sont pas : les autres
 // DÉCLARENT un état qu'elles ne peuvent pas réparer (héritage d'un produit, câblage d'un poste,
 // R-29). Celui-ci nomme un travail que LA SESSION QUI LIT peut prendre à l'instant, en une
-// commande. Un constat qu'on relit chaque matin sans le traiter cesse d'être lu (R-33 bis) : le
+// commande. Un constat qu'on relit chaque matin sans le traiter cesse d'être lu (motif que R-33 bis donne pour le verdict websec) : le
 // seuil de 24 h sépare donc la file d'attente normale de l'oubli, et seul l'oubli passe en tête.
 if (iPilot < 0) {
   const ob = join(PILOT, "oracles", "oracle-boite-entree.mjs");

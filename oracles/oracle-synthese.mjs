@@ -204,7 +204,7 @@ const compteMots = (s) => (String(s).match(/[\p{L}\p{N}]\S*/gu) || []).length;
 // objet ». Chercher le mot dans un bloc LONG accuse un bloc plein : mesuré sur les 148 synthèses
 // d'`output\04-plans\`, la première écriture de cette règle rendait UN faux positif, et sur la
 // colonne que le gabarit PRESCRIT lui-même au bloc 8 — « Si rien n'est fait ». Un contrôle qui
-// accuse la forme prescrite s'apprend à contourner (R-33 bis) : la borne de longueur est donc
+// accuse la forme prescrite s'apprend à contourner (motif que R-33 bis donne pour le verdict websec) : la borne de longueur est donc
 // dans la règle, pas dans la fixture.
 const declareSonVide = (t) => compteMots(t) <= 20 && MOTIFS_ABSENCE.test(t);
 const estPlein = (b, seuil) => {
