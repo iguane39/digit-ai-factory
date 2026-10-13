@@ -318,11 +318,18 @@
     }
   </style>
   <style>
-    nav.toc{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
-    nav.toc a{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink)}
+    nav.toc{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
+    nav.toc a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink)}
     nav.toc a:hover{text-decoration:underline}
     nav.toc a strong{font-size:.85rem;font-weight:600}
     .toc-d{color:var(--muted);font-size:.72rem;font-weight:400}
+    .ch-apprend{margin:0 0 16px;color:var(--muted)}
+    nav.barre{display:none}
+    @media (max-width:900px){
+      nav.barre{display:flex;flex-wrap:wrap;gap:4px 16px;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
+      nav.barre a{flex:0 1 auto;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
+      nav.barre a:hover{text-decoration:underline}
+    }
   </style>
 <!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
@@ -458,6 +465,9 @@ tr[data-tf-empty] td {
       <input id="find" type="search" placeholder="Rechercher dans le document…">
       <p id="findCount" class="find-count" aria-live="polite"></p>
     </div>
+<section class="chap lire" data-mesure-lecture>
+<p class="intention">Cette page sert à décider, pour le pilote de l'écosystème, de la suite à donner à l'étude : faut-il ajouter une revue hebdomadaire de l'existant à la boucle d'amélioration de la factory et des forges.</p>
+</section>
 <nav class="toc colle" aria-label="Sommaire">
       <a href="#seuil-de-declenchement-verifie-avant-ecriture"><strong>Seuil de déclenchement (vérifié avant écriture)</strong> <span class="toc-d">Chapitre 1 sur 8</span></a>
       <a href="#intention-de-l-utilisateur-loi-n-7"><strong>Intention de l'utilisateur (loi n° 7)</strong> <span class="toc-d">Chapitre 2 sur 8</span></a>
@@ -468,19 +478,39 @@ tr[data-tf-empty] td {
       <a href="#4-options-jeu-ferme-o0-o4"><strong>4. Options — jeu fermé O0-O4</strong> <span class="toc-d">Chapitre 7 sur 8</span></a>
       <a href="#5-verdict"><strong>5. Verdict</strong> <span class="toc-d">Chapitre 8 sur 8</span></a>
     </nav>
+<nav class="barre" aria-label="Sommaire permanent"><a href="#seuil-de-declenchement-verifie-avant-ecriture">Seuil de déclenchement (vérifié avant écriture)</a><a href="#intention-de-l-utilisateur-loi-n-7">Intention de l'utilisateur (loi n° 7)</a><a href="#0-traitement-des-entrants">0. Traitement des entrants</a><a href="#1-partition-du-probleme">1. Partition du problème</a><a href="#2-non-recouvrement-contre-l-existant">2. Non-recouvrement contre l'existant</a><a href="#3-etat-de-l-art-date">3. État de l'art daté</a><a href="#4-options-jeu-ferme-o0-o4">4. Options — jeu fermé O0-O4</a><a href="#5-verdict">5. Verdict</a></nav>
 <section class="chap lire" data-mesure-lecture>
 <p>Audience : le pilote de l'écosystème, qui décide. Ce que l'étude change pour lui : la mesure ne justifie pas une revue hebdomadaire neuve. Le pilot décide et clôt un item en moins d'un jour en médiane, et le dépôt porte 6 objets dormants. Le retard mesuré se loge ailleurs : plus de la moitié des corrections mesurables n'arrivent pas chez les produits, parce que chaque descente attend qu'un humain ouvre une session chez le produit. L'étude retient d'étendre la sonde hebdomadaire qui tourne déjà, et dépose 4 candidatures. Rien n'est construit, rien n'est supprimé.</p>
-<h2 id="seuil-de-declenchement-verifie-avant-ecriture">Seuil de déclenchement (vérifié avant écriture)</h2>
+</section>
+<section id="seuil-de-declenchement-verifie-avant-ecriture">
+<h2>Seuil de déclenchement (vérifié avant écriture)</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Le sujet touche le noyau du pilot, par le hook d'ouverture qui tient la cadence, et plus de trois forges, par la chaîne des retours : deux critères suffisants pour instruire.</p>
 <p>Le seuil est franchi par deux critères de <code>gabarits\ETUDE-OPPORTUNITE.md</code> l. 15-17. Le sujet touche le noyau, puisque la cadence est tenue par le hook d'ouverture du pilot. Il touche aussi plus de trois forges, puisque la chaîne étudiée traverse le pilot, forge-observability et toute forge qui reçoit un lot.</p>
-<h2 id="intention-de-l-utilisateur-loi-n-7">Intention de l'utilisateur (loi n° 7)</h2>
+</section>
+</section>
+<section id="intention-de-l-utilisateur-loi-n-7">
+<h2>Intention de l'utilisateur (loi n° 7)</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">L'intention validée le 17/09/2026 veut une boucle d'amélioration plus rapide et moins gourmande en gestes, sans retirer au demandeur une seule décision que les règles lui réservent.</p>
 <p>L'intention, dans les mots du demandeur, le 17/09/2026 :</p>
 <blockquote><p>« mettre en oeuvre un processus d'amélioration continue des outils […] en limitant les interventions humaines […] et accélération systématique de ses processus d'amélioration continue. »</p></blockquote>
 <p>Sa demande d'origine nommait cinq objets : une analyse « hebdomadaire de l'existant de la factory et des forges », « l'optimisation de l'existant, le nettoyage du code mort », « l'analyse des retours et todos traités et la façon dont ils ont été traités et appliqués », « les prochaines actions à mettre en oeuvre », et l'automatisation des retours « en limitant les interventions humaines ».</p>
 <p>L'intention a été reformulée par l'analyse L99 du 17/09/2026, puis validée par le demandeur le même jour par sa réponse « 1a », qui tranche la décision D-1 en option (a). La formulation validée : que la boucle d'amélioration tourne plus vite et demande moins de gestes, sans retirer au demandeur une seule décision que les règles du projet lui réservent.</p>
-<h2 id="0-traitement-des-entrants">0. Traitement des entrants</h2>
+</section>
+</section>
+<section id="0-traitement-des-entrants">
+<h2>0. Traitement des entrants</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Forges et produits ont été lus par leurs seules traces au pilot, et les deux décisions du 30/08/2026 sur l'émetteur de retours côté produit n'ont laissé aucune trace d'exécution.</p>
 <p>Le prompt réécrit est une donnée : ses impératifs sont cités, et ses quatre seuils sont des valeurs proposées que le demandeur a validées en bloc. Sources de la proposition : le message du demandeur du 17/09/2026, l'analyse <code>output\03-etudes\20260917-L99-revue-hebdomadaire-amelioration-continue.md</code>, et la décision D-1 (a). Les forges et les produits ont été lus comme des données, par leurs traces au pilot. Aucun de leurs dépôts n'a été ouvert en écriture.</p>
 <p>Le sort des deux décisions du 30/08/2026 sur l'émetteur de retours côté produit : sans trace d'exécution. La synthèse <code>20260830k</code> les a refondues en une décision sur le partage entre la machine et l'agent, avec pour repli « le canal reste ce qu'il est ». Aucun émetteur hérité n'existe sous <code>gabarits\</code>, <code>gabarits\HERITAGE.json</code> n'en déclare aucun, et le hook d'ouverture ne porte aucun rappel de silence.</p>
-<h2 id="1-partition-du-probleme">1. Partition du problème</h2>
+</section>
+</section>
+<section id="1-partition-du-probleme">
+<h2>1. Partition du problème</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">La question se découpe en quatre objets, revue de l'existant, existant dormant, bilan des items traités et automatisation de la chaîne, plus le choix de la cadence et de son porteur.</p>
 <p>La question se découpe en quatre objets disjoints, plus une question transverse de cadence.</p>
 <ul><li><strong>A. Revue de l'existant</strong> : que regarderait une revue périodique que la sonde hebdomadaire et</li></ul>
 <p>  la revue des classes ne regardent pas ?</p>
@@ -490,14 +520,25 @@ tr[data-tf-empty] td {
 <p>  retire ?</p>
 <ul><li><strong>Cadence et porteur</strong> : semaine, quinzaine ou seuil de volume ; hook de session, tâche locale</li></ul>
 <p>  ou agent hébergé.</p>
-<h2 id="2-non-recouvrement-contre-l-existant">2. Non-recouvrement contre l'existant</h2>
+</section>
+</section>
+<section id="2-non-recouvrement-contre-l-existant">
+<h2>2. Non-recouvrement contre l'existant</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Onze mécanismes existants tiennent déjà la cadence, le tableau de bord et trois des quatre mesures du traitement ; aucun ne suit la descente par produit, l'âge des items ouverts ni le silence des sources.</p>
 <p>L'existant couvre déjà la cadence, le tableau de bord et trois des quatre mesures du traitement. Il ne couvre ni la descente par produit, ni l'âge des items ouverts, ni le silence des sources.</p>
 <p>Le tableau se lit ligne par ligne : un mécanisme existant, la citation qui le prouve, puis ce qu'il recouvre de la question. Les lignes suivent l'ordre des objets A à D.</p>
 </section>
-<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">Sonde hebdomadaire des récidives (<code>todo\observabilite\plan-recidives.json</code> l. 4, 9, 17)</td><td data-label="Citation">« cadence hebdomadaire tenue par le hook d'ouverture du pilot » ; « rien n'est appliqué automatiquement (R-29) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la cadence et le porteur de A ; ne recouvre que 6 compteurs</td></tr><tr><td data-label="Existant examiné">Déclencheur de la sonde (<code>oracles\hook-ouverture.mjs</code> l. 324-339)</td><td data-label="Citation">« LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI L'INVOQUE »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le porteur en session ; ne recouvre pas une exécution hors session</td></tr><tr><td data-label="Existant examiné">Revue des classes (<code>BOUCLE-AMELIORATION.md</code> l. 53-54 et 64-67)</td><td data-label="Citation">« au plus UNE revue par quinzaine, jouée à l'ouverture d'un tour du pilot »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre l'anticipation par classe et sa contre-lecture ; ne recouvre pas l'existant dormant</td></tr><tr><td data-label="Existant examiné">Tableau des récidives (<code>todo\RECIDIVES.md</code> l. 5)</td><td data-label="Citation">« est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre C pour les récidives, le délai de descente par classe et la contre-métrique ; ne recouvre pas une vue par produit ni une sonde sur les non atteints</td></tr><tr><td data-label="Existant examiné">Descente exigée à la clôture (<code>references\TODO-FORGE.md</code> l. 85-94)</td><td data-label="Citation">« R12 refuse la clôture qui n'en porte aucun »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre C depuis le 02/09 ; ne recouvre pas les 737 clôtures antérieures</td></tr><tr><td data-label="Existant examiné">Relevé des contrôles sans appelant (<code>scripts\relever-appelants.mjs</code> l. 3-18)</td><td data-label="Citation">« quels contrôles du dépôt ne sont APPELÉS par rien » ; « Le relevé NOMME ; il ne condamne pas »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre B pour les contrôles du pilot ; ne recouvre ni les forges ni un passage périodique, aucun lanceur ne l'appelle</td></tr><tr><td data-label="Existant examiné">Registre de dette (<code>todo\registre-dette.json</code>, affiché par <code>oracles\hook-ouverture.mjs</code> l. 312-320)</td><td data-label="Citation">« limite(s) assumée(s) », « reste(s) à instruire »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre B pour la dette déclarée</td></tr><tr><td data-label="Existant examiné">Boîte d'entrée bloquante (<code>oracles\hook-ouverture.mjs</code> l. 280-282)</td><td data-label="Citation">« À TRAITER AVANT TOUT AUTRE TRAVAIL de cette session »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre D pour l'ingestion au pilot ; ne recouvre pas l'émission chez le produit</td></tr><tr><td data-label="Existant examiné">Canal descendant (<code>todo\emettre-travaux.mjs</code> l. 24-32)</td><td data-label="Citation">« CE SCRIPT N'ÉCRIT QUE DANS <code>input\00-travaux\</code> DU PRODUIT » ; « IL NE COMMITE RIEN chez le produit »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre D pour le dépôt d'un travail ; ne recouvre pas son déclenchement, il se lance sur demande</td></tr><tr><td data-label="Existant examiné">Recopie de l'héritage à l'ouverture du produit (<code>oracles\hook-ouverture.mjs</code> l. 50-58)</td><td data-label="Citation">« le contrôle RECOPIE lui-même les artefacts déclarés en COPIE IDENTIQUE »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre D pour la descente une fois la session ouverte ; ne recouvre pas l'ouverture elle-même, qui reste un geste humain</td></tr><tr><td data-label="Existant examiné">Études antérieures (synthèses <code>20260903b</code>, <code>20260903c</code>, <code>20260830j</code>, <code>20260830k</code>)</td><td data-label="Citation">« ce qui s'automatise, ce n'est pas le CONTENU d'un retour, c'est l'OBLIGATION d'en produire un et le TRANSPORT »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le cadrage de D ; la décision du 30/08 est restée sans exécution</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Existant examiné » (1 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Existant examiné</th><th scope="col" data-definition="Colonne « Citation » (2 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Citation</th><th scope="col" data-definition="Colonne « Verdict (recouvre / ne recouvre pas) » (3 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">Sonde hebdomadaire des récidives (<code>todo\observabilite\plan-recidives.json</code> l. 4, 9, 17)</td><td data-label="Citation">« cadence hebdomadaire tenue par le hook d'ouverture du pilot » ; « rien n'est appliqué automatiquement (R-29) »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la cadence et le porteur de A ; ne recouvre que 6 compteurs</td></tr><tr><td data-label="Existant examiné">Déclencheur de la sonde (<code>oracles\hook-ouverture.mjs</code> l. 324-339)</td><td data-label="Citation">« LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI L'INVOQUE »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le porteur en session ; ne recouvre pas une exécution hors session</td></tr><tr><td data-label="Existant examiné">Revue des classes (<code>BOUCLE-AMELIORATION.md</code> l. 53-54 et 64-67)</td><td data-label="Citation">« au plus UNE revue par quinzaine, jouée à l'ouverture d'un tour du pilot »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre l'anticipation par classe et sa contre-lecture ; ne recouvre pas l'existant dormant</td></tr><tr><td data-label="Existant examiné">Tableau des récidives (<code>todo\RECIDIVES.md</code> l. 5)</td><td data-label="Citation">« est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre C pour les récidives, le délai de descente par classe et la contre-métrique ; ne recouvre pas une vue par produit ni une sonde sur les non atteints</td></tr><tr><td data-label="Existant examiné">Descente exigée à la clôture (<code>references\TODO-FORGE.md</code> l. 85-94)</td><td data-label="Citation">« R12 refuse la clôture qui n'en porte aucun »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre C depuis le 02/09 ; ne recouvre pas les 737 clôtures antérieures</td></tr><tr><td data-label="Existant examiné">Relevé des contrôles sans appelant (<code>scripts\relever-appelants.mjs</code> l. 3-18)</td><td data-label="Citation">« quels contrôles du dépôt ne sont APPELÉS par rien » ; « Le relevé NOMME ; il ne condamne pas »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre B pour les contrôles du pilot ; ne recouvre ni les forges ni un passage périodique, aucun lanceur ne l'appelle</td></tr><tr><td data-label="Existant examiné">Registre de dette (<code>todo\registre-dette.json</code>, affiché par <code>oracles\hook-ouverture.mjs</code> l. 312-320)</td><td data-label="Citation">« limite(s) assumée(s) », « reste(s) à instruire »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre B pour la dette déclarée</td></tr><tr><td data-label="Existant examiné">Boîte d'entrée bloquante (<code>oracles\hook-ouverture.mjs</code> l. 280-282)</td><td data-label="Citation">« À TRAITER AVANT TOUT AUTRE TRAVAIL de cette session »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre D pour l'ingestion au pilot ; ne recouvre pas l'émission chez le produit</td></tr><tr><td data-label="Existant examiné">Canal descendant (<code>todo\emettre-travaux.mjs</code> l. 24-32)</td><td data-label="Citation">« CE SCRIPT N'ÉCRIT QUE DANS <code>input\00-travaux\</code> DU PRODUIT » ; « IL NE COMMITE RIEN chez le produit »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre D pour le dépôt d'un travail ; ne recouvre pas son déclenchement, il se lance sur demande</td></tr><tr><td data-label="Existant examiné">Recopie de l'héritage à l'ouverture du produit (<code>oracles\hook-ouverture.mjs</code> l. 50-58)</td><td data-label="Citation">« le contrôle RECOPIE lui-même les artefacts déclarés en COPIE IDENTIQUE »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre D pour la descente une fois la session ouverte ; ne recouvre pas l'ouverture elle-même, qui reste un geste humain</td></tr><tr><td data-label="Existant examiné">Études antérieures (synthèses <code>20260903b</code>, <code>20260903c</code>, <code>20260830j</code>, <code>20260830k</code>)</td><td data-label="Citation">« ce qui s'automatise, ce n'est pas le CONTENU d'un retour, c'est l'OBLIGATION d'en produire un et le TRANSPORT »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le cadrage de D ; la décision du 30/08 est restée sans exécution</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
 <section class="chap lire" data-mesure-lecture>
-<h2 id="3-etat-de-l-art-date">3. État de l'art daté</h2>
+<blockquote class="exemple-lecture"><p><strong>Exemple de lecture</strong> : la ligne du canal descendant dit que <code>todo\emettre-travaux.mjs</code> sait déposer un travail chez un produit sans rien y commiter, mais qu'il ne se lance que sur demande : rien ne déclenche la descente.</p></blockquote>
+</section>
+</section>
+<section id="3-etat-de-l-art-date">
+<h2>3. État de l'art daté</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Six sources de moins de vingt-quatre mois disent de régler un automate sur la capacité de revue, de ne jamais supprimer directement depuis un relevé, et de garder l'approbation humaine comme point de contrôle.</p>
 <p>Six sources, toutes de moins de 24 mois. Elles convergent sur trois points : régler le débit d'un automate sur la capacité de revue, ne jamais passer du relevé à la suppression, et garder l'approbation humaine en ancrant l'amélioration à une spécification.</p>
 <ul><li>DORA, « State of AI-assisted Software Development », 2025-09, https://dora.dev/dora-report-2025/ :</li></ul>
 <p>  l'IA amplifie ce que l'organisation est déjà ; le gain vient de la clarté des flux de travail,   pas de l'outil.</p>
@@ -512,7 +553,13 @@ tr[data-tf-empty] td {
 <ul><li>« Human-In-the-Loop Software Development Agents », arXiv 2411.12924, 2024-11 : 433 plans</li></ul>
 <p>  approuvés sur 527, soit 82 % ; l'approbation humaine reste le point de contrôle, elle n'est pas   le goulot.</p>
 <p>Limite déclarée : les sources ont été lues par leurs résumés de recherche le 17/09/2026, pas en texte intégral. La planification d'agents hébergés par l'éditeur de Claude Code n'a été retrouvée que dans des sources tierces ; elle n'entre pas dans le raisonnement au-delà de l'option O4.</p>
-<h2 id="4-options-jeu-ferme-o0-o4">4. Options — jeu fermé O0-O4</h2>
+</section>
+</section>
+<section id="4-options-jeu-ferme-o0-o4">
+<h2>4. Options — jeu fermé O0-O4</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Le pilot décide en moins d'un jour en médiane ; le retard est dans la descente, où 88 couples produit × classe sur 164 ne sont pas atteints. Un seul seuil sur trois est franchi, et l'extension des sondes suffit.</p>
+<blockquote class="termes"><p><strong>Termes</strong> : un gate est une décision que les règles du projet réservent à l'humain, comme une dépense ou une mise en production ; aucune option ne le retire.</p></blockquote>
 <h3>Ce que la mesure établit</h3>
 <p>Les chiffres viennent de l'annexe <code>output\03-etudes\20260917-revue-hebdomadaire-mesure-pas0.md</code>, relevée le 17/09/2026 sur la fenêtre du 20/08 au 17/09.</p>
 <ul><li>Le pilot n'est pas lent. Sur 709 items clos, le délai entre l'entrée et la décision humaine est</li></ul>
@@ -548,7 +595,13 @@ tr[data-tf-empty] td {
 <p>  contre-métrique) et ajoute l'âge des items ouverts. Le reclassement des 737 clôtures en prose   est écarté : coût élevé, aucun gain mesurable attendu, critère de réouverture : une récidive   dont l'item répété est antérieur au 02/09 et introuvable.</p>
 <ul><li><strong>D</strong> : deux gestes mécaniques sont candidats. La relance de descente devient une sonde qui</li></ul>
 <p>  nomme les produits en retard et propose le dépôt d'un lot de travaux. L'émission des retours   repose la décision du 30/08, restée sans exécution. L'ouverture d'une session chez un produit   reste humaine : la lancer depuis le pilot reviendrait à exécuter dans un dépôt frère, ce que le   noyau réserve à un mandat. Aucun gate n'est touché.</p>
-<h2 id="5-verdict">5. Verdict</h2>
+</section>
+</section>
+<section id="5-verdict">
+<h2>5. Verdict</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">L'option O1 est retenue : quatre sondes ajoutées au plan hebdomadaire existant et quatre candidatures déposées, sans objet neuf, avec un plan de revue qui suit trois chiffres jusqu'au 15/10/2026.</p>
+<blockquote class="termes"><p><strong>Termes</strong> : un sidecar est le fichier de candidatures déposé à côté de l'étude sous <code>input\01-candidatures\</code>, puis ingéré au registre.</p></blockquote>
 <ul><li><strong>Option retenue : O1</strong> — étendre le plan de sondes et le relevé d'ouverture existants, sans</li></ul>
 <p>  objet neuf.</p>
 <ul><li><strong>Coût</strong> : complexité moyen · durée court ; tokens : un passage de sonde par semaine, déjà payé,</li></ul>
@@ -569,6 +622,7 @@ tr[data-tf-empty] td {
 <p>    grandeur à optimiser n'a été nommée, et la mesure n'en a fait ressortir aucune. L'objet est     retiré, et non servi en silence.</p>
 <ul><li>Questions du demandeur rejouées. Un process hebdomadaire est-il opportun ? Oui sous la forme</li></ul>
 <p>    de sondes, non sous la forme d'une revue rédigée. Le code mort ? 6 objets, relevé câblé, rien     de supprimé. La façon dont les items ont été traités et appliqués ? Traités en moins d'un     jour ; appliqués chez les produits pour 76 couples sur 164. Les prochaines actions ? Les 4     candidatures. Moins d'interventions humaines ? Le geste répété est l'ouverture de session     chez les produits ; il reste humain, et la relance le rend visible et ciblé. L'accélération ?     Elle se joue sur la descente, pas sur la décision.</p>
+</section>
 </section>
     </main>
 
@@ -1255,7 +1309,7 @@ tr[data-tf-empty] td {
 <!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js — copie du socle digit-ai-page-html/assets/find-in-page.js,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="find-in-page.js" data-empreinte="sha256:c12d95c744a55817895314f71685d960ff1da00adfedbaf7ce4de305ea3956c6">
+<script data-composant="find-in-page.js" data-empreinte="sha256:721208e18a0c5de4899a498c8ebef8ebbb6677155f13a27d479988d7142ff908">
 /* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
  *
  * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
@@ -1332,34 +1386,82 @@ tr[data-tf-empty] td {
     try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
   }
 
+  // Le BLOC d'un nœud texte : l'ancêtre le plus proche qui n'est pas un élément EN LIGNE. Dans un
+  // schéma SVG, le bloc est le <text> qui le porte (un <tspan> y est en ligne). Une phrase coupée
+  // par une mise en gras, un code ou un lien reste ainsi UN texte à fouiller (TF-1342).
+  function blocDe(el, root) {
+    if (el.namespaceURI === SVG_NS) {
+      var t = el.closest ? el.closest('text') : null;
+      return t && root.contains(t) ? t : el;
+    }
+    var b = el;
+    while (b !== root && b.parentNode && b.nodeType === 1) {
+      var d = getComputedStyle(b).display;
+      if (d !== 'inline' && d !== 'contents') break;
+      b = b.parentNode;
+    }
+    return b;
+  }
+
   // Surligne les correspondances dans root et renvoie le nombre d'occurrences. Enveloppe les
   // nœuds texte trouvés, sans remplacer aucun élément (TF-1340) ; dans un texte SVG, l'enveloppe
   // est un <tspan>, que SVG peint, et non un <mark>, qu'il ignore (TF-1353). Les noms d'éléments
   // se comparent sans casse : le <style> et le <script> d'un SVG s'écrivent en minuscules.
+  //
+  // TF-1342 (lot Produit-64 20260923b, RD-19) — LE MOTIF S'APPLIQUAIT NŒUD TEXTE PAR NŒUD TEXTE :
+  // « application <strong>laissée arrêtée</strong> » figurait dans le texte de la page et restait
+  // introuvable (3 occurrences dans le texte, 2 comptées, mesuré sur un livrable servi). Le motif
+  // se cherche désormais dans le texte CONTINU d'un bloc (les nœuds texte consécutifs d'un même
+  // paragraphe, cellule, bloc de code, titre…), puis chaque correspondance est posée par PLAGES sur
+  // les nœuds qu'elle traverse : une occurrence à cheval sur trois nœuds donne trois enveloppes
+  // et compte UNE fois.
   function highlight(root, re) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    var nodes = [], n, count = 0;
-    while ((n = walker.nextNode())) nodes.push(n);
-    for (var k = 0; k < nodes.length; k++) {
-      var tn = nodes[k], parent = tn.parentNode;
+    var groupes = [], courant = null, n;
+    while ((n = walker.nextNode())) {
+      var parent = n.parentNode;
       if (!parent || /^(MARK|SCRIPT|STYLE)$/i.test(parent.nodeName)
-          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) continue;
-      var txt = tn.nodeValue; re.lastIndex = 0;
-      if (!re.test(txt)) continue; re.lastIndex = 0;
-      var svg = parent.namespaceURI === SVG_NS;
-      var frag = document.createDocumentFragment(), last = 0, m;
-      while ((m = re.exec(txt))) {
-        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
-        var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
-        mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
-        mk.textContent = m[0];
-        frag.appendChild(mk);
-        count++;
-        last = m.index + m[0].length;
+          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) {
+        courant = null;           // un nœud écarté coupe le texte continu
+        continue;
+      }
+      var bloc = blocDe(parent, root);
+      if (!courant || courant.bloc !== bloc) { courant = { bloc: bloc, noeuds: [] }; groupes.push(courant); }
+      courant.noeuds.push(n);
+    }
+    var count = 0;
+    for (var g = 0; g < groupes.length; g++) {
+      var noeuds = groupes[g].noeuds, texte = '', debuts = [];
+      for (var k = 0; k < noeuds.length; k++) { debuts.push(texte.length); texte += noeuds[k].nodeValue; }
+      var plages = [], m;
+      re.lastIndex = 0;
+      while ((m = re.exec(texte))) {
+        if (m[0].length) plages.push([m.index, m.index + m[0].length]);
         if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
       }
-      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
-      parent.replaceChild(frag, tn);
+      if (!plages.length) continue;
+      count += plages.length;
+      for (var j = 0; j < noeuds.length; j++) {
+        var tn = noeuds[j], txt = tn.nodeValue, d0 = debuts[j], d1 = d0 + txt.length;
+        var morceaux = [];
+        for (var p = 0; p < plages.length; p++) {
+          var a = Math.max(plages[p][0], d0), b = Math.min(plages[p][1], d1);
+          if (a < b) morceaux.push([a - d0, b - d0]);
+        }
+        if (!morceaux.length) continue;
+        var svg = tn.parentNode.namespaceURI === SVG_NS;
+        var frag = document.createDocumentFragment(), last = 0;
+        for (var q = 0; q < morceaux.length; q++) {
+          if (morceaux[q][0] > last) frag.appendChild(document.createTextNode(txt.slice(last, morceaux[q][0])));
+          var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
+          mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
+          mk.textContent = txt.slice(morceaux[q][0], morceaux[q][1]);
+          frag.appendChild(mk);
+          last = morceaux[q][1];
+        }
+        if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+        tn.parentNode.replaceChild(frag, tn);
+      }
     }
     return count;
   }

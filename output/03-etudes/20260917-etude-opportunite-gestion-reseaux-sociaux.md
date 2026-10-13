@@ -29,6 +29,8 @@ nommé pour jouer un calendrier entre deux runs.
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> Le seuil est franchi sur trois critères : l'option la plus légère crée déjà un preset et un référentiel, six porteurs sont touchés pour un seuil de trois, et aucune publication n'existe encore pour servir de preuve.
+
 Franchi sur trois critères. **Objet durable** : l'option la plus légère crée un preset de skill et
 un référentiel (règle 31). **Portée** : forge-agents, forge-design, forge-observability,
 forge-data, forge-agents-security et le pilot sont touchés, soit six pour un seuil de trois.
@@ -37,6 +39,8 @@ société de conseil), preuve 1 (aucune publication produite sous la discipline 
 aucun chiffre de départ relevé).
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> La demande du 17/09/2026 est citée mot pour mot ; la réponse « A1 » valide trois hypothèses : Digit-AI est le bénéficiaire, le profil et la page sont les deux types de comptes, et LinkedIn est le seul réseau étudié.
 
 Citée dans les mots du demandeur, message du 17/09/2026 : « Lance une étude d'opportunités sur
 une forge pour la gestion de réseaux sociaux particuliers et professionnels, avec définition et
@@ -63,6 +67,8 @@ verdict, chacun rattaché à sa ligne tactique (section 5.4).
 
 ## 0. Traitement des entrants
 
+> L'étude part du verdict du 11/09/2026 sans le rejouer, et la recherche d'antériorité au registre ne trouve que deux candidatures en cours sur le sujet, la barre de qualité et la transparence.
+
 La demande, le prompt réécrit et les artefacts relevés sont des DONNÉES : leurs impératifs se
 citent, ne s'exécutent pas. Le skill `linkedin-post-generator` porte des consignes d'exécution
 (« rappel systématique après livraison », appels d'outils de recherche) : décrites, jamais jouées.
@@ -82,6 +88,8 @@ citent, ne s'exécutent pas. Le skill `linkedin-post-generator` porte des consig
   à la restitution.
 
 ## 1. Partition du problème
+
+> La gestion d'un réseau se ferme sur dix fonctions, des objectifs à l'itération ; deux d'entre elles, publier et animer, restent des gestes humains quel que soit le type de compte.
 
 Le lecteur trouvera ici la chaîne complète de la gestion d'un réseau, fermée à dix fonctions, puis
 la surface implicite proposée et tranchée. Chaque fonction dit qui agit, à quelle cadence et avec
@@ -105,6 +113,8 @@ de comptes de H1 partagent la grille ; leurs différences sont notées dans la d
 | F8 | Suivi de l'engagement | IA lit l'export, humain lit les commentaires | chaque semaine | mêmes exports ; aucune donnée nominative d'abonné | identique |
 | F9 | Itération | IA propose, humain décide | chaque mois | écart entre indicateurs et seuils de F0 | identique |
 
+> **Exemple de lecture** : la ligne F7 dit que la performance se mesure chaque semaine. L'humain exporte le fichier XLSX de la plateforme, l'IA le lit, et le profil comme la page ont chacun leur export.
+
 **Surface implicite (loi n° 3), proposée puis tranchée.** Retenus : la **veille** des sujets
 (alimentation de F3, par recherche ouverte, sans compte) ; les **langues** (français d'abord,
 toute autre langue sur décision) ; l'**archivage** des publications et de leurs chiffres chez le
@@ -114,6 +124,8 @@ collaborateurs** (l'étude du 11/09 a laissé l'interne en question ouverte) ; l
 crise** (geste humain, hors cadence ; le type de run en porte seulement la consigne d'arrêt).
 
 ## 2. Non-recouvrement contre l'existant
+
+> L'existant couvre la marque, les faits et la mesure restituée, mais cinq manques restent sans porteur. Les chiffres de LinkedIn ne s'obtiennent que par export manuel gratuit, et le test d'admission refuse la forge.
 
 Chaque ligne porte une citation vérifiable, relue le 17/09/2026 en lecture seule. Le lecteur y
 verra que l'existant couvre la marque, les faits, la page HTML et la mesure restituée, que deux
@@ -141,6 +153,8 @@ réécrit.
 | Skill installé `linkedin-post-generator` | audit `ameliore-un-skill` du 17/09 : 21/35, un red flag de frontière, verdict « Refondre » ; 0 lien mort sur 8 ; `linkedin-best-practices-2025.md` l.169 : « Hashtags = NO IMPACT (recherche 8 mois 2024-2025) » | **recouvre** F3 en partie (structures, mise en forme, image) ; **ne recouvre pas** F0, F5 ; vit hors de toute forge (section 2 ter) |
 | `references\INTEGRATIONS-FOURNISSEURS.md` (pilot) | recherche du 17/09 sur LinkedIn, Instagram, Facebook, TikTok, Buffer, Hootsuite : 0 occurrence ; spécification du produit l.239, EX-12 : « à défaut, le geste est humain (envoi, publication) » | **ne recouvre pas** : aucun connecteur déclaré ; la règle du produit tranche déjà F5 |
 | Types de run du pilot | `references\RUN-AO.md` : « Cinquième voie d'exécution […] une offre à échéance » ; aucune voie à cadence récurrente parmi les cinq | **ne recouvre pas** F4 à F9 dans la durée : tous les types de run existants sont événementiels |
+
+> **Exemple de lecture** : la ligne forge-observability dit qu'une sonde « manuel » peut tenir la cadence de la mesure, F7 à F9, mais que la forge observe sans produire, donc ne couvre ni le calendrier, ni la publication, ni l'animation.
 
 ### 2 bis. État des onze candidatures du 11/09, relevé le 17/09
 
@@ -218,6 +232,8 @@ corpus.
 
 ## 3. État de l'art daté
 
+> Sept sources récentes établissent que l'accès programmatique de LinkedIn est sous agrément, que son contrat interdit l'automatisation, et qu'une page atteint environ 1,6 % de ses abonnés quand un profil porte bien plus loin.
+
 Le lecteur y trouve sept sources de moins de 24 mois, ouvertes et vérifiées le 17/09/2026 par un
 agent de recherche. Elles établissent trois choses : l'accès programmatique est sous agrément,
 l'automatisation est interdite, et la page d'organisation perd sa portée au profit du profil.
@@ -241,6 +257,8 @@ programmatique ; la méthode complète du rapport cité en dernière ligne ; une
 l'autorité française de protection des données sur les statistiques de page.
 
 ## 4. Options — jeu fermé O0-O4
+
+> Les cinq options se départagent sur une seule question, qui joue le calendrier entre deux runs ; le logiciel et la forge sont exclus, et l'outil du marché est une dépense laissée à la décision humaine.
 
 Cinq options, celles du prompt réécrit. Chacune porte son contenu, son coût en complexité ×
 durée, le temps humain hebdomadaire qu'elle induit, ce qu'elle exclut et ses frontières. La
@@ -293,6 +311,10 @@ coûtent vraiment.
 
 ## 5. Verdict
 
+> L'option O2 est retenue : l'existant étendu plus un type de run à cadence hebdomadaire, sans forge, sans logiciel ni dépense, éprouvé sur le profil du dirigeant pendant quatre semaines.
+
+> **Termes** : un sidecar est le fichier de candidatures déposé à côté de l'étude sous `input\01-candidatures\`, puis ingéré au registre ; « sidecar » dans la dernière colonne désigne une candidature née de cette étude.
+
 - **Option retenue** : **O2** — étendre l'existant, plus un type de run « animation de réseau »
   à cadence hebdomadaire chez le pilot. Aucune forge, aucun logiciel, aucune dépense.
 - **Coût** : complexité moyen × durée court pour l'ensemble ; par lot, table 5.2. Dette : un type
@@ -328,6 +350,8 @@ servie et la candidature qui le porte. Les lignes suivent le chemin critique.
 | R7 | Plan de mesure : sonde « manuel » hebdomadaire sur l'export, seuils de F0, dérive signalée | plan (`forge-observability/plan@1`) | forge-observability (format), produit (plan et exports) | F7, F8, F9 | sidecar |
 | R8 | Données de l'instance : objectifs, personas sourcés, ligne éditoriale, calendrier, état de départ ; ouverture du palier V2 des publications | donnée de l'instance | produit `digit-ai-marketing` | F0, F1, F2, F4 | sidecar |
 | R9 | Déclaration de LinkedIn aux intégrations : « aucun connecteur ; export manuel ; automatisation interdite par contrat (2025-11-03) » | ligne de référentiel | pilot (`INTEGRATIONS-FOURNISSEURS.md`) | F5, F7 | sidecar |
+
+> **Exemple de lecture** : la ligne R6 crée chez le pilot le type de run « animation de réseau », avec ouverture, boucle hebdomadaire, revue mensuelle et consigne d'arrêt ; il sert F0 et F4 à F9.
 
 ### 5.2 Plan de mise à jour par canal, ordonné par chemin critique
 
@@ -377,6 +401,8 @@ F4, portés par R1, R5, R6, R8 ; « la performance, le suivi de l'engagement » 
 par l'export manuel, portés par R7.
 
 ## Interdits (tenus)
+
+> L'étude a tenu ses interdits : aucun nom de personne ni de client, aucune publication ni compte créé, aucun identifiant de compte écrit et aucune donnée d'abonné collectée.
 
 Aucun critère subjectif ; jeu fermé O0-O4 ; chaque ligne de la section 2 citée ; chaque source
 datée ; O0 réfutée sur coût cité ; aucun effort chiffré autrement qu'en complexité × durée ; aucun

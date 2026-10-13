@@ -24,12 +24,16 @@ pas une réussite.
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> Le seuil est franchi parce que toute option autre que le statu quo crée ou étend un référentiel, un gabarit ou un câblage de contrôle, chez quatre porteurs pour un seuil de trois.
+
 Franchi sur deux critères. **Objet durable** : toute option autre que le statu quo crée ou étend un
 référentiel (catalogue, typologie), un gabarit exécutable ou un câblage de contrôle, objets que la
 règle 31 soumet à étude. **Portée** : le pilot, forge-design (socle HTML), forge-agents (porteur de
 quality-oracles) et les produits par l'héritage sont touchés, quatre porteurs pour un seuil à trois.
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> La demande du 14/09/2026 est citée mot pour mot ; sa lecture validée veut qu'un document parte juste la première fois et que chaque retour rende plus justes les documents suivants.
 
 Citée dans les mots du demandeur, message du 14/09/2026 : « comment anticiper, via un outil de
 conception, spécialisé par types de documents, types de contenus, types de lecteurs cibles, afin de
@@ -51,6 +55,8 @@ aurait évité que les contrôles existants n'évitent pas ; **opérationnel**, 
 désigne.
 
 ## 0. Traitement des entrants
+
+> Six points de départ relevés le 14/09/2026 montrent que la conception d'un document est écrite comme doctrine, jamais jouée avant l'écriture, et que trois classes du sujet récidivent à 100 %.
 
 La proposition instruite est une DONNÉE : le message du demandeur et l'analyse L99 qui l'a réécrit
 (`output\03-etudes\20260914-L99-conception-documentaire-amont.md`). Les lots de retours lus pour la
@@ -74,6 +80,8 @@ Points de départ imposés par le prompt, tous relevés le 14/09/2026 :
 
 ## 1. Partition du problème
 
+> Le sujet se découpe en trois objets disjoints par leur moment : la conception avant l'écriture, l'épreuve des gabarits que personne n'a lus, et la boucle qui propage chaque retour.
+
 Trois objets, disjoints par leur moment et par leur mesure ; chaque option de la section 4 se
 rattache à l'un d'eux.
 
@@ -96,6 +104,8 @@ vocabulaire qu'ils n'ont pas, et leur contexte de lecture — jamais un personna
 
 ## 2. Non-recouvrement contre l'existant
 
+> Treize mécanismes existants portent chacun un morceau de la demande, mais aucun ne fixe le lecteur et le type de contenu d'un document avant qu'il soit écrit.
+
 **Mode de lecture** : une ligne par mécanisme existant qui pourrait déjà porter la demande ; la
 citation localise ce qu'il fait ; la dernière colonne dit s'il recouvre A, B ou C.
 
@@ -115,7 +125,11 @@ citation localise ce qu'il fait ; la dernière colonne dit s'il recouvre A, B ou
 | Candidature des défauts semés | TF-1079 : une instance semée par classe dans un livrable témoin | recouvre B par la preuve, pas par la conception |
 | Candidature du contrôle à la porte | TF-1076 : `gabarit-famille-manquante` bloquant au geste | recouvre une part de A (famille résolue avant l'écriture) |
 
+> **Exemple de lecture** : la ligne « Oracle de lecture par un tiers » dit qu'il juge bien le lecteur sans contexte, mais après l'écriture et sur invocation seulement, d'où sa classe qui récidive 7 fois sur 7.
+
 ## 3. État de l'art daté
+
+> Dix sources récentes confirment que penser le lecteur avant d'écrire aide, que les typologies de contenu reposent encore sur DITA, et que l'absence de retour mesure une sortie, pas une réussite.
 
 Dix sources publiées après le 14/09/2024, ouvertes le 14/09/2026 par une recherche déléguée (modèle
 Sonnet, défaut de routage du contrat d'interface §4, escalade : aucune). Limite déclarée par la
@@ -138,6 +152,8 @@ et sa limite. L'axe A instruit l'objet A, l'axe B la typologie des contenus, l'a
 | C — mesure | Alibhai, 2026-03-21, blog Supportbench | le ressenti diverge de la réussite de la tâche ; pas de cadre validé |
 | C — mesure | Fechter, 2026-03-16, TechnicalWriterHQ | « a page can be popular and wrong at the same time » ; propose le délai de correction après retour comme métrique de boucle |
 
+> **Exemple de lecture** : la ligne Isaacs, du 28/08/2026, rattachée à l'axe C, dit qu'un client qui abandonne compte comme une sortie sans être une réussite ; sa limite est d'être centrée sur le support.
+
 Références normatives plus anciennes, citées comme telles et hors du compte des dix : ISO
 24495-1:2023, langage clair (quatre principes : pertinent, trouvable, compréhensible, utilisable ;
 page iso.org non ouverte, contenu confirmé par une source contributrice) ; OASIS DITA 1.3, standard du
@@ -153,6 +169,8 @@ pour l'usage établi). Pour C, les sources convergent sur un point que la demand
 l'absence de retour mesure une sortie, pas la réussite du lecteur (preuve faible à moyenne).
 
 ## 4. Options — jeu fermé O0-O4
+
+> Sur 20 griefs réels, 11 relèvent de la seule conception amont, au-dessus du seuil de 6 fixé d'avance : le statu quo et l'outil neuf sont réfutés, la simple extension de l'existant est insuffisante.
 
 ### Ce que la mesure a donné
 
@@ -201,6 +219,8 @@ lecteur) ; et le **nombre de récidives** des classes closes du sujet.
 
 ## 5. Verdict
 
+> L'option O3 est retenue sous réserve, jouée par étapes : d'abord une fiche courte remplie avant chaque document et deux oracles joués à l'écriture, puis l'épreuve des gabarits et la propagation des retours.
+
 - **Option retenue : O3**, sous réserve, jouée par étapes : A d'abord (fiche de conception amont et
   câblage des deux oracles), puis B et C sur les candidatures qui les portent déjà.
 - **Coût** : complexe × moyen pour l'ensemble ; l'étape A seule est moyen × moyen. Coût par document
@@ -229,6 +249,10 @@ lecteur) ; et le **nombre de récidives** des classes closes du sujet.
   jamais le silence pris pour une réussite.
 
 ## Annexe — mesure et rétro-test
+
+> Les vingt griefs du rétro-test sont listés avec leur lot source et leur ligne, chacun classé selon la phase qui l'aurait attrapé : 11 par la conception amont seule, 5 par rien.
+
+> **Termes** : le grain d'un jeu de données dit ce que représente une de ses lignes ; le grief 20 demande justement de l'appeler « granularité » devant ce lecteur.
 
 **Mode de lecture** : une ligne par grief, dans l'ordre de sélection ; la source est le lot de
 retours et sa ligne ; la dernière colonne est le classement de la session déléguée. Les produits sont
@@ -261,6 +285,8 @@ désignés par leur pseudonyme.
 > documentaire amont avait existé — `amont`, `aval` ou `aucun`. C'est une ÉTIQUETTE posée par la
 > session déléguée, jamais un score : elle ne se calcule pas et n'ordonne pas ce tableau, qui se
 > lit dans l'ordre de sélection des griefs.
+
+> **Exemple de lecture** : la ligne 2 cite un retour sur une fiche sécurité qui réclame une deuxième colonne plus large ; elle est classée « amont », parce qu'un format dérivé du volume de contenu l'aurait évité.
 
 Décompte : amont seul 11, oracle seul 2, les deux 2, aucun 5. Mesure de départ détaillée par famille
 au § « Ce que la mesure a donné » ; règle de comptage : une ligne de la section « Retours sur les

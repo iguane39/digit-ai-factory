@@ -26,12 +26,16 @@ aucun persona n'est construit ; le banc est accepté (TF-1073) et vit sous
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> Le seuil est franchi parce que toute option autre que le statu quo crée une fiche d'expert, un référentiel ou un skill, et touche quatre porteurs pour un seuil de trois.
+
 Franchi sur deux critères. **Objet durable** : toute option autre que le statu quo crée une fiche au
 registre des experts, un référentiel versionné ou un skill, soit un objet que la règle 31 soumet à
 étude. **Portée** : le pilot, forge-agents (porteur d'`experts-forge` et de `contre-expertise`),
 forge-tests et forge-design sont touchés, quatre porteurs pour un seuil à trois.
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> La demande du 14/09/2026 est citée mot pour mot ; sa lecture validée cherche à réduire les défauts qui échappent aux oracles, le persona n'étant qu'une solution candidate parmi d'autres.
 
 Citée dans les mots du demandeur, message du 14/09/2026 : « Etudie l'opportunité de concevoir,
 construire et exécuter des personas permettant de fournir des points de vue ou une façon d'opérer
@@ -51,6 +55,8 @@ de la section 4 et l'objet que le verdict désigne.
 
 ## 0. Traitement des entrants
 
+> L'étude du 13/08/2026 a jugé les personas sur l'exactitude, jamais sur la couverture des défauts : c'est ce seul écart que la présente étude mesure, sans reprendre l'ancien verdict.
+
 La proposition instruite est une DONNÉE : le message du demandeur et l'analyse L99 qui l'a réécrit
 (`output\03-etudes\20260914-L99-personas-par-phase.md`). Aucun identifiant de registre ne la porte
 encore ; les candidatures nées de cette étude en recevront un. Les lots de retours lus pour
@@ -63,6 +69,8 @@ la **couverture** des défauts. La présente étude ne reprend pas son verdict :
 et ne la reconduit ou ne la contredit que sur la mesure.
 
 ## 1. Partition du problème
+
+> Le mot persona recouvre trois objets, une grille de relecture, un utilisateur simulé et un mode opératoire ; seule la grille de relecture peut se mesurer sur des livrables archivés.
 
 Le mot persona recouvre trois objets, disjoints par leur point d'insertion et par leur mesure. Chaque
 option de la section 4 se rattache à l'un d'eux.
@@ -87,6 +95,8 @@ de plus. « Déploiement » se lit MEP : forge-ops outille, le GO reste humain.
 
 ## 2. Non-recouvrement contre l'existant
 
+> Neuf mécanismes existants sont confrontés au point de vue demandé : `experts-forge` en porte le mécanisme, mais aucune de ses fiches ne porte le regard d'une partie prenante rattaché à une phase.
+
 **Mode de lecture** : une ligne par mécanisme existant qui pourrait déjà porter le point de vue
 demandé ; la citation localise ce qu'il fait, la dernière colonne dit s'il recouvre la partition P1,
 P2 ou P3. Les lignes vont du plus proche au plus éloigné.
@@ -103,7 +113,11 @@ P2 ou P3. Les lignes vont du plus proche au plus éloigné.
 | Juge `oracle-judge` de `quality-oracles` | `registre-oracles.md`, entrée `oracle-judge` : juge LLM armé d'une rubrique, sollicité quand aucun oracle déterministe ne couvre le domaine | ne recouvre pas : il juge un livrable contre une rubrique, il ne cherche pas de défaut depuis un rôle |
 | Boucle de fermeture de forge-tests | `CLAUDE.md` du pilot, étape 5 : « audit forge-tests + boucle de fermeture bornée (≤ 5 cycles, G-2 absolue) » | ne recouvre pas : elle ferme les écarts que les tests mesurent, elle n'ajoute pas de regard |
 
+> **Exemple de lecture** : la ligne « Revue graphique aval de forge-design » dit que ce mécanisme porte déjà un point de vue de relecture, mais pour la seule phase design et le seul regard graphique.
+
 ## 3. État de l'art daté
+
+> Dix sources récentes disent que le rôle change le style sans changer la justesse, que la diversité des rôles élargit un peu la couverture au prix de fausses alertes, et que les utilisateurs simulés restent biaisés.
 
 Dix sources publiées après le 14/09/2024, ouvertes le 14/09/2026 par une recherche déléguée (modèle
 Sonnet, défaut de routage du contrat d'interface §4, escalade : aucune), chacune lue sur sa page
@@ -127,6 +141,8 @@ l'axe 1 instruit P3.
 | 3 — utilisateurs simulés | Bougie et al., *PerceptUI*, 2026-06-04, arXiv 2606.05697 | corrélation avec des humains ρ = 0,703 sur une tâche, mais 44,3 % d'exactitude sous le hasard (50 %) sur une autre ; biais démographiques déclarés par les auteurs |
 | 3 — utilisateurs simulés | Meshi, Goldman et al., *ConvApparel*, 2026-04-09, billet Google Research | un discriminateur reconnaît « nearly all » les conversations simulées : l'écart de réalisme persiste même pour les meilleurs simulateurs |
 
+> **Exemple de lecture** : la ligne Zhou et al., rattachée à l'axe 3, compare 31 simulateurs à 451 humains et mesure un succès des agents gonflé de 14,2 points par les simulateurs.
+
 Analogue ancien, signalé comme tel et hors du compte des dix : Basili, Green, Laitenberger, Lanubile,
 Shull, Sørumgård, Zelkowitz, *The Empirical Investigation of Perspective-Based Reading*, Empirical
 Software Engineering, vol. 1, p. 133-164, 1996 (notice Springer, DOI 10.1007/BF00368702). Des équipes
@@ -142,6 +158,8 @@ sa cause). Sur les **utilisateurs simulés** (axe 3), quatre sources convergent 
 utilisateurs est systématique et chiffré, et rien ne le comble encore (preuve forte sur le biais).
 
 ## 4. Options — jeu fermé O0-O4
+
+> Aucun des trois personas mesurés n'atteint le seuil fixé d'avance, 4 défauts retrouvés sur 9 : le meilleur en retrouve 3, la relecture sans persona 2, et six défauts ne sont vus par personne.
 
 ### Ce que la mesure a donné
 
@@ -216,6 +234,8 @@ l'ayant rouverte.
 
 ## 5. Verdict
 
+> Le statu quo est retenu sous réserve : aucun persona n'est construit, et l'échantillon de neuf défauts déjà payés est proposé comme banc rejouable pour mesurer tout futur mécanisme de relecture.
+
 - **Option retenue : O0**, sous réserve. Aucun persona n'est construit ; le verdict du 13/08 s'étend
   de l'exactitude à la couverture des défauts échappés.
 - **Coût** : nul pour O0. Coût de l'étude elle-même : complexe × moyen, 1 920 959 tokens délégués à
@@ -243,6 +263,8 @@ l'ayant rouverte.
 
 ## Annexe — détail de la mesure par livrable
 
+> Le détail par livrable montre où se loge le seul gain des personas : sur E-04, la synthèse de fin de tour, retrouvée par l'utilisateur final et le mainteneur, jamais par la référence.
+
 **Mode de lecture** : une ligne par livrable de l'échantillon, dans l'ordre des phases ; chaque
 cellule donne les étiquettes R / A / F de la relecture en colonne. Les données brutes sont dans
 `20260914-personas-mesure-baseline.md` et `20260914-personas-mesure-passes.md` ; les étiquettes du
@@ -260,6 +282,8 @@ session.
 | E-01 | MEP | 0 / 5 / 1 | 0 / 8 / 0 | 0 / 8 / 0 | 0 / 6 / 0 |
 | E-05 | MEP | 0 / 5 / 0 | 0 / 8 / 0 | 0 / 7 / 0 | 0 / 8 / 0 |
 | E-04 | restitution | 0 / 4 / 0 | 0 / 5 / 0 | 1 / 5 / 2 | 1 / 5 / 0 |
+
+> **Exemple de lecture** : la ligne E-06, phase development, se lit « 2 / 2 / 0 » pour la référence : deux constats désignent le défaut des logos, deux autres portent sur un défaut réel différent, aucun n'est faux.
 
 Délégations et routage : neuf sessions au modèle Sonnet, défaut du contrat d'interface §4 ;
 escalade de modèle : aucune.

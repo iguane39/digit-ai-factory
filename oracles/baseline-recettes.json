@@ -511,8 +511,8 @@
   "vu_le": "2026-10-02"
  },
  "scripts/generer-page-etude.mjs": {
-  "cas": 26,
-  "vu_le": "2026-10-12"
+  "cas": 28,
+  "vu_le": "2026-10-13"
  },
  "scripts/generer-remplacements-historique.test.mjs": {
   "cas": 11,

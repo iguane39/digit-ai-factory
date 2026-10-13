@@ -148,6 +148,8 @@ couverte et dit ce qui reste. Les lignes sont rangées dans l'ordre des partitio
 | Skill `qualifie-l-entrant`, mode rétro-modèle | `references\RUN-CONSEIL.md` l.88-89 : « Si la compréhension complète d'un existant est requise : **mode rétro-modèle** (`RETRO-MODELE.md`, oracle RM1-RM5) » | **recouvre P1** pour la lecture de l'existant — à composer tel quel |
 | Répartition des skills entre forges | arborescence `.claude\skills` relevée le 19/09 : forge-agents en porte 18, dont `digit-ai-page-html`, `quality-oracles`, `pilote-de-mission`, `contre-expertise` ; forge-conception 4 ; forge-design 4 ; forge-audit et forge-data aucun | **tranche P7** — les skills transverses et le socle de page vivent chez forge-agents |
 
+> **Exemple de lecture** : la ligne « forge-audit — schéma des actions » dit que le contrat amont des remédiations existe et se valide, mais qu'il ne porte ni gain, ni cible, ni horizon, et que son identifiant reste borné à une seule dimension sur dix-huit.
+
 En une phrase : l'amont (l'audit et sa donnée), l'aval (lotir, planifier, remettre) et le socle de
 page existent ; ce qui n'existe nulle part, ce sont **trois verbes** — joindre, juger, rendre un
 plan d'amélioration — et la méthode écrite qui les nourrit.

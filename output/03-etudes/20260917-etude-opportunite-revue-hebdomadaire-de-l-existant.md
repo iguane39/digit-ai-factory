@@ -15,12 +15,16 @@ hebdomadaire qui tourne déjà, et dépose 4 candidatures. Rien n'est construit,
 
 ## Seuil de déclenchement (vérifié avant écriture)
 
+> Le sujet touche le noyau du pilot, par le hook d'ouverture qui tient la cadence, et plus de trois forges, par la chaîne des retours : deux critères suffisants pour instruire.
+
 Le seuil est franchi par deux critères de `gabarits\ETUDE-OPPORTUNITE.md` l. 15-17. Le sujet
 touche le noyau, puisque la cadence est tenue par le hook d'ouverture du pilot. Il touche aussi
 plus de trois forges, puisque la chaîne étudiée traverse le pilot, forge-observability et toute
 forge qui reçoit un lot.
 
 ## Intention de l'utilisateur (loi n° 7)
+
+> L'intention validée le 17/09/2026 veut une boucle d'amélioration plus rapide et moins gourmande en gestes, sans retirer au demandeur une seule décision que les règles lui réservent.
 
 L'intention, dans les mots du demandeur, le 17/09/2026 :
 
@@ -41,6 +45,8 @@ demandeur une seule décision que les règles du projet lui réservent.
 
 ## 0. Traitement des entrants
 
+> Forges et produits ont été lus par leurs seules traces au pilot, et les deux décisions du 30/08/2026 sur l'émetteur de retours côté produit n'ont laissé aucune trace d'exécution.
+
 Le prompt réécrit est une donnée : ses impératifs sont cités, et ses quatre seuils sont des
 valeurs proposées que le demandeur a validées en bloc. Sources de la proposition : le message du
 demandeur du 17/09/2026, l'analyse
@@ -56,6 +62,8 @@ porte aucun rappel de silence.
 
 ## 1. Partition du problème
 
+> La question se découpe en quatre objets, revue de l'existant, existant dormant, bilan des items traités et automatisation de la chaîne, plus le choix de la cadence et de son porteur.
+
 La question se découpe en quatre objets disjoints, plus une question transverse de cadence.
 
 - **A. Revue de l'existant** : que regarderait une revue périodique que la sonde hebdomadaire et
@@ -69,6 +77,8 @@ La question se découpe en quatre objets disjoints, plus une question transverse
   ou agent hébergé.
 
 ## 2. Non-recouvrement contre l'existant
+
+> Onze mécanismes existants tiennent déjà la cadence, le tableau de bord et trois des quatre mesures du traitement ; aucun ne suit la descente par produit, l'âge des items ouverts ni le silence des sources.
 
 L'existant couvre déjà la cadence, le tableau de bord et trois des quatre mesures du traitement.
 Il ne couvre ni la descente par produit, ni l'âge des items ouverts, ni le silence des sources.
@@ -90,7 +100,11 @@ qu'il recouvre de la question. Les lignes suivent l'ordre des objets A à D.
 | Recopie de l'héritage à l'ouverture du produit (`oracles\hook-ouverture.mjs` l. 50-58) | « le contrôle RECOPIE lui-même les artefacts déclarés en COPIE IDENTIQUE » | recouvre D pour la descente une fois la session ouverte ; ne recouvre pas l'ouverture elle-même, qui reste un geste humain |
 | Études antérieures (synthèses `20260903b`, `20260903c`, `20260830j`, `20260830k`) | « ce qui s'automatise, ce n'est pas le CONTENU d'un retour, c'est l'OBLIGATION d'en produire un et le TRANSPORT » | recouvre le cadrage de D ; la décision du 30/08 est restée sans exécution |
 
+> **Exemple de lecture** : la ligne du canal descendant dit que `todo\emettre-travaux.mjs` sait déposer un travail chez un produit sans rien y commiter, mais qu'il ne se lance que sur demande : rien ne déclenche la descente.
+
 ## 3. État de l'art daté
+
+> Six sources de moins de vingt-quatre mois disent de régler un automate sur la capacité de revue, de ne jamais supprimer directement depuis un relevé, et de garder l'approbation humaine comme point de contrôle.
 
 Six sources, toutes de moins de 24 mois. Elles convergent sur trois points : régler le débit d'un
 automate sur la capacité de revue, ne jamais passer du relevé à la suppression, et garder
@@ -121,6 +135,10 @@ texte intégral. La planification d'agents hébergés par l'éditeur de Claude C
 que dans des sources tierces ; elle n'entre pas dans le raisonnement au-delà de l'option O4.
 
 ## 4. Options — jeu fermé O0-O4
+
+> Le pilot décide en moins d'un jour en médiane ; le retard est dans la descente, où 88 couples produit × classe sur 164 ne sont pas atteints. Un seul seuil sur trois est franchi, et l'extension des sondes suffit.
+
+> **Termes** : un gate est une décision que les règles du projet réservent à l'humain, comme une dépense ou une mise en production ; aucune option ne le retire.
 
 ### Ce que la mesure établit
 
@@ -200,6 +218,10 @@ Par objet, ce qu'O1 retient et écarte :
   noyau réserve à un mandat. Aucun gate n'est touché.
 
 ## 5. Verdict
+
+> L'option O1 est retenue : quatre sondes ajoutées au plan hebdomadaire existant et quatre candidatures déposées, sans objet neuf, avec un plan de revue qui suit trois chiffres jusqu'au 15/10/2026.
+
+> **Termes** : un sidecar est le fichier de candidatures déposé à côté de l'étude sous `input\01-candidatures\`, puis ingéré au registre.
 
 - **Option retenue : O1** — étendre le plan de sondes et le relevé d'ouverture existants, sans
   objet neuf.
