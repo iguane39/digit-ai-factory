@@ -1,8 +1,8 @@
 # Bancs auto-étiquetés, étape 1 (TF-1551)
 
 Étape 1 de l'option O2 de `output\03-etudes\20261001-etude-opportunite-rsi-et-ssl.md`. Deux bancs jouables, sans
-appel de modèle, lecture seule sur les oracles. Le troisième banc de l'étude (les paires « fautif, corrigé » tirées du
-git) n'est pas construit.
+appel de modèle, lecture seule sur les oracles. Le troisième banc de l'étude, les paires « fautif, corrigé » tirées du
+git, vit dans `oracles\banc-paires\` avec son propre README.
 
 ## Banc de mutation des oracles
 

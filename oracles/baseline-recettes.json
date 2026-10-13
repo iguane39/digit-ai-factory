@@ -346,6 +346,10 @@
   "cas": 14,
   "vu_le": "2026-10-12"
  },
+ "oracles/banc-paires/paires.test.mjs": {
+  "cas": 11,
+  "vu_le": "2026-10-13"
+ },
  "oracles/banc-restitutions/restitutions.test.mjs": {
   "cas": 11,
   "vu_le": "2026-10-12"
