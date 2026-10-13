@@ -385,6 +385,16 @@ ledger (`escalade_modele`, avec la raison). Une affectation qui réussit du prem
 inférieur est la preuve que le routage était bon — le tableau ci-dessus est un a priori, le ledger
 accumule la vérité mesurée.
 
+**Effort par classe de tâche** (TF-1557, 13/10/2026) : l'effort de réflexion d'une tâche Opus se lit
+dans la table datée `effort_par_classe` de `references\MODELES-EN-SERVICE.json`, jamais recopiée ici.
+Elle vient du rejeu du 2026-10-01 (`output\03-etudes\20261001-etude-resultats-rejeu-opus-5-5.md`),
+et chaque ligne y porte sa classe, l'effort décidé, le plancher que le rejeu a retenu et la mesure
+qui le fonde ; une classe absente prend l'effort des classes non testées. Un agent délégué reçoit
+l'effort de sa classe (paramètre d'effort à l'appel, champ `effort` d'un `agent.def`), sans quoi il
+hérite de celui de la session. Descendre au plancher mesuré ou ajouter une classe demande une mesure
+citée (§4 bis). Juge : `oracle-modeles-en-service.mjs`, règle MS5, qui signale aussi l'écart entre
+l'effort réglé au poste et l'attendu de la table.
+
 ### 4 bis. Protocole de mesure du routage (TF-0051)
 
 Constat fondateur : ~25 affectations de modèle en 2 produits réels, zéro escalade ET zéro donnée
