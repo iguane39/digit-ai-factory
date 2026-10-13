@@ -543,7 +543,7 @@
   "vu_le": "2026-09-27"
  },
  "scripts/installer-projet.test.mjs": {
-  "cas": 17,
+  "cas": 21,
   "vu_le": "2026-10-13"
  },
  "scripts/lib-extensions-jugees.test.mjs": {

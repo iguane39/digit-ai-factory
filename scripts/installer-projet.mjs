@@ -39,6 +39,8 @@ import { skillsInstalles } from "./lib-config-installee.mjs";
 
 const PILOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Sous Windows, c:dev et C:dev sont le même dossier : toute comparaison de chemins ignore la casse.
+// Signatures d'un échec réseau passager dans la sortie de git (curl sous-jacent).
+export const RESEAU_PASSAGER = /Empty reply from server|unable to access .*(?:timed out|Could not resolve|Connection reset|Failed to connect|Recv failure|SSL)|early EOF|RPC failed/i;
 const meme = (a, b) => (process.platform === "win32" ? resolve(a).toLowerCase() === resolve(b).toLowerCase() : resolve(a) === resolve(b));
 
 export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(PILOT), sansBootstrap = false, env = process.env, log = () => {} }) {
@@ -69,6 +71,14 @@ export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(P
       const p = jouer([process.execPath, poseur, PILOT, "--seul=pre-push"], PILOT);
       const s = jouer([process.execPath, join(PILOT, "scripts", "verifier-hooks-git.mjs"), "--depot", PILOT, "--installer"], PILOT);
       log(`[pose] hook pre-push du pilot (installeur de forge-agents, exit ${p.status}) et sa section R-38 (exit ${s.status}) ; bootstrap rejoué`);
+      b = bootstrap();
+    }
+    // Un incident réseau passager (« Empty reply from server », mesuré le 13/10 à 19:38 sur le clone
+    // d'un dépôt privé, puis 3 refus d'accès normaux à la sonde suivante) ne doit pas faire échouer
+    // l'installation d'un développeur : une seconde tentative, une seule, quand l'échec en porte la
+    // signature. bootstrap est idempotent, la seconde passe ne refait que ce qui manque.
+    if (b.status !== 0 && RESEAU_PASSAGER.test(b.out)) {
+      log("[reprise] échec réseau passager au bootstrap : seconde tentative");
       b = bootstrap();
     }
     sortieBootstrap = b.out;

@@ -19,7 +19,7 @@ import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { installer } from "./installer-projet.mjs";
+import { installer, RESEAU_PASSAGER } from "./installer-projet.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = resolve(ICI, "..");
@@ -74,9 +74,17 @@ try {
 
   // 6. Usage : une option inconnue est refusée en exit 2.
   att(spawnSync(process.execPath, [SCRIPT, "--oui"], { encoding: "utf8" }).status === 2, "option inconnue : exit 2 attendu");
+
+  // 7. Seconde tentative du bootstrap : la signature réseau passager se reconnaît, et elle ne se
+  // confond ni avec un refus d'accès à un dépôt privé ni avec un défaut réel (sinon la reprise
+  // masquerait un défaut, ou tournerait pour rien).
+  att(RESEAU_PASSAGER.test("fatal: unable to access 'https://github.com/x/y.git/': Empty reply from server"), "réseau : « Empty reply from server » non reconnu");
+  att(RESEAU_PASSAGER.test("fatal: unable to access 'https://github.com/x/y.git/': Failed to connect to github.com port 443"), "réseau : « Failed to connect » non reconnu");
+  att(!RESEAU_PASSAGER.test("fatal: could not read Username for 'https://github.com': terminal prompts disabled"), "réseau : un refus d'accès est pris pour un incident réseau");
+  att(!RESEAU_PASSAGER.test("[DEFAUT] digit-ai-forge-tests — DIVERGÉ (2 devant, 3 derrière)"), "réseau : un défaut réel est pris pour un incident réseau");
 } finally {
   rmSync(base, { recursive: true, force: true });
 }
 
-console.log(`installer-projet : ${ok}/${ok + ko} tests verts — cas rouges : sans bootstrap la bannière ne dit pas « opérationnelle » (exit 1), dossier personnel refusé`);
+console.log(`installer-projet : ${ok}/${ok + ko} tests verts — cas rouges : sans bootstrap la bannière ne dit pas « opérationnelle » (exit 1), dossier personnel refusé, refus d'accès non pris pour un incident réseau`);
 process.exit(ko ? 1 : 0);
