@@ -85,7 +85,7 @@ check("sous le seuil — à 7 jours de retard le produit est NOMMÉ en section 5
   if (!/\| Produit-12 \| 2026-09-01 \| 2 \|/.test(md)) throw new Error("section 7 : le dernier lot n'est pas le plus récent des deux dossiers");
   if (!/Sources muettes depuis plus de 7 jours : 0 sur 1\./.test(md)) throw new Error("section 7 : silence de 2 jours compté muet");
 });
-check("au-dessus du seuil — l'état des sources avance de 9 jours : le produit est proposé à la relance, les items sont vieux, la source est muette, et le JSON le compte", () => {
+check("cas rouge — au-dessus du seuil — l'état des sources avance de 9 jours : le produit est proposé à la relance, les items sont vieux, la source est muette, et le JSON le compte", () => {
   const reg2 = w("TODO2.jsonl", readFileSync(registre, "utf8") + JSON.stringify({ ev: "maj", ts: "2026-09-12T10:00:00.000Z", id: "TF-0001", note: "n" }) + "\n");
   const out = join(T, "R3.md"), js = join(T, "R3.json"); const r = generer(join(T, "RELEVES.jsonl"), out, { reg: reg2, json: js });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stderr}`);
@@ -158,7 +158,7 @@ check("semis PRÉSENT — section 8 publie ses compteurs, et le JSON les porte �
   if (!c.semis_defauts || c.semis_defauts.couvertes !== 5 || c.semis_defauts.sans_controle !== 31)
     throw new Error(`semis_defauts JSON inattendu : ${JSON.stringify(c.semis_defauts)}`);
 });
-check("semis PRÉSENT avec couvertures FAUSSES — la ligne d'alerte nomme chaque classe accusée", () => {
+check("cas rouge — semis PRÉSENT avec couvertures FAUSSES — la ligne d'alerte nomme chaque classe accusée", () => {
   const rapport = w("semis-accuse.json", JSON.stringify({
     outil: "semer-defauts", referentiel: { version: "1.17.0", date: "2026-09-20" }, generateurs_date: "2026-09-20",
     mesure: { couvertes: 4, accusees: 1, non_concluantes: 2, non_jouees: 0, sans_controle: 31, sans_generateur: 49 },

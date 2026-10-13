@@ -134,7 +134,7 @@ function selfTest() {
 
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test coherence-restitution : 4/4 PASS (les trois porteurs accordés → PASS ; les deux "
+    : "Self-test coherence-restitution : 4/4 PASS (les trois porteurs accordés → PASS ; cas rouges : les deux "
       + "porteurs restés en arrière du gabarit → FAIL nommant les deux versions ; un seul porteur "
       + "en écart → FAIL, pas de pardon à la majorité ; un porteur absent → SANS_OBJET nommé, "
       + "jamais un PASS silencieux)");

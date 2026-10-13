@@ -38,7 +38,11 @@ const att = (cond, message) => { if (!cond) throw new Error(message); };
  *  autres règles (dont EC-3, défaut préexistant d'oracle-ecriture sur les blocs <style>) ne sont
  *  pas de ce périmètre. */
 function sansFailMesure(chemin, relatif) {
-  const texte = readFileSync(chemin, "utf8");
+  return echecsMesures(readFileSync(chemin, "utf8"), relatif);
+}
+
+/** Le même jugement, sur un TEXTE : les constats FAIL des règles mesurées. */
+function echecsMesures(texte, relatif) {
   const { findings } = juger(texte, { donnee: DONNEE, cheminRelatif: relatif });
   return findings.filter((f) => f.statut === "FAIL" && /^EC-(1|8|9)(:|$)/.test(f.regle));
 }
@@ -58,6 +62,31 @@ for (const [rel, chemin] of CIBLES) {
     att(echecs.length === 0, `${echecs.length} échec(s) encore mesuré(s) : ${echecs.map((f) => `${f.regle} — ${f.message.slice(0, 80)}`).join(" | ")}`);
   });
 }
+
+// SENS ROUGE (TF-1245) : le jugement doit REFUSER un texte qui porte les défauts d'origine (EC-8 en
+// titre et en en-tête de colonne, EC-9 en valeurs écrites en toutes lettres), et laisser passer le
+// même fait écrit en chiffres. Ces fixtures sont celles de la recette d'oracle-ecriture.
+const EC8_ROUGE = "# Ce que ce guide couvre\n\nUn paragraphe de prose ordinaire, assez long pour "
+  + "ne rien declencher d'autre, qui decrit un dispositif sans employer de tournure d'annonce.\n\n"
+  + "| Ce qu'elle apprend | Mesure |\n|---|---|\n| une ligne | une valeur |\n";
+const EC9_ROUGE = "# Mesure\n\nLes vues pesent huit virgule huit megaoctets sur les deux cent "
+  + "quatre-vingts du depot. Un identifiant vit dans cent trente-deux revisions. La doctrine est "
+  + "entree le sept septembre, et la mesure a ete refaite le seize septembre.\n";
+const EC9_VERTE = "# Mesure\n\nLes vues pesent 8,8 Mo sur les 280 du depot. Un identifiant vit "
+  + "dans 132 revisions. La doctrine est entree le 7 septembre, et la mesure a ete refaite le "
+  + "16 septembre.\n";
+check("cas rouge — un titre et un en-tête de colonne en tournure d'annonce rendent FAIL (EC-8)", () => {
+  const echecs = echecsMesures(EC8_ROUGE, "banc/ec8-rouge.md");
+  att(echecs.some((f) => f.regle === "EC-8"), "le jugement a laissé passer la tournure d'annonce refusée");
+});
+check("cas rouge — des valeurs écrites en toutes lettres rendent FAIL (EC-9)", () => {
+  const echecs = echecsMesures(EC9_ROUGE, "banc/ec9-rouge.md");
+  att(echecs.some((f) => f.regle === "EC-9"), "le jugement a laissé passer des valeurs en toutes lettres");
+});
+check("cas vert — les mêmes faits écrits en chiffres ne rendent aucun FAIL", () => {
+  const echecs = echecsMesures(EC9_VERTE, "banc/ec9-verte.md");
+  att(echecs.length === 0, `faux FAIL : ${echecs.map((f) => f.regle).join(", ")}`);
+});
 
 console.log(`\nordonnancement-mep-ecriture (TF-1529) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

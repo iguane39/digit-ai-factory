@@ -78,7 +78,7 @@ contient("contenu : le sigle, insensible à la casse et mot entier", "regex:(?i)
 contient("contenu : le produit d'un seul mot, mot entier", "regex:(?i)(?<![A-Za-z0-9])Zorg(?![A-Za-z0-9])==>Produit-92");
 contient("contenu : la VARIANTE de graphie du produit multi-mots", "gestion[\\s\\-_]*des[\\s\\-_]*locaux[\\s\\-_]*vides");
 cas.push({
-  libelle: "contenu : une clé CHEMIN n'est PAS versée en règle",
+  libelle: "cas rouge — contenu : une clé CHEMIN n'est PAS versée en règle",
   ok: !regles.includes("Produit-93"), obtenu: !regles.includes("Produit-93"), attendu: true,
 });
 
@@ -91,8 +91,8 @@ dit("nom de fichier : le nom composé passe AVANT le client qu'il contient",
 dit("nom de fichier : le client seul est bien traité", nomApres("docs/Acmecorp.md"), "docs/Client-Z.md");
 
 // --- cas NÉGATIFS : ce qui ne doit pas bouger ---
-dit("nom de fichier : un mot qui CONTIENT le produit court reste intact", nomApres("src/Zorgon.mjs"), "src/Zorgon.mjs");
-dit("nom de fichier : sans aucun terme, rien ne change", nomApres("docs/lisez-moi.md"), "docs/lisez-moi.md");
+dit("cas rouge — nom de fichier : un mot qui CONTIENT le produit court reste intact", nomApres("src/Zorgon.mjs"), "src/Zorgon.mjs");
+dit("cas rouge — nom de fichier : sans aucun terme, rien ne change", nomApres("docs/lisez-moi.md"), "docs/lisez-moi.md");
 
 rmSync(bac, { recursive: true, force: true });
 

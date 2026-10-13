@@ -224,7 +224,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test controle-maison : 6/6 PASS (contrôle de sécurité écrit à la main sur un domaine couvert → FAIL ; " +
+    : "Self-test controle-maison : 6/6 PASS (cas rouge : contrôle de sécurité écrit à la main sur un domaine couvert → FAIL ; " +
       "le MÊME fichier avec son exemption écrite → PASS ; contrôle d'un domaine neuf → PASS, règle §4 nommée ; " +
       "fichier que le registre INVOQUE → PASS, il EST l'oracle du domaine ; fichier qui n'annonce pas un contrôle → SKIP ; registre absent → SKIP DIT, jamais PASS par silence)");
   return casse.length ? 1 : 0;

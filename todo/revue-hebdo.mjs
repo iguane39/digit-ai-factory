@@ -181,7 +181,7 @@ function selfTest() {
   if (!/## Mises en œuvre sans vous, pour information[\s\S]*Option appliquée : Lancer le banc/.test(r.corps) || r.automatiques[0]?.id !== "TF-9004") casse.push("la proposition hors du ressort humain n'est pas rendue pour information");
   if (!/Fiche sans ressort — manque : ressort/.test(r.corps)) casse.push("une fiche sans ressort n'est pas listée à instruire");
   writeFileSync(join(dir, "r.jsonl"), reg);
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — 1 décision rendue au format du bloc 3 (avantages, inconvénients, impacts, recommandation, tableau, repli), 1 proposition hors du ressort humain rendue pour information et non posée, la décidée écartée, l'incomplète et celle sans ressort listées à instruire");
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — 1 décision rendue au format du bloc 3 (avantages, inconvénients, impacts, recommandation, tableau, repli), 1 proposition hors du ressort humain rendue pour information et non posée, cas rouges : la décidée écartée, l'incomplète et celle sans ressort refusées comme décision et listées à instruire");
   process.exit(casse.length ? 1 : 0);
 }
 

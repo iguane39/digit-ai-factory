@@ -238,13 +238,13 @@ if (args.includes("--self-test")) {
     writeFileSync(join(depot, "credentials.json"), "{}", "utf8");
 
     const r = juger(base);
-    att("SP1 — le cas FONDATEUR est attrapé : un porteur hors de tout dépôt",
+    att("cas rouge SP1 — le cas FONDATEUR est attrapé : un porteur hors de tout dépôt",
       r.horsDepot.length === 1 && basename(r.horsDepot[0]) === ".env");
     att("SP1 — le `.env` correctement ignoré PAR SON DÉPÔT n'est pas accusé",
       !r.horsDepot.some((p) => p.includes("produit")) && !r.dansDepotNonIgnore.some((x) => basename(x.p) === ".env"));
     att("borne — un `.env.example` versionné exprès n'est JAMAIS un porteur",
       !PORTEUR_DE_SECRETS(".env.example") && !PORTEUR_DE_SECRETS(".env.exemple"));
-    att("SP2 — un porteur dans un dépôt qui ne l'ignore pas est SIGNALÉ",
+    att("cas rouge SP2 — un porteur dans un dépôt qui ne l'ignore pas est SIGNALÉ",
       r.dansDepotNonIgnore.some((x) => basename(x.p) === "credentials.json"));
     att("la famille reconnaît les formes usuelles",
       [".env", ".env.local", "cle.pem", "id.key", "credentials.json", "secrets.yaml", ".npmrc", ".databrickscfg"]
@@ -253,7 +253,7 @@ if (args.includes("--self-test")) {
       ![ "README.md", "package.json", "tokens.css", "environnement.md" ].some(PORTEUR_DE_SECRETS));
     // TF-0619 — L'ÉCHELLE DES TROIS ÉTATS, chacun joué sur un dépôt fabriqué exprès. Un état
     // dont la branche rouge n'est jamais jouée est une branche morte qui se croit vivante.
-    att("SP2 — un porteur non ignoré et NON SUIVI rend l'état le plus FAIBLE",
+    att("cas rouge SP2 — un porteur non ignoré et NON SUIVI rend l'état le plus FAIBLE",
       r.dansDepotNonIgnore.find((x) => basename(x.p) === "credentials.json").etat === "non_ignore");
 
     // Un dépôt SANS aucune référence distante : la publication n'est pas jugeable (N-16).

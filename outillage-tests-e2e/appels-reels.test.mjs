@@ -52,7 +52,7 @@ cas("un rapport dont forge-tests dit `terminee` autorise le vert", () => {
   assert.equal(cibleAtteinte(rapport), true);
 });
 
-cas("un rapport dont forge-tests dit `en_cours` INTERDIT le vert, triplet vert ou pas", () => {
+cas("cas rouge — un rapport dont forge-tests dit `en_cours` INTERDIT le vert, triplet vert ou pas", () => {
   const rapport = {
     ...RAPPORT_VERT,
     boucle: { statut: "en_cours", manques: ["porte « e2e » ABSENTE du journal"] },
@@ -172,14 +172,14 @@ cas("l'ordre de construction porte les gates du CONTRAT, pas des gates inventés
   assert.match(r.ordre.frontiere, /G-2 absolue/);
 });
 
-cas("un playbook introuvable est DIT, jamais supposé lisible", () => {
+cas("cas rouge — un playbook introuvable est DIT, jamais supposé lisible", () => {
   const r = declencherDevelopment({ finding_ref: "H-13", produit: "C:/x" }, { racine: "Z:/vide" });
 
   assert.equal(r.ordre.spec_lisible, false);
   assert.match(r.motif, /playbook cité est introuvable/);
 });
 
-cas("sans produit, l'ordre est REFUSÉ — deviner la cible serait choisir où écrire du code", () => {
+cas("cas rouge — sans produit, l'ordre est REFUSÉ — deviner la cible serait choisir où écrire du code", () => {
   const r = declencherDevelopment({ finding_ref: "H-13" });
 
   assert.equal(r.joue, false);

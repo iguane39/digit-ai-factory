@@ -63,4 +63,4 @@ try {
 }
 
 if (echecs.length) { console.error("balayer-motifs-numeriques : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("balayer-motifs-numeriques (TF-0438) : 9/9 — nu signalé, gardé muet, commentaire ignoré, et les 6 faits de garde tenus par exécution");
+console.log("balayer-motifs-numeriques (TF-0438) : 9/9 — cas rouge : motif nu signalé ; verts : gardé muet, commentaire ignoré, et les 6 faits de garde tenus par exécution");

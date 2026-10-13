@@ -89,14 +89,14 @@ try {
   gitP("init", "-q", "-b", "main");
   const ARTEFACT_MODELE = { mode: "copie_conforme", source: "gabarits/MODELE.md", cible: "forge/MODELE.md" };
 
-  check("TF-0851 — une recopie CONFORME mais NON SUIVIE par git est relevée « hors histoire », et le geste est nommé", () => {
+  check("cas rouge — TF-0851 — une recopie CONFORME mais NON SUIVIE par git est relevée « hors histoire », et le geste est nommé", () => {
     const e = etatArtefact(versionne, ARTEFACT_MODELE, pilot);
     att(e.etat === "conforme", `état « ${e.etat} » : le CONTENU est bien conforme, c'est le propos`);
     att(e.histoire === "non_suivi", `histoire « ${e.histoire} » — ce poste l'a, le dépôt ne l'a pas, et rien ne le disait`);
     att(/git add/.test(e.geste_git || ""), "le geste qui répare n'est pas nommé");
   });
 
-  check("TF-0848 — la même copie, SUIVIE mais NON COMMISE, est relevée à part : une recopie n'est tenue qu'une fois commise", () => {
+  check("cas rouge — TF-0848 — la même copie, SUIVIE mais NON COMMISE, est relevée à part : une recopie n'est tenue qu'une fois commise", () => {
     gitP("add", "forge/MODELE.md");
     gitP("commit", "-q", "-m", "socle");
     writeFileSync(join(versionne, "forge", "MODELE.md"), "vieille version\n", "utf8");
@@ -133,7 +133,7 @@ try {
     att(!p.some((x) => x.includes("digit-ai-forge-tests")), "une forge figure au relevé");
   });
 
-  check("TF-1592 — un fichier personnalisé qui ne porte pas le MOTIF exigé (mode presence_et_motif) est INCOMPLET, comme le juge R-47", () => {
+  check("cas rouge — TF-1592 — un fichier personnalisé qui ne porte pas le MOTIF exigé (mode presence_et_motif) est INCOMPLET, comme le juge R-47", () => {
     const P = mkdtempSync(join(tmpdir(), "heritage-motif-"));
     try {
       mkdirSync(join(P, ".claude"), { recursive: true });
@@ -182,7 +182,7 @@ try {
     att(!produitsDuParc(T).includes(dedans), "un sous-dossier d'un produit a été relevé");
   });
 
-  check("ABSENT et PÉRIMÉ sont distingués — c'est toute l'utilité du relevé", () => {
+  check("cas rouge — ABSENT et PÉRIMÉ sont distingués — c'est toute l'utilité du relevé", () => {
     const bon = etatArtefact(conforme, CONTRAT.artefacts[0], pilot);
     att(bon.etat === "conforme", `état « ${bon.etat} » au lieu de conforme`);
     const vieux = etatArtefact(perime, CONTRAT.artefacts[0], pilot);

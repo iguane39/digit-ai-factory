@@ -289,7 +289,7 @@ if (args[0] === "--self-test") {
 
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
   console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test propagation : 8/8 PASS (concerné sans manifeste → FAIL ; adoption prouvée → PASS ; " +
+    : "Self-test propagation : 8/8 PASS (cas rouge : concerné sans manifeste → FAIL ; adoption prouvée → PASS ; " +
       "antidatée → FAIL ; id inconnu → FAIL ; match par type → FAIL ; non concerné → SANS_OBJET ; " +
       "ligne invalide → FAIL ; registre sans critères → SANS_OBJET déclaré)");
   process.exit(casse.length ? 1 : 0);

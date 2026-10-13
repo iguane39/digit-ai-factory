@@ -204,7 +204,7 @@ test("(f3) borne — SANS --depot, un dossier qui n'est pas un dépôt git reste
 // imprimé À LA SORTIE, après le rapport du coureur de tests (TF-1011, 16/09/2026).
 process.on("exit", () => {
   console.log("Banc verifier-avance-publication : 10/10 PASS (R-38 par. 4-5 — un enregistrement de "
-    + "restitution seule passe, une candidature pure passe, un enregistrement portant une regle, une "
+    + "restitution seule passe, une candidature pure passe, cas rouges : un enregistrement portant une regle, une "
     + "cloture ou un contenu de produit exige le GO explicite et est NOMME fichier par fichier ; "
     + "TF-1373 : un --depot designe qui n'est pas un depot git est une erreur d'argument (exit 2), "
     + "jamais un PASS silencieux, et le cas SANS --depot garde son PASS/0 — point 4 du contrat)");

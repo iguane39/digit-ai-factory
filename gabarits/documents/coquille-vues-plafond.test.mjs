@@ -60,6 +60,22 @@ function blocComposant(texte, nom) {
   return m ? m[0] : texte;
 }
 
+/** Le contrôle lui-même, sur un TEXTE : lève si nav.vues n'est pas plafonné ET défilant sous 760px. */
+function verifierPlafond(texte) {
+  const bloc = blocPhone(texte);
+  if (!bloc) throw new Error("media query téléphone (max-width: 760px) introuvable");
+  const m = bloc.match(/nav\.vues\s*\{([^}]*)\}/);
+  if (!m) throw new Error("aucune règle nav.vues dans la media query téléphone — le bandeau reste sans plafond");
+  if (!/max-height\s*:/.test(m[1])) throw new Error("nav.vues n'a pas de max-height — la barre des vues peut encore croître sans borne");
+  if (!/overflow-y\s*:\s*auto/.test(m[1])) throw new Error("nav.vues n'a pas overflow-y: auto — un plafond sans défilement couperait des vues, inatteignables");
+}
+
+/** Le second contrôle, sur un TEXTE : lève si le bandeau haut porte lui-même un plafond. */
+function verifierBandeauSansPlafond(texte) {
+  const regleBandeau = texte.match(/header\.bandeau\s*\{[^}]*\}/)[0];
+  if (/max-height/.test(regleBandeau)) throw new Error("header.bandeau porte un max-height — la marque et les outils risqueraient d'être coupés");
+}
+
 for (const [nom, chemin, scope] of [
   ["composants/coquille-vues.css (source)", SOURCE, null],
   ["SQUELETTE.html (posé)", SQUELETTE, "coquille-vues.css"],
@@ -67,21 +83,30 @@ for (const [nom, chemin, scope] of [
 ]) {
   check(`${nom} — nav.vues porte un plafond de hauteur ET un défilement interne sous 760px`, () => {
     const brut = readFileSync(chemin, "utf8");
-    const texte = scope ? blocComposant(brut, scope) : brut;
-    const bloc = blocPhone(texte);
-    if (!bloc) throw new Error("media query téléphone (max-width: 760px) introuvable");
-    const m = bloc.match(/nav\.vues\s*\{([^}]*)\}/);
-    if (!m) throw new Error("aucune règle nav.vues dans la media query téléphone — le bandeau reste sans plafond");
-    if (!/max-height\s*:/.test(m[1])) throw new Error("nav.vues n'a pas de max-height — la barre des vues peut encore croître sans borne");
-    if (!/overflow-y\s*:\s*auto/.test(m[1])) throw new Error("nav.vues n'a pas overflow-y: auto — un plafond sans défilement couperait des vues, inatteignables");
+    verifierPlafond(scope ? blocComposant(brut, scope) : brut);
   });
 }
 
 check("header.bandeau lui-même n'a pas de max-height — c'est nav.vues qui plafonne, pas le bandeau haut (marque, outils)", () => {
-  const texte = readFileSync(SOURCE, "utf8");
-  const regleBandeau = texte.match(/header\.bandeau\s*\{[^}]*\}/)[0];
-  if (/max-height/.test(regleBandeau)) throw new Error("header.bandeau porte un max-height — la marque et les outils risqueraient d'être coupés");
+  verifierBandeauSansPlafond(readFileSync(SOURCE, "utf8"));
 });
+
+// SENS ROUGE (TF-1245) : le contrôle doit REFUSER une coquille fautive. Chaque cas ci-dessous est
+// un texte volontairement défectueux ; le cas est vert quand le contrôle le refuse pour la bonne raison.
+const refuse = (nom, fonction, texte, motif) => check(`cas rouge — ${nom} est REFUSÉ`, () => {
+  let message = null;
+  try { fonction(texte); } catch (e) { message = e.message; }
+  if (message === null) throw new Error("le contrôle a laissé passer une coquille fautive");
+  if (!motif.test(message)) throw new Error(`refusé pour une autre raison que celle attendue : ${message}`);
+});
+const VUES_OK = "nav.vues { max-height: 40vh; overflow-y: auto; }";
+const phone = (corps) => `@media (max-width: 760px) { ${corps} }`;
+check("cas vert — la coquille conforme du banc passe", () => verifierPlafond(phone(VUES_OK)));
+refuse("sans media query téléphone", verifierPlafond, VUES_OK, /introuvable/);
+refuse("sans règle nav.vues sous 760px", verifierPlafond, phone("header.bandeau { top: 0; }"), /aucune règle nav\.vues/);
+refuse("nav.vues sans max-height", verifierPlafond, phone("nav.vues { overflow-y: auto; }"), /max-height/);
+refuse("nav.vues sans overflow-y: auto", verifierPlafond, phone("nav.vues { max-height: 40vh; }"), /overflow-y/);
+refuse("bandeau haut plafonné", verifierBandeauSansPlafond, "header.bandeau { max-height: 120px; }", /header\.bandeau porte un max-height/);
 
 console.log(`\ncoquille-vues-plafond (TF-1515) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

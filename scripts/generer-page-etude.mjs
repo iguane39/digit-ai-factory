@@ -948,8 +948,8 @@ Audience : le pilote de l'écosystème, qui décide des mandats. Le reste de la 
       "embarqués ; bascule de thème câblée et persistée ; chaque tableau repliable en cartes ; " +
       "composants embarqués sous marqueur scellé ; marquage machine d'assistance IA posé (TR2) ; " +
       "note de colonne d'une lettre reliée par aria-describedby, sans régresser le cas déjà couvert ; " +
-      "sommaire latéral collant posé et ancré DÈS quatre chapitres, absent à trois ; chapeau " +
-      ".ch-apprend écrit depuis une citation, jamais généré, nav.barre collante en permanence sous " +
+      "sommaire latéral collant posé et ancré DÈS quatre chapitres, absent à trois (cas rouge : le seuil REFUSE le sommaire d'une étude courte) ; chapeau " +
+      ".ch-apprend écrit depuis une citation, jamais généré (cas rouge : un chapitre sans citation ne reçoit aucun chapeau), nav.barre collante en permanence sous " +
       "900 px ; exemple de lecture et glossaire classés depuis leur libellé réservé, sans déborder" + (casseControleReel ? " ; check_html.py et render_page.py verts sur une étude réelle)" : ")") +
       (nonJuge.length ? ` — NON JOUÉ : ${nonJuge.join(" · ")}` : ""));
   return casse.length ? 1 : 0;

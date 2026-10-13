@@ -42,14 +42,35 @@ const CAS = [
   ["references/TODO-FORGE.md", "remise au sas `input\\00-retours\\_arrivee\\`,"],
 ];
 
+/** Le contrôle, sur un TEXTE : lève si la phrase de remise attendue (vers le sas) est absente. */
+function verifierRemise(brut, attendu) {
+  if (!norm(brut).includes(norm(attendu))) {
+    throw new Error(`sous-chaîne attendue absente : « ${attendu} »`);
+  }
+}
+
 for (const [rel, attendu] of CAS) {
   check(`${rel} — la remise pointe vers le sas, pas la racine (TF-1460)`, () => {
-    const texte = norm(readFileSync(join(PILOT, rel), "utf8"));
-    if (!texte.includes(norm(attendu))) {
-      throw new Error(`sous-chaîne attendue absente : « ${attendu} »`);
-    }
+    verifierRemise(readFileSync(join(PILOT, rel), "utf8"), attendu);
   });
 }
+
+// SENS ROUGE (TF-1245) : une consigne qui prescrit encore la RACINE d'`input\00-retours\` comme
+// lieu de remise doit être REFUSÉE par le contrôle, et la phrase corrigée acceptée.
+const [, ATTENDU] = CAS[0];
+check("cas rouge — une consigne qui prescrit la racine nue comme lieu de remise est REFUSÉE", () => {
+  let refuse = false;
+  try { verifierRemise("sidecar remis à la racine `<pilot>\\input\\00-retours\\`,", ATTENDU); } catch { refuse = true; }
+  if (!refuse) throw new Error("le contrôle a laissé passer une remise à la racine");
+});
+check("cas rouge — un texte qui ne parle plus de remise du tout est REFUSÉ", () => {
+  let refuse = false;
+  try { verifierRemise("", ATTENDU); } catch { refuse = true; }
+  if (!refuse) throw new Error("le contrôle a laissé passer un texte vide");
+});
+check("cas vert — la phrase corrigée passe, même coupée par un retour à la ligne", () => {
+  verifierRemise(ATTENDU.replace(" au sas ", "\n au   sas "), ATTENDU);
+});
 
 console.log(`\nsas-retours-doctrine (TF-1460) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
