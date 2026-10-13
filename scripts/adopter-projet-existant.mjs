@@ -122,8 +122,19 @@ const HORS_SIGNAUX = new Set([".git", "node_modules", ".venv", "venv", "__pycach
  * triés. Lecture seule, six niveaux au plus (la profondeur de `oracle-conformite-projet`). Une
  * racine web déclarée (`racine_web:` de `docs/projet/PARAMETRAGE.md`) est aussi un signal.
  */
-export function signauxLogicielOuSite(racine) {
+export function signauxLogicielOuSite(racine, pilot = PILOT) {
   const trouves = [];
+  // TF-1614 (lot Produit-79 20261007a, RP-5) : un `robots.txt` ou un `llms.txt` IDENTIQUE à son gabarit
+  // est ce que l'adoption a posé elle-même, pas un site que le projet a bâti. Le compter rendait la
+  // déclaration « documentaire » impossible après une adoption sans `--type` (la session déclarait
+  // FORGE_ROOT pour passer). Dès que le fichier est instancié ou modifié, il redevient un signal.
+  const poseParAdoption = (chemin, nom) => {
+    if (nom !== "robots.txt" && nom !== "llms.txt") return false;
+    const gab = join(pilot, "gabarits", "web", nom);
+    if (!existsSync(gab)) return false;
+    const norm = (t) => t.replace(/^﻿/, "").replace(/\r\n/g, "\n").trimEnd();
+    try { return norm(readFileSync(chemin, "utf8")) === norm(readFileSync(gab, "utf8")); } catch { return false; }
+  };
   const parcourir = (d, rel, prof) => {
     if (prof > 6) return;
     let entrees = [];
@@ -135,7 +146,7 @@ export function signauxLogicielOuSite(racine) {
       const ext = nom.includes(".") ? nom.split(".").pop() : "";
       if (EXT_LOGICIEL.has(ext)) trouves.push(`${r} (code)`);
       else if (MANIFESTES.has(nom)) trouves.push(`${r} (manifeste)`);
-      else if (FICHIERS_DE_SITE.has(nom)) trouves.push(`${r} (fichier de site)`);
+      else if (FICHIERS_DE_SITE.has(nom) && !poseParAdoption(join(d, e.name), nom)) trouves.push(`${r} (fichier de site)`);
     }
   };
   parcourir(racine, "", 0);

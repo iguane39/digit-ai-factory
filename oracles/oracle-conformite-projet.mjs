@@ -545,6 +545,29 @@ else {
   }
 }
 
+// R-20 ter · llms.txt — les marqueurs du gabarit se lisent aussi hors de docs\projet\ (TF-1615,
+// 13/10/2026). Le fait (lot Produit-79 20261007a, RP-6) : l'adoption pose `llms.txt` depuis
+// `gabarits\web\llms.txt`, qui garde ses `{Produit}` et `{Accueil}`, et aucune règle ne le
+// relevait — R-20 ter ne lit que les fiches de docs\projet\ et les artefacts à marqueurs
+// déclarés. Les marqueurs se DÉRIVENT du gabarit (une seule vérité, pas une liste recopiée).
+// RÈGLE NEUVE, opposable à tous les produits : AVERTISSEMENT non bloquant (précédent D-70 (b)).
+{
+  const gabaritLlms = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "web", "llms.txt");
+  if (existsSync(gabaritLlms)) {
+    const marquesGabarit = [...new Set(readFileSync(gabaritLlms, "utf8").match(/\{[^{}\n]{2,80}\}/g) || [])];
+    for (const f of fichiers(cible)) {
+      if (basename(f).toLowerCase() !== "llms.txt") continue;
+      if (/^(forge|input|gabarits)\//.test(rel(f))) continue; // copies de dispositif et entrants : données, pas la carte du site
+      const texte = readFileSync(f, "utf8");
+      const restes = marquesGabarit.filter((m) => texte.includes(m));
+      if (restes.length) {
+        ok("R-20 ter", rel(f), `AVERTISSEMENT, non bloquant : ${restes.length} marqueur(s) du gabarit llms.txt NON INSTANCIÉ(S) (${restes.slice(0, 4).join(", ")}${restes.length > 4 ? `, +${restes.length - 4}` : ""}) — `
+          + "la carte du site que lisent les moteurs génératifs porte encore ses trous ; la renseigner depuis docs/projet/FONCTIONNEL.md (TF-1615)");
+      }
+    }
+  }
+}
+
 // R-6 — code : jamais de copie datée, jamais dans Old\
 let r6 = true;
 for (const f of fichiers(cible)) {
@@ -1488,7 +1511,6 @@ else {
   }
 }
 
-
 // R-42 — INTÉGRITÉ du ledger (TF-0411, 20/08) : `seq` strictement croissant depuis 1,
 // horodatages non décroissants, première entrée `run_open`. Le contrôle EXISTAIT depuis
 // l'origine (`ledger.mjs verify`, contrat §3) et n'était câblé à aucun déclencheur : il
@@ -2030,7 +2052,9 @@ else {
       // signalait rien. Une prose d'écart sans déclaration structurée est désormais un défaut.
       if (!declares.length) {
         const prose = corps.split(/\r?\n/).find((l) =>
-          /(écart|ecart|dérogation|derogation|exception|non[- ]conforme|à renommer|a renommer)/i.test(l)
+          // TF-1613 : MOT ENTIER. « aucun nom d'hôte ne s'écarte de la règle R-24 » est une phrase de
+          // conformité (verbe), pas un écart. Bornes en lettres Unicode : `\b` ne connaît pas « é ».
+          /(?<![\p{L}])(écarts?|ecarts?|dérogations?|derogations?|exceptions?|non[- ]conformes?|à renommer|a renommer)(?![\p{L}])/iu.test(l)
           && /(R-24|convention de nommage|suffixe|nommage)/i.test(l));
         if (prose) {
           ko("R-24", "docs\\projet\\PARAMETRAGE.md", `écart de nommage documenté EN PROSE (« ${prose.trim().slice(0, 80)} ») sans champ structuré — un écart s'accepte en frontmatter \`ecarts_r24\` (url, environnement, motif, decide_le), jamais en note : le 15/08 la prose n'a rien signalé et l'URL fausse est partie en livraison`); ok24 = false;
@@ -2432,6 +2456,8 @@ const nonJuge = [
   "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML EST jugée depuis le 18/08 (R-26 bis, sceau de source, TF-0338) — ce qui reste hors jugement est la fraîcheur d'une page ANTÉRIEURE au mécanisme de sceau : elle est déclarée, jamais mise en échec",
   "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo-geo au run)",
   "R-13 (TF-1439) : la déclaration « documentaire » se confronte à des SIGNAUX — fichiers de code par extension, manifestes de dépendances, robots.txt / llms.txt / sitemap.xml, racine web déclarée — relevés hors forge\\, input\\ (entrants = données) et répertoires d'outillage, sur 6 niveaux ; un logiciel ou un site qui n'en porte aucun (site statique fait de seuls .html, classeur à macros, script sans extension) passerait pour documentaire : limite déclarée",
+  "R-13 (TF-1614) : un robots.txt ou llms.txt STRICTEMENT identique à son gabarit (fins de ligne normalisées) est tenu pour posé par l'adoption et ne compte pas comme signal de site ; modifié d'un seul caractère, il redevient un signal. Un site dont le seul fichier de site est resté au gabarit passerait pour documentaire : limite déclarée",
+  "R-20 ter llms.txt (TF-1615) : les marqueurs sont ceux de gabarits\\web\\llms.txt (dérivés, non recopiés), cherchés par inclusion textuelle dans tout llms.txt hors forge\\, input\\ et gabarits\\ ; un marqueur inventé par le projet, ou un llms.txt réécrit avec d'autres trous, n'est pas vu. Règle neuve : AVERTISSEMENT non bloquant (précédent D-70 (b))",
   "R-2 localisation (TF-0319) : seul ce qui est MARQUÉ est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ, mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ; la JUSTESSE du marquage relève de la relecture, pas d'un contrôle de forme ; `input\\`, `gabarits\\`, `fixtures\\`, `old\\` et `.oracles\\` sont hors jugement par motif déclaré ; la marque est attendue sur la COPIE remise, pas sur l'original de travail de `forge\\etapes\\` (règle 16) — l'oracle ne rapproche pas un original de sa copie",
   "R-2 localisation (TF-0319) : la structure INTERNE d'`output\\` (familles numérotées uniques, une seule version courante par famille, graphie `old\\`, LISEZMOI.md de correspondance — D-15 al. a à e) n'est PAS jugée ici : sa mécanisation vit chez `oracle-conventions.mjs` d'organization et reste suspendue à un mandat humain d'écriture dans ce dépôt frère",
   "R-20 nature des lignes (TF-0528) : les lignes dont l'Id reste un gabarit (`{A-01}`) ne sont pas jugées — juger l'exemple que le gabarit prescrit mettrait le gabarit en défaut, jamais l'auteur ; un produit qui garde ses placeholders échappe donc au contrôle",
