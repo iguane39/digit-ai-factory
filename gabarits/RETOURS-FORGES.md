@@ -68,6 +68,24 @@ dans un sidecar, et une clé approchée choisie faute de mieux fausse le compte 
 close chez le pilot entre quand même, **marqué récidive** — c'est précisément l'information
 que la factory cherche : une correction qui n'a pas redescendu jusqu'à vous.
 
+**Le sidecar se juge avant la remise (LOT-SIDECAR, TF-1591, 13/10/2026)** : `forge\retours\oracle-lot.mjs`
+(1.6.0) lit aussi le sidecar et rejoue les rejets de la porte qui se décident sur lui seul : JSON
+valide, `schema` 1, aucun `id`, les cinq champs obligatoires, aucun caractère de contrôle, la classe
+(présente, connue de `CLASSES.json`) et, pour `classe-a-creer`, une `classe_proposee` complète, d'une
+clé neuve, d'une famille connue, nommée dans le `.md`. Le 03/10, deux lots ont été refusés pour une
+`classe_proposee` absente alors que leur contrôle de remise rendait PASS : il ne regardait pas le
+sidecar. La règle est un **avertissement** (le lot n'est pas bloqué chez vous) ; la porte, elle,
+refuse toujours. Corriger le sidecar avant la remise ; ce qui exige le registre du pilot (rectification
+d'un id inconnu, doublon strict) ne se rejoue pas chez vous. Dans le `.md`, rappeler le numéro du
+retour (« **RT-xxx** : … clé proposée ») sur la ligne de chaque proposition de classe.
+
+**Une règle de forme neuve avertit d'abord (TF-1570, 13/10/2026)** : l'héritage qui porte une règle
+n'atteint un produit qu'à sa prochaine ouverture, et le 01/10 deux lots conformes à leur outillage ont
+été refusés par une règle entrée trois jours plus tôt. Depuis `oracle-lot.mjs` 1.7.0, une règle de
+section dont le seuil est postérieur au 13/10/2026 rend un avertissement, puis un refus, pour les lots
+datés de moins de sept jours après son seuil ; le message dit jusqu'à quel jour. Rafraîchir l'héritage à
+l'ouverture évite d'attendre la fin du délai.
+
 **L'indice est PRIS dès que le lot est remis (R-49, TF-0884, 08/09)** : avant d'écrire un lot,
 demander l'indice libre du jour — `node scripts\allouer-indice.mjs` — plutôt que de reprendre
 celui qu'un mandat nomme. Le 06/09, un compte rendu a pris l'indice « a » que son mandat citait,
@@ -101,6 +119,13 @@ devine pas — écrire « `<forge>` : … » en tête du titre), et un retour sa
 réutilisé** — continuer la séquence des lots précédents du même produit. Jugé depuis le
 14/09/2026 (règle LOT-IDS de `forge\retours\oracle-lot.mjs`, TF-1039) : un identifiant déjà
 défini par un lot antérieur du même produit est refusé, et le premier libre est donné.
+
+**Pièce jointe d'un lot (TF-1215, 13/10/2026)** : une étude, un rapport d'audit ou toute pièce que
+le lot annonce se nomme d'après lui, `<projet> - RETOURS - AAAAMMJJ<indice> - PJ - <libellé>.<extension>`,
+et se remet avec lui dans le sas `_arrivee\`. Ainsi nommée, elle n'est ni un lot sans sidecar ni un
+lot sans sections R-45 et R-46 : la boîte d'entrée du pilot (règle B10) vérifie seulement que le lot
+dont elle porte le nom existe, dans la boîte ou dans `old\` s'il est ingéré. Un `.md` qui ne suit pas
+cette convention reste jugé comme un lot et demande son sidecar.
 
 ---
 

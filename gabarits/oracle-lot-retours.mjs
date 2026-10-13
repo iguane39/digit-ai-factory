@@ -97,7 +97,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.5.0"; // 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.7.0"; // 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 /**
  * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
@@ -121,9 +121,28 @@ try {
  *  antériorité déclarée, jamais devinée. R-57 est décidée le 24/09 et entre au main le 28/09 : les
  *  lots écrits jusque-là, sans la règle sous la main, ne sont pas accusés. Même chose pour GFP-LOT,
  *  entrée en vigueur le jour où elle rejoint le gabarit (TF-1526). */
-export const SEUILS = { "R-45": "20260821", "R-46": "20260822", "R-57": "20260929", "GFP-LOT": "20261002" };
+export const SEUILS = { "R-45": "20260821", "R-46": "20260822", "R-57": "20260929", "GFP-LOT": "20261002", "LOT-SIDECAR": "20261013" };
 
-const SECTION_R45 = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
+/**
+ * DÉLAI DE GRÂCE D'UNE RÈGLE NEUVE (TF-1570, 13/10/2026). Mesuré le 02/10 : la règle des documents mûrs
+ * (R-57) était entrée au juge du pilot le 28/09, la porte l'appliquait à tout lot daté du 29/09 ou après,
+ * et deux produits ont remis le 01/10 des lots que leur contrôle de remise, encore en 1.0.0 et 1.1.0,
+ * jugeait conformes : l'héritage qui porte la règle n'atteint un produit qu'à sa prochaine ouverture. La
+ * fenêtre entre l'entrée d'une règle au pilot et son arrivée chez le producteur a fait refuser des lots
+ * conformes à leur outillage. Une règle de SECTION dont le seuil est postérieur à `DATE_GRACE` rend donc
+ * un AVERTISSEMENT, et non un FAIL, pour tout lot daté de moins de `GRACE_JOURS` jours après son seuil ;
+ * ensuite elle bloque. Les règles antérieures (R-45, R-46, R-57, GFP-LOT) ne sont pas touchées : leur
+ * fenêtre est passée, et une grâce rétroactive affaiblirait ce qui est déjà tenu.
+ */
+export const GRACE_JOURS = 7;
+export const DATE_GRACE = "20261013";
+/** AAAAMMJJ + n jours, en jours civils UTC (le nom d'un lot porte une date, pas une heure). */
+export function jourPlus(aaaammjj, n) {
+  const d = new Date(Date.UTC(+aaaammjj.slice(0, 4), +aaaammjj.slice(4, 6) - 1, +aaaammjj.slice(6, 8) + n));
+  return d.toISOString().slice(0, 10).replaceAll("-", "");
+}
+
+const SECTION_R45 =/^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
 const SECTION_R46 = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
 const SECTION_R57 = /^##\s+Documents\s+m[ûu]rs\b[^\n]*$/im;
 // Pas de `\b` juste après la lettre accentuée : sans drapeau Unicode, elle n'a pas de frontière de
@@ -299,6 +318,75 @@ export function jourLocal(d = new Date()) {
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
 }
 
+// ---- LOT-SIDECAR : la lecture du sidecar, rejouée comme `todo\ingerer-lot.mjs` la fait (TF-1591) -------
+const CHAMPS_SIDECAR = ["titre", "contenu", "demandeur", "source", "date_demande"];
+const SEUIL_CLASSE_PORTE = "20260903";
+const CLE_A_CREER = "classe-a-creer";
+
+/** Le référentiel des classes, là où il est à portée : à côté de ce juge chez le produit
+ *  (`forge\retours\CLASSES.json`, copie héritée), ou `todo\CLASSES.json` au pilot. `null` sinon. */
+function lireClasses() {
+  const ici = dirname(fileURLToPath(import.meta.url));
+  for (const p of [join(ici, "CLASSES.json"), join(ici, "..", "todo", "CLASSES.json")]) {
+    try { return JSON.parse(readFileSync(p, "utf8")); } catch { /* absent ou illisible : suivant */ }
+  }
+  return null;
+}
+
+/**
+ * Juge le sidecar d'un lot comme la porte le jugera. Rend `{ sansObjet }` quand il n'y a rien à juger,
+ * sinon `{ lignes, motifs, nonJugees, sansReferentiel }`. Ne rend jamais d'exception : un sidecar
+ * illisible est un motif, pas une panne du juge.
+ */
+function jugerSidecar(cheminLot, texteMd, date) {
+  const sidecar = String(cheminLot).replace(/\.md$/i, ".tf.jsonl");
+  if (!existsSync(sidecar)) return { sansObjet: `sidecar « ${basename(sidecar)} » absent — rien à juger (sa présence est tenue ailleurs : boîte d'entrée B3)` };
+  let brut;
+  try { brut = readFileSync(sidecar, "utf8"); } catch (e) { return { sansObjet: `sidecar illisible (${e.code || e.message}) — non jugé` }; }
+  const REF = lireClasses();
+  const classes = new Map((REF?.classes || []).map((k) => [k.cle, k]));
+  const familles = new Set([...classes.values()].map((k) => k.famille).concat((REF?.familles || []).map((f) => f.cle)));
+  const estUnLot = basename(String(cheminLot)).includes(" - RETOURS - ");
+  const classeExigee = estUnLot && date >= SEUIL_CLASSE_PORTE;
+  const motifs = [];
+  let lignes = 0, nonJugees = 0, sansReferentiel = false;
+  brut.split(/\r?\n/).filter((l) => l.trim()).forEach((l, i) => {
+    const n = i + 1;
+    let c;
+    try { c = JSON.parse(l); } catch { motifs.push(`ligne ${n} : JSON invalide`); return; }
+    if (c === null || typeof c !== "object" || Array.isArray(c)) { motifs.push(`ligne ${n} : ce n'est pas un objet JSON`); return; }
+    // Le format R10 BRUT d'un produit (sans `schema`) est normalisé par le pilot : la porte ne le voit jamais.
+    if (c.schema === undefined) { nonJugees++; return; }
+    lignes++;
+    if (c.schema !== 1) motifs.push(`ligne ${n} : schema attendu 1, reçu ${c.schema}`);
+    if (c.id) motifs.push(`ligne ${n} : une candidature ne porte JAMAIS d'id (frappé à l'ingestion)`);
+    for (const champ of CHAMPS_SIDECAR) if (!c[champ]) motifs.push(`ligne ${n} : champ ${champ} manquant`);
+    for (const [champ, v] of Object.entries(c)) {
+      if (typeof v !== "string") continue;
+      const k = [...v].findIndex((ch) => { const o = ch.charCodeAt(0); return (o < 32 && o !== 9 && o !== 10 && o !== 13) || o === 127; });
+      if (k >= 0) motifs.push(`ligne ${n} : le champ « ${champ} » porte un caractère de contrôle U+${[...v][k].charCodeAt(0).toString(16).padStart(4, "0").toUpperCase()} (chemin Windows écrit dans une chaîne non brute ?)`);
+    }
+    if (c.rectifie !== undefined) return; // une rectification vise un id : pas de classe à elle
+    if (String(c.classe) === CLE_A_CREER) {
+      const p = c.classe_proposee && typeof c.classe_proposee === "object" ? c.classe_proposee : {};
+      const manque = ["cle", "famille", "libelle"].filter((k) => !p[k] || !String(p[k]).trim());
+      if (manque.length) motifs.push(`ligne ${n} : classe « ${CLE_A_CREER} » sans classe_proposee complète — manque ${manque.join(", ")} ; la ligne porte "classe_proposee": {"cle", "famille", "libelle"} et le .md les nomme (section « La règle qui aurait évité le retour »)`);
+      else if (classes.has(String(p.cle))) motifs.push(`ligne ${n} : classe proposée « ${p.cle} » EXISTE déjà au référentiel — la porter directement dans "classe"`);
+      else if (REF && !familles.has(String(p.famille))) motifs.push(`ligne ${n} : famille « ${p.famille} » de la classe proposée inconnue — familles du référentiel : ${[...familles].join(", ")}`);
+      else if (!String(texteMd).includes(String(p.cle))) motifs.push(`ligne ${n} : la classe proposée « ${p.cle} » n'est pas nommée dans le .md du lot — section « La règle qui aurait évité le retour »`);
+      if (!REF) sansReferentiel = true;
+      return;
+    }
+    if (c.classe === undefined || c.classe === null || c.classe === "") {
+      if (classeExigee) motifs.push(`ligne ${n} : classe manquante — tout retour d'un lot daté du 03/09/2026 ou après désigne UNE classe du référentiel, ou porte « ${CLE_A_CREER} » avec sa classe_proposee`);
+      return;
+    }
+    if (!REF) { sansReferentiel = true; return; }
+    if (!classes.has(String(c.classe))) motifs.push(`ligne ${n} : classe « ${c.classe} » inconnue du référentiel — si aucune clé ne convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"} (TF-1128)`);
+  });
+  return { lignes, motifs, nonJugees, sansReferentiel };
+}
+
 export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = {}) {
   const constats = [];
   const ajouter = (regle, statut, message, remede) => constats.push({ regle, statut, message, remede });
@@ -381,16 +469,21 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
         null);
       continue;
     }
+    // TF-1570 : une règle NEUVE (seuil à partir de DATE_GRACE) avertit pendant GRACE_JOURS jours, puis bloque.
+    const finGrace = seuil >= DATE_GRACE ? jourPlus(seuil, GRACE_JOURS) : null;
+    const enGrace = finGrace !== null && date < finGrace;
+    const echec = enGrace ? "AVERTISSEMENT" : "FAIL";
+    const grace = enGrace ? ` [délai de grâce : ${regle} avertit jusqu'au lot du ${jourPlus(finGrace, -1)} et bloque ensuite — l'héritage qui la porte n'atteint un produit qu'à sa prochaine ouverture]` : "";
     if (!section.test(texte)) {
-      ajouter(regle, "FAIL",
-        `section « ${quoi} » absente — ${pourquoi}`,
+      ajouter(regle, echec,
+        `section « ${quoi} » absente — ${pourquoi}${grace}`,
         `ajouter la section « ## ${quoi} » au lot. Rien à y mettre ? L'écrire : « ${rienADire} ». La forme se déclare, elle ne se devine pas (loi n° 3). Gabarit : ${GABARIT_LOT}`);
       continue;
     }
     const suite = corpsDeSection(texte, section);
     if (!present.test(suite) && !absent.test(suite)) {
-      ajouter(regle, "FAIL",
-        `la section « ${quoi} » ne porte ni ${substance}, ni la déclaration qu'il n'y a rien à dire — une section vide se lit comme un oubli, et l'omission ne vaut pas décision`,
+      ajouter(regle, echec,
+        `la section « ${quoi} » ne porte ni ${substance}, ni la déclaration qu'il n'y a rien à dire — une section vide se lit comme un oubli, et l'omission ne vaut pas décision${grace}`,
         `porter sous la section ${substance}, ou écrire « ${rienADire} »`);
       continue;
     }
@@ -428,6 +521,43 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
     }
   } else {
     ajouter("LOT-MURS", "SANS_OBJET", `lot du ${date}, antérieur à l'entrée en vigueur de R-57 (${SEUILS["R-57"]}) — antériorité déclarée`, null);
+  }
+
+  // ---- LOT-SIDECAR · LE SIDECAR SE JUGE COMME LA PORTE LE JUGERA (TF-1591, TF-1602, 13/10/2026) ------
+  //
+  // Le fait, mesuré le 04/10 : les lots Produit-02 du 03/10 sont refusés en rejet atomique par
+  // `todo\ingerer-lot.mjs` — « classe-a-creer sans classe_proposee complète » — alors que le produit avait
+  // la dernière copie de ce juge (1.5.0, depuis le 02/10) et l'avait jouée : PASS, honnêtement. Ce juge ne
+  // lisait JAMAIS le sidecar (hors R-49, qui en prend l'empreinte). La porte jugeait donc une chose que le
+  // contrôle distribué ne regardait pas, et son message affirmait « ce refus était évitable » : faux pour
+  // cette règle. Le contrôle distribué rejoue ici les rejets de la porte qui se décident SUR LE SIDECAR SEUL.
+  //
+  // CE QUI EST REJOUÉ (la même lecture que `ingerer-lot.mjs`, ligne à ligne) : JSON valide, `schema` 1,
+  // aucun `id`, les cinq champs obligatoires, aucun caractère de contrôle (TF-1067), et la classe — présente
+  // pour un lot daté du 03/09 ou après, connue du référentiel `CLASSES.json` quand il est à portée, et pour
+  // `classe-a-creer` une `classe_proposee` complète {cle, famille, libelle}, d'une clé encore libre, d'une
+  // famille connue, nommée dans le .md du lot (TF-1128).
+  //
+  // CE QUI NE L'EST PAS, et le dit : les rejets qui exigent le REGISTRE du pilot (rectification d'un id
+  // inconnu ou archivé TF-0703, doublon strict TF-0956, préflight de collision TF-0394) — le produit n'a pas
+  // ce registre ; la cible `forges_cibles_initiales`, que la porte déduit du texte (R-48) ; et un sidecar au
+  // format R10 BRUT (sans `schema`), que le pilot normalise lui-même (`normaliser-lot.mjs`).
+  //
+  // AVERTISSEMENT, jamais blocage (campagne du 13/10, précédent D-70 (b)) : une règle neuve opposable à tous
+  // les produits entre en avertissement. La porte, elle, refuse toujours ; l'avertissement dit au produit,
+  // AVANT la remise, ce que la porte lui dira après. Le promouvoir en blocage est une décision humaine.
+  if (date < SEUILS["LOT-SIDECAR"]) {
+    ajouter("LOT-SIDECAR", "SANS_OBJET", `lot du ${date}, antérieur à l'entrée en vigueur de LOT-SIDECAR (${SEUILS["LOT-SIDECAR"]}) — antériorité déclarée`, null);
+  } else {
+    const r = jugerSidecar(cheminLot, texte, date);
+    if (r.sansObjet) ajouter("LOT-SIDECAR", "SANS_OBJET", r.sansObjet, null);
+    else if (r.motifs.length) {
+      ajouter("LOT-SIDECAR", "AVERTISSEMENT",
+        `${r.motifs.length} motif(s) dont la porte du pilot REFUSERA ce lot (rejet atomique, registre intact) : ${r.motifs.slice(0, 6).join(" ; ")}${r.motifs.length > 6 ? ` ; et ${r.motifs.length - 6} autre(s)` : ""}`,
+        "corriger le sidecar AVANT la remise (un lot remis ne se modifie plus : la correction passe par l'indice suivant) ; une classe sans clé qui convienne se porte par « classe-a-creer » + « classe_proposee »");
+    } else {
+      ajouter("LOT-SIDECAR", "PASS", `${r.lignes} ligne(s) de sidecar jugée(s) comme la porte les jugera${r.nonJugees ? ` (${r.nonJugees} ligne(s) au format brut, normalisées par le pilot : non jugées)` : ""}${r.sansReferentiel ? " (référentiel des classes hors de portée : clés de classe non vérifiées)" : ""}`, null);
+    }
   }
 
   // ---- R-49 · UN LOT REMIS ET INGÉRÉ NE SE RÉÉCRIT JAMAIS (TF-0884, 08/09/2026) --------------

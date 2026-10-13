@@ -124,6 +124,72 @@ try {
     const r = spawnSync(PYTHON, [script, "inconnu"], { encoding: "utf8", env: CONSOLE });
     att(r.status !== 0 && entrees(d).length === 1, `exit ${r.status}, ${entrees(d).length} entrée(s)`);
   });
+
+  // ---- TF-1575 (écriture concurrente : seq 283 porté deux fois le 22/09/2026) ------------------------
+  const SANS_VERROU = GABARIT.replace("    prendre_verrou(verrou)\n", "");
+  const SANS_NOMMER = GABARIT.replace(/        lignes_par_seq: dict = \{\}[\s\S]*?(?=        if e\[0\]\["type"\] != "run_open":)/, "");
+
+  check("témoin — la chirurgie des rouges TF-1575 a bien retiré le verrou et le nommage du doublon", () => {
+    att(SANS_VERROU !== GABARIT && !/\n    prendre_verrou\(verrou\)\n/.test(SANS_VERROU), "le verrou n'a pas été retiré");
+    att(SANS_NOMMER !== GABARIT && !/lignes_par_seq/.test(SANS_NOMMER), "le nommage du doublon n'a pas été retiré");
+  });
+
+  check("vert — huit écritures SIMULTANÉES reçoivent huit seq distincts, consécutifs, sans verrou résiduel", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const harnais = join(d, "rafale.py");
+    writeFileSync(harnais, [
+      "import subprocess, sys",
+      `ps = [subprocess.Popen([sys.executable, ${JSON.stringify(script)}, 'retour', '--resume', 'rafale ' + str(i)], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE) for i in range(8)]`,
+      "codes = [p.wait() for p in ps]",
+      "sys.exit(0 if all(c == 0 for c in codes) else 1)",
+    ].join("\n"), "utf8");
+    const r = spawnSync(PYTHON, [harnais], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `une écriture de la rafale a échoué : ${r.stderr.slice(-300)}`);
+    att(entrees(d).map((x) => x.seq).join() === "1,2,3,4,5,6,7,8,9", `seq : ${entrees(d).map((x) => x.seq).join()}`);
+    att(!existsSync(join(d, "forge", "ledger.jsonl.lock")), "le verrou n'est pas libéré");
+  });
+
+  check("rouge — un verrou tenu par un autre écrivain REFUSE l'écriture (sortie non nulle, rien d'écrit) ; sans verrou dans le code, elle passait", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    writeFileSync(join(d, "forge", "ledger.jsonl.lock"), "", "utf8");
+    const r = spawnSync(PYTHON, [script, "retour", "--resume", "x"], { encoding: "utf8", env: CONSOLE });
+    att(r.status !== 0 && /verrou non obtenu/.test(r.stderr), `exit ${r.status} : ${r.stderr.slice(-200)}`);
+    att(entrees(d).length === 1, "une entrée a été écrite malgré le verrou tenu");
+    const m = produit(SANS_VERROU); dossiers.push(m.d);
+    writeFileSync(join(m.d, "forge", "ledger.jsonl.lock"), "", "utf8");
+    const rm = spawnSync(PYTHON, [m.script, "retour", "--resume", "x"], { encoding: "utf8", env: CONSOLE });
+    att(rm.status === 0 && entrees(m.d).length === 2, "le mutant sans verrou aurait dû écrire malgré le verrou tenu : le témoin est vide");
+  });
+
+  check("vert — le seq vient de la FIN du fichier, pas du nombre de lignes", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const f = join(d, "forge", "ledger.jsonl");
+    const premiere = readFileSync(f, "utf8");
+    writeFileSync(f, premiere + premiere.replace('"seq": 1', '"seq": 5').replace('"seq":1', '"seq":5'), "utf8"); // 2 lignes, dernier seq 5
+    const r = spawnSync(PYTHON, [script, "retour", "--resume", "x"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0 && entrees(d).pop().seq === 6, `seq attendu 6 : ${r.stdout}${r.stderr}`);
+  });
+
+  const avecDoublon = (d) => {
+    const f = join(d, "forge", "ledger.jsonl");
+    const l = readFileSync(f, "utf8").split("\n").filter(Boolean);
+    const e = (n, t) => JSON.stringify({ seq: n, ts: "2026-09-22T20:21:01Z", type: t, resume: "x" });
+    writeFileSync(f, [l[0], e(2, "retour"), e(3, "retour"), e(3, "question_humain"), e(4, "retour")].join("\n") + "\n", "utf8");
+  };
+  check("vert — --verifier NOMME le seq en double en tête des écarts (« seq 3 porté par 2 entrées, lignes 3, 4 »)", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    avecDoublon(d);
+    const r = spawnSync(PYTHON, [script, "--verifier"], { env: CONSOLE });
+    const sortie = r.stdout.toString("utf8").split("\n").filter((x) => /\[BLOQUANT\]/.test(x));
+    att(r.status === 1, `exit ${r.status}`);
+    att(/seq 3 porté par 2 entrées, lignes 3, 4/.test(sortie[0] || ""), `première rupture : ${sortie[0]}`);
+  });
+  check("rouge — sans le nommage, le doublon n'apparaît que comme « attendu » en cascade (le bruit de TF-1367)", () => {
+    const { d, script } = produit(SANS_NOMMER); dossiers.push(d);
+    avecDoublon(d);
+    const r = spawnSync(PYTHON, [script, "--verifier"], { env: CONSOLE });
+    att(!/porté par/.test(r.stdout.toString("utf8")), "le mutant nomme encore le doublon : le témoin est vide");
+  });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }
 

@@ -515,6 +515,139 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   });
 }
 
+// ---- TF-1570 : LE DÉLAI DE GRÂCE D'UNE RÈGLE NEUVE ---------------------------------------------
+// Le fait : R-57 est entrée le 28/09, la porte l'a appliquée dès le 29/09, et deux produits dont l'héritage
+// n'était pas encore rafraîchi ont vu refuser le 01/10 des lots conformes à leur outillage. Une règle de
+// section dont le seuil est postérieur à DATE_GRACE avertit pendant GRACE_JOURS jours, puis bloque. Aucune
+// règle réelle n'est encore dans ce cas : le banc simule l'entrée d'une règle neuve en déplaçant le seuil
+// de GFP-LOT (objet exporté), puis le restaure.
+{
+  const { GRACE_JOURS, DATE_GRACE, jourPlus } = await import("./oracle-lot-retours.mjs");
+  const SANS_GFP = "# lot\n\n" + R45 + "\n" + R46 + "\n## Documents mûrs\n\nAucun document mûr.\n";
+  const SEUIL_AVANT = SEUILS["GFP-LOT"];
+  const NEUF = "20261020";
+  const jouer = (jour) => {
+    SEUILS["GFP-LOT"] = NEUF;
+    try { const r = verifier(lot(`${jour}a`), SANS_GFP, { aujourdhui: "20261101" }); return { c: constat(r, "GFP-LOT"), verdict: r.verdict }; }
+    finally { SEUILS["GFP-LOT"] = SEUIL_AVANT; }
+  };
+  check("TF-1570 — jourPlus : 20261020 + 7 = 20261027, et la fin de mois passe", () => {
+    if (jourPlus("20261020", 7) !== "20261027" || jourPlus("20261030", 3) !== "20261102" || jourPlus("20261027", -1) !== "20261026") throw new Error("calcul de date faux");
+    if (GRACE_JOURS !== 7 || DATE_GRACE !== "20261013") throw new Error("paramètres de grâce dérivés");
+  });
+  check("TF-1570 rouge→avertissement — règle neuve, section absente, lot du jour du seuil : AVERTISSEMENT, verdict inchangé, la fin de grâce est dite", () => {
+    const { c, verdict } = jouer(NEUF);
+    if (!c || c.statut !== "AVERTISSEMENT") throw new Error(`statut ${c ? c.statut : "absent"}`);
+    if (!/délai de grâce/.test(c.message) || !/20261026/.test(c.message)) throw new Error(`la grâce ne dit pas jusqu'où : ${c.message}`);
+    if (verdict !== "PASS") throw new Error(`un lot en grâce ne doit pas être bloqué : verdict ${verdict}`);
+  });
+  check("TF-1570 — dernier jour de grâce (seuil + 6 jours) : encore AVERTISSEMENT", () => {
+    const { c } = jouer("20261026");
+    if (!c || c.statut !== "AVERTISSEMENT") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+  check("TF-1570 vert→FAIL — la grâce FINIT : un lot daté du seuil + 7 jours est refusé comme avant", () => {
+    const { c, verdict } = jouer("20261027");
+    if (!c || c.statut !== "FAIL" || /grâce/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+    if (verdict !== "FAIL") throw new Error(`verdict ${verdict}`);
+  });
+  check("TF-1570 borne — une règle d'AVANT DATE_GRACE (GFP-LOT, seuil réel du 02/10) n'a PAS de grâce : le jour du seuil est refusé", () => {
+    const r = verifier(lot("20261002a"), SANS_GFP, { aujourdhui: "20261002" });
+    const c = constat(r, "GFP-LOT");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — une grâce rétroactive affaiblirait ce qui est tenu`);
+    if (SEUILS["GFP-LOT"] !== "20261002") throw new Error("le seuil de GFP-LOT n'a pas été restauré");
+  });
+}
+
+// ---- LOT-SIDECAR (TF-1591, TF-1602) : le sidecar jugé comme la porte le jugera -----------------
+// Le fait : les lots Produit-02 du 03/10 ont été refusés pour « classe-a-creer sans classe_proposee »,
+// que ce juge ne regardait pas — le produit avait rendu PASS. Chaque règle rejouée a son cas rouge ET
+// son cas vert ; la règle entre en AVERTISSEMENT (jamais en blocage, précédent D-70 (b)).
+{
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const ICI_S = dirname(fileURLToPath(import.meta.url));
+  const REF = JSON.parse(readFileSync(join(ICI_S, "..", "todo", "CLASSES.json"), "utf8"));
+  const EXISTANTE = REF.classes[0], FAMILLE = REF.classes[0].famille;
+  const D = mkdtempSync(join(tmpdir(), "lot-sidecar-"));
+  const AUJ = "20261013";
+  const R57S = "## Documents mûrs\n\nAucun document mûr.\n", GFPS = "## Garde-fou de plateforme relevé\n\nAucun garde-fou de plateforme relevé.\n";
+  const lotMd = (extra = "") => `# lot\n\n${R45}\n${R46}\n${R57S}\n${GFPS}\n${extra}`;
+  const ligne = (o = {}) => JSON.stringify({ schema: 1, demandeur: "Produit-02-essai", date_demande: "2026-10-13", source: "lot d'essai",
+    titre: "factory : un retour d'essai", contenu: "un contenu d'essai", forges_cibles_initiales: ["digit-ai-factory"], classe: EXISTANTE.cle, ...o });
+  let n = 0;
+  /** Écrit un lot et son sidecar sous un nom frais ; rend le constat LOT-SIDECAR et le verdict. */
+  const jouer = (lignes, { md = lotMd(), date = AUJ, sansSidecar = false } = {}) => {
+    n++;
+    const base = join(D, `PROD - RETOURS - ${date}${String.fromCharCode(96 + n)}`);
+    writeFileSync(`${base}.md`, md, "utf8");
+    if (!sansSidecar) writeFileSync(`${base}.tf.jsonl`, lignes.join("\n") + "\n", "utf8");
+    const r = verifier(`${base}.md`, md, { aujourdhui: AUJ });
+    return { c: constat(r, "LOT-SIDECAR"), verdict: r.verdict };
+  };
+  const avert = (res, motif) => {
+    if (!res.c || res.c.statut !== "AVERTISSEMENT") throw new Error(`statut ${res.c ? res.c.statut : "absent"} — ${res.c && res.c.message}`);
+    if (motif && !motif.test(res.c.message)) throw new Error(`le motif attendu ${motif} n'est pas dit : ${res.c.message}`);
+    if (res.verdict !== "PASS") throw new Error(`un AVERTISSEMENT ne doit jamais bloquer : verdict ${res.verdict}`);
+  };
+  const passe = (res) => { if (!res.c || res.c.statut !== "PASS") throw new Error(`statut ${res.c ? res.c.statut : "absent"} — ${res.c && res.c.message}`); };
+
+  check("LOT-SIDECAR rouge — le cas du 03/10 : « classe-a-creer » SANS classe_proposee est signalé, et le lot n'est pas bloqué", () => {
+    avert(jouer([ligne({ classe: "classe-a-creer" })]), /classe_proposee complète — manque cle, famille, libelle/);
+  });
+  check("LOT-SIDECAR rouge — une classe_proposee INCOMPLÈTE nomme ce qui manque", () => {
+    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "ma-cle-neuve", famille: FAMILLE } })]), /manque libelle/);
+  });
+  check("LOT-SIDECAR vert — le remède joué : classe_proposee complète, clé neuve, famille connue, clé nommée dans le .md → PASS", () => {
+    const cle = "regle-neuve-essai";
+    passe(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle, famille: FAMILLE, libelle: "Un défaut neuf d'essai" } })],
+      { md: lotMd(`## La règle qui aurait évité le retour\n\n${cle} (${FAMILLE}) : un défaut neuf d'essai\n`) }));
+  });
+  check("LOT-SIDECAR rouge — la clé proposée n'est pas nommée dans le .md du lot", () => {
+    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "cle-absente-du-md", famille: FAMILLE, libelle: "x" } })]), /n'est pas nommée dans le \.md/);
+  });
+  check("LOT-SIDECAR rouge — la famille de la classe proposée est inconnue", () => {
+    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "cle-neuve-2", famille: "famille-inventee", libelle: "x" } })],
+      { md: lotMd("cle-neuve-2") }), /famille « famille-inventee » .* inconnue/);
+  });
+  check("LOT-SIDECAR rouge — la clé proposée EXISTE déjà au référentiel", () => {
+    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: EXISTANTE.cle, famille: FAMILLE, libelle: "x" } })],
+      { md: lotMd(EXISTANTE.cle) }), /EXISTE déjà/);
+  });
+  check("LOT-SIDECAR vert — une classe existante du référentiel : PASS", () => passe(jouer([ligne()])));
+  check("LOT-SIDECAR rouge — une classe INCONNUE, avec la sortie conforme proposée", () => {
+    avert(jouer([ligne({ classe: "classe-qui-n-existe-pas" })]), /inconnue du référentiel .*classe-a-creer/);
+  });
+  check("LOT-SIDECAR rouge — classe MANQUANTE d'un lot daté du 03/09 ou après", () => {
+    const sans = JSON.parse(ligne()); delete sans.classe;
+    avert(jouer([JSON.stringify(sans)]), /classe manquante/);
+  });
+  check("LOT-SIDECAR rouge — champ obligatoire manquant, JSON invalide, id présent, caractère de contrôle : chacun nommé", () => {
+    const sansDem = JSON.parse(ligne()); delete sansDem.demandeur;
+    avert(jouer([JSON.stringify(sansDem), "{ pas du json", ligne({ id: "RT-1" }), ligne({ titre: "avec un octet nul \u0000 dedans" })]),
+      /champ demandeur manquant.*JSON invalide.*JAMAIS d'id.*caractère de contrôle U\+0000/);
+  });
+  check("LOT-SIDECAR vert — une ligne de rectification n'a pas de classe à porter", () => {
+    passe(jouer([ligne({ rectifie: "TF-0001", nature_de_la_rectification: "annule", classe: undefined })]));
+  });
+  check("LOT-SIDECAR borne — un sidecar au format R10 BRUT (sans schema) est normalisé par le pilot : non jugé, et dit", () => {
+    const res = jouer([JSON.stringify({ id: "RT-1", gravite: "mineur", titre: "x", preuve: "y", proposition: "z" })]);
+    passe(res);
+    if (!/non jugées/.test(res.c.message)) throw new Error(`le PASS ne dit pas qu'il n'a rien jugé : ${res.c.message}`);
+  });
+  check("LOT-SIDECAR borne — sidecar absent : SANS_OBJET, et dit", () => {
+    const res = jouer([], { sansSidecar: true });
+    if (!res.c || res.c.statut !== "SANS_OBJET" || !/absent/.test(res.c.message)) throw new Error(`statut ${res.c ? res.c.statut : "absent"}`);
+  });
+  check("LOT-SIDECAR borne — un lot du 12/10, jour d'AVANT l'entrée en vigueur, n'est pas accusé : antériorité déclarée", () => {
+    const res = jouer([ligne({ classe: "classe-a-creer" })], { date: "20261012" });
+    if (!res.c || res.c.statut !== "SANS_OBJET" || !/antériorité/.test(res.c.message)) throw new Error(`statut ${res.c ? res.c.statut : "absent"}`);
+    if (SEUILS["LOT-SIDECAR"] !== "20261013") throw new Error("seuil LOT-SIDECAR dérivé");
+  });
+  try { rmSync(D, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
 // ---- TF-1473 : un IMPORT sans fichier de script (node -e) ne doit pas exécuter la CLI ---------
 // La garde d'exécution directe comparait import.meta.url à endsWith(process.argv[1] || "") : un
 // argv[1] VIDE (cas de `node -e "import(...)"`, où aucun fichier n'est passé en argument) rend
