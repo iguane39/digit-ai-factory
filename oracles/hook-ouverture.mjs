@@ -489,6 +489,19 @@ if (iPilot < 0) {
   } catch (e) { lignes.push("", `- revue hebdomadaire des propositions : NON mesurée (${String(e.message).slice(0, 160)})`); }
 }
 
+// TF-1301 (13/10/2026) — LE STOCK D'ITEMS OUVERTS SANS CLASSE SE PUBLIE À CHAQUE OUVERTURE. La porte posée
+// sur l'écriture du registre refuse les créations sans classe ; elle ne garde pas le stock qui la précède, et ce
+// stock devenait invisible au compteur qu'elle existe pour rendre lisible. Le compte est une mesure, jamais un
+// blocage : classer un item à la place de son producteur est exactement ce que l'ingesteur refuse.
+if (iPilot < 0) {
+  try {
+    const { stockSansClasse, ligneStock } = await import(pathToFileURL(join(PILOT, "todo", "stock-sans-classe.mjs")).href);
+    const { etatCourant } = await import(pathToFileURL(join(PILOT, "todo", "revue-hebdo.mjs")).href);
+    const stock = stockSansClasse(etatCourant(readFileSync(join(PILOT, "todo", "TODO.jsonl"), "utf8")));
+    lignes.push("", "## Items ouverts sans classe (TF-1301, todo/stock-sans-classe.mjs)", `- ${ligneStock(stock)}`);
+  } catch (e) { lignes.push("", `- stock d'items sans classe : NON mesuré (${String(e.message).slice(0, 160)})`); }
+}
+
 // TF-0790 (décision D-2 (a), 03/09/2026) — LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI
 // L'INVOQUE. forge-observability le dit elle-même : « la cadence est documentaire en v0 ». Sans
 // invocateur, le plan des récidives serait une intention de plus (N-1). L'ouverture du pilot joue

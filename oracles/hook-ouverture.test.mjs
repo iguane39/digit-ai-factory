@@ -119,6 +119,11 @@ check("TF-1521 borne — un déplacement CLOS (`deplacement_effectue` postérieu
     throw new Error("une attente CLOSE par un événement plus récent est encore listée — le ledger est en ajout seul, le DERNIER événement fait foi");
 });
 
+// TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans classe (une mesure, jamais un blocage).
+check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans classe, par statut", () => {
+  if (!/## Items ouverts sans classe \(TF-1301/.test(sortieOuverturePilot)) throw new Error("section absente de l'ouverture du pilot");
+  if (!/item\(s\) ouvert\(s\) sans classe|aucun item ouvert sans classe/.test(sortieOuverturePilot)) throw new Error("ni compte ni constat d'absence de stock");
+});
 // TF-1576 — l'annonce des README dit l'état MESURÉ des crochets du projet ouvert.
 {
   const sansCrochet = mkdtempSync(join(tmpdir(), "hook-readme-sans-"));
@@ -128,6 +133,9 @@ check("TF-1521 borne — un déplacement CLOS (`deplacement_effectue` postérieu
   mkdirSync(join(avecCrochet, ".claude"), { recursive: true });
   writeFileSync(join(avecCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write", hooks: [] }] } }), "utf8");
   const sortieSans = joue(sansCrochet), sortieAvec = joue(avecCrochet);
+  check("TF-1301 borne — l'ouverture d'un PRODUIT ne publie pas le stock du registre du pilot", () => {
+    if (/Items ouverts sans classe/.test(sortieSans)) throw new Error("le stock du pilot est publié chez un produit");
+  });
   check("TF-1576 rouge — un produit sans PostToolUse : l'annonce dit que les README ne se régénèrent PAS", () => {
     if (!/ATTENTION, état MESURÉ.*ne déclare aucun crochet PostToolUse/.test(sortieSans)) throw new Error("l'annonce n'a pas mesuré l'absence du crochet");
     if (/se régénèrent après chaque écriture par un outil/.test(sortieSans)) throw new Error("l'annonce affirme encore un crochet absent");
