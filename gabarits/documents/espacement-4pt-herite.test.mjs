@@ -33,6 +33,30 @@ const check = (nom, fn) => {
   catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; }
 };
 
+// Les quatre contrôles, sur un TEXTE : chacun lève si le gabarit porte l'écart (ou n'a pas la valeur recalée).
+const CONTROLES = [
+  ["les cellules de tableau ne sont plus en 8px 10px (hors échelle 4 pt)", (texte) => {
+    if (/padding:\s*8px 10px/.test(texte)) {
+      throw new Error("le bloc th, td porte encore 8px 10px — 10 n'est pas un multiple de 4");
+    }
+  }],
+  ["les cellules de tableau sont en 8px 12px, recalées sur l'échelle 4 pt", (texte) => {
+    if (!/th,\s*td\s*\{[^}]*padding:\s*8px 12px/.test(texte)) {
+      throw new Error("le bloc th, td n'affiche pas padding: 8px 12px — la correction a-t-elle été reprise ?");
+    }
+  }],
+  ["le sommaire latéral n'est plus en 16px 18px (hors échelle 4 pt)", (texte) => {
+    if (/padding:\s*16px 18px/.test(texte)) {
+      throw new Error("le bloc nav.toc porte encore 16px 18px — 18 n'est pas un multiple de 4");
+    }
+  }],
+  ["le sommaire latéral est en 16px 20px, recalé sur l'échelle 4 pt", (texte) => {
+    if (!/nav\.toc\s*\{[^}]*padding:\s*16px 20px/.test(texte)) {
+      throw new Error("le bloc nav.toc n'affiche pas padding: 16px 20px — la correction a-t-elle été reprise ?");
+    }
+  }],
+];
+
 for (const fam of FAMILLES) {
   for (const nom of FICHIERS) {
     const chemin = join(ICI, fam, nom);
@@ -40,28 +64,27 @@ for (const fam of FAMILLES) {
     try { texte = readFileSync(chemin, "utf8"); }
     catch (e) { check(`${fam}/${nom} lisible`, () => { throw new Error(e.message); }); continue; }
 
-    check(`${fam}/${nom} — les cellules de tableau ne sont plus en 8px 10px (hors échelle 4 pt)`, () => {
-      if (/padding:\s*8px 10px/.test(texte)) {
-        throw new Error("le bloc th, td porte encore 8px 10px — 10 n'est pas un multiple de 4");
-      }
-    });
-    check(`${fam}/${nom} — les cellules de tableau sont en 8px 12px, recalées sur l'échelle 4 pt`, () => {
-      if (!/th,\s*td\s*\{[^}]*padding:\s*8px 12px/.test(texte)) {
-        throw new Error("le bloc th, td n'affiche pas padding: 8px 12px — la correction a-t-elle été reprise ?");
-      }
-    });
-    check(`${fam}/${nom} — le sommaire latéral n'est plus en 16px 18px (hors échelle 4 pt)`, () => {
-      if (/padding:\s*16px 18px/.test(texte)) {
-        throw new Error("le bloc nav.toc porte encore 16px 18px — 18 n'est pas un multiple de 4");
-      }
-    });
-    check(`${fam}/${nom} — le sommaire latéral est en 16px 20px, recalé sur l'échelle 4 pt`, () => {
-      if (!/nav\.toc\s*\{[^}]*padding:\s*16px 20px/.test(texte)) {
-        throw new Error("le bloc nav.toc n'affiche pas padding: 16px 20px — la correction a-t-elle été reprise ?");
-      }
-    });
+    for (const [libelle, controle] of CONTROLES) {
+      check(`${fam}/${nom} — ${libelle}`, () => controle(texte));
+    }
   }
 }
+
+// SENS ROUGE (TF-1245) : les contrôles doivent REFUSER le bloc de style hérité d'avant la correction
+// (8px 10px, 16px 18px) ; le cas est vert quand AU MOINS le contrôle visé le refuse.
+const HERITE_FAUTIF = "th, td { padding: 8px 10px; } nav.toc { padding: 16px 18px; }";
+const RECALE = "th, td { padding: 8px 12px; } nav.toc { padding: 16px 20px; }";
+const refuse = (libelleControle, texte) => check(`cas rouge — le bloc hérité fautif est REFUSÉ par « ${libelleControle} »`, () => {
+  const controle = CONTROLES.find(([l]) => l === libelleControle)[1];
+  let leve = false;
+  try { controle(texte); } catch { leve = true; }
+  if (!leve) throw new Error("le contrôle a laissé passer le bloc fautif");
+});
+check("cas vert — le bloc recalé passe les quatre contrôles", () => { for (const [, c] of CONTROLES) c(RECALE); });
+refuse(CONTROLES[0][0], HERITE_FAUTIF);
+refuse(CONTROLES[1][0], HERITE_FAUTIF);
+refuse(CONTROLES[2][0], HERITE_FAUTIF);
+refuse(CONTROLES[3][0], HERITE_FAUTIF);
 
 console.log(`\nespacement-4pt-herite (TF-1274) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

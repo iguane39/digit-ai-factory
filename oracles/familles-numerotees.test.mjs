@@ -48,6 +48,16 @@ const DOUBLONS_GELES = new Map([
     + "registre à événements figés. Numéro gelé, mapping documenté au LISEZMOI."],
 ]);
 
+// Les trois jugements, sur des LISTES (le disque et la table), pour que les cas rouges plus bas
+// les rejouent sur des états fautifs fabriqués. Chacun rend la liste des écarts (vide = tenu).
+const familleNonDeclaree = (surDisque, declarees) => surDisque.filter((f) => !declarees.includes(f));
+const familleFantome = (surDisque, declarees) => declarees.filter((f) => !surDisque.includes(f));
+const numeroSansGel = (dossier, surDisque) => {
+  const parNumero = new Map();
+  for (const f of surDisque) parNumero.set(f.slice(0, 2), [...(parNumero.get(f.slice(0, 2)) || []), f]);
+  return [...parNumero].filter(([n, familles]) => familles.length > 1 && !DOUBLONS_GELES.has(`${dossier}|${n}`)).map(([n]) => n);
+};
+
 let echecs = 0;
 let joues = 0;
 const dit = (ok, message) => {
@@ -91,14 +101,14 @@ for (const dossier of ["input", "output"]) {
   )].sort();
 
   // I3.a — du disque vers la table.
-  const nonDeclarees = surDisque.filter((f) => !declarees.includes(f));
+  const nonDeclarees = familleNonDeclaree(surDisque, declarees);
   dit(!nonDeclarees.length,
     `I3.a ${dossier}\\ : les ${surDisque.length} famille(s) du disque sont déclarées`
     + (nonDeclarees.length ? ` — MANQUE(NT) à la table : ${nonDeclarees.join(", ")}` : ""));
 
   // I3.b — de la table vers le disque. C'est le sens qui a manqué : une famille déclarée sans
   // dossier a l'air d'exister, et un dépôt qu'on y ferait irait dans le vide.
-  const fantomes = declarees.filter((f) => !surDisque.includes(f));
+  const fantomes = familleFantome(surDisque, declarees);
   dit(!fantomes.length,
     `I3.b ${dossier}\\ : les ${declarees.length} famille(s) déclarée(s) existent sur le disque`
     + (fantomes.length
@@ -115,7 +125,7 @@ for (const dossier of ["input", "output"]) {
   for (const [numero, familles] of [...parNumero].sort()) {
     if (familles.length === 1) continue;
     const gel = DOUBLONS_GELES.get(`${dossier}|${numero}`);
-    dit(Boolean(gel),
+    dit(!numeroSansGel(dossier, surDisque).includes(numero),
       `I3.c ${dossier}\\ : numéro ${numero} porté par ${familles.length} familles `
       + `(${familles.join(", ")})`
       + (gel ? ` — doublon GELÉ et motivé : ${gel}` : " — numéro non unique, et aucun gel déclaré"));
@@ -124,6 +134,24 @@ for (const dossier of ["input", "output"]) {
   if (uniques) {
     dit(true, `I3.c ${dossier}\\ : ${parNumero.size} numéro(s), tous uniques`);
   }
+}
+
+// SENS ROUGE (TF-1245) : chacun des trois jugements doit REFUSER un état fautif fabriqué. Un cas
+// rouge est vert quand le jugement relève l'écart attendu ; il échoue si le jugement se tait.
+{
+  const disque = ["01-a", "02-b", "03-c"];
+  const table = ["01-a", "02-b", "03-c"];
+  dit(familleNonDeclaree(disque, table).length === 0 && familleFantome(disque, table).length === 0
+    && numeroSansGel("input", disque).length === 0,
+    "cas vert — disque et table d'accord, numéros uniques : aucun écart relevé");
+  dit(familleNonDeclaree([...disque, "04-d"], table).join() === "04-d",
+    "cas rouge I3.a — une famille du disque absente de la table est REFUSÉE");
+  dit(familleFantome(disque, [...table, "09-fantome"]).join() === "09-fantome",
+    "cas rouge I3.b — une famille déclarée sans dossier est REFUSÉE");
+  dit(numeroSansGel("input", [...disque, "03-autre"]).join() === "03",
+    "cas rouge I3.c — un numéro porté par deux familles sans gel déclaré est REFUSÉ");
+  dit(numeroSansGel("output", ["05-catalogues-readmes-forges", "05-insatisfactions"]).length === 0,
+    "cas vert I3.c — le doublon gelé et motivé de output (05) reste admis, nommé");
 }
 
 // Le COMPTE DE CAS figure dans la ligne de résumé, et pas seulement le verdict : sans lui, cette
