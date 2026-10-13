@@ -19,7 +19,7 @@ l'entrée : code de sortie 1, l'appelant lit un échec là où l'écriture a ré
 UTF-8 en tête de fichier, et l'affichage de confirmation retombe sur l'ASCII échappé plutôt que de
 planter : l'écriture a eu lieu, le code de sortie le dit.
 """
-import sys, json, argparse, datetime, pathlib, subprocess
+import sys, os, time, json, argparse, datetime, pathlib, subprocess
 
 # Forcer l'UTF-8 sur les flux AVANT toute écriture. `reconfigure` existe depuis Python 3.7 ; un flux
 # remplacé par un objet sans cette méthode (redirection exotique) garde son encodage, et l'affichage
@@ -57,20 +57,49 @@ def lignes(p: pathlib.Path) -> list[dict]:
     return [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
+VERROU_ESSAIS = 100
+VERROU_PAUSE_S = 0.05
+
+
+def prendre_verrou(verrou: pathlib.Path) -> None:
+    """Verrou d'écriture (TF-1575, TF-1367) : un fichier `<ledger>.lock` créé en exclusif, pris pour
+    toute la section lecture-de-la-fin → écriture. Deux sessions simultanées recevaient le même `seq`
+    (seq 283 porté deux fois le 22/09/2026) parce que le numéro était calculé sans verrou. Même
+    mécanisme que `ledger.mjs append`. Un verrou resté pris (processus tué) se supprime à la main."""
+    for _ in range(VERROU_ESSAIS):
+        try:
+            os.close(os.open(verrou, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+            return
+        except FileExistsError:
+            time.sleep(VERROU_PAUSE_S)
+        except PermissionError:           # Windows : création/suppression concurrente du même fichier
+            time.sleep(VERROU_PAUSE_S)
+    raise SystemExit(f"verrou non obtenu après {VERROU_ESSAIS * VERROU_PAUSE_S:.0f} s — un autre "
+                     f"processus détient {verrou} (s'il est mort, supprimer ce fichier)")
+
+
 def ajouter(run: str, type_: str, **champs) -> dict:
     if type_ not in TYPES:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
     p = chemin(run)
-    dejà = lignes(p)
-    if not dejà and type_ != "run_open":
-        raise SystemExit("la première entrée d'un ledger doit être `run_open`")
-    seq = len(dejà) + 1
-    ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    if dejà and ts < dejà[-1]["ts"]:
-        ts = dejà[-1]["ts"]                      # `ts` non décroissant, jamais falsifié
-    e = {"seq": seq, "ts": ts, "type": type_, **champs}
-    with p.open("a", encoding="utf-8", newline="\n") as fh:
-        fh.write(json.dumps(e, ensure_ascii=False) + "\n")
+    verrou = p.with_name(p.name + ".lock")
+    prendre_verrou(verrou)
+    try:
+        dejà = lignes(p)                         # relu SOUS verrou : la fin du fichier au moment d'écrire
+        if not dejà and type_ != "run_open":
+            raise SystemExit("la première entrée d'un ledger doit être `run_open`")
+        seq = (dejà[-1]["seq"] if dejà else 0) + 1
+        ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        if dejà and ts < dejà[-1]["ts"]:
+            ts = dejà[-1]["ts"]                  # `ts` non décroissant, jamais falsifié
+        e = {"seq": seq, "ts": ts, "type": type_, **champs}
+        with p.open("a", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(e, ensure_ascii=False) + "\n")
+    finally:
+        try:
+            verrou.unlink()
+        except FileNotFoundError:
+            pass
     return e
 
 
@@ -101,6 +130,15 @@ def verifier(run: str) -> int:
     if not e:
         bloquants.append("ledger vide")
     else:
+        # TF-1575 : un seq porté par plusieurs entrées (deux écrivains sans verrou commun) se NOMME,
+        # EN TÊTE, à part des ruptures en cascade qu'il provoque ensuite (« seq N attendu M »).
+        lignes_par_seq: dict = {}
+        for i, x in enumerate(e, start=1):
+            lignes_par_seq.setdefault(x["seq"], []).append(i)
+        for s, ls in lignes_par_seq.items():
+            if len(ls) > 1:
+                bloquants.append(f"seq {s} porté par {len(ls)} entrées, lignes "
+                                 f"{', '.join(map(str, ls))} — deux écrivains sans verrou commun")
         if e[0]["type"] != "run_open":
             bloquants.append("première entrée ≠ run_open")
         for i, x in enumerate(e, start=1):
