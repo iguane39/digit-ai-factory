@@ -1,15 +1,17 @@
 # Niveaux d'intervention — proportionner la réponse à la question
 
-Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.3.0,
-12/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
-Moyen en essai ; 1.3.0 ne compte plus une copie vers le dossier temporaire comme un effet). Source : l'étude `output\03-etudes\20260925-etude-opportunite-niveaux-d-intervention.md`,
+Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.4.0,
+13/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
+Moyen en essai ; 1.3.0 ne compte plus une copie vers le dossier temporaire comme un effet ; 1.4.0
+consigne la revue de l'essai). Source : l'étude `output\03-etudes\20260925-etude-opportunite-niveaux-d-intervention.md`,
 verdict O3 (3 niveaux fixés par les effets du tour, déployés en 3 étapes), validé par la décision
 humaine D-3 (a) du 25/09/2026. Candidature au registre : TF-1418 (niveaux d'intervention, étape 1).
 
 **État : étapes 1 et 2 en essai au pilot seul.** Le niveau Simple est en essai du 2026-09-26 au
 2026-10-02 inclus ; le niveau Moyen, du 2026-10-01 au 2026-10-09 inclus, avec sa branche du juge de
 fin de tour. Le niveau Complexe est le fonctionnement actuel, inchangé. Rien ici ne change l'effort
-de la session.
+de la session. **Revue jouée le 2026-10-13** (section « Essai et revue ») : critères non tenus, essai
+à prolonger ; le dispositif reste en service au pilot seul jusqu'à la décision humaine.
 
 ## Ce qui change pour la session
 
@@ -149,3 +151,10 @@ L'essai prouve le gain avant toute généralisation ; il se juge sur des critèr
   réponse acceptée au niveau Moyen dans un tour qui a eu un effet. Retour arrière : retirer la
   branche Moyen du juge, le mot-clé « moyen : » et cette section, ensemble. Revue le 2026-10-09 ;
   la propagation aux produits (étape 3, `gabarits\HERITAGE.json`) n'est envisagée qu'après elle.
+- **Revue jouée le 2026-10-13** (`output\03-etudes\20261013-revue-essai-niveaux-d-intervention.md`),
+  sur les tours du pilot des 2 profils du poste. Simple : médiane de 0,35 minute sur 4 réponses
+  acceptées, atteinte ; 5 textes sur 7 sous 150 mots, non atteint ; arrêt anticipé atteint une fois le
+  01/10, réponse refusée par le juge. Moyen : aucune réponse dans sa fenêtre, critères non jugeables.
+  Complexe : médiane de 8,07 minutes, hors bande dans le sens favorable ; refus à 25,9 %, dégradé.
+  Recommandation : prolonger l'essai, sans propager ni retirer ; la propagation reste une décision
+  humaine.
