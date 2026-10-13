@@ -113,5 +113,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261001-L99-etude-textes-relance.md` | fichier | 13,8 Ko | Analyse L99 — relance de l'étude sur les textes affichés en session |
 | `20261001-L99-textes-affiches-en-session.md` | fichier | 14,2 Ko | Analyse L99 — étude d'opportunité sur les textes affichés en session Claude Code |
 | `20261003-etude-opportunite-pages-html-indicateurs.md` | fichier | 16,3 Ko | Étude d'opportunité — pages HTML de données : indicateurs, graphiques, infobulles et juste |
+| `20261013-revue-essai-niveaux-d-intervention.md` | fichier | 10,5 Ko | Revue de l'essai des niveaux Simple et Moyen : critères écrits d'avance, rejoués le 2026-1 |
 
-_97 fichier(s), 0 sous-dossier(s)_
+_98 fichier(s), 0 sous-dossier(s)_

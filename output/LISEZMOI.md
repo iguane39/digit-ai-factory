@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 392 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 393 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -201,6 +201,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261001-L99-etude-textes-relance.md | — | 13.8 Ko | `03-etudes/20261001-L99-etude-textes-relance.md` |
 | 20261001-L99-textes-affiches-en-session.md | — | 14.2 Ko | `03-etudes/20261001-L99-textes-affiches-en-session.md` |
 | 20261003-etude-opportunite-pages-html-indicateurs.md | — | 16.3 Ko | `03-etudes/20261003-etude-opportunite-pages-html-indicateurs.md` |
+| 20261013-revue-essai-niveaux-d-intervention.md | — | 10.5 Ko | `03-etudes/20261013-revue-essai-niveaux-d-intervention.md` |
 
 ### 04-plans
 
