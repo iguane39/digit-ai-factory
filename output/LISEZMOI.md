@@ -270,7 +270,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md | 20260915a | 22.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md | 20260920e | 30 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md | 20260920d | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md` |
-| Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md | 20261013h | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` |
+| Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md | 20261013h | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` |
 | Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md | 20261012c | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md` |
 | Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md | 20260901b | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` |
 | Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md | 20260908d | 20.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` |
