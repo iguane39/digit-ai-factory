@@ -391,8 +391,8 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 42,
-  "vu_le": "2026-10-12"
+  "cas": 43,
+  "vu_le": "2026-10-13"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
@@ -587,8 +587,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 36,
-  "vu_le": "2026-10-12"
+  "cas": 37,
+  "vu_le": "2026-10-13"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
   "cas": 7,
@@ -683,8 +683,8 @@
   "vu_le": "2026-10-12"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 35,
-  "vu_le": "2026-10-12"
+  "cas": 36,
+  "vu_le": "2026-10-13"
  },
  "todo/generer-page.test.mjs": {
   "cas": 6,
