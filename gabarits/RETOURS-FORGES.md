@@ -79,6 +79,13 @@ refuse toujours. Corriger le sidecar avant la remise ; ce qui exige le registre 
 d'un id inconnu, doublon strict) ne se rejoue pas chez vous. Dans le `.md`, rappeler le numéro du
 retour (« **RT-xxx** : … clé proposée ») sur la ligne de chaque proposition de classe.
 
+**Une règle de forme neuve avertit d'abord (TF-1570, 13/10/2026)** : l'héritage qui porte une règle
+n'atteint un produit qu'à sa prochaine ouverture, et le 01/10 deux lots conformes à leur outillage ont
+été refusés par une règle entrée trois jours plus tôt. Depuis `oracle-lot.mjs` 1.7.0, une règle de
+section dont le seuil est postérieur au 13/10/2026 rend un avertissement, puis un refus, pour les lots
+datés de moins de sept jours après son seuil ; le message dit jusqu'à quel jour. Rafraîchir l'héritage à
+l'ouverture évite d'attendre la fin du délai.
+
 **L'indice est PRIS dès que le lot est remis (R-49, TF-0884, 08/09)** : avant d'écrire un lot,
 demander l'indice libre du jour — `node scripts\allouer-indice.mjs` — plutôt que de reprendre
 celui qu'un mandat nomme. Le 06/09, un compte rendu a pris l'indice « a » que son mandat citait,

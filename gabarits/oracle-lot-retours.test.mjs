@@ -515,6 +515,49 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   });
 }
 
+// ---- TF-1570 : LE DÉLAI DE GRÂCE D'UNE RÈGLE NEUVE ---------------------------------------------
+// Le fait : R-57 est entrée le 28/09, la porte l'a appliquée dès le 29/09, et deux produits dont l'héritage
+// n'était pas encore rafraîchi ont vu refuser le 01/10 des lots conformes à leur outillage. Une règle de
+// section dont le seuil est postérieur à DATE_GRACE avertit pendant GRACE_JOURS jours, puis bloque. Aucune
+// règle réelle n'est encore dans ce cas : le banc simule l'entrée d'une règle neuve en déplaçant le seuil
+// de GFP-LOT (objet exporté), puis le restaure.
+{
+  const { GRACE_JOURS, DATE_GRACE, jourPlus } = await import("./oracle-lot-retours.mjs");
+  const SANS_GFP = "# lot\n\n" + R45 + "\n" + R46 + "\n## Documents mûrs\n\nAucun document mûr.\n";
+  const SEUIL_AVANT = SEUILS["GFP-LOT"];
+  const NEUF = "20261020";
+  const jouer = (jour) => {
+    SEUILS["GFP-LOT"] = NEUF;
+    try { const r = verifier(lot(`${jour}a`), SANS_GFP, { aujourdhui: "20261101" }); return { c: constat(r, "GFP-LOT"), verdict: r.verdict }; }
+    finally { SEUILS["GFP-LOT"] = SEUIL_AVANT; }
+  };
+  check("TF-1570 — jourPlus : 20261020 + 7 = 20261027, et la fin de mois passe", () => {
+    if (jourPlus("20261020", 7) !== "20261027" || jourPlus("20261030", 3) !== "20261102" || jourPlus("20261027", -1) !== "20261026") throw new Error("calcul de date faux");
+    if (GRACE_JOURS !== 7 || DATE_GRACE !== "20261013") throw new Error("paramètres de grâce dérivés");
+  });
+  check("TF-1570 rouge→avertissement — règle neuve, section absente, lot du jour du seuil : AVERTISSEMENT, verdict inchangé, la fin de grâce est dite", () => {
+    const { c, verdict } = jouer(NEUF);
+    if (!c || c.statut !== "AVERTISSEMENT") throw new Error(`statut ${c ? c.statut : "absent"}`);
+    if (!/délai de grâce/.test(c.message) || !/20261026/.test(c.message)) throw new Error(`la grâce ne dit pas jusqu'où : ${c.message}`);
+    if (verdict !== "PASS") throw new Error(`un lot en grâce ne doit pas être bloqué : verdict ${verdict}`);
+  });
+  check("TF-1570 — dernier jour de grâce (seuil + 6 jours) : encore AVERTISSEMENT", () => {
+    const { c } = jouer("20261026");
+    if (!c || c.statut !== "AVERTISSEMENT") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+  check("TF-1570 vert→FAIL — la grâce FINIT : un lot daté du seuil + 7 jours est refusé comme avant", () => {
+    const { c, verdict } = jouer("20261027");
+    if (!c || c.statut !== "FAIL" || /grâce/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+    if (verdict !== "FAIL") throw new Error(`verdict ${verdict}`);
+  });
+  check("TF-1570 borne — une règle d'AVANT DATE_GRACE (GFP-LOT, seuil réel du 02/10) n'a PAS de grâce : le jour du seuil est refusé", () => {
+    const r = verifier(lot("20261002a"), SANS_GFP, { aujourdhui: "20261002" });
+    const c = constat(r, "GFP-LOT");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — une grâce rétroactive affaiblirait ce qui est tenu`);
+    if (SEUILS["GFP-LOT"] !== "20261002") throw new Error("le seuil de GFP-LOT n'a pas été restauré");
+  });
+}
+
 // ---- LOT-SIDECAR (TF-1591, TF-1602) : le sidecar jugé comme la porte le jugera -----------------
 // Le fait : les lots Produit-02 du 03/10 ont été refusés pour « classe-a-creer sans classe_proposee »,
 // que ce juge ne regardait pas — le produit avait rendu PASS. Chaque règle rejouée a son cas rouge ET

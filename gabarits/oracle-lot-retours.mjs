@@ -97,7 +97,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.6.0"; // 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.7.0"; // 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 /**
  * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
@@ -123,7 +123,26 @@ try {
  *  entrée en vigueur le jour où elle rejoint le gabarit (TF-1526). */
 export const SEUILS = { "R-45": "20260821", "R-46": "20260822", "R-57": "20260929", "GFP-LOT": "20261002", "LOT-SIDECAR": "20261013" };
 
-const SECTION_R45 = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
+/**
+ * DÉLAI DE GRÂCE D'UNE RÈGLE NEUVE (TF-1570, 13/10/2026). Mesuré le 02/10 : la règle des documents mûrs
+ * (R-57) était entrée au juge du pilot le 28/09, la porte l'appliquait à tout lot daté du 29/09 ou après,
+ * et deux produits ont remis le 01/10 des lots que leur contrôle de remise, encore en 1.0.0 et 1.1.0,
+ * jugeait conformes : l'héritage qui porte la règle n'atteint un produit qu'à sa prochaine ouverture. La
+ * fenêtre entre l'entrée d'une règle au pilot et son arrivée chez le producteur a fait refuser des lots
+ * conformes à leur outillage. Une règle de SECTION dont le seuil est postérieur à `DATE_GRACE` rend donc
+ * un AVERTISSEMENT, et non un FAIL, pour tout lot daté de moins de `GRACE_JOURS` jours après son seuil ;
+ * ensuite elle bloque. Les règles antérieures (R-45, R-46, R-57, GFP-LOT) ne sont pas touchées : leur
+ * fenêtre est passée, et une grâce rétroactive affaiblirait ce qui est déjà tenu.
+ */
+export const GRACE_JOURS = 7;
+export const DATE_GRACE = "20261013";
+/** AAAAMMJJ + n jours, en jours civils UTC (le nom d'un lot porte une date, pas une heure). */
+export function jourPlus(aaaammjj, n) {
+  const d = new Date(Date.UTC(+aaaammjj.slice(0, 4), +aaaammjj.slice(4, 6) - 1, +aaaammjj.slice(6, 8) + n));
+  return d.toISOString().slice(0, 10).replaceAll("-", "");
+}
+
+const SECTION_R45 =/^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
 const SECTION_R46 = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
 const SECTION_R57 = /^##\s+Documents\s+m[ûu]rs\b[^\n]*$/im;
 // Pas de `\b` juste après la lettre accentuée : sans drapeau Unicode, elle n'a pas de frontière de
@@ -450,16 +469,21 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
         null);
       continue;
     }
+    // TF-1570 : une règle NEUVE (seuil à partir de DATE_GRACE) avertit pendant GRACE_JOURS jours, puis bloque.
+    const finGrace = seuil >= DATE_GRACE ? jourPlus(seuil, GRACE_JOURS) : null;
+    const enGrace = finGrace !== null && date < finGrace;
+    const echec = enGrace ? "AVERTISSEMENT" : "FAIL";
+    const grace = enGrace ? ` [délai de grâce : ${regle} avertit jusqu'au lot du ${jourPlus(finGrace, -1)} et bloque ensuite — l'héritage qui la porte n'atteint un produit qu'à sa prochaine ouverture]` : "";
     if (!section.test(texte)) {
-      ajouter(regle, "FAIL",
-        `section « ${quoi} » absente — ${pourquoi}`,
+      ajouter(regle, echec,
+        `section « ${quoi} » absente — ${pourquoi}${grace}`,
         `ajouter la section « ## ${quoi} » au lot. Rien à y mettre ? L'écrire : « ${rienADire} ». La forme se déclare, elle ne se devine pas (loi n° 3). Gabarit : ${GABARIT_LOT}`);
       continue;
     }
     const suite = corpsDeSection(texte, section);
     if (!present.test(suite) && !absent.test(suite)) {
-      ajouter(regle, "FAIL",
-        `la section « ${quoi} » ne porte ni ${substance}, ni la déclaration qu'il n'y a rien à dire — une section vide se lit comme un oubli, et l'omission ne vaut pas décision`,
+      ajouter(regle, echec,
+        `la section « ${quoi} » ne porte ni ${substance}, ni la déclaration qu'il n'y a rien à dire — une section vide se lit comme un oubli, et l'omission ne vaut pas décision${grace}`,
         `porter sous la section ${substance}, ou écrire « ${rienADire} »`);
       continue;
     }
