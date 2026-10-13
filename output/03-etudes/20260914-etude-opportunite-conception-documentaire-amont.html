@@ -23,6 +23,7 @@
   
   <title>Digit-AI — Étude d'opportunité — conception documentaire en amont — 20260914b — 20260914a</title>
   <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict.">
+  <meta name="ai-generated" content="Claude Code">
   <meta name="theme-color" content="#2563EB">
   
   <meta name="color-scheme" content="light">
@@ -84,9 +85,9 @@
          jamais lu n'est pas neutre, c'est la trace visible d'une doctrine abandonnee, en tete
          du fichier que tout auteur de page copie. Le prochain le rebrancherait. */
       --w: clamp(75vw, 1680px, 92vw);
-      /* Familles (repli système obligatoire) */
-      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
-      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      /* Familles (repli système obligatoire) — charte des présentations (D-5 (a), D-11 (a)) */
+      --head: "Montserrat", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "Inter", "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
       /* Année de référence (token isolé) */
       --annee-ref: "2026";
@@ -316,6 +317,20 @@
       .theme-toggle { display: none; }
     }
   </style>
+  <style>
+    nav.toc{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
+    nav.toc a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink)}
+    nav.toc a:hover{text-decoration:underline}
+    nav.toc a strong{font-size:.85rem;font-weight:600}
+    .toc-d{color:var(--muted);font-size:.72rem;font-weight:400}
+    .ch-apprend{margin:0 0 16px;color:var(--muted)}
+    nav.barre{display:none}
+    @media (max-width:900px){
+      nav.barre{display:flex;flex-wrap:wrap;gap:4px 16px;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
+      nav.barre a{flex:0 1 auto;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
+      nav.barre a:hover{text-decoration:underline}
+    }
+  </style>
 <!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
@@ -451,15 +466,44 @@ tr[data-tf-empty] td {
       <p id="findCount" class="find-count" aria-live="polite"></p>
     </div>
 <section class="chap lire" data-mesure-lecture>
+<p class="intention">Cette page sert à décider, pour le pilote de l'écosystème, de la suite à donner à l'étude : concevoir en amont, par type de document, de contenu et de lecteur, les formats et contenus des documents avant leur construction.</p>
+</section>
+<nav class="toc colle" aria-label="Sommaire">
+      <a href="#seuil-de-declenchement-verifie-avant-ecriture"><strong>Seuil de déclenchement (vérifié avant écriture)</strong> <span class="toc-d">Chapitre 1 sur 9</span></a>
+      <a href="#intention-de-l-utilisateur-loi-n-7"><strong>Intention de l'utilisateur (loi n° 7)</strong> <span class="toc-d">Chapitre 2 sur 9</span></a>
+      <a href="#0-traitement-des-entrants"><strong>0. Traitement des entrants</strong> <span class="toc-d">Chapitre 3 sur 9</span></a>
+      <a href="#1-partition-du-probleme"><strong>1. Partition du problème</strong> <span class="toc-d">Chapitre 4 sur 9</span></a>
+      <a href="#2-non-recouvrement-contre-l-existant"><strong>2. Non-recouvrement contre l'existant</strong> <span class="toc-d">Chapitre 5 sur 9</span></a>
+      <a href="#3-etat-de-l-art-date"><strong>3. État de l'art daté</strong> <span class="toc-d">Chapitre 6 sur 9</span></a>
+      <a href="#4-options-jeu-ferme-o0-o4"><strong>4. Options — jeu fermé O0-O4</strong> <span class="toc-d">Chapitre 7 sur 9</span></a>
+      <a href="#5-verdict"><strong>5. Verdict</strong> <span class="toc-d">Chapitre 8 sur 9</span></a>
+      <a href="#annexe-mesure-et-retro-test"><strong>Annexe — mesure et rétro-test</strong> <span class="toc-d">Chapitre 9 sur 9</span></a>
+    </nav>
+<nav class="barre" aria-label="Sommaire permanent"><a href="#seuil-de-declenchement-verifie-avant-ecriture">Seuil de déclenchement (vérifié avant écriture)</a><a href="#intention-de-l-utilisateur-loi-n-7">Intention de l'utilisateur (loi n° 7)</a><a href="#0-traitement-des-entrants">0. Traitement des entrants</a><a href="#1-partition-du-probleme">1. Partition du problème</a><a href="#2-non-recouvrement-contre-l-existant">2. Non-recouvrement contre l'existant</a><a href="#3-etat-de-l-art-date">3. État de l'art daté</a><a href="#4-options-jeu-ferme-o0-o4">4. Options — jeu fermé O0-O4</a><a href="#5-verdict">5. Verdict</a><a href="#annexe-mesure-et-retro-test">Annexe — mesure et rétro-test</a></nav>
+<section class="chap lire" data-mesure-lecture>
 <p>Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict. L'étude instruit la demande du 14/09/2026 telle que réécrite par l'analyse L99 du même jour, sous la décision humaine prise à sa lecture : « 7a », soit D-7 (a), la lecture reconstruite de l'intention et les sept écarts à la lettre validés, le prompt réécrit exécuté tel quel.</p>
 <p><strong>Ce que le lecteur va apprendre.</strong> Sur 20 griefs réels de lecteurs portant sur des documents, 11 auraient été évités par une conception fixée avant l'écriture — qui est le lecteur, ce qu'il doit décider, le type de contenu de chaque partie, le format qui en découle — et par elle seule ; 2 par un oracle existant qu'on aurait joué, 2 par les deux, 5 par rien. Le seuil fixé d'avance était de 6. La conception en amont est donc justifiée, sous réserve : un seul classeur, sans jugement à l'aveugle. Elle ne demande pas d'outil neuf : les pièces existent, et le verdict les assemble en une fiche courte remplie avant chaque document, jugée avant l'écriture. Deux limites commandent la suite : le taux de retours par document ne se calcule pas aujourd'hui, faute de documents qui disent de quel gabarit ils sortent ; et « zéro retour » ne peut pas être la cible, puisque l'absence de retour mesure un silence, pas une réussite.</p>
-<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
+</section>
+<section id="seuil-de-declenchement-verifie-avant-ecriture">
+<h2>Seuil de déclenchement (vérifié avant écriture)</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Le seuil est franchi parce que toute option autre que le statu quo crée ou étend un référentiel, un gabarit ou un câblage de contrôle, chez quatre porteurs pour un seuil de trois.</p>
 <p>Franchi sur deux critères. <strong>Objet durable</strong> : toute option autre que le statu quo crée ou étend un référentiel (catalogue, typologie), un gabarit exécutable ou un câblage de contrôle, objets que la règle 31 soumet à étude. <strong>Portée</strong> : le pilot, forge-design (socle HTML), forge-agents (porteur de quality-oracles) et les produits par l'héritage sont touchés, quatre porteurs pour un seuil à trois.</p>
-<h3>Intention de l'utilisateur (loi n° 7)</h3>
+</section>
+</section>
+<section id="intention-de-l-utilisateur-loi-n-7">
+<h2>Intention de l'utilisateur (loi n° 7)</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">La demande du 14/09/2026 est citée mot pour mot ; sa lecture validée veut qu'un document parte juste la première fois et que chaque retour rende plus justes les documents suivants.</p>
 <p>Citée dans les mots du demandeur, message du 14/09/2026 : « comment anticiper, via un outil de conception, spécialisé par types de documents, types de contenus, types de lecteurs cibles, afin de travailler en amont de la construction des fichiers HTML leurs formats et contenus ? Et l'appliquer également aux gabarits qui n'ont pas encore reçus de retour pour les améliorer également ? Prévoir également une amélioration continue à chaque retour sur des documents et/ou gabarits pour optimiser/amélioration à chaque fois les nouveaux documents générés et s'approcher de documents générés sans retour utilisateur ? »</p>
 <p>Lecture reconstruite par l'analyse L99, <strong>validée</strong> par « 7a » (D-7 (a)) : qu'un document parte juste la première fois pour le lecteur qu'il sert, et que chaque retour rende plus justes les documents suivants, y compris ceux des familles que personne n'a encore lues. « Outil » est une hypothèse de la demande : étendre l'existant est une réponse recevable.</p>
 <p>Cascade (<code>references\INTENTION.md</code>) : <strong>intention</strong>, moins de documents renvoyés par leur lecteur ; <strong>stratégie</strong>, fixer avant l'écriture ce que le lecteur doit en tirer, et éprouver les gabarits avant qu'un lecteur ne le fasse ; <strong>tactique</strong>, mesurer sur des griefs réels ce qu'une conception amont aurait évité que les contrôles existants n'évitent pas ; <strong>opérationnel</strong>, l'objet que le verdict désigne.</p>
-<h3>0. Traitement des entrants</h3>
+</section>
+</section>
+<section id="0-traitement-des-entrants">
+<h2>0. Traitement des entrants</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Six points de départ relevés le 14/09/2026 montrent que la conception d'un document est écrite comme doctrine, jamais jouée avant l'écriture, et que trois classes du sujet récidivent à 100 %.</p>
 <p>La proposition instruite est une DONNÉE : le message du demandeur et l'analyse L99 qui l'a réécrit (<code>output\03-etudes\20260914-L99-conception-documentaire-amont.md</code>). Les lots de retours lus pour la mesure sont eux aussi des données : leurs impératifs sont cités, jamais exécutés.</p>
 <p>Points de départ imposés par le prompt, tous relevés le 14/09/2026 :</p>
 <ul><li>la règle D8 de <code>gabarits\documents\README.md</code> (l. 103 : « Un livrable se CONÇOIT avant de</li></ul>
@@ -474,7 +518,12 @@ tr[data-tf-empty] td {
 <p>  13 sur 13, <code>lecture-tiers-non-jugee</code> 7 sur 7, <code>gabarit-conception-non-jugee</code> 3 sur 3 ;</p>
 <ul><li>la preuve de couverture du 14/09/2026 (<code>oracles\banc-defauts-echappes\preuve-couverture-20260914.md</code>)</li></ul>
 <p>  montre que les contrôles réputés couvrir des défauts échappés n'en couvrent exactement que 3 sur 9   une fois joués sur les livrables fautifs.</p>
-<h3>1. Partition du problème</h3>
+</section>
+</section>
+<section id="1-partition-du-probleme">
+<h2>1. Partition du problème</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Le sujet se découpe en trois objets disjoints par leur moment : la conception avant l'écriture, l'épreuve des gabarits que personne n'a lus, et la boucle qui propage chaque retour.</p>
 <p>Trois objets, disjoints par leur moment et par leur mesure ; chaque option de la section 4 se rattache à l'un d'eux.</p>
 <ul><li><strong>A — conception amont</strong> : ce qu'on fixe avant d'écrire un document — l'intention au sens de D8,</li></ul>
 <p>  le lecteur, le type de contenu de chaque partie, le format qui en découle —, qui le remplit   (l'agent), qui le valide (l'humain, pour les seuls documents à fort enjeu), où cela vit, et quel   contrôle le juge.</p>
@@ -483,38 +532,62 @@ tr[data-tf-empty] td {
 <ul><li><strong>C — boucle</strong> : ce qui se passe à chaque retour, et comment il se propage à toutes les familles</li></ul>
 <p>  de sa classe, pas seulement au document ou à la famille touchés.</p>
 <p>Types de documents : les familles du catalogue. Types de contenus : une typologie établie (section 3). Lecteurs : définis par ce qu'ils doivent décider avec le document, ce qu'ils savent déjà, le vocabulaire qu'ils n'ont pas, et leur contexte de lecture — jamais un personnage, l'étude du 14/09/2026 ayant mesuré qu'un rôle incarné ne fait pas trouver plus de défauts.</p>
-<h3>2. Non-recouvrement contre l'existant</h3>
+</section>
+</section>
+<section id="2-non-recouvrement-contre-l-existant">
+<h2>2. Non-recouvrement contre l'existant</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Treize mécanismes existants portent chacun un morceau de la demande, mais aucun ne fixe le lecteur et le type de contenu d'un document avant qu'il soit écrit.</p>
 <p><strong>Mode de lecture</strong> : une ligne par mécanisme existant qui pourrait déjà porter la demande ; la citation localise ce qu'il fait ; la dernière colonne dit s'il recouvre A, B ou C.</p>
 </section>
-<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">Règle D8 des gabarits</td><td data-label="Citation"><code>gabarits\documents\README.md</code> l. 103 : conception de l'intention à l'opérationnel, vérifiée en remontant ; l. 106 : « une DOCTRINE, pas un oracle »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la <strong>méthode</strong> de A ; ne recouvre pas son <strong>exécution</strong> : rien ne la joue avant l'écriture</td></tr><tr><td data-label="Existant examiné">Typologie des textes</td><td data-label="Citation"><code>references\ECRITURE.md</code> l. 43-47, T1-T5 par lecteur ; T2 : « le destinataire nommé du livrable »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le principe du lecteur ; ne recouvre pas A : un seul lecteur pour tous les documents</td></tr><tr><td data-label="Existant examiné">Catalogue et son oracle</td><td data-label="Citation"><code>gabarits\documents\catalogue.jsonl</code> (champs <code>quand_l_employer</code>, <code>formats</code>, <code>regles</code>, <code>oracles</code>) ; <code>oracle-gabarits-documents</code> G1-G4, G8</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le type de document ; ne recouvre pas le lecteur ni le type de contenu</td></tr><tr><td data-label="Existant examiné">Oracle de conception</td><td data-label="Citation"><code>oracle-conception-livrable.mjs</code> C1 glossaire, C2 listes autoportantes, C3 intention de chapitre</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre une part de A, <strong>après</strong> l'écriture</td></tr><tr><td data-label="Existant examiné">Oracle de lecture par un tiers</td><td data-label="Citation"><code>oracle-lecture-tiers.mjs</code> T1 intention, T2 vocabulaire, T3 geste, T4 lecture sans le brief ; invocation explicite</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le lecteur sans contexte, après l'écriture ; sa classe récidive 7 sur 7 faute d'invocation</td></tr><tr><td data-label="Existant examiné"><code>digit-ai-communication</code></td><td data-label="Citation">description du skill : analyse d'audience, préréglages par type de livrable (propale, COPIL, formation, note)</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre A pour les messages et prises de parole ; ne recouvre pas le format d'un document HTML</td></tr><tr><td data-label="Existant examiné">Voix de marque</td><td data-label="Citation"><code>systeme-de-marque</code>, <code>voix.md</code> : voix, ton, vocabulaire, anti-références</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : fixe la voix de l'émetteur, pas le lecteur d'un document</td></tr><tr><td data-label="Existant examiné"><code>la-barre</code></td><td data-label="Citation">description du skill : référence externe de qualité, mode pré-vol avant exécution</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la barre de qualité, pas le lecteur ni le contenu</td></tr><tr><td data-label="Existant examiné">Design amont de forge-design</td><td data-label="Citation"><code>CLAUDE.md</code> du pilot, étape 3 : <code>DESIGN.md</code> et maquette avant development</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre A pour les produits applicatifs, pas pour les documents</td></tr><tr><td data-label="Existant examiné">Boucle d'amélioration</td><td data-label="Citation"><code>BOUCLE-AMELIORATION.md</code> ; registre, 81 classes, récidives comptées (<code>todo\RECIDIVES.md</code>)</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre C en mode réactif ; ne propage pas un retour aux autres familles de sa classe</td></tr><tr><td data-label="Existant examiné">Banc des défauts échappés</td><td data-label="Citation"><code>oracles\banc-defauts-echappes\README.md</code> (TF-1073) : tout mécanisme de relecture passe le banc avant adoption</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la mesure de C et de B pour les défauts déjà payés</td></tr><tr><td data-label="Existant examiné">Candidature des défauts semés</td><td data-label="Citation">TF-1079 : une instance semée par classe dans un livrable témoin</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre B par la preuve, pas par la conception</td></tr><tr><td data-label="Existant examiné">Candidature du contrôle à la porte</td><td data-label="Citation">TF-1076 : <code>gabarit-famille-manquante</code> bloquant au geste</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre une part de A (famille résolue avant l'écriture)</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-1" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Existant examiné » (1 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Existant examiné</th><th scope="col" data-definition="Colonne « Citation » (2 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Citation</th><th scope="col" data-definition="Colonne « Verdict (recouvre / ne recouvre pas) » (3 sur 3) du tableau du chapitre « 2. Non-recouvrement contre l'existant »">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td data-label="Existant examiné">Règle D8 des gabarits</td><td data-label="Citation"><code>gabarits\documents\README.md</code> l. 103 : conception de l'intention à l'opérationnel, vérifiée en remontant ; l. 106 : « une DOCTRINE, pas un oracle »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la <strong>méthode</strong> de A ; ne recouvre pas son <strong>exécution</strong> : rien ne la joue avant l'écriture</td></tr><tr><td data-label="Existant examiné">Typologie des textes</td><td data-label="Citation"><code>references\ECRITURE.md</code> l. 43-47, T1-T5 par lecteur ; T2 : « le destinataire nommé du livrable »</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le principe du lecteur ; ne recouvre pas A : un seul lecteur pour tous les documents</td></tr><tr><td data-label="Existant examiné">Catalogue et son oracle</td><td data-label="Citation"><code>gabarits\documents\catalogue.jsonl</code> (champs <code>quand_l_employer</code>, <code>formats</code>, <code>regles</code>, <code>oracles</code>) ; <code>oracle-gabarits-documents</code> G1-G4, G8</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le type de document ; ne recouvre pas le lecteur ni le type de contenu</td></tr><tr><td data-label="Existant examiné">Oracle de conception</td><td data-label="Citation"><code>oracle-conception-livrable.mjs</code> C1 glossaire, C2 listes autoportantes, C3 intention de chapitre</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre une part de A, <strong>après</strong> l'écriture</td></tr><tr><td data-label="Existant examiné">Oracle de lecture par un tiers</td><td data-label="Citation"><code>oracle-lecture-tiers.mjs</code> T1 intention, T2 vocabulaire, T3 geste, T4 lecture sans le brief ; invocation explicite</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre le lecteur sans contexte, après l'écriture ; sa classe récidive 7 sur 7 faute d'invocation</td></tr><tr><td data-label="Existant examiné"><code>digit-ai-communication</code></td><td data-label="Citation">description du skill : analyse d'audience, préréglages par type de livrable (propale, COPIL, formation, note)</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre A pour les messages et prises de parole ; ne recouvre pas le format d'un document HTML</td></tr><tr><td data-label="Existant examiné">Voix de marque</td><td data-label="Citation"><code>systeme-de-marque</code>, <code>voix.md</code> : voix, ton, vocabulaire, anti-références</td><td data-label="Verdict (recouvre / ne recouvre pas)">ne recouvre pas : fixe la voix de l'émetteur, pas le lecteur d'un document</td></tr><tr><td data-label="Existant examiné"><code>la-barre</code></td><td data-label="Citation">description du skill : référence externe de qualité, mode pré-vol avant exécution</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la barre de qualité, pas le lecteur ni le contenu</td></tr><tr><td data-label="Existant examiné">Design amont de forge-design</td><td data-label="Citation"><code>CLAUDE.md</code> du pilot, étape 3 : <code>DESIGN.md</code> et maquette avant development</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre A pour les produits applicatifs, pas pour les documents</td></tr><tr><td data-label="Existant examiné">Boucle d'amélioration</td><td data-label="Citation"><code>BOUCLE-AMELIORATION.md</code> ; registre, 81 classes, récidives comptées (<code>todo\RECIDIVES.md</code>)</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre C en mode réactif ; ne propage pas un retour aux autres familles de sa classe</td></tr><tr><td data-label="Existant examiné">Banc des défauts échappés</td><td data-label="Citation"><code>oracles\banc-defauts-echappes\README.md</code> (TF-1073) : tout mécanisme de relecture passe le banc avant adoption</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre la mesure de C et de B pour les défauts déjà payés</td></tr><tr><td data-label="Existant examiné">Candidature des défauts semés</td><td data-label="Citation">TF-1079 : une instance semée par classe dans un livrable témoin</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre B par la preuve, pas par la conception</td></tr><tr><td data-label="Existant examiné">Candidature du contrôle à la porte</td><td data-label="Citation">TF-1076 : <code>gabarit-famille-manquante</code> bloquant au geste</td><td data-label="Verdict (recouvre / ne recouvre pas)">recouvre une part de A (famille résolue avant l'écriture)</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
 <section class="chap lire" data-mesure-lecture>
-<h3>3. État de l'art daté</h3>
+<blockquote class="exemple-lecture"><p><strong>Exemple de lecture</strong> : la ligne « Oracle de lecture par un tiers » dit qu'il juge bien le lecteur sans contexte, mais après l'écriture et sur invocation seulement, d'où sa classe qui récidive 7 fois sur 7.</p></blockquote>
+</section>
+</section>
+<section id="3-etat-de-l-art-date">
+<h2>3. État de l'art daté</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Dix sources récentes confirment que penser le lecteur avant d'écrire aide, que les typologies de contenu reposent encore sur DITA, et que l'absence de retour mesure une sortie, pas une réussite.</p>
 <p>Dix sources publiées après le 14/09/2024, ouvertes le 14/09/2026 par une recherche déléguée (modèle Sonnet, défaut de routage du contrat d'interface §4, escalade : aucune). Limite déclarée par la recherche elle-même : l'axe A repose sur des travaux académiques ; les axes B et C ne reposent que sur des articles d'éditeurs et de praticiens, sans étude contrôlée.</p>
 <p><strong>Mode de lecture</strong> : une ligne par source, groupées par axe ; la dernière colonne donne le résultat et sa limite. L'axe A instruit l'objet A, l'axe B la typologie des contenus, l'axe C l'objet C.</p>
 </section>
-<div class="defile"><table id="tab-2" data-filterable class="repli-cartes"><thead><tr><th scope="col">Axe</th><th scope="col">Source (date, localisateur)</th><th scope="col">Résultat et limite</th></tr></thead><tbody><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Guo, Sohn, Leroy, Cohen, 2025-05-15, arXiv 2505.10409</td><td data-label="Résultat et limite">150 lecteurs : les résumés en langage clair écrits par des humains font mieux comprendre que ceux d'un modèle ; échantillon en ligne, sans contexte réel</td></tr><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Pal, Wangmo, Bharadia et al., 2025-07-31, *Patient Preference and Adherence* 19</td><td data-label="Résultat et limite">sorties de modèles jugées lisibles pour le grand public ; « only three studies involved actual patients »</td></tr><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Moreno, Martínez, 2026-03-19, arXiv 2603.18879</td><td data-label="Résultat et limite">les systèmes actuels « fail to reflect user comprehension or normative standards » ; cadre proposé, sans évaluation à grande échelle</td></tr><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Ayesh, Gutiérrez-Rolón, Alva-Manchego, 2025-08-05, arXiv 2508.03240</td><td data-label="Résultat et limite">réécriture en langage clair par consignes à un modèle, classée 2e et 3e d'une tâche partagée ; une seule langue</td></tr><tr><td data-label="Axe">B — contenu</td><td data-label="Source (date, localisateur)">Drury, 2025-09-26, blog MadCap Software</td><td data-label="Résultat et limite">contenu découpé en blocs réutilisables (procédures, descriptions, politiques) ; contenu d'éditeur, sans preuve indépendante</td></tr><tr><td data-label="Axe">B — contenu</td><td data-label="Source (date, localisateur)">Mosher Zinck, 2025-11-26, blog Paligo</td><td data-label="Résultat et limite">contenu structuré par sujets, séparé de sa mise en forme ; argumentaire commercial</td></tr><tr><td data-label="Axe">B — contenu</td><td data-label="Source (date, localisateur)">Fechter, 2026-08, TechnicalWriterHQ (guide DITA)</td><td data-label="Résultat et limite">le triptyque concept, tâche, référence reste la référence ; vulgarisation</td></tr><tr><td data-label="Axe">C — mesure</td><td data-label="Source (date, localisateur)">Isaacs, 2026-08-28, blog Voiceflow</td><td data-label="Résultat et limite">une absence de ticket compte une sortie, pas une réussite : « a customer who abandons … has been 'deflected' » ; centré support</td></tr><tr><td data-label="Axe">C — mesure</td><td data-label="Source (date, localisateur)">Alibhai, 2026-03-21, blog Supportbench</td><td data-label="Résultat et limite">le ressenti diverge de la réussite de la tâche ; pas de cadre validé</td></tr><tr><td data-label="Axe">C — mesure</td><td data-label="Source (date, localisateur)">Fechter, 2026-03-16, TechnicalWriterHQ</td><td data-label="Résultat et limite">« a page can be popular and wrong at the same time » ; propose le délai de correction après retour comme métrique de boucle</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-2" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Axe » (1 sur 3) du tableau du chapitre « 3. État de l'art daté »">Axe</th><th scope="col" data-definition="Colonne « Source (date, localisateur) » (2 sur 3) du tableau du chapitre « 3. État de l'art daté »">Source (date, localisateur)</th><th scope="col" data-definition="Colonne « Résultat et limite » (3 sur 3) du tableau du chapitre « 3. État de l'art daté »">Résultat et limite</th></tr></thead><tbody><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Guo, Sohn, Leroy, Cohen, 2025-05-15, arXiv 2505.10409</td><td data-label="Résultat et limite">150 lecteurs : les résumés en langage clair écrits par des humains font mieux comprendre que ceux d'un modèle ; échantillon en ligne, sans contexte réel</td></tr><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Pal, Wangmo, Bharadia et al., 2025-07-31, *Patient Preference and Adherence* 19</td><td data-label="Résultat et limite">sorties de modèles jugées lisibles pour le grand public ; « only three studies involved actual patients »</td></tr><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Moreno, Martínez, 2026-03-19, arXiv 2603.18879</td><td data-label="Résultat et limite">les systèmes actuels « fail to reflect user comprehension or normative standards » ; cadre proposé, sans évaluation à grande échelle</td></tr><tr><td data-label="Axe">A — lecteur</td><td data-label="Source (date, localisateur)">Ayesh, Gutiérrez-Rolón, Alva-Manchego, 2025-08-05, arXiv 2508.03240</td><td data-label="Résultat et limite">réécriture en langage clair par consignes à un modèle, classée 2e et 3e d'une tâche partagée ; une seule langue</td></tr><tr><td data-label="Axe">B — contenu</td><td data-label="Source (date, localisateur)">Drury, 2025-09-26, blog MadCap Software</td><td data-label="Résultat et limite">contenu découpé en blocs réutilisables (procédures, descriptions, politiques) ; contenu d'éditeur, sans preuve indépendante</td></tr><tr><td data-label="Axe">B — contenu</td><td data-label="Source (date, localisateur)">Mosher Zinck, 2025-11-26, blog Paligo</td><td data-label="Résultat et limite">contenu structuré par sujets, séparé de sa mise en forme ; argumentaire commercial</td></tr><tr><td data-label="Axe">B — contenu</td><td data-label="Source (date, localisateur)">Fechter, 2026-08, TechnicalWriterHQ (guide DITA)</td><td data-label="Résultat et limite">le triptyque concept, tâche, référence reste la référence ; vulgarisation</td></tr><tr><td data-label="Axe">C — mesure</td><td data-label="Source (date, localisateur)">Isaacs, 2026-08-28, blog Voiceflow</td><td data-label="Résultat et limite">une absence de ticket compte une sortie, pas une réussite : « a customer who abandons … has been 'deflected' » ; centré support</td></tr><tr><td data-label="Axe">C — mesure</td><td data-label="Source (date, localisateur)">Alibhai, 2026-03-21, blog Supportbench</td><td data-label="Résultat et limite">le ressenti diverge de la réussite de la tâche ; pas de cadre validé</td></tr><tr><td data-label="Axe">C — mesure</td><td data-label="Source (date, localisateur)">Fechter, 2026-03-16, TechnicalWriterHQ</td><td data-label="Résultat et limite">« a page can be popular and wrong at the same time » ; propose le délai de correction après retour comme métrique de boucle</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-2" aria-live="polite"></p>
 <section class="chap lire" data-mesure-lecture>
+<blockquote class="exemple-lecture"><p><strong>Exemple de lecture</strong> : la ligne Isaacs, du 28/08/2026, rattachée à l'axe C, dit qu'un client qui abandonne compte comme une sortie sans être une réussite ; sa limite est d'être centrée sur le support.</p></blockquote>
 <p>Références normatives plus anciennes, citées comme telles et hors du compte des dix : ISO 24495-1:2023, langage clair (quatre principes : pertinent, trouvable, compréhensible, utilisable ; page iso.org non ouverte, contenu confirmé par une source contributrice) ; OASIS DITA 1.3, standard du 2015-12-17 (types de sujets concept, tâche, référence) ; Information Mapping, Horn et al., 1969 (types d'information concept, procédure, processus, principe, fait, structure, classification ; document primaire non ouvert, date corroborée par deux sources secondaires).</p>
 <p><strong>Ce que la littérature dit, par axe.</strong> Pour A, penser le lecteur avant d'écrire est un principe actif, et l'écart entre un texte généré et la compréhension réelle reste mesuré, non comblé (preuve moyenne). Pour B, aucune source académique récente ne réévalue les typologies de contenu ; les normes DITA et Information Mapping restent la base disponible (preuve faible pour le récent, forte pour l'usage établi). Pour C, les sources convergent sur un point que la demande doit entendre : l'absence de retour mesure une sortie, pas la réussite du lecteur (preuve faible à moyenne).</p>
-<h3>4. Options — jeu fermé O0-O4</h3>
-<h4>Ce que la mesure a donné</h4>
+</section>
+</section>
+<section id="4-options-jeu-ferme-o0-o4">
+<h2>4. Options — jeu fermé O0-O4</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Sur 20 griefs réels, 11 relèvent de la seule conception amont, au-dessus du seuil de 6 fixé d'avance : le statu quo et l'outil neuf sont réfutés, la simple extension de l'existant est insuffisante.</p>
+<h3>Ce que la mesure a donné</h3>
 <p>La mesure a été jouée en lecture seule par une session déléguée (modèle Sonnet, 57 appels d'outils, 276 557 tokens), sur les lots de retours datés du 15/08 au 14/09/2026 (171 fichiers). Détail en annexe.</p>
 <ul><li><strong>Mesure de départ.</strong> Au moins 47 retours portent sur un document ou un gabarit de document :</li></ul>
 <p>  11 sur la fiche sécurité, 6 sur des familles absentes du catalogue au moment du retour, 5 sur des   documents de projet hors catalogue, 4 sur le rapport de données, 4 sur le socle HTML, 3 sur les   dossiers d'architecture et d'exploitation, 3 sur le gabarit de restitution, 3 sur un support   PowerPoint, 1 sur un rapport d'audit, 1 sur un index. C'est un plancher : un retour documentaire   rangé hors de la section dédiée des lots a été trouvé et n'est pas compté.</p>
 <ul><li><strong>Dénominateur absent.</strong> 13 fichiers du parc affichent « Gabarit : gd-… » : 6 sont les</li></ul>
 <p>  squelettes et instances du catalogue, 2 des copies héritées, 1 une page d'archive qui cite la   chaîne, 4 seulement des livrables réels. Le taux de retours par document n'est pas calculable, et   trois griefs du rétro-test portent précisément sur l'absence de cette étiquette.</p>
 <ul><li><strong>Rétro-test, 20 griefs</strong> sur 10 familles ou types de documents, listés avec leur source avant</li></ul>
-<p>  les résultats (annexe) : <strong>amont seul 11</strong>, oracle seul 2, les deux 2, aucun 5. Seuil fixé d'avance :   6. Les griefs évités par l'amont se groupent en trois causes : un document sans famille ni conception   préalable (griefs 5, 8, 13, 14, 19), un vocabulaire du lecteur non fixé (18, 20), un format non   dérivé du volume de contenu (2, 10, 11, 12).</p>
+<p>  les résultats (annexe) : <strong>amont seul 11</strong>, oracle seul 2, les deux 2, aucun 5. Seuil fixé d'avance :</p>
+<ol><li>Les griefs évités par l'amont se groupent en trois causes : un document sans famille ni conception</li></ol>
+<p>  préalable (griefs 5, 8, 13, 14, 19), un vocabulaire du lecteur non fixé (18, 20), un format non   dérivé du volume de contenu (2, 10, 11, 12).</p>
 <p>Réserves : les 20 griefs ont été choisis et classés par la même session, sans jugement à l'aveugle ni second classeur ; le grief 9 est une paraphrase fidèle du lot, pas une citation. Le verdict est donc rendu sous réserve.</p>
-<h4>Les options</h4>
+<h3>Les options</h3>
 <p><strong>Mode de lecture</strong> : une ligne par option du jeu fermé ; « sur la mesure » dit ce que les chiffres en font. Les options s'emboîtent de la plus légère à la plus lourde.</p>
 </section>
-<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col">Option</th><th scope="col">Contenu</th><th scope="col">Coût</th><th scope="col">Ce qu'elle exclut</th><th scope="col">Sur la mesure</th></tr></thead><tbody><tr><td data-label="Option"><strong>O0 — ne rien faire</strong></td><td data-label="Contenu">les pièces restent éparses, jouées après l'écriture</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">toute baisse des retours documentaires</td><td data-label="Sur la mesure"><strong>réfutée</strong> : 11 griefs sur 20 relèvent de la seule conception amont, et les trois classes du sujet récidivent à 100 %</td></tr><tr><td data-label="Option"><strong>O1 — étendre et câbler l'existant</strong></td><td data-label="Contenu">champs « lecteur » et « type de contenu » au catalogue ; T2 décliné par lecteur dans <code>ECRITURE.md</code> ; <code>oracle-conception-livrable</code> et <code>oracle-lecture-tiers</code> joués d'office à l'écriture des pages ; étiquette de gabarit exigée partout</td><td data-label="Coût">moyen × court</td><td data-label="Ce qu'elle exclut">la décision de conception prise avant d'écrire : O1 juge après</td><td data-label="Sur la mesure"><strong>insuffisante</strong> : elle couvre les griefs « oracle » et « les deux », 4 sur 20, pas les 11 « amont »</td></tr><tr><td data-label="Option"><strong>O2 — O1 plus une fiche de conception amont</strong></td><td data-label="Contenu">par document, une fiche courte remplie par l'agent avant d'écrire (intention au sens de D8, lecteur défini par ses décisions, type de contenu par partie, format dérivé), validée par l'humain pour les seuls documents à fort enjeu, jugée par un contrôle avant l'écriture</td><td data-label="Coût">moyen × moyen</td><td data-label="Ce qu'elle exclut">l'épreuve des gabarits non lus et la propagation des retours</td><td data-label="Sur la mesure">couvre les 11 griefs « amont » et les 4 autres évitables, soit 15 sur 20 ; ne traite ni B ni C</td></tr><tr><td data-label="Option"><strong>O3 — O2 plus l'épreuve et la propagation</strong></td><td data-label="Contenu">O2, plus l'épreuve des gabarits non lus par des défauts semés (TF-1079) et par la lecture d'un tiers sur leur instance, plus la propagation de chaque retour à toutes les familles de sa classe</td><td data-label="Coût">complexe × moyen</td><td data-label="Ce qu'elle exclut">une réécriture spéculative des gabarits : on éprouve, on ne modifie que sur échec</td><td data-label="Sur la mesure">couvre A, B et C ; B et C s'appuient sur des candidatures existantes (TF-1079, TF-1076, TF-1095)</td></tr><tr><td data-label="Option"><strong>O4 — un outil ou un skill neuf</strong></td><td data-label="Contenu">un « outil de conception documentaire » séparé</td><td data-label="Coût">complexe × long</td><td data-label="Ce qu'elle exclut">la réutilisation de D8, du catalogue et des deux oracles</td><td data-label="Sur la mesure"><strong>réfutée</strong> : aucun verbe outillé absent ailleurs (règle 31, critère 1), et il reproduirait la classe <code>oracle-remplace-par-controle-maison</code> (86 % de récidive)</td></tr></tbody></table></div>
+<div class="defile"><table class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « Option » (1 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Option</th><th scope="col" data-definition="Colonne « Contenu » (2 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Contenu</th><th scope="col" data-definition="Colonne « Coût » (3 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Coût</th><th scope="col" data-definition="Colonne « Ce qu'elle exclut » (4 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Ce qu'elle exclut</th><th scope="col" data-definition="Colonne « Sur la mesure » (5 sur 5) du tableau du chapitre « 4. Options — jeu fermé O0-O4 »">Sur la mesure</th></tr></thead><tbody><tr><td data-label="Option"><strong>O0 — ne rien faire</strong></td><td data-label="Contenu">les pièces restent éparses, jouées après l'écriture</td><td data-label="Coût">nul</td><td data-label="Ce qu'elle exclut">toute baisse des retours documentaires</td><td data-label="Sur la mesure"><strong>réfutée</strong> : 11 griefs sur 20 relèvent de la seule conception amont, et les trois classes du sujet récidivent à 100 %</td></tr><tr><td data-label="Option"><strong>O1 — étendre et câbler l'existant</strong></td><td data-label="Contenu">champs « lecteur » et « type de contenu » au catalogue ; T2 décliné par lecteur dans <code>ECRITURE.md</code> ; <code>oracle-conception-livrable</code> et <code>oracle-lecture-tiers</code> joués d'office à l'écriture des pages ; étiquette de gabarit exigée partout</td><td data-label="Coût">moyen × court</td><td data-label="Ce qu'elle exclut">la décision de conception prise avant d'écrire : O1 juge après</td><td data-label="Sur la mesure"><strong>insuffisante</strong> : elle couvre les griefs « oracle » et « les deux », 4 sur 20, pas les 11 « amont »</td></tr><tr><td data-label="Option"><strong>O2 — O1 plus une fiche de conception amont</strong></td><td data-label="Contenu">par document, une fiche courte remplie par l'agent avant d'écrire (intention au sens de D8, lecteur défini par ses décisions, type de contenu par partie, format dérivé), validée par l'humain pour les seuls documents à fort enjeu, jugée par un contrôle avant l'écriture</td><td data-label="Coût">moyen × moyen</td><td data-label="Ce qu'elle exclut">l'épreuve des gabarits non lus et la propagation des retours</td><td data-label="Sur la mesure">couvre les 11 griefs « amont » et les 4 autres évitables, soit 15 sur 20 ; ne traite ni B ni C</td></tr><tr><td data-label="Option"><strong>O3 — O2 plus l'épreuve et la propagation</strong></td><td data-label="Contenu">O2, plus l'épreuve des gabarits non lus par des défauts semés (TF-1079) et par la lecture d'un tiers sur leur instance, plus la propagation de chaque retour à toutes les familles de sa classe</td><td data-label="Coût">complexe × moyen</td><td data-label="Ce qu'elle exclut">une réécriture spéculative des gabarits : on éprouve, on ne modifie que sur échec</td><td data-label="Sur la mesure">couvre A, B et C ; B et C s'appuient sur des candidatures existantes (TF-1079, TF-1076, TF-1095)</td></tr><tr><td data-label="Option"><strong>O4 — un outil ou un skill neuf</strong></td><td data-label="Contenu">un « outil de conception documentaire » séparé</td><td data-label="Coût">complexe × long</td><td data-label="Ce qu'elle exclut">la réutilisation de D8, du catalogue et des deux oracles</td><td data-label="Sur la mesure"><strong>réfutée</strong> : aucun verbe outillé absent ailleurs (règle 31, critère 1), et il reproduirait la classe <code>oracle-remplace-par-controle-maison</code> (86 % de récidive)</td></tr></tbody></table></div>
 <section class="chap lire" data-mesure-lecture>
 <p>La cible de la boucle n'est jamais « zéro retour ». La métrique retenue a trois termes, chacun avec sa formule : le <strong>taux de retours par document étiqueté</strong> (retours documentaires du mois ÷ documents livrés portant l'étiquette de gabarit, calculable seulement quand l'étiquette est générale) ; le <strong>rappel au banc</strong> des défauts échappés et des défauts semés (indépendant de la bonne volonté du lecteur) ; et le <strong>nombre de récidives</strong> des classes closes du sujet.</p>
-<h3>5. Verdict</h3>
+</section>
+</section>
+<section id="5-verdict">
+<h2>5. Verdict</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">L'option O3 est retenue sous réserve, jouée par étapes : d'abord une fiche courte remplie avant chaque document et deux oracles joués à l'écriture, puis l'épreuve des gabarits et la propagation des retours.</p>
 <ul><li><strong>Option retenue : O3</strong>, sous réserve, jouée par étapes : A d'abord (fiche de conception amont et</li></ul>
 <p>  câblage des deux oracles), puis B et C sur les candidatures qui les portent déjà.</p>
 <ul><li><strong>Coût</strong> : complexe × moyen pour l'ensemble ; l'étape A seule est moyen × moyen. Coût par document</li></ul>
@@ -527,14 +600,22 @@ tr[data-tf-empty] td {
 <p>  avec un second classeur à l'aveugle, et publier le taux de retours par document étiqueté dès que   l'étiquette est générale.</p>
 <ul><li><strong>Test rétro</strong> : l'élément opérationnel (une fiche remplie avant chaque document, deux oracles joués</li></ul>
 <p>  à l'écriture, les gabarits éprouvés par des défauts semés, chaque retour rejoué sur sa classe)   remonte à la tactique (mesurer sur des griefs réels ce que l'amont évite : 11 sur 20), puis à la   stratégie (fixer avant l'écriture ce que le lecteur doit en tirer, et éprouver les gabarits avant un   lecteur), puis à l'intention (moins de documents renvoyés par leur lecteur, y compris dans les   familles non encore lues). Aucune rupture. Les mots du demandeur rejoués un à un : « outil de   conception » → une fiche et un câblage, pas un outil neuf (O4 réfutée) ; « types de documents » →   les familles du catalogue ; « types de contenus » → la typologie DITA et Information Mapping ;   « types de lecteurs » → le lecteur défini par ses décisions ; « gabarits sans retour » → éprouvés   par défauts semés et lecture d'un tiers avant toute modification ; « amélioration continue » → la   propagation de chaque retour à sa classe ; « documents sans retour » → une métrique à trois termes,   jamais le silence pris pour une réussite.</p>
-<h3>Annexe — mesure et rétro-test</h3>
+</section>
+</section>
+<section id="annexe-mesure-et-retro-test">
+<h2>Annexe — mesure et rétro-test</h2>
+<section class="chap lire" data-mesure-lecture>
+<p class="ch-apprend">Les vingt griefs du rétro-test sont listés avec leur lot source et leur ligne, chacun classé selon la phase qui l'aurait attrapé : 11 par la conception amont seule, 5 par rien.</p>
+<blockquote class="termes"><p><strong>Termes</strong> : le grain d'un jeu de données dit ce que représente une de ses lignes ; le grief 20 demande justement de l'appeler « granularité » devant ce lecteur.</p></blockquote>
 <p><strong>Mode de lecture</strong> : une ligne par grief, dans l'ordre de sélection ; la source est le lot de retours et sa ligne ; la dernière colonne est le classement de la session déléguée. Les produits sont désignés par leur pseudonyme.</p>
 </section>
-<div class="defile"><table id="tab-3" data-filterable class="repli-cartes"><thead><tr><th scope="col">N°</th><th scope="col">Famille ou type</th><th scope="col">Source</th><th scope="col">Grief</th><th scope="col" aria-describedby="col-1">Classement</th></tr></thead><tbody><tr><td data-label="N°">1</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-04 - RETOURS - 20260827a.md</code>, l. 45</td><td data-label="Grief">« pourquoi la règle de nouvelle version de fichier avec nouvel indice n'est pas respectée ? »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">2</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-04 - RETOURS - 20260827b.md</code>, l. 44</td><td data-label="Grief">« laisser plus d'espace pour la largeur de la deuxième colonne qui contient plus de texte »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">3</td><td data-label="Famille ou type">support PowerPoint</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827a.md</code>, l. 10</td><td data-label="Grief">« ne respecte pas du tout la charte Client-A du document fourni en entrée »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">4</td><td data-label="Famille ou type">support PowerPoint</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827a.md</code>, l. 12</td><td data-label="Grief">« cela provoque des défauts dans l'affichage des contenus »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">5</td><td data-label="Famille ou type">support PowerPoint</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827a.md</code>, l. 111</td><td data-label="Grief">« fournis un schéma d'architecture de la solution »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">6</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827b.md</code>, l. 6-9</td><td data-label="Grief">« le fichier est généré en html mais il devrait aussi être généré en pdf »</td><td data-label="Classement">oracle</td></tr><tr><td data-label="N°">7</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-01 - RETOURS - 20260827a.md</code>, l. 9</td><td data-label="Grief">« la fiche doit également être générée en PDF »</td><td data-label="Classement">oracle</td></tr><tr><td data-label="N°">8</td><td data-label="Famille ou type">document de projet</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260908c.md</code>, l. 7</td><td data-label="Grief">« Et les informations de l'API, elles ne sont pas dans le tableau ? »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">9</td><td data-label="Famille ou type">rapport d'audit</td><td data-label="Source"><code>Produit-61 - RETOURS - 20260909c.md</code>, l. 3</td><td data-label="Grief">le rapport remis ne respecte pas la forme attendue (paraphrase du lot)</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">10</td><td data-label="Famille ou type">rapport de données</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260911b.md</code>, l. 41</td><td data-label="Grief">« le tableau de synthèse doit intégrer directement les détails […] sans recréer un deuxième listing »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">11</td><td data-label="Famille ou type">rapport de données</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260911b.md</code>, l. 43-44</td><td data-label="Grief">« agrandis la largeur de la page […] sans avoir des cellules trop grandes en hauteur »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">12</td><td data-label="Famille ou type">rapport de données</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260911b.md</code>, l. 44</td><td data-label="Grief">« homogénéise la largeur des contenus »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">13</td><td data-label="Famille ou type">famille absente</td><td data-label="Source"><code>Produit-12 - RETOURS - 20260831d.md</code>, l. 69</td><td data-label="Grief">« le format ne respecte pas la Factory »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">14</td><td data-label="Famille ou type">famille absente</td><td data-label="Source"><code>Produit-12 - RETOURS - 20260831d.md</code>, l. 69</td><td data-label="Grief">« l'en-tête n'est pas fixe avec les onglets affichés en permanence »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">15</td><td data-label="Famille ou type">index de livrables</td><td data-label="Source"><code>old\Produit-10 - RETOURS - 20260824b.md</code>, l. 57</td><td data-label="Grief">« aucun des 2 liens n'ouvre le fichier »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">16</td><td data-label="Famille ou type">gabarit de restitution</td><td data-label="Source"><code>old\Produit-10 - RETOURS - 20260824c.md</code>, l. 55</td><td data-label="Grief">« le prompt de réponse s'affiche 2 fois »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">17</td><td data-label="Famille ou type">gabarit de restitution</td><td data-label="Source"><code>old\Produit-10 - RETOURS - 20260824d.md</code>, l. 70</td><td data-label="Grief">« sans puce, ce texte est illisible »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">18</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>old\Produit-03 - RETOURS - 20260824b.md</code>, l. 14</td><td data-label="Grief">« &quot;appartenir au tenant&quot; correspond-il exactement à l'audience autorisée ? »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">19</td><td data-label="Famille ou type">famille absente</td><td data-label="Source"><code>Produit-65 - RETOURS - 20260903a.md</code>, l. 15</td><td data-label="Grief">« mets à jour le fichier pour être conforme à la Factory »</td><td data-label="Classement">les deux</td></tr><tr><td data-label="N°">20</td><td data-label="Famille ou type">rapport de restitution de données</td><td data-label="Source"><code>Produit-62 - RETOURS - 20260908e.md</code>, l. 14</td><td data-label="Grief">« Utilise le mot granularité plutôt que grain »</td><td data-label="Classement">les deux</td></tr></tbody></table></div>
+<div class="defile"><table id="tab-3" data-filterable class="repli-cartes"><thead><tr><th scope="col" data-definition="Colonne « N° » (1 sur 5) du tableau du chapitre « Annexe — mesure et rétro-test »">N°</th><th scope="col" data-definition="Colonne « Famille ou type » (2 sur 5) du tableau du chapitre « Annexe — mesure et rétro-test »">Famille ou type</th><th scope="col" data-definition="Colonne « Source » (3 sur 5) du tableau du chapitre « Annexe — mesure et rétro-test »">Source</th><th scope="col" data-definition="Colonne « Grief » (4 sur 5) du tableau du chapitre « Annexe — mesure et rétro-test »">Grief</th><th scope="col" aria-describedby="col-1">Classement</th></tr></thead><tbody><tr><td data-label="N°">1</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-04 - RETOURS - 20260827a.md</code>, l. 45</td><td data-label="Grief">« pourquoi la règle de nouvelle version de fichier avec nouvel indice n'est pas respectée ? »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">2</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-04 - RETOURS - 20260827b.md</code>, l. 44</td><td data-label="Grief">« laisser plus d'espace pour la largeur de la deuxième colonne qui contient plus de texte »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">3</td><td data-label="Famille ou type">support PowerPoint</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827a.md</code>, l. 10</td><td data-label="Grief">« ne respecte pas du tout la charte Client-A du document fourni en entrée »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">4</td><td data-label="Famille ou type">support PowerPoint</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827a.md</code>, l. 12</td><td data-label="Grief">« cela provoque des défauts dans l'affichage des contenus »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">5</td><td data-label="Famille ou type">support PowerPoint</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827a.md</code>, l. 111</td><td data-label="Grief">« fournis un schéma d'architecture de la solution »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">6</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260827b.md</code>, l. 6-9</td><td data-label="Grief">« le fichier est généré en html mais il devrait aussi être généré en pdf »</td><td data-label="Classement">oracle</td></tr><tr><td data-label="N°">7</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>Produit-01 - RETOURS - 20260827a.md</code>, l. 9</td><td data-label="Grief">« la fiche doit également être générée en PDF »</td><td data-label="Classement">oracle</td></tr><tr><td data-label="N°">8</td><td data-label="Famille ou type">document de projet</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260908c.md</code>, l. 7</td><td data-label="Grief">« Et les informations de l'API, elles ne sont pas dans le tableau ? »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">9</td><td data-label="Famille ou type">rapport d'audit</td><td data-label="Source"><code>Produit-61 - RETOURS - 20260909c.md</code>, l. 3</td><td data-label="Grief">le rapport remis ne respecte pas la forme attendue (paraphrase du lot)</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">10</td><td data-label="Famille ou type">rapport de données</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260911b.md</code>, l. 41</td><td data-label="Grief">« le tableau de synthèse doit intégrer directement les détails […] sans recréer un deuxième listing »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">11</td><td data-label="Famille ou type">rapport de données</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260911b.md</code>, l. 43-44</td><td data-label="Grief">« agrandis la largeur de la page […] sans avoir des cellules trop grandes en hauteur »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">12</td><td data-label="Famille ou type">rapport de données</td><td data-label="Source"><code>Produit-11 - RETOURS - 20260911b.md</code>, l. 44</td><td data-label="Grief">« homogénéise la largeur des contenus »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">13</td><td data-label="Famille ou type">famille absente</td><td data-label="Source"><code>Produit-12 - RETOURS - 20260831d.md</code>, l. 69</td><td data-label="Grief">« le format ne respecte pas la Factory »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">14</td><td data-label="Famille ou type">famille absente</td><td data-label="Source"><code>Produit-12 - RETOURS - 20260831d.md</code>, l. 69</td><td data-label="Grief">« l'en-tête n'est pas fixe avec les onglets affichés en permanence »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">15</td><td data-label="Famille ou type">index de livrables</td><td data-label="Source"><code>old\Produit-10 - RETOURS - 20260824b.md</code>, l. 57</td><td data-label="Grief">« aucun des 2 liens n'ouvre le fichier »</td><td data-label="Classement">aucun</td></tr><tr><td data-label="N°">16</td><td data-label="Famille ou type">gabarit de restitution</td><td data-label="Source"><code>old\Produit-10 - RETOURS - 20260824c.md</code>, l. 55</td><td data-label="Grief">« le prompt de réponse s'affiche 2 fois »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">17</td><td data-label="Famille ou type">gabarit de restitution</td><td data-label="Source"><code>old\Produit-10 - RETOURS - 20260824d.md</code>, l. 70</td><td data-label="Grief">« sans puce, ce texte est illisible »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">18</td><td data-label="Famille ou type">fiche sécurité</td><td data-label="Source"><code>old\Produit-03 - RETOURS - 20260824b.md</code>, l. 14</td><td data-label="Grief">« &quot;appartenir au tenant&quot; correspond-il exactement à l'audience autorisée ? »</td><td data-label="Classement">amont</td></tr><tr><td data-label="N°">19</td><td data-label="Famille ou type">famille absente</td><td data-label="Source"><code>Produit-65 - RETOURS - 20260903a.md</code>, l. 15</td><td data-label="Grief">« mets à jour le fichier pour être conforme à la Factory »</td><td data-label="Classement">les deux</td></tr><tr><td data-label="N°">20</td><td data-label="Famille ou type">rapport de restitution de données</td><td data-label="Source"><code>Produit-62 - RETOURS - 20260908e.md</code>, l. 14</td><td data-label="Grief">« Utilise le mot granularité plutôt que grain »</td><td data-label="Classement">les deux</td></tr></tbody></table></div>
 <p class="tf-count" data-tf-count-for="tab-3" aria-live="polite"></p>
 <section class="chap lire" data-mesure-lecture>
 <blockquote id="col-1"><p><strong>Classement</strong> : la phase de la chaîne où le grief aurait été attrapé si la conception documentaire amont avait existé — <code>amont</code>, <code>aval</code> ou <code>aucun</code>. C'est une ÉTIQUETTE posée par la session déléguée, jamais un score : elle ne se calcule pas et n'ordonne pas ce tableau, qui se lit dans l'ordre de sélection des griefs.</p></blockquote>
+<blockquote class="exemple-lecture"><p><strong>Exemple de lecture</strong> : la ligne 2 cite un retour sur une fiche sécurité qui réclame une deuxième colonne plus large ; elle est classée « amont », parce qu'un format dérivé du volume de contenu l'aurait évité.</p></blockquote>
 <p>Décompte : amont seul 11, oracle seul 2, les deux 2, aucun 5. Mesure de départ détaillée par famille au § « Ce que la mesure a donné » ; règle de comptage : une ligne de la section « Retours sur les documents produits » des lots vaut un retour, les lots antérieurs à cette section comptés sur leur prose non ambiguë, les 69 lots déclarant « aucun document produit » exclus.</p>
+</section>
 </section>
     </main>
 
@@ -1221,7 +1302,7 @@ tr[data-tf-empty] td {
 <!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js — copie du socle digit-ai-page-html/assets/find-in-page.js,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="find-in-page.js" data-empreinte="sha256:108b35a7313c8a214dc846c1957d8c88902204496f5cf151f0d10564e25c8d17">
+<script data-composant="find-in-page.js" data-empreinte="sha256:721208e18a0c5de4899a498c8ebef8ebbb6677155f13a27d479988d7142ff908">
 /* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
  *
  * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
@@ -1237,6 +1318,21 @@ tr[data-tf-empty] td {
  *
  * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
  * vise aussi le PDF, prévoir un équivalent statique de l'information.
+ *
+ * ⚠️ LE CONTENEUR N'EST JAMAIS RÉÉCRIT (TF-1340, 23/09/2026). La recherche réaffectait
+ * `container.innerHTML` à chaque frappe : les attributs survivaient, les écouteurs posés par
+ * les autres composants du socle (table-filters.js, table-detail.js, infobulle.js) non. Mesuré
+ * au navigateur : après une recherche puis son effacement, un bouton de filtre n'ouvrait plus
+ * son panneau (0 au lieu de 1). Le surlignage ENVELOPPE désormais les nœuds texte trouvés, et
+ * la frappe suivante les DÉSENVELOPPE : aucun élément du conteneur n'est remplacé. `getHTML`
+ * et `refresh()` ne sont plus nécessaires (la recherche lit le contenu vivant) ; ils restent
+ * acceptés, sans effet, pour les pages déjà câblées.
+ *
+ * ⚠️ DANS UN SCHÉMA SVG, LE SURLIGNAGE EST UN <tspan> (TF-1353, 24/09/2026). SVG ne peint pas
+ * un <mark> HTML : le mot trouvé DISPARAISSAIT du schéma pendant la recherche (mesuré le 24/09
+ * dans Chromium : getNumberOfChars() de 93 à 87 ; rejoué sur la fixture du banc : de 74 à 67).
+ * Un nœud texte dont le parent est dans l'espace de noms SVG reçoit un <tspan class="find-hit"> ;
+ * le HTML d'un <foreignObject> garde son <mark>.
  *
  * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
  * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
@@ -1259,11 +1355,14 @@ tr[data-tf-empty] td {
  *
  * CSS attendu (à adapter aux tokens du livrable) :
  *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
+ *   tspan.find-hit { fill: #9a3412; text-decoration: underline; }   (texte d'un schéma SVG)
  *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
  *   .find-count.zero { color: #c0392b; }
  */
 (function (global) {
   'use strict';
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
 
   // Regex insensible aux accents et à la casse à partir d'une saisie libre.
   function buildRegex(q) {
@@ -1280,45 +1379,112 @@ tr[data-tf-empty] td {
     try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
   }
 
-  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
+  // Le BLOC d'un nœud texte : l'ancêtre le plus proche qui n'est pas un élément EN LIGNE. Dans un
+  // schéma SVG, le bloc est le <text> qui le porte (un <tspan> y est en ligne). Une phrase coupée
+  // par une mise en gras, un code ou un lien reste ainsi UN texte à fouiller (TF-1342).
+  function blocDe(el, root) {
+    if (el.namespaceURI === SVG_NS) {
+      var t = el.closest ? el.closest('text') : null;
+      return t && root.contains(t) ? t : el;
+    }
+    var b = el;
+    while (b !== root && b.parentNode && b.nodeType === 1) {
+      var d = getComputedStyle(b).display;
+      if (d !== 'inline' && d !== 'contents') break;
+      b = b.parentNode;
+    }
+    return b;
+  }
+
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences. Enveloppe les
+  // nœuds texte trouvés, sans remplacer aucun élément (TF-1340) ; dans un texte SVG, l'enveloppe
+  // est un <tspan>, que SVG peint, et non un <mark>, qu'il ignore (TF-1353). Les noms d'éléments
+  // se comparent sans casse : le <style> et le <script> d'un SVG s'écrivent en minuscules.
+  //
+  // TF-1342 (lot Produit-64 20260923b, RD-19) — LE MOTIF S'APPLIQUAIT NŒUD TEXTE PAR NŒUD TEXTE :
+  // « application <strong>laissée arrêtée</strong> » figurait dans le texte de la page et restait
+  // introuvable (3 occurrences dans le texte, 2 comptées, mesuré sur un livrable servi). Le motif
+  // se cherche désormais dans le texte CONTINU d'un bloc (les nœuds texte consécutifs d'un même
+  // paragraphe, cellule, bloc de code, titre…), puis chaque correspondance est posée par PLAGES sur
+  // les nœuds qu'elle traverse : une occurrence à cheval sur trois nœuds donne trois enveloppes
+  // et compte UNE fois.
   function highlight(root, re) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    var nodes = [], n, count = 0;
-    while ((n = walker.nextNode())) nodes.push(n);
-    for (var k = 0; k < nodes.length; k++) {
-      var tn = nodes[k];
-      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
-      var txt = tn.nodeValue; re.lastIndex = 0;
-      if (!re.test(txt)) continue; re.lastIndex = 0;
-      var frag = document.createDocumentFragment(), last = 0, m;
-      while ((m = re.exec(txt))) {
-        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
-        var mk = document.createElement('mark');
-        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
-        mk.textContent = m[0];
-        frag.appendChild(mk);
-        count++;
-        last = m.index + m[0].length;
+    var groupes = [], courant = null, n;
+    while ((n = walker.nextNode())) {
+      var parent = n.parentNode;
+      if (!parent || /^(MARK|SCRIPT|STYLE)$/i.test(parent.nodeName)
+          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) {
+        courant = null;           // un nœud écarté coupe le texte continu
+        continue;
+      }
+      var bloc = blocDe(parent, root);
+      if (!courant || courant.bloc !== bloc) { courant = { bloc: bloc, noeuds: [] }; groupes.push(courant); }
+      courant.noeuds.push(n);
+    }
+    var count = 0;
+    for (var g = 0; g < groupes.length; g++) {
+      var noeuds = groupes[g].noeuds, texte = '', debuts = [];
+      for (var k = 0; k < noeuds.length; k++) { debuts.push(texte.length); texte += noeuds[k].nodeValue; }
+      var plages = [], m;
+      re.lastIndex = 0;
+      while ((m = re.exec(texte))) {
+        if (m[0].length) plages.push([m.index, m.index + m[0].length]);
         if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
       }
-      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
-      tn.parentNode.replaceChild(frag, tn);
+      if (!plages.length) continue;
+      count += plages.length;
+      for (var j = 0; j < noeuds.length; j++) {
+        var tn = noeuds[j], txt = tn.nodeValue, d0 = debuts[j], d1 = d0 + txt.length;
+        var morceaux = [];
+        for (var p = 0; p < plages.length; p++) {
+          var a = Math.max(plages[p][0], d0), b = Math.min(plages[p][1], d1);
+          if (a < b) morceaux.push([a - d0, b - d0]);
+        }
+        if (!morceaux.length) continue;
+        var svg = tn.parentNode.namespaceURI === SVG_NS;
+        var frag = document.createDocumentFragment(), last = 0;
+        for (var q = 0; q < morceaux.length; q++) {
+          if (morceaux[q][0] > last) frag.appendChild(document.createTextNode(txt.slice(last, morceaux[q][0])));
+          var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
+          mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
+          mk.textContent = txt.slice(morceaux[q][0], morceaux[q][1]);
+          frag.appendChild(mk);
+          last = morceaux[q][1];
+        }
+        if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+        tn.parentNode.replaceChild(frag, tn);
+      }
     }
     return count;
   }
 
+  // Retire le surlignage : chaque enveloppe redevient son texte, et les textes voisins se
+  // RECOLLENT (normalize) — sans quoi un terme à cheval sur une ancienne coupure ne serait plus
+  // trouvé à la frappe suivante. Seuls les nœuds texte bougent : les éléments, et les écouteurs
+  // que d'autres composants y ont posés, restent en place (TF-1340).
+  function unhighlight(root) {
+    var hits = root.querySelectorAll('mark.find-hit, tspan.find-hit');
+    var parents = [];
+    for (var i = 0; i < hits.length; i++) {
+      var h = hits[i], p = h.parentNode;
+      if (!p) continue;
+      p.replaceChild(document.createTextNode(h.textContent), h);
+      if (parents.indexOf(p) === -1) parents.push(p);
+    }
+    for (var j = 0; j < parents.length; j++) parents[j].normalize();
+  }
+
   /* Branche la recherche live sur un champ.
    * input, container, counter : éléments DOM (counter optionnel).
-   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
-   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
-   *   Sinon, le HTML initial est capturé une fois à l'init.
-   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
-   *   le HTML pristine (mode sans getHTML). */
+   * getHTML (optionnel) : n'est plus nécessaire depuis TF-1340 — la recherche lit le contenu
+   *   VIVANT du conteneur, qui n'est jamais réécrit. Accepté, sans effet, pour les pages câblées.
+   * Retourne { run, refresh } : run() relance la recherche ; refresh() est conservé, sans
+   *   effet (il n'y a plus de HTML capturé à rafraîchir). */
   function init(input, container, counter, getHTML) {
     if (!input || !container) return null;
-    var pristine = getHTML ? null : container.innerHTML;
     function run() {
-      container.innerHTML = getHTML ? getHTML() : pristine;
+      unhighlight(container);
       var re = buildRegex(input.value);
       if (!re) {
         if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
@@ -1333,11 +1499,12 @@ tr[data-tf-empty] td {
     input.addEventListener('input', run);
     return {
       run: run,
-      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
+      refresh: function () {}
     };
   }
 
-  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight,
+                               unhighlight: unhighlight };
 })(window);
 </script>
 <!-- COMPOSANT-EMBARQUE:FIN find-in-page.js -->
