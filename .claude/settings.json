@@ -7,8 +7,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-ouverture.mjs",
-            "timeout": 240
+            "command": "node oracles/hook-ouverture.mjs --contexte-json",
+            "timeout": 240,
+            "async": true
           },
           {
             "type": "command",

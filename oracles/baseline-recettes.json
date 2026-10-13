@@ -383,7 +383,7 @@
   "vu_le": "2026-10-13"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 11,
+  "cas": 14,
   "vu_le": "2026-10-13"
  },
  "oracles/hook-publication-hebergee.test.mjs": {

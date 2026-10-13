@@ -7,8 +7,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node forge/hooks/factory.mjs ouverture --sans-readme",
-            "timeout": 240
+            "command": "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json",
+            "timeout": 240,
+            "async": true
           }
         ]
       }

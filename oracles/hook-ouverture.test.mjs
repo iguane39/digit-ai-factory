@@ -151,5 +151,35 @@ check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans cla
   });
 }
 
+// ---- 13/10/2026 : LA SORTIE JSON DU MODE ASYNCHRONE ------------------------------------------
+//
+// Le hook est déclaré `async` (l'extension VS Code coupe à 60 s une initialisation que ses gestes
+// réseau dépassaient). Mesuré sur le CLI 2.1.296 : en `async`, le texte brut n'atteint JAMAIS le
+// contexte de l'assistant, la forme `hookSpecificOutput.additionalContext` l'atteint. Le contrat :
+// sous `--contexte-json`, la sortie est UN objet JSON valide, l'événement est SessionStart, et le
+// contexte porte TOUT le relevé texte — rien de perdu au passage — précédé de l'en-tête qui dit
+// l'asynchronie. Sens rouge : une ligne du relevé absente du contexte, ou une sortie non JSON.
+const sortieJson = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--contexte-json"],
+  { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racineParcTest } });
+
+check("--contexte-json : la sortie est UN objet JSON SessionStart, sans texte autour", () => {
+  let j;
+  try { j = JSON.parse(sortieJson); } catch { throw new Error("sortie non JSON : " + sortieJson.slice(0, 200)); }
+  const h = j && j.hookSpecificOutput;
+  if (!h || h.hookEventName !== "SessionStart") throw new Error("hookSpecificOutput.hookEventName ≠ SessionStart");
+  if (typeof h.additionalContext !== "string" || !h.additionalContext) throw new Error("additionalContext absent ou vide");
+});
+
+check("--contexte-json : le contexte porte TOUT le relevé texte, et l'en-tête d'asynchronie", () => {
+  // Deux lancements successifs diffèrent par construction sur DEUX valeurs seulement : l'horodatage
+  // du relevé précédent (le premier lancement l'a écrit) et une durée en millisecondes. Elles sont
+  // neutralisées, et rien d'autre : toute autre différence reste une perte.
+  const neutre = (t) => t.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g, "<horodatage>").replace(/\ben \d+ ms\b/g, "en <durée> ms");
+  const ctx = neutre(JSON.parse(sortieJson).hookSpecificOutput.additionalContext);
+  const manquantes = neutre(sortieOuverturePilot).split(NL).map((l) => l.trimEnd()).filter(Boolean).filter((l) => !ctx.includes(l));
+  if (manquantes.length) throw new Error(`${manquantes.length} ligne(s) du relevé absente(s) du contexte, dont : ${manquantes[0].slice(0, 120)}`);
+  if (!/hook SessionStart asynchrone/.test(ctx)) throw new Error("l'en-tête qui dit l'asynchronie manque");
+});
+
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
