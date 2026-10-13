@@ -33,6 +33,7 @@ import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
+import { LIBELLE_STATUT, libelleAction } from "./lib-action.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // Surchargeables POUR LA RECETTE (`generer-page.test.mjs`) : sans elles, éprouver le rendu
@@ -143,7 +144,8 @@ for (const forge of [...parForge.keys()].sort()) {
         <article class="card s-${e.statut}" id="item-${e.id}" data-cite data-forge="${esc(forge)}" data-statut="${e.statut}" data-prio="${p.k}">
           <header class="card-head">
             <code class="tf-id">${e.id}</code>
-            <span class="statut s-${e.statut}">${e.statut}</span>
+            <span class="statut s-${e.statut}">${esc(LIBELLE_STATUT[e.statut] || e.statut)}</span>
+            <span class="chip action" title="action attendue : qui doit agir (R16)">${esc(libelleAction(e))}</span>
             <span class="chip prio p-${p.k}" title="priorité dérivée du score (valeur ${e.score.valeur})">Priorité ${p.l}</span>
             ${reel}
           </header>

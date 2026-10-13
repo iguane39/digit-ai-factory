@@ -10,6 +10,7 @@ import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
+import { LIBELLE_STATUT, LIBELLE_ACTION, actionDe, libelleAction } from "./lib-action.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(ICI, "TODO.jsonl"), ARC = join(ICI, "TODO-ARCHIVE.jsonl"), OUT = join(ICI, "TODO.md");
@@ -36,14 +37,15 @@ for (const e of etats.values()) {
 // LF, pour un registre identique. Un sceau qui depend du checkout ne prouve rien.
 const sceau = (f) => empreinteFichier(f, 12);
 const compte = (s) => [...etats.values()].filter((e) => e.statut === s).length;
-// R16 (13/10/2026) — qui doit agir sur un sujet en cours : le champ `attente`, rendu en clair.
-const LIBELLE_ATTENTE = { session: "session", produit: "produit", produit_absent: "produit absent du poste",
-  autre_poste: "autre poste", decision_humaine: "décision humaine", echeance: "échéance", dependance: "autre sujet" };
+// R16 (13/10/2026) — deux colonnes : le STATUT en clair, et l'ACTION attendue (qui doit agir).
 const attentesLigne = () => {
   const n = {};
-  for (const e of etats.values()) if (e.statut === "en_cours") n[e.attente || "non dite"] = (n[e.attente || "non dite"] || 0) + 1;
-  const parts = Object.entries(n).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${LIBELLE_ATTENTE[k] || k} ${v}`);
-  return parts.length ? `En cours, en attente de : ${parts.join(" · ")}.` : "";
+  for (const e of etats.values()) {
+    const k = actionDe(e);
+    if (k !== "aucune") n[k] = (n[k] || 0) + 1;
+  }
+  const parts = Object.entries(n).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${LIBELLE_ACTION[k] || k} ${v}`);
+  return parts.length ? `Sujets ouverts, par action attendue : ${parts.join(" · ")}.` : "";
 };
 
 let md = `# TODO-FORGE — registre d'amélioration de l'écosystème
@@ -59,9 +61,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 for (const forge of [...parForge.keys()].sort()) {
   const items = parForge.get(forge).sort((a, b) =>
     ORDRE_STATUT.indexOf(a.statut) - ORDRE_STATUT.indexOf(b.statut) || b.score.valeur - a.score.valeur);
-  md += `\n## ${forge}\n\n| id | statut | score | titre | payé en réel |\n|---|---|---|---|---|\n`;
+  md += `\n## ${forge}\n\n| id | statut | action | score | titre | payé en réel |\n|---|---|---|---|---|---|\n`;
   for (const e of items)
-    md += `| ${e.id} | ${e.statut === "en_cours" && e.attente ? `en_cours · attente ${LIBELLE_ATTENTE[e.attente] || e.attente}${e.attente_jusqu_au ? ` (${e.attente_jusqu_au})` : ""}${e.attente_de ? ` (${e.attente_de})` : ""}` : e.statut} | ${e.score.valeur} | ${e.titre} | ${e.preuve_du_cout ? "**oui** — " + e.preuve_du_cout : "non"} |\n`;
+    md += `| ${e.id} | ${LIBELLE_STATUT[e.statut] || e.statut} | ${libelleAction(e)} | ${e.score.valeur} | ${e.titre} | ${e.preuve_du_cout ? "**oui** — " + e.preuve_du_cout : "non"} |\n`;
 }
 md += `\n---\nDétail d'un item : \`grep '"id":"TF-xxxx"' todo/TODO.jsonl\` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.\n`;
 writeFileSync(OUT, md);

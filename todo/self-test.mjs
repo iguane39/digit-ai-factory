@@ -719,6 +719,17 @@ check("rouge R16 : échéance sans date, dépendance sans sujet → FAIL", () =>
   if (!r16Echoue(a)) throw new Error("échéance sans attente_jusqu_au acceptée");
   if (!r16Echoue(b)) throw new Error("dépendance sans attente_de acceptée");
 });
+check("R16 : un DÉCIDÉ sans action passe (il attend la session), mais une action déclarée hors vocabulaire échoue", () => {
+  const base = [item({}), maj({ statut: "decide", decideur: "humain", date_decision: "2026-08-08" })];
+  const vert = lanceR16("R16-decide.jsonl", base.join("\n") + "\n");
+  if (vert.code !== 0) throw new Error(`décidé sans action refusé : exit ${vert.code} — chaque décision appliquée serait refusée`);
+  const rouge = lanceR16("R16-decide-faux.jsonl", [...base, JSON.stringify({ ev: "maj", ts: "2026-08-08T12:00:00Z", id: "TF-9001", attente: "client" })].join("\n") + "\n");
+  if (rouge.code !== 1 || !r16Echoue(rouge)) throw new Error(`décidé à action inconnue accepté : exit ${rouge.code}`);
+});
+check("verte R16 : un candidat SANS action passe — il attend la décision humaine par construction", () => {
+  const r = lanceR16("R16-candidat.jsonl", item({}) + "\n");
+  if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 200)}`);
+});
 check("verte R16 : attente produit, échéance datée, dépendance nommée → PASS exit 0", () => {
   for (const [nom, sur] of [["R16-produit.jsonl", { attente: "produit" }],
     ["R16-date.jsonl", { attente: "echeance", attente_jusqu_au: "2026-10-15" }],

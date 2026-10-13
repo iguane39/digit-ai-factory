@@ -163,11 +163,15 @@ statuts avec Attente Produit, Attente Autre Poste ») : tout sujet `en_cours` po
 | `produit_absent` | le produit, absent de ce poste | aucun |
 | `autre_poste` | une session de l'autre poste | aucun |
 | `decision_humaine` | l'humain, qui doit trancher | aucun |
+| `geste_humain` | l'humain, pour un geste sans choix à trancher (rotation d'un identifiant) | aucun |
 | `echeance` | personne avant une date | `attente_jusqu_au` (AAAA-MM-JJ) |
 | `dependance` | un autre sujet du registre | `attente_de` (TF-####) |
 
 Toute mise à jour qui fait entrer un sujet en `en_cours`, ou qui change son reste, porte son
-`attente`. La vue `TODO.md` l'affiche à côté du statut et compte les sujets par attente.
+`attente`. Un sujet décidé qui attend autre chose que la session la déclare aussi. Pour les autres,
+l'action se déduit (`todo/lib-action.mjs`) : un candidat attend la décision humaine, un décidé la
+session, un sujet clos plus rien. Les deux vues (`TODO.md` et `TODO.html`) portent deux colonnes,
+le statut en clair et l'action attendue, et comptent les sujets ouverts par action.
 
 **Intake** : lots des produits (règle 18), **lots des forges** (toute forge peut déposer un
 lot ciblant n'importe quelle forge — même gabarit, remise au sas `input\00-retours\_arrivee\`,

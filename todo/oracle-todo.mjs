@@ -54,6 +54,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ATTENTES as ATTENTES_ACTION } from "./lib-action.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // Les drapeaux ne sont pas des chemins : sans ce tri, `--rectifications` était lu comme le
@@ -329,13 +330,17 @@ if (CLASSES_BRUTES === null) {
 // un acteur extérieur à la session, et rien dans le registre ne le disait : « en cours » se lisait
 // comme « la session y travaille ». Le statut garde sa machine (R5) ; le champ `attente` porte qui
 // doit agir, en vocabulaire fermé, avec son complément quand il en faut un.
-const ATTENTES = new Set(["session", "produit", "produit_absent", "autre_poste", "decision_humaine", "echeance", "dependance"]);
+// Pour les autres statuts, l'action se DÉDUIT (todo/lib-action.mjs) : un candidat attend la
+// décision humaine, un décidé la session, un clos plus rien. Un décidé qui attend autre chose
+// le déclare, et sa valeur est jugée ici comme celle d'un sujet en cours.
+const ATTENTES = new Set(ATTENTES_ACTION);
+const AVEC_ACTION = new Set(["en_cours"]);
 let r16Juges = 0;
 for (const [id, e] of etatsActifs) {
-  if (e.attente === undefined && e.statut !== "en_cours") continue;
-  if (e.statut === "en_cours") r16Juges++;
-  if (e.statut === "en_cours" && !e.attente)
-    { ko("R16", id, "sujet en cours sans `attente` — dire qui doit agir : " + [...ATTENTES].join(" | ")); continue; }
+  if (e.attente === undefined && !AVEC_ACTION.has(e.statut)) continue;
+  if (AVEC_ACTION.has(e.statut)) r16Juges++;
+  if (AVEC_ACTION.has(e.statut) && !e.attente)
+    { ko("R16", id, `sujet ${e.statut} sans \`attente\` — dire qui doit agir : ` + [...ATTENTES].join(" | ")); continue; }
   if (e.attente === null) continue; // effacée à la sortie de « en cours »
   if (!ATTENTES.has(e.attente))
     { ko("R16", id, `attente « ${e.attente} » hors vocabulaire (${[...ATTENTES].join(", ")})`); continue; }
@@ -345,7 +350,7 @@ for (const [id, e] of etatsActifs) {
     ko("R16", id, `attente « dependance » sans \`attente_de\` qui désigne un sujet du registre (lu : « ${e.attente_de || ""} »)`);
 }
 if (!findings.some((f) => f.regle === "R16" && f.statut === "FAIL"))
-  ok("R16", `${r16Juges} sujet(s) en cours, chacun avec son attente au vocabulaire fermé`);
+  ok("R16", `${r16Juges} sujet(s) en cours, chacun avec son action au vocabulaire fermé ; les actions déclarées ailleurs sont au vocabulaire`);
 
 const echecs = findings.filter((f) => f.statut === "FAIL").length;
 console.log(JSON.stringify({
