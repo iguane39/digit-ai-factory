@@ -259,8 +259,10 @@ try {
       const cache = join(base, "cache-prive.git");
       renameSync(join(bare, `${prive.nom}.git`), cache);
       const r = lancerAutre();
-      attendre("4 bis : dépôt privé hors d'accès → poste prêt, refus dit", r, 0, new RegExp(`${prive.nom} — dépôt PRIVÉ hors d'accès`));
-      if (/preuve absente/.test(r.stdout)) echecs.push("4 bis : la preuve d'un dépôt privé hors d'accès est encore jugée en défaut");
+      attendre("4 bis : dépôt privé hors d'accès → poste prêt, installation confirmée", r, 0, /FACTORY DIGIT-AI CORRECTEMENT INSTALLÉE/);
+      // Décision humaine du 13/10 : facultatif ET silencieux — le nom du dépôt n'apparaît nulle part.
+      const bruit = (r.stdout + r.stderr).split("\n").filter((l) => l.includes(prive.nom));
+      if (bruit.length) echecs.push(`4 bis : le dépôt privé hors d'accès s'affiche encore — ${bruit.join(" | ").slice(0, 300)}`);
       renameSync(join(bare, `${publique.nom}.git`), join(base, "cache-public.git"));
       rmSync(join(autre, publique.nom), { recursive: true, force: true });
       attendre("4 bis : forge PUBLIQUE introuvable → toujours un défaut", lancerAutre(), 1, new RegExp(`${publique.nom} — clone en échec`));

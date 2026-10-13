@@ -93,16 +93,13 @@ const defaut = (msg, remede) => { ligne("DEFAUT", `${msg} — remède : ${remede
 // 13/10/2026 — UN DÉPÔT PRIVÉ HORS D'ACCÈS N'EST PAS UN DÉFAUT DU POSTE. Un autre développeur a joué
 // `--pull` sur son poste : les quatorze forges publiques à jour, et pourtant « Poste NON prêt — 3
 // défaut(s) », tous dus aux deux dépôts privés du propriétaire (digit-ai-queue, digit-ai-confidentiel)
-// que son compte ne peut pas lire. Le refus d'accès se dit en [avert] avec son remède ; une autre
-// cause d'échec (réseau, disque) reste un défaut.
+// que son compte ne peut pas lire. Décision humaine du même jour : un dépôt privé hors d'accès est
+// FACULTATIF et SILENCIEUX — ni défaut, ni avertissement, ni preuve jugée. Une autre cause d'échec
+// (réseau, disque) reste un défaut. Présent (poste du propriétaire), il est jugé comme une forge.
 const privesHorsAcces = new Set();
 const cloneRefuse = (depot, stderr) => {
-  const premiere = (stderr || "").trim().split("\n")[0].slice(0, 120);
   if (!depot.prive || !ACCES_REFUSE.test(stderr || "")) return false;
   privesHorsAcces.add(depot.nom);
-  ligne("avert", `${depot.nom} — dépôt PRIVÉ hors d'accès pour ce compte (${premiere}) : facultatif, le poste reste jugé sur le reste du parc. ` +
-    `Pour y accéder : le propriétaire invite ce compte (gh api -X PUT repos/<propriétaire>/${depot.nom}/collaborators/<compte>), puis relancer --pull`);
-  averts.push(`${depot.nom} privé hors d'accès`);
   return true;
 };
 
@@ -329,7 +326,7 @@ for (const f of FORGES) {
     // refusé au checkout laisse un clone SANS arbre de travail (TF-1015, 10/09/2026).
     const r = git(racine, "clone", "--quiet", "-c", "core.longpaths=true", `${SOURCE}/${CANAL.nom}.git`, dest);
     if (r.status === 0) ligne("ok", `${CANAL.nom} — canal confidentiel cloné en ${dest} ; si ce poste portait encore des tables libres, jouer scripts/fusionner-tables-confidentielles.mjs`);
-    else if (cloneRefuse(CANAL, r.stderr)) { /* dit par cloneRefuse : tables lues à l'ancien emplacement s'il existe */ }
+    else if (cloneRefuse(CANAL, r.stderr)) { /* facultatif et silencieux : tables lues à l'ancien emplacement s'il existe */ }
     else if (process.env.BOOTSTRAP_SOURCE) { ligne("avert", `${CANAL.nom} — canal confidentiel absent à la source surchargée ${SOURCE} : tables lues à l'ancien emplacement s'il existe`); averts.push(`${CANAL.nom} absent à la source surchargée`); }
     else defaut(`${CANAL.nom} — canal confidentiel ABSENT et clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`, `vérifier l'accès au dépôt PRIVÉ ${SOURCE}/${CANAL.nom}.git (gh auth status), puis scripts/fusionner-tables-confidentielles.mjs si des tables libres existent`);
   }
@@ -572,8 +569,8 @@ console.log("");
 console.log("");
 for (const f of FORGES) {
   const p = join(racine, f.nom, f.preuve);
-  if (privesHorsAcces.has(f.nom)) ligne("avert", `preuve ${f.nom} non jugée : dépôt privé hors d'accès (dit plus haut)`);
-  else if (existsSync(p)) ligne("ok", `preuve ${f.nom} : ${f.preuve}`);
+  if (privesHorsAcces.has(f.nom)) continue; // facultatif et silencieux (13/10/2026)
+  if (existsSync(p)) ligne("ok", `preuve ${f.nom} : ${f.preuve}`);
   else defaut(`preuve absente : ${f.nom}/${f.preuve}`, "dépôt incomplet ou contrat d'interface changé — relancer --pull, sinon signaler");
 }
 
@@ -730,4 +727,12 @@ console.log(
     ? `\nPoste NON prêt — ${defauts.length} défaut(s), chacun avec son remède ci-dessus.`
     : `\nPoste prêt — présent, à jour, skills alignés${averts.length ? ` (${averts.length} avertissement(s) non bloquant(s))` : ""}. Si la racine n'est pas le parent du pilot, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
 );
+// Confirmation explicite de l'installation (13/10/2026) : le dernier mot de la commande dit, sans
+// interprétation, si la Factory est utilisable sur ce poste.
+if (!defauts.length) {
+  const forgesPresentes = FORGES.filter((f) => existsSync(join(racine, f.nom, ".git"))).length;
+  console.log("\n" + "═".repeat(72) +
+    `\n  FACTORY DIGIT-AI CORRECTEMENT INSTALLÉE — ${forgesPresentes} dépôt(s) de forge présent(s) et à jour, 0 défaut` +
+    "\n" + "═".repeat(72));
+}
 process.exit(defauts.length ? 1 : 0);
