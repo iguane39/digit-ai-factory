@@ -222,7 +222,7 @@ try {
     const puits = join(racine, "null");
     writeFileSync(puits, "<html>Error 403 - Forbidden</html>\n");
     const r = lancer();
-    attendre("3 ter : un puits de redirection RATÉ à la racine est déclaré", r, 0, /FICHIER de \d+ octets à la racine/);
+    attendre("3 ter : un puits de redirection RATÉ à la racine est déclaré", r, 0, /FICHIER de \d+ octets \(dernière écriture \d{4}-\d\d-\d\d \d\d:\d\d UTC\) à la racine/);
     if (!/redirection `> \/dev\/null` jouée par un shell Windows/.test(r.stdout + r.stderr))
       echecs.push("3 ter : le constat ne dit pas la CAUSE — sans elle, on efface le fichier et la cause revient");
     if (!/geste HUMAIN/.test(r.stdout + r.stderr))
