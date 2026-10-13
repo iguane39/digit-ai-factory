@@ -51,6 +51,18 @@ TF-1054) ; le pilot le dépose lui-même après pseudonymisation (`todo\accueill
 geste humain de remise disparaît ; la décision humaine demeure (tout entre en candidat au
 registre TODO-FORGE).
 
+**Remettre sans nom réel (TF-1233, 13/10/2026)** : le dépôt du pilot est public et ne porte que des
+identifiants d'emprunt (pseudonymes de produits et de clients). Ce que le produit fait : nommer son lot
+`<projet> - RETOURS - …` avec son vrai nom de projet (règle ci-dessus) et le poser dans le sas
+`_arrivee\`, jamais directement dans `input\00-retours\` ni dans `input\01-candidatures\`. Ce que le
+produit ne fait pas : pseudonymiser lui-même. Le pilot réécrit le nom et le contenu à l'accueil
+(`todo\accueillir-lot.mjs`), produit la forme normalisée sans toucher à l'original
+(`todo\normaliser-lot.mjs`) et enregistre les candidatures (`todo\ingerer-lot.mjs`) ; rien de cela ne
+revient au produit. `input\01-candidatures\` n'accueille que des sidecars `.tf.jsonl` déjà passés par
+cette chaîne, jamais un `.md` lisible. Une candidature isolée suit le même sas, sous le nom `<projet> - CANDIDATURE - <objet> - AAAAMMJJ<indice>` : le pilot l'accueille et la range où il l'ingère. Un
+nom réel posé hors du sas entre dans un dépôt public, et un nettoyage d'historique coûte neuf envois
+forcés (incident du 30/08/2026, 115 fichiers).
+
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
 ## Règles de socle applicables — remplies à l'ouverture, selon le type de livrable (TF-0765)
