@@ -115,6 +115,12 @@
  *   S61 une action humaine de motif `decision` qui commande un geste d'EXÉCUTION sans nommer de
  *       choix ouvert porte la trace de la voie automatique essayée (12/10, TF-1567, R-29 point 4) ;
  *       avertissante ;
+ *   S64 un bloc présent porte au moins une ligne sous son titre (13/10, TF-1632) ; S65 un motif
+ *       `acces` nomme au moins deux familles de voies automatiques essayées (13/10, TF-1514) ; S66 une
+ *       mesure concentrée sur une période ou dite invraisemblable se présente au bloc 3 en anomalie
+ *       (13/10, TF-1565) ; S67 une promesse de prévenir portée par une mesure en cours nomme un porteur
+ *       qui survit à la session (13/10, TF-1579) ; S68 une absence déclarée sur une image ou un site
+ *       cite l'essai du moyen disponible (13/10, TF-1580) ; toutes avertissantes ;
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
  *       depuis le 13/08 et restée sans juge ; en TABLEAU, les colonnes suffisent (borne de S19 :
  *       une ligne se juge avec son en-tête). Sans elle, une liste d'options est un menu.
@@ -3368,6 +3374,177 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // S64 (TF-1632, 13/10/2026) — UN BLOC PRÉSENT PORTE AU MOINS UNE LIGNE SOUS SON TITRE.
+  // LE FAIT, trouvé le 12/10/2026 par le banc de mutation (`oracles\banc-mutation\`) : une mutation qui
+  // vide le bloc 7 d'une restitution conforme passe S1. Le message de S1 dit pourtant « un bloc sans
+  // contenu se DIT en une ligne, il ne disparaît pas » : S1 voyait le TITRE, jamais ce qu'il porte. Un
+  // titre suivi de rien est un bloc disparu qui garde son étiquette. AVERTISSANTE à son entrée (hors
+  // de BLOQUANTES du hook), comme toute règle neuve : S1 reste ce qu'elle était. Le contenu d'un bloc
+  // court jusqu'au titre suivant de même niveau ou de niveau supérieur, ou jusqu'au titre d'un autre
+  // bloc ; un sous-titre compte comme contenu, et une suite écrite sur la ligne même du titre après
+  // « : » ou un tiret (« ## 7. Risques — aucun ») aussi. NON JUGÉ : que la ligne dise quelque chose.
+  {
+    const t64 = texte.replace(/\r\n?/g, "\n");
+    const vides = [];
+    BLOCS.forEach(([re, nom], i) => {
+      let m = t64.match(re);
+      if (!m && pointEtape && i === 1) m = t64.match(BLOC_MESURE);
+      if (!m) return;                                   // absent : c'est le terrain de S1
+      const debutTitre = m.index + m[1].length;
+      const finTitre = t64.indexOf("\n", debutTitre);
+      const ligneTitre = t64.slice(debutTitre, finTitre === -1 ? undefined : finTitre);
+      const niveau = (ligneTitre.match(/^#+/) || ["##"])[0].length;
+      const suiteTitre = ligneTitre.slice(m[0].length - m[1].length);
+      if (/(?:\s[:—–-]|:)\s*[\p{L}\p{N}]/u.test(suiteTitre)) return;
+      const corps = finTitre === -1 ? "" : t64.slice(finTitre + 1);
+      const lignes = corps.split("\n");
+      let porte = false;
+      for (const l of lignes) {
+        const h = /^(#{1,6})\s/.exec(l);
+        if (h && (h[1].length <= niveau || BLOCS.some(([r]) => r.test("\n" + l)))) break;
+        if (/[\p{L}\p{N}]/u.test(l)) { porte = true; break; }
+      }
+      if (!porte) vides.push(nom);
+    });
+    vides.length
+      ? ko("S64", `${vides.length} bloc(s) réduit(s) à leur titre : ${vides.join(" · ")} — un bloc sans contenu se DIT en une ligne `
+        + "(« Aucun risque identifié. », « Aucune décision attendue de vous. »), il ne se laisse pas vide sous son titre (loi n° 3, TF-1632)")
+      : ok("S64", "chaque bloc présent porte au moins une ligne sous son titre");
+  }
+
+  // S65 (TF-1514, 13/10/2026, R-29 point 4) — UN MOTIF `acces` ÉNUMÈRE LES VOIES AUTOMATIQUES ESSAYÉES.
+  // LE FAIT, 01/10/2026, lot Produit-64 (RT-31) : un secret à déposer dans un coffre de dev. La session
+  // teste UNE identité, la sienne (« ForbiddenByRbac »), et recommande de solliciter l'équipe plateforme ;
+  // elle n'a lu ni les attributions de rôle du coffre (deux identités de service de la chaîne y avaient le
+  // droit) ni le dépôt du produit, dont une pipeline écrit justement ce secret. S21 était satisfaite : il
+  // y avait une trace. Elle ne porte que sur UNE porte. R-29 point 4 demande l'énumération : identité de
+  // la session, identités de service autorisées sur la cible, automatisation du dépôt, API de la
+  // plateforme. Ce juge exige au moins DEUX de ces quatre familles nommées dans le groupe de l'action —
+  // la même borne que S25 pour un refus d'accès. AVERTISSANTE à son entrée. NON JUGÉ : que chaque voie ait
+  // vraiment été essayée, que les quatre l'aient été, et qu'une trace porte sur la même ressource.
+  {
+    const VOIES = [
+      ["identité de la session", uni(/(\bsession\b|compte de l['’]agent|identit[ée] de l['’]agent|\baz login\b|\bgh auth\b|compte (?:de l['’])?utilisateur de la session)/i)],
+      ["identités de service", /(identit[ée]s? (?:de service|manag[ée]e?s?)|principa(?:l|ux) de service|service principal|managed identity|\bUAMI\b|attributions? de r[ôo]le|role assignment|compte de service|service account)/i],
+      ["automatisation du dépôt", uni(/(pipeline|workflow|GitHub Actions|\bscript\b|automatisation du d[ée]p[ôo]t|azure-pipelines|\.github)/i)],
+      ["API de la plateforme", /(\bAPI\b|\bREST\b|_apis\/|\bcurl\b|\baz rest\b|\bgh api\b|\bHTTP\s*\d{3}\b|endpoint)/i],
+    ];
+    const familles = (g) => VOIES.filter(([, re]) => re.test(g)).map(([n]) => n);
+    juger8("S65", /\bacces\b/, (g) => familles(g).length >= 2,
+      "un motif `acces` ne nomme qu'une voie automatique, ou aucune : R-29 point 4 (voie automatique d'abord) demande " +
+      "d'énumérer les voies et le code de retour de chacune — identité de la session, identités de service qui ont le droit " +
+      "sur la cible (attributions de rôle lues), automatisation du dépôt (pipeline, script), API de la plateforme. Le 01/10/2026, " +
+      "une seule identité essayée a fait laisser à l'humain un dépôt qu'une pipeline du produit savait faire (TF-1514). " +
+      "Nomme au moins deux familles essayées, chacune avec son code, dans le groupe de l'action.",
+      "chaque motif `acces` nomme au moins deux familles de voies automatiques essayées",
+      { cibleSurMotif: true });
+  }
+
+  // S66 (TF-1565, 13/10/2026) — UNE INVRAISEMBLANCE SE PRÉSENTE EN ANOMALIE, JAMAIS EN CHOIX À VALIDER.
+  // LE FAIT, 29/09/2026 chez Produit-12 : « date d'entrée = plus ancien fichier (83 dossiers sur 183 en
+  // 2022-05) » présenté comme l'un de 10 choix à confirmer, validé tel quel le 30/09. Le pic venait de la
+  // copie des fichiers à la reprise du portefeuille ; les dates lues dans les baux le font disparaître.
+  // Reconnaître qu'une mesure viole un invariant du métier est un jugement de fond : ce juge n'en lit que
+  // les DEUX FORMES visibles au bloc 3 — une CONCENTRATION chiffrée sur une seule période (« N sur M en
+  // AAAA-MM », N ≥ 30 % de M), et une mesure que le texte qualifie lui-même d'invraisemblable, d'aberrante
+  // ou d'anormale. Dans les deux cas, le groupe dit l'ANOMALIE et sa CAUSE PROBABLE (compte, dénominateur,
+  // cause, question qui la lève). AVERTISSANTE à son entrée. NON JUGÉ : une invraisemblance que le texte ne
+  // chiffre pas ainsi et ne qualifie pas, c'est-à-dire le cas où personne ne l'a vue.
+  {
+    const b3 = bloc(texte, BLOCS[2][0]) || "";
+    const MOIS = "janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[ûu]t|septembre|octobre|novembre|d[ée]cembre";
+    const CONCENTRATION = new RegExp(`\\b(\\d{1,6})\\s+[\\p{L}'’-]+(?:\\s+[\\p{L}'’-]+)?\\s+sur\\s+(\\d{1,6})\\s+(?:en|au cours de|sur|à|au mois de|le mois de)\\s+(?:\\d{4}-\\d{2}\\b|\\d{2}\\/\\d{4}\\b|(?:${MOIS})\\s+\\d{4}\\b)`, "giu");
+    const QUALIFIEE = uni(/\b(invraisemblables?|aberrante?s?|anormale?s?|anormalement|improbables?|incoh[ée]rente?s?|incoh[ée]rence)\b/i);
+    const ANOMALIE_DITE = uni(/(\banomalie|cause probable|cause possible|artefact|signal d['’]anomalie)/i);
+    const groupes66 = b3.split(/\n(?=\s{0,3}(?:[-*]\s|>\s*\*\*D|\|)|\s*\n)/).filter((g) => /\S/.test(g));
+    const concerne = (g) => {
+      const sansCit = g.replace(/«[^»]*»/g, " ");
+      if (QUALIFIEE.test(sansCit) && /\d/.test(sansCit)) return true;   // une MESURE qualifiée : sans chiffre, « improbable » juge une option
+      for (const m of sansCit.matchAll(CONCENTRATION)) {
+        const n = Number(m[1]), d = Number(m[2]);
+        if (d > 0 && n <= d && n / d >= 0.3) return true;
+      }
+      return false;
+    };
+    const concernes66 = groupes66.filter(concerne);
+    const muets66 = concernes66.filter((g) => !ANOMALIE_DITE.test(g));
+    if (!concernes66.length) ok("S66", "aucune mesure concentrée sur une période ni qualifiée d'invraisemblable au bloc 3 — rien à juger");
+    else if (muets66.length) ko("S66", `${muets66.length} mesure(s) sur ${concernes66.length} présentée(s) au bloc 3 sans signal d'anomalie ni cause probable — `
+      + "une mesure qui viole un invariant du métier se présente en ANOMALIE (compte, dénominateur, cause probable, question qui la lève), "
+      + "jamais en option à valider : le 29/09/2026, « 83 dossiers sur 183 en 2022-05 » a été validé comme un choix, alors que le pic venait "
+      + `d'une copie de fichiers (TF-1565). Ex. : ${muets66[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    else ok("S66", `${concernes66.length} mesure(s) concentrée(s) ou invraisemblable(s) au bloc 3, chacune présentée en anomalie avec sa cause probable`);
+  }
+
+  // S67 (TF-1579, 13/10/2026) — UNE PROMESSE DE PRÉVENIR NOMME UN PORTEUR QUI SURVIT À LA SESSION.
+  // LE FAIT, point d'étape du 25/09/2026 jugé PASS : « je vous préviens » à la première impression des
+  // campagnes, porté par une veille de fond de la session. Session close à 07:39 ; relue le 26/09 :
+  // 8 relevés sur 18, tous à 0, un trou de dix heures, puis « [killed] ». Aucun avis, et le registre la
+  // disait toujours en cours. Ce juge lit la FORME : une promesse d'avis ou de suivi à l'humain (« je vous
+  // préviens », « je vous tiens informé », « je reviens vers vous ») dit, dans son paragraphe, un porteur
+  // qui survit à la session (planificateur, tâche planifiée, routine, CI, pipeline), ou le bloc 8 nomme
+  // qui relance la mesure, et quand. Le texte entre « » est une citation et ne se juge pas.
+  // AVERTISSANTE à son entrée. NON JUGÉ : que le porteur nommé existe et tourne.
+  {
+    const PROMESSE = uni(/\b(je vous (?:pr[ée]viens|pr[ée]viendrai|alerte(?:rai)?|tiens inform[ée]e?s?|tiendrai inform[ée]e?s?|signalerai|ferai signe|recontacte(?:rai)?)|je reviens(?:drai)? vers vous|vous serez (?:pr[ée]venue?s?|alert[ée]e?s?|averti(?:e|s|es)?))\b/i);
+    const PORTEUR_DURABLE = uni(/(planificateur|t[âa]che planifi[ée]e|\bcron\b|\broutine\b|\bschedule[dr]?\b|\bCI\b|pipeline|GitHub Actions|survit [àa] la session|hors de la session|apr[èe]s la (?:fin|cl[ôo]ture) de la session)/i);
+    // La promesse ne compte que portée par une MESURE EN COURS : veille, tâche de fond, relevés périodiques.
+    // Mesuré le 13/10/2026 sur 590 restitutions de produits : sans cette borne, « je vous signalerai » au
+    // détour d'une parade de risque était accusé, 2 fois, sans aucune mesure en cours derrière.
+    const FOND = uni(/(\bveilles?\b|t[âa]che de fond|arri[èe]re-plan|\ben fond\b|\brelev[ée]s?\b|surveill\w*|toutes les \d+\s*min|\bmonitor\w*|guetteur)/i);
+    const b8_67 = bloc(texte, BLOCS[7][0]) || "";
+    const RELANCE_DITE = uni(/\brelanc\w*\b[^\n]*\b(?:le\s+\d{1,2}\/\d{1,2}|\d{1,2}\s*[h:]\s*\d{2}|demain|à la prochaine session|au prochain tour|au tour suivant)/i);
+    const paragraphes67 = texte.replace(/\r\n?/g, "\n").replace(/```[\s\S]*?```/g, "").split(/\n\s*\n/)
+      .map((p) => p.replace(/«[^»]*»/g, " "));
+    const promesses = paragraphes67.filter((p) => PROMESSE.test(p) && FOND.test(p));
+    const sansPorteur = promesses.filter((p) => !PORTEUR_DURABLE.test(p));
+    if (!promesses.length) ok("S67", "aucune promesse de prévenir ou de tenir informé — rien à juger");
+    else if (sansPorteur.length && !RELANCE_DITE.test(b8_67)) ko("S67", `${sansPorteur.length} promesse(s) de prévenir sur ${promesses.length} sans porteur qui survit à la session `
+      + "ni relance nommée au bloc 8 — une veille de fond s'éteint avec la session : le 25/09/2026, « je vous préviens » portait sur 18 relevés, "
+      + "8 ont tourné, aucun n'a été lu et aucun avis n'est parti (TF-1579). Nomme le porteur et sa durée de vie (planificateur, tâche planifiée, "
+      + `CI), ou dis au bloc 8 qui relance la mesure, et quand. Ex. : ${sansPorteur[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    else ok("S67", `${promesses.length} promesse(s) de prévenir, chacune avec un porteur durable ou une relance nommée au bloc 8`);
+  }
+
+  // S68 (TF-1580, 13/10/2026) — UNE ABSENCE DÉCLARÉE CITE L'ESSAI DU MOYEN DISPONIBLE.
+  // DEUX FAITS chez Produit-02. Le 24/09/2026, un jour de collecte déclaré « non mesurable » parce que
+  // publié en tableaux image ; le 25/09, les 4 images lues avec l'outil de lecture d'image de l'agent
+  // donnaient la ligne cherchée. Le 13/09, trois faits « introuvables sur Internet […] ni sur le site » :
+  // des pages du site de l'exploitant les donnaient, listées par son `sitemap.xml`. Même forme que S25 :
+  // l'absence se prouve par l'essai du moyen qui existait. Ce juge lit une phrase qui déclare une
+  // information non mesurable, illisible ou introuvable À PROPOS d'une image ou d'un site, et exige dans
+  // son paragraphe l'essai correspondant : la lecture de l'image (outil de lecture d'image, recadrage,
+  // OCR), ou le plan du site lu (`sitemap`). AVERTISSANTE à son entrée. NON JUGÉ : que l'essai ait été
+  // fait, et toute autre source (un PDF, une base, une API) — S24 et S25 en couvrent une partie.
+  {
+    const ABSENCE = uni(/\b(non mesurables?|introuvables?|illisibles?|non lisibles?|pas lisibles?|inexploitables?)\b/i);
+    // « capture » n'est pas retenu : mesuré le 13/10/2026 sur les 239 documents d'`output\04-plans\`, la
+    // seule accusation venait de « front non servi (pas de capture) », où la capture n'est pas la source.
+    const IMAGE = uni(/\b(images?|tableaux? image|scann[ée]e?s?|scans?|PNG|JPE?G)\b/i);
+    const SITE = uni(/\b(site|sites|page web|pages web|sur internet|en ligne|sitemap)\b/i);
+    const ESSAI_IMAGE = uni(/(lecture d['’]image|outil de lecture d['’]image|lue?s? (?:avec|par) l['’]outil|recadr\w*|\bOCR\b|images? lues?|lu(?:e|es)? l['’]image)/i);
+    const ESSAI_SITE = /sitemap/i;
+    const paragraphes68 = texte.replace(/\r\n?/g, "\n").replace(/```[\s\S]*?```/g, "").split(/\n\s*\n/)
+      .map((p) => p.replace(/«[^»]*»/g, " "));
+    const fautes = [];
+    let vus = 0;
+    for (const p of paragraphes68) {
+      for (const ph of p.split(/(?<=[.!?;])\s+|\n/)) {
+        if (!ABSENCE.test(ph)) continue;
+        const surImage = IMAGE.test(ph), surSite = SITE.test(ph);
+        if (!surImage && !surSite) continue;
+        vus++;
+        if ((surImage && !ESSAI_IMAGE.test(p)) || (surSite && !surImage && !ESSAI_SITE.test(p))) fautes.push(ph);
+      }
+    }
+    if (!vus) ok("S68", "aucune information déclarée non mesurable, illisible ou introuvable sur une image ou un site — rien à juger");
+    else if (fautes.length) ko("S68", `${fautes.length} absence(s) déclarée(s) sur ${vus} sans l'essai du moyen disponible — une source en image se lit `
+      + "avec l'outil de lecture d'image (recadrage au besoin) avant d'être dite « non mesurable » ; un site se parcourt par son `sitemap.xml`, nombre "
+      + "de pages relues cité, avant d'être dit « introuvable » : le 25/09/2026, 4 images lues donnaient le jour de collecte déclaré non mesurable la "
+      + `veille (TF-1580). Ex. : ${fautes[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    else ok("S68", `${vus} absence(s) déclarée(s) sur une image ou un site, chacune avec l'essai du moyen disponible`);
+  }
+
   return findings;
 }
 
@@ -3582,7 +3759,7 @@ Aucun écart : la demande a été suivie à la lettre.
   // revient ») : c'est la moitié du corpus mesuré le 27/09, et la règle doit la laisser tranquille.
   const ACTION_INTERFACE = "- **A-4** — neuve (manuelle_utilisateur) — importer les campagnes dans Google Ads : écran"
     + " « Importations », bouton « Aperçu » puis « Appliquer », sur `https://ads.google.com`." + saut
-    + "  - pourquoi pas l'IA : acces — import TENTÉ le 22/09, `HTTP 403 PERMISSION_DENIED` ; seul le titulaire du compte y est connecté ;" + saut
+    + "  - pourquoi pas l'IA : acces — import TENTÉ le 22/09 par l'API de la plateforme avec l'identité de la session, `HTTP 403 PERMISSION_DENIED` ; seul le titulaire du compte y est connecté ;" + saut
     + "  - si rien n'est fait : les campagnes ne sont pas publiées.";
   const SOURCE_DATEE = saut + "  - source : `support.google.com/google-ads`, lue le 27/09/2026.";
   const GUIDE = "## Guide — importer les campagnes dans Google Ads" + saut + saut
@@ -4764,6 +4941,97 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("TF-1582 : S63 devrait rendre SANS_OBJET hors de toute citation d'une page tierce, et le dire : "
       + String(c63so.message || c63so.statut || "").slice(0, 200));
 
+  // 13/10 — TF-1632 : S64, LE BLOC RÉDUIT À SON TITRE, DANS SES QUATRE SENS. La mutation du banc
+  // (le bloc 7 vidé sous son titre) FAIL sur S64 alors que S1 reste PASS — c'est le trou mesuré ; la
+  // MÊME restitution dont le bloc 7 dit son vide en une ligne PASS en entier (le remède que le message
+  // recommande, TF-1013) ; la MÊME qui le dit sur la ligne du titre PASS ; la verte PASS.
+  const BLOC7_V = /## 7\. Risques[\s\S]*?(?=## 8\.)/;
+  const r64vide = jouerPe("tf1632-bloc-7-vide.md", verte.replace(BLOC7_V, "## 7. Risques\n\n"));
+  const c64v = constatDe(r64vide, "S64");
+  if (c64v.statut !== "FAIL" || !/7\. Risques/.test(c64v.message || ""))
+    casse.push("TF-1632 : un bloc 7 réduit à son titre passe S64 — c'est la mutation que le banc du 12/10 a vue passer : "
+      + String(c64v.message || c64v.statut || "").slice(0, 200));
+  if (constatDe(r64vide, "S1").statut !== "PASS")
+    casse.push("TF-1632 : S1 change de verdict sur un bloc présent mais vide — S64 devait s'ajouter, pas modifier S1");
+  const r64dit = jouerPe("tf1632-bloc-7-dit-son-vide.md", verte.replace(BLOC7_V, "## 7. Risques\nAucun risque identifié.\n\n"));
+  if (constatDe(r64dit, "S64").statut !== "PASS" || r64dit.status !== 0)
+    casse.push("TF-1632 : un bloc 7 qui DIT son vide en une ligne, le remède que le message recommande, n'est pas PASS en entier : "
+      + echecsDe(r64dit) + " " + String(constatDe(r64dit, "S64").message || "").slice(0, 160));
+  const r64titre = jouerPe("tf1632-vide-dit-sur-le-titre.md", verte.replace(BLOC7_V, "## 7. Risques — aucun risque identifié\n\n"));
+  if (constatDe(r64titre, "S64").statut !== "PASS")
+    casse.push("TF-1632 : un bloc qui dit son vide sur la ligne de son titre est accusé : " + String(constatDe(r64titre, "S64").message || "").slice(0, 160));
+  if (constatDe(r58sansObjet, "S64").statut !== "PASS")
+    casse.push("TF-1632 : la verte, dont chaque bloc porte du contenu, est accusée par S64 : " + String(constatDe(r58sansObjet, "S64").message || "").slice(0, 160));
+
+  // 13/10 — TF-1514 : S65, L'ÉNUMÉRATION DES VOIES AUTOMATIQUES, DANS SES DEUX SENS. La verte nomme deux
+  // familles pour son motif `acces` (l'API, par son code de retour, et le compte de l'agent) : PASS. La
+  // MÊME privée de sa seconde clause ne nomme plus qu'une voie : FAIL. Une clause sépare les deux.
+  const CLAUSE_SESSION = " ; le compte de l'agent ne porte aucun rôle sur le portail";
+  const r65une = jouerPe("tf1514-une-seule-voie.md", verte.replace(CLAUSE_SESSION, ""));
+  const c65u = constatDe(r65une, "S65");
+  if (verte.indexOf(CLAUSE_SESSION) === -1 || c65u.statut !== "FAIL" || !/R-29 point 4/.test(c65u.message || ""))
+    casse.push("TF-1514 : un motif `acces` qui ne nomme qu'UNE voie automatique passe S65 — c'est le dépôt du 01/10/2026 laissé à "
+      + "l'humain après une seule identité essayée : " + String(c65u.message || c65u.statut || "").slice(0, 200));
+  if (constatDe(r58sansObjet, "S65").statut !== "PASS")
+    casse.push("TF-1514 : la verte, qui nomme deux voies essayées, est accusée par S65 : " + String(constatDe(r58sansObjet, "S65").message || "").slice(0, 200));
+
+  // 13/10 — TF-1565 : S66, L'INVRAISEMBLANCE PRÉSENTÉE EN CHOIX, DANS SES TROIS SENS. Une concentration
+  // chiffrée sur une seule période glissée dans une décision FAIL ; la MÊME présentée en anomalie avec sa
+  // cause probable PASS ; la verte, sans aucune mesure de ce genre, PASS.
+  const FIN_D1 = "et personne d'autre n'en profite tant qu'on attend.";
+  const r66choix = jouerPe("tf1565-concentration-en-choix.md", verte.replace(FIN_D1,
+    FIN_D1 + " Date de détection retenue : la plus ancienne trace, soit 12 défauts sur 19 en 2026-08, à confirmer."));
+  const c66c = constatDe(r66choix, "S66");
+  if (verte.indexOf(FIN_D1) === -1 || c66c.statut !== "FAIL" || !/anomalie/i.test(c66c.message || ""))
+    casse.push("TF-1565 : une concentration chiffrée sur une seule période, présentée comme un choix à confirmer, passe S66 — c'est "
+      + "« 83 dossiers sur 183 en 2022-05 » validé le 30/09/2026 : " + String(c66c.message || c66c.statut || "").slice(0, 200));
+  const r66anomalie = jouerPe("tf1565-concentration-en-anomalie.md", verte.replace(FIN_D1,
+    FIN_D1 + " Anomalie relevée : 12 défauts sur 19 en 2026-08 ; cause probable : la réécriture du banc ce mois-là."));
+  if (constatDe(r66anomalie, "S66").statut !== "PASS")
+    casse.push("TF-1565 : la MÊME mesure présentée en anomalie avec sa cause probable est accusée — le remède du message échoue : "
+      + String(constatDe(r66anomalie, "S66").message || "").slice(0, 200));
+  if (constatDe(r58sansObjet, "S66").statut !== "PASS")
+    casse.push("TF-1565 : la verte, sans mesure concentrée ni invraisemblable, est accusée par S66 : " + String(constatDe(r58sansObjet, "S66").message || "").slice(0, 200));
+
+  // 13/10 — TF-1579 : S67, LA PROMESSE DE PRÉVENIR, DANS SES TROIS SENS. Une veille de fond de la
+  // session promise par « je vous préviens » FAIL ; la MÊME portée par une tâche planifiée qui survit à
+  // la session PASS ; la verte, qui ne promet rien, PASS.
+  const VEILLE = (porteur) => verte.replace("## 5. Non traité", "- Veille des impressions lancée " + porteur
+    + " (18 relevés à 20 min) — preuve : premier relevé à 0 impression ; je vous préviens à la première impression.\n\n## 5. Non traité");
+  const r67fond = jouerPe("tf1579-veille-de-fond.md", VEILLE("en tâche de fond"));
+  const c67f = constatDe(r67fond, "S67");
+  if (c67f.statut !== "FAIL" || !/survit à la session/.test(c67f.message || ""))
+    casse.push("TF-1579 : « je vous préviens » porté par une tâche de fond de la session passe S67 — c'est la veille éteinte du 25/09/2026 : "
+      + String(c67f.message || c67f.statut || "").slice(0, 200));
+  const r67planif = jouerPe("tf1579-veille-planifiee.md", VEILLE("en tâche planifiée du poste, qui survit à la session,"));
+  if (constatDe(r67planif, "S67").statut !== "PASS")
+    casse.push("TF-1579 : la MÊME promesse portée par une tâche planifiée qui survit à la session est accusée : "
+      + String(constatDe(r67planif, "S67").message || "").slice(0, 200));
+  if (constatDe(r58sansObjet, "S67").statut !== "PASS")
+    casse.push("TF-1579 : la verte, qui ne promet aucun avis, est accusée par S67 : " + String(constatDe(r58sansObjet, "S67").message || "").slice(0, 200));
+
+  // 13/10 — TF-1580 : S68, L'ABSENCE DÉCLARÉE SANS L'ESSAI DISPONIBLE, DANS SES QUATRE SENS. Une
+  // donnée « non mesurable » parce que publiée en image FAIL, la MÊME après lecture des images PASS ;
+  // des faits « introuvables sur le site » FAIL, les MÊMES après lecture du plan du site PASS.
+  const B5_68 = (ligne) => verte.replace(B5cible, B5cible + "\n" + ligne);
+  const r68img = jouerPe("tf1580-image-non-lue.md", B5_68("- Jour de collecte : motif — non mesurable, publié en tableaux image."));
+  const r68imgLue = jouerPe("tf1580-image-lue.md", B5_68("- Jour de collecte : motif — non mesurable, publié en tableaux image ; "
+    + "les 4 images lues avec l'outil de lecture d'image, recadrées, ne portent pas la ligne."));
+  const r68site = jouerPe("tf1580-site-sans-plan.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant."));
+  const r68plan = jouerPe("tf1580-site-plan-lu.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant, "
+    + "`sitemap.xml` lu et 24 pages relues."));
+  const attendu68 = [
+    [r68img, "FAIL", "une donnée « non mesurable » parce que publiée en image, sans lecture de l'image, passe"],
+    [r68imgLue, "PASS", "la MÊME, après lecture des images avec l'outil de lecture d'image, est accusée"],
+    [r68site, "FAIL", "des faits « introuvables sur le site » sans lecture du plan du site passent"],
+    [r68plan, "PASS", "les MÊMES, après lecture du `sitemap.xml` et nombre de pages relues cité, sont accusés"],
+  ];
+  for (const [r, statut, quoi] of attendu68)
+    if (constatDe(r, "S68").statut !== statut)
+      casse.push(`TF-1580 : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S68").message || "sortie illisible").slice(0, 160));
+  if (constatDe(r58sansObjet, "S68").statut !== "PASS")
+    casse.push("TF-1580 : la verte, qui ne déclare aucune absence, est accusée par S68 : " + String(constatDe(r58sansObjet, "S68").message || "").slice(0, 200));
+
   // 12/10 — TF-1588 : S52 ET LA LANGUE DE L'ÉCRAN, DANS SES TROIS SENS. Une action d'écran dont la
   // source officielle datée porte `hl=en` est accusée ; la MÊME en `hl=fr` passe ; la MÊME en `hl=en`
   // qui dit s'appuyer sur une capture de l'écran du jour passe (la capture prime sur l'aide).
@@ -4935,6 +5203,7 @@ console.log(JSON.stringify({
     "S54 (TF-1494) juge la SOURCE, pas le rendu : une ligne coupée par un retour à la ligne forcé (deux espaces en fin de ligne) compte comme une coupure, et un élément de liste coupé à la main n'est pas accusé, alors que le chat l'affiche aussi en colonne",
     "S55 (TF-1493) juge la PRÉSENCE de la ligne « Ne vérifie pas : … » là où le feu vert est donné, jamais sa justesse : qu'elle nomme la limite qui compte, aucun oracle ne le voit. Le feu vert se reconnaît à un vocabulaire fermé et à un guide de LANCEMENT ; un feu vert de production écrit autrement passe sans être vu",
     "S56 (TF-1498) ne vérifie pas que la porte citée a réellement été rejouée, ni sur ce qui sera lancé : il lit une ligne qui la nomme, datée du jour de la restitution et chiffrée. La déclaration « aucune porte de la chaîne ne juge une base externe » n'est pas vérifiée non plus",
+    "S64 à S68 (13/10/2026) jugent une FORME : S64 qu'une ligne existe sous un titre, jamais ce qu'elle dit ; S65 que deux familles de voies sont NOMMÉES, jamais qu'elles ont été essayées ni sur la même ressource, et pas les quatre que R-29 point 4 énumère ; S66 une concentration chiffrée ou une invraisemblance qualifiée par le texte, jamais celle que l'auteur n'a pas vue ; S67 qu'un porteur durable est nommé, jamais qu'il tourne ; S68 qu'un essai est cité pour une image ou un site, jamais pour un PDF, une base ou une API",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);
