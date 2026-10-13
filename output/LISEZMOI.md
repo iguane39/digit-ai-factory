@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 396 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 397 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -184,7 +184,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.5 Ko | `03-etudes/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
 | 20260917-releve-autres-reseaux-sociaux.md | — | 8.3 Ko | `03-etudes/20260917-releve-autres-reseaux-sociaux.md` |
 | 20260917-revue-hebdomadaire-mesure-pas0.md | — | 21.2 Ko | `03-etudes/20260917-revue-hebdomadaire-mesure-pas0.md` |
-| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 116.2 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 114.7 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
 | 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 33 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
 | 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.3 Ko | `03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
 | 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.1 Ko | `03-etudes/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
@@ -201,6 +201,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261001-L99-etude-textes-relance.md | — | 13.8 Ko | `03-etudes/20261001-L99-etude-textes-relance.md` |
 | 20261001-L99-textes-affiches-en-session.md | — | 14.2 Ko | `03-etudes/20261001-L99-textes-affiches-en-session.md` |
 | 20261003-etude-opportunite-pages-html-indicateurs.md | — | 16.3 Ko | `03-etudes/20261003-etude-opportunite-pages-html-indicateurs.md` |
+| 20261013-etude-opportunite-juge-de-comprehension.md | — | 21.9 Ko | `03-etudes/20261013-etude-opportunite-juge-de-comprehension.md` |
 | 20261013-revue-essai-niveaux-d-intervention.md | — | 10.5 Ko | `03-etudes/20261013-revue-essai-niveaux-d-intervention.md` |
 
 ### 04-plans
