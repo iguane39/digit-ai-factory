@@ -542,6 +542,10 @@
   "cas": 5,
   "vu_le": "2026-09-27"
  },
+ "scripts/installer-projet.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-10-13"
+ },
  "scripts/lib-extensions-jugees.test.mjs": {
   "cas": 11,
   "vu_le": "2026-09-17"

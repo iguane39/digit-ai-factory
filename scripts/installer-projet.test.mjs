@@ -26,7 +26,7 @@ const PILOT = resolve(ICI, "..");
 const SCRIPT = join(ICI, "installer-projet.mjs");
 let ok = 0, ko = 0;
 const att = (cond, msg) => { if (cond) ok++; else { ko++; console.log(`  ✗ ${msg}`); } };
-const empreinte = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
+const empreinte = (f) => createHash("sha256").update(readFileSync(f)).digest("hex"); // empreinte-brute-ok : prouve qu'aucun octet d'un fichier du projet n'a bougé, fins de ligne comprises
 const base = mkdtempSync(join(tmpdir(), "installer-projet-"));
 const ctl = (r, quoi) => r.controles.find((c) => c.quoi === quoi);
 
@@ -78,5 +78,5 @@ try {
   rmSync(base, { recursive: true, force: true });
 }
 
-console.log(`installer-projet : ${ok}/${ok + ko} tests verts`);
+console.log(`installer-projet : ${ok}/${ok + ko} tests verts — cas rouges : sans bootstrap la bannière ne dit pas « opérationnelle » (exit 1), dossier personnel refusé`);
 process.exit(ko ? 1 : 0);
