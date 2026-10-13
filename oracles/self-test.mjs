@@ -2061,6 +2061,66 @@ check("TF-0923 (a) borne écart : l'écart DÉCLARÉ AU LEDGER avec son motif é
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1372, 02/10/2026 puis 13/10/2026 (D-70 (b)) — R-32 quater : LA REVUE DE LECTURE N'A -----
+// AUCUN JUGE À LA REMISE. Réappliquée en AVERTISSEMENT : statut PASS, message « AVERTISSEMENT,
+// non bloquant », jamais un FAIL tant que la bascule n'est pas décidée (REGLES-PROJET.md).
+// SKILL.md de digit-ai-page-html écrit la revue OBLIGATOIRE avant toute livraison (TF-0422) ;
+// le 20/09/2026, un rapport d'audit remis sans REVUE.md a gardé quatre jours un schéma illisible.
+const projetRevue = (html, { ecrireRevue = null, mtimeRevueAvantHtml = false } = {}) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-revue-"));
+  mkdirSync(join(d, "output"), { recursive: true });
+  writeFileSync(join(d, "output", html), "<html><body>livrable</body></html>\n", "utf8");
+  if (ecrireRevue !== null) {
+    // « REVUE.md vit à côté du livrable » (gabarit-revue-de-lecture.md) : même dossier que le `.html`.
+    const cheminRevue = join(d, "output", "REVUE.md");
+    writeFileSync(cheminRevue, ecrireRevue, "utf8");
+    if (mtimeRevueAvantHtml) {
+      const hier = new Date(Date.now() - 24 * 3600 * 1000);
+      utimesSync(cheminRevue, hier, hier);
+    }
+  }
+  return d;
+};
+const r32quater = (d) => (lanceArgs(d, "--regles", "R-32 quater").rapport.findings || []).find((x) => x.regle === "R-32 quater");
+check("TF-1372 rouge : un livrable HTML remis SANS REVUE.md à côté → AVERTISSEMENT nommé R-32 quater, jamais FAIL", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html");
+  try {
+    const f = r32quater(d);
+    if (!f || f.statut !== "PASS" || !/AVERTISSEMENT, non bloquant/.test(f.message)) throw new Error(`un livrable sans revue n'est pas signalé en avertissement : ${JSON.stringify(f)}`);
+    if (!/REVUE\.md/.test(f.message) || !/Rapport d audit/.test(f.message)) throw new Error("le constat ne nomme pas le livrable concerné : " + f.message);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1372 rouge : REVUE.md présente mais VIDE → AVERTISSEMENT R-32 quater", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html", { ecrireRevue: "   \n\n  " });
+  try {
+    const f = r32quater(d);
+    if (!f || f.statut !== "PASS" || !/AVERTISSEMENT/.test(f.message) || !/VIDE/.test(f.message)) throw new Error(`une revue vide (espaces seuls) n'est pas signalée : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1372 rouge : REVUE.md ANTÉRIEURE au livrable (jamais rejouée après la dernière écriture) → AVERTISSEMENT R-32 quater", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html",
+    { ecrireRevue: "# Revue de lecture — Produit - Rapport d audit - 20260920a — 2026-09-18 10:00\n\nCaptures lues : 1920 · 1280 · 768 · 390, aucun constat.\n", mtimeRevueAvantHtml: true });
+  try {
+    const f = r32quater(d);
+    if (!f || f.statut !== "PASS" || !/AVERTISSEMENT/.test(f.message) || !/APRÈS leur revue/.test(f.message)) throw new Error(`une revue plus ancienne que le livrable n'est pas signalée : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1372 verte : REVUE.md substantielle et plus récente que le livrable → PASS R-32 quater sans avertissement", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html",
+    { ecrireRevue: "# Revue de lecture — Produit - Rapport d audit - 20260920a — 2026-09-20 10:00\n\nCaptures lues : 1920 · 1280 · 768 · 390, aucun constat.\n" });
+  try {
+    const f = r32quater(d);
+    if (!f || f.statut !== "PASS" || /AVERTISSEMENT/.test(f.message)) throw new Error(`la revue conforme est accusée : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1372 non bloquant : un livrable sans revue ne fait pas échouer le verdict de la règle", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html");
+  try {
+    const r = lanceArgs(d, "--regles", "R-32 quater").rapport;
+    if ((r.findings || []).some((x) => x.regle === "R-32 quater" && x.statut === "FAIL")) throw new Error("R-32 quater bloque alors qu'elle est en avertissement");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- TF-0923 volet (b), 20/09 — R-35 : « un existant » se MESURE, jamais ne se déclare --------
 // TF-0906 (07/09) : TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est antérieur au
 // `run_open`. Le geste était écrit — `git log --reverse --format=%aI` comparé au run_open — et
