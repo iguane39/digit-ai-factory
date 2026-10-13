@@ -61,6 +61,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `oracle-condition-restitution-seule-20260910a.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
 | `oracle-fidelite-de-traduction-absent-du-registre-20260916a.normalise.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `oracle-fidelite-de-traduction-absent-du-registre-20260916a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
+| `ouverture-de-session-sous-le-delai-du-client-20261013b.tf.jsonl` | fichier | 7,6 Ko | 2 ligne(s) JSONL |
 | `page-registre-octets-nuls-20260912a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `personas-banc-defauts-echappes-20260914a.tf.jsonl` | fichier | 2,9 Ko | 1 ligne(s) JSONL |
 | `pilot-constat-empreintes-site-produit-20260921a.tf.jsonl` | fichier | 1,9 Ko | 1 ligne(s) JSONL |
@@ -92,4 +93,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_74 fichier(s), 1 sous-dossier(s)_
+_75 fichier(s), 1 sous-dossier(s)_
