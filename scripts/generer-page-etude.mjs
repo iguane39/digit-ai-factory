@@ -214,6 +214,32 @@ export function gloserColonnes(html) {
 }
 
 /**
+ * L'EXEMPLE DE LECTURE ET LE GLOSSAIRE D'UN CHAPITRE SONT ÉCRITS PAR L'AUTEUR (TF-1463, 13/10/2026).
+ *
+ * LE FAIT : régénérées avec leur sommaire, les 8 pages d'étude échouaient à `check_html.py` sur L10
+ * (un chapitre qui porte une table d'au moins 8 lignes doit porter un `.exemple-lecture`) et sur
+ * L30 (un terme du référentiel `jargon-a-gloser.json` employé dans un chapitre y porte sa glose :
+ * `<dfn>`, `.termes` ou `.glossaire`). Le Markdown des études n'avait aucune forme pour l'un ni pour
+ * l'autre : la régénération du 12/10 a été annulée (b2847ce9).
+ *
+ * LA CONVENTION, au même patron que la note de colonne de `decrireColonnes` : une citation ouverte
+ * par un libellé réservé en gras reçoit la classe que le socle attend. Le générateur n'écrit pas un
+ * mot de leur texte ; il ne fait que nommer ce que l'auteur a écrit.
+ *
+ *     > **Exemple de lecture** : la ligne T1 dit que …
+ *     > **Termes** : le grain est …
+ *
+ * Posée AVANT `identifierChapitres` et `decrireColonnes` : une citation ainsi classée n'est plus
+ * prise pour un chapeau, ni pour la note d'une colonne qui s'appellerait « Termes ».
+ */
+const CITATIONS_NOMMEES = { "exemple de lecture": "exemple-lecture", "termes": "termes" };
+
+export function marquerCitationsNommees(html) {
+  return html.replace(/<blockquote><p><strong>(Exemple de lecture|Termes)<\/strong>(\s*(?::|&nbsp;:))/gi,
+    (tout, nom, sep) => `<blockquote class="${CITATIONS_NOMMEES[nom.toLowerCase()]}"><p><strong>${nom}</strong>${sep}`);
+}
+
+/**
  * UNE ÉTUDE LONGUE POSE SON SOMMAIRE, ET LE SOMMAIRE POINTE VERS DE VRAIS CHAPITRES (TF-1437,
  * 28/09/2026, retour Produit-78 20260928a RP-3).
  *
@@ -330,7 +356,9 @@ export const SEUIL_SOMMAIRE = 4;
  * T3 sur `nav.toc` de toute page portant un sommaire, à chaque régénération.
  *
  * `nav.barre` : seconde navigation, compacte et collante EN PERMANENCE, sous 900 px seulement
- * (cf. commentaire de `sommaireLateral`).
+ * (cf. commentaire de `sommaireLateral`). Elle passe à la ligne au lieu de défiler (TF-1463,
+ * 13/10/2026) : en défilement horizontal, ses liens au-delà de la fenêtre faisaient échouer V1 de
+ * `render_page.py` à 390 et 768 px, 8 et 6 débordements mesurés sur l'étude du 07/09/2026.
  */
 const STYLE_SOMMAIRE = `  <style>
     nav.toc{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
@@ -341,8 +369,8 @@ const STYLE_SOMMAIRE = `  <style>
     .ch-apprend{margin:0 0 16px;color:var(--muted)}
     nav.barre{display:none}
     @media (max-width:900px){
-      nav.barre{display:flex;gap:16px;overflow-x:auto;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
-      nav.barre a{flex:0 0 auto;white-space:nowrap;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
+      nav.barre{display:flex;flex-wrap:wrap;gap:4px 16px;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
+      nav.barre a{flex:0 1 auto;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
       nav.barre a:hover{text-decoration:underline}
     }
   </style>
@@ -418,7 +446,7 @@ export function pageEtude(texteSource, nomSource, { gabarit = lireAsset("boilerp
   // (id, chapeau) ET le découpage en largeur de lecture — les deux doivent composer dans UNE
   // passe, cf. son commentaire. Le sommaire, lui, reste HORS des chapitres : un frère du texte,
   // pas un paragraphe de lecture (cf. lib-socle-page.mjs).
-  const { html: corpsDote, chapitres } = identifierChapitres(mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, "")));
+  const { html: corpsDote, chapitres } = identifierChapitres(marquerCitationsNommees(mdVersHtml(corps.replace(/^#\s+.+$\r?\n/m, ""))));
   const sommaire = sommaireLateral(chapitres);
   const intention = phraseIntention(front, corps, titre);
   const brut = coquilleDuSocle({
@@ -426,7 +454,9 @@ export function pageEtude(texteSource, nomSource, { gabarit = lireAsset("boilerp
     titre,
     description,
     indice: indiceDeLaPage(front, indiceDuNom(nomSource) || undefined),
-    corpsHtml: (intention ? `<p class="intention">${esc(intention)}</p>\n` : "") + sommaire + corpsDote,
+    // TF-1463 (13/10/2026) : la phrase d'intention vit dans un bloc de lecture, comme toute prose ;
+    // posée nue, elle s'étirait sur 184 caractères par ligne à 2 560 px (V18 de render_page.py).
+    corpsHtml: (intention ? `<section class="chap lire" data-mesure-lecture>\n<p class="intention">${esc(intention)}</p>\n</section>\n` : "") + sommaire + corpsDote,
     // TF-1442 : le contenu du marquage TR2 est LU dans le frontmatter de la source, jamais câblé ici.
     marqueurIA: front.assistant,
   });
@@ -876,12 +906,34 @@ Audience : le pilote de l'écosystème, qui décide des mandats. Le reste de la 
   if (!/data-definition="Colonne « Résultat » \(2 sur 2\)/.test(htmlAvec))
     casse.push("le rang d'une colonne glosée change quand sa voisine est décrite par l'auteur — le rang doit compter TOUTES les colonnes");
 
+  // 27 et 28. TF-1463 — L'EXEMPLE DE LECTURE (L10) ET LE GLOSSAIRE (L30), AUX DEUX BORDS. Vert : les
+  // deux libellés réservés reçoivent leur classe, sans voler le chapeau ni devenir une note de
+  // colonne. Rouge : un libellé voisin (« Exemple ») ou une citation sans libellé restent nus.
+  const SOURCE_CITATIONS_NOMMEES = `${SOURCE_SANS_AUTEUR}
+> **Exemple de lecture** : la ligne « a » vaut 1, ce que l'auteur dit de sa table.
+
+> **Termes** : le grain est la granularité d'une ligne de fait.
+
+> **Exemple** : un libellé voisin, qui ne vaut pas exemple de lecture.
+
+## 2. Suite
+
+> **Exemple de lecture** : placé en tête de chapitre, il n'en devient pas le chapeau.
+`;
+  const htmlCitations = pageEtude(SOURCE_CITATIONS_NOMMEES, "20261013-etude-opportunite-essai-citations.md");
+  if (!/<blockquote class="exemple-lecture"><p><strong>Exemple de lecture<\/strong> : la ligne/.test(htmlCitations)
+    || !/<blockquote class="termes"><p><strong>Termes<\/strong> : le grain/.test(htmlCitations))
+    casse.push("une citation « **Exemple de lecture** : » ou « **Termes** : » ne reçoit pas sa classe — L10 et L30 de check_html.py resteraient en FAIL");
+  if (/<blockquote class="[^"]*"><p><strong>Exemple<\/strong>/.test(htmlCitations) || /aria-describedby/.test(htmlCitations)
+    || /<p class="ch-apprend"><strong>Exemple de lecture/.test(htmlCitations))
+    casse.push("un libellé voisin reçoit une classe réservée, ou une citation nommée devient chapeau ou note de colonne — la convention déborde de ses deux libellés");
+
   const nonJuge = [];
   const casseControleReel = jouerControlesDuSocleSurUneEtudeReelle(nonJuge);
   if (casseControleReel && casseControleReel.length) casse.push(...casseControleReel);
 
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
-  const nbCas = casseControleReel ? 26 : 25;
+  const nbCas = casseControleReel ? 28 : 27;
   // TF-1018 (12/10/2026) : le cas non joué se DÉCLARE dans la forme fermée que lit le cliquet du
   // harnais (TF-1434) ; écrit seulement dans le résumé, il était compté PERDU (23 → 22) et rendait
   // le circuit hébergé ROUGE, faute de playwright sur le runner.
@@ -898,7 +950,7 @@ Audience : le pilote de l'écosystème, qui décide des mandats. Le reste de la 
       "note de colonne d'une lettre reliée par aria-describedby, sans régresser le cas déjà couvert ; " +
       "sommaire latéral collant posé et ancré DÈS quatre chapitres, absent à trois ; chapeau " +
       ".ch-apprend écrit depuis une citation, jamais généré, nav.barre collante en permanence sous " +
-      "900 px" + (casseControleReel ? " ; check_html.py et render_page.py verts sur une étude réelle)" : ")") +
+      "900 px ; exemple de lecture et glossaire classés depuis leur libellé réservé, sans déborder" + (casseControleReel ? " ; check_html.py et render_page.py verts sur une étude réelle)" : ")") +
       (nonJuge.length ? ` — NON JOUÉ : ${nonJuge.join(" · ")}` : ""));
   return casse.length ? 1 : 0;
 }
