@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 92 services · 77 prouvés · 15 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 93 services · 77 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -74,7 +74,7 @@
 | cat-agt-11 | **Fixer la barre d'un livrable** | trouver, prouver (test d'existence exécuté) et décomposer la référence externe qui fixe le niveau d'un livrable — pré-vol d'un prompt ou en ligne d'une boucle | `skill la-barre — invocation : « barre… » en tête de message ; registre : .claude\skills\la-barre\references\registre-barres.md` | usages réels : pré-vol TF-0083 (11/08, 3 barres data), campagne catalogues (12/08), TF-0153 (13/08, barre Allure), run Produit-10 (13/08 : protocole tenu intégralement, arrêt au pas 5, garde anti-gameable exercé) | prouve | production |
 | cat-agt-13 | **Construire un plan d'amélioration post-audit** | recevoir un plan d'amélioration multi-domaines joint aux actions de remédiation d'un audit, jugé contre son contrat et rendu en page | `skill plan-d-amelioration — node .claude\skills\plan-d-amelioration\scripts\joindre.mjs plan.json --actions <yaml> --controles <json>, puis oracle-plan-d-amelioration.mjs et rendre.mjs` | TF-1234 (12/10/2026) : recette du skill 36/36, paire rouge/verte au manifeste de quality-oracles (434 contrôles PASS) ; gabarit de page jugé par forge-design (TF-1236, verdict « Livrer »). Aucune mission réelle encore : statut declare | declare | experimental |
 
-## forge-ops (transverse) — 6 services
+## forge-ops (transverse) — 7 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -84,6 +84,7 @@
 | cat-ops-04 | **Canary local simulé** | basculer progressivement avec critère de promotion explicite | `node scripts\ops.mjs canary <build> <cible> [--seuils f.json]` | TF-0107 (12/08) : promotion ET dégradation au palier 25 % prouvées au self-test (45 PASS rejoué pilot) | prouve | experimental |
 | cat-ops-05 | **Drift O-6 et verdict rollback SLO** | détecter la dérive déclaré↔constaté et savoir quand recommander un retour arrière | `node oracles\oracle-ops.mjs --drift <f> <cible> · --verdict-rollback <mesures> --seuils <f>` | TF-0107 (12/08) : 3 classes de dérive invisibles à O1-O4, chacune PASS-avant/FAIL-après au self-test | prouve | experimental |
 | cat-ops-06 | **Plans plan-first d'un produit data** | préparer la promotion d'un bundle Databricks et d'un projet Power BI entre espaces de travail, publication sur GO humain | `node scripts\ops.mjs plan databricks-bundle\|powerbi-workspace <build> --sortie plan.json + oracle O-5` | TF-0865 (07/09) : self-test forge-ops, O-5 PASS sur les deux plans générés | prouve | experimental |
+| cat-ops-07 | **Préparer et relever des campagnes Google Ads** | générer l'import web d'un plan de campagnes confronté aux modèles de l'écran Importations, relever le compte en lecture seule contre le plan et la diffusion, calculer le fichier des changements | `node scripts\google-ads\google-ads.mjs (import-web \| releve \| delta \| avant-depense \| --self-test)` | TF-1364 (13/10/2026) : recette 51/51 sur données factices, recette de forge-ops 163/0 ; générateur joué contre les vrais modèles d'un produit (46 colonnes, 0 défaut). Aucune lecture d'un compte réel par la version générique : statut declare | declare | experimental |
 
 ## forge-data (transverse) — 13 services
 

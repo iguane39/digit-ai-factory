@@ -191,9 +191,12 @@ conformité au plan et diffusion.
 Le kit éprouvé chez le produit compte cinq pièces (annexe C du lot) : le générateur de l'import web
 confronté aux modèles (191 lignes sur 191 acceptées), le relevé en lecture seule qui compare le
 compte au plan, le fichier des changements calculé depuis l'état lu du compte, le plan de campagnes
-qui les alimente, et les commandes documentées. Il reste chez le produit à ce jour. En faire un kit
-de la factory, rangé et recetté hors de tout produit, est une construction à part, déclarée
-restante sous TF-1364.
+qui les alimente, et les commandes documentées. Depuis le 13/10/2026 (TF-1364, décision humaine
+D-69 (a)), sa version générique vit dans `digit-ai-forge-ops/scripts/google-ads/` : recette
+`node scripts/google-ads/google-ads.mjs --self-test` (51 cas sur données factices, aucun appel à
+Google), règles datées dans `regles-google-ads.json`. Le kit reste en lecture seule sur le compte ;
+l'acceptation réelle par l'« Aperçu » et la première lecture d'un compte réel se consignent au
+ledger du run qui les exécute.
 
 ---
 
