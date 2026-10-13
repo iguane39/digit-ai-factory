@@ -68,6 +68,17 @@ dans un sidecar, et une clé approchée choisie faute de mieux fausse le compte 
 close chez le pilot entre quand même, **marqué récidive** — c'est précisément l'information
 que la factory cherche : une correction qui n'a pas redescendu jusqu'à vous.
 
+**Le sidecar se juge avant la remise (LOT-SIDECAR, TF-1591, 13/10/2026)** : `forge\retours\oracle-lot.mjs`
+(1.6.0) lit aussi le sidecar et rejoue les rejets de la porte qui se décident sur lui seul : JSON
+valide, `schema` 1, aucun `id`, les cinq champs obligatoires, aucun caractère de contrôle, la classe
+(présente, connue de `CLASSES.json`) et, pour `classe-a-creer`, une `classe_proposee` complète, d'une
+clé neuve, d'une famille connue, nommée dans le `.md`. Le 03/10, deux lots ont été refusés pour une
+`classe_proposee` absente alors que leur contrôle de remise rendait PASS : il ne regardait pas le
+sidecar. La règle est un **avertissement** (le lot n'est pas bloqué chez vous) ; la porte, elle,
+refuse toujours. Corriger le sidecar avant la remise ; ce qui exige le registre du pilot (rectification
+d'un id inconnu, doublon strict) ne se rejoue pas chez vous. Dans le `.md`, rappeler le numéro du
+retour (« **RT-xxx** : … clé proposée ») sur la ligne de chaque proposition de classe.
+
 **L'indice est PRIS dès que le lot est remis (R-49, TF-0884, 08/09)** : avant d'écrire un lot,
 demander l'indice libre du jour — `node scripts\allouer-indice.mjs` — plutôt que de reprendre
 celui qu'un mandat nomme. Le 06/09, un compte rendu a pris l'indice « a » que son mandat citait,
