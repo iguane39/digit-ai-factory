@@ -2262,6 +2262,128 @@ check("TF-1439 remède joué : la ligne retirée de l'en-tête et `.env.example`
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1613 (13/10/2026) — « aucun nom d'hôte ne s'écarte de la règle R-24 » n'est pas un écart ---
+// Le fait (lot Produit-79 20261007a, RP-4) : le motif « écart » sans borne de mot lisait le verbe
+// « s'écarte » d'une phrase de CONFORMITÉ comme la prose d'un écart. Verte : la phrase passe. Rouge :
+// la prose d'écart authentique (« écart connu… ») reste refusée (déjà tenue par rouge-R24, rejouée ici
+// avec la même phrase de conformité à côté pour prouver que la borne ne l'a pas desserrée).
+const projet1613 = (note) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1613-"));
+  mkdirSync(join(d, "docs", "projet"), { recursive: true });
+  writeFileSync(join(d, "docs", "projet", "PARAMETRAGE.md"),
+    '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-10-13\nvariables:\n  - PORT\n---\n# Paramétrage\n\n## URLs & ports par environnement\n\n' +
+    '| Environnement | Front | Notes |\n|---|---|---|\n| qualif | https://demoapp-qualif.up.railway.app | conforme |\n| production | https://demoapp-production.up.railway.app | conforme |\n\n' + note);
+  return d;
+};
+const r24de1613 = (d) => lanceArgs(d, "--regles", "R-24").rapport.findings.filter((f) => f.regle === "R-24" && f.statut === "FAIL");
+check("TF-1613 vert : « aucun nom d'hôte ne s'écarte de la règle R-24 » (verbe, conformité) ne déclenche pas la prose d'écart", () => {
+  const d = projet1613("> Note : aucun nom d'hôte ne s'écarte de la règle R-24.\n");
+  try {
+    const f = r24de1613(d);
+    if (f.length) throw new Error(`faux positif : ${JSON.stringify(f.map((x) => x.message))}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1613 rouge : la prose d'écart authentique (« écart », « dérogation », au pluriel aussi) reste refusée malgré la borne", () => {
+  for (const note of ["> Note : aucun nom d'hôte ne s'écarte de la règle R-24, sauf un écart connu sur le nommage.\n",
+    "> Dérogation sur le suffixe de l'hôte qualif, à renommer.\n", "> Deux écarts de nommage subsistent.\n"]) {
+    const d = projet1613(note);
+    try {
+      if (!r24de1613(d).some((x) => /EN PROSE/.test(x.message))) throw new Error(`la prose d'écart n'est plus relevée : ${note.trim()}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  }
+});
+
+// ---- TF-1614 (13/10/2026) — un projet adopté SANS type puis déclaré documentaire passe R-13 -------
+// Le fait (RP-5) : robots.txt et llms.txt posés par l'adoption elle-même comptaient comme signaux de
+// site ; la session a dû déclarer FORGE_ROOT pour passer. Verte : de bout en bout, adoption réelle.
+// Rouge : le même projet dont le llms.txt a été instancié par le projet redevient un site → R-13 FAIL.
+check("TF-1614 vert : adopté sans type puis déclaré documentaire, les artefacts posés par l'adoption ne contredisent pas la déclaration", () => {
+  const d = seDitDocumentaire({ "notes/etude.md": "# Étude\n", "README.md": "# Dossier\n" });
+  try {
+    if (!existsSync(join(d, "robots.txt")) || !existsSync(join(d, "llms.txt"))) throw new Error("la fixture n'a pas reçu robots.txt et llms.txt de l'adoption");
+    const f13 = r1439(d).filter((x) => x.regle === "R-13");
+    if (f13.some((x) => x.statut === "FAIL")) throw new Error(`R-13 rougit les artefacts de l'adoption : ${JSON.stringify(f13)}`);
+    if (!f13.some((x) => x.statut === "SANS_OBJET" && /documentaire/.test(x.message))) throw new Error(`l'exemption documentaire n'est pas dite : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1614 rouge : un llms.txt instancié par le projet redevient un signal de site → R-13 FAIL qui le nomme", () => {
+  const d = seDitDocumentaire({ "notes/etude.md": "# Étude\n" });
+  try {
+    writeFileSync(join(d, "llms.txt"), "# Mon site\n\n> Il existe.\n", "utf8");
+    const f13 = r1439(d).filter((x) => x.regle === "R-13");
+    if (!f13.some((x) => x.statut === "FAIL" && /llms\.txt/.test(x.message))) throw new Error(`le site instancié passe pour documentaire : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1615 (13/10/2026) — R-20 ter lit les marqueurs du gabarit llms.txt (AVERTISSEMENT) -------
+// Le fait (RP-6) : le llms.txt posé par l'adoption garde `{Produit}`, `{Accueil}` sans qu'aucune règle
+// le dise. Règle neuve : avertissement non bloquant (PASS imprimé), jamais un FAIL (précédent D-70 (b)).
+const r20llms = (d) => lanceArgs(d, "--regles", "R-20 ter").rapport.findings.filter((f) => f.regle === "R-20 ter" && /llms\.txt/.test(f.message));
+check("TF-1615 rouge : un llms.txt qui garde {Produit} et {Accueil} est SIGNALÉ en avertissement, sans échec", () => {
+  const d = projet1439({ "notes/a.md": "# a\n" });
+  try {
+    if (adopter1439(d).verdict !== "ADOPTE") throw new Error("adoption");
+    const f = r20llms(d);
+    if (!f.some((x) => x.statut === "PASS" && /AVERTISSEMENT/.test(x.message) && /\{Produit\}/.test(x.message) && /\{Accueil\}/.test(x.message))) throw new Error(`marqueurs non signalés : ${JSON.stringify(f)}`);
+    if (lanceArgs(d, "--regles", "R-20 ter").rapport.findings.some((x) => x.statut === "FAIL")) throw new Error("la règle neuve bloque : elle doit rester un avertissement");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1615 vert : un llms.txt instancié (une route à paramètre {id} comprise) ne déclenche rien", () => {
+  const d = projet1439({ "notes/a.md": "# a\n" });
+  try {
+    adopter1439(d);
+    writeFileSync(join(d, "llms.txt"), "# Annonces\n\n> Gère des annonces.\n\n## Pages principales\n\n- [Accueil](/): liste\n- [Fiche](/annonces/{id}): détail d'une annonce\n", "utf8");
+    const f = r20llms(d);
+    if (f.length) throw new Error(`faux positif sur un llms.txt instancié : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1212 (13/10/2026) — R-19 ter : la couverture des dimensions d'audit se déclare à l'ouverture ---
+// Le fait (Produit-61) : cinq dimensions sans propriétaire dans le run portaient 40 des 125 écarts de
+// l'audit. Règle neuve, AVERTISSEMENT non bloquant : le dernier run_open daté du 13/10/2026 ou après
+// porte `couverture_dimensions` — une forge, un contrôle, ou « aucune : <motif> ». Quatre sens : la
+// déclaration complète PASS sans avertissement, l'absence est signalée, un « aucune » nu est signalé,
+// et un run antérieur n'est pas accusé. Aucun cas ne fait échouer l'oracle.
+const projet1212 = (runOpen) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1212-"));
+  mkdirSync(join(d, "forge"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"), JSON.stringify({ seq: 1, type: "run_open", schema_ledger: "1.1", versions_forges: {}, ...runOpen }) + "\n", "utf8");
+  return d;
+};
+const f1212 = (d) => lanceArgs(d, "--regles", "R-19 ter").rapport.findings.filter((f) => f.regle === "R-19 ter");
+const COUVERTURE_COMPLETE = { performance: "forge-development : budget de performance", couts: "aucune : produit sans coût d'exploitation propre", observabilite: "digit-ai-forge-observability", principes_data: "digit-ai-forge-data", gouvernance_ia: "aucune : le produit n'embarque aucun modèle" };
+check("TF-1212 vert : un run_open qui déclare les cinq dimensions (forge ou « aucune : motif ») → PASS sans avertissement", () => {
+  const d = projet1212({ ts: "2026-10-14T08:00:00Z", couverture_dimensions: COUVERTURE_COMPLETE });
+  try {
+    const f = f1212(d);
+    if (!f.some((x) => x.statut === "PASS" && /déclarées à l'ouverture/.test(x.message)) || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1212 rouge : un run_open sans couverture_dimensions → AVERTISSEMENT qui nomme les cinq dimensions, jamais un FAIL", () => {
+  const d = projet1212({ ts: "2026-10-14T08:00:00Z" });
+  try {
+    const f = f1212(d);
+    const a = f.find((x) => /AVERTISSEMENT, non bloquant/.test(x.message));
+    if (!a || !/performance, couts, observabilite, principes_data, gouvernance_ia/.test(a.message)) throw new Error(JSON.stringify(f));
+    if (f.some((x) => x.statut === "FAIL")) throw new Error("la règle neuve bloque : elle doit rester un avertissement");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1212 rouge : « aucune » sans motif et dimension manquante → AVERTISSEMENT qui nomme les deux défauts", () => {
+  const d = projet1212({ ts: "2026-10-14T08:00:00Z", couverture_dimensions: { ...COUVERTURE_COMPLETE, couts: "aucune", observabilite: undefined } });
+  try {
+    const a = f1212(d).find((x) => /AVERTISSEMENT/.test(x.message));
+    if (!a || !/non déclarée pour observabilite/.test(a.message) || !/« aucune » sans motif pour couts/.test(a.message)) throw new Error(JSON.stringify(f1212(d)));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1212 borne : un run_open antérieur au 13/10/2026 n'est pas accusé — antériorité déclarée au non_juge", () => {
+  const d = projet1212({ ts: "2026-10-01T08:00:00Z" });
+  try {
+    const r = lanceArgs(d, "--regles", "R-19 ter").rapport;
+    if ((r.findings || []).some((x) => x.regle === "R-19 ter" && x.statut !== "SANS_OBJET")) throw new Error("un run antérieur est jugé");
+    if (!(r.non_juge || []).some((l) => /R-19 ter \(couverture des dimensions d'audit\) non jugé.*2026-10-01/.test(l))) throw new Error("l'antériorité n'est pas déclarée au non_juge");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- TF-1284 (12/10/2026) : le profil d'authentification commis à la racine d'un produit ------
 // Le fait fondateur, rejoué : un outil a reçu le dossier de configuration `C` au lieu d'un chemin
 // absolu et y a écrit son profil, commis trois minutes plus tard. Trois sens : le dossier `C` et

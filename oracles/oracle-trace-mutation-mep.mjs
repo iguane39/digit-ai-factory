@@ -46,6 +46,16 @@
  *        complété, `az webapp auth` ne s'emploie pas sans extension déclarée, et le dossier porte
  *        la section des étapes remises à l'exploitant — BLOQUANT (M-13, TF-1546, TF-1548,
  *        TF-1549), câblé sur `scripts\verifier-etape-chaine.mjs`.
+ *   TM9  un parcours tiers embarqué qui engage l'utilisateur (paiement, réservation) est vérifié de
+ *        bout en bout, dans un navigateur, sur l'état exécuté, jusqu'à l'étape qui encaisse, et le
+ *        dossier porte la section « Parcours tiers embarqués » — AVERTISSEMENT (M-14, TF-1583), câblé
+ *        sur `scripts\verifier-parcours-tiers.mjs`.
+ *
+ * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
+ * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
+ * son refus (exit 1) ; ce câblage le lit comme AVERTISSEMENT, et le passage en blocage est une décision
+ * humaine, prise sur les produits réels qu'elle aura vus (aucun dossier de MEP du parc n'a encore passé
+ * M-14 : la borne n'est pas mesurée, elle est déclarée).
  *
  * TM5 EST UN CÂBLAGE BLOQUANT, ET LA DIFFÉRENCE AVEC TM4 EST VOULUE (TF-1498, 01/10/2026). Le
  * 30/09/2026, un feu vert de lancement reposait sur les portes de la veille : 3 avis de sécurité
@@ -226,6 +236,17 @@ const confronterEtapeChaine = (racine) => confronterVerbe(racine, "verifier-etap
   (j) => `${(j.mesure || {}).creations_annuaire || 0} création(s) d'objet d'annuaire lue(s) avant écriture, `
     + `${(j.mesure || {}).ecritures_de_chaine || 0} fichier(s) de chaîne qui écrivent dans la plateforme, étapes remises déclarées au dossier`);
 
+/**
+ * TM9 — un parcours tiers embarqué vérifié de bout en bout, dans un navigateur, sur l'état exécuté
+ * (M-14, TF-1583). AVERTISSEMENT : règle neuve, le refus du verbe est rendu sans bloquer.
+ */
+function confronterParcoursTiers(racine) {
+  const r = confronterVerbe(racine, "verifier-parcours-tiers.mjs", "M-14",
+    (j) => `${(j.mesure || {}).parcours || 0} parcours tiers embarqué(s) chez ${(j.mesure || {}).tiers || 0} tiers, joué(s) dans un navigateur sur l'état exécuté et déclaré(s) au dossier`);
+  if (r.statut !== "FAIL") return r;
+  return { statut: "AVERTISSEMENT", message: "règle neuve du 13/10/2026, non bloquante (précédent D-70 (b)) — " + r.message };
+}
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -318,6 +339,9 @@ export function juger(racine) {
   // TM8 — la chaîne du produit et son dossier, jugés ensemble par le verbe.
   const ec = confronterEtapeChaine(racine);
   findings.push({ regle: "TM8", statut: ec.statut, ou: racine, message: ec.message });
+  // TM9 — les parcours tiers embarqués du produit, jugés ensemble avec son dossier par le verbe.
+  const pt = confronterParcoursTiers(racine);
+  findings.push({ regle: "TM9", statut: pt.statut, ou: racine, message: pt.message });
   return findings;
 }
 
@@ -336,6 +360,8 @@ const NON_JUGE = [
   + "présente, jamais s'il était juste — et TM4 AVERTIT sans jamais bloquer, parce que le remède "
   + "(rejouer l'oracle) appartient à forge-ops et qu'un contrôle qui bloque sur ce qu'il ne peut pas "
   + "faire réparer apprend à être contourné",
+  "la VÉRACITÉ du parcours déclaré joué (TM9) : le verbe exige la section, sa date, son lieu (un navigateur) et "
+  + "son objet (l'état exécuté) ; il ne rejoue pas le clic, et TM9 AVERTIT sans bloquer — règle neuve du 13/10/2026",
   "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
   + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
 ];
@@ -516,6 +542,33 @@ function selfTest() {
     if (r.status !== 1) casse.push("une fiche d'annuaire écrite aussitôt créée ne met pas l'oracle en échec — TM8 devait bloquer");
   }
 
+  // ---- TM9 : LES PARCOURS TIERS EMBARQUÉS (M-14, TF-1583) ----------------------------------------
+  // Le produit du cas fondateur du 25/08/2026, réduit à son fait : un cadre de réservation intégré et la
+  // politique de contenu qui nomme la passerelle de paiement.
+  const avecParcours = (racine, dossier) => {
+    mkdirSync(join(racine, "site"), { recursive: true });
+    writeFileSync(join(racine, "site", "reservation.html"), '<iframe src="https://www.beds24.com/booking2.php" title="Réservation"></iframe>\n', "utf8");
+    writeFileSync(join(racine, "staticwebapp.config.json"), '{ "value": "frame-src \'self\' https://www.beds24.com https://js.stripe.com" }\n', "utf8");
+    writeFileSync(join(racine, "forge", "etapes", "mep", "DOSSIER-MEP.md"), dossier, "utf8");
+    return racine;
+  };
+  const PARCOURS_DITS = `${DOSSIER_OK}\n## Parcours tiers embarqués\n\n- Tiers : beds24 (réservation) et stripe (paiement de l'acompte).\n`
+    + "- Joué dans un navigateur le 2026-10-13, sur l'état exécuté (DOM après chargement), pas sur le HTML servi.\n"
+    + "- Étape atteinte : jusqu'à l'étape qui encaisse ; l'encaissement lui-même est à confirmer par un paiement réel.\n";
+  // SANS OBJET : aucun parcours tiers embarqué dans le produit.
+  attendre("tm9-sans-objet", join(dir, "vert"), "TM9", "SANS_OBJET");
+  // VERT : le parcours nommé, joué dans un navigateur sur l'état exécuté, étape déclarée.
+  attendre("tm9-remede", avecParcours(produit("tm9-remede", DOSSIER_OK, MARQUEUR), PARCOURS_DITS), "TM9", "PASS");
+  // ROUGE : le cas fondateur — un dossier muet sur un parcours de paiement embarqué.
+  const muetParcours = avecParcours(produit("tm9-muet", DOSSIER_OK, MARQUEUR), DOSSIER_OK);
+  attendre("tm9-muet", muetParcours, "TM9", "AVERTISSEMENT");
+  // ET IL N'EST PAS BLOQUANT : règle neuve, sortie 0 — sans ce cas, « avertit » ne se distingue pas de « bloque ».
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), muetParcours], { encoding: "utf8" });
+    if (r.status !== 0) casse.push("un parcours tiers embarqué sans section au dossier fait sortir l'oracle en échec — TM9 devait AVERTIR, règle neuve du 13/10/2026");
+    if (!/TM9/.test(r.stdout) || !/Parcours tiers embarqués/.test(r.stdout)) casse.push("TM9 n'apparaît pas au verdict JSON — un avertissement que personne ne lit n'est pas un avertissement");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -525,7 +578,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 28/28 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 32/32 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -540,7 +593,9 @@ function selfTest() {
       + "PASS ; TM7 identifiant de mémoire, ajout masqué et « consentie » sans relecture FAIL — le cas fondateur "
       + "du 16/09/2026 ; TM7 bloque, code de sortie 1 vérifié ; TM8 sans objet SANS_OBJET ; TM8 objet lu en boucle "
       + "avant d'être complété PASS ; TM8 fiche écrite aussitôt créée et az webapp auth FAIL — le cas fondateur "
-      + "du 01/10/2026 ; TM8 bloque, code de sortie 1 vérifié)");
+      + "du 01/10/2026 ; TM8 bloque, code de sortie 1 vérifié ; TM9 sans parcours tiers embarqué SANS_OBJET ; TM9 parcours "
+      + "nommé, joué dans un navigateur sur l'état exécuté et étape déclarée PASS ; TM9 dossier muet sur un parcours de "
+      + "paiement embarqué AVERTISSEMENT — le cas fondateur du 25/08/2026 ; TM9 ne bloque PAS, code de sortie 0 vérifié)");
   return casse.length ? 1 : 0;
 }
 

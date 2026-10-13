@@ -140,7 +140,7 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 142,
+  "cas": 152,
   "vu_le": "2026-10-13"
  },
  "oracle-constantes-externes.mjs": {
@@ -327,8 +327,8 @@
   "vu_le": "2026-10-13"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 28,
-  "vu_le": "2026-10-12"
+  "cas": 32,
+  "vu_le": "2026-10-13"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -491,8 +491,8 @@
   "vu_le": "2026-10-02"
  },
  "scripts/adopter-projet-existant.test.mjs": {
-  "cas": 28,
-  "vu_le": "2026-10-02"
+  "cas": 30,
+  "vu_le": "2026-10-13"
  },
  "scripts/allouer-indice.test.mjs": {
   "cas": 12,
@@ -650,6 +650,10 @@
   "cas": 3,
   "vu_le": "2026-08-31"
  },
+ "scripts/verifier-parcours-tiers.test.mjs": {
+  "cas": 12,
+  "vu_le": "2026-10-13"
+ },
  "scripts/verifier-portes-du-jour.test.mjs": {
   "cas": 12,
   "vu_le": "2026-10-01"
@@ -799,8 +803,8 @@
   "vu_le": "2026-08-26"
  },
  "todo/self-test.mjs": {
-  "cas": 58,
-  "vu_le": "2026-09-16"
+  "cas": 64,
+  "vu_le": "2026-10-13"
  },
  "todo/semer-defauts.test.mjs": {
   "cas": 12,

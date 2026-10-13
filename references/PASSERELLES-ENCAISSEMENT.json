@@ -1,0 +1,41 @@
+{
+  "format": "pilot/passerelles-encaissement@1",
+  "version": "1.0.0",
+  "date": "2026-10-13",
+  "source": "TF-1583 (lot Produit-02 - RETOURS - 20261001b, RT-109) : un parcours de paiement embarqué dans un site, vérifié sur l'étape corrigée et jamais jusqu'à l'étape qui encaisse, a rendu le paiement de l'acompte impossible pendant 35 jours (du 25/08 au 29/09/2026), signalé par l'exploitant et non par un contrôle.",
+  "pourquoi_une_donnee_et_pas_du_code": "Loi transverse n° 4 : les passerelles de paiement et de réservation en ligne changent de nom et d'adresse sans prévenir. Une liste recopiée dans un contrôle se périme au premier ajout, en silence. Elle vit ici, datée, et se corrige sans toucher au contrôle.",
+  "usage": "scripts/verifier-parcours-tiers.mjs (porte M-14 de ETAPE-MEP.md, § 3 undecies) lit `fragments_de_nom_d_hote` pour reconnaître un hôte de passerelle dans un fichier du produit, et `vocabulaire` pour reconnaître un parcours qui engage l'utilisateur (il paie, il réserve) autour d'un cadre intégré.",
+  "limite": "Liste d'EXEMPLES relevés, non exhaustive : une passerelle absente d'ici n'est reconnue que par le vocabulaire du parcours. Le contrôle ne la connaît pas, et le dit à son périmètre de non-jugé. Aucune adresse n'a été relue en ligne pour cette version ; la liste n'est pas une mesure de ce que les passerelles font aujourd'hui, seulement des noms que le contrôle cherche.",
+  "fragments_de_nom_d_hote": [
+    "stripe.com",
+    "paypal.com",
+    "adyen.com",
+    "mollie.com",
+    "sumup.com",
+    "lemonsqueezy.com",
+    "checkout.com",
+    "helloasso.com",
+    "payplug.com",
+    "monetico",
+    "paybox",
+    "systempay",
+    "lyra.com",
+    "beds24.com",
+    "smoobu.com",
+    "lodgify.com",
+    "reservit.com",
+    "secureholiday.net"
+  ],
+  "vocabulaire": [
+    "paiement",
+    "payment",
+    "checkout",
+    "reservation",
+    "réservation",
+    "booking",
+    "acompte",
+    "billetterie",
+    "encaissement",
+    "commande"
+  ]
+}

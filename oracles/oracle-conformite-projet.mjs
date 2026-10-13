@@ -545,6 +545,29 @@ else {
   }
 }
 
+// R-20 ter · llms.txt — les marqueurs du gabarit se lisent aussi hors de docs\projet\ (TF-1615,
+// 13/10/2026). Le fait (lot Produit-79 20261007a, RP-6) : l'adoption pose `llms.txt` depuis
+// `gabarits\web\llms.txt`, qui garde ses `{Produit}` et `{Accueil}`, et aucune règle ne le
+// relevait — R-20 ter ne lit que les fiches de docs\projet\ et les artefacts à marqueurs
+// déclarés. Les marqueurs se DÉRIVENT du gabarit (une seule vérité, pas une liste recopiée).
+// RÈGLE NEUVE, opposable à tous les produits : AVERTISSEMENT non bloquant (précédent D-70 (b)).
+{
+  const gabaritLlms = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "web", "llms.txt");
+  if (existsSync(gabaritLlms)) {
+    const marquesGabarit = [...new Set(readFileSync(gabaritLlms, "utf8").match(/\{[^{}\n]{2,80}\}/g) || [])];
+    for (const f of fichiers(cible)) {
+      if (basename(f).toLowerCase() !== "llms.txt") continue;
+      if (/^(forge|input|gabarits)\//.test(rel(f))) continue; // copies de dispositif et entrants : données, pas la carte du site
+      const texte = readFileSync(f, "utf8");
+      const restes = marquesGabarit.filter((m) => texte.includes(m));
+      if (restes.length) {
+        ok("R-20 ter", rel(f), `AVERTISSEMENT, non bloquant : ${restes.length} marqueur(s) du gabarit llms.txt NON INSTANCIÉ(S) (${restes.slice(0, 4).join(", ")}${restes.length > 4 ? `, +${restes.length - 4}` : ""}) — `
+          + "la carte du site que lisent les moteurs génératifs porte encore ses trous ; la renseigner depuis docs/projet/FONCTIONNEL.md (TF-1615)");
+      }
+    }
+  }
+}
+
 // R-6 — code : jamais de copie datée, jamais dans Old\
 let r6 = true;
 for (const f of fichiers(cible)) {
@@ -1486,8 +1509,50 @@ else {
       (anteriorites ? ` — ${anteriorites} run_open antérieur(s) au ${DOCTRINE_CLES_COMPLETES} en antériorité déclarée sur la forme des clés (jamais réécrits)` : "") +
       (rectifies.length ? ` — [RECTIFIÉ] ${rectifies.length} run_open couvert(s) par rectification déclarée (champ absent, clé malformée ou run_precedent omis) : ${rectifies.join(" · ")}` : ""));
   }
-}
 
+// R-19 ter — LA COUVERTURE DES DIMENSIONS D'AUDIT SE DÉCLARE À L'OUVERTURE DU RUN (TF-1212, 13/10/2026).
+//
+// LE FAIT (Produit-61, retour du 09/09/2026) : cinq étapes closes, oracles au vert, contrat de fin de
+// construction tenu, puis 76 contrôles non conformes, 49 partiels et 12 fatals non tenus sur 175 au
+// référentiel d'audit de la même maison. Cinq dimensions — performance, coûts, observabilité,
+// principes data, gouvernance de l'IA — n'avaient aucun propriétaire dans le run et portaient 40 des
+// 125 écarts ; sur quatorze forges déclarées à l'ouverture, cinq n'avaient jamais été mobilisées. Le
+// défaut n'est pas qu'une forge manque : c'est que son ABSENCE n'a jamais été un terme déclaré du run.
+//
+// LA RÈGLE, calquée sur R-11 bis : le `run_open` porte `couverture_dimensions`, une valeur par
+// dimension — le nom de la forge ou du contrôle qui la tient, ou « aucune : <motif> ». « Aucune » est
+// une réponse VALIDE ; ce qui est refusé est le silence. RÈGLE NEUVE, opposable à tous les produits :
+// AVERTISSEMENT non bloquant (précédent D-70 (b)), jugé sur le DERNIER `run_open` daté du 13/10/2026 ou
+// après — les runs ouverts avant n'ont pas pu la connaître, et R-42 interdit de réécrire leur entrée.
+// Elle ne tranche pas la doctrine : les trois contradictions relevées entre le contrat et le référentiel
+// d'audit (route de déploiement manuelle, sauvegarde absente de l'oracle de mise en production, fournisseur
+// d'identité) restent des décisions humaines.
+{
+  const DIMENSIONS_D_AUDIT = ["performance", "couts", "observabilite", "principes_data", "gouvernance_ia"];
+  const ENTREE_COUVERTURE = "2026-10-13";
+  const dernier = opens.length ? opens[opens.length - 1] : null;
+  if (dernier) {
+    if (String(dernier.ts || "") < ENTREE_COUVERTURE) {
+      antecedences.push(`R-19 ter (couverture des dimensions d'audit) non jugé : le dernier run_open date du ${String(dernier.ts || "?").slice(0, 10)}, avant l'entrée de la règle le ${ENTREE_COUVERTURE} (TF-1212) — antériorité déclarée, l'entrée ne se réécrit pas (R-42) ; exigée à l'ouverture du prochain run`);
+    } else {
+      const c = dernier.couverture_dimensions;
+      const objet = c && typeof c === "object" && !Array.isArray(c);
+      const absentes = DIMENSIONS_D_AUDIT.filter((d) => !objet || typeof c[d] !== "string" || !c[d].trim());
+      const sansMotif = objet ? DIMENSIONS_D_AUDIT.filter((d) => typeof c[d] === "string" && /^aucune\b/i.test(c[d].trim()) && c[d].replace(/^aucune\s*[:\-—]?\s*/i, "").trim().length < 10) : [];
+      if (absentes.length || sansMotif.length) {
+        ok("R-19 ter", `forge/ledger.jsonl (run_open seq ${dernier.seq ?? "?"})`,
+          `AVERTISSEMENT, non bloquant : ${absentes.length ? `couverture non déclarée pour ${absentes.join(", ")}` : ""}${absentes.length && sansMotif.length ? " ; " : ""}`
+          + `${sansMotif.length ? `« aucune » sans motif pour ${sansMotif.join(", ")}` : ""} — le run_open porte \`couverture_dimensions\` : `
+          + "pour chacune de ces dimensions du référentiel d'audit, la forge ou le contrôle qui la tient, ou « aucune : <motif> » ; « aucune » est une réponse valide, le silence n'en est pas une. "
+          + "Mesuré le 09/09/2026 : 40 écarts sur 125 portaient sur ces cinq dimensions, qu'aucune étape du run ne regardait (TF-1212)");
+      } else {
+        ok("R-19 ter", `forge/ledger.jsonl (run_open seq ${dernier.seq ?? "?"})`,
+          `les ${DIMENSIONS_D_AUDIT.length} dimensions d'audit sans propriétaire historique sont déclarées à l'ouverture du run (forge ou « aucune » motivé)`);
+      }
+    }
+  }
+}
+}
 
 // R-42 — INTÉGRITÉ du ledger (TF-0411, 20/08) : `seq` strictement croissant depuis 1,
 // horodatages non décroissants, première entrée `run_open`. Le contrôle EXISTAIT depuis
@@ -2030,7 +2095,9 @@ else {
       // signalait rien. Une prose d'écart sans déclaration structurée est désormais un défaut.
       if (!declares.length) {
         const prose = corps.split(/\r?\n/).find((l) =>
-          /(écart|ecart|dérogation|derogation|exception|non[- ]conforme|à renommer|a renommer)/i.test(l)
+          // TF-1613 : MOT ENTIER. « aucun nom d'hôte ne s'écarte de la règle R-24 » est une phrase de
+          // conformité (verbe), pas un écart. Bornes en lettres Unicode : `\b` ne connaît pas « é ».
+          /(?<![\p{L}])(écarts?|ecarts?|dérogations?|derogations?|exceptions?|non[- ]conformes?|à renommer|a renommer)(?![\p{L}])/iu.test(l)
           && /(R-24|convention de nommage|suffixe|nommage)/i.test(l));
         if (prose) {
           ko("R-24", "docs\\projet\\PARAMETRAGE.md", `écart de nommage documenté EN PROSE (« ${prose.trim().slice(0, 80)} ») sans champ structuré — un écart s'accepte en frontmatter \`ecarts_r24\` (url, environnement, motif, decide_le), jamais en note : le 15/08 la prose n'a rien signalé et l'URL fausse est partie en livraison`); ok24 = false;
@@ -2432,6 +2499,8 @@ const nonJuge = [
   "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML EST jugée depuis le 18/08 (R-26 bis, sceau de source, TF-0338) — ce qui reste hors jugement est la fraîcheur d'une page ANTÉRIEURE au mécanisme de sceau : elle est déclarée, jamais mise en échec",
   "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo-geo au run)",
   "R-13 (TF-1439) : la déclaration « documentaire » se confronte à des SIGNAUX — fichiers de code par extension, manifestes de dépendances, robots.txt / llms.txt / sitemap.xml, racine web déclarée — relevés hors forge\\, input\\ (entrants = données) et répertoires d'outillage, sur 6 niveaux ; un logiciel ou un site qui n'en porte aucun (site statique fait de seuls .html, classeur à macros, script sans extension) passerait pour documentaire : limite déclarée",
+  "R-13 (TF-1614) : un robots.txt ou llms.txt STRICTEMENT identique à son gabarit (fins de ligne normalisées) est tenu pour posé par l'adoption et ne compte pas comme signal de site ; modifié d'un seul caractère, il redevient un signal. Un site dont le seul fichier de site est resté au gabarit passerait pour documentaire : limite déclarée",
+  "R-20 ter llms.txt (TF-1615) : les marqueurs sont ceux de gabarits\\web\\llms.txt (dérivés, non recopiés), cherchés par inclusion textuelle dans tout llms.txt hors forge\\, input\\ et gabarits\\ ; un marqueur inventé par le projet, ou un llms.txt réécrit avec d'autres trous, n'est pas vu. Règle neuve : AVERTISSEMENT non bloquant (précédent D-70 (b))",
   "R-2 localisation (TF-0319) : seul ce qui est MARQUÉ est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ, mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ; la JUSTESSE du marquage relève de la relecture, pas d'un contrôle de forme ; `input\\`, `gabarits\\`, `fixtures\\`, `old\\` et `.oracles\\` sont hors jugement par motif déclaré ; la marque est attendue sur la COPIE remise, pas sur l'original de travail de `forge\\etapes\\` (règle 16) — l'oracle ne rapproche pas un original de sa copie",
   "R-2 localisation (TF-0319) : la structure INTERNE d'`output\\` (familles numérotées uniques, une seule version courante par famille, graphie `old\\`, LISEZMOI.md de correspondance — D-15 al. a à e) n'est PAS jugée ici : sa mécanisation vit chez `oracle-conventions.mjs` d'organization et reste suspendue à un mandat humain d'écriture dans ce dépôt frère",
   "R-20 nature des lignes (TF-0528) : les lignes dont l'Id reste un gabarit (`{A-01}`) ne sont pas jugées — juger l'exemple que le gabarit prescrit mettrait le gabarit en défaut, jamais l'auteur ; un produit qui garde ses placeholders échappe donc au contrôle",

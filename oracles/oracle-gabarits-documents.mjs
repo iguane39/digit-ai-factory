@@ -954,6 +954,30 @@ if (args[0] === "--self-test") {
       casse.push("G8 : « Synthese Executive » retombe sur la famille des restitutions — le préfixe le plus LONG ne gagne " +
         `pas, et la règle désigne la mauvaise famille en rendant PASS : ${plusLong.message.slice(0, 120)}`);
 
+    // TF-1389 et TF-1617 (13/10/2026) — LES DEUX FAMILLES NÉES DES RETOURS RP-61 ET RP-8 SE RÉSOLVENT PAR
+    // LE NOM. Sens VERT : « Note de presentation », « Presentation restitution » et « Fiche produit »
+    // tombent sur leur famille (le premier nom était celui que G8 ne résolvait pas le 24/09). Sens
+    // ROUGE, qui empêche d'avoir tout avalé : « Presentation » seul reste à la décision de mise en
+    // production, et un type voisin non déclaré (« Fiche technique ») reste sans famille.
+    {
+      const nomme = (nom) => g8(nom);
+      const note = nomme("Digit-AI - Note de presentation - Points bloquants audit - 20261013a.pptx");
+      const resto = nomme("Digit-AI - Presentation restitution - Audit Produit-X - 20261013a.pptx");
+      const fiche = nomme("Digit-AI - Fiche produit - Outil de suivi - 20261013a.html");
+      const decision = nomme("Digit-AI - Presentation - Decision de mise en production - 20261013a.pptx");
+      const voisin = nomme("Digit-AI - Fiche technique - Outil de suivi - 20261013a.html");
+      if (!(note.statut === "PASS" && note.message.includes("presentation-restitution-audit")))
+        casse.push(`TF-1389 : « Note de présentation » ne résout pas la famille de restitution d'audit — ${note.message.slice(0, 140)}`);
+      if (!(resto.statut === "PASS" && resto.message.includes("presentation-restitution-audit")))
+        casse.push(`TF-1389 : « Présentation de restitution » ne résout pas la famille de restitution d'audit — ${resto.message.slice(0, 140)}`);
+      if (!(fiche.statut === "PASS" && fiche.message.includes("fiche-produit")))
+        casse.push(`TF-1617 : « Fiche produit » ne résout pas sa famille — ${fiche.message.slice(0, 140)}`);
+      if (!(decision.statut === "PASS" && decision.message.includes("presentation-autorite")))
+        casse.push(`TF-1389 : « Présentation » seul n'est plus résolu sur la décision de mise en production — la nouvelle famille a tout avalé : ${decision.message.slice(0, 140)}`);
+      if (voisin.statut !== "FAIL")
+        casse.push("TF-1617 : « Fiche technique », type non déclaré, passe G8 — la famille neuve a élargi la résolution au-delà de ses noms");
+    }
+
     // TF-1230 (campagne D-51 (a), 02/10/2026) — LES HUIT FICHIERS docs-projet SONT UNE FAMILLE DU
     // CATALOGUE RÉEL, PAS UN ANGLE MORT. Avant ce correctif, aucune ligne de
     // gabarits/documents/catalogue.jsonl ne les déclarait : ils vivaient sous gabarits/docs-projet/,

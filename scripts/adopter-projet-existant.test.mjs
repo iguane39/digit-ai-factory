@@ -275,6 +275,22 @@ try {
       && s.some((x) => /racine web déclarée : site/.test(x)), `signaux manqués : ${s.join(", ")}`);
   });
 
+  // TF-1614 (13/10/2026) : ce que l'adoption a posée elle-même n'est pas un site que le projet a bâti.
+  check("TF-1614 vert : robots.txt et llms.txt posés par l'adoption (identiques au gabarit) ne comptent pas comme signaux de site", () => {
+    const d = projet({ "notes/a.md": "# a\n" });
+    const r = adopter(d, { pilot: PILOT });
+    att(r.verdict === "ADOPTE" && existsSync(join(d, "robots.txt")) && existsSync(join(d, "llms.txt")), `adoption sans type : ${r.verdict} — robots/llms non posés`);
+    att(signauxLogicielOuSite(d).length === 0, `signaux sur un projet fraîchement adopté : ${signauxLogicielOuSite(d).join(", ")}`);
+  });
+  check("TF-1614 rouge : les mêmes fichiers MODIFIÉS (instanciés par le projet) redeviennent des signaux de site", () => {
+    const d = projet({ "notes/a.md": "# a\n" });
+    adopter(d, { pilot: PILOT });
+    writeFileSync(join(d, "llms.txt"), "# Mon site\n\n> Une vraie carte.\n", "utf8");
+    writeFileSync(join(d, "robots.txt"), readFileSync(join(d, "robots.txt"), "utf8") + "Disallow: /prive\n", "utf8");
+    const s = signauxLogicielOuSite(d);
+    att(s.some((x) => /^llms\.txt \(fichier de site\)/.test(x)) && s.some((x) => /^robots\.txt \(fichier de site\)/.test(x)), `signaux manqués : ${s.join(", ")}`);
+  });
+
   check("typeProjetDeclare ne lit que l'EN-TÊTE du carnet — une mention dans le corps n'est pas une déclaration", () => {
     const d = projet({ [CARNET]: "---\nrole: carnet\n---\n\n# Carnet\n\ntype_projet: documentaire\n" });
     att(typeProjetDeclare(d) === null, "une ligne du corps est lue comme une déclaration");

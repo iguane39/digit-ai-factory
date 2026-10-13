@@ -925,6 +925,25 @@ function selfTest() {
     casse.push("TF-1507 : gabarits\\docs-projet\\FONCTIONNEL.md porte encore, en en-tête de colonne, un des deux "
       + `libellés refusés par EC-8 — le produit qui l'instancie serait de nouveau refusé : ${JSON.stringify(f8fonctionnel)}`);
 
+  // TF-1616 (13/10/2026) — TOUS LES GABARITS docs-projet, pas deux libellés. Le titre « Ce que le produit
+  // ne fait volontairement pas » de FONCTIONNEL.md était refusé par EC-8 chez le produit qui
+  // l'instancie (lot Produit-79 20261007a, RP-7) : la garde TF-1507 ne nommait que deux libellés de
+  // colonne. Sens ROUGE : le titre ancien, rejoué, est bien refusé (la règle n'est pas desserrée) ;
+  // sens VERT : aucun gabarit du dossier ne porte plus un seul constat EC-8.
+  const rAncienTitre = jouer("tf1616-ancien-titre.md",
+    "# Fonctionnel\n\nUn paragraphe de prose ordinaire qui pose le sujet du produit avant ses sections.\n\n"
+    + "## Ce que le produit ne fait volontairement pas\n\n- une exclusion assumée\n");
+  const f8ancien = (rAncienTitre.j?.findings || []).find((f) => f.regle === "EC-8");
+  if (!f8ancien || f8ancien.statut !== "FAIL")
+    casse.push(`TF-1616 : l'ancien titre « Ce que le produit ne fait volontairement pas » n'est plus refusé en titre — la règle a été desserrée au lieu du gabarit reformulé : ${JSON.stringify(f8ancien)}`);
+  const dossierDocsProjet = join(RACINE, "gabarits", "docs-projet");
+  for (const nomGabarit of readdirSync(dossierDocsProjet).filter((n) => n.endsWith(".md"))) {
+    const rg = jouer(`tf1616-${nomGabarit}`, readFileSync(join(dossierDocsProjet, nomGabarit), "utf8"));
+    const f8g = (rg.j?.findings || []).filter((f) => f.regle === "EC-8" && f.statut === "FAIL");
+    if (f8g.length)
+      casse.push(`TF-1616 : le gabarit gabarits\\docs-projet\\${nomGabarit} est refusé par EC-8 chez le produit qui l'instancie : ${JSON.stringify(f8g)}`);
+  }
+
   // 11, 12 et 13 (TF-1138) — EC-10, LE LECTEUR DECLARE. Trois sens : la commande REFUSEE quand le
   // lecteur n'execute pas, ADMISE quand il execute, et le document sans lecteur declare qui rend
   // SKIP en le DISANT — jamais PASS par silence. Le bloc qui se RECOPIE n'est compte dans aucun

@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-13 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-14 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -245,6 +245,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-11 | **Garde-fous de la plateforme relevés, contraintes connues relues** | **si et seulement si** le produit déploie sur une plateforme à stratégies (Azure Policy) ou porte une contrainte « Obligatoire ici ». Le dossier de MEP porte le relevé daté des stratégies de la portée cible, fait AVANT de concevoir l'ordre de déploiement. Il cite chaque contrainte connue avec son verdict contre la séquence retenue : commentaire d'un environnement, entrée du registre de la factory, parole de l'humain mot pour mot. Contrôle exécutable : `node scripts\verifier-garde-fous.mjs <produit>`, joué en TM6 par `oracle-trace-mutation-mep` — § 1 ter, TF-1495 et TF-1496 |
 | M-12 | **Scripts qui accordent un droit** | **si et seulement si** le produit porte un script ou une chaîne qui accorde un droit, ou qui nomme une permission Microsoft Graph. Chaque identifiant de permission Graph est celui de la table officielle datée, sous son nom et son type ; l'échec d'un octroi reste visible ; l'effet est relu dans la plateforme avant d'être annoncé. Contrôle exécutable : `node scripts\verifier-droits-accordes.mjs <produit>`, joué en TM7 par `oracle-trace-mutation-mep` — § 3 octies, TF-1497 |
 | M-13 | **Étapes de chaîne** | **si et seulement si** la chaîne du produit crée un objet d'annuaire, touche à `az webapp auth` ou écrit dans la plateforme. Un objet créé se lit avant d'être complété ; l'authentification se lit et s'écrit par l'API `authsettingsV2` ; le dossier porte la section « Étapes de chaîne remises à l'exploitant » (exécuté hors production et daté, écritures à blanc avec leur différence, branches que seule la production exécute). Contrôle exécutable : `node scripts\verifier-etape-chaine.mjs <produit>`, joué en TM8 par `oracle-trace-mutation-mep` ; sondage du formulaire Entra : `scripts\verifier-formulaire-entra.mjs` — § 3 decies, TF-1519, TF-1543, TF-1546 à TF-1549 |
+| M-14 | **Parcours tiers embarqués** (AVERTISSEMENT, règle neuve du 13/10/2026) | **si et seulement si** le produit embarque un parcours tiers qui engage l'utilisateur : un cadre intégré, une directive `frame-src`, `child-src` ou `form-action`, ou l'adresse d'une passerelle de paiement ou de réservation. Le dossier de MEP porte la section « Parcours tiers embarqués » : chaque tiers nommé, la vérification **jouée dans un navigateur** à une date, sur **l'état exécuté** (DOM après chargement) et non sur le HTML servi, et l'étape atteinte, « jusqu'à l'étape qui encaisse » ou « à confirmer » quand seul un paiement réel tranche. Contrôle exécutable : `node scripts\verifier-parcours-tiers.mjs <produit>`, joué en TM9 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 undecies, TF-1583 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -592,6 +593,58 @@ ou deux étages différents : EC-1 lit 30 lignes d'un même fichier. La véracit
 déclare exécuté : EC-4 exige la déclaration, pas la preuve. L'approbation du formulaire elle-même :
 la lire demande une session `az` connectée. L'en-tête de la sonde Entra (jeton Firefox mesuré par le
 produit, déclaré en plus par `X-Sonde`) n'a pu être rejoué depuis le pilot.
+
+### § 3 undecies — Un parcours tiers embarqué se vérifie jusqu'à l'étape qui encaisse, dans un navigateur, sur l'état exécuté (M-14, TF-1583)
+
+**Le fait, du 25/08 au 29/09/2026 chez Produit-02.** Le 25/08 (commit 3659a35), le cadre du moteur
+de réservation est nommé ; la vérification porte sur le mécanisme (« les six contrôles passent »),
+pas sur la suite. Le nom captait aussi la fenêtre du paiement, que la passerelle refuse d'exécuter
+dans un cadre. Le 01/09, la politique de contenu ajoute `'self'` à `frame-src` pour le retour de
+paiement sans inventorier son départ vers les passerelles. Le 12/09, la provenance est mesurée par
+`curl` dans le HTML servi, alors qu'un script la réécrit au chargement. L'exploitant le signale le
+29/09 : 35 jours sans paiement de l'acompte possible depuis le site. Le correctif du produit
+(`be7a376`, `build/ci/check-paiement.mjs`, banc `verifier:paiement`) joue un clic réel, atteint le
+formulaire des coordonnées sans le valider, rejoue la navigation vers la passerelle depuis son
+contexte de départ et écrit « à confirmer » quand seul un paiement réel tranche.
+
+**3 règles, pour tout produit qui embarque un parcours tiers qui engage l'utilisateur.**
+
+1. **On vérifie jusqu'à l'étape qui encaisse**, pas sur l'étape corrigée. Un correctif d'un parcours
+   de paiement ou de réservation est rejoué du premier clic à l'étape où le tiers prend l'argent ou
+   confirme la réservation. Quand seule une transaction réelle tranche et qu'on ne réserve pas pour
+   l'éprouver, le dossier le dit : « à confirmer », jamais « les contrôles passent ».
+2. **On vérifie dans un navigateur, sur l'état exécuté.** Le HTML servi n'est pas ce que voit
+   l'utilisateur dès qu'un script le réécrit au chargement ; une mesure par `curl` ne vaut que pour le
+   HTML servi. La navigation vers la passerelle se rejoue depuis son contexte de départ, pas depuis une
+   page neuve.
+3. **Une politique de contenu qui nomme un tiers inventorie son départ** : chaque hôte que le
+   parcours traverse (cadre, retour, passerelle) figure à `frame-src`, `child-src` ou `form-action`.
+   La vérification de la règle 1 est ce qui le prouve.
+
+**La forme, au dossier de MEP** :
+
+```
+## Parcours tiers embarqués
+
+Tiers : beds24 (réservation), stripe (paiement de l'acompte).
+Joué dans un navigateur le 2026-10-13 : banc verifier:paiement, sur l'état exécuté (DOM après chargement).
+Étape atteinte : jusqu'à l'étape qui encaisse (formulaire des coordonnées atteint sans validation, navigation vers la passerelle rejouée) ; l'encaissement est à confirmer par un paiement réel.
+```
+
+**Le contrôle exécutable.** `node scripts\verifier-parcours-tiers.mjs <produit>` relève, dans les
+fichiers du produit, un cadre intégré vers un hôte externe quand le parcours engage l'utilisateur,
+une directive `frame-src`, `child-src` ou `form-action` qui nomme un hôte externe, et l'adresse en
+clair d'une passerelle de `references\PASSERELLES-ENCAISSEMENT.json` (donnée datée, loi 4). Quand un
+parcours est relevé et qu'un dossier de MEP existe, il exige la section ci-dessus : chaque tiers
+nommé, « navigateur » avec une date, « état exécuté », l'étape atteinte. L'oracle de l'étape le joue
+en TM9 et le rend en **AVERTISSEMENT** : règle neuve, opposable à tous les produits, elle entre sans
+bloquer (précédent D-70 (b)) ; son passage en blocage est une décision humaine.
+
+**Hors jugement, et c'est dit.** Que le parcours déclaré ait réellement atteint l'étape qui encaisse :
+le contrôle exige la déclaration, sa date, son lieu et son objet, il ne rejoue pas le clic ; la preuve
+est le banc du produit. Un cadre dont l'adresse se construit à l'exécution. Une passerelle absente de
+la donnée datée, reconnue par le seul vocabulaire du parcours. La fraîcheur de la vérification par
+rapport au dernier changement du produit.
 
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 

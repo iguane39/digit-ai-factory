@@ -23,6 +23,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\INTEGRATIONS-FOURNISSEURS.md` | Faits mesurés sur les interfaces de fournisseurs |
 | `references\INTENTION.md` | La cascade de l'intention : Intention → Stratégie → Tactique → Opérationnel |
 | `references\MODELES-EN-SERVICE.json` | Donnée datée et sourcée de la génération de modèles en service, une version par famille, et du re-test de la règle de challenge qu'une nouvelle version déclenche ; jouée à chaque ouverture par `oracles\oracle-modeles-en-service.mjs` (D-1 (a) du 25/09/2026) |
+| `references\PASSERELLES-ENCAISSEMENT.json` | Donnée datée des noms d'hôte de passerelles de paiement et de réservation, et du vocabulaire d'un parcours qui engage l'utilisateur ; lue par `scripts\verifier-parcours-tiers.mjs` (porte M-14, `ETAPE-MEP.md` § 3 undecies) |
 | `references\PATRONS-EPROUVES.md` | Patrons éprouvés : mécanismes payés une fois, réutilisables tels quels |
 | `references\PERMISSIONS-GRAPH.json` | Table officielle datée des permissions Microsoft Graph et de leurs identifiants, relevée sur la page publiée de la documentation ; lue hors ligne par `scripts\verifier-droits-accordes.mjs` (porte M-12), rafraîchie par son option `--rafraichir` |
 | `references\PLATEFORME-LINKEDIN.md` | Plateforme LinkedIn — règles datées (contrat, accès aux chiffres, transparence, portée), péremption déclarée |

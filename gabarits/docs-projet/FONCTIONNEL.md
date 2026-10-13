@@ -39,6 +39,6 @@ verifie_le: {AAAA-MM-JJ}
 - {Règle 1 — la contrainte métier qui explique une bizarrerie du code.}
 - {Règle 2.}
 
-## Ce que le produit ne fait volontairement pas
+## Exclusions volontaires
 
 - {Exclusion assumée 1 — et pourquoi (renvoi exigence ou décision datée).}
