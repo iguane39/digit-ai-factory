@@ -47,7 +47,7 @@
  *
  * C'est pourquoi ce mécanisme entre au harnais en AVERTISSEMENT : il MESURE une couverture et la
  * publie. Le mettre au rouge sur l'existant transformerait une mesure en dette du jour, et un
- * gate qu'on subit avant de l'avoir compris s'apprend à contourner (R-33 bis).
+ * gate qu'on subit avant de l'avoir compris s'apprend à contourner (motif que R-33 bis donne pour le verdict websec).
  */
 
 /**

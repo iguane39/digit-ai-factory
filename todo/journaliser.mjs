@@ -63,7 +63,7 @@ function sortir(code, corps) {
  * CE QUI A LAISSÉ PASSER, et c'est le cœur du sujet :
  *   · le SyntaxWarning de Python est un signal INVERSÉ — il parle sur les échappements NON reconnus
  *     (`\d` de `\dev`), donc les cas INOFFENSIFS, et se tait sur les reconnus, donc les destructeurs.
- *     Un avertissement qui parle quand tout va bien apprend à être ignoré (R-33 bis) ;
+ *     Un avertissement qui parle quand tout va bien apprend à être ignoré (motif que R-33 bis donne pour le verdict websec) ;
  *   · `oracle-pieges-regex` P3 existe exactement pour cette classe et ne l'a pas vue : sa portée
  *     s'arrête aux fichiers de CODE. Le registre est une DONNÉE, et c'est la donnée qui alimente le
  *     livrable lu par l'humain. Une exclusion nommée dans un contrôle signale une cause non traitée (N-13) ;

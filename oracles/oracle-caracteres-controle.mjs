@@ -103,7 +103,7 @@ export function zoneDeclaree(cheminPosix) {
  * jet lisait les OCTETS, et les octets de continuation d'UTF-8 (0x80-0xBF) tombent exactement
  * dans la plage des contrôles C1 : mesure sur ce dépôt, 34 098 « constats » sur des textes
  * parfaitement sains — chaque « é » en produisait un. Un contrôle qui crie sur tout ne dit plus
- * rien (précédent R-33 bis), et il aurait été désarmé le jour même de sa livraison. Ce qui est
+ * rien (même motif que R-33 bis pour le verdict websec), et il aurait été désarmé le jour même de sa livraison. Ce qui est
  * jugé est donc un POINT DE CODE, jamais un octet.
  */
 export function constatsDuContenu(cheminPosix, octets) {

@@ -60,8 +60,8 @@
  * un FAIL y suspend l'ouverture. Or l'état actuel — C7 versionné, non câblé — est une décision
  * humaine PENDANTE : câbler un hook engage toutes les sessions du poste (R-29, dépenses et gates
  * restent humains). Un K7 bloquant briquerait donc toutes les ouvertures de run tant que cette
- * décision n'est pas prise, et un gate qu'on apprend à contourner ne protège plus rien (précédent
- * R-33 bis). K7 rend PASS avec ses constats en clair, et `non_juge` dit pourquoi il ne bloque pas.
+ * décision n'est pas prise, et un gate qu'on apprend à contourner ne protège plus rien (même motif que
+ * R-33 bis pour le verdict websec). K7 rend PASS avec ses constats en clair, et `non_juge` dit pourquoi il ne bloque pas.
  * Le passage de K7 en bloquant sera une décision humaine, pas une décision d'oracle.
  *
  * K10 (TF-0995, 09/09/2026). Toute la chaîne d'alignement résolvait la copie installée par
@@ -196,7 +196,7 @@ const NON_JUGE = [
   `les sidecars d'oracles et les artefacts d'atelier : le diff de K2 et K6 est calculé ${LIBELLE_EXCLUS} (TF-0289)`,
   "un hook sans version déclarée ne peut pas bénéficier de la protection « en avance » : la comparaison de versions demande qu'elle soit écrite des DEUX côtés (même limite que K5 pour un skill sans frontmatter)",
   "une édition FUTURE de la copie installée — l'oracle la verra au run suivant, il ne la verrouille pas",
-  "le CÂBLAGE des hooks (K7) est DÉCLARÉ, jamais mis en échec : cet oracle s'ouvre à tout run (R-35) et un FAIL y suspend l'ouverture, alors que câbler un hook engage toutes les sessions du poste — c'est une décision humaine (R-29). Bloquer sur une décision pendante briquerait toutes les ouvertures, et un gate qu'on apprend à contourner ne protège plus rien (R-33 bis). Le passage de K7 en bloquant est une décision humaine, pas une décision d'oracle",
+  "le CÂBLAGE des hooks (K7) est DÉCLARÉ, jamais mis en échec : cet oracle s'ouvre à tout run (R-35) et un FAIL y suspend l'ouverture, alors que câbler un hook engage toutes les sessions du poste — c'est une décision humaine (R-29). Bloquer sur une décision pendante briquerait toutes les ouvertures, et un gate qu'on apprend à contourner ne protège plus rien (motif que R-33 bis donne pour le verdict websec). Le passage de K7 en bloquant est une décision humaine, pas une décision d'oracle",
   "les entrées PERSONNELLES du `settings.json` installé (tableau de bord, réglages, hooks de l'humain) : ni jugées, ni listées, ni comptées — seul le câblage attendu par les forges est confronté (même prudence que K4)",
   "un câblage versionné qui référence un script HORS `<forge>\\.claude\\hooks\\` (ex. `.queue/gates/*.sh`) : il est de portée PROJET, chargé par le harnais quand la session s'ouvre dans ce dépôt, le settings utilisateur n'a pas à le porter — K7 ne confronte que les hooks dont une forge versionne le fichier",
   "K7 confronte sur le NOM du fichier de hook, pas sur le chemin complet : la copie installée vit ailleurs que sa source, comparer les chemins ne dirait rien. Conséquence assumée et déclarée : deux scripts homonymes dans deux arborescences se confondraient — un constat de trop, jamais un blocage",
@@ -683,7 +683,7 @@ function jugerCheminsCables(confrontees, installesHooks, hooks, installe, appliq
  *  qui se lit comme un gate sain (loi transverse n°1).
  *
  *  DÉCLARATIF PAR CONSTRUCTION : ce jugement n'émet que des findings PASS. Voir `non_juge` pour la
- *  raison de gouvernance (R-35, R-29, R-33 bis). N'écrit jamais dans le settings installé, même
+ *  raison de gouvernance (R-35, R-29 ; motif de R-33 bis pour le verdict websec). N'écrit jamais dans le settings installé, même
  *  sous `--appliquer` : câbler est un acte humain.
  */
 function jugerCablage(racine, fichierSettings, installesHooks, appliquer, findings) {
@@ -1359,7 +1359,7 @@ function selfTest() {
   // ---- TF-0297 : K7, le CÂBLAGE. Un hook dont la copie installée est parfaite mais qu'aucun
   // `settings.json` ne référence ne s'exécute JAMAIS (loi transverse n°1). K7 est DÉCLARATIF par
   // construction — chaque cas vérifie donc AUSSI que le verdict reste PASS : un K7 bloquant
-  // briquerait toutes les ouvertures de run sur une décision humaine pendante (R-35, R-33 bis).
+  // briquerait toutes les ouvertures de run sur une décision humaine pendante (R-35 ; motif de R-33 bis pour le verdict websec).
   const base4 = mkdtempSync(join(tmpdir(), "cablage-"));
   const racine4 = join(base4, "forges");
   const inst4 = join(base4, ".claude", "skills");
@@ -1434,7 +1434,7 @@ function selfTest() {
   r = juger(racine4, inst4, false, false, instH4, settings4);
   k7 = k7de(r);
 
-  cas.push(["K7    — DÉCLARATIF : câblage manquant, et le verdict reste PASS (R-35, R-33 bis)",
+  cas.push(["K7    — DÉCLARATIF : câblage manquant, et le verdict reste PASS (R-35 ; motif de R-33 bis pour le verdict websec)",
             r.verdict === "PASS"
             && !r.findings.some((f) => f.regle === "K7" && f.statut !== "PASS")]);
 
@@ -1532,7 +1532,7 @@ function selfTest() {
             Boolean(k8) && /ni à ce chemin, ni en copie installée sous .+, ni en source versionnée/.test(k8.message)]);
   cas.push(["K8    — K7 lit cette même entrée « câblée » : exactement le trou que K8 comble",
             /ET câblé/.test(k7de(r).message)]);
-  cas.push(["K8    — DÉCLARATIF : chemin mort, et le verdict reste PASS (R-35, R-33 bis)",
+  cas.push(["K8    — DÉCLARATIF : chemin mort, et le verdict reste PASS (R-35 ; motif de R-33 bis pour le verdict websec)",
             r.verdict === "PASS"
             && !r.findings.some((f) => f.regle === "K8" && f.statut !== "PASS")]);
 

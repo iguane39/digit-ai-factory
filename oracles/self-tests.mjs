@@ -466,7 +466,7 @@ if ((bilan.baisses.length || bilan.disparues.length) && APPLIQUER) {
 //
 // AVERTISSEMENT, ET PAS ENCORE UN VERDICT. Ce passage MESURE une couverture et la publie. Mettre
 // le harnais au rouge sur l'existant transformerait une mesure en dette du jour et ferait
-// contourner le contrôle avant qu'il soit compris (R-33 bis) — le compte ci-dessous est
+// contourner le contrôle avant qu'il soit compris (motif que R-33 bis donne pour le verdict websec) — le compte ci-dessous est
 // l'indicateur à faire monter, et le seuil de bascule une décision humaine.
 const sensRouge = confronterSensRouge(resultats);
 if (sensRouge.sansRouge.length) {

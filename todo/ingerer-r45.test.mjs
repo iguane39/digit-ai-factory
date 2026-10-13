@@ -99,7 +99,7 @@ check("verte — un verdict de généralisation écrit par remarque", () => {
   if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 200)}`);
 });
 
-check("borne — lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (R-33 bis)", () => {
+check("borne — lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (motif que R-33 bis donne pour le verdict websec)", () => {
   const r = ingerer({ nomLot: "PROD - RETOURS - 20260819a", md: "# lot ancien\n\n## pilot\n\ntable\n" });
   if (r.code !== 0) throw new Error(`un lot du 19/08 a été refusé — le contrôle met l'existant en échec (exit ${r.code})`);
 });

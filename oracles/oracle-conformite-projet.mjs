@@ -81,7 +81,7 @@ const so = (regle, message) => findings.push({ regle, statut: "SANS_OBJET", ou: 
 // TF-0366 (18/08) — antécédences de jeu de règles, déclarées au `non_juge` plutôt qu'en échec.
 // Raison : le livrable n'a rien fait de mal, c'est la RÈGLE qui a bougé. Transformer une
 // évolution de règle en défaut de produit ferait rejouer tout l'historique à chaque ajout, et
-// un gate qu'on apprend à contourner ne protège plus rien (R-33 bis). Même doctrine que
+// un gate qu'on apprend à contourner ne protège plus rien (motif que R-33 bis donne pour le verdict websec). Même doctrine que
 // TF-0266 pour les fichiers antérieurs à un mandat : liste nommée, jamais un total anonyme.
 const antecedences = [];
 

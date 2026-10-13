@@ -90,7 +90,7 @@ function mesurerSegment(segment) {
   // Ce que ça coûtait : le gate est BLOQUANT, donc le refus force à réécrire un message DÉJÀ
   // CONFORME — huit blocs relus pour rien, exactement le coût que la v2.5.0 existait pour
   // supprimer. Et le motif ACCUSE L'AUTEUR d'avoir omis ce qu'il a écrit. Un gate qui accuse à
-  // tort s'apprend à contourner (R-33 bis).
+  // tort s'apprend à contourner (motif que R-33 bis donne pour le verdict websec).
   //
   // REMÈDE, TROISIÈME ÉTAT — et les deux précédents valent d'être écrits, parce qu'ils disent
   // pourquoi celui-ci est le bon.

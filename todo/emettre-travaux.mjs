@@ -38,7 +38,7 @@
  *
  * IL EST IDEMPOTENT PAR CONTENU : un lot dont le contenu est déjà déposé chez le produit n'est pas
  * redéposé. Sans cela, deux exécutions du même relevé enseveliraient le produit sous des lots
- * identiques, et le canal deviendrait la nuisance qu'il est censé éviter (R-33 bis).
+ * identiques, et le canal deviendrait la nuisance qu'il est censé éviter (motif que R-33 bis donne pour le verdict websec).
  *
  * Usage :
  *   node todo\emettre-travaux.mjs --produit <nom> [--essai]
@@ -230,7 +230,7 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // Premier jet : le sceau etait calcule sur le lot ENTIER, titre compris — or le titre porte
   // l'indice du jour, qui change a chaque passage (`a`, puis `b`). Deux executions du meme relevé
   // deposaient donc deux lots identiques dans le fond et differents dans l'octet, et la boite du
-  // produit se remplissait — exactement la nuisance que ce canal doit eviter (R-33 bis). Trouve
+  // produit se remplissait — exactement la nuisance que ce canal doit eviter (motif que R-33 bis donne pour le verdict websec). Trouve
   // par la recette d'idempotence, qui rendait 4 fichiers au lieu de 2.
   const sceauConfie = empreinteTexte([
     ...[...perimes, ...absents, ...horsRacine]
@@ -526,7 +526,7 @@ if (lanceEnDirect) {
     // LE COMPORTEMENT ÉTAIT CORRECT AU SENS DE LA RÈGLE ÉCRITE — le contenu a bien changé — ET
     // NUISIBLE AU SENS DE CE QU'ELLE PROTÈGE : « sans cela, deux exécutions du même relevé
     // enseveliraient le produit sous des lots identiques, et le canal deviendrait la nuisance
-    // qu'il est censé éviter » (R-33 bis). La règle mesurait l'ÉGALITÉ des contenus quand la
+    // qu'il est censé éviter » (motif que R-33 bis donne pour le verdict websec). La règle mesurait l'ÉGALITÉ des contenus quand la
     // propriété visée est l'ABSENCE DE NOUVEAUTÉ.
     //
     // LA BORNE COMPTE AUTANT QUE LA RÈGLE, et elle est dans le constat d'origine : un lot déjà
