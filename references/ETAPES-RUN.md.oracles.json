@@ -1,9 +1,9 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\references\\ETAPES-RUN.md",
-  "date_iso": "2026-10-02T08:44:30.985Z",
+  "cible": "references/ETAPES-RUN.md",
+  "date_iso": "2026-10-03T09:25:15.987Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
-  "niveau": "note",
+  "niveau": "diffuse",
   "verdict": "PASS",
   "resume": {
     "pass": 5,
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\ETAPES-RUN.md",
-    "ts": "2026-10-02T08:44:30.984Z",
+    "ts": "2026-10-03T09:25:15.987Z",
     "fichiers": {
-      "references\\ETAPES-RUN.md": "8c3e137ca596dbb13ed0e813ef0fbe4e02f066ad71d88d129f0712a77b764038"
+      "references\\ETAPES-RUN.md": "4d8ad1ad42a95c170d67aeeda0d33bdf8be3397923e561a786091945ba8fc6a3"
     }
   },
   "empreinte_motif": null,

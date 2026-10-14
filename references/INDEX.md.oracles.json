@@ -1,9 +1,9 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\references\\INDEX.md",
-  "date_iso": "2026-10-02T07:45:08.593Z",
+  "cible": "references/INDEX.md",
+  "date_iso": "2026-10-03T09:25:16.229Z",
   "registre_version": "2.35.0",
   "profil": "digit-ai",
-  "niveau": "note",
+  "niveau": "diffuse",
   "verdict": "PASS",
   "resume": {
     "pass": 3,
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\INDEX.md",
-    "ts": "2026-10-02T07:45:08.592Z",
+    "ts": "2026-10-03T09:25:16.229Z",
     "fichiers": {
-      "references\\INDEX.md": "8d1fdc585ae882556b45ee7d0b5251af75989f59fa30f0b343dbf9659c5923f5"
+      "references\\INDEX.md": "c6a7c42cf0bef5523d9260ace4b3fcee0de3253fb319e70da413d3bfe40cfe9d"
     }
   },
   "empreinte_motif": null,

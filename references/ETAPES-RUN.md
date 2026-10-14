@@ -173,8 +173,14 @@ se résout par observation datée consignée en hypothèse — pas de suspension
 surface implicite SaaS est proposée d'office en exigences candidates et s'écarte
 explicitement (cf. `enumere-la-surface`).
 
+**Cascade ISTO** (loi transverse n° 7, `references\INTENTION.md` 2.0.0) : l'intention est citée
+et **validée avec sa trace** avant la première exigence ; stratégies, tactiques, contraintes et
+non-objectifs vont dans `forge\etapes\conception\cascade\CASCADE.json` (gabarit
+`gabarits\CASCADE-ISTO.json`), chaque exigence rattachée à une tactique et à une seule.
+
 **Valider** : `node <conception>\oracles\oracle-{exigences,tracabilite,surface,claims}.mjs
-<EXIGENCES.json>`. Sous le seuil de suffisance → `bloque_question` : écrire `QUESTIONS.md`,
+<EXIGENCES.json>`, puis `node <pilot>\oracles\oracle-cascade-isto.mjs <CASCADE.json>
+--exigences <EXIGENCES.json> --tests <dossier des tests>`. Sous le seuil de suffisance → `bloque_question` : écrire `QUESTIONS.md`,
 suspendre.
 
 ## 3. Étape design (mode dégradé, oracles natifs)

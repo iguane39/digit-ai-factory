@@ -39,9 +39,15 @@ provenance, R-26 —, ARCHITECTURE relevée de l'arborescence et des flux observ
 2 vues régénérées), reconstruire `.env.example` depuis le code (R-13) AVANT que R-22 ne juge
 la parité, puis dérouler l'oracle. Consigné au ledger comme `rattrapage_import`.
 
+Le brief delta déclare le **plus haut niveau ISTO** qu'il touche (I, S, T ou O) : c'est lui qui
+dit quelle part de l'aval se rejoue (`references\INTENTION.md`, section « Quand la cascade
+change »). Une intention touchée se revalide avant toute exigence.
+
 Étapes rejouées **en delta** :
 - **conception** : exigences nouvelles/modifiées dans `EXIGENCES.json` (ids retirés via
-  `identifiants_retires`, jamais réaffectés), oracles rejoués sur le référentiel entier ;
+  `identifiants_retires`, jamais réaffectés), oracles rejoués sur le référentiel entier ; la
+  cascade du produit mise à jour en place (éléments retirés marqués, entrée d'historique portant
+  le niveau touché) et `oracles\oracle-cascade-isto.mjs` rejoué en entier ;
 - **design** : seuls les écrans touchés, oracles sur les artefacts modifiés ;
 - **development** : delta sous les mêmes gates (ruff, pytest, traçabilité des exigences du
   delta) ;
