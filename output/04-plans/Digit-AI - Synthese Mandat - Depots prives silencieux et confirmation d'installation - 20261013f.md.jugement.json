@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Depots prives silencieux et confirmation d'installation - 20261013f.md",
+ "empreinte": "f75cdebe650fea33000443de8f3363d400abf4fddc4a09a68b86b46d325a33a5",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-13T15:43:14.799Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

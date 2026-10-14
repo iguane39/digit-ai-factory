@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Installation sans question et banniere operationnelle - 20261013d.md",
+ "empreinte": "ccee0a38c69b018d0388701c8521b5c23caf20b7daf168b3b7481118a691c88b",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-13T15:05:47.861Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

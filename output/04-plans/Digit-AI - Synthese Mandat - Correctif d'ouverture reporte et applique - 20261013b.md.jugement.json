@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md",
+ "empreinte": "c9ad92e550f62f9c68aa4f37c493b037832ad75938216186c0f861bd33d44bc3",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-13T14:36:50.222Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

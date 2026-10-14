@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md",
+ "empreinte": "b062597f5bbe05481fe5687eaa978d3872adbf136b8c16a40b5c58e809d6f16f",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-13T17:40:55.044Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

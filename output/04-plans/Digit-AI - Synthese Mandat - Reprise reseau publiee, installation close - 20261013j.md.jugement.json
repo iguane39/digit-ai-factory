@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md",
+ "empreinte": "1b8b7085c6e816f673261ade2b6f75e01225c915951085ecb56d2a0b6513b07a",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-13T17:56:53.722Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

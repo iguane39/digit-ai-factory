@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md",
+ "empreinte": "8b6f456f5b656fce5115e7523a28946ba15def90e3b554d9297c5d06dbc74f9f",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-13T17:52:49.978Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

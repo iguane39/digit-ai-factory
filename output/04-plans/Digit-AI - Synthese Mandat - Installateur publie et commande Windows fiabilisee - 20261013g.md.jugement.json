@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Installateur publie et commande Windows fiabilisee - 20261013g.md",
+ "empreinte": "08546d0e8df3dcd7539f872071ac8743e7ffffb19593f202916ac50347a90dd0",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-13T16:15:57.186Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

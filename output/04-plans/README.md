@@ -87,7 +87,9 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Cinq decisions executees publication a decider - 20260920g.md` | fichier | 18,1 Ko | Vos 5 décisions du 20/09/2026 sont exécutées : dépôts publiés, skills à jour, rapport d'au |
 | `Digit-AI - Synthese Mandat - Cinq familles de cadence et le controle aveugle - 20260915a.md` | fichier | 25,3 Ko | Synthèse de mandat — les cinq familles de cadence sont écrites, et j'ai trouvé pourquoi le |
 | `Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md` | fichier | 9,5 Ko | Synthèse de mandat — le circuit hébergé ne dépend plus de ce poste, et l'accueil des lots  |
+| `Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` | fichier | 7,1 Ko | Synthèse Mandat — commande d'installation publiée et verte sur poste neuf, reprise réseau  |
 | `Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md` | fichier | 22,3 Ko | Communication : les parts de forge sont finies en local, et 6 décisions vous attendent, dé |
+| `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
 | `Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` | fichier | 13,4 Ko | Synthèse de mandat — D-13 (a) exécutée : le pilot et la forge d'audit sont publiés et véri |
@@ -143,6 +145,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md` | fichier | 12,5 Ko | Synthèse de mandat — votre feu vert est exécuté : huit enregistrements publiés, le registr |
 | `Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` | fichier | 16,4 Ko | Synthèse de mandat — ce qu'ouvrent réellement les onze porteurs de secrets du poste (30/08 |
 | `Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` | fichier | 13,8 Ko | Synthèse de mandat — l'ingestion rouverte, deux journées enregistrées, et le banc entièrem |
+| `Digit-AI - Synthese Mandat - Installateur publie et commande Windows fiabilisee - 20261013g.md` | fichier | 8,1 Ko | Synthèse Mandat — installateur publié, commande Windows fiabilisée après mesure sur l'adre |
+| `Digit-AI - Synthese Mandat - Installation sans question et banniere operationnelle - 20261013d.md` | fichier | 12,0 Ko | Synthèse Mandat — installation de la factory sans question, avec une bannière finale d'opé |
 | `Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` | fichier | 15,1 Ko | Synthèse de mandat — le juste milieu entre les deux voies de remontée, et pourquoi ce n'es |
 | `Digit-AI - Synthese Mandat - Le corpus corrige et 9 arbitrages poses - 20260922d.md` | fichier | 33,7 Ko | Digit-AI — Synthèse de mandat — le corpus corrigé et 9 arbitrages posés — 22/09/2026 |
 | `Digit-AI - Synthese Mandat - Le registre est entierement classe - 20260922f.md` | fichier | 15,7 Ko | Digit-AI — Synthèse de mandat — le registre est entièrement classé — 22/09/2026 |
@@ -164,6 +168,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-12 (a) exécutée : la reconstruction d'un clone divergé est |
 | `Digit-AI - Synthese Mandat - Outils recopies et quatre forges publiees - 20260919c.md` | fichier | 10,2 Ko | Vos 2 décisions sont exécutées : les outils corrigés tournent sur ce poste, et les 4 forge |
 | `Digit-AI - Synthese Mandat - Ouverture de session reparee chez les 19 produits - 20261013c.md` | fichier | 9,3 Ko | Synthèse Mandat — ouverture de session VS Code : correctif repris, propagé aux 19 produits |
+| `Digit-AI - Synthese Mandat - Ouverture de session, correctif arrete et 2 candidatures - 20261013a.md` | fichier | 9,9 Ko | Synthèse Mandat — correctif d'ouverture arrêté sur une base qui a bougé, 2 candidatures in |
 | `Digit-AI - Synthese Mandat - Paliers 1 et 2 des premiers HTML de nouveaux formats - 20260914c.md` | fichier | 22,7 Ko | Synthèse de mandat — le premier palier est fait et prouvé, le deuxième est écrit et bute s |
 | `Digit-AI - Synthese Mandat - Paliers 2 et 3 des premiers HTML de nouveaux formats - 20260914d.md` | fichier | 23,0 Ko | Synthèse de mandat — les trois règles sont écrites au socle, le premier format démuni a so |
 | `Digit-AI - Synthese Mandat - Parc aligne sur GitHub et deux branches non fusionnees - 20260921a.md` | fichier | 13,8 Ko | Le parc est aligné sur GitHub, et 2 branches n'ont jamais été fusionnées dans main : 1 au  |
@@ -204,6 +209,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
 | `Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` | fichier | 19,2 Ko | Synthèse de mandat — remise à niveau du dépôt et renommage des lots (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
+| `Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` | fichier | 3,5 Ko | Synthèse Mandat — reprise réseau de l'installateur publiée, chantier d'installation sans q |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` | fichier | 11,3 Ko | Synthèse de mandat — réseaux sociaux : la barre est validée, et votre objection est fondée |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md` | fichier | 12,8 Ko | Synthèse de mandat — réseaux sociaux : votre décision est exécutée, les sept candidatures  |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux D-3 executee et mandat permanent R-55 - 20260917j.md` | fichier | 14,9 Ko | Synthèse de mandat — réseaux sociaux : votre règle de mandat permanent est écrite, et les  |
@@ -259,4 +265,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_242 fichier(s), 0 sous-dossier(s)_ · 6 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_248 fichier(s), 0 sous-dossier(s)_
