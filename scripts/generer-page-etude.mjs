@@ -642,8 +642,15 @@ const ETUDE_REELLE = join(ICI, "..", "output", "03-etudes",
  */
 const moteurDeRenduAbsent = (stderr) => /playwright non install|Executable doesn't exist|playwright install/i.test(String(stderr || ""));
 
-/** Joue `check_html.py` et `render_page.py` sur la page régénérée de l'étude réelle. */
-function jouerControlesDuSocleSurUneEtudeReelle(nonJuge) {
+/**
+ * Joue `check_html.py` et `render_page.py` sur la page régénérée de l'étude réelle.
+ *
+ * TF-1690 (14/10/2026) : la page se régénère sur une COPIE de l'étude, posée sous `dossierTemporaire`,
+ * jamais à côté de la source. Écrite en place, elle réécrivait à chaque passage de
+ * `oracles\self-tests.mjs` un fichier SUIVI d'`output\03-etudes\` (fins de ligne comprises). La copie
+ * garde le nom de la source : l'indice de la page se lit dans ce nom.
+ */
+function jouerControlesDuSocleSurUneEtudeReelle(nonJuge, dossierTemporaire) {
   if (!CHECK_HTML || !RENDER_PAGE || !PYTHON) {
     nonJuge.push("les deux contrôles du socle sur une étude réelle : " +
       (!PYTHON ? "aucun interpréteur python" : `check_html.py ${CHECK_HTML ? "trouvé" : "introuvable"}, render_page.py ${RENDER_PAGE ? "trouvé" : "introuvable"}`) +
@@ -654,7 +661,9 @@ function jouerControlesDuSocleSurUneEtudeReelle(nonJuge) {
     nonJuge.push(`les deux contrôles du socle sur une étude réelle : ${ETUDE_REELLE} introuvable — ce cas n'a PAS tourné`);
     return;
   }
-  const pageReelle = ecrirePage(ETUDE_REELLE);
+  const copieEtude = join(dossierTemporaire, basename(ETUDE_REELLE));
+  writeFileSync(copieEtude, readFileSync(ETUDE_REELLE));
+  const pageReelle = ecrirePage(copieEtude);
   const casse = [];
 
   const rCheck = spawnSync(PYTHON, ["-X", "utf8", CHECK_HTML, pageReelle],
@@ -929,7 +938,7 @@ Audience : le pilote de l'écosystème, qui décide des mandats. Le reste de la 
     casse.push("un libellé voisin reçoit une classe réservée, ou une citation nommée devient chapeau ou note de colonne — la convention déborde de ses deux libellés");
 
   const nonJuge = [];
-  const casseControleReel = jouerControlesDuSocleSurUneEtudeReelle(nonJuge);
+  const casseControleReel = jouerControlesDuSocleSurUneEtudeReelle(nonJuge, dir);
   if (casseControleReel && casseControleReel.length) casse.push(...casseControleReel);
 
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
