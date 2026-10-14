@@ -139,7 +139,30 @@ function mesurerSegment(segment) {
       commandes: commandesIdx.filter((i) => i >= precedent.outilsAvant).length }
     : null;
   return { ecritures, commandes, dernierTexte, textes: tousLesTextes.length, finaux: finaux.length, fichiersMd, depuisDernierAffichage,
-    effets: detecterEffets(segment), prejuge: prejugements > 0 };
+    effets: detecterEffets(segment), prejuge: prejugements > 0, enAttente: tachesEnAttente(segment) };
+}
+
+// TF-1649 (14/10/2026) — LES TÂCHES D'ARRIÈRE-PLAN DU TOUR QUI NE SONT PAS REVENUES. Une commande
+// lancée en arrière-plan rend « Command running in background with ID: <id> » ; un agent asynchrone,
+// « Async agent launched … agentId: <id> ». Leur fin arrive dans le transcript comme une notification
+// `<task-notification>` portant le même identifiant et un statut — jamais comme un message humain,
+// donc dans le MÊME segment. Rend les identifiants lancés dans le segment et non revenus.
+export function tachesEnAttente(segment) {
+  const lancees = new Set(), revenues = new Set();
+  for (const e of segment) {
+    for (const b of contenuDe(e)) {
+      if (b.type !== "tool_result") continue;
+      const t = typeof b.content === "string" ? b.content
+        : Array.isArray(b.content) ? b.content.map((c) => (typeof c === "string" ? c : c?.text || "")).join("\n") : "";
+      for (const m of t.matchAll(/running in background with ID:\s*([\w-]+)/g)) lancees.add(m[1]);
+      for (const m of t.matchAll(/Async agent launched[\s\S]{0,400}?agentId:\s*([\w-]+)/g)) lancees.add(m[1]);
+    }
+    const brut = JSON.stringify(e);
+    if (!brut.includes("task-notification")) continue;
+    for (const m of brut.matchAll(/<task-id>([\w-]+)<\/task-id>[\s\S]{0,600}?<status>(\w+)<\/status>/g))
+      if (!/^(?:running|pending|started)$/i.test(m[2])) revenues.add(m[1]);
+  }
+  return [...lancees].filter((id) => !revenues.has(id));
 }
 
 // TF-1647 (point 3) et TF-1666 — LE PRÉJUGEMENT SE MESURE. Une commande du tour qui juge un
@@ -784,7 +807,9 @@ const VERDICT = { test: (s) => VERDICT_MOTS.test(s) || VERDICT_JETONS.test(s) };
 // prose, entre parenthèses ou en complément, reste une citation.
 const POSE_UN_GESTE = /(?<![A-Za-zÀ-ÿ])[DA]\s*-\s*\d{1,3}(?![0-9])\**\s*(?:[—–:|]|-\s|\(\s*[a-e]\s*\)|[a-e](?=\s*(?:[.,;!?»]|$)))/m;
 
-export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null }) {
+const SEUIL_ATTENTE = 60;
+const ATTENTE = /\b(?:attends?|attente|en cours|tourne(?:nt)?|arri[èe]re-plan|reviens|reprends|reprendrai|d[èe]s (?:qu|la fin|son|leur)|notifi|en t[âa]che de fond)/i;
+export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null, enAttente = [] }) {
   if (!dernierTexte) return { juge: false, motif: "aucun texte final dans le transcript" };
   const mots = dernierTexte.trim().split(/\s+/).filter(Boolean).length;
   // ---- TF-1182 (17/09/2026) — LE RELAIS D'AVANCEMENT N'EST PAS UN RENDU DE FIN DE TRAITEMENT ---
@@ -811,6 +836,20 @@ export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, 
   if (relaisPossible && mots <= SEUIL_MOTS && !VERDICT.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
     return { juge: false, motif: `relais de ${mots} mots : rien n'a été écrit depuis le dernier affichage `
       + `(${depuisDernierAffichage.commandes} commande(s), 0 écriture), aucun verdict, aucune D-N ni A-N (TF-1182)` };
+  // ---- TF-1649 (14/10/2026) — LE MESSAGE D'ATTENTE D'UNE TÂCHE D'ARRIÈRE-PLAN DU TOUR ----------
+  //
+  // LE FAIT, mesuré le 13/10 chez un produit : 2 refus (S1, S3, S4, S6) de messages d'attente rendus
+  // pendant qu'un relevé tournait en arrière-plan — deux doublons pour une phrase. Le tour a écrit,
+  // donc il est jugé ; mais sa restitution ne PEUT pas encore exister : la mesure n'est pas revenue,
+  // et le harnais rouvrira le tour à la notification de fin, dans le MÊME segment. C'est ce message-là
+  // qui sera jugé, travail compris : TF-0978 ne se rouvre pas, la restitution est différée, pas
+  // exemptée. BORNES, toutes mesurables : une tâche lancée dans le segment et non revenue
+  // (`tachesEnAttente`), 3 lignes et 60 mots au plus, un mot d'attente, aucun verdict, aucune D-N ni A-N.
+  const lignes = dernierTexte.trim().split(/\r?\n/).filter((l) => l.trim()).length;
+  if (enAttente.length && mots <= SEUIL_ATTENTE && lignes <= 3 && ATTENTE.test(dernierTexte)
+    && !VERDICT.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
+    return { juge: false, motif: `message d'attente de ${mots} mots : ${enAttente.length} tâche(s) d'arrière-plan lancée(s) dans le tour et `
+      + "non revenue(s), aucun verdict, aucune D-N ni A-N — la restitution vient avec son résultat (TF-1649)" };
   if (travail) return { juge: true, motif: `tour de travail (${ecritures} écriture(s), ${commandes} commande(s))` };
   // Une QUESTION rendue à l'humain n'est pas une restitution : c'est `bloque_question`, et la
   // doctrine la veut courte. L'exempter explicitement vaut mieux que de la laisser au seuil.
@@ -938,7 +977,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains, prejuge } = analyserTranscript(readFileSync(chemin, "utf8"));
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
@@ -960,7 +999,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
   }
   const portee = escaladeMoyen ? { juge: true, motif: escaladeMoyen }
-    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage });
+    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage, enAttente });
   if (!portee.juge) process.exit(0);
   const { code, fails } = juger(dernierTexte, entree.cwd || process.cwd());
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
