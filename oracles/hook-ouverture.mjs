@@ -235,6 +235,22 @@ if (iPilot >= 0) {
   } catch (e) { lignes.push("", `- fraîcheur du dépôt du produit : NON mesurée (${String(e.message).slice(0, 160)})`); }
 }
 
+// TF-1676 (14/10/2026) — LA RÈGLE HUMAINE DU 01/10/2026 SUR LES NOMS DESCEND CHEZ LES PRODUITS. Elle
+// n'était écrite qu'au § 3 sexies de CONTRAT-INTERFACE.md : le même jour, chez un produit à dépôt privé,
+// une session a anonymisé avant commit et une autre a proposé d'anonymiser la norme de rangement ;
+// l'humain a refusé. Le CLAUDE.md d'un produit n'est jamais recopié : l'ouverture, elle, atteint
+// chaque produit. La visibilité du dépôt se MESURE (gh), elle ne se suppose pas.
+if (iPilot >= 0) {
+  const v = spawnSync("gh", ["repo", "view", "--json", "visibility", "-q", ".visibility"], { encoding: "utf8", cwd: process.cwd(), timeout: 15000, windowsHide: true });
+  const visibilite = v.status === 0 ? (v.stdout || "").trim().toUpperCase() : "";
+  const regle = "règle humaine du 01/10/2026 : « Les dépôts privés peuvent conserver des données de type nom » ; la pseudonymisation ne vaut que pour ce qui sort vers un dépôt PUBLIC (pilot, forge publique), lot de retours compris, que le pilot pseudonymise lui-même à l'accueil";
+  lignes.push("", "## Noms réels dans ce dépôt (TF-1676)", visibilite === "PRIVATE"
+    ? `- Dépôt PRIVÉ (mesuré par gh) : il versionne les noms réels de clients, de produits et de personnes, sans anonymiser avant commit — ${regle}.`
+    : visibilite === "PUBLIC"
+      ? `- Dépôt PUBLIC (mesuré par gh) : aucun nom réel de tiers n'y entre ; pseudonymiser avant commit — ${regle}.`
+      : `- Visibilité NON mesurée (\`gh repo view --json visibility\` sans réponse) : la mesurer avant de pseudonymiser quoi que ce soit — ${regle}.`);
+}
+
 // TF-1658 (14/10/2026) — UN SOCLE POSÉ À CÔTÉ DU DÉPÔT D'UN TIERS SE JUGE À CHAQUE OUVERTURE : rien
 // de nouveau sous le clone du tiers depuis son relevé. Sans objet pour tout autre projet.
 if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "DEPOT-TIERS.json"))) {

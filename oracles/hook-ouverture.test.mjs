@@ -17,7 +17,7 @@
  * Le hook est joué avec `--sans-bootstrap` (aucun accès réseau) et `--sans-readme` sur un produit
  * temporaire ; rien n'est écrit dans le dépôt.
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir, hostname } from "node:os";
 import { join, dirname } from "node:path";
@@ -358,6 +358,26 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
     const s = joue(lue);
     if (/\*\*EN RETARD\*\*/.test(s) || !/0 commit\(s\) de retard/.test(s)) throw new Error("alerte ou écart faux sur un dépôt à jour");
   });
+}
+
+// ---- TF-1676 (14/10/2026) : LA RÈGLE DES NOMS ATTEINT CHAQUE PRODUIT, SELON LA VISIBILITÉ MESURÉE --
+{
+  const sansDistant = joue(mkdtempSync(join(tmpdir(), "ouverture-noms-")));
+  check("TF-1676 — sans visibilité mesurable, la règle du 01/10 est dite et la mesure demandée avant toute pseudonymisation", () => {
+    if (!/## Noms réels dans ce dépôt \(TF-1676\)\n- Visibilité NON mesurée/.test(sansDistant)) throw new Error("la règle des noms n'atteint pas le produit");
+    if (!/Les dépôts privés peuvent conserver des données de type nom/.test(sansDistant)) throw new Error("la règle humaine n'est pas citée");
+  });
+  const ghOk = spawnSync("gh", ["auth", "status"], { encoding: "utf8", timeout: 15000 }).status === 0;
+  if (!ghOk) console.log("[NON JOUÉ] 1 cas — TF-1676 visibilité mesurée : gh absent ou non authentifié sur ce poste");
+  else {
+    const P = mkdtempSync(join(tmpdir(), "ouverture-noms-public-"));
+    execFileSync("git", ["init", "-q"], { cwd: P });
+    execFileSync("git", ["remote", "add", "origin", "https://github.com/iguane39/digit-ai-factory.git"], { cwd: P });
+    const s = joue(P);
+    check("TF-1676 rouge — dépôt PUBLIC mesuré par gh : aucun nom réel n'y entre (la règle des dépôts privés ne s'y applique pas)", () => {
+      if (!/Dépôt PUBLIC \(mesuré par gh\)/.test(s)) throw new Error(`visibilité non mesurée ou fausse : ${(s.split("Noms réels")[1] || "").slice(0, 200)}`);
+    });
+  }
 }
 
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
