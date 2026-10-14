@@ -338,5 +338,27 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   });
 }
 
+// ---- TF-1642 (14/10/2026) : L'OUVERTURE D'UN PRODUIT MESURE SON PROPRE DÉPÔT CONTRE SON DISTANT --
+{
+  const T4 = mkdtempSync(join(tmpdir(), "ouverture-fraicheur-"));
+  const nu = join(T4, "d.git"), lue = join(T4, "produit"), autre = join(T4, "autre");
+  const gx = (d, ...a) => execFileSync("git", ["-C", d, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  execFileSync("git", ["init", "-q", "--bare", "--initial-branch=main", nu]);
+  execFileSync("git", ["clone", "-q", nu, lue], { stdio: "ignore" });
+  writeFileSync(join(lue, "a.txt"), "x\n"); gx(lue, "add", "-A"); gx(lue, "commit", "-q", "-m", "v0"); gx(lue, "push", "-q", "origin", "main");
+  execFileSync("git", ["clone", "-q", nu, autre], { stdio: "ignore" });
+  writeFileSync(join(autre, "b.txt"), "y\n"); gx(autre, "add", "-A"); gx(autre, "commit", "-q", "-m", "v1"); gx(autre, "push", "-q", "origin", "main");
+  const sortie = joue(lue);
+  check("TF-1642 rouge — un produit en retard sur son distant le lit à l'ouverture, avec l'écart et le geste", () => {
+    if (!/## Fraîcheur du dépôt de ce produit \(TF-1642\)\n- \*\*EN RETARD\*\* — .*1 commit\(s\) de retard/.test(sortie)) throw new Error("le retard du dépôt du produit n'est pas dit");
+    if (!/fraicheur-depot\.mjs" <dépôt>/.test(sortie)) throw new Error("la sonde pour tout autre dépôt lu n'est pas nommée");
+  });
+  gx(lue, "pull", "-q", "--ff-only");
+  check("TF-1642 vert — à jour après le tirage : aucune alerte", () => {
+    const s = joue(lue);
+    if (/\*\*EN RETARD\*\*/.test(s) || !/0 commit\(s\) de retard/.test(s)) throw new Error("alerte ou écart faux sur un dépôt à jour");
+  });
+}
+
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

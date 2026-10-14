@@ -221,6 +221,20 @@ if (iPilot >= 0) {
   }
 }
 
+// TF-1642 (14/10/2026) — LA FRAÎCHEUR NE SE JUGE PLUS SUR LES SEULS DÉPÔTS DE LA FACTORY. Le 12/10, un
+// rapport a recommandé un correctif livré 13 jours plus tôt : le clone lu avait 290 commits de retard,
+// et l'ouverture ne mesurait que le pilot et les forges. Chez un produit, son propre dépôt est mesuré
+// contre son distant ; pour tout autre dépôt lu, la sonde se joue avant de citer son code.
+if (iPilot >= 0) {
+  try {
+    const { mesurerFraicheur } = await import(pathToFileURL(join(PILOT, "scripts", "fraicheur-depot.mjs")).href);
+    const f = mesurerFraicheur(process.cwd());
+    lignes.push("", "## Fraîcheur du dépôt de ce produit (TF-1642)",
+      f.etat === "non_jugeable" ? `- non jugeable — ${f.motif}` : `- ${f.etat === "en_retard" || f.etat === "diverge" ? "**" + f.etat.toUpperCase().replace("_", " ") + "** — " : ""}${f.citation}${f.retard ? ` ; ${f.geste}` : ""}`,
+      `- Tout AUTRE dépôt dont le code est lu ou cité se mesure avant : \`node "${join(PILOT, "scripts", "fraicheur-depot.mjs")}" <dépôt>\` (référence lue et écart au distant à citer ; en retard, lire la référence distante).`);
+  } catch (e) { lignes.push("", `- fraîcheur du dépôt du produit : NON mesurée (${String(e.message).slice(0, 160)})`); }
+}
+
 // TF-1658 (14/10/2026) — UN SOCLE POSÉ À CÔTÉ DU DÉPÔT D'UN TIERS SE JUGE À CHAQUE OUVERTURE : rien
 // de nouveau sous le clone du tiers depuis son relevé. Sans objet pour tout autre projet.
 if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "DEPOT-TIERS.json"))) {
