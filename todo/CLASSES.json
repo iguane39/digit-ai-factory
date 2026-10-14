@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.30.0",
+ "version": "1.31.0",
  "date": "2026-10-14",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -1800,6 +1800,32 @@
    "oracle": "digit-ai-forge-agents, check_html.py L12, fixtures l12-cellule-points-virgules (rouge) et l12-cellule-en-puces (verte), self_test.py",
    "voisines": [
     "ecart-sans-remede-par-ligne"
+   ]
+  },
+  {
+   "cle": "recommandation-contre-une-decision-mesuree-non-lue",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une recommandation de changer une valeur chiffrée d'un produit est écrite d'après une métrique, sans lire la décision mesurée qui avait fixé cette valeur : le livrable propose de défaire un choix qu'il ne connaît pas.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1645"
+   ],
+   "regle": "gabarits/DIAGNOSTIC-EXPLOITATION.md, gabarit de la fiche constat et préconisations, references/RUN-CONSEIL.md : une recommandation qui change une valeur chiffrée cite [décision : <où>] ou [décision : aucune — cherché <où>]",
+   "oracle": "pilot, oracles/oracle-livrable-conseil.mjs (LC6) et oracles/oracle-fiche-constat-precos.mjs (CP7), détection commune oracles/lib-decision-lue.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "ecran-juge-sur-donnees-de-demonstration",
+   "famille": "affordance-ui",
+   "libelle": "Un écran passe toutes les revues graphiques sur des données de démonstration et devient inexploitable à la première alimentation réelle : pages de plusieurs milliers de pixels, colonnes déséquilibrées, valeurs machine affichées brutes.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1654"
+   ],
+   "regle": "references/ETAPES-RUN.md étape 5 bis et ETAPE-MEP.md § 3 bis point 7 : revue et contrôle d'exploitabilité rejoués sur une instance alimentée au volume réel, écran jugé sur la seule démonstration déclaré",
+   "oracle": "digit-ai-forge-design, oracles/oracle-exploitabilite.mjs (X0 à X5), fixtures exploitabilite-verte et exploitabilite-rouge, oracles/self-test.mjs",
+   "voisines": [
+    "critique-application-connectee-injouable"
    ]
   }
  ],

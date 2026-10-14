@@ -380,9 +380,10 @@ machine (`not_assessed`, objets sérialisés) s'affichaient brutes. La revue gra
 donc sur une instance alimentée au volume réel** (la qualif populée, `ETAPE-MEP.md` § 3 bis), avec
 un contrôle d'exploitabilité mesuré dans le rendu : hauteur de page hors tableau filtrable,
 densité des lignes, valeurs machine visibles, colonnes déséquilibrées, libellés trop longs. Le
-contrôle commun relève de forge-design, part forge de TF-1654 ; en attendant sa livraison, le
-patron est l'oracle écrit par le produit d'origine (`forge\oracles\oracle-exploitabilite.mjs`,
-règles X1 à X5, 9 échecs mesurés sur l'instance alimentée). Le verdict se consigne au ledger
+contrôle commun est `<racine>\digit-ai-forge-design\oracles\oracle-exploitabilite.mjs` (règles X0
+à X5, livré le 14/10/2026, part forge de TF-1654) : il juge une URL ou un fichier, et une
+application derrière une connexion avec `--etat-connexion <storageState.json>`. Il reprend les
+seuils de l'oracle écrit par le produit d'origine (9 échecs mesurés sur l'instance alimentée). Le verdict se consigne au ledger
 (`oracles_verdict`) et entre au dossier de MEP ; un écran jugé sur la seule démonstration se
 déclare comme tel, jamais par silence.
 
