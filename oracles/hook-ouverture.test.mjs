@@ -136,8 +136,22 @@ check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans cla
   writeFileSync(join(sansCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { SessionStart: [{ hooks: [] }], Stop: [{ hooks: [] }] } }), "utf8");
   const avecCrochet = mkdtempSync(join(tmpdir(), "hook-readme-avec-"));
   mkdirSync(join(avecCrochet, ".claude"), { recursive: true });
-  writeFileSync(join(avecCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write", hooks: [] }] } }), "utf8");
-  const sortieSans = joue(sansCrochet), sortieAvec = joue(avecCrochet);
+  // TF-1667 (14/10/2026) : le crochet se reconnaît à sa COMMANDE. Le témoin vert déclare la régénération
+  // des README ; le témoin « autres crochets » porte ceux d'un produit réel (page-html, écriture), qui ne
+  // régénèrent rien — l'annonce les prenait pour le crochet des README.
+  writeFileSync(join(avecCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write", hooks: [{ type: "command", command: "node scripts/readme-dossiers.mjs --silencieux" }] }] } }), "utf8");
+  const autresCrochets = mkdtempSync(join(tmpdir(), "hook-readme-autres-"));
+  mkdirSync(join(autresCrochets, ".claude"), { recursive: true });
+  writeFileSync(join(autresCrochets, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs page-html" }, { type: "command", command: "node forge/hooks/factory.mjs ecriture" }] }] } }), "utf8");
+  const sortieSans = joue(sansCrochet), sortieAvec = joue(avecCrochet), sortieAutres = joue(autresCrochets);
+  check("TF-1667 rouge → vert — un produit dont les PostToolUse ne régénèrent pas les README : l'annonce dit qu'ils ne se régénèrent PAS", () => {
+    if (!/ATTENTION, état MESURÉ.*ne déclare aucun crochet PostToolUse qui régénère les README/.test(sortieAutres)) throw new Error("l'annonce prend les crochets page-html et écriture pour celui des README");
+  });
+  check("TF-1652, TF-1667 — chez un produit, la consigne nomme le script du pilot, --base . et --racines borné", () => {
+    const attendu = `node "${join(PILOT, "scripts", "readme-dossiers.mjs")}" --base . --racines`;
+    if (!sortieAutres.includes(attendu)) throw new Error("la commande prescrite au produit n'est pas celle du pilot bornée au dossier écrit");
+    if (/`node scripts\\\\readme-dossiers\.mjs`/.test(sortieAutres)) throw new Error("la consigne prescrit encore un chemin qui n'existe pas chez un produit");
+  });
   check("TF-1301 borne — l'ouverture d'un PRODUIT ne publie pas le stock du registre du pilot", () => {
     if (/Items ouverts sans classe/.test(sortieSans)) throw new Error("le stock du pilot est publié chez un produit");
   });

@@ -597,15 +597,24 @@ if (iPilot < 0) {
 // dont `.claude/settings.json` ne déclare aucun PostToolUse n'a aucune régénération des README après
 // écriture : l'annonce l'affirmait pourtant, et la restitution l'a recopiée avant mesure (index périmé
 // du 22 au 26/09 chez un produit). Le crochet se lit dans les réglages du projet ouvert.
+// TF-1652 et TF-1667 (14/10/2026) — LE CROCHET SE RECONNAÎT À SA COMMANDE, ET LA CONSIGNE NOMME LA
+// COMMANDE VALABLE LÀ OÙ ELLE EST LUE. Un produit déclare des PostToolUse (page-html, écriture, droits)
+// sans aucun qui régénère les README : l'annonce affirmait le contraire. Et `node scripts\readme-dossiers.mjs`
+// n'existe pas chez un produit (MODULE_NOT_FOUND) ; la session a alors joué le script du pilot sur tout le
+// produit, 41 README rédigés à la main écrasés le 13/10. Chez un produit, la commande porte le chemin du
+// pilot, `--base .` et `--racines` borné au dossier écrit.
 function ligneCrochetReadme() {
   let declare = null;
   try {
-    const t = readFileSync(join(process.cwd(), ".claude", "settings.json"), "utf8");
-    declare = /"PostToolUse"\s*:\s*\[\s*\{/.test(t);
+    const j = JSON.parse(readFileSync(join(process.cwd(), ".claude", "settings.json"), "utf8"));
+    declare = (((j.hooks || {}).PostToolUse) || []).flatMap((g) => g.hooks || []).some((h) => /readme-dossiers/.test(String(h.command || "")));
   } catch { /* réglages absents ou illisibles : dit ci-dessous */ }
+  const commande = iPilot >= 0
+    ? `\`node "${join(PILOT, "scripts", "readme-dossiers.mjs")}" --base . --racines <dossier écrit, ex. output\\03-Syntheses>\` depuis la racine du produit, jamais sur tout le produit ; un README rédigé à la main (sans la marque « Généré par ») est préservé, un dossier gelé se déclare par \`.no-index\` ou dans le CLAUDE.md`
+    : "`node scripts\\readme-dossiers.mjs`";
   if (declare === true)
-    return "- Les README d'input\\ et output\\ se régénèrent après chaque écriture par un outil (hook PostToolUse) ; une écriture par commande (script, mv, redirection) n'en déclenche aucune : rejouer `node scripts\\readme-dossiers.mjs` avant l'enregistrement. Un rôle non rédigé est un défaut.";
-  return "- ATTENTION, état MESURÉ : `.claude/settings.json` de ce projet " + (declare === false ? "ne déclare aucun crochet PostToolUse" : "est absent ou illisible") + ". Les README d'input\\ et output\\ NE se régénèrent PAS après une écriture : les rejouer à la main (`node scripts\\readme-dossiers.mjs`) avant l'enregistrement. Un rôle non rédigé est un défaut.";
+    return `- Les README d'input\\ et output\\ se régénèrent après chaque écriture par un outil (hook PostToolUse) ; une écriture par commande (script, mv, redirection) n'en déclenche aucune : rejouer ${commande} avant l'enregistrement. Un rôle non rédigé est un défaut.`;
+  return "- ATTENTION, état MESURÉ : `.claude/settings.json` de ce projet " + (declare === false ? "ne déclare aucun crochet PostToolUse qui régénère les README" : "est absent ou illisible") + `. Les README d'input\\ et output\\ NE se régénèrent PAS après une écriture : les rejouer à la main (${commande}) avant l'enregistrement. Un rôle non rédigé est un défaut.`;
 }
 
 lignes.push(...lignesGates());
