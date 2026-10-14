@@ -9,8 +9,9 @@
  *   LC1 sections du gabarit du type présentes ;
  *   LC2 tout montant (€) ou pourcentage (%) porte une source `[src: …]` ou la mention
  *       « à vérifier » sur sa ligne — un chiffre sans source ne vaut rien ;
- *   LC3 (diagnostic) chaque recommandation cite >= 1 mesure M-xx, et chaque M-xx cité
- *       existe au tableau des mesures — un avis sans mesure n'entre pas au livrable ;
+ *   LC3 (diagnostic) chaque recommandation — puce ou ligne de tableau (TF-1691) — cite >= 1
+ *       mesure M-xx, et chaque M-xx cité existe au tableau des mesures — un avis sans mesure
+ *       n'entre pas au livrable ;
  *   LC4 (démarche ROI) chaque lot porte ses trois critères (utile, utilisable, utilisé)
  *       non vides ET un jalon daté — sinon ce n'est pas un lot, c'est un chapitre ;
  *   LC5 plan de revue daté (AAAA-MM-JJ) ;
@@ -37,6 +38,23 @@ function lignesTableau(bloc) {
     .filter((l) => /^\|/.test(l.trim()))
     .filter((l) => !/^\|[\s:|-]+\|?\s*$/.test(l.trim()))
     .slice(1);
+}
+
+/**
+ * Les lignes de DONNÉES de chaque tableau d'un bloc : chaque suite de lignes `|…|` est un tableau, dont
+ * la première ligne est l'en-tête et la ligne de tirets le séparateur — tous deux écartés. Un bloc qui
+ * porte deux tableaux n'en compte pas le second en-tête comme une donnée.
+ */
+function lignesDesTableaux(bloc) {
+  const donnees = [];
+  let enTete = true;
+  for (const l of (bloc || "").split("\n")) {
+    if (!/^\s*\|/.test(l)) { enTete = true; continue; }
+    if (/^\s*\|[\s:|-]+\|?\s*$/.test(l)) continue;
+    if (enTete) { enTete = false; continue; }
+    donnees.push(l);
+  }
+  return donnees;
 }
 
 function section(texte, re) {
@@ -81,8 +99,14 @@ function juger(texte) {
   if (estDiagnostic) {
     const idsMesures = new Set(lignesTableau(section(texte, /mesures ex[ée]cut[ée]es/i))
       .map((l) => (l.split("|").map((c) => c.trim())[1] || "")).filter((id) => /^M-\d{2,}$/.test(id)));
+    // TF-1691 (14/10/2026) : une recommandation se lit en puce OU en ligne de tableau. Le gabarit de la
+    // bibliothèque (gd-diagnostic) la pose en tableau, parce qu'elle porte plusieurs champs (ce qu'elle
+    // évite, complexité, durée, réversibilité, décideur) ; lue seulement en puces, son instance rendait
+    // « aucune recommandation » et échouait à son propre juge. L'exigence ne change pas : CHAQUE ligne
+    // cite une mesure M-xx du tableau des mesures.
     const recos = section(texte, /recommandations/i).split("\n")
-      .filter((l) => /^\s*(?:[-*]|\d+[.)])\s+/.test(l));
+      .filter((l) => /^\s*(?:[-*]|\d+[.)])\s+/.test(l))
+      .concat(lignesDesTableaux(section(texte, /recommandations/i)));
     const sansMesure = recos.filter((l) => !/\bM-\d{2,}\b/.test(l));
     const citees = [...new Set((section(texte, /recommandations/i).match(/\bM-\d{2,}\b/g) || []))];
     const orphelines = citees.filter((id) => !idsMesures.has(id));
@@ -195,9 +219,19 @@ Revue à caler.
   const diagLc6Rouge = diagVert.replace("## 5. Plan de revue", `${reduction}.\n## 5. Plan de revue`);
   const diagLc6Vert = diagVert.replace("## 5. Plan de revue",
     `${reduction} [décision : infra/apps.tf, budget de latence de 5 s, garde 2 vCPU en production].\n## 5. Plan de revue`);
+  // LC3 en TABLEAU (TF-1691) : la forme du gabarit gd-diagnostic. Vert quand chaque ligne cite sa
+  // mesure ; rouge quand une ligne n'en cite aucune — la lecture en tableau n'assouplit rien.
+  const TABLEAU_RECOS = "| Recommandation | Mesures | Ce que ça évite | Complexité | Durée | Réversible ? | Qui décide |\n"
+    + "|---|---|---|---|---|---|---|\n"
+    + "| Indexer les 12 requêtes relevées | M-02 | le scan complet de table | faible | courte | oui | équipe applicative |\n";
+  const diagTableauVert = diagVert.replace(/## 4\. Recommandations\n[^\n]*\n/, `## 4. Recommandations\n${TABLEAU_RECOS}`);
+  const diagTableauRouge = diagTableauVert.replace("## 5. Plan de revue",
+    "| Migrer vers une architecture plus performante | | la lenteur | forte | longue | non | direction |\n## 5. Plan de revue");
   const cas = [
     ["diag-vert.md", diagVert, 0, null],
     ["diag-rouge.md", diagRouge, 1, ["LC1", "LC2", "LC3", "LC5"]],
+    ["diag-tableau-vert.md", diagTableauVert, 0, null],
+    ["diag-tableau-rouge.md", diagTableauRouge, 1, ["LC3"]],
     ["diag-lc6-rouge.md", diagLc6Rouge, 1, ["LC6"]],
     ["diag-lc6-vert.md", diagLc6Vert, 0, null],
     ["roi-vert.md", roiVert, 0, null],
@@ -217,7 +251,8 @@ Revue à caler.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test livrable conseil : 6/6 PASS (diag vert/rouge, roi vert/rouge, LC6 rouge sans décision lue et vert avec — LC1-LC6 double sens)");
+    : "Self-test livrable conseil : 8/8 PASS (diag vert/rouge, roi vert/rouge, LC6 rouge sans décision lue et vert avec, "
+      + "LC3 en tableau vert quand chaque ligne cite sa mesure et rouge sur une ligne sans mesure — LC1-LC6 double sens)");
   process.exit(casse.length ? 1 : 0);
 }
 
