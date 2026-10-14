@@ -978,6 +978,19 @@ if (args[0] === "--self-test") {
         casse.push("TF-1617 : « Fiche technique », type non déclaré, passe G8 — la famille neuve a élargi la résolution au-delà de ses noms");
     }
 
+    // TF-1640 (14/10/2026) — LA FICHE CONSTAT ET PRÉCONISATIONS SE RÉSOUT PAR SON NOM. Sens VERT : le
+    // nom que la famille prescrit, type en tête de l'Objet, tombe sur elle. Sens ROUGE : le nom des
+    // deux fiches d'origine, sujet en tête (« Couts APR2 - Constat et precos »), ne résout aucune
+    // famille — c'est pourquoi le gabarit prescrit l'ordre, et la règle ne l'avale pas en silence.
+    {
+      const prescrit = g8("Client-A - Constat et precos - Couts hebergement - 20261014a.md");
+      const sujetEnTete = g8("Client-A - Couts APR2 - Constat et precos - 20261012d.md");
+      if (!(prescrit.statut === "PASS" && prescrit.message.includes("fiche-constat-precos")))
+        casse.push(`TF-1640 : « Constat et precos » en tête de l'Objet ne résout pas sa famille — ${prescrit.message.slice(0, 140)}`);
+      if (sujetEnTete.statut !== "FAIL")
+        casse.push("TF-1640 : un nom au sujet en tête passe G8 — la résolution a cessé de lire le type en tête de l'Objet (R-4)");
+    }
+
     // TF-1230 (campagne D-51 (a), 02/10/2026) — LES HUIT FICHIERS docs-projet SONT UNE FAMILLE DU
     // CATALOGUE RÉEL, PAS UN ANGLE MORT. Avant ce correctif, aucune ligne de
     // gabarits/documents/catalogue.jsonl ne les déclarait : ils vivaient sous gabarits/docs-projet/,
