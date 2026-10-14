@@ -52,8 +52,10 @@
  *        sur `scripts\verifier-parcours-tiers.mjs`.
  *   TM10 un dossier qui fait voter ou approuver un plan porte une contre-lecture qui compare les
  *        PARAMÈTRES de l'exécution qui a produit le plan à la fiche ou à la décision, tranche chaque
- *        écart et publie ce qu'elle ne compare pas — AVERTISSEMENT (M-15, TF-1681), câblé sur
- *        `scripts\verifier-contre-lecture.mjs`. Règle neuve du 14/10/2026 : même doctrine que TM9.
+ *        écart et publie ce qu'elle ne compare pas — BLOQUANT (M-15, TF-1681), câblé sur
+ *        `scripts\verifier-contre-lecture.mjs`. Entrée en avertissement le 14/10/2026 comme TM9, elle
+ *        bloque depuis le même jour : décision humaine « Traite A1 » sur TF-1688, prise sur son bruit
+ *        mesuré, 0 dossier accusé sur les 6 dossiers de MEP du poste.
  *
  * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
  * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
@@ -253,15 +255,12 @@ function confronterParcoursTiers(racine) {
 
 /**
  * TM10 — la contre-lecture d'un plan voté lit les paramètres de lancement et les compare à la fiche
- * (M-15, TF-1681). AVERTISSEMENT : règle neuve du 14/10/2026, le refus du verbe est rendu sans bloquer.
+ * (M-15, TF-1681). BLOQUANT depuis la décision humaine sur TF-1688 (14/10/2026) : le refus du verbe est
+ * rendu tel quel, en FAIL. Son bruit mesuré à la bascule : 0 dossier accusé sur 6.
  */
-function confronterContreLecture(racine) {
-  const r = confronterVerbe(racine, "verifier-contre-lecture.mjs", "M-15",
-    (j) => `${(j.mesure || {}).parametres || 0} paramètre(s) de lancement lus à l'exécution et comparés à la fiche, `
-      + `${(j.mesure || {}).ecarts_traites || 0} écart(s) tranché(s), non-comparé publié`);
-  if (r.statut !== "FAIL") return r;
-  return { statut: "AVERTISSEMENT", message: "règle neuve du 14/10/2026, non bloquante (précédent D-70 (b)) — " + r.message };
-}
+const confronterContreLecture = (racine) => confronterVerbe(racine, "verifier-contre-lecture.mjs", "M-15",
+  (j) => `${(j.mesure || {}).parametres || 0} paramètre(s) de lancement lus à l'exécution et comparés à la fiche, `
+    + `${(j.mesure || {}).ecarts_traites || 0} écart(s) tranché(s), non-comparé publié`);
 
 export function juger(racine) {
   const findings = [];
@@ -383,7 +382,7 @@ const NON_JUGE = [
   + "son objet (l'état exécuté) ; il ne rejoue pas le clic, et TM9 AVERTIT sans bloquer — règle neuve du 13/10/2026",
   "la VÉRITÉ des paramètres recopiés à la contre-lecture (TM10) : le verbe exige la valeur à l'exécution, sa source, la "
   + "valeur attendue et sa référence, il ne relit pas l'API de la chaîne ; un vote de plan dit en d'autres mots n'est pas "
-  + "vu, et TM10 AVERTIT sans bloquer — règle neuve du 14/10/2026",
+  + "vu : ce silence-là passe TM10, bien que la règle bloque depuis la décision sur TF-1688 (14/10/2026)",
   "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
   + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
 ];
@@ -604,12 +603,12 @@ function selfTest() {
   attendre("tm10-remede", produit("tm10-remede", CONTRE_LECTURE, MARQUEUR), "TM10", "PASS");
   // ROUGE : le cas fondateur — un plan voté sans contre-lecture des paramètres.
   const muetPlan = produit("tm10-muet", VOTE_PLAN, MARQUEUR);
-  attendre("tm10-muet", muetPlan, "TM10", "AVERTISSEMENT");
-  // ET IL N'EST PAS BLOQUANT : règle neuve, sortie 0.
+  attendre("tm10-muet", muetPlan, "TM10", "FAIL");
+  // ET IL BLOQUE depuis la décision sur TF-1688 (14/10/2026) : sortie 1, comme TM5 à TM8.
   {
     const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), muetPlan], { encoding: "utf8" });
-    if (r.status !== 0) casse.push("un plan voté sans contre-lecture fait sortir l'oracle en échec — TM10 devait AVERTIR, règle neuve du 14/10/2026");
-    if (!/TM10/.test(r.stdout) || !/Contre-lecture/.test(r.stdout)) casse.push("TM10 n'apparaît pas au verdict JSON — un avertissement que personne ne lit n'est pas un avertissement");
+    if (r.status !== 1) casse.push("un plan voté sans contre-lecture ne met pas l'oracle en échec — TM10 devait bloquer depuis la décision sur TF-1688");
+    if (!/TM10/.test(r.stdout) || !/Contre-lecture/.test(r.stdout)) casse.push("TM10 n'apparaît pas au verdict JSON — un refus que personne ne lit ne protège rien");
   }
 
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
@@ -640,8 +639,8 @@ function selfTest() {
       + "nommé, joué dans un navigateur sur l'état exécuté et étape déclarée PASS ; TM9 dossier muet sur un parcours de "
       + "paiement embarqué AVERTISSEMENT — le cas fondateur du 25/08/2026 ; TM9 ne bloque PAS, code de sortie 0 vérifié ; "
       + "TM10 sans plan voté SANS_OBJET ; TM10 paramètre lu à l'exécution, écart tranché et non-comparé publié PASS ; TM10 cas "
-      + "rouge — plan voté sans contre-lecture des paramètres — rendu en AVERTISSEMENT, le cas fondateur du 29/09/2026 ; "
-      + "TM10 ne bloque PAS, code de sortie 0 vérifié)");
+      + "rouge — plan voté sans contre-lecture des paramètres — FAIL, le cas fondateur du 29/09/2026 ; "
+      + "TM10 bloque depuis TF-1688, code de sortie 1 vérifié)");
   return casse.length ? 1 : 0;
 }
 
