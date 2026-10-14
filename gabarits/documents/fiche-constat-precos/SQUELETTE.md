@@ -35,7 +35,7 @@ version_du_gabarit: 1.0.0
 
 | # | Action | Gain par mois | Effort | Attention |
 |---|---|---:|---|---|
-| **1** | **{Verbe et objet}** : {le geste}. | {montant ou effet nommé} | {durée du geste} | {ce qu'il faut vérifier avant ou après} |
+| **1** | **{Verbe et objet}** : {le geste}. | {montant ou effet nommé} | {durée du geste} | {ce qu'il faut vérifier avant ou après} {si l'action change une valeur chiffrée : [décision : où la décision qui l'accompagne est écrite, ou « aucune, cherché dans … »]} |
 | **2** | **{Verbe et objet}** : {le geste}. | {montant ou effet nommé} | {durée du geste} | {ce qu'il faut vérifier} |
 
 **Rien à faire** sur {ce qui a été regardé et reste tel quel} ({le motif}).

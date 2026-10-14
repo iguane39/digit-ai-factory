@@ -60,6 +60,7 @@ par `oracles\oracle-fiche-constat-precos.mjs` :
 | CP4 | de 1 à 5 constats numérotés, chacun porteur d'au moins un chiffre | 4 constats |
 | CP5 | colonnes Action, Gain, Effort, Attention ; 5 actions au plus, chacune avec un gain ou un effet nommé | 5 actions |
 | CP6 | le couple `gabarit` et `version du gabarit` rendu | absent : écrite sans gabarit |
+| CP7 | une action qui change une valeur chiffrée du produit cite, sur sa ligne, la décision lue : `[décision : <où>]` ou `[décision : aucune, cherché <où>]` | 1 action sans renvoi (le constat 2 citait pourtant la décision) |
 
 *Le compte des mots.* Le lot annonçait 744 mots ; l'oracle en compte 617, parce qu'il ne compte ni
 les lignes de séparation des tableaux ni les signes isolés. La borne s'applique au compte de
@@ -83,6 +84,12 @@ de préconisations. L'oracle la refuse sur CP1, CP2, CP3 et CP5 : c'était un di
   ne se compare à rien.
 - **Une sixième action.** Au-delà de cinq, l'ordre conseillé ne se lit plus d'un coup d'œil ; les
   actions mineures se regroupent, ou la fiche devient un diagnostic.
+- **Un changement de valeur sans la décision lue.** Avant de recommander de réduire, d'augmenter ou
+  de reconfigurer une valeur d'un produit, on lit le commentaire ou la décision qui l'accompagne
+  dans son code (bloc d'infrastructure, ADR, décision consignée) et on la cite. Une valeur
+  commentée comme décision prise après mesure ne se renverse pas sur une métrique d'usage seule :
+  la veille de la fiche d'origine, une réduction de 2 à 0,25 vCPU recommandée sur l'utilisation
+  moyenne aurait cassé un budget de latence de 5 secondes documenté dans le code (TF-1645).
 - **Un « Rien à faire » muet.** Ce qu'on laisse se motive, sinon le lecteur croit à un oubli.
 - **La démarche dans la fiche.** Commandes, requêtes et sorties restent à la session ; la fiche cite
   ses sources en une ligne.

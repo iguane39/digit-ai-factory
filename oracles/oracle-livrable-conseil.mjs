@@ -13,7 +13,13 @@
  *       existe au tableau des mesures — un avis sans mesure n'entre pas au livrable ;
  *   LC4 (démarche ROI) chaque lot porte ses trois critères (utile, utilisable, utilisé)
  *       non vides ET un jalon daté — sinon ce n'est pas un lot, c'est un chapitre ;
- *   LC5 plan de revue daté (AAAA-MM-JJ).
+ *   LC5 plan de revue daté (AAAA-MM-JJ) ;
+ *   LC6 (diagnostic, TF-1645) une recommandation qui CHANGE une valeur chiffrée d'un produit
+ *       (dimensionnement, configuration, nombre d'exemplaires, rétention) cite la décision qui
+ *       accompagne cette valeur dans son code : `[décision : <où>]` ou `[décision : aucune —
+ *       cherché <où>]`. Le 12/10/2026, une réduction de 2 à 0,25 vCPU recommandée sur la seule
+ *       utilisation moyenne aurait cassé un budget de latence documenté dans le code du produit.
+ *       Détection et message partagés avec oracle-fiche-constat-precos (lib-decision-lue.mjs).
  *
  * Usage : node oracle-livrable-conseil.mjs <livrable.md>   → verdict JSON
  *         node oracle-livrable-conseil.mjs --self-test     → fixtures double sens (2 types)
@@ -24,6 +30,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { changeUneValeur, citeLaDecision, MESSAGE_REGLE } from "./lib-decision-lue.mjs";
 
 function lignesTableau(bloc) {
   return (bloc || "").split("\n")
@@ -85,6 +92,19 @@ function juger(texte) {
     else ok("LC3", `${recos.length} recommandation(s), toutes ancrées à des mesures existantes`);
   }
 
+  // LC6 — une recommandation qui change une valeur chiffrée cite la décision lue (diagnostic seulement).
+  // Lue sur les puces ET sur les lignes de tableau de la section : le gabarit de la bibliothèque
+  // (gd-diagnostic) pose ses recommandations en tableau, celui du run de conseil en puces.
+  if (estDiagnostic) {
+    const lignes = section(texte, /recommandations/i).split("\n").slice(1)
+      .filter((l) => /^\s*(?:[-*]|\d+[.)])\s+/.test(l) || (/^\s*\|/.test(l) && !/^\s*\|[\s:|-]+\|?\s*$/.test(l)));
+    const changements = lignes.filter(changeUneValeur);
+    const muettes = changements.filter((l) => !citeLaDecision(l));
+    if (!changements.length) ok("LC6", "aucune recommandation ne change une valeur chiffrée du produit");
+    else if (muettes.length) ko("LC6", `${muettes.length} recommandation(s) qui changent une valeur sans citer la décision lue : « ${muettes[0].trim().slice(0, 90)} » — ${MESSAGE_REGLE}`);
+    else ok("LC6", `${changements.length} recommandation(s) qui changent une valeur, chacune avec la décision lue`);
+  }
+
   // LC4 — lots complets (ROI seulement)
   if (estRoi) {
     const lots = lignesTableau(section(texte, /^## .*lots/im));
@@ -114,6 +134,7 @@ function verdictDe(findings) {
 }
 
 const NON_JUGE = [
+  "LC6 : la décision CITÉE n'est pas relue — le renvoi prouve que la lecture a été déclarée, pas qu'elle a été faite ni bien faite ; un changement de valeur dit sans chiffre ni verbe de changement du vocabulaire fermé (« passer en mode dev ») n'est pas vu (lib-decision-lue.mjs)",
   "la justesse des mesures et la pertinence des recommandations — l'oracle tient la FORME opposable, pas le fond",
   "la lecture seule sur le SI étudié — discipline du run, hors de portée d'un contrôle du livrable",
   "le chiffrage commercial (TJM, montants de propale) — délégué à digit-ai-propale, jamais jugé ici",
@@ -168,9 +189,17 @@ Gain estimé 30 % dès le premier trimestre.
 ## 5. Plan de revue
 Revue à caler.
 `;
+  // LC6 (TF-1645) : le même diagnostic vert, augmenté d'une recommandation de redimensionnement.
+  // Rouge sans la décision lue — le cas du 12/10/2026 ; vert avec le renvoi, qui est le remède.
+  const reduction = "- Réduire le service de traitement de 2 vCPU à 0,25 vCPU (M-01), effort 1 h";
+  const diagLc6Rouge = diagVert.replace("## 5. Plan de revue", `${reduction}.\n## 5. Plan de revue`);
+  const diagLc6Vert = diagVert.replace("## 5. Plan de revue",
+    `${reduction} [décision : infra/apps.tf, budget de latence de 5 s, garde 2 vCPU en production].\n## 5. Plan de revue`);
   const cas = [
     ["diag-vert.md", diagVert, 0, null],
     ["diag-rouge.md", diagRouge, 1, ["LC1", "LC2", "LC3", "LC5"]],
+    ["diag-lc6-rouge.md", diagLc6Rouge, 1, ["LC6"]],
+    ["diag-lc6-vert.md", diagLc6Vert, 0, null],
     ["roi-vert.md", roiVert, 0, null],
     ["roi-rouge.md", roiRouge, 1, ["LC1", "LC2", "LC4", "LC5"]],
   ];
@@ -188,7 +217,7 @@ Revue à caler.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test livrable conseil : 4/4 PASS (diag vert/rouge, roi vert/rouge — LC1-LC5 double sens)");
+    : "Self-test livrable conseil : 6/6 PASS (diag vert/rouge, roi vert/rouge, LC6 rouge sans décision lue et vert avec — LC1-LC6 double sens)");
   process.exit(casse.length ? 1 : 0);
 }
 

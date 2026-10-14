@@ -42,8 +42,8 @@ version_du_gabarit: 1.0.0
 | # | Action | Gain par mois | Effort | Attention |
 |---|---|---:|---|---|
 | **1** | **Renouveler le jeton** du connecteur de recette, puis relancer l'import. | Recette rétablie | 20 min | Mettre la date d'expiration au calendrier de l'équipe |
-| **2** | **Réduire l'indexation de recette** à 1 cœur, la production garde ses 4. | ~110 € | 1 h | Imports plus lents en recette, acceptables |
-| **3** | **Ramener la rétention des journaux** à 30 jours. | ~25 € | 30 min | Irréversible pour les journaux déjà effacés |
+| **2** | **Réduire l'indexation de recette** à 1 cœur, la production garde ses 4. | ~110 € | 1 h | Imports plus lents en recette, acceptables [décision : `infra/indexation.tf`, les 4 cœurs sont dimensionnés pour la production seule] |
+| **3** | **Ramener la rétention des journaux** à 30 jours. | ~25 € | 30 min | Irréversible pour les journaux déjà effacés [décision : aucune, cherché dans `infra/` et `docs/adr/`] |
 | **4** | **Éteindre l'indexation de recette la nuit** par une tâche planifiée. | ~20 € | 1 jour, recette comprise | La tâche doit se rallumer avant 7 h |
 
 **Rien à faire** sur la base de données : elle est déjà au plus petit niveau proposé.

@@ -24,7 +24,12 @@
  *         5 lignes, et chaque ligne nomme un gain ou un effet (une case vide ou un tiret ne nomme rien) ;
  *   CP6 · le document rend son gabarit et sa version (`Gabarit : gd-fiche-constat-precos · version du
  *         gabarit x.y.z`), comme G4 l'exige de toute famille : sans ce couple, un retour sur la forme
- *         ne se rattache à rien.
+ *         ne se rattache à rien ;
+ *   CP7 · (TF-1645, 1.1.0) une préconisation qui CHANGE une valeur chiffrée du produit
+ *         (dimensionnement, configuration, rétention) cite sur sa ligne la décision qui accompagne
+ *         cette valeur dans son code : `[décision : <où>]` ou `[décision : aucune — cherché <où>]`.
+ *         La fiche d'origine en est née : la veille, une réduction de 2 à 0,25 vCPU recommandée sur
+ *         la seule utilisation moyenne aurait cassé un budget de latence documenté dans le code.
  *
  * Contrat : JSON {oracle, version, cible, verdict, findings[], mesures, non_juge[]} · exit 0 PASS,
  * 1 FAIL, 2 non jugeable (fichier absent ou illisible).
@@ -33,8 +38,9 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { changeUneValeur, citeLaDecision, MESSAGE_REGLE } from "./lib-decision-lue.mjs";
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 export const BORNES = { mots: 900, puces: [3, 4], constats: [1, 5], actions: 5 };
 const GABARIT = "gd-fiche-constat-precos";
 
@@ -153,6 +159,12 @@ export function juger(texte) {
       else if (nActions > BORNES.actions) ko("CP5", `${nActions} préconisations, au-delà de ${BORNES.actions} — au-delà, l'ordre conseillé ne se lit plus d'un coup d'œil`);
       else if (sansGain.length) ko("CP5", `${sansGain.length} préconisation(s) sans gain ni effet nommé : « ${(sansGain[0][iAction] || "").slice(0, 80)} »`);
       else ok("CP5", `${nActions} préconisation(s), chacune avec son gain ou son effet nommé`);
+      // CP7 (TF-1645) — une action qui change une valeur chiffrée cite la décision lue, sur sa ligne.
+      const changements = t.donnees.filter((c) => changeUneValeur(c[iAction] || ""));
+      const muettes = changements.filter((c) => !citeLaDecision(c.join(" | ")));
+      if (!changements.length) ok("CP7", "aucune préconisation ne change une valeur chiffrée du produit");
+      else if (muettes.length) ko("CP7", `${muettes.length} préconisation(s) qui changent une valeur sans citer la décision lue : « ${(muettes[0][iAction] || "").slice(0, 80)} » — ${MESSAGE_REGLE}`);
+      else ok("CP7", `${changements.length} préconisation(s) qui changent une valeur, chacune avec la décision lue`);
     }
   } else ko("CP5", "« Préconisations » absent : rien à compter");
 
@@ -174,6 +186,7 @@ export const NON_JUGE = [
   "la PERTINENCE d'une préconisation et la réalité du gain annoncé : CP5 exige un gain ou un effet NOMMÉ, pas qu'il soit atteignable",
   "le choix de la famille : une fiche qui devrait être un diagnostic (gd-diagnostic) passe ce juge si elle tient ses bornes",
   "le rendu HTML : la famille est Markdown ; une page tirée de la fiche relève du socle digit-ai-page-html",
+  "CP7 : la décision citée n'est pas relue, et un changement de valeur dit sans chiffre ni verbe de changement du vocabulaire fermé n'est pas vu (lib-decision-lue.mjs)",
 ];
 
 // --- recette à double sens : la fixture verte passe, chaque fixture rouge fait échouer SA règle ---
@@ -245,13 +258,18 @@ function selfTest() {
   rouge("six préconisations", "CP5", (t) => t.replace("| 2 | Supprimer", [3, 4, 5, 6].map((n) => `| ${n} | Action ${n} | ~${n} € | 1 h | rien |`).join("\n") + "\n| 2 | Supprimer"));
   rouge("colonne Attention absente", "CP5", (t) => t.replace("| Attention |", "|").replace("| Remesurer la latence |", "|").replace("| Irréversible |", "|"));
   rouge("couple gabarit et version absent", "CP6", (t) => t.replace(/^gabarit:.*\n/m, "").replace(/\*Gabarit :.*\*/, ""));
+  const reduire = "Réduire le traitement à 0,5 cœur";
+  rouge("réduction de cœurs sans la décision lue, le cas du 12/10/2026", "CP7", (t) => t.replace("Allonger l'intervalle d'interrogation", reduire));
+  const decisionLue = FIXTURE_VERTE.replace("Allonger l'intervalle d'interrogation", reduire)
+    .replace("| Remesurer la latence |", "| Recette seule [décision : code d'infrastructure, budget de latence de 5 s, la production garde 2 cœurs] |");
+  cas.push({ nom: "réduction de cœurs avec la décision lue (le remède)", attendu: "PASS", ok: verdictDe(juger(decisionLue).findings) === "PASS" });
   // « Rien à faire » et « Ordre conseillé » en titres de niveau 2 sont admis : la forme d'origine
   // les pose en tête de paragraphe, une autre fiche peut les poser en titres.
   const enTitres = FIXTURE_VERTE.replace("**Rien à faire** sur", "## Rien à faire\n\nSur").replace("**Ordre conseillé** :", "## Ordre conseillé\n\n");
   cas.push({ nom: "parties en titres de niveau 2", attendu: "PASS", ok: verdictDe(juger(enTitres).findings) === "PASS" });
   for (const c of cas) console.log(`  [${c.ok ? "PASS" : "FAIL"}] ${c.nom} → ${c.attendu}`);
   const casse = cas.filter((c) => !c.ok);
-  console.log(`\noracle-fiche-constat-precos self-test : ${cas.length - casse.length}/${cas.length} PASS (fixture verte et ${cas.length - 2} cas rouges, recette à double sens)`);
+  console.log(`\noracle-fiche-constat-precos self-test : ${cas.length - casse.length}/${cas.length} PASS (${cas.filter((c) => c.nom.startsWith("cas rouge")).length} cas rouges, ${cas.filter((c) => !c.nom.startsWith("cas rouge")).length} cas verts, recette à double sens)`);
   process.exit(casse.length ? 1 : 0);
 }
 
