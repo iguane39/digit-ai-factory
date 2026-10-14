@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.31.0",
+ "version": "1.32.0",
  "date": "2026-10-14",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -1826,6 +1826,86 @@
    "oracle": "digit-ai-forge-design, oracles/oracle-exploitabilite.mjs (X0 à X5), fixtures exploitabilite-verte et exploitabilite-rouge, oracles/self-test.mjs",
    "voisines": [
     "critique-application-connectee-injouable"
+   ]
+  },
+  {
+   "cle": "ouverture-session-hors-delai-client",
+   "famille": "hook-ou-gate",
+   "libelle": "L'initialisation d'une session attend des hooks SessionStart synchrones de durée non bornée, au-delà du délai du client : l'extension abandonne à 60 s avec un message sans rapport avec la cause, et la session est perdue.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1635"
+   ],
+   "regle": "hooks SessionStart lents en async ; délai d'initialisation mesuré par une sonde rejouable, seuil 30 s contre 60 s pour le client ; geste fait avant la fin du relevé déclaré",
+   "oracle": "pilot, scripts/verifier-ouverture-cli.mjs et sa recette scripts/verifier-ouverture-cli.test.mjs (cas rouge par sommeil injecté) ; oracles/lib-gestes-avant-releve.mjs",
+   "voisines": [
+    "contexte-de-hook-tronque-en-silence"
+   ]
+  },
+  {
+   "cle": "contexte-de-hook-tronque-en-silence",
+   "famille": "hook-ou-gate",
+   "libelle": "La sortie d'un hook au-delà d'un plafond du harnais est remplacée par un aperçu : les sections de fin, dont les gates de session, n'atteignent jamais l'assistant, et rien ne le dit.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1636"
+   ],
+   "regle": "plafond mesuré et daté, budget du contexte, sections omises nommées, gates en tête du relevé",
+   "oracle": "pilot, oracles/lib-budget-contexte.mjs et oracles/hook-ouverture.test.mjs (relevé de 90 000 caractères borné, gates gardés)",
+   "voisines": [
+    "ouverture-session-hors-delai-client"
+   ]
+  },
+  {
+   "cle": "analyse-de-depot-sur-copie-perimee",
+   "famille": "donnees-perissables-en-dur",
+   "libelle": "Une analyse lit un dépôt sur une copie locale en retard sur son distant et recommande un correctif déjà livré : 290 commits de retard mesurés le 12/10, un correctif livré depuis 13 jours.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1642"
+   ],
+   "regle": "gabarits/DIAGNOSTIC-EXPLOITATION.md §2 : citer la référence lue, prouver une absence sur toute la référence, relire git log autour d'une date ; retard mesuré à l'ouverture d'un produit",
+   "oracle": "pilot, scripts/fraicheur-depot.mjs et sa recette (retard d'un commit : exit 1), cas TF-1642 de oracles/hook-ouverture.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "regeneration-ecrase-contenu-redige",
+   "famille": "readme-role",
+   "libelle": "Un générateur d'index réécrit des fichiers rédigés à la main, ou écrit dans un dossier gelé, faute de vérifier la marque du fichier suivi et le statut du dossier : 41 README réécrits chez un produit le 13/10.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1667"
+   ],
+   "regle": "scripts/readme-dossiers.mjs : un README sans marque « Généré par » est préservé et annoncé ; dossiers de fixtures fermés ; dossier déclaré gelé fermé",
+   "oracle": "pilot, scripts/readme-dossiers.test.mjs (cas TF-1667, 4 rouges sur la version d'avant)",
+   "voisines": []
+  },
+  {
+   "cle": "adoption-ecrit-dans-un-depot-tiers",
+   "famille": "emplacement-livrable",
+   "libelle": "La voie d'adoption d'un projet existant suppose que la session possède le dépôt et y pose le socle : 25 écritures annoncées le 13/10 dans le dépôt d'un client.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1658"
+   ],
+   "regle": "scripts/adopter-projet-existant.mjs --hors-depot : socle posé à côté, dépôt du tiers relevé et vérifié intact à chaque ouverture ; ACCUEIL.md, question fermée à l'étape 1",
+   "oracle": "pilot, scripts/adopter-projet-existant.test.mjs (verifierDepotTiers : intact puis FAIL après écriture, socle interne refusé)",
+   "voisines": [
+    "surface-web-posee-hors-racine-servie"
+   ]
+  },
+  {
+   "cle": "surface-web-posee-hors-racine-servie",
+   "famille": "heritage-produit",
+   "libelle": "robots.txt et llms.txt sont posés à la racine d'un dépôt multi-projets, hors de la racine web servie : le contrôle de présence est vert et la surface n'est jamais servie.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1659"
+   ],
+   "regle": "scripts/adopter-projet-existant.mjs, racinesServies() : racine_web déclarée, sinon public/wwwroot/static/site ; ambiguïté consignée, rien posé",
+   "oracle": "pilot, scripts/adopter-projet-existant.test.mjs (3 cas TF-1659 : multi-projets, ambiguïté, sens inverse)",
+   "voisines": [
+    "adoption-ecrit-dans-un-depot-tiers"
    ]
   }
  ],
