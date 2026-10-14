@@ -257,6 +257,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-12 - RETOURS - 20261001b.tf.jsonl` | fichier | 2,7 Ko | 2 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261002a.md` | fichier | 9,3 Ko | Retours forges — Produit-12 — 20261002a |
 | `Produit-12 - RETOURS - 20261002a.tf.jsonl` | fichier | 4,6 Ko | 3 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261014a.md` | fichier | 6,8 Ko | Retours forges — Produit-12 — 20261014a |
+| `Produit-12 - RETOURS - 20261014a.tf.jsonl` | fichier | 1,9 Ko | 1 ligne(s) JSONL |
 | `Produit-61 - Rapport d'audit - 20260909a.html` | fichier | 359,8 Ko | Digit-AI — Rapport d'audit — Rapport d'audit — Produit-61 |
 | `Produit-61 - Rapport d'audit - 20260909a.remediation-actions.yaml` | fichier | 57,2 Ko | YAML |
 | `Produit-61 - RETOURS - 20260905a.md` | fichier | 11,6 Ko | Retours forges — Produit-61 — 20260905a |
@@ -467,4 +469,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `UIA - RETOURS - 20260924c.md` | fichier | 3,7 Ko | Retours forges — UIA (Produit-72) — 20260924c |
 | `UIA - RETOURS - 20260924c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_448 fichier(s), 2 sous-dossier(s)_
+_450 fichier(s), 2 sous-dossier(s)_
