@@ -2467,5 +2467,48 @@ check("TF-1284 remède joué : `git rm -r --cached C` puis commit → R-14 et R-
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- R-60 (TF-1678, 14/10/2026) — la cascade d'un produit tient sa chaîne avant la clôture -------
+// Les fixtures sont des produits minimaux : un ledger au premier run_open daté, un référentiel
+// d'exigences, et la cascade (ou son absence). La cascade verte est celle du banc d'oracle-cascade-isto,
+// importée et non recopiée : un format qui change change les deux bancs à la fois.
+const { fixtureVerte: cascadeVerte } = await import("./oracle-cascade-isto.mjs");
+const projet60 = (tsRunOpen, cascade) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r60-"));
+  mkdirSync(join(d, "forge", "etapes", "conception", "cascade"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"), JSON.stringify({ type: "run_open", ts: tsRunOpen }) + "\n", "utf8");
+  writeFileSync(join(d, "forge", "etapes", "conception", "EXIGENCES.json"), JSON.stringify({ exigences: [{ id: "E-001" }, { id: "E-002" }] }), "utf8");
+  if (cascade) writeFileSync(join(d, "forge", "etapes", "conception", "cascade", "CASCADE.json"), JSON.stringify(cascade), "utf8");
+  return d;
+};
+const r60 = (d) => (lanceArgs(d, "--regles", "R-60").rapport.findings || []).find((x) => x.regle === "R-60");
+const attendu60 = (nom, d, statut, motif) => check(nom, () => {
+  try {
+    const f = r60(d);
+    if (!f || f.statut !== statut || (motif && !motif.test(f.message))) throw new Error(`attendu ${statut}, reçu ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+attendu60("R-60 vert : cascade au format commun, chaîne tenue, exigences rattachées → PASS", projet60("2026-10-15T09:00:00Z", cascadeVerte()), "PASS", /2 exigence/);
+{
+  const rompue = cascadeVerte(); rompue.tactiques[0].strategie = "STR-9";
+  attendu60("R-60 rouge : tactique sous une stratégie inconnue → FAIL nommant T2", projet60("2026-10-15T09:00:00Z", rompue), "FAIL", /T2/);
+}
+{
+  const orpheline = cascadeVerte(); orpheline.tactiques[0].exigences = ["E-001"];
+  attendu60("R-60 rouge : une exigence du référentiel rattachée à aucune tactique → FAIL nommant O1", projet60("2026-10-15T09:00:00Z", orpheline), "FAIL", /O1/);
+}
+attendu60("R-60 rouge : produit ouvert après l'entrée de la règle, exigences sans cascade → FAIL", projet60("2026-10-15T09:00:00Z", null), "FAIL", /sans cascade/);
+attendu60("R-60 antériorité : produit ouvert avant le 2026-10-14, sans cascade → SANS_OBJET nommé", projet60("2026-09-05T09:00:00Z", null), "SANS_OBJET", /avant l'entrée/);
+attendu60("R-60 antériorité : cascade au format du produit, ouverte avant le format commun → SANS_OBJET nommé", projet60("2026-09-05T09:00:00Z", { projet: "x", version: "1.1.0" }), "SANS_OBJET", /format du produit/);
+attendu60("R-60 rouge : cascade à un autre format chez un produit ouvert après l'entrée → FAIL nommant F1", projet60("2026-10-15T09:00:00Z", { projet: "x", version: "1.1.0" }), "FAIL", /F1/);
+check("R-60 remède joué : la cascade écrite au gabarit commun lève le refus d'un produit sans cascade (TF-1013)", () => {
+  const d = projet60("2026-10-15T09:00:00Z", null);
+  try {
+    if (r60(d)?.statut !== "FAIL") throw new Error("le cas de départ n'est pas rouge");
+    writeFileSync(join(d, "forge", "etapes", "conception", "cascade", "CASCADE.json"), JSON.stringify(cascadeVerte()), "utf8");
+    const f = r60(d);
+    if (f?.statut !== "PASS") throw new Error(`le remède prescrit ne rend pas R-60 verte : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

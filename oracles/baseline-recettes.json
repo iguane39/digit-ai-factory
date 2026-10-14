@@ -22,6 +22,10 @@
   "cas": 27,
   "vu_le": "2026-10-13"
  },
+ "gabarits/documents/cascade-produit/generateur/generer-vue-cascade.mjs": {
+  "cas": 11,
+  "vu_le": "2026-10-14"
+ },
  "gabarits/documents/construire-guide-socle.test.mjs": {
   "cas": 3,
   "vu_le": "2026-10-02"
@@ -119,6 +123,10 @@
   "cas": 6,
   "vu_le": "2026-09-08"
  },
+ "oracle-cascade-isto.mjs": {
+  "cas": 28,
+  "vu_le": "2026-10-14"
+ },
  "oracle-catalogues.mjs": {
   "cas": 5,
   "vu_le": "2026-08-27"
@@ -140,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 154,
-  "vu_le": "2026-10-13"
+  "cas": 162,
+  "vu_le": "2026-10-14"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -196,6 +204,10 @@
   "cas": 3,
   "vu_le": "2026-10-12"
  },
+ "oracle-fiche-constat-precos.mjs": {
+  "cas": 15,
+  "vu_le": "2026-10-14"
+ },
  "oracle-fraicheur-doc.mjs": {
   "cas": 10,
   "vu_le": "2026-09-22"
@@ -230,8 +242,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-livrable-conseil.mjs": {
-  "cas": 4,
-  "vu_le": "2026-08-26"
+  "cas": 6,
+  "vu_le": "2026-10-14"
  },
  "oracle-modeles-en-service.mjs": {
   "cas": 31,
@@ -327,8 +339,8 @@
   "vu_le": "2026-10-13"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 32,
-  "vu_le": "2026-10-13"
+  "cas": 36,
+  "vu_le": "2026-10-14"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -625,6 +637,10 @@
  "scripts/verifier-bascule.test.mjs": {
   "cas": 8,
   "vu_le": "2026-08-26"
+ },
+ "scripts/verifier-contre-lecture.mjs": {
+  "cas": 9,
+  "vu_le": "2026-10-14"
  },
  "scripts/verifier-droits-accordes.test.mjs": {
   "cas": 13,

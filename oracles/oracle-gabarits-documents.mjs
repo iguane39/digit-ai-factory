@@ -978,6 +978,32 @@ if (args[0] === "--self-test") {
         casse.push("TF-1617 : « Fiche technique », type non déclaré, passe G8 — la famille neuve a élargi la résolution au-delà de ses noms");
     }
 
+    // TF-1640 (14/10/2026) — LA FICHE CONSTAT ET PRÉCONISATIONS SE RÉSOUT PAR SON NOM. Sens VERT : le
+    // nom que la famille prescrit, type en tête de l'Objet, tombe sur elle. Sens ROUGE : le nom des
+    // deux fiches d'origine, sujet en tête (« Couts APR2 - Constat et precos »), ne résout aucune
+    // famille — c'est pourquoi le gabarit prescrit l'ordre, et la règle ne l'avale pas en silence.
+    {
+      const prescrit = g8("Client-A - Constat et precos - Couts hebergement - 20261014a.md");
+      const sujetEnTete = g8("Client-A - Couts APR2 - Constat et precos - 20261012d.md");
+      if (!(prescrit.statut === "PASS" && prescrit.message.includes("fiche-constat-precos")))
+        casse.push(`TF-1640 : « Constat et precos » en tête de l'Objet ne résout pas sa famille — ${prescrit.message.slice(0, 140)}`);
+      if (sujetEnTete.statut !== "FAIL")
+        casse.push("TF-1640 : un nom au sujet en tête passe G8 — la résolution a cessé de lire le type en tête de l'Objet (R-4)");
+    }
+
+    // TF-1679 (14/10/2026) — LA VUE DE LA CASCADE D'UN PRODUIT A SA FAMILLE. Sens VERT : `CASCADE.md`,
+    // le nom que la vue porte chez le produit, résout gd-cascade-produit (le 02/10/2026, sa fiche de
+    // conception avait dû déclarer « famille: aucune »). Sens ROUGE : une restitution qui parle de la
+    // cascade reste une restitution — le type en tête de l'Objet gagne, la famille neuve n'avale rien.
+    {
+      const vue = g8("CASCADE.md");
+      const resto = g8("Produit-X - Restitution cascade du produit - 20261002a.md");
+      if (!(vue.statut === "PASS" && vue.message.includes("cascade-produit")))
+        casse.push(`TF-1679 : la vue CASCADE.md ne résout pas la famille de la cascade du produit — ${vue.message.slice(0, 140)}`);
+      if (!(resto.statut === "PASS" && /« restitution »/.test(resto.message) && !resto.message.includes("cascade-produit")))
+        casse.push(`TF-1679 : une restitution sur la cascade est avalée par la famille neuve — ${resto.message.slice(0, 140)}`);
+    }
+
     // TF-1230 (campagne D-51 (a), 02/10/2026) — LES HUIT FICHIERS docs-projet SONT UNE FAMILLE DU
     // CATALOGUE RÉEL, PAS UN ANGLE MORT. Avant ce correctif, aucune ligne de
     // gabarits/documents/catalogue.jsonl ne les déclarait : ils vivaient sous gabarits/docs-projet/,

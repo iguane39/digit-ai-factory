@@ -96,7 +96,8 @@ y trouve*.
    (forge-data `mesurer_base.py` en lecture seule pour les bases — chaque mesure y archive
    sa CIBLE depuis le 24/08 : profil, entrepôt, hôte et namespace ; forge-audit sur
    mandat pour la gouvernance ; forge-observability pour les sondes). Jugé par
-   `oracles\oracle-livrable-conseil.mjs` (LC1-LC5).
+   `oracles\oracle-livrable-conseil.mjs` (LC1-LC6 ; LC6 : une recommandation qui change une
+   valeur chiffrée du produit cite la décision lue dans son code, TF-1645).
 3. **Recommander (C3)** — directions, solutions, corrections, optimisations : chaque
    recommandation **ancrée aux mesures** du diagnostic (id `M-xx`), alternatives
    fermées, arbitrages assumés. **Un constat juste sans sa conclusion opérationnelle ne

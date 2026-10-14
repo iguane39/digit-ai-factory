@@ -1641,3 +1641,34 @@ parce qu'elle exige une source et une date, non que la phrase soit dans la sourc
 Contrôles exécutables : `oracles\oracle-source-contenu.mjs` (SC1 à SC3, recette
 `oracles\oracle-source-contenu.test.mjs` à double sens) pour le point 1 ; la règle S63 de
 `oracles\oracle-synthese.mjs` pour le point 2, avertissante à son entrée.
+
+## AO. R-60 — la cascade ISTO d'un produit tient sa chaîne avant toute clôture de run (TF-1678, 14/10/2026)
+
+Le fait, mesuré chez Produit-12 le 02/10/2026 : 99 exigences, 8 besoins, 0 stratégie et 0 tactique
+écrites. La loi n° 7 était jouée sur les études (E9, E10) et sur les restitutions (S51), jamais sur
+le produit lui-même. L'humain, le même jour : « ça aurait dû être fait suite directement à ma
+demande, et devra être fait pour les autres futurs produits ». Le format commun de la cascade et son
+juge existent depuis ISTO 2.0.0 (`references\INTENTION.md`) ; le texte disait qu'il se joue « avant
+la clôture », et rien ne le jouait là.
+
+**R-60.**
+1. **Un produit qui a un référentiel d'exigences tient sa cascade** dans
+   `forge\etapes\conception\cascade\CASCADE.json`, au format `pilot/cascade-isto@1` (gabarit
+   `gabarits\CASCADE-ISTO.json`), écrite à l'étape de conception de son run d'ouverture et mise à
+   jour à chaque run de version.
+2. **Avant `run_close`, la source passe `oracles\oracle-cascade-isto.mjs`** avec le référentiel
+   d'exigences : une règle bloquante en échec bloque la clôture, comme R-20.
+3. **Sa vue lisible se génère** par la famille `gd-cascade-produit`
+   (`gabarits\documents\cascade-produit\generateur\generer-vue-cascade.mjs`), jamais à la main.
+4. **L'antériorité est déclarée, jamais rattrapée en silence.** Un produit dont le premier
+   `run_open` précède le 2026-10-14, jour où le format commun a été publié, n'est pas accusé : sa
+   cascade absente, ou écrite à son propre format, est nommée au `non_juge` et s'écrit au prochain
+   run de version. Mesuré le 14/10/2026 sur les 7 produits du poste qui ont un référentiel
+   d'exigences : 1 cascade au format du produit et 6 absentes, tous antérieurs, 0 accusé.
+5. **Ce que R-60 ne juge pas** : que l'intention citée soit la vraie, qu'une tactique serve
+   réellement sa stratégie. Seule la ratification humaine le tranche, et l'oracle exige qu'elle soit
+   tracée (I2).
+
+Contrôle exécutable : la règle R-60 d'`oracles\oracle-conformite-projet.mjs`, rejoué avant
+`run_close` (`references\ETAPES-RUN.md`, étape 1), recette `oracles\self-test.mjs` à double sens
+(8 cas, dont le remède joué).

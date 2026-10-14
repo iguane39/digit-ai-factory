@@ -157,7 +157,8 @@ l'ouverture (socle créé depuis l'état constaté, `.env.example` reconstruit a
 
 **Valider** : `node <pilot>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé avant
 l'étape 2 ; rejouer l'oracle avant `run_close` — **un FAIL R-20 (socle incomplet) bloque la
-clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal). Nommage : tout livrable copié dans
+clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal), **comme un FAIL R-60**
+(la cascade du produit ne tient pas sa chaîne, TF-1678). Nommage : tout livrable copié dans
 `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
 sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre dans `old\`
 du même dossier — **versionné** (C1 tranché le 13/08, TF-0150 ; l'ancien libellé « jamais
@@ -176,7 +177,10 @@ explicitement (cf. `enumere-la-surface`).
 **Cascade ISTO** (loi transverse n° 7, `references\INTENTION.md` 2.0.0) : l'intention est citée
 et **validée avec sa trace** avant la première exigence ; stratégies, tactiques, contraintes et
 non-objectifs vont dans `forge\etapes\conception\cascade\CASCADE.json` (gabarit
-`gabarits\CASCADE-ISTO.json`), chaque exigence rattachée à une tactique et à une seule.
+`gabarits\CASCADE-ISTO.json`), chaque exigence rattachée à une tactique et à une seule. Sa
+vue `forge\etapes\conception\CASCADE.md` se génère par la famille `gd-cascade-produit`
+(`<pilot>\gabarits\documents\cascade-produit\generateur\generer-vue-cascade.mjs`), jamais à la
+main ; la porte R-60 rejoue la source avant `run_close`.
 
 **Valider** : `node <conception>\oracles\oracle-{exigences,tracabilite,surface,claims}.mjs
 <EXIGENCES.json>`, puis `node <pilot>\oracles\oracle-cascade-isto.mjs <CASCADE.json>
@@ -366,6 +370,21 @@ hypothèse — la revue le classe « accepté », pas défaut.
 **Gate généricité rejoué (loi n° 6, TF-0237)** : `oracle-taste.mjs` PASS sur le rendu
 implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la baseline
 (`oracle-baseline.mjs juger`) détecte toute dérive depuis l'approbation de l'étape 3.
+
+**Exploitabilité au volume réel (TF-1654, 14/10/2026).** Une revue jouée sur le seul jeu de
+démonstration ne dit rien de l'écran que l'utilisateur aura. Le 12/10/2026, chez Produit-80, les
+écrans avaient passé la critique d'implémentation, `render_page.py` aux 7 largeurs et plus de
+3 000 tests, tous sur 2 projets de démonstration ; à la première alimentation réelle, une fiche
+mesurait 5 220 px en 4 colonnes déséquilibrées, un écran de complétude 20 630 px, et des valeurs
+machine (`not_assessed`, objets sérialisés) s'affichaient brutes. La revue graphique se **rejoue
+donc sur une instance alimentée au volume réel** (la qualif populée, `ETAPE-MEP.md` § 3 bis), avec
+un contrôle d'exploitabilité mesuré dans le rendu : hauteur de page hors tableau filtrable,
+densité des lignes, valeurs machine visibles, colonnes déséquilibrées, libellés trop longs. Le
+contrôle commun relève de forge-design, part forge de TF-1654 ; en attendant sa livraison, le
+patron est l'oracle écrit par le produit d'origine (`forge\oracles\oracle-exploitabilite.mjs`,
+règles X1 à X5, 9 échecs mesurés sur l'instance alimentée). Le verdict se consigne au ledger
+(`oracles_verdict`) et entre au dossier de MEP ; un écran jugé sur la seule démonstration se
+déclare comme tel, jamais par silence.
 
 ## 6. Étape MEP (portée par le pilot — `ETAPE-MEP.md`)
 

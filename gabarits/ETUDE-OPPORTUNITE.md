@@ -24,7 +24,11 @@ retenait qu'un — TF-0154.)
 elle est reconstruite par l'agent, elle est VALIDÉE par le demandeur avant d'exécuter :
 jouer une étude sur une intention devinée reproduit le défaut fondateur du 01/09/2026.
 Chaque option de la section 4 et le verdict s'y rattachent ; cascade et test rétro :
-`references\INTENTION.md`. Contrôle : E9.>
+`references\INTENTION.md`. Contrôle : E9. Quand l'intention demande la stratégie et la
+tactique d'un PRODUIT, le verdict produit la cascade de ce produit (`CASCADE.json` au gabarit
+`gabarits\CASCADE-ISTO.json`, vue de la famille `gd-cascade-produit`) et non la seule cascade
+de l'étude : le 01/10/2026, une étude commandée en ces mots a écrit la sienne et laissé le
+produit à 0 stratégie et 0 tactique (TF-1678).>
 
 ## 0. Traitement des entrants
 

@@ -1,5 +1,5 @@
 {
-  "_mode_emploi": "Gabarit de la cascade ISTO d'un produit (references/INTENTION.md 2.0.0). Copier sous forge/etapes/conception/cascade/CASCADE.json, remplacer chaque <...>, retirer les clés « _ ». Juge : node <PILOT_ROOT>/oracles/oracle-cascade-isto.mjs <CASCADE.json> --exigences <EXIGENCES.json> --tests <dossier des tests>. Une liste vide vaut « aucun » et se déclare ; une clé omise ne vaut rien.",
+  "_mode_emploi": "Gabarit de la cascade ISTO d'un produit (references/INTENTION.md 2.0.0). Copier sous forge/etapes/conception/cascade/CASCADE.json, remplacer chaque <...>, retirer les clés « _ ». Juge : node <PILOT_ROOT>/oracles/oracle-cascade-isto.mjs <CASCADE.json> --exigences <EXIGENCES.json> --tests <dossier des tests>. Vue lisible : node <PILOT_ROOT>/gabarits/documents/cascade-produit/generateur/generer-vue-cascade.mjs <CASCADE.json> --exigences <EXIGENCES.json> --tests <dossier des tests> --sortie forge/etapes/conception/CASCADE.md (famille gd-cascade-produit), jamais écrite à la main. Avant run_close : R-60 d'oracle-conformite-projet. Une liste vide vaut « aucun » et se déclare ; une clé omise ne vaut rien.",
   "format": "pilot/cascade-isto@1",
   "projet": "<nom du produit>",
   "version": "1.0.0",
