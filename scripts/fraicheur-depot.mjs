@@ -25,8 +25,11 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Jamais de fenêtre d'identifiants (la sonde tourne aussi dans le hook d'ouverture, sans humain devant) :
+// un distant qui en demande une rend un fetch en échec, déclaré, comme dans scripts/installer-projet.mjs.
+const ENV = { ...process.env, GIT_TERMINAL_PROMPT: "0", GCM_INTERACTIVE: "never" };
 const g = (d, ...a) => {
-  const r = spawnSync("git", ["-C", d, ...a], { encoding: "utf8", timeout: 60000 });
+  const r = spawnSync("git", ["-C", d, ...a], { encoding: "utf8", timeout: 60000, env: ENV });
   return { ok: r.status === 0, sortie: (r.stdout || "").trim(), err: (r.stderr || "").trim() };
 };
 
