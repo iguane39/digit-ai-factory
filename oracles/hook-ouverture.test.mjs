@@ -25,6 +25,14 @@ import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const hook = join(ICI, "hook-ouverture.mjs");
+// TF-0957 (bancs isolés) : le hook joué ici touche la chaîne de pseudonymisation (journal du relevé
+// d'héritage, consigne du générateur d'index nommée par TF-1652). Ses tables sont désignées sous un
+// dossier temporaire et VOLONTAIREMENT ABSENTES : jamais celles du canal du poste, et, référentiel
+// manquant, le hook ne journalise pas le relevé des produits jouets dans `todo/HERITAGE-RELEVES.jsonl`,
+// qui est suivi (il le dit : « relevé NON journalisé »). Des tables vides l'y faisaient écrire.
+const TABLES = mkdtempSync(join(tmpdir(), "hook-ouverture-tables-"));
+process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
 const PILOT = join(ICI, "..");
 
 const NL = String.fromCharCode(10);
