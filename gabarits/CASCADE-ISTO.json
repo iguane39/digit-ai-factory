@@ -1,0 +1,65 @@
+{
+  "_mode_emploi": "Gabarit de la cascade ISTO d'un produit (references/INTENTION.md 2.0.0). Copier sous forge/etapes/conception/cascade/CASCADE.json, remplacer chaque <...>, retirer les clés « _ ». Juge : node <PILOT_ROOT>/oracles/oracle-cascade-isto.mjs <CASCADE.json> --exigences <EXIGENCES.json> --tests <dossier des tests>. Une liste vide vaut « aucun » et se déclare ; une clé omise ne vaut rien.",
+  "format": "pilot/cascade-isto@1",
+  "projet": "<nom du produit>",
+  "version": "1.0.0",
+  "date": "AAAA-MM-JJ",
+  "statut": "<proposée | ratifiée le AAAA-MM-JJ (décision)>",
+  "regle": "references/INTENTION.md 2.0.0",
+  "intention": {
+    "citations": [
+      { "texte": "<la demande, dans les MOTS du demandeur>", "source": "<document et section, ou message daté>" }
+    ],
+    "reformulation": "<ce que le demandeur cherche à obtenir, en une phrase>",
+    "validation": {
+      "date": "AAAA-MM-JJ",
+      "par": "<qui a validé : rôle ou nom>",
+      "trace": "<entrée de ledger type intention_validee (seq) ou décision D-N (option)>"
+    }
+  },
+  "parties_prenantes": [
+    { "id": "PP-1", "role": "<demandeur>", "intention": "<ce qu'il cherche>" }
+  ],
+  "arbitrage": "<obligatoire dès deux parties prenantes : quelle intention prime, et ce qui est garanti à l'autre>",
+  "contraintes": [
+    { "id": "C-1", "enonce": "<budget, droit, sécurité, plateforme, délai…>", "source": "<d'où elle vient>" }
+  ],
+  "non_objectifs": [
+    { "id": "N-1", "enonce": "<ce que le produit ne cherche PAS à faire>", "motif": "<pourquoi c'est écarté>" }
+  ],
+  "strategies": [
+    {
+      "id": "STR-1",
+      "effet": "<ce qui devient possible chez l'utilisateur>",
+      "manque": "<le manque constaté qui fonde le besoin, jamais l'offre d'un outil>",
+      "indicateur": {
+        "formule": "<numérateur ÷ dénominateur>",
+        "numerateur": "<ce qu'on compte>",
+        "denominateur": "<sur quoi on le compte>",
+        "source": "<où la mesure se lit>"
+      },
+      "valeur_actuelle": { "valeur": "<x sur y>", "mesuree_le": "AAAA-MM-JJ", "source": "<commande ou écran de mesure>" },
+      "_valeur_actuelle_si_non_mesuree": { "non_mesuree": "<motif : pas encore en service, donnée absente…>" },
+      "cible": "<la cible, par jalons si la valeur de départ est inconnue>"
+    }
+  ],
+  "tactiques": [
+    {
+      "id": "TAC-1",
+      "strategie": "STR-1",
+      "moyen": "<la capacité du produit qui produit l'effet>",
+      "alternative_ecartee": "<l'autre moyen envisagé>",
+      "justification": "<pourquoi celui-ci et pas l'autre>",
+      "source": "<d'où vient la justification>",
+      "statut_justification": "<sourcée | reconstruite>",
+      "exigences": ["E-001"],
+      "autres_elements": [
+        { "id": "ECR-1", "type": "<ecran | composant | test | commande_mep | indicateur_exploitation | controle_securite | flux_donnees | page_referencement | document | autre>", "libelle": "<ce que c'est>" }
+      ]
+    }
+  ],
+  "_retrait": "Un élément retiré garde sa place : « statut »: « retiree » + « motif_retrait » ou « remplacee_par ». Ses enfants actifs deviennent des ruptures (T2) jusqu'à leur rattachement ailleurs ou leur retrait.",
+  "historique": [
+    { "version": "1.0.0", "date": "AAAA-MM-JJ", "niveau": "<I | S | T | O : le plus haut niveau touché>", "resume": "<ce qui change>", "decision": "<D-N (option) ou entrée de ledger>" }
+  ]
+}

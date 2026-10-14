@@ -1,0 +1,79 @@
+{
+  "cible": "gabarits/CASCADE-ISTO.json",
+  "date_iso": "2026-10-03T10:02:57.448Z",
+  "registre_version": "2.35.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 2,
+    "fail": 0,
+    "skip": 5,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\CASCADE-ISTO.json"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\CASCADE-ISTO.json",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\CASCADE-ISTO.json",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\CASCADE-ISTO.json",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Exigences produit : testabilité de l'énoncé",
+      "file": "gabarits\\CASCADE-ISTO.json",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité besoin ↔ exigence ↔ vue (référentiel de conception)",
+      "file": "gabarits\\CASCADE-ISTO.json",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Couverture de la surface fonctionnelle",
+      "file": "gabarits\\CASCADE-ISTO.json",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Affirmations chiffrées d'un référentiel d'exigences",
+      "file": "gabarits\\CASCADE-ISTO.json",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\CASCADE-ISTO.json",
+    "ts": "2026-10-03T10:02:57.447Z",
+    "fichiers": {
+      "gabarits\\CASCADE-ISTO.json": "545c665b17e8a8182fea1c582474df819a8c5e007392e52bcf7a1215d7f726e9"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
