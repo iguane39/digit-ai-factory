@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.29.0",
- "date": "2026-10-02",
+ "version": "1.30.0",
+ "date": "2026-10-14",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -1688,6 +1688,118 @@
    "oracle": "pilot, scripts/verifier-etape-chaine.mjs (EC-4), câblé en TM8 bloquant d'oracles/oracle-trace-mutation-mep.mjs ; banc scripts/verifier-etape-chaine.test.mjs",
    "voisines": [
     "verdict-de-porte-perime-au-lancement"
+   ]
+  },
+  {
+   "cle": "retention-de-versions-sans-borne",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une prescription garde des versions déployées pour le retour arrière sans borner combien restent actives ni prévoir leur ménage : chaque déploiement en laisse une de plus, facturée. Mesuré chez Produit-64 (lot 20261012c) : 100 révisions actives, 34 jours sans qu'aucun oracle le voie.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1638",
+    "TF-1639"
+   ],
+   "regle": "forge-ops, plan azure de scripts/ops.mjs : borne « révisions servies + une N-1 saine », ménage après bascule et ménage périodique prescrits",
+   "oracle": "digit-ai-forge-ops, oracles/oracle-ops.mjs --revisions-actives (O-18), fixtures/o18-revisions-actives rouge et verte, oracles/self-test.mjs",
+   "voisines": [
+    "etape-remise-sur-compilation"
+   ]
+  },
+  {
+   "cle": "declaration-constat-ancree-a-la-ligne",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une déclaration de constat contesté se joint au constat par une clé qui porte un numéro de ligne : dès que le code se décale, la déclaration tombe et le constat revient, au prix d'un audit complet de plus.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1672"
+   ],
+   "regle": "forge-tests, forge_tests/declarations.py : ancre facultative `texte`, rapprochement d'une déclaration orpheline par sa forme sans numéro de ligne, ambiguïtés nommées",
+   "oracle": "digit-ai-forge-tests, tests/test_tf_1672_ancrage_declarations.py (12 cas, 7 rouges sur la version d'avant)",
+   "voisines": [
+    "reglage-projet-ignore-par-la-forge"
+   ]
+  },
+  {
+   "cle": "reglage-projet-ignore-par-la-forge",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un réglage que le projet pose dans le fichier de configuration de la forge n'est pas appliqué, parce que la forge le lit avant de charger ce fichier ou parce que la valeur est fixée dans son code.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1673",
+    "TF-1675"
+   ],
+   "regle": "forge-tests, forge_tests/execution.py : contrat du projet chargé en tête d'exécution, provenance du réglage dite au motif, délai backend réglable (FORGE_TESTS_DELAI_BACKEND_S)",
+   "oracle": "digit-ai-forge-tests, tests/test_tf_1673_trace_du_projet.py et tests/test_tf_1675_delai_backend.py (10 cas rouges sur la version d'avant)",
+   "voisines": [
+    "declaration-constat-ancree-a-la-ligne"
+   ]
+  },
+  {
+   "cle": "exigence-sans-tactique-ni-strategie",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une exigence du référentiel ne remonte à aucune tactique ni stratégie : la cascade Intention > Stratégie > Tactique > Opérationnel du produit n'est vérifiable par aucun contrôle, et elle vit hors du référentiel.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1680"
+   ],
+   "regle": "forge-conception, schema-referentiel.md : champ facultatif `tactique` aligné sur la cascade ISTO 2.0.0 du pilot (cascade/CASCADE.json, pilot/cascade-isto@1)",
+   "oracle": "digit-ai-forge-conception, oracles/oracle-tracabilite.mjs --cascade (règle T6), fixtures cascade-verte et cascade-rouge ; pilot, oracles/oracle-cascade-isto.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "critique-application-connectee-injouable",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "La critique d'implémentation et le rendu réel ne savent juger qu'une page ouverte sans connexion : une application servie derrière une connexion n'est jugée que sur son écran de connexion, et ses matrices d'états sont injouables.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1674"
+   ],
+   "regle": "forge-agents, render_page.py --etat-session et --theme ; forge-design, oracle-exploitabilite.mjs --etat-connexion et --theme dark, détection de uv dans oracles/lib/rendu.mjs",
+   "oracle": "digit-ai-forge-agents, digit-ai-page-html/scripts/self_test.py (banc run_session_et_theme, 9 cas) ; digit-ai-forge-design, oracles/self-test.mjs",
+   "voisines": [
+    "ecran-juge-sur-donnees-de-demonstration"
+   ]
+  },
+  {
+   "cle": "gabarit-de-skill-refuse-par-les-oracles-du-socle",
+   "famille": "page-html-socle",
+   "libelle": "Un gabarit fourni par un skill produit, une fois instancié, une page que les oracles du socle refusent : le produit paie en cycles de correction un défaut qui vient du gabarit (6 cycles mesurés, 62 bloquants).",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1660"
+   ],
+   "regle": "forge-agents, digit-ai-schemas/assets/template-multi-bandes.html : chevauchements déclarés, bride de lecture déclarée, références de conventions-communes.md corrigées",
+   "oracle": "digit-ai-forge-agents, digit-ai-page-html/scripts/self_test.py (run_gabarit_multi_bandes : instance jugée par check_html.py et render_page.py aux 6 largeurs, sens rouge compris)",
+   "voisines": [
+    "ecart-sans-remede-par-ligne"
+   ]
+  },
+  {
+   "cle": "ecart-sans-remede-par-ligne",
+   "famille": "page-html-socle",
+   "libelle": "Un tableau d'écarts dont aucune ligne en statut défavorable ne dit quoi faire passe tous les oracles : le lecteur voit 21 écarts sur 26 lignes et aucune action.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1664"
+   ],
+   "regle": "forge-agents, check_html.py règle L37 (avertissement) : une ligne défavorable porte une colonne d'action renseignée ou un lien vers l'action",
+   "oracle": "digit-ai-forge-agents, check_html.py L37, fixtures l37-ecart-sans-remede (rouge), l37-ecart-avec-remede et l37-ecart-lien-vers-action (vertes), self_test.py",
+   "voisines": [
+    "enumeration-en-prose-sous-le-seuil"
+   ]
+  },
+  {
+   "cle": "enumeration-en-prose-sous-le-seuil",
+   "famille": "page-html-socle",
+   "libelle": "Une cellule de tableau énumère plusieurs faits en prose, séparés par des points-virgules, sous le seuil de la règle des énumérations : elle passe, et le lecteur la déchiffre.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1665"
+   ],
+   "regle": "forge-agents, check_html.py règle L12, branche cellule (avertissement)",
+   "oracle": "digit-ai-forge-agents, check_html.py L12, fixtures l12-cellule-points-virgules (rouge) et l12-cellule-en-puces (verte), self_test.py",
+   "voisines": [
+    "ecart-sans-remede-par-ligne"
    ]
   }
  ],
