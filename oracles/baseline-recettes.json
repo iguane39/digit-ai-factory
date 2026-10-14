@@ -335,8 +335,8 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 149,
-  "vu_le": "2026-10-13"
+  "cas": 157,
+  "vu_le": "2026-10-14"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 36,
@@ -415,8 +415,8 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 44,
-  "vu_le": "2026-10-13"
+  "cas": 48,
+  "vu_le": "2026-10-14"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
