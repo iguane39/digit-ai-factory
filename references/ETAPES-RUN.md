@@ -371,6 +371,21 @@ hypothèse — la revue le classe « accepté », pas défaut.
 implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la baseline
 (`oracle-baseline.mjs juger`) détecte toute dérive depuis l'approbation de l'étape 3.
 
+**Exploitabilité au volume réel (TF-1654, 14/10/2026).** Une revue jouée sur le seul jeu de
+démonstration ne dit rien de l'écran que l'utilisateur aura. Le 12/10/2026, chez Produit-80, les
+écrans avaient passé la critique d'implémentation, `render_page.py` aux 7 largeurs et plus de
+3 000 tests, tous sur 2 projets de démonstration ; à la première alimentation réelle, une fiche
+mesurait 5 220 px en 4 colonnes déséquilibrées, un écran de complétude 20 630 px, et des valeurs
+machine (`not_assessed`, objets sérialisés) s'affichaient brutes. La revue graphique se **rejoue
+donc sur une instance alimentée au volume réel** (la qualif populée, `ETAPE-MEP.md` § 3 bis), avec
+un contrôle d'exploitabilité mesuré dans le rendu : hauteur de page hors tableau filtrable,
+densité des lignes, valeurs machine visibles, colonnes déséquilibrées, libellés trop longs. Le
+contrôle commun relève de forge-design, part forge de TF-1654 ; en attendant sa livraison, le
+patron est l'oracle écrit par le produit d'origine (`forge\oracles\oracle-exploitabilite.mjs`,
+règles X1 à X5, 9 échecs mesurés sur l'instance alimentée). Le verdict se consigne au ledger
+(`oracles_verdict`) et entre au dossier de MEP ; un écran jugé sur la seule démonstration se
+déclare comme tel, jamais par silence.
+
 ## 6. Étape MEP (portée par le pilot — `ETAPE-MEP.md`)
 
 Dockerfile/compose dans le produit, déploiement **staging** réel, `ROLLBACK.md` testé une

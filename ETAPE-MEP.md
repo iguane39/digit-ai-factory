@@ -719,8 +719,16 @@ déployée et auditée comme l'application réelle :
    `.env` local (déclarées en NOMS dans `.env.example`, R-13), et remis à l'humain **par le canal
    de la mission**. Aucune page servie ne les affiche — une qualif est servie sur Internet comme
    la production l'est. `docs\projet\ACCES-TEST.md` nomme ces variables, jamais leurs valeurs.
+7. **Les écrans se rejugent au volume réel** (TF-1654). Le compte peuplé l'est au volume que le
+   produit aura en service, jamais au seul jeu de démonstration ; la revue graphique
+   d'implémentation et le contrôle d'exploitabilité (`references\ETAPES-RUN.md`, étape 5 bis) se
+   rejouent sur lui. Le 12/10/2026, des écrans verts sur 2 projets de démonstration mesuraient
+   5 220 px et 20 630 px à la première alimentation réelle. Quand le volume réel n'est pas
+   disponible avant le GO, le dossier le dit : « écrans jugés sur démonstration, volume réel non
+   éprouvé ».
 
-Le résultat qualif (couverture, non-testables soldés) entre au dossier de MEP.
+Le résultat qualif (couverture, non-testables soldés, exploitabilité au volume réel) entre au
+dossier de MEP.
 
 ## 3 ter. Ressources créées hors IaC, et l'écart de réglages servis (TF-0398, 20/08)
 
