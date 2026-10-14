@@ -190,7 +190,7 @@ try {
       const tombe = join(racine, "digit-ai-forge-tombale");
       mkdirSync(tombe);
       writeFileSync(join(tombe, "PERIME.md"), "# PÉRIMÉ — ne rien exécuter d'ici\n");
-      attendre("marqueur PERIME.md lu même sans dépôt git", lancer(), 0, /mise de côté DÉCLARÉE/);
+      attendre("marqueur PERIME.md lu même sans dépôt git", lancer(), 0, /\[ok\] digit-ai-forge-tombale — mise de côté déclarée/);
       rmSync(tombe, { recursive: true, force: true });
     }
 

@@ -61,7 +61,7 @@ export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(P
   else {
     log("Mise à jour du pilot et des forges, propagation des skills (1 à 3 minutes au premier passage)…");
     // TF-1657 : l'installation sert un projet ; un défaut du parc (canal confidentiel) ne la rend pas incomplète.
-    const bootstrap = () => jouer([process.execPath, join(PILOT, "bootstrap.mjs"), "--pull", "--racine", racine, "--pour-produit"], PILOT);
+    const bootstrap = () => jouer([process.execPath, join(PILOT, "bootstrap.mjs"), "--pull", "--racine", racine, "--pour-produit", "--sous-installateur"], PILOT);
     let b = bootstrap();
     // Un clone NEUF du pilot n'a pas de pre-push (`.git/hooks` ne voyage pas) : bootstrap le dit en
     // H3/H4 avec un remède entièrement mécanique, mesuré le 13/10 sur un poste tiers simulé. Le
@@ -120,7 +120,9 @@ export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(P
     } else {
       const a = node("scripts/adopter-projet-existant.mjs", projet);
       const verdict = (a.out.match(/^verdict : (.*)$/m) || [, ""])[1];
-      nature = "adopté";
+      // 14/10/2026 : « adopté » se relayait en « <projet> est maintenant adopté », phrase vide de sens
+      // pour l'humain. Ce qui s'est passé : le socle de la Factory est posé, l'existant intact.
+      nature = "socle Factory posé, aucun fichier existant modifié";
       ctl("adoption du projet", a.status === 0, verdict || a.out.trim().slice(0, 300),
         `node "${join(PILOT, "scripts", "adopter-projet-existant.mjs")}" "${projet}" et lire son refus`);
     }

@@ -38,7 +38,7 @@ try {
   writeFileSync(join(p1, "README.md"), "# Mon projet\n");
   const avant = { app: empreinte(join(p1, "src", "app.js")), readme: empreinte(join(p1, "README.md")) };
   const r1 = installer({ projet: p1, sansBootstrap: true });
-  att(r1.nature === "adopté", `projet existant : nature « adopté » attendue, lu « ${r1.nature} »`);
+  att(r1.nature.startsWith("socle Factory posé"), `projet existant : nature « socle Factory posé… » attendue, lu « ${r1.nature} »`);
   att(ctl(r1, "adoption du projet")?.ok === true, "projet existant : adoption verte");
   att(empreinte(join(p1, "src", "app.js")) === avant.app && empreinte(join(p1, "README.md")) === avant.readme, "projet existant : un fichier d'avant a changé");
   att(existsSync(join(p1, ".git")), "projet existant : dépôt git local non créé");
