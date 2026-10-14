@@ -1,10 +1,12 @@
 # ISTO — la cascade de l'intention : Intention → Stratégie → Tactique → Opération
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.0.0, 03/10/2026** (ISTO devient
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.1.0, 14/10/2026** (la cascade du
+produit est rejouée avant la clôture par R-60 et sa vue a sa famille, `gd-cascade-produit` ;
+TF-1678, TF-1679 ; précédente : 2.0.0, 03/10/2026, ISTO devient
 contrôlable : format commun de cascade et son oracle, indicateurs structurés, validation tracée de
 l'intention, grille de profondeur, propagation des changements, contraintes et non-objectifs,
 phases transverses ; décision humaine « 1b » du 03/10/2026 sur le diagnostic des huit manques ;
-précédentes : 1.2.0, 03/10/2026, le nom ISTO et le tableau par phase ; 1.1.0, 20/09/2026, le
+antérieures : 1.2.0, 03/10/2026, le nom ISTO et le tableau par phase ; 1.1.0, 20/09/2026, le
 contrôle s'étend aux restitutions, S51 ; 1.0.0, 01/09/2026). Porté par la
 **loi transverse n° 7** du noyau ; né du retour humain du 01/09/2026 (TF-0791) et décidé le
 même jour (D-2, option a).
@@ -183,7 +185,13 @@ servie, tactique justifiée avec son alternative, rattachée et opérée, exigen
 tactique et à une seule, historique versionné avec le niveau touché, retrait motivé. Il mesure
 sans bloquer : cibles à fixer (M1), justifications reconstruites (M2), exigences qu'aucun test
 ne cite (M3), stratégies non mesurées (M4). Il se joue à la sortie de la conception, à chaque
-run de version et avant la clôture.
+run de version et avant la clôture ; avant la clôture, c'est la règle R-60 de
+`oracles\oracle-conformite-projet.mjs` qui le rejoue et bloque (`REGLES-PROJET.md`, TF-1678).
+
+La vue lisible se génère par la famille `gd-cascade-produit` de la bibliothèque de documents
+(`gabarits\documents\cascade-produit\`) : six parties, dont un test rétro qui est le verdict de
+l'oracle rejoué à la génération, et un `--verifier` qui refuse une vue retouchée à la main
+(TF-1679).
 
 ## Profondeur — proportionnée à la demande
 
@@ -257,6 +265,8 @@ question se pose toujours : *le résultat sert-il l'intention, ou la lettre ?*
 - **Cascade d'un produit** (depuis le 03/10/2026, 2.0.0) : `oracles\oracle-cascade-isto.mjs`
   — la chaîne structurelle de bout en bout, la validation tracée, les indicateurs, l'historique
   (section « Le format commun de la cascade »). Gabarit porteur : `gabarits\CASCADE-ISTO.json`.
+  Avant la clôture d'un run : R-60 d'`oracles\oracle-conformite-projet.mjs` (TF-1678). Vue :
+  famille `gd-cascade-produit`, `generer-vue-cascade.mjs --verifier` (TF-1679).
 - **Le fond n'est pas mécanisable** et c'est déclaré : aucun oracle ne mesure qu'une
   remontée est *juste*, ni qu'une intention citée est *la vraie*. La validation de
   l'intention par l'utilisateur (niveau 1) est le seul contrôle du fond — humaine, et tracée

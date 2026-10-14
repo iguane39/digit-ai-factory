@@ -157,7 +157,8 @@ l'ouverture (socle créé depuis l'état constaté, `.env.example` reconstruit a
 
 **Valider** : `node <pilot>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé avant
 l'étape 2 ; rejouer l'oracle avant `run_close` — **un FAIL R-20 (socle incomplet) bloque la
-clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal). Nommage : tout livrable copié dans
+clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal), **comme un FAIL R-60**
+(la cascade du produit ne tient pas sa chaîne, TF-1678). Nommage : tout livrable copié dans
 `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
 sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre dans `old\`
 du même dossier — **versionné** (C1 tranché le 13/08, TF-0150 ; l'ancien libellé « jamais
@@ -176,7 +177,10 @@ explicitement (cf. `enumere-la-surface`).
 **Cascade ISTO** (loi transverse n° 7, `references\INTENTION.md` 2.0.0) : l'intention est citée
 et **validée avec sa trace** avant la première exigence ; stratégies, tactiques, contraintes et
 non-objectifs vont dans `forge\etapes\conception\cascade\CASCADE.json` (gabarit
-`gabarits\CASCADE-ISTO.json`), chaque exigence rattachée à une tactique et à une seule.
+`gabarits\CASCADE-ISTO.json`), chaque exigence rattachée à une tactique et à une seule. Sa
+vue `forge\etapes\conception\CASCADE.md` se génère par la famille `gd-cascade-produit`
+(`<pilot>\gabarits\documents\cascade-produit\generateur\generer-vue-cascade.mjs`), jamais à la
+main ; la porte R-60 rejoue la source avant `run_close`.
 
 **Valider** : `node <conception>\oracles\oracle-{exigences,tracabilite,surface,claims}.mjs
 <EXIGENCES.json>`, puis `node <pilot>\oracles\oracle-cascade-isto.mjs <CASCADE.json>

@@ -57,7 +57,7 @@ import { join, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const VERSION = "1.0.0";
-const FORMAT = "pilot/cascade-isto@1";
+export const FORMAT = "pilot/cascade-isto@1";
 const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/;
 const SEMVER = /^\d+\.\d+\.\d+$/;
 const NIVEAUX = ["I", "S", "T", "O"];
@@ -224,7 +224,7 @@ const NON_JUGE = [
   "la COUVERTURE par les tests : M3 lit l'identifiant dans le texte des tests — citée n'est pas testée",
 ];
 
-function lireTestsCites(dossier, motif) {
+export function lireTestsCites(dossier, motif) {
   const re = new RegExp(motif, "g");
   const cites = new Set();
   const parcourir = (d) => {
