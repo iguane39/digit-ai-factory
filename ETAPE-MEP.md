@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-14 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-15 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -246,6 +246,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-12 | **Scripts qui accordent un droit** | **si et seulement si** le produit porte un script ou une chaîne qui accorde un droit, ou qui nomme une permission Microsoft Graph. Chaque identifiant de permission Graph est celui de la table officielle datée, sous son nom et son type ; l'échec d'un octroi reste visible ; l'effet est relu dans la plateforme avant d'être annoncé. Contrôle exécutable : `node scripts\verifier-droits-accordes.mjs <produit>`, joué en TM7 par `oracle-trace-mutation-mep` — § 3 octies, TF-1497 |
 | M-13 | **Étapes de chaîne** | **si et seulement si** la chaîne du produit crée un objet d'annuaire, touche à `az webapp auth` ou écrit dans la plateforme. Un objet créé se lit avant d'être complété ; l'authentification se lit et s'écrit par l'API `authsettingsV2` ; le dossier porte la section « Étapes de chaîne remises à l'exploitant » (exécuté hors production et daté, écritures à blanc avec leur différence, branches que seule la production exécute). Contrôle exécutable : `node scripts\verifier-etape-chaine.mjs <produit>`, joué en TM8 par `oracle-trace-mutation-mep` ; sondage du formulaire Entra : `scripts\verifier-formulaire-entra.mjs` — § 3 decies, TF-1519, TF-1543, TF-1546 à TF-1549 |
 | M-14 | **Parcours tiers embarqués** (AVERTISSEMENT, règle neuve du 13/10/2026) | **si et seulement si** le produit embarque un parcours tiers qui engage l'utilisateur : un cadre intégré, une directive `frame-src`, `child-src` ou `form-action`, ou l'adresse d'une passerelle de paiement ou de réservation. Le dossier de MEP porte la section « Parcours tiers embarqués » : chaque tiers nommé, la vérification **jouée dans un navigateur** à une date, sur **l'état exécuté** (DOM après chargement) et non sur le HTML servi, et l'étape atteinte, « jusqu'à l'étape qui encaisse » ou « à confirmer » quand seul un paiement réel tranche. Contrôle exécutable : `node scripts\verifier-parcours-tiers.mjs <produit>`, joué en TM9 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 undecies, TF-1583 |
+| M-15 | **Contre-lecture d'un plan voté** (AVERTISSEMENT, règle neuve du 14/10/2026) | **si et seulement si** le dossier fait voter ou approuver un plan (d'infrastructure, de migration, de production) avant un geste irréversible. La section « Contre-lecture » lit les **paramètres de l'exécution** qui a produit le plan, chacun avec sa valeur à l'exécution, l'endroit où elle a été lue, la valeur attendue et sa référence (fiche ou décision) ; chaque écart est tranché ; une ligne « Non comparé : … » dit ce qu'elle ne compare pas. Contrôle exécutable : `node scripts\verifier-contre-lecture.mjs <produit>`, joué en TM10 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 duodecies, TF-1681 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -645,6 +646,51 @@ le contrôle exige la déclaration, sa date, son lieu et son objet, il ne rejoue
 est le banc du produit. Un cadre dont l'adresse se construit à l'exécution. Une passerelle absente de
 la donnée datée, reconnue par le seul vocabulaire du parcours. La fraîcheur de la vérification par
 rapport au dernier changement du produit.
+
+### § 3 duodecies — Une contre-lecture qui autorise un geste irréversible compare les paramètres de lancement à la fiche (M-15, TF-1681)
+
+**Le fait, du 28 au 30/09/2026 chez Produit-03.** Le 28/09, la décision D-54 (a) fixe à 11 le seuil
+de créations de la chaîne d'infrastructure, pour que la chaîne refuse d'elle-même un plan fautif. Le
+29/09 à 10h02, la relance de production tourne avec `seuilCreations` à 12. Le plan comptait
+11 créations : sans effet ce jour-là. La contre-lecture de la session avait lu le plan seul, et rien
+dans la méthode ne lui demandait de comparer les paramètres saisis par l'exploitant à la fiche.
+Relus après coup dans l'API de la chaîne : 12 pour les exécutions du 28 et du 29/09, 1 et 0 pour les
+deux suivantes. Trois votes de production avaient été donnés sur cette contre-lecture (lot
+`Produit-03 - RETOURS - 20261002e`, RA-77). La règle S55 de la restitution exige qu'un feu vert dise
+ce qu'il ne vérifie pas ; elle ne dit pas que les paramètres de lancement font partie de ce qu'on
+vérifie.
+
+**La règle.** Toute contre-lecture qui autorise un geste irréversible lit, en plus de l'artefact
+jugé, les paramètres de l'exécution qui l'a produit. Elle les compare à la valeur écrite dans la
+fiche de mise en production ou dans la décision, tranche chaque écart, et publie ce qu'elle ne
+compare pas.
+
+**La forme, au dossier de MEP** :
+
+```
+## Contre-lecture du plan
+
+| Paramètre | Valeur à l'exécution | Lue où | Valeur attendue | Référence | Concorde |
+|---|---|---|---|---|---|
+| seuilCreations | 12 | API de la chaîne, exécution 15452 | 11 | décision D-54 (a) | non — exécution annulée, relancée à 11 |
+
+Non comparé : les variables de la bibliothèque de la chaîne, que l'exécution ne publie pas.
+```
+
+**Le contrôle exécutable.** `node scripts\verifier-contre-lecture.mjs <produit> [--document <fichier.md>]`
+lit chaque `DOSSIER-MEP*.md`. Un dossier qui fait voter ou approuver un plan porte la section (CL-0) ;
+chaque paramètre porte sa valeur à l'exécution, sa source et sa valeur attendue (CL-1) ; la
+concordance dit `oui`, ou `non` suivi de ce qui a été fait de l'écart (CL-2) ; la ligne « Non
+comparé » est remplie (CL-3). L'oracle de l'étape le joue en TM10 et le rend en **AVERTISSEMENT** :
+règle neuve, elle entre sans bloquer (précédent D-70 (b)). Mesuré le 14/10/2026 sur les 6 dossiers
+de MEP du poste : aucun ne fait voter un plan, 0 accusé. Joué par `--document` sur la procédure de
+mise en production de Produit-03, il rend CL-0 : la contre-lecture y est écrite en prose, sans
+tableau des paramètres.
+
+**Hors jugement, et c'est dit.** La vérité des valeurs recopiées : le contrôle ne relit pas l'API de
+la chaîne. La complétude de la liste des paramètres : un paramètre absent du tableau relève de la
+ligne « Non comparé ». Un vote de plan dit en d'autres mots que « vote », « voter », « approbation »
+ou « approuver » à côté de « plan ».
 
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 

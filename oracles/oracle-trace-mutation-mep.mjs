@@ -50,6 +50,10 @@
  *        bout en bout, dans un navigateur, sur l'état exécuté, jusqu'à l'étape qui encaisse, et le
  *        dossier porte la section « Parcours tiers embarqués » — AVERTISSEMENT (M-14, TF-1583), câblé
  *        sur `scripts\verifier-parcours-tiers.mjs`.
+ *   TM10 un dossier qui fait voter ou approuver un plan porte une contre-lecture qui compare les
+ *        PARAMÈTRES de l'exécution qui a produit le plan à la fiche ou à la décision, tranche chaque
+ *        écart et publie ce qu'elle ne compare pas — AVERTISSEMENT (M-15, TF-1681), câblé sur
+ *        `scripts\verifier-contre-lecture.mjs`. Règle neuve du 14/10/2026 : même doctrine que TM9.
  *
  * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
  * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
@@ -247,6 +251,18 @@ function confronterParcoursTiers(racine) {
   return { statut: "AVERTISSEMENT", message: "règle neuve du 13/10/2026, non bloquante (précédent D-70 (b)) — " + r.message };
 }
 
+/**
+ * TM10 — la contre-lecture d'un plan voté lit les paramètres de lancement et les compare à la fiche
+ * (M-15, TF-1681). AVERTISSEMENT : règle neuve du 14/10/2026, le refus du verbe est rendu sans bloquer.
+ */
+function confronterContreLecture(racine) {
+  const r = confronterVerbe(racine, "verifier-contre-lecture.mjs", "M-15",
+    (j) => `${(j.mesure || {}).parametres || 0} paramètre(s) de lancement lus à l'exécution et comparés à la fiche, `
+      + `${(j.mesure || {}).ecarts_traites || 0} écart(s) tranché(s), non-comparé publié`);
+  if (r.statut !== "FAIL") return r;
+  return { statut: "AVERTISSEMENT", message: "règle neuve du 14/10/2026, non bloquante (précédent D-70 (b)) — " + r.message };
+}
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -342,6 +358,9 @@ export function juger(racine) {
   // TM9 — les parcours tiers embarqués du produit, jugés ensemble avec son dossier par le verbe.
   const pt = confronterParcoursTiers(racine);
   findings.push({ regle: "TM9", statut: pt.statut, ou: racine, message: pt.message });
+  // TM10 — les contre-lectures de plan des dossiers du produit, jugées ensemble par le verbe.
+  const cl = confronterContreLecture(racine);
+  findings.push({ regle: "TM10", statut: cl.statut, ou: racine, message: cl.message });
   return findings;
 }
 
@@ -362,6 +381,9 @@ const NON_JUGE = [
   + "faire réparer apprend à être contourné",
   "la VÉRACITÉ du parcours déclaré joué (TM9) : le verbe exige la section, sa date, son lieu (un navigateur) et "
   + "son objet (l'état exécuté) ; il ne rejoue pas le clic, et TM9 AVERTIT sans bloquer — règle neuve du 13/10/2026",
+  "la VÉRITÉ des paramètres recopiés à la contre-lecture (TM10) : le verbe exige la valeur à l'exécution, sa source, la "
+  + "valeur attendue et sa référence, il ne relit pas l'API de la chaîne ; un vote de plan dit en d'autres mots n'est pas "
+  + "vu, et TM10 AVERTIT sans bloquer — règle neuve du 14/10/2026",
   "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
   + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
 ];
@@ -569,6 +591,27 @@ function selfTest() {
     if (!/TM9/.test(r.stdout) || !/Parcours tiers embarqués/.test(r.stdout)) casse.push("TM9 n'apparaît pas au verdict JSON — un avertissement que personne ne lit n'est pas un avertissement");
   }
 
+  // ---- TM10 : LA CONTRE-LECTURE D'UN PLAN VOTÉ (M-15, TF-1681) -----------------------------------
+  // Le cas fondateur du 29/09/2026, réduit à son fait : un plan soumis au vote, une contre-lecture qui
+  // n'a lu que le plan, un paramètre de lancement à 12 quand la décision disait 11.
+  const VOTE_PLAN = `${DOSSIER_OK}\nLe plan d'infrastructure est soumis au vote de l'exploitant avant application : 11 créations.\n`;
+  const CONTRE_LECTURE = `${VOTE_PLAN}\n## Contre-lecture du plan\n\n| Paramètre | Valeur à l'exécution | Lue où | Valeur attendue | Référence | Concorde |\n`
+    + "|---|---|---|---|---|---|\n| seuilCreations | 12 | API de la chaîne, exécution 15452 | 11 | décision D-54 (a) | non — exécution annulée, relancée à 11 |\n\n"
+    + "Non comparé : les variables de la bibliothèque de la chaîne, que l'exécution ne publie pas.\n";
+  // SANS OBJET : aucun plan voté, aucune contre-lecture.
+  attendre("tm10-sans-objet", join(dir, "vert"), "TM10", "SANS_OBJET");
+  // VERT : le paramètre lu à l'exécution, comparé à la décision, l'écart tranché, le non-comparé publié.
+  attendre("tm10-remede", produit("tm10-remede", CONTRE_LECTURE, MARQUEUR), "TM10", "PASS");
+  // ROUGE : le cas fondateur — un plan voté sans contre-lecture des paramètres.
+  const muetPlan = produit("tm10-muet", VOTE_PLAN, MARQUEUR);
+  attendre("tm10-muet", muetPlan, "TM10", "AVERTISSEMENT");
+  // ET IL N'EST PAS BLOQUANT : règle neuve, sortie 0.
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), muetPlan], { encoding: "utf8" });
+    if (r.status !== 0) casse.push("un plan voté sans contre-lecture fait sortir l'oracle en échec — TM10 devait AVERTIR, règle neuve du 14/10/2026");
+    if (!/TM10/.test(r.stdout) || !/Contre-lecture/.test(r.stdout)) casse.push("TM10 n'apparaît pas au verdict JSON — un avertissement que personne ne lit n'est pas un avertissement");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -578,7 +621,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 32/32 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 36/36 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -595,7 +638,10 @@ function selfTest() {
       + "avant d'être complété PASS ; TM8 fiche écrite aussitôt créée et az webapp auth FAIL — le cas fondateur "
       + "du 01/10/2026 ; TM8 bloque, code de sortie 1 vérifié ; TM9 sans parcours tiers embarqué SANS_OBJET ; TM9 parcours "
       + "nommé, joué dans un navigateur sur l'état exécuté et étape déclarée PASS ; TM9 dossier muet sur un parcours de "
-      + "paiement embarqué AVERTISSEMENT — le cas fondateur du 25/08/2026 ; TM9 ne bloque PAS, code de sortie 0 vérifié)");
+      + "paiement embarqué AVERTISSEMENT — le cas fondateur du 25/08/2026 ; TM9 ne bloque PAS, code de sortie 0 vérifié ; "
+      + "TM10 sans plan voté SANS_OBJET ; TM10 paramètre lu à l'exécution, écart tranché et non-comparé publié PASS ; TM10 cas "
+      + "rouge — plan voté sans contre-lecture des paramètres — rendu en AVERTISSEMENT, le cas fondateur du 29/09/2026 ; "
+      + "TM10 ne bloque PAS, code de sortie 0 vérifié)");
   return casse.length ? 1 : 0;
 }
 
