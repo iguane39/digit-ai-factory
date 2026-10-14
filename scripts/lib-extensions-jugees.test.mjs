@@ -8,10 +8,11 @@
  * Le module doit donc ARRÊTER, jamais se replier.
  * Joué par `oracles\self-tests.mjs`.
  */
-import { mkdtempSync, writeFileSync, rmSync, readFileSync, copyFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, copyFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import { livrablesPorteurs, texteBalaye, versionReferentiel, CHEMIN_REFERENTIEL } from "./lib-extensions-jugees.mjs";
 
 const casse = [];
@@ -37,19 +38,35 @@ for (const e of [...porteurs, ...texte]) {
 // ── SENS ROUGE : un référentiel illisible, vide ou amputé ARRÊTE le lecteur ─────────────────
 // Joué dans un processus séparé : le module met sa lecture en cache, et un cache chaud masquerait
 // exactement le défaut qu'on cherche.
+//
+// TF-1690 (14/10/2026) : les référentiels fautifs s'écrivent dans une COPIE de l'arborescence, sous le
+// dossier temporaire — `scripts\lib-extensions-jugees.mjs` copié à côté d'un `references\` jetable,
+// puisque le module lit son référentiel relativement à lui-même. Écrits sur le VRAI référentiel puis
+// remis, ils faisaient lire un référentiel faux à toute session qui travaillait sur le dépôt pendant
+// le passage, et un arrêt du banc au milieu l'aurait laissé abîmé.
 const dossier = mkdtempSync(join(tmpdir(), "ext-jugees-"));
-const sauvegarde = join(dossier, "reel.json");
-copyFileSync(CHEMIN_REFERENTIEL, sauvegarde);
-const mien = new URL(import.meta.url).pathname;
+mkdirSync(join(dossier, "scripts"));
+mkdirSync(join(dossier, "references"));
+copyFileSync(new URL("./lib-extensions-jugees.mjs", import.meta.url), join(dossier, "scripts", "lib-extensions-jugees.mjs"));
+const referentielCopie = join(dossier, "references", "EXTENSIONS-JUGEES.json");
+const reelAvant = readFileSync(CHEMIN_REFERENTIEL);
 const essai = (contenu, quoi) => {
-  writeFileSync(CHEMIN_REFERENTIEL, contenu, "utf8");
+  writeFileSync(referentielCopie, contenu, "utf8");
   const r = spawnSync(process.execPath, ["-e",
-    `import(${JSON.stringify(new URL("./lib-extensions-jugees.mjs", import.meta.url).href)})`
+    `import(${JSON.stringify(pathToFileURL(join(dossier, "scripts", "lib-extensions-jugees.mjs")).href)})`
     + `.then((m) => { m.livrablesPorteurs(); process.exit(0); }).catch(() => process.exit(3));`],
     { encoding: "utf8" });
   veut(r.status === 3, `${quoi} : le module n'a pas arrêté (code ${r.status})`);
 };
 try {
+  // Témoin : la copie, garnie du VRAI référentiel, se lit — sans quoi les quatre arrêts ci-dessous
+  // pourraient venir d'une copie mal posée et non du contenu fautif.
+  writeFileSync(referentielCopie, reelAvant);
+  const temoin = spawnSync(process.execPath, ["-e",
+    `import(${JSON.stringify(pathToFileURL(join(dossier, "scripts", "lib-extensions-jugees.mjs")).href)})`
+    + `.then((m) => { m.livrablesPorteurs(); process.exit(0); }).catch(() => process.exit(3));`],
+    { encoding: "utf8" });
+  veut(temoin.status === 0, `la copie garnie du référentiel réel ne se lit pas (code ${temoin.status}) — les arrêts du sens rouge ne prouveraient rien`);
   essai("{ ceci n'est pas du json", "référentiel illisible");
   essai(JSON.stringify({ roles: {} }), "référentiel sans aucun rôle");
   essai(JSON.stringify({ roles: { livrables_porteurs: { extensions: [] }, texte_balaye: { extensions: [".md"] } } }),
@@ -57,19 +74,18 @@ try {
   essai(JSON.stringify({ roles: { livrables_porteurs: { extensions: [".md"] } } }),
         "rôle du balayage de texte absent");
 } finally {
-  writeFileSync(CHEMIN_REFERENTIEL, readFileSync(sauvegarde, "utf8"), "utf8");
   rmSync(dossier, { recursive: true, force: true });
 }
 
-// Le référentiel est rendu à l'identique : un banc qui abîme sa source n'est pas un banc.
-veut(readFileSync(CHEMIN_REFERENTIEL, "utf8").includes("pilot/extensions-jugees@1"),
-     "le référentiel n'a PAS été rendu à l'identique après le sens rouge");
+// Le VRAI référentiel n'a pas été touché : un banc qui écrit dans sa source n'est pas un banc.
+veut(Buffer.compare(readFileSync(CHEMIN_REFERENTIEL), reelAvant) === 0,
+     "le référentiel réel a été modifié par le sens rouge — le banc doit travailler sur sa copie");
 
 if (casse.length) {
-  console.log(`Self-test extensions-jugees : ${11 - casse.length}/11 PASS · CASSE : ${casse.join(" · ")}`);
+  console.log(`Self-test extensions-jugees : ${12 - casse.length}/12 PASS · CASSE : ${casse.join(" · ")}`);
   process.exit(1);
 }
-console.log("Self-test extensions-jugees : 11/11 PASS (le référentiel réel se lit et se date ; `.pdf` "
+console.log("Self-test extensions-jugees : 12/12 PASS (le référentiel réel se lit et se date ; `.pdf` "
   + "compté et `.png` écarté ; le balayage de texte plus large que les livrables ; et les QUATRE sens "
   + "rouges — illisible, sans rôle, rôle vide, rôle absent — ARRÊTENT le lecteur au lieu de rendre une "
-  + "liste vide, parce qu'un balayage qui ne cherche rien rend un vert)");
+  + "liste vide, parce qu'un balayage qui ne cherche rien rend un vert ; joués sur une COPIE témoin qui se lit, le vrai référentiel jamais écrit)");
