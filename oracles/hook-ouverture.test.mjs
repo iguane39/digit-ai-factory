@@ -261,5 +261,65 @@ check(`TF-1635 — tout hook SessionStart synchrone du pilot et du gabarit produ
   if (rouge.length !== 1) throw new Error("sens rouge : un hook synchrone à 120 s n'est pas refusé");
 });
 
+// ---- TF-1636 (14/10/2026) : LES GATES EN TÊTE, ET UN BUDGET DE CONTEXTE MESURÉ ---------------
+// Le 13/10, le harnais a coupé le relevé à 2 Ko et les gates, en dernière section, n'ont pas atteint
+// l'assistant. Vert : dans le contexte réel du pilot, les gates précèdent toute section de taille
+// variable, et le contexte tient dans le budget mesuré. Rouge : un relevé gonflé au-delà du budget est
+// borné par le hook lui-même, les gates gardés, les sections retirées NOMMÉES.
+const { borner, BUDGET_CONTEXTE_ASYNC, PLAFONDS_MESURES } = await import(new URL("./lib-budget-contexte.mjs", import.meta.url));
+check(`TF-1636 vert — le contexte réel du pilot tient dans le budget (${BUDGET_CONTEXTE_ASYNC} car., plafond asynchrone prouvé ${PLAFONDS_MESURES.asynchrone_json.recu_entier_au_moins}) et les gates précèdent les sections variables`, () => {
+  const ctx = JSON.parse(sortieJson).hookSpecificOutput.additionalContext;
+  if (ctx.length > BUDGET_CONTEXTE_ASYNC) throw new Error(`${ctx.length} caractères, au-delà du budget`);
+  const titres = ctx.split(NL).filter((l) => /^## /.test(l));
+  const iGates = titres.findIndex((t) => /Gates actifs dans cette session/.test(t));
+  if (iGates < 0 || iGates > 2) throw new Error(`gates en position ${iGates} parmi ${titres.length} sections`);
+  console.log(`    (mesure : contexte du pilot sans tirage = ${ctx.length} caractères, ${titres.length} sections)`);
+});
+check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gates gardés, sections omises nommées, budget tenu", () => {
+  const tete = ["## Relevé d'ouverture", "", "## Gates actifs dans cette session (R-44)", "- règle de session", ""];
+  const corps = []; for (let i = 0; i < 30; i++) corps.push("", `## Section variable ${i}`, "x".repeat(3000));
+  const r = borner([...tete, ...corps], BUDGET_CONTEXTE_ASYNC, tete.length, "renvoi");
+  const t = r.lignes.join(NL);
+  if (!r.tronque) throw new Error("un relevé de 90 000 caractères n'est pas borné");
+  if (t.length > BUDGET_CONTEXTE_ASYNC) throw new Error(`borné à ${t.length}, au-delà du budget`);
+  if (!t.includes("## Gates actifs dans cette session (R-44)")) throw new Error("les gates ont été retirés");
+  if (!/Relevé TRONQUÉ par le hook lui-même/.test(t) || !/Section variable 29/.test(t.split("Relevé TRONQUÉ")[1])) throw new Error("les sections omises ne sont pas nommées");
+  if (borner(tete, BUDGET_CONTEXTE_ASYNC, 2).tronque) throw new Error("un relevé court est borné à tort");
+});
+
+// ---- TF-1635 (c) (14/10/2026) : UN GESTE FAIT AVANT LA FIN DU RELEVÉ SE DÉCLARE ---------------
+// Le relevé asynchrone peut arriver après le premier échange. Le hook relit la transcription de la
+// session (chemin reçu sur son entrée) et déclare en tête les appels d'outil faits depuis son propre
+// démarrage, avec une trace locale dans les métadonnées git du dépôt ouvert. Rouge : un appel ANTÉRIEUR
+// au démarrage du relevé (session reprise) n'est pas déclaré ; une session sans geste ne reçoit rien.
+{
+  const { gestesDansFenetre } = await import(new URL("./lib-gestes-avant-releve.mjs", import.meta.url));
+  const P = mkdtempSync(join(tmpdir(), "ouverture-gestes-"));
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const tr = join(P, "transcript.jsonl");
+  const entree = (ts, nom) => JSON.stringify({ type: "assistant", timestamp: new Date(ts).toISOString(), message: { content: [{ type: "tool_use", name: nom, input: {} }] } });
+  const t0 = Date.now();
+  writeFileSync(tr, [entree(t0 - 60000, "Read"), entree(t0 + 1200, "Bash")].join(NL) + NL, "utf8");
+  const sortie = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT, "--contexte-json"],
+    { cwd: P, encoding: "utf8", timeout: 120000, input: JSON.stringify({ session_id: "s-test", transcript_path: tr }) });
+  const duree = Date.now() - t0;
+  const ctx = JSON.parse(sortie).hookSpecificOutput.additionalContext;
+  check("TF-1635 (c) rouge → vert — un appel d'outil fait pendant le relevé est déclaré en tête, l'appel antérieur au relevé ne l'est pas", () => {
+    if (duree < 1300) throw new Error(`relevé rendu en ${duree} ms, avant l'horodatage du geste témoin : cas non probant`);
+    if (!/## Gestes faits AVANT la fin de ce relevé \(TF-1635\) : 1\b/.test(ctx)) throw new Error("le geste fait pendant le relevé n'est pas déclaré (ou l'appel antérieur est compté)");
+    if (!/\(Bash\)/.test(ctx)) throw new Error("l'outil du geste n'est pas nommé");
+    if (ctx.indexOf("Gestes faits AVANT") > ctx.indexOf("## Gates actifs")) throw new Error("la déclaration ne précède pas les gates");
+  });
+  check("TF-1635 (c) — la trace locale est écrite dans les métadonnées git du dépôt ouvert, rien de suivi", () => {
+    const f = join(P, ".git", "digit-ai-gestes-avant-releve.jsonl");
+    if (!existsSync(f) || !/"outil":"Bash"/.test(readFileSync(f, "utf8"))) throw new Error("trace locale absente");
+  });
+  check("TF-1635 (c) sens rouge — fenêtre sans geste : aucune déclaration ; transcription illisible : aucune erreur", () => {
+    if (gestesDansFenetre(readFileSync(tr, "utf8"), t0 + 5000, t0 + 9000).length) throw new Error("un geste hors fenêtre est compté");
+    if (gestesDansFenetre("pas du json\n{\"tool_use\":1}", 0, Date.now()).length) throw new Error("une ligne illisible produit un geste");
+    if (/Gestes faits AVANT/.test(JSON.parse(sortieJson).hookSpecificOutput.additionalContext)) throw new Error("un relevé sans transcription déclare des gestes");
+  });
+}
+
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

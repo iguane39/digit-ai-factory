@@ -355,6 +355,26 @@ try {
     }
   }
 
+  // ── TF-1657 — UN DÉFAUT DU PARC NE REND PAS LE POSTE « NON PRÊT » POUR UN PRODUIT ───────────
+  // Un canal confidentiel présent mais en défaut (table des produits absente, contrôle absent) : sans
+  // `--pour-produit` (session du pilot, qui tient le parc), c'est un DÉFAUT et exit 1 — sens rouge ;
+  // sous `--pour-produit`, c'est un avertissement « PARC » nommé, exit 0, et le verdict du parc se dit
+  // à part. Le canal jetable est retiré ensuite : les cas suivants retrouvent la racine d'avant.
+  {
+    const canalBare = join(bare, "digit-ai-confidentiel.git"); mkdirSync(canalBare);
+    git(canalBare, "init", "--quiet", "--bare", "--initial-branch=main", ".");
+    const cw = join(atelier, "canal"); git(atelier, "clone", "--quiet", canalBare, cw);
+    writeFileSync(join(cw, "LISEZMOI.md"), "canal jetable sans tables\n"); git(cw, "add", "-A"); git(cw, "commit", "--quiet", "-m", "c0"); git(cw, "push", "--quiet", "origin", "main");
+    lancer();   // premier passage : le canal est cloné sous la racine
+    const rouge = lancer();
+    attendre("TF-1657 rouge : canal en défaut, session du pilot → DÉFAUT, poste NON prêt", rouge, 1, /Parc NON sain/);
+    const produit = lancer("--pour-produit");
+    attendre("TF-1657 vert : le même canal sous --pour-produit → avertissement PARC, poste prêt", produit, 0, /\[avert\] PARC \(hors du périmètre d'un produit\)/);
+    if (!/Poste prêt/.test(produit.stdout) || !/Parc NON sain .*jamais à corriger depuis le produit/.test(produit.stdout)) echecs.push("TF-1657 : sous --pour-produit, les deux verdicts (poste prêt, parc non sain) ne sont pas dits");
+    rmSync(join(racine, "_confidentiel"), { recursive: true, force: true });
+    rmSync(canalBare, { recursive: true, force: true });
+  }
+
   // ── TF-1282 — LE MODE `--rebatir` EST PRESCRIT PAR UN DOCUMENT, DONC IL SE JOUE ─────────────
   //
   // `references\TODO-FORGE.md` prescrit `node bootstrap.mjs --rebatir <dépôt> [--essai]` depuis le
