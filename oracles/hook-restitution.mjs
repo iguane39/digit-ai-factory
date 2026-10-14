@@ -684,6 +684,36 @@ export function controlerGeste({ dernierHumain, dernierTexte, textePrecedent, te
   return { applicable: true, decision, verdict: ecarts.length ? "FAIL" : "PASS", ecarts };
 }
 
+// ---- TF-1641 (14/10/2026) — UNE EXPLICATION DEMANDÉE SE LIVRE DANS UNE FICHE ----------------------
+//
+// LE FAIT, du 12/10 chez un produit : deux diagnostics demandés (détail des coûts, puis
+// recommandations) rendus en restitutions de 9 blocs ; le porteur a dû demander DEUX FOIS un
+// fichier, puis « le constat et les précos dans un fichier MD, simple, bref, lisible et
+// exploitable ». Le contenu utile existait dès le premier tour, dispersé entre les blocs. La règle
+// (`references\ECRITURE.md` E-16) : l'explication va dans une fiche datée, la restitution y renvoie.
+// CE QUI SE MESURE : le dernier message humain DEMANDE une explication (impératif expliquer,
+// détailler, diagnostiquer, ou « fournis/donne/ajoute … précos, diagnostic, constat »), la réponse
+// est une restitution complète (5 titres numérotés au moins), et le tour n'a écrit ni ne cite aucune
+// fiche `.md` autre qu'une synthèse. AVERTISSEMENT, jamais blocage : la frontière entre une demande
+// d'explication et une demande de travail reste un jugement. Mesure d'entrée sur les restitutions
+// des produits du poste depuis le 17/09 : 24 sur 364 suivent un message humain que ce motif lit
+// comme une demande d'explication ; la plupart en sont (« Explique… », « Détaille… »), 2 au moins
+// demandent un travail (« écris un message … pour lui expliquer ») — d'où l'avertissement seul.
+const DEMANDE_EXPLICATION = /(?<!\p{L})(?:explique[rz]?|d[ée]taille[rz]?|diagnostique[rz]?)(?!\p{L})|(?<!\p{L})(?:fournis|donne|ajoute)(?!\p{L})[^.?!\n]{0,40}(?<!\p{L})(?:pr[ée]cos?|pr[ée]conisations?|diagnostics?|constats?|recommandations?)(?!\p{L})/iu;
+const FICHE_MD = /[\w\-. \/\\]+\.md\b/gi;
+export function controlerExplication({ dernierHumain = "", dernierTexte = "", fichiersMd = [] }) {
+  const restitution = (String(dernierTexte).match(/^#{1,4}\s*\d{1,2}\b/gm) || []).length >= 5;
+  if (!DEMANDE_EXPLICATION.test(String(dernierHumain)) || !restitution) return { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
+  // Une fiche est un livrable DATÉ (R-4 : « … - AAAAMMJJ<indice>.md ») qui n'est pas la synthèse du tour.
+  const fiche = (p) => { const nom = String(p).split(/[\\/]/).pop(); return /\d{8}[a-z]{0,2}\.md$/i.test(nom) && !/synth[eè]se|restitution/i.test(nom); };
+  const ecrite = fichiersMd.some(fiche);
+  const citee = (String(dernierTexte).match(FICHE_MD) || []).some(fiche);
+  if (ecrite || citee) return { applicable: true, verdict: "PASS", ecarts: [] };
+  return { applicable: true, verdict: "FAIL", ecarts: ["une explication demandée est rendue dans la restitution sans fiche : livre-la dans une fiche datée "
+    + "(en bref chiffré, constat, préconisations, ordre conseillé, sources) et renvoie-y depuis la restitution, au lieu d'en disperser le contenu "
+    + "dans les blocs 4 et 8 (references\\ECRITURE.md E-16, TF-1641)"] };
+}
+
 // TF-1666 — le défaut DISTINCT, dit au refus quand aucun préjugement n'a été joué dans le tour.
 const RAPPEL_PREJUGEMENT = "PRÉJUGEMENT — cette réponse n'a pas été préjugée avant affichage, d'où le doublon à l'écran : écris la "
   + "prochaine restitution dans un fichier du dossier temporaire, joue `node oracles/hook-restitution.mjs --prejuger <fichier>` "
@@ -1021,11 +1051,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // TF-1514 — la POSSESSION : « seul l'humain la détient », contredit par un message humain de la session.
   // Avertissement seulement : il rejoint la liste des règles non bloquantes.
   const possession = controlerPossession({ textesHumains, dernierTexte });
+  // TF-1641 — l'EXPLICATION demandée vit dans une fiche. Avertissement seulement.
+  const explication = controlerExplication({ dernierHumain, dernierTexte, fichiersMd });
   const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));
   const avertissements = [...fails.filter((f) => !BLOQUANTES.has(f.regle)),
-    ...possession.ecarts.map((e) => ({ regle: "POSSESSION", statut: "FAIL", message: e }))];
+    ...possession.ecarts.map((e) => ({ regle: "POSSESSION", statut: "FAIL", message: e })),
+    ...explication.ecarts.map((e) => ({ regle: "EXPLICATION", statut: "FAIL", message: e }))];
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
-  const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL";
+  const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
+    && explication.verdict !== "FAIL";
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   try {
     mkdirSync(dirname(journal), { recursive: true });
@@ -1040,6 +1074,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(geste.applicable ? { geste: { decision: geste.decision, verdict: geste.verdict, ecarts: geste.ecarts } } : {}),
       ...(procedure.applicable ? { procedure: { verdict: procedure.verdict, ecarts: procedure.ecarts } } : {}),
       ...(possession.applicable ? { possession: { verdict: possession.verdict } } : {}),
+      ...(explication.applicable ? { explication: { verdict: explication.verdict } } : {}),
       prejuge: !!prejuge,
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
