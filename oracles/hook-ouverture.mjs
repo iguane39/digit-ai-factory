@@ -221,6 +221,16 @@ if (iPilot >= 0) {
   }
 }
 
+// TF-1658 (14/10/2026) — UN SOCLE POSÉ À CÔTÉ DU DÉPÔT D'UN TIERS SE JUGE À CHAQUE OUVERTURE : rien
+// de nouveau sous le clone du tiers depuis son relevé. Sans objet pour tout autre projet.
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "DEPOT-TIERS.json"))) {
+  try {
+    const { verifierDepotTiers } = await import(pathToFileURL(join(PILOT, "scripts", "adopter-projet-existant.mjs")).href);
+    const v = verifierDepotTiers(process.cwd());
+    lignes.push("", "## Dépôt du tiers en lecture seule (TF-1658)", v.verdict === "FAIL" ? `- **DÉFAUT — ${v.message}**` : `- ${v.verdict === "PASS" ? "intact" : "sans objet"} — ${v.message}`);
+  } catch (e) { lignes.push("", `- dépôt du tiers : NON jugé (${String(e.message).slice(0, 160)})`); }
+}
+
 if (!args.includes("--sans-readme")) {
   const g = join(PILOT, "scripts", "readme-dossiers.mjs");
   if (existsSync(g)) {

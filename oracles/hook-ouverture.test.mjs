@@ -321,5 +321,22 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   });
 }
 
+// ---- TF-1658 (14/10/2026) : LE SOCLE D'UN DÉPÔT TIERS JUGE LE TIERS À CHAQUE OUVERTURE --------
+{
+  const T3 = mkdtempSync(join(tmpdir(), "ouverture-tiers-"));
+  const tiers = join(T3, "tiers"), socle = join(T3, "socle");
+  mkdirSync(tiers, { recursive: true }); mkdirSync(join(socle, "forge"), { recursive: true });
+  const g = (...a) => execFileSync("git", ["-C", tiers, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8" });
+  writeFileSync(join(tiers, "a.txt"), "x\n"); g("init", "-q"); g("add", "-A"); g("commit", "-q", "-m", "t");
+  writeFileSync(join(socle, "forge", "DEPOT-TIERS.json"), JSON.stringify({ chemin: tiers, git: true, commit: g("rev-parse", "HEAD").trim(), porcelain_initial: [], releve_le: "2026-10-14T00:00:00Z" }), "utf8");
+  const intact = joue(socle);
+  writeFileSync(join(tiers, "ecrit.md"), "x\n");
+  const ecrit = joue(socle);
+  check("TF-1658 rouge → vert — à l'ouverture du socle, le dépôt du tiers est dit intact, puis en DÉFAUT dès qu'on y a écrit", () => {
+    if (!/## Dépôt du tiers en lecture seule \(TF-1658\)\n- intact/.test(intact)) throw new Error("le tiers intact n'est pas dit");
+    if (!/\*\*DÉFAUT — écriture sous le dépôt du tiers.*ecrit\.md/.test(ecrit)) throw new Error("l'écriture sous le tiers n'est pas vue à l'ouverture");
+  });
+}
+
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

@@ -61,12 +61,15 @@
  * ici, et rougir R-13 là-bas — un produit web ne s'exempte pas en se disant documentaire.
  *
  * Usage : node <PILOT_ROOT>\scripts\adopter-projet-existant.mjs <racine du projet> [--essai] [--type documentaire]
+ *         node <PILOT_ROOT>\scripts\adopter-projet-existant.mjs <clone du tiers> --hors-depot <socle> [--essai]  (TF-1658)
+ *         node <PILOT_ROOT>\scripts\adopter-projet-existant.mjs --verifier-tiers <socle>  (exit 0 intact, 1 écrit, 2 sans objet)
  *   À lancer PAR LE PROJET, depuis son dépôt — le pilot n'écrit jamais chez un produit de
  *   lui-même, et l'adoption est un geste que le projet demande.
  * Exit : 0 adopté (ou rien à faire) · 1 refusé par une garde · 2 usage.
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from "node:fs";
-import { dirname, join, resolve, relative } from "node:path";
+import { dirname, join, resolve, relative, sep } from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -159,6 +162,103 @@ export function signauxLogicielOuSite(racine, pilot = PILOT) {
   return trouves.sort();
 }
 
+// ---- TF-1659 · LA RACINE SERVIE ------------------------------------------------------------------
+// LE FAIT (13/10/2026) : sur un dépôt à deux sous-projets (`FRONT/`, servi depuis `FRONT/public/`, et
+// `BACK/`), l'essai à blanc annonçait `robots.txt` et `llms.txt` à la racine du DÉPÔT, où ils ne seront
+// jamais servis : le contrôle de présence serait passé sans que la surface publiée change. L'adoption
+// relève donc la racine servie AVANT de poser la surface web : la racine déclarée (`racine_web:` de
+// `docs/projet/PARAMETRAGE.md`) si elle existe, sinon les dossiers aux noms de racine servie des cadres
+// courants (`public`, `wwwroot`, `static`, `site`), trois niveaux au plus, hors outillage. Une seule
+// trouvée : la surface y est posée. Plusieurs : rien n'est posé, l'ambiguïté est consignée au carnet.
+// Aucune : la racine du dépôt, comme avant.
+const NOMS_RACINE_SERVIE = new Set(["public", "wwwroot", "static", "site"]);
+export function racinesServies(racine) {
+  const param = join(racine, "docs", "projet", "PARAMETRAGE.md");
+  if (existsSync(param)) {
+    const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(param, "utf8").replace(/^﻿/, ""));
+    const web = fm && /^racine_web\s*:\s*["']?([^"'\r\n#]+?)["']?\s*$/m.exec(fm[1]);
+    if (web) return [web[1].trim().replace(/\\/g, "/").replace(/^\.\/|\/+$/g, "")].filter(Boolean);
+  }
+  const trouves = [];
+  const parcourir = (d, rel, prof) => {
+    if (prof > 3) return;
+    let entrees = [];
+    try { entrees = readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const e of entrees) {
+      if (!e.isDirectory() || HORS_SIGNAUX.has(e.name.toLowerCase()) || e.name.startsWith(".")) continue;
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (NOMS_RACINE_SERVIE.has(e.name.toLowerCase())) { trouves.push(r); continue; }
+      if (!["docs", "output", "test", "tests", "dist", "build", "bin", "obj"].includes(e.name.toLowerCase())) parcourir(join(d, e.name), r, prof + 1);
+    }
+  };
+  parcourir(racine, "", 1);
+  return trouves.sort();
+}
+
+/** L'écart de surface web, consigné au carnet quand une racine servie a été relevée hors de la racine. */
+export function blocSurfaceWeb(servies, quand) {
+  const une = servies.length === 1;
+  return ["", `## Surface web : racine servie ${une ? `relevée sous \`${servies[0]}\`` : "AMBIGUË"} (TF-1659) — ${quand}`, "",
+    une
+      ? `\`robots.txt\` et \`llms.txt\` sont posés sous \`${servies[0]}/\`, la racine que le projet sert, et non à la racine du dépôt, où ils ne seraient jamais servis. À déclarer à l'ouverture du run : \`racine_web: ${servies[0]}\` dans l'en-tête de \`docs/projet/PARAMETRAGE.md\`, que lisent la conformité et le relevé d'héritage.`
+      : `Plusieurs racines servies candidates : ${servies.map((s) => `\`${s}\``).join(", ")}. \`robots.txt\` et \`llms.txt\` ne sont posés NULLE PART : à la racine du dépôt, ils passeraient le contrôle de présence sans changer la surface publiée. À trancher au premier run : déclarer \`racine_web:\` dans \`docs/projet/PARAMETRAGE.md\`, puis rejouer la recopie d'héritage.`,
+    ""].join("\n");
+}
+
+// ---- TF-1658 · LE DÉPÔT D'UN TIERS (audit, coaching) ---------------------------------------------
+// LE FAIT (13/10/2026) : sur le clone d'un dépôt client développé par un tiers, l'essai annonçait 25
+// écritures dans son arbre de travail (CLAUDE.md, hooks, robots.txt, forge/**…), et la démarche
+// proposée allait jusqu'au commit local. Le porteur, coach et auditeur, a dû arrêter la session : « ne
+// pousse jamais sur le repo, le projet est géré par un autre développeur ». Avec `--hors-depot
+// <dossier>`, le socle est posé dans un dossier frère sous git local, et le clone du tiers devient un
+// ENTRANT en lecture seule : chemin, commit et état relevés dans `forge/DEPOT-TIERS.json`. La règle
+// propre à ce mode, jugée par `--verifier-tiers` et à chaque ouverture : rien de nouveau sous le clone
+// du tiers (`git status --porcelain` identique au relevé), son HEAD inchangé.
+export const FICHIER_TIERS = "forge/DEPOT-TIERS.json";
+/** Le mode hors dépôt, consigné au carnet du socle. */
+export function blocDepotTiers(tiers, quand) {
+  return ["", `## Dépôt d'un tiers en lecture seule — socle hors dépôt (TF-1658) — ${quand}`, "",
+    `Le projet étudié vit dans \`${tiers}\`, un dépôt que cette session ne possède pas (audit, coaching). Le socle, les livrables et les lots de retours vivent ICI, sous git local ; le dépôt du tiers est un ENTRANT : il se lit, il ne s'écrit jamais, et rien ne s'y pousse. Son chemin, son commit et son état au relevé sont dans \`${FICHIER_TIERS}\`.`,
+    `Règle jugée : aucune écriture sous le clone du tiers (\`git status --porcelain\` identique au relevé, HEAD inchangé) — \`node <PILOT_ROOT>\\scripts\\adopter-projet-existant.mjs --verifier-tiers .\` depuis ce socle, et à chaque ouverture de session.`,
+    ""].join("\n");
+}
+const gitLire = (d, ...a) => {
+  const r = spawnSync("git", ["-C", d, ...a], { encoding: "utf8" });
+  return r.status === 0 ? (r.stdout || "").trim() : null;
+};
+export function releverTiers(tiers) {
+  const porcelain = gitLire(tiers, "status", "--porcelain");
+  return {
+    schema: "pilot/depot-tiers@1",
+    chemin: tiers,
+    git: porcelain !== null,
+    commit: gitLire(tiers, "rev-parse", "HEAD"),
+    branche: gitLire(tiers, "rev-parse", "--abbrev-ref", "HEAD"),
+    origin: gitLire(tiers, "remote", "get-url", "origin"),
+    porcelain_initial: porcelain === null ? null : porcelain.split(/\r?\n/).filter(Boolean),
+    releve_le: new Date().toISOString(),
+    regle: "lecture seule : aucune écriture sous ce clone (git status --porcelain identique au relevé, HEAD inchangé) — jugé par adopter-projet-existant.mjs --verifier-tiers et à chaque ouverture",
+  };
+}
+/** Juge la règle du mode hors dépôt. Rend `{ verdict: PASS|FAIL|SANS_OBJET, message, nouvelles }`. */
+export function verifierDepotTiers(socle) {
+  const f = join(socle, ...FICHIER_TIERS.split("/"));
+  if (!existsSync(f)) return { verdict: "SANS_OBJET", message: `aucun ${FICHIER_TIERS} : ce projet n'est pas en mode hors dépôt`, nouvelles: [] };
+  let t; try { t = JSON.parse(readFileSync(f, "utf8")); } catch (e) { return { verdict: "FAIL", message: `${FICHIER_TIERS} illisible : ${e.message}`, nouvelles: [] }; }
+  if (!existsSync(t.chemin)) return { verdict: "SANS_OBJET", message: `clone du tiers absent de ce poste (${t.chemin})`, nouvelles: [] };
+  if (!t.git) return { verdict: "SANS_OBJET", message: `le dossier du tiers n'est pas un dépôt git (${t.chemin}) : l'écriture n'y est pas mesurable`, nouvelles: [] };
+  const avant = new Set(t.porcelain_initial || []);
+  const maintenant = (gitLire(t.chemin, "status", "--porcelain") || "").split(/\r?\n/).filter(Boolean);
+  const nouvelles = maintenant.filter((l) => !avant.has(l));
+  const head = gitLire(t.chemin, "rev-parse", "HEAD");
+  const headBouge = t.commit && head && head !== t.commit;
+  if (nouvelles.length || headBouge) {
+    return { verdict: "FAIL", nouvelles,
+      message: `écriture sous le dépôt du tiers ${t.chemin} : ${nouvelles.length} entrée(s) nouvelle(s) à git status${nouvelles.length ? ` (${nouvelles.slice(0, 5).join(" ; ")})` : ""}${headBouge ? `, HEAD ${t.commit.slice(0, 8)} → ${head.slice(0, 8)}` : ""}. Remède : retirer ces écritures du clone du tiers (elles appartiennent à son développeur) et les refaire dans le socle` };
+  }
+  return { verdict: "PASS", nouvelles: [], message: `dépôt du tiers intact depuis le relevé du ${t.releve_le} (${t.chemin}, HEAD ${String(t.commit || "?").slice(0, 8)})` };
+}
+
 /**
  * Le type de projet DÉCLARÉ : ligne `type_projet:` de l'en-tête du carnet des écarts assumés, et
  * nulle part ailleurs (une mention dans le corps n'est pas une déclaration). Rend `{ type, ou }`,
@@ -239,12 +339,21 @@ export function blocEcartInitial(releve, quand) {
   return l.join("\n");
 }
 
-export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date().toISOString().slice(0, 10), type = null } = {}) {
-  const cible = resolve(racine);
+export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date().toISOString().slice(0, 10), type = null, horsDepot = null } = {}) {
+  // TF-1658 : en mode hors dépôt, `racine` est le clone du TIERS (lu, jamais écrit) et le socle va
+  // dans le dossier `horsDepot`, créé et mis sous git local s'il n'existe pas.
+  const tiers = horsDepot ? resolve(racine) : null;
+  const cible = horsDepot ? resolve(horsDepot) : resolve(racine);
   if (cible === PILOT || cible === resolve(pilot)) {
     return { verdict: "REFUS", motif: "le pilot n'est pas un produit — l'adoption ne s'applique pas à lui", faits: [] };
   }
-  if (!existsSync(cible)) {
+  if (tiers) {
+    if (!existsSync(tiers)) return { verdict: "REFUS", motif: `dépôt du tiers introuvable : ${tiers}`, faits: [] };
+    const dedans = (a, b) => a === b || a.toLowerCase().startsWith(b.toLowerCase() + sep);
+    if (dedans(cible, tiers)) return { verdict: "REFUS", motif: `le socle (${cible}) serait DANS le dépôt du tiers (${tiers}) : il doit vivre à côté, jamais dedans (TF-1658)`, faits: [] };
+    if (!existsSync(cible) && !essai) mkdirSync(cible, { recursive: true });
+  }
+  if (!existsSync(cible) && !(tiers && essai)) {
     return { verdict: "REFUS", motif: `dossier introuvable : ${cible}`, faits: [] };
   }
   if (type !== null && type !== TYPE_DOCUMENTAIRE) {
@@ -276,6 +385,16 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
 
   const releve = relever(cible, pilot);
   if (documentaire) for (const r of releve) if (r.conditionnel === CONDITION_SITE && r.etat === "absent") r.etat = "ecarte";
+  // TF-1658 : le socle d'un dépôt tiers n'a pas de surface web ; celle du tiers ne se touche pas.
+  if (tiers) for (const r of releve) if (r.conditionnel === CONDITION_SITE && r.etat === "absent") r.etat = "ecarte_tiers";
+  // TF-1659 : la surface web va sous la racine SERVIE quand le dépôt en a une hors de sa racine.
+  const servies = documentaire || tiers ? [] : racinesServies(cible);
+  if (servies.length) for (const r of releve) {
+    if (r.conditionnel !== CONDITION_SITE || r.etat !== "absent") continue;
+    if (servies.length > 1) { r.etat = "ambigu"; continue; }
+    r.cibleServie = `${servies[0]}/${r.cible}`;
+    if (existsSync(join(cible, r.cibleServie))) r.etat = "present_servie";
+  }
   const faits = [];
 
   // 1. les répertoires exigés — créés seulement s'ils manquent
@@ -295,16 +414,29 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
       faits.push({ quoi: "artefact", cible: r.cible, mode: r.mode, action: `ÉCARTÉ — projet documentaire, dû au seul « ${CONDITION_SITE} » (TF-1439) — écart consigné au carnet` });
       continue;
     }
+    if (r.etat === "ecarte_tiers") {
+      faits.push({ quoi: "artefact", cible: r.cible, mode: r.mode, action: "ÉCARTÉ — socle d'un dépôt tiers : la surface web est celle du tiers, jamais posée par le socle (TF-1658)" });
+      continue;
+    }
+    if (r.etat === "present_servie") {
+      faits.push({ quoi: "artefact", cible: r.cibleServie, mode: r.mode, action: "LAISSÉ INTACT (préexistant sous la racine servie, TF-1659)" });
+      continue;
+    }
+    if (r.etat === "ambigu") {
+      faits.push({ quoi: "artefact", cible: r.cible, mode: r.mode, action: `NON POSÉ — racines servies multiples (${servies.join(", ")}) : ambiguïté consignée au carnet (TF-1659)` });
+      continue;
+    }
     const src = join(pilot, r.source || "");
     if (!r.source || !existsSync(src)) {
       faits.push({ quoi: "artefact", cible: r.cible, mode: r.mode, action: `NON POSÉ — source absente du pilot (${r.source || "aucune déclarée"})` });
       continue;
     }
+    const ou = r.cibleServie || r.cible;
     if (!essai) {
-      mkdirSync(dirname(join(cible, r.cible)), { recursive: true });
-      writeFileSync(join(cible, r.cible), readFileSync(src));
+      mkdirSync(dirname(join(cible, ou)), { recursive: true });
+      writeFileSync(join(cible, ou), readFileSync(src));
     }
-    faits.push({ quoi: "artefact", cible: r.cible, mode: r.mode, action: `posé depuis ${r.source}` });
+    faits.push({ quoi: "artefact", cible: ou, mode: r.mode, action: `posé depuis ${r.source}${r.cibleServie ? ` sous la racine servie relevée (TF-1659)` : ""}` });
   }
 
   // 3. l'écart initial, au carnet que le contrat prévoit — ajouté, jamais substitué
@@ -318,17 +450,33 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
       mkdirSync(dirname(carnet), { recursive: true });
       let avant = existsSync(carnet) ? readFileSync(carnet, "utf8").replace(/\s*$/, "\n") : "";
       if (documentaire) avant = declarerType(avant);
-      writeFileSync(carnet, avant + bloc + (documentaire ? blocEcartDocumentaire(ecartes, quand) : "") + "\n", "utf8");
+      writeFileSync(carnet, avant + bloc + (documentaire ? blocEcartDocumentaire(ecartes, quand) : "")
+        + (servies.length ? blocSurfaceWeb(servies, quand) : "") + (tiers ? blocDepotTiers(tiers, quand) : "") + "\n", "utf8");
     }
     faits.push({ quoi: "carnet", cible: relative(cible, carnet), action: "écart initial consigné, en ajout" });
     if (documentaire) faits.push({ quoi: "carnet", cible: relative(cible, carnet), action: `type_projet: ${TYPE_DOCUMENTAIRE} déclaré en en-tête, écart « Type de projet : documentaire » consigné (TF-1439)` });
+    if (servies.length) faits.push({ quoi: "carnet", cible: relative(cible, carnet), action: `racine servie ${servies.length === 1 ? `relevée sous ${servies[0]}` : `ambiguë (${servies.join(", ")})`} consignée (TF-1659)` });
+  }
+
+  // 4. TF-1658 : le dépôt du tiers est un ENTRANT en lecture seule, relevé ; le socle est sous git local.
+  if (tiers) {
+    const f = join(cible, ...FICHIER_TIERS.split("/"));
+    if (existsSync(f)) faits.push({ quoi: "dépôt tiers", cible: FICHIER_TIERS, action: "relevé DÉJÀ présent — rien réécrit (idempotent)" });
+    else {
+      if (!essai) { mkdirSync(dirname(f), { recursive: true }); writeFileSync(f, JSON.stringify(releverTiers(tiers), null, 1) + "\n", "utf8"); }
+      faits.push({ quoi: "dépôt tiers", cible: FICHIER_TIERS, action: `relevé du clone du tiers en lecture seule (${tiers}) : chemin, commit, état (TF-1658)` });
+    }
+    if (!existsSync(join(cible, ".git"))) {
+      if (!essai) spawnSync("git", ["init", "-q"], { cwd: cible });
+      faits.push({ quoi: "git", cible: ".git", action: "dépôt git LOCAL créé pour le socle (aucun distant, aucun push)" });
+    }
   }
 
   const poses = faits.filter((f) => /^(créé|posé)/.test(f.action)).length;
   const laisses = faits.filter((f) => /LAISSÉ INTACT/.test(f.action)).length;
   return {
     verdict: essai ? "ESSAI" : "ADOPTE",
-    racine: cible, vivant: estVivant(cible), poses, laisses, type: documentaire ? TYPE_DOCUMENTAIRE : null, ecartes: ecartes.length,
+    racine: cible, tiers, servies, vivant: estVivant(cible), poses, laisses, type: documentaire ? TYPE_DOCUMENTAIRE : null, ecartes: ecartes.length,
     faits,
     non_juge: [
       "la CONVENTION de nommage des livrables déjà présents : aucun fichier n'est renommé, aucun n'est rangé — l'adoption ne déplace rien, et le premier run de version tranchera",
@@ -353,19 +501,31 @@ if (lanceEnDirect) {
   // Sans `--type`, iType + 1 vaudrait 0 et écarterait le dossier lui-même (défaut déjà payé par
   // `--regles` d'oracle-conformite-projet) : la position de la valeur n'existe que si l'option existe.
   const iValeurType = iType >= 0 ? iType + 1 : -1;
-  const dossier = args.find((a, i) => !a.startsWith("--") && i !== iValeurType);
+  // TF-1658 : `--verifier-tiers <socle>` juge la règle du mode hors dépôt ; `--hors-depot <dossier>`
+  // pose le socle à côté du dépôt d'un tiers.
+  const iVerif = args.indexOf("--verifier-tiers");
+  if (iVerif >= 0) {
+    const v = verifierDepotTiers(resolve(args[iVerif + 1] || "."));
+    console.log(`[${v.verdict}] ${v.message}`);
+    process.exit(v.verdict === "FAIL" ? 1 : v.verdict === "PASS" ? 0 : 2);
+  }
+  const iHors = args.indexOf("--hors-depot");
+  const horsDepot = iHors >= 0 ? (args[iHors + 1] || "") : null;
+  const iValeurHors = iHors >= 0 ? iHors + 1 : -1;
+  const dossier = args.find((a, i) => !a.startsWith("--") && i !== iValeurType && i !== iValeurHors);
+  if (horsDepot === "") { console.error("usage : --hors-depot <dossier du socle, à côté du dépôt du tiers>"); process.exit(2); }
   if (!dossier || type === "") {
-    console.error("usage : node <PILOT_ROOT>\\scripts\\adopter-projet-existant.mjs <racine du projet> [--essai] [--type documentaire]\n"
+    console.error("usage : node <PILOT_ROOT>\\scripts\\adopter-projet-existant.mjs <racine du projet> [--essai] [--type documentaire] [--hors-depot <socle>]\n"
       + "  À lancer PAR LE PROJET, depuis son dépôt — l'adoption est un geste que le projet demande.\n"
       + "  --type documentaire : projet sans logiciel ni site — robots.txt et llms.txt écartés, déclaration lue par R-13 et R-27.");
     process.exit(2);
   }
-  const r = adopter(dossier, { essai, type });
+  const r = adopter(dossier, { essai, type, horsDepot });
   if (r.verdict === "REFUS") {
     console.error(`[REFUS] ${r.motif}`);
     process.exit(1);
   }
-  console.log(`adopter-projet-existant — ${r.racine}`);
+  console.log(`adopter-projet-existant — ${r.racine}${r.tiers ? ` (socle hors dépôt ; dépôt du tiers en LECTURE SEULE : ${r.tiers})` : ""}`);
   console.log(`verdict : ${r.verdict}${essai ? " (rien n'a été écrit)" : ""} · ${r.poses} élément(s) posé(s), ${r.laisses} artefact(s) préexistant(s) laissé(s) intact(s)`
     + `${r.type ? ` · type ${r.type}, ${r.ecartes} artefact(s) écarté(s)` : ""}`
     + `${r.vivant ? " · le dossier portait déjà du contenu, et il est intact" : ""}`);
