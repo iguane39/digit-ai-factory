@@ -21,9 +21,15 @@ import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { passerOuvertureEnAsync } from "./lib-ouverture-async.mjs";
+import { borner, BUDGET_CONTEXTE_ASYNC } from "./lib-budget-contexte.mjs";
+import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gestes-avant-releve.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
+// TF-1635 (c) : l'instant où le relevé commence, et l'entrée du hook (chemin de la transcription),
+// lue avant tout geste lent — elle sert à déclarer les gestes faits pendant le tirage.
+const DEBUT_RELEVE = Date.now();
+const ENTREE_HOOK = args.includes("--contexte-json") ? lireEntreeHook() : null;
 const iPilot = args.indexOf("--pilot");
 const PILOT = iPilot >= 0 ? args[iPilot + 1] : join(ICI, "..");
 const lignes = [];
@@ -52,9 +58,11 @@ if (iPilot >= 0) {
 if (!args.includes("--sans-bootstrap")) {
   const b = join(PILOT, "bootstrap.mjs");
   if (existsSync(b)) {
-    const r = spawnSync(process.execPath, [b, "--pull"], { encoding: "utf8", timeout: 200000, cwd: PILOT });
+    // TF-1657 : chez un produit, un défaut du parc (canal confidentiel) n'empêche pas CE produit de
+    // travailler — il est dit en avertissement, à relever au lot, sans rendre le poste « NON prêt ».
+    const r = spawnSync(process.execPath, [b, "--pull", ...(iPilot >= 0 ? ["--pour-produit"] : [])], { encoding: "utf8", timeout: 200000, cwd: PILOT });
     const sortie = (r.stdout || "") + (r.stderr || "");
-    const utiles = sortie.split(/\r?\n/).filter((l) => /^\[(DEFAUT|avert|relance)\]|^Poste|^\s{2}digit-ai-/.test(l));
+    const utiles = sortie.split(/\r?\n/).filter((l) => /^\[(DEFAUT|avert|relance)\]|^Poste|^Parc|^\s{2}digit-ai-/.test(l));
     lignes.push(`## Fraîcheur (bootstrap --pull, exit ${r.status ?? "?"})`, ...utiles.map((l) => l.trimEnd()));
     if (r.status !== 0) lignes.push("→ Poste NON prêt : appliquer les remèdes ci-dessus AVANT tout run (règle Fraîcheur, R-19).");
   } else lignes.push("## Fraîcheur : bootstrap.mjs introuvable dans le pilot — mise à jour NON jouée.");
@@ -211,6 +219,46 @@ if (iPilot >= 0) {
         "- Non bloquant : ce contrôle DÉCLARE ce qu'il ne peut pas réparer, il n'arrête pas la session.");
     }
   }
+}
+
+// TF-1642 (14/10/2026) — LA FRAÎCHEUR NE SE JUGE PLUS SUR LES SEULS DÉPÔTS DE LA FACTORY. Le 12/10, un
+// rapport a recommandé un correctif livré 13 jours plus tôt : le clone lu avait 290 commits de retard,
+// et l'ouverture ne mesurait que le pilot et les forges. Chez un produit, son propre dépôt est mesuré
+// contre son distant ; pour tout autre dépôt lu, la sonde se joue avant de citer son code.
+if (iPilot >= 0) {
+  try {
+    const { mesurerFraicheur } = await import(pathToFileURL(join(PILOT, "scripts", "fraicheur-depot.mjs")).href);
+    const f = mesurerFraicheur(process.cwd());
+    lignes.push("", "## Fraîcheur du dépôt de ce produit (TF-1642)",
+      f.etat === "non_jugeable" ? `- non jugeable — ${f.motif}` : `- ${f.etat === "en_retard" || f.etat === "diverge" ? "**" + f.etat.toUpperCase().replace("_", " ") + "** — " : ""}${f.citation}${f.retard ? ` ; ${f.geste}` : ""}`,
+      `- Tout AUTRE dépôt dont le code est lu ou cité se mesure avant : \`node "${join(PILOT, "scripts", "fraicheur-depot.mjs")}" <dépôt>\` (référence lue et écart au distant à citer ; en retard, lire la référence distante).`);
+  } catch (e) { lignes.push("", `- fraîcheur du dépôt du produit : NON mesurée (${String(e.message).slice(0, 160)})`); }
+}
+
+// TF-1676 (14/10/2026) — LA RÈGLE HUMAINE DU 01/10/2026 SUR LES NOMS DESCEND CHEZ LES PRODUITS. Elle
+// n'était écrite qu'au § 3 sexies de CONTRAT-INTERFACE.md : le même jour, chez un produit à dépôt privé,
+// une session a anonymisé avant commit et une autre a proposé d'anonymiser la norme de rangement ;
+// l'humain a refusé. Le CLAUDE.md d'un produit n'est jamais recopié : l'ouverture, elle, atteint
+// chaque produit. La visibilité du dépôt se MESURE (gh), elle ne se suppose pas.
+if (iPilot >= 0) {
+  const v = spawnSync("gh", ["repo", "view", "--json", "visibility", "-q", ".visibility"], { encoding: "utf8", cwd: process.cwd(), timeout: 15000, windowsHide: true });
+  const visibilite = v.status === 0 ? (v.stdout || "").trim().toUpperCase() : "";
+  const regle = "règle humaine du 01/10/2026 : « Les dépôts privés peuvent conserver des données de type nom » ; la pseudonymisation ne vaut que pour ce qui sort vers un dépôt PUBLIC (pilot, forge publique), lot de retours compris, que le pilot pseudonymise lui-même à l'accueil";
+  lignes.push("", "## Noms réels dans ce dépôt (TF-1676)", visibilite === "PRIVATE"
+    ? `- Dépôt PRIVÉ (mesuré par gh) : il versionne les noms réels de clients, de produits et de personnes, sans anonymiser avant commit — ${regle}.`
+    : visibilite === "PUBLIC"
+      ? `- Dépôt PUBLIC (mesuré par gh) : aucun nom réel de tiers n'y entre ; pseudonymiser avant commit — ${regle}.`
+      : `- Visibilité NON mesurée (\`gh repo view --json visibility\` sans réponse) : la mesurer avant de pseudonymiser quoi que ce soit — ${regle}.`);
+}
+
+// TF-1658 (14/10/2026) — UN SOCLE POSÉ À CÔTÉ DU DÉPÔT D'UN TIERS SE JUGE À CHAQUE OUVERTURE : rien
+// de nouveau sous le clone du tiers depuis son relevé. Sans objet pour tout autre projet.
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "DEPOT-TIERS.json"))) {
+  try {
+    const { verifierDepotTiers } = await import(pathToFileURL(join(PILOT, "scripts", "adopter-projet-existant.mjs")).href);
+    const v = verifierDepotTiers(process.cwd());
+    lignes.push("", "## Dépôt du tiers en lecture seule (TF-1658)", v.verdict === "FAIL" ? `- **DÉFAUT — ${v.message}**` : `- ${v.verdict === "PASS" ? "intact" : "sans objet"} — ${v.message}`);
+  } catch (e) { lignes.push("", `- dépôt du tiers : NON jugé (${String(e.message).slice(0, 160)})`); }
 }
 
 if (!args.includes("--sans-readme")) {
@@ -597,18 +645,31 @@ if (iPilot < 0) {
 // dont `.claude/settings.json` ne déclare aucun PostToolUse n'a aucune régénération des README après
 // écriture : l'annonce l'affirmait pourtant, et la restitution l'a recopiée avant mesure (index périmé
 // du 22 au 26/09 chez un produit). Le crochet se lit dans les réglages du projet ouvert.
+// TF-1652 et TF-1667 (14/10/2026) — LE CROCHET SE RECONNAÎT À SA COMMANDE, ET LA CONSIGNE NOMME LA
+// COMMANDE VALABLE LÀ OÙ ELLE EST LUE. Un produit déclare des PostToolUse (page-html, écriture, droits)
+// sans aucun qui régénère les README : l'annonce affirmait le contraire. Et `node scripts\readme-dossiers.mjs`
+// n'existe pas chez un produit (MODULE_NOT_FOUND) ; la session a alors joué le script du pilot sur tout le
+// produit, 41 README rédigés à la main écrasés le 13/10. Chez un produit, la commande porte le chemin du
+// pilot, `--base .` et `--racines` borné au dossier écrit.
 function ligneCrochetReadme() {
   let declare = null;
   try {
-    const t = readFileSync(join(process.cwd(), ".claude", "settings.json"), "utf8");
-    declare = /"PostToolUse"\s*:\s*\[\s*\{/.test(t);
+    const j = JSON.parse(readFileSync(join(process.cwd(), ".claude", "settings.json"), "utf8"));
+    declare = (((j.hooks || {}).PostToolUse) || []).flatMap((g) => g.hooks || []).some((h) => /readme-dossiers/.test(String(h.command || "")));
   } catch { /* réglages absents ou illisibles : dit ci-dessous */ }
+  const commande = iPilot >= 0
+    ? `\`node "${join(PILOT, "scripts", "readme-dossiers.mjs")}" --base . --racines <dossier écrit, ex. output\\03-Syntheses>\` depuis la racine du produit, jamais sur tout le produit ; un README rédigé à la main (sans la marque « Généré par ») est préservé, un dossier gelé se déclare par \`.no-index\` ou dans le CLAUDE.md`
+    : "`node scripts\\readme-dossiers.mjs`";
   if (declare === true)
-    return "- Les README d'input\\ et output\\ se régénèrent après chaque écriture par un outil (hook PostToolUse) ; une écriture par commande (script, mv, redirection) n'en déclenche aucune : rejouer `node scripts\\readme-dossiers.mjs` avant l'enregistrement. Un rôle non rédigé est un défaut.";
-  return "- ATTENTION, état MESURÉ : `.claude/settings.json` de ce projet " + (declare === false ? "ne déclare aucun crochet PostToolUse" : "est absent ou illisible") + ". Les README d'input\\ et output\\ NE se régénèrent PAS après une écriture : les rejouer à la main (`node scripts\\readme-dossiers.mjs`) avant l'enregistrement. Un rôle non rédigé est un défaut.";
+    return `- Les README d'input\\ et output\\ se régénèrent après chaque écriture par un outil (hook PostToolUse) ; une écriture par commande (script, mv, redirection) n'en déclenche aucune : rejouer ${commande} avant l'enregistrement. Un rôle non rédigé est un défaut.`;
+  return "- ATTENTION, état MESURÉ : `.claude/settings.json` de ce projet " + (declare === false ? "ne déclare aucun crochet PostToolUse qui régénère les README" : "est absent ou illisible") + `. Les README d'input\\ et output\\ NE se régénèrent PAS après une écriture : les rejouer à la main (${commande}) avant l'enregistrement. Un rôle non rédigé est un défaut.`;
 }
 
-lignes.push(...lignesGates());
+// TF-1636 (invariant 3, 14/10/2026) — LES RÈGLES QUI CONDITIONNENT LE PREMIER GESTE PASSENT EN TÊTE.
+// Elles fermaient le relevé, après dix sections de taille variable : quand le harnais coupe une sortie
+// trop longue, c'est la fin qui se perd, et le 13/10 c'était elles.
+const GATES = lignesGates().slice(1);
+lignes.unshift(...GATES, "");
 function lignesGates() { return ["",
   "## Gates actifs dans cette session (R-44)",
   "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. v2.33.0 (01/10) : LE BLOC 3 NE PORTE QUE LES DÉCISIONS QUI REVIENNENT À L'HUMAIN — les autres s'exécutent dans le tour et se rendent pour information (R-58, décision humaine du 01/10). v2.32.0 (01/10) : UN PARAGRAPHE DE PROSE S'ÉCRIT SUR UNE SEULE LIGNE SOURCE — un paragraphe coupé à la main s'affiche en colonne étroite dans le chat de l'extension VS Code (S54, TF-1494). v2.31.0 (28/09) : UNE DÉCISION DÉJÀ POSÉE ET INCHANGÉE SE RAPPELLE EN UNE LIGNE, ELLE NE SE REPOSE PLUS — sélecteur, sujet, heure de pose, « inchangée » (S4, TF-1429). v2.30.0 (28/09) : LES IDENTIFIANTS DU REGISTRE PRODUIT ET DU LOT DE RETOURS SONT RECONNUS, ET « NEUVE » SE DÉCLARE — « registre A-18 », « RT-2 » (S14, S39, TF-1428, TF-1449). v2.29.0 (28/09) : UNE BARRE VERTICALE DANS UNE CELLULE DE TABLEAU S'ÉCHAPPE, ET LE JUGE NOMME LA COUPURE AU LIEU D'ACCUSER LA COLONNE VOISINE (S18, TF-1427). v2.28.0 (27/09) : UNE ACTION SUR L'ÉCRAN D'UNE PLATEFORME TIERCE CITE SA SOURCE OFFICIELLE ET LA DATE OÙ ELLE A ÉTÉ LUE (S52), ET, LAISSÉE À manuelle_utilisateur, ELLE SE GUIDE EN TÊTE — une section « ## Guide — … » avant le bloc 0 alors titré, des étapes numérotées closes par « Résultat attendu : … » (S53, bloquante quand le dernier message humain demande la procédure ; TF-1362, TF-1361). v2.27.0 (19/09) : UN REFUS PROUVE QU'UNE PORTE EST FERMÉE, JAMAIS QU'IL N'Y EN A QU'UNE — une incapacité d'accès déclarée porte les codes de retour de DEUX FAMILLES de chemins au moins (un préfixe d'URL ou un scope distinct, pas une variante du même), ou cite la source qui établit qu'un seul chemin existe ; « seule voie » ne vaut plus preuve (S25 durcie, TF-1189). v2.26.0 (17/09) : LE BLOC 1 DIT L'INTENTION DE LA DEMANDE — une phrase pour l'intention initiale, puis « Test rétro : » qui dit si le résultat la sert ou n'en sert que la lettre (S51, loi transverse n° 7). v2.25.0 (17/09) : UN TOUR DE TRAVAIL DONT LE RÉSULTAT N'EST PAS ENCORE MESURABLE SE DÉCLARE « POINT D'ÉTAPE » AU BLOC 1 — bloc 2 remplacé par « ce qui reste à mesurer, et par quoi » (la mesure attendue ET l'outil qui la rendra), blocs 1, 4 et 8 PLEINS (S50), les autres admis en une ligne ; et un RELAIS d'avancement de trois lignes, quand rien n'a été écrit depuis ton dernier affichage, ne se rejuge pas et ne reprend pas la synthèse déposée en entier (TF-1182). v2.24.0 (17/09) : UNE OPTION DU BLOC 3 QUI COMMANDE UN GESTE HUMAIN (se connecter, saisir, coller, installer, ouvrir un terminal, lancer une commande, valider un second facteur, publier soi-même) porte SUR PLACE de quoi l'exécuter — la commande entre accents graves, l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » (S49). v2.23.0 (17/09) : CHEZ UN PRODUIT, le bloc 9 porte une ligne « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » — « rien à remonter » est une réponse valide, le silence ne l'est pas (S48 ; sans objet au pilot et dans une forge). Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Coût | Exclusions` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
@@ -630,8 +691,26 @@ if (args.includes("--contexte-json")) {
     "- Ce relevé est produit en arrière-plan : s'il arrive après le premier échange, les gestes faits avant lui l'ont été sur l'état d'AVANT le `bootstrap --pull`. Le reprendre dès réception.",
     "",
   ];
+  // TF-1635 (c) : les gestes faits pendant le relevé se DÉCLARENT, en tête, et laissent une trace locale.
+  let gestes = [];
+  const transcript = ENTREE_HOOK && ENTREE_HOOK.transcript_path;
+  if (transcript && existsSync(transcript)) {
+    try { gestes = gestesDansFenetre(readFileSync(transcript, "utf8"), DEBUT_RELEVE, Date.now()); } catch { gestes = []; }
+  }
+  if (gestes.length) {
+    try {
+      const p = spawnSync("git", ["rev-parse", "--git-path", "digit-ai-gestes-avant-releve.jsonl"], { encoding: "utf8", cwd: process.cwd() }).stdout.trim();
+      if (p) appendFileSync(isAbsolute(p) ? p : join(process.cwd(), p), JSON.stringify({ ts: new Date().toISOString(), session: ENTREE_HOOK.session_id || null, debut_releve: new Date(DEBUT_RELEVE).toISOString(), gestes }) + "\n", "utf8");
+    } catch { /* trace locale non écrite : la déclaration en tête du relevé reste */ }
+  }
+  const tete = [...entete, ...lignesGestesAvant(gestes), ...GATES, ""];
+  // TF-1636 : le contexte injecté tient dans le budget MESURÉ (lib-budget-contexte.mjs) ; au-delà, les
+  // sections de fin sont retirées entières et nommées, la tête (gates compris) est toujours gardée.
+  const corps = lignes.slice(GATES.length + 1);
+  const { lignes: bornees } = borner([...tete, ...corps], BUDGET_CONTEXTE_ASYNC, tete.length,
+    `node "${join(PILOT, "oracles", "hook-ouverture.mjs")}"${iPilot >= 0 ? ` --pilot "${PILOT}" --sans-readme` : ""} depuis la racine de la session rejoue le relevé en entier`);
   process.stdout.write(JSON.stringify({
-    hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: [...entete, ...lignes].join("\n") },
+    hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: bornees.join("\n") },
   }) + "\n");
 } else {
   console.log(lignes.join("\n"));

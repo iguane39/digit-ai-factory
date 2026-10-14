@@ -63,6 +63,13 @@ cette chaîne, jamais un `.md` lisible. Une candidature isolée suit le même sa
 nom réel posé hors du sas entre dans un dépôt public, et un nettoyage d'historique coûte neuf envois
 forcés (incident du 30/08/2026, 115 fichiers).
 
+**Noms réels dans le dépôt du produit (règle humaine du 01/10/2026, TF-1676)** : « Les dépôts privés
+peuvent conserver des données de type nom ». Un dépôt PRIVÉ (mesuré : `gh repo view --json visibility`)
+versionne les noms réels de clients, de produits et de personnes, sans les anonymiser avant commit. La
+pseudonymisation ne vaut que pour ce qui sort vers un dépôt public (pilot, forge publique), lot de
+retours compris, et c'est le pilot qui la fait à l'accueil. L'ouverture de chaque session rappelle la
+visibilité mesurée de ce dépôt.
+
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
 ## Règles de socle applicables — remplies à l'ouverture, selon le type de livrable (TF-0765)

@@ -60,7 +60,8 @@ export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(P
   if (sansBootstrap) ctl("poste (bootstrap --pull)", null, "non joué (--sans-bootstrap) : poste NON vérifié");
   else {
     log("Mise à jour du pilot et des forges, propagation des skills (1 à 3 minutes au premier passage)…");
-    const bootstrap = () => jouer([process.execPath, join(PILOT, "bootstrap.mjs"), "--pull", "--racine", racine], PILOT);
+    // TF-1657 : l'installation sert un projet ; un défaut du parc (canal confidentiel) ne la rend pas incomplète.
+    const bootstrap = () => jouer([process.execPath, join(PILOT, "bootstrap.mjs"), "--pull", "--racine", racine, "--pour-produit"], PILOT);
     let b = bootstrap();
     // Un clone NEUF du pilot n'a pas de pre-push (`.git/hooks` ne voyage pas) : bootstrap le dit en
     // H3/H4 avec un remède entièrement mécanique, mesuré le 13/10 sur un poste tiers simulé. Le

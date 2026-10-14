@@ -20,6 +20,8 @@
 //                 n'a vu (R-29)
 //   --sans-skills ne juge ni ne propage les skills (recette sur dépôts factices)
 //   --sans-pilot  ne touche pas au dépôt pilot courant (recette)
+//   --pour-produit verdict du poste POUR UN PRODUIT : un défaut du parc (canal confidentiel) y est un
+//                 avertissement nommé, sans exit 1 — passé par le hook d'ouverture d'un produit (TF-1657)
 //   --rebatir <dépôt> [--essai]  rebâtit un clone DIVERGÉ sur son histoire publiée réécrite, sans
 //                 perdre le travail propre au poste (scripts/rebatir-clone.mjs, D-12 a du 07/09) ;
 //                 jamais de push — la publication reste un GO humain
@@ -89,7 +91,25 @@ const defauts = [];
 const averts = [];
 const versions = [];
 const ligne = (statut, msg) => console.log(`[${statut}] ${msg}`);
-const defaut = (msg, remede) => { ligne("DEFAUT", `${msg} — remède : ${remede}`); defauts.push(msg); };
+// TF-1657 (14/10/2026) — DEUX VERDICTS : LE POSTE POUR UN PRODUIT, ET LE PARC. Mesuré le 13/10 : le
+// pilot et quatorze forges à jour, et pourtant « Poste NON prêt » à l'ouverture d'un produit, pour un
+// seul défaut du canal confidentiel que ce produit ne touche pas — et la consigne d'accueil disait
+// d'appliquer le remède, hors du périmètre de la session. Sous `--pour-produit` (passé par le hook
+// d'ouverture d'un produit), un défaut du PARC (canal confidentiel) devient un avertissement nommé, à
+// relever au lot de retours et jamais à corriger depuis le produit ; sans l'option (session du pilot,
+// qui tient le parc), il reste un défaut. Le verdict du parc se dit à part, sur sa propre ligne.
+const pourProduit = args.includes("--pour-produit");
+const defautsParc = [];
+let zoneParc = false;
+const defaut = (msg, remede) => {
+  if (zoneParc && pourProduit) {
+    ligne("avert", `PARC (hors du périmètre d'un produit) — ${msg} — remède, à la session du pilot : ${remede}. Depuis un produit : le relever au lot de retours, ne pas le corriger (TF-1657)`);
+    defautsParc.push(msg); averts.push(msg);
+    return;
+  }
+  ligne("DEFAUT", `${msg} — remède : ${remede}`); defauts.push(msg);
+  if (zoneParc) defautsParc.push(msg);
+};
 // 13/10/2026 — UN DÉPÔT PRIVÉ HORS D'ACCÈS N'EST PAS UN DÉFAUT DU POSTE. Un autre développeur a joué
 // `--pull` sur son poste : les quatorze forges publiques à jour, et pourtant « Poste NON prêt — 3
 // défaut(s) », tous dus aux deux dépôts privés du propriétaire (digit-ai-queue, digit-ai-confidentiel)
@@ -306,6 +326,7 @@ for (const f of FORGES) {
 
 // 4 ter. LE CANAL CONFIDENTIEL : présent, à jour, privé, sans secret ------------------------
 {
+  zoneParc = true;   // TF-1657 : le canal confidentiel est du PARC, pas du poste d'un produit
   const dest = process.env.FORGE_CONFIDENTIEL || join(racine, CANAL.dossier);
   if (existsSync(join(dest, ".git"))) {
     traiterPresent(`${CANAL.nom} (canal confidentiel)`, dest);
@@ -330,6 +351,7 @@ for (const f of FORGES) {
     else if (process.env.BOOTSTRAP_SOURCE) { ligne("avert", `${CANAL.nom} — canal confidentiel absent à la source surchargée ${SOURCE} : tables lues à l'ancien emplacement s'il existe`); averts.push(`${CANAL.nom} absent à la source surchargée`); }
     else defaut(`${CANAL.nom} — canal confidentiel ABSENT et clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`, `vérifier l'accès au dépôt PRIVÉ ${SOURCE}/${CANAL.nom}.git (gh auth status), puis scripts/fusionner-tables-confidentielles.mjs si des tables libres existent`);
   }
+  zoneParc = false;
 }
 
 // 4 bis. LES DÉPÔTS QUE LA LISTE NE CONNAÎT PAS (TF-0525) ------------------------------------
@@ -727,6 +749,8 @@ console.log(
     ? `\nPoste NON prêt — ${defauts.length} défaut(s), chacun avec son remède ci-dessus.`
     : `\nPoste prêt — présent, à jour, skills alignés${averts.length ? ` (${averts.length} avertissement(s) non bloquant(s))` : ""}. Si la racine n'est pas le parent du pilot, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
 );
+// TF-1657 : le verdict du parc, distinct de celui du poste. Il ne se tait que quand il n'y a rien à dire.
+if (defautsParc.length) console.log(`Parc NON sain — ${defautsParc.length} défaut(s) du parc (canal confidentiel)${pourProduit ? ", hors du périmètre de ce produit : avertis ci-dessus, à relever au lot de retours, jamais à corriger depuis le produit" : ", comptés dans le verdict du poste"}.`);
 // Confirmation explicite de l'installation (13/10/2026) : le dernier mot de la commande dit, sans
 // interprétation, si la Factory est utilisable sur ce poste.
 if (!defauts.length) {

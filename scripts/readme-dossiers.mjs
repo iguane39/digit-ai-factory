@@ -76,7 +76,10 @@ if (!CHECK_TOT && !DEDANS && !BASE_DECLAREE) {
     `refus : lance depuis ${process.cwd()}, ce generateur ecrirait dans ${BASE} — un autre depot. ` +
     "Ecrire dans un depot ou l on n est pas se declare : relancer avec `--base <depot>` si c est " +
     "bien le geste voulu, ou depuis le depot a regenerer. Le 12/09, six fichiers suivis du pilot " +
-    "ont ete modifies depuis un depot produit sans que rien ne le dise.");
+    "ont ete modifies depuis un depot produit sans que rien ne le dise. " +
+    // TF-1652 (14/10/2026) : le refus nomme la commande valable chez un produit, bornee au dossier
+    // ecrit — sans quoi le geste qui suit le refus est `--base .` sur tout le produit (TF-1667).
+    `Chez un produit, depuis sa racine : node "${join(PILOT, "scripts", "readme-dossiers.mjs")}" --base . --racines <dossier ecrit, ex. output/03-Syntheses>`);
   process.exit(2);
 }
 // TF-0590 (25/08) : la comparaison normalise LES DEUX COTES, pas un seul. Le cote `courant`
@@ -155,8 +158,30 @@ const EST_MACHINE = (nom) => nom.startsWith(".") || nom === "_oracles";
 // `package.json` n'y est PAS : il marque un projet de code, qu'on indexe légitimement.
 const MANIFESTES_TIERS = [/\.pbip$/i, /^\.platform$/];
 const NOMS_FORMAT_TIERS = /\.(SemanticModel|Report|Dataset)$/;
+// TF-1667 (14/10/2026) — UN DOSSIER DE TESTS, DE FIXTURES OU GELÉ NE REÇOIT AUCUN README. Mesuré le
+// 13/10 chez un produit : 20 README créés sous `compliance-pack\__tests__\fixtures\`, et 1 dans un
+// témoin que le CLAUDE.md du produit déclare gelé. Un dossier de fixtures est une donnée de test : un
+// fichier de plus y change ce que la recette lit. Un dossier gelé se déclare par `.no-index` à sa
+// racine, ou par une ligne du CLAUDE.md du dépôt qui dit « gelé » (ou « figé ») et cite son chemin
+// entre accents graves : c'est là que le produit l'avait écrit, et rien ne le lisait.
+const NOMS_TESTS = new Set(["__tests__", "__fixtures__", "fixtures", "node_modules"]);
+const GELES = (() => {
+  const s = new Set();
+  let t = "";
+  try { t = readFileSync(join(BASE, "CLAUDE.md"), "utf8"); } catch { return s; }
+  for (const l of t.split(/\r?\n/)) {
+    if (!/\b(?:gel|fig)[ée]e?s?(?![a-zà-ÿ])/i.test(l)) continue;
+    for (const m of l.matchAll(/`([^`]+)`/g)) {
+      const rel = m[1].trim().replace(/\\/g, "/").replace(/\/+$/, "");
+      if (rel && !rel.includes("..") && !rel.startsWith("/") && !/^[a-z]:/i.test(rel)) s.add(sansCasse(rel));
+    }
+  }
+  return s;
+})();
 const motifClos = (dir) => {
   if (existsSync(join(dir, ".no-index"))) return "marqueur `.no-index`, TF-1050";
+  if (NOMS_TESTS.has(dir.split(sep).pop())) return "dossier de tests ou de fixtures, TF-1667";
+  if (GELES.has(sansCasse(posix(relative(BASE, dir))))) return "dossier déclaré gelé par le CLAUDE.md du dépôt, TF-1667";
   if (NOMS_FORMAT_TIERS.test(dir)) return "élément de format tiers reconnu à son nom, TF-1126";
   let noms = [];
   try { noms = readdirSync(dir); } catch { return null; }
@@ -247,6 +272,17 @@ function compter(dir) {
   return fichiers;
 }
 
+// TF-1667 (14/10/2026) — UN README RÉDIGÉ À LA MAIN N'EST JAMAIS RÉÉCRIT. Mesuré le 13/10 chez un
+// produit : 41 README suivis, rédigés à la main (ni la marque « Généré par » ni bloc ROLE), remplacés
+// par une table et un rôle « à rédiger » — le texte du dossier perdu, annulé à la main dans la minute.
+// Un README existant SANS la marque du générateur appartient à qui l'a écrit : il est préservé, compté,
+// et le compte se dit (loi n° 3). Le pilot n'en porte aucun : ses 25 README portent la marque.
+const MARQUE_GENERE = /Généré par scripts\\readme-dossiers\.mjs/;
+const estRedigeMain = (readme) => {
+  if (!existsSync(readme)) return false;
+  try { const t = readFileSync(readme, "utf8"); return !MARQUE_GENERE.test(t) && !t.includes(MARQUE_DEBUT); } catch { return false; }
+};
+
 function roleExistant(readme) {
   if (!existsSync(readme)) return null;
   const t = readFileSync(readme, "utf8");
@@ -315,7 +351,8 @@ function attendu(dir, rel) {
       // Le rôle du sous-dossier (son README, sinon la table des rôles) : une ligne qui dit ce
       // qu'il contient — « sous-dossier, voir son README » n'informait personne.
       const roleSous = (roleExistant(join(chemin, "README.md")) || roleConnu(relE) || "").replace(/\s+/g, " ");
-      const resume = roleSous && roleSous !== PLACEHOLDER ? roleSous.replace(/\*\*/g, "").slice(0, 160) + (roleSous.length > 160 ? "…" : "") : "rôle à rédiger dans son README";
+      const resume = roleSous && roleSous !== PLACEHOLDER ? roleSous.replace(/\*\*/g, "").slice(0, 160) + (roleSous.length > 160 ? "…" : "")
+        : estRedigeMain(join(chemin, "README.md")) ? "README rédigé à la main, préservé (TF-1667)" : "rôle à rédiger dans son README";
       lignes.push(`| [\`${e.name}\\\`](${e.name}/README.md) | dossier (${n} fichier${n > 1 ? "s" : ""}) | — | ${resume.replace(/\|/g, "/")} |`);
     } else {
       nf++;
@@ -364,6 +401,7 @@ const defauts = [];
 // (fichier apparu, disparu, renommé) et le RÔLE non rédigé. `--strict` disparaît avec la
 // tolérance qu'il servait à lever — un drapeau sans objet est une affordance morte.
 const ecrits = [];
+const preserves = [];
 for (const racine of RACINES) {
   const abs = join(BASE, racine);
   if (!existsSync(abs)) { defauts.push(`${racine}\\ : racine absente`); continue; }
@@ -390,6 +428,7 @@ for (const racine of RACINES) {
   for (const dir of dossiers(abs)) {
     const rel = posix(relative(BASE, dir));
     const readme = join(dir, "README.md");
+    if (estRedigeMain(readme)) { preserves.push(affiche(rel) + "README.md"); continue; }
     const { texte: texteBrut, role } = attendu(dir, rel);
     const propre = pseudonymise(texteBrut);
     if (!propre.ok) {
@@ -414,6 +453,7 @@ for (const racine of RACINES) {
 const MODE = DEPOT_PRODUIT ? " — dépôt de produit (`forge\\`) : ni pseudonymisation ni rôle du pilot (TF-1451, TF-1452)" : "";
 if (!SILENCIEUX && ecrits.length) console.log(`README régénérés dans ${BASE}${MODE} (${ecrits.length}) : ${ecrits.join(" · ")}`);
 if (!SILENCIEUX && !ecrits.length && !CHECK) console.log(`README à jour dans ${BASE}${MODE}, rien à régénérer`);
+if (!SILENCIEUX && preserves.length) console.log(`${preserves.length} README rédigé(s) à la main (sans la marque du générateur), préservé(s) tel(s) quel(s) (TF-1667) : ${preserves.slice(0, 8).join(" · ")}${preserves.length > 8 ? " · …" : ""}`);
 if (defauts.length) {
   console.error(`[readme-dossiers] ${defauts.length} défaut(s) :\n  - ${defauts.join("\n  - ")}`);
   process.exit(1);
