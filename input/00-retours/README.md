@@ -410,6 +410,32 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-64 - RETOURS - 20261001c.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20261012a.md` | fichier | 7,4 Ko | Lot de retours — Produit-64 → digit-ai-forge-agents (digit-ai-page-html) — 2026-10-12, ind |
 | `Produit-64 - RETOURS - 20261012a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261012b.md` | fichier | 8,0 Ko | Lot de retours — Produit-64 → digit-ai-forge-agents (digit-ai-page-html) — 2026-10-12, ind |
+| `Produit-64 - RETOURS - 20261012b.tf.jsonl` | fichier | 4,1 Ko | 2 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261012c.md` | fichier | 9,4 Ko | Lot de retours — Produit-64 → digit-ai-forge-ops — 2026-10-12, indice c |
+| `Produit-64 - RETOURS - 20261012c.tf.jsonl` | fichier | 4,7 Ko | 2 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261012d.md` | fichier | 7,8 Ko | Lot de retours — Produit-64 → pilot (gabarits/documents, écriture des restitutions) — 2026 |
+| `Produit-64 - RETOURS - 20261012d.tf.jsonl` | fichier | 3,9 Ko | 2 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261012e.md` | fichier | 8,2 Ko | Lot de retours — Produit-64 → pilot (méthode d'analyse d'un dépôt, contrôle de fraîcheur)  |
+| `Produit-64 - RETOURS - 20261012e.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261012f.md` | fichier | 8,6 Ko | Lot de retours — Produit-64 → pilot (S48 « remontée à la factory », hook de restitution) — |
+| `Produit-64 - RETOURS - 20261012f.tf.jsonl` | fichier | 6,1 Ko | 4 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261012g.md` | fichier | 5,6 Ko | Lot de retours — Produit-64 → pilot (hook de restitution : message refusé APRÈS affichage, |
+| `Produit-64 - RETOURS - 20261012g.tf.jsonl` | fichier | 2,0 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261013a.md` | fichier | 4,6 Ko | Lot de retours — Produit-64 → pilot (récidive de RT-43 : une mémoire de session ne tient p |
+| `Produit-64 - RETOURS - 20261013a.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261013b.md` | fichier | 6,0 Ko | Lot de retours — Produit-64 → pilot (régénération des README : consigne inexécutable, puis |
+| `Produit-64 - RETOURS - 20261013b.tf.jsonl` | fichier | 2,0 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261013c.md` | fichier | 5,7 Ko | Lot de retours — Produit-64 → pilot (un dénombrement d'impact filtré sur les échecs, et un |
+| `Produit-64 - RETOURS - 20261013c.tf.jsonl` | fichier | 2,8 Ko | 2 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261013d.md` | fichier | 4,7 Ko | Lot de retours — Produit-64 → pilot (une préconisation qui corrige les cas observés sans t |
+| `Produit-64 - RETOURS - 20261013d.tf.jsonl` | fichier | 1,8 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261013e.md` | fichier | 4,1 Ko | Lot de retours — Produit-64 → pilot (un sigle de pipeline attribué au mauvais produit, et  |
+| `Produit-64 - RETOURS - 20261013e.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261013f.md` | fichier | 6,2 Ko | Lot de retours — Produit-64 → pilot (report des lots c, d et e, que la porte refuserait po |
+| `Produit-64 - RETOURS - 20261013f.tf.jsonl` | fichier | 4,4 Ko | 4 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261013g.md` | fichier | 3,7 Ko | Lot de retours — Produit-64 → pilot (analyse L99 « Étape Run après MEP ») — 2026-10-13, in |
+| `Produit-64 - RETOURS - 20261013g.tf.jsonl` | fichier | 1,6 Ko | 2 ligne(s) JSONL |
 | `Produit-65 - RETOURS - 20260903a.md` | fichier | 15,9 Ko | Retours forges — Produit-65 — 20260903a |
 | `Produit-65 - RETOURS - 20260903a.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
 | `Produit-67 - RETOURS - 20260922a.md` | fichier | 10,1 Ko | Retours forges — Produit-67 — 20260922a |
@@ -456,6 +482,16 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-79 - RETOURS - 20261007e.tf.jsonl` | fichier | 8,1 Ko | 7 ligne(s) JSONL |
 | `Produit-79 - RETOURS - 20261007f.md` | fichier | 3,7 Ko | Retours forges — Produit-79 — 20261007f |
 | `Produit-79 - RETOURS - 20261007f.tf.jsonl` | fichier | 2,8 Ko | 3 ligne(s) JSONL |
+| `Produit-80 - RETOURS - 20261012a.md` | fichier | 5,1 Ko | Retours forges — Produit-80 — 20261012a |
+| `Produit-80 - RETOURS - 20261012a.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
+| `Produit-80 - RETOURS - 20261012b.md` | fichier | 7,0 Ko | Retours forges — Produit-80 — 20261012b |
+| `Produit-80 - RETOURS - 20261012b.tf.jsonl` | fichier | 3,1 Ko | 3 ligne(s) JSONL |
+| `Produit-80 - RETOURS - 20261012c.md` | fichier | 3,3 Ko | Retours forges — Produit-80 — 20261012c |
+| `Produit-80 - RETOURS - 20261012c.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261013a.md` | fichier | 12,3 Ko | Lot de retours — Produit-81 → pilot et canal confidentiel (initialisation sur un dépôt tie |
+| `Produit-81 - RETOURS - 20261013a.tf.jsonl` | fichier | 6,5 Ko | 4 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261013b.md` | fichier | 10,3 Ko | Lot de retours — Produit-81 → digit-ai-forge-agents, digit-ai-forge-design et skill client |
+| `Produit-81 - RETOURS - 20261013b.tf.jsonl` | fichier | 5,3 Ko | 4 ligne(s) JSONL |
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `UIA - RETOURS - 20260923a.md` | fichier | 4,4 Ko | Retours forges — UIA (Produit-71) — 20260923a |
@@ -467,4 +503,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `UIA - RETOURS - 20260924c.md` | fichier | 3,7 Ko | Retours forges — UIA (Produit-72) — 20260924c |
 | `UIA - RETOURS - 20260924c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_448 fichier(s), 2 sous-dossier(s)_
+_484 fichier(s), 2 sous-dossier(s)_

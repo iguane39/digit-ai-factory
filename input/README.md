@@ -16,7 +16,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| [`00-retours\`](00-retours/README.md) | dossier (598 fichiers) | — | Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl` homonyme, préfixe projet obligatoire. À la racine : à in… |
+| [`00-retours\`](00-retours/README.md) | dossier (634 fichiers) | — | Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl` homonyme, préfixe projet obligatoire. À la racine : à in… |
 | [`01-candidatures\`](01-candidatures/README.md) | dossier (134 fichiers) | — | Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`, et leurs formes `.normalise.tf.jsonl` produites par `normaliser-lot.mjs`. À la … |
 | [`02-entrants-html\`](02-entrants-html/README.md) | dossier (1 fichier) | — | Livrables HTML fournis comme référence ou source d'extraction (best practices, modèles de rapport) — nom d'origine conservé, il porte déjà marque et date. |
 | [`03-artefacts\`](03-artefacts/README.md) | dossier (3 fichiers) | — | Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) — aucun sidecar exigé du remettant, notice `LISEZMOI.md` ; le Produit-67 écrit le sid… |
@@ -25,4 +25,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `etude.md` | fichier | 10,7 Ko | Étude — Skills Claude Code « animation / motion » (2026-08-16) |
 | `LISEZMOI.md` | fichier | 4,0 Ko | input\ — entrants du pilot, familles numérotées |
 
-_2 fichier(s), 6 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
+_2 fichier(s), 6 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914) · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
