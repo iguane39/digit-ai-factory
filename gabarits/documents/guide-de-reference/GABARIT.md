@@ -53,9 +53,17 @@ cle_theme: {nom-du-guide}-theme
 gabarit: gd-guide-de-reference
 version_du_gabarit: 1.0.0
 # facultatif : marque_html, favicon_lettre, anatomie (défaut « Niveau, Source, Exceptions »),
-# accent, accent_fonce, accent_sombre, accent_fonce_sombre (jetons de marque, #RRGGBB)
+# accent, accent_fonce, accent_sombre, accent_fonce_sombre, accent_voile, accent_voile_sombre
+# (jetons de marque, #RRGGBB)
 ---
 ```
+
+**Tous les jetons d'accent suivent la marque** (TF-1761, 15/10/2026). Le voile d'accent, fond des
+cartes et des lignes mises en avant, se prend de `accent_voile` et `accent_voile_sombre`, ou se dérive
+de l'accent quand ces champs manquent (10 % de l'accent sur blanc, 15 % de l'accent sombre sur le fond
+sombre). Une marque déclarée en clair seulement dérive aussi son accent sombre. *Le fait* : le
+générateur ne surchargeait que `accent` et `accent_fonce`, et 10 cartes d'un schéma restaient bleues
+sur une page à la marque verte.
 
 Le **`role_destinataire` n'est pas décoratif** : chaque vue se juge à ce qu'elle permet à CE lecteur
 de faire. Un chapitre qui ne change rien à ce qu'il fait n'a pas sa place dans le guide (D8).
@@ -167,7 +175,7 @@ Ce que la machine juge sur une page de cette famille, et ce qui reste une lectur
 | `check_completude.py` du socle, et la garde du générateur | la page porte au moins les mots de sa source |
 | `generateur/sonde-interactions.py` | les composants MARCHENT : onglets, adresse profonde, menu latéral en fin de page, recherche et résultats, filtres après une recherche effacée, fenêtre source et retour du focus, fiche d'un code, thème, téléphone |
 | `construire-guide.py --constat` | chaque composant posé, ceux de la famille et les 4 du socle qu'elle embarque, est la copie exacte de sa source ; un bloc non comparé est nommé, exit 2 (TF-1433) |
-| `construire-guide.py --self-test` | la parité sait refuser : un bloc du socle d'une autre version est PÉRIMÉ, et reposé par le poseur du socle il repasse |
+| `construire-guide.py --self-test` | la parité sait refuser : un bloc du socle d'une autre version est PÉRIMÉ, et reposé par le poseur du socle il repasse ; une marque verte ne garde aucun jeton d'accent de teinte bleue, en clair comme en sombre (TF-1761) |
 | `oracle-gabarits-documents.mjs` (G1-G5, G7, G10-G12) | doctrine et instance, fil gabarit + version rendu, largeur de page déclarée, lecteur et frontière |
 | relecture humaine — **due, et non mécanisable** | que chaque chapitre serve le lecteur déclaré, et que chaque règle citée soit à jour à sa source |
 

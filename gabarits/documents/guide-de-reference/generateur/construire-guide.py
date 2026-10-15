@@ -711,14 +711,37 @@ def favicon(couleur, lettre):
 RE_HEX = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
 
+def melange(hexa, vers, part_de_vers):
+    """La couleur `hexa` mêlée à `vers` : part_de_vers = 0 rend hexa, 1 rend vers (#RRGGBB)."""
+    a = [int(hexa[i:i + 2], 16) for i in (1, 3, 5)]
+    b = [int(vers[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join("%02X" % round(x + (y - x) * part_de_vers) for x, y in zip(a, b))
+
+
+FOND_SOMBRE = "#0B1220"  # --bg du thème sombre de jetons.css, sur lequel se pose le voile sombre
+
+
 def style_de_marque(meta):
-    """Les jetons de la MARQUE du document, posés APRÈS jetons.css : ils le surchargent."""
-    clair = [("--accent", meta.get("accent")), ("--accent-fonce", meta.get("accent_fonce"))]
-    sombre = [("--accent", meta.get("accent_sombre")), ("--accent-fonce", meta.get("accent_fonce_sombre"))]
-    for nom, valeur in clair + sombre:
+    """Les jetons de la MARQUE du document, posés APRÈS jetons.css : ils le surchargent.
+
+    TF-1761 (15/10/2026) : TOUS les jetons d'accent suivent la marque. --accent-voile se prend du
+    champ accent_voile (accent_voile_sombre en sombre) ou, à défaut, se DÉRIVE de l'accent : 10 % de
+    l'accent sur blanc en clair, 15 % de l'accent sombre sur le fond sombre (à 12 %, le fond bleu
+    nuit de jetons.css rendait encore bleu le voile d'un vert, mesuré le 15/10/2026). Une marque déclarée en
+    clair seulement dérive aussi son accent sombre (l'accent éclairci), sinon le thème sombre
+    gardait le bleu de jetons.css."""
+    for nom in ("accent", "accent_fonce", "accent_sombre", "accent_fonce_sombre", "accent_voile", "accent_voile_sombre"):
+        valeur = meta.get(nom)
         if valeur and not RE_HEX.match(valeur):
             print("jeton de marque invalide : %s = %r (attendu #RRGGBB)" % (nom, valeur), file=sys.stderr)
             raise SystemExit(5)
+    accent = meta.get("accent")
+    accent_sombre = meta.get("accent_sombre") or (melange(accent, "#FFFFFF", 0.35) if accent else None)
+    fonce_sombre = meta.get("accent_fonce_sombre") or (melange(accent, "#FFFFFF", 0.55) if accent else None)
+    voile = meta.get("accent_voile") or (melange(accent, "#FFFFFF", 0.90) if accent else None)
+    voile_sombre = meta.get("accent_voile_sombre") or (melange(accent_sombre, FOND_SOMBRE, 0.85) if accent_sombre else None)
+    clair = [("--accent", accent), ("--accent-fonce", meta.get("accent_fonce")), ("--accent-voile", voile)]
+    sombre = [("--accent", accent_sombre), ("--accent-fonce", fonce_sombre), ("--accent-voile", voile_sombre)]
     regles = []
     if any(v for _, v in clair):
         regles.append(":root { " + " ".join("%s: %s;" % (n, v) for n, v in clair if v) + " }")
@@ -726,6 +749,43 @@ def style_de_marque(meta):
         regles.append(':root[data-theme="dark"] { ' + " ".join("%s: %s;" % (n, v) for n, v in sombre if v) + " }")
     return ("<style>/* Jetons de la marque du document (en-tête de la source). */\n" + SAUT.join(regles)
             + "\n</style>") if regles else ""
+
+
+def _jetons_accent(css):
+    """Les jetons --accent* de chaque thème d'une feuille : {"clair": {nom: valeur}, "sombre": {...}}."""
+    themes = {"clair": {}, "sombre": {}}
+    for selecteur, corps in re.findall(r"(:root(?:\[data-theme=\"dark\"\])?)\s*\{([^}]*)\}", css):
+        theme = "sombre" if "dark" in selecteur else "clair"
+        for nom, valeur in re.findall(r"(--accent[\w-]*)\s*:\s*(#[0-9A-Fa-f]{6})", corps):
+            themes[theme][nom] = valeur.upper()
+    return themes
+
+
+def teinte_bleue(hexa):
+    """Vrai si la couleur est d'une teinte bleue (200° à 260°) assez saturée pour se voir."""
+    r, g, b = (int(hexa[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    hi, lo = max(r, g, b), min(r, g, b)
+    if hi - lo < 0.03:
+        return False
+    d = hi - lo
+    if hi == r:
+        h = (60 * ((g - b) / d)) % 360
+    elif hi == g:
+        h = 60 * ((b - r) / d) + 120
+    else:
+        h = 60 * ((r - g) / d) + 240
+    return 200 <= h <= 260
+
+
+def teintes_bleues_effectives(style):
+    """Les jetons d'accent EFFECTIFS (jetons.css surchargé par le style de marque) de teinte bleue."""
+    base = _jetons_accent((COMPOSANTS_DIR / "jetons.css").read_text(encoding="utf-8"))
+    marque = _jetons_accent(style)
+    bleus = []
+    for theme in ("clair", "sombre"):
+        effectifs = dict(base[theme], **marque[theme])
+        bleus += ["%s %s %s" % (theme, n, v) for n, v in sorted(effectifs.items()) if teinte_bleue(v)]
+    return bleus
 
 
 # --------------------------------------------------------------------------- pose des composants
@@ -1112,6 +1172,28 @@ def self_test(socle_explicite=None):
         casse.append("TF-1516 borne : la garde du deux-points empêche aussi un VRAI titre de pas "
                      "(amorce suivie d'une majuscule) de se promouvoir")
 
+    # 0 bis. TF-1761 (15/10/2026, lot Produit-64 20261015f RT-66) — UNE PAGE À LA MARQUE VERTE NE
+    #    GARDE AUCUN JETON D'ACCENT BLEU. Rouge (défaut d'origine) : style_de_marque ne surchargeait
+    #    que --accent et --accent-fonce ; --accent-voile restait #EAF0FD / #16233F, et 10 cartes d'un
+    #    schéma se peignaient en bleu sur une page verte. La recette compte, dans les jetons d'accent
+    #    EFFECTIFS (jetons.css surchargé par le style de marque), les couleurs de teinte bleue : 0
+    #    attendu en clair comme en sombre. Vert, la borne : des champs accent_voile et
+    #    accent_voile_sombre explicites sont repris tels quels.
+    joues[0] += 3
+    vert = {"accent": "#15803D", "accent_fonce": "#166534", "accent_sombre": "#4ADE80", "accent_fonce_sombre": "#86EFAC"}
+    bleus = teintes_bleues_effectives(style_de_marque(vert))
+    if bleus:
+        casse.append("TF-1761 : une marque verte garde %d jeton(s) d'accent de teinte bleue — %s"
+                     % (len(bleus), ", ".join(bleus)))
+    seul_clair = teintes_bleues_effectives(style_de_marque({"accent": "#15803D", "accent_fonce": "#166534"}))
+    if seul_clair:
+        casse.append("TF-1761 : une marque verte déclarée en clair seulement garde %d jeton(s) d'accent bleu — %s"
+                     % (len(seul_clair), ", ".join(seul_clair)))
+    explicite = style_de_marque(dict(vert, accent_voile="#E8F5EC", accent_voile_sombre="#10261A"))
+    if "--accent-voile: #E8F5EC" not in explicite or "--accent-voile: #10261A" not in explicite:
+        casse.append("TF-1761 borne : accent_voile et accent_voile_sombre explicites ne sont pas repris tels quels — %s"
+                     % explicite[:200])
+
     base = poser("<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n<title>recette</title>\n</head>\n"
                  "<body>\n<p>recette</p>\n</body>\n</html>\n", ["jetons.css"])
     # 1. ROUGE, jouable partout : des blocs du socle, et aucun socle pour les juger.
@@ -1160,7 +1242,8 @@ def self_test(socle_explicite=None):
         return 1
     print("construire-guide --self-test (TF-1433) : %d/%d%s — TF-1516 : une amorce suivie d'un deux-points "
           "ne devient pas un pas et ne laisse pas de deux-points résiduel, la MÊME suivie d'une majuscule "
-          "reste un vrai pas ; la parité de --constat dans ses DEUX sens : "
+          "reste un vrai pas ; TF-1761 : une marque verte ne garde aucun jeton d'accent de teinte bleue, "
+          "en clair comme en sombre, et des voiles explicites sont repris tels quels ; la parité de --constat dans ses DEUX sens : "
           "blocs du socle non jugés DITS non comparés (exit 2), bloc de la famille dérivé PÉRIMÉ, page posée "
           "par le poseur du socle à jour, en LF comme en CRLF, find-in-page.js d'une autre version PÉRIMÉ "
           "(exit 1) puis à jour une fois reposé"
