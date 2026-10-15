@@ -234,6 +234,9 @@
     table { width: 100%; border-collapse: collapse; }
     th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { font-weight: 700; }
+    /* TF-1719 (15/10/2026) — un identifiant ne se coupe pas : « E-012 » sur deux lignes à 1920 px
+       (lot Produit-83 20261014a) se lit comme deux valeurs. */
+    td[data-label="Id"] { white-space: nowrap; }
     /* TF-0558 (24/08/2026) — LE SEUIL ETAIT FIGE A 900 px, ET TOUT PROJET QUI INSTANCIE CETTE
        FAMILLE LE REPRODUISAIT. Mesure sur un livrable reel : un tableau de huit colonnes debordait
        jusque vers 1 400 px (bord droit a 1 308 px pour un viewport de 1 280) — SEIZE debordements
@@ -365,7 +368,7 @@
       <div class="doc-ident">
         <p class="eyebrow">Client-A · Fiche produit · 2026-10-13</p>
         <h1>Outil de suivi des ateliers</h1>
-        <p class="muted">Périmètre fonctionnel en paliers, tiré du référentiel d'exigences. Exemplaire ILLUSTRATIF : client pseudonymisé, aucune donnée réelle.<br>Gabarit : gd-fiche-produit · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+        <p class="muted">Périmètre fonctionnel en paliers, tiré du référentiel d'exigences. Exemplaire ILLUSTRATIF : client pseudonymisé, aucune donnée réelle.<br>Gabarit : gd-fiche-produit · version du gabarit 1.1.0 — à reporter tel quel dans tout retour sur ce document</p>
       </div>
       <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
       <button id="theme-toggle" class="theme-toggle" type="button"
@@ -446,7 +449,7 @@
             <th data-definition="OÙ et QUAND la brique a été relevée. Une brique sans date de relevé ne figure pas.">Relevé</th>
           </tr></thead>
           <tbody>
-            <tr><td data-label="Brique">Site vitrine</td><td data-label="Usage actuel">Pages des gîtes, offres et conseils</td><td data-label="Rôle dans le produit">Source des pages ; le produit les liste, il ne les remplace pas</td><td data-label="Relevé">sitemap lu le 2026-10-07</td></tr>
+            <tr><td data-label="Brique">Site vitrine</td><td data-label="Usage actuel">Pages des gîtes, offres et conseils</td><td data-label="Rôle dans le produit">Source des pages, que le produit liste sans les remplacer</td><td data-label="Relevé">sitemap lu le 2026-10-07</td></tr>
             <tr><td data-label="Brique">Logiciel de réservation</td><td data-label="Usage actuel">Moteur embarqué sur les pages de réservation</td><td data-label="Rôle dans le produit">Source des réservations</td><td data-label="Relevé">page de réservation lue le 2026-10-07</td></tr>
             <tr><td data-label="Brique">Classeur de gestion</td><td data-label="Usage actuel">Un classeur par saison, un onglet par mois</td><td data-label="Rôle dans le produit">Remplacé par le palier MVP</td><td data-label="Relevé">en-têtes lus le 2026-10-07</td></tr>
           </tbody>
@@ -533,7 +536,7 @@
       <section class="chap lire" id="hypotheses">
         <h2>Hypothèses à lever</h2>
         <p class="chapo ch-apprend">Vous trouverez ce qu'il faut confirmer avant de construire, et qui peut le confirmer.</p>
-        <p class="contenu">Ce chapitre contient chaque hypothèse, l'exigence qu'elle conditionne, qui peut la lever et avant quand. Il ne contient aucun fait constaté.</p>
+        <p class="contenu">Ce chapitre contient chaque hypothèse avec l'exigence qu'elle conditionne, et dit qui peut la lever et avant quand. Il ne contient aucun fait constaté.</p>
         <p><strong>Exemple de lecture.</strong> Si H-01 est infirmée, E-002 devient une saisie à la main et son critère de recette change.</p>
         <div class="table-hote">
         <table class="repli-cartes">
@@ -568,7 +571,7 @@
             <th data-definition="Ce que chaque option écarte.">Exclusion</th>
           </tr></thead>
           <tbody>
-            <tr><td data-label="Point">Construire le produit ou étendre un logiciel existant</td><td data-label="Options">(a) construire ; (b) étendre le logiciel de réservation</td><td data-label="Exclusion">(a) écarte l'extension ; (b) écarte l'outil sur mesure</td></tr>
+            <tr><td data-label="Point">Construire le produit ou étendre un logiciel existant</td><td data-label="Options"><ul><li>(a) construire</li><li>(b) étendre le logiciel de réservation</li></ul></td><td data-label="Exclusion"><ul><li>(a) écarte l'extension</li><li>(b) écarte l'outil sur mesure</li></ul></td></tr>
           </tbody>
         </table>
         <p class="etat-vide">Aucune ligne. Ce n'est pas un oubli : le référentiel n'en porte aucune au relevé ci-dessus.</p>

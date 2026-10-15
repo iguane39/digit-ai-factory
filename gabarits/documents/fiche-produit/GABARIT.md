@@ -1,6 +1,6 @@
 # Gabarit — Fiche produit
 
-**Famille** `gd-fiche-produit` · **Version du gabarit** 1.0.0 · **Écrite le** 13/10/2026
+**Famille** `gd-fiche-produit` · **Version du gabarit** 1.1.0 · **Écrite le** 13/10/2026 · **Révisée le** 15/10/2026
 
 > **Formats** HTML (rendu remis) · Markdown (source)
 > **Règles engagées** D1 D3 D4 D6 D7 D11 (`gabarits\documents\README.md`)
