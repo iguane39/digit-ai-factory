@@ -57,6 +57,11 @@
             "type": "command",
             "command": "node oracles/hook-identite-sortante.mjs",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node oracles/hook-remisage.mjs",
+            "timeout": 10
           }
         ]
       }

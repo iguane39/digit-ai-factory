@@ -30,7 +30,7 @@
  * se fait désactiver le jour de son arrivée.
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
-import { join, extname, basename } from "node:path";
+import { join, extname, basename, dirname } from "node:path";
 import { createHash } from "node:crypto";
 // TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
 // il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
@@ -93,6 +93,8 @@ const NON_JUGE = [
   "signalé ici. Depuis le 31/08 les deux formats sont scellés SÉPARÉMENT, ce qui attrape la " +
   "modification silencieuse de l'un ou de l'autre ; l'ABSENCE de l'un des deux reste un autre " +
   "sujet, et il est déclaré plutôt que faussement promis",
+  "un journal R-32 (`forge\\oracles\\<livrable>.json`) qui ne consigne aucune empreinte sha256 du " +
+  "livrable : il prouve qu'un oracle a tourné, pas sur quel contenu, et J-3 ne le lit pas (TF-1745)",
 ];
 
 const sha = (b) => createHash("sha256").update(b).digest("hex");
@@ -183,6 +185,60 @@ if (!cibles.length) {
   process.exit(2);
 }
 
+// TF-1745 (lot Produit-03 20260908a, RA-44) — LE JOURNAL R-32 EST UN SCEAU SOUS UN AUTRE NOM. R-32
+// fait écrire, au premier passage des oracles, `forge\oracles\<livrable>.json`, et ce journal porte
+// souvent l'empreinte du contenu jugé (`sha256_livrable`). Le 07-08/09/2026, quatre empreintes
+// successives y ont été consignées sous le même nom de livrable, sans qu'aucun contrôle ne le dise.
+// Le journal se lit donc comme un sceau équivalent : plusieurs empreintes distinctes pour un même nom,
+// ou une empreinte qui n'est plus celle du fichier, signalent un écrasement à indice inchangé.
+// AVERTISSEMENT (J-3), jamais bloquant : la règle est neuve, et le journal n'a pas de format imposé.
+let journauxR32 = 0;
+// Seules les clés qui désignent CE fichier comptent : `sha256_livrable`, ou `sha256_<extension>`
+// (`sha256_html` pour un .html). Un journal porte aussi les empreintes de la source, du script d'oracle
+// ou du PDF frère : les compter ferait passer quatre fichiers pour quatre versions d'un seul (mesuré le
+// 15/10/2026 sur un dépôt du parc : 10 faux avertissements avant cette borne).
+const empreintesConsignees = (o, ext, out = []) => {
+  const cle = new RegExp(`^sha256_(?:livrable|${ext})$`, "i");
+  if (Array.isArray(o)) o.forEach((x) => empreintesConsignees(x, ext, out));
+  else if (o && typeof o === "object") {
+    for (const [k, v] of Object.entries(o)) {
+      if (cle.test(k) && typeof v === "string" && /^[0-9a-f]{64}$/i.test(v)) out.push(v.toLowerCase());
+      else empreintesConsignees(v, ext, out);
+    }
+  }
+  return out;
+};
+function lireJournalR32(f) {
+  // La racine du produit est le premier ancêtre qui porte `forge\oracles\` (six niveaux au plus).
+  let d = dirname(f);
+  for (let i = 0; i < 6 && !existsSync(join(d, "forge", "oracles")); i++) {
+    const parent = dirname(d);
+    if (parent === d) return;
+    d = parent;
+  }
+  const journal = join(d, "forge", "oracles", basename(f, extname(f)) + ".json");
+  if (!existsSync(journal)) return;
+  let j = null;
+  try { j = JSON.parse(readFileSync(journal, "utf8")); } catch { return; }
+  const consignees = empreintesConsignees(j, extname(f).slice(1).toLowerCase());
+  if (!consignees.length) return;
+  journauxR32++;
+  const distinctes = [...new Set(consignees)];
+  const presentes = empreintesDePoste(f);
+  if (distinctes.length > 1) {
+    add("J-3", "avertissement", f,
+      `AVERTISSEMENT, non bloquant : le journal R-32 (${basename(journal)}) consigne ${distinctes.length} empreintes ` +
+      `distinctes pour ce même nom de livrable (${distinctes.map((e) => e.slice(0, 12)).join(", ")}) : le livrable a été ` +
+      "modifié après jugement à indice inchangé, et le même nom désigne plusieurs contenus. Règle 5 : une nouvelle " +
+      "version = un nouveau fichier daté, avec l'indice suivant (TF-1745)");
+  } else if (!presentes.includes(distinctes[0])) {
+    add("J-3", "avertissement", f,
+      `AVERTISSEMENT, non bloquant : le journal R-32 (${basename(journal)}) consigne l'empreinte ${distinctes[0].slice(0, 12)}…, ` +
+      "qui n'est plus celle du fichier présent : le livrable a été modifié après son dernier passage d'oracles consigné, " +
+      "à indice inchangé. Rejouer les oracles sur un nouveau fichier à l'indice suivant (règle 5, TF-1745)");
+  }
+}
+
 let scelles = 0, verifies = 0, nonScelles = 0;
 const aSceller = [], ecrases = [];
 for (const cible of cibles) {
@@ -207,6 +263,7 @@ for (const cible of cibles) {
       aSceller.push({ fichier: f, sceau, empreinte });
       continue;
     }
+    lireJournalR32(f);
     if (!existsSync(sceau)) { nonScelles++; continue; }
     let j = null;
     try { j = JSON.parse(readFileSync(sceau, "utf8")); } catch { /* sceau illisible */ }
@@ -275,7 +332,7 @@ const durs = findings.filter((f) => f.severite === "bloquant" || f.severite === 
 const verdict = SCELLER ? (ESSAI ? "ESSAI" : "SCELLE") : durs.length ? "FAIL" : "PASS";
 process.stdout.write(JSON.stringify({
   outil: "verifier-jugement", version: "1.0.0", cibles, verdict,
-  mesure: SCELLER ? { scelles, ecraserait: ecrases.length } : { verifies, non_scelles: nonScelles, ecarts: durs.length },
+  mesure: SCELLER ? { scelles, ecraserait: ecrases.length } : { verifies, non_scelles: nonScelles, ecarts: durs.length, journaux_r32_lus: journauxR32, avertissements_r32: findings.filter((x) => x.regle === "J-3").length },
   // L ESSAI REND LA LISTE A NOMMER. Depuis D-29 un scellement reel refuse un dossier : l essai
   // est donc la voie par laquelle on obtient les chemins a passer en clair. Une voie prescrite
   // qui ne rend pas ce qu elle prescrit de reutiliser n est pas une voie.

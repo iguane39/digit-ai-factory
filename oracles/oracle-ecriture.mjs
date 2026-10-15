@@ -105,6 +105,10 @@ function decouper(texte) {
     // Les CELLULES d'un tableau : leur texte reste prose, mais la barre devient une frontière —
     // une ligne de six cellules n'est pas une phrase de soixante-quinze mots. Le remplacement
     // est d'égale longueur, donc les offsets relevés restent ceux de la ligne finale.
+    // TF-1784 (lot Produit-83 20261015b, RT-9) : un tiret SEUL dans une cellule est la marque d'une
+    // cellule vide (MODELE-DONNEES.md la prescrit pour une clé absente), pas un tiret d'incise. Il
+    // devient un blanc d'égale longueur ; un tiret entouré de texte dans la cellule reste compté.
+    if (/^\s*\|/.test(l)) l = l.replace(/(?<=\|[ \t]*)[—–-]{1,2}(?=[ \t]*(?:\||$))/g, (m) => " ".repeat(m.length));
     l = l.replace(/\|/g, (m, offset) => { cellules[i].push(offset); return " "; });
     proseLignes[i] = l;
   }
@@ -1014,6 +1018,44 @@ function selfTest() {
     const f8g = (rg.j?.findings || []).filter((f) => f.regle === "EC-8" && f.statut === "FAIL");
     if (f8g.length)
       casse.push(`TF-1616 : le gabarit gabarits\\docs-projet\\${nomGabarit} est refusé par EC-8 chez le produit qui l'instancie : ${JSON.stringify(f8g)}`);
+  }
+
+  // TF-1783 (lot Produit-83 20261015b, RT-8) — BORNE, PAS UN DESSERREMENT. « Ce que les tests simulent »
+  // en titre ouvre sur la tournure que la décision D-2 (a) du 16/09 refuse partout en titre : c'est le
+  // cas que la règle vise, pas un faux positif. Le cas reste rouge ; le remède est de nommer le contenu.
+  const r1783 = jouer("tf1783.md", "# Tests\n\nUn paragraphe de prose ordinaire qui pose le sujet.\n\n## Ce que les tests simulent\n\n- un service tiers\n");
+  if ((r1783.j?.findings || []).find((f) => f.regle === "EC-8")?.statut !== "FAIL")
+    casse.push("TF-1783 : le titre « Ce que les tests simulent » n'est plus refusé — EC-8 a été desserré au lieu du titre renommé");
+  const r1783v = jouer("tf1783v.md", "# Tests\n\nUn paragraphe de prose ordinaire qui pose le sujet.\n\n## Services simulés par les tests\n\n- un service tiers\n");
+  if ((r1783v.j?.findings || []).find((f) => f.regle === "EC-8")?.statut !== "PASS")
+    casse.push("TF-1783 : le titre qui NOMME son contenu (« Services simulés par les tests ») est refusé");
+
+  // TF-1784 (lot Produit-83 20261015b, RT-9) — LE TIRET SEUL DANS UNE CELLULE EST UNE CELLULE VIDE.
+  // Le gabarit MODELE-DONNEES.md prescrit « — » pour une clé absente ; EC-1 comptait chacun comme un
+  // tiret d'incise, et un modèle de 20 tables écrit comme le gabarit échouait (120 occurrences, 77 ‰).
+  // VERT : 20 tables à cellule « — » ne déclenchent rien. ROUGE : la même prose en cascade d'incises
+  // DANS une cellule de texte reste comptée — la borne porte sur la cellule vide, pas sur le tableau.
+  const table1784 = (cle) => Array.from({ length: 20 }, (_, i) => `## Table : t${i}\n\nUne ligne représente un objet métier numéro ${i} du produit, lu dans sa migration.\n\n| Colonne | Type | Nullable | Clé |\n|---|---|---|---|\n`
+    + Array.from({ length: 6 }, (_, k) => `| c${k} | text | non | ${cle} |`).join("\n") + "\n").join("\n");
+  const r1784v = jouer("tf1784v.md", "# Modèle de données\n\n" + table1784("—"));
+  const f1784v = (r1784v.j?.findings || []).find((f) => f.regle === "EC-1:ponctuation-de-cadence");
+  if (!f1784v || f1784v.statut !== "PASS")
+    casse.push(`TF-1784 : un modèle de 20 tables à cellule « — » (forme que le gabarit prescrit) est accusé de tirets d'incise : ${JSON.stringify(f1784v)}`);
+  const r1784r = jouer("tf1784r.md", "# Modèle de données\n\n" + table1784("clé — étrangère — vers la table voisine"));
+  const f1784r = (r1784r.j?.findings || []).find((f) => f.regle === "EC-1:ponctuation-de-cadence");
+  if (!f1784r || f1784r.statut === "PASS")
+    casse.push(`TF-1784 : la cascade d'incises DANS une cellule de texte n'est plus comptée — la borne a débordé : ${JSON.stringify(f1784r)}`);
+
+  // TF-1785 (lot Produit-83 20261015b, RT-10) — CHAQUE GABARIT docs-projet DÉCLARE SON LECTEUR. Sans
+  // `role_destinataire`, EC-10 rendait SKIP sur chaque fiche instanciée et ses blocs n'étaient jamais
+  // jugés. VERT : aucun gabarit ne rend plus EC-10 SKIP ; COMMANDES.md, dont le lecteur exécute, PASS.
+  for (const nomGabarit of readdirSync(dossierDocsProjet).filter((n) => n.endsWith(".md"))) {
+    const rg = jouer(`tf1785-${nomGabarit}`, readFileSync(join(dossierDocsProjet, nomGabarit), "utf8"));
+    const f10 = (rg.j?.findings || []).find((f) => f.regle === "EC-10");
+    if (!f10 || f10.statut === "SKIP")
+      casse.push(`TF-1785 : le gabarit gabarits\\docs-projet\\${nomGabarit} ne déclare pas son lecteur — EC-10 rend ${f10?.statut || "rien"}`);
+    else if (nomGabarit === "COMMANDES.md" && f10.statut !== "PASS")
+      casse.push(`TF-1785 : COMMANDES.md, écrit pour un lecteur qui exécute, est refusé par EC-10 : ${JSON.stringify(f10)}`);
   }
 
   // 11, 12 et 13 (TF-1138) — EC-10, LE LECTEUR DECLARE. Trois sens : la commande REFUSEE quand le

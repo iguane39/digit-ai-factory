@@ -556,8 +556,19 @@ else {
             "au registre d'organization (D-04) reste dû (TF-1713)");
         } else if (!admis.has(normeType(type))) {
           const suggestion = plusProche(type, typesAffiches);
+          // TF-1741 (lot Produit-76 20260825b) : quand le nom de PROJET contient lui-même « - », le
+          // 2e segment est la fin du nom de projet, et le type lu est un mot de ce nom. Douze refus
+          // identiques renvoyaient au registre, jamais à la cause. Le refus la nomme désormais : un
+          // segment plus loin ouvre sur un type admis, ou le mot lu figure dans le nom du dossier.
+          const plusLoin = segs.slice(2, -1).map((s) => s.split(" ")[0]).find((t) => admis.has(normeType(t)));
+          const dansDossier = type.length >= 4 && normeType(basename(resolve(cible))).includes(normeType(type));
+          const cause = plusLoin
+            ? ` — le nom de projet semble contenir le séparateur « - » : le type lu (« ${type} ») est probablement un mot du nom de projet, le segment suivant ouvre sur le type admis « ${plusLoin} » ; renommer le projet sans « - » dans les noms de livrables`
+            : dansDossier
+              ? ` — « ${type} » figure dans le nom du dossier du produit : le nom de projet semble contenir le séparateur « - », et le type lu est un mot de ce nom`
+              : "";
           ko("R-25", rel(f),
-            `type « ${type} » absent du registre des types` +
+            `type « ${type} » absent du registre des types` + cause +
             (suggestion ? ` — vouliez-vous dire « ${suggestion.type} » (distance ${suggestion.distance}) ?` : "") +
             ` — types admis : ${typesAffiches.join(", ")}` +
             " — un type nouveau s'ajoute au registre d'organization (commit motivé, D-04), jamais improvisé dans un nom");
@@ -885,6 +896,43 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
           "rejouer la revue (render_page.py, ouvrir et lire les captures) après la dernière écriture de la page, puis mettre à jour REVUE.md");
       } else {
         ok("R-32 quater", "*/REVUE.md", `revue de lecture présente, non vide et plus récente que chacun des ${htmls.length} livrable(s) HTML remis`);
+      }
+    }
+
+    // R-32 quinquies (TF-1746, 15/10/2026, lot Produit-03 20260908a RA-45) — LE LECTEUR SAIT CE QUI A
+    // CHANGÉ. Un mode opératoire remis à des administrateurs affichait « indice 20260907a » et rien
+    // d'autre, après quatre modifications en deux jours : un lecteur de la veille ne pouvait pas savoir
+    // ce qui avait bougé, ni même que quelque chose avait bougé (« aucun historique n'est enclenché »,
+    // mot du commanditaire). Le journal R-32 garde la trace machine, dans un fichier que le destinataire
+    // n'ouvre jamais. Mesure : une page HTML remise porte une section « Historique » (du document, des
+    // versions) dont le PREMIER indice cité est l'indice de son propre nom. SÉVÉRITÉ : AVERTISSEMENT en
+    // PASS, jamais un FAIL — règle neuve, d'abord mesurée. ANTÉRIORITÉ : seuls les livrables datés du
+    // 15/10/2026 ou après sont jugés ; l'existant n'est pas réécrit (déclaré au non_juge).
+    {
+      const DEPUIS_1746 = "20261015";
+      const sansHistorique = [], perime = [];
+      let juges1746 = 0;
+      for (const f of htmls) {
+        const m = basename(f).match(/\s-\s(\d{8})([a-z])\.html?$/i);
+        if (!m || m[1] < DEPUIS_1746) continue;
+        juges1746++;
+        const indice = m[1] + m[2].toLowerCase();
+        const texte = readFileSync(f, "utf8");
+        const titre = /<h[1-6][^>]*>[^<]*historique[^<]*<\/h[1-6]>/i.exec(texte);
+        if (!titre) { sansHistorique.push(rel(f)); continue; }
+        const premier = /\b(\d{8}[a-z])\b/i.exec(texte.slice(titre.index + titre[0].length).replace(/<[^>]+>/g, " "));
+        if (!premier || premier[1].toLowerCase() !== indice) perime.push(`${rel(f)} (1er indice de l'historique : ${premier ? premier[1] : "aucun"}, indice du nom : ${indice})`);
+      }
+      if (!juges1746) {
+        antecedences.push(`R-32 quinquies (historique lisible, TF-1746) non jugé : aucun livrable HTML daté du ${DEPUIS_1746} ou après — l'existant n'est pas réécrit`);
+      } else if (sansHistorique.length || perime.length) {
+        ok("R-32 quinquies", "output/*.html",
+          `AVERTISSEMENT, non bloquant : ${sansHistorique.length + perime.length} livrable(s) HTML remis sans historique lisible par son lecteur` +
+          (sansHistorique.length ? ` ; sans section « Historique du document » : ${sansHistorique.join(" · ")}` : "") +
+          (perime.length ? ` ; historique dont la première ligne n'est pas l'indice courant : ${perime.join(" · ")}` : "") +
+          " — un livrable documentaire remis porte un bloc « Historique du document » (version, date, ce qui change), dont la première ligne est son indice (TF-1746)");
+      } else {
+        ok("R-32 quinquies", "output/*.html", `${juges1746} livrable(s) HTML portent un historique dont la première ligne est leur indice`);
       }
     }
   }
@@ -2061,11 +2109,20 @@ else {
   if (existsSync(tp)) {
     const front = frontmatter(readFileSync(tp, "utf8")) || "";
     const bloc = front.match(/^versions\s*:\s*\r?\n((?:[ \t]+.+\r?\n?)*)/m);
-    const paires = [];
+    const paires = [], illisibles = [];
+    // TF-1787 (lot Produit-83 20261015b, RT-11) : une clé entre guillemets (« "@vitejs/plugin-react" »,
+    // une clé YAML ne pouvant commencer par @ sans guillemets) était ignorée sans un mot. La clé se lit
+    // désormais nue ou citée ; une ligne que l'oracle ne sait pas lire est DITE, jamais tue.
     if (bloc) for (const l of bloc[1].split(/\r?\n/)) {
-      const m = l.match(/^[ \t]+([\w@\/.–-]+)\s*:\s*"([^"]+)"/);
-      if (m && !m[1].startsWith("#")) paires.push([m[1], m[2]]);
+      if (!l.trim() || l.trim().startsWith("#")) continue;
+      const m = l.match(/^[ \t]+(?:"([^"]+)"|'([^']+)'|([\w@\/.–-]+))\s*:\s*"([^"]+)"/);
+      if (m) paires.push([m[1] || m[2] || m[3], m[4]]);
+      else illisibles.push(l.trim());
     }
+    if (illisibles.length) ok("R-21", "docs\\projet\\TECHNOS.md",
+      `AVERTISSEMENT, non bloquant : ${illisibles.length} ligne(s) du bloc versions non lue(s), donc jamais confrontée(s) aux lockfiles : ` +
+      illisibles.slice(0, 5).map((l) => `« ${l.slice(0, 60)} »`).join(", ") +
+      ` — forme attendue : clé nue ou entre guillemets, version entre guillemets (ex. "@vitejs/plugin-react": "5.0.0")`);
     // TF-0088 puis TF-0128(a)(b) : lockfiles cherchés sur 2 niveaux de descente au plus
     // (monorepo : frontend/yarn.lock…), exclusions node_modules/.venv/dist/build ; yarn.lock,
     // pnpm-lock.yaml et bun.lockb rejoignent la liste des noms canoniques.
@@ -2143,13 +2200,19 @@ else {
    *        environnement: qualif
    *        motif: domaine créé avant la convention, renommage planifié
    *        decide_le: 2026-08-15                                                          */
+  // TF-1736 (lot Produit-76 20260825a) : une URL écrite entre accents graves dans la table était
+  // capturée AVEC l'accent grave final et ne rejoignait jamais l'écart déclaré sur l'URL nue. L'URL
+  // se normalise des deux côtés avant comparaison : guillemets, accents graves, ponctuation de fin,
+  // barre oblique finale.
+  const urlNue = (u) => String(u).replace(/^[`'"<(]+/, "").replace(/[`'"*_>),.;:]+$/, "").replace(/\/+$/, "");
+  const hoteDe = (u) => urlNue(u).replace(/^https?:\/\//, "").split(/[/:]/)[0].toLowerCase();
   const ecartsR24 = (front) => {
     const bloc = (front || "").match(/^ecarts_r24\s*:\s*\r?\n((?:[ \t]+.+\r?\n?)*)/m);
     if (!bloc) return [];
     const out = [];
     for (const l of bloc[1].split(/\r?\n/)) {
       const debut = l.match(/^[ \t]+-\s*url\s*:\s*(\S+)/);
-      if (debut) { out.push({ url: debut[1] }); continue; }
+      if (debut) { out.push({ url: urlNue(debut[1]) }); continue; }
       const champ = l.match(/^[ \t]+(environnement|motif|decide_le)\s*:\s*(.+?)\s*$/);
       if (champ && out.length) out[out.length - 1][champ[1]] = champ[2];
     }
@@ -2166,9 +2229,16 @@ else {
       for (const l of lignes) {
         const env = l.trim().match(/^\|\s*(\w+)/)[1].toLowerCase();
         const attendu = ENV_LIGNE[env];
-        for (const [url] of l.matchAll(/https?:\/\/[^\s|)>}\]]+/g)) {
-          if (/[<>{}]/.test(url)) continue; // placeholder
+        for (const [brute] of l.matchAll(/https?:\/\/[^\s|)>}\]`]+/g)) {
+          if (/[<>{}]/.test(brute)) continue; // placeholder
+          const url = urlNue(brute);
           jugees++;
+          // TF-1736 : un écart déclaré sur le même hôte mais une autre URL se NOMME dans le refus,
+          // au lieu de laisser répéter la règle de nommage sur un écart pourtant déclaré.
+          const voisin = declares.find((e) => e.url !== url && hoteDe(e.url) === hoteDe(url));
+          const ko24 = (msg) => ko("R-24", "docs\\projet\\PARAMETRAGE.md", msg + (voisin
+            ? ` ; un écart déclaré en \`ecarts_r24\` porte le même hôte sous une autre URL (« ${voisin.url} ») : l'écart ne vaut que pour l'URL exacte de la table`
+            : ""));
           const hote = url.replace(/^https?:\/\//, "").split(/[/:]/)[0];
           const label = hote.split(".")[0];
           const morceaux = label.split("-");
@@ -2178,14 +2248,14 @@ else {
             ko("R-24", "docs\\projet\\PARAMETRAGE.md", `URL ${env} « ${url.slice(0, 70)} » : doublon d'environnement dans l'hôte (« -${queue[0]}-${queue[1]} ») — un hôte qui porte deux environnements se contredit ; aucun écart déclaré ne l'excuse`); ok24 = false;
             continue;
           }
-          const excuse = declares.find((e) => e.url === url || e.url === url.replace(/\/+$/, ""));
+          const excuse = declares.find((e) => e.url === url);
           if (!/-(dev|qualif|production)$/.test(label)) {
             if (excuse) { excuses++; continue; }
-            ko("R-24", "docs\\projet\\PARAMETRAGE.md", `URL ${env} « ${url.slice(0, 70)} » : le premier label d'hôte doit finir par -dev, -qualif ou -production (« ${label} » constaté)`); ok24 = false;
+            ko24(`URL ${env} « ${url.slice(0, 70)} » : le premier label d'hôte doit finir par -dev, -qualif ou -production (« ${label} » constaté)`); ok24 = false;
           } else if (attendu && !label.endsWith(`-${attendu}`)) {
             // (a) le suffixe est présent mais ment sur l'environnement de sa ligne.
             if (excuse) { excuses++; continue; }
-            ko("R-24", "docs\\projet\\PARAMETRAGE.md", `URL ${env} « ${url.slice(0, 70)} » : suffixe discordant — la ligne ${env} exige « -${attendu} » (« ${label} » constaté)${env === "staging" ? " ; l'environnement de l'étape MEP se nomme qualif dans les URLs" : ""}`); ok24 = false;
+            ko24(`URL ${env} « ${url.slice(0, 70)} » : suffixe discordant — la ligne ${env} exige « -${attendu} » (« ${label} » constaté)${env === "staging" ? " ; l'environnement de l'étape MEP se nomme qualif dans les URLs" : ""}`); ok24 = false;
           }
         }
       }

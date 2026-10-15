@@ -152,7 +152,13 @@ try {
   }
 
   const r2 = lancer("mauvais-actif", MAUVAIS, ["Write"], true);
-  if (r2.decision !== null) echecs.push("2 : stop_hook_active → attendu laisser passer (anti-boucle)");
+  // TF-1739 (lot du 25/08, RV-2) : la garde anti-boucle laissait passer la réécriture SANS la juger
+  // visiblement — refusée sur S1/S3/S4/S6, réécrite, acceptée, puis rejouée à la main : S15 et S16 FAIL.
+  // Désormais : pas de second refus (pas de boucle), mais la réécriture est REJUGÉE et son verdict
+  // AFFICHÉ à l'humain par un systemMessage nommant les règles encore en défaut.
+  if (r2.decision === null || r2.decision.decision === "block"
+      || !/réécriture/.test(r2.decision.systemMessage || "") || !/S\d+/.test(r2.decision.systemMessage || ""))
+    echecs.push(`2 : stop_hook_active → attendu pas de second refus ET verdict de la réécriture affiché (TF-1739), obtenu ${JSON.stringify(r2.decision)?.slice(0, 200)}`);
 
   const r3 = lancer("bon", BON, ["Write", "Edit"]);
   if (r3.decision !== null) echecs.push(`3 : travail + conforme → attendu laisser passer, obtenu ${JSON.stringify(r3.decision).slice(0, 200)}`);

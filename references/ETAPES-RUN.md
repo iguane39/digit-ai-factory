@@ -214,7 +214,7 @@ humaine si absents du brief.
 l'accueil), et la dérivation est **consignée dans `DESIGN.md`** — chaque choix graphique
 structurant motivé par cette expérience, jamais par défaut d'outillage ; (b) **généricité** :
 `node <design>\oracles\oracle-taste.mjs <html>` PASS exigé (`cat-des-09`) ; (c) **baseline
-visuelle** posée : `node <design>\oracles\oracle-baseline.mjs approuver` (`cat-des-08`).
+visuelle** posée : `node <design>\oracles\oracle-baseline.mjs <maquette.html|url> --slug <nom> --racine <racine du produit> --approuver` (`cat-des-08`) ; un écart voulu après un FAIL s'approuve avec `--motif "<écart voulu>"`, tracé ; une application derrière connexion se rend par son URL avec `--etat-session`.
 Écart assumé possible mais explicite, jamais par omission (loi n° 3).
 
 **Valider** : `node <design>\oracles\run-oracles-design.mjs <html> --tokens <tokens.css>
@@ -348,7 +348,7 @@ requalifié — un échec résistant = retour consigné avec diagnostic. Les ite
 et `manuelle_utilisateur` sont listés avec leur attendu détaillé (dashboard, onglet Actions)
 — l'objectif : maximiser l'auto-traité, ne laisser en manuel que l'irréductible.
 **La boucle ne se clôt pas sur un solde d'adoption non nul (R-40)** :
-`node oracles\oracle-adoption-tests.mjs <racine-produit>` rend PASS (solde nul par les trois
+`node oracles\oracle-adoption-tests.mjs <racine-produit>` (il lit d'office les cahiers sous `<racine>\digit-ai-forge-tests\output\<projet>-livrables\`, ou `--livrables <dossier>`) rend PASS (solde nul par les trois
 issues — les deux issues non-adoption se déclarent dans `forge\cas-ecartes.jsonl`) ou
 SANS_OBJET motivé ; un FAIL est un reste-à-faire de la boucle, jamais un livrable clos.
 
@@ -376,13 +376,17 @@ d'implémentation » de forge-design
 (`skills\critique-le-design\references\critique-implementation.md`) — le produit jugé contre
 SA promesse design (tokens du run, écrans/états, CTA, rendu 2 thèmes, voix). Sortie :
 `etapes\design\revue-implementation.md`, écarts versés au ledger (`type: retour`,
-`source: produit`, destinataire development). Verdict Refondre ou ≥ 1 bloquant → retour à
-development (boucle bornée partagée avec l'étape tests). Un écart voulu se consigne en
-hypothèse — la revue le classe « accepté », pas défaut.
+`source: produit`, destinataire development). Le verdict se dit dans le vocabulaire de
+forge-design, qui le rend : **Livrer**, **Renforcer** ou **Refondre**, et aucun autre. Un mandat
+d'agent recopie ces trois mots ; le 15/10/2026, un mandat qui disait « Accepter / Retravailler »
+a obligé la revue à publier une table de correspondance (TF-1801). Verdict Refondre ou ≥ 1
+bloquant → retour à development (boucle bornée partagée avec l'étape tests). Un écart voulu se
+consigne en hypothèse — la revue le classe « accepté », pas défaut.
 
 **Gate généricité rejoué (loi n° 6, TF-0237)** : `oracle-taste.mjs` PASS sur le rendu
 implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la baseline
-(`oracle-baseline.mjs juger`) détecte toute dérive depuis l'approbation de l'étape 3.
+(`oracle-baseline.mjs <page|url> --slug <nom> --racine <racine du produit>`) détecte toute dérive depuis l'approbation de l'étape 3.
+Une application derrière connexion se rend avec sa session : `render_page.py <url> --etat-session <état de session Playwright>` ; sans elle, seule la mire est jugée, et `render_page` le dit (« MIRE DE CONNEXION RENDUE », TF-1788).
 
 **Exploitabilité au volume réel (TF-1654, 14/10/2026).** Une revue jouée sur le seul jeu de
 démonstration ne dit rien de l'écran que l'utilisateur aura. Le 12/10/2026, chez Produit-80, les
@@ -464,6 +468,19 @@ implémentées et testées, seuls les secrets restant à saisir par l'administra
 unique. Un run qui s'arrête avant le dit, écrit « N exigences sur M tenues » au bloc 0 ou au verdict de
 sa restitution, et nomme ce qui reste ; le critère de sortie d'une phase tenu se dit « phase close ».
 Juges : S70 à S72 d'`oracles\oracle-synthese.mjs`, avertissantes.
+
+*Une recette verte a joué chaque parcours dans un vrai navigateur, sur l'adresse publique*
+(TF-1766, 15/10/2026, **avertissement** ; rattachée au point 3 de R-61, « la mesure se fait par
+l'usage »). Le fait : une restitution annonçait 5 parcours de personas au vert, en local et chez
+l'hébergeur ; la première connexion humaine sur l'adresse publique a rendu « Application failed to
+respond », parce qu'un identifiant inconnu faisait planter le serveur. Les tests appelaient le portail
+par le réseau privé, avec les seules saisies attendues. Pour un produit à interface, la recette joue
+donc chaque parcours de la fiche (chapitre « Personas et usages », `gd-fiche-produit` 1.2.0) dans un
+vrai navigateur, sur l'adresse publique, avec au moins une saisie inattendue par formulaire ; la
+colonne « Parcours testé » de la fiche en porte la trace datée. Une restitution ne dit « fonctionnel »
+ou « livré » d'un produit à interface qu'avec cette trace. Juges, avertissants : FP8
+d'`oracles\oracle-fiche-produit.mjs` (la trace dans la fiche) et S75 d'`oracles\oracle-synthese.mjs`
+(la trace dans la restitution qui déclare la livraison).
 
 *L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
 

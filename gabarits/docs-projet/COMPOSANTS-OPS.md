@@ -1,6 +1,7 @@
 ---
 role: composants déployés — vue consolidée depuis forge-ops et le dossier MEP (R-20)
 destinataire: humain
+role_destinataire: exploitant du produit (astreinte, administrateur de la cible)
 sources_de_verite: ["ops.mjs etat <cible>", "forge/etapes/mep/DOSSIER-MEP.md", "plan forge-ops (O-5)"]
 verifie_le: {AAAA-MM-JJ}
 environnements: [locale, staging, production]

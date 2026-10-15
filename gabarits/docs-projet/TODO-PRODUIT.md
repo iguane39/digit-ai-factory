@@ -1,6 +1,7 @@
 ---
 role: reste-à-faire et décisions attendues du produit — vue pour humain, hors session (R-20, TF-0318)
 destinataire: humain
+role_destinataire: commanditaire et porteur du produit
 sources_de_verite: [forge/QUESTIONS.md, forge/retours/, forge/ledger.jsonl, forge/EXIGENCES.json]
 verifie_le: {AAAA-MM-JJ}
 ---

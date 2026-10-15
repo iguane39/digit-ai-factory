@@ -83,8 +83,12 @@
  *       système, ou « justesse non mesurée » (15/10, TF-1694, R-63) ; S74 un gain annoncé sur un
  *       échantillon dit le contrôle des changements dans la population et l'effet sur l'existant
  *       (TF-1695, R-63) ; avertissantes ;
- *   S75 chez un produit qui déclare un canal de reprise (forge/REPRISE.json), aucune action
+ *   S77 chez un produit qui déclare un canal de reprise (forge/REPRISE.json), aucune action
  *       manuelle_utilisateur ne demande un transport entre postes (15/10, TF-1736, R-64) ; avertissante ;
+ *   S75 une livraison déclarée d'un produit à interface dit qu'un parcours a été joué dans un vrai
+ *       navigateur sur l'adresse publique, ou l'avoue non joué (15/10, TF-1766, R-61 point 3) ; S76 un
+ *       chiffre attribué au rapport d'un agent se recompte à la source, ou se dit « non recompté »
+ *       (15/10, TF-1802) ; avertissantes ;
  *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
  *   S38 une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'EXEMPTION
  *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
@@ -3801,8 +3805,55 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // S75 (TF-1766, lot Produit-82 20261015b RT-15, R-61 point 3) — UNE LIVRAISON À INTERFACE DIT QUE SES
+  // PARCOURS ONT ÉTÉ JOUÉS DANS UN VRAI NAVIGATEUR, SUR L'ADRESSE PUBLIQUE. Le 15/10/2026, une restitution
+  // annonçait 5 parcours de personas au vert, en local et chez l'hébergeur ; la première connexion humaine
+  // sur l'adresse publique a rendu « Application failed to respond ». Les tests appelaient le portail par
+  // le réseau privé, avec les seules saisies attendues. Ce juge lit une livraison déclarée (S71) d'un
+  // produit à interface (portail, page, écran, site, connexion, formulaire, tableau de bord), et exige
+  // dans la restitution un parcours joué dans un navigateur avec l'adresse publique, ou l'aveu qu'il ne
+  // l'a pas été. AVERTISSANTE. NON JUGÉ : que le parcours ait vraiment été joué, la saisie inattendue.
+  {
+    const INTERFACE = uni(/\b(portails?|interfaces?|[ée]crans?|pages?|sites?|application web|connexion|se connecter|formulaires?|tableaux? de bord|navigateur)\b/i);
+    const sansCode75 = texte.replace(/```[\s\S]*?```/g, " ");
+    const PARCOURS_NAV = uni(/\b(parcours|recette|tests?|jou[ée]s?)\b[^.\n]{0,120}\bnavigateur\b|\bnavigateur\b[^.\n]{0,120}\b(parcours|jou[ée]s?)\b/i);
+    const PUBLIQUE = uni(/\badresse publique\b|https?:\/\/[^\s)`>\]]+/i);
+    const AVEU = uni(/\bparcours\b[^.\n]{0,60}\bnon jou[ée]s?\b|\bnon jou[ée]s?\b[^.\n]{0,60}\bnavigateur\b|\bpas (?:encore )?(?:[ée]t[ée] )?jou[ée]s? dans un navigateur\b/i);
+    const aInterface = livraisons.length > 0 && INTERFACE.test(lireDAbord);
+    if (!aInterface) ok("S75", "aucune livraison d'un produit à interface déclarée au bloc 0 ou au verdict — rien à juger");
+    else if (AVEU.test(sansCode75) || (PARCOURS_NAV.test(sansCode75) && PUBLIQUE.test(sansCode75)))
+      ok("S75", "livraison à interface déclarée, avec la trace d'un parcours joué dans un navigateur sur l'adresse publique, ou l'aveu qu'il ne l'a pas été");
+    else ko("S75", "une livraison d'un produit à interface est déclarée sans dire qu'un parcours a été joué dans un vrai navigateur, sur l'adresse "
+      + "publique — le 15/10/2026, 5 parcours verts appelaient le portail par le réseau privé, et la première connexion humaine a rendu « Application "
+      + "failed to respond » (TF-1766). Écris le parcours joué (navigateur, adresse publique, date, saisie inattendue), ou « parcours non joué dans un navigateur ». "
+      + `Ex. : ${livraisons[0].replace(/\s+/g, " ").slice(0, 110)}`);
+  }
 
-  // S75 (TF-1736, lot Produit-12 20261014b RS-33, R-64 point 5) — UN TRANSPORT ENTRE POSTES NE SE LAISSE
+  // S76 (TF-1802, lot Produit-83 20261015b RT-14) — UN CHIFFRE RAPPORTÉ PAR UN AGENT SE RECOMPTE À LA
+  // SOURCE AVANT D'ÊTRE RESTITUÉ. Le 15/10/2026, un peuplement a été annoncé à 13 087 établissements, le
+  // compte du rapport de l'agent ; recompté en base, 9 872 établissements distincts, les cercles de
+  // collecte se chevauchant. Ce juge lit une phrase qui attribue un nombre à un agent (« l'agent
+  // rapporte », « selon l'agent », « rapport de l'agent ») et exige dans la restitution un recompte à la
+  // source (recompté, compté en base, requête, `COUNT`, `wc -l`) ou l'aveu « non recompté ». AVERTISSANTE.
+  // NON JUGÉ : que le recompte soit juste, un chiffre d'agent restitué sans être attribué à l'agent.
+  {
+    const sansCode76 = texte.replace(/```[\s\S]*?```/g, " ");
+    const PAR_AGENT = uni(/\b(?:(?:l['’]|les |un |le |des |du |d['’])?(?:sous-)?agents?\b[^.\n]{0,40}\b(?:rapporte|rapportent|annonce|annoncent|compte|comptent|a compt[ée]|ont compt[ée]|dit|disent|remonte|remontent|indique|indiquent|signale|signalent)|selon (?:l['’]|les )(?:sous-)?agents?|d['’]apr[èe]s (?:l['’]|les )(?:sous-)?agents?|rapports? (?:de l['’]|des |du )(?:sous-)?agents?|rapport[ée]s? par (?:l['’]|les |un )(?:sous-)?agents?)\b/i);
+    // Un COMPTE d'objets : trois chiffres au moins, ou un séparateur de milliers. Hors du jugement : les
+    // lignes de tableau (bloc 8), le décompte d'appels d'outils d'un agent, qui n'est pas un résultat.
+    const NOMBRE = /\b\d{1,3}(?:[  .]\d{3})+\b|\b\d{3,}\b/;
+    const RECOMPTE = uni(/\b(recompt\w*|compt[ée]s? (?:en base|[àa] la source|dans la base)|mesur[ée]s? (?:en base|[àa] la source)|requ[êe]te|non recompt[ée]s?|non rejou[ée]s?)\b|\bCOUNT\s*\(|\bwc -l\b/i);
+    const chiffres = phrasesDe(sansCode76.split("\n").filter((l) => !/^\s*\|/.test(l)).join("\n"))
+      .filter((p) => PAR_AGENT.test(p) && NOMBRE.test(p) && !/appels? d['’]outils?/i.test(p));
+    if (!chiffres.length) ok("S76", "aucun chiffre attribué au rapport d'un agent — rien à juger");
+    else if (RECOMPTE.test(sansCode76)) ok("S76", `${chiffres.length} chiffre(s) attribué(s) à un agent, avec un recompte à la source ou l'aveu « non recompté »`);
+    else ko("S76", `${chiffres.length} chiffre(s) rapporté(s) par un agent restitué(s) sans recompte à la source — le rapport d'un agent est une donnée `
+      + "à vérifier, pas une mesure : le 15/10/2026, 13 087 établissements annoncés d'après le rapport de l'agent en valaient 9 872 en base, les "
+      + "tuiles de collecte se chevauchant (TF-1802). Recompte en base ou dans le fichier, et donne la commande ; à défaut, écris « non recompté ». "
+      + `Ex. : ${chiffres[0].replace(/\s+/g, " ").slice(0, 110)}`);
+  }
+
+  // S77 (TF-1736, lot Produit-12 20261014b RS-33, R-64 point 5) — UN TRANSPORT ENTRE POSTES NE SE LAISSE
   // PAS À L'HUMAIN QUAND LE CANAL EST DÉCLARÉ. Le 14/10/2026, une session a laissé « le transport des
   // entrants » en manuelle_utilisateur, « canal à choisir », alors que le dossier Google Drive de reprise
   // était déclaré et contenait déjà ces entrants. Portée : un produit qui porte `forge/REPRISE.json`,
@@ -3820,7 +3871,7 @@ function juger(texte, cheminJuge = null) {
       const parent = dirname(d); if (parent === d) break; d = parent;
     }
     if (!canalDeclare)
-      findings.push({ regle: "S75", statut: "SANS_OBJET", message: "aucun canal de reprise déclaré (forge/REPRISE.json absent en remontant depuis le fichier jugé) — transport entre postes non jugé" });
+      findings.push({ regle: "S77", statut: "SANS_OBJET", message: "aucun canal de reprise déclaré (forge/REPRISE.json absent en remontant depuis le fichier jugé) — transport entre postes non jugé" });
     else {
       const bActions = bloc(texte, BLOCS[7][0]) || "";
       const segments = [];
@@ -3833,11 +3884,11 @@ function juger(texte, cheminJuge = null) {
       const TRANSPORT = uni(new RegExp(String.raw`\b${VERBE}\b[^|]{0,100}\b${LIEU}\b|\b${LIEU}\b[^|]{0,60}\b${VERBE}\b`, "i"));
       const fautives = segments.filter((s) => /\bmanuelle_utilisateur\b/.test(s) && TRANSPORT.test(s));
       fautives.length
-        ? ko("S75", `${fautives.length} action(s) manuelle_utilisateur demandent un transport entre postes alors que le canal de reprise est déclaré (forge/REPRISE.json) — `
+        ? ko("S77", `${fautives.length} action(s) manuelle_utilisateur demandent un transport entre postes alors que le canal de reprise est déclaré (forge/REPRISE.json) — `
           + "la reprise se joue sans geste humain : le hook `reprise` restaure à l'ouverture et envoie en fin de tour ; ce qui revient à l'humain est le feu vert de publication, pas la copie. "
           + "Le 14/10/2026, le transport des entrants a été laissé à l'humain alors que le dossier Drive les contenait déjà (TF-1736, R-64). "
           + `Ex. : ${fautives[0].replace(/\s+/g, " ").trim().slice(0, 110)}`)
-        : ok("S75", "canal de reprise déclaré, et aucune action de transport entre postes n'est laissée à l'humain");
+        : ok("S77", "canal de reprise déclaré, et aucune action de transport entre postes n'est laissée à l'humain");
     }
   }
   return findings;
@@ -5592,7 +5643,7 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`${regle} (TF-1694, TF-1695) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
   if (!/existant/.test(constatDe(r74pop, "S74").message || ""))
     casse.push("S74 (TF-1695) : le gain contrôlé dans la population mais pas sur l'existant doit NOMMER l'existant qui manque : " + String(constatDe(r74pop, "S74").message || "").slice(0, 160));
-  // 15/10 — TF-1736 : S75, LE TRANSPORT ENTRE POSTES, DANS SES QUATRE SENS. Un produit jetable porte son
+  // 15/10 — TF-1736 : S77, LE TRANSPORT ENTRE POSTES, DANS SES QUATRE SENS. Un produit jetable porte son
   // `forge/REPRISE.json`. (a) L'action A-2 laissée à l'humain demande de copier les entrants sur l'autre
   // poste par le Drive : FAIL. (b) La MÊME passée en auto_ia, le remède : PASS. (c) La MÊME hors de tout
   // produit qui déclare un canal : SANS_OBJET dit à voix haute. (d) La verte sous canal déclaré : PASS.
@@ -5608,14 +5659,38 @@ Aucun écart : la demande a été suivie à la lettre.
   const r75remede = jouer75("tf1736-transport-auto.md", transport75.replace("TF-0221 (manuelle_utilisateur) — copier", "TF-0221 (auto_ia) — copier"), true);
   const r75hors = jouer75("tf1736-transport-sans-canal.md", transport75, false);
   const r75verte = jouer75("tf1736-verte-sous-canal.md", verte, true);
-  if (transport75 === verte) casse.push("S75 (TF-1736) : la fixture n'a pas remplacé l'action A-2 — la verte a changé, le cas ne prouve plus rien");
+  if (transport75 === verte) casse.push("S77 (TF-1736) : la fixture n'a pas remplacé l'action A-2 — la verte a changé, le cas ne prouve plus rien");
   for (const [r, statut, quoi] of [
     [r75faute, "FAIL", "le transport des entrants laissé à l'humain sous canal déclaré passe — c'est le défaut du 14/10"],
     [r75remede, "PASS", "la MÊME action passée en auto_ia est accusée — le remède du message échoue"],
     [r75hors, "SANS_OBJET", "hors de tout canal déclaré, la règle devrait se taire et le DIRE"],
     [r75verte, "PASS", "la verte, qui ne demande aucun transport, est accusée sous canal déclaré"],
-  ]) if (!new RegExp(`"S75"[^}]*${statut}`).test(r.stdout))
-    casse.push(`S75 (TF-1736) : ${quoi} — attendu ${statut} : ` + ((/"S75"[\s\S]{0,200}/.exec(r.stdout) || ["sortie illisible"])[0]).replace(/\s+/g, " "));
+  ]) if (!new RegExp(`"S77"[^}]*${statut}`).test(r.stdout))
+    casse.push(`S77 (TF-1736) : ${quoi} — attendu ${statut} : ` + ((/"S77"[\s\S]{0,200}/.exec(r.stdout) || ["sortie illisible"])[0]).replace(/\s+/g, " "));
+  // 15/10 — TF-1766 ET TF-1802 : S75 ET S76, DANS LEURS DEUX SENS. (a) La livraison de r71avec (portail,
+  // adresse, usage, compte) ne dit d'aucun parcours qu'il a été joué dans un navigateur : S75 FAIL ; la
+  // MÊME avec « parcours joués dans un navigateur sur l'adresse publique » : PASS ; avec l'aveu « parcours
+  // non joué dans un navigateur » : PASS (le manque est dit). (b) « L'agent de collecte rapporte 13 087
+  // établissements » sans recompte : S76 FAIL ; la MÊME avec le recompte en base : PASS.
+  const TRACE_75 = USAGE_71 + nl + nl + "Les 5 parcours des personas ont été joués dans un navigateur, sur l'adresse publique, le 2026-10-15, avec une saisie inattendue par formulaire.";
+  const r75avec = jouerPe("tf1766-parcours-navigateur.md", ouv70(BRIEF_71).replace(VERDICT_70, TRACE_75));
+  const r75aveu = jouerPe("tf1766-parcours-non-joue.md", ouv70(BRIEF_71).replace(VERDICT_70, USAGE_71 + nl + nl + "Parcours non joué dans un navigateur : la recette appelle le portail par le réseau privé."));
+  const AGENT_76 = "L'agent de collecte rapporte 13 087 établissements peuplés dans la base de qualification.";
+  const r76sans = jouerPe("tf1802-compte-de-l-agent.md", ouv70(AGENT_76));
+  const r76avec = jouerPe("tf1802-compte-recompte.md", ouv70(AGENT_76 + " Recompté en base : 9 872 établissements distincts (SELECT COUNT(DISTINCT siret)), les tuiles se chevauchant."));
+  const attendu75 = [
+    [r71avec, "S75", "FAIL", "une livraison de portail qui ne dit d'aucun parcours qu'il a été joué dans un navigateur sur l'adresse publique passe — c'est la recette du 15/10 par le réseau privé"],
+    [r75avec, "S75", "PASS", "la MÊME livraison avec les parcours joués dans un navigateur sur l'adresse publique est accusée — le remède du message échoue"],
+    [r75aveu, "S75", "PASS", "la MÊME livraison qui avoue le parcours non joué dans un navigateur est accusée — le manque dit est le remède"],
+    [r72nie, "S75", "PASS", "une restitution qui dit le produit NON livré est accusée"],
+    [r58sansObjet, "S75", "PASS", "la verte, sans livraison, est accusée"],
+    [r76sans, "S76", "FAIL", "un compte rapporté par un agent, restitué sans recompte à la source, passe — c'est 13 087 annoncés pour 9 872 réels"],
+    [r76avec, "S76", "PASS", "le MÊME compte recompté en base est accusé — le remède du message échoue"],
+    [r58sansObjet, "S76", "PASS", "la verte, sans compte d'agent, est accusée"],
+  ];
+  for (const [r, regle, statut, quoi] of attendu75)
+    if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-1766, TF-1802) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
   // 27/09 — LE COMPTE DE CAS SE MESURE. Le bilan portait « 39/39 » écrit à la main ; le harnais le lit
   // comme un CLIQUET (I5, `lib-baseline-recettes.mjs` : premier « N PASS », sinon le ratio N/N), et il
   // n'avait pas bougé quand deux paires se sont ajoutées le 26/09. Retiré seul, il a laissé le
@@ -5659,7 +5734,7 @@ console.log(JSON.stringify({
     "S56 (TF-1498) ne vérifie pas que la porte citée a réellement été rejouée, ni sur ce qui sera lancé : il lit une ligne qui la nomme, datée du jour de la restitution et chiffrée. La déclaration « aucune porte de la chaîne ne juge une base externe » n'est pas vérifiée non plus",
     "S64 à S68 (13/10/2026) jugent une FORME : S64 qu'une ligne existe sous un titre, jamais ce qu'elle dit ; S65 que deux familles de voies sont NOMMÉES, jamais qu'elles ont été essayées ni sur la même ressource, et pas les quatre que R-29 point 4 énumère ; S66 une concentration chiffrée ou une invraisemblance qualifiée par le texte, jamais celle que l'auteur n'a pas vue ; S67 qu'un porteur durable est nommé, jamais qu'il tourne ; S68 qu'un essai est cité pour une image ou un site, jamais pour un PDF, une base ou une API",
     "S70 à S72 (15/10/2026, R-61) jugent ce que le bloc 0 et le verdict DÉCLARENT : S70 qu'une adresse cliquable et un geste d'accès y figurent, jamais que l'adresse réponde ; S71 que l'usage à l'instant et ce qui manque y sont dits, jamais que ce soit vrai ; S72 qu'un compte d'exigences y figure, jamais qu'il soit juste. Une livraison annoncée par le seul nom d'un produit, sans « le produit » ni déploiement annoncé, n'est pas vue",
-    "S75 (15/10/2026, R-64) lit le seul bloc 8 et les verbes de transport (copier, transférer, apporter, déposer, synchroniser…) près d'un lieu (autre poste, Drive, clé USB, dossier synchronisé) : un transport demandé ailleurs, ou dit autrement, lui échappe ; elle ne vérifie pas que le canal déclaré contienne ce qu'il faudrait transporter — c'est RP4 d'oracle-reprise qui le mesure",
+    "S77 (15/10/2026, R-64) lit le seul bloc 8 et les verbes de transport (copier, transférer, apporter, déposer, synchroniser…) près d'un lieu (autre poste, Drive, clé USB, dossier synchronisé) : un transport demandé ailleurs, ou dit autrement, lui échappe ; elle ne vérifie pas que le canal déclaré contienne ce qu'il faudrait transporter — c'est RP4 d'oracle-reprise qui le mesure",
     "S73 et S74 (15/10/2026, R-63) jugent une MENTION : S73 qu'une justesse, un échantillon de référence ou « justesse non mesurée » figure dans une restitution qui rapporte une part traitée, jamais que l'échantillon soit indépendant ni la mesure juste (PC-2 à PC-6 non jugés) ; S74 que le contrôle des changements dans la population et l'effet sur l'existant sont nommés, jamais qu'ils aient été faits, ni le test rouge sur le code précédent ni la règle d'arrêt",
   ],
 }, null, 1));

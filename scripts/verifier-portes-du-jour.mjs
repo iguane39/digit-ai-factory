@@ -145,6 +145,17 @@ export function memeObjet(lance, texte) {
   return t.includes(l);
 }
 
+/** Les identifiants d'une déclaration d'objet lancé (TF-1811) : commits et empreintes d'abord, sinon les
+ *  jetons porteurs d'un chiffre (étiquette `v1.2.0`, image `produit:12`), sinon le premier mot. */
+export function identifiantsDe(declaration) {
+  const jetons = String(declaration).replace(/`/g, " ").split(/[\s,;()]+/).map((j) => j.replace(/[.:]+$/, "")).filter(Boolean);
+  const commits = jetons.filter((j) => /^[0-9a-f]{7,40}$/i.test(j) || /^sha\d*:[0-9a-f]{7,}$/i.test(j));
+  if (commits.length) return commits;
+  const forts = jetons.filter((j) => /\d/.test(j) && (j.length >= 3 || /[:@/.]/.test(j)) && !/^20\d{2}-\d{2}-\d{2}$/.test(j));
+  if (forts.length) return forts;
+  return jetons.slice(0, 1);
+}
+
 // Une cellule se coupe sur les barres verticales NON échappées : `2>/dev/null \|\| true` reste entier.
 const cellules = (l) => l.trim().replace(/^\|/, "").replace(/(?<!\\)\|\s*$/, "").split(/(?<!\\)\|/).map((c) => c.trim());
 const EST_SEPARATEUR = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
@@ -223,8 +234,13 @@ export function juger(racine, { document = null, lancementForce = null } = {}) {
     const corps = sections.flatMap((s) => [s.titre, ...s.lignes]).filter((l) => !/^\s*\|/.test(l)).join("\n");
     const mDate = /lancement[^|\n]{0,60}?((?:20\d{2}-\d{2}-\d{2})|(?:\d{1,2}\/\d{1,2}\/20\d{2}))/i.exec(corps);
     const dateDeclaree = mDate ? dateDe(mDate[1]) : null;
-    const mObjet = /objet\s+lanc[ée]e?\s*:?\s*`?([^\s`·|,;()]+)/i.exec(corps);
-    const objetLance = mObjet ? mObjet[1] : null;
+    // TF-1811 (lot Produit-83 20261015b, RT-16) : l'objet était le PREMIER MOT de la déclaration, et
+    // « Objet lancé : version 12, image produit:12 » faisait de « version » l'objet, refusant chaque porte.
+    // L'objet se lit dans ses IDENTIFIANTS : les commits ou empreintes s'ils existent, sinon les jetons
+    // qui portent un chiffre (étiquette, image), et le premier mot seulement à défaut de tout identifiant.
+    const mObjet = /objet\s+lanc[ée]e?\s*:?\s*([^\n·|]+)/i.exec(corps);
+    const identifiants = mObjet ? identifiantsDe(mObjet[1]) : [];
+    const objetLance = identifiants.length ? identifiants.join(", ") : null;
     const lancement = lancementForce || dateDeclaree;
     if (!lancementRetenu && lancement) lancementRetenu = lancement;
     if (sections.length && !lancement) {
@@ -259,7 +275,7 @@ export function juger(racine, { document = null, lancementForce = null } = {}) {
       }
       if (objetLance) {
         const cellule = r.iObjet >= 0 ? r.cellules[r.iObjet] || "" : r.brut;
-        if (!memeObjet(objetLance, cellule)) {
+        if (!identifiants.some((id) => memeObjet(id, cellule))) {
           refus("PJ-3", ou, `porte ${famille} : l'objet jugé (« ${cellule.slice(0, 60)} ») n'est pas l'objet lancé (${objetLance}) — `
             + "une porte rejouée sur un autre commit, ou nommée « idem », ne juge pas ce qui part en production");
         }

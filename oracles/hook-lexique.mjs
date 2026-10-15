@@ -102,6 +102,23 @@ export function demandeAuditProduit(message) {
   });
 }
 
+/**
+ * LA QUESTION D'IMITATION (TF-1753, 15/10/2026, récidive de TF-1518 et TF-1542, classe
+ * « processus-du-commanditaire-reattribue ») — « peut-on le faire comme X ? » demande si l'on peut
+ * reproduire le procédé de X, pas s'il faut demander à X de le faire. Le fait : chez un produit,
+ * l'humain demandait si le projet commun pouvait reproduire le tirage automatique que la factory
+ * fait à l'ouverture de session ; la restitution a recommandé un lot de retours à la factory et
+ * déclaré l'inscription directe « exclue ». Réponse : « Je n'ai pas dit de le demander à la
+ * Factory ». Le geste tenait dans un hook d'ouverture et un script du projet commun. Reconnu : dans
+ * une même phrase, un verbe de possibilité, le verbe faire et « comme X » (ou « à la manière de X »),
+ * X n'étant ni « prévu », ni « d'habitude », ni « tu veux ».
+ */
+const POSSIBILITE = /\b(?:peu[tx]|peut-on|peux-tu|pourr(?:ait|ais|ions|iez|a|ons)|pourrait-on|pouvons|pouvez|possible)\b/iu;
+const COMME_X = /\bfaire\b[^.!?\n]{0,80}?(?:\bcomme\s+(?!pr[ée]vu|d['’]habitude|tu\s+veux|vous\s+voulez|avant|[çc]a\b|cela|ceci|il\s+faut)\S+|(?<![\p{L}])[àa]\s+la\s+mani[èe]re\s+d[e'’])/iu;
+export function questionDImitation(message) {
+  return String(message || "").split(/[.!\n]/).some((p) => POSSIBILITE.test(p) && COMME_X.test(p));
+}
+
 export const CONSIGNES = [
   { regle: "audit", forme: "demande d'audit du produit",
     reconnait: demandeAuditProduit,
@@ -127,6 +144,13 @@ export const CONSIGNES = [
       "pas, ou confie une étape à un autre acteur, est exclue. Si un fait technique semble l'exiger, mesurer d'abord " +
       "les voies automatiques (loi n° 5), puis poser UNE décision qui porte la voie tenant le processus tel quel et " +
       "son risque mesuré (gabarits\\RESTITUTION.md, bloc 3). Classe « processus-du-commanditaire-reattribue »." },
+  { regle: "imitation", forme: "question « peut-on le faire comme X ? »",
+    reconnait: questionDImitation,
+    texte: "Ce message demande si l'on peut faire SOI-MÊME comme X : c'est une demande d'IMITATION, pas une délégation " +
+      "à X. La réponse cherche d'abord la voie que porte celui qui pose la question (la session, le produit, le projet " +
+      "commun : script, hook, étage de chaîne) en reprenant le procédé de X, et la mesure. Recommander de demander à X " +
+      "de le faire (lot de retours, remontée, ticket) n'est admis que si cette voie propre est mesurée impossible, la " +
+      "mesure citée (TF-1753). Classe « processus-du-commanditaire-reattribue »." },
 ];
 
 /** Rend les consignes de règle reconnues dans un message (hors code cité) : [{regle, forme, texte}]. */
@@ -346,6 +370,17 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ["Fais un audit de sécurité de l'application", []],
     ["Relance l'audit des tests du projet", []],
     ["l'audit forge-tests a rendu exit 3", []],
+    // TF-1753 (15/10/2026, lot Produit-64 20261015a RT-69) — « peut-on le faire comme X ? » demande
+    // une IMITATION, pas une délégation à X. Les verts reprennent la question de l'humain et ses
+    // voisines ; les rouges sont les « comme » qui n'imitent personne, et la délégation explicite.
+    ["Est-ce que le projet commun peut faire le tirage automatique comme la factory le fait à l'ouverture de session ?", ["imitation"]],
+    ["Peut-on le faire comme la Factory ?", ["imitation"]],
+    ["On pourrait faire comme le produit 12 pour la recette ?", ["imitation"]],
+    ["Tu peux le faire à la manière de forge-ops ?", ["imitation"]],
+    ["Fais comme tu veux pour les marges", []],
+    ["Peut-on faire comme prévu demain ?", []],
+    ["Demande à la Factory de le faire", []],
+    ["Comme d'habitude, lance les tests", []],
   ];
   for (const [msg, attendu] of casConsignes) {
     const obtenu = reconnaitreConsignes(msg).map((c) => c.regle);

@@ -253,6 +253,107 @@ check("TF-1635 — sens rouge et bords : réglage sans hook de la factory, illis
   if (avant.async === true) throw new Error("témoin rouge mal construit : déjà async");
 });
 
+// ---- TF-1755 (15/10/2026) : TOUTE ENTRÉE DU GABARIT QUI MANQUE AU PRODUIT S'Y AJOUTE À L'OUVERTURE --
+// Mesuré le 15/10 sur 21 produits : publication-hebergee câblé chez 2, droits-accordes chez 2. Vert : un
+// produit qui porte le lanceur reçoit chaque entrée absente du gabarit, sans perdre ses hooks, ses
+// permissions ni ses délais, sans doublon, et une exclusion déclarée est respectée. Rouge : un produit
+// sans lanceur n'est pas touché ; une seconde passe n'ajoute rien.
+const { fusionnerHooksDuGabarit } = await import(new URL("./lib-ouverture-async.mjs", import.meta.url));
+const GABARIT_SETTINGS = join(PILOT, "gabarits", "settings-produit.json");
+const nomsDe = (j) => Object.values(j.hooks || {}).flat().flatMap((g) => g.hooks || [])
+  .map((h) => (String(h.command).match(/forge\/hooks\/factory\.mjs\s+([\w-]+)/) || [])[1]).filter(Boolean);
+const nomsGabarit = nomsDe(JSON.parse(readFileSync(GABARIT_SETTINGS, "utf8")));
+const SETTINGS_ANCIEN = JSON.stringify({
+  permissions: { allow: ["Bash(npm test)"] },
+  _hooks_factory_exclus: [{ commande: "forge/hooks/factory.mjs droits-accordes", motif: "aucun script d'infrastructure dans ce produit" }],
+  hooks: {
+    SessionStart: [{ matcher: "startup|resume", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", timeout: 240, async: true }] }],
+    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution", timeout: 90 }] }],
+    PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [{ type: "command", command: "node scripts/mon-hook.mjs", timeout: 5 }, { type: "command", command: "node forge/hooks/factory.mjs page-html", timeout: 90 }] }],
+  },
+}, null, 2).replace(/\n/g, "\r\n") + "\r\n";
+
+check("TF-1755 — fusion : chaque entrée absente du gabarit ajoutée, rien de retiré ni modifié, exclusion respectée, idempotente", () => {
+  const P = mkdtempSync(join(tmpdir(), "ouverture-fusion-"));
+  const f = join(P, "settings.json");
+  writeFileSync(f, SETTINGS_ANCIEN, "utf8");
+  const r = fusionnerHooksDuGabarit(f, GABARIT_SETTINGS);
+  const apres = readFileSync(f, "utf8");
+  const j = JSON.parse(apres);
+  const noms = nomsDe(j);
+  const attendus = nomsGabarit.filter((n) => n !== "droits-accordes");
+  const manquent = attendus.filter((n) => !noms.includes(n));
+  if (r.etat !== "corrige" || manquent.length) throw new Error(`état ${r.etat}, manquent : ${manquent.join(", ")}`);
+  if (noms.includes("droits-accordes")) throw new Error("l'exclusion déclarée n'est pas respectée");
+  if (noms.length !== new Set(noms).size) throw new Error(`doublon : ${noms.join(", ")}`);
+  if (j.permissions.allow[0] !== "Bash(npm test)" || j.hooks.Stop[0].hooks[0].timeout !== 90) throw new Error("un réglage du produit a été modifié");
+  if (!j.hooks.PostToolUse[0].hooks.some((h) => h.command === "node scripts/mon-hook.mjs")) throw new Error("le hook propre au produit a disparu");
+  if (!j.hooks.PostToolUse[0].hooks.some((h) => /factory\.mjs ecriture/.test(h.command))) throw new Error("l'entrée ajoutée ne rejoint pas le groupe de même matcher");
+  if (!apres.includes("\r\n  \"hooks\"")) throw new Error("fins de ligne ou indentation du produit perdues");
+  if (fusionnerHooksDuGabarit(f, GABARIT_SETTINGS).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
+});
+
+check("TF-1755 — par le hook d'ouverture : produit muni du lanceur complété et le geste DIT ; produit sans lanceur intact", () => {
+  const avec = mkdtempSync(join(tmpdir(), "ouverture-fusion-hook-"));
+  mkdirSync(join(avec, ".claude"), { recursive: true });
+  mkdirSync(join(avec, "forge", "hooks"), { recursive: true });
+  writeFileSync(join(avec, "forge", "hooks", "factory.mjs"), "// lanceur jouet\n", "utf8");
+  writeFileSync(join(avec, ".claude", "settings.json"), SETTINGS_ANCIEN, "utf8");
+  const s = joue(avec);
+  if (!/## Câblage des hooks de la factory \(TF-1755\)/.test(s) || !/remisage/.test(s)) throw new Error("le geste n'est pas dit dans le relevé");
+  if (!nomsDe(JSON.parse(readFileSync(join(avec, ".claude", "settings.json"), "utf8"))).includes("remisage")) throw new Error("entrée remisage non ajoutée");
+  const sans = mkdtempSync(join(tmpdir(), "ouverture-fusion-sans-"));
+  mkdirSync(join(sans, ".claude"), { recursive: true });
+  writeFileSync(join(sans, ".claude", "settings.json"), SETTINGS_ANCIEN, "utf8");
+  const s2 = joue(sans);
+  if (readFileSync(join(sans, ".claude", "settings.json"), "utf8") !== SETTINGS_ANCIEN || /TF-1755/.test(s2)) throw new Error("un produit sans lanceur a été touché");
+});
+
+// ---- TF-1758 et TF-1760 (15/10/2026) : LOTS NON REMIS ET SORT DES RETOURS, À L'OUVERTURE DU PRODUIT --
+// Vert : un lot `a_remettre` de plus de 24 h, jamais parvenu au pilot, est NOMMÉ ; les TF du registre qui
+// désignent le produit (par son pseudonyme, retrouvé par une table jetable) sont comptés, et la seconde
+// ouverture dit ce qui a été clos depuis la première. Rouge : un lot « remis le … » et un lot `a_remettre`
+// de moins de 24 h ne sont pas nommés ; aucun autre nom que le pseudonyme du produit n'est imprimé.
+{
+  const { utimesSync } = await import("node:fs");
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-retours-")), "ProduitJouetZZ");
+  const retours = join(P, "forge", "retours");
+  mkdirSync(retours, { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const lotVieux = join(retours, "ProduitJouetZZ - RETOURS - 20260901a.md");
+  writeFileSync(lotVieux, "# lot\n\n- **Statut** : a_remettre\n", "utf8");
+  const ilYa = (Date.now() - 20 * 86400000) / 1000;
+  utimesSync(lotVieux, ilYa, ilYa);
+  writeFileSync(join(retours, "ProduitJouetZZ - RETOURS - 20260902a.md"), "# lot\n\n- **Statut** : remis le 2026-09-03\n", "utf8");
+  utimesSync(join(retours, "ProduitJouetZZ - RETOURS - 20260902a.md"), ilYa, ilYa);
+  const auj = new Date(); const jour = `${auj.getFullYear()}${String(auj.getMonth() + 1).padStart(2, "0")}${String(auj.getDate()).padStart(2, "0")}`;
+  writeFileSync(join(retours, `ProduitJouetZZ - RETOURS - ${jour}a.md`), "# lot\n\n- **Statut** : a_remettre\n", "utf8");
+  const T2 = mkdtempSync(join(tmpdir(), "ouverture-retours-tables-"));
+  writeFileSync(join(T2, "noms.json"), JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+  writeFileSync(join(T2, "produits.json"), JSON.stringify({ produits: { ProduitJouetZZ: "Produit-64" } }), "utf8");
+  const env = { ...process.env, FORGE_NOMS_INTERDITS: join(T2, "noms.json"), FORGE_PRODUITS_PSEUDO: join(T2, "produits.json") };
+  const jouer = () => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT], { cwd: P, encoding: "utf8", timeout: 120000, env });
+  const t0 = Date.now();
+  const s1 = jouer();
+  const duree = Date.now() - t0;
+  const s2 = jouer();
+  const section = (s, t) => (s.split(t)[1] || "").split("\n## ")[0];
+  check("TF-1758 — un lot « a_remettre » de plus de 24 h, jamais parvenu, est nommé ; le lot remis et le lot du jour ne le sont pas", () => {
+    const l = section(s1, "## Lots de retours restés « a_remettre »");
+    if (!/JAMAIS parvenu/.test(l) || !/20260901a/.test(l)) throw new Error(`lot non nommé : ${l.slice(0, 200) || "(section absente)"}`);
+    if (/20260902a/.test(l) || new RegExp(`${jour}a`).test(l)) throw new Error("un lot remis ou du jour est nommé à tort");
+  });
+  check("TF-1760 — les TF du produit, retrouvés par son pseudonyme, sont comptés ; la seconde ouverture dit ce qui a été clos depuis", () => {
+    const v1 = section(s1, "## Vos retours au registre du pilot (TF-1760)");
+    if (!/TF désignent ce produit au registre public \(pseudonyme : Produit-64\)/.test(v1)) throw new Error(`section : ${v1.slice(0, 200) || "(absente)"}`);
+    if (/depuis votre ouverture précédente/.test(v1)) throw new Error("première ouverture : rien ne devrait être dit « depuis »");
+    if (!/depuis votre ouverture précédente/.test(section(s2, "## Vos retours au registre du pilot (TF-1760)"))) throw new Error("la seconde ouverture ne situe pas les clôtures");
+  });
+  check(`TF-1758/TF-1760 — le relevé du produit reste sous 20 s (mesuré : ${duree} ms, sans bootstrap)`, () => {
+    if (duree > 20000) throw new Error(`${duree} ms`);
+  });
+}
+
 // TF-1635 — LE DÉLAI DU CLIENT EST UNE BORNE, PAS UNE CONSIGNE. Tout hook SessionStart resté
 // synchrone, au pilot comme dans le gabarit des produits, porte un délai d'au plus 45 s : coupé à
 // ce délai, il ne peut plus faire dépasser les 60 s de l'extension VS Code. Sens rouge : le même

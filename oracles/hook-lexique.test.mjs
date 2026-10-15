@@ -27,11 +27,20 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // puis de 45 à 47 le 01/10 (niveau Moyen en essai) : « moyen : » reconnu en tête, et ailleurs non ;
 // puis de 47 à 48 le 13/10 (étape 3, D-68 (a)) : un produit portant `forge/NIVEAUX.md` est en service ;
 // puis de 48 à 58 le 15/10 (TF-1735, D-1 (a)) : la consigne de l'AUDIT DU PRODUIT, 4 demandes reconnues
-// et 6 phrases voisines épargnées (audits spécialisés, run de forge-tests).
-check("self-test du hook : 58 cas verts", () => {
+// et 6 phrases voisines épargnées (audits spécialisés, run de forge-tests) ; puis de 58 à 66 le 15/10
+// (TF-1753) : la question d'IMITATION, 4 questions « comme X » reconnues et 4 phrases voisines épargnées.
+check("self-test du hook : 66 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/58 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/66 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+});
+// TF-1753 — la question de l'humain, jouée au point d'entrée réel : elle reçoit la consigne
+// d'imitation ; « Demande à la Factory de le faire », délégation explicite, ne reçoit rien.
+check("hook — « peut-on le faire comme la Factory ? » injecte la consigne d'imitation, la délégation explicite rien", () => {
+  const oui = jouer("Est-ce que le projet commun peut faire le tirage automatique comme la factory le fait à l'ouverture de session ?");
+  const non = jouer("Demande à la Factory de le faire");
+  if (oui.status !== 0 || !/\[imitation — hook-lexique\][^\n]*IMITATION/.test(oui.stdout)) throw new Error(`consigne absente : ${oui.stdout}`);
+  if (non.stdout.trim() !== "") throw new Error(`la délégation explicite reçoit la consigne : ${non.stdout}`);
 });
 
 // R-57 — le point d'entrée RÉEL injecte la consigne sur le message qui a fondé la règle, et rien sur

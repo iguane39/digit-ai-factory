@@ -1,5 +1,5 @@
 {
-  "_commentaire": "Gabarit du pilot (gabarits\\settings-produit.json, R-44) : copié en .claude\\settings.json de chaque produit à l'ouverture du run, avec gabarits\\hooks-factory.mjs copié en forge\\hooks\\factory.mjs. Les hooks de la factory s'exécutent dans le produit : fraîcheur à l'ouverture, restitution jugée à la fin de chaque tour de travail. Vérifié par oracle-conformite-projet (R-43). PreToolUse sur Artifact (TF-1592, 12/10/2026) : R-38 se joue sur l'outil qui publie — hook-publication-hebergee refuse toute publication sans GO consigné. PreToolUse sur Bash, PowerShell et WebFetch (TF-1716, 15/10/2026) : R-62 se joue sur l'outil qui émet la requête — hook-identite-sortante refuse une requête vers un service tiers qui porte l'adresse électronique de l'utilisateur, ou une adresse dans un en-tête User-Agent ou From, sans demande de sa part. UserPromptSubmit (03/09/2026) : le lexique d'invocation RV-6 devient un détrompeur — hook-lexique reconnaît « améliore le prompt » / « l99 » / « barre » / « améliore ce skill » et injecte l'appel du skill. SessionStart et Stop « reprise » (TF-1736, 15/10/2026, R-64) : un produit qui déclare un canal de reprise (forge/REPRISE.json) se reprend sur tous les postes de son développeur sans geste humain — restauration asynchrone à l ouverture, envoi en fin de tour sous le feu vert de publication consigné ; muet sans manifeste.",
+  "_commentaire": "Gabarit du pilot (gabarits\\settings-produit.json, R-44) : copié en .claude\\settings.json de chaque produit à l'ouverture du run, avec gabarits\\hooks-factory.mjs copié en forge\\hooks\\factory.mjs. Les hooks de la factory s'exécutent dans le produit : fraîcheur à l'ouverture, restitution jugée à la fin de chaque tour de travail. Vérifié par oracle-conformite-projet (R-43). PreToolUse sur Artifact (TF-1592, 12/10/2026) : R-38 se joue sur l'outil qui publie — hook-publication-hebergee refuse toute publication sans GO consigné. PreToolUse sur Bash, PowerShell et WebFetch (TF-1716, 15/10/2026) : R-62 se joue sur l'outil qui émet la requête — hook-identite-sortante refuse une requête vers un service tiers qui porte l'adresse électronique de l'utilisateur, ou une adresse dans un en-tête User-Agent ou From, sans demande de sa part. PreToolUse remisage sur Bash et PowerShell (TF-1754, 15/10/2026) : la pile de remisage git est partagée entre arbres de travail et sessions — hook-remisage refuse `git stash` nu, `pop`, un remisage sans `-m`, `apply` sans SHA, `drop` nu et `clear`. À l'ouverture, le produit reçoit toute entrée du gabarit qui lui manque (TF-1755, oracles/lib-ouverture-async.mjs) ; il en écarte une en la déclarant sous `_hooks_factory_exclus` ({\"commande\": \"forge/hooks/factory.mjs <nom>\", \"motif\": \"…\"}). UserPromptSubmit (03/09/2026) : le lexique d'invocation RV-6 devient un détrompeur — hook-lexique reconnaît « améliore le prompt » / « l99 » / « barre » / « améliore ce skill » et injecte l'appel du skill. SessionStart et Stop « reprise » (TF-1736, 15/10/2026, R-64) : un produit qui déclare un canal de reprise (forge/REPRISE.json) se reprend sur tous les postes de son développeur sans geste humain — restauration asynchrone à l'ouverture, envoi en fin de tour sous le feu vert de publication consigné ; muet sans manifeste.",
   "hooks": {
     "SessionStart": [
       {
@@ -53,6 +53,11 @@
           {
             "type": "command",
             "command": "node forge/hooks/factory.mjs identite-sortante",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node forge/hooks/factory.mjs remisage",
             "timeout": 10
           }
         ]

@@ -107,15 +107,12 @@ const poste = (nomProjet, { herite, sousDossier = null }) => {
       // Deux artefacts ont un CONTENU juge, pas seulement une presence : les recopier depuis le
       // gabarit ne suffirait pas, l'oracle y cherche des marqueurs precis. Ils restent explicites.
       if (a.cible === ".claude/settings.json") {
-        // HERITAGE 1.24.0 (TF-1736) : le hook de reprise multi-poste, à l'ouverture et en fin de tour.
-        writeFileSync(cible, JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true },
-            { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true }] }],
-          Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
-          PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
-            { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" }] }] } }));
+        // HERITAGE 1.24.0 (TF-1756) : chaque hook du gabarit est exigé ; le produit conforme porte le gabarit
+        // lui-même, avec un réglage propre à lui (permissions) qui ne compte pas.
+        const g = JSON.parse(readFileSync(join(GAB, "settings-produit.json"), "utf8"));
+        writeFileSync(cible, JSON.stringify({ permissions: { allow: ["Bash(npm test)"] }, hooks: g.hooks }));
       } else if (a.cible === "CLAUDE.md") {
-        // HERITAGE 1.23.0 (TF-1735) : la route d'audit du produit est exigée à côté de la précédence ;
-        // HERITAGE 1.24.0 (TF-1736) : la section de reprise multi-poste (R-64).
+        // HERITAGE 1.23.0 (TF-1735) : la route d'audit du produit est exigée à côté de la précédence.
         writeFileSync(cible, "# projet\n\n## Précédence (R-43)\nLes règles de la factory priment.\n\n| Auditer le produit | forge-audit : `node tools/init-audit-workspace.mjs` |\n\n## Reprise sur un autre poste (R-64)\nCanal de reprise : absent — un seul poste.\n");
       } else if (existsSync(source)) {
         writeFileSync(cible, readFileSync(source, "utf8"));

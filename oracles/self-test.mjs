@@ -93,7 +93,7 @@ writeFileSync(join(verte, "CLAUDE.md"), readFileSync(join(verte, "CLAUDE.md"), "
 mkdirSync(join(verte, ".claude"), { recursive: true });
 // TF-1592 (HERITAGE 1.16.1) : le câblage PreToolUse sur Artifact est exigé par R-47 ; la verte le porte.
 // TF-1635 (HERITAGE 1.19.0) : le hook d'ouverture asynchrone aussi.
-// TF-1736 (HERITAGE 1.24.0, 15/10/2026) : le hook de reprise multi-poste, à l'ouverture et en fin de tour.
+// TF-1736 (HERITAGE 1.26.0, 15/10/2026) : le hook de reprise multi-poste, à l'ouverture et en fin de tour.
 // TF-1716 (HERITAGE 1.22.0, 15/10/2026) : la garde d'identité sortante aussi — la verte ne la portait
 // pas, et 9 cas de cette recette étaient rouges à HEAD depuis l'entrée de l'exigence.
 writeFileSync(join(verte, ".claude", "settings.json"),
@@ -101,7 +101,11 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true }] }],
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
-      { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" }] }] } }) + "\n");
+      { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },
+        { type: "command", command: "node forge/hooks/factory.mjs remisage" }] }],
+    // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
+    PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) }],
+    UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
@@ -2648,6 +2652,145 @@ check("R-60 remède joué : la cascade écrite au gabarit commun lève le refus 
     writeFileSync(join(d, "forge", "etapes", "conception", "cascade", "CASCADE.json"), JSON.stringify(cascadeVerte()), "utf8");
     const f = r60(d);
     if (f?.statut !== "PASS") throw new Error(`le remède prescrit ne rend pas R-60 verte : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1736 (lot Produit-76 20260825a, RV-1) — R-24 : l'URL entre accents graves -------------
+// Le fait : une URL écrite `https://…` dans la table était capturée AVEC l'accent grave final, et ne
+// correspondait plus à l'écart `ecarts_r24` qui porte l'URL nue : FAIL maintenu sur un écart déclaré.
+// Vert : l'URL entre accents graves rejoint son écart. Rouge : sans écart, la même URL reste refusée
+// et le message cite l'URL sans accent grave. Rouge : un écart déclaré sur le même hôte mais une autre
+// URL est NOMMÉ dans le refus, au lieu de répéter la règle de nommage.
+const BT = String.fromCharCode(96);
+const projet1736 = (ligneQualif, ecartUrl) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1736-"));
+  mkdirSync(join(d, "docs", "projet"), { recursive: true });
+  const ecart = ecartUrl ? "ecarts_r24:\n  - url: " + ecartUrl + "\n    environnement: qualif\n    motif: domaine antérieur à la convention\n    decide_le: 2026-08-25\n" : "";
+  writeFileSync(join(d, "docs", "projet", "PARAMETRAGE.md"),
+    "---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-25\nvariables:\n  - PORT\n" + ecart + "---\n# Paramétrage\n\n## URLs & ports par environnement\n\n" +
+    "| Environnement | Front | Notes |\n|---|---|---|\n" + ligneQualif + "| production | " + BT + "https://demoapp-production.up.railway.app" + BT + " | conforme |\n", "utf8");
+  return d;
+};
+const r24de1736 = (d) => (lanceArgs(d, "--regles", "R-24").rapport.findings || []).filter((f) => f.regle === "R-24");
+check("TF-1736 vert : une URL entre accents graves rejoint l'écart déclaré sur l'URL nue → R-24 PASS, écart dit au verdict", () => {
+  const d = projet1736("| qualif | " + BT + "https://ancienhote-legacy.up.railway.app" + BT + " | écart déclaré |\n", "https://ancienhote-legacy.up.railway.app");
+  try {
+    const f = r24de1736(d);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error(`l'écart déclaré n'est pas rejoint : ${JSON.stringify(f.map((x) => x.message))}`);
+    if (!f.some((x) => x.statut === "PASS" && /1 écart\(s\) déclaré\(s\)/.test(x.message))) throw new Error(`l'écart accepté n'est pas dit : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1736 rouge : sans écart, l'URL entre accents graves reste refusée, et le message la cite sans l'accent grave", () => {
+  const d = projet1736("| qualif | " + BT + "https://ancienhote-legacy.up.railway.app" + BT + " | sans écart |\n", null);
+  try {
+    const ko = r24de1736(d).filter((x) => x.statut === "FAIL");
+    if (ko.length !== 1) throw new Error(`1 refus attendu, ${ko.length} : ${JSON.stringify(ko)}`);
+    if (ko[0].message.includes(BT + " ")) throw new Error(`l'URL est encore citée avec son accent grave : ${ko[0].message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1736 rouge : un écart déclaré sur le MÊME hôte mais une autre URL est nommé dans le refus", () => {
+  const d = projet1736("| qualif | https://ancienhote-legacy.up.railway.app/app | autre chemin |\n", "https://ancienhote-legacy.up.railway.app/admin");
+  try {
+    const ko = r24de1736(d).filter((x) => x.statut === "FAIL");
+    if (!ko.some((x) => /écart déclaré/.test(x.message) && /\/admin/.test(x.message))) throw new Error(`l'écart voisin n'est pas nommé : ${JSON.stringify(ko.map((x) => x.message))}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1741 (lot Produit-76 20260825b, RV-3) — R-25 nomme la cause quand le PROJET contient « - » ---
+// Le fait : douze refus « type Ventilation absent du registre » sur des livrables dont le type réel
+// (Rapport, Note…) est admis ; le nom de projet contenait le séparateur. Rouge : le refus nomme la
+// cause et le segment qui porte le type admis. Borne : un type improvisé dans un nom à trois segments
+// garde le message ordinaire, sans l'hypothèse du séparateur.
+check("TF-1741 rouge : nom de projet contenant « - » → R-25 FAIL qui nomme le séparateur et le type admis lu plus loin", () => {
+  const d = projetOutput("Produit - Ventilation - Rapport d audit - 20260825a.md");
+  try {
+    const ko = r25De(d).filter((x) => x.statut === "FAIL");
+    if (ko.length !== 1) throw new Error(`1 refus attendu : ${JSON.stringify(ko)}`);
+    if (!/séparateur/.test(ko[0].message) || !/« Rapport »/.test(ko[0].message)) throw new Error(`la cause n'est pas nommée : ${ko[0].message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1741 borne : un type improvisé dans un nom à trois segments garde le message ordinaire", () => {
+  const d = projetOutput("Produit - Grimoire Neant - 20260825a.md");
+  try {
+    const ko = r25De(d).filter((x) => x.statut === "FAIL");
+    if (ko.length !== 1 || /séparateur/.test(ko[0].message)) throw new Error(`message inattendu : ${JSON.stringify(ko)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1787 (lot Produit-83 20261015b, RT-11) — R-21 lit une clé de version entre guillemets ------
+// Le fait : `"@vitejs/plugin-react": "5.0.0"` (une clé YAML ne peut commencer par @ sans guillemets)
+// était ignorée sans un mot. Vert : la clé citée est confrontée au lockfile et comptée. Rouge : la même
+// clé à une version absente du lockfile est refusée en la nommant. Rouge : une ligne du bloc versions
+// que l'oracle ne sait pas lire est DITE (avertissement), jamais tue.
+const projet1787 = (versions) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1787-"));
+  mkdirSync(join(d, "docs", "projet"), { recursive: true });
+  writeFileSync(join(d, "docs", "projet", "TECHNOS.md"), "---\nrole: technos\nsources_de_verite: [package-lock.json]\nverifie_le: 2026-10-15\nversions:\n" + versions + "---\n# Technos\n", "utf8");
+  writeFileSync(join(d, "package-lock.json"), JSON.stringify({ packages: { "node_modules/@vitejs/plugin-react": { version: "5.0.0" }, "node_modules/react": { version: "19.1.0" } } }, null, 2), "utf8");
+  return d;
+};
+const r21de1787 = (d) => (lanceArgs(d, "--regles", "R-21").rapport.findings || []).filter((f) => f.regle === "R-21");
+check("TF-1787 vert : une clé entre guillemets (« \"@vitejs/plugin-react\" ») est confrontée et comptée", () => {
+  const d = projet1787('  "@vitejs/plugin-react": "5.0.0"\n  react: "19.1.0"\n');
+  try {
+    const f = r21de1787(d);
+    if (f.some((x) => x.statut === "FAIL") || !f.some((x) => x.statut === "PASS" && /^2 version/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1787 rouge : la clé entre guillemets à une version absente du lockfile est refusée en la nommant", () => {
+  const d = projet1787('  "@vitejs/plugin-react": "4.9.9"\n  react: "19.1.0"\n');
+  try {
+    if (!r21de1787(d).some((x) => x.statut === "FAIL" && /@vitejs\/plugin-react@4\.9\.9/.test(x.message))) throw new Error(JSON.stringify(r21de1787(d)));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1787 rouge : une ligne du bloc versions illisible (valeur sans guillemets) est dite en avertissement, jamais tue", () => {
+  const d = projet1787('  react: 19.1.0\n  "@vitejs/plugin-react": "5.0.0"\n');
+  try {
+    const f = r21de1787(d);
+    if (!f.some((x) => /AVERTISSEMENT/.test(x.message) && /react: 19\.1\.0/.test(x.message))) throw new Error(`la ligne illisible est tue : ${JSON.stringify(f)}`);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error("l'avertissement bloque");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1746 (lot Produit-03 20260908a, RA-45) — R-32 quinquies : l'historique lisible par le lecteur ---
+// Règle neuve, AVERTISSEMENT non bloquant. Rouge : une page remise sans section « Historique » est
+// signalée ; une page dont l'historique ouvre sur un autre indice aussi. Vert : l'historique ouvre sur
+// l'indice du nom. Antériorité : un livrable daté avant le 15/10/2026 n'est pas jugé, et c'est dit.
+const projet1746 = (nom, corps) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1746-"));
+  mkdirSync(join(d, "output"), { recursive: true });
+  writeFileSync(join(d, "output", nom), `<!doctype html><html lang="fr"><body><h1>Mode opératoire</h1><p>indice ${nom.match(/(\d{8}[a-z])/)[1]}</p>${corps}</body></html>`, "utf8");
+  return d;
+};
+const r1746 = (d) => lanceArgs(d, "--regles", "R-32 quinquies").rapport;
+check("TF-1746 rouge : une page remise sans section « Historique » → AVERTISSEMENT R-32 quinquies, jamais un FAIL", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20261015a.html", "<h2>Étapes</h2><p>1. faire</p>");
+  try {
+    const f = (r1746(d).findings || []).filter((x) => x.regle === "R-32 quinquies");
+    if (!f.some((x) => x.statut === "PASS" && /AVERTISSEMENT/.test(x.message) && /sans section/.test(x.message))) throw new Error(JSON.stringify(f));
+    if (f.some((x) => x.statut === "FAIL")) throw new Error("la règle neuve bloque");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1746 rouge : un historique qui ouvre sur un autre indice (20261014b) → AVERTISSEMENT qui nomme les deux indices", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20261015a.html", "<h2>Historique du document</h2><table><tr><td>20261014b</td><td>ajout</td></tr></table>");
+  try {
+    const f = (r1746(d).findings || []).filter((x) => x.regle === "R-32 quinquies");
+    if (!f.some((x) => /AVERTISSEMENT/.test(x.message) && /20261014b/.test(x.message) && /20261015a/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1746 vert : un historique dont la première ligne est l'indice du nom → PASS sans avertissement", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20261015a.html", "<h2>Historique du document</h2><table><tr><td>20261015a</td><td>15/10/2026</td><td>étape 12 corrigée</td></tr><tr><td>20261014b</td><td>14/10/2026</td><td>première remise</td></tr></table>");
+  try {
+    const f = (r1746(d).findings || []).filter((x) => x.regle === "R-32 quinquies");
+    if (!f.some((x) => x.statut === "PASS") || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1746 antériorité : un livrable daté avant le 15/10/2026 n'est pas jugé, et c'est dit au non_juge", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20260907a.html", "<h2>Étapes</h2>");
+  try {
+    const r = r1746(d);
+    if ((r.findings || []).some((x) => x.regle === "R-32 quinquies" && x.statut !== "SANS_OBJET")) throw new Error(JSON.stringify(r.findings));
+    if (!(r.non_juge || []).some((l) => /R-32 quinquies/.test(l))) throw new Error("l'antériorité n'est pas déclarée");
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 

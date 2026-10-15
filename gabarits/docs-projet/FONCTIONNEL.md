@@ -1,6 +1,7 @@
 ---
 role: vue fonctionnelle du produit — ce qu'il fait et pour qui (R-20, TF-0087)
 destinataire: humain
+role_destinataire: commanditaire et équipe produit
 sources_de_verite: [forge/EXIGENCES.json]
 verifie_le: {AAAA-MM-JJ}
 ---

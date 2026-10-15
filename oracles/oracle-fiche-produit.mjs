@@ -27,7 +27,13 @@
  *         dans une fiche d'offre technique, la colonne Couverture, si elle existe, tient aussi son
  *         vocabulaire fermé (natif, configuration, extension, à développer — TF-1704) ;
  *   FP6 · chaque brique du chapitre 2 porte la date de son relevé (point 3) ;
- *   FP7 · aucun emplacement `{…}` ne reste dans le texte (point 5).
+ *   FP7 · aucun emplacement `{…}` ne reste dans le texte (point 5) ;
+ *   FP8 · AVERTISSANTE (gabarit 1.2.0, TF-1764, TF-1769, TF-1766) : le chapitre « Personas et usages »
+ *         existe ; chaque persona a un parcours testable (se connecter, geste principal, résultat
+ *         attendu) et une colonne « Parcours testé » qui dit « non joué » ou porte la trace d'un vrai
+ *         navigateur sur l'adresse publique, datée ; chaque usage est `actif` ou `en attente`, jamais
+ *         retiré, et un usage en attente porte son motif et l'action par rôle. FP8 n'abaisse jamais le
+ *         verdict : ses constats ont le statut AVERTISSEMENT.
  *
  * Contrat : JSON {oracle, version, cible, verdict, findings[], mesures, non_juge[]} · exit 0 PASS,
  * 1 FAIL, 2 non jugeable (fichier absent ou illisible).
@@ -38,7 +44,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
 /** Le vocabulaire fermé du statut d'une exigence (GABARIT.md, « Les vocabulaires fermés »).
@@ -269,6 +275,56 @@ export function juger(source) {
     if (restes.length) ko("FP7", "fiche", `${restes.length} emplacement(s) non rempli(s), dont « ${restes[0]} »`);
     else ok("FP7", "fiche", "aucun emplacement {…} restant");
   }
+
+  // FP8 (AVERTISSANTE, gabarit 1.2.0) — chaque persona a un parcours testable, chaque usage reste à
+  // l'écran. TF-1764 : 34 exigences sur 35 tenues, aucun des 4 personas servi en entier. TF-1769 : un
+  // usage dont la clé manquait a été retiré de l'écran au lieu d'y rester inactif. TF-1766 : une recette
+  // verte n'avait jamais joué un parcours dans un navigateur sur l'adresse publique.
+  {
+    const avert = (ou, message) => findings.push({ regle: "FP8", statut: "AVERTISSEMENT", ou, message });
+    const ch = chapitre(chs, "personas");
+    const tP = (ch?.tableaux || []).find((t) => colonne(t, "persona") >= 0 && colonne(t, "geste") >= 0);
+    const tU = (ch?.tableaux || []).find((t) => colonne(t, "usage") >= 0 && colonne(t, "etat") >= 0);
+    let ecarts = 0;
+    if (!ch) { avert("fiche", "aucun chapitre « Personas et usages » : des exigences tenues ne disent pas qu'un persona est servi en entier — le 14/10/2026, 34 exigences sur 35 tenues laissaient 4 personas sans parcours (TF-1764, GABARIT.md 1.2.0)"); ecarts++; }
+    else {
+      if (!tP) { avert("chapitre « Personas et usages »", "pas de tableau des personas avec les colonnes Persona, Se connecter, Geste principal, Résultat attendu et Parcours testé"); ecarts++; }
+      else {
+        const iN = colonne(tP, "persona"), iC = colonne(tP, "se connecter", "connexion"), iG = colonne(tP, "geste"),
+          iR = colonne(tP, "resultat"), iT = colonne(tP, "parcours");
+        mesures.personas = tP.lignes.length;
+        for (const l of tP.lignes) {
+          const nom = l[iN] || "?";
+          const manque = [[iC, "se connecter"], [iG, "geste principal"], [iR, "résultat attendu"]]
+            .filter(([i]) => i < 0 || VIDE.test(NORMALISER(l[i] || ""))).map(([, q]) => q);
+          if (manque.length) { avert(`persona « ${nom} »`, `parcours sans ${manque.join(", ")} : un parcours testable dit comment le persona se connecte, son geste principal et le résultat qu'il voit`); ecarts++; }
+          const t = iT >= 0 ? NORMALISER(l[iT] || "") : "";
+          if (iT < 0 || VIDE.test(t)) { avert(`persona « ${nom} »`, "colonne « Parcours testé » vide : écrire « non joué », ou la trace du parcours joué (navigateur, adresse publique, date)"); ecarts++; }
+          else if (t !== "non joue" && !(DATE.test(t) && /navigateur/.test(t) && (/adresse publique/.test(t) || /https?:\/\//.test(t)))) {
+            avert(`persona « ${nom} »`, `parcours déclaré testé (« ${l[iT]} ») sans la trace d'un vrai navigateur sur l'adresse publique, datée : le 15/10/2026, 5 parcours verts par le réseau privé ont rendu « Application failed to respond » au premier clic humain (TF-1766)`); ecarts++;
+          }
+        }
+      }
+      if (!tU) { avert("chapitre « Personas et usages »", "pas de tableau des usages avec les colonnes Usage, Persona, Dépend de, État, Motif et Action par rôle"); ecarts++; }
+      else {
+        const iU = colonne(tU, "usage"), iE = colonne(tU, "etat"), iM = colonne(tU, "motif"), iA = colonne(tU, "action");
+        mesures.usages = tU.lignes.length;
+        mesures.usages_en_attente = 0;
+        for (const l of tU.lignes) {
+          const nom = l[iU] || "?";
+          const etat = NORMALISER(l[iE] || "");
+          if (etat === "en attente") {
+            mesures.usages_en_attente++;
+            const manque = [[iM, "motif"], [iA, "action par rôle"]].filter(([i]) => i < 0 || VIDE.test(NORMALISER(l[i] || ""))).map(([, q]) => q);
+            if (manque.length) { avert(`usage « ${nom} »`, `en attente sans ${manque.join(" ni ")} : l'usage reste à l'écran, inactif, et dit pourquoi et qui le débloque`); ecarts++; }
+          } else if (etat !== "actif") {
+            avert(`usage « ${nom} »`, `état « ${l[iE]} » hors du vocabulaire fermé (actif, en attente) : un usage dont un composant manque (paramètre, clé d'API, service) n'est jamais retiré, il reste à l'écran en attente avec son motif et l'action par rôle (TF-1769)`); ecarts++;
+          }
+        }
+      }
+    }
+    if (!ecarts) ok("FP8", "chapitre « Personas et usages »", `${mesures.personas} persona(s) avec parcours, ${mesures.usages} usage(s) dont ${mesures.usages_en_attente} en attente rendu(s) avec motif et action`);
+  }
   return { findings, mesures };
 }
 
@@ -280,6 +336,8 @@ export const NON_JUGE = [
   "qu'une exigence `fait constaté` le soit vraiment : la source citée n'est pas relue",
   "les chiffres écrits hors de la forme du squelette (« trente-six exigences », un tableau de synthèse) : FP2 rend SKIP quand il n'en lit aucun, il ne devine pas",
   "le rendu et le marquage de la page : check_html.py et render_page.py du socle digit-ai-page-html",
+  "FP8 : que chaque persona du produit figure au chapitre « Personas et usages », et qu'un parcours déclaré joué l'ait été : la trace (navigateur, adresse publique, date) est lue, pas rejouée",
+  "FP8 : qu'un usage en attente soit VRAIMENT rendu à l'écran du produit : la fiche le déclare, l'interface se juge chez le produit",
 ];
 
 // --- recette à double sens : la verte est l'INSTANCE de la famille, chaque rouge fait échouer SA règle ---
@@ -327,6 +385,20 @@ role_destinataire: le commanditaire, qui valide le périmètre
 
 *Gabarit : gd-fiche-produit · version du gabarit 1.1.0*
 `;
+
+/** La même fiche avec le chapitre « Personas et usages » (gabarit 1.2.0, TF-1764, TF-1769). */
+export const FIXTURE_MD_PERSONAS = FIXTURE_MD.replace("## 6. Hypothèses à lever", `## Personas et usages
+
+| Persona | Se connecter | Geste principal | Résultat attendu | Exigences | Parcours testé |
+|---|---|---|---|---|---|
+| Exploitant | Identifiant et mot de passe | Ouvre le tableau de routage | Voit les appels routés du jour | EF-01, ENF-01 | non joué |
+
+| Usage | Persona | Dépend de | État | Motif | Action par rôle |
+|---|---|---|---|---|---|
+| Router un appel | Exploitant | aucun | actif | — | — |
+| Basculer de fournisseur | Exploitant | clé d'API du fournisseur B | en attente | Clé du fournisseur B non saisie | L'administrateur saisit la clé ; l'exploitant voit l'usage inactif et son motif |
+
+## 6. Hypothèses à lever`).replace("version du gabarit 1.1.0", "version du gabarit 1.2.0");
 
 function selfTest() {
   const cas = [];
@@ -381,9 +453,36 @@ function selfTest() {
     .replace("## 5. Toutes les exigences", "## Architecture\n\nLa passerelle reçoit les appels et les route vers deux fournisseurs.\n\n## 5. Toutes les exigences");
   verte("offre technique : chapitre Architecture et colonne Couverture au vocabulaire fermé", offre);
   rouge("offre technique : couverture hors vocabulaire", "FP5", offre.replace("| hypothèse | à développer |", "| hypothèse | partielle |"));
+  // TF-1764 (lot Produit-82 20261015a, RT-13), TF-1769 (lot Produit-83 20261015a, RT-7) et TF-1766
+  // (lot Produit-82 20261015b, RT-15) — le chapitre « Personas et usages » (gabarit 1.2.0). FP8 est
+  // AVERTISSANTE : elle n'abaisse jamais le verdict, elle dit ce qui manque. Chaque cas averti l'est
+  // sur la règle FP8 ; chaque cas « sans avertissement » prouve le remède.
+  const averti = (nom, source) => {
+    const r = juger(source);
+    const avert = r.findings.some((f) => f.regle === "FP8" && f.statut === "AVERTISSEMENT");
+    cas.push({ nom: `cas averti — ${nom}`, attendu: "FP8 AVERTISSEMENT, verdict PASS", ok: avert && verdictDe(r.findings) === "PASS" });
+  };
+  const sansAvert = (nom, source) => {
+    const r = juger(source);
+    const avert = r.findings.filter((f) => f.regle === "FP8" && f.statut !== "PASS");
+    cas.push({ nom: `cas vert — ${nom}`, attendu: "FP8 PASS, verdict PASS", ok: !avert.length && verdictDe(r.findings) === "PASS",
+      detail: avert.length ? JSON.stringify(avert) : "" });
+  };
+  sansAvert("INSTANCE.html : personas avec parcours, usage en attente rendu avec motif et action", instance);
+  sansAvert("fiche Markdown : chapitre Personas et usages complet", FIXTURE_MD_PERSONAS);
+  averti("fiche sans chapitre « Personas et usages » (les 4 personas du 14/10 sans parcours)", FIXTURE_MD);
+  averti("persona sans geste principal", muter(FIXTURE_MD_PERSONAS, "| Ouvre le tableau de routage |", "| — |"));
+  averti("parcours testé laissé vide", muter(FIXTURE_MD_PERSONAS, "| non joué |", "|  |"));
+  averti("parcours déclaré testé sans navigateur ni adresse publique (TF-1766, recette par le réseau privé)",
+    muter(FIXTURE_MD_PERSONAS, "| non joué |", "| testé le 2026-10-15 |"));
+  sansAvert("parcours testé dans un navigateur sur l'adresse publique, daté", muter(FIXTURE_MD_PERSONAS, "| non joué |",
+    "| navigateur, adresse publique https://exemple.invalid, 2026-10-15, saisie inattendue refusée |"));
+  averti("usage retiré parce que sa clé d'API manque (TF-1769)", muter(FIXTURE_MD_PERSONAS, "| en attente | Clé du fournisseur B non saisie |", "| retiré | Clé du fournisseur B non saisie |"));
+  averti("usage en attente sans action par rôle", muter(FIXTURE_MD_PERSONAS, "| L'administrateur saisit la clé ; l'exploitant voit l'usage inactif et son motif |", "| — |"));
+  averti("usage en attente sans motif", muter(FIXTURE_MD_PERSONAS, "| Clé du fournisseur B non saisie |", "|  |"));
   for (const c of cas) console.log(`  [${c.ok ? "PASS" : "FAIL"}] ${c.nom} → ${c.attendu}${c.detail ? ` — ${c.detail}` : ""}`);
   const casse = cas.filter((c) => !c.ok);
-  console.log(`\noracle-fiche-produit self-test : ${cas.length - casse.length}/${cas.length} PASS (${cas.filter((c) => c.nom.startsWith("cas rouge")).length} cas rouges, ${cas.filter((c) => c.nom.startsWith("cas vert")).length} cas verts, recette à double sens)`);
+  console.log(`\noracle-fiche-produit self-test : ${cas.length - casse.length}/${cas.length} PASS (${cas.filter((c) => c.nom.startsWith("cas rouge")).length} cas rouges, ${cas.filter((c) => c.nom.startsWith("cas vert")).length} cas verts, ${cas.filter((c) => c.nom.startsWith("cas averti")).length} cas avertis, recette à double sens)`);
   process.exit(casse.length ? 1 : 0);
 }
 

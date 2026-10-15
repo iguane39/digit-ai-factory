@@ -35,8 +35,13 @@
 > écrite en **prose** ici, et jugée en **code** là-bas. *Une affordance non câblée n'existe pas.*
 >
 > Le fichier `forge\retours\oracle-lot.mjs` absent ? Alors l'héritage du produit n'est pas tenu —
-> `oracle-conformite-projet` (R-47) le dit — et il se recopie depuis `gabarits\oracle-lot-retours.mjs`
-> du pilot, avec ce gabarit.
+> `oracle-conformite-projet` (R-47) le dit — et il se recopie depuis `gabarits\oracle-lot-relais.mjs`
+> du pilot, avec ce gabarit. Depuis le 15/10/2026 (TF-1759), ce fichier est un RELAIS : il résout le pilot
+> (`FORGE_ROOT`, sinon le dossier voisin `digit-ai-factory`) et joue SON juge, `gabarits\oracle-lot-retours.mjs`.
+> Les règles du jour s'appliquent donc sans recopie ; pilot introuvable, le relais le dit et sort en 2.
+>
+> Un lot resté `a_remettre` plus de 24 h est nommé à l'ouverture de votre session (TF-1758) : la
+> remise est un geste, et rien d'autre ne le déclenche.
 
 Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un
 aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).
@@ -97,6 +102,22 @@ disque un autre texte, et plus rien ne les rapproche. Depuis, **R-49** de `oracl
 refuse un lot dont le chemin est déjà ingéré sous une AUTRE empreinte, et prescrit l'indice
 suivant. Le geste de réparation, s'il est déjà trop tard : restaurer le lot d'origine depuis git,
 puis remettre le nouveau texte sous l'indice suivant.
+
+**Chercher au registre avant de déclarer un retour neuf (TF-1757, 15/10/2026)** : un retour qui dit
+« aucun item » au registre du pilot porte, dans une section `## Rattachement`, la recherche qui le
+prouve : **la commande jouée, mot pour mot, et le nombre de lignes qu'elle a trouvées**, sortie
+complète. Une sortie bornée (`head`, `-n`, `--max-count`, `Select-Object -First`) n'est pas une
+recherche : le total se dit à côté, ou la borne se retire. Chaque item trouvé se cite par son id
+(`TF-xxxx`) ; le retour qui le recoupe s'y rattache au lieu d'entrer comme neuf. *Le fait* : le
+15/10/2026, un retour déclaré sans item doublonnait TF-1201, déjà corrigé la veille ; la recherche
+avait été tronquée à 5 lignes par `head -5`, et la ligne de TF-1201 était la sixième.
+
+```
+## Rattachement
+
+Registre interrogé le <JJ/MM/AAAA> : `<commande jouée, sans borne>` → <N> ligne(s) trouvée(s).
+Items recoupés : <TF-xxxx (ce qu'il porte) — ou « aucun »>.
+```
 
 **Rectifier un retour déjà remis (TF-0703, 31/08)** : un lot remis ne se modifie JAMAIS — et
 c'est cette immuabilité qui force à déclarer une erreur plutôt qu'à l'effacer. Le geste
@@ -182,6 +203,16 @@ la réalité des projets le dépasse et que personne ne le dit.
 
 Reporter le couple **`gabarit` + `version_du_gabarit`** que le document porte dans son en-tête :
 sans lui, un retour dit « il manquait une section » et personne ne sait à quoi l'appliquer.
+
+**Le document vient d'un gabarit qui ne se marque pas** (TF-1752, 15/10/2026) : les familles de
+`gabarits\documents\` rendent leur couple en pied de page (règle G4 d'`oracle-gabarits-documents`),
+mais un gabarit venu d'ailleurs, comme ceux du kit d'audit de forge-audit, n'émet aucun `gd-…`. Ne
+pas écrire de mémoire ce que le document aurait dû déclarer, et ne pas employer la formule d'absence
+ci-dessous : elle serait fausse, puisque le document vient bien d'un gabarit. Écrire dans la colonne
+« Gabarit employé + version » : `gabarit non marqué : <chemin du gabarit à sa source> — aucune
+version du gabarit déclarée dans le document`, puis remonter le défaut au porteur du gabarit, dans
+la section de sa forge. Le 25/09/2026, `grep -io "gd-[a-z0-9-]*"` ne rendait rien sur un rapport
+d'audit et une fiche de sécurité issus du kit d'audit.
 
 | Document produit | Gabarit employé + version | Ce qui a manqué | Ce qui a GÊNÉ LE LECTEUR | Ajouté à la main | Portée |
 |---|---|---|---|---|---|

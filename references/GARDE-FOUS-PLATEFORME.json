@@ -1,6 +1,6 @@
 {
   "format": "pilot/garde-fous-plateforme@1",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "date": "2026-10-15",
   "source": "Décision humaine D-37 (a) du 01/10/2026, TF-1495 et TF-1496 — lots « Produit-03 - RETOURS - 20260929d » (RA-51) et « Produit-03 - RETOURS - 20260929e » (RA-52). Le 29/09/2026, une stratégie Deny de la souscription d'un client a refusé la première livraison de production d'un produit. Le même produit l'avait heurtée en qualification le 23/07 et l'avait écrite en commentaire ; un produit voisin du même client l'avait heurtée le 31/08. La leçon n'a circulé ni vers la production, ni vers la factory.",
   "pourquoi_une_donnee": "Loi transverse n° 4 : une contrainte de plateforme est une donnée volatile. Le client la pose, la change ou la retire sans prévenir. Elle vit ici, datée et sourcée, et se confirme par le relevé du jour (ETAPE-MEP.md § 1 ter) : une entrée de ce registre est une piste à vérifier, jamais une preuve.",
@@ -102,6 +102,26 @@
       "inscrite_le": "2026-10-15",
       "verifiee_le": "2026-10-14",
       "verifiee_par": "constat du produit : message de refus de la CLI relevé mot pour mot"
+    },
+    {
+      "id": "GFP-005",
+      "client": "tous",
+      "plateforme": "windows-poste",
+      "mecanisme": "stratégie de contrôle d'application Windows",
+      "effet": "ImportError « DLL load failed » sur les extensions compilées sqlalchemy/*_cy.*.pyd (SQLAlchemy 2.1)",
+      "portee": "poste de construction d'un produit Python",
+      "vise": "les DLL non approuvées",
+      "refuse": "le chargement des extensions compilées de SQLAlchemy 2.1",
+      "consequence": "import sqlalchemy échoue sur ce poste",
+      "remede_eprouve": "[tool.uv] no-binary-package = [\"sqlalchemy\"] et [tool.uv.extra-build-variables] sqlalchemy = { DISABLE_SQLALCHEMY_CEXT = \"1\" } ; mode opératoire : digit-ai-forge-development docs/run-playbook.md, section Garde-fous de plateforme du poste de construction",
+      "posee_le": null,
+      "constatee": [
+        { "produit": "Produit-83", "le": "2026-10-15", "environnement": "développement", "trace": "ledger du produit seq 90 ; backend/pyproject.toml" }
+      ],
+      "source": "lot « Produit-83 - RETOURS - 20261015b » (TF-1782)",
+      "inscrite_le": "2026-10-15",
+      "verifiee_le": "2026-10-15",
+      "verifiee_par": "constat du produit ; non reproduit sur un autre poste du parc (roue 2.1.4 chargée), installation pure rejouée (_row_cy.py)"
     }
   ]
 }

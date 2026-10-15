@@ -368,7 +368,7 @@
       <div class="doc-ident">
         <p class="eyebrow">{Client} · Fiche produit · {AAAA-MM-JJ}</p>
         <h1>{Nom du produit}</h1>
-        <p class="muted">Périmètre fonctionnel en paliers, tiré du référentiel d'exigences du produit.<br>Gabarit : gd-fiche-produit · version du gabarit 1.1.0 — à reporter tel quel dans tout retour sur ce document</p>
+        <p class="muted">Périmètre fonctionnel en paliers, tiré du référentiel d'exigences du produit.<br>Gabarit : gd-fiche-produit · version du gabarit 1.2.0 — à reporter tel quel dans tout retour sur ce document</p>
       </div>
       <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
       <button id="theme-toggle" class="theme-toggle" type="button"
@@ -394,6 +394,7 @@
           <li><a href="#domaines"><span class="toc-t">Domaines et socle</span><span class="toc-d">le besoin couvert, par palier</span></a></li>
           <li><a href="#palier"><span class="toc-t">Le palier du premier lot</span><span class="toc-d">ce que le premier palier remplace</span></a></li>
           <li><a href="#exigences"><span class="toc-t">Toutes les exigences</span><span class="toc-d">la référence, avec le critère de recette</span></a></li>
+          <li><a href="#personas"><span class="toc-t">Personas et usages</span><span class="toc-d">le parcours de chaque persona, l'état de chaque usage</span></a></li>
           <li><a href="#hypotheses"><span class="toc-t">Hypothèses à lever</span><span class="toc-d">ce qu'il faut confirmer avant de construire</span></a></li>
           <li><a href="#arbitrage"><span class="toc-t">Points laissés à l'arbitrage</span><span class="toc-d">les décisions qui reviennent à vous</span></a></li>
           <li><a href="#provenance"><span class="toc-t">Provenance</span><span class="toc-d">d'où viennent les chiffres</span></a></li>
@@ -522,6 +523,48 @@
           </tr></thead>
           <tbody>
             <tr><td data-label="Id">{E-001}</td><td data-label="Domaine">{domaine}</td><td data-label="Palier">{MVP | V1 | V2}</td><td data-label="Qui agit">{qui agit}</td><td data-label="Comportement attendu">{comportement attendu, en une phrase}</td><td data-label="Critère de recette">{le test qui dit si l'exigence est tenue}</td><td data-label="Statut"><span class="badge part" title="Statut : {fait constaté | présent dans la base | hypothèse}.">{fait constaté | présent dans la base | hypothèse}</span></td><td data-label="Impact (1 à 5)">{1 à 5}</td></tr>
+          </tbody>
+        </table>
+        <p class="etat-vide">Aucune ligne. Ce n'est pas un oubli : le référentiel n'en porte aucune au relevé ci-dessus.</p>
+        </div>
+      </section>
+      <section class="chap lire" id="personas">
+        <h2>Personas et usages</h2>
+        <p class="chapo ch-apprend">Vous saurez, pour chaque personne qui se sert du produit, si son parcours entier est servi et testé.</p>
+        <p class="contenu">Ce chapitre donne le parcours testable de chaque persona et l'état de chaque usage. Un usage dont un composant manque reste à l'écran en attente, avec son motif et l'action de chaque rôle : il n'est jamais retiré.</p>
+        <p><strong>Exemple de lecture.</strong> {une ligne qui lit un usage en attente : ce que le persona voit à l'écran, et qui le débloque}</p>
+        <h3>Les parcours des personas</h3>
+        <div class="table-hote">
+        <table class="repli-cartes">
+          <caption>Un parcours testable par persona</caption>
+          <thead><tr>
+            <th data-definition="La personne qui se sert du produit, par son rôle.">Persona</th>
+            <th data-definition="Comment elle entre dans le produit.">Se connecter</th>
+            <th data-definition="Le geste pour lequel elle ouvre le produit.">Geste principal</th>
+            <th data-definition="Ce qu'elle voit quand le geste a réussi.">Résultat attendu</th>
+            <th data-definition="Les exigences du chapitre Toutes les exigences que le parcours traverse.">Exigences</th>
+            <th data-definition="« non joué », ou la trace du parcours joué dans un vrai navigateur sur l'adresse publique : date et saisie inattendue essayée.">Parcours testé</th>
+          </tr></thead>
+          <tbody>
+            <tr><td data-label="Persona">{persona}</td><td data-label="Se connecter">{comment il entre}</td><td data-label="Geste principal">{son geste principal}</td><td data-label="Résultat attendu">{ce qu'il voit}</td><td data-label="Exigences">{E-nnn}</td><td data-label="Parcours testé">{non joué, ou navigateur, adresse publique, date}</td></tr>
+          </tbody>
+        </table>
+        <p class="etat-vide">Aucune ligne. Ce n'est pas un oubli : le référentiel n'en porte aucune au relevé ci-dessus.</p>
+        </div>
+        <h3>Les usages et leur état</h3>
+        <div class="table-hote">
+        <table class="repli-cartes">
+          <caption>Chaque usage, ce dont il dépend et son état à l'écran</caption>
+          <thead><tr>
+            <th data-definition="Ce que le persona fait avec le produit.">Usage</th>
+            <th data-definition="Le persona qui s'en sert.">Persona</th>
+            <th data-definition="Le paramètre, la clé d'API ou le service dont l'usage a besoin, ou « aucun ».">Dépend de</th>
+            <th data-definition="Valeurs admises : actif, en attente. Un usage n'est jamais retiré.">État</th>
+            <th data-definition="Pourquoi l'usage est en attente, affiché à l'écran.">Motif</th>
+            <th data-definition="Ce que chaque rôle fait pour le débloquer, ou voit en attendant.">Action par rôle</th>
+          </tr></thead>
+          <tbody>
+            <tr><td data-label="Usage">{usage}</td><td data-label="Persona">{persona}</td><td data-label="Dépend de">{composant, ou aucun}</td><td data-label="État">{actif ou en attente}</td><td data-label="Motif">{motif affiché}</td><td data-label="Action par rôle">{qui fait quoi}</td></tr>
           </tbody>
         </table>
         <p class="etat-vide">Aucune ligne. Ce n'est pas un oubli : le référentiel n'en porte aucune au relevé ci-dessus.</p>

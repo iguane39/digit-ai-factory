@@ -1,6 +1,7 @@
 ---
 role: commandes canoniques du produit — copiables par un humain, parsables par un agent (R-20)
 destinataire: humain
+role_destinataire: développeur ou exploitant du produit
 sources_de_verite: [package.json scripts, Makefile, CLAUDE.md produit]
 verifie_le: {AAAA-MM-JJ}
 ---

@@ -31,7 +31,7 @@ Où vit quoi, à la racine d'un produit. Le tableau se lit par CHEMIN : la colon
 | n° | Règle (binaire) | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 1 | `input\` existe à la racine ; tout entrant fourni par l'humain y vit. **Précision TF-0688 (décidée 28/08)** : `input\` est en **LECTURE SEULE pour tout producteur** — un livrable généré ne s'y écrit JAMAIS, pas même « à côté de sa référence » ; il va sous `output\`, dans le **sous-dossier existant** qui correspond (D-15), jamais dans un dossier créé pour l'occasion. Mesuré le 27/08 chez un produit : livrable écrit dans `input\` à côté du document de référence du client pendant qu'`output\` portait déjà l'arborescence dédiée — la convention vivait dans la structure des dossiers et nulle part où un producteur la lirait | observée 7/11 (forges, Produit-12, Transcript…) ; précision : lot Produit-11 du 27/08 | tous projets, nouveaux + rattrapage | P0+O | nul | **défaut** |
-| 2 | `output\` existe ; tout livrable généré destiné à l'humain y vit (rapports, PV, exports). **Précision D-06 (adoptée 11/08, TF-0084)** : un document *normatif* (doctrine, gabarit, registre) n'est pas une sortie — il vit à la racine ou dans `docs\`, avec son `Old\` à côté, jamais sous `output\` | observée 3/11 (`digit-ai-forge-agents/output/`, Transcript, BeefProject) ; précision : D-06 organization | tous, nouveaux + rattrapage | P0+O | nul | **défaut** |
+| 2 | `output\` existe ; tout livrable généré destiné à l'humain y vit (rapports, PV, exports). **Précision D-06 (adoptée 11/08, TF-0084)** : un document *normatif* (doctrine, gabarit, registre) n'est pas une sortie — il vit à la racine ou dans `docs\`, avec son `Old\` à côté, jamais sous `output\`. **Précision TF-1750 (décision humaine D-5 (a) du 15/10/2026)** : ce qu'un programme du produit écrit en service (fichiers déposés, journaux, base locale, caches) n'est pas un livrable — il vit sous `var\`, ignoré par git (motif `var/` du gitignore hérité, exigé par l'héritage), jamais sous `output\`. Mesuré le 25/09 chez un produit web : factures déposées, journaux et base d'administration côtoyaient 9 familles de livrables sous `output\`, et la purge de conservation a dû recevoir une liste blanche | observée 3/11 (`digit-ai-forge-agents/output/`, Transcript, BeefProject) ; précision : D-06 organization | tous, nouveaux + rattrapage | P0+O | nul | **défaut** |
 | 3 | `docs\` pour la documentation pérenne du produit (hors run) | observée 3/11 (development, tests, Produit-02) | produits, nouveaux | P0 | nul | option |
 | — | `forge\` (ledger, étapes) : **déjà acté** au contrat d'interface §2, pour mémoire | Produit-12/forge/ | — | — | — | déjà appliqué |
 
@@ -451,6 +451,17 @@ produit aucun faux positif signalé par un produit (par exemple une page de réf
 pas à être relue). À défaut, **revue de la règle le 10/11/2026**. La bascule reste une décision
 humaine : elle ajoute un FAIL opposable à tous les produits. Elle se consigne au registre
 (TF-1372) et retire l'avertissement du texte de cette règle.
+
+**R-32 quinquies (TF-1746, 15/10/2026) — un livrable HTML remis porte son historique, en
+AVERTISSEMENT.** Le 08/09/2026, un document remis à des administrateurs pour préparer une mise en
+production affichait son seul indice alors qu'il avait changé quatre fois en deux jours : son lecteur
+ne pouvait pas savoir ce qui avait bougé. Le journal R-32 garde la trace machine, dans un fichier que
+le destinataire n'ouvre jamais. Règle : un livrable HTML d'`output\` daté du 15/10/2026 ou après porte
+une section titrée « Historique du document » (version, date, ce qui change), dont la première ligne
+est l'indice de son nom. Mécanisme : O — contrôle R-32 quinquies d'`oracle-conformite-projet.mjs`,
+non bloquant ; les livrables antérieurs sont une antériorité déclarée. Non jugé : la justesse de ce
+que l'historique dit avoir changé. La bascule en bloquant est une décision humaine, prise sur une
+mesure du bruit chez les produits, comme pour R-32 quater.
 
 ## M. Sécurité offensive — sur mandat, jamais dans la voie automatique (règle 33 — 14/08, TF-0189)
 
@@ -1708,7 +1719,11 @@ Contrôles exécutables : les règles S70 (point 4), S71 (point 3) et S72 (point
 d'`oracles\oracle-synthese.mjs`, avertissantes à leur entrée, fixtures double sens au self-test ;
 texte hérité par les produits dans `gabarits\RESTITUTION.md` (v2.38.0, bloc 2). Mesure d'entrée : 0
 accusation sur les 241 synthèses d'`output\04-plans\`, 3 sur 15 restitutions écrites des produits, les
-3 restitutions contestées du 14/10.
+3 restitutions contestées du 14/10. Le point 3 a deux juges avertissants de plus depuis le 15/10/2026
+(TF-1766) : S75 d'`oracle-synthese` (une livraison déclarée d'un produit à interface dit le parcours
+joué dans un navigateur sur l'adresse publique, ou l'avoue non joué ; 0 accusation sur 245 synthèses)
+et FP8 d'`oracles\oracle-fiche-produit.mjs` (un parcours de persona déclaré testé porte navigateur,
+adresse publique et date).
 
 ## AQ. R-62 — aucune donnée d'identité de l'utilisateur ne part vers un service tiers sans sa demande (TF-1716 — 15/10/2026)
 
@@ -1811,8 +1826,8 @@ critique pour le travail des développeurs, leur efficacité, résilience. »
 Contrôles exécutables : `oracles\oracle-reprise.mjs` (RP1 manifeste valide, RP2 aucun secret déclaré,
 RP3 canal joignable sur ce poste, RP4 aucun écart non restauré, RP5 envoi actif sous feu vert
 consigné ; recette `oracle-reprise.test.mjs`, 8 cas, dont le cas du 14/10 rejoué) ; `oracles\hook-reprise.mjs`,
-câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.json` 1.24.0 (recette
-`gabarits\hooks-factory.test.mjs`, cas 9) ; la règle S75 d'`oracles\oracle-synthese.mjs` (point 5).
+câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.json` 1.26.0, et ajouté par le hook d'ouverture du produit depuis le gabarit (recette
+`gabarits\hooks-factory.test.mjs`, cas 12) ; la règle S77 d'`oracles\oracle-synthese.mjs` (point 5).
 Non jugé : une suppression ne se propage pas ; deux écritures du même fichier entre deux
 synchronisations ne se fusionnent pas, l'une reste en sauvegarde ; le pilot lui-même, dont la reprise
 passe par git et `scripts\rebatir-clone.mjs`, n'est pas concerné.

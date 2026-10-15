@@ -588,8 +588,16 @@ check("page rouge : un littéral nu réinjecté dans un titre est bien dénoncé
 check("page courante : R-30 tenue (clair strict, color-scheme dans les tokens, pas de <meta>)", () => {
   if (echecDeRegeneration) throw new Error(`la vue n a pas pu etre regeneree : ${echecDeRegeneration.trim().slice(0, 200)}`);
   const html = readFileSync(join(ICI, "TODO.html"), "utf8");
-  if (/prefers-color-scheme:\s*dark/.test(html))
+  // Le CODE de la page seulement (feuilles de style et scripts) : le 15/10/2026, deux items du
+  // registre citaient la règle en toutes lettres dans leur texte, et ce cas rendait FAIL sur une
+  // page conforme.
+  const codeDeLaPage = (h) => [...h.matchAll(/<(style|script)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((m) => m[2]).join("\n");
+  if (/prefers-color-scheme:\s*dark/.test(codeDeLaPage(html)))
     throw new Error("auto-sombre hérité de l'OS — retiré par l'amendement TF-0158");
+  if (!/prefers-color-scheme:\s*dark/.test(codeDeLaPage("<p>cite prefers-color-scheme: dark</p><style>@media (prefers-color-scheme: dark){:root{}}</style>")))
+    throw new Error("le relevé ne voit plus la règle dans une feuille de style : le contrôle serait mort");
+  if (/prefers-color-scheme:\s*dark/.test(codeDeLaPage("<p>un item cite prefers-color-scheme: dark</p><style>:root{}</style>")))
+    throw new Error("une citation dans le texte d'un item est encore lue comme du code");
   if (/<meta\s+name="color-scheme"/i.test(html.replace(/<!--[\s\S]*?-->/g, "")))
     throw new Error("color-scheme figé dans un <meta> — défaut RV-9");
   if (!/:root \{\s*\n\s*color-scheme:light/.test(html) || !/:root\[data-theme="dark"\] \{\s*\n\s*color-scheme:dark/.test(html))

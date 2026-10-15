@@ -74,15 +74,22 @@
  *     100 % » s'entend en cas EXÉCUTÉS — ce verdict en est le critère mesurable ;
  *   - `oracles\self-tests.mjs` pour sa recette à double sens (invariant I1).
  *
- * Usage : node oracle-adoption-tests.mjs <racine-projet>   → verdict JSON, exit 0/1/2
+ * Usage : node oracle-adoption-tests.mjs <racine-projet> [--livrables <dossier hors projet>]
+ *                                                          → verdict JSON, exit 0/1/2
+ *         sans cahier sous la cible, lit `--livrables`, sinon le chemin prescrit par l'étape 5 :
+ *         `<racine>\digit-ai-forge-tests\output\<projet>-livrables\` (TF-1793)
  *         node oracle-adoption-tests.mjs --self-test       → fixtures double sens
  */
 // Exit : 0 = conforme · 1 = defaut MESURE · 2 = JE NE PEUX PAS MESURER — la condition et
 // son remede sont alors NOMMES. Un oracle qui ne distingue pas les deux fait passer une panne
 // d'environnement pour un defaut du produit (TF-0648).
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, join, relative } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
+
+// Racine du parc (dépôts frères du pilot) : $FORGE_ROOT, sinon le parent du pilot (TF-1793).
+const RACINE_FORGES = process.env.FORGE_ROOT || join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 // Jour où R-40 est entrée au contrat (`REGLES-PROJET.md` §T, 17/08). Tout cahier antérieur est
 // une antériorité déclarée : la règle s'oppose au PROCHAIN cahier, jamais au passé réécrit.
@@ -248,7 +255,7 @@ function racineProduit(cible) {
 }
 
 // ── jugement ───────────────────────────────────────────────────────────────────────
-function juger(cible) {
+function juger(cible, options = {}) {
   const findings = [];
   const ko = (regle, ou, message) => findings.push({ regle, statut: "FAIL", ou, message });
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -268,7 +275,21 @@ function juger(cible) {
   }
 
   // ── A1 · inventaire, et A5 · antériorités déclarées ───────────────────────────────
-  const tous = trouverCahiers(cible).map(lireCahier);
+  // TF-1793 (lot Produit-83 20261015b, RT-12) : G-1 dépose les cahiers HORS du projet, et l'étape 5
+  // prescrit cet oracle sur `<racine-produit>`. Sous la cible rien n'est trouvé ; on lit alors le
+  // dossier `--livrables` s'il est donné, sinon le chemin que l'étape 5 prescrit,
+  // `<racine>\digit-ai-forge-tests\output\<projet>-livrables\`. Le lieu de lecture est dit en A1.
+  let tous = trouverCahiers(cible).map(lireCahier);
+  let horsProjet = null;
+  const cherches = [];
+  if (!tous.length) {
+    const prescrit = join(options.racineForges || RACINE_FORGES, "digit-ai-forge-tests", "output", `${basename(resolve(racine))}-livrables`);
+    for (const d of options.livrables ? [resolve(options.livrables)] : [prescrit]) {
+      cherches.push(d);
+      const t = trouverCahiers(d).map(lireCahier);
+      if (t.length) { tous = t; horsProjet = d; break; }
+    }
+  }
   const anteriorites = tous.filter((c) => !c.date || c.date < DOCTRINE_R40);
   const juges = tous.filter((c) => c.date && c.date >= DOCTRINE_R40);
   if (anteriorites.length) {
@@ -276,14 +297,14 @@ function juger(cible) {
   }
   if (!tous.length) {
     return { verdict: "SKIP", findings, racine, mesure: { cahiers: 0, anteriorites: 0 },
-      motif: `aucun cahier de tests dérivé sous ${cible} — R-40 s'applique aux cas DÉRIVÉS par forge-tests ; sans cahier, il n'y a pas de solde à opposer (et non : pas de solde nul)` };
+      motif: `aucun cahier de tests dérivé sous ${cible}${cherches.length ? `, ni hors du projet (cherché : ${cherches.join(", ")})` : ""} — R-40 s'applique aux cas DÉRIVÉS par forge-tests ; sans cahier, il n'y a pas de solde à opposer (et non : pas de solde nul) ; des cahiers déposés ailleurs se désignent par --livrables <dossier>` };
   }
   if (!juges.length) {
     return { verdict: "SKIP", findings, racine,
       mesure: { cahiers: tous.length, anteriorites: anteriorites.length, juges: 0 },
       motif: `${tous.length} cahier(s) trouvé(s), tous ANTÉRIEURS au ${DOCTRINE_R40} : antériorités déclarées, jamais jugées — R-40 s'oppose au prochain cahier dérivé, l'existant ne se réécrit pas` };
   }
-  ok("A1", bref(cible), `${juges.length} cahier(s) jugé(s) (dérivé(s) le ${DOCTRINE_R40} ou après)${anteriorites.length ? `, ${anteriorites.length} antériorité(s) déclarée(s)` : ""}`);
+  ok("A1", horsProjet || bref(cible), `${juges.length} cahier(s) jugé(s) (dérivé(s) le ${DOCTRINE_R40} ou après)${anteriorites.length ? `, ${anteriorites.length} antériorité(s) déclarée(s)` : ""}${horsProjet ? ` — lus hors du projet (G-1) : ${horsProjet}` : ""}`);
 
   // ── A2 · les contrats ─────────────────────────────────────────────────────────────
   const lu = lireAdoptions(racine);
@@ -500,6 +521,31 @@ function selfTest() {
   cas.push(["vert  — forme Produit-11 : cahiers déposés hors produit (G-1), contrat trouvé sous le produit",
     r.verdict === "PASS" && r.mesure.solde_total === 0 && r.mesure.racine_produit.endsWith("Produit-11"), r.verdict]);
 
+  // ── TF-1793 (lot Produit-83 20261015b, RT-12) · cible = RACINE DU PRODUIT, cahiers hors projet ──
+  // G-1 impose de déposer les cahiers HORS du projet audité ; l'étape 5 prescrit
+  // `<racine>\digit-ai-forge-tests\output\<projet>-livrables\` et cet oracle sur `<racine-produit>`.
+  // Les deux prescriptions suivies ensemble rendaient SKIP « aucun cahier ». Vert : le chemin
+  // prescrit est lu, et le solde jugé. Vert : `--livrables` explicite. Borne : rien nulle part →
+  // SKIP qui NOMME les chemins cherchés.
+  const parc = join(base, "parc-1793");
+  const produit1793 = join(parc, "Produit-T");
+  mkdirSync(join(produit1793, "forge"), { recursive: true });
+  const prescrit = join(parc, "digit-ai-forge-tests", "output", "Produit-T-livrables");
+  mkdirSync(prescrit, { recursive: true });
+  writeFileSync(join(prescrit, "demo - Cahier de tests fonctionnels - 20261015a.md"), cahier({ date: "2026-10-15", refs: [prop("F1-0001-1")] }));
+  r = juger(produit1793, { racineForges: parc });
+  cas.push(["TF-1793 vert — cible = racine produit, cahiers au chemin prescrit hors projet (G-1) : jugés, solde 1 nommé",
+    r.verdict === "FAIL" && aFail(r, "A3", "solde d'adoption NON NUL : 1 cas") && r.findings.some((f) => f.regle === "A1" && f.statut === "PASS" && /hors du projet/.test(f.message)), r.verdict]);
+  const ailleurs = join(base, "ailleurs-1793");
+  mkdirSync(ailleurs, { recursive: true });
+  writeFileSync(join(ailleurs, "demo - Cahier de tests fonctionnels - 20261015a.md"), cahier({ date: "2026-10-15", refs: [prop("F1-0001-1"), prop("F1-0001-2")] }));
+  r = juger(produit1793, { racineForges: join(base, "parc-vide-1793"), livrables: ailleurs });
+  cas.push(["TF-1793 vert — `--livrables <dossier>` explicite : les cahiers y sont lus",
+    aFail(r, "A3", "solde d'adoption NON NUL : 2 cas"), r.verdict]);
+  r = juger(produit1793, { racineForges: join(base, "parc-vide-1793") });
+  cas.push(["TF-1793 borne — aucun cahier ni sous la cible ni au chemin prescrit : SKIP qui nomme le chemin cherché",
+    r.verdict === "SKIP" && /Produit-T-livrables/.test(r.motif || ""), r.verdict]);
+
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {
     console.log(`  [${tenu ? "OK    " : "ECHEC "}] ${nom} (verdict ${verdict})`);
@@ -513,7 +559,9 @@ function selfTest() {
 const args = process.argv.slice(2);
 if (args.includes("--self-test")) process.exit(selfTest());
 
-const cible = args.find((a) => !a.startsWith("--"));
+const iLivrables = args.indexOf("--livrables");
+const livrables = iLivrables >= 0 ? args[iLivrables + 1] : null;
+const cible = args.find((a, i) => !a.startsWith("--") && !(iLivrables >= 0 && i === iLivrables + 1));
 if (!cible) {
   process.stdout.write(JSON.stringify({
     oracle: "oracle-adoption-tests", version: "1.1.0", verdict: "SKIP",
@@ -522,7 +570,7 @@ if (!cible) {
   }, null, 2) + "\n");
   process.exit(2);
 }
-const res = juger(cible);
+const res = juger(cible, { livrables });
 process.stdout.write(JSON.stringify({
   oracle: "oracle-adoption-tests", version: "1.0.0", cible,
   regle: "R-40 (REGLES-PROJET.md §T, TF-0349)",

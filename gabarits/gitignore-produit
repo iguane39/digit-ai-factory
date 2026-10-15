@@ -48,6 +48,12 @@ generated/
 dist/
 build/
 
+# ---- Ce que le programme écrit en service (règle 2, TF-1750, D-5 (a) du 15/10/2026) -----------
+# Fichiers déposés, journaux, base locale, caches : ce n'est pas un livrable, et `output\` est
+# réservé aux livrables datés. Le 25/09, chez un produit web, ils côtoyaient 9 familles de livrables
+# et la purge de conservation a dû recevoir une liste blanche.
+var/
+
 # ---- Sidecars d'oracles (règle 10 du socle, arbitrage C4) --------------------------------------
 # Les journaux d'oracles sont des PREUVES quand ils vivent sous `forge\` : ils y restent versionnés.
 # Partout ailleurs ce sont des artefacts d'atelier, et trois campagnes ont été polluées par eux.

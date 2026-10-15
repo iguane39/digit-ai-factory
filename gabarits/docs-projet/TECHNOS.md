@@ -1,6 +1,7 @@
 ---
 role: technologies du produit — vue ancrée sur les lockfiles (R-20/R-21)
 destinataire: humain
+role_destinataire: développeur du produit
 sources_de_verite: [package-lock.json, pyproject.toml]
 verifie_le: {AAAA-MM-JJ}
 versions:

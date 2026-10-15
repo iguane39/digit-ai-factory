@@ -72,6 +72,18 @@ check("vert — TF-1703 : un journal rangé comme PREUVE sous forge\\ reste vers
   for (const rel of ["forge/etapes/p2/_oracles-journal.json", "forge/oracles/_oracles-journal-historique.jsonl"])
     if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
 });
+// TF-1750 (D-5 (a) du 15/10/2026) : ce que le programme écrit en service vit sous var\, ignoré.
+const heritage = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
+check("rouge → vert — TF-1750 : le gitignore socle ignore var\\ (fichiers déposés, journaux, base locale)", () => {
+  for (const rel of ["var/depots/facture.pdf", "var/journaux/app.log", "var/admin.sqlite"])
+    if (!socle.ignore(rel)) throw new Error(`${rel} n'est pas ignoré par gabarits/gitignore-produit`);
+  const entree = JSON.stringify(heritage).includes('"var/"');
+  if (!entree) throw new Error("var/ n'est pas aux motifs exigés de gabarits/HERITAGE.json : un produit sans lui ne serait pas relevé");
+});
+check("vert — TF-1750 : un livrable sous output\\ reste versionnable", () => {
+  for (const rel of ["output/01-rapports/Produit-X - Rapport - 20261015a.html"])
+    if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
+});
 
 reel.fin();
 vide.fin();
