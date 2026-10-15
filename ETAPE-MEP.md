@@ -588,7 +588,11 @@ production (EC-4). L'oracle de l'étape le joue en TM8 et son refus bloque. Le m
 `--restitution <fichier>`, signale une option qui fait lancer par la session un script de
 déploiement (EC-5) : il se joue à la main sur la restitution avant de la remettre. Le sondage du
 formulaire (règle 6) est `scripts\verifier-formulaire-entra.mjs`, hors TM8 parce qu'il vise une
-adresse et non un dépôt.
+adresse et non un dépôt. Deux règles avertissantes s'y ajoutent depuis le 15/10/2026, sans bloquer
+TM8 : EC-6 passe `bash -n` sur chaque script bash extrait du YAML, macros `$(nom)` neutralisées,
+erreur située à sa ligne (le comportement sous `set -e` n'est pas jugé ; TF-1748) ; EC-7 avertit un
+étage de déploiement vers un `environment:` sans `lockBehavior: sequential`, à poser après le
+contrôle « Exclusive Lock » de l'environnement (TF-1749).
 
 **Hors jugement, et c'est dit.** La règle 4 (EC-3) : l'état d'une autorisation vit dans la
 plateforme, aucun contrôle hors ligne ne la lit. La création et l'écriture placées dans deux fichiers
