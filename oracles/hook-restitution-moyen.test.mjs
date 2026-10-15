@@ -77,7 +77,10 @@ try {
   check("3 forme : pièce absente → refus MOYEN au rappel court", f?.decision === "block" && /MOYEN — pièce\(s\) absente\(s\) : Non vérifié/.test(f.reason)
     && !/8 blocs numérotés/.test(f.reason), JSON.stringify(f)?.slice(0, 200));
   const f2 = jouer("forme-deja", lectures, sansNonVerifie, { stop_hook_active: true });
-  check("3 bis : forme en défaut déjà refusée une fois → laisse passer (anti-boucle)", f2 === null);
+  // TF-1739 : la réécriture est REJUGÉE et son verdict AFFICHÉ à l'humain (systemMessage), sans second refus.
+  check("3 bis : forme en défaut déjà refusée une fois → pas de second refus, verdict de la réécriture affiché (TF-1739)",
+    f2 !== null && f2.decision === undefined && /réécriture/.test(f2.systemMessage || "") && /MOYEN — pièce/.test(f2.systemMessage || ""),
+    JSON.stringify(f2)?.slice(0, 200));
   const long = MOYEN.replace("Aucune.", "Aucune. " + "mot ".repeat(350));
   check("3 ter : 400 mots dépassés → écart nommé", jugerFormeMoyen(long).ecarts.some((e) => /au-delà des 400/.test(e)));
   const dSansOptions = MOYEN.replace("Aucune.", "D-12 — faut-il publier ?");

@@ -8,7 +8,7 @@
  * n'écrit RIEN chez les produits, ce qui est vérifié octet pour octet.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -161,6 +161,32 @@ try {
       att(JSON.stringify(rouge.motifs_absents) === JSON.stringify([A.motif_exige[1]]), `motifs absents mal nommés : ${JSON.stringify(rouge.motifs_absents)}`);
       writeFileSync(join(P, ".claude", "settings.json"), '{"c":["node forge/hooks/factory.mjs publication-hebergee","node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json"]}', "utf8");
       att(etatArtefact(P, A, P).etat === "present", "fichier qui porte les 2 motifs non reconnu");
+    } finally { rmSync(P, { recursive: true, force: true }); }
+  });
+
+  // TF-1756 (15/10/2026) — LES MOTIFS EXIGÉS DU CÂBLAGE SE DÉRIVENT DU GABARIT. Le contrat n'exigeait que
+  // 2 des 7 hooks du gabarit : restitution, page-html, ecriture, droits-accordes, lexique pouvaient manquer
+  // sans constat. Vert : chaque commande `forge/hooks/factory.mjs <nom>` du VRAI gabarit est exigée par le
+  // VRAI contrat ; un produit qui en déclare une sous `_hooks_factory_exclus` la tient (écart déclaré).
+  // Rouge : un settings qui câble tout sauf `restitution` est incomplet, et le motif manquant est nommé.
+  check("TF-1756 — chaque hook du gabarit settings-produit est exigé par HERITAGE.json ; exclusion déclarée tenue, oubli incomplet", () => {
+    const racine = join(dirname(fileURLToPath(import.meta.url)), "..");
+    const gabarit = JSON.parse(readFileSync(join(racine, "gabarits", "settings-produit.json"), "utf8"));
+    const contrat = JSON.parse(readFileSync(join(racine, "gabarits", "HERITAGE.json"), "utf8"));
+    const A = contrat.artefacts.find((a) => a.cible === ".claude/settings.json");
+    const exiges = [].concat(A.motif_exige);
+    const commandes = Object.values(gabarit.hooks).flat().flatMap((g) => g.hooks || []).map((h) => String(h.command));
+    const nonExiges = commandes.filter((c) => /forge\/hooks\/factory\.mjs\s+[\w-]+/.test(c) && !exiges.some((m) => c.includes(m)));
+    att(!nonExiges.length, `commande(s) du gabarit non exigée(s) : ${nonExiges.join(" ; ")}`);
+    const P = mkdtempSync(join(tmpdir(), "heritage-derive-"));
+    try {
+      mkdirSync(join(P, ".claude"), { recursive: true });
+      const sansRestitution = commandes.filter((c) => !/factory\.mjs restitution/.test(c));
+      writeFileSync(join(P, ".claude", "settings.json"), JSON.stringify({ c: sansRestitution }), "utf8");
+      const rouge = etatArtefact(P, A, P);
+      att(rouge.etat === "incomplet" && (rouge.motifs_absents || []).some((m) => /restitution/.test(m)), `oubli de restitution : état « ${rouge.etat} », absents ${JSON.stringify(rouge.motifs_absents)}`);
+      writeFileSync(join(P, ".claude", "settings.json"), JSON.stringify({ _hooks_factory_exclus: [{ commande: "forge/hooks/factory.mjs restitution", motif: "essai" }], c: sansRestitution }), "utf8");
+      att(etatArtefact(P, A, P).etat === "present", "une exclusion déclarée n'est pas tenue pour un motif présent");
     } finally { rmSync(P, { recursive: true, force: true }); }
   });
 

@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { passerOuvertureEnAsync } from "./lib-ouverture-async.mjs";
+import { passerOuvertureEnAsync, fusionnerHooksDuGabarit } from "./lib-ouverture-async.mjs";
 import { borner, BUDGET_CONTEXTE_ASYNC } from "./lib-budget-contexte.mjs";
 import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gestes-avant-releve.mjs";
 
@@ -41,16 +41,30 @@ const lignes = [];
 // synchrone coupé à 60 s ne laisse rien faire à ce qu'il aurait joué ensuite. Lancé en synchrone
 // (sans `--contexte-json`), le hook rend aussitôt la main avec les seules règles de session : le
 // relevé complet attend l'ouverture suivante, déjà asynchrone, plutôt que de faire échouer celle-ci.
+// TF-1755 (15/10/2026) — ET TOUTE ENTRÉE DU GABARIT QUI MANQUE AU PRODUIT S'Y AJOUTE, au même moment et
+// par le même principe : chirurgical, ajout seulement, exclusions déclarées par le produit dans le
+// fichier (`_hooks_factory_exclus`). Seulement chez un produit qui porte le lanceur : sans lui, une
+// entrée ajoutée appellerait un fichier absent.
+const lignesFusion = [];
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "hooks", "factory.mjs"))) {
+  const fu = fusionnerHooksDuGabarit(join(process.cwd(), ".claude", "settings.json"), join(PILOT, "gabarits", "settings-produit.json"));
+  if (fu.etat === "corrige") lignesFusion.push("## Câblage des hooks de la factory (TF-1755)",
+    `- \`.claude/settings.json\` : ${fu.ajoutes.length} entrée(s) du gabarit ajoutée(s) — ${fu.ajoutes.join(", ")} ; rien d'autre n'est touché. Actives à la prochaine session. Enregistrer ce changement avec le travail du produit ; pour en écarter une, la déclarer sous \`_hooks_factory_exclus\` avec son motif.`
+      + (fu.exclus.length ? ` Exclusion(s) déclarée(s) et respectée(s) : ${fu.exclus.join(", ")}.` : ""), "");
+  else if (fu.etat === "illisible" || fu.etat === "gabarit_illisible") lignesFusion.push("## Câblage des hooks de la factory (TF-1755)", `- fusion NON jouée (${fu.etat} : ${fu.detail}) : les entrées neuves du gabarit n'atteignent pas ce produit.`, "");
+}
 if (iPilot >= 0) {
   const r = passerOuvertureEnAsync(join(process.cwd(), ".claude", "settings.json"));
   if (r.etat === "corrige" && !args.includes("--contexte-json")) {
     console.log([
       "## Ouverture de session (TF-1635)",
       "- `.claude/settings.json` de ce produit déclarait le hook d'ouverture en synchrone, que l'extension VS Code coupe à 60 s. Il vient d'être passé en `async` avec `--contexte-json` ; le reste du fichier est intact. Le relevé complet (fraîcheur, héritage, boîte d'entrée) arrivera à la prochaine ouverture : ne pas supposer le poste à jour d'ici là. Enregistrer ce changement avec le travail du produit.",
+      ...lignesFusion,
       ...lignesGates(),
     ].join("\n"));
     process.exit(0);
   }
+  lignes.push(...lignesFusion);
   if (r.etat === "corrige") lignes.push("## Ouverture de session (TF-1635)", "- `.claude/settings.json` de ce produit : hook d'ouverture complété (`async`, `--contexte-json`) ; le reste du fichier est intact. Enregistrer ce changement avec le travail du produit.", "");
   if (r.etat === "illisible") lignes.push("## Ouverture de session (TF-1635)", `- \`.claude/settings.json\` illisible (${r.detail}) : le hook d'ouverture n'a pas pu être vérifié en async. S'il est synchrone, l'extension VS Code coupera l'ouverture à 60 s.`, "");
 }
@@ -221,6 +235,44 @@ if (iPilot >= 0) {
   }
 }
 
+// TF-1758 et TF-1760 (15/10/2026) — LE PRODUIT VOIT SES LOTS NON REMIS ET CE QUE SONT DEVENUS SES RETOURS.
+// Mesuré le 15/10 : quatre lots `a_remettre` de 17 à 50 jours, absents du pilot, qu'aucun contrôle ne lisait ;
+// et aucune des 24 sections de ce relevé ne disait au produit le sort de ses TF. Le registre public porte
+// des pseudonymes : celui de CE produit se retrouve par la table (oracles/lib-retours-produit.mjs), et seul
+// lui est imprimé. L'instant de l'ouverture précédente vit dans les métadonnées git LOCALES du produit.
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "retours"))) {
+  try {
+    const t0 = Date.now();
+    const { pseudonymesDuProduit, lotsARemettre, vosRetours, SEUIL_H } = await import(pathToFileURL(join(ICI, "lib-retours-produit.mjs")).href);
+    const { pseudos, tables, anon } = await pseudonymesDuProduit(process.cwd(), PILOT);
+    const enAttente = await lotsARemettre(process.cwd(), PILOT, { anon });
+    if (enAttente.length) {
+      const jamais = enAttente.filter((l) => l.parvenu === false), parvenus = enAttente.filter((l) => l.parvenu === true);
+      lignes.push("", `## Lots de retours restés « a_remettre » plus de ${SEUIL_H} h (TF-1758)`);
+      if (jamais.length) lignes.push(`- **${jamais.length} lot(s) JAMAIS parvenu(s) au pilot** — ${jamais.slice(0, 6).map((l) => `« ${l.nom} » (${l.jours} j)`).join(", ")}${jamais.length > 6 ? ", …" : ""} : jouer \`node forge\\retours\\oracle-lot.mjs "<lot>.md"\`, copier le lot et son sidecar dans \`${join(PILOT, "input", "00-retours", "_arrivee")}\`, puis passer la ligne de statut à « remis le <date> ».`);
+      if (parvenus.length) lignes.push(`- ${parvenus.length} lot(s) déjà reçu(s) par le pilot dont la ligne de statut dit encore « a_remettre » : la passer à « remis le <date> » (seule édition permise d'un lot remis).`);
+      const inconnus = enAttente.length - jamais.length - parvenus.length;
+      if (inconnus) lignes.push(`- ${inconnus} lot(s) dont l'arrivée au pilot n'a pas pu être vérifiée (boîte du pilot illisible).`);
+    }
+    const cheminEtat = (() => { const r = spawnSync("git", ["rev-parse", "--git-path", "digit-ai-vos-retours.json"], { encoding: "utf8", cwd: process.cwd() }); const p = (r.stdout || "").trim(); return r.status === 0 && p ? (isAbsolute(p) ? p : join(process.cwd(), p)) : null; })();
+    let depuis = null;
+    try { depuis = JSON.parse(readFileSync(cheminEtat, "utf8")).ouverture || null; } catch { /* première ouverture, ou hors dépôt git */ }
+    const v = vosRetours(pseudos, PILOT, { depuis });
+    if (v && v.total) {
+      const comptes = Object.entries(v.parStatut).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${n} ${s}`).join(", ");
+      lignes.push("", `## Vos retours au registre du pilot (TF-1760)`,
+        `- ${v.total} TF désignent ce produit au registre public (pseudonyme : ${pseudos.filter((p) => /^Produit-\d+$/.test(p)).join(", ") || pseudos.join(", ")}) : ${comptes}.`);
+      if (depuis) lignes.push(v.closDepuis.length
+        ? `- ${v.closDepuis.length} clos depuis votre ouverture précédente (${depuis.slice(0, 16).replace("T", " ")} UTC) : ${v.closDepuis.slice(0, 6).map((x) => `${x.id} ${x.statut} — ${String(x.titre || "").slice(0, 90)}`).join(" ; ")}${v.closDepuis.length > 6 ? " ; …" : ""}`
+        : `- aucun clos depuis votre ouverture précédente (${depuis.slice(0, 16).replace("T", " ")} UTC).`);
+      lignes.push(`- Détail : \`todo\\TODO.jsonl\` du pilot, ou les lots de travaux reçus sous \`forge\\travaux\\\`.`);
+    }
+    if (!tables) lignes.push(`- pseudonyme NON résolu (tables du canal confidentiel absentes) : le registre a été lu sous le nom brut seul, ses retours sous pseudonyme ne sont pas comptés.`);
+    if (cheminEtat) { try { writeFileSync(cheminEtat, JSON.stringify({ ouverture: new Date().toISOString() }), "utf8"); } catch { /* état non écrit */ } }
+    if (Date.now() - t0 > 5000) lignes.push(`- (relevé des retours : ${Date.now() - t0} ms)`);
+  } catch (e) { lignes.push("", `- lots et retours du produit : NON relevés (${String(e.message).slice(0, 160)})`); }
+}
+
 // TF-1642 (14/10/2026) — LA FRAÎCHEUR NE SE JUGE PLUS SUR LES SEULS DÉPÔTS DE LA FACTORY. Le 12/10, un
 // rapport a recommandé un correctif livré 13 jours plus tôt : le clone lu avait 290 commits de retard,
 // et l'ouverture ne mesurait que le pilot et les forges. Chez un produit, son propre dépôt est mesuré
@@ -327,6 +379,24 @@ if (iPilot < 0) {
       }
       if (enDefaut.length > 12) lignes.push(`  - … et ${enDefaut.length - 12} autre(s) — détail : node scripts/relever-heritage.mjs --md <fichier>`);
       if (!enDefaut.length) lignes.push("- tous les produits relevés portent leur héritage à jour");
+
+      // TF-1758 (15/10/2026) — LES LOTS RESTÉS « a_remettre » CHEZ LES PRODUITS SE COMPTENT ICI AUSSI. La
+      // boîte du pilot (B8, B9) ne voit que ce qui lui est arrivé : un lot écrit et jamais remis n'existait
+      // pour personne. Comptes seulement, et le nom de chaque produit tel que le relevé l'affiche déjà.
+      try {
+        const { lotsARemettre, SEUIL_H } = await import(pathToFileURL(join(ICI, "lib-retours-produit.mjs")).href);
+        const parProduit = [];
+        for (const l of j.lignes || []) {
+          if (!l.dossier || !existsSync(join(l.dossier, "forge", "retours"))) continue;
+          const a = await lotsARemettre(l.dossier, PILOT);
+          const jamais = a.filter((x) => x.parvenu === false);
+          if (a.length) parProduit.push({ produit: l.produit, total: a.length, jamais: jamais.length, plusVieux: Math.max(0, ...jamais.map((x) => x.jours)) });
+        }
+        const total = parProduit.reduce((s, p) => s + p.total, 0), jamais = parProduit.reduce((s, p) => s + p.jamais, 0);
+        lignes.push("", `## Lots restés « a_remettre » chez les produits, plus de ${SEUIL_H} h (TF-1758)`,
+          !total ? "- aucun." : `- ${total} lot(s) chez ${parProduit.length} produit(s), dont **${jamais} jamais parvenu(s) au pilot** ; les autres sont reçus, leur ligne de statut n'a pas été mise à jour.`,
+          ...parProduit.filter((p) => p.jamais).slice(0, 8).map((p) => `  - ${p.produit} : ${p.jamais} jamais parvenu(s), le plus ancien de ${p.plusVieux} j — nommé à sa prochaine ouverture`));
+      } catch (e) { lignes.push(`- lots restés a_remettre chez les produits : NON comptés (${String(e.message).slice(0, 160)})`); }
 
       // TF-1521 (02/10/2026) — LE REJEU D'UN DÉPLACEMENT EN ATTENTE N'ÉTAIT CÂBLÉ NULLE PART. La
       // règle 7 bis (TF-1503) tolère qu'une version antérieure reste en place tant que le ledger du

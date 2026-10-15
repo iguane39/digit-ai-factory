@@ -389,6 +389,61 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
+// ---- TF-1813 (15/10/2026) : LOT-IDS CHEZ LE PRODUIT LIT AUSSI LES COPIES REÇUES PAR LE PILOT ------
+//
+// Le pilot renumérote parfois un identifiant à la réception (R-49, « Note de réception du pilot » en
+// tête de SA copie). Mesuré chez Produit-64 : son lot 20261012b porte RT-32 chez lui, RT-58 au pilot ;
+// le lot 20261015a reprenait RT-58 et a été refusé. Rouge : le lot du produit qui reprend RT-58, défini
+// par la seule copie du pilot (sous pseudonyme), est attrapé. Vert : un numéro neuf passe ; le voisin
+// du produit au nom RÉEL est toujours lu quand le préfixe se pseudonymise (cas du relais, TF-1759).
+// Bord : pilot introuvable → AVERTISSEMENT « vérification partielle », jamais d'échec.
+{
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const T = mkdtempSync(join(tmpdir(), "lot-ids-pilot-"));
+  const avant = { c: process.env.FORGE_NOMS_INTERDITS, p: process.env.FORGE_PRODUITS_PSEUDO, r: process.env.FORGE_ROOT };
+  writeFileSync(join(T, "_noms.json"), JSON.stringify({ noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+  writeFileSync(join(T, "_prod.json"), JSON.stringify({ produits: { "CalculatriceZorglubZAP": "Produit-01" } }), "utf8");
+  process.env.FORGE_NOMS_INTERDITS = join(T, "_noms.json");
+  process.env.FORGE_PRODUITS_PSEUDO = join(T, "_prod.json");
+  const CORPS = (lignes) => "# lot\n\n| Réf | gravité | retour |\n|---|---|---|\n" + lignes + "\n" + R45 + "\n" + R46;
+  const boite = join(T, "parc", "digit-ai-factory", "input", "00-retours");
+  mkdirSync(join(boite, "old"), { recursive: true });
+  mkdirSync(join(T, "parc", "digit-ai-factory", "todo"), { recursive: true });
+  const retours = join(T, "parc", "CalculatriceZorglubZAP", "forge", "retours");
+  mkdirSync(retours, { recursive: true });
+  writeFileSync(join(retours, "CalculatriceZorglubZAP - RETOURS - 20261012b.md"), CORPS("| RT-32 | majeur | un |"), "utf8");
+  writeFileSync(join(boite, "old", "Produit-01 - RETOURS - 20261012b.md"),
+    "> Note de réception du pilot : RT-32 renuméroté RT-58 (R-49).\n\n" + CORPS("| RT-58 | majeur | un |"), "utf8");
+  const lotNeuf = join(retours, "CalculatriceZorglubZAP - RETOURS - 20261015a.md");
+  process.env.FORGE_ROOT = join(T, "parc");
+
+  check("TF-1813 rouge — le lot du produit reprend RT-58, défini par la seule copie du PILOT (renumérotée) : FAIL", () => {
+    const c = constat(verifier(lotNeuf, CORPS("| RT-58 | majeur | reprise |")), "LOT-IDS");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+    if (!/Produit-01 - RETOURS - 20261012b\.md/.test(c.message)) throw new Error(`la copie du pilot n'est pas nommée : ${c.message}`);
+    if (!/RT-59/.test(c.remede || "")) throw new Error(`premier libre attendu RT-59 : ${c.remede}`);
+  });
+  check("TF-1813 rouge — RT-32 du voisin au nom RÉEL reste lu, le préfixe pseudonymisé ne le fait pas perdre", () => {
+    const c = constat(verifier(lotNeuf, CORPS("| RT-32 | majeur | reprise |")), "LOT-IDS");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+  check("TF-1813 vert — un numéro neuf (RT-59) ne reprend rien, chez le produit ni au pilot : PASS", () => {
+    const c = constat(verifier(lotNeuf, CORPS("| RT-59 | majeur | neuf |")), "LOT-IDS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+  check("TF-1813 bord — pilot introuvable : AVERTISSEMENT « vérification partielle », le verdict n'échoue pas pour cela", () => {
+    process.env.FORGE_ROOT = join(T, "nulle-part");
+    const r = verifier(join(T, "seul", "forge", "retours", "SEUL - RETOURS - 20261015a.md"), CORPS("| RT-1 | majeur | x |"));
+    const c = constat(r, "LOT-IDS");
+    if (!c || c.statut !== "AVERTISSEMENT" || !/partielle/i.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+
+  for (const [k, v] of [["FORGE_NOMS_INTERDITS", avant.c], ["FORGE_PRODUITS_PSEUDO", avant.p], ["FORGE_ROOT", avant.r]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
 // ---- R-57 et LOT-MURS (24/09/2026, au main le 28/09) : UN DOCUMENT MÛR REMONTE, OU SON MAINTIEN S'ÉCRIT
 //
 // La section se juge comme R-45 et R-46, dans les deux sens. La MESURE se rejoue sur un produit
@@ -568,6 +623,7 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   const { join, dirname } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
   const ICI_S = dirname(fileURLToPath(import.meta.url));
+  const { spawnSync: spawnSyncS } = await import("node:child_process");
   const REF = JSON.parse(readFileSync(join(ICI_S, "..", "todo", "CLASSES.json"), "utf8"));
   const EXISTANTE = REF.classes[0], FAMILLE = REF.classes[0].famille;
   const D = mkdtempSync(join(tmpdir(), "lot-sidecar-"));
@@ -640,10 +696,32 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
     const res = jouer([], { sansSidecar: true });
     if (!res.c || res.c.statut !== "SANS_OBJET" || !/absent/.test(res.c.message)) throw new Error(`statut ${res.c ? res.c.statut : "absent"}`);
   });
-  check("LOT-SIDECAR borne — un lot du 12/10, jour d'AVANT l'entrée en vigueur, n'est pas accusé : antériorité déclarée", () => {
-    const res = jouer([ligne({ classe: "classe-a-creer" })], { date: "20261012" });
-    if (!res.c || res.c.statut !== "SANS_OBJET" || !/antériorité/.test(res.c.message)) throw new Error(`statut ${res.c ? res.c.statut : "absent"}`);
-    if (SEUILS["LOT-SIDECAR"] !== "20261013") throw new Error("seuil LOT-SIDECAR dérivé");
+  // TF-1814 (2) (15/10/2026) — LA PRÉDICTION N'EST EXEMPTÉE QUE LÀ OÙ LA PORTE L'EST. Le juge rendait
+  // SANS_OBJET sur tout lot daté d'avant le 13/10 ; la porte, elle, juge ces lots : un lot daté du 25/09,
+  // remis le 15/10 sans classe, a été refusé (classe exigée dès le 03/09). Rouge : ce lot est signalé.
+  // Vert : un lot daté d'avant le 03/09 sans classe passe, comme à la porte.
+  check("LOT-SIDECAR rouge — TF-1814 : un lot daté du 25/09 SANS classe est signalé, la porte le refusant", () => {
+    const sans = JSON.parse(ligne()); delete sans.classe;
+    avert(jouer([JSON.stringify(sans)], { date: "20260925" }), /classe manquante/);
+  });
+  check("LOT-SIDECAR vert — TF-1814 : un lot daté du 02/09 sans classe passe, la porte n'exigeant la classe que dès le 03/09", () => {
+    const sans = JSON.parse(ligne()); delete sans.classe;
+    passe(jouer([JSON.stringify(sans)], { date: "20260902" }));
+  });
+  // TF-1814 (1) — le verdict PASS d'un lot que la porte REFUSERA ne se lit plus « PASS » tout court :
+  // le résultat porte `refus_predit`, que la ligne de verdict de la CLI dit en toutes lettres.
+  check("LOT-SIDECAR rouge — TF-1814 : un refus prédit est porté au résultat (refus_predit) et dit sur la ligne de verdict", () => {
+    const base = join(D, "PROD - RETOURS - 20261013y");
+    writeFileSync(`${base}.md`, lotMd(), "utf8");
+    writeFileSync(`${base}.tf.jsonl`, ligne({ classe: "classe-qui-n-existe-pas" }) + "\n", "utf8");
+    const r = verifier(`${base}.md`, lotMd(), { aujourdhui: AUJ });
+    if (r.refus_predit !== true) throw new Error(`refus_predit ${r.refus_predit}`);
+    const cli = spawnSyncS(process.execPath, [join(ICI_S, "oracle-lot-retours.mjs"), `${base}.md`], { encoding: "utf8" });
+    if (!/^verdict : PASS[^\n]*la porte du pilot REFUSERA ce lot/m.test(cli.stdout || "")) throw new Error(`ligne de verdict : ${(cli.stdout || "").split("\n").find((l) => /^verdict/.test(l))}`);
+    const ok = join(D, "PROD - RETOURS - 20261013z");
+    writeFileSync(`${ok}.md`, lotMd(), "utf8");
+    writeFileSync(`${ok}.tf.jsonl`, ligne() + "\n", "utf8");
+    if (verifier(`${ok}.md`, lotMd(), { aujourdhui: AUJ }).refus_predit) throw new Error("refus prédit sur un sidecar conforme");
   });
   try { rmSync(D, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
@@ -663,6 +741,112 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
     if (r.status !== 0) throw new Error(`exit ${r.status} — l'import seul déclenche la CLI (usage + exit 2) : ${(r.stdout || "") + (r.stderr || "")}`);
     if (!/IMPORT_OK function/.test(r.stdout || "")) throw new Error(`sortie inattendue : ${r.stdout}`);
   });
+}
+
+// ---- TF-1752 (15/10/2026) : « gabarit non marqué » RATTACHE un document à son gabarit (R-46) ----------
+// Un gabarit venu d'ailleurs n'émet aucun `gd-…` ; le gabarit des lots prescrit alors la formule
+// « gabarit non marqué : <chemin> ». Vert : elle vaut rattachement, même sans le mot « version ». Rouge :
+// une section qui ne porte ni rattachement ni déclaration d'absence reste refusée.
+check("verte TF-1752 — « gabarit non marqué : <chemin> » vaut rattachement R-46", () => {
+  const c = constat(verifier(lot("20261015a"), `# lot\n\n${R45}\n## Retours sur les documents produits\n\n| rapport | gabarit non marqué : kit-audit/rapport.md | section absente |\n`, { aujourdhui: "20261015" }), "R-46");
+  if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+});
+check("rouge TF-1752 — une section R-46 sans rattachement ni absence déclarée reste refusée", () => {
+  const c = constat(verifier(lot("20261015a"), `# lot\n\n${R45}\n## Retours sur les documents produits\n\n| rapport | un gabarit quelconque | section absente |\n`, { aujourdhui: "20261015" }), "R-46");
+  if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"}`);
+});
+
+// ---- TF-1757 (15/10/2026) : « aucun item » AU REGISTRE SE PROUVE PAR LA RECHERCHE CITÉE, SANS BORNE -----
+// Le 15/10, un retour déclaré « aucun item » doublonnait TF-1201 : `grep … | head -5` avait coupé la
+// sixième ligne. Règle LOT-RATTACHEMENT, avertissante. Rouge : « aucun item » sans section Rattachement ;
+// section sans commande citée ou sans « N ligne(s) trouvée(s) » ; commande bornée (head, -n,
+// --max-count, Select-Object -First) sans total cité. Vert : commande sans borne et compte ; commande
+// bornée avec son total ; lot qui ne déclare pas « aucun item » : sans objet.
+{
+  const base = `# lot\n\n${R45}\n${R46}\n| RT-1 | majeur | un retour, aucun item au registre du pilot |\n`;
+  const RAT = (cmd, compte) => `\n## Rattachement\n\nRegistre interrogé le 15/10/2026 : \`${cmd}\` → ${compte}.\nItems recoupés : aucun.\n`;
+  const lr = (txt) => constat(verifier(lot("20261015b"), txt, { aujourdhui: "20261015" }), "LOT-RATTACHEMENT");
+  const av = (c, re) => { if (!c || c.statut !== "AVERTISSEMENT" || (re && !re.test(c.message))) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`); };
+  check("rouge TF-1757 — « aucun item » sans section Rattachement : avertissement", () => av(lr(base), /Rattachement/));
+  check("rouge TF-1757 — section sans le compte « N ligne(s) trouvée(s) » : avertissement", () => av(lr(base + RAT('grep -n "stash" todo/TODO.jsonl', "rien")), /ligne\(s\) trouvée\(s\)/));
+  check("rouge TF-1757 — commande bornée par head sans total cité : avertissement (le cas du 15/10)", () => av(lr(base + RAT('grep -n "README" todo/TODO.jsonl | head -5', "5 ligne(s) trouvée(s)")), /borne/));
+  check("rouge TF-1757 — Select-Object -First sans total : avertissement", () => av(lr(base + RAT('Select-String README todo/TODO.jsonl | Select-Object -First 3', "3 ligne(s) trouvée(s)")), /borne/));
+  check("verte TF-1757 — commande sans borne et compte cité : PASS", () => {
+    const c = lr(base + RAT('grep -c "README" todo/TODO.jsonl', "7 ligne(s) trouvée(s)"));
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+  check("verte TF-1757 — commande bornée AVEC son total cité : PASS", () => {
+    const c = lr(base + RAT('grep -n "README" todo/TODO.jsonl | head -5', "5 ligne(s) trouvée(s) affichées sur un total de 12"));
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+  check("borne TF-1757 — un lot qui ne déclare pas « aucun item » : sans objet, et le verdict n'est jamais bloqué par la règle", () => {
+    const r = verifier(lot("20261015b"), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20261015" });
+    const c = constat(r, "LOT-RATTACHEMENT");
+    if (!c || c.statut !== "SANS_OBJET") throw new Error(`statut ${c ? c.statut : "absent"}`);
+    if (verifier(lot("20261015b"), base, { aujourdhui: "20261015" }).constats.some((x) => x.regle === "LOT-RATTACHEMENT" && x.statut === "FAIL")) throw new Error("la règle bloque");
+  });
+}
+
+// ---- TF-1759 (15/10/2026) : LE PRODUIT JOUE LE MODULE DU PILOT PAR UN RELAIS, PLUS UNE COPIE -------
+// Recopié chez chaque produit, le module entier dérivait de l'histoire du produit, et une copie jouée
+// avant sa recopie a fait refuser deux lots (TF-1568, TF-1569). Vert : le relais posé chez un produit
+// jetable rend le MÊME verdict et le même code que le module du pilot, dans les deux sens, en CLI comme
+// à l'import. Rouge : pilot introuvable → exit 2 et le dit, jamais un PASS ; le contrat d'héritage fait
+// voyager le relais, pas le module.
+{
+  const { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join, dirname } = await import("node:path");
+  const { fileURLToPath, pathToFileURL } = await import("node:url");
+  const { spawnSync } = await import("node:child_process");
+  const ICI = dirname(fileURLToPath(import.meta.url));
+  const T = mkdtempSync(join(tmpdir(), "lot-relais-"));
+  const parc = join(T, "parc");
+  mkdirSync(join(parc, "digit-ai-factory", "gabarits"), { recursive: true });
+  copyFileSync(join(ICI, "oracle-lot-retours.mjs"), join(parc, "digit-ai-factory", "gabarits", "oracle-lot-retours.mjs"));
+  const retours = join(parc, "ProduitJouet", "forge", "retours");
+  mkdirSync(retours, { recursive: true });
+  const relais = join(retours, "oracle-lot.mjs");
+  copyFileSync(join(ICI, "oracle-lot-relais.mjs"), relais);
+  const bon = join(retours, "PROD - RETOURS - 20260824a.md"), mauvais = join(retours, "PROD - RETOURS - 20260824b.md");
+  writeFileSync(bon, `# lot\n\n${R45}\n${R46}`, "utf8");
+  writeFileSync(mauvais, `# lot\n\n${R46}`, "utf8");
+  const env = { ...process.env, FORGE_ROOT: parc };
+  const cli = (f, e = env) => spawnSync(process.execPath, [relais, f, "--json"], { encoding: "utf8", cwd: join(parc, "ProduitJouet"), env: e });
+  check("TF-1759 vert — par le relais, le même verdict et le même code que le module du pilot, dans les deux sens", () => {
+    for (const [f, code] of [[bon, 0], [mauvais, 1]]) {
+      const r = cli(f);
+      const direct = verifier(f);
+      if (r.status !== code) throw new Error(`exit ${r.status} au lieu de ${code} pour ${f} : ${r.stderr}`);
+      if (JSON.parse(r.stdout).verdict !== direct.verdict) throw new Error(`verdict relais ${JSON.parse(r.stdout).verdict} ≠ module ${direct.verdict}`);
+    }
+  });
+  check("TF-1759 vert — importé, le relais rend les fonctions du pilot", () => {
+    const code = `import(${JSON.stringify(pathToFileURL(relais).href)}).then(m => console.log("IMPORT", typeof m.verifier, m.VERSION, m.verifier(${JSON.stringify(mauvais)}).verdict))`;
+    const r = spawnSync(process.execPath, ["--input-type=module", "-e", code], { encoding: "utf8", env });
+    if (!/IMPORT function \d+\.\d+\.\d+ FAIL/.test(r.stdout || "")) throw new Error(`sortie : ${r.stdout}${r.stderr}`);
+  });
+  if (!require_absent_pilote()) console.log("  [NON JOUÉ] TF-1759 rouge pilot introuvable — ce poste porte c:\\dev\\digit-ai-factory ou ~\\.digit-ai-forge, que le relais trouve en repli");
+  else check("TF-1759 rouge — pilot introuvable : exit 2 et le dit, jamais un PASS", () => {
+    const seul = join(T, "seul", "forge", "retours");
+    mkdirSync(seul, { recursive: true });
+    copyFileSync(join(ICI, "oracle-lot-relais.mjs"), join(seul, "oracle-lot.mjs"));
+    const r = spawnSync(process.execPath, [join(seul, "oracle-lot.mjs"), bon], { encoding: "utf8", env: { ...process.env, FORGE_ROOT: join(T, "nulle-part") } });
+    if (r.status !== 2 || !/pilot introuvable/.test(r.stderr)) throw new Error(`exit ${r.status} : ${r.stdout}${r.stderr}`);
+  });
+  check("TF-1759 contrat — HERITAGE.json fait voyager le RELAIS sous forge/retours/oracle-lot.mjs", () => {
+    const h = JSON.parse(readFileSync(join(ICI, "HERITAGE.json"), "utf8"));
+    const a = h.artefacts.find((x) => x.cible === "forge/retours/oracle-lot.mjs");
+    if (!a || a.source !== "gabarits/oracle-lot-relais.mjs" || a.mode !== "copie_conforme") throw new Error(`artefact : ${JSON.stringify(a)}`);
+  });
+  function require_absent_pilote() {
+    // Le relais essaie aussi `c:\dev\digit-ai-factory` et `~\.digit-ai-forge` : sur un poste qui les porte,
+    // le cas rouge se joue sur la seule résolution prioritaire, déjà prouvée par le cas vert.
+    const { existsSync } = process.getBuiltinModule("node:fs");
+    const { homedir } = process.getBuiltinModule("node:os");
+    return ![join("c:\\dev\\digit-ai-factory", "gabarits", "oracle-lot-retours.mjs"), join(homedir(), ".digit-ai-forge", "digit-ai-factory", "gabarits", "oracle-lot-retours.mjs")].some((p) => existsSync(p));
+  }
+  try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
 console.log(`\noracle-lot-retours (TF-0597) : ${pass} PASS, ${echec} FAIL`);

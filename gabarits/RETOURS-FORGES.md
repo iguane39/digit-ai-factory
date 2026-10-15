@@ -35,8 +35,13 @@
 > écrite en **prose** ici, et jugée en **code** là-bas. *Une affordance non câblée n'existe pas.*
 >
 > Le fichier `forge\retours\oracle-lot.mjs` absent ? Alors l'héritage du produit n'est pas tenu —
-> `oracle-conformite-projet` (R-47) le dit — et il se recopie depuis `gabarits\oracle-lot-retours.mjs`
-> du pilot, avec ce gabarit.
+> `oracle-conformite-projet` (R-47) le dit — et il se recopie depuis `gabarits\oracle-lot-relais.mjs`
+> du pilot, avec ce gabarit. Depuis le 15/10/2026 (TF-1759), ce fichier est un RELAIS : il résout le pilot
+> (`FORGE_ROOT`, sinon le dossier voisin `digit-ai-factory`) et joue SON juge, `gabarits\oracle-lot-retours.mjs`.
+> Les règles du jour s'appliquent donc sans recopie ; pilot introuvable, le relais le dit et sort en 2.
+>
+> Un lot resté `a_remettre` plus de 24 h est nommé à l'ouverture de votre session (TF-1758) : la
+> remise est un geste, et rien d'autre ne le déclenche.
 
 Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un
 aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).

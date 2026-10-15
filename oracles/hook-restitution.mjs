@@ -12,7 +12,8 @@
  * Entrée (stdin, JSON Claude Code) : { session_id, transcript_path, stop_hook_active }.
  * Sortie : rien (exit 0) = arrêt accepté · {"decision":"block","reason":…} = réécrire.
  * Garde anti-boucle : si `stop_hook_active` est vrai (le hook a déjà refusé une fois dans ce
- * tour), l'arrêt est accepté — une seconde réécriture n'est pas imposée, le verdict est journalisé.
+ * tour), l'arrêt est accepté — une seconde réécriture n'est pas imposée ; depuis TF-1739 (15/10/2026),
+ * la réécriture est rejugée et, en défaut, son verdict est AFFICHÉ à l'humain (systemMessage).
  *
  * Ce qui est un tour de TRAVAIL (et donc une restitution) : au moins une écriture (Write, Edit,
  * MultiEdit, NotebookEdit) ou au moins quatre commandes (Bash, PowerShell) depuis le dernier
@@ -34,6 +35,20 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const ORACLE = join(ICI, "oracle-synthese.mjs");
 const ECRITURES = new Set(["Write", "Edit", "MultiEdit", "NotebookEdit"]);
 const COMMANDES = new Set(["Bash", "PowerShell"]);
+
+// TF-1739 (lot du 25/08/2026, RV-2) — LA RÉÉCRITURE EST JUGÉE, ET SON VERDICT SE VOIT. La garde
+// anti-boucle (`stop_hook_active`) acceptait l'arrêt sans rien dire : une restitution refusée sur
+// S1/S3/S4/S6 a été réécrite, la réécriture n'a jamais été rejugée devant personne, et rejouée à la
+// main elle rendait S15 et S16 FAIL. Le second refus n'est toujours pas imposé (pas de boucle), mais
+// le verdict de la réécriture est AFFICHÉ à l'humain au moment où il lit la réponse — journalisé, il
+// était invisible au moment où il compte.
+function afficherReecritureEnDefaut(motifs) {
+  if (!motifs.length) return;
+  console.log(JSON.stringify({
+    systemMessage: `[restitution — R-44] la réécriture reste en défaut après un premier refus ; elle n'est pas refusée une seconde fois (garde anti-boucle), à lire avec ces écarts : `
+      + motifs.map((m) => String(m).slice(0, 300)).join(" · "),
+  }));
+}
 
 function lireStdin() {
   try { return JSON.parse(readFileSync(0, "utf8") || "{}"); } catch { return {}; }
@@ -1074,7 +1089,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       journaliser({ ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
         portee: `niveau Moyen déclaré, aucun effet (${mots} mots)`, verdict: ecarts.length ? "FAIL" : "PASS", niveau: "Moyen",
         ecarts_moyen: ecarts, deja_refuse: !!entree.stop_hook_active });
-      if (!ecarts.length || entree.stop_hook_active) process.exit(0);
+      if (!ecarts.length) process.exit(0);
+      if (entree.stop_hook_active) { afficherReecritureEnDefaut(ecarts.map((e) => `MOYEN — ${e}`)); process.exit(0); }
       console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — niveau Moyen] forme en défaut :\n`
         + ecarts.map((e) => `MOYEN — ${e}`).join("\n") + `\n\n${RAPPEL_MOYEN}` }));
       process.exit(0);
@@ -1141,7 +1157,17 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }));
     process.exit(0);
   }
-  if (entree.stop_hook_active) process.exit(0); // déjà refusé une fois : on ne boucle pas, le verdict est journalisé
+  if (entree.stop_hook_active) {
+    // Déjà refusé une fois : pas de second refus (pas de boucle), mais la réécriture est JUGÉE et
+    // son verdict DIT à l'humain (TF-1739).
+    afficherReecritureEnDefaut([
+      ...bloquants.map((f) => `${f.regle} — ${f.message}`),
+      ...ecartsAffichage.map((e) => `AFFICHAGE — ${e}`),
+      ...geste.ecarts.map((e) => `GESTE — ${e}`),
+      ...procedure.ecarts.map((e) => `PROCÉDURE — ${e}`),
+    ]);
+    process.exit(0);
+  }
   const motifs = [
     ...(escaladeMoyen ? [escaladeMoyen] : []),
     ...bloquants.map((f) => `${f.regle} — ${f.message}`),

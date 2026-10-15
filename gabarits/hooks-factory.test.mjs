@@ -18,10 +18,10 @@
  *      ligne de niveau qui cite CE chemin ; chez un produit qui ne le porte pas, rien.
  * Joué par oracles/self-tests.mjs (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, readFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { spawnSync } from "node:child_process";
+import { spawnSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -149,6 +149,44 @@ try {
   check("8 identité sortante : l'adresse de l'utilisateur dans un User-Agent vers une API tierce est refusée par le lanceur (R-62)",
     iFaute.status === 2 && /R-62/.test(iFaute.stderr), iFaute.stdout + iFaute.stderr);
   check("8 bis identité sortante : le même appel avec un en-tête neutre passe", iNeutre.status === 0, iNeutre.stdout + iNeutre.stderr);
+
+  // 9 — TF-1765, préjugement par le lanceur avec une entrée standard OUVERTE : le 14/10, un préjugement
+  // n'a rien rendu en 9 minutes tant que l'entrée standard restait ouverte (rendu en secondes avec
+  // </dev/null). Le lanceur lisait l'entrée standard pour tout hook ; `--prejuger` juge un fichier et
+  // n'en a pas l'usage. Vert : rendu sous 60 s, entrée jamais fermée. Rouge : le même lanceur sur le
+  // hook de fin de tour SANS `--prejuger` attend toujours son entrée (c'est le contrat du hook Stop).
+  const brouillon = join(base, "brouillon-prejuge.md");
+  writeFileSync(brouillon, SIMPLE, "utf8");
+  const ouvert = (args, ms) => new Promise((ok) => {
+    const t0 = Date.now();
+    const c = spawn(process.execPath, [lanceur, ...args], { cwd: P, env, stdio: ["pipe", "pipe", "pipe"] });
+    let out = "";
+    c.stdout.on("data", (d) => { out += d; });
+    const minuteur = setTimeout(() => { c.kill(); ok({ fini: false, ms: Date.now() - t0, out }); }, ms);
+    c.on("exit", (code) => { clearTimeout(minuteur); ok({ fini: true, code, ms: Date.now() - t0, out }); });
+  });
+  const pj = await ouvert(["restitution", "--prejuger", brouillon], 60000);
+  check("9 préjugement par le lanceur, entrée standard ouverte : rendu sans attendre l'entrée (TF-1765)",
+    pj.fini && /hook-restitution --prejuger/.test(pj.out), `fini=${pj.fini} en ${pj.ms} ms, sortie ${pj.out.slice(0, 160)}`);
+  // 10 — TF-1754, remisage par le lanceur : `git stash` nu refusé (exit 2), `push -u -m` admis.
+  const remise = (command) => spawnSync(process.execPath, [lanceur, "remisage"], { encoding: "utf8", cwd: P, env,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command } }) });
+  const rNu = remise("git add . && git stash"), rEtiq = remise('git stash push -u -m "avant rebase"');
+  check("10 remisage : `git stash` nu refusé par le lanceur (TF-1754)", rNu.status === 2 && /TF-1754/.test(rNu.stderr), rNu.stdout + rNu.stderr);
+  check("10 bis remisage : `git stash push -u -m <étiquette>` passe", rEtiq.status === 0, rEtiq.stdout + rEtiq.stderr);
+
+  // 11 — TF-1755/TF-1756 : toute commande `forge/hooks/factory.mjs <nom>` du gabarit est un hook que le
+  // lanceur connaît et que le pilot porte ; sans quoi la fusion à l'ouverture câblerait un hook muet.
+  const gabarit = JSON.parse(readFileSync(join(ICI, "settings-produit.json"), "utf8"));
+  const nomsGabarit = Object.values(gabarit.hooks).flat().flatMap((g) => g.hooks || [])
+    .map((h) => (String(h.command).match(/forge\/hooks\/factory\.mjs\s+([\w-]+)/) || [])[1]).filter(Boolean);
+  const lanceurTexte = readFileSync(join(ICI, "hooks-factory.mjs"), "utf8");
+  const inconnus = nomsGabarit.filter((n) => !lanceurTexte.includes(`"${n}"`) || !existsSync(join(PILOT, "oracles", `hook-${n}.mjs`)));
+  check(`11 les ${nomsGabarit.length} hooks du gabarit sont connus du lanceur et portés par le pilot`, nomsGabarit.length >= 9 && !inconnus.length, inconnus.join(", "));
+
+  const stopOuvert = await ouvert(["restitution"], 4000);
+  check("9 bis sans --prejuger, le hook de fin de tour attend toujours son entrée (le contrat du hook Stop)",
+    !stopOuvert.fini, `fini=${stopOuvert.fini} en ${stopOuvert.ms} ms`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 

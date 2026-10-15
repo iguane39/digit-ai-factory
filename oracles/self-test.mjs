@@ -99,7 +99,11 @@ writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true }] }],
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
-      { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" }] }] } }) + "\n");
+      { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },
+        { type: "command", command: "node forge/hooks/factory.mjs remisage" }] }],
+    // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
+    PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) }],
+    UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.

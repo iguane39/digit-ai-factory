@@ -1,7 +1,8 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "date": "2026-10-15",
+  "evolution_1_24_0": "TF-1754, TF-1755, TF-1756, TF-1759, 15/10/2026 (campagne « Traite tous les TODOs & retours ») — (1) le câblage exigé de `.claude/settings.json` se dérive du gabarit : un motif par commande `forge/hooks/factory.mjs <nom>` de `settings-produit.json` (9 hooks, dont `remisage`, neuf : la pile de remisage git partagée entre arbres de travail n'accepte plus `git stash` nu, `pop`, un remisage sans `-m`) ; avant, 2 hooks sur 7 étaient exigés. (2) Le hook d'ouverture du produit AJOUTE lui-même toute entrée du gabarit qui lui manque, sans rien retirer ni modifier (`oracles/lib-ouverture-async.mjs`) : l'exigence se répare à l'ouverture suivante. Un produit qui écarte un hook le déclare sous `_hooks_factory_exclus` ({commande, motif}) : l'écart est déclaré, le motif tenu. (3) `forge/retours/oracle-lot.mjs` devient un RELAIS (`gabarits/oracle-lot-relais.mjs`) qui joue le juge du pilot, au lieu d'une copie qui dérivait. Le fait : le 15/10, publication-hebergee câblé chez 2 produits sur 21, droits-accordes chez 2, ecriture chez 8 ; deux lots refusés pour une copie du juge antérieure à sa règle (TF-1568, TF-1569). Ce qui change pour celui qui produit : à sa prochaine ouverture, son settings.json est complété et ses nouvelles entrées s'activent à la session suivante ; un produit non rouvert est relevé incomplet jusque-là.",
   "evolution_1_23_0": "TF-1735, 15/10/2026 (décision humaine D-1 (a) du 15/10/2026 « 1a ») — le CLAUDE.md du produit doit porter la route de l audit du produit vers forge-audit : le motif `init-audit-workspace` entre aux motifs exigés de `CLAUDE.md`. Le fait : « lance un audit complet du projet » a lancé forge_tests chez un produit, parce que son CLAUDE.md, copié avant la correction du 22/09, ne connaissait que cette route ; 16 CLAUDE.md du parc portaient la ligne « Audit complet (verdict) », dont 7 sans mention de forge-audit. Ce qui change pour celui qui produit : à sa prochaine ouverture, un CLAUDE.md sans la route est relevé incomplet ; la remise à niveau ne le réécrit pas, c est le lot de travaux qui corrige la ligne de routage et la section Commandes.",
   "evolution_1_22_0": "TF-1716 suite, 15/10/2026 (décision humaine D-2 (a) du 15/10/2026 « 2a ») — le câblage du hook `identite-sortante` est EXIGÉ par le contrat : le motif `forge/hooks/factory.mjs identite-sortante` entre aux motifs exigés de `.claude/settings.json`. Le fait : l incident du 14/10 s est produit chez un produit existant, que le seul gabarit des nouveaux produits ne protège pas. Ce qui change pour celui qui produit : à sa prochaine ouverture, un produit dont le settings.json ne câble pas la garde est relevé incomplet, puis remis à niveau.",
   "evolution_1_21_0": "TF-1716, 15/10/2026 (lot Produit-83 20261014a, RT-5) — R-62 se joue sur l'outil qui émet une requête. Le fait : le 14/10/2026, une session a placé l'adresse électronique de l'utilisateur dans le User-Agent d'un appel à une API publique tierce, sans demande, et aucune garde ne l'a vu. Ce qui change pour celui qui produit : `forge/hooks/factory.mjs` (copie conforme) reconnaît le hook `identite-sortante`, et le gabarit `settings-produit.json` câble un `PreToolUse` sur `Bash|PowerShell|WebFetch` qui l'appelle ; une requête vers un service tiers portant l'adresse de l'utilisateur, ou une adresse dans un en-tête User-Agent ou From, est refusée sauf adresse donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session. Le câblage n'entre pas encore à `motif_exige` : un produit existant le reçoit en complétant son `.claude/settings.json` depuis le gabarit, geste du produit.",
@@ -41,9 +42,10 @@
       ]
     },
     {
-      "source": "gabarits/oracle-lot-retours.mjs",
+      "source": "gabarits/oracle-lot-relais.mjs",
       "cible": "forge/retours/oracle-lot.mjs",
       "mode": "copie_conforme",
+      "note_relais": "TF-1759 (15/10/2026) : le produit reçoit un RELAIS, plus une copie du module. Le relais résout le pilot (FORGE_ROOT, voisin digit-ai-factory, c:\\dev, ~/.digit-ai-forge) et joue SON `gabarits/oracle-lot-retours.mjs` : une règle corrigée au pilot s'applique sans recopie, et la copie du produit ne dérive plus de son histoire à chaque version du juge.",
       "motif": "LE JUGE de la forme d'un lot, a cote du gabarit qui la decrit. TF-0597 (24/08) : SIX lots admis par derogation en une journee, tous pour les memes sections R-45/R-46 absentes. La cause mesuree est TRIPLE — un produit sans heritage, un produit jamais instancie, et un produit qui a le gabarit A JOUR et ne l'applique pas (quatre lots sur six, le cas le plus frequent). Seul le troisieme n'avait AUCUN controle : les regles vivaient uniquement a la porte du pilot, donc le produit decouvrait le refus apres coup — et sous derogation, jamais. Copie CONFORME et non simple presence : deux implementations de la meme forme donneraient deux verites (defaut nomme par TF-0474 sur les empreintes). Le produit joue `node forge\retours\\oracle-lot.mjs \"<son lot>.md\"` avant de remettre ; le pilot importe le MEME module a l'ingestion.",
       "depuis": "2026-08-24",
       "familles_protegees": [
@@ -97,8 +99,15 @@
       "motif_exige": [
         "forge/hooks/factory.mjs publication-hebergee",
         "forge/hooks/factory.mjs identite-sortante",
-        "factory.mjs ouverture --sans-readme --contexte-json"
+        "factory.mjs ouverture --sans-readme --contexte-json",
+        "forge/hooks/factory.mjs restitution",
+        "forge/hooks/factory.mjs remisage",
+        "forge/hooks/factory.mjs page-html",
+        "forge/hooks/factory.mjs ecriture",
+        "forge/hooks/factory.mjs droits-accordes",
+        "forge/hooks/factory.mjs lexique"
       ],
+      "motifs_derives_du_gabarit": "TF-1756 (15/10/2026) : un motif par commande `forge/hooks/factory.mjs <nom>` de gabarits/settings-produit.json ; la recette scripts/relever-heritage.test.mjs (cas TF-1756) échoue dès qu'une commande du gabarit n'est pas exigée ici. Un produit écarte un hook en le déclarant sous `_hooks_factory_exclus` ({commande, motif}) dans son settings.json : la commande y étant écrite, le motif est tenu (écart déclaré, pas oubli). Le hook d'ouverture du produit ajoute toute entrée absente (TF-1755), donc l'exigence se répare à l'ouverture.",
       "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
       "depuis": "2026-08-23",
       "familles_protegees": [

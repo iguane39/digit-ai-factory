@@ -42,8 +42,11 @@ const [nom, ...options] = process.argv.slice(2);
 // `identite-sortante` (15/10/2026, TF-1716, retour RT-5 du 14/10) : hook PreToolUse sur Bash, PowerShell et
 // WebFetch — R-62 (aucune donnée d'identité de l'utilisateur vers un service tiers sans sa demande) se joue
 // sur l'outil qui émet la requête : l'adresse de l'utilisateur, ou une adresse dans un User-Agent, refusée. Bloque.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante"]);
-if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee | droits-accordes | identite-sortante)`); process.exit(0); }
+// `remisage` (15/10/2026, TF-1754, retour RT-59) : hook PreToolUse sur Bash et PowerShell — la pile de remisage git
+// est partagée entre arbres de travail et sessions : `git stash` nu, `pop`, un remisage sans `-m`, `apply` sans SHA,
+// `drop` nu et `clear` sont refusés ; `push -u -m <étiquette>`, `apply <sha>` et `list` passent. Bloque.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage"]);
+if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [
   process.env.FORGE_ROOT && join(process.env.FORGE_ROOT, "digit-ai-factory"),
@@ -56,8 +59,13 @@ if (!pilot) {
   console.error(`[hooks-factory] pilot introuvable (${candidats.join(" ; ")}) — hook ${nom} SAUTÉ, règle non jouée : installer la factory (AGENTS.md phase 0) ou exporter FORGE_ROOT.`);
   process.exit(0);
 }
+// TF-1765 (15/10/2026) : `--prejuger <fichier>` juge un FICHIER et n'a pas l'usage de l'entrée standard ;
+// la lire attendait sa fermeture, et un préjugement lancé avec une entrée ouverte n'a rien rendu en
+// 9 minutes le 14/10. Elle n'est donc pas lue en préjugement, ni quand elle est un terminal.
 let stdin = "";
-try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin (SessionStart) */ }
+if (!options.includes("--prejuger") && !process.stdin.isTTY) {
+  try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin (SessionStart) */ }
+}
 const argv = [join(pilot, "oracles", `hook-${nom}.mjs`), ...options];
 if (nom === "ouverture") argv.push("--pilot", pilot);
 const r = spawnSync(process.execPath, argv, { encoding: "utf8", input: stdin, cwd: PRODUIT, timeout: 230000 });
