@@ -159,6 +159,12 @@ décision, l'omettre est un oubli (loi n° 3).
   ouvert, jamais d'action « fermer le document » laissée à l'utilisateur, jamais une application
   de l'utilisateur quittée ou tuée. `oracle-conformite-projet` (R-7 bis) tolère les deux versions
   tant que l'attente est consignée.
+- **Aucune donnée d'identité de l'utilisateur ne part vers un service tiers sans sa demande** (R-62,
+  TF-1716). Une requête vers une API ou un site tiers ne porte ni son adresse électronique, ni son
+  nom, ni son téléphone, dans l'adresse, les en-têtes ou le corps ; un `User-Agent` reste neutre (le
+  nom de l'outil). Le 14/10/2026, une adresse est partie ainsi dans l'en-tête d'un appel à un annuaire
+  public. Le hook `PreToolUse` sur `Bash`, `PowerShell` et `WebFetch` refuse ce geste, sauf adresse
+  donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)

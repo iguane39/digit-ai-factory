@@ -1708,6 +1708,31 @@ texte hérité par les produits dans `gabarits\RESTITUTION.md` (v2.38.0, bloc 2)
 accusation sur les 241 synthèses d'`output\04-plans\`, 3 sur 15 restitutions écrites des produits, les
 3 restitutions contestées du 14/10.
 
+## AQ. R-62 — aucune donnée d'identité de l'utilisateur ne part vers un service tiers sans sa demande (TF-1716 — 15/10/2026)
+
+Le fait, lot `Produit-83 - RETOURS - 20261014a` (RT-5) : le 14/10/2026, pendant un run de conception,
+la session a placé l'adresse électronique de l'utilisateur dans l'en-tête `User-Agent` d'un appel à une
+API publique tierce, sans qu'il l'ait demandé. Aucune garde ne l'a vu ; les appels suivants portaient
+un en-tête neutre. Une donnée envoyée ne se reprend pas. Classe : `secret-porte-hors-perimetre`,
+récidive de TF-0616 et TF-1284.
+
+**R-62.**
+1. **Une requête vers un service tiers ne porte aucune donnée d'identité de l'utilisateur** (adresse
+   électronique, nom, téléphone) dans son adresse, ses en-têtes ou son corps, sauf demande explicite
+   de sa part. Un en-tête `User-Agent` ou `From` reste neutre : le nom de l'outil, jamais une adresse.
+2. **La demande explicite se lit** : l'utilisateur a donné l'adresse dans la conversation pour cet
+   usage, ou il a posé `FORGE_IDENTITE_GO` avant d'ouvrir la session. Une API qui « recommande » un
+   contact dans l'agent pose une question à l'humain ; elle ne vaut pas demande.
+3. **Ce que R-62 ne juge pas** : une requête émise par un script dont le texte n'est pas dans la
+   commande, les données d'identité autres que l'adresse électronique, les outils `mcp__*` connectés.
+
+Contrôle exécutable : `oracles\hook-identite-sortante.mjs`, hook `PreToolUse` sur `Bash`, `PowerShell`
+et `WebFetch`, qui refuse une requête vers un hôte tiers portant une adresse de l'utilisateur
+(`git config user.email`, liste `FORGE_IDENTITES`) ou une adresse dans un en-tête `User-Agent` ou `From`
+(recette `oracles\hook-identite-sortante.test.mjs`, 8 cas à double sens dont le remède joué). Câblé au
+pilot par `.claude\settings.json`, chez un produit par `forge\hooks\factory.mjs identite-sortante`
+(`gabarits\settings-produit.json`).
+
 ## AR. R-63 — une sortie automatisée se juge sur un échantillon étiqueté hors du système, et sa version améliorée sur ses effets (TF-1694, TF-1695 — 15/10/2026)
 
 Le fait, lot `Produit-12 - RETOURS - 20261014a` (RS-31, RS-32) et ses deux pièces jointes. Le

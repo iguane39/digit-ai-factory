@@ -138,8 +138,19 @@ try {
   check("7 droits accordés : un script d'octroi fautif écrit chez le produit est signalé (DA-1, DA-2), sans bloquer",
     dFaute.status === 0 && /DA-1/.test(dFaute.stdout) && /DA-2/.test(dFaute.stdout), dFaute.stdout + dFaute.stderr);
   check("7 bis droits accordés : un script ordinaire reste muet", dOrdinaire.status === 0 && dOrdinaire.stdout.trim() === "", dOrdinaire.stdout + dOrdinaire.stderr);
+
+  // 8 — TF-1716, identité sortante par le lanceur : l'adresse de l'utilisateur dans le User-Agent d'un
+  // appel à une API tierce est refusée (exit 2, R-62) ; le même appel avec un en-tête neutre passe.
+  const envId = { ...env, FORGE_IDENTITES: "camille.essai@poste-fictif.fr", FORGE_IDENTITES_SANS_GIT: "1" };
+  delete envId.FORGE_IDENTITE_GO;
+  const sortie = (ua) => spawnSync(process.execPath, [lanceur, "identite-sortante"], { encoding: "utf8", cwd: P, env: envId,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command: `curl -H "User-Agent: ${ua}" "https://api.exemple-tiers.fr/recherche?q=x"` } }) });
+  const iFaute = sortie("fiche (camille.essai@poste-fictif.fr)"), iNeutre = sortie("digit-ai-factory");
+  check("8 identité sortante : l'adresse de l'utilisateur dans un User-Agent vers une API tierce est refusée par le lanceur (R-62)",
+    iFaute.status === 2 && /R-62/.test(iFaute.stderr), iFaute.stdout + iFaute.stderr);
+  check("8 bis identité sortante : le même appel avec un en-tête neutre passe", iNeutre.status === 0, iNeutre.stdout + iNeutre.stderr);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716)`);

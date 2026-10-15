@@ -49,6 +49,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node oracles/hook-identite-sortante.mjs",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUse": [
