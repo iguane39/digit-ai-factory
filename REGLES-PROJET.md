@@ -1707,3 +1707,46 @@ d'`oracles\oracle-synthese.mjs`, avertissantes à leur entrée, fixtures double 
 texte hérité par les produits dans `gabarits\RESTITUTION.md` (v2.38.0, bloc 2). Mesure d'entrée : 0
 accusation sur les 241 synthèses d'`output\04-plans\`, 3 sur 15 restitutions écrites des produits, les
 3 restitutions contestées du 14/10.
+
+## AR. R-63 — une sortie automatisée se juge sur un échantillon étiqueté hors du système, et sa version améliorée sur ses effets (TF-1694, TF-1695 — 15/10/2026)
+
+Le fait, lot `Produit-12 - RETOURS - 20261014a` (RS-31, RS-32) et ses deux pièces jointes. Le
+classement de 9 662 fichiers affichait 97 % de fichiers rangés en norme 2.7, toutes portes vertes.
+Mesuré sur 150 fichiers tirés au hasard et étiquetés par trois agents qui ne voyaient pas le résultat,
+le dossier était juste dans 63,3 % des cas (intervalle de Wilson 55,4 à 70,6), 66,0 % après deux
+versions. Jusqu'à la 2.9, la seule relecture était celle de l'auteur des règles. Dans la boucle
+d'amélioration qui a suivi, la v2.11 gagnait 2,7 points sur l'échantillon sans un faux, mais ses 201
+changements dans la population comptaient 4 faux sur 12 relus ; la v2.10 annonçait une correction qui
+ne touchait aucune ligne existante ; un test de la v2.14 passait aussi sur le code précédent.
+
+**R-63.**
+1. **Une sortie qui trie, classe, range ou rédige à la place d'un humain se juge sur un échantillon
+   étiqueté par le métier, hors du système, et sur les conséquences de ses erreurs** — jamais sur son
+   taux d'affectation ni sur sa conformité aux règles qu'elle s'est données. Les six règles PC-1 à PC-6
+   du produit s'appliquent : justesse à côté de toute part traitée, ou « justesse non mesurée » (PC-1) ;
+   échantillon que la sortie jugée n'a pas choisi, méthode de tirage écrite (PC-2) ; gravité notée pour
+   chaque sortie relue, la plus forte bloquant la remise (PC-3) ; entité déduite recoupée avec une
+   seconde source, contradiction présentée en anomalie (PC-4) ; règle évaluée par ses cas d'échec,
+   avec sa condition de non-application testée (PC-5) ; compteurs de synthèse recalculés par script
+   depuis la table qu'ils résument (PC-6).
+2. **Une version améliorée se juge en huit étapes** : mesurer avant d'améliorer, sur un échantillon de
+   référence tiré par strates avec une graine écrite ; étiqueter à l'aveugle, les désaccords allant au
+   métier en questions fermées, la mesure restant provisoire tant qu'il n'a pas répondu ; mesurer
+   plusieurs justesses et la gravité, jamais la seule couverture ; chaque règle nouvelle porte un test
+   rouge sur le code précédent, puis vert ; chaque règle s'applique aux lignes déjà traitées, pas
+   seulement aux nouvelles ; la version se mesure sur le même échantillon et sur un tirage des
+   changements qu'elle fait dans toute la population ; une version qui fait baisser une justesse,
+   augmente les erreurs graves ou dont le tirage trouve des faux est rejetée, numéro et raison gardés ;
+   la boucle s'arrête quand deux versions consécutives gagnent moins d'un point, ou à la borne fixée
+   d'avance, en disant ce que seul le métier peut lever.
+3. **Ce que R-63 ne fixe pas** : la taille d'un échantillon ni un seuil de justesse, choix du métier de
+   chaque produit. Elle ne remplace pas les oracles de forme ; elle s'y ajoute pour juger le fond.
+
+Contrôles exécutables : la règle S73 d'`oracles\oracle-synthese.mjs` (point 1, PC-1 : une part traitée
+restituée sans justesse ni « justesse non mesurée ») et la règle S74 (point 2, étapes 5 et 6 : un gain
+annoncé sur un échantillon sans le contrôle de ses changements dans la population ni son effet sur
+l'existant), avertissantes à leur entrée, fixtures double sens au self-test ; 0 accusation sur les 241
+synthèses d'`output\04-plans\`. Non mécanisé ici : PC-2 à PC-6 et les étapes 1 à 4, 7 et 8, que seul un
+oracle du domaine peut jouer. Leur place est le registre de `quality-oracles` (domaine « sortie
+automatisée de tri, de classement ou de rédaction ») et le skill `la-boucle`, dans la forge des agents :
+la descente y est déclarée à faire, elle n'est pas faite par cette règle.

@@ -79,6 +79,10 @@
  *       cliquable et le geste d'accès (15/10, TF-1708) ; S71 une livraison déclarée y dit ce qu'un
  *       utilisateur peut faire à l'instant et ce qui manque (TF-1709) ; S72 elle y porte le compte des
  *       exigences tenues (TF-1711, R-61) ; toutes avertissantes ;
+ *   S73 une part rangée, classée ou triée d'une sortie automatisée porte sa justesse mesurée hors du
+ *       système, ou « justesse non mesurée » (15/10, TF-1694, R-63) ; S74 un gain annoncé sur un
+ *       échantillon dit le contrôle des changements dans la population et l'effet sur l'existant
+ *       (TF-1695, R-63) ; avertissantes ;
  *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
  *   S38 une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'EXEMPTION
  *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
@@ -3739,6 +3743,61 @@ function juger(texte, cheminJuge = null) {
       else ok("S72", `livraison déclarée avec son compte d'exigences (${m[0].replace(/\s+/g, " ").trim()})`);
     }
   }
+  // S73 (TF-1694, lot Produit-12 20261014a RS-31, R-63) — LA PART TRAITÉE D'UNE SORTIE AUTOMATISÉE NE
+  // DIT PAS SA JUSTESSE. Le classement de 9 662 fichiers affichait 97 % de fichiers rangés, portes de
+  // forme vertes ; mesuré sur 150 fichiers étiquetés à l'aveugle, le dossier était juste dans 63,3 % des
+  // cas. Principe PC-1 du produit : tout indicateur de part traitée s'accompagne d'un taux de justesse
+  // mesuré sur un échantillon étiqueté hors du système, ou de la mention « justesse non mesurée ». Ce
+  // juge lit une part rangée, classée, triée, affectée, catégorisée ou typée, chiffrée (« 97 % des
+  // fichiers rangés », « 410 fichiers rangés sur 416 », « part rangée »), et exige que la restitution
+  // dise une justesse, un échantillon de référence ou étiqueté, ou « justesse non mesurée ». NON JUGÉ :
+  // que l'échantillon soit indépendant (PC-2), sa taille, et les autres principes PC-3 à PC-6.
+  {
+    const PP = String.raw`(?:rang|class|tri|affect|cat[ée]goris|typ)(?:é|ée|és|ées)`;
+    const N = String.raw`\d[\d  ]*`;
+    const PART_TRAITEE = uni(new RegExp([
+      String.raw`\b\d+(?:[,.]\d+)?\s*%\s+(?:de |des |du |d['’])?(?:\p{L}+\s+){0,2}${PP}\b`,
+      String.raw`\b${N}\s+(?:\p{L}+\s+){0,2}${PP}\s+sur\s+\d`,
+      String.raw`\b${N}\s+sur\s+${N}\s+${PP}\b`,
+      String.raw`\b${PP}\s*:\s*\d+(?:[,.]\d+)?\s*%`,
+      String.raw`\bpart (?:rang|class|tri|trait|affect)[ée]e\b`,
+    ].join("|"), "i"));
+    const JUSTESSE = uni(/\b(justesse|exactitude|taux d['’]erreur|[ée]chantillon (?:de r[ée]f[ée]rence|[ée]tiquet[ée])|[ée]tiquet[ée]s? (?:[àa] l['’]aveugle|hors du syst[èe]me|par le m[ée]tier)|justesse non mesur[ée]e)\b/i);
+    const sansCode = texte.replace(/```[\s\S]*?```/g, " ");
+    const parts = sansCode.split(/(?<=[.!?;])\s+|\n+/).filter((p) => PART_TRAITEE.test(p));
+    if (!parts.length) ok("S73", "aucune part traitée d'une sortie de tri, de classement ou de rangement — rien à juger");
+    else if (!JUSTESSE.test(sansCode)) ko("S73", `${parts.length} part(s) traitée(s) d'une sortie automatisée sans justesse mesurée — la part rangée ne dit `
+      + "pas si c'est bien rangé : donne le taux de justesse mesuré sur un échantillon étiqueté hors du système, ou écris « justesse non mesurée ». "
+      + "Le 14/10/2026, 97 % de fichiers rangés valaient 63,3 % de dossiers justes sur 150 fichiers étiquetés à l'aveugle (TF-1694, R-63). "
+      + `Ex. : ${parts[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    else ok("S73", `${parts.length} part(s) traitée(s), accompagnée(s) d'une justesse ou de sa mention « non mesurée »`);
+  }
+
+  // S74 (TF-1695, lot Produit-12 20261014a RS-32, R-63) — UNE VERSION AMÉLIORÉE SE JUGE AUSSI HORS DE SON
+  // ÉCHANTILLON. La v2.11 gagnait 2,7 points de justesse sur l'échantillon sans un faux ; ses 201
+  // changements dans la population comptaient 4 faux sur 12 relus. La v2.10 annonçait une correction qui
+  // ne touchait aucune ligne existante. Ce juge lit un gain annoncé sur un échantillon (« gagne », « + N
+  // points », « passe de … à … », « améliore », près du mot échantillon) et exige que la restitution dise
+  // le contrôle des changements dans la population (tirage des changements, changements relus) et l'effet
+  // sur l'existant (règle appliquée aux lignes déjà traitées) — ou les déclare non contrôlés. NON JUGÉ :
+  // le test rouge sur le code précédent, la taille du tirage, la règle d'arrêt (étapes 4, 6 et 8 de la
+  // méthode, R-63).
+  {
+    const GAIN_ECHANTILLON = uni(/\b(gagne|gain|am[ée]lior\w*|progress\w*|monte|passe de)\b[^.\n]{0,80}\b[ée]chantillon\b|\b[ée]chantillon\b[^.\n]{0,80}\b(gagne|gain|am[ée]lior\w*|progress\w*|\+\s?\d+(?:[,.]\d+)?\s*points?|passe de)\b/i);
+    const POPULATION = uni(/\b(changements?|modifications?|retypages?|d[ée]placements?)\b[^.\n]{0,60}\b(?:dans|sur) (?:toute )?la population\b|\btirage des changements\b|\bchangements? (?:non contr[ôo]l[ée]s|relus)\b/i);
+    const EXISTANT = uni(/\b(appliqu[ée]e?s? (?:aux|[àa] l['’]|sur les) (?:lignes?|fichiers?|[ée]l[ée]ments?)? ?(?:d[ée]j[àa] (?:trait|rang|class)\w*|existant)|effet sur l['’]existant|lignes? d[ée]j[àa] (?:trait|rang|class)[ée]e?s?)\b/i);
+    const gains = phrasesDe(texte).filter((p) => GAIN_ECHANTILLON.test(p));
+    if (!gains.length) ok("S74", "aucune amélioration annoncée sur un échantillon — rien à juger");
+    else {
+      const manque = [!POPULATION.test(texte) && "le contrôle de ses changements dans la population", !EXISTANT.test(texte) && "son effet sur l'existant"].filter(Boolean);
+      manque.length
+        ? ko("S74", `une amélioration est jugée sur son échantillon sans ${manque.join(" ni ")} — l'échantillon ne voit pas les effets rares `
+          + "d'une règle : le 14/10/2026, une version qui gagnait 2,7 points sans un faux sur l'échantillon comptait 4 faux sur 12 de ses 201 changements "
+          + "relus dans la population, et une autre annonçait une correction qui ne touchait aucune ligne existante (TF-1695, R-63). "
+          + `Ex. : ${gains[0].replace(/\s+/g, " ").slice(0, 110)}`)
+        : ok("S74", `${gains.length} amélioration(s) sur échantillon, avec le contrôle des changements dans la population et l'effet sur l'existant`);
+    }
+  }
 
   return findings;
 }
@@ -5461,9 +5520,37 @@ Aucun écart : la demande a été suivie à la lettre.
   for (const [r, regle, statut, quoi] of attendu7x)
     if (constatDe(r, regle).statut !== statut)
       casse.push(`${regle} (TF-1708, TF-1709, TF-1711) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
-  for (const regle of ["S70", "S71", "S72"])
+  for (const regle of ["S70", "S71", "S72", "S73", "S74"])
     if (constatDe(r58sansObjet, regle).statut !== "PASS")
-      casse.push(`${regle} : la verte, qui n'annonce ni déploiement ni livraison, est accusée : ` + String(constatDe(r58sansObjet, regle).message || "").slice(0, 160));
+      casse.push(`${regle} : la verte, qui n'annonce ni déploiement, ni livraison, ni sortie automatisée, est accusée : ` + String(constatDe(r58sansObjet, regle).message || "").slice(0, 160));
+  // 15/10 — TF-1694 ET TF-1695 : S73 ET S74, LA SORTIE AUTOMATISÉE ET SA VERSION AMÉLIORÉE, DANS LEURS DEUX
+  // SENS. Les chiffres sont ceux du lot du produit. (a) « 97 % des fichiers sont rangés » sans justesse : S73
+  // FAIL ; la MÊME avec la justesse mesurée sur l'échantillon étiqueté PASS ; la MÊME avec « justesse non
+  // mesurée » PASS. (b) Un gain de 2,7 points sur l'échantillon, seul : S74 FAIL ; avec ses changements
+  // dans la population mais sans l'existant : FAIL, l'existant nommé ; avec les deux : PASS.
+  const TRAITE_7X = (ligne) => verte.replace("## 5. Non traité", ligne + nl + nl + "## 5. Non traité");
+  const RANGE_73 = "- Classement des pièces reçues : 97 % des fichiers sont rangés — preuve : portes de forme vertes sur les 9 662 fichiers";
+  const r73sans = jouerPe("tf1694-part-rangee-seule.md", TRAITE_7X(RANGE_73 + "."));
+  const r73mesure = jouerPe("tf1694-justesse-mesuree.md", TRAITE_7X(RANGE_73 + " ; justesse du dossier mesurée sur un échantillon de 150 fichiers étiquetés à l'aveugle : 63,3 %."));
+  const r73mention = jouerPe("tf1694-justesse-non-mesuree.md", TRAITE_7X(RANGE_73 + " ; justesse non mesurée."));
+  const GAIN_74 = "- Norme 2.11 : elle gagne 2,7 points de justesse du type sur l'échantillon — preuve : mesure de la norme 2.11, 150 fichiers.";
+  const POP_74 = " Ses 201 changements dans la population : 12 relus, 4 faux.";
+  const r74seul = jouerPe("tf1695-gain-sur-echantillon.md", TRAITE_7X(GAIN_74));
+  const r74pop = jouerPe("tf1695-gain-et-population.md", TRAITE_7X(GAIN_74 + POP_74));
+  const r74complet = jouerPe("tf1695-gain-controle.md", TRAITE_7X(GAIN_74 + POP_74 + " La règle est appliquée aux lignes déjà rangées."));
+  const attendu73 = [
+    [r73sans, "S73", "FAIL", "« 97 % des fichiers sont rangés » sans justesse passe — c'est la part rangée qui a tenu lieu de qualité jusqu'à la 2.9"],
+    [r73mesure, "S73", "PASS", "la MÊME part avec sa justesse mesurée sur un échantillon étiqueté est accusée — le remède du message échoue"],
+    [r73mention, "S73", "PASS", "la MÊME part avec « justesse non mesurée », la mention que PC-1 admet, est accusée"],
+    [r74seul, "S74", "FAIL", "un gain de 2,7 points sur l'échantillon, seul, passe — c'est la v2.11 rejetée au contrôle de ses changements"],
+    [r74pop, "S74", "FAIL", "le MÊME gain avec ses changements dans la population mais sans l'existant passe"],
+    [r74complet, "S74", "PASS", "le MÊME gain avec ses changements dans la population et l'existant est accusé — le remède du message échoue"],
+  ];
+  for (const [r, regle, statut, quoi] of attendu73)
+    if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-1694, TF-1695) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+  if (!/existant/.test(constatDe(r74pop, "S74").message || ""))
+    casse.push("S74 (TF-1695) : le gain contrôlé dans la population mais pas sur l'existant doit NOMMER l'existant qui manque : " + String(constatDe(r74pop, "S74").message || "").slice(0, 160));
   // 27/09 — LE COMPTE DE CAS SE MESURE. Le bilan portait « 39/39 » écrit à la main ; le harnais le lit
   // comme un CLIQUET (I5, `lib-baseline-recettes.mjs` : premier « N PASS », sinon le ratio N/N), et il
   // n'avait pas bougé quand deux paires se sont ajoutées le 26/09. Retiré seul, il a laissé le
@@ -5507,6 +5594,7 @@ console.log(JSON.stringify({
     "S56 (TF-1498) ne vérifie pas que la porte citée a réellement été rejouée, ni sur ce qui sera lancé : il lit une ligne qui la nomme, datée du jour de la restitution et chiffrée. La déclaration « aucune porte de la chaîne ne juge une base externe » n'est pas vérifiée non plus",
     "S64 à S68 (13/10/2026) jugent une FORME : S64 qu'une ligne existe sous un titre, jamais ce qu'elle dit ; S65 que deux familles de voies sont NOMMÉES, jamais qu'elles ont été essayées ni sur la même ressource, et pas les quatre que R-29 point 4 énumère ; S66 une concentration chiffrée ou une invraisemblance qualifiée par le texte, jamais celle que l'auteur n'a pas vue ; S67 qu'un porteur durable est nommé, jamais qu'il tourne ; S68 qu'un essai est cité pour une image ou un site, jamais pour un PDF, une base ou une API",
     "S70 à S72 (15/10/2026, R-61) jugent ce que le bloc 0 et le verdict DÉCLARENT : S70 qu'une adresse cliquable et un geste d'accès y figurent, jamais que l'adresse réponde ; S71 que l'usage à l'instant et ce qui manque y sont dits, jamais que ce soit vrai ; S72 qu'un compte d'exigences y figure, jamais qu'il soit juste. Une livraison annoncée par le seul nom d'un produit, sans « le produit » ni déploiement annoncé, n'est pas vue",
+    "S73 et S74 (15/10/2026, R-63) jugent une MENTION : S73 qu'une justesse, un échantillon de référence ou « justesse non mesurée » figure dans une restitution qui rapporte une part traitée, jamais que l'échantillon soit indépendant ni la mesure juste (PC-2 à PC-6 non jugés) ; S74 que le contrôle des changements dans la population et l'effet sur l'existant sont nommés, jamais qu'ils aient été faits, ni le test rouge sur le code précédent ni la règle d'arrêt",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);
