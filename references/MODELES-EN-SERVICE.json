@@ -1,7 +1,7 @@
 {
   "schema": "pilot/modeles-en-service@1",
-  "version": "1.1.0",
-  "date": "2026-10-13",
+  "version": "1.2.0",
+  "date": "2026-10-15",
   "pourquoi": "Loi transverse n° 4 : la génération de modèles est une donnée volatile. Elle vivait en prose au §4 de CONTRAT-INTERFACE.md, épinglée le 2026-08-10 et révisée seulement « à chaque changement de famille » : Fable 5.1, servie au pilotage dès le 02/09, et Opus 5.5, servie depuis le 23/09, n'ont déclenché aucune révision. Décision humaine D-1 (a) du 25/09/2026 : suivre par nom de famille, et mesurer la version servie.",
   "decision": "D-1 (a) du 2026-09-25, posée par la synthèse output/04-plans/Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md",
   "regle": "Un rôle se désigne par son NOM DE FAMILLE (fable, opus, sonnet, haiku), jamais par un identifiant : le nom suit la dernière version. Toute version servie absente de ce référentiel déclenche le re-test de la règle de challenge (CONTRAT-INTERFACE.md §4) et une mise à jour datée de ce fichier. Juge : oracles/oracle-modeles-en-service.mjs, joué à chaque ouverture de session du pilot par oracles/hook-ouverture.mjs.",
@@ -20,6 +20,11 @@
       "quoi": "versions réellement servies aux sessions et aux sous-agents du poste",
       "ou": "transcripts de session de Claude Code, champ message.model des réponses",
       "lu_le": "2026-09-25"
+    },
+    {
+      "quoi": "claude-sonnet-5-5 répond aux sous-agents du poste depuis le 2026-10-03 (première réponse 15:58 UTC) ; claude-sonnet-5 plus servie depuis le 2026-10-02",
+      "ou": "transcripts de session de Claude Code du poste DESKTOP-ULTRA7, champ message.model ; oracle-modeles-en-service MS2 du 2026-10-15",
+      "lu_le": "2026-10-15"
     }
   ],
   "generation_courante": {
@@ -36,10 +41,10 @@
       "source_de_la_date": "premier pilotage déclaré en Opus 5.5 : synthèse 20260923b, commit 020f08d du pilot"
     },
     "sonnet": {
-      "nom": "Claude Sonnet 5",
-      "identifiant": "claude-sonnet-5",
-      "courante_depuis": "2026-08-10",
-      "source_de_la_date": "épinglage de la génération courante au §4 de CONTRAT-INTERFACE.md"
+      "nom": "Claude Sonnet 5.5",
+      "identifiant": "claude-sonnet-5-5",
+      "courante_depuis": "2026-10-03",
+      "source_de_la_date": "première réponse servie relevée dans les transcriptions du poste (2026-10-03T15:58Z), signalée par oracle-modeles-en-service MS2 et datée le 2026-10-15 (D-1 (a) du 15/10/2026)"
     },
     "haiku": {
       "nom": "Claude Haiku 4.5",
@@ -58,12 +63,17 @@
       "identifiant": "claude-opus-5",
       "suivie_par": "claude-opus-5-5",
       "courante_du": "2026-08-10"
+    },
+    {
+      "identifiant": "claude-sonnet-5",
+      "suivie_par": "claude-sonnet-5-5",
+      "courante_du": "2026-08-10"
     }
   ],
   "re_test_regle_de_challenge": {
     "statut": "du",
     "depuis": "2026-09-25",
-    "declencheur": "Fable 5 vers Fable 5.1 et Opus 5 vers Opus 5.5, servies sans révision du tableau de routage",
+    "declencheur": "Fable 5 vers Fable 5.1 et Opus 5 vers Opus 5.5, servies sans révision du tableau de routage ; puis Sonnet 5 vers Sonnet 5.5, servie depuis le 2026-10-03",
     "protocole": "CONTRAT-INTERFACE.md §4 bis : au premier run ou à la première campagne qui porte 2 tranches comparables, une tranche par modèle, coût comparé à qualité égale",
     "clos_par": null
   },
