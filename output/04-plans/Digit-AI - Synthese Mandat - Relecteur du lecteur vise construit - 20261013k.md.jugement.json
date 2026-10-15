@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md",
+ "empreinte": "493ff7b465ad8d4629e2aa77174df3988d2548cf0defaffc6a17ea33bb75361e",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-15T08:39:39.273Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 405 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 406 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -270,7 +270,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md | 20260915a | 22.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md | 20260920e | 30 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md | 20260920d | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md` |
-| Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md | 20261013h | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` |
+| Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md | 20261013h | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` |
 | Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md | 20261012c | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md` |
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261014a.md | 20261014a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261014a.md` |
 | Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md | 20260901b | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` |
@@ -400,6 +400,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md | 20261001i | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md` |
 | Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md | 20261001k | 18.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` |
 | Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md | 20261001h | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md` |
+| Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md | 20261013k | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` |
 | Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md | 20260830b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` |
 | Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md | 20260830j | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` |
 | Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md | 20261013j | 3.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` |

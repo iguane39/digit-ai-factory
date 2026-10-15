@@ -78,7 +78,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` | fichier | 22,6 Ko | Synthèse de mandat — les retours en attente sont entrés au registre et la campagne des cin |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours 18 items clos - 20260920e.md` | fichier | 30,0 Ko | Campagne des todos et retours du 20/09/2026 : 18 items décidés clos sur preuve rejouée, 18 |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours premiere vague lancee - 20260920d.md` | fichier | 17,6 Ko | Point d'étape — campagne des todos et retours : 17 items clos au registre, 8 constats entr |
-| `Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` | fichier | 7,1 Ko | Synthèse Mandat — campagne du matin reprise et close, relecteur du lecteur visé construit  |
+| `Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` | fichier | 9,6 Ko | Synthèse Mandat — campagne du matin reprise et close, 2 restes avancés (13/10/2026) |
 | `Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md` | fichier | 12,5 Ko | Synthèse Mandat — campagne du 12/10 sur 86 sujets du registre : 50 clos, 35 en cours avec  |
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261014a.md` | fichier | 9,9 Ko | Synthèse Mandat — tous les retours et sujets décidés traités, forges et pilot publiés, pro |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
@@ -208,6 +208,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md` | fichier | 9,6 Ko | Point d'étape : le rejeu tourne en version 2 ; un défaut de mon banc, vu sur les 7 premièr |
 | `Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` | fichier | 18,3 Ko | Synthèse de mandat : le rejeu est joué en entier ; Opus 5.5 à l'effort high réussit les 6  |
 | `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
+| `Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` | fichier | 7,1 Ko | Synthèse Mandat — campagne du matin reprise et close, relecteur du lecteur visé construit  |
 | `Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` | fichier | 19,2 Ko | Synthèse de mandat — remise à niveau du dépôt et renommage des lots (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
 | `Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` | fichier | 3,5 Ko | Synthèse Mandat — reprise réseau de l'installateur publiée, chantier d'installation sans q |
@@ -266,4 +267,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_249 fichier(s), 0 sous-dossier(s)_
+_250 fichier(s), 0 sous-dossier(s)_

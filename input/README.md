@@ -25,4 +25,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `etude.md` | fichier | 10,7 Ko | Étude — Skills Claude Code « animation / motion » (2026-08-16) |
 | `LISEZMOI.md` | fichier | 4,0 Ko | input\ — entrants du pilot, familles numérotées |
 
-_2 fichier(s), 6 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914) · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
+_2 fichier(s), 6 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
