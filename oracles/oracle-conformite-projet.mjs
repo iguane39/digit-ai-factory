@@ -120,7 +120,11 @@ const EXT_CODE = new Set(["py", "js", "mjs", "cjs", "ts", "tsx", "jsx", "go", "r
 const EXT_LIVRABLE = new Set(["md", "pdf", "html", "pptx", "docx", "xlsx", "zip", "png", "svg"]);
 // LISEZMOI.md : index de dossier, pas un livrable daté (convention des familles numérotées
 // d'`output\`/`input\`, 13/08). Ajouté avec `.oracles\` ci-dessous — TF-0197, 14/08.
-const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md", "LISEZMOI.md"]);
+// REVUE.md (TF-1714, 15/10/2026) : la revue de lecture que R-32 quater exige « à côté » de chaque
+// page d'`output\` porte un nom FIXE, prescrit par le gabarit du socle de page. R-4 la refusait
+// (« livrable sans nommage ») : la règle interdisait son propre remède, et la revue fuyait sous
+// `forge\oracles\`, où R-32 quater ne la voit plus (lot Produit-83 20261014a, RT-3).
+const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md", "LISEZMOI.md", "REVUE.md"]);
 const IGNORES_PARCOURS = new Set([".git", ".venv", "node_modules", "__pycache__", "generated", "dist", ".claude"]);
 
 function* fichiers(dossier, prof = 0) {

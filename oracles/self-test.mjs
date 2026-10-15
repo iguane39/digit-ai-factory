@@ -2162,6 +2162,30 @@ check("TF-1372 non bloquant : un livrable sans revue ne fait pas échouer le ver
     if ((r.findings || []).some((x) => x.regle === "R-32 quater" && x.statut === "FAIL")) throw new Error("R-32 quater bloque alors qu'elle est en avertissement");
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
+// TF-1714 (lot Produit-83 20261014a, RT-3) — LE REMÈDE DE R-32 QUATER NE SE FAIT PAS REFUSER PAR R-4.
+// Le 14/10/2026, un produit a posé `output\REVUE.md` à côté de sa fiche, comme R-32 quater le
+// prescrit ; R-4 l'a refusé (« livrable sans nommage »), et la revue a fui sous `forge\oracles\`,
+// où R-32 quater ne la voit plus. Le remède est joué ici (TF-1013) : la revue écrite là où R-32
+// quater la demande doit passer R-4 ET éteindre l'avertissement de R-32 quater, dans le même run.
+check("TF-1714 remède joué : REVUE.md à côté du livrable HTML passe R-4 et éteint l'avertissement R-32 quater", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html",
+    { ecrireRevue: "# Revue de lecture — Produit - Rapport d audit - 20260920a — 2026-09-20 10:00\n\nCaptures lues : 1920 · 1280 · 768 · 390, aucun constat.\n" });
+  try {
+    const r = lanceArgs(d, "--regles", "R-4,R-32 quater").rapport;
+    const r4ko = (r.findings || []).filter((x) => x.regle === "R-4" && x.statut === "FAIL");
+    if (r4ko.length) throw new Error(`R-4 refuse la revue que R-32 quater prescrit : ${JSON.stringify(r4ko)}`);
+    const f = (r.findings || []).find((x) => x.regle === "R-32 quater");
+    if (!f || f.statut !== "PASS" || /AVERTISSEMENT/.test(f.message)) throw new Error(`la revue posée n'éteint pas R-32 quater : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1714 borne : un autre .md sans nommage daté reste refusé par R-4 (l'exemption nomme REVUE.md, rien d'autre)", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html", { ecrireRevue: "# Revue\n\naucun constat.\n" });
+  try {
+    writeFileSync(join(d, "output", "NOTES.md"), "# notes\n", "utf8");
+    const r = lanceArgs(d, "--regles", "R-4").rapport;
+    if (!(r.findings || []).some((x) => x.regle === "R-4" && x.statut === "FAIL" && /NOTES\.md/.test(x.ou))) throw new Error("un .md non nommé n'est plus refusé : l'exemption a débordé");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
 
 // ---- TF-0923 volet (b), 20/09 — R-35 : « un existant » se MESURE, jamais ne se déclare --------
 // TF-0906 (07/09) : TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est antérieur au

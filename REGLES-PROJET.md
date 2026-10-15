@@ -424,7 +424,9 @@ sans revue a gardé quatre jours un schéma illisible. Règle : chaque `.html` d
 `old\`) a, **dans le même dossier**, un `REVUE.md` non vide et plus récent que lui. Mécanisme :
 O — contrôle R-32 quater de `oracle-conformite-projet.mjs`. Non jugé : la justesse de la revue
 (qu'elle ait vraiment lu chaque capture) ; seules la présence, le contenu non vide et la date
-se vérifient.
+se vérifient. Le nom fixe `REVUE.md` est exempté du nommage daté de R-4, comme `README.md`
+(TF-1714, 15/10/2026) : sans cette exemption, R-4 refusait la revue posée là où R-32 quater la
+demande.
 
 *Sévérité : AVERTISSEMENT.* Le contrôle signale (statut PASS, message `AVERTISSEMENT, non
 bloquant`), il ne bloque ni le verdict ni la remise. Une première version bloquante, écrite le
