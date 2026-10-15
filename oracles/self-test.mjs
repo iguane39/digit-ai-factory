@@ -2649,5 +2649,102 @@ check("R-60 remède joué : la cascade écrite au gabarit commun lève le refus 
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1736 (lot Produit-76 20260825a, RV-1) — R-24 : l'URL entre accents graves -------------
+// Le fait : une URL écrite `https://…` dans la table était capturée AVEC l'accent grave final, et ne
+// correspondait plus à l'écart `ecarts_r24` qui porte l'URL nue : FAIL maintenu sur un écart déclaré.
+// Vert : l'URL entre accents graves rejoint son écart. Rouge : sans écart, la même URL reste refusée
+// et le message cite l'URL sans accent grave. Rouge : un écart déclaré sur le même hôte mais une autre
+// URL est NOMMÉ dans le refus, au lieu de répéter la règle de nommage.
+const BT = String.fromCharCode(96);
+const projet1736 = (ligneQualif, ecartUrl) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1736-"));
+  mkdirSync(join(d, "docs", "projet"), { recursive: true });
+  const ecart = ecartUrl ? "ecarts_r24:\n  - url: " + ecartUrl + "\n    environnement: qualif\n    motif: domaine antérieur à la convention\n    decide_le: 2026-08-25\n" : "";
+  writeFileSync(join(d, "docs", "projet", "PARAMETRAGE.md"),
+    "---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-25\nvariables:\n  - PORT\n" + ecart + "---\n# Paramétrage\n\n## URLs & ports par environnement\n\n" +
+    "| Environnement | Front | Notes |\n|---|---|---|\n" + ligneQualif + "| production | " + BT + "https://demoapp-production.up.railway.app" + BT + " | conforme |\n", "utf8");
+  return d;
+};
+const r24de1736 = (d) => (lanceArgs(d, "--regles", "R-24").rapport.findings || []).filter((f) => f.regle === "R-24");
+check("TF-1736 vert : une URL entre accents graves rejoint l'écart déclaré sur l'URL nue → R-24 PASS, écart dit au verdict", () => {
+  const d = projet1736("| qualif | " + BT + "https://ancienhote-legacy.up.railway.app" + BT + " | écart déclaré |\n", "https://ancienhote-legacy.up.railway.app");
+  try {
+    const f = r24de1736(d);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error(`l'écart déclaré n'est pas rejoint : ${JSON.stringify(f.map((x) => x.message))}`);
+    if (!f.some((x) => x.statut === "PASS" && /1 écart\(s\) déclaré\(s\)/.test(x.message))) throw new Error(`l'écart accepté n'est pas dit : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1736 rouge : sans écart, l'URL entre accents graves reste refusée, et le message la cite sans l'accent grave", () => {
+  const d = projet1736("| qualif | " + BT + "https://ancienhote-legacy.up.railway.app" + BT + " | sans écart |\n", null);
+  try {
+    const ko = r24de1736(d).filter((x) => x.statut === "FAIL");
+    if (ko.length !== 1) throw new Error(`1 refus attendu, ${ko.length} : ${JSON.stringify(ko)}`);
+    if (ko[0].message.includes(BT + " ")) throw new Error(`l'URL est encore citée avec son accent grave : ${ko[0].message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1736 rouge : un écart déclaré sur le MÊME hôte mais une autre URL est nommé dans le refus", () => {
+  const d = projet1736("| qualif | https://ancienhote-legacy.up.railway.app/app | autre chemin |\n", "https://ancienhote-legacy.up.railway.app/admin");
+  try {
+    const ko = r24de1736(d).filter((x) => x.statut === "FAIL");
+    if (!ko.some((x) => /écart déclaré/.test(x.message) && /\/admin/.test(x.message))) throw new Error(`l'écart voisin n'est pas nommé : ${JSON.stringify(ko.map((x) => x.message))}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1741 (lot Produit-76 20260825b, RV-3) — R-25 nomme la cause quand le PROJET contient « - » ---
+// Le fait : douze refus « type Ventilation absent du registre » sur des livrables dont le type réel
+// (Rapport, Note…) est admis ; le nom de projet contenait le séparateur. Rouge : le refus nomme la
+// cause et le segment qui porte le type admis. Borne : un type improvisé dans un nom à trois segments
+// garde le message ordinaire, sans l'hypothèse du séparateur.
+check("TF-1741 rouge : nom de projet contenant « - » → R-25 FAIL qui nomme le séparateur et le type admis lu plus loin", () => {
+  const d = projetOutput("Produit - Ventilation - Rapport d audit - 20260825a.md");
+  try {
+    const ko = r25De(d).filter((x) => x.statut === "FAIL");
+    if (ko.length !== 1) throw new Error(`1 refus attendu : ${JSON.stringify(ko)}`);
+    if (!/séparateur/.test(ko[0].message) || !/« Rapport »/.test(ko[0].message)) throw new Error(`la cause n'est pas nommée : ${ko[0].message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1741 borne : un type improvisé dans un nom à trois segments garde le message ordinaire", () => {
+  const d = projetOutput("Produit - Grimoire Neant - 20260825a.md");
+  try {
+    const ko = r25De(d).filter((x) => x.statut === "FAIL");
+    if (ko.length !== 1 || /séparateur/.test(ko[0].message)) throw new Error(`message inattendu : ${JSON.stringify(ko)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1787 (lot Produit-83 20261015b, RT-11) — R-21 lit une clé de version entre guillemets ------
+// Le fait : `"@vitejs/plugin-react": "5.0.0"` (une clé YAML ne peut commencer par @ sans guillemets)
+// était ignorée sans un mot. Vert : la clé citée est confrontée au lockfile et comptée. Rouge : la même
+// clé à une version absente du lockfile est refusée en la nommant. Rouge : une ligne du bloc versions
+// que l'oracle ne sait pas lire est DITE (avertissement), jamais tue.
+const projet1787 = (versions) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1787-"));
+  mkdirSync(join(d, "docs", "projet"), { recursive: true });
+  writeFileSync(join(d, "docs", "projet", "TECHNOS.md"), "---\nrole: technos\nsources_de_verite: [package-lock.json]\nverifie_le: 2026-10-15\nversions:\n" + versions + "---\n# Technos\n", "utf8");
+  writeFileSync(join(d, "package-lock.json"), JSON.stringify({ packages: { "node_modules/@vitejs/plugin-react": { version: "5.0.0" }, "node_modules/react": { version: "19.1.0" } } }, null, 2), "utf8");
+  return d;
+};
+const r21de1787 = (d) => (lanceArgs(d, "--regles", "R-21").rapport.findings || []).filter((f) => f.regle === "R-21");
+check("TF-1787 vert : une clé entre guillemets (« \"@vitejs/plugin-react\" ») est confrontée et comptée", () => {
+  const d = projet1787('  "@vitejs/plugin-react": "5.0.0"\n  react: "19.1.0"\n');
+  try {
+    const f = r21de1787(d);
+    if (f.some((x) => x.statut === "FAIL") || !f.some((x) => x.statut === "PASS" && /^2 version/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1787 rouge : la clé entre guillemets à une version absente du lockfile est refusée en la nommant", () => {
+  const d = projet1787('  "@vitejs/plugin-react": "4.9.9"\n  react: "19.1.0"\n');
+  try {
+    if (!r21de1787(d).some((x) => x.statut === "FAIL" && /@vitejs\/plugin-react@4\.9\.9/.test(x.message))) throw new Error(JSON.stringify(r21de1787(d)));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1787 rouge : une ligne du bloc versions illisible (valeur sans guillemets) est dite en avertissement, jamais tue", () => {
+  const d = projet1787('  react: 19.1.0\n  "@vitejs/plugin-react": "5.0.0"\n');
+  try {
+    const f = r21de1787(d);
+    if (!f.some((x) => /AVERTISSEMENT/.test(x.message) && /react: 19\.1\.0/.test(x.message))) throw new Error(`la ligne illisible est tue : ${JSON.stringify(f)}`);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error("l'avertissement bloque");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
