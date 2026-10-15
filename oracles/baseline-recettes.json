@@ -411,12 +411,12 @@
   "vu_le": "2026-10-12"
  },
  "oracles/hook-restitution-selection.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-02"
+  "cas": 7,
+  "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 48,
-  "vu_le": "2026-10-14"
+  "cas": 49,
+  "vu_le": "2026-10-15"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,

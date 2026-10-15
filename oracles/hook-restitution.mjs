@@ -26,7 +26,7 @@
  */
 import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { tmpdir } from "node:os";
+import { tmpdir, homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -479,12 +479,45 @@ const estMarque = (c) => {
     return /^destinataire\s*:\s*humain\s*$/im.test(readFileSync(c, "utf8").slice(0, 400));
   } catch { return false; /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
 };
+// TF-1720 (15/10/2026, lot Produit-83 20261014b RT-6) — UN DOCUMENT DE PROJET N'EST JAMAIS LA SYNTHÈSE.
+// Le 14/10 à 18:58, chez un produit, le hook a refusé une restitution préjugée PASS en la comparant à
+// `docs\projet\COMPOSANTS-OPS.md` : « options par défaut nommées : 0 dans le fichier jugé, 1 à l'écran ».
+// Ce document porte `destinataire: humain` PAR SON GABARIT (les 9 gabarits de `gabarits\docs-projet\`
+// le portent), il avait été écrit dans le tour, et aucune synthèse nommée n'y était : le repli l'a
+// retenu. Le repli garde son rôle (TF-0767), mais il ne retient plus un fichier rangé sous
+// `docs\projet\`, dossier des documents de projet et jamais des restitutions (RESTITUTION.md § Où, et
+// sous quel nom). Même classe que TF-0767 et TF-1184 : `restitution-fichier-juge-mal-choisi`.
+const DOC_DE_PROJET = /(^|[\\/])docs[\\/]projet[\\/]/i;
 const choisirParmi = (chemins) => {
   const marques = [];
   for (let i = chemins.length - 1; i >= 0; i--) if (estMarque(chemins[i])) marques.push(chemins[i]);
   const nomme = marques.find((c) => /synth[eè]se|restitution/i.test(String(c).split(/[\\/]/).pop()));
-  return nomme || marques[0] || null;
+  return nomme || marques.find((c) => !DOC_DE_PROJET.test(String(c))) || null;
 };
+
+// TF-1720, second volet — LE PRÉJUGEMENT JOUE LE MÊME CHOIX DE FICHIER QUE LE HOOK DE FIN DE TOUR.
+// `--prejuger` jugeait le texte seul : il ne voyait pas la synthèse déposée dans le tour, donc il
+// rendait exit 0 sur un brouillon que le hook refusait ensuite sur AFFICHAGE. Il relit désormais le
+// transcript de la session, et choisit la synthèse par `syntheseDuTour` comme le hook. Le transcript
+// se donne par `--transcript <chemin.jsonl>`, ou se retrouve par l'identifiant de session que Claude
+// Code passe à ses commandes (`CLAUDE_CODE_SESSION_ID`), cherché sous `projects\*\` de chaque profil
+// (`CLAUDE_CONFIG_DIR`, `~\.claude`, `~\.claude-*`). Introuvable, la comparaison n'est pas jouée et la
+// sortie le dit ; elle ne se transforme jamais en refus.
+export function transcriptDeSession(env = process.env, maison = homedir()) {
+  const id = env.CLAUDE_CODE_SESSION_ID;
+  if (!id || !/^[\w-]+$/.test(id)) return null;
+  const racines = new Set([env.CLAUDE_CONFIG_DIR].filter(Boolean));
+  try { for (const n of readdirSync(maison)) if (/^\.claude(?:-[\w-]+)?$/i.test(n)) racines.add(join(maison, n)); } catch { /* pas de profil lisible */ }
+  for (const r of racines) {
+    let dossiers = [];
+    try { dossiers = readdirSync(join(r, "projects")); } catch { continue; }
+    for (const d of dossiers) {
+      const f = join(r, "projects", d, id + ".jsonl");
+      if (existsSync(f)) return f;
+    }
+  }
+  return null;
+}
 
 export function syntheseDuTour(cheminsEcrits) {
   return choisirParmi(cheminsEcrits) || choisirParmi(relusDuDisque(cheminsEcrits));
@@ -968,7 +1001,8 @@ const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md 
 // bloquante sur les 9 autres ; journal du pilot, 1 393 refus au premier passage sur 4 549 jugements.
 // Un brouillon jugé AVANT l'affichage aurait évité les 2 doublons. `--prejuger <brouillon.md>` rend
 // le verdict BLOQUANT du hook sur ce texte — mêmes règles, même ensemble `BLOQUANTES`, même dossier
-// de projet (`--racine`, donc S48 chez un produit) — sans le transcript : exit 0 = affichable.
+// de projet (`--racine`, donc S48 chez un produit) : exit 0 = affichable. Depuis TF-1720 (15/10/2026),
+// il joue aussi l'AFFICHAGE contre la synthèse déposée dans le tour, retrouvée au transcript.
 // Chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <brouillon.md>`.
 if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes("--prejuger")) {
   const f = process.argv[process.argv.indexOf("--prejuger") + 1];
@@ -977,14 +1011,32 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
       message: "brouillon introuvable — usage : node oracles/hook-restitution.mjs --prejuger <brouillon.md>" }));
     process.exit(2);
   }
-  const { fails } = juger(readFileSync(f, "utf8"), process.cwd());
+  const brouillon = readFileSync(f, "utf8");
+  const { fails } = juger(brouillon, process.cwd());
   const bloquants = fails.filter((x) => BLOQUANTES.has(x.regle));
   const avertissements = fails.filter((x) => !BLOQUANTES.has(x.regle));
-  console.log(JSON.stringify({ outil: "hook-restitution --prejuger", brouillon: f, affichable: !bloquants.length,
-    bloquants: bloquants.map((x) => `${x.regle} — ${x.message}`), avertissements: avertissements.map((x) => x.regle),
-    non_juge: "les contrôles qui lisent le TOUR et non le texte — GESTE (réponse à un mot de décision), AFFICHAGE (synthèse déposée), "
+  // TF-1720 — l'AFFICHAGE contre la synthèse que le hook retiendra, choisie de la même façon.
+  const iT = process.argv.indexOf("--transcript");
+  const cheminT = iT > 1 ? process.argv[iT + 1] : transcriptDeSession();
+  let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
+  const ecartsAffichage = [];
+  try {
+    if (cheminT && existsSync(cheminT)) {
+      syntheseDeposee = syntheseDuTour(analyserTranscript(readFileSync(cheminT, "utf8")).fichiersMd);
+      if (syntheseDeposee) {
+        ecartsAffichage.push(...comparerAffiche(brouillon, readFileSync(syntheseDeposee, "utf8")));
+        affichage = ecartsAffichage.length ? "FAIL" : "PASS";
+      } else affichage = "sans objet : aucune synthèse déposée dans le tour";
+    }
+  } catch { affichage = "non joué : transcript ou synthèse illisible"; }
+  const refus = [...bloquants.map((x) => `${x.regle} — ${x.message}`),
+    ...ecartsAffichage.map((e) => `AFFICHAGE — ce brouillon ne dit pas ce que dit la synthèse déposée ${syntheseDeposee} : ${e}`)];
+  console.log(JSON.stringify({ outil: "hook-restitution --prejuger", brouillon: f, affichable: !refus.length,
+    bloquants: refus, avertissements: avertissements.map((x) => x.regle),
+    synthese_deposee: syntheseDeposee, affichage,
+    non_juge: "les contrôles qui lisent le TOUR et non le texte — GESTE (réponse à un mot de décision), "
       + "PROCÉDURE, POSSESSION, niveau Moyen : le hook de fin de tour les joue sur le transcript ; un brouillon affiché autrement qu'il a été préjugé n'est plus couvert" }));
-  process.exit(bloquants.length ? 1 : 0);
+  process.exit(refus.length ? 1 : 0);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes("--pre-vol")) {
