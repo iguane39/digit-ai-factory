@@ -218,6 +218,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` | fichier | 11,3 Ko | Synthèse de mandat — réseaux sociaux : la barre est validée, et votre objection est fondée |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md` | fichier | 12,8 Ko | Synthèse de mandat — réseaux sociaux : votre décision est exécutée, les sept candidatures  |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux D-3 executee et mandat permanent R-55 - 20260917j.md` | fichier | 14,9 Ko | Synthèse de mandat — réseaux sociaux : votre règle de mandat permanent est écrite, et les  |
+| `Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` | fichier | 12,2 Ko | Synthèse Mandat — retours et sujets qui attendaient ce poste (14/10/2026) |
 | `Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` | fichier | 37,5 Ko | Synthèse de mandat — tous les retours sont pris et la boîte d'entrée est verte pour la pre |
 | `Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` | fichier | 17,6 Ko | Synthèse de mandat — « fais tous les retours et todos » : les neuf lots en attente sont in |
 | `Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` | fichier | 12,6 Ko | Synthèse de mandat — trois lots pris, la propagation devient mesurable, et le banc monte à |
@@ -270,4 +271,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_253 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_254 fichier(s), 0 sous-dossier(s)_
