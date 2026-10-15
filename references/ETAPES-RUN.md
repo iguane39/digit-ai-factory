@@ -446,6 +446,12 @@ pans mesurés · oracle MEP au complet en staging (`ETAPE-MEP.md`) · `DOSSIER-M
 MVP → tests 100 % · ledger vérifié par `ledger.mjs verify` · couverture des dimensions d'audit déclarée
 à l'ouverture du run (R-19 ter, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage).
 
+*« Livré » a une définition opposable* (R-61, TF-1711, 15/10/2026) : toutes les exigences de la fiche
+implémentées et testées, seuls les secrets restant à saisir par l'administrateur, par un geste guidé
+unique. Un run qui s'arrête avant le dit, écrit « N exigences sur M tenues » au bloc 0 ou au verdict de
+sa restitution, et nomme ce qui reste ; le critère de sortie d'une phase tenu se dit « phase close ».
+Juges : S70 à S72 d'`oracles\oracle-synthese.mjs`, avertissantes.
+
 *L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
 
 ## 4 bis. L'auteur d'un brief ne juge pas son propre contrat de sortie (TF-0776 — 02/09/2026)

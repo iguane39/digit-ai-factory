@@ -75,6 +75,10 @@
  *       une page citée comme SOURCE (bloc de code, citation, ligne « lue ») n'est pas livrée (14/10, TF-1653) ;
  *   S69 une heure datée du bloc 1 n'est pas postérieure de plus de 10 min au moment du jugement
  *       (`--horloge <ISO>`, l'horloge du poste à défaut) : elle a été composée (14/10, TF-1646) ; avertissante ;
+ *   S70 un service déployé ou une page publiée annoncé au bloc 0 ou au verdict y porte son adresse
+ *       cliquable et le geste d'accès (15/10, TF-1708) ; S71 une livraison déclarée y dit ce qu'un
+ *       utilisateur peut faire à l'instant et ce qui manque (TF-1709) ; S72 elle y porte le compte des
+ *       exigences tenues (TF-1711, R-61) ; toutes avertissantes ;
  *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
  *   S38 une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'EXEMPTION
  *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
@@ -3649,6 +3653,93 @@ function juger(texte, cheminJuge = null) {
     else ok("S69", `${jugees} heure(s) datée(s) au bloc 1, aucune postérieure au moment du jugement`);
   }
 
+  // ---- S70 à S72 (TF-1708, TF-1709, TF-1711 — 15/10/2026, R-61) ------------------------------------
+  // Le même jour, trois retours d'un produit sur ce qu'une restitution DÉCLARE du livrable. Les trois
+  // règles lisent la FORME de la déclaration, là où le lecteur lit d'abord : la synthèse d'ouverture
+  // (bloc 0) et le verdict (bloc 2). Toutes AVERTISSANTES à leur entrée. Mesure d'entrée, jouée sur les
+  // 241 synthèses d'`output\04-plans\` et sur les 15 restitutions écrites des produits du poste : 0
+  // accusation au pilot ; 3 chez les produits, et ce sont les 3 restitutions que l'humain a contestées
+  // le 14/10 (Produit-82, 20261014f, g et h).
+  const lireDAbord = ouverture + "\n" + (bloc(texte, BLOCS[1][0]) || "");
+  const phrasesDe = (t) => String(t).replace(/```[\s\S]*?```/g, " ").replace(/«[^»]*»/g, " « » ")
+    .split(/(?<=[.!?;])\s+|\n+/).map((s) => s.trim()).filter(Boolean);
+  const NIE = uni(/\b(n['’](?:est|a|ont|[ée]tait|[ée]taient)\s+(?:pas|jamais|plus)|ne\s+\S+\s+(?:pas|jamais|plus)|pas encore|non d[ée]ploy|[àa] d[ée]ployer|reste [àa]|avant (?:de|le) d[ée]ploi|aucun(?:e)?|sans d[ée]ploi|avait tort|[àa] tort|[ée]tait faux)\b/i);
+
+  // S70 (TF-1708, lot Produit-82 20261014f RT-9) — UN SERVICE DÉPLOYÉ SE NOMME PAR SON ADRESSE, LÀ OÙ
+  // LE LECTEUR LIT D'ABORD. Le 14/10/2026, une restitution jugée PASS sur 63 règles annonçait un service
+  // déployé sans son adresse au bloc 0 ni au verdict ; elle n'apparaissait qu'au bloc 4 et aux traces.
+  // Retour humain : « L'URL n'est même pas fournie avec le prompt, ce n'est pas normal ». Ce juge lit, au
+  // bloc 0 et au verdict, une phrase qui annonce un service, une application, une API, une instance ou
+  // une page déployée, mise en ligne ou publiée (ou qui tourne chez un hébergeur nommé), sans négation ;
+  // il exige dans ces deux blocs une adresse cliquable (`http(s)://…`) et le geste d'accès : point
+  // d'accès, clé ou identifiant, commande d'essai, page à ouvrir. NON JUGÉ : que l'adresse réponde, que
+  // la commande d'essai marche, et un déploiement que les deux premiers blocs taisent.
+  const DEPLOIE = uni(/\b(d[ée]ploy[ée]e?s?|mise? en ligne|en ligne (?:sur|[àa] l['’]adresse|depuis)|mise? en production|en production (?:sur|[àa] l['’]adresse)|tourne(?:nt)? (?:sur|en production|en ligne)|h[ée]berg[ée]e?s? (?:sur|chez)|publi[ée]e?s? (?:sur|[àa] l['’]adresse|en ligne))\b/i);
+  const SERVICE_LIVRE = uni(/\b(services?|applications?|applis?|API|sites?|pages? web|page publi[ée]e|passerelles?|instances?|portails?|consoles?|tableaux? de bord|serveurs?|frontaux?|front|back-?end|Railway|Vercel|Netlify|Render|Fly\.io|Heroku|Cloud Run|App Service|Static Web Apps?|GitHub Pages|Cloudflare|claude\.ai|Artifact)\b/i);
+  const annonces70 = phrasesDe(lireDAbord).filter((p) => DEPLOIE.test(p) && SERVICE_LIVRE.test(p) && !NIE.test(p));
+  {
+    const URL_CLIQUABLE = /https?:\/\/[^\s)`>\]]+/i;
+    const GESTE_ACCES = uni(/(\bcurl\b|Invoke-(?:WebRequest|RestMethod)|commande d['’]essai|pour l['’]essayer|\bessayez\b|points? d['’]acc[èe]s|\bendpoint|\bcl[ée]s?\b|\bjetons?\b|identifiants? de connexion|mot de passe|\bouvr(?:ez|ir|e)\b|\bconnectez-vous|se connecter|\/v\d\b|\/api\b|\bnavigateur\b)/i);
+    if (!annonces70.length) ok("S70", "aucun service déployé ni page publiée annoncé au bloc 0 ou au verdict — rien à juger");
+    else {
+      const manque = [!URL_CLIQUABLE.test(lireDAbord) && "son adresse cliquable", !GESTE_ACCES.test(lireDAbord) && "le geste pour s'en servir"].filter(Boolean);
+      manque.length
+        ? ko("S70", `un service déployé ou une page publiée est annoncé sans ${manque.join(" ni ")} au bloc 0 ni au verdict — le lecteur cherche `
+          + "d'abord où le service répond : son adresse `https://…`, puis le point d'accès, la clé ou la commande d'essai. Le 14/10/2026, "
+          + "une restitution PASS ne donnait l'adresse qu'au bloc 4 ; retour humain : « L'URL n'est même pas fournie » (TF-1708). "
+          + `Ex. : ${annonces70[0].replace(/\s+/g, " ").slice(0, 110)}`)
+        : ok("S70", `${annonces70.length} service(s) ou page(s) annoncé(s), adresse et geste d'accès au bloc 0 ou au verdict`);
+    }
+  }
+
+  // S71 (TF-1709, lot Produit-82 20261014g RT-10) ET S72 (TF-1711, lot 20261014i RT-12, R-61) — UN
+  // VERDICT DE LIVRAISON SE MESURE DU CÔTÉ DE L'UTILISATEUR. Le 14/10/2026, une restitution PASS sur 65
+  // règles déclarait « P4 close » et « le brief mené jusqu'au bout » pour un service qui ne servait que des
+  // réponses de mock, sans clé de fournisseur, sans page d'accueil, et que le navigateur rendait en 401.
+  // Retour humain : « Comment est-ce qu'on peut considérer que le produit est fini et livré ? ». Le run
+  // avait clos ses phases avec 10 exigences sur 35 non tenues. Une DÉCLARATION DE LIVRAISON, ici : au
+  // bloc 0 ou au verdict, une phrase sans négation qui dit livré, fini, terminé, complet, prêt à
+  // l'emploi, mené jusqu'au bout, ou une phase close — d'un produit, d'un service, d'une application,
+  // d'une API, d'un site, d'une passerelle ou d'un portail nommé ainsi dans les 100 caractères qui
+  // précèdent, ou dans une restitution qui annonce un déploiement (S70). S71 exige au bloc 0 ou au
+  // verdict ce qu'un utilisateur peut faire du livrable À L'INSTANT et ce qui manque pour un usage réel
+  // (ou que rien ne manque) ; S72 exige le compte des exigences de la fiche tenues (« 34 exigences sur
+  // 35 », « toutes les exigences ») et, si le compte n'est pas plein, ce qui reste. NON JUGÉ : que l'usage
+  // dit soit vrai, que le compte soit juste, un produit désigné par son seul nom sans déploiement annoncé.
+  const LIVRE = uni(/\b(livr[ée]e?s?|produit (?:fini|complet|termin[ée])|(?:est|sont) (?:fini|finie|termin[ée]e?|complet|compl[èe]te|achev[ée]e?|op[ée]rationnel(?:le)?|pr[êe]te?s? (?:[àa] l['’]emploi|pour la production|[àa] servir))|men[ée]e? jusqu['’]au bout|(?:phase|lot|brief|run) P?\d*\s*(?:clos|close|termin[ée]e?)|P\d+ close?)\b/i);
+  const SUJET_LIVRE = uni(/\b(?:le|ce|votre|notre|un|du|l['’])\s*(?:produit|service|application|appli|API|site|passerelle|portail|plateforme)\b/i);
+  const sujetAvant = (p) => { const l = LIVRE.exec(p); return !!l && SUJET_LIVRE.test(p.slice(Math.max(0, l.index - 100), l.index)); };
+  const livraisons = phrasesDe(lireDAbord).filter((p) => LIVRE.test(p) && !NIE.test(p) && (sujetAvant(p) || annonces70.length > 0));
+  const MANQUE_DIT = uni(/\b(manque(?:nt)?|il (?:vous )?reste|reste(?:nt)? [àa]|[àa] saisir|faute d[e']|il faut|rien ne manque|aucun manque|ne (?:r[ée]pond|sert|fait) qu|seul(?:e)? (?:geste|manque)|non tenue?s?|pas encore)\b/i);
+  {
+    const USAGE = uni(/\b(utilisateurs? (?:peu(?:t|vent)|pourr(?:a|ont))|vous pouvez|utilisable|inutilisable|ce qu['’](?:un utilisateur|on|vous) peu[tx]|[àa] l['’]instant|d[èe]s maintenant|vous ouvrez|ouvrez|permet (?:[àa]|aux|de)|sert [àa]|r[ée]pond (?:[àa]|aux|avec))\b/i);
+    if (!livraisons.length) ok("S71", "aucune livraison de produit ou de service déclarée au bloc 0 ou au verdict — rien à juger");
+    else {
+      const manque = [!USAGE.test(lireDAbord) && "ce qu'un utilisateur peut en faire à l'instant", !MANQUE_DIT.test(lireDAbord) && "ce qui manque pour un usage réel (ou que rien ne manque)"].filter(Boolean);
+      manque.length
+        ? ko("S71", `une livraison est déclarée sans dire ${manque.join(" ni ")}, au bloc 0 ni au verdict — un verdict de livraison se mesure du `
+          + "côté de l'utilisateur, pas seulement contre le critère de sortie d'un brief : le 14/10/2026, « P4 close » et « le brief mené jusqu'au bout » "
+          + "annonçaient un service qui ne servait que des réponses de mock, 401 au premier clic (TF-1709). "
+          + `Ex. : ${livraisons[0].replace(/\s+/g, " ").slice(0, 110)}`)
+        : ok("S71", `${livraisons.length} livraison(s) déclarée(s), avec l'usage à l'instant et ce qui manque`);
+    }
+  }
+  {
+    const COMPTE_EXIGENCES = uni(/(\b(\d+)\s*(?:exigences?\s*)?(?:sur|\/)\s*(\d+)\s*exigences?|\b(\d+)\s+exigences?\s+(?:de la fiche\s+)?sur\s+(\d+)|\btoutes les exigences)/i);
+    if (!livraisons.length) ok("S72", "aucune livraison de produit ou de service déclarée au bloc 0 ou au verdict — rien à juger");
+    else {
+      const m = COMPTE_EXIGENCES.exec(lireDAbord);
+      const n = m ? Number(m[2] || m[4]) : NaN, tot = m ? Number(m[3] || m[5]) : NaN;
+      if (!m) ko("S72", "une livraison est déclarée sans le compte des exigences de la fiche tenues, au bloc 0 ni au verdict — « livré » veut dire "
+        + "toutes les exigences implémentées et testées, seuls les secrets restant à saisir par un geste guidé (R-61) : le 14/10/2026, un run a clos "
+        + "ses phases avec 10 exigences sur 35 non tenues, puis l'a restitué comme livré (TF-1711). Écris « N exigences sur M tenues », et ce qui reste. "
+        + `Ex. : ${livraisons[0].replace(/\s+/g, " ").slice(0, 110)}`);
+      else if (tot && n < tot && !MANQUE_DIT.test(lireDAbord)) ko("S72", `${n} exigences sur ${tot} : la livraison est déclarée sur un compte incomplet `
+        + "sans nommer ce qui reste — un run qui s'arrête avant la fin le dit, et liste ce qui manque (R-61, TF-1711)");
+      else ok("S72", `livraison déclarée avec son compte d'exigences (${m[0].replace(/\s+/g, " ").trim()})`);
+    }
+  }
+
   return findings;
 }
 
@@ -5333,6 +5424,46 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S4 (TF-1467) : un bloc 3 qui OUVRE par « Aucune décision nouvelle » passe en entier même quand une VRAIE "
       + "décision sans choix fermé suit — le contrôle ne lisait que la 1re ligne ou les 120 premiers caractères du bloc, "
       + "jamais ce qui vient après le mot d'ouverture");
+
+  // 15/10 — TF-1708, TF-1709, TF-1711 : S70, S71 ET S72, LA LIVRAISON DÉCLARÉE, DANS LEURS DEUX SENS. Les
+  // fixtures reprennent les trois restitutions contestées du 14/10 chez un produit. (a) Un service annoncé
+  // déployé au bloc 0 sans adresse ni geste : S70 FAIL ; le MÊME avec son adresse et le geste au verdict :
+  // S70 PASS. (b) « déployé » et « le brief mené jusqu'au bout » sans usage ni compte d'exigences : S71 et
+  // S72 FAIL ; la MÊME avec ce qu'un utilisateur peut faire à l'instant, ce qui reste et « 34 exigences sur
+  // 35 tenues, une non tenue » : PASS. (c) « 25 exigences sur 35 » sans rien de ce qui manque : S72 FAIL.
+  // (d) La restitution qui dit le produit NON livré n'est pas accusée. La verte, sans rien de tout cela, PASS.
+  const FIN_OUV = "ce qui prouve que la surveillance fonctionne.";
+  const VERDICT_70 = "Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
+  const ouv70 = (phrase) => verte.replace(FIN_OUV, FIN_OUV + " " + phrase);
+  const ADRESSE_70 = VERDICT_70 + nl + nl + "Adresse du tableau de bord : https://recette-exemple.up.railway.app — ouvrez-la dans un navigateur ; "
+    + "identifiant de connexion dans le coffre de l'équipe.";
+  const DEPLOYE_70 = "Le tableau de bord de la recette est déployé sur Railway.";
+  const r70sans = jouerPe("tf1708-adresse-absente.md", ouv70(DEPLOYE_70));
+  const r70avec = jouerPe("tf1708-adresse-au-verdict.md", ouv70(DEPLOYE_70).replace(VERDICT_70, ADRESSE_70));
+  const BRIEF_71 = "Le service de recette est déployé sur Railway, et le brief est mené jusqu'au bout.";
+  const r71sans = jouerPe("tf1709-livre-sans-usage.md", ouv70(BRIEF_71).replace(VERDICT_70, ADRESSE_70));
+  const USAGE_71 = ADRESSE_70 + nl + nl + "Ce qu'un utilisateur peut faire à l'instant : ouvrir le portail et lire sa consommation ; il reste à saisir "
+    + "les clés des fournisseurs. 34 exigences sur 35 tenues, la trente-cinquième non tenue et nommée au bloc 5.";
+  const r71avec = jouerPe("tf1709-livre-avec-usage.md", ouv70(BRIEF_71).replace(VERDICT_70, USAGE_71));
+  const r72partiel = jouerPe("tf1711-livre-compte-partiel.md", ouv70("Le produit est livré : 25 exigences sur 35, et vous pouvez ouvrir le portail."));
+  const r72nie = jouerPe("tf1711-produit-non-livre.md", ouv70("Le produit n'est pas livré : il ne sert qu'un modèle de test."));
+  const attendu7x = [
+    [r70sans, "S70", "FAIL", "un service annoncé déployé au bloc 0 sans adresse ni geste au bloc 0 ni au verdict passe — c'est la restitution du 14/10 « l'URL n'est même pas fournie »"],
+    [r70avec, "S70", "PASS", "le MÊME service avec son adresse et le geste d'accès au verdict est accusé — le remède du message échoue"],
+    [r71sans, "S71", "FAIL", "« déployé » et « le brief mené jusqu'au bout » sans ce qu'un utilisateur peut faire à l'instant passent — c'est « P4 close » du 14/10"],
+    [r71sans, "S72", "FAIL", "la MÊME livraison sans compte d'exigences passe — c'est la clôture du 14/10 avec 10 exigences sur 35 non tenues"],
+    [r71avec, "S71", "PASS", "la MÊME livraison avec l'usage à l'instant et ce qui reste est accusée — le remède du message échoue"],
+    [r71avec, "S72", "PASS", "la MÊME livraison avec « 34 exigences sur 35 tenues » et la non tenue nommée est accusée"],
+    [r72partiel, "S72", "FAIL", "« livré » sur 25 exigences sur 35 sans rien de ce qui manque passe"],
+    [r72nie, "S71", "PASS", "une restitution qui dit le produit NON livré est accusée de le déclarer livré"],
+    [r72nie, "S72", "PASS", "une restitution qui dit le produit NON livré est accusée de ne pas compter ses exigences"],
+  ];
+  for (const [r, regle, statut, quoi] of attendu7x)
+    if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-1708, TF-1709, TF-1711) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+  for (const regle of ["S70", "S71", "S72"])
+    if (constatDe(r58sansObjet, regle).statut !== "PASS")
+      casse.push(`${regle} : la verte, qui n'annonce ni déploiement ni livraison, est accusée : ` + String(constatDe(r58sansObjet, regle).message || "").slice(0, 160));
   // 27/09 — LE COMPTE DE CAS SE MESURE. Le bilan portait « 39/39 » écrit à la main ; le harnais le lit
   // comme un CLIQUET (I5, `lib-baseline-recettes.mjs` : premier « N PASS », sinon le ratio N/N), et il
   // n'avait pas bougé quand deux paires se sont ajoutées le 26/09. Retiré seul, il a laissé le
@@ -5375,6 +5506,7 @@ console.log(JSON.stringify({
     "S55 (TF-1493) juge la PRÉSENCE de la ligne « Ne vérifie pas : … » là où le feu vert est donné, jamais sa justesse : qu'elle nomme la limite qui compte, aucun oracle ne le voit. Le feu vert se reconnaît à un vocabulaire fermé et à un guide de LANCEMENT ; un feu vert de production écrit autrement passe sans être vu",
     "S56 (TF-1498) ne vérifie pas que la porte citée a réellement été rejouée, ni sur ce qui sera lancé : il lit une ligne qui la nomme, datée du jour de la restitution et chiffrée. La déclaration « aucune porte de la chaîne ne juge une base externe » n'est pas vérifiée non plus",
     "S64 à S68 (13/10/2026) jugent une FORME : S64 qu'une ligne existe sous un titre, jamais ce qu'elle dit ; S65 que deux familles de voies sont NOMMÉES, jamais qu'elles ont été essayées ni sur la même ressource, et pas les quatre que R-29 point 4 énumère ; S66 une concentration chiffrée ou une invraisemblance qualifiée par le texte, jamais celle que l'auteur n'a pas vue ; S67 qu'un porteur durable est nommé, jamais qu'il tourne ; S68 qu'un essai est cité pour une image ou un site, jamais pour un PDF, une base ou une API",
+    "S70 à S72 (15/10/2026, R-61) jugent ce que le bloc 0 et le verdict DÉCLARENT : S70 qu'une adresse cliquable et un geste d'accès y figurent, jamais que l'adresse réponde ; S71 que l'usage à l'instant et ce qui manque y sont dits, jamais que ce soit vrai ; S72 qu'un compte d'exigences y figure, jamais qu'il soit juste. Une livraison annoncée par le seul nom d'un produit, sans « le produit » ni déploiement annoncé, n'est pas vue",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);

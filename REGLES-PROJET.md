@@ -1672,3 +1672,38 @@ la clôture », et rien ne le jouait là.
 Contrôle exécutable : la règle R-60 d'`oracles\oracle-conformite-projet.mjs`, rejoué avant
 `run_close` (`references\ETAPES-RUN.md`, étape 1), recette `oracles\self-test.mjs` à double sens
 (8 cas, dont le remède joué).
+
+## AP. R-61 — « livré » a une définition opposable : toutes les exigences de la fiche, seuls les secrets restant à saisir (TF-1708, TF-1709, TF-1711 — 15/10/2026)
+
+Trois faits du même run, lots `Produit-82 - RETOURS - 20261014f`, `g` et `i`. Le 14/10/2026, une
+restitution jugée PASS sur 63 règles annonçait un service déployé sans son adresse au bloc 0 ni au
+verdict : « L'URL n'est même pas fournie avec le prompt, ce n'est pas normal ». La version corrigée,
+PASS sur 65 règles, déclarait « P4 close » et « le brief mené jusqu'au bout » pour un service qui ne
+servait que des réponses de mock, sans clé de fournisseur, sans page d'accueil, et que le navigateur
+rendait en 401 : « Comment est-ce qu'on peut considérer que le produit est fini et livré ? ». Le run
+avait clos ses phases avec 10 exigences sur 35 non tenues. Consigne humaine, mot pour mot : « Il faut
+que tout soit implémenté, que l'administrateur de l'appli n'ait qu'à saisir les clés à la fin pour que
+cela soit utilisable complètement. Et remonte ce point à la Factory pour les futurs produits ». Le tour
+suivant a implémenté les 10 exigences et la saisie guidée des clés, en une recette de 33 tests.
+
+**R-61.**
+1. **Un produit n'est « livré » que si toutes les exigences de sa fiche sont implémentées et
+   testées.** Seuls les secrets (clés de fournisseurs, jetons, mots de passe) restent à la main de
+   l'administrateur, et ils se saisissent par un geste guidé unique et documenté. Le critère de sortie
+   d'une phase ou d'un brief tenu n'est pas une livraison : il se dit « phase close », jamais « livré ».
+2. **Un run qui s'arrête avant le dit.** Sa restitution écrit « N exigences sur M tenues » au bloc 0 ou
+   au verdict, nomme ce qui reste, et n'emploie ni « livré », ni « fini », ni « complet ».
+3. **Un verdict de livraison se mesure du côté de l'utilisateur.** Il dit, au bloc 0 ou au verdict, ce
+   qu'un utilisateur peut faire du livrable à l'instant, et ce qui manque pour un usage réel, ou que
+   rien ne manque. La mesure se fait par l'usage : ouvrir l'adresse, appeler un vrai point d'accès.
+4. **Un service déployé ou une page publiée se nomme par son adresse cliquable** au bloc 0 et en tête
+   du verdict, avec le geste pour s'en servir : point d'accès, emplacement de la clé, commande d'essai.
+5. **Ce que R-61 ne juge pas** : que les exigences comptées soient les bonnes, que l'usage décrit soit
+   vrai, qu'un écart accepté par l'humain soit encore d'actualité. Le compte et l'usage se lisent dans
+   la restitution ; leur justesse relève des oracles du produit et du contrat « prêt client ».
+
+Contrôles exécutables : les règles S70 (point 4), S71 (point 3) et S72 (points 1 et 2)
+d'`oracles\oracle-synthese.mjs`, avertissantes à leur entrée, fixtures double sens au self-test ;
+texte hérité par les produits dans `gabarits\RESTITUTION.md` (v2.38.0, bloc 2). Mesure d'entrée : 0
+accusation sur les 241 synthèses d'`output\04-plans\`, 3 sur 15 restitutions écrites des produits, les
+3 restitutions contestées du 14/10.
