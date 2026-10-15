@@ -6,7 +6,7 @@ destinataire: humain
 
 ## 0. Synthèse d'ouverture
 
-Les retours arrivés hier sont tous entrés au registre et tous traités, sauf un, qui attend votre choix. Les corrections sont publiées dans le pilot et dans deux forges, et les outils à jour sont en service sur ce poste. Les produits présents ont reçu leur lot de travaux. Trois questions de règle vous reviennent ci-dessous. Elles ne bloquent rien, et la recommandation est donnée pour chacune.
+Les retours arrivés hier sont tous entrés au registre et tous traités, sauf un, qui attend votre choix. Les corrections sont publiées dans le pilot et dans 2 forges, et les outils à jour sont en service sur ce poste. Les produits présents ont reçu leur lot de travaux. Trois questions de règle vous reviennent ci-dessous. Elles ne bloquent rien, et la recommandation est donnée pour chacune.
 
 ## 1. En-tête d'identification
 
@@ -26,7 +26,7 @@ Trois questions de doctrine sont nées de la campagne. Aucune ne bloque un produ
 
 > **D-1 — Le skill d'itération doit-il être versionné dans la forge des outils ?**
 >
-> Ce skill sert à faire progresser un livrable par cycles. Il n'existe que dans votre synchronisation claude.ai, et aucune forge ne le porte. La correction qui lui ajoute la méthode d'amélioration décidée aujourd'hui est prête et testée hors dépôt. Elle passe son contrôle, sur lequel la version actuelle échoue 7 fois. Je ne l'ai pas versée au dépôt public sans vous.
+> Le skill `la-boucle` sert à faire progresser un livrable par cycles. Il n'existe que dans votre synchronisation claude.ai, et aucune forge ne le porte. La correction qui lui ajoute la méthode d'amélioration décidée aujourd'hui est prête et testée hors dépôt. Elle passe son contrôle, sur lequel la version actuelle échoue 7 fois. Je ne l'ai pas versée au dépôt public sans vous.
 >
 > **Recommandation : (a).** Source consultée : `todo/CLASSES.json`, classe `capacite-hors-versionnement-de-forge`. Une capacité qu'aucune forge ne versionne ne reçoit aucune correction de campagne, et ce sujet en est l'exemple.
 
@@ -40,7 +40,7 @@ Trois questions de doctrine sont nées de la campagne. Aucune ne bloque un produ
 
 > **D-2 — La garde d'identité sortante doit-elle devenir exigée chez tous les produits ?**
 >
-> Cette garde bloque l'envoi de votre adresse électronique vers un service tiers. Elle est câblée au pilot et dans le gabarit des nouveaux produits. L'exiger dans l'héritage ferait déclarer non conformes les produits existants jusqu'à leur prochaine remise à niveau, faite à leur ouverture. Ce choix change la doctrine d'héritage.
+> La garde `oracles/hook-identite-sortante.mjs` bloque l'envoi de votre adresse électronique vers un service tiers. Elle est câblée au pilot et dans le gabarit des nouveaux produits. L'exiger dans l'héritage ferait déclarer non conformes les produits existants jusqu'à leur prochaine remise à niveau, faite à leur ouverture. Ce choix change la doctrine d'héritage.
 >
 > **Recommandation : (a).** Source consultée : `REGLES-PROJET.md`, R-62. L'incident du 14/10 s'est produit chez un produit existant, que le seul gabarit ne protège pas.
 
@@ -53,9 +53,9 @@ Trois questions de doctrine sont nées de la campagne. Aucune ne bloque un produ
 
 > **D-3 — La règle de nommage doit-elle garder sa tolérance pour les types du catalogue ?**
 >
-> La règle de nommage des livrables refusait les noms que les gabarits de documents eux-mêmes prescrivent. Un agent l'a assouplie : un nom au type d'une famille du catalogue passe désormais en avertissement. J'ai aussi ajouté le type « Fiche » au registre d'organization. La dette restante est mesurée : 27 familles sur 45.
+> La règle de nommage des livrables, jouée par `oracle-conformite-projet`, refusait les noms que les gabarits de documents eux-mêmes prescrivent. Un agent l'a assouplie : un nom au type d'une famille du catalogue passe désormais en avertissement. J'ai aussi ajouté le type « Fiche » au registre d'organization. La dette restante est mesurée : 27 familles sur 45.
 >
-> **Recommandation : (a).** Source consultée : `REGLES-PROJET.md`, règle 25 et son alinéa du 15/10. La tolérance supprime une contradiction entre deux règles du socle, et le nouveau contrôle de dette empêche qu'elle s'oublie.
+> **Recommandation : (a).** Source consultée : `REGLES-PROJET.md`, règle 25 et son alinéa du 15/10. La tolérance supprime une contradiction entre 2 règles du socle, et le nouveau contrôle de dette empêche qu'elle s'oublie.
 
 | Option | Coût | Exclusions |
 |---|---|---|
@@ -107,7 +107,7 @@ Trois questions de doctrine sont nées de la campagne. Aucune ne bloque un produ
   - Signal : `git diff` sur le registre, avant chaque commit.
   - Parade : corrigé avant tout commit, aucune occurrence publiée. Les motifs suivants ont été écrits en pseudonymes.
 - **Recettes perturbées par la charge.**
-  - Énoncé : avec plusieurs agents en parallèle, la recette complète a vu deux recettes échouer puis passer seules.
+  - Énoncé : avec plusieurs agents en parallèle, la recette complète a vu 2 recettes échouer puis passer seules.
   - Signal : un défaut qui disparaît au rejeu isolé.
   - Parade : chaque défaut rejoué seul avant d'être compté, et la recette finale jouée sans agent actif.
 - **Héritage 1.21.0 chez les produits.**
