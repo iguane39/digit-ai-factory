@@ -396,6 +396,48 @@ check("TF-1119 BORNE — un carnet hérité instancié, sans second carnet, ne d
   if (f.some((x) => x.statut === "FAIL" || /AVERTISSEMENT/.test(x.message))) throw new Error(`faux positif : ${JSON.stringify(f)}`);
 });
 
+// TF-1698 (15/10/2026) — UN FICHIER HÉRITÉ SANS `verifie_le` SE DATE PAR SA NAISSANCE. Le gabarit
+// CLAUDE-PRODUIT.md ne porte pas de `verifie_le` : un CLAUDE.md posé le 14/10 au gabarit brut était
+// rangé en antériorité (« non daté ») et ne serait jamais jugé. Sa date est désormais son premier
+// commit, sinon la date d'adoption consignée au carnet d'écarts. Trois sens : posé après la règle
+// (commit ou adoption) → FAIL ; commis avant la règle → antériorité déclarée, jamais un FAIL.
+const projet1698 = ({ commitLe = null, adopteLe = null } = {}) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1698-"));
+  mkdirSync(join(d, "forge", "travaux"), { recursive: true });
+  writeFileSync(join(d, "CLAUDE.md"), readFileSync(join(GAB47, "CLAUDE-PRODUIT.md"), "utf8"), "utf8");
+  if (adopteLe) writeFileSync(join(d, "forge", "travaux", "ECARTS-ASSUMES.md"), `# Écarts\n\n## Écart initial à l'adoption du dispositif — ${adopteLe}\n\nrien\n`, "utf8");
+  if (commitLe) {
+    sh("git", ["init", "-q"], d);
+    execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "add", "CLAUDE.md"], { cwd: d });
+    execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "commit", "-q", "-m", "socle"],
+      { cwd: d, env: { ...process.env, GIT_AUTHOR_DATE: `${commitLe}T10:00:00`, GIT_COMMITTER_DATE: `${commitLe}T10:00:00` } });
+  }
+  return d;
+};
+const claude1698 = (d) => { const r = lance(d).rapport; return { f: (r.findings || []).filter((x) => x.ou === "CLAUDE.md" && x.statut === "FAIL"), nj: r.non_juge || [] }; };
+check("TF-1698 rouge — un CLAUDE.md au gabarit brut, COMMIS le 14/10/2026 sans verifie_le : marqueurs FAIL, datés par le premier commit", () => {
+  const d = projet1698({ commitLe: "2026-10-14" });
+  try {
+    const { f, nj } = claude1698(d);
+    if (!f.some((x) => /<commande>/.test(x.message) && /premier commit/.test(x.message))) throw new Error(`antériorité accordée à un fichier né après la règle : ${JSON.stringify(f)} / ${nj.filter((l) => /CLAUDE/.test(l)).join(" | ")}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1698 rouge — le même CLAUDE.md, NON commis, adopté le 14/10/2026 : daté par l'adoption consignée au carnet → FAIL", () => {
+  const d = projet1698({ adopteLe: "2026-10-14" });
+  try {
+    const { f } = claude1698(d);
+    if (!f.some((x) => /<commande>/.test(x.message) && /adoption/.test(x.message))) throw new Error(`la date d'adoption n'est pas lue : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1698 vert — le même CLAUDE.md commis le 01/09/2026, avant la règle : antériorité déclarée datée, jamais un FAIL", () => {
+  const d = projet1698({ commitLe: "2026-09-01", adopteLe: "2026-10-14" });
+  try {
+    const { f, nj } = claude1698(d);
+    if (f.length) throw new Error(`défaut rétroactif : ${JSON.stringify(f)}`);
+    if (!nj.some((l) => /R-20 ter \(fichier hérité\) non jugé sur CLAUDE\.md/.test(l) && /2026-09-01/.test(l))) throw new Error(`l'antériorité n'est pas déclarée avec sa date : ${nj.join(" | ")}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // TF-1113, TF-1117, TF-1120 — L'INVENTAIRE DIT L'USAGE (R-20 étendu, étude 20260915a option O1).
 // Même borne que 01faf22 : antérieur au 15/09 → antériorité déclarée ; postérieur → jugé.
 const COP_BASE = (date, corps) => `---\nrole: composants\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: ${date}\n---\n# Composants\n\n`
@@ -2354,6 +2396,36 @@ check("TF-1614 rouge : un llms.txt instancié par le projet redevient un signal 
     writeFileSync(join(d, "llms.txt"), "# Mon site\n\n> Il existe.\n", "utf8");
     const f13 = r1439(d).filter((x) => x.regle === "R-13");
     if (!f13.some((x) => x.statut === "FAIL" && /llms\.txt/.test(x.message))) throw new Error(`le site instancié passe pour documentaire : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-1699 (15/10/2026) — le type « service » : R-27 sans objet, R-13 jamais exemptée -----------
+// Le fait (lot Produit-82 20261014a, RT-4) : une passerelle d'API sans site a reçu robots.txt et
+// llms.txt. Vert : adopté `--type service` (vraie adoption), R-27 SANS_OBJET qui nomme la déclaration,
+// type reconnu (jamais « inconnu »), R-13 jugée comme partout. Rouge : un fichier de site entré après
+// la déclaration la contredit → R-27 FAIL qui nomme la déclaration et le fichier.
+const projetService = (fichiers) => {
+  const d = projet1439(fichiers);
+  const a = adopter1439(d, { type: "service" });
+  if (a.verdict !== "ADOPTE") throw new Error(`adoption service : ${a.verdict} — ${a.motif}`);
+  return d;
+};
+check("TF-1699 vert : un service adopté `--type service` → R-27 SANS_OBJET qui nomme la déclaration ; R-13 jugée (FAIL sans .env.example), jamais « type inconnu »", () => {
+  const d = projetService({ "src/server.py": "print(1)\n", "requirements.txt": "x==1\n" });
+  try {
+    const f = r1439(d);
+    const f27 = f.filter((x) => x.regle === "R-27"), f13 = f.filter((x) => x.regle === "R-13");
+    if (f27.some((x) => x.statut === "FAIL") || !f27.some((x) => x.statut === "SANS_OBJET" && /service/.test(x.message) && /ECARTS-ASSUMES/.test(x.message))) throw new Error(`R-27 : ${JSON.stringify(f27)}`);
+    if (f13.some((x) => /inconnu/.test(x.message))) throw new Error(`le type service est lu comme inconnu : ${JSON.stringify(f13)}`);
+    if (f13.some((x) => x.statut === "SANS_OBJET") || !f13.some((x) => x.statut === "FAIL" && /absent/.test(x.message))) throw new Error(`R-13 exemptée pour un service : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1699 rouge : un service qui gagne un fichier de site (sitemap.xml) → R-27 FAIL qui nomme la déclaration et le signal", () => {
+  const d = projetService({ "src/server.py": "print(1)\n" });
+  try {
+    writeFileSync(join(d, "sitemap.xml"), "<urlset/>\n", "utf8");
+    const f27 = r1439(d).filter((x) => x.regle === "R-27");
+    if (!f27.some((x) => x.statut === "FAIL" && /déclaré « service »/.test(x.message) && /sitemap\.xml/.test(x.message))) throw new Error(`la déclaration contredite passe : ${JSON.stringify(f27)}`);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 

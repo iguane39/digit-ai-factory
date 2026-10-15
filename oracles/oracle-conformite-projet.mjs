@@ -41,7 +41,7 @@ import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge } from "
 import { rolePageHomonyme, DOCTRINE_PAGE_HOMONYME } from "../scripts/generer-page-etude.mjs";
 // TF-1439 : le type « documentaire » est POSÉ par l'adoption et LU ici par le même lecteur — deux
 // lectures de la même déclaration qui divergeraient rendraient deux verdicts sur un même dépôt.
-import { typeProjetDeclare, signauxLogicielOuSite, TYPE_DOCUMENTAIRE } from "../scripts/adopter-projet-existant.mjs";
+import { typeProjetDeclare, signauxLogicielOuSite, signauxDeSite, TYPE_DOCUMENTAIRE, TYPE_SERVICE, TYPES_PROJET } from "../scripts/adopter-projet-existant.mjs";
 // TF-1678 : R-60 juge la cascade d'un produit par le juge du format commun, importé et non recopié.
 import { juger as jugerCascade, FORMAT as FORMAT_CASCADE } from "./oracle-cascade-isto.mjs";
 
@@ -535,9 +535,19 @@ else {
   const AGENTS_IA = ["GPTBot", "OAI-SearchBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "ChatGPT-User", "Claude-Web"];
   const robots = [...fichiers(cible)].filter((f) => basename(f).toLowerCase() === "robots.txt");
   const type27 = typeProjetDeclare(cible);   // TF-1439 : le projet documentaire DIT pourquoi il n'a pas de robots.txt
-  if (!robots.length) so("R-27", type27 && type27.type === TYPE_DOCUMENTAIRE
+  // TF-1699 (15/10/2026) : le service sans site public le dit aussi, et sa déclaration se CONFRONTE
+  // aux signaux de site — un fichier de site ou une racine web déclarée la contredit.
+  const site27 = type27 && type27.type === TYPE_SERVICE ? signauxDeSite(cible) : [];
+  if (site27.length) {
+    ko("R-27", type27.ou, `projet déclaré « ${TYPE_SERVICE} » (sans site public), mais le dépôt porte ${site27.length} signal(aux) de site : ${site27.slice(0, 5).join(", ")} — `
+      + `retirer la ligne « type_projet: ${TYPE_SERVICE} » de l'en-tête du carnet et tenir R-27 comme un produit à surface web, ou retirer ce fichier du dépôt (TF-1699)`);
+  }
+  if (!robots.length && site27.length) { /* déjà en échec ci-dessus : aucun robots.txt à juger */ }
+  else if (!robots.length) so("R-27", type27 && type27.type === TYPE_DOCUMENTAIRE
     ? `aucun robots.txt — projet déclaré documentaire (${type27.ou}, type_projet) : aucune surface web à ouvrir aux agents IA, l'écart est consigné au carnet (TF-1439)`
-    : "aucun robots.txt — surface web non déclarée, agents IA non jugeables");
+    : type27 && type27.type === TYPE_SERVICE
+      ? `aucun robots.txt — projet déclaré service sans site public (${type27.ou}, type_projet) : aucune surface web à ouvrir aux agents IA, l'écart est consigné au carnet (TF-1699)`
+      : "aucun robots.txt — surface web non déclarée, agents IA non jugeables");
   else {
     let ok27 = true;
     for (const rb of robots) {
@@ -1090,6 +1100,24 @@ else {
       const PILOT47 = join(dirname(fileURLToPath(import.meta.url)), "..");
       const SEUIL_HERITES_1119 = "2026-09-15";
       const dateDe =(t) => (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+      // TF-1698 (15/10/2026) — UN FICHIER HÉRITÉ SANS `verifie_le` SE DATE PAR SA NAISSANCE. Le
+      // gabarit CLAUDE-PRODUIT.md n'en porte pas : un CLAUDE.md posé le 14/10 au gabarit brut était
+      // rangé « non daté », donc antérieur, et ne serait jamais justiciable. Sa date est son PREMIER
+      // COMMIT (un fait de l'histoire), sinon la date d'adoption consignée au carnet d'écarts (un
+      // fichier posé par l'adoption et pas encore commis). Ni l'un ni l'autre : antériorité, comme avant.
+      const adoption1698 = (() => {
+        const carnet = p("forge", "travaux", "ECARTS-ASSUMES.md");
+        if (!existsSync(carnet)) return null;
+        return (/^## Écart initial à l'adoption du dispositif — (\d{4}-\d{2}-\d{2})/m.exec(readFileSync(carnet, "utf8")) || [])[1] || null;
+      })();
+      const naissance = (cibleRel) => {
+        if (aGit) {
+          const r = git("log", "--diff-filter=A", "--format=%cs", "--", cibleRel);
+          const d = (r.status === 0 ? r.stdout : "").trim().split(/\r?\n/).filter(Boolean).pop();
+          if (d) return { date: d, source: "premier commit" };
+        }
+        return adoption1698 ? { date: adoption1698, source: "adoption consignée au carnet d'écarts" } : null;
+      };
       for (const a of heritage.artefacts) {
         if (!/^presence/.test(a.mode || "")) continue;
         const src = join(PILOT47, a.source), dst = p(a.cible);
@@ -1100,15 +1128,18 @@ else {
         if (perimes.length) so("R-20", `HERITAGE.json déclare pour ${a.source} des marqueurs que le gabarit ne porte plus : ${perimes.join(", ")} — déclaration à retirer (TF-1119)`);
         const restes = declares.filter((m) => tSrc.includes(m) && tDst.includes(m));
         const vSrc = dateDe(tSrc), vDst = dateDe(tDst);
+        const ne = !vDst && restes.length ? naissance(a.cible) : null;   // TF-1698
+        const dateJugee = vDst || (ne && ne.date) || null;
         // ANTÉRIORITÉ, jamais un défaut rétroactif (correctif du 15/09, même idiome que les
         // sections de COMPOSANTS-OPS) : cet oracle suspend l'ouverture de run sur un FAIL, et la
         // règle est née le 15/09. Un fichier revu avant, ou jamais daté, est relevé au non_juge —
         // mesuré au parc : 12 écarts, tous antérieurs — et exigé à sa prochaine revue datée.
-        if (restes.length && vDst && vDst >= SEUIL_HERITES_1119) {
+        if (restes.length && dateJugee && dateJugee >= SEUIL_HERITES_1119) {
           ko("R-20", a.cible, `${restes.length} marqueur(s) du gabarit ${a.source} NON INSTANCIÉ(S) dans ce fichier hérité — `
-            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`);
+            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`
+            + (vDst ? "" : ` — sans verifie_le, daté du ${ne.date} par son ${ne.source} (TF-1698)`));
         } else if (restes.length) {
-          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || "non daté"} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
+          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || (ne ? `non daté, né le ${ne.date} (${ne.source}, TF-1698)` : "non daté")} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
         }
         if (vDst && (vDst === vSrc || vDst === a.depuis)) {
           ok("R-20", a.cible, `AVERTISSEMENT, non bloquant : verifie_le=${vDst} est la date du GABARIT, pas celle d'une revue du produit — `
@@ -1270,9 +1301,10 @@ const envEx = [".env.example", ".env.exemple"].map((n) => p(n)).find((f) => exis
 // Un produit web qui se dirait documentaire pour échapper à R-13 reste donc vu.
 const type13 = typeProjetDeclare(cible);
 const signaux13 = type13 ? signauxLogicielOuSite(cible) : [];
-if (type13 && type13.type !== TYPE_DOCUMENTAIRE) {
-  ko("R-13", type13.ou, `type_projet « ${type13.type} » inconnu — seul « ${TYPE_DOCUMENTAIRE} » est lu, et une déclaration illisible n'exempte de rien (TF-1439)`);
-} else if (type13 && signaux13.length) {
+if (type13 && !TYPES_PROJET.includes(type13.type)) {
+  ko("R-13", type13.ou, `type_projet « ${type13.type} » inconnu — seuls ${TYPES_PROJET.map((t) => `« ${t} »`).join(" et ")} sont lus, et une déclaration illisible n'exempte de rien (TF-1439, TF-1699)`);
+} else if (type13 && type13.type === TYPE_DOCUMENTAIRE && signaux13.length) {
+  // TF-1699 : un service a du code par nature ; seul le documentaire se confronte aux signaux de logiciel.
   ko("R-13", type13.ou, `projet déclaré « ${TYPE_DOCUMENTAIRE} », mais le dépôt porte ${signaux13.length} signal(aux) de logiciel ou de site : `
     + `${signaux13.slice(0, 5).join(", ")}${signaux13.length > 5 ? `, et ${signaux13.length - 5} autre(s)` : ""} — `
     + `la déclaration ne vaut que pour un projet sans code ni site. Retirer la ligne « type_projet: ${TYPE_DOCUMENTAIRE} » de l'en-tête du carnet `

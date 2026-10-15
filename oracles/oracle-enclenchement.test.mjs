@@ -32,8 +32,8 @@ const MECANISME_REEL = join(PARC_REEL, MECANISME);
 if (!existsSync(MECANISME_REEL) || !interpretePython()) {
   // TF-1477 — la forme comptée (TF-1434), lue par `nonJouesDe` : sans elle, le cliquet du harnais
   // (oracles\self-tests.mjs) range cette recette parmi les « sans compte lisible » au lieu de
-  // compter ses 27 cas comme déclarés non joués sur ce poste.
-  console.log(`  [NON JOUÉ] 27 cas — ${existsSync(MECANISME_REEL)
+  // compter ses 30 cas comme déclarés non joués sur ce poste.
+  console.log(`  [NON JOUÉ] 30 cas —${existsSync(MECANISME_REEL)
     ? "aucun interpréteur Python"
     : `forge-tests absente (${MECANISME_REEL})`} : le mécanisme de confrontation réel n'est pas joignable`);
   process.exit(0);
@@ -160,6 +160,34 @@ try {
     if (nomNormalise("oracle-conformite-projet (audit complet)") !== "oracle-conformite-projet") throw new Error("annotation non retirée");
     const r = juger({ ledger: ledger(P, [ouvrir(MOB), v("oracles/oracle-a1.mjs --json"), v("ORACLE-A2.MJS"), v("oracle-b1 (relevé)"), clore]), racine: P });
     if (r.verdict !== "PASS") throw new Error(r.verdict);
+  });
+
+  // ---- TF-1715 (15/10/2026) : une déclaration fausse de `forges_mobilisees` se rectifie PAR AJOUT ----
+  // Le fait : un run_open a déclaré à tort une forge mobilisée ; aucune entrée ne le rectifiait, et le
+  // run a dû passer `--forges` au juge. Rouge sur l'ancien code : la forge déclarée à tort reste exigée.
+  check("VERT TF-1715 — une `rectification_forges_mobilisees` postérieure remplace la liste du run_open, et le juge dit d'où il la tient", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ forges_mobilisees: ["alpha", "beta"] }), v("oracle-a1"), v("oracle-a2"),
+      { type: "rectification_forges_mobilisees", forges_mobilisees: ["alpha"], cause: "beta déclarée à tort au run_open" }, clore]), racine: P });
+    if (r.verdict !== "PASS") throw new Error(`${r.verdict} — la forge retirée par rectification est encore exigée : ${JSON.stringify(en1(r, "digit-ai-forge-beta"))}`);
+    if (en1(r, "digit-ai-forge-beta")) throw new Error("la forge rectifiée est encore confrontée");
+    if (!/rectification_forges_mobilisees \(seq 4\)/.test(r.forges_mobilisees?.source || "")) throw new Error(`source non dite : ${r.forges_mobilisees?.source}`);
+  });
+  check("ROUGE TF-1715 — une rectification SANS cause ou à liste vide ne rectifie rien : la liste du run_open reste jugée, et c'est dit", () => {
+    for (const rect of [{ forges_mobilisees: ["alpha"] }, { forges_mobilisees: [], cause: "x" }]) {
+      const r = juger({ ledger: ledger(P, [ouvrir({ forges_mobilisees: ["alpha", "beta"] }), v("oracle-a1"), v("oracle-a2"),
+        { type: "rectification_forges_mobilisees", ...rect }, clore]), racine: P });
+      if (r.verdict !== "FAIL" || en1(r, "digit-ai-forge-beta")?.statut !== "FAIL") throw new Error(`${r.verdict} — une rectification incomplète a éteint la promesse de beta`);
+      if (!r.non_juge.some((x) => /rectification_forges_mobilisees/.test(x) && /seq 4/.test(x))) throw new Error("la rectification ignorée n'est pas dite");
+    }
+  });
+  check("BORNE TF-1715 — `--forges` prime sur la rectification ; une rectification d'un AUTRE run ne compte pas", () => {
+    const l = ledger(P, [ouvrir({ forges_mobilisees: ["alpha"], run: "v1" }),
+      { type: "rectification_forges_mobilisees", forges_mobilisees: ["beta"], cause: "test" }, clore,
+      ouvrir({ forges_mobilisees: ["alpha"], run: "v2" }), v("oracle-a1"), v("oracle-a2"), clore]);
+    const r = juger({ ledger: l, racine: P });
+    if (r.verdict !== "PASS" || r.forges_mobilisees?.source !== "run_open.forges_mobilisees") throw new Error(`${r.verdict} ${r.forges_mobilisees?.source}`);
+    const o = juger({ ledger: l, racine: P, run: "v1", forges: "alpha" });
+    if (o.forges_mobilisees?.source !== "--forges") throw new Error(`--forges ne prime pas : ${o.forges_mobilisees?.source}`);
   });
 
   // ---- EN1, sens rouge ----------------------------------------------------------------------------

@@ -288,6 +288,29 @@ try {
     att(etat.etat === "absent", `état « ${etat.etat} » : un artefact SANS conditionnel ne doit jamais être exempté par type_projet`);
   });
 
+  // TF-1699 (15/10/2026) — le type « service » (sans site public) exempte les artefacts de site
+  // comme R-27, MÊME avec du code ; un fichier de site le contredit.
+  const ecrireCarnetService = (produit) => {
+    mkdirSync(join(produit, "forge", "travaux"), { recursive: true });
+    writeFileSync(join(produit, ...CARNET.split("/")), "---\ntype_projet: service\n---\n\n## Type de projet : service sans site public\n", "utf8");
+  };
+  check("TF-1699 — un artefact de site est SANS_OBJET chez un service déclaré, code compris", () => {
+    const produit = join(T, "_ClientService");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    ecrireCarnetService(produit);
+    writeFileSync(join(produit, "server.py"), "print(1)\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_SITE, pilot);
+    att(etat.etat === "sans_objet" && /service/.test(etat.motif || ""), `état « ${etat.etat} » (${etat.motif || ""}) : le type service n'est pas lu`);
+  });
+  check("TF-1699 borne — un service qui porte un fichier de site (sitemap.xml) : l'artefact reste ABSENT", () => {
+    const produit = join(T, "_ClientFauxService");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    ecrireCarnetService(produit);
+    writeFileSync(join(produit, "sitemap.xml"), "<urlset/>\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_SITE, pilot);
+    att(etat.etat === "absent", `état « ${etat.etat} » : un service contredit par un fichier de site ne doit rien exempter`);
+  });
+
   check("le relevé compte les exemptions à part, ni manque ni conforme", () => {
     const produit = join(T, "_ClientDocumentaireCompte");
     mkdirSync(join(produit, "forge"), { recursive: true });
