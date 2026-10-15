@@ -2399,6 +2399,36 @@ check("TF-1614 rouge : un llms.txt instancié par le projet redevient un signal 
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1699 (15/10/2026) — le type « service » : R-27 sans objet, R-13 jamais exemptée -----------
+// Le fait (lot Produit-82 20261014a, RT-4) : une passerelle d'API sans site a reçu robots.txt et
+// llms.txt. Vert : adopté `--type service` (vraie adoption), R-27 SANS_OBJET qui nomme la déclaration,
+// type reconnu (jamais « inconnu »), R-13 jugée comme partout. Rouge : un fichier de site entré après
+// la déclaration la contredit → R-27 FAIL qui nomme la déclaration et le fichier.
+const projetService = (fichiers) => {
+  const d = projet1439(fichiers);
+  const a = adopter1439(d, { type: "service" });
+  if (a.verdict !== "ADOPTE") throw new Error(`adoption service : ${a.verdict} — ${a.motif}`);
+  return d;
+};
+check("TF-1699 vert : un service adopté `--type service` → R-27 SANS_OBJET qui nomme la déclaration ; R-13 jugée (FAIL sans .env.example), jamais « type inconnu »", () => {
+  const d = projetService({ "src/server.py": "print(1)\n", "requirements.txt": "x==1\n" });
+  try {
+    const f = r1439(d);
+    const f27 = f.filter((x) => x.regle === "R-27"), f13 = f.filter((x) => x.regle === "R-13");
+    if (f27.some((x) => x.statut === "FAIL") || !f27.some((x) => x.statut === "SANS_OBJET" && /service/.test(x.message) && /ECARTS-ASSUMES/.test(x.message))) throw new Error(`R-27 : ${JSON.stringify(f27)}`);
+    if (f13.some((x) => /inconnu/.test(x.message))) throw new Error(`le type service est lu comme inconnu : ${JSON.stringify(f13)}`);
+    if (f13.some((x) => x.statut === "SANS_OBJET") || !f13.some((x) => x.statut === "FAIL" && /absent/.test(x.message))) throw new Error(`R-13 exemptée pour un service : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1699 rouge : un service qui gagne un fichier de site (sitemap.xml) → R-27 FAIL qui nomme la déclaration et le signal", () => {
+  const d = projetService({ "src/server.py": "print(1)\n" });
+  try {
+    writeFileSync(join(d, "sitemap.xml"), "<urlset/>\n", "utf8");
+    const f27 = r1439(d).filter((x) => x.regle === "R-27");
+    if (!f27.some((x) => x.statut === "FAIL" && /déclaré « service »/.test(x.message) && /sitemap\.xml/.test(x.message))) throw new Error(`la déclaration contredite passe : ${JSON.stringify(f27)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- TF-1615 (13/10/2026) — R-20 ter lit les marqueurs du gabarit llms.txt (AVERTISSEMENT) -------
 // Le fait (RP-6) : le llms.txt posé par l'adoption garde `{Produit}`, `{Accueil}` sans qu'aucune règle
 // le dise. Règle neuve : avertissement non bloquant (PASS imprimé), jamais un FAIL (précédent D-70 (b)).

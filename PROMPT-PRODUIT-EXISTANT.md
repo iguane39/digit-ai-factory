@@ -36,6 +36,8 @@ Phase 0 et 0 bis — installation ET adoption, sans me poser AUCUNE question :
    aucun robots.txt/llms.txt/sitemap.xml) — un projet purement documentaire —, l'adoption
    s'est faite au type par défaut : dis-le, et propose `--type documentaire` au premier run
    de version (TF-1439, R-13 exempte ce type tant qu'aucun signal de code ou de site n'entre).
+   Si c'est un service SANS site public (API, traitement), propose de même `--type service`
+   (TF-1699 : robots.txt et llms.txt écartés, R-13 reste due).
 4. Retiens la racine qu'il affiche comme FORGE_ROOT pour toute la session.
 5. Relis-moi la section « Écart initial à l'adoption » que l'outil a écrite dans
    forge\travaux\ECARTS-ASSUMES.md. Ne tranche AUCUN de ces écarts maintenant : ils se

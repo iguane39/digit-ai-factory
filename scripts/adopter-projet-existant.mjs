@@ -60,7 +60,10 @@
  * signal de logiciel ou de site (code, manifeste de dépendances, fichier de site) la fait refuser
  * ici, et rougir R-13 là-bas — un produit web ne s'exempte pas en se disant documentaire.
  *
- * Usage : node <PILOT_ROOT>\scripts\adopter-projet-existant.mjs <racine du projet> [--essai] [--type documentaire]
+ * TYPE « service » (TF-1699, 15/10/2026) : service sans site public — `robots.txt` et `llms.txt`
+ * écartés comme pour le type documentaire, R-13 jamais exemptée ; confronté aux seuls signaux de site.
+ *
+ * Usage : node <PILOT_ROOT>\scripts\adopter-projet-existant.mjs <racine du projet> [--essai] [--type documentaire|service]
  *         node <PILOT_ROOT>\scripts\adopter-projet-existant.mjs <clone du tiers> --hors-depot <socle> [--essai]  (TF-1658)
  *         node <PILOT_ROOT>\scripts\adopter-projet-existant.mjs --verifier-tiers <socle>  (exit 0 intact, 1 écrit, 2 sans objet)
  *   À lancer PAR LE PROJET, depuis son dépôt — le pilot n'écrit jamais chez un produit de
@@ -100,8 +103,18 @@ export function estVivant(racine) {
 }
 
 // ---- TF-1439 · LE TYPE DE PROJET « documentaire » ---------------------------------------------
-/** Le seul type que l'adoption sait poser, et que la conformité sait lire. */
+/** Le type d'un projet sans logiciel ni site (TF-1439). */
 export const TYPE_DOCUMENTAIRE = "documentaire";
+/**
+ * TF-1699 (15/10/2026) — le type d'un SERVICE SANS SITE PUBLIC (passerelle d'API, traitement, outil
+ * interne). Le fait, lot Produit-82 20261014a (RT-4) : une passerelle d'API a reçu `robots.txt` et
+ * `llms.txt`, que R-27 réserve au produit à surface web, et R-20 ter avertissait sur `llms.txt` à
+ * chaque ouverture. Le type écarte ces deux fichiers comme le type documentaire, mais n'exempte PAS
+ * R-13 : un service a du code, donc des variables. Il se confronte aux seuls signaux de SITE.
+ */
+export const TYPE_SERVICE = "service";
+/** Les types que l'adoption sait poser et que la conformité sait lire. */
+export const TYPES_PROJET = [TYPE_DOCUMENTAIRE, TYPE_SERVICE];
 /** Le `conditionnel` du contrat d'héritage qu'un projet documentaire écarte (R-27). */
 export const CONDITION_SITE = "produit à surface web";
 /** Où vit la déclaration : l'en-tête du carnet des écarts assumés, que l'adoption pose toujours. */
@@ -160,6 +173,23 @@ export function signauxLogicielOuSite(racine, pilot = PILOT) {
     if (web) trouves.push(`docs/projet/PARAMETRAGE.md (racine web déclarée : ${web[1].trim()})`);
   }
   return trouves.sort();
+}
+
+/** TF-1699 : les seuls signaux de SITE (fichier de site, racine web déclarée) — ce qui contredit un service. */
+export function signauxDeSite(racine, pilot = PILOT) {
+  return signauxLogicielOuSite(racine, pilot).filter((s) => /\(fichier de site\)$|racine web déclarée/.test(s));
+}
+
+/**
+ * Le type déclaré qui écarte la surface web, CONFRONTÉ au dépôt (TF-1439, TF-1699) : documentaire sans
+ * aucun signal de logiciel ni de site, ou service sans aucun signal de site. Rend `{ type, ou }` ou null.
+ */
+export function surfaceWebEcarteePar(racine, pilot = PILOT) {
+  const t = typeProjetDeclare(racine);
+  if (!t) return null;
+  if (t.type === TYPE_DOCUMENTAIRE && !signauxLogicielOuSite(racine, pilot).length) return t;
+  if (t.type === TYPE_SERVICE && !signauxDeSite(racine, pilot).length) return t;
+  return null;
 }
 
 // ---- TF-1659 · LA RACINE SERVIE ------------------------------------------------------------------
@@ -282,6 +312,16 @@ export function blocEcartDocumentaire(ecartes, quand) {
     ""].join("\n");
 }
 
+/** TF-1699 : l'écart qu'un service sans site public assume, avec les quatre champs que le carnet exige. */
+export function blocEcartService(ecartes, quand) {
+  return ["", "## Type de projet : service sans site public — surface web écartée", "",
+    `- **objet** : ${ecartes.length ? ecartes.map((c) => `\`${c}\``).join(" et ") : "aucun artefact"} (dus au seul « ${CONDITION_SITE} » par le contrat d'héritage, R-27). R-13 n'est PAS écartée : un service a du code, ses variables se déclarent au \`.env.example\`.`,
+    "- **motif** : service sans site public (passerelle d'API, traitement, outil interne). À l'adoption, aucun fichier de site ni racine web déclarée n'a été relevé ; il n'y a donc aucune surface à ouvrir aux agents IA de recherche.",
+    `- **date** : ${quand}`,
+    "- **reouverture** : le premier fichier de site (`robots.txt`, `llms.txt`, `sitemap.xml`) ou la première `racine_web:` déclarée. `oracle-conformite-projet` le relève alors sous R-27, et la ligne `type_projet: service` de l'en-tête de ce carnet se retire.",
+    ""].join("\n");
+}
+
 /**
  * Le relevé : pour chaque artefact du contrat et chaque répertoire exigé, `{ cible, mode, etat }`
  * où `etat` vaut `present` (laissé intact) ou `absent` (à poser). Aucune écriture ici.
@@ -356,8 +396,8 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
   if (!existsSync(cible) && !(tiers && essai)) {
     return { verdict: "REFUS", motif: `dossier introuvable : ${cible}`, faits: [] };
   }
-  if (type !== null && type !== TYPE_DOCUMENTAIRE) {
-    return { verdict: "REFUS", motif: `type de projet « ${type} » inconnu — seul « ${TYPE_DOCUMENTAIRE} » est admis ; sans \`--type\`, l'adoption pose tout le contrat d'héritage`, faits: [] };
+  if (type !== null && !TYPES_PROJET.includes(type)) {
+    return { verdict: "REFUS", motif: `type de projet « ${type} » inconnu — seuls ${TYPES_PROJET.map((t) => `« ${t} »`).join(" et ")} sont admis ; sans \`--type\`, l'adoption pose tout le contrat d'héritage`, faits: [] };
   }
   if (existsSync(join(cible, "forge"))) {
     return {
@@ -382,13 +422,26 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
       };
     }
   }
+  // TF-1699 : la déclaration « service » se confronte aux seuls signaux de SITE ; le code est attendu.
+  const service = type === TYPE_SERVICE;
+  if (service) {
+    const site = signauxDeSite(cible, pilot);
+    if (site.length) {
+      return {
+        verdict: "REFUS",
+        motif: `type « ${TYPE_SERVICE} » refusé : le projet porte ${site.length} signal(aux) de site — ${site.slice(0, 5).join(", ")}. `
+          + "Un service sans site public n'a ni fichier de site ni racine web ; adopter sans `--type`, qui pose tout le contrat d'héritage",
+        faits: [],
+      };
+    }
+  }
 
   const releve = relever(cible, pilot);
-  if (documentaire) for (const r of releve) if (r.conditionnel === CONDITION_SITE && r.etat === "absent") r.etat = "ecarte";
+  if (documentaire || service) for (const r of releve) if (r.conditionnel === CONDITION_SITE && r.etat === "absent") r.etat = "ecarte";
   // TF-1658 : le socle d'un dépôt tiers n'a pas de surface web ; celle du tiers ne se touche pas.
   if (tiers) for (const r of releve) if (r.conditionnel === CONDITION_SITE && r.etat === "absent") r.etat = "ecarte_tiers";
   // TF-1659 : la surface web va sous la racine SERVIE quand le dépôt en a une hors de sa racine.
-  const servies = documentaire || tiers ? [] : racinesServies(cible);
+  const servies = documentaire || service || tiers ? [] : racinesServies(cible);
   if (servies.length) for (const r of releve) {
     if (r.conditionnel !== CONDITION_SITE || r.etat !== "absent") continue;
     if (servies.length > 1) { r.etat = "ambigu"; continue; }
@@ -411,7 +464,9 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
       continue;
     }
     if (r.etat === "ecarte") {
-      faits.push({ quoi: "artefact", cible: r.cible, mode: r.mode, action: `ÉCARTÉ — projet documentaire, dû au seul « ${CONDITION_SITE} » (TF-1439) — écart consigné au carnet` });
+      faits.push({ quoi: "artefact", cible: r.cible, mode: r.mode, action: service
+        ? `ÉCARTÉ — service sans site public, dû au seul « ${CONDITION_SITE} » (TF-1699) — écart consigné au carnet`
+        : `ÉCARTÉ — projet documentaire, dû au seul « ${CONDITION_SITE} » (TF-1439) — écart consigné au carnet` });
       continue;
     }
     if (r.etat === "ecarte_tiers") {
@@ -449,12 +504,14 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
     if (!essai) {
       mkdirSync(dirname(carnet), { recursive: true });
       let avant = existsSync(carnet) ? readFileSync(carnet, "utf8").replace(/\s*$/, "\n") : "";
-      if (documentaire) avant = declarerType(avant);
+      if (documentaire || service) avant = declarerType(avant, type);
       writeFileSync(carnet, avant + bloc + (documentaire ? blocEcartDocumentaire(ecartes, quand) : "")
+        + (service ? blocEcartService(ecartes, quand) : "")
         + (servies.length ? blocSurfaceWeb(servies, quand) : "") + (tiers ? blocDepotTiers(tiers, quand) : "") + "\n", "utf8");
     }
     faits.push({ quoi: "carnet", cible: relative(cible, carnet), action: "écart initial consigné, en ajout" });
     if (documentaire) faits.push({ quoi: "carnet", cible: relative(cible, carnet), action: `type_projet: ${TYPE_DOCUMENTAIRE} déclaré en en-tête, écart « Type de projet : documentaire » consigné (TF-1439)` });
+    if (service) faits.push({ quoi: "carnet", cible: relative(cible, carnet), action: `type_projet: ${TYPE_SERVICE} déclaré en en-tête, écart « Type de projet : service sans site public » consigné (TF-1699)` });
     if (servies.length) faits.push({ quoi: "carnet", cible: relative(cible, carnet), action: `racine servie ${servies.length === 1 ? `relevée sous ${servies[0]}` : `ambiguë (${servies.join(", ")})`} consignée (TF-1659)` });
   }
 
@@ -476,7 +533,7 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
   const laisses = faits.filter((f) => /LAISSÉ INTACT/.test(f.action)).length;
   return {
     verdict: essai ? "ESSAI" : "ADOPTE",
-    racine: cible, tiers, servies, vivant: estVivant(cible), poses, laisses, type: documentaire ? TYPE_DOCUMENTAIRE : null, ecartes: ecartes.length,
+    racine: cible, tiers, servies, vivant: estVivant(cible), poses, laisses, type: documentaire || service ? type : null, ecartes: ecartes.length,
     faits,
     non_juge: [
       "la CONVENTION de nommage des livrables déjà présents : aucun fichier n'est renommé, aucun n'est rangé — l'adoption ne déplace rien, et le premier run de version tranchera",
@@ -485,6 +542,7 @@ export function adopter(racine, { pilot = PILOT, essai = false, quand = new Date
       "un artefact `copie_conforme` PRÉEXISTANT n'est pas comparé à sa source ici : l'adoption le laisse et l'inscrit au carnet, et c'est `relever-heritage.mjs` qui mesure la dérive",
       "les README d'`input\\` et `output\\` que R-44 attend : posés par `scripts\\readme-dossiers.mjs --base .`, un geste distinct, nommé dans la sortie",
       ...(documentaire ? ["le type documentaire n'allège pas `docs\\projet\\` : les 8 fiches de R-20 naissent à l'ouverture du run, et ce qui est sans objet s'y déclare fiche par fiche (TF-1439)"] : []),
+      ...(service ? ["le type service n'exempte PAS R-13 : un service a du code, ses variables se déclarent au `.env.example` à l'ouverture du run ; seule la surface web (R-27) est écartée (TF-1699)"] : []),
     ],
   };
 }
@@ -515,9 +573,10 @@ if (lanceEnDirect) {
   const dossier = args.find((a, i) => !a.startsWith("--") && i !== iValeurType && i !== iValeurHors);
   if (horsDepot === "") { console.error("usage : --hors-depot <dossier du socle, à côté du dépôt du tiers>"); process.exit(2); }
   if (!dossier || type === "") {
-    console.error("usage : node <PILOT_ROOT>\\scripts\\adopter-projet-existant.mjs <racine du projet> [--essai] [--type documentaire] [--hors-depot <socle>]\n"
+    console.error("usage : node <PILOT_ROOT>\\scripts\\adopter-projet-existant.mjs <racine du projet> [--essai] [--type documentaire|service] [--hors-depot <socle>]\n"
       + "  À lancer PAR LE PROJET, depuis son dépôt — l'adoption est un geste que le projet demande.\n"
-      + "  --type documentaire : projet sans logiciel ni site — robots.txt et llms.txt écartés, déclaration lue par R-13 et R-27.");
+      + "  --type documentaire : projet sans logiciel ni site — robots.txt et llms.txt écartés, déclaration lue par R-13 et R-27.\n"
+      + "  --type service : service sans site public (API, traitement) — robots.txt et llms.txt écartés, R-13 reste due (TF-1699).");
     process.exit(2);
   }
   const r = adopter(dossier, { essai, type, horsDepot });

@@ -17,6 +17,11 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { adopter, relever, estVivant, blocEcartInitial, contratHeritage, REPERTOIRES,
   TYPE_DOCUMENTAIRE, CONDITION_SITE, CARNET, signauxLogicielOuSite, typeProjetDeclare, declarerType, verifierDepotTiers } from "./adopter-projet-existant.mjs";
+// TF-1699 : importés à part, par l'espace de noms, pour que l'ancien code rende des cas ROUGES
+// (exports absents) au lieu d'un échec d'import qui ne prouverait rien.
+import * as ADOPTION from "./adopter-projet-existant.mjs";
+const TYPE_SERVICE = ADOPTION.TYPE_SERVICE || "service";
+const signauxDeSite = (...a) => { if (!ADOPTION.signauxDeSite) throw new Error("signauxDeSite absent"); return ADOPTION.signauxDeSite(...a); };
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -248,6 +253,35 @@ try {
   check("REFUS — un type inconnu est refusé, jamais deviné", () => {
     const r = adopter(projet({ "notes/a.md": "# a\n" }), { pilot: PILOT, type: "docu" });
     att(r.verdict === "REFUS" && /« docu » inconnu/.test(r.motif), `verdict ${r.verdict} — ${r.motif}`);
+  });
+
+  // ── TF-1699 : le type « service » (sans site public) — surface web écartée, R-13 jamais ─────
+  // Le fait du 14/10 : une passerelle d'API sans site public a reçu robots.txt et llms.txt, que R-27
+  // réserve au produit à surface web, et R-20 ter avertit sur llms.txt à chaque ouverture.
+  check("TF-1699 rouge → vert — un SERVICE (code, manifeste) adopté `--type service` : robots.txt et llms.txt écartés, type déclaré, R-13 non exemptée", () => {
+    const d = projet({ "src/server.py": "print(1)\n", "requirements.txt": "fastapi==0.1\n", "README.md": "# Passerelle\n" });
+    const r = adopter(d, { pilot: PILOT, type: TYPE_SERVICE, quand: "2026-10-15" });
+    att(r.verdict === "ADOPTE" && r.type === TYPE_SERVICE, `verdict ${r.verdict}, type ${r.type} — ${r.motif || ""}`);
+    for (const c of conditionnels) {
+      att(!existsSync(join(d, c)), `${c} a été posé sur un service sans site public`);
+      att(r.faits.some((f) => f.cible === c && /ÉCARTÉ — service sans site public/.test(f.action)), `${c} n'est pas nommé ÉCARTÉ`);
+    }
+    const t = readFileSync(join(d, CARNET), "utf8");
+    att(/^type_projet: service\s*$/m.test(/^---\r?\n([\s\S]*?)\r?\n---/.exec(t)[1]), "la déclaration n'est pas dans l'en-tête du carnet");
+    att(/^## Type de projet : service sans site public/m.test(t) && /R-13/.test(t), "l'écart « service » n'est pas consigné, ou ne dit pas que R-13 reste due");
+    att(typeProjetDeclare(d)?.type === TYPE_SERVICE, "le lecteur ne relit pas la déclaration");
+    att(r.non_juge.some((l) => /R-13/.test(l) && /service/.test(l)), "le non_juge ne dit pas que R-13 reste exigée");
+  });
+  check("TF-1699 REFUS service — un fichier de SITE contredit la déclaration (sitemap.xml), et rien n'est écrit", () => {
+    const d = projet({ "src/server.py": "x\n", "sitemap.xml": "<urlset/>\n" });
+    const avant = readdirSync(d).sort().join(",");
+    const r = adopter(d, { pilot: PILOT, type: TYPE_SERVICE });
+    att(r.verdict === "REFUS" && /sitemap\.xml \(fichier de site\)/.test(r.motif), `verdict ${r.verdict} — ${r.motif}`);
+    att(readdirSync(d).sort().join(",") === avant, "le refus a écrit sur le disque");
+  });
+  check("TF-1699 signaux — signauxDeSite ne compte pas le code ni les manifestes, compte un fichier de site et une racine web déclarée", () => {
+    att(signauxDeSite(projet({ "src/a.ts": "x\n", "package.json": "{}\n" })).length === 0, "du code compte comme un site");
+    att(signauxDeSite(projet({ "docs/projet/PARAMETRAGE.md": "---\nracine_web: public\n---\n" })).length === 1, "une racine web déclarée ne compte pas");
   });
 
   check("ESSAI documentaire — rien n'est écrit, et les écartés sont déjà nommés", () => {
