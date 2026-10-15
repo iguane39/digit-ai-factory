@@ -39,8 +39,11 @@ const [nom, ...options] = process.argv.slice(2);
 // `droits-accordes` (13/10/2026, TF-1528) : hook PostToolUse joué à chaque écriture d'un script ou d'un fichier
 // d'infrastructure — le contrôle des droits accordés (identifiants Graph, échec masqué, succès sans relecture)
 // se joue quand le produit écrit le script, pas à la mise en production. Avertit, ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes"]);
-if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee | droits-accordes)`); process.exit(0); }
+// `identite-sortante` (15/10/2026, TF-1716, retour RT-5 du 14/10) : hook PreToolUse sur Bash, PowerShell et
+// WebFetch — R-62 (aucune donnée d'identité de l'utilisateur vers un service tiers sans sa demande) se joue
+// sur l'outil qui émet la requête : l'adresse de l'utilisateur, ou une adresse dans un User-Agent, refusée. Bloque.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante"]);
+if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee | droits-accordes | identite-sortante)`); process.exit(0); }
 
 const candidats = [
   process.env.FORGE_ROOT && join(process.env.FORGE_ROOT, "digit-ai-factory"),

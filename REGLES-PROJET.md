@@ -1674,3 +1674,106 @@ la clôture », et rien ne le jouait là.
 Contrôle exécutable : la règle R-60 d'`oracles\oracle-conformite-projet.mjs`, rejoué avant
 `run_close` (`references\ETAPES-RUN.md`, étape 1), recette `oracles\self-test.mjs` à double sens
 (8 cas, dont le remède joué).
+
+## AP. R-61 — « livré » a une définition opposable : toutes les exigences de la fiche, seuls les secrets restant à saisir (TF-1708, TF-1709, TF-1711 — 15/10/2026)
+
+Trois faits du même run, lots `Produit-82 - RETOURS - 20261014f`, `g` et `i`. Le 14/10/2026, une
+restitution jugée PASS sur 63 règles annonçait un service déployé sans son adresse au bloc 0 ni au
+verdict : « L'URL n'est même pas fournie avec le prompt, ce n'est pas normal ». La version corrigée,
+PASS sur 65 règles, déclarait « P4 close » et « le brief mené jusqu'au bout » pour un service qui ne
+servait que des réponses de mock, sans clé de fournisseur, sans page d'accueil, et que le navigateur
+rendait en 401 : « Comment est-ce qu'on peut considérer que le produit est fini et livré ? ». Le run
+avait clos ses phases avec 10 exigences sur 35 non tenues. Consigne humaine, mot pour mot : « Il faut
+que tout soit implémenté, que l'administrateur de l'appli n'ait qu'à saisir les clés à la fin pour que
+cela soit utilisable complètement. Et remonte ce point à la Factory pour les futurs produits ». Le tour
+suivant a implémenté les 10 exigences et la saisie guidée des clés, en une recette de 33 tests.
+
+**R-61.**
+1. **Un produit n'est « livré » que si toutes les exigences de sa fiche sont implémentées et
+   testées.** Seuls les secrets (clés de fournisseurs, jetons, mots de passe) restent à la main de
+   l'administrateur, et ils se saisissent par un geste guidé unique et documenté. Le critère de sortie
+   d'une phase ou d'un brief tenu n'est pas une livraison : il se dit « phase close », jamais « livré ».
+2. **Un run qui s'arrête avant le dit.** Sa restitution écrit « N exigences sur M tenues » au bloc 0 ou
+   au verdict, nomme ce qui reste, et n'emploie ni « livré », ni « fini », ni « complet ».
+3. **Un verdict de livraison se mesure du côté de l'utilisateur.** Il dit, au bloc 0 ou au verdict, ce
+   qu'un utilisateur peut faire du livrable à l'instant, et ce qui manque pour un usage réel, ou que
+   rien ne manque. La mesure se fait par l'usage : ouvrir l'adresse, appeler un vrai point d'accès.
+4. **Un service déployé ou une page publiée se nomme par son adresse cliquable** au bloc 0 et en tête
+   du verdict, avec le geste pour s'en servir : point d'accès, emplacement de la clé, commande d'essai.
+5. **Ce que R-61 ne juge pas** : que les exigences comptées soient les bonnes, que l'usage décrit soit
+   vrai, qu'un écart accepté par l'humain soit encore d'actualité. Le compte et l'usage se lisent dans
+   la restitution ; leur justesse relève des oracles du produit et du contrat « prêt client ».
+
+Contrôles exécutables : les règles S70 (point 4), S71 (point 3) et S72 (points 1 et 2)
+d'`oracles\oracle-synthese.mjs`, avertissantes à leur entrée, fixtures double sens au self-test ;
+texte hérité par les produits dans `gabarits\RESTITUTION.md` (v2.38.0, bloc 2). Mesure d'entrée : 0
+accusation sur les 241 synthèses d'`output\04-plans\`, 3 sur 15 restitutions écrites des produits, les
+3 restitutions contestées du 14/10.
+
+## AQ. R-62 — aucune donnée d'identité de l'utilisateur ne part vers un service tiers sans sa demande (TF-1716 — 15/10/2026)
+
+Le fait, lot `Produit-83 - RETOURS - 20261014a` (RT-5) : le 14/10/2026, pendant un run de conception,
+la session a placé l'adresse électronique de l'utilisateur dans l'en-tête `User-Agent` d'un appel à une
+API publique tierce, sans qu'il l'ait demandé. Aucune garde ne l'a vu ; les appels suivants portaient
+un en-tête neutre. Une donnée envoyée ne se reprend pas. Classe : `secret-porte-hors-perimetre`,
+récidive de TF-0616 et TF-1284.
+
+**R-62.**
+1. **Une requête vers un service tiers ne porte aucune donnée d'identité de l'utilisateur** (adresse
+   électronique, nom, téléphone) dans son adresse, ses en-têtes ou son corps, sauf demande explicite
+   de sa part. Un en-tête `User-Agent` ou `From` reste neutre : le nom de l'outil, jamais une adresse.
+2. **La demande explicite se lit** : l'utilisateur a donné l'adresse dans la conversation pour cet
+   usage, ou il a posé `FORGE_IDENTITE_GO` avant d'ouvrir la session. Une API qui « recommande » un
+   contact dans l'agent pose une question à l'humain ; elle ne vaut pas demande.
+3. **Ce que R-62 ne juge pas** : une requête émise par un script dont le texte n'est pas dans la
+   commande, les données d'identité autres que l'adresse électronique, les outils `mcp__*` connectés.
+
+Contrôle exécutable : `oracles\hook-identite-sortante.mjs`, hook `PreToolUse` sur `Bash`, `PowerShell`
+et `WebFetch`, qui refuse une requête vers un hôte tiers portant une adresse de l'utilisateur
+(`git config user.email`, liste `FORGE_IDENTITES`) ou une adresse dans un en-tête `User-Agent` ou `From`
+(recette `oracles\hook-identite-sortante.test.mjs`, 8 cas à double sens dont le remède joué). Câblé au
+pilot par `.claude\settings.json`, chez un produit par `forge\hooks\factory.mjs identite-sortante`
+(`gabarits\settings-produit.json`).
+
+## AR. R-63 — une sortie automatisée se juge sur un échantillon étiqueté hors du système, et sa version améliorée sur ses effets (TF-1694, TF-1695 — 15/10/2026)
+
+Le fait, lot `Produit-12 - RETOURS - 20261014a` (RS-31, RS-32) et ses deux pièces jointes. Le
+classement de 9 662 fichiers affichait 97 % de fichiers rangés en norme 2.7, toutes portes vertes.
+Mesuré sur 150 fichiers tirés au hasard et étiquetés par trois agents qui ne voyaient pas le résultat,
+le dossier était juste dans 63,3 % des cas (intervalle de Wilson 55,4 à 70,6), 66,0 % après deux
+versions. Jusqu'à la 2.9, la seule relecture était celle de l'auteur des règles. Dans la boucle
+d'amélioration qui a suivi, la v2.11 gagnait 2,7 points sur l'échantillon sans un faux, mais ses 201
+changements dans la population comptaient 4 faux sur 12 relus ; la v2.10 annonçait une correction qui
+ne touchait aucune ligne existante ; un test de la v2.14 passait aussi sur le code précédent.
+
+**R-63.**
+1. **Une sortie qui trie, classe, range ou rédige à la place d'un humain se juge sur un échantillon
+   étiqueté par le métier, hors du système, et sur les conséquences de ses erreurs** — jamais sur son
+   taux d'affectation ni sur sa conformité aux règles qu'elle s'est données. Les six règles PC-1 à PC-6
+   du produit s'appliquent : justesse à côté de toute part traitée, ou « justesse non mesurée » (PC-1) ;
+   échantillon que la sortie jugée n'a pas choisi, méthode de tirage écrite (PC-2) ; gravité notée pour
+   chaque sortie relue, la plus forte bloquant la remise (PC-3) ; entité déduite recoupée avec une
+   seconde source, contradiction présentée en anomalie (PC-4) ; règle évaluée par ses cas d'échec,
+   avec sa condition de non-application testée (PC-5) ; compteurs de synthèse recalculés par script
+   depuis la table qu'ils résument (PC-6).
+2. **Une version améliorée se juge en huit étapes** : mesurer avant d'améliorer, sur un échantillon de
+   référence tiré par strates avec une graine écrite ; étiqueter à l'aveugle, les désaccords allant au
+   métier en questions fermées, la mesure restant provisoire tant qu'il n'a pas répondu ; mesurer
+   plusieurs justesses et la gravité, jamais la seule couverture ; chaque règle nouvelle porte un test
+   rouge sur le code précédent, puis vert ; chaque règle s'applique aux lignes déjà traitées, pas
+   seulement aux nouvelles ; la version se mesure sur le même échantillon et sur un tirage des
+   changements qu'elle fait dans toute la population ; une version qui fait baisser une justesse,
+   augmente les erreurs graves ou dont le tirage trouve des faux est rejetée, numéro et raison gardés ;
+   la boucle s'arrête quand deux versions consécutives gagnent moins d'un point, ou à la borne fixée
+   d'avance, en disant ce que seul le métier peut lever.
+3. **Ce que R-63 ne fixe pas** : la taille d'un échantillon ni un seuil de justesse, choix du métier de
+   chaque produit. Elle ne remplace pas les oracles de forme ; elle s'y ajoute pour juger le fond.
+
+Contrôles exécutables : la règle S73 d'`oracles\oracle-synthese.mjs` (point 1, PC-1 : une part traitée
+restituée sans justesse ni « justesse non mesurée ») et la règle S74 (point 2, étapes 5 et 6 : un gain
+annoncé sur un échantillon sans le contrôle de ses changements dans la population ni son effet sur
+l'existant), avertissantes à leur entrée, fixtures double sens au self-test ; 0 accusation sur les 241
+synthèses d'`output\04-plans\`. Non mécanisé ici : PC-2 à PC-6 et les étapes 1 à 4, 7 et 8, que seul un
+oracle du domaine peut jouer. Leur place est le registre de `quality-oracles` (domaine « sortie
+automatisée de tri, de classement ou de rédaction ») et le skill `la-boucle`, dans la forge des agents :
+la descente y est déclarée à faire, elle n'est pas faite par cette règle.

@@ -47,8 +47,8 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 10,
-  "vu_le": "2026-10-13"
+  "cas": 12,
+  "vu_le": "2026-10-15"
  },
  "gabarits/ledger.test.mjs": {
   "cas": 13,
@@ -339,8 +339,8 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 157,
-  "vu_le": "2026-10-14"
+  "cas": 169,
+  "vu_le": "2026-10-15"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 36,
@@ -394,6 +394,10 @@
   "cas": 5,
   "vu_le": "2026-10-13"
  },
+ "oracles/hook-identite-sortante.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-10-15"
+ },
  "oracles/hook-lexique.test.mjs": {
   "cas": 12,
   "vu_le": "2026-10-13"
@@ -415,12 +419,12 @@
   "vu_le": "2026-10-12"
  },
  "oracles/hook-restitution-selection.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-02"
+  "cas": 7,
+  "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 48,
-  "vu_le": "2026-10-14"
+  "cas": 49,
+  "vu_le": "2026-10-15"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
