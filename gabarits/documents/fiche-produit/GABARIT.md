@@ -26,6 +26,9 @@ la fiche ne chiffre aucun coût et ne promet aucune date.
 
 ## Structure — les huit chapitres sont dus
 
+Une fiche d'offre technique y ajoute des chapitres optionnels déclarés (section « Variante « offre
+technique » » ci-dessous).
+
 Les chapitres suivent la question que se pose le commanditaire, dans son ordre : de quoi parle-t-on et
 que me demande-t-on, sur quoi s'appuie-t-on déjà, que couvre l'outil, que contient le premier lot, quel
 est le détail, qu'est-ce qui reste à confirmer, qu'est-ce que je dois trancher, d'où cela vient-il.
@@ -45,6 +48,33 @@ est le détail, qu'est-ce qui reste à confirmer, qu'est-ce que je dois trancher
 trouverez…*), ce que le chapitre contient et ne contient pas, puis un **exemple de lecture** sur une
 ligne réelle du tableau. L'exemple de lecture est le seul moyen, pour un lecteur non spécialiste, de
 vérifier qu'il sait lire la table qui suit.
+
+## Variante « offre technique » — chapitres optionnels déclarés
+
+Quand la fiche porte une **offre technique** (un produit bâti sur une base existante, un service à
+déployer), le brief peut demander davantage que les huit chapitres. Le 14/10/2026, un brief en
+imposait dix, dont l'architecture, le modèle de déploiement et une colonne de couverture, sans
+équivalent au gabarit (TF-1704). La variante admet ces ajouts, et seulement eux :
+
+| Chapitre optionnel | Porte | Se place |
+|---|---|---|
+| **Architecture** | Les composants et leurs flux, en figure (Mermaid admis dans la source Markdown) | après « Domaines et socle » |
+| **Modèle de déploiement** | Où tourne le produit, qui l'exploite, ce qui reste à la charge du client | après « Architecture » |
+| **Fournisseurs** | Les services tiers dont le produit dépend, et ce que chacun fournit | après « Modèle de déploiement » |
+| **Risques** | Chaque risque, l'exigence qu'il menace et sa parade | juste avant « Hypothèses à lever » |
+
+- **La colonne Couverture** s'ajoute au chapitre 5. Elle dit ce que la base couvre déjà de
+  l'exigence, dans un vocabulaire fermé : `natif` · `configuration` · `extension` · `à développer`.
+  Une couverture `natif` ou `configuration` sans essai dans le produit laisse le statut à
+  `présent dans la base`.
+- **Les identifiants** peuvent séparer fonctionnel et non fonctionnel par leur préfixe (`EF-01`,
+  `ENF-01`) ; le chapitre 1 le déclare dans « Lire cette fiche ».
+- **La déclaration est due.** Le chapitre 1 nomme les chapitres optionnels que la fiche porte : un
+  chapitre absent de cette liste est un chapitre inventé. Les huit chapitres restent dus, et un
+  chapitre optionnel ne remplace aucun d'eux. Il ouvre par les mêmes trois lignes.
+
+`oracle-fiche-produit.mjs` juge la colonne Couverture quand elle existe (FP5) ; les chapitres
+optionnels n'entrent dans aucun recomptage.
 
 ## Les vocabulaires fermés
 

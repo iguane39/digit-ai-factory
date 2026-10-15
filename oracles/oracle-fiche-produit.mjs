@@ -24,6 +24,8 @@
  *         conditionnée par une ligne du chapitre 6, et chaque ligne du chapitre 6 renvoie à une
  *         exigence du chapitre 5 qui n'est pas `fait constaté` (point 2) ;
  *   FP5 · chaque exigence porte un statut du vocabulaire fermé et un critère de recette non vide ;
+ *         dans une fiche d'offre technique, la colonne Couverture, si elle existe, tient aussi son
+ *         vocabulaire fermé (natif, configuration, extension, à développer — TF-1704) ;
  *   FP6 · chaque brique du chapitre 2 porte la date de son relevé (point 3) ;
  *   FP7 · aucun emplacement `{…}` ne reste dans le texte (point 5).
  *
@@ -43,6 +45,8 @@ const ICI = dirname(fileURLToPath(import.meta.url));
  *  `présent dans la base` (TF-1710, gabarit 1.1.0) : la fonction existe dans le code ou le produit de
  *  base, sans essai dans ce produit ; elle se lève au chapitre 6 comme une hypothèse (FP4). */
 export const STATUTS = ["fait constaté", "présent dans la base", "hypothèse"];
+/** La colonne optionnelle Couverture d'une fiche d'offre technique (TF-1704, gabarit 1.1.0). */
+export const COUVERTURES = ["natif", "configuration", "extension", "à développer"];
 const CONSTATE = "fait constate";
 
 const NORMALISER = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
@@ -133,6 +137,7 @@ export function juger(source) {
   const iStat = t5 ? colonne(t5, "statut") : -1;
   const iDom = t5 ? colonne(t5, "domaine") : -1;
   const iCrit = t5 ? colonne(t5, "critere") : -1;
+  const iCouv = t5 ? colonne(t5, "couverture") : -1;
   if (!ch5 || !t5 || iPal < 0 || iStat < 0) {
     ko("FP1", ch5 ? "chapitre « Toutes les exigences »" : "fiche",
       (ch5 ? "le tableau du chapitre ne porte pas les colonnes Id, Palier et Statut" : "aucun chapitre « Toutes les exigences »") +
@@ -144,6 +149,7 @@ export function juger(source) {
   const exigences = t5.lignes.map((l) => ({
     id: (l[iId] || "").trim(), palier: NORMALISER(l[iPal] || ""), statut: NORMALISER(l[iStat] || ""),
     domaine: iDom >= 0 ? NORMALISER(l[iDom] || "") : null, critere: iCrit >= 0 ? NORMALISER(l[iCrit] || "") : null,
+    couverture: iCouv >= 0 ? NORMALISER(l[iCouv] || "") : null,
   }));
   const parPalier = new Map();
   for (const e of exigences) parPalier.set(e.palier, (parPalier.get(e.palier) || 0) + 1);
@@ -231,9 +237,11 @@ export function juger(source) {
   // FP5 — vocabulaire fermé du statut, critère de recette dû à chaque ligne.
   {
     const admis = new Set(STATUTS.map(NORMALISER));
+    const couvertures = new Set(COUVERTURES.map(NORMALISER));
     let ecarts = 0;
     for (const e of exigences) {
       if (!admis.has(e.statut)) { ko("FP5", `exigence ${e.id}`, `statut « ${e.statut} » hors du vocabulaire fermé (${STATUTS.join(", ")})`); ecarts++; }
+      if (e.couverture !== null && !couvertures.has(e.couverture)) { ko("FP5", `exigence ${e.id}`, `couverture « ${e.couverture} » hors du vocabulaire fermé (${COUVERTURES.join(", ")})`); ecarts++; }
       if (e.critere === null || VIDE.test(e.critere)) { ko("FP5", `exigence ${e.id}`, "sans critère de recette : une exigence sans critère est une intention (GABARIT.md, « Les refus »)"); ecarts++; }
     }
     if (!ecarts) ok("FP5", "chapitre « Toutes les exigences »", "statuts au vocabulaire fermé, critère de recette à chaque ligne");
@@ -362,6 +370,17 @@ function selfTest() {
     "| H-01 | Deux fournisseurs", "| H-02 | La sonde amont répond dans ce produit | ENF-01 | L'exploitant, par un essai | avant le palier MVP |\n| H-01 | Deux fournisseurs")
     .replace("**1 hypothèse**", "**2 hypothèses**"));
   rouge("exigence « présent dans la base » sans hypothèse au chapitre 6", "FP4", presente);
+  // TF-1704 (lot Produit-82 20261014b, RT-6) — la variante « offre technique » : chapitres optionnels
+  // déclarés et colonne Couverture au vocabulaire fermé, sans que les huit chapitres cessent d'être dus.
+  const offre = muter(muter(muter(FIXTURE_MD,
+    "| Id | Domaine | Palier | Comportement attendu | Critère de recette | Statut |\n|---|---|---|---|---|---|",
+    "| Id | Domaine | Palier | Comportement attendu | Critère de recette | Statut | Couverture |\n|---|---|---|---|---|---|---|"),
+    "| L'appel arrive au fournisseur | fait constaté |", "| L'appel arrive au fournisseur | fait constaté | natif |"),
+    "| La bascule se fait en 5 s | hypothèse |", "| La bascule se fait en 5 s | hypothèse | à développer |")
+    .replace("| La sonde rend 200 | fait constaté |", "| La sonde rend 200 | fait constaté | configuration |")
+    .replace("## 5. Toutes les exigences", "## Architecture\n\nLa passerelle reçoit les appels et les route vers deux fournisseurs.\n\n## 5. Toutes les exigences");
+  verte("offre technique : chapitre Architecture et colonne Couverture au vocabulaire fermé", offre);
+  rouge("offre technique : couverture hors vocabulaire", "FP5", offre.replace("| hypothèse | à développer |", "| hypothèse | partielle |"));
   for (const c of cas) console.log(`  [${c.ok ? "PASS" : "FAIL"}] ${c.nom} → ${c.attendu}${c.detail ? ` — ${c.detail}` : ""}`);
   const casse = cas.filter((c) => !c.ok);
   console.log(`\noracle-fiche-produit self-test : ${cas.length - casse.length}/${cas.length} PASS (${cas.filter((c) => c.nom.startsWith("cas rouge")).length} cas rouges, ${cas.filter((c) => c.nom.startsWith("cas vert")).length} cas verts, recette à double sens)`);
