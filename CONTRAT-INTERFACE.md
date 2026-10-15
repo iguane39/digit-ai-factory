@@ -135,12 +135,18 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
   guetté + ts — TF-0173, §4 ter), `demande_emise` et `demande_recue` (un produit demande une
   évolution à un autre, §3 sexies), `deplacement_en_attente` et `deplacement_effectue` (version
-  antérieure tenue ouverte, règle 7 de `REGLES-PROJET.md`), `run_close`.
+  antérieure tenue ouverte, règle 7 de `REGLES-PROJET.md`), `rectification_forges_mobilisees`
+  (TF-1715, ci-dessous), `run_close`.
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
   quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
   jugé selon ses propres règles). Sous `1.1`, `run_open` porte aussi **`forges_mobilisees`**, un
   tableau non vide de noms de forges, courts ou complets (D-18 (a)) ; le pilot n'y figure jamais
-  (TF-1444, règle écrite au juge ci-dessous). L'entrée porte au minimum :
+  (TF-1444, règle écrite au juge ci-dessous). **Une déclaration fausse se rectifie par ajout
+  (TF-1715, 15/10/2026)** : une entrée `type: rectification_forges_mobilisees` porte la liste
+  corrigée ENTIÈRE (`forges_mobilisees`) et sa `cause` ; `oracle-enclenchement` retient la dernière
+  du run, nomme d'où il tient la liste, et ignore en le disant une rectification sans liste ou sans
+  cause. `--forges` reste prioritaire. Le fait : un run_open du 14/10 déclarait une forge à tort, et
+  le run a dû passer `--forges` au juge à la main. L'entrée porte au minimum :
 
   | Champ | Contenu |
   |---|---|
