@@ -99,6 +99,19 @@ ailleurs. Conséquence directe : le rapport de fin ne peut plus dire « au vert 
 vert CONTRE QUOI »**. La question ne se pose qu'une fois par produit — la réponse vit à son
 `CLAUDE.md`, le run la recopie — et elle est tenue par **R-11 bis** d'`oracle-conformite-projet`.
 
+**POSER LE SOCLE PAR LE GESTE OUTILLÉ (TF-1697, TF-1724)** — dans un projet déjà adopté (`forge\`
+présent), le socle d'ouverture se pose par une commande, jamais à la main :
+`node <pilot>\scripts\ouvrir-run.mjs <projet> --run <id> --forges <forges mobilisées>`. Elle copie
+les fiches de `gabarits\docs-projet\` qui manquent (R-20), pose `README.md` (R-12) et `.env.example`
+sans aucune variable inventée (R-13), écrit le `run_open` par `ledger.mjs` (schéma 1.1,
+`forges_mobilisees`, `versions_forges`), puis joue `oracle-conformite-projet` et rend chaque FAIL
+restant comme un reste à faire nommé. Elle n'écrase rien et ne pose rien au second passage. Elle
+n'écrit ni `referentiels` ni `couverture_dimensions` : un run qui les déclare dès le `run_open`
+lance le geste sans `--run` ni `--forges`, puis écrit son `run_open` complet par `ledger.mjs`.
+*Pourquoi* (lot Produit-82 20261014a, RT-2) : après une adoption, une session a lu l'oracle de conformité pour
+deviner ses exigences et l'a rejoué trois fois (3 FAIL, 4 FAIL, puis PASS). Les paragraphes
+suivants décrivent ce que le socle contient ; ils ne remplacent pas le geste.
+
 Dans le projet produit, créer `forge\` (`ledger.jsonl` ouvert avec `run_open`, `BRIEF.md` avec
 le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la racine du projet, l'y copier
 depuis le pilot (auto-documentation et reprise). Écrivain unique du ledger : l'orchestrateur.
