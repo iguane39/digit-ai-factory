@@ -24,10 +24,11 @@
  *     adresses de service (`noreply@`, `no-reply@`).
  *
  * CE QUI N'EST PAS DISTINGUÉ (déclaré, et prouvé par la recette) :
- *   · « Prénom Nom » sans capitales au nom de famille (« Marie Dupont ») n'est PAS relevé : rien ne le
- *     distingue d'un nom de produit ou d'une expression à capitales (« Google Ads ») sans une liste de
- *     prénoms, que ce dépôt ne porte pas. La table des personnes du canal confidentiel, jugée par la
- *     même porte, est la voie qui lèverait cette limite ; elle n'est pas construite ici ;
+ *   · « Prénom Nom » sans capitales au nom de famille n'est relevé que si le prénom est dans la liste
+ *     FERMÉE `PRENOMS` (TF-1812, 15/10/2026 : « Marie Dupont » l'est, « Gwenola Dupont » non) — rien
+ *     d'autre ne le distingue d'un nom de produit (« Google Ads »). Bruit mesuré le 15/10 sur les 786
+ *     lots et candidatures reçus : 0 fichier relevé à tort. La table des personnes du canal
+ *     confidentiel reste la voie qui lèverait la limite des prénoms rares ;
  *   · un nom de famille de trois lettres (« Paul ROY ») n'est pas relevé : le seuil de quatre lettres
  *     est ce qui écarte les sigles, mesure à l'appui ;
  *   · un mot capitalisé suivi d'un sigle de quatre lettres ou plus absent de la liste d'exclusion
@@ -50,6 +51,28 @@ const MAJ = "A-ZÀ-ÖØ-Þ", MIN = "a-zà-öø-ÿ";
 // les 162 lots de la boîte au 26/09, les 26 faux positifs à trois lettres étaient tous des sigles
 // (CLI, POC, SHA, DAX, DEV, DWH…) ; un nom de famille de trois lettres (« ROY ») n'est donc pas relevé.
 export const MOTIF_PRENOM_NOM = new RegExp(`(?<![\\p{L}\\d-])([${MAJ}][${MIN}]+(?:-[${MAJ}][${MIN}]+)?)\\s+([${MAJ}]{2,}(?:[-'][${MAJ}]{2,})+|[${MAJ}]{4,})(?![\\p{L}\\d])`, "gu");
+// « Prénom Nom » sans capitales au nom de famille (TF-1812, 15/10/2026) : relevé seulement quand le
+// prénom est dans la liste FERMÉE ci-dessous. LE FAIT : le 15/10, un lot du 25/09 nommait en clair
+// l'auteur d'un audit (« Prénom Nom », nom en minuscules) ; l'accueil l'aurait suivi et publié, la
+// borne déclarée l'ayant laissé passer. La liste porte les prénoms français les plus donnés, et
+// RIEN qui soit aussi un mot du parc : « Claude » (le modèle), « Victor », « Pierre » en tête de
+// phrase sont absents ou bornés par NON_NOMS. L'élargir se fait sur un cas mesuré.
+export const PRENOMS = new Set(["Adrien", "Agnès", "Alain", "Alexandre", "Alexis", "Alice", "Aline", "Amandine", "Anaïs",
+  "André", "Anne", "Annie", "Antoine", "Arnaud", "Arthur", "Audrey", "Aurélie", "Aurélien", "Baptiste", "Benjamin", "Benoît",
+  "Bernard", "Bertrand", "Brigitte", "Bruno", "Camille", "Caroline", "Catherine", "Cécile", "Céline", "Charles", "Charlotte",
+  "Chloé", "Christian", "Christine", "Christophe", "Claire", "Clément", "Corinne", "Cyril", "Damien", "Daniel", "David",
+  "Delphine", "Denis", "Didier", "Dominique", "Éric", "Élodie", "Émilie", "Emma", "Emmanuel", "Étienne", "Fabien", "Fabrice",
+  "Florence", "Florian", "François", "Françoise", "Frédéric", "Gaël", "Gaëlle", "Guillaume", "Hélène", "Henri", "Hugo",
+  "Isabelle", "Jacques", "Jean", "Jérémy", "Jérôme", "Joël", "Jonathan", "Julie", "Julien", "Justine", "Karine", "Laetitia",
+  "Laura", "Laurence", "Laurent", "Léa", "Lionel", "Louis", "Luc", "Lucas", "Lucie", "Ludovic", "Maëlle", "Manon", "Marc",
+  "Marie", "Marine", "Martine", "Mathieu", "Mathilde", "Matthieu", "Maxime", "Mélanie", "Michel", "Mickaël", "Monique",
+  "Nadia", "Nathalie", "Nicolas", "Noémie", "Olivier", "Pascal", "Pascale", "Patrice", "Patricia", "Patrick", "Paul",
+  "Pauline", "Philippe", "Quentin", "Raphaël", "Rémi", "Romain", "Sabrina", "Samuel", "Sandrine", "Sébastien", "Simon",
+  "Sophie", "Stéphane", "Stéphanie", "Sylvain", "Sylvie", "Thierry", "Thomas", "Valérie", "Vanessa", "Véronique", "Vincent",
+  "Virginie", "Xavier", "Yann", "Yannick", "Yves"]);
+// Mots qui, derrière un prénom de la liste, ne font pas un nom : produits, outils et termes du parc.
+const NON_NOMS = new Set(["Code", "Desktop", "Opus", "Sonnet", "Haiku", "Fable", "Ads", "Cloud", "Studio", "Server"]);
+export const MOTIF_PRENOM_NOM_COURANT = new RegExp(`(?<![\\p{L}\\d-])([${MAJ}][${MIN}]+(?:-[${MAJ}][${MIN}]+)?)\\s+([${MAJ}][${MIN}]{2,}(?:-[${MAJ}][${MIN}]+)?)(?![\\p{L}\\d])`, "gu");
 export const MOTIF_CIVILITE = new RegExp(`(?<![\\p{L}])(M\\.|Mme|Mlle|Monsieur|Madame|Mademoiselle|Me|Maître|Dr\\.?|Docteur)\\s+([${MAJ}][\\p{L}'-]+)`, "gu");
 export const MOTIF_COURRIEL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 // Les sigles en capitales qu'un mot capitalisé précède sans nommer personne. Liste FERMÉE, tirée du
@@ -82,6 +105,10 @@ export function relever(texte) {
   const t = String(texte);
   const vues = new Set();
   for (const m of t.matchAll(MOTIF_PRENOM_NOM)) if (!SIGLES.has(m[2]) && !MOTS_OUTILS.has(m[1])) vues.add(`${m[1]} ${m[2]}`);
+  for (const m of t.matchAll(MOTIF_PRENOM_NOM_COURANT)) {
+    const prenom = m[1].split("-")[0];
+    if (PRENOMS.has(prenom) && !NON_NOMS.has(m[2]) && !MOTS_OUTILS.has(m[2])) vues.add(`${m[1]} ${m[2]}`);
+  }
   for (const m of t.matchAll(MOTIF_CIVILITE)) if (!MOTS_OUTILS.has(m[2])) vues.add(m[0]);
   for (const m of t.matchAll(MOTIF_COURRIEL)) if (!DOMAINE_DE_DOC.test(m[0]) && !SERVICE.test(m[0])) vues.add(m[0]);
   return [...vues];
