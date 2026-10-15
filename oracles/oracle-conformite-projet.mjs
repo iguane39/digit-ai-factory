@@ -1090,6 +1090,24 @@ else {
       const PILOT47 = join(dirname(fileURLToPath(import.meta.url)), "..");
       const SEUIL_HERITES_1119 = "2026-09-15";
       const dateDe =(t) => (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+      // TF-1698 (15/10/2026) — UN FICHIER HÉRITÉ SANS `verifie_le` SE DATE PAR SA NAISSANCE. Le
+      // gabarit CLAUDE-PRODUIT.md n'en porte pas : un CLAUDE.md posé le 14/10 au gabarit brut était
+      // rangé « non daté », donc antérieur, et ne serait jamais justiciable. Sa date est son PREMIER
+      // COMMIT (un fait de l'histoire), sinon la date d'adoption consignée au carnet d'écarts (un
+      // fichier posé par l'adoption et pas encore commis). Ni l'un ni l'autre : antériorité, comme avant.
+      const adoption1698 = (() => {
+        const carnet = p("forge", "travaux", "ECARTS-ASSUMES.md");
+        if (!existsSync(carnet)) return null;
+        return (/^## Écart initial à l'adoption du dispositif — (\d{4}-\d{2}-\d{2})/m.exec(readFileSync(carnet, "utf8")) || [])[1] || null;
+      })();
+      const naissance = (cibleRel) => {
+        if (aGit) {
+          const r = git("log", "--diff-filter=A", "--format=%cs", "--", cibleRel);
+          const d = (r.status === 0 ? r.stdout : "").trim().split(/\r?\n/).filter(Boolean).pop();
+          if (d) return { date: d, source: "premier commit" };
+        }
+        return adoption1698 ? { date: adoption1698, source: "adoption consignée au carnet d'écarts" } : null;
+      };
       for (const a of heritage.artefacts) {
         if (!/^presence/.test(a.mode || "")) continue;
         const src = join(PILOT47, a.source), dst = p(a.cible);
@@ -1100,15 +1118,18 @@ else {
         if (perimes.length) so("R-20", `HERITAGE.json déclare pour ${a.source} des marqueurs que le gabarit ne porte plus : ${perimes.join(", ")} — déclaration à retirer (TF-1119)`);
         const restes = declares.filter((m) => tSrc.includes(m) && tDst.includes(m));
         const vSrc = dateDe(tSrc), vDst = dateDe(tDst);
+        const ne = !vDst && restes.length ? naissance(a.cible) : null;   // TF-1698
+        const dateJugee = vDst || (ne && ne.date) || null;
         // ANTÉRIORITÉ, jamais un défaut rétroactif (correctif du 15/09, même idiome que les
         // sections de COMPOSANTS-OPS) : cet oracle suspend l'ouverture de run sur un FAIL, et la
         // règle est née le 15/09. Un fichier revu avant, ou jamais daté, est relevé au non_juge —
         // mesuré au parc : 12 écarts, tous antérieurs — et exigé à sa prochaine revue datée.
-        if (restes.length && vDst && vDst >= SEUIL_HERITES_1119) {
+        if (restes.length && dateJugee && dateJugee >= SEUIL_HERITES_1119) {
           ko("R-20", a.cible, `${restes.length} marqueur(s) du gabarit ${a.source} NON INSTANCIÉ(S) dans ce fichier hérité — `
-            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`);
+            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`
+            + (vDst ? "" : ` — sans verifie_le, daté du ${ne.date} par son ${ne.source} (TF-1698)`));
         } else if (restes.length) {
-          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || "non daté"} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
+          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || (ne ? `non daté, né le ${ne.date} (${ne.source}, TF-1698)` : "non daté")} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
         }
         if (vDst && (vDst === vSrc || vDst === a.depuis)) {
           ok("R-20", a.cible, `AVERTISSEMENT, non bloquant : verifie_le=${vDst} est la date du GABARIT, pas celle d'une revue du produit — `
