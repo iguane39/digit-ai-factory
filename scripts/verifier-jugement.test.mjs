@@ -303,6 +303,51 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
   rmSync(N, { recursive: true, force: true });
 }
 
+// TF-1745 (lot Produit-03 20260908a, RA-44) — LE JOURNAL R-32 EST UN SCEAU, ET IL SE LIT. Le journal
+// `forge\oracles\<livrable>.json` porte l'empreinte du contenu jugé (`sha256_livrable`). Le 07-08/09,
+// quatre empreintes successives y ont été consignées sous le même nom, sans que rien ne le dise.
+// Rouge : plusieurs empreintes distinctes au journal → J-3 AVERTISSEMENT, jamais un échec (règle neuve).
+// Rouge : une seule empreinte, qui n'est plus celle du fichier → J-3 AVERTISSEMENT. Vert : l'empreinte
+// consignée est celle du fichier présent → aucun J-3.
+{
+  const P = mkdtempSync(join(tmpdir(), "jugement-r32-"));
+  const { mkdirSync } = await import("node:fs");
+  mkdirSync(join(P, "output"), { recursive: true });
+  mkdirSync(join(P, "forge", "oracles"), { recursive: true });
+  const L = join(P, "output", "Client-A - Ordonnancement - 20260907a.html");
+  const hash = (s) => createHash("sha256").update(Buffer.from(s, "utf8")).digest("hex");
+  const journal = (o) => writeFileSync(join(P, "forge", "oracles", "Client-A - Ordonnancement - 20260907a.json"), JSON.stringify(o, null, 1), "utf8");
+  const jouer = () => {
+    const r = spawnSync(process.execPath, [OUTIL, join(P, "output")], { encoding: "utf8" });
+    let j = null; try { j = JSON.parse(r.stdout || "null"); } catch { /* illisible */ }
+    return { code: r.status, j, j3: (j?.findings || []).filter((f) => f.regle === "J-3") };
+  };
+  writeFileSync(L, page("v4"), "utf8");
+  check("VERT TF-1745 — l'empreinte consignée au journal R-32 est celle du fichier présent : aucun J-3", () => {
+    journal({ livrable: "output/Client-A - Ordonnancement - 20260907a.html", sha256_livrable: hash(page("v4")), verdict: "PASS" });
+    const r = jouer();
+    if (r.code !== 0 || r.j3.length) throw new Error(JSON.stringify(r.j));
+  });
+  check("ROUGE TF-1745 — quatre empreintes successives au journal R-32, indice inchangé : J-3 l'avertit, sans échec", () => {
+    journal({ livrable: "output/Client-A - Ordonnancement - 20260907a.html", sha256_livrable: hash(page("v1")),
+      rejoue_apres: { sha256_livrable: hash(page("v2")) }, rejoue_apres_2: { sha256_livrable: hash(page("v3")) }, rejoue_apres_3: { sha256_livrable: hash(page("v4")) } });
+    const r = jouer();
+    if (r.code !== 0) throw new Error(`exit ${r.code} : la règle neuve ne bloque pas`);
+    if (r.j3.length !== 1 || r.j3[0].severite !== "avertissement" || !/4 empreintes/.test(r.j3[0].message) || !/indice/.test(r.j3[0].message)) throw new Error(JSON.stringify(r.j3));
+  });
+  check("ROUGE TF-1745 — une seule empreinte au journal, qui n'est plus celle du fichier : J-3 l'avertit", () => {
+    journal({ livrable: "output/Client-A - Ordonnancement - 20260907a.html", sha256_livrable: hash(page("v1")) });
+    const r = jouer();
+    if (r.code !== 0 || r.j3.length !== 1 || !/modifié après/.test(r.j3[0].message)) throw new Error(JSON.stringify(r.j));
+  });
+  check("BORNE TF-1745 — les empreintes du PDF frère, de la source et du script d'oracle ne sont pas des versions du livrable : aucun J-3", () => {
+    journal({ livrables: { sha256_html: hash(page("v4")), sha256_pdf: hash("pdf") }, source: { sha256: hash("src") }, oracles: { o: { sha256_script: hash("s") } } });
+    const r = jouer();
+    if (r.code !== 0 || r.j3.length) throw new Error(JSON.stringify(r.j3));
+  });
+  rmSync(P, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
-console.log(`\nverifier-jugement (TF-0523, TF-0692, TF-1303, TF-1306, TF-1312) : ${pass} PASS, ${fail} FAIL`);
+console.log(`\nverifier-jugement (TF-0523, TF-0692, TF-1303, TF-1306, TF-1312, TF-1745) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
