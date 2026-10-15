@@ -158,5 +158,26 @@ check("borne — chaîne tirée d'un gabarit d'un AUTRE dépôt : ses portes non
   nettoyer(D);
 });
 
+// TF-1811 (lot Produit-83 20261015b, RT-16) — « Objet lancé : version 12, image produit:12 ». PJ-3 prenait
+// le premier mot (« version ») pour l'objet, et refusait chaque porte jugée sur l'image. Vert : l'objet
+// est lu dans ses identifiants (commit, étiquette, image), pas dans son premier mot. Rouge : une porte
+// jugée sur une AUTRE image reste refusée.
+const feuVertImage = (objetNpm) => feuVert({ objetNpm })
+  .replace("Objet lancé : 630f874 (env/prd)", "Objet lancé : version 12, image produit:12")
+  .replace("image construite sans cache depuis 630f874", "image produit:12");
+check("TF-1811 vert — « Objet lancé : version 12, image produit:12 » : les portes jugées sur produit:12 passent, exit 0", () => {
+  const D = produit({ dossier: feuVertImage("produit:12") });
+  const r = lancer(D);
+  if (r.code !== 0 || regles(r, "PJ-3").length) throw new Error(r.brut.slice(0, 400));
+  nettoyer(D);
+});
+check("TF-1811 rouge — même déclaration, une porte jugée sur produit:11 : PJ-3 la refuse, et elle seule", () => {
+  const D = produit({ dossier: feuVertImage("produit:11") });
+  const r = lancer(D);
+  const pj3 = regles(r, "PJ-3");
+  if (r.code !== 1 || pj3.length !== 1 || !/produit:11/.test(pj3[0].message)) throw new Error(r.brut.slice(0, 400));
+  nettoyer(D);
+});
+
 console.log(`\nverifier-portes-du-jour (M-10, TF-1498) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
