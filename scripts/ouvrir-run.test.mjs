@@ -67,6 +67,12 @@ try {
     att(r.conformite.verdict === "FAIL" || r.conformite.verdict === "PASS", `conformité non jouée : ${JSON.stringify(r.conformite)}`);
   });
 
+  check("VERT — la fiche PARAMETRAGE posée telle quelle ne fait pas échouer R-24 sur sa propre rubrique d'écart (TF-1723)", () => {
+    const d = projetAdopte({ "src/app.py": "print(1)\n" });
+    ouvrirRun({ projet: d, racine: RACINE || T });
+    att(!fails(conformite(d), "R-24").length, `R-24 FAIL hérité du gabarit : ${JSON.stringify(fails(conformite(d), "R-24").map((x) => x.message))}`);
+  });
+
   check("VERT — aucune variable n'est inventée : .env.example sans variable, et R-13 reste un RESTE À FAIRE nommé", () => {
     const d = projetAdopte({ "src/app.py": "print(1)\n" });
     const r = ouvrirRun({ projet: d, racine: RACINE || T });
