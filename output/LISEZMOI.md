@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 413 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 415 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -409,6 +409,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md | 20261013k | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` |
 | Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md | 20260830b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` |
 | Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md | 20260830j | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` |
+| Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md | 20261015i | 4.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` |
+| Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md | 20261015j | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` |
 | Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md | 20261013j | 3.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` |
 | Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md | 20260917l | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` |
 | Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md | 20260917e | 12.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md` |

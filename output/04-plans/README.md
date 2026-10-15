@@ -217,6 +217,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` | fichier | 7,1 Ko | Synthèse Mandat — campagne du matin reprise et close, relecteur du lecteur visé construit  |
 | `Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` | fichier | 19,2 Ko | Synthèse de mandat — remise à niveau du dépôt et renommage des lots (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
+| `Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` | fichier | 4,7 Ko | Synthèse Mandat — reprise multi-poste construite, fusionnée avec l'autre poste, publicatio |
+| `Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` | fichier | 9,5 Ko | Synthèse Mandat — vos réponses 1a, 2a et 3b exécutées, reprise multi-poste prête à publier |
 | `Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` | fichier | 3,5 Ko | Synthèse Mandat — reprise réseau de l'installateur publiée, chantier d'installation sans q |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` | fichier | 11,3 Ko | Synthèse de mandat — réseaux sociaux : la barre est validée, et votre objection est fondée |
 | `Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md` | fichier | 12,8 Ko | Synthèse de mandat — réseaux sociaux : votre décision est exécutée, les sept candidatures  |
@@ -274,4 +276,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_257 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_259 fichier(s), 0 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
