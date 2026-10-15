@@ -204,16 +204,16 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Quatre decisions executees et cinq nouvelles posees - 20260923d.md` | fichier | 23,6 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 5 nouvelles posées — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees et quatre nouvelles posees - 20260923a.md` | fichier | 29,6 Ko | Digit-AI — Synthèse de mandat — 4 décisions exécutées et 4 nouvelles posées — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` | fichier | 14,1 Ko | Synthèse de mandat — vos quatre décisions et vos quatre actions exécutées : le parc entier |
-| `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001g.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
+| `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
 | `Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md` | fichier | 22,7 Ko | Synthèse de mandat — les quinze actions du tableau sont traitées : six chantiers livrés et |
 | `Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md` | fichier | 17,6 Ko | Quinze items du registre traités, et trois contrôles posés là où l'on produit |
 | `Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` | fichier | 14,6 Ko | Synthèse de mandat — la Factory se recopie chez les produits, et un contrôle de configurat |
 | `Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` | fichier | 7,1 Ko | Synthèse de mandat — « récupère la todo et les retours, traite les tous » (18 items, 7 cam |
 | `Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` | fichier | 13,3 Ko | Synthèse de mandat — décision D-10 (a) exécutée : deux histoires réécrites et publiées ave |
 | `Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md` | fichier | 17,4 Ko | Synthèse de mandat — votre règle est écrite et publiée, mais j'ai affaibli le noyau en la  |
-| `Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001i.md` | fichier | 9,6 Ko | Point d'étape : le rejeu tourne en version 2 ; un défaut de mon banc, vu sur les 7 premièr |
+| `Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001n.md` | fichier | 9,6 Ko | Point d'étape : le rejeu tourne en version 2 ; un défaut de mon banc, vu sur les 7 premièr |
 | `Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` | fichier | 18,3 Ko | Synthèse de mandat : le rejeu est joué en entier ; Opus 5.5 à l'effort high réussit les 6  |
-| `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001h.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
+| `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
 | `Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` | fichier | 7,1 Ko | Synthèse Mandat — campagne du matin reprise et close, relecteur du lecteur visé construit  |
 | `Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` | fichier | 19,2 Ko | Synthèse de mandat — remise à niveau du dépôt et renommage des lots (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
@@ -276,4 +276,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_259 fichier(s), 0 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_259 fichier(s), 0 sous-dossier(s)_
