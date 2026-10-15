@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 415 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 417 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -399,6 +399,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md | 20261001l | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` |
 | Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md | 20260911d | 22.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md` |
 | Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md | 20260916b | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md` |
+| Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md | 20261015m | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` |
 | Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md | 20260830h | 14.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` |
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md | 20260817a | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md | 20260907h | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` |
@@ -425,6 +426,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md | 20260908h | 45.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` |
 | Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md | 20260901f | 12.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` |
 | Digit-AI - Synthese Mandat - Six actions retenues cinq faites la derniere a une erreur structurelle pres - 20260910e.md | 20260910e | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Six actions retenues cinq faites la derniere a une erreur structurelle pres - 20260910e.md` |
+| Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md | 20261015l | 47.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` |
 | Digit-AI - Synthese Mandat - Sondes etendues descente par produit et controles instruits - 20260917f.md | 20260917f | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Sondes etendues descente par produit et controles instruits - 20260917f.md` |
 | Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md | 20260903c | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` |
 | Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md | 20260907k | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md` |

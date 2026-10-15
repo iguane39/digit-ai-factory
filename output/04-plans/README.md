@@ -207,6 +207,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
 | `Digit-AI - Synthese Mandat - Quinze actions traitees publication en attente - 20260911d.md` | fichier | 22,7 Ko | Synthèse de mandat — les quinze actions du tableau sont traitées : six chantiers livrés et |
 | `Digit-AI - Synthese Mandat - Quinze items du registre traites et controles poses a la porte - 20260916b.md` | fichier | 17,6 Ko | Quinze items du registre traités, et trois contrôles posés là où l'on produit |
+| `Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` | fichier | 6,1 Ko | Synthèse Mandat — recette complète du pilot jouée : 2 contrôles en défaut sur 221, aucun d |
 | `Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` | fichier | 14,6 Ko | Synthèse de mandat — la Factory se recopie chez les produits, et un contrôle de configurat |
 | `Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` | fichier | 7,1 Ko | Synthèse de mandat — « récupère la todo et les retours, traite les tous » (18 items, 7 cam |
 | `Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` | fichier | 13,3 Ko | Synthèse de mandat — décision D-10 (a) exécutée : deux histoires réécrites et publiées ave |
@@ -233,6 +234,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` | fichier | 45,1 Ko | Synthèse de mandat — vos sept décisions sont exécutées, le parc est publié, la porte le bl |
 | `Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` | fichier | 12,8 Ko | Synthèse de mandat — les six actions, et la porte qui a refusé la publication |
 | `Digit-AI - Synthese Mandat - Six actions retenues cinq faites la derniere a une erreur structurelle pres - 20260910e.md` | fichier | 25,9 Ko | Synthèse de mandat — vos six actions : cinq sont faites, la sixième bute sur une question  |
+| `Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` | fichier | 47,6 Ko | Synthèse Mandat — six travaux faits, onze décisions instruites, publication du pilot en at |
 | `Digit-AI - Synthese Mandat - Sondes etendues descente par produit et controles instruits - 20260917f.md` | fichier | 15,3 Ko | Synthèse de mandat — votre « 2a » est exécuté : les 4 améliorations sont décidées, 3 sont  |
 | `Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` | fichier | 11,3 Ko | Synthèse de mandat — surveillance des récidives entre les runs (03/09/2026, après votre dé |
 | `Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md` | fichier | 14,1 Ko | Synthèse de mandat — synchronisation faite et action A-45 de l'autre poste jouée ici : rie |
@@ -276,4 +278,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_259 fichier(s), 0 sous-dossier(s)_
+_261 fichier(s), 0 sous-dossier(s)_
