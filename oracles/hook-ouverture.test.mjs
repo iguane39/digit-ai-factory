@@ -285,7 +285,11 @@ check("TF-1755 — fusion : chaque entrée absente du gabarit ajoutée, rien de 
   const manquent = attendus.filter((n) => !noms.includes(n));
   if (r.etat !== "corrige" || manquent.length) throw new Error(`état ${r.etat}, manquent : ${manquent.join(", ")}`);
   if (noms.includes("droits-accordes")) throw new Error("l'exclusion déclarée n'est pas respectée");
-  if (noms.length !== new Set(noms).size) throw new Error(`doublon : ${noms.join(", ")}`);
+  // TF-1736 (15/10/2026) : un même hook peut servir deux événements (`reprise` à l'ouverture et en fin de
+  // tour) ; le doublon se juge par ÉVÉNEMENT, l'unité où la fusion décide de la présence d'une entrée.
+  const parEvenement = Object.entries(j.hooks).flatMap(([ev, gs]) => (gs || []).flatMap((g) => (g.hooks || [])
+    .map((h) => (String(h.command || "").match(/factory\.mjs\s+([a-z-]+)/) || [])[1]).filter(Boolean).map((n) => `${ev}:${n}`)));
+  if (parEvenement.length !== new Set(parEvenement).size) throw new Error(`doublon : ${parEvenement.join(", ")}`);
   if (j.permissions.allow[0] !== "Bash(npm test)" || j.hooks.Stop[0].hooks[0].timeout !== 90) throw new Error("un réglage du produit a été modifié");
   if (!j.hooks.PostToolUse[0].hooks.some((h) => h.command === "node scripts/mon-hook.mjs")) throw new Error("le hook propre au produit a disparu");
   if (!j.hooks.PostToolUse[0].hooks.some((h) => /factory\.mjs ecriture/.test(h.command))) throw new Error("l'entrée ajoutée ne rejoint pas le groupe de même matcher");

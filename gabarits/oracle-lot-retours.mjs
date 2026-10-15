@@ -92,12 +92,12 @@
  *   node oracle-lot-retours.mjs --murs <racine-produit>   (liste les documents mûrs mesurés)
  * Exit : 0 = forme tenue (ou lot antérieur aux règles) · 1 = forme en défaut · 2 = lot illisible.
  */
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, realpathSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.8.0"; // 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.8.1"; // 1.8.1 (15/10/2026) : le lancement direct se reconnaît par le chemin réel, un chemin à nom court Windows ne rend plus le module muet · 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 /**
  * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
@@ -744,7 +744,15 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
 // ---- CLI : le geste qui précède la remise ----------------------------------------------------
 // C'est CE geste que le gabarit de retours nomme. Il coûte une seconde au produit et lui évite
 // un refus à la porte du pilot — ou, pire, une dérogation qui lui épargne le refus ET la leçon.
-if (import.meta.url === `file://${process.argv[1]?.split("\\").join("/")}`
+// 15/10/2026 — LE LANCEMENT DIRECT SE RECONNAÎT PAR LE CHEMIN RÉEL. Comparer l'adresse du module au chemin
+// reçu échouait quand ce chemin porte un nom court Windows (`SBASTI~1`) que Node résout en nom long
+// (`Sébastien`) : le module se taisait, exit 0, et un lot passait sans être jugé (recette TF-1759 rouge
+// sur un tel poste). Les deux formes d'origine restent admises.
+const LANCE_DIRECTEMENT = (() => {
+  try { return !!process.argv[1] && realpathSync(resolve(process.argv[1])).toLowerCase() === realpathSync(fileURLToPath(import.meta.url)).toLowerCase(); }
+  catch { return false; }
+})();
+if (LANCE_DIRECTEMENT || import.meta.url === `file://${process.argv[1]?.split("\\").join("/")}`
     || (process.argv[1] && import.meta.url.endsWith(encodeURI(process.argv[1].split("\\").join("/"))))) {
   const args = process.argv.slice(2);
   const cible = args.find((a) => !a.startsWith("--"));
