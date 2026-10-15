@@ -39,8 +39,10 @@ import { fileURLToPath } from "node:url";
 const VERSION = "1.0.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
-/** Le vocabulaire fermé du statut d'une exigence (GABARIT.md, « Les vocabulaires fermés »). */
-export const STATUTS = ["fait constaté", "hypothèse"];
+/** Le vocabulaire fermé du statut d'une exigence (GABARIT.md, « Les vocabulaires fermés »).
+ *  `présent dans la base` (TF-1710, gabarit 1.1.0) : la fonction existe dans le code ou le produit de
+ *  base, sans essai dans ce produit ; elle se lève au chapitre 6 comme une hypothèse (FP4). */
+export const STATUTS = ["fait constaté", "présent dans la base", "hypothèse"];
 const CONSTATE = "fait constate";
 
 const NORMALISER = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
@@ -352,6 +354,14 @@ function selfTest() {
   rouge("emplacement resté vide", "FP7", muter(instance, "<td data-label=\"Brique\">Site vitrine</td>", "<td data-label=\"Brique\">{brique}</td>"));
   rouge("SQUELETTE.html remis tel quel", "FP7", squelette);
   rouge("fiche sans chapitre des exigences", "FP1", muter(FIXTURE_MD, "## 5. Toutes les exigences", "## 5. Le détail"));
+  // TF-1710 (lot Produit-82 20261014h, RT-11) — une fonction présente dans la base n'est pas un
+  // fait constaté. Le statut `présent dans la base` est admis, et il se lève au chapitre 6 comme
+  // une hypothèse : l'essai dans le produit est ce qui reste à faire.
+  const presente = muter(FIXTURE_MD, "| La sonde rend 200 | fait constaté |", "| La sonde rend 200 | présent dans la base |");
+  verte("exigence « présent dans la base » levée au chapitre 6 (le remède)", muter(presente,
+    "| H-01 | Deux fournisseurs", "| H-02 | La sonde amont répond dans ce produit | ENF-01 | L'exploitant, par un essai | avant le palier MVP |\n| H-01 | Deux fournisseurs")
+    .replace("**1 hypothèse**", "**2 hypothèses**"));
+  rouge("exigence « présent dans la base » sans hypothèse au chapitre 6", "FP4", presente);
   for (const c of cas) console.log(`  [${c.ok ? "PASS" : "FAIL"}] ${c.nom} → ${c.attendu}${c.detail ? ` — ${c.detail}` : ""}`);
   const casse = cas.filter((c) => !c.ok);
   console.log(`\noracle-fiche-produit self-test : ${cas.length - casse.length}/${cas.length} PASS (${cas.filter((c) => c.nom.startsWith("cas rouge")).length} cas rouges, ${cas.filter((c) => c.nom.startsWith("cas vert")).length} cas verts, recette à double sens)`);

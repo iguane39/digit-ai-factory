@@ -50,9 +50,12 @@ vérifier qu'il sait lire la table qui suit.
 
 - **Palier** : `MVP` (premier lot utile) · `V1` (lot suivant) · `V2` (plus tard). Une fiche peut
   n'en porter que deux ; elle n'en invente pas un quatrième sans le déclarer au chapitre 1.
-- **Statut d'une exigence** : `fait constaté` (elle vient de la demande, du site ou de l'existant,
-  et la source est citée) · `hypothèse` (elle est proposée et doit être confirmée). Toute exigence
-  `hypothèse` apparaît au chapitre 6.
+- **Statut d'une exigence** : `fait constaté` (elle vient de la demande ou du site, et la source est
+  citée ; tirée de l'existant, elle n'est constatée que par la **trace d'un essai dans le produit
+  lui-même** : le geste ou la commande, sa date, son résultat) · `présent dans la base` (la fonction
+  existe dans le code ou le produit de base, sans configuration ni essai dans ce produit) ·
+  `hypothèse` (elle est proposée et doit être confirmée). Toute exigence `présent dans la base` ou
+  `hypothèse` apparaît au chapitre 6 ; pour la première, ce qu'il reste à lever est l'essai.
 - **Impact** : une note de 1 à 5 de la valeur attendue, **déclarée telle** (échelle dite au
   chapitre 1). La note exprime un jugement du référentiel, pas une mesure.
 - **Identifiant** : `E-001`, stable d'une version de la fiche à l'autre. Une exigence retirée garde
@@ -66,6 +69,10 @@ vérifier qu'il sait lire la table qui suit.
   recalculés sur le chapitre 5 avant la remise (voir « Avant de remettre »).
 - **Une hypothèse présentée comme un fait constaté.** C'est le défaut qui oriente une construction
   entière sur une supposition ; le statut est une colonne, pas une nuance de ton.
+- **Une exigence constatée sur la seule présence d'une fonction dans la base.** Le code amont dit
+  qu'une fonction existe, pas que ce produit la rend. Le 14/10/2026, trois exigences d'une fiche sur
+  vingt-huit `fait constaté` ne l'étaient que par le code amont, et la première question de
+  conformité l'a révélé (TF-1710) : sans trace d'essai, le statut est `présent dans la base`.
 - **Un chapitre des coûts ou des dates.** La fiche porte un périmètre, pas un engagement.
 - **Un jargon sans glose.** Un terme du métier du produit se définit à son premier emploi, au
   chapitre 1 (« Lire cette fiche »).
