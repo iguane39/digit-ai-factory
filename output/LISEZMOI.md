@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 409 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 411 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -333,6 +333,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md | 20260830c | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` |
 | Digit-AI - Synthese Mandat - Fusion de la branche du pilot publiee sur GitHub - 20260921c.md | 20260921c | 8.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion de la branche du pilot publiee sur GitHub - 20260921c.md` |
 | Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md | 20260920b | 14.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md` |
+| Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md | 20261015d | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` |
 | Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md | 20260921d | 15.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md` |
 | Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md | 20260921e | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md` |
 | Digit-AI - Synthese Mandat - Garde d envoi du canal confidentiel posee et eprouvee - 20260927c.md | 20260927c | 12.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Garde d envoi du canal confidentiel posee et eprouvee - 20260927c.md` |
@@ -410,6 +411,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md | 20260917l | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux barre validee et perimetre LinkedIn conteste - 20260917l.md` |
 | Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md | 20260917e | 12.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux D-2 executee premier lot ecrit - 20260917e.md` |
 | Digit-AI - Synthese Mandat - Reseaux sociaux D-3 executee et mandat permanent R-55 - 20260917j.md | 20260917j | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reseaux sociaux D-3 executee et mandat permanent R-55 - 20260917j.md` |
+| Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md | 20261014b | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` |
 | Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md | 20260908g | 37.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` |
 | Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md | 20260908b | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` |
 | Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md | 20260901a | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` |

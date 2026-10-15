@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014a.md",
+ "empreinte": "781d9d90314996798560e771c4b418de73f4ad001827b22485a4ab222ce14ddd",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-14T10:10:53.582Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
