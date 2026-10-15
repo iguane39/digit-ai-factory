@@ -217,8 +217,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 45,
-  "vu_le": "2026-10-12"
+  "cas": 55,
+  "vu_le": "2026-10-15"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -599,7 +599,7 @@
   "vu_le": "2026-09-23"
  },
  "scripts/ouvrir-run.test.mjs": {
-  "cas": 10,
+  "cas": 11,
   "vu_le": "2026-10-15"
  },
  "scripts/pre-commit-index.test.mjs": {
@@ -679,8 +679,8 @@
   "vu_le": "2026-10-12"
  },
  "scripts/verifier-garde-fous.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-10-01"
+  "cas": 15,
+  "vu_le": "2026-10-15"
  },
  "scripts/verifier-hook-poste.test.mjs": {
   "cas": 15,
