@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.33.0",
- "date": "2026-10-14",
+ "version": "1.34.0",
+ "date": "2026-10-15",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -1961,6 +1961,71 @@
    "voisines": [
     "restitution-jugee-apres-affichage"
    ]
+  },
+  {
+   "cle": "adoption-sans-ouverture-de-run",
+   "famille": "heritage-produit",
+   "libelle": "L'adoption pose l'héritage mais aucun geste outillé ne pose le socle d'ouverture de run",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1697"
+   ],
+   "regle": "scripts/ouvrir-run.mjs, cité comme geste suivant par adopter-projet-existant et la bannière de installer-projet",
+   "oracle": "pilot, scripts/ouvrir-run.test.mjs (10 cas)",
+   "voisines": [
+    "type-de-projet-binaire-a-l-adoption"
+   ]
+  },
+  {
+   "cle": "type-de-projet-binaire-a-l-adoption",
+   "famille": "heritage-produit",
+   "libelle": "L'adoption ne distingue que documentaire et site web, et un service sans site public reçoit les artefacts d'un site",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1699"
+   ],
+   "regle": "REGLES-PROJET.md R-27 : type_projet service au carnet d'écarts, robots.txt et llms.txt écartés",
+   "oracle": "pilot, oracles/oracle-conformite-projet.mjs R-27 et R-13 (surfaceWebEcarteePar), recette scripts/adopter-projet-existant.test.mjs",
+   "voisines": [
+    "adoption-sans-ouverture-de-run"
+   ]
+  },
+  {
+   "cle": "artefact-d-oracle-hors-gitignore-socle",
+   "famille": "heritage-produit",
+   "libelle": "Un outil de la forge écrit un artefact d'atelier dans l'arbre d'un produit, et le gitignore socle hérité ne le couvre pas",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1703"
+   ],
+   "regle": "gabarits/gitignore-produit et gabarits/HERITAGE.json 1.20.0 (motifs_exiges)",
+   "oracle": "pilot, scripts/relever-heritage.mjs (presence_et_motifs) et scripts/gitignore-captures.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "garde-fou-plateforme-decouvert-au-deploiement",
+   "famille": "heritage-produit",
+   "libelle": "Une contrainte de plateforme connue d'aucun registre se découvre par essais au premier déploiement d'un produit",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1706",
+    "TF-1707"
+   ],
+   "regle": "references/GARDE-FOUS-PLATEFORME.json (client « tous » pour une contrainte de la plateforme elle-même), ETAPE-MEP § 1 ter",
+   "oracle": "pilot, scripts/verifier-garde-fous.mjs --registre (GR-1 à GR-3) et section GFP-LOT de gabarits/oracle-lot-retours.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "declaration-de-run-sans-rectification",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un champ déclaratif du run_open ne dispose d'aucune rectification par ajout",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1715"
+   ],
+   "regle": "CONTRAT-INTERFACE.md § 3 : entrée de ledger rectification_forges_mobilisees",
+   "oracle": "pilot, oracles/oracle-enclenchement.mjs EN1 (source de la liste), recette oracles/oracle-enclenchement.test.mjs",
+   "voisines": []
   }
  ],
  "cliquet_porteur": {
