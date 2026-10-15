@@ -31,6 +31,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` | fichier | 13,1 Ko | Digit-AI — Synthèse de boucle : les 17 restants du registre — 20260818a |
 | `Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` | fichier | 3,6 Ko | Synthèse de campagne — 4e mandat global « ok, fais tout » |
 | `Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md` | fichier | 17,3 Ko | Synthèse de conseil : les agents suivent déjà Fable 5.1 et Opus 5.5 par héritage, mais le  |
+| `Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` | fichier | 8,4 Ko | Synthèse Conseil — pourquoi « audit complet » part encore vers forge-tests, et comment le  |
 | `Digit-AI - Synthese Conseil - Qualite sans personas cinq propositions mesurees - 20260914c.md` | fichier | 15,8 Ko | Synthèse Conseil — améliorer la qualité sans personas : vos deux décisions sont exécutées, |
 | `Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` | fichier | 3,7 Ko | Synthèse de diagnostic — pourquoi aucun avancement toutes les 3 minutes (TF-0252) |
 | `Digit-AI - Synthese Etude - Communication marketing AO verdict O3 huit candidatures - 20260911g.md` | fichier | 22,2 Ko | Synthèse d'étude — l'étude d'opportunité « communication, marketing et appels d'offres » e |
@@ -268,4 +269,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_251 fichier(s), 0 sous-dossier(s)_
+_252 fichier(s), 0 sous-dossier(s)_
