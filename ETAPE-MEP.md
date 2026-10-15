@@ -772,7 +772,8 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   `node scripts\verifier-verdict-archive.mjs <cible|journal>` : FRAIS se cite, PÉRIMÉ se rejoue
   (TF-1084, reste de TF-0579) ;
 - le rapport forge-tests (couvertures, mutation, findings, pans non couverts), le **dashboard
-  de tests** (copie datée dans `output\`) et la liste `actions[manuelle_utilisateur]` extraite
+  de tests** (copie datée dans `output\`, déposée par `uv run python -m forge_tests <racine>
+  --livrables <dossier hors projet> --copie-output`, TF-1808) et la liste `actions[manuelle_utilisateur]` extraite
   du rapport — chaque saisie attendue de l'utilisateur (champs, où, pourquoi) pour compléter
   les tests restants ; à réception, `--reprendre` rejoue les seuls tests concernés et le
   dashboard est régénéré ;
