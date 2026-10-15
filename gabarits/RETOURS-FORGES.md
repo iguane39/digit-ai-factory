@@ -55,13 +55,13 @@ pilot, préfixé du nom de la forge émettrice).
 par élément visant une forge :
 `{"schema":1, "titre":…, "contenu":…, "demandeur":"<produit ou forge>", "source":"<lot +
 seq ledger>", "date_demande":…, "forges_cibles_initiales":[…], "score":{gain,preuve,effort}
-si estimable, "preuve_du_cout":…, "classe":"<clé de forge\retours\CLASSES.json>"}`. **JAMAIS
+si estimable, "preuve_du_cout":…, "classe":"<clé de todo\CLASSES.json, au pilot>"}`. **JAMAIS
 d'id** : les ids TF sont frappés à l'ingestion par le pilot. Le sidecar est ce qui rend la
 remontée automatique — le `.md` reste la lecture humaine.
 
 **La classe est obligatoire depuis le 03/09/2026** (mandat d'amélioration continue) : chaque ligne
-du sidecar désigne UNE classe de `forge\retours\CLASSES.json` — copie identique du référentiel
-du pilot, reçue avec ce gabarit. Une classe est le défaut généralisé que ce retour illustre — la
+du sidecar désigne UNE classe du référentiel du pilot, `todo\CLASSES.json`, lu au pilot à chaque
+lot (chez le produit, `forge\retours\CLASSES.json` en est le relais, TF-1821). Une classe est le défaut généralisé que ce retour illustre — la
 règle qui aurait évité le retour — jamais une famille. Lot sans classe, ou à classe inconnue :
 **refusé à l'ingestion**, avec les clés proches. **Aucune clé ne convient ?** C'est un défaut
 vraiment neuf, et il a sa sortie conforme (TF-1128, 15/09/2026) : la ligne porte la clé RÉSERVÉE

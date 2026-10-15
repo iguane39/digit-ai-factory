@@ -1,10 +1,12 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\references\\TODO-FORGE.md",
-  "date_iso": "2026-10-02T07:21:50.773Z",
-  "registre_version": "2.35.0",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
+  "date_iso": "2026-10-15T19:46:00.757Z",
+  "registre_version": "2.42.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 4,
     "fail": 0,
@@ -13,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "references\\TODO-FORGE.md"
+      ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,60 +26,60 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "PASS",
       "detail": "4 constat(s) · 4 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; pourcentage « 3,9 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     },
     {
       "domaine": "Autorité d'une décision affirmée",
-      "file": "references\\TODO-FORGE.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucun bloc se déclarant décision (ni table Décision/Décideur, ni champ « Décision : ») — hors périmètre"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "references\\TODO-FORGE.md",
-    "ts": "2026-10-02T07:21:50.773Z",
+    "release": ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md",
+    "ts": "2026-10-15T19:46:00.757Z",
     "fichiers": {
-      "references\\TODO-FORGE.md": "be8f6208405165a2866712e2aa397531eceaffcbb62ec3ddd7091d26992647a7"
+      ".claude\\worktrees\\c2-tf1821\\references\\TODO-FORGE.md": "0111ea29b83125d97cf1a84099a5258155e924c194974d2b78aa62b53bf2cd8c"
     }
   },
   "empreinte_motif": null,

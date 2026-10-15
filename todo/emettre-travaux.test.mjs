@@ -299,9 +299,12 @@ try {
     // l'installe VRAIMENT — un fichier bouchon rendrait l'artefact « PÉRIMÉ » au lieu de le
     // faire disparaître, l'élément changerait de libellé, et il n'y aurait plus d'inclusion.
     // Ce faux pas a été payé en écrivant ce cas : il passait au vert sans rien exercer.
+    // La source installée se LIT au contrat (TF-1821 : le gabarit voyage désormais en relais).
+    const gabaritLot = JSON.parse(readFileSync(join(ICI, "..", "gabarits", "HERITAGE.json"), "utf8"))
+      .artefacts.find((a) => a.alias_accepte === "forge/retours/RETOURS-FORGES.md");
     mkdirSync(join(produit, "forge", "retours"), { recursive: true });
     writeFileSync(join(produit, "forge", "retours", "RETOURS-FORGES.md"),
-      readFileSync(join(ICI, "..", "gabarits", "RETOURS-FORGES.md"), "utf8"), "utf8");
+      readFileSync(join(ICI, "..", gabaritLot.source), "utf8"), "utf8");
     return { boite, lancer };
   };
 

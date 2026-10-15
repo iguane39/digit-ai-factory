@@ -145,7 +145,8 @@ const ingerer = (nomProjet, racine, { racineProduit = null } = {}) => {
 check("rouge — produit dont l'héritage manque : l'ingestion AVERTIT et nomme les artefacts absents", () => {
   const r = ingerer("ProduitNu", poste("ProduitNu", { herite: false }));
   if (!/R-47 — AVERTISSEMENT/.test(r.sortie)) throw new Error("aucun avertissement R-47 — le cercle n'est pas rompu");
-  if (!/RETOURS-FORGES\.md/.test(r.sortie)) throw new Error("l'avertissement ne NOMME pas l'artefact manquant — un constat sans nom ne se répare pas");
+  // TF-1821 : l'artefact se nomme par sa CIBLE chez le produit ; sa source au pilot est un relais.
+  if (!/GABARIT-LOT-RETOURS\.md/.test(r.sortie)) throw new Error("l'avertissement ne NOMME pas l'artefact manquant — un constat sans nom ne se répare pas");
 });
 
 check("BORNE — et il n'a PAS bloqué : le lot est ingéré quand même", () => {

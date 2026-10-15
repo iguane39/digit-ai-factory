@@ -1,10 +1,12 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a576abdf8d21a41a4\\gabarits\\RETOURS-FORGES.md",
-  "date_iso": "2026-10-02T07:12:27.636Z",
-  "registre_version": "2.35.0",
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
+  "date_iso": "2026-10-15T19:45:59.212Z",
+  "registre_version": "2.42.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 3,
     "fail": 0,
@@ -13,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "gabarits\\RETOURS-FORGES.md"
+      ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,54 +26,54 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "gabarits\\RETOURS-FORGES.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "gabarits\\RETOURS-FORGES.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "gabarits\\RETOURS-FORGES.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "gabarits\\RETOURS-FORGES.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "gabarits\\RETOURS-FORGES.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "gabarits\\RETOURS-FORGES.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "gabarits\\RETOURS-FORGES.md",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "gabarits\\RETOURS-FORGES.md",
-    "ts": "2026-10-02T07:12:27.635Z",
+    "release": ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md",
+    "ts": "2026-10-15T19:45:59.212Z",
     "fichiers": {
-      "gabarits\\RETOURS-FORGES.md": "bf31e628d679a0f646bc2e5a539c7b064fc8bb462eee83bed350f09ab05c8115"
+      ".claude\\worktrees\\c2-tf1821\\gabarits\\RETOURS-FORGES.md": "2daed5d93e59b1a558990e31e7d795718f0a653bb399962b72c4e847be73250a"
     }
   },
   "empreinte_motif": null,

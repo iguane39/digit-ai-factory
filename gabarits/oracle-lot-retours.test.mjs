@@ -77,7 +77,14 @@ check("rouge — section R-46 absente : FAIL, et le remède nomme LE TITRE de la
   const { fileURLToPath } = await import("node:url");
   const PILOT = join(dirname(fileURLToPath(import.meta.url)), "..");
   const contrat = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
-  const gabarit = contrat.artefacts.find((a) => a.source === "gabarits/RETOURS-FORGES.md");
+  // TF-1821 : le gabarit voyage en RELAIS (`gabarits/GABARIT-LOT-RELAIS.md`) ; l'artefact se trouve
+  // par son alias de transition, et le gabarit vivant par le chemin que le relais nomme.
+  const gabarit = contrat.artefacts.find((a) => a.alias_accepte === "forge/retours/RETOURS-FORGES.md");
+  const gabaritVivant = (src) => {
+    const texte = readFileSync(join(PILOT, src), "utf8");
+    const vers = (/`(gabarits\/[^`]+\.md)`/.exec(texte) || [])[1];
+    return vers && vers !== src ? vers : src;
+  };
   const cheminDuRemede = (remede) => ((/Gabarit : (\S+)/.exec(remede || "") || [])[1] || "").split("\\").join("/");
 
   check("rouge TF-1430 — le remède de R-45 nomme la cible CANONIQUE du contrat d'héritage, jamais son alias de transition", () => {
@@ -92,10 +99,11 @@ check("rouge — section R-46 absente : FAIL, et le remède nomme LE TITRE de la
     const c = constat(verifier(lot("20260928a"), `# lot\n\n${R46}`), "R-45");
     const source = contrat.artefacts.find((a) => a.cible === cheminDuRemede(c.remede));
     if (!source) throw new Error("le chemin nommé par le remède n'est la cible d'aucun artefact du contrat");
-    const texteGabarit = readFileSync(join(PILOT, source.source), "utf8");
+    const vivant = gabaritVivant(source.source);
+    const texteGabarit = readFileSync(join(PILOT, vivant), "utf8");
     const titre = (/« (## [^»]+?) »/.exec(c.remede) || [])[1];
     const rien = (/L'écrire : « ([^»]+?) »/.exec(c.remede) || [])[1];
-    if (!titre || !existsSync(join(PILOT, source.source)) || !texteGabarit.split(/\r?\n/).includes(titre)) throw new Error(`le gabarit ${source.source} ne porte pas le titre « ${titre} » que le remède fait écrire`);
+    if (!titre || !existsSync(join(PILOT, vivant)) || !texteGabarit.split(/\r?\n/).includes(titre)) throw new Error(`le gabarit ${vivant} (atteint depuis ${source.source}) ne porte pas le titre « ${titre} » que le remède fait écrire`);
     const r = verifier(lot("20260928a"), `# lot\n\n${titre}\n\n${rien}.\n\n${R46}`);
     if (constat(r, "R-45").statut !== "PASS") throw new Error(`le lot corrigé selon le remède reste en défaut : ${JSON.stringify(constat(r, "R-45"))}`);
   });

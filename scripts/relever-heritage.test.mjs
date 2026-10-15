@@ -8,7 +8,7 @@
  * n'écrit RIEN chez les produits, ce qui est vérifié octet pour octet.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync, readFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -516,6 +516,66 @@ try {
     writeFileSync(join(sans, "docs", "projet", "PARAMETRAGE.md"), "# Paramétrage\n\nracine_web: site\n", "utf8");
     att(racineWebDeclaree(sans) === null, "une ligne hors frontmatter a été prise pour une déclaration");
   });
+
+  // ── TF-1821 (15/10/2026) — LE GABARIT DES LOTS ET LE RÉFÉRENTIEL DES CLASSES PASSENT PAR RELAIS ──
+  // Le fait : depuis TF-1759, le juge du lot est un relais chez le produit, mais le gabarit
+  // (`gabarits/RETOURS-FORGES.md`, 7 versions du 15/09 au 15/10) et le référentiel des classes
+  // (`todo/CLASSES.json`, 27 versions sur la même période) restaient des COPIES : chaque version du
+  // pilot, recopiée à l'ouverture, laissait le produit conforme sur le disque et divergent de HEAD
+  // (constat du lot Produit-64 20261015e, RT-64). Le relevé le DISAIT (TF-0848, « non commis ») ;
+  // il ne pouvait pas l'empêcher de revenir. Le cas joue le VRAI contrat sur un pilot et un produit
+  // jetables : le produit commet son héritage, le pilot publie une classe et une ligne de gabarit,
+  // l'ouverture remet à niveau — et l'histoire du produit doit rester tenue.
+  {
+    const CONTRAT_REEL = JSON.parse(readFileSync(join(ICI, "..", "gabarits", "HERITAGE.json"), "utf8"));
+    const VIVANTS = { "forge/retours/GABARIT-LOT-RETOURS.md": "gabarits/RETOURS-FORGES.md", "forge/retours/CLASSES.json": "todo/CLASSES.json" };
+    const entrees = CONTRAT_REEL.artefacts.filter((a) => a.cible in VIVANTS);
+    const P = join(T, "tf1821");
+    const pilotJ = join(P, "digit-ai-factory");
+    const produit = join(P, "_Client", "produit-relais");
+    const copier = (rel, vers) => { mkdirSync(dirname(join(vers, rel)), { recursive: true }); writeFileSync(join(vers, rel), readFileSync(join(ICI, "..", rel), "utf8"), "utf8"); };
+    for (const rel of new Set([...Object.values(VIVANTS), ...entrees.map((a) => a.source)])) copier(rel, pilotJ);
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const gitR = (...a) => spawnSync("git", ["-C", produit, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+    // La remise à niveau de l'ouverture (oracles/hook-ouverture.mjs) : une copie conforme qui diffère est recopiée.
+    const ouvrir = () => {
+      for (const a of entrees) {
+        if (a.mode !== "copie_conforme") continue;
+        const src = readFileSync(join(pilotJ, a.source), "utf8");
+        const dst = join(produit, a.cible);
+        let avant = null; try { avant = readFileSync(dst, "utf8"); } catch { /* absent */ }
+        if (avant !== src) { mkdirSync(dirname(dst), { recursive: true }); writeFileSync(dst, src, "utf8"); }
+      }
+    };
+    gitR("init", "-q", "-b", "main");
+    ouvrir();
+    gitR("add", "-A");
+    gitR("commit", "-q", "-m", "heritage commis");
+    // Le pilot publie : une classe de plus, une ligne de gabarit de plus.
+    const cl = JSON.parse(readFileSync(join(pilotJ, "todo", "CLASSES.json"), "utf8"));
+    cl.classes.push({ cle: "classe-de-recette-tf1821", famille: cl.familles[0].cle, libelle: "recette TF-1821" });
+    writeFileSync(join(pilotJ, "todo", "CLASSES.json"), JSON.stringify(cl, null, 1), "utf8");
+    writeFileSync(join(pilotJ, "gabarits", "RETOURS-FORGES.md"), readFileSync(join(pilotJ, "gabarits", "RETOURS-FORGES.md"), "utf8") + "\nRègle publiée après le commit du produit (recette TF-1821).\n", "utf8");
+    ouvrir();
+
+    check("cas rouge — TF-1821 — une version neuve du gabarit des lots ou des classes au pilot ne laisse pas le produit divergent de HEAD", () => {
+      att(entrees.length === 2, `le contrat déclare ${entrees.length} des 2 artefacts attendus (${Object.keys(VIVANTS).join(", ")})`);
+      for (const a of entrees) {
+        const e = etatArtefact(produit, a, pilotJ);
+        att(e.etat === "conforme", `${a.cible} : état « ${e.etat} » après la remise à niveau`);
+        att(e.histoire === "commis", `${a.cible} : histoire « ${e.histoire} » — chaque version du pilot (${VIVANTS[a.cible]}) le fait dériver de HEAD jusqu'au prochain commit du produit ; source au contrat : ${a.source}`);
+      }
+    });
+
+    check("TF-1821 borne — le relais mène au référentiel VIVANT du pilot, et ne recopie pas son contenu", () => {
+      for (const a of entrees) {
+        const texte = readFileSync(join(produit, a.cible), "utf8");
+        att(texte.includes(VIVANTS[a.cible]), `${a.cible} ne nomme pas ${VIVANTS[a.cible]}, le fichier du pilot à lire`);
+        att(!texte.includes("classe-de-recette-tf1821") && !texte.includes("recette TF-1821"), `${a.cible} porte le contenu publié : c'est une copie, pas un relais`);
+        att(existsSync(join(ICI, "..", VIVANTS[a.cible])), `${VIVANTS[a.cible]} n'existe pas au pilot : le relais mènerait nulle part`);
+      }
+    });
+  }
 
   // ── TF-0711 — L'ATTRIBUTION D'UNE DIVERGENCE SE MESURE DANS L'HISTORIQUE GIT DU PILOT ──
   // Les trois sens, joués contre le VRAI dépôt du pilot : une copie qui correspond à une version

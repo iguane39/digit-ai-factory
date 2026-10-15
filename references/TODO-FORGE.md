@@ -103,8 +103,8 @@ HTML ») n'est pas un défaut (« polices distantes chargées »). D'où trois c
 jour. (1) **Le référentiel `todo\CLASSES.json`** — donnée datée (loi n° 4), deux niveaux : la
 FAMILLE sert à lire, la CLASSE sert à compter ; une classe est un défaut généralisé avec la règle
 où il vit, l'oracle qui la joue et les clôtures qui l'ont fondée (`fondee_par`, ids seulement —
-la date se lit au registre, N-6). Il est **hérité en copie identique** (`forge\retours\CLASSES.json`,
-R-47) : le producteur qui écrit un lot y lit ce qu'il doit déclarer. (2) **À l'ingestion**, tout
+la date se lit au registre, N-6). Il se **lit au pilot** : le produit n'en reçoit qu'un relais (`forge\retours\CLASSES.json`,
+R-47, TF-1821), et le producteur qui écrit un lot lit au pilot ce qu'il doit déclarer. (2) **À l'ingestion**, tout
 retour d'un lot daté du 03/09 ou après porte `classe` ; absente ou inconnue, `ingerer-lot.mjs`
 REFUSE en nommant les clés proches — une classe nouvelle se crée dans le référentiel, jamais dans
 un sidecar. Le défaut vraiment neuf a sa sortie (TF-1128, 15/09/2026) : la clé RÉSERVÉE

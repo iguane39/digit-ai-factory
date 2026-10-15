@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+  "date_iso": "2026-10-15T19:42:39.290Z",
+  "registre_version": "2.42.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+      "verdict": "SKIP",
+      "detail": "aucune affirmation chiffrée hors table détectée"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+      "verdict": "SKIP",
+      "detail": "nom ne se réclamant pas de la convention"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 0 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 1 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md",
+    "ts": "2026-10-15T19:42:39.290Z",
+    "fichiers": {
+      ".claude\\worktrees\\c2-tf1821\\gabarits\\GABARIT-LOT-RELAIS.md": "f621817777c5fdf48a04262482fa6c45738b159c3af52c7a6c6dd5912bb7adf2"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

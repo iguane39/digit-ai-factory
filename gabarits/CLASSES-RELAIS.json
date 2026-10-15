@@ -1,0 +1,13 @@
+{
+  "schema": "pilot/relais@1",
+  "relais_de": "todo/CLASSES.json",
+  "regle": "Ce fichier ne porte pas les classes de défaut : il dit où les lire (TF-1821, 15/10/2026). Le référentiel vit au pilot, sous todo/CLASSES.json, et s'y lit à chaque lot : la `classe` d'un sidecar est une de ses clés, et une classe se crée au pilot, jamais dans un sidecar.",
+  "pourquoi": "Recopié chez chaque produit, le référentiel changeait au pilot plusieurs fois par jour (27 versions du 15/09 au 15/10/2026) : la copie du produit, remise à niveau à l'ouverture, restait divergente de son histoire git jusqu'au commit suivant (lot Produit-64 20261015e, RT-64). Ce relais ne change pas d'une version du référentiel à l'autre.",
+  "pilot": [
+    "$FORGE_ROOT/digit-ai-factory",
+    "le dossier digit-ai-factory voisin de ce produit",
+    "c:/dev/digit-ai-factory",
+    "~/.digit-ai-forge/digit-ai-factory"
+  ],
+  "juge": "node forge/retours/oracle-lot.mjs \"<lot>.md\" juge la classe du sidecar contre le référentiel du pilot (règle LOT-SIDECAR)."
+}
