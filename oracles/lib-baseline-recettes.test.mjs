@@ -269,7 +269,9 @@ check("TF-1434 — la lecture : plusieurs déclarations s'additionnent, fins de 
       `le fallback sans python n'est pas lu par le cliquet (forme hors de « [NON JOUÉ] <n> cas ») : ${JSON.stringify(d)} — sortie : ${r.stdout}`);
   });
 
-  check("TF-1477 — oracle-enclenchement.test.mjs sans mécanisme joignable déclare ses 27 cas dans la forme comptée", () => {
+  // TF-1715 (15/10/2026) : la recette d'oracle-enclenchement passe de 27 à 30 cas (rectification de
+  // forges_mobilisees) ; le compte déclaré hors mécanisme suit, 30 joués quand le mécanisme est joignable.
+  check("TF-1477 — oracle-enclenchement.test.mjs sans mécanisme joignable déclare ses 30 cas dans la forme comptée", () => {
     // FORGE_ROOT pointé vers un dossier vide : forge-tests n'y existe pas, MECANISME_REEL est
     // introuvable — même branche que sur un poste sans le clone.
     const T = mkdtempSync(join(tmpdir(), "enclenchement-vide-"));
@@ -277,7 +279,7 @@ check("TF-1434 — la lecture : plusieurs déclarations s'additionnent, fins de 
       { encoding: "utf8", env: { ...process.env, FORGE_ROOT: T } });
     att(r.status === 0, `exit ${r.status} attendu 0 : ${(r.stdout || "") + (r.stderr || "")}`);
     const d = nonJouesDe(r.stdout || "");
-    att(d.length === 1 && d[0].cas === 27,
+    att(d.length === 1 && d[0].cas === 30,
       `le fallback sans mécanisme n'est pas lu par le cliquet : ${JSON.stringify(d)} — sortie : ${r.stdout}`);
   });
 }
