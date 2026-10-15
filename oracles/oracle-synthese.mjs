@@ -83,6 +83,10 @@
  *       système, ou « justesse non mesurée » (15/10, TF-1694, R-63) ; S74 un gain annoncé sur un
  *       échantillon dit le contrôle des changements dans la population et l'effet sur l'existant
  *       (TF-1695, R-63) ; avertissantes ;
+ *   S75 une livraison déclarée d'un produit à interface dit qu'un parcours a été joué dans un vrai
+ *       navigateur sur l'adresse publique, ou l'avoue non joué (15/10, TF-1766, R-61 point 3) ; S76 un
+ *       chiffre attribué au rapport d'un agent se recompte à la source, ou se dit « non recompté »
+ *       (15/10, TF-1802) ; avertissantes ;
  *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
  *   S38 une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'EXEMPTION
  *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
@@ -3799,6 +3803,54 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // S75 (TF-1766, lot Produit-82 20261015b RT-15, R-61 point 3) — UNE LIVRAISON À INTERFACE DIT QUE SES
+  // PARCOURS ONT ÉTÉ JOUÉS DANS UN VRAI NAVIGATEUR, SUR L'ADRESSE PUBLIQUE. Le 15/10/2026, une restitution
+  // annonçait 5 parcours de personas au vert, en local et chez l'hébergeur ; la première connexion humaine
+  // sur l'adresse publique a rendu « Application failed to respond ». Les tests appelaient le portail par
+  // le réseau privé, avec les seules saisies attendues. Ce juge lit une livraison déclarée (S71) d'un
+  // produit à interface (portail, page, écran, site, connexion, formulaire, tableau de bord), et exige
+  // dans la restitution un parcours joué dans un navigateur avec l'adresse publique, ou l'aveu qu'il ne
+  // l'a pas été. AVERTISSANTE. NON JUGÉ : que le parcours ait vraiment été joué, la saisie inattendue.
+  {
+    const INTERFACE = uni(/\b(portails?|interfaces?|[ée]crans?|pages?|sites?|application web|connexion|se connecter|formulaires?|tableaux? de bord|navigateur)\b/i);
+    const sansCode75 = texte.replace(/```[\s\S]*?```/g, " ");
+    const PARCOURS_NAV = uni(/\b(parcours|recette|tests?|jou[ée]s?)\b[^.\n]{0,120}\bnavigateur\b|\bnavigateur\b[^.\n]{0,120}\b(parcours|jou[ée]s?)\b/i);
+    const PUBLIQUE = uni(/\badresse publique\b|https?:\/\/[^\s)`>\]]+/i);
+    const AVEU = uni(/\bparcours\b[^.\n]{0,60}\bnon jou[ée]s?\b|\bnon jou[ée]s?\b[^.\n]{0,60}\bnavigateur\b|\bpas (?:encore )?(?:[ée]t[ée] )?jou[ée]s? dans un navigateur\b/i);
+    const aInterface = livraisons.length > 0 && INTERFACE.test(lireDAbord);
+    if (!aInterface) ok("S75", "aucune livraison d'un produit à interface déclarée au bloc 0 ou au verdict — rien à juger");
+    else if (AVEU.test(sansCode75) || (PARCOURS_NAV.test(sansCode75) && PUBLIQUE.test(sansCode75)))
+      ok("S75", "livraison à interface déclarée, avec la trace d'un parcours joué dans un navigateur sur l'adresse publique, ou l'aveu qu'il ne l'a pas été");
+    else ko("S75", "une livraison d'un produit à interface est déclarée sans dire qu'un parcours a été joué dans un vrai navigateur, sur l'adresse "
+      + "publique — le 15/10/2026, 5 parcours verts appelaient le portail par le réseau privé, et la première connexion humaine a rendu « Application "
+      + "failed to respond » (TF-1766). Écris le parcours joué (navigateur, adresse publique, date, saisie inattendue), ou « parcours non joué dans un navigateur ». "
+      + `Ex. : ${livraisons[0].replace(/\s+/g, " ").slice(0, 110)}`);
+  }
+
+  // S76 (TF-1802, lot Produit-83 20261015b RT-14) — UN CHIFFRE RAPPORTÉ PAR UN AGENT SE RECOMPTE À LA
+  // SOURCE AVANT D'ÊTRE RESTITUÉ. Le 15/10/2026, un peuplement a été annoncé à 13 087 établissements, le
+  // compte du rapport de l'agent ; recompté en base, 9 872 établissements distincts, les cercles de
+  // collecte se chevauchant. Ce juge lit une phrase qui attribue un nombre à un agent (« l'agent
+  // rapporte », « selon l'agent », « rapport de l'agent ») et exige dans la restitution un recompte à la
+  // source (recompté, compté en base, requête, `COUNT`, `wc -l`) ou l'aveu « non recompté ». AVERTISSANTE.
+  // NON JUGÉ : que le recompte soit juste, un chiffre d'agent restitué sans être attribué à l'agent.
+  {
+    const sansCode76 = texte.replace(/```[\s\S]*?```/g, " ");
+    const PAR_AGENT = uni(/\b(?:(?:l['’]|les |un |le |des |du |d['’])?(?:sous-)?agents?\b[^.\n]{0,40}\b(?:rapporte|rapportent|annonce|annoncent|compte|comptent|a compt[ée]|ont compt[ée]|dit|disent|remonte|remontent|indique|indiquent|signale|signalent)|selon (?:l['’]|les )(?:sous-)?agents?|d['’]apr[èe]s (?:l['’]|les )(?:sous-)?agents?|rapports? (?:de l['’]|des |du )(?:sous-)?agents?|rapport[ée]s? par (?:l['’]|les |un )(?:sous-)?agents?)\b/i);
+    // Un COMPTE d'objets : trois chiffres au moins, ou un séparateur de milliers. Hors du jugement : les
+    // lignes de tableau (bloc 8), le décompte d'appels d'outils d'un agent, qui n'est pas un résultat.
+    const NOMBRE = /\b\d{1,3}(?:[  .]\d{3})+\b|\b\d{3,}\b/;
+    const RECOMPTE = uni(/\b(recompt\w*|compt[ée]s? (?:en base|[àa] la source|dans la base)|mesur[ée]s? (?:en base|[àa] la source)|requ[êe]te|non recompt[ée]s?|non rejou[ée]s?)\b|\bCOUNT\s*\(|\bwc -l\b/i);
+    const chiffres = phrasesDe(sansCode76.split("\n").filter((l) => !/^\s*\|/.test(l)).join("\n"))
+      .filter((p) => PAR_AGENT.test(p) && NOMBRE.test(p) && !/appels? d['’]outils?/i.test(p));
+    if (!chiffres.length) ok("S76", "aucun chiffre attribué au rapport d'un agent — rien à juger");
+    else if (RECOMPTE.test(sansCode76)) ok("S76", `${chiffres.length} chiffre(s) attribué(s) à un agent, avec un recompte à la source ou l'aveu « non recompté »`);
+    else ko("S76", `${chiffres.length} chiffre(s) rapporté(s) par un agent restitué(s) sans recompte à la source — le rapport d'un agent est une donnée `
+      + "à vérifier, pas une mesure : le 15/10/2026, 13 087 établissements annoncés d'après le rapport de l'agent en valaient 9 872 en base, les "
+      + "tuiles de collecte se chevauchant (TF-1802). Recompte en base ou dans le fichier, et donne la commande ; à défaut, écris « non recompté ». "
+      + `Ex. : ${chiffres[0].replace(/\s+/g, " ").slice(0, 110)}`);
+  }
+
   return findings;
 }
 
@@ -5551,6 +5603,30 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`${regle} (TF-1694, TF-1695) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
   if (!/existant/.test(constatDe(r74pop, "S74").message || ""))
     casse.push("S74 (TF-1695) : le gain contrôlé dans la population mais pas sur l'existant doit NOMMER l'existant qui manque : " + String(constatDe(r74pop, "S74").message || "").slice(0, 160));
+  // 15/10 — TF-1766 ET TF-1802 : S75 ET S76, DANS LEURS DEUX SENS. (a) La livraison de r71avec (portail,
+  // adresse, usage, compte) ne dit d'aucun parcours qu'il a été joué dans un navigateur : S75 FAIL ; la
+  // MÊME avec « parcours joués dans un navigateur sur l'adresse publique » : PASS ; avec l'aveu « parcours
+  // non joué dans un navigateur » : PASS (le manque est dit). (b) « L'agent de collecte rapporte 13 087
+  // établissements » sans recompte : S76 FAIL ; la MÊME avec le recompte en base : PASS.
+  const TRACE_75 = USAGE_71 + nl + nl + "Les 5 parcours des personas ont été joués dans un navigateur, sur l'adresse publique, le 2026-10-15, avec une saisie inattendue par formulaire.";
+  const r75avec = jouerPe("tf1766-parcours-navigateur.md", ouv70(BRIEF_71).replace(VERDICT_70, TRACE_75));
+  const r75aveu = jouerPe("tf1766-parcours-non-joue.md", ouv70(BRIEF_71).replace(VERDICT_70, USAGE_71 + nl + nl + "Parcours non joué dans un navigateur : la recette appelle le portail par le réseau privé."));
+  const AGENT_76 = "L'agent de collecte rapporte 13 087 établissements peuplés dans la base de qualification.";
+  const r76sans = jouerPe("tf1802-compte-de-l-agent.md", ouv70(AGENT_76));
+  const r76avec = jouerPe("tf1802-compte-recompte.md", ouv70(AGENT_76 + " Recompté en base : 9 872 établissements distincts (SELECT COUNT(DISTINCT siret)), les tuiles se chevauchant."));
+  const attendu75 = [
+    [r71avec, "S75", "FAIL", "une livraison de portail qui ne dit d'aucun parcours qu'il a été joué dans un navigateur sur l'adresse publique passe — c'est la recette du 15/10 par le réseau privé"],
+    [r75avec, "S75", "PASS", "la MÊME livraison avec les parcours joués dans un navigateur sur l'adresse publique est accusée — le remède du message échoue"],
+    [r75aveu, "S75", "PASS", "la MÊME livraison qui avoue le parcours non joué dans un navigateur est accusée — le manque dit est le remède"],
+    [r72nie, "S75", "PASS", "une restitution qui dit le produit NON livré est accusée"],
+    [r58sansObjet, "S75", "PASS", "la verte, sans livraison, est accusée"],
+    [r76sans, "S76", "FAIL", "un compte rapporté par un agent, restitué sans recompte à la source, passe — c'est 13 087 annoncés pour 9 872 réels"],
+    [r76avec, "S76", "PASS", "le MÊME compte recompté en base est accusé — le remède du message échoue"],
+    [r58sansObjet, "S76", "PASS", "la verte, sans compte d'agent, est accusée"],
+  ];
+  for (const [r, regle, statut, quoi] of attendu75)
+    if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-1766, TF-1802) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
   // 27/09 — LE COMPTE DE CAS SE MESURE. Le bilan portait « 39/39 » écrit à la main ; le harnais le lit
   // comme un CLIQUET (I5, `lib-baseline-recettes.mjs` : premier « N PASS », sinon le ratio N/N), et il
   // n'avait pas bougé quand deux paires se sont ajoutées le 26/09. Retiré seul, il a laissé le

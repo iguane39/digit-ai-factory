@@ -147,6 +147,15 @@ gains_constates, ou retour en non-clos), régénère la vue et la page, et journ
 campagne dans BOUCLE-AMELIORATION.md. Tu n'as donc PAS à écrire ces artefacts — ton
 rapport est ta seule interface de sortie.
 
+**L'orchestrateur recompte à la source un chiffre qu'il restitue** (TF-1802, 15/10/2026). La règle
+« Remesurer plutôt que reprendre » vaut aussi pour celui qui reçoit le rapport. Un compte annoncé par
+un agent (lignes peuplées, fichiers traités, cas de recette) se recompte en base, dans le fichier ou
+par la commande native, avant d'entrer dans une restitution ; la preuve cite la commande. Faute de
+recompte, le chiffre s'écrit « rapporté par l'agent, non recompté ». *Le fait* : le 15/10/2026, un
+peuplement a été annoncé à 13 087 établissements d'après le rapport de l'agent ; recompté en base, il
+en comptait 9 872, la somme tuile par tuile comptant deux fois les cercles de collecte qui se
+chevauchent. Juge, avertissant : S76 d'`oracles\oracle-synthese.mjs`.
+
 ## Synthèse de fin de campagne (TF-0249, consigne RESTITUTION v2.1)
 
 La synthèse de TOUTE campagne suit `gabarits\RESTITUTION.md` (8 blocs). Côté pilot :

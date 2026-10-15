@@ -468,6 +468,19 @@ unique. Un run qui s'arrête avant le dit, écrit « N exigences sur M tenues »
 sa restitution, et nomme ce qui reste ; le critère de sortie d'une phase tenu se dit « phase close ».
 Juges : S70 à S72 d'`oracles\oracle-synthese.mjs`, avertissantes.
 
+*Une recette verte a joué chaque parcours dans un vrai navigateur, sur l'adresse publique*
+(TF-1766, 15/10/2026, **avertissement** ; rattachée au point 3 de R-61, « la mesure se fait par
+l'usage »). Le fait : une restitution annonçait 5 parcours de personas au vert, en local et chez
+l'hébergeur ; la première connexion humaine sur l'adresse publique a rendu « Application failed to
+respond », parce qu'un identifiant inconnu faisait planter le serveur. Les tests appelaient le portail
+par le réseau privé, avec les seules saisies attendues. Pour un produit à interface, la recette joue
+donc chaque parcours de la fiche (chapitre « Personas et usages », `gd-fiche-produit` 1.2.0) dans un
+vrai navigateur, sur l'adresse publique, avec au moins une saisie inattendue par formulaire ; la
+colonne « Parcours testé » de la fiche en porte la trace datée. Une restitution ne dit « fonctionnel »
+ou « livré » d'un produit à interface qu'avec cette trace. Juges, avertissants : FP8
+d'`oracles\oracle-fiche-produit.mjs` (la trace dans la fiche) et S75 d'`oracles\oracle-synthese.mjs`
+(la trace dans la restitution qui déclare la livraison).
+
 *L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
 
 ## 4 bis. L'auteur d'un brief ne juge pas son propre contrat de sortie (TF-0776 — 02/09/2026)
