@@ -88,6 +88,9 @@ role_destinataire: {qui lit cette fiche produit, et quelles décisions elle lui 
 4. Rendu HTML jugé par `check_html.py` **et** `render_page.py --widths 1280,768,390` (D7).
 5. Aucun `{…}` restant.
 
+Les points 1, 2, 3 et 5 se jouent en une commande : `node oracles\oracle-fiche-produit.mjs <fiche>`
+(règles FP1 à FP7, sur la fiche HTML ou Markdown).
+
 ## Document d'auteur — ce qui ne va pas au lecteur
 
 Le lecteur de ce document est celui que déclare `role_destinataire`. Tout ce qui n'entre pas
@@ -117,15 +120,19 @@ contraire de son lecteur : 11 fichiers à partager sont un coût pour lui, jamai
 - `render_page.py` du même socle — zéro défaut visuel aux six largeurs, dont **V18** (mesure de
   lecture) et **V19** (une seule largeur de contenu) ;
 - `oracle-gabarits-documents.mjs` du pilot — G1 à G13 ;
-- pour le **fond** : `oracle-couverture-exigences.mjs` du pilot (chaque exigence du référentiel est
-  couverte) et `oracle-ecriture.mjs` (tournures d'annonce en titre et en en-tête de colonne, EC-8).
+- pour le **fond** : `oracle-fiche-produit.mjs` du pilot, qui recompte la fiche sur elle-même (FP1 à
+  FP7 : chiffres d'« En bref » et tableau des domaines sur le chapitre 5, hypothèses croisées avec
+  les exigences, statut au vocabulaire fermé, critère de recette à chaque ligne, briques datées,
+  aucun emplacement restant), et `oracle-ecriture.mjs` (tournures d'annonce en titre et en en-tête
+  de colonne, EC-8). `oracle-couverture-exigences.mjs` ne juge pas la fiche : il juge le référentiel
+  d'exigences du pilot lui-même (TF-1712).
 
 ## Limites du jugement
 
 **Qu'une exigence soit la bonne.** Le critère de recette est présent et testable en forme ; qu'il
-mesure ce que veut le commanditaire reste une relecture. **Qu'un total recompté le soit juste** : le
-recomptage de « Avant de remettre » est un geste de l'auteur, et aucun oracle du pilot ne rouvre le
-référentiel pour le refaire à sa place.
+mesure ce que veut le commanditaire reste une relecture. **Que la fiche soit fidèle au référentiel** :
+`oracle-fiche-produit.mjs` recompte la fiche sur son propre chapitre 5, il ne rouvre pas
+`forge\EXIGENCES.json`, et une exigence absente des deux côtés passe.
 
 ## Boucle de retour
 
