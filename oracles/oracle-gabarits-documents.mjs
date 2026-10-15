@@ -21,7 +21,11 @@
  *        `[À REMPLIR]`) hors commentaires,
  *        et elle diffère de son squelette. Une instance qui recopie le squelette ne prouve rien ;
  *   G3 · squelette ET instance passent le contrôle de MARQUAGE du socle (`check_html.py`). C'est
- *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait ;
+ *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait.
+ *        Ses AVERTISSEMENTS se publient aussi (TF-1726, 15/10/2026), en statut AVERTISSEMENT qui
+ *        ne fait pas échouer : l'avertissement L12 que chaque fiche héritait du squelette
+ *        gd-fiche-produit passait G3 sans être dit, alors qu'un défaut du squelette se recopie
+ *        dans toute instance qui en part ;
  *   G11 · toute famille du CATALOGUE qui déclare produire du `html` porte son `point_de_depart` :
  *        son TYPE (`squelette` · `generateur` · `canevas` · `aucun`) et, sauf pour `aucun`, le
  *        CHEMIN qui le porte, vérifié sur disque. Née le 14/09/2026 d'une mesure qui s'est
@@ -112,9 +116,44 @@ const sansCommentaires = (html) => html.replace(/<!--[\s\S]*?-->/g, " ");
 function marquage(fichier) {
   if (!SOCLE || !PYTHON) return { skip: true };
   const r = spawnSync(PYTHON, ["-X", "utf8", SOCLE, fichier], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
-  const sortie = (r.stdout || "") + (r.stderr || "");
+  return lireMarquage((r.stdout || "") + (r.stderr || ""));
+}
+
+/** La sortie de check_html lue : verdict, détail des échecs, et (TF-1726) les lignes « ! … » de sa
+ *  rubrique « Avertissements : », publiées au lieu d'être jetées avec le reste. Pure : le
+ *  self-test la joue sur une sortie écrite, sans dépendre des règles du socle du jour. */
+function lireMarquage(sortie) {
   const m = /^Verdict\s*:\s*(\w+)/m.exec(sortie);
-  return { verdict: m ? m[1] : "ILLISIBLE", detail: sortie.split("\n").filter((l) => /^\s+\[/.test(l)).slice(0, 3).join(" · ") };
+  const lignes = sortie.split(/\r?\n/);
+  const avertissements = lignes.filter((l) => /^\s+!\s+\S/.test(l)).map((l) => l.trim().replace(/^!\s+/, ""));
+  return { verdict: m ? m[1] : "ILLISIBLE", detail: lignes.filter((l) => /^\s+\[/.test(l)).slice(0, 3).join(" · "), avertissements };
+}
+
+/** « L12 ×4 · L35 » : les règles du socle qui ont averti, comptées, dans l'ordre de leur sortie. */
+function resumerAvertissements(avertissements) {
+  const compte = new Map();
+  for (const a of avertissements) {
+    const regle = (/^([A-Z]+-?\d+)\b/.exec(a) || [, "non numéroté"])[1];
+    compte.set(regle, (compte.get(regle) || 0) + 1);
+  }
+  return [...compte].map(([r, n]) => (n > 1 ? `${r} ×${n}` : r)).join(" · ");
+}
+
+/** Les constats G3 d'une pièce, à partir de son marquage lu. Un avertissement du socle se publie
+ *  en AVERTISSEMENT, qui ne compte pas au verdict (TF-1726). */
+function constatsG3(ou, r) {
+  if (r.skip) return [{ regle: "G3", statut: "SKIP", ou, message:
+    "socle de marquage ou python introuvable — le contrôle n'a PAS tourné" }];
+  const constats = [r.verdict !== "PASS"
+    ? { regle: "G3", statut: "FAIL", ou, message: `marquage ${r.verdict} — ${r.detail || "voir check_html.py"}` }
+    : { regle: "G3", statut: "PASS", ou, message: "marquage PASS" }];
+  if (r.avertissements.length) {
+    constats.push({ regle: "G3", statut: "AVERTISSEMENT", ou, message:
+      `${r.avertissements.length} avertissement(s) du marquage (${resumerAvertissements(r.avertissements)}), ` +
+      `sans effet sur le verdict : « ${r.avertissements[0].slice(0, 160)} »` +
+      (/SQUELETTE/.test(ou) ? " — un squelette les transmet à toute instance qui en part" : "") });
+  }
+  return constats;
 }
 
 // ---- G8 (TF-1076, 16/09/2026) — UN LIVRABLE ÉCRIT SANS FAMILLE AU CATALOGUE ------------------
@@ -621,16 +660,7 @@ export function juger(dossier, catalogue = lireCatalogue()) {
     }
 
     for (const n of ["SQUELETTE.html", "INSTANCE.html"].filter((f) => fichiers.includes(f))) {
-      const r = marquage(p(n));
-      if (r.skip) {
-        findings.push({ regle: "G3", statut: "SKIP", ou: `${fam}/${n}`, message:
-          "socle de marquage ou python introuvable — le contrôle n'a PAS tourné" });
-      } else if (r.verdict !== "PASS") {
-        findings.push({ regle: "G3", statut: "FAIL", ou: `${fam}/${n}`, message:
-          `marquage ${r.verdict} — ${r.detail || "voir check_html.py"}` });
-      } else {
-        findings.push({ regle: "G3", statut: "PASS", ou: `${fam}/${n}`, message: "marquage PASS" });
-      }
+      findings.push(...constatsG3(`${fam}/${n}`, marquage(p(n))));
     }
 
     // G4 (TF-0690, 28/08) — LE DOCUMENT LIVRÉ PORTE SON GABARIT ET SA VERSION, VISIBLEMENT.
@@ -908,6 +938,22 @@ if (args[0] === "--self-test") {
   if (!g10("g10-sans-lecteur").some((x) => x.statut === "FAIL" && /role_destinataire/.test(x.message)))
     casse.push("G10 : un gabarit qui ne déclare pas son lecteur passe — la frontière n'a alors aucun lecteur à protéger");
 
+  // G3, avertissements (TF-1726), dans ses deux sens, sur des sorties de check_html écrites : un
+  // marquage PASS sans rubrique d'avertissements ne publie que son PASS ; le même avec deux
+  // avertissements L12 et un EC-9 publie un AVERTISSEMENT qui les compte, et ne fait rien échouer.
+  const sortieNette = "Source  : x.html\nVerdict : PASS\nRègles  : 46 règles\n\nPérimètre de NON-MESURE :\n  non jugé — x\n";
+  const sortieAvertie = "Source  : x.html\r\nVerdict : PASS\r\n\r\nAvertissements :\r\n" +
+    "  ! L12 énumération en prose (avertissement) : 4 éléments\r\n  ! L12 énumération en prose (avertissement) : 5 éléments\r\n" +
+    "  ! EC-9 1 valeur(s) écrite(s) en toutes lettres\r\n";
+  const g3Nette = constatsG3("pure/SQUELETTE.html", lireMarquage(sortieNette));
+  if (g3Nette.length !== 1 || g3Nette[0].statut !== "PASS")
+    casse.push("G3 publie autre chose que son PASS sur un marquage sans avertissement : " + JSON.stringify(g3Nette));
+  const g3Averti = constatsG3("pure/SQUELETTE.html", lireMarquage(sortieAvertie));
+  if (g3Averti.some((x) => x.statut === "FAIL"))
+    casse.push("G3 fait échouer un marquage PASS sur de simples avertissements du socle — il doit les dire, pas bloquer");
+  if (!g3Averti.some((x) => x.statut === "AVERTISSEMENT" && /^3 avertissement\(s\) du marquage \(L12 ×2 · EC-9\)/.test(x.message)))
+    casse.push("G3 tait ou compte mal les avertissements d'un marquage PASS (attendu « 3 … (L12 ×2 · EC-9) ») : " + JSON.stringify(g3Averti));
+
   // G3, sens rouge : une classe posée sans règle CSS — le défaut exact du 24/08, en modèle réduit.
   mkdirSync(join(dir, "classe-nue"), { recursive: true });
   writeFileSync(join(dir, "classe-nue", "GABARIT.md"), "# doctrine\n", "utf8");
@@ -931,6 +977,18 @@ if (args[0] === "--self-test") {
     process.exit(casse.length ? 1 : 0);
   }
   if (!g3.some((x) => x.statut === "FAIL")) casse.push("une classe posée sans règle CSS passe G3 — c'est le défaut mesuré le 24/08");
+
+  // G3, avertissements, de bout en bout (TF-1726) : le marquage réel d'un squelette qui porte une
+  // espace ordinaire devant un deux-points (L35) publie l'avertissement. Ce cas prouve que la sortie
+  // du socle du jour se lit encore ; les deux sens purs sont joués plus haut, sans python.
+  mkdirSync(join(dir, "averti"), { recursive: true });
+  writeFileSync(join(dir, "averti", "GABARIT.md"), "# doctrine\n", "utf8");
+  writeFileSync(join(dir, "averti", "SQUELETTE.html"), PAGE("Squelette", "<p>Forme : à remplir par le projet.</p>" + COUPLE), "utf8");
+  writeFileSync(join(dir, "averti", "INSTANCE.html"), PAGE("Instance", "<p>Contenu réel, mesuré le 24 août 2026.</p>" + COUPLE), "utf8");
+  f = juger(dir);
+  const g3a = g("G3", "averti/SQUELETTE");
+  if (!g3a.some((x) => x.statut === "AVERTISSEMENT" && /\bL35\b/.test(x.message)))
+    casse.push("G3 tait l'avertissement L35 rendu par le socle réel sur un squelette — l'avertissement hérité reste invisible (TF-1726) : " + JSON.stringify(g3a));
 
   // G8 (TF-1076) — LA RÉSOLUTION D'UNE FAMILLE PAR LE NOM, DANS SES TROIS SENS. Les fixtures sont
   // des NOMS, pas des fichiers : la règle lit ce que R-4 rend porteur et ne touche jamais au
@@ -1197,7 +1255,7 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 45/45 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 49/49 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
@@ -1206,7 +1264,7 @@ if (args[0] === "--self-test") {
       "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
       "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS) ; " +
       "TF-1230 : la famille docs-projet existe au catalogue réel, cite les huit fichiers de gabarits/docs-projet/, tous présents sur le disque ; " +
-      "G13 dans ses QUATRE sens (TF-1249) : lecteur/type_de_contenu en prose sur une famille ok → FAIL, structure complète → PASS, valeur hors vocabulaire fermé → FAIL, famille hors statut ok → jamais jugée)");
+      "G13 dans ses QUATRE sens (TF-1249) : lecteur/type_de_contenu en prose sur une famille ok → FAIL, structure complète → PASS, valeur hors vocabulaire fermé → FAIL, famille hors statut ok → jamais jugée ; G3 publie les avertissements du marquage dans ses TROIS sens (TF-1726) : marquage net → son seul PASS, marquage averti → AVERTISSEMENT compté qui ne fait rien échouer, et le socle réel lu de bout en bout sur un L35)");
   process.exit(casse.length ? 1 : 0);
 }
 
