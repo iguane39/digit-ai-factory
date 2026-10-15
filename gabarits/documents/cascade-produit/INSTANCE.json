@@ -1,0 +1,82 @@
+{
+ "format": "pilot/cascade-isto@1",
+ "projet": "Produit-X, outil de réservation de salles",
+ "version": "1.1.0",
+ "date": "2026-10-10",
+ "statut": "ratifiée le 2026-10-10 (D-4 (a)) ; exemplaire ILLUSTRATIF, client pseudonymisé, aucune donnée réelle",
+ "regle": "references/INTENTION.md 2.0.0",
+ "intention": {
+  "citations": [
+   { "texte": "On perd une demi-heure par jour à chercher une salle libre, et les salles réservées restent vides.", "source": "BRIEF.md, § Problème (brief du client)" }
+  ],
+  "reformulation": "Rendre aux équipes le temps perdu à trouver une salle, et rendre aux autres les salles réservées et inoccupées.",
+  "validation": { "date": "2026-10-08", "par": "la responsable des services généraux, demandeuse", "trace": "ledger seq 12, entrée intention_validee" }
+ },
+ "parties_prenantes": [
+  { "id": "PP-1", "role": "services généraux, demandeurs", "intention": "des salles occupées quand elles sont réservées" },
+  { "id": "PP-2", "role": "équipes qui réservent", "intention": "trouver une salle en moins d'une minute" }
+ ],
+ "arbitrage": "Le temps des équipes prime ; la libération automatique d'une salle inoccupée est garantie aux services généraux, après un délai que les équipes connaissent.",
+ "contraintes": [
+  { "id": "C-1", "enonce": "aucun capteur de présence ne peut être posé dans les salles", "source": "BRIEF.md, § Contraintes" }
+ ],
+ "non_objectifs": [
+  { "id": "N-1", "enonce": "gérer les équipements des salles (écrans, visioconférence)", "motif": "un autre outil les gère déjà" }
+ ],
+ "strategies": [
+  {
+   "id": "STR-1",
+   "effet": "Une équipe trouve et réserve une salle libre en moins d'une minute.",
+   "manque": "la recherche se fait salle par salle, dans trois calendriers différents (brief, § Problème)",
+   "indicateur": { "formule": "réservations faites en moins de 60 s ÷ réservations", "numerateur": "réservations faites en moins de 60 s", "denominateur": "réservations faites dans l'outil", "source": "journal des réservations" },
+   "valeur_actuelle": { "non_mesuree": "l'outil n'est pas encore en service" },
+   "cible": "jalon 1, mise en service : la mesure est en place ; jalon 2 : la part se fixe sur le premier mois d'usage"
+  },
+  {
+   "id": "STR-2",
+   "effet": "Une salle réservée et inoccupée redevient libre pour les autres.",
+   "manque": "les salles réservées restent vides : 41 réservations sur 120 sans présence relevée sur une semaine (relevé manuel des services généraux)",
+   "indicateur": { "formule": "salles libérées ÷ réservations sans présence confirmée", "numerateur": "salles libérées automatiquement", "denominateur": "réservations sans présence confirmée à 15 min", "source": "journal des réservations" },
+   "valeur_actuelle": { "valeur": "0 sur 41", "mesuree_le": "2026-10-06", "source": "relevé manuel des services généraux, semaine du 29/09" },
+   "cible": "au moins 30 libérations sur 41 réservations sans présence, sur la première semaine mesurée"
+  },
+  {
+   "id": "STR-3",
+   "effet": "Les services généraux voient l'occupation réelle des salles.",
+   "manque": "aucune mesure d'occupation n'existe",
+   "statut": "retiree",
+   "motif_retrait": "fusionnée dans STR-2 : la libération produit la même mesure (D-4 (a))",
+   "indicateur": { "formule": "heures occupées ÷ heures réservées", "numerateur": "heures occupées", "denominateur": "heures réservées", "source": "journal des réservations" },
+   "valeur_actuelle": { "non_mesuree": "retirée avant mesure" },
+   "cible": "sans objet"
+  }
+ ],
+ "tactiques": [
+  {
+   "id": "TAC-1",
+   "strategie": "STR-1",
+   "moyen": "Une seule vue des salles libres, filtrée par heure et capacité, réservable en un geste.",
+   "alternative_ecartee": "synchroniser les trois calendriers existants",
+   "justification": "la synchronisation garderait trois écrans à consulter ; le brief demande « un seul endroit »",
+   "source": "BRIEF.md, § Problème",
+   "statut_justification": "sourcée",
+   "exigences": ["E-001", "E-002", "E-003"],
+   "autres_elements": [ { "id": "ECR-1", "type": "ecran", "libelle": "vue des salles libres" } ]
+  },
+  {
+   "id": "TAC-2",
+   "strategie": "STR-2",
+   "moyen": "La présence se confirme d'un geste à l'arrivée ; sans confirmation à 15 minutes, la salle se libère.",
+   "alternative_ecartee": "des capteurs de présence",
+   "justification": "la contrainte C-1 interdit les capteurs ; la confirmation manuelle est le seul signal disponible",
+   "source": "BRIEF.md, § Contraintes",
+   "statut_justification": "reconstruite — ratifiée le 2026-10-10 (D-4 (a))",
+   "exigences": ["E-004", "E-005"],
+   "autres_elements": [ { "id": "IND-1", "type": "indicateur_exploitation", "libelle": "libérations par jour" } ]
+  }
+ ],
+ "historique": [
+  { "version": "1.0.0", "date": "2026-10-08", "niveau": "I", "resume": "cascade initiale, intention validée", "decision": "ledger seq 12" },
+  { "version": "1.1.0", "date": "2026-10-10", "niveau": "S", "resume": "STR-3 fusionnée dans STR-2", "decision": "D-4 (a)" }
+ ]
+}

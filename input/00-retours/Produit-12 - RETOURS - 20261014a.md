@@ -1,58 +1,49 @@
 # Retours forges — Produit-12 — 20261014a
 
-- **Contexte** : autre — remontée immédiate sur mandat humain du 2026-10-14 (« Remonte ou rappelle à la Factory qu'un projet doit pouvoir être traité en autonomie par son développeur sur tous ses postes de façon automatique s'il a précisé un Google Drive (ou équivalent) »), à la suite de la décision D-44 (a) du même jour.
-- **Références ledger** : `forge\ledger.jsonl` seq 296 (RS-31), entrée `type: retour` ; la réponse humaine D-44 (a) est la seq 295.
-- **Remise au pilot** : copier ce fichier et son sidecar dans le SAS `<pilot>\input\00-retours\_arrivee\` (ignoré par git), jamais à la racine de `input\00-retours\` ; l'original reste ici. Statut : `a_remettre` → `remis le <date>`.
-- **Statut** : remis le 2026-10-14 dans le SAS d'arrivée du pilot (`<pilot>\input\00-retours\_arrivee\`), sur mandat humain du 14/10 (« Remonte ou rappelle à la Factory ») — ce lot ne se modifie plus.
-- **Note de réception du pilot (14/10/2026)** : à l accueil, deux titres de page de la section « Documents mûrs » portaient le nom d un client du produit, absent des tables de noms ; ils sont remplacés ici par « [client du produit n° 1] » et « [client du produit n° 2] ». L original reste chez le produit. Aucune autre modification.
+- **Contexte** : autre — boucle d'amélioration de la qualité du classement des fichiers (normes 2.7 à 2.14), remontée sur décision humaine D-46 (a) du 14/10/2026
+- **Références ledger** : `forge\ledger.jsonl` seq 314, 315 (entrées `type: retour` et `reponse_humain`)
+- **Remise au pilot** : copier ce fichier, son sidecar et ses deux pièces jointes dans le SAS `<pilot>\input\00-retours\_arrivee\`.
+- **Statut** : remis le 2026-10-14
 
-Convention de gravité : **bloquant** · **majeur** · **mineur**. Ids en séquence continue du produit : la série RS s'arrêtait à RS-30 (lot 17).
+Pièces jointes, remises avec le lot :
+- `Produit-12 - RETOURS - 20261014a - PJ - Etude qualite du classement.md` : l'étude du 14/10, dont le chapitre 7 décrit la méthode ;
+- `Produit-12 - RETOURS - 20261014a - PJ - Principe d'analyse critique.md` : la proposition de principe du 14/10 (règles PC-1 à PC-6).
 
 ---
 
 ## pilot (`digit-ai-factory`)
 
-Un développeur qui a déclaré un canal de reprise, et qui a demandé à pouvoir reprendre ailleurs, a trouvé son produit incomplet sur son autre poste ; le canal contenait pourtant tout ce qui manquait.
+Une sortie automatisée de classement a été jugée pendant huit versions sur la part de fichiers rangés et sur des portes de forme. Mesurée le 14/10 sur un échantillon étiqueté à l'aveugle, sa justesse est de 63 à 66 % ; la boucle d'amélioration qui a suivi a montré deux défauts de méthode que la loi transverse de qualité n'outille pas.
 
 | id | Gravité | Portée | Retour (fait observé, avec preuve : fichier, message, mesure) | Proposition esquissée |
 |---|---|---|---|---|
-| RS-31 | bloquant | générique | **La reprise d'un produit sur un autre poste du développeur reste manuelle, même quand un canal est déclaré et que le développeur l'a demandée.** Le 03/10, l'humain a demandé la reprise sur un autre PC (ledger seq 282 et 286). Un dossier Google Drive privé « Produit-12 - Reprise » a été créé, avec une notice `REPRISE.md` à suivre à la main. Il contient les 58 générateurs des pages d'exemple (9 et 49 fichiers sur le miroir local, vérifié le 14/10), les secrets et les entrants. Le 14/10, sur l'autre poste, une session a déclaré ces générateurs introuvables. L'humain a dû poser une décision (D-44) et les faire passer par git (commit 8d0d51c, seq 295). Le même jour, la session de ce poste a reproduit le défaut : elle a laissé le transport des entrants à l'humain (action A-3, `manuelle_utilisateur`, « canal à choisir »), alors que le Drive était déclaré dans la mémoire du projet et contenait déjà ces entrants. Aucune règle de la factory ne couvre ce cas : 0 occurrence de « Drive », « autre poste » ou « multi-poste » dans `REGLES-PROJET.md` et `CONTRAT-INTERFACE.md`. `references\TODO-FORGE.md` outille le seul pilot (`rebatir-clone`), et il écrit encore « ce que git ne synchronise pas entre deux postes se copie à la main ». Parole humaine : « Ce type d'erreurs ne doit plus se reproduire. C'est critique pour le travail des développeurs, leur efficacité, résilience. » | 1) Une règle : un produit dont le développeur a déclaré un canal de reprise (Google Drive ou équivalent) se reprend sur tous ses postes sans geste humain. 2) Le canal se déclare au `CLAUDE.md` du produit, par le gabarit `gabarits\CLAUDE-PRODUIT.md`, et dans un manifeste lisible par machine (`REPRISE.json` : source, cible, empreinte). 3) Le hook d'ouverture compare le manifeste au poste et restaure ce qui manque ou a vieilli, sans le demander. 4) La fin de tour pousse vers le canal ce qui a changé hors de git. 5) `RESTITUTION.md` refuse une action de transport entre postes laissée en `manuelle_utilisateur` quand un canal est déclaré. Ce qui ne doit pas partir vers un service hébergé, au sens de R-38, reste exclu du manifeste par une liste écrite. |
+| RS-31 | majeur | produit+générique | Le classement de 9 662 fichiers affichait 97 % de fichiers « rangés » en norme 2.7 ; toutes les portes étaient vertes (grammaire, dates de baux). Mesuré sur 150 fichiers tirés au hasard et étiquetés par trois agents qui ne voyaient pas le résultat, le dossier est juste dans 63,3 % des cas (intervalle de Wilson 55,4 à 70,6), puis 66,0 % après deux versions. Jusqu'à la 2.9, la seule relecture était celle de l'auteur des règles. Preuve : `output\06-dossiers-dropbox\reference\mesure-norme-2.9.json`, ledger seq 313, étude jointe chapitres 1 à 3 | Ajouter au registre de `quality-oracles` un domaine « sortie automatisée de tri, de classement ou de rédaction », jugé sur un échantillon de référence étiqueté hors du système, avec le principe PC-1 à PC-6 de la pièce jointe |
+| RS-32 | majeur | produit+générique | Deux versions d'une boucle d'amélioration auraient été mal jugées par la seule mesure sur l'échantillon. La v2.11 gagnait 2,7 points de justesse du type sans un faux sur l'échantillon, mais ses 201 changements dans la population comptaient 4 faux sur 12 relus : l'en-tête des diagnostiqueurs cite tous leurs métiers. La v2.10 annonçait une correction des années comptables qui ne touchait aucune ligne existante, puisqu'elle ne s'appliquait qu'aux rangements neufs. Un test de la v2.14 passait aussi sur le code précédent. Preuve : `mesure-norme-2.11-rejetee.json`, `passes.py` règles RV-4 et RV-5, ledger seq 313, étude jointe chapitre 4. Classe proposée : `amelioration-jugee-sans-ses-effets` (famille `regle-morte`), « Une version améliorée est jugée sur son échantillon sans contrôle de ses changements dans la population ni de son effet sur l'existant » | Porter dans `la-boucle` et dans la loi de qualité la méthode en huit étapes du chapitre 7 de l'étude : test rouge sur le code précédent, règle appliquée à l'existant, tirage des changements dans la population à chaque version, rejet tracé, arrêt chiffré et borné |
 
 ## Remarques restées au produit
 
-Ce que le produit a constaté ce jour et garde chez lui, avec son verdict de généralisation.
-
 | Remarque (chez le produit) | Corrigée comment | Généralisable ? | Verdict |
 |---|---|---|---|
-| Les générateurs étaient hors de git depuis le 01/10 (D-14 (b)), alors que le motif de l'exclusion a été levé le même jour par la règle sur les dépôts privés | versionnés et poussés le 14/10 (D-44 (a), commit 8d0d51c) | oui | la classe, une règle humaine qui ne descend pas aux produits, est déjà remontée en RS-28 (lot 16) |
-| L'archive de quittancement est extraite dans un dossier imbriqué (`input\ARCHIVES QUITT CRG\ARCHIVES QUITT CRG\`) | non corrigée, signalée à l'humain le 14/10 | non | propre à ce poste ; le manifeste proposé en RS-31 la rendrait identique sur tous les postes |
+| Les règles de rangement elles-mêmes (passes RP, RL, RD, RV) se trompaient sur des cas propres au courrier du cabinet : Kbis pris pour une pièce de candidat, en-têtes de diagnostiqueurs, garants mal placés | règles et tests dans `passes.py` et `tests_passes.py`, normes 2.8 à 2.14 | non | Rien de généralisable dans les règles elles-mêmes, parce qu'elles décrivent le courrier d'un cabinet ; la méthode qui les a jugées est remontée en RS-31 et RS-32 |
+| 65 désaccords entre l'outil et le lecteur restent à trancher | questions fermées au cabinet, `questions-cabinet-norme-2.14.csv` | non | Rien de généralisable : c'est une décision de métier propre au cabinet |
 
 ## Retours sur les documents produits
 
-Aucun document produit depuis un gabarit de la bibliothèque sur ce lot : la restitution du 14/10 suit `RESTITUTION.md`, pas une famille de `gabarits\documents\`.
+Aucun document produit depuis un gabarit sur ce lot : l'étude ci-dessous a été écrite hors famille, et c'est ce manque que la ligne rapporte.
+
+| Document produit | Gabarit employé + version | Ce qui a manqué | Ce qui a GÊNÉ LE LECTEUR | Ajouté à la main | Portée |
+|---|---|---|---|---|---|
+| Produit-12 - Etude qualite du classement - 20261014o | aucun gabarit (étude hors famille) | une famille de document pour une étude de qualité mesurée : échantillon, mesures par version, décisions de rejet, méthode | rien n'a encore été rapporté par le lecteur | tout le document, en particulier le tableau des versions avec leur décision et le chapitre de méthode | générique |
 
 ## Documents mûrs
 
-Deux pages de ce produit ont été reprises cinq fois. Leur verdict est déclaré ici une fois pour toutes.
-
-| Document | Versions | Verdict |
+| Document | Versions datées | Verdict |
 |---|---|---|
-| « Exemple avant apres [client du produit n° 1] » | 5 | reste au produit, parce que ses versions (05/09 au 03/10) suivent pour l'essentiel celles de la norme de rangement du cabinet, de la v1 du 03/09 à la 2.5 du 03/10 : c'est la matière qui a changé, pas la forme, et cette norme est propre au métier du cabinet |
-| « Exemple avant apres [client du produit n° 2] » | 5 | reste au produit, pour la même raison : 5 versions du 29/09 au 03/10, pendant que la norme passait de 2.1 à 2.5, sur le même gabarit de page |
+| Exemple avant apres BERNARD | 7 | reste au produit, parce que sa matière est le courrier d'un cabinet et que sa forme suit déjà le socle `digit-ai-page-html` sans composant à extraire |
+| Exemple avant apres SAS CREER PROMOTION | 7 | reste au produit, pour la même raison |
+| Exemple reponses contextualisees BERNARD | 5 | reste au produit, parce que sa forme (mail reçu, brouillon, règles appliquées) est propre au produit de rédaction de réponses |
+| Exemple reponses contextualisees SAS CREER PROMOTION | 5 | reste au produit, pour la même raison |
 
 ## Garde-fou de plateforme relevé
 
-Aucun garde-fou de plateforme relevé.
-
-## Confirmations positives
-
-- **Le canal de reprise a tenu son contenu** : le miroir local du Drive portait le 14/10 les 58 fichiers que l'autre poste cherchait. Le défaut n'est pas dans le transport, il est dans l'absence d'un geste automatique qui l'applique.
-- **Le juge des restitutions a tenu la forme** : `oracle-synthese` a accusé et fait corriger six règles sur la restitution du 14/10 avant affichage.
-
-## Ordre recommandé
-
-1. **RS-31** — la règle et la ligne au gabarit `CLAUDE-PRODUIT.md` d'abord. C'est le geste le moins coûteux, et il fait connaître le canal à toute session. Viennent ensuite la restauration par le hook d'ouverture, puis la synchronisation de fin de tour.
-
-## La règle qui aurait évité le retour
-
-- **RS-31** : aucune règle n'existe. Le canal a été déclaré par l'humain le 03/10, mais il n'est écrit que dans une notice et dans la mémoire d'une session, et rien ne le joue. Classe `classe-a-creer` : reprise multi-poste déclarée et jamais câblée.
+Aucun garde-fou de plateforme relevé sur ce lot. Le renommage des copies rangées, refusé par Windows tant que l'Explorateur et Google Drive tenaient les dossiers, a été repris au tour suivant ; il ne relève d'aucune stratégie de plateforme.

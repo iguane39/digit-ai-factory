@@ -26,7 +26,7 @@
  */
 import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { tmpdir } from "node:os";
+import { tmpdir, homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -58,7 +58,7 @@ function mesurerSegment(segment) {
   // Chaque texte du tour, AVEC le nombre d'outils déjà vus à ce moment-là. C'est ce compteur qui
   // permet de reconnaître un texte FINAL : rien ne l'a suivi.
   const tousLesTextes = [];
-  let outils = 0;
+  let outils = 0, prejugements = 0;
   for (const e of segment) {
     if (e.type !== "assistant") continue;
     const blocs = contenu(e);
@@ -74,7 +74,10 @@ function mesurerSegment(segment) {
           // celle que la doctrine prescrit d'écrire AVANT d'afficher (voir `syntheseDuTour`).
           const p = b.input?.file_path;
           if (typeof p === "string" && /\.md$/i.test(p)) fichiersMd.push(p);
-        } else if (COMMANDES.has(b.name)) { commandes++; commandesIdx.push(outils - 1); }
+        } else if (COMMANDES.has(b.name)) {
+          commandes++; commandesIdx.push(outils - 1);
+          if (PREJUGEMENT.test(String(b.input?.command || ""))) prejugements++;
+        }
       }
     }
   }
@@ -136,8 +139,39 @@ function mesurerSegment(segment) {
       commandes: commandesIdx.filter((i) => i >= precedent.outilsAvant).length }
     : null;
   return { ecritures, commandes, dernierTexte, textes: tousLesTextes.length, finaux: finaux.length, fichiersMd, depuisDernierAffichage,
-    effets: detecterEffets(segment) };
+    effets: detecterEffets(segment), prejuge: prejugements > 0, enAttente: tachesEnAttente(segment) };
 }
+
+// TF-1649 (14/10/2026) — LES TÂCHES D'ARRIÈRE-PLAN DU TOUR QUI NE SONT PAS REVENUES. Une commande
+// lancée en arrière-plan rend « Command running in background with ID: <id> » ; un agent asynchrone,
+// « Async agent launched … agentId: <id> ». Leur fin arrive dans le transcript comme une notification
+// `<task-notification>` portant le même identifiant et un statut — jamais comme un message humain,
+// donc dans le MÊME segment. Rend les identifiants lancés dans le segment et non revenus.
+export function tachesEnAttente(segment) {
+  const lancees = new Set(), revenues = new Set();
+  for (const e of segment) {
+    for (const b of contenuDe(e)) {
+      if (b.type !== "tool_result") continue;
+      const t = typeof b.content === "string" ? b.content
+        : Array.isArray(b.content) ? b.content.map((c) => (typeof c === "string" ? c : c?.text || "")).join("\n") : "";
+      for (const m of t.matchAll(/running in background with ID:\s*([\w-]+)/g)) lancees.add(m[1]);
+      for (const m of t.matchAll(/Async agent launched[\s\S]{0,400}?agentId:\s*([\w-]+)/g)) lancees.add(m[1]);
+    }
+    const brut = JSON.stringify(e);
+    if (!brut.includes("task-notification")) continue;
+    for (const m of brut.matchAll(/<task-id>([\w-]+)<\/task-id>[\s\S]{0,600}?<status>(\w+)<\/status>/g))
+      if (!/^(?:running|pending|started)$/i.test(m[2])) revenues.add(m[1]);
+  }
+  return [...lancees].filter((id) => !revenues.has(id));
+}
+
+// TF-1647 (point 3) et TF-1666 — LE PRÉJUGEMENT SE MESURE. Une commande du tour qui juge un
+// brouillon avant l'affichage : `--prejuger`, `--pre-vol` (réponse courte) ou `oracle-synthese`
+// joué directement. Le champ `prejuge` du journal en mesure l'adoption ; au refus, son absence est
+// dite comme un défaut DISTINCT — TF-1666 : une mémoire de session chargée n'a pas suffi le 13/10,
+// une consigne lue n'est pas un geste tenu. Ce que la mesure ne voit pas : que le brouillon préjugé
+// soit le texte affiché ; elle constate le geste, pas l'identité des deux textes.
+const PREJUGEMENT = /hook-restitution\.mjs[^\n]*--(?:prejuger|pre-vol)|factory\.mjs["']?\s+restitution\s+--(?:prejuger|pre-vol)|oracle-synthese\.mjs\s+(?!--self-test)\S/;
 
 // ---- NIVEAU MOYEN (étape 2 des niveaux d'intervention, en essai depuis le 01/10/2026) ----------
 //
@@ -321,11 +355,15 @@ export function analyserTranscript(texte) {
   return { travail: m.ecritures >= 1 || m.commandes >= 4, ...m, dernierHumain, textePrecedent, depuis, textesHumains };
 }
 
-export function juger(texte) {
+// `racine` (TF-1644, 14/10/2026) : le dossier du projet du tour. Le message est écrit dans un
+// fichier TEMPORAIRE, d'où S48 ne pouvait pas reconnaître un produit (elle remonte depuis le
+// fichier jusqu'à un `forge\retours\`) : elle rendait SANS_OBJET à chaque tour de chaque produit,
+// et le FAIL du 12/10 n'a été vu qu'au rejeu sur un fichier placé chez le produit.
+export function juger(texte, racine = process.cwd()) {
   const dir = mkdtempSync(join(tmpdir(), "restitution-"));
   const f = join(dir, "message.md");
   writeFileSync(f, texte, "utf8");
-  const r = spawnSync(process.execPath, [ORACLE, f], { encoding: "utf8" });
+  const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : [])], { encoding: "utf8" });
   let rapport = {};
   try { rapport = JSON.parse(r.stdout); } catch { /* jugé par le code */ }
   return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL") };
@@ -441,12 +479,45 @@ const estMarque = (c) => {
     return /^destinataire\s*:\s*humain\s*$/im.test(readFileSync(c, "utf8").slice(0, 400));
   } catch { return false; /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
 };
+// TF-1720 (15/10/2026, lot Produit-83 20261014b RT-6) — UN DOCUMENT DE PROJET N'EST JAMAIS LA SYNTHÈSE.
+// Le 14/10 à 18:58, chez un produit, le hook a refusé une restitution préjugée PASS en la comparant à
+// `docs\projet\COMPOSANTS-OPS.md` : « options par défaut nommées : 0 dans le fichier jugé, 1 à l'écran ».
+// Ce document porte `destinataire: humain` PAR SON GABARIT (les 9 gabarits de `gabarits\docs-projet\`
+// le portent), il avait été écrit dans le tour, et aucune synthèse nommée n'y était : le repli l'a
+// retenu. Le repli garde son rôle (TF-0767), mais il ne retient plus un fichier rangé sous
+// `docs\projet\`, dossier des documents de projet et jamais des restitutions (RESTITUTION.md § Où, et
+// sous quel nom). Même classe que TF-0767 et TF-1184 : `restitution-fichier-juge-mal-choisi`.
+const DOC_DE_PROJET = /(^|[\\/])docs[\\/]projet[\\/]/i;
 const choisirParmi = (chemins) => {
   const marques = [];
   for (let i = chemins.length - 1; i >= 0; i--) if (estMarque(chemins[i])) marques.push(chemins[i]);
   const nomme = marques.find((c) => /synth[eè]se|restitution/i.test(String(c).split(/[\\/]/).pop()));
-  return nomme || marques[0] || null;
+  return nomme || marques.find((c) => !DOC_DE_PROJET.test(String(c))) || null;
 };
+
+// TF-1720, second volet — LE PRÉJUGEMENT JOUE LE MÊME CHOIX DE FICHIER QUE LE HOOK DE FIN DE TOUR.
+// `--prejuger` jugeait le texte seul : il ne voyait pas la synthèse déposée dans le tour, donc il
+// rendait exit 0 sur un brouillon que le hook refusait ensuite sur AFFICHAGE. Il relit désormais le
+// transcript de la session, et choisit la synthèse par `syntheseDuTour` comme le hook. Le transcript
+// se donne par `--transcript <chemin.jsonl>`, ou se retrouve par l'identifiant de session que Claude
+// Code passe à ses commandes (`CLAUDE_CODE_SESSION_ID`), cherché sous `projects\*\` de chaque profil
+// (`CLAUDE_CONFIG_DIR`, `~\.claude`, `~\.claude-*`). Introuvable, la comparaison n'est pas jouée et la
+// sortie le dit ; elle ne se transforme jamais en refus.
+export function transcriptDeSession(env = process.env, maison = homedir()) {
+  const id = env.CLAUDE_CODE_SESSION_ID;
+  if (!id || !/^[\w-]+$/.test(id)) return null;
+  const racines = new Set([env.CLAUDE_CONFIG_DIR].filter(Boolean));
+  try { for (const n of readdirSync(maison)) if (/^\.claude(?:-[\w-]+)?$/i.test(n)) racines.add(join(maison, n)); } catch { /* pas de profil lisible */ }
+  for (const r of racines) {
+    let dossiers = [];
+    try { dossiers = readdirSync(join(r, "projects")); } catch { continue; }
+    for (const d of dossiers) {
+      const f = join(r, "projects", d, id + ".jsonl");
+      if (existsSync(f)) return f;
+    }
+  }
+  return null;
+}
 
 export function syntheseDuTour(cheminsEcrits) {
   return choisirParmi(cheminsEcrits) || choisirParmi(relusDuDisque(cheminsEcrits));
@@ -646,6 +717,41 @@ export function controlerGeste({ dernierHumain, dernierTexte, textePrecedent, te
   return { applicable: true, decision, verdict: ecarts.length ? "FAIL" : "PASS", ecarts };
 }
 
+// ---- TF-1641 (14/10/2026) — UNE EXPLICATION DEMANDÉE SE LIVRE DANS UNE FICHE ----------------------
+//
+// LE FAIT, du 12/10 chez un produit : deux diagnostics demandés (détail des coûts, puis
+// recommandations) rendus en restitutions de 9 blocs ; le porteur a dû demander DEUX FOIS un
+// fichier, puis « le constat et les précos dans un fichier MD, simple, bref, lisible et
+// exploitable ». Le contenu utile existait dès le premier tour, dispersé entre les blocs. La règle
+// (`references\ECRITURE.md` E-16) : l'explication va dans une fiche datée, la restitution y renvoie.
+// CE QUI SE MESURE : le dernier message humain DEMANDE une explication (impératif expliquer,
+// détailler, diagnostiquer, ou « fournis/donne/ajoute … précos, diagnostic, constat »), la réponse
+// est une restitution complète (5 titres numérotés au moins), et le tour n'a écrit ni ne cite aucune
+// fiche `.md` autre qu'une synthèse. AVERTISSEMENT, jamais blocage : la frontière entre une demande
+// d'explication et une demande de travail reste un jugement. Mesure d'entrée sur les restitutions
+// des produits du poste depuis le 17/09 : 24 sur 364 suivent un message humain que ce motif lit
+// comme une demande d'explication ; la plupart en sont (« Explique… », « Détaille… »), 2 au moins
+// demandent un travail (« écris un message … pour lui expliquer ») — d'où l'avertissement seul.
+const DEMANDE_EXPLICATION = /(?<!\p{L})(?:explique[rz]?|d[ée]taille[rz]?|diagnostique[rz]?)(?!\p{L})|(?<!\p{L})(?:fournis|donne|ajoute)(?!\p{L})[^.?!\n]{0,40}(?<!\p{L})(?:pr[ée]cos?|pr[ée]conisations?|diagnostics?|constats?|recommandations?)(?!\p{L})/iu;
+const FICHE_MD = /[\w\-. \/\\]+\.md\b/gi;
+export function controlerExplication({ dernierHumain = "", dernierTexte = "", fichiersMd = [] }) {
+  const restitution = (String(dernierTexte).match(/^#{1,4}\s*\d{1,2}\b/gm) || []).length >= 5;
+  if (!DEMANDE_EXPLICATION.test(String(dernierHumain)) || !restitution) return { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
+  // Une fiche est un livrable DATÉ (R-4 : « … - AAAAMMJJ<indice>.md ») qui n'est pas la synthèse du tour.
+  const fiche = (p) => { const nom = String(p).split(/[\\/]/).pop(); return /\d{8}[a-z]{0,2}\.md$/i.test(nom) && !/synth[eè]se|restitution/i.test(nom); };
+  const ecrite = fichiersMd.some(fiche);
+  const citee = (String(dernierTexte).match(FICHE_MD) || []).some(fiche);
+  if (ecrite || citee) return { applicable: true, verdict: "PASS", ecarts: [] };
+  return { applicable: true, verdict: "FAIL", ecarts: ["une explication demandée est rendue dans la restitution sans fiche : livre-la dans une fiche datée "
+    + "(en bref chiffré, constat, préconisations, ordre conseillé, sources) et renvoie-y depuis la restitution, au lieu d'en disperser le contenu "
+    + "dans les blocs 4 et 8 (references\\ECRITURE.md E-16, TF-1641)"] };
+}
+
+// TF-1666 — le défaut DISTINCT, dit au refus quand aucun préjugement n'a été joué dans le tour.
+const RAPPEL_PREJUGEMENT = "PRÉJUGEMENT — cette réponse n'a pas été préjugée avant affichage, d'où le doublon à l'écran : écris la "
+  + "prochaine restitution dans un fichier du dossier temporaire, joue `node oracles/hook-restitution.mjs --prejuger <fichier>` "
+  + "(chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), corrige jusqu'à l'exit 0, puis affiche "
+  + "ce texte tel quel (TF-1647, TF-1666).";
 const RAPPEL_GESTE = "Un mot de décision reçoit la PREUVE du geste au bloc 4, jamais la décision reposée.";
 
 // ---- TF-1361 (27/09/2026) — UNE PROCÉDURE DEMANDÉE REÇOIT LE GUIDE, PAS UN TABLEAU DE PLUS ------
@@ -764,7 +870,9 @@ const VERDICT = { test: (s) => VERDICT_MOTS.test(s) || VERDICT_JETONS.test(s) };
 // prose, entre parenthèses ou en complément, reste une citation.
 const POSE_UN_GESTE = /(?<![A-Za-zÀ-ÿ])[DA]\s*-\s*\d{1,3}(?![0-9])\**\s*(?:[—–:|]|-\s|\(\s*[a-e]\s*\)|[a-e](?=\s*(?:[.,;!?»]|$)))/m;
 
-export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null }) {
+const SEUIL_ATTENTE = 60;
+const ATTENTE = /\b(?:attends?|attente|en cours|tourne(?:nt)?|arri[èe]re-plan|reviens|reprends|reprendrai|d[èe]s (?:qu|la fin|son|leur)|notifi|en t[âa]che de fond)/i;
+export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null, enAttente = [] }) {
   if (!dernierTexte) return { juge: false, motif: "aucun texte final dans le transcript" };
   const mots = dernierTexte.trim().split(/\s+/).filter(Boolean).length;
   // ---- TF-1182 (17/09/2026) — LE RELAIS D'AVANCEMENT N'EST PAS UN RENDU DE FIN DE TRAITEMENT ---
@@ -791,6 +899,20 @@ export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, 
   if (relaisPossible && mots <= SEUIL_MOTS && !VERDICT.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
     return { juge: false, motif: `relais de ${mots} mots : rien n'a été écrit depuis le dernier affichage `
       + `(${depuisDernierAffichage.commandes} commande(s), 0 écriture), aucun verdict, aucune D-N ni A-N (TF-1182)` };
+  // ---- TF-1649 (14/10/2026) — LE MESSAGE D'ATTENTE D'UNE TÂCHE D'ARRIÈRE-PLAN DU TOUR ----------
+  //
+  // LE FAIT, mesuré le 13/10 chez un produit : 2 refus (S1, S3, S4, S6) de messages d'attente rendus
+  // pendant qu'un relevé tournait en arrière-plan — deux doublons pour une phrase. Le tour a écrit,
+  // donc il est jugé ; mais sa restitution ne PEUT pas encore exister : la mesure n'est pas revenue,
+  // et le harnais rouvrira le tour à la notification de fin, dans le MÊME segment. C'est ce message-là
+  // qui sera jugé, travail compris : TF-0978 ne se rouvre pas, la restitution est différée, pas
+  // exemptée. BORNES, toutes mesurables : une tâche lancée dans le segment et non revenue
+  // (`tachesEnAttente`), 3 lignes et 60 mots au plus, un mot d'attente, aucun verdict, aucune D-N ni A-N.
+  const lignes = dernierTexte.trim().split(/\r?\n/).filter((l) => l.trim()).length;
+  if (enAttente.length && mots <= SEUIL_ATTENTE && lignes <= 3 && ATTENTE.test(dernierTexte)
+    && !VERDICT.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
+    return { juge: false, motif: `message d'attente de ${mots} mots : ${enAttente.length} tâche(s) d'arrière-plan lancée(s) dans le tour et `
+      + "non revenue(s), aucun verdict, aucune D-N ni A-N — la restitution vient avec son résultat (TF-1649)" };
   if (travail) return { juge: true, motif: `tour de travail (${ecritures} écriture(s), ${commandes} commande(s))` };
   // Une QUESTION rendue à l'humain n'est pas une restitution : c'est `bloque_question`, et la
   // doctrine la veut courte. L'exempter explicitement vaut mieux que de la laisser au seuil.
@@ -833,7 +955,13 @@ export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, 
 //     chemin rendent la liste MOINS UTILE, jamais illisible — le doublon d'affichage qu'un
 //     blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le
 //     corpus sera propre, exactement comme la v2.0.0 est restée informative avant de bloquer.
-const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
+//   · S48 (TF-1644, 14/10/2026) devient BLOQUANTE. Elle ne FAIL que chez un produit, et le refus
+//     y est la seule voie par laquelle la SESSION apprend qu'elle n'a pas dit ce qu'elle remonte :
+//     un avertissement s'affiche à l'humain, jamais à l'agent. Le 12/10, ni l'une ni l'autre ne l'a
+//     vu, et le porteur a dû poser la question. Mesure d'entrée sur les restitutions des produits
+//     du poste (transcripts des deux profils) : 20 FAIL sur 364 depuis le 17/09 (12 muettes, 8 qui
+//     ne tranchent pas), 7 sur 147 depuis le 01/10 — un refus de plus sur vingt tours environ.
+const BLOQUANTES = new Set(["S1", "S3", "S4", "S6", "S48"]);
 
 // LE TEXTE QUI APPREND LA FORME — et il avait DIX VERSIONS DE RETARD (01/09/2026).
 //
@@ -859,13 +987,58 @@ const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.36.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Coût | Exclusions | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur. · v2.18.0 (08/09) : LE VERDICT AFFICHÉ MESURE CE QUE LE FICHIER JUGÉ MESURE — une restitution n'est pas un fil d'avancement : si l'écran a été enrichi au fil du tour (un rapport reçu, un compteur qui monte), c'est le FICHIER qu'il faut redéposer, jamais l'écran qu'il faut appauvrir ; la trace est la pièce opposable, et une pièce périmée ment à tous ceux qui la reliront. · v2.19.0 (08/09) : UN TEST JOUABLE S'EXÉCUTE — une action de TEST auto_ia (recette, banc, couverture, self-test) ne se laisse pas non exécutée sous `hors_mandat` ni `borne_atteinte` : ces deux motifs déclarent un périmètre que tu écris seul, ils ne mesurent rien ; joue la recette, ou nomme l'obstacle EXTÉRIEUR qui la bloque (dependance_bloc_3, gate_gouvernance, garde_fou, dependance_externe). Et « REMONTÉ » N'EST PAS « TRAITÉ » : une remontée annoncée au bloc 4 porte son identifiant TF-####, sans quoi le lecteur ne peut ni la retrouver ni savoir si quelqu'un l'a prise — elle vaut alors « déposé, non traité » et appartient au bloc 5 avec son motif. · v2.20.0 (08/09) : LA FORME DATÉE EN TÊTE EST RÉSERVÉE AUX ÉTUDES — un livrable cité sous `output\\` porte « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » (R-4) ; le préfixe « AAAAMMJJ-… » n'appartient qu'à `output\\03-etudes\\`, et onze livrables d'un mandat sont sortis hors R-4 le 07/09 pour l'avoir imité. Et QUAND LA DOCTRINE RÉGIT LE MOT, C'EST ELLE LA SOURCE : une décision qui parle d'une version remplacée, d'un `old\\`, d'un livrable à supprimer ou à renommer cite REGLES-PROJET.md, CLAUDE.md, ETAPES-RUN.md ou la règle numérotée qui la tranche — sourcer par un fichier du chantier une question que la doctrine a déjà tranchée, c'est poser une question qui n'avait pas à l'être. · v2.21.0 (11/09) : UN MOT DE DÉCISION REÇOIT LA PREUVE DU GESTE — quand le message humain qui précède est un sélecteur de décision (« 11a », « D-11 (a) », « 32b, 30a »), il tranche et n'attend plus d'analyse : ton bloc 4 porte la preuve exécutée du geste que l'option choisie commandait, ton bloc 3 ne repose JAMAIS la même D-N, et ta réponse n'est jamais la restitution précédente rejouée mot pour mot — le 11/09 la synthèse de la veille a été renvoyée deux fois à l'identique après deux « 11a », et le geste n'est venu que deux heures plus tard (TF-1019). · v2.22.0 (16/09) : AUCUNE EXEMPTION NE S'APPLIQUE À UN TOUR DE TRAVAIL — la jugeabilité est une propriété du TOUR, la longueur et le vocabulaire sont des propriétés du MESSAGE, et un tour qui a écrit, commité ou lancé une exécution se restitue en entier même en cent mots (TF-0978). Si son résultat n'est PAS ENCORE MESURABLE, la forme n'est pas l'exemption mais le POINT D'ÉTAPE, qui se déclare en bloc 1 : blocs 1, 4 et 8 pleins, bloc 2 remplacé par « ce qui reste à mesurer, et par quoi », les autres admis en une ligne (TF-0979). Un tour qui n'apporte RIEN DE NEUF rend un accusé de trois lignes — ce qui est arrivé, ce que cela ne change pas, ce qui reste attendu de vous — et cette exemption exige les TROIS absences : aucun verdict, aucune D-N, aucune A-N (TF-0990). Quand la demande citée au bloc 6 porte un MOT D'EXCLUSIVITÉ (uniquement, seulement, exclusivement, rien que, only), le bloc 6 dit ce que le livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient rien d'autre (S44, TF-0988). Quand un traitement est ARRÊTÉ — un élément du bloc 5 motivé par garde_fou, dependance_bloc_3, dependance_externe ou gate_gouvernance —, le bloc 3 s'ouvre par une ligne portant le mot « bloquants » puis leur inventaire, chaque entrée disant ce qui est bloqué, ce qu'il faut fournir pour le lever et ce qui se passe si rien n'est fourni, sans renvoi à un fichier ni à une autre section (S45, TF-1127). Un SECRET cité se désigne par ses cinq premiers caractères et sa longueur, relevés depuis l'exécution qui le porte, jamais par sa valeur ni par rien (TF-0986). · v2.23.0 (17/09) : CHEZ UN PRODUIT, LE TOUR DIT CE QU'IL REMONTE À LA FACTORY — une ligne au bloc 9, « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » ; « rien à remonter » est une réponse valide, le silence et « à voir » ne le sont pas, parce que ne rien remonter et n'avoir rien à remonter sont indiscernables sans elle (S48, TF-1166 ; sans objet au pilot et dans une forge). · v2.24.0 (17/09) : UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE — toute option du bloc 3 portant un verbe de geste (se connecter, s'authentifier, saisir, coller, taper, cliquer, installer, ouvrir un terminal, lancer ou exécuter une commande, valider un second facteur, publier ou pousser soi-même, renouveler un jeton) porte SUR PLACE de quoi l'exécuter : la commande ou le chemin entre accents graves, le libellé de l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » dans le groupe de la décision (en tableau, une colonne « Comment faire » suffit) ; le mode opératoire écrit soixante lignes plus bas au bloc 8 ne sert pas au lecteur, qui tranche ici (S49, TF-1172). · v2.25.0 (17/09) : LE POINT D'ÉTAPE EST UNE FORME JUGÉE, ET ELLE EST RECONNUE — un tour de travail dont le résultat n'est pas encore mesurable se déclare « point d'étape » AU BLOC 1 ; son bloc 2 porte alors « ce qui reste à mesurer, et par quoi » — la mesure attendue ET l'outil qui la rendra, une commande, un oracle ou un fichier — à défaut d'un verdict chiffré (S3, second sens), et ses blocs 1, 4 et 8 restent PLEINS (S50) : déclarer la forme sans rien mettre dans le traité serait une exemption déguisée en forme jugée. Un RELAIS d'avancement — l'émission d'un agent de campagne répercutée à l'humain — n'est plus jugé comme un rendu de fin de tour quand RIEN n'a été écrit depuis ton dernier affichage : trois lignes suffisent, et la synthèse déposée ne se reprend pas en entier à chaque relais (TF-1182). La borne n'est pas la longueur : une seule écriture depuis le dernier affichage, un verdict, une D-N ou une A-N, et le message redevient un rendu, jugé comme tel. · v2.26.0 (17/09) : TON BLOC 1 DIT L'INTENTION DE LA DEMANDE ET SON TEST RÉTRO — une phrase pour l'intention initiale (à quoi le travail devait servir, pas ce qu'il fallait faire), puis « Test rétro : » qui dit si le résultat sert cette intention ou seulement la lettre de la consigne ; un écart s'écrit au bloc 6. Loi transverse n° 7, `references\\INTENTION.md` : le 01/09 une étude conforme à sa définition et verte à tous ses contrôles a été refusée par son destinataire, sept questions sans réponse (S51, TF-0791). · v2.27.0 (19/09) : UN REFUS PROUVE QU'UNE PORTE EST FERMÉE, JAMAIS QU'IL N'Y EN A QU'UNE — une incapacité d'accès que tu déclares porte les CODES DE RETOUR DE DEUX FAMILLES de chemins au moins (un préfixe d'URL ou un scope distinct, pas une variante du même : `…/myorg/groups/…` et `…/myorg/reports/…` sont deux familles, `…/groups/{id}/reports` et `…/groups/{id}/reports/{id}` n'en sont qu'une), ou elle CITE LA SOURCE qui établit qu'un seul chemin existe ; les formules « seule voie » et « aucun autre chemin » ne valent plus preuve à elles seules, et dès que tu cites des appels ce sont eux qui font foi (S25 durcie, TF-1189 : quatre appels d'une même famille plus la formule ont fait écrire un constat FAUX dans deux synthèses jugées PASS, le scope personnel rendant 200 là où l'espace de travail rendait 401). · v2.28.0 (27/09) : UNE ACTION SUR L'INTERFACE D'UNE PLATEFORME TIERCE SE DÉCRIT D'APRÈS SA DOCUMENTATION DU JOUR, ET ELLE SE GUIDE EN TÊTE — toute action du bloc 8 laissée à l'humain qui vise l'écran d'une plateforme de `gabarits\\PLATEFORMES-TIERCES.json` (une adresse d'écran, ou son nom hors code avec un bouton, un onglet, des réglages, un « cliquer ») cite dans sa ligne sa SOURCE OFFICIELLE et la DATE où tu l'as lue, « source : <adresse de la documentation>, lue le JJ/MM/AAAA » (S52, D-24 (b), TF-1362 : le 22/09 un bouton « Prévisualiser » nommé de mémoire là où l'écran offre « Aperçu », et trois gestes d'accès supprimés par la plateforme le 09/09 prescrits quand même) ; et si l'action est laissée à manuelle_utilisateur, le message S'OUVRE sur « ## Guide — <le geste à faire> », AVANT le bloc 0 alors titré « ## 0. Synthèse d'ouverture » : des étapes numérotées, chacune close par « Résultat attendu : … » (S53, TF-1361 : la procédure a été redemandée cinq fois en 56 minutes tant qu'elle vivait en cellules de tableau). S53 est BLOQUANTE quand le dernier message humain demande la procédure. Ce que seule la plateforme fournit — un modèle d'import, un rapport d'erreurs — se demande dans le tour qui prépare le dépôt, jamais après l'échec. · v2.29.0 (28/09) : UNE BARRE VERTICALE DANS UNE CELLULE DE TABLEAU S'ÉCHAPPE — une colonne se lit dans la ligne telle que GFM la découpe, barre échappée (`\|`) comprise ; un refus sur une ligne coupée nomme la coupure au lieu d'accuser la colonne voisine (S18, S12, TF-1427 : le 25/09 une cellule portant `2>/dev/null || echo 0` a coupé la ligne à l'affichage, et l'action a été accusée à tort d'être laissée à l'humain « sans raison d'impossibilité »). · v2.30.0 (28/09) : LES IDENTIFIANTS DU REGISTRE PRODUIT ET DU LOT DE RETOURS SONT RECONNUS, ET « NEUVE » SE DÉCLARE — un identifiant qualifié (« registre A-18 ») ou posé dans une colonne Registre hors de la cellule du sélecteur vaut identifiant, de même que le numéro d'une remontée de lot (« RT-2 ») ; un « A-18 » nu reste un sélecteur ou un renvoi, et la mention « neuve » ne se lit plus dans une prose qui parle d'autre chose (« un clone neuf ») — elle se déclare entre accents graves, « `neuve` » (S14, S39, TF-1428, TF-1449 : le 25/09 « A-18 » en colonne Registre a été refusé, et le 28/09 une restitution de clôture a échoué sur ses identifiants réels). · v2.31.0 (28/09) : UNE DÉCISION DÉJÀ POSÉE ET INCHANGÉE SE RAPPELLE EN UNE LIGNE, ELLE NE SE REPOSE PAS — « **D-N** : <son sujet en trois mots au moins>, posée le JJ/MM à HH:MM, inchangée », sans option ni question, compte comme RAPPELÉE et non redemandée ; une décision NOUVELLE garde son choix fermé, même posée à côté d'un rappel (S4, TF-1429 : le 25/09 « à décider : D-6, posée à 14:20 » a été refusé faute de sujet et de « inchangée », et la même décision a été reposée mot pour mot dans 8 restitutions du jour). · v2.32.0 (01/10) : UN PARAGRAPHE DE PROSE S'ÉCRIT SUR UNE SEULE LIGNE SOURCE — la synthèse d'ouverture, la prose des blocs et l'introduction du guide ne se coupent jamais à la main, une ligne vide sépare deux paragraphes : le chat de l'extension VS Code rend chaque saut de ligne, et un paragraphe coupé vers 100 caractères s'y affiche en colonne étroite au lieu d'occuper la largeur (S54, TF-1494 : une restitution renvoyée le 29/09 pour ce seul défaut, capture à l'appui) ; les listes, les tableaux, les citations et le code gardent leur forme. UN FEU VERT DE PRODUCTION DIT CE QU'IL NE VÉRIFIE PAS — quand ton verdict donne un feu vert de mise en production ou que tu remets un guide de lancement, une ligne « Ne vérifie pas : … » suit le feu vert, au verdict comme au guide (S55, TF-1493 : le 28/09 un plan approuvé sur son seul compte portait une date refusée à l'application) ; ET IL REPOSE SUR LES PORTES DU JOUR — la sortie des portes qui jugent une base externe (audit des dépendances, scan d'image), rejouée sur ce qui sera lancé, datée du jour et chiffrée, « `npm audit` rejoué le JJ/MM à HHhMM : 0 vulnérabilité élevée », ou la déclaration « aucune porte de la chaîne ne juge une base externe » (S56, TF-1498 : le 30/09 trois avis publiés dans la nuit ont arrêté une livraison que la qualification de la veille avait laissée passer). UN CHEMIN DE LIVRABLE CITÉ TIENT EN 116 CARACTÈRES, sous `output\\` comme sous le `forge\\` d'un produit — chemin relatif + 34 de sidecar d'oracle ≤ 150, raccourcis l'objet du nom (S42, TF-1500 : le 30/09 `git worktree add` a échoué 2 fois sur une synthèse de 154 caractères). UNE OPTION QU'UNE CONTRAINTE CONNUE REND IMPOSSIBLE LE DIT dans sa colonne Exclusions, en citant la contrainte — garde-fou de plateforme (`references\\GARDE-FOUS-PLATEFORME.json`), décision humaine, parole de l'humain inscrite —, au lieu de se présenter comme plus chère (TF-1496 : le 21/09 l'option retenue sur son coût heurtait une stratégie déjà écrite, et la livraison a été refusée le 29/09). UN DOCUMENT TENU OUVERT N'EST PAS UN BLOQUANT ET NE DEVIENT JAMAIS UNE QUESTION — la nouvelle version sort à l'indice suivant ; dis au bloc 4 que l'ancienne, tenue ouverte, n'a pas pu être déplacée et qu'elle le sera au tour suivant ; au bloc 8, `auto_ia`, motif `dependance_externe` avec l'application nommée ; ni décision, ni inventaire des bloquants, ni action manuelle_utilisateur « fermer le document », et l'application de l'utilisateur n'est jamais quittée (TF-1503, décision humaine du 30/09 : « Ne pose plus la question sur les documents ouverts »). · v2.33.0 (01/10) : LE BLOC 3 NE PORTE QUE CE QUI REVIENT À L'HUMAIN (R-58) — une décision n'est posée que si elle porte un motif depense, publication, irreversible, doctrine, arbitrage (préférence du porteur entre options réellement concurrentes) ou produit ; sinon tu exécutes l'option recommandée dans le tour et tu la rends pour information, au bloc 4 si elle est faite, au bloc 8 en auto_ia si elle va l'être. ET UNE VOIE PROPOSÉE SE RELIT CONTRE LE PROCESSUS DU COMMANDITAIRE ÉTAPE PAR ÉTAPE ET ACTEUR PAR ACTEUR : une option qui ajoute une étape absente du processus décrit par l'humain est exclue (réponse humaine « 42a » du 01/10 : 7 retours humains en 4 heures chez un produit pour une étape ajoutée 2 fois). · v2.36.0 (13/10) : AUCUN BLOC N'EST UN TITRE SEUL — une ligne au moins sous chaque titre, « Aucun risque identifié. » si rien (S64, TF-1632). UN MOTIF `acces` ÉNUMÈRE LES VOIES AUTOMATIQUES ESSAYÉES — au moins deux familles parmi l'identité de la session, les identités de service autorisées sur la cible, l'automatisation du dépôt et l'API de la plateforme, chacune avec son code (S65, TF-1514, R-29 point 4) ; une valeur que l'humain a fournie dans la conversation n'est jamais « qu'en sa possession ». UNE INVRAISEMBLANCE SE PRÉSENTE EN ANOMALIE — compte, dénominateur, cause probable, question qui la lève —, jamais en choix à valider (S66, TF-1565). UNE PROMESSE DE PRÉVENIR NOMME UN PORTEUR QUI SURVIT À LA SESSION (planificateur, tâche planifiée, CI), ou le bloc 8 dit qui relance la mesure et quand (S67, TF-1579). UNE ABSENCE SE PROUVE PAR L'ESSAI DISPONIBLE — l'image lue avec l'outil de lecture d'image, le `sitemap.xml` d'un site lu avec le nombre de pages relues — avant « non mesurable » ou « introuvable » (S68, TF-1580).";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.38.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Coût | Exclusions | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur. · v2.18.0 (08/09) : LE VERDICT AFFICHÉ MESURE CE QUE LE FICHIER JUGÉ MESURE — une restitution n'est pas un fil d'avancement : si l'écran a été enrichi au fil du tour (un rapport reçu, un compteur qui monte), c'est le FICHIER qu'il faut redéposer, jamais l'écran qu'il faut appauvrir ; la trace est la pièce opposable, et une pièce périmée ment à tous ceux qui la reliront. · v2.19.0 (08/09) : UN TEST JOUABLE S'EXÉCUTE — une action de TEST auto_ia (recette, banc, couverture, self-test) ne se laisse pas non exécutée sous `hors_mandat` ni `borne_atteinte` : ces deux motifs déclarent un périmètre que tu écris seul, ils ne mesurent rien ; joue la recette, ou nomme l'obstacle EXTÉRIEUR qui la bloque (dependance_bloc_3, gate_gouvernance, garde_fou, dependance_externe). Et « REMONTÉ » N'EST PAS « TRAITÉ » : une remontée annoncée au bloc 4 porte son identifiant TF-####, sans quoi le lecteur ne peut ni la retrouver ni savoir si quelqu'un l'a prise — elle vaut alors « déposé, non traité » et appartient au bloc 5 avec son motif. · v2.20.0 (08/09) : LA FORME DATÉE EN TÊTE EST RÉSERVÉE AUX ÉTUDES — un livrable cité sous `output\\` porte « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » (R-4) ; le préfixe « AAAAMMJJ-… » n'appartient qu'à `output\\03-etudes\\`, et onze livrables d'un mandat sont sortis hors R-4 le 07/09 pour l'avoir imité. Et QUAND LA DOCTRINE RÉGIT LE MOT, C'EST ELLE LA SOURCE : une décision qui parle d'une version remplacée, d'un `old\\`, d'un livrable à supprimer ou à renommer cite REGLES-PROJET.md, CLAUDE.md, ETAPES-RUN.md ou la règle numérotée qui la tranche — sourcer par un fichier du chantier une question que la doctrine a déjà tranchée, c'est poser une question qui n'avait pas à l'être. · v2.21.0 (11/09) : UN MOT DE DÉCISION REÇOIT LA PREUVE DU GESTE — quand le message humain qui précède est un sélecteur de décision (« 11a », « D-11 (a) », « 32b, 30a »), il tranche et n'attend plus d'analyse : ton bloc 4 porte la preuve exécutée du geste que l'option choisie commandait, ton bloc 3 ne repose JAMAIS la même D-N, et ta réponse n'est jamais la restitution précédente rejouée mot pour mot — le 11/09 la synthèse de la veille a été renvoyée deux fois à l'identique après deux « 11a », et le geste n'est venu que deux heures plus tard (TF-1019). · v2.22.0 (16/09) : AUCUNE EXEMPTION NE S'APPLIQUE À UN TOUR DE TRAVAIL — la jugeabilité est une propriété du TOUR, la longueur et le vocabulaire sont des propriétés du MESSAGE, et un tour qui a écrit, commité ou lancé une exécution se restitue en entier même en cent mots (TF-0978). Si son résultat n'est PAS ENCORE MESURABLE, la forme n'est pas l'exemption mais le POINT D'ÉTAPE, qui se déclare en bloc 1 : blocs 1, 4 et 8 pleins, bloc 2 remplacé par « ce qui reste à mesurer, et par quoi », les autres admis en une ligne (TF-0979). Un tour qui n'apporte RIEN DE NEUF rend un accusé de trois lignes — ce qui est arrivé, ce que cela ne change pas, ce qui reste attendu de vous — et cette exemption exige les TROIS absences : aucun verdict, aucune D-N, aucune A-N (TF-0990). Quand la demande citée au bloc 6 porte un MOT D'EXCLUSIVITÉ (uniquement, seulement, exclusivement, rien que, only), le bloc 6 dit ce que le livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient rien d'autre (S44, TF-0988). Quand un traitement est ARRÊTÉ — un élément du bloc 5 motivé par garde_fou, dependance_bloc_3, dependance_externe ou gate_gouvernance —, le bloc 3 s'ouvre par une ligne portant le mot « bloquants » puis leur inventaire, chaque entrée disant ce qui est bloqué, ce qu'il faut fournir pour le lever et ce qui se passe si rien n'est fourni, sans renvoi à un fichier ni à une autre section (S45, TF-1127). Un SECRET cité se désigne par ses cinq premiers caractères et sa longueur, relevés depuis l'exécution qui le porte, jamais par sa valeur ni par rien (TF-0986). · v2.23.0 (17/09) : CHEZ UN PRODUIT, LE TOUR DIT CE QU'IL REMONTE À LA FACTORY — une ligne au bloc 9, « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » ; « rien à remonter » est une réponse valide, le silence et « à voir » ne le sont pas, parce que ne rien remonter et n'avoir rien à remonter sont indiscernables sans elle (S48, TF-1166 ; sans objet au pilot et dans une forge). · v2.24.0 (17/09) : UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE — toute option du bloc 3 portant un verbe de geste (se connecter, s'authentifier, saisir, coller, taper, cliquer, installer, ouvrir un terminal, lancer ou exécuter une commande, valider un second facteur, publier ou pousser soi-même, renouveler un jeton) porte SUR PLACE de quoi l'exécuter : la commande ou le chemin entre accents graves, le libellé de l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » dans le groupe de la décision (en tableau, une colonne « Comment faire » suffit) ; le mode opératoire écrit soixante lignes plus bas au bloc 8 ne sert pas au lecteur, qui tranche ici (S49, TF-1172). · v2.25.0 (17/09) : LE POINT D'ÉTAPE EST UNE FORME JUGÉE, ET ELLE EST RECONNUE — un tour de travail dont le résultat n'est pas encore mesurable se déclare « point d'étape » AU BLOC 1 ; son bloc 2 porte alors « ce qui reste à mesurer, et par quoi » — la mesure attendue ET l'outil qui la rendra, une commande, un oracle ou un fichier — à défaut d'un verdict chiffré (S3, second sens), et ses blocs 1, 4 et 8 restent PLEINS (S50) : déclarer la forme sans rien mettre dans le traité serait une exemption déguisée en forme jugée. Un RELAIS d'avancement — l'émission d'un agent de campagne répercutée à l'humain — n'est plus jugé comme un rendu de fin de tour quand RIEN n'a été écrit depuis ton dernier affichage : trois lignes suffisent, et la synthèse déposée ne se reprend pas en entier à chaque relais (TF-1182). La borne n'est pas la longueur : une seule écriture depuis le dernier affichage, un verdict, une D-N ou une A-N, et le message redevient un rendu, jugé comme tel. · v2.26.0 (17/09) : TON BLOC 1 DIT L'INTENTION DE LA DEMANDE ET SON TEST RÉTRO — une phrase pour l'intention initiale (à quoi le travail devait servir, pas ce qu'il fallait faire), puis « Test rétro : » qui dit si le résultat sert cette intention ou seulement la lettre de la consigne ; un écart s'écrit au bloc 6. Loi transverse n° 7, `references\\INTENTION.md` : le 01/09 une étude conforme à sa définition et verte à tous ses contrôles a été refusée par son destinataire, sept questions sans réponse (S51, TF-0791). · v2.27.0 (19/09) : UN REFUS PROUVE QU'UNE PORTE EST FERMÉE, JAMAIS QU'IL N'Y EN A QU'UNE — une incapacité d'accès que tu déclares porte les CODES DE RETOUR DE DEUX FAMILLES de chemins au moins (un préfixe d'URL ou un scope distinct, pas une variante du même : `…/myorg/groups/…` et `…/myorg/reports/…` sont deux familles, `…/groups/{id}/reports` et `…/groups/{id}/reports/{id}` n'en sont qu'une), ou elle CITE LA SOURCE qui établit qu'un seul chemin existe ; les formules « seule voie » et « aucun autre chemin » ne valent plus preuve à elles seules, et dès que tu cites des appels ce sont eux qui font foi (S25 durcie, TF-1189 : quatre appels d'une même famille plus la formule ont fait écrire un constat FAUX dans deux synthèses jugées PASS, le scope personnel rendant 200 là où l'espace de travail rendait 401). · v2.28.0 (27/09) : UNE ACTION SUR L'INTERFACE D'UNE PLATEFORME TIERCE SE DÉCRIT D'APRÈS SA DOCUMENTATION DU JOUR, ET ELLE SE GUIDE EN TÊTE — toute action du bloc 8 laissée à l'humain qui vise l'écran d'une plateforme de `gabarits\\PLATEFORMES-TIERCES.json` (une adresse d'écran, ou son nom hors code avec un bouton, un onglet, des réglages, un « cliquer ») cite dans sa ligne sa SOURCE OFFICIELLE et la DATE où tu l'as lue, « source : <adresse de la documentation>, lue le JJ/MM/AAAA » (S52, D-24 (b), TF-1362 : le 22/09 un bouton « Prévisualiser » nommé de mémoire là où l'écran offre « Aperçu », et trois gestes d'accès supprimés par la plateforme le 09/09 prescrits quand même) ; et si l'action est laissée à manuelle_utilisateur, le message S'OUVRE sur « ## Guide — <le geste à faire> », AVANT le bloc 0 alors titré « ## 0. Synthèse d'ouverture » : des étapes numérotées, chacune close par « Résultat attendu : … » (S53, TF-1361 : la procédure a été redemandée cinq fois en 56 minutes tant qu'elle vivait en cellules de tableau). S53 est BLOQUANTE quand le dernier message humain demande la procédure. Ce que seule la plateforme fournit — un modèle d'import, un rapport d'erreurs — se demande dans le tour qui prépare le dépôt, jamais après l'échec. · v2.29.0 (28/09) : UNE BARRE VERTICALE DANS UNE CELLULE DE TABLEAU S'ÉCHAPPE — une colonne se lit dans la ligne telle que GFM la découpe, barre échappée (`\|`) comprise ; un refus sur une ligne coupée nomme la coupure au lieu d'accuser la colonne voisine (S18, S12, TF-1427 : le 25/09 une cellule portant `2>/dev/null || echo 0` a coupé la ligne à l'affichage, et l'action a été accusée à tort d'être laissée à l'humain « sans raison d'impossibilité »). · v2.30.0 (28/09) : LES IDENTIFIANTS DU REGISTRE PRODUIT ET DU LOT DE RETOURS SONT RECONNUS, ET « NEUVE » SE DÉCLARE — un identifiant qualifié (« registre A-18 ») ou posé dans une colonne Registre hors de la cellule du sélecteur vaut identifiant, de même que le numéro d'une remontée de lot (« RT-2 ») ; un « A-18 » nu reste un sélecteur ou un renvoi, et la mention « neuve » ne se lit plus dans une prose qui parle d'autre chose (« un clone neuf ») — elle se déclare entre accents graves, « `neuve` » (S14, S39, TF-1428, TF-1449 : le 25/09 « A-18 » en colonne Registre a été refusé, et le 28/09 une restitution de clôture a échoué sur ses identifiants réels). · v2.31.0 (28/09) : UNE DÉCISION DÉJÀ POSÉE ET INCHANGÉE SE RAPPELLE EN UNE LIGNE, ELLE NE SE REPOSE PAS — « **D-N** : <son sujet en trois mots au moins>, posée le JJ/MM à HH:MM, inchangée », sans option ni question, compte comme RAPPELÉE et non redemandée ; une décision NOUVELLE garde son choix fermé, même posée à côté d'un rappel (S4, TF-1429 : le 25/09 « à décider : D-6, posée à 14:20 » a été refusé faute de sujet et de « inchangée », et la même décision a été reposée mot pour mot dans 8 restitutions du jour). · v2.32.0 (01/10) : UN PARAGRAPHE DE PROSE S'ÉCRIT SUR UNE SEULE LIGNE SOURCE — la synthèse d'ouverture, la prose des blocs et l'introduction du guide ne se coupent jamais à la main, une ligne vide sépare deux paragraphes : le chat de l'extension VS Code rend chaque saut de ligne, et un paragraphe coupé vers 100 caractères s'y affiche en colonne étroite au lieu d'occuper la largeur (S54, TF-1494 : une restitution renvoyée le 29/09 pour ce seul défaut, capture à l'appui) ; les listes, les tableaux, les citations et le code gardent leur forme. UN FEU VERT DE PRODUCTION DIT CE QU'IL NE VÉRIFIE PAS — quand ton verdict donne un feu vert de mise en production ou que tu remets un guide de lancement, une ligne « Ne vérifie pas : … » suit le feu vert, au verdict comme au guide (S55, TF-1493 : le 28/09 un plan approuvé sur son seul compte portait une date refusée à l'application) ; ET IL REPOSE SUR LES PORTES DU JOUR — la sortie des portes qui jugent une base externe (audit des dépendances, scan d'image), rejouée sur ce qui sera lancé, datée du jour et chiffrée, « `npm audit` rejoué le JJ/MM à HHhMM : 0 vulnérabilité élevée », ou la déclaration « aucune porte de la chaîne ne juge une base externe » (S56, TF-1498 : le 30/09 trois avis publiés dans la nuit ont arrêté une livraison que la qualification de la veille avait laissée passer). UN CHEMIN DE LIVRABLE CITÉ TIENT EN 116 CARACTÈRES, sous `output\\` comme sous le `forge\\` d'un produit — chemin relatif + 34 de sidecar d'oracle ≤ 150, raccourcis l'objet du nom (S42, TF-1500 : le 30/09 `git worktree add` a échoué 2 fois sur une synthèse de 154 caractères). UNE OPTION QU'UNE CONTRAINTE CONNUE REND IMPOSSIBLE LE DIT dans sa colonne Exclusions, en citant la contrainte — garde-fou de plateforme (`references\\GARDE-FOUS-PLATEFORME.json`), décision humaine, parole de l'humain inscrite —, au lieu de se présenter comme plus chère (TF-1496 : le 21/09 l'option retenue sur son coût heurtait une stratégie déjà écrite, et la livraison a été refusée le 29/09). UN DOCUMENT TENU OUVERT N'EST PAS UN BLOQUANT ET NE DEVIENT JAMAIS UNE QUESTION — la nouvelle version sort à l'indice suivant ; dis au bloc 4 que l'ancienne, tenue ouverte, n'a pas pu être déplacée et qu'elle le sera au tour suivant ; au bloc 8, `auto_ia`, motif `dependance_externe` avec l'application nommée ; ni décision, ni inventaire des bloquants, ni action manuelle_utilisateur « fermer le document », et l'application de l'utilisateur n'est jamais quittée (TF-1503, décision humaine du 30/09 : « Ne pose plus la question sur les documents ouverts »). · v2.33.0 (01/10) : LE BLOC 3 NE PORTE QUE CE QUI REVIENT À L'HUMAIN (R-58) — une décision n'est posée que si elle porte un motif depense, publication, irreversible, doctrine, arbitrage (préférence du porteur entre options réellement concurrentes) ou produit ; sinon tu exécutes l'option recommandée dans le tour et tu la rends pour information, au bloc 4 si elle est faite, au bloc 8 en auto_ia si elle va l'être. ET UNE VOIE PROPOSÉE SE RELIT CONTRE LE PROCESSUS DU COMMANDITAIRE ÉTAPE PAR ÉTAPE ET ACTEUR PAR ACTEUR : une option qui ajoute une étape absente du processus décrit par l'humain est exclue (réponse humaine « 42a » du 01/10 : 7 retours humains en 4 heures chez un produit pour une étape ajoutée 2 fois). · v2.36.0 (13/10) : AUCUN BLOC N'EST UN TITRE SEUL — une ligne au moins sous chaque titre, « Aucun risque identifié. » si rien (S64, TF-1632). UN MOTIF `acces` ÉNUMÈRE LES VOIES AUTOMATIQUES ESSAYÉES — au moins deux familles parmi l'identité de la session, les identités de service autorisées sur la cible, l'automatisation du dépôt et l'API de la plateforme, chacune avec son code (S65, TF-1514, R-29 point 4) ; une valeur que l'humain a fournie dans la conversation n'est jamais « qu'en sa possession ». UNE INVRAISEMBLANCE SE PRÉSENTE EN ANOMALIE — compte, dénominateur, cause probable, question qui la lève —, jamais en choix à valider (S66, TF-1565). UNE PROMESSE DE PRÉVENIR NOMME UN PORTEUR QUI SURVIT À LA SESSION (planificateur, tâche planifiée, CI), ou le bloc 8 dit qui relance la mesure et quand (S67, TF-1579). UNE ABSENCE SE PROUVE PAR L'ESSAI DISPONIBLE — l'image lue avec l'outil de lecture d'image, le `sitemap.xml` d'un site lu avec le nombre de pages relues — avant « non mesurable » ou « introuvable » (S68, TF-1580). · v2.37.0 (14/10) : CHEZ UN PRODUIT, LA LIGNE « Remontée à la factory » EST BLOQUANTE (S48, TF-1644) — elle tranche : « rien à remonter », ou le lot nommé « <produit> - RETOURS - AAAAMMJJ<indice> » remis, ou « reste au produit, parce que <motif> » ; un tour qui CORRIGE une erreur de la session n’écrit jamais « rien à remonter » (TF-1643). PRÉJUGE AVANT D’AFFICHER : écris la restitution dans un fichier temporaire, `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`) jusqu’à l’exit 0, puis affiche ce texte tel quel (TF-1647, TF-1666). · v2.38.0 (15/10) : UNE LIVRAISON SE DÉCLARE DU CÔTÉ DE L'UTILISATEUR (R-61) — un service déployé ou une page publiée se nomme par son adresse cliquable et le geste pour s'en servir (point d'accès, clé, commande d'essai) au bloc 0 ou au verdict (S70, TF-1708) ; « livré », « fini », « complet » ou « mené jusqu'au bout » disent au même endroit ce qu'un utilisateur peut faire du livrable à l'instant et ce qui manque pour un usage réel (S71, TF-1709), et portent « N exigences sur M tenues », seuls les secrets restant à saisir — un critère de sortie de phase tenu se dit « phase close », jamais « livré » (S72, TF-1711). UNE PART RANGÉE, CLASSÉE OU TRIÉE PORTE SA JUSTESSE — mesurée sur un échantillon étiqueté hors du système, ou « justesse non mesurée » (S73, TF-1694, R-63) ; un gain annoncé sur un échantillon dit le contrôle des changements dans la population et l'effet sur les lignes déjà traitées (S74, TF-1695).";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
 // réponse deux fois. Une réponse courte (`references\NIVEAUX.md`, niveau Simple) se joue donc
 // AVANT d'être rendue : `node oracles/hook-restitution.mjs --pre-vol` lit son texte sur l'entrée
 // standard et dit si le juge la refuserait, et pourquoi (mots comptés, verdict, D-N posée).
+// 14/10/2026 (TF-1647, TF-1666) — LE PRÉJUGEMENT D'UNE RESTITUTION COMPLÈTE. Le défaut est assumé
+// depuis TF-0677 (26/08) : un hook `Stop` juge APRÈS l'affichage, et N refus font N+1 affichages.
+// Ce qui se réduit, c'est la FRÉQUENCE. Mesuré le 12/10 chez un produit : les 11 restitutions d'une
+// session, rejouées sur fichier, retrouvent exactement les 2 refus rejouables et aucune règle
+// bloquante sur les 9 autres ; journal du pilot, 1 393 refus au premier passage sur 4 549 jugements.
+// Un brouillon jugé AVANT l'affichage aurait évité les 2 doublons. `--prejuger <brouillon.md>` rend
+// le verdict BLOQUANT du hook sur ce texte — mêmes règles, même ensemble `BLOQUANTES`, même dossier
+// de projet (`--racine`, donc S48 chez un produit) : exit 0 = affichable. Depuis TF-1720 (15/10/2026),
+// il joue aussi l'AFFICHAGE contre la synthèse déposée dans le tour, retrouvée au transcript.
+// Chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <brouillon.md>`.
+if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes("--prejuger")) {
+  const f = process.argv[process.argv.indexOf("--prejuger") + 1];
+  if (!f || !existsSync(f)) {
+    console.log(JSON.stringify({ outil: "hook-restitution --prejuger", verdict: "ERREUR",
+      message: "brouillon introuvable — usage : node oracles/hook-restitution.mjs --prejuger <brouillon.md>" }));
+    process.exit(2);
+  }
+  const brouillon = readFileSync(f, "utf8");
+  const { fails } = juger(brouillon, process.cwd());
+  const bloquants = fails.filter((x) => BLOQUANTES.has(x.regle));
+  const avertissements = fails.filter((x) => !BLOQUANTES.has(x.regle));
+  // TF-1720 — l'AFFICHAGE contre la synthèse que le hook retiendra, choisie de la même façon.
+  const iT = process.argv.indexOf("--transcript");
+  const cheminT = iT > 1 ? process.argv[iT + 1] : transcriptDeSession();
+  let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
+  const ecartsAffichage = [];
+  try {
+    if (cheminT && existsSync(cheminT)) {
+      syntheseDeposee = syntheseDuTour(analyserTranscript(readFileSync(cheminT, "utf8")).fichiersMd);
+      if (syntheseDeposee) {
+        ecartsAffichage.push(...comparerAffiche(brouillon, readFileSync(syntheseDeposee, "utf8")));
+        affichage = ecartsAffichage.length ? "FAIL" : "PASS";
+      } else affichage = "sans objet : aucune synthèse déposée dans le tour";
+    }
+  } catch { affichage = "non joué : transcript ou synthèse illisible"; }
+  const refus = [...bloquants.map((x) => `${x.regle} — ${x.message}`),
+    ...ecartsAffichage.map((e) => `AFFICHAGE — ce brouillon ne dit pas ce que dit la synthèse déposée ${syntheseDeposee} : ${e}`)];
+  console.log(JSON.stringify({ outil: "hook-restitution --prejuger", brouillon: f, affichable: !refus.length,
+    bloquants: refus, avertissements: avertissements.map((x) => x.regle),
+    synthese_deposee: syntheseDeposee, affichage,
+    non_juge: "les contrôles qui lisent le TOUR et non le texte — GESTE (réponse à un mot de décision), "
+      + "PROCÉDURE, POSSESSION, niveau Moyen : le hook de fin de tour les joue sur le transcript ; un brouillon affiché autrement qu'il a été préjugé n'est plus couvert" }));
+  process.exit(refus.length ? 1 : 0);
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes("--pre-vol")) {
   const texte = readFileSync(0, "utf8");
   if (declareMoyen(texte)) {
@@ -886,7 +1059,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains } = analyserTranscript(readFileSync(chemin, "utf8"));
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
@@ -908,9 +1081,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
   }
   const portee = escaladeMoyen ? { juge: true, motif: escaladeMoyen }
-    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage });
+    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage, enAttente });
   if (!portee.juge) process.exit(0);
-  const { code, fails } = juger(dernierTexte);
+  const { code, fails } = juger(dernierTexte, entree.cwd || process.cwd());
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.
@@ -930,11 +1103,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // TF-1514 — la POSSESSION : « seul l'humain la détient », contredit par un message humain de la session.
   // Avertissement seulement : il rejoint la liste des règles non bloquantes.
   const possession = controlerPossession({ textesHumains, dernierTexte });
+  // TF-1641 — l'EXPLICATION demandée vit dans une fiche. Avertissement seulement.
+  const explication = controlerExplication({ dernierHumain, dernierTexte, fichiersMd });
   const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));
   const avertissements = [...fails.filter((f) => !BLOQUANTES.has(f.regle)),
-    ...possession.ecarts.map((e) => ({ regle: "POSSESSION", statut: "FAIL", message: e }))];
+    ...possession.ecarts.map((e) => ({ regle: "POSSESSION", statut: "FAIL", message: e })),
+    ...explication.ecarts.map((e) => ({ regle: "EXPLICATION", statut: "FAIL", message: e }))];
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
-  const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL";
+  const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
+    && explication.verdict !== "FAIL";
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   try {
     mkdirSync(dirname(journal), { recursive: true });
@@ -949,6 +1126,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(geste.applicable ? { geste: { decision: geste.decision, verdict: geste.verdict, ecarts: geste.ecarts } } : {}),
       ...(procedure.applicable ? { procedure: { verdict: procedure.verdict, ecarts: procedure.ecarts } } : {}),
       ...(possession.applicable ? { possession: { verdict: possession.verdict } } : {}),
+      ...(explication.applicable ? { explication: { verdict: explication.verdict } } : {}),
+      prejuge: !!prejuge,
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
   } catch { /* journal facultatif */ }
@@ -970,6 +1149,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + `Le document jugé est ${fichierSynthese} : reprends-en le bloc 3 en entier plutôt qu'une version abrégée.`),
     ...geste.ecarts.map((e) => `GESTE — ${e}. ${RAPPEL_GESTE}`),
     ...procedure.ecarts.map((e) => `PROCÉDURE — ${e} ${RAPPEL_PROCEDURE}`),
+    ...(prejuge ? [] : [RAPPEL_PREJUGEMENT]),
   ].join("\n");
   const enPlus = avertissements.length ? `\n(à corriger au passage, non bloquant : ${avertissements.map((f) => f.regle).join(", ")})` : "";
   console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — R-44] oracle-synthese FAIL BLOQUANT sur ta réponse finale :\n${motifs}${enPlus}\n\n${RAPPEL}` }));

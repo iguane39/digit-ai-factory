@@ -99,6 +99,19 @@ ailleurs. Conséquence directe : le rapport de fin ne peut plus dire « au vert 
 vert CONTRE QUOI »**. La question ne se pose qu'une fois par produit — la réponse vit à son
 `CLAUDE.md`, le run la recopie — et elle est tenue par **R-11 bis** d'`oracle-conformite-projet`.
 
+**POSER LE SOCLE PAR LE GESTE OUTILLÉ (TF-1697, TF-1724)** — dans un projet déjà adopté (`forge\`
+présent), le socle d'ouverture se pose par une commande, jamais à la main :
+`node <pilot>\scripts\ouvrir-run.mjs <projet> --run <id> --forges <forges mobilisées>`. Elle copie
+les fiches de `gabarits\docs-projet\` qui manquent (R-20), pose `README.md` (R-12) et `.env.example`
+sans aucune variable inventée (R-13), écrit le `run_open` par `ledger.mjs` (schéma 1.1,
+`forges_mobilisees`, `versions_forges`), puis joue `oracle-conformite-projet` et rend chaque FAIL
+restant comme un reste à faire nommé. Elle n'écrase rien et ne pose rien au second passage. Elle
+n'écrit ni `referentiels` ni `couverture_dimensions` : un run qui les déclare dès le `run_open`
+lance le geste sans `--run` ni `--forges`, puis écrit son `run_open` complet par `ledger.mjs`.
+*Pourquoi* (lot Produit-82 20261014a, RT-2) : après une adoption, une session a lu l'oracle de conformité pour
+deviner ses exigences et l'a rejoué trois fois (3 FAIL, 4 FAIL, puis PASS). Les paragraphes
+suivants décrivent ce que le socle contient ; ils ne remplacent pas le geste.
+
 Dans le projet produit, créer `forge\` (`ledger.jsonl` ouvert avec `run_open`, `BRIEF.md` avec
 le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la racine du projet, l'y copier
 depuis le pilot (auto-documentation et reprise). Écrivain unique du ledger : l'orchestrateur.
@@ -157,7 +170,8 @@ l'ouverture (socle créé depuis l'état constaté, `.env.example` reconstruit a
 
 **Valider** : `node <pilot>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé avant
 l'étape 2 ; rejouer l'oracle avant `run_close` — **un FAIL R-20 (socle incomplet) bloque la
-clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal). Nommage : tout livrable copié dans
+clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal), **comme un FAIL R-60**
+(la cascade du produit ne tient pas sa chaîne, TF-1678). Nommage : tout livrable copié dans
 `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
 sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre dans `old\`
 du même dossier — **versionné** (C1 tranché le 13/08, TF-0150 ; l'ancien libellé « jamais
@@ -176,7 +190,10 @@ explicitement (cf. `enumere-la-surface`).
 **Cascade ISTO** (loi transverse n° 7, `references\INTENTION.md` 2.0.0) : l'intention est citée
 et **validée avec sa trace** avant la première exigence ; stratégies, tactiques, contraintes et
 non-objectifs vont dans `forge\etapes\conception\cascade\CASCADE.json` (gabarit
-`gabarits\CASCADE-ISTO.json`), chaque exigence rattachée à une tactique et à une seule.
+`gabarits\CASCADE-ISTO.json`), chaque exigence rattachée à une tactique et à une seule. Sa
+vue `forge\etapes\conception\CASCADE.md` se génère par la famille `gd-cascade-produit`
+(`<pilot>\gabarits\documents\cascade-produit\generateur\generer-vue-cascade.mjs`), jamais à la
+main ; la porte R-60 rejoue la source avant `run_close`.
 
 **Valider** : `node <conception>\oracles\oracle-{exigences,tracabilite,surface,claims}.mjs
 <EXIGENCES.json>`, puis `node <pilot>\oracles\oracle-cascade-isto.mjs <CASCADE.json>
@@ -367,6 +384,22 @@ hypothèse — la revue le classe « accepté », pas défaut.
 implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la baseline
 (`oracle-baseline.mjs juger`) détecte toute dérive depuis l'approbation de l'étape 3.
 
+**Exploitabilité au volume réel (TF-1654, 14/10/2026).** Une revue jouée sur le seul jeu de
+démonstration ne dit rien de l'écran que l'utilisateur aura. Le 12/10/2026, chez Produit-80, les
+écrans avaient passé la critique d'implémentation, `render_page.py` aux 7 largeurs et plus de
+3 000 tests, tous sur 2 projets de démonstration ; à la première alimentation réelle, une fiche
+mesurait 5 220 px en 4 colonnes déséquilibrées, un écran de complétude 20 630 px, et des valeurs
+machine (`not_assessed`, objets sérialisés) s'affichaient brutes. La revue graphique se **rejoue
+donc sur une instance alimentée au volume réel** (la qualif populée, `ETAPE-MEP.md` § 3 bis), avec
+un contrôle d'exploitabilité mesuré dans le rendu : hauteur de page hors tableau filtrable,
+densité des lignes, valeurs machine visibles, colonnes déséquilibrées, libellés trop longs. Le
+contrôle commun est `<racine>\digit-ai-forge-design\oracles\oracle-exploitabilite.mjs` (règles X0
+à X5, livré le 14/10/2026, part forge de TF-1654) : il juge une URL ou un fichier, et une
+application derrière une connexion avec `--etat-connexion <storageState.json>`. Il reprend les
+seuils de l'oracle écrit par le produit d'origine (9 échecs mesurés sur l'instance alimentée). Le verdict se consigne au ledger
+(`oracles_verdict`) et entre au dossier de MEP ; un écran jugé sur la seule démonstration se
+déclare comme tel, jamais par silence.
+
 ## 6. Étape MEP (portée par le pilot — `ETAPE-MEP.md`)
 
 Dockerfile/compose dans le produit, déploiement **staging** réel, `ROLLBACK.md` testé une
@@ -425,6 +458,12 @@ Les seuls critères — tous mesurables, aucun « optimal »/« confiance » : o
 pans mesurés · oracle MEP au complet en staging (`ETAPE-MEP.md`) · `DOSSIER-MEP.md` complet · traçabilité exigences
 MVP → tests 100 % · ledger vérifié par `ledger.mjs verify` · couverture des dimensions d'audit déclarée
 à l'ouverture du run (R-19 ter, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage).
+
+*« Livré » a une définition opposable* (R-61, TF-1711, 15/10/2026) : toutes les exigences de la fiche
+implémentées et testées, seuls les secrets restant à saisir par l'administrateur, par un geste guidé
+unique. Un run qui s'arrête avant le dit, écrit « N exigences sur M tenues » au bloc 0 ou au verdict de
+sa restitution, et nomme ce qui reste ; le critère de sortie d'une phase tenu se dit « phase close ».
+Juges : S70 à S72 d'`oracles\oracle-synthese.mjs`, avertissantes.
 
 *L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
 

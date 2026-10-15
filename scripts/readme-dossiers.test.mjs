@@ -395,6 +395,86 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   rmSync(P, { recursive: true, force: true });
 }
 
+// TF-1667 (14/10/2026) — LE GÉNÉRATEUR NE RÉÉCRIT PAS UN README RÉDIGÉ À LA MAIN ET N'ÉCRIT NI SOUS DES
+// FIXTURES NI DANS UN DOSSIER GELÉ. Le fait du 13/10 chez un produit : 41 README suivis rédigés à la main
+// remplacés par une table et un rôle « à rédiger », 20 README créés sous `__tests__\fixtures\`, 1 dans un
+// témoin que le CLAUDE.md du produit déclare gelé. Sens rouge : le même arbre SANS ces protections (un
+// README qui porte la marque, un dossier ordinaire) est bien régénéré — la règle ne mord pas trop large.
+{
+  const P = mkdtempSync(join(tmpdir(), "readme-redige-main-"));
+  mkdirSync(join(P, "forge"), { recursive: true });
+  mkdirSync(join(P, "input"), { recursive: true });
+  for (const d of [["03-Syntheses"], ["pack", "__tests__", "fixtures", "cas"], ["07-Standards", "baseline-20260710b"], ["genere"]])
+    mkdirSync(join(P, "output", ...d), { recursive: true });
+  const MAIN = "# Synthèses\n\nCe dossier porte les synthèses du projet, rédigées à la main.\n";
+  writeFileSync(join(P, "output", "03-Syntheses", "README.md"), MAIN, "utf8");
+  writeFileSync(join(P, "output", "03-Syntheses", "s.md"), "# S\n", "utf8");
+  writeFileSync(join(P, "output", "pack", "__tests__", "fixtures", "cas", "f.json"), "{}\n", "utf8");
+  writeFileSync(join(P, "output", "07-Standards", "baseline-20260710b", "norme.md"), "# Norme\n", "utf8");
+  writeFileSync(join(P, "output", "genere", "g.md"), "# G\n", "utf8");
+  writeFileSync(join(P, "CLAUDE.md"), "# Produit\n\n- Le témoin `output/07-Standards/baseline-20260710b/` est gelé : ne rien y écrire.\n", "utf8");
+  const r = spawnSync(process.execPath, [OUTIL, "--base", P, "--racines", "output"], { encoding: "utf8" });
+  check("TF-1667 rouge → vert — un README rédigé à la main (sans marque ni bloc ROLE) n'est PAS réécrit, et la sortie le dit", () => {
+    if (readFileSync(join(P, "output", "03-Syntheses", "README.md"), "utf8") !== MAIN) throw new Error("le README rédigé à la main a été réécrit (défaut d'origine)");
+    if (!/1 README rédigé\(s\) à la main .*préservé/.test(r.stdout || "")) throw new Error(`la préservation n'est pas dite : ${(r.stdout || "").slice(0, 200)}`);
+  });
+  check("TF-1667 rouge → vert — aucun README sous `__tests__` ni `fixtures`, le parent les compte comme un bloc clos", () => {
+    for (const rel of [["pack", "__tests__"], ["pack", "__tests__", "fixtures"], ["pack", "__tests__", "fixtures", "cas"]])
+      if (existsSync(join(P, "output", ...rel, "README.md"))) throw new Error(`README posé dans output\\${rel.join("\\")}`);
+    if (!/`__tests__\\` \| livrable à structure close .*dossier de tests ou de fixtures/.test(readFileSync(join(P, "output", "pack", "README.md"), "utf8")))
+      throw new Error("le parent ne déclare pas le dossier de tests");
+  });
+  check("TF-1667 rouge → vert — le dossier que le CLAUDE.md déclare gelé ne reçoit aucun README", () => {
+    if (existsSync(join(P, "output", "07-Standards", "baseline-20260710b", "README.md"))) throw new Error("README posé dans le témoin gelé (défaut d'origine)");
+    if (!/déclaré gelé par le CLAUDE\.md/.test(readFileSync(join(P, "output", "07-Standards", "README.md"), "utf8"))) throw new Error("le parent ne dit pas pourquoi le témoin n'est pas indexé");
+  });
+  check("TF-1667 sens rouge — un dossier ordinaire et un README qui porte la marque sont toujours régénérés", () => {
+    if (!existsSync(join(P, "output", "genere", "README.md"))) throw new Error("la règle mord trop large : le dossier ordinaire n'a pas de README");
+    const f = join(P, "output", "genere", "README.md");
+    writeFileSync(f, readFileSync(f, "utf8").replace("| `g.md` |", "| `ancien.md` |"), "utf8");
+    spawnSync(process.execPath, [OUTIL, "--base", P, "--racines", "output"], { encoding: "utf8" });
+    if (!/\| `g\.md` \|/.test(readFileSync(f, "utf8"))) throw new Error("un README généré périmé n'a pas été régénéré");
+  });
+  check("TF-1667 — `--racines` borné au dossier écrit ne touche aucun autre dossier", () => {
+    const Q = mkdtempSync(join(tmpdir(), "readme-borne-"));
+    mkdirSync(join(Q, "forge"), { recursive: true });
+    mkdirSync(join(Q, "output", "a"), { recursive: true });
+    mkdirSync(join(Q, "output", "b"), { recursive: true });
+    writeFileSync(join(Q, "output", "a", "x.md"), "# X\n", "utf8");
+    writeFileSync(join(Q, "output", "b", "y.md"), "# Y\n", "utf8");
+    spawnSync(process.execPath, [OUTIL, "--base", Q, "--racines", "output/a"], { encoding: "utf8" });
+    const ok = existsSync(join(Q, "output", "a", "README.md")) && !existsSync(join(Q, "output", "b", "README.md")) && !existsSync(join(Q, "output", "README.md"));
+    rmSync(Q, { recursive: true, force: true });
+    if (!ok) throw new Error("la borne --racines n'a pas tenu");
+  });
+  rmSync(P, { recursive: true, force: true });
+}
+
+// TF-1652 (14/10/2026) — JOUÉ DEPUIS LA RACINE D'UN PRODUIT SUR LA COPIE DU PILOT QU'IL PORTE
+// (`factory\`), LE GÉNÉRATEUR N'ÉCRIT RIEN DANS CETTE COPIE. Le fait du 13/10 : `node factory/scripts/
+// readme-dossiers.mjs` lancé depuis la racine d'un produit a régénéré 8 README dans `factory\`. Le refus
+// nomme la commande valable chez le produit, bornée au dossier écrit.
+{
+  const R = mkdtempSync(join(tmpdir(), "readme-produit-factory-"));
+  const F = join(R, "factory");
+  for (const f of ["scripts/readme-dossiers.mjs", "scripts/lib-empreinte.mjs", "scripts/lib-confidentiel.mjs", "scripts/lib-parc.mjs", "todo/anonymiser-entrant.mjs"]) {
+    mkdirSync(dirname(join(F, f)), { recursive: true });
+    writeFileSync(join(F, f), readFileSync(join(ICI, "..", f)));
+  }
+  mkdirSync(join(F, "input"), { recursive: true });
+  mkdirSync(join(F, "output"), { recursive: true });
+  mkdirSync(join(R, "forge"), { recursive: true });
+  const r = spawnSync(process.execPath, [join("factory", "scripts", "readme-dossiers.mjs")], { cwd: R, encoding: "utf8" });
+  check("TF-1652 — lancé depuis la racine du produit sans --base : refus, aucun README écrit dans factory\\", () => {
+    if (r.status !== 2) throw new Error(`exit ${r.status} au lieu du refus (2)`);
+    if (existsSync(join(F, "input", "README.md")) || existsSync(join(F, "output", "README.md"))) throw new Error("un README a été écrit dans la copie du pilot (défaut d'origine)");
+  });
+  check("TF-1652 — le refus nomme la commande valable chez un produit (--base . et --racines)", () => {
+    if (!/--base \. --racines/.test(r.stderr || "")) throw new Error(`commande produit absente du refus : ${(r.stderr || "").slice(-200)}`);
+  });
+  rmSync(R, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
 rmSync(TABLES, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);

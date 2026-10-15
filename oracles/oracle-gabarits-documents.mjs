@@ -21,7 +21,11 @@
  *        `[À REMPLIR]`) hors commentaires,
  *        et elle diffère de son squelette. Une instance qui recopie le squelette ne prouve rien ;
  *   G3 · squelette ET instance passent le contrôle de MARQUAGE du socle (`check_html.py`). C'est
- *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait ;
+ *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait.
+ *        Ses AVERTISSEMENTS se publient aussi (TF-1726, 15/10/2026), en statut AVERTISSEMENT qui
+ *        ne fait pas échouer : l'avertissement L12 que chaque fiche héritait du squelette
+ *        gd-fiche-produit passait G3 sans être dit, alors qu'un défaut du squelette se recopie
+ *        dans toute instance qui en part ;
  *   G11 · toute famille du CATALOGUE qui déclare produire du `html` porte son `point_de_depart` :
  *        son TYPE (`squelette` · `generateur` · `canevas` · `aucun`) et, sauf pour `aucun`, le
  *        CHEMIN qui le porte, vérifié sur disque. Née le 14/09/2026 d'une mesure qui s'est
@@ -52,6 +56,11 @@
  *        `<main>`, et ses chapitres tiennent la déclaration (`.lire` partout en lecture, nulle part
  *        en données), sauf un chapitre marqué `largeur-exception`. Jugé sur le MARQUAGE : la
  *        largeur rendue reste au socle de rendu, et ce contrôle ne la prétend pas mesurée.
+ *   G14 · la DETTE D-04 entre le catalogue et le registre des types d'organization est mesurée et
+ *        publiée (TF-1725, 15/10/2026) : toute famille dont un `types_de_nom` s'ouvre sur un mot
+ *        absent de `digit-ai-forge-organization\registre-types.json` est nommée, avec ce mot, en
+ *        AVERTISSEMENT ; le total se rend à chaque passage. R-25 admet ces noms en avertissement
+ *        (TF-1713) ; sans compte, la dette ne baissait que par hasard. Registre absent : SKIP.
  *
  * CE QU'IL NE FAIT PAS : rendre la page. Le rendu a son propre contrôle — `scripts\verifier-rendu-
  * instances.mjs` — et le dupliquer créerait deux vérités sur les familles bloquantes. Il ne juge
@@ -112,9 +121,44 @@ const sansCommentaires = (html) => html.replace(/<!--[\s\S]*?-->/g, " ");
 function marquage(fichier) {
   if (!SOCLE || !PYTHON) return { skip: true };
   const r = spawnSync(PYTHON, ["-X", "utf8", SOCLE, fichier], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
-  const sortie = (r.stdout || "") + (r.stderr || "");
+  return lireMarquage((r.stdout || "") + (r.stderr || ""));
+}
+
+/** La sortie de check_html lue : verdict, détail des échecs, et (TF-1726) les lignes « ! … » de sa
+ *  rubrique « Avertissements : », publiées au lieu d'être jetées avec le reste. Pure : le
+ *  self-test la joue sur une sortie écrite, sans dépendre des règles du socle du jour. */
+function lireMarquage(sortie) {
   const m = /^Verdict\s*:\s*(\w+)/m.exec(sortie);
-  return { verdict: m ? m[1] : "ILLISIBLE", detail: sortie.split("\n").filter((l) => /^\s+\[/.test(l)).slice(0, 3).join(" · ") };
+  const lignes = sortie.split(/\r?\n/);
+  const avertissements = lignes.filter((l) => /^\s+!\s+\S/.test(l)).map((l) => l.trim().replace(/^!\s+/, ""));
+  return { verdict: m ? m[1] : "ILLISIBLE", detail: lignes.filter((l) => /^\s+\[/.test(l)).slice(0, 3).join(" · "), avertissements };
+}
+
+/** « L12 ×4 · L35 » : les règles du socle qui ont averti, comptées, dans l'ordre de leur sortie. */
+function resumerAvertissements(avertissements) {
+  const compte = new Map();
+  for (const a of avertissements) {
+    const regle = (/^([A-Z]+-?\d+)\b/.exec(a) || [, "non numéroté"])[1];
+    compte.set(regle, (compte.get(regle) || 0) + 1);
+  }
+  return [...compte].map(([r, n]) => (n > 1 ? `${r} ×${n}` : r)).join(" · ");
+}
+
+/** Les constats G3 d'une pièce, à partir de son marquage lu. Un avertissement du socle se publie
+ *  en AVERTISSEMENT, qui ne compte pas au verdict (TF-1726). */
+function constatsG3(ou, r) {
+  if (r.skip) return [{ regle: "G3", statut: "SKIP", ou, message:
+    "socle de marquage ou python introuvable — le contrôle n'a PAS tourné" }];
+  const constats = [r.verdict !== "PASS"
+    ? { regle: "G3", statut: "FAIL", ou, message: `marquage ${r.verdict} — ${r.detail || "voir check_html.py"}` }
+    : { regle: "G3", statut: "PASS", ou, message: "marquage PASS" }];
+  if (r.avertissements.length) {
+    constats.push({ regle: "G3", statut: "AVERTISSEMENT", ou, message:
+      `${r.avertissements.length} avertissement(s) du marquage (${resumerAvertissements(r.avertissements)}), ` +
+      `sans effet sur le verdict : « ${r.avertissements[0].slice(0, 160)} »` +
+      (/SQUELETTE/.test(ou) ? " — un squelette les transmet à toute instance qui en part" : "") });
+  }
+  return constats;
 }
 
 // ---- G8 (TF-1076, 16/09/2026) — UN LIVRABLE ÉCRIT SANS FAMILLE AU CATALOGUE ------------------
@@ -577,6 +621,50 @@ export function jugerCatalogue(chemin, racineParc) {
   return findings;
 }
 
+// G14 (TF-1725, 15/10/2026) — LA DETTE ENTRE LE CATALOGUE ET LE REGISTRE DES TYPES, COMPTÉE. R-25
+// d'oracle-conformite-projet lit le <Type> d'un livrable comme le PREMIER MOT du 2e segment de son
+// nom et le cherche au registre d'organization (D-04). Le catalogue prescrit, lui, des types de nom
+// entiers (« compte rendu », « fiche produit »). Depuis TF-1713, R-25 admet en avertissement un nom
+// que le catalogue déclare et dont le mot de tête manque au registre : la contradiction ne bloque
+// plus, mais rien ne la comptait. Mesuré le 15/10/2026 : 29 familles sur 45 avant l'admission de
+// « Fiche » au registre 1.6.0, 27 après. La règle lit le registre en LECTURE SEULE, avec la même
+// normalisation que R-25 (casse et accents ignorés, alias compris) ; elle n'échoue jamais : la
+// dette se règle chez organization, par un commit motivé, ou au catalogue.
+const normeTete = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+export function detteTypesDeNom(familles, racineParc) {
+  const chemin = join(racineParc, "digit-ai-forge-organization", "registre-types.json");
+  if (!existsSync(chemin)) return [{ regle: "G14", statut: "SKIP", ou: "catalogue/types_de_nom", message:
+    `registre des types d'organization introuvable (${chemin}) — la dette D-04 n'est PAS mesurée` }];
+  let reg;
+  try { reg = JSON.parse(readFileSync(chemin, "utf8")); } catch { reg = null; }
+  if (!reg || !Array.isArray(reg.types)) return [{ regle: "G14", statut: "SKIP", ou: "catalogue/types_de_nom", message:
+    "registre des types d'organization illisible — la dette D-04 n'est PAS mesurée" }];
+  const admis = new Set(reg.types.flatMap((t) => [t.type, ...(t.alias || [])]).map(normeTete));
+  const constats = [];
+  // La ligne d'en-tête du catalogue documente `types_de_nom` en prose : seule une famille compte.
+  const declarantes = familles.filter((f) => f && f.famille && Array.isArray(f.types_de_nom) && f.types_de_nom.length);
+  const mots = new Set();
+  for (const f of declarantes) {
+    const manquants = new Map(); // mot de tête → types de nom qui s'ouvrent sur lui
+    for (const t of f.types_de_nom) {
+      const tete = normeTete(String(t).trim().split(/\s+/)[0]);
+      if (!tete || admis.has(tete)) continue;
+      manquants.set(tete, [...(manquants.get(tete) || []), t]);
+    }
+    if (!manquants.size) continue;
+    for (const m of manquants.keys()) mots.add(m);
+    constats.push({ regle: "G14", statut: "AVERTISSEMENT", ou: `catalogue/${f.famille}`, message:
+      `type(s) de nom au mot de tête absent du registre des types d'organization : ` +
+      [...manquants].map(([m, ts]) => `« ${m} » (${ts.join(", ")})`).join(", ") +
+      " — R-25 les admet en avertissement (TF-1713) ; la dette se règle au registre (D-04, commit motivé chez organization) ou au catalogue" });
+  }
+  const version = reg.version ? ` ${reg.version}` : "";
+  constats.push({ regle: "G14", statut: constats.length ? "AVERTISSEMENT" : "PASS", ou: "catalogue/types_de_nom", message:
+    `dette D-04 : ${constats.length} famille(s) sur ${declarantes.length} déclarant des types de nom s'ouvrent sur un mot absent ` +
+    `du registre des types${version}` + (mots.size ? ` — ${mots.size} mot(s) de tête : ${[...mots].sort().join(", ")}` : "") });
+  return constats;
+}
+
 export function juger(dossier, catalogue = lireCatalogue()) {
   const findings = [];
   const familles = existsSync(dossier)
@@ -621,16 +709,7 @@ export function juger(dossier, catalogue = lireCatalogue()) {
     }
 
     for (const n of ["SQUELETTE.html", "INSTANCE.html"].filter((f) => fichiers.includes(f))) {
-      const r = marquage(p(n));
-      if (r.skip) {
-        findings.push({ regle: "G3", statut: "SKIP", ou: `${fam}/${n}`, message:
-          "socle de marquage ou python introuvable — le contrôle n'a PAS tourné" });
-      } else if (r.verdict !== "PASS") {
-        findings.push({ regle: "G3", statut: "FAIL", ou: `${fam}/${n}`, message:
-          `marquage ${r.verdict} — ${r.detail || "voir check_html.py"}` });
-      } else {
-        findings.push({ regle: "G3", statut: "PASS", ou: `${fam}/${n}`, message: "marquage PASS" });
-      }
+      findings.push(...constatsG3(`${fam}/${n}`, marquage(p(n))));
     }
 
     // G4 (TF-0690, 28/08) — LE DOCUMENT LIVRÉ PORTE SON GABARIT ET SA VERSION, VISIBLEMENT.
@@ -908,6 +987,22 @@ if (args[0] === "--self-test") {
   if (!g10("g10-sans-lecteur").some((x) => x.statut === "FAIL" && /role_destinataire/.test(x.message)))
     casse.push("G10 : un gabarit qui ne déclare pas son lecteur passe — la frontière n'a alors aucun lecteur à protéger");
 
+  // G3, avertissements (TF-1726), dans ses deux sens, sur des sorties de check_html écrites : un
+  // marquage PASS sans rubrique d'avertissements ne publie que son PASS ; le même avec deux
+  // avertissements L12 et un EC-9 publie un AVERTISSEMENT qui les compte, et ne fait rien échouer.
+  const sortieNette = "Source  : x.html\nVerdict : PASS\nRègles  : 46 règles\n\nPérimètre de NON-MESURE :\n  non jugé — x\n";
+  const sortieAvertie = "Source  : x.html\r\nVerdict : PASS\r\n\r\nAvertissements :\r\n" +
+    "  ! L12 énumération en prose (avertissement) : 4 éléments\r\n  ! L12 énumération en prose (avertissement) : 5 éléments\r\n" +
+    "  ! EC-9 1 valeur(s) écrite(s) en toutes lettres\r\n";
+  const g3Nette = constatsG3("pure/SQUELETTE.html", lireMarquage(sortieNette));
+  if (g3Nette.length !== 1 || g3Nette[0].statut !== "PASS")
+    casse.push("G3 publie autre chose que son PASS sur un marquage sans avertissement : " + JSON.stringify(g3Nette));
+  const g3Averti = constatsG3("pure/SQUELETTE.html", lireMarquage(sortieAvertie));
+  if (g3Averti.some((x) => x.statut === "FAIL"))
+    casse.push("G3 fait échouer un marquage PASS sur de simples avertissements du socle — il doit les dire, pas bloquer");
+  if (!g3Averti.some((x) => x.statut === "AVERTISSEMENT" && /^3 avertissement\(s\) du marquage \(L12 ×2 · EC-9\)/.test(x.message)))
+    casse.push("G3 tait ou compte mal les avertissements d'un marquage PASS (attendu « 3 … (L12 ×2 · EC-9) ») : " + JSON.stringify(g3Averti));
+
   // G3, sens rouge : une classe posée sans règle CSS — le défaut exact du 24/08, en modèle réduit.
   mkdirSync(join(dir, "classe-nue"), { recursive: true });
   writeFileSync(join(dir, "classe-nue", "GABARIT.md"), "# doctrine\n", "utf8");
@@ -931,6 +1026,18 @@ if (args[0] === "--self-test") {
     process.exit(casse.length ? 1 : 0);
   }
   if (!g3.some((x) => x.statut === "FAIL")) casse.push("une classe posée sans règle CSS passe G3 — c'est le défaut mesuré le 24/08");
+
+  // G3, avertissements, de bout en bout (TF-1726) : le marquage réel d'un squelette qui porte une
+  // espace ordinaire devant un deux-points (L35) publie l'avertissement. Ce cas prouve que la sortie
+  // du socle du jour se lit encore ; les deux sens purs sont joués plus haut, sans python.
+  mkdirSync(join(dir, "averti"), { recursive: true });
+  writeFileSync(join(dir, "averti", "GABARIT.md"), "# doctrine\n", "utf8");
+  writeFileSync(join(dir, "averti", "SQUELETTE.html"), PAGE("Squelette", "<p>Forme : à remplir par le projet.</p>" + COUPLE), "utf8");
+  writeFileSync(join(dir, "averti", "INSTANCE.html"), PAGE("Instance", "<p>Contenu réel, mesuré le 24 août 2026.</p>" + COUPLE), "utf8");
+  f = juger(dir);
+  const g3a = g("G3", "averti/SQUELETTE");
+  if (!g3a.some((x) => x.statut === "AVERTISSEMENT" && /\bL35\b/.test(x.message)))
+    casse.push("G3 tait l'avertissement L35 rendu par le socle réel sur un squelette — l'avertissement hérité reste invisible (TF-1726) : " + JSON.stringify(g3a));
 
   // G8 (TF-1076) — LA RÉSOLUTION D'UNE FAMILLE PAR LE NOM, DANS SES TROIS SENS. Les fixtures sont
   // des NOMS, pas des fichiers : la règle lit ce que R-4 rend porteur et ne touche jamais au
@@ -976,6 +1083,32 @@ if (args[0] === "--self-test") {
         casse.push(`TF-1389 : « Présentation » seul n'est plus résolu sur la décision de mise en production — la nouvelle famille a tout avalé : ${decision.message.slice(0, 140)}`);
       if (voisin.statut !== "FAIL")
         casse.push("TF-1617 : « Fiche technique », type non déclaré, passe G8 — la famille neuve a élargi la résolution au-delà de ses noms");
+    }
+
+    // TF-1640 (14/10/2026) — LA FICHE CONSTAT ET PRÉCONISATIONS SE RÉSOUT PAR SON NOM. Sens VERT : le
+    // nom que la famille prescrit, type en tête de l'Objet, tombe sur elle. Sens ROUGE : le nom des
+    // deux fiches d'origine, sujet en tête (« Couts APR2 - Constat et precos »), ne résout aucune
+    // famille — c'est pourquoi le gabarit prescrit l'ordre, et la règle ne l'avale pas en silence.
+    {
+      const prescrit = g8("Client-A - Constat et precos - Couts hebergement - 20261014a.md");
+      const sujetEnTete = g8("Client-A - Couts APR2 - Constat et precos - 20261012d.md");
+      if (!(prescrit.statut === "PASS" && prescrit.message.includes("fiche-constat-precos")))
+        casse.push(`TF-1640 : « Constat et precos » en tête de l'Objet ne résout pas sa famille — ${prescrit.message.slice(0, 140)}`);
+      if (sujetEnTete.statut !== "FAIL")
+        casse.push("TF-1640 : un nom au sujet en tête passe G8 — la résolution a cessé de lire le type en tête de l'Objet (R-4)");
+    }
+
+    // TF-1679 (14/10/2026) — LA VUE DE LA CASCADE D'UN PRODUIT A SA FAMILLE. Sens VERT : `CASCADE.md`,
+    // le nom que la vue porte chez le produit, résout gd-cascade-produit (le 02/10/2026, sa fiche de
+    // conception avait dû déclarer « famille: aucune »). Sens ROUGE : une restitution qui parle de la
+    // cascade reste une restitution — le type en tête de l'Objet gagne, la famille neuve n'avale rien.
+    {
+      const vue = g8("CASCADE.md");
+      const resto = g8("Produit-X - Restitution cascade du produit - 20261002a.md");
+      if (!(vue.statut === "PASS" && vue.message.includes("cascade-produit")))
+        casse.push(`TF-1679 : la vue CASCADE.md ne résout pas la famille de la cascade du produit — ${vue.message.slice(0, 140)}`);
+      if (!(resto.statut === "PASS" && /« restitution »/.test(resto.message) && !resto.message.includes("cascade-produit")))
+        casse.push(`TF-1679 : une restitution sur la cascade est avalée par la famille neuve — ${resto.message.slice(0, 140)}`);
     }
 
     // TF-1230 (campagne D-51 (a), 02/10/2026) — LES HUIT FICHIERS docs-projet SONT UNE FAMILLE DU
@@ -1167,11 +1300,42 @@ if (args[0] === "--self-test") {
   if (g13Pour("w-a-extraire").length)
     casse.push("G13 juge une famille hors statut ok — elle doit rester hors de sa portée (vide déclaré admis)");
 
+  // G14 (TF-1725) dans ses TROIS sens : un catalogue dont tous les mots de tête sont au registre
+  // (directement ou par alias, accents ignorés) → PASS sans constat de famille ; une famille dont
+  // un type de nom s'ouvre sur un mot absent → AVERTISSEMENT qui nomme le mot, et le total le
+  // compte ; registre absent → SKIP, jamais PASS.
+  const parc14 = join(catDir, "parc14");
+  mkdirSync(join(parc14, "digit-ai-forge-organization"), { recursive: true });
+  writeFileSync(join(parc14, "digit-ai-forge-organization", "registre-types.json"), JSON.stringify({ version: "9.9.9",
+    types: [{ type: "Rapport" }, { type: "Synthèse", alias: ["Compte"] }] }), "utf8");
+  const fams14 = [
+    // La ligne d'en-tête du vrai catalogue documente le champ en prose : la compter comme une
+    // famille a rendu, au premier passage sur le parc, un mot de tête par caractère.
+    { schema: "pilot/gabarits-documents@1", types_de_nom: "liste des types de nom" },
+    { famille: "a-tenue", types_de_nom: ["rapport audit", "synthese executive", "compte rendu"] },
+    { famille: "b-en-dette", types_de_nom: ["rapport de donnees", "zorglub machin"] },
+    { famille: "c-sans-type" },
+  ];
+  const g14Vert = detteTypesDeNom(fams14.filter((x) => x.famille !== "b-en-dette"), parc14);
+  if (g14Vert.length !== 1 || g14Vert[0].statut !== "PASS" || !/0 famille\(s\) sur 1\b/.test(g14Vert[0].message))
+    casse.push("G14 accuse un catalogue dont tous les mots de tête sont au registre (alias et accents compris) : " + JSON.stringify(g14Vert));
+  const g14Rouge = detteTypesDeNom(fams14, parc14);
+  if (!g14Rouge.some((x) => x.statut === "AVERTISSEMENT" && x.ou === "catalogue/b-en-dette" && /« zorglub » \(zorglub machin\)/.test(x.message)))
+    casse.push("G14 tait la famille dont un type de nom s'ouvre sur un mot absent du registre : " + JSON.stringify(g14Rouge));
+  if (g14Rouge.some((x) => x.ou === "catalogue/a-tenue"))
+    casse.push("G14 accuse la famille tenue en même temps que la famille en dette : " + JSON.stringify(g14Rouge));
+  if (!g14Rouge.some((x) => x.ou === "catalogue/types_de_nom" && x.statut === "AVERTISSEMENT" && /1 famille\(s\) sur 2 .*9\.9\.9 — 1 mot\(s\) de tête : zorglub/.test(x.message)))
+    casse.push("G14 ne publie pas le total de la dette (attendu « 1 famille(s) sur 2 », version du registre, mot nommé) : " + JSON.stringify(g14Rouge));
+  if (g14Rouge.some((x) => x.statut === "FAIL")) casse.push("G14 fait échouer sur une dette qu'il doit seulement publier");
+  const g14Absent = detteTypesDeNom(fams14, join(catDir, "parc-sans-organization"));
+  if (g14Absent.length !== 1 || g14Absent[0].statut !== "SKIP")
+    casse.push("G14 rend autre chose que SKIP quand le registre d'organization est absent : " + JSON.stringify(g14Absent));
+
   rmSync(catDir, { recursive: true, force: true, maxRetries: 5 });
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 45/45 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 55/55 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
@@ -1180,7 +1344,7 @@ if (args[0] === "--self-test") {
       "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
       "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS) ; " +
       "TF-1230 : la famille docs-projet existe au catalogue réel, cite les huit fichiers de gabarits/docs-projet/, tous présents sur le disque ; " +
-      "G13 dans ses QUATRE sens (TF-1249) : lecteur/type_de_contenu en prose sur une famille ok → FAIL, structure complète → PASS, valeur hors vocabulaire fermé → FAIL, famille hors statut ok → jamais jugée)");
+      "G13 dans ses QUATRE sens (TF-1249) : lecteur/type_de_contenu en prose sur une famille ok → FAIL, structure complète → PASS, valeur hors vocabulaire fermé → FAIL, famille hors statut ok → jamais jugée ; G3 publie les avertissements du marquage dans ses TROIS sens (TF-1726) : marquage net → son seul PASS, marquage averti → AVERTISSEMENT compté qui ne fait rien échouer, et le socle réel lu de bout en bout sur un L35 ; G14 dans ses TROIS sens (TF-1725) : mots de tête tous au registre, alias et accents compris → PASS sans constat de famille, mot absent → AVERTISSEMENT qui nomme la famille et le mot et que le total compte, sans FAIL, registre absent → SKIP)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -1253,9 +1417,14 @@ const catalogue = join(PILOT, "gabarits", "documents", "catalogue.jsonl");
 // Mesuré le 22/09 : 7 règles rendues sur le chemin relatif, 9 sur le chemin par défaut. Le
 // commentaire ci-dessus promettait de « le dire plutôt que le supposer » ; le code ne le disait pas.
 const catalogueJuge = resolve(dossierJuge) === resolve(join(PILOT, "gabarits", "documents"));
+// La racine du parc suit la convention des chemins du pilot : $FORGE_ROOT, sinon le parent de ce
+// dépôt (TF-1725). Dans un worktree lié, le parent n'est pas le parc : G11 et G14 y rendent SKIP
+// sans $FORGE_ROOT, et le disent.
+const PARC = process.env.FORGE_ROOT || join(PILOT, "..");
 const findings = [
   ...juger(dossierJuge),
-  ...(catalogueJuge ? jugerCatalogue(catalogue, join(PILOT, "..")) : []),
+  ...(catalogueJuge ? jugerCatalogue(catalogue, PARC) : []),
+  ...(catalogueJuge ? detteTypesDeNom(lireCatalogue(catalogue), PARC) : []),
 ];
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({

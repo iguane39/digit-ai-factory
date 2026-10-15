@@ -59,7 +59,7 @@ d'erreur avalé se paie en redéploiements.
 | qualif | {https://<nom-appli>-qualif.<domaine>} | {https://<nom-appli>-api-qualif.<domaine>} | {<HOTE_BDD_QUALIF>} | staging de l'étape MEP (O-1…O-4) |
 | production | {https://<nom-appli>-production.<domaine>} | {https://<nom-appli>-api-production.<domaine>} | {<HOTE_BDD_PROD>} | placeholders — GO humain requis |
 
-### Un écart à R-24 se déclare en CHAMP, jamais en prose (TF-0267, 15/08)
+### Déclarer un écart : en CHAMP `ecarts_r24` du frontmatter, jamais en prose (TF-0267, 15/08)
 
 Depuis le 15/08, `oracle-conformite-projet` **juge le suffixe** : accord suffixe ↔ ligne
 (dev→`-dev`, qualif et staging→`-qualif`, production et prod→`-production`), et un

@@ -21,13 +21,15 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { analyserTranscript, comparerAffiche, controlerGeste, controlerPossession, controlerProcedure, demandeProcedure, syntheseDuTour } from "./hook-restitution.mjs";
+import { analyserTranscript, comparerAffiche, controlerExplication, controlerGeste, controlerPossession, controlerProcedure, demandeProcedure, syntheseDuTour } from "./hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "hook-restitution.mjs");
 const ORACLE = join(ICI, "oracle-synthese.mjs");
 const base = mkdtempSync(join(tmpdir(), "hook-rest-"));
 const echecs = [];
+const ENV_SANS_SESSION = { ...process.env };
+delete ENV_SANS_SESSION.CLAUDE_CODE_SESSION_ID;
 
 const MAUVAIS = "J'ai corrigé le script et commité. Tout s'est bien passé, dis-moi si tu veux autre chose.";
 const BON = `La mise à jour demandée est en place et vérifiée : le poste repart sur les dernières versions des forges, et rien ne bloque la suite de votre journée. Ce que cela change : les prochaines sessions démarrent à jour sans geste de votre part. Ce qui est attendu de vous : une seule décision, ci-dessous, sur le moment de la publication.
@@ -739,8 +741,186 @@ try {
     const an = analyserTranscript(tr);
     if ((an.textesHumains || []).length !== 2) echecs.push(`44 quinquies : le transcript devait rendre 2 messages humains, obtenu ${(an.textesHumains || []).length}`);
   }
+  // 45 — TF-1644 : S48 JUGÉE AU HOOK, CHEZ UN PRODUIT, DANS SES DEUX SENS. Le hook écrivait le message
+  // dans un fichier temporaire, d'où S48 rendait SANS_OBJET à chaque tour : le FAIL du 12/10 n'a été vu
+  // ni par la session ni par le porteur. Un tour de travail dans un produit (dossier courant portant
+  // `forge\retours\`) dont la restitution conforme ne dit rien de sa remontée → BLOQUÉ, S48 nommée ; la
+  // MÊME restitution portant « Remontée à la factory : rien à remonter. » → laissée passer.
+  {
+    const produit = join(base, "produit-45");
+    mkdirSync(join(produit, "forge", "retours"), { recursive: true });
+    const jouer45 = (nom, texte) => {
+      const p = join(base, nom + ".jsonl");
+      writeFileSync(p, transcript(texte, ["Write", "Edit"]), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: produit,
+        input: JSON.stringify({ session_id: "test", transcript_path: p, stop_hook_active: false, cwd: produit }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* laisse passer */ }
+      return d;
+    };
+    const muet = jouer45("s48-muet-produit", BON);
+    if (muet?.decision !== "block" || !/S48/.test(muet.reason || ""))
+      echecs.push(`45 : chez un produit, une restitution muette sur sa remontée → attendu block nommant S48, obtenu ${JSON.stringify(muet).slice(0, 200)}`);
+    const rien = jouer45("s48-rien-produit", BON + "\n- Remontée à la factory : rien à remonter.\n");
+    if (rien !== null)
+      echecs.push(`45 bis : la MÊME restitution qui déclare « rien à remonter » → attendu laisser passer, obtenu ${JSON.stringify(rien).slice(0, 200)}`);
+  }
+  // 46 — TF-1647 et TF-1666 : LE PRÉJUGEMENT, DANS SES QUATRE SENS. (a) `--prejuger` sur le texte que le
+  // hook refuse (cas 1) rend exit 1 et nomme S1 ; sur le texte que le hook laisse passer (cas 3) exit 0 :
+  // même verdict bloquant que le hook, avant l'affichage. (b) Un refus d'un tour SANS préjugement dit le
+  // défaut distinct « PRÉJUGEMENT » ; le MÊME refus dans un tour qui a joué `--prejuger` ne le dit pas,
+  // et le journal porte `prejuge` dans les deux sens.
+  {
+    const prejuger = (nom, texte) => {
+      const f = join(base, nom + ".md"); writeFileSync(f, texte, "utf8");
+      // Sans l'identifiant de la session qui joue la recette : depuis TF-1720, --prejuger relit le
+      // transcript de la session courante, qui n'est pas celui de ce cas (cas 49 pour ce volet).
+      const r = spawnSync(process.execPath, [HOOK, "--prejuger", f], { encoding: "utf8", env: ENV_SANS_SESSION });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+      return { code: r.status, o };
+    };
+    const pm = prejuger("brouillon-mauvais", MAUVAIS);
+    if (pm.code !== 1 || pm.o?.affichable !== false || !(pm.o?.bloquants || []).some((b) => /^S1 /.test(b)))
+      echecs.push(`46 : --prejuger sur un texte que le hook refuse → attendu exit 1 et S1 nommée, obtenu ${pm.code} ${JSON.stringify(pm.o).slice(0, 200)}`);
+    const pb = prejuger("brouillon-bon", BON);
+    if (pb.code !== 0 || pb.o?.affichable !== true)
+      echecs.push(`46 bis : --prejuger sur un texte que le hook laisse passer → attendu exit 0, obtenu ${pb.code} ${JSON.stringify(pb.o).slice(0, 200)}`);
+    const tourAvec = (commande) => [
+      { type: "user", message: { role: "user", content: "fais la mise à jour" } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: { file_path: "C:/tmp/x.txt" } },
+        { type: "tool_use", name: "Bash", input: { command: commande } }] } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: MAUVAIS }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const jouer46 = (nom, commande) => {
+      const p = join(base, nom + ".jsonl"); writeFileSync(p, tourAvec(commande), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ session_id: "test-46", transcript_path: p, stop_hook_active: false }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* laisse passer */ }
+      return d;
+    };
+    const sans = jouer46("sans-prejugement", "git status");
+    if (sans?.decision !== "block" || !/PRÉJUGEMENT/.test(sans.reason || ""))
+      echecs.push(`46 ter : refus d'un tour sans préjugement → attendu le défaut distinct PRÉJUGEMENT, obtenu ${JSON.stringify(sans).slice(0, 200)}`);
+    const avec = jouer46("avec-prejugement", "node oracles/hook-restitution.mjs --prejuger C:/tmp/brouillon.md");
+    if (avec?.decision !== "block" || /PRÉJUGEMENT/.test(avec.reason || ""))
+      echecs.push(`46 quater : refus d'un tour qui a préjugé → attendu block SANS le défaut PRÉJUGEMENT, obtenu ${JSON.stringify(avec).slice(0, 200)}`);
+    const an1 = analyserTranscript(tourAvec("git status")), an2 = analyserTranscript(tourAvec("node forge/hooks/factory.mjs restitution --prejuger b.md"));
+    if (an1.prejuge !== false || an2.prejuge !== true)
+      echecs.push(`46 quinquies : le champ prejuge du journal devait valoir false puis true, obtenu ${an1.prejuge} ${an2.prejuge}`);
+  }
+  // 47 — TF-1649 : LE MESSAGE D'ATTENTE D'UNE TÂCHE D'ARRIÈRE-PLAN, DANS SES QUATRE SENS. Un tour qui a
+  // écrit, lancé une recette en arrière-plan non revenue, et rend 2 lignes d'attente → NON jugé ; le
+  // MÊME texte sans tâche lancée → jugé (bloqué) ; la MÊME tâche dont la notification de fin est au
+  // transcript → jugé ; la MÊME attente qui porte un verdict → jugé.
+  {
+    const ATTENTE_TXT = "La recette complète tourne en arrière-plan, environ 10 minutes.\nJe reprends la restitution dès son résultat.";
+    const tour47 = (texte, { lancee = true, revenue = false } = {}) => [
+      { type: "user", message: { role: "user", content: "corrige et rejoue la recette" } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id: "t1", name: "Edit", input: { file_path: "C:/tmp/a.mjs" } },
+        { type: "tool_use", id: "t2", name: "Bash", input: { command: "node oracles/self-tests.mjs", run_in_background: true } }] } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", tool_use_id: "t1", content: "ok" },
+        { type: "tool_result", tool_use_id: "t2", content: lancee ? "Command running in background with ID: b47xyz. Output is being written to: C:/tmp/b47xyz.output" : "ok" }] } },
+      ...(revenue ? [{ type: "queue-operation", operation: "enqueue", content: "<task-notification>\n<task-id>b47xyz</task-id>\n<status>completed</status>\n</task-notification>" }] : []),
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texte }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const jouer47 = (nom, texte, o) => {
+      const p = join(base, nom + ".jsonl"); writeFileSync(p, tour47(texte, o), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ session_id: "test-47", transcript_path: p, stop_hook_active: false }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* laisse passer */ }
+      return d;
+    };
+    const a = jouer47("attente-en-cours", ATTENTE_TXT);
+    if (a !== null) echecs.push(`47 : message d'attente pendant une tâche d'arrière-plan non revenue → attendu non jugé, obtenu ${JSON.stringify(a).slice(0, 200)}`);
+    const b = jouer47("attente-sans-tache", ATTENTE_TXT, { lancee: false });
+    if (b?.decision !== "block") echecs.push(`47 bis : le MÊME texte sans tâche d'arrière-plan → attendu jugé et bloqué, obtenu ${JSON.stringify(b).slice(0, 160)}`);
+    const c = jouer47("attente-tache-revenue", ATTENTE_TXT, { revenue: true });
+    if (c?.decision !== "block") echecs.push(`47 ter : la tâche est REVENUE, l'attente n'a plus d'objet → attendu jugé et bloqué, obtenu ${JSON.stringify(c).slice(0, 160)}`);
+    const d = jouer47("attente-verdict", "La recette tourne en arrière-plan ; le premier lot est PASS.\nJe reprends dès son résultat.");
+    if (d?.decision !== "block") echecs.push(`47 quater : une attente qui porte un verdict → attendu jugée et bloquée, obtenu ${JSON.stringify(d).slice(0, 160)}`);
+  }
+  // 48 — TF-1641 : UNE EXPLICATION DEMANDÉE SE LIVRE DANS UNE FICHE, DANS SES QUATRE SENS. « Explique
+  // les différentes pipelines » rendu en restitution complète sans fiche → FAIL (avertissement) ; le
+  // MÊME tour qui écrit sa fiche → PASS ; la MÊME restitution qui cite sa fiche → PASS ; une demande de
+  // travail (« fais la mise à jour ») → hors contrôle. Et le hook le dit sans bloquer.
+  {
+    const DEMANDE = "Explique les différentes pipelines et ce qui est encore utile";
+    const FICHE = "output/Client-A - Fiche Pipelines constat et precos - 20261014a.md";
+    const a = controlerExplication({ dernierHumain: DEMANDE, dernierTexte: BON, fichiersMd: [] });
+    if (a.verdict !== "FAIL") echecs.push(`48 : explication demandée rendue sans fiche → attendu FAIL, obtenu ${a.verdict}`);
+    const b = controlerExplication({ dernierHumain: DEMANDE, dernierTexte: BON, fichiersMd: ["C:/p/" + FICHE, "C:/p/output/Client-A - Note Synthese Run - 20261014a.md"] });
+    if (b.verdict !== "PASS") echecs.push(`48 bis : la fiche écrite dans le tour → attendu PASS, obtenu ${b.verdict}`);
+    const c = controlerExplication({ dernierHumain: DEMANDE, dernierTexte: BON.replace("## 4. Traité\n", `## 4. Traité\n- fiche livrée : \`${FICHE}\` — preuve : 612 mots.\n`), fichiersMd: [] });
+    if (c.verdict !== "PASS") echecs.push(`48 ter : la restitution qui cite sa fiche → attendu PASS, obtenu ${c.verdict}`);
+    const d = controlerExplication({ dernierHumain: "fais la mise à jour", dernierTexte: BON, fichiersMd: [] });
+    if (d.applicable) echecs.push("48 quater : une demande de travail est lue comme une demande d'explication");
+    const tour48 = [
+      { type: "user", message: { role: "user", content: DEMANDE } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: { file_path: "C:/tmp/notes.txt" } }] } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: BON }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const p = join(base, "explication-sans-fiche.jsonl"); writeFileSync(p, tour48, "utf8");
+    const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ session_id: "test-48", transcript_path: p, stop_hook_active: false }) });
+    let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+    if (o?.decision === "block" || !/EXPLICATION/.test(o?.systemMessage || ""))
+      echecs.push(`48 quinquies : le hook doit DIRE l'avertissement EXPLICATION sans bloquer, obtenu ${JSON.stringify(o).slice(0, 200)}`);
+  }
+  // 49 — TF-1720 : LE FICHIER JUGÉ ET LE PRÉJUGEMENT, DANS LEURS CINQ SENS. Le cas du 14/10 chez un
+  // produit : le tour écrit un document de projet marqué par son gabarit (`docs\projet\COMPOSANTS-OPS.md`)
+  // et aucune synthèse nommée ; le hook comparait l'écran à ce document et refusait une restitution
+  // conforme (« options par défaut nommées : 0 dans le fichier jugé, 1 à l'écran »). (a) Le hook de fin
+  // de tour laisse passer. (b) Une synthèse NOMMÉE déposée dans le tour reste comparée : l'écran qui
+  // perd sa ligne de repli est refusé sur AFFICHAGE. (c) `--prejuger` sur le MÊME brouillon, avec le
+  // transcript, rend le même refus avant l'affichage ; (d) le brouillon identique à la synthèse passe ;
+  // (e) sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit, sans refus.
+  {
+    const MARQUEE = (t) => "---\ndestinataire: humain\n---\n\n" + t;
+    const DOC_PROJET = MARQUEE("# Composants d'exploitation\n\nLe service tourne sur deux réplicas.\n");
+    const SANS_REPLI = BON.replace("  - si rien n'est décidé : (a) s'applique.\n", "");
+    const dossier49 = join(base, "produit-49");
+    mkdirSync(join(dossier49, "docs", "projet"), { recursive: true });
+    mkdirSync(join(dossier49, "output"), { recursive: true });
+    const composants49 = join(dossier49, "docs", "projet", "COMPOSANTS-OPS.md");
+    const synthese49 = join(dossier49, "output", "Produit - Note Synthese Run - 20261015a.md");
+    writeFileSync(composants49, DOC_PROJET, "utf8");
+    writeFileSync(synthese49, MARQUEE(BON), "utf8");
+    const tour49 = (ecrits, texteFinal) => [
+      { type: "user", message: { role: "user", content: "rédige la fiche des composants et clos le run" } },
+      { type: "assistant", message: { role: "assistant", content: ecrits.map((p) => ({ type: "tool_use", name: "Write", input: { file_path: p } })) } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const hook49 = (nom, ecrits, texteFinal) => {
+      const p = join(base, nom + ".jsonl"); writeFileSync(p, tour49(ecrits, texteFinal), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", env: ENV_SANS_SESSION,
+        input: JSON.stringify({ session_id: "test-49", transcript_path: p, stop_hook_active: false }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* laisse passer */ }
+      return { d, p };
+    };
+    const prejuger49 = (nom, texte, transcript) => {
+      const f = join(base, nom + ".md"); writeFileSync(f, texte, "utf8");
+      const args = [HOOK, "--prejuger", f, ...(transcript ? ["--transcript", transcript] : [])];
+      const r = spawnSync(process.execPath, args, { encoding: "utf8", env: ENV_SANS_SESSION });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+      return { code: r.status, o };
+    };
+    const a = hook49("doc-projet-seul", [composants49], BON);
+    if (a.d?.decision === "block")
+      echecs.push(`49 : un document de projet marqué par son gabarit est jugé à la place de la restitution → attendu laisser passer, obtenu ${JSON.stringify(a.d).slice(0, 200)}`);
+    const b = hook49("synthese-nommee", [composants49, synthese49], SANS_REPLI);
+    if (b.d?.decision !== "block" || !/AFFICHAGE/.test(b.d.reason || ""))
+      echecs.push(`49 bis : une synthèse nommée déposée et un écran qui perd sa ligne de repli → attendu block AFFICHAGE, obtenu ${JSON.stringify(b.d).slice(0, 200)}`);
+    const c = prejuger49("brouillon-49-sans-repli", SANS_REPLI, b.p);
+    if (c.code !== 1 || c.o?.synthese_deposee !== synthese49 || !(c.o?.bloquants || []).some((x) => /^AFFICHAGE/.test(x)))
+      echecs.push(`49 ter : --prejuger avec le transcript doit rendre le refus AFFICHAGE du hook, avant l'affichage ; obtenu ${c.code} ${JSON.stringify(c.o).slice(0, 240)}`);
+    const d = prejuger49("brouillon-49-identique", BON, b.p);
+    if (d.code !== 0 || d.o?.affichage !== "PASS")
+      echecs.push(`49 quater : le brouillon qui reprend la synthèse déposée → attendu exit 0 et affichage PASS, obtenu ${d.code} ${JSON.stringify(d.o).slice(0, 200)}`);
+    const e = prejuger49("brouillon-49-sans-transcript", SANS_REPLI, null);
+    if (e.code !== 0 || !/non joué/.test(e.o?.affichage || ""))
+      echecs.push(`49 quinquies : sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit → attendu exit 0 et « non joué », obtenu ${e.code} ${JSON.stringify(e.o).slice(0, 200)}`);
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 44/44 — « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 49/49 — un document de projet marqué par son gabarit n est plus jugé à la place de la restitution, une synthèse nommée reste comparée, et --prejuger rend le même refus AFFICHAGE avant l affichage en relisant le transcript, la comparaison non jouée étant dite (cas 49, TF-1720, 15/10/2026) ; une explication demandée rendue en restitution sans fiche est dite en avertissement EXPLICATION, et la fiche écrite ou citée la lève (cas 48, TF-1641, 14/10/2026) ; un message d attente de 3 lignes au plus n est pas jugé tant qu une tâche d arrière-plan du tour n est pas revenue, et il redevient jugé sans tâche, tâche revenue ou verdict porté (cas 47, TF-1649, 14/10/2026) ; --prejuger rend le verdict bloquant du hook avant affichage, et un refus sans préjugement le dit comme un défaut distinct (cas 46, TF-1647, TF-1666, 14/10/2026) ; S48 est jugée au hook chez un produit, bloquante, et « rien à remonter » passe (cas 45, TF-1644, 14/10/2026) ; « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");

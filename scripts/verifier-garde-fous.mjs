@@ -209,7 +209,8 @@ export function jugerRegistre(chemin, aujourdhui = new Date().toISOString().slic
     for (const champ of ["plateforme", "mecanisme", "effet", "portee", "vise", "refuse", "consequence", "source", "verifiee_par"]) {
       if (typeof e[champ] !== "string" || !e[champ].trim()) refus("GR-1", ou, `champ « ${champ} » absent ou vide`);
     }
-    if (!/^Client-[A-Z]{1,2}$/.test(e.client || "")) refus("GR-2", ou, `client hors pseudonyme : « ${e.client} » — attendu Client-X`);
+    // « tous » (TF-1706, 15/10/2026) : une contrainte de la plateforme elle-même, vraie chez tout client.
+    if (!/^(Client-[A-Z]{1,2}|tous)$/.test(e.client || "")) refus("GR-2", ou, `client hors pseudonyme : « ${e.client} » — attendu Client-X, ou « tous » pour une contrainte de la plateforme elle-même`);
     for (const champ of ["inscrite_le", "verifiee_le"]) {
       if (!ISO.test(e[champ] || "")) refus("GR-1", ou, `« ${champ} » n'est pas une date AAAA-MM-JJ`);
       else if (e[champ] > aujourdhui) refus("GR-1", ou, `« ${champ} » (${e[champ]}) est dans le futur`);

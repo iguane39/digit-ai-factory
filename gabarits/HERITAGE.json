@@ -1,7 +1,11 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.19.0",
-  "date": "2026-10-13",
+  "version": "1.23.0",
+  "date": "2026-10-15",
+  "evolution_1_23_0": "TF-1735, 15/10/2026 (décision humaine D-1 (a) du 15/10/2026 « 1a ») — le CLAUDE.md du produit doit porter la route de l audit du produit vers forge-audit : le motif `init-audit-workspace` entre aux motifs exigés de `CLAUDE.md`. Le fait : « lance un audit complet du projet » a lancé forge_tests chez un produit, parce que son CLAUDE.md, copié avant la correction du 22/09, ne connaissait que cette route ; 16 CLAUDE.md du parc portaient la ligne « Audit complet (verdict) », dont 7 sans mention de forge-audit. Ce qui change pour celui qui produit : à sa prochaine ouverture, un CLAUDE.md sans la route est relevé incomplet ; la remise à niveau ne le réécrit pas, c est le lot de travaux qui corrige la ligne de routage et la section Commandes.",
+  "evolution_1_22_0": "TF-1716 suite, 15/10/2026 (décision humaine D-2 (a) du 15/10/2026 « 2a ») — le câblage du hook `identite-sortante` est EXIGÉ par le contrat : le motif `forge/hooks/factory.mjs identite-sortante` entre aux motifs exigés de `.claude/settings.json`. Le fait : l incident du 14/10 s est produit chez un produit existant, que le seul gabarit des nouveaux produits ne protège pas. Ce qui change pour celui qui produit : à sa prochaine ouverture, un produit dont le settings.json ne câble pas la garde est relevé incomplet, puis remis à niveau.",
+  "evolution_1_21_0": "TF-1716, 15/10/2026 (lot Produit-83 20261014a, RT-5) — R-62 se joue sur l'outil qui émet une requête. Le fait : le 14/10/2026, une session a placé l'adresse électronique de l'utilisateur dans le User-Agent d'un appel à une API publique tierce, sans demande, et aucune garde ne l'a vu. Ce qui change pour celui qui produit : `forge/hooks/factory.mjs` (copie conforme) reconnaît le hook `identite-sortante`, et le gabarit `settings-produit.json` câble un `PreToolUse` sur `Bash|PowerShell|WebFetch` qui l'appelle ; une requête vers un service tiers portant l'adresse de l'utilisateur, ou une adresse dans un en-tête User-Agent ou From, est refusée sauf adresse donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session. Le câblage n'entre pas encore à `motif_exige` : un produit existant le reçoit en complétant son `.claude/settings.json` depuis le gabarit, geste du produit.",
+  "evolution_1_20_0": "TF-1703, 15/10/2026 (lot Produit-82 20261014b, RT-5) — le `.gitignore` socle couvre le journal de `run-oracles` : motif `_oracles-journal*.json*`, placé avant `!forge/**`. Le fait : le 14/10, `_oracles-journal.json` et `_oracles-journal-historique.jsonl`, écrits à la racine d'un dossier jugé, sont apparus dans `git status` chez un produit, à un `git add` de l'histoire. Ce qui change pour celui qui produit : le motif entre aux `motifs_exiges` ; R-47 et le relevé d'héritage déclarent incomplet un `.gitignore` qui ne le porte pas, et `recopier-heritage.mjs` l'ajoute en fin de fichier. Un journal rangé comme preuve sous `forge\\` reste versionné (C4). Recette : `scripts/gitignore-captures.test.mjs`, jugée sur le vrai gabarit dans les deux sens.",
   "evolution_1_19_0": "TF-1635, 13/10/2026 (ouverture de session sous le délai du client VS Code) — le hook d'ouverture d'un produit tourne en `async` avec `--contexte-json`. Le fait : l'extension VS Code coupe à 60 s une initialisation que le hook synchrone à 240 s dépassait (73 s mesurées sur le pilot), et 19 produits sur 19 portaient encore cette forme le 13/10. Ce qui change pour celui qui produit : (1) le hook d'ouverture passe lui-même `.claude/settings.json` en `async`, en premier geste et sur la seule entrée `forge/hooks/factory.mjs ouverture` (`oracles/lib-ouverture-async.mjs`), puis rend la main aussitôt avec les règles de session ; le relevé complet arrive à l'ouverture suivante ; (2) `motif_exige` de `.claude/settings.json` devient une liste et exige aussi `factory.mjs ouverture --sans-readme --contexte-json` : R-47 et le relevé d'héritage déclarent incomplet un produit pas encore ouvert depuis.",
   "evolution_1_18_0": "TF-1591 et TF-1602, 13/10/2026 (campagne du 13/10, avertissement et non blocage) — le juge de forme d'un lot (`forge/retours/oracle-lot.mjs`, copie conforme, 1.6.0) lit désormais le sidecar : règle LOT-SIDECAR, qui rejoue les rejets de la porte décidés sur le seul sidecar (JSON, schema, id, champs obligatoires, caractères de contrôle, classe connue de `forge/retours/CLASSES.json`, et pour `classe-a-creer` une `classe_proposee` complète, de clé neuve, de famille connue, nommée dans le `.md`). Ce qui change pour celui qui produit : un lot dont le sidecar serait refusé à la porte reçoit un AVERTISSEMENT chez lui, avant la remise ; il n'est pas bloqué. Le fait : les lots du 03/10 (RT-117 à RT-121) ont été refusés pour une `classe_proposee` absente alors que leur contrôle de remise 1.5.0, à jour, rendait PASS — il ne lisait pas le sidecar. Le gabarit `forge/retours/GABARIT-LOT-RETOURS.md` le dit. TF-1215 : le gabarit de lot décrit la pièce jointe d'un lot, nommée d'après lui (`<base du lot> - PJ - <libellé>.<extension>`) ; la boîte d'entrée du pilot (B10) la juge rattachée à son lot, sans exiger de sidecar ni les sections R-45 et R-46. TF-1570 : le juge passe en 1.7.0 — une règle de section dont le seuil est postérieur au 13/10/2026 avertit pendant 7 jours (lots datés de moins de sept jours après le seuil), puis bloque ; la fenêtre entre l'entrée d'une règle au pilot et son arrivée chez le producteur ne fait plus refuser de lot conforme à son outillage (R-57, 01/10/2026). Aucune règle antérieure n'est touchée. Recette : `gabarits/oracle-lot-retours.test.mjs`, 19 cas à double sens pour TF-1591 et TF-1570.",
   "evolution_1_17_0": "TF-1418, 13/10/2026 (décision humaine D-68 (a) : « propager les niveaux aux produits », étape 3 de l'étude des niveaux d'intervention) — `references/NIVEAUX.md` entre au contrat, en COPIE CONFORME, sous `forge/NIVEAUX.md`. Ce qui change pour celui qui produit : une question simple reçoit une réponse Simple (150 mots, aucune écriture) ou Moyen (4 pièces, 400 mots, aucun effet), jugée comme au pilot. Le juge ne voyage pas : `forge/hooks/factory.mjs` délègue déjà au hook de fin de tour du pilot, dossier du produit pour dossier courant, mêmes bornes et même escalade par les effets ; le hook de lexique, par le même lanceur, s'éveille sur « vite : », « moyen : », « complet : » dès que `forge/NIVEAUX.md` existe et cite ce chemin. Recette : `gabarits/hooks-factory.test.mjs`.",
@@ -92,6 +96,7 @@
       "mode": "presence_et_motif",
       "motif_exige": [
         "forge/hooks/factory.mjs publication-hebergee",
+        "forge/hooks/factory.mjs identite-sortante",
         "factory.mjs ouverture --sans-readme --contexte-json"
       ],
       "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
@@ -108,7 +113,7 @@
       "source": "gabarits/CLAUDE-PRODUIT.md",
       "cible": "CLAUDE.md",
       "mode": "presence_et_motif",
-      "motif_exige": "R-43",
+      "motif_exige": ["R-43", "init-audit-workspace"],
       "marqueurs_a_instancier": [
         "<commande>",
         "<autre type de ce produit>"
@@ -184,6 +189,7 @@
         "*.oracles.json",
         "*.oracles-cache.json",
         "*.oracles-historique.jsonl",
+        "_oracles-journal*.json*",
         "!forge/**",
         "forge/**/.env*",
         "forge/**/*mdp*",

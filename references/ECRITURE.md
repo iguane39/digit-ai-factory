@@ -58,7 +58,7 @@ jugé à sa prochaine réécriture de fond.
 
 ## Les règles
 
-15 règles, numérotées E-1 à E-15 — les douze du plancher d'origine, puis E-13, E-14 et E-15, nées de retours humains datés. Chaque règle porte les types qu'elle vise, son juge et son
+16 règles, numérotées E-1 à E-16 — les douze du plancher d'origine, puis E-13 à E-16, nées de retours humains datés. Chaque règle porte les types qu'elle vise, son juge et son
 statut : **mécanisée** (un script la joue), **déléguée** (un oracle existant la joue déjà) ou
 **revue** (aucun script ; elle se tient à la relecture, et c'est dit). Les exemples avant / après
 sont tirés de textes réels de la Factory.
@@ -222,11 +222,22 @@ Avant (15/09, guide pour développeurs assistés par IA) : un bloc `az repos lis
 vérifier qu'un trigramme est libre. Après : « ouvrez l'URL du dépôt — si elle répond, le trigramme
 est pris ».
 
+### E-16 — Une explication demandée se livre dans une fiche, et la restitution y renvoie
+*Types T2, T3. Juge : contrôle EXPLICATION de `oracles\hook-restitution.mjs`, en avertissement. Mécanisée en partie.*
+
+Retour humain du 12/10/2026, chez un produit, après deux diagnostics rendus en restitutions de 9 blocs : « Fournis le constat et les précos dans un fichier MD, simple, bref, lisible et exploitable », puis, la fiche reçue : « Fais en sorte que les explications données pour les futurs sujets respectent ce type de demande. » Le contenu utile existait dès le premier tour, dispersé entre les blocs avec les identifiants et le journal du tour, et le porteur a dû demander le fichier 2 fois.
+
+Quand l'humain demande une **explication** (expliquer, détailler, diagnostiquer, « fournis les précos », « donne le constat »), l'explication est un livrable. Elle se livre dans une **fiche datée**, nommée selon R-4, d'une page au plus (environ 800 mots) : un « En bref » de 3 à 4 puces chiffrées, le constat (un tableau, puis 3 à 5 constats titrés par leur verdict), les préconisations (un tableau « # · Action · Gain · Effort · Attention », 5 lignes au plus), ce qu'il n'y a pas à faire et pourquoi, l'ordre conseillé, une ligne de sources. C'est la forme que le porteur a jugée exploitable (RT-36 du même lot ; famille de gabarit candidate TF-1640). La restitution du tour reste due, avec sa forme jugée : elle **renvoie à la fiche** au bloc 4, au lieu d'en recopier le contenu dans ses blocs 4 et 8.
+
+Le contrôle EXPLICATION lit le dernier message humain, la forme de la réponse et les fichiers du tour : une demande d'explication rendue en restitution complète, sans fiche datée écrite ni citée, est signalée sous la réponse. Il ne bloque jamais, parce que la frontière entre une explication et un travail reste un jugement. Mesuré à l'entrée : 24 des 364 restitutions de produits depuis le 17/09 suivent un message que le motif lit comme une demande d'explication, et au moins 2 d'entre eux demandaient en fait un travail.
+
+Avant (12/10) : les coûts d'un abonnement expliqués dans les blocs 4 et 8 d'une restitution, identifiants et journal compris. Après : une fiche de 744 mots, jugée « simple, bref, lisible & exploitable », et une restitution qui la cite.
+
 ## Précédence
 
 1. La structure imposée par un gabarit prime (blocs et tableaux de `RESTITUTION.md`, sections
    d'une étude) : aucune règle de ce document ne s'y oppose.
-2. Le plancher (E-1 à E-15) ne se franchit pas.
+2. Le plancher (E-1 à E-16) ne se franchit pas.
 3. La voix du produit (`MARQUE.md`) se déploie au-dessus : ton, registre, vocabulaire choisi.
 4. Un conflit entre une règle de forge et ce document se tranche par la règle la plus stricte
    (R-43 : renforcer oui, assouplir jamais) et se consigne au ledger.

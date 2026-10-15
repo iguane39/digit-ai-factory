@@ -50,7 +50,7 @@ import { PROFONDEUR_MAX, SAUTES } from "../todo/localiser-produit.mjs";
 // TF-1471 (28/09/2026, campagne D-32 (a)) — mêmes helpers que R-13/R-27 d'oracle-conformite-projet.mjs
 // (TF-1439) : un seul endroit sait lire `type_projet: documentaire` et confronter la déclaration
 // au dépôt réel, et c'est lui, jamais une seconde lecture maison du même en-tête.
-import { typeProjetDeclare, signauxLogicielOuSite, TYPE_DOCUMENTAIRE, CONDITION_SITE } from "./adopter-projet-existant.mjs";
+import { surfaceWebEcarteePar, TYPE_DOCUMENTAIRE, CONDITION_SITE } from "./adopter-projet-existant.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -312,10 +312,14 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
     // est la MÊME que R-13/R-27 : une déclaration non confrontée exempterait un produit web qui se
     // dirait documentaire pour échapper au contrat.
     if (artefact.conditionnel === CONDITION_SITE) {
-      const type = typeProjetDeclare(dossierProduit);
-      if (type && type.type === TYPE_DOCUMENTAIRE && !signauxLogicielOuSite(dossierProduit).length) {
+      // TF-1699 (15/10/2026) : le type « service » (sans site public) exempte aussi, confronté aux
+      // seuls signaux de SITE — même lecteur que R-27 (`surfaceWebEcarteePar`).
+      const type = surfaceWebEcarteePar(dossierProduit);
+      if (type) {
         return { etat: "sans_objet",
-          motif: `projet déclaré documentaire (${type.ou}, type_projet) : ${artefact.conditionnel} non dû (TF-1439, TF-1471)` };
+          motif: type.type === TYPE_DOCUMENTAIRE
+            ? `projet déclaré documentaire (${type.ou}, type_projet) : ${artefact.conditionnel} non dû (TF-1439, TF-1471)`
+            : `projet déclaré service sans site public (${type.ou}, type_projet) : ${artefact.conditionnel} non dû (TF-1699)` };
       }
     }
     return { etat: "absent" };

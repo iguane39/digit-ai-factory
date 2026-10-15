@@ -84,8 +84,9 @@
  * Usage : node oracles\oracle-enclenchement.mjs <ledger.jsonl> [--forges a,b] [--run <id>]
  *           [--racine <racine-du-parc>]
  *   --forges : noms complets (`digit-ai-forge-design`) ou courts (`design`), séparés par des
- *              virgules ; sans lui, le champ `forges_mobilisees` du `run_open` du run jugé, dont
- *              l'annotation qui suit le nom (« ops (MEP) ») est ignorée.
+ *              virgules ; sans lui, la dernière entrée `rectification_forges_mobilisees` du run
+ *              (liste + `cause`, TF-1715), sinon le champ `forges_mobilisees` du `run_open` du run
+ *              jugé, dont l'annotation qui suit le nom (« ops (MEP) ») est ignorée.
  *   --run    : le run à juger quand le ledger en porte plusieurs (run de version) ; par défaut, le
  *              DERNIER `run_open` et ce qui le suit.
  *   --racine : où les dépôts du parc sont clonés ; sinon `$FORGE_ROOT`, sinon le parent du pilot.
@@ -163,11 +164,34 @@ export function segmentsDeRun(entrees) {
 
 const idDeRun = (runOpen) => (nonVide(runOpen.run) ? String(runOpen.run) : `seq ${runOpen.seq}`);
 
-/** Les forges mobilisées : l'option d'abord, le `run_open` ensuite, jamais une devinette. */
-export function forgesMobilisees(runOpen, option) {
+//: TF-1715 (15/10/2026) : le type d'entrée qui rectifie PAR AJOUT une déclaration fausse de
+//: `forges_mobilisees` (CONTRAT-INTERFACE.md §3). Le fait : un run_open a déclaré à tort une forge
+//: mobilisée, le contrat ne prévoyait de rectification que pour `versions_forges` et l'horodatage, et
+//: le run a dû passer `--forges` au juge à la main.
+export const TYPE_RECTIFICATION_FORGES = "rectification_forges_mobilisees";
+
+/**
+ * Les rectifications de `forges_mobilisees` d'un run : `{ valide, seq }` par entrée. Une rectification
+ * n'est retenue que si elle porte une liste non vide ET sa `cause` ; sinon elle est rendue invalide,
+ * pour être DITE au non_juge, jamais appliquée.
+ */
+export function rectificationsForges(entrees) {
+  return (entrees || []).filter((e) => e && e.type === TYPE_RECTIFICATION_FORGES).map((e) => {
+    const liste = Array.isArray(e.forges_mobilisees) ? e.forges_mobilisees : nonVide(e.forges_mobilisees) ? String(e.forges_mobilisees).split(",") : [];
+    return { seq: e.seq, liste, valide: liste.some((x) => nonVide(x)) && nonVide(e.cause) };
+  });
+}
+
+/**
+ * Les forges mobilisées : l'option d'abord, la DERNIÈRE rectification valide du run ensuite
+ * (TF-1715), le `run_open` enfin, jamais une devinette.
+ */
+export function forgesMobilisees(runOpen, option, rectifications = []) {
   let brut = null;
   let source = null;
+  const rect = rectifications.filter((r) => r.valide).pop();
   if (nonVide(option)) { brut = String(option).split(","); source = "--forges"; }
+  else if (rect) { brut = rect.liste; source = `${TYPE_RECTIFICATION_FORGES} (seq ${rect.seq})`; }
   else if (Array.isArray(runOpen.forges_mobilisees)) { brut = runOpen.forges_mobilisees; source = "run_open.forges_mobilisees"; }
   else if (nonVide(runOpen.forges_mobilisees)) { brut = String(runOpen.forges_mobilisees).split(","); source = "run_open.forges_mobilisees"; }
   if (!brut) return null;
@@ -321,7 +345,11 @@ export function juger({ ledger, forges = null, run = null, racine = racineParDef
   if (!segment.entrees.some((e) => e && e.type === "run_close")) {
     nonJuge.push(`le run ${runId} n'est pas clos (aucun \`run_close\`) : le verdict vaut à l'instant de la lecture, un oracle attendu peut encore tourner`);
   }
-  const mob = forgesMobilisees(segment.run_open, forges);
+  const rectifs = rectificationsForges(segment.entrees);
+  for (const r of rectifs.filter((x) => !x.valide)) {
+    nonJuge.push(`entrée ${TYPE_RECTIFICATION_FORGES} seq ${r.seq} ignorée : elle doit porter une liste \`forges_mobilisees\` non vide ET sa \`cause\` (CONTRAT-INTERFACE §3, TF-1715) — la déclaration précédente reste jugée`);
+  }
+  const mob = forgesMobilisees(segment.run_open, forges, rectifs);
   if (!mob || !mob.forges.length) {
     return skip(`forges mobilisées inconnues pour le run ${runId} : ni \`--forges\`, ni \`forges_mobilisees\` au \`run_open\` — ce juge ne devine pas ce qu'un run a mobilisé, et \`versions_forges\` porte le parc, pas la mobilisation`, { run: runId });
   }

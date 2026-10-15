@@ -170,6 +170,16 @@ check("rouge — deux entrées sous le même identifiant : GR-3", () => {
   if (r.code !== 1 || refus(r, "GR-3").length !== 1 || refus(r, "GR-1").length) throw new Error(r.brut.slice(0, 400));
   nettoyer(D);
 });
+check("vert — une contrainte de la PLATEFORME elle-même, sans client, s'écrit « client »: « tous » et passe GR-2 (TF-1706)", () => {
+  const D = mkdtempSync(join(tmpdir(), "garde-fous-tous-"));
+  const f = join(D, "registre.json");
+  const e = { id: "GFP-003", client: "tous", plateforme: "railway", mecanisme: "CLI", effet: "refus", portee: "tout déploiement", vise: "v", refuse: "r",
+    consequence: "c", source: "lot « Produit-82 - RETOURS - 20261014d »", verifiee_par: "relevé", inscrite_le: "2026-10-15", verifiee_le: "2026-10-14", posee_le: null, constatee: [{ produit: "Produit-82", le: "2026-10-14" }] };
+  writeFileSync(f, JSON.stringify({ format: "pilot/garde-fous-plateforme@1", garde_fous: [e] }), "utf8");
+  const r = lancer("--registre", f);
+  if (r.code !== 0 || r.j.verdict !== "PASS") throw new Error(r.brut.slice(0, 400));
+  nettoyer(D);
+});
 
 console.log(`\nverifier-garde-fous (M-11, TF-1495 et TF-1496) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

@@ -41,7 +41,9 @@ import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge } from "
 import { rolePageHomonyme, DOCTRINE_PAGE_HOMONYME } from "../scripts/generer-page-etude.mjs";
 // TF-1439 : le type « documentaire » est POSÉ par l'adoption et LU ici par le même lecteur — deux
 // lectures de la même déclaration qui divergeraient rendraient deux verdicts sur un même dépôt.
-import { typeProjetDeclare, signauxLogicielOuSite, TYPE_DOCUMENTAIRE } from "../scripts/adopter-projet-existant.mjs";
+import { typeProjetDeclare, signauxLogicielOuSite, signauxDeSite, TYPE_DOCUMENTAIRE, TYPE_SERVICE, TYPES_PROJET } from "../scripts/adopter-projet-existant.mjs";
+// TF-1678 : R-60 juge la cascade d'un produit par le juge du format commun, importé et non recopié.
+import { juger as jugerCascade, FORMAT as FORMAT_CASCADE } from "./oracle-cascade-isto.mjs";
 
 // TF-0898 (08/09/2026) — R-4 DOIT ÊTRE JOUABLE SEULE, SUR UN `output\` ET RIEN D'AUTRE.
 // Le fait : onze livrables d'un mandat sont sortis en « AAAAMMJJ-objet.ext » parce que la FORME
@@ -118,7 +120,11 @@ const EXT_CODE = new Set(["py", "js", "mjs", "cjs", "ts", "tsx", "jsx", "go", "r
 const EXT_LIVRABLE = new Set(["md", "pdf", "html", "pptx", "docx", "xlsx", "zip", "png", "svg"]);
 // LISEZMOI.md : index de dossier, pas un livrable daté (convention des familles numérotées
 // d'`output\`/`input\`, 13/08). Ajouté avec `.oracles\` ci-dessous — TF-0197, 14/08.
-const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md", "LISEZMOI.md"]);
+// REVUE.md (TF-1714, 15/10/2026) : la revue de lecture que R-32 quater exige « à côté » de chaque
+// page d'`output\` porte un nom FIXE, prescrit par le gabarit du socle de page. R-4 la refusait
+// (« livrable sans nommage ») : la règle interdisait son propre remède, et la revue fuyait sous
+// `forge\oracles\`, où R-32 quater ne la voit plus (lot Produit-83 20261014a, RT-3).
+const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md", "LISEZMOI.md", "REVUE.md"]);
 const IGNORES_PARCOURS = new Set([".git", ".venv", "node_modules", "__pycache__", "generated", "dist", ".claude"]);
 
 function* fichiers(dossier, prof = 0) {
@@ -487,6 +493,37 @@ function racineDuParcParDefaut(ici) {
 }
 const racineForges = process.env.FORGE_ROOT || racineDuParcParDefaut(dirname(fileURLToPath(import.meta.url)));
 const registreTypes = join(racineForges, "digit-ai-forge-organization", "registre-types.json");
+// TF-1713 (15/10/2026, lot Produit-83 20261014a RT-2) — LE CATALOGUE DES FAMILLES DU PILOT PRESCRIT
+// AUSSI DES NOMS. Une famille déclare ses `types_de_nom` (« fiche produit », « compte rendu »…), et
+// `oracle-gabarits-documents` (G8) résout la famille d'un livrable par ce nom. Le 14/10/2026, une
+// fiche nommée au gabarit gd-fiche-produit a rendu R-25 FAIL, « Fiche » n'étant pas au registre
+// d'organization : deux règles du socle ne pouvaient pas être tenues ensemble. Mesuré ce jour-là,
+// 29 familles du catalogue sur 45 déclarent au moins un type de nom dont le premier mot manque au
+// registre. Un nom que le catalogue déclare n'est pas « improvisé » : il passe, en AVERTISSEMENT qui
+// nomme la famille et la dette D-04 chez organization. La comparaison porte sur le type de nom
+// ENTIER (préfixe le plus long, quatre mots au plus, comme G8), jamais sur le seul premier mot.
+const NORME_NOM = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const typesDuCatalogue = (() => {
+  const index = new Map();
+  const chemin = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "documents", "catalogue.jsonl");
+  if (!existsSync(chemin)) return index;
+  for (const l of readFileSync(chemin, "utf8").split(/\r?\n/).filter(Boolean)) {
+    let f; try { f = JSON.parse(l); } catch { continue; }
+    if (!f || !f.id || !["ok", "porte_ailleurs"].includes(f.statut)) continue;
+    for (const t of f.types_de_nom || []) index.set(NORME_NOM(t), f.id);
+  }
+  return index;
+})();
+/** La famille du catalogue dont un type de nom ouvre l'<Objet> (2e segment), ou null. */
+function familleDuNom(objet) {
+  const mots = NORME_NOM(objet).split(" ").filter(Boolean);
+  for (let n = Math.min(4, mots.length); n >= 1; n--) {
+    const cle = mots.slice(0, n).join(" ");
+    if (typesDuCatalogue.has(cle)) return { id: typesDuCatalogue.get(cle), cle };
+  }
+  return null;
+}
 if (!existsSync(registreTypes)) so("R-25", "registre-types.json d'organization introuvable — types non jugeables (poste non équipé ? node bootstrap.mjs)");
 else {
   let admis, typesAffiches;
@@ -510,7 +547,14 @@ else {
         if (segs.length < 3) continue; // pas de segment type — déjà R-4
         vus++;
         const type = segs[1].split(" ")[0];
-        if (!admis.has(normeType(type))) {
+        const parCatalogue = admis.has(normeType(type)) ? null : familleDuNom(segs[1]);
+        if (parCatalogue) {
+          ok("R-25", rel(f),
+            `AVERTISSEMENT, non bloquant : type « ${type} » absent du registre d'organization, mais le nom suit le type ` +
+            `« ${parCatalogue.cle} » que la famille ${parCatalogue.id} du catalogue du pilot déclare ` +
+            "(gabarits\\documents\\catalogue.jsonl, champ types_de_nom) — le nom n'est pas en faute ; l'ajout du type " +
+            "au registre d'organization (D-04) reste dû (TF-1713)");
+        } else if (!admis.has(normeType(type))) {
           const suggestion = plusProche(type, typesAffiches);
           ko("R-25", rel(f),
             `type « ${type} » absent du registre des types` +
@@ -533,9 +577,19 @@ else {
   const AGENTS_IA = ["GPTBot", "OAI-SearchBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "ChatGPT-User", "Claude-Web"];
   const robots = [...fichiers(cible)].filter((f) => basename(f).toLowerCase() === "robots.txt");
   const type27 = typeProjetDeclare(cible);   // TF-1439 : le projet documentaire DIT pourquoi il n'a pas de robots.txt
-  if (!robots.length) so("R-27", type27 && type27.type === TYPE_DOCUMENTAIRE
+  // TF-1699 (15/10/2026) : le service sans site public le dit aussi, et sa déclaration se CONFRONTE
+  // aux signaux de site — un fichier de site ou une racine web déclarée la contredit.
+  const site27 = type27 && type27.type === TYPE_SERVICE ? signauxDeSite(cible) : [];
+  if (site27.length) {
+    ko("R-27", type27.ou, `projet déclaré « ${TYPE_SERVICE} » (sans site public), mais le dépôt porte ${site27.length} signal(aux) de site : ${site27.slice(0, 5).join(", ")} — `
+      + `retirer la ligne « type_projet: ${TYPE_SERVICE} » de l'en-tête du carnet et tenir R-27 comme un produit à surface web, ou retirer ce fichier du dépôt (TF-1699)`);
+  }
+  if (!robots.length && site27.length) { /* déjà en échec ci-dessus : aucun robots.txt à juger */ }
+  else if (!robots.length) so("R-27", type27 && type27.type === TYPE_DOCUMENTAIRE
     ? `aucun robots.txt — projet déclaré documentaire (${type27.ou}, type_projet) : aucune surface web à ouvrir aux agents IA, l'écart est consigné au carnet (TF-1439)`
-    : "aucun robots.txt — surface web non déclarée, agents IA non jugeables");
+    : type27 && type27.type === TYPE_SERVICE
+      ? `aucun robots.txt — projet déclaré service sans site public (${type27.ou}, type_projet) : aucune surface web à ouvrir aux agents IA, l'écart est consigné au carnet (TF-1699)`
+      : "aucun robots.txt — surface web non déclarée, agents IA non jugeables");
   else {
     let ok27 = true;
     for (const rb of robots) {
@@ -940,6 +994,9 @@ else {
   const manques = [];
   if (!/##\s*Routage forge/i.test(claude)) manques.push("section « Routage forge »");
   if (!/forge_tests/.test(claude)) manques.push("route tests (forge_tests)");
+  // TF-1735 (D-1 (a) du 15/10/2026) : l'audit du produit a sa route, forge-audit — sans elle, « audit
+  // complet » partait vers forge_tests, seule route de verdict que le CLAUDE.md connaissait.
+  if (!/init-audit-workspace/.test(claude)) manques.push("route audit du produit (forge-audit, init-audit-workspace)");
   if (!/run de version/i.test(claude)) manques.push("route évolution (run de version)");
   if (!/MEP/.test(claude)) manques.push("route déploiement (MEP)");
   manques.length
@@ -1088,6 +1145,24 @@ else {
       const PILOT47 = join(dirname(fileURLToPath(import.meta.url)), "..");
       const SEUIL_HERITES_1119 = "2026-09-15";
       const dateDe =(t) => (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+      // TF-1698 (15/10/2026) — UN FICHIER HÉRITÉ SANS `verifie_le` SE DATE PAR SA NAISSANCE. Le
+      // gabarit CLAUDE-PRODUIT.md n'en porte pas : un CLAUDE.md posé le 14/10 au gabarit brut était
+      // rangé « non daté », donc antérieur, et ne serait jamais justiciable. Sa date est son PREMIER
+      // COMMIT (un fait de l'histoire), sinon la date d'adoption consignée au carnet d'écarts (un
+      // fichier posé par l'adoption et pas encore commis). Ni l'un ni l'autre : antériorité, comme avant.
+      const adoption1698 = (() => {
+        const carnet = p("forge", "travaux", "ECARTS-ASSUMES.md");
+        if (!existsSync(carnet)) return null;
+        return (/^## Écart initial à l'adoption du dispositif — (\d{4}-\d{2}-\d{2})/m.exec(readFileSync(carnet, "utf8")) || [])[1] || null;
+      })();
+      const naissance = (cibleRel) => {
+        if (aGit) {
+          const r = git("log", "--diff-filter=A", "--format=%cs", "--", cibleRel);
+          const d = (r.status === 0 ? r.stdout : "").trim().split(/\r?\n/).filter(Boolean).pop();
+          if (d) return { date: d, source: "premier commit" };
+        }
+        return adoption1698 ? { date: adoption1698, source: "adoption consignée au carnet d'écarts" } : null;
+      };
       for (const a of heritage.artefacts) {
         if (!/^presence/.test(a.mode || "")) continue;
         const src = join(PILOT47, a.source), dst = p(a.cible);
@@ -1098,15 +1173,18 @@ else {
         if (perimes.length) so("R-20", `HERITAGE.json déclare pour ${a.source} des marqueurs que le gabarit ne porte plus : ${perimes.join(", ")} — déclaration à retirer (TF-1119)`);
         const restes = declares.filter((m) => tSrc.includes(m) && tDst.includes(m));
         const vSrc = dateDe(tSrc), vDst = dateDe(tDst);
+        const ne = !vDst && restes.length ? naissance(a.cible) : null;   // TF-1698
+        const dateJugee = vDst || (ne && ne.date) || null;
         // ANTÉRIORITÉ, jamais un défaut rétroactif (correctif du 15/09, même idiome que les
         // sections de COMPOSANTS-OPS) : cet oracle suspend l'ouverture de run sur un FAIL, et la
         // règle est née le 15/09. Un fichier revu avant, ou jamais daté, est relevé au non_juge —
         // mesuré au parc : 12 écarts, tous antérieurs — et exigé à sa prochaine revue datée.
-        if (restes.length && vDst && vDst >= SEUIL_HERITES_1119) {
+        if (restes.length && dateJugee && dateJugee >= SEUIL_HERITES_1119) {
           ko("R-20", a.cible, `${restes.length} marqueur(s) du gabarit ${a.source} NON INSTANCIÉ(S) dans ce fichier hérité — `
-            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`);
+            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`
+            + (vDst ? "" : ` — sans verifie_le, daté du ${ne.date} par son ${ne.source} (TF-1698)`));
         } else if (restes.length) {
-          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || "non daté"} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
+          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || (ne ? `non daté, né le ${ne.date} (${ne.source}, TF-1698)` : "non daté")} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
         }
         if (vDst && (vDst === vSrc || vDst === a.depuis)) {
           ok("R-20", a.cible, `AVERTISSEMENT, non bloquant : verifie_le=${vDst} est la date du GABARIT, pas celle d'une revue du produit — `
@@ -1268,9 +1346,10 @@ const envEx = [".env.example", ".env.exemple"].map((n) => p(n)).find((f) => exis
 // Un produit web qui se dirait documentaire pour échapper à R-13 reste donc vu.
 const type13 = typeProjetDeclare(cible);
 const signaux13 = type13 ? signauxLogicielOuSite(cible) : [];
-if (type13 && type13.type !== TYPE_DOCUMENTAIRE) {
-  ko("R-13", type13.ou, `type_projet « ${type13.type} » inconnu — seul « ${TYPE_DOCUMENTAIRE} » est lu, et une déclaration illisible n'exempte de rien (TF-1439)`);
-} else if (type13 && signaux13.length) {
+if (type13 && !TYPES_PROJET.includes(type13.type)) {
+  ko("R-13", type13.ou, `type_projet « ${type13.type} » inconnu — seuls ${TYPES_PROJET.map((t) => `« ${t} »`).join(" et ")} sont lus, et une déclaration illisible n'exempte de rien (TF-1439, TF-1699)`);
+} else if (type13 && type13.type === TYPE_DOCUMENTAIRE && signaux13.length) {
+  // TF-1699 : un service a du code par nature ; seul le documentaire se confronte aux signaux de logiciel.
   ko("R-13", type13.ou, `projet déclaré « ${TYPE_DOCUMENTAIRE} », mais le dépôt porte ${signaux13.length} signal(aux) de logiciel ou de site : `
     + `${signaux13.slice(0, 5).join(", ")}${signaux13.length > 5 ? `, et ${signaux13.length - 5} autre(s)` : ""} — `
     + `la déclaration ne vaut que pour un projet sans code ni site. Retirer la ligne « type_projet: ${TYPE_DOCUMENTAIRE} » de l'en-tête du carnet `
@@ -2498,6 +2577,81 @@ else {
   }
 }
 
+// ---- R-60 (TF-1678, 14/10/2026) — LA CASCADE ISTO D'UN PRODUIT TIENT SA CHAÎNE, AVANT TOUTE CLÔTURE --
+//
+// LE FAIT, mesuré chez Produit-12 le 02/10/2026 : 99 exigences, 8 besoins, 0 stratégie et 0 tactique
+// écrites. La loi n° 7 était jouée sur les études (E9, E10) et sur les restitutions (S51), jamais sur
+// le produit lui-même ; l'humain, le même jour : « ça aurait dû être fait suite directement à ma
+// demande, et devra être fait pour les autres futurs produits ». Le format commun et son juge
+// (`oracle-cascade-isto.mjs`) existent depuis ISTO 2.0.0 ; `references\INTENTION.md` disait qu'il se
+// joue « avant la clôture », et rien ne le jouait là. Cette règle est ce câblage : l'oracle de
+// conformité se rejoue avant `run_close` (ETAPES-RUN.md, étape 1), il porte donc la porte.
+//
+// CE QUI EST JUGÉ. Une cascade présente (`forge\etapes\conception\cascade\CASCADE.json`) passe
+// `oracle-cascade-isto`, avec le référentiel d'exigences quand il existe : une règle bloquante en échec
+// est un FAIL. Une cascade ABSENTE chez un produit qui a un référentiel d'exigences est un FAIL si le
+// premier `run_open` du produit date du jour d'entrée de la règle ou d'après.
+//
+// L'ANTÉRIORITÉ EST DÉCLARÉE, JAMAIS RATTRAPÉE EN SILENCE. Un produit ouvert avant le 2026-10-14, jour
+// où le format commun a été publié au pilot, n'est pas accusé de ne pas le tenir : il est NOMMÉ au
+// `non_juge`, cascade absente ou écrite à son propre format. Mesuré le 14/10/2026 sur les 7 produits du
+// poste qui ont un référentiel d'exigences : 1 cascade, au format du produit, et 6 absentes, tous
+// ouverts avant cette date ; aucun n'est donc accusé le jour de la naissance de la règle.
+{
+  const ENTREE_R60 = "2026-10-14";
+  const REL_CASCADE = "forge/etapes/conception/cascade/CASCADE.json";
+  const fCascade = join(cible, ...REL_CASCADE.split("/"));
+  const fExigences = join(cible, "forge", "etapes", "conception", "EXIGENCES.json");
+  const fLedger60 = join(cible, "forge", "ledger.jsonl");
+  let premierOpen = null;
+  if (existsSync(fLedger60)) {
+    for (const l of readFileSync(fLedger60, "utf8").split("\n")) {
+      let e = null;
+      try { e = JSON.parse(l); } catch { continue; }
+      if (e && (e.type === "run_open" || e.ev === "run_open") && e.ts) {
+        const jour = String(e.ts).slice(0, 10);
+        if (!premierOpen || jour < premierOpen) premierOpen = jour;
+      }
+    }
+  }
+  const anterieur = !premierOpen || premierOpen < ENTREE_R60;
+  let referentiel = null;
+  if (existsSync(fExigences)) {
+    try { referentiel = (JSON.parse(readFileSync(fExigences, "utf8")).exigences || []).map((e) => e.id); } catch { referentiel = null; }
+  }
+  if (existsSync(fCascade)) {
+    let cascade = null;
+    try { cascade = JSON.parse(readFileSync(fCascade, "utf8")); } catch (e) {
+      ko("R-60", REL_CASCADE, `cascade illisible : ${e.message.slice(0, 80)} — la chaîne de l'intention ne se juge pas`);
+    }
+    if (cascade && cascade.format !== FORMAT_CASCADE && anterieur) {
+      so("R-60", `cascade au format du produit, antérieure au format commun (${FORMAT_CASCADE}) publié le ${ENTREE_R60} — migration attendue à son prochain run de version`);
+      antecedences.push(`R-60 (TF-1678) : ${REL_CASCADE} est écrite au format du produit, avant le format commun du ${ENTREE_R60} — sa migration est attendue au prochain run de version, elle n'est pas jugée ici`);
+    } else if (cascade) {
+      const { findings: fc } = jugerCascade(cascade, { referentiel });
+      const echecs = fc.filter((f) => f.statut === "FAIL");
+      echecs.length
+        ? ko("R-60", REL_CASCADE, `${echecs.length} règle(s) d'oracle-cascade-isto en échec : `
+          + echecs.slice(0, 4).map((f) => `${f.regle} ${String(f.message).slice(0, 90)}`).join(" · ")
+          + (echecs.length > 4 ? " · …" : "") + " — la chaîne de l'intention ne tient pas, le run ne se clôt pas (détail : node <pilot>\\oracles\\oracle-cascade-isto.mjs "
+          + `${REL_CASCADE}${referentiel ? " --exigences forge/etapes/conception/EXIGENCES.json" : ""})`)
+        : ok("R-60", REL_CASCADE, `cascade au format ${FORMAT_CASCADE} : ${fc.length} règle(s) d'oracle-cascade-isto tenue(s)`
+          + (referentiel ? `, ${referentiel.length} exigence(s) du référentiel rattachée(s)` : ", sans référentiel d'exigences à rattacher"));
+    }
+  } else if (referentiel) {
+    if (anterieur) {
+      so("R-60", `aucune cascade, produit ouvert ${premierOpen ? `le ${premierOpen}` : "sans run_open daté"}, avant l'entrée de la règle le ${ENTREE_R60}`);
+      antecedences.push(`R-60 (TF-1678) : produit à ${referentiel.length} exigence(s) sans cascade, ouvert avant le ${ENTREE_R60} — la cascade s'écrit à son prochain run de version (references\\INTENTION.md), elle n'est pas exigée ici`);
+    } else {
+      ko("R-60", REL_CASCADE, `produit à ${referentiel.length} exigence(s), ouvert le ${premierOpen}, sans cascade : l'intention, les stratégies et les tactiques `
+        + "qui fondent ces exigences ne sont écrites nulle part. Écrire la source au gabarit gabarits\\CASCADE-ISTO.json, puis la juger par "
+        + "oracle-cascade-isto (references\\INTENTION.md, ETAPES-RUN.md étape 2)");
+    }
+  } else {
+    so("R-60", "aucun référentiel d'exigences : aucun produit conçu dont la cascade serait due");
+  }
+}
+
 const nonJuge = [
   ...antecedences,
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
@@ -2527,6 +2681,7 @@ const nonJuge = [
   "R-32 ter (TF-0923 volet a) : le RÔLE d'un livrable est lu dans son NOM (R-4) — un document remis à un humain sous un objet qui ne dit pas « proposition », « étude », « trajectoire » ou « conseil » échappe au contrôle, et c'est un faux négatif ASSUMÉ : juger l'INTENTION d'un document demanderait de le lire. La PRÉSENCE de la page homonyme est jugée, jamais sa CONFORMITÉ — c'est R-32 qui exige son journal d'oracles une fois qu'elle existe. L'écart déclaré au ledger se reconnaît à un type portant « ecart », une cause d'au moins vingt caractères et la citation du radical du livrable : un écart déclaré en prose, ailleurs qu'au ledger, n'est pas vu",
   "R-35 (TF-0923 volet b) : l'exemption d'existant (TF-0266) n'est REFUSÉE que lorsqu'elle est INVOQUÉE au ledger par son identifiant `TF-0266` alors que la mesure la contredit. Une exemption racontée en d'autres mots, ou dans la prose d'une synthèse hors ledger, n'est pas vue — le vocabulaire est étroit et fermé par choix : l'élargir à « antérieur » ou « existant » accuserait toute entrée qui décrit honnêtement un fichier ancien. Ce que le contrôle ne fait PAS non plus : il ne juge aucun constat un par un comme « couvert » ou « non couvert » par l'exemption — il dit si elle est ouverte, et la déclaration nommée reste la responsabilité du run (jamais un total anonyme)",
   "R-14 profils d'authentification et R-28 (TF-1284) : le profil se reconnaît à une liste NOMMÉE de noms de fichiers (azureProfile.json, msal_token_cache*, az.sess, .databrickscfg, accessTokens.json, credentials.json, application_default_credentials.json) — l'outil d'un autre éditeur, sous un autre nom, passera ; l'historique n'est pas fouillé, seul l'index courant est lu. R-28 ne voit que les noms d'artefact de shell (lettre seule, null, NUL, con, prn, aux, ~) : la liste FERMÉE des entrées attendues à la racine n'est pas jouée, parce que sur 13 dépôts de produits mesurés le 12/10/2026 elle accuserait des dizaines d'entrées légitimes (code, données, manifestes)",
+  "R-60 (TF-1678) : la moitié STRUCTURELLE du test rétro est jugée, par oracle-cascade-isto rejoué sur la source avec le référentiel d'exigences ; la VÉRITÉ de l'intention et la pertinence d'un rattachement restent humaines (I2 exige la trace de la ratification, jamais sa justesse). La vue CASCADE.md n'est pas confrontée à sa source ici : son générateur le fait (`--verifier`). La date d'entrée se lit au PREMIER run_open du ledger : un produit sans run_open daté est tenu pour antérieur, et c'est un faux négatif déclaré",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
@@ -2538,7 +2693,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, R-42, « R-42 bis », R-43, R-47)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, R-42, « R-42 bis », R-43, R-47, R-60)" });
     }
   }
 }

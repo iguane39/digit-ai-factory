@@ -25,8 +25,8 @@ propagés vers `~/.claude/skills`), puis **installe le projet** sans rien écras
 déplacer : dépôt git local, socle `forge\`, `input\`, `output\`, `docs\`, hameçons câblés.
 Il vérifie le tout par des contrôles exécutés et finit sur l'une de ces deux bannières :
 
-- **« FACTORY DIGIT-AI OPÉRATIONNELLE — prête à être utilisée sur ce projet »** : rends cette
-  bannière à l'utilisateur telle quelle, puis passe au protocole d'accueil ;
+- **« FACTORY DIGIT-AI OPÉRATIONNELLE — prête à être utilisée sur ce projet »** : recopie
+  cette ligne telle quelle, en tête de ta réponse ; jamais « <projet> est adopté » à sa place ;
 - **« INSTALLATION INCOMPLÈTE »** : chaque contrôle rouge porte son remède ; applique-le et
   relance l'installateur. Ne reviens vers l'utilisateur que pour un remède qui exige un
   secret ou un geste que tu ne peux pas faire.
@@ -34,12 +34,17 @@ Il vérifie le tout par des contrôles exécutés et finit sur l'une de ces deux
 **Ce qui n'est jamais une question à l'utilisateur** : installer git, node, uv ou python ;
 choisir entre installation portable, winget ou manuelle (c'est toujours la portable) ; gh,
 qui n'est requis que pour des dépôts privés d'engagement ; un dépôt privé du propriétaire
-inaccessible (c'est un avertissement, pas un défaut). Une intention vague (« pour ce
-projet ») ne retarde pas l'installation : elle se demande **après** la bannière.
+inaccessible (c'est un avertissement, pas un défaut) ; **à qui appartient le dépôt** (il est
+celui de l'utilisateur, sauf si son message dit le contraire).
+
+**Une demande d'installation s'arrête sur la bannière.** Si le message demande d'installer la
+Factory, ou ne porte pas d'intention de run concrète (« pour ce projet »), ta réponse finit sur
+la bannière, ce qui a été posé et la ligne « Pour commencer, dites ce que vous voulez obtenir ».
+Tu ne poses **aucune** question : ni douleur, ni intention, ni ce qui ne doit pas bouger.
 
 ## Ensuite — le protocole d'accueil
 
-Une fois la bannière « OPÉRATIONNELLE » rendue, ouvre et déroule
+Quand le message porte une intention de run concrète, une fois la bannière rendue, ouvre et déroule
 [references/ACCUEIL.md](references/ACCUEIL.md) : identifier l'intention
 de l'utilisateur, la reformuler simplement, montrer les catalogues de services des forges
 impliquées ([catalogues/CATALOGUES.md](catalogues/CATALOGUES.md)), proposer la démarche,

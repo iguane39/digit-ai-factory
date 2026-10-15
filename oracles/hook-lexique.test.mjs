@@ -25,11 +25,13 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // un cas de provenance ; puis de 39 à 45 le 01/10 (réponse humaine « 42a ») : la consigne du
 // PROCESSUS, 3 messages humains réels qui corrigent un processus et 3 phrases voisines épargnées ;
 // puis de 45 à 47 le 01/10 (niveau Moyen en essai) : « moyen : » reconnu en tête, et ailleurs non ;
-// puis de 47 à 48 le 13/10 (étape 3, D-68 (a)) : un produit portant `forge/NIVEAUX.md` est en service.
-check("self-test du hook : 48 cas verts", () => {
+// puis de 47 à 48 le 13/10 (étape 3, D-68 (a)) : un produit portant `forge/NIVEAUX.md` est en service ;
+// puis de 48 à 58 le 15/10 (TF-1735, D-1 (a)) : la consigne de l'AUDIT DU PRODUIT, 4 demandes reconnues
+// et 6 phrases voisines épargnées (audits spécialisés, run de forge-tests).
+check("self-test du hook : 58 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/48 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/58 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
 });
 
 // R-57 — le point d'entrée RÉEL injecte la consigne sur le message qui a fondé la règle, et rien sur
@@ -39,6 +41,14 @@ check("hook — un verdict de forme injecte la consigne R-57, sa négation n'inj
   const non = jouer("Le format n'est pas top, reprends les marges");
   if (oui.status !== 0 || !/\[R-57 — hook-lexique\]/.test(oui.stdout)) throw new Error(`rien injecté : ${oui.stdout}`);
   if (non.stdout.trim() !== "") throw new Error(`la négation injecte : ${non.stdout}`);
+});
+// TF-1735 — le message de la capture du 15/10, joué au point d'entrée réel : il reçoit la route
+// forge-audit ; « Relance les tests du projet » ne reçoit rien.
+check("hook — « lance un audit complet du projet » injecte la route forge-audit, « Relance les tests » rien", () => {
+  const oui = jouer("lance un audit complet du projet");
+  const non = jouer("Relance les tests du projet");
+  if (oui.status !== 0 || !/\[audit — hook-lexique\][^\n]*forge-audit[^\n]*init-audit-workspace/.test(oui.stdout)) throw new Error(`route absente : ${oui.stdout}`);
+  if (non.stdout.trim() !== "") throw new Error(`les tests reçoivent la route d'audit : ${non.stdout}`);
 });
 // TF-1314 — l'enveloppe RÉELLE d'un message entre sessions, telle que reçue le 22/09. Le corps porte
 // « l99 » en mot isolé, et c'est voulu : les règles ANCRÉES en tête (« Améliore ce prompt… ») ne se

@@ -57,3 +57,7 @@ todo/AVANCEMENT.md
 # regenerent par `scripts\verifier-rendu-instances.mjs --out`. Un dossier d atelier `.oracles/` ne porte que
 # des captures ignorees ; ce qui est DEJA suivi le reste (ignorer n efface rien de l historique).
 **/.oracles/*.png
+
+# 14/10/2026 : cache de compilation Python, état machine — il faisait compter le pilot « modifié localement » à chaque installation.
+__pycache__/
+*.pyc

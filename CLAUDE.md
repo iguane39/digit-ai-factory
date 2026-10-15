@@ -5,8 +5,8 @@ un produit mobilisant les forges bout en bout : conception → design → develo
 → tests → MEP — en transverse : **forge-agents** (outils), **forge-ops** (outille la MEP,
 ne décide jamais), **forge-data** (lineage, qualité, restitution), **forge-observability**
 (veille entre runs). Sur mandat humain : **forge-seo-geo** (post-MEP, SEO+GEO), **forge-audit**
-(gouvernance), **forge-organization** (conventions), **forge-agents-security** (sécurité
-agentique), **forge-websec** (sécurité du produit livré). Gouvernance : **organization
+(audit produit), **forge-organization** (conventions), **forge-agents-security** (sécurité
+agentique), **forge-websec** (sécurité du livrable). Gouvernance : **organization
 propose, le pilot décide** (`REGLES-PROJET.md`).
 
 Noyau ≤ 6 Ko (`oracle-claude-md.mjs`) ; détail : `references\INDEX.md`.

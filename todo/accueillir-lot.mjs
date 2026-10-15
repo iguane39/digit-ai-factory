@@ -103,10 +103,16 @@ function depotsDuParc(racine) {
  * Un nom, déjà présent dans un fichier SUIVI d'un dépôt du parc (HEAD, insensible à la casse) ?
  * Rend la liste des dépôts et du premier fichier porteur, jamais plus — c'est à l'arbitrage humain
  * de regarder le reste.
+ *
+ * TF-1721 (15/10/2026) — LE DÉPÔT DU PRODUIT LUI-MÊME EST EXCLU. Un dépôt produit cite toujours son
+ * propre nom (README, .env.example, ledger) : le 15/10, 22 fichiers de 2 produits neufs ont été
+ * refusés pour cette seule raison. Le dépôt dont le nom de dossier égale le nom cherché, à la casse
+ * près, n'est donc pas interrogé ; toute citation dans un AUTRE dépôt garde le refus.
  */
 export function nomCiteDansLeParc(nom, racine = RACINE_PARC_PAR_DEFAUT) {
   const trouves = [];
   for (const depot of depotsDuParc(racine)) {
+    if (basename(depot).toLowerCase() === String(nom).toLowerCase()) continue;
     const r = spawnSync("git", ["-C", depot, "grep", "--quiet", "-i", "-F", "-e", nom, "HEAD", "--"], { encoding: "utf8" });
     // exit 0 = trouvé · 1 = rien trouvé · >1 = dépôt sans HEAD, grep illisible… silencieusement passé :
     // un dépôt qu'on ne sait pas interroger n'est pas un dépôt où le nom est absent, mais l'arrêter
@@ -271,6 +277,37 @@ async function selfTest() {
     if (!/^Produit-\d+/.test(fait8.vers)) casse.push("le nom déposé n'est pas devenu un pseudonyme : " + fait8.vers);
   }
 
+  // 10) TF-1721 (15/10/2026) — LE DÉPÔT DU PRODUIT LUI-MÊME NE COMPTE PAS COMME CITATION. Le
+  // 15/10, 22 fichiers de 2 produits neufs ont été refusés parce que leur README, leur .env.example
+  // et leur ledger citaient leur propre nom. Rouge sur l'ancien code : le lot est refusé. Second
+  // sens : le même produit, cité AUSSI par un dépôt voisin, reste refusé, et le motif nomme le
+  // voisin, jamais son propre dépôt.
+  const depotPropre = join(parc, "ProduitAvecSonDepot");
+  mkdirSync(depotPropre, { recursive: true });
+  const gitPropre = (...a) => spawnSync("git", ["-C", depotPropre, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+  gitPropre("init", "-q", "-b", "main");
+  writeFileSync(join(depotPropre, "README.md"), "# produitavecsondepot\nCe dépôt porte ProduitAvecSonDepot et ProduitCiteChezLeVoisin.\n", "utf8");
+  gitPropre("add", "-A"); gitPropre("commit", "-q", "-m", "init");
+  writeFileSync(join(arr, "ProduitAvecSonDepot - RETOURS - 20261015a.md"), "lot de ProduitAvecSonDepot\n", "utf8");
+  const r10 = accueillir({ arrivee: arr, boite: bo, racineParc: parc });
+  const fait10 = r10.faits.find((x) => x.de.startsWith("ProduitAvecSonDepot"));
+  const ref10 = r10.refuses.find((x) => x.fichier.startsWith("ProduitAvecSonDepot"));
+  if (!fait10) casse.push("TF-1721 : le premier lot d'un produit neuf est refusé parce que SON PROPRE dépôt cite son nom : " + (ref10 ? ref10.motif : "(ni accueilli ni refusé)"));
+  else if (!fait10.produit_neuf_inscrit || /ProduitAvecSonDepot/i.test(fait10.vers)) casse.push("TF-1721 : le produit neuf n'est pas inscrit puis pseudonymisé : " + fait10.vers);
+  // Second sens : ProduitCiteChezLeVoisin a son propre dépôt ET une citation dans digit-ai-exemple.
+  const depotVoisinCite = join(parc, "produitcitechezlevoisin");
+  mkdirSync(depotVoisinCite, { recursive: true });
+  spawnSync("git", ["-C", depotVoisinCite, "init", "-q", "-b", "main"], { encoding: "utf8" });
+  writeFileSync(join(depotVoisinCite, "README.md"), "ProduitCiteChezLeVoisin\n", "utf8");
+  spawnSync("git", ["-C", depotVoisinCite, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "add", "-A"], { encoding: "utf8" });
+  spawnSync("git", ["-C", depotVoisinCite, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "commit", "-q", "-m", "init"], { encoding: "utf8" });
+  writeFileSync(join(arr, "ProduitCiteChezLeVoisin - RETOURS - 20261015a.md"), "lot\n", "utf8");
+  const r10b = accueillir({ arrivee: arr, boite: bo, racineParc: parc });
+  const ref10b = r10b.refuses.find((x) => x.fichier.startsWith("ProduitCiteChezLeVoisin"));
+  if (!ref10b) casse.push("TF-1721 : un nom cité par un dépôt VOISIN n'est plus refusé — l'exemption a avalé le contrôle");
+  else if (!/ProduitAvecSonDepot : (HEAD:)?README\.md/.test(ref10b.motif) || /produitcitechezlevoisin :/.test(ref10b.motif))
+    casse.push("TF-1721 : le refus ne nomme pas le seul dépôt voisin porteur : " + ref10b.motif);
+
   // 9) TF-1540 (12/10/2026) — LA FORME PAR LAQUELLE UN LOT DÉSIGNE SON PROJET ET QU'AUCUNE TABLE NE
   // CONNAÎT est relevée à l'accueil, dans les deux sens. Rouge : une forme inconnue (inventée) qui
   // « tient une séquence » ressort à `designations_a_qualifier`, et le lot est quand même accueilli
@@ -305,8 +342,8 @@ async function selfTest() {
 
   rmSync(T, { recursive: true, force: true });
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289, TF-1540) : ${9 - casse.length}/9 cas, ${casse.length} FAIL`
-    + (casse.length ? "" : " — cas rouges : un lot du même nom REFUSÉ sans écraser le déposé, un nom inconnu déjà cité dans le parc REFUSÉ et gardé au sas, une option inconnue REFUSÉE sans lancer l'accueil réel"));
+  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289, TF-1540, TF-1721) : ${10 - casse.length}/10 cas, ${casse.length} FAIL`
+    + (casse.length ? "" : " — cas rouges : un lot du même nom REFUSÉ sans écraser le déposé, un nom inconnu déjà cité dans le parc REFUSÉ et gardé au sas, un nom cité par un dépôt voisin REFUSÉ même quand le produit a son propre dépôt, une option inconnue REFUSÉE sans lancer l'accueil réel"));
   return casse.length ? 1 : 0;
 }
 

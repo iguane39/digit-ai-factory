@@ -43,7 +43,7 @@ Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte s
 |---|---|---|---|---|---|---|
 | 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé 4 fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
-| 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
+| 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL. **Alinéa TF-1713 (15/10/2026)** : un nom qui suit un type de nom déclaré par une famille du catalogue du pilot (`gabaritsdocumentscatalogue.jsonl`, champ `types_de_nom`, préfixe entier) passe en AVERTISSEMENT nommant la famille, l'ajout au registre d'organization restant dû | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
 **Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026 ; constante du
 sidecar corrigée le 01/10/2026, TF-1500).** La règle 4
@@ -220,7 +220,7 @@ Ce qui distingue un environnement d'un autre, et ce qui ne doit jamais les trave
 | 28 | Aucune entrée versionnée à la racine au nom d'un **artefact de shell** (lettre seule, `null`, `NUL`, `con`, `~`) : elle naît d'un chemin mal passé à un outil (TF-1284, 12/10/2026). La liste fermée des entrées attendues n'est pas jouée, mesurée trop bruyante sur 13 produits | constat 15/09/2026 chez un produit, mesuré le 12/10/2026 | produits | O | nul | **défaut** |
 | 15 | Les variables que la forge ne peut pas renseigner (clés tierces, identifiants) portent un commentaire `# à fournir :` dans `.env.example` — elles alimentent directement les `non_testables[]` de l'étape qualif (RT-6) | générique, prolonge RT-6 | produits | P0+S | faible | **défaut** |
 | 26 | **Modèle de données ancré au schéma réel** : chaque table déclarée dans `MODELE-DONNEES.md` porte une `provenance:` (fichier/dossier de schéma — migration, ORM, DDL) qui existe et contient le nom de la table ; table introuvable dans sa provenance = FAIL localisant. Exemption explicite : « sans objet — aucune persistance » (loi 3). Placeholders de squelette non jugés. Complétude inverse et exactitude des colonnes : revue de schéma (non_juge) | **TF-0091** (décision humaine du 11/08) — le REX Produit-11 : modèle reconstitué de tête en plein run | produits, nouveaux + rattrapage | O | nul | **défaut** |
-| 27 | **Surface web née ouverte aux agents IA** : tout produit à surface web copie à l'ouverture `gabarits\web\robots.txt` (agents IA de recherche AUTORISÉS par défaut — GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended… ; bloquer = décision consignée, datée et motivée DANS le fichier) et `gabarits\web\llms.txt` (carte du site pour les moteurs génératifs, ouverture reprise de FONCTIONNEL.md, tenue par development/MEP, cohérente avec le sitemap). Oracle : un `robots.txt` présent qui interdit un agent IA sans ligne de décision = FAIL ; `llms.txt` absent à côté d'un `robots.txt` = FAIL ; aucun `robots.txt` = SANS_OBJET (surface web non déclarée) | **décision humaine du 11/08 (TF-0095)** — pendant produit du nœud 58 de la grille seo | produits à surface web, nouveaux + rattrapage | P0+O | nul | **défaut** |
+| 27 | **Surface web née ouverte aux agents IA** : tout produit à surface web copie à l'ouverture `gabarits\web\robots.txt` (agents IA de recherche AUTORISÉS par défaut — GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended… ; bloquer = décision consignée, datée et motivée DANS le fichier) et `gabarits\web\llms.txt` (carte du site pour les moteurs génératifs, ouverture reprise de FONCTIONNEL.md, tenue par development/MEP, cohérente avec le sitemap). Oracle : un `robots.txt` présent qui interdit un agent IA sans ligne de décision = FAIL ; `llms.txt` absent à côté d'un `robots.txt` = FAIL ; aucun `robots.txt` = SANS_OBJET (surface web non déclarée). **Type « service »** (TF-1699, 15/10/2026) : un service sans site public adopté `--type service` déclare `type_projet: service` à l'en-tête de son carnet des écarts assumés et ne reçoit ni `robots.txt` ni `llms.txt` ; R-27 le dit SANS_OBJET, et FAIL dès qu'un fichier de site ou une `racine_web:` contredit la déclaration ; R-13 reste due | **décision humaine du 11/08 (TF-0095)** — pendant produit du nœud 58 de la grille seo | produits à surface web, nouveaux + rattrapage | P0+O | nul | **défaut** |
 | 24 | **URLs d'application par environnement** : tout environnement hébergé expose son application sous un hôte préfixé `<nom-appli>-<env>.<domaine>` avec env ∈ {`dev`, `qualif`, `production`} — ex. `https://produit-02-production.up.railway.app`. Le staging outillé de l'étape MEP se nomme **qualif** dans les URLs ; le local (`localhost`, `127.0.0.1`) est hors périmètre ; les hôtes non applicatifs (BDD…) aussi. Vérifié sur la table « URLs & ports par environnement » de `PARAMETRAGE.md` (placeholders `<…>`/`{…}` non jugés) | **décision humaine du 11/08** (TF-0090) | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
 
 ## F. Livrables et archivage
@@ -424,7 +424,9 @@ sans revue a gardé quatre jours un schéma illisible. Règle : chaque `.html` d
 `old\`) a, **dans le même dossier**, un `REVUE.md` non vide et plus récent que lui. Mécanisme :
 O — contrôle R-32 quater de `oracle-conformite-projet.mjs`. Non jugé : la justesse de la revue
 (qu'elle ait vraiment lu chaque capture) ; seules la présence, le contenu non vide et la date
-se vérifient.
+se vérifient. Le nom fixe `REVUE.md` est exempté du nommage daté de R-4, comme `README.md`
+(TF-1714, 15/10/2026) : sans cette exemption, R-4 refusait la revue posée là où R-32 quater la
+demande.
 
 *Sévérité : AVERTISSEMENT.* Le contrôle signale (statut PASS, message `AVERTISSEMENT, non
 bloquant`), il ne bloque ni le verdict ni la remise. Une première version bloquante, écrite le
@@ -1641,3 +1643,137 @@ parce qu'elle exige une source et une date, non que la phrase soit dans la sourc
 Contrôles exécutables : `oracles\oracle-source-contenu.mjs` (SC1 à SC3, recette
 `oracles\oracle-source-contenu.test.mjs` à double sens) pour le point 1 ; la règle S63 de
 `oracles\oracle-synthese.mjs` pour le point 2, avertissante à son entrée.
+
+## AO. R-60 — la cascade ISTO d'un produit tient sa chaîne avant toute clôture de run (TF-1678, 14/10/2026)
+
+Le fait, mesuré chez Produit-12 le 02/10/2026 : 99 exigences, 8 besoins, 0 stratégie et 0 tactique
+écrites. La loi n° 7 était jouée sur les études (E9, E10) et sur les restitutions (S51), jamais sur
+le produit lui-même. L'humain, le même jour : « ça aurait dû être fait suite directement à ma
+demande, et devra être fait pour les autres futurs produits ». Le format commun de la cascade et son
+juge existent depuis ISTO 2.0.0 (`references\INTENTION.md`) ; le texte disait qu'il se joue « avant
+la clôture », et rien ne le jouait là.
+
+**R-60.**
+1. **Un produit qui a un référentiel d'exigences tient sa cascade** dans
+   `forge\etapes\conception\cascade\CASCADE.json`, au format `pilot/cascade-isto@1` (gabarit
+   `gabarits\CASCADE-ISTO.json`), écrite à l'étape de conception de son run d'ouverture et mise à
+   jour à chaque run de version.
+2. **Avant `run_close`, la source passe `oracles\oracle-cascade-isto.mjs`** avec le référentiel
+   d'exigences : une règle bloquante en échec bloque la clôture, comme R-20.
+3. **Sa vue lisible se génère** par la famille `gd-cascade-produit`
+   (`gabarits\documents\cascade-produit\generateur\generer-vue-cascade.mjs`), jamais à la main.
+4. **L'antériorité est déclarée, jamais rattrapée en silence.** Un produit dont le premier
+   `run_open` précède le 2026-10-14, jour où le format commun a été publié, n'est pas accusé : sa
+   cascade absente, ou écrite à son propre format, est nommée au `non_juge` et s'écrit au prochain
+   run de version. Mesuré le 14/10/2026 sur les 7 produits du poste qui ont un référentiel
+   d'exigences : 1 cascade au format du produit et 6 absentes, tous antérieurs, 0 accusé.
+5. **Ce que R-60 ne juge pas** : que l'intention citée soit la vraie, qu'une tactique serve
+   réellement sa stratégie. Seule la ratification humaine le tranche, et l'oracle exige qu'elle soit
+   tracée (I2).
+
+Contrôle exécutable : la règle R-60 d'`oracles\oracle-conformite-projet.mjs`, rejoué avant
+`run_close` (`references\ETAPES-RUN.md`, étape 1), recette `oracles\self-test.mjs` à double sens
+(8 cas, dont le remède joué).
+
+## AP. R-61 — « livré » a une définition opposable : toutes les exigences de la fiche, seuls les secrets restant à saisir (TF-1708, TF-1709, TF-1711 — 15/10/2026)
+
+Trois faits du même run, lots `Produit-82 - RETOURS - 20261014f`, `g` et `i`. Le 14/10/2026, une
+restitution jugée PASS sur 63 règles annonçait un service déployé sans son adresse au bloc 0 ni au
+verdict : « L'URL n'est même pas fournie avec le prompt, ce n'est pas normal ». La version corrigée,
+PASS sur 65 règles, déclarait « P4 close » et « le brief mené jusqu'au bout » pour un service qui ne
+servait que des réponses de mock, sans clé de fournisseur, sans page d'accueil, et que le navigateur
+rendait en 401 : « Comment est-ce qu'on peut considérer que le produit est fini et livré ? ». Le run
+avait clos ses phases avec 10 exigences sur 35 non tenues. Consigne humaine, mot pour mot : « Il faut
+que tout soit implémenté, que l'administrateur de l'appli n'ait qu'à saisir les clés à la fin pour que
+cela soit utilisable complètement. Et remonte ce point à la Factory pour les futurs produits ». Le tour
+suivant a implémenté les 10 exigences et la saisie guidée des clés, en une recette de 33 tests.
+
+**R-61.**
+1. **Un produit n'est « livré » que si toutes les exigences de sa fiche sont implémentées et
+   testées.** Seuls les secrets (clés de fournisseurs, jetons, mots de passe) restent à la main de
+   l'administrateur, et ils se saisissent par un geste guidé unique et documenté. Le critère de sortie
+   d'une phase ou d'un brief tenu n'est pas une livraison : il se dit « phase close », jamais « livré ».
+2. **Un run qui s'arrête avant le dit.** Sa restitution écrit « N exigences sur M tenues » au bloc 0 ou
+   au verdict, nomme ce qui reste, et n'emploie ni « livré », ni « fini », ni « complet ».
+3. **Un verdict de livraison se mesure du côté de l'utilisateur.** Il dit, au bloc 0 ou au verdict, ce
+   qu'un utilisateur peut faire du livrable à l'instant, et ce qui manque pour un usage réel, ou que
+   rien ne manque. La mesure se fait par l'usage : ouvrir l'adresse, appeler un vrai point d'accès.
+4. **Un service déployé ou une page publiée se nomme par son adresse cliquable** au bloc 0 et en tête
+   du verdict, avec le geste pour s'en servir : point d'accès, emplacement de la clé, commande d'essai.
+5. **Ce que R-61 ne juge pas** : que les exigences comptées soient les bonnes, que l'usage décrit soit
+   vrai, qu'un écart accepté par l'humain soit encore d'actualité. Le compte et l'usage se lisent dans
+   la restitution ; leur justesse relève des oracles du produit et du contrat « prêt client ».
+
+Contrôles exécutables : les règles S70 (point 4), S71 (point 3) et S72 (points 1 et 2)
+d'`oracles\oracle-synthese.mjs`, avertissantes à leur entrée, fixtures double sens au self-test ;
+texte hérité par les produits dans `gabarits\RESTITUTION.md` (v2.38.0, bloc 2). Mesure d'entrée : 0
+accusation sur les 241 synthèses d'`output\04-plans\`, 3 sur 15 restitutions écrites des produits, les
+3 restitutions contestées du 14/10.
+
+## AQ. R-62 — aucune donnée d'identité de l'utilisateur ne part vers un service tiers sans sa demande (TF-1716 — 15/10/2026)
+
+Le fait, lot `Produit-83 - RETOURS - 20261014a` (RT-5) : le 14/10/2026, pendant un run de conception,
+la session a placé l'adresse électronique de l'utilisateur dans l'en-tête `User-Agent` d'un appel à une
+API publique tierce, sans qu'il l'ait demandé. Aucune garde ne l'a vu ; les appels suivants portaient
+un en-tête neutre. Une donnée envoyée ne se reprend pas. Classe : `secret-porte-hors-perimetre`,
+récidive de TF-0616 et TF-1284.
+
+**R-62.**
+1. **Une requête vers un service tiers ne porte aucune donnée d'identité de l'utilisateur** (adresse
+   électronique, nom, téléphone) dans son adresse, ses en-têtes ou son corps, sauf demande explicite
+   de sa part. Un en-tête `User-Agent` ou `From` reste neutre : le nom de l'outil, jamais une adresse.
+2. **La demande explicite se lit** : l'utilisateur a donné l'adresse dans la conversation pour cet
+   usage, ou il a posé `FORGE_IDENTITE_GO` avant d'ouvrir la session. Une API qui « recommande » un
+   contact dans l'agent pose une question à l'humain ; elle ne vaut pas demande.
+3. **Ce que R-62 ne juge pas** : une requête émise par un script dont le texte n'est pas dans la
+   commande, les données d'identité autres que l'adresse électronique, les outils `mcp__*` connectés.
+
+Contrôle exécutable : `oracles\hook-identite-sortante.mjs`, hook `PreToolUse` sur `Bash`, `PowerShell`
+et `WebFetch`, qui refuse une requête vers un hôte tiers portant une adresse de l'utilisateur
+(`git config user.email`, liste `FORGE_IDENTITES`) ou une adresse dans un en-tête `User-Agent` ou `From`
+(recette `oracles\hook-identite-sortante.test.mjs`, 8 cas à double sens dont le remède joué). Câblé au
+pilot par `.claude\settings.json`, chez un produit par `forge\hooks\factory.mjs identite-sortante`
+(`gabarits\settings-produit.json`).
+
+## AR. R-63 — une sortie automatisée se juge sur un échantillon étiqueté hors du système, et sa version améliorée sur ses effets (TF-1694, TF-1695 — 15/10/2026)
+
+Le fait, lot `Produit-12 - RETOURS - 20261014a` (RS-31, RS-32) et ses deux pièces jointes. Le
+classement de 9 662 fichiers affichait 97 % de fichiers rangés en norme 2.7, toutes portes vertes.
+Mesuré sur 150 fichiers tirés au hasard et étiquetés par trois agents qui ne voyaient pas le résultat,
+le dossier était juste dans 63,3 % des cas (intervalle de Wilson 55,4 à 70,6), 66,0 % après deux
+versions. Jusqu'à la 2.9, la seule relecture était celle de l'auteur des règles. Dans la boucle
+d'amélioration qui a suivi, la v2.11 gagnait 2,7 points sur l'échantillon sans un faux, mais ses 201
+changements dans la population comptaient 4 faux sur 12 relus ; la v2.10 annonçait une correction qui
+ne touchait aucune ligne existante ; un test de la v2.14 passait aussi sur le code précédent.
+
+**R-63.**
+1. **Une sortie qui trie, classe, range ou rédige à la place d'un humain se juge sur un échantillon
+   étiqueté par le métier, hors du système, et sur les conséquences de ses erreurs** — jamais sur son
+   taux d'affectation ni sur sa conformité aux règles qu'elle s'est données. Les six règles PC-1 à PC-6
+   du produit s'appliquent : justesse à côté de toute part traitée, ou « justesse non mesurée » (PC-1) ;
+   échantillon que la sortie jugée n'a pas choisi, méthode de tirage écrite (PC-2) ; gravité notée pour
+   chaque sortie relue, la plus forte bloquant la remise (PC-3) ; entité déduite recoupée avec une
+   seconde source, contradiction présentée en anomalie (PC-4) ; règle évaluée par ses cas d'échec,
+   avec sa condition de non-application testée (PC-5) ; compteurs de synthèse recalculés par script
+   depuis la table qu'ils résument (PC-6).
+2. **Une version améliorée se juge en huit étapes** : mesurer avant d'améliorer, sur un échantillon de
+   référence tiré par strates avec une graine écrite ; étiqueter à l'aveugle, les désaccords allant au
+   métier en questions fermées, la mesure restant provisoire tant qu'il n'a pas répondu ; mesurer
+   plusieurs justesses et la gravité, jamais la seule couverture ; chaque règle nouvelle porte un test
+   rouge sur le code précédent, puis vert ; chaque règle s'applique aux lignes déjà traitées, pas
+   seulement aux nouvelles ; la version se mesure sur le même échantillon et sur un tirage des
+   changements qu'elle fait dans toute la population ; une version qui fait baisser une justesse,
+   augmente les erreurs graves ou dont le tirage trouve des faux est rejetée, numéro et raison gardés ;
+   la boucle s'arrête quand deux versions consécutives gagnent moins d'un point, ou à la borne fixée
+   d'avance, en disant ce que seul le métier peut lever.
+3. **Ce que R-63 ne fixe pas** : la taille d'un échantillon ni un seuil de justesse, choix du métier de
+   chaque produit. Elle ne remplace pas les oracles de forme ; elle s'y ajoute pour juger le fond.
+
+Contrôles exécutables : la règle S73 d'`oracles\oracle-synthese.mjs` (point 1, PC-1 : une part traitée
+restituée sans justesse ni « justesse non mesurée ») et la règle S74 (point 2, étapes 5 et 6 : un gain
+annoncé sur un échantillon sans le contrôle de ses changements dans la population ni son effet sur
+l'existant), avertissantes à leur entrée, fixtures double sens au self-test ; 0 accusation sur les 241
+synthèses d'`output\04-plans\`. Non mécanisé ici : PC-2 à PC-6 et les étapes 1 à 4, 7 et 8, que seul un
+oracle du domaine peut jouer. Leur place est le registre de `quality-oracles` (domaine « sortie
+automatisée de tri, de classement ou de rédaction ») et le skill `la-boucle`, dans la forge des agents :
+la descente y est déclarée à faire, elle n'est pas faite par cette règle.

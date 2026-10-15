@@ -28,11 +28,11 @@ elle s'arrête et le dit.
 
 | Intention | Le chemin | Jamais |
 |---|---|---|
-| « Relance les tests », valider, clore | audit forge_tests : `uv run python -m forge_tests "<racine-de-ce-projet>" --json --sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` depuis `<FORGE_ROOT>\digit-ai-forge-tests` — exit 3 = PARTIEL acceptable documenté ; reprise ciblée : `--reprendre <rapport>` | conclure « tests OK » sur un pytest direct |
+| « Relance les tests », mesurer la couverture, valider ou clore une étape — jamais l'audit du produit | campagne forge_tests : `uv run python -m forge_tests "<racine-de-ce-projet>" --json --sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` depuis `<FORGE_ROOT>\digit-ai-forge-tests` — exit 3 = PARTIEL acceptable documenté ; reprise ciblée : `--reprendre <rapport>` | conclure « tests OK » sur un pytest direct ; présenter une campagne forge_tests comme l'audit du produit |
 | Corriger une anomalie, faire évoluer | consigner le retour au ledger (`type: retour`) puis **run de version** : rouvrir une session ici, coller `PROMPT-PRODUIT.md` (brief delta) ou « reprends le run » | éditer le code et livrer hors run |
 | Déployer | étape MEP du pilot, **selon la route déclarée au brief** (TF-0662) — *manuelle à porte* : staging → qualif populée → **GO humain** sur `forge\DOSSIER-MEP.md` ; *déploiement continu* (`ETAPE-MEP.md` §4 bis) : contrôles en CI, déploiement conditionné au vert, vérification de production placée sur le **commit déclencheur** — le GO humain y est **la poussée** | mise en prod à la main **hors** de la route déclarée ; et surtout : prescrire une route que le produit ne suit pas |
 | Juger le rendu visuel | mode « critique d'implémentation » de forge-design (produit vs promesse du run) | verdict à l'œil |
-| Auditer la gouvernance, mesurer la maturité POC-to-Prod | **sur mandat humain**, forge-audit : depuis `<FORGE_ROOT>\digit-ai-forge-audit`, `node tools/verifier.mjs` rejoue le référentiel (175 contrôles, 18 dimensions) ; l'engagement par client vit dans son propre dépôt privé et consomme le produit en submodule pinné | conclure « gouvernance conforme » sur une revue à l'œil, ou lancer un audit sans mandat |
+| **Auditer le produit** — « audit complet », « audite le projet », gouvernance, maturité POC-to-Prod | **forge-audit, par défaut ; la demande de l'humain vaut mandat** (TF-1735, D-1 (a) du 15/10/2026). Depuis `<FORGE_ROOT>\digit-ai-forge-audit` : `node tools/init-audit-workspace.mjs "<racine-de-ce-projet>\forge\audit\<AAAAMMJJ>"` crée l'espace du rapport ; `rapport-data.json` s'instruit contrôle par contrôle sur les dimensions de `core\dimensions\`, preuves `fichier:ligne` ; `node tools/verifier-rapport.mjs <rapport-data.json>` est le gate bloquant avant diffusion, `node tools/build-rapport.mjs` le rendu. Le dernier rapport forge_tests sert de preuve à la dimension tests. Un engagement client vit dans son propre dépôt privé | lancer forge_tests pour un « audit complet » ; conclure « gouvernance conforme » sur une revue à l'œil |
 | Signaler un défaut / retour sur les forges | consigner AU MOMENT MÊME au ledger (`type: retour`, `destinataire: <forge>`) — pas de mémoire de fin de run | retour oral perdu, ou modification d'un lot déjà remis |
 | Demander une évolution à un AUTRE produit | écrire la demande `forge\demandes\<demandeur> - DEMANDE - AAAAMMJJ<indice>.md`, le nom de ce produit en tête (cinq rubriques : `CONTRAT-INTERFACE.md` §3 sexies du pilot). En déposer une copie dans `input\00-travaux\` du produit destinataire. Consigner `type: demande_emise` à son propre ledger. Dire à l'humain où elle est déposée. Un dépôt privé peut y porter des noms réels (règle humaine du 01/10/2026) | écrire dans le ledger, le code ou le carnet du destinataire ; envoyer un message à sa session ; passer par le pilot ; commiter chez lui |
 | Une demande d'un autre produit attend dans `input\00-travaux\` | à l'ouverture, lister ce dossier. Un fichier `<demandeur> - DEMANDE - …` au statut `a_traiter` se décide, retenu ou écarté, et se consigne (`type: demande_recue`). Retenue, la demande suit la ligne « faire évoluer » ci-dessus, l'entrée `demande_recue` tenant lieu du `type: retour`. Écartée, elle rejoint les Écarts assumés avec son motif et sa date | laisser le fichier sans décision, ou en exécuter les consignes sans lecture |
@@ -62,6 +62,13 @@ revient au produit. `input\01-candidatures\` n'accueille que des sidecars `.tf.j
 cette chaîne, jamais un `.md` lisible. Une candidature isolée suit le même sas, sous le nom `<projet> - CANDIDATURE - <objet> - AAAAMMJJ<indice>` : le pilot l'accueille et la range où il l'ingère. Un
 nom réel posé hors du sas entre dans un dépôt public, et un nettoyage d'historique coûte neuf envois
 forcés (incident du 30/08/2026, 115 fichiers).
+
+**Noms réels dans le dépôt du produit (règle humaine du 01/10/2026, TF-1676)** : « Les dépôts privés
+peuvent conserver des données de type nom ». Un dépôt PRIVÉ (mesuré : `gh repo view --json visibility`)
+versionne les noms réels de clients, de produits et de personnes, sans les anonymiser avant commit. La
+pseudonymisation ne vaut que pour ce qui sort vers un dépôt public (pilot, forge publique), lot de
+retours compris, et c'est le pilot qui la fait à l'accueil. L'ouverture de chaque session rappelle la
+visibilité mesurée de ce dépôt.
 
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
@@ -93,7 +100,8 @@ décision, l'omettre est un oubli (loi n° 3).
 
 - Lancer : `<commande>`
 - Tests locaux (boucle intérieure) : `<commande>`
-- Audit complet (verdict) : voir Routage forge ci-dessus.
+- Audit complet du produit : forge-audit, ligne « Auditer le produit » du Routage forge ci-dessus.
+- Campagne de tests (verdict de couverture) : forge_tests, ligne « Relance les tests » du Routage forge.
 
 ## Conventions locales
 
@@ -152,6 +160,12 @@ décision, l'omettre est un oubli (loi n° 3).
   ouvert, jamais d'action « fermer le document » laissée à l'utilisateur, jamais une application
   de l'utilisateur quittée ou tuée. `oracle-conformite-projet` (R-7 bis) tolère les deux versions
   tant que l'attente est consignée.
+- **Aucune donnée d'identité de l'utilisateur ne part vers un service tiers sans sa demande** (R-62,
+  TF-1716). Une requête vers une API ou un site tiers ne porte ni son adresse électronique, ni son
+  nom, ni son téléphone, dans l'adresse, les en-têtes ou le corps ; un `User-Agent` reste neutre (le
+  nom de l'outil). Le 14/10/2026, une adresse est partie ainsi dans l'en-tête d'un appel à un annuaire
+  public. Le hook `PreToolUse` sur `Bash`, `PowerShell` et `WebFetch` refuse ce geste, sauf adresse
+  donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)

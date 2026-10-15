@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.29.0",
- "date": "2026-10-02",
+ "version": "1.35.0",
+ "date": "2026-10-15",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -1689,6 +1689,403 @@
    "voisines": [
     "verdict-de-porte-perime-au-lancement"
    ]
+  },
+  {
+   "cle": "retention-de-versions-sans-borne",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une prescription garde des versions déployées pour le retour arrière sans borner combien restent actives ni prévoir leur ménage : chaque déploiement en laisse une de plus, facturée. Mesuré chez Produit-64 (lot 20261012c) : 100 révisions actives, 34 jours sans qu'aucun oracle le voie.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1638",
+    "TF-1639"
+   ],
+   "regle": "forge-ops, plan azure de scripts/ops.mjs : borne « révisions servies + une N-1 saine », ménage après bascule et ménage périodique prescrits",
+   "oracle": "digit-ai-forge-ops, oracles/oracle-ops.mjs --revisions-actives (O-18), fixtures/o18-revisions-actives rouge et verte, oracles/self-test.mjs",
+   "voisines": [
+    "etape-remise-sur-compilation"
+   ]
+  },
+  {
+   "cle": "declaration-constat-ancree-a-la-ligne",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une déclaration de constat contesté se joint au constat par une clé qui porte un numéro de ligne : dès que le code se décale, la déclaration tombe et le constat revient, au prix d'un audit complet de plus.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1672"
+   ],
+   "regle": "forge-tests, forge_tests/declarations.py : ancre facultative `texte`, rapprochement d'une déclaration orpheline par sa forme sans numéro de ligne, ambiguïtés nommées",
+   "oracle": "digit-ai-forge-tests, tests/test_tf_1672_ancrage_declarations.py (12 cas, 7 rouges sur la version d'avant)",
+   "voisines": [
+    "reglage-projet-ignore-par-la-forge"
+   ]
+  },
+  {
+   "cle": "reglage-projet-ignore-par-la-forge",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un réglage que le projet pose dans le fichier de configuration de la forge n'est pas appliqué, parce que la forge le lit avant de charger ce fichier ou parce que la valeur est fixée dans son code.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1673",
+    "TF-1675"
+   ],
+   "regle": "forge-tests, forge_tests/execution.py : contrat du projet chargé en tête d'exécution, provenance du réglage dite au motif, délai backend réglable (FORGE_TESTS_DELAI_BACKEND_S)",
+   "oracle": "digit-ai-forge-tests, tests/test_tf_1673_trace_du_projet.py et tests/test_tf_1675_delai_backend.py (10 cas rouges sur la version d'avant)",
+   "voisines": [
+    "declaration-constat-ancree-a-la-ligne"
+   ]
+  },
+  {
+   "cle": "exigence-sans-tactique-ni-strategie",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une exigence du référentiel ne remonte à aucune tactique ni stratégie : la cascade Intention > Stratégie > Tactique > Opérationnel du produit n'est vérifiable par aucun contrôle, et elle vit hors du référentiel.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1680"
+   ],
+   "regle": "forge-conception, schema-referentiel.md : champ facultatif `tactique` aligné sur la cascade ISTO 2.0.0 du pilot (cascade/CASCADE.json, pilot/cascade-isto@1)",
+   "oracle": "digit-ai-forge-conception, oracles/oracle-tracabilite.mjs --cascade (règle T6), fixtures cascade-verte et cascade-rouge ; pilot, oracles/oracle-cascade-isto.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "critique-application-connectee-injouable",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "La critique d'implémentation et le rendu réel ne savent juger qu'une page ouverte sans connexion : une application servie derrière une connexion n'est jugée que sur son écran de connexion, et ses matrices d'états sont injouables.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1674"
+   ],
+   "regle": "forge-agents, render_page.py --etat-session et --theme ; forge-design, oracle-exploitabilite.mjs --etat-connexion et --theme dark, détection de uv dans oracles/lib/rendu.mjs",
+   "oracle": "digit-ai-forge-agents, digit-ai-page-html/scripts/self_test.py (banc run_session_et_theme, 9 cas) ; digit-ai-forge-design, oracles/self-test.mjs",
+   "voisines": [
+    "ecran-juge-sur-donnees-de-demonstration"
+   ]
+  },
+  {
+   "cle": "gabarit-de-skill-refuse-par-les-oracles-du-socle",
+   "famille": "page-html-socle",
+   "libelle": "Un gabarit fourni par un skill produit, une fois instancié, une page que les oracles du socle refusent : le produit paie en cycles de correction un défaut qui vient du gabarit (6 cycles mesurés, 62 bloquants).",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1660"
+   ],
+   "regle": "forge-agents, digit-ai-schemas/assets/template-multi-bandes.html : chevauchements déclarés, bride de lecture déclarée, références de conventions-communes.md corrigées",
+   "oracle": "digit-ai-forge-agents, digit-ai-page-html/scripts/self_test.py (run_gabarit_multi_bandes : instance jugée par check_html.py et render_page.py aux 6 largeurs, sens rouge compris)",
+   "voisines": [
+    "ecart-sans-remede-par-ligne"
+   ]
+  },
+  {
+   "cle": "ecart-sans-remede-par-ligne",
+   "famille": "page-html-socle",
+   "libelle": "Un tableau d'écarts dont aucune ligne en statut défavorable ne dit quoi faire passe tous les oracles : le lecteur voit 21 écarts sur 26 lignes et aucune action.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1664"
+   ],
+   "regle": "forge-agents, check_html.py règle L37 (avertissement) : une ligne défavorable porte une colonne d'action renseignée ou un lien vers l'action",
+   "oracle": "digit-ai-forge-agents, check_html.py L37, fixtures l37-ecart-sans-remede (rouge), l37-ecart-avec-remede et l37-ecart-lien-vers-action (vertes), self_test.py",
+   "voisines": [
+    "enumeration-en-prose-sous-le-seuil"
+   ]
+  },
+  {
+   "cle": "enumeration-en-prose-sous-le-seuil",
+   "famille": "page-html-socle",
+   "libelle": "Une cellule de tableau énumère plusieurs faits en prose, séparés par des points-virgules, sous le seuil de la règle des énumérations : elle passe, et le lecteur la déchiffre.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1665"
+   ],
+   "regle": "forge-agents, check_html.py règle L12, branche cellule (avertissement)",
+   "oracle": "digit-ai-forge-agents, check_html.py L12, fixtures l12-cellule-points-virgules (rouge) et l12-cellule-en-puces (verte), self_test.py",
+   "voisines": [
+    "ecart-sans-remede-par-ligne"
+   ]
+  },
+  {
+   "cle": "recommandation-contre-une-decision-mesuree-non-lue",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une recommandation de changer une valeur chiffrée d'un produit est écrite d'après une métrique, sans lire la décision mesurée qui avait fixé cette valeur : le livrable propose de défaire un choix qu'il ne connaît pas.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1645"
+   ],
+   "regle": "gabarits/DIAGNOSTIC-EXPLOITATION.md, gabarit de la fiche constat et préconisations, references/RUN-CONSEIL.md : une recommandation qui change une valeur chiffrée cite [décision : <où>] ou [décision : aucune — cherché <où>]",
+   "oracle": "pilot, oracles/oracle-livrable-conseil.mjs (LC6) et oracles/oracle-fiche-constat-precos.mjs (CP7), détection commune oracles/lib-decision-lue.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "ecran-juge-sur-donnees-de-demonstration",
+   "famille": "affordance-ui",
+   "libelle": "Un écran passe toutes les revues graphiques sur des données de démonstration et devient inexploitable à la première alimentation réelle : pages de plusieurs milliers de pixels, colonnes déséquilibrées, valeurs machine affichées brutes.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1654"
+   ],
+   "regle": "references/ETAPES-RUN.md étape 5 bis et ETAPE-MEP.md § 3 bis point 7 : revue et contrôle d'exploitabilité rejoués sur une instance alimentée au volume réel, écran jugé sur la seule démonstration déclaré",
+   "oracle": "digit-ai-forge-design, oracles/oracle-exploitabilite.mjs (X0 à X5), fixtures exploitabilite-verte et exploitabilite-rouge, oracles/self-test.mjs",
+   "voisines": [
+    "critique-application-connectee-injouable"
+   ]
+  },
+  {
+   "cle": "ouverture-session-hors-delai-client",
+   "famille": "hook-ou-gate",
+   "libelle": "L'initialisation d'une session attend des hooks SessionStart synchrones de durée non bornée, au-delà du délai du client : l'extension abandonne à 60 s avec un message sans rapport avec la cause, et la session est perdue.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1635"
+   ],
+   "regle": "hooks SessionStart lents en async ; délai d'initialisation mesuré par une sonde rejouable, seuil 30 s contre 60 s pour le client ; geste fait avant la fin du relevé déclaré",
+   "oracle": "pilot, scripts/verifier-ouverture-cli.mjs et sa recette scripts/verifier-ouverture-cli.test.mjs (cas rouge par sommeil injecté) ; oracles/lib-gestes-avant-releve.mjs",
+   "voisines": [
+    "contexte-de-hook-tronque-en-silence"
+   ]
+  },
+  {
+   "cle": "contexte-de-hook-tronque-en-silence",
+   "famille": "hook-ou-gate",
+   "libelle": "La sortie d'un hook au-delà d'un plafond du harnais est remplacée par un aperçu : les sections de fin, dont les gates de session, n'atteignent jamais l'assistant, et rien ne le dit.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1636"
+   ],
+   "regle": "plafond mesuré et daté, budget du contexte, sections omises nommées, gates en tête du relevé",
+   "oracle": "pilot, oracles/lib-budget-contexte.mjs et oracles/hook-ouverture.test.mjs (relevé de 90 000 caractères borné, gates gardés)",
+   "voisines": [
+    "ouverture-session-hors-delai-client"
+   ]
+  },
+  {
+   "cle": "analyse-de-depot-sur-copie-perimee",
+   "famille": "donnees-perissables-en-dur",
+   "libelle": "Une analyse lit un dépôt sur une copie locale en retard sur son distant et recommande un correctif déjà livré : 290 commits de retard mesurés le 12/10, un correctif livré depuis 13 jours.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1642"
+   ],
+   "regle": "gabarits/DIAGNOSTIC-EXPLOITATION.md §2 : citer la référence lue, prouver une absence sur toute la référence, relire git log autour d'une date ; retard mesuré à l'ouverture d'un produit",
+   "oracle": "pilot, scripts/fraicheur-depot.mjs et sa recette (retard d'un commit : exit 1), cas TF-1642 de oracles/hook-ouverture.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "regeneration-ecrase-contenu-redige",
+   "famille": "readme-role",
+   "libelle": "Un générateur d'index réécrit des fichiers rédigés à la main, ou écrit dans un dossier gelé, faute de vérifier la marque du fichier suivi et le statut du dossier : 41 README réécrits chez un produit le 13/10.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1667"
+   ],
+   "regle": "scripts/readme-dossiers.mjs : un README sans marque « Généré par » est préservé et annoncé ; dossiers de fixtures fermés ; dossier déclaré gelé fermé",
+   "oracle": "pilot, scripts/readme-dossiers.test.mjs (cas TF-1667, 4 rouges sur la version d'avant)",
+   "voisines": []
+  },
+  {
+   "cle": "adoption-ecrit-dans-un-depot-tiers",
+   "famille": "emplacement-livrable",
+   "libelle": "La voie d'adoption d'un projet existant suppose que la session possède le dépôt et y pose le socle : 25 écritures annoncées le 13/10 dans le dépôt d'un client.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1658"
+   ],
+   "regle": "scripts/adopter-projet-existant.mjs --hors-depot : socle posé à côté, dépôt du tiers relevé et vérifié intact à chaque ouverture ; ACCUEIL.md, question fermée à l'étape 1",
+   "oracle": "pilot, scripts/adopter-projet-existant.test.mjs (verifierDepotTiers : intact puis FAIL après écriture, socle interne refusé)",
+   "voisines": [
+    "surface-web-posee-hors-racine-servie"
+   ]
+  },
+  {
+   "cle": "surface-web-posee-hors-racine-servie",
+   "famille": "heritage-produit",
+   "libelle": "robots.txt et llms.txt sont posés à la racine d'un dépôt multi-projets, hors de la racine web servie : le contrôle de présence est vert et la surface n'est jamais servie.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1659"
+   ],
+   "regle": "scripts/adopter-projet-existant.mjs, racinesServies() : racine_web déclarée, sinon public/wwwroot/static/site ; ambiguïté consignée, rien posé",
+   "oracle": "pilot, scripts/adopter-projet-existant.test.mjs (3 cas TF-1659 : multi-projets, ambiguïté, sens inverse)",
+   "voisines": [
+    "adoption-ecrit-dans-un-depot-tiers"
+   ]
+  },
+  {
+   "cle": "explication-rendue-en-forme-longue",
+   "famille": "restitution-forme",
+   "libelle": "Une explication demandée par le porteur est rendue dans la forme longue de la restitution, et il doit la reconstituer à travers neuf blocs.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1641"
+   ],
+   "regle": "references/ECRITURE.md E-16 : l'explication se livre dans une fiche datée d'une page, que la restitution cite",
+   "oracle": "pilot, oracles/hook-restitution.mjs contrôle EXPLICATION (avertissant), cas 48 de oracles/hook-restitution.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "remontee-declaree-nulle-apres-correction",
+   "famille": "hook-ou-gate",
+   "libelle": "Un produit déclare « rien à remonter » dans le tour même où il corrige une erreur de la session, et la règle qui devait le voir n'était jugée par personne au hook.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1643",
+    "TF-1644"
+   ],
+   "regle": "gabarits/RESTITUTION.md 2.37.0, S48 : jugée au hook avec le dossier du tour, bloquante chez un produit ; « rien à remonter » refusé après une correction",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S48 (--racine), cas 45 de oracles/hook-restitution.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "restitution-jugee-apres-affichage",
+   "famille": "restitution-forme",
+   "libelle": "Le message final est jugé après son affichage : chaque refus du hook laisse la version rejetée à l'écran et la réécriture dessous, lue comme un doublon.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1647",
+    "TF-1666"
+   ],
+   "regle": "gabarits/RESTITUTION.md § « Préjuger, puis afficher » : écrire, préjuger, n'afficher que la version exit 0",
+   "oracle": "pilot, oracles/hook-restitution.mjs --prejuger et champ `prejuge` du journal, cas 46 de oracles/hook-restitution.test.mjs",
+   "voisines": [
+    "tour-clos-sur-une-attente"
+   ]
+  },
+  {
+   "cle": "tour-clos-sur-une-attente",
+   "famille": "hook-ou-gate",
+   "libelle": "Un message d'attente clôt le tour pendant qu'une commande tourne en arrière-plan, et le hook le refuse comme une restitution incomplète.",
+   "creee_le": "2026-10-14",
+   "fondee_par": [
+    "TF-1649"
+   ],
+   "regle": "gabarits/RESTITUTION.md § Portée, septième exemption : un message d'attente court n'est pas jugé tant qu'une tâche du tour n'est pas revenue",
+   "oracle": "pilot, oracles/hook-restitution.mjs tachesEnAttente(), cas 47 de oracles/hook-restitution.test.mjs",
+   "voisines": [
+    "restitution-jugee-apres-affichage"
+   ]
+  },
+  {
+   "cle": "adoption-sans-ouverture-de-run",
+   "famille": "heritage-produit",
+   "libelle": "L'adoption pose l'héritage mais aucun geste outillé ne pose le socle d'ouverture de run",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1697"
+   ],
+   "regle": "scripts/ouvrir-run.mjs, cité comme geste suivant par adopter-projet-existant et la bannière de installer-projet",
+   "oracle": "pilot, scripts/ouvrir-run.test.mjs (10 cas)",
+   "voisines": [
+    "type-de-projet-binaire-a-l-adoption"
+   ]
+  },
+  {
+   "cle": "type-de-projet-binaire-a-l-adoption",
+   "famille": "heritage-produit",
+   "libelle": "L'adoption ne distingue que documentaire et site web, et un service sans site public reçoit les artefacts d'un site",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1699"
+   ],
+   "regle": "REGLES-PROJET.md R-27 : type_projet service au carnet d'écarts, robots.txt et llms.txt écartés",
+   "oracle": "pilot, oracles/oracle-conformite-projet.mjs R-27 et R-13 (surfaceWebEcarteePar), recette scripts/adopter-projet-existant.test.mjs",
+   "voisines": [
+    "adoption-sans-ouverture-de-run"
+   ]
+  },
+  {
+   "cle": "artefact-d-oracle-hors-gitignore-socle",
+   "famille": "heritage-produit",
+   "libelle": "Un outil de la forge écrit un artefact d'atelier dans l'arbre d'un produit, et le gitignore socle hérité ne le couvre pas",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1703"
+   ],
+   "regle": "gabarits/gitignore-produit et gabarits/HERITAGE.json 1.20.0 (motifs_exiges)",
+   "oracle": "pilot, scripts/relever-heritage.mjs (presence_et_motifs) et scripts/gitignore-captures.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "garde-fou-plateforme-decouvert-au-deploiement",
+   "famille": "heritage-produit",
+   "libelle": "Une contrainte de plateforme connue d'aucun registre se découvre par essais au premier déploiement d'un produit",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1706",
+    "TF-1707"
+   ],
+   "regle": "references/GARDE-FOUS-PLATEFORME.json (client « tous » pour une contrainte de la plateforme elle-même), ETAPE-MEP § 1 ter",
+   "oracle": "pilot, scripts/verifier-garde-fous.mjs --registre (GR-1 à GR-3) et section GFP-LOT de gabarits/oracle-lot-retours.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "declaration-de-run-sans-rectification",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un champ déclaratif du run_open ne dispose d'aucune rectification par ajout",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1715"
+   ],
+   "regle": "CONTRAT-INTERFACE.md § 3 : entrée de ledger rectification_forges_mobilisees",
+   "oracle": "pilot, oracles/oracle-enclenchement.mjs EN1 (source de la liste), recette oracles/oracle-enclenchement.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "amelioration-jugee-sans-ses-effets",
+   "famille": "regle-morte",
+   "libelle": "Une version améliorée est jugée sur son échantillon sans contrôle de ses changements dans la population ni de son effet sur l'existant",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1695"
+   ],
+   "regle": "REGLES-PROJET.md R-63 point 2 (méthode en huit étapes)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S74",
+   "voisines": []
+  },
+  {
+   "cle": "restitution-sans-acces-au-service-livre",
+   "famille": "restitution-forme",
+   "libelle": "Une restitution annonce un service déployé ou une page publiée sans en donner l'adresse et le geste d'accès là où le lecteur lit d'abord",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1708"
+   ],
+   "regle": "REGLES-PROJET.md R-61 point 4, gabarits/RESTITUTION.md 2.38.0 bloc 2",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S70",
+   "voisines": []
+  },
+  {
+   "cle": "verdict-de-livraison-sur-critere-de-brief-sans-usage-reel",
+   "famille": "restitution-forme",
+   "libelle": "Un verdict déclare livré ce qui tient le critère d'un brief, sans dire ce qu'un utilisateur peut en faire à l'instant",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1709"
+   ],
+   "regle": "REGLES-PROJET.md R-61 point 3, gabarits/RESTITUTION.md 2.38.0 bloc 2",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S71",
+   "voisines": []
+  },
+  {
+   "cle": "exigence-constatee-sur-l-existant-sans-essai-dans-le-produit",
+   "famille": "gabarit-document",
+   "libelle": "Une exigence est déclarée constatée parce que la fonction existe dans la base, sans essai dans le produit livré",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1710"
+   ],
+   "regle": "gabarits/documents/fiche-produit/GABARIT.md 1.1.0, vocabulaires fermés (statut « présent dans la base »)",
+   "oracle": "pilot, oracles/oracle-fiche-produit.mjs FP4 et FP5",
+   "voisines": []
+  },
+  {
+   "cle": "livraison-partielle-presentee-comme-produit",
+   "famille": "restitution-forme",
+   "libelle": "Un produit est restitué comme livré alors que des exigences de sa fiche ne sont ni implémentées ni testées, au-delà des seuls secrets à saisir",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1711"
+   ],
+   "regle": "REGLES-PROJET.md R-61 (définition de livré), references/ETAPES-RUN.md contrat prêt client",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S72",
+   "voisines": []
   }
  ],
  "cliquet_porteur": {

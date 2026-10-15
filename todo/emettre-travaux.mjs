@@ -290,11 +290,17 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
 - **Si ce n'est pas fait** : l'ancien fichier reste lisible et citable à côté de la version à jour, et rien ne distingue les deux pour qui tombe dessus.
 `;
 
+  // TF-1735 (15/10/2026) — UN MOTIF EXIGÉ N'EST PAS UN MOT À COLLER. Pour un CLAUDE.md, « ajouter
+  // le motif » lu à la lettre ferait coller `init-audit-workspace` en fin de fichier, la route fautive
+  // restant en place au-dessus. Le geste attendu se dit donc en toutes lettres, motif par motif.
+  const gesteMotif = {
+    "init-audit-workspace": "dans le tableau « Routage forge », REMPLACER la ligne « Auditer la gouvernance, mesurer la maturité POC-to-Prod » (ou l'ajouter si elle manque) par la ligne « **Auditer le produit** » du gabarit, et dans la section Commandes, REMPLACER la ligne « Audit complet (verdict) : voir Routage forge » par les 2 lignes du gabarit (audit complet → forge-audit ; campagne de tests → forge_tests). Décision humaine D-1 (a) du 15/10/2026 (TF-1735) : « audit complet » ouvre forge-audit, la demande vaut mandat",
+  };
   const blocIncomplet = (a, jour) => `### TF-0649 — artefact d'héritage INCOMPLET : \`${a.cible}\` · gravité majeur
 
 - **Le fait**, mesuré le ${jour.slice(6, 8)}/${jour.slice(4, 6)}/${jour.slice(0, 4)} : \`${a.cible}\` existe dans votre dépôt mais ne porte pas ${(a.motifs_absents || []).map((m) => `« \`${m}\` »`).join(", ")}. Contrat : \`gabarits\\HERITAGE.json\`, mode \`${a.mode}\`.
 - **Pourquoi cela vous concerne** : ${glose[a.cible] || "artefact du contrat d'héritage"} ; ce fichier vous est propre, seuls ces motifs sont exigés.
-- **Ce qui est demandé** : AJOUTER ${(a.motifs_absents || []).length > 1 ? "ces motifs" : "ce motif"} à \`${a.cible}\`, sans recopier le fichier ni toucher au reste${a.source ? ` — la forme attendue est dans \`${a.source}\` du pilot (\`c:\\dev\\digit-ai-factory\\\`)` : ""}.
+- **Ce qui est demandé** : AJOUTER ${(a.motifs_absents || []).length > 1 ? "ces motifs" : "ce motif"} à \`${a.cible}\`, sans recopier le fichier${(a.motifs_absents || []).some((m) => gesteMotif[m]) ? "" : " ni toucher au reste"}${a.source ? ` — la forme attendue est dans \`${a.source}\` du pilot (\`c:\\dev\\digit-ai-factory\\\`)` : ""}.${(a.motifs_absents || []).filter((m) => gesteMotif[m]).map((m) => ` Pour « \`${m}\` » : ${gesteMotif[m]}.`).join("")}
 - **Effort estimé** : simple × court
 - **Comment vous saurez que c'est fait** : \`node c:\\dev\\digit-ai-factory\\scripts\\relever-heritage.mjs\` ne compte plus cet artefact « incomplet » pour votre projet.
 - **Si ce n'est pas fait** : l'automatisme que ce motif câble ne s'exécute pas chez vous, et le contrôle de conformité du pilot le rend à chaque lot que vous remettez.
@@ -553,7 +559,17 @@ if (lanceEnDirect) {
     //
     // L'inclusion se lit sur les ÉLÉMENTS, jamais sur le texte : deux formulations d'un même
     // constat sont le même travail pour le produit.
-    const elementsDe = (txt) => new Set([...txt.matchAll(/^### (.+?)\s*$/gm)].map((m) => m[1].trim()));
+    // TF-1735 (15/10/2026) — UN INCOMPLET SE DÉFINIT PAR SES MOTIFS ABSENTS, pas par son titre. La
+    // clé par titre seul a tenu pour « déjà confié » le motif `init-audit-workspace` chez 4 produits
+    // dont le CLAUDE.md était déjà incomplet d'un AUTRE motif : leur lot en attente ne demandait que
+    // la précédence, et la route d'audit ne leur parvenait jamais. Les motifs nommés entrent donc
+    // dans la clé ; la formulation, elle, n'y entre toujours pas.
+    const elementsDe = (txt) => new Set(txt.split(/^(?=### )/m).filter((s) => s.startsWith("### ")).map((s) => {
+      const titre = s.slice(4).split(/\r?\n/)[0].trim();
+      if (!/INCOMPLET/.test(titre)) return titre;
+      const fait = (s.match(/^- \*\*Le fait\*\*.*$/m) || [""])[0];
+      return `${titre}|${[...fait.matchAll(/« `([^`]+)` »/g)].map((m) => m[1]).sort().join(",")}`;
+    }));
     const estATraiter = (txt) => /^-\s+\*\*Statut\*\*\s*:\s*a_traiter\s*$/m.test(txt);
     const mien = elementsDe(lot.md);
     const englobant = correction ? null : lotsPresents.find((l) => {

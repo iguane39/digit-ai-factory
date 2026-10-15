@@ -58,7 +58,7 @@ for (const a of CONTRAT47.artefacts) {
     .replaceAll("<produit>", "Produit-test").replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-15"));
 }
 writeFileSync(join(verte, "CLAUDE.md"),
-  "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
+  "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\nauditer le produit : forge-audit, init-audit-workspace\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
 writeFileSync(join(verte, ".env.example"), "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE= # à fournir :\n");
 writeFileSync(join(verte, ".env"), "PORT=8000\n");
@@ -93,10 +93,13 @@ writeFileSync(join(verte, "CLAUDE.md"), readFileSync(join(verte, "CLAUDE.md"), "
 mkdirSync(join(verte, ".claude"), { recursive: true });
 // TF-1592 (HERITAGE 1.16.1) : le câblage PreToolUse sur Artifact est exigé par R-47 ; la verte le porte.
 // TF-1635 (HERITAGE 1.19.0) : le hook d'ouverture asynchrone aussi.
+// TF-1716 (HERITAGE 1.22.0, 15/10/2026) : la garde d'identité sortante aussi — la verte ne la portait
+// pas, et 9 cas de cette recette étaient rouges à HEAD depuis l'entrée de l'exigence.
 writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true }] }],
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
-    PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] }] } }) + "\n");
+    PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
+      { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
@@ -173,6 +176,21 @@ check("verte : projet conforme → PASS exit 0", () => {
   if (exit !== 0) throw new Error(`exit ${exit}, findings FAIL : ${JSON.stringify(rapport.findings.filter((f) => f.statut === "FAIL"))}`);
   if (rapport.verdict !== "PASS") throw new Error("verdict != PASS");
   if (!rapport.non_juge.length) throw new Error("non_juge vide — un oracle sans limites déclarées ne juge rien");
+});
+
+// TF-1735 (D-1 (a) du 15/10/2026) — rouge : le CLAUDE.md d'avant la correction, qui ne connaît que
+// forge_tests comme route de verdict, est refusé par R-11 et par R-47, chacun nommant la route d'audit.
+check("TF-1735 rouge — CLAUDE.md sans route d'audit du produit : R-11 et R-47 FAIL qui nomment forge-audit", () => {
+  const f = join(verte, "CLAUDE.md");
+  const avant = readFileSync(f, "utf8");
+  try {
+    writeFileSync(f, avant.replace(/auditer le produit[^\n]*\n/, ""));
+    const { exit, rapport } = lance(verte);
+    const r11 = rapport.findings.filter((x) => x.regle === "R-11" && x.statut === "FAIL");
+    const r47 = rapport.findings.filter((x) => x.regle === "R-47" && x.statut === "FAIL");
+    if (exit !== 1 || !r11.some((x) => /forge-audit/.test(x.message))) throw new Error(`exit ${exit}, R-11 : ${JSON.stringify(r11)}`);
+    if (!r47.some((x) => /init-audit-workspace|CLAUDE\.md/.test(x.message))) throw new Error(`R-47 muette : ${JSON.stringify(r47)}`);
+  } finally { writeFileSync(f, avant); }
 });
 
 // TF-1592 (HERITAGE 1.16.1) — rouge : un settings câblé pour la factory mais SANS le PreToolUse sur
@@ -394,6 +412,48 @@ check("TF-1119 BORNE — un carnet hérité instancié, sans second carnet, ne d
   const { rapport } = lance(verte);
   const f = rapport.findings.filter((x) => x.ou === "forge/travaux/ECARTS-ASSUMES.md");
   if (f.some((x) => x.statut === "FAIL" || /AVERTISSEMENT/.test(x.message))) throw new Error(`faux positif : ${JSON.stringify(f)}`);
+});
+
+// TF-1698 (15/10/2026) — UN FICHIER HÉRITÉ SANS `verifie_le` SE DATE PAR SA NAISSANCE. Le gabarit
+// CLAUDE-PRODUIT.md ne porte pas de `verifie_le` : un CLAUDE.md posé le 14/10 au gabarit brut était
+// rangé en antériorité (« non daté ») et ne serait jamais jugé. Sa date est désormais son premier
+// commit, sinon la date d'adoption consignée au carnet d'écarts. Trois sens : posé après la règle
+// (commit ou adoption) → FAIL ; commis avant la règle → antériorité déclarée, jamais un FAIL.
+const projet1698 = ({ commitLe = null, adopteLe = null } = {}) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1698-"));
+  mkdirSync(join(d, "forge", "travaux"), { recursive: true });
+  writeFileSync(join(d, "CLAUDE.md"), readFileSync(join(GAB47, "CLAUDE-PRODUIT.md"), "utf8"), "utf8");
+  if (adopteLe) writeFileSync(join(d, "forge", "travaux", "ECARTS-ASSUMES.md"), `# Écarts\n\n## Écart initial à l'adoption du dispositif — ${adopteLe}\n\nrien\n`, "utf8");
+  if (commitLe) {
+    sh("git", ["init", "-q"], d);
+    execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "add", "CLAUDE.md"], { cwd: d });
+    execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", "commit", "-q", "-m", "socle"],
+      { cwd: d, env: { ...process.env, GIT_AUTHOR_DATE: `${commitLe}T10:00:00`, GIT_COMMITTER_DATE: `${commitLe}T10:00:00` } });
+  }
+  return d;
+};
+const claude1698 = (d) => { const r = lance(d).rapport; return { f: (r.findings || []).filter((x) => x.ou === "CLAUDE.md" && x.statut === "FAIL"), nj: r.non_juge || [] }; };
+check("TF-1698 rouge — un CLAUDE.md au gabarit brut, COMMIS le 14/10/2026 sans verifie_le : marqueurs FAIL, datés par le premier commit", () => {
+  const d = projet1698({ commitLe: "2026-10-14" });
+  try {
+    const { f, nj } = claude1698(d);
+    if (!f.some((x) => /<commande>/.test(x.message) && /premier commit/.test(x.message))) throw new Error(`antériorité accordée à un fichier né après la règle : ${JSON.stringify(f)} / ${nj.filter((l) => /CLAUDE/.test(l)).join(" | ")}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1698 rouge — le même CLAUDE.md, NON commis, adopté le 14/10/2026 : daté par l'adoption consignée au carnet → FAIL", () => {
+  const d = projet1698({ adopteLe: "2026-10-14" });
+  try {
+    const { f } = claude1698(d);
+    if (!f.some((x) => /<commande>/.test(x.message) && /adoption/.test(x.message))) throw new Error(`la date d'adoption n'est pas lue : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1698 vert — le même CLAUDE.md commis le 01/09/2026, avant la règle : antériorité déclarée datée, jamais un FAIL", () => {
+  const d = projet1698({ commitLe: "2026-09-01", adopteLe: "2026-10-14" });
+  try {
+    const { f, nj } = claude1698(d);
+    if (f.length) throw new Error(`défaut rétroactif : ${JSON.stringify(f)}`);
+    if (!nj.some((l) => /R-20 ter \(fichier hérité\) non jugé sur CLAUDE\.md/.test(l) && /2026-09-01/.test(l))) throw new Error(`l'antériorité n'est pas déclarée avec sa date : ${nj.join(" | ")}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
 // TF-1113, TF-1117, TF-1120 — L'INVENTAIRE DIT L'USAGE (R-20 étendu, étude 20260915a option O1).
@@ -2162,6 +2222,55 @@ check("TF-1372 non bloquant : un livrable sans revue ne fait pas échouer le ver
     if ((r.findings || []).some((x) => x.regle === "R-32 quater" && x.statut === "FAIL")) throw new Error("R-32 quater bloque alors qu'elle est en avertissement");
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
+// TF-1714 (lot Produit-83 20261014a, RT-3) — LE REMÈDE DE R-32 QUATER NE SE FAIT PAS REFUSER PAR R-4.
+// Le 14/10/2026, un produit a posé `output\REVUE.md` à côté de sa fiche, comme R-32 quater le
+// prescrit ; R-4 l'a refusé (« livrable sans nommage »), et la revue a fui sous `forge\oracles\`,
+// où R-32 quater ne la voit plus. Le remède est joué ici (TF-1013) : la revue écrite là où R-32
+// quater la demande doit passer R-4 ET éteindre l'avertissement de R-32 quater, dans le même run.
+check("TF-1714 remède joué : REVUE.md à côté du livrable HTML passe R-4 et éteint l'avertissement R-32 quater", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html",
+    { ecrireRevue: "# Revue de lecture — Produit - Rapport d audit - 20260920a — 2026-09-20 10:00\n\nCaptures lues : 1920 · 1280 · 768 · 390, aucun constat.\n" });
+  try {
+    const r = lanceArgs(d, "--regles", "R-4,R-32 quater").rapport;
+    const r4ko = (r.findings || []).filter((x) => x.regle === "R-4" && x.statut === "FAIL");
+    if (r4ko.length) throw new Error(`R-4 refuse la revue que R-32 quater prescrit : ${JSON.stringify(r4ko)}`);
+    const f = (r.findings || []).find((x) => x.regle === "R-32 quater");
+    if (!f || f.statut !== "PASS" || /AVERTISSEMENT/.test(f.message)) throw new Error(`la revue posée n'éteint pas R-32 quater : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1714 borne : un autre .md sans nommage daté reste refusé par R-4 (l'exemption nomme REVUE.md, rien d'autre)", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html", { ecrireRevue: "# Revue\n\naucun constat.\n" });
+  try {
+    writeFileSync(join(d, "output", "NOTES.md"), "# notes\n", "utf8");
+    const r = lanceArgs(d, "--regles", "R-4").rapport;
+    if (!(r.findings || []).some((x) => x.regle === "R-4" && x.statut === "FAIL" && /NOTES\.md/.test(x.ou))) throw new Error("un .md non nommé n'est plus refusé : l'exemption a débordé");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// TF-1713 (lot Produit-83 20261014a, RT-2) — R-25 NE REFUSE PLUS UN NOM QUE LE CATALOGUE DU PILOT PRESCRIT.
+// Le 14/10/2026, une fiche produit nommée au gabarit gd-fiche-produit (« … - Fiche produit … - »)
+// a rendu R-25 FAIL : « Fiche » n'est pas au registre d'organization, alors que le catalogue des
+// familles du pilot déclare « fiche produit » parmi ses types de nom. Deux règles du socle ne
+// pouvaient pas être tenues ensemble. Le nom que le catalogue déclare passe, en AVERTISSEMENT qui
+// nomme la famille et la dette du registre ; un mot de tête seul ne suffit pas (« Charte bidon »).
+// Le 15/10/2026, « Fiche » est entré au registre (registre-types 1.6.0) : l'exemple joué est désormais
+// « Charte partenariat » (famille charte-partenariat), dont le mot de tête manque encore au registre.
+const r25De = (d) => (lanceArgs(d, "--regles", "R-25").rapport.findings || []).filter((x) => x.regle === "R-25");
+check("TF-1713 remède joué : un livrable nommé au type de nom d'une famille du catalogue (« Charte partenariat ») passe R-25, avertissement nommant la famille", () => {
+  const d = projetOutput("Digit-AI - Charte partenariat Produit Exemple - Prospection - 20261014a.html");
+  try {
+    const f = r25De(d);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error(`R-25 refuse le nom que le gabarit gd-charte-partenariat prescrit : ${JSON.stringify(f)}`);
+    const avert = f.find((x) => /AVERTISSEMENT/.test(x.message));
+    if (!avert || !/gd-charte-partenariat/.test(avert.message) || !/registre/.test(avert.message)) throw new Error(`l'avertissement ne nomme ni la famille ni la dette du registre : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1713 borne : un mot de tête hors registre qui ne forme AUCUN type de nom du catalogue reste refusé (« Charte bidon »)", () => {
+  const d = projetOutput("Digit-AI - Charte bidon Produit Exemple - 20261014a.html");
+  try {
+    if (!r25De(d).some((x) => x.statut === "FAIL")) throw new Error("« Charte bidon » passe : l'admission par le catalogue a débordé sur le seul premier mot");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
 
 // ---- TF-0923 volet (b), 20/09 — R-35 : « un existant » se MESURE, jamais ne se déclare --------
 // TF-0906 (07/09) : TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est antérieur au
@@ -2357,6 +2466,36 @@ check("TF-1614 rouge : un llms.txt instancié par le projet redevient un signal 
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1699 (15/10/2026) — le type « service » : R-27 sans objet, R-13 jamais exemptée -----------
+// Le fait (lot Produit-82 20261014a, RT-4) : une passerelle d'API sans site a reçu robots.txt et
+// llms.txt. Vert : adopté `--type service` (vraie adoption), R-27 SANS_OBJET qui nomme la déclaration,
+// type reconnu (jamais « inconnu »), R-13 jugée comme partout. Rouge : un fichier de site entré après
+// la déclaration la contredit → R-27 FAIL qui nomme la déclaration et le fichier.
+const projetService = (fichiers) => {
+  const d = projet1439(fichiers);
+  const a = adopter1439(d, { type: "service" });
+  if (a.verdict !== "ADOPTE") throw new Error(`adoption service : ${a.verdict} — ${a.motif}`);
+  return d;
+};
+check("TF-1699 vert : un service adopté `--type service` → R-27 SANS_OBJET qui nomme la déclaration ; R-13 jugée (FAIL sans .env.example), jamais « type inconnu »", () => {
+  const d = projetService({ "src/server.py": "print(1)\n", "requirements.txt": "x==1\n" });
+  try {
+    const f = r1439(d);
+    const f27 = f.filter((x) => x.regle === "R-27"), f13 = f.filter((x) => x.regle === "R-13");
+    if (f27.some((x) => x.statut === "FAIL") || !f27.some((x) => x.statut === "SANS_OBJET" && /service/.test(x.message) && /ECARTS-ASSUMES/.test(x.message))) throw new Error(`R-27 : ${JSON.stringify(f27)}`);
+    if (f13.some((x) => /inconnu/.test(x.message))) throw new Error(`le type service est lu comme inconnu : ${JSON.stringify(f13)}`);
+    if (f13.some((x) => x.statut === "SANS_OBJET") || !f13.some((x) => x.statut === "FAIL" && /absent/.test(x.message))) throw new Error(`R-13 exemptée pour un service : ${JSON.stringify(f13)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1699 rouge : un service qui gagne un fichier de site (sitemap.xml) → R-27 FAIL qui nomme la déclaration et le signal", () => {
+  const d = projetService({ "src/server.py": "print(1)\n" });
+  try {
+    writeFileSync(join(d, "sitemap.xml"), "<urlset/>\n", "utf8");
+    const f27 = r1439(d).filter((x) => x.regle === "R-27");
+    if (!f27.some((x) => x.statut === "FAIL" && /déclaré « service »/.test(x.message) && /sitemap\.xml/.test(x.message))) throw new Error(`la déclaration contredite passe : ${JSON.stringify(f27)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- TF-1615 (13/10/2026) — R-20 ter lit les marqueurs du gabarit llms.txt (AVERTISSEMENT) -------
 // Le fait (RP-6) : le llms.txt posé par l'adoption garde `{Produit}`, `{Accueil}` sans qu'aucune règle
 // le dise. Règle neuve : avertissement non bloquant (PASS imprimé), jamais un FAIL (précédent D-70 (b)).
@@ -2464,6 +2603,49 @@ check("TF-1284 remède joué : `git rm -r --cached C` puis commit → R-14 et R-
     const f = r1284(d);
     if (f.some((x) => x.statut === "FAIL") || !f.some((x) => x.regle === "R-14" && x.statut === "PASS") || !f.some((x) => x.regle === "R-28" && x.statut === "PASS"))
       throw new Error(`le remède prescrit ne rend pas R-14 et R-28 vertes : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- R-60 (TF-1678, 14/10/2026) — la cascade d'un produit tient sa chaîne avant la clôture -------
+// Les fixtures sont des produits minimaux : un ledger au premier run_open daté, un référentiel
+// d'exigences, et la cascade (ou son absence). La cascade verte est celle du banc d'oracle-cascade-isto,
+// importée et non recopiée : un format qui change change les deux bancs à la fois.
+const { fixtureVerte: cascadeVerte } = await import("./oracle-cascade-isto.mjs");
+const projet60 = (tsRunOpen, cascade) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r60-"));
+  mkdirSync(join(d, "forge", "etapes", "conception", "cascade"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"), JSON.stringify({ type: "run_open", ts: tsRunOpen }) + "\n", "utf8");
+  writeFileSync(join(d, "forge", "etapes", "conception", "EXIGENCES.json"), JSON.stringify({ exigences: [{ id: "E-001" }, { id: "E-002" }] }), "utf8");
+  if (cascade) writeFileSync(join(d, "forge", "etapes", "conception", "cascade", "CASCADE.json"), JSON.stringify(cascade), "utf8");
+  return d;
+};
+const r60 = (d) => (lanceArgs(d, "--regles", "R-60").rapport.findings || []).find((x) => x.regle === "R-60");
+const attendu60 = (nom, d, statut, motif) => check(nom, () => {
+  try {
+    const f = r60(d);
+    if (!f || f.statut !== statut || (motif && !motif.test(f.message))) throw new Error(`attendu ${statut}, reçu ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+attendu60("R-60 vert : cascade au format commun, chaîne tenue, exigences rattachées → PASS", projet60("2026-10-15T09:00:00Z", cascadeVerte()), "PASS", /2 exigence/);
+{
+  const rompue = cascadeVerte(); rompue.tactiques[0].strategie = "STR-9";
+  attendu60("R-60 rouge : tactique sous une stratégie inconnue → FAIL nommant T2", projet60("2026-10-15T09:00:00Z", rompue), "FAIL", /T2/);
+}
+{
+  const orpheline = cascadeVerte(); orpheline.tactiques[0].exigences = ["E-001"];
+  attendu60("R-60 rouge : une exigence du référentiel rattachée à aucune tactique → FAIL nommant O1", projet60("2026-10-15T09:00:00Z", orpheline), "FAIL", /O1/);
+}
+attendu60("R-60 rouge : produit ouvert après l'entrée de la règle, exigences sans cascade → FAIL", projet60("2026-10-15T09:00:00Z", null), "FAIL", /sans cascade/);
+attendu60("R-60 antériorité : produit ouvert avant le 2026-10-14, sans cascade → SANS_OBJET nommé", projet60("2026-09-05T09:00:00Z", null), "SANS_OBJET", /avant l'entrée/);
+attendu60("R-60 antériorité : cascade au format du produit, ouverte avant le format commun → SANS_OBJET nommé", projet60("2026-09-05T09:00:00Z", { projet: "x", version: "1.1.0" }), "SANS_OBJET", /format du produit/);
+attendu60("R-60 rouge : cascade à un autre format chez un produit ouvert après l'entrée → FAIL nommant F1", projet60("2026-10-15T09:00:00Z", { projet: "x", version: "1.1.0" }), "FAIL", /F1/);
+check("R-60 remède joué : la cascade écrite au gabarit commun lève le refus d'un produit sans cascade (TF-1013)", () => {
+  const d = projet60("2026-10-15T09:00:00Z", null);
+  try {
+    if (r60(d)?.statut !== "FAIL") throw new Error("le cas de départ n'est pas rouge");
+    writeFileSync(join(d, "forge", "etapes", "conception", "cascade", "CASCADE.json"), JSON.stringify(cascadeVerte()), "utf8");
+    const f = r60(d);
+    if (f?.statut !== "PASS") throw new Error(`le remède prescrit ne rend pas R-60 verte : ${JSON.stringify(f)}`);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 

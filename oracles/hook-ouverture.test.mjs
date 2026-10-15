@@ -17,7 +17,7 @@
  * Le hook est joué avec `--sans-bootstrap` (aucun accès réseau) et `--sans-readme` sur un produit
  * temporaire ; rien n'est écrit dans le dépôt.
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir, hostname } from "node:os";
 import { join, dirname } from "node:path";
@@ -25,6 +25,14 @@ import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const hook = join(ICI, "hook-ouverture.mjs");
+// TF-0957 (bancs isolés) : le hook joué ici touche la chaîne de pseudonymisation (journal du relevé
+// d'héritage, consigne du générateur d'index nommée par TF-1652). Ses tables sont désignées sous un
+// dossier temporaire et VOLONTAIREMENT ABSENTES : jamais celles du canal du poste, et, référentiel
+// manquant, le hook ne journalise pas le relevé des produits jouets dans `todo/HERITAGE-RELEVES.jsonl`,
+// qui est suivi (il le dit : « relevé NON journalisé »). Des tables vides l'y faisaient écrire.
+const TABLES = mkdtempSync(join(tmpdir(), "hook-ouverture-tables-"));
+process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
 const PILOT = join(ICI, "..");
 
 const NL = String.fromCharCode(10);
@@ -136,8 +144,22 @@ check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans cla
   writeFileSync(join(sansCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { SessionStart: [{ hooks: [] }], Stop: [{ hooks: [] }] } }), "utf8");
   const avecCrochet = mkdtempSync(join(tmpdir(), "hook-readme-avec-"));
   mkdirSync(join(avecCrochet, ".claude"), { recursive: true });
-  writeFileSync(join(avecCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write", hooks: [] }] } }), "utf8");
-  const sortieSans = joue(sansCrochet), sortieAvec = joue(avecCrochet);
+  // TF-1667 (14/10/2026) : le crochet se reconnaît à sa COMMANDE. Le témoin vert déclare la régénération
+  // des README ; le témoin « autres crochets » porte ceux d'un produit réel (page-html, écriture), qui ne
+  // régénèrent rien — l'annonce les prenait pour le crochet des README.
+  writeFileSync(join(avecCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write", hooks: [{ type: "command", command: "node scripts/readme-dossiers.mjs --silencieux" }] }] } }), "utf8");
+  const autresCrochets = mkdtempSync(join(tmpdir(), "hook-readme-autres-"));
+  mkdirSync(join(autresCrochets, ".claude"), { recursive: true });
+  writeFileSync(join(autresCrochets, ".claude", "settings.json"), JSON.stringify({ hooks: { PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs page-html" }, { type: "command", command: "node forge/hooks/factory.mjs ecriture" }] }] } }), "utf8");
+  const sortieSans = joue(sansCrochet), sortieAvec = joue(avecCrochet), sortieAutres = joue(autresCrochets);
+  check("TF-1667 rouge → vert — un produit dont les PostToolUse ne régénèrent pas les README : l'annonce dit qu'ils ne se régénèrent PAS", () => {
+    if (!/ATTENTION, état MESURÉ.*ne déclare aucun crochet PostToolUse qui régénère les README/.test(sortieAutres)) throw new Error("l'annonce prend les crochets page-html et écriture pour celui des README");
+  });
+  check("TF-1652, TF-1667 — chez un produit, la consigne nomme le script du pilot, --base . et --racines borné", () => {
+    const attendu = `node "${join(PILOT, "scripts", "readme-dossiers.mjs")}" --base . --racines`;
+    if (!sortieAutres.includes(attendu)) throw new Error("la commande prescrite au produit n'est pas celle du pilot bornée au dossier écrit");
+    if (/`node scripts\\\\readme-dossiers\.mjs`/.test(sortieAutres)) throw new Error("la consigne prescrit encore un chemin qui n'existe pas chez un produit");
+  });
   check("TF-1301 borne — l'ouverture d'un PRODUIT ne publie pas le stock du registre du pilot", () => {
     if (/Items ouverts sans classe/.test(sortieSans)) throw new Error("le stock du pilot est publié chez un produit");
   });
@@ -246,6 +268,125 @@ check(`TF-1635 — tout hook SessionStart synchrone du pilot et du gabarit produ
   const rouge = horsBorne({ hooks: { SessionStart: [{ hooks: [{ command: "node oracles/hook-produits-intacts.mjs --empreinte", timeout: 120 }] }] } });
   if (rouge.length !== 1) throw new Error("sens rouge : un hook synchrone à 120 s n'est pas refusé");
 });
+
+// ---- TF-1636 (14/10/2026) : LES GATES EN TÊTE, ET UN BUDGET DE CONTEXTE MESURÉ ---------------
+// Le 13/10, le harnais a coupé le relevé à 2 Ko et les gates, en dernière section, n'ont pas atteint
+// l'assistant. Vert : dans le contexte réel du pilot, les gates précèdent toute section de taille
+// variable, et le contexte tient dans le budget mesuré. Rouge : un relevé gonflé au-delà du budget est
+// borné par le hook lui-même, les gates gardés, les sections retirées NOMMÉES.
+const { borner, BUDGET_CONTEXTE_ASYNC, PLAFONDS_MESURES } = await import(new URL("./lib-budget-contexte.mjs", import.meta.url));
+check(`TF-1636 vert — le contexte réel du pilot tient dans le budget (${BUDGET_CONTEXTE_ASYNC} car., plafond asynchrone prouvé ${PLAFONDS_MESURES.asynchrone_json.recu_entier_au_moins}) et les gates précèdent les sections variables`, () => {
+  const ctx = JSON.parse(sortieJson).hookSpecificOutput.additionalContext;
+  if (ctx.length > BUDGET_CONTEXTE_ASYNC) throw new Error(`${ctx.length} caractères, au-delà du budget`);
+  const titres = ctx.split(NL).filter((l) => /^## /.test(l));
+  const iGates = titres.findIndex((t) => /Gates actifs dans cette session/.test(t));
+  if (iGates < 0 || iGates > 2) throw new Error(`gates en position ${iGates} parmi ${titres.length} sections`);
+  console.log(`    (mesure : contexte du pilot sans tirage = ${ctx.length} caractères, ${titres.length} sections)`);
+});
+check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gates gardés, sections omises nommées, budget tenu", () => {
+  const tete = ["## Relevé d'ouverture", "", "## Gates actifs dans cette session (R-44)", "- règle de session", ""];
+  const corps = []; for (let i = 0; i < 30; i++) corps.push("", `## Section variable ${i}`, "x".repeat(3000));
+  const r = borner([...tete, ...corps], BUDGET_CONTEXTE_ASYNC, tete.length, "renvoi");
+  const t = r.lignes.join(NL);
+  if (!r.tronque) throw new Error("un relevé de 90 000 caractères n'est pas borné");
+  if (t.length > BUDGET_CONTEXTE_ASYNC) throw new Error(`borné à ${t.length}, au-delà du budget`);
+  if (!t.includes("## Gates actifs dans cette session (R-44)")) throw new Error("les gates ont été retirés");
+  if (!/Relevé TRONQUÉ par le hook lui-même/.test(t) || !/Section variable 29/.test(t.split("Relevé TRONQUÉ")[1])) throw new Error("les sections omises ne sont pas nommées");
+  if (borner(tete, BUDGET_CONTEXTE_ASYNC, 2).tronque) throw new Error("un relevé court est borné à tort");
+});
+
+// ---- TF-1635 (c) (14/10/2026) : UN GESTE FAIT AVANT LA FIN DU RELEVÉ SE DÉCLARE ---------------
+// Le relevé asynchrone peut arriver après le premier échange. Le hook relit la transcription de la
+// session (chemin reçu sur son entrée) et déclare en tête les appels d'outil faits depuis son propre
+// démarrage, avec une trace locale dans les métadonnées git du dépôt ouvert. Rouge : un appel ANTÉRIEUR
+// au démarrage du relevé (session reprise) n'est pas déclaré ; une session sans geste ne reçoit rien.
+{
+  const { gestesDansFenetre } = await import(new URL("./lib-gestes-avant-releve.mjs", import.meta.url));
+  const P = mkdtempSync(join(tmpdir(), "ouverture-gestes-"));
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const tr = join(P, "transcript.jsonl");
+  const entree = (ts, nom) => JSON.stringify({ type: "assistant", timestamp: new Date(ts).toISOString(), message: { content: [{ type: "tool_use", name: nom, input: {} }] } });
+  const t0 = Date.now();
+  writeFileSync(tr, [entree(t0 - 60000, "Read"), entree(t0 + 1200, "Bash")].join(NL) + NL, "utf8");
+  const sortie = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT, "--contexte-json"],
+    { cwd: P, encoding: "utf8", timeout: 120000, input: JSON.stringify({ session_id: "s-test", transcript_path: tr }) });
+  const duree = Date.now() - t0;
+  const ctx = JSON.parse(sortie).hookSpecificOutput.additionalContext;
+  check("TF-1635 (c) rouge → vert — un appel d'outil fait pendant le relevé est déclaré en tête, l'appel antérieur au relevé ne l'est pas", () => {
+    if (duree < 1300) throw new Error(`relevé rendu en ${duree} ms, avant l'horodatage du geste témoin : cas non probant`);
+    if (!/## Gestes faits AVANT la fin de ce relevé \(TF-1635\) : 1\b/.test(ctx)) throw new Error("le geste fait pendant le relevé n'est pas déclaré (ou l'appel antérieur est compté)");
+    if (!/\(Bash\)/.test(ctx)) throw new Error("l'outil du geste n'est pas nommé");
+    if (ctx.indexOf("Gestes faits AVANT") > ctx.indexOf("## Gates actifs")) throw new Error("la déclaration ne précède pas les gates");
+  });
+  check("TF-1635 (c) — la trace locale est écrite dans les métadonnées git du dépôt ouvert, rien de suivi", () => {
+    const f = join(P, ".git", "digit-ai-gestes-avant-releve.jsonl");
+    if (!existsSync(f) || !/"outil":"Bash"/.test(readFileSync(f, "utf8"))) throw new Error("trace locale absente");
+  });
+  check("TF-1635 (c) sens rouge — fenêtre sans geste : aucune déclaration ; transcription illisible : aucune erreur", () => {
+    if (gestesDansFenetre(readFileSync(tr, "utf8"), t0 + 5000, t0 + 9000).length) throw new Error("un geste hors fenêtre est compté");
+    if (gestesDansFenetre("pas du json\n{\"tool_use\":1}", 0, Date.now()).length) throw new Error("une ligne illisible produit un geste");
+    if (/Gestes faits AVANT/.test(JSON.parse(sortieJson).hookSpecificOutput.additionalContext)) throw new Error("un relevé sans transcription déclare des gestes");
+  });
+}
+
+// ---- TF-1658 (14/10/2026) : LE SOCLE D'UN DÉPÔT TIERS JUGE LE TIERS À CHAQUE OUVERTURE --------
+{
+  const T3 = mkdtempSync(join(tmpdir(), "ouverture-tiers-"));
+  const tiers = join(T3, "tiers"), socle = join(T3, "socle");
+  mkdirSync(tiers, { recursive: true }); mkdirSync(join(socle, "forge"), { recursive: true });
+  const g = (...a) => execFileSync("git", ["-C", tiers, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8" });
+  writeFileSync(join(tiers, "a.txt"), "x\n"); g("init", "-q"); g("add", "-A"); g("commit", "-q", "-m", "t");
+  writeFileSync(join(socle, "forge", "DEPOT-TIERS.json"), JSON.stringify({ chemin: tiers, git: true, commit: g("rev-parse", "HEAD").trim(), porcelain_initial: [], releve_le: "2026-10-14T00:00:00Z" }), "utf8");
+  const intact = joue(socle);
+  writeFileSync(join(tiers, "ecrit.md"), "x\n");
+  const ecrit = joue(socle);
+  check("TF-1658 rouge → vert — à l'ouverture du socle, le dépôt du tiers est dit intact, puis en DÉFAUT dès qu'on y a écrit", () => {
+    if (!/## Dépôt du tiers en lecture seule \(TF-1658\)\n- intact/.test(intact)) throw new Error("le tiers intact n'est pas dit");
+    if (!/\*\*DÉFAUT — écriture sous le dépôt du tiers.*ecrit\.md/.test(ecrit)) throw new Error("l'écriture sous le tiers n'est pas vue à l'ouverture");
+  });
+}
+
+// ---- TF-1642 (14/10/2026) : L'OUVERTURE D'UN PRODUIT MESURE SON PROPRE DÉPÔT CONTRE SON DISTANT --
+{
+  const T4 = mkdtempSync(join(tmpdir(), "ouverture-fraicheur-"));
+  const nu = join(T4, "d.git"), lue = join(T4, "produit"), autre = join(T4, "autre");
+  const gx = (d, ...a) => execFileSync("git", ["-C", d, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  execFileSync("git", ["init", "-q", "--bare", "--initial-branch=main", nu]);
+  execFileSync("git", ["clone", "-q", nu, lue], { stdio: "ignore" });
+  writeFileSync(join(lue, "a.txt"), "x\n"); gx(lue, "add", "-A"); gx(lue, "commit", "-q", "-m", "v0"); gx(lue, "push", "-q", "origin", "main");
+  execFileSync("git", ["clone", "-q", nu, autre], { stdio: "ignore" });
+  writeFileSync(join(autre, "b.txt"), "y\n"); gx(autre, "add", "-A"); gx(autre, "commit", "-q", "-m", "v1"); gx(autre, "push", "-q", "origin", "main");
+  const sortie = joue(lue);
+  check("TF-1642 rouge — un produit en retard sur son distant le lit à l'ouverture, avec l'écart et le geste", () => {
+    if (!/## Fraîcheur du dépôt de ce produit \(TF-1642\)\n- \*\*EN RETARD\*\* — .*1 commit\(s\) de retard/.test(sortie)) throw new Error("le retard du dépôt du produit n'est pas dit");
+    if (!/fraicheur-depot\.mjs" <dépôt>/.test(sortie)) throw new Error("la sonde pour tout autre dépôt lu n'est pas nommée");
+  });
+  gx(lue, "pull", "-q", "--ff-only");
+  check("TF-1642 vert — à jour après le tirage : aucune alerte", () => {
+    const s = joue(lue);
+    if (/\*\*EN RETARD\*\*/.test(s) || !/0 commit\(s\) de retard/.test(s)) throw new Error("alerte ou écart faux sur un dépôt à jour");
+  });
+}
+
+// ---- TF-1676 (14/10/2026) : LA RÈGLE DES NOMS ATTEINT CHAQUE PRODUIT, SELON LA VISIBILITÉ MESURÉE --
+{
+  const sansDistant = joue(mkdtempSync(join(tmpdir(), "ouverture-noms-")));
+  check("TF-1676 — sans visibilité mesurable, la règle du 01/10 est dite et la mesure demandée avant toute pseudonymisation", () => {
+    if (!/## Noms réels dans ce dépôt \(TF-1676\)\n- Visibilité NON mesurée/.test(sansDistant)) throw new Error("la règle des noms n'atteint pas le produit");
+    if (!/Les dépôts privés peuvent conserver des données de type nom/.test(sansDistant)) throw new Error("la règle humaine n'est pas citée");
+  });
+  const ghOk = spawnSync("gh", ["auth", "status"], { encoding: "utf8", timeout: 15000 }).status === 0;
+  if (!ghOk) console.log("[NON JOUÉ] 1 cas — TF-1676 visibilité mesurée : gh absent ou non authentifié sur ce poste");
+  else {
+    const P = mkdtempSync(join(tmpdir(), "ouverture-noms-public-"));
+    execFileSync("git", ["init", "-q"], { cwd: P });
+    execFileSync("git", ["remote", "add", "origin", "https://github.com/iguane39/digit-ai-factory.git"], { cwd: P });
+    const s = joue(P);
+    check("TF-1676 rouge — dépôt PUBLIC mesuré par gh : aucun nom réel n'y entre (la règle des dépôts privés ne s'y applique pas)", () => {
+      if (!/Dépôt PUBLIC \(mesuré par gh\)/.test(s)) throw new Error(`visibilité non mesurée ou fausse : ${(s.split("Noms réels")[1] || "").slice(0, 200)}`);
+    });
+  }
+}
 
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

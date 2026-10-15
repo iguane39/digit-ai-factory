@@ -56,6 +56,9 @@ build/
 *.oracles-cache.json
 *.oracles-historique.jsonl
 .oracles/
+# TF-1703 (15/10/2026) : le journal de run-oracles, écrit à la racine du dossier jugé
+# (`_oracles-journal.json`, `_oracles-journal-historique.jsonl`), mesuré dans `git status` d'un produit.
+_oracles-journal*.json*
 !forge/**
 
 # ---- Ce que la négation ne doit PAS rouvrir (TF-0713, 30/08) -----------------------------------

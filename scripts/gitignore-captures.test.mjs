@@ -56,7 +56,25 @@ check("vert — la règle ne mord pas trop large : un PNG livrable, un gabarit e
   ]) if (reel.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
 });
 
+// TF-1703 (15/10/2026) — LE GITIGNORE SOCLE D'UN PRODUIT COUVRE LES JOURNAUX DE run-oracles. Le
+// 14/10, `_oracles-journal.json` et `_oracles-journal-historique.jsonl`, écrits par run-oracles à
+// la racine d'un dossier jugé, sont apparus dans `git status` chez un produit. Jugé sur le VRAI
+// gabarit `gabarits/gitignore-produit`, dans les deux sens.
+const socle = depot(readFileSync(join(PILOT, "gabarits", "gitignore-produit"), "utf8"));
+check("rouge → vert — TF-1703 : le gitignore socle ignore les journaux de run-oracles hors de forge\\", () => {
+  for (const rel of ["_oracles-journal.json", "_oracles-journal-historique.jsonl", "Produit-X/_oracles-journal.json", "src/_oracles-journal-historique.jsonl"])
+    if (!socle.ignore(rel)) throw new Error(`${rel} n'est pas ignoré par gabarits/gitignore-produit`);
+});
+check("rouge — TF-1703 : sans la règle (gitignore vide), le même journal n'est PAS ignoré", () => {
+  if (vide.ignore("_oracles-journal.json")) throw new Error("la recette ne distingue pas avec et sans règle");
+});
+check("vert — TF-1703 : un journal rangé comme PREUVE sous forge\\ reste versionnable (C4)", () => {
+  for (const rel of ["forge/etapes/p2/_oracles-journal.json", "forge/oracles/_oracles-journal-historique.jsonl"])
+    if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
+});
+
 reel.fin();
 vide.fin();
-console.log(`\ngitignore-captures (TF-1273) : ${pass} PASS, ${fail} FAIL`);
+socle.fin();
+console.log(`\ngitignore-captures (TF-1273, TF-1703) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

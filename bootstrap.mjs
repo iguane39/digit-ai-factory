@@ -20,6 +20,8 @@
 //                 n'a vu (R-29)
 //   --sans-skills ne juge ni ne propage les skills (recette sur dépôts factices)
 //   --sans-pilot  ne touche pas au dépôt pilot courant (recette)
+//   --pour-produit verdict du poste POUR UN PRODUIT : un défaut du parc (canal confidentiel) y est un
+//                 avertissement nommé, sans exit 1 — passé par le hook d'ouverture d'un produit (TF-1657)
 //   --rebatir <dépôt> [--essai]  rebâtit un clone DIVERGÉ sur son histoire publiée réécrite, sans
 //                 perdre le travail propre au poste (scripts/rebatir-clone.mjs, D-12 a du 07/09) ;
 //                 jamais de push — la publication reste un GO humain
@@ -36,7 +38,7 @@
 // Contrat de sortie : rapport sur stdout, exit 0 = poste prêt, 1 = au moins un défaut.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync, renameSync, readdirSync, statSync, readlinkSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, renameSync, readdirSync, statSync, readlinkSync, unlinkSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { skillsInstalles } from "./scripts/lib-config-installee.mjs";
 import { releverNonEnregistres, dire } from "./scripts/lib-non-enregistre.mjs";
@@ -68,6 +70,9 @@ if (iRebatir >= 0) {
 }
 const pull = args.includes("--pull");
 const sansSkills = args.includes("--sans-skills");
+// 14/10/2026 : joué par `scripts/installer-projet.mjs`, le bootstrap tait sa bannière — l'installateur
+// rend la sienne, la seule que l'humain doit lire (deux bannières successives se lisaient comme deux verdicts).
+const sousInstallateur = args.includes("--sous-installateur");
 const sansPilot = args.includes("--sans-pilot");
 const iRacine = args.indexOf("--racine");
 const racine = resolve(iRacine >= 0 ? args[iRacine + 1] : process.env.FORGE_ROOT || dirname(ICI));
@@ -88,8 +93,32 @@ const sortie = (r) => (r.stdout || "").trim();
 const defauts = [];
 const averts = [];
 const versions = [];
-const ligne = (statut, msg) => console.log(`[${statut}] ${msg}`);
-const defaut = (msg, remede) => { ligne("DEFAUT", `${msg} — remède : ${remede}`); defauts.push(msg); };
+// LE COMPTE DES AVERTISSEMENTS EST CELUI DES LIGNES AFFICHÉES (14/10/2026). Le bilan comptait les
+// seules entrées poussées dans `averts`, et plusieurs lignes [avert] n'en poussaient aucune : le
+// 14/10, quatre lignes affichées, « 2 avertissement(s) » au bilan. Un compte qui contredit l'écran
+// qu'on vient de lire apprend à ne plus lire ni l'un ni l'autre.
+let avertsAffiches = 0;
+const ligne = (statut, msg) => { if (statut === "avert") avertsAffiches++; console.log(`[${statut}] ${msg}`); };
+// TF-1657 (14/10/2026) — DEUX VERDICTS : LE POSTE POUR UN PRODUIT, ET LE PARC. Mesuré le 13/10 : le
+// pilot et quatorze forges à jour, et pourtant « Poste NON prêt » à l'ouverture d'un produit, pour un
+// seul défaut du canal confidentiel que ce produit ne touche pas — et la consigne d'accueil disait
+// d'appliquer le remède, hors du périmètre de la session. Sous `--pour-produit` (passé par le hook
+// d'ouverture d'un produit), un défaut du PARC (canal confidentiel) devient un avertissement nommé, à
+// relever au lot de retours et jamais à corriger depuis le produit ; sans l'option (session du pilot,
+// qui tient le parc), il reste un défaut. Le verdict du parc se dit à part, sur sa propre ligne.
+const pourProduit = args.includes("--pour-produit");
+const defautsParc = [];
+let zoneParc = false;
+let prePushReporte = ""; // H3/H4 du pilot, jugés après le clone des forges (étape 4 bis)
+const defaut = (msg, remede) => {
+  if (zoneParc && pourProduit) {
+    ligne("avert", `PARC (hors du périmètre d'un produit) — ${msg} — remède, à la session du pilot : ${remede}. Depuis un produit : le relever au lot de retours, ne pas le corriger (TF-1657)`);
+    defautsParc.push(msg); averts.push(msg);
+    return;
+  }
+  ligne("DEFAUT", `${msg} — remède : ${remede}`); defauts.push(msg);
+  if (zoneParc) defautsParc.push(msg);
+};
 // 13/10/2026 — UN DÉPÔT PRIVÉ HORS D'ACCÈS N'EST PAS UN DÉFAUT DU POSTE. Un autre développeur a joué
 // `--pull` sur son poste : les quatorze forges publiques à jour, et pourtant « Poste NON prêt — 3
 // défaut(s) », tous dus aux deux dépôts privés du propriétaire (digit-ai-queue, digit-ai-confidentiel)
@@ -247,6 +276,12 @@ if (!sansPilot) {
     const lignes = (h.stdout || "").trim().split(/\r?\n/);
     for (const l of lignes.filter((x) => /^\[INSTALLÉ\]/.test(x))) ligne("ok", `digit-ai-factory (pilot) — ${l.replace(/^\[INSTALLÉ\]\s*/, "")}`);
     if (h.status === 0) ligne("ok", "digit-ai-factory (pilot) — gardes de pré-commit appelées par le hook installé");
+    // 14/10/2026 — LE PRE-PUSH SE POSE SEUL, IL NE S'ANNONCE PLUS « introuvable ». Mesuré sur un poste
+    // neuf : « Poste NON prêt » pour le seul H3, et la session concluait que l'installeur du hook
+    // manquait, parce qu'à cette étape la forge des outils qui le porte n'est pas encore clonée. Sous
+    // --pull, H3/H4 se reportent après les forges (étape 4 bis), où l'installeur est posé et joué.
+    else if (h.status === 1 && pull && lignes.some((x) => /^\[FAIL\] H[34]\b/.test(x)) && !lignes.some((x) => /^\[FAIL\] (?!H[34]\b)/.test(x)))
+      prePushReporte = lignes.filter((x) => x.startsWith("[FAIL]")).join(" · ").slice(0, 300);
     else if (h.status === 1) defaut(`digit-ai-factory (pilot) — ${lignes.filter((x) => x.startsWith("[FAIL]")).join(" · ").slice(0, 300)}`,
       lignes.some((x) => x.startsWith("[FAIL] H3")) ? "rétablir le pre-push R-38 (H3, TF-1275) : installeur de la forge des outils, puis la section d'avance avant la porte des noms"
         : lignes.some((x) => x.startsWith("[FAIL] H4")) ? "poser la section TF-1400 du pre-push : installeur de la forge des outils --seul=pre-push, puis node scripts/verifier-hooks-git.mjs --installer"
@@ -306,6 +341,7 @@ for (const f of FORGES) {
 
 // 4 ter. LE CANAL CONFIDENTIEL : présent, à jour, privé, sans secret ------------------------
 {
+  zoneParc = true;   // TF-1657 : le canal confidentiel est du PARC, pas du poste d'un produit
   const dest = process.env.FORGE_CONFIDENTIEL || join(racine, CANAL.dossier);
   if (existsSync(join(dest, ".git"))) {
     traiterPresent(`${CANAL.nom} (canal confidentiel)`, dest);
@@ -330,6 +366,7 @@ for (const f of FORGES) {
     else if (process.env.BOOTSTRAP_SOURCE) { ligne("avert", `${CANAL.nom} — canal confidentiel absent à la source surchargée ${SOURCE} : tables lues à l'ancien emplacement s'il existe`); averts.push(`${CANAL.nom} absent à la source surchargée`); }
     else defaut(`${CANAL.nom} — canal confidentiel ABSENT et clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`, `vérifier l'accès au dépôt PRIVÉ ${SOURCE}/${CANAL.nom}.git (gh auth status), puis scripts/fusionner-tables-confidentielles.mjs si des tables libres existent`);
   }
+  zoneParc = false;
 }
 
 // 4 bis. LES DÉPÔTS QUE LA LISTE NE CONNAÎT PAS (TF-0525) ------------------------------------
@@ -433,7 +470,10 @@ console.log("");
       // PIERRE TOMBALE posée délibérément recevaient le même verdict, « rien de ce qu'on y écrit
       // n'est suivi ». Or l'un est un accident à corriger et l'autre un choix à respecter — les
       // confondre apprend à ignorer les deux.
-      if (perime) suspects.push({ nom, motif: "mise de côté DÉCLARÉE (PERIME.md présent, répertoire non versionné) — pierre tombale, pas accident" });
+      // 14/10/2026 : une pierre tombale DÉCLARÉE n'est plus un avertissement. Elle n'est ni un
+      // dépôt, ni un accident, et son PERIME.md dit déjà ce qu'un avertissement répétait à chaque
+      // ouverture ; répété, il habituait à lire « avert » comme du bruit. Elle se nomme en [ok].
+      if (perime) ligne("ok", `${nom} — mise de côté déclarée (PERIME.md, non versionné) : ignorée par le parc`);
       // Un répertoire NON git qui porte le nom d'un dépôt de l'écosystème est un piège aussi : on
       // s'y installe en croyant être dans un dépôt, et rien n'y est versionné.
       else if (/^digit-ai/i.test(nom)) suspects.push({ nom, motif: "répertoire NON versionné portant un nom de l'écosystème — rien de ce qu'on y écrit n'est suivi" });
@@ -500,6 +540,16 @@ console.log("");
       .map((e) => e.name);
   } catch { fichiersSuspects = []; }
   for (const nom of fichiersSuspects) {
+    // UN PUITS VIDE S'EFFACE SEUL (14/10/2026, mandat humain « ça s'installe et c'est opérationnel »).
+    // Zéro octet : il n'y a rien à vérifier avant d'effacer, donc rien qui relève d'un geste humain ;
+    // l'avertissement revenait à chaque ouverture sans rien protéger. Un puits NON vide reste déclaré.
+    try {
+      if (statSync(join(racine, nom)).size === 0) {
+        unlinkSync(join(racine, nom));
+        ligne("ok", `${nom} — puits de redirection raté VIDE (0 octet) effacé à la racine du parc : rien à perdre (${PUITS_RATES.get(nom.toLowerCase())})`);
+        continue;
+      }
+    } catch { /* illisible ou verrouillé : déclaré ci-dessous comme un puits non vide */ }
     let taille = "?";
     let modifie = "?";
     try { const st = statSync(join(racine, nom)); taille = String(st.size); modifie = st.mtime.toISOString().slice(0, 16).replace("T", " "); } catch { /* taille indisponible */ }
@@ -557,12 +607,26 @@ console.log("");
     averts.push(nom);
   }
 
-  if (!suspects.length && !fichiersSuspects.length && !liensSuspects.length) ligne("ok", `racine propre — aucun dépôt hors liste, puits de redirection raté ni lien symbolique sous ${racine}`);
+  if (!suspects.length && !fichiersSuspects.some((n) => existsSync(join(racine, n))) && !liensSuspects.length) ligne("ok", `racine propre — aucun dépôt hors liste, puits de redirection raté ni lien symbolique sous ${racine}`);
   else if (!suspects.length) ligne("ok", `racine sans dépôt hors liste sous ${racine}`);
   else for (const x of suspects) {
     ligne("avert", `${x.nom} — ${x.motif}. Ne rien y exécuter ; supprimer un répertoire est un geste HUMAIN (R-29) — ce contrôle le déclare, il ne l'efface pas`);
     averts.push(x.nom);
   }
+}
+
+// 4 bis. Le pre-push du pilot, reporté de l'étape 3 : la forge des outils est maintenant présente --
+if (prePushReporte) {
+  const poseur = join(racine, "digit-ai-forge-agents", ".claude", "skills", "quality-oracles", "scripts", "installer-hamecon-publication.mjs");
+  if (existsSync(poseur)) {
+    spawnSync(process.execPath, [poseur, ICI, "--seul=pre-push"], { encoding: "utf8" });
+    spawnSync(process.execPath, [join(ICI, "scripts", "verifier-hooks-git.mjs"), "--depot", ICI, "--installer"], { encoding: "utf8" });
+  }
+  const v = spawnSync(process.execPath, [join(ICI, "scripts", "verifier-hooks-git.mjs"), "--depot", ICI], { encoding: "utf8" });
+  if (v.status === 0) ligne("ok", "digit-ai-factory (pilot) — hook pre-push posé par l'installeur de la forge des outils (H3/H4 verts)");
+  else defaut(`digit-ai-factory (pilot) — ${prePushReporte}`, existsSync(poseur)
+    ? `l'installeur a été joué sans effet : node "${poseur}" "${ICI}" --seul=pre-push, lire sa sortie`
+    : `forge des outils absente (${poseur}) : relancer node bootstrap.mjs --pull`);
 }
 
 // 5. Preuves de points d'entrée (contrat d'interface) ---------------------------------------
@@ -725,11 +789,13 @@ if (versions.length) {
 console.log(
   defauts.length
     ? `\nPoste NON prêt — ${defauts.length} défaut(s), chacun avec son remède ci-dessus.`
-    : `\nPoste prêt — présent, à jour, skills alignés${averts.length ? ` (${averts.length} avertissement(s) non bloquant(s))` : ""}. Si la racine n'est pas le parent du pilot, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
+    : `\nPoste prêt — présent, à jour, skills alignés${avertsAffiches ? ` (${avertsAffiches} avertissement(s) non bloquant(s), affichés ci-dessus)` : ""}. Si la racine n'est pas le parent du pilot, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
 );
+// TF-1657 : le verdict du parc, distinct de celui du poste. Il ne se tait que quand il n'y a rien à dire.
+if (defautsParc.length) console.log(`Parc NON sain — ${defautsParc.length} défaut(s) du parc (canal confidentiel)${pourProduit ? ", hors du périmètre de ce produit : avertis ci-dessus, à relever au lot de retours, jamais à corriger depuis le produit" : ", comptés dans le verdict du poste"}.`);
 // Confirmation explicite de l'installation (13/10/2026) : le dernier mot de la commande dit, sans
 // interprétation, si la Factory est utilisable sur ce poste.
-if (!defauts.length) {
+if (!defauts.length && !sousInstallateur) {
   const forgesPresentes = FORGES.filter((f) => existsSync(join(racine, f.nom, ".git"))).length;
   console.log("\n" + "═".repeat(72) +
     `\n  FACTORY DIGIT-AI CORRECTEMENT INSTALLÉE — ${forgesPresentes} dépôt(s) de forge présent(s) et à jour, 0 défaut` +

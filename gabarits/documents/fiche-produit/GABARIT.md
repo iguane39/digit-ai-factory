@@ -1,6 +1,6 @@
 # Gabarit — Fiche produit
 
-**Famille** `gd-fiche-produit` · **Version du gabarit** 1.0.0 · **Écrite le** 13/10/2026
+**Famille** `gd-fiche-produit` · **Version du gabarit** 1.1.0 · **Écrite le** 13/10/2026 · **Révisée le** 15/10/2026
 
 > **Formats** HTML (rendu remis) · Markdown (source)
 > **Règles engagées** D1 D3 D4 D6 D7 D11 (`gabarits\documents\README.md`)
@@ -26,6 +26,9 @@ la fiche ne chiffre aucun coût et ne promet aucune date.
 
 ## Structure — les huit chapitres sont dus
 
+Une fiche d'offre technique y ajoute des chapitres optionnels déclarés (section « Variante « offre
+technique » » ci-dessous).
+
 Les chapitres suivent la question que se pose le commanditaire, dans son ordre : de quoi parle-t-on et
 que me demande-t-on, sur quoi s'appuie-t-on déjà, que couvre l'outil, que contient le premier lot, quel
 est le détail, qu'est-ce qui reste à confirmer, qu'est-ce que je dois trancher, d'où cela vient-il.
@@ -46,13 +49,43 @@ trouverez…*), ce que le chapitre contient et ne contient pas, puis un **exempl
 ligne réelle du tableau. L'exemple de lecture est le seul moyen, pour un lecteur non spécialiste, de
 vérifier qu'il sait lire la table qui suit.
 
+## Variante « offre technique » — chapitres optionnels déclarés
+
+Quand la fiche porte une **offre technique** (un produit bâti sur une base existante, un service à
+déployer), le brief peut demander davantage que les huit chapitres. Le 14/10/2026, un brief en
+imposait dix, dont l'architecture, le modèle de déploiement et une colonne de couverture, sans
+équivalent au gabarit (TF-1704). La variante admet ces ajouts, et seulement eux :
+
+| Chapitre optionnel | Porte | Se place |
+|---|---|---|
+| **Architecture** | Les composants et leurs flux, en figure (Mermaid admis dans la source Markdown) | après « Domaines et socle » |
+| **Modèle de déploiement** | Où tourne le produit, qui l'exploite, ce qui reste à la charge du client | après « Architecture » |
+| **Fournisseurs** | Les services tiers dont le produit dépend, et ce que chacun fournit | après « Modèle de déploiement » |
+| **Risques** | Chaque risque, l'exigence qu'il menace et sa parade | juste avant « Hypothèses à lever » |
+
+- **La colonne Couverture** s'ajoute au chapitre 5. Elle dit ce que la base couvre déjà de
+  l'exigence, dans un vocabulaire fermé : `natif` · `configuration` · `extension` · `à développer`.
+  Une couverture `natif` ou `configuration` sans essai dans le produit laisse le statut à
+  `présent dans la base`.
+- **Les identifiants** peuvent séparer fonctionnel et non fonctionnel par leur préfixe (`EF-01`,
+  `ENF-01`) ; le chapitre 1 le déclare dans « Lire cette fiche ».
+- **La déclaration est due.** Le chapitre 1 nomme les chapitres optionnels que la fiche porte : un
+  chapitre absent de cette liste est un chapitre inventé. Les huit chapitres restent dus, et un
+  chapitre optionnel ne remplace aucun d'eux. Il ouvre par les mêmes trois lignes.
+
+`oracle-fiche-produit.mjs` juge la colonne Couverture quand elle existe (FP5) ; les chapitres
+optionnels n'entrent dans aucun recomptage.
+
 ## Les vocabulaires fermés
 
 - **Palier** : `MVP` (premier lot utile) · `V1` (lot suivant) · `V2` (plus tard). Une fiche peut
   n'en porter que deux ; elle n'en invente pas un quatrième sans le déclarer au chapitre 1.
-- **Statut d'une exigence** : `fait constaté` (elle vient de la demande, du site ou de l'existant,
-  et la source est citée) · `hypothèse` (elle est proposée et doit être confirmée). Toute exigence
-  `hypothèse` apparaît au chapitre 6.
+- **Statut d'une exigence** : `fait constaté` (elle vient de la demande ou du site, et la source est
+  citée ; tirée de l'existant, elle n'est constatée que par la **trace d'un essai dans le produit
+  lui-même** : le geste ou la commande, sa date, son résultat) · `présent dans la base` (la fonction
+  existe dans le code ou le produit de base, sans configuration ni essai dans ce produit) ·
+  `hypothèse` (elle est proposée et doit être confirmée). Toute exigence `présent dans la base` ou
+  `hypothèse` apparaît au chapitre 6 ; pour la première, ce qu'il reste à lever est l'essai.
 - **Impact** : une note de 1 à 5 de la valeur attendue, **déclarée telle** (échelle dite au
   chapitre 1). La note exprime un jugement du référentiel, pas une mesure.
 - **Identifiant** : `E-001`, stable d'une version de la fiche à l'autre. Une exigence retirée garde
@@ -66,6 +99,10 @@ vérifier qu'il sait lire la table qui suit.
   recalculés sur le chapitre 5 avant la remise (voir « Avant de remettre »).
 - **Une hypothèse présentée comme un fait constaté.** C'est le défaut qui oriente une construction
   entière sur une supposition ; le statut est une colonne, pas une nuance de ton.
+- **Une exigence constatée sur la seule présence d'une fonction dans la base.** Le code amont dit
+  qu'une fonction existe, pas que ce produit la rend. Le 14/10/2026, trois exigences d'une fiche sur
+  vingt-huit `fait constaté` ne l'étaient que par le code amont, et la première question de
+  conformité l'a révélé (TF-1710) : sans trace d'essai, le statut est `présent dans la base`.
 - **Un chapitre des coûts ou des dates.** La fiche porte un périmètre, pas un engagement.
 - **Un jargon sans glose.** Un terme du métier du produit se définit à son premier emploi, au
   chapitre 1 (« Lire cette fiche »).
@@ -87,6 +124,9 @@ role_destinataire: {qui lit cette fiche produit, et quelles décisions elle lui 
 3. Chaque brique du chapitre 2 porte la date de son relevé.
 4. Rendu HTML jugé par `check_html.py` **et** `render_page.py --widths 1280,768,390` (D7).
 5. Aucun `{…}` restant.
+
+Les points 1, 2, 3 et 5 se jouent en une commande : `node oracles\oracle-fiche-produit.mjs <fiche>`
+(règles FP1 à FP7, sur la fiche HTML ou Markdown).
 
 ## Document d'auteur — ce qui ne va pas au lecteur
 
@@ -117,15 +157,19 @@ contraire de son lecteur : 11 fichiers à partager sont un coût pour lui, jamai
 - `render_page.py` du même socle — zéro défaut visuel aux six largeurs, dont **V18** (mesure de
   lecture) et **V19** (une seule largeur de contenu) ;
 - `oracle-gabarits-documents.mjs` du pilot — G1 à G13 ;
-- pour le **fond** : `oracle-couverture-exigences.mjs` du pilot (chaque exigence du référentiel est
-  couverte) et `oracle-ecriture.mjs` (tournures d'annonce en titre et en en-tête de colonne, EC-8).
+- pour le **fond** : `oracle-fiche-produit.mjs` du pilot, qui recompte la fiche sur elle-même (FP1 à
+  FP7 : chiffres d'« En bref » et tableau des domaines sur le chapitre 5, hypothèses croisées avec
+  les exigences, statut au vocabulaire fermé, critère de recette à chaque ligne, briques datées,
+  aucun emplacement restant), et `oracle-ecriture.mjs` (tournures d'annonce en titre et en en-tête
+  de colonne, EC-8). `oracle-couverture-exigences.mjs` ne juge pas la fiche : il juge le référentiel
+  d'exigences du pilot lui-même (TF-1712).
 
 ## Limites du jugement
 
 **Qu'une exigence soit la bonne.** Le critère de recette est présent et testable en forme ; qu'il
-mesure ce que veut le commanditaire reste une relecture. **Qu'un total recompté le soit juste** : le
-recomptage de « Avant de remettre » est un geste de l'auteur, et aucun oracle du pilot ne rouvre le
-référentiel pour le refaire à sa place.
+mesure ce que veut le commanditaire reste une relecture. **Que la fiche soit fidèle au référentiel** :
+`oracle-fiche-produit.mjs` recompte la fiche sur son propre chapitre 5, il ne rouvre pas
+`forge\EXIGENCES.json`, et une exigence absente des deux côtés passe.
 
 ## Boucle de retour
 

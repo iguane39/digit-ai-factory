@@ -12,7 +12,7 @@
  *
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { syntheseDuTour } from "./hook-restitution.mjs";
@@ -47,6 +47,25 @@ check("aucun fichier marqué → null (la règle ne réclame pas un fichier)", (
   if (syntheseDuTour([note]) !== null) throw new Error("un fichier non marqué a été retenu");
 });
 
+// TF-1720 (15/10/2026) — le cas du 14/10 chez un produit : un document de projet marqué par son
+// gabarit, écrit dans le tour, sans synthèse nommée. Il n'est plus retenu ; le repli hors de
+// `docs\projet\` garde son rôle, et une synthèse nommée l'emporte toujours.
+mkdirSync(join(T, "docs", "projet"), { recursive: true });
+const composants = join(T, "docs", "projet", "COMPOSANTS-OPS.md");
+writeFileSync(composants, MARQUE, "utf8");
+check("rouge → vert (TF-1720) : un document de projet marqué par son gabarit n'est pas jugé à la place de la restitution", () => {
+  const r = syntheseDuTour([note, composants]);
+  if (r !== null) throw new Error(`fichier jugé : ${r}`);
+});
+check("TF-1720 : à côté d'un document de projet, une synthèse nommée reste retenue", () => {
+  const r = syntheseDuTour([synthese, composants]);
+  if (r !== synthese) throw new Error(`fichier jugé : ${r}`);
+});
+check("TF-1720 : le repli hors de docs\\projet\\ tient encore — l'analyse marquée reste retenue à côté du document de projet", () => {
+  const r = syntheseDuTour([analyse, composants]);
+  if (r !== analyse) throw new Error(`fichier jugé : ${r}`);
+});
+
 rmSync(T, { recursive: true, force: true });
-console.log(`\nhook-restitution (sélection de la synthèse jugée, TF-0767) : ${pass} PASS, ${fail} FAIL`);
+console.log(`\nhook-restitution (sélection de la synthèse jugée, TF-0767, TF-1720) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

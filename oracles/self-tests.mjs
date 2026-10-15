@@ -45,6 +45,10 @@
  * sur un clone frais, quatre de ces oracles jugeaient un parc absent et le circuit hébergé aurait
  * été rouge à sa première exécution.
  *
+ * INVARIANT (I7, TF-1690 du 14/10/2026) : aucune recette n'écrit dans un fichier SUIVI du dépôt. Chaque
+ * recette se joue sous une garde (`lib-garde-arbre-suivi.mjs`) qui compare les fichiers suivis avant et
+ * après elle et nomme celle qui a écrit. Deux recettes le faisaient à chaque passage, sans le dire.
+ *
  * Usage : node oracles\self-tests.mjs        → exit 0 si tout passe, 1 sinon.
  */
 import { execFileSync, spawnSync } from "node:child_process";
@@ -55,8 +59,14 @@ import {
   confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline,
 } from "./lib-baseline-recettes.mjs";
 import { confronterSensRouge, verdictSensRouge, SEUIL_I6_BLOQUANT } from "./lib-sens-rouge.mjs";
+import { creerGarde } from "./lib-garde-arbre-suivi.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
+// I7 (TF-1690, 14/10/2026) — UNE RECETTE N'ÉCRIT PAS DANS L'ARBRE SUIVI. Chaque recette se joue sous
+// une garde qui relève les fichiers suivis avant et après elle ; un écart nomme la recette et les
+// chemins (motif et limites : `lib-garde-arbre-suivi.mjs`). Le cas : deux recettes réécrivaient à chaque
+// passage une étude HTML d'`output\03-etudes\` et `references\EXTENSIONS-JUGEES.json`, sans le dire.
+const garde = creerGarde(join(ICI, ".."));
 // TF-1465 (02/10/2026) : l'interpréteur Python du poste, cherché UNE fois — même ordre que
 // `scripts\verifier-ooxml.test.mjs`. `null` si absent : les recettes `.py` se déclarent alors
 // « [NON JOUÉ] » plutôt que d'être tues ou de faire échouer le pas sur un poste sans Python.
@@ -103,7 +113,7 @@ for (const nom of oracles) {
   const [cmd, args] = interne
     ? [join(ICI, nom), ["--self-test"]]
     : [join(ICI, dedie), []];
-  const r = spawnSync(process.execPath, [cmd, ...args], { encoding: "utf8" });
+  const r = garde.jouer(nom, () => spawnSync(process.execPath, [cmd, ...args], { encoding: "utf8" }));
   const lignes = (r.stdout || "").split("\n").filter((l) => l.trim());
   // `detail` est tronqué pour l'affichage ; `resume` garde la ligne ENTIÈRE. Lire un compte de
   // cas dans une chaîne coupée à 72 caractères reviendrait à mesurer la mise en page.
@@ -214,8 +224,8 @@ for (const zone of zonesTests) {
     // Windows, python imprime en cp1252 quand sa sortie est redirigée : « [NON JOUÉ] » devenait « JOU\ufffd »,
     // la déclaration de TF-1434 n'était plus lue, et le cliquet comptait « 8 → 4 cas perdus » au lieu de
     // « 4 joués + 4 non joués » (simulation du circuit hébergé sur un clone sans socle, 12/10/2026).
-    const r = spawnSync(estPython ? PYTHON : process.execPath, [join(RACINE, zone, nom), ...args],
-      { encoding: "utf8", env: estPython ? { ...process.env, PYTHONUTF8: "1", PYTHONIOENCODING: "utf-8" } : process.env });
+    const r = garde.jouer(`${zone}/${nom}`, () => spawnSync(estPython ? PYTHON : process.execPath, [join(RACINE, zone, nom), ...args],
+      { encoding: "utf8", env: estPython ? { ...process.env, PYTHONUTF8: "1", PYTHONIOENCODING: "utf-8" } : process.env }));
     const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
     const resume = lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie";
     resultats.push({
@@ -364,7 +374,7 @@ for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // SANS_OBJET faute de cible — un vert de complaisance, exactement ce que cet agregateur
   // existe pour eteindre. Un chemin relatif se resout depuis la racine du pilot.
   const cibles = (argsParc || []).map((c) => join(ICI, "..", c));
-  const r = spawnSync(process.execPath, [join(ICI, nom), ...cibles], { encoding: "utf8" });
+  const r = garde.jouer(`${nom} (parc réel)`, () => spawnSync(process.execPath, [join(ICI, nom), ...cibles], { encoding: "utf8" }));
   let verdict = null, sansObjet = null;
   try {
     const j = JSON.parse(r.stdout || "{}");
@@ -487,17 +497,33 @@ if (sensRouge.sansRouge.length) {
     + "un cas ROUGE joué — le double sens est tenu sur tout le passage");
 }
 
+// ── I7 — L'ARBRE SUIVI (TF-1690) : une recette qui écrit dans un fichier suivi est nommée, avec ses
+// chemins, et fait échouer le passage. Une garde qui n'a pas pu jouer le DIT : son silence se lirait
+// comme un vert.
+if (!garde.jouee) {
+  console.log("  [NON JOUÉ] garde de l'arbre suivi (I7) : aucun dépôt git lisible à la racine — les écritures "
+    + "des recettes dans les fichiers suivis ne sont PAS vues à ce passage");
+}
+for (const { nom, chemins } of garde.ecritures) {
+  console.error(`  [ARBRE SUIVI] ${nom} a écrit dans ${chemins.length} fichier(s) suivi(s) : ${chemins.join(", ")}. `
+    + "Une recette travaille sur une copie sous le dossier temporaire, jamais dans l'arbre suivi (TF-1690) ; "
+    + "si une autre session écrivait ces chemins pendant le passage, rejouer cette recette seule tranche.");
+}
+
 const echecs = resultats.filter((r) => r.statut !== "OK");
 const perdus = APPLIQUER ? [] : [...bilan.baisses, ...bilan.disparues];
 const casNonJoues = bilan.nonJoues.reduce((n, x) => n + x.nonJoues, 0);
 const sansRougeBloquant = verdictI6.bloquant ? sensRouge.sansRouge.length : 0;
+const ecrivains = garde.ecritures.length;
 console.log("=".repeat(78));
 console.log(
-  echecs.length || perdus.length || sansRougeBloquant
+  echecs.length || perdus.length || sansRougeBloquant || ecrivains
     ? `  ${echecs.length}/${resultats.length} oracle(s) en défaut${echecs.length ? ` : ${echecs.map((r) => r.nom).join(", ")}` : ""}`
       + `${perdus.length ? ` · ${perdus.length} recette(s) ont PERDU des cas` : ""}`
       + `${sansRougeBloquant ? ` · ${sansRougeBloquant} recette(s) sans cas rouge lisible (I6)` : ""}`
+      + `${ecrivains ? ` · ${ecrivains} recette(s) ont écrit dans l'arbre suivi (I7) : ${garde.ecritures.map((e) => e.nom).join(", ")}` : ""}`
     : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles, fichiers de test du dépôt, état du parc — I1, I2 et I4) · cliquet des cas tenu (I5)`
-      + (casNonJoues ? `, dont ${casNonJoues} cas déclaré(s) NON JOUÉ(S) sur ce poste dans ${bilan.nonJoues.length} recette(s)` : ""),
+      + (casNonJoues ? `, dont ${casNonJoues} cas déclaré(s) NON JOUÉ(S) sur ce poste dans ${bilan.nonJoues.length} recette(s)` : "")
+      + (garde.jouee ? " · aucune écriture dans l'arbre suivi (I7)" : ""),
 );
-process.exit(echecs.length || perdus.length || sansRougeBloquant ? 1 : 0);
+process.exit(echecs.length || perdus.length || sansRougeBloquant || ecrivains ? 1 : 0);

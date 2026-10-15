@@ -14,8 +14,14 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import { adopter, relever, estVivant, blocEcartInitial, contratHeritage, REPERTOIRES,
-  TYPE_DOCUMENTAIRE, CONDITION_SITE, CARNET, signauxLogicielOuSite, typeProjetDeclare, declarerType } from "./adopter-projet-existant.mjs";
+  TYPE_DOCUMENTAIRE, CONDITION_SITE, CARNET, signauxLogicielOuSite, typeProjetDeclare, declarerType, verifierDepotTiers } from "./adopter-projet-existant.mjs";
+// TF-1699 : importés à part, par l'espace de noms, pour que l'ancien code rende des cas ROUGES
+// (exports absents) au lieu d'un échec d'import qui ne prouverait rien.
+import * as ADOPTION from "./adopter-projet-existant.mjs";
+const TYPE_SERVICE = ADOPTION.TYPE_SERVICE || "service";
+const signauxDeSite = (...a) => { if (!ADOPTION.signauxDeSite) throw new Error("signauxDeSite absent"); return ADOPTION.signauxDeSite(...a); };
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -249,6 +255,35 @@ try {
     att(r.verdict === "REFUS" && /« docu » inconnu/.test(r.motif), `verdict ${r.verdict} — ${r.motif}`);
   });
 
+  // ── TF-1699 : le type « service » (sans site public) — surface web écartée, R-13 jamais ─────
+  // Le fait du 14/10 : une passerelle d'API sans site public a reçu robots.txt et llms.txt, que R-27
+  // réserve au produit à surface web, et R-20 ter avertit sur llms.txt à chaque ouverture.
+  check("TF-1699 rouge → vert — un SERVICE (code, manifeste) adopté `--type service` : robots.txt et llms.txt écartés, type déclaré, R-13 non exemptée", () => {
+    const d = projet({ "src/server.py": "print(1)\n", "requirements.txt": "fastapi==0.1\n", "README.md": "# Passerelle\n" });
+    const r = adopter(d, { pilot: PILOT, type: TYPE_SERVICE, quand: "2026-10-15" });
+    att(r.verdict === "ADOPTE" && r.type === TYPE_SERVICE, `verdict ${r.verdict}, type ${r.type} — ${r.motif || ""}`);
+    for (const c of conditionnels) {
+      att(!existsSync(join(d, c)), `${c} a été posé sur un service sans site public`);
+      att(r.faits.some((f) => f.cible === c && /ÉCARTÉ — service sans site public/.test(f.action)), `${c} n'est pas nommé ÉCARTÉ`);
+    }
+    const t = readFileSync(join(d, CARNET), "utf8");
+    att(/^type_projet: service\s*$/m.test(/^---\r?\n([\s\S]*?)\r?\n---/.exec(t)[1]), "la déclaration n'est pas dans l'en-tête du carnet");
+    att(/^## Type de projet : service sans site public/m.test(t) && /R-13/.test(t), "l'écart « service » n'est pas consigné, ou ne dit pas que R-13 reste due");
+    att(typeProjetDeclare(d)?.type === TYPE_SERVICE, "le lecteur ne relit pas la déclaration");
+    att(r.non_juge.some((l) => /R-13/.test(l) && /service/.test(l)), "le non_juge ne dit pas que R-13 reste exigée");
+  });
+  check("TF-1699 REFUS service — un fichier de SITE contredit la déclaration (sitemap.xml), et rien n'est écrit", () => {
+    const d = projet({ "src/server.py": "x\n", "sitemap.xml": "<urlset/>\n" });
+    const avant = readdirSync(d).sort().join(",");
+    const r = adopter(d, { pilot: PILOT, type: TYPE_SERVICE });
+    att(r.verdict === "REFUS" && /sitemap\.xml \(fichier de site\)/.test(r.motif), `verdict ${r.verdict} — ${r.motif}`);
+    att(readdirSync(d).sort().join(",") === avant, "le refus a écrit sur le disque");
+  });
+  check("TF-1699 signaux — signauxDeSite ne compte pas le code ni les manifestes, compte un fichier de site et une racine web déclarée", () => {
+    att(signauxDeSite(projet({ "src/a.ts": "x\n", "package.json": "{}\n" })).length === 0, "du code compte comme un site");
+    att(signauxDeSite(projet({ "docs/projet/PARAMETRAGE.md": "---\nracine_web: public\n---\n" })).length === 1, "une racine web déclarée ne compte pas");
+  });
+
   check("ESSAI documentaire — rien n'est écrit, et les écartés sont déjà nommés", () => {
     const d = projet({ "notes/a.md": "# a\n" });
     const avant = readdirSync(d).sort().join(",");
@@ -303,6 +338,67 @@ try {
     att((declarerType(une).match(/type_projet/g) || []).length === 1, "une seconde déclaration a été ajoutée");
     att(/^---\ntype_projet: documentaire\n---\n# sans/.test(declarerType("# sans en-tête\n")), "un carnet sans en-tête n'en reçoit pas");
   });
+
+  // ── TF-1659 : la surface web va sous la racine SERVIE ───────────────────────────────────────
+  // Le fait du 13/10 : dépôt à deux sous-projets, `FRONT/` servi depuis `FRONT/public/`, et l'essai
+  // annonçait robots.txt et llms.txt à la racine du dépôt, où ils ne seront jamais servis.
+  check("TF-1659 rouge → vert — dépôt multi-projets servi depuis FRONT/public : la surface web y est posée, jamais à la racine du dépôt", () => {
+    const d = projet({ "FRONT/package.json": "{}\n", "FRONT/public/index.html": "<p>x</p>\n", "FRONT/src/App.jsx": "x\n", "BACK/Api.csproj": "<Project/>\n" });
+    const r = adopter(d, { pilot: PILOT });
+    att(r.verdict === "ADOPTE", `verdict ${r.verdict}`);
+    att(!existsSync(join(d, "robots.txt")) && !existsSync(join(d, "llms.txt")), "robots.txt ou llms.txt posé à la racine du dépôt, où il ne sera jamais servi (défaut d'origine)");
+    att(existsSync(join(d, "FRONT", "public", "robots.txt")) && existsSync(join(d, "FRONT", "public", "llms.txt")), "la surface web n'est pas posée sous la racine servie");
+    att(/racine servie relevée sous `FRONT\/public`/.test(readFileSync(join(d, CARNET), "utf8")) && /racine_web: FRONT\/public/.test(readFileSync(join(d, CARNET), "utf8")), "le carnet ne dit pas la racine relevée ni la déclaration à faire");
+  });
+  check("TF-1659 — deux racines servies candidates : rien n'est posé, l'ambiguïté est consignée", () => {
+    const d = projet({ "web/public/index.html": "x\n", "admin/wwwroot/index.html": "x\n" });
+    const r = adopter(d, { pilot: PILOT });
+    att(!existsSync(join(d, "robots.txt")) && !existsSync(join(d, "web", "public", "robots.txt")) && !existsSync(join(d, "admin", "wwwroot", "robots.txt")), "un robots.txt a été posé malgré l'ambiguïté");
+    att(r.faits.some((f) => /NON POSÉ — racines servies multiples/.test(f.action)), "l'ambiguïté n'est pas dite");
+    att(/racine servie AMBIGUË/.test(readFileSync(join(d, CARNET), "utf8")), "l'ambiguïté n'est pas consignée au carnet");
+  });
+  check("TF-1659 sens inverse — sans racine servie relevée, la surface web reste posée à la racine (comportement d'avant)", () => {
+    const d = projet({ "notes/a.md": "# a\n" });
+    adopter(d, { pilot: PILOT });
+    att(existsSync(join(d, "robots.txt")) && existsSync(join(d, "llms.txt")), "la règle mord trop large : plus rien à la racine d'un projet sans racine servie");
+  });
+
+  // ── TF-1658 : le dépôt d'un TIERS (audit, coaching) n'est jamais écrit ──────────────────────
+  // Le fait du 13/10 : 25 écritures annoncées dans l'arbre d'un dépôt client géré par un autre
+  // développeur, et une démarche qui allait jusqu'au commit. En mode `--hors-depot`, le socle vit à
+  // côté, sous git local, et le clone du tiers est relevé comme entrant en lecture seule.
+  {
+    const tiers = projet({ "src/app.js": "x\n", "README.md": "# Le projet du tiers\n" });
+    const g = (...a) => spawnSync("git", ["-C", tiers, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8" });
+    g("init", "-q"); g("add", "-A"); g("commit", "-q", "-m", "tiers");
+    const socle = join(T, "socle-hors-depot");
+    const r = adopter(tiers, { pilot: PILOT, horsDepot: socle });
+    check("TF-1658 rouge → vert — en mode --hors-depot, le clone du tiers reste intact : aucune écriture, git status vide", () => {
+      att(r.verdict === "ADOPTE", `verdict ${r.verdict} — ${r.motif || ""}`);
+      att(g("status", "--porcelain").stdout.trim() === "", `écritures sous le dépôt du tiers : ${g("status", "--porcelain").stdout.trim()}`);
+      att(!existsSync(join(tiers, "forge")) && !existsSync(join(tiers, "CLAUDE.md")) && !existsSync(join(tiers, "robots.txt")), "le socle a été posé dans le dépôt du tiers (défaut d'origine)");
+    });
+    check("TF-1658 — le socle vit à côté, sous git local, avec le relevé du tiers (chemin, commit) et l'écart au carnet", () => {
+      att(existsSync(join(socle, ".git")) && existsSync(join(socle, "forge", "retours")) && existsSync(join(socle, "CLAUDE.md")), "socle incomplet ou sans git local");
+      const t = JSON.parse(readFileSync(join(socle, "forge", "DEPOT-TIERS.json"), "utf8"));
+      att(t.chemin === tiers && t.commit === g("rev-parse", "HEAD").stdout.trim(), "chemin ou commit du tiers mal relevés");
+      att(/Dépôt d'un tiers en lecture seule/.test(readFileSync(join(socle, CARNET), "utf8")), "le mode n'est pas consigné au carnet");
+      att(!existsSync(join(socle, "robots.txt")), "une surface web est posée dans le socle d'un dépôt tiers");
+    });
+    check("TF-1658 — la règle du mode : PASS sur un tiers intact, FAIL dès qu'un fichier y est écrit (sens rouge)", () => {
+      att(verifierDepotTiers(socle).verdict === "PASS", `verdict ${verifierDepotTiers(socle).verdict} sur un tiers intact`);
+      writeFileSync(join(tiers, "ecrit-par-la-session.md"), "x\n", "utf8");
+      const v = verifierDepotTiers(socle);
+      att(v.verdict === "FAIL" && /ecrit-par-la-session\.md/.test(v.message), `écriture sous le tiers non vue : ${v.verdict} — ${v.message}`);
+      rmSync(join(tiers, "ecrit-par-la-session.md"));
+      att(verifierDepotTiers(join(T, "p1")).verdict === "SANS_OBJET", "un projet ordinaire est jugé comme un mode hors dépôt");
+    });
+    check("TF-1658 — REFUS : un socle DANS le dépôt du tiers", () => {
+      const x = adopter(tiers, { pilot: PILOT, horsDepot: join(tiers, "socle") });
+      att(x.verdict === "REFUS" && /DANS le dépôt du tiers/.test(x.motif), `verdict ${x.verdict}`);
+      att(!existsSync(join(tiers, "socle")), "le refus a quand même créé le dossier");
+    });
+  }
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }
