@@ -141,6 +141,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
 | `Digit-AI - Synthese Mandat - Fusion de la branche du pilot publiee sur GitHub - 20260921c.md` | fichier | 8,2 Ko | La fusion est publiée : main porte le travail du 14 au 17/09, et plus aucune branche du pi |
 | `Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md` | fichier | 14,4 Ko | Les 2 postes sont fusionnés : 7 dépôts réconciliés au cas par cas, publiés, et le parc ent |
+| `Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` | fichier | 13,1 Ko | Synthèse Mandat — retours et sujets de ce poste, après fusion avec l'autre poste (15/10/20 |
 | `Digit-AI - Synthese Mandat - Fusion mergee et une alerte que son diagnostic effacait - 20260921d.md` | fichier | 15,6 Ko | Synthèse de mandat — la fusion est passée, et j'ai effacé une alerte en cherchant à la lir |
 | `Digit-AI - Synthese Mandat - Fusion publiee et une session distante ecrit sur la branche - 20260921e.md` | fichier | 14,1 Ko | La fusion est publiée, mais une session Claude distante écrit encore sur la branche : ne l |
 | `Digit-AI - Synthese Mandat - Garde d envoi du canal confidentiel posee et eprouvee - 20260927c.md` | fichier | 12,7 Ko | Digit-AI — Synthèse de mandat — La garde d'envoi du canal confidentiel posée et éprouvée — |
@@ -271,4 +272,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_254 fichier(s), 0 sous-dossier(s)_
+_255 fichier(s), 0 sous-dossier(s)_
