@@ -214,7 +214,7 @@ humaine si absents du brief.
 l'accueil), et la dérivation est **consignée dans `DESIGN.md`** — chaque choix graphique
 structurant motivé par cette expérience, jamais par défaut d'outillage ; (b) **généricité** :
 `node <design>\oracles\oracle-taste.mjs <html>` PASS exigé (`cat-des-09`) ; (c) **baseline
-visuelle** posée : `node <design>\oracles\oracle-baseline.mjs approuver` (`cat-des-08`).
+visuelle** posée : `node <design>\oracles\oracle-baseline.mjs <maquette.html|url> --slug <nom> --racine <racine du produit> --approuver` (`cat-des-08`) ; un écart voulu après un FAIL s'approuve avec `--motif "<écart voulu>"`, tracé ; une application derrière connexion se rend par son URL avec `--etat-session`.
 Écart assumé possible mais explicite, jamais par omission (loi n° 3).
 
 **Valider** : `node <design>\oracles\run-oracles-design.mjs <html> --tokens <tokens.css>
@@ -348,7 +348,7 @@ requalifié — un échec résistant = retour consigné avec diagnostic. Les ite
 et `manuelle_utilisateur` sont listés avec leur attendu détaillé (dashboard, onglet Actions)
 — l'objectif : maximiser l'auto-traité, ne laisser en manuel que l'irréductible.
 **La boucle ne se clôt pas sur un solde d'adoption non nul (R-40)** :
-`node oracles\oracle-adoption-tests.mjs <racine-produit>` rend PASS (solde nul par les trois
+`node oracles\oracle-adoption-tests.mjs <racine-produit>` (il lit d'office les cahiers sous `<racine>\digit-ai-forge-tests\output\<projet>-livrables\`, ou `--livrables <dossier>`) rend PASS (solde nul par les trois
 issues — les deux issues non-adoption se déclarent dans `forge\cas-ecartes.jsonl`) ou
 SANS_OBJET motivé ; un FAIL est un reste-à-faire de la boucle, jamais un livrable clos.
 
@@ -385,7 +385,8 @@ consigne en hypothèse — la revue le classe « accepté », pas défaut.
 
 **Gate généricité rejoué (loi n° 6, TF-0237)** : `oracle-taste.mjs` PASS sur le rendu
 implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la baseline
-(`oracle-baseline.mjs juger`) détecte toute dérive depuis l'approbation de l'étape 3.
+(`oracle-baseline.mjs <page|url> --slug <nom> --racine <racine du produit>`) détecte toute dérive depuis l'approbation de l'étape 3.
+Une application derrière connexion se rend avec sa session : `render_page.py <url> --etat-session <état de session Playwright>` ; sans elle, seule la mire est jugée, et `render_page` le dit (« MIRE DE CONNEXION RENDUE », TF-1788).
 
 **Exploitabilité au volume réel (TF-1654, 14/10/2026).** Une revue jouée sur le seul jeu de
 démonstration ne dit rien de l'écran que l'utilisateur aura. Le 12/10/2026, chez Produit-80, les
