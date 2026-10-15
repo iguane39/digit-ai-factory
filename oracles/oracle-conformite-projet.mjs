@@ -994,6 +994,9 @@ else {
   const manques = [];
   if (!/##\s*Routage forge/i.test(claude)) manques.push("section « Routage forge »");
   if (!/forge_tests/.test(claude)) manques.push("route tests (forge_tests)");
+  // TF-1735 (D-1 (a) du 15/10/2026) : l'audit du produit a sa route, forge-audit — sans elle, « audit
+  // complet » partait vers forge_tests, seule route de verdict que le CLAUDE.md connaissait.
+  if (!/init-audit-workspace/.test(claude)) manques.push("route audit du produit (forge-audit, init-audit-workspace)");
   if (!/run de version/i.test(claude)) manques.push("route évolution (run de version)");
   if (!/MEP/.test(claude)) manques.push("route déploiement (MEP)");
   manques.length

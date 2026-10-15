@@ -83,8 +83,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 48,
-  "vu_le": "2026-10-13"
+  "cas": 58,
+  "vu_le": "2026-10-15"
  },
  "hook-page-html.mjs": {
   "cas": 11,
@@ -148,7 +148,7 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 171,
+  "cas": 172,
   "vu_le": "2026-10-15"
  },
  "oracle-constantes-externes.mjs": {
@@ -399,8 +399,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 12,
-  "vu_le": "2026-10-13"
+  "cas": 13,
+  "vu_le": "2026-10-15"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 29,
@@ -751,8 +751,8 @@
   "vu_le": "2026-10-12"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 36,
-  "vu_le": "2026-10-13"
+  "cas": 37,
+  "vu_le": "2026-10-15"
  },
  "todo/generer-page.test.mjs": {
   "cas": 6,

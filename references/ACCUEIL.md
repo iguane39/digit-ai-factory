@@ -105,7 +105,7 @@ Ce tableau **se lit par la colonne de gauche** : on y cherche la phrase qui ress
 | déployer | étape MEP | `ETAPE-MEP.md`, forge-ops O-1…O-5, GO humain sur dossier de preuve |
 | signaler que quelque chose ne va pas | circuit de l'insatisfaction (dépôt en une phrase) | `gabarits\INSATISFACTION.md` — instruction automatique à six blocs (`AGENT-INSATISFACTION.md`), réouvertures comptées, cible zéro |
 | auditer le SEO et le GEO d’un site en ligne | mission forge-seo-geo (mandat) | `new_mission.py`, `METHODE.md`, `validate.py` exit 0 exigé |
-| auditer la gouvernance | forge-audit (mandat) | référentiel `core\`, engagement par tenant |
+| auditer le produit (« audit complet », gouvernance, maturité POC-to-Prod) | forge-audit, par défaut — la demande de l'humain vaut mandat (TF-1735, D-1 (a) du 15/10/2026) ; forge-tests n'en est que la preuve de la dimension tests | `tools/init-audit-workspace.mjs` chez le produit, `rapport-data.json` instruit sur `core\`, gate `tools/verifier-rapport.mjs`, rendu `tools/build-rapport.mjs` ; engagement client dans son dépôt privé |
 | discipliner ses données | forge-data | oracles profiler / tracer / restituer |
 
 ## Garde-fous du protocole (détail des garde-fous du noyau — RV-6, 14/08)

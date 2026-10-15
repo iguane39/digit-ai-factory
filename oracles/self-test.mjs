@@ -58,7 +58,7 @@ for (const a of CONTRAT47.artefacts) {
     .replaceAll("<produit>", "Produit-test").replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-15"));
 }
 writeFileSync(join(verte, "CLAUDE.md"),
-  "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
+  "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\nauditer le produit : forge-audit, init-audit-workspace\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
 writeFileSync(join(verte, ".env.example"), "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE= # à fournir :\n");
 writeFileSync(join(verte, ".env"), "PORT=8000\n");
@@ -93,10 +93,13 @@ writeFileSync(join(verte, "CLAUDE.md"), readFileSync(join(verte, "CLAUDE.md"), "
 mkdirSync(join(verte, ".claude"), { recursive: true });
 // TF-1592 (HERITAGE 1.16.1) : le câblage PreToolUse sur Artifact est exigé par R-47 ; la verte le porte.
 // TF-1635 (HERITAGE 1.19.0) : le hook d'ouverture asynchrone aussi.
+// TF-1716 (HERITAGE 1.22.0, 15/10/2026) : la garde d'identité sortante aussi — la verte ne la portait
+// pas, et 9 cas de cette recette étaient rouges à HEAD depuis l'entrée de l'exigence.
 writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true }] }],
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
-    PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] }] } }) + "\n");
+    PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
+      { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
@@ -173,6 +176,21 @@ check("verte : projet conforme → PASS exit 0", () => {
   if (exit !== 0) throw new Error(`exit ${exit}, findings FAIL : ${JSON.stringify(rapport.findings.filter((f) => f.statut === "FAIL"))}`);
   if (rapport.verdict !== "PASS") throw new Error("verdict != PASS");
   if (!rapport.non_juge.length) throw new Error("non_juge vide — un oracle sans limites déclarées ne juge rien");
+});
+
+// TF-1735 (D-1 (a) du 15/10/2026) — rouge : le CLAUDE.md d'avant la correction, qui ne connaît que
+// forge_tests comme route de verdict, est refusé par R-11 et par R-47, chacun nommant la route d'audit.
+check("TF-1735 rouge — CLAUDE.md sans route d'audit du produit : R-11 et R-47 FAIL qui nomment forge-audit", () => {
+  const f = join(verte, "CLAUDE.md");
+  const avant = readFileSync(f, "utf8");
+  try {
+    writeFileSync(f, avant.replace(/auditer le produit[^\n]*\n/, ""));
+    const { exit, rapport } = lance(verte);
+    const r11 = rapport.findings.filter((x) => x.regle === "R-11" && x.statut === "FAIL");
+    const r47 = rapport.findings.filter((x) => x.regle === "R-47" && x.statut === "FAIL");
+    if (exit !== 1 || !r11.some((x) => /forge-audit/.test(x.message))) throw new Error(`exit ${exit}, R-11 : ${JSON.stringify(r11)}`);
+    if (!r47.some((x) => /init-audit-workspace|CLAUDE\.md/.test(x.message))) throw new Error(`R-47 muette : ${JSON.stringify(r47)}`);
+  } finally { writeFileSync(f, avant); }
 });
 
 // TF-1592 (HERITAGE 1.16.1) — rouge : un settings câblé pour la factory mais SANS le PreToolUse sur

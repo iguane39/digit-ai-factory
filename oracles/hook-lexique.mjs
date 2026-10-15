@@ -79,7 +79,40 @@ export function correctionDeProcessus(message) {
   return String(message || "").split(/[.!?\n]/).some((p) => MOT_DE_PROCESSUS.test(p) && CORRECTION_DE_PROCESSUS.test(p));
 }
 
+/**
+ * LA CONSIGNE DE L'AUDIT DU PRODUIT (TF-1735, décision humaine D-1 (a) du 15/10/2026) — « audit
+ * complet » désigne forge-audit, et la demande de l'humain vaut mandat. Le fait : chez un produit,
+ * « lance un audit complet du projet » a lancé forge_tests, la session citant la ligne « Audit complet
+ * (verdict) » de son CLAUDE.md. La correction de TF-1206 (22/09) n'avait touché que le gabarit, et le
+ * mot « audit » restait à forge-tests, qui nomme ainsi ses propres runs. Reconnu : dans une même
+ * phrase, un mot d'audit et un objet qui est le produit entier. Épargné : l'audit SPÉCIALISÉ, quand le
+ * mot qui suit l'audit nomme un autre objet (prompt, skill, SEO, sécurité, tests…) — ces demandes ont
+ * leur skill ou leur forge. Limite assumée : « le rapport d'audit du projet est prêt » reçoit aussi la
+ * ligne ; elle ne bloque rien et ne dit à la session que la route à suivre si audit il y a.
+ */
+const MOT_AUDIT = /\b(?:audit|audits|auditer|audite[rz]?)\b\s*(?:(?:des|du|de|d['’]|les|la|le|l['’]|cette|cet|ce|mon|ma|notre|son|sa)(?![\p{L}])\s*)*(\p{L}+)?/iu;
+const AUDIT_SPECIALISE = /^(?:prompts?|skills?|seo|geo|s[ée]curit[ée]|websec|tests?|couverture|accessibilit[ée]|rgaa|traductions?|design|rendu|donn[ée]es|forge)$/iu;
+const OBJET_PRODUIT = /\b(?:complet|compl[èe]te|global|globale|g[ée]n[ée]ral|projet|produit|appli|application|code|d[ée]p[ôo]t|repo|plateforme|site|gouvernance|maturit[ée]|poc[- ]to[- ]prod)\b/iu;
+export function demandeAuditProduit(message) {
+  return String(message || "").split(/[.!?\n]/).some((p) => {
+    const a = MOT_AUDIT.exec(p);
+    if (!a) return false;
+    if (a[1] && AUDIT_SPECIALISE.test(a[1])) return false;
+    return OBJET_PRODUIT.test(p);
+  });
+}
+
 export const CONSIGNES = [
+  { regle: "audit", forme: "demande d'audit du produit",
+    reconnait: demandeAuditProduit,
+    texte: "Ce message demande un AUDIT DU PRODUIT : la route par défaut est forge-audit, et la demande de l'humain " +
+      "vaut mandat (décision humaine D-1 (a) du 15/10/2026, TF-1735). Depuis `<FORGE_ROOT>\\digit-ai-forge-audit` : " +
+      "`node tools/init-audit-workspace.mjs \"<racine du produit>\\forge\\audit\\<AAAAMMJJ>\"` crée l'espace du rapport ; " +
+      "le `rapport-data.json` s'instruit contrôle par contrôle sur les dimensions de `core\\dimensions\\`, preuves " +
+      "`fichier:ligne` ; `node tools/verifier-rapport.mjs <rapport-data.json>` est le gate bloquant avant diffusion, " +
+      "`node tools/build-rapport.mjs` le rendu. forge_tests n'est PAS l'audit du produit : son rapport sert de preuve " +
+      "à la dimension tests. Lancer forge_tests seul pour cette demande reproduit le défaut de TF-1206 et TF-1735." },
+
   { regle: "R-57", forme: "verdict de forme ou demande de gabarit",
     reconnait: (m) => DEMANDE_GABARIT.test(m) || verdictDeForme(m),
     texte: "Ce message porte un verdict humain sur la FORME d'un document, ou demande d'en faire un gabarit : " +
@@ -301,6 +334,18 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ["Ajoute une étape de tests au run", []],
     ["Tu ne devrais pas utiliser ce mot dans le titre", []],
     ["Non, garde la version précédente", []],
+    // TF-1735 (15/10/2026) — le premier cas est le message humain de la capture, mot pour mot ; les
+    // rouges sont les audits spécialisés, qui ont leur skill ou leur forge, et le run de forge-tests.
+    ["lance un audit complet du projet", ["audit"]],
+    ["Audite le produit avant la mise en production", ["audit"]],
+    ["Peux-tu auditer l'application ?", ["audit"]],
+    ["Fais un audit de gouvernance du projet", ["audit"]],
+    ["Relance les tests du projet", []],
+    ["Audite ce skill : quality-oracles déclenche mal", []],
+    ["Lance un audit SEO du site", []],
+    ["Fais un audit de sécurité de l'application", []],
+    ["Relance l'audit des tests du projet", []],
+    ["l'audit forge-tests a rendu exit 3", []],
   ];
   for (const [msg, attendu] of casConsignes) {
     const obtenu = reconnaitreConsignes(msg).map((c) => c.regle);

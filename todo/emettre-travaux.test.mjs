@@ -51,6 +51,17 @@ try {
     att(/INCOMPLET/.test(lot.md), "le bloc ne dit pas que l'artefact est incomplet");
     const r = verifier(lot.md);
     att(r.verdict === "PASS", `le lot émis ne tient pas sa propre forme : ${r.constats.filter((c) => c.statut === "FAIL").map((c) => c.regle).join(", ")}`);
+    att(!/REMPLACER/.test(lot.md) && /ni toucher au reste/.test(lot.md), "un motif sans geste propre reçoit la consigne d'un autre");
+  });
+
+  check("TF-1735 — CLAUDE.md sans route d'audit : le lot dit de REMPLACER les 2 lignes fautives, pas de coller le motif, et passe son juge", () => {
+    const lot = lotHeritage(LIGNE([{ cible: "CLAUDE.md", source: "gabarits/CLAUDE-PRODUIT.md",
+      mode: "presence_et_motif", etat: "incomplet", motifs_absents: ["init-audit-workspace"] }]), "20261015", "a", join(T, "registre-vide.jsonl"));
+    att(lot && lot.elements === 1, `${lot && lot.elements} élément(s) au lieu de 1`);
+    att(/REMPLACER la ligne « Auditer la gouvernance/.test(lot.md) && /Audit complet \(verdict\)/.test(lot.md), "le geste de remplacement n'est pas dit");
+    att(!/ni toucher au reste/.test(lot.md), "le lot interdit de toucher au reste tout en demandant de remplacer");
+    const r2 = verifier(lot.md);
+    att(r2.verdict === "PASS", `le lot émis ne tient pas sa propre forme : ${r2.constats.filter((c) => c.statut === "FAIL").map((c) => c.regle).join(", ")}`);
   });
 
   check("un produit CONFORME ne reçoit AUCUN lot — un canal qui parle pour rien se fait taire", () => {

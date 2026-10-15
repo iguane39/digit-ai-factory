@@ -51,7 +51,7 @@ change »). Une intention touchée se revalide avant toute exigence.
 - **design** : seuls les écrans touchés, oracles sur les artefacts modifiés ;
 - **development** : delta sous les mêmes gates (ruff, pytest, traçabilité des exigences du
   delta) ;
-- **tests** : **audit complet** (jamais en delta — la régression ne se voit qu'en entier) ;
+- **tests** : **campagne forge-tests complète** (jamais en delta — la régression ne se voit qu'en entier) ;
 - **MEP** : staging + qualif populée + GO, comme un premier run (M-4 avec un vrai N-1 cette
   fois).
 
