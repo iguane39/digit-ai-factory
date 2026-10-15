@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.34.0",
+ "version": "1.35.0",
  "date": "2026-10-15",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2025,6 +2025,66 @@
    ],
    "regle": "CONTRAT-INTERFACE.md § 3 : entrée de ledger rectification_forges_mobilisees",
    "oracle": "pilot, oracles/oracle-enclenchement.mjs EN1 (source de la liste), recette oracles/oracle-enclenchement.test.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "amelioration-jugee-sans-ses-effets",
+   "famille": "regle-morte",
+   "libelle": "Une version améliorée est jugée sur son échantillon sans contrôle de ses changements dans la population ni de son effet sur l'existant",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1695"
+   ],
+   "regle": "REGLES-PROJET.md R-63 point 2 (méthode en huit étapes)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S74",
+   "voisines": []
+  },
+  {
+   "cle": "restitution-sans-acces-au-service-livre",
+   "famille": "restitution-forme",
+   "libelle": "Une restitution annonce un service déployé ou une page publiée sans en donner l'adresse et le geste d'accès là où le lecteur lit d'abord",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1708"
+   ],
+   "regle": "REGLES-PROJET.md R-61 point 4, gabarits/RESTITUTION.md 2.38.0 bloc 2",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S70",
+   "voisines": []
+  },
+  {
+   "cle": "verdict-de-livraison-sur-critere-de-brief-sans-usage-reel",
+   "famille": "restitution-forme",
+   "libelle": "Un verdict déclare livré ce qui tient le critère d'un brief, sans dire ce qu'un utilisateur peut en faire à l'instant",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1709"
+   ],
+   "regle": "REGLES-PROJET.md R-61 point 3, gabarits/RESTITUTION.md 2.38.0 bloc 2",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S71",
+   "voisines": []
+  },
+  {
+   "cle": "exigence-constatee-sur-l-existant-sans-essai-dans-le-produit",
+   "famille": "gabarit-document",
+   "libelle": "Une exigence est déclarée constatée parce que la fonction existe dans la base, sans essai dans le produit livré",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1710"
+   ],
+   "regle": "gabarits/documents/fiche-produit/GABARIT.md 1.1.0, vocabulaires fermés (statut « présent dans la base »)",
+   "oracle": "pilot, oracles/oracle-fiche-produit.mjs FP4 et FP5",
+   "voisines": []
+  },
+  {
+   "cle": "livraison-partielle-presentee-comme-produit",
+   "famille": "restitution-forme",
+   "libelle": "Un produit est restitué comme livré alors que des exigences de sa fiche ne sont ni implémentées ni testées, au-delà des seuls secrets à saisir",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1711"
+   ],
+   "regle": "REGLES-PROJET.md R-61 (définition de livré), references/ETAPES-RUN.md contrat prêt client",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S72",
    "voisines": []
   }
  ],
