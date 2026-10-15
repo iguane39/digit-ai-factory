@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 162,
-  "vu_le": "2026-10-14"
+  "cas": 167,
+  "vu_le": "2026-10-15"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -197,8 +197,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-enclenchement.mjs": {
-  "cas": 27,
-  "vu_le": "2026-09-28"
+  "cas": 30,
+  "vu_le": "2026-10-15"
  },
  "oracle-etude-opportunite.mjs": {
   "cas": 3,
@@ -459,8 +459,8 @@
   "vu_le": "2026-10-12"
  },
  "oracles/oracle-enclenchement.test.mjs": {
-  "cas": 27,
-  "vu_le": "2026-09-28"
+  "cas": 30,
+  "vu_le": "2026-10-15"
  },
  "oracles/oracle-invariant-mesure.test.mjs": {
   "cas": 16,
@@ -515,8 +515,8 @@
   "vu_le": "2026-10-02"
  },
  "scripts/adopter-projet-existant.test.mjs": {
-  "cas": 37,
-  "vu_le": "2026-10-14"
+  "cas": 40,
+  "vu_le": "2026-10-15"
  },
  "scripts/allouer-indice.test.mjs": {
   "cas": 12,
@@ -555,16 +555,16 @@
   "vu_le": "2026-09-09"
  },
  "scripts/gitignore-captures.test.mjs": {
-  "cas": 3,
-  "vu_le": "2026-10-13"
+  "cas": 6,
+  "vu_le": "2026-10-15"
  },
  "scripts/indices-uniques.test.mjs": {
   "cas": 5,
   "vu_le": "2026-09-27"
  },
  "scripts/installer-projet.test.mjs": {
-  "cas": 21,
-  "vu_le": "2026-10-13"
+  "cas": 27,
+  "vu_le": "2026-10-15"
  },
  "scripts/lib-extensions-jugees.test.mjs": {
   "cas": 12,
@@ -589,6 +589,10 @@
  "scripts/oracles-design-page-generee.test.mjs": {
   "cas": 13,
   "vu_le": "2026-09-23"
+ },
+ "scripts/ouvrir-run.test.mjs": {
+  "cas": 10,
+  "vu_le": "2026-10-15"
  },
  "scripts/pre-commit-index.test.mjs": {
   "cas": 2,
@@ -631,8 +635,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 38,
-  "vu_le": "2026-10-13"
+  "cas": 40,
+  "vu_le": "2026-10-15"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
   "cas": 10,
@@ -715,8 +719,8 @@
   "vu_le": "2026-09-15"
  },
  "todo/accueillir-lot.mjs": {
-  "cas": 9,
-  "vu_le": "2026-10-12"
+  "cas": 10,
+  "vu_le": "2026-10-15"
  },
  "todo/adresses-ip.test.mjs": {
   "cas": 14,
