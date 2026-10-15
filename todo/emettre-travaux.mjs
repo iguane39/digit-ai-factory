@@ -559,7 +559,17 @@ if (lanceEnDirect) {
     //
     // L'inclusion se lit sur les ÉLÉMENTS, jamais sur le texte : deux formulations d'un même
     // constat sont le même travail pour le produit.
-    const elementsDe = (txt) => new Set([...txt.matchAll(/^### (.+?)\s*$/gm)].map((m) => m[1].trim()));
+    // TF-1735 (15/10/2026) — UN INCOMPLET SE DÉFINIT PAR SES MOTIFS ABSENTS, pas par son titre. La
+    // clé par titre seul a tenu pour « déjà confié » le motif `init-audit-workspace` chez 4 produits
+    // dont le CLAUDE.md était déjà incomplet d'un AUTRE motif : leur lot en attente ne demandait que
+    // la précédence, et la route d'audit ne leur parvenait jamais. Les motifs nommés entrent donc
+    // dans la clé ; la formulation, elle, n'y entre toujours pas.
+    const elementsDe = (txt) => new Set(txt.split(/^(?=### )/m).filter((s) => s.startsWith("### ")).map((s) => {
+      const titre = s.slice(4).split(/\r?\n/)[0].trim();
+      if (!/INCOMPLET/.test(titre)) return titre;
+      const fait = (s.match(/^- \*\*Le fait\*\*.*$/m) || [""])[0];
+      return `${titre}|${[...fait.matchAll(/« `([^`]+)` »/g)].map((m) => m[1]).sort().join(",")}`;
+    }));
     const estATraiter = (txt) => /^-\s+\*\*Statut\*\*\s*:\s*a_traiter\s*$/m.test(txt);
     const mien = elementsDe(lot.md);
     const englobant = correction ? null : lotsPresents.find((l) => {
