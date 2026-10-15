@@ -18,7 +18,7 @@ import { spawnSync } from "node:child_process";
 import {
   lotHeritage, indiceLibre, dateLot,
   blocConstat, constatsDestines, constatsDuRegistre, memeProduit, normaliserProduit,
-  orphelins, pseudonymeDe,
+  orphelins, pseudonymeDe, repartirOrphelins,
 } from "./emettre-travaux.mjs";
 import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
 
@@ -406,6 +406,27 @@ try {
       "le constat est dénoncé orphelin alors que son produit est rangé dans un sous-dossier du parc");
     att(orphelins([{ produit: "_Client/AutreProduit" }], f).length === 1,
       "un autre produit du même dossier client a capté le constat");
+  }));
+
+  // ── ABSENT DE CE POSTE N'EST PAS ORPHELIN (15/10/2026) ──
+  //
+  // Le 15/10, `--tous --essai` sur un poste rendait 9 « orphelins » et accusait le registre
+  // (« corriger destinataire_produit »). Mesuré : 8 des 9 produits étaient connus de la table des
+  // pseudonymes, et leur dépôt vivait sur l'AUTRE poste. Le registre était juste ; le poste, partiel.
+  check("un constat adressé à un produit CONNU de la table mais absent du parc est « absent du poste », pas orphelin", () => avecTable(() => {
+    const f = registre([
+      { ev: "creation", id: "TF-9014", statut: "en_cours", destinataire_produit: "Produit-77" },
+      { ev: "creation", id: "TF-9015", statut: "en_cours", destinataire_produit: "Produit-99" },
+    ], "i");
+    const perdus = orphelins([{ produit: "AutreProduit.com" }], f);
+    att(perdus.length === 2, `les deux constats devraient échapper au parc, obtenu ${perdus.length}`);
+    const { absents, inconnus } = repartirOrphelins(perdus, tablePseudo);
+    att(absents.map((e) => e.id).join() === "TF-9014", `le produit connu de la table n'est pas dit absent du poste : ${absents.map((e) => e.id)}`);
+    att(inconnus.map((e) => e.id).join() === "TF-9015", `le pseudonyme inconnu n'est plus dénoncé : ${inconnus.map((e) => e.id)}`);
+    const sansTable = repartirOrphelins(perdus, join(T, "table-absente.json"));
+    att(sansTable.inconnus.length === 2 && !sansTable.absents.length, "sans table, un constat a été dit absent du poste — la répartition invente");
+    const eco = repartirOrphelins([{ id: "TF-9016", destinataire_produit: "digit-ai-marketing" }], join(T, "table-absente.json"));
+    att(eco.absents.length === 1, "un produit DÉCLARÉ de l'écosystème, hors table par construction, est dénoncé orphelin");
   }));
 
   check("un pseudonyme que la table ne porte PAS reste orphelin — la résolution n'invente rien", () => avecTable(() => {

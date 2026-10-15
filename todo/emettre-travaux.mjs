@@ -49,6 +49,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { cheminsTables } from "../scripts/lib-confidentiel.mjs";
+import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { relever } from "../scripts/relever-heritage.mjs";
@@ -141,6 +142,24 @@ export function orphelins(lignes, chemin = join(PILOT, "todo", "TODO.jsonl")) {
   const produits = lignes.map((l) => l.produit);
   return constatsDestines(chemin)
     .filter((e) => !produits.some((p) => designeProduit(e.destinataire_produit, p)));
+}
+
+/**
+ * ABSENT DE CE POSTE N'EST PAS ORPHELIN (15/10/2026). Le parc scanné est celui d'UN poste ; un produit
+ * dont le dépôt vit sur l'autre poste échappe au scan sans que le registre ait tort. La table des
+ * pseudonymes, elle, connaît tous les produits du parc entier : un destinataire qu'elle porte (comme
+ * pseudonyme ou comme nom réel) est « absent du poste », et seul un destinataire qu'elle ignore reste
+ * un orphelin, qui accuse le registre. Mesuré le 15/10 : 8 « orphelins » sur 9 étaient des produits de
+ * l'autre poste. Lecture seule de la table ; sans table, rien n'est dit absent — la répartition n'invente pas.
+ * Les produits de l'écosystème (`PRODUITS_DE_L_ECOSYSTEME` de `scripts/lib-parc.mjs`) ne sont jamais dans la
+ * table, parce qu'ils se citent en clair : déclarés, ils sont connus au même titre (le 9e « orphelin » du 15/10).
+ */
+export function repartirOrphelins(perdus, chemin = cheminsTables().produits) {
+  let table = {};
+  try { table = existsSync(chemin) ? JSON.parse(readFileSync(chemin, "utf8")).produits || {} : {}; } catch { table = {}; }
+  const connu = (d) => [...PRODUITS_DE_L_ECOSYSTEME].some((p) => memeProduit(d, p))
+    || Object.entries(table).some(([reel, pseudo]) => memeProduit(d, pseudo) || memeProduit(d, reel));
+  return { absents: perdus.filter((e) => connu(e.destinataire_produit)), inconnus: perdus.filter((e) => !connu(e.destinataire_produit)) };
 }
 
 export function constatsDuRegistre(produit, chemin = join(PILOT, "todo", "TODO.jsonl")) {
@@ -629,15 +648,22 @@ if (lanceEnDirect) {
       + `(${resolve(racine)}) : le registre et le parc ne parlent pas des mêmes produits, `
       + "et tout constat réel y paraîtrait orphelin");
   }
-  if (perdus.length) {
-    console.error(`\n[ORPHELINS] ${perdus.length} constat(s) désignent un produit que le parc ne porte pas —`);
+  const { absents, inconnus } = repartirOrphelins(perdus);
+  if (absents.length) {
+    console.log(`\n[ABSENTS DU POSTE] ${absents.length} constat(s) désignent un produit que la table des pseudonymes connaît, `
+      + "mais dont le dépôt n'est pas sur ce poste — le registre n'est pas en cause :");
+    for (const e of absents.slice(0, 10))
+      console.log(`  - ${e.id} → « ${e.destinataire_produit} » (à émettre depuis le poste qui porte ce produit)`);
+  }
+  if (inconnus.length) {
+    console.error(`\n[ORPHELINS] ${inconnus.length} constat(s) désignent un produit que ni le parc ni la table des pseudonymes ne portent —`);
     console.error("ils n'atteindront JAMAIS personne, et rien d'autre ne le dirait :");
-    for (const e of perdus.slice(0, 10))
-      console.error(`  - ${e.id} → « ${e.destinataire_produit} » (aucun produit du parc ne correspond)`);
+    for (const e of inconnus.slice(0, 10))
+      console.error(`  - ${e.id} → « ${e.destinataire_produit} » (aucun produit du parc ni de la table ne correspond)`);
     console.error("Corriger `destinataire_produit` au registre, ou clore l'item avec son motif.");
   }
 
   console.log("AUCUN commit n'a été fait chez aucun produit : déposer dans une boîte d'entrée est réversible,");
   console.log("entrer dans un historique est un geste dont le produit est seul auteur.");
-  process.exit(refuses || perdus.length ? 1 : 0);
+  process.exit(refuses || inconnus.length ? 1 : 0);
 }
