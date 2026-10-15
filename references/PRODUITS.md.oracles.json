@@ -1,9 +1,9 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-ac8323f7666706cb1\\references\\PRODUITS.md",
-  "date_iso": "2026-10-02T07:45:42.428Z",
-  "registre_version": "2.35.0",
+  "cible": "references/PRODUITS.md",
+  "date_iso": "2026-10-15T08:37:44.399Z",
+  "registre_version": "2.39.0",
   "profil": "digit-ai",
-  "niveau": "note",
+  "niveau": "diffuse",
   "verdict": "PASS",
   "resume": {
     "pass": 3,
@@ -44,34 +44,34 @@
       "domaine": "Calculs / chiffres",
       "file": "references\\PRODUITS.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "references\\PRODUITS.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
       "file": "references\\PRODUITS.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
       "file": "references\\PRODUITS.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\PRODUITS.md",
-    "ts": "2026-10-02T07:45:42.427Z",
+    "ts": "2026-10-15T08:37:44.398Z",
     "fichiers": {
-      "references\\PRODUITS.md": "63e429e67145d1db144b8c808fa9d55c715dc1a5886e5d51ac93d58b219c045d"
+      "references\\PRODUITS.md": "2487d9870619e7e15e5b8484dca4c6802f8f2dc15ef71ba13aa09f094d501e11"
     }
   },
   "empreinte_motif": null,
