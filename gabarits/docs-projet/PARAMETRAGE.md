@@ -1,6 +1,7 @@
 ---
 role: signification de la configuration — miroir structuré de .env.example (R-20/R-22)
 destinataire: humain
+role_destinataire: développeur ou exploitant qui configure le produit
 sources_de_verite: [.env.example]
 verifie_le: {AAAA-MM-JJ}
 # exactement les noms de .env.example — l'oracle R-22 vérifie la parité. Le commentaire vit
