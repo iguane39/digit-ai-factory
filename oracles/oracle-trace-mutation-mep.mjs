@@ -150,7 +150,13 @@ function dossiersMep(racine, profondeur = 4) {
 // recopier une formule au lieu de rendre compte — le contraire de ce que cet oracle cherche.
 const PARLE_DE_MUTATION = /\bmutation(s)?\b|\bmutant(s)?\b/i;
 const DECLAREE_JOUEE = /(campagne|mutation)[^.\n]{0,80}(jou[ée]e?|ex[ée]cut[ée]e?|lanc[ée]e?|pass[ée]e?|men[ée]e?)|jou[ée]e?[^.\n]{0,40}(campagne|mutation)/i;
-const DECLAREE_REFUSEE = /(refus|report|[ée]cart|non retenue|pas jou[ée]e?|non jou[ée]e?|d[ée]clin)/i;
+// TF-1803 (lot Produit-83 20261015b, RT-15) : DECLAREE_JOUEE lisait « jouée » dans une phrase NIÉE
+// (« non jouée », « n'a pas été jouée ») et exigeait preuve et marqueur d'un refus écrit. La campagne
+// est dite jouée si UNE proposition (coupée au point, au point-virgule, au retour) l'affirme sans
+// négation devant le verbe ; une proposition niée n'affirme rien.
+const NEGATION_AVANT_VERBE = /(?:\bnon\b|\bpas\b|\bjamais\b|\bni\b|\baucune?\b|\bsans\b)[^.;\n]{0,30}?(?:jou[ée]|ex[ée]cut[ée]|lanc[ée]|pass[ée]|men[ée])/i;
+const affirmeJouee = (texte) => texte.split(/[.;\n]/).some((p) => DECLAREE_JOUEE.test(p) && !NEGATION_AVANT_VERBE.test(p));
+const DECLAREE_REFUSEE =/(refus|report|[ée]cart|non retenue|pas jou[ée]e?|non jou[ée]e?|d[ée]clin)/i;
 const PROPOSEE = /(propos|recommand|sugg[ée]r)/i;
 // La PREUVE d'une campagne : un chiffre qui la localise, ou le chemin du marqueur. Le simple mot
 // « mutation » suivi d'un « OK » n'en est pas une, et c'est precisement ce que TM2 refuse.
@@ -294,7 +300,7 @@ export function juger(racine) {
 
     // TM1 — le dossier PARLE de la mutation, dans un sens ou dans l'autre.
     const parle = PARLE_DE_MUTATION.test(texte);
-    const joueeDite = parle && DECLAREE_JOUEE.test(texte);
+    const joueeDite = parle && affirmeJouee(texte);
     const refusDit = parle && (DECLAREE_REFUSEE.test(texte) || PROPOSEE.test(texte));
     if (!parle) {
       ko("TM1", chemin, "le dossier de MEP ne dit RIEN de la campagne de mutation. Depuis D-34 "
@@ -445,6 +451,23 @@ function selfTest() {
   attendre("refus", refus, "TM1", "PASS");
   attendre("refus", refus, "TM2", "SANS_OBJET");
   attendre("refus", refus, "TM3", "SANS_OBJET");
+
+  // TF-1803 (lot Produit-83 20261015b, RT-15) : « jouée » dans une phrase NIÉE n'est pas une campagne
+  // jouée. Avant : « non jouée » et « n'a pas été jouée » faisaient exiger preuve et marqueur (TM2/TM3
+  // FAIL) à un refus pourtant écrit. Vert : les deux négations rendent TM2 et TM3 SANS_OBJET. Borne :
+  // une phrase niée SUIVIE d'une affirmation dans une autre proposition reste une campagne jouée.
+  for (const [nom, phrase] of [
+    ["nie-non", "Campagne de mutation non jouée : proposée au porteur puis refusée pour ce passage, décision du jour.\n"],
+    ["nie-pas", "La campagne de mutation n'a pas été jouée ; elle a été écartée par décision humaine du jour.\n"],
+  ]) {
+    const r = produit(nom, "# Dossier de MEP\n\n" + phrase, null);
+    attendre(nom, r, "TM1", "PASS");
+    attendre(nom, r, "TM2", "SANS_OBJET");
+    attendre(nom, r, "TM3", "SANS_OBJET");
+  }
+  attendre("nie-puis-joue", produit("nie-puis-joue",
+    "# Dossier de MEP\n\nLa campagne de mutation n'a pas été jouée hier ; la campagne de mutation a été rejouée ce matin : score 0,8 sur 30 mutants.\n",
+    { sha: "abc1234def5678" }), "TM2", "PASS");
 
   // SANS OBJET : produit sans dossier de MEP — une absence d'evenement ne s'accable pas.
   attendre("sans-dossier", produit("sans-dossier", null, null), "TM1", "SANS_OBJET");
