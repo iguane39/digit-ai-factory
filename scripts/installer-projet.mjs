@@ -21,7 +21,10 @@
  *      (`adopter-projet-existant.mjs`), README d'`input\` et `output\` ;
  *   3. VÉRIFIE par des contrôles exécutés, puis affiche une bannière : « FACTORY DIGIT-AI
  *      OPÉRATIONNELLE » si tous sont verts, « INSTALLATION INCOMPLÈTE » sinon, chaque défaut avec
- *      son remède. Jamais l'une à la place de l'autre.
+ *      son remède. Jamais l'une à la place de l'autre ;
+ *   4. joue `oracle-conformite-projet` sur un produit (TF-1696) et rend chaque FAIL comme reste à faire
+ *      avant l'ouverture du run, avec le geste qui pose le socle (`ouvrir-run.mjs`, TF-1697). La
+ *      conformité ne rend pas l'installation incomplète, mais la bannière ne dit plus « prête ».
  *
  * Usage : node <pilot>/scripts/installer-projet.mjs [<projet>] [--sans-bootstrap] [--json]
  *   <projet>          dossier du projet (défaut : dossier courant)
@@ -100,6 +103,7 @@ export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(P
 
   // 2. Le projet -----------------------------------------------------------------------------
   let nature = "";
+  let conformite = null;   // TF-1696 : jouée sur un produit seulement, jamais sur le pilot ni une forge
   const forge = FORGES.find((f) => meme(join(racine, f.nom), projet));
   if (!existsSync(projet) || !statSync(projet).isDirectory()) {
     ctl("projet", false, `${projet} n'existe pas`, "ouvrir la session dans le dossier du projet, puis relancer");
@@ -153,22 +157,36 @@ export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(P
       trouvable ? `${PILOT}, par l'ordre de résolution du lanceur`
         : persistee ? `FORGE_ROOT=${racine} posée en variable utilisateur (prochaines sessions)` : `${PILOT} hors des chemins résolus sans variable`,
       remedeRacine);
+    // TF-1696 (15/10/2026) — LA CONFORMITÉ DU PROJET EST JOUÉE, ET RENDUE COMME RESTE À FAIRE. Le fait
+    // (lot Produit-82 20261014a, RT-1) : « OPÉRATIONNELLE », 8/8 verts, exit 0, au même instant
+    // qu'oracle-conformite-projet rendait FAIL (R-12, R-13, R-20) sur le même projet. L'installation et
+    // la conformité restent deux questions : la seconde ne rend pas l'installation incomplète, mais la
+    // bannière ne dit plus « prête » quand l'oracle dit FAIL, et chaque FAIL est nommé avec le geste
+    // qui pose le socle (`ouvrir-run.mjs`, TF-1697).
+    const o = node("oracles/oracle-conformite-projet.mjs", projet);
+    try {
+      const j = JSON.parse(o.out.slice(o.out.indexOf("{")));
+      conformite = { verdict: j.verdict, fails: (j.findings || []).filter((f) => f.statut === "FAIL").map((f) => ({ regle: f.regle, ou: f.ou, message: f.message })) };
+    } catch { conformite = { verdict: "ILLISIBLE", fails: [], exit: o.status }; }
   }
   const juges = controles.filter((c) => c.ok !== null);
   const operationnelle = juges.every((c) => c.ok) && controles.every((c) => c.ok !== null);
-  return { projet, pilot: PILOT, racine, nature, operationnelle, controles, sortieBootstrap,
+  return { projet, pilot: PILOT, racine, nature, operationnelle, controles, sortieBootstrap, ...(conformite ? { conformite } : {}),
     version: spawnSync("git", ["describe", "--tags", "--always"], { cwd: PILOT, encoding: "utf8" }).stdout?.trim() || "",
     pathNeuf: (env.FORGE_PATH_NEUF || "").trim() };
 }
 
-function banniere(r) {
+export function banniere(r) {
   const trait = "═".repeat(72);
   const L = [];
+  const restes = r.conformite && r.conformite.verdict !== "PASS" ? r.conformite.fails || [] : [];
   if (r.sortieBootstrap) L.push(r.sortieBootstrap.trimEnd(), "");
   L.push(trait);
-  L.push(r.operationnelle
-    ? "  FACTORY DIGIT-AI OPÉRATIONNELLE — prête à être utilisée sur ce projet"
-    : "  INSTALLATION INCOMPLÈTE — la factory n'est PAS encore opérationnelle");
+  L.push(!r.operationnelle
+    ? "  INSTALLATION INCOMPLÈTE — la factory n'est PAS encore opérationnelle"
+    : r.conformite && r.conformite.verdict !== "PASS"
+      ? `  FACTORY DIGIT-AI OPÉRATIONNELLE — installée ; le projet n'est PAS encore conforme : ${restes.length} reste(s) à faire avant l'ouverture du run`
+      : "  FACTORY DIGIT-AI OPÉRATIONNELLE — prête à être utilisée sur ce projet");
   L.push(trait);
   L.push(`  Projet : ${r.projet}${r.nature ? ` (${r.nature})` : ""}`);
   L.push(`  Pilot  : ${r.pilot} (${r.version})`);
@@ -178,7 +196,16 @@ function banniere(r) {
     if (c.ok === false && c.remede) L.push(`      remède : ${c.remede}`);
   }
   const n = r.controles.filter((c) => c.ok !== null).length;
-  L.push(`  ${r.controles.filter((c) => c.ok).length}/${n} contrôle(s) exécuté(s) verts.`);
+  L.push(`  ${r.controles.filter((c) => c.ok).length}/${n} contrôle(s) d'installation exécuté(s) verts.`);
+  if (r.conformite) {
+    // TF-1696 : la conformité du projet, jouée par son oracle, dite à part de l'installation.
+    L.push(`  ${r.conformite.verdict === "PASS" ? "✓" : "✗"} conformité du projet (oracle-conformite-projet) : ${r.conformite.verdict}`
+      + (restes.length ? ` — ${restes.length} reste(s) à faire avant l'ouverture du run :` : ""));
+    const AFFICHES = 12;
+    for (const f of restes.slice(0, AFFICHES)) L.push(`      ${f.regle} · ${f.ou} — ${String(f.message).slice(0, 160)}`);
+    if (restes.length > AFFICHES) L.push(`      … et ${restes.length - AFFICHES} autre(s), sur ${restes.length} : node "${join(PILOT, "oracles", "oracle-conformite-projet.mjs")}" "${r.projet}"`);
+    if (restes.length) L.push(`      geste qui pose le socle d'ouverture et redit ce qui reste : node "${join(PILOT, "scripts", "ouvrir-run.mjs")}" "${r.projet}" --run <id> --forges <forges mobilisées>`);
+  }
   if (r.operationnelle) {
     L.push("");
     if (r.pathNeuf) L.push(`  Outils ajoutés au PATH utilisateur (${r.pathNeuf}) : les prochaines fenêtres VS Code et terminaux les verront.`);
