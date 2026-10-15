@@ -58,7 +58,7 @@ for (const a of CONTRAT47.artefacts) {
     .replaceAll("<produit>", "Produit-test").replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-15"));
 }
 writeFileSync(join(verte, "CLAUDE.md"),
-  "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\nauditer le produit : forge-audit, init-audit-workspace\névoluer : run de version\ndéployer : MEP\n");
+  "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\nauditer le produit : forge-audit, init-audit-workspace\névoluer : run de version\ndéployer : MEP\n## Reprise sur un autre poste (R-64)\nCanal de reprise : absent — un seul poste.\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
 writeFileSync(join(verte, ".env.example"), "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE= # à fournir :\n");
 writeFileSync(join(verte, ".env"), "PORT=8000\n");
@@ -93,11 +93,13 @@ writeFileSync(join(verte, "CLAUDE.md"), readFileSync(join(verte, "CLAUDE.md"), "
 mkdirSync(join(verte, ".claude"), { recursive: true });
 // TF-1592 (HERITAGE 1.16.1) : le câblage PreToolUse sur Artifact est exigé par R-47 ; la verte le porte.
 // TF-1635 (HERITAGE 1.19.0) : le hook d'ouverture asynchrone aussi.
+// TF-1736 (HERITAGE 1.24.0, 15/10/2026) : le hook de reprise multi-poste, à l'ouverture et en fin de tour.
 // TF-1716 (HERITAGE 1.22.0, 15/10/2026) : la garde d'identité sortante aussi — la verte ne la portait
 // pas, et 9 cas de cette recette étaient rouges à HEAD depuis l'entrée de l'exigence.
 writeFileSync(join(verte, ".claude", "settings.json"),
-  JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true }] }],
-    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }],
+  JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true },
+      { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true }] }],
+    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
       { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });

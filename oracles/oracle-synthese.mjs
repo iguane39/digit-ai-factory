@@ -83,6 +83,8 @@
  *       système, ou « justesse non mesurée » (15/10, TF-1694, R-63) ; S74 un gain annoncé sur un
  *       échantillon dit le contrôle des changements dans la population et l'effet sur l'existant
  *       (TF-1695, R-63) ; avertissantes ;
+ *   S75 chez un produit qui déclare un canal de reprise (forge/REPRISE.json), aucune action
+ *       manuelle_utilisateur ne demande un transport entre postes (15/10, TF-1736, R-64) ; avertissante ;
  *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
  *   S38 une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'EXEMPTION
  *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
@@ -3799,6 +3801,45 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+
+  // S75 (TF-1736, lot Produit-12 20261014b RS-33, R-64 point 5) — UN TRANSPORT ENTRE POSTES NE SE LAISSE
+  // PAS À L'HUMAIN QUAND LE CANAL EST DÉCLARÉ. Le 14/10/2026, une session a laissé « le transport des
+  // entrants » en manuelle_utilisateur, « canal à choisir », alors que le dossier Google Drive de reprise
+  // était déclaré et contenait déjà ces entrants. Portée : un produit qui porte `forge/REPRISE.json`,
+  // reconnu en remontant depuis le fichier jugé ou depuis `--racine` (même voie que S48). Ce juge lit, au
+  // bloc 8, une action manuelle_utilisateur qui demande de copier, transférer, apporter ou déposer
+  // quelque chose vers un autre poste, un dossier synchronisé ou une clé. Avertissante à son entrée.
+  // NON JUGÉ : un transport demandé ailleurs qu'au bloc 8, ou dit sans ces verbes.
+  {
+    const departs = [];
+    if (cheminJuge) { try { departs.push(dirname(resolve(cheminJuge))); } catch { /* chemin non résolu */ } }
+    if (RACINE_PROJET) { try { departs.push(resolve(RACINE_PROJET)); } catch { /* racine non résolue */ } }
+    let canalDeclare = false;
+    for (let d of departs) for (let i = 0; i < 12 && d; i++) {
+      if (existsSync(join(d, "forge", "REPRISE.json"))) { canalDeclare = true; break; }
+      const parent = dirname(d); if (parent === d) break; d = parent;
+    }
+    if (!canalDeclare)
+      findings.push({ regle: "S75", statut: "SANS_OBJET", message: "aucun canal de reprise déclaré (forge/REPRISE.json absent en remontant depuis le fichier jugé) — transport entre postes non jugé" });
+    else {
+      const bActions = bloc(texte, BLOCS[7][0]) || "";
+      const segments = [];
+      for (const l of bActions.split("\n")) {
+        if (/^(?:[-*]\s|\|)/.test(l) || !segments.length) segments.push(l);
+        else segments[segments.length - 1] += "\n" + l;
+      }
+      const VERBE = String.raw`(?:copi\w*|recopi\w*|transf[ée]r\w*|apport\w*|d[ée]pos\w*|d[ée]plac\w*|transport\w*|rapatri\w*|t[ée]l[ée]vers\w*|synchronis\w*)`;
+      const LIEU = String.raw`(?:autre (?:poste|pc|ordinateur|machine)|second poste|entre (?:les |deux )?postes|(?:google )?drive|onedrive|dropbox|cl[ée] usb|dossier (?:synchronis[ée]|partag[ée])|canal de reprise)`;
+      const TRANSPORT = uni(new RegExp(String.raw`\b${VERBE}\b[^|]{0,100}\b${LIEU}\b|\b${LIEU}\b[^|]{0,60}\b${VERBE}\b`, "i"));
+      const fautives = segments.filter((s) => /\bmanuelle_utilisateur\b/.test(s) && TRANSPORT.test(s));
+      fautives.length
+        ? ko("S75", `${fautives.length} action(s) manuelle_utilisateur demandent un transport entre postes alors que le canal de reprise est déclaré (forge/REPRISE.json) — `
+          + "la reprise se joue sans geste humain : le hook `reprise` restaure à l'ouverture et envoie en fin de tour ; ce qui revient à l'humain est le feu vert de publication, pas la copie. "
+          + "Le 14/10/2026, le transport des entrants a été laissé à l'humain alors que le dossier Drive les contenait déjà (TF-1736, R-64). "
+          + `Ex. : ${fautives[0].replace(/\s+/g, " ").trim().slice(0, 110)}`)
+        : ok("S75", "canal de reprise déclaré, et aucune action de transport entre postes n'est laissée à l'humain");
+    }
+  }
   return findings;
 }
 
@@ -5551,6 +5592,30 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`${regle} (TF-1694, TF-1695) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
   if (!/existant/.test(constatDe(r74pop, "S74").message || ""))
     casse.push("S74 (TF-1695) : le gain contrôlé dans la population mais pas sur l'existant doit NOMMER l'existant qui manque : " + String(constatDe(r74pop, "S74").message || "").slice(0, 160));
+  // 15/10 — TF-1736 : S75, LE TRANSPORT ENTRE POSTES, DANS SES QUATRE SENS. Un produit jetable porte son
+  // `forge/REPRISE.json`. (a) L'action A-2 laissée à l'humain demande de copier les entrants sur l'autre
+  // poste par le Drive : FAIL. (b) La MÊME passée en auto_ia, le remède : PASS. (c) La MÊME hors de tout
+  // produit qui déclare un canal : SANS_OBJET dit à voix haute. (d) La verte sous canal déclaré : PASS.
+  mkdirSync(join(dir, "produit75", "forge"), { recursive: true });
+  writeFileSync(join(dir, "produit75", "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { chemins: ["G:/Mon Drive/Produit - Reprise"] }, elements: ["input"] }), "utf8");
+  const A2_75 = "- **A-2** — ensuite TF-0221 (manuelle_utilisateur) — décision normative, impact sur 19 citations.";
+  const transport75 = verte.replace(A2_75, "- **A-2** — ensuite TF-0221 (manuelle_utilisateur) — copier les entrants du produit sur l'autre poste par le dossier Drive.");
+  const jouer75 = (nom, contenu, avecCanal) => {
+    const f = join(dir, nom); writeFileSync(f, contenu, "utf8");
+    return spawnSync(process.execPath, [moi, f, ...(avecCanal ? ["--racine", join(dir, "produit75")] : [])], { encoding: "utf8" });
+  };
+  const r75faute = jouer75("tf1736-transport-humain.md", transport75, true);
+  const r75remede = jouer75("tf1736-transport-auto.md", transport75.replace("TF-0221 (manuelle_utilisateur) — copier", "TF-0221 (auto_ia) — copier"), true);
+  const r75hors = jouer75("tf1736-transport-sans-canal.md", transport75, false);
+  const r75verte = jouer75("tf1736-verte-sous-canal.md", verte, true);
+  if (transport75 === verte) casse.push("S75 (TF-1736) : la fixture n'a pas remplacé l'action A-2 — la verte a changé, le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r75faute, "FAIL", "le transport des entrants laissé à l'humain sous canal déclaré passe — c'est le défaut du 14/10"],
+    [r75remede, "PASS", "la MÊME action passée en auto_ia est accusée — le remède du message échoue"],
+    [r75hors, "SANS_OBJET", "hors de tout canal déclaré, la règle devrait se taire et le DIRE"],
+    [r75verte, "PASS", "la verte, qui ne demande aucun transport, est accusée sous canal déclaré"],
+  ]) if (!new RegExp(`"S75"[^}]*${statut}`).test(r.stdout))
+    casse.push(`S75 (TF-1736) : ${quoi} — attendu ${statut} : ` + ((/"S75"[\s\S]{0,200}/.exec(r.stdout) || ["sortie illisible"])[0]).replace(/\s+/g, " "));
   // 27/09 — LE COMPTE DE CAS SE MESURE. Le bilan portait « 39/39 » écrit à la main ; le harnais le lit
   // comme un CLIQUET (I5, `lib-baseline-recettes.mjs` : premier « N PASS », sinon le ratio N/N), et il
   // n'avait pas bougé quand deux paires se sont ajoutées le 26/09. Retiré seul, il a laissé le
@@ -5594,6 +5659,7 @@ console.log(JSON.stringify({
     "S56 (TF-1498) ne vérifie pas que la porte citée a réellement été rejouée, ni sur ce qui sera lancé : il lit une ligne qui la nomme, datée du jour de la restitution et chiffrée. La déclaration « aucune porte de la chaîne ne juge une base externe » n'est pas vérifiée non plus",
     "S64 à S68 (13/10/2026) jugent une FORME : S64 qu'une ligne existe sous un titre, jamais ce qu'elle dit ; S65 que deux familles de voies sont NOMMÉES, jamais qu'elles ont été essayées ni sur la même ressource, et pas les quatre que R-29 point 4 énumère ; S66 une concentration chiffrée ou une invraisemblance qualifiée par le texte, jamais celle que l'auteur n'a pas vue ; S67 qu'un porteur durable est nommé, jamais qu'il tourne ; S68 qu'un essai est cité pour une image ou un site, jamais pour un PDF, une base ou une API",
     "S70 à S72 (15/10/2026, R-61) jugent ce que le bloc 0 et le verdict DÉCLARENT : S70 qu'une adresse cliquable et un geste d'accès y figurent, jamais que l'adresse réponde ; S71 que l'usage à l'instant et ce qui manque y sont dits, jamais que ce soit vrai ; S72 qu'un compte d'exigences y figure, jamais qu'il soit juste. Une livraison annoncée par le seul nom d'un produit, sans « le produit » ni déploiement annoncé, n'est pas vue",
+    "S75 (15/10/2026, R-64) lit le seul bloc 8 et les verbes de transport (copier, transférer, apporter, déposer, synchroniser…) près d'un lieu (autre poste, Drive, clé USB, dossier synchronisé) : un transport demandé ailleurs, ou dit autrement, lui échappe ; elle ne vérifie pas que le canal déclaré contienne ce qu'il faudrait transporter — c'est RP4 d'oracle-reprise qui le mesure",
     "S73 et S74 (15/10/2026, R-63) jugent une MENTION : S73 qu'une justesse, un échantillon de référence ou « justesse non mesurée » figure dans une restitution qui rapporte une part traitée, jamais que l'échantillon soit indépendant ni la mesure juste (PC-2 à PC-6 non jugés) ; S74 que le contrôle des changements dans la population et l'effet sur l'existant sont nommés, jamais qu'ils aient été faits, ni le test rouge sur le code précédent ni la règle d'arrêt",
   ],
 }, null, 1));

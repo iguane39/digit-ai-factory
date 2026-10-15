@@ -18,7 +18,7 @@
  *      ligne de niveau qui cite CE chemin ; chez un produit qui ne le porte pas, rien.
  * Joué par oracles/self-tests.mjs (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -79,7 +79,7 @@ try {
   }
   copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie, "bootstrap.mjs"));
   // TF-1528 : le hook des droits accordés rejoue `scripts/verifier-droits-accordes.mjs` et sa table datée.
-  for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json"]) {
+  for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs"]) {
     mkdirSync(join(copie, dirname(f)), { recursive: true });
     copyFileSync(join(PILOT, f), join(copie, f));
   }
@@ -149,8 +149,28 @@ try {
   check("8 identité sortante : l'adresse de l'utilisateur dans un User-Agent vers une API tierce est refusée par le lanceur (R-62)",
     iFaute.status === 2 && /R-62/.test(iFaute.stderr), iFaute.stdout + iFaute.stderr);
   check("8 bis identité sortante : le même appel avec un en-tête neutre passe", iNeutre.status === 0, iNeutre.stdout + iNeutre.stderr);
+  // 9 — TF-1736, reprise par le lanceur (R-64) : le canal déclaré porte un générateur absent du poste,
+  // l'ouverture le restaure sans geste humain ; sans feu vert, la fin de tour n'envoie rien ; un produit
+  // sans manifeste reste muet.
+  const canalR = join(base, "Mon Drive", "Produit - Reprise");
+  mkdirSync(join(canalR, "scripts", "generateurs"), { recursive: true });
+  writeFileSync(join(canalR, "scripts", "generateurs", "gen-1.py"), "# générateur 1\n", "utf8");
+  const PR = produit("produit-reprise", false);
+  writeFileSync(join(PR, "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { chemins: [canalR] }, elements: ["scripts/generateurs"] }), "utf8");
+  mkdirSync(join(PR, "scripts", "generateurs"), { recursive: true });
+  writeFileSync(join(PR, "scripts", "generateurs", "local.py"), "# fait ici\n", "utf8");
+  const envR = { ...env, REPRISE_ETAT: join(base, "etat-reprise") };
+  const reprise = (dossier, mode) => spawnSync(process.execPath, [join(dossier, "forge", "hooks", "factory.mjs"), "reprise", mode], { encoding: "utf8", cwd: dossier, env: envR, input: "{}" });
+  const rR = reprise(PR, "--restaurer");
+  check("9 reprise : l'ouverture restaure depuis le canal déclaré le générateur absent du poste (R-64)",
+    rR.status === 0 && existsSync(join(PR, "scripts", "generateurs", "gen-1.py")) && /1 fichier\(s\) restauré/.test(rR.stdout), rR.stdout + rR.stderr);
+  const rP = reprise(PR, "--pousser");
+  check("9 bis reprise : sans envoi actif ni feu vert, la fin de tour n'envoie rien vers le canal",
+    rP.status === 0 && !existsSync(join(canalR, "scripts", "generateurs", "local.py")), rP.stdout + rP.stderr);
+  const rMuet = reprise(produit("produit-sans-reprise", false), "--restaurer");
+  check("9 ter reprise : un produit sans forge/REPRISE.json reste muet", rMuet.status === 0 && !rMuet.stdout.trim() && !rMuet.stderr.trim(), rMuet.stdout + rMuet.stderr);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736)`);

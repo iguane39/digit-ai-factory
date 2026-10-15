@@ -1777,3 +1777,42 @@ synthèses d'`output\04-plans\`. Non mécanisé ici : PC-2 à PC-6 et les étape
 oracle du domaine peut jouer. Leur place est le registre de `quality-oracles` (domaine « sortie
 automatisée de tri, de classement ou de rédaction ») et le skill `la-boucle`, dans la forge des agents :
 la descente y est déclarée à faire, elle n'est pas faite par cette règle.
+
+## AS. R-64 — un produit dont le canal de reprise est déclaré se reprend sur tous les postes de son développeur sans geste humain (TF-1736 — 15/10/2026)
+
+Le fait, lot `Produit-12 - RETOURS - 20261014b` (RS-33), décision humaine D-3 (b) du 15/10/2026. Le
+03/10, le développeur demande à reprendre son produit sur un autre poste ; un dossier Google Drive
+privé est créé, avec une notice à suivre à la main. Il contient les 58 générateurs des pages
+d'exemple, les secrets et les entrants. Le 14/10, une session de l'autre poste déclare ces générateurs
+introuvables ; l'humain doit poser une décision et les faire passer par git. Le même jour, la session
+de ce poste reproduit le défaut : elle laisse le transport des entrants à l'humain, « canal à
+choisir », alors que le canal était déclaré dans sa mémoire et contenait déjà ces entrants. Aucune
+règle ne couvrait le cas. Parole humaine : « Ce type d'erreurs ne doit plus se reproduire. C'est
+critique pour le travail des développeurs, leur efficacité, résilience. »
+
+**R-64.**
+1. **Le canal se déclare, il ne se raconte pas.** Dès que le développeur dit travailler sur plusieurs
+   postes, ou nomme un dossier synchronisé pour reprendre ailleurs, la session du produit écrit
+   `forge\REPRISE.json` depuis `gabarits\REPRISE.json` : les emplacements du dossier sur chaque poste,
+   les chemins hors de git à reprendre, et la section « Reprise sur un autre poste » de son `CLAUDE.md`
+   le nomme. Une notice à suivre à la main ou une mémoire de session ne sont pas une déclaration.
+2. **La reprise se joue sans geste humain** : le hook `reprise` restaure à l'ouverture ce que le canal
+   porte et que ce poste n'a pas, ou a plus ancien, et envoie en fin de tour ce qui a changé hors de
+   git. Décision fichier par fichier sur l'empreinte de la dernière synchronisation ; quand les deux
+   côtés ont changé, le plus récent gagne et l'autre est sauvegardé, jamais perdu.
+3. **L'envoi vers le canal est une publication sur un service hébergé** (R-38) : il n'a lieu que sous
+   le feu vert humain consigné au manifeste (`envoi.go_publication` : décision, date, auteur), donné
+   une fois par produit. Sans lui, la restauration joue seule.
+4. **Un secret ne transite jamais par le canal**, dans aucun sens et quelle que soit la liste du
+   manifeste (garde-fou « les .env ne transitent jamais ») : il se ressaisit sur chaque poste.
+5. **Une action de transport entre postes ne se laisse pas à l'humain** quand un canal est déclaré :
+   ce qui lui reste, c'est le feu vert, pas la copie.
+
+Contrôles exécutables : `oracles\oracle-reprise.mjs` (RP1 manifeste valide, RP2 aucun secret déclaré,
+RP3 canal joignable sur ce poste, RP4 aucun écart non restauré, RP5 envoi actif sous feu vert
+consigné ; recette `oracle-reprise.test.mjs`, 8 cas, dont le cas du 14/10 rejoué) ; `oracles\hook-reprise.mjs`,
+câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.json` 1.24.0 (recette
+`gabarits\hooks-factory.test.mjs`, cas 9) ; la règle S75 d'`oracles\oracle-synthese.mjs` (point 5).
+Non jugé : une suppression ne se propage pas ; deux écritures du même fichier entre deux
+synchronisations ne se fusionnent pas, l'une reste en sauvegarde ; le pilot lui-même, dont la reprise
+passe par git et `scripts\rebatir-clone.mjs`, n'est pas concerné.

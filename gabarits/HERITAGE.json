@@ -1,7 +1,8 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "date": "2026-10-15",
+  "evolution_1_24_0": "TF-1736, 15/10/2026 (lot Produit-12 20261014b, RS-33 ; décision humaine D-3 (b) du 15/10/2026 « 3b ») — un produit dont le développeur a déclaré un canal de reprise se reprend sur tous ses postes sans geste humain (R-64). Le fait : le 14/10, un dossier Google Drive de reprise contenait les 58 générateurs des pages d un produit ; une session de l autre poste les a déclarés introuvables, et une session de ce poste a laissé leur transport à l humain. Ce qui change pour celui qui produit : `.claude/settings.json` doit câbler le hook `reprise` à l ouverture (`factory.mjs reprise --restaurer`, asynchrone) et en fin de tour (`factory.mjs reprise --pousser`) ; `CLAUDE.md` porte la section « Reprise sur un autre poste (R-64) », qui fait écrire `forge/REPRISE.json` depuis `gabarits/REPRISE.json` dès que le développeur dit travailler sur plusieurs postes. Sans manifeste, le hook se tait ; l envoi exige le feu vert de publication consigné au manifeste (R-38) ; les secrets ne transitent jamais. Juge : `oracles/oracle-reprise.mjs` (RP1 à RP5) et S75 d oracle-synthese.",
   "evolution_1_23_0": "TF-1735, 15/10/2026 (décision humaine D-1 (a) du 15/10/2026 « 1a ») — le CLAUDE.md du produit doit porter la route de l audit du produit vers forge-audit : le motif `init-audit-workspace` entre aux motifs exigés de `CLAUDE.md`. Le fait : « lance un audit complet du projet » a lancé forge_tests chez un produit, parce que son CLAUDE.md, copié avant la correction du 22/09, ne connaissait que cette route ; 16 CLAUDE.md du parc portaient la ligne « Audit complet (verdict) », dont 7 sans mention de forge-audit. Ce qui change pour celui qui produit : à sa prochaine ouverture, un CLAUDE.md sans la route est relevé incomplet ; la remise à niveau ne le réécrit pas, c est le lot de travaux qui corrige la ligne de routage et la section Commandes.",
   "evolution_1_22_0": "TF-1716 suite, 15/10/2026 (décision humaine D-2 (a) du 15/10/2026 « 2a ») — le câblage du hook `identite-sortante` est EXIGÉ par le contrat : le motif `forge/hooks/factory.mjs identite-sortante` entre aux motifs exigés de `.claude/settings.json`. Le fait : l incident du 14/10 s est produit chez un produit existant, que le seul gabarit des nouveaux produits ne protège pas. Ce qui change pour celui qui produit : à sa prochaine ouverture, un produit dont le settings.json ne câble pas la garde est relevé incomplet, puis remis à niveau.",
   "evolution_1_21_0": "TF-1716, 15/10/2026 (lot Produit-83 20261014a, RT-5) — R-62 se joue sur l'outil qui émet une requête. Le fait : le 14/10/2026, une session a placé l'adresse électronique de l'utilisateur dans le User-Agent d'un appel à une API publique tierce, sans demande, et aucune garde ne l'a vu. Ce qui change pour celui qui produit : `forge/hooks/factory.mjs` (copie conforme) reconnaît le hook `identite-sortante`, et le gabarit `settings-produit.json` câble un `PreToolUse` sur `Bash|PowerShell|WebFetch` qui l'appelle ; une requête vers un service tiers portant l'adresse de l'utilisateur, ou une adresse dans un en-tête User-Agent ou From, est refusée sauf adresse donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session. Le câblage n'entre pas encore à `motif_exige` : un produit existant le reçoit en complétant son `.claude/settings.json` depuis le gabarit, geste du produit.",
@@ -97,6 +98,8 @@
       "motif_exige": [
         "forge/hooks/factory.mjs publication-hebergee",
         "forge/hooks/factory.mjs identite-sortante",
+        "factory.mjs reprise --restaurer",
+        "factory.mjs reprise --pousser",
         "factory.mjs ouverture --sans-readme --contexte-json"
       ],
       "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
@@ -113,7 +116,7 @@
       "source": "gabarits/CLAUDE-PRODUIT.md",
       "cible": "CLAUDE.md",
       "mode": "presence_et_motif",
-      "motif_exige": ["R-43", "init-audit-workspace"],
+      "motif_exige": ["R-43", "init-audit-workspace", "R-64"],
       "marqueurs_a_instancier": [
         "<commande>",
         "<autre type de ce produit>"

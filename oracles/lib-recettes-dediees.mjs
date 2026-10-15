@@ -28,6 +28,7 @@ export const DEDIES = {
   "oracle-regle-sans-juge.mjs": "oracle-regle-sans-juge.test.mjs",
   "oracle-chemin-ancre.mjs": "oracle-chemin-ancre.test.mjs",
   "oracle-invariant-mesure.mjs": "oracle-invariant-mesure.test.mjs",
+  "oracle-reprise.mjs": "oracle-reprise.test.mjs",
   "oracle-banc-double-sens.mjs": "oracle-banc-double-sens.test.mjs",
   // Les 2 oracles nés des décisions humaines D-17 (a) et D-18 (a) du 22/09/2026, qui donnent
   // enfin un juge à 2 règles du corpus que rien ne jouait. Banc dédié pour la même raison que

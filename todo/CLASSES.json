@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.35.0",
+ "version": "1.36.0",
  "date": "2026-10-15",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2086,6 +2086,20 @@
    "regle": "REGLES-PROJET.md R-61 (définition de livré), references/ETAPES-RUN.md contrat prêt client",
    "oracle": "pilot, oracles/oracle-synthese.mjs S72",
    "voisines": []
+  },
+  {
+   "cle": "reprise-multi-poste-declaree-non-cablee",
+   "famille": "heritage-produit",
+   "libelle": "Un produit dont le développeur a déclaré un canal de reprise entre ses postes (Google Drive ou équivalent) et demandé à reprendre ailleurs ne se reprend pas sans geste humain : le canal n est écrit que dans une notice et dans la mémoire d une session, aucun gabarit hérité ne le déclare, aucun hook ne le joue, et la restitution laisse le transport entre postes en manuelle_utilisateur",
+   "creee_le": "2026-10-15",
+   "fondee_par": [
+    "TF-1736"
+   ],
+   "regle": "REGLES-PROJET.md R-64 (section AS) ; gabarits/CLAUDE-PRODUIT.md section « Reprise sur un autre poste (R-64) » ; gabarits/REPRISE.json ; gabarits/HERITAGE.json 1.24.0",
+   "oracle": "pilot, oracles/oracle-reprise.mjs (RP1 à RP5, recette oracle-reprise.test.mjs) et oracles/hook-reprise.mjs câblé par gabarits/settings-produit.json (recette gabarits/hooks-factory.test.mjs, cas 9) ; oracles/oracle-synthese.mjs S75",
+   "voisines": [
+    "produit-instancie-a-moitie-hors-de-tout-depot"
+   ]
   }
  ],
  "cliquet_porteur": {

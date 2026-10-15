@@ -1,0 +1,24 @@
+{
+  "_commentaire": "Gabarit du pilot (gabarits/REPRISE.json, R-64, TF-1736) : copié en forge/REPRISE.json par la session du produit dès que le développeur dit travailler sur plusieurs postes, ou nomme un dossier synchronisé (Google Drive, OneDrive, Dropbox…) pour reprendre ailleurs. Le hook `reprise` restaure à l'ouverture ce que le canal porte et que ce poste n'a pas, et envoie en fin de tour ce qui a changé hors de git, sous le feu vert consigné. Juge : node <PILOT_ROOT>/oracles/oracle-reprise.mjs (RP1 à RP5). Les secrets ne transitent jamais, quelle que soit la liste.",
+  "schema": "factory/reprise@1",
+  "canal": {
+    "fournisseur": "<Google Drive | OneDrive | Dropbox | partage réseau>",
+    "chemins": [
+      "<emplacement du dossier synchronisé sur le premier poste, ex. G:/Mon Drive/<Produit> - Reprise>",
+      "<emplacement sur l'autre poste, ex. ~/Google Drive/<Produit> - Reprise>"
+    ]
+  },
+  "elements": [
+    "<chemin relatif au produit, hors de git, à reprendre — ex. input>",
+    "<ex. scripts/generateurs>"
+  ],
+  "exclusions": [],
+  "envoi": {
+    "actif": false,
+    "go_publication": {
+      "decision": "<la décision humaine qui autorise l'envoi vers ce service hébergé, ex. D-3 (b) du 15/10/2026>",
+      "date": "<AAAA-MM-JJ>",
+      "par": "humain"
+    }
+  }
+}

@@ -9,7 +9,7 @@
  * s'applique au produit sans recopie — et quand la factory est impliquée, ses règles
  * priment sur celles du projet (R-43).
  *
- * Usage : node forge\hooks\factory.mjs <ouverture|restitution|page-html|lexique> [options du hook]
+ * Usage : node forge\hooks\factory.mjs <ouverture|restitution|page-html|lexique|…|reprise> [options du hook]
  * Pilot introuvable : le hook est sauté en le DISANT (stderr), jamais en silence, exit 0 —
  * un produit ne doit pas devenir inutilisable parce que la factory n'est pas sur ce poste.
  */
@@ -42,8 +42,12 @@ const [nom, ...options] = process.argv.slice(2);
 // `identite-sortante` (15/10/2026, TF-1716, retour RT-5 du 14/10) : hook PreToolUse sur Bash, PowerShell et
 // WebFetch — R-62 (aucune donnée d'identité de l'utilisateur vers un service tiers sans sa demande) se joue
 // sur l'outil qui émet la requête : l'adresse de l'utilisateur, ou une adresse dans un User-Agent, refusée. Bloque.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante"]);
-if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee | droits-accordes | identite-sortante)`); process.exit(0); }
+// `reprise` (15/10/2026, TF-1736, décision humaine D-3 (b), R-64) : hook SessionStart (asynchrone) et Stop —
+// un produit dont le développeur a déclaré un canal de reprise (forge/REPRISE.json) se reprend sur tous ses
+// postes sans geste humain : restauration depuis le canal à l ouverture, envoi vers le canal en fin de tour
+// sous le feu vert de publication consigné. Ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "reprise"]);
+if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture | publication-hebergee | droits-accordes | identite-sortante | reprise)`); process.exit(0); }
 
 const candidats = [
   process.env.FORGE_ROOT && join(process.env.FORGE_ROOT, "digit-ai-factory"),

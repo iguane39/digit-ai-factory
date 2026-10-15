@@ -233,3 +233,23 @@ process.exit(c.length?2:1)}console.log(c[0])"
 Deux candidats indiscernables ne se tranchent **jamais en silence** : la commande sort en
 échec et demande `PILOT_ROOT`. Référence exécutable et son `non_juge` :
 `<PILOT_ROOT>\oracles\resoudre-pilot.mjs [--json]`.
+
+## Reprise sur un autre poste (R-64)
+
+**Canal de reprise** : `forge\REPRISE.json` ou `absent — un seul poste`.
+
+Dès que le développeur dit travailler sur plusieurs postes, ou nomme un dossier synchronisé
+(Google Drive, OneDrive, Dropbox…) pour reprendre ailleurs, la session écrit `forge\REPRISE.json`
+depuis `<PILOT_ROOT>\gabarits\REPRISE.json` : les emplacements du dossier sur chaque poste, les
+chemins hors de git à reprendre, et le feu vert de publication qui autorise l'envoi. Ce n'est pas
+un geste laissé à l'humain : ce qui lui revient, c'est le feu vert, une fois par produit.
+
+Ensuite, rien ne se copie à la main : le hook `reprise` restaure à l'ouverture ce que le canal
+porte et que ce poste n'a pas, ou a plus ancien, et envoie en fin de tour ce qui a changé hors de
+git. Une action de transport entre postes laissée en `manuelle_utilisateur` alors que ce canal est
+déclaré est refusée à la restitution (S75). Les secrets ne transitent jamais par le canal : ils se
+ressaisissent sur chaque poste. Juge : `node <PILOT_ROOT>\oracles\oracle-reprise.mjs` (RP1 à RP5).
+
+*Pourquoi cette section existe* : le 14/10/2026, un produit avait déclaré un dossier Google Drive
+de reprise qui contenait les 58 générateurs de ses pages ; une session de l'autre poste les a
+déclarés introuvables, et une session de ce poste a laissé leur transport à l'humain (TF-1736).

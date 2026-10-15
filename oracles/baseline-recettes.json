@@ -47,7 +47,7 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 12,
+  "cas": 15,
   "vu_le": "2026-10-15"
  },
  "gabarits/ledger.test.mjs": {
@@ -308,6 +308,10 @@
   "cas": 13,
   "vu_le": "2026-09-22"
  },
+ "oracle-reprise.mjs": {
+  "cas": 8,
+  "vu_le": "2026-10-15"
+ },
  "oracle-run-reseau.mjs": {
   "cas": 27,
   "vu_le": "2026-09-28"
@@ -339,7 +343,7 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 169,
+  "cas": 173,
   "vu_le": "2026-10-15"
  },
  "oracle-trace-mutation-mep.mjs": {
@@ -489,6 +493,10 @@
  "oracles/oracle-repere-externe.test.mjs": {
   "cas": 13,
   "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-reprise.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-10-15"
  },
  "oracles/oracle-source-contenu.test.mjs": {
   "cas": 12,
