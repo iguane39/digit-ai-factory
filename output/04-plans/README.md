@@ -68,6 +68,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Anatomie du bloc 3 armee - 20260830e.md` | fichier | 17,8 Ko | Synthèse de mandat — l'anatomie du bloc des décisions, écrite et armée (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md` | fichier | 11,2 Ko | Synthèse de mandat — l'anonymisation était câblée sur une porte, elle l'est maintenant sur |
 | `Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md` | fichier | 3,8 Ko | Synthèse de mandat — architecture du circuit de l'insatisfaction (TF-0287) |
+| `Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md` | fichier | 7,0 Ko | Synthèse Mandat — « audit complet » ouvre désormais forge-audit, chez tous les produits (1 |
 | `Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` | fichier | 3,4 Ko | Synthèse de mandat — option (a) : l'avancement des campagnes est câblé (TF-0252) |
 | `Digit-AI - Synthese Mandat - Banc elargi source unique et deux lignees fusionnees - 20260917a.md` | fichier | 21,8 Ko | Synthèse de mandat — le banc du socle voyait une largeur sur six, et deux lignées du même  |
 | `Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` | fichier | 10,4 Ko | Synthèse de mandat — décisions D-6 (a) et D-7 (a) exécutées : quatre barres validées et cl |
@@ -269,4 +270,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_252 fichier(s), 0 sous-dossier(s)_
+_253 fichier(s), 0 sous-dossier(s)_

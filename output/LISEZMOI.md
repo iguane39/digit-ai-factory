@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 408 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 409 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -260,6 +260,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Anatomie du bloc 3 armee - 20260830e.md | 20260830e | 17.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Anatomie du bloc 3 armee - 20260830e.md` |
 | Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md | 20260901g | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md` |
 | Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md` |
+| Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md | 20261015c | 7 Ko | `04-plans/Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md` |
 | Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md | 20260815a | 3.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` |
 | Digit-AI - Synthese Mandat - Banc elargi source unique et deux lignees fusionnees - 20260917a.md | 20260917a | 21.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Banc elargi source unique et deux lignees fusionnees - 20260917a.md` |
 | Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md | 20260907e | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` |
