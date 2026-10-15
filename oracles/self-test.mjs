@@ -2187,6 +2187,29 @@ check("TF-1714 borne : un autre .md sans nommage daté reste refusé par R-4 (l'
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// TF-1713 (lot Produit-83 20261014a, RT-2) — R-25 NE REFUSE PLUS UN NOM QUE LE CATALOGUE DU PILOT PRESCRIT.
+// Le 14/10/2026, une fiche produit nommée au gabarit gd-fiche-produit (« … - Fiche produit … - »)
+// a rendu R-25 FAIL : « Fiche » n'est pas au registre d'organization, alors que le catalogue des
+// familles du pilot déclare « fiche produit » parmi ses types de nom. Deux règles du socle ne
+// pouvaient pas être tenues ensemble. Le nom que le catalogue déclare passe, en AVERTISSEMENT qui
+// nomme la famille et la dette du registre ; un mot de tête seul ne suffit pas (« Fiche bidon »).
+const r25De = (d) => (lanceArgs(d, "--regles", "R-25").rapport.findings || []).filter((x) => x.regle === "R-25");
+check("TF-1713 remède joué : un livrable nommé au type de nom d'une famille du catalogue (« Fiche produit ») passe R-25, avertissement nommant la famille", () => {
+  const d = projetOutput("Digit-AI - Fiche produit Beef Project - Prospection - 20261014a.html");
+  try {
+    const f = r25De(d);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error(`R-25 refuse le nom que le gabarit gd-fiche-produit prescrit : ${JSON.stringify(f)}`);
+    const avert = f.find((x) => /AVERTISSEMENT/.test(x.message));
+    if (!avert || !/gd-fiche-produit/.test(avert.message) || !/registre/.test(avert.message)) throw new Error(`l'avertissement ne nomme ni la famille ni la dette du registre : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1713 borne : un mot de tête hors registre qui ne forme AUCUN type de nom du catalogue reste refusé (« Fiche bidon »)", () => {
+  const d = projetOutput("Digit-AI - Fiche bidon Beef Project - 20261014a.html");
+  try {
+    if (!r25De(d).some((x) => x.statut === "FAIL")) throw new Error("« Fiche bidon » passe : l'admission par le catalogue a débordé sur le seul premier mot");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- TF-0923 volet (b), 20/09 — R-35 : « un existant » se MESURE, jamais ne se déclare --------
 // TF-0906 (07/09) : TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est antérieur au
 // `run_open`. Le geste était écrit — `git log --reverse --format=%aI` comparé au run_open — et
