@@ -1,6 +1,6 @@
 # Gabarit — Fiche produit
 
-**Famille** `gd-fiche-produit` · **Version du gabarit** 1.1.0 · **Écrite le** 13/10/2026 · **Révisée le** 15/10/2026
+**Famille** `gd-fiche-produit` · **Version du gabarit** 1.2.0 · **Écrite le** 13/10/2026 · **Révisée le** 15/10/2026 (1.2.0 : chapitre « Personas et usages », TF-1764, TF-1769, TF-1766)
 
 > **Formats** HTML (rendu remis) · Markdown (source)
 > **Règles engagées** D1 D3 D4 D6 D7 D11 (`gabarits\documents\README.md`)
@@ -26,7 +26,8 @@ la fiche ne chiffre aucun coût et ne promet aucune date.
 
 ## Structure — les huit chapitres sont dus
 
-Une fiche d'offre technique y ajoute des chapitres optionnels déclarés (section « Variante « offre
+Depuis la version 1.2.0, le chapitre 5 bis « Personas et usages » l'est aussi ; son absence est
+signalée en avertissement, jamais en refus (FP8). Une fiche d'offre technique y ajoute des chapitres optionnels déclarés (section « Variante « offre
 technique » » ci-dessous).
 
 Les chapitres suivent la question que se pose le commanditaire, dans son ordre : de quoi parle-t-on et
@@ -40,6 +41,7 @@ est le détail, qu'est-ce qui reste à confirmer, qu'est-ce que je dois trancher
 | 3 | **Domaines et socle** | Pour chaque domaine et pour le socle commun, le besoin couvert et le nombre d'exigences par palier | Les exigences elles-mêmes |
 | 4 | **Le palier du premier lot** | Le contenu du premier palier, et ce qu'il remplace dans l'existant | Les paliers suivants |
 | 5 | **Toutes les exigences** | Le référentiel : une ligne par exigence, avec son critère de recette | Toute exigence absente du référentiel |
+| 5 bis | **Personas et usages** (dû depuis 1.2.0) | Le parcours testable de chaque persona et l'état de chaque usage, actif ou en attente | Un usage retiré parce qu'un composant manque |
 | 6 | **Hypothèses à lever** | Chaque hypothèse, l'exigence qu'elle conditionne, qui peut la lever et avant quand | Les faits constatés |
 | 7 | **Points laissés à l'arbitrage** | Chaque décision qui revient au commanditaire, ses options, leur exclusion | Une recommandation déguisée en fait |
 | 8 | **Provenance** | Les sources lues, leur date, les contrôles exécutés | Toute source non datée |
@@ -48,6 +50,37 @@ est le détail, qu'est-ce qui reste à confirmer, qu'est-ce que je dois trancher
 trouverez…*), ce que le chapitre contient et ne contient pas, puis un **exemple de lecture** sur une
 ligne réelle du tableau. L'exemple de lecture est le seul moyen, pour un lecteur non spécialiste, de
 vérifier qu'il sait lire la table qui suit.
+
+## Le chapitre « Personas et usages » (1.2.0)
+
+**Des exigences tenues ne disent pas qu'un persona est servi.** Le 14/10/2026, une fiche portait 35
+exigences, dont 34 tenues et testées, sans qu'aucun de ses 4 personas ait son usage servi en entier :
+ni connexion par identifiant et mot de passe, ni libre-service des clés pour l'administrateur client,
+ni documentation pour le développeur, ni page pour le délégué à la protection des données (TF-1764).
+Le lendemain, un produit masquait les fonctions d'un fournisseur faute d'identifiants, contre la
+demande humaine : « un composant manquant ne bloque pas l'implémentation ; l'usage reste présent,
+inactif, avec motif et action par rôle » (TF-1769). Le chapitre porte deux tableaux.
+
+1. **Les parcours des personas** : `Persona` · `Se connecter` · `Geste principal` · `Résultat
+   attendu` · `Exigences` (celles que le parcours traverse) · `Parcours testé`. Chaque persona a un
+   parcours testable de bout en bout ; la recette du produit joue un test par parcours.
+2. **Les usages et leur état** : `Usage` · `Persona` · `Dépend de` (paramètre, clé d'API, service, ou
+   `aucun`) · `État` · `Motif` · `Action par rôle`.
+
+**Le parcours testé.** La colonne dit `non joué` au stade de la conception. Une fois joué, elle porte
+la trace : **un vrai navigateur, sur l'adresse publique**, la date, et au moins une saisie inattendue
+par formulaire. Le 15/10/2026, cinq parcours annoncés verts appelaient le portail par le réseau privé,
+avec les seules saisies attendues ; la première connexion humaine sur l'adresse publique a rendu
+« Application failed to respond » (TF-1766). Un parcours joué hors navigateur reste `non joué`.
+
+**Un usage n'est jamais retiré.** Un usage dont un composant manque garde l'état `en attente` : il
+reste rendu à l'écran, inactif, avec son motif et ce que chaque rôle fait pour le débloquer
+(l'administrateur saisit la clé, l'utilisateur voit pourquoi le bouton est inactif).
+
+`oracle-fiche-produit.mjs` juge le chapitre par sa règle **FP8, avertissante** : chapitre absent,
+étape de parcours vide, parcours déclaré testé sans navigateur ni adresse publique datée, usage hors
+du vocabulaire `actif` · `en attente`, usage en attente sans motif ou sans action. Elle n'abaisse
+jamais le verdict.
 
 ## Variante « offre technique » — chapitres optionnels déclarés
 
@@ -124,9 +157,11 @@ role_destinataire: {qui lit cette fiche produit, et quelles décisions elle lui 
 3. Chaque brique du chapitre 2 porte la date de son relevé.
 4. Rendu HTML jugé par `check_html.py` **et** `render_page.py --widths 1280,768,390` (D7).
 5. Aucun `{…}` restant.
+6. Chaque persona a son parcours, chaque usage son état ; un usage en attente porte son motif et
+   l'action par rôle (chapitre « Personas et usages »).
 
-Les points 1, 2, 3 et 5 se jouent en une commande : `node oracles\oracle-fiche-produit.mjs <fiche>`
-(règles FP1 à FP7, sur la fiche HTML ou Markdown).
+Les points 1, 2, 3, 5 et 6 se jouent en une commande : `node oracles\oracle-fiche-produit.mjs <fiche>`
+(règles FP1 à FP7 bloquantes, FP8 avertissante, sur la fiche HTML ou Markdown).
 
 ## Document d'auteur — ce qui ne va pas au lecteur
 
@@ -160,7 +195,7 @@ contraire de son lecteur : 11 fichiers à partager sont un coût pour lui, jamai
 - pour le **fond** : `oracle-fiche-produit.mjs` du pilot, qui recompte la fiche sur elle-même (FP1 à
   FP7 : chiffres d'« En bref » et tableau des domaines sur le chapitre 5, hypothèses croisées avec
   les exigences, statut au vocabulaire fermé, critère de recette à chaque ligne, briques datées,
-  aucun emplacement restant), et `oracle-ecriture.mjs` (tournures d'annonce en titre et en en-tête
+  aucun emplacement restant ; FP8, avertissante : parcours des personas et état des usages), et `oracle-ecriture.mjs` (tournures d'annonce en titre et en en-tête
   de colonne, EC-8). `oracle-couverture-exigences.mjs` ne juge pas la fiche : il juge le référentiel
   d'exigences du pilot lui-même (TF-1712).
 
