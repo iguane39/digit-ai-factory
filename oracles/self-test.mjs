@@ -2204,6 +2204,53 @@ check("TF-1372 non bloquant : un livrable sans revue ne fait pas échouer le ver
     if ((r.findings || []).some((x) => x.regle === "R-32 quater" && x.statut === "FAIL")) throw new Error("R-32 quater bloque alors qu'elle est en avertissement");
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
+// TF-1714 (lot Produit-83 20261014a, RT-3) — LE REMÈDE DE R-32 QUATER NE SE FAIT PAS REFUSER PAR R-4.
+// Le 14/10/2026, un produit a posé `output\REVUE.md` à côté de sa fiche, comme R-32 quater le
+// prescrit ; R-4 l'a refusé (« livrable sans nommage »), et la revue a fui sous `forge\oracles\`,
+// où R-32 quater ne la voit plus. Le remède est joué ici (TF-1013) : la revue écrite là où R-32
+// quater la demande doit passer R-4 ET éteindre l'avertissement de R-32 quater, dans le même run.
+check("TF-1714 remède joué : REVUE.md à côté du livrable HTML passe R-4 et éteint l'avertissement R-32 quater", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html",
+    { ecrireRevue: "# Revue de lecture — Produit - Rapport d audit - 20260920a — 2026-09-20 10:00\n\nCaptures lues : 1920 · 1280 · 768 · 390, aucun constat.\n" });
+  try {
+    const r = lanceArgs(d, "--regles", "R-4,R-32 quater").rapport;
+    const r4ko = (r.findings || []).filter((x) => x.regle === "R-4" && x.statut === "FAIL");
+    if (r4ko.length) throw new Error(`R-4 refuse la revue que R-32 quater prescrit : ${JSON.stringify(r4ko)}`);
+    const f = (r.findings || []).find((x) => x.regle === "R-32 quater");
+    if (!f || f.statut !== "PASS" || /AVERTISSEMENT/.test(f.message)) throw new Error(`la revue posée n'éteint pas R-32 quater : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1714 borne : un autre .md sans nommage daté reste refusé par R-4 (l'exemption nomme REVUE.md, rien d'autre)", () => {
+  const d = projetRevue("Produit - Rapport d audit - 20260920a.html", { ecrireRevue: "# Revue\n\naucun constat.\n" });
+  try {
+    writeFileSync(join(d, "output", "NOTES.md"), "# notes\n", "utf8");
+    const r = lanceArgs(d, "--regles", "R-4").rapport;
+    if (!(r.findings || []).some((x) => x.regle === "R-4" && x.statut === "FAIL" && /NOTES\.md/.test(x.ou))) throw new Error("un .md non nommé n'est plus refusé : l'exemption a débordé");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// TF-1713 (lot Produit-83 20261014a, RT-2) — R-25 NE REFUSE PLUS UN NOM QUE LE CATALOGUE DU PILOT PRESCRIT.
+// Le 14/10/2026, une fiche produit nommée au gabarit gd-fiche-produit (« … - Fiche produit … - »)
+// a rendu R-25 FAIL : « Fiche » n'est pas au registre d'organization, alors que le catalogue des
+// familles du pilot déclare « fiche produit » parmi ses types de nom. Deux règles du socle ne
+// pouvaient pas être tenues ensemble. Le nom que le catalogue déclare passe, en AVERTISSEMENT qui
+// nomme la famille et la dette du registre ; un mot de tête seul ne suffit pas (« Fiche bidon »).
+const r25De = (d) => (lanceArgs(d, "--regles", "R-25").rapport.findings || []).filter((x) => x.regle === "R-25");
+check("TF-1713 remède joué : un livrable nommé au type de nom d'une famille du catalogue (« Fiche produit ») passe R-25, avertissement nommant la famille", () => {
+  const d = projetOutput("Digit-AI - Fiche produit Beef Project - Prospection - 20261014a.html");
+  try {
+    const f = r25De(d);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error(`R-25 refuse le nom que le gabarit gd-fiche-produit prescrit : ${JSON.stringify(f)}`);
+    const avert = f.find((x) => /AVERTISSEMENT/.test(x.message));
+    if (!avert || !/gd-fiche-produit/.test(avert.message) || !/registre/.test(avert.message)) throw new Error(`l'avertissement ne nomme ni la famille ni la dette du registre : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1713 borne : un mot de tête hors registre qui ne forme AUCUN type de nom du catalogue reste refusé (« Fiche bidon »)", () => {
+  const d = projetOutput("Digit-AI - Fiche bidon Beef Project - 20261014a.html");
+  try {
+    if (!r25De(d).some((x) => x.statut === "FAIL")) throw new Error("« Fiche bidon » passe : l'admission par le catalogue a débordé sur le seul premier mot");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
 
 // ---- TF-0923 volet (b), 20/09 — R-35 : « un existant » se MESURE, jamais ne se déclare --------
 // TF-0906 (07/09) : TF-0266 ne couvre qu'un dépôt dont le PREMIER COMMIT est antérieur au

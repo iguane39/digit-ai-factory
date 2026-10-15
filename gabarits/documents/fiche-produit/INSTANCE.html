@@ -234,6 +234,9 @@
     table { width: 100%; border-collapse: collapse; }
     th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { font-weight: 700; }
+    /* TF-1719 (15/10/2026) — un identifiant ne se coupe pas : « E-012 » sur deux lignes à 1920 px
+       (lot Produit-83 20261014a) se lit comme deux valeurs. */
+    td[data-label="Id"] { white-space: nowrap; }
     /* TF-0558 (24/08/2026) — LE SEUIL ETAIT FIGE A 900 px, ET TOUT PROJET QUI INSTANCIE CETTE
        FAMILLE LE REPRODUISAIT. Mesure sur un livrable reel : un tableau de huit colonnes debordait
        jusque vers 1 400 px (bord droit a 1 308 px pour un viewport de 1 280) — SEIZE debordements
@@ -365,7 +368,7 @@
       <div class="doc-ident">
         <p class="eyebrow">Client-A · Fiche produit · 2026-10-13</p>
         <h1>Outil de suivi des ateliers</h1>
-        <p class="muted">Périmètre fonctionnel en paliers, tiré du référentiel d'exigences. Exemplaire ILLUSTRATIF : client pseudonymisé, aucune donnée réelle.<br>Gabarit : gd-fiche-produit · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+        <p class="muted">Périmètre fonctionnel en paliers, tiré du référentiel d'exigences. Exemplaire ILLUSTRATIF : client pseudonymisé, aucune donnée réelle.<br>Gabarit : gd-fiche-produit · version du gabarit 1.1.0 — à reporter tel quel dans tout retour sur ce document</p>
       </div>
       <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
       <button id="theme-toggle" class="theme-toggle" type="button"
@@ -420,7 +423,7 @@
           <li><strong>E-001</strong> : identifiant stable d'une exigence, c'est-à-dire un comportement attendu du produit.</li>
           <li><strong>Critère de recette</strong> : le test qui dit si l'exigence est tenue.</li>
           <li><strong>Palier</strong> : MVP (premier lot utile), V1 (lot suivant), V2 (plus tard).</li>
-          <li><strong>Fait constaté</strong> : l'exigence vient de la demande ou de l'existant. <strong>Hypothèse</strong> : elle est proposée et doit être confirmée.</li>
+          <li><strong>Fait constaté</strong> : l'exigence vient de la demande, ou un essai dans le produit l'a vérifiée. <strong>Présent dans la base</strong> : la fonction existe dans le produit de base, sans essai dans celui-ci. <strong>Hypothèse</strong> : elle est proposée et doit être confirmée.</li>
           <li><strong>Impact</strong> : note de 1 à 5 de la valeur attendue, jugement du référentiel et non mesure.</li>
           <li><strong>Channel manager</strong> : le logiciel qui synchronise réservations et disponibilités entre les plateformes de location.</li>
         </ul>
@@ -446,7 +449,7 @@
             <th data-definition="OÙ et QUAND la brique a été relevée. Une brique sans date de relevé ne figure pas.">Relevé</th>
           </tr></thead>
           <tbody>
-            <tr><td data-label="Brique">Site vitrine</td><td data-label="Usage actuel">Pages des gîtes, offres et conseils</td><td data-label="Rôle dans le produit">Source des pages ; le produit les liste, il ne les remplace pas</td><td data-label="Relevé">sitemap lu le 2026-10-07</td></tr>
+            <tr><td data-label="Brique">Site vitrine</td><td data-label="Usage actuel">Pages des gîtes, offres et conseils</td><td data-label="Rôle dans le produit">Source des pages, que le produit liste sans les remplacer</td><td data-label="Relevé">sitemap lu le 2026-10-07</td></tr>
             <tr><td data-label="Brique">Logiciel de réservation</td><td data-label="Usage actuel">Moteur embarqué sur les pages de réservation</td><td data-label="Rôle dans le produit">Source des réservations</td><td data-label="Relevé">page de réservation lue le 2026-10-07</td></tr>
             <tr><td data-label="Brique">Classeur de gestion</td><td data-label="Usage actuel">Un classeur par saison, un onglet par mois</td><td data-label="Rôle dans le produit">Remplacé par le palier MVP</td><td data-label="Relevé">en-têtes lus le 2026-10-07</td></tr>
           </tbody>
@@ -515,7 +518,7 @@
             <th data-definition="Qui agit : le gestionnaire, le voyageur ou le produit.">Qui agit</th>
             <th data-definition="Le comportement attendu, en une phrase.">Comportement attendu</th>
             <th data-definition="Le test qui dit si l'exigence est tenue. Une exigence sans critère ne figure pas.">Critère de recette</th>
-            <th data-definition="Valeurs admises : fait constaté, hypothèse.">Statut</th>
+            <th data-definition="Valeurs admises : fait constaté, présent dans la base, hypothèse.">Statut</th>
             <th data-definition="Note de 1 à 5 de la valeur attendue.">Impact (1 à 5)</th>
           </tr></thead>
           <tbody>
@@ -524,7 +527,7 @@
             <tr><td data-label="Id">E-003</td><td data-label="Domaine">Réservations</td><td data-label="Palier">V1</td><td data-label="Qui agit">Gestionnaire</td><td data-label="Comportement attendu">Exporte le mois en tableur.</td><td data-label="Critère de recette">Le fichier porte les colonnes du classeur de gestion actuel.</td><td data-label="Statut"><span class="badge ok" title="Statut : fait constaté.">fait constaté</span></td><td data-label="Impact (1 à 5)">3</td></tr>
             <tr><td data-label="Id">E-004</td><td data-label="Domaine">Messages</td><td data-label="Palier">MVP</td><td data-label="Qui agit">Outil</td><td data-label="Comportement attendu">Prépare un message de bienvenue depuis un modèle.</td><td data-label="Critère de recette">Le message affiche le nom du voyageur et ses dates de séjour.</td><td data-label="Statut"><span class="badge part" title="Statut : hypothèse.">hypothèse</span></td><td data-label="Impact (1 à 5)">4</td></tr>
             <tr><td data-label="Id">E-005</td><td data-label="Domaine">Messages</td><td data-label="Palier">V2</td><td data-label="Qui agit">Gestionnaire</td><td data-label="Comportement attendu">Choisit la langue du modèle.</td><td data-label="Critère de recette">Le modèle s'affiche dans la langue choisie parmi celles du site.</td><td data-label="Statut"><span class="badge part" title="Statut : hypothèse.">hypothèse</span></td><td data-label="Impact (1 à 5)">2</td></tr>
-            <tr><td data-label="Id">E-006</td><td data-label="Domaine">Socle</td><td data-label="Palier">MVP</td><td data-label="Qui agit">Gestionnaire</td><td data-label="Comportement attendu">Se connecte avec son compte.</td><td data-label="Critère de recette">Un compte non reconnu est refusé et le motif est affiché.</td><td data-label="Statut"><span class="badge ok" title="Statut : fait constaté.">fait constaté</span></td><td data-label="Impact (1 à 5)">5</td></tr>
+            <tr><td data-label="Id">E-006</td><td data-label="Domaine">Socle du produit</td><td data-label="Palier">MVP</td><td data-label="Qui agit">Gestionnaire</td><td data-label="Comportement attendu">Se connecte avec son compte.</td><td data-label="Critère de recette">Un compte non reconnu est refusé et le motif est affiché.</td><td data-label="Statut"><span class="badge ok" title="Statut : fait constaté.">fait constaté</span></td><td data-label="Impact (1 à 5)">5</td></tr>
           </tbody>
         </table>
         <p class="etat-vide">Aucune ligne. Ce n'est pas un oubli : le référentiel n'en porte aucune au relevé ci-dessus.</p>
@@ -533,7 +536,7 @@
       <section class="chap lire" id="hypotheses">
         <h2>Hypothèses à lever</h2>
         <p class="chapo ch-apprend">Vous trouverez ce qu'il faut confirmer avant de construire, et qui peut le confirmer.</p>
-        <p class="contenu">Ce chapitre contient chaque hypothèse, l'exigence qu'elle conditionne, qui peut la lever et avant quand. Il ne contient aucun fait constaté.</p>
+        <p class="contenu">Ce chapitre contient chaque hypothèse avec l'exigence qu'elle conditionne, et dit qui peut la lever et avant quand. Il ne contient aucun fait constaté.</p>
         <p><strong>Exemple de lecture.</strong> Si H-01 est infirmée, E-002 devient une saisie à la main et son critère de recette change.</p>
         <div class="table-hote">
         <table class="repli-cartes">
@@ -568,7 +571,7 @@
             <th data-definition="Ce que chaque option écarte.">Exclusion</th>
           </tr></thead>
           <tbody>
-            <tr><td data-label="Point">Construire le produit ou étendre un logiciel existant</td><td data-label="Options">(a) construire ; (b) étendre le logiciel de réservation</td><td data-label="Exclusion">(a) écarte l'extension ; (b) écarte l'outil sur mesure</td></tr>
+            <tr><td data-label="Point">Construire le produit ou étendre un logiciel existant</td><td data-label="Options"><ul><li>(a) construire</li><li>(b) étendre le logiciel de réservation</li></ul></td><td data-label="Exclusion"><ul><li>(a) écarte l'extension</li><li>(b) écarte l'outil sur mesure</li></ul></td></tr>
           </tbody>
         </table>
         <p class="etat-vide">Aucune ligne. Ce n'est pas un oubli : le référentiel n'en porte aucune au relevé ci-dessus.</p>

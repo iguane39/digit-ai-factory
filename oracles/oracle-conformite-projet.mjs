@@ -120,7 +120,11 @@ const EXT_CODE = new Set(["py", "js", "mjs", "cjs", "ts", "tsx", "jsx", "go", "r
 const EXT_LIVRABLE = new Set(["md", "pdf", "html", "pptx", "docx", "xlsx", "zip", "png", "svg"]);
 // LISEZMOI.md : index de dossier, pas un livrable daté (convention des familles numérotées
 // d'`output\`/`input\`, 13/08). Ajouté avec `.oracles\` ci-dessous — TF-0197, 14/08.
-const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md", "LISEZMOI.md"]);
+// REVUE.md (TF-1714, 15/10/2026) : la revue de lecture que R-32 quater exige « à côté » de chaque
+// page d'`output\` porte un nom FIXE, prescrit par le gabarit du socle de page. R-4 la refusait
+// (« livrable sans nommage ») : la règle interdisait son propre remède, et la revue fuyait sous
+// `forge\oracles\`, où R-32 quater ne la voit plus (lot Produit-83 20261014a, RT-3).
+const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md", "LISEZMOI.md", "REVUE.md"]);
 const IGNORES_PARCOURS = new Set([".git", ".venv", "node_modules", "__pycache__", "generated", "dist", ".claude"]);
 
 function* fichiers(dossier, prof = 0) {
@@ -489,6 +493,37 @@ function racineDuParcParDefaut(ici) {
 }
 const racineForges = process.env.FORGE_ROOT || racineDuParcParDefaut(dirname(fileURLToPath(import.meta.url)));
 const registreTypes = join(racineForges, "digit-ai-forge-organization", "registre-types.json");
+// TF-1713 (15/10/2026, lot Produit-83 20261014a RT-2) — LE CATALOGUE DES FAMILLES DU PILOT PRESCRIT
+// AUSSI DES NOMS. Une famille déclare ses `types_de_nom` (« fiche produit », « compte rendu »…), et
+// `oracle-gabarits-documents` (G8) résout la famille d'un livrable par ce nom. Le 14/10/2026, une
+// fiche nommée au gabarit gd-fiche-produit a rendu R-25 FAIL, « Fiche » n'étant pas au registre
+// d'organization : deux règles du socle ne pouvaient pas être tenues ensemble. Mesuré ce jour-là,
+// 29 familles du catalogue sur 45 déclarent au moins un type de nom dont le premier mot manque au
+// registre. Un nom que le catalogue déclare n'est pas « improvisé » : il passe, en AVERTISSEMENT qui
+// nomme la famille et la dette D-04 chez organization. La comparaison porte sur le type de nom
+// ENTIER (préfixe le plus long, quatre mots au plus, comme G8), jamais sur le seul premier mot.
+const NORME_NOM = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const typesDuCatalogue = (() => {
+  const index = new Map();
+  const chemin = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "documents", "catalogue.jsonl");
+  if (!existsSync(chemin)) return index;
+  for (const l of readFileSync(chemin, "utf8").split(/\r?\n/).filter(Boolean)) {
+    let f; try { f = JSON.parse(l); } catch { continue; }
+    if (!f || !f.id || !["ok", "porte_ailleurs"].includes(f.statut)) continue;
+    for (const t of f.types_de_nom || []) index.set(NORME_NOM(t), f.id);
+  }
+  return index;
+})();
+/** La famille du catalogue dont un type de nom ouvre l'<Objet> (2e segment), ou null. */
+function familleDuNom(objet) {
+  const mots = NORME_NOM(objet).split(" ").filter(Boolean);
+  for (let n = Math.min(4, mots.length); n >= 1; n--) {
+    const cle = mots.slice(0, n).join(" ");
+    if (typesDuCatalogue.has(cle)) return { id: typesDuCatalogue.get(cle), cle };
+  }
+  return null;
+}
 if (!existsSync(registreTypes)) so("R-25", "registre-types.json d'organization introuvable — types non jugeables (poste non équipé ? node bootstrap.mjs)");
 else {
   let admis, typesAffiches;
@@ -512,7 +547,14 @@ else {
         if (segs.length < 3) continue; // pas de segment type — déjà R-4
         vus++;
         const type = segs[1].split(" ")[0];
-        if (!admis.has(normeType(type))) {
+        const parCatalogue = admis.has(normeType(type)) ? null : familleDuNom(segs[1]);
+        if (parCatalogue) {
+          ok("R-25", rel(f),
+            `AVERTISSEMENT, non bloquant : type « ${type} » absent du registre d'organization, mais le nom suit le type ` +
+            `« ${parCatalogue.cle} » que la famille ${parCatalogue.id} du catalogue du pilot déclare ` +
+            "(gabarits\\documents\\catalogue.jsonl, champ types_de_nom) — le nom n'est pas en faute ; l'ajout du type " +
+            "au registre d'organization (D-04) reste dû (TF-1713)");
+        } else if (!admis.has(normeType(type))) {
           const suggestion = plusProche(type, typesAffiches);
           ko("R-25", rel(f),
             `type « ${type} » absent du registre des types` +

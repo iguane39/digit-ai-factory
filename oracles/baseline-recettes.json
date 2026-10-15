@@ -148,7 +148,7 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 167,
+  "cas": 171,
   "vu_le": "2026-10-15"
  },
  "oracle-constantes-externes.mjs": {
@@ -207,6 +207,10 @@
  "oracle-fiche-constat-precos.mjs": {
   "cas": 15,
   "vu_le": "2026-10-14"
+ },
+ "oracle-fiche-produit.mjs": {
+  "cas": 21,
+  "vu_le": "2026-10-15"
  },
  "oracle-fraicheur-doc.mjs": {
   "cas": 10,
