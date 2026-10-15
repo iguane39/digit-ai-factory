@@ -2234,21 +2234,23 @@ check("TF-1714 borne : un autre .md sans nommage daté reste refusé par R-4 (l'
 // a rendu R-25 FAIL : « Fiche » n'est pas au registre d'organization, alors que le catalogue des
 // familles du pilot déclare « fiche produit » parmi ses types de nom. Deux règles du socle ne
 // pouvaient pas être tenues ensemble. Le nom que le catalogue déclare passe, en AVERTISSEMENT qui
-// nomme la famille et la dette du registre ; un mot de tête seul ne suffit pas (« Fiche bidon »).
+// nomme la famille et la dette du registre ; un mot de tête seul ne suffit pas (« Charte bidon »).
+// Le 15/10/2026, « Fiche » est entré au registre (registre-types 1.6.0) : l'exemple joué est désormais
+// « Charte partenariat » (famille charte-partenariat), dont le mot de tête manque encore au registre.
 const r25De = (d) => (lanceArgs(d, "--regles", "R-25").rapport.findings || []).filter((x) => x.regle === "R-25");
-check("TF-1713 remède joué : un livrable nommé au type de nom d'une famille du catalogue (« Fiche produit ») passe R-25, avertissement nommant la famille", () => {
-  const d = projetOutput("Digit-AI - Fiche produit Beef Project - Prospection - 20261014a.html");
+check("TF-1713 remède joué : un livrable nommé au type de nom d'une famille du catalogue (« Charte partenariat ») passe R-25, avertissement nommant la famille", () => {
+  const d = projetOutput("Digit-AI - Charte partenariat Produit Exemple - Prospection - 20261014a.html");
   try {
     const f = r25De(d);
-    if (f.some((x) => x.statut === "FAIL")) throw new Error(`R-25 refuse le nom que le gabarit gd-fiche-produit prescrit : ${JSON.stringify(f)}`);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error(`R-25 refuse le nom que le gabarit gd-charte-partenariat prescrit : ${JSON.stringify(f)}`);
     const avert = f.find((x) => /AVERTISSEMENT/.test(x.message));
-    if (!avert || !/gd-fiche-produit/.test(avert.message) || !/registre/.test(avert.message)) throw new Error(`l'avertissement ne nomme ni la famille ni la dette du registre : ${JSON.stringify(f)}`);
+    if (!avert || !/gd-charte-partenariat/.test(avert.message) || !/registre/.test(avert.message)) throw new Error(`l'avertissement ne nomme ni la famille ni la dette du registre : ${JSON.stringify(f)}`);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
-check("TF-1713 borne : un mot de tête hors registre qui ne forme AUCUN type de nom du catalogue reste refusé (« Fiche bidon »)", () => {
-  const d = projetOutput("Digit-AI - Fiche bidon Beef Project - 20261014a.html");
+check("TF-1713 borne : un mot de tête hors registre qui ne forme AUCUN type de nom du catalogue reste refusé (« Charte bidon »)", () => {
+  const d = projetOutput("Digit-AI - Charte bidon Produit Exemple - 20261014a.html");
   try {
-    if (!r25De(d).some((x) => x.statut === "FAIL")) throw new Error("« Fiche bidon » passe : l'admission par le catalogue a débordé sur le seul premier mot");
+    if (!r25De(d).some((x) => x.statut === "FAIL")) throw new Error("« Charte bidon » passe : l'admission par le catalogue a débordé sur le seul premier mot");
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
