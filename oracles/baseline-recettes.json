@@ -679,8 +679,8 @@
   "vu_le": "2026-10-12"
  },
  "scripts/verifier-garde-fous.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-10-01"
+  "cas": 15,
+  "vu_le": "2026-10-15"
  },
  "scripts/verifier-hook-poste.test.mjs": {
   "cas": 15,
