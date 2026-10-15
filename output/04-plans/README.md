@@ -86,6 +86,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015a.md` | fichier | 11,8 Ko | Synthèse Mandat — retours du 14/10 traités, deux vagues de corrections publiées, produits  |
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015e.md` | fichier | 13,8 Ko | Synthèse Mandat — retours du 15/10 traités, 80 sujets corrigés, 6 forges publiées, pilot e |
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015f.md` | fichier | 4,4 Ko | Synthèse Mandat — vos trois décisions appliquées, pilot publié, campagne du 15/10 close (1 |
+| `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md` | fichier | 7,1 Ko | Synthèse Mandat — reprise entre postes câblée, 3 sujets clos, publication du pilot à décid |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
 | `Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` | fichier | 20,1 Ko | Synthèse de mandat — campagnes en cours : trois corrections vérifiées et closes, trois cam |
 | `Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` | fichier | 25,4 Ko | Synthèse de mandat — le canal confidentiel existe et les tables y vivent, la forge des out |
@@ -278,4 +279,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_261 fichier(s), 0 sous-dossier(s)_
+_262 fichier(s), 0 sous-dossier(s)_
