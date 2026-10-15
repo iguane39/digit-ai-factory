@@ -655,7 +655,7 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 41,
+  "cas": 43,
   "vu_le": "2026-10-15"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
@@ -763,7 +763,7 @@
   "vu_le": "2026-10-12"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 37,
+  "cas": 38,
   "vu_le": "2026-10-15"
  },
  "todo/generer-page.test.mjs": {
