@@ -2746,5 +2746,47 @@ check("TF-1787 rouge : une ligne du bloc versions illisible (valeur sans guillem
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-1746 (lot Produit-03 20260908a, RA-45) — R-32 quinquies : l'historique lisible par le lecteur ---
+// Règle neuve, AVERTISSEMENT non bloquant. Rouge : une page remise sans section « Historique » est
+// signalée ; une page dont l'historique ouvre sur un autre indice aussi. Vert : l'historique ouvre sur
+// l'indice du nom. Antériorité : un livrable daté avant le 15/10/2026 n'est pas jugé, et c'est dit.
+const projet1746 = (nom, corps) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1746-"));
+  mkdirSync(join(d, "output"), { recursive: true });
+  writeFileSync(join(d, "output", nom), `<!doctype html><html lang="fr"><body><h1>Mode opératoire</h1><p>indice ${nom.match(/(\d{8}[a-z])/)[1]}</p>${corps}</body></html>`, "utf8");
+  return d;
+};
+const r1746 = (d) => lanceArgs(d, "--regles", "R-32 quinquies").rapport;
+check("TF-1746 rouge : une page remise sans section « Historique » → AVERTISSEMENT R-32 quinquies, jamais un FAIL", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20261015a.html", "<h2>Étapes</h2><p>1. faire</p>");
+  try {
+    const f = (r1746(d).findings || []).filter((x) => x.regle === "R-32 quinquies");
+    if (!f.some((x) => x.statut === "PASS" && /AVERTISSEMENT/.test(x.message) && /sans section/.test(x.message))) throw new Error(JSON.stringify(f));
+    if (f.some((x) => x.statut === "FAIL")) throw new Error("la règle neuve bloque");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1746 rouge : un historique qui ouvre sur un autre indice (20261014b) → AVERTISSEMENT qui nomme les deux indices", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20261015a.html", "<h2>Historique du document</h2><table><tr><td>20261014b</td><td>ajout</td></tr></table>");
+  try {
+    const f = (r1746(d).findings || []).filter((x) => x.regle === "R-32 quinquies");
+    if (!f.some((x) => /AVERTISSEMENT/.test(x.message) && /20261014b/.test(x.message) && /20261015a/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1746 vert : un historique dont la première ligne est l'indice du nom → PASS sans avertissement", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20261015a.html", "<h2>Historique du document</h2><table><tr><td>20261015a</td><td>15/10/2026</td><td>étape 12 corrigée</td></tr><tr><td>20261014b</td><td>14/10/2026</td><td>première remise</td></tr></table>");
+  try {
+    const f = (r1746(d).findings || []).filter((x) => x.regle === "R-32 quinquies");
+    if (!f.some((x) => x.statut === "PASS") || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1746 antériorité : un livrable daté avant le 15/10/2026 n'est pas jugé, et c'est dit au non_juge", () => {
+  const d = projet1746("Client-A - Mode operatoire - 20260907a.html", "<h2>Étapes</h2>");
+  try {
+    const r = r1746(d);
+    if ((r.findings || []).some((x) => x.regle === "R-32 quinquies" && x.statut !== "SANS_OBJET")) throw new Error(JSON.stringify(r.findings));
+    if (!(r.non_juge || []).some((l) => /R-32 quinquies/.test(l))) throw new Error("l'antériorité n'est pas déclarée");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

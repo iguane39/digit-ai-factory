@@ -376,9 +376,12 @@ d'implémentation » de forge-design
 (`skills\critique-le-design\references\critique-implementation.md`) — le produit jugé contre
 SA promesse design (tokens du run, écrans/états, CTA, rendu 2 thèmes, voix). Sortie :
 `etapes\design\revue-implementation.md`, écarts versés au ledger (`type: retour`,
-`source: produit`, destinataire development). Verdict Refondre ou ≥ 1 bloquant → retour à
-development (boucle bornée partagée avec l'étape tests). Un écart voulu se consigne en
-hypothèse — la revue le classe « accepté », pas défaut.
+`source: produit`, destinataire development). Le verdict se dit dans le vocabulaire de
+forge-design, qui le rend : **Livrer**, **Renforcer** ou **Refondre**, et aucun autre. Un mandat
+d'agent recopie ces trois mots ; le 15/10/2026, un mandat qui disait « Accepter / Retravailler »
+a obligé la revue à publier une table de correspondance (TF-1801). Verdict Refondre ou ≥ 1
+bloquant → retour à development (boucle bornée partagée avec l'étape tests). Un écart voulu se
+consigne en hypothèse — la revue le classe « accepté », pas défaut.
 
 **Gate généricité rejoué (loi n° 6, TF-0237)** : `oracle-taste.mjs` PASS sur le rendu
 implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la baseline

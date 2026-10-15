@@ -898,6 +898,43 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
         ok("R-32 quater", "*/REVUE.md", `revue de lecture présente, non vide et plus récente que chacun des ${htmls.length} livrable(s) HTML remis`);
       }
     }
+
+    // R-32 quinquies (TF-1746, 15/10/2026, lot Produit-03 20260908a RA-45) — LE LECTEUR SAIT CE QUI A
+    // CHANGÉ. Un mode opératoire remis à des administrateurs affichait « indice 20260907a » et rien
+    // d'autre, après quatre modifications en deux jours : un lecteur de la veille ne pouvait pas savoir
+    // ce qui avait bougé, ni même que quelque chose avait bougé (« aucun historique n'est enclenché »,
+    // mot du commanditaire). Le journal R-32 garde la trace machine, dans un fichier que le destinataire
+    // n'ouvre jamais. Mesure : une page HTML remise porte une section « Historique » (du document, des
+    // versions) dont le PREMIER indice cité est l'indice de son propre nom. SÉVÉRITÉ : AVERTISSEMENT en
+    // PASS, jamais un FAIL — règle neuve, d'abord mesurée. ANTÉRIORITÉ : seuls les livrables datés du
+    // 15/10/2026 ou après sont jugés ; l'existant n'est pas réécrit (déclaré au non_juge).
+    {
+      const DEPUIS_1746 = "20261015";
+      const sansHistorique = [], perime = [];
+      let juges1746 = 0;
+      for (const f of htmls) {
+        const m = basename(f).match(/\s-\s(\d{8})([a-z])\.html?$/i);
+        if (!m || m[1] < DEPUIS_1746) continue;
+        juges1746++;
+        const indice = m[1] + m[2].toLowerCase();
+        const texte = readFileSync(f, "utf8");
+        const titre = /<h[1-6][^>]*>[^<]*historique[^<]*<\/h[1-6]>/i.exec(texte);
+        if (!titre) { sansHistorique.push(rel(f)); continue; }
+        const premier = /\b(\d{8}[a-z])\b/i.exec(texte.slice(titre.index + titre[0].length).replace(/<[^>]+>/g, " "));
+        if (!premier || premier[1].toLowerCase() !== indice) perime.push(`${rel(f)} (1er indice de l'historique : ${premier ? premier[1] : "aucun"}, indice du nom : ${indice})`);
+      }
+      if (!juges1746) {
+        antecedences.push(`R-32 quinquies (historique lisible, TF-1746) non jugé : aucun livrable HTML daté du ${DEPUIS_1746} ou après — l'existant n'est pas réécrit`);
+      } else if (sansHistorique.length || perime.length) {
+        ok("R-32 quinquies", "output/*.html",
+          `AVERTISSEMENT, non bloquant : ${sansHistorique.length + perime.length} livrable(s) HTML remis sans historique lisible par son lecteur` +
+          (sansHistorique.length ? ` ; sans section « Historique du document » : ${sansHistorique.join(" · ")}` : "") +
+          (perime.length ? ` ; historique dont la première ligne n'est pas l'indice courant : ${perime.join(" · ")}` : "") +
+          " — un livrable documentaire remis porte un bloc « Historique du document » (version, date, ce qui change), dont la première ligne est son indice (TF-1746)");
+      } else {
+        ok("R-32 quinquies", "output/*.html", `${juges1746} livrable(s) HTML portent un historique dont la première ligne est leur indice`);
+      }
+    }
   }
 }
 
