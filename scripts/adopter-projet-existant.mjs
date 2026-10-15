@@ -592,6 +592,7 @@ if (lanceEnDirect) {
   console.log("\nnon jugé, et déclaré :");
   for (const l of r.non_juge) console.log(`  · ${l}`);
   console.log("\nGeste suivant : `node <PILOT_ROOT>\\scripts\\readme-dossiers.mjs --base .` pose les README d'`input\\` et `output\\` (R-44),"
-    + " puis le protocole d'accueil du pilot (`references\\ACCUEIL.md`) reprend la main.");
+    + " puis le protocole d'accueil du pilot (`references\\ACCUEIL.md`) reprend la main ;"
+    + " `node <PILOT_ROOT>\\scripts\\ouvrir-run.mjs . --run <id> --forges <forges>` pose le socle d'ouverture de run et dit ce qui reste (TF-1697).");
   process.exit(0);
 }
