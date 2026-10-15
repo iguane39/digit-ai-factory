@@ -28,6 +28,13 @@
  *   EC-5  (mode --restitution) une option d'une restitution ne fait pas lancer par la session un
  *         script de déploiement ou de mise en service : l'étape devient un étage de la chaîne,
  *         rejouable seul par l'exploitant.
+ *   EC-6  AVERTISSANTE (TF-1748, lot Produit-76 20260925a RV-4, 15/10/2026) : chaque script bash
+ *         embarqué dans un fichier de chaîne, macros `$(nom)`, `${{ … }}` et `$[ … ]` neutralisées,
+ *         passe `bash -n` ; un défaut de syntaxe ne se découvre sinon qu'après le déploiement ;
+ *   EC-7  AVERTISSANTE (TF-1749, même lot, RV-5) : un étage qui déploie vers un `environment:` porte
+ *         `lockBehavior: sequential`, sur l'étage ou en tête de la chaîne.
+ *   Mesure d'entrée, 15/10/2026, 41 chaînes Azure DevOps du poste : 232 scripts bash, 0 refusé par
+ *   `bash -n` ; 9 étages de déploiement sans verrou.
  * (EC-3, la fenêtre d'autorisation refermée quel que soit qui l'a ouverte, est une règle de
  *  doctrine que ce contrôle ne juge pas : voir NON_JUGE.)
  *
@@ -38,6 +45,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 
 const NON_JUGE = [
   "EC-3 : qu'une fenêtre d'autorisation se referme à la fin de l'exécution quel que soit qui l'a ouverte (ETAPE-MEP.md § 3 decies, règle 4) : l'état d'une autorisation vit dans la plateforme, ce contrôle hors ligne ne le lit pas",
@@ -46,6 +54,8 @@ const NON_JUGE = [
   "la VÉRACITÉ de ce que le dossier déclare avoir exécuté hors production (EC-4) : le contrôle exige la déclaration, sa date et ses trois rubriques, il ne rejoue pas la commande",
   "l'extension authV2 déclarée présente (EC-2) : le commentaire daté est cru, la mesure se refait avec `az extension list` dans la chaîne même",
   "EC-5 : une option de restitution qui fait lancer le geste sous d'autres mots que ceux de la liste (sujet de session, verbe de lancement, objet de type script, mot de déploiement sur la même ligne)",
+  "EC-6 : le COMPORTEMENT d'un script de chaîne : `bash -n` ne lit que la syntaxe (`[ -z \"$X\" ] && affectation` sous `set -e` passe et tue le script) ; les scalaires repliés `>` et les scripts PowerShell ne sont pas lus",
+  "EC-7 : le contrôle « Exclusive Lock » de l'environnement Azure DevOps : il vit dans la plateforme, sans lui `lockBehavior: sequential` reste sans effet ; et le contrôle d'état final de remplacement (image réellement configurée relue en fin d'étage)",
 ];
 
 const EXTENSIONS = /\.(sh|bash|ps1|psm1|ya?ml)$/i;
@@ -134,6 +144,120 @@ export function jugerScript(texte, rel) {
   return { findings, mesure };
 }
 
+// ── EC-6 et EC-7 : le fichier de chaîne lui-même (TF-1748, TF-1749 — AVERTISSANTES) ──────────────
+// EC-6 : chaque script bash embarqué (`bash:`, `script:`, `inlineScript:` d'une tâche AzureCLI dont le
+// scriptType n'est pas PowerShell, `run:` d'un flux GitHub) est extrait, ses macros neutralisées —
+// `$(nom)` d'Azure DevOps, que bash lirait comme une substitution de commande, `${{ … }}` et `$[ … ]`
+// — puis passé à `bash -n`. LIMITE, écrite ici comme au lot : `bash -n` ne voit que la syntaxe ; le
+// même jour, `[ -z "$VAR" ] && affectation` sous `set -e` tuait un script à la deuxième itération,
+// syntaxe valide, comportement faux.
+// EC-7 : un étage qui porte un job `deployment:` vers un `environment:` porte `lockBehavior:
+// sequential` (sur l'étage, ou en tête de la chaîne). Il reste sans effet tant que l'environnement n'a
+// pas le contrôle « Exclusive Lock », que ce contrôle hors ligne ne lit pas (NON_JUGE).
+const CLE_SCRIPT = /^(\s*)(?:-\s+)?(bash|script|inlineScript|run)\s*:\s*(.*)$/;
+const SCRIPT_TYPE_NON_BASH = /\bscriptType\s*:\s*['"]?(?:ps|pscore|batch|powershell)\b/i;
+const SHELL_NON_BASH = /\bshell\s*:\s*['"]?(?:pwsh|powershell|cmd|python)\b/i;
+
+let BASH = undefined;
+/** Le bash du poste : FORGE_BASH, puis celui de Git pour Windows, puis `bash` du chemin. null si aucun. */
+function bashDuPoste() {
+  if (BASH !== undefined) return BASH;
+  const candidats = [process.env.FORGE_BASH,
+    ...(process.platform === "win32" ? ["C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe"] : []), "bash"].filter(Boolean);
+  BASH = null;
+  for (const c of candidats) {
+    if (c !== "bash" && !existsSync(c)) continue;
+    const r = spawnSync(c, ["-c", "echo ok"], { encoding: "utf8", timeout: 15000 });
+    if (r.status === 0 && /ok/.test(r.stdout || "")) { BASH = c; break; }
+  }
+  return BASH;
+}
+
+/** Les scripts bash d'un fichier de chaîne : [{ ligne (1re ligne du script dans le YAML), texte }]. */
+export function extraireScripts(yaml) {
+  const lignes = yaml.split(/\r?\n/);
+  const out = [];
+  for (let i = 0; i < lignes.length; i++) {
+    const m = CLE_SCRIPT.exec(lignes[i]);
+    if (!m) continue;
+    const [, retrait, cle, valeur] = m;
+    const voisinage = lignes.slice(Math.max(0, i - 8), Math.min(lignes.length, i + 8)).join("\n");
+    if (cle === "inlineScript" && SCRIPT_TYPE_NON_BASH.test(voisinage)) continue;
+    if (cle === "run" && SHELL_NON_BASH.test(voisinage)) continue;
+    // `script:` sous les `inputs:` d'une tâche : bash seulement pour Bash@N (PowerShell@2 porte aussi
+    // une clé `script:` ; mesuré le 15/10/2026 sur 41 chaînes du poste, 1 faux avertissement sans ce garde).
+    if (cle === "script" && !/^\s*-\s/.test(lignes[i])) {
+      const tache = lignes.slice(Math.max(0, i - 12), i).reverse().find((l) => /^\s*-?\s*task\s*:/.test(l));
+      if (tache && !/task\s*:\s*['"]?Bash@/i.test(tache)) continue;
+    }
+    const v = valeur.trim();
+    if (/^\|[-+]?\d*$/.test(v)) {
+      const corps = [];
+      let j = i + 1, indent = null;
+      for (; j < lignes.length; j++) {
+        const l = lignes[j];
+        if (!l.trim()) { corps.push(""); continue; }
+        const n = /^\s*/.exec(l)[0].length;
+        if (indent === null) { if (n <= retrait.length) break; indent = n; }
+        if (n < indent) break;
+        corps.push(l.slice(indent));
+      }
+      while (corps.length && !corps[corps.length - 1]) corps.pop();
+      if (corps.length) out.push({ ligne: i + 2, texte: corps.join("\n") + "\n" });
+      i = j - 1;
+    } else if (v && !/^[>]/.test(v)) {
+      out.push({ ligne: i + 1, texte: v.replace(/^(['"])([\s\S]*)\1$/, "$2") + "\n", enLigne: true });
+    }
+  }
+  return out;
+}
+
+const neutraliserMacros = (s) => s
+  .replace(/\$\{\{[\s\S]*?\}\}/g, "__EXPR__")
+  .replace(/\$\[[^\]\n]*\]/g, "__EXPR__")
+  .replace(/\$\(([A-Za-z_][\w.\-]*)\)/g, "__MACRO__");
+
+export function jugerChaine(texte, rel) {
+  const findings = [];
+  const mesure = { scripts_de_chaine: 0, scripts_en_echec_de_syntaxe: 0, etages_sans_verrou: 0 };
+  // EC-6
+  const scripts = extraireScripts(texte);
+  mesure.scripts_de_chaine = scripts.length;
+  if (scripts.length) {
+    const bash = bashDuPoste();
+    if (!bash) findings.push({ regle: "EC-6", statut: "SKIP", ou: rel, message: `${scripts.length} script(s) bash embarqué(s), non jugé(s) : aucun bash sur ce poste (FORGE_BASH, Git pour Windows, bash du chemin)` });
+    else for (const s of scripts) {
+      const r = spawnSync(bash, ["-n"], { input: neutraliserMacros(s.texte), encoding: "utf8", timeout: 15000 });
+      if (r.status === 0) continue;
+      mesure.scripts_en_echec_de_syntaxe++;
+      const err = String(r.stderr || "").trim().split(/\r?\n/)[0] || `bash -n a rendu ${r.status}`;
+      const n = Number((/line (\d+)/.exec(err) || [])[1]);
+      const ligne = Number.isFinite(n) && !s.enLigne ? s.ligne + n - 1 : s.ligne;
+      findings.push({ regle: "EC-6", statut: "AVERTISSEMENT", ou: `${rel}:${ligne}`,
+        message: `script de la chaîne refusé par \`bash -n\` (macros $(nom) neutralisées) : ${err.replace(/^.*?line \d+:\s*/, "")}. Un défaut de syntaxe d'un script de chaîne ne se découvre qu'à l'exécution, après le déploiement : `
+          + "le 25/09/2026, une exécution a déployé correctement puis est morte sur un `fi` en double, chaîne rouge sur un déploiement sain (TF-1748). "
+          + "Limite : `bash -n` ne voit pas les défauts de comportement (`[ -z \"$X\" ] && …` sous `set -e`)" });
+    }
+  }
+  // EC-7
+  const lignes = texte.split(/\r?\n/);
+  const enTete = lignes.some((l) => /^lockBehavior\s*:\s*sequential\b/.test(l));
+  const debuts = lignes.map((l, i) => (/^\s*-\s*stage\s*:/.test(l) ? i : -1)).filter((i) => i >= 0);
+  const etages = debuts.length ? debuts.map((d, k) => ({ d, f: k + 1 < debuts.length ? debuts[k + 1] : lignes.length })) : [{ d: 0, f: lignes.length }];
+  for (const { d, f } of etages) {
+    const bloc = lignes.slice(d, f).join("\n");
+    if (!/^\s*-\s*deployment\s*:/m.test(bloc) || !/^\s*environment\s*:/m.test(bloc)) continue;
+    if (enTete || /^\s*lockBehavior\s*:\s*sequential\b/m.test(bloc)) continue;
+    mesure.etages_sans_verrou++;
+    const env = (/^\s*environment\s*:\s*(?:\n\s*name\s*:\s*)?['"]?([\w.\-]+)/m.exec(bloc) || [])[1] || "?";
+    findings.push({ regle: "EC-7", statut: "AVERTISSEMENT", ou: `${rel}:${d + 1}`,
+      message: `étage de déploiement vers l'environnement « ${env} » sans \`lockBehavior: sequential\` : deux exécutions peuvent viser la même cible en même temps, et le retour arrière de la seconde défaire la première, restée verte. `
+        + "Deux gestes, dans cet ordre : créer l'environnement AVEC le contrôle « Exclusive Lock », puis poser `lockBehavior: sequential` sur l'étage (sans effet tant que le contrôle n'existe pas). "
+        + "À défaut de droit sur l'environnement, un contrôle d'état final en fin d'étage : relire l'image réellement configurée et refuser de déclarer verte une livraison qui n'est plus en service (TF-1749, exécutions du 25/09/2026 à 18 s d'écart)" });
+  }
+  return { findings, mesure };
+}
+
 // ── EC-4 : la section du dossier de MEP ────────────────────────────────────────────────────────
 const FICHIER_DE_CHAINE = /(^|\/)azure-pipelines[^/]*\.ya?ml$|(^|\/)\.github\/workflows\/[^/]+\.ya?ml$|(^|\/)\.gitlab-ci\.ya?ml$|(^|\/)(?:\.azure-pipelines|\.pipelines|pipelines)\/.+\.ya?ml$/i;
 // Une écriture dans la plateforme : une commande az qui n'est pas une lecture, ou terraform apply.
@@ -170,6 +294,14 @@ export function jugerProduit(racine, { document = null } = {}) {
   // EC-4 — seulement si une chaîne existe ET écrit dans la plateforme (dans son fichier ou dans un script du produit).
   const chaines = fichiers.filter((f) => FICHIER_DE_CHAINE.test(f.rel));
   mesure.fichiers_de_chaine = chaines.length;
+  // EC-6 et EC-7 (avertissantes) : sur chaque fichier de chaîne, qu'il écrive ou non dans la plateforme.
+  Object.assign(mesure, { scripts_de_chaine: 0, scripts_en_echec_de_syntaxe: 0, etages_sans_verrou: 0, avertissements: 0 });
+  for (const { chemin, rel } of chaines) {
+    const r = jugerChaine(lire(chemin), rel);
+    findings.push(...r.findings);
+    for (const k of ["scripts_de_chaine", "scripts_en_echec_de_syntaxe", "etages_sans_verrou"]) mesure[k] += r.mesure[k];
+  }
+  mesure.avertissements = findings.filter((f) => f.statut === "AVERTISSEMENT").length;
   if (chaines.length) {
     mesure.ecritures_de_chaine = fichiers.filter((f) => lignesLogiques(lire(f.chemin)).some((l) => !estCommentaire(l.texte) && ECRITURE_PLATEFORME.test(l.texte))).length;
   }
@@ -233,7 +365,7 @@ const lanceEnDirect = process.argv[1]
 if (lanceEnDirect) {
   const args = process.argv.slice(2);
   const valeur = (nom) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : null; };
-  const sortir = (corps, code) => { process.stdout.write(JSON.stringify({ outil: "verifier-etape-chaine", version: "1.0.0", regle: "M-13 (ETAPE-MEP.md § 3 decies)", ...corps, non_juge: NON_JUGE }, null, 1) + "\n"); process.exit(code); };
+  const sortir = (corps, code) => { process.stdout.write(JSON.stringify({ outil: "verifier-etape-chaine", version: "1.1.0", regle: "M-13 (ETAPE-MEP.md § 3 decies)", ...corps, non_juge: NON_JUGE }, null, 1) + "\n"); process.exit(code); };
   const fichierRestitution = valeur("--restitution");
   if (fichierRestitution) {
     if (!existsSync(fichierRestitution)) sortir({ verdict: "NON_JUGEABLE", message: `restitution introuvable : ${fichierRestitution}` }, 2);

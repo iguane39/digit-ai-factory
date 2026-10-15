@@ -201,5 +201,76 @@ check("VERT EC-5 — une exécution de test lancée par la session, sans déploi
   egal(r.code, 0, "code de sortie");
 });
 
+// ---- EC-6 et EC-7 (TF-1748, TF-1749 — lot Produit-76 20260925a, RV-4 et RV-5) : AVERTISSANTES ----
+// EC-6 : le cas fondateur est un `fi` en double, reste d'un remplacement de bloc, qui a tué un script
+// de chaîne APRÈS un déploiement réussi (exécution 15155). EC-7 : deux exécutions à 18 secondes d'écart
+// sur le même environnement, la seconde défaisant la première (15164 et 15165).
+const CHAINE_AZ = (script, verrou = "") => [
+  "trigger: [main]",
+  "stages:",
+  "- stage: Deployer",
+  ...(verrou ? [`  ${verrou}`] : []),
+  "  jobs:",
+  "  - deployment: Deployer",
+  "    environment: cible-dev",
+  "    strategy:",
+  "      runOnce:",
+  "        deploy:",
+  "          steps:",
+  "          - bash: |",
+  ...script.map((l) => (l ? "              " + l : "")),
+  "            displayName: Bascule",
+  "          - task: AzureCLI@2",
+  "            inputs:",
+  "              scriptType: bash",
+  "              inlineScript: |",
+  "                IMG=$(az webapp config show -n \"$(nomApp)\" --query linuxFxVersion -o tsv)",
+  "                echo \"$IMG\"",
+  "          - powershell: |",
+  "              if ($x) { Write-Host 'non jugé : PowerShell' }",
+  "",
+].join("\n");
+const SAIN = ["set -euo pipefail", "if [ -n \"$(Build.SourceVersion)\" ]; then", "  echo \"${{ parameters.cible }} $(Build.BuildId)\"", "fi"];
+const FI_DOUBLE = [...SAIN, "fi"];
+const { jugerChaine } = await import(pathToFileURL(OUTIL).href);
+const avert = (fs, regle) => fs.filter((f) => f.regle === regle && f.statut === "AVERTISSEMENT");
+const bashJoue = (fs) => !fs.some((f) => f.regle === "EC-6" && f.statut === "SKIP");
+check("ROUGE EC-6 — un `fi` en double dans un script de la chaîne : averti, localisé dans le YAML, sans refus", () => {
+  const r = jugerChaine(CHAINE_AZ(FI_DOUBLE, "lockBehavior: sequential"), "azure-pipelines.yml");
+  if (!bashJoue(r.findings)) return console.log("    (bash introuvable sur ce poste : cas déclaré NON JOUÉ)");
+  const f = avert(r.findings, "EC-6");
+  egal(f.length, 1, "avertissement EC-6 " + JSON.stringify(r.findings).slice(0, 300));
+  egal(f[0].ou, "azure-pipelines.yml:17", "localisation");
+  egal(r.findings.filter((x) => x.statut === "FAIL").length, 0, "refus");
+});
+check("VERT EC-6 — le même script sain passe, macros $(nom) et ${{ … }} neutralisées ; PowerShell non jugé", () => {
+  const r = jugerChaine(CHAINE_AZ(SAIN, "lockBehavior: sequential"), "azure-pipelines.yml");
+  if (!bashJoue(r.findings)) return console.log("    (bash introuvable sur ce poste : cas déclaré NON JOUÉ)");
+  egal(avert(r.findings, "EC-6").length, 0, "avertissement EC-6 sur le sain " + JSON.stringify(r.findings).slice(0, 300));
+  egal(r.mesure.scripts_de_chaine, 2, "scripts bash extraits (bash: et inlineScript:, pas powershell:)");
+});
+check("VERT EC-6 — le `script:` d'une tâche PowerShell@2 n'est pas lu comme du bash ; celui d'une étape `- script:` l'est", () => {
+  const ps = "steps:\n- task: PowerShell@2\n  inputs:\n    targetType: inline\n    script: |\n      foreach ($e in $liste){\n        Write-Output $e\n      }\n- script: |\n    echo ok\n";
+  const r = jugerChaine(ps, "azure-pipelines.yml");
+  if (!bashJoue(r.findings)) return console.log("    (bash introuvable sur ce poste : cas déclaré NON JOUÉ)");
+  egal(avert(r.findings, "EC-6").length, 0, "faux avertissement sur PowerShell@2");
+  egal(r.mesure.scripts_de_chaine, 1, "scripts bash extraits");
+});
+check("ROUGE EC-7 — un étage de déploiement vers un environnement sans `lockBehavior: sequential` : averti", () => {
+  const f = avert(jugerChaine(CHAINE_AZ(SAIN), "azure-pipelines.yml").findings, "EC-7");
+  egal(f.length, 1, "avertissement EC-7");
+  if (!/Exclusive Lock/.test(f[0].message)) throw new Error("le message ne nomme pas le contrôle « Exclusive Lock » à poser sur l'environnement");
+});
+check("VERT EC-7 — `lockBehavior: sequential` sur l'étage, ou en tête de la chaîne : rien", () => {
+  egal(avert(jugerChaine(CHAINE_AZ(SAIN, "lockBehavior: sequential"), "azure-pipelines.yml").findings, "EC-7").length, 0, "sur l'étage");
+  egal(avert(jugerChaine("lockBehavior: sequential\n" + CHAINE_AZ(SAIN), "azure-pipelines.yml").findings, "EC-7").length, 0, "en tête");
+});
+check("CLI — une chaîne au `fi` en double et sans verrou : avertissements rendus, exit inchangé (aucun refus neuf)", () => {
+  const D = produit({ "azure-pipelines.yml": CHAINE_AZ(FI_DOUBLE), "infra/fiche-entra.sh": ECRIT, "DOSSIER-MEP.md": DOSSIER(SECTION) });
+  const r = lancer(D); nettoyer(D);
+  egal(r.code, 0, "code de sortie " + r.brut.slice(0, 300));
+  egal(avert(r.j.findings, "EC-7").length, 1, "EC-7 au JSON");
+});
+
 console.log(`\n${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
