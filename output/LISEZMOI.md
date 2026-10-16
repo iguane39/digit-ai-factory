@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 451 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 452 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -491,6 +491,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md | 20261001l | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` |
 | Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md | 20261016d | 5.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` |
 | Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md | 20261015m | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` |
+| Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md | 20261016j | 5.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md` |
 | Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001n.md | 20261001n | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001n.md` |
 | Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md | 20261001k | 18.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` |
 | Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md | 20261001m | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` |
