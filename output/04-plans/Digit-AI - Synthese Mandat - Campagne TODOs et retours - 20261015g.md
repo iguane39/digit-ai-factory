@@ -55,7 +55,7 @@ Inventaire des bloquants :
 ## 5. Non traité
 
 - **Publication du pilot.** Motif : dependance_bloc_3, elle attend la décision D-6.
-- **Un cas de recette qui dépend du temps (TF-1838).** Motif : inscrit en candidat, il est sans lien avec les sujets du soir et passe 40 sur 40 au second passage.
+- **Un cas de recette qui dépend du temps (TF-1828).** Motif : inscrit en candidat, il est sans lien avec les sujets du soir et passe 40 sur 40 au second passage.
 - **Gestes de reprise d'un produit dont le dossier n'est pas retrouvé (TF-1825).** Motif : même défaut de localisation que TF-1630, inchangé.
 - **Décisions des sessions précédentes.** Motif : décision humaine, inchangée. Les sujets sont TF-0963, TF-1160, TF-1212, TF-1307, TF-1319, TF-1323, TF-1396, TF-1432, TF-1540, TF-1552 et TF-1584.
 
