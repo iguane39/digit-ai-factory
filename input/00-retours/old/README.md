@@ -7,7 +7,7 @@
 ## Rôle
 
 <!-- ROLE:DEBUT -->
-Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réécrit pas.
+Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réécrit pas. Classés par émetteur, un sous-dossier chacun (`node scripts\ranger-dossiers.mjs`, 16/10/2026).
 <!-- ROLE:FIN -->
 
 ## Contenu

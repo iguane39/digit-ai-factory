@@ -100,6 +100,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md` | fichier | 9,5 Ko | Synthèse de mandat — le circuit hébergé ne dépend plus de ce poste, et l'accueil des lots  |
 | `Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` | fichier | 7,1 Ko | Synthèse Mandat — commande d'installation publiée et verte sur poste neuf, reprise réseau  |
 | `Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md` | fichier | 22,3 Ko | Communication : les parts de forge sont finies en local, et 6 décisions vous attendent, dé |
+| `Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` | fichier | 8,8 Ko | Synthèse Mandat — Supabase outillé dans quatre forges et au pilot, publication du pilot à  |
 | `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
@@ -284,4 +285,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_266 fichier(s), 1 sous-dossier(s)_
+_267 fichier(s), 1 sous-dossier(s)_

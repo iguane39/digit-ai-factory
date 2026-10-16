@@ -7,7 +7,7 @@
 ## Rôle
 
 <!-- ROLE:DEBUT -->
-Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée.
+Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. Classées par mois, `sans-date\` pour les noms sans date (`node scripts\ranger-dossiers.mjs`, 16/10/2026).
 <!-- ROLE:FIN -->
 
 ## Contenu

@@ -7,7 +7,7 @@
 ## Rôle
 
 <!-- ROLE:DEBUT -->
-Études d'opportunité au gabarit `gabarits\ETUDE-OPPORTUNITE.md` (jugées par `oracles\oracle-etude-opportunite.mjs`, sections + O0-O4 + verdict unique + plan de revue), cartographies et études datées `AAAAMMJJ-etude-*.md`.
+Études d'opportunité au gabarit `gabarits\ETUDE-OPPORTUNITE.md` (jugées par `oracles\oracle-etude-opportunite.mjs`, sections + O0-O4 + verdict unique + plan de revue), cartographies et études datées `AAAAMMJJ-etude-*.md`. Mois en cours à la racine, mois clos en `AAAA-MM\` (`node scripts\ranger-dossiers.mjs`, 16/10/2026).
 <!-- ROLE:FIN -->
 
 ## Contenu

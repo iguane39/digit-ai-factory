@@ -16,7 +16,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| [`old\`](old/README.md) | dossier (130 fichiers) | — | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
+| [`old\`](old/README.md) | dossier (130 fichiers) | — | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. Classées par mois, `sans-date\` pour les noms sans dat… |
 | `porte-publication-faux-positif-20260909a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - CANDIDATURE - Etude DataForSEO - 20260831a.md` | fichier | 7,3 Ko | Produit-02 — Candidature : étude poussée de la stratégie DataForSEO — 20260831a |
 | `Produit-02 - CANDIDATURE - Etude DataForSEO - 20260831a.normalise.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |

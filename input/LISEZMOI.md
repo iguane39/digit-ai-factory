@@ -51,3 +51,19 @@ puisque personne ne relit une table qu'aucun contrôle ne joue. Le contrôle exi
 `oracles\familles-numerotees.test.mjs` (I3), joué à chaque recette du dépôt. Il tient les
 **deux sens** — toute famille du disque est déclarée, toute famille déclarée existe — et
 l'unicité des numéros, les doublons gelés étant nommés avec leur décision.
+
+## Classement des archives en sous-dossiers (16/10/2026)
+
+Les archives ne se lisaient plus : 742 fichiers dans `00-retours\old\`, 131 dans
+`01-candidatures\old\`. Elles sont classées par `node scripts\ranger-dossiers.mjs`, rejouable et sans
+écrasement (`--sec` pour voir avant d'agir).
+
+| Archive | Classement | Exemple |
+|---|---|---|
+| `00-retours\old\` | un sous-dossier par émetteur, le préfixe du lot | `old\Produit-64\`, `old\digit-ai-forge-agents\`, `old\INSATISFACTION\` |
+| `01-candidatures\old\` | un sous-dossier par mois porté par le nom | `old\2026-09\`, `old\sans-date\` |
+
+Les lots historiques sans préfixe (`RETOURS-FORGES*.md`) sont sous `old\historiques-sans-prefixe\`.
+Un lot qui vient d'être ingéré part en `old\` comme avant ; le script le range ensuite dans son
+sous-dossier. Les lecteurs de l'archive la parcourent avec ses sous-dossiers : `oracle-boite-entree`
+(B10), `lib-retours-produit`, `generer-recidives` et le gabarit `oracle-lot-retours`.
