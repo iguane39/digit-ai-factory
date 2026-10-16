@@ -1104,7 +1104,7 @@
   {
    "cle": "constat-non-bloquant-jamais-lu",
    "famille": "hook-ou-gate",
-   "libelle": "Un controle cable a un hook qui n affiche sa sortie qu en cas de blocage rend un echec que personne ne lit : il tourne, constate, sort en 0 parce qu il ne bloque que ce que le pilot peut reparer, et le defaut vit aussi longtemps qu avant son existence. Mesure le 14/09/2026 : oracle-secrets-hors-perimetre FAIL (11 porteurs hors depot, 3 dans des depots qui ne les ignorent pas, dont publies) a chaque fin de tour depuis sa pose, jamais affiche ; la rotation demandee le 30/08 sans trace. Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-6 (a))",
+   "libelle": "Un controle cable a un hook qui n affiche sa sortie qu en cas de blocage rend un echec que personne ne lit : il tourne, constate, sort en 0 parce qu il ne bloque que ce que le pilot peut reparer, et le defaut vit aussi longtemps qu avant son existence. Mesure le 14/09/2026 : oracle-secrets-hors-perimetre FAIL (11 porteurs hors depot, 3 dans des depots qui ne les ignorent pas, dont publies) a chaque fin de tour depuis sa pose, jamais affiche ; la rotation demandee le 30/08 sans trace. Source : decision humaine du 14/09/2026, synthese output/04-plans/2026-09/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-6 (a))",
    "creee_le": "2026-09-14",
    "fondee_par": [],
    "regle": "tout controle dont un constat ne bloque pas est cable la ou sa sortie est LUE (releve d ouverture, restitution) ; un hook qui avale la sortie d un controle non bloquant n est pas un cablage",
@@ -1117,7 +1117,7 @@
   {
    "cle": "secret-porte-hors-perimetre",
    "famille": "hook-ou-gate",
-   "libelle": "Un fichier porteur de secrets vit hors de tout depot, ou dans un depot qui ne l ignore pas, jusqu a etre publie : R-14 juge un depot et ne voit pas ce qui vit a cote. Un secret publie ne se retire pas, il se fait tourner. Reste du 14/09/2026 : 14 porteurs, dont des publies sur la branche principale de trois produits, clos en archive sans suite (TF-0616). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "libelle": "Un fichier porteur de secrets vit hors de tout depot, ou dans un depot qui ne l ignore pas, jusqu a etre publie : R-14 juge un depot et ne voit pas ce qui vit a cote. Un secret publie ne se retire pas, il se fait tourner. Reste du 14/09/2026 : 14 porteurs, dont des publies sur la branche principale de trois produits, clos en archive sans suite (TF-0616). Source : decision humaine du 14/09/2026, synthese output/04-plans/2026-09/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
    "creee_le": "2026-09-14",
    "fondee_par": [
     "TF-0616"
@@ -1132,7 +1132,7 @@
   {
    "cle": "controle-ecrit-non-cable-a-son-etape",
    "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Un controle existe, porte parfois sa recette, et aucune etape du run, aucun hook ni aucune recette ne l appelle : loi transverse n° 1, toute affordance est cablee ou n existe pas. La classe se distingue de regle-ecrite-sans-oracle-qui-la-joue (pas de controle du tout) et du controle mort (il rend PASS a tort). Releve des restes archives du 14/09/2026 : sept controles dans ce cas (TF-0522, TF-0592, TF-0594, TF-0647, TF-0669, TF-0726, TF-0733). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "libelle": "Un controle existe, porte parfois sa recette, et aucune etape du run, aucun hook ni aucune recette ne l appelle : loi transverse n° 1, toute affordance est cablee ou n existe pas. La classe se distingue de regle-ecrite-sans-oracle-qui-la-joue (pas de controle du tout) et du controle mort (il rend PASS a tort). Releve des restes archives du 14/09/2026 : sept controles dans ce cas (TF-0522, TF-0592, TF-0594, TF-0647, TF-0669, TF-0726, TF-0733). Source : decision humaine du 14/09/2026, synthese output/04-plans/2026-09/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
    "creee_le": "2026-09-14",
    "fondee_par": [
     "TF-0522",
@@ -1153,7 +1153,7 @@
   {
    "cle": "controle-joue-sur-fichier-pas-sur-instance-servie",
    "famille": "page-html-socle",
-   "libelle": "Le rendu et les interactions d une page sont juges sur le fichier, jamais sur une instance servie : les etats apres interaction et les combinaisons de filtres croises ne sont joues par personne (TF-0480, TF-0493). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "libelle": "Le rendu et les interactions d une page sont juges sur le fichier, jamais sur une instance servie : les etats apres interaction et les combinaisons de filtres croises ne sont joues par personne (TF-0480, TF-0493). Source : decision humaine du 14/09/2026, synthese output/04-plans/2026-09/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
    "creee_le": "2026-09-14",
    "fondee_par": [
     "TF-0480",
@@ -1168,7 +1168,7 @@
   {
    "cle": "severite-declaree-invisible-au-consommateur",
    "famille": "regle-morte",
-   "libelle": "Une famille de mesure declare sa severite (bloquante), et ses consommateurs la lisent comme un avertissement : la severite existe dans la source et nulle part ou elle agit (TF-0531). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "libelle": "Une famille de mesure declare sa severite (bloquante), et ses consommateurs la lisent comme un avertissement : la severite existe dans la source et nulle part ou elle agit (TF-0531). Source : decision humaine du 14/09/2026, synthese output/04-plans/2026-09/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
    "creee_le": "2026-09-14",
    "fondee_par": [
     "TF-0531"
@@ -1182,7 +1182,7 @@
   {
    "cle": "chaine-declaree-etapes-non-ecrites",
    "famille": "contrat-interface-forge",
-   "libelle": "Une chaine de travail est declaree (etapes nommees, sortie promise) et la majorite de ses etapes n est ecrite nulle part : sept des dix etapes de la chaine de traduction et d audit d un produit (TF-0664). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "libelle": "Une chaine de travail est declaree (etapes nommees, sortie promise) et la majorite de ses etapes n est ecrite nulle part : sept des dix etapes de la chaine de traduction et d audit d un produit (TF-0664). Source : decision humaine du 14/09/2026, synthese output/04-plans/2026-09/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
    "creee_le": "2026-09-14",
    "fondee_par": [
     "TF-0664"
@@ -1196,7 +1196,7 @@
   {
    "cle": "livrable-sans-identite-de-gabarit",
    "famille": "gabarit-document",
-   "libelle": "Un livrable produit par un generateur de forge ne porte ni l identifiant ni la version de son gabarit, et un option de contournement (--gabarit) remplace la mesure de la cause : l instance perimee est invisible sur l artefact (TF-0690, TF-0702 ; regle G4 d oracle-gabarits-documents). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "libelle": "Un livrable produit par un generateur de forge ne porte ni l identifiant ni la version de son gabarit, et un option de contournement (--gabarit) remplace la mesure de la cause : l instance perimee est invisible sur l artefact (TF-0690, TF-0702 ; regle G4 d oracle-gabarits-documents). Source : decision humaine du 14/09/2026, synthese output/04-plans/2026-09/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
    "creee_le": "2026-09-14",
    "fondee_par": [
     "TF-0690",

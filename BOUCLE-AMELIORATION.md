@@ -833,7 +833,7 @@ plus rien en attente ni en cours.
 
 **Mandat humain** (prompt barré L99) : plan détaillé d'une stratégie de tests de bout en bout,
 complète et autonome, après un run Produit-11 insatisfaisant. Livrable = plan (document) + candidatures :
-`output\04-plans\20260813-plan-strategie-tests-e2e.md`.
+`output\04-plans\2026-08\20260813-plan-strategie-tests-e2e.md`.
 
 **Diagnostic Produit-11 sur pièces** (rapport-tests.json, verdict PARTIEL) : forge-tests n'est pas
 cassée — elle CONSTATE correctement et donne le `pour_couvrir` de chaque pan. Les pans sont
