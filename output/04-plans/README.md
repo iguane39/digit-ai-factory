@@ -34,7 +34,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` | fichier | 3,6 Ko | Synthèse de campagne — 4e mandat global « ok, fais tout » |
 | `Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md` | fichier | 17,3 Ko | Synthèse de conseil : les agents suivent déjà Fable 5.1 et Opus 5.5 par héritage, mais le  |
 | `Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` | fichier | 8,4 Ko | Synthèse Conseil — pourquoi « audit complet » part encore vers forge-tests, et comment le  |
-| `Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` | fichier | 7,3 Ko | Synthèse Conseil — faire tourner L99 en boucle jusqu'à un score, étude d'opportunité (16/1 |
+| `Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` | fichier | 7,1 Ko | Synthèse Conseil — faire tourner L99 en boucle jusqu'à un score, étude d'opportunité (16/1 |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
 | `Digit-AI - Synthese Conseil - Qualite sans personas cinq propositions mesurees - 20260914c.md` | fichier | 15,8 Ko | Synthèse Conseil — améliorer la qualité sans personas : vos deux décisions sont exécutées, |
 | `Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` | fichier | 3,7 Ko | Synthèse de diagnostic — pourquoi aucun avancement toutes les 3 minutes (TF-0252) |

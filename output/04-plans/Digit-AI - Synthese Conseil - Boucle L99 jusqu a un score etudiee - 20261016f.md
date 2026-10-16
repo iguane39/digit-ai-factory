@@ -10,7 +10,7 @@ Votre intuition tient, à une condition : la boucle doit être jugée par un aut
 
 ## 1. En-tête d'identification
 
-Étude d'opportunité au gabarit `gabarits\ETUDE-OPPORTUNITE.md`, sur le skill `prompt-analyzer-l99` v2.5.0. Période : 16/10/2026 de 10:46 à 11:01, heure de Paris (UTC+02:00). Session pilote Claude Opus 5.5, 5 agents relecteurs Claude Opus 5.5 lancés en parallèle.
+Étude d'opportunité au gabarit `gabarits\ETUDE-OPPORTUNITE.md`, sur le skill `prompt-analyzer-l99` v2.5.0. Période : 16/10/2026 de 10:46 à 11:03, heure de Paris (UTC+02:00). Session pilote Claude Opus 5.5, 5 agents relecteurs Claude Opus 5.5 lancés en parallèle.
 
 Intention de la demande : obtenir de L99 des prompts réécrits réellement meilleurs, sans relancer l'analyse à la main, en s'arrêtant à un score.
 
@@ -47,13 +47,12 @@ Inventaire des bloquants :
 - **Chiffres des relecteurs recomptés à la source.** Deux étaient faux : `oracle-claims` existe chez forge-conception et chez forge-agents, et le registre compte 1 044 créations, pas 3 982. Ils sont corrigés dans l'étude, qui en tire une règle : le défaut d'un relecteur se recompte avant d'entrer dans la passe suivante.
 - **Constat vérifié sur le prompt Supabase de ce matin.** Il prescrit un contrôle `oracle-secrets` qui n'existe pas : seul `oracles\oracle-secrets-hors-perimetre.mjs` existe, recherche du 16/10/2026 sur le pilot et les 13 forges.
 - **Étude déposée et jugée.** `oracle-etude-opportunite` 1.2.0 PASS, E1 à E10, exit 0.
-- **Constats transmis au run Supabase.** Ce run tourne dans une autre session depuis 10:49. Les 3 constats lui ont été envoyés par message entre sessions, aux 2 sessions actives du pilot, avec la consigne de les ignorer hors de ce run. Les comptes Azure cités ont été recomptés : 29 fichiers dans forge-development, 1 dans forge-conception.
+- **Constats transmis au run Supabase.** Ce run tourne dans une autre session depuis 10:49. Les 3 constats lui ont été envoyés par message entre sessions, aux 2 sessions actives du pilot, avec la consigne de les ignorer hors de ce run. Les comptes Azure cités ont été recomptés : 29 fichiers dans forge-development, 1 dans forge-conception. La session du run a répondu qu'elle les avait vérifiés à la source et pris en compte. Le contrôle de secrets est remplacé par un `git grep` de motifs Supabase sur les fichiers enregistrés, qui ne trouve rien. Les comptes Azure reçoivent un écart motivé, et forge-tests passe sans objet. Ces corrections sont dans le commit 8cac7905, local.
 - **Proposition inscrite.** TF-1831 par `todo\journaliser.mjs`, classe `amelioration-jugee-sans-ses-effets`, cible forge-agents.
 
 ## 5. Non traité
 
 - **Construction du mode.** Motif : décision humaine, D-1.
-- **Correction du prompt Supabase version b.** Motif : hors demande, et le run tourne déjà dans une autre session.
 - **Publication du pilot.** Motif : décision humaine (R-38).
 
 ## 6. Écarts à la lettre
@@ -69,20 +68,19 @@ Inventaire des bloquants :
   - Énoncé : il est du même modèle, et chaque prompt n'a eu qu'un relecteur ; 2 de ses chiffres étaient faux.
   - Signal : un défaut retenu qu'un recompte à la source dément.
   - Parade : recompter chaque défaut avant la passe suivante ; deux relecteurs pour un prompt de run, sur le modèle d'`oracle-judge --lecteur-vise`.
-- **Le run Supabase en cours s'appuie sur un contrat dont un contrôle n'existe pas.**
-  - Énoncé : la version b exige `oracle-secrets` PASS.
-  - Signal : la synthèse du run déclare ce contrôle vert.
-  - Parade : les 3 constats sont transmis à la session du run ; A-2 vérifie sa synthèse à la clôture.
+- **Le pilot n'est pas publié.**
+  - Énoncé : l'étude, la synthèse et TF-1831 sont enregistrés en local seulement.
+  - Signal : `git rev-list --count origin/main..HEAD` différent de 0.
+  - Parade : publication sur votre GO (R-38).
 
 ## 8. Prochaines actions
 
-Votre réponse à D-1 vient d'abord, parce que la construction du mode (A-1) en dépend ; le contrôle du run Supabase (A-2) vient ensuite, parce qu'il attend la clôture de ce run.
+Votre réponse à D-1 (A-2) vient d'abord, parce que la construction du mode (A-1) en dépend ; le tableau range l'action de l'IA en tête.
 
 | Sélecteur | Registre | Action | Acteur | Motif / raison | Commande | Coût si non fait |
 |---|---|---|---|---|---|---|
 | **A-1** | TF-1831 | Construire le mode boucle dans `prompt-analyzer-l99`, avec sa recette de 2 cas | auto_ia | dependance_bloc_3 : attend D-1 | Répondre `D-1 (a)` dans cette conversation | L99 garde un score projeté non mesuré |
-| **A-2** | `neuve` | Vérifier à la clôture du run Supabase que sa synthèse ne déclare pas `oracle-secrets` vert | auto_ia | suite de la transmission faite dans ce tour | `git -C c:\dev\digit-ai-factory grep -n "oracle-secrets" -- output/04-plans` | Le run déclare vert un contrôle qui n'existe pas |
-| **A-3** | TF-1831 | Trancher D-1 | manuelle_utilisateur | decision | Répondre dans la conversation, par exemple `D-1 (a)` | L'option (c) s'applique |
+| **A-2** | TF-1831 | Trancher D-1 | manuelle_utilisateur | decision | Répondre dans la conversation, par exemple `D-1 (a)` | L'option (c) s'applique |
 
 ## 9. Traces
 
