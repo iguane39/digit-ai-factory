@@ -1462,7 +1462,7 @@ renommer aurait rendu indiscernables deux artefacts distincts. G5 : marqueur pos
 discrets par table (lacune réelle comblée), l'écrivain reste unique par construction.
 pytest **467 passed 0 échec**, ruff clean, preuve socle exit 0, S-01 13/13.
 
-**Revue D8 exécutée** (`output\01-revues-et-propositions\…Revue D8…20260815a.md`) :
+**Revue D8 exécutée** (`output\01-revues-et-propositions\…Revue D8…20260815c.md`) :
 4/5 × 3 artefacts, aucun red flag, tous les écarts déclarés — et les trois manifestes
 d'écarts sont CALCULÉS, pas rédigés.
 
