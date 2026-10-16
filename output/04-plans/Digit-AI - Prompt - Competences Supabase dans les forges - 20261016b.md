@@ -34,6 +34,11 @@ ou n'existe pas).
    mentions Azure de forge-development visent Azure DevOps (hôte git et pipelines), celle de
    forge-conception un terme SSO d'`oracle-ears`. Aucune n'est une surface à reproduire : chacune
    reçoit un écart motivé.
+   **Idempotence (ajout du 16/10/2026, seconde relecture aveugle).** Compter aussi
+   `git grep -il supabase` dans chaque dépôt. Après le run du 16/10/2026, il rend 9 fichiers dans
+   forge-agents, 8 dans forge-ops, 10 dans forge-audit, 4 dans forge-data et 15 au pilot. Une surface
+   déjà présente s'audite contre le contrat de sortie ; elle ne se recrée pas. Seul ce qui y manque
+   se complète.
 4. **Ancrage par symbole.** Les numéros de ligne de la table datent du 16/10/2026 et dériveront :
    l'exécutant retrouve chaque point par son symbole (`PLANS.azure`, `const CLI`, `PROFILS_AUTH`),
    jamais par la ligne.
@@ -52,8 +57,10 @@ ou n'existe pas).
 ## Contraintes
 
 - Toute commande, nom de fichier, chemin ou capacité propre à Supabase se tire de la documentation
-  officielle (supabase.com/docs), citée avec sa date de lecture dans le frontmatter `sources`
-  (loi n° 4). Les éléments Supabase écrits dans ce prompt sont des hypothèses à confirmer, pas des
+  officielle (supabase.com/docs), citée avec sa date de lecture (loi n° 4). Le support de la
+  source dépend du type de fichier : le frontmatter `sources` en Markdown ; un tableau `sources[]`
+  dont chaque entrée porte `url` et `lu_le` en JSON, comme `profiles/supabase/bindings.json` ; un
+  commentaire daté qui cite l'adresse en `.mjs`. Les éléments Supabase écrits dans ce prompt sont des hypothèses à confirmer, pas des
   faits.
 - Aucune connexion à un projet Supabase vivant, aucun appel payant, aucun jeton dans un plan ou un
   fichier : les forges jugent des artefacts exportés (DDL, `config.toml`, migrations).

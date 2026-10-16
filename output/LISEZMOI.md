@@ -215,7 +215,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md | 20260818a | 4.1 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` |
 | Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 20.8 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.2 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
-| Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 9.4 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
+| Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 33.1 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |
 | Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md | 20261001f | 11.9 Ko | `04-plans/Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` |
 | Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md | 20260911a | 36.6 Ko | `04-plans/Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` |
@@ -293,7 +293,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md | 20260915c | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md` |
 | Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md | 20261013i | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` |
 | Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md | 20260921f | 22.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md` |
-| Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 8.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
+| Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
 | Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md | 20260911b | 21.7 Ko | `04-plans/Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` |
 | Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md | 20260911c | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` |

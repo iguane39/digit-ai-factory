@@ -22,7 +22,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` | fichier | 20,8 Ko | Plan de mise en œuvre — les huit rangs d'opportunités à verdict favorable non traité |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
-| `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 9,4 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
+| `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
 | `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 33,1 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
 | `Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` | fichier | 11,9 Ko | Revue hebdomadaire des propositions — 2026-10-01 |
 | `Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` | fichier | 36,6 Ko | Spécification de création — produit `digit-ai-marketing` — 20260911a |
@@ -100,7 +100,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Circuit heberge corrige et accueil sous harnais - 20260915c.md` | fichier | 9,5 Ko | Synthèse de mandat — le circuit hébergé ne dépend plus de ce poste, et l'accueil des lots  |
 | `Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` | fichier | 7,1 Ko | Synthèse Mandat — commande d'installation publiée et verte sur poste neuf, reprise réseau  |
 | `Digit-AI - Synthese Mandat - Communication parts de forge finies et 6 decisions - 20260921f.md` | fichier | 22,3 Ko | Communication : les parts de forge sont finies en local, et 6 décisions vous attendent, dé |
-| `Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` | fichier | 8,8 Ko | Synthèse Mandat — Supabase outillé dans quatre forges et au pilot, publication du pilot à  |
+| `Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` | fichier | 9,2 Ko | Synthèse Mandat — Supabase outillé dans quatre forges et au pilot, publication du pilot à  |
 | `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
