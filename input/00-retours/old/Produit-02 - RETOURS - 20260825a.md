@@ -59,6 +59,31 @@ Ce n'est pas un détail de confort : c'est ce qui permet de tout préparer et de
 avant de rien risquer. Une procédure de migration qui ne s'appuie pas sur cette propriété
 travaille sous pression sans raison.
 
+## Remarques restées au produit
+
+> Section ajoutée le **2026-08-26**, après l'arrivée du gabarit `RETOURS-FORGES.md`
+> (`TF-0626`) : ce lot avait été rédigé sans lui et ne portait donc ni R-45 ni R-46.
+> L'ajout est **purement additif** — aucun retour, aucun chiffre, aucune formulation
+> d'origine n'a été touché. Le contenu ci-dessous est reconstitué depuis les commits
+> de la fenêtre du lot.
+
+Ce que le produit a corrigé chez lui, avec son verdict de généralisation.
+
+| Corrigé chez le produit | Verdict de généralisation |
+|---|---|
+| Documentation dans `.env.example` des six faits mesurés sur l'API OVH et des pièges rencontrés. | **Généralisable → REMONTÉ en RT-22** : les faits étaient tous mesurés, aucun n'était documenté là où on les cherche. |
+
+## Retours sur les documents produits
+
+**Aucun document produit depuis un gabarit.** Aucun des gabarits de `gabarits\documents\`
+n'a servi sur ce projet : aucun document du dépôt ne porte d'identifiant `gd-…`. La section
+est déclarée vide, elle n'est pas omise.
+
+Une observation tombe hors du périmètre de R-46, qui vise les livrables issus de
+`gabarits\documents\`, et est consignée faute de canal plus juste : **ce lot lui-même a été
+produit sans son gabarit de méthode**, `RETOURS-FORGES.md` étant absent du dépôt jusqu'à
+`TF-0626` du 26/08/2026. C'est la cause directe de l'ajout rétroactif signalé ci-dessus.
+
 ## Confirmations positives
 
 - **Le diff a fait exactement son travail.** Sans lui, la bascule se faisait sur quatre zones

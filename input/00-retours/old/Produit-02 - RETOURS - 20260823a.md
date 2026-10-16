@@ -56,6 +56,32 @@ inapplicable, telle qu'écrite, la consigne de traçabilité du `CLAUDE.md` livr
 | RT-5 | majeur | **Le retour de fond, formulé par l'humain en séance.** RT-1 à RT-4 ne sont pas quatre défauts de forge-tests : c'est quatre fois le même réflexe. À chaque fois la bonne réponse était déductible du contexte — un dossier nommé `input\` n'est pas du produit ; un `.min.js.téléchargement` n'est pas du code ; le tour que je viens d'exécuter est celui que je dois journaliser ; les clés que je viens d'énumérer sont celles que je dois pré-remplir. À chaque fois l'outil a préféré **dégrader son verdict et rendre la main** plutôt que trancher. Le coût est double : le temps humain, et surtout le **signal noyé** — il a fallu écrire un script de dépouillement pour découvrir que `site\` ne portait aucun constat, l'information réellement utile de cet audit. | Poser la règle au socle, opposable à toutes les forges : **une forge ne sollicite l'humain que lorsqu'il y a réellement un arbitrage à rendre.** Quand la réponse se déduit du contexte, elle décide, applique, et l'**inscrit au rapport** dans une section dédiée (« décisions prises d'office ») que l'humain relit *a posteriori*. Ce n'est pas un affaiblissement du GO humain : le GO humain porte sur les **verdicts** et les **mises en production**, pas sur des évidences de configuration. Critère de discrimination proposé : si deux personnes compétentes trancheraient identiquement sans information supplémentaire, ce n'est pas une décision — c'est un défaut d'automatisation. |
 | RT-6 | mineur | Deux divergences dans le gabarit de projet livré par la Factory, découvertes en voulant appliquer la consigne *« consigner AU MOMENT MÊME au ledger »* : (1) `CLAUDE.md` désigne le ledger comme `forge\ledger.jsonl` — à deux endroits, dont « Le ledger `forge\ledger.jsonl` porte l'état exact » — alors que `forge\ledger.py` écrit dans `runs\<run>\ledger.jsonl` ; le chemin annoncé n'existe pas. (2) `forge\ledger.py` **épingle le run en dur** (`run = "20260815-audit-seo-Produit-02"`, ligne 68) : ouvrir le run suivant impose d'éditer l'outil. Le run du 15/08 étant clos (`run_close`, seq 24), la consigne du CLAUDE.md était inapplicable telle quelle — le ledger du run de ce jour a dû être écrit à la main, au contrat de `CONTRAT-INTERFACE §3`. | Aligner le `CLAUDE.md` gabarit sur `runs\<run>\ledger.jsonl`, et faire de `ledger.py` un outil paramétré : `--run <id>`, avec défaut = dernier run non clos, et `run_open` refusé si un run est déjà ouvert. Le run courant se lit, il ne se recompile pas dans le source. |
 
+## Remarques restées au produit
+
+> Section ajoutée le **2026-08-26**, après l'arrivée du gabarit `RETOURS-FORGES.md`
+> (`TF-0626`) : ce lot avait été rédigé sans lui et ne portait donc ni R-45 ni R-46.
+> L'ajout est **purement additif** — aucun retour, aucun chiffre, aucune formulation
+> d'origine n'a été touché. Le contenu ci-dessous est reconstitué depuis les commits
+> de la fenêtre du lot.
+
+Ce que le produit a corrigé chez lui, avec son verdict de généralisation.
+
+| Corrigé chez le produit | Verdict de généralisation |
+|---|---|
+| Retrait des gîtes bretons de l'ensemble du site : 7 catalogues de langue, données, images, régénération des 203 pages. | **Rien de généralisable** — le périmètre commercial d'un produit n'est pas une leçon de forge. |
+| Reprise des 3 constats d'audit `forge_tests` qui portaient sur le code du produit. | **Rien de généralisable** — défauts propres à ce code. Les 12 autres, qui portaient sur `input\`, sont **REMONTÉS en RT-1**. |
+
+## Retours sur les documents produits
+
+**Aucun document produit depuis un gabarit.** Aucun des gabarits de `gabarits\documents\`
+n'a servi sur ce projet : aucun document du dépôt ne porte d'identifiant `gd-…`. La section
+est déclarée vide, elle n'est pas omise.
+
+Une observation tombe hors du périmètre de R-46, qui vise les livrables issus de
+`gabarits\documents\`, et est consignée faute de canal plus juste : **ce lot lui-même a été
+produit sans son gabarit de méthode**, `RETOURS-FORGES.md` étant absent du dépôt jusqu'à
+`TF-0626` du 26/08/2026. C'est la cause directe de l'ajout rétroactif signalé ci-dessus.
+
 ## Confirmations positives
 
 - **Le pan `i18n` a fait exactement son travail.** C'est le seul PASS de l'audit, et c'est

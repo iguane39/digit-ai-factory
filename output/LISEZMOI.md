@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 421 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
+**État** : 422 livrable(s) courant(s), 5 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -117,6 +117,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260815-etude-opportunite-lecons-audit-reel.md | — | 5.6 Ko | `03-etudes/20260815-etude-opportunite-lecons-audit-reel.md` |
 | 20260815-etude-opportunite-qualite-graphique.md | — | 5.6 Ko | `03-etudes/20260815-etude-opportunite-qualite-graphique.md` |
 | 20260815-etude-opportunite-restitution-lisible.md | — | 6.3 Ko | `03-etudes/20260815-etude-opportunite-restitution-lisible.md` |
+| 20260816-etude-skills-animation-motion.md | — | 10.7 Ko | `03-etudes/20260816-etude-skills-animation-motion.md` |
 | 20260817-etude-opportunite-cadence-de-mission.md | — | 24 Ko | `03-etudes/20260817-etude-opportunite-cadence-de-mission.md` |
 | 20260817-etude-opportunite-consignes-de-mise-a-jour.md | — | 20.1 Ko | `03-etudes/20260817-etude-opportunite-consignes-de-mise-a-jour.md` |
 | 20260817-etude-opportunite-conventions-parametrables.md | — | 20.6 Ko | `03-etudes/20260817-etude-opportunite-conventions-parametrables.md` |

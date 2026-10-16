@@ -29,6 +29,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260815-etude-opportunite-lecons-audit-reel.md` | fichier | 5,6 Ko | Étude d'opportunité — leçons du run d'audit réel (TF-0260..TF-0266) — 20260815c |
 | `20260815-etude-opportunite-qualite-graphique.md` | fichier | 5,6 Ko | Étude d'opportunité — qualité graphique par défaut (TF-0236, TF-0237, TF-0238) — 20260815b |
 | `20260815-etude-opportunite-restitution-lisible.md` | fichier | 6,3 Ko | Étude d'opportunité — doctrine « restitution lisible » (TF-0235) — 20260815a |
+| `20260816-etude-skills-animation-motion.md` | fichier | 10,7 Ko | Étude — Skills Claude Code « animation / motion » (2026-08-16) |
 | `20260817-etude-opportunite-cadence-de-mission.md` | fichier | 24,0 Ko | Étude d'opportunité — gouvernance et cadence d'une mission (TF-0323 · TF-0324) — 20260817g |
 | `20260817-etude-opportunite-consignes-de-mise-a-jour.md` | fichier | 20,1 Ko | Étude d'opportunité — la mise à jour des forges transporte le code, pas la consigne (TF-03 |
 | `20260817-etude-opportunite-conventions-parametrables.md` | fichier | 20,6 Ko | Étude d'opportunité — conventions de la forge gravées ou paramétrables (TF-0322) — 2026081 |
@@ -116,4 +117,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261013-etude-opportunite-juge-de-comprehension.md` | fichier | 21,9 Ko | Étude d'opportunité — un relecteur qui joue le lecteur visé et refuse ce qu'il ne sait pas |
 | `20261013-revue-essai-niveaux-d-intervention.md` | fichier | 10,5 Ko | Revue de l'essai des niveaux Simple et Moyen : critères écrits d'avance, rejoués le 2026-1 |
 
-_99 fichier(s), 0 sous-dossier(s)_
+_100 fichier(s), 0 sous-dossier(s)_

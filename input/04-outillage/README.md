@@ -16,6 +16,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| [`old\`](old/README.md) | dossier (2 fichiers) | — | Outillage entrant déjà instruit, remplacé ou écarté — archive. |
+| [`old\`](old/README.md) | dossier (3 fichiers) | — | Outillage entrant déjà instruit, remplacé ou écarté — archive. |
 
 _0 fichier(s), 1 sous-dossier(s)_

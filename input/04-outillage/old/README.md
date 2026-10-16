@@ -16,7 +16,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
+| `Digit-AI - Correctif Factory - Ouverture de session sous le delai client - 20261013b.zip` | fichier | 11,3 Ko | ZIP |
 | `livrables-gen.py` | fichier | 29,4 Ko | PY |
 | `prompt-analyzer-l99 (5).skill` | fichier | 8,4 Ko | SKILL |
 
-_2 fichier(s), 0 sous-dossier(s)_
+_3 fichier(s), 0 sous-dossier(s)_

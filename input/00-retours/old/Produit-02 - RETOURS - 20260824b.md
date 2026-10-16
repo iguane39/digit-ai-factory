@@ -65,6 +65,31 @@ Le jeton OVH de la session, scopé à `/domain/zone/*/*`, ne couvre d'ailleurs *
 changement de serveurs de noms — mesuré : `403` sur `/domain/Produit-02.com/nameServer`.
 La première voie exigerait donc, en plus, un élargissement de portée.
 
+## Remarques restées au produit
+
+> Section ajoutée le **2026-08-26**, après l'arrivée du gabarit `RETOURS-FORGES.md`
+> (`TF-0626`) : ce lot avait été rédigé sans lui et ne portait donc ni R-45 ni R-46.
+> L'ajout est **purement additif** — aucun retour, aucun chiffre, aucune formulation
+> d'origine n'a été touché. Le contenu ci-dessous est reconstitué depuis les commits
+> de la fenêtre du lot.
+
+Ce que le produit a corrigé chez lui, avec son verdict de généralisation.
+
+| Corrigé chez le produit | Verdict de généralisation |
+|---|---|
+| Création des zones Cloudflare, enregistrements proxifiés et règles de redirection pour les quatre domaines ; 12 MX préservés. | **Rien de généralisable** en tant que geste ; ce que le mécanisme a coûté à découvrir est **REMONTÉ en RT-19, RT-23, RT-25 et RT-27**. |
+
+## Retours sur les documents produits
+
+**Aucun document produit depuis un gabarit.** Aucun des gabarits de `gabarits\documents\`
+n'a servi sur ce projet : aucun document du dépôt ne porte d'identifiant `gd-…`. La section
+est déclarée vide, elle n'est pas omise.
+
+Une observation tombe hors du périmètre de R-46, qui vise les livrables issus de
+`gabarits\documents\`, et est consignée faute de canal plus juste : **ce lot lui-même a été
+produit sans son gabarit de méthode**, `RETOURS-FORGES.md` étant absent du dépôt jusqu'à
+`TF-0626` du 26/08/2026. C'est la cause directe de l'ajout rétroactif signalé ci-dessus.
+
 ## Confirmations positives
 
 - **Le contrôle de préservation DNS avait bien fonctionné.** Les quatre zones ont été
