@@ -116,5 +116,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261003-etude-opportunite-pages-html-indicateurs.md` | fichier | 16,3 Ko | Étude d'opportunité — pages HTML de données : indicateurs, graphiques, infobulles et juste |
 | `20261013-etude-opportunite-juge-de-comprehension.md` | fichier | 21,9 Ko | Étude d'opportunité — un relecteur qui joue le lecteur visé et refuse ce qu'il ne sait pas |
 | `20261013-revue-essai-niveaux-d-intervention.md` | fichier | 10,5 Ko | Revue de l'essai des niveaux Simple et Moyen : critères écrits d'avance, rejoués le 2026-1 |
+| `20261016-etude-opportunite-boucle-l99-jusqu-a-un-score.md` | fichier | 12,9 Ko | Étude d'opportunité — faire tourner « améliore le prompt » en boucle jusqu'à un score — 20 |
 
-_100 fichier(s), 0 sous-dossier(s)_
+_101 fichier(s), 0 sous-dossier(s)_
