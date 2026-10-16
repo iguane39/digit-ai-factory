@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 425 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 427 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -216,6 +216,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md | 20260922h | 20.8 Ko | `04-plans/Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.2 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
+| Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
 | Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 33.1 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |
 | Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md | 20261001f | 11.9 Ko | `04-plans/Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` |
 | Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md | 20260911a | 36.6 Ko | `04-plans/Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` |
@@ -365,6 +366,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md | 20260907f | 16 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md` |
 | Digit-AI - Synthese Mandat - Lots refuses traites et huit corrections closes - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites et huit corrections closes - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md | 20260907c | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md` |
+| Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
 | Digit-AI - Synthese Mandat - Modele corrige et familles outillees - 20260914e.md | 20260914e | 20.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Modele corrige et familles outillees - 20260914e.md` |
 | Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md | 20260901c | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` |
 | Digit-AI - Synthese Mandat - Neuf decisions executees publiees et propagees - 20260927a.md | 20260927a | 23.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Neuf decisions executees publiees et propagees - 20260927a.md` |

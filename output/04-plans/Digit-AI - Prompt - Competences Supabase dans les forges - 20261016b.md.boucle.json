@@ -1,0 +1,26 @@
+{
+ "schema": "l99-boucle@1",
+ "prompt": "Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b (premier exercice réel du mode L99 boucle, TF-1831, 16/10/2026)",
+ "arbitre": { "rubrique": "prompt-analyzer-l99 references/couches.md Ch1, 6 dimensions /100, plafond 40 par bloquant", "arret": "0 bloquant et 0 majeur", "seuil_score": null, "gain_min": 3, "borne": 3, "garde_longueur": 0.15 },
+ "passes": [
+  { "n": 1, "fichier": "version b au commit 844b7af9", "mots": 1231,
+    "relecteur": { "agent": "relecteur aveugle P5, 16/10/2026 10:55", "aveugle": true, "interdits": ["analyse L99 et synthèse 20261016c", "fichiers .jugement.json"] },
+    "score_mesure": 84,
+    "defauts": [
+     { "severite": "majeur", "citation": "Zéro jeton, URL de projet réelle ou clé dans les fichiers ajoutés (`oracle-secrets`).", "recompte": { "commande": "Get-ChildItem C:\\dev\\digit-ai-forge-*, C:\\dev\\digit-ai-factory -Recurse -Filter oracle-secrets*", "resultat": "seul oracles\\oracle-secrets-hors-perimetre.mjs existe : le contrôle prescrit n'existe pas" }, "statut": "retenu" },
+     { "severite": "majeur", "citation": "compter `git grep -il databricks` et `git grep -il azure` […] Toute forge où ce compte est non nul reçoit une décision écrite", "recompte": { "commande": "git -C C:\\dev\\digit-ai-forge-development grep -il azure ; git -C C:\\dev\\digit-ai-forge-conception grep -il azure", "resultat": "29 et 1 fichiers, aucune ligne au contrat" }, "statut": "retenu" },
+     { "severite": "majeur", "citation": "| Surface | Existant Azure / Databricks | Équivalent Supabase attendu |", "recompte": { "commande": "git -C C:\\dev\\digit-ai-forge-<ops|audit|agents|data> grep -il supabase", "resultat": "8, 10, 8 et 4 fichiers : des surfaces Supabase existent déjà, rien ne dit qu'en faire" }, "statut": "retenu" }
+    ],
+    "majeurs_clos": 0, "rejetee": false, "decision": "continuer" },
+  { "n": 2, "fichier": "version b corrigée au commit 8cac7905 par la session du run", "mots": 1353,
+    "relecteur": { "agent": "relecteur aveugle P5v2, 16/10/2026 11:35", "aveugle": true, "interdits": ["analyses et synthèses L99", "fichiers .jugement.json et .boucle.json", "version de la passe 1"] },
+    "score_mesure": 84,
+    "defauts": [
+     { "severite": "majeur", "citation": "Pour chaque dépôt du parc, compter `git grep -il databricks` et `git grep -il azure`.", "recompte": { "commande": "Select-String P5v2.md « git grep » + « supabase » ; git -C C:\\dev\\digit-ai-forge-<ops|audit|agents|data> grep -il supabase", "resultat": "0 consigne de comptage Supabase dans le prompt ; 8, 10, 8 et 4 fichiers Supabase dans les forges : majeur de la passe 1 toujours ouvert" }, "statut": "retenu" },
+     { "severite": "majeur", "citation": "citée avec sa date de lecture dans le frontmatter `sources`", "recompte": { "commande": "Get-ChildItem C:\\dev\\digit-ai-forge-audit\\profiles\\azure ; Select-String README.md -Pattern sources", "resultat": "le profil de référence est bindings.json + README.md, 0 ligne sources : le contrôle ne s'applique pas aux .json et .mjs" }, "statut": "retenu" }
+    ],
+    "majeurs_clos": 2, "rejetee": false, "decision": "arreter" }
+ ],
+ "arret": { "passe": 2, "raison": "gain_insuffisant" },
+ "score_affiche": { "valeur": 84, "nature": "mesure" }
+}

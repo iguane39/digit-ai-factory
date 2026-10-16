@@ -23,6 +23,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Plan - Mise en oeuvre des huit rangs d opportunites - 20260922h.md` | fichier | 20,8 Ko | Plan de mise en œuvre — les huit rangs d'opportunités à verdict favorable non traité |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
+| `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
 | `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 33,1 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
 | `Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` | fichier | 11,9 Ko | Revue hebdomadaire des propositions — 2026-10-01 |
 | `Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` | fichier | 36,6 Ko | Spécification de création — produit `digit-ai-marketing` — 20260911a |
@@ -172,6 +173,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md` | fichier | 16,0 Ko | Synthèse de mandat — décision D-8 (a) et GO A-24 à A-26 exécutés : la forge des données pu |
 | `Digit-AI - Synthese Mandat - Lots refuses traites et huit corrections closes - 20261004b.md` | fichier | 7,4 Ko | Synthèse Mandat — votre décision D-57 (a) est exécutée : les 2 lots de Produit-02 sont ent |
 | `Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md` | fichier | 9,5 Ko | Synthèse de mandat — décisions D-3 (a) et D-4 (b) exécutées : les huit candidatures de la  |
+| `Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` | fichier | 6,5 Ko | Synthèse Mandat — mode « L99 boucle » construit, publié et exercé une première fois (16/10 |
 | `Digit-AI - Synthese Mandat - Modele corrige et familles outillees - 20260914e.md` | fichier | 20,6 Ko | Synthèse de mandat — le modèle de référence est corrigé et prouvé, trois familles sont out |
 | `Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` | fichier | 12,2 Ko | Synthèse de mandat — la mutation devient une porte, et une page de doctrine cessait d'avoi |
 | `Digit-AI - Synthese Mandat - Neuf decisions executees publiees et propagees - 20260927a.md` | fichier | 23,6 Ko | Digit-AI — Synthèse de mandat — Neuf décisions exécutées, publiées et propagées — 27/09/20 |
@@ -285,4 +287,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_267 fichier(s), 1 sous-dossier(s)_
+_269 fichier(s), 1 sous-dossier(s)_
