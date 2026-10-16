@@ -8,8 +8,8 @@ sources:
   - "PCI Security Standards Council — retrait de 6.4.3/11.6.1 du SAQ A au 31/03/2025 (nouveau critère d'éligibilité anti-script)"
   - "schema.org Product — vocabulaire stable, validé par le Rich Results Test de Google"
   - "profil website — profils\\website.md (WCAG 2.2, Core Web Vitals, RGESN v2) — ce profil l'étend, ne le remplace pas"
-  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
-  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
+  - "étude d'opportunité forges — output\\03-etudes\\2026-08\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\2026-08\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — e-commerce

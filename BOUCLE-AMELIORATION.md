@@ -85,7 +85,7 @@ lanceur `todo\observer-recidives.mjs` (recette 4 cas rouge/vert), cadence hebdom
 le hook d'ouverture du pilot, premier passage exercé — voir `fiches\forge-observability.md`.
 
 **Plan étendu le 17/09/2026 (TF-1163, TF-1164, TF-1165 — décision D-2 (a) sur l'étude
-`output\03-etudes\20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md`).** L'étude a
+`output\03-etudes\2026-09\20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md`).** L'étude a
 écarté une revue hebdomadaire rédigée : sur 709 items clos en 4 semaines, le pilot décide et clôt
 en moins d'un jour en médiane. Le retard mesuré vit dans la descente chez les produits (88 couples
 produit × classe non atteints sur 164), dans le stock d'items décidés non clos (de 3 à 40 en
@@ -664,7 +664,7 @@ vide. Oracle R1-R10 PASS. Pushes : pilot + les 12 forges (dont les 2 créations 
 
 **Mandat humain** : analyse d'opportunité (cybersecurity, website, webapp, mobile) — analyse
 seulement, prompt barré/L99 au préalable. Livrable :
-`output\03-etudes\20260812-etude-opportunite-forges.md` (grille : partition → non-recouvrement cité
+`output\03-etudes\2026-08\20260812-etude-opportunite-forges.md` (grille : partition → non-recouvrement cité
 contre le catalogue v1.3.0 → état de l'art sourcé → options tranchées → coût).
 
 **Verdicts** : cybersecurity → **forge dédiée recommandée** (modèle seo ; trou prouvé sur
@@ -794,7 +794,7 @@ chirurgical à 2 lignes × 4 fichiers, sous mandat explicite), vérif pytest 126
 ## 12/08/2026 — étude d'opportunité « spécialisations forge-data par moteur »
 
 **Mandat humain** (prompt barré L99) : pertinence de 4 spécialisations forge-data (Databricks,
-Oracle, Postgres, Azure SQL). Analyse seulement — `output\03-etudes\20260812-etude-forge-data-moteurs.md`.
+Oracle, Postgres, Azure SQL). Analyse seulement — `output\03-etudes\2026-08\20260812-etude-forge-data-moteurs.md`.
 
 **Verdict** : NE PAS créer 4 spécialisations. Grille R-28 : les formats de forge-data
 (assertions@1/contrat@1/lineage@1) sont agnostiques du moteur et jugent des artefacts, jamais
@@ -1076,7 +1076,7 @@ Mandat humain cadré par `prompt-analyzer-l99` (appel de skill RV-6), exécuté 
 : le pilot n'a pas de `forge\` ni de ledger propre (les mandats internes se tracent ici et au
 registre TODO) — les pas 1-2 de RUN-MANDAT supposent un projet ; la preuve cadrée d'avance
 reste la même (`oracle-etude-opportunite`, E1-E7). Livrable :
-`output\03-etudes\20260814-etude-opportunite-pentest-owasp.md`, **oracle PASS 7/7** (11 lignes
+`output\03-etudes\2026-08\20260814-etude-opportunite-pentest-owasp.md`, **oracle PASS 7/7** (11 lignes
 de non-recouvrement toutes citées, 15 sources datées, jeu fermé O0-O4, verdict unique, plan de
 revue au 2026-11-14). **Constat central** : « Penetration Tests & OWASP » n'est pas un sujet
 mais six (exigences ASVS · méthode WSTG · surface IA · DAST · pentest manuel · gouvernance), et
@@ -2186,7 +2186,7 @@ son prochain lot de retours.
 
 **En passant.** La demande « Améliore ce prompt : conçois et construis un système d'amélioration
 continue… », interrompue par l'humain, avait déjà été traitée par L99 avant l'interruption
-(`output/03-etudes/20260903-L99-amelioration-continue.md`, synthèse 20260903a PASS) : l'analyse
+(`output/03-etudes/2026-09/20260903-L99-amelioration-continue.md`, synthèse 20260903a PASS) : l'analyse
 conclut que le système existe pour l'essentiel et que le défaut réel est la DESCENTE chez les
 produits ; l'écart de verbe (« conçois » → « mesure puis complète ») est soumis en D-44, rien n'est
 construit sans validation.
@@ -2244,7 +2244,7 @@ Registre PASS, porte de publication PASS (historique compris), banc du pilot rej
 Décision humaine du jour : la Factory écrit dans les forges sans décision humaine, seul le
 résultat remonte (R-55, `REGLES-PROJET.md` §AI ; noyau et `references\ACCUEIL.md` alignés).
 Première campagne sous cette règle, issue de l'étude
-`output\03-etudes\20260917-etude-opportunite-gestion-reseaux-sociaux.md` (verdict O2) : trois
+`output\03-etudes\2026-09\20260917-etude-opportunite-gestion-reseaux-sociaux.md` (verdict O2) : trois
 agents en parallèle chez `digit-ai-forge-agents`, chemins d'écriture disjoints, départ `11da7be`.
 
 | Item | Commit local | Preuve |

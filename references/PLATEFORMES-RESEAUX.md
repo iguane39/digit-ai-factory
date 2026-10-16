@@ -1,6 +1,6 @@
 ---
 role: référentiel périssable de ce que 9 réseaux sociaux permettent à une petite structure sur son propre compte, sans dépense — publier par interface officielle, programmer dans l'outil de la plateforme, exporter ses chiffres, déclarer un contenu généré, régime de l'automatisation
-sources_de_verite: [output/03-etudes/20260921-etude-opportunite-reseaux-sociaux-complement.md §2 bis et §3, 4 rapports d'agents de recherche du 21/09/2026 en lecture seule, 13 adresses testées par test_existence.py et 4 citations relues mot pour mot par le pilot le 21/09/2026, references/PLATEFORME-LINKEDIN.md pour le détail de LinkedIn]
+sources_de_verite: [output/03-etudes/2026-09/20260921-etude-opportunite-reseaux-sociaux-complement.md §2 bis et §3, 4 rapports d'agents de recherche du 21/09/2026 en lecture seule, 13 adresses testées par test_existence.py et 4 citations relues mot pour mot par le pilot le 21/09/2026, references/PLATEFORME-LINKEDIN.md pour le détail de LinkedIn]
 verifie_le: 2026-09-21
 perime_le: 2026-12-02
 ---

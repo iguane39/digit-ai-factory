@@ -202,7 +202,7 @@ ledger du run qui les exécute.
 
 ## LinkedIn — aucun connecteur, et c'est une déclaration
 
-*Établi le 17/09/2026 par l'étude `output\03-etudes\20260917-etude-opportunite-gestion-reseaux-sociaux.md`
+*Établi le 17/09/2026 par l'étude `output\03-etudes\2026-09\20260917-etude-opportunite-gestion-reseaux-sociaux.md`
 (TF-1161, décision humaine D-2 (a)). L'étude du 11/09 avait retiré le connecteur de diffusion de
 son verdict en laissant la question ouverte ; elle est tranchée ici.*
 
@@ -220,7 +220,7 @@ minutes à 3 mois ; il ne reste une dépense que pour lire les chiffres sans exp
 
 ## Les 8 autres réseaux — aucun connecteur non plus, et c'est un choix
 
-*Établi le 21/09/2026 par l'étude `output\03-etudes\20260921-etude-opportunite-reseaux-sociaux-complement.md`
+*Établi le 21/09/2026 par l'étude `output\03-etudes\2026-09\20260921-etude-opportunite-reseaux-sociaux-complement.md`
 (TF-1276, décision humaine D-12 (a)). Sur LinkedIn, l'absence de connecteur est imposée par le
 contrat. Ici elle est choisie : 5 de ces 8 réseaux ouvrent gratuitement leur interface de
 publication, et la tentation d'un outil maison est réelle.*

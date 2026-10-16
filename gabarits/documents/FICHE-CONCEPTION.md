@@ -6,7 +6,7 @@
 > **Jugée par** `node oracles\oracle-gabarits-documents.mjs --fiche <fiche.md> [<document.md>]`
 > (règle **G6**) — la fiche AVANT l'écriture, puis que le document la TIENT.
 > **Provenance** étude d'opportunité du 14/09/2026
-> (`output\03-etudes\20260914-etude-opportunite-conception-documentaire-amont.md`), option **O3**,
+> (`output\03-etudes\2026-09\20260914-etude-opportunite-conception-documentaire-amont.md`), option **O3**,
 > **étape A**, sous la décision humaine **D-7 (a)**. Règle **D8** de `README.md` de ce dossier.
 > **Version de la fiche : 1.0.0**
 

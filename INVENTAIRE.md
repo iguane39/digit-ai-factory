@@ -295,7 +295,7 @@ invoqué par un run, ni oracle. C'est un **protocole de file de tickets versionn
 présent sur le poste depuis le 2026-07-16, que le corpus du pilot ignorait entièrement — 0
 occurrence dans `CLAUDE.md`, `INVENTAIRE.md`, `CONTRAT-INTERFACE.md`, `REGLES-PROJET.md`,
 `bootstrap.mjs` et `catalogues\CATALOGUES.md` au 18/08. Il est admis ici comme **référence
-LUE**, au terme de l'étude `output\03-etudes\20260818-etude-opportunite-admission-digit-ai-queue.md`
+LUE**, au terme de l'étude `output\03-etudes\2026-08\20260818-etude-opportunite-admission-digit-ai-queue.md`
 (verdict O2), pour une raison précise : l'écosystème a instruit puis refusé le 17/08 un
 mécanisme de tickets (TF-0318, moitié écriture) sans jamais le confronter à cet exemplaire
 éprouvé. Le trou était **de connaissance, pas technique**.

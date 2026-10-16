@@ -104,97 +104,97 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 
 | Livrable | Version | Poids | Chemin à copier |
 |---|---|---|---|
-| 20260812-etude-forge-data-moteurs.md | — | 7.3 Ko | `03-etudes/20260812-etude-forge-data-moteurs.md` |
-| 20260812-etude-opportunite-forges.md | — | 15 Ko | `03-etudes/20260812-etude-opportunite-forges.md` |
-| 20260813-etude-opportunite-outillage-analyse.md | — | 19.8 Ko | `03-etudes/20260813-etude-opportunite-outillage-analyse.md` |
-| 20260813-etude-personas-agents.md | — | 11.3 Ko | `03-etudes/20260813-etude-personas-agents.md` |
-| 20260814-etude-opportunite-pans-tests-prompts.md | — | 18.4 Ko | `03-etudes/20260814-etude-opportunite-pans-tests-prompts.md` |
-| 20260814-etude-opportunite-pentest-owasp.md | — | 17.2 Ko | `03-etudes/20260814-etude-opportunite-pentest-owasp.md` |
-| 20260814-etude-opportunite-taste-skill.md | — | 14.4 Ko | `03-etudes/20260814-etude-opportunite-taste-skill.md` |
-| 20260815-etude-opportunite-ce-que-personne-ne-juge.md | — | 6.4 Ko | `03-etudes/20260815-etude-opportunite-ce-que-personne-ne-juge.md` |
-| 20260815-etude-opportunite-circuit-insatisfaction.md | — | 5.3 Ko | `03-etudes/20260815-etude-opportunite-circuit-insatisfaction.md` |
-| 20260815-etude-opportunite-cout-du-faux-positif.md | — | 6.9 Ko | `03-etudes/20260815-etude-opportunite-cout-du-faux-positif.md` |
-| 20260815-etude-opportunite-lecons-audit-reel.md | — | 5.6 Ko | `03-etudes/20260815-etude-opportunite-lecons-audit-reel.md` |
-| 20260815-etude-opportunite-qualite-graphique.md | — | 5.6 Ko | `03-etudes/20260815-etude-opportunite-qualite-graphique.md` |
-| 20260815-etude-opportunite-restitution-lisible.md | — | 6.3 Ko | `03-etudes/20260815-etude-opportunite-restitution-lisible.md` |
-| 20260816-etude-skills-animation-motion.md | — | 10.7 Ko | `03-etudes/20260816-etude-skills-animation-motion.md` |
-| 20260817-etude-opportunite-cadence-de-mission.md | — | 24 Ko | `03-etudes/20260817-etude-opportunite-cadence-de-mission.md` |
-| 20260817-etude-opportunite-consignes-de-mise-a-jour.md | — | 20.1 Ko | `03-etudes/20260817-etude-opportunite-consignes-de-mise-a-jour.md` |
-| 20260817-etude-opportunite-conventions-parametrables.md | — | 20.6 Ko | `03-etudes/20260817-etude-opportunite-conventions-parametrables.md` |
-| 20260817-etude-opportunite-couverture-par-role.md | — | 5.4 Ko | `03-etudes/20260817-etude-opportunite-couverture-par-role.md` |
-| 20260817-etude-opportunite-ecart-servi-versionne.md | — | 6.3 Ko | `03-etudes/20260817-etude-opportunite-ecart-servi-versionne.md` |
-| 20260817-etude-opportunite-publication-livrables.md | — | 6.3 Ko | `03-etudes/20260817-etude-opportunite-publication-livrables.md` |
-| 20260817-etude-opportunite-rangement-output.md | — | 18.3 Ko | `03-etudes/20260817-etude-opportunite-rangement-output.md` |
-| 20260817-etude-opportunite-renommage-factory.md | — | 22.8 Ko | `03-etudes/20260817-etude-opportunite-renommage-factory.md` |
-| 20260817-etude-opportunite-sequencement-factory.md | — | 44.8 Ko | `03-etudes/20260817-etude-opportunite-sequencement-factory.md` |
-| 20260817-etude-opportunite-tests-bout-en-bout.md | — | 27.2 Ko | `03-etudes/20260817-etude-opportunite-tests-bout-en-bout.md` |
-| 20260817-etude-opportunite-todo-produit.md | — | 27.4 Ko | `03-etudes/20260817-etude-opportunite-todo-produit.md` |
-| 20260818-cartographie-oracles-cadence-de-mission.md | — | 5.7 Ko | `03-etudes/20260818-cartographie-oracles-cadence-de-mission.md` |
-| 20260818-etude-opportunite-admission-digit-ai-queue.md | — | 14.8 Ko | `03-etudes/20260818-etude-opportunite-admission-digit-ai-queue.md` |
-| 20260818-etude-opportunite-cablage-orchestrer-boucle.md | — | 12.4 Ko | `03-etudes/20260818-etude-opportunite-cablage-orchestrer-boucle.md` |
-| 20260818-etude-opportunite-memoire-partagee.md | — | 25.4 Ko | `03-etudes/20260818-etude-opportunite-memoire-partagee.md` |
-| 20260818-etude-opportunite-retour-usage-vers-delta.md | — | 9.1 Ko | `03-etudes/20260818-etude-opportunite-retour-usage-vers-delta.md` |
-| 20260819-etude-opportunite-forge-consulting.md | — | 13.3 Ko | `03-etudes/20260819-etude-opportunite-forge-consulting.md` |
-| 20260819-etude-opportunite-meta-oracle-enclenchement.md | — | 16.8 Ko | `03-etudes/20260819-etude-opportunite-meta-oracle-enclenchement.md` |
-| 20260819-etude-opportunite-module-de-traduction.md | — | 16.3 Ko | `03-etudes/20260819-etude-opportunite-module-de-traduction.md` |
-| 20260819-etude-opportunite-retro-documentation.md | — | 9.5 Ko | `03-etudes/20260819-etude-opportunite-retro-documentation.md` |
-| 20260819-etude-opportunite-retro-engineering.md | — | 10.3 Ko | `03-etudes/20260819-etude-opportunite-retro-engineering.md` |
-| 20260820-etude-opportunite-communication-interlocuteur.md | — | 10.4 Ko | `03-etudes/20260820-etude-opportunite-communication-interlocuteur.md` |
-| 20260820-etude-opportunite-rgaa.md | — | 12.9 Ko | `03-etudes/20260820-etude-opportunite-rgaa.md` |
-| 20260822-etude-opportunite-fraicheur-des-verdicts.md | — | 13.8 Ko | `03-etudes/20260822-etude-opportunite-fraicheur-des-verdicts.md` |
-| 20260822-etude-opportunite-troisieme-point-observation-i18n.md | — | 8.1 Ko | `03-etudes/20260822-etude-opportunite-troisieme-point-observation-i18n.md` |
-| 20260822-etude-opportunite-vue-portefeuille.md | — | 8.4 Ko | `03-etudes/20260822-etude-opportunite-vue-portefeuille.md` |
-| 20260830-L99-etat-de-l-art-marche.md | — | 26.9 Ko | `03-etudes/20260830-L99-etat-de-l-art-marche.md` |
-| 20260831-opportunite-etat-de-l-art-marche.md | — | 9 Ko | `03-etudes/20260831-opportunite-etat-de-l-art-marche.md` |
-| 20260901-etude-dataforseo-cadrage-v2.md | — | 8.6 Ko | `03-etudes/20260901-etude-dataforseo-cadrage-v2.md` |
-| 20260901-etude-opportunite-dataforseo.md | — | 20.6 Ko | `03-etudes/20260901-etude-opportunite-dataforseo.md` |
-| 20260901-etude-opportunite-donnees-de-recherche.md | — | 20.6 Ko | `03-etudes/20260901-etude-opportunite-donnees-de-recherche.md` |
-| 20260901-etude-opportunite-strategie-tests.md | — | 23.9 Ko | `03-etudes/20260901-etude-opportunite-strategie-tests.md` |
-| 20260902-etude-opportunite-dataforseo-produit-02.md | — | 43.7 Ko | `03-etudes/20260902-etude-opportunite-dataforseo-produit-02.md` |
-| 20260903-L99-amelioration-continue.md | — | 42.3 Ko | `03-etudes/20260903-L99-amelioration-continue.md` |
-| 20260903-recidives-mesure.md | — | 7.3 Ko | `03-etudes/20260903-recidives-mesure.md` |
-| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.html | — | 133.4 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` |
-| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 46.5 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
-| 20260907-L99-mission-data-silver-gold-powerbi.md | — | 47.5 Ko | `03-etudes/20260907-L99-mission-data-silver-gold-powerbi.md` |
-| 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 10.9 Ko | `03-etudes/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
-| 20260911-etude-opportunite-communication-marketing-ao.html | — | 141.1 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.html` |
-| 20260911-etude-opportunite-communication-marketing-ao.md | — | 48.9 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.md` |
-| 20260911-L99-forge-communication-marketing.md | — | 52.4 Ko | `03-etudes/20260911-L99-forge-communication-marketing.md` |
-| 20260911-L99-regles-d-ecriture-factory.md | — | 58.5 Ko | `03-etudes/20260911-L99-regles-d-ecriture-factory.md` |
-| 20260914-etude-opportunite-conception-documentaire-amont.html | — | 112.4 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.html` |
-| 20260914-etude-opportunite-conception-documentaire-amont.md | — | 27.4 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.md` |
-| 20260914-etude-opportunite-personas-par-phase.html | — | 110.9 Ko | `03-etudes/20260914-etude-opportunite-personas-par-phase.html` |
-| 20260914-etude-opportunite-personas-par-phase.md | — | 26.4 Ko | `03-etudes/20260914-etude-opportunite-personas-par-phase.md` |
-| 20260914-etude-opportunite-premiers-html-nouveaux-formats.md | — | 31.2 Ko | `03-etudes/20260914-etude-opportunite-premiers-html-nouveaux-formats.md` |
-| 20260914-L99-conception-documentaire-amont.md | — | 36.8 Ko | `03-etudes/20260914-L99-conception-documentaire-amont.md` |
-| 20260914-L99-personas-par-phase.md | — | 34.9 Ko | `03-etudes/20260914-L99-personas-par-phase.md` |
-| 20260914-L99-qualite-premiers-html-nouveaux-formats.md | — | 57.9 Ko | `03-etudes/20260914-L99-qualite-premiers-html-nouveaux-formats.md` |
-| 20260914-personas-mesure-baseline.md | — | 19.5 Ko | `03-etudes/20260914-personas-mesure-baseline.md` |
-| 20260914-personas-mesure-echantillon.md | — | 5.8 Ko | `03-etudes/20260914-personas-mesure-echantillon.md` |
-| 20260914-personas-mesure-fiches.md | — | 5.5 Ko | `03-etudes/20260914-personas-mesure-fiches.md` |
-| 20260914-personas-mesure-passes.md | — | 54.9 Ko | `03-etudes/20260914-personas-mesure-passes.md` |
-| 20260914-personas-mesure-protocole.md | — | 4.4 Ko | `03-etudes/20260914-personas-mesure-protocole.md` |
-| 20260914-releve-restes-archives.md | — | 6.5 Ko | `03-etudes/20260914-releve-restes-archives.md` |
-| 20260915-etude-opportunite-inventaire-des-composants.html | — | 102.6 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.html` |
-| 20260915-etude-opportunite-inventaire-des-composants.md | — | 22.9 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.md` |
-| 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 129.3 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
-| 20260917-etude-opportunite-gestion-reseaux-sociaux.md | — | 39.7 Ko | `03-etudes/20260917-etude-opportunite-gestion-reseaux-sociaux.md` |
-| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html | — | 97.8 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html` |
-| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md | — | 20.8 Ko | `03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` |
-| 20260917-L99-gestion-reseaux-sociaux.md | — | 45.7 Ko | `03-etudes/20260917-L99-gestion-reseaux-sociaux.md` |
-| 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.5 Ko | `03-etudes/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
-| 20260917-releve-autres-reseaux-sociaux.md | — | 8.3 Ko | `03-etudes/20260917-releve-autres-reseaux-sociaux.md` |
-| 20260917-revue-hebdomadaire-mesure-pas0.md | — | 21.2 Ko | `03-etudes/20260917-revue-hebdomadaire-mesure-pas0.md` |
-| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 116.2 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
-| 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 33 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
-| 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.3 Ko | `03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
-| 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.1 Ko | `03-etudes/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
-| 20260922-etude-opportunite-messagerie-inter-sessions.md | — | 35.6 Ko | `03-etudes/20260922-etude-opportunite-messagerie-inter-sessions.md` |
-| 20260922-L99-echanges-inter-session.md | — | 28.3 Ko | `03-etudes/20260922-L99-echanges-inter-session.md` |
-| 20260922-revue-des-candidatures-par-famille.md | — | 11.7 Ko | `03-etudes/20260922-revue-des-candidatures-par-famille.md` |
-| 20260925-etude-opportunite-niveaux-d-intervention.md | — | 47.9 Ko | `03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md` |
-| 20260925-L99-niveaux-d-intervention.md | — | 51 Ko | `03-etudes/20260925-L99-niveaux-d-intervention.md` |
-| 20260927-L99-saut-opus-5-vers-opus-5-5.md | — | 54.1 Ko | `03-etudes/20260927-L99-saut-opus-5-vers-opus-5-5.md` |
+| 20260812-etude-forge-data-moteurs.md | — | 7.3 Ko | `03-etudes/2026-08/20260812-etude-forge-data-moteurs.md` |
+| 20260812-etude-opportunite-forges.md | — | 15 Ko | `03-etudes/2026-08/20260812-etude-opportunite-forges.md` |
+| 20260813-etude-opportunite-outillage-analyse.md | — | 19.8 Ko | `03-etudes/2026-08/20260813-etude-opportunite-outillage-analyse.md` |
+| 20260813-etude-personas-agents.md | — | 11.3 Ko | `03-etudes/2026-08/20260813-etude-personas-agents.md` |
+| 20260814-etude-opportunite-pans-tests-prompts.md | — | 18.4 Ko | `03-etudes/2026-08/20260814-etude-opportunite-pans-tests-prompts.md` |
+| 20260814-etude-opportunite-pentest-owasp.md | — | 17.2 Ko | `03-etudes/2026-08/20260814-etude-opportunite-pentest-owasp.md` |
+| 20260814-etude-opportunite-taste-skill.md | — | 14.4 Ko | `03-etudes/2026-08/20260814-etude-opportunite-taste-skill.md` |
+| 20260815-etude-opportunite-ce-que-personne-ne-juge.md | — | 6.4 Ko | `03-etudes/2026-08/20260815-etude-opportunite-ce-que-personne-ne-juge.md` |
+| 20260815-etude-opportunite-circuit-insatisfaction.md | — | 5.3 Ko | `03-etudes/2026-08/20260815-etude-opportunite-circuit-insatisfaction.md` |
+| 20260815-etude-opportunite-cout-du-faux-positif.md | — | 6.9 Ko | `03-etudes/2026-08/20260815-etude-opportunite-cout-du-faux-positif.md` |
+| 20260815-etude-opportunite-lecons-audit-reel.md | — | 5.6 Ko | `03-etudes/2026-08/20260815-etude-opportunite-lecons-audit-reel.md` |
+| 20260815-etude-opportunite-qualite-graphique.md | — | 5.6 Ko | `03-etudes/2026-08/20260815-etude-opportunite-qualite-graphique.md` |
+| 20260815-etude-opportunite-restitution-lisible.md | — | 6.3 Ko | `03-etudes/2026-08/20260815-etude-opportunite-restitution-lisible.md` |
+| 20260816-etude-skills-animation-motion.md | — | 10.7 Ko | `03-etudes/2026-08/20260816-etude-skills-animation-motion.md` |
+| 20260817-etude-opportunite-cadence-de-mission.md | — | 24 Ko | `03-etudes/2026-08/20260817-etude-opportunite-cadence-de-mission.md` |
+| 20260817-etude-opportunite-consignes-de-mise-a-jour.md | — | 20.1 Ko | `03-etudes/2026-08/20260817-etude-opportunite-consignes-de-mise-a-jour.md` |
+| 20260817-etude-opportunite-conventions-parametrables.md | — | 20.6 Ko | `03-etudes/2026-08/20260817-etude-opportunite-conventions-parametrables.md` |
+| 20260817-etude-opportunite-couverture-par-role.md | — | 5.4 Ko | `03-etudes/2026-08/20260817-etude-opportunite-couverture-par-role.md` |
+| 20260817-etude-opportunite-ecart-servi-versionne.md | — | 6.3 Ko | `03-etudes/2026-08/20260817-etude-opportunite-ecart-servi-versionne.md` |
+| 20260817-etude-opportunite-publication-livrables.md | — | 6.3 Ko | `03-etudes/2026-08/20260817-etude-opportunite-publication-livrables.md` |
+| 20260817-etude-opportunite-rangement-output.md | — | 18.3 Ko | `03-etudes/2026-08/20260817-etude-opportunite-rangement-output.md` |
+| 20260817-etude-opportunite-renommage-factory.md | — | 22.8 Ko | `03-etudes/2026-08/20260817-etude-opportunite-renommage-factory.md` |
+| 20260817-etude-opportunite-sequencement-factory.md | — | 44.8 Ko | `03-etudes/2026-08/20260817-etude-opportunite-sequencement-factory.md` |
+| 20260817-etude-opportunite-tests-bout-en-bout.md | — | 27.2 Ko | `03-etudes/2026-08/20260817-etude-opportunite-tests-bout-en-bout.md` |
+| 20260817-etude-opportunite-todo-produit.md | — | 27.4 Ko | `03-etudes/2026-08/20260817-etude-opportunite-todo-produit.md` |
+| 20260818-cartographie-oracles-cadence-de-mission.md | — | 5.7 Ko | `03-etudes/2026-08/20260818-cartographie-oracles-cadence-de-mission.md` |
+| 20260818-etude-opportunite-admission-digit-ai-queue.md | — | 14.8 Ko | `03-etudes/2026-08/20260818-etude-opportunite-admission-digit-ai-queue.md` |
+| 20260818-etude-opportunite-cablage-orchestrer-boucle.md | — | 12.4 Ko | `03-etudes/2026-08/20260818-etude-opportunite-cablage-orchestrer-boucle.md` |
+| 20260818-etude-opportunite-memoire-partagee.md | — | 25.4 Ko | `03-etudes/2026-08/20260818-etude-opportunite-memoire-partagee.md` |
+| 20260818-etude-opportunite-retour-usage-vers-delta.md | — | 9.1 Ko | `03-etudes/2026-08/20260818-etude-opportunite-retour-usage-vers-delta.md` |
+| 20260819-etude-opportunite-forge-consulting.md | — | 13.3 Ko | `03-etudes/2026-08/20260819-etude-opportunite-forge-consulting.md` |
+| 20260819-etude-opportunite-meta-oracle-enclenchement.md | — | 16.8 Ko | `03-etudes/2026-08/20260819-etude-opportunite-meta-oracle-enclenchement.md` |
+| 20260819-etude-opportunite-module-de-traduction.md | — | 16.3 Ko | `03-etudes/2026-08/20260819-etude-opportunite-module-de-traduction.md` |
+| 20260819-etude-opportunite-retro-documentation.md | — | 9.5 Ko | `03-etudes/2026-08/20260819-etude-opportunite-retro-documentation.md` |
+| 20260819-etude-opportunite-retro-engineering.md | — | 10.3 Ko | `03-etudes/2026-08/20260819-etude-opportunite-retro-engineering.md` |
+| 20260820-etude-opportunite-communication-interlocuteur.md | — | 10.4 Ko | `03-etudes/2026-08/20260820-etude-opportunite-communication-interlocuteur.md` |
+| 20260820-etude-opportunite-rgaa.md | — | 12.9 Ko | `03-etudes/2026-08/20260820-etude-opportunite-rgaa.md` |
+| 20260822-etude-opportunite-fraicheur-des-verdicts.md | — | 13.8 Ko | `03-etudes/2026-08/20260822-etude-opportunite-fraicheur-des-verdicts.md` |
+| 20260822-etude-opportunite-troisieme-point-observation-i18n.md | — | 8.1 Ko | `03-etudes/2026-08/20260822-etude-opportunite-troisieme-point-observation-i18n.md` |
+| 20260822-etude-opportunite-vue-portefeuille.md | — | 8.4 Ko | `03-etudes/2026-08/20260822-etude-opportunite-vue-portefeuille.md` |
+| 20260830-L99-etat-de-l-art-marche.md | — | 26.9 Ko | `03-etudes/2026-08/20260830-L99-etat-de-l-art-marche.md` |
+| 20260831-opportunite-etat-de-l-art-marche.md | — | 9 Ko | `03-etudes/2026-08/20260831-opportunite-etat-de-l-art-marche.md` |
+| 20260901-etude-dataforseo-cadrage-v2.md | — | 8.6 Ko | `03-etudes/2026-09/20260901-etude-dataforseo-cadrage-v2.md` |
+| 20260901-etude-opportunite-dataforseo.md | — | 20.6 Ko | `03-etudes/2026-09/20260901-etude-opportunite-dataforseo.md` |
+| 20260901-etude-opportunite-donnees-de-recherche.md | — | 20.6 Ko | `03-etudes/2026-09/20260901-etude-opportunite-donnees-de-recherche.md` |
+| 20260901-etude-opportunite-strategie-tests.md | — | 23.9 Ko | `03-etudes/2026-09/20260901-etude-opportunite-strategie-tests.md` |
+| 20260902-etude-opportunite-dataforseo-produit-02.md | — | 43.7 Ko | `03-etudes/2026-09/20260902-etude-opportunite-dataforseo-produit-02.md` |
+| 20260903-L99-amelioration-continue.md | — | 42.3 Ko | `03-etudes/2026-09/20260903-L99-amelioration-continue.md` |
+| 20260903-recidives-mesure.md | — | 7.3 Ko | `03-etudes/2026-09/20260903-recidives-mesure.md` |
+| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.html | — | 133.4 Ko | `03-etudes/2026-09/20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` |
+| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 46.5 Ko | `03-etudes/2026-09/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
+| 20260907-L99-mission-data-silver-gold-powerbi.md | — | 47.5 Ko | `03-etudes/2026-09/20260907-L99-mission-data-silver-gold-powerbi.md` |
+| 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 10.9 Ko | `03-etudes/2026-09/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
+| 20260911-etude-opportunite-communication-marketing-ao.html | — | 141.1 Ko | `03-etudes/2026-09/20260911-etude-opportunite-communication-marketing-ao.html` |
+| 20260911-etude-opportunite-communication-marketing-ao.md | — | 48.9 Ko | `03-etudes/2026-09/20260911-etude-opportunite-communication-marketing-ao.md` |
+| 20260911-L99-forge-communication-marketing.md | — | 52.4 Ko | `03-etudes/2026-09/20260911-L99-forge-communication-marketing.md` |
+| 20260911-L99-regles-d-ecriture-factory.md | — | 58.5 Ko | `03-etudes/2026-09/20260911-L99-regles-d-ecriture-factory.md` |
+| 20260914-etude-opportunite-conception-documentaire-amont.html | — | 112.4 Ko | `03-etudes/2026-09/20260914-etude-opportunite-conception-documentaire-amont.html` |
+| 20260914-etude-opportunite-conception-documentaire-amont.md | — | 27.4 Ko | `03-etudes/2026-09/20260914-etude-opportunite-conception-documentaire-amont.md` |
+| 20260914-etude-opportunite-personas-par-phase.html | — | 110.9 Ko | `03-etudes/2026-09/20260914-etude-opportunite-personas-par-phase.html` |
+| 20260914-etude-opportunite-personas-par-phase.md | — | 26.4 Ko | `03-etudes/2026-09/20260914-etude-opportunite-personas-par-phase.md` |
+| 20260914-etude-opportunite-premiers-html-nouveaux-formats.md | — | 31.2 Ko | `03-etudes/2026-09/20260914-etude-opportunite-premiers-html-nouveaux-formats.md` |
+| 20260914-L99-conception-documentaire-amont.md | — | 36.8 Ko | `03-etudes/2026-09/20260914-L99-conception-documentaire-amont.md` |
+| 20260914-L99-personas-par-phase.md | — | 34.9 Ko | `03-etudes/2026-09/20260914-L99-personas-par-phase.md` |
+| 20260914-L99-qualite-premiers-html-nouveaux-formats.md | — | 57.9 Ko | `03-etudes/2026-09/20260914-L99-qualite-premiers-html-nouveaux-formats.md` |
+| 20260914-personas-mesure-baseline.md | — | 19.5 Ko | `03-etudes/2026-09/20260914-personas-mesure-baseline.md` |
+| 20260914-personas-mesure-echantillon.md | — | 5.8 Ko | `03-etudes/2026-09/20260914-personas-mesure-echantillon.md` |
+| 20260914-personas-mesure-fiches.md | — | 5.5 Ko | `03-etudes/2026-09/20260914-personas-mesure-fiches.md` |
+| 20260914-personas-mesure-passes.md | — | 54.9 Ko | `03-etudes/2026-09/20260914-personas-mesure-passes.md` |
+| 20260914-personas-mesure-protocole.md | — | 4.4 Ko | `03-etudes/2026-09/20260914-personas-mesure-protocole.md` |
+| 20260914-releve-restes-archives.md | — | 6.5 Ko | `03-etudes/2026-09/20260914-releve-restes-archives.md` |
+| 20260915-etude-opportunite-inventaire-des-composants.html | — | 102.6 Ko | `03-etudes/2026-09/20260915-etude-opportunite-inventaire-des-composants.html` |
+| 20260915-etude-opportunite-inventaire-des-composants.md | — | 22.9 Ko | `03-etudes/2026-09/20260915-etude-opportunite-inventaire-des-composants.md` |
+| 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 129.3 Ko | `03-etudes/2026-09/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
+| 20260917-etude-opportunite-gestion-reseaux-sociaux.md | — | 39.7 Ko | `03-etudes/2026-09/20260917-etude-opportunite-gestion-reseaux-sociaux.md` |
+| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html | — | 97.8 Ko | `03-etudes/2026-09/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html` |
+| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md | — | 20.8 Ko | `03-etudes/2026-09/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` |
+| 20260917-L99-gestion-reseaux-sociaux.md | — | 45.7 Ko | `03-etudes/2026-09/20260917-L99-gestion-reseaux-sociaux.md` |
+| 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.5 Ko | `03-etudes/2026-09/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
+| 20260917-releve-autres-reseaux-sociaux.md | — | 8.3 Ko | `03-etudes/2026-09/20260917-releve-autres-reseaux-sociaux.md` |
+| 20260917-revue-hebdomadaire-mesure-pas0.md | — | 21.2 Ko | `03-etudes/2026-09/20260917-revue-hebdomadaire-mesure-pas0.md` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 116.2 Ko | `03-etudes/2026-09/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 33 Ko | `03-etudes/2026-09/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
+| 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.3 Ko | `03-etudes/2026-09/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
+| 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.1 Ko | `03-etudes/2026-09/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
+| 20260922-etude-opportunite-messagerie-inter-sessions.md | — | 35.6 Ko | `03-etudes/2026-09/20260922-etude-opportunite-messagerie-inter-sessions.md` |
+| 20260922-L99-echanges-inter-session.md | — | 28.3 Ko | `03-etudes/2026-09/20260922-L99-echanges-inter-session.md` |
+| 20260922-revue-des-candidatures-par-famille.md | — | 11.7 Ko | `03-etudes/2026-09/20260922-revue-des-candidatures-par-famille.md` |
+| 20260925-etude-opportunite-niveaux-d-intervention.md | — | 47.9 Ko | `03-etudes/2026-09/20260925-etude-opportunite-niveaux-d-intervention.md` |
+| 20260925-L99-niveaux-d-intervention.md | — | 51 Ko | `03-etudes/2026-09/20260925-L99-niveaux-d-intervention.md` |
+| 20260927-L99-saut-opus-5-vers-opus-5-5.md | — | 54.1 Ko | `03-etudes/2026-09/20260927-L99-saut-opus-5-vers-opus-5-5.md` |
 | 20261001-etude-opportunite-rsi-et-ssl.md | — | 30 Ko | `03-etudes/20261001-etude-opportunite-rsi-et-ssl.md` |
 | 20261001-etude-opportunite-saut-opus-5-5.md | — | 37.1 Ko | `03-etudes/20261001-etude-opportunite-saut-opus-5-5.md` |
 | 20261001-etude-opportunite-textes-affiches.md | — | 18.2 Ko | `03-etudes/20261001-etude-opportunite-textes-affiches.md` |
@@ -511,36 +511,36 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 
 | Livrable | Version | Poids | Chemin à copier |
 |---|---|---|---|
-| pilot - TRAVAUX - 20260905c.md | 20260905c | 9.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905c.md` |
-| pilot - TRAVAUX - 20260905c.tf.jsonl | — | 1.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905c.tf.jsonl` |
-| pilot - TRAVAUX - 20260905d.md | 20260905d | 6.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905d.md` |
-| pilot - TRAVAUX - 20260905d.tf.jsonl | — | 0.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905d.tf.jsonl` |
-| pilot - TRAVAUX - 20260905e.md | 20260905e | 6.4 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905e.md` |
-| pilot - TRAVAUX - 20260905e.tf.jsonl | — | 0.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905e.tf.jsonl` |
-| pilot - TRAVAUX - 20260905f.md | 20260905f | 6.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905f.md` |
-| pilot - TRAVAUX - 20260905f.tf.jsonl | — | 0.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905f.tf.jsonl` |
-| pilot - TRAVAUX - 20260905g.md | 20260905g | 9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905g.md` |
-| pilot - TRAVAUX - 20260905g.tf.jsonl | — | 1.5 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905g.tf.jsonl` |
-| pilot - TRAVAUX - 20260905h.md | 20260905h | 9.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905h.md` |
-| pilot - TRAVAUX - 20260905h.tf.jsonl | — | 1.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905h.tf.jsonl` |
-| pilot - TRAVAUX - 20260905i.md | 20260905i | 6.2 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905i.md` |
-| pilot - TRAVAUX - 20260905i.tf.jsonl | — | 0.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905i.tf.jsonl` |
-| pilot - TRAVAUX - 20260905j.md | 20260905j | 5.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905j.md` |
-| pilot - TRAVAUX - 20260905j.tf.jsonl | — | 0.6 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905j.tf.jsonl` |
-| pilot - TRAVAUX - 20260905k.md | 20260905k | 5.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905k.md` |
-| pilot - TRAVAUX - 20260905k.tf.jsonl | — | 0.6 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905k.tf.jsonl` |
-| pilot - TRAVAUX - 20260907a.md | 20260907a | 9.4 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260907a.md` |
-| pilot - TRAVAUX - 20260907a.tf.jsonl | — | 1.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260907a.tf.jsonl` |
-| pilot - TRAVAUX - 20260908a.md | 20260908a | 7.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260908a.md` |
-| pilot - TRAVAUX - 20260908a.tf.jsonl | — | 1 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260908a.tf.jsonl` |
-| pilot - TRAVAUX - 20260912a.md | 20260912a | 10.8 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912a.md` |
-| pilot - TRAVAUX - 20260912a.tf.jsonl | — | 1.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912a.tf.jsonl` |
-| pilot - TRAVAUX - 20260912b.md | 20260912b | 10.1 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912b.md` |
-| pilot - TRAVAUX - 20260912b.tf.jsonl | — | 1.5 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912b.tf.jsonl` |
-| pilot - TRAVAUX - 20260912c.md | 20260912c | 7.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912c.md` |
-| pilot - TRAVAUX - 20260912c.tf.jsonl | — | 1.4 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912c.tf.jsonl` |
-| pilot - TRAVAUX - 20260914a.md | 20260914a | 12.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260914a.md` |
-| pilot - TRAVAUX - 20260914a.tf.jsonl | — | 2.2 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260914a.tf.jsonl` |
+| pilot - TRAVAUX - 20260905c.md | 20260905c | 9.9 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905c.md` |
+| pilot - TRAVAUX - 20260905c.tf.jsonl | — | 1.7 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905c.tf.jsonl` |
+| pilot - TRAVAUX - 20260905d.md | 20260905d | 6.9 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905d.md` |
+| pilot - TRAVAUX - 20260905d.tf.jsonl | — | 0.9 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905d.tf.jsonl` |
+| pilot - TRAVAUX - 20260905e.md | 20260905e | 6.4 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905e.md` |
+| pilot - TRAVAUX - 20260905e.tf.jsonl | — | 0.9 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905e.tf.jsonl` |
+| pilot - TRAVAUX - 20260905f.md | 20260905f | 6.3 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905f.md` |
+| pilot - TRAVAUX - 20260905f.tf.jsonl | — | 0.7 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905f.tf.jsonl` |
+| pilot - TRAVAUX - 20260905g.md | 20260905g | 9 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905g.md` |
+| pilot - TRAVAUX - 20260905g.tf.jsonl | — | 1.5 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905g.tf.jsonl` |
+| pilot - TRAVAUX - 20260905h.md | 20260905h | 9.3 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905h.md` |
+| pilot - TRAVAUX - 20260905h.tf.jsonl | — | 1.3 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905h.tf.jsonl` |
+| pilot - TRAVAUX - 20260905i.md | 20260905i | 6.2 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905i.md` |
+| pilot - TRAVAUX - 20260905i.tf.jsonl | — | 0.7 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905i.tf.jsonl` |
+| pilot - TRAVAUX - 20260905j.md | 20260905j | 5.7 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905j.md` |
+| pilot - TRAVAUX - 20260905j.tf.jsonl | — | 0.6 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905j.tf.jsonl` |
+| pilot - TRAVAUX - 20260905k.md | 20260905k | 5.7 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905k.md` |
+| pilot - TRAVAUX - 20260905k.tf.jsonl | — | 0.6 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905k.tf.jsonl` |
+| pilot - TRAVAUX - 20260907a.md | 20260907a | 9.4 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260907a.md` |
+| pilot - TRAVAUX - 20260907a.tf.jsonl | — | 1.3 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260907a.tf.jsonl` |
+| pilot - TRAVAUX - 20260908a.md | 20260908a | 7.3 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260908a.md` |
+| pilot - TRAVAUX - 20260908a.tf.jsonl | — | 1 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260908a.tf.jsonl` |
+| pilot - TRAVAUX - 20260912a.md | 20260912a | 10.8 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260912a.md` |
+| pilot - TRAVAUX - 20260912a.tf.jsonl | — | 1.7 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260912a.tf.jsonl` |
+| pilot - TRAVAUX - 20260912b.md | 20260912b | 10.1 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260912b.md` |
+| pilot - TRAVAUX - 20260912b.tf.jsonl | — | 1.5 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260912b.tf.jsonl` |
+| pilot - TRAVAUX - 20260912c.md | 20260912c | 7.7 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260912c.md` |
+| pilot - TRAVAUX - 20260912c.tf.jsonl | — | 1.4 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260912c.tf.jsonl` |
+| pilot - TRAVAUX - 20260914a.md | 20260914a | 12.9 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260914a.md` |
+| pilot - TRAVAUX - 20260914a.tf.jsonl | — | 2.2 Ko | `06-travaux-confies/2026-09/pilot - TRAVAUX - 20260914a.tf.jsonl` |
 
 *Un livrable présent et absent de ce tableau est un défaut : cet index est régénéré, et un
 index qui a dérivé de son dossier ne sert plus qu'à donner confiance à tort.*

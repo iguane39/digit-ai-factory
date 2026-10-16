@@ -212,6 +212,18 @@ function prefixeComparable(nom, prefixe) {
   } catch { return prefixe; }
 }
 
+/**
+ * Un dossier de lots, son `old\`, et les sous-dossiers d'`old\` : depuis le 16/10/2026, la boîte du pilot
+ * classe ses lots ingérés par émetteur (`old\<émetteur>\`, `scripts\ranger-dossiers.mjs`). Lire `old\`
+ * à plat perdrait en silence tout lot classé.
+ */
+function dossierEtArchives(d) {
+  const old = join(d, "old");
+  const sous = [];
+  try { for (const e of readdirSync(old, { withFileTypes: true })) if (e.isDirectory()) sous.push(join(old, e.name)); } catch { /* pas d'old */ }
+  return [d, old, ...sous];
+}
+
 /** Les identifiants qu'un lot DÉFINIT, numéros normalisés (`RT-050` = `RT-50`). */
 export function idsDefinis(texte) {
   const ids = new Set();
@@ -232,14 +244,14 @@ export function idsEnDouble(cheminLot, texte) {
   const [, prefixeBrut, cle] = m;
   const prefixe = prefixeComparable(nom, prefixeBrut);
   const dossier = dirname(resolve(String(cheminLot)));
-  const dossiers = [dossier, join(dossier, "old")];
-  if (/^_arrivee$/i.test(basename(dossier))) dossiers.push(join(dossier, ".."), join(dossier, "..", "old"));
+  const dossiers = dossierEtArchives(dossier);
+  if (/^_arrivee$/i.test(basename(dossier))) dossiers.push(...dossierEtArchives(join(dossier, "..")));
   // TF-1813 (15/10/2026) — LES COPIES REÇUES PAR LE PILOT COMPTENT AUSSI. Le pilot renumérote parfois un
   // identifiant à la réception (R-49, « Note de réception du pilot ») : chez Produit-64, RT-32 chez lui
   // est devenu RT-58 au pilot, et le lot suivant a repris RT-58. La boîte du pilot (et son `old\`) se
   // lit donc à côté des copies du produit ; ses noms sont sous pseudonyme, d'où le préfixe comparable.
   const boite = boiteDuPilot(dossier);
-  if (boite) dossiers.push(boite, join(boite, "old"));
+  if (boite) dossiers.push(...dossierEtArchives(boite));
   const vus = new Set();
   const comparables = new Map();
   const comparable = (n, brut) => {
@@ -339,7 +351,7 @@ function murDesLotsAnterieurs(cheminLot) {
   const prefixe = prefixeComparable(nom, prefixeBrut);
   const dossier = dirname(resolve(String(cheminLot)));
   let cumul = "";
-  for (const d of [dossier, join(dossier, "old")]) {
+  for (const d of dossierEtArchives(dossier)) {
     if (!existsSync(d)) continue;
     for (const n of readdirSync(d)) {
       const v = NOM_DE_LOT.exec(n);

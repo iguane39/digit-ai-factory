@@ -197,7 +197,10 @@ const dernieresSemaines = [...fluxParSemaine.entries()].sort().slice(-4);
 
 const dernierLot = new Map();
 let retoursLus = false;
-for (const d of [RET, join(RET, "old")]) {
+// `old\` avec ses sous-dossiers par émetteur (classement du 16/10/2026, `scripts\ranger-dossiers.mjs`).
+const sousOld = [];
+try { for (const e of readdirSync(join(RET, "old"), { withFileTypes: true })) if (e.isDirectory()) sousOld.push(join(RET, "old", e.name)); } catch { /* pas d'old */ }
+for (const d of [RET, join(RET, "old"), ...sousOld]) {
   if (!existsSync(d)) continue;
   retoursLus = true;
   for (const f of readdirSync(d)) {

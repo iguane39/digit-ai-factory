@@ -6,7 +6,7 @@
 > document Word)
 > **Règles engagées** D1 D3 D6 D8 D9 D11 (`gabarits\documents\README.md`)
 > **Provenance** ouverte par l'étude d'opportunité du 11/09/2026
-> (`output\03-etudes\20260911-etude-opportunite-communication-marketing-ao.md`), typologie L11 :
+> (`output\03-etudes\2026-09\20260911-etude-opportunite-communication-marketing-ao.md`), typologie L11 :
 > « Étude de cas, référence client · prospects · PDF, HTML · non couvert ; dépend d'un accord
 > client », et mesure M9 : « aucune famille partenaire, fournisseur, étude de cas » au catalogue.
 > **Gabarit : gd-etude-de-cas-client** · **Version du gabarit : 1.0.0**

@@ -246,7 +246,7 @@ revenue en 63 s. Il a été délivré sans approbation, les deux sessions étant
 destinataire, il a coûté **3 appels de modèle et 1 397 740 jetons relus en cache** pour un
 accusé d'une ligne. **Ce qui coûte, c'est le contexte du destinataire, pas la taille du message.**
 Le destinataire a relu cette section avant de répondre et n'a rien fait d'autre : la règle a
-tenu. Détail : `output\03-etudes\20260922-etude-opportunite-messagerie-inter-sessions.md`,
+tenu. Détail : `output\03-etudes\2026-09\20260922-etude-opportunite-messagerie-inter-sessions.md`,
 sections 6 et 7.
 
 ### Les trois usages convenus (décision humaine D-7 (a) du 22/09/2026)

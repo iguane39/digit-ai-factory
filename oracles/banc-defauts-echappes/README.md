@@ -17,11 +17,11 @@ confidentielles ne sont jamais recopiées dans le pilot.
 
 | Pièce | Rôle | Où |
 |---|---|---|
-| Protocole | consigne commune de relecture, séquence, règle de jugement, seuil | `output\03-etudes\20260914-personas-mesure-protocole.md` |
-| Échantillon | neuf défauts échappés réels, leur phase, leur source | `output\03-etudes\20260914-personas-mesure-echantillon.md` |
+| Protocole | consigne commune de relecture, séquence, règle de jugement, seuil | `output\03-etudes\2026-09\20260914-personas-mesure-protocole.md` |
+| Échantillon | neuf défauts échappés réels, leur phase, leur source | `output\03-etudes\2026-09\20260914-personas-mesure-echantillon.md` |
 | Livrables reconstitués | le livrable de chaque défaut dans son état d'avant correction | canal confidentiel, `bancs\defauts-echappes\livrables\` |
-| Relecture de référence | la ligne de base sans mécanisme, figée le 14/09/2026 à 10:04 | `output\03-etudes\20260914-personas-mesure-baseline.md` |
-| Relectures des personas du 14/09 | trois conditions déjà mesurées, non retenues | `output\03-etudes\20260914-personas-mesure-passes.md` |
+| Relecture de référence | la ligne de base sans mécanisme, figée le 14/09/2026 à 10:04 | `output\03-etudes\2026-09\20260914-personas-mesure-baseline.md` |
+| Relectures des personas du 14/09 | trois conditions déjà mesurées, non retenues | `output\03-etudes\2026-09\20260914-personas-mesure-passes.md` |
 | Manifeste | défauts à rechercher, permutations, seuil | `manifeste.json` |
 | Jugement du 14/09 | clé et étiquettes du juge, pour rejouer le décompte | `jugement-20260914\` |
 | Scripts | construire l'entrée du juge, décompter son jugement | `construire.mjs`, `decompter.mjs` |
@@ -34,7 +34,7 @@ confidentielles ne sont jamais recopiées dans le pilot.
    mesurer. Aucun autre fichier ne lui est ouvert. Enregistrer sa sortie brute dans un bloc
    ```` ```text ```` d'un fichier daté, sous `output\03-etudes\`.
 2. **Construire l'entrée du juge.**
-   `node oracles\banc-defauts-echappes\construire.mjs --reference output\03-etudes\20260914-personas-mesure-baseline.md --candidats <fichier du mécanisme> --codes N --sortie <dossier hors dépôt>`
+   `node oracles\banc-defauts-echappes\construire.mjs --reference output\03-etudes\2026-09\20260914-personas-mesure-baseline.md --candidats <fichier du mécanisme> --codes N --sortie <dossier hors dépôt>`
 3. **Juger à l'aveugle.** Une session neuve reçoit `entree.md` et les livrables du canal, jamais
    `cle.json`, et étiquette chaque constat R (retrouvé), A (autre défaut réel, « proche » s'il frôle
    le défaut) ou F (faux ou générique), une ligne par constat : `E-01 L1 1 A — raison`.

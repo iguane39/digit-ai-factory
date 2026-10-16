@@ -5,7 +5,7 @@
 > `digit-ai-docx`, sous les gates de `references\PRODUCTION-OOXML.md`)
 > **Règles engagées** D1 D3 D6 D8 D11 (`gabarits\documents\README.md`)
 > **Provenance** ouverte par l'étude d'opportunité du 11/09/2026
-> (`output\03-etudes\20260911-etude-opportunite-communication-marketing-ao.md`), typologie L10 et
+> (`output\03-etudes\2026-09\20260911-etude-opportunite-communication-marketing-ao.md`), typologie L10 et
 > mesure M9 : « aucune famille partenaire, fournisseur, étude de cas » au catalogue.
 > **Gabarit : gd-charte-partenariat** · **Version du gabarit : 1.0.0**
 

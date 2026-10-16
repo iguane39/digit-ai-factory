@@ -3,8 +3,8 @@
 Référentiel de capitalisation (loi n° 4 : daté, sourcé, éditable) — **version 1.0.0,
 01/09/2026**. Origine : le chantier « données de recherche » du produit pionnier
 (candidature TF-0741, décisions D-1 à D-3 du 01/09/2026, session pilot du même jour) et ses
-deux études (`output\03-etudes\20260901-etude-opportunite-dataforseo.md`, remplacée par
-`output\03-etudes\20260901-etude-opportunite-donnees-de-recherche.md`, dite « l'étude v2 »).
+deux études (`output\03-etudes\2026-09\20260901-etude-opportunite-dataforseo.md`, remplacée par
+`output\03-etudes\2026-09\20260901-etude-opportunite-donnees-de-recherche.md`, dite « l'étude v2 »).
 Ce document généralise ce qui est **réutilisable pour tout produit** ; il ne porte AUCUN
 prix — un prix est une donnée périssable qui vit dans une étude datée avec sa péremption,
 jamais dans un référentiel d'expertise. Mandat d'écriture : demande humaine du 01/09/2026

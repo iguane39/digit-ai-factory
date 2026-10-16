@@ -630,7 +630,7 @@ const PYTHON = ["python", "python3", "py"].find((bin) => {
   const r = spawnSync(bin, ["--version"], { encoding: "utf8" });
   return !r.error && r.status === 0;
 });
-const ETUDE_REELLE = join(ICI, "..", "output", "03-etudes",
+const ETUDE_REELLE = join(ICI, "..", "output", "03-etudes", "2026-09",
   "20260919-etude-opportunite-plan-d-amelioration-post-audit.md");
 
 /**

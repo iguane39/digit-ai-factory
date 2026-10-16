@@ -5,7 +5,7 @@
 > sous les gates de `references\PRODUCTION-OOXML.md` — ce gabarit ne rend aucun fichier Word)
 > **Règles engagées** D1 D3 D6 D8 D11 (`gabarits\documents\README.md`)
 > **Provenance** ouverte par l'étude d'opportunité du 11/09/2026
-> (`output\03-etudes\20260911-etude-opportunite-communication-marketing-ao.md`), typologie L10 :
+> (`output\03-etudes\2026-09\20260911-etude-opportunite-communication-marketing-ao.md`), typologie L10 :
 > « Kit partenaire, charte de partenariat, courrier fournisseur · partenaires, fournisseurs ·
 > DOCX, PDF · non couvert : aucun preset, aucun gabarit », et mesure M9 du même document :
 > « aucune famille partenaire, fournisseur, étude de cas » au catalogue.

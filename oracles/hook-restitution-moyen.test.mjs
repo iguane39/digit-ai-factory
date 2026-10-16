@@ -2,7 +2,7 @@
 /**
  * hook-restitution-moyen.test.mjs — recette du NIVEAU MOYEN (étape 2 des niveaux d'intervention,
  * en essai depuis le 01/10/2026 à la demande humaine ; étude
- * `output/03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md`, « Le mécanisme qui
+ * `output/03-etudes/2026-09/20260925-etude-opportunite-niveaux-d-intervention.md`, « Le mécanisme qui
  * empêche le raccourci »).
  *
  *   1. VERT — une recherche de 12 commandes de lecture rendue au format Moyen : laisse passer.

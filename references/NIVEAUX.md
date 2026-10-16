@@ -3,7 +3,7 @@
 Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.5.0,
 13/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
 Moyen en essai ; 1.3.0 ne compte plus une copie vers le dossier temporaire comme un effet ; 1.4.0
-consigne la revue de l'essai ; 1.5.0 engage l'étape 3, la propagation aux produits). Source : l'étude `output\03-etudes\20260925-etude-opportunite-niveaux-d-intervention.md`,
+consigne la revue de l'essai ; 1.5.0 engage l'étape 3, la propagation aux produits). Source : l'étude `output\03-etudes\2026-09\20260925-etude-opportunite-niveaux-d-intervention.md`,
 verdict O3 (3 niveaux fixés par les effets du tour, déployés en 3 étapes), validé par la décision
 humaine D-3 (a) du 25/09/2026. Candidature au registre : TF-1418 (niveaux d'intervention, étape 1).
 

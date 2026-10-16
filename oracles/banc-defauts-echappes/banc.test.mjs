@@ -29,8 +29,8 @@ test("vert — le jugement du 14/09 redonne 2/9, 1/9, 3/9, 3/9 et aucun persona 
 
 test("vert — la reconstruction depuis les fichiers de mesure redonne la même clé et 216 constats", () => {
   const { cle: cle2, decompte } = construire({
-    reference: readFileSync(join(PILOT, "output", "03-etudes", "20260914-personas-mesure-baseline.md"), "utf8"),
-    candidats: readFileSync(join(PILOT, "output", "03-etudes", "20260914-personas-mesure-passes.md"), "utf8"),
+    reference: readFileSync(join(PILOT, "output", "03-etudes", "2026-09", "20260914-personas-mesure-baseline.md"), "utf8"),
+    candidats: readFileSync(join(PILOT, "output", "03-etudes", "2026-09", "20260914-personas-mesure-passes.md"), "utf8"),
     codes: "XUM",
     manifeste,
   });

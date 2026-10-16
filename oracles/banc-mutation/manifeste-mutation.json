@@ -54,7 +54,7 @@
    "args": [
     "{FICHIER}"
    ],
-   "vert": "input/00-retours/produits-anciens - RETOURS - 20260906a.md",
+   "vert": "input/00-retours/old/produits-anciens/produits-anciens - RETOURS - 20260906a.md",
    "sollicitation": {
     "fichiers_qui_le_citent": 11
    },
@@ -72,7 +72,7 @@
    "args": [
     "{FICHIER}"
    ],
-   "vert": "output/06-travaux-confies/pilot - TRAVAUX - 20260905d.md",
+   "vert": "output/06-travaux-confies/2026-09/pilot - TRAVAUX - 20260905d.md",
    "sollicitation": {
     "fichiers_qui_le_citent": 10
    },
@@ -91,7 +91,7 @@
    "args": [
     "{FICHIER}"
    ],
-   "vert": "output/03-etudes/20260914-etude-opportunite-personas-par-phase.md",
+   "vert": "output/03-etudes/2026-09/20260914-etude-opportunite-personas-par-phase.md",
    "sollicitation": {
     "fichiers_qui_le_citent": 5
    },

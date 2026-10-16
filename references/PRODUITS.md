@@ -1,6 +1,6 @@
 ---
 role: référentiel DÉCLARÉ des produits que la Factory suit — la première pierre du verdict O1 de l'étude du 22/08 sur la vue portefeuille (partition P2), rouvert sous TF-1313 le 22/09/2026
-sources_de_verite: [todo/TODO.jsonl et todo/TODO-ARCHIVE.jsonl (créations, champs demandeur et source), output/03-etudes/20260822-etude-opportunite-vue-portefeuille.md, oracles/fraicheur-claims.json (claim produits-connus-du-registre)]
+sources_de_verite: [todo/TODO.jsonl et todo/TODO-ARCHIVE.jsonl (créations, champs demandeur et source), output/03-etudes/2026-08/20260822-etude-opportunite-vue-portefeuille.md, oracles/fraicheur-claims.json (claim produits-connus-du-registre)]
 verifie_le: 2026-09-22
 ---
 

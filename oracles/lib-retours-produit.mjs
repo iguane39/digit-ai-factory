@@ -42,7 +42,12 @@ function etatDuPilot(pilot) {
   if (ETATS.has(pilot)) return ETATS.get(pilot);
   const boite = pilot ? join(pilot, "input", "00-retours") : null;
   const presents = new Set();
-  if (boite && existsSync(boite)) for (const d of [boite, join(boite, "old"), join(boite, "_arrivee")]) {
+  // `old\` se lit avec ses sous-dossiers : la boîte classe ses lots ingérés par émetteur depuis le
+  // 16/10/2026 (`scripts\ranger-dossiers.mjs`) ; lu à plat, tout lot classé passerait pour jamais parvenu.
+  const old = boite ? join(boite, "old") : null;
+  const sousOld = [];
+  try { for (const e of readdirSync(old, { withFileTypes: true })) if (e.isDirectory()) sousOld.push(join(old, e.name)); } catch { /* pas d'old */ }
+  if (boite && existsSync(boite)) for (const d of [boite, old, ...sousOld, join(boite, "_arrivee")]) {
     try { for (const n of readdirSync(d)) presents.add(n.toLowerCase()); } catch { /* dossier absent */ }
   }
   let ingeres = null;

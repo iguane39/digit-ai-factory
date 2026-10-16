@@ -59,6 +59,7 @@ import { fileURLToPath } from "node:url";
 import { tmpdir, hostname } from "node:os";
 import { spawnSync } from "node:child_process";
 import { empreinteFichier, empreinteBinaire } from "../scripts/lib-empreinte.mjs";
+import { emetteurDuNom } from "../scripts/ranger-dossiers.mjs";
 
 const VERSION = "1.0.0";
 const ORACLE = "oracle-boite-entree";
@@ -447,7 +448,9 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   let orphelines = 0;
   for (const nom of pieces) {
     const lot = pieceJointe(nom)[1] + ".md";
-    if (fichiers.includes(lot) || existsSync(join(repertoire, "old", lot))) continue;
+    // `old\<émetteur>\` compte aussi : la boîte y classe ses lots ingérés depuis le 16/10/2026.
+    if (fichiers.includes(lot) || existsSync(join(repertoire, "old", lot))
+      || existsSync(join(repertoire, "old", emetteurDuNom(lot), lot))) continue;
     orphelines++;
     const age = ageHeures(join(repertoire, nom));
     findings.push({ regle: "B10", statut: "FAIL", ou: nom, depuis_h: age === null ? null : Number(age.toFixed(1)),

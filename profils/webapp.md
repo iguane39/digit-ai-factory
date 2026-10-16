@@ -7,8 +7,8 @@ sources:
   - "WAI-ARIA 1.2/1.3 — W3C ; les patterns APG (design patterns) ne sont PAS machine-testables"
   - "Lighthouse PWA — audit installabilité (manifest + service worker + HTTPS)"
   - "DTCG (Design Tokens Community Group) — spécification 2025.10, schéma vérifiable, hors standards-track W3C"
-  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
-  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
+  - "étude d'opportunité forges — output\\03-etudes\\2026-08\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\2026-08\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — webapp

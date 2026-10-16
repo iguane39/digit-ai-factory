@@ -193,7 +193,7 @@ const PREJUGEMENT = /hook-restitution\.mjs[^\n]*--(?:prejuger|pre-vol)|factory\.
 // LE FAIT. Une question de diagnostic (« pourquoi… », « où en est… ») part en recherche : dix
 // commandes de lecture, aucune écriture. Le compte d'outils (4 commandes = tour de travail) la juge
 // comme un tour de travail et lui impose 8 blocs. Mesuré le 21/09 : 1 683 mots rendus là où 124
-// suffisaient (étude `output/03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md`).
+// suffisaient (étude `output/03-etudes/2026-09/20260925-etude-opportunite-niveaux-d-intervention.md`).
 //
 // LE REMÈDE, ET CE QUI EMPÊCHE LE RACCOURCI. Le niveau Moyen remplace le compte d'outils par un
 // relevé d'EFFETS. Un tour qui se déclare « Niveau : Moyen » et n'a aucun effet est jugé sur sa

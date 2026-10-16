@@ -2,7 +2,7 @@
 /**
  * oracle-enclenchement.mjs — LES ORACLES QUI DEVAIENT TOURNER SUR UN RUN ONT-ILS TOURNÉ ?
  * (TF-1319, décision humaine D-13 (a) du 23/09/2026 : temps 3 du verdict O3 de l'étude
- * `output/03-etudes/20260819-etude-opportunite-meta-oracle-enclenchement.md`.)
+ * `output/03-etudes/2026-08/20260819-etude-opportunite-meta-oracle-enclenchement.md`.)
  *
  * ============================================================================================
  * LA QUESTION, ET POURQUOI IL A FALLU TROIS TEMPS POUR Y RÉPONDRE

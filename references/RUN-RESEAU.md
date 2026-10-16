@@ -2,12 +2,12 @@
 
 Sixième voie d'exécution (avec `ETAPES-RUN.md`, `RUN-VERSION.md`, `RUN-MANDAT.md`,
 `RUN-CONSEIL.md` et `RUN-AO.md`), née de la décision humaine D-2 (a) du 17/09/2026 sur l'étude
-`output\03-etudes\20260917-etude-opportunite-gestion-reseaux-sociaux.md` (verdict O2 : aucune
+`output\03-etudes\2026-09\20260917-etude-opportunite-gestion-reseaux-sociaux.md` (verdict O2 : aucune
 forge, aucun logiciel ; candidature TF-1158). Animer un réseau, c'est tenir dans la durée une
 chaîne de dix fonctions, des objectifs à l'itération, sur un compte nommé.
 
 **Paramétré par réseau et par type d'émetteur depuis le 21/09/2026** (décision humaine D-12 (a),
-étude `output\03-etudes\20260921-etude-opportunite-reseaux-sociaux-complement.md`, candidature
+étude `output\03-etudes\2026-09\20260921-etude-opportunite-reseaux-sociaux-complement.md`, candidature
 TF-1278). Le run ne vaut plus pour le seul LinkedIn ni pour la seule société de conseil : il
 s'ouvre sur une fiche qui dit qui émet, sur quels réseaux, avec quel modèle de publication.
 

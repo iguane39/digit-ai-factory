@@ -263,7 +263,7 @@ décision pilot tant qu'aucune proposition n'est remise.
 
 ## H. Admission d'une nouvelle forge (règle 28 — décidée le 12/08, TF-0125)
 
-Issue de l'étude d'opportunité du 12/08 (`output\03-etudes\20260812-etude-opportunite-forges.md`),
+Issue de l'étude d'opportunité du 12/08 (`output\03-etudes\2026-08\20260812-etude-opportunite-forges.md`),
 qui a départagé 4 candidatures avec ce critère (fixture de validation : appliqué aux 4,
 il redonne les verdicts rendus — 1 forge, 3 profils).
 
@@ -465,7 +465,7 @@ mesure du bruit chez les produits, comme pour R-32 quater.
 
 ## M. Sécurité offensive — sur mandat, jamais dans la voie automatique (règle 33 — 14/08, TF-0189)
 
-Constat de l'étude du 14/08 (`output\03-etudes\20260814-etude-opportunite-pentest-owasp.md`) :
+Constat de l'étude du 14/08 (`output\03-etudes\2026-08\20260814-etude-opportunite-pentest-owasp.md`) :
 forge-websec porte un contrat ASVS 5.0.0 L1 depuis le 12/08 que **rien ne branche au cycle**
 (dette D-W3 : « jamais exercée sur produit réel ») — un produit franchit M-1…M-5 sans qu'aucune
 exigence de sécurité lui soit opposée. Et le pentest manuel, exclu par websec (README §Limites),
@@ -666,7 +666,7 @@ ouverts) a été rendu à la fois comme fichier local et comme **page hébergée
 (URL claude.ai/code/artifact/…, 17/08), avant toute validation humaine. Aucune règle écrite
 ne l'interdisait : G-1 et R-32 cadrent l'EMPLACEMENT et la FORME des livrables sur le poste,
 le garde-fou git ne couvre que le push — la publication n'a enfreint aucun texte, **c'est
-exactement le défaut**. Étude : `output\03-etudes\20260817-etude-opportunite-publication-livrables.md`
+exactement le défaut**. Étude : `output\03-etudes\2026-08\20260817-etude-opportunite-publication-livrables.md`
 (verdict O3).
 
 **R-38.**
@@ -761,7 +761,7 @@ la dette déclarée par D-15 elle-même — candidature de mécanisation au regi
 
 ## T. Un test proposé s'exécute — la voie « proposition de tests » est fermée (règle 40 — 17/08, TF-0349)
 
-Mandat humain direct du 17/08 ; étude `output\03-etudes\20260817-etude-opportunite-tests-bout-en-bout.md`
+Mandat humain direct du 17/08 ; étude `output\03-etudes\2026-08\20260817-etude-opportunite-tests-bout-en-bout.md`
 (verdict O3). Le coût, mesuré sur pièces le jour même : des « Cahiers de tests » qui se
 déclarent eux-mêmes proposition, soldes réels **971 cas dérivés / 0 adopté** (Produit-11) et
 **680 / 0** (COMPTA) — des contrôles jamais joués livrés comme s'ils protégeaient (R-35).
@@ -812,7 +812,7 @@ NOMMÉE : `orchestrer-boucle.mjs` sans appelant (TF-0351, conditionné à TF-034
 
 ## U. Trois invariants de coordination, admis d'un protocole éprouvé (règle 41 — 18/08, TF-0329)
 
-Étude `output\03-etudes\20260818-etude-opportunite-admission-digit-ai-queue.md` (verdict O2).
+Étude `output\03-etudes\2026-08\20260818-etude-opportunite-admission-digit-ai-queue.md` (verdict O2).
 Le coût du statu quo est daté : l'écosystème a instruit puis **refusé** le 17/08 un mécanisme
 de tickets (TF-0318, moitié écriture) sans jamais le confronter à `c:\dev\digit-ai-queue`, un
 protocole présent sur le poste depuis le 2026-07-16, éprouvé sur 5 tickets réels dont 4 bouclés

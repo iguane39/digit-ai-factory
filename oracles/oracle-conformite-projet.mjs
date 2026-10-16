@@ -732,7 +732,10 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
       if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
       const m = nom.match(/^(.*) - (\d{8}[a-z]?)\.([\w.]+)$/);
       if (!m) continue;
-      const dossierRel = dirname(rel(f));
+      // Un sous-dossier de mois (`AAAA-MM\`, `scripts\ranger-dossiers.mjs` du 16/10/2026) range une
+      // famille sans en changer le sens : les versions d'un radical se comparent dans la FAMILLE, sinon
+      // ranger un mois clos éteindrait la détection d'une version restée hors old\.
+      const dossierRel = dirname(rel(f)).replace(/\/\d{4}-\d{2}$/, "");
       if (DOSSIERS_LIVRABLES_DISTINCTS.has(dossierRel)) continue;
       if (RADICAUX_LIVRABLES_DISTINCTS.has(JSON.stringify([dossierRel, m[1]]))) continue;
       // Clé COMPOSÉE, jamais concaténée : un radical porte des espaces et des tirets, et un

@@ -207,7 +207,7 @@ export function contexte(message) {
 
 /**
  * NIVEAUX D'INTERVENTION — étape 1 (TF-1418, décision humaine D-3 (a) du 25/09/2026 ; étude
- * `output/03-etudes/20260925-etude-opportunite-niveaux-d-intervention.md`, verdict O3).
+ * `output/03-etudes/2026-09/20260925-etude-opportunite-niveaux-d-intervention.md`, verdict O3).
  *
  * LE FAIT. Mesuré sur 165 tours du pilot : une question courte attendait 6,3 minutes en médiane et
  * recevait 1 813 mots, parce qu'elle finissait presque toujours en restitution complète, alors que

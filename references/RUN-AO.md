@@ -2,7 +2,7 @@
 
 Cinquième voie d'exécution (avec `ETAPES-RUN.md`, `RUN-VERSION.md`, `RUN-MANDAT.md` et
 `RUN-CONSEIL.md`), née de la décision humaine D-3 (a) du 11/09/2026 sur l'étude
-`output\03-etudes\20260911-etude-opportunite-communication-marketing-ao.md` (verdict O3 :
+`output\03-etudes\2026-09\20260911-etude-opportunite-communication-marketing-ao.md` (verdict O3 :
 aucune forge nouvelle ; candidature TF-1025). Une réponse à appel d'offres — public ou privé —
 reprend des documents **tiers** (règlement de consultation, cahier des clauses techniques et
 administratives, bordereau de prix, trame de mémoire imposée) et rend, **avant une échéance**,

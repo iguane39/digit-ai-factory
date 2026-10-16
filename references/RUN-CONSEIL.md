@@ -2,7 +2,7 @@
 
 Quatrième voie d'exécution (avec `ETAPES-RUN.md`, `RUN-VERSION.md` et `RUN-MANDAT.md`),
 née du GO humain du 19/08/2026 sur l'étude
-`output\03-etudes\20260819-etude-opportunite-forge-consulting.md` (verdict O1 : orchestrer
+`output\03-etudes\2026-08\20260819-etude-opportunite-forge-consulting.md` (verdict O1 : orchestrer
 l'existant, jamais une forge dédiée). Une mission de conseil reprend des besoins, des
 problématiques d'exploitation (charge, performance, temps de réponse, coûts), des CDC,
 des spécifications ou des architectures — et rend un diagnostic, des recommandations, un

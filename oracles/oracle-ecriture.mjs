@@ -4,7 +4,7 @@
  * L'ÉTAIT PAR RIEN.
  *
  * POURQUOI (mandat humain du 12/09/2026, décisions D-1 (a) et D-3 (a) de la synthèse 20260911j ;
- * analyse L99 `output\03-etudes\20260911-L99-regles-d-ecriture-factory.md`). Une restitution passe
+ * analyse L99 `output\03-etudes\2026-09\20260911-L99-regles-d-ecriture-factory.md`). Une restitution passe
  * sous S1-S41, un document sous M7-M18, une page sous L1-L31 : la STRUCTURE d'un livrable est
  * tenue par des oracles exécutés. Sa PROSE ne l'était par personne — un texte pouvait sortir
  * conforme à son gabarit, ponctuellement juste, et écrit dans la cadence mécanique que les deux

@@ -3,7 +3,7 @@
 Ce document fixe les règles d'écriture que tout texte produit par la Factory, ses forges et ses
 produits respecte, quel que soit son auteur. Il est né du mandat humain du 12/09/2026 (décisions
 D-1 (a) et D-3 (a) de la synthèse 20260911j) sur l'analyse L99
-`output\03-etudes\20260911-L99-regles-d-ecriture-factory.md`. Vous y trouverez ce que le
+`output\03-etudes\2026-09\20260911-L99-regles-d-ecriture-factory.md`. Vous y trouverez ce que le
 plancher exige, à quels textes il s'applique, qui le juge, et ce qu'il ne fait pas.
 
 **Le fait qui l'a fait naître.** La forme des textes est jugée à chaque tour (quarante et une

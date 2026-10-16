@@ -3,7 +3,7 @@
  "version": "1.0.0",
  "cree_le": "2026-09-14",
  "decision": "D-8 (a) du 14/09/2026 — synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md",
- "source": "todo/TODO-ARCHIVE.jsonl (reste_a_faire des items archives) ; tri : output/03-etudes/20260914-releve-restes-archives.md",
+ "source": "todo/TODO-ARCHIVE.jsonl (reste_a_faire des items archives) ; tri : output/03-etudes/2026-09/20260914-releve-restes-archives.md",
  "modele": "c:/dev/digit-ai-forge-tests/registre-dette.json (statuts assume / todo / retiree / ok)",
  "statuts": {
   "assume": "limite ecrite et motivee par l item qui l a close ; ne demande pas de travail, elle ne se confond plus avec du travail oublie",

@@ -2,7 +2,7 @@
 /**
  * decouvrir-oracles.mjs — les oracles du PILOT, lus sur le disque, au contrat commun du parc
  * (TF-1319, 23/09/2026 : temps 2 du verdict O3 de l'étude
- * `output/03-etudes/20260819-etude-opportunite-meta-oracle-enclenchement.md`).
+ * `output/03-etudes/2026-08/20260819-etude-opportunite-meta-oracle-enclenchement.md`).
  *
  * ============================================================================================
  * LE CONTRAT, ET POURQUOI IL EST LE MÊME PARTOUT
