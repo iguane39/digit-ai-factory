@@ -38,7 +38,7 @@ Aucune décision ne vous revient dans ce tour. La publication du pilot reste sou
 
 - **4 fichiers d'`input\01-candidatures\`.** Motif : ils relèvent d'un traitement, pas d'un rangement. La candidature DataForSEO de Produit-02 du 31/08 n'a jamais été ingérée sous sa forme brute, et sa forme normalisée a changé depuis son ingestion. `porte-publication-faux-positif-20260909a` a lui aussi changé depuis son ingestion.
 - **Lot au sas `_arrivee`, déposé ce matin.** Motif : il demande un accueil puis une ingestion, et c'est une action du bloc 8.
-- **Publication du pilot.** Motif : décision humaine (R-38). Le pilot a 12 commits d'avance et 12 de retard : il faut d'abord le rebaser.
+- **Publication du pilot.** Motif : décision humaine (R-38). Le pilot a 12 commits de retard sur son distant, et les commits de ce poste en divergent : il faut d'abord le rebaser.
 
 ## 6. Écarts à la lettre
 
