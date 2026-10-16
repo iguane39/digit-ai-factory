@@ -7,7 +7,7 @@
 ## Rôle
 
 <!-- ROLE:DEBUT -->
-_(rôle à rédiger : ce que ce dossier contient, qui y écrit, quand — puis relancer `node scripts\readme-dossiers.mjs`)_
+Versions remplacées des plans et prompts de `output\04-plans\`, gardées pour trace (règle 7 des règles du projet). Une session y déplace par `git mv` l'ancienne version d'un livrable quand elle en dépose une nouvelle sous le même radical ; personne n'y écrit de livrable neuf.
 <!-- ROLE:FIN -->
 
 ## Contenu

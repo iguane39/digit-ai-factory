@@ -16,7 +16,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| [`old\`](old/README.md) | dossier (1 fichier) | — | rôle à rédiger dans son README |
+| [`old\`](old/README.md) | dossier (1 fichier) | — | Versions remplacées des plans et prompts de `output\04-plans\`, gardées pour trace (règle 7 des règles du projet). Une session y déplace par `git mv` l'ancienne… |
 | `20260813-plan-strategie-tests-e2e.md` | fichier | 13,3 Ko | Plan de mise en œuvre — stratégie de tests de bout en bout, complète et autonome-sous-gate |
 | `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,2 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
