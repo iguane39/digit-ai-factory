@@ -10,7 +10,7 @@ Un produit Supabase trouve désormais, à chaque étape, l'outillage d'un produi
 
 ## 1. En-tête d'identification
 
-Synthèse de clôture du run de mandat « exécute le prompt », sur le prompt « Competences Supabase dans les forges », version b. Forges touchées : forge-agents, forge-ops, forge-audit, forge-data, et le pilot digit-ai-factory. Période : 16/10/2026 de 10:27 à 11:26, heure de Paris (UTC+02:00). Session pilote Claude Opus 5.5 ; 3 agents Opus 5.5, un par forge, en parallèle.
+Synthèse de clôture du run de mandat « exécute le prompt », sur le prompt « Competences Supabase dans les forges », version b. Forges touchées : forge-agents, forge-ops, forge-audit, forge-data, et le pilot digit-ai-factory. Période : 16/10/2026 de 10:27 à 11:30, heure de Paris (UTC+02:00). Session pilote Claude Opus 5.5 ; 3 agents Opus 5.5, un par forge, en parallèle.
 
 Intention de la demande : qu'un run de produit Supabase trouve à chaque étape son outillage, câblé et prouvé, sans fichier que rien n'appelle.
 
@@ -51,7 +51,7 @@ Rappel de D-1, la couverture de forge-tests posée à 10:26 : close sans objet. 
 - **Pilot, garde-fous (TF-1836).** R-14 reconnaît `.supabase/access-token` et `.env.keys` : 185 PASS et 1 FAIL avant le motif, 186 PASS après. Le gabarit `.gitignore` ignore aussi `supabase/.temp/` et `.branches` : FAIL sur l'ancien gabarit, 10 PASS sur le nouveau. Commits locaux 8cac7905 et 184002a1.
 - **Secrets.** `git grep -E` des motifs `sb_secret_`, JWT `eyJ` et `<ref>.supabase.co` sur les fichiers des 4 commits de forge : 0 occurrence. Aucun `createHash` neuf.
 - **Prompt b corrigé.** forge-tests est sans objet ; les mentions Azure de forge-development (Azure DevOps) et de forge-conception (terme SSO) reçoivent un écart motivé ; le contrôle de secrets nommé est celui qui existe. La version a passe dans `old\`.
-- **Recette complète du pilot.** `node oracles/self-tests.mjs` rend 218 oracles verts sur 219, exit 1. Le défaut est `banc-mutation.test.mjs` (12 PASS, 2 FAIL) : son manifeste vise `input/00-retours/produits-anciens - RETOURS - 20260906a.md`, déplacé ce matin par la session qui range `input\`. Ce défaut n'est pas imputable à ce run, et la session de rangement en est informée.
+- **Recette complète du pilot.** `node oracles/self-tests.mjs` rend 218 oracles verts sur 219, exit 1. Le défaut est `banc-mutation.test.mjs` (12 PASS, 2 FAIL) : son manifeste vise `input/00-retours/produits-anciens - RETOURS - 20260906a.md`, déplacé ce matin par la session qui range `input\`. Ce défaut n'était pas imputable à ce run : la session de rangement a corrigé le manifeste, et le banc rejoué à 11:29 rend 14 PASS, 0 FAIL.
 
 ## 5. Non traité
 
