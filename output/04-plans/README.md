@@ -74,6 +74,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` | fichier | 9,9 Ko | Synthèse Mandat — correctif d'ouverture arrêté sur une base qui a bougé, 2 candidatures in |
 | `Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` | fichier | 9,3 Ko | Synthèse Mandat — ouverture de session VS Code : correctif repris, propagé aux 19 produits |
 | `Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` | fichier | 5,6 Ko | Synthèse Mandat — pilot publié après reconstruction sur le distant, décision « 2a » exécut |
+| `Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` | fichier | 8,3 Ko | Synthèse Mandat — plans classés par mois, noms trop longs raccourcis (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
 | `Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` | fichier | 5,3 Ko | Synthèse Mandat — vos décisions D-61 (a), D-62 (a) et D-63 sont exécutées : 3 dépôts publi |
 | `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
@@ -93,4 +94,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` | fichier | 17,6 Ko | Synthèse Mandat — 4 lots reçus, 10 corrections faites et publiées, 5 décisions vous revien |
 | `Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` | fichier | 16,1 Ko | Synthèse Mandat — la recette hébergée du pilot repasse au vert, les 2 lots du jour attende |
 
-_73 fichier(s), 3 sous-dossier(s)_
+_74 fichier(s), 3 sous-dossier(s)_
