@@ -72,6 +72,17 @@ check("vert — TF-1703 : un journal rangé comme PREUVE sous forge\\ reste vers
   for (const rel of ["forge/etapes/p2/_oracles-journal.json", "forge/oracles/_oracles-journal-historique.jsonl"])
     if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
 });
+// Supabase (16/10/2026) : jeton du CLI, dossiers locaux de `supabase link` et clés dotenvx, d'après
+// supabase.com/docs/reference/cli et le dépôt github.com/supabase/cli, lus le 16/10/2026.
+check("rouge → vert — Supabase : le gitignore socle ignore le jeton du CLI et ses dossiers locaux", () => {
+  for (const rel of [".supabase/access-token", "supabase/.temp/project-ref", "supabase/.temp/pooler-url", "supabase/.branches/_current_branch", "supabase/.env.keys"])
+    if (!socle.ignore(rel)) throw new Error(`${rel} n'est pas ignoré par gabarits/gitignore-produit`);
+  if (vide.ignore("supabase/.temp/project-ref")) throw new Error("la recette ne distingue pas avec et sans règle");
+});
+check("vert — Supabase : migrations et config.toml restent versionnables (« safe to commit »)", () => {
+  for (const rel of ["supabase/config.toml", "supabase/migrations/20261016000000_init.sql", "supabase/functions/notifier/index.ts"])
+    if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
+});
 // TF-1750 (D-5 (a) du 15/10/2026) : ce que le programme écrit en service vit sous var\, ignoré.
 const heritage = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
 check("rouge → vert — TF-1750 : le gitignore socle ignore var\\ (fichiers déposés, journaux, base locale)", () => {

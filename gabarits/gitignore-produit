@@ -37,6 +37,14 @@
 **/accessTokens.json
 **/credentials.json
 **/application_default_credentials.json
+# Supabase (16/10/2026) : `supabase login` écrit son jeton en clair dans `.supabase/access-token`
+# faute de stockage natif (supabase.com/docs/reference/cli) ; `supabase link` écrit
+# `supabase/.temp/` (project-ref, pooler-url) ; le `.gitignore` de `supabase init` exclut aussi
+# `.branches` et `.env.keys` (dépôt github.com/supabase/cli). Sources lues le 16/10/2026.
+**/.supabase/access-token
+**/supabase/.temp/
+**/supabase/.branches/
+**/.env.keys
 
 # ---- Artefacts compilés et dépendances ---------------------------------------------------------
 # Aucun projet n'a de raison de versionner ce qu'une commande régénère.

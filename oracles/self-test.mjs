@@ -2601,6 +2601,18 @@ check("TF-1284 rouge : le MÊME profil sous un dossier ordinaire (outils/azure/)
     if (!f.some((x) => x.regle === "R-28" && x.statut === "PASS")) throw new Error(`R-28 accuse un dossier ordinaire : ${JSON.stringify(f)}`);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
+// Supabase (16/10/2026) : `supabase login` écrit le jeton en clair dans `~/.supabase/access-token`
+// faute de stockage natif (supabase.com/docs/reference/cli, lu le 16/10/2026), et le `.gitignore`
+// posé par `supabase init` exclut `.env.keys` (dépôt github.com/supabase/cli, lu le même jour).
+check("Supabase rouge : `.supabase/access-token` et `supabase/.env.keys` commis → R-14 FAIL, les deux nommés ; un `access-token` hors `.supabase/` n'est pas accusé", () => {
+  const d = projet1284({ "README.md": "# p\n", ".supabase/access-token": "x\n", "supabase/.env.keys": "x\n", "docs/access-token": "x\n" });
+  try {
+    const f = r1284(d);
+    const r14 = f.find((x) => x.regle === "R-14" && x.statut === "FAIL" && /PROFIL/.test(x.message));
+    if (!r14 || !/\.supabase\/access-token/.test(r14.message) || !/\.env\.keys/.test(r14.message)) throw new Error(`R-14 ne voit pas les fichiers du CLI Supabase : ${JSON.stringify(f)}`);
+    if (/docs\/access-token/.test(r14.message)) throw new Error(`R-14 accuse un access-token hors .supabase/ : ${r14.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
 check("TF-1284 remède joué : `git rm -r --cached C` puis commit → R-14 et R-28 PASS (TF-1013)", () => {
   const d = projet1284({ "README.md": "# p\n", "C/azureProfile.json": "{}\n", "C/az.sess": "{}\n" });
   try {

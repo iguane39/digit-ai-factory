@@ -26,8 +26,14 @@ ou n'existe pas).
 3. **Relevé des surfaces par mesure, pas par liste.** Pour chaque dépôt du parc, compter
    `git grep -il databricks` et `git grep -il azure`. Le relevé du 16/10/2026 donne Databricks dans
    forge-agents (10 fichiers), forge-audit (43), forge-data (22), forge-ops (4), **forge-tests (4)**
-   et le pilot (36). Toute forge où ce compte est non nul reçoit une décision écrite : surface
-   Supabase à créer, ou écart motivé. La table ci-dessous est un point de départ, pas un plafond.
+   et le pilot (36) ; Azure en plus dans forge-development (29) et forge-conception (1). Toute
+   forge où l'un des deux comptes est non nul reçoit une décision écrite : surface Supabase à
+   créer, ou écart motivé. La table ci-dessous est un point de départ, pas un plafond.
+   *Correctif du 16/10/2026, relecture aveugle d'une autre session* : les 4 fichiers de
+   forge-tests commentent un défaut corrigé (TF-0381, variables Databricks réclamées à tort), les
+   mentions Azure de forge-development visent Azure DevOps (hôte git et pipelines), celle de
+   forge-conception un terme SSO d'`oracle-ears`. Aucune n'est une surface à reproduire : chacune
+   reçoit un écart motivé.
 4. **Ancrage par symbole.** Les numéros de ligne de la table datent du 16/10/2026 et dériveront :
    l'exécutant retrouve chaque point par son symbole (`PLANS.azure`, `const CLI`, `PROFILS_AUTH`),
    jamais par la ligne.
@@ -40,7 +46,7 @@ ou n'existe pas).
 | forge-ops, cibles de plan | `scripts/ops.mjs` : entrée `azure` de `PLANS` (l. 334), `PLANS["databricks-bundle"]` (l. 414) ; `oracles/oracle-ops.mjs`, table `CLI` (l. 117) ; `oracles/self-test.mjs`, deux boucles de cibles (l. 173 et 191) | Entrée `supabase` : 4 phases (provision, deploiement, healthcheck, rollback), placeholders, zéro credential, publication sur GO humain (R-38) ; `supabase: "supabase "` dans `CLI` ; cible ajoutée aux deux boucles du self-test. Le rollback cite ce que la documentation offre réellement ; s'il n'existe pas de retour arrière natif des migrations, la phase le dit et décrit la voie retenue (migration corrective, restauration à un instant) |
 | forge-audit, profils | `profiles/azure/`, `profiles/databricks-lakehouse/` (README.md + bindings.json, contrôles AuditCore avec `verification_command` et `evidence`) | `profiles/supabase/`. Contrôles candidats, chacun à confirmer par une page datée de la documentation avant d'entrer : RLS activée sur toute table exposée par l'API, clé `service_role` absente du code client, politiques de stockage, configuration d'auth, sauvegardes et restauration à un instant, restrictions réseau, SSL imposé. Un contrôle sans source datée sort du profil et devient candidat |
 | forge-data, profils-moteur | `references/profils-moteur/azure-sql.md`, `databricks.md`, `postgres.md` ; doctrine `references/profils-moteur/LISEZMOI.md` | Décision écrite selon la doctrine de `LISEZMOI.md` (référentiel versionné, pas un verbe) : soit `supabase.md` dit ce qu'il ajoute à `postgres.md` (schémas `auth`, `storage`, politiques RLS, export par le CLI), soit `postgres.md` gagne une section Supabase. Le verbe `importer` ne s'étend que sur une fixture d'export réel, prouvée par non-recouvrement (R-28, comme le prévoit `LISEZMOI.md` l. 25) |
-| forge-tests | `forge_tests/noyau.py` l. 116, `forge_tests/actions.py` l. 339, `tests/test_tf_0381_action_sans_issue.py` : variables `DATABRICKS_*` réclamées par pan | Décision écrite : les variables Supabase (URL de projet, clé publique) sont-elles sollicitées par pan selon la même règle (R-48), et les tests de base de données du CLI sont-ils un pan testable ? Créer ou écarter avec motif |
+| forge-tests | `forge_tests/noyau.py` l. 116, `forge_tests/actions.py` l. 339, `tests/test_tf_0381_action_sans_issue.py` : variables `DATABRICKS_*` réclamées par pan | **Sans objet** (correctif de l'étape 0) : ces lignes commentent un défaut corrigé, aucune surface à reproduire ; écart motivé au bilan. Décision initiale, conservée pour trace : les variables Supabase (URL de projet, clé publique) sont-elles sollicitées par pan selon la même règle (R-48), et les tests de base de données du CLI sont-ils un pan testable ? Créer ou écarter avec motif |
 | pilot, garde-fous | `oracles/oracle-conformite-projet.mjs`, contrôle R-14 (l. 1478) et motif `PROFILS_AUTH` (l. 1489) ; `gabarits/gitignore-produit` l. 33-36 | Fichiers d'authentification et dossiers locaux du CLI Supabase ajoutés à `PROFILS_AUTH` et au gabarit `.gitignore`, chacun tiré d'une page datée de la documentation ; fixture rouge (fichier versionné) et verte dans le self-test de conformité |
 
 ## Contraintes
@@ -81,7 +87,9 @@ ou n'existe pas).
   exit 0 ; symbole appelé (sortie de `git grep`).
 - Zéro valeur Supabase sans source datée (contrôle : chaque fichier neuf porte `sources` au
   frontmatter, et chaque commande du plan ops figure dans une page citée).
-- Zéro jeton, URL de projet réelle ou clé dans les fichiers ajoutés (`oracle-secrets`).
+- Zéro jeton, URL de projet réelle ou clé dans les fichiers ajoutés. Aucun oracle `oracle-secrets`
+  n'existe dans le parc : le contrôle est un `git grep -E` des motifs `sb_secret_…`,
+  `eyJ….…` et `<ref de 20 lettres>.supabase.co` sur les fichiers du commit, sortie relevée.
 - Items TF journalisés, versions montées, CHANGELOG à jour, push des forges vérifié.
 - Synthèse nommée selon R-4 et R-25 : `Digit-AI - Synthese Mandat - Competences Supabase dans les
   forges - AAAAMMJJ<indice>.md`, dans `output\04-plans\`, jugée PASS par `oracle-synthese`.
