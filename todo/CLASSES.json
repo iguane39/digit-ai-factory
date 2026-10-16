@@ -1212,11 +1212,11 @@
   {
    "cle": "restitution-bloquants-disperses",
    "famille": "restitution-forme",
-   "libelle": "Ce qui empeche d avancer est reparti entre plusieurs blocs de la restitution — une decision qui nomme le prealable bloquant et renvoie ailleurs, des restes aux motifs types, des actions qui repetent l information sous une autre forme — et nulle part ecrit en entier avec la valeur attendue et le geste qui le leve : le lecteur doit ouvrir un fichier pour savoir ce qui le bloque. Mesure le 13/09/2026 sur une restitution jugee PASS, production arretee (lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1).",
+   "libelle": "Ce qui empeche d avancer est reparti entre plusieurs blocs de la restitution — une decision qui nomme le prealable bloquant et renvoie ailleurs, des restes aux motifs types, des actions qui repetent l information sous une autre forme — et nulle part ecrit en entier avec la valeur attendue et le geste qui le leve : le lecteur doit ouvrir un fichier pour savoir ce qui le bloque. Mesure le 13/09/2026 sur une restitution jugee PASS, production arretee (lot input/00-retours/old/Produit-64/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1).",
    "creee_le": "2026-09-15",
    "fondee_par": [],
    "regle": "tout element qui bloque la suite est ecrit une fois, en entier, a un seul endroit de la restitution — ce qui manque, qui peut le fournir, le geste qui le leve — et les autres blocs y renvoient par son selecteur",
-   "oracle": "a creer dans oracle-synthese (candidature du lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1)",
+   "oracle": "a creer dans oracle-synthese (candidature du lot input/00-retours/old/Produit-64/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1)",
    "voisines": [
     "restitution-fichier-juge-mal-choisi",
     "restitution-action-humaine-geste-agent",
@@ -1226,11 +1226,11 @@
   {
    "cle": "preuve-produite-mais-illisible",
    "famille": "page-html-socle",
-   "libelle": "Une preuve est produite et citee, mais elle ne peut pas etre lue par celui qui s en sert : une capture pleine page ramenee a la taille d affichage divise un corps de texte de 16 pixels par 9,5 a 23, et une revue de lecture se declare faite sur une image ou rien n est lisible. Mesure le 13-14/09/2026 : cinq defauts graphiques passes sous une revue declaree sans constat (lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5).",
+   "libelle": "Une preuve est produite et citee, mais elle ne peut pas etre lue par celui qui s en sert : une capture pleine page ramenee a la taille d affichage divise un corps de texte de 16 pixels par 9,5 a 23, et une revue de lecture se declare faite sur une image ou rien n est lisible. Mesure le 13-14/09/2026 : cinq defauts graphiques passes sous une revue declaree sans constat (lot input/00-retours/old/Produit-64/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5).",
    "creee_le": "2026-09-15",
    "fondee_par": [],
    "regle": "une preuve visuelle citee a l appui d une revue est lisible a sa taille d affichage — capture decoupee ou a l echelle 1, jamais une pleine page reduite — et la revue nomme les captures qu elle a lues",
-   "oracle": "a creer dans render_page.py du socle digit-ai-page-html (candidature du lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5)",
+   "oracle": "a creer dans render_page.py du socle digit-ai-page-html (candidature du lot input/00-retours/old/Produit-64/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5)",
    "voisines": [
     "restitution-rendu-visuel-non-critique",
     "page-html-largeur-lecture-donnees"
