@@ -47,7 +47,7 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 20,
+  "cas": 21,
   "vu_le": "2026-10-15"
  },
  "gabarits/ledger.test.mjs": {
@@ -67,7 +67,7 @@
   "vu_le": "2026-10-12"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 90,
+  "cas": 92,
   "vu_le": "2026-10-15"
  },
  "gabarits/oracle-revue-deck.test.mjs": {
@@ -148,7 +148,7 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 185,
+  "cas": 186,
   "vu_le": "2026-10-17"
  },
  "oracle-constantes-externes.mjs": {
@@ -415,7 +415,7 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 38,
+  "cas": 40,
   "vu_le": "2026-10-18"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
@@ -917,5 +917,9 @@
  "todo/stock-sans-classe.test.mjs": {
   "cas": 4,
   "vu_le": "2026-10-13"
+ },
+ "todo/revues-datees.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-10-16"
  }
 }

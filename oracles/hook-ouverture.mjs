@@ -635,6 +635,22 @@ if (iPilot < 0) {
   } catch (e) { lignes.push("", `- revue hebdomadaire des propositions : NON mesurée (${String(e.message).slice(0, 160)})`); }
 }
 
+// TF-1831 (16/10/2026) — UN PLAN DE REVUE DATÉ SE RAPPELLE À SA DATE. Toute étude porte un plan de
+// revue daté (E7) et rien ne le rappelait. Un item qui porte `revue_le` est publié ici dès sa date,
+// avec sa commande de mesure ; jouer la mesure et consigner `revue_jouee_le` reste un geste du tour.
+if (iPilot < 0) {
+  try {
+    const { revuesDues, revuesAVenir } = await import(pathToFileURL(join(PILOT, "todo", "revues-datees.mjs")).href);
+    const { etatCourant } = await import(pathToFileURL(join(PILOT, "todo", "revue-hebdo.mjs")).href);
+    const etat = etatCourant(readFileSync(join(PILOT, "todo", "TODO.jsonl"), "utf8"));
+    const jour = new Date().toISOString().slice(0, 10);
+    const dues = revuesDues(etat, jour), avenir = revuesAVenir(etat, jour);
+    lignes.push("", "## Revues datées (TF-1831, todo/revues-datees.mjs)");
+    if (!dues.length) lignes.push(`- aucune revue due${avenir.length ? ` ; prochaine : ${avenir[0].id} le ${avenir[0].revue_le}` : ""}`);
+    else for (const d of dues) lignes.push(`- **revue DUE depuis le ${d.revue_le} : ${d.id}** — ${d.titre.slice(0, 140)}${d.commande ? ` ; mesure : \`${d.commande}\`` : ""} ; puis consigner \`revue_jouee_le\` au registre`);
+  } catch (e) { lignes.push("", `- revues datées : NON mesurées (${String(e.message).slice(0, 160)})`); }
+}
+
 // TF-1301 (13/10/2026) — LE STOCK D'ITEMS OUVERTS SANS CLASSE SE PUBLIE À CHAQUE OUVERTURE. La porte posée
 // sur l'écriture du registre refuse les créations sans classe ; elle ne garde pas le stock qui la précède, et ce
 // stock devenait invisible au compteur qu'elle existe pour rendre lisible. Le compte est une mesure, jamais un
