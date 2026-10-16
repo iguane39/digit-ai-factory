@@ -10,7 +10,7 @@ Un produit Supabase trouve désormais, à chaque étape, l'outillage d'un produi
 
 ## 1. En-tête d'identification
 
-Synthèse de clôture du run de mandat « exécute le prompt », sur le prompt « Competences Supabase dans les forges », version b. Forges touchées : forge-agents, forge-ops, forge-audit, forge-data, et le pilot digit-ai-factory. Période : 16/10/2026 de 10:27 à 11:36, heure de Paris (UTC+02:00). Session pilote Claude Opus 5.5 ; 3 agents Opus 5.5, un par forge, en parallèle.
+Synthèse de clôture du run de mandat « exécute le prompt », sur le prompt « Competences Supabase dans les forges », version b. Forges touchées : forge-agents, forge-ops, forge-audit, forge-data, et le pilot digit-ai-factory. Période : 16/10/2026 de 10:27 à 11:31, heure de Paris (UTC+02:00). Session pilote Claude Opus 5.5 ; 3 agents Opus 5.5, un par forge, en parallèle.
 
 Intention de la demande : qu'un run de produit Supabase trouve à chaque étape son outillage, câblé et prouvé, sans fichier que rien n'appelle.
 
