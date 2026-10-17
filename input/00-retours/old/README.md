@@ -48,6 +48,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`Produit-67\`](Produit-67/README.md) | dossier (2 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-67 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
 | [`Produit-68\`](Produit-68/README.md) | dossier (8 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-68 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
 | [`Produit-70\`](Produit-70/README.md) | dossier (2 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-70 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
+| [`Produit-72\`](Produit-72/README.md) | dossier (8 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-72 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
 | [`Produit-76\`](Produit-76/README.md) | dossier (10 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-76 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
 | [`Produit-77\`](Produit-77/README.md) | dossier (8 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-77 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
 | [`Produit-78\`](Produit-78/README.md) | dossier (16 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-78 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
@@ -57,7 +58,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`Produit-82\`](Produit-82/README.md) | dossier (22 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-82 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
 | [`Produit-83\`](Produit-83/README.md) | dossier (8 fichiers) | — | Lots de retours ingérés de l'émetteur « Produit-83 » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-doss… |
 | [`produits-anciens\`](produits-anciens/README.md) | dossier (2 fichiers) | — | Lots de retours ingérés de l'émetteur « produits-anciens » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\range… |
-| [`UIA\`](UIA/README.md) | dossier (8 fichiers) | — | Lots de retours ingérés de l'émetteur « UIA » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\ranger-dossiers.mj… |
 | `Produit-61 - Étude - 20260909b.md` | fichier | 8,1 Ko | Pourquoi la construction a laissé passer ce que l'audit trouve |
 
 _1 fichier(s), 42 sous-dossier(s)_

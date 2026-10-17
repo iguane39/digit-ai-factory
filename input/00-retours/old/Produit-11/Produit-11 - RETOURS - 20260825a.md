@@ -20,7 +20,7 @@ aller-retour ou une découverte par lecture de code) · **mineur** (confort/pré
 **CE QUI S'EST PASSÉ, SANS ENJOLIVER.** L'agent devait ajouter deux lignes au `.env` du produit.
 Il a écrit `cat >> .env` sans chemin absolu, depuis un répertoire de travail qui n'était pas
 celui qu'il croyait. Le fichier a été **créé** — pas modifié, créé — dans
-`c:\dev\_Client-A\BourseAuxVacants2\`, le dossier PARENT du dépôt. L'humain y a collé une clé
+`c:\dev\_Client-A\Produit-11\`, le dossier PARENT du dépôt. L'humain y a collé une clé
 d'abonnement réelle. L'application, elle, lit `…\Produit-11\.env` : la clé était dans un
 fichier que rien ne consulte, et il a fallu un aller-retour pour s'en apercevoir. **C'est une
 faute de l'agent.** Les deux retours ci-dessous portent sur ce que l'outillage aurait pu voir et
@@ -88,7 +88,7 @@ git status --short | grep .env →  (rien)
 
 Les deux réponses sont **vraies**. Elles portent sur `…\Produit-11\.env`, parce que la
 commande a tourné depuis le dépôt. Le fichier écrit, lui, était
-`…\BourseAuxVacants2\.env`. **Le contrôle était juste ; son objet était faux.** Il a donc rendu
+`…\Produit-11\.env`. **Le contrôle était juste ; son objet était faux.** Il a donc rendu
 un vert sur un fichier que personne n'avait touché, et l'agent a rapporté à l'humain que sa clé
 était en sécurité.
 

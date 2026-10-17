@@ -1,6 +1,6 @@
 # Retours forges — Produit-11 — 20260814a
 
-- **Contexte** : rangement des dossiers de livrables après le run `20260814-bav2-completion`
+- **Contexte** : rangement des dossiers de livrables après le run `20260814-Produit-11-completion`
   — un geste d'entretien, pas un audit. C'est en vérifiant ce que je pouvais déplacer sans
   casser une mesure que le constat est apparu.
 - **Références ledger** : `forge\ledger.jsonl` seq 95

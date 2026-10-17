@@ -64,6 +64,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node oracles/hook-puits-windows.mjs",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUse": [

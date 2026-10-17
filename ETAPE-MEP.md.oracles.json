@@ -1,14 +1,16 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\ETAPE-MEP.md",
-  "date_iso": "2026-09-05T13:18:05.215Z",
-  "registre_version": "2.16.0",
+  "cible": "C:\\dev\\digit-ai-factory\\ETAPE-MEP.md",
+  "date_iso": "2026-10-17T08:58:44.343Z",
+  "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
-  "verdict": "PASS",
+  "verdict": "FAIL",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 4,
-    "fail": 0,
-    "skip": 3,
+    "fail": 2,
+    "skip": 2,
     "cache": 0
   },
   "bilan_fichiers": {
@@ -25,8 +27,8 @@
     {
       "domaine": "Lisibilité d'un document (Markdown)",
       "file": "ETAPE-MEP.md",
-      "verdict": "PASS",
-      "detail": ""
+      "verdict": "FAIL",
+      "detail": "1 constat(s) · M18 identifiant muet : « RA-77 » employé sans son sens (ligne 673) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
     },
     {
       "domaine": "Format / livraison / versioning",
@@ -38,42 +40,48 @@
       "domaine": "Sécurité / secrets",
       "file": "ETAPE-MEP.md",
       "verdict": "PASS",
-      "detail": "aucun secret détecté"
+      "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
       "file": "ETAPE-MEP.md",
-      "verdict": "PASS",
-      "detail": "0 total(aux) de colonne vérifié(s) par re-somme + 3 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 0/0 mesure(s) publiée(s) portant leur dénominateur et leurs unités, 0 écart"
+      "verdict": "FAIL",
+      "detail": "2 constat(s) · N2 — compte contradictoire dans le même document : « 6 règles » alors que le cardinal réel mesuré est 3 ; N2 — compte contradictoire dans le même document : « Deux règles » alors que le cardinal réel mesuré est 3"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "ETAPE-MEP.md",
-      "verdict": "SKIP",
-      "detail": ""
+      "verdict": "PASS",
+      "detail": "6 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; date d'engagement non sourcée : « **Le fait, du 29/09/2026 chez Produit-03.** La première livraison de production  »"
     },
     {
       "domaine": "Nommage / convention de livraison",
       "file": "ETAPE-MEP.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
       "file": "ETAPE-MEP.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 6 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 1 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    },
+    {
+      "domaine": "Livrabilité d'une conséquence déclarée",
+      "file": "ETAPE-MEP.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune forme de subissance en contexte de repli — hors périmètre"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "ETAPE-MEP.md",
-    "ts": "2026-09-05T13:18:05.214Z",
+    "ts": "2026-10-17T08:58:44.342Z",
     "fichiers": {
-      "ETAPE-MEP.md": "339872f164f22ff199ed7c063d547bade20abd95594fd1e003e47017d56c94de"
+      "ETAPE-MEP.md": "78fa6f32f4e22bff176baab5fc22bd8a96343a42b7a7eb65689dc471d5b66cbb"
     }
   },
   "empreinte_motif": null,
-  "verdict_oracles": "PASS"
+  "verdict_oracles": "FAIL"
 }

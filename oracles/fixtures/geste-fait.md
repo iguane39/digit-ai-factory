@@ -8,17 +8,20 @@ La publication est faite : la version corrigée est partie vers le dépôt dista
 
 ## 3. Décisions attendues
 
-> **D-12 — Faut-il enchaîner sur la forge-ops ce soir, ou reprendre demain matin ?** La publication qui vient d'être faite libère la suite du mandat ; la seule question est de savoir si on enchaîne tout de suite sur `digit-ai-forge-ops`, ou si on s'arrête là pour la journée avec un état propre.
+> **D-12 — Faut-il enchaîner sur la forge-ops ce soir, ou reprendre demain matin ?**
 >
-> **Recommandation : (b).** Source consultée : `references\ETAPES-RUN.md` — un enchaînement de forge se prend en début de tour, jamais après un geste de publication.
+> - **De quoi s'agit-il** : la suite du mandat, le travail sur `digit-ai-forge-ops`, que la publication qui vient d'être faite libère.
+> - **Le problème** : enchaîner tout de suite allonge la session ; s'arrêter laisse un état propre pour la nuit.
+> - **Pourquoi vous** : c'est votre préférence de rythme, aucun fait ne la tranche.
+> - **Recommandation : (b)** — un enchaînement de forge se prend en début de tour, jamais après un geste de publication. Source consultée : `references\ETAPES-RUN.md`.
 
-| Option | Coût | Exclusions |
-|---|---|---|
-| (a) enchaîner ce soir | une session longue | un état stable pour la nuit |
-| (b) reprendre demain matin | une demi-journée de décalage | l'avance prise ce soir |
-| (c) suspendre le mandat | la perte du fil du mandat | toute suite automatique |
+| Option | Ce qui se passe | Coût | Retour arrière |
+|---|---|---|---|
+| (a) Enchaîner ce soir | La forge-ops est ouverte dans la foulée ; pas d'état stable pour la nuit | Une session longue | Possible |
+| (b) Reprendre demain matin | La session s'arrête sur un état propre ; l'avance de ce soir est perdue | Une demi-journée de décalage | Possible |
+| (c) Suspendre le mandat | Aucune suite automatique | La perte du fil du mandat | Possible |
 
-> **Si rien n'est décidé** : (c) s'applique — le mandat est suspendu en l'état.
+> **Sans réponse** : (c) s'applique — le mandat est suspendu en l'état.
 
 ## 4. Traité
 - publication exécutée — preuve : `git push origin main` rendu `main -> main`, 683 commits côté distant, recette rejouée 22/22 verte.

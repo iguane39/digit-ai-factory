@@ -1675,7 +1675,8 @@ else {
 // après — les runs ouverts avant n'ont pas pu la connaître, et R-42 interdit de réécrire leur entrée.
 // Elle ne tranche pas la doctrine : les trois contradictions relevées entre le contrat et le référentiel
 // d'audit (route de déploiement manuelle, sauvegarde absente de l'oracle de mise en production, fournisseur
-// d'identité) restent des décisions humaines.
+// d'identité) ont été tranchées par la décision humaine D-3 (a) du 17/10/2026, et se jugent à l'étape MEP
+// (M-16 à M-18, `scripts/verifier-exigences-fatales.mjs`, TM11 à TM13 d'oracle-trace-mutation-mep).
 {
   const DIMENSIONS_D_AUDIT = ["performance", "couts", "observabilite", "principes_data", "gouvernance_ia"];
   const ENTREE_COUVERTURE = "2026-10-13";

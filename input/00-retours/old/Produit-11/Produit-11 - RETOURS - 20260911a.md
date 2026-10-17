@@ -3,7 +3,7 @@
 <!-- Gabarit du pilot (gabarits\RETOURS-FORGES.md). Un fichier = UN lot de retours.
      Un fichier remis ne se modifie JAMAIS — le lot suivant est un nouveau fichier daté. -->
 
-- **Contexte** : mandat du 11/09/2026 — production d'un **plan de tests de sécurité (PenTest)** pour BAV2,
+- **Contexte** : mandat du 11/09/2026 — production d'un **plan de tests de sécurité (PenTest)** pour Produit-11,
   puis trois retours humains successifs : (1) « le format du prompt de sortie n'est pas toujours respecté,
   corrige et remonte encore une fois à la Factory » ; (2) « la forge web sécurité n'a pas été utilisée,
   remonte pour que ce ne soit plus jamais le cas » ; (3) « un manque vis-à-vis de la Factory doit être
@@ -13,7 +13,7 @@
   l'original reste ici (historique du produit).
 - **Statut** : remis le 2026-09-11
 
-**Numérotation** : BAV2 tient une séquence `RT-nn` ; RT-1 … RT-49 sont consommés. Ce lot
+**Numérotation** : Produit-11 tient une séquence `RT-nn` ; RT-1 … RT-49 sont consommés. Ce lot
 continue en RT-50 … RT-52.
 
 Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un
@@ -23,7 +23,7 @@ aller-retour ou une découverte par lecture de code) · **mineur** (confort/pré
 
 ## Le fait mesuré, avant toute interprétation
 
-Session ouverte à la racine **englobante** `c:\dev\_Client-A\BourseAuxVacants2`, config active
+Session ouverte à la racine **englobante** `c:\dev\_Client-A\Produit-11`, config active
 `CLAUDE_CONFIG_DIR=.claude-b`. Le produit instancié vit dans `Produit-75\` (et `Produit-11\`),
 dont le `.claude\settings.json` câble **quatre** hooks de la doctrine : `SessionStart` (fraîcheur),
 `Stop` (**restitution jugée à la fin de chaque tour**), `PostToolUse` (page-html), `UserPromptSubmit`

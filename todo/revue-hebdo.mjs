@@ -34,7 +34,16 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const valeur = (nom, defaut = null) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : defaut; };
 
-const CHAMPS = ["question", "avantages", "inconvenients", "impacts", "options", "recommandation", "source", "ressort"];
+/**
+ * LE FORMAT B (décision humaine du 17/10/2026, `gabarits\RESTITUTION.md` v2.41.0, règle S78) : une
+ * décision se comprend et se tranche sans rien d'autre qu'elle-même. La fiche porte donc l'objet nommé
+ * (`de_quoi`, une valeur sensible masquée, première et dernière lettre visibles), ce qui est en jeu
+ * (`probleme`, un ou deux chiffres), le motif qui revient à l'humain (`pourquoi_vous`), et pour chaque
+ * option ce qui se passe (`effet`), son coût (`cout`) et son retour arrière (`retour`). Les fiches
+ * d'avant, à avantages, inconvénients, impacts et exclusions, restent au registre et se listent « à
+ * instruire » avec ce qui leur manque : rien n'est rendu qu'on n'ait écrit.
+ */
+const CHAMPS = ["question", "de_quoi", "probleme", "pourquoi_vous", "options", "recommandation", "source", "ressort"];
 
 /**
  * LE TRI AVANT LA REVUE (règle humaine du 01/10/2026, R-58) : « Je souhaite que les décisions soient
@@ -72,7 +81,7 @@ export function manques(f) {
   const m = CHAMPS.filter((c) => f[c] === undefined || f[c] === null || f[c] === "" || (Array.isArray(f[c]) && !f[c].length));
   for (const o of ["a", "b", "c"]) {
     const opt = f.options?.[o];
-    if (!opt?.libelle || !opt?.cout || !opt?.exclusions) m.push(`options.${o}`);
+    if (!opt?.libelle || !opt?.effet || !opt?.cout || !opt?.retour) m.push(`options.${o}`);
   }
   if (f.recommandation && !["a", "b", "c"].includes(f.recommandation)) m.push("recommandation (a, b ou c)");
   if (f.ressort && typeof f.ressort === "object") {
@@ -84,29 +93,27 @@ export function manques(f) {
 }
 
 const valeurDe = (e) => Number(e.score?.valeur ?? 0);
-const liste = (x) => (Array.isArray(x) ? x : [x]).map((s) => `${s}`.trim()).filter(Boolean).join(" ; ");
 
-/** Une décision au format du bloc 3 : citation, tableau pleine largeur, repli. */
+/** Une décision au format B du bloc 3 : citation à trois lignes titrées, tableau pleine largeur, repli. */
 export function rendreDecision(n, e) {
   const f = e.fiche_decision;
   const q = f.question.trim().replace(/\s*\?*$/, " ?");
-  const ligne = (o) => `| **(${o})**${f.recommandation === o ? " *(recommandée)*" : ""} ${f.options[o].libelle} | ${f.options[o].cout} | ${f.options[o].exclusions} |`;
+  const point = (s) => `${s}`.trim().replace(/[.\s]*$/, ".");
+  const cellule = (s) => { const c = `${s}`.trim().replace(/\|/g, "\\|"); return c.charAt(0).toUpperCase() + c.slice(1); };
+  const ligne = (o) => `| (${o})${f.recommandation === o ? " *(recommandée)*" : ""} ${cellule(f.options[o].libelle)} | ${cellule(f.options[o].effet)} | ${cellule(f.options[o].cout)} | ${cellule(f.options[o].retour)} |`;
   return [
-    `> **D-${n} — ${q}**`,
+    `> **D-${n} — ${q} (${e.id})**`,
     ">",
-    `> ${f.rappel || e.titre}`,
-    ">",
-    `> **Avantages** : ${liste(f.avantages)}.`,
-    `> **Inconvénients** : ${liste(f.inconvenients)}.`,
-    `> **Impacts** : ${liste(f.impacts)}.`,
-    ">",
-    `> **Recommandation : (${f.recommandation}).** Source consultée : ${f.source}.${f.pourquoi ? ` ${f.pourquoi}` : ""}`,
+    `> - **De quoi s'agit-il** : ${point(f.de_quoi)}`,
+    `> - **Le problème** : ${point(f.probleme)}`,
+    `> - **Pourquoi vous** : ${point(f.pourquoi_vous)}`,
+    `> - **Recommandation : (${f.recommandation})**${f.pourquoi ? ` — ${point(f.pourquoi)}` : "."} Source consultée : ${point(f.source)}`,
     "",
-    "| Option | Coût | Exclusions |",
-    "|---|---|---|",
+    "| Option | Ce qui se passe | Coût | Retour arrière |",
+    "|---|---|---|---|",
     ligne("a"), ligne("b"), ligne("c"),
     "",
-    `> **Si rien n'est décidé** : (c) ${f.options.c.libelle}.`,
+    `> **Sans réponse** : (c), ${point(f.options.c.libelle.charAt(0).toLowerCase() + f.options.c.libelle.slice(1))}`,
     "",
   ].join("\n");
 }
@@ -120,7 +127,7 @@ export function construire({ texteRegistre, depuis, max = 7, jour }) {
   const reportes = humains.slice(max);
   const ligneAuto = (e) => {
     const f = e.fiche_decision;
-    return `- ${f.rappel || e.titre} Option appliquée : ${f.options[f.recommandation].libelle}. Pourquoi sans vous : ${f.ressort.pourquoi}.`;
+    return `- ${f.de_quoi || f.rappel || e.titre} Option appliquée : ${f.options[f.recommandation].libelle}. Pourquoi sans vous : ${f.ressort.pourquoi}.`;
   };
   const aInstruire = candidats.filter((e) => e.fiche_decision && manques(e.fiche_decision).length)
     .map((e) => ({ id: e.id, titre: e.titre, manques: manques(e.fiche_decision) }));
@@ -129,7 +136,7 @@ export function construire({ texteRegistre, depuis, max = 7, jour }) {
   const corps = [
     `# Revue hebdomadaire des propositions — ${jour}`,
     "",
-    `${retenus.length} proposition(s) vous reviennent cette semaine, classées par valeur au registre. Chacune dit ses avantages, ses inconvénients et ses impacts, puis ses 3 options ; la colonne Coût dit la complexité et la durée, la colonne Exclusions ce que retenir l'option ferme.`,
+    `${retenus.length} proposition(s) vous reviennent cette semaine, classées par valeur au registre. Chacune dit de quoi il s'agit, le problème et pourquoi il vous revient, puis ses 3 options : ce qui se passe après chaque choix, son coût en complexité et durée, et si l'on peut revenir en arrière.`,
     "",
     retenus.length ? `Pour répondre, une ligne suffit, par exemple : « ${reponse} ». Une décision sans réponse prend son option (c).` : "Aucune proposition ne vous revient cette semaine : rien n'est à trancher.",
     "",
@@ -152,12 +159,20 @@ function selfTest() {
   const dir = mkdtempSync(join(tmpdir(), "revue-hebdo-"));
   const fiche = {
     question: "Faut-il mesurer le taux de détection des 10 oracles les plus sollicités",
-    avantages: ["les défauts de juges se voient avant de coûter"], inconvenients: ["un catalogue de mutations à tenir"],
-    impacts: ["pilot seul, aucune écriture chez les produits"],
-    options: { a: { libelle: "Lancer le banc", cout: "moyen × court", exclusions: "aucune" },
-      b: { libelle: "Le limiter à 3 oracles", cout: "simple × court", exclusions: "7 oracles non mesurés" },
-      c: { libelle: "Reporter", cout: "nul", exclusions: "les défauts restent découverts après coup" } },
-    recommandation: "a", source: "l'étude du 01/10/2026", ressort: { humain: true, motif: "arbitrage" },
+    de_quoi: "un banc qui plante des défauts dans les 10 oracles les plus sollicités et compte ceux qu'ils voient",
+    probleme: "aucun de ces oracles n'a de taux de détection mesuré ; un juge aveugle ne se voit qu'après coup",
+    pourquoi_vous: "le banc coûte des exécutions et choisit quels oracles passer d'abord",
+    options: { a: { libelle: "Lancer le banc", effet: "les 10 oracles sont mesurés, chacun avec son taux", cout: "moyen × court", retour: "Possible" },
+      b: { libelle: "Le limiter à 3 oracles", effet: "3 oracles mesurés, 7 restent sans mesure", cout: "simple × court", retour: "Possible" },
+      c: { libelle: "Reporter", effet: "les défauts de juge restent découverts après coup", cout: "nul", retour: "Sans objet" } },
+    recommandation: "a", pourquoi: "les 10 oracles portent la plupart des refus", source: "l'étude du 01/10/2026", ressort: { humain: true, motif: "arbitrage" },
+  };
+  // L'ancienne fiche, d'avant le format B : elle reste au registre, et elle se liste à instruire.
+  const ficheAncienne = {
+    question: "Faut-il garder l'ancienne fiche", avantages: ["a"], inconvenients: ["b"], impacts: ["c"],
+    options: { a: { libelle: "Oui", cout: "nul", exclusions: "aucune" }, b: { libelle: "Non", cout: "nul", exclusions: "aucune" },
+      c: { libelle: "Plus tard", cout: "nul", exclusions: "aucune" } },
+    recommandation: "a", source: "le registre", ressort: { humain: true, motif: "arbitrage" },
   };
   const ficheAuto = { ...fiche, question: "Faut-il corriger le motif local", ressort: { humain: false, pourquoi: "défaut reproduit, correction réversible, sans dépense ni doctrine" } };
   const reg = [
@@ -167,21 +182,26 @@ function selfTest() {
     { ev: "maj", id: "TF-9003", statut: "decide" },
     { ev: "creation", id: "TF-9004", titre: "Correctif sans arbitrage", score: { valeur: 20 }, fiche_decision: ficheAuto },
     { ev: "creation", id: "TF-9005", titre: "Fiche sans ressort", score: { valeur: 9 }, fiche_decision: { ...fiche, ressort: undefined } },
+    { ev: "creation", id: "TF-9006", titre: "Fiche d'avant le format B", score: { valeur: 9 }, fiche_decision: ficheAncienne },
   ].map((e) => JSON.stringify(e)).join("\n");
   const r = construire({ texteRegistre: reg, depuis: 40, max: 7, jour: "2026-10-01" });
   const casse = [];
   if (r.decisions.length !== 1 || r.decisions[0].d !== "D-40" || r.decisions[0].id !== "TF-9001") casse.push(`décisions attendues [D-40 → TF-9001], obtenu ${JSON.stringify(r.decisions)}`);
-  for (const m of ["> **D-40 — Faut-il mesurer", "> **Avantages** :", "> **Inconvénients** :", "> **Impacts** :",
-    "> **Recommandation : (a).** Source consultée :", "| Option | Coût | Exclusions |", "| **(a)** *(recommandée)* Lancer le banc |",
-    "> **Si rien n'est décidé** : (c) Reporter.", "« D-40 a »"])
+  for (const m of ["> **D-40 — Faut-il mesurer le taux de détection des 10 oracles les plus sollicités ? (TF-9001)**",
+    "> - **De quoi s'agit-il** : un banc qui plante", "> - **Le problème** : aucun de ces oracles", "> - **Pourquoi vous** : le banc coûte",
+    "> - **Recommandation : (a)** — les 10 oracles portent la plupart des refus. Source consultée :",
+    "| Option | Ce qui se passe | Coût | Retour arrière |", "| (a) *(recommandée)* Lancer le banc | Les 10 oracles sont mesurés, chacun avec son taux | Moyen × court | Possible |",
+    "> **Sans réponse** : (c), reporter.", "« D-40 a »"])
     if (!r.corps.includes(m)) casse.push(`le dossier ne porte pas « ${m} »`);
   if (r.corps.includes("Déjà décidée")) casse.push("une candidature déjà décidée est représentée");
-  if (!/Proposition sans fiche complète — manque : avantages/.test(r.corps)) casse.push("la fiche incomplète n'est pas listée à instruire avec ses manques");
+  if (!/Proposition sans fiche complète — manque : de_quoi/.test(r.corps)) casse.push("la fiche incomplète n'est pas listée à instruire avec ses manques");
+  if (!/Fiche d'avant le format B — manque : de_quoi, probleme, pourquoi_vous, options\.a/.test(r.corps) || r.decisions.some((x) => x.id === "TF-9006"))
+    casse.push("une fiche d'avant le format B est posée au lieu d'être listée à instruire avec ce qui lui manque");
   if (r.decisions.some((x) => x.id === "TF-9004")) casse.push("une proposition qui ne relève pas de l'humain lui est posée");
   if (!/## Mises en œuvre sans vous, pour information[\s\S]*Option appliquée : Lancer le banc/.test(r.corps) || r.automatiques[0]?.id !== "TF-9004") casse.push("la proposition hors du ressort humain n'est pas rendue pour information");
   if (!/Fiche sans ressort — manque : ressort/.test(r.corps)) casse.push("une fiche sans ressort n'est pas listée à instruire");
   writeFileSync(join(dir, "r.jsonl"), reg);
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — 1 décision rendue au format du bloc 3 (avantages, inconvénients, impacts, recommandation, tableau, repli), 1 proposition hors du ressort humain rendue pour information et non posée, cas rouges : la décidée écartée, l'incomplète et celle sans ressort refusées comme décision et listées à instruire");
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — 1 décision rendue au format B du bloc 3 (de quoi il s agit, le problème, pourquoi vous, recommandation, tableau à retour arrière, repli « Sans réponse »), 1 fiche d avant le format B listée à instruire, 1 proposition hors du ressort humain rendue pour information et non posée, cas rouges : la décidée écartée, l'incomplète et celle sans ressort refusées comme décision et listées à instruire");
   process.exit(casse.length ? 1 : 0);
 }
 

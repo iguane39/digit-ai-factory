@@ -1,8 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md",
- "empreinte": "e6a2659e75438010124267d7d07858458248f23af7f9a3219f0933c31bc158c6",
+ "empreinte": "7f00d1b2d64263e88b9eacf3906f618ced9b51dc0dc18fca99a4d7419cd260cf",
  "methode": "sha256/lf",
- "scelle_le": "2026-09-25T06:41:36.992Z",
+ "scelle_le": "2026-10-17T12:17:07.178Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }

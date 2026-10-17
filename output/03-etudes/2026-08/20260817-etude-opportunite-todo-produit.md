@@ -104,7 +104,7 @@ publiées de plus n'aurait déplacé aucune option : elles ne peuvent pas dire c
 ## 4. Options — jeu fermé O0-O4
 
 **Pesée honnête du couple `gain:4 / preuve:2`.** Le gain 4 se vérifie **en partie** : sur les 5
-produits porteurs d'un arbre `forge\` (Produit-01, BourseAuxVacants2, COMPTA-Fournisseur-A, Cockpit IA,
+produits porteurs d'un arbre `forge\` (Produit-01, Produit-11, COMPTA-Fournisseur-A, Cockpit IA,
 Produit-10), **1 seul** porte le `forge\QUESTIONS.md` que le contrat prescrit
 (`CONTRAT-INTERFACE.md` l.60). Un arbitrage en attente est donc invisible pour **4 produits sur
 5** — c'est un manque réel, compté, et il porte entièrement sur P1. La preuve 2 se vérifie

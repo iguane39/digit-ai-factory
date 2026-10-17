@@ -16,7 +16,7 @@ Vos 6 décisions sont exécutées. Les 20 candidatures que vous avez décidées 
 - **quoi** — exécution des décisions D-15 a, D-17 a, D-18 a, D-19 b, D-20 a et D-21 b de la synthèse 20260924a, puis réévaluation des candidatures restées candidates, pour vous les reproposer.
 - **sur quoi** — le pilot `digit-ai-factory` ; `digit-ai-forge-agents`, `digit-ai-forge-design`, `digit-ai-forge-tests` et `digit-ai-forge-audit` ; le canal confidentiel ; les hameçons des 13 forges.
 - **quand** — du 24/09/2026 à 17:17 au 25/09/2026 à 08:36 (UTC+02:00), avec une interruption de nuit, entre 20:19, dernier relevé du 24/09, et 08:20, premier relevé du 25/09. Début lu à l'horodatage de votre message, fin relevée par `date`.
-- **qui** — session de pilotage Claude Opus 5.5. 10 agents délégués pour la construction, chacun relu et rejoué par le pilot, et 2 agents de lecture pour instruire les retours du produit UIA. Escalade de modèle : aucune.
+- **qui** — session de pilotage Claude Opus 5.5. 10 agents délégués pour la construction, chacun relu et rejoué par le pilot, et 2 agents de lecture pour instruire les retours du produit Produit-72. Escalade de modèle : aucune.
 - **intention** — que vos choix soient appliqués et prouvés, et que les candidatures restantes reviennent avec une évaluation qui tient compte de ce qui vient d'être fait. **Test rétro** : servie pour les 6 décisions, chaque clôture portant sa mesure et `oracle-todo` rendant PASS. Servie aussi pour la réévaluation : 16 motifs écrits au registre, dont 6 rejoués sur ce poste. Elle l'est en partie pour D-18 : le juge bloque les runs 1.1 comme décidé, mais les lanceurs qui éviteraient la consignation à la main restent à faire (bloc 7).
 
 ## 2. Verdict en une ligne
@@ -48,7 +48,7 @@ Comment lire les tableaux : chaque tableau porte une option par ligne ; la colon
 
 > **D-23 — Faut-il décider les 16 candidatures de `todo/TODO.jsonl` restées candidates au 24/09, maintenant réévaluées après le traitement de vos décisions ?**
 >
-> La réévaluation change 15 scores sur 16, chacun avec son motif écrit au registre. Les 7 retours du produit UIA n'avaient qu'un score par défaut : 2 agents de lecture ont confirmé 6 causes dans le code et réfuté la dernière, le PDF de la fiche de sécurité étant bien produit. Une candidature est résolue par une correction du jour : la recherche du socle ne ramène plus la vue active, mesuré dans Chromium. En tête vient l'analyse des dépendances, muette sous Windows à chaque audit npm, parce que l'oracle lance `npm` sans passer par le shell.
+> La réévaluation change 15 scores sur 16, chacun avec son motif écrit au registre. Les 7 retours du produit Produit-72 n'avaient qu'un score par défaut : 2 agents de lecture ont confirmé 6 causes dans le code et réfuté la dernière, le PDF de la fiche de sécurité étant bien produit. Une candidature est résolue par une correction du jour : la recherche du socle ne ramène plus la vue active, mesuré dans Chromium. En tête vient l'analyse des dépendances, muette sous Windows à chaque audit npm, parce que l'oracle lance `npm` sans passer par le shell.
 >
 > **Recommandation : (a).** Source consultée : les 16 événements de réévaluation du 24/09 au registre ; la sonde Chromium de la recherche, sur l'ancien composant et sur le socle 1.26.0 ; les rapports des 2 agents de lecture, fichiers et lignes cités ; les recettes de `digit-ai-forge-conception` et `digit-ai-forge-organization`, rejouées.
 
@@ -69,7 +69,7 @@ Comment lire les tableaux : chaque tableau porte une option par ligne ; la colon
 | Option | Coût | Exclusions |
 |---|---|---|
 | **(a)** *(recommandée)* Décider les 15 de valeur 10 ou plus : TF-1385, TF-1387 et TF-1389 (20), TF-1380, TF-1382, TF-1369 et TF-1372 (15), TF-1371 (12), puis TF-1384, TF-1388, TF-1368, TF-1373, TF-1374, TF-1377 et TF-1378 (10) | complexe × moyen | 7 restent candidates : TF-1379, TF-1390, TF-1381, TF-1370, TF-1375, TF-1376, TF-1383 |
-| **(b)** Décider les 6 qui touchent la preuve ou la publication : TF-1385, TF-1387, TF-1368, TF-1369, TF-1371, TF-1372 | moyen × court | 16 restent candidates, dont les retours du produit UIA |
+| **(b)** Décider les 6 qui touchent la preuve ou la publication : TF-1385, TF-1387, TF-1368, TF-1369, TF-1371, TF-1372 | moyen × court | 16 restent candidates, dont les retours du produit Produit-72 |
 | **(c)** Ne rien décider | nul | les 3 ledgers réels restent rouges, et un enregistrement fait depuis un arbre de travail lié vide l'index d'output |
 
 > **Si rien n'est décidé** : (c).
@@ -126,7 +126,7 @@ Chaque ligne ci-dessous nomme ce qui a changé et la mesure rejouée qui l'étab
   - preuve : `todo/CLASSES.json` 1.22.0, 97 classes ; `oracle-todo` R15 (une classe créée après le 16/09 nomme un contrôle qui existe) : « 73 famille(s) portée(s) par un contrôle existant » ; créées sans leur contrôle, les 2 autres l'auraient mis en échec.
 - **Les 16 candidatures restantes sont réévaluées**, chacune avec son motif au registre ; 15 scores changent.
   - preuve : 16 événements au registre, `oracle-todo` PASS. TF-1354 : dans Chromium, l'ancien composant ramenait la vue g8 à g1 pendant la recherche, le socle 1.26.0 la garde. TF-1342 : 4 occurrences dans le texte, 3 comptées. TF-1348 : `npm` lancé sans shell rend `ENOENT` sur ce poste. TF-1335 : `oracle-ears` rend FAIL sur la fixture verte. TF-1336 : 11/12 et sortie 1 à `digit-ai-forge-organization`. TF-1329 : l'indice 60 toujours vacant.
-- **4 lots arrivés au sas pendant le tour sont reçus et ingérés** : 2 du produit UIA, 2 de Produit-64, pseudonymisés à l'accueil. Chaque geste de réception est dit par une note en tête du lot : RX-11 (le retour du produit UIA sur les README pseudonymisés), dont l'accueil avait rendu identiques les 2 graphies qu'il oppose, et 2 identifiants déjà pris, renumérotés.
+- **4 lots arrivés au sas pendant le tour sont reçus et ingérés** : 2 du produit Produit-72, 2 de Produit-64, pseudonymisés à l'accueil. Chaque geste de réception est dit par une note en tête du lot : RX-11 (le retour du produit Produit-72 sur les README pseudonymisés), dont l'accueil avait rendu identiques les 2 graphies qu'il oppose, et 2 identifiants déjà pris, renumérotés.
   - preuve : `oracle-lot-retours` PASS sur les 4 ; l'accueil a relevé 2 formes « Prénom NOM » qui ne désignent pas des personnes ; `ingerer-lot` : 11 candidatures, TF-1379 à TF-1384 et TF-1386 à TF-1390 ; 5 évaluées à l'entrée.
 - **12 constats du pilot sont inscrits**, TF-1368 à TF-1378 et TF-1385, chacun rejoué avant d'être écrit.
   - preuve : `ingerer-lot` PASS ; `oracle-todo` PASS ; chaque candidature porte sa mesure.
@@ -151,7 +151,7 @@ Chaque ligne ci-dessous nomme ce qui a changé et la mesure rejouée qui l'étab
 
 - **Vous avez demandé** de reproposer les autres candidatures après traitement. **J'ai aussi reçu** 4 lots arrivés au sas pendant le tour, et inscrit 12 constats de mes vérifications. **Pourquoi** : un lot au sas se reçoit, et un constat vérifié entre au registre. Ils forment D-24 et D-25, séparées de D-23 pour ne pas mêler réévaluation et nouveauté.
 - **Vous avez demandé** d'ajuster les évaluations. **Je repropose** TF-1354 comme une clôture sur preuve plutôt qu'une correction. **Pourquoi** : la correction de TF-1340 la résout, mesuré dans Chromium ; il manque son cas au banc de la recherche.
-- **Le retour** du produit UIA sur la fiche de sécurité demandait un PDF que rien ne produirait. **Je l'ai réévalué** sur son reste documentaire. **Pourquoi** : le PDF est produit à chaque passe, lu dans le code ; la méthodologie ne le nomme pas. L'écarter reste possible.
+- **Le retour** du produit Produit-72 sur la fiche de sécurité demandait un PDF que rien ne produirait. **Je l'ai réévalué** sur son reste documentaire. **Pourquoi** : le PDF est produit à chaque passe, lu dans le code ; la méthodologie ne le nomme pas. L'écarter reste possible.
 - **L'action de création des classes en annonçait 6. J'en ai créé 4.** **Pourquoi** : R15 refuse une classe tant que son contrôle n'existe pas ; les 2 autres entreront avec leur correction.
 - **Vous avez décidé** D-18 a, « bloquant une fois l'outil de consignation livré ». **L'outil est livré dans ce même tour** : le juge bloque donc dès maintenant la clôture d'un run 1.1 (bloc 7).
 - **La règle des lots** veut qu'un lot remis ne se modifie pas. **J'ai modifié** 3 lots reçus, chaque fois avant leur ingestion. **Pourquoi** : sans note, RX-11 ne se lit plus ; et 2 identifiants repris faisaient refuser 2 lots à la porte. Un lot déjà ingéré, lui, ne se touche plus : essayé sur le premier, la porte a refusé, et c'est le lot suivant qui a pris le numéro libre. Chaque geste est écrit dans une note de réception, le texte du producteur est intact ailleurs.

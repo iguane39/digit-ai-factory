@@ -57,11 +57,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-11 - RETOURS - 20260911b.tf.jsonl` | fichier | 14,0 Ko | 8 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260911c.md` | fichier | 11,1 Ko | Retours forges — Produit-11 — 20260911c |
 | `Produit-11 - RETOURS - 20260911c.tf.jsonl` | fichier | 4,0 Ko | 2 ligne(s) JSONL |
-| `Produit-11 - RETOURS - 20260914a.md` | fichier | 15,5 Ko | Retours forges — Produit-11 — 20260914a |
+| `Produit-11 - RETOURS - 20260914a.md` | fichier | 15,6 Ko | Retours forges — Produit-11 — 20260914a |
 | `Produit-11 - RETOURS - 20260914a.tf.jsonl` | fichier | 6,4 Ko | 3 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260914b.md` | fichier | 18,6 Ko | Retours forges — Produit-11 — 20260914b |
 | `Produit-11 - RETOURS - 20260914b.tf.jsonl` | fichier | 9,6 Ko | 4 ligne(s) JSONL |
-| `Produit-11 - RETOURS - 20260914c.md` | fichier | 13,4 Ko | Retours forges — Produit-11 — 20260914c |
+| `Produit-11 - RETOURS - 20260914c.md` | fichier | 13,5 Ko | Retours forges — Produit-11 — 20260914c |
 | `Produit-11 - RETOURS - 20260914c.tf.jsonl` | fichier | 6,9 Ko | 3 ligne(s) JSONL |
 
 _47 fichier(s), 0 sous-dossier(s)_

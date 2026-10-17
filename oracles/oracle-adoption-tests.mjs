@@ -512,7 +512,7 @@ function selfTest() {
     r.verdict === "SKIP" && /aucun cahier de tests dérivé/.test(r.motif || ""), r.verdict]);
 
   // ── vert · forme réelle de Produit-11 : cahiers hors produit, contrat un cran plus bas ──
-  r = juger(projet("vert-forme-bav2", {
+  r = juger(projet("vert-forme-Produit-11", {
     produitDans: "Produit-11",
     cahiers: [{ refs: [prop("F1-0001-1")] }],
     tests: ["e2e/10-navigation.spec.ts"],

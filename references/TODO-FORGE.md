@@ -360,15 +360,20 @@ une décision humaine.
 
 1. **La fiche.** Une candidature n'est présentée que si elle porte un champ `fiche_decision` complet,
    écrit par `todo\journaliser.mjs` en `creation` ou en `maj` : `question` (sans le point
-   d'interrogation, ajouté au rendu), `avantages`, `inconvenients`, `impacts` (listes de phrases
-   courtes et chiffrées), `options.a`, `options.b`, `options.c` (chacune `libelle`, `cout` en
-   complexité × durée, `exclusions`), `recommandation` (`a`, `b` ou `c`), `source`, et `pourquoi`
-   en option. L'option (c) est le repli : elle s'applique si rien n'est décidé. Une fiche ne
-   s'invente pas : un avantage ou un impact non mesuré se dit « non mesuré ». Le champ `rappel`,
-   facultatif, remplace au rendu le titre de la candidature : le juge de la restitution refuse un
-   identifiant nu (« TF-1413 », « R-57 ») avant les options, et beaucoup de titres en portent
-   (mesuré le 01/10/2026 sur la première revue : 5 décisions sur 7 refusées). La question et les
-   listes de la fiche s'écrivent de même, sans identifiant ni renvoi à un numéro de ligne.
+   d'interrogation, ajouté au rendu), puis, au **format B** depuis la décision humaine du
+   17/10/2026 (`gabarits\RESTITUTION.md` v2.41.0, règle S78) : `de_quoi` (l'objet, nommé ; une
+   valeur sensible masquée, première et dernière lettre visibles), `probleme` (ce qui est en jeu,
+   un ou deux chiffres qui changent la décision), `pourquoi_vous` (le motif qui revient à l'humain,
+   en une phrase), `options.a`, `options.b`, `options.c` (chacune `libelle`, `effet` — ce qui se
+   passe concrètement après ce choix, et ce qu'il ne fait pas —, `cout` en complexité × durée,
+   `retour` — possible et comment, impossible, ou sans objet), `recommandation` (`a`, `b` ou `c`),
+   `source`, et `pourquoi` en option. L'option (c) est le repli : elle s'applique sans réponse. Une
+   fiche ne s'invente pas : un fait non mesuré se dit « non mesuré ». Le test avant d'écrire : un
+   lecteur qui n'a que la fiche rendue peut-il trancher ? Sans vocabulaire interne (« porte »,
+   « tables », « oracle » se remplacent par ce qu'ils font), sans identifiant ni renvoi à un numéro
+   de ligne ; le numéro du sujet s'ajoute au rendu, en fin de titre. Les fiches d'avant le
+   17/10/2026, à `avantages`, `inconvenients`, `impacts` et `exclusions`, restent au registre et se
+   listent « à instruire » jusqu'à leur réécriture.
 2. **Le rappel.** `oracles\hook-ouverture.mjs` dit à chaque ouverture du pilot combien de
    propositions sont prêtes et si la revue est due, c'est-à-dire si la dernière a 7 jours ou plus.
 3. **Le dossier.** `node todo\revue-hebdo.mjs --depuis <prochain D-N> --sortie <dossier>` rend les

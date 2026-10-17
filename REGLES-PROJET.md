@@ -1508,7 +1508,11 @@ aucune étape du run ne regardait (`performance`, `couts`, `observabilite`, `pri
 réponse valide, le silence n'en est pas une. Règle neuve, opposable à tous les produits : elle entre
 en **avertissement non bloquant** (précédent D-70 (b)) ; en faire un blocage est une décision humaine.
 Détail et mesure : `references\ETAPES-RUN.md`. Contrôle exécutable : `oracle-conformite-projet`
-R-19 ter, joué par `oracles\self-test.mjs`.
+R-19 ter, joué par `oracles\self-test.mjs`. *Suite, 17/10/2026* : les trois contradictions de doctrine
+relevées par le même sujet (route de déploiement manuelle, sauvegarde absente de l'oracle de mise en
+production, fournisseur d'identité sans règle) sont tranchées par la décision humaine D-3 (a), qui
+aligne la doctrine sur le référentiel d'audit. Elles vivent à l'étape MEP, portes M-16, M-17 et M-18
+(`ETAPE-MEP.md` § 3 terdecies, avertissement, taux d'accusation mesuré), pas dans cette règle.
 
 ## AK. R-99 — numéro RÉSERVÉ : il ne désigne aucune règle, il désigne leur ABSENCE
 

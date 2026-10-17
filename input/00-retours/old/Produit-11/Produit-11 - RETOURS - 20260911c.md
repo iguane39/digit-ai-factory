@@ -17,7 +17,7 @@
 > node forge\retours\oracle-lot.mjs "forge\retours\Produit-11 - RETOURS - 20260911c.md"
 > ```
 
-**Numérotation** : BAV2 tient une séquence `RT-nn`. RT-1 … RT-62 sont consommés au 11/09, la
+**Numérotation** : Produit-11 tient une séquence `RT-nn`. RT-1 … RT-62 sont consommés au 11/09, la
 collision signalée en RT-62 comprise. Ce lot continue en **RT-63 … RT-64**.
 
 Convention de gravité : **bloquant** · **majeur** · **mineur**. Portée : *générique* ou

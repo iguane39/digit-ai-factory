@@ -1,10 +1,12 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\REGLES-PROJET.md",
-  "date_iso": "2026-10-03T10:25:24.046Z",
-  "registre_version": "2.35.0",
+  "cible": "C:\\dev\\digit-ai-factory\\REGLES-PROJET.md",
+  "date_iso": "2026-10-17T08:59:55.874Z",
+  "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 4,
     "fail": 0,
@@ -44,46 +46,46 @@
       "domaine": "Calculs / chiffres",
       "file": "REGLES-PROJET.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "REGLES-PROJET.md",
       "verdict": "PASS",
-      "detail": "12 constat(s) · 11 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (11 avertissement(s)) ; nombre « 3 984 » non sourcé"
+      "detail": "17 constat(s) · 17 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (16 avertissement(s)) ; pourcentage « 100 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
       "file": "REGLES-PROJET.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
       "file": "REGLES-PROJET.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     },
     {
       "domaine": "Autorité d'une décision affirmée",
       "file": "REGLES-PROJET.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucun bloc se déclarant décision (ni table Décision/Décideur, ni champ « Décision : ») — hors périmètre"
     },
     {
       "domaine": "Livrabilité d'une conséquence déclarée",
       "file": "REGLES-PROJET.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune forme de subissance en contexte de repli — hors périmètre"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "REGLES-PROJET.md",
-    "ts": "2026-10-03T10:25:24.044Z",
+    "ts": "2026-10-17T08:59:55.873Z",
     "fichiers": {
-      "REGLES-PROJET.md": "8ffcf34becd90e4d173429c831051c3672740fca202c7888f32c4a438bdd89f4"
+      "REGLES-PROJET.md": "1fe5545f5448cdcf2f5ece1a8a13a44f8fe3acd13d906e9ee670f0f5b5c986b9"
     }
   },
   "empreinte_motif": null,

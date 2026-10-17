@@ -32,8 +32,8 @@ const MECANISME_REEL = join(PARC_REEL, MECANISME);
 if (!existsSync(MECANISME_REEL) || !interpretePython()) {
   // TF-1477 — la forme comptée (TF-1434), lue par `nonJouesDe` : sans elle, le cliquet du harnais
   // (oracles\self-tests.mjs) range cette recette parmi les « sans compte lisible » au lieu de
-  // compter ses 30 cas comme déclarés non joués sur ce poste.
-  console.log(`  [NON JOUÉ] 30 cas —${existsSync(MECANISME_REEL)
+  // compter ses 38 cas comme déclarés non joués sur ce poste.
+  console.log(`  [NON JOUÉ] 38 cas —${existsSync(MECANISME_REEL)
     ? "aucun interpréteur Python"
     : `forge-tests absente (${MECANISME_REEL})`} : le mécanisme de confrontation réel n'est pas joignable`);
   process.exit(0);
@@ -55,6 +55,11 @@ const FAUSSE_DECOUVERTE = [
   'const d = join(racine, "oracles");',
   'const oracles = existsSync(d) ? readdirSync(d).filter((f) => /^oracle-[a-z0-9-]+[.]mjs$/.test(f)).sort()',
   '  .map((f) => ({ nom: f.slice(0, -4), chemin: "oracles/" + f })) : [];',
+  // TF-1841 : une forge-boîte à outils range ses oracles sous ses skills, comme forge-agents.
+  'const sk = join(racine, ".claude", "skills");',
+  'if (existsSync(sk)) for (const s of readdirSync(sk).sort()) { const sc = join(sk, s, "scripts");',
+  '  if (existsSync(sc)) for (const f of readdirSync(sc).filter((f) => /^oracle-[a-z0-9-]+[.]mjs$/.test(f)).sort())',
+  '    oracles.push({ nom: f.slice(0, -4), chemin: ".claude/skills/" + s + "/scripts/" + f }); }',
   'console.log(JSON.stringify({ contrat: "digit-ai/decouverte-oracles@1", forge: basename(racine), racine, regle: "fixture", oracles, non_juge: [] }));',
 ].join("\n");
 
@@ -77,7 +82,13 @@ function parc(forges, { avecMecanisme = true } = {}) {
     if (def === "sans-entree") { poser(join(depot, "README.md"), "# forge sans oracle\n"); continue; }
     if (def === "casse") { poser(join(depot, "oracles", "decouvrir-oracles.mjs"), 'console.log("ceci n est pas du JSON");\n'); continue; }
     poser(join(depot, "oracles", "decouvrir-oracles.mjs"), FAUSSE_DECOUVERTE);
-    for (const o of def) poser(join(depot, "oracles", `${o}.mjs`));
+    // TF-1841 : `{ racine: [oracles], skills: { skill: [oracles] } }` pour une forge-boîte à outils.
+    const { racine: aLaRacine = [], skills = {} } = Array.isArray(def) ? { racine: def } : def;
+    for (const o of aLaRacine) poser(join(depot, "oracles", `${o}.mjs`));
+    for (const [s, os] of Object.entries(skills)) {
+      poser(join(depot, ".claude", "skills", s, "SKILL.md"), `# ${s}\n`);
+      for (const o of os) poser(join(depot, ".claude", "skills", s, "scripts", `${o}.mjs`));
+    }
   }
   return racine;
 }
@@ -135,6 +146,9 @@ const P = parc({
   "digit-ai-forge-vide": [],
   "digit-ai-forge-jumelle": ["oracle-a1"],
   "digit-ai-factory": ["oracle-p1"],
+  // TF-1841 : une forge-boîte à outils, sur le modèle de forge-agents — un skill « journal » (l'outil
+  // qu'un run mobilise), un skill « controles » lourd, un skill sans oracle, un oracle hors skill.
+  "digit-ai-forge-outils": { racine: ["oracle-o-cadre"], skills: { journal: ["oracle-journal"], controles: ["oracle-c1", "oracle-c2", "oracle-c3"], "sans-oracle": [] } },
 });
 const MOB = { forges_mobilisees: ["alpha", "beta (delta, --rendu)"] };
 
@@ -188,6 +202,64 @@ try {
     if (r.verdict !== "PASS" || r.forges_mobilisees?.source !== "run_open.forges_mobilisees") throw new Error(`${r.verdict} ${r.forges_mobilisees?.source}`);
     const o = juger({ ledger: l, racine: P, run: "v1", forges: "alpha" });
     if (o.forges_mobilisees?.source !== "--forges") throw new Error(`--forges ne prime pas : ${o.forges_mobilisees?.source}`);
+  });
+
+  // ---- TF-1841 (17/10/2026) : une forge mobilisée comme OUTIL ne promet que la partie mobilisée ----
+  // Le fait : 7 refus sur 7 runs jugés, dont 5 sur une forge mobilisée sans aucun verdict ; forge-agents,
+  // mobilisée pour son seul journal, y promettait jusqu'à 48 oracles. Le run déclare ses parties.
+  const OUTIL = { forges_mobilisees: ["outils"] };
+  check("ROUGE TF-1841 — une forge-outil SANS partie déclarée promet TOUT : le run qui n'a servi que son outil est refusé", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir(OUTIL), v("oracle-journal"), clore]), racine: P });
+    const f = en1(r, "digit-ai-forge-outils");
+    if (r.verdict !== "FAIL" || JSON.stringify(f?.manquants) !== JSON.stringify(["oracle-c1", "oracle-c2", "oracle-c3", "oracle-o-cadre"])) throw new Error(`${r.verdict} ${JSON.stringify(f?.manquants)}`);
+    if (r.mesures.promesses["digit-ai-forge-outils"] !== 5 || r.mesures.promesses_bornees) throw new Error(JSON.stringify(r.mesures));
+  });
+  check("VERT TF-1841 — `parties_mobilisees` borne la promesse au skill déclaré : PASS, exit 0 (CLI), et la borne est DITE", () => {
+    const l = ledger(P, [ouvrir({ ...OUTIL, parties_mobilisees: { outils: ["journal"] } }), v("oracle-journal"), clore]);
+    const r = cli([l, "--racine", P]);
+    if (r.code !== 0 || r.j?.verdict !== "PASS") throw new Error(`exit ${r.code} ${r.j?.verdict} ${JSON.stringify(en1(r.j || { findings: [] }, "digit-ai-forge-outils"))}`);
+    if (r.j.mesures.promesses["digit-ai-forge-outils"] !== 1) throw new Error(JSON.stringify(r.j.mesures));
+    const b = r.j.mesures.promesses_bornees?.["digit-ai-forge-outils"];
+    if (b?.promis !== 1 || b?.decouverts !== 5 || b?.parties?.join() !== "journal") throw new Error(JSON.stringify(b));
+    if (!r.j.non_juge.some((x) => /promesse BORNÉE/.test(x) && /1 oracle\(s\) promis sur 5/.test(x))) throw new Error("la borne n'est pas dite");
+  });
+  check("ROUGE TF-1841 — la borne ne dispense pas la partie déclarée : son oracle non servi est réclamé", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ ...OUTIL, parties_mobilisees: { "digit-ai-forge-outils": ["journal", "controles"] } }), v("oracle-journal"), v("oracle-c1"), clore]), racine: P });
+    const f = en1(r, "digit-ai-forge-outils");
+    if (r.verdict !== "FAIL" || JSON.stringify(f?.manquants) !== JSON.stringify(["oracle-c2", "oracle-c3"])) throw new Error(`${r.verdict} ${JSON.stringify(f?.manquants)}`);
+  });
+  check("COMPATIBILITÉ TF-1841 — une forge sans partie déclarée garde sa promesse entière, même si une autre forge en déclare", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ forges_mobilisees: ["alpha", "outils"], parties_mobilisees: { outils: ["journal"] } }), v("oracle-a1"), v("oracle-journal"), clore]), racine: P });
+    if (r.verdict !== "FAIL" || JSON.stringify(en1(r, "digit-ai-forge-alpha")?.manquants) !== JSON.stringify(["oracle-a2"])) throw new Error(`${r.verdict} ${JSON.stringify(en1(r, "digit-ai-forge-alpha"))}`);
+    if (en1(r, "digit-ai-forge-outils")?.statut !== "PASS") throw new Error("la forge bornée n'est pas jugée sur sa borne");
+    if (r.mesures.promesses_bornees?.["digit-ai-forge-alpha"]) throw new Error("alpha bornée sans déclaration");
+  });
+  check("ROUGE TF-1841 — une partie INCONNUE (faute de frappe) ne borne RIEN : promesse entière, et c'est dit", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ ...OUTIL, parties_mobilisees: { outils: ["jounral"] } }), v("oracle-journal"), clore]), racine: P });
+    if (r.verdict !== "FAIL" || en1(r, "digit-ai-forge-outils")?.manquants?.length !== 4) throw new Error(`${r.verdict} — une faute de frappe a éteint la promesse`);
+    if (!r.non_juge.some((x) => /inconnue\(s\)/.test(x) && /jounral/.test(x) && /ENTIÈRE/.test(x))) throw new Error("la partie inconnue n'est pas dite");
+  });
+  check("SKIP TF-1841 — une partie réelle SANS oracle ne promet rien : SKIP motivé de la forge, jamais PASS", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ ...OUTIL, parties_mobilisees: { outils: ["sans-oracle"] } }), v("oracle-journal"), clore]), racine: P });
+    const f = en1(r, "digit-ai-forge-outils");
+    if (r.verdict !== "SKIP" || f?.statut !== "SKIP" || !/ne portent aucun oracle/.test(f.message)) throw new Error(`${r.verdict} ${f?.statut} ${f?.message}`);
+  });
+  check("VERT EN2 TF-1841 — un oracle servi HORS des parties déclarées est signalé (hors_parties), jamais accusé ni pris pour inconnu", () => {
+    const r = juger({ ledger: ledger(P, [ouvrir({ ...OUTIL, parties_mobilisees: { outils: ["journal"] } }), v("oracle-journal"), v("oracle-c2"), clore]), racine: P });
+    if (r.verdict !== "PASS") throw new Error(r.verdict);
+    const f = r.findings.find((x) => x.regle === "EN2" && x.hors_parties);
+    if (f?.statut !== "AVERTISSEMENT" || f.hors_parties.map((x) => x.nom).join() !== "oracle-c2") throw new Error(JSON.stringify(f));
+    if (r.findings.some((x) => (x.inconnus || []).some((i) => i.nom === "oracle-c2"))) throw new Error("rangé parmi les inconnus");
+  });
+  check("TF-1841 sources — une rectification porte ses parties ; `--parties` (CLI) prime ; une déclaration illisible est DITE et ne borne rien", () => {
+    const rect = juger({ ledger: ledger(P, [ouvrir({ ...OUTIL, parties_mobilisees: { outils: ["controles"] } }), v("oracle-journal"),
+      { type: "rectification_forges_mobilisees", forges_mobilisees: ["outils"], parties_mobilisees: { outils: ["journal"] }, cause: "le run n'a mobilisé que le journal" }, clore]), racine: P });
+    if (rect.verdict !== "PASS" || !/rectification_forges_mobilisees/.test(rect.forges_mobilisees.source_parties || "")) throw new Error(`${rect.verdict} ${rect.forges_mobilisees?.source_parties}`);
+    const l = ledger(P, [ouvrir(OUTIL), v("oracle-journal"), clore]);
+    const opt = cli([l, "--racine", P, "--parties", "outils:journal"]);
+    if (opt.code !== 0 || opt.j?.forges_mobilisees?.source_parties !== "--parties") throw new Error(`--parties : exit ${opt.code} ${opt.j?.forges_mobilisees?.source_parties}`);
+    const mal = juger({ ledger: ledger(P, [ouvrir({ ...OUTIL, parties_mobilisees: ["journal"] }), v("oracle-journal"), clore]), racine: P });
+    if (mal.verdict !== "FAIL" || !mal.non_juge.some((x) => /parties_mobilisees/.test(x) && /ENTIÈRE/.test(x))) throw new Error(`${mal.verdict} — déclaration illisible tue ou appliquée`);
   });
 
   // ---- EN1, sens rouge ----------------------------------------------------------------------------

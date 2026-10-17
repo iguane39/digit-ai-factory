@@ -1,6 +1,6 @@
-# Retours forges — UIA (Produit-71) — 20260924a
+# Retours forges — Produit-72 (Produit-71) — 20260924a
 
-- **Contexte** : tour additionnel après clôture du run `UIA-mandat-audit-poc-to-prod-20260923` (demande humaine du 2026-09-24).
+- **Contexte** : tour additionnel après clôture du run `Produit-72-mandat-audit-poc-to-prod-20260923` (demande humaine du 2026-09-24).
 - **Références ledger** : `forge\ledger.jsonl` seq 86-88 (entrées `type: retour` seq 88).
 - **Remise au pilot** : copier ce fichier et son sidecar dans `<pilot>\input\00-retours\_arrivee\`.
 - **Statut** : a_remettre
@@ -15,7 +15,7 @@ Convention de gravité : **bloquant** · **majeur** · **mineur**.
 
 ## Remarques restées au produit
 
-- Aucune remarque de portée purement produit n'est restée : le PDF A4 a été généré pour UIA dans ce tour, à côté de la fiche HTML. **Généralisable : non** (le livrable produit ici est propre à UIA ; la règle, elle, est remontée ci-dessus).
+- Aucune remarque de portée purement produit n'est restée : le PDF A4 a été généré pour Produit-72 dans ce tour, à côté de la fiche HTML. **Généralisable : non** (le livrable produit ici est propre à Produit-72 ; la règle, elle, est remontée ci-dessus).
 
 ## Retours sur les documents produits
 

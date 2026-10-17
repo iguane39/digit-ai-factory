@@ -1120,7 +1120,7 @@ s'affiche enfin sous le constat du formulaire qu'il explique ; **RT-13** module 
 devient un solde qui descend. **Écart à la lettre déclaré** : RT-10 demandait l'exclusion pour
 « interface, securite, visuel » ; elle ne s'applique qu'à `interface` — exclure `output\` du
 scan de secrets créerait un angle mort (un secret commis dans un livrable est un vrai secret),
-et `visuel` ne parcourt aucun fichier. **Preuves** : 10 tests neufs (`tests/test_lot_bav2_
+et `visuel` ne parcourt aucun fichier. **Preuves** : 10 tests neufs (`tests/test_lot_produit11_
 20260814a.py`), pytest **164 verts**, livrable Produit-11 `20260814f` régénéré, check_html PASS,
 capture d'état ouvert relue. RT-9 et RT-11 ne sont **pas re-mesurés sur Produit-11** : l'inventaire
 se fait à l'audit, qui est un run du produit, pas une campagne de forge — dit, pas tu.

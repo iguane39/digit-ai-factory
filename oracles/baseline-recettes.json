@@ -107,8 +107,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-boite-entree.mjs": {
-  "cas": 45,
-  "vu_le": "2026-10-13"
+  "cas": 47,
+  "vu_le": "2026-10-17"
  },
  "oracle-cadence.mjs": {
   "cas": 16,
@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 184,
-  "vu_le": "2026-10-15"
+  "cas": 185,
+  "vu_le": "2026-10-17"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -197,8 +197,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-enclenchement.mjs": {
-  "cas": 30,
-  "vu_le": "2026-10-15"
+  "cas": 38,
+  "vu_le": "2026-10-17"
  },
  "oracle-etude-opportunite.mjs": {
   "cas": 3,
@@ -262,8 +262,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-portee-doctrine.mjs": {
-  "cas": 12,
-  "vu_le": "2026-09-17"
+  "cas": 18,
+  "vu_le": "2026-10-17"
  },
  "oracle-portee-doctrine.mjs (parc réel)": {
   "non_lu": true,
@@ -343,12 +343,12 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 177,
-  "vu_le": "2026-10-15"
+  "cas": 180,
+  "vu_le": "2026-10-17"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 36,
-  "vu_le": "2026-10-14"
+  "cas": 43,
+  "vu_le": "2026-10-17"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -407,8 +407,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 34,
-  "vu_le": "2026-10-15"
+  "cas": 36,
+  "vu_le": "2026-10-17"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
   "cas": 10,
@@ -446,6 +446,10 @@
   "cas": 23,
   "vu_le": "2026-10-13"
  },
+ "oracles/mesure-refus-enclenchement.test.mjs": {
+  "cas": 12,
+  "vu_le": "2026-10-17"
+ },
  "oracles/oracle-amorcage-poste.test.mjs": {
   "cas": 23,
   "vu_le": "2026-09-22"
@@ -475,8 +479,8 @@
   "vu_le": "2026-10-12"
  },
  "oracles/oracle-enclenchement.test.mjs": {
-  "cas": 30,
-  "vu_le": "2026-10-15"
+  "cas": 38,
+  "vu_le": "2026-10-17"
  },
  "oracles/oracle-invariant-mesure.test.mjs": {
   "cas": 16,
@@ -575,8 +579,8 @@
   "vu_le": "2026-09-09"
  },
  "scripts/gitignore-captures.test.mjs": {
-  "cas": 8,
-  "vu_le": "2026-10-15"
+  "cas": 10,
+  "vu_le": "2026-10-17"
  },
  "scripts/indices-uniques.test.mjs": {
   "cas": 5,
@@ -681,6 +685,10 @@
  "scripts/verifier-etape-chaine.test.mjs": {
   "cas": 27,
   "vu_le": "2026-10-15"
+ },
+ "scripts/verifier-exigences-fatales.test.mjs": {
+  "cas": 22,
+  "vu_le": "2026-10-17"
  },
  "scripts/verifier-familles-mesure.mjs": {
   "cas": 11,

@@ -39,7 +39,11 @@ récente que sa source (K5) — le jour de son écriture, `prompt-analyzer-l99` 
 et il commande la suite : `schema_ledger: "1.1"`, avec **`forges_mobilisees`**, la liste des forges
 que le run mobilise (`["design", "tests"]`, noms courts ou complets), obligatoire depuis ce schéma
 (D-18 (a) du 26/09/2026) : c'est elle que le juge de l'enclenchement confronte aux verdicts
-consignés (étape 7). **Le pilot n'y figure jamais**, ni dans `--forges` (TF-1444) : il orchestre le
+consignés (étape 7). **Une forge mobilisée comme OUTIL se déclare avec ses parties (TF-1841,
+17/10/2026)** : `parties_mobilisees: { "agents": ["forge-agents"] }` nomme les skills mobilisés, et
+le juge ne réclame que leurs oracles — sans cette déclaration, forge-agents, mobilisée pour son seul
+journal, promettait jusqu'à 48 oracles. Une forge sans partie déclarée garde sa promesse entière ;
+une partie inconnue de la forge ne borne rien. **Le pilot n'y figure jamais**, ni dans `--forges` (TF-1444) : il orchestre le
 run, et ses oracles que tout run joue, la conformité et le contrôle du lot au moins, en sont le cadre.
 Le juge les range à part, sans avertir (`CONTRAT-INTERFACE.md` §3). Sans `schema_ledger`, le
 ledger est réputé **antérieur au schéma** et
@@ -61,7 +65,8 @@ donc pas calculable, et aucun juge de l'enclenchement n'avait d'entrée. Le cham
 documenter : il sert à rendre un fait **opposable**.
 
 *Un relevé qui porte plusieurs oracles produit plusieurs entrées*, une par oracle. C'est le prix
-de la calculabilité, et il est bas.
+de la calculabilité, et il est bas : `ledger.mjs consigner` les écrit depuis le rapport du lanceur
+(étape 7, TF-1319).
 
 **DÉCLARER LA COUVERTURE DES DIMENSIONS D'AUDIT (TF-1212, 13/10/2026)** — au `run_open` du ledger,
 champ `couverture_dimensions`, une valeur pour chacune des cinq dimensions du référentiel d'audit de
@@ -74,10 +79,11 @@ regardait ; sur quatorze forges déclarées à l'ouverture, cinq n'avaient jamai
 la forge d'audit. `oracle-conformite-projet` le juge en **R-19 ter**, en **avertissement non
 bloquant** (règle neuve, précédent D-70 (b)), sur le dernier `run_open` daté du 13/10/2026 ou après.
 *Ce que la règle ne fait pas* : elle n'ajoute pas d'étape d'audit obligatoire (l'option (b) de la
-décision n'est pas prise), elle n'est pas bloquante, et elle ne tranche pas les trois contradictions relevées entre la doctrine et le
-référentiel d'audit (route de déploiement manuelle contre pipeline exclusif, sauvegarde absente de
-l'oracle de mise en production, fournisseur d'identité sans règle) : ce sont des décisions de doctrine,
-qui reviennent à l'humain (R-58).
+décision n'est pas prise) et elle n'est pas bloquante. Les trois contradictions relevées entre la
+doctrine et le référentiel d'audit (route de déploiement manuelle contre pipeline exclusif, sauvegarde
+absente de l'oracle de mise en production, fournisseur d'identité sans règle) ne relèvent pas d'elle :
+elles sont **tranchées** par la décision humaine D-3 (a) du 17/10/2026, qui aligne la doctrine sur le
+référentiel — portes M-16, M-17 et M-18 de `ETAPE-MEP.md` § 3 terdecies, en avertissement.
 
 **DÉCLARER LES RÉFÉRENTIELS DISPONIBLES (TF-0373, 18/08)** — une fois par produit, avant tout.
 Pour chacun des trois, soit son chemin, soit `absent` avec son motif ; le `run_open` du ledger le
@@ -236,6 +242,16 @@ aller/retour/rejeu, tests citant les id d'exigences — cf. « Contrat du projet
 README de forge-tests) ; **disciplines de livrable** (lois 1, 2, 4) : zéro élément interactif
 sans effet, artefacts de démonstration derrière `*_MODE_DEMO` absent par défaut, données
 volatiles en base éditables datées sourcées.
+
+**Construire ce que l'audit exigera** (TF-1212, décision humaine D-3 (a) du 17/10/2026) : trois
+exigences fatales du référentiel d'audit de la maison se construisent ici, pas à la MEP. Le
+déploiement vers tout environnement géré est une étape de la chaîne du produit (pipeline versionné,
+ou chaîne de l'hébergeur déclenchée par la poussée), jamais une commande lancée d'un poste
+(CTL-D09-01). Tout actif de données critique a son RPO, son RTO, sa sauvegarde et un exercice de
+restauration (CTL-D05-09, CTL-D12-06, CTL-D16-09). Tout accès humain authentifié passe par un
+fournisseur d'identité central avec MFA, un compte local n'existant qu'avec sa procédure de secours
+(CTL-D03-01). Un produit qui n'a ni environnement géré, ni donnée critique, ni accès humain le
+déclare au dossier de MEP avec son motif. Juges : M-16, M-17, M-18 de `ETAPE-MEP.md` § 3 terdecies.
 
 **Valider** (gates rejoués) : les gates de l'écosystème du produit au vert ; chaque
 exigence MVP a ≥ 1 test qui la cite par son id (gate grep 100 %).
@@ -408,8 +424,10 @@ déclare comme tel, jamais par silence.
 
 Dockerfile/compose dans le produit, déploiement **staging** réel, `ROLLBACK.md` testé une
 fois, oracle MEP exécuté (`ETAPE-MEP.md`, liste à jour ; build, healthcheck ×3, smoke tests des exigences critiques
-contre l'instance servie, rollback prouvé, scan secrets de l'image). Puis générer
-`DOSSIER-MEP.md` et demander le **GO humain** — la production n'est jamais lancée sans lui ;
+contre l'instance servie, rollback prouvé, scan secrets de l'image ; chaîne de déploiement,
+sauvegarde et fournisseur d'identité déclarés, M-16 à M-18). Puis générer
+`DOSSIER-MEP.md` et demander le **GO humain** — la production n'est jamais lancée sans lui, et
+jamais depuis un poste : le GO est la porte d'approbation de la chaîne ou la poussée d'un commit nommé ;
 sans GO, clore en `pret_production_en_attente_GO` (état de succès).
 
 ## 7. Clore le run
@@ -438,9 +456,21 @@ au ledger (`CONTRAT-INTERFACE.md` §3). Les forges mobilisées se lisent au cham
 `forges_mobilisees` du `run_open`, sinon `--forges`. Son verdict se consigne au ledger en
 `oracles_verdict` et se cite dans la synthèse de clôture ; il **ne bloque pas** la clôture. *Pourquoi
 pas bloquant* : jugé sur les deux seuls runs réels qui déclarent leur schéma et leurs forges, il rend
-FAIL parce que ces runs consignent tous les verdicts d'un lanceur en UNE entrée, et l'outil qui
-consignerait un verdict par oracle n'existe pas encore ; un FAIL sur un regroupement n'est pas un
-oubli. Il deviendra bloquant à la livraison de cet outil, et c'est TF-1319 qui porte ce passage.
+FAIL parce que ces runs consignent tous les verdicts d'un lanceur en UNE entrée ; un FAIL sur un
+regroupement n'est pas un oubli. Il reste informatif jusqu'à une mesure de ses refus à tort sur
+plusieurs runs (décision D-5 (b) du 17/10/2026, TF-1319).
+
+*Consigner un verdict PAR oracle (TF-1319, 17/10/2026)* : à chaque étape, le rapport d'un lanceur se
+consigne par `node <racine>\digit-ai-forge-agents\.claude\skills\forge-agents\scripts\ledger.mjs
+consigner forge\ledger.jsonl --forge <forge> -- node <lanceur> <cible> --json-only` (ou
+`--rapport <rapport.json>`) : une entrée `oracles_verdict` par oracle du rapport, tout le lot ou rien.
+Le verdict du juge lui-même se consigne de la même façon (`-- node <pilot>\oracles\oracle-enclenchement.mjs
+forge\ledger.jsonl`). **Si le juge rend FAIL**, le run qualifie ce refus avant `run_close` par une
+entrée `type: qualification_enclenchement`, `qualification: "fonde"` (un contrôle dû n'a pas tourné
+ou n'a pas été consigné) ou `"a_tort"` (le run était complet, bloquer sa clôture aurait été une
+erreur), et sa `cause`. `node <pilot>\oracles\mesure-refus-enclenchement.mjs` compte ensuite, sur
+tous les produits, les clôtures que le juge aurait refusées et la part à tort, en séparant les runs
+qui ont consigné par l'outil : c'est sur ces chiffres que l'humain décidera du passage en bloquant.
 
 Compiler les entrées `type: retour` du ledger en un **lot de retours** —
 `forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** homonyme
@@ -461,7 +491,9 @@ Les seuls critères — tous mesurables, aucun « optimal »/« confiance » : o
 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation tenus sur les
 pans mesurés · oracle MEP au complet en staging (`ETAPE-MEP.md`) · `DOSSIER-MEP.md` complet · traçabilité exigences
 MVP → tests 100 % · ledger vérifié par `ledger.mjs verify` · couverture des dimensions d'audit déclarée
-à l'ouverture du run (R-19 ter, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage).
+à l'ouverture du run (R-19 ter, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage) ·
+chaîne de déploiement exclusive, sauvegarde des actifs critiques et fournisseur d'identité déclarés au
+dossier de MEP (M-16 à M-18, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage).
 
 *« Livré » a une définition opposable* (R-61, TF-1711, 15/10/2026) : toutes les exigences de la fiche
 implémentées et testées, seuls les secrets restant à saisir par l'administrateur, par un geste guidé

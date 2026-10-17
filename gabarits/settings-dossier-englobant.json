@@ -1,0 +1,16 @@
+{
+  "_commentaire": "Gabarit du pilot (gabarits\\settings-dossier-englobant.json, TF-0963, décision humaine du 17/10/2026 D-6 (a)) : réglages à poser en .claude\\settings.json d'un DOSSIER ENGLOBANT — le dossier de travail client qui CONTIENT le produit instancié (son forge\\ et son .claude\\) sans en être la racine. Le harnais ne charge que les réglages de SA racine : sans ce fichier, aucun hameçon du produit ne s'exécute depuis ce dossier et rien ne le dit. PORTÉE VOLONTAIREMENT RÉDUITE À UN SEUL HAMEÇON, UserPromptSubmit : la reconnaissance des mots-clés du lexique d'invocation RV-6 (« améliore le prompt », « l99 », « barre », « améliore ce skill »), seule portée éprouvée (Produit-11, posée et vérifiée le 09/09/2026). Les autres familles (ouverture, restitution jugée, refus avant outil, remisage) ne sont PAS reportées : posées ici, elles jugeraient aussi les messages écrits pour les dossiers voisins du produit. Leur absence reste SIGNALÉE à l'ouverture (oracle-portee-doctrine, PD3 et PD4). MARQUEUR À INSTANCIER dans la commande : le nom du sous-dossier qui contient le produit (chemin relatif à ce dossier englobant, barres obliques normales), à la place du marqueur entre chevrons, guillemets conservés. Un seul produit par dossier englobant : s'il en contient plusieurs, choisir celui sur lequel on travaille, sinon le lexique se déclencherait en double. Le hook du produit est lancé par chemin préfixé et résout lui-même sa racine (il s'exécute dans le produit, pas ici). Produit sans forge\\hooks\\factory.mjs à jour : rien ne se passe, sans erreur — c'est le produit qui doit porter le hook (R-47).",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PRODUIT>/forge/hooks/factory.mjs\" lexique",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

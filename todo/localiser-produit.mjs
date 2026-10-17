@@ -8,10 +8,10 @@
  *
  * LE FAIT. L'ingestion d'un lot a rendu « conformité de l'héritage NON VÉRIFIÉE pour
  * Produit-11 — dossier introuvable sous C:\dev ». Le produit existait, à
- * `_Client-A\BourseAuxVacants2\Produit-11`, soit TROIS niveaux sous la racine. Deux défauts
+ * `_Client-A\Produit-11\Produit-11`, soit TROIS niveaux sous la racine. Deux défauts
  * se cumulaient, et aucun ne se voyait depuis la sortie :
  *
- *   · la comparaison de nom était BRUTE — `"bourseauxvacants2".startsWith("Produit-11")`
+ *   · la comparaison de nom était BRUTE — `"Produit-11".startsWith("Produit-11")`
  *     est faux, les tirets du nom de produit n'existant pas dans les noms de dossiers ;
  *   · la recherche s'arrêtait à DEUX niveaux, borne assumée et écrite dans le code (« au-delà, on
  *     balaierait le disque pour deviner ») — défendable jusqu'à ce qu'un produit vive plus bas.

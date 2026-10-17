@@ -1,13 +1,15 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a576abdf8d21a41a4\\gabarits\\RESTITUTION.md",
-  "date_iso": "2026-10-02T07:38:52.205Z",
-  "registre_version": "2.35.0",
+  "cible": "C:\\dev\\digit-ai-factory\\gabarits\\RESTITUTION.md",
+  "date_iso": "2026-10-17T06:23:09.620Z",
+  "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "FAIL",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
-    "pass": 5,
-    "fail": 1,
+    "pass": 4,
+    "fail": 2,
     "skip": 2,
     "cache": 0
   },
@@ -44,19 +46,19 @@
       "domaine": "Calculs / chiffres",
       "file": "gabarits\\RESTITUTION.md",
       "verdict": "FAIL",
-      "detail": "1 constat(s) · N2 — compte contradictoire dans le même document : « Deux points » alors que le cardinal réel mesuré est 5"
+      "detail": "2 constat(s) · N2 — compte contradictoire dans le même document : « 7 points » alors que le cardinal réel mesuré est 5 ; N2 — compte contradictoire dans le même document : « Deux points » alors que le cardinal réel mesuré est 5"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "gabarits\\RESTITUTION.md",
-      "verdict": "PASS",
-      "detail": "7 constat(s) · 7 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (6 avertissement(s)) ; date d'engagement non sourcée : « **Un guide de lancement porte la sortie des portes du jour** (TF-1498, règle **S »"
+      "verdict": "FAIL",
+      "detail": "15 constat(s) · date d'engagement non sourcée : « **Un guide de lancement porte la sortie des portes du jour** (TF-1498, règle **S » ; pourcentage « 94,6 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
       "file": "gabarits\\RESTITUTION.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
@@ -68,16 +70,16 @@
       "domaine": "Livrabilité d'une conséquence déclarée",
       "file": "gabarits\\RESTITUTION.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune forme de subissance en contexte de repli — hors périmètre"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\RESTITUTION.md",
-    "ts": "2026-10-02T07:38:52.205Z",
+    "ts": "2026-10-17T06:23:09.619Z",
     "fichiers": {
-      "gabarits\\RESTITUTION.md": "5375befdbd506e12a175dc1e7e9c68749439fc05acf3efcf1a7095cd6d681237"
+      "gabarits\\RESTITUTION.md": "3776235b4789941bc5f1a93233e2b29a3383b12b88387f1ff41ba75f427fefe9"
     }
   },
   "empreinte_motif": null,

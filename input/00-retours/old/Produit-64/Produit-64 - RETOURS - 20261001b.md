@@ -1,10 +1,10 @@
 # Lot de retours — Produit-64 → digit-ai-factory — 2026-10-01, indice b
 
-**Émetteur** : produit `Produit-64` · **Cible** : le pilot `digit-ai-factory` (loi n° 5, gabarit de restitution, `oracle-synthese`) · **Origine** : une demande de dépôt de secret faite le 01/10/2026 par le porteur pour un développeur du projet BAV2, et le constat du porteur : « J'ai pu faire cette inscription manuellement, pourquoi est-ce que tu ne l'as pas fait quand je te l'ai demandé ? »
+**Émetteur** : produit `Produit-64` · **Cible** : le pilot `digit-ai-factory` (loi n° 5, gabarit de restitution, `oracle-synthese`) · **Origine** : une demande de dépôt de secret faite le 01/10/2026 par le porteur pour un développeur du projet Produit-11, et le constat du porteur : « J'ai pu faire cette inscription manuellement, pourquoi est-ce que tu ne l'as pas fait quand je te l'ai demandé ? »
 
 Ce lot porte **1 retour**, mesuré pendant cette demande.
 
-- **Contexte** : demande du porteur du 01/10/2026, 10:00 environ — déposer un jeton Mapbox au Key Vault de développement de BAV2 pour un développeur dont le compte est refusé. Hors run. Décision du porteur à la clôture : « tout ce qui peut être fait automatiquement doit être fait automatiquement, pas manuellement […] remonte ce sujet à la Factory pour que ce soit appliqué systématiquement pour toutes les demandes et tous les besoins, dans tous les projets / produits ».
+- **Contexte** : demande du porteur du 01/10/2026, 10:00 environ — déposer un jeton Mapbox au Key Vault de développement de Produit-11 pour un développeur dont le compte est refusé. Hors run. Décision du porteur à la clôture : « tout ce qui peut être fait automatiquement doit être fait automatiquement, pas manuellement […] remonte ce sujet à la Factory pour que ce soit appliqué systématiquement pour toutes les demandes et tous les besoins, dans tous les projets / produits ».
 - **Références ledger** : sans objet — ce produit ne tient pas de ledger de run.
 - **Remise au pilot** : ce fichier et son sidecar copiés dans le SAS `<pilot>/input/00-retours/_arrivee/`.
 - **Statut** : **remis le 2026-10-01** dans le sas d'arrivée du pilot, empreintes SHA-256 comparées

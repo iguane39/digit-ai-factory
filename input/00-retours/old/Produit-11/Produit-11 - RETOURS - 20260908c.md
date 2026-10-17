@@ -16,7 +16,7 @@
   l'original reste ici (historique du produit).
 - **Statut** : remis le 2026-09-08
 
-**Numérotation** : BAV2 tient une séquence `RT-nn` ; RT-1 … RT-47 sont consommés. Ce lot
+**Numérotation** : Produit-11 tient une séquence `RT-nn` ; RT-1 … RT-47 sont consommés. Ce lot
 continue en RT-48 … RT-49.
 
 Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un

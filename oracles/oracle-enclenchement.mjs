@@ -81,8 +81,16 @@
  *
  * Recette à double sens : `oracles\oracle-enclenchement.test.mjs`.
  *
+ * LA PROMESSE D'UNE FORGE-OUTIL SE BORNE AUX PARTIES DÉCLARÉES (TF-1841, 17/10/2026). Un run qui
+ * mobilise une forge pour un outil (le journal de forge-agents) le déclare à l'ouverture :
+ * `parties_mobilisees: { "agents": ["forge-agents"] }`. La promesse de cette forge se réduit aux
+ * oracles rangés sous ces skills ; une forge sans partie déclarée garde sa promesse entière. Une
+ * partie inconnue de la forge ne borne rien (dit au non_juge). Un oracle servi hors des parties
+ * déclarées est signalé en EN2, jamais accusé. Détail au bloc TF-1841 ci-dessous.
+ *
  * Usage : node oracles\oracle-enclenchement.mjs <ledger.jsonl> [--forges a,b] [--run <id>]
- *           [--racine <racine-du-parc>]
+ *           [--parties forge:partie,forge:partie] [--racine <racine-du-parc>]
+ *   --parties : les parties mobilisées (TF-1841), prioritaires sur `parties_mobilisees` du run.
  *   --forges : noms complets (`digit-ai-forge-design`) ou courts (`design`), séparés par des
  *              virgules ; sans lui, la dernière entrée `rectification_forges_mobilisees` du run
  *              (liste + `cause`, TF-1715), sinon le champ `forges_mobilisees` du `run_open` du run
@@ -178,25 +186,95 @@ export const TYPE_RECTIFICATION_FORGES = "rectification_forges_mobilisees";
 export function rectificationsForges(entrees) {
   return (entrees || []).filter((e) => e && e.type === TYPE_RECTIFICATION_FORGES).map((e) => {
     const liste = Array.isArray(e.forges_mobilisees) ? e.forges_mobilisees : nonVide(e.forges_mobilisees) ? String(e.forges_mobilisees).split(",") : [];
-    return { seq: e.seq, liste, valide: liste.some((x) => nonVide(x)) && nonVide(e.cause) };
+    return { seq: e.seq, liste, valide: liste.some((x) => nonVide(x)) && nonVide(e.cause), parties: e[CHAMP_PARTIES] };
   });
 }
 
 /**
  * Les forges mobilisées : l'option d'abord, la DERNIÈRE rectification valide du run ensuite
- * (TF-1715), le `run_open` enfin, jamais une devinette.
+ * (TF-1715), le `run_open` enfin, jamais une devinette. Les PARTIES déclarées (TF-1841) se lisent
+ * dans la même entrée que la liste — une rectification porte la déclaration ENTIÈRE, parties
+ * comprises — sauf `--parties`, qui prime sur toute source.
  */
-export function forgesMobilisees(runOpen, option, rectifications = []) {
+export function forgesMobilisees(runOpen, option, rectifications = [], optionParties = null) {
   let brut = null;
   let source = null;
+  let partiesBrutes;
   const rect = rectifications.filter((r) => r.valide).pop();
   if (nonVide(option)) { brut = String(option).split(","); source = "--forges"; }
-  else if (rect) { brut = rect.liste; source = `${TYPE_RECTIFICATION_FORGES} (seq ${rect.seq})`; }
-  else if (Array.isArray(runOpen.forges_mobilisees)) { brut = runOpen.forges_mobilisees; source = "run_open.forges_mobilisees"; }
-  else if (nonVide(runOpen.forges_mobilisees)) { brut = String(runOpen.forges_mobilisees).split(","); source = "run_open.forges_mobilisees"; }
+  else if (rect) { brut = rect.liste; source = `${TYPE_RECTIFICATION_FORGES} (seq ${rect.seq})`; partiesBrutes = rect.parties; }
+  else if (Array.isArray(runOpen.forges_mobilisees)) { brut = runOpen.forges_mobilisees; source = "run_open.forges_mobilisees"; partiesBrutes = runOpen[CHAMP_PARTIES]; }
+  else if (nonVide(runOpen.forges_mobilisees)) { brut = String(runOpen.forges_mobilisees).split(","); source = "run_open.forges_mobilisees"; partiesBrutes = runOpen[CHAMP_PARTIES]; }
   if (!brut) return null;
   const forges = [...new Set(brut.map(forgeCanonique).filter(Boolean))];
-  return { source, brut, forges };
+  const lues = nonVide(optionParties)
+    ? { ...partiesDeclarees(partiesDeOption(optionParties)), source: "--parties" }
+    : { ...partiesDeclarees(partiesBrutes), source: partiesBrutes === undefined ? null : source };
+  return { source, brut, forges, parties: lues.parties, source_parties: lues.source, parties_invalides: lues.invalides };
+}
+
+// ---- TF-1841 (17/10/2026) : une forge mobilisée comme OUTIL ne promet que la partie mobilisée ----
+//: Le fait, mesuré le 17/10/2026 par `mesure-refus-enclenchement.mjs` : sur 7 runs clos jugés, 7
+//: refus, dont 5 sur une forge mobilisée sans AUCUN verdict — forge-agents, mobilisée pour son seul
+//: outil de journal, y promettait jusqu'à 48 oracles. La granularité « forge » (étude du 19/08, §5)
+//: est trop large pour une forge-boîte à outils. Le run déclare donc, à l'ouverture, les PARTIES
+//: (skills) qu'il mobilise d'une forge : `parties_mobilisees: { "agents": ["forge-agents"] }`. La
+//: promesse de cette forge se borne aux oracles rangés sous `.claude/skills/<partie>/` (ou
+//: `skills/<partie>/`). Une forge déclarée SANS partie garde sa promesse entière (compatibilité :
+//: aucun journal antérieur ne change de verdict). Une partie qui ne désigne aucun skill de la forge
+//: ne borne RIEN — la promesse reste entière, et c'est dit : une faute de frappe ne doit jamais
+//: éteindre une promesse en silence. L'annotation libre après le nom (« agents (skill x) ») reste
+//: ignorée : la lire serait deviner, et réinterpréterait l'histoire.
+export const CHAMP_PARTIES = "parties_mobilisees";
+
+/** `forge:partie,forge:partie` (option `--parties`) → `{ forge: [parties] }`. */
+export function partiesDeOption(texte) {
+  const brut = {};
+  for (const morceau of String(texte ?? "").split(",")) {
+    const i = morceau.indexOf(":");
+    if (i <= 0) { brut[morceau.trim() || "(vide)"] = null; continue; }
+    const forge = morceau.slice(0, i).trim();
+    brut[forge] = [...(brut[forge] || []), morceau.slice(i + 1).trim()];
+  }
+  return brut;
+}
+
+/**
+ * La déclaration de parties, lue : `{ parties: { <forge canonique>: [parties] }, invalides: [] }`.
+ * Une valeur est un tableau de noms ou une chaîne à virgules ; ce qui ne se lit pas est rendu dans
+ * `invalides` pour être DIT, jamais appliqué (la forge concernée garde sa promesse entière).
+ */
+export function partiesDeclarees(brut) {
+  const parties = {};
+  const invalides = [];
+  if (brut === undefined || brut === null) return { parties, invalides };
+  if (typeof brut !== "object" || Array.isArray(brut)) return { parties, invalides: [`\`${CHAMP_PARTIES}\` n'est pas un objet { forge: [parties] } (reçu ${Array.isArray(brut) ? "un tableau" : typeof brut})`] };
+  for (const [cle, valeur] of Object.entries(brut)) {
+    const forge = forgeCanonique(cle);
+    const liste = Array.isArray(valeur) ? valeur : nonVide(valeur) && typeof valeur === "string" ? valeur.split(",") : null;
+    const noms = (liste || []).filter((x) => typeof x === "string" && x.trim()).map((x) => x.trim().toLowerCase());
+    if (!forge || !liste || !noms.length || noms.length !== liste.length) { invalides.push(`« ${cle} » : ${JSON.stringify(valeur)}`); continue; }
+    parties[forge] = [...new Set([...(parties[forge] || []), ...noms])];
+  }
+  return { parties, invalides };
+}
+
+//: La partie d'un oracle : le skill sous lequel son chemin le range, `null` hors de tout skill.
+const RE_PARTIE = /^(?:\.claude\/)?skills\/([^/]+)\//i;
+export function partieDe(chemin) {
+  const m = RE_PARTIE.exec(String(chemin ?? "").split("\\").join("/").replace(/^\.\//, ""));
+  return m ? m[1].toLowerCase() : null;
+}
+
+/** Les skills d'un dépôt, lus sur le disque (`.claude/skills/*`, `skills/*`). */
+export function skillsDuDepot(dossier) {
+  const noms = new Set();
+  for (const sous of [join(".claude", "skills"), "skills"]) {
+    try {
+      for (const e of readdirSync(join(dossier, sous), { withFileTypes: true })) if (e.isDirectory()) noms.add(e.name.toLowerCase());
+    } catch { /* pas de skills à cet endroit */ }
+  }
+  return noms;
 }
 
 /** Les dépôts du parc clonés sous la racine — lus sur le disque. */
@@ -319,7 +397,7 @@ export function racineParDefaut() {
  * Le jugement. Rend `{ verdict, motif?, findings, non_juge, … }` — jamais d'exception pour un
  * ledger ou un parc incomplet : ce qui ne se lit pas devient un SKIP motivé ou une ligne de non_juge.
  */
-export function juger({ ledger, forges = null, run = null, racine = racineParDefaut() } = {}) {
+export function juger({ ledger, forges = null, parties = null, run = null, racine = racineParDefaut() } = {}) {
   const nonJuge = [...NON_JUGE];
   const tete = { cible: ledger || null, racine };
   const skip = (motif, extra = {}) => ({ ...tete, verdict: "SKIP", motif, findings: [], non_juge: nonJuge, ...extra });
@@ -349,9 +427,15 @@ export function juger({ ledger, forges = null, run = null, racine = racineParDef
   for (const r of rectifs.filter((x) => !x.valide)) {
     nonJuge.push(`entrée ${TYPE_RECTIFICATION_FORGES} seq ${r.seq} ignorée : elle doit porter une liste \`forges_mobilisees\` non vide ET sa \`cause\` (CONTRAT-INTERFACE §3, TF-1715) — la déclaration précédente reste jugée`);
   }
-  const mob = forgesMobilisees(segment.run_open, forges, rectifs);
+  const mob = forgesMobilisees(segment.run_open, forges, rectifs, parties);
   if (!mob || !mob.forges.length) {
     return skip(`forges mobilisées inconnues pour le run ${runId} : ni \`--forges\`, ni \`forges_mobilisees\` au \`run_open\` — ce juge ne devine pas ce qu'un run a mobilisé, et \`versions_forges\` porte le parc, pas la mobilisation`, { run: runId });
+  }
+  if (mob.parties_invalides.length) {
+    nonJuge.push(`\`${CHAMP_PARTIES}\` (${mob.source_parties}) : ${mob.parties_invalides.join(" ; ")} — illisible(s), ignoré(s) : la forge concernée garde sa promesse ENTIÈRE (TF-1841)`);
+  }
+  for (const f of Object.keys(mob.parties).filter((x) => !mob.forges.includes(x))) {
+    nonJuge.push(`\`${CHAMP_PARTIES}\` nomme ${f}, qui n'est pas mobilisée par ce run : ses parties sont ignorées (TF-1841)`);
   }
 
   // ---- le SERVICE : ce que le run a consigné ------------------------------------------------
@@ -377,6 +461,25 @@ export function juger({ ledger, forges = null, run = null, racine = racineParDef
 
   // ---- la PROMESSE : ce que chaque forge mobilisée découvre sur son disque ------------------
   const decouvertes = new Map(mob.forges.map((f) => [f, decouvrir(racine, f)]));
+  // …BORNÉE aux parties que le run déclare mobiliser d'une forge-outil (TF-1841). La découverte
+  // entière est gardée à part : un oracle servi hors des parties déclarées reste RECONNU (EN2).
+  const entieres = new Map([...decouvertes].map(([f, d]) => [f, d]));
+  const bornes = {};
+  for (const [f, d] of decouvertes) {
+    const declarees = mob.parties[f];
+    if (!declarees || d.statut !== "ok") continue;
+    const connues = new Set([...skillsDuDepot(join(racine, f)), ...d.oracles.map((o) => partieDe(o.chemin)).filter(Boolean)]);
+    const inconnues = declarees.filter((p) => !connues.has(p));
+    if (inconnues.length) {
+      nonJuge.push(`${f} : partie(s) déclarée(s) inconnue(s) de la forge (${inconnues.join(", ")}) — aucun skill de ce nom : la déclaration ne borne RIEN, la promesse reste ENTIÈRE (${d.oracles.length} oracle(s)) (TF-1841)`);
+      continue;
+    }
+    const gardes = d.oracles.filter((o) => declarees.includes(partieDe(o.chemin)));
+    bornes[f] = { parties: declarees, promis: gardes.length, decouverts: d.oracles.length };
+    nonJuge.push(`${f} : promesse BORNÉE aux parties déclarées (${declarees.join(", ")}, ${mob.source_parties}) — ${gardes.length} oracle(s) promis sur ${d.oracles.length} découvert(s) ; les ${d.oracles.length - gardes.length} autre(s) ne sont pas réclamés à ce run (TF-1841)`);
+    decouvertes.set(f, gardes.length ? { ...d, oracles: gardes }
+      : { ...d, oracles: [], motif_borne: `les parties déclarées (${declarees.join(", ")}) ne portent aucun oracle découvert de ${f} : rien n'est promis, rien n'est confronté` });
+  }
   // …lue à la VERSION que le run a consignée : un oracle absent de cette version n'a pas pu y
   // tourner. Son jugement est SUSPENDU, avec son motif — jamais tu, jamais accusé.
   const versions = segment.run_open.versions_forges && typeof segment.run_open.versions_forges === "object"
@@ -405,9 +508,9 @@ export function juger({ ledger, forges = null, run = null, racine = racineParDef
     return {
       domaine: f,
       promesse: {
-        nom: `oracles découverts de ${f}`,
+        nom: bornes[f] ? `oracles découverts de ${f}, parties ${bornes[f].parties.join(", ")}` : `oracles découverts de ${f}`,
         elements: d.statut === "ok" ? [...new Set(d.oracles.map((o) => nomNormalise(o.nom)))] : [],
-        motif_absence: d.statut === "ok" ? "" : d.motif,
+        motif_absence: d.statut === "ok" ? (d.motif_borne || "") : d.motif,
         sources: [d.entree || join(racine, f)],
       },
       service,
@@ -447,7 +550,22 @@ export function juger({ ledger, forges = null, run = null, racine = racineParDef
   }
 
   // ---- EN2 : servi sans promesse — signalé, jamais accusé ------------------------------------
-  const horsPromesse = [...servis.keys()].filter((nom) => !porteurs.has(nom));
+  const horsPromesseBrut = [...servis.keys()].filter((nom) => !porteurs.has(nom));
+  // TF-1841 : un nom qu'une forge mobilisée découvre HORS des parties que le run a déclarées n'est
+  // ni inconnu ni hors mobilisation — la déclaration de parties est peut-être incomplète. Signalé
+  // à part, jamais accusé, jamais compté comme une promesse servie.
+  const horsParties = horsPromesseBrut.map((nom) => ({
+    nom,
+    forges: Object.keys(bornes).filter((f) => entieres.get(f).oracles.some((o) => nomNormalise(o.nom) === nom)),
+    seqs: servis.get(nom),
+  })).filter((x) => x.forges.length);
+  const horsPromesse = horsPromesseBrut.filter((nom) => !horsParties.some((x) => x.nom === nom));
+  if (horsParties.length) findings.push({
+    regle: "EN2",
+    statut: "AVERTISSEMENT",
+    message: `${horsParties.length} nom(s) servi(s) au run ${runId} hors des parties déclarées de sa forge (${horsParties.map((x) => `${x.nom} ← ${x.forges.join("/")}`).join(", ")}) — signalé(s), jamais accusé(s) : la déclaration \`${CHAMP_PARTIES}\` est peut-être incomplète (TF-1841)`,
+    hors_parties: horsParties,
+  });
   if (horsPromesse.length) {
     const ailleurs = new Map();
     const sansDecouverte = [];
@@ -508,6 +626,7 @@ export function juger({ ledger, forges = null, run = null, racine = racineParDef
       canoniques: canoniques.length,
       noms_servis: servis.size,
       promesses: Object.fromEntries([...decouvertes].map(([f, d]) => [f, d.statut === "ok" ? d.oracles.length : null])),
+      ...(Object.keys(bornes).length ? { promesses_bornees: bornes } : {}),
     },
     verdict,
     ...(verdict === "SKIP" ? { motif: `aucune forge mobilisée n'a pu être jugée : ${en1.map((f) => `${f.forge} — ${f.message}`).join(" ; ")}` } : {}),
@@ -522,12 +641,13 @@ const lanceEnDirect = process.argv[1]
      === resolve(process.argv[1]).toLowerCase().split("\\").join("/");
 if (lanceEnDirect) {
   const args = process.argv.slice(2);
-  const AVEC_VALEUR = ["--forges", "--run", "--racine"];
+  const AVEC_VALEUR = ["--forges", "--parties", "--run", "--racine"];
   const valeur = (nom) => { const i = args.indexOf(nom); return i >= 0 && args[i + 1] !== undefined ? args[i + 1] : null; };
   const ledger = args.find((a, i) => !a.startsWith("--") && !AVEC_VALEUR.includes(args[i - 1])) || null;
   const r = juger({
     ledger: ledger ? resolve(ledger) : null,
     forges: valeur("--forges"),
+    parties: valeur("--parties"),
     run: valeur("--run"),
     racine: valeur("--racine") ? resolve(valeur("--racine")) : racineParDefaut(),
   });

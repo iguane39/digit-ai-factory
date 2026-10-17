@@ -1,7 +1,7 @@
 # Plan de mise en œuvre — stratégie de tests de bout en bout, complète et autonome-sous-gates
 
 **Mandat humain du 13/08/2026** (prompt barré L99) — motivé par l'insatisfaction sur un run réel
-(BourseAuxVacants2 : « la plupart des pans ne sont même pas construits, encore moins exécutés »).
+(Produit-11 : « la plupart des pans ne sont même pas construits, encore moins exécutés »).
 **Livrable = ce plan** (document), pas l'implémentation. Il **redéfinit la mission de forge-tests**
 (aujourd'hui elle *audite* des suites, ne les écrit pas — CDC §4.4) : R-28 s'applique, la décision
 reste humaine, et la feuille de route (§8) est une liste de **candidatures**. Aucune écriture dans
@@ -189,7 +189,7 @@ honnête sur ce qui reste** — pas proclamé.
 ---
 
 ## Annexe — traçabilité
-Diagnostic ancré sur `BourseAuxVacants2/Produit-11/forge/rapport-tests.json` (verdict PARTIEL,
+Diagnostic ancré sur `Produit-11/Produit-11/forge/rapport-tests.json` (verdict PARTIEL,
 mutation back 0,1132, 8 pans non couverts avec leur `pour_couvrir`). Cadre : CDC §4.4 (frontière
 actuelle), CONTRAT-INTERFACE §5 (dettes D-T*), REGLES-PROJET (G-1, G-2, R-28, R-29). Aucune écriture
 hors pilot (`git status` des forges inchangé). Feuille de route → 5 candidatures TODO-FORGE.

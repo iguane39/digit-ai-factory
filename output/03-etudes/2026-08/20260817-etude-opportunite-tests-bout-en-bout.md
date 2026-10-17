@@ -41,7 +41,7 @@ PROPOSITIONS déposées dans un dossier … »). Exemplaires réels, mesurés le
 
 | Exemplaire (chemin réel) | Date | Ce qu'il porte |
 |---|---|---|
-| `C:\dev\_Client-A\BourseAuxVacants2\proposition-tests\livrables\Produit-11 - Cahier de tests fonctionnels - 20260817b.md` | 2026-08-17 | 160 éléments inventoriés · **971 cas dérivés · 0 cas adoptés** · 4 non couverts |
+| `C:\dev\_Client-A\Produit-11\proposition-tests\livrables\Produit-11 - Cahier de tests fonctionnels - 20260817b.md` | 2026-08-17 | 160 éléments inventoriés · **971 cas dérivés · 0 cas adoptés** · 4 non couverts |
 | `…\Produit-11 - Cahier de tests techniques - 20260817b.md` | 2026-08-17 | 102 inventoriés · **94 cas · 0 adoptés** · 8 non couverts |
 | `C:\dev\_Client-A\Produit-01-livrables\Produit-01 - Cahier de tests fonctionnels - 20260812a.md` | 2026-08-12 | 120 inventoriés · **176 cas dérivés** |
 | `C:\dev\_Client-A\Produit-73\forge\etapes\tests\livrables\COMPTA … Cahier de tests fonctionnels - 20260814b.md` | 2026-08-14 | 389 inventoriés · **680 cas · 0 adoptés** |
@@ -51,7 +51,7 @@ PROPOSITIONS déposées dans un dossier … »). Exemplaires réels, mesurés le
 | `C:\dev\digit-ai-forge-tests\docs\cartographie-familles-de-tests.md` | 2026-08-02 | familles de tests à couvrir, non couvertes |
 
 **Contre-épreuve (le même titre peut cacher l'inverse)** :
-`C:\dev\_Client-A\BourseAuxVacants2\Produit-11\forge\etapes\tests\STRATEGIE-E2E.md`
+`C:\dev\_Client-A\Produit-11\Produit-11\forge\etapes\tests\STRATEGIE-E2E.md`
 s'intitule « Stratégie de tests de bout en bout » et est un **rapport d'exécution réel**
 (69 tests verts, 399 pytest, mutation 0,90 sur 45/50 mutants tués, 13 défauts trouvés,
 3 gates passantes, `verifie_le: 2026-08-17`). La règle demandée n'a donc rien à inventer :

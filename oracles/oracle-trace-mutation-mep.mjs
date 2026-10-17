@@ -56,6 +56,15 @@
  *        `scripts\verifier-contre-lecture.mjs`. Entrée en avertissement le 14/10/2026 comme TM9, elle
  *        bloque depuis le même jour : décision humaine « Traite A1 » sur TF-1688, prise sur son bruit
  *        mesuré, 0 dossier accusé sur les 6 dossiers de MEP du poste.
+ *   TM11 le dossier porte la section « Chaîne de déploiement » : la chaîne qui déploie et l'exécution
+ *        citée, sans commande de déploiement direct depuis un poste (M-16, CTL-D09-01) ;
+ *   TM12 le dossier porte la section « Sauvegarde et restauration » : la déclaration de sauvegarde
+ *        jugée par O-19 de forge-ops, ou « aucun actif de données critique » motivé (M-17, CTL-D05-09,
+ *        CTL-D12-06, CTL-D16-09) ;
+ *   TM13 le dossier porte la section « Fournisseur d'identité » : le fournisseur central et le MFA, ou
+ *        « aucun accès humain authentifié » motivé (M-18, CTL-D03-01). TM11 à TM13 sont câblés sur
+ *        `scripts\verifier-exigences-fatales.mjs` et AVERTISSENT, comme TM9 : règles neuves du
+ *        17/10/2026 (TF-1212, décision humaine D-3 (a)), taux d'accusation mesuré à l'entrée 7 sur 7.
  *
  * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
  * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
@@ -210,12 +219,12 @@ function confronterVerdictsArchives(racine) {
  * sien. La règle vit en un seul endroit, et son banc la prouve. `porte` nomme la règle de l'étape,
  * `pass` dit le vert à partir de la mesure du verbe.
  */
-function confronterVerbe(racine, script, porte, pass) {
+function confronterVerbe(racine, script, porte, pass, options = []) {
   const verbe = join(ICI, "..", "scripts", script);
   if (!existsSync(verbe)) {
     return { statut: "NON_JUGE", message: `scripts\\${script} absent du pilot — ${porte} n'est jugé par rien, et c'est dit plutôt que tu` };
   }
-  const r = spawnSync(process.execPath, [verbe, racine], { encoding: "utf8", timeout: 120000 });
+  const r = spawnSync(process.execPath, [verbe, racine, ...options], { encoding: "utf8", timeout: 120000 });
   let j = null;
   try { j = JSON.parse(r.stdout || ""); } catch { /* dit ci-dessous */ }
   if (!j) {
@@ -267,6 +276,29 @@ function confronterParcoursTiers(racine) {
 const confronterContreLecture = (racine) => confronterVerbe(racine, "verifier-contre-lecture.mjs", "M-15",
   (j) => `${(j.mesure || {}).parametres || 0} paramètre(s) de lancement lus à l'exécution et comparés à la fiche, `
     + `${(j.mesure || {}).ecarts_traites || 0} écart(s) tranché(s), non-comparé publié`);
+
+/**
+ * TM11, TM12, TM13 — les trois exigences FATALES du référentiel d'audit que la doctrine contredisait
+ * (TF-1212, décision humaine D-3 (a) du 17/10/2026) : déploiement par chaîne exclusive (M-16,
+ * CTL-D09-01), sauvegarde des actifs critiques jugée par O-19 de forge-ops (M-17, CTL-D05-09,
+ * CTL-D12-06, CTL-D16-09), fournisseur d'identité central avec MFA (M-18, CTL-D03-01). Un seul verbe,
+ * `scripts\verifier-exigences-fatales.mjs`, joué une fois par exigence (`--regle`). AVERTISSEMENT :
+ * règle neuve opposable à tous les produits (précédent D-70 (b)) ; taux d'accusation mesuré à l'entrée
+ * sur les 7 dossiers de MEP du poste : 7 sur 7 pour chacune (aucun ne porte encore la section), et 2 sur
+ * 7 prescrivent une commande de déploiement direct non antérieure (ETAPE-MEP.md § 3 terdecies).
+ */
+function confronterExigenceFatale(racine, regle, porte, pass) {
+  const r = confronterVerbe(racine, "verifier-exigences-fatales.mjs", porte, pass, ["--regle", regle]);
+  if (r.statut !== "FAIL") return r;
+  return { statut: "AVERTISSEMENT", message: "règle neuve du 17/10/2026, non bloquante (précédent D-70 (b)) — " + r.message };
+}
+const confronterChaine = (racine) => confronterExigenceFatale(racine, "pipeline", "M-16",
+  (j) => `déploiement par la chaîne déclaré au dossier (${(j.mesure || {}).chaines || 0} chaîne(s) relevée(s), `
+    + `${(j.mesure || {}).commandes_directes || 0} commande de déploiement direct prescrite) — CTL-D09-01`);
+const confronterSauvegarde = (racine) => confronterExigenceFatale(racine, "sauvegarde", "M-17",
+  (j) => `sauvegarde des actifs critiques déclarée au dossier${(j.mesure || {}).o19 ? `, O-19 ${(j.mesure || {}).o19}` : ""} — CTL-D05-09, CTL-D12-06, CTL-D16-09`);
+const confronterIdentite = (racine) => confronterExigenceFatale(racine, "identite", "M-18",
+  () => "fournisseur d'identité central et MFA déclarés au dossier (ou aucun accès humain, motivé) — CTL-D03-01");
 
 export function juger(racine) {
   const findings = [];
@@ -366,6 +398,11 @@ export function juger(racine) {
   // TM10 — les contre-lectures de plan des dossiers du produit, jugées ensemble par le verbe.
   const cl = confronterContreLecture(racine);
   findings.push({ regle: "TM10", statut: cl.statut, ou: racine, message: cl.message });
+  // TM11 à TM13 — les exigences fatales du référentiel d'audit, jugées une par une par le même verbe.
+  for (const [regle, confronter] of [["TM11", confronterChaine], ["TM12", confronterSauvegarde], ["TM13", confronterIdentite]]) {
+    const v = confronter(racine);
+    findings.push({ regle, statut: v.statut, ou: racine, message: v.message });
+  }
   return findings;
 }
 
@@ -389,6 +426,10 @@ const NON_JUGE = [
   "la VÉRITÉ des paramètres recopiés à la contre-lecture (TM10) : le verbe exige la valeur à l'exécution, sa source, la "
   + "valeur attendue et sa référence, il ne relit pas l'API de la chaîne ; un vote de plan dit en d'autres mots n'est pas "
   + "vu : ce silence-là passe TM10, bien que la règle bloque depuis la décision sur TF-1688 (14/10/2026)",
+  "la RÉALITÉ des déploiements, sauvegardes et authentifications déclarés (TM11 à TM13) : le verbe exige la "
+  + "section, la chaîne et son exécution, la déclaration de sauvegarde jugée par O-19, le fournisseur et le MFA ; "
+  + "l'inventaire des accès de déploiement direct et la capture de la configuration d'identité restent des gestes "
+  + "d'audit (forge-audit) — et ces trois règles AVERTISSENT sans bloquer, règles neuves du 17/10/2026",
   "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
   + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
 ];
@@ -634,6 +675,35 @@ function selfTest() {
     if (!/TM10/.test(r.stdout) || !/Contre-lecture/.test(r.stdout)) casse.push("TM10 n'apparaît pas au verdict JSON — un refus que personne ne lit ne protège rien");
   }
 
+  // ---- TM11 à TM13 : LES EXIGENCES FATALES DU RÉFÉRENTIEL D'AUDIT (M-16 à M-18, TF-1212) -------------
+  // Le cas fondateur du 09/09/2026, réduit à son fait : un dossier de MEP qui prescrit `railway up`
+  // depuis le poste et ne dit rien de la sauvegarde ni du fournisseur d'identité. Le remède : les trois
+  // sections, avec la chaîne nommée et son exécution, et des « aucun » motivés.
+  const MANUEL = `${DOSSIER_OK}\n## Production : commandes exactes\n\n\`\`\`bash\nrailway up --detach --service app --environment production\n\`\`\`\n`;
+  const ALIGNE = `${DOSSIER_OK}\n## Chaîne de déploiement\n\nChaîne : \`.github/workflows/deploiement.yml\`, porte d'approbation de l'environnement production. `
+    + "Exécution 15452 du 2026-10-17 : auteur, version 6f78b88, cible production, résultat succès.\n\n"
+    + "## Sauvegarde et restauration\n\nAucun actif de données critique : site statique, le dépôt git est la source de tout le contenu servi.\n\n"
+    + "## Fournisseur d'identité\n\nAucun accès humain authentifié : site public sans compte ni espace d'administration.\n";
+  const avecWorkflow = (racine) => {
+    mkdirSync(join(racine, ".github", "workflows"), { recursive: true });
+    writeFileSync(join(racine, ".github", "workflows", "deploiement.yml"), "on: push\njobs:\n  d:\n    steps:\n      - run: railway up --ci\n", "utf8");
+    return racine;
+  };
+  const manuel = avecWorkflow(produit("tm11-manuel", MANUEL, MARQUEUR));
+  attendre("tm11-manuel", manuel, "TM11", "AVERTISSEMENT");
+  attendre("tm12-muet", manuel, "TM12", "AVERTISSEMENT");
+  attendre("tm13-muet", manuel, "TM13", "AVERTISSEMENT");
+  const aligne = avecWorkflow(produit("tm11-aligne", ALIGNE, MARQUEUR));
+  attendre("tm11-aligne", aligne, "TM11", "PASS");
+  attendre("tm12-aligne", aligne, "TM12", "PASS");
+  attendre("tm13-aligne", aligne, "TM13", "PASS");
+  // ET ILS NE BLOQUENT PAS : règles neuves, sortie 0, et le refus se lit au verdict JSON.
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), manuel], { encoding: "utf8" });
+    if (r.status !== 0) casse.push("un dossier qui prescrit un déploiement direct sans sauvegarde ni fournisseur d'identité fait sortir l'oracle en échec — TM11 à TM13 devaient AVERTIR, règles neuves du 17/10/2026");
+    if (!/TM11/.test(r.stdout) || !/railway up/.test(r.stdout) || !/CTL-D03-01/.test(r.stdout)) casse.push("TM11 à TM13 n'apparaissent pas au verdict JSON avec la commande et l'exigence d'audit — un avertissement que personne ne lit n'est pas un avertissement");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -643,7 +713,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 36/36 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 43/43 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -663,7 +733,10 @@ function selfTest() {
       + "paiement embarqué AVERTISSEMENT — le cas fondateur du 25/08/2026 ; TM9 ne bloque PAS, code de sortie 0 vérifié ; "
       + "TM10 sans plan voté SANS_OBJET ; TM10 paramètre lu à l'exécution, écart tranché et non-comparé publié PASS ; TM10 cas "
       + "rouge — plan voté sans contre-lecture des paramètres — FAIL, le cas fondateur du 29/09/2026 ; "
-      + "TM10 bloque depuis TF-1688, code de sortie 1 vérifié)");
+      + "TM10 bloque depuis TF-1688, code de sortie 1 vérifié ; TM11 à TM13 dossier qui prescrit `railway up` "
+      + "et ne dit rien de la sauvegarde ni du fournisseur d'identité AVERTISSEMENT ×3 — le cas fondateur du "
+      + "09/09/2026 (TF-1212) ; TM11 à TM13 chaîne nommée avec son exécution, « aucun » motivés PASS ×3 ; TM11 à "
+      + "TM13 ne bloquent PAS, code de sortie 0 vérifié)");
   return casse.length ? 1 : 0;
 }
 

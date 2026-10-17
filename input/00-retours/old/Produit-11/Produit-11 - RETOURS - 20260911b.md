@@ -19,7 +19,7 @@
 > node forge\retours\oracle-lot.mjs "forge\retours\Produit-11 - RETOURS - 20260911b.md"
 > ```
 
-**Numérotation** : BAV2 tient une séquence `RT-nn`. RT-1 … RT-54 étaient consommés au 10/09.
+**Numérotation** : Produit-11 tient une séquence `RT-nn`. RT-1 … RT-54 étaient consommés au 10/09.
 Ce lot continue en **RT-55 … RT-62**. ⚠️ **Une collision d'identifiants est signalée en RT-62** :
 le lot `20260911a`, écrit le même jour par une autre session du même produit, a repris RT-50 à
 RT-52, déjà portés par les lots `20260909b` et `20260910a`.

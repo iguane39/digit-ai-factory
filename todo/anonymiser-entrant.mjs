@@ -145,6 +145,29 @@ export function variantes(nom, { clients = null } = {}) {
   return new RegExp(`(?<![A-Za-z0-9_])${corps}(?![A-Za-z0-9_])`, "gi");
 }
 
+/**
+ * TF-1839 (17/10/2026, décision D-16 (a)) — LA FORME COLLÉE d'un nom à séparateurs.
+ *
+ * Les variantes ci-dessus ne couvrent que les clés SANS point séparées par espace, tiret, souligné
+ * ou point médian. Une clé à point (graphie de domaine) ou séparée par une autre ponctuation
+ * (apostrophe, esperluette, barre oblique) voyait sa forme ÉCRITE COLLÉE traverser. Ici : accents
+ * repliés, tout non-alphanumérique retiré ; la forme n'existe que si la clé portait au moins un
+ * séparateur ET que la forme collée fait au moins SEUIL_COLLEE caractères (en dessous, une suite
+ * de lettres est un mot ordinaire). Insensible à la casse, bornée à gauche par un non-alphanumérique ;
+ * à droite des CHIFFRES peuvent suivre (suffixe de version d'un dossier, « <nom collé>2 » : les 30
+ * occurrences mesurées le 17/10 sont de cette forme) et sont AVALÉS avec le nom — « Produit-11 » + « 2 »
+ * se lirait « Produit-112 » ; une LETTRE après la forme collée l'écarte (mot voisin).
+ * Même règle que `formeColleeProduit()` de la porte `oracle-nom-client-publie` (forge-agents).
+ */
+export const SEUIL_COLLEE = 8;
+export function formeCollee(nom) {
+  if (typeof nom !== "string") return null;
+  const pliee = plier(nom);
+  const collee = pliee.replace(/[^A-Za-z0-9]+/g, "");
+  if (collee.length < SEUIL_COLLEE || collee.length === pliee.length) return null;
+  return new RegExp(`(?<![A-Za-z0-9_])${tolerantAccents(collee)}\\d*(?![A-Za-z0-9_])`, "gi");
+}
+
 function lireProduits() {
   const p = CHEMIN_PRODUITS();
   if (!existsSync(p)) return null;
@@ -472,6 +495,9 @@ export function anonymiser(texte, { code = false } = {}) {
     // graphie de domaine et se prend telle quelle : la dériver attraperait des liens légitimes.
     const re = variantes(nom, { clients: parNom });
     if (re && re.test(out)) { out = out.replace(re, pseudo); remplaces.push(nom); }
+    // TF-1839 : la forme COLLÉE d'un nom à séparateurs (voir `formeCollee`).
+    const collee = formeCollee(nom);
+    if (collee && collee.test(out)) { collee.lastIndex = 0; out = out.replace(collee, pseudo); remplaces.push(nom); }
     // TF-0826 (08/09/2026) — LA CASSE, POUR LES PRODUITS AUSSI, ET ELLE A DORMI SEPT JOURS.
     //
     // La ligne du dessus compare avec `includes`, donc À LA CASSE PRÈS. La table portait un nom
@@ -542,7 +568,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     pseudonymes: { Zorglub: "Client-A", "wks-99999999999999": "wks-00000000000000", ZRG: "Sigle-A" },
   }), "utf8");
   writeFileSync(join(dir, "_produits-pseudonymes.json"), JSON.stringify({
-    produits: { "CalculatriceZorglubZAP": "Produit-01", "Gribouille-ai.fr": "Produit-02" },
+    produits: { "CalculatriceZorglubZAP": "Produit-01", "Gribouille-ai.fr": "Produit-02", "Atelier.Boréal": "Produit-02", "Lune.Net": "Produit-02" },
   }), "utf8");
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_noms-interdits.json");
   process.env.FORGE_PRODUITS_PSEUDO = join(dir, "_produits-pseudonymes.json");
@@ -573,6 +599,20 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   // (nom de domaine INVENTÉ : une clé réelle écrite ici serait réécrite par la passe d'anonymisation
   //  — c'est arrivé le 02/09, et le banc s'est mis à tester autre chose que ce qu'il croyait)
   if (variantes("Zorglub-ai.fr") !== null) casse.push("une clé de domaine (avec un point) se voit dériver des variantes — elle doit être prise telle quelle");
+
+  // 2 ter) TF-1839 (17/10/2026, D-16 (a)) — LA FORME COLLÉE d'un nom à séparateurs, DANS LES TROIS SENS.
+  //        Clés INVENTÉES. Rouge avant le correctif : « atelierboreal » et « AtelierBoreal » traversaient
+  //        (la clé porte un point, donc aucune variante dérivée) ; vert : remplacées par « Produit-02 ».
+  //        Contre-épreuves : un mot voisin (« atelierborealite ») ne bouge pas ; une clé dont la forme
+  //        collée fait MOINS de SEUIL_COLLEE caractères (« Lune.Net » → « LuneNet », 7) n'a pas de forme collée.
+  const r2t1 = anonymiser("Voir atelierboreal et AtelierBoreal, ou ATELIERBOREAL, dossier c:/dev/AtelierBoreal2/src.");
+  if ((r2t1.texte.match(/Produit-02/g) || []).length !== 4 || /atelierboreal/i.test(r2t1.texte) || !r2t1.texte.includes("Produit-02/src"))
+    casse.push("TF-1839 : la forme collée d'une clé à séparateurs traverse : " + r2t1.texte);
+  const r2t2 = anonymiser("Un atelierborealite, un atelierboreal2b ne sont pas ce produit ; luneNet non plus.");
+  if (/atelierboreal$/.test(r2t2.texte) || !/atelierborealite/.test(r2t2.texte) || !/atelierboreal2b/.test(r2t2.texte) || !/luneNet/.test(r2t2.texte))
+    casse.push("TF-1839 : la forme collée mord sur un mot voisin ou sous le seuil : " + r2t2.texte);
+  if (formeCollee("Lune.Net") !== null || formeCollee("Atelier.Boréal") === null || formeCollee("Produit") !== null)
+    casse.push("TF-1839 : formeCollee ne respecte pas le seuil de " + SEUIL_COLLEE + " caractères ou l'exigence d'un séparateur");
 
   // 3 quater) LA CASSE D'UNE CLÉ DE PRODUIT, DANS LES DEUX SENS (TF-0826, 08/09) — sens vert :
   //           la clé porte une capitale initiale, le texte porte la graphie minuscule du même

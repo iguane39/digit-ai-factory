@@ -177,7 +177,7 @@ poste avait numérotée D-15 le même soir, renumérotée pour ne pas confondre 
 > publie malgré le refus de la garde `pre-push`. C'est arrivé ici à 13:49 sur 13 dépôts, et la
 > parade d'une ligne est éprouvée sur un dépôt jetable. Les lots de Produit-64 portent 11
 > candidatures, presque toutes sur la recherche dans la page du socle `digit-ai-page-html`, et
-> sur 2 juges de `digit-ai-forge-design`. Les 2 lots du produit UIA en portent 7, venues d'un audit
+> sur 2 juges de `digit-ai-forge-design`. Les 2 lots du produit Produit-72 en portent 7, venues d'un audit
 > « du prototype à la production » : faux positifs d'oracles et une fiche de sécurité à livrer
 > aussi en PDF ; leur sidecar ne portait pas de score utile, d'où une valeur de 1. Ce tour en
 > ajoute 3 autres au pilot : les noms de personnes que l'accueil laisse passer, un lot daté d'un
@@ -189,8 +189,8 @@ poste avait numérotée D-15 le même soir, renumérotée pour ne pas confondre 
 
 | Option | Coût | Exclusions |
 |---|---|---|
-| **(a)** Décider les 22 | complexe × long | le mandat suivant traite aussi les 7 candidatures du produit UIA sans score |
-| **(b)** *(recommandée)* Décider les 9 de valeur 10 ou plus (TF-1360 la garde contournée, puis TF-1338, TF-1341, TF-1343, TF-1359, TF-1339, TF-1340, TF-1353, TF-1358), plus TF-1357 sur les noms de personnes | moyen × moyen | 12 restent candidates, dont les 7 du produit UIA en attendant un score |
+| **(a)** Décider les 22 | complexe × long | le mandat suivant traite aussi les 7 candidatures du produit Produit-72 sans score |
+| **(b)** *(recommandée)* Décider les 9 de valeur 10 ou plus (TF-1360 la garde contournée, puis TF-1338, TF-1341, TF-1343, TF-1359, TF-1339, TF-1340, TF-1353, TF-1358), plus TF-1357 sur les noms de personnes | moyen × moyen | 12 restent candidates, dont les 7 du produit Produit-72 en attendant un score |
 | **(c)** Ne rien décider | nul | les 22 restent candidates, la garde de publication reste contournable par un filtre cassé, et un lot qui nomme une personne passe l'accueil sans alerte |
 
 > **Si rien n'est décidé** : (c).
@@ -225,12 +225,12 @@ synchronisation d'abord, puis les lots, puis la prise en compte du retour.
   au premier message écrit dans un tuyau fermé, et git publie quand même.
   - preuve : sur 2 dépôts jetables, refusé sans filtre, PUBLIÉ avec le filtre cassé, refusé avec
     `trap '' PIPE` en tête du hameçon ; candidature TF-1360, en tête de D-21.
-- **Le sas d'arrivée est vide.** 9 lots accueillis et ingérés : 6 de Produit-64, 2 du produit UIA,
+- **Le sas d'arrivée est vide.** 9 lots accueillis et ingérés : 6 de Produit-64, 2 du produit Produit-72,
   et le vôtre.
   - preuve : `accueillir-lot` a pseudonymisé 18 fichiers, sans adresse IP à qualifier ;
     `oracle-lot-retours` : 8 PASS et 1 FAIL couvert par la dérogation ; `oracle-boite-entree` PASS.
 - **3 noms de produits entrent à la table**, hors de tout dépôt : Produit-70 pour l'émetteur de
-  votre lot, Produit-71 et Produit-72 pour les 2 noms longs du produit UIA.
+  votre lot, Produit-71 et Produit-72 pour les 2 noms longs du produit Produit-72.
   - preuve : aucune occurrence de ces noms dans les fichiers suivis ni dans les messages du pilot et
     des 13 forges, mesuré avant ; `oracle-confidentiel` rendait FAIL K5 sur un alias, PASS avec 2
     pseudonymes distincts.

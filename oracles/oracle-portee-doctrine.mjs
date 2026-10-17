@@ -41,8 +41,9 @@
 // mesurer » : il ne depend d'aucun outil externe et lit des fichiers du depot. Le declarer
 // vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
 // d'environnement (TF-0648).
-import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
-import { join, dirname, isAbsolute } from "node:path";
+import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, copyFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { join, dirname, isAbsolute, basename } from "node:path";
 import { tmpdir, homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
@@ -179,6 +180,47 @@ export function juger({ registre, racine }) {
  * BLOQUER quand la cible n'est pas la sienne »). La cible de PD3 est la RACINE DE SESSION de
  * celui qui l'exécute — la seule chose qu'il puisse réparer sur-le-champ, et le geste est connu.
  */
+/** Les produits instanciés (forge\) dans les sous-dossiers DIRECTS de `cwd` — profondeur un, comme PD3. */
+export function produitsImbriques(cwd) {
+  let enfants = [];
+  try { enfants = readdirSync(cwd, { withFileTypes: true }).filter((d) => d.isDirectory()); } catch {}
+  const out = [];
+  for (const d of enfants) {
+    if (d.name.startsWith(".") || d.name === "node_modules") continue;
+    if (existsSync(join(cwd, d.name, "forge"))) out.push({ nom: d.name, cable: existsSync(join(cwd, d.name, ".claude", "settings.json")) });
+  }
+  return out;
+}
+
+/** Le gabarit du dossier englobant (TF-0963, D-6 (a) du 17/10/2026) : UserPromptSubmit seul, délégué au produit. */
+export const GABARIT_ENGLOBANT = "gabarits/settings-dossier-englobant.json";
+
+/** Les réglages à poser en .claude/settings.json d'un dossier englobant : le gabarit, marqueur <PRODUIT> instancié. */
+export function reglagesEnglobants(nomProduit, pilot = PILOT) {
+  const brut = readFileSync(join(pilot, GABARIT_ENGLOBANT), "utf8");
+  const o = JSON.parse(brut.split("<PRODUIT>").join(String(nomProduit).split("\\").join("/")));
+  delete o._commentaire;
+  return o;
+}
+
+/**
+ * La reconnaissance des mots-clés est-elle DÉLÉGUÉE au produit `nom` par les réglages de `cwd` ?
+ * Vrai si un hameçon UserPromptSubmit de <cwd>/.claude/settings.json appelle
+ * `<nom>/forge/hooks/factory.mjs ... lexique` (barres obliques de l'un ou l'autre sens, guillemets admis).
+ */
+export function lexiqueDelegue(cwd, nom) {
+  try {
+    const h = JSON.parse(readFileSync(join(cwd, ".claude", "settings.json"), "utf8")).hooks?.UserPromptSubmit || [];
+    const cmds = h.flatMap((e) => (e.hooks || []).map((x) => String(x.command || "").split("\\").join("/")));
+    return cmds.some((c) => c.includes(nom + "/forge/hooks/factory.mjs") && /\blexique\b/.test(c));
+  } catch { return false; }
+}
+
+const GESTE_ENGLOBANT = (nom) =>
+  "copier " + GABARIT_ENGLOBANT.split("/").join("\\") + " en .claude\\settings.json de CETTE racine en remplaçant le marqueur <PRODUIT> par « " + nom + " » " +
+  "(il ne reporte que la reconnaissance des mots-clés du lexique RV-6, déléguée au hook du produit par chemin préfixé ; " +
+  "décision du 17/10/2026, TF-0963)";
+
 export function jugerPortee(cwd) {
   // La question est celle du lot, mot pour mot : « un forge\ existe-t-il dans un SOUS-dossier du
   // répertoire courant et non dans le répertoire courant ». Profondeur UN seulement — au-delà, on
@@ -187,30 +229,32 @@ export function jugerPortee(cwd) {
     return { regle: "PD3", statut: "PASS", ou: cwd, message:
       "la racine de session porte elle-même un forge\\ — le harnais y charge les réglages du produit" };
   }
-  let enfants = [];
-  try { enfants = readdirSync(cwd, { withFileTypes: true }).filter((d) => d.isDirectory()); } catch {}
-  const imbriques = [];
-  for (const d of enfants) {
-    if (d.name.startsWith(".") || d.name === "node_modules") continue;
-    const sous = join(cwd, d.name);
-    if (!existsSync(join(sous, "forge"))) continue;
-    const cable = existsSync(join(sous, ".claude", "settings.json"));
-    imbriques.push({ nom: d.name, cable });
-  }
+  const imbriques = produitsImbriques(cwd);
   if (!imbriques.length) {
     return { regle: "PD3", statut: "PASS", ou: cwd, message:
       "aucun produit instancié dans un sous-dossier direct de la racine de session — rien à signaler" };
   }
   const noms = imbriques.map((i) => `${i.nom}${i.cable ? " (câblé, et pourtant inerte d'ici)" : " (non câblé)"}`);
+  const delegue = imbriques.find((i) => lexiqueDelegue(cwd, i.nom));
+  if (delegue) {
+    // Le gabarit englobant est posé : seul le lexique s'exécute d'ici (option (a) du 17/10/2026). Le reste
+    // reste NOMMÉ, jamais passé sous silence — l'état est celui que la décision a voulu, pas un oubli.
+    return { regle: "PD3", statut: "FAIL", ou: cwd, message:
+      "RACINE DE SESSION AU-DESSUS DU PRODUIT, GABARIT ENGLOBANT POSÉ : la reconnaissance des mots-clés (UserPromptSubmit) " +
+      "est déléguée au hook de « " + delegue.nom + " » et s'exécute d'ici. RIEN D'AUTRE ne s'exécute : ni l'ouverture " +
+      "(SessionStart), ni la restitution jugée (Stop), ni les refus avant outil (PreToolUse), ni les contrôles après écriture " +
+      "(PostToolUse) — choix assumé du 17/10/2026, car les poser ici jugerait aussi les messages écrits pour les dossiers voisins. " +
+      "Pour les avoir : ouvrir la session DANS le dossier du produit" };
+  }
   return { regle: "PD3", statut: "FAIL", ou: cwd, message:
     `RACINE DE SESSION AU-DESSUS DU PRODUIT : ${imbriques.length} produit(s) instancié(s) dans un sous-dossier ` +
     `direct (${noms.join(", ")}), et AUCUN forge\\ ici. Le harnais ne charge les réglages que de SA racine : ` +
     "les hameçons du produit (SessionStart, UserPromptSubmit, Stop, PostToolUse) ne s'exécutent pas, " +
     "quel que soit leur état de conformité chez lui. C'est invisible sans ce constat — rien n'échoue, " +
     "tout se tait. Remède : ouvrir la session DANS le dossier du produit ; ou, si la racine englobante " +
-    "doit rester la racine de travail, y poser un .claude\\settings.json qui délègue au hook du " +
-    "sous-dossier par chemin préfixé (le report des seuls hameçons non ambigus relève d'un arbitrage " +
-    "du pilot — TF-0963)" };
+    "doit rester la racine de travail : " +
+    GESTE_ENGLOBANT(imbriques.length === 1 ? imbriques[0].nom : "<le produit sur lequel on travaille>") +
+    " — les autres hameçons restent absents et signalés" };
 }
 
 /**
@@ -273,9 +317,15 @@ export function jugerHamecons(cwd, { pilot = join(ICI, ".."), utilisateur = unde
     `actifs ${[...actifs].sort().join(", ") || "aucun"} (lu dans ${lus.join(", ") || "aucun fichier de réglages"}). ` +
     "Un hameçon qui ne s'exécute pas ne se distingue pas d'un hameçon qui approuve : un mandat entier " +
     "peut se rendre sans une seule restitution jugée, et rien ne le dit (TF-1047, 11/09/2026). " +
-    `Remède : reprendre les entrées manquantes de ${join(pilot, "gabarits", "settings-produit.json")} ` +
-    "dans le .claude\\settings.json de CETTE racine, en préfixant les chemins de commande par le " +
-    "sous-dossier quand le produit est imbriqué." };
+    (produitsImbriques(cwd).length
+      ? "Racine englobant un produit : seule la reconnaissance des mots-clés se pose ici (décision du 17/10/2026, TF-0963) ; " +
+        "les autres hameçons s'obtiennent en ouvrant la session DANS le produit. " +
+        (produitsImbriques(cwd).some((i) => lexiqueDelegue(cwd, i.nom))
+          ? "Le gabarit englobant est DÉJÀ posé (UserPromptSubmit délégué) : l'état voulu du 17/10/2026, rien d'autre à poser ici."
+          : "Geste : " + GESTE_ENGLOBANT(produitsImbriques(cwd).length === 1 ? produitsImbriques(cwd)[0].nom : "<le produit sur lequel on travaille>"))
+      : `Remède : reprendre les entrées manquantes de ${join(pilot, "gabarits", "settings-produit.json")} ` +
+        "dans le .claude\\settings.json de CETTE racine, en préfixant les chemins de commande par le " +
+        "sous-dossier quand le produit est imbriqué.") };
 }
 
 const verdictDe = (f) => (f.some((x) => x.statut === "FAIL") ? "FAIL" : f.every((x) => x.statut === "SKIP") ? "SKIP" : "PASS");
@@ -362,15 +412,55 @@ if (args[0] === "--self-test") {
   // Sens SANS_OBJET : sans gabarit de réglages lisible, la règle se tait à voix haute.
   const pd4so = jugerHamecons(complet, { pilot: join(dir, "pilot-absent"), utilisateur: null });
   if (pd4so.statut !== "SANS_OBJET") casse.push("PD4 : sans gabarit de réglages, la règle devrait rendre SANS_OBJET et le DIRE, obtenu " + pd4so.statut);
+  // DOSSIER ENGLOBANT (TF-0963, décision humaine du 17/10/2026, option (a)) — ROUGE puis VERT sur un produit
+  // JETABLE sous le dossier temporaire. Le produit porte le VRAI hook (gabarits\hooks-factory.mjs) : le vert
+  // joue la commande du gabarit comme le harnais la joue, depuis la racine englobante, et lit ce qui sort.
+  const englobant = join(dir, "englobant");
+  const prod = join(englobant, "Produit-Jetable");
+  mkdirSync(join(prod, "forge", "hooks"), { recursive: true });
+  mkdirSync(join(prod, ".claude"), { recursive: true });
+  copyFileSync(join(PILOT, "gabarits", "hooks-factory.mjs"), join(prod, "forge", "hooks", "factory.mjs"));
+  copyFileSync(join(PILOT, "gabarits", "settings-produit.json"), join(prod, ".claude", "settings.json"));
+  const gesteDit = (m) => /settings-dossier-englobant\.json/.test(m) && /Produit-Jetable/.test(m) && /<PRODUIT>/.test(m);
+  // ROUGE : le dossier englobant n'a AUCUN réglage → signalé, avec le geste qui nomme le gabarit.
+  const rougePd3 = jugerPortee(englobant);
+  if (rougePd3.statut !== "FAIL" || !gesteDit(rougePd3.message)) casse.push("PD3 englobant sans réglages : non signalé avec le geste du gabarit : " + JSON.stringify(rougePd3));
+  const rougePd4 = jugerHamecons(englobant, { pilot: PILOT, utilisateur: null });
+  if (rougePd4.statut !== "FAIL" || !gesteDit(rougePd4.message)) casse.push("PD4 englobant sans réglages : le constat ne porte pas le geste du gabarit : " + rougePd4.message);
+  if (lexiqueDelegue(englobant, "Produit-Jetable")) casse.push("lexiqueDelegue : vrai sans aucun réglage");
+  // VERT : le dossier englobant porte le gabarit instancié.
+  mkdirSync(join(englobant, ".claude"), { recursive: true });
+  writeFileSync(join(englobant, ".claude", "settings.json"), JSON.stringify(reglagesEnglobants("Produit-Jetable", PILOT), null, 2), "utf8");
+  const reglages = JSON.parse(readFileSync(join(englobant, ".claude", "settings.json"), "utf8"));
+  if (Object.keys(reglages.hooks).join() !== "UserPromptSubmit") casse.push("gabarit englobant : autre chose que UserPromptSubmit câblé : " + Object.keys(reglages.hooks));
+  if (/<PRODUIT>/.test(JSON.stringify(reglages))) casse.push("gabarit englobant : marqueur <PRODUIT> non instancié");
+  if (!lexiqueDelegue(englobant, "Produit-Jetable")) casse.push("lexiqueDelegue : faux alors que le gabarit est posé");
+  if (lexiqueDelegue(englobant, "Autre-Produit")) casse.push("lexiqueDelegue : vrai pour un produit qui n'est pas celui du gabarit");
+  const commande = reglages.hooks.UserPromptSubmit[0].hooks[0].command;
+  const jouer = (prompt) => spawnSync(commande, { shell: true, cwd: englobant, input: JSON.stringify({ prompt }), encoding: "utf8", timeout: 60000,
+    env: { ...process.env, FORGE_ROOT: basename(PILOT) === "digit-ai-factory" ? dirname(PILOT) : (process.env.FORGE_ROOT || "") } });
+  const vert = jouer("Améliore ce prompt : écris-moi un titre");
+  if (vert.status !== 0 || !/prompt-analyzer-l99/.test(vert.stdout || "")) casse.push("englobant avec gabarit : la reconnaissance des mots-clés NE SE DÉCLENCHE PAS depuis la racine englobante : " + (vert.stdout || "") + (vert.stderr || ""));
+  const neutre2 = jouer("Bonjour, peux-tu me résumer ce fichier ?");
+  if (neutre2.status !== 0 || (neutre2.stdout || "").trim() !== "") casse.push("englobant avec gabarit : un message ordinaire déclenche quelque chose : " + neutre2.stdout);
+  const vertPd3 = jugerPortee(englobant);
+  if (vertPd3.statut !== "FAIL" || !/GABARIT ENGLOBANT POSÉ/.test(vertPd3.message) || !/Stop/.test(vertPd3.message) || !/SessionStart/.test(vertPd3.message)) {
+    casse.push("PD3 englobant avec gabarit : l'état n'est pas décrit (lexique délégué, reste non exécuté) : " + vertPd3.message);
+  }
+  const vertPd4 = jugerHamecons(englobant, { pilot: PILOT, utilisateur: null });
+  if (vertPd4.statut !== "FAIL" || /SessionStart, UserPromptSubmit|UserPromptSubmit, /.test(vertPd4.message.split("attendus")[0] || "")) casse.push("PD4 englobant avec gabarit : doit continuer à nommer les autres hameçons, jamais UserPromptSubmit comme manquant : " + vertPd4.message);
+  else if (/MANQUANTS POUR CETTE RACINE : [^—]*UserPromptSubmit/.test(vertPd4.message)) casse.push("PD4 englobant avec gabarit : UserPromptSubmit nommé manquant alors qu'il est posé");
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test portée de doctrine : 12/12 PASS (produit complet → PASS ; cas rouge : hook sans le texte → FAIL nommé ; " +
+    : "Self-test portée de doctrine : 18/18 PASS (produit complet → PASS ; cas rouge : hook sans le texte → FAIL nommé ; " +
       "dépôt jamais instancié → HORS_DOCTRINE ; produit absent du poste → NON_VERIFIE ; hook non câblé → FAIL ; " +
       "PD3 racine au-dessus du produit → FAIL avec son remède ; PD3 session dans le produit → PASS ; " +
       "PD3 dossier sans produit imbriqué → PASS ; PD4 jeu de hameçons complet → PASS, jeu réduit au seul " +
       "UserPromptSubmit → FAIL nommant chaque hameçon manquant et la source du jeu attendu, gabarit de " +
-      "réglages absent → SANS_OBJET dit à voix haute)");
+      "réglages absent → SANS_OBJET dit à voix haute ; dossier englobant SANS réglages → PD3 FAIL avec le geste du gabarit, " +
+      "PD4 FAIL avec le même geste ; dossier englobant PORTANT le gabarit → le lexique délégué se déclenche depuis cette " +
+      "racine, un message neutre ne déclenche rien, aucun autre hameçon n'est câblé, PD3 le dit et nomme le reste)");
   process.exit(casse.length ? 1 : 0);
 }
 

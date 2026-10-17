@@ -11,7 +11,7 @@
  * `input\00-travaux\` du destinataire, cinq rubriques, statut `a_traiter` → `traitée le …` — et
  * le dit lui-même : « rien ne le joue encore : ni gabarit de demande, ni juge de forme que le
  * demandeur et le destinataire importeraient tous deux ». Le 24/09/2026, une demande réelle
- * (UIA vers IAC, 5 écarts mesurés) a dû être transférée par deux fichiers déposés à la main, hors
+ * (Produit-72 vers IAC, 5 écarts mesurés) a dû être transférée par deux fichiers déposés à la main, hors
  * de tout juge de forme (TF-1399). Un canal décrit en PROSE et jugé par PERSONNE n'existe pas
  * pour qui l'emploie (loi n° 1).
  *

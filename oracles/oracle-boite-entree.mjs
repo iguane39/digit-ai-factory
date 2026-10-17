@@ -888,6 +888,19 @@ function selfTest() {
     !!sortieCli && sortieCli.poste === hostname() && sortieCli.poste.length > 0
       && sortieCli.non_juge.some((m) => /AUTRES postes/.test(m)), String(cli.status)]);
 
+  // TF-1830 (17/10/2026) — LE RÉPERTOIRE PASSÉ SEUL EST CELUI QUI EST JUGÉ. Sans `--registre`, le filtre
+  // `a !== args[iReg + 1]` valait `a !== args[0]` et écartait le répertoire lui-même : l'usage documenté
+  // `node oracle-boite-entree.mjs <repertoire>` jugeait `input\00-retours` à sa place, sans rien dire.
+  // Joué par le CLI réel dans les deux ordres d'arguments.
+  const cibleDuCli = (argv) => {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), ...argv], { encoding: "utf8" });
+    try { return JSON.parse(r.stdout.slice(r.stdout.indexOf("{"))).cible; } catch { return null; }
+  };
+  cas.push(["TF-1830 — rouge corrigé : le répertoire passé SEUL, sans --registre, est celui qui est jugé",
+    cibleDuCli([boite9]) === resolve(boite9), String(cibleDuCli([boite9]))]);
+  cas.push(["TF-1830 bis — --registre en PREMIER argument est lu, et le répertoire qui suit est jugé",
+    cibleDuCli(["--registre", reg9, boite9]) === resolve(boite9), String(cibleDuCli(["--registre", reg9, boite9]))]);
+
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {
     console.log(`  [${tenu ? "OK    " : "ECHEC "}] ${nom} (verdict ${verdict})`);
@@ -901,9 +914,11 @@ function selfTest() {
 const args = process.argv.slice(2);
 if (args.includes("--self-test")) process.exit(selfTest());
 
+// TF-1830 : sans `--registre`, iReg vaut -1 et `args[iReg + 1]` désignait le répertoire lui-même ; et un
+// `--registre` posé en premier (indice 0) était ignoré. La valeur du drapeau est écartée par sa POSITION.
 const iReg = args.indexOf("--registre");
-const registre = resolve(iReg > 0 ? args[iReg + 1] : join(ICI, "..", "todo", "TODO.jsonl"));
-const cible = resolve(args.find((a) => !a.startsWith("--") && a !== args[iReg + 1]) ?? join(ICI, "..", "input", "00-retours"));
+const registre = resolve(iReg >= 0 ? args[iReg + 1] : join(ICI, "..", "todo", "TODO.jsonl"));
+const cible = resolve(args.find((a, i) => !a.startsWith("--") && (iReg < 0 || i !== iReg + 1)) ?? join(ICI, "..", "input", "00-retours"));
 
 const { verdict, findings, motif } = juger(cible, registre);
 // TF-1214 (13/10/2026) — LE POSTE QUI JUGE SE DIT. Un fichier non suivi par git ne voyage pas : le 14/09,

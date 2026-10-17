@@ -18,7 +18,7 @@
  * temporaire ; rien n'est écrit dans le dépôt.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, readFileSync, existsSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir, hostname } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -411,14 +411,29 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   execFileSync("git", ["init", "-q"], { cwd: P });
   const tr = join(P, "transcript.jsonl");
   const entree = (ts, nom) => JSON.stringify({ type: "assistant", timestamp: new Date(ts).toISOString(), message: { content: [{ type: "tool_use", name: nom, input: {} }] } });
-  const t0 = Date.now();
-  writeFileSync(tr, [entree(t0 - 60000, "Read"), entree(t0 + 1200, "Bash")].join(NL) + NL, "utf8");
-  const sortie = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT, "--contexte-json"],
-    { cwd: P, encoding: "utf8", timeout: 120000, input: JSON.stringify({ session_id: "s-test", transcript_path: tr }) });
-  const duree = Date.now() - t0;
+  // TF-1838 (17/10/2026) — LE GESTE TÉMOIN SE PLACE DANS LA FENÊTRE MESURÉE, PAS À UNE HEURE FIXE. Le témoin
+  // était daté de t0 + 1 200 ms : quand le relevé rendait la main en moins de 1 300 ms, le cas était « non
+  // probant » et la recette rougissait sans lien avec le code (2 passages sur 3 le 15/10). Le hook écrit dans
+  // sa trace locale le début de sa fenêtre ; un essai non probant replace le témoin au milieu de la fenêtre
+  // mesurée à l'essai précédent, 4 essais au plus. Le cas reste rouge si aucun essai ne tombe dans la fenêtre.
+  const traceGestes = join(P, ".git", "digit-ai-gestes-avant-releve.jsonl");
+  let decalage = 1200, sortie = "", probant = false, fenetre = "";
+  for (let essai = 0; essai < 4 && !probant; essai++) {
+    rmSync(traceGestes, { force: true });
+    const t0 = Date.now();
+    writeFileSync(tr, [entree(t0 - 60000, "Read"), entree(t0 + decalage, "Bash")].join(NL) + NL, "utf8");
+    sortie = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT, "--contexte-json"],
+      { cwd: P, encoding: "utf8", timeout: 120000, input: JSON.stringify({ session_id: "s-test", transcript_path: tr }) });
+    const fin = Date.now();
+    let debut = t0;
+    try { debut = Date.parse(JSON.parse(readFileSync(traceGestes, "utf8").trim().split(NL).pop()).debut_releve); } catch { /* trace absente : le cas le dira */ }
+    probant = debut <= t0 + decalage && t0 + decalage <= fin - 50;
+    fenetre = `fenêtre ${debut - t0} → ${fin - t0} ms, témoin à ${decalage} ms`;
+    decalage = Math.max(1, Math.round((debut - t0) + (fin - debut) / 2));
+  }
   const ctx = JSON.parse(sortie).hookSpecificOutput.additionalContext;
   check("TF-1635 (c) rouge → vert — un appel d'outil fait pendant le relevé est déclaré en tête, l'appel antérieur au relevé ne l'est pas", () => {
-    if (duree < 1300) throw new Error(`relevé rendu en ${duree} ms, avant l'horodatage du geste témoin : cas non probant`);
+    if (!probant) throw new Error(`aucun des 4 essais n'a placé le geste témoin dans la fenêtre du relevé (${fenetre}) : cas non probant`);
     if (!/## Gestes faits AVANT la fin de ce relevé \(TF-1635\) : 1\b/.test(ctx)) throw new Error("le geste fait pendant le relevé n'est pas déclaré (ou l'appel antérieur est compté)");
     if (!/\(Bash\)/.test(ctx)) throw new Error("l'outil du geste n'est pas nommé");
     if (ctx.indexOf("Gestes faits AVANT") > ctx.indexOf("## Gates actifs")) throw new Error("la déclaration ne précède pas les gates");
@@ -428,9 +443,34 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
     if (!existsSync(f) || !/"outil":"Bash"/.test(readFileSync(f, "utf8"))) throw new Error("trace locale absente");
   });
   check("TF-1635 (c) sens rouge — fenêtre sans geste : aucune déclaration ; transcription illisible : aucune erreur", () => {
-    if (gestesDansFenetre(readFileSync(tr, "utf8"), t0 + 5000, t0 + 9000).length) throw new Error("un geste hors fenêtre est compté");
+    if (gestesDansFenetre(readFileSync(tr, "utf8"), Date.now() + 5000, Date.now() + 9000).length) throw new Error("un geste hors fenêtre est compté");
     if (gestesDansFenetre("pas du json\n{\"tool_use\":1}", 0, Date.now()).length) throw new Error("une ligne illisible produit un geste");
     if (/Gestes faits AVANT/.test(JSON.parse(sortieJson).hookSpecificOutput.additionalContext)) throw new Error("un relevé sans transcription déclare des gestes");
+  });
+}
+
+// ---- TF-1829 (17/10/2026) : LE RÉSUMÉ R-47 AFFICHE LE PIRE CONSTAT, PAS LE PREMIER -------------
+// L'ordre réel des constats d'oracle-conformite-projet, relevé sur un parc jetable le 17/10 : alias
+// périmés (SANS_OBJET), hors histoire (SANS_OBJET), héritage (FAIL), secrets (PASS). Rouge : la lecture
+// d'avant (le premier constat) rend « sans objet » ; vert : le FAIL d'héritage est affiché.
+{
+  const { constatR47 } = await import(new URL("./lib-resume-r47.mjs", import.meta.url));
+  const RELEVE = [
+    { regle: "R-46", statut: "PASS", message: "autre règle" },
+    { regle: "R-47", statut: "SANS_OBJET", message: "1 alias de transition PÉRIMÉ(S)" },
+    { regle: "R-47", statut: "SANS_OBJET", message: "aucun artefact hors histoire" },
+    { regle: "R-47", statut: "FAIL", message: "héritage du pilot non tenu — 5 absent(s)" },
+    { regle: "R-47", statut: "PASS", message: "aucun secret sous forge" },
+  ];
+  check("TF-1829 rouge → vert — un « sans objet » placé avant ne cache plus le FAIL d'héritage", () => {
+    const avant = RELEVE.find((x) => x.regle === "R-47");
+    if (avant.statut !== "SANS_OBJET") throw new Error("la fixture ne reproduit plus le défaut d'avant");
+    if (constatR47(RELEVE)?.statut !== "FAIL") throw new Error(`constat affiché : ${constatR47(RELEVE)?.statut}`);
+  });
+  check("TF-1829 — sans FAIL, « sans objet » prime sur « à jour » ; sans constat R-47, rien n'est inventé", () => {
+    if (constatR47(RELEVE.filter((x) => x.statut !== "FAIL"))?.statut !== "SANS_OBJET") throw new Error("le sans objet n'est plus rendu");
+    if (constatR47([{ regle: "R-47", statut: "PASS", message: "à jour" }])?.statut !== "PASS") throw new Error("un PASS seul n'est pas rendu");
+    if (constatR47([{ regle: "R-46", statut: "FAIL" }]) !== null || constatR47(undefined) !== null) throw new Error("un constat est inventé");
   });
 }
 

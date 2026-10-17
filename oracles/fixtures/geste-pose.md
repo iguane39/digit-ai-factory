@@ -8,17 +8,20 @@ La publication de la version corrigée attend encore votre mot : tout est prêt 
 
 ## 3. Décisions attendues
 
-> **D-11 — Publier maintenant la version corrigée du démarrage, ou attendre demain matin ?** Le contrôle de `bootstrap.mjs` vient de passer en entier sur un clone frais, donc la version est prête ; la seule question est de savoir si on la met à disposition des autres postes tout de suite, ou si on garde une nuit pour un dernier regard humain avant qu'elle ne circule.
+> **D-11 — Publier maintenant la version corrigée du démarrage, ou attendre demain matin ?**
 >
-> **Recommandation : (a).** Source consultée : `references\ETAPES-RUN.md` — le journal `recette.md` ne porte aucun défaut ouvert, et la règle de publication y est écrite.
+> - **De quoi s'agit-il** : la version corrigée de `bootstrap.mjs`, le script de démarrage des postes, prête en local.
+> - **Le problème** : son contrôle vient de passer en entier sur un clone frais ; tant qu'elle n'est pas publiée, les autres postes restent sur la version d'hier.
+> - **Pourquoi vous** : publier hors du poste vous revient.
+> - **Recommandation : (a)** — le journal `recette.md` ne porte aucun défaut ouvert, et la règle de publication y est écrite. Source consultée : `references\ETAPES-RUN.md`.
 
-| Option | Coût | Exclusions |
-|---|---|---|
-| (a) pousser maintenant | nul | un dernier regard humain |
-| (b) pousser demain matin | un poste périmé une nuit | la mise à disposition immédiate |
-| (c) ne rien publier | la version corrigée reste locale | toute diffusion aux autres postes |
+| Option | Ce qui se passe | Coût | Retour arrière |
+|---|---|---|---|
+| (a) Pousser maintenant | La version circule dès ce soir, sans dernier regard humain | Nul | Possible, par une version suivante |
+| (b) Pousser demain matin | Les autres postes restent une nuit sur la version d'hier | Un poste périmé une nuit | Possible |
+| (c) Ne rien publier | La version corrigée reste locale, personne ne la reçoit | Nul | Sans objet |
 
-> **Si rien n'est décidé** : (c) s'applique — la version reste locale, personne ne la reçoit.
+> **Sans réponse** : (c) s'applique — la version reste locale, personne ne la reçoit.
 
 ## 4. Traité
 - bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.

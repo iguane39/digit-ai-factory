@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-15 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-18 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -21,6 +21,7 @@ Qui fait quoi, et surtout qui NE decide pas : ce tableau se lit par acteur, et l
 | oracle-ops (O-7, TF-1075) | l'ensemble servi est conforme à son scellé (empreinte de TOUT l'arbre déployé) — contrôle exécutable de M-8, § 3 sexies |
 | oracle-ops (O-13, TF-1116 et TF-1118) | tout geste destructif écrit dans un document d'exploitation ou un carnet d'écarts porte sa MATURITÉ (éprouvé sur cette cible, ou déduit et à mesurer) et sa MESURE DE NON-RÉGRESSION — joué sur les documents que la MEP produit, § 3 septies |
 | oracle-ops (O-14, TF-1114) | chaque nom de l'export machine du parc figure littéralement dans `docs\projet\COMPOSANTS-OPS.md` — joué à chaque MEP qui actualise ce document, § 3 septies |
+| oracle-ops (O-19, TF-1212) | chaque actif de données critique de la déclaration de sauvegarde porte RPO, RTO, sauvegarde effective conforme au RPO, et une restauration réussie depuis 12 mois au plus — consommé par M-17, § 3 terdecies |
 | pilot (cette étape) | orchestre les gestes, exécute M-1…M-5 (qui consomme O-1…O-4 comme preuves), assemble `DOSSIER-MEP.md` |
 | humain | **GO production** — incompressible, jamais délégué à un oracle |
 
@@ -194,6 +195,10 @@ Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fi
    (arrêt de la version N, redémarrage de la version N-1 taguée, vérification healthcheck).
    **C'est un ARTEFACT sur disque, jamais seulement une ligne de journal** — voir §2 bis.
 4. `DOSSIER-MEP.md` : le dossier de GO (cf. §4).
+5. La **chaîne de déploiement** du produit (un pipeline versionné, ou la chaîne de l'hébergeur
+   déclenchée par la poussée) dès qu'une cible est un environnement géré, et la **déclaration de
+   sauvegarde** `forge\etapes\mep\SAUVEGARDE.json` (format `forge-ops/sauvegarde@1`) dès que le
+   produit garde des données — § 3 terdecies (M-16, M-17).
 
 ## 2 bis. Un retour arrière ne vit pas dans un journal (TF-0512, 22/08/2026)
 
@@ -249,6 +254,9 @@ et elle grossit par les incidents, pas par la devinette.
 | M-13 | **Étapes de chaîne** | **si et seulement si** la chaîne du produit crée un objet d'annuaire, touche à `az webapp auth` ou écrit dans la plateforme. Un objet créé se lit avant d'être complété ; l'authentification se lit et s'écrit par l'API `authsettingsV2` ; le dossier porte la section « Étapes de chaîne remises à l'exploitant » (exécuté hors production et daté, écritures à blanc avec leur différence, branches que seule la production exécute). Contrôle exécutable : `node scripts\verifier-etape-chaine.mjs <produit>`, joué en TM8 par `oracle-trace-mutation-mep` ; sondage du formulaire Entra : `scripts\verifier-formulaire-entra.mjs` — § 3 decies, TF-1519, TF-1543, TF-1546 à TF-1549 |
 | M-14 | **Parcours tiers embarqués** (AVERTISSEMENT, règle neuve du 13/10/2026) | **si et seulement si** le produit embarque un parcours tiers qui engage l'utilisateur : un cadre intégré, une directive `frame-src`, `child-src` ou `form-action`, ou l'adresse d'une passerelle de paiement ou de réservation. Le dossier de MEP porte la section « Parcours tiers embarqués » : chaque tiers nommé, la vérification **jouée dans un navigateur** à une date, sur **l'état exécuté** (DOM après chargement) et non sur le HTML servi, et l'étape atteinte, « jusqu'à l'étape qui encaisse » ou « à confirmer » quand seul un paiement réel tranche. Contrôle exécutable : `node scripts\verifier-parcours-tiers.mjs <produit>`, joué en TM9 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 undecies, TF-1583 |
 | M-15 | **Contre-lecture d'un plan voté** (BLOQUANT depuis le 14/10/2026, décision sur TF-1688) | **si et seulement si** le dossier fait voter ou approuver un plan (d'infrastructure, de migration, de production) avant un geste irréversible. La section « Contre-lecture » lit les **paramètres de l'exécution** qui a produit le plan, chacun avec sa valeur à l'exécution, l'endroit où elle a été lue, la valeur attendue et sa référence (fiche ou décision) ; chaque écart est tranché ; une ligne « Non comparé : … » dit ce qu'elle ne compare pas. Contrôle exécutable : `node scripts\verifier-contre-lecture.mjs <produit>`, joué en TM10 par `oracle-trace-mutation-mep`, qui le **bloque** — § 3 duodecies, TF-1681, TF-1688 |
+| M-16 | **Déploiement par la chaîne, exclusivement** (AVERTISSEMENT, règle neuve du 17/10/2026) | Tout déploiement vers un environnement géré passe par la chaîne du produit, jamais par une commande lancée d'un poste. Le dossier porte la section « Chaîne de déploiement » : la chaîne nommée (fichier de pipeline du produit, ou chaîne de l'hébergeur déclenchée par la poussée) et l'exécution qui a déployé, citée par son identifiant ; ou « Aucun environnement géré : <motif> ». Le dossier ne prescrit aucune commande de déploiement direct (`railway up`, `az webapp deploy`, `terraform apply`…). Exigence fatale CTL-D09-01 du référentiel d'audit. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle pipeline`, joué en TM11 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 terdecies, TF-1212 |
+| M-17 | **Sauvegarde et restauration des actifs critiques** (AVERTISSEMENT, règle neuve du 17/10/2026) | Le dossier porte la section « Sauvegarde et restauration » : elle cite la déclaration de sauvegarde du produit (`forge-ops/sauvegarde@1`), que l'oracle O-19 de forge-ops juge (RPO et RTO déclarés, sauvegarde effective conforme au RPO, restauration réussie depuis 12 mois au plus, durée sous le RTO, intégrité constatée) ; ou « Aucun actif de données critique : <motif> », refusé si le produit persiste des données. Exigences fatales CTL-D05-09, CTL-D12-06 et CTL-D16-09. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle sauvegarde`, joué en TM12, qui l'**avertit** — § 3 terdecies, TF-1212 |
+| M-18 | **Fournisseur d'identité central, avec MFA** (AVERTISSEMENT, règle neuve du 17/10/2026) | Le dossier porte la section « Fournisseur d'identité » : le fournisseur central qui authentifie tout accès humain et le MFA qui l'accompagne, la procédure de tout compte local restant (secours) ; ou « Aucun accès humain authentifié : <motif> », refusé si le code porte une authentification locale. Exigence fatale CTL-D03-01. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle identite`, joué en TM13, qui l'**avertit** — § 3 terdecies, TF-1212 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -700,6 +708,111 @@ la chaîne. La complétude de la liste des paramètres : un paramètre absent du
 ligne « Non comparé ». Un vote de plan dit en d'autres mots que « vote », « voter », « approbation »
 ou « approuver » à côté de « plan ».
 
+### § 3 terdecies — La construction ne valide pas ce que l'audit de la maison refuse : chaîne exclusive, sauvegarde, fournisseur d'identité (M-16, M-17, M-18, TF-1212)
+
+**Le fait, du 09/09/2026 chez Produit-61.** Cinq étapes closes, oracles au vert, contrat de fin de
+construction tenu ; puis le référentiel d'audit de la même maison relève 125 écarts et 12 contrôles
+fatals non tenus sur 175. Trois venaient de la doctrine elle-même. Elle admettait une route de
+déploiement manuelle « à porte » : staging, GO humain, puis une commande lancée d'un poste. Son oracle
+de mise en production ne regardait aucune sauvegarde : M-4 prouve le retour à la version N-1, jamais
+la restauration des données. Et elle ne disait rien du fournisseur d'identité. Décision humaine D-3
+(a) du 17/10/2026 : la doctrine s'aligne sur le référentiel ; les produits déjà livrés ne sont pas
+touchés.
+
+**Les exigences, texte exact** (forge-audit, `core\controls\`, pack `controls-core` 1.0.0, criticité
+Fatal) :
+
+| Contrôle | Exigence |
+|---|---|
+| CTL-D09-01 | « Tout déploiement vers un environnement géré transite exclusivement par un pipeline CI/CD automatisé ; chaque exécution produit un journal immuable et horodaté (auteur, version, cible, résultat). » |
+| CTL-D05-09 | « Chaque actif de données critique est sauvegardé conformément à un objectif de perte de données (RPO) explicitement déclaré, et la restauration est testée périodiquement. » |
+| CTL-D12-06 | « Un objectif de perte de données tolérée (RPO) et de délai de restauration (RTO) est déclaré pour chaque actif critique, et la capacité de restauration est testée périodiquement avec preuve de conformité. » |
+| CTL-D16-09 | « La base de données fait l'objet de sauvegardes régulières conformes à un RPO déclaré, et la procédure de restauration est testée périodiquement avec preuve de conformité au RTO. » |
+| CTL-D03-01 | « L'authentification de tout accès humain est déléguée à un fournisseur d'identité central, avec MFA activé. » |
+
+La grille des trois contrôles de sauvegarde est commune : « conforme » exige les objectifs déclarés
+et une restauration testée avec succès dans les 12 derniers mois.
+
+**Ce qui change.**
+
+1. **La route manuelle à porte disparaît pour tout environnement géré.** Le GO humain reste
+   incompressible (§4) ; il change de place : c'est la **porte d'approbation de la chaîne** (un
+   environnement protégé qui attend l'approbation d'un humain nommé), ou la **poussée d'un commit
+   nommé** (§4 bis). La commande qui déploie s'exécute DANS la chaîne, avec un secret de la chaîne,
+   jamais depuis un poste. Le staging local du §2 (`docker compose up` sur le poste) n'est pas un
+   environnement géré et ne change pas. Une impossibilité réelle (hébergeur sans aucune intégration
+   de chaîne) se déclare en « Dérogation : <motif> » adossée à une décision humaine, et reste
+   « partiel » au référentiel, jamais « conforme ».
+2. **La sauvegarde entre à l'oracle de mise en production.** Le produit qui garde des données écrit
+   `forge\etapes\mep\SAUVEGARDE.json` (format `forge-ops/sauvegarde@1`, exemple :
+   `fixtures\o19-sauvegarde\verte.json` de forge-ops) : par actif critique, RPO, RTO, mécanisme,
+   fréquence et configuration de la sauvegarde, et le dernier exercice de restauration (date,
+   résultat, durée, intégrité). L'exercice se joue avant le GO, comme le rollback de M-4.
+   `node <ops>\oracles\oracle-ops.mjs --sauvegarde <declaration>` (O-19) le juge.
+3. **Le fournisseur d'identité a sa règle.** Tout accès humain authentifié (utilisateurs,
+   administrateurs, exploitants) passe par un fournisseur d'identité central (Entra ID, Google,
+   Okta, Auth0, Keycloak, OIDC ou SAML), avec MFA. Un compte local restant n'existe qu'avec sa
+   procédure écrite (compte de secours, bris de glace). Un produit sans aucun accès humain
+   authentifié le dit, avec son motif. La règle se connaît dès la conception : elle entre au
+   référentiel d'exigences du produit qui a des comptes.
+
+**La forme, au dossier de MEP** :
+
+```
+## Chaîne de déploiement
+
+Chaîne : `.github/workflows/deploiement.yml`, environnement `production` protégé par l'approbation de <humain>.
+Exécution 15452 du 2026-10-17 : auteur, version 6f78b88, cible production, résultat succès.
+
+## Sauvegarde et restauration
+
+Déclaration : `forge/etapes/mep/SAUVEGARDE.json`, jugée par O-19 (PASS).
+
+## Fournisseur d'identité
+
+Fournisseur : Entra ID (OIDC), MFA exigé par la stratégie d'accès conditionnel du locataire.
+Comptes locaux : un compte de secours, procédure de bris de glace au coffre de l'exploitant.
+```
+
+« Aucun environnement géré : <motif> », « Aucun actif de données critique : <motif> » et « Aucun
+accès humain authentifié : <motif> » sont des réponses valides. Le silence n'en est pas une.
+
+**Le contrôle exécutable.** `node scripts\verifier-exigences-fatales.mjs <produit> [--regle
+pipeline|sauvegarde|identite] [--document <fichier.md>]` lit chaque `DOSSIER-MEP*.md`. M-16 : la
+section existe (PE-1), nomme la chaîne et cite une exécution (PE-2), et le dossier ne prescrit aucune
+commande de déploiement direct (PE-3). M-17 : la section existe (SR-1), cite une déclaration présente
+ou dit « aucun actif » sans que le produit persiste de données (SR-2), et la déclaration passe O-19
+(SR-3). M-18 : la section existe (FI-1), nomme le fournisseur et le MFA ou dit « aucun accès humain »
+(FI-2), et toute authentification locale relevée dans le code est couverte par une procédure (FI-3).
+L'oracle de l'étape le joue en TM11, TM12 et TM13.
+
+**Sévérité : AVERTISSEMENT.** Ce sont des règles neuves, opposables à tous les produits : elles
+entrent en avertissement (précédent D-70 (b)), et leur passage en blocage est une décision humaine
+prise sur leur bruit mesuré. Le verbe rend son refus (exit 1), le câblage le lit en avertissement.
+O-19, lui, rend son verdict brut, comme O-18 : c'est une preuve, et M-17 en porte la sévérité.
+
+*Taux d'accusation mesuré le 17/10/2026* (lecture seule, verbe rejoué sur les 7 dépôts du poste qui
+portent un `DOSSIER-MEP*.md`, sous les pseudonymes de mesure A à G propres à cette ligne) :
+**7 dossiers sur 7 accusés** pour chacune des trois exigences, puisque aucun ne porte encore la
+section (PE-1, SR-1, FI-1 : 7/7). PE-3 accuse 2 dossiers sur 7 : A prescrit 2 fois `railway up` sous
+des titres non datés, B prescrit `docker compose up` sous son titre de mise en production. 7 autres
+commandes directes, dans 3 dossiers, sont sous un titre daté d'avant le 17/10/2026 : comptées en
+antériorité, non accusées. 2 dépôts sur 7 portent déjà une chaîne qui déploie (7 fichiers de pipeline
+chacun) et passeraient M-16 en écrivant la section. O-19 : 0 déclaration de sauvegarde sur le poste,
+0 accusée. Aucun verdict d'ensemble d'`oracle-trace-mutation-mep` ne change sur ces 7 dépôts : 2 PASS
+restent PASS, 5 FAIL restent FAIL par TM1 ou TM3.
+
+**Antériorité.** Une commande directe sous un titre (ou un titre parent) daté d'avant le 17/10/2026
+décrit un run passé : elle ne se réécrit pas, comme une entrée de ledger (R-42), et le verbe la compte
+sans l'accuser. Un dossier cumulatif aux titres non datés reste accusé jusqu'à ce que son prochain
+run écrive les sections.
+
+**Hors jugement, et c'est dit.** Que la chaîne citée ait réellement déployé la version servie : le
+verbe ne lit pas le journal du moteur de chaîne. Un déploiement manuel fait sans être écrit au dossier :
+l'inventaire des accès de déploiement direct sur chaque environnement reste un geste d'audit. La vérité
+de la déclaration de sauvegarde : O-19 juge ce qu'elle déclare, pas la plateforme. La configuration
+réelle du fournisseur d'identité : sa capture reste la preuve d'audit de CTL-D03-01.
+
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
 Entre le staging technique et le GO, une **version de qualification populée de données** est
@@ -784,8 +897,12 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   lancement sur l'objet lancé, avec leur sortie datée (M-10, § 3 nonies) ;
 - les garde-fous de la plateforme et les contraintes connues : le relevé daté des stratégies de
   la portée cible, et chaque contrainte avec son verdict contre la séquence retenue (M-11, § 1 ter) ;
+- les trois sections des exigences fatales du référentiel d'audit : « Chaîne de déploiement »,
+  « Sauvegarde et restauration », « Fournisseur d'identité » (M-16 à M-18, § 3 terdecies) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
-- la commande exacte de mise en production et la procédure de rollback.
+- le geste exact qui déclenche la mise en production — l'approbation de la porte de la chaîne, ou la
+  poussée d'un commit nommé (§4 bis), jamais une commande de déploiement lancée d'un poste vers un
+  environnement géré (M-16) — et la procédure de rollback.
 
 Le GO est consigné au ledger (`reponse_humain`, portée : « GO production <produit> <version> »).
 Sans GO : le run se clôt en statut `pret_production_en_attente_GO` — c'est un état de succès,
@@ -880,6 +997,11 @@ poste. Quatre faits, une cause : le principe vivait dans la mémoire des session
   laisser la session conclure au geste humain — l'épisode du 31/08 a coûté un aller-retour
   humain complet et une entrée de ledger fausse pour un déploiement qui a réussi 30 minutes
   plus tard avec le jeton du poste.
+- **Vers un environnement Railway, `railway up` s'exécute dans la chaîne, jamais depuis le poste**
+  (M-16, TF-1212, 17/10/2026). Le jeton y est un secret de la chaîne, et le GO humain la porte
+  d'approbation de l'environnement de production ou la poussée d'un commit nommé. Le repli sur le
+  jeton du poste décrit ci-dessus sert les lectures et le diagnostic, jamais un déploiement : un
+  environnement Railway, recette comprise, est un environnement géré.
 - **Le CLI ne sert qu'à téléverser** (TF-0704). `railway service` ne sait ni renommer un
   service ni corriger un domaine ; tout le reste passe par l'API GraphQL —
   `https://backboard.railway.com/graphql/v2`, en-tête `Authorization: Bearer <jeton>` :

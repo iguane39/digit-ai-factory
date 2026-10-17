@@ -36,6 +36,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md` | fichier | 17,3 Ko | Synthèse de conseil : les agents suivent déjà Fable 5.1 et Opus 5.5 par héritage, mais le  |
 | `Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` | fichier | 8,4 Ko | Synthèse Conseil — pourquoi « audit complet » part encore vers forge-tests, et comment le  |
 | `Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` | fichier | 7,1 Ko | Synthèse Conseil — faire tourner L99 en boucle jusqu'à un score, étude d'opportunité (16/1 |
+| `Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` | fichier | 24,9 Ko | Synthèse Conseil — 12 décisions à trancher, une qualification de noms et 4 gestes humains  |
+| `Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` | fichier | 10,4 Ko | Synthèse Conseil — trois formats pour qu'une décision se comprenne et se tranche sans rien |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
 | `Digit-AI - Synthese Conseil - Qualite sans personas cinq propositions mesurees - 20260914c.md` | fichier | 15,8 Ko | Synthèse Conseil — améliorer la qualité sans personas : vos deux décisions sont exécutées, |
 | `Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` | fichier | 3,7 Ko | Synthèse de diagnostic — pourquoi aucun avancement toutes les 3 minutes (TF-0252) |
@@ -134,10 +136,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` | fichier | 19,6 Ko | Synthèse Mandat — vos décisions D-49, D-50 et D-51 sont exécutées ou en cours ; la campagn |
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
 | `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,5 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
-| `Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` | fichier | 26,7 Ko | Digit-AI — Synthèse de mandat — Décisions du 24/09 exécutées et candidatures reproposées — |
+| `Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` | fichier | 26,8 Ko | Digit-AI — Synthèse de mandat — Décisions du 24/09 exécutées et candidatures reproposées — |
 | `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |
 | `Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` | fichier | 6,5 Ko | Synthèse Mandat — dépôts privés hors d'accès non bloquants pour un poste tiers (13/10/2026 |
 | `Digit-AI - Synthese Mandat - Depots prives silencieux et confirmation d'installation - 20261013f.md` | fichier | 5,2 Ko | Synthèse Mandat — dépôts privés silencieux et confirmation d'installation en fin de comman |
+| `Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` | fichier | 17,4 Ko | Synthèse Mandat — vos 12 décisions exécutées, rien n'est encore publié (17/10/2026) |
 | `Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` | fichier | 13,8 Ko | Synthèse de mandat — votre « 3a » est exécuté : un produit doit désormais dire ce qu'il re |
 | `Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` | fichier | 11,7 Ko | Synthèse de mandat — votre « 4b » est exécuté à moitié : l'enregistrement est fait, la pub |
 | `Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` | fichier | 9,8 Ko | Synthèse de mandat — tout n'est pas encore commité, et une branche ancienne n'est pas fusi |
@@ -148,6 +151,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` | fichier | 10,8 Ko | Synthèse Mandat — étude d'opportunité sur l'auto-amélioration récursive et l'apprentissage |
 | `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
 | `Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` | fichier | 19,1 Ko | Synthèse de mandat — la forge d'audit est publiée et vérifiée sur ce qui est en ligne, mai |
+| `Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md` | fichier | 28,5 Ko | Synthèse Mandat — format B appliqué aux décisions, et les 12 décisions ouvertes réécrites  |
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
 | `Digit-AI - Synthese Mandat - Fusion de la branche du pilot publiee sur GitHub - 20260921c.md` | fichier | 8,2 Ko | La fusion est publiée : main porte le travail du 14 au 17/09, et plus aucune branche du pi |
 | `Digit-AI - Synthese Mandat - Fusion des deux postes sept depots publies - 20260920b.md` | fichier | 14,4 Ko | Les 2 postes sont fusionnés : 7 dépôts réconciliés au cas par cas, publiés, et le parc ent |
@@ -193,7 +197,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` | fichier | 20,7 Ko | Synthèse de mandat — les huit dépôts en attente sont publiés et les dix-sept du parc sont  |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260920a.md` | fichier | 9,4 Ko | Le parc est synchronisé avec GitHub : 16 dépôts alignés, et 4 jours de travail fini enfin  |
 | `Digit-AI - Synthese Mandat - Parc synchronise et decisions des deux postes - 20260925a.md` | fichier | 33,9 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et décisions des deux postes réunies — 25 |
-| `Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md` | fichier | 30,1 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et le retour de cohérence devenu oracle — |
+| `Digit-AI - Synthese Mandat - Parc synchronise et le retour de coherence devenu oracle - 20260924a.md` | fichier | 30,2 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et le retour de cohérence devenu oracle — |
 | `Digit-AI - Synthese Mandat - Parc synchronise et quatre depots publies - 20260923b.md` | fichier | 16,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et 4 dépôts publiés — 23/09/2026 |
 | `Digit-AI - Synthese Mandat - Parc synchronise et travail des deux postes reuni - 20260928a.md` | fichier | 23,7 Ko | Digit-AI — Synthèse de mandat — Parc synchronisé et travail des deux postes réuni — 28/09/ |
 | `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
@@ -288,4 +292,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_270 fichier(s), 1 sous-dossier(s)_
+_274 fichier(s), 1 sous-dossier(s)_ · 3 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

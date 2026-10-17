@@ -1,10 +1,12 @@
 {
-  "cible": "references/ETAPES-RUN.md",
-  "date_iso": "2026-10-15T08:36:07.867Z",
-  "registre_version": "2.39.0",
+  "cible": "c:\\dev\\digit-ai-factory\\references\\ETAPES-RUN.md",
+  "date_iso": "2026-10-17T11:39:47.886Z",
+  "registre_version": "2.43.0",
   "profil": "digit-ai",
-  "niveau": "diffuse",
+  "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 5,
     "fail": 0,
@@ -69,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\ETAPES-RUN.md",
-    "ts": "2026-10-15T08:36:07.866Z",
+    "ts": "2026-10-17T11:39:47.886Z",
     "fichiers": {
-      "references\\ETAPES-RUN.md": "444a65dc2372e9d7070018d706c91f7a88816342884ae29df92a11a7caf3de60"
+      "references\\ETAPES-RUN.md": "692f2caf1bc2373595b968214d65081d791dfe675e0fb81dd6da5cd9358e3972"
     }
   },
   "empreinte_motif": null,

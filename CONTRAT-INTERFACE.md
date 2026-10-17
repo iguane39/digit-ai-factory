@@ -146,7 +146,15 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   corrigée ENTIÈRE (`forges_mobilisees`) et sa `cause` ; `oracle-enclenchement` retient la dernière
   du run, nomme d'où il tient la liste, et ignore en le disant une rectification sans liste ou sans
   cause. `--forges` reste prioritaire. Le fait : un run_open du 14/10 déclarait une forge à tort, et
-  le run a dû passer `--forges` au juge à la main. L'entrée porte au minimum :
+  le run a dû passer `--forges` au juge à la main. **Une forge mobilisée comme outil déclare ses
+  parties (TF-1841, 17/10/2026)** : champ facultatif `parties_mobilisees`, un objet
+  `{ "<forge>": ["<skill>", …] }`, au `run_open` ou dans la rectification (qui porte la déclaration
+  entière). `oracle-enclenchement` borne la promesse de la forge aux oracles rangés sous
+  `.claude/skills/<skill>/` ; une forge sans partie garde sa promesse entière ; une partie qui ne
+  désigne aucun skill de la forge ne borne rien, et c'est dit. `--parties forge:skill,…` prime.
+  `ledger.mjs append` refuse le champ présent et mal formé. Le fait : forge-agents, mobilisée pour
+  son seul journal, promettait jusqu'à 48 oracles ; 5 des 7 refus mesurés le 17/10 portaient sur
+  une forge mobilisée sans aucun verdict. L'entrée porte au minimum :
 
   | Champ | Contenu |
   |---|---|
@@ -158,7 +166,17 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 
   Tout autre champ reste libre : un run consigne ce qu'il a besoin de consigner. **Un relevé qui
   porte plusieurs oracles produit plusieurs entrées**, une par oracle — c'est la condition pour
-  que la liste des oracles qui ont tourné soit CALCULABLE.
+  que la liste des oracles qui ont tourné soit CALCULABLE. **L'outil qui les écrit (TF-1319, D-5 (b)
+  du 17/10/2026)** : `ledger.mjs consigner <ledger> (--rapport <fichier|-> | -- <commande>) [--forge]
+  [--cible] [--etape]` lit le rapport d'un lanceur (`{oracles: [{oracle, verdict}]}`), d'un oracle
+  (`{oracle, verdict}`) ou une liste, et écrit une entrée par oracle, sous un verrou, tout le lot ou
+  rien. Les verdicts écrits autrement par les lanceurs (`NON_JUGE`, `INCONCLUSIF` → `SKIP` ;
+  `SANS OBJET` → `NA`) sont ramenés par une table écrite, l'original gardé en `verdict_brut` ;
+  chaque entrée porte `consigne_par: "ledger.mjs consigner"` et `lot {id, rang, total}`. **Un refus
+  du juge d'enclenchement se qualifie** par une entrée `type: qualification_enclenchement`
+  (`qualification: "fonde" | "a_tort"`, `cause`, toutes deux dues à l'écriture) ;
+  `oracles\mesure-refus-enclenchement.mjs` compte, sur les ledgers des produits, les clôtures que
+  le juge aurait refusées et la part qualifiée à tort, runs consignés par l'outil à part.
 
   *Le coût du silence, mesuré le 19/08* : **huit** entrées `oracles_verdict` d'un même ledger
   réel portaient **six formes de champs différentes** — deux avec `oracle` et `verdict` au
@@ -216,7 +234,9 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   pas pu tourner, son jugement est suspendu et le motif est dit. La confrontation est celle de
   forge-tests (`forge_tests/confrontation.py`, TF-0371), appelée et non recopiée. Les forges
   mobilisées se lisent dans `--forges`, sinon au champ `forges_mobilisees` du `run_open` ; une
-  annotation après le nom de forge est ignorée. **Le pilot ne se déclare pas mobilisé (TF-1444,
+  annotation après le nom de forge est ignorée. La promesse d'une forge se borne aux parties que
+  le run déclare (`parties_mobilisees`, TF-1841, ci-dessus) ; un verdict servi hors de ces parties
+  est signalé en EN2 (`hors_parties`), jamais accusé. **Le pilot ne se déclare pas mobilisé (TF-1444,
   28/09/2026)** : il orchestre tout run, aucun ne le mobilise. Le déclarer ferait réclamer par EN1
   un verdict pour chacun de ses oracles découverts, 53 le 28/09, dont la plupart jugent le pilot
   lui-même. Les verdicts de ses oracles que tout run consigne, la conformité et le contrôle du lot
