@@ -1,8 +1,8 @@
 {
  "format": "pilot/jugement@1",
  "fichier": "Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md",
- "empreinte": "15642e0b9123f151feb1c05967a33db9eb492a9d5d50f59f2eb0890fd4001147",
+ "empreinte": "7f5e4152a66c7af8f84ae7efe7bf0453b0f83c81c282640501e0190a98a5e1a8",
  "methode": "sha256/lf",
- "scelle_le": "2026-10-17T07:05:19.621Z",
+ "scelle_le": "2026-10-17T12:20:12.827Z",
  "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
 }
