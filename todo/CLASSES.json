@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.42.0",
+ "version": "1.43.0",
  "date": "2026-10-18",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2261,6 +2261,20 @@
    "oracle": "digit-ai-forge-agents, digit-ai-page-html/scripts/check_html.py L39 (avertissement) ; recette self_test.py run_l39_graphique_maison",
    "voisines": [
     "gabarit-de-skill-refuse-par-les-oracles-du-socle"
+   ]
+  },
+  {
+   "cle": "designateur-de-decision-sans-reservation",
+   "famille": "restitution-forme",
+   "libelle": "Un numéro de décision affiché à l humain n est réservé nulle part : deux sessions du même produit le prennent toutes deux",
+   "creee_le": "2026-10-18",
+   "fondee_par": [
+    "TF-1849"
+   ],
+   "regle": "gabarits/RESTITUTION.md 2.45.0, « Une D-N NOUVELLE s inscrit au registre du produit AVANT d être affichée »",
+   "oracle": "pilot, contrôle RÉSERVATION de oracles/hook-restitution.mjs (controlerReservation, avertissant jusqu au 2026-11-01 puis bloquant, rejoué par --prejuger) ; recette oracles/hook-restitution.test.mjs cas 52",
+   "voisines": [
+    "regle-de-forme-primant-sur-la-demande"
    ]
   }
  ],

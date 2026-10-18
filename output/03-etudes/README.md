@@ -28,10 +28,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261013-etude-opportunite-juge-de-comprehension.md` | fichier | 21,9 Ko | Étude d'opportunité — un relecteur qui joue le lecteur visé et refuse ce qu'il ne sait pas |
 | `20261013-revue-essai-niveaux-d-intervention.md` | fichier | 10,5 Ko | Revue de l'essai des niveaux Simple et Moyen : critères écrits d'avance, rejoués le 2026-1 |
 | `20261016-etude-opportunite-boucle-l99-jusqu-a-un-score.md` | fichier | 12,9 Ko | Étude d'opportunité — faire tourner « améliore le prompt » en boucle jusqu'à un score — 20 |
+| `20261018-etude-opportunite-connexion-sources-google.md` | fichier | 32,4 Ko | Étude d'opportunité — connexion d'un produit à ses sources de mesure Google (Google Analyt |
 | `20261018-etude-opportunite-flotte-d-agents.md` | fichier | 22,7 Ko | Étude d'opportunité — analyse critique de la flotte d'agents de la Factory et moyens de l' |
 | `20261018-etude-opportunite-relecteur-d-intention-v2.md` | fichier | 18,0 Ko | Étude d'opportunité — un relecteur d'intention sur tous les travaux de la Factory, version |
 | `20261018-etude-opportunite-relecteur-d-intention.md` | fichier | 18,3 Ko | Étude d'opportunité — un relecteur critique qui garde l'intention initiale d'une demande — |
+| `20261018-etude-opportunite-tableau-de-bord-pilotage.md` | fichier | 35,4 Ko | Étude d'opportunité — famille de document « tableau de bord de pilotage » et sa règle de l |
 | `20261018-L99-relecteur-critique-d-intention.md` | fichier | 22,7 Ko | Analyse L99 — « un relecteur critique qui garde l'intention initiale » — 20261018 |
 | `20261018-mesure-relecteur-d-intention.json` | fichier | 14,7 Ko | JSON |
 
-_15 fichier(s), 2 sous-dossier(s)_
+_17 fichier(s), 2 sous-dossier(s)_

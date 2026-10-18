@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 445 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 447 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -205,9 +205,11 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261013-etude-opportunite-juge-de-comprehension.md | — | 21.9 Ko | `03-etudes/20261013-etude-opportunite-juge-de-comprehension.md` |
 | 20261013-revue-essai-niveaux-d-intervention.md | — | 10.5 Ko | `03-etudes/20261013-revue-essai-niveaux-d-intervention.md` |
 | 20261016-etude-opportunite-boucle-l99-jusqu-a-un-score.md | — | 12.9 Ko | `03-etudes/20261016-etude-opportunite-boucle-l99-jusqu-a-un-score.md` |
+| 20261018-etude-opportunite-connexion-sources-google.md | — | 32.4 Ko | `03-etudes/20261018-etude-opportunite-connexion-sources-google.md` |
 | 20261018-etude-opportunite-flotte-d-agents.md | — | 22.7 Ko | `03-etudes/20261018-etude-opportunite-flotte-d-agents.md` |
 | 20261018-etude-opportunite-relecteur-d-intention-v2.md | — | 18 Ko | `03-etudes/20261018-etude-opportunite-relecteur-d-intention-v2.md` |
 | 20261018-etude-opportunite-relecteur-d-intention.md | — | 18.3 Ko | `03-etudes/20261018-etude-opportunite-relecteur-d-intention.md` |
+| 20261018-etude-opportunite-tableau-de-bord-pilotage.md | — | 35.4 Ko | `03-etudes/20261018-etude-opportunite-tableau-de-bord-pilotage.md` |
 | 20261018-L99-relecteur-critique-d-intention.md | — | 22.7 Ko | `03-etudes/20261018-L99-relecteur-critique-d-intention.md` |
 | 20261018-mesure-relecteur-d-intention.json | — | 14.7 Ko | `03-etudes/20261018-mesure-relecteur-d-intention.json` |
 
