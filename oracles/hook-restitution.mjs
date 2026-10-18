@@ -825,6 +825,10 @@ export function controlerProcedure({ dernierHumain, fails = [] }) {
 // sont refusés. BLOQUANT, comme GESTE : une décision absente de l'écran ne peut pas être prise, et la garde
 // anti-boucle borne le coût d'un faux positif à une relecture.
 //
+// MESURE D'ENTRÉE (18/10/2026) : sur les 265 phrases humaines distinctes citées « mot pour mot » dans les 750 fichiers de
+// input/00-retours et du registre, la reconnaissance en retient 2, « 51 détaille » et « je demande de détailler 51 et ce n'est pas fait,
+// pourquoi ? » (les deux du 16/10), et aucune des 263 autres. Population : les phrases que les lots citent, pas tous les messages
+// humains des sessions, qui ne sont pas une entrée de cette campagne ; la mesure sur ces messages reste à rejouer par le pilot.
 // NON JUGÉ : que le détail soit bon, que les options soient celles qui conviennent ; « détaille » sans numéro
 // (on ne sait pas de quelle décision il parle) ; un tour que la portée du hook ne juge pas (réponse courte sans
 // verdict) ; la désignation d'une décision par son sujet (« détaille la publication ») plutôt que par son numéro.
