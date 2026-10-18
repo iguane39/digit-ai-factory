@@ -1,14 +1,16 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\references\\INTEGRATIONS-FOURNISSEURS.md",
-  "date_iso": "2026-09-27T06:42:01.752Z",
-  "registre_version": "2.28.0",
+  "date_iso": "2026-10-18T08:17:35.133Z",
+  "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
-    "pass": 3,
+    "pass": 4,
     "fail": 0,
-    "skip": 4,
+    "skip": 3,
     "cache": 0
   },
   "bilan_fichiers": {
@@ -44,34 +46,34 @@
       "domaine": "Calculs / chiffres",
       "file": "references\\INTEGRATIONS-FOURNISSEURS.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "references\\INTEGRATIONS-FOURNISSEURS.md",
-      "verdict": "SKIP",
-      "detail": ""
+      "verdict": "PASS",
+      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; nombre « 20261014 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
       "file": "references\\INTEGRATIONS-FOURNISSEURS.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
       "file": "references\\INTEGRATIONS-FOURNISSEURS.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\INTEGRATIONS-FOURNISSEURS.md",
-    "ts": "2026-09-27T06:42:01.751Z",
+    "ts": "2026-10-18T08:17:35.133Z",
     "fichiers": {
-      "references\\INTEGRATIONS-FOURNISSEURS.md": "9436f2ae38657558eb7f40675b818bf9c5cac6cb89fd4017d37c8689b3275ec3"
+      "references\\INTEGRATIONS-FOURNISSEURS.md": "b23206e53e8e76772f226e1254e1dfc0dc89f4f5c0512b49048998c465a00035"
     }
   },
   "empreinte_motif": null,
