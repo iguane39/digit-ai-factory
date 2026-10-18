@@ -18,8 +18,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 |---|---|---|---|
 | `_arrivee\` | dossier ignoré par git (absent d'un clone) | — | Sas d'arrivée des lots, IGNORÉ par git (absent d'un clone frais) : le producteur y dépose son lot tel qu'il est, nom réel compris ; `node todo\accueillir-lot.mj… |
 | [`old\`](old/README.md) | dossier (678 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
-| `Produit-02 - RETOURS - 20261015a.md` | fichier | 7,8 Ko | Retours forges — Produit-02 — 20261015a |
-| `Produit-02 - RETOURS - 20261015a.tf.jsonl` | fichier | 2,7 Ko | 2 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261015a.md` | fichier | 8,5 Ko | Retours forges — Produit-02 — 20261015a |
+| `Produit-02 - RETOURS - 20261015a.tf.jsonl` | fichier | 3,3 Ko | 2 ligne(s) JSONL |
 | `Produit-79 - RETOURS - 20261017a.md` | fichier | 4,6 Ko | Retours forges — Produit-79 — 20261017a |
 | `Produit-79 - RETOURS - 20261017a.tf.jsonl` | fichier | 1,4 Ko | 1 ligne(s) JSONL |
 | `Produit-79 - RETOURS - 20261017b.md` | fichier | 11,9 Ko | Retours forges — Produit-79 — 20261017b |
