@@ -628,6 +628,44 @@ try {
     const cause = attribuerDivergence("gabarits/MODELE.md", "x", pilot);
     att(cause.qui === "inconnu", `attribution « ${cause.qui} » sur un dépôt sans historique`);
   });
+
+  // ---- TF-1867 (18/10/2026) : l'écrivain de ledger Python entre à l'héritage, copie conforme -----
+  // Avant, gabarits/ledger.py n'était déclaré nulle part (0 occurrence au contrat) : la copie d'un produit
+  // numérotait `len(dejà) + 1` et aucune ouverture ne la remettait à niveau (13 seq en double, RT-127).
+  const LEDGER_GABARIT = readFileSync(join(PILOT_REEL, "gabarits", "ledger.py"), "utf8");
+  const LEDGER_CONTRAT = JSON.parse(readFileSync(join(PILOT_REEL, "gabarits", "HERITAGE.json"), "utf8"))
+    .artefacts.find((a) => a.cible === "forge/ledger.py");
+  const LEDGER_PERIME = LEDGER_GABARIT.replace('seq = max((x["seq"] for x in dejà), default=0) + 1', "seq = len(dejà) + 1");
+  const produitLedger = (texte) => {
+    const d = mkdtempSync(join(tmpdir(), "heritage-ledger-"));
+    mkdirSync(join(d, "forge"), { recursive: true });
+    if (texte !== null) writeFileSync(join(d, "forge", "ledger.py"), texte, "utf8");
+    return d;
+  };
+  check("TF-1867 — le contrat déclare forge/ledger.py en copie conforme de gabarits/ledger.py", () => {
+    att(LEDGER_CONTRAT, "forge/ledger.py n'est pas déclaré à gabarits/HERITAGE.json");
+    att(LEDGER_CONTRAT.mode === "copie_conforme" && LEDGER_CONTRAT.source === "gabarits/ledger.py", `mode ${LEDGER_CONTRAT.mode}, source ${LEDGER_CONTRAT.source}`);
+    att(LEDGER_PERIME !== LEDGER_GABARIT, "la chirurgie de la copie périmée n'a rien changé : le test ne vise plus le calcul du seq");
+  });
+  check("TF-1867 rouge — une copie qui numérote len(dejà)+1 est relevée DIVERGENTE ; absente, ABSENTE", () => {
+    const perime = produitLedger(LEDGER_PERIME), absent = produitLedger(null);
+    try {
+      const e = etatArtefact(perime, LEDGER_CONTRAT, PILOT_REEL);
+      att(e.etat === "divergent", `copie périmée relevée « ${e.etat} »`);
+      att(etatArtefact(absent, LEDGER_CONTRAT, PILOT_REEL).etat === "absent", "copie absente non relevée absente");
+    } finally { rmSync(perime, { recursive: true, force: true }); rmSync(absent, { recursive: true, force: true }); }
+  });
+  check("TF-1867 vert — la remise à niveau remplace la copie périmée et le produit est relevé CONFORME ; une copie à jour l'est d'emblée", () => {
+    const perime = produitLedger(LEDGER_PERIME), ajour = produitLedger(LEDGER_GABARIT);
+    try {
+      const r = spawnSync(process.execPath, [join(ICI, "recopier-heritage.mjs"), perime], { encoding: "utf8" });
+      att(r.status === 0, `recopie : exit ${r.status} ${r.stderr}`);
+      att(/\[COPIÉ  \] forge\/ledger\.py/.test(r.stdout), `la recopie ne dit pas avoir remis forge/ledger.py à niveau : ${r.stdout.slice(0, 200)}`);
+      att(etatArtefact(perime, LEDGER_CONTRAT, PILOT_REEL).etat === "conforme", "relevé non conforme après la recopie");
+      att(readFileSync(join(perime, "forge", "ledger.py"), "utf8").replace(/\r\n/g, "\n") === LEDGER_GABARIT.replace(/\r\n/g, "\n"), "copie différente du gabarit");
+      att(etatArtefact(ajour, LEDGER_CONTRAT, PILOT_REEL).etat === "conforme", "une copie à jour est relevée autrement que conforme");
+    } finally { rmSync(perime, { recursive: true, force: true }); rmSync(ajour, { recursive: true, force: true }); }
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }

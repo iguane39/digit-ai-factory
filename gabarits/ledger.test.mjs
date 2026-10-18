@@ -170,6 +170,58 @@ try {
     att(r.status === 0 && entrees(d).pop().seq === 6, `seq attendu 6 : ${r.stdout}${r.stderr}`);
   });
 
+  // ---- TF-1867 (18/10/2026) : numéroter après le PLUS GRAND seq déjà pris -------------------------
+  // Chez un produit, la copie calculait `len(dejà) + 1` : 13 seq en double relevés le 15/10/2026 (RT-127).
+  // Le gabarit calculait `dejà[-1]["seq"] + 1`, faux dès que la dernière ligne porte un numéro plus petit
+  // qu'une précédente. Les deux mutants sont les deux calculs fautifs ; le vert est le gabarit.
+  const SEQ_ACTUEL = '        seq = max((x["seq"] for x in dejà), default=0) + 1';
+  const SEQ_DERNIERE = GABARIT.replace(SEQ_ACTUEL, '        seq = (dejà[-1]["seq"] if dejà else 0) + 1');
+  const SEQ_NB_LIGNES = GABARIT.replace(SEQ_ACTUEL, '        seq = len(dejà) + 1');
+  /** Écrit un journal aux seq donnés (le run_open porte le premier), à la suite du run_open de `produit()`. */
+  const avecSeq = (d, seqs) => {
+    const f = join(d, "forge", "ledger.jsonl");
+    const lignes = seqs.map((n, i) => JSON.stringify({ seq: n, ts: "2026-10-15T08:00:00Z", type: i === 0 ? "run_open" : "retour", resume: "x" }));
+    writeFileSync(f, lignes.join("\n") + "\n", "utf8");
+  };
+  const ajouterUne = (script) => spawnSync(PYTHON, [script, "retour", "--resume", "x"], { encoding: "utf8", env: CONSOLE });
+
+  check("témoin — la chirurgie des rouges TF-1867 a bien remplacé le calcul du seq par les deux calculs fautifs", () => {
+    att(GABARIT.includes(SEQ_ACTUEL), "le calcul attendu du gabarit (max + 1) est introuvable : la recette ne le vise plus");
+    att(SEQ_DERNIERE !== GABARIT && !/default=0\) \+ 1/.test(SEQ_DERNIERE), "le mutant « dernière ligne + 1 » n'a pas été produit");
+    att(SEQ_NB_LIGNES !== GABARIT && /len\(dejà\) \+ 1/.test(SEQ_NB_LIGNES), "le mutant « nombre de lignes + 1 » n'a pas été produit");
+  });
+
+  check("rouge — journal dont la dernière ligne porte un numéro inférieur au maximum (1,2,4,3) : « dernière ligne + 1 » redonne le 4 déjà pris", () => {
+    const { d, script } = produit(SEQ_DERNIERE); dossiers.push(d);
+    avecSeq(d, [1, 2, 4, 3]);
+    att(ajouterUne(script).status === 0, "écriture refusée");
+    const s = entrees(d).map((x) => x.seq);
+    att(s.filter((n) => n === 4).length === 2, `le mutant ne reproduit pas le doublon (seq : ${s.join()})`);
+  });
+  check("rouge — journal à numéros sautés (1,5) : « nombre de lignes + 1 » écrit 3, sous le maximum (le défaut du produit)", () => {
+    const { d, script } = produit(SEQ_NB_LIGNES); dossiers.push(d);
+    avecSeq(d, [1, 5]);
+    att(ajouterUne(script).status === 0, "écriture refusée");
+    att(entrees(d).pop().seq === 3, `le mutant ne reproduit pas le défaut (seq : ${entrees(d).map((x) => x.seq).join()})`);
+  });
+  check("vert — dernière ligne inférieure au maximum (1,2,4,3) : le gabarit écrit 5, jamais un numéro déjà pris", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    avecSeq(d, [1, 2, 4, 3]);
+    const r = ajouterUne(script);
+    att(r.status === 0 && entrees(d).pop().seq === 5, `seq attendu 5 : ${r.stdout}${r.stderr}`);
+  });
+  check("vert — numéros sautés (1,5) : le gabarit écrit 6, strictement au-dessus du maximum", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    avecSeq(d, [1, 5]);
+    const r = ajouterUne(script);
+    att(r.status === 0 && entrees(d).pop().seq === 6, `seq attendu 6 : ${r.stdout}${r.stderr}`);
+  });
+  check("vert — journal sain : la suite reste 1,2,3 (le calcul ne change rien quand le journal est intègre)", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    att(ajouterUne(script).status === 0 && ajouterUne(script).status === 0, "écriture refusée");
+    att(entrees(d).map((x) => x.seq).join() === "1,2,3", `seq : ${entrees(d).map((x) => x.seq).join()}`);
+  });
+
   const avecDoublon = (d) => {
     const f = join(d, "forge", "ledger.jsonl");
     const l = readFileSync(f, "utf8").split("\n").filter(Boolean);

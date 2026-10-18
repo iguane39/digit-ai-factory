@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Écriture du ledger de run — contrat CONTRAT-INTERFACE §3 du pilot (gabarit du pilot, TF-1205).
 
-JSON Lines append-only, `seq` strictement croissant depuis 1, `ts` ISO non décroissant,
+JSON Lines append-only, `seq` strictement croissant depuis 1 (numéroté après le plus grand déjà pris), `ts` ISO non décroissant,
 première entrée `run_open`. Écrivain unique : l'orchestrateur de session.
 
   python forge/ledger.py <type> --champ valeur ...
@@ -88,7 +88,10 @@ def ajouter(run: str, type_: str, **champs) -> dict:
         dejà = lignes(p)                         # relu SOUS verrou : la fin du fichier au moment d'écrire
         if not dejà and type_ != "run_open":
             raise SystemExit("la première entrée d'un ledger doit être `run_open`")
-        seq = (dejà[-1]["seq"] if dejà else 0) + 1
+        # TF-1867 : après le PLUS GRAND numéro déjà pris, pas après le nombre de lignes (une copie
+        # de produit portait `len(dejà) + 1` : 13 seq en double relevés le 15/10/2026) ni après le
+        # numéro de la dernière ligne (faux dès qu'elle porte un numéro inférieur à une précédente).
+        seq = max((x["seq"] for x in dejà), default=0) + 1
         ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         if dejà and ts < dejà[-1]["ts"]:
             ts = dejà[-1]["ts"]                  # `ts` non décroissant, jamais falsifié
