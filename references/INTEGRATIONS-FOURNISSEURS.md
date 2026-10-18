@@ -1,6 +1,6 @@
 ---
 role: les faits MESURÉS sur les interfaces de fournisseurs tiers — ceux qu'aucune documentation officielle ne dit là où on les cherche, et dont l'ignorance a coûté un aller-retour au moins une fois
-sources_de_verite: [todo/TODO.jsonl (les items qui les ont mesurés, avec leur coût), gabarits/.env.example du projet concerné (les clés et leurs portées), input/00-retours/Produit-79 - RETOURS - 20261017b.md (retours RP-11 : référentiel Google, RG-1 : sources du SEO, RA-9 : connexion Google d'un produit, et garde-fou de plateforme relevé ; item TF-1848 du registre, décidé par R-58), documentation de Google lue le 2026-10-18 (adresses citées ligne à ligne dans les sections Google)]
+sources_de_verite: [todo/TODO.jsonl (les items qui les ont mesurés, avec leur coût), gabarits/.env.example du projet concerné (les clés et leurs portées), input/00-retours/Produit-79 - RETOURS - 20261017b.md (retours RP-11 : référentiel Google, RG-1 : sources du SEO, RA-9 : connexion Google d'un produit, et garde-fou de plateforme relevé ; item TF-1848 du registre, décidé par R-58), output/03-etudes/20261018-etude-opportunite-connexion-sources-google.md (TF-1852, décision D-30 (a) : les 11 étapes, la durée, les critères de réouverture du skill), lecture seule du dépôt de Produit-02 le 2026-10-18 (TF-1871 : workflows de CI, scripts de lecture, journal), documentation de Google, README des deux serveurs MCP et spécification de MCP lus le 2026-10-18 (adresses citées ligne à ligne dans les sections Google et dans la section de connexion pas à pas)]
 verifie_le: 2026-10-18
 ---
 
@@ -206,7 +206,7 @@ ledger du run qui les exécute.
 
 ## Google — se connecter : voie OAuth « utilisateur » ou compte de service
 
-*Mesuré le 17/10/2026 par le run `Produit-79` (lot `Produit-79 - RETOURS - 20261017b`, retours RP-11 et RA-9 ; item TF-1848, décision R-58 du 18/10/2026), puis confronté à la documentation de Google lue le 18/10/2026. Chaque ligne dit si son fait est relu (page, commande ou réponse d'API rejouée le 18/10/2026) ou attribué au constat de Produit-79, non rejoué ici. Aucun identifiant de compte, de projet ni de propriété n'y figure.*
+*Mesuré le 17/10/2026 par le run `Produit-79` (lot `Produit-79 - RETOURS - 20261017b`, retours RP-11 et RA-9 ; item TF-1848, décision R-58 du 18/10/2026), puis confronté à la documentation de Google lue le 18/10/2026. Chaque ligne dit si son fait est relu (page, commande ou réponse d'API rejouée le 18/10/2026) ou attribué au constat de Produit-79, non rejoué ici. La lecture de GA4 et de Search Console par un compte de service a été requalifiée le 18/10/2026 sur la lecture du dépôt de Produit-02 (TF-1871, R-58). Aucun identifiant de compte, de projet ni de propriété n'y figure.*
 
 La connexion de Produit-79 à Google Analytics 4, à Search Console et à Google Ads a pris une matinée, dont
 la moitié à chercher ce que ce référentiel aurait pu dire (RP-11). Son déroulé consigné va de 07:55 à 08:50 :
@@ -216,14 +216,33 @@ pas ventilée par fait : une ligne dit son coût propre seulement quand il est c
 
 ### Quand choisir laquelle
 
-3 lignes disent à quel moment un compte de service remplace la connexion d'une personne, et ce qui le
-ferme. La première est l'arbitrage ; les deux suivantes sont les faits qui le fondent.
+4 lignes disent à quel moment un compte de service remplace la connexion d'une personne, et ce qui le
+ferme. La première est l'arbitrage ; les trois suivantes sont les faits qui le fondent. La preuve de la
+troisième ligne est détaillée sous le tableau.
 
 | Fait | Coût si on l'ignore | Comment le rejouer, et source |
 |---|---|---|
-| **Règle de choix.** Compte de service quand la ressource accepte son adresse comme utilisateur ; voie utilisateur sinon. Aujourd'hui : compte de service pour Google Ads (relu), voie utilisateur pour GA4 et Search Console (l'ajout d'un compte de service n'y est pas vérifié, voir la dernière section Google). *Arbitrage de rédaction tiré des 2 lignes suivantes et du constat de Produit-79, pas un fait mesuré tel quel.* | une voie utilisateur choisie par défaut met un humain et un jeton de 7 jours dans une chaîne conçue pour tourner seule ; un compte de service supposé accepté par GA4 ou Search Console envoie l'exploitant chercher un réglage non vérifié | tenter d'ajouter l'adresse d'un compte de service à une propriété GA4, puis à une propriété Search Console, et noter la réponse de l'écran ; la règle se corrige à la première réponse |
+| **Règle de choix.** Compte de service quand la ressource accepte son adresse comme utilisateur ; voie utilisateur sinon. Aujourd'hui : compte de service pour Google Ads (relu), pour GA4 et pour Search Console (relevé chez Produit-02, 3e ligne), sauf quand l'organisation interdit la clé du compte de service (4e ligne) ; voie utilisateur alors. *Arbitrage de rédaction tiré des 3 lignes suivantes et du constat de Produit-79, pas un fait mesuré tel quel. Requalifié le 18/10/2026 (TF-1871) : la règle donnait la voie utilisateur pour GA4 et Search Console.* | une voie utilisateur choisie par défaut met un humain et un jeton de 7 jours dans une chaîne conçue pour tourner seule : la règle précédente y envoyait un relevé hebdomadaire (constat C1 de l'étude du 18/10/2026, coût non subi) | lister, avec l'identité du compte de service, les propriétés qu'elle voit avant de choisir (3e ligne) ; la règle se corrige à la première réponse contraire |
 | **Un compte de service ne dépend d'aucune personne et n'exige aucun consentement humain.** La documentation Google Ads le présente comme un flux OAuth 2.0 sans autorisation humaine, dont l'accès survit au départ de la personne qui l'a configuré ; on l'ajoute comme utilisateur du compte publicitaire (Admin → Accès et sécurité → Utilisateurs), sans le niveau « Email only », et sans rôle d'administrateur par défaut | la voie utilisateur se coupe quand la personne qui a consenti part, et expire à 7 jours en mode Test (ligne « 7 jours » plus bas) | `developers.google.com/google-ads/api/docs/oauth/service-accounts` (page du 2026-10-14, lue le 18/10/2026) ; lecture réussie par `produit-02` le 22/09/2026 (section Google Ads, ligne « Un compte de service s'ajoute comme utilisateur ») |
+| **Un compte de service lit GA4 et Search Console : l'ajout de son adresse à la propriété est accepté.** Relevé en lecture seule chez Produit-02 le 18/10/2026 (TF-1871, R-58) : Search Console lu chaque semaine par la CI, GA4 lu par un script du produit avec un compte de service, depuis le poste et non en CI. Ce référentiel disait ce point « non vérifié » jusqu'à cette date. Le niveau d'autorisation accordé à ce compte n'est pas consigné au dossier lu | la voie utilisateur est prescrite à tort pour un relevé récurrent. Son jeton de 7 jours oblige un humain toutes les semaines. L'exploitant cherche un réglage que Produit-02 a déjà passé | preuve ligne à ligne dans « Preuve relevée chez Produit-02 », sous ce tableau. Pour rejouer, lister les propriétés que voit le compte de service : `sites.list` de Search Console, dont le champ `permissionLevel` donne le niveau, et `accountSummaries` de l'API d'administration de GA4 |
 | **L'organisation peut interdire la clé d'un compte de service.** Les contraintes de sécurité de base de Google Cloud s'appliquent à toute organisation créée à partir du 03/05/2024 (certaines créées entre février et avril 2024 peuvent l'être aussi), dont l'interdiction des clés persistantes de compte de service (`iam.managed.disableServiceAccountKeyCreation`) | le compte de service se crée, sa clé ne se télécharge pas, et la voie compte de service est fermée sans changer la politique de l'organisation, décision qui reste humaine ; il reste la voie utilisateur, ou l'emprunt d'identité d'un compte de service que le README d'`analytics-mcp` documente (`--impersonate-service-account`) | `docs.cloud.google.com/resource-manager/docs/secure-by-default-organizations` (page du 2026-10-13, lue le 18/10/2026) ; README : `github.com/googleanalytics/google-analytics-mcp` (lu le 18/10/2026) |
+
+### Preuve relevée chez Produit-02 : un compte de service lit GA4 et Search Console
+
+*Relevé le 18/10/2026 (TF-1871, R-58), en lecture seule dans le dépôt de Produit-02 au commit `34a8e64f` du 2026-10-04 : ses workflows de CI, ses scripts de lecture, sa documentation de paramétrage et son journal. Aucun appel à Google, aucune clé ouverte. Aucun identifiant de compte, de projet ni de propriété n'y figure.*
+
+6 lignes disent ce que le dépôt prouve, ce qu'il ne prouve pas, et où le relire. Les chemins sont ceux du dépôt de Produit-02.
+
+| Relevé | Fichier et ligne, ou commande |
+|---|---|
+| **Le secret de la CI est la clé d'un compte de service en lecture seule.** Aucune étape de consentement n'existe sur un exécuteur de CI | `.github/workflows/mesure.yml` lignes 89 à 93 (le secret `GOOGLE_CREDENTIALS_JSON` est écrit dans un fichier d'identifiants) ; `.github/workflows/indexation.yml` ligne 9 (« compte de service, droits de lecture Search Console ») ; `docs/projet/PARAMETRAGE.md` ligne 87 ; journal du produit, entrée 63 du 2026-09-01 (secret posé « depuis la clef locale du compte de service en lecture seule ») |
+| **La CI lit Search Console avec ces identifiants.** | `build/console/releve.py` lignes 43 et 78-79 (portée `webmasters.readonly`, client `searchconsole` v1, identifiants par défaut) ; `build/google/indexation.py` lignes 45-46 (même portée) |
+| **La CI a versé 11 relevés.** 6 versements « Relever les indicateurs de découverte » du 2026-09-06 au 2026-09-28 et 5 versements « statut d'indexation » du 2026-09-05 au 2026-10-01. Dans les deux workflows, l'étape de versement suit l'étape de lecture. Ces relevés couvrent plus de 3 semaines, donc plus que les 7 jours d'un jeton en mode Test : c'est cohérent avec une clé de compte de service, déduction non rejouée | `git log` du dépôt, filtré sur le compte de versement de la CI ; ordre des étapes : `mesure.yml` et `indexation.yml`. Le clone s'arrête au 2026-10-04 : les versements suivants ne sont pas vus |
+| **GA4 est lu par un compte de service, depuis le poste du produit et non en CI.** Aucun workflow ne lance le script de statut | `build/google/statut.py` ligne 50 (identifiants par défaut) et lignes 62 à 66 (`analyticsdata` v1beta, `runReport`) ; `docs/projet/PARAMETRAGE.md` lignes 333-334 (« relit la propriété GA4 et la Search Console avec le compte de service ») ; journal, entrée 200 de 14:34 le 2026-09-12 (ligne 200 du fichier ; le numéro 200 est aussi porté par l'entrée de la ligne 204) : « Lecture seule GA4 (compte de service, analyticsadmin v1beta) », une liaison Google Ads et les événements clés lus ; rapport de statut du 2026-10-16, en-tête : lecture seule de l'API de données, de l'API d'administration et de Search Console par `statut.py`, le 16/10/2026 vers 7:29 ; `grep -rn statut.py .github` : 0 occurrence |
+| **L'ajout comme utilisateur est le geste qui ouvre la lecture.** Le script le dit à l'écran quand le compte ne voit aucune propriété | `build/google/statut.py` lignes 143-144 : « AUCUNE PROPRIÉTÉ visible par ce compte de service. Cause probable : il n'a pas été ajouté comme utilisateur dans Search Console » |
+| **Un autre dossier du parc lit aussi ces sources par compte de service.** Attribué à l'étude, dossier non relu ici | étude du 18/10/2026, constat C1 : `scripts/google-api-inspect.js` lignes 3 à 6 |
+
+Ce que le relevé ne dit pas : le niveau d'autorisation accordé au compte de service (le script lit le champ `permissionLevel` à sa ligne 147, mais aucun fichier `.md`, `.json` ni `.jsonl` du dépôt ne l'a conservé), la personne qui a ajouté l'adresse à chaque propriété et la date de ce geste humain, et l'état des versements après le 2026-10-04. Que la clé locale lue par `statut.py` (ligne 8) soit celle du secret de CI n'est pas vérifié : les deux scripts nomment le même chemin de clé locale (`indexation.py`, ligne 9), les fichiers de clé n'ont pas été ouverts.
 
 ### La voie utilisateur : prérequis, durée du jeton, commande
 
@@ -285,7 +304,7 @@ et les niveaux d'autorisation d'une propriété. Même lecture ligne à ligne qu
 | **Une API, deux portées : `https://www.googleapis.com/auth/webmasters.readonly` lit, `https://www.googleapis.com/auth/webmasters` lit et écrit.** Produit-79 a demandé `webmasters.readonly`. Le service à activer s'appelle `searchconsole.googleapis.com` | demander `webmasters` accorde l'écriture sans besoin : coût non subi, relevé en vérifiant la documentation | `developers.google.com/webmaster-tools/v1/how-tos/authorizing` (page du 2025-08-28, lue le 18/10/2026) ; `curl -s 'https://searchconsole.googleapis.com/$discovery/rest?version=v1'` puis lire `auth.oauth2.scopes` et `rootUrl` (révision 20261014, rejoué le 18/10/2026) |
 | **Deux adresses se rencontrent.** Les pages de référence donnent `https://www.googleapis.com/webmasters/v3/sites` ; le document de découverte donne la racine `https://searchconsole.googleapis.com/`. Sans jeton le 18/10, `/webmasters/v3/sites` rend `401` sur les deux hôtes | une sonde écrite d'après une seule des deux adresses laisse croire que l'autre n'existe pas : coût non subi, relevé en rejouant | `curl -s -o /dev/null -w "%{http_code}\n" https://www.googleapis.com/webmasters/v3/sites`, puis la même sur `https://searchconsole.googleapis.com/webmasters/v3/sites` (rejoué le 18/10/2026) ; `developers.google.com/webmaster-tools/v1/sites/list` (page du 2024-07-23, lue le 18/10/2026) |
 | **Produit-79 a lu Search Console en direct avec un compte du client** : `sites.list` en 200 et `searchAnalytics/query` en 200 sur une propriété de domaine, le 17/10/2026 (retour RG-1 du même lot). Le référentiel des sources du SEO les déclarait absentes, ce que RG-1 corrige de son côté | une voie « connecteur » ignorée : 16 nœuds du SEO déclarés non mesurables faute d'export | `GET https://www.googleapis.com/webmasters/v3/sites` avec le jeton de la voie utilisateur, puis `POST …/sites/<siteUrl>/searchAnalytics/query` ; page de la méthode : `developers.google.com/webmaster-tools/v1/searchanalytics/query` (page du 2026-08-11, lue le 18/10/2026) ; non rejoué ici faute de jeton |
-| **Quatre niveaux d'autorisation sur une propriété** : propriétaire, utilisateur complet, utilisateur restreint, associé. L'aide ne dit ni lesquels l'API lit, ni si l'adresse d'un compte de service peut y être ajoutée. Le niveau du compte du client n'est pas au lot | choisir la voie compte de service pour Search Console sur une hypothèse | `support.google.com/webmasters/answer/7687615` (lue le 18/10/2026, aucune date affichée) |
+| **Quatre niveaux d'autorisation sur une propriété** : propriétaire, utilisateur complet, utilisateur restreint, associé. L'aide ne dit pas lesquels l'API lit. L'adresse d'un compte de service peut y être ajoutée (requalifié le 18/10/2026, TF-1871 : voir « Preuve relevée chez Produit-02 »). Le niveau accordé à ce compte de service n'est pas consigné au dossier de Produit-02, et le niveau du compte du client de Produit-79 n'est pas au lot | demander ou accorder un niveau sans savoir lequel la lecture exige : coût non subi | `support.google.com/webmasters/answer/7687615` (lue le 18/10/2026, aucune date affichée) ; le niveau se lit au champ `permissionLevel` de `sites.list` |
 
 ### Faits attribués au constat de Produit-79, faute de vérification
 
@@ -296,8 +315,127 @@ Cette liste dit ce que le référentiel ne sait pas par lui-même. Elle vaut pou
 - **Les 9 outils d'`analytics-mcp`** : le README en liste 7 (section « Serveurs MCP de lecture »).
 - **Le type « Desktop app » du client OAuth, et l'absence de commande `gcloud` pour le créer** : l'absence est relue pour `gcloud iam oauth-clients create` seulement ; le type reste le choix de Produit-79.
 - **Le message de la console sur « Publier l'application »** : l'exigence est confirmée par la page de Google sur le « Branding », pas le message lui-même.
-- **L'ajout d'un compte de service à une propriété GA4 ou Search Console** : les aides lues n'en parlent pas. À tenter avant de choisir cette voie.
+- **Le niveau d'autorisation accordé à un compte de service sur une propriété GA4 ou Search Console** : non consigné au dossier de Produit-02 lu le 18/10/2026. L'ajout de l'adresse lui-même n'est plus dans cette liste : il est établi (TF-1871, section « Preuve relevée chez Produit-02 »).
 - **La ligne de commande exacte de la connexion de lecture, la version installée d'`analytics-mcp`, le niveau d'autorisation du compte du client sur Search Console** : absents du lot.
+
+---
+
+## Connexion pas à pas — d'un produit à GA4, Search Console et Google Ads
+
+*Établi le 18/10/2026 par l'étude `output\03-etudes\20261018-etude-opportunite-connexion-sources-google.md` (TF-1852, décision humaine D-30 (a) du 18/10/2026 : une procédure au référentiel, sans skill). Les 11 étapes sont celles que l'étude a relevées (M-8) dans le déroulé de Produit-79 du 17/10/2026 (lot `Produit-79 - RETOURS - 20261017b`, retour RA-9 ; entrées 240 à 250 du journal du produit, citées par l'étude). Les commandes sont relues dans l'aide de `gcloud` (SDK 580.0.0) ou dans les README des serveurs MCP, lus le 18/10/2026. Un écran n'est nommé que lorsqu'une source le nomme : un nom d'option d'interface ne se dicte pas de mémoire. Aucun identifiant de compte, de projet ni de propriété n'y figure.*
+
+Ce que cette section change pour vous : un produit qui doit lire GA4, Search Console ou Google Ads suit 11 étapes dans un ordre connu, au lieu de les redécouvrir. 7 reviennent à l'agent et 4 à une personne : le clic de connexion, l'écran « Branding », la création du client OAuth à la console et la demande d'accès « Explorer » (3 gestes seulement sans compte Google Ads). Aucun skill ne retire ces 4 gestes (étude, M-8) : la procédure vit donc ici, et le skill se rouvre sous conditions (dernière partie).
+
+Lecture : une étape par ligne, numérotée dans son intitulé et rangée dans l'ordre de l'étude. Ses sous-puces disent qui la fait, le geste (une commande ou un écran par sous-puce), le résultat attendu et la source.
+
+### Les 11 étapes de la voie utilisateur
+
+- **Étape 1 — Choisir la voie.**
+  - Qui : l'agent.
+  - Geste : appliquer la « Règle de choix » de la section « Google — se connecter ». Les étapes ci-dessous suivent la voie utilisateur ; la variante par compte de service est plus bas.
+  - Résultat attendu : la voie retenue et sa raison, notées au journal du produit.
+  - Source : étude, M-8 ligne 1.
+- **Étape 2 — Créer le projet Cloud, activer les API, isoler la configuration.**
+  - Qui : l'agent. Projet créé et 4 API activées à 08:02 le 17/10 (entrée 241 du journal de Produit-79, étude M-7).
+  - Geste : poser `CLOUDSDK_CONFIG=<répertoire du produit>` devant chaque commande `gcloud`, pour que la connexion d'un second produit du même exploitant n'écrase pas celle du premier.
+  - Geste : `gcloud projects create <identifiant du projet>`. La commande employée par Produit-79 n'est pas au lot.
+  - Geste : `gcloud services enable analyticsadmin.googleapis.com analyticsdata.googleapis.com searchconsole.googleapis.com --project=<projet>`, plus l'API Google Ads, que son README demande d'activer dans le projet (nom de service non relevé ici). Cela fait 4 API, comme chez Produit-79 ; la composition est déduite des sections GA4 et Search Console.
+  - Résultat attendu : `gcloud services list --enabled --project=<projet>` nomme les API activées ; `gcloud info --format="value(config.paths.global_config_dir)"` rend le répertoire du produit (rejoué le 18/10/2026).
+  - Source : étude, M-8 ligne 2 ; `gcloud projects create --help` et `gcloud services list --help` (SDK 580.0.0, 18/10/2026) ; lignes « 2 API à activer » (section GA4) et « Une configuration `gcloud` par produit » ; README de `google-ads-mcp` (lu le 18/10/2026).
+- **Étape 3 — Le clic de connexion.**
+  - Qui : l'humain, geste 1.
+  - Écran : la fenêtre de consentement de Google qui s'ouvre dans le navigateur de la personne ; elle y choisit son compte et accepte.
+  - Résultat attendu : la commande qui attendait ce consentement rend la main.
+  - Source : étude, M-8 ligne 3 (« consentement personnel »). La commande qui ouvre cette fenêtre n'est pas au lot.
+- **Étape 4 — L'écran « Branding ».**
+  - Qui : l'humain, geste 2.
+  - Écran : la console Google Auth Platform, écran « Branding ».
+  - Écran : l'écran « Audience », que la ligne « Publier l'application » cite avec « Branding » ; l'application peut y rester en mode Test, avec un utilisateur test.
+  - Résultat attendu : l'écran « Branding » est enregistré. « Publier l'application » reste grisé tant qu'il ne porte ni page d'accueil ni page de confidentialité (message de la console du 17/10, constat de Produit-79) ; l'application reste donc en mode Test, et son jeton expire à 7 jours.
+  - Source : lignes « Publier l'application » et « En mode Test » de la section « La voie utilisateur » ; `support.google.com/cloud/answer/15549049` (lue le 18/10/2026) ; étude, M-8 ligne 4.
+- **Étape 5 — Le client OAuth « Desktop app ».**
+  - Qui : l'humain, geste 3, à la console seulement.
+  - Écran : la page des identifiants de la console, `https://console.cloud.google.com/apis/credentials` (adresse que donne l'aide de `gcloud auth application-default login`). Il y crée un identifiant « OAuth Client ID » de type « Desktop app », type choisi par Produit-79 : la page de Google ne le nomme pas.
+  - Geste : télécharger le fichier JSON du client, que l'agent range (entrée 245 du journal de Produit-79 : « client OAuth rangé »). Par précaution, hors du dépôt : ce fichier est un identifiant.
+  - Résultat attendu : un fichier de client OAuth, utilisable à l'étape 6.
+  - Source : ligne « Le client OAuth « Desktop app » se crée à la console seulement » (aucune commande `gcloud` ne le crée : `gcloud iam oauth-clients create` crée un client IAM aux portées limitées) ; étude, M-8 ligne 5.
+- **Étape 6 — La connexion de lecture.**
+  - Qui : l'agent (entrée 245, 08:34).
+  - Geste : `gcloud auth application-default login --client-id-file=<client.json> --scopes https://www.googleapis.com/auth/analytics.readonly,https://www.googleapis.com/auth/webmasters.readonly,https://www.googleapis.com/auth/adwords,https://www.googleapis.com/auth/cloud-platform`. Les 4 portées sont celles de Produit-79 ; sa ligne exacte n'est pas au lot, celle-ci est composée des commandes des README. Sans Google Ads, retirer `adwords`.
+  - Résultat attendu : la commande imprime « Credentials saved to file: <chemin> ». Ce chemin devient `GOOGLE_APPLICATION_CREDENTIALS` à l'étape 8.
+  - Source : lignes « La connexion de lecture se fait par les identifiants par défaut » et « Une configuration `gcloud` par produit » ; README de `google-analytics-mcp` et de `google-ads-mcp` (lus le 18/10/2026) ; étude, M-8 ligne 6.
+- **Étape 7 — La demande d'accès « Explorer »** (Google Ads seulement).
+  - Qui : l'humain, geste 4.
+  - Écran : le bouton de demande de niveau que décrit la page « Access levels » de la documentation de l'API ; l'intitulé de l'écran n'est pas relevé ici.
+  - Résultat attendu : le compte réel se lit au niveau « Explorer ». Chez Produit-79, 7 minutes d'attente (demandé à 08:30, lecture à 08:37). Google peut relever le niveau automatiquement après la demande, et le niveau « Explorer » est plafonné à 2 880 opérations par jour.
+  - Source : `developers.google.com/google-ads/api/docs/api-policy/access-levels` (page du 2026-10-14, lue le 18/10/2026) ; délai : constat de Produit-79, non rejoué (étude, M-7) ; étude, M-8 ligne 7.
+- **Étape 8 — Déclarer les 2 serveurs MCP.**
+  - Qui : l'agent (entrées 245 et 248).
+  - Geste : installer `pipx`, prérequis des README des deux serveurs.
+  - Geste : `claude mcp add analytics-mcp -e "GOOGLE_APPLICATION_CREDENTIALS=<chemin de l'étape 6>" -e "GOOGLE_PROJECT_ID=<projet>" -- pipx run analytics-mcp`. C'est la forme du README, qui ajoute `--scope user` ; l'étendue retenue par Produit-79 n'est pas au lot.
+  - Geste : déclarer `google-ads-mcp` de la même façon, avec la commande `pipx run --spec git+https://github.com/googleads/google-ads-mcp.git google-ads-mcp` (forme du README) et, seulement si la configuration l'exige, la variable `GOOGLE_ADS_DEVELOPER_TOKEN`. La valeur ne s'écrit jamais ici.
+  - Résultat attendu : les 2 serveurs sont déclarés, mais leurs outils ne se chargent qu'à la session suivante. L'étape 9 les essaie sans attendre.
+  - Source : README des 2 dépôts (lus le 18/10/2026) ; ligne « Les outils d'un serveur MCP déclaré en cours de session ne se chargent qu'à la session suivante » ; étude, M-8 ligne 8.
+- **Étape 9 — Essayer les serveurs dans la session par un client stdio.**
+  - Qui : l'agent (entrée 250, 08:48).
+  - Geste : lancer un client stdio sur chaque serveur et lui faire jouer `initialize`, `tools/list` puis `tools/call` (détail dans la partie « L'essai des serveurs MCP dans la session »).
+  - Résultat attendu : la liste des outils s'affiche et un appel en lecture rend une réponse sans erreur. 2 serveurs sur 2 chez Produit-79 le 17/10 (constat, non rejoué).
+  - Source : étude, M-8 ligne 9 ; retour RA-9 du lot.
+- **Étape 10 — La sonde d'accès datée.**
+  - Qui : l'agent (entrée 246, étude M-7).
+  - Geste : relire la version de l'API Google Ads en service dans la table des échéances le jour de la sonde, puis jouer la sonde sans jeton de la ligne « API : versions » (section Google Ads).
+  - Geste : avec le jeton de l'étape 6, appeler `listAccessibleCustomers` pour Google Ads, `runReport` pour GA4, puis `sites.list` et `searchAnalytics/query` pour Search Console (lignes des sections GA4 et Search Console).
+  - Résultat attendu : GA4 et Search Console en 200 (Produit-79, 17/10). Une propriété hors de l'accès de l'identité rend une erreur d'accès, pas une liste vide. La sonde porte sa date et la version d'API essayée.
+  - Source : le lot dit « mesure des accès sur 5 appels » (RA-9) sans les lister ; les appels ci-dessus sont ceux que ce référentiel documente, pas la liste de Produit-79 ; étude, M-8 ligne 10.
+- **Étape 11 — Consigner variables et journal.**
+  - Qui : l'agent (entrée 242).
+  - Geste : inscrire les noms des variables (`CLOUDSDK_CONFIG`, `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_PROJECT_ID`, et `GOOGLE_ADS_DEVELOPER_TOKEN` s'il est utilisé) dans le `.env.example` du produit, jamais leurs valeurs.
+  - Geste : écrire au journal du produit la date, la durée de la connexion, ses attentes et ses écarts avec cette section. Sans cela, les critères de réouverture (dernière partie) ne se jouent pas.
+  - Résultat attendu : un `.env.example` que juge `oracles\oracle-parite-configuration.mjs`, et un journal qui porte la durée.
+  - Source : étude, M-8 ligne 11 ; section « Limites de ce document » (le `.env.example` porte le quoi).
+
+### Variante par compte de service
+
+- Qui : l'humain.
+- Geste : ajouter l'adresse du compte de service à chaque propriété GA4, à chaque propriété Search Console et au compte publicitaire. Pour Google Ads, le chemin est Admin → Accès et sécurité → Utilisateurs, niveau « Lecture seule » (section Google Ads). Les écrans de GA4 et de Search Console ne sont pas relevés.
+- Résultat attendu : la lecture réussit sans étape d'acceptation (Google Ads, 22/09/2026) ; GA4 et Search Console acceptent l'ajout (section « Preuve relevée chez Produit-02 »).
+- Condition : cette voie n'exige ni consentement humain, ni écran « Branding », ni client OAuth, et elle se ferme quand l'organisation interdit la clé du compte de service (ligne « L'organisation peut interdire la clé »). Que les étapes 3 à 6 n'y aient pas lieu est une déduction, non rejouée.
+- Source : étude, M-8 ligne 12 (« déduit de la page Google Ads et de l'usage de Produit-02, non rejoué »).
+
+### Durée mesurée
+
+- 55 minutes, de 07:55 à 08:50 le 17/10/2026, chez Produit-79, avec 4 gestes humains (lot, RA-9 ; étude, M-7).
+- Dont 7 minutes d'attente d'« Explorer », soit 13 % (7 / 55) : demandé à 08:30, lecture réelle à 08:37 (constat de Produit-79, non rejoué).
+- Repères du journal, heure de Paris (UTC + 2), horodatés à l'écriture au journal et non au geste : 08:02 demande, projet créé et 4 API activées (entrées 240 et 241) ; 08:34 connexion de lecture, 32 minutes après la demande (entrée 245) ; 08:48 essai des 2 serveurs, 46 minutes après la demande (entrée 250). Source : étude, M-7.
+- Non mesuré : la part de recherche (« une matinée, dont la moitié à chercher », en tête de la section « Google — se connecter », n'est pas la durée du déroulé), le temps de l'agent contre celui de l'humain par geste, la durée des 3 autres connexions du parc, et le temps que cette procédure fera gagner (étude, M-7, H4 et H5).
+
+### L'essai des serveurs MCP dans la session
+
+Un serveur MCP, le protocole par lequel un agent appelle des outils, déclaré en cours de session n'expose pas ses outils avant la session suivante. Produit-79 les a essayés dans la session avec un client « stdio » de 40 lignes : un petit programme qui lance le serveur comme sous-processus et lui parle par ses flux d'entrée et de sortie (constat de Produit-79, RA-9, 2 serveurs sur 2, non rejoué). Son code n'est pas versé : l'étude le situe au dossier temporaire de la session de Produit-79 (constat C3), et le verdict O2 ne crée pas l'outil. Le client joue 3 échanges :
+
+- `initialize` : le client se présente au serveur et attend sa réponse.
+- `tools/list` : le client demande les outils. Attendu : 3 outils pour `google-ads-mcp` (README), 7 au README pour `analytics-mcp`, 9 au constat de Produit-79.
+- `tools/call` : le client appelle un outil en lecture du README, par exemple `list_accessible_customers` ou `get_account_summaries`. Attendu : une réponse sans erreur.
+
+La spécification de MCP décrit le transport stdio comme des messages JSON-RPC séparés par un saut de ligne, sur les flux d'un sous-processus lancé par le client. Sa révision du 2026-07-28 fait porter à chaque requête sa version de protocole, là où les révisions antérieures ouvraient une session par `initialize` (`modelcontextprotocol.io/specification/2026-07-28/basic/transports`, lue le 18/10/2026). Lequel des deux régimes parlent `google-ads-mcp` 0.0.5 et `analytics-mcp` 0.7.0 n'a pas été vérifié : le client de Produit-79 envoie `initialize`, et 2 serveurs sur 2 ont répondu.
+
+### Quand rouvrir le skill
+
+Décision D-30 (a) du 18/10/2026 : le skill se rouvre après 2 nouvelles connexions, ou si une connexion suivie avec la procédure dépasse 55 minutes. Les critères ci-dessous sont repris tels quels de l'étude (section « Verdict », plan de revue du 2026-12-18 sur les connexions faites depuis le 2026-10-18). O1 y désigne le skill complet, O3 l'outil d'essai MCP seul.
+
+- K1 — au moins 2 nouvelles connexions de produit à ces sources dans la période → rouvrir O1.
+- K2 — la durée mesurée de chaque connexion suivie avec la procédure dépasse les 55 minutes de Produit-79 → la procédure n'a rien gagné, la réviser.
+- K3 — au moins un écart entre la procédure et la réalité relevé → le corriger au référentiel dans la semaine.
+- K4 — le client d'essai MCP recopié au moins 2 fois → ouvrir O3.
+
+Sans nouvelle connexion, le skill n'avait pas d'usage et O2 se confirme (étude). Sur K2, l'étude en tire la révision de la procédure et D-30 (a) la réouverture du skill : à la revue du 2026-12-18, les deux lectures sont posées à l'humain.
+
+### Limites de la procédure
+
+- L'ordre des étapes 3 à 6 est celui de l'étude ; le lot ne dit pas quelle commande ouvre le consentement du geste 1.
+- La commande de création du projet, la ligne exacte de la connexion de lecture et les 5 appels de la sonde de Produit-79 ne sont pas au lot.
+- Le client stdio n'est pas versé ni rejoué ; le délai de 7 minutes d'« Explorer » est un constat de Produit-79, non rejoué.
+- Aucune connexion n'a encore été suivie avec cette procédure : K2 n'a que les 55 minutes de Produit-79 pour terme de comparaison.
 
 ---
 

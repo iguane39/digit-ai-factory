@@ -1,6 +1,6 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\references\\INTEGRATIONS-FOURNISSEURS.md",
-  "date_iso": "2026-10-18T08:17:35.133Z",
+  "date_iso": "2026-10-18T15:21:54.865Z",
   "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -8,9 +8,9 @@
   "perimetre": "disque",
   "perimetre_motif": null,
   "resume": {
-    "pass": 4,
+    "pass": 5,
     "fail": 0,
-    "skip": 3,
+    "skip": 2,
     "cache": 0
   },
   "bilan_fichiers": {
@@ -45,8 +45,8 @@
     {
       "domaine": "Calculs / chiffres",
       "file": "references\\INTEGRATIONS-FOURNISSEURS.md",
-      "verdict": "SKIP",
-      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 0 total(aux) de colonne vérifié(s) par re-somme + 1 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 0/0 mesure(s) publiée(s) portant leur dénominateur et leurs unités + 0 indicateur(s) à valeur unique, 0 écart"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\INTEGRATIONS-FOURNISSEURS.md",
-    "ts": "2026-10-18T08:17:35.133Z",
+    "ts": "2026-10-18T15:21:54.865Z",
     "fichiers": {
-      "references\\INTEGRATIONS-FOURNISSEURS.md": "b23206e53e8e76772f226e1254e1dfc0dc89f4f5c0512b49048998c465a00035"
+      "references\\INTEGRATIONS-FOURNISSEURS.md": "5fade08f2422a41da4d3c2d66e8e5eab83732020804559fb0cd92bd75c41529d"
     }
   },
   "empreinte_motif": null,
