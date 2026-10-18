@@ -51,8 +51,8 @@
   "vu_le": "2026-10-15"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 13,
-  "vu_le": "2026-10-13"
+  "cas": 19,
+  "vu_le": "2026-10-18"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
@@ -399,7 +399,7 @@
   "vu_le": "2026-10-13"
  },
  "oracles/hook-flotte.test.mjs": {
-  "cas": 18,
+  "cas": 20,
   "vu_le": "2026-10-18"
  },
  "oracles/hook-identite-sortante.test.mjs": {
@@ -435,7 +435,7 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 51,
+  "cas": 52,
   "vu_le": "2026-10-18"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
@@ -675,8 +675,8 @@
   "vu_le": "2026-10-18"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 43,
-  "vu_le": "2026-10-15"
+  "cas": 46,
+  "vu_le": "2026-10-18"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
   "cas": 10,

@@ -1,6 +1,6 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\gabarits\\RESTITUTION.md",
-  "date_iso": "2026-10-18T08:59:04.181Z",
+  "cible": "gabarits/RESTITUTION.md",
+  "date_iso": "2026-10-18T13:53:06.325Z",
   "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -52,7 +52,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "gabarits\\RESTITUTION.md",
       "verdict": "FAIL",
-      "detail": "15 constat(s) · date d'engagement non sourcée : « **Un guide de lancement porte la sortie des portes du jour** (TF-1498, règle **S » ; pourcentage « 94,6 % » non sourcé"
+      "detail": "16 constat(s) · date d'engagement non sourcée : « **Un guide de lancement porte la sortie des portes du jour** (TF-1498, règle **S » ; pourcentage « 3,3 % » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -77,9 +77,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\RESTITUTION.md",
-    "ts": "2026-10-18T08:59:04.181Z",
+    "ts": "2026-10-18T13:53:06.325Z",
     "fichiers": {
-      "gabarits\\RESTITUTION.md": "58f9920ee2d05f0a76fbfa1c73325d49eeaf34dfcf8e97c6427f690cf9c5b29d"
+      "gabarits\\RESTITUTION.md": "4bfc3e75df077488826a3b716135c9fca70c97ec3fb87b41fe6b75a0e6007848"
     }
   },
   "empreinte_motif": null,
