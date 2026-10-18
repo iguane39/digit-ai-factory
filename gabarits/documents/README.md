@@ -4,9 +4,10 @@ Les gabarits de **livrables** que la factory propose à un projet, quel que soit
 un projet qui doit rendre un rapport de données, un diagnostic, un rapport d'audit ou une
 fiche de sécurité prend le gabarit de sa famille plutôt que d'inventer une forme.
 
-La bibliothèque est autant un **index** qu'un atelier. Sur ses **quarante-cinq** familles (recomptées
-sur `catalogue.jsonl` le 14/10/2026 : 21 `ok`, 17 `porte_ailleurs`, 7 `a_extraire`, dont `fiche-constat-precos`
-et `cascade-produit` nées ce jour-là des retours RT-36 et RS-30, et `fiche-produit` et `presentation-restitution-audit` nées le 13/10 des
+La bibliothèque est autant un **index** qu'un atelier. Sur ses **quarante-six** familles (recomptées
+sur `catalogue.jsonl` le 18/10/2026 : 22 `ok`, 17 `porte_ailleurs`, 7 `a_extraire`, dont `tableau-de-bord-pilotage`
+née ce jour-là du retour RP-15 et de la décision D-31 (a), `fiche-constat-precos`
+et `cascade-produit` nées le 14/10 des retours RT-36 et RS-30, et `fiche-produit` et `presentation-restitution-audit` nées le 13/10 des
 retours RP-8 et RP-61 ; le 24/09/2026 le compte
 annoncé ici était resté à celui du 20/09, trente-huit familles dont 9 `ok`, alors que des familles
 avaient été extraites depuis), **dix-sept**
@@ -101,6 +102,12 @@ depuis sa source Markdown, et les composants de la page vivent en fichiers sépa
 catalogue `COMPOSANTS.md`) — chacun posable SEUL dans une autre page, scellé par l'empreinte de sa
 source, sa parité rejouable (`--poser`, `--constat`). Squelette et instance restent dus (G1) : ils
 sont alors GÉNÉRÉS, et c'est ce qui prouve le générateur.
+
+**Une famille peut porter son MOTEUR** (18/10/2026, `tableau-de-bord-pilotage`, TF-1855). Quand la
+page se recalcule dans le navigateur, son HTML ne porte aucun chiffre et un contrôle statique n'en
+juge que la forme : la famille embarque son moteur dans le squelette, recopié à l'identique dans
+l'instance, et son oracle recompte chaque chiffre affiché dans Chromium, à chaque état des commandes
+(`oracles\oracle-tableau-de-bord-pilotage.mjs`).
 
 ## S'en servir
 ### La boucle de retour — comment cette bibliothèque s'améliore

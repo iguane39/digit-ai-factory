@@ -1111,6 +1111,28 @@ if (args[0] === "--self-test") {
         casse.push(`TF-1679 : une restitution sur la cascade est avalée par la famille neuve — ${resto.message.slice(0, 140)}`);
     }
 
+    // TF-1855 (18/10/2026) — LE TABLEAU DE BORD DE PILOTAGE A SA FAMILLE, ET « DASHBOARD TESTS » GARDE LA
+    // SIENNE. « dashboard » seul résolvait dashboard-tests, famille sans gabarit : les cinq versions de la
+    // page refaite par Produit-79 y tombaient (étude 20261018a, M5). Sens VERT : ces cinq noms, relevés
+    // dans le parc, résolvent gd-tableau-de-bord-pilotage ; le nom que le générateur de forge-tests écrit
+    // résout toujours dashboard-tests. Sens ROUGE, qui empêche la famille neuve de tout avaler : « Dashboard
+    // de tests » reste aux tests, et « Tableau de bord » reste au delta d'audit de forge-audit.
+    {
+      const versions = ["20261017s", "20261017y", "20261017e", "20261018h", "20261018s"]
+        .map((v) => g8(`Produit-79 - Dashboard - Acquisition et réservations - ${v}.html`));
+      const tests = g8("Produit-11 - Dashboard tests - 20260813c.html");
+      const deTests = g8("Produit-X - Dashboard de tests - 20261018a.html");
+      const delta = g8("Produit-X - Tableau de bord - Delta des audits - 20261018a.md");
+      if (!versions.every((r) => r.statut === "PASS" && r.message.includes("tableau-de-bord-pilotage")))
+        casse.push(`TF-1855 : une version du tableau de bord de pilotage ne résout pas sa famille — ${versions.map((r) => r.message.slice(0, 60)).join(" | ")}`);
+      if (!(tests.statut === "PASS" && tests.message.includes("dashboard-tests") && tests.message.includes("« dashboard tests »")))
+        casse.push(`TF-1855 : le nom du générateur de forge-tests ne résout plus dashboard-tests — ${tests.message.slice(0, 140)}`);
+      if (!(deTests.statut === "PASS" && deTests.message.includes("dashboard-tests")))
+        casse.push(`TF-1855 : « Dashboard de tests » est avalé par la famille neuve — ${deTests.message.slice(0, 140)}`);
+      if (!(delta.statut === "PASS" && delta.message.includes("tableau-bord-post-remediation")))
+        casse.push(`TF-1855 : « Tableau de bord » ne résout plus le delta d'audit de forge-audit — ${delta.message.slice(0, 140)}`);
+    }
+
     // TF-1230 (campagne D-51 (a), 02/10/2026) — LES HUIT FICHIERS docs-projet SONT UNE FAMILLE DU
     // CATALOGUE RÉEL, PAS UN ANGLE MORT. Avant ce correctif, aucune ligne de
     // gabarits/documents/catalogue.jsonl ne les déclarait : ils vivaient sous gabarits/docs-projet/,
@@ -1335,11 +1357,11 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 55/55 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 59/59 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
-      "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G10 dans ses TROIS sens (TF-1142, fixtures du 22/09 sous TF-1256) : lecteur déclaré et frontière lecteur/auteur écrite → PASS, frontière absente → FAIL, lecteur absent → FAIL ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain ; " +
+      "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G10 dans ses TROIS sens (TF-1142, fixtures du 22/09 sous TF-1256) : lecteur déclaré et frontière lecteur/auteur écrite → PASS, frontière absente → FAIL, lecteur absent → FAIL ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; TF-1855 dans ses QUATRE sens : les cinq versions du tableau de bord de pilotage relevées dans le parc résolvent gd-tableau-de-bord-pilotage, le nom écrit par le générateur de forge-tests résout toujours dashboard-tests, et dans le sens rouge « Dashboard de tests » reste aux tests et « Tableau de bord » au delta d'audit ;G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain ; " +
       "G12 dans ses DEUX sens rouges — « aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; la répartition nomme NON MESURÉE la famille nue et elle seule (TF-1255) ; " +
       "G11 dans ses CINQ sens — catalogue conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, " +
       "« aucun » avec un chemin → FAIL, dépôt porteur absent du poste → SKIP et jamais PASS) ; " +

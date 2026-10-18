@@ -217,8 +217,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 55,
-  "vu_le": "2026-10-15"
+  "cas": 59,
+  "vu_le": "2026-10-18"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -344,6 +344,10 @@
  },
  "oracle-synthese.mjs": {
   "cas": 222,
+  "vu_le": "2026-10-18"
+ },
+ "oracle-tableau-de-bord-pilotage.mjs": {
+  "cas": 31,
   "vu_le": "2026-10-18"
  },
  "oracle-trace-mutation-mep.mjs": {
