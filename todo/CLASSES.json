@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.43.0",
+ "version": "1.44.0",
  "date": "2026-10-18",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2269,12 +2269,27 @@
    "libelle": "Un numéro de décision affiché à l humain n est réservé nulle part : deux sessions du même produit le prennent toutes deux",
    "creee_le": "2026-10-18",
    "fondee_par": [
-    "TF-1849"
+    "TF-1849",
+    "TF-1872"
    ],
-   "regle": "gabarits/RESTITUTION.md 2.45.0, « Une D-N NOUVELLE s inscrit au registre du produit AVANT d être affichée »",
-   "oracle": "pilot, contrôle RÉSERVATION de oracles/hook-restitution.mjs (controlerReservation, avertissant jusqu au 2026-11-01 puis bloquant, rejoué par --prejuger) ; recette oracles/hook-restitution.test.mjs cas 52",
+   "regle": "gabarits/RESTITUTION.md 2.45.0 puis 2.47.0 (« Le même mécanisme vaut au pilot : UNE règle, UNE façon de réserver »)",
+   "oracle": "pilot, contrôle RÉSERVATION de oracles/hook-restitution.mjs (controlerReservation pour les produits, avertissant jusqu au 2026-11-01 ; controlerReservationPilot pour le pilot, avertissant jusqu au 2026-10-25) ; outil scripts/reserver-decision.mjs, registre decisions/REGISTRE.jsonl ; recettes oracles/hook-restitution.test.mjs cas 52 et 53, scripts/reserver-decision.test.mjs",
    "voisines": [
     "regle-de-forme-primant-sur-la-demande"
+   ]
+  },
+  {
+   "cle": "affirmation-d-exhaustivite-sans-reference-externe",
+   "famille": "hook-ou-gate",
+   "libelle": "Une restitution affirme qu un ensemble est complet ou à jour en s appuyant sur une liste de contrôle écrite par son auteur, sans relire la source de vérité au moment de répondre ni dire le périmètre mesuré : le gate rend PASS sur la forme et l humain découvre l écart.",
+   "creee_le": "2026-10-18",
+   "fondee_par": [
+    "TF-1866"
+   ],
+   "regle": "gabarits/RESTITUTION.md 2.47.0, « Une affirmation d exhaustivité porte sa ligne « Mesuré sur » »",
+   "oracle": "pilot, S82 de oracles/oracle-synthese.mjs et contrôle COMPLÉTUDE de oracles/hook-restitution.mjs (oracles/lib-exhaustivite.mjs), bloquants ; recettes oracle-synthese --self-test, oracles/lib-exhaustivite.test.mjs, oracles/hook-restitution.test.mjs cas 54",
+   "voisines": [
+    "regle-ecrite-sans-oracle-qui-la-joue"
    ]
   }
  ],
