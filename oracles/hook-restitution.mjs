@@ -914,11 +914,10 @@ const RAPPEL_DETAIL = "Un détail demandé reçoit la décision EN ENTIER, au bl
 //
 // OÙ UN PRODUIT CONSIGNE UNE DÉCISION POSÉE (mesuré le 18/10/2026 sur les 11 produits du poste, lecture seule).
 // gabarits\ ne définit que le NOM du type, `question_humain` (CONTRAT-INTERFACE.md §3), jamais ses champs. Sur 11 produits,
-// 6 portent des entrées de ce type et 5 aucune (Produit-68, digit-desk.fr, forge-digit-ai-fr, Produit-69 ; Digit-ai.fr
-// n'a pas de ledger) ; les 6 les écrivent de 4 façons : `question` en prose (Produit-12, BdL), `id` +
-// `question` + `options` (Produit-61, Produit-02.fr pour D-1), `decisions` / `decisions_posees` en objet {"D-44": sujet} (Produit-02.fr, qui
-// a écrit lui-même « réservée au registre avant affichage »), `etape` ou `porte_sur` + `resume` (Produit-02.com,
-// apdlb-cgv, où les D-N s'inscrivent surtout en `reponse_humain`). Le contrôle ne présume donc d'aucun champ : un numéro est INSCRIT si une entrée `question_humain` du `forge\ledger.jsonl` du produit le nomme, n'importe où.
+// 6 portent des entrées de ce type et 5 aucune (dont un sans ledger) ; les 6 les écrivent de 4 façons, un produit en combinant
+// deux : `question` en prose (2 produits), `id` + `question` + `options` (2), `decisions` / `decisions_posees` en objet
+// {"D-44": sujet} (1, qui a écrit lui-même « réservée au registre avant affichage »), `etape` ou `porte_sur` + `resume`
+// (2, où les D-N s'inscrivent surtout en `reponse_humain`). Le contrôle ne présume donc d'aucun champ : un numéro est INSCRIT si une entrée `question_humain` du `forge\ledger.jsonl` du produit le nomme, n'importe où.
 // Le champ recommandé est `decisions_posees`, déjà employé ; il n'est pas exigé.
 //
 // CE QUI SE MESURE. Chez un produit seulement (un `forge\retours\` en remontant depuis le dossier de la session) :
@@ -964,11 +963,11 @@ export function registreDesDecisions(produit) {
 
 // MESURE D'ENTRÉE (18/10/2026, lecture seule) — population : les messages finaux des sessions de produits conservées à ce
 // poste, rejoués par CETTE fonction avec le registre tel qu'il était à l'instant de l'affichage (entrées dont le ts ne dépasse
-// pas celui du message). 4 produits ont des sessions avec des D-N (Produit-12, Produit-02.com, Produit-02.fr,
-// Produit-68) : 225 restitutions posent au moins une D-N nouvelle, 205 seraient REFUSÉES (91 %) et 182 le seraient encore avec le
+// pas celui du message). 4 produits ont des sessions avec des D-N :
+// 225 restitutions posent au moins une D-N nouvelle, 205 seraient REFUSÉES (91 %) et 182 le seraient encore avec le
 // registre d'aujourd'hui (81 %) ; en acceptant aussi les `reponse_humain`, 178 seraient refusées à l'instant (79 %). Par produit,
 // refusées à l'instant sur posées : 18/30, 109/112, 63/68, 15/15. Un blocage immédiat refuserait donc la plupart des restitutions
-// d'un produit, y compris d'un produit qui inscrit déjà ses décisions (Produit-02.fr, 63/68 depuis le 11/10) : le
+// d'un produit, y compris d'un produit qui inscrit déjà ses décisions (63 sur 68 depuis le 11/10 chez l'un d'eux) : le
 // contrôle AVERTIT jusqu'à l'échéance ci-dessous, puis REFUSE. Les produits reçoivent la règle à leur ouverture suivante
 // (copie conforme de RESTITUTION.md) ; l'échéance est à REMESURER (même rejeu) avant d'être tenue.
 // Échéance du blocage (TF-1849) : avant cette date, une D-N non inscrite est un AVERTISSEMENT ; à partir d'elle, le hook REFUSE.
