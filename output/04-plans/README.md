@@ -142,6 +142,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
 | `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,5 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
 | `Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md` | fichier | 16,7 Ko | Synthèse Mandat — vos 5 décisions exécutées, 2 études rendues, 5 nouvelles décisions (18/1 |
+| `Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md` | fichier | 8,1 Ko | Synthèse Mandat — vos décisions D-29 à D-33 exécutées, 5 sujets clos, aucune décision nouv |
 | `Digit-AI - Synthese Mandat - Decisions du 24-09 executees et candidatures reproposees - 20260925g.md` | fichier | 26,8 Ko | Digit-AI — Synthèse de mandat — Décisions du 24/09 exécutées et candidatures reproposées — |
 | `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort humain - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |
 | `Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` | fichier | 6,5 Ko | Synthèse Mandat — dépôts privés hors d'accès non bloquants pour un poste tiers (13/10/2026 |
@@ -303,4 +304,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_285 fichier(s), 1 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_286 fichier(s), 1 sous-dossier(s)_ · 5 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
