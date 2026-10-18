@@ -89,6 +89,12 @@
  *       navigateur sur l'adresse publique, ou l'avoue non joué (15/10, TF-1766, R-61 point 3) ; S76 un
  *       chiffre attribué au rapport d'un agent se recompte à la source, ou se dit « non recompté »
  *       (15/10, TF-1802) ; avertissantes ;
+ *   S80 une énumération numérotée « 1) … 2) … 3) » ne tient pas sur UNE ligne, dans un paragraphe, une
+ *       puce ou une cellule de tableau : elle devient une liste, une ligne par élément (E-11 de
+ *       references\ECRITURE.md ; 18/10, TF-1847, retour Produit-79 RP-10) ; BLOQUANTE au hook,
+ *       mesurée à la mise en service : 9 accusations sur 274 synthèses d'output\04-plans, aucune fausse ;
+ *   S81 une étape de GUIDE n'enchaîne pas trois gestes ou plus dans un paragraphe : une sous-puce par
+ *       geste, « Résultat attendu » en dernière sous-puce (18/10, TF-1847) ; avertissante ;
  *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
  *   S38 une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'EXEMPTION
  *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
@@ -162,6 +168,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
+import { enumerationsEnLigne, etapesDeGuide, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
 
 // --racine <dossier> (TF-1644, 14/10/2026) : le dossier du PROJET dont la restitution est jugée,
 // quand le fichier jugé n'y vit pas. Le hook de fin de tour écrit le message dans un fichier
@@ -2876,7 +2883,18 @@ function juger(texte, cheminJuge = null) {
       const enteteComment = COMMENT_FAIRE.test(entete);
       // La ligne « Comment faire » du groupe porte elle-même son localisateur : un libellé nu
       // (« Comment faire : voir plus bas ») est le renvoi que le retour du 16/09 dénonce.
-      const groupeComment = g.some((l) => !RE_LIGNE_OPTION.test(l) && COMMENT_FAIRE.test(l) && _LOCALISATEURS.test(l));
+      // 18/10/2026 (TF-1847) : la forme PRESCRITE est une liste numérotée sous le tableau des options,
+      // l'en-tête « Comment faire (b) : » puis un geste par ligne (E-11) ; le localisateur peut donc
+      // vivre dans l'un des éléments de la liste. La forme en ligne « 1) … 2) … » reste admise ICI —
+      // S49 juge qu'il y a de quoi exécuter, S80 juge la forme.
+      const dansLaListe = (i) => {
+        for (let j = i + 1; j < g.length; j++) {
+          if (RE_LIGNE_OPTION.test(g[j]) || !/^\s*(?:\d{1,2}[.)]|[-*+•])\s+\S/.test(g[j])) return false;
+          if (_LOCALISATEURS.test(g[j])) return true;
+        }
+        return false;
+      };
+      const groupeComment = g.some((l, i) => !RE_LIGNE_OPTION.test(l) && COMMENT_FAIRE.test(l) && (_LOCALISATEURS.test(l) || dansLaListe(i)));
       for (const l of g) {
         if (!RE_LIGNE_OPTION.test(l)) continue;
         if (OPTION_PAR_DEFAUT.test(l)) continue;
@@ -2891,8 +2909,8 @@ function juger(texte, cheminJuge = null) {
       ko("S49", `${sansGeste.length} option(s) sur ${gestes} commandant un GESTE HUMAIN sans dire COMMENT le faire — ` +
         "le lecteur sait quoi choisir et ne sait pas quoi faire, et le mode opératoire écrit soixante lignes " +
         "plus bas au bloc 8 ne lui sert pas : il tranche ici. Dû sur place : la commande ou le chemin entre " +
-        "accents graves, le libellé de l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » dans " +
-        "le groupe de la décision (en tableau, une colonne « Comment faire » suffit). C'est le retour humain " +
+        "accents graves, le libellé de l'écran à ouvrir, ou « Comment faire : » suivi d'une liste numérotée, un geste " +
+        "par ligne, placée sous le tableau des options (jamais en ligne « 1) … 2) … 3) », S80). C'est le retour humain " +
         "du 16/09/2026 : « Tu dis ce qu'il faut faire, mais tu ne dis pas comment le faire simplement ? Du " +
         `coup, on ne sait pas quoi faire. » Ex. : ${sansGeste[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
     } else ok("S49", `${gestes} option(s) commandant un geste humain, chacune exécutable là où le choix se fait`);
@@ -3095,6 +3113,69 @@ function juger(texte, cheminJuge = null) {
             + "guide écran par écran EN TÊTE, chaque étape close par « Résultat attendu : … », y a mis fin au tour suivant.")
           : ok("S53", `${aGuider.length} action(s) manuelle_utilisateur sur ${noms}, guidée(s) en tête, étape par étape`);
       }
+    }
+  }
+
+  // ---- S80 et S81 (18/10/2026, TF-1847, retour Produit-79 RP-10) — E-11 SUR UNE RESTITUTION
+  // MARKDOWN : UNE ÉNUMÉRATION DEVIENT UNE LISTE ------------------------------------------------
+  //
+  // LE FAIT, retour humain du 17/10/2026, mot pour mot : « J'ai déjà dit que lorsqu'il y avait des
+  // listes, il devait y avoir des puces et sous-puces affichées, ce qui n'est pas le cas ici. » Un
+  // guide S53 de 4 étapes enchaînait chacune 3 à 6 gestes et son « Résultat attendu » dans un
+  // paragraphe ; une option S49 portait « Comment faire : 1) … 2) … 3) … » sur une ligne de tableau ;
+  // `hook-restitution --prejuger` rendait la restitution affichable, 0 bloquant. E-11 de
+  // `references\ECRITURE.md` n'avait de juge que pour HTML (L12) et PPTX ; le gabarit prescrivait
+  // lui-même la forme en ligne (S49) et ne demandait aucune sous-puce au guide (S53).
+  //
+  // S80 — UNE ÉNUMÉRATION NUMÉROTÉE EN LIGNE. Trois marqueurs consécutifs « 1) … 2) … 3) » (ou
+  // « (1) … (2) … (3) ») sur une même ligne source — paragraphe, puce, cellule de tableau —, hors code
+  // et hors citation entre guillemets français. Les motifs vivent une fois, dans
+  // `lib-enumeration-liste.mjs`, que partage EC-12 d'oracle-ecriture pour les textes qui ne sont pas
+  // des restitutions. BLOQUANTE au hook : mesurée à la mise en service sur les 274 synthèses
+  // d'`output\04-plans\`, elle en accuse 9 (3,3 %), toutes lues une à une, aucune fausse ; ce sont
+  // des énumérations de 3 à 9 éléments en prose ou en cellule (dont 2 « Comment faire : 1) … »).
+  // Sur les 202 autres Markdown du pilot (études, références, gabarits), 2 accusés, vrais aussi.
+  // Le seuil de trois est celui du retour ; à deux éléments, la même mesure accuse 20 fichiers, bruit
+  // compris.
+  //
+  // S81 — LES ÉTAPES D'UN GUIDE. Dans la section « Guide » : une étape sans sous-puce qui enchaîne
+  // trois gestes ou plus, une sous-puce qui en enchaîne trois, une étape à sous-puces dont la dernière
+  // n'est pas « Résultat attendu ». Le geste se compte par un vocabulaire FERMÉ de verbes d'action
+  // (ouvrez, cliquez, saisissez, collez, choisissez…) et par les enchaînements (puis, ensuite, →) :
+  // « Ouvrez A, puis B, puis C » compte trois gestes. AVERTISSANTE : le pilot n'a aucun guide dans son
+  // corpus (0 sur 274), la règle n'a donc pas de mesure de faux positifs sur du réel ; elle se durcira
+  // quand les restitutions des produits l'auront mesurée.
+  //
+  // NON JUGÉ : un paragraphe qui énumère sans numéroter, un raisonnement coupé en puces à tort (le sens
+  // inverse d'E-11), le compte exact des gestes d'une étape, la qualité de la source du guide (S52).
+  {
+    const enums80 = enumerationsEnLigne(texte);
+    if (!enums80.length) ok("S80", "aucune énumération numérotée « 1) … 2) … 3) » sur une même ligne");
+    else {
+      const cellules80 = enums80.filter((e) => e.cellule).length;
+      ko("S80", `${enums80.length} énumération(s) numérotée(s) en ligne${cellules80 ? ` (dont ${cellules80} en cellule de tableau)` : ""} : `
+        + enums80.slice(0, 3).map((e) => `l.${e.ligne} (${e.elements} éléments) « ${e.extrait.slice(0, 70)} »`).join(" · ")
+        + (enums80.length > 3 ? ` · et ${enums80.length - 3} autre(s)` : "")
+        + ". Une énumération devient une liste (E-11, references\\ECRITURE.md) : une ligne par élément, numérotée quand l'ordre compte, "
+        + "en puces et sous-puces ; une énumération sortie d'une cellule se place SOUS le tableau, après un en-tête (« Comment faire (b) : »). "
+        + "Retour humain du 17/10/2026, mot pour mot : « J'ai déjà dit que lorsqu'il y avait des listes, il devait y avoir des puces et "
+        + "sous-puces affichées, ce qui n'est pas le cas ici. »");
+    }
+    if (!etapesDeGuide(texte).length) ok("S81", "aucune étape de guide — rien dont juger la forme");
+    else {
+      const chaines81 = etapesQuiEnchainent(texte);
+      const sansCloture81 = etapesSansClotureEnDerniere(texte);
+      const defauts81 = [];
+      if (chaines81.length)
+        defauts81.push(`${chaines81.length} étape(s) ou sous-puce(s) enchaînent trois gestes ou plus dans un paragraphe : `
+          + chaines81.slice(0, 2).map((e) => `l.${e.ligne} (${e.gestes} gestes) « ${e.extrait.slice(0, 70)} »`).join(" · "));
+      if (sansCloture81.length)
+        defauts81.push(`${sansCloture81.length} étape(s) à sous-puces dont la dernière n'est pas « Résultat attendu : … » : `
+          + sansCloture81.slice(0, 2).map((e) => `l.${e.ligne} « ${e.extrait.slice(0, 60)} »`).join(" · "));
+      defauts81.length
+        ? ko("S81", defauts81.join(" ; ") + ". Chaque étape du guide s'écrit en sous-puces, une par geste (écran, champ, bouton), "
+          + "et « Résultat attendu : … » en dernière sous-puce (E-11, retour humain du 17/10/2026 : « il devait y avoir des puces et sous-puces affichées »).")
+        : ok("S81", `${etapesDeGuide(texte).length} étape(s) de guide, aucune n'enchaîne trois gestes dans un paragraphe`);
     }
   }
 
@@ -4138,15 +4219,39 @@ Aucun écart : la demande a été suivie à la lettre.
   // commande de geste, reste PASS — sans quoi la règle crierait sur tout le corpus.
   const OPTION_GESTE = "  - (c) rouvrir la connexion soi-même — se connecter au portail puis saisir le code reçu ;"
     + " coût : effort simple × court ; exclut de repartir sans intervention humaine.";
-  const COMMENT_GESTE = "  - Comment faire (c) : 1) ouvrir un terminal ; 2) coller `python forge\\etapes\\data\\sonde.py --login` ;"
-    + " 3) saisir le code affiché dans l'écran « Connexion » du navigateur.";
   const saut = String.fromCharCode(10);
+  // 18/10/2026 (TF-1847) : la forme PRESCRITE du « Comment faire » est une liste numérotée, un geste par
+  // ligne, sous les options (E-11) ; l'ancienne forme en ligne « 1) … 2) … 3) » n'est plus qu'une rouge
+  // de S80, que S49 laisse passer (elle juge qu'il y a de quoi exécuter, S80 juge la forme).
+  const COMMENT_GESTE = "  - Comment faire (c) :" + saut
+    + "    1. Ouvrir un terminal." + saut
+    + "    2. Coller `python forge\\etapes\\data\\sonde.py --login`." + saut
+    + "    3. Saisir le code affiché dans l'écran « Connexion » du navigateur.";
+  const COMMENT_GESTE_EN_LIGNE = "  - Comment faire (c) : 1) ouvrir un terminal ; 2) coller `python forge\\etapes\\data\\sonde.py --login` ;"
+    + " 3) saisir le code affiché dans l'écran « Connexion » du navigateur.";
   const gesteSansComment = verte.replace("  - sans décision : rien n'est publié.",
     OPTION_GESTE + saut + "  - sans décision : rien n'est publié.");
   const gesteAvecComment = verte.replace("  - sans décision : rien n'est publié.",
     OPTION_GESTE + saut + COMMENT_GESTE + saut + "  - sans décision : rien n'est publié.");
+  const gesteCommentEnLigne = verte.replace("  - sans décision : rien n'est publié.",
+    OPTION_GESTE + saut + COMMENT_GESTE_EN_LIGNE + saut + "  - sans décision : rien n'est publié.");
   writeFileSync(join(dir, "geste-sans-comment.md"), gesteSansComment, "utf8");
   writeFileSync(join(dir, "geste-avec-comment.md"), gesteAvecComment, "utf8");
+  writeFileSync(join(dir, "geste-comment-en-ligne.md"), gesteCommentEnLigne, "utf8");
+  // S80 (TF-1847) — l'énumération numérotée en ligne, dans ses trois sens. Rouge : la même énumération
+  // dans une CELLULE du tableau des risques. Verte : deux éléments seulement, ou une citation entre
+  // guillemets français qui MONTRE la forme interdite (un texte qui explique le défaut ne le commet pas).
+  const enumerationEnCellule = verte.replace("- Le pack anglais ne se régénère plus.",
+    "| Risque | Parade |" + saut + "|---|---|" + saut
+    + "| Le pack anglais ne se régénère plus | Trois gestes : 1) corriger la source ; 2) relancer l'assemblage ; 3) relire le pack. |" + saut
+    + "- Le pack anglais ne se régénère plus.");
+  const enumerationDeuxElements = verte.replace("- Le pack anglais ne se régénère plus.",
+    "- Le pack anglais ne se régénère plus : 1) corriger la source ; 2) relancer l'assemblage.");
+  const enumerationCitee = verte.replace("- Le pack anglais ne se régénère plus.",
+    "- Le pack anglais ne se régénère plus ; l'ancien gabarit écrivait « 1) corriger ; 2) relancer ; 3) relire » sur une ligne.");
+  writeFileSync(join(dir, "enumeration-en-cellule.md"), enumerationEnCellule, "utf8");
+  writeFileSync(join(dir, "enumeration-deux-elements.md"), enumerationDeuxElements, "utf8");
+  writeFileSync(join(dir, "enumeration-citee.md"), enumerationCitee, "utf8");
   // S52 ET S53 (27/09/2026, D-24 (b), TF-1362, TF-1361) — L'ACTION SUR UNE INTERFACE TIERCE. Trois
   // fixtures. La première ajoute à la verte une action d'import dans l'écran d'une plateforme, sans
   // source ni guide : rouge des deux règles. La deuxième porte la MÊME action avec sa source
@@ -4159,12 +4264,36 @@ Aucun écart : la demande a été suivie à la lettre.
     + "  - pourquoi pas l'IA : acces — import TENTÉ le 22/09 par l'API de la plateforme avec l'identité de la session, `HTTP 403 PERMISSION_DENIED` ; seul le titulaire du compte y est connecté ;" + saut
     + "  - si rien n'est fait : les campagnes ne sont pas publiées.";
   const SOURCE_DATEE = saut + "  - source : `support.google.com/google-ads`, lue le 27/09/2026.";
+  // 18/10/2026 (TF-1847, E-11) : une étape porte UNE SOUS-PUCE PAR GESTE et « Résultat attendu » en dernière
+  // sous-puce. L'ancienne forme (les gestes et la clôture dans un paragraphe) reste lue par S53, qui juge la
+  // PRÉSENCE de la clôture, et devient la rouge de S81 (`GUIDE_EN_PARAGRAPHE`).
   const GUIDE = "## Guide — importer les campagnes dans Google Ads" + saut + saut
+    + "Source : `support.google.com/google-ads`, lue le 27/09/2026." + saut + saut
+    + "1. Ouvrir l'écran des importations." + saut
+    + "   - Ouvrez Outils." + saut
+    + "   - Cliquez sur Actions groupées." + saut
+    + "   - Cliquez sur Importations." + saut
+    + "   - Résultat attendu : la liste des importations passées." + saut
+    + "2. Lancer l'aperçu." + saut
+    + "   - Déposez le fichier." + saut
+    + "   - Cliquez sur « Aperçu »." + saut
+    + "   - Résultat attendu : le nombre de modifications acceptées, et zéro erreur." + saut
+    + "3. Appliquer." + saut
+    + "   - Cliquez sur « Appliquer »." + saut
+    + "   - Résultat attendu : l'importation marquée terminée." + saut + saut
+    + "## 0. Synthèse d'ouverture" + saut + saut;
+  const GUIDE_EN_PARAGRAPHE = "## Guide — importer les campagnes dans Google Ads" + saut + saut
     + "Source : `support.google.com/google-ads`, lue le 27/09/2026." + saut + saut
     + "1. Ouvrez Outils, puis Actions groupées, puis Importations. Résultat attendu : la liste des importations passées." + saut
     + "2. Déposez le fichier et cliquez sur « Aperçu ». Résultat attendu : le nombre de modifications acceptées, et zéro erreur." + saut
     + "3. Cliquez sur « Appliquer ». Résultat attendu : l'importation marquée terminée." + saut + saut
     + "## 0. Synthèse d'ouverture" + saut + saut;
+  const GUIDE_CLOTURE_EN_TETE = GUIDE.replace(
+    "   - Cliquez sur Importations." + saut + "   - Résultat attendu : la liste des importations passées.",
+    "   - Résultat attendu : la liste des importations passées." + saut + "   - Cliquez sur Importations.");
+  const GUIDE_SOUS_PUCE_QUI_ENCHAINE = GUIDE.replace(
+    "   - Cliquez sur Actions groupées." + saut + "   - Cliquez sur Importations.",
+    "   - Cliquez sur Actions groupées, puis sur Importations, puis sur Nouveau.");
   const interfaceSansSource = verte + ACTION_INTERFACE + saut;
   const interfaceAvecSource = (verte + ACTION_INTERFACE + SOURCE_DATEE + saut)
     .replace("# Restitution — campagne de test" + saut + saut, "# Restitution — campagne de test" + saut + saut + GUIDE);
@@ -4173,6 +4302,12 @@ Aucun écart : la demande a été suivie à la lettre.
   // prouverait pas que la clôture est lue : elle prouverait seulement qu'elle n'est plus exigée.
   const guideSansCloture = interfaceAvecSource.replace(/ Résultat attendu : [^\n]*/g, "");
   writeFileSync(join(dir, "guide-sans-cloture.md"), guideSansCloture, "utf8");
+  // 18/10/2026 (TF-1847) — S81 dans ses quatre sens : le MÊME guide dont l'étape 1 enchaîne trois gestes
+  // dans un paragraphe (rouge), dont la clôture n'est pas la dernière sous-puce (rouge), dont une sous-puce
+  // enchaîne trois gestes (rouge) ; la verte est interfaceAvecSource, une sous-puce par geste.
+  for (const [nom, guide] of [["guide-en-paragraphe", GUIDE_EN_PARAGRAPHE], ["guide-cloture-en-tete", GUIDE_CLOTURE_EN_TETE],
+    ["guide-sous-puce-qui-enchaine", GUIDE_SOUS_PUCE_QUI_ENCHAINE]])
+    writeFileSync(join(dir, nom + ".md"), interfaceAvecSource.replace(GUIDE, guide), "utf8");
   const plateformeSansEcran = verte + "- **A-4** — neuve (manuelle_utilisateur) — trancher la publication : répondre « D-1 (a) »." + saut
     + "  - pourquoi pas l'IA : decision — publier sur GitHub vous revient (R-38) ;" + saut
     + "  - où : `git push origin main` une fois décidé ;" + saut
@@ -4425,8 +4560,35 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S49"[^}]*PASS/.test(rv.stdout))
     casse.push("S49 : la verte, dont aucune option ne commande de geste humain, est accusée — la règle mordrait sur " +
       "tout le corpus : " + (/"S49"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 18/10 — S49 ET S80 (TF-1847) : le remède que S49 recommande — « Comment faire » suivi d'une liste
+  // numérotée, un geste par ligne — PASSE S49 ET S80 (geste-avec-comment) ; la MÊME option avec l'ancienne
+  // ligne en ligne « 1) … 2) … 3) » passe S49 (de quoi exécuter est là) et FAIL S80 (la forme est le défaut) ;
+  // l'énumération en cellule FAIL S80 en le disant ; deux éléments et une citation entre guillemets français
+  // PASSENT ; la verte PASSE.
+  {
+    const constat80 = (r, regle) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === regle) || {}; } catch { return {}; } };
+    const j80 = (nom) => spawnSync(process.execPath, [moi, join(dir, nom)], { encoding: "utf8" });
+    const attendu80 = [
+      [rga, "S49", "PASS", "geste-avec-comment : la liste numérotée sous « Comment faire » n'est pas lue comme de quoi exécuter — le remède que S49 recommande échoue"],
+      [rga, "S80", "PASS", "geste-avec-comment : la liste numérotée, forme prescrite, est accusée d'énumération en ligne"],
+      [j80("geste-comment-en-ligne.md"), "S49", "PASS", "geste-comment-en-ligne : l'ancienne forme en ligne n'est plus de quoi exécuter pour S49 — S49 juge le comment, S80 la forme"],
+      [j80("geste-comment-en-ligne.md"), "S80", "FAIL", "geste-comment-en-ligne : « Comment faire : 1) … 2) … 3) » en ligne passe — c'est la forme que le retour du 17/10/2026 dénonce"],
+      [j80("enumeration-en-cellule.md"), "S80", "FAIL", "enumeration-en-cellule : une énumération numérotée dans une cellule de tableau passe"],
+      [j80("enumeration-deux-elements.md"), "S80", "PASS", "enumeration-deux-elements : deux éléments sont accusés — le seuil est de trois, celui du retour"],
+      [j80("enumeration-citee.md"), "S80", "PASS", "enumeration-citee : la forme interdite MONTRÉE entre guillemets français est accusée — un texte qui explique le défaut le commet"],
+      [rv, "S80", "PASS", "la verte est accusée d'une énumération en ligne"],
+    ];
+    for (const [r, regle, statut, quoi] of attendu80)
+      if (constat80(r, regle).statut !== statut)
+        casse.push(`${regle} (TF-1847, E-11) : ${quoi} — attendu ${statut} : ` + String(constat80(r, regle).message || "sortie illisible").slice(0, 200));
+    if (!/dont 1 en cellule de tableau/.test(constat80(j80("enumeration-en-cellule.md"), "S80").message || ""))
+      casse.push("S80 : le constat sur une énumération en cellule doit le DIRE (« dont 1 en cellule de tableau ») : "
+        + String(constat80(j80("enumeration-en-cellule.md"), "S80").message || "").slice(0, 200));
+    if (!/puces et sous-puces/.test(constat80(j80("geste-comment-en-ligne.md"), "S80").message || ""))
+      casse.push("S80 : le constat doit citer le retour humain du 17/10/2026 (« puces et sous-puces »)");
+  }
   // 27/09 — S52 ET S53 DANS LEURS TROIS SENS (D-24 (b), TF-1362, TF-1361).
-  const ris = spawnSync(process.execPath, [moi, join(dir, "interface-sans-source.md")], { encoding: "utf8" });
+  const ris =spawnSync(process.execPath, [moi, join(dir, "interface-sans-source.md")], { encoding: "utf8" });
   const ria = spawnSync(process.execPath, [moi, join(dir, "interface-avec-source.md")], { encoding: "utf8" });
   const rpe = spawnSync(process.execPath, [moi, join(dir, "plateforme-sans-ecran.md")], { encoding: "utf8" });
   const extraitDe = (r, regle) => (new RegExp(`"${regle}"[\\s\\S]{0,200}`).exec(r.stdout) || [""])[0].replace(/\s+/g, " ");
@@ -4453,6 +4615,29 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S52/S53 : la restitution guidée en tête n'est pas PASS en entier — le guide doit être une forme RECONNUE, "
       + "et une forme que le gabarit prescrit et que son juge refuse est un piège : "
       + ((JSON.parse(ria.stdout || "{}").findings || []).filter((f) => f.statut === "FAIL").map((f) => f.regle).join(", ") || ria.stderr.slice(0, 200)));
+  // 18/10 — S81 (TF-1847, E-11) DANS SES QUATRE SENS. La verte est le guide à une sous-puce par geste et
+  // « Résultat attendu » en dernière sous-puce (ria, déjà PASS en entier ci-dessus). Les trois rouges ne
+  // diffèrent d'elle que par une seule chose : les gestes de l'étape 1 dans un paragraphe, la clôture
+  // placée avant le dernier geste, une sous-puce qui en enchaîne trois. L'ancienne forme en paragraphe
+  // PASSE encore S53, qui juge la présence de la clôture : c'est S81 qui juge la forme.
+  {
+    const constat81 = (r, regle) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === regle) || {}; } catch { return {}; } };
+    const j81 = (nom) => spawnSync(process.execPath, [moi, join(dir, nom)], { encoding: "utf8" });
+    const rpar = j81("guide-en-paragraphe.md"), rtete = j81("guide-cloture-en-tete.md"), rench = j81("guide-sous-puce-qui-enchaine.md");
+    for (const [r, regle, statut, quoi] of [
+      [ria, "S81", "PASS", "la verte (une sous-puce par geste, « Résultat attendu » en dernière sous-puce) est accusée — le remède que le gabarit prescrit échoue"],
+      [rpar, "S81", "FAIL", "un guide dont l'étape 1 enchaîne trois gestes dans un paragraphe passe — c'est le guide du 17/10/2026 (4 étapes de 3 à 6 gestes)"],
+      [rpar, "S53", "PASS", "l'ancienne forme en paragraphe n'est plus lue par S53 — S53 juge la présence de la clôture, S81 la forme"],
+      [rtete, "S81", "FAIL", "une clôture « Résultat attendu » placée avant le dernier geste passe"],
+      [rench, "S81", "FAIL", "une sous-puce qui enchaîne trois gestes (« Cliquez …, puis …, puis … ») passe"],
+      [rv, "S81", "PASS", "la verte d'origine, sans guide, est accusée"],
+    ]) if (constat81(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-1847, E-11) : ${quoi} — attendu ${statut} : ` + String(constat81(r, regle).message || "sortie illisible").slice(0, 200));
+    if (!/\(3 gestes\)/.test(constat81(rpar, "S81").message || ""))
+      casse.push("S81 : le constat sur le guide en paragraphe doit COMPTER les gestes de l'étape (« (3 gestes) ») : " + String(constat81(rpar, "S81").message || "").slice(0, 200));
+    if (!/Résultat attendu/.test(constat81(rtete, "S81").message || ""))
+      casse.push("S81 : le constat sur la clôture mal placée doit la NOMMER (« Résultat attendu ») : " + String(constat81(rtete, "S81").message || "").slice(0, 200));
+  }
   const rnn = spawnSync(process.execPath, [moi, join(dir, "numero-nu.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnn.stdout))
     casse.push("S30 : un numéro NU (« 1. ») passe encore pour un sélecteur de décision — c'est par cette tolérance " +
@@ -4829,8 +5014,14 @@ Aucun écart : la demande a été suivie à la lettre.
   const NE_VERIFIE = "Ne vérifie pas : les valeurs que le plan envoie à la plateforme, ni leur validité à la date d'application.";
   const GUIDE_LANCEMENT = (avecLimite) => "## Guide — Relancer la production de la version 1.12.0" + saut + saut
     + "Source officielle lue le 14/08/2026 : `learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals`." + saut + saut
-    + "1. Ouvrir la chaîne de livraison, choisir la branche de production et lancer l'exécution. Résultat attendu : une exécution arrêtée sur le bouton « Review »." + saut
-    + "2. Cliquer sur « Approve » si le plan compte 11 créations, 1 modification et 0 destruction. Résultat attendu : l'étape d'application en vert." + saut + saut
+    + "1. Lancer l'exécution de production." + saut
+    + "   - Ouvrir la chaîne de livraison." + saut
+    + "   - Choisir la branche de production." + saut
+    + "   - Lancer l'exécution." + saut
+    + "   - Résultat attendu : une exécution arrêtée sur le bouton « Review »." + saut
+    + "2. Approuver le plan." + saut
+    + "   - Cliquer sur « Approve » si le plan compte 11 créations, 1 modification et 0 destruction." + saut
+    + "   - Résultat attendu : l'étape d'application en vert." + saut + saut
     + (avecLimite ? NE_VERIFIE + saut + saut : "")
     + "## 0. Synthèse d'ouverture" + saut + saut;
   const VERDICT_VERTE = "Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
@@ -5763,6 +5954,29 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S78 : le constat sur l'ancien format doit NOMMER les libellés manquants : " + String(constatDe(r78ancien, "S78").message || "").slice(0, 160));
   if (!/retour arrière/.test(constatDe(r78sansRetour, "S78").message || ""))
     casse.push("S78 : le constat sans retour arrière doit le NOMMER : " + String(constatDe(r78sansRetour, "S78").message || "").slice(0, 160));
+  // 18/10 — S49, S80 ET LA MISE EN PAGE PRESCRITE (TF-1847). La décision au format B dont l'option (b) commande un
+  // geste porte « Comment faire (b) : » puis une liste numérotée SOUS le tableau des options, en pleine largeur : elle
+  // passe S49 (le geste est compté et de quoi l'exécuter est là), S80 et S78 ; la MÊME décision sans la liste FAIL S49.
+  const OPTION_B_ATTENDRE = "| (b) Attendre le prochain lot | Les 26 commits restent sur ce poste | Nul | Sans objet |";
+  const OPTION_B_GESTE = "| (b) Se connecter au portail soi-même et saisir le code reçu | Vous rouvrez la connexion ; rien n'est publié d'ici là | Faible × court | Possible |";
+  const LISTE_COMMENT_FAIRE = nl + nl + "Comment faire (b) :" + nl + nl + "1. Ouvrir un terminal." + nl
+    + "2. Coller `python forge\\etapes\\data\\sonde.py --login`." + nl
+    + "3. Saisir le code affiché dans l'écran « Connexion » du navigateur." + nl + nl + "> **Sans réponse**";
+  const geste78 = FORMAT_B.replace(OPTION_B_ATTENDRE, OPTION_B_GESTE);
+  const geste78Liste = geste78.replace(nl + nl + "> **Sans réponse**", LISTE_COMMENT_FAIRE);
+  const dansBloc3 = (decision) => verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, `## 3. Décisions attendues\n\n${decision}\n\n`);
+  if (geste78 === FORMAT_B || geste78Liste === geste78) casse.push("S49/S80 (format B) : une fixture n'a pas été modifiée — le cas ne prouve plus rien");
+  const r49bListe = jouerPe("format-b-geste-liste.md", dansBloc3(geste78Liste));
+  const r49bSans = jouerPe("format-b-geste-sans-liste.md", dansBloc3(geste78));
+  for (const [r, regle, statut, quoi] of [
+    [r49bListe, "S49", "PASS", "la décision B dont l'option (b) commande un geste, avec « Comment faire (b) : » et sa liste numérotée sous le tableau, est accusée — la mise en page que le gabarit prescrit échoue"],
+    [r49bListe, "S80", "PASS", "la liste numérotée sous le tableau est accusée d'énumération en ligne"],
+    [r49bListe, "S78", "PASS", "la liste « Comment faire » ajoutée sous le tableau casse le format B"],
+    [r49bSans, "S49", "FAIL", "la MÊME décision B sans « Comment faire » passe — le geste commandé n'a aucun comment"],
+  ]) if (constatDe(r, regle).statut !== statut)
+    casse.push(`${regle} (format B, TF-1847) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 200));
+  if (!/commandant un geste humain, chacune exécutable/.test(constatDe(r49bListe, "S49").message || ""))
+    casse.push("S49 (format B) : la verte ne passe que parce qu'aucune option ne commande de geste — le geste n'est pas compté : " + String(constatDe(r49bListe, "S49").message || "").slice(0, 200));
   // 15/10 — TF-1766 ET TF-1802 : S75 ET S76, DANS LEURS DEUX SENS. (a) La livraison de r71avec (portail,
   // adresse, usage, compte) ne dit d'aucun parcours qu'il a été joué dans un navigateur : S75 FAIL ; la
   // MÊME avec « parcours joués dans un navigateur sur l'adresse publique » : PASS ; avec l'aveu « parcours
@@ -5797,7 +6011,7 @@ Aucun écart : la demande a été suivie à la lettre.
   const nCas = compterFixtures(dir);
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; S78 dans ses QUATRE sens (format B du 17/10 : la décision au format B PASS sur S78, S15, S16, S30, S31 et S32 ; l'ancien format en citation FAIL en nommant les libellés manquants ; la MÊME décision B sans retour arrière FAIL ; la verte en puce SANS_OBJET dit à voix haute) ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 117 caracteres — 151 avec les 34 du sidecar d oracle, 26 jusqu au 01/10 — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS ; et TF-1500 dans ses QUATRE sens sous le forge d un produit : un chemin `forge/` cite de 117 caracteres FAIL, le meme a 116 PASS, le fichier juge sous un dossier `forge` mesure comme `forge/<nom>`, FAIL a 117 et PASS a 116) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S55 et S56 dans leurs QUATRE sens (TF-1493, TF-1498 : un guide de LANCEMENT et un feu vert au verdict sans ligne « Ne vérifie pas » et sur un audit des dependances date de la VEILLE FAIL sur les deux regles, la MEME bornee aux deux endroits et portant ses portes du jour chiffrees PASS en entier, le feu vert que l agent ATTEND de l humain ne declenche rien, et une chaine qui DECLARE n avoir aucune porte a base externe PASS — taux mesure a la mise en service : 0 sur les 215 syntheses d output\\04-plans\\, 10 et 9 sur les 142 restitutions des produits du poste : avertissantes) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit ; TF-1644 : le MEME message muet pose hors de tout produit rend SANS_OBJET seul et FAIL quand `--racine` nomme le produit, forme que le hook de fin de tour emploie ; TF-1643 dans ses TROIS sens : un tour qui CORRIGE une erreur de la session et declare « rien a remonter » FAIL, le MEME qui nomme son lot PASS, le MEME qui dit « reste au produit, parce que <motif> » PASS) ; S36 dans ses DEUX sens (TF-1653 : un schema HTML nomme par un prompt recopie dans un bloc de code et cite comme source lue PASS, le MEME schema presente comme livre sans critique d implementation FAIL) ; S69 dans ses DEUX sens (TF-1646 : la MEME verte dont l en-tete porte 15h48 jugee a 13:00 ce jour-la FAIL, heure composee dans le futur, et a 16:00 PASS ; et la MEME heure suivie de « (UTC+02:00) » lue avec son decalage, PASS) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; S80 dans ses sens (TF-1847, E-11 : « Comment faire : 1) … 2) … 3) » en ligne FAIL, la MÊME option en liste numérotée PASS S49 ET S80, une énumération en cellule FAIL en le disant, deux éléments et une citation entre guillemets français PASS) ; S81 dans ses quatre sens (guide à une sous-puce par geste PASS, étape de trois gestes en paragraphe FAIL en les comptant, clôture avant le dernier geste FAIL, sous-puce qui enchaîne FAIL) ; S78 dans ses QUATRE sens (format B du 17/10 : la décision au format B PASS sur S78, S15, S16, S30, S31 et S32 ; l'ancien format en citation FAIL en nommant les libellés manquants ; la MÊME décision B sans retour arrière FAIL ; la verte en puce SANS_OBJET dit à voix haute) ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 117 caracteres — 151 avec les 34 du sidecar d oracle, 26 jusqu au 01/10 — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS ; et TF-1500 dans ses QUATRE sens sous le forge d un produit : un chemin `forge/` cite de 117 caracteres FAIL, le meme a 116 PASS, le fichier juge sous un dossier `forge` mesure comme `forge/<nom>`, FAIL a 117 et PASS a 116) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S55 et S56 dans leurs QUATRE sens (TF-1493, TF-1498 : un guide de LANCEMENT et un feu vert au verdict sans ligne « Ne vérifie pas » et sur un audit des dependances date de la VEILLE FAIL sur les deux regles, la MEME bornee aux deux endroits et portant ses portes du jour chiffrees PASS en entier, le feu vert que l agent ATTEND de l humain ne declenche rien, et une chaine qui DECLARE n avoir aucune porte a base externe PASS — taux mesure a la mise en service : 0 sur les 215 syntheses d output\\04-plans\\, 10 et 9 sur les 142 restitutions des produits du poste : avertissantes) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit ; TF-1644 : le MEME message muet pose hors de tout produit rend SANS_OBJET seul et FAIL quand `--racine` nomme le produit, forme que le hook de fin de tour emploie ; TF-1643 dans ses TROIS sens : un tour qui CORRIGE une erreur de la session et declare « rien a remonter » FAIL, le MEME qui nomme son lot PASS, le MEME qui dit « reste au produit, parce que <motif> » PASS) ; S36 dans ses DEUX sens (TF-1653 : un schema HTML nomme par un prompt recopie dans un bloc de code et cite comme source lue PASS, le MEME schema presente comme livre sans critique d implementation FAIL) ; S69 dans ses DEUX sens (TF-1646 : la MEME verte dont l en-tete porte 15h48 jugee a 13:00 ce jour-la FAIL, heure composee dans le futur, et a 16:00 PASS ; et la MEME heure suivie de « (UTC+02:00) » lue avec son decalage, PASS) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -5827,6 +6041,8 @@ console.log(JSON.stringify({
     "S14 (TF-1428) ne lit pas un « A-18 » NU comme l'identifiant du registre produit, même quand c'en est un : il ne se distingue pas d'un sélecteur ou d'un renvoi à une autre action. La forme qualifiée « registre A-18 » ou la colonne Registre est exigée, et l'existence de l'identifiant au registre n'est jamais vérifiée",
     "S54 (TF-1494) juge la SOURCE, pas le rendu : une ligne coupée par un retour à la ligne forcé (deux espaces en fin de ligne) compte comme une coupure, et un élément de liste coupé à la main n'est pas accusé, alors que le chat l'affiche aussi en colonne",
     "S55 (TF-1493) juge la PRÉSENCE de la ligne « Ne vérifie pas : … » là où le feu vert est donné, jamais sa justesse : qu'elle nomme la limite qui compte, aucun oracle ne le voit. Le feu vert se reconnaît à un vocabulaire fermé et à un guide de LANCEMENT ; un feu vert de production écrit autrement passe sans être vu",
+    "S80 (TF-1847) ne juge QUE l'énumération NUMÉROTÉE en ligne (trois marqueurs « 1) … 2) … 3) » consécutifs sur une ligne, hors code et hors citation en guillemets français) : un paragraphe qui énumère sans numéroter (« A, B, C et D ») et un raisonnement coupé en puces à tort (le sens inverse d'E-11) restent à la revue. Les listes en lettres « a) b) c) » ne sont pas lues : les options (a), (b), (c) d'une décision sont le format",
+    "S81 (TF-1847) compte les gestes d'une étape par un vocabulaire FERMÉ de verbes d'action et par les enchaînements (puis, ensuite, →) : un verbe hors liste n'est pas compté, et la règle préfère manquer un cas que crier sur une phrase. Le pilot n'a aucun guide dans son corpus (0 sur 274 synthèses) : la règle n'a pas de mesure de faux positifs sur du réel, d'où son avertissement",
     "S56 (TF-1498) ne vérifie pas que la porte citée a réellement été rejouée, ni sur ce qui sera lancé : il lit une ligne qui la nomme, datée du jour de la restitution et chiffrée. La déclaration « aucune porte de la chaîne ne juge une base externe » n'est pas vérifiée non plus",
     "S64 à S68 (13/10/2026) jugent une FORME : S64 qu'une ligne existe sous un titre, jamais ce qu'elle dit ; S65 que deux familles de voies sont NOMMÉES, jamais qu'elles ont été essayées ni sur la même ressource, et pas les quatre que R-29 point 4 énumère ; S66 une concentration chiffrée ou une invraisemblance qualifiée par le texte, jamais celle que l'auteur n'a pas vue ; S67 qu'un porteur durable est nommé, jamais qu'il tourne ; S68 qu'un essai est cité pour une image ou un site, jamais pour un PDF, une base ou une API",
     "S70 à S72 (15/10/2026, R-61) jugent ce que le bloc 0 et le verdict DÉCLARENT : S70 qu'une adresse cliquable et un geste d'accès y figurent, jamais que l'adresse réponde ; S71 que l'usage à l'instant et ce qui manque y sont dits, jamais que ce soit vrai ; S72 qu'un compte d'exigences y figure, jamais qu'il soit juste. Une livraison annoncée par le seul nom d'un produit, sans « le produit » ni déploiement annoncé, n'est pas vue",

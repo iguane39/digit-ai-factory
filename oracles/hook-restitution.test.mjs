@@ -645,9 +645,18 @@ try {
       + "  - si rien n'est fait : les campagnes ne sont pas publiées.\n";
     const GUIDE = "## Guide — importer les campagnes dans Google Ads\n\n"
       + "Source : `support.google.com/google-ads`, lue le 27/09/2026.\n\n"
-      + "1. Ouvrez Outils, puis Actions groupées, puis Importations. Résultat attendu : la liste des importations passées.\n"
-      + "2. Déposez le fichier et cliquez sur « Aperçu ». Résultat attendu : les modifications acceptées, et zéro erreur.\n"
-      + "3. Cliquez sur « Appliquer ». Résultat attendu : l'importation marquée terminée.\n\n"
+      + "1. Ouvrir l'écran des importations.\n"
+      + "   - Ouvrez Outils.\n"
+      + "   - Cliquez sur Actions groupées.\n"
+      + "   - Cliquez sur Importations.\n"
+      + "   - Résultat attendu : la liste des importations passées.\n"
+      + "2. Lancer l'aperçu.\n"
+      + "   - Déposez le fichier.\n"
+      + "   - Cliquez sur « Aperçu ».\n"
+      + "   - Résultat attendu : les modifications acceptées, et zéro erreur.\n"
+      + "3. Appliquer.\n"
+      + "   - Cliquez sur « Appliquer ».\n"
+      + "   - Résultat attendu : l'importation marquée terminée.\n\n"
       + "## 0. Synthèse d'ouverture\n\n";
     const rougeTexte = BON + ACTION_ADS;
     const verteTexte = GUIDE + BON + ACTION_ADS + "  - source : `support.google.com/google-ads`, lue le 27/09/2026.\n";
@@ -925,8 +934,58 @@ try {
     if (e.code !== 0 || !/non joué/.test(e.o?.affichage || ""))
       echecs.push(`49 quinquies : sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit → attendu exit 0 et « non joué », obtenu ${e.code} ${JSON.stringify(e.o).slice(0, 200)}`);
   }
+  // 50 — TF-1847 (18/10/2026) : E-11 SUR LE MARKDOWN, S80 BLOQUANTE, dans ses quatre sens. (a) Une restitution
+  // conforme dont le bloc 4 énumère « 1) … 2) … 3) » sur une ligne est REFUSÉE par `--prejuger` (exit 1) et par le
+  // hook de fin de tour, S80 nommée ; c'est le retour du 17/10/2026, jugé affichable jusque-là. (b) La MÊME
+  // information en liste (une ligne par élément) est affichable : le remède du message PASSE. (c) La forme montrée
+  // entre guillemets français n'est pas commise. (d) Le guide en paragraphe n'est qu'AVERTI (S81), jamais refusé.
+  {
+    const EN_LIGNE = BON.replace("- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
+      "- bootstrap v2 livré en trois temps : 1) écriture ; 2) recette ; 3) enregistrement — preuve : bootstrap.test.mjs 7/7, recette 22/22.");
+    const EN_LISTE = BON.replace("- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
+      "- bootstrap v2 livré en trois temps — preuve : bootstrap.test.mjs 7/7, recette 22/22.\n  1. Écriture.\n  2. Recette.\n  3. Enregistrement.");
+    const CITEE = BON.replace("- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
+      "- bootstrap v2 livré ; l'ancien gabarit écrivait « 1) écriture ; 2) recette ; 3) enregistrement » sur une ligne — preuve : bootstrap.test.mjs 7/7, recette 22/22.");
+    const GUIDE_PARAGRAPHE = "## Guide — connecter le compte\n\nSource : `docs.exemple.org`, lue le 17/10/2026.\n\n"
+      + "1. Ouvrez la console, choisissez le projet, cliquez sur « Activer ». Résultat attendu : l'API est active.\n\n## 0. Synthèse d'ouverture\n\n";
+    const prejuger50 = (nom, texte) => {
+      const fichier = join(base, nom + ".md"); writeFileSync(fichier, texte, "utf8");
+      const r = spawnSync(process.execPath, [HOOK, "--prejuger", fichier], { encoding: "utf8", env: ENV_SANS_SESSION });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+      return { code: r.status, o };
+    };
+    const hook50 = (nom, texteFinal) => {
+      const p = join(base, nom + ".jsonl");
+      writeFileSync(p, [
+        { type: "user", message: { role: "user", content: "corrige le script" } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: { file_path: "x.mjs" } }] } },
+        { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
+      ].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", env: ENV_SANS_SESSION,
+        input: JSON.stringify({ session_id: "test-50", transcript_path: p, stop_hook_active: false }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* laisse passer */ }
+      return d;
+    };
+    if (EN_LIGNE === BON || EN_LISTE === BON || CITEE === BON) echecs.push("50 : une fixture n'a pas été modifiée — le cas ne prouve plus rien");
+    const a = prejuger50("brouillon-50-en-ligne", EN_LIGNE);
+    if (a.code !== 1 || !(a.o?.bloquants || []).some((x) => /^S80\b/.test(x)))
+      echecs.push(`50 : « 1) … 2) … 3) » sur une ligne du bloc 4 → attendu --prejuger exit 1 et S80 bloquante, obtenu ${a.code} ${JSON.stringify(a.o).slice(0, 240)}`);
+    const h = hook50("tour-50-en-ligne", EN_LIGNE);
+    if (h?.decision !== "block" || !/S80/.test(h.reason || ""))
+      echecs.push(`50 bis : le hook de fin de tour doit refuser l'énumération en ligne en nommant S80, obtenu ${JSON.stringify(h).slice(0, 240)}`);
+    const b = prejuger50("brouillon-50-en-liste", EN_LISTE);
+    if (b.code !== 0 || b.o?.affichable !== true)
+      echecs.push(`50 ter : la MÊME information en liste doit être affichable (le remède du message), obtenu ${b.code} ${JSON.stringify(b.o).slice(0, 240)}`);
+    const c = prejuger50("brouillon-50-citee", CITEE);
+    if (c.code !== 0)
+      echecs.push(`50 quater : la forme interdite montrée entre guillemets français ne doit pas être refusée, obtenu ${c.code} ${JSON.stringify(c.o).slice(0, 240)}`);
+    const d = prejuger50("brouillon-50-guide-paragraphe", GUIDE_PARAGRAPHE + BON);
+    if ((d.o?.bloquants || []).some((x) => /^S81\b/.test(x)) || !(d.o?.avertissements || []).includes("S81"))
+      echecs.push(`50 quinquies : un guide dont l'étape enchaîne trois gestes doit être AVERTI par S81 sans être bloqué, obtenu ${d.code} ${JSON.stringify(d.o).slice(0, 240)}`);
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 49/49 — un document de projet marqué par son gabarit n est plus jugé à la place de la restitution, une synthèse nommée reste comparée, et --prejuger rend le même refus AFFICHAGE avant l affichage en relisant le transcript, la comparaison non jouée étant dite (cas 49, TF-1720, 15/10/2026) ; une explication demandée rendue en restitution sans fiche est dite en avertissement EXPLICATION, et la fiche écrite ou citée la lève (cas 48, TF-1641, 14/10/2026) ; un message d attente de 3 lignes au plus n est pas jugé tant qu une tâche d arrière-plan du tour n est pas revenue, et il redevient jugé sans tâche, tâche revenue ou verdict porté (cas 47, TF-1649, 14/10/2026) ; --prejuger rend le verdict bloquant du hook avant affichage, et un refus sans préjugement le dit comme un défaut distinct (cas 46, TF-1647, TF-1666, 14/10/2026) ; S48 est jugée au hook chez un produit, bloquante, et « rien à remonter » passe (cas 45, TF-1644, 14/10/2026) ; « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 50/50 — S80 (E-11 sur le Markdown, TF-1847, 18/10/2026) est BLOQUANTE : une énumération « 1) … 2) … 3) » sur une ligne du bloc 4 est refusée par --prejuger et par le hook de fin de tour, la MÊME information en liste est affichable, la forme montrée entre guillemets français n est pas refusée, et le guide en paragraphe n est qu averti par S81 (cas 50) ; un document de projet marqué par son gabarit n est plus jugé à la place de la restitution, une synthèse nommée reste comparée, et --prejuger rend le même refus AFFICHAGE avant l affichage en relisant le transcript, la comparaison non jouée étant dite (cas 49, TF-1720, 15/10/2026) ; une explication demandée rendue en restitution sans fiche est dite en avertissement EXPLICATION, et la fiche écrite ou citée la lève (cas 48, TF-1641, 14/10/2026) ; un message d attente de 3 lignes au plus n est pas jugé tant qu une tâche d arrière-plan du tour n est pas revenue, et il redevient jugé sans tâche, tâche revenue ou verdict porté (cas 47, TF-1649, 14/10/2026) ; --prejuger rend le verdict bloquant du hook avant affichage, et un refus sans préjugement le dit comme un défaut distinct (cas 46, TF-1647, TF-1666, 14/10/2026) ; S48 est jugée au hook chez un produit, bloquante, et « rien à remonter » passe (cas 45, TF-1644, 14/10/2026) ; « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");

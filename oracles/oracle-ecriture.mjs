@@ -30,6 +30,8 @@
  * EC-9 valeur, heure ou date écrite en toutes lettres (E-14, retour humain du 16/09/2026).
  * EC-11 question de décision dont le paragraphe ne nomme rien, hors restitution (AVERT seulement,
  * TF-1392, D-2 (a) du 13/10/2026).
+ * EC-12 énumération numérotée « 1) … 2) … 3) » sur une même ligne, hors restitution (E-11, AVERT seulement,
+ * TF-1847, 18/10/2026) ; les restitutions sont jugées par S80 d'oracle-synthese, bloquante chez elles.
  * Un AVERT n'échoue jamais : il nomme, et c'est ce qui permet à l'oracle de rester branché.
  *
  * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--json]
@@ -39,6 +41,7 @@
  */
 import { existsSync, readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
+import { enumerationsEnLigne } from "./lib-enumeration-liste.mjs";
 import { join, dirname, resolve, relative, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -720,6 +723,36 @@ export function juger(texte, options = {}) {
       muettes[0].ligne);
   }
 
+  // EC-12 (TF-1847, 18/10/2026, retour Produit-79 RP-10) — UNE ÉNUMÉRATION DEVIENT UNE LISTE (E-11).
+  // AVERT SEULEMENT, JAMAIS FAIL, hors restitution.
+  //
+  // LE FAIT. E-11 (« un paragraphe qui énumère devient une liste ») n'avait de juge que pour HTML (L12) et
+  // PPTX. Retour humain du 17/10/2026, mot pour mot : « J'ai déjà dit que lorsqu'il y avait des listes, il
+  // devait y avoir des puces et sous-puces affichées, ce qui n'est pas le cas ici. » Une restitution portait
+  // « Comment faire : 1) … 2) … 3) … » sur une ligne de tableau.
+  //
+  // CE QU'ELLE MESURE. Trois marqueurs « 1) … 2) … 3) » (ou « (1) … (2) … (3) ») consécutifs sur une même ligne
+  // source, hors code et hors citation entre guillemets français. Les motifs vivent une fois, dans
+  // lib-enumeration-liste.mjs, que S80 d'oracle-synthese partage. UNE RESTITUTION N'EST PAS JUGÉE ICI : S80 la
+  // juge, bloquante chez elle (mesure d'entrée : 9 accusations sur 274 synthèses d'output\04-plans, aucune
+  // fausse). Hors restitution, sur 202 autres Markdown du pilot (études, références, gabarits) : 2 accusés, vrais
+  // aussi, d'où l'avertissement seul. NON JUGÉ : une énumération sans numéros, un raisonnement coupé en puces.
+  {
+    const restitution12 = /^\s*>\s*\*\*D-\d{1,3}\b/m.test(texte) || (String(texte).match(/^#{1,4}\s*\d{1,2}\.?\s/gm) || []).length >= 5;
+    if (restitution12) pousser("EC-12", "SKIP", "restitution : ses énumérations sont jugées par S80 d'oracle-synthese, bloquante chez elle");
+    else {
+      const enums = enumerationsEnLigne(texte);
+      if (!enums.length) pousser("EC-12", "PASS", "aucune énumération numérotée « 1) … 2) … 3) » sur une même ligne");
+      else pousser("EC-12", "AVERT",
+        `${enums.length} énumération(s) numérotée(s) en ligne : `
+        + enums.slice(0, 4).map((e) => `l.${e.ligne} (${e.elements} éléments${e.cellule ? ", en cellule de tableau" : ""}) « ${e.extrait.slice(0, 60)} »`).join(" · ")
+        + (enums.length > 4 ? ` · et ${enums.length - 4} autre(s)` : "")
+        + " — une énumération devient une liste, une ligne par élément (E-11). Retour humain du 17/10/2026 : « il devait y avoir des puces et "
+        + "sous-puces affichées ». AVERTISSEMENT, jamais bloquant hors restitution (TF-1847)",
+        enums[0].ligne);
+    }
+  }
+
   const verdict = findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS";
   return { mots, verdict, findings, non_juge: nonJuge(donnee) };
 }
@@ -1172,10 +1205,34 @@ function selfTest() {
   if (g11(r11c)?.statut !== "PASS" || !/aucune question de décision/.test(g11(r11c)?.message || ""))
     casse.push(`EC-11 : une question citée ou rhétorique est comptée comme question de décision : ${JSON.stringify(g11(r11c))}`);
 
+  // 25, 26, 27 et 28 (TF-1847, 18/10/2026) — EC-12, E-11 SUR LE MARKDOWN, HORS RESTITUTION, EN AVERTISSEMENT.
+  // Le rouge est le « Comment faire : 1) … 2) … 3) » du retour du 17/10/2026, dans une note ; le vert porte la
+  // MÊME information en liste numérotée ; la restitution est laissée à S80 (SKIP dit) ; la forme interdite
+  // MONTRÉE entre guillemets français n'est pas commise.
+  const EC12_ROUGE = "# Procédure\n\nComment faire : 1) ouvrir un terminal ; 2) coller la commande ; 3) saisir le code affiché.\n";
+  const EC12_VERTE = "# Procédure\n\nComment faire :\n\n1. Ouvrir un terminal.\n2. Coller la commande.\n3. Saisir le code affiché.\n";
+  const EC12_RESTITUTION = "# Synthèse\n\n> **D-1 — Publie-t-on la version 1.12.0 ?**\n> Comment faire : 1) ouvrir un terminal ; 2) coller la commande ; 3) saisir le code.\n";
+  const EC12_CITEE = "# Note\n\nL'ancien gabarit écrivait « Comment faire : 1) ouvrir ; 2) coller ; 3) saisir » sur une ligne.\n";
+  const g12 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-12");
+  const r12r = jouer("ec12-rouge.md", EC12_ROUGE);
+  const r12v = jouer("ec12-verte.md", EC12_VERTE);
+  const r12s = jouer("ec12-restitution.md", EC12_RESTITUTION);
+  const r12c = jouer("ec12-citee.md", EC12_CITEE);
+  if (g12(r12r)?.statut !== "AVERT" || !/1 énumération\(s\) numérotée\(s\) en ligne/.test(g12(r12r)?.message || ""))
+    casse.push(`EC-12 : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, n'est pas signalé : ${JSON.stringify(g12(r12r))}`);
+  if (r12r.statut !== 0 || r12r.j?.verdict === "FAIL")
+    casse.push("EC-12 : l'avertissement fait échouer le texte — hors restitution la règle est en AVERTISSEMENT (TF-1847), jamais bloquante");
+  if (g12(r12v)?.statut !== "PASS")
+    casse.push(`EC-12 : la MÊME information en liste numérotée est signalée — le remède échoue : ${JSON.stringify(g12(r12v))}`);
+  if (g12(r12s)?.statut !== "SKIP")
+    casse.push(`EC-12 : une restitution est jugée ici alors que S80 la juge déjà : ${JSON.stringify(g12(r12s))}`);
+  if (g12(r12c)?.statut !== "PASS")
+    casse.push(`EC-12 : la forme interdite montrée entre guillemets français est comptée comme commise : ${JSON.stringify(g12(r12c))}`);
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 24 cas, 0 défaut (24/24 PASS — EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes)`);
+    : `Self-test ${NOM} : 28 cas, 0 défaut (28/28 PASS — EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes)`);
   return casse.length ? 1 : 0;
 }
 

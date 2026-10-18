@@ -127,10 +127,12 @@ Avant (TF-0511) : « justificatif fédéré, identité system-assigned, UAMI, co
 même explication sans aucun de ces termes, acceptée immédiatement.
 
 ### E-11 — Une liste énumère, un raisonnement enchaîne
-*Types T2, T3. Juge : L12 (une énumération de données n'est pas une phrase) ; le sens inverse, revue.*
+*Types T2, T3. Juge : L12 (HTML, TF-1621, TF-1665) et TF-1390 (PPTX) ; pour le Markdown, depuis le 18/10/2026 (TF-1847), S80 d'`oracle-synthese` sur une restitution (bloquante) et EC-12 d'`oracle-ecriture` sur tout autre texte (avertissement) pour l'énumération numérotée « 1) … 2) … 3) » sur une même ligne, S81 pour les étapes d'un guide ; le sens inverse, revue.*
 Un paragraphe qui énumère devient une liste ; un raisonnement dont chaque pas dépend du
 précédent reste en prose. Découper une démonstration en puces casse le lien logique
 (`bonnes-pratiques.md` §3 du socle).
+
+Retour humain du 17/10/2026, mot pour mot : « J'ai déjà dit que lorsqu'il y avait des listes, il devait y avoir des puces et sous-puces affichées, ce qui n'est pas le cas ici. » Un guide de 4 étapes enchaînait chacune 3 à 6 gestes et son résultat attendu dans un paragraphe, et une option portait ses trois gestes sur une ligne de tableau. Les deux sont des énumérations : chaque geste a sa ligne, en sous-puce sous son étape, et « Résultat attendu » ferme la liste. Avant : « Comment faire : 1) ouvrir un terminal ; 2) coller la commande ; 3) saisir le code. » Après : « Comment faire (b) : » suivi de trois lignes numérotées.
 
 ### E-12 — Le vocabulaire du lecteur, jamais celui du système
 *Types T2, T3, T4. Juge : `glossaire-restitution.json` (forge-data), contrat `voix.md` (T4). Revue.*

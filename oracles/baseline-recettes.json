@@ -184,8 +184,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 24,
-  "vu_le": "2026-10-13"
+  "cas": 28,
+  "vu_le": "2026-10-18"
  },
  "oracle-empreintes.mjs": {
   "cas": 13,
@@ -343,8 +343,8 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 180,
-  "vu_le": "2026-10-17"
+  "cas": 189,
+  "vu_le": "2026-10-18"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 43,
@@ -435,12 +435,16 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 49,
-  "vu_le": "2026-10-15"
+  "cas": 50,
+  "vu_le": "2026-10-18"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
   "vu_le": "2026-10-02"
+ },
+ "oracles/lib-enumeration-liste.test.mjs": {
+  "cas": 29,
+  "vu_le": "2026-10-18"
  },
  "oracles/lib-garde-arbre-suivi.test.mjs": {
   "cas": 9,
