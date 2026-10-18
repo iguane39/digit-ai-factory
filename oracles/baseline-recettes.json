@@ -343,7 +343,7 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 206,
+  "cas": 222,
   "vu_le": "2026-10-18"
  },
  "oracle-trace-mutation-mep.mjs": {
@@ -435,7 +435,7 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 52,
+  "cas": 54,
   "vu_le": "2026-10-18"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
@@ -444,6 +444,10 @@
  },
  "oracles/lib-enumeration-liste.test.mjs": {
   "cas": 29,
+  "vu_le": "2026-10-18"
+ },
+ "oracles/lib-exhaustivite.test.mjs": {
+  "cas": 85,
   "vu_le": "2026-10-18"
  },
  "oracles/lib-garde-arbre-suivi.test.mjs": {
@@ -676,6 +680,10 @@
  },
  "scripts/relever-heritage.test.mjs": {
   "cas": 46,
+  "vu_le": "2026-10-18"
+ },
+ "scripts/reserver-decision.test.mjs": {
+  "cas": 53,
   "vu_le": "2026-10-18"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
