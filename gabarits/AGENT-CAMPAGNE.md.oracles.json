@@ -1,6 +1,6 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
-  "date_iso": "2026-10-18T09:27:24.069Z",
+  "date_iso": "2026-10-18T14:43:13.496Z",
   "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\AGENT-CAMPAGNE.md",
-    "ts": "2026-10-18T09:27:24.069Z",
+    "ts": "2026-10-18T14:43:13.495Z",
     "fichiers": {
-      "gabarits\\AGENT-CAMPAGNE.md": "82c3962f8194a873042d2d99908bad6363912e9cf677319ae823d5a20d4970b3"
+      "gabarits\\AGENT-CAMPAGNE.md": "ede444ab420ac1fd72de24595315247e16bd532c1ee070125d4d9e85d77865e0"
     }
   },
   "empreinte_motif": null,

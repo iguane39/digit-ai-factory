@@ -1,6 +1,6 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\references\\RELECTURE-INTENTION.md",
-  "date_iso": "2026-10-18T09:27:21.668Z",
+  "date_iso": "2026-10-18T14:38:48.566Z",
   "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -52,7 +52,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "references\\RELECTURE-INTENTION.md",
       "verdict": "PASS",
-      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; nombre « 20261018 » non sourcé"
+      "detail": "12 constat(s) · 11 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (11 avertissement(s)) ; nombre « 20261018 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\RELECTURE-INTENTION.md",
-    "ts": "2026-10-18T09:27:21.668Z",
+    "ts": "2026-10-18T14:38:48.565Z",
     "fichiers": {
-      "references\\RELECTURE-INTENTION.md": "5fc21e9e44647df1a1049c3c9a31eebff7d25ce824548665a11ef048a471e401"
+      "references\\RELECTURE-INTENTION.md": "eb3a2c7c56add314d5342a934a059ef3f9634577dff3b3b96f70aa5d14705fc3"
     }
   },
   "empreinte_motif": null,

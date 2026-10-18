@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+ "empreinte": "679e80ea81cd32a96dd547a6bb0062a0734dde30cb38db4bc5f2e9fab05f0296",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-18T15:15:41.676Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

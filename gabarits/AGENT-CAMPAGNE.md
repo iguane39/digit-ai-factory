@@ -21,6 +21,8 @@ l'appel (alerte, jamais blocage). Essai du 2026-10-18 au 2026-11-01, `references
 liste » est devenu « dès 8 lignes » dans une consigne (TF-0176), et le livrable a été refusé. Cela ne dispense pas l'agent des
 « Écarts à la lettre » ci-dessous : il déclare ses écarts à SA consigne ; le relecteur juge l'écart entre la consigne et la demande.
 
+**Depuis le 18/10/2026 (D-26 (a)), une consigne peut n'être qu'un écart à corriger** : l'agent `campagne` qui reçoit pour consigne un écart majeur de nature `hors_demande`, signalé par la relecture d'intention, corrige cet écart et rien d'autre, puis le pilot fait relire son travail (2 passes de correction au plus), et un écart de nature `choix_humain`, ou qui résiste, est posé à l'humain et non corrigé (`references\RELECTURE-INTENTION.md`, section « La boucle de correction »).
+
 Fin de campagne : le pilot joue
 `node scripts\relever-flotte.mjs --depuis <début> --journal <journal> --etiquette <campagne>`, qui
 consigne modèle, effort, jetons et appels d'outils de chaque agent (CONTRAT-INTERFACE.md §4 bis).

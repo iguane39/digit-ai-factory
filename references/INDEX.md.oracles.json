@@ -1,6 +1,6 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\references\\INDEX.md",
-  "date_iso": "2026-10-18T08:27:26.319Z",
+  "date_iso": "2026-10-18T15:13:36.555Z",
   "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\INDEX.md",
-    "ts": "2026-10-18T08:27:26.319Z",
+    "ts": "2026-10-18T15:13:36.555Z",
     "fichiers": {
-      "references\\INDEX.md": "e373332d3e7ac1bab56541af9e34e8fcd683327878782182b90b92bc27a31b5d"
+      "references\\INDEX.md": "633c8821bda7d8f01378297a7910ad2b38f46f0d69c0a02d70b27026d86ebb66"
     }
   },
   "empreinte_motif": null,

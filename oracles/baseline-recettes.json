@@ -343,7 +343,7 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 199,
+  "cas": 206,
   "vu_le": "2026-10-18"
  },
  "oracle-trace-mutation-mep.mjs": {
@@ -655,7 +655,7 @@
   "vu_le": "2026-10-12"
  },
  "scripts/relecture-intention.test.mjs": {
-  "cas": 33,
+  "cas": 64,
   "vu_le": "2026-10-18"
  },
  "scripts/relever-appelants.test.mjs": {

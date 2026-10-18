@@ -87,6 +87,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` | fichier | 15,3 Ko | Synthèse de mandat — la forme du bloc des décisions, relevée à la source et rendue lisible |
 | `Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` | fichier | 17,3 Ko | La boîte d'entrée est vide, 15 todos sont clos, et une campagne travaille encore |
 | `Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` | fichier | 17,5 Ko | Vos trois décisions sont exécutées, et la question que vous n'avez pas pu lire est reposée |
+| `Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` | fichier | 9,6 Ko | Synthèse Mandat — seuil relevé à 4 millions, boucle de correction et relecteur renforcé en |
 | `Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md` | fichier | 13,7 Ko | La branche du pilot est fusionnée dans une branche locale, harnais vert : il reste votre a |
 | `Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` | fichier | 11,7 Ko | Synthèse Mandat — votre décision D-55 (a) est exécutée : les 8 améliorations des pages de  |
 | `Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` | fichier | 22,6 Ko | Synthèse de mandat — les retours en attente sont entrés au registre et la campagne des cin |
@@ -149,6 +150,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` | fichier | 13,8 Ko | Synthèse de mandat — votre « 3a » est exécuté : un produit doit désormais dire ce qu'il re |
 | `Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` | fichier | 11,7 Ko | Synthèse de mandat — votre « 4b » est exécuté à moitié : l'enregistrement est fait, la pub |
 | `Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` | fichier | 11,3 Ko | Synthèse Mandat — l'essai de relecture d'intention est en place sur le poste, et la mesure |
+| `Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` | fichier | 12,6 Ko | Synthèse Mandat — l'essai est publié ; les alertes ne corrigent encore rien d'elles-mêmes, |
 | `Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` | fichier | 9,8 Ko | Synthèse de mandat — tout n'est pas encore commité, et une branche ancienne n'est pas fusi |
 | `Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` | fichier | 15,2 Ko | Synthèse de mandat — l'étude d'opportunité conclut de ne rien construire, et signale une f |
 | `Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` | fichier | 10,2 Ko | Synthèse Mandat — la remontée sur les pages HTML et les indicateurs est instruite ; l'étud |
@@ -301,4 +303,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_283 fichier(s), 1 sous-dossier(s)_ · 5 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_285 fichier(s), 1 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

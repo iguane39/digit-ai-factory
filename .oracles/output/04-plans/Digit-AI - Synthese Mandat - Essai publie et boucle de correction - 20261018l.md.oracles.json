@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+  "date_iso": "2026-10-18T13:14:02.861Z",
+  "registre_version": "2.43.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+      "verdict": "PASS",
+      "detail": "7 constat(s) · 6 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (6 avertissement(s)) ; nombre « 1 145 733 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md",
+    "ts": "2026-10-18T13:14:02.860Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md": "e6eaad313c31716cb343c5ed5c86cc059c290895b01033d51862b4eeaafbd8a7"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

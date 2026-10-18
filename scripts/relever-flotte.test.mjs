@@ -85,7 +85,7 @@ try {
   // D-23 (a) du 18/10/2026 — les relectures d'intention : un `verificateur` dont la description commence par « Relecture d'intention ».
   // Les jetons d'une relecture sont ceux de toutes ses réponses (5 + sortie + relus + 100 écrits en cache, ici) ; le seuil d'arrêt
   // de l'essai porte sur le total PAR JOUR.
-  const RELU = 200000, PAR_REPONSE = 5 + 10 + RELU + 100;
+  const RELU = 700000, PAR_REPONSE = 5 + 10 + RELU + 100;
   const relecture = (desc, quand, type = "verificateur") => [[reponse(`r1-${desc}-${quand}`, "claude-sonnet-5-5", 10, RELU, quand), reponse(`r2-${desc}-${quand}`, "claude-sonnet-5-5", 10, RELU, quand)], { agentType: type, description: desc }];
   const J15 = "2026-10-15T10:00:00.000Z", J16 = "2026-10-16T10:00:00.000Z";
   const tenu = projet("relectures-tenu", [], [relecture("Relecture d'intention fin-de-tour", J15), relecture("Relecture d'intention consigne", J16),
@@ -96,9 +96,9 @@ try {
     if (e.relectures !== 3) throw new Error(`relectures ${e.relectures}, attendu 3 : un verificateur « Relecture R01 aveugle » et un campagne « Relecture d'intention » ne comptent pas`);
     if (e.jetons !== 3 * 2 * PAR_REPONSE) throw new Error(`jetons ${e.jetons}, attendu ${3 * 2 * PAR_REPONSE}`);
     if (e.jetons_par_jour[Object.keys(e.jetons_par_jour).sort()[0]] !== 2 * 2 * PAR_REPONSE || Object.keys(e.jetons_par_jour).length !== 2) throw new Error(JSON.stringify(e.jetons_par_jour));
-    if (e.seuil_franchi !== false) throw new Error("seuil franchi à tort : 1 200 690 jetons répartis sur deux jours, chacun sous le million");
+    if (e.seuil_franchi !== false) throw new Error("seuil franchi à tort : 4 200 690 jetons répartis sur deux jours, chacun sous les 4 millions");
   });
-  check("rouge — plus de 1 000 000 de jetons de relecture en UN jour : le seuil d'arrêt est franchi, dit, exit 0, et le verdict de la flotte ne bouge pas", () => {
+  check("rouge — plus de 4 000 000 de jetons de relecture en UN jour : le seuil d'arrêt est franchi, dit, exit 0, et le verdict de la flotte ne bouge pas", () => {
     const r = lancer(franchi);
     const e = r.rapport.indicateurs.essai_relecture_intention;
     if (e.seuil_franchi !== true || e.jour_max.jetons !== 3 * 2 * PAR_REPONSE) throw new Error(JSON.stringify(e));
@@ -109,7 +109,7 @@ try {
   });
   check("vert — sans relecture d'intention, le relevé le dit (0, seuil tenu) ; un verificateur ordinaire ne compte pas", () => {
     const t = executer(["--transcripts", vert, "--depuis", "2026-10-01", "--referentiel", REF]).sortie;
-    if (!/0 relecture\(s\), 0 jetons ; aucun jour chargé — seuil de 1 000 000 jetons par jour tenu/.test(t)) throw new Error(t);
+    if (!/0 relecture\(s\), 0 jetons ; aucun jour chargé — seuil de 4 000 000 jetons par jour tenu/.test(t)) throw new Error(t);
   });
   check("bornes — --journal ajoute exactement une ligne datée et étiquetée", () => {
     const j = join(T, "journal.jsonl");

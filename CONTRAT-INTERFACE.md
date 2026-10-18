@@ -406,7 +406,7 @@ chaque règle de ce tableau dépendait de la consigne écrite au moment de l'app
 elle-même, le pilot prépare la relecture de sa consigne (`node scripts\relecture-intention.mjs --preparer consigne --fichier <consigne.md>`) et
 la passe à un `verificateur` dont la description commence par « Relecture d'intention » : il compare la consigne à la demande
 humaine du tour, citée mot pour mot depuis la transcription. Un écart majeur est corrigé dans la consigne ou posé à l'humain
-avant le lancement ; ce n'est qu'une alerte, jamais un blocage. Le relevé de flotte compte ces relectures et leurs jetons par
+avant le lancement ; ce n'est qu'une alerte, jamais un blocage. Depuis la boucle de correction (D-26 (a) du 18/10/2026), un écart majeur de nature `hors_demande` se corrige (la consigne avant le lancement, le travail en fin de tour, par le pilot ou par un agent `campagne` qui reçoit l'écart pour consigne) puis se relit, 2 passes au plus, alors qu'un écart de nature `choix_humain`, ou qui résiste, est posé à l'humain (`node scripts\relecture-intention.mjs --boucle <identifiant>`). Le relevé de flotte compte ces relectures et leurs jetons par
 jour, et dit si le seuil d'arrêt de l'essai est franchi. *Le fait* : la dérive TF-0176, « pour chaque liste » devenu
 « dès 8 lignes », est née dans une consigne.
 

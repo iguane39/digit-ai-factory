@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+  "date_iso": "2026-10-18T15:15:02.528Z",
+  "registre_version": "2.43.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+      "verdict": "PASS",
+      "detail": "5 constat(s) · 4 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (4 avertissement(s)) ; nombre « 4 000 000 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md",
+    "ts": "2026-10-18T15:15:02.527Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md": "679e80ea81cd32a96dd547a6bb0062a0734dde30cb38db4bc5f2e9fab05f0296"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

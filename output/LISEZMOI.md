@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 448 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 450 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -287,6 +287,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md | 20260830f | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` |
 | Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md | 20260917k | 17.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et cinq campagnes lancees - 20260917k.md` |
 | Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md | 20260916e | 17.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` |
+| Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md | 20261018n | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` |
 | Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md | 20260921b | 13.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Branche du pilot reportee sur une branche locale prete a publier - 20260921b.md` |
 | Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md | 20261003b | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` |
 | Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md | 20260915a | 22.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` |
@@ -349,6 +350,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md | 20260917g | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` |
 | Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md | 20260917h | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` |
 | Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md | 20261018j | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` |
+| Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md | 20261018l | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` |
 | Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md | 20260915d | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md | 20260831a | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md | 20261003a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` |

@@ -133,7 +133,7 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
   if (!/AUTRE poste n'y est pas visible/.test(sortieOuverturePilot)) throw new Error("la limite (autre poste) n'est pas dite");
 });
 // D-23 (a) du 18/10/2026 — l'ouverture du pilot affiche, dans « Flotte d'agents », les relectures d'intention de l'essai et dit
-// si le seuil d'arrêt (plus de 1 000 000 de jetons de relecture par jour) est franchi. Transcriptions SYNTHÉTIQUES d'un profil
+// si le seuil d'arrêt (plus de 4 000 000 de jetons de relecture par jour, D-25 du 18/10/2026) est franchi. Transcriptions SYNTHÉTIQUES d'un profil
 // jetable : ni le vrai poste (USERPROFILE/HOME vidés), ni le vrai relevé.
 {
   const maisonVide = mkdtempSync(join(tmpdir(), "hook-ouverture-maison-"));
@@ -144,7 +144,7 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
     const maintenant = new Date().toISOString();
     writeFileSync(join(d, "s1.jsonl"), JSON.stringify({ type: "assistant", timestamp: maintenant, message: { id: "a0", model: "claude-opus-5-5", usage: { output_tokens: 1 }, content: [{ type: "text", text: "x" }] } }) + NL);
     for (let i = 0; i < n; i++) {
-      const rep = (id) => JSON.stringify({ type: "assistant", timestamp: maintenant, effort: "medium", message: { id, model: "claude-sonnet-5-5", usage: { input_tokens: 5, output_tokens: 10, cache_read_input_tokens: 200000, cache_creation_input_tokens: 100 }, content: [{ type: "text", text: "x" }] } });
+      const rep = (id) => JSON.stringify({ type: "assistant", timestamp: maintenant, effort: "medium", message: { id, model: "claude-sonnet-5-5", usage: { input_tokens: 5, output_tokens: 10, cache_read_input_tokens: 700000, cache_creation_input_tokens: 100 }, content: [{ type: "text", text: "x" }] } });
       writeFileSync(join(d, "s1", "subagents", `agent-${i}.jsonl`), [rep(`r1-${i}`), rep(`r2-${i}`)].join(NL) + NL);
       writeFileSync(join(d, "s1", "subagents", `agent-${i}.meta.json`), JSON.stringify({ agentType: "verificateur", description: "Relecture d'intention fin-de-tour" }));
     }
@@ -153,14 +153,14 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
   const ouvrirAvec = (profil) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
     { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonVide, HOME: maisonVide } });
   const sortieTenu = ouvrirAvec(profilRelecture("tenu", 2)), sortieFranchi = ouvrirAvec(profilRelecture("franchi", 3));
-  check("D-23 vert — l'ouverture du pilot affiche les relectures d'intention (2 relectures, 800 460 jetons) et un seuil TENU", () => {
+  check("D-23 vert — l'ouverture du pilot affiche les relectures d'intention (2 relectures, 2 800 460 jetons) et un seuil TENU", () => {
     if (!/Flotte d'agents/.test(sortieTenu)) throw new Error("section « Flotte d'agents » absente");
-    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, revue le 2026-11-08.*2 relecture\(s\), 800 460 jetons.*seuil de 1 000 000 jetons par jour tenu/.test(sortieTenu))
+    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, revue le 2026-11-08.*2 relecture\(s\), 2 800 460 jetons.*seuil de 4 000 000 jetons par jour tenu/.test(sortieTenu))
       throw new Error((sortieTenu.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
-    if (/FRANCHI/.test(sortieTenu)) throw new Error("seuil dit franchi à 800 460 jetons");
+    if (/FRANCHI/.test(sortieTenu)) throw new Error("seuil dit franchi à 2 800 460 jetons");
   });
-  check("D-23 rouge — plus de 1 000 000 de jetons de relecture en un jour (3 relectures, 1 200 690) : l'ouverture dit FRANCHI et demande l'arrêt", () => {
-    if (!/3 relecture\(s\), 1 200 690 jetons.*\*\*FRANCHI : arrêter l'essai et demander à l'humain\*\*/.test(sortieFranchi))
+  check("D-23 rouge — plus de 4 000 000 de jetons de relecture en un jour (3 relectures, 4 200 690) : l'ouverture dit FRANCHI et demande l'arrêt", () => {
+    if (!/3 relecture\(s\), 4 200 690 jetons.*\*\*FRANCHI : arrêter l'essai et demander à l'humain\*\*/.test(sortieFranchi))
       throw new Error((sortieFranchi.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
   });
 }
