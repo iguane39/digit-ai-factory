@@ -30,4 +30,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261016-etude-opportunite-boucle-l99-jusqu-a-un-score.md` | fichier | 12,9 Ko | Étude d'opportunité — faire tourner « améliore le prompt » en boucle jusqu'à un score — 20 |
 | `20261018-etude-opportunite-flotte-d-agents.md` | fichier | 22,7 Ko | Étude d'opportunité — analyse critique de la flotte d'agents de la Factory et moyens de l' |
 
-_11 fichier(s), 2 sous-dossier(s)_
+_11 fichier(s), 2 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
