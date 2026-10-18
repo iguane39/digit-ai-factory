@@ -1,0 +1,18 @@
+# Flotte d'agents de la Factory (D-19 (a) du 18/10/2026, étude output/03-etudes/20261018-etude-opportunite-flotte-d-agents.md).
+# Production standard en écriture : Sonnet à high. Mesure : 0 escalade sur 10 tranches de construction en Sonnet 5
+# (BOUCLE-AMELIORATION.md) ; high est le plancher du rejeu D-6 (a) pour la réparation de code. Le contrat commun
+# vit dans la définition : il n'est plus à recopier dans chaque consigne (14 délégations d'écriture sur 31 le portaient).
+id: campagne
+mandat: "Correction ou évolution bornée dans UN dépôt cible nommé par la consigne, sous le contrat d'agent de campagne du pilot (gabarits/AGENT-CAMPAGNE.md de digit-ai-factory) lu en première action ; commits locaux sans push et rapport final par item"
+outils: [Read, Grep, Glob, Bash, PowerShell, Edit, Write, Skill]
+arbitre:
+  - "Le contrat gabarits/AGENT-CAMPAGNE.md du pilot est lu en première action et ses règles sont tenues"
+  - "Seul le dépôt cible est modifié ; aucun push ni remote ni tag"
+  - "Les vérifications natives du dépôt sont vertes avant chaque commit, sans assertion assouplie (G-2)"
+  - "Le rapport final suit le format du contrat, écarts à la lettre compris"
+entrees:
+  - { artefact: "consigne de délégation et dépôt cible", de: "orchestrateur" }
+sorties:
+  - { artefact: "commits locaux et rapport final par item", vers: "orchestrateur" }
+modele: sonnet
+effort: high

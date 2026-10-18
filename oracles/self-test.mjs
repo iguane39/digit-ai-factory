@@ -102,7 +102,9 @@ writeFileSync(join(verte, ".claude", "settings.json"),
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
       { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },
-        { type: "command", command: "node forge/hooks/factory.mjs remisage" }] }],
+        { type: "command", command: "node forge/hooks/factory.mjs remisage" }] },
+      // D-19 (a) (HERITAGE 1.29.0, 18/10/2026) : la flotte d'agents rappelée à chaque délégation.
+      { matcher: "Agent|Task", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs flotte" }] }],
     // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
     PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) }],
     UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } }) + "\n");

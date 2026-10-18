@@ -6,6 +6,15 @@ Le prompt d'un agent devient : **référence à ce gabarit + delta spécifique**
 items, vérifications propres). Le pilot colle le contenu de ce fichier en tête du prompt,
 ou donne son chemin à lire en première action.
 
+**Depuis le 18/10/2026 (D-19 (a)), le contrat vit dans la définition de l'agent.** Une délégation
+d'écriture se lance sur l'agent nommé `campagne` (Sonnet à high) ou, sur complexité manifeste ou
+escalade, `constructeur` (Opus à max) : leur définition (`gabarits\flotte\*.yaml`, compilée en
+`.claude\agents\`) impose de lire ce gabarit en première action, et porte modèle, effort et outils.
+Le fait : le 18/10, 14 délégations d'écriture du pilot sur 31 portaient ce contrat dans leur consigne.
+La consigne de l'appel ne porte plus que le delta. Fin de campagne : le pilot joue
+`node scripts\relever-flotte.mjs --depuis <début> --journal <journal> --etiquette <campagne>`, qui
+consigne modèle, effort, jetons et appels d'outils de chaque agent (CONTRAT-INTERFACE.md §4 bis).
+
 ## Contrat de l'agent de campagne
 
 **Langue.** Tout en français : commits, commentaires, rapports, noms de livrables.

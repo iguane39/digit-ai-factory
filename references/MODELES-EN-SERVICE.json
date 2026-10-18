@@ -1,7 +1,7 @@
 {
   "schema": "pilot/modeles-en-service@1",
-  "version": "1.2.0",
-  "date": "2026-10-15",
+  "version": "1.3.0",
+  "date": "2026-10-18",
   "pourquoi": "Loi transverse n° 4 : la génération de modèles est une donnée volatile. Elle vivait en prose au §4 de CONTRAT-INTERFACE.md, épinglée le 2026-08-10 et révisée seulement « à chaque changement de famille » : Fable 5.1, servie au pilotage dès le 02/09, et Opus 5.5, servie depuis le 23/09, n'ont déclenché aucune révision. Décision humaine D-1 (a) du 25/09/2026 : suivre par nom de famille, et mesurer la version servie.",
   "decision": "D-1 (a) du 2026-09-25, posée par la synthèse output/04-plans/Digit-AI - Synthese Conseil - Agents et nouvelles versions de modeles - 20260924b.md",
   "regle": "Un rôle se désigne par son NOM DE FAMILLE (fable, opus, sonnet, haiku), jamais par un identifiant : le nom suit la dernière version. Toute version servie absente de ce référentiel déclenche le re-test de la règle de challenge (CONTRAT-INTERFACE.md §4) et une mise à jour datée de ce fichier. Juge : oracles/oracle-modeles-en-service.mjs, joué à chaque ouverture de session du pilot par oracles/hook-ouverture.mjs.",
@@ -75,7 +75,13 @@
     "depuis": "2026-09-25",
     "declencheur": "Fable 5 vers Fable 5.1 et Opus 5 vers Opus 5.5, servies sans révision du tableau de routage ; puis Sonnet 5 vers Sonnet 5.5, servie depuis le 2026-10-03",
     "protocole": "CONTRAT-INTERFACE.md §4 bis : au premier run ou à la première campagne qui porte 2 tranches comparables, une tranche par modèle, coût comparé à qualité égale",
-    "clos_par": null
+    "clos_par": null,
+    "clos_en_partie": {
+      "par": "TF-1559, rejeu figé de 38 exécutions du 2026-10-01 (output/03-etudes/20261001-etude-resultats-rejeu-opus-5-5.md), clos au registre le 2026-10-13",
+      "couvre": "Opus 5.5 aux efforts max, high et medium, Sonnet 5 à high et Opus 5 à high, sur 6 classes de tâche",
+      "reste": "Sonnet 5.5 et Haiku 4.5 n'ont jamais été mesurés, ni la classe « vérification » ; le statut reste « du » pour eux (relevé du 2026-10-18, D-19 (a))",
+      "protocole_restant": "au premier relevé de flotte (scripts/relever-flotte.mjs) qui porte 2 tranches comparables d'explorateur (Haiku) et de verificateur (Sonnet 5.5) contre le modèle supérieur, coût comparé à qualité égale (CONTRAT-INTERFACE.md §4 bis)"
+    }
   },
   "effort_par_classe": {
     "version": "1.0.0",
@@ -101,6 +107,48 @@
       "ou": "`modelSettings` → `claude-opus-5-5` → `effortLevel` dans settings.json de chaque profil ~/.claude*, et aucune variable CLAUDE_CODE_EFFORT_LEVEL posée au lancement, qui primerait",
       "geste": "humain : réglage du poste, hors dépôt"
     }
+  },
+  "flotte": {
+    "date": "2026-10-18",
+    "decision": "D-19 (a) du 2026-10-18, sur l'étude output/03-etudes/20261018-etude-opportunite-flotte-d-agents.md",
+    "regle": "Une délégation vise un agent NOMMÉ de la flotte, qui porte son modèle, son effort et ses outils dans sa définition (gabarits/flotte/<id>.yaml, compilée en .claude/agents/<id>.md par compile-agent-def.mjs de forge-agents) ; l'agent générique ne se garde qu'en déclarant `model` ET `effort` à l'appel. Rappel : oracles/hook-flotte.mjs (PreToolUse, avertit). Mesure : scripts/relever-flotte.mjs, à chaque ouverture. Changer un modèle ou un effort de la flotte demande une mesure citée (CONTRAT-INTERFACE.md §4 bis).",
+    "agents": [
+      {
+        "id": "explorateur",
+        "famille": "haiku",
+        "effort": null,
+        "classe": "extraction mécanique, inventaire, comptage",
+        "fondement": "tableau §4 (mécanique → Haiku) ; Haiku absent du rejeu, aucun effort déclaré : re-test dû"
+      },
+      {
+        "id": "verificateur",
+        "famille": "sonnet",
+        "effort": "medium",
+        "classe": "vérification d'état en lecture seule",
+        "fondement": "plancher medium du rejeu pour l'extraction (Opus) ; 17 sous-agents Sonnet 5.5 du pilot servis à medium depuis le 13/10 sans escalade consignée ; re-test dû"
+      },
+      {
+        "id": "campagne",
+        "famille": "sonnet",
+        "effort": "high",
+        "classe": "production standard en écriture dans un dépôt",
+        "fondement": "0 escalade sur 10 tranches de construction en Sonnet 5 (BOUCLE-AMELIORATION.md) ; high, plancher du rejeu pour la réparation de code"
+      },
+      {
+        "id": "constructeur",
+        "famille": "opus",
+        "effort": "max",
+        "classe": "construction-complexe",
+        "fondement": "table effort_par_classe ci-dessus, classe construction-complexe (non rejouée : max)"
+      },
+      {
+        "id": "redacteur",
+        "famille": "sonnet",
+        "effort": "high",
+        "classe": "étude, synthèse, document sous gabarit",
+        "fondement": "high retenu par le rejeu pour les classes restitution et étude"
+      }
+    ]
   },
   "sessions": {
     "date": "2026-10-13",

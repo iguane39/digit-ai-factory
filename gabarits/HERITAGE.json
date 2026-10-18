@@ -1,7 +1,8 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.28.0",
-  "date": "2026-10-17",
+  "version": "1.29.0",
+  "date": "2026-10-18",
+  "evolution_1_29_0": "Décision humaine D-19 (a) du 18/10/2026, sur l'étude `output/03-etudes/20261018-etude-opportunite-flotte-d-agents.md` — LA FLOTTE D'AGENTS VOYAGE AVEC LE PRODUIT. Le fait : relevé du 18/10 sur 30 jours, les sessions des produits ont lancé 97 sous-agents, dont 75 sans modèle nommé, donc au modèle et à l'effort de la session (Opus à l'effort le plus haut le plus souvent) ; aucun appel, au pilot comme chez un produit, ne transmettait l'effort de sa classe de tâche. CE QUI CHANGE POUR CELUI QUI PRODUIT : (1) cinq agents nommés arrivent sous `.claude/agents/` — `explorateur` (lecture et comptage mécaniques, Haiku), `verificateur` (rejouer et dire si c'est fait, Sonnet à medium), `campagne` (écrire dans UN dépôt sous le contrat AGENT-CAMPAGNE, Sonnet à high), `constructeur` (construction complexe, Opus à max), `redacteur` (document sous gabarit, Sonnet à high) ; chacun porte son modèle, son effort et ses outils, et se lance par `subagent_type` ; (2) le hook `flotte` (PreToolUse sur l'outil Agent) rappelle cette flotte quand une délégation vise l'agent générique sans déclarer `model` ET `effort` ; il avertit, il ne bloque pas. Les définitions sont des copies conformes : un produit qui veut un agent de plus en crée un sous un autre nom, il ne réécrit pas ceux de la flotte. L'ouverture suivante les met en place.",
   "evolution_1_28_0": "Décision humaine du 17/10/2026 (« Format B, mais conserve les lettres (a,b,c...) pour les choix des décisions ») — `forge/RESTITUTION.md` passe en v2.41.0. CE QUI CHANGE POUR CELUI QUI PRODUIT : une décision du bloc 3 s'écrit au format B, pour se comprendre et se trancher sans rien d'autre qu'elle-même : trois lignes citées « De quoi s'agit-il » (l'objet nommé, une valeur sensible masquée, première et dernière lettre visibles), « Le problème » (ce qui est en jeu, un ou deux chiffres), « Pourquoi vous » (le motif qui revient à l'humain), puis la recommandation sourcée ; hors citation, le tableau « Option | Ce qui se passe | Coût | Retour arrière » aux options (a), (b), (c) ; puis « Sans réponse ». Le juge partagé l'accepte (S15, S31, S32) et en contrôle les pièces (S78, avertissante). Le fait : le 17/10, une décision conforme aux règles du bloc 3 demandait si « ce sigle » était sensible sans dire lequel. Les restitutions déjà écrites ne se réécrivent pas. AUSSI, décisions du même jour : (D-3 (a), TF-1212) `CLAUDE.md` du produit ne propose plus de route de déploiement manuelle « à porte » : toute mise en production d'un environnement géré passe par le pipeline, et le dossier de MEP porte trois sections jugées en avertissement (chaîne de déploiement, sauvegarde et restauration, fournisseur d'identité ; portes M-16 à M-18 d'`ETAPE-MEP.md`, `scripts/verifier-exigences-fatales.mjs`) — un produit déjà livré n'est averti qu'à sa prochaine MEP ; (D-6 (a), TF-0963) quand une session s'ouvre dans un dossier client qui CONTIENT le produit, `gabarits/settings-dossier-englobant.json` se copie en `.claude/settings.json` de ce dossier (marqueur <PRODUIT> remplacé) : seule la reconnaissance des mots-clés y est déléguée au produit, et ce fichier ne voyage pas par la copie d'ouverture, il se pose sur le geste que nomme le contrôle d'ouverture (PD3, PD4).",
   "evolution_1_27_0": "TF-1821, 15/10/2026 (lot Produit-64 20261015e, RT-64 ; décision humaine D-1 (a) du 15/10/2026) — le gabarit d un lot de retours et le référentiel des classes passent par RELAIS, comme le juge du lot depuis 1.24.0. Le fait : `gabarits/RETOURS-FORGES.md` (7 versions du 15/09 au 15/10) et `todo/CLASSES.json` (27 versions) étaient recopiés chez chaque produit ; la remise à niveau de l ouverture laissait le produit conforme sur le disque et divergent de HEAD à chaque version du pilot, ce que le relevé disait (« non commis », TF-0848) sans pouvoir l empêcher de revenir. Ce qui change pour celui qui produit : `forge/retours/GABARIT-LOT-RETOURS.md` vient de `gabarits/GABARIT-LOT-RELAIS.md` et `forge/retours/CLASSES.json` de `gabarits/CLASSES-RELAIS.json`, deux relais stables qui nomment le pilot et les chemins à lire (`gabarits/RETOURS-FORGES.md`, `todo/CLASSES.json`) ; l ouverture suivante les met en place, le produit les commet une fois, puis une version neuve du gabarit ou des classes ne touche plus son dépôt. Un lot s écrit en lisant le gabarit et les classes AU PILOT ; le juge (`forge/retours/oracle-lot.mjs`) lisait déjà les classes du pilot. Recette : `scripts/relever-heritage.test.mjs`, cas TF-1821.",
   "evolution_1_26_0": "TF-1736, 15/10/2026 (lot Produit-12 20261014b, RS-33 ; décision humaine D-3 (b) du 15/10/2026 « 3b ») — un produit dont le développeur a déclaré un canal de reprise se reprend sur tous ses postes sans geste humain (R-64). Le fait : le 14/10, un dossier Google Drive de reprise contenait les 58 générateurs des pages d un produit ; une session de l autre poste les a déclarés introuvables, et une session de ce poste a laissé leur transport à l humain. Ce qui change pour celui qui produit : `.claude/settings.json` câble le hook `reprise` à l ouverture (`factory.mjs reprise --restaurer`, asynchrone) et en fin de tour (`factory.mjs reprise --pousser`) — le hook d ouverture du produit les ajoute lui-même depuis le gabarit (1.24.0) ; `CLAUDE.md` porte la section « Reprise sur un autre poste (R-64) », qui fait écrire `forge/REPRISE.json` depuis `gabarits/REPRISE.json` dès que le développeur dit travailler sur plusieurs postes. Sans manifeste, le hook se tait ; l envoi exige le feu vert de publication consigné au manifeste (R-38) ; les secrets ne transitent jamais. Juge : `oracles/oracle-reprise.mjs` (RP1 à RP5) et S77 d oracle-synthese.",
@@ -111,7 +112,8 @@
         "forge/hooks/factory.mjs ecriture",
         "forge/hooks/factory.mjs droits-accordes",
         "forge/hooks/factory.mjs lexique",
-        "forge/hooks/factory.mjs reprise"
+        "forge/hooks/factory.mjs reprise",
+        "forge/hooks/factory.mjs flotte"
       ],
       "motifs_derives_du_gabarit": "TF-1756 (15/10/2026) : un motif par commande `forge/hooks/factory.mjs <nom>` de gabarits/settings-produit.json ; la recette scripts/relever-heritage.test.mjs (cas TF-1756) échoue dès qu'une commande du gabarit n'est pas exigée ici. Un produit écarte un hook en le déclarant sous `_hooks_factory_exclus` ({commande, motif}) dans son settings.json : la commande y étant écrite, le motif est tenu (écart déclaré, pas oubli). Le hook d'ouverture du produit ajoute toute entrée absente (TF-1755), donc l'exigence se répare à l'ouverture.",
       "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
@@ -281,6 +283,56 @@
       "depuis": "2026-10-13",
       "familles_protegees": [
         "restitution-forme"
+      ]
+    },
+    {
+      "source": ".claude/agents/explorateur.md",
+      "cible": ".claude/agents/explorateur.md",
+      "mode": "copie_conforme",
+      "motif": "agent `explorateur` de la flotte (lecture et comptage mécaniques, Haiku), compilé depuis `gabarits/flotte/explorateur.yaml` par `compile-agent-def.mjs` de forge-agents : modèle, effort et outils DÉCLARÉS au lieu d'être hérités de la session. Copie conforme : le rappel du hook `flotte` et le relevé de flotte comptent ce nom. Le fait : relevé du 18/10/2026, 75 délégations sur 97 chez les produits sans modèle nommé, et aucune avec l'effort de sa classe (D-19 (a)).",
+      "depuis": "2026-10-18",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque"
+      ]
+    },
+    {
+      "source": ".claude/agents/verificateur.md",
+      "cible": ".claude/agents/verificateur.md",
+      "mode": "copie_conforme",
+      "motif": "agent `verificateur` de la flotte (rejouer une recette ou un oracle et dire si c'est fait, Sonnet à medium), compilé depuis `gabarits/flotte/verificateur.yaml` par `compile-agent-def.mjs` de forge-agents : modèle, effort et outils DÉCLARÉS au lieu d'être hérités de la session. Copie conforme : le rappel du hook `flotte` et le relevé de flotte comptent ce nom. Le fait : relevé du 18/10/2026, 75 délégations sur 97 chez les produits sans modèle nommé, et aucune avec l'effort de sa classe (D-19 (a)).",
+      "depuis": "2026-10-18",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque"
+      ]
+    },
+    {
+      "source": ".claude/agents/campagne.md",
+      "cible": ".claude/agents/campagne.md",
+      "mode": "copie_conforme",
+      "motif": "agent `campagne` de la flotte (écrire dans UN dépôt sous le contrat AGENT-CAMPAGNE, Sonnet à high), compilé depuis `gabarits/flotte/campagne.yaml` par `compile-agent-def.mjs` de forge-agents : modèle, effort et outils DÉCLARÉS au lieu d'être hérités de la session. Copie conforme : le rappel du hook `flotte` et le relevé de flotte comptent ce nom. Le fait : relevé du 18/10/2026, 75 délégations sur 97 chez les produits sans modèle nommé, et aucune avec l'effort de sa classe (D-19 (a)).",
+      "depuis": "2026-10-18",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque"
+      ]
+    },
+    {
+      "source": ".claude/agents/constructeur.md",
+      "cible": ".claude/agents/constructeur.md",
+      "mode": "copie_conforme",
+      "motif": "agent `constructeur` de la flotte (construction complexe sur complexité manifeste ou escalade, Opus à max), compilé depuis `gabarits/flotte/constructeur.yaml` par `compile-agent-def.mjs` de forge-agents : modèle, effort et outils DÉCLARÉS au lieu d'être hérités de la session. Copie conforme : le rappel du hook `flotte` et le relevé de flotte comptent ce nom. Le fait : relevé du 18/10/2026, 75 délégations sur 97 chez les produits sans modèle nommé, et aucune avec l'effort de sa classe (D-19 (a)).",
+      "depuis": "2026-10-18",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque"
+      ]
+    },
+    {
+      "source": ".claude/agents/redacteur.md",
+      "cible": ".claude/agents/redacteur.md",
+      "mode": "copie_conforme",
+      "motif": "agent `redacteur` de la flotte (document sous gabarit jugé par son oracle, Sonnet à high), compilé depuis `gabarits/flotte/redacteur.yaml` par `compile-agent-def.mjs` de forge-agents : modèle, effort et outils DÉCLARÉS au lieu d'être hérités de la session. Copie conforme : le rappel du hook `flotte` et le relevé de flotte comptent ce nom. Le fait : relevé du 18/10/2026, 75 délégations sur 97 chez les produits sans modèle nommé, et aucune avec l'effort de sa classe (D-19 (a)).",
+      "depuis": "2026-10-18",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque"
       ]
     }
   ],

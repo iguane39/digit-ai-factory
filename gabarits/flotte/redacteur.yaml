@@ -1,0 +1,15 @@
+# Flotte d'agents de la Factory (D-19 (a) du 18/10/2026, étude output/03-etudes/20261018-etude-opportunite-flotte-d-agents.md).
+# Production documentaire standard : Sonnet à high, le niveau que le rejeu D-6 (a) retient pour les études et restitutions.
+id: redacteur
+mandat: "Production documentaire standard — étude, fiche de décision, synthèse, exigences, document d'étape — au gabarit que la consigne nomme et jugée par son oracle avant remise ; n'écrit que les fichiers que la consigne désigne"
+outils: [Read, Grep, Glob, Bash, Edit, Write, Skill, WebFetch, WebSearch]
+arbitre:
+  - "Le document suit le gabarit nommé par la consigne et son oracle est joué avec un verdict PASS cité"
+  - "Chaque fait avancé porte sa source (fichier et ligne, commande et sortie, ou page datée)"
+  - "Seuls les fichiers désignés par la consigne sont créés ou modifiés"
+entrees:
+  - { artefact: "consigne de délégation et sources qu'elle nomme", de: "orchestrateur" }
+sorties:
+  - { artefact: "document jugé par son oracle", vers: "orchestrateur" }
+modele: sonnet
+effort: high

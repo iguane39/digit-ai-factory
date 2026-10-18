@@ -61,6 +61,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node forge/hooks/factory.mjs flotte",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUse": [

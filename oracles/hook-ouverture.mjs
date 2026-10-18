@@ -712,6 +712,28 @@ if (iPilot < 0) {
   }
 }
 
+// D-19 (a) du 18/10/2026 (étude 20261018a) — LA FLOTTE D'AGENTS SE VOIT À L'OUVERTURE. Le 18/10, 191 sous-agents
+// génériques sur 201 en 30 jours, aucun appel avec l'effort de sa classe, et aucune consignation au ledger depuis le
+// 25/09 : le tableau de routage ne recevait plus de mesure. Le relevé lit les transcriptions des 14 derniers jours
+// et dit les 3 critères de la revue du 2026-11-01. Il ne bloque jamais l'ouverture.
+if (iPilot < 0) {
+  const rf = join(PILOT, "scripts", "relever-flotte.mjs");
+  if (existsSync(rf)) {
+    lignes.push("", "## Flotte d'agents (D-19 (a) du 18/10/2026, relevé des 14 derniers jours)");
+    const r = spawnSync(process.execPath, [rf, "--jours", "14", "--json"], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- relevé ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la flotte : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else {
+      const I = j.indicateurs;
+      const pc = (x) => (x === null ? "—" : `${Math.round(x * 100)} %`);
+      lignes.push(`- verdict ${j.verdict} — ${I.appels} appel(s) de l'outil Agent : ${I.appels_vers_agent_nomme} vers un agent nommé (${pc(I.part_nommee)}), ${I.appels_avec_derogation} dérogation(s) dite(s), ${I.appels_hors_flotte} hors flotte ; ${I.delegations_opus_sans_effort} délégation(s) Opus sans effort ; ${I.reponses_hors_generation} réponse(s) hors génération courante`);
+      for (const c of (j.criteres || []).filter((x) => x.tenu === false)) lignes.push(`- NON TENU : ${c.critere}`);
+      lignes.push("- détail et consignation de fin de campagne : `node scripts/relever-flotte.mjs [--journal <fichier> --etiquette <campagne>]`");
+    }
+  }
+}
+
 // TF-1576 (13/10/2026) — L'ANNONCE DIT L'ÉTAT MESURÉ DES CROCHETS, PAS CELUI QU'ON SUPPOSE. Un produit
 // dont `.claude/settings.json` ne déclare aucun PostToolUse n'a aucune régénération des README après
 // écriture : l'annonce l'affirmait pourtant, et la restitution l'a recopiée avant mesure (index périmé

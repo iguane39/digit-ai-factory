@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md",
+ "empreinte": "44c2dbfbbedf8faaf777bdd5e385cc90c755834a27fd5429f461956bf4bdf9df",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-18T06:24:32.827Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

@@ -1,10 +1,12 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a30d86c0476355e71\\gabarits\\AGENT-CAMPAGNE.md",
-  "date_iso": "2026-10-02T07:36:46.102Z",
-  "registre_version": "2.35.0",
+  "cible": "C:\\dev\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
+  "date_iso": "2026-10-18T05:56:01.480Z",
+  "registre_version": "2.43.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 4,
     "fail": 0,
@@ -44,34 +46,34 @@
       "domaine": "Calculs / chiffres",
       "file": "gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune table détectée, aucun effectif annoncé ancré, aucun pourcentage ni unité publiés"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "PASS",
-      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; nombre « 1 024 » non sourcé"
+      "detail": "6 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; nombre « 1 024 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
       "file": "gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
       "file": "gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\AGENT-CAMPAGNE.md",
-    "ts": "2026-10-02T07:36:46.101Z",
+    "ts": "2026-10-18T05:56:01.479Z",
     "fichiers": {
-      "gabarits\\AGENT-CAMPAGNE.md": "99cba3317e26f6ca3badfabd9c11d55b4ec77a66b44c80f8557351759ca753dc"
+      "gabarits\\AGENT-CAMPAGNE.md": "c69d65185aab53482c5df62712dbcd5d68b4b03dbdde6f52e8a39f230df63cce"
     }
   },
   "empreinte_motif": null,

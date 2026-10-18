@@ -49,7 +49,10 @@ const [nom, ...options] = process.argv.slice(2);
 // un produit dont le développeur a déclaré un canal de reprise (forge/REPRISE.json) se reprend sur tous ses
 // postes sans geste humain : restauration depuis le canal à l'ouverture, envoi vers le canal en fin de tour
 // sous le feu vert de publication consigné. Ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise"]);
+// `flotte` (18/10/2026, décision humaine D-19 (a)) : hook PreToolUse sur l'outil Agent — une délégation vise un
+// agent nommé de la flotte (`.claude/agents/`, modèle, effort et outils déclarés), ou déclare `model` ET `effort`
+// pour garder l'agent générique ; sinon un rappel entre dans le contexte de la session. Avertit, ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [

@@ -388,6 +388,19 @@ symétriques — déléguer un arbitrage, et facturer un travail mécanique au p
 | Production standard (documents d'étape, exigences, tokens, tests simples) | Sonnet | **défaut** |
 | Tâches mécaniques (extraction, reformatage, vérifications simples) | Haiku | quand la tâche est purement mécanique |
 
+**La flotte d'agents porte ce tableau dans ses définitions** (décision humaine D-19 (a) du 18/10/2026, étude
+`output\03-etudes\20261018-etude-opportunite-flotte-d-agents.md`). Une délégation vise un agent NOMMÉ, par
+`subagent_type` : `explorateur` (mécanique, Haiku), `verificateur` (vérification d'état en lecture seule, Sonnet à
+medium), `campagne` (écriture dans UN dépôt sous `gabarits\AGENT-CAMPAGNE.md`, Sonnet à high), `constructeur`
+(construction complexe, Opus à max), `redacteur` (document sous gabarit, Sonnet à high). Chacun déclare son modèle,
+son effort et ses outils dans `gabarits\flotte\<id>.yaml`, compilé en `.claude\agents\<id>.md` par
+`compile-agent-def.mjs` de forge-agents, et voyage chez les produits par l'héritage (HERITAGE 1.29.0). L'agent
+générique ne se garde qu'en déclarant `model` ET `effort` à l'appel : c'est une dérogation dite. Le fait qui l'impose :
+le 18/10/2026, 191 sous-agents génériques sur 201 en 30 jours, et aucun appel sur 157 avec l'effort de sa classe ;
+chaque règle de ce tableau dépendait de la consigne écrite au moment de l'appel. Rappel à l'appel :
+`oracles\hook-flotte.mjs` (PreToolUse, avertit). Référentiel daté : clé `flotte` de
+`references\MODELES-EN-SERVICE.json`.
+
 **Le modèle se désigne par son NOM DE FAMILLE, jamais par un identifiant** (décisions humaines
 D-1 (a) et D-2 (a) du 25/09/2026). `opus`, `sonnet`, `haiku` et `fable` suivent la dernière
 version sans qu'aucun fichier ne bouge : à l'appel d'un agent, dans la définition d'un agent
@@ -432,6 +445,12 @@ comparative — un a priori jamais confronté. Protocole, appliqué à toute cam
    l'affectation, tokens consommés (relevés du harnais), nombre de passes, verdict des
    vérifications natives. `escalade_modele` se consigne **même
    « aucune »** — l'absence d'escalade est une donnée, pas un silence.
+   **Depuis le 18/10/2026 (D-19 (a)), le relevé produit cette consignation** : `node scripts\relever-flotte.mjs
+   --depuis <début de campagne> --journal <journal de campagne> --etiquette <campagne>` lit dans les transcriptions,
+   par sous-agent, le type, le modèle et l'effort servis, les jetons et les appels d'outils, et ajoute une ligne
+   datée au journal. La consignation à la main avait cessé : aucune invocation au ledger après le 25/09, aucun
+   journal de campagne après le 01/10. Le relevé joue aussi à chaque ouverture du pilot (section « Flotte
+   d'agents »), avec les 3 critères de la revue du 2026-11-01.
 2. **Tranches comparables** : dès qu'une campagne comporte ≥ 2 tranches de nature équivalente
    (même type de correctif, dépôts différents), affecter A→Sonnet et B→Opus et comparer coût
    par tranche **à qualité égale** (vérification native verte dans les 2 cas).
@@ -508,7 +527,7 @@ dans une boucle est une dette qu'on a acceptée sans le dire.
 | Design | méthode des **4 skills** (INSTALLÉS au poste le 14/08) + `node oracles/run-oracles-design.mjs <html> [--rendu] --tokens <css> --json-only` ; **aval** : mode critique d'implémentation (étape 5 bis, produit vs promesse design du run) | **natif (skills + oracles)** | ~~D-D1~~ **soldée le 14/08** (4 skills installés) ; ~~D-D2~~ **périmée, constatée le 14/08** : « C1/C6/C7 sans exécutant local » avait pour cause l'absence de skills installés — les 5 skills design sont au poste, `oracle-motion` est committé (la faiblesse « jamais committé » du 08/08 a disparu) et l'arbre est propre. La dette décrivait un état qui n'existe plus ; l'appellation C1/C6/C7 elle-même ne désigne plus rien dans le corpus ; **D-D3 requalifiée** : ce n'est pas « pas de producteur d'images » — la capacité EXISTE et a été exercée (cat-des-06, trois visuels réels jugés PASS le 12/08, via le pilot). Ce qui manque est un producteur **local à design**, et cela seul reste **bloqué par garde-fou** (feu vert coût API) : décision humaine d'outillage, pas un correctif ; ~~D-D4~~ **soldée** (audit 14/08 : le README documente le runner, la dette était périmée) |
 | Development | construction directe par agent (méthode du run-playbook lue comme spec), gates rejoués : `ruff check` + `pytest` sur le produit | degrade **assumé** | D-V1 : `conductor` inutilisable en headless — **assumée le 14/08** : la construction directe par agent EST le mode de travail réel et prouvé ; conductor ne se répare que si un besoin HITL réapparaît ; D-V2 : ~~volet design soldé 07/08~~ ; reste le volet conception (EXIGENCES.json → `_bmad-output/`) ; ~~D-V3~~ **arbitrée le 14/08 (mandat humain « fais D »)** : Conception FAIT FOI pour les exigences (le volet conception de BMAD est une dette, jamais une source) ; les gates de development sont des contrôles PRÉ-COMMIT du constructeur, forge-tests est l'AUDIT indépendant post-construction — le recouvrement est voulu (deux regards), pas un doublon |
 | Tests | `uv run python -m forge_tests <racine-produit> --json` (capture stdout) | **natif** | D-T1 : exit 3 (PARTIEL) — **requalifiée assumée le 14/08** : c'est le CONTRAT de sortie (des pans non jouables dans l'environnement se déclarent), pas un défaut ; ~~D-T2~~ **soldée** (audit 14/08 : `--sortie <fichier>` persiste le rapport, `__main__.py`) ; ~~D-T3~~ **soldée** (audit 14/08 : `TimeoutExpired` attrapée partout — `execution.py` décrit le bug au passé, `visuel.py` l.110 — et G-1 prouvée par la recette : 13 sources empreintées, aucune altérée) ; ~~D-T4~~ **soldée** (audit 14/08 : messages `--generer` routés sur stderr, « stdout JSON PUR » — `__main__.py` l.260) |
-| Agents (transverse) | ledger contract + `compile-agent-def.mjs` si des agents dédiés sont justifiés ; sinon Agent tool du harnais | degrade | D-A1 : composition conversationnelle par doctrine ; D-A2 : `ledger.mjs` sans verrou → règle écrivain unique ; D-A3 : gates G1-G3 inactifs hors session dédiée |
+| Agents (transverse) | flotte nommée compilée par `compile-agent-def.mjs` (`gabarits\flotte\*.yaml` → `.claude\agents\`, D-19 (a) du 18/10/2026), lancée par l'Agent tool du harnais ; mesure par `scripts\relever-flotte.mjs` ; ledger contract pour les runs | natif (flotte) + degrade (composition) | D-A1 : composition conversationnelle par doctrine ; D-A2 : `ledger.mjs` sans verrou → règle écrivain unique ; D-A3 : gates G1-G3 inactifs hors session dédiée |
 | Ops (transverse, outille la MEP — 11/08) | dépôt `digit-ai-forge-ops` — verbes : `node <ops>\scripts\ops.mjs deployer\|restaurer\|etat <cible>` ; verdicts : `node <ops>\oracles\oracle-ops.mjs <cible> --json-only` (O-1…O-4, consommés par M-1…M-5) ; preuve : `oracles/self-test.mjs` rejoue un déploiement réel local + rollback | **natif** | D-P1 (amendée 11/08, TF-0081) : plans cloud **plan-first** livrés pour railway/gcp/azure/aws (`ops.mjs plan` + O-5, fiches expert admises) — reste ouvert : **exécution réelle à consigner par cible** au premier run MEP ; D-P2 : invocation par le pilot uniquement, jamais par les produits en direct |
 | Data (transverse, discipline — 11/08) | dépôt `digit-ai-forge-data` — verdicts : `node <data>\oracles\oracle-profiler.mjs <assertions.json>` · `oracle-tracer.mjs <lineage.json>` · `oracle-restituer.mjs <rapport.md>` (contrat JSON, exit 0/1/2) ; formats `forge-data/assertions@1`, `forge-data/lineage@1` ; barres : Great Expectations / OpenLineage / dbt (registre la-barre) | **natif** | D-D1 : grain dataset (colonne→colonne hors v0) ; D-D2 : véracité runtime non capturée (déclaratif jugé, exécution réelle non observée) ; composition data-quality-auditor conversationnelle |
 | Agents-security (transverse, sur mandat — 12/08, TF-0111) | dépôt `digit-ai-forge-agents-security` — verdicts : `node <sec>\oracles\oracle-scan-agentdef.mjs <def>` · `node <sec>\oracles\oracle-scan-toolcalls.mjs <journal.jsonl> --perimetre <racine>` (contrat JSON, exit 0/1/2, fail-closed) ; preuve : `oracles/self-test.mjs` 24 PASS | **natif** | D-AS1 : v0 lexicale (pas de sandbox ni d'analyse sémantique, README §Limites) ; D-AS2 : référentiel d'outils manuel ; jamais exercée sur agent réel |
