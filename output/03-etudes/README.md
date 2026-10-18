@@ -29,5 +29,9 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261013-revue-essai-niveaux-d-intervention.md` | fichier | 10,5 Ko | Revue de l'essai des niveaux Simple et Moyen : critères écrits d'avance, rejoués le 2026-1 |
 | `20261016-etude-opportunite-boucle-l99-jusqu-a-un-score.md` | fichier | 12,9 Ko | Étude d'opportunité — faire tourner « améliore le prompt » en boucle jusqu'à un score — 20 |
 | `20261018-etude-opportunite-flotte-d-agents.md` | fichier | 22,7 Ko | Étude d'opportunité — analyse critique de la flotte d'agents de la Factory et moyens de l' |
+| `20261018-etude-opportunite-relecteur-d-intention-v2.md` | fichier | 18,0 Ko | Étude d'opportunité — un relecteur d'intention sur tous les travaux de la Factory, version |
+| `20261018-etude-opportunite-relecteur-d-intention.md` | fichier | 18,3 Ko | Étude d'opportunité — un relecteur critique qui garde l'intention initiale d'une demande — |
+| `20261018-L99-relecteur-critique-d-intention.md` | fichier | 22,7 Ko | Analyse L99 — « un relecteur critique qui garde l'intention initiale » — 20261018 |
+| `20261018-mesure-relecteur-d-intention.json` | fichier | 14,7 Ko | JSON |
 
-_11 fichier(s), 2 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_15 fichier(s), 2 sous-dossier(s)_

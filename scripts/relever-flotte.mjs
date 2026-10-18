@@ -16,6 +16,9 @@
  *     appels d'outils ;
  *   · les réponses servies par un modèle HORS DE LA GÉNÉRATION COURANTE de `references/MODELES-EN-SERVICE.json`,
  *     sessions comprises (le juge externe `oracle-judge` y tournait sur Opus 4.6 le 18/10).
+ *   · les RELECTURES D'INTENTION de l'essai du 18/10/2026 (D-23 (a), `references/RELECTURE-INTENTION.md`) : les sous-agents
+ *     `verificateur` dont la description commence par « Relecture d'intention », leurs jetons par jour, et si le SEUIL
+ *     D'ARRÊT de l'essai (plus de 1 000 000 de jetons de relecture par jour) est franchi — il se dit à part des critères.
  * Et il juge les 4 critères de revue écrits d'avance par l'étude (revue du 2026-11-01) : part des appels vers un
  * agent nommé ≥ 90 % ; 0 délégation Opus sans effort déclaré ; 0 réponse hors génération courante ; et il donne la
  * médiane des jetons relus par sous-agent, à comparer à la période de l'étude.
@@ -34,12 +37,17 @@ import { join, dirname, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dossiersParDefaut } from "./relever-contexte-sessions.mjs";
 
-export const VERSION = "1.0.0";
+export const VERSION = "1.1.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const REF_DEFAUT = join(ICI, "..", "references", "MODELES-EN-SERVICE.json");
 export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan", ""]);
 export const INTEGRES_FIXES = new Set(["claude-code-guide", "statusline-setup"]);
 export const SEUILS = { part_nommee_min: 0.9, opus_sans_effort_max: 0, hors_generation_max: 0 };
+/** L'essai de relecture d'intention (D-23 (a) du 18/10/2026, `references/RELECTURE-INTENTION.md`) : dates et seuil d'arrêt. */
+export const ESSAI_RELECTURE = { debut: "2026-10-18", fin: "2026-11-01", revue: "2026-11-08", seuil_jetons_par_jour: 1000000 };
+/** Une relecture d'intention est un sous-agent `verificateur` dont la description commence par « Relecture d'intention ». */
+export const estRelectureIntention = (type, description) => type === "verificateur" && /^\s*relecture d['’]intention/i.test(String(description || ""));
+const jourLocal = (iso) => { const d = new Date(iso); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 
 const lignes = (txt) => txt.split("\n").filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
 const mediane = (xs) => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : null; };
@@ -117,7 +125,7 @@ export function relever(dossiers, depuisIso, courants) {
       continue;
     }
     let meta = {}; try { meta = JSON.parse(readFileSync(t.fichier.replace(/\.jsonl$/, ".meta.json"), "utf8")); } catch { /* méta absente */ }
-    const g = { projet, type: meta.agentType ?? "?", servis: {}, efforts: {}, sortie: 0, relus: 0, outils: 0 };
+    const g = { projet, type: meta.agentType ?? "?", description: meta.description ?? "", jour: jourLocal(rep[0].timestamp), servis: {}, efforts: {}, sortie: 0, relus: 0, total: 0, outils: 0 };
     const u0 = rep[0].message.usage || {};
     g.contexte_initial = (u0.input_tokens || 0) + (u0.cache_read_input_tokens || 0) + (u0.cache_creation_input_tokens || 0);
     for (const r of rep) {
@@ -125,6 +133,7 @@ export function relever(dossiers, depuisIso, courants) {
       if (r.effort) g.efforts[r.effort] = (g.efforts[r.effort] || 0) + 1;
       const u = r.message.usage || {};
       g.sortie += u.output_tokens || 0; g.relus += u.cache_read_input_tokens || 0;
+      g.total += (u.input_tokens || 0) + (u.output_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0);
     }
     for (const r of recs) for (const c of r.message.content || []) if (c?.type === "tool_use") g.outils++;
     g.modele = principal(g.servis); g.effort = principal(g.efforts);
@@ -157,7 +166,31 @@ export function relever(dossiers, depuisIso, courants) {
     { critere: "0 réponse hors génération courante", tenu: courants ? horsGeneration.length <= SEUILS.hors_generation_max : null },
   ];
   const verdict = criteres.some((c) => c.tenu === false) ? "AVERT" : "PASS";
+  // L'essai de relecture d'intention : les jetons d'une relecture sont ceux de toutes ses réponses (entrée, sortie, cache relu
+  // et écrit, une réponse comptée sur sa dernière ligne) — la méthode de la mesure du 18/10 (min 46 056 = 4 + 1 660 + 25 131 + 19 261).
+  // Le seuil porte sur les jetons de relecture PAR JOUR : la dépense que l'essai ajoute. Il n'entre pas dans les critères de la
+  // flotte (son verdict reste celui de l'étude flotte) : il se dit à part, et franchi, l'essai s'arrête et demande.
+  const relectures = sous.filter((g) => estRelectureIntention(g.type, g.description));
+  const parJour = {};
+  for (const g of relectures) parJour[g.jour] = (parJour[g.jour] || 0) + g.total;
+  const jourMax = Object.entries(parJour).sort((x, y) => y[1] - x[1])[0] || null;
+  indicateurs.essai_relecture_intention = {
+    ...ESSAI_RELECTURE,
+    relectures: relectures.length,
+    jetons: relectures.reduce((t, g) => t + g.total, 0),
+    jetons_par_jour: parJour,
+    jour_max: jourMax ? { jour: jourMax[0], jetons: jourMax[1] } : null,
+    seuil_franchi: !!jourMax && jourMax[1] > ESSAI_RELECTURE.seuil_jetons_par_jour,
+  };
   return { indicateurs, criteres, verdict, appels, sous_agents: sous };
+}
+
+/** La ligne du relevé sur l'essai de relecture d'intention : le décompte, le jour le plus chargé, et le seuil d'arrêt dit. */
+export function ligneEssaiRelecture(e) {
+  const n = (x) => String(x).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  const max = e.jour_max ? `jour le plus chargé ${e.jour_max.jour} : ${n(e.jour_max.jetons)} jetons` : "aucun jour chargé";
+  return `  relectures d'intention (essai du ${e.debut} au ${e.fin}, revue le ${e.revue}) : ${e.relectures} relecture(s), ${n(e.jetons)} jetons ; ${max} — seuil de ${n(e.seuil_jetons_par_jour)} jetons par jour `
+    + (e.seuil_franchi ? "FRANCHI : arrêter l'essai et demander à l'humain" : "tenu");
 }
 
 export function executer(argv, env = process.env, maintenant = new Date()) {
@@ -198,6 +231,7 @@ export function executer(argv, env = process.env, maintenant = new Date()) {
     `  jetons des sous-agents : ${k(I.jetons_sortie_sous_agents)} en sortie, ${k(I.jetons_relus_sous_agents)} relus ; médianes : ${k(I.mediane_relus_par_sous_agent)} relus, ${k(I.mediane_contexte_initial)} au premier appel, ${I.mediane_appels_outils ?? "—"} appels d'outils`,
     `  réponses hors génération courante : ${I.reponses_hors_generation}${I.reponses_hors_generation ? " — " + Object.entries(I.hors_generation_par_modele).map(([m, n]) => `${m} ×${n}`).join(", ") : ""}${courants ? "" : " (référentiel illisible : non jugé)"}`,
   ];
+  out.push(ligneEssaiRelecture(I.essai_relecture_intention));
   for (const c of r.criteres) out.push(`  [${c.tenu === null ? "NON JUGÉ" : c.tenu ? "TENU" : "NON TENU"}] ${c.critere}`);
   if (a.journal) out.push(`  journal : une ligne ajoutée à ${a.journal}`);
   return { code: 0, sortie: out.join("\n"), rapport };

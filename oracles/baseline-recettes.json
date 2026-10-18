@@ -343,7 +343,7 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 189,
+  "cas": 199,
   "vu_le": "2026-10-18"
  },
  "oracle-trace-mutation-mep.mjs": {
@@ -399,7 +399,7 @@
   "vu_le": "2026-10-13"
  },
  "oracles/hook-flotte.test.mjs": {
-  "cas": 12,
+  "cas": 18,
   "vu_le": "2026-10-18"
  },
  "oracles/hook-identite-sortante.test.mjs": {
@@ -411,8 +411,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 36,
-  "vu_le": "2026-10-17"
+  "cas": 38,
+  "vu_le": "2026-10-18"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
   "cas": 10,
@@ -551,8 +551,8 @@
   "vu_le": "2026-10-15"
  },
  "scripts/allouer-indice.test.mjs": {
-  "cas": 12,
-  "vu_le": "2026-09-28"
+  "cas": 19,
+  "vu_le": "2026-10-18"
  },
  "scripts/balayer-motifs-numeriques.test.mjs": {
   "cas": 9,
@@ -654,6 +654,10 @@
   "cas": 9,
   "vu_le": "2026-10-12"
  },
+ "scripts/relecture-intention.test.mjs": {
+  "cas": 33,
+  "vu_le": "2026-10-18"
+ },
  "scripts/relever-appelants.test.mjs": {
   "cas": 5,
   "vu_le": "2026-09-17"
@@ -667,7 +671,7 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-flotte.test.mjs": {
-  "cas": 8,
+  "cas": 11,
   "vu_le": "2026-10-18"
  },
  "scripts/relever-heritage.test.mjs": {
@@ -771,8 +775,8 @@
   "vu_le": "2026-10-02"
  },
  "todo/anonymiser-suivis.mjs": {
-  "cas": 10,
-  "vu_le": "2026-09-15"
+  "cas": 12,
+  "vu_le": "2026-10-18"
  },
  "todo/bancs-isoles.test.mjs": {
   "cas": 7,

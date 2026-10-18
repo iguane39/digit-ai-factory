@@ -60,9 +60,7 @@ check("rouge — sans agent nommé visible, le rappel le dit au lieu d'inventer 
 });
 
 const VERTS = [
-  [appel({ subagent_type: "campagne" }), "un agent nommé du projet"],
-  [appel({ subagent_type: "general-purpose", model: "sonnet", effort: "medium" }), "un générique qui déclare modèle ET effort (dérogation dite)"],
-  [appel({ subagent_type: "claude-code-guide" }), "un agent intégré à modèle fixe"],
+  [appel({ subagent_type: "verificateur", description: "Relecture d'intention consigne" }), "la relecture d'intention elle-même (sinon chaque relecture en appellerait une)"],
   [{ tool_name: "Bash", tool_input: { command: "ls" }, cwd: projet }, "un autre outil"],
   ["{pas du json", "une entrée illisible"],
 ];
@@ -72,6 +70,34 @@ for (const [entree, nom] of VERTS) {
     if (r.code !== 0 || r.out.trim()) throw new Error(`exit ${r.code}, sortie « ${r.out.slice(0, 120)} »`);
   });
 }
+
+// D-23 (a) du 18/10/2026 — « chaque consigne d'agent » : TOUT appel d'agent rappelle la relecture de sa consigne, pas seulement
+// les agents d'écriture (restriction relevée par la relecture de fin de tour RI-20261018-01). Même sortie, exit 0, jamais un refus.
+for (const nom of ["campagne", "constructeur", "redacteur", "explorateur", "verificateur", "claude-code-guide"]) {
+  check(`rouge — un appel vers « ${nom} » rappelle la relecture de la consigne sans bloquer`, () => {
+    const r = jouer(appel({ subagent_type: nom }));
+    if (r.code !== 0) throw new Error(`exit ${r.code} : un rappel ne bloque jamais`);
+    if (!/RELECTURE D'INTENTION \(essai D-23 \(a\)/.test(r.ctx)) throw new Error(`aucun rappel : ${r.out.slice(0, 160)}`);
+    if (!r.ctx.includes(`« ${nom} »`) || !/--preparer consigne --fichier/.test(r.ctx) || !/verificateur/.test(r.ctx) || !/jamais blocage/.test(r.ctx))
+      throw new Error(`le rappel ne nomme pas l'agent, la commande, le relecteur ou l'absence de blocage : ${r.ctx.slice(0, 260)}`);
+    if (/FLOTTE D'AGENTS/.test(r.ctx)) throw new Error("un agent nommé reçoit l'avertissement de flotte en plus du rappel");
+  });
+}
+check("rouge — l'ancien nom d'outil Task vers « campagne » rappelle aussi la relecture", () => {
+  if (!/RELECTURE D'INTENTION/.test(jouer(appel({ subagent_type: "campagne" }, "Task")).ctx)) throw new Error("Task passe sans rappel");
+});
+check("rouge — sans agent nommé visible, un appel vers « constructeur » rappelle quand même (le rappel ne dépend pas du dossier)", () => {
+  const vide = join(racine, "vide2"); mkdirSync(vide, { recursive: true });
+  if (!/RELECTURE D'INTENTION/.test(jouer({ tool_name: "Agent", tool_input: { subagent_type: "constructeur" }, cwd: vide }).ctx)) throw new Error("rappel absent");
+});
+check("rouge — une dérogation dite (générique avec model ET effort) reçoit le rappel de relecture, sans l'avertissement de flotte", () => {
+  const r = jouer(appel({ subagent_type: "general-purpose", model: "sonnet", effort: "medium" }));
+  if (r.code !== 0 || !/RELECTURE D'INTENTION/.test(r.ctx) || /FLOTTE D'AGENTS/.test(r.ctx)) throw new Error(`sortie inattendue : « ${r.out.slice(0, 160)} »`);
+});
+check("rouge — un générique sans modèle reçoit l'avertissement de flotte ET le rappel de relecture", () => {
+  const r = jouer(appel({ subagent_type: "general-purpose" }));
+  if (!/FLOTTE D'AGENTS/.test(r.ctx) || !/RELECTURE D'INTENTION/.test(r.ctx)) throw new Error(r.ctx.slice(0, 200));
+});
 
 rmSync(racine, { recursive: true, force: true });
 console.log(`\nhook-flotte : ${pass} PASS, ${fail} FAIL`);

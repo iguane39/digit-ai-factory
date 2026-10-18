@@ -401,6 +401,15 @@ chaque règle de ce tableau dépendait de la consigne écrite au moment de l'app
 `oracles\hook-flotte.mjs` (PreToolUse, avertit). Référentiel daté : clé `flotte` de
 `references\MODELES-EN-SERVICE.json`.
 
+**Avant chaque agent, la consigne est relue** (décision humaine D-23 (a) du 18/10/2026, essai du 2026-10-18 au
+2026-11-01, `references\RELECTURE-INTENTION.md`). Avant de lancer un agent, quel qu'il soit, sauf la relecture d'intention
+elle-même, le pilot prépare la relecture de sa consigne (`node scripts\relecture-intention.mjs --preparer consigne --fichier <consigne.md>`) et
+la passe à un `verificateur` dont la description commence par « Relecture d'intention » : il compare la consigne à la demande
+humaine du tour, citée mot pour mot depuis la transcription. Un écart majeur est corrigé dans la consigne ou posé à l'humain
+avant le lancement ; ce n'est qu'une alerte, jamais un blocage. Le relevé de flotte compte ces relectures et leurs jetons par
+jour, et dit si le seuil d'arrêt de l'essai est franchi. *Le fait* : la dérive TF-0176, « pour chaque liste » devenu
+« dès 8 lignes », est née dans une consigne.
+
 **Le modèle se désigne par son NOM DE FAMILLE, jamais par un identifiant** (décisions humaines
 D-1 (a) et D-2 (a) du 25/09/2026). `opus`, `sonnet`, `haiku` et `fable` suivent la dernière
 version sans qu'aucun fichier ne bouge : à l'appel d'un agent, dans la définition d'un agent

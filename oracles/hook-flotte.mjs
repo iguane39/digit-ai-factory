@@ -23,6 +23,9 @@
  * NON JUGÉ (déclaré). Le choix du BON agent pour la tâche (un `explorateur` lancé sur une construction
  * passe) ; les sous-agents lancés par un script ou une CLI (`claude -p`), qui ne passent pas par l'outil.
  *
+ * Et quand l'appel vise un agent d'ÉCRITURE (`campagne`, `constructeur`, `redacteur`), il rappelle la relecture de la consigne de
+ * l'essai du 18/10/2026 (D-23 (a), `references/RELECTURE-INTENTION.md`) : même sortie `additionalContext`, même exit 0.
+ *
  * Usage : node oracles\hook-flotte.mjs      (stdin : JSON du hook PreToolUse)
  * Exit : toujours 0 ; l'avertissement sort sur stdout en JSON `hookSpecificOutput.additionalContext`.
  */
@@ -34,6 +37,8 @@ import { fileURLToPath } from "node:url";
 export const OUTILS = new Set(["Agent", "Task"]);
 export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan", ""]);
 export const INTEGRES_FIXES = new Set(["claude-code-guide", "statusline-setup"]);
+/** Les agents d'ÉCRITURE de la flotte (conservé pour les appelants ; la relecture de consigne vaut pour TOUT agent, D-23 (a)). */
+export const AGENTS_D_ECRITURE = new Set(["campagne", "constructeur", "redacteur"]);
 
 /** Les agents nommés visibles depuis un dossier de projet : `.claude/agents/` du projet et du poste. */
 export function agentsNommes(cwd, maison = homedir()) {
@@ -47,16 +52,28 @@ export function agentsNommes(cwd, maison = homedir()) {
   return noms;
 }
 
-/** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" } ou { decision: "avertit", message }. */
+/** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message } ou { decision: "rappelle", message }. */
 export function juger(entree, { maison } = {}) {
   if (!OUTILS.has(entree?.tool_name)) return { decision: "laisse" };
   const ti = entree?.tool_input || {};
   const type = typeof ti.subagent_type === "string" ? ti.subagent_type.trim() : "";
   const nommes = agentsNommes(entree?.cwd || process.cwd(), maison);
-  if (type && !GENERIQUES.has(type) && (nommes.has(type) || INTEGRES_FIXES.has(type))) return { decision: "laisse" };
+  // D-23 (a) du 18/10/2026 : CHAQUE consigne passée à un agent se relit avant le lancement — « Chaque consigne d'agent
+  // et chaque fin de tour sont relues ». La première version ne visait que les agents d'écriture : la relecture de fin de
+  // tour du 18/10 l'a relevé comme une restriction que la décision n'autorisait pas (RI-20261018-01). Seule exception, la
+  // relecture d'intention elle-même (description « Relecture d'intention … »), sans quoi chaque relecture en appellerait une.
+  // Rappel seulement — l'appel part tel quel.
+  const description = typeof ti.description === "string" ? ti.description.trim() : "";
+  if (/^Relecture d'intention/i.test(description)) return { decision: "laisse" };
+  const rappel = (cible) => "RELECTURE D'INTENTION (essai D-23 (a) du 18/10/2026, du 2026-10-18 au 2026-11-01) — cet appel vise « " + cible + " » : "
+    + "chaque consigne passée à un agent se relit AVANT le lancement. `node scripts/relecture-intention.mjs --preparer consigne --fichier <consigne.md>` "
+    + "(chez un produit : le script du pilot) écrit la demande humaine du tour, citée mot pour mot, et imprime la consigne à passer à un `verificateur` "
+    + "dont la description commence par « Relecture d'intention » ; un écart majeur se corrige dans la consigne ou se pose à l'humain avant l'appel. "
+    + "Rappel seulement (alerte, jamais blocage) : l'appel part tel quel. `references/RELECTURE-INTENTION.md`.";
+  if (type && !GENERIQUES.has(type)) return { decision: "rappelle", message: rappel(type) };
   const aModele = typeof ti.model === "string" && ti.model.trim() !== "";
   const aEffort = typeof ti.effort === "string" && ti.effort.trim() !== "";
-  if (aModele && aEffort) return { decision: "laisse" };
+  if (aModele && aEffort) return { decision: "rappelle", message: rappel(type || "agent générique") };
   const manque = [!aModele && "le modèle (`model`)", !aEffort && "l'effort (`effort`)"].filter(Boolean).join(" et ");
   const flotte = [...nommes].sort();
   const cible = type || "(aucun type : agent générique)";
@@ -69,7 +86,7 @@ export function juger(entree, { maison } = {}) {
         + "redacteur : document sous gabarit). Relancer l'appel avec `subagent_type` à l'un d'eux, "
       : "Aucun agent nommé n'est visible ici (`.claude/agents/` absent) : ")
     + "ou garder l'agent générique en déclarant `model` ET `effort` — une dérogation dite, que le relevé de flotte compte "
-    + "(`node scripts/relever-flotte.mjs` au pilot). Avertissement seulement : l'appel part tel quel.";
+    + "(`node scripts/relever-flotte.mjs` au pilot). Avertissement seulement : l'appel part tel quel. " + rappel(cible);
   return { decision: "avertit", message };
 }
 
@@ -80,7 +97,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try { entree = JSON.parse(brut || "{}"); } catch { /* entrée illisible : pas un appel d'outil */ }
   let v = { decision: "laisse" };
   try { v = juger(entree); } catch { /* une panne du juge ne bloque jamais un outil */ }
-  if (v.decision === "avertit") {
+  if (v.decision === "avertit" || v.decision === "rappelle") {
     process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: v.message } }) + "\n");
   }
   process.exit(0);

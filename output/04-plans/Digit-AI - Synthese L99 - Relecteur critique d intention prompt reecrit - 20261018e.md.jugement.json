@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md",
+ "empreinte": "38c8b9a3e5a8e24f585be194cc18b4c2d16843096cf88bed721f17213e3ee1b6",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-18T07:00:03.439Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

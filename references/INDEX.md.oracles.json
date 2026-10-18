@@ -1,10 +1,12 @@
 {
-  "cible": "references/INDEX.md",
-  "date_iso": "2026-10-03T09:25:16.229Z",
-  "registre_version": "2.35.0",
+  "cible": "C:\\dev\\digit-ai-factory\\references\\INDEX.md",
+  "date_iso": "2026-10-18T08:27:26.319Z",
+  "registre_version": "2.43.0",
   "profil": "digit-ai",
-  "niveau": "diffuse",
+  "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 3,
     "fail": 0,
@@ -44,34 +46,34 @@
       "domaine": "Calculs / chiffres",
       "file": "references\\INDEX.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "references\\INDEX.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
       "file": "references\\INDEX.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
       "file": "references\\INDEX.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\INDEX.md",
-    "ts": "2026-10-03T09:25:16.229Z",
+    "ts": "2026-10-18T08:27:26.319Z",
     "fichiers": {
-      "references\\INDEX.md": "c6a7c42cf0bef5523d9260ace4b3fcee0de3253fb319e70da413d3bfe40cfe9d"
+      "references\\INDEX.md": "e373332d3e7ac1bab56541af9e34e8fcd683327878782182b90b92bc27a31b5d"
     }
   },
   "empreinte_motif": null,

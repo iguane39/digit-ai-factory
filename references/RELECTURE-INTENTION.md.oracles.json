@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\references\\RELECTURE-INTENTION.md",
+  "date_iso": "2026-10-18T09:27:21.668Z",
+  "registre_version": "2.43.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "references\\RELECTURE-INTENTION.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "references\\RELECTURE-INTENTION.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "references\\RELECTURE-INTENTION.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "references\\RELECTURE-INTENTION.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "references\\RELECTURE-INTENTION.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 0 total(aux) de colonne vérifié(s) par re-somme + 1 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 0/0 mesure(s) publiée(s) portant leur dénominateur et leurs unités + 0 indicateur(s) à valeur unique, 0 écart"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "references\\RELECTURE-INTENTION.md",
+      "verdict": "PASS",
+      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; nombre « 20261018 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "references\\RELECTURE-INTENTION.md",
+      "verdict": "SKIP",
+      "detail": "nom ne se réclamant pas de la convention"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "references\\RELECTURE-INTENTION.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "references\\RELECTURE-INTENTION.md",
+    "ts": "2026-10-18T09:27:21.668Z",
+    "fichiers": {
+      "references\\RELECTURE-INTENTION.md": "5fc21e9e44647df1a1049c3c9a31eebff7d25ce824548665a11ef048a471e401"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

@@ -1,0 +1,291 @@
+#!/usr/bin/env node
+/**
+ * relecture-intention.test.mjs — la relecture d'intention, dans les deux sens (D-23 (a), 18/10/2026).
+ * Transcriptions SYNTHÉTIQUES en dossier temporaire ; aucune écriture dans le dépôt.
+ *   VERT  : les messages humains sortent mot pour mot et dans l'ordre ; les fichiers écrits depuis le dernier message humain
+ *           (Write, Edit, NotebookEdit) sont cités avec leur contenu ; la décision à laquelle répond « 23a + b » est retrouvée ;
+ *           la consigne stricte est celle de la mesure du 18/10 ; la transcription la plus récente du projet courant est
+ *           choisie ; le registre reçoit une ligne par relecture et par confirmation ; le relevé compte par type et par point ;
+ *   ROUGE : un résultat d'outil, un retour de hook, un message système, de pair, de notification, du SDK ou le résumé d'une
+ *           compaction n'est PAS un message humain ; une écriture antérieure au dernier message humain n'est pas citée ; un
+ *           `.env` n'est jamais cité ; une borne est DITE ; un verdict inexploitable, un point ou un type inconnu, un
+ *           identifiant inconnu, une confirmation sans alerte et une option inconnue rendent 2 sans rien écrire.
+ * Joué par `oracles\self-tests.mjs` (I2).
+ */
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, utimesSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
+import { executer, STRICTE, FORME_JSON, texteHumain, lireVerdict } from "./relecture-intention.mjs";
+
+const ICI = dirname(fileURLToPath(import.meta.url));
+const RACINE = join(ICI, "..");
+let pass = 0, fail = 0;
+const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
+const egal = (a, b, quoi) => { if (a !== b) throw new Error(`${quoi} : « ${String(a).slice(0, 200)} » ≠ attendu « ${String(b).slice(0, 200)} »`); };
+
+const T = mkdtempSync(join(tmpdir(), "relecture-intention-"));
+const MAISON = join(T, "maison");
+const PROJET = join(T, "monprojet");
+mkdirSync(PROJET, { recursive: true });
+const slug = PROJET.replace(/[^A-Za-z0-9]/g, "-");
+
+// ---- la transcription synthétique -----------------------------------------------------------------------------------
+const H1 = "Étudie « l'opportunité » d'un relecteur,\navec deux lignes et des accents : œ, é, à — mot pour mot.";
+const H2 = "pour chaque liste, pas seulement les longues";
+const H3 = "23a + b";
+const humain = (texte, extra = {}) => JSON.stringify({ type: "user", origin: { kind: "human" }, timestamp: "2026-10-18T10:00:00Z", message: { role: "user", content: [{ type: "text", text: texte }] }, ...extra });
+const assistant = (blocs) => JSON.stringify({ type: "assistant", timestamp: "2026-10-18T10:00:05Z", message: { id: `m${Math.random()}`, role: "assistant", content: blocs } });
+const texte = (t) => ({ type: "text", text: t });
+const outil = (name, input) => ({ type: "tool_use", id: `t${Math.random()}`, name, input });
+
+const GROS = join(T, "gros.md"), PETIT = join(T, "petit.md"), NOTE = join(T, "nb.ipynb"), ENV = join(T, ".env"), ANCIEN = join(T, "ancien.md"), EDITE = join(T, "edite.mjs");
+writeFileSync(GROS, "x".repeat(70000) + "FIN-DU-GROS");
+writeFileSync(PETIT, "# Petit livrable\nLe contenu du petit livrable.\n");
+writeFileSync(NOTE, "{\"cells\": []}");
+writeFileSync(ENV, "CLE_SECRETE=ne-doit-jamais-etre-citee\n");
+writeFileSync(ANCIEN, "ECRIT-AVANT-LE-DERNIER-MESSAGE-HUMAIN");
+writeFileSync(EDITE, "export const x = 1; // édité\n");
+
+const DECISION = ["Voici la décision :", "", "> **D-23 — Faut-il lancer un essai de 2 semaines ?**", ">", "> - **Le problème** : la dérive naît dans la consigne.", "", "| Option | Ce qui se passe |", "|---|---|", "| (a) Essai | O4 |", "", "> **D-24 — Une autre décision ?**", "> - hors sujet"].join("\n");
+
+const lignes = [
+  humain(H1),
+  assistant([texte("Je commence."), outil("Write", { file_path: ANCIEN, content: "x" })]),
+  JSON.stringify({ type: "user", timestamp: "2026-10-18T10:00:06Z", message: { role: "user", content: [{ type: "tool_result", tool_use_id: "t", content: "RESULTAT-D-OUTIL-A-NE-PAS-CITER" }] } }),
+  JSON.stringify({ type: "attachment", attachment: { type: "hook_success", content: "RETOUR-DE-HOOK-A-NE-PAS-CITER" } }),
+  JSON.stringify({ type: "user", isMeta: true, timestamp: "2026-10-18T10:00:07Z", message: { role: "user", content: "<system-reminder>MESSAGE-SYSTEME-A-NE-PAS-CITER</system-reminder>" } }),
+  JSON.stringify({ type: "user", origin: { kind: "peer", body: "x" }, isMeta: true, message: { role: "user", content: "Another Claude session sent a message: MESSAGE-DE-PAIR-A-NE-PAS-CITER" } }),
+  JSON.stringify({ type: "user", origin: { kind: "task-notification" }, message: { role: "user", content: "<task-notification>NOTIFICATION-A-NE-PAS-CITER</task-notification>" } }),
+  JSON.stringify({ type: "user", turnOrigin: "sdk", message: { role: "user", content: "# Rubrique figée SDK-A-NE-PAS-CITER" } }),
+  JSON.stringify({ type: "user", origin: { kind: "human" }, message: { role: "user", content: "This session is being continued from a previous conversation RESUME-DE-COMPACTION-A-NE-PAS-CITER" } }),
+  assistant([texte(DECISION)]),
+  humain(H2),
+  assistant([texte("Question suivante."), outil("Bash", { command: "node scripts/exemple.mjs --effet" })]),
+  humain(H3),
+  assistant([outil("Write", { file_path: PETIT, content: "x" }), outil("Edit", { file_path: EDITE, old_string: "a", new_string: "b" }), outil("NotebookEdit", { notebook_path: NOTE, new_source: "x" }),
+    outil("Write", { file_path: GROS, content: "x" }), outil("Write", { file_path: ENV, content: "x" }), outil("Write", { file_path: PETIT, content: "doublon" }), outil("Read", { file_path: ANCIEN }), outil("Bash", { command: "node scripts/effet-du-dernier-tour.mjs" })]),
+  assistant([texte("Restitution finale du tour.")]),
+];
+const TRANSCRIPT = join(T, "session.jsonl");
+writeFileSync(TRANSCRIPT, lignes.join("\n") + "\n");
+const CTX = { cwd: PROJET, maison: MAISON };
+const SORTIE = join(T, "sortie");
+const REG = join(T, "registre.jsonl");
+
+const fin = executer(["--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", SORTIE], {}, new Date("2026-10-18T12:00:00Z"), CTX);
+const demande = existsSync(join(SORTIE, "demande.txt")) ? readFileSync(join(SORTIE, "demande.txt"), "utf8") : "";
+const livrables = existsSync(join(SORTIE, "livrables.md")) ? readFileSync(join(SORTIE, "livrables.md"), "utf8") : "";
+
+try {
+  // ---- les messages humains ---------------------------------------------------------------------------------------
+  check("vert — les messages humains sortent mot pour mot, dans l'ordre, numérotés", () => {
+    egal(fin.code, 0, "exit");
+    const i1 = demande.indexOf(`1. « ${H1} »`), i2 = demande.indexOf(`2. « ${H2} »`), i3 = demande.indexOf(`3. « ${H3} »`);
+    if (i1 < 0 || i2 < 0 || i3 < 0 || !(i1 < i2 && i2 < i3)) throw new Error(demande.slice(0, 400));
+  });
+  for (const [marqueur, quoi] of [["RESULTAT-D-OUTIL", "un résultat d'outil"], ["RETOUR-DE-HOOK", "un retour de hook"], ["MESSAGE-SYSTEME", "un message système"], ["MESSAGE-DE-PAIR", "un message d'une autre session"],
+    ["NOTIFICATION-A-NE", "une notification de tâche"], ["SDK-A-NE", "un message du SDK"], ["RESUME-DE-COMPACTION", "le résumé d'une compaction"]])
+    check(`rouge — ${quoi} n'est pas un message humain`, () => {
+      if (demande.includes(marqueur)) throw new Error(`« ${marqueur} » cité dans demande.txt`);
+    });
+  check("rouge — texteHumain refuse un résultat d'outil, un message méta, un message sans origine humaine ; accepte l'ancien format (turnOrigin human)", () => {
+    egal(texteHumain({ type: "user", origin: { kind: "human" }, message: { content: [{ type: "tool_result", content: "x" }] } }), null, "résultat d'outil");
+    egal(texteHumain({ type: "user", isMeta: true, origin: { kind: "human" }, message: { content: "x" } }), null, "méta");
+    egal(texteHumain({ type: "user", message: { content: "x" } }), null, "sans origine");
+    egal(texteHumain({ type: "user", turnOrigin: "human", message: { content: "ancien format" } }), "ancien format", "ancien format");
+    egal(texteHumain({ type: "user", origin: { kind: "human" }, message: { content: [{ type: "text", text: "<ide_opened_file>un fichier</ide_opened_file>" }, { type: "text", text: "ma demande" }] } }), "ma demande", "balise IDE");
+  });
+
+  // ---- les décisions ----------------------------------------------------------------------------------------------
+  check("vert — « 23a + b » : la décision D-23 telle qu'elle a été posée est retrouvée, pas la D-24 voisine", () => {
+    if (!/D-23 \(posée avant le message 3\)/.test(demande)) throw new Error(demande.slice(demande.indexOf("Décisions"), demande.indexOf("Décisions") + 300));
+    if (!demande.includes("Faut-il lancer un essai de 2 semaines ?") || !demande.includes("(a) Essai")) throw new Error("la décision posée n'est pas citée");
+    if (demande.includes("hors sujet") || demande.includes("Une autre décision")) throw new Error("la décision D-24 voisine est citée");
+  });
+
+  // ---- les fichiers écrits ----------------------------------------------------------------------------------------
+  check("vert — Write, Edit et NotebookEdit depuis le dernier message humain : chemins et contenus cités, une seule fois", () => {
+    for (const [f, c] of [[PETIT, "Le contenu du petit livrable."], [EDITE, "// édité"], [NOTE, "\"cells\""]])
+      if (!livrables.includes(f) || !livrables.includes(c)) throw new Error(`${f} ou son contenu absent`);
+    egal(livrables.split(`— ${PETIT}`).length - 1, 1, "occurrences du chemin d'un fichier écrit deux fois");
+    if (!/écrits ou modifiés par Write, Edit ou NotebookEdit depuis le dernier message humain : 5\./.test(livrables)) throw new Error("décompte des fichiers : " + livrables.slice(0, 200));
+  });
+  check("rouge — un fichier écrit AVANT le dernier message humain, et un fichier seulement lu, ne sont pas cités", () => {
+    if (livrables.includes("ECRIT-AVANT") || livrables.includes(ANCIEN)) throw new Error("l'écriture antérieure est citée");
+  });
+  check("rouge — un `.env` écrit n'est jamais cité : son chemin oui, sa valeur non", () => {
+    if (livrables.includes("ne-doit-jamais-etre-citee")) throw new Error("le contenu du .env transite");
+    if (!/NON cité : un fichier `\.env` ne transite jamais/.test(livrables)) throw new Error("l'omission n'est pas dite");
+  });
+  check("borne — un fichier de 70 000 caractères est coupé, la borne et le total sont DITS ; un petit fichier n'est pas coupé", () => {
+    if (!/COUPÉ : 60000 caractères cités sur 70011/.test(livrables)) throw new Error("borne non dite : " + (livrables.match(/COUPÉ[^\]]*/) || ["aucune"])[0]);
+    if (livrables.includes("FIN-DU-GROS")) throw new Error("le fichier n'a pas été coupé");
+    egal(livrables.split("COUPÉ").length - 1, 1, "bornes dites (le petit livrable ne doit pas porter de coupe)");
+  });
+  check("vert — la commande lancée pendant le tour est listée (pas celle d'un tour antérieur), et le dernier message du tour est cité", () => {
+    if (!livrables.includes("node scripts/effet-du-dernier-tour.mjs")) throw new Error("commande du dernier tour absente");
+    if (livrables.includes("exemple.mjs --effet")) throw new Error("la commande d'un tour antérieur est citée");
+    if (!livrables.includes("Restitution finale du tour.")) throw new Error("dernier message absent");
+  });
+  check("borne — la demande trop longue omet le milieu et le DIT, le premier message et le dernier restent", () => {
+    const longs = [humain("PREMIER-MESSAGE-DU-MANDAT"), ...Array.from({ length: 8 }, (_, i) => humain(`milieu-${i} ` + "y".repeat(7000))), humain("DERNIER-MESSAGE")];
+    const f = join(T, "long.jsonl"); writeFileSync(f, longs.join("\n") + "\n");
+    const d = join(T, "sortie-longue");
+    executer(["--preparer", "fin-de-tour", "--transcript", f, "--sortie", d], {}, new Date(), CTX);
+    const t = readFileSync(join(d, "demande.txt"), "utf8");
+    if (!t.includes("PREMIER-MESSAGE-DU-MANDAT") || !t.includes("DERNIER-MESSAGE")) throw new Error("premier ou dernier message omis");
+    if (!/message\(s\) humain\(s\) intermédiaire\(s\) OMIS sur 10 \(total \d+ caractères, borne 40000\)/.test(t)) throw new Error("omission non dite : " + t.slice(-300));
+  });
+
+  // ---- la consigne ------------------------------------------------------------------------------------------------
+  check("vert — la consigne imprimée porte la consigne stricte de la mesure du 18/10, la forme JSON v1 et les deux fichiers", () => {
+    const mesure = JSON.parse(readFileSync(join(RACINE, "output", "03-etudes", "20261018-mesure-relecteur-d-intention.json"), "utf8"));
+    egal(STRICTE, mesure.consignes.stricte, "STRICTE ≠ consignes.stricte de la mesure");
+    if (!fin.sortie.includes(STRICTE) || !fin.sortie.includes(FORME_JSON)) throw new Error("consigne stricte ou forme JSON absentes de la sortie");
+    if (!fin.sortie.includes(join(SORTIE, "demande.txt")) || !fin.sortie.includes(join(SORTIE, "livrables.md"))) throw new Error("chemins des deux fichiers absents");
+    if (!/Lecture seule : tu lis EXACTEMENT deux fichiers/.test(fin.sortie)) throw new Error("lecture seule non dite");
+  });
+  check("vert — le référentiel recopie la consigne stricte, la forme JSON, les dates de l'essai et le seuil", () => {
+    const ref = readFileSync(join(RACINE, "references", "RELECTURE-INTENTION.md"), "utf8");
+    for (const m of [STRICTE, FORME_JSON, "2026-10-18", "2026-11-01", "2026-11-08", "1 000 000 de jetons", "`verificateur`", "alerte"])
+      if (!ref.includes(m)) throw new Error(`référentiel sans « ${m.slice(0, 60)} »`);
+  });
+  check("vert — --preparer consigne : la consigne de délégation est le livrable, la demande reste celle de la transcription", () => {
+    const c = join(T, "consigne-agent.md"); writeFileSync(c, "Corrige les listes dès 8 lignes.\n");
+    const d = join(T, "sortie-consigne");
+    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX);
+    egal(r.code, 0, "exit");
+    if (!readFileSync(join(d, "livrables.md"), "utf8").includes("Corrige les listes dès 8 lignes.")) throw new Error("consigne absente de livrables.md");
+    if (!readFileSync(join(d, "demande.txt"), "utf8").includes(`2. « ${H2} »`)) throw new Error("demande absente");
+    if (!/Le LIVRABLE est la consigne que l'on s'apprête à passer à un agent/.test(r.sortie)) throw new Error("la consigne du relecteur ne dit pas que le livrable est une consigne");
+  });
+  check("rouge — --preparer consigne sans --fichier, ou avec un fichier absent : 2", () => {
+    egal(executer(["--preparer", "consigne", "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "sans fichier");
+    egal(executer(["--preparer", "consigne", "--fichier", join(T, "absent.md"), "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "fichier absent");
+  });
+
+  // ---- la transcription par défaut --------------------------------------------------------------------------------
+  const profil = join(T, "profil");
+  const dossierProjet = join(profil, "projects", slug), autre = join(profil, "projects", "autre-projet");
+  mkdirSync(dossierProjet, { recursive: true }); mkdirSync(autre, { recursive: true });
+  const ecrire = (f, mot, date) => { writeFileSync(f, humain(mot) + "\n"); utimesSync(f, date, date); };
+  ecrire(join(dossierProjet, "vieille.jsonl"), "MESSAGE-DE-LA-VIEILLE", new Date("2026-10-10T10:00:00Z"));
+  ecrire(join(dossierProjet, "recente.jsonl"), "MESSAGE-DE-LA-RECENTE", new Date("2026-10-17T10:00:00Z"));
+  ecrire(join(autre, "plus-recente-mais-ailleurs.jsonl"), "MESSAGE-D-UN-AUTRE-PROJET", new Date("2026-10-18T10:00:00Z"));
+  check("vert — par défaut, la transcription la plus récente du projet courant (pas celle d'un autre projet, pas une plus ancienne)", () => {
+    const d = join(T, "sortie-defaut");
+    const r = executer(["--preparer", "fin-de-tour", "--sortie", d], { CLAUDE_CONFIG_DIR: profil }, new Date(), CTX);
+    egal(r.code, 0, "exit");
+    const t = readFileSync(join(d, "demande.txt"), "utf8");
+    if (!t.includes("MESSAGE-DE-LA-RECENTE")) throw new Error("la transcription récente du projet n'est pas lue");
+    if (t.includes("MESSAGE-DE-LA-VIEILLE") || t.includes("MESSAGE-D-UN-AUTRE-PROJET")) throw new Error("une transcription d'un autre fichier ou projet est lue");
+  });
+  check("rouge — sans transcription pour le projet courant : 2, et rien n'est inventé", () => {
+    const r = executer(["--preparer", "fin-de-tour"], { CLAUDE_CONFIG_DIR: profil }, new Date(), { cwd: join(T, "projet-sans-transcription"), maison: MAISON });
+    egal(r.code, 2, "exit");
+    if (!/aucune transcription trouvée/.test(r.sortie)) throw new Error(r.sortie);
+  });
+
+  // ---- le registre ------------------------------------------------------------------------------------------------
+  const verdict = (o) => { const f = join(T, `verdict-${Math.random().toString(36).slice(2)}.json`); writeFileSync(f, typeof o === "string" ? o : JSON.stringify(o)); return f; };
+  const consigner = (v, point, type, extra = []) => executer(["--consigner", v, "--point", point, "--type", type, "--registre", REG, "--session", "sess-1", ...extra], {}, new Date("2026-10-18T12:00:00Z"), CTX);
+  const lignesReg = () => (existsSync(REG) ? readFileSync(REG, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : []);
+  check("vert — --consigner : une ligne horodatée (verdict, gravité, écarts, projet, session) ; la dérive majeure est une alerte", () => {
+    const r1 = consigner(verdict({ verdict: "sert", gravite: "mineure", ecarts: [], confiance: "elevee" }), "fin-de-tour", "etude");
+    const r2 = consigner(verdict({ verdict: "derive", gravite: "majeure", ecarts: [{ la_demande_dit: "a", le_livrable_fait: "b", pourquoi: "c" }], confiance: "moyenne" }), "consigne", "code");
+    egal(r1.code + r2.code, 0, "exits");
+    const l = lignesReg();
+    egal(l.length, 2, "lignes");
+    egal(l[0].id, "RI-20261018-01", "id 1"); egal(l[1].id, "RI-20261018-02", "id 2");
+    egal(l[0].ts, "2026-10-18T12:00:00.000Z", "ts"); egal(l[0].projet, "monprojet", "projet"); egal(l[0].session, "sess-1", "session");
+    egal(l[0].alerte, false, "sert sans alerte"); egal(l[1].alerte, true, "dérive majeure = alerte"); egal(l[1].ecarts, 1, "nombre d'écarts");
+    if (!/ALERTE/.test(r2.sortie) || /ALERTE/.test(r1.sortie)) throw new Error("l'alerte n'est dite que pour la dérive majeure");
+  });
+  check("vert — un JSON entouré de texte est lu ; « dérive » accentué vaut « derive »", () => {
+    const avant = lignesReg().length;
+    const r = consigner(verdict("Voici mon verdict :\n```json\n{\"verdict\": \"dérive\", \"gravite\": \"bloquante\", \"ecarts\": [{\"pourquoi\": \"x\"}], \"confiance\": \"faible\"}\n```"), "fin-de-tour", "lot");
+    egal(r.code, 0, "exit");
+    egal(lignesReg().length, avant + 1, "ligne ajoutée");
+    egal(lignesReg().pop().verdict, "derive", "verdict normalisé");
+  });
+  check("rouge — verdict inexploitable, point ou type inconnu, fichier absent : 2 et le registre ne bouge pas", () => {
+    const avant = readFileSync(REG, "utf8");
+    for (const [v, p, t, quoi] of [[verdict("pas du json"), "fin-de-tour", "etude", "pas de JSON"], [verdict({ verdict: "peut-être", gravite: "mineure" }), "fin-de-tour", "etude", "verdict inconnu"],
+      [verdict({ verdict: "sert", gravite: "énorme" }), "fin-de-tour", "etude", "gravité inconnue"], [verdict({ verdict: "sert", gravite: "aucune" }), "milieu", "etude", "point inconnu"],
+      [verdict({ verdict: "sert", gravite: "aucune" }), "fin-de-tour", "poème", "type inconnu"], [join(T, "absent.json"), "fin-de-tour", "etude", "fichier absent"]])
+      egal(consigner(v, p, t).code, 2, quoi);
+    egal(readFileSync(REG, "utf8"), avant, "registre modifié par un refus");
+  });
+  check("vert — --confirmer : la réponse humaine à une alerte est consignée (oui / non), la dernière fait foi", () => {
+    const r = executer(["--confirmer", "RI-20261018-02", "oui", "--registre", REG], {}, new Date("2026-10-18T13:00:00Z"), CTX);
+    egal(r.code, 0, "exit"); if (!/CONFIRMÉE/.test(r.sortie)) throw new Error(r.sortie);
+    const dernier = lignesReg().pop();
+    egal(dernier.ev, "confirmation", "ev"); egal(dernier.id, "RI-20261018-02", "id"); egal(dernier.confirme, true, "confirme");
+  });
+  check("rouge — --confirmer : identifiant inconnu, relecture sans alerte, réponse autre que oui/non : 2, rien d'écrit", () => {
+    const avant = readFileSync(REG, "utf8");
+    egal(executer(["--confirmer", "RI-20200101-01", "oui", "--registre", REG], {}, new Date(), CTX).code, 2, "id inconnu");
+    egal(executer(["--confirmer", "RI-20261018-01", "oui", "--registre", REG], {}, new Date(), CTX).code, 2, "sans alerte");
+    egal(executer(["--confirmer", "RI-20261018-02", "peut-être", "--registre", REG], {}, new Date(), CTX).code, 2, "réponse");
+    egal(readFileSync(REG, "utf8"), avant, "registre modifié par un refus");
+  });
+  check("vert — lireVerdict : une dérive mineure est consignée telle quelle, sans alerte", () => {
+    const v = lireVerdict(JSON.stringify({ verdict: "derive", gravite: "mineure", ecarts: [] }));
+    egal(v.ok, true, "ok"); egal(v.verdict.verdict, "derive", "verdict");
+  });
+
+  // ---- le relevé --------------------------------------------------------------------------------------------------
+  check("vert — --releve : par type et par point, relectures, dérives, alertes confirmées et infirmées", () => {
+    const reg2 = join(T, "registre-releve.jsonl");
+    const L = (id, ts, point, type, verdictV, gravite, alerte) => JSON.stringify({ ts, ev: "relecture", id, point, type, verdict: verdictV, gravite, ecarts: alerte ? 1 : 0, alerte });
+    writeFileSync(reg2, [
+      L("A", "2026-10-18T09:00:00Z", "fin-de-tour", "etude", "sert", "mineure", false),
+      L("B", "2026-10-18T10:00:00Z", "fin-de-tour", "etude", "derive", "majeure", true),
+      L("C", "2026-10-19T10:00:00Z", "fin-de-tour", "etude", "derive", "majeure", true),
+      L("D", "2026-10-19T11:00:00Z", "consigne", "consigne", "derive", "bloquante", true),
+      L("E", "2026-10-20T11:00:00Z", "consigne", "consigne", "sert", "aucune", false),
+      JSON.stringify({ ts: "2026-10-19T12:00:00Z", ev: "confirmation", id: "B", confirme: true }),
+      JSON.stringify({ ts: "2026-10-19T12:01:00Z", ev: "confirmation", id: "C", confirme: false }),
+    ].join("\n") + "\n");
+    const r = executer(["--releve", "--json", "--registre", reg2], {}, new Date(), CTX);
+    egal(r.code, 0, "exit");
+    const etude = r.releve.lignes.find((x) => x.type === "etude" && x.point === "fin-de-tour");
+    const cons = r.releve.lignes.find((x) => x.type === "consigne" && x.point === "consigne");
+    egal(JSON.stringify([etude.relectures, etude.derives, etude.confirmees, etude.infirmees, etude.sans_reponse]), "[3,2,1,1,0]", "étude");
+    egal(JSON.stringify([cons.relectures, cons.derives, cons.confirmees, cons.infirmees, cons.sans_reponse]), "[2,1,0,0,1]", "consigne");
+    egal(r.releve.total.relectures, 5, "total");
+    const depuis = executer(["--releve", "--json", "--depuis", "2026-10-19", "--registre", reg2], {}, new Date(), CTX).releve;
+    egal(depuis.total.relectures, 3, "depuis le 19/10");
+    const texteReleve = executer(["--releve", "--registre", reg2], {}, new Date(), CTX).sortie;
+    if (!/etude\s+fin-de-tour\s+3\s+2/.test(texteReleve) || !/TOTAL/.test(texteReleve)) throw new Error(texteReleve);
+  });
+  check("borne — --releve sur un registre absent ou une date invalide : exit 0 toujours, et le dit", () => {
+    const r = executer(["--releve", "--registre", join(T, "inexistant.jsonl")], {}, new Date(), CTX);
+    egal(r.code, 0, "exit"); if (!/aucune relecture consignée/.test(r.sortie)) throw new Error(r.sortie);
+    const d = executer(["--releve", "--depuis", "hier", "--registre", join(T, "inexistant.jsonl")], {}, new Date(), CTX);
+    egal(d.code, 0, "exit date invalide"); if (!/--depuis attend AAAA-MM-JJ/.test(d.sortie)) throw new Error(d.sortie);
+  });
+  check("borne — une option inconnue, ou aucun mode : 2", () => {
+    egal(executer(["--inconnue"], {}, new Date(), CTX).code, 2, "option inconnue");
+    egal(executer([], {}, new Date(), CTX).code, 2, "aucun mode");
+    egal(executer(["--preparer", "milieu"], {}, new Date(), CTX).code, 2, "point inconnu");
+  });
+  check("vert — la ligne de commande : --preparer imprime la consigne (exit 0) ; --releve sur un registre absent rend 0", () => {
+    const p = spawnSync(process.execPath, [join(ICI, "relecture-intention.mjs"), "--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", join(T, "sortie-cli")], { encoding: "utf8", cwd: PROJET });
+    egal(p.status, 0, "exit --preparer"); if (!/CONSIGNE À PASSER À L'AGENT verificateur/.test(p.stdout)) throw new Error(p.stdout.slice(0, 300));
+    const q = spawnSync(process.execPath, [join(ICI, "relecture-intention.mjs"), "--releve", "--registre", join(T, "rien.jsonl")], { encoding: "utf8", cwd: PROJET });
+    egal(q.status, 0, "exit --releve");
+    const r = spawnSync(process.execPath, [join(ICI, "relecture-intention.mjs"), "--inconnue"], { encoding: "utf8", cwd: PROJET });
+    egal(r.status, 2, "exit option inconnue");
+  });
+  check("borne — le registre du pilot n'a pas été touché par la recette", () => {
+    const pilote = join(RACINE, "todo", "relectures-intention.jsonl");
+    if (existsSync(pilote) && /RI-20261018-0[12]"/.test(readFileSync(pilote, "utf8")) && /"session":"sess-1"/.test(readFileSync(pilote, "utf8"))) throw new Error("la recette a écrit au registre du pilot");
+  });
+} finally {
+  rmSync(T, { recursive: true, force: true });
+}
+console.log(`\nrelecture-intention : ${pass} PASS, ${fail} FAIL`);
+process.exit(fail ? 1 : 0);

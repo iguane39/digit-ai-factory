@@ -51,6 +51,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Etude - Niveaux d intervention verdict O3 en 3 etapes - 20260925c.md` | fichier | 14,9 Ko | Synthèse Étude — niveaux d'intervention : l'étude est menée et passe ses 3 contrôles, le v |
 | `Digit-AI - Synthese Etude - Personas par phase verdict statu quo banc rejouable - 20260914b.md` | fichier | 16,9 Ko | Synthèse Étude — personas par phase : aucun persona ne franchit le seuil fixé d'avance, si |
 | `Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md` | fichier | 20,4 Ko | Synthèse d'étude — « plan d'amélioration après audit, rendu en page HTML » : l'étude d'opp |
+| `Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md` | fichier | 8,5 Ko | Synthèse Étude — la relecture d'intention étendue à tous les travaux : deux points de rele |
+| `Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` | fichier | 9,0 Ko | Synthèse Étude — un relecteur d'intention voit les dérives à condition d'avoir une consign |
 | `Digit-AI - Synthese Etude - Revue hebdomadaire de l existant verdict sondes etendues - 20260917d.md` | fichier | 13,7 Ko | Synthèse d'étude — votre « 1a » est exécuté : l'étude est jouée, elle écarte la revue hebd |
 | `Digit-AI - Synthese L99 - Audit et plan d amelioration plateforme prompt reecrit - 20260919b.md` | fichier | 17,2 Ko | Synthèse L99 — le prompt « audit, et en plus un plan d'amélioration complet » est analysé  |
 | `Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md` | fichier | 19,9 Ko | Synthèse L99 — le prompt « forge communication & marketing » est réécrit et jugé, trois co |
@@ -59,6 +61,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese L99 - Passage Opus 5 vers Opus 5.5 prompt reecrit - 20260927d.md` | fichier | 20,3 Ko | Synthèse L99 — le prompt « étude d'opportunités après le passage d'Opus 5 à Opus 5.5 » est |
 | `Digit-AI - Synthese L99 - Personas par phase prompt reecrit - 20260914a.md` | fichier | 12,7 Ko | Synthèse L99 — le prompt « personas par phase » est analysé et réécrit : il part de l'étud |
 | `Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md` | fichier | 21,5 Ko | Synthèse L99 — le prompt « règles d'écriture de la Factory » est analysé et réécrit, une e |
+| `Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md` | fichier | 13,6 Ko | Synthèse L99 — le prompt « relecteur critique qui garde l'intention » est analysé et réécr |
 | `Digit-AI - Synthese L99 - Revue hebdomadaire de l existant prompt reecrit - 20260917b.md` | fichier | 14,0 Ko | Synthèse L99 — le prompt « revue hebdomadaire de l'existant » est analysé et réécrit : il  |
 | `Digit-AI - Synthese Mandat - 115 valeurs passees en chiffres chez les producteurs - 20260916e.md` | fichier | 8,4 Ko | Les producteurs écrivent en chiffres, l'historique reste tel quel |
 | `Digit-AI - Synthese Mandat - 4 decisions executees et etude des reseaux sociaux elargie - 20260921g.md` | fichier | 13,5 Ko | Vos 4 décisions sont exécutées : 2 forges publiées, 2 travaux clos, et l'étude des réseaux |
@@ -144,6 +147,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` | fichier | 17,4 Ko | Synthèse Mandat — vos 12 décisions exécutées, rien n'est encore publié (17/10/2026) |
 | `Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` | fichier | 13,8 Ko | Synthèse de mandat — votre « 3a » est exécuté : un produit doit désormais dire ce qu'il re |
 | `Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` | fichier | 11,7 Ko | Synthèse de mandat — votre « 4b » est exécuté à moitié : l'enregistrement est fait, la pub |
+| `Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` | fichier | 11,3 Ko | Synthèse Mandat — l'essai de relecture d'intention est en place sur le poste, et la mesure |
 | `Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` | fichier | 9,8 Ko | Synthèse de mandat — tout n'est pas encore commité, et une branche ancienne n'est pas fusi |
 | `Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` | fichier | 15,2 Ko | Synthèse de mandat — l'étude d'opportunité conclut de ne rien construire, et signale une f |
 | `Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` | fichier | 10,2 Ko | Synthèse Mandat — la remontée sur les pages HTML et les indicateurs est instruite ; l'étud |
@@ -152,6 +156,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` | fichier | 10,8 Ko | Synthèse Mandat — étude d'opportunité sur l'auto-amélioration récursive et l'apprentissage |
 | `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
 | `Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md` | fichier | 12,3 Ko | Synthèse Mandat — D-19 (a) exécutée : 5 agents nommés, un rappel à chaque délégation, un r |
+| `Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md` | fichier | 5,3 Ko | Synthèse Mandat — D-20 (a) exécutée : la flotte d'agents est enregistrée et publiée, et la |
 | `Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` | fichier | 19,1 Ko | Synthèse de mandat — la forge d'audit est publiée et vérifiée sur ce qui est en ligne, mai |
 | `Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md` | fichier | 28,5 Ko | Synthèse Mandat — format B appliqué aux décisions, et les 12 décisions ouvertes réécrites  |
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
@@ -295,4 +300,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 | `Digit-AI - Synthese Video - Film de 25 secondes sur le depot factory rendu en local - 20260919f.md` | fichier | 17,7 Ko | Synthèse d'exécution — la vidéo de 25 secondes sur le dépôt de la factory existe : rendue  |
 
-_277 fichier(s), 1 sous-dossier(s)_ · 9 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_282 fichier(s), 1 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

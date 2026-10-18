@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md",
+ "empreinte": "3525670a459f9a48c9e7553aaee8ffcc19d55093c5928fc0953f28419632b928",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-18T07:17:34.534Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
