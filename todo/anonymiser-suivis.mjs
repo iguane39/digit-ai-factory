@@ -80,9 +80,15 @@
  *   node todo\anonymiser-suivis.mjs --fichiers <chemin>…   → une liste explicite, suivie ou non
  *   node todo\anonymiser-suivis.mjs --self-test
  *
- * Exit : 0 = rien à faire ou fait · 1 = référentiel manquant, ou écriture impossible.
+ * Exit : 0 = rien à faire ou fait · 1 = référentiel manquant, ou écriture impossible, ou renommage NON FAIT.
+ *
+ * LE COMPTE RENDU DIT LE FAIT, PAS LE PLAN (TF-1842, 18/10/2026). `a_renommer` est le compte du PLAN ;
+ * `renommes` est le fait, `non_faits` liste chaque renommage qui n'a pas eu lieu avec sa cause, et
+ * `verdict_renommages` le dit en une ligne (« FAIT » seulement si tous ont eu lieu, sinon « NON FAIT »).
+ * `git mv` ne crée pas le dossier d'arrivée : l'essai l'annonce (`renommages_non_faisables`) et le jeu
+ * le constate, sans rien créer — le dossier se crée à dessein, puis la passe se rejoue.
  */
-import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync, renameSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdtempSync, mkdirSync, rmSync, renameSync } from "node:fs";
 import { join, dirname, basename, relative, isAbsolute } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -137,23 +143,55 @@ export function planifier(depot, fichiers, lire = (f) => readFileSync(join(depot
   return { contenus, renommages, binaires, illisibles, refuses };
 }
 
-function jouer(depot, plan) {
-  const faits = { ecrits: 0, renommes: 0, echecs: [] };
+// TF-1842 (18/10/2026) — UN RENOMMAGE QUI N'A PAS EU LIEU SE DIT « NON FAIT », AVEC SA CAUSE.
+// Le fait, mesuré le 17/10 : le dossier d'arrivée (`…/Produit-72/`) n'existait pas, `git mv` a échoué
+// sur les 9 fichiers, et le compte rendu portait « a_renommer 9 » — un compte du PLAN, lu comme un
+// succès — puis des ré-empreintes ILLISIBLES, le chemin d'arrivée n'existant pas. `git mv` ne crée pas
+// le dossier d'arrivée : l'essai et le jeu le constatent AVANT et le disent, sans rien créer.
+export function nonFaisables(depot, plan) {
+  const nf = [];
+  for (const r of plan.renommages) {
+    const dossier = dirname(r.vers);
+    if (dossier !== "." && !existsSync(join(depot, dossier)))
+      nf.push({ de: r.de, vers: r.vers, cause: `dossier d'arrivée absent : ${dossier}` });
+  }
+  return nf;
+}
+
+/** Le verdict, en une ligne, des renommages d'une passe : FAIT seulement si TOUS ont eu lieu. */
+function verdictRenommages(prevus, renommes, nonFaits) {
+  if (!prevus) return "SANS OBJET : aucun renommage prévu";
+  if (!nonFaits.length) return `FAIT : ${renommes}/${prevus} renommage(s)`;
+  const causes = [...new Set(nonFaits.map((x) => x.cause))].join(" ; ");
+  return `NON FAIT : ${nonFaits.length} renommage(s) sur ${prevus} n'ont pas eu lieu (${renommes} fait(s)) — cause : ${causes}`;
+}
+
+/** Où EST le fichier après la passe : à l'arrivée s'il y a été renommé, à l'origine sinon. */
+export function ouEstLeFichier(depot, de, vers) {
+  return !existsSync(join(depot, de)) && existsSync(join(depot, vers)) ? vers : de;
+}
+
+export function jouer(depot, plan) {
+  const faits = { ecrits: 0, renommes: 0, echecs: [], non_faits: [] };
   for (const c of plan.contenus) {
     try { writeFileSync(join(depot, c.fichier), c.texte, "utf8"); faits.ecrits++; }
     catch (e) { faits.echecs.push(`${c.fichier} : ${e.code || e.message}`); }
   }
   // Les renommages APRÈS les contenus : `git mv` déplace le fichier, et écrire ensuite à
   // l'ancien chemin recréerait un doublon non suivi portant le nom sale.
+  const impossibles = new Map(nonFaisables(depot, plan).map((x) => [x.de, x]));
+  const nonFait = (r, cause) => { faits.non_faits.push({ de: r.de, vers: r.vers, cause }); faits.echecs.push(`${r.de} -> ${r.vers} : ${cause}`); };
   for (const r of plan.renommages) {
+    if (impossibles.has(r.de)) { nonFait(r, impossibles.get(r.de).cause); continue; }
     const mv = spawnSync("git", ["-C", depot, "mv", "--", r.de, r.vers], { encoding: "utf8" });
     if (mv.status === 0) { faits.renommes++; continue; }
     // Un fichier que git ne suit pas (mode `--fichiers`) se renomme sur le disque.
     if (/not under version control|pas sous contr/i.test(mv.stderr || "")) {
-      try { renameSync(join(depot, r.de), join(depot, r.vers)); faits.renommes++; continue; } catch (e) { faits.echecs.push(`${r.de} -> ${r.vers} : ${e.code || e.message}`); continue; }
+      try { renameSync(join(depot, r.de), join(depot, r.vers)); faits.renommes++; continue; } catch (e) { nonFait(r, e.code || e.message); continue; }
     }
-    faits.echecs.push(`${r.de} -> ${r.vers} : ${(mv.stderr || "").trim()}`);
+    nonFait(r, (mv.stderr || "").trim() || `git mv a rendu le code ${mv.status}`);
   }
+  faits.verdict_renommages = verdictRenommages(plan.renommages.length, faits.renommes, faits.non_faits);
   return faits;
 }
 
@@ -167,7 +205,9 @@ function jouer(depot, plan) {
 export function reempreinter(depot, plan, registre = join(depot, "todo", "TODO.jsonl")) {
   const resultats = [];
   if (!existsSync(registre)) return resultats;
-  const versFinal = new Map(plan.renommages.map((r) => [r.de, r.vers]));
+  // TF-1842 : le chemin d'arrivée n'est retenu que si le renommage a EU LIEU — sinon la ré-empreinte
+  // visait un chemin inexistant et sortait ILLISIBLE, au lieu de juger le fichier là où il est.
+  const versFinal = new Map(plan.renommages.map((r) => [r.de, ouEstLeFichier(depot, r.de, r.vers)]));
   for (const c of plan.contenus) {
     if (!c.fichier.endsWith(".tf.jsonl") || typeof c.avant !== "string") continue;
     const chemin = join(depot, versFinal.get(c.fichier) || c.fichier);
@@ -258,6 +298,55 @@ function selfTest() {
   if (!planC.refuses.length || !planC.refuses.every((x) => x.fichier === "outil.py" && /identifiant/.test(x.motif)))
     casse.push("le refus n'est pas remonté au rapport avec son fichier et son motif : " + JSON.stringify(planC.refuses));
 
+  // 3 quinquies) TF-1842 (18/10/2026) — UN RENOMMAGE QUI N'A PAS EU LIEU SE DIT « NON FAIT », AVEC SA CAUSE.
+  //              Le fait, mesuré le 17/10 : le dossier d'arrivée (`…/Produit-72/`) n'existait pas, `git mv` a
+  //              échoué sur les 9 fichiers, et le compte rendu portait « a_renommer 9 » — lu comme un succès —
+  //              puis des ré-empreintes ILLISIBLES, le chemin d'arrivée n'existant pas. Sens rouge : dossier
+  //              d'arrivée absent. Sens vert : dossier d'arrivée présent, le renommage a lieu et est dit FAIT.
+  const git = (d, ...a) => spawnSync("git", ["-C", d, ...a], { encoding: "utf8" });
+  const depotGit = (nom, fichiers) => {
+    const d = join(dir, nom);
+    mkdirSync(d, { recursive: true });
+    git(d, "init", "-q");
+    git(d, "config", "user.email", "banc@exemple.invalide"); git(d, "config", "user.name", "banc");
+    git(d, "config", "core.autocrlf", "false");
+    for (const [f, texte] of Object.entries(fichiers)) {
+      mkdirSync(dirname(join(d, f)), { recursive: true });
+      writeFileSync(join(d, f), texte, "utf8");
+    }
+    git(d, "add", "-A"); git(d, "commit", "-q", "-m", "banc");
+    return d;
+  };
+  const suivisDe = (d) => git(d, "ls-files", "-z").stdout.split("\0").filter(Boolean);
+
+  // rouge : le dossier d'arrivée (Produit-07) n'existe pas
+  const sansDossier = depotGit("sans-dossier", { "lot/ZorglubZAP/a.md": "propre\n", "lot/ZorglubZAP/b.md": "propre aussi\n" });
+  const planS = planifier(sansDossier, suivisDe(sansDossier));
+  const essaiS = nonFaisables(sansDossier, planS);
+  if (essaiS.length !== 2 || !essaiS.every((x) => /dossier d'arrivée absent/.test(x.cause || "")))
+    casse.push("l'ESSAI n'annonce pas « non faisable » (avec la cause) un renommage dont le dossier d'arrivée manque : " + JSON.stringify(essaiS));
+  const faitsS = jouer(sansDossier, planS);
+  if (faitsS.renommes !== 0) casse.push("des renommages sont comptés faits alors que le dossier d'arrivée n'existe pas : " + faitsS.renommes);
+  if (!Array.isArray(faitsS.non_faits) || faitsS.non_faits.length !== 2 || !faitsS.non_faits.every((x) => /dossier d'arrivée absent/.test(x.cause || "")))
+    casse.push("le compte rendu ne porte pas les renommages NON FAITS avec leur cause : " + JSON.stringify(faitsS.non_faits));
+  if (!/^NON FAIT/.test(faitsS.verdict_renommages || ""))
+    casse.push("le verdict des renommages ne dit pas « NON FAIT » : « " + faitsS.verdict_renommages + " »");
+  if (ouEstLeFichier(sansDossier, planS.renommages[0].de, planS.renommages[0].vers) !== planS.renommages[0].de)
+    casse.push("le chemin à ré-empreinter est celui d'ARRIVÉE alors que le fichier n'a pas bougé : la ré-empreinte sortirait ILLISIBLE");
+  if (!existsSync(join(sansDossier, "lot", "ZorglubZAP", "a.md"))) casse.push("le fichier a disparu de son chemin d'origine");
+
+  // vert : le dossier d'arrivée existe, le renommage a lieu et le compte rendu le dit
+  const avecDossier = depotGit("avec-dossier", { "lot/ZorglubZAP/a.md": "propre\n", "lot/Produit-07/.garde": "x\n" });
+  const planA = planifier(avecDossier, suivisDe(avecDossier));
+  if (nonFaisables(avecDossier, planA).length) casse.push("l'essai déclare non faisable un renommage dont le dossier d'arrivée existe");
+  const faitsA = jouer(avecDossier, planA);
+  if (faitsA.renommes !== 1 || (faitsA.non_faits || []).length || faitsA.echecs.length)
+    casse.push("le renommage vers un dossier existant n'est pas fait ou est déclaré en échec : " + JSON.stringify(faitsA));
+  if (!/^FAIT/.test(faitsA.verdict_renommages || "")) casse.push("le verdict d'un renommage réussi ne dit pas « FAIT » : « " + faitsA.verdict_renommages + " »");
+  if (!existsSync(join(avecDossier, "lot", "Produit-07", "a.md"))) casse.push("le fichier n'est pas arrivé à destination");
+  if (ouEstLeFichier(avecDossier, planA.renommages[0].de, planA.renommages[0].vers) !== planA.renommages[0].vers)
+    casse.push("le chemin à ré-empreinter n'est pas celui d'ARRIVÉE après un renommage réussi");
+
   // 4) un REFERENTIEL MANQUANT arrete tout, sans ecrire une ligne
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_absent.json");
   let leve = false;
@@ -267,10 +356,12 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test anonymiser-suivis : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test anonymiser-suivis : 10/10 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
+    : "Self-test anonymiser-suivis : 12/12 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
       + "nom de fichier porteur renommé ; destination du renommage propre ; binaire sauté et hors du "
       + "plan d'écriture ; cas rouge : référentiel manquant = arrêt sans écriture ; clé la plus longue appariée avant la clé courte qui la contient, nom ET contenu, TF-0913 ; "
-      + "cas rouge : nom dans un identifiant de code REFUSÉ et remonté, prose du même fichier nettoyée, TF-0927)");
+      + "cas rouge : nom dans un identifiant de code REFUSÉ et remonté, prose du même fichier nettoyée, TF-0927 ; "
+      + "cas rouge : dossier d'arrivée absent = renommage dit NON FAIT avec sa cause, à l'essai comme au jeu, ré-empreinte visant le fichier là où il est ; "
+      + "cas vert : dossier d'arrivée présent = renommage fait et dit FAIT, TF-1842)");
   return casse.length ? 1 : 0;
 }
 
@@ -299,7 +390,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     depot,
     suivis: fichiers.length,
     a_reecrire: plan.contenus.length,
-    a_renommer: plan.renommages.length,
+    a_renommer: plan.renommages.length, // le PLAN, pas le fait : voir `renommes`, `non_faits`, `verdict_renommages` (TF-1842)
     binaires_sautes: plan.binaires.length,
     illisibles: plan.illisibles,
     refuses: plan.refuses,
@@ -319,7 +410,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ],
   };
   if (ESSAI) {
-    console.log(JSON.stringify({ ...rapport, message: "ESSAI — rien n'a été écrit" }, null, 1));
+    // TF-1842 : l'essai ne promet pas ce que le jeu ne tiendrait pas — un renommage dont le dossier
+    // d'arrivée manque est annoncé « non faisable », avec sa cause.
+    const non_faisables = nonFaisables(depot, plan);
+    const causes = [...new Set(non_faisables.map((x) => x.cause))].join(" ; ");
+    console.log(JSON.stringify({
+      ...rapport,
+      renommages_non_faisables: non_faisables,
+      verdict_renommages: non_faisables.length
+        ? `NON FAIT À PRÉVOIR : ${non_faisables.length} renommage(s) sur ${plan.renommages.length} n'auraient pas lieu — cause : ${causes}`
+        : plan.renommages.length ? `${plan.renommages.length} renommage(s) possible(s)` : "SANS OBJET : aucun renommage prévu",
+      message: "ESSAI — rien n'a été écrit",
+    }, null, 1));
     process.exit(0);
   }
   const faits = jouer(depot, plan);
