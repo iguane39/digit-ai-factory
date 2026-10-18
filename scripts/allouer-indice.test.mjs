@@ -9,7 +9,7 @@
  *
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { allouerIndice, canonique } from "./allouer-indice.mjs";
@@ -25,6 +25,7 @@ const T = mkdtempSync(join(tmpdir(), "allouer-indice-"));
 const PREFIXE = "Client - CAL - Fiche Securite - Dev - ";
 const JOUR = "20260831";
 const nom = (i) => `${PREFIXE}${JOUR}${i}.html`;
+const LETTRES_26 = "abcdefghijklmnopqrstuvwxyz";
 
 try {
   check("rien n'existe pour ce jour → `a`", () => {
@@ -116,6 +117,73 @@ try {
     writeFileSync(join(d, `Produit - Etude - ${JOUR}a.md`), "contenu identique", "utf8");
     const indice = allouerIndice({ dossier: d, prefixe: "Produit - Etude - ", jour: JOUR, contenu: "contenu identique", porte: "dossier" });
     att(indice === "a", `indice ${indice} au lieu de « a » — la relecture du contenu sous la portée dossier a échoué (nom de fichier mal reconstruit)`);
+  });
+
+  // ---- TF-1850 (18/10/2026, RP-13) : au-delà de « z », l'allocateur rendait « z » — un nom DÉJÀ PRIS —
+  // alors que R-4 n'admet qu'une lettre et que des lettres du jour restaient libres dans le dossier
+  // (17 en 06-rapports le 15/10). Remède : la première lettre libre du jour DANS LE DOSSIER ; aucune
+  // libre → l'outil échoue avec un message clair. Double sens : « z » pris avec des trous ; dossier plein.
+  const peupler = (d, lettres, radical = "Produit - Rapport") => {
+    mkdirSync(d, { recursive: true });
+    for (const l of lettres) writeFileSync(join(d, `${radical} - ${JOUR}${l}.md`), `contenu ${l}`, "utf8");
+  };
+  const lettresAI = [..."abcdefghi"];
+
+  check("TF-1850 : « z » pris, des trous en deçà → la PREMIÈRE lettre libre du dossier, jamais « z »", () => {
+    const d = join(T, "z-avec-trous");
+    peupler(d, [...lettresAI, "z"]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    att(indice === "j", `indice « ${indice} » au lieu de « j » — au-delà de z l'allocateur doit rendre la première lettre libre du dossier (et non « z », déjà pris)`);
+  });
+
+  check("TF-1850 : même cas sous la portée « dossier » → « j » aussi", () => {
+    const d = join(T, "z-avec-trous-dossier");
+    peupler(d, [...lettresAI, "z"]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md", porte: "dossier" });
+    att(indice === "j", `indice « ${indice} » au lieu de « j »`);
+  });
+
+  check("TF-1850 : portée par défaut — la lettre libre POUR CE PRÉFIXE mais prise par un AUTRE radical est écartée", () => {
+    const d = join(T, "z-autre-radical");
+    peupler(d, [...lettresAI, "z"], "Produit - Rapport");
+    peupler(d, ["j", "k"], "Produit - Etude"); // j et k : libres pour « Rapport », prises (R-4) par « Etude »
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    att(indice === "l", `indice « ${indice} » au lieu de « l » — R-4 juge l'indice par dossier, tous radicaux confondus`);
+  });
+
+  check("TF-1850 : le nom rendu est ACCEPTÉ par R-4 (une lettre, unique dans le dossier du jour)", () => {
+    const d = join(T, "z-r4");
+    peupler(d, [...lettresAI, "z"]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    const nomRendu = `Produit - Rapport - ${JOUR}${indice}.md`;
+    att(/ - \d{8}[a-z]\.[\w.]+$/.test(nomRendu), `« ${nomRendu} » n'est pas une forme admise par R-4`);
+    att(!existsSync(join(d, nomRendu)), `« ${nomRendu} » existe déjà dans le dossier`);
+  });
+
+  check("TF-1850 : 26 lettres prises dans UN AUTRE dossier ne gênent pas le dossier cible", () => {
+    const plein = join(T, "autre-dossier-plein");
+    peupler(plein, [...LETTRES_26]);
+    const d = join(T, "cible-libre");
+    peupler(d, ["z"]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    att(indice === "a", `indice « ${indice} » au lieu de « a » — la portée est le dossier cible, pas le parc`);
+  });
+
+  check("TF-1850 : dossier PLEIN (a à z pris) → l'outil échoue avec un message clair, il ne rend pas un nom refusé", () => {
+    const d = join(T, "plein");
+    peupler(d, [...LETTRES_26]);
+    let message = null;
+    try { allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }); }
+    catch (e) { message = e.message; }
+    att(message !== null, "dossier plein : aucune erreur levée — un nom déjà pris ou refusé a été rendu");
+    att(/aucune lettre libre/.test(message) && /26/.test(message) && message.includes(JOUR), `message peu clair : « ${message} »`);
+  });
+
+  check("TF-1850 : dossier plein mais contenu IDENTIQUE à un fichier présent → son indice (pas d'erreur : rien à écrire)", () => {
+    const d = join(T, "plein-identique");
+    peupler(d, [...LETTRES_26]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "contenu q", extension: ".md" });
+    att(indice === "q", `indice « ${indice} » au lieu de « q »`);
   });
 
   check("un jour hors format AAAAMMJJ est REFUSÉ — il fabriquerait un motif faux en silence", () => {

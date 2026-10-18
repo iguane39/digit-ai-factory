@@ -16,7 +16,9 @@
  *   · rien n'existe pour ce jour                  → indice `a` ;
  *   · un fichier du jour porte le MÊME contenu    → SON indice — une re-génération à contenu
  *     inchangé n'est pas une nouvelle version, sinon l'outil pond un fichier par lancement ;
- *   · sinon                                       → l'indice SUIVANT le dernier pris.
+ *   · sinon                                       → l'indice SUIVANT le dernier pris ;
+ *   · le dernier pris est « z » (TF-1850)         → la PREMIÈRE LETTRE LIBRE DU JOUR DANS LE
+ *     DOSSIER (tous radicaux, comme R-4) ; les 26 prises → erreur claire, jamais un nom refusé.
  *
  * LA COMPARAISON SE FAIT SUR UNE FORME CANONIQUE où l'indice est neutralisé, parce que la
  * référence imprimée DANS le document (`REF-…-20260827a`, nom de fichier auto-cité) contient
@@ -83,5 +85,20 @@ export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".h
   }
   const derniere = pris[pris.length - 1].lettre;
   const suivant = LETTRES.indexOf(derniere) + 1;
-  return suivant < LETTRES.length ? LETTRES[suivant] : "z";
+  if (suivant < LETTRES.length) return LETTRES[suivant];
+  // TF-1850 (18/10/2026, RP-13) : « z » est pris et la suivante n'existe pas — l'ancienne branche
+  // rendait « z », un nom DÉJÀ PRIS. R-4 n'admet qu'UNE lettre (` - \d{8}[a-z]?\.`) et la juge par
+  // jour ET par dossier, tous radicaux confondus : on rend donc la PREMIÈRE LETTRE LIBRE DU JOUR
+  // DANS LE DOSSIER, quelle que soit la portée demandée (une lettre libre pour CE préfixe peut être
+  // prise par un AUTRE radical, que R-4 verrait en collision). Mesuré le 15/10 : 17 lettres du jour
+  // restaient libres dans 06-rapports. Aucune libre : l'outil échoue, il ne rend pas un nom que
+  // l'oracle de nommage refuserait.
+  const motifDossier = new RegExp(` - ${jour}([a-z])\\.[\\w.]+$`);
+  const prisDuDossier = new Set(readdirSync(dossier).map((f) => f.match(motifDossier)).filter(Boolean).map((m) => m[1]));
+  const libre = [...LETTRES].find((l) => !prisDuDossier.has(l));
+  if (!libre) {
+    throw new Error(`aucune lettre libre pour le jour ${jour} dans ${dossier} : les 26 lettres a-z sont prises `
+      + "(R-4 n'admet qu'une lettre par jour et par dossier) — ranger ce livrable dans un autre dossier, ou le dater du jour suivant");
+  }
+  return libre;
 }
