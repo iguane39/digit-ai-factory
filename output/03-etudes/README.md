@@ -35,5 +35,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261018-etude-opportunite-tableau-de-bord-pilotage.md` | fichier | 35,4 Ko | Étude d'opportunité — famille de document « tableau de bord de pilotage » et sa règle de l |
 | `20261018-L99-relecteur-critique-d-intention.md` | fichier | 22,7 Ko | Analyse L99 — « un relecteur critique qui garde l'intention initiale » — 20261018 |
 | `20261018-mesure-relecteur-d-intention.json` | fichier | 14,7 Ko | JSON |
+| `20261019-tri-opportunites-favoris-tiktok.md` | fichier | 25,7 Ko | Tri des favoris TikTok — opportunités pour la Factory — 20261019a |
 
-_17 fichier(s), 2 sous-dossier(s)_
+_18 fichier(s), 2 sous-dossier(s)_
