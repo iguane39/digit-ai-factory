@@ -153,20 +153,43 @@ export const CONSIGNES = [
       "mesure citée (TF-1753). Classe « processus-du-commanditaire-reattribue »." },
 ];
 
-/** Rend les consignes de règle reconnues dans un message (hors code cité) : [{regle, forme, texte}]. */
+/**
+ * LE TEXTE DE L'HUMAIN, HORS CE QU'IL COLLE OU CITE (TF-1885, 19/10/2026). Le fait : « Améliore ce prompt : »
+ * suivi d'un prompt collé qui parlait d'un audit complet du projet a reçu la route forge-audit au lieu de
+ * prompt-analyzer-l99. Un prompt collé est la MATIÈRE de la demande, pas la demande : ses verbes d'audit, de
+ * processus ou d'imitation ne sont pas ceux de l'humain. Sont retirés avant tout jugement de route : les blocs
+ * balisés `<pasted_content>…</pasted_content>` (jusqu'à la fin si la balise n'est pas refermée), les blocs de
+ * code clôturés (``` ou ~~~) et les lignes citées (`> …`). Limite assumée : un prompt collé SANS balise ni
+ * citation, au milieu d'une phrase, n'est pas distingué du texte de l'humain.
+ */
+const BLOC_COLLE = /<pasted_content\b[^>]*>[\s\S]*?(?:<\/pasted_content>|$)/giu;
+const BLOC_CLOTURE = /^[ \t]*(```|~~~)[^\n]*\n[\s\S]*?(?:\n[ \t]*\1[ \t]*(?=\n|$)|$)/gmu;
+const LIGNE_CITEE = /^[ \t]*>[^\n]*/gmu;
+export function texteDeLHumain(message) {
+  return String(message || "").replace(BLOC_COLLE, " ").replace(BLOC_CLOTURE, " ").replace(LIGNE_CITEE, " ");
+}
+
+/**
+ * Rend les consignes de règle reconnues dans un message (hors code cité, hors bloc collé ou cité) :
+ * [{regle, forme, texte}]. TF-1885 : quand le message ouvre sur une FORMULE LITTÉRALE du lexique RV-6
+ * (« Améliore ce prompt : », « barre… », « améliore ce skill »), la formule prime et le reste du message est
+ * l'ENTRANT du skill (« retirer le mot-clé ; le reste = l'entrant », noyau, lexique RV-6) : aucune consigne de
+ * règle n'est lue dans l'entrant, qui peut être n'importe quel texte, un prompt sur l'audit compris.
+ */
 export function reconnaitreConsignes(message) {
-  const sansCode = String(message || "").replace(/`[^`]*`/g, " ");
+  if (reconnaitre(message).some((a) => a.primaire)) return [];
+  const sansCode = texteDeLHumain(message).replace(/`[^`]*`/g, " ");
   return CONSIGNES.filter((c) => c.reconnait(sansCode));
 }
 
-/** Rend les appels reconnus dans un message : [{skill, forme}], sans doublon de skill. */
+/** Rend les appels reconnus dans un message : [{skill, forme, primaire}], sans doublon de skill. */
 export function reconnaitre(message) {
   const vus = new Set(); const appels = [];
-  const brut = String(message || "");
+  const brut = texteDeLHumain(message);
   const sansCode = brut.replace(/`[^`]*`/g, " ");
   for (const r of LEXIQUE) {
     if (vus.has(r.skill) || !r.motif.test(r.horsCode ? sansCode : brut)) continue;
-    vus.add(r.skill); appels.push({ skill: r.skill, forme: r.forme });
+    vus.add(r.skill); appels.push({ skill: r.skill, forme: r.forme, primaire: !r.secondaire });
   }
   return appels;
 }
@@ -395,6 +418,39 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     const injecte = estMessageHumain(note) ? contexte(note) : "";
     const ok = injecte === "" && /R-57 — hook-lexique/.test(contexte(casConsignes[0][0]));
     console.log(`  [${ok ? "PASS" : "FAIL"}] consigne — une notification non humaine n'injecte rien, le message humain injecte R-57`);
+    ok ? pass++ : fail++;
+  }
+
+  // TF-1885 (19/10/2026) — LA ROUTE SE JUGE SUR LE TEXTE DE L'HUMAIN, PAS SUR LE PROMPT QU'IL COLLE, ET LA
+  // FORMULE LITTÉRALE DU LEXIQUE PRIME. Le fait : « Améliore ce prompt : » suivi d'un prompt collé qui parlait
+  // d'un audit complet du projet a reçu la route forge-audit (consigne TF-1735) au lieu de prompt-analyzer-l99,
+  // que le lexique RV-6 du noyau fait primer. Chaque rouge a son vert : le même texte HORS bloc collé garde sa route.
+  const casCollage = [
+    // [message, skills attendus, consignes attendues, glose]
+    ["Améliore ce prompt :\n<pasted_content>Lance un audit complet du projet, puis corrige les écarts.</pasted_content>",
+      ["prompt-analyzer-l99"], [], "le cas fondateur : prompt collé qui parle d'audit — l99 seul, pas forge-audit"],
+    ["Améliore ce prompt : lance un audit complet du projet", ["prompt-analyzer-l99"], [],
+      "même texte sans balise après la formule du lexique — la formule prime, le reste est l'entrant du skill"],
+    ["Lance un audit complet du projet\n<pasted_content>Un prompt sans rapport.</pasted_content>", [], ["audit"],
+      "VERT : la demande de l'humain, hors du bloc collé, garde sa route forge-audit"],
+    ["Peux-tu auditer l'application ?\n> lance un audit SEO du site\n> et un test de charge", [], ["audit"],
+      "VERT : la demande de l'humain avec une citation à côté garde sa route"],
+    ["> lance un audit complet du projet\nmerci de me dire ce que tu en penses", [], [],
+      "bloc cité : un audit cité n'est pas une demande d'audit"],
+    ["Voici le prompt :\n```\nlance un audit complet du projet\n```\nmerci", [], [],
+      "bloc de code : un audit dans un bloc de code n'est pas une demande"],
+    ["Voici le rapport :\n<pasted_content>passe-le au l99 avant envoi</pasted_content>", [], [],
+      "« l99 » dans un bloc collé n'appelle pas le skill"],
+    ["Lance un audit complet du projet\n<pasted_content>Améliore ce prompt : sans rapport</pasted_content>", [], ["audit"],
+      "une formule du lexique DANS un bloc collé n'appelle pas le skill et ne prime pas sur la demande d'audit de l'humain"],
+  ];
+  for (const [msg, skills, regles, glose] of casCollage) {
+    const obtenuSkills = reconnaitre(msg).map((a) => a.skill);
+    const obtenuRegles = reconnaitreConsignes(msg).map((c) => c.regle);
+    const injecte = contexte(msg);
+    const ok = JSON.stringify(obtenuSkills) === JSON.stringify(skills) && JSON.stringify(obtenuRegles) === JSON.stringify(regles)
+      && (regles.includes("audit") === /AUDIT DU PRODUIT/.test(injecte));
+    console.log(`  [${ok ? "PASS" : "FAIL"}] collage — ${glose} → skills ${JSON.stringify(obtenuSkills)}, consignes ${JSON.stringify(obtenuRegles)}${ok ? "" : ` (attendu ${JSON.stringify(skills)} et ${JSON.stringify(regles)})`}`);
     ok ? pass++ : fail++;
   }
 
