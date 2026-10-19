@@ -270,6 +270,11 @@
         "motif": "exploitant|astreinte|run\\b|ops\\b|sre\\b|administrateur|devops|int[ée]grateur|d[ée]veloppeur(?!s? (?:ia|assist))",
         "pourquoi": "un lecteur dont le métier EST d'exécuter : la commande lui épargne une traduction, elle ne lui en impose pas",
         "depuis": "2026-09-16"
+      },
+      {
+        "motif": "session\\s+(?:de\\s+)?claude|claude\\s*code|sous-agents?|agents?\\s+(?:claude|ia\\b|de\\s+campagne|autonomes?)",
+        "pourquoi": "un prompt dont le lecteur est une SESSION ou un AGENT (Claude Code, sous-agent, agent de campagne) est exécuté par lui : le bloc de commande est l'instruction même, pas une compétence imposée à un humain (TF-1886, lot Produit-84 20261016c RT-5, 19/10/2026). « agent » seul n'en fait pas partie : un agent commercial ou immobilier est un humain qui n'exécute pas",
+        "depuis": "2026-10-19"
       }
     ],
     "non_juge": [

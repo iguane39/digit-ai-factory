@@ -1118,6 +1118,25 @@ function selfTest() {
     casse.push("EC-10 : un document SANS lecteur declare recoit un verdict — un destinataire inconnu "
       + `se DIT, il ne se devine pas : ${JSON.stringify(f10s)}`);
 
+  // TF-1886 (lot Produit-84 20261016c, RT-5) — UNE SESSION OU UN AGENT QUI LIT UN PROMPT L'EXÉCUTE. Le
+  // prompt du 16/10 déclarait pour lecteur « la session Claude Code du produit » et EC-10 refusait ses deux
+  // blocs bash (« le lecteur n'exécute pas ») : la liste des lecteurs exécutants ne connaissait que des
+  // métiers humains. VERTS : session Claude Code, sous-agent, agent de campagne. ROUGES, pour que la règle
+  // ne soit pas desserrée : un agent commercial (humain) et des développeurs assistés par IA (humains)
+  // restent refusés, et le bloc qui se RECOPIE n'est toujours compté pour personne.
+  const lecteurEC10 = (lecteur) => jouer("ec10-lecteur.md", EC10_ROUGE.replace("developpeurs assistes par IA", lecteur));
+  const fEC10 = (r) => (r.j?.findings || []).find((f) => f.regle === "EC-10");
+  for (const lecteur of ["la session Claude Code du produit", "un sous-agent de campagne", "agent de campagne autonome"]) {
+    const f = fEC10(lecteurEC10(lecteur));
+    if (f?.statut !== "PASS")
+      casse.push(`TF-1886 : un prompt dont le lecteur déclaré est « ${lecteur} », qui EXÉCUTE ses blocs, est refusé par EC-10 : ${JSON.stringify(f)}`);
+  }
+  for (const lecteur of ["agent commercial du réseau", "développeurs assistés par IA", "l'agent immobilier"]) {
+    const f = fEC10(lecteurEC10(lecteur));
+    if (f?.statut !== "FAIL")
+      casse.push(`TF-1886 : la règle est desserrée — un lecteur HUMAIN qui n'exécute pas (« ${lecteur} ») passe EC-10 : ${JSON.stringify(f)}`);
+  }
+
   // 4. ANTERIORITE — le meme texte rouge, sous un chemin declare, rend SKIP et jamais FAIL.
   const ante = jouer("anteriorite.md", FIXTURE_ROUGE, ["--chemin-relatif", "REGLES-PROJET.md"]);
   if (ante.statut !== 0) casse.push(`anteriorite : exit ${ante.statut}, attendu 0`);
@@ -1232,7 +1251,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 28 cas, 0 défaut (28/28 PASS — EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes)`);
+    : `Self-test ${NOM} : 30 cas, 0 défaut (30/30 PASS — EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 
