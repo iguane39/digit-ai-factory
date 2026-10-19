@@ -1,5 +1,7 @@
 # Retours forges — Produit-02 — 20261018c
 
+> **Note de réception du pilot (19/10/2026, décision humaine D-43 (a) de la synthèse 20261019e)** : ce lot a été refusé à la porte le 19/10 parce que ses lignes « classe-a-creer » ne portaient pas de classe_proposee au sidecar. Au sidecar, la classe proposée de RT-133 est reprise mot pour mot de la section « La règle qui aurait évité le retour ». Famille « interaction » de RT-133, absente du référentiel, rattachée par le pilot à « affordance-ui ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : pages de réservation par gîte du site, troisième version du 18/10/2026, hors run. L'exploitant a demandé que changer de gîte ne ramène plus en haut de la page, et d'en faire « une règle générale des onglets en milieu de page pour la Factory ». Heures en heure de Paris, sauf mention UTC.
 - **Références ledger** : `forge\ledger.jsonl` seq 485 (type `retour`, destinataire `digit-ai-forge-design`).
 - **Remise au pilot** : copier ce fichier et son sidecar dans le sas `<pilot>\input\00-retours\_arrivee\`, jamais à la racine de `input\00-retours\`. Statut : `a_remettre` → `remis le <date>`.

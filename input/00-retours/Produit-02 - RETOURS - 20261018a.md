@@ -1,5 +1,7 @@
 # Retours forges — Produit-02 — 20261018a
 
+> **Note de réception du pilot (19/10/2026, décision humaine D-43 (a) de la synthèse 20261019e)** : ce lot a été refusé à la porte le 19/10 parce que ses lignes « classe-a-creer » ne portaient pas de classe_proposee au sidecar. Au sidecar, la classe proposée de RT-128 est reprise mot pour mot de la section « La règle qui aurait évité le retour ». RT-129, pour lequel cette section ne nomme aucune classe, est retiré du sidecar et renvoyé au produit par un lot de travaux ; il reste lisible ci-dessous. Famille « consigne-d-agent » de RT-128, absente du référentiel, rattachée par le pilot à « regle-morte ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : clôture du run de version « Livret d'accueil traduit » du 18/10/2026 (décisions D-147 a, puis D-148 a à D-151 a), qui publie en 6 langues les 55 pages du livret du .fr. Heures en heure de Paris, sauf mention UTC.
 - **Références ledger** : `forge\ledger.jsonl` seq 455 et seq 462, corrigée par seq 463 (type `retour`, destinataire `digit-ai-factory`).
 - **Remise au pilot** : copier ce fichier et son sidecar dans le sas `<pilot>\input\00-retours\_arrivee\`, jamais à la racine de `input\00-retours\`. Statut : `a_remettre` → `remis le <date>`.

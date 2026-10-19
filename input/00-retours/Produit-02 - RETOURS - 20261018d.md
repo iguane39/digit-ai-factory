@@ -1,5 +1,7 @@
 # Retours forges — Produit-02 — 20261018d
 
+> **Note de réception du pilot (19/10/2026, décision humaine D-43 (a) de la synthèse 20261019e)** : ce lot a été refusé à la porte le 19/10 parce que ses lignes « classe-a-creer » ne portaient pas de classe_proposee au sidecar. Au sidecar, la classe proposée de RT-134 est reprise mot pour mot de la section « La règle qui aurait évité le retour ». RT-135 et RT-136, dont cette section nomme la clé et la famille mais pas le libellé, sont retirés du sidecar et renvoyés au produit par un lot de travaux ; ils restent lisibles ci-dessous. Famille « rendu » de RT-134, absente du référentiel, rattachée par le pilot à « page-html-socle ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : seconde correction de la page /agenda du 18/10/2026, après le retour de l'exploitant sur la version mise en ligne sous D-148 (a). Heures en heure de Paris, sauf mention UTC.
 - **Références ledger** : `forge\ledger.jsonl` seq 494, 495 et 496 (type `retour`, destinataire `digit-ai-factory`).
 - **Remise au pilot** : copier ce fichier et son sidecar dans le sas `<pilot>\input\00-retours\_arrivee\`, jamais à la racine de `input\00-retours\`. Statut : `a_remettre` → `remis le <date>`.

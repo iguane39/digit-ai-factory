@@ -20,14 +20,14 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`old\`](old/README.md) | dossier (678 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
 | `Produit-02 - RETOURS - 20261015a.md` | fichier | 8,5 Ko | Retours forges — Produit-02 — 20261015a |
 | `Produit-02 - RETOURS - 20261015a.tf.jsonl` | fichier | 3,3 Ko | 2 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20261018a.md` | fichier | 5,7 Ko | Retours forges — Produit-02 — 20261018a |
-| `Produit-02 - RETOURS - 20261018a.tf.jsonl` | fichier | 2,4 Ko | 2 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20261018b.md` | fichier | 7,7 Ko | Retours forges — Produit-02 — 20261018b |
-| `Produit-02 - RETOURS - 20261018b.tf.jsonl` | fichier | 4,1 Ko | 3 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20261018c.md` | fichier | 6,0 Ko | Retours forges — Produit-02 — 20261018c |
-| `Produit-02 - RETOURS - 20261018c.tf.jsonl` | fichier | 2,0 Ko | 1 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20261018d.md` | fichier | 6,8 Ko | Retours forges — Produit-02 — 20261018d |
-| `Produit-02 - RETOURS - 20261018d.tf.jsonl` | fichier | 4,0 Ko | 3 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261018a.md` | fichier | 6,4 Ko | Retours forges — Produit-02 — 20261018a |
+| `Produit-02 - RETOURS - 20261018a.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261018b.md` | fichier | 8,3 Ko | Retours forges — Produit-02 — 20261018b |
+| `Produit-02 - RETOURS - 20261018b.tf.jsonl` | fichier | 4,4 Ko | 3 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261018c.md` | fichier | 6,5 Ko | Retours forges — Produit-02 — 20261018c |
+| `Produit-02 - RETOURS - 20261018c.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261018d.md` | fichier | 7,5 Ko | Retours forges — Produit-02 — 20261018d |
+| `Produit-02 - RETOURS - 20261018d.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261019a.md` | fichier | 4,9 Ko | Retours forges — Produit-02 — 20261019a |
 | `Produit-02 - RETOURS - 20261019a.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261018a.md` | fichier | 6,6 Ko | Retours forges — Produit-12 — 20261018a |
