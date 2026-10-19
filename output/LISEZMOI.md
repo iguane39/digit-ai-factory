@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 456 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 457 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -505,6 +505,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md | 20261001b | 18.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md` |
 | Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md | 20261015l | 47.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` |
 | Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md | 20261019a | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` |
+| Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019c.md | 20261019c | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019c.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md | 20261018k | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md | 20261019b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` |
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |

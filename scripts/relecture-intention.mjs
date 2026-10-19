@@ -381,7 +381,7 @@ export function fabriquerDepot(depot, dejaCites) {
     if (ESTENV(f.rel)) corps = "[contenu NON cité : un fichier `.env` ne transite jamais]";
     else if (f.etat === "supprimé") corps = "[supprimé du disque depuis le commit de comparaison ; date de la suppression inconnue]";
     else if (f.etat.startsWith("neuf")) corps = coupe(citerFichier(f.abs), BORNES.depotFichier, "contenu du fichier neuf");
-    else { const d = git(depot.racine, ["diff", "--no-color", "--no-ext-diff", depot.base.length === 10 ? depot.base : ARBRE_VIDE, "--", f.rel]); corps = coupe(d.ok ? (d.out || "[diff vide]") : `[diff illisible : ${court(d.err, 150)}]`, BORNES.depotFichier, "diff du fichier"); }
+    else { const d = git(depot.racine, ["diff", "--no-color", "--no-ext-diff", depot.baseRev, "--", f.rel]); corps = coupe(d.ok ? (d.out || "[diff vide]") : `[diff illisible : ${court(d.err, 150)}]`, BORNES.depotFichier, "diff du fichier"); }
     corps = corps.length > reste ? coupe(corps, reste, "borne globale du dépôt") : corps;
     reste -= corps.length;
     out.push(`### ${f.rel} — ${f.etat}`, "", "```", corps, "```", "");
