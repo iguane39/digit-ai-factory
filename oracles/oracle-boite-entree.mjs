@@ -253,7 +253,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
         ? { regle: "B2", statut: "FAIL", ou: nom, depuis_h: age === null ? null : Number(age.toFixed(1)),
             message: "sidecar ÉDITÉ après son ingestion — le registre porte ce nom, mais plus ce contenu ; ce qui a été ajouté depuis n'est entré nulle part" }
         : { regle: "B1", statut: "FAIL", ou: nom, depuis_h: age === null ? null : Number(age.toFixed(1)),
-            message: "sidecar JAMAIS ingéré — le travail est arrivé et n'a pas été pris (`node todo\\ingerer-lot.mjs <fichier>`)"
+            message: "sidecar JAMAIS ingéré — le travail est arrivé et n'a pas été pris (`node todo/ingerer-lot.mjs <fichier>`)"
               + (age === null ? "" : ` ; déposé depuis ${age < 1 ? "moins d'une heure" : `${age.toFixed(0)} h`}`) },
     );
   }
@@ -272,7 +272,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     if (sidecars.some((s) => s.startsWith(base))) continue;
     const ageMd = ageHeures(join(repertoire, nom));
     findings.push({ regle: "B3", statut: "FAIL", ou: nom, depuis_h: ageMd === null ? null : Number(ageMd.toFixed(1)),
-      message: "lot remis SANS sidecar — aucun canal ne peut l'ingérer, il est invisible par construction (`node todo\\normaliser-lot.mjs` ou sidecar à réclamer au produit)"
+      message: "lot remis SANS sidecar — aucun canal ne peut l'ingérer, il est invisible par construction (`node todo/normaliser-lot.mjs` ou sidecar à réclamer au produit)"
         + (ageMd === null ? "" : ` ; déposé depuis ${ageMd < 1 ? "moins d'une heure" : `${ageMd.toFixed(0)} h`}`) });
   }
 
@@ -475,8 +475,8 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
       message: `${oublies.length} lot(s) attendent depuis plus de ${SEUIL_OUBLI_H} h (le plus ancien : ${plusVieux.toFixed(0)} h) — `
         + `${oublies.slice(0, 6).map((f) => f.ou).join(", ")}${oublies.length > 6 ? ", …" : ""}. `
         + "Un travail remonté qui n'entre pas au registre est un travail que le producteur croit remonté et que personne ne traite "
-        + "(mesuré le 07/09 : six lots déposés, zéro item). À jouer AVANT tout autre travail : `node todo\\ingerer-lot.mjs <fichier>` "
-        + "pour chacun (un lot sans sidecar passe d'abord par `node todo\\normaliser-lot.mjs`)" });
+        + "(mesuré le 07/09 : six lots déposés, zéro item). À jouer AVANT tout autre travail : `node todo/ingerer-lot.mjs <fichier>` "
+        + "pour chacun (un lot sans sidecar passe d'abord par `node todo/normaliser-lot.mjs`)" });
   }
 
   // B9 (TF-1198, 19/09/2026) — LE SAS D'ARRIVÉE EST HORS DE TOUT, DONC PERSONNE NE LE REGARDE.
@@ -506,7 +506,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
       message: `${auSas.length} lot(s) au sas d'arrivée, le plus ancien depuis ${plusVieux.toFixed(0)} h — `
         + (oubli ? `au-delà de ${SEUIL_OUBLI_H} h ce n'est plus une arrivée, c'est un OUBLI : le producteur croit son travail remonté et personne ne le traite. `
           : "ils attendent leur accueil. ")
-        + "À jouer : `node todo\\accueillir-lot.mjs` (pseudonymise et déplace), puis `node todo\\ingerer-lot.mjs <sidecar>` pour chacun. "
+        + "À jouer : `node todo/accueillir-lot.mjs` (pseudonymise et déplace), puis `node todo/ingerer-lot.mjs <sidecar>` pour chacun. "
         + "Les noms ne sont pas imprimés ici : ils sont réels, et c'est ce que le sas protège" });
   }
 

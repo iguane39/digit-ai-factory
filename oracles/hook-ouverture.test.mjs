@@ -188,9 +188,24 @@ check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans cla
     if (!/ATTENTION, état MESURÉ.*ne déclare aucun crochet PostToolUse qui régénère les README/.test(sortieAutres)) throw new Error("l'annonce prend les crochets page-html et écriture pour celui des README");
   });
   check("TF-1652, TF-1667 — chez un produit, la consigne nomme le script du pilot, --base . et --racines borné", () => {
-    const attendu = `node "${join(PILOT, "scripts", "readme-dossiers.mjs")}" --base . --racines`;
+    // TF-1887 : le chemin du pilot s'écrit avec des barres obliques (Git Bash avale la barre inverse).
+    const attendu = `node "${join(PILOT, "scripts", "readme-dossiers.mjs").replace(/\\/g, "/")}" --base . --racines`;
     if (!sortieAutres.includes(attendu)) throw new Error("la commande prescrite au produit n'est pas celle du pilot bornée au dossier écrit");
     if (/`node scripts\\\\readme-dossiers\.mjs`/.test(sortieAutres)) throw new Error("la consigne prescrit encore un chemin qui n'existe pas chez un produit");
+  });
+  // TF-1887 (19/10/2026) — LES COMMANDES PRESCRITES S'ÉCRIVENT AVEC DES BARRES OBLIQUES. Sous Git Bash, la barre
+  // inverse non protégée est avalée : `--racines output\03-Syntheses` devenait `output03-Syntheses` (exit 2).
+  // Node accepte la barre oblique sous Windows comme sous Bash. Le cas ROUGE est la commande du relevé
+  // d'ouverture rejouée dans un shell POSIX réel (sh), qui doit atteindre le dossier ; le VERT est qu'aucune
+  // commande prescrite (`node …`) ne porte plus de barre inverse, la prose des documents restant intacte.
+  check("TF-1887 — la commande readme-dossiers prescrite au produit ne porte AUCUNE barre inverse, placeholder de dossier compris", () => {
+    const m = /`(node "[^"`]*readme-dossiers\.mjs" --base \. --racines <[^>`]*>)`/.exec(sortieAutres);
+    if (!m) throw new Error("commande readme-dossiers prescrite au produit introuvable");
+    if (m[1].includes("\\")) throw new Error(`barre inverse dans la commande prescrite : ${m[1]}`);
+  });
+  check("TF-1887 — aucune commande `node …` du relevé d'ouverture du pilot ne porte une barre inverse", () => {
+    const fautives = [...sortieOuverturePilot.matchAll(/`(node [^`]*\\[^`]*)`/g)].map((x) => x[1]);
+    if (fautives.length) throw new Error(`commande(s) prescrite(s) à barre inverse : ${fautives.slice(0, 3).join(" | ")}`);
   });
   check("TF-1301 borne — l'ouverture d'un PRODUIT ne publie pas le stock du registre du pilot", () => {
     if (/Items ouverts sans classe/.test(sortieSans)) throw new Error("le stock du pilot est publié chez un produit");
