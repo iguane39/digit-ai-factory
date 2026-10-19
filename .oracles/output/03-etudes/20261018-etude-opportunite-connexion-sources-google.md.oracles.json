@@ -1,0 +1,81 @@
+{
+  "cible": "output/03-etudes/20261018-etude-opportunite-connexion-sources-google.md",
+  "date_iso": "2026-10-18T13:29:18.848Z",
+  "registre_version": "2.43.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+      "verdict": "PASS",
+      "detail": "6 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; pourcentage « 20 % » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+      "verdict": "SKIP",
+      "detail": "nom ne se réclamant pas de la convention"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 0 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 1 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md",
+    "ts": "2026-10-18T13:29:18.847Z",
+    "fichiers": {
+      "output\\03-etudes\\20261018-etude-opportunite-connexion-sources-google.md": "b45e296c06fef50b705c763efb02c7528f2ea00b0273da9e0bec2970b260c0f7"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

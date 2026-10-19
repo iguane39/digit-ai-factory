@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md",
+ "empreinte": "87250b307816afc728ad6317b640838bb2905a52919745b8e8e36d330b3013ca",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-17T15:37:04.267Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

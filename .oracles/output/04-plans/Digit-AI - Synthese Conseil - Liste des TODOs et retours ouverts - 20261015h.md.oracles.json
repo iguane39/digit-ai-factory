@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+  "date_iso": "2026-10-15T18:55:01.185Z",
+  "registre_version": "2.42.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; date d'engagement non sourcée : « **Une échéance, le 10/11/2026 (2).** »"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md",
+    "ts": "2026-10-15T18:55:01.184Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md": "561a066d4be45ff29982e754f1dc68bceecb09f7dffe13473fd7fbe676cf5d7e"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

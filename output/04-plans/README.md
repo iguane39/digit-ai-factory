@@ -27,7 +27,9 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` | fichier | 24,9 Ko | Synthèse Conseil — 12 décisions à trancher, une qualification de noms et 4 gestes humains  |
 | `Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` | fichier | 11,1 Ko | Synthèse Conseil — la flotte d'agents tient par ses gardes, pas par sa définition : 15 éca |
 | `Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` | fichier | 10,4 Ko | Synthèse Conseil — trois formats pour qu'une décision se comprenne et se tranche sans rien |
+| `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
+| `Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md` | fichier | 8,7 Ko | Synthèse Conseil — 4 sujets traitables tout de suite, 2 sur un mot de vous, le reste atten |
 | `Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md` | fichier | 8,5 Ko | Synthèse Étude — la relecture d'intention étendue à tous les travaux : deux points de rele |
 | `Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` | fichier | 9,0 Ko | Synthèse Étude — un relecteur d'intention voit les dérives à condition d'avoir une consign |
 | `Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md` | fichier | 13,6 Ko | Synthèse L99 — le prompt « relecteur critique qui garde l'intention » est analysé et réécr |
@@ -37,6 +39,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Archives classees en sous-dossiers - 20261016h.md` | fichier | 9,0 Ko | Synthèse Mandat — archives d'input et d'output classées en sous-dossiers (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md` | fichier | 7,0 Ko | Synthèse Mandat — « audit complet » ouvre désormais forge-audit, chez tous les produits (1 |
 | `Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` | fichier | 9,6 Ko | Synthèse Mandat — seuil relevé à 4 millions, boucle de correction et relecteur renforcé en |
+| `Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` | fichier | 6,1 Ko | Synthèse Mandat — boucle de correction, relecteur renforcé et seuil de 4 millions enregist |
 | `Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` | fichier | 11,7 Ko | Synthèse Mandat — votre décision D-55 (a) est exécutée : les 8 améliorations des pages de  |
 | `Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` | fichier | 9,6 Ko | Synthèse Mandat — campagne du matin reprise et close, 2 restes avancés (13/10/2026) |
 | `Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md` | fichier | 12,5 Ko | Synthèse Mandat — campagne du 12/10 sur 86 sujets du registre : 50 clos, 35 en cours avec  |
@@ -76,6 +79,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` | fichier | 5,6 Ko | Synthèse Mandat — pilot publié après reconstruction sur le distant, décision « 2a » exécut |
 | `Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` | fichier | 8,3 Ko | Synthèse Mandat — plans classés par mois, noms trop longs raccourcis (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
+| `Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` | fichier | 9,3 Ko | Synthèse Mandat — 4 dépôts publiés, skills recopiés, campagne de consigne jouée sans gagna |
 | `Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` | fichier | 5,3 Ko | Synthèse Mandat — vos décisions D-61 (a), D-62 (a) et D-63 sont exécutées : 3 dépôts publi |
 | `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
 | `Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` | fichier | 5,9 Ko | Synthèse Mandat — rangement des entrants dans input et output (16/10/2026) |
@@ -88,6 +92,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` | fichier | 4,7 Ko | Synthèse Mandat — reprise multi-poste construite, fusionnée avec l'autre poste, publicatio |
 | `Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` | fichier | 9,5 Ko | Synthèse Mandat — vos réponses 1a, 2a et 3b exécutées, reprise multi-poste prête à publier |
 | `Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` | fichier | 3,5 Ko | Synthèse Mandat — reprise réseau de l'installateur publiée, chantier d'installation sans q |
+| `Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019d.md` | fichier | 7,9 Ko | Synthèse Mandat — ce qui reste à faire au pilot, le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` | fichier | 12,2 Ko | Synthèse Mandat — retours et sujets qui attendaient ce poste (14/10/2026) |
 | `Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md` | fichier | 18,6 Ko | Digit-AI — Synthèse de mandat — Sas traité, 11 lots ingérés, 2 en attente de décision — 01 |
 | `Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` | fichier | 47,6 Ko | Synthèse Mandat — six travaux faits, onze décisions instruites, publication du pilot en at |
@@ -96,5 +101,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` | fichier | 17,6 Ko | Synthèse Mandat — 4 lots reçus, 10 corrections faites et publiées, 5 décisions vous revien |
 | `Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` | fichier | 10,7 Ko | Synthèse Mandat — 7 lots reçus, 24 sujets traités, 20 corrections publiées, 4 décisions ex |
 | `Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` | fichier | 16,1 Ko | Synthèse Mandat — la recette hébergée du pilot repasse au vert, les 2 lots du jour attende |
+| `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
 
-_77 fichier(s), 3 sous-dossier(s)_ · 6 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_83 fichier(s), 3 sous-dossier(s)_
