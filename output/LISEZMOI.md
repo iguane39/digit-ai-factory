@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 455 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 456 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -506,6 +506,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md | 20261015l | 47.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` |
 | Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md | 20261019a | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md | 20261018k | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` |
+| Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md | 20261019b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` |
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md *(archivé)* | 20261016a | 4.5 Ko | `04-plans/old/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` |
 
