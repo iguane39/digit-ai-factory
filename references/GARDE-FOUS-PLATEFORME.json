@@ -1,7 +1,7 @@
 {
   "format": "pilot/garde-fous-plateforme@1",
-  "version": "1.2.0",
-  "date": "2026-10-15",
+  "version": "1.3.0",
+  "date": "2026-10-19",
   "source": "Décision humaine D-37 (a) du 01/10/2026, TF-1495 et TF-1496 — lots « Produit-03 - RETOURS - 20260929d » (RA-51) et « Produit-03 - RETOURS - 20260929e » (RA-52). Le 29/09/2026, une stratégie Deny de la souscription d'un client a refusé la première livraison de production d'un produit. Le même produit l'avait heurtée en qualification le 23/07 et l'avait écrite en commentaire ; un produit voisin du même client l'avait heurtée le 31/08. La leçon n'a circulé ni vers la production, ni vers la factory.",
   "pourquoi_une_donnee": "Loi transverse n° 4 : une contrainte de plateforme est une donnée volatile. Le client la pose, la change ou la retire sans prévenir. Elle vit ici, datée et sourcée, et se confirme par le relevé du jour (ETAPE-MEP.md § 1 ter) : une entrée de ce registre est une piste à vérifier, jamais une preuve.",
   "pourquoi_ici": "Le pilot reçoit les lots de retours de tous les produits : c'est le seul endroit où une contrainte trouvée par un produit peut servir au suivant. Un fichier tenu par chaque produit ne circulerait pas, et un fichier tenu chez le client ne serait lu par aucun produit.",
@@ -122,6 +122,32 @@
       "inscrite_le": "2026-10-15",
       "verifiee_le": "2026-10-15",
       "verifiee_par": "constat du produit ; non reproduit sur un autre poste du parc (roue 2.1.4 chargée), installation pure rejouée (_row_cy.py)"
+    },
+    {
+      "id": "GFP-006",
+      "client": "tous",
+      "plateforme": "dropbox",
+      "mecanisme": "client de synchronisation Dropbox pour Windows, dossier synchronisé : la synchronisation retient chaque renommage d'un fichier déjà synchronisé",
+      "effet": "ralentissement sans refus : 3,0 s par renommage d'un fichier déjà synchronisé (3 031, 3 029 et 3 022 ms mesurés), contre 0 ms pour un fichier neuf et 0 ms Dropbox quitté",
+      "portee": "tout dossier synchronisé par le client Dropbox pour Windows, pour les fichiers déjà synchronisés ; Google Drive et OneDrive : non mesurés",
+      "vise": "le renommage et le déplacement d'un fichier déjà synchronisé, dans un dossier synchronisé",
+      "refuse": "rien, il retarde : 2 526 déplacements ont pris 2 h 06 (soit 3,0 s chacun, calcul du pilot : 7 560 s pour 2 526), puis 21 237 déplacements ont pris 84 s Dropbox quitté",
+      "consequence": "une modification en masse d'un dossier synchronisé se compte en heures au lieu de minutes (dossier de 81 414 fichiers au constat) : aucun gabarit ni aucune règle ne prévoyait ce frein, découvert en cours d'application",
+      "regle": "une modification en masse d'un dossier synchronisé (Dropbox, Google Drive, OneDrive) se fait synchronisation suspendue, après une mesure de vitesse sur un fichier réel du dossier",
+      "remede_eprouve": "client Dropbox quitté pendant l'application de la norme : 21 237 déplacements en 84 s (ledger du produit seq 339). La pause de la synchronisation, qui n'est pas la fermeture du client, est décrite par https://help.dropbox.com/sync/pause-resume (page mise à jour le 18/12/2024, lue le 18/10/2026 par le produit et le 19/10/2026 par le pilot) : sous Windows, icône de la zone de notification, texte d'état en bas de la fenêtre, puis 30 minutes, 1 heure, jusqu'à demain ou indéfiniment ; la pause n'a pas été mesurée ici, seule la fermeture du client l'est",
+      "non_mesure": [
+        "Google Drive : aucune mesure de vitesse de renommage dans un dossier synchronisé ; la façon de suspendre sa synchronisation n'a pas été lue",
+        "OneDrive : aucune mesure de vitesse de renommage dans un dossier synchronisé ; la façon de suspendre sa synchronisation n'a pas été lue",
+        "la pause de Dropbox, distincte de la fermeture du client : non mesurée"
+      ],
+      "posee_le": null,
+      "constatee": [
+        { "produit": "Produit-12", "le": "2026-10-18", "environnement": "poste de l'exploitant, dossier réel synchronisé de 81 414 fichiers", "trace": "application de la norme de rangement 2.18 ; ledger du produit seq 336 (2 526 déplacements en 2 h 06) et seq 339 (21 237 en 84 s, Dropbox quitté) ; vitesse_reel.py" }
+      ],
+      "source": "lot « Produit-12 - RETOURS - 20261018a » (RS-35)",
+      "inscrite_le": "2026-10-19",
+      "verifiee_le": "2026-10-18",
+      "verifiee_par": "constat du produit : 3 031, 3 029 et 3 022 ms par renommage d'un fichier déjà synchronisé, 0 ms pour un fichier neuf et 0 ms Dropbox quitté (vitesse_reel.py, ledger seq 336 et 339) ; non rejoué par le pilot, qui n'a lu que la page de pause de Dropbox"
     }
   ]
 }
