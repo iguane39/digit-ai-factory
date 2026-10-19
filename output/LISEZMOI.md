@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 458 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 473 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -212,6 +212,20 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261018-etude-opportunite-tableau-de-bord-pilotage.md | — | 35.4 Ko | `03-etudes/20261018-etude-opportunite-tableau-de-bord-pilotage.md` |
 | 20261018-L99-relecteur-critique-d-intention.md | — | 22.7 Ko | `03-etudes/20261018-L99-relecteur-critique-d-intention.md` |
 | 20261018-mesure-relecteur-d-intention.json | — | 14.7 Ko | `03-etudes/20261018-mesure-relecteur-d-intention.json` |
+| 20261019-etude-opportunite-animation-finition-interfaces.md | — | 21.2 Ko | `03-etudes/20261019-etude-opportunite-animation-finition-interfaces.md` |
+| 20261019-etude-opportunite-base-connaissance-wiki.md | — | 21.2 Ko | `03-etudes/20261019-etude-opportunite-base-connaissance-wiki.md` |
+| 20261019-etude-opportunite-check-list-avant-mise-en-ligne.md | — | 22 Ko | `03-etudes/20261019-etude-opportunite-check-list-avant-mise-en-ligne.md` |
+| 20261019-etude-opportunite-jeton-abonnement-taches-sans-ecran.md | — | 21.8 Ko | `03-etudes/20261019-etude-opportunite-jeton-abonnement-taches-sans-ecran.md` |
+| 20261019-etude-opportunite-modele-local-sans-gpu.md | — | 23 Ko | `03-etudes/20261019-etude-opportunite-modele-local-sans-gpu.md` |
+| 20261019-etude-opportunite-packs-agents-skills-tiers.md | — | 27 Ko | `03-etudes/20261019-etude-opportunite-packs-agents-skills-tiers.md` |
+| 20261019-etude-opportunite-pilotage-ordinateur-a-distance.md | — | 29.3 Ko | `03-etudes/20261019-etude-opportunite-pilotage-ordinateur-a-distance.md` |
+| 20261019-etude-opportunite-retro-ingenierie-par-agents.md | — | 20.8 Ko | `03-etudes/20261019-etude-opportunite-retro-ingenierie-par-agents.md` |
+| 20261019-etude-opportunite-service-marketing-agents.md | — | 21.5 Ko | `03-etudes/20261019-etude-opportunite-service-marketing-agents.md` |
+| 20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md | — | 24 Ko | `03-etudes/20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md` |
+| 20261019-etude-opportunite-skills-design-tiers.md | — | 27.6 Ko | `03-etudes/20261019-etude-opportunite-skills-design-tiers.md` |
+| 20261019-etude-opportunite-style-ecriture.md | — | 19.7 Ko | `03-etudes/20261019-etude-opportunite-style-ecriture.md` |
+| 20261019-etude-opportunite-tactiques-seo-geo-recentes.md | — | 22.3 Ko | `03-etudes/20261019-etude-opportunite-tactiques-seo-geo-recentes.md` |
+| 20261019-etude-opportunite-video-lancement-generee-par-code.md | — | 19.9 Ko | `03-etudes/20261019-etude-opportunite-video-lancement-generee-par-code.md` |
 | 20261019-tri-opportunites-favoris-tiktok.md | — | 25.7 Ko | `03-etudes/20261019-tri-opportunites-favoris-tiktok.md` |
 
 ### 04-plans
@@ -476,6 +490,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md | 20261003a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` |
 | Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md | 20261001g | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md` |
 | Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md | 20261001d | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` |
+| Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md | 20261019d | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md` |
 | Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md | 20261018c | 12.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md` |
 | Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md | 20261018d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md` |
 | Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md | 20261017c | 28.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md` |

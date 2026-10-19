@@ -35,6 +35,20 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261018-etude-opportunite-tableau-de-bord-pilotage.md` | fichier | 35,4 Ko | Étude d'opportunité — famille de document « tableau de bord de pilotage » et sa règle de l |
 | `20261018-L99-relecteur-critique-d-intention.md` | fichier | 22,7 Ko | Analyse L99 — « un relecteur critique qui garde l'intention initiale » — 20261018 |
 | `20261018-mesure-relecteur-d-intention.json` | fichier | 14,7 Ko | JSON |
+| `20261019-etude-opportunite-animation-finition-interfaces.md` | fichier | 21,2 Ko | Étude d'opportunité — animation et finition des interfaces — 20261019i |
+| `20261019-etude-opportunite-base-connaissance-wiki.md` | fichier | 21,2 Ko | Étude d'opportunité — une base de connaissance en wiki tenue par l'IA, pour la reprise de  |
+| `20261019-etude-opportunite-check-list-avant-mise-en-ligne.md` | fichier | 22,0 Ko | Étude d'opportunité — une check-list avant mise en ligne, comparée à la surface implicite  |
+| `20261019-etude-opportunite-jeton-abonnement-taches-sans-ecran.md` | fichier | 21,8 Ko | Étude d'opportunité — jeton d'abonnement pour les tâches sans écran — 20261019b |
+| `20261019-etude-opportunite-modele-local-sans-gpu.md` | fichier | 23,0 Ko | Étude d'opportunité — un modèle local sans carte graphique (BitNet de Microsoft) — 2026101 |
+| `20261019-etude-opportunite-packs-agents-skills-tiers.md` | fichier | 27,0 Ko | Étude d'opportunité — packs d'agents et de skills tiers comparés à la flotte — 20261019d |
+| `20261019-etude-opportunite-pilotage-ordinateur-a-distance.md` | fichier | 29,3 Ko | Étude d'opportunité — le pilotage de l'ordinateur à distance (Computer Use et Dispatch) —  |
+| `20261019-etude-opportunite-retro-ingenierie-par-agents.md` | fichier | 20,8 Ko | Étude d'opportunité — rétro-ingénierie par agents, le dépôt REA et le mode rétro-modèle —  |
+| `20261019-etude-opportunite-service-marketing-agents.md` | fichier | 21,5 Ko | Étude d'opportunité — un service marketing tenu par des agents — 20261019o |
+| `20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md` | fichier | 24,0 Ko | Étude d'opportunité — sessions parallèles et paliers d'autonomie : la fonction Projects de |
+| `20261019-etude-opportunite-skills-design-tiers.md` | fichier | 27,6 Ko | Étude d'opportunité — skills de design tiers pour digit-ai-forge-design — 20261019e |
+| `20261019-etude-opportunite-style-ecriture.md` | fichier | 19,7 Ko | Étude d'opportunité — style d'écriture « poli » ou « humanisé » — 20261019n |
+| `20261019-etude-opportunite-tactiques-seo-geo-recentes.md` | fichier | 22,3 Ko | Étude d'opportunité — tactiques SEO et GEO récentes pour digit-ai-forge-seo-geo — 20261019 |
+| `20261019-etude-opportunite-video-lancement-generee-par-code.md` | fichier | 19,9 Ko | Étude d'opportunité — une vidéo de lancement générée par le code, livrée avec la mise en p |
 | `20261019-tri-opportunites-favoris-tiktok.md` | fichier | 25,7 Ko | Tri des favoris TikTok — opportunités pour la Factory — 20261019a |
 
-_18 fichier(s), 2 sous-dossier(s)_
+_32 fichier(s), 2 sous-dossier(s)_
