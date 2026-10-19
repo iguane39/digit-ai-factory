@@ -24,8 +24,11 @@ veille/
 
 ## Index (le plus récent en haut)
 
+Le tableau liste chaque proposition étudiée, de la plus récente à la plus ancienne, avec son type, son verdict global et le lien vers son rapport ou son étude.
+
 | Date | Proposition | Type | Verdict global | Rapport |
 |---|---|---|---|---|
+| 2026-10-19 | GStack, Everything Claude Code et skills de Matt Pocock (`garrytan/gstack`, `affaan-m/everything-claude-code`, `mattpocock/skills`) | repos | Extraire l'idée sans installer (relevé du poids des descriptions de skills, 2 tests de rédaction) ; revue le 2026-11-16 | [étude](20261019-packs-agents-skills-tiers/etude.md) (inscription datée, sans rapport HTML) |
 | 2026-08-10 | Everything Claude Code (`affaan-m/everything-claude-code`) | repo | Adopter des éléments (3 patterns → forge-agents) | [rapport](20260810-everything-claude-code/rapport.html) |
 
 ### Précédents « pré-système » (avant ce gabarit, mêmes disciplines)
