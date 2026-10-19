@@ -18,17 +18,22 @@
  * il AVERTIT au moment de l'écriture, il ne bloque pas — bloquer une édition est le rôle du gate
  * d'écriture du poste (C7), et une page se construit en plusieurs écritures.
  *
+ * LA FAMILLE DU LIVRABLE (G8, TF-1874, 19/10/2026). Comme `hook-ecriture.mjs` pour un `.md`, il demande
+ * au catalogue la famille d'une page écrite sous `output\` ou `livrables\` (`jouerFamille`, importée
+ * de ce hook) : sans cela, la famille n'était vérifiée à l'écriture que pour un `.md`.
+ *
  * BORNES : rien si le poste n'a pas le skill (dit, jamais tu) ; rien hors `.html` ; un oracle qui ne
  * rend pas de JSON est rapporté ILLISIBLE, pas ignoré.
  *
  * Usage : node oracles/hook-page-html.mjs [--fichier <page.html>] [--self-test]   (stdin : JSON du hook)
  */
-import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { cheminSkillsInstalles } from "../scripts/lib-config-installee.mjs";
+import { jouerFamille } from "./hook-ecriture.mjs";
 
 const SKILLS = cheminSkillsInstalles();
 const ORACLE_FILTRES = join(SKILLS, "quality-oracles", "scripts", "oracle-filtres-tableau.mjs");
@@ -127,9 +132,22 @@ process.exit(fail ? 1 : 0);
   if (!jouerAvertissement(verte, { libelle: "lecture par un tiers (T1-T3)", chemin: fauxDoc }).some((l) => /PASS/.test(l))) casse.push("une page conforme à l'oracle documentaire n'est pas dite PASS");
   if (!jouerAvertissement(verte, { libelle: "conception", chemin: join(dir, "nulle-part.mjs") }).some((l) => /NON jouée/.test(l))) casse.push("un oracle documentaire absent est tu au lieu d'être dit");
   if (ORACLES_DOCUMENTAIRES.length !== 2) casse.push("les deux oracles documentaires ne sont plus déclarés");
+  // TF-1874 (19/10/2026) : la famille du livrable (G8) se joue à l'écriture d'une PAGE comme à celle d'un
+  // `.md` (hook-ecriture). Trois sens, jugés par le hook LANCÉ pour de bon sur une page jetable : hors
+  // `output\` la question ne se pose pas ; un type du catalogue résout sa famille ; un type absent est NOMMÉ.
+  const lancerHook = (page) => spawnSync(process.execPath, [fileURLToPath(import.meta.url), "--fichier", page],
+    { encoding: "utf8", timeout: 120000 }).stdout || "";
+  const pageHorsLivrable = join(dir, "note.html"); writeFileSync(pageHorsLivrable, "<p>x</p>", "utf8");
+  if (/\[famille\]/.test(lancerHook(pageHorsLivrable))) casse.push("la famille est demandée à une page qui n'est pas un livrable (hors `output\\`)");
+  mkdirSync(join(dir, "output", "04-plans"), { recursive: true });
+  const pageCouverte = join(dir, "output", "04-plans", "Digit-AI - Synthese Mandat - Campagne close - 20260916a.html");
+  const pageNue = join(dir, "output", "04-plans", "Digit-AI - Note Migration - Chemins renommes - 20260916a.html");
+  writeFileSync(pageCouverte, "<p>x</p>", "utf8"); writeFileSync(pageNue, "<p>x</p>", "utf8");
+  if (!/\[famille\][^\n]*famille « restitution »/.test(lancerHook(pageCouverte))) casse.push("une page « Synthese … » ne résout pas sa famille à l'écriture (TF-1874)");
+  if (!/\[famille\][^\n]*G8 — aucune famille/.test(lancerHook(pageNue))) casse.push("une page d'un type ABSENT du catalogue n'est pas nommée à l'écriture : la classe gabarit-famille-manquante récidive par ce silence (TF-1874)");
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length ? `Self-test hook-page-html : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-page-html : 11/11 PASS (cas rouge : page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés)");
+    : "Self-test hook-page-html : 14/14 PASS (cas rouge : page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés ; G8 dans ses TROIS sens sur une page lancée pour de bon — pas de famille demandée hors `output\\`, famille résolue sur une « Synthese … », type absent du catalogue NOMMÉ à l'écriture, TF-1874)");
   return casse.length ? 1 : 0;
 }
 
@@ -142,7 +160,9 @@ if (lanceEnDirect) {
   if (i >= 0) page = args[i + 1];
   else { let stdin = ""; try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin */ } page = fichierVise(stdin); }
   if (!page) process.exit(0);
-  const lignes = [...jouer(resolve(page)), ...ORACLES_DOCUMENTAIRES.flatMap((o) => jouerAvertissement(resolve(page), o))];
+  // TF-1874 : la famille du livrable (G8), jouée comme `hook-ecriture.mjs` la joue pour un `.md`.
+  const lignes = [...jouer(resolve(page)), ...ORACLES_DOCUMENTAIRES.flatMap((o) => jouerAvertissement(resolve(page), o)),
+    ...jouerFamille(resolve(page))];
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);
 }
