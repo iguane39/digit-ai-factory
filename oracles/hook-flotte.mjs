@@ -68,7 +68,7 @@ export function juger(entree, { maison } = {}) {
   const rappel = (cible) => "RELECTURE D'INTENTION (essai D-23 (a) du 18/10/2026, du 2026-10-18 au 2026-11-01) — cet appel vise « " + cible + " » : "
     + "chaque consigne passée à un agent se relit AVANT le lancement. `node scripts/relecture-intention.mjs --preparer consigne --fichier <consigne.md>` "
     + "(chez un produit : le script du pilot) écrit la demande humaine du tour, citée mot pour mot, et imprime la consigne à passer à un `verificateur` "
-    + "dont la description commence par « Relecture d'intention » ; un écart majeur se corrige dans la consigne ou se pose à l'humain avant l'appel. "
+    + "dont la description commence par « Relecture d'intention » ; un écart majeur se corrige dans la consigne ou se pose à l'humain avant l'appel. Une campagne dont les agents reçoivent le même gabarit se relit une fois, le gabarit et la liste des sujets ensemble (plusieurs --fichier), puis chaque livrable à sa réception (--preparer reception, D-40 (a) du 19/10/2026). "
     + "Rappel seulement (alerte, jamais blocage) : l'appel part tel quel. `references/RELECTURE-INTENTION.md`.";
   if (type && !GENERIQUES.has(type)) return { decision: "rappelle", message: rappel(type) };
   const aModele = typeof ti.model === "string" && ti.model.trim() !== "";

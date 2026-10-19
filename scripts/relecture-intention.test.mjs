@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { executer, STRICTE, FORME_JSON, FORME_JSON_V1, CONSIGNE_V2, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, MAX_PASSES, TYPES, texteHumain, lireVerdict, etatChaine, releverRegistre, numerosDeDecision, problemesReferentiel, verifierSources, reglesDesTypes } from "./relecture-intention.mjs";
+import { executer, STRICTE, FORME_JSON, FORME_JSON_V1, CONSIGNE_V2, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, MAX_PASSES, TYPES, texteHumain, lireVerdict, etatChaine, releverRegistre, numerosDeDecision, problemesReferentiel, verifierSources, reglesDesTypes, relusALaReception, sectionsDeConclusion, jugerForme } from "./relecture-intention.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
@@ -639,6 +639,62 @@ try {
     egal(q.status, 0, "exit --releve");
     const r = spawnSync(process.execPath, [join(ICI, "relecture-intention.mjs"), "--inconnue"], { encoding: "utf8", cwd: PROJET });
     egal(r.status, 2, "exit option inconnue");
+  });
+  // ---- D-40 (a), A-1, A-2 et A-3 du 19/10/2026 : réception, cohérence, consigne de campagne ----------------------------
+  const REGR = join(T, "registre-reception.jsonl");
+  const PLUS_TARD = new Date(Date.now() + 60000);
+  const ETUDE_A = join(T, "etude-a.md"), ETUDE_B = join(T, "etude-b.md");
+  writeFileSync(ETUDE_A, "# Étude A\nChapeau de l'étude A.\n\n## 1. Partition\nMILIEU-A-NE-PAS-CITER\n\n## 5. Verdict\n- Option retenue : O3 pour A.\n");
+  writeFileSync(ETUDE_B, "# Étude B\nChapeau B.\n\n## 2. État de l'art\nMILIEU-B-NE-PAS-CITER\n\n## 5. Verdict\n- Option retenue : O0 pour B.\n\n## Annexe\nANNEXE-B\n");
+  const PASS_FORME = () => ({ joue: true, verdict: "PASS", echecs: [], texte: "oracle-ecriture PASS" });
+  check("rouge — réception (A-2) : un oracle de forme en FAIL ne prépare rien et rend 1 ; sans un --fichier unique, 2", () => {
+    const d = join(T, "sortie-reception-fail");
+    const r = executer(["--preparer", "reception", "--fichier", ETUDE_A, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), { ...CTX, jugerForme: () => ({ joue: true, verdict: "FAIL", echecs: ["EC-2 : tic"], texte: "oracle-ecriture FAIL, 1 règle(s) en échec" }) });
+    egal(r.code, 1, "exit FAIL de forme"); if (existsSync(join(d, "demande.txt"))) throw new Error("une relecture préparée malgré le FAIL de forme");
+    if (!/EC-2 : tic/.test(r.sortie)) throw new Error("la règle en échec n'est pas dite");
+    egal(executer(["--preparer", "reception", "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "sans fichier");
+    egal(executer(["--preparer", "reception", "--fichier", ETUDE_A, "--fichier", ETUDE_B, "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "deux fichiers");
+  });
+  check("vert — réception (D-40 (a)) : le livrable est cité EN ENTIER avec le verdict de forme ; l'oracle réel saute un non-.md", () => {
+    const d = join(T, "sortie-reception");
+    const r = executer(["--preparer", "reception", "--fichier", ETUDE_A, "--transcript", TRANSCRIPT, "--sortie", d, "--type", "etude"], {}, new Date(), { ...CTX, jugerForme: PASS_FORME });
+    egal(r.code, 0, "exit"); const l = readFileSync(join(d, "livrables.md"), "utf8");
+    if (!l.includes("MILIEU-A-NE-PAS-CITER") || !l.includes("oracle-ecriture PASS")) throw new Error("livrable incomplet : " + l.slice(0, 300));
+    if (!/UN livrable qu'un agent vient de rendre/.test(r.consigne)) throw new Error("la consigne ne dit pas le point réception");
+    egal(jugerForme(NOTE).verdict, "SKIP", "oracle de forme sur un .ipynb");
+  });
+  check("vert — consigner la réception nomme le livrable ; la fin de tour le cite par son seul chemin, puis le recite s'il change", () => {
+    const v = join(T, "verdict-reception.json"); writeFileSync(v, JSON.stringify({ verdict: "sert", gravite: "aucune", ecarts: [], confiance: "elevee" }));
+    egal(executer(["--consigner", v, "--point", "reception", "--type", "etude", "--registre", REGR], {}, PLUS_TARD, CTX).code, 2, "réception sans --fichier");
+    const c = executer(["--consigner", v, "--point", "reception", "--type", "etude", "--fichier", PETIT, "--registre", REGR, "--session", "s"], {}, PLUS_TARD, CTX);
+    egal(c.code, 0, "exit consigner"); if (!c.ligne.fichier || !/petit\.md$/.test(c.ligne.fichier)) throw new Error("fichier non consigné : " + JSON.stringify(c.ligne));
+    if (relusALaReception(readFileSync(REGR, "utf8").trim().split("\n").map((x) => JSON.parse(x))).size !== 1) throw new Error("le livrable relu n'est pas reconnu");
+    const d = join(T, "sortie-fin-relus");
+    executer(["--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", d, "--registre", REGR], {}, new Date(), CTX);
+    const l = readFileSync(join(d, "livrables.md"), "utf8");
+    if (!/relu à sa réception sous RI-\d{8}-01/.test(l) || l.includes("Le contenu du petit livrable")) throw new Error("le livrable relu est recité : " + l.slice(0, 500));
+    const futur = new Date(Date.now() + 3600000); utimesSync(PETIT, futur, futur);
+    const d2 = join(T, "sortie-fin-relus-change");
+    executer(["--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", d2, "--registre", REGR], {}, new Date(), CTX);
+    if (!readFileSync(join(d2, "livrables.md"), "utf8").includes("Le contenu du petit livrable")) throw new Error("un livrable modifié après sa relecture n'est pas recité");
+  });
+  check("vert — cohérence (A-3) : chapeau et verdict de chaque livrable côte à côte, sans leur milieu ; moins de deux livrables, 2", () => {
+    const d = join(T, "sortie-coherence");
+    const r = executer(["--preparer", "coherence", "--fichier", ETUDE_A, "--fichier", ETUDE_B, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX);
+    egal(r.code, 0, "exit"); const l = readFileSync(join(d, "livrables.md"), "utf8");
+    for (const x of ["Chapeau de l'étude A", "O3 pour A", "Chapeau B", "O0 pour B"]) if (!l.includes(x)) throw new Error(`« ${x} » absent`);
+    for (const x of ["MILIEU-A-NE-PAS-CITER", "MILIEU-B-NE-PAS-CITER", "ANNEXE-B"]) if (l.includes(x)) throw new Error(`« ${x} » cité à tort`);
+    if (!/ENSEMBLE/.test(r.consigne) || !/contredisent/.test(r.consigne)) throw new Error("la consigne de cohérence ne dit pas sa question");
+    egal(executer(["--preparer", "coherence", "--fichier", ETUDE_A, "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "un seul livrable");
+    if (!/aucune section de verdict/.test(sectionsDeConclusion("# T\nchapeau\n\n## 1. Seul\ncorps"))) throw new Error("le repli sans section de verdict n'est pas dit");
+  });
+  check("vert — consigne de campagne (A-1) : le gabarit et la liste des sujets se relisent en une fois", () => {
+    const g = join(T, "gabarit.md"), s = join(T, "sujets.md");
+    writeFileSync(g, "Étudie l'opportunité <SUJET> au gabarit d'étude."); writeFileSync(s, "1. jeton d'abonnement\n2. vidéo de lancement");
+    const d = join(T, "sortie-campagne");
+    egal(executer(["--preparer", "consigne", "--fichier", g, "--fichier", s, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX).code, 0, "exit");
+    const l = readFileSync(join(d, "livrables.md"), "utf8");
+    if (!/2 pièces lues ensemble/.test(l) || !l.includes("<SUJET>") || !l.includes("vidéo de lancement")) throw new Error(l.slice(0, 400));
   });
   check("borne — le registre du pilot n'a pas été touché par la recette", () => {
     const pilote = join(RACINE, "todo", "relectures-intention.jsonl");
