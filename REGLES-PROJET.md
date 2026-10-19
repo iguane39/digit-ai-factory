@@ -1785,6 +1785,17 @@ ne touchait aucune ligne existante ; un test de la v2.14 passait aussi sur le co
    augmente les erreurs graves ou dont le tirage trouve des faux est rejetée, numéro et raison gardés ;
    la boucle s'arrête quand deux versions consécutives gagnent moins d'un point, ou à la borne fixée
    d'avance, en disant ce que seul le métier peut lever.
+2 bis. **Trois étapes s'y ajoutent** (décision humaine D-35 (a) du 19/10/2026, TF-1879 et TF-1881,
+   lot `Produit-12 - RETOURS - 20261018a`, RS-34 et RS-36) :
+   - une règle se juge sur un échantillon NEUF, qu'elle n'a pas servi à écrire, et deux versions se
+     comparent sur les MÊMES fichiers, la place donnée par l'ancienne jugée à l'aveugle pour les seuls
+     fichiers qui changent. Le fait : la v2.17 corrigeait 27 des 44 erreurs de son jeu d'écriture,
+     mais ne gagnait que 2 fichiers nets sur 150 fichiers neufs ; deux tirages de la même version ont
+     donné 69,7 et 62,3 % ;
+   - l'étiquetage à l'aveugle se fait deux fois, par deux étiqueteurs indépendants, et seuls leurs
+     désaccords vont au métier. Le fait : accord de 91,3 %, questions au métier de 65 à 19 ;
+   - les images que la reconnaissance de texte ne lit pas se lisent par planches de vignettes
+     numérotées. Le fait : 996 images lues, 52 pièces sensibles sorties de dossiers de photos.
 3. **Ce que R-63 ne fixe pas** : la taille d'un échantillon ni un seuil de justesse, choix du métier de
    chaque produit. Elle ne remplace pas les oracles de forme ; elle s'y ajoute pour juger le fond.
 
