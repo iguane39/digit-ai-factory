@@ -148,6 +148,11 @@ import { postesParDefaut } from "./oracle-amorcage-poste.mjs";
 // TF-0965 — la table des dépôts consommateurs (DONNÉE datée) et le geste avant/après.
 import { encadrer } from "./consommateurs-skills.mjs";
 
+// TF-1878 : l'environnement d'un appel git SANS les variables GIT_* héritées (GIT_DIR, GIT_WORK_TREE,
+// GIT_INDEX_FILE… posées par un hameçon git ou par une session). Lu à CHAQUE appel, pas à l'import :
+// la recette pose un GIT_DIR piège le temps d'un cas.
+const envSansGit = () => Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_/i.test(k)));
+
 const VERSION = "1.3.0"; // 1.3.0 : K8 (le câblage installé pointe-t-il un fichier qui existe — TF-0305)
 const ORACLE = "oracle-skills";
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -409,7 +414,7 @@ function modifieeDepuisPropagation(cible, derniers) {
 // rien et K11 garde son verdict d'origine — l'oracle ne devient pas plus permissif faute d'outil.
 function identiqueAUnEtatAnterieurDeLaSource(srcFichier, cible) {
   try {
-    const git = (cwd, ...a) => spawnSync("git", ["-C", cwd, ...a], { encoding: "utf8", timeout: 20000, maxBuffer: 32 * 1024 * 1024 });
+    const git = (cwd, ...a) => spawnSync("git", ["-C", cwd, ...a], { encoding: "utf8", timeout: 20000, maxBuffer: 32 * 1024 * 1024, env: envSansGit() });
     const top = git(dirname(srcFichier), "rev-parse", "--show-toplevel");
     if (top.status !== 0) return false;
     const racineDepot = top.stdout.trim();
@@ -1183,7 +1188,7 @@ function selfTest() {
   // ni relevée par K11, ni épargnée par `--appliquer`. Rouge : une copie qui diffère de TOUS les états
   // de l'historique reste relevée et épargnée (le garde ne devient pas permissif).
   const depotAgents = join(racine, "digit-ai-forge-agents");
-  const gitT = (...a) => spawnSync("git", ["-C", depotAgents, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+  const gitT = (...a) => spawnSync("git", ["-C", depotAgents, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8", env: envSansGit() });
   gitT("init", "-q", "-b", "main");
   poser(join(src, "iota", "SKILL.md"), "# iota v1\n");
   gitT("add", "-A"); gitT("commit", "-q", "-m", "iota v1");
@@ -1204,6 +1209,41 @@ function selfTest() {
   cas.push(["K11 ter— …et toujours épargnée par --appliquer", readFileSync(cibleI, "utf8").includes("lignes propres")]);
   rmSync(join(src, "iota"), { recursive: true, force: true });
   rmSync(join(inst, "iota"), { recursive: true, force: true });
+
+  // K11 (TF-1878, 19/10/2026) — LES VARIABLES GIT_* D'UN HAMEÇON NE DOIVENT PAS DÉTOURNER LA CONFRONTATION.
+  // Le fait : sous un `GIT_DIR` hérité (hameçon git, session qui l'exporte), les deux cas TF-1611 ci-dessus
+  // rendaient « 96/98 » — la confrontation à l'historique et les `git commit` de la recette visaient le dépôt
+  // de l'hameçon au lieu du dépôt de la source. Pire : `git add -A` + `git commit` de la recette s'écrivaient
+  // alors dans CE dépôt (un commit « iota v1 » constaté dans le dépôt réel en le reproduisant, défait).
+  // Le banc pose donc un dépôt LEURRE, désigné par GIT_DIR/GIT_WORK_TREE le temps du cas, et rejoue le
+  // scénario TF-1611 : sans lui, un GIT_DIR vers un dépôt réel ferait écrire la recette dans ce dépôt.
+  {
+    const leurre = join(racine, "leurre-hamecon");
+    mkdirSync(leurre, { recursive: true });
+    spawnSync("git", ["-C", leurre, "init", "-q", "-b", "main"], { encoding: "utf8", env: envSansGit() });
+    const sauve = { dir: process.env.GIT_DIR, arbre: process.env.GIT_WORK_TREE };
+    process.env.GIT_DIR = join(leurre, ".git");
+    process.env.GIT_WORK_TREE = leurre;
+    try {
+      poser(join(src, "kappa", "SKILL.md"), "# kappa v1\n");
+      gitT("add", "-A"); gitT("commit", "-q", "-m", "kappa v1");
+      poser(join(src, "kappa", "SKILL.md"), "# kappa v2\n");
+      gitT("add", "-A"); gitT("commit", "-q", "-m", "kappa v2");
+      juger(racine, inst, true);
+      const cibleK = join(inst, "kappa", "SKILL.md");
+      writeFileSync(cibleK, "# kappa v1\n"); // état périmé, identique au blob du premier commit
+      r = juger(racine, inst);
+      cas.push(["K11 hameçon — sous un GIT_DIR hérité, une copie identique à un état ANTÉRIEUR n'est toujours pas un travail propre",
+                !echoue(r, "K11") && echoue(r, "K2")]);
+      juger(racine, inst, true);
+      cas.push(["K11 hameçon — …et --appliquer l'écrase toujours", readFileSync(cibleK, "utf8") === "# kappa v2\n"]);
+    } finally {
+      if (sauve.dir === undefined) delete process.env.GIT_DIR; else process.env.GIT_DIR = sauve.dir;
+      if (sauve.arbre === undefined) delete process.env.GIT_WORK_TREE; else process.env.GIT_WORK_TREE = sauve.arbre;
+    }
+    rmSync(join(src, "kappa"), { recursive: true, force: true });
+    rmSync(join(inst, "kappa"), { recursive: true, force: true });
+  }
 
   // K12 (TF-1099) — une source EN COURS DE MODIFICATION n'est ni comparée ni propagée, et c'est
   // déclaré. Rouge d'origine : sans l'exclusion, `--appliquer` recopiait l'état intermédiaire.
