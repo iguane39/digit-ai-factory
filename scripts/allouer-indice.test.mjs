@@ -12,6 +12,8 @@
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { allouerIndice, canonique } from "./allouer-indice.mjs";
 
 let pass = 0, fail = 0;
@@ -184,6 +186,74 @@ try {
     peupler(d, [...LETTRES_26]);
     const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "contenu q", extension: ".md" });
     att(indice === "q", `indice « ${indice} » au lieu de « q »`);
+  });
+
+  // ---- TF-1863 (19/10/2026, R-58 option a) : six documents prescrivent `node scripts\allouer-indice.mjs`
+  // en ligne de commande ; le module n'avait aucun point d'entrée, la commande finissait muette (exit 0,
+  // aucune sortie). Chaque cas LANCE le script comme le prescrivent les documents (processus node réel).
+  const SCRIPT = fileURLToPath(new URL("./allouer-indice.mjs", import.meta.url));
+  const lancer = (args, cwd = T) => spawnSync(process.execPath, [SCRIPT, ...args], { cwd, encoding: "utf8" });
+
+  check("TF-1863 vert : sans argument, dans un dossier vide → imprime `a` (exit 0) — la commande prescrite rend un indice", () => {
+    const d = join(T, "cli-vide");
+    mkdirSync(d, { recursive: true });
+    const r = lancer([], d);
+    att(r.status === 0 && r.stdout.trim() === "a", `exit ${r.status}, sortie « ${r.stdout.trim()} » — attendu exit 0 et « a »`);
+  });
+
+  check("TF-1863 vert : sans argument, le dossier courant porte déjà le jour → l'indice SUIVANT, tous radicaux confondus", () => {
+    const d = join(T, "cli-courant");
+    mkdirSync(d, { recursive: true });
+    const maintenant = new Date();
+    const aujourdhui = `${maintenant.getFullYear()}${String(maintenant.getMonth() + 1).padStart(2, "0")}${String(maintenant.getDate()).padStart(2, "0")}`;
+    writeFileSync(join(d, `Produit - Etude - ${aujourdhui}a.md`), "x", "utf8");
+    const r = lancer([], d);
+    att(r.status === 0 && r.stdout.trim() === "b", `exit ${r.status}, sortie « ${r.stdout.trim()} » — attendu « b »`);
+  });
+
+  check("TF-1863 vert : forme positionnelle `dossier préfixe jour` (la signature du module) → l'indice suivant", () => {
+    const d = join(T, "cli-positions");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, `Produit - Rapport - ${JOUR}a.md`), "x", "utf8");
+    writeFileSync(join(d, `Produit - Rapport - ${JOUR}b.md`), "y", "utf8");
+    const r = lancer([d, "Produit - Rapport - ", JOUR]);
+    att(r.status === 0 && r.stdout.trim() === "c", `exit ${r.status}, sortie « ${r.stdout.trim()} » — attendu « c »`);
+  });
+
+  check("TF-1863 vert : options nommées, jour au format ISO, portée « prefixe » demandée → seul ce préfixe compte", () => {
+    const d = join(T, "cli-options");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, `Produit - Etude - ${JOUR}a.md`), "x", "utf8");
+    const r = lancer(["--dossier", d, "--prefixe", "Produit - Rapport - ", "--jour", "2026-08-31", "--extension", ".md", "--porte", "prefixe"]);
+    att(r.status === 0 && r.stdout.trim() === "a", `exit ${r.status}, sortie « ${r.stdout.trim()} » — attendu « a »`);
+  });
+
+  check("TF-1863 vert : `--contenu-fichier` identique au fichier présent → son indice, pas un neuf", () => {
+    const d = join(T, "cli-contenu");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, `Produit - Rapport - ${JOUR}a.md`), "meme texte", "utf8");
+    writeFileSync(join(d, `Produit - Rapport - ${JOUR}b.md`), "autre texte", "utf8");
+    const candidat = join(T, "cli-contenu-candidat.txt");
+    writeFileSync(candidat, "meme texte", "utf8");
+    const r = lancer(["--dossier", d, "--prefixe", "Produit - Rapport - ", "--jour", JOUR, "--extension", ".md", "--contenu-fichier", candidat]);
+    att(r.status === 0 && r.stdout.trim() === "a", `exit ${r.status}, sortie « ${r.stdout.trim()} » — attendu « a »`);
+  });
+
+  check("TF-1863 rouge : jour mal formé → exit 1 et message sur stderr, rien sur stdout", () => {
+    const r = lancer([T, "", "31/08/2026"]);
+    att(r.status === 1 && r.stdout === "" && /AAAAMMJJ/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+  });
+
+  check("TF-1863 rouge : dossier plein (a à z) → exit 1 « aucune lettre libre », jamais un nom refusé", () => {
+    const d = join(T, "cli-plein");
+    peupler(d, [...LETTRES_26]);
+    const r = lancer([d, "Produit - Rapport - ", JOUR]);
+    att(r.status === 1 && r.stdout === "" && /aucune lettre libre/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+  });
+
+  check("TF-1863 rouge : option inconnue → exit 2 (usage), pas d'indice deviné", () => {
+    const r = lancer(["--hasard", "x"]);
+    att(r.status === 2 && r.stdout === "" && /option inconnue/.test(r.stderr), `exit ${r.status}, stderr « ${r.stderr.trim()} »`);
   });
 
   check("un jour hors format AAAAMMJJ est REFUSÉ — il fabriquerait un motif faux en silence", () => {

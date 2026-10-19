@@ -50,7 +50,8 @@
  *     existe, comme pour toute allocation par lecture du disque.
  */
 import { readdirSync, readFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const LETTRES = "abcdefghijklmnopqrstuvwxyz";
 
@@ -77,11 +78,14 @@ export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".h
       .sort((a, b) => a.lettre.localeCompare(b.lettre))
     : [];
   if (!pris.length) return "a";
-  const mienne = canonique(contenu, jour);
-  for (const { lettre, nom } of pris) {
-    let existant;
-    try { existant = readFileSync(join(dossier, nom), "utf8"); } catch { continue; }
-    if (canonique(existant, jour) === mienne) return lettre;
+  // TF-1863 : sans `contenu` (appel en ligne de commande, rien à comparer), pas de recherche d'identité.
+  if (contenu !== undefined) {
+    const mienne = canonique(contenu, jour);
+    for (const { lettre, nom } of pris) {
+      let existant;
+      try { existant = readFileSync(join(dossier, nom), "utf8"); } catch { continue; }
+      if (canonique(existant, jour) === mienne) return lettre;
+    }
   }
   const derniere = pris[pris.length - 1].lettre;
   const suivant = LETTRES.indexOf(derniere) + 1;
@@ -101,4 +105,55 @@ export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".h
       + "(R-4 n'admet qu'une lettre par jour et par dossier) — ranger ce livrable dans un autre dossier, ou le dater du jour suivant");
   }
   return libre;
+}
+
+/**
+ * POINT D'ENTRÉE EN LIGNE DE COMMANDE (TF-1863, 19/10/2026, R-58 option a). Six documents prescrivent
+ * `node scripts\allouer-indice.mjs` ; le module n'avait aucun point d'entrée, la commande se terminait
+ * sans rien dire. Elle imprime désormais l'indice (une lettre) sur la sortie standard.
+ *
+ *   node scripts/allouer-indice.mjs [dossier] [prefixe] [jour]
+ *   node scripts/allouer-indice.mjs --dossier <d> --prefixe <p> --jour AAAAMMJJ [--extension .md]
+ *                                   [--contenu-fichier <f>] [--porte dossier|prefixe]
+ *
+ * Défauts : dossier = répertoire courant, prefixe = « » (aucun), jour = aujourd'hui (heure locale),
+ * portée « dossier » (celle de R-4 : une lettre par jour et par dossier, tous radicaux confondus ;
+ * « prefixe » reste demandable). Sans `--contenu-fichier`, aucune identité de contenu n'est cherchée :
+ * l'indice rendu est la lettre qui suit la dernière prise. Sortie 0 = indice imprimé ; 1 = dossier plein
+ * ou jour mal formé ; 2 = usage erroné.
+ */
+export function executerCli(argv, { sortie = (t) => process.stdout.write(t), erreur = (t) => process.stderr.write(t) } = {}) {
+  const valeurs = {};
+  const positions = [];
+  const AVEC_VALEUR = new Set(["dossier", "prefixe", "jour", "extension", "contenu-fichier", "porte"]);
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a.startsWith("--")) {
+      const cle = a.slice(2);
+      if (!AVEC_VALEUR.has(cle) || i + 1 >= argv.length) { erreur(`option inconnue ou sans valeur : ${a}\n`); return 2; }
+      valeurs[cle] = argv[++i];
+    } else positions.push(a);
+  }
+  if (positions.length > 3) { erreur("trop d'arguments : [dossier] [prefixe] [jour]\n"); return 2; }
+  const [pDossier, pPrefixe, pJour] = positions;
+  const dossier = valeurs.dossier ?? pDossier ?? process.cwd();
+  const prefixe = valeurs.prefixe ?? pPrefixe ?? "";
+  const porte = valeurs.porte ?? "dossier";
+  if (porte !== "dossier" && porte !== "prefixe") { erreur("--porte attend « dossier » ou « prefixe »\n"); return 2; }
+  const d = new Date();
+  const aujourdhui = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+  const jour = String(valeurs.jour ?? pJour ?? aujourdhui).replaceAll("-", "");
+  let contenu;
+  if (valeurs["contenu-fichier"] !== undefined) {
+    try { contenu = readFileSync(valeurs["contenu-fichier"], "utf8"); }
+    catch (e) { erreur(`contenu illisible : ${e.message}\n`); return 2; }
+  }
+  try {
+    sortie(`${allouerIndice({ dossier, prefixe, jour, contenu, extension: valeurs.extension ?? ".html", porte })}\n`);
+    return 0;
+  } catch (e) { erreur(`${e.message}\n`); return 1; }
+}
+
+if (process.argv[1] && resolve(process.argv[1]).toLowerCase() === fileURLToPath(import.meta.url).toLowerCase()) {
+  process.exit(executerCli(process.argv.slice(2)));
 }
