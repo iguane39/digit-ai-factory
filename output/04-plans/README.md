@@ -91,7 +91,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` | fichier | 12,2 Ko | Synthèse Mandat — retours et sujets qui attendaient ce poste (14/10/2026) |
 | `Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md` | fichier | 18,6 Ko | Digit-AI — Synthèse de mandat — Sas traité, 11 lots ingérés, 2 en attente de décision — 01 |
 | `Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` | fichier | 47,6 Ko | Synthèse Mandat — six travaux faits, onze décisions instruites, publication du pilot en at |
+| `Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` | fichier | 9,2 Ko | Synthèse Mandat — sujets ouverts au 19/10/2026 |
 | `Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` | fichier | 17,6 Ko | Synthèse Mandat — 4 lots reçus, 10 corrections faites et publiées, 5 décisions vous revien |
 | `Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` | fichier | 16,1 Ko | Synthèse Mandat — la recette hébergée du pilot repasse au vert, les 2 lots du jour attende |
 
-_74 fichier(s), 3 sous-dossier(s)_
+_75 fichier(s), 3 sous-dossier(s)_
