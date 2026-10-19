@@ -255,7 +255,10 @@ Avant (12/10) : les coûts d'un abonnement expliqués dans les blocs 4 et 8 d'un
   PASS ; il reste à 95 % ou plus sur les textes déjà jugés, sinon la donnée se recalibre, jamais
   la règle ne se supprime.
 - **La donnée** : `references\tics-redactionnels.json`, datée et sourcée ; un retour humain de
-  lisibilité y ajoute une tournure, une famille ou un seuil ; l'oracle ne change pas.
+  lisibilité y ajoute une tournure, une famille ou un seuil ; l'oracle ne change pas. Chaque famille
+  porte `derniere_lecture` et `revue_prevue` : EC-13 avertit, sans jamais faire échouer un texte,
+  quand une revue est dépassée ou sans date (TF-1905, 19/10/2026). Relire une liste, c'est la
+  confronter de nouveau à ses sources, puis inscrire les deux dates.
 - **Ce que le plancher ne juge pas** est déclaré dans le `non_juge` de l'oracle : la justesse
   d'une voix, la véracité, le jargon hors référentiel, les textes d'application (T4, lot de
   travaux forge-design), un tic hors liste.
