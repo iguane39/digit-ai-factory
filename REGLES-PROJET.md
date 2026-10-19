@@ -314,7 +314,12 @@ revient à l'utilisateur, sans critère écrit.
    présente dans le dépôt, l'API de la plateforme pour le geste lui-même. Le motif
    « décision » vaut pour un choix encore ouvert, jamais pour l'exécution d'un choix déjà
    rendu. Ne reste à l'humain que ce qui est refusé sur toutes les voies, ou ce qui relève de
-   sa décision, d'une dépense ou d'un geste irréversible.
+   sa décision, d'une dépense ou d'un geste irréversible. Le pilotage d'écran (Computer Use,
+   Dispatch, Claude in Chrome) n'est pas une cinquième voie automatique : c'est une voie sur
+   mandat humain, jamais la voie automatique d'un run (D-41 (a) du 19/10/2026, TF-1909) ; il ne
+   s'exerce pas sur un geste qu'une clause de service, un consentement, une dépense ou un
+   irréversible ferme, et ses limites vivent dans `references\INTEGRATIONS-FOURNISSEURS.md`,
+   section « Pilotage d'écran ».
 
 Surfaces d'application encodées : `references\ACCUEIL.md` étape 5 (démarche proposée),
 `gabarits\AGENT-CAMPAGNE.md` (rapport final des agents de campagne).
