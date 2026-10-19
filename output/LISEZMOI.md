@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 464 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 465 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -465,6 +465,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md | 20261013i | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` |
 | Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
+| Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md | 20261019f | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` |
 | Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md | 20261001c | 21.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` |
 | Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md | 20261002a | 19.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` |
 | Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md | 20261012b | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` |
