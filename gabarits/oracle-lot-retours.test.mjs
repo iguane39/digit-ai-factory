@@ -834,7 +834,7 @@ check("rouge TF-1752 — une section R-46 sans rattachement ni absence déclaré
     const r = spawnSync(process.execPath, ["--input-type=module", "-e", code], { encoding: "utf8", env });
     if (!/IMPORT function \d+\.\d+\.\d+ FAIL/.test(r.stdout || "")) throw new Error(`sortie : ${r.stdout}${r.stderr}`);
   });
-  if (!require_absent_pilote()) console.log("  [NON JOUÉ] TF-1759 rouge pilot introuvable — ce poste porte c:\\dev\\digit-ai-factory ou ~\\.digit-ai-forge, que le relais trouve en repli");
+  if (!require_absent_pilote()) console.log("  [NON JOUÉ] 1 cas — TF-1759 rouge pilot introuvable — ce poste porte c:\\dev\\digit-ai-factory ou ~\\.digit-ai-forge, que le relais trouve en repli");
   else check("TF-1759 rouge — pilot introuvable : exit 2 et le dit, jamais un PASS", () => {
     const seul = join(T, "seul", "forge", "retours");
     mkdirSync(seul, { recursive: true });

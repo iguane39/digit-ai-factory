@@ -25,14 +25,14 @@ const registre = [
 ].map((e) => JSON.stringify(e)).join("\n");
 const etat = etatCourant(registre);
 
-check("une revue n'est pas due la veille de sa date", () => egal(revuesDues(etat, "2026-11-15").map((d) => d.id), [], "dues le 15"));
+check("rouge — une revue n'est pas due la veille de sa date", () => egal(revuesDues(etat, "2026-11-15").map((d) => d.id), [], "dues le 15"));
 check("une revue est due à sa date, avec sa commande", () => egal(revuesDues(etat, "2026-11-16"), [{ id: "TF-9001", revue_le: "2026-11-16", commande: "node releve.mjs C:/dev", titre: "mode à revoir" }], "dues le 16"));
 check("une revue reste due après sa date tant qu'elle n'est pas jouée", () => egal(revuesDues(etat, "2026-11-20").map((d) => d.id), ["TF-9001"], "dues le 20"));
-check("une revue jouée n'est plus due", () => {
+check("rouge — une revue jouée n'est plus due", () => {
   const solde = etatCourant(registre + "\n" + JSON.stringify({ ev: "maj", id: "TF-9001", revue_jouee_le: "2026-11-16" }));
   egal(revuesDues(solde, "2026-11-20"), [], "dues après jeu");
 });
-check("un item écarté et une date mal formée ne sont jamais dus", () => egal(revuesDues(etat, "2027-01-01").map((d) => d.id), ["TF-9001"], "dues en 2027"));
+check("rouge — un item écarté et une date mal formée ne sont jamais dus", () => egal(revuesDues(etat, "2027-01-01").map((d) => d.id), ["TF-9001"], "dues en 2027"));
 check("la prochaine revue à venir est dite", () => egal(revuesAVenir(etat, "2026-10-16"), [{ id: "TF-9001", revue_le: "2026-11-16" }], "à venir"));
 
 console.log(`\nrevues-datees : ${pass} PASS, ${fail} FAIL`);
