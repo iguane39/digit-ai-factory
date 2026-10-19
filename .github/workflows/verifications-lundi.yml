@@ -1,0 +1,68 @@
+# verifications-lundi.yml — les cadences hebdomadaires du pilot qui ne lisent que le dépôt, jouées chaque
+# lundi sans session ouverte (décision humaine D-42 (a) du 19/10/2026).
+#
+# Le fait : l'ouverture d'une session rappelait seule ces cadences, et 11 jours ont séparé les relevés de
+# récidives du 01/10 et du 12/10. Ce workflow joue `todo/verifications-lundi.mjs` : surveillance des
+# récidives, revue hebdomadaire des propositions, revues datées, stock d'items sans classe.
+#
+# Ce qu'il ne fait pas, par décision : il ne pousse RIEN sur le pilot (le push reste un geste humain, et deux
+# postes publient). Le rapport part en artefact ; une issue s'ouvre quand un relevé appelle un geste.
+# Ce qu'il ne voit pas : le sas des lots non ingérés (ignoré par git) et tout ce qui lit le poste — modèles
+# en service, flotte, secrets, amorçage — qui restent rendus à l'ouverture d'une session.
+name: Vérifications du lundi
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  verifications:
+    runs-on: ubuntu-latest
+    env:
+      FORGE_ROOT: ${{ github.workspace }}
+    steps:
+      - name: Récupérer le pilot avec son historique
+        uses: actions/checkout@v4
+        with:
+          path: digit-ai-factory
+          fetch-depth: 0
+
+      - name: Récupérer le dépôt frère public digit-ai-forge-observability
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/digit-ai-forge-observability
+          path: digit-ai-forge-observability
+
+      - name: Installer Node 20+
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Jouer les vérifications
+        id: verif
+        working-directory: digit-ai-factory
+        run: |
+          node todo/verifications-lundi.mjs --sortie "$RUNNER_TEMP/rapport.md" | tee "$RUNNER_TEMP/verdict.json"
+          echo "alerte=$(node -e "process.stdout.write(String(JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).alerte))" "$RUNNER_TEMP/verdict.json")" >> "$GITHUB_OUTPUT"
+          cat "$RUNNER_TEMP/rapport.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Garder le rapport
+        uses: actions/upload-artifact@v4
+        with:
+          name: verifications-lundi
+          path: ${{ runner.temp }}/rapport.md
+          retention-days: 90
+
+      - name: Ouvrir une issue quand un relevé appelle un geste
+        if: steps.verif.outputs.alerte == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --repo "${{ github.repository }}" \
+            --title "Vérifications du lundi — $(date -u +%F) : à lire" \
+            --body-file "$RUNNER_TEMP/rapport.md"
