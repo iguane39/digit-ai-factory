@@ -1,7 +1,7 @@
 ---
 role: les faits MESURÉS sur les interfaces de fournisseurs tiers — ceux qu'aucune documentation officielle ne dit là où on les cherche, et dont l'ignorance a coûté un aller-retour au moins une fois
-sources_de_verite: [todo/TODO.jsonl (les items qui les ont mesurés, avec leur coût), gabarits/.env.example du projet concerné (les clés et leurs portées), input/00-retours/Produit-79 - RETOURS - 20261017b.md (retours RP-11 : référentiel Google, RG-1 : sources du SEO, RA-9 : connexion Google d'un produit, et garde-fou de plateforme relevé ; item TF-1848 du registre, décidé par R-58), output/03-etudes/20261018-etude-opportunite-connexion-sources-google.md (TF-1852, décision D-30 (a) : les 11 étapes, la durée, les critères de réouverture du skill), lecture seule du dépôt de Produit-02 le 2026-10-18 (TF-1871 : workflows de CI, scripts de lecture, journal), documentation de Google, README des deux serveurs MCP et spécification de MCP lus le 2026-10-18 (adresses citées ligne à ligne dans les sections Google et dans la section de connexion pas à pas)]
-verifie_le: 2026-10-18
+sources_de_verite: [todo/TODO.jsonl (les items qui les ont mesurés, avec leur coût), gabarits/.env.example du projet concerné (les clés et leurs portées), input/00-retours/Produit-79 - RETOURS - 20261017b.md (retours RP-11 : référentiel Google, RG-1 : sources du SEO, RA-9 : connexion Google d'un produit, et garde-fou de plateforme relevé ; item TF-1848 du registre, décidé par R-58), output/03-etudes/20261018-etude-opportunite-connexion-sources-google.md (TF-1852, décision D-30 (a) : les 11 étapes, la durée, les critères de réouverture du skill), lecture seule du dépôt de Produit-02 le 2026-10-18 (TF-1871 : workflows de CI, scripts de lecture, journal), documentation de Google, README des deux serveurs MCP et spécification de MCP lus le 2026-10-18 (adresses citées ligne à ligne dans les sections Google et dans la section de connexion pas à pas), input/00-retours/Produit-84 - RETOURS - 20261016d.md (retours RT-7 et RT-8 : Microsoft 365 ; item TF-1888 du registre, décidé par R-58), documentation d'Anthropic et de Microsoft lue le 2026-10-19 (adresses citées ligne à ligne dans la section Microsoft 365)]
+verifie_le: 2026-10-19
 ---
 
 # Faits mesurés sur les interfaces de fournisseurs
@@ -439,6 +439,65 @@ Sans nouvelle connexion, le skill n'avait pas d'usage et O2 se confirme (étude)
 
 ---
 
+## Microsoft 365 — lire la messagerie : le connecteur claude.ai d'abord, Outlook par COM et Graph fermés chez un client
+
+*Mesuré le 16/10/2026 par un produit pseudonymisé Produit-84, sur une demande humaine hors run (lot `Produit-84 - RETOURS - 20261016d`, retours RT-7 et RT-8 ; item TF-1888, décision R-58 du 19/10/2026), puis confronté à la documentation d'Anthropic et de Microsoft lue le 19/10/2026. Chaque ligne dit si son fait est relu (page lue le 19/10/2026) ou attribué au constat de Produit-84, non rejoué ici. Les lignes du lot sont citées par numéro (fichier `input\00-retours\Produit-84 - RETOURS - 20261016d.md`). Aucun identifiant de compte, de tenant ni d'adresse n'y figure.*
+
+Ce que cette section change pour vous : une demande de lire la messagerie, l'agenda ou Teams d'un utilisateur chez un client commence par le connecteur claude.ai Microsoft 365, et par rien d'autre. Le 16/10, lire des emails a coûté 21 minutes, 1 module PowerShell installé et 2 décisions posées à l'humain, parce que la session a essayé deux voies fermées avant la bonne (lot, ligne 20). Les lignes ci-dessous disent l'ordre des voies, le code de chaque refus et les gestes qui restent à une personne.
+
+### Les voies, dans l'ordre
+
+4 lignes disent dans quel ordre essayer les voies et ce que chacune a rendu. La première est l'arbitrage ; les trois suivantes sont les faits qui le fondent, dans l'ordre où il les range.
+
+| Fait | Coût si on l'ignore | Comment le rejouer, et source |
+|---|---|---|
+| **Règle de choix.** Le connecteur claude.ai Microsoft 365 d'abord. Ni Outlook classique par COM, ni Microsoft Graph en ligne de commande chez un client dont les utilisateurs ne peuvent pas consentir eux-mêmes. Jamais l'identifiant d'une autre application Microsoft pour contourner ce consentement. *Arbitrage de rédaction tiré des 3 lignes suivantes et de la proposition de RT-7, pas un fait mesuré tel quel.* | la session essaie deux voies fermées avant la bonne : 21 minutes pour lire des emails, 1 module PowerShell installé, 2 décisions posées à l'humain | chercher les outils du connecteur en premier : ToolSearch sur le préfixe `mcp__claude_ai_Microsoft_365__` ; lot, lignes 16 et 20 |
+| **Voie 1, le connecteur, fonctionne.** Après `/login`, `get_me`, `search_people`, `outlook_email_search` (`totalResultCount` de 4) et `read_resource` ont joué sans geste supplémentaire : 4 emails trouvés, 3 lus en entier. Constat de Produit-84, non rejoué ici | chercher une autre voie quand celle-ci tient | lot, lignes 21 et 52 ; les outils sont ceux de ces appels, la liste complète des outils du connecteur n'est pas au lot |
+| **Voie 2, Microsoft Graph par code d'appareil, fermée.** `Connect-MgGraph -UseDeviceAuthentication` a échoué dans l'hôte non interactif (« Une erreur s'est produite lors de l'écriture dans un écouteur »), puis le tenant du client a rendu « Approbation requise » (capture fournie par l'humain le 16/10). Constat de Produit-84, non rejoué ici | un module `Microsoft.Graph.Authentication` 2.41.2 installé pour rien, resté sur le poste (il se retire par `Uninstall-Module Microsoft.Graph.Authentication`, sur demande de l'humain) | lot, lignes 20, 27 et 47-48 ; l'option du code d'appareil existe dans `learn.microsoft.com/en-us/powershell/microsoftgraph/authentication-commands` (page du 2025-07-10, lue le 19/10/2026) |
+| **Voie 3, Outlook classique par COM, fermée.** 7 refus `RPC_E_CALL_REJECTED` et une fenêtre « Nouveau profil » : le client classique n'a aucun profil, la messagerie vit dans le nouvel Outlook, non pilotable. Constat de Produit-84, non rejoué ici. Microsoft écrit que le nouvel Outlook pour Windows ne prend pas en charge les compléments COM, ni VBA ; sa page ne dit rien de l'automatisation COM lancée depuis un autre programme, d'où les 7 refus comme seule mesure | une boucle d'essais sur une porte qui ne s'ouvre pas | lot, ligne 20 ; `learn.microsoft.com/en-us/microsoft-365-apps/outlook/get-started/state-of-com-add-ins` (page du 2025-08-27, lue le 19/10/2026) ; `learn.microsoft.com/en-us/office/dev/add-ins/outlook/one-outlook` (page du 2026-06-23, lue le 19/10/2026) |
+
+### Le connecteur : ce qui l'ouvre, ce qui le limite
+
+5 lignes disent pourquoi ses outils manquent parfois, quel compte Microsoft il accepte, qui consent pour le tenant, ce qu'il lit et ce qu'il rend quand le corps d'un email est long.
+
+| Fait | Coût si on l'ignore | Comment le rejouer, et source |
+|---|---|---|
+| **Les outils `mcp__claude_ai_Microsoft_365__*` sont absents tant que le profil Claude Code est connecté à un autre compte Claude.** Mesure du 16/10 : ToolSearch rend « No matching deferred tools found » ; ils sont présents après `/login`. Relu : Claude Code ne charge les connecteurs de claude.ai que sous une connexion par abonnement claude.ai ; en leur absence, `/status` donne la méthode d'authentification active, `/login` choisit le compte, et `/mcp` liste les serveurs, ceux de claude.ai portant un indicateur | un connecteur déclaré « absent » à tort, ou une voie fermée tentée à sa place | ToolSearch sur le préfixe du connecteur, puis `/status` ; lot, ligne 21 ; `code.claude.com/docs/en/mcp`, section « claude.ai connectors » (page sans date affichée, lue le 19/10/2026, 100 000 caractères sur 123 186 lus, section citée comprise) |
+| **Le connecteur exige un tenant Microsoft Entra rattaché à une offre Microsoft Business ; un compte Microsoft personnel (`@outlook.com`, `@hotmail.com`) ne se connecte pas.** Chez Produit-84, sa connexion à Microsoft ne dépend pas de l'adresse du compte Claude (constat, non rejoué) | proposer le connecteur pour une boîte personnelle | lot, ligne 52 ; `support.claude.com/en/articles/12542951-enabling-and-using-the-microsoft-365-connector` (page affichée « Updated this week », sans date, lue le 19/10/2026) |
+| **Un administrateur général Entra autorise le connecteur une fois par tenant**, soit en connectant Microsoft 365 depuis son propre compte Claude en cochant l'accès pour toute l'organisation, soit à la main dans Entra ID s'il n'a pas de compte Claude. Sur les offres Team et Enterprise, un propriétaire de l'organisation Claude l'active d'abord (Organization settings > Connectors). Sans cette autorisation, les membres lisent « an administrator must grant app permissions before they can use the integration ». Chez Produit-84 le connecteur est passé : qui avait donné cette autorisation, et quand, n'est pas au lot | une connexion qui échoue sans que la session sache qu'un administrateur du client doit agir | page Anthropic ci-dessus (lue le 19/10/2026) ; non rejoué ici |
+| **Le connecteur lit avec les droits de l'utilisateur, rien de plus.** La page liste : la boîte principale et son dossier Archive (pas l'archive en ligne), les boîtes partagées en accès délégué, l'agenda, Teams (conversations, messages de canal), les réunions (transcriptions, enregistrements), OneDrive et SharePoint. Les outils d'écriture (envoi, brouillons, agenda, fichiers, messages Teams) sont facultatifs ; ceux d'un connecteur déjà en usage avant leur lancement sont bloqués par défaut jusqu'à ce qu'un administrateur les active | une promesse de lire une archive en ligne, ou une écriture tentée sans activation | page Anthropic ci-dessus (lue le 19/10/2026) ; les écritures restent hors des lectures décrites ici et se font sur demande expresse |
+| **Un corps d'email long n'arrive pas dans la réponse : il arrive dans un fichier.** Mesure du 16/10 : 2 corps sur 3 dépassent la limite de sortie (78 744 et 137 372 caractères), le HTML s'y mêle, et l'extraction demande un script. Relu : Claude Code limite une sortie d'outil MCP à 25 000 jetons par défaut, et enregistre dans un fichier tout texte de plus de 50 000 caractères, sauf réglage de l'outil, en laissant à la conversation le chemin du fichier | un corps lu comme vide, ou tronqué, quand le chemin d'un fichier est le résultat | lot, ligne 21 ; `code.claude.com/docs/en/mcp`, section « Tool output limits » (lue le 19/10/2026). Le script d'extraction proposé par RT-8 (HTML retiré, coupe à `divRplyFwdMsg` et à `Signature`, sortie UTF-8) n'est pas versé : non vérifié |
+
+### Le consentement administrateur n'est pas à contourner
+
+3 lignes disent ce que la documentation de Microsoft établit sur le consentement, et pourquoi « Approbation requise » arrête la session au lieu de la guider vers une autre porte.
+
+| Fait | Coût si on l'ignore | Comment le rejouer, et source |
+|---|---|---|
+| **Quand le consentement des utilisateurs est désactivé, un utilisateur n'est pas invité à consentir.** Seuls ceux qui ont un rôle d'annuaire prévu pour cela consentent à une nouvelle application. Avec le « workflow de consentement administrateur » activé, l'utilisateur lit « Approval required », saisit une justification et demande l'approbation. C'est l'écran « Approbation requise » du 16/10, vu en français par Produit-84 : le lien entre les deux libellés est une déduction | chercher un réglage du côté de l'utilisateur pour un refus qui relève de l'administrateur | `learn.microsoft.com/en-us/entra/identity/enterprise-apps/user-admin-consent-overview` (ms.date 2025-03-18, lue le 19/10/2026) ; lot, ligne 44 |
+| **Accorder le consentement pour tout le tenant exige un rôle précis, et Microsoft le qualifie d'opération sensible.** Privileged Role Administrator pour toute permission de toute API ; Cloud Application Administrator, AI Administrator ou Application Administrator pour toute permission sauf les rôles d'application de Microsoft Graph ; ou un rôle personnalisé. La page avertit qu'une permission accordée par programme n'est soumise à aucune revue ni confirmation (« aren't subject to review or confirmation ») | un octroi tenté depuis un compte sans l'un de ces rôles, ou pris par programme sans qu'un administrateur l'ait décidé | `learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent`, sections « Prerequisites » et « Be careful » (ms.date 2025-03-25, lue le 19/10/2026) |
+| **Le refus du 16/10 vise une application précise, pas la messagerie.** Le lot nomme « Microsoft Graph Command Line Tools » (refusée) et le connecteur claude.ai Microsoft 365 (passé), tous deux mesurés. La page Microsoft nomme l'application par défaut du module « Microsoft Graph PowerShell » et documente une application personnalisée (`-ClientId`) pour qui veut isoler le consentement : que les deux noms désignent la même application, et qu'une application personnalisée change le refus chez ce client, n'est pas vérifié. La règle de la Factory ne dépend pas de cette réponse : une session n'emprunte jamais l'identifiant d'une autre application Microsoft pour passer outre, et ne crée aucune application dans le tenant d'un client sans l'accord de son administrateur | un contournement que le client n'a pas consenti, avec l'identité de son tenant | lot, lignes 39 à 48 (capture de l'humain du 16/10) ; `learn.microsoft.com/en-us/powershell/microsoftgraph/authentication-commands` (ms.date 2025-07-10, lue le 19/10/2026) ; règle : proposition de RT-7, retenue par la décision R-58 du 19/10/2026 |
+
+### Les gestes qui restent à une personne
+
+Le cas courant demande 2 gestes au plus. Les autres n'arrivent que sur le message qui les annonce.
+
+1. Si ToolSearch ne trouve aucun outil `mcp__claude_ai_Microsoft_365__*` : taper `/status` pour lire la méthode d'authentification, puis `/login` sur le compte Claude qui porte le connecteur (page `code.claude.com/docs/en/mcp`, lue le 19/10/2026).
+2. Si le connecteur n'existe pas encore sur ce compte Claude : l'ajouter dans les connecteurs de claude.ai, choisir Microsoft 365, cliquer sur « Connect » et s'authentifier avec le compte professionnel ; puis taper `/mcp` dans Claude Code (pages Anthropic des connecteurs et de `code.claude.com/docs/en/mcp`, lues le 19/10/2026). Sur une offre Team ou Enterprise, un propriétaire de l'organisation Claude l'active d'abord.
+3. Si le message « an administrator must grant app permissions before they can use the integration » s'affiche : demander à un administrateur général Entra du client de donner l'autorisation unique du connecteur (page Anthropic, lue le 19/10/2026). Le geste est le sien et la décision aussi ; la session ne le remplace pas.
+4. Si une application répond « Approbation requise » : s'arrêter. La demande justifiée à l'administrateur est le geste de l'utilisateur concerné, et la décision du client.
+
+### Faits non vérifiés de cette section
+
+- **Rejoué ici : rien des lignes de mesure.** Le 19/10/2026, seules les pages de documentation ont été lues. Les 7 refus COM, l'échec de `Connect-MgGraph`, l'écran « Approbation requise », les 4 emails et la présence des outils après `/login` sont des constats de Produit-84 du 16/10.
+- **Le message d'erreur de `Connect-MgGraph` dans l'hôte non interactif** n'est expliqué par aucune des pages lues : la cause reste inconnue.
+- **La durée de 21 minutes** est le total du lot (ligne 16), non ventilé par voie.
+- **Si le connecteur passerait chez un client dont l'administrateur n'a rien autorisé** : non éprouvé. La page d'Anthropic dit qu'il échoue ; Produit-84 ne dit pas qui avait autorisé son tenant.
+- **Le skill de poste et la classe de défaut proposés par RT-8** (`lis-la-messagerie`, clé `competence-de-poste-sans-voie-outillee`) ne sont pas l'objet de cet item : cette section ne crée ni l'un ni l'autre.
+- **Le garde-fou de plateforme relevé par le lot** (consentement des utilisateurs désactivé dans l'annuaire Entra du client) n'est pas inscrit au registre des garde-fous par cet item.
+
+---
+
 ## LinkedIn — aucun connecteur, et c'est une déclaration
 
 *Établi le 17/09/2026 par l'étude `output\03-etudes\2026-09\20260917-etude-opportunite-gestion-reseaux-sociaux.md`
@@ -480,7 +539,7 @@ Le détail daté, avec sa solidité ligne à ligne et sa péremption, vit dans
 
 ## Limites de ce document
 
-- **Il vieillit, et vite.** Chaque section porte la date de sa mesure, du 24/08 au 18/10/2026. Une interface de
+- **Il vieillit, et vite.** Chaque section porte la date de sa mesure, du 24/08 au 19/10/2026. Une interface de
   fournisseur change sans avertir : chaque ligne porte donc **comment la rejouer**, et une ligne
   qu'on ne sait plus rejouer doit être **retirée** plutôt que conservée par prudence.
 - **Il ne couvre que ce qui a été payé.** Aucun fait n'y figure « au cas où » : un fait sans coût
