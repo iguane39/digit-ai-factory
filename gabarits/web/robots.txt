@@ -14,4 +14,6 @@
 User-agent: *
 Allow: /
 
-Sitemap: /sitemap.xml
+# Le plan du site s'écrit en adresse COMPLÈTE : Google exige une adresse complète, pas un chemin.
+# À l'ouverture du produit, remplacer {domaine} par le nom de domaine de production.
+Sitemap: https://{domaine}/sitemap.xml
