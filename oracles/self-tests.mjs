@@ -504,10 +504,16 @@ if (!garde.jouee) {
   console.log("  [NON JOUÉ] garde de l'arbre suivi (I7) : aucun dépôt git lisible à la racine — les écritures "
     + "des recettes dans les fichiers suivis ne sont PAS vues à ce passage");
 }
+// TF-1878 : un écart que la recette, rejouée seule, ne réécrit pas vient d'un autre processus (une session
+// vivante sur le dépôt) — nommé, jamais tu, et ne fait pas échouer le passage.
+for (const { nom, chemins } of garde.concurrentes) {
+  console.log(`  [ÉCRITURE CONCURRENTE] pendant ${nom} : ${chemins.length} fichier(s) suivi(s) écrit(s) que la recette, `
+    + `rejouée seule, ne réécrit pas — imputés à un autre processus, non bloquant : ${chemins.join(", ")}`);
+}
 for (const { nom, chemins } of garde.ecritures) {
   console.error(`  [ARBRE SUIVI] ${nom} a écrit dans ${chemins.length} fichier(s) suivi(s) : ${chemins.join(", ")}. `
     + "Une recette travaille sur une copie sous le dossier temporaire, jamais dans l'arbre suivi (TF-1690) ; "
-    + "si une autre session écrivait ces chemins pendant le passage, rejouer cette recette seule tranche.");
+    + "ces chemins sont ceux que la recette a réécrits AUSSI à un rejeu immédiat, seule (TF-1878) : ce n'est pas une autre session.");
 }
 
 const echecs = resultats.filter((r) => r.statut !== "OK");

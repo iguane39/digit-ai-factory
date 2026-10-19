@@ -21,7 +21,7 @@ const veut = (cond, quoi) => { if (!cond) casse.push(quoi); };
 const git = (dir, ...args) => spawnSync("git", ["-c", "core.autocrlf=true", "-c", "user.name=recette", "-c", "user.email=recette@exemple.invalid", ...args], { cwd: dir, encoding: "utf8", env: ENV_SANS_GIT });
 
 if (spawnSync("git", ["--version"], { encoding: "utf8" }).status !== 0) {
-  console.log("[NON JOUÉ] 9 cas — aucun git sur ce poste : la garde de l'arbre suivi ne peut pas être éprouvée");
+  console.log("[NON JOUÉ] 12 cas — aucun git sur ce poste : la garde de l'arbre suivi ne peut pas être éprouvée");
   process.exit(0);
 }
 
@@ -33,6 +33,8 @@ try {
   writeFileSync(join(depot, "referentiel.json"), "{ \"version\": 1 }\n", "utf8");
   writeFileSync(join(depot, "etude.html"), "<p>un</p>\r\n<p>deux</p>\r\n", "utf8");
   writeFileSync(join(depot, "a-supprimer.md"), "# bientôt absent\n", "utf8");
+  writeFileSync(join(depot, "voisin.md"), "# écrit par une autre session\n", "utf8");
+  writeFileSync(join(depot, "propre.json"), "{ \"propre\": 1 }\n", "utf8");
   git(depot, "add", "-A");
   git(depot, "commit", "-q", "-m", "fixture");
   const garde = creerGarde(depot);
@@ -71,6 +73,33 @@ try {
   veut(!nommees.has("recette-non-suivi"), "cas vert : une recette qui écrit un fichier non suivi est accusée à tort");
   veut(garde.ecritures.length === 4, `la garde a nommé ${garde.ecritures.length} recette(s), 4 attendues — une écriture est imputée à la mauvaise recette`);
 
+  // TF-1878 (19/10/2026) — LA GARDE SE BORNE AUX ÉCRITURES DES RECETTES ELLES-MÊMES. Une autre session qui
+  // écrit un fichier suivi pendant un passage de 18 à 20 minutes était imputée à la recette en cours. La
+  // contre-épreuve : une recette suspecte est REJOUÉE seule ; un chemin qu'elle ne réécrit pas est tiers.
+  // Le tiers est simulé par un appel : il n'écrit que la PREMIÈRE fois, comme une session qui passe.
+  let appels = 0;
+  attendre(20);
+  garde.jouer("recette-propre-et-voisin-actif", () => {
+    appels++;
+    if (appels === 1) writeFileSync(join(depot, "voisin.md"), "# réécrit par la session voisine\n", "utf8");
+  });
+  const apresTiers = garde.ecritures.map((e) => e.nom);
+  veut(!apresTiers.includes("recette-propre-et-voisin-actif"),
+    "cas vert : l'écriture d'une AUTRE session pendant une recette propre est imputée à cette recette (TF-1878)");
+  veut((garde.concurrentes || []).some((c) => c.nom === "recette-propre-et-voisin-actif" && c.chemins.includes("voisin.md")),
+    "cas vert : l'écriture d'un tiers n'est pas NOMMÉE comme présumée concurrente — elle serait tue, et un silence se lit comme un vert");
+  // Rouge : la recette écrit son propre fichier à CHAQUE passage, le tiers une fois — seul le premier est imputé.
+  let passes = 0;
+  attendre(20);
+  garde.jouer("recette-fautive-et-voisin-actif", () => {
+    passes++;
+    writeFileSync(join(depot, "propre.json"), `{ "propre": ${passes + 1} }\n`, "utf8");
+    if (passes === 1) writeFileSync(join(depot, "voisin.md"), "# encore la session voisine\n", "utf8");
+  });
+  const fautive = garde.ecritures.find((e) => e.nom === "recette-fautive-et-voisin-actif");
+  veut(fautive && fautive.chemins.length === 1 && fautive.chemins[0] === "propre.json",
+    `cas rouge : une recette qui écrit un fichier suivi à chaque passage doit être imputée sur ce seul fichier — reçu ${JSON.stringify(fautive)}`);
+
   // NON JOUÉE : hors d'un dépôt git, la garde le dit au lieu de rendre un vert.
   veut(releverSuivis(ailleurs) === null && creerGarde(ailleurs).jouee === false,
     "hors d'un dépôt git, la garde se dit jouée — son silence se lirait comme un vert");
@@ -80,10 +109,11 @@ try {
 }
 
 if (casse.length) {
-  console.log(`Self-test garde-arbre-suivi : ${9 - casse.length}/9 PASS · CASSE : ${casse.join(" · ")}`);
+  console.log(`Self-test garde-arbre-suivi : ${12 - casse.length}/12 PASS · CASSE : ${casse.join(" · ")}`);
   process.exit(1);
 }
-console.log("Self-test garde-arbre-suivi : 9/9 PASS (garde jouée dans un dépôt git ; quatre cas rouges nommés avec leur chemin — contenu changé, "
+console.log("Self-test garde-arbre-suivi : 12/12 PASS (garde jouée dans un dépôt git ; quatre cas rouges nommés avec leur chemin — contenu changé, "
   + "fichier écrit puis remis, fins de ligne seules réécrites, fichier supprimé ; deux cas verts tus — écriture "
   + "sous le dossier temporaire, fichier non suivi ; aucune écriture imputée à la mauvaise recette ; hors git, "
-  + "garde déclarée non jouée)");
+  + "garde déclarée non jouée ; TF-1878 : l'écriture d'une autre session pendant une recette propre n'est pas imputée "
+  + "mais NOMMÉE, et une recette fautive qui subit la même écriture n'est imputée que sur son propre fichier)");

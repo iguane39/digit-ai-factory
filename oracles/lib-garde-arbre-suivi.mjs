@@ -17,9 +17,15 @@
  *     ou seulement dans ses fins de ligne, ce que `git status` ne voit pas quand la conversion des fins
  *     de ligne ramène le contenu au même objet (les deux cas du 14/10/2026 étaient de cette sorte).
  *
+ * LES ÉCRITURES D'UN AUTRE PROCESSUS (TF-1878, 19/10/2026). Une session vivante sur le même dépôt écrit
+ * pendant un passage de 18 à 20 minutes : l'écart lui était imputé à tort. Une recette qui laisse un écart
+ * est donc REJOUÉE aussitôt, seule ; les chemins qu'elle réécrit lui sont imputés (`ecritures`, bloquant),
+ * les autres sont rendus à part (`concurrentes`, nommés, non bloquants).
+ *
  * CE QU'ELLE NE JUGE PAS, et c'est dit : une écriture faite par un AUTRE processus pendant la recette
- * (une session vivante sur le même dépôt) lui est imputée — le chemin est nommé, rejouer la recette
- * seule tranche ; une écriture hors des fichiers suivis (fichier non suivi, dossier temporaire) ;
+ * ET pendant son rejeu lui reste imputée (une session qui réécrit le même fichier deux fois de suite) ; une
+ * recette qui n'écrit qu'au premier passage (elle génère « si absent ») est classée concurrente, nommée mais
+ * non bloquante ; une écriture hors des fichiers suivis (fichier non suivi, dossier temporaire) ;
  * un dépôt sans git, où la garde se déclare non jouée plutôt que verte.
  */
 import { spawnSync } from "node:child_process";
@@ -75,17 +81,36 @@ export function ecritsEntre(avant, apres) {
 export function creerGarde(racine) {
   let releve = releverSuivis(racine);
   const ecritures = [];
+  const concurrentes = [];
   return {
     jouee: releve !== null,
     ecritures,
+    concurrentes,
     jouer(nom, fn) {
       const resultat = fn();
       if (releve) {
         const apres = releverSuivis(racine);
         if (apres) {
           const chemins = ecritsEntre(releve, apres);
-          if (chemins.length) ecritures.push({ nom, chemins });
           releve = apres;
+          if (chemins.length) {
+            // TF-1878 (19/10/2026) — LA GARDE SE BORNE AUX ÉCRITURES DE LA RECETTE ELLE-MÊME. Un écart
+            // relevé pendant un passage de 18 à 20 minutes peut venir d'une AUTRE session qui travaille sur
+            // le même dépôt ; l'imputer à la recette fait échouer une recette qui n'écrit rien (mesuré le
+            // 18/10/2026 : rejouées seules, elles n'écrivaient rien). La contre-épreuve que l'ancien message
+            // demandait à la main est jouée ici : la recette suspecte est REJOUÉE aussitôt, seule, et seuls les
+            // chemins qu'elle réécrit lui sont imputés. Les autres sont NOMMÉS « présumés concurrents » (le
+            // harnais les affiche, sans faire échouer) : ni imputés à tort, ni tus. Si la contre-épreuve
+            // échoue (recette qui lève au second passage), l'imputation reste entière — la garde ne devient
+            // pas plus permissive faute de pouvoir trancher.
+            let rejouees = null;
+            try { fn(); const apres2 = releverSuivis(racine); if (apres2) { rejouees = new Set(ecritsEntre(apres, apres2)); releve = apres2; } }
+            catch { /* contre-épreuve impossible : imputation entière */ }
+            const siennes = rejouees ? chemins.filter((c) => rejouees.has(c)) : chemins;
+            const tiers = rejouees ? chemins.filter((c) => !rejouees.has(c)) : [];
+            if (siennes.length) ecritures.push({ nom, chemins: siennes });
+            if (tiers.length) concurrentes.push({ nom, chemins: tiers });
+          }
         }
       }
       return resultat;
