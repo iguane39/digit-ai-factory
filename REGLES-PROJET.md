@@ -316,7 +316,7 @@ revient à l'utilisateur, sans critère écrit.
    rendu. Ne reste à l'humain que ce qui est refusé sur toutes les voies, ou ce qui relève de
    sa décision, d'une dépense ou d'un geste irréversible. Le pilotage d'écran (Computer Use,
    Dispatch, Claude in Chrome) n'est pas une cinquième voie automatique : c'est une voie sur
-   mandat humain, jamais la voie automatique d'un run (D-41 (a) du 19/10/2026, TF-1909) ; il ne
+   mandat humain, jamais la voie automatique d'un run (D-48 (a) du 19/10/2026, TF-1930) ; il ne
    s'exerce pas sur un geste qu'une clause de service, un consentement, une dépense ou un
    irréversible ferme, et ses limites vivent dans `references\INTEGRATIONS-FOURNISSEURS.md`,
    section « Pilotage d'écran ».

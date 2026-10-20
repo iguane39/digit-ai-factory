@@ -111,7 +111,7 @@ try {
     const t = executer(["--transcripts", vert, "--depuis", "2026-10-01", "--referentiel", REF]).sortie;
     if (!/0 relecture\(s\), 0 jetons ; aucun jour chargé — seuil de 4 000 000 jetons par jour tenu/.test(t)) throw new Error(t);
   });
-  // TF-1907 (D-41 (a) du 19/10/2026) — la simultanéité : le pic de sous-agents dont les durées de vie se chevauchent, par session.
+  // TF-1928 (D-48 (a) du 19/10/2026) — la simultanéité : le pic de sous-agents dont les durées de vie se chevauchent, par session.
   const H = (hm) => `2026-10-15T${hm}:00.000Z`;
   const vivants = (nom, durees) => durees.map(([debut, fin], i) => [[reponse(`${nom}-${i}-a`, "claude-sonnet-5-5", 5, 1000, H(debut)), reponse(`${nom}-${i}-b`, "claude-sonnet-5-5", 5, 1000, H(fin))], { agentType: "campagne" }]);
   // trois sous-agents se chevauchent de 10:05 à 10:08 ; le quatrième vient bien après : pic 3 pour 4 sous-agents.

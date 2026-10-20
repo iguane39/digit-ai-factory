@@ -1,6 +1,6 @@
 ---
 role: les fonctions officielles de Claude Code qui font travailler plusieurs agents ou sessions à la fois, avec leur statut, leur limite, leur source et leur date de lecture, et la décision du pilot sur chacune
-sources_de_verite: [output/03-etudes/20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md (étude 20261019f, section 3 « État de l'art daté » : pages de documentation de Claude Code lues le 2026-10-19), scripts/relever-flotte.mjs (indicateur de simultanéité, TF-1907), gabarits/AGENT-CAMPAGNE.md (contrat de campagne)]
+sources_de_verite: [output/03-etudes/20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md (étude 20261019f, section 3 « État de l'art daté » : pages de documentation de Claude Code lues le 2026-10-19), scripts/relever-flotte.mjs (indicateur de simultanéité, TF-1928), gabarits/AGENT-CAMPAGNE.md (contrat de campagne)]
 verifie_le: 2026-10-19
 revue_prevue: 2026-11-08
 ---
@@ -31,8 +31,8 @@ Le tableau donne, pour chaque fonction officielle, son statut, ses limites et la
 
 ## Décision du pilot
 
-**Projects : non adopté.** Décideur : l'humain, par sa réponse « 41a » du 19/10/2026 (D-41 (a)), consignée au registre
-`todo\TODO.jsonl` sous TF-1907 (événement `maj`, statut `decide`, 2026-10-19), qui a retenu l'option O1 de l'étude. Trois obstacles se cumulent.
+**Projects : non adopté.** Décideur : l'humain, par sa réponse « 41a » du 19/10/2026 (D-48 (a)), consignée au registre
+`todo\TODO.jsonl` sous TF-1928 (événement `maj`, statut `decide`, 2026-10-19), qui a retenu l'option O1 de l'étude. Trois obstacles se cumulent.
 Projects manque au CLI et à VS Code, où la Factory travaille. Ses fils clonent des dépôts GitHub, alors que la
 Factory lit l'état du poste : transcriptions, registre, skills installés. Et son nombre de fils n'est pas plafonné,
 quand la Factory borne ses boucles à 5 cycles. Un fil local par Remote Control existe, mais exige Claude Code 2.1.280
@@ -48,7 +48,7 @@ Un essai ne se décide que si les conditions écrites d'avance tiennent à la re
 la documentation de Projects annonce son arrivée aux plans Team ou au CLI.
 
 1. L'indicateur de pic se lit au relevé de flotte : `node scripts\relever-flotte.mjs --depuis <date>` écrit une ligne
-   « simultanéité de sous-agents » (fait par TF-1907).
+   « simultanéité de sous-agents » (fait par TF-1928).
 2. La part des appels vers un agent nommé a atteint 90 % (critère du relevé de flotte).
 3. L'isolation par `worktree` est posée pour les agents qui écrivent dans un même dépôt.
 4. Aucun commit croisé entre sessions n'est consigné sur la période (précédent : `3f47dcfc`, le 22/09/2026).

@@ -1,6 +1,6 @@
 {
   "cible": "veille/20261019-packs-agents-skills-tiers/etude.md",
-  "date_iso": "2026-10-19T16:51:52.981Z",
+  "date_iso": "2026-10-20T06:52:00.212Z",
   "registre_version": "2.45.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "veille\\20261019-packs-agents-skills-tiers\\etude.md",
-    "ts": "2026-10-19T16:51:52.981Z",
+    "ts": "2026-10-20T06:52:00.211Z",
     "fichiers": {
-      "veille\\20261019-packs-agents-skills-tiers\\etude.md": "2d0d329f3f204c0c7687f123c48b6e5cf1b851472c8201f6e0268901a87a5792"
+      "veille\\20261019-packs-agents-skills-tiers\\etude.md": "3d915af48bd69b194594f23b0a1b2b8f5d6e3c0c7521fd9368b5a4969763a452"
     }
   },
   "empreinte_motif": null,

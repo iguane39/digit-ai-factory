@@ -23,7 +23,7 @@
  *        même demande ; la consigne de délégation est le livrable ; plusieurs `--fichier` se lisent ensemble : une campagne dont
  *        les agents reçoivent le même gabarit se relit en UNE fois, le gabarit et la liste des sujets (A-1 du 19/10/2026) ;
  *   --preparer reception --fichier <livrable> [--type <type>]
- *        (D-40 (a) du 19/10/2026) relit UN livrable d'agent dès sa réception, en entier : le livrable `.md` passe d'abord
+ *        (D-47 (a) du 19/10/2026) relit UN livrable d'agent dès sa réception, en entier : le livrable `.md` passe d'abord
  *        `oracles/oracle-ecriture.mjs` (A-2) — FAIL : rien n'est préparé, exit 1, la forme se corrige avant de dépenser une relecture ;
  *   --preparer coherence --fichier <a> --fichier <b> [… ] [--type <type>]
  *        (A-3 du 19/10/2026) relit les livrables d'une campagne CÔTE À CÔTE, leur chapeau et leurs sections de verdict ou de
@@ -61,7 +61,7 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 export const REGISTRE_DEFAUT = join(ICI, "..", "todo", "relectures-intention.jsonl");
 export const REGLES_DEFAUT = join(ICI, "..", "references", "RELECTURE-INTENTION-REGLES.json");
 export const ORACLE_FORME = join(ICI, "..", "oracles", "oracle-ecriture.mjs");
-/** « reception » et « coherence » : D-40 (a), A-2 et A-3 du 19/10/2026 (relire chaque livrable d'agent à sa réception, puis l'ensemble). */
+/** « reception » et « coherence » : D-47 (a), A-2 et A-3 du 19/10/2026 (relire chaque livrable d'agent à sa réception, puis l'ensemble). */
 export const POINTS = ["fin-de-tour", "consigne", "reception", "coherence"];
 export const TYPES = ["etude", "restitution", "code", "page", "lot", "consigne", "presentation", "exigences", "autre"];
 export const GRAVITES = ["bloquante", "majeure", "mineure", "aucune"];
@@ -396,7 +396,7 @@ export function fabriquerDepot(depot, dejaCites, relus = new Map()) {
     if (ESTENV(f.rel)) corps = "[contenu NON cité : un fichier `.env` ne transite jamais]";
     else if (f.etat === "supprimé") corps = "[supprimé du disque depuis le commit de comparaison ; date de la suppression inconnue]";
     else if (f.etat.startsWith("neuf")) corps = coupe(citerFichier(f.abs), BORNES.depotFichier, "contenu du fichier neuf");
-    else { const d = git(depot.racine, ["diff", "--no-color", "--no-ext-diff", depot.base.length === 10 ? depot.base : ARBRE_VIDE, "--", f.rel]); corps = coupe(d.ok ? (d.out || "[diff vide]") : `[diff illisible : ${court(d.err, 150)}]`, BORNES.depotFichier, "diff du fichier"); }
+    else { const d = git(depot.racine, ["diff", "--no-color", "--no-ext-diff", depot.baseRev, "--", f.rel]); corps = coupe(d.ok ? (d.out || "[diff vide]") : `[diff illisible : ${court(d.err, 150)}]`, BORNES.depotFichier, "diff du fichier"); }
     corps = corps.length > reste ? coupe(corps, reste, "borne globale du dépôt") : corps;
     reste -= corps.length;
     out.push(`### ${f.rel} — ${f.etat}`, "", "```", corps, "```", "");
@@ -484,9 +484,9 @@ export function fabriquerLivrablesConsigne(pieces, texte) {
   return out.join("\n");
 }
 
-// ---------- la réception d'un livrable d'agent et la cohérence d'une campagne (D-40 (a), A-2 et A-3 du 19/10/2026) ----------
+// ---------- la réception d'un livrable d'agent et la cohérence d'une campagne (D-47 (a), A-2 et A-3 du 19/10/2026) ----------
 
-const MENTION_RELU = (id) => `[relu à sa réception sous ${id} et inchangé depuis : contenu non recité, la relecture de fin de tour juge le reste (D-40 (a) du 19/10/2026)]`;
+const MENTION_RELU = (id) => `[relu à sa réception sous ${id} et inchangé depuis : contenu non recité, la relecture de fin de tour juge le reste (D-47 (a) du 19/10/2026)]`;
 
 /**
  * Les livrables relus à leur réception et inchangés depuis : chemin normalisé → identifiant de la relecture la plus récente.

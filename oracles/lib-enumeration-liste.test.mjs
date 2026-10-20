@@ -86,7 +86,7 @@ if (casse.length) {
   console.log(`Self-test lib-enumeration-liste : ${n - casse.length}/${n} PASS · CASSE : ${casse.join(" · ")}`);
   process.exit(1);
 }
-console.log(`Self-test lib-enumeration-liste : ${n}/${n} PASS (E-11 sur le Markdown : l'énumération « 1) … 2) … 3) » en ligne, en cellule et en puce est accusée, `
-  + "la même information en liste, deux éléments, une citation entre guillemets français, du code, un front matter et une adresse ne le sont pas ; "
+console.log(`Self-test lib-enumeration-liste : ${n}/${n} PASS, double sens (E-11 sur le Markdown, cas rouges : l'énumération « 1) … 2) … 3) » en ligne, en cellule et en puce est accusée, `
+  + "la même information en liste, deux éléments, une citation entre guillemets français, du code, un front matter et une adresse ne le sont pas ; cas rouges : "
   + "le guide dont l'étape enchaîne trois gestes, dont une sous-puce en enchaîne trois, dont la clôture n'est pas la dernière sous-puce est accusé, "
   + "le guide à une sous-puce par geste et l'ancienne forme courte ne le sont pas)");

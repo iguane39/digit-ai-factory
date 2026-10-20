@@ -1,6 +1,6 @@
 {
   "cible": "references/INDEX.md",
-  "date_iso": "2026-10-19T16:51:22.929Z",
+  "date_iso": "2026-10-20T06:51:56.275Z",
   "registre_version": "2.45.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\INDEX.md",
-    "ts": "2026-10-19T16:51:22.929Z",
+    "ts": "2026-10-20T06:51:56.274Z",
     "fichiers": {
-      "references\\INDEX.md": "eefcf94311697d338ea9f1a13bfd3b1ce06cc8ec6103373b803b45d3bec4817c"
+      "references\\INDEX.md": "3d246dc4416aeeb30376a2a57752d0ca2dad228c8821d6d17935ecbc7f914850"
     }
   },
   "empreinte_motif": null,

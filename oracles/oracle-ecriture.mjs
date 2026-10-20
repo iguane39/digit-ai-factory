@@ -34,7 +34,7 @@
  * TF-1847, 18/10/2026) ; les restitutions sont jugées par S80 d'oracle-synthese, bloquante chez elles.
  * EC-13 la revue des listes de tournures est datée et n'est pas dépassée : chaque famille de la donnée porte une
  * `revue_prevue` (AAAA-MM-JJ) ; une date absente ou dépassée avertit, sur tout texte jugé (AVERT seulement,
- * TF-1905, décision D-41 (a) du 19/10/2026).
+ * TF-1926, décision D-48 (a) du 19/10/2026).
  * Un AVERT n'échoue jamais : il nomme, et c'est ce qui permet à l'oracle de rester branché.
  *
  * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--aujourd-hui AAAA-MM-JJ] [--json]
@@ -756,7 +756,7 @@ export function juger(texte, options = {}) {
     }
   }
 
-  // EC-13 (TF-1905, décision D-41 (a) du 19/10/2026, étude style-ecriture O3) — LA REVUE DES LISTES DE TOURNURES A UNE DATE.
+  // EC-13 (TF-1926, décision D-48 (a) du 19/10/2026, étude style-ecriture O3) — LA REVUE DES LISTES DE TOURNURES A UNE DATE.
   // AVERT SEULEMENT, JAMAIS FAIL, sur tout texte jugé.
   //
   // LE FAIT. Les 9 familles de `references/tics-redactionnels.json` n'ont été relues qu'une fois, le 11/09/2026, et rien
@@ -785,7 +785,7 @@ export function juger(texte, options = {}) {
           + (enRetard.length && sansDate.length ? " · " : "")
           + (sansDate.length ? `${sansDate.length} famille(s) sans revue_prevue lisible : ${sansDate.slice(0, 5).join(", ")}${sansDate.length > 5 ? ` · et ${sansDate.length - 5} autre(s)` : ""}` : "")
           + " — relire les listes contre leurs sources, puis inscrire derniere_lecture et une nouvelle revue_prevue dans references\\tics-redactionnels.json (loi n° 4). "
-          + "AVERTISSEMENT, jamais bloquant (TF-1905, D-41 (a) du 19/10/2026)");
+          + "AVERTISSEMENT, jamais bloquant (TF-1926, D-48 (a) du 19/10/2026)");
       }
     }
   }
@@ -1285,7 +1285,7 @@ function selfTest() {
   if (g12(r12c)?.statut !== "PASS")
     casse.push(`EC-12 : la forme interdite montrée entre guillemets français est comptée comme commise : ${JSON.stringify(g12(r12c))}`);
 
-  // 31 à 37 (TF-1905, D-41 (a) du 19/10/2026) — EC-13, LA REVUE DES LISTES DE TOURNURES EST DATÉE, EN AVERTISSEMENT.
+  // 31 à 37 (TF-1926, D-48 (a) du 19/10/2026) — EC-13, LA REVUE DES LISTES DE TOURNURES EST DATÉE, EN AVERTISSEMENT.
   // Le rouge est la donnée réelle dont deux familles ont une revue dépassée et une troisième aucune date ; le vert est la
   // donnée réelle au jour injecté (--aujourd-hui) ; le remède (dates futures inscrites) doit PASSER ; la frontière : le
   // jour dit n'est pas en retard, le lendemain l'est.
@@ -1310,7 +1310,7 @@ function selfTest() {
     || !/1 famille\(s\) sans revue_prevue lisible : emphase-creuse/.test(g13(r13r)?.message || ""))
     casse.push(`EC-13 : deux revues dépassées et une date absente ne sont pas nommées : ${JSON.stringify(g13(r13r))}`);
   if (r13r.statut !== 0 || r13r.j?.verdict === "FAIL")
-    casse.push("EC-13 : l'avertissement fait échouer le texte — la règle est en AVERTISSEMENT (TF-1905), jamais bloquante");
+    casse.push("EC-13 : l'avertissement fait échouer le texte — la règle est en AVERTISSEMENT (TF-1926), jamais bloquante");
   if (g13(r13v)?.statut !== "PASS" || !/9 famille\(s\) sur 9, la plus proche le 2026-11-16/.test(g13(r13v)?.message || ""))
     casse.push(`EC-13 : la donnée réelle, datée sur ses 9 familles, n'est pas en PASS : ${JSON.stringify(g13(r13v))}`);
   if (g13(r13c)?.statut !== "PASS")
@@ -1325,7 +1325,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 37 cas, 0 défaut (37/37 PASS — EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1905), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : 37 cas, 0 défaut (37/37 PASS — EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 

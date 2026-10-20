@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md",
+ "empreinte": "51da8dce6655365f0a05533fe774b6c5afaf83a2aec192904230198dc56816f7",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-19T10:34:14.445Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

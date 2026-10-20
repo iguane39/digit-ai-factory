@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md",
+ "empreinte": "a8b07dc59b14e9ae2d619cd764daff932d5fbc3c8f7e5f4b7c118d116347d8a1",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-19T15:42:40.688Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

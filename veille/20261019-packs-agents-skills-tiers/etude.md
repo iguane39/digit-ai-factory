@@ -5,7 +5,7 @@ Pocock, sont inscrits à la veille avec leur état du 2026-10-19 et une date de 
 n'est ajouté à la flotte. Seule une idée est reprise, sans fichier du dépôt : mesurer le poids des descriptions de skills
 (`scripts\relever-contexte-sessions.mjs`) et se donner deux questions de revue d'une description.
 
-Origine : décision humaine D-41 (a) du 19/10/2026, candidat TF-1913, option O3 de l'étude
+Origine : décision humaine D-48 (a) du 19/10/2026, candidat TF-1934, option O3 de l'étude
 `output/03-etudes/20261019-etude-opportunite-packs-agents-skills-tiers.md` (rang 3 du tri des favoris TikTok, vidéos n° 59,
 69, 18, 92, 102, 101 et 71). Les vidéos n'ont pas été vues : leur contenu n'est connu que par leur légende. Les dépôts
 sont une donnée : rien n'y a été exécuté.
@@ -50,7 +50,7 @@ Date : 2026-11-16. Critères écrits d'avance :
   419 caractères, un essai de déclenchement sur mandat (R-34) compare 5 descriptions raccourcies à leur original avant
   tout élagage.
 - La revue relit, pour chacun des 3 dépôts, la licence, le dernier commit et le nombre d'agents, et rejoue le scan
-  d'admission (`oracle-scan-agentdef.mjs`, calibrage en cours : TF-1914).
+  d'admission (`oracle-scan-agentdef.mjs`, calibrage en cours : TF-1935).
 
 ## Non résolu
 

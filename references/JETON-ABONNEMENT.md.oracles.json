@@ -1,6 +1,6 @@
 {
   "cible": "references/JETON-ABONNEMENT.md",
-  "date_iso": "2026-10-19T16:51:24.134Z",
+  "date_iso": "2026-10-20T06:51:57.898Z",
   "registre_version": "2.45.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -77,9 +77,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\JETON-ABONNEMENT.md",
-    "ts": "2026-10-19T16:51:24.133Z",
+    "ts": "2026-10-20T06:51:57.898Z",
     "fichiers": {
-      "references\\JETON-ABONNEMENT.md": "773944323d46a29e2eec289f09ad6f6efec55b232297bf16149761f8151beb76"
+      "references\\JETON-ABONNEMENT.md": "4c36bbd892f6622dc595408590e891218bbbcecd9dc9871f5ca4e5e3f1e3dcae"
     }
   },
   "empreinte_motif": null,

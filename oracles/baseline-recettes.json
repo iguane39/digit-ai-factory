@@ -47,8 +47,8 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 21,
-  "vu_le": "2026-10-15"
+  "cas": 20,
+  "vu_le": "2026-10-19"
  },
  "gabarits/ledger.test.mjs": {
   "cas": 19,
@@ -67,8 +67,8 @@
   "vu_le": "2026-10-12"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 92,
-  "vu_le": "2026-10-15"
+  "cas": 91,
+  "vu_le": "2026-10-19"
  },
  "gabarits/oracle-revue-deck.test.mjs": {
   "cas": 21,
@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 186,
-  "vu_le": "2026-10-17"
+  "cas": 185,
+  "vu_le": "2026-10-19"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,

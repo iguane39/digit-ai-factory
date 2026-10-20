@@ -16,7 +16,7 @@
  *     appels d'outils ;
  *   · les réponses servies par un modèle HORS DE LA GÉNÉRATION COURANTE de `references/MODELES-EN-SERVICE.json`,
  *     sessions comprises (le juge externe `oracle-judge` y tournait sur Opus 4.6 le 18/10).
- *   · la SIMULTANÉITÉ (TF-1907, décision humaine D-41 (a) du 19/10/2026, étude `output/03-etudes/20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md`) :
+ *   · la SIMULTANÉITÉ (TF-1928, décision humaine D-48 (a) du 19/10/2026, étude `output/03-etudes/20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md`) :
  *     par session principale, le PIC de sous-agents dont les durées de vie se chevauchent (du premier au dernier message du
  *     sous-agent ; deux durées qui se touchent ne se chevauchent pas), la distribution de ce pic et le nombre de sessions à 5
  *     ou plus et à 10 ou plus. Un sous-agent en attente compte comme actif : le pic peut être surestimé. L'unité est le
@@ -199,7 +199,7 @@ export function relever(dossiers, depuisIso, courants) {
   const parJour = {};
   for (const g of relectures) parJour[g.jour] = (parJour[g.jour] || 0) + g.total;
   const jourMax = Object.entries(parJour).sort((x, y) => y[1] - x[1])[0] || null;
-  // La simultanéité (TF-1907) : le pic par session principale, sa distribution, et la session qui porte le maximum.
+  // La simultanéité (TF-1928) : le pic par session principale, sa distribution, et la session qui porte le maximum.
   const pics = [...parSession].map(([cle, iv]) => ({ cle, pic: picSimultaneite(iv), sous_agents: iv.length }));
   const picMax = pics.reduce((m, p) => (p.pic > (m ? m.pic : 0) ? p : m), null);
   indicateurs.simultaneite = {

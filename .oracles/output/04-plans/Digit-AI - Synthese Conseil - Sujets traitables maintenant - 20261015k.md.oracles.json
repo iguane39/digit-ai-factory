@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+  "date_iso": "2026-10-15T19:26:52.687Z",
+  "registre_version": "2.42.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; date d'engagement non sourcée : « Sur les 40 sujets ouverts du registre, quatre travaux ne demandent aucune décisi »"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md",
+    "ts": "2026-10-15T19:26:52.687Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md": "7b9225dffda3ecbc87f22ad9b8c322c0624ca147715353e182aac1cbb048cdb7"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

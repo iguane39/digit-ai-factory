@@ -1,6 +1,6 @@
 {
   "cible": "references/ECRITURE.md",
-  "date_iso": "2026-10-19T17:07:01.276Z",
+  "date_iso": "2026-10-20T06:51:55.443Z",
   "registre_version": "2.45.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\ECRITURE.md",
-    "ts": "2026-10-19T17:07:01.276Z",
+    "ts": "2026-10-20T06:51:55.442Z",
     "fichiers": {
-      "references\\ECRITURE.md": "dc6b86b985a230d74d2f16a92a504a8a0066e809266553489887dab349981882"
+      "references\\ECRITURE.md": "f52dc7dac7bc9f7ef2be750910bf127f5f5bfb16d4264b7a67755d6841b45473"
     }
   },
   "empreinte_motif": null,

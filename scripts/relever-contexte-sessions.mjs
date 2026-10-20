@@ -22,7 +22,7 @@
  * du seuil. Le seuil se lit au référentiel (`references\MODELES-EN-SERVICE.json`, `sessions.seuil_contexte_jetons`),
  * ou `--seuil`.
  *
- * LES DESCRIPTIONS DE SKILLS (TF-1913, décision humaine D-41 (a) du 19/10/2026, étude
+ * LES DESCRIPTIONS DE SKILLS (TF-1934, décision humaine D-48 (a) du 19/10/2026, étude
  * `output/03-etudes/20261019-etude-opportunite-packs-agents-skills-tiers.md`, option O3). Le contexte permanent d'un skill
  * est sa description : Claude Code pré-charge le nom et la description de CHAQUE skill installé dans le prompt système
  * (Anthropic, « Equipping agents for the real world with Agent Skills », 2025-10-16). Aucun relevé n'en donnait le cumul,

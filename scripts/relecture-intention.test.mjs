@@ -640,7 +640,7 @@ try {
     const r = spawnSync(process.execPath, [join(ICI, "relecture-intention.mjs"), "--inconnue"], { encoding: "utf8", cwd: PROJET });
     egal(r.status, 2, "exit option inconnue");
   });
-  // ---- D-40 (a), A-1, A-2 et A-3 du 19/10/2026 : réception, cohérence, consigne de campagne ----------------------------
+  // ---- D-47 (a), A-1, A-2 et A-3 du 19/10/2026 : réception, cohérence, consigne de campagne ----------------------------
   const REGR = join(T, "registre-reception.jsonl");
   const PLUS_TARD = new Date(Date.now() + 60000);
   const ETUDE_A = join(T, "etude-a.md"), ETUDE_B = join(T, "etude-b.md");
@@ -655,7 +655,7 @@ try {
     egal(executer(["--preparer", "reception", "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "sans fichier");
     egal(executer(["--preparer", "reception", "--fichier", ETUDE_A, "--fichier", ETUDE_B, "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "deux fichiers");
   });
-  check("vert — réception (D-40 (a)) : le livrable est cité EN ENTIER avec le verdict de forme ; l'oracle réel saute un non-.md", () => {
+  check("vert — réception (D-47 (a)) : le livrable est cité EN ENTIER avec le verdict de forme ; l'oracle réel saute un non-.md", () => {
     const d = join(T, "sortie-reception");
     const r = executer(["--preparer", "reception", "--fichier", ETUDE_A, "--transcript", TRANSCRIPT, "--sortie", d, "--type", "etude"], {}, new Date(), { ...CTX, jugerForme: PASS_FORME });
     egal(r.code, 0, "exit"); const l = readFileSync(join(d, "livrables.md"), "utf8");

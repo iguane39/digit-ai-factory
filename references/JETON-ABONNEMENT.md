@@ -1,6 +1,6 @@
 ---
 role: la fiche datée du jeton d'abonnement `claude setup-token` pour les tâches sans écran (commande, variable, priorité des identifiants, limites, réserves contractuelles), consignée sans être adoptée
-sources_de_verite: [output/03-etudes/20261019-etude-opportunite-jeton-abonnement-taches-sans-ecran.md (étude 20261019b, option O2 retenue par la décision D-41 (a) du 19/10/2026 ; section 3 « État de l'art daté » : neuf sources d'Anthropic lues le 2026-10-19), oracles/oracle-depense-voie-par-defaut.mjs (R-34), REGLES-PROJET.md R-29 et R-34 et R-38]
+sources_de_verite: [output/03-etudes/20261019-etude-opportunite-jeton-abonnement-taches-sans-ecran.md (étude 20261019b, option O2 retenue par la décision D-48 (a) du 19/10/2026 ; section 3 « État de l'art daté » : neuf sources d'Anthropic lues le 2026-10-19), oracles/oracle-depense-voie-par-defaut.mjs (R-34), REGLES-PROJET.md R-29 et R-34 et R-38]
 verifie_le: 2026-10-19
 revue_prevue: 2026-11-19
 ---
@@ -10,7 +10,7 @@ revue_prevue: 2026-11-19
 Ce que change ce document pour vous : la Factory n'a aucune tâche sans écran qui appelle un modèle, donc aucun
 jeton n'est créé et aucune dépense n'est engagée. La fiche garde, datés, les faits qui coûteraient un aller-retour
 le jour où une telle tâche apparaîtrait, et le critère qui rouvre la question. Elle découle de la décision humaine
-D-41 (a) du 19/10/2026 (candidat TF-1900). Une règle de plateforme se périme sans avertir (loi transverse n° 4) :
+D-48 (a) du 19/10/2026 (candidat TF-1921). Une règle de plateforme se périme sans avertir (loi transverse n° 4) :
 chaque fait porte sa source, et la revue est fixée au 2026-11-19.
 
 Provenance : les neuf sources ci-dessous sont des pages d'Anthropic lues le 2026-10-19 par l'étude 20261019b, non
@@ -74,7 +74,7 @@ et ferait échouer DP1, alors qu'il s'invoque à la main. Ce chantier n'est pas 
 
 ## Le jeton n'est pas adopté
 
-Décideur : l'humain, par sa réponse « 41a » du 19/10/2026 (D-41 (a)), consignée au registre `todo\TODO.jsonl` sous TF-1900
+Décideur : l'humain, par sa réponse « 41a » du 19/10/2026 (D-48 (a)), consignée au registre `todo\TODO.jsonl` sous TF-1921
 (événement `maj`, statut `decide`, date de décision 2026-10-19). Il a retenu l'option O2 de l'étude : consigner sans adopter.
 
 Aucune tâche sans écran n'appelle un modèle ; le jeton serait créé pour rien. Aucun jeton n'est créé, aucun secret n'est

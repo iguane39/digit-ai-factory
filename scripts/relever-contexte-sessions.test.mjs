@@ -5,7 +5,7 @@
  *           `message.id`) ne se compte qu'une fois ; un résultat d'outil et un retour de hook n'ouvrent pas de tour ;
  *   ROUGE : une session qui franchit le seuil est NOMMÉE (AVERT), jamais un échec (exit 0) ;
  *   BORNES : le seuil se lit au référentiel ; une option inconnue rend 2.
- * TF-1913 — les descriptions de skills (VERT : un corpus court, cumul, moyenne et maximum exacts, sans rappel de revue ;
+ * TF-1934 — les descriptions de skills (VERT : un corpus court, cumul, moyenne et maximum exacts, sans rappel de revue ;
  *   ROUGE : un corpus aux descriptions longues est nommé et rappelle les deux questions de revue, sans bouger le verdict
  *   du contexte ; BORNES : un dossier de skills lié à un autre profil ne se compte qu'une fois).
  * Joué par `oracles\self-tests.mjs` (I2).
@@ -64,7 +64,7 @@ try {
     if (executer(["--inconnue"]).code !== 2) throw new Error("pas 2");
   });
 
-  // TF-1913 (D-41 (a) du 19/10/2026) — les descriptions de skills : cumul, moyenne, maximum, part au-dessus de 419 caractères.
+  // TF-1934 (D-48 (a) du 19/10/2026) — les descriptions de skills : cumul, moyenne, maximum, part au-dessus de 419 caractères.
   const skill = (dossier, nom, frontmatter, crlf = false) => {
     mkdirSync(join(dossier, nom), { recursive: true });
     const txt = `---\n${frontmatter}\n---\n\nCorps du skill.\n`;
