@@ -227,7 +227,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261019-etude-opportunite-tactiques-seo-geo-recentes.md | — | 22.3 Ko | `03-etudes/20261019-etude-opportunite-tactiques-seo-geo-recentes.md` |
 | 20261019-etude-opportunite-video-lancement-generee-par-code.md | — | 19.9 Ko | `03-etudes/20261019-etude-opportunite-video-lancement-generee-par-code.md` |
 | 20261019-tri-opportunites-favoris-tiktok.md | — | 25.7 Ko | `03-etudes/20261019-tri-opportunites-favoris-tiktok.md` |
-| 20261020-etude-opportunite-conseil-avant-arbitrage.md | — | 14.7 Ko | `03-etudes/20261020-etude-opportunite-conseil-avant-arbitrage.md` |
+| 20261020-etude-opportunite-conseil-avant-arbitrage.md | — | 15.7 Ko | `03-etudes/20261020-etude-opportunite-conseil-avant-arbitrage.md` |
 
 ### 04-plans
 

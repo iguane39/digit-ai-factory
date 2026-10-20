@@ -8,7 +8,7 @@ gabarit: gabarits\ETUDE-OPPORTUNITE.md
 
 # Étude d'opportunité — un conseil de cinq agents séparés avant un arbitrage humain — 20261020a
 
-Résultat de la revue, le 20/10/2026 à 11:30, après l'essai O1 (section 3 ter) : sur 4 décisions passées, le conseil a rejoint votre choix 2 fois, et la requête unique aussi 2 fois. Le critère fixé d'avance n'est pas tenu, et TF-1936 est écartée. Le paragraphe suivant décrit l'état d'avant l'essai O1.
+Résultat de la revue, le 20/10/2026 à 11:35, après l'essai O1 (section 3 ter) : sur 4 décisions passées, le conseil a rejoint votre choix 2 fois, et la requête unique aussi 2 fois. À longueur comparable, le conseil apporte 4 considérations à risque que la requête unique n'a pas, contre 3 dans l'autre sens, et aucun cas n'atteint le seuil de 3. Aucun des 2 critères fixés d'avance n'est tenu. TF-1936 est inscrite écartée au registre ; la décision de la garder écartée vous est posée. Le paragraphe suivant décrit l'état d'avant l'essai O1.
 
 Ce qui change pour vous : un premier essai mesuré existe. Il porte sur votre décision du 19/10 sur la lecture de la messagerie Microsoft 365, que vous aviez tranchée par une fiche sans skill. Quatre conseillers sur cinq ont rejoint votre choix, alors qu'une requête unique à Opus recommandait une fiche et un skill. Le conseil a aussi soulevé 17 considérations que la requête unique n'avait pas, dont un risque de conformité sur le consentement du client. Il a coûté 5 fois plus de jetons, et ses textes étaient 3 fois plus longs, ce qui fausse en partie le compte. Un seul cas ne suffit pas à créer un skill durable. L'étude recommande l'option O1 : un essai borné sur 3 décisions passées de plus, à longueur égale, avant de décider un objet durable.
 
@@ -119,7 +119,16 @@ Parmi les 17 considérations propres au conseil, le compteur en retient 5 dont l
 - Le conseil ne départage pas mieux que la requête unique : le critère « plus souvent juste sur au moins 3 cas sur 4 » n'est pas tenu.
 - Sur la propagation des skills, la majorité du conseil a suivi la recommandation d'origine, qui était fausse au regard de votre choix. Cela confirme la corrélation d'erreurs que décrit l'état de l'art, et non une indépendance.
 - Les voix minoritaires portaient pourtant des faits utiles. Sur la propagation, le contradicteur a vu qu'une propagation peut écraser une copie modifiée sur un poste. Sur le skill LinkedIn, il a vu qu'une reprise en forge crée une deuxième source qui diverge. À longueur égale, le bras A a relevé lui aussi la fragilité du compte de 6 produits et le diff des 5 skills.
-- Le compteur aveugle des considérations n'a pas été joué sur ces 3 cas, parce que le premier critère suffisait à trancher. C'est un écart au protocole décidé, consigné dans la restitution.
+- Le compteur aveugle, d'abord omis puis joué après l'alerte de la relecture d'intention RI-20261020-10, sépare l'effet de la longueur. Chaque cas présente les deux analyses sous les noms P et Q, dans un ordre qui change d'un cas à l'autre.
+
+| Cas | Mots, bras A / conseil | Considérations distinctes | Propres au bras A | Propres au conseil | À risque, propres au bras A | À risque, propres au conseil |
+|---|---|---|---|---|---|---|
+| Porte de sécurité des agents | 1 057 / 1 539 | 21 | 3 | 7 | 0 | 2 |
+| Propagation des skills | 1 078 / 1 614 | 25 | 5 | 8 | 2 | 1 |
+| Skill LinkedIn | 845 / 1 465 | 22 | 3 | 8 | 1 | 1 |
+| Total | 2 980 / 4 618 | 68 | 11 | 23 | 3 | 4 |
+
+- Le conseil apporte 2 fois plus de considérations propres, 23 contre 11, pour 1,5 fois plus de mots. À risque, l'écart tombe à 4 contre 3, et aucun cas n'atteint le seuil de 3 considérations à risque propres au conseil.
 
 **Limites.** 4 cas restent un petit échantillon. Les 3 cas du 20/10 portaient tous la même réponse humaine, (a). Le rôle de contradicteur tient le plus souvent la thèse opposée à la majorité, ce qui gonfle les votes (b).
 
@@ -135,7 +144,7 @@ Parmi les 17 considérations propres au conseil, le compteur en retient 5 dont l
 
 - **Option retenue** : O1, un essai borné sur 3 décisions passées de plus, à longueur égale.
 - **Coût** : complexité simple · durée court ; environ 600 000 jetons ; aucune dette, rien ne s'installe.
-- **Candidature(s) émise(s)** : aucune nouvelle ; TF-1936 décidée par D-53 (a) le 20/10/2026, puis écartée le même jour selon le plan de revue ci-dessous, le critère n'étant pas tenu (section 3 ter).
+- **Candidature(s) émise(s)** : aucune nouvelle ; TF-1936 décidée par D-53 (a) le 20/10/2026, puis inscrite écartée le même jour selon le plan de revue ci-dessous, aucun des 2 critères n'étant tenu (section 3 ter) ; garder l'écart ou rouvrir revient au porteur.
 - **Plan de revue** : 2026-11-03, ou au retour de l'essai O1 s'il revient avant. Si le conseil rejoint la réponse humaine plus souvent que la requête unique sur au moins 3 cas sur 4, et garde au moins 3 considérations propres à risque par cas à longueur égale, O2 s'instruit. Sinon, TF-1936 s'écarte.
 - **Test rétro** :
   - Opérationnel : 3 essais à longueur égale.
