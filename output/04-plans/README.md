@@ -52,6 +52,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md` | fichier | 7,1 Ko | Synthèse Mandat — reprise entre postes câblée, 3 sujets clos, publication du pilot à décid |
 | `Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` | fichier | 7,1 Ko | Synthèse Mandat — commande d'installation publiée et verte sur poste neuf, reprise réseau  |
 | `Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` | fichier | 9,2 Ko | Synthèse Mandat — Supabase outillé dans quatre forges et au pilot, publication du pilot à  |
+| `Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` | fichier | 6,5 Ko | Synthèse Mandat — conseil de cinq agents avant un arbitrage : étude instruite (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
 | `Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` | fichier | 9,4 Ko | Synthèse Mandat — D-41, D-43 et D-44 exécutées le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` | fichier | 5,8 Ko | Synthèse Mandat — D-45 reposée en clair, le 19/10/2026 au soir |
@@ -113,4 +114,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 
-_93 fichier(s), 3 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_94 fichier(s), 3 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

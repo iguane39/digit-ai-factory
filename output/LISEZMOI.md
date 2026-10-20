@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 489 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 490 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -227,7 +227,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261019-etude-opportunite-tactiques-seo-geo-recentes.md | — | 22.3 Ko | `03-etudes/20261019-etude-opportunite-tactiques-seo-geo-recentes.md` |
 | 20261019-etude-opportunite-video-lancement-generee-par-code.md | — | 19.9 Ko | `03-etudes/20261019-etude-opportunite-video-lancement-generee-par-code.md` |
 | 20261019-tri-opportunites-favoris-tiktok.md | — | 25.7 Ko | `03-etudes/20261019-tri-opportunites-favoris-tiktok.md` |
-| 20261020-etude-opportunite-conseil-avant-arbitrage.md | — | 11.9 Ko | `03-etudes/20261020-etude-opportunite-conseil-avant-arbitrage.md` |
+| 20261020-etude-opportunite-conseil-avant-arbitrage.md | — | 14.7 Ko | `03-etudes/20261020-etude-opportunite-conseil-avant-arbitrage.md` |
 
 ### 04-plans
 
@@ -481,6 +481,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md | 20261015g | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md` |
 | Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md | 20261013i | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` |
 | Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
+| Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
 | Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md | 20261019f | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` |
 | Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md | 20261019g | 5.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` |
