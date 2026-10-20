@@ -50,5 +50,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261019-etude-opportunite-tactiques-seo-geo-recentes.md` | fichier | 22,3 Ko | Étude d'opportunité — tactiques SEO et GEO récentes pour digit-ai-forge-seo-geo — 20261019 |
 | `20261019-etude-opportunite-video-lancement-generee-par-code.md` | fichier | 19,9 Ko | Étude d'opportunité — une vidéo de lancement générée par le code, livrée avec la mise en p |
 | `20261019-tri-opportunites-favoris-tiktok.md` | fichier | 25,7 Ko | Tri des favoris TikTok — opportunités pour la Factory — 20261019a |
+| `20261020-etude-opportunite-conseil-avant-arbitrage.md` | fichier | 11,9 Ko | Étude d'opportunité — un conseil de cinq agents séparés avant un arbitrage humain — 202610 |
 
-_32 fichier(s), 2 sous-dossier(s)_
+_33 fichier(s), 2 sous-dossier(s)_
