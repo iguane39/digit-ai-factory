@@ -27,6 +27,13 @@ fi
 # detache du commit, environnement de runner (scripts/rejouer-verdicts-cites.mjs). Un ecart (exit 1)
 # ou une plage illisible (exit 2, rien n'a ete juge) refuse l'envoi. Sans ligne `Verdict:`, rien a
 # rejouer : le script rend PASS en quelques dixiemes de seconde.
+# L'ENTREE DE GIT SE LIT UNE FOIS, ET SE REND (20/10/2026). git ecrit sur l'entree du hameçon une
+# ligne par reference envoyee, et ce flux ne se relit pas. La boucle ci-dessous le consommait :
+# la section TF-1555 du gabarit, plus bas, ne lisait plus rien et jugeait TOUTE l'histoire du pilot
+# (19 min le 20/10 au lieu de 44 s pour 5 revisions). Le flux est garde dans un fichier, lu ici,
+# puis rebranche sur l'entree pour les sections suivantes.
+ENTREE_PUSH="$(mktemp 2>/dev/null || echo "${TMPDIR:-/tmp}/pre-push-entree.$")"
+cat > "$ENTREE_PUSH"
 if [ -f "$DEPOT_PILOT/scripts/rejouer-verdicts-cites.mjs" ]; then
   ZERO="0000000000000000000000000000000000000000"
   while read REF_LOCALE SHA_LOCAL REF_DISTANTE SHA_DISTANT; do
@@ -42,5 +49,7 @@ if [ -f "$DEPOT_PILOT/scripts/rejouer-verdicts-cites.mjs" ]; then
       echo "  Corriger le commit ou sa ligne Verdict:, ou contourner EXPLICITEMENT : git push --no-verify" >&2
       exit 1
     }
-  done
+  done < "$ENTREE_PUSH"
 fi
+exec < "$ENTREE_PUSH"
+rm -f "$ENTREE_PUSH" 2>/dev/null
