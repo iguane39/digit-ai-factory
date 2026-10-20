@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 485 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 486 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -488,6 +488,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md | 20261012b | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` |
 | Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md | 20261018m | 16.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md` |
 | Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md | 20261018p | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md` |
+| Digit-AI - Synthese Mandat - Decisions D-49 a D-51 detaillees - 20261020b.md | 20261020b | 7.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-49 a D-51 detaillees - 20261020b.md` |
 | Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md | 20261001h | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` |
 | Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md | 20261013e | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` |
 | Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md | 20261013f | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` |

@@ -60,6 +60,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
 | `Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md` | fichier | 16,7 Ko | Synthèse Mandat — vos 5 décisions exécutées, 2 études rendues, 5 nouvelles décisions (18/1 |
 | `Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md` | fichier | 8,1 Ko | Synthèse Mandat — vos décisions D-29 à D-33 exécutées, 5 sujets clos, aucune décision nouv |
+| `Digit-AI - Synthese Mandat - Decisions D-49 a D-51 detaillees - 20261020b.md` | fichier | 7,6 Ko | Synthèse Mandat — D-49, D-50 et D-51 détaillées (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |
 | `Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` | fichier | 6,5 Ko | Synthèse Mandat — dépôts privés hors d'accès non bloquants pour un poste tiers (13/10/2026 |
 | `Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` | fichier | 5,2 Ko | Synthèse Mandat — dépôts privés silencieux et confirmation d'installation en fin de comman |
@@ -110,4 +111,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 
-_90 fichier(s), 3 sous-dossier(s)_
+_91 fichier(s), 3 sous-dossier(s)_
