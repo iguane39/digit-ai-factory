@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { passerOuvertureEnAsync, fusionnerHooksDuGabarit } from "./lib-ouverture-async.mjs";
+import { passerOuvertureEnAsync, fusionnerHooksDuGabarit, ancrerCommandesFactory } from "./lib-ouverture-async.mjs";
 import { borner, BUDGET_CONTEXTE_ASYNC } from "./lib-budget-contexte.mjs";
 import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gestes-avant-releve.mjs";
 import { constatR47 } from "./lib-resume-r47.mjs";
@@ -57,6 +57,12 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "hooks", "factory.mjs
     `- \`.claude/settings.json\` : ${fu.ajoutes.length} entrée(s) du gabarit ajoutée(s) — ${fu.ajoutes.join(", ")} ; rien d'autre n'est touché. Actives à la prochaine session. Enregistrer ce changement avec le travail du produit ; pour en écarter une, la déclarer sous \`_hooks_factory_exclus\` avec son motif.`
       + (fu.exclus.length ? ` Exclusion(s) déclarée(s) et respectée(s) : ${fu.exclus.join(", ")}.` : ""), "");
   else if (fu.etat === "illisible" || fu.etat === "gabarit_illisible") lignesFusion.push("## Câblage des hooks de la factory (TF-1755)", `- fusion NON jouée (${fu.etat} : ${fu.detail}) : les entrées neuves du gabarit n'atteignent pas ce produit.`, "");
+  // TF-1903 (21/10/2026) — ET LA COMMANDE RELATIVE DU LANCEUR S'ANCRE EN PLACE sur la racine du projet : après un `cd`
+  // dans un sous-dossier, `node forge/hooks/factory.mjs` ne se trouvait plus et le hook se taisait. Même nom, mêmes
+  // options, aucune entrée ajoutée ni retirée : un produit ne se retrouve jamais avec les deux commandes.
+  const an = ancrerCommandesFactory(join(process.cwd(), ".claude", "settings.json"));
+  if (an.etat === "corrige") lignesFusion.push("## Câblage des hooks de la factory (TF-1903)",
+    `- \`.claude/settings.json\` : ${an.ancres.length} commande(s) du lanceur ancrée(s) sur la racine du projet (\`node "\${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" <nom>\`) — ${an.ancres.join(", ")}. Le chemin relatif se résolvait depuis le répertoire courant : après un \`cd\` dans un sous-dossier, ces hooks ne se déclenchaient plus. Mêmes noms et options, permissions et autres réglages intacts. Actives à la prochaine session. Enregistrer ce changement avec le travail du produit.`, "");
 }
 if (iPilot >= 0) {
   const r = passerOuvertureEnAsync(join(process.cwd(), ".claude", "settings.json"));

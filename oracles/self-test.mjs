@@ -107,7 +107,9 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       { matcher: "Agent|Task", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs flotte" }] }],
     // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
     PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) }],
-    UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } }) + "\n");
+    UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } })
+    // TF-1903 (21/10/2026) : le lanceur s'appelle par un chemin ancré sur la racine du projet (R-43), comme au gabarit.
+    .replace(/node forge\/hooks\/factory\.mjs/g, () => 'node \\"${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs\\"') + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
@@ -213,6 +215,25 @@ check("TF-1592 rouge — settings sans le hook publication-hebergee : R-47 FAIL 
     const r47 = rapport.findings.filter((x) => x.regle === "R-47" && x.statut === "FAIL");
     if (exit !== 1 || !r47.some((x) => /publication-hebergee/.test(x.message))) throw new Error(`exit ${exit}, R-47 : ${JSON.stringify(r47)}`);
   } finally { writeFileSync(f, avant); }
+});
+
+// TF-1903 (21/10/2026) — rouge : le même câblage complet, mais appelé par le chemin RELATIF d'avant
+// (`node forge/hooks/factory.mjs <nom>`) ; après un `cd` dans un sous-dossier, ces hooks se taisaient.
+// R-43 le refuse et nomme les hooks ; R-47 reste tenu (le câblage est là, seul l'ancrage manque).
+check("TF-1903 rouge — settings au lanceur relatif au répertoire courant : R-43 FAIL qui nomme l'ancrage, R-47 tenu", () => {
+  const f = join(verte, ".claude", "settings.json");
+  const avant = readFileSync(f, "utf8");
+  try {
+    writeFileSync(f, avant.split('node \\"${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs\\"').join("node forge/hooks/factory.mjs"));
+    if (readFileSync(f, "utf8") === avant) throw new Error("témoin rouge mal construit : réglage inchangé");
+    const { exit, rapport } = lance(verte);
+    const r43 = rapport.findings.filter((x) => x.regle === "R-43" && x.statut === "FAIL");
+    const r47 = rapport.findings.filter((x) => x.regle === "R-47" && x.statut === "FAIL" && /settings\.json/.test(x.message));
+    if (exit !== 1 || !r43.some((x) => /ancrage/.test(x.message) && /ecriture/.test(x.message))) throw new Error(`exit ${exit}, R-43 : ${JSON.stringify(r43)}`);
+    if (r47.length) throw new Error(`R-47 ne doit pas accuser le câblage relatif : ${JSON.stringify(r47)}`);
+  } finally { writeFileSync(f, avant); }
+  const { rapport } = lance(verte);
+  if (!rapport.findings.some((x) => x.regle === "R-43" && x.statut === "PASS")) throw new Error("verte ancrée : R-43 non PASS");
 });
 
 check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui nomme le motif asynchrone", () => {

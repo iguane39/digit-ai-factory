@@ -34,7 +34,8 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
-import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge } from "../scripts/relever-heritage.mjs";
+import { COMMANDE_RELATIVE_FACTORY } from "./lib-ouverture-async.mjs";
+import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs } from "../scripts/relever-heritage.mjs";
 // TF-0923 volet (a) : les rôles qui portent une page homonyme et la date d'entrée de la doctrine
 // sont DÉCLARÉS chez le générateur qui les applique, et LUS ici. Une copie se périmerait au
 // premier rôle ajouté là-bas, en silence.
@@ -1066,6 +1067,17 @@ else {
   const reglages = p(".claude/settings.json");
   if (!existsSync(reglages)) manques.push(".claude/settings.json (gabarits\\settings-produit.json)");
   else if (!/forge\/hooks\/factory\.mjs/.test(readFileSync(reglages, "utf8"))) manques.push("hooks de la factory dans .claude/settings.json");
+  else {
+    // TF-1903 (21/10/2026) : un lanceur appelé par un chemin RELATIF se résout depuis le répertoire courant du
+    // hook ; après un `cd` dans un sous-dossier, il ne se déclenche plus (MODULE_NOT_FOUND, rejoué le 21/10).
+    let relatives = [];
+    try {
+      const j = JSON.parse(readFileSync(reglages, "utf8").replace(/^﻿/, ""));
+      relatives = Object.values(j?.hooks || {}).flat().flatMap((g) => g?.hooks || [])
+        .map((h) => String(h?.command || "")).filter((c) => COMMANDE_RELATIVE_FACTORY.test(c));
+    } catch { /* illisible : R-47 le dit */ }
+    if (relatives.length) manques.push(`ancrage des hooks de la factory : ${relatives.length} commande(s) relative(s) au répertoire courant (${relatives.map((c) => c.split(/\s+/)[2] || c).join(", ")}) — écrire \`node "\${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" <nom>\` ; le hook d'ouverture du produit le fait en place (TF-1903)`);
+  }
   if (!existsSync(p("forge/hooks/factory.mjs"))) manques.push("forge/hooks/factory.mjs (gabarits\\hooks-factory.mjs)");
   manques.length
     ? ko("R-43", "CLAUDE.md / .claude", `précédence de la factory non câblée — manque : ${manques.join(", ")} (socle d'ouverture, ETAPES-RUN)`)
@@ -1138,7 +1150,7 @@ else {
         }
       } else if (a.mode === "presence_et_motif") {
         // TF-1635 (13/10/2026) : `motif_exige` peut être une liste, chaque motif exigé à part.
-        const texte = readFileSync(dst, "utf8");
+        const texte = texteDesMotifs(readFileSync(dst, "utf8")); // TF-1903 : lanceur ancré entre guillemets
         const manquants = [].concat(a.motif_exige || []).filter((m) => !texte.includes(m));
         manquants.length
           ? perimes.push(`${a.cible} ne porte pas ${manquants.map((m) => `« ${m} »`).join(" ni ")}`)

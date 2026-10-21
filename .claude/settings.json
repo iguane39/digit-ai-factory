@@ -7,13 +7,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-ouverture.mjs --contexte-json",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-ouverture.mjs\" --contexte-json",
             "timeout": 240,
             "async": true
           },
           {
             "type": "command",
-            "command": "node oracles/hook-produits-intacts.mjs --empreinte",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-produits-intacts.mjs\" --empreinte",
             "timeout": 45
           }
         ]
@@ -24,16 +24,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-produits-intacts.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-produits-intacts.mjs\"",
             "timeout": 120
           },
           {
             "type": "command",
-            "command": "node oracles/oracle-secrets-hors-perimetre.mjs"
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/oracle-secrets-hors-perimetre.mjs\""
           },
           {
             "type": "command",
-            "command": "node oracles/hook-restitution.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-restitution.mjs\"",
             "timeout": 60
           }
         ]
@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-publication-hebergee.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-publication-hebergee.mjs\"",
             "timeout": 10
           }
         ]
@@ -55,12 +55,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-identite-sortante.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-identite-sortante.mjs\"",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "node oracles/hook-remisage.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-remisage.mjs\"",
             "timeout": 10
           }
         ]
@@ -70,7 +70,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-puits-windows.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-puits-windows.mjs\"",
             "timeout": 10
           }
         ]
@@ -80,7 +80,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-flotte.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-flotte.mjs\"",
             "timeout": 10
           }
         ]
@@ -92,12 +92,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node scripts/readme-dossiers.mjs --silencieux",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/scripts/readme-dossiers.mjs\" --silencieux",
             "timeout": 30
           },
           {
             "type": "command",
-            "command": "node scripts/generer-lisezmoi-output.mjs --silencieux",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/scripts/generer-lisezmoi-output.mjs\" --silencieux",
             "timeout": 30
           }
         ]
@@ -107,12 +107,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-ecriture.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-ecriture.mjs\"",
             "timeout": 60
           },
           {
             "type": "command",
-            "command": "node oracles/hook-page-html.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-page-html.mjs\"",
             "timeout": 60
           }
         ]
@@ -123,7 +123,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node oracles/hook-lexique.mjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-lexique.mjs\"",
             "timeout": 10
           }
         ]

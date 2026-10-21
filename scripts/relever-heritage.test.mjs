@@ -13,7 +13,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence, racineWebDeclaree } from "./relever-heritage.mjs";
+import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence, racineWebDeclaree, texteDesMotifs } from "./relever-heritage.mjs";
 import { CARNET, CONDITION_SITE } from "./adopter-projet-existant.mjs";
 
 // TF-0957 — LES TABLES DE CE BANC SONT JETABLES, ET C'EST LUI QUI LES POSE.
@@ -176,12 +176,19 @@ try {
     const A = contrat.artefacts.find((a) => a.cible === ".claude/settings.json");
     const exiges = [].concat(A.motif_exige);
     const commandes = Object.values(gabarit.hooks).flat().flatMap((g) => g.hooks || []).map((h) => String(h.command));
-    const nonExiges = commandes.filter((c) => /forge\/hooks\/factory\.mjs\s+[\w-]+/.test(c) && !exiges.some((m) => c.includes(m)));
+    // TF-1903 (21/10/2026) : le gabarit écrit le lanceur ancré entre guillemets ; le motif se lit sans le guillemet fermant.
+    const factory = commandes.filter((c) => /forge\/hooks\/factory\.mjs"?\s+[\w-]+/.test(c));
+    att(factory.length >= 9, `${factory.length} commande(s) du lanceur reconnue(s) au gabarit, 9 au moins attendues`);
+    const nonExiges = factory.filter((c) => !exiges.some((m) => texteDesMotifs(c).includes(m)));
     att(!nonExiges.length, `commande(s) du gabarit non exigée(s) : ${nonExiges.join(" ; ")}`);
     const P = mkdtempSync(join(tmpdir(), "heritage-derive-"));
     try {
       mkdirSync(join(P, ".claude"), { recursive: true });
-      const sansRestitution = commandes.filter((c) => !/factory\.mjs restitution/.test(c));
+      // Vert d'abord : le gabarit lui-même, tel qu'il est posé chez un produit, tient tous les motifs.
+      writeFileSync(join(P, ".claude", "settings.json"), readFileSync(join(racine, "gabarits", "settings-produit.json"), "utf8"), "utf8");
+      const vert = etatArtefact(P, A, P);
+      att(vert.etat === "present", `le gabarit posé tel quel : état « ${vert.etat} », absents ${JSON.stringify(vert.motifs_absents)}`);
+      const sansRestitution = commandes.filter((c) => !/factory\.mjs"? restitution/.test(c));
       writeFileSync(join(P, ".claude", "settings.json"), JSON.stringify({ c: sansRestitution }), "utf8");
       const rouge = etatArtefact(P, A, P);
       att(rouge.etat === "incomplet" && (rouge.motifs_absents || []).some((m) => /restitution/.test(m)), `oubli de restitution : état « ${rouge.etat} », absents ${JSON.stringify(rouge.motifs_absents)}`);

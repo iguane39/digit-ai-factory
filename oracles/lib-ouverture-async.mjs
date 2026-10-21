@@ -18,7 +18,9 @@
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-export const MOTIF_HOOK_OUVERTURE = /forge\/hooks\/factory\.mjs\s+ouverture\b/;
+// TF-1903 (21/10/2026) : le chemin du lanceur peut être ancré et entre guillemets
+// (`node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" ouverture`) ; le guillemet fermant est admis.
+export const MOTIF_HOOK_OUVERTURE = /forge\/hooks\/factory\.mjs"?\s+ouverture\b/;
 
 /**
  * TF-1755 (15/10/2026) — UN HOOK AJOUTÉ AU GABARIT APRÈS L'INSTALLATION D'UN PRODUIT L'ATTEINT À SON OUVERTURE.
@@ -41,7 +43,49 @@ export const MOTIF_HOOK_OUVERTURE = /forge\/hooks\/factory\.mjs\s+ouverture\b/;
  *
  * Retour : { etat: "absent" | "illisible" | "gabarit_illisible" | "deja" | "corrige", ajoutes: [noms], exclus: [noms] }.
  */
-export const MOTIF_COMMANDE_FACTORY = /forge\/hooks\/factory\.mjs\s+([\w-]+)/;
+export const MOTIF_COMMANDE_FACTORY = /forge\/hooks\/factory\.mjs"?\s+([\w-]+)/;
+
+/**
+ * TF-1903 (21/10/2026) — LE LANCEUR S'APPELLE PAR UN CHEMIN ANCRÉ SUR LA RACINE DU PROJET.
+ *
+ * LE FAIT : `node forge/hooks/factory.mjs <nom>` se résout depuis le répertoire courant du hook, qui
+ * suit celui de la session (un `cd` dans un sous-dossier, un arbre de travail). Rejoué le 21/10/2026
+ * dans une session réelle (Claude Code 2.1.299 et 2.1.107) : après `cd sub`, une écriture ne déclenche
+ * plus la commande relative (MODULE_NOT_FOUND), et déclenche `node "${CLAUDE_PROJECT_DIR}/forge/hooks/
+ * factory.mjs" <nom>`, sous Git Bash comme sous PowerShell. La forme dite « exec » (`args`) est ignorée
+ * par la 2.1.107 : elle n'est pas retenue.
+ *
+ * L'ANCRAGE EST CHIRURGICAL : seule une commande qui commence par `node forge/hooks/factory.mjs` est
+ * réécrite, en place, avec le même nom et les mêmes options ; aucune entrée n'est ajoutée ni retirée,
+ * donc un produit qui portait l'ancienne commande n'en porte pas deux. Permissions, autres hooks,
+ * délais, indentation, BOM et fins de ligne sont gardés.
+ *
+ * Retour : { etat: "absent" | "illisible" | "deja" | "corrige", ancres: [noms] }.
+ */
+export const COMMANDE_RELATIVE_FACTORY = /^(\s*node\s+)(?:\.[\\/])?forge[\\/]hooks[\\/]factory\.mjs(?=\s|$)/;
+export const LANCEUR_ANCRE = 'node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs"';
+
+export function ancrerCommandesFactory(chemin) {
+  if (!existsSync(chemin)) return { etat: "absent", ancres: [] };
+  const brut = readFileSync(chemin, "utf8");
+  let j;
+  try { j = JSON.parse(brut.replace(/^﻿/, "")); } catch (e) { return { etat: "illisible", detail: e.message, ancres: [] }; }
+  const ancres = [];
+  for (const groupes of Object.values(j?.hooks && typeof j.hooks === "object" ? j.hooks : {})) {
+    for (const g of Array.isArray(groupes) ? groupes : []) for (const h of (g?.hooks || [])) {
+      if (typeof h?.command !== "string" || !COMMANDE_RELATIVE_FACTORY.test(h.command)) continue;
+      h.command = h.command.replace(COMMANDE_RELATIVE_FACTORY, () => LANCEUR_ANCRE);
+      ancres.push((h.command.match(MOTIF_COMMANDE_FACTORY) || [])[1] || "?");
+    }
+  }
+  if (!ancres.length) return { etat: "deja", ancres };
+  const eol = brut.includes("\r\n") ? "\r\n" : "\n";
+  const indent = (brut.match(/\n([ \t]+)"/) || [, "  "])[1];
+  let sortie = JSON.stringify(j, null, indent).replace(/\n/g, eol);
+  if (/\r?\n$/.test(brut)) sortie += eol;
+  writeFileSync(chemin, (brut.startsWith("﻿") ? "﻿" : "") + sortie);
+  return { etat: "corrige", ancres };
+}
 
 export function nomsExclus(j) {
   return [].concat(j?._hooks_factory_exclus || [])

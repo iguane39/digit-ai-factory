@@ -174,6 +174,8 @@ const globVersRegex = (glob) => {
   return new RegExp(`^${re}$`);
 };
 const temoinsDe = (motif) => [...new Set(["", "a", "a-b"].map((jeton) => motif.replace(/\*+/g, jeton)))];
+/** TF-1903 : le texte où se cherche un `motif_exige`, guillemet fermant du lanceur ancré ôté (`factory.mjs\" x` → `factory.mjs x`). */
+export const texteDesMotifs = (texte) => String(texte).replace(/factory\.mjs\\?"(?=\s)/g, "factory.mjs");
 export function estCouvertParPlusLarge(motif, lignes) {
   if (motif.startsWith("!")) return false;
   const familles = [temoinsDe(motif)];
@@ -342,13 +344,16 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
     const absents = (artefact.motifs_exiges || []).filter((m) => !lignes.has(m) && !estCouvertParPlusLarge(m, lignes));
     return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
   }
+  // TF-1903 (21/10/2026) : le lanceur s'écrit désormais ancré et entre guillemets
+  // (`node \"${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs\" ecriture` dans le JSON) ; le motif
+  // `forge/hooks/factory.mjs ecriture` se lit sur le texte dont ce guillemet fermant est ôté (texteDesMotifs).
   // TF-1592 (13/10/2026) — LE MODE AU SINGULIER, `presence_et_motif`, TOMBAIT DANS « present ».
   // R-47 (oracle-conformite-projet) cherche le motif littéral dans le texte ; le relevé ne le
   // lisait pas, et l'émetteur de travaux ne confiait donc jamais le câblage manquant : le hook
   // publication-hebergee, exigé de 7 produits sur 7 le 12/10, n'atteignait aucun d'eux.
   if (artefact.mode === "presence_et_motif" && artefact.motif_exige) {
     // TF-1635 (13/10/2026) : `motif_exige` peut être une liste, chaque motif exigé à part.
-    const texte = readFileSync(cible, "utf8");
+    const texte = texteDesMotifs(readFileSync(cible, "utf8"));
     const absents = [].concat(artefact.motif_exige).filter((m) => !texte.includes(m));
     return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
   }

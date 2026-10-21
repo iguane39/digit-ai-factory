@@ -472,6 +472,16 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   check("TF-1652 — le refus nomme la commande valable chez un produit (--base . et --racines)", () => {
     if (!/--base \. --racines/.test(r.stderr || "")) throw new Error(`commande produit absente du refus : ${(r.stderr || "").slice(-200)}`);
   });
+  // TF-1903 (21/10/2026) — LE MÊME DÉPÔT, ÉCRIT AVEC UNE AUTRE CASSE DE LECTEUR, N'EST PAS UN AUTRE DÉPÔT. Le hook du
+  // pilot s'appelle désormais par `${CLAUDE_PROJECT_DIR}`, que l'extension VS Code écrit `c:\…`, depuis une session
+  // en `C:\…` : le 21/10, chaque écriture a été refusée « un autre dépôt ». Rouge ci-dessus (autre dépôt) gardé.
+  if (process.platform === "win32" && /^[A-Za-z]:/.test(F)) {
+    const autreCasse = (p) => (p[0] === p[0].toUpperCase() ? p[0].toLowerCase() : p[0].toUpperCase()) + p.slice(1);
+    const rc = spawnSync(process.execPath, [join(autreCasse(F), "scripts", "readme-dossiers.mjs"), "--silencieux"], { cwd: F, encoding: "utf8" });
+    check("TF-1903 — lancé depuis son dépôt par un chemin à la casse de lecteur différente : pas de refus", () => {
+      if (rc.status !== 0 || /un autre depot/.test(rc.stderr || "")) throw new Error(`exit ${rc.status} : ${(rc.stderr || "").slice(0, 200)}`);
+    });
+  }
   rmSync(R, { recursive: true, force: true });
 }
 
