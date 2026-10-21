@@ -51,8 +51,8 @@
   "vu_le": "2026-10-19"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-10-18"
+  "cas": 21,
+  "vu_le": "2026-10-21"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
@@ -83,12 +83,12 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 66,
-  "vu_le": "2026-10-15"
+  "cas": 74,
+  "vu_le": "2026-10-21"
  },
  "hook-page-html.mjs": {
-  "cas": 11,
-  "vu_le": "2026-09-14"
+  "cas": 14,
+  "vu_le": "2026-10-21"
  },
  "hook-produits-intacts.mjs": {
   "cas": 14,
@@ -184,8 +184,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 28,
-  "vu_le": "2026-10-18"
+  "cas": 37,
+  "vu_le": "2026-10-21"
  },
  "oracle-empreintes.mjs": {
   "cas": 13,
@@ -217,8 +217,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 59,
-  "vu_le": "2026-10-18"
+  "cas": 63,
+  "vu_le": "2026-10-21"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -455,8 +455,8 @@
   "vu_le": "2026-10-18"
  },
  "oracles/lib-garde-arbre-suivi.test.mjs": {
-  "cas": 9,
-  "vu_le": "2026-10-14"
+  "cas": 12,
+  "vu_le": "2026-10-21"
  },
  "oracles/lib-sens-rouge.test.mjs": {
   "cas": 23,
@@ -559,8 +559,8 @@
   "vu_le": "2026-10-15"
  },
  "scripts/allouer-indice.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-10-18"
+  "cas": 27,
+  "vu_le": "2026-10-21"
  },
  "scripts/balayer-motifs-numeriques.test.mjs": {
   "cas": 9,
@@ -671,16 +671,16 @@
   "vu_le": "2026-09-17"
  },
  "scripts/relever-contexte-sessions.test.mjs": {
-  "cas": 5,
-  "vu_le": "2026-10-13"
+  "cas": 10,
+  "vu_le": "2026-10-21"
  },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,
   "vu_le": "2026-09-03"
  },
  "scripts/relever-flotte.test.mjs": {
-  "cas": 11,
-  "vu_le": "2026-10-18"
+  "cas": 16,
+  "vu_le": "2026-10-21"
  },
  "scripts/relever-heritage.test.mjs": {
   "cas": 46,
@@ -799,8 +799,8 @@
   "vu_le": "2026-10-12"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 38,
-  "vu_le": "2026-10-15"
+  "cas": 40,
+  "vu_le": "2026-10-21"
  },
  "todo/generer-page.test.mjs": {
   "cas": 6,
@@ -906,6 +906,10 @@
   "cas": 8,
   "vu_le": "2026-08-26"
  },
+ "todo/revues-datees.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-10-16"
+ },
  "todo/self-test.mjs": {
   "cas": 64,
   "vu_le": "2026-10-13"
@@ -918,8 +922,8 @@
   "cas": 4,
   "vu_le": "2026-10-13"
  },
- "todo/revues-datees.test.mjs": {
-  "cas": 6,
-  "vu_le": "2026-10-16"
+ "todo/verifications-lundi.test.mjs": {
+  "cas": 9,
+  "vu_le": "2026-10-21"
  }
 }
