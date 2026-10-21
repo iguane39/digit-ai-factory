@@ -222,7 +222,7 @@ export function resoudreFamille(nomFichier, catalogue) {
     const cle = mots.slice(0, n).join(" ");
     if (index.has(cle)) {
       const f = index.get(cle);
-      return { resolue: true, famille: f.famille, id: f.id, statut: f.statut, cle, candidats: [] };
+      return { resolue: true, famille: f.famille, id: f.id, statut: f.statut, regles: f.regles || [], cle, candidats: [] };
     }
   }
   // Rien ne résout : on rend les clés les plus PROCHES, parce qu'un refus qui ne propose rien
@@ -286,7 +286,9 @@ export function jugerLivrable(chemin, catalogue) {
   const nom = String(chemin).replace(/^.*[\\/]/, "");
   const r = resoudreFamille(nom, catalogue);
   if (r.resolue) {
-    return { regle: "G8", statut: "PASS", ou: nom,
+    // `id` et `regles` : TF-1907, le hook d'écriture lit dans la famille résolue si elle engage D8 (la fiche
+    // de conception amont) sans relire le catalogue ni résoudre la famille une seconde fois (champs additifs).
+    return { regle: "G8", statut: "PASS", ou: nom, id: r.id, regles: r.regles,
       message: `famille « ${r.famille} » (${r.id}, statut ${r.statut}) résolue sur « ${r.cle} »` };
   }
   return { regle: "G8", statut: "FAIL", ou: nom,
@@ -1104,6 +1106,15 @@ if (args[0] === "--self-test") {
         casse.push(`TF-1389 : « Présentation » seul n'est plus résolu sur la décision de mise en production — la nouvelle famille a tout avalé : ${decision.message.slice(0, 140)}`);
       if (voisin.statut !== "FAIL")
         casse.push("TF-1617 : « Fiche technique », type non déclaré, passe G8 — la famille neuve a élargi la résolution au-delà de ses noms");
+      // TF-1907 : le hook d'écriture lit dans le constat G8 si la famille ENGAGE D8 (la fiche de conception amont).
+      // Le contrat est ici gardé des deux côtés : une famille qui l'engage rend `regles` avec D8, une qui ne
+      // l'engage pas ne le porte pas — sans quoi le hook avertirait à tort ou se tairait à tort.
+      const kit = nomme("Digit-AI - Kit partenaire - Onboarding - 20261021a.md");
+      const synthese = nomme("Digit-AI - Synthese Mandat - Campagne - 20261021a.md");
+      if (!(Array.isArray(kit.regles) && kit.regles.includes("D8") && kit.id === "gd-kit-partenaire"))
+        casse.push(`TF-1907 : le constat G8 d'une famille qui engage D8 ne porte pas ses règles (${JSON.stringify([kit.id, kit.regles])}) — le hook d'écriture ne peut plus demander la fiche`);
+      if (!(Array.isArray(synthese.regles) && !synthese.regles.includes("D8")))
+        casse.push(`TF-1907 : une famille qui n'engage pas D8 (restitution) en porte la règle ou ne rend pas ses règles (${JSON.stringify(synthese.regles)})`);
     }
 
     // TF-1640 (14/10/2026) — LA FICHE CONSTAT ET PRÉCONISATIONS SE RÉSOUT PAR SON NOM. Sens VERT : le
