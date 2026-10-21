@@ -59,6 +59,19 @@ seuil ou neutraliser un test pour faire passer : un échec résistant = item non
 diagnostic au rapport. Si la vérification native est elle-même défaillante, le prouver
 (sortie à l'appui) et le rapporter — ne pas la contourner.
 
+**Un refus d'oracle jugé faux se RAPPORTE, il ne se contourne pas (TF-1912, 21/10/2026).**
+Quand un oracle, un validateur ou un contrôle remis à l'agent refuse ce que l'agent juge correct,
+l'agent n'altère pas le livrable pour le faire taire. Il garde la forme correcte, cite au rapport
+le refus (règle, message) et la raison pour laquelle il est faux, ou applique l'exemption que
+l'oracle déclare lui-même. L'item qu'un faux refus empêche de commiter reste `non_clos`, avec ce
+refus en preuve : c'est la même règle que G-2, appliquée à la forme du livrable plutôt qu'à
+l'assertion. Un livrable qui passe l'oracle en se dégradant est une conformité de façade, et elle
+coûte plus qu'un échec dit, parce que personne ne la voit. Le fait : le 18/10/2026, 6 agents
+traducteurs sur 6 ont déformé 11 segments (« The sauna », « Die Sauna », « Restaurantempfehlungen »)
+pour faire taire un validateur trop strict qui refusait tout segment identique au français ;
+aucun n'a contesté le refus, et les 11 segments ont été rétablis à la main après relecture humaine
+des rapports.
+
 **Skill touché : la recette de l'agrégateur en plus du self-test (TF-1224).** Le self-test
 d'un skill ne juge que ce skill. La recette de `quality-oracles` juge tous les skills
 ensemble : longueur des descriptions (limite 1 024 caractères), parité des copies du socle,
