@@ -209,7 +209,7 @@ nuit ? Mission par mission : oui, non ou à condition, avec la mesure de l'étap
   analysé depuis le JJ/MM » ; le skill se lance sur chaque poste (D-62 (a)) ;
 - volume : extraction par script des seuls messages humains et réponses finales, pseudonymisés
   par les tables existantes ; analyse découpée par session, confiée à des agents nommés de la
-  flotte ; mesure de référence : 1,30 million de caractères extraits de 17 sessions du 20 au
+  flotte ; mesure de référence : 795 447 caractères extraits de 16 sessions du 20 au
   21/10 sur un poste, pour 77 Mo de transcripts hors sous-agents ;
 - exclusion : la session qui lance le skill et ses sous-agents n'entrent pas dans l'analyse.
 

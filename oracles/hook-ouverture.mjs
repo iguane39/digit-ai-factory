@@ -15,8 +15,8 @@
  * --contexte-json (sortie `hookSpecificOutput.additionalContext`, exigée quand le hook est déclaré
  * `async` — voir la fin du fichier).
  */
-import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, readFileSync, readdirSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir, hostname } from "node:os";
 import { join, dirname, sep, isAbsolute } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -673,6 +673,12 @@ if (iPilot < 0) {
 // invocateur, le plan des récidives serait une intention de plus (N-1). L'ouverture du pilot joue
 // donc `todo/observer-recidives.mjs` quand le dernier snapshot a plus de sept jours, ou n'existe
 // pas — et rend le verdict de dérive en une ligne, sans jamais bloquer : le FAIL est le signal.
+// D-64 (a) du 21/10/2026 (proposition « Oeil critique - 20261021a », §j.6 et §j.8) — LES SECTIONS
+// « SURVEILLANCE DES RÉCIDIVES » ET « FLOTTE D'AGENTS » SONT REMPLACÉES PAR LA SECTION « ŒIL CRITIQUE »,
+// qui affiche la sortie du skill oeil-critique. N'en restent que leurs ALARMES, une ligne chacune :
+// la cadence hebdomadaire des récidives (TF-0790, D-2 (a)) tourne toujours et ne parle que pour une
+// dérive ou un passage illisible ; les sources muettes (TF-1166) passent à la mission 4 du skill.
+const alarmesOeil = [];
 if (iPilot < 0) {
   const plan = join(PILOT, "todo", "observabilite", "plan-recidives.json");
   const ledger = join(PILOT, "todo", "observabilite", "snapshots-recidives.jsonl");
@@ -680,32 +686,12 @@ if (iPilot < 0) {
     let dernier = null;
     try { const l = readFileSync(ledger, "utf8").trim().split("\n").filter(Boolean); dernier = l.length ? JSON.parse(l[l.length - 1]).ts : null; } catch { dernier = null; }
     const age = dernier ? (Date.now() - Date.parse(dernier)) / 86400000 : Infinity;
-    lignes.push("", "## Surveillance des récidives (TF-0790, forge-observability, cadence hebdomadaire)");
-    if (age < 7) lignes.push(`- dernier relevé du ${dernier} (${age.toFixed(1)} j) — prochain passage dans ${(7 - age).toFixed(1)} j ; à la demande : node todo/observer-recidives.mjs`);
-    else {
+    if (age >= 7) {
       const r = spawnSync(process.execPath, [join(PILOT, "todo", "observer-recidives.mjs")], { encoding: "utf8", cwd: PILOT, timeout: 180000 });
       let j = null; try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
-      if (!j) lignes.push(`- passage NON rendu (exit ${r.status}) — ${(r.stderr || r.stdout || "").trim().slice(0, 200)}`);
-      else if (j.verdict === "PASS") lignes.push(`- passage joué : aucune dérive depuis le relevé précédent (snapshot ${j.snapshot_seq ?? "?"})`);
-      else if (j.verdict === "donnees_insuffisantes") lignes.push(`- premier relevé écrit (snapshot ${j.snapshot_seq ?? "?"}) — la dérive se lira au prochain passage`);
-      else lignes.push(`- DÉRIVE (${j.verdict}) : ${(j.derive?.findings || [j.message]).slice(0, 4).join(" ; ")} — lire todo/RECIDIVES.md, décider en revue des classes (rien n'est appliqué automatiquement)`);
+      if (!j) alarmesOeil.push(`- récidives : passage hebdomadaire NON rendu (exit ${r.status}) — ${(r.stderr || r.stdout || "").trim().slice(0, 200)}`);
+      else if (!["PASS", "donnees_insuffisantes"].includes(j.verdict)) alarmesOeil.push(`- récidives : DÉRIVE (${j.verdict}) : ${(j.derive?.findings || [j.message]).slice(0, 4).join(" ; ")} — lire todo/RECIDIVES.md, décider en revue des classes`);
     }
-    // TF-1166 (décision D-3 (a), 17/09/2026) — LES SOURCES MUETTES SE NOMMENT À CHAQUE OUVERTURE, pas une
-    // fois par semaine : le silence médian des sources de retours est passé de 8 à 11 jours entre le
-    // 30/08 et le 17/09 sans qu'aucune ligne le dise. Le calcul n'est PAS refait ici — une seconde
-    // lecture de la boîte serait un contrôle maison : `generer-recidives.mjs` est rejoué vers des
-    // fichiers TEMPORAIRES (aucune vue suivie n'est touchée à l'ouverture) et son JSON est lu.
-    // Une source sans activité n'a rien à remonter : la ligne nomme, elle ne condamne pas.
-    try {
-      const tmp = mkdtempSync(join(tmpdir(), "ouverture-recidives-"));
-      const r = spawnSync(process.execPath, [join(PILOT, "todo", "generer-recidives.mjs"), "--sortie", join(tmp, "R.md"), "--json", join(tmp, "R.json")], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
-      const c = r.status === 0 ? JSON.parse(readFileSync(join(tmp, "R.json"), "utf8")) : null;
-      rmSync(tmp, { recursive: true, force: true });
-      if (!c) lignes.push(`- sources muettes : NON mesurées (generer-recidives exit ${r.status})`);
-      else if (c.sources_muettes === null) lignes.push("- sources muettes : non mesurable, boîte des lots de retours introuvable");
-      else if (!c.sources_muettes.length) lignes.push(`- sources de retours : aucune muette depuis plus de ${c.seuil_jours} j`);
-      else lignes.push(`- ${c.sources_muettes.length} source(s) de retours muette(s) depuis plus de ${c.seuil_jours} j : ${c.sources_muettes.slice(0, 8).map((s) => `${s.source} (${s.silence} j)`).join(", ")}${c.sources_muettes.length > 8 ? ", …" : ""} — une source sans activité n'a rien à remonter ; détail et descente par produit : todo/RECIDIVES.md sections 5 et 7`);
-    } catch (e) { lignes.push(`- sources muettes : NON mesurées (${String(e.message || e).slice(0, 120)})`); }
   }
 }
 
@@ -736,30 +722,46 @@ if (iPilot < 0) {
 // génériques sur 201 en 30 jours, aucun appel avec l'effort de sa classe, et aucune consignation au ledger depuis le
 // 25/09 : le tableau de routage ne recevait plus de mesure. Le relevé lit les transcriptions des 14 derniers jours
 // et dit les 3 critères de la revue du 2026-11-01. Il ne bloque jamais l'ouverture.
+// De l'ancienne section « Flotte d'agents » ne reste que l'alarme de l'essai de relecture d'intention
+// (D-23 (a) et D-25 du 18/10/2026) : son coût et son seuil d'arrêt se disent tant que l'essai court.
+// Les indicateurs de la flotte passent à la mission 5 du skill oeil-critique.
 if (iPilot < 0) {
   const rf = join(PILOT, "scripts", "relever-flotte.mjs");
   if (existsSync(rf)) {
-    lignes.push("", "## Flotte d'agents (D-19 (a) du 18/10/2026, relevé des 14 derniers jours)");
     const r = spawnSync(process.execPath, [rf, "--jours", "14", "--json"], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
     let j = null;
     try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
-    if (!j) lignes.push(`- relevé ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la flotte : ${(r.stderr || "").trim().slice(0, 160)}`);
+    if (!j) alarmesOeil.push(`- relevé de la flotte ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la flotte : ${(r.stderr || "").trim().slice(0, 160)}`);
     else {
-      const I = j.indicateurs;
-      const pc = (x) => (x === null ? "—" : `${Math.round(x * 100)} %`);
-      lignes.push(`- verdict ${j.verdict} — ${I.appels} appel(s) de l'outil Agent : ${I.appels_vers_agent_nomme} vers un agent nommé (${pc(I.part_nommee)}), ${I.appels_avec_derogation} dérogation(s) dite(s), ${I.appels_hors_flotte} hors flotte ; ${I.delegations_opus_sans_effort} délégation(s) Opus sans effort ; ${I.reponses_hors_generation} réponse(s) hors génération courante`);
-      for (const c of (j.criteres || []).filter((x) => x.tenu === false)) lignes.push(`- NON TENU : ${c.critere}`);
-      // D-23 (a) du 18/10/2026 — l'essai de relecture d'intention : son coût se voit à chaque ouverture, et son seuil d'arrêt se dit.
-      const E = I.essai_relecture_intention;
+      const E = j.indicateurs.essai_relecture_intention;
       if (E) {
         const sp = (x) => String(x).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-        lignes.push(`- relectures d'intention (essai du ${E.debut} au ${E.fin}, revue le ${E.revue}, \`references\\RELECTURE-INTENTION.md\`) : ${E.relectures} relecture(s), ${sp(E.jetons)} jetons`
+        alarmesOeil.push(`- relectures d'intention (essai du ${E.debut} au ${E.fin}, revue le ${E.revue}, \`references\\RELECTURE-INTENTION.md\`) : ${E.relectures} relecture(s), ${sp(E.jetons)} jetons`
           + `${E.jour_max ? ` ; jour le plus chargé ${E.jour_max.jour} : ${sp(E.jour_max.jetons)} jetons` : ""} — seuil de ${sp(E.seuil_jetons_par_jour)} jetons par jour `
           + (E.seuil_franchi ? "**FRANCHI : arrêter l'essai et demander à l'humain**" : "tenu"));
       }
-      lignes.push("- détail et consignation de fin de campagne : `node scripts/relever-flotte.mjs [--journal <fichier> --etiquette <campagne>]`");
     }
   }
+}
+
+// La section « Œil critique » : le repère de chaque poste, la sortie de la dernière exécution du
+// poste courant (10 lignes au plus, écrite par le skill), puis les alarmes ci-dessus.
+if (iPilot < 0) {
+  lignes.push("", "## Œil critique (D-64 (a) du 21/10/2026, skill oeil-critique)");
+  const reperes = [];
+  try {
+    for (const n of readdirSync(join(PILOT, "todo")).filter((x) => /^oeil-critique-.+\.json$/.test(x))) {
+      try { reperes.push(JSON.parse(readFileSync(join(PILOT, "todo", n), "utf8"))); } catch { lignes.push(`- repère illisible : todo/${n}`); }
+    }
+  } catch { /* dossier todo illisible : dit par l'absence de repère */ }
+  const ici = hostname();
+  if (!reperes.some((r) => r.poste === ici)) lignes.push(`- poste ${ici} : aucune exécution — lancer « œil critique » ; la première analyse part du 20/10/2026`);
+  for (const r of reperes.sort((a, b) => String(a.poste).localeCompare(String(b.poste)))) {
+    const age = (Date.now() - Date.parse(r.fin)) / 86400000;
+    lignes.push(`- poste ${r.poste} : dernière analyse jusqu'au ${r.fin} (${age.toFixed(1)} j)${r.poste === ici ? "" : " — autre poste, sa sortie se lit sur lui"}`);
+    if (r.poste === ici) for (const l of (r.sortie || []).slice(0, 10)) lignes.push(`  - ${l.replace(/^[-*]\s*/, "")}`);
+  }
+  lignes.push(...alarmesOeil);
 }
 
 // TF-1576 (13/10/2026) — L'ANNONCE DIT L'ÉTAT MESURÉ DES CROCHETS, PAS CELUI QU'ON SUPPOSE. Un produit

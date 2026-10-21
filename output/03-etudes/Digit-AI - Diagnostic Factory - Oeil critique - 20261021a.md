@@ -291,7 +291,7 @@ Ce que chaque déclencheur peut lire, mesuré le 21/10/2026 entre 09:40 et 10:00
 |---|---|---|---|---|
 | Dépôts du pilot et des forges | oui, clones locaux | oui | oui, par GitHub, dépôts publics | oui, par GitHub, avec un jeton |
 | Dépôts des produits | oui, 38 dépôts relevés à l'ouverture du 20/10 | oui | GitHub seulement ; non pour l'Azure DevOps d'un client et les dépôts sans remote | idem |
-| Transcripts du poste | oui : 17 sessions depuis le 20/10, 77 Mo hors sous-agents, 1,30 million de caractères extraits | oui | non | non sans export |
+| Transcripts du poste | oui : 17 sessions depuis le 20/10, 77 Mo hors sous-agents, 0,80 million de caractères extraits par le script du skill | oui | non | non sans export |
 | Transcripts de l'autre poste | non | non | non | non |
 | Travail local non poussé | oui : 7 commits d'avance le 21/10 à 09:47 | oui | non | non |
 
@@ -315,7 +315,7 @@ Voies d'accès essayées :
 - **Repère de dernière exécution.** Un fichier par poste, `todo/oeil-critique-<poste>.json` : heure de fin de la dernière analyse, période couverte, poste. La première exécution part du 20/10/2026, selon votre réponse D-62 (a).
 - **Partage avec le passage de nuit.** Un seul repère par poste. Le déclencheur qui finit l'avance ; l'autre le lit avant de commencer et ne reprend que la période restante.
 - **Couverture.** Chaque exécution déclare le poste analysé, la période, et l'autre poste « non analysé depuis le JJ/MM ». Le skill se lance sur chaque poste ; l'analyse complète est la somme des 2.
-- **Volume.** Un script extrait les seuls messages humains et textes de réponse, et les pseudonymise par les tables existantes. Il reprend la lecture de transcript de `scripts/relecture-intention.mjs`. L'analyse se découpe par session et se confie aux agents nommés de la flotte. Mesure de référence : 1,30 million de caractères pour 17 sessions du 20 au 21/10 sur ce poste.
+- **Volume.** Un script extrait les seuls messages humains et textes de réponse, et les pseudonymise par les tables existantes. Il reprend la lecture de transcript de `scripts/relecture-intention.mjs`. L'analyse se découpe par session et se confie aux agents nommés de la flotte. Mesure de référence : 795 447 caractères et 99 messages humains pour 16 sessions du 20 au 21/10 sur ce poste, la session de mesure exclue.
 - **Exclusion.** La session qui lance le skill et ses sous-agents n'entrent pas dans l'analyse.
 
 ### j.3 Passage de nuit : quatre hébergements comparés
@@ -388,7 +388,7 @@ Elle remplace 2 sections du relevé d'ouverture, « Surveillance des récidives 
 
 ### j.7 Bornes et jugement du dispositif
 
-- **Coût.** Plafond proposé : 1 million de jetons par exécution. 1,30 million de caractères pour un jour et demi font environ 0,35 million de jetons d'entrée **[hypothèse : 4 caractères par jeton, à mesurer à la première exécution]**. Au-delà, l'analyse se découpe sur plusieurs exécutions. Référence : environ 1,4 million de jetons d'agents pour les 30 jours de ce diagnostic.
+- **Coût.** Plafond proposé : 1 million de jetons par exécution. 0,80 million de caractères pour un jour et demi font environ 0,2 million de jetons d'entrée **[hypothèse : 4 caractères par jeton, à mesurer à la première exécution]**. Au-delà, l'analyse se découpe sur plusieurs exécutions. Référence : environ 1,4 million de jetons d'agents pour les 30 jours de ce diagnostic.
 - **Jugement.** Part des majeures acceptées, part des automatiques faites, effet mesuré sur les indicateurs du §g, coût. Le dispositif est revu s'il ne fait rien progresser en 4 semaines.
 
 ### j.8 Ce que le dispositif retire
