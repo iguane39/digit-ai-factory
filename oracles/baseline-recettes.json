@@ -663,8 +663,8 @@
   "vu_le": "2026-10-12"
  },
  "scripts/relecture-intention.test.mjs": {
-  "cas": 64,
-  "vu_le": "2026-10-18"
+  "cas": 69,
+  "vu_le": "2026-10-19"
  },
  "scripts/relever-appelants.test.mjs": {
   "cas": 5,

@@ -22,6 +22,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`03-artefacts\`](03-artefacts/README.md) | dossier (3 fichiers) | — | Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) — aucun sidecar exigé du remettant, notice `LISEZMOI.md` ; le Produit-67 écrit le sid… |
 | [`04-outillage\`](04-outillage/README.md) | dossier (3 fichiers) | — | Scripts et paquets fournis par l'humain — à INSTRUIRE avant tout usage : un outillage entrant ne s'exécute jamais sans instruction (étude ou candidature). |
 | [`05-entrants-media\`](05-entrants-media/README.md) | dossier (1 fichier) | — | Médias fournis (captures, vidéos) en appui d'un retour ou d'une insatisfaction — les binaires lourds restent hors git ; notice `LISEZMOI.md`. |
+| `Tiktok\` | dossier ignoré par git (absent d'un clone) | — | Page de favoris TikTok enregistrée par l'humain depuis son compte, IGNORÉE par git : elle porte des adresses signées de sa session. Le tri qui en est tiré est s… |
 | `LISEZMOI.md` | fichier | 5,0 Ko | input\ — entrants du pilot, familles numérotées |
 
-_1 fichier(s), 6 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
+_1 fichier(s), 7 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)

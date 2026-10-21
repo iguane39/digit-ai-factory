@@ -41,6 +41,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md` | fichier | 7,0 Ko | Synthèse Mandat — « audit complet » ouvre désormais forge-audit, chez tous les produits (1 |
 | `Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` | fichier | 9,6 Ko | Synthèse Mandat — seuil relevé à 4 millions, boucle de correction et relecteur renforcé en |
 | `Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` | fichier | 6,1 Ko | Synthèse Mandat — boucle de correction, relecteur renforcé et seuil de 4 millions enregist |
+| `Digit-AI - Synthese Mandat - Campagne D-41 - 20261019e.md` | fichier | 13,6 Ko | Synthèse Mandat — campagne D-41 (a), suites des études des favoris TikTok, 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` | fichier | 11,7 Ko | Synthèse Mandat — votre décision D-55 (a) est exécutée : les 8 améliorations des pages de  |
 | `Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` | fichier | 9,6 Ko | Synthèse Mandat — campagne du matin reprise et close, 2 restes avancés (13/10/2026) |
 | `Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md` | fichier | 12,5 Ko | Synthèse Mandat — campagne du 12/10 sur 86 sujets du registre : 50 clos, 35 en cours avec  |
@@ -60,6 +61,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
 | `Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md` | fichier | 16,7 Ko | Synthèse Mandat — vos 5 décisions exécutées, 2 études rendues, 5 nouvelles décisions (18/1 |
 | `Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md` | fichier | 8,1 Ko | Synthèse Mandat — vos décisions D-29 à D-33 exécutées, 5 sujets clos, aucune décision nouv |
+| `Digit-AI - Synthese Mandat - Decisions D-49 a D-51 detaillees - 20261020b.md` | fichier | 7,6 Ko | Synthèse Mandat — D-49, D-50 et D-51 détaillées (20/10/2026) |
+| `Digit-AI - Synthese Mandat - Decisions D-49 a D-51 executees - 20261020c.md` | fichier | 7,6 Ko | Synthèse Mandat — D-49, D-50 et D-51 exécutées selon l'option (a) (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |
 | `Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` | fichier | 6,5 Ko | Synthèse Mandat — dépôts privés hors d'accès non bloquants pour un poste tiers (13/10/2026 |
 | `Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` | fichier | 5,2 Ko | Synthèse Mandat — dépôts privés silencieux et confirmation d'installation en fin de comman |
@@ -69,6 +72,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` | fichier | 10,2 Ko | Synthèse Mandat — la remontée sur les pages HTML et les indicateurs est instruite ; l'étud |
 | `Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md` | fichier | 17,9 Ko | Synthèse de mandat : vos décisions D-1 (a), D-2 (a) et D-3 (a) sont exécutées, l'étude du  |
 | `Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` | fichier | 10,8 Ko | Synthèse Mandat — étude d'opportunité sur l'auto-amélioration récursive et l'apprentissage |
+| `Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md` | fichier | 8,9 Ko | Synthèse Mandat — études d'opportunité tirées des favoris TikTok, 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md` | fichier | 12,3 Ko | Synthèse Mandat — D-19 (a) exécutée : 5 agents nommés, un rappel à chaque délégation, un r |
 | `Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md` | fichier | 5,3 Ko | Synthèse Mandat — D-20 (a) exécutée : la flotte d'agents est enregistrée et publiée, et la |
 | `Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md` | fichier | 28,5 Ko | Synthèse Mandat — format B appliqué aux décisions, et les 12 décisions ouvertes réécrites  |
@@ -102,9 +106,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` | fichier | 47,6 Ko | Synthèse Mandat — six travaux faits, onze décisions instruites, publication du pilot en at |
 | `Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` | fichier | 9,2 Ko | Synthèse Mandat — sujets ouverts au 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019c.md` | fichier | 6,8 Ko | Synthèse Mandat — pilot aligné sur GitHub, 29 commits récupérés, rien à publier (19/10/202 |
+| `Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md` | fichier | 7,0 Ko | Synthèse Mandat — pilot fusionné avec GitHub et publié, numéros en collision renumérotés ( |
 | `Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` | fichier | 17,6 Ko | Synthèse Mandat — 4 lots reçus, 10 corrections faites et publiées, 5 décisions vous revien |
 | `Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` | fichier | 10,7 Ko | Synthèse Mandat — 7 lots reçus, 24 sujets traités, 20 corrections publiées, 4 décisions ex |
 | `Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` | fichier | 16,1 Ko | Synthèse Mandat — la recette hébergée du pilot repasse au vert, les 2 lots du jour attende |
 | `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
+| `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 
-_87 fichier(s), 3 sous-dossier(s)_
+_93 fichier(s), 3 sous-dossier(s)_

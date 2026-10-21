@@ -111,6 +111,43 @@ try {
     const t = executer(["--transcripts", vert, "--depuis", "2026-10-01", "--referentiel", REF]).sortie;
     if (!/0 relecture\(s\), 0 jetons ; aucun jour chargé — seuil de 4 000 000 jetons par jour tenu/.test(t)) throw new Error(t);
   });
+  // TF-1928 (D-48 (a) du 19/10/2026) — la simultanéité : le pic de sous-agents dont les durées de vie se chevauchent, par session.
+  const H = (hm) => `2026-10-15T${hm}:00.000Z`;
+  const vivants = (nom, durees) => durees.map(([debut, fin], i) => [[reponse(`${nom}-${i}-a`, "claude-sonnet-5-5", 5, 1000, H(debut)), reponse(`${nom}-${i}-b`, "claude-sonnet-5-5", 5, 1000, H(fin))], { agentType: "campagne" }]);
+  // trois sous-agents se chevauchent de 10:05 à 10:08 ; le quatrième vient bien après : pic 3 pour 4 sous-agents.
+  const chevauche = projet("simult-vert", [], vivants("v", [["10:00", "10:10"], ["10:02", "10:08"], ["10:05", "10:12"], ["10:20", "10:30"]]));
+  // six sous-agents l'un après l'autre, chaque fin touchant le début du suivant : pic 1, jamais 6.
+  const enfile = projet("simult-rouge", [], vivants("r", [["10:00", "10:10"], ["10:10", "10:20"], ["10:20", "10:30"], ["10:30", "10:40"], ["10:40", "10:50"], ["10:50", "11:00"]]));
+  // cinq sous-agents vivants ensemble : une session à 5 ou plus.
+  const cinq = projet("simult-cinq", [], vivants("c", [["10:00", "10:30"], ["10:01", "10:31"], ["10:02", "10:32"], ["10:03", "10:33"], ["10:04", "10:34"]]));
+  check("vert — la simultanéité est le pic de chevauchement (3 pour 4 sous-agents dont un tardif), pas leur nombre", () => {
+    const s = lancer(chevauche).rapport.indicateurs.simultaneite;
+    if (s.pic_max !== 3 || s.sessions_avec_sous_agents !== 1 || s.distribution_des_pics["3"] !== 1) throw new Error(JSON.stringify(s));
+    if (s.sessions_a_5_ou_plus !== 0 || s.sessions_a_10_ou_plus !== 0) throw new Error(JSON.stringify(s));
+    if (s.limite_par_defaut !== 20) throw new Error(`limite ${s.limite_par_defaut}`);
+  });
+  check("rouge — six sous-agents bout à bout ne sont pas six simultanés : pic 1, aucune session à 5 ou plus", () => {
+    const s = lancer(enfile).rapport.indicateurs.simultaneite;
+    if (s.pic_max !== 1) throw new Error(`pic ${s.pic_max} : des durées qui se touchent ont été comptées comme chevauchantes, ou le nombre de sous-agents a été lu comme un pic`);
+    if (s.sessions_a_5_ou_plus !== 0) throw new Error(JSON.stringify(s));
+  });
+  check("vert — la distribution compte les sessions : trois dossiers, trois sessions, pics 3, 1 et 5 ; une session à 5 ou plus", () => {
+    const r = lancer(chevauche, "--transcripts", enfile, "--transcripts", cinq).rapport.indicateurs;
+    const s = r.simultaneite;
+    if (s.sessions_avec_sous_agents !== 3 || s.pic_max !== 5 || s.sessions_a_5_ou_plus !== 1 || s.sessions_a_10_ou_plus !== 0) throw new Error(JSON.stringify(s));
+    if (JSON.stringify(s.distribution_des_pics) !== JSON.stringify({ 1: 1, 3: 1, 5: 1 })) throw new Error(JSON.stringify(s.distribution_des_pics));
+    if (r.sous_agents !== 4 + 6 + 5) throw new Error(`sous-agents ${r.sous_agents}, attendu 15 : le pic doit porter sur la population des sous-agents relevés`);
+  });
+  check("vert — la ligne du relevé dit le pic, la session, les seuils 5 et 10 et la limite par défaut ; sans sous-agent, elle le dit", () => {
+    const t = executer(["--transcripts", chevauche, "--transcripts", cinq, "--depuis", "2026-10-01", "--referentiel", REF]).sortie;
+    if (!/simultanéité de sous-agents : 2 session\(s\) en ont lancé, pic maximal 5 \(session s1\), 1 session\(s\) à 5 ou plus, 0 à 10 ou plus ; limite par défaut d'une session : 20/.test(t)) throw new Error(t);
+    const v = executer(["--transcripts", projet("simult-aucun", [appel("z1", { subagent_type: "campagne", prompt: "x" })]), "--depuis", "2026-10-01", "--referentiel", REF]).sortie;
+    if (!/simultanéité : aucune session n'a lancé de sous-agent/.test(v)) throw new Error(v);
+  });
+  check("bornes — la simultanéité n'entre pas dans les critères de la flotte : le verdict reste celui des trois critères", () => {
+    const r = lancer(cinq).rapport;
+    if (r.criteres.length !== 3) throw new Error(`${r.criteres.length} critères`);
+  });
   check("bornes — --journal ajoute exactement une ligne datée et étiquetée", () => {
     const j = join(T, "journal.jsonl");
     lancer(vert, "--journal", j, "--etiquette", "campagne-test");

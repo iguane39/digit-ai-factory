@@ -1,0 +1,81 @@
+{
+  "cible": "references/RUN-RESEAU.md",
+  "date_iso": "2026-10-20T08:22:15.185Z",
+  "registre_version": "2.45.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "references\\RUN-RESEAU.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "references\\RUN-RESEAU.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "references\\RUN-RESEAU.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "references\\RUN-RESEAU.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "references\\RUN-RESEAU.md",
+      "verdict": "SKIP",
+      "detail": "aucune table détectée, aucun effectif annoncé ancré, aucun pourcentage ni unité publiés"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "references\\RUN-RESEAU.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "references\\RUN-RESEAU.md",
+      "verdict": "SKIP",
+      "detail": "nom ne se réclamant pas de la convention"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "references\\RUN-RESEAU.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "references\\RUN-RESEAU.md",
+    "ts": "2026-10-20T08:22:15.185Z",
+    "fichiers": {
+      "references\\RUN-RESEAU.md": "7053ac4c6325f5e1bbc529d6449aef33ae7397533e8aa82ece826e15a1e09f22"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

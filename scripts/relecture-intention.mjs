@@ -19,20 +19,29 @@
  *        depuis ce message (git : contenu ou diff, bornés, la borne dite) ET les écritures que les transcriptions des
  *        sous-agents de la session ont faites depuis ce message ; écrit demande.txt et livrables.md dans un dossier
  *        temporaire et imprime la consigne complète à passer à l'agent `verificateur` ;
- *   --preparer consigne --fichier <consigne.md> [--type <type>[,<type>…]]
- *        même demande ; la consigne de délégation est le livrable ;
+ *   --preparer consigne --fichier <consigne.md> [--fichier <liste-des-sujets.md> …] [--type <type>[,<type>…]]
+ *        même demande ; la consigne de délégation est le livrable ; plusieurs `--fichier` se lisent ensemble : une campagne dont
+ *        les agents reçoivent le même gabarit se relit en UNE fois, le gabarit et la liste des sujets (A-1 du 19/10/2026) ;
+ *   --preparer reception --fichier <livrable> [--type <type>]
+ *        (D-47 (a) du 19/10/2026) relit UN livrable d'agent dès sa réception, en entier : le livrable `.md` passe d'abord
+ *        `oracles/oracle-ecriture.mjs` (A-2) — FAIL : rien n'est préparé, exit 1, la forme se corrige avant de dépenser une relecture ;
+ *   --preparer coherence --fichier <a> --fichier <b> [… ] [--type <type>]
+ *        (A-3 du 19/10/2026) relit les livrables d'une campagne CÔTE À CÔTE, leur chapeau et leurs sections de verdict ou de
+ *        conclusion : doublons, contradictions et parties de la demande que l'ensemble laisse sans réponse ;
  *        `--type` ajoute à la demande, SOUS UN TITRE QUI LES DISTINGUE d'elle, les règles de la Factory que tout livrable de ce
  *        type doit tenir (`references/RELECTURE-INTENTION-REGLES.json`, ou `--regles <fichier>`) ;
- *   --consigner <verdict.json> --point <fin-de-tour|consigne> --type <type> [--passe <n> --suite-de <identifiant>]
+ *   --consigner <verdict.json> --point <fin-de-tour|consigne|reception|coherence> --type <type> [--fichier <livrable>]
+ *        [--passe <n> --suite-de <identifiant>]
  *        ajoute une ligne horodatée à todo/relectures-intention.jsonl ; `--passe` et `--suite-de` chaînent les passes d'un
- *        même travail (au plus 2 passes de correction, soit 3 relectures) ;
+ *        même travail (au plus 2 passes de correction, soit 3 relectures) ; au point « reception », `--fichier` est exigé : le
+ *        point « fin-de-tour » cite ensuite ce livrable par son seul chemin tant qu'il n'a pas changé depuis sa relecture ;
  *   --boucle <identifiant>                          l'état de la chaîne d'un travail : passes faites, passe suivante permise ou non,
  *        écarts à poser à l'humain ;
  *   --confirmer <id> <oui|non>                      consigne la réponse humaine à une alerte ;
  *   --releve [--depuis AAAA-MM-JJ]                  par type et par point : relectures, dérives signalées, alertes confirmées et
  *        infirmées, corrigées par la boucle ; et les écarts levés sans l'humain ou posés à l'humain. Exit 0 toujours.
  * Options communes : --registre <fichier> (registre autre que celui du pilot, pour un essai), --sortie <dossier>, --json.
- * Exit : 0 · 2 usage invalide ou pièce illisible (jamais pour --releve).
+ * Exit : 0 · 1 (point « reception » seulement) l'oracle de forme rend FAIL, rien n'est préparé · 2 usage invalide ou pièce illisible (jamais pour --releve).
  *
  * NON JUGÉ (déclaré) : la justesse d'un verdict de relecteur ; la nature (hors_demande / choix_humain) qu'il donne à un écart ;
  * les commandes à effet, listées mais pas lues ; MultiEdit (outil absent de la flotte d'outils de ce poste) ; le diff d'un fichier
@@ -47,11 +56,13 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { dossiersParDefaut } from "./relever-contexte-sessions.mjs";
 
-export const VERSION = "2.0.0";
+export const VERSION = "2.1.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const REGISTRE_DEFAUT = join(ICI, "..", "todo", "relectures-intention.jsonl");
 export const REGLES_DEFAUT = join(ICI, "..", "references", "RELECTURE-INTENTION-REGLES.json");
-export const POINTS = ["fin-de-tour", "consigne"];
+export const ORACLE_FORME = join(ICI, "..", "oracles", "oracle-ecriture.mjs");
+/** « reception » et « coherence » : D-47 (a), A-2 et A-3 du 19/10/2026 (relire chaque livrable d'agent à sa réception, puis l'ensemble). */
+export const POINTS = ["fin-de-tour", "consigne", "reception", "coherence"];
 export const TYPES = ["etude", "restitution", "code", "page", "lot", "consigne", "presentation", "exigences", "autre"];
 export const GRAVITES = ["bloquante", "majeure", "mineure", "aucune"];
 /** La nature d'un écart : ce qui décide si le pilot le corrige (hors_demande) ou le pose tout de suite à l'humain (choix_humain). */
@@ -59,7 +70,8 @@ export const NATURES = ["hors_demande", "choix_humain"];
 /** Au plus 2 passes de correction, donc 3 relectures au plus pour un même travail (D-26 (a) du 18/10/2026). */
 export const MAX_PASSES = 2;
 export const BORNES = { message: 8000, demande: 40000, fichier: 60000, livrables: 150000, decision: 3500, commandes: 30,
-  depot: 80000, depotFichier: 12000, depotFichiers: 40, sousAgents: 40000, sousAgentsFichier: 8000, detailEcart: 300, regle: 600 };
+  depot: 80000, depotFichier: 12000, depotFichiers: 40, sousAgents: 40000, sousAgentsFichier: 8000, detailEcart: 300, regle: 600,
+  coherence: 80000, coherenceFichier: 8000, chapeau: 1500 };
 
 /** La consigne stricte figée (version 1), recopiée mot pour mot de `consignes.stricte` de la mesure du 18/10/2026. Reste la base de la version 2. */
 export const STRICTE = "une restriction ou un recadrage que la demande n autorisait pas est une dérive, même annoncé, justifié ou validé ; une conclusion négative n en est pas une si la demande posait la question";
@@ -366,14 +378,17 @@ export function ecrituresSousAgents(transcript, depuisTs) {
  * La section de livrables.md sur le dépôt. `dejaCites` : chemins (normalisés) dont le contenu figure plus haut.
  * Rend { texte, cites } : `cites` = les chemins (normalisés) dont le contenu ou le diff est cité dans cette section.
  */
-export function fabriquerDepot(depot, dejaCites) {
+export function fabriquerDepot(depot, dejaCites, relus = new Map()) {
   const out = ["## Fichiers du dépôt modifiés depuis le dernier message humain (relevé par git, pas par la transcription)", ""];
   const cites = new Set();
   if (!depot.ok) return { texte: [...out, `[dépôt non relevé : ${depot.raison}]`, ""].join("\n"), cites };
   out.push(`Dépôt ${depot.racine}, comparé au dernier commit antérieur au message (${depot.base}), message du ${depot.depuis}. Un fichier est retenu s'il a changé par rapport à ce commit ET s'il a été modifié sur le disque après le message.`);
-  const surDisque = depot.fichiers.filter((f) => !dejaCites.has(norm(f.abs)));
-  const dedoubles = depot.fichiers.length - surDisque.length;
-  out.push(`${depot.fichiers.length} fichier(s) retenu(s)${dedoubles ? `, dont ${dedoubles} déjà cité(s) plus haut (Write, Edit, NotebookEdit)` : ""} ; ${depot.exclus} dérivé(s) des contrôles non cité(s) (\`.oracles\\\`, \`*.oracles*.json*\`, \`*.jugement.json\`) ; ${depot.anterieurs} fichier(s) changé(s) par rapport à ce commit mais modifié(s) sur le disque avant le message, non cité(s).`, "");
+  const surDisque = depot.fichiers.filter((f) => !dejaCites.has(norm(f.abs)) && !relus.has(norm(f.abs)));
+  const dejaRelus = depot.fichiers.filter((f) => !dejaCites.has(norm(f.abs)) && relus.has(norm(f.abs)));
+  const dedoubles = depot.fichiers.length - surDisque.length - dejaRelus.length;
+  out.push(`${depot.fichiers.length} fichier(s) retenu(s)${dedoubles ? `, dont ${dedoubles} déjà cité(s) plus haut (Write, Edit, NotebookEdit)` : ""}${dejaRelus.length ? `, dont ${dejaRelus.length} relu(s) à leur réception et inchangé(s) depuis, cité(s) par leur seul chemin` : ""} ; ${depot.exclus} dérivé(s) des contrôles non cité(s) (\`.oracles\\\`, \`*.oracles*.json*\`, \`*.jugement.json\`) ; ${depot.anterieurs} fichier(s) changé(s) par rapport à ce commit mais modifié(s) sur le disque avant le message, non cité(s).`, "");
+  for (const f of dejaRelus) { out.push(`- ${f.rel} — ${f.etat} — ${MENTION_RELU(relus.get(norm(f.abs)))}`); cites.add(norm(f.abs)); }
+  if (dejaRelus.length) out.push("");
   let reste = BORNES.depot; const omis = [];
   surDisque.forEach((f, i) => {
     if (i >= BORNES.depotFichiers || reste <= 0) { omis.push(`${f.rel} (${f.etat})`); return; }
@@ -393,7 +408,7 @@ export function fabriquerDepot(depot, dejaCites) {
 }
 
 /** La section de livrables.md sur les écritures des sous-agents. */
-export function fabriquerSousAgents(sa, citesPlusHaut) {
+export function fabriquerSousAgents(sa, citesPlusHaut, relus = new Map()) {
   const out = ["## Écritures faites par les sous-agents de la session depuis le dernier message humain (transcriptions des sous-agents)", ""];
   if (sa.absent) return [...out, `Aucun dossier de sous-agents pour cette session (${sa.dossier} absent) : aucun sous-agent n'a travaillé, ou la transcription lue n'est pas celle d'une session avec sous-agents.`, ""].join("\n");
   if (!sa.ecritures.length) return [...out, `${sa.agents} sous-agent(s) actif(s) depuis ce message, aucune écriture par Write, Edit ou NotebookEdit${sa.commandes ? ` ; ${sa.commandes} commande(s) lancée(s) par eux, non listées` : ""}.`, ""].join("\n");
@@ -404,6 +419,7 @@ export function fabriquerSousAgents(sa, citesPlusHaut) {
   for (const x of parChemin.values()) {
     const ent = `- ${x.chemin} — ${[...x.outils].join(", ")} ×${x.n} — par : ${[...x.agents].join(" ; ")}`;
     if (citesPlusHaut.has(norm(x.chemin))) { out.push(`${ent} — contenu cité plus haut`); continue; }
+    if (relus.has(norm(x.chemin))) { out.push(`${ent} — ${MENTION_RELU(relus.get(norm(x.chemin)))}`); continue; }
     if (ESTENV(x.chemin)) { out.push(`${ent} — [contenu NON cité : un fichier \`.env\` ne transite jamais]`); continue; }
     if (reste <= 0) { omis.push(x.chemin); out.push(ent); continue; }
     const c = coupe(citerFichier(x.chemin), BORNES.sousAgentsFichier, "contenu d'un fichier écrit par un sous-agent");
@@ -428,11 +444,12 @@ export function citerFichier(chemin) {
 }
 
 /** livrables.md d'un point « fin de tour ». `ajouts` : { depot, sousAgents } (sections déjà fabriquées), absents pour un appel sans dépôt. */
-export function fabriquerLivrablesFin(travail, ajouts = {}) {
+export function fabriquerLivrablesFin(travail, ajouts = {}, relus = new Map()) {
   const out = ["# Ce que le tour a livré", "", `Fichiers écrits ou modifiés par Write, Edit ou NotebookEdit depuis le dernier message humain : ${travail.fichiers.length}.`, ""];
   let reste = BORNES.livrables;
   const omis = [];
   travail.fichiers.forEach((f, i) => {
+    if (relus.has(norm(f))) { out.push(`## Fichier ${i + 1} — ${f}`, "", MENTION_RELU(relus.get(norm(f))), ""); return; }
     const c = citerFichier(f);
     if (reste <= 0) { omis.push(f); return; }
     const corps = c.length > reste ? coupe(c, reste, "borne globale des livrables") : c;
@@ -454,13 +471,100 @@ export function fabriquerLivrablesFin(travail, ajouts = {}) {
   return out.join("\n");
 }
 
-/** livrables.md d'un point « consigne ». */
-export function fabriquerLivrablesConsigne(chemin, texte) {
-  return ["# La consigne de délégation que le pilot s'apprête à passer à un agent", "", `Source : ${chemin}`, "", "```", coupe(texte, BORNES.fichier, "consigne de délégation"), "```", ""].join("\n");
+/**
+ * livrables.md d'un point « consigne ». `pieces` : [{ chemin, texte }] ; une seule pièce, ou le gabarit commun d'une campagne
+ * suivi de la liste de ses sujets (A-1 du 19/10/2026 : une relecture pour les N agents qui reçoivent le même gabarit).
+ */
+export function fabriquerLivrablesConsigne(pieces, texte) {
+  const liste = Array.isArray(pieces) ? pieces : [{ chemin: pieces, texte }];
+  const out = [liste.length > 1
+    ? `# La consigne de délégation d'une campagne : ${liste.length} pièces lues ensemble (le gabarit commun et la liste des sujets) — chaque agent reçoit le gabarit appliqué à UN sujet`
+    : "# La consigne de délégation que le pilot s'apprête à passer à un agent", ""];
+  for (const p of liste) out.push(liste.length > 1 ? `## Pièce — ${p.chemin}` : `Source : ${p.chemin}`, "", "```", coupe(p.texte, BORNES.fichier, "consigne de délégation"), "```", "");
+  return out.join("\n");
+}
+
+// ---------- la réception d'un livrable d'agent et la cohérence d'une campagne (D-47 (a), A-2 et A-3 du 19/10/2026) ----------
+
+const MENTION_RELU = (id) => `[relu à sa réception sous ${id} et inchangé depuis : contenu non recité, la relecture de fin de tour juge le reste (D-47 (a) du 19/10/2026)]`;
+
+/**
+ * Les livrables relus à leur réception et inchangés depuis : chemin normalisé → identifiant de la relecture la plus récente.
+ * Un fichier modifié après sa relecture n'y est plus : la fin de tour le recite en entier.
+ */
+export function relusALaReception(lignes) {
+  const m = new Map();
+  for (const l of lignes) {
+    if (l.ev !== "relecture" || l.point !== "reception" || !l.fichier) continue;
+    const ms = Date.parse(l.ts || "");
+    let mt; try { mt = statSync(l.fichier).mtimeMs; } catch { continue; }
+    const k = norm(l.fichier);
+    if (Number.isFinite(ms) && mt <= ms) m.set(k, l.id); else m.delete(k);
+  }
+  return m;
+}
+
+/** Ce qu'une étude conclut : son chapeau (avant le premier titre ##) et ses sections de verdict, conclusion, recommandation ou synthèse. Pur. */
+export function sectionsDeConclusion(texte, borne = BORNES.coherenceFichier) {
+  const L = String(texte ?? "").split(/\r?\n/);
+  const k = L.findIndex((l) => /^##\s/.test(l));
+  const chapeau = coupe((k < 0 ? L : L.slice(0, k)).join("\n").trim(), BORNES.chapeau, "chapeau");
+  const sections = [];
+  const CLE = /verdict|conclusion|recommandation|synth[eè]se|en bref|d[ée]cision|option retenue/i;
+  for (let i = 0; i < L.length; i++) {
+    if (!/^##\s/.test(L[i]) || !CLE.test(L[i])) continue;
+    let j = i + 1; while (j < L.length && !/^##\s/.test(L[j])) j++;
+    sections.push(L.slice(i, j).join("\n").trim());
+  }
+  const corps = sections.length ? sections.join("\n\n") : `[aucune section de verdict ou de conclusion trouvée : le début du document est cité]\n${L.slice(k < 0 ? 0 : k).join("\n")}`;
+  return coupe(`${chapeau}\n\n${corps}`.trim(), borne, "conclusions du livrable");
+}
+
+/** livrables.md d'un point « reception » : UN livrable d'agent, en entier (borne d'un fichier), et le verdict de l'oracle de forme. */
+export function fabriquerLivrablesReception(chemin, forme) {
+  return ["# Le livrable qu'un agent vient de rendre, relu dès sa réception", "", `Source : ${chemin}`, forme ? `Oracle de forme joué avant cette relecture : ${forme}` : "", "", "```", citerFichier(chemin), "```", ""].join("\n");
+}
+
+/** livrables.md d'un point « coherence » : les conclusions de chaque livrable, côte à côte, la part de chacun bornée et dite. */
+export function fabriquerLivrablesCoherence(chemins) {
+  const part = Math.max(1000, Math.min(BORNES.coherenceFichier, Math.floor(BORNES.coherence / Math.max(1, chemins.length))));
+  const out = [`# Les livrables d'une même campagne, côte à côte : ${chemins.length} livrable(s)`, "",
+    `Pour chacun : son chapeau et ses sections de verdict, de conclusion, de recommandation ou de synthèse, ${part} caractères au plus (borne ${BORNES.coherence} pour l'ensemble). Le texte entier de chaque livrable a été relu à sa réception.`, ""];
+  chemins.forEach((c, i) => {
+    let t; try { t = ESTENV(c) ? null : readFileSync(c, "utf8"); } catch { t = undefined; }
+    out.push(`## Livrable ${i + 1} — ${c}`, "", "```", t === null ? "[contenu NON cité : un fichier `.env` ne transite jamais]" : t === undefined ? "[illisible ou absent du disque]" : sectionsDeConclusion(t, part), "```", "");
+  });
+  return out.join("\n");
+}
+
+/** L'oracle de forme d'un livrable `.md` reçu (A-2) : `oracles/oracle-ecriture.mjs --json`. Rend { joue, verdict, echecs, texte }. */
+export function jugerForme(chemin, oracle = ORACLE_FORME) {
+  if (!/\.md$/i.test(chemin)) return { joue: false, verdict: "SKIP", echecs: [], texte: "oracle de forme non joué : le livrable n'est pas un fichier .md" };
+  const r = spawnSync(process.execPath, [oracle, chemin, "--json"], { encoding: "utf8", timeout: 120000, maxBuffer: 64 * 1024 * 1024 });
+  let j = null; try { j = JSON.parse(r.stdout || ""); } catch { /* dit ci-dessous */ }
+  if (!j) return { joue: true, verdict: "ERREUR", echecs: [], texte: `oracle de forme illisible (exit ${r.status}) : ${court(r.stderr || r.stdout, 200)}` };
+  const echecs = (j.findings || []).filter((f) => f.statut === "FAIL").map((f) => `${f.regle} : ${court(f.message, 200)}`);
+  return { joue: true, verdict: j.verdict, echecs, texte: `${basename(oracle, ".mjs")} ${j.verdict}${echecs.length ? `, ${echecs.length} règle(s) en échec` : ""}` };
 }
 
 /** La consigne complète à passer au `verificateur` (version 2). `avecRegles` : demande.txt porte un titre de règles applicables. */
 export function consigneRelecteur(point, fDemande, fLivrables, avecRegles = false) {
+  if (point === "coherence") return [
+    "Tu es RELECTEUR D'INTENTION (essai du 2026-10-18, references\\RELECTURE-INTENTION.md, consigne version 2, point « cohérence » du 19/10/2026). Lecture seule : tu lis EXACTEMENT deux fichiers, et aucun autre (ni le dépôt, ni d'autres dossiers, ni git).",
+    `- DEMANDE : ${fDemande}`,
+    `- LIVRABLE : ${fLivrables}`,
+    "",
+    "La DEMANDE est la demande humaine d'origine (messages mot pour mot, et les décisions qui l'ont modifiée). Le LIVRABLE réunit les conclusions de plusieurs livrables d'une même campagne, chacun déjà relu seul à sa réception.",
+    avecRegles ? "La DEMANDE se termine par un titre « Règles de la Factory applicables à ce type de travail » : ce ne sont PAS des mots du demandeur, ce sont les règles que les livrables doivent tenir même si la demande ne les nomme pas." : "Aucune règle applicable n'est fournie pour ce travail : tu ne juges que l'écart à la demande.",
+    "",
+    "Question unique : ENSEMBLE, ces livrables servent-ils l'INTENTION de la demande ? Cherche seulement ce qu'une relecture livrable par livrable ne voit pas : deux livrables qui traitent le même sujet ou recommandent la même chose sans se citer (doublon), deux conclusions qui se contredisent, une partie de la demande qu'aucun livrable ne traite.",
+    "Ne juge ni le style, ni la qualité technique, ni la forme, ni chaque livrable pris seul. Le « le_livrable_fait » de chaque écart nomme les livrables en cause par leur chemin.",
+    `Règle de jugement : ${CONSIGNE_V2}`,
+    "",
+    "Rends UNIQUEMENT ce bloc JSON, sans texte autour :",
+    FORME_JSON,
+    "« derive » exige au moins un écart de gravité majeure ou bloquante ; sinon « sert », avec les écarts mineurs éventuels. Une contradiction entre deux conclusions est au moins majeure. Chaque écart porte sa nature.",
+  ].join("\n");
   const consigne = point === "consigne";
   return [
     "Tu es RELECTEUR D'INTENTION (essai du 2026-10-18, references\\RELECTURE-INTENTION.md, consigne version 2). Lecture seule : tu lis EXACTEMENT deux fichiers, et aucun autre (ni le dépôt, ni d'autres dossiers, ni git).",
@@ -469,7 +573,9 @@ export function consigneRelecteur(point, fDemande, fLivrables, avecRegles = fals
     "",
     consigne
       ? "La DEMANDE est la demande humaine d'origine (messages mot pour mot, et les décisions qui l'ont modifiée). Le LIVRABLE est la consigne que l'on s'apprête à passer à un agent pour y répondre."
-      : "La DEMANDE est la demande humaine d'origine (messages mot pour mot, et les décisions qui l'ont modifiée). Le LIVRABLE est ce que le tour de travail a produit pour y répondre : fichiers écrits par le tour, fichiers du dépôt modifiés depuis le dernier message humain, écritures des sous-agents.",
+      : point === "reception"
+        ? "La DEMANDE est la demande humaine d'origine (messages mot pour mot, et les décisions qui l'ont modifiée). Le LIVRABLE est UN livrable qu'un agent vient de rendre pour y répondre, en entier : juge-le pour la part de la demande qu'il traite, pas pour les parts confiées à d'autres agents."
+        : "La DEMANDE est la demande humaine d'origine (messages mot pour mot, et les décisions qui l'ont modifiée). Le LIVRABLE est ce que le tour de travail a produit pour y répondre : fichiers écrits par le tour, fichiers du dépôt modifiés depuis le dernier message humain, écritures des sous-agents.",
     avecRegles ? "La DEMANDE se termine par un titre « Règles de la Factory applicables à ce type de travail » : ce ne sont PAS des mots du demandeur, ce sont les règles que le livrable doit tenir même si la demande ne les nomme pas." : "Aucune règle applicable n'est fournie pour ce travail : tu ne juges que l'écart à la demande.",
     "",
     consigne
@@ -634,7 +740,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   const cwd = contexte.cwd || process.cwd();
   const projetDir = contexte.projet || env.CLAUDE_PROJECT_DIR || cwd;   // le projet dont on lit la transcription
   const maison = contexte.maison || homedir();
-  const a = { mode: null, preparer: null, fichier: null, transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null };
+  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null };
   const usage = (m) => ({ code: 2, sortie: `relecture-intention : ${m}` });
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
@@ -645,7 +751,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       else if (x === "--confirmer") { a.mode = "confirmer"; a.id = val(); a.reponse = val(); }
       else if (x === "--boucle") { a.mode = "boucle"; a.boucle = val(); }
       else if (x === "--releve") a.mode = "releve";
-      else if (x === "--fichier") a.fichier = val();
+      else if (x === "--fichier") a.fichiers.push(val());
       else if (x === "--transcript") a.transcript = val();
       else if (x === "--sortie") a.sortie = val();
       else if (x === "--registre") a.registre = val();
@@ -730,13 +836,21 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       if (!etat.prochaine_passe_permise) return usage(`--suite-de : pas de passe permise après ${prec.id} — ${etat.motif}`);
       suiteDe = prec.id; chaine = etat.chaine;
     } else if (passe !== 0) return usage(`--passe ${passe} exige --suite-de <identifiant de la relecture précédente> : une passe de correction suit une relecture`);
+    // Au point « reception », le livrable relu est nommé : la fin de tour le cite ensuite par son seul chemin tant qu'il n'a pas changé.
+    let fichier = null;
+    if (a.point === "reception") {
+      if (a.fichiers.length !== 1) return usage("--consigner --point reception exige --fichier <livrable relu> (un seul)");
+      fichier = resolve(cwd, a.fichiers[0]).replace(/\\/g, "/");
+      if (!existsSync(fichier)) return usage(`--fichier : livrable absent du disque (${fichier})`);
+      if (suiteDe) { const prec = registre.find((l) => l.id === suiteDe); if (prec?.fichier && norm(prec.fichier) !== norm(fichier)) return usage(`--suite-de : ${prec.id} a relu ${prec.fichier}, pas ${fichier} — une chaîne est UN travail`); }
+    }
     let session = a.session || env.CLAUDE_SESSION_ID || null;
     if (!session) { const t = transcriptionRecente(projetDir, env, maison); session = t ? basename(t, ".jsonl") : "inconnue"; }
     const jour = dateLocale(maintenant);
     const n = registre.filter((l) => l.ev === "relecture" && String(l.id).startsWith(`RI-${jour}-`)).length + 1;
     const alerte = v.verdict.verdict === "derive" && ["majeure", "bloquante"].includes(v.verdict.gravite);
     const id = `RI-${jour}-${String(n).padStart(2, "0")}`;
-    const ligne = { ts: maintenant.toISOString(), ev: "relecture", id, point: a.point, type: a.type, ...v.verdict, alerte, passe, suite_de: suiteDe, chaine: chaine || id, projet: basename(resolve(projetDir)), session };
+    const ligne = { ts: maintenant.toISOString(), ev: "relecture", id, point: a.point, type: a.type, ...v.verdict, alerte, passe, suite_de: suiteDe, chaine: chaine || id, projet: basename(resolve(projetDir)), session, ...(fichier ? { fichier } : {}) };
     mkdirSync(dirname(resolve(a.registre)), { recursive: true });
     appendFileSync(a.registre, JSON.stringify(ligne) + "\n");
     const avis = v.verdict.verdict === "derive" && !alerte ? " — verdict « derive » sans écart majeur ni bloquant : consigné tel quel, pas d'alerte" : "";
@@ -763,10 +877,24 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     regles = chargerRegles(resolve(cwd, a.regles));
     if (!regles.ok) return usage(regles.raison);
   }
-  let consigneTexte = null;
+  let pieces = null;
   if (a.preparer === "consigne") {
-    if (!a.fichier) return usage("--preparer consigne attend --fichier <consigne.md>");
-    try { consigneTexte = readFileSync(resolve(cwd, a.fichier), "utf8"); } catch (e) { return usage(`consigne illisible : ${e.message}`); }
+    if (!a.fichiers.length) return usage("--preparer consigne attend --fichier <consigne.md> (et, pour une campagne, --fichier <liste des sujets>)");
+    pieces = [];
+    for (const f of a.fichiers) { try { pieces.push({ chemin: resolve(cwd, f), texte: readFileSync(resolve(cwd, f), "utf8") }); } catch (e) { return usage(`consigne illisible : ${e.message}`); } }
+  }
+  let forme = null;
+  if (a.preparer === "reception") {
+    if (a.fichiers.length !== 1) return usage("--preparer reception attend --fichier <livrable rendu par l'agent> (un seul)");
+    const f = resolve(cwd, a.fichiers[0]);
+    if (!existsSync(f) || !statSync(f).isFile()) return usage(`livrable absent du disque : ${f}`);
+    // A-2 du 19/10/2026 : la forme d'abord. Un FAIL de l'oracle de forme ne dépense pas de relecture : rien n'est préparé.
+    forme = (contexte.jugerForme || jugerForme)(f);
+    if (forme.verdict === "FAIL") return { code: 1, sortie: [`relecture-intention ${VERSION} — point « reception » : ${forme.texte} sur ${f} — rien n'est préparé : corriger la forme, puis rejouer --preparer reception (A-2 du 19/10/2026).`, ...forme.echecs.map((e) => `  - ${e}`)].join("\n"), forme };
+  }
+  if (a.preparer === "coherence") {
+    if (a.fichiers.length < 2) return usage("--preparer coherence attend au moins deux --fichier <livrable> (les livrables d'une même campagne)");
+    for (const f of a.fichiers) if (!existsSync(resolve(cwd, f))) return usage(`livrable absent du disque : ${resolve(cwd, f)}`);
   }
   const transcript = a.transcript ? resolve(cwd, a.transcript) : transcriptionRecente(projetDir, env, maison);
   if (!transcript) return usage(`aucune transcription trouvée pour le projet « ${projetDir} » sous les profils .claude* ; --transcript <jsonl> la désigne`);
@@ -782,13 +910,20 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     const travail = travailDuTour(records, dernier ? dernier.rang : -1);
     const depot = fichiersDepot(resolve(projetDir), dernier?.ts);
     const sa = ecrituresSousAgents(transcript, dernier?.ts);
+    const relus = relusALaReception(lireRegistre(a.registre));
     const cites = new Set(travail.fichiers.map(norm));
-    const sectionDepot = fabriquerDepot(depot, cites);
-    livrables = fabriquerLivrablesFin(travail, { depot: sectionDepot.texte, sousAgents: fabriquerSousAgents(sa, new Set([...cites, ...sectionDepot.cites])) });
-    resume = `${travail.fichiers.length} fichier(s) écrit(s), ${travail.commandes.length} commande(s) depuis le dernier message humain ; dépôt : ${depot.ok ? `${depot.fichiers.length} fichier(s) modifié(s)` : "non relevé"} ; sous-agents : ${sa.absent ? "aucun" : `${sa.ecritures.length} écriture(s) de ${sa.agents} sous-agent(s)`}`;
+    const sectionDepot = fabriquerDepot(depot, cites, relus);
+    livrables = fabriquerLivrablesFin(travail, { depot: sectionDepot.texte, sousAgents: fabriquerSousAgents(sa, new Set([...cites, ...sectionDepot.cites]), relus) }, relus);
+    resume = `${travail.fichiers.length} fichier(s) écrit(s), ${travail.commandes.length} commande(s) depuis le dernier message humain ; dépôt : ${depot.ok ? `${depot.fichiers.length} fichier(s) modifié(s)` : "non relevé"} ; sous-agents : ${sa.absent ? "aucun" : `${sa.ecritures.length} écriture(s) de ${sa.agents} sous-agent(s)`} ; ${relus.size} livrable(s) relu(s) à leur réception et inchangé(s), cité(s) par leur seul chemin`;
+  } else if (a.preparer === "reception") {
+    livrables = fabriquerLivrablesReception(resolve(cwd, a.fichiers[0]), forme.texte);
+    resume = `le livrable ${a.fichiers[0]} (${forme.texte})`;
+  } else if (a.preparer === "coherence") {
+    livrables = fabriquerLivrablesCoherence(a.fichiers.map((f) => resolve(cwd, f)));
+    resume = `${a.fichiers.length} livrable(s) côte à côte`;
   } else {
-    livrables = fabriquerLivrablesConsigne(resolve(cwd, a.fichier), consigneTexte);
-    resume = `la consigne ${a.fichier}`;
+    livrables = fabriquerLivrablesConsigne(pieces);
+    resume = pieces.length > 1 ? `la consigne d'une campagne en ${pieces.length} pièces (${a.fichiers.join(", ")})` : `la consigne ${a.fichiers[0]}`;
   }
   const blocRegles = regles ? fabriquerRegles(regles.ref, types) : "";
   writeFileSync(fDemande, fabriquerDemande(humains, decisions, blocRegles), "utf8");
@@ -803,7 +938,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     `--- CONSIGNE À PASSER À L'AGENT verificateur (description de l'appel : « Relecture d'intention ${a.preparer} » — c'est elle que compte scripts\\relever-flotte.mjs) ---`,
     consigne,
     "--- FIN DE LA CONSIGNE ---",
-    `Ensuite : écrire le bloc JSON rendu dans un fichier, puis node scripts\\relecture-intention.mjs --consigner <verdict.json> --point ${a.preparer} --type <${TYPES.join("|")}> [--passe <n> --suite-de <identifiant>]. Un écart majeur de nature hors_demande se corrige (2 passes au plus, chacune relue) ; un écart de nature choix_humain, ou qui résiste, est posé à l'humain : alerte, jamais blocage. L'état d'une chaîne : --boucle <identifiant>.`,
+    `Ensuite : écrire le bloc JSON rendu dans un fichier, puis node scripts\\relecture-intention.mjs --consigner <verdict.json> --point ${a.preparer} --type <${TYPES.join("|")}>${a.preparer === "reception" ? ` --fichier ${a.fichiers[0]}` : ""} [--passe <n> --suite-de <identifiant>]. Un écart majeur de nature hors_demande se corrige (2 passes au plus, chacune relue) ; un écart de nature choix_humain, ou qui résiste, est posé à l'humain : alerte, jamais blocage. L'état d'une chaîne : --boucle <identifiant>.`,
   ].join("\n");
   return { code: 0, sortie, dossier, consigne, demande: fDemande, livrables: fLivrables };
 }

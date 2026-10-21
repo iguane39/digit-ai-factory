@@ -1,16 +1,16 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\references\\RELECTURE-INTENTION.md",
-  "date_iso": "2026-10-18T14:38:48.566Z",
-  "registre_version": "2.43.0",
+  "cible": "references/RELECTURE-INTENTION.md",
+  "date_iso": "2026-10-20T06:51:59.460Z",
+  "registre_version": "2.45.0",
   "profil": "digit-ai",
-  "niveau": "note",
+  "niveau": "diffuse",
   "verdict": "PASS",
   "perimetre": "disque",
   "perimetre_motif": null,
   "resume": {
-    "pass": 5,
+    "pass": 4,
     "fail": 0,
-    "skip": 2,
+    "skip": 3,
     "cache": 0
   },
   "bilan_fichiers": {
@@ -45,14 +45,14 @@
     {
       "domaine": "Calculs / chiffres",
       "file": "references\\RELECTURE-INTENTION.md",
-      "verdict": "PASS",
-      "detail": "1 constat(s) · 0 total(aux) de colonne vérifié(s) par re-somme + 1 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 0/0 mesure(s) publiée(s) portant leur dénominateur et leurs unités + 0 indicateur(s) à valeur unique, 0 écart"
+      "verdict": "SKIP",
+      "detail": "aucune table détectée, aucun effectif annoncé ancré, aucun pourcentage ni unité publiés"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "references\\RELECTURE-INTENTION.md",
       "verdict": "PASS",
-      "detail": "12 constat(s) · 11 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (11 avertissement(s)) ; nombre « 20261018 » non sourcé"
+      "detail": "16 constat(s) · 15 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (15 avertissement(s)) ; nombre « 20261018 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\RELECTURE-INTENTION.md",
-    "ts": "2026-10-18T14:38:48.565Z",
+    "ts": "2026-10-20T06:51:59.459Z",
     "fichiers": {
-      "references\\RELECTURE-INTENTION.md": "eb3a2c7c56add314d5342a934a059ef3f9634577dff3b3b96f70aa5d14705fc3"
+      "references\\RELECTURE-INTENTION.md": "c75845aed86d301f5e218385fc34ed0bdf8b83433b96097c653cf4b7adcacf42"
     }
   },
   "empreinte_motif": null,

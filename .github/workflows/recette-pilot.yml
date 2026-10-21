@@ -1,10 +1,11 @@
 # recette-pilot.yml — rejeu hébergé minimal de la recette du pilot (TF-1018, décision « 12a »
 # du 15/09/2026, option O3 de l'étude d'opportunité citée par le mandat).
 #
-# INACTIF PAR CONSTRUCTION : ce fichier vit ici, hors de .github/workflows/, précisément pour
-# qu'aucune exécution hébergée ne se déclenche avant un GO humain distinct (R-38). Voir
-# ci/hebergee/ACTIVER.md pour le geste d'activation, ce qu'il engage, et la simulation locale
-# (scripts/simuler-recette-hebergee.mjs) qui se joue AVANT lui.
+# ACTIF depuis le 02/10/2026 (décision humaine D-50 (a)) : ce fichier vit sous .github/workflows/,
+# où une exécution hébergée se déclenche à chaque push et à chaque pull request sur main. Il
+# vivait auparavant sous ci/hebergee/, hors de ce dossier, pour qu'aucune exécution ne parte
+# avant un GO humain distinct (R-38). Voir ci/hebergee/ACTIVER.md pour le geste d'activation et
+# la simulation locale (scripts/simuler-recette-hebergee.mjs) qui se joue AVANT toute modification.
 #
 # Ce que ce fichier rejoue : les deux mêmes commandes que la recette locale du pilot — aucun secret,
 # aucune API tierce payante, aucun déploiement. TF-1133 : rejoué sur un clone frais, le premier jet

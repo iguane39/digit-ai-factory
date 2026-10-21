@@ -5,14 +5,17 @@
  *           `message.id`) ne se compte qu'une fois ; un résultat d'outil et un retour de hook n'ouvrent pas de tour ;
  *   ROUGE : une session qui franchit le seuil est NOMMÉE (AVERT), jamais un échec (exit 0) ;
  *   BORNES : le seuil se lit au référentiel ; une option inconnue rend 2.
+ * TF-1934 — les descriptions de skills (VERT : un corpus court, cumul, moyenne et maximum exacts, sans rappel de revue ;
+ *   ROUGE : un corpus aux descriptions longues est nommé et rappelle les deux questions de revue, sans bouger le verdict
+ *   du contexte ; BORNES : un dossier de skills lié à un autre profil ne se compte qu'une fois).
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { lireTranscription, executer } from "./relever-contexte-sessions.mjs";
+import { lireTranscription, executer, descriptionDe, dossiersSkillsParDefaut } from "./relever-contexte-sessions.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 let pass = 0, fail = 0;
@@ -59,6 +62,65 @@ try {
   });
   check("borne : une option inconnue rend 2", () => {
     if (executer(["--inconnue"]).code !== 2) throw new Error("pas 2");
+  });
+
+  // TF-1934 (D-48 (a) du 19/10/2026) — les descriptions de skills : cumul, moyenne, maximum, part au-dessus de 419 caractères.
+  const skill = (dossier, nom, frontmatter, crlf = false) => {
+    mkdirSync(join(dossier, nom), { recursive: true });
+    const txt = `---\n${frontmatter}\n---\n\nCorps du skill.\n`;
+    writeFileSync(join(dossier, nom, "SKILL.md"), crlf ? txt.replace(/\n/g, "\r\n") : txt);
+  };
+  const x = (n) => "x".repeat(n);
+  const COURTS = join(T, "profil-a", "skills");
+  skill(COURTS, "alpha", `name: alpha\ndescription: ${x(100)}`);
+  skill(COURTS, "beta", `name: beta\ndescription: "${x(200)}"`);
+  // description repliée sur deux lignes : 150 + une espace de pliage + 50 = 201 caractères
+  skill(COURTS, "gamma", `name: gamma\ndescription: >\n  ${x(150)}\n  ${x(50)}`, true);
+  const LONGS = join(T, "profil-b", "skills");
+  skill(LONGS, "un", `name: un\ndescription: ${x(500)}`);
+  skill(LONGS, "deux", `name: deux\ndescription: ${x(1100)}`);
+  skill(LONGS, "trois", `name: trois\ndescription: ${x(300)}`);
+  mkdirSync(join(LONGS, "sans-skill-md"), { recursive: true });
+  mkdirSync(join(LONGS, "illisible"), { recursive: true });
+  writeFileSync(join(LONGS, "illisible", "SKILL.md"), "pas de frontmatter ici\n");
+  const hermetique = (...skills) => executer(["--transcripts", projet, "--referentiel", ref, ...skills.flatMap((s) => ["--skills", s])]);
+
+  check("vert : la description se lit en ligne, entre guillemets, repliée (CRLF compris) ou littérale ; sans frontmatter, null", () => {
+    const l = [descriptionDe("---\nname: a\ndescription: abc def\n---\n"), descriptionDe('---\ndescription: "entre guillemets"\n---\n'),
+      descriptionDe("---\ndescription: >\n  deux\n  lignes\n---\n"), descriptionDe("---\r\ndescription: |-\r\n  une\r\n  autre\r\n---\r\n"), descriptionDe("rien")];
+    if (JSON.stringify(l) !== JSON.stringify(["abc def", "entre guillemets", "deux lignes", "une\nautre", null])) throw new Error(JSON.stringify(l));
+  });
+  check("vert : un corpus aux descriptions courtes rend cumul, moyenne et maximum exacts, sans rien au-dessus du seuil ni les questions de revue", () => {
+    const { rapport: r, sortie } = hermetique(COURTS);
+    const c = r.descriptions_de_skills.corpus[0];
+    if (c.skills !== 3 || c.cumul !== 501 || c.moyenne !== 167 || c.maximum.nom !== "gamma" || c.maximum.longueur !== 201) throw new Error(JSON.stringify(c));
+    if (c.au_dela_du_seuil !== 0 || c.au_dela_du_plafond !== 0) throw new Error(JSON.stringify(c));
+    if (!/descriptions de skills \(profil-a\/skills\) : 3 skill\(s\), 501 caractères au cumul, moyenne 167, maximum 201 \(gamma\) ; 0 au-dessus de 419 caractères \(0 %\)/.test(sortie)) throw new Error(sortie);
+    if (/deux questions/.test(sortie)) throw new Error("les questions de revue sont rappelées sous le seuil");
+  });
+  check("rouge : un corpus de descriptions longues est nommé (2 au-dessus de 419, 1 au-dessus du plafond de 1 024) et rappelle les deux questions de revue ; exit 0", () => {
+    const { code, rapport: r, sortie } = hermetique(LONGS);
+    if (code !== 0) throw new Error(`exit ${code}`);
+    const c = r.descriptions_de_skills.corpus[0];
+    if (c.skills !== 3 || c.cumul !== 1900 || c.moyenne !== 633 || c.au_dela_du_seuil !== 2 || c.au_dela_du_plafond !== 1 || c.maximum.nom !== "deux") throw new Error(JSON.stringify(c));
+    if (c.illisibles.join() !== "illisible") throw new Error(`illisibles ${c.illisibles}`);
+    if (!/2 au-dessus de 419 caractères \(67 %\), 1 au-dessus du plafond d'import de 1 024 ; 1 sans description lisible/.test(sortie)) throw new Error(sortie);
+    if (!/deux questions/.test(sortie) || !/1\. cette phrase change-t-elle le comportement par défaut/.test(sortie) || !/2\. dit-elle ce qu'il faut faire plutôt que ce qu'il faut éviter/.test(sortie)) throw new Error(sortie);
+    if (r.ensemble.verdict !== "AVERT") throw new Error("le verdict du contexte des sessions a bougé : les descriptions n'y entrent pas");
+  });
+  check("vert : sans aucun dossier de skills lisible, le relevé le dit ; la référence mesurée le 2026-10-19 est citée", () => {
+    const vide = hermetique(join(T, "n-existe-pas"));
+    if (!/descriptions de skills : aucun dossier de skills lu/.test(vide.sortie)) throw new Error(vide.sortie);
+    if (!/référence mesurée le 2026-10-19 par l'étude 20261019d : mattpocock\/skills \(38 skills\) moyenne 142, maximum 419/.test(hermetique(COURTS).sortie)) throw new Error("référence absente");
+  });
+  check("borne : un dossier de skills lié à un autre profil ne se compte qu'une fois", () => {
+    const maison = join(T, "maison");
+    mkdirSync(join(maison, ".claude", "skills"), { recursive: true });
+    mkdirSync(join(maison, ".claude-b"), { recursive: true });
+    try { symlinkSync(join(maison, ".claude", "skills"), join(maison, ".claude-b", "skills"), "junction"); } catch (e) { throw new Error(`lien impossible à créer : ${e.message}`); }
+    mkdirSync(join(maison, ".claude-c", "skills"), { recursive: true });
+    const d = dossiersSkillsParDefaut({}, maison);
+    if (d.length !== 2) throw new Error(`${d.length} dossiers au lieu de 2 : ${d.join(" | ")}`);
   });
 } finally { rmSync(T, { recursive: true, force: true }); }
 console.log(`\nrelever-contexte-sessions (TF-1558) : ${pass} PASS, ${fail} FAIL`);

@@ -1,17 +1,32 @@
 # Relecture d'intention — essai sur tous les travaux
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 1.1.0, 18/10/2026** : la boucle de correction bornée à 2 passes et trois ajouts au relecteur, décision humaine D-26 (a) du 18/10/2026 (section « La boucle de correction » ; première version : 1.0.0). Né de la décision humaine D-23 (a) du 18/10/2026, sur l'étude `output\03-etudes\20261018-etude-opportunite-relecteur-d-intention-v2.md` (option O4) ; mesure : `output\03-etudes\20261018-mesure-relecteur-d-intention.json`. Porté par la **loi transverse n° 7** (le résultat sert l'intention, pas la lettre, `references\INTENTION.md`). Voyage chez les produits par la restitution (`forge\RESTITUTION.md`, ligne « Relecture d'intention » du bloc 4) ; l'outil et le registre restent au pilot.
+Référentiel versionné (loi n° 4, daté-éditable) — **version 1.2.0, 19/10/2026** : chaque livrable d'agent est relu à sa réception, la forme d'abord, puis l'ensemble d'une campagne côte à côte, et la consigne commune d'une campagne se relit en une fois (décision humaine D-47 (a) et actions A-1 à A-3 du 19/10/2026, section « Les campagnes à agents »). Version 1.1.0 du 18/10/2026 : la boucle de correction bornée à 2 passes et trois ajouts au relecteur, décision humaine D-26 (a) (section « La boucle de correction ») ; première version : 1.0.0. Né de la décision humaine D-23 (a) du 18/10/2026, sur l'étude `output\03-etudes\20261018-etude-opportunite-relecteur-d-intention-v2.md` (option O4) ; mesure : `output\03-etudes\20261018-mesure-relecteur-d-intention.json`. Porté par la **loi transverse n° 7** (le résultat sert l'intention, pas la lettre, `references\INTENTION.md`). Voyage chez les produits par la restitution (`forge\RESTITUTION.md`, ligne « Relecture d'intention » du bloc 4) ; l'outil et le registre restent au pilot.
 
 ## Le fait
 
 Une dérive naît dans la consigne passée à un agent et se voit à la fin du tour, quand l'auteur a déjà écrit lui-même son intention et son test rétro : 71 restitutions sur 71 portent une intention écrite par leur auteur, et c'est cette reformulation qui a laissé passer la restriction à LinkedIn d'une étude. Le cas fondateur de la consigne est TF-0176 : « pour chaque liste » devenu « dès 8 lignes », un livrable refusé. Mesure de l'étude, sur les études seulement : avec la consigne stricte ci-dessous, le relecteur voit 2 dérives sur 2. Restitutions, code, pages, lots et consignes d'agents ne sont pas encore mesurés : l'essai est l'instrument qui les mesure.
 
-## Les deux points de relecture
+## Les points de relecture
 
 1. **La consigne passée à un agent, avant son travail.** Avant de lancer CHAQUE agent, quel qu'il soit (de la flotte, intégré ou générique), le pilot fait relire la consigne qu'il s'apprête à passer ; seule la relecture d'intention elle-même en est exemptée, sans quoi chaque relecture en appellerait une. La première version limitait ce point aux agents d'écriture : la relecture de fin de tour du 18/10 (RI-20261018-01) l'a relevé comme une restriction que la décision « chaque consigne d'agent » n'autorisait pas. `node scripts\relecture-intention.mjs --preparer consigne --fichier <consigne.md> [--type <type>]`.
 2. **La fin de chaque tour de travail.** Un tour qui a écrit un fichier ou lancé une commande à effet est relu avant la restitution. `node scripts\relecture-intention.mjs --preparer fin-de-tour [--transcript <jsonl>] [--type <type>]`. Une question simple (`references\NIVEAUX.md`, niveau Simple) n'a rien écrit : elle n'est pas relue.
+3. **La réception de chaque livrable d'agent** (D-47 (a) du 19/10/2026). Dès qu'un agent rend un livrable, il est relu seul et en entier : `node scripts\relecture-intention.mjs --preparer reception --fichier <livrable> [--type <type>]`, puis `--consigner … --point reception --fichier <livrable>`. Un livrable `.md` passe d'abord `oracles\oracle-ecriture.mjs` : s'il rend FAIL, rien n'est préparé (exit 1), et la forme se corrige avant de dépenser une relecture (A-2).
+4. **La cohérence d'une campagne** (A-3 du 19/10/2026). Quand tous les livrables d'une campagne sont reçus, leurs chapeaux et leurs sections de verdict ou de conclusion sont relus côte à côte : doublons, contradictions, parties de la demande qu'aucun ne traite. `node scripts\relecture-intention.mjs --preparer coherence --fichier <a> --fichier <b> … [--type <type>]`.
 
 Chez un produit, la commande est celle du pilot (`<racine>\digit-ai-factory\scripts\relecture-intention.mjs`, racine = `$FORGE_ROOT`, sinon le parent du dépôt), comme `oracle-synthese`.
+
+## Les campagnes à agents (D-47 (a), A-1 à A-3 du 19/10/2026)
+
+*Le fait.* Le 19/10, une campagne de 14 études a été lancée sans aucune relecture de consigne inscrite, et sa seule relecture de fin de tour lisait au plus 80 000 caractères pour environ 300 000 écrits : une dizaine d'études sortaient sans relecture d'intention.
+
+Une campagne dont les agents reçoivent le même gabarit suit cet ordre :
+
+1. **La consigne, une fois** (A-1) : le gabarit commun et la liste des sujets se relisent ensemble, `--preparer consigne --fichier <gabarit.md> --fichier <sujets.md>` ; cette relecture vaut pour chaque agent de la campagne. Une consigne qui s'écarte du gabarit se relit seule.
+2. **Chaque livrable, à sa réception** (D-47 (a), A-2) : l'oracle de forme, puis la relecture du point « reception » ; la boucle de correction s'applique à chaque livrable, 2 passes au plus, pendant que les autres agents travaillent encore.
+3. **L'ensemble** (A-3) : la relecture du point « coherence » sur tous les livrables reçus.
+4. **La fin de tour** ne juge plus que ce que le tour a écrit en plus : un livrable relu à sa réception et inchangé depuis y est cité par son seul chemin et l'identifiant de sa relecture ; modifié après, il est recité en entier.
+
+Coût attendu : une relecture par livrable, environ 720 000 jetons pour 14 études (51 322 en médiane chacune), sous le seuil d'arrêt de l'essai.
 
 ## L'entrée du relecteur
 
@@ -26,13 +41,13 @@ Une seule consigne, pour tous les types de travaux, en **version 2 depuis le 202
 
 > une restriction ou un recadrage que la demande n autorisait pas est une dérive, même annoncé, justifié ou validé ; une conclusion négative n en est pas une si la demande posait la question
 
-La version 2 la complète de trois règles, dans cet ordre (`CONSIGNE_V2` de `scripts\relecture-intention.mjs` : la stricte, un point, puis les trois) :
+La version 2 la complète de 3 règles, dans cet ordre (`CONSIGNE_V2` de `scripts\relecture-intention.mjs` : la stricte, un point, puis les trois) :
 
 1. **Le contenu visible ajouté** (deuxième ajout) : un contenu visible ajouté sans demande — une source, une mention, une section, une phrase, une colonne, un avertissement, un élément d'interface que la demande ne nommait pas — est un écart majeur, même annoncé, justifié ou validé en bloc ; ce que les règles applicables imposent n'en est pas un. *Le fait* : la mesure du 18/10 chez les produits a classé « mineure », 2 fois sur 2, la source ajoutée à une présentation (TF-1391).
 2. **L'usage des règles applicables** (premier ajout) : quand des règles applicables au type de travail sont fournies, sous leur propre titre et distinctes de la demande humaine, ce sont les règles de la Factory que le livrable doit tenir même si la demande ne les nomme pas : un livrable qui en enfreint une est un écart, la règle citée, majeur quand le demandeur devrait redemander ce qu'il croyait acquis.
 3. **La nature de chaque écart** (boucle de correction) : chaque écart porte sa nature : « hors_demande » quand il sort de la demande (une restriction ou un recadrage non autorisé, une partie oubliée, un contenu visible ajouté sans demande, une règle applicable enfreinte) ; « choix_humain » quand il touche un choix qui revient à l'humain (une dépense, un périmètre à trancher, une publication, ou une décision humaine déjà prise) ; dans le doute, « choix_humain ».
 
-**Ce qui est mesuré et ce qui ne l'est pas.** La stricte v1 a une mesure : sur les études seulement, elle voit 2 dérives sur 2. Les trois règles de la v2 n'en ont pas encore ; elles sont mises à l'essai, et la revue du 2026-11-08 les mesure avec le reste.
+**Ce qui est mesuré et ce qui ne l'est pas.** La stricte v1 a une mesure : sur les études seulement, elle voit 2 dérives sur 2. Les 3 règles de la v2 n'en ont pas encore ; elles sont mises à l'essai, et la revue du 2026-11-08 les mesure avec le reste.
 
 **Date et décision de la v2** : 2026-10-18, décision humaine D-26 (a), sur la synthèse `output\04-plans\Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md`. La v1 reste la base ; le référentiel `references\RELECTURE-INTENTION-REGLES.json` (clé `consigne_relecteur`) la garde et dit la date et la décision de la v2.
 
@@ -52,7 +67,7 @@ La version 1 n'avait pas la nature (`FORME_JSON_V1`) :
 
 ## L'agent relecteur
 
-`verificateur` de la flotte (`gabarits\flotte\verificateur.yaml`) : Sonnet à medium, lecture seule. La description de l'appel **commence par « Relecture d'intention »** : c'est elle que lit le relevé de flotte pour compter les relectures et leurs jetons. Il lit exactement les deux fichiers préparés. Coût mesuré sur les études : 51 322 jetons par relecture en médiane (jetons d'entrée, de sortie, relus et écrits en cache, une réponse comptée sur sa dernière ligne).
+`verificateur` de la flotte (`gabarits\flotte\verificateur.yaml`) : Sonnet à medium, lecture seule. La description de l'appel **commence par « Relecture d'intention »** : c'est elle que lit le relevé de flotte pour compter les relectures et leurs jetons. Il lit exactement les 2 fichiers préparés. Coût mesuré sur les études : 51 322 jetons par relecture en médiane (jetons d'entrée, de sortie, relus et écrits en cache, une réponse comptée sur sa dernière ligne).
 
 ## L'autorité : alerte, jamais blocage
 
@@ -91,7 +106,7 @@ Le référentiel `references\RELECTURE-INTENTION-REGLES.json` (loi n° 4 : une d
 
 ## Le registre et le relevé
 
-`node scripts\relecture-intention.mjs --consigner <verdict.json> --point <fin-de-tour|consigne> --type <etude|restitution|code|page|lot|consigne|presentation|exigences|autre> [--passe <n> --suite-de <identifiant>]` ajoute une ligne horodatée à `todo\relectures-intention.jsonl` (verdict, gravité, nombre d'écarts, nature et détail de chaque écart, passe, relecture précédente, chaîne, projet, session). `--releve [--depuis AAAA-MM-JJ]` compte, par type et par point, les relectures, les dérives signalées, les alertes confirmées, infirmées et corrigées par la boucle, et les écarts levés sans l'humain ou posés à l'humain. `node scripts\relever-flotte.mjs` compte les relectures d'intention et leurs jetons par jour (section « Flotte d'agents » du relevé d'ouverture).
+`node scripts\relecture-intention.mjs --consigner <verdict.json> --point <fin-de-tour|consigne|reception|coherence> [--fichier <livrable>] --type <etude|restitution|code|page|lot|consigne|presentation|exigences|autre> [--passe <n> --suite-de <identifiant>]` ajoute une ligne horodatée à `todo\relectures-intention.jsonl` (verdict, gravité, nombre d'écarts, nature et détail de chaque écart, passe, relecture précédente, chaîne, projet, session). `--releve [--depuis AAAA-MM-JJ]` compte, par type et par point, les relectures, les dérives signalées, les alertes confirmées, infirmées et corrigées par la boucle, et les écarts levés sans l'humain ou posés à l'humain. `node scripts\relever-flotte.mjs` compte les relectures d'intention et leurs jetons par jour (section « Flotte d'agents » du relevé d'ouverture).
 
 ## Dates, seuil, revue
 
@@ -102,4 +117,4 @@ Le référentiel `references\RELECTURE-INTENTION-REGLES.json` (loi n° 4 : une d
 
 ## Non jugé (déclaré)
 
-La justesse d'un « sert » (un relecteur peut laisser passer une dérive) ; la nature qu'un relecteur donne à un écart, et la justesse d'une correction (elle est relue, pas jugée) ; les trois règles de la consigne v2, qui n'ont pas encore de mesure ; ce qu'un sous-agent fait par une commande plutôt que par Write, Edit ou NotebookEdit (git le relève dans le dépôt, pas ailleurs) ; le diff d'un fichier modifié avant le dernier message humain puis retouché depuis (il porte aussi l'ancienne modification) ; un tour dont la demande n'est pas dans la transcription lue (session reprise après compaction : la demande est alors le résumé, et la relecture le dit).
+La justesse d'un « sert » (un relecteur peut laisser passer une dérive) ; la nature qu'un relecteur donne à un écart, et la justesse d'une correction (elle est relue, pas jugée) ; les 3 règles de la consigne v2, qui n'ont pas encore de mesure ; ce qu'un sous-agent fait par une commande plutôt que par Write, Edit ou NotebookEdit (git le relève dans le dépôt, pas ailleurs) ; le diff d'un fichier modifié avant le dernier message humain puis retouché depuis (il porte aussi l'ancienne modification) ; un tour dont la demande n'est pas dans la transcription lue (session reprise après compaction : la demande est alors le résumé, et la relecture le dit).

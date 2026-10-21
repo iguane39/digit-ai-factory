@@ -32,9 +32,12 @@
  * TF-1392, D-2 (a) du 13/10/2026).
  * EC-12 énumération numérotée « 1) … 2) … 3) » sur une même ligne, hors restitution (E-11, AVERT seulement,
  * TF-1847, 18/10/2026) ; les restitutions sont jugées par S80 d'oracle-synthese, bloquante chez elles.
+ * EC-13 la revue des listes de tournures est datée et n'est pas dépassée : chaque famille de la donnée porte une
+ * `revue_prevue` (AAAA-MM-JJ) ; une date absente ou dépassée avertit, sur tout texte jugé (AVERT seulement,
+ * TF-1926, décision D-48 (a) du 19/10/2026).
  * Un AVERT n'échoue jamais : il nomme, et c'est ce qui permet à l'oracle de rester branché.
  *
- * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--json]
+ * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--aujourd-hui AAAA-MM-JJ] [--json]
  *         node oracles\oracle-ecriture.mjs --baseline <dossier> [--donnee <tics.json>]
  *         node oracles\oracle-ecriture.mjs --self-test
  * Exit : 0 PASS ou SKIP · 1 FAIL · 2 erreur (fichier introuvable, donnée illisible).
@@ -753,6 +756,40 @@ export function juger(texte, options = {}) {
     }
   }
 
+  // EC-13 (TF-1926, décision D-48 (a) du 19/10/2026, étude style-ecriture O3) — LA REVUE DES LISTES DE TOURNURES A UNE DATE.
+  // AVERT SEULEMENT, JAMAIS FAIL, sur tout texte jugé.
+  //
+  // LE FAIT. Les 9 familles de `references/tics-redactionnels.json` n'ont été relues qu'une fois, le 11/09/2026, et rien
+  // ne disait qui les relit ni quand ; la page qui fonde les tournures date elle-même un de ses signes. Loi n° 4 (une
+  // donnée volatile porte sa date de péremption) et loi n° 1 (une date que rien ne lit n'existe pas).
+  //
+  // CE QU'ELLE MESURE. La clé `revue_prevue` (AAAA-MM-JJ) de chaque famille : absente ou illisible, ou strictement
+  // antérieure à aujourd'hui (le jour dit n'est pas encore en retard). Le remède se joue : relire les listes contre leurs
+  // sources, puis inscrire `derniere_lecture` et une nouvelle `revue_prevue` dans la donnée. NON JUGÉ : que la relecture
+  // ait réellement eu lieu — la date est déclarée par l'humain ou la session qui relit.
+  {
+    const AAAA_MM_JJ = /^\d{4}-\d{2}-\d{2}$/;
+    const valide = (d) => AAAA_MM_JJ.test(String(d || "")) && !Number.isNaN(Date.parse(`${d}T00:00:00Z`));
+    const jour = options.aujourdhui || (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`; })();
+    const familles = Array.isArray(donnee?.familles) ? donnee.familles : [];
+    if (!familles.length) pousser("EC-13", "SKIP", "aucune famille dans la donnée : revue non jugée");
+    else {
+      const sansDate = familles.filter((f) => !valide(f.revue_prevue)).map((f) => f.cle);
+      const enRetard = familles.filter((f) => valide(f.revue_prevue) && f.revue_prevue < jour).map((f) => `${f.cle} (prévue le ${f.revue_prevue})`);
+      if (!sansDate.length && !enRetard.length) {
+        const prochaine = familles.map((f) => f.revue_prevue).sort()[0];
+        pousser("EC-13", "PASS", `revue des listes de tournures datée pour ${familles.length} famille(s) sur ${familles.length}, la plus proche le ${prochaine}`);
+      } else {
+        pousser("EC-13", "AVERT",
+          (enRetard.length ? `${enRetard.length} famille(s) dont la revue est en retard au ${jour} : ${enRetard.slice(0, 5).join(", ")}${enRetard.length > 5 ? ` · et ${enRetard.length - 5} autre(s)` : ""}` : "")
+          + (enRetard.length && sansDate.length ? " · " : "")
+          + (sansDate.length ? `${sansDate.length} famille(s) sans revue_prevue lisible : ${sansDate.slice(0, 5).join(", ")}${sansDate.length > 5 ? ` · et ${sansDate.length - 5} autre(s)` : ""}` : "")
+          + " — relire les listes contre leurs sources, puis inscrire derniere_lecture et une nouvelle revue_prevue dans references\\tics-redactionnels.json (loi n° 4). "
+          + "AVERTISSEMENT, jamais bloquant (TF-1926, D-48 (a) du 19/10/2026)");
+      }
+    }
+  }
+
   const verdict = findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS";
   return { mots, verdict, findings, non_juge: nonJuge(donnee) };
 }
@@ -1248,10 +1285,47 @@ function selfTest() {
   if (g12(r12c)?.statut !== "PASS")
     casse.push(`EC-12 : la forme interdite montrée entre guillemets français est comptée comme commise : ${JSON.stringify(g12(r12c))}`);
 
+  // 31 à 37 (TF-1926, D-48 (a) du 19/10/2026) — EC-13, LA REVUE DES LISTES DE TOURNURES EST DATÉE, EN AVERTISSEMENT.
+  // Le rouge est la donnée réelle dont deux familles ont une revue dépassée et une troisième aucune date ; le vert est la
+  // donnée réelle au jour injecté (--aujourd-hui) ; le remède (dates futures inscrites) doit PASSER ; la frontière : le
+  // jour dit n'est pas en retard, le lendemain l'est.
+  const g13 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-13");
+  const reelle = JSON.parse(readFileSync(DONNEE_PAR_DEFAUT, "utf8"));
+  const enRetard = JSON.parse(JSON.stringify(reelle));
+  enRetard.familles[0].revue_prevue = "2026-01-15";
+  enRetard.familles[1].revue_prevue = "2026-02-01";
+  delete enRetard.familles[2].revue_prevue;
+  const cheminRetard = join(dir, "donnee-en-retard.json");
+  writeFileSync(cheminRetard, JSON.stringify(enRetard), "utf8");
+  const corrigee = JSON.parse(JSON.stringify(enRetard));
+  for (const f of corrigee.familles) { f.derniere_lecture = "2026-10-19"; f.revue_prevue = "2027-01-15"; }
+  const cheminCorrigee = join(dir, "donnee-corrigee.json");
+  writeFileSync(cheminCorrigee, JSON.stringify(corrigee), "utf8");
+  const r13r = jouer("ec13-rouge.md", FIXTURE_VERTE, ["--donnee", cheminRetard, "--aujourd-hui", "2026-10-19"]);
+  const r13v = jouer("ec13-verte.md", FIXTURE_VERTE, ["--aujourd-hui", "2026-10-19"]);
+  const r13c = jouer("ec13-corrigee.md", FIXTURE_VERTE, ["--donnee", cheminCorrigee, "--aujourd-hui", "2026-10-19"]);
+  const r13j = jouer("ec13-jour-dit.md", FIXTURE_VERTE, ["--aujourd-hui", "2026-11-16"]);
+  const r13l = jouer("ec13-lendemain.md", FIXTURE_VERTE, ["--aujourd-hui", "2026-11-17"]);
+  if (g13(r13r)?.statut !== "AVERT" || !/2 famille\(s\) dont la revue est en retard au 2026-10-19 : annonce-vide \(prévue le 2026-01-15\), cloture-resumante/.test(g13(r13r)?.message || "")
+    || !/1 famille\(s\) sans revue_prevue lisible : emphase-creuse/.test(g13(r13r)?.message || ""))
+    casse.push(`EC-13 : deux revues dépassées et une date absente ne sont pas nommées : ${JSON.stringify(g13(r13r))}`);
+  if (r13r.statut !== 0 || r13r.j?.verdict === "FAIL")
+    casse.push("EC-13 : l'avertissement fait échouer le texte — la règle est en AVERTISSEMENT (TF-1926), jamais bloquante");
+  if (g13(r13v)?.statut !== "PASS" || !/9 famille\(s\) sur 9, la plus proche le 2026-11-16/.test(g13(r13v)?.message || ""))
+    casse.push(`EC-13 : la donnée réelle, datée sur ses 9 familles, n'est pas en PASS : ${JSON.stringify(g13(r13v))}`);
+  if (g13(r13c)?.statut !== "PASS")
+    casse.push(`EC-13 : le remède (dates futures inscrites dans la donnée) ne fait pas passer la règle : ${JSON.stringify(g13(r13c))}`);
+  if (g13(r13j)?.statut !== "PASS")
+    casse.push(`EC-13 : le jour dit de la revue est compté en retard : ${JSON.stringify(g13(r13j))}`);
+  if (g13(r13l)?.statut !== "AVERT" || r13l.statut !== 0)
+    casse.push(`EC-13 : le lendemain du jour dit n'avertit pas, ou fait échouer : ${JSON.stringify(g13(r13l))}`);
+  if (jouer("ec13-date-invalide.md", FIXTURE_VERTE, ["--aujourd-hui", "hier"]).statut !== 2)
+    casse.push("EC-13 : --aujourd-hui accepte une valeur qui n'est pas une date AAAA-MM-JJ");
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 30 cas, 0 défaut (30/30 PASS — EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : 37 cas, 0 défaut (37/37 PASS — EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 
@@ -1275,7 +1349,7 @@ if (lanceEnDirect) {
   const dossier = valeur("--baseline");
   if (dossier) modeBaseline(dossier, donnee);
 
-  const DRAPEAUX_A_VALEUR = new Set(["--donnee", "--chemin-relatif", "--baseline"]);
+  const DRAPEAUX_A_VALEUR = new Set(["--donnee", "--chemin-relatif", "--baseline", "--aujourd-hui"]);
   const cible = args.find((a, i) => !a.startsWith("--") && !(i > 0 && DRAPEAUX_A_VALEUR.has(args[i - 1])));
   if (!cible) erreur("cible absente — usage : node oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] | --baseline <dossier> | --self-test");
   if (!existsSync(cible)) erreur(`fichier introuvable : ${cible}`);
@@ -1283,7 +1357,9 @@ if (lanceEnDirect) {
   const cheminRelatif = valeur("--chemin-relatif") || relative(RACINE, resolve(cible)).replace(/\\/g, "/");
   let texte;
   try { texte = readFileSync(cible, "utf8"); } catch (e) { erreur(`fichier illisible : ${cible} (${e.message})`); }
-  const r = juger(texte, { donnee, cheminRelatif, cheminJuge: resolve(cible) });
+  const aujourdhui = valeur("--aujourd-hui");
+  if (aujourdhui && !/^\d{4}-\d{2}-\d{2}$/.test(aujourdhui)) erreur("--aujourd-hui attend une date AAAA-MM-JJ");
+  const r = juger(texte, { donnee, cheminRelatif, cheminJuge: resolve(cible), aujourdhui });
   console.log(JSON.stringify({
     oracle: NOM, version: VERSION, cible: String(cible).replace(/\\/g, "/"),
     mots: r.mots, verdict: r.verdict, findings: r.findings, non_juge: r.non_juge,

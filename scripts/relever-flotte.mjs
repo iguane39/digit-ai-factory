@@ -16,6 +16,11 @@
  *     appels d'outils ;
  *   · les réponses servies par un modèle HORS DE LA GÉNÉRATION COURANTE de `references/MODELES-EN-SERVICE.json`,
  *     sessions comprises (le juge externe `oracle-judge` y tournait sur Opus 4.6 le 18/10).
+ *   · la SIMULTANÉITÉ (TF-1928, décision humaine D-48 (a) du 19/10/2026, étude `output/03-etudes/20261019-etude-opportunite-sessions-paralleles-paliers-autonomie.md`) :
+ *     par session principale, le PIC de sous-agents dont les durées de vie se chevauchent (du premier au dernier message du
+ *     sous-agent ; deux durées qui se touchent ne se chevauchent pas), la distribution de ce pic et le nombre de sessions à 5
+ *     ou plus et à 10 ou plus. Un sous-agent en attente compte comme actif : le pic peut être surestimé. L'unité est le
+ *     sous-agent d'une session, pas la session parallèle. Indicateur seul : il n'entre pas dans les critères de la flotte ;
  *   · les RELECTURES D'INTENTION de l'essai du 18/10/2026 (D-23 (a), `references/RELECTURE-INTENTION.md`) : les sous-agents
  *     `verificateur` dont la description commence par « Relecture d'intention », leurs jetons par jour, et si le SEUIL
  *     D'ARRÊT de l'essai (plus de 4 000 000 de jetons de relecture par jour, D-25 du 18/10/2026 ; 1 000 000 à l'ouverture de l'essai) est franchi — il se dit à part des critères.
@@ -30,14 +35,15 @@
  *           [--projet <motif>] [--referentiel <MODELES-EN-SERVICE.json>] [--json] [--journal <f.jsonl> [--etiquette <nom>]]
  * Exit : 0 relevé rendu (PASS ou AVERT : un relevé n'échoue pas, il dit) · 2 option inconnue ou valeur invalide.
  * NON JUGÉ (déclaré) : la justesse de l'agent choisi pour la tâche ; les sous-agents lancés hors de l'outil Agent
- * (une CLI `claude -p` compte comme une SESSION) ; les postes et profils absents de ce poste.
+ * (une CLI `claude -p` compte comme une SESSION) ; les postes et profils absents de ce poste ; les sessions principales
+ * vivantes en parallèle (la simultanéité compte des sous-agents, pas des sessions).
  */
 import { existsSync, readFileSync, readdirSync, statSync, appendFileSync } from "node:fs";
 import { join, dirname, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dossiersParDefaut } from "./relever-contexte-sessions.mjs";
 
-export const VERSION = "1.1.0";
+export const VERSION = "1.2.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const REF_DEFAUT = join(ICI, "..", "references", "MODELES-EN-SERVICE.json");
 export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan", ""]);
@@ -47,6 +53,17 @@ export const SEUILS = { part_nommee_min: 0.9, opus_sans_effort_max: 0, hors_gene
 export const ESSAI_RELECTURE = { debut: "2026-10-18", fin: "2026-11-01", revue: "2026-11-08", seuil_jetons_par_jour: 4000000 };
 /** Une relecture d'intention est un sous-agent `verificateur` dont la description commence par « Relecture d'intention ». */
 export const estRelectureIntention = (type, description) => type === "verificateur" && /^\s*relecture d['’]intention/i.test(String(description || ""));
+/** Limite par défaut de sous-agents simultanés d'une session (`code.claude.com/docs/en/sub-agents`, lue le 2026-10-19) : voir `references/PARALLELISME-CLAUDE-CODE.md`. */
+export const LIMITE_SOUS_AGENTS_SIMULTANES = 20;
+/** Le pic de chevauchement d'intervalles [début, fin] en millisecondes ; à égalité d'instant, une fin précède un début. */
+export function picSimultaneite(intervalles) {
+  const ev = [];
+  for (const [d, f] of intervalles) { ev.push([d, 1]); ev.push([f, -1]); }
+  ev.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  let c = 0, m = 0;
+  for (const [, v] of ev) { c += v; if (c > m) m = c; }
+  return m;
+}
 const jourLocal = (iso) => { const d = new Date(iso); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 
 const lignes = (txt) => txt.split("\n").filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
@@ -91,14 +108,14 @@ function* fichiers(dossier) {
     if (e.isFile() && e.name.endsWith(".jsonl")) yield { fichier: p, sous_agent: false };
     else if (e.isDirectory()) {
       const s = join(p, "subagents");
-      if (existsSync(s)) for (const f of readdirSync(s)) if (f.endsWith(".jsonl")) yield { fichier: join(s, f), sous_agent: true };
+      if (existsSync(s)) for (const f of readdirSync(s)) if (f.endsWith(".jsonl")) yield { fichier: join(s, f), sous_agent: true, session: e.name };
     }
   }
 }
 
 /** Relève la flotte dans des dossiers de projets, depuis un horodatage ISO. */
 export function relever(dossiers, depuisIso, courants) {
-  const appels = [], sous = [], horsGeneration = [];
+  const appels = [], sous = [], horsGeneration = [], parSession = new Map();
   const limiteMs = Date.parse(depuisIso);
   for (const d of dossiers) for (const t of fichiers(d)) {
     let st; try { st = statSync(t.fichier); } catch { continue; }
@@ -107,7 +124,8 @@ export function relever(dossiers, depuisIso, courants) {
     // `message.id` : le contenu se lit sur toutes les lignes ; l'usage, une fois par réponse, sur sa DERNIÈRE ligne —
     // les jetons relus y sont répétés à chaque ligne, et la sortie n'y est complète qu'à la dernière (mesuré le
     // 18/10 : 8, 8 puis 557 jetons de sortie pour une même réponse). Additionner ligne à ligne surestime.
-    const recs = lignes(readFileSync(t.fichier, "utf8")).filter((r) => r.type === "assistant" && r.message && r.timestamp >= depuisIso);
+    const toutes = lignes(readFileSync(t.fichier, "utf8"));
+    const recs = toutes.filter((r) => r.type === "assistant" && r.message && r.timestamp >= depuisIso);
     if (!recs.length) continue;
     const parId = new Map();
     recs.forEach((r, i) => parId.set(r.message.id || `#${i}`, r));
@@ -137,6 +155,13 @@ export function relever(dossiers, depuisIso, courants) {
     }
     for (const r of recs) for (const c of r.message.content || []) if (c?.type === "tool_use") g.outils++;
     g.modele = principal(g.servis); g.effort = principal(g.efforts);
+    // La durée de vie du sous-agent : de son premier à son dernier message horodaté (toutes lignes, prompt compris).
+    const horo = toutes.map((r) => Date.parse(r.timestamp)).filter(Number.isFinite);
+    if (horo.length) {
+      const cle = `${projet}/${t.session}`;
+      if (!parSession.has(cle)) parSession.set(cle, []);
+      parSession.get(cle).push([Math.min(...horo), Math.max(...horo)]);
+    }
     sous.push(g);
   }
   const parClasse = compter(appels.map((a) => a.classe));
@@ -174,6 +199,18 @@ export function relever(dossiers, depuisIso, courants) {
   const parJour = {};
   for (const g of relectures) parJour[g.jour] = (parJour[g.jour] || 0) + g.total;
   const jourMax = Object.entries(parJour).sort((x, y) => y[1] - x[1])[0] || null;
+  // La simultanéité (TF-1928) : le pic par session principale, sa distribution, et la session qui porte le maximum.
+  const pics = [...parSession].map(([cle, iv]) => ({ cle, pic: picSimultaneite(iv), sous_agents: iv.length }));
+  const picMax = pics.reduce((m, p) => (p.pic > (m ? m.pic : 0) ? p : m), null);
+  indicateurs.simultaneite = {
+    sessions_avec_sous_agents: pics.length,
+    pic_max: picMax ? picMax.pic : 0,
+    session_pic_max: picMax ? picMax.cle.split("/").pop().slice(0, 8) : null,
+    sessions_a_5_ou_plus: pics.filter((p) => p.pic >= 5).length,
+    sessions_a_10_ou_plus: pics.filter((p) => p.pic >= 10).length,
+    distribution_des_pics: compter(pics.map((p) => p.pic)),
+    limite_par_defaut: LIMITE_SOUS_AGENTS_SIMULTANES,
+  };
   indicateurs.essai_relecture_intention = {
     ...ESSAI_RELECTURE,
     relectures: relectures.length,
@@ -183,6 +220,13 @@ export function relever(dossiers, depuisIso, courants) {
     seuil_franchi: !!jourMax && jourMax[1] > ESSAI_RELECTURE.seuil_jetons_par_jour,
   };
   return { indicateurs, criteres, verdict, appels, sous_agents: sous };
+}
+
+/** La ligne du relevé sur la simultanéité : le pic maximal et sa session, les sessions à 5 ou plus et à 10 ou plus, la limite par défaut dite. */
+export function ligneSimultaneite(s) {
+  if (!s.sessions_avec_sous_agents) return "  simultanéité : aucune session n'a lancé de sous-agent sur la période";
+  return `  simultanéité de sous-agents : ${s.sessions_avec_sous_agents} session(s) en ont lancé, pic maximal ${s.pic_max} (session ${s.session_pic_max}), `
+    + `${s.sessions_a_5_ou_plus} session(s) à 5 ou plus, ${s.sessions_a_10_ou_plus} à 10 ou plus ; limite par défaut d'une session : ${s.limite_par_defaut} (unité : le sous-agent, pas la session parallèle)`;
 }
 
 /** La ligne du relevé sur l'essai de relecture d'intention : le décompte, le jour le plus chargé, et le seuil d'arrêt dit. */
@@ -218,7 +262,7 @@ export function executer(argv, env = process.env, maintenant = new Date()) {
   const courants = generationCourante(a.referentiel);
   const r = relever(dossiers, depuisIso, courants);
   const rapport = { outil: "relever-flotte", version: VERSION, depuis: depuisIso, dossiers: dossiers.length, verdict: r.verdict, criteres: r.criteres, indicateurs: r.indicateurs,
-    non_juge: ["la justesse de l'agent choisi pour la tâche", "les sous-agents lancés hors de l'outil Agent (une CLI `claude -p` compte comme une session)", "les postes et profils absents de ce poste"] };
+    non_juge: ["la justesse de l'agent choisi pour la tâche", "les sous-agents lancés hors de l'outil Agent (une CLI `claude -p` compte comme une session)", "les postes et profils absents de ce poste", "les sessions principales vivantes en parallèle (la simultanéité compte les sous-agents d'une session, et un sous-agent en attente compte comme actif)"] };
   if (a.journal) appendFileSync(a.journal, JSON.stringify({ ts: maintenant.toISOString(), etiquette: a.etiquette, depuis: depuisIso, verdict: r.verdict, indicateurs: r.indicateurs }) + "\n");
   if (a.json) return { code: 0, sortie: JSON.stringify(rapport, null, 1), rapport };
   const I = r.indicateurs;
@@ -231,6 +275,7 @@ export function executer(argv, env = process.env, maintenant = new Date()) {
     `  jetons des sous-agents : ${k(I.jetons_sortie_sous_agents)} en sortie, ${k(I.jetons_relus_sous_agents)} relus ; médianes : ${k(I.mediane_relus_par_sous_agent)} relus, ${k(I.mediane_contexte_initial)} au premier appel, ${I.mediane_appels_outils ?? "—"} appels d'outils`,
     `  réponses hors génération courante : ${I.reponses_hors_generation}${I.reponses_hors_generation ? " — " + Object.entries(I.hors_generation_par_modele).map(([m, n]) => `${m} ×${n}`).join(", ") : ""}${courants ? "" : " (référentiel illisible : non jugé)"}`,
   ];
+  out.push(ligneSimultaneite(I.simultaneite));
   out.push(ligneEssaiRelecture(I.essai_relecture_intention));
   for (const c of r.criteres) out.push(`  [${c.tenu === null ? "NON JUGÉ" : c.tenu ? "TENU" : "NON TENU"}] ${c.critere}`);
   if (a.journal) out.push(`  journal : une ligne ajoutée à ${a.journal}`);

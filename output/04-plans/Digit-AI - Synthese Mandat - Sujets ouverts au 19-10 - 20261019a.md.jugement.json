@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md",
+ "empreinte": "ff91cb1896ab608535bf0db3ef317fffe486ed078f8934b316808ae7850ca659",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-19T10:12:16.489Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

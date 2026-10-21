@@ -105,6 +105,7 @@ const ROLES = {
   "input/00-retours/old": "Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réécrit pas. Classés par émetteur, un sous-dossier chacun (`node scripts\\ranger-dossiers.mjs`, 16/10/2026).",
   // TF-1055 : le sas est IGNORÉ par git, donc son README aussi — son protocole vit dans un texte
   // versionné, et c'est lui que l'index nomme (un clone frais n'a pas le dossier).
+  "input/Tiktok": "Page de favoris TikTok enregistrée par l'humain depuis son compte, IGNORÉE par git : elle porte des adresses signées de sa session. Le tri qui en est tiré est suivi dans `output\\03-etudes`.",
   "input/00-retours/_arrivee": "Sas d'arrivée des lots, IGNORÉ par git (absent d'un clone frais) : le producteur y dépose son lot tel qu'il est, nom réel compris ; `node todo\\accueillir-lot.mjs` le pseudonymise et le dépose ici. Protocole versionné : `references\\TODO-FORGE.md`, § « Le sas d'arrivée ».",
   "input/01-candidatures": "Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`, et leurs formes `.normalise.tf.jsonl` produites par `normaliser-lot.mjs`. À la racine : à ingérer ; ingérées ou traitées par un autre canal → `old\\`.",
   "input/01-candidatures/old": "Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. Classées par mois, `sans-date\\` pour les noms sans date (`node scripts\\ranger-dossiers.mjs`).",

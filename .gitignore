@@ -25,6 +25,11 @@
 # La fenetre ne se reduit pas : elle disparait.
 input/00-retours/_arrivee/
 
+# 19/10/2026 — page de favoris TikTok enregistree par l humain depuis son compte : elle porte
+# des adresses signees de sa session et son activite personnelle. Le pilot est PUBLIC ; seul
+# le tri qui en est tire (output\03-etudes\20261019-tri-opportunites-favoris-tiktok.md) est suivi.
+input/Tiktok/
+
 # TF-0980 — journal des substitutions faites au commit : etat MACHINE, propre a ce poste.
 .claude/anonymisation-au-commit.jsonl
 

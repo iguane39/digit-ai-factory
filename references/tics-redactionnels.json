@@ -1,7 +1,8 @@
 {
   "format": "pilot/tics-redactionnels@1",
-  "version": "1.2.0",
-  "date": "2026-09-16",
+  "version": "1.3.0",
+  "date": "2026-10-19",
+  "evolution_1_3_0": "Revue datée des listes (TF-1926, décision humaine D-48 (a) du 19/10/2026, étude output/03-etudes/20261019-etude-opportunite-style-ecriture.md, option O3). Chaque famille porte derniere_lecture (le jour où sa liste a été écrite ou relue contre ses sources : le plus récent `depuis` de ses motifs, sauf relecture ultérieure dite) et revue_prevue (le jour où elle doit être relue). Une revue_prevue dépassée ou absente fait avertir EC-13 de oracles/oracle-ecriture.mjs, sans jamais faire échouer un texte : une date que rien ne lit n'existe pas (loi n° 1). Relire une liste, c'est la confronter de nouveau à ses sources, puis écrire ici derniere_lecture et une nouvelle revue_prevue. Première revue faite le 2026-10-19, sur la seule famille ponctuation-de-cadence : le tiret d'incise reste compté, car E-8 repose sur la lisibilité (une phrase qui rebondit) et non sur la détection ; les 8 autres familles ne sont pas relues ce jour-là.",
   "evolution_1_2_0": "Deux apports du 16/09/2026, écrits par deux sessions du pilot le même jour : (1) la famille `annonce-nominalisee` et ses positions bloquantes, jouées par EC-8 — retour humain « arrête d'utiliser le terme \"Ce que\" », TF-1137 ; (2) la clé `chiffres_en_lettres`, jouée par EC-9 — retour humain « utilise des chiffres plutôt que l'écriture en toutes lettres », E-14. S'y ajoute (3) la clé `blocs_de_code`, jouée par EC-10 — retour humain « les développeurs IA ne sont pas des codeurs », E-15 et TF-1138. Le numéro a porté 1.1.0 pour deux contenus différents pendant une heure, le temps que les deux sessions se coordonnent : c'est la fenêtre décrite par references/TODO-FORGE.md pour le registre, transposée à une donnée.",
   "source": "Mandat humain du 12/09/2026 (décisions D-1 (a), D-3 (a) de la synthèse 20260911j) sur l'analyse L99 output/03-etudes/2026-09/20260911-L99-regles-d-ecriture-factory.md. Familles dérivées de deux catalogues de signes (Wikipédia FR « Aide:Identifier l'usage d'une IA générative », Wikipédia EN « Wikipedia:Signs of AI writing », lus le 11/09/2026), des règles de terrain RULE-A..I d'agent-style (2026) et de guides francophones de détection 2026 ; seuils CALIBRÉS sur le corpus du pilot le 12/09/2026 (voir « calibrage »).",
   "pourquoi_une_donnee_et_pas_du_code": "Loi transverse n° 4 — une donnée volatile est une donnée, pas du code. Les tournures qui trahissent une écriture générée changent avec chaque génération de modèle (Wikipédia EN mesure la chute de « delve » en 2025) : une liste en dur dans l'oracle obligerait à publier une version de l'oracle pour ajouter ou retirer un mot. Chaque entrée est datée et sourcée ; chaque famille porte un seuil de densité explicite, recalibrable sans toucher au code.",
@@ -17,6 +18,8 @@
   "familles": [
     {
       "cle": "annonce-vide",
+      "derniere_lecture": "2026-09-12",
+      "revue_prevue": "2026-11-16",
       "libelle": "Annonce ou méta-commentaire qui dit qu'on va dire au lieu de dire",
       "ce_que_le_lecteur_paie": "une phrase lue pour rien avant l'information ; en série, l'impression d'un texte qui se regarde écrire",
       "remede": "supprimer l'annonce et commencer par le fait ; un chapitre ouvre par ce que le lecteur apprend (M7, L7)",
@@ -57,6 +60,8 @@
     },
     {
       "cle": "cloture-resumante",
+      "derniere_lecture": "2026-09-12",
+      "revue_prevue": "2026-11-16",
       "libelle": "Clôture qui résume ce que le bloc vient de dire",
       "ce_que_le_lecteur_paie": "relire ce qu'il vient de lire ; le signal le plus constant des textes générés selon les deux catalogues Wikipédia",
       "remede": "supprimer la phrase de synthèse en fin de bloc ; la synthèse vit une fois, en ouverture (bloc 0, M7)",
@@ -79,6 +84,8 @@
     },
     {
       "cle": "emphase-creuse",
+      "derniere_lecture": "2026-09-12",
+      "revue_prevue": "2026-11-16",
       "libelle": "Adjectif ou image qui amplifie sans fait",
       "ce_que_le_lecteur_paie": "un ton promotionnel qui ne dit rien ; Wikipédia FR : « ton promotionnel », « emphase excessive » ; Wikipédia EN : « undue emphasis on significance », « promotional language »",
       "remede": "remplacer par le fait (un chiffre, un nom, une date, une conséquence) ou supprimer",
@@ -107,6 +114,8 @@
     },
     {
       "cle": "parallelisme-mecanique",
+      "derniere_lecture": "2026-09-12",
+      "revue_prevue": "2026-11-16",
       "libelle": "Symétrie de construction par réflexe : négation-affirmation, balancement",
       "ce_que_le_lecteur_paie": "une phrase qui semble réfuter une objection que personne n'a faite ; Wikipédia EN : « negative parallelisms », « rule of three » ; agent-style RULE-07 (forme affirmative)",
       "remede": "dire la chose affirmativement ; garder la symétrie quand les idées sont réellement coordonnées (RULE-09)",
@@ -129,6 +138,8 @@
     },
     {
       "cle": "attribution-vague",
+      "derniere_lecture": "2026-09-12",
+      "revue_prevue": "2026-11-16",
       "libelle": "Autorité floue à la place d'une source",
       "ce_que_le_lecteur_paie": "une affirmation qu'il ne peut pas vérifier ; Wikipédia EN : « weasel wording » ; LC2 du pilot : un chiffre sans source ne vaut rien",
       "remede": "nommer la source (fichier, ligne, URL, personne, date) ou marquer « à vérifier »",
@@ -151,6 +162,8 @@
     },
     {
       "cle": "formule-de-conversation",
+      "derniere_lecture": "2026-09-12",
+      "revue_prevue": "2026-11-16",
       "libelle": "Reste de dialogue d'assistant dans un texte destiné à un lecteur",
       "ce_que_le_lecteur_paie": "un texte qui s'adresse à un interlocuteur absent ; Wikipédia EN : « collaborative communication », « knowledge-cutoff disclaimers »",
       "remede": "supprimer ; un livrable ne converse pas, il informe",
@@ -173,6 +186,8 @@
     },
     {
       "cle": "transition-de-remplissage",
+      "derniere_lecture": "2026-09-12",
+      "revue_prevue": "2026-11-16",
       "libelle": "Connecteur d'addition en tête de phrase, par réflexe",
       "ce_que_le_lecteur_paie": "une transition qui n'articule rien ; agent-style RULE-D ; Wikipédia EN : « Additionally » en tête de la liste du vocabulaire IA",
       "remede": "supprimer le connecteur ou articuler réellement (cause, opposition, conséquence)",
@@ -197,6 +212,9 @@
     },
     {
       "cle": "ponctuation-de-cadence",
+      "derniere_lecture": "2026-10-19",
+      "revue_prevue": "2026-11-16",
+      "revue_du_2026_10_19": "le tiret d'incise reste compté : E-8 repose sur la lisibilité (une phrase qui rebondit), non sur la détection d'un texte généré (étude 20261019, option O3, TF-1926)",
       "libelle": "Tiret d'incise employé à la place de la virgule, du point ou des deux-points, en cascade",
       "ce_que_le_lecteur_paie": "une phrase qui rebondit au lieu de finir ; le tiret d'incise est légitime en français, sa CASCADE (plusieurs par phrase, à chaque phrase) est une cadence mécanique — Wikipédia EN « overuse of em dashes », impeccable em-dash-overuse (advisory)",
       "remede": "un tiret d'incise par phrase au plus ; sinon une virgule, un point, ou deux phrases",
@@ -214,6 +232,8 @@
     },
     {
       "cle": "annonce-nominalisee",
+      "derniere_lecture": "2026-09-16",
+      "revue_prevue": "2026-11-16",
       "libelle": "Annonce NOMINALISÉE : « Ce que ce document tient », « Ce qu'il ne porte pas »",
       "ce_que_le_lecteur_paie": "un titre qui PROMET un contenu au lieu de le nommer : le lecteur doit ouvrir le chapitre pour savoir de quoi il parle, et une table des matières faite de ces titres ne se survole pas",
       "remede": "nommer le contenu — « Ce que le guide couvre » devient « Périmètre du guide », « Ce qu'il ne tient pas » devient « Hors périmètre » ; en en-tête de colonne, le nom de la grandeur mesurée",
