@@ -51,6 +51,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261019-etude-opportunite-video-lancement-generee-par-code.md` | fichier | 19,9 Ko | Étude d'opportunité — une vidéo de lancement générée par le code, livrée avec la mise en p |
 | `20261019-tri-opportunites-favoris-tiktok.md` | fichier | 25,7 Ko | Tri des favoris TikTok — opportunités pour la Factory — 20261019a |
 | `20261020-etude-opportunite-conseil-avant-arbitrage.md` | fichier | 15,7 Ko | Étude d'opportunité — un conseil de cinq agents séparés avant un arbitrage humain — 202610 |
-| `20261021-L99-agent-nocturne-skill-vs-code.md` | fichier | 27,2 Ko | Analyse L99 — agent nocturne : lancement par un skill et liste de modifications |
+| `20261021-L99-agent-nocturne-skill-vs-code.md` | fichier | 27,3 Ko | Analyse L99 — agent nocturne : lancement par un skill et liste de modifications |
+| `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,8 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 
-_34 fichier(s), 2 sous-dossier(s)_ · 8 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_35 fichier(s), 2 sous-dossier(s)_ · 8 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
