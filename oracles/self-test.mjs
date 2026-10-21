@@ -236,6 +236,58 @@ check("TF-1903 rouge — settings au lanceur relatif au répertoire courant : R-
   if (!rapport.findings.some((x) => x.regle === "R-43" && x.statut === "PASS")) throw new Error("verte ancrée : R-43 non PASS");
 });
 
+// TF-1915 (21/10/2026) — R-35 bis : une cadence promise a un porteur qui survit à la session. Rouge : la forme de
+// l'incident — une page « mise à jour chaque semaine », son script « Relevé hebdomadaire » qui l'écrit, et un
+// workflow planifié qui lance AUTRE CHOSE (deux existaient, aucun ne lançait le relevé) : AVERTISSEMENT qui nomme la
+// page et le script, jamais un FAIL. Vert, par chacun des deux gestes que le message prescrit : un workflow
+// `on: schedule` qui appelle le script ; une déclaration `porteur-cadence:` pour une planification hors dépôt.
+const projetCadence = ({ planifieLeScript = false, declare = false } = {}) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-1915-"));
+  for (const s of ["site", "scripts", ".github/workflows"]) mkdirSync(join(d, s), { recursive: true });
+  writeFileSync(join(d, "site", "agenda.html"), "<!doctype html><html lang=\"fr\"><body><h1>Agenda</h1><p>La liste est mise à jour chaque semaine.</p></body></html>\n", "utf8");
+  writeFileSync(join(d, "scripts", "releve-agenda.mjs"), "// Relevé hebdomadaire des évènements, écrit dans site/agenda.html.\n"
+    + (declare ? "// porteur-cadence: tâche planifiée Windows « Relevé agenda » du serveur de l'exploitant, chaque lundi 5 h\n" : "")
+    + "import { writeFileSync } from 'node:fs';\nwriteFileSync('site/agenda.html', '<p>…</p>');\n", "utf8");
+  writeFileSync(join(d, ".github", "workflows", "mesure.yml"), "name: Mesure\non:\n  schedule:\n    - cron: '0 4 * * *'\njobs:\n  m:\n    runs-on: ubuntu-latest\n    steps:\n      - run: python scripts/mesure.py\n", "utf8");
+  if (planifieLeScript) writeFileSync(join(d, ".github", "workflows", "agenda.yml"), "name: Relevé de l'agenda\non:\n  schedule:\n    - cron: '30 3 * * 1'\n  workflow_dispatch:\njobs:\n  r:\n    runs-on: ubuntu-latest\n    steps:\n      - run: node scripts/releve-agenda.mjs\n", "utf8");
+  return d;
+};
+const r35bis = (d) => (lance(d).rapport.findings || []).filter((x) => x.regle === "R-35 bis");
+check("TF-1915 rouge — page « mise à jour chaque semaine » et script hebdomadaire sans workflow planifié qui le lance : R-35 bis AVERTISSEMENT, jamais FAIL", () => {
+  const d = projetCadence();
+  try {
+    const f = r35bis(d);
+    if (f.some((x) => x.statut === "FAIL")) throw new Error(`R-35 bis en échec au lieu d'un avertissement : ${JSON.stringify(f)}`);
+    const av = f.find((x) => /^AVERTISSEMENT/.test(x.message));
+    if (!av || !/site\/agenda\.html:1/.test(av.message) || !/scripts\/releve-agenda\.mjs:1/.test(av.message) || !/on: schedule/.test(av.message)) throw new Error(`avertissement absent ou incomplet : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1915 vert — le remède joué : un workflow `on: schedule` qui appelle le script tient la page et le script", () => {
+  const d = projetCadence({ planifieLeScript: true });
+  try {
+    const f = r35bis(d);
+    if (f.length !== 1 || f[0].statut !== "PASS" || /AVERTISSEMENT/.test(f[0].message) || !/2 cadence\(s\) promise\(s\), toutes portées/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1915 vert — l'autre remède : une planification hors dépôt DÉCLARÉE (`porteur-cadence:`) dans le script", () => {
+  const d = projetCadence({ declare: true });
+  try {
+    const f = r35bis(d);
+    if (f.length !== 1 || f[0].statut !== "PASS" || /AVERTISSEMENT/.test(f[0].message) || !/1 déclaration/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-1915 sans objet — la verte ne promet aucune cadence : R-35 bis SANS_OBJET, et « ouvert tous les jours » n'est pas une promesse", () => {
+  const f = r35bis(verte);
+  if (f.length !== 1 || f[0].statut !== "SANS_OBJET") throw new Error(JSON.stringify(f));
+  const d = mkdtempSync(join(tmpdir(), "conf-1915-horaires-"));
+  try {
+    mkdirSync(join(d, "site"), { recursive: true });
+    writeFileSync(join(d, "site", "infos.html"), "<p>Ouvert tous les jours de 9 h à 17 h (relevé le 21/09/2026).</p>\n", "utf8");
+    const g = r35bis(d);
+    if (g.length !== 1 || g[0].statut !== "SANS_OBJET") throw new Error(`horaires ou relevé daté pris pour une promesse : ${JSON.stringify(g)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui nomme le motif asynchrone", () => {
   const f = join(verte, ".claude", "settings.json");
   const avant = readFileSync(f, "utf8");

@@ -596,6 +596,12 @@ Deux corollaires opposables :
 2. **Invariant I1** — un oracle sans recette à double sens est un **échec** de l'agrégateur,
    jamais un silence. Sans cela, ajouter un oracle non testé serait la façon la plus simple de
    faire baisser le compte d'échecs.
+3. **R-35 bis — un traitement PROMIS à une cadence désigne son porteur** (TF-1915, 21/10/2026). Chez
+   un produit, une page qui promet « relevée chaque semaine » sans planificateur qui lance le relevé
+   est un contrôle sans appelant servi à des visiteurs : un seul relevé en 32 jours le 18/10. Le
+   porteur survit à la session (workflow `on: schedule`, tâche planifiée, CI planifiée) et appelle
+   le script, ou se déclare `porteur-cadence: <où>` s'il vit hors du dépôt. Juge : R-35 bis
+   d'`oracles\oracle-conformite-projet.mjs`, en avertissement (`ETAPE-MEP.md`, § 3 quinquies).
 
 ## P. La restitution se conçoit pour ses lecteurs (règle 36 — 15/08, TF-0235)
 

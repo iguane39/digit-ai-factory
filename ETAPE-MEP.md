@@ -394,6 +394,16 @@ déclarées hors jugement, pas jugées vertes.
 **Contrôle exécutable** (chez forge-ops) :
 `node <ops>\oracles\oracle-ops.mjs <racine-du-produit> --planifie` — verdict O-8.
 
+**La moitié inverse : une cadence PROMISE a un porteur (R-35 bis, TF-1915, 21/10/2026).** Une page d'agenda
+servait « La liste est relevée chaque semaine » et son script se disait « Relevé hebdomadaire » ; deux workflows
+planifiés existaient, aucun ne lançait ce script : un seul relevé en 32 jours. M-7 juge une planification qui
+existe ; rien ne jugeait une promesse sans planification. Toute cadence promise par un texte servi ou un
+commentaire de script (« chaque semaine », « mis à jour quotidiennement », « every week »…) se confronte à un
+porteur qui survit à la session et qui appelle le script concerné : workflow `on: schedule`, pipeline planifié,
+crontab, minuterie, tâche planifiée Windows, ou, hors dépôt, une déclaration `porteur-cadence: <où elle vit>`.
+**Contrôle exécutable** : la règle R-35 bis d'`oracles\oracle-conformite-projet.mjs`, en AVERTISSEMENT
+(vocabulaire et limites : `oracles\lib-cadence-promise.mjs`).
+
 ### § 3 septies — Un geste destructif et un inventaire se jugent contre le réel (O-13, O-14)
 
 **Le fait, mesuré le 14/09/2026 chez un produit.** Un correctif réussi sur un environnement a été

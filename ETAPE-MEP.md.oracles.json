@@ -1,7 +1,7 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\ETAPE-MEP.md",
-  "date_iso": "2026-10-17T08:58:44.343Z",
-  "registre_version": "2.43.0",
+  "date_iso": "2026-10-21T06:43:54.914Z",
+  "registre_version": "2.45.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "FAIL",
@@ -28,7 +28,7 @@
       "domaine": "Lisibilité d'un document (Markdown)",
       "file": "ETAPE-MEP.md",
       "verdict": "FAIL",
-      "detail": "1 constat(s) · M18 identifiant muet : « RA-77 » employé sans son sens (ligne 673) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
+      "detail": "1 constat(s) · M18 identifiant muet : « RA-77 » employé sans son sens (ligne 683) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
     },
     {
       "domaine": "Format / livraison / versioning",
@@ -77,9 +77,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "ETAPE-MEP.md",
-    "ts": "2026-10-17T08:58:44.342Z",
+    "ts": "2026-10-21T06:43:54.913Z",
     "fichiers": {
-      "ETAPE-MEP.md": "78fa6f32f4e22bff176baab5fc22bd8a96343a42b7a7eb65689dc471d5b66cbb"
+      "ETAPE-MEP.md": "865fd951450a6ec6b7d3d101f5494b5db35bc371eb38b1e5208d9ddf6737a6a1"
     }
   },
   "empreinte_motif": null,

@@ -35,6 +35,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { COMMANDE_RELATIVE_FACTORY } from "./lib-ouverture-async.mjs";
+import { cadencesSansPorteur } from "./lib-cadence-promise.mjs";
 import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs } from "../scripts/relever-heritage.mjs";
 // TF-0923 volet (a) : les rôles qui portent une page homonyme et la date d'entrée de la doctrine
 // sont DÉCLARÉS chez le générateur qui les applique, et LUS ici. Une copie se périmerait au
@@ -2663,6 +2664,28 @@ else {
   }
 }
 
+// ---- R-35 bis · TF-1915 (21/10/2026) — UNE CADENCE PROMISE A UN PORTEUR QUI SURVIT À LA SESSION ----------------
+//
+// LE FAIT : une page d'agenda servait « La liste est relevée chaque semaine », son script se disait « Relevé
+// hebdomadaire » ; deux workflows planifiés existaient, aucun ne lançait ce script. Un seul relevé en 32 jours.
+// C'est R-35 appliqué à un traitement promis : un traitement sans appelant planifié est une décoration. La règle
+// et ses limites vivent dans `oracles/lib-cadence-promise.mjs`. AVERTISSEMENT non bloquant (précédent D-70 (b)) :
+// mesuré le 21/10/2026 sur les 15 produits du poste, 2 signalés (13 %), les deux à l'état d'avant le workflow
+// planifié qui tient aujourd'hui la promesse ; 4 lignes sur 5 signalées y sont la promesse de l'incident.
+{
+  const c = cadencesSansPorteur(cible);
+  const cite = (x) => `${x.fichier}:${x.ligne} « ${x.extrait.slice(0, 90)} »`;
+  if (!c.promesses.length) so("R-35 bis", "aucune cadence promise (« chaque semaine », « mis à jour quotidiennement »…) dans un texte servi ni un commentaire de script");
+  else if (!c.sansPorteur.length) ok("R-35 bis", "-", `${c.promesses.length} cadence(s) promise(s), toutes portées : ${c.porteurs.length} porteur(s) planifié(s) (${[...new Set(c.porteurs.map((x) => x.nature))].join(", ") || "aucun"}), ${c.declarations.length} déclaration(s) \`porteur-cadence:\``);
+  else {
+    const montres = c.sansPorteur.slice(0, 12);
+    ok("R-35 bis", c.sansPorteur[0].fichier, `AVERTISSEMENT, non bloquant : ${c.sansPorteur.length} cadence(s) promise(s) sans porteur qui survive à la session` +
+      `${c.sansPorteur.length > montres.length ? ` (${montres.length} citées sur ${c.sansPorteur.length})` : ""} : ${montres.map(cite).join(" · ")} — ` +
+      `${c.porteurs.length} porteur(s) planifié(s) au dépôt, aucun ne lance le script concerné. Geste : un workflow \`on: schedule\` (ou une tâche planifiée) ` +
+      "qui appelle ce script, ou, si la planification vit hors du dépôt, la déclarer dans le script ou la page : `porteur-cadence: <où elle vit>` (TF-1915)");
+  }
+}
+
 // ---- R-60 (TF-1678, 14/10/2026) — LA CASCADE ISTO D'UN PRODUIT TIENT SA CHAÎNE, AVANT TOUTE CLÔTURE --
 //
 // LE FAIT, mesuré chez Produit-12 le 02/10/2026 : 99 exigences, 8 besoins, 0 stratégie et 0 tactique
@@ -2768,6 +2791,7 @@ const nonJuge = [
   "R-35 (TF-0923 volet b) : l'exemption d'existant (TF-0266) n'est REFUSÉE que lorsqu'elle est INVOQUÉE au ledger par son identifiant `TF-0266` alors que la mesure la contredit. Une exemption racontée en d'autres mots, ou dans la prose d'une synthèse hors ledger, n'est pas vue — le vocabulaire est étroit et fermé par choix : l'élargir à « antérieur » ou « existant » accuserait toute entrée qui décrit honnêtement un fichier ancien. Ce que le contrôle ne fait PAS non plus : il ne juge aucun constat un par un comme « couvert » ou « non couvert » par l'exemption — il dit si elle est ouverte, et la déclaration nommée reste la responsabilité du run (jamais un total anonyme)",
   "R-14 profils d'authentification et R-28 (TF-1284) : le profil se reconnaît à une liste NOMMÉE de noms de fichiers (azureProfile.json, msal_token_cache*, az.sess, .databrickscfg, accessTokens.json, credentials.json, application_default_credentials.json) — l'outil d'un autre éditeur, sous un autre nom, passera ; l'historique n'est pas fouillé, seul l'index courant est lu. R-28 ne voit que les noms d'artefact de shell (lettre seule, null, NUL, con, prn, aux, ~) : la liste FERMÉE des entrées attendues à la racine n'est pas jouée, parce que sur 13 dépôts de produits mesurés le 12/10/2026 elle accuserait des dizaines d'entrées légitimes (code, données, manifestes)",
   "R-60 (TF-1678) : la moitié STRUCTURELLE du test rétro est jugée, par oracle-cascade-isto rejoué sur la source avec le référentiel d'exigences ; la VÉRITÉ de l'intention et la pertinence d'un rattachement restent humaines (I2 exige la trace de la ratification, jamais sa justesse). La vue CASCADE.md n'est pas confrontée à sa source ici : son générateur le fait (`--verifier`). La date d'entrée se lit au PREMIER run_open du ledger : un produit sans run_open daté est tenu pour antérieur, et c'est un faux négatif déclaré",
+  "R-35 bis (TF-1915) : une promesse de cadence se reconnaît à un VOCABULAIRE fermé — un mot de cadence (chaque semaine, quotidien, every week, daily…) à moins de 60 caractères d'un participe de mise à jour non daté (mis à jour, relevé, actualisé, updated…) — dans les textes servis et les seuls COMMENTAIRES des scripts ; une promesse dite autrement n'est pas vue, une description du monde dite ainsi est signalée. Le rapprochement est TEXTUEL : un script est porté si un porteur planifié le nomme ; une page l'est si l'un de ses producteurs (scripts qui nomment son fichier) l'est, ou, sans producteur repérable, dès qu'un porteur existe. Une planification hors dépôt (serveur, interface d'une CI) n'est vue que DÉCLARÉE (`porteur-cadence:`) ; que le porteur tourne vraiment, et à la cadence promise, n'est pas jugé (M-7 de l'étape MEP)",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
@@ -2779,7 +2803,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, R-42, « R-42 bis », R-43, R-47, R-60)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, « R-35 bis », R-42, « R-42 bis », R-43, R-47, R-60)" });
     }
   }
 }
