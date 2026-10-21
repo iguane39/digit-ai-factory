@@ -13,10 +13,15 @@
  *
  * CE QUE FAIT L'OUTIL (alerte seulement, jamais blocage) :
  *   --preparer fin-de-tour [--transcript <jsonl>] [--type <type>[,<type>…]]
- *        lit la transcription (par défaut la plus récente du projet courant sous ~\.claude*\projects\), extrait mot pour mot
+ *        lit la transcription (par défaut celle de la session qui joue la commande, CLAUDE_CODE_SESSION_ID, sinon la plus
+ *        récente du projet courant sous ~\.claude*\projects\ ; une transcription dont le répertoire de travail n'est pas le
+ *        dépôt relu est REFUSÉE, exit 2 — TF-1941), extrait mot pour mot
  *        les messages humains (ni résultats d'outils, ni retours de hooks, ni messages système), relève les fichiers écrits
  *        ou modifiés par Write, Edit ou NotebookEdit depuis le dernier message humain, ET les fichiers du dépôt modifiés
- *        depuis ce message (git : contenu ou diff, bornés, la borne dite) ET les écritures que les transcriptions des
+ *        depuis ce message (git : contenu ou diff, bornés, la borne dite) ET les commits faits depuis ce message ET, pour
+ *        chaque worktree du dépôt que les commandes du tour visent, ses fichiers modifiés et ses commits (depuis le message,
+ *        et `origin/main..HEAD`) ET les écritures faites par commande, lues dans le texte des commandes (TF-1941) ET les
+ *        écritures que les transcriptions des
  *        sous-agents de la session ont faites depuis ce message ; écrit demande.txt et livrables.md dans un dossier
  *        temporaire et imprime la consigne complète à passer à l'agent `verificateur` ;
  *   --preparer consigne --fichier <consigne.md> [--fichier <liste-des-sujets.md> …] [--type <type>[,<type>…]]
@@ -46,7 +51,11 @@
  * NON JUGÉ (déclaré) : la justesse d'un verdict de relecteur ; la nature (hors_demande / choix_humain) qu'il donne à un écart ;
  * les commandes à effet, listées mais pas lues ; MultiEdit (outil absent de la flotte d'outils de ce poste) ; le diff d'un fichier
  * déjà modifié AVANT le dernier message humain et retouché depuis (il porte aussi l'ancienne modification) ; ce qu'un sous-agent
- * a fait par une commande plutôt que par Write, Edit ou NotebookEdit (git le relève dans le dépôt, pas ailleurs). Les fichiers
+ * a fait par une commande plutôt que par Write, Edit ou NotebookEdit (git le relève dans le dépôt, pas ailleurs) ; ce qu'écrit un
+ * programme lancé par une commande (`node x.mjs`) hors du dépôt relu et de ses worktrees touchés (le texte de la commande ne le dit pas) ;
+ * un worktree que les commandes visent par un chemin relatif ou une variable ; la cible d'une écriture par commande dont le chemin relatif
+ * dépend d'un `cd` antérieur (lue depuis la racine du dépôt, et dite telle) ; le contenu des commits de `origin/main..HEAD` antérieurs
+ * au message (listés, non cités). Les fichiers
  * `.env` ne transitent jamais : leur chemin est cité, jamais leur contenu.
  */
 import { existsSync, readFileSync, readdirSync, statSync, realpathSync, mkdtempSync, mkdirSync, writeFileSync, appendFileSync } from "node:fs";
@@ -374,12 +383,169 @@ export function ecrituresSousAgents(transcript, depuisTs) {
   return { ok: true, dossier, agents, ecritures, commandes, absent: false };
 }
 
+// ---------- TF-1941 (21/10/2026, retour Produit-02 RT-140) : la session relue, les worktrees, les commits, les écritures par commande ----------
+//
+// LE FAIT, 19/10/2026 : lancé depuis le pilot, `--preparer fin-de-tour` a lu la transcription la plus récente du PILOT au lieu de celle
+// du produit relu, et le relecteur a rendu « dérive » sur un travail étranger. Relancé avec --transcript, le livrable ne portait que les
+// 2 fichiers écrits par Write : ni le code modifié par script dans un worktree, ni les 3 commits envoyés ; « dépôt : 2 fichier(s) modifié(s) »
+// mesurait le dépôt principal. CE QUI CHANGE : (a) sans --transcript, la transcription de la SESSION qui joue la commande
+// (CLAUDE_CODE_SESSION_ID) passe avant la plus récente du projet ; (b) une transcription dont le répertoire de travail n'est pas le dépôt
+// relu est REFUSÉE, et le refus le dit ; (c) les commits faits depuis le dernier message humain sont listés, et chaque worktree du dépôt
+// que les commandes du tour ont touché est relevé (ses fichiers modifiés depuis le message, ses commits depuis le message et ceux de
+// `origin/main..HEAD`) ; (d) les écritures faites par commande (redirection, heredoc, tee, sed -i, Set-Content, Out-File, cp, mv) sont
+// relevées dans le texte des commandes, et ce que cette lecture ne voit pas est DÉCLARÉ au livrable.
+
+/** La transcription `<id>.jsonl` de la session qui joue la commande (CLAUDE_CODE_SESSION_ID), cherchée sous les profils ; null sinon. */
+export function transcriptionDeSession(env = process.env, maison = homedir()) {
+  const id = env.CLAUDE_CODE_SESSION_ID;
+  if (!id || !/^[\w-]+$/.test(id)) return null;
+  for (const d of dossiersParDefaut(env, maison)) { const f = join(d, `${id}.jsonl`); if (existsSync(f)) return f; }
+  return null;
+}
+
+/** Le répertoire de travail d'une transcription : celui de son dernier message humain, sinon le plus fréquent ; null si elle n'en dit aucun. */
+export function repertoireDeTranscription(records) {
+  for (let i = records.length - 1; i >= 0; i--) if (texteHumain(records[i]) !== null && typeof records[i].cwd === "string" && records[i].cwd) return records[i].cwd;
+  const n = new Map();
+  for (const r of records) if (typeof r?.cwd === "string" && r.cwd) n.set(r.cwd, (n.get(r.cwd) || 0) + 1);
+  return n.size ? [...n.entries()].sort((a, b) => b[1] - a[1])[0][0] : null;
+}
+
+/** Deux dossiers désignent-ils le même dépôt ? Même dépôt git (worktrees compris), ou, hors git, le même dossier ou l'un dans l'autre. */
+export function memeDepot(a, b) {
+  const commun = (d) => { if (!existsSync(d)) return null; const r = git(d, ["rev-parse", "--path-format=absolute", "--git-common-dir"]); return r.ok && r.out.trim() ? norm(r.out.trim()) : null; };
+  const ca = commun(a), cb = commun(b);
+  if (ca && cb) return ca === cb;
+  const na = norm(a), nb = norm(b);
+  return na === nb || na.startsWith(nb + "/") || nb.startsWith(na + "/");
+}
+
+/** Un chemin tel qu'une commande l'écrit, rendu comparable : `/c/…` → `c:/…`, barres obliques, minuscules. */
+const normCommande = (s) => String(s).replace(/\\/g, "/").replace(/(^|[\s"'=(])\/([a-zA-Z])\//g, (_, a, l) => `${a}${l}:/`).toLowerCase();
+
+/** Les worktrees du dépôt `dossier` (hors le sien) dont le chemin paraît dans une commande du tour ou sous un fichier écrit. */
+export function worktreesTouches(dossier, commandes, fichiersEcrits = []) {
+  const l = git(dossier, ["worktree", "list", "--porcelain"]);
+  if (!l.ok) return [];
+  const top = git(dossier, ["rev-parse", "--show-toplevel"]);
+  const moi = top.ok ? norm(top.out.trim()) : null;
+  // Les chemins absolus écrits dans les commandes, résolus comme les worktrees (un nom court 8.3 de Windows devient son nom long).
+  const resolus = commandes.flatMap((c) => [...String(c).matchAll(/(?:[A-Za-z]:|(?<![\w.~-])\/[a-zA-Z](?=\/))[\\/][^\s"'`;&|<>()]*/g)]
+    .map((m) => norm(m[0].replace(/^\/([a-zA-Z])\//, (_, l) => `${l}:/`))));
+  const textes = [...commandes.map(normCommande), ...resolus, ...fichiersEcrits.map((f) => norm(f)), ...fichiersEcrits.map(normCommande)];
+  const sortie = [];
+  for (const bloc of l.out.split(/\r?\n\r?\n/)) {
+    const m = /^worktree (.+)$/m.exec(bloc); if (!m) continue;
+    const p = m[1].trim(), np = norm(p);
+    if (np === moi) continue;
+    // Le chemin long (résolu) ET le chemin tel que git l'a gardé : une commande peut écrire l'un ou l'autre (nom court 8.3 de Windows).
+    const formes = [np, normCommande(p).replace(/\/+$/, "")];
+    if (textes.some((t) => formes.some((f) => t.includes(f)))) sortie.push({ chemin: p, branche: (/^branch refs\/heads\/(.+)$/m.exec(bloc) || [])[1] || "(tête détachée)" });
+  }
+  return sortie;
+}
+
+/** La référence amont d'un worktree : origin/main, origin/master ou origin/HEAD, sinon la branche du worktree principal. */
+export function baseAmont(dossier) {
+  for (const r of ["origin/main", "origin/master", "origin/HEAD"]) if (git(dossier, ["rev-parse", "--verify", "--quiet", r]).ok) return r;
+  const l = git(dossier, ["worktree", "list", "--porcelain"]);
+  const b = l.ok ? (/^branch refs\/heads\/(.+)$/m.exec(l.out.split(/\r?\n\r?\n/)[0] || "") || [])[1] : null;
+  return b || null;
+}
+
+/** Les commits d'un dépôt ou d'un worktree : faits depuis `depuisTs` (`--since`), ou d'une plage (`base..HEAD`). */
+export function commitsDe(dossier, { depuisTs = null, plage = null } = {}) {
+  const args = ["log", "--no-color", "--format=%h%x09%cI%x09%s", ...(depuisTs ? [`--since=${depuisTs}`, "HEAD"] : [plage])];
+  const r = git(dossier, args);
+  return r.ok ? r.out.split(/\r?\n/).filter(Boolean).map((x) => { const [sha, date, ...s] = x.split("\t"); return { sha, date, sujet: s.join("\t") }; }) : [];
+}
+
+/**
+ * Les écritures que les commandes du tour font sur des fichiers, lues dans leur TEXTE : redirection (`>`, `>>`, `cat > f <<'EOF'`),
+ * `tee`, `sed -i`, `Set-Content`, `Add-Content`, `Out-File`, la destination d'un `cp` ou d'un `mv`. Pur. Rend [{ cible, commande }].
+ * NE VOIT PAS : un programme lancé par la commande qui écrit lui-même (`node x.mjs`, `python y.py`, `git apply`) — déclaré au livrable.
+ */
+export function ecrituresParCommande(commandes) {
+  const sortie = [];
+  let dossier = null;
+  const ajouter = (cible, commande) => {
+    const c = String(cible || "").replace(/^["']|["']$/g, "");
+    if (!c || /^&\d?$|^\/dev\/null$|^\$null$|^nul$/i.test(c) || /^\$/.test(c)) return;
+    if (!sortie.some((x) => x.cible === c && x.dossier === dossier)) sortie.push({ cible: c, dossier, commande: court(commande, 160) });
+  };
+  for (const brute of commandes) {
+    dossier = null;   // un `cd` vaut pour la suite de SA commande ; d'une commande à l'autre, il n'est pas suivi (dit au livrable)
+    // Le corps d'un heredoc est du contenu, pas des commandes : seule sa première ligne (« cat > f <<'EOF' ») se lit.
+    const cmd = String(brute).replace(/<<-?\s*(["']?)(\w+)\1([^\n]*)\n[\s\S]*?\n\s*\2\s*(?=\n|$)/g, "<<$2$3");
+    for (const simple of cmd.split(/&&|\|\||[;\n]/)) {
+      const s = simple.trim(); if (!s) continue;
+      const cd = /^(?:cd|Set-Location|pushd)\s+("[^"]+"|'[^']+'|\S+)\s*$/i.exec(s);
+      if (cd) { dossier = cd[1].replace(/^["']|["']$/g, ""); continue; }
+      // Une chaîne entre guillemets (`node -e "x > 2"`) n'est pas une redirection : elle est masquée à longueur égale, sauf quand elle
+      // EST la cible (`> "f.txt"`) ; la cible se relit ensuite dans la commande d'origine, aux mêmes positions.
+      const masquee = s.replace(/(?<!>\s*)(["'])(?:\\.|(?!\1)[^\\])*\1/g, (x) => "\u0001".repeat(x.length));
+      for (const m of masquee.matchAll(/(?<![<>=\-\d])\d?>>?\s*("[^"]+"|'[^']+'|[^\s;&|)<\u0001]+)/g))
+        ajouter(s.slice(m.index + m[0].length - m[1].length, m.index + m[0].length), s);
+      const jetons = (s.match(/"[^"]*"|'[^']*'|\S+/g) || []);
+      const verbe = jetons.findIndex((j) => /^(?:tee|cp|mv|Copy-Item|Move-Item|Set-Content|Add-Content|Out-File)$/i.test(j));
+      if (verbe >= 0) {
+        const args = jetons.slice(verbe + 1).filter((j) => !/^-/.test(j));
+        const v = jetons[verbe].toLowerCase();
+        const nomme = /set-content|add-content|out-file/.test(v) ? (jetons[jetons.findIndex((j) => /^-(?:Path|FilePath|LiteralPath)$/i.test(j)) + 1] || null) : null;
+        if (nomme) ajouter(nomme, s);
+        else if (/^(?:tee|set-content|add-content|out-file)$/.test(v)) { if (args[0]) ajouter(args[0], s); }
+        else if (args.length >= 2) ajouter(args[args.length - 1], s);
+      }
+      const sed = /\bsed\s+(?:-[a-zA-Z]*i[a-zA-Z]*|--in-place)\b/.test(s) ? jetons[jetons.length - 1] : null;
+      if (sed) ajouter(sed, s);
+    }
+  }
+  return sortie;
+}
+
+/** Le chemin sur le disque d'une cible de commande : `/c/…` rendu `C:/…`, un chemin relatif lu depuis `base`. */
+const cheminDeCible = (cible, base) => { const c = String(cible).replace(/^\/([a-zA-Z])\//, (_, l) => `${l.toUpperCase()}:/`); return /^(?:[A-Za-z]:[\\/]|\/|\\\\)/.test(c) ? resolve(c) : resolve(base, c); };
+
+/** La section de livrables.md sur les écritures par commande. `dejaCites` : chemins normalisés déjà cités plus haut. */
+export function fabriquerEcrituresCommande(ecritures, base, dejaCites) {
+  const out = ["## Écritures faites par commande (Bash, PowerShell), relevées dans le texte des commandes du tour", ""];
+  out.push("Lecture du TEXTE des commandes : redirections et heredocs, `tee`, `sed -i`, `Set-Content`, `Add-Content`, `Out-File`, destination d'un `cp` ou d'un `mv`. "
+    + "NON VU par cette lecture : ce qu'écrit un programme lancé par une commande (`node x.mjs`, `python y.py`, `git apply`…) — git le relève dans le dépôt relu et dans les worktrees touchés (sections ci-dessus), pas ailleurs. "
+    + `Un chemin relatif est lu depuis le dossier d'un \`cd\` de la même commande, sinon depuis ${base} : un \`cd\` fait par une commande antérieure n'est pas suivi.`, "");
+  if (!ecritures.length) return [...out, "Aucune écriture par commande relevée dans ce tour.", ""].join("\n");
+  let reste = BORNES.depot;
+  for (const e of ecritures.slice(0, BORNES.depotFichiers)) {
+    const p = cheminDeCible(e.cible, e.dossier ? cheminDeCible(e.dossier, base) : base);
+    const ent = `- ${e.cible} — par : \`${e.commande.replace(/`/g, "'")}\``;
+    if (dejaCites.has(norm(p))) { out.push(`${ent} — contenu cité plus haut`); continue; }
+    if (ESTENV(p)) { out.push(`${ent} — [contenu NON cité : un fichier \`.env\` ne transite jamais]`); continue; }
+    if (!existsSync(p)) { out.push(`${ent} — [absent du disque à la préparation : fichier temporaire supprimé, déplacé, ou chemin relatif à un autre dossier]`); continue; }
+    if (reste <= 0) { out.push(`${ent} — [contenu omis : borne ${BORNES.depot} caractères atteinte]`); continue; }
+    const c = coupe(citerFichier(p), Math.min(BORNES.depotFichier, reste), "contenu d'un fichier écrit par commande");
+    reste -= c.length; dejaCites.add(norm(p));
+    out.push(ent, "", "```", c, "```", "");
+  }
+  if (ecritures.length > BORNES.depotFichiers) out.push(`[BORNE : ${ecritures.length - BORNES.depotFichiers} écriture(s) par commande non listée(s) (borne ${BORNES.depotFichiers})]`);
+  out.push("");
+  return out.join("\n");
+}
+
+/** La section de livrables.md sur les commits du dépôt relu et sur un worktree touché. */
+export function fabriquerCommits(titre, commits, quoi) {
+  const out = [titre, ""];
+  if (!commits.length) return [...out, `Aucun commit ${quoi}.`, ""].join("\n");
+  out.push(`${commits.length} commit(s) ${quoi}${commits.length > 40 ? " (40 cités)" : ""} :`, "");
+  for (const c of commits.slice(0, 40)) out.push(`- ${c.sha} ${c.date} — ${court(c.sujet, 200)}`);
+  out.push("");
+  return out.join("\n");
+}
+
 /**
  * La section de livrables.md sur le dépôt. `dejaCites` : chemins (normalisés) dont le contenu figure plus haut.
  * Rend { texte, cites } : `cites` = les chemins (normalisés) dont le contenu ou le diff est cité dans cette section.
  */
-export function fabriquerDepot(depot, dejaCites, relus = new Map()) {
-  const out = ["## Fichiers du dépôt modifiés depuis le dernier message humain (relevé par git, pas par la transcription)", ""];
+export function fabriquerDepot(depot, dejaCites, relus = new Map(), titre = "## Fichiers du dépôt modifiés depuis le dernier message humain (relevé par git, pas par la transcription)") {
+  const out = [titre, ""];
   const cites = new Set();
   if (!depot.ok) return { texte: [...out, `[dépôt non relevé : ${depot.raison}]`, ""].join("\n"), cites };
   out.push(`Dépôt ${depot.racine}, comparé au dernier commit antérieur au message (${depot.base}), message du ${depot.depuis}. Un fichier est retenu s'il a changé par rapport à ce commit ET s'il a été modifié sur le disque après le message.`);
@@ -896,9 +1062,19 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     if (a.fichiers.length < 2) return usage("--preparer coherence attend au moins deux --fichier <livrable> (les livrables d'une même campagne)");
     for (const f of a.fichiers) if (!existsSync(resolve(cwd, f))) return usage(`livrable absent du disque : ${resolve(cwd, f)}`);
   }
-  const transcript = a.transcript ? resolve(cwd, a.transcript) : transcriptionRecente(projetDir, env, maison);
+  // TF-1941 (a) : la session qui joue la commande d'abord ; la plus récente du projet n'est qu'un repli.
+  const deSession = a.transcript ? null : transcriptionDeSession(env, maison);
+  const transcript = a.transcript ? resolve(cwd, a.transcript) : (deSession || transcriptionRecente(projetDir, env, maison));
+  const origine = a.transcript ? "désignée par --transcript" : deSession ? "celle de la session qui joue la commande (CLAUDE_CODE_SESSION_ID)" : "la plus récente du projet (aucune session identifiée)";
   if (!transcript) return usage(`aucune transcription trouvée pour le projet « ${projetDir} » sous les profils .claude* ; --transcript <jsonl> la désigne`);
   let records; try { records = lignesJson(readFileSync(transcript, "utf8")); } catch (e) { return usage(`transcription illisible : ${e.message}`); }
+  // TF-1941 (b) : une transcription dont le répertoire de travail n'est pas le dépôt relu est REFUSÉE, et le refus le dit.
+  const cwdTranscription = repertoireDeTranscription(records);
+  if (cwdTranscription && !memeDepot(cwdTranscription, resolve(projetDir)))
+    return usage(`la transcription lue (${transcript}, ${origine}) a pour répertoire de travail ${cwdTranscription}, qui n'est pas le dépôt relu (${resolve(projetDir)}) : `
+      + `elle porte la demande et le travail d'une AUTRE session, rien n'est préparé (TF-1941 : le 19/10/2026, un verdict « dérive » a été rendu sur le travail d'une autre session). `
+      + `Lance la commande depuis ${cwdTranscription}, ou désigne par --transcript la transcription d'une session ouverte dans ${resolve(projetDir)}.`);
+  const avisCwd = cwdTranscription ? `répertoire de la transcription : ${cwdTranscription}, même dépôt que ${resolve(projetDir)}` : "la transcription ne dit pas son répertoire de travail : sa correspondance au dépôt relu n'est pas vérifiée";
   const humains = messagesHumains(records);
   const decisions = decisionsPosees(records, humains);
   const dossier = a.sortie ? resolve(cwd, a.sortie) : mkdtempSync(join(tmpdir(), "relecture-intention-"));
@@ -913,8 +1089,30 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     const relus = relusALaReception(lireRegistre(a.registre));
     const cites = new Set(travail.fichiers.map(norm));
     const sectionDepot = fabriquerDepot(depot, cites, relus);
-    livrables = fabriquerLivrablesFin(travail, { depot: sectionDepot.texte, sousAgents: fabriquerSousAgents(sa, new Set([...cites, ...sectionDepot.cites]), relus) }, relus);
-    resume = `${travail.fichiers.length} fichier(s) écrit(s), ${travail.commandes.length} commande(s) depuis le dernier message humain ; dépôt : ${depot.ok ? `${depot.fichiers.length} fichier(s) modifié(s)` : "non relevé"} ; sous-agents : ${sa.absent ? "aucun" : `${sa.ecritures.length} écriture(s) de ${sa.agents} sous-agent(s)`} ; ${relus.size} livrable(s) relu(s) à leur réception et inchangé(s), cité(s) par leur seul chemin`;
+    for (const c of sectionDepot.cites) cites.add(c);
+    // TF-1941 (c) : les commits du dépôt relu depuis le message, puis chaque worktree touché par les commandes du tour.
+    const parties = [sectionDepot.texte];
+    const commitsDepot = depot.ok && dernier?.ts ? commitsDe(depot.racine, { depuisTs: dernier.ts }) : [];
+    if (depot.ok) parties.push(fabriquerCommits(`## Commits du dépôt relu faits depuis le dernier message humain (${depot.racine})`, commitsDepot, "depuis ce message"));
+    const wts = depot.ok ? worktreesTouches(depot.racine, travail.commandes, travail.fichiers) : [];
+    let fichiersWt = 0, commitsWt = 0;
+    if (depot.ok) parties.push(wts.length ? `## Worktrees du dépôt touchés par les commandes du tour : ${wts.length}\n` : "## Worktrees du dépôt touchés par les commandes du tour : aucun\n\nAucune commande ni aucun fichier écrit du tour ne vise un worktree de ce dépôt (`git worktree list`).\n");
+    for (const w of wts) {
+      const dw = fichiersDepot(w.chemin, dernier?.ts);
+      const sw = fabriquerDepot(dw, cites, relus, `### Worktree ${w.chemin} (branche ${w.branche}) — fichiers modifiés depuis le dernier message humain (git)`);
+      for (const c of sw.cites) cites.add(c);
+      const depuis = dernier?.ts ? commitsDe(w.chemin, { depuisTs: dernier.ts }) : [];
+      const base = baseAmont(w.chemin);
+      const plage = base ? commitsDe(w.chemin, { plage: `${base}..HEAD` }) : [];
+      fichiersWt += dw.ok ? dw.fichiers.length : 0; commitsWt += depuis.length;
+      parties.push(sw.texte, fabriquerCommits(`#### Commits du worktree faits depuis le dernier message humain`, depuis, "depuis ce message"),
+        base ? fabriquerCommits(`#### Commits du worktree absents de ${base} (\`${base}..HEAD\`)`, plage, `dans ${base}..HEAD`) : "#### Commits absents de l'amont\n\nAucune référence amont (origin/main, origin/master, origin/HEAD ni branche du worktree principal) : plage non relevée.\n");
+    }
+    // TF-1941 (d) : les écritures faites par commande, lues dans le texte des commandes ; ce qui ne s'y lit pas est déclaré.
+    const parCommande = ecrituresParCommande(travail.commandes);
+    const sectionCommandes = fabriquerEcrituresCommande(parCommande, depot.ok ? depot.racine : resolve(projetDir), cites);
+    livrables = fabriquerLivrablesFin(travail, { depot: [...parties, sectionCommandes].join("\n"), sousAgents: fabriquerSousAgents(sa, cites, relus) }, relus);
+    resume = `${travail.fichiers.length} fichier(s) écrit(s), ${travail.commandes.length} commande(s) depuis le dernier message humain ; dépôt : ${depot.ok ? `${depot.fichiers.length} fichier(s) modifié(s), ${commitsDepot.length} commit(s) depuis le message` : "non relevé"} ; worktrees touchés : ${wts.length}${wts.length ? ` (${fichiersWt} fichier(s) modifié(s), ${commitsWt} commit(s) depuis le message)` : ""} ; écritures par commande : ${parCommande.length} relevée(s) (ce qu'écrit un programme lancé n'est pas lu, git le relève) ; sous-agents : ${sa.absent ? "aucun" : `${sa.ecritures.length} écriture(s) de ${sa.agents} sous-agent(s)`} ; ${relus.size} livrable(s) relu(s) à leur réception et inchangé(s), cité(s) par leur seul chemin`;
   } else if (a.preparer === "reception") {
     livrables = fabriquerLivrablesReception(resolve(cwd, a.fichiers[0]), forme.texte);
     resume = `le livrable ${a.fichiers[0]} (${forme.texte})`;
@@ -932,7 +1130,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   const nbRegles = regles ? reglesDesTypes(regles.ref, types).length : 0;
   const sortie = [
     `relecture-intention ${VERSION} — point « ${a.preparer} » : ${humains.length} message(s) humain(s) cité(s) mot pour mot, ${decisions.length} décision(s) posée(s) retrouvée(s), ${resume}${regles ? `, ${nbRegles} règle(s) applicable(s) au type ${types.join("+")} (référentiel ${regles.ref.version})` : ", aucune règle applicable ajoutée (pas de --type)"}`,
-    `transcription lue : ${transcript}`,
+    `transcription lue : ${transcript} (${origine}) ; ${avisCwd}`,
     `écrit : ${fDemande} · ${fLivrables}`,
     "",
     `--- CONSIGNE À PASSER À L'AGENT verificateur (description de l'appel : « Relecture d'intention ${a.preparer} » — c'est elle que compte scripts\\relever-flotte.mjs) ---`,

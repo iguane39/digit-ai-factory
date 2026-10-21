@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { executer, STRICTE, FORME_JSON, FORME_JSON_V1, CONSIGNE_V2, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, MAX_PASSES, TYPES, texteHumain, lireVerdict, etatChaine, releverRegistre, numerosDeDecision, problemesReferentiel, verifierSources, reglesDesTypes, relusALaReception, sectionsDeConclusion, jugerForme } from "./relecture-intention.mjs";
+import { executer, STRICTE, FORME_JSON, FORME_JSON_V1, CONSIGNE_V2, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, MAX_PASSES, TYPES, texteHumain, lireVerdict, etatChaine, releverRegistre, numerosDeDecision, problemesReferentiel, verifierSources, reglesDesTypes, relusALaReception, sectionsDeConclusion, jugerForme, ecrituresParCommande } from "./relecture-intention.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
@@ -695,6 +695,79 @@ try {
     egal(executer(["--preparer", "consigne", "--fichier", g, "--fichier", s, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX).code, 0, "exit");
     const l = readFileSync(join(d, "livrables.md"), "utf8");
     if (!/2 pièces lues ensemble/.test(l) || !l.includes("<SUJET>") || !l.includes("vidéo de lancement")) throw new Error(l.slice(0, 400));
+  });
+  // ==== TF-1941 (21/10/2026, retour Produit-02 RT-140) : la session relue, les worktrees, les commits, les écritures par commande ====
+  // ROUGE, le fait du 19/10 rejoué : un tour qui modifie un .js par heredoc DANS UN WORKTREE puis commite. Le livrable d'avant n'en portait
+  // rien — les fichiers écrits par Write (aucun), le dépôt principal (inchangé) et la commande coupée à 300 caractères, avant le code.
+  const { d: REPO3, g: g3 } = mkRepo("depot-worktree");
+  ecrireA(join(REPO3, "src", "app.js"), "export const x = 1;\n", date("08:00"));
+  g3(["add", "-A"]); g3(["commit", "-q", "-m", "base"], "2026-10-18T09:00:00Z");
+  const WT = join(T, "wt-1941");
+  g3(["worktree", "add", "-q", "-b", "travail", WT]);
+  const MARQUE = "MODIFIE-PAR-HEREDOC-DANS-LE-WORKTREE";
+  const CORPS = `// ${"commentaire long ".repeat(25)}\nexport const x = 2; // ${MARQUE}\n`;
+  const CMD_WT = `cd ${WT.replace(/\\/g, "/")} && cat > src/app.js <<'EOF'\n${CORPS}EOF\ngit add -A && git commit -m "app : x vaut 2"`;
+  writeFileSync(join(WT, "src", "app.js"), CORPS);
+  const gWt = (args, quand) => spawnSync("git", ["-C", WT, ...args], { encoding: "utf8", env: { ...process.env, ...(quand ? { GIT_AUTHOR_DATE: quand, GIT_COMMITTER_DATE: quand } : {}) } });
+  gWt(["add", "-A"]); gWt(["commit", "-q", "-m", "app : x vaut 2"], "2026-10-18T10:20:00Z");
+  const TR3 = join(T, "session-worktree.jsonl");
+  writeFileSync(TR3, [humain("Corrige x dans le worktree et commite.", { timestamp: T0, cwd: REPO3 }), assistant([outil("Bash", { command: CMD_WT })]), assistant([texte("Fait : x vaut 2, commité.")])].join("\n") + "\n");
+  const finWt = executer(["--preparer", "fin-de-tour", "--transcript", TR3, "--sortie", join(T, "sortie-wt")], {}, new Date(), { cwd: REPO3, maison: MAISON });
+  const livWt = existsSync(join(T, "sortie-wt", "livrables.md")) ? readFileSync(join(T, "sortie-wt", "livrables.md"), "utf8") : "";
+  const entre = (t, a, b) => { const i = t.indexOf(a); if (i < 0) return ""; const j = b ? t.indexOf(b, i + a.length) : -1; return t.slice(i, j < 0 ? undefined : j); };
+  check("rouge — TF-1941 : le .js modifié par heredoc dans un worktree puis commité n'est ni dans le dépôt principal, ni dans la commande citée (coupée) : le livrable d'avant n'en portait rien", () => {
+    egal(finWt.code, 0, "exit");
+    const avant = entre(livWt, "## Commandes lancées pendant le tour", "## Fichiers du dépôt modifiés") + entre(livWt, "## Fichiers du dépôt modifiés", "## Commits du dépôt relu");
+    if (!avant) throw new Error("sections d'avant introuvables : " + livWt.slice(0, 300));
+    if (avant.includes(MARQUE)) throw new Error("la fixture ne reproduit plus le fait : le code est déjà visible dans les sections d'avant");
+  });
+  check("vert — TF-1941 : le worktree touché est relevé (fichier modifié et son contenu, commit depuis le message, plage amont), le résumé le compte", () => {
+    const sw = entre(livWt, "### Worktree ", "## Écritures faites par commande");
+    if (!sw.includes(MARQUE) || !/src\/app\.js — modifié/.test(sw)) throw new Error("le .js du worktree n'est pas cité : " + sw.slice(0, 500));
+    if (!/#### Commits du worktree faits depuis le dernier message humain[\s\S]*app : x vaut 2/.test(sw)) throw new Error("le commit du tour n'est pas listé : " + sw.slice(0, 800));
+    if (!/#### Commits du worktree absents de \S+ \(`\S+\.\.HEAD`\)[\s\S]*app : x vaut 2/.test(sw)) throw new Error("la plage amont..HEAD n'est pas listée : " + sw.slice(0, 900));
+    if (!/worktrees touchés : 1 \(1 fichier\(s\) modifié\(s\), 1 commit\(s\) depuis le message\)/.test(finWt.sortie)) throw new Error(finWt.sortie.slice(0, 600));
+  });
+  check("vert — TF-1941 : l'écriture par heredoc est relevée dans le texte de la commande (cd suivi), son contenu déjà cité n'est pas recopié, et ce que la lecture ne voit pas est DÉCLARÉ", () => {
+    const sc = entre(livWt, "## Écritures faites par commande", "## Écritures faites par les sous-agents");
+    if (!/- src\/app\.js — par : .*contenu cité plus haut/.test(sc)) throw new Error("l'écriture par heredoc n'est pas relevée : " + sc.slice(0, 600));
+    if (!/NON VU par cette lecture : ce qu'écrit un programme lancé par une commande/.test(sc)) throw new Error("la limite n'est pas déclarée");
+    egal(livWt.split(MARQUE).length - 1, 1, "occurrences du code (une seule citation)");
+  });
+  check("vert — TF-1941 : un tour sans worktree ni commit le DIT, et ne cite rien de plus ; les écritures par commande se lisent (redirection, tee, sed -i, Out-File, cp) sans prendre une chaîne pour une redirection", () => {
+    if (!/## Worktrees du dépôt touchés par les commandes du tour : aucun/.test(livDepot)) throw new Error("absence de worktree non dite");
+    if (!/## Commits du dépôt relu faits depuis le dernier message humain[\s\S]*1 commit\(s\) depuis ce message[\s\S]*— c$/m.test(livDepot)) throw new Error("le commit « c » du tour du dépôt n'est pas listé : " + entre(livDepot, "## Commits du dépôt relu", "## Worktrees").slice(0, 400));
+    const e = ecrituresParCommande(["echo a > sortie.txt", "node -e \"if (x > 2) console.log(1)\" 2>&1", "cat note.md | tee -a journal.md", "sed -i 's/a/b/' conf.ini", "Get-Date | Out-File -FilePath C:/tmp/h.txt", "cp a.txt /c/dev/b.txt", "cd sous && echo b >> c.txt", "git log > /dev/null"]);
+    egal(e.map((x) => x.cible).join(","), "sortie.txt,journal.md,conf.ini,C:/tmp/h.txt,/c/dev/b.txt,c.txt", "cibles");
+    egal(e.find((x) => x.cible === "c.txt").dossier, "sous", "cd suivi dans la commande");
+  });
+  check("vert — TF-1941 (a) : sans --transcript, la transcription de la SESSION qui joue la commande passe avant la plus récente du projet", () => {
+    const profil2 = join(T, "profil-session"), dP = join(profil2, "projects", slug);
+    mkdirSync(dP, { recursive: true });
+    const ecr = (f, mot, quand) => { writeFileSync(f, humain(mot, { cwd: PROJET }) + "\n"); utimesSync(f, quand, quand); };
+    ecr(join(dP, "ma-session.jsonl"), "MA-DEMANDE-DE-CETTE-SESSION", new Date("2026-10-17T10:00:00Z"));
+    ecr(join(dP, "autre-session.jsonl"), "DEMANDE-D-UNE-AUTRE-SESSION", new Date("2026-10-18T10:00:00Z"));
+    const d = join(T, "sortie-session");
+    const r = executer(["--preparer", "fin-de-tour", "--sortie", d], { CLAUDE_CONFIG_DIR: profil2, CLAUDE_CODE_SESSION_ID: "ma-session" }, new Date(), CTX);
+    egal(r.code, 0, "exit");
+    const dm = readFileSync(join(d, "demande.txt"), "utf8");
+    if (!dm.includes("MA-DEMANDE-DE-CETTE-SESSION") || dm.includes("DEMANDE-D-UNE-AUTRE-SESSION")) throw new Error("la transcription la plus récente du projet est lue à la place de celle de la session : " + dm.slice(0, 300));
+    if (!/session qui joue la commande \(CLAUDE_CODE_SESSION_ID\)/.test(r.sortie)) throw new Error("l'origine de la transcription n'est pas dite : " + r.sortie.slice(0, 400));
+  });
+  check("rouge — TF-1941 (b) : lancée depuis le pilot par la session d'un produit, la commande REFUSE (2) la transcription dont le répertoire n'est pas le dépôt relu, et le dit ; rien n'est écrit", () => {
+    const profil3 = join(T, "profil-produit"), PRODUIT = join(T, "produit-relu"), dQ = join(profil3, "projects", PRODUIT.replace(/[^A-Za-z0-9]/g, "-"));
+    mkdirSync(dQ, { recursive: true }); mkdirSync(PRODUIT, { recursive: true });
+    writeFileSync(join(dQ, "sess-produit.jsonl"), humain("DEMANDE-DU-PRODUIT", { cwd: PRODUIT }) + "\n");
+    const d = join(T, "sortie-refus-cwd");
+    const r = executer(["--preparer", "fin-de-tour", "--sortie", d], { CLAUDE_CONFIG_DIR: profil3, CLAUDE_CODE_SESSION_ID: "sess-produit" }, new Date(), CTX);
+    egal(r.code, 2, "exit");
+    if (!/n'est pas le dépôt relu/.test(r.sortie) || !r.sortie.includes(PRODUIT) || !/Lance la commande depuis/.test(r.sortie)) throw new Error(r.sortie);
+    egal(existsSync(d), false, "dossier de sortie créé par un refus");
+    const r2 = executer(["--preparer", "fin-de-tour", "--transcript", join(dQ, "sess-produit.jsonl"), "--sortie", d], {}, new Date(), CTX);
+    egal(r2.code, 2, "--transcript d'une autre session");
+    const r3 = executer(["--preparer", "fin-de-tour", "--transcript", join(dQ, "sess-produit.jsonl"), "--sortie", join(T, "sortie-cwd-ok")], {}, new Date(), { cwd: PRODUIT, maison: MAISON });
+    egal(r3.code, 0, "la MÊME transcription lue depuis son dépôt");
+    if (!/même dépôt que/.test(r3.sortie)) throw new Error("la correspondance n'est pas dite : " + r3.sortie.slice(0, 300));
   });
   check("borne — le registre du pilot n'a pas été touché par la recette", () => {
     const pilote = join(RACINE, "todo", "relectures-intention.jsonl");
