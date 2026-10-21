@@ -340,6 +340,27 @@ export function partiesDeLaFiche(texte) {
   });
 }
 
+// TF-1908 (lot Produit-79 20261018b, RP-21) — LES TITRES D'UN DOCUMENT HTML SONT SES <h1> À <h6>.
+// Le second temps de G6 ne lisait que les titres Markdown : un rapport HTML portant ses 16 <h2> se
+// voyait déclarer « 16 parties absentes ». Les entités courantes sont décodées avant de normaliser,
+// sans quoi « &eacute; » deviendrait « eacute » et la partie « Évaluation » ne retrouverait pas son titre.
+const ENTITES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", eacute: "é", egrave: "è",
+  ecirc: "ê", euml: "ë", agrave: "à", acirc: "â", ccedil: "ç", ocirc: "ô", icirc: "î", iuml: "ï",
+  ugrave: "ù", ucirc: "û", Eacute: "É", Egrave: "È", Agrave: "À", Ccedil: "Ç", rsquo: "’", lsquo: "‘",
+  laquo: "«", raquo: "»", hellip: "…", ndash: "–", mdash: "—", oelig: "œ" };
+const decoderEntites = (s) => s
+  .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+  .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+  .replace(/&([a-z]+);/gi, (m, n) => (n in ENTITES ? ENTITES[n] : m));
+
+/** Les titres d'un document, normalisés : lignes `#` du Markdown ET balises <h1> à <h6> du HTML. */
+export function titresDuDocument(doc) {
+  const md = [...doc.matchAll(/^\s{0,3}#{1,6}\s+(.+?)\s*$/gm)].map((m) => NORMALISER(m[1]));
+  const html = [...doc.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1\s*>/gi)]
+    .map((m) => NORMALISER(decoderEntites(m[2].replace(/<[^>]*>/g, " "))));
+  return [...md, ...html].filter(Boolean);
+}
+
 /**
  * G6 sur UNE fiche de conception, et — si un document est fourni — sur le fait qu'il la TIENT.
  * Rend un tableau de findings `{ regle, statut, ou, message }`.
@@ -443,7 +464,7 @@ export function jugerFiche(cheminFiche, cheminDocument = null) {
       f.push({ regle: "G6", statut: "FAIL", ou: nomDoc, message: `document illisible ou absent : ${cheminDocument}` });
       return f;
     }
-    const titres = [...doc.matchAll(/^\s{0,3}#{1,6}\s+(.+?)\s*$/gm)].map((m) => NORMALISER(m[1]));
+    const titres = titresDuDocument(doc);
     const absentes = parties.filter((p) => p.titre && !champVide(p.titre))
       .filter((p) => !titres.some((t) => t.includes(NORMALISER(p.titre)) || NORMALISER(p.titre).includes(t)));
     f.push(absentes.length
@@ -1251,6 +1272,21 @@ if (args[0] === "--self-test") {
   if (!aFail(verdict6(poserFiche("f-doc2.md"), docAmpute), /NE TIENT PAS sa fiche/))
     casse.push("G6 : un document qui a PERDU une partie conçue passe — la fiche devient un rite, " +
       "et une conception qu'on n'exécute pas coûte sans rien rendre");
+  // TF-1908 — LE MÊME CONTRÔLE SUR UN DOCUMENT HTML. Rouge d'avant : un rapport HTML qui porte ses deux
+  // parties en <h2> était déclaré « ne tient pas sa fiche ». VERT : <h2> à attributs, titre à balises
+  // internes et à entités (&eacute;), <h3> admis ; ROUGE conservé : l'HTML amputé d'une partie échoue
+  // encore, et un texte qui n'est PAS dans un titre (un paragraphe) ne tient pas la partie.
+  const docHtml = join(dir, "doc-tenu.html");
+  writeFileSync(docHtml, "<!doctype html><html><body><h1>Rapport</h1>\n<h2 id=\"p1\" class=\"t\">Ce qui a &eacute;t&eacute; <em>mesur&eacute;</em></h2>\n<p>Texte.</p>\n<h3>Comment\n  relire un chiffre</h3>\n<p>Texte.</p></body></html>", "utf8");
+  const docHtmlAmpute = join(dir, "doc-ampute.html");
+  writeFileSync(docHtmlAmpute, "<!doctype html><html><body><h1>Rapport</h1><h2>Ce qui a été mesuré</h2><p>Comment relire un chiffre</p></body></html>", "utf8");
+  if (verdict6(poserFiche("f-html.md"), docHtml).some((x) => x.statut === "FAIL"))
+    casse.push("G6 : un document HTML qui PORTE ses deux parties en <h2>/<h3> est déclaré ne pas tenir sa fiche — " +
+      "TF-1908, 16 parties déclarées absentes d'un rapport qui portait ses 16 <h2> : " +
+      JSON.stringify(verdict6(poserFiche("f-html.md"), docHtml).filter((x) => x.statut === "FAIL").map((x) => x.message.slice(0, 120))));
+  if (!aFail(verdict6(poserFiche("f-html2.md"), docHtmlAmpute), /NE TIENT PAS sa fiche.*Comment relire un chiffre/))
+    casse.push("G6 : un document HTML qui a PERDU une partie (présente seulement en paragraphe) passe — la lecture " +
+      "des balises de titre ne doit pas devenir une lecture du texte entier");
 
   // --- G11, LES DEUX SENS, sur un catalogue fabriqué : la seule forme qui prouve qu'une règle
   // juge ce qu'elle prétend juger et non le reste de la ligne (doctrine du banc rouge/vert).
