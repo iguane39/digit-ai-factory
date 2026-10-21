@@ -51,7 +51,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261019-etude-opportunite-video-lancement-generee-par-code.md` | fichier | 19,9 Ko | Étude d'opportunité — une vidéo de lancement générée par le code, livrée avec la mise en p |
 | `20261019-tri-opportunites-favoris-tiktok.md` | fichier | 25,7 Ko | Tri des favoris TikTok — opportunités pour la Factory — 20261019a |
 | `20261020-etude-opportunite-conseil-avant-arbitrage.md` | fichier | 15,7 Ko | Étude d'opportunité — un conseil de cinq agents séparés avant un arbitrage humain — 202610 |
+| `20261020-L99-oeil-critique-amelioration-continue-automatisee.md` | fichier | 25,9 Ko | Analyse L99 — œil critique automatisé et enclenchement garanti des process |
+| `20261021-L99-agent-nocturne-oeil-critique.md` | fichier | 27,4 Ko | Analyse L99 — agent nocturne de l'œil critique |
 | `20261021-L99-agent-nocturne-skill-vs-code.md` | fichier | 27,3 Ko | Analyse L99 — agent nocturne : lancement par un skill et liste de modifications |
+| `Digit-AI - Diagnostic Factory - Oeil critique - 20261020b.md` | fichier | 23,9 Ko | Diagnostic de la Factory — œil critique (20/10/2026) |
+| `Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` | fichier | 31,8 Ko | Diagnostic de la Factory — œil critique, proposition révisée (20/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 
-_35 fichier(s), 2 sous-dossier(s)_ · 8 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_39 fichier(s), 2 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

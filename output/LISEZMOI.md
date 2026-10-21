@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 492 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 496 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -228,7 +228,11 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261019-etude-opportunite-video-lancement-generee-par-code.md | — | 19.9 Ko | `03-etudes/20261019-etude-opportunite-video-lancement-generee-par-code.md` |
 | 20261019-tri-opportunites-favoris-tiktok.md | — | 25.7 Ko | `03-etudes/20261019-tri-opportunites-favoris-tiktok.md` |
 | 20261020-etude-opportunite-conseil-avant-arbitrage.md | — | 15.7 Ko | `03-etudes/20261020-etude-opportunite-conseil-avant-arbitrage.md` |
+| 20261020-L99-oeil-critique-amelioration-continue-automatisee.md | — | 25.9 Ko | `03-etudes/20261020-L99-oeil-critique-amelioration-continue-automatisee.md` |
+| 20261021-L99-agent-nocturne-oeil-critique.md | — | 27.4 Ko | `03-etudes/20261021-L99-agent-nocturne-oeil-critique.md` |
 | 20261021-L99-agent-nocturne-skill-vs-code.md | — | 27.3 Ko | `03-etudes/20261021-L99-agent-nocturne-skill-vs-code.md` |
+| Digit-AI - Diagnostic Factory - Oeil critique - 20261020b.md | 20261020b | 23.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020b.md` |
+| Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md | 20261020c | 31.8 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md | 20261021a | 48.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` |
 
 ### 04-plans
