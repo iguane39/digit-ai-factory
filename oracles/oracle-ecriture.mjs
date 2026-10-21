@@ -472,7 +472,14 @@ export function juger(texte, options = {}) {
     } else {
       const constats = [];
       for (const famille of bloquantes) {
-        const exempte = (texte) => (famille.exemptions || []).some((e) => texte.includes(e.literal));
+        // TF-1901 (21/10/2026) : une exemption peut se BORNER — `position` (elle ne vaut qu'à cette position)
+        // et `exact` (le texte, hors numérotation « 5. », EST le libellé, il ne le contient pas seulement).
+        // Sans borne, le comportement d'avant : le libellé contenu dans le texte, à toute position.
+        const exempte = (texte, position) => (famille.exemptions || []).some((e) => {
+          if (e.position && e.position !== position) return false;
+          if (e.exact) return texte.replace(/^\s*\d+[.)]\s*/, "").trim() === e.literal;
+          return texte.includes(e.literal);
+        });
         // LE MOTIF DE POSITION EST PLUS LARGE QUE CELUI DE DENSITÉ, et la mesure du 16/09 dit
         // pourquoi : le motif de densité exige un verbe de contenance, et il ne voyait donc ni
         // « Ce qu'elle coûte » ni « Ce qu'elle exclut ». En titre et en en-tête de colonne, la
@@ -501,7 +508,7 @@ export function juger(texte, options = {}) {
           const titre = /^\s*#{1,6}\s+(.*\S)\s*$/.exec(brut);
           if (titre && famille.positions_bloquantes.includes("titre")) {
             const trouve = cherche(titre[1]);
-            if (trouve && !exempte(titre[1])) constats.push({ ligne: i + 1, position: "titre", texte: titre[1].slice(0, 80), trouve });
+            if (trouve && !exempte(titre[1], "titre")) constats.push({ ligne: i + 1, position: "titre", texte: titre[1].slice(0, 80), trouve });
             continue;
           }
           // UN EN-TÊTE DE COLONNE : une ligne de tableau dont la SUIVANTE est le séparateur. C'est
@@ -512,7 +519,7 @@ export function juger(texte, options = {}) {
               const c = cellule.trim();
               if (!c) continue;
               const trouve = cherche(c);
-              if (trouve && !exempte(c)) constats.push({ ligne: i + 1, position: "en-tête de colonne", texte: c.slice(0, 80), trouve });
+              if (trouve && !exempte(c, "en-tete-de-colonne")) constats.push({ ligne: i + 1, position: "en-tête de colonne", texte: c.slice(0, 80), trouve });
             }
           }
         }
@@ -1099,6 +1106,34 @@ function selfTest() {
   const r1783v = jouer("tf1783v.md", "# Tests\n\nUn paragraphe de prose ordinaire qui pose le sujet.\n\n## Services simulés par les tests\n\n- un service tiers\n");
   if ((r1783v.j?.findings || []).find((f) => f.regle === "EC-8")?.statut !== "PASS")
     casse.push("TF-1783 : le titre qui NOMME son contenu (« Services simulés par les tests ») est refusé");
+
+  // TF-1901 (lot Produit-79 20261018a, RP-17) — DEUX GARDIENS DU MÊME SOCLE NE SE CONTREDISENT PLUS.
+  // DEM-3 (gabarits/oracle-demande.mjs) impose, ancré, le titre « Ce que cette demande ne réclame pas » ;
+  // EC-8 le refusait en titre : corriger l'une des deux demandes d'un produit cassait l'autre.
+  // L'exemption est dans la DONNÉE (references/tics-redactionnels.json) et BORNÉE : ce titre exact, à la
+  // position titre. Quatre sens : VERT le titre imposé (nu, puis numéroté comme DEMANDE-PRODUIT.md), le
+  // gabarit RÉEL gabarits/DEMANDE.md (le fichier qui portait le FAIL mesuré, pas une fixture qui le copie) ;
+  // ROUGE le titre voisin non imposé, le titre qui ne fait que CONTENIR le libellé, et le même libellé en
+  // en-tête de colonne — l'exemption n'est pas un desserrement de la règle.
+  const DEM_TEXTE = "Un paragraphe de prose ordinaire qui pose le sujet de la demande avant ses rubriques.\n\n";
+  const ec8Dem = (titre) => (jouer("tf1901.md", `# Demande\n\n${DEM_TEXTE}## ${titre}\n\n- une exclusion assumée\n`).j?.findings || []).find((f) => f.regle === "EC-8");
+  const f1901v = ec8Dem("Ce que cette demande ne réclame pas");
+  const f1901n = ec8Dem("5. Ce que cette demande ne réclame pas");
+  if (f1901v?.statut !== "PASS" || f1901n?.statut !== "PASS")
+    casse.push(`TF-1901 : le titre « Ce que cette demande ne réclame pas », que DEM-3 impose, est refusé par EC-8 (nu : ${f1901v?.statut}, numéroté : ${f1901n?.statut}) — corriger une demande casserait l'autre`);
+  const f1901voisin = ec8Dem("Ce que cette demande ne couvre pas");
+  const f1901contient = ec8Dem("Ce que cette demande ne réclame pas, ni ce qu'elle exclut");
+  if (f1901voisin?.statut !== "FAIL" || f1901contient?.statut !== "FAIL")
+    casse.push(`TF-1901 : l'exemption déborde — un titre voisin non imposé (${f1901voisin?.statut}) ou qui ne fait que CONTENIR le libellé (${f1901contient?.statut}) passe ; elle devait se borner au titre exact imposé`);
+  const f1901col = (jouer("tf1901-colonne.md", `# Demande\n\n${DEM_TEXTE}| Ce que cette demande ne réclame pas | Mesure |\n|---|---|\n| une ligne | une valeur |\n`).j?.findings || []).find((f) => f.regle === "EC-8");
+  if (f1901col?.statut !== "FAIL")
+    casse.push("TF-1901 : le même libellé en EN-TÊTE DE COLONNE passe — l'exemption devait se borner à la position titre");
+  for (const nomDemande of ["DEMANDE.md", "DEMANDE-PRODUIT.md"]) {
+    const rDem = jouer(`tf1901-${nomDemande}`, readFileSync(join(RACINE, "gabarits", nomDemande), "utf8"));
+    const f8dem = (rDem.j?.findings || []).filter((f) => f.regle === "EC-8" && f.statut === "FAIL");
+    if (f8dem.length)
+      casse.push(`TF-1901 : le gabarit gabarits\\${nomDemande} est refusé par EC-8 chez le produit qui l'instancie : ${JSON.stringify(f8dem)}`);
+  }
 
   // TF-1784 (lot Produit-83 20261015b, RT-9) — LE TIRET SEUL DANS UNE CELLULE EST UNE CELLULE VIDE.
   // Le gabarit MODELE-DONNEES.md prescrit « — » pour une clé absente ; EC-1 comptait chacun comme un

@@ -258,6 +258,16 @@
         "par": "décision humaine D-2 (a) : « D2 : a »",
         "quoi": "les 2 libellés que gabarits/RESTITUTION.md imposait au tableau d'options du bloc 3 — ils portaient la tournure même que le retour du 15/09 proscrit. Ils sont devenus « Coût » et « Exclusions » dans le gabarit, ses 3 juges, 2 fixtures et 1 recette ; l'exemption n'a donc plus d'objet, et EC-8 refuse désormais la tournure partout, sans exception."
       },
+      "exemptions": [
+        {
+          "literal": "Ce que cette demande ne réclame pas",
+          "position": "titre",
+          "exact": true,
+          "depuis": "2026-10-21",
+          "motif": "titre que le gabarit de demande (gabarits/DEMANDE.md) et son juge de forme (gabarits/oracle-demande.mjs, règle DEM-3, regex ancrée sur ce titre exact) IMPOSENT : deux gardiens du même socle se contredisaient, corriger l'une des deux demandes d'un produit cassait l'autre. Exemption BORNÉE : ce titre exact (numérotation « 5. » admise), à la position titre seulement — le même libellé en en-tête de colonne, ou un titre voisin (« Ce que cette demande ne couvre pas »), reste refusé.",
+          "source": "TF-1901, lot Produit-79 - RETOURS - 20261018a (RP-17), décidé le 21/10/2026 au titre de R-58 ; précédents TF-1507 et TF-1453 (le remède y était de renommer, ici le titre est imposé par un juge et ne peut pas l'être)"
+        }
+      ],
       "motifs_positions": [
         {
           "motif": "^\\s*ce (?:que|qu'il|qu'elle|qu'ils|qu'elles|qu’il|qu’elle)\\b",
