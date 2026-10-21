@@ -1,7 +1,7 @@
 {
   "cible": "C:\\dev\\digit-ai-factory\\gabarits\\RESTITUTION.md",
-  "date_iso": "2026-10-18T15:51:56.247Z",
-  "registre_version": "2.43.0",
+  "date_iso": "2026-10-21T05:55:05.161Z",
+  "registre_version": "2.45.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "FAIL",
@@ -77,9 +77,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\RESTITUTION.md",
-    "ts": "2026-10-18T15:51:56.246Z",
+    "ts": "2026-10-21T05:55:05.160Z",
     "fichiers": {
-      "gabarits\\RESTITUTION.md": "607f15bc8e34452e16d26ef5345cd05e2cb8b7f1709fe2863519ed2a7870ae5a"
+      "gabarits\\RESTITUTION.md": "b85475c13dbea89549c51855d03cdd11ea6ef2eaaac3c6389a4762897340c1c4"
     }
   },
   "empreinte_motif": null,
