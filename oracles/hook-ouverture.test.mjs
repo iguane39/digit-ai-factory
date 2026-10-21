@@ -423,6 +423,38 @@ check("TF-1903 — par le hook d'ouverture : l'ancrage est fait et DIT chez un p
   if (readFileSync(join(sans, ".claude", "settings.json"), "utf8") !== SETTINGS_ANCIEN || /TF-1903/.test(s2)) throw new Error("un produit sans lanceur a été touché");
 });
 
+// ---- TF-1942 (21/10/2026) : LES PERMISSIONS D'UN PRODUIT SURVIVENT À L'OUVERTURE, ET LE RELEVÉ LE DIT ---------
+// Le fait : la phrase « Si l'un d'eux portait une modification locale, elle a été écrasée » ne nommait pas ce
+// qu'elle visait ; Produit-73 a cru son `.claude/settings.json` écrasé et renoncé à poser la règle de sécurité
+// exigée par son client. Vert : un produit muni du lanceur, aux permissions `allow`, `ask`, `deny`, `defaultMode`
+// (forme de l'étude 20261021, option O2), ouvert par le hook complet : permissions identiques octet pour octet
+// après fusion, ancrage et recopie ; le relevé ne dit écrasés que les fichiers « remplacé » et dit
+// `.claude/settings.json` jamais recopié. Rouge : l'ancienne phrase, qui ne nommait rien, n'est plus émise, et
+// `.claude/settings.json` ne figure jamais parmi les fichiers recopiés.
+check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit intactes après l'ouverture ; le relevé ne vise que les fichiers remplacés", () => {
+  const P = mkdtempSync(join(tmpdir(), "ouverture-permissions-"));
+  mkdirSync(join(P, ".claude"), { recursive: true });
+  mkdirSync(join(P, "forge", "hooks"), { recursive: true });
+  writeFileSync(join(P, "forge", "hooks", "factory.mjs"), "// lanceur jouet, périmé : la recopie le remplace\n", "utf8");
+  const permissions = {
+    defaultMode: "default",
+    disableBypassPermissionsMode: "disable",
+    allow: ["Bash(npm test)", "Read(./src/**)"],
+    ask: ["Bash(git commit *)", "Bash(git push *)", "PowerShell(git commit *)", "PowerShell(git push *)"],
+    deny: ["Read(./.env)", "Bash(rm -rf *)"],
+  };
+  writeFileSync(join(P, ".claude", "settings.json"), JSON.stringify({ ...JSON.parse(SETTINGS_ANCIEN), permissions }, null, 2) + "\n", "utf8");
+  const s = joue(P);
+  const apres = JSON.parse(readFileSync(join(P, ".claude", "settings.json"), "utf8"));
+  if (JSON.stringify(apres.permissions) !== JSON.stringify(permissions)) throw new Error(`permissions modifiées : ${JSON.stringify(apres.permissions)}`);
+  if (readFileSync(join(P, "forge", "hooks", "factory.mjs"), "utf8") !== readFileSync(join(PILOT, "gabarits", "hooks-factory.mjs"), "utf8")) throw new Error("témoin mal construit : le lanceur périmé n'a pas été remplacé");
+  if (!/forge\/hooks\/factory\.mjs — remplacé depuis/.test(s)) throw new Error("le fichier remplacé n'est pas listé");
+  if (!/des \d+ fichier\(s\) « remplacé » ci-dessus, et d'eux seuls, a été écrasée/.test(s)) throw new Error("l'écrasement n'est pas borné aux fichiers remplacés");
+  if (!/Rien d'autre n'est recopié : `\.claude\/settings\.json` \(permissions `allow`, `ask`, `deny`, `defaultMode`/.test(s)) throw new Error("le relevé ne dit pas que settings.json n'est jamais recopié");
+  if (/Si l'un d'eux portait une modification locale, elle a été écrasée/.test(s)) throw new Error("l'ancienne phrase, qui ne nommait rien, est encore émise");
+  if (/^\s*- \.claude\/settings\.json — (remplacé|créé) depuis/m.test(s)) throw new Error("settings.json listé parmi les fichiers recopiés");
+});
+
 // ---- TF-1758 et TF-1760 (15/10/2026) : LOTS NON REMIS ET SORT DES RETOURS, À L'OUVERTURE DU PRODUIT --
 // Vert : un lot `a_remettre` de plus de 24 h, jamais parvenu au pilot, est NOMMÉ ; les TF du registre qui
 // désignent le produit (par son pseudonyme, retrouvé par une table jetable) sont comptés, et la seconde

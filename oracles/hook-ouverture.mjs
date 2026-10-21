@@ -223,10 +223,15 @@ if (iPilot >= 0) {
     // CE QUI A ÉTÉ ÉCRIT SE DIT AVANT LE VERDICT, toujours, et même quand tout est vert. Un fichier
     // remplacé sous les pieds d'une session sans que rien ne le dise est le pire des deux mondes :
     // l'agent lit un contenu qu'il n'a pas vu changer et n'a aucun moyen de savoir pourquoi.
+    // TF-1942 (21/10/2026) : la phrase « modification locale écrasée » ne nommait pas ce qu'elle visait ; un produit a
+    // cru ses permissions écrasées et renoncé à poser une règle de sécurité exigée par son client. Elle vise désormais
+    // les seuls fichiers REMPLACÉS listés ci-dessus, et dit ce qui n'est jamais recopié.
     if (recopies.length) {
+      const remplaces = recopies.filter((r) => / — remplacé depuis /.test(r)).length;
       lignes.push(`- **${recopies.length} artefact(s) MIS À JOUR à l'instant** depuis le pilot (mode « copie identique » — ces pièces ne se personnalisent pas) :`,
         ...recopies.map((r) => `  - ${r}`),
-        "  Si l'un d'eux portait une modification locale, elle a été écrasée : c'est ce que le mode déclare, et la version du pilot fait foi.");
+        (remplaces ? `  Une modification locale de l'un des ${remplaces} fichier(s) « remplacé » ci-dessus, et d'eux seuls, a été écrasée : c'est ce que leur mode déclare, et la version du pilot fait foi. ` : "  ")
+          + "Rien d'autre n'est recopié : `.claude/settings.json` (permissions `allow`, `ask`, `deny`, `defaultMode`, serveurs MCP, hooks propres), `CLAUDE.md` et les autres fichiers que le produit personnalise ne le sont jamais — l'ouverture n'ajoute à `.claude/settings.json` que les entrées de hook manquantes du gabarit, et n'y réécrit que le chemin relatif du lanceur (TF-1903).");
     }
     for (const r of refus) lignes.push(`- non recopié : ${r}`);
     if (!f) lignes.push("- verdict ILLISIBLE — le contrôle n'a pas rendu de résultat exploitable ; ce n'est pas un constat sur ce produit.");
