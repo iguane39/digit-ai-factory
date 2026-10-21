@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+  "date_iso": "2026-10-21T05:28:34.339Z",
+  "registre_version": "2.45.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+      "verdict": "SKIP",
+      "detail": "aucune affirmation chiffrée hors table détectée"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+      "verdict": "SKIP",
+      "detail": "nom ne se réclamant pas de la convention"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 3 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 0 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md",
+    "ts": "2026-10-21T05:28:34.338Z",
+    "fichiers": {
+      "output\\03-etudes\\20261021-etude-opportunite-surcouche-permissions-produit.md": "195348fa6174ad7f80c15c87fa601a924c950aa3fcb22b52c4a388240f783caf"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

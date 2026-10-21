@@ -109,6 +109,11 @@
             "type": "command",
             "command": "node oracles/hook-ecriture.mjs",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "node oracles/hook-page-html.mjs",
+            "timeout": 60
           }
         ]
       }

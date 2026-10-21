@@ -1,7 +1,7 @@
 {
   "format": "pilot/garde-fous-plateforme@1",
-  "version": "1.3.0",
-  "date": "2026-10-19",
+  "version": "1.4.0",
+  "date": "2026-10-21",
   "source": "Décision humaine D-37 (a) du 01/10/2026, TF-1495 et TF-1496 — lots « Produit-03 - RETOURS - 20260929d » (RA-51) et « Produit-03 - RETOURS - 20260929e » (RA-52). Le 29/09/2026, une stratégie Deny de la souscription d'un client a refusé la première livraison de production d'un produit. Le même produit l'avait heurtée en qualification le 23/07 et l'avait écrite en commentaire ; un produit voisin du même client l'avait heurtée le 31/08. La leçon n'a circulé ni vers la production, ni vers la factory.",
   "pourquoi_une_donnee": "Loi transverse n° 4 : une contrainte de plateforme est une donnée volatile. Le client la pose, la change ou la retire sans prévenir. Elle vit ici, datée et sourcée, et se confirme par le relevé du jour (ETAPE-MEP.md § 1 ter) : une entrée de ce registre est une piste à vérifier, jamais une preuve.",
   "pourquoi_ici": "Le pilot reçoit les lots de retours de tous les produits : c'est le seul endroit où une contrainte trouvée par un produit peut servir au suivant. Un fichier tenu par chaque produit ne circulerait pas, et un fichier tenu chez le client ne serait lu par aucun produit.",
@@ -148,6 +148,31 @@
       "inscrite_le": "2026-10-19",
       "verifiee_le": "2026-10-18",
       "verifiee_par": "constat du produit : 3 031, 3 029 et 3 022 ms par renommage d'un fichier déjà synchronisé, 0 ms pour un fichier neuf et 0 ms Dropbox quitté (vitesse_reel.py, ledger seq 336 et 339) ; non rejoué par le pilot, qui n'a lu que la page de pause de Dropbox"
+    },
+    {
+      "id": "GFP-007",
+      "client": "Client-A",
+      "plateforme": "entra-id",
+      "mecanisme": "Microsoft Entra ID du client, consentement aux applications : consentement des utilisateurs désactivé, approbation de l'administrateur requise",
+      "effet": "la page de connexion rend « Approbation requise » et propose une demande justifiée à l'administrateur ; l'accès n'est pas accordé",
+      "portee": "tout le tenant du client, pour toute application à laquelle aucun consentement n'a déjà été accordé",
+      "vise": "les applications qui demandent l'accès à la messagerie (Mail.Read) ou au profil de l'utilisateur",
+      "refuse": "« Microsoft Graph Command Line Tools » connecté par code d'appareil (mesuré le 16/10/2026) ; le connecteur claude.ai Microsoft 365 passe (mesuré le même jour)",
+      "consequence": "une compétence qui lit la messagerie, l'agenda ou Teams de l'utilisateur ne peut pas passer par une application cliente sans consentement préalable de l'administrateur du client : la voie Graph en ligne de commande est fermée tant que l'administrateur n'a pas approuvé",
+      "remede_eprouve": "passer par le connecteur claude.ai Microsoft 365 : il a lu la boîte sans geste supplémentaire après /login, 4 emails trouvés et 3 lus en entier (16/10/2026) ; une demande d'approbation à l'administrateur n'a pas été essayée",
+      "non_mesure": [
+        "la date à laquelle le client a posé ce réglage",
+        "la réponse de l'administrateur à une demande d'approbation justifiée : non faite",
+        "les autres applications et les autres permissions que Mail.Read et le profil"
+      ],
+      "posee_le": null,
+      "constatee": [
+        { "produit": "Produit-84", "le": "2026-10-16", "environnement": "poste de l'exploitant, tenant Microsoft 365 du client", "trace": "capture fournie par l'humain ; essai de Connect-MgGraph -UseDeviceAuthentication puis connexion par code d'appareil refusée (« Approbation requise ») ; RT-7 du lot" }
+      ],
+      "source": "lot « Produit-84 - RETOURS - 20261016d » (section « Garde-fou de plateforme relevé », RT-7), relevé par le rédacteur de TF-1888 le 19/10/2026 (TF-1899)",
+      "inscrite_le": "2026-10-21",
+      "verifiee_le": "2026-10-16",
+      "verifiee_par": "constat du produit sur capture humaine ; non rejoué par le pilot"
     }
   ]
 }

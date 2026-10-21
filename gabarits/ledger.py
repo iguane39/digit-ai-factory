@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Écriture du ledger de run — contrat CONTRAT-INTERFACE §3 du pilot (gabarit du pilot, TF-1205).
 
 JSON Lines append-only, `seq` strictement croissant depuis 1 (numéroté après le plus grand déjà pris), `ts` ISO non décroissant,
@@ -19,7 +18,11 @@ l'entrée : code de sortie 1, l'appelant lit un échec là où l'écriture a ré
 UTF-8 en tête de fichier, et l'affichage de confirmation retombe sur l'ASCII échappé plutôt que de
 planter : l'écriture a eu lieu, le code de sortie le dit.
 """
-import sys, os, time, json, argparse, datetime, pathlib, subprocess
+import json
+import os
+import pathlib
+import sys
+import time
 
 # Forcer l'UTF-8 sur les flux AVANT toute écriture. `reconfigure` existe depuis Python 3.7 ; un flux
 # remplacé par un objet sans cette méthode (redirection exotique) garde son encodage, et l'affichage
@@ -54,7 +57,7 @@ def chemin(run: str = "") -> pathlib.Path:
 def lignes(p: pathlib.Path) -> list[dict]:
     if not p.exists():
         return []
-    return [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+    return [json.loads(ligne) for ligne in p.read_text(encoding="utf-8").splitlines() if ligne.strip()]
 
 
 VERROU_ESSAIS = 100
@@ -92,7 +95,7 @@ def ajouter(run: str, type_: str, **champs) -> dict:
         # de produit portait `len(dejà) + 1` : 13 seq en double relevés le 15/10/2026) ni après le
         # numéro de la dernière ligne (faux dès qu'elle porte un numéro inférieur à une précédente).
         seq = max((x["seq"] for x in dejà), default=0) + 1
-        ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         if dejà and ts < dejà[-1]["ts"]:
             ts = dejà[-1]["ts"]                  # `ts` non décroissant, jamais falsifié
         e = {"seq": seq, "ts": ts, "type": type_, **champs}
