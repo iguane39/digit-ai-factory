@@ -326,6 +326,87 @@ try {
       "un lot déjà traité bloque le redépôt — un constat rouvert n'atteindrait plus personne");
   });
 
+  // ── TF-1920 — UNE DEMANDE MODIFIÉE N'EST PAS UN DOUBLON. Le cas du 19/10/2026 : la demande d'un
+  // constat est complétée au registre 30 minutes après le dépôt du lot qui le porte, le lot est encore
+  // `a_traiter`. Avant : « INCLUS DANS UN LOT NON TRAITÉ », rien déposé. Après : un lot COMPLÉMENTAIRE
+  // qui ne porte QUE ce constat. Tout se joue dans un dossier temporaire, avec une COPIE du registre
+  // (`--registre`) : aucun lot réel n'est émis, le registre réel n'est ni lu ni écrit.
+  const monterDemandeModifiee = (nomParc) => {
+    const faux = join(T, nomParc);
+    const produit = join(faux, "_Client", "produit-recette");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const reg = join(T, `registre-${nomParc}.jsonl`);
+    const evt = (e) => writeFileSync(reg, (existsSync(reg) ? readFileSync(reg, "utf8") : "") + JSON.stringify(e) + "\n", "utf8");
+    evt({ ev: "creation", id: "TF-9920", statut: "decide", destinataire_produit: "produit-recette",
+      titre: "Un constat dont la demande sera complétée", contenu: "le fait", gravite: "majeur",
+      demande_produit: "version 1 de la demande" });
+    evt({ ev: "creation", id: "TF-9921", statut: "decide", destinataire_produit: "produit-recette",
+      titre: "Un constat qui ne change pas", contenu: "un autre fait", gravite: "mineur",
+      demande_produit: "demande stable" });
+    const lancer = () => spawnSync(process.execPath, [join(ICI, "emettre-travaux.mjs"), "--tous", "--registre", reg],
+      { encoding: "utf8", env: { ...process.env, FORGE_ROOT: faux } });
+    const boite = join(produit, "input", "00-travaux");
+    const lots = () => (existsSync(boite) ? readdirSync(boite).filter((f) => f.endsWith(".md")).sort() : []);
+    return { boite, lancer, lots, evt, reg };
+  };
+
+  check("TF-1920 — une demande COMPLÉTÉE sur un élément déjà dans un lot non traité part dans un lot complémentaire qui ne porte que lui", () => {
+    const { boite, lancer, lots, evt } = monterDemandeModifiee("parc-1920");
+    lancer();
+    att(lots().length === 1, `${lots().length} lot(s) au premier passage, 1 attendu`);
+    const premier = lots()[0];
+    const avantPremier = readFileSync(join(boite, premier), "utf8");
+    att(/### TF-9920/.test(avantPremier) && /### TF-9921/.test(avantPremier) && /### TF-0626/.test(avantPremier),
+      "le premier lot ne porte pas ses constats et ses artefacts d'héritage — la scène ne reproduit pas le cas");
+    // la demande est complétée au registre : le sceau du contenu confié change, les titres restent.
+    evt({ ev: "maj", id: "TF-9920", demande_produit: "version 2 de la demande, complétée après le dépôt" });
+    const r2 = lancer();
+    att(!/INCLUS DANS UN LOT NON TRAITÉ/.test(r2.stdout),
+      "la demande complétée est tenue pour un doublon (« INCLUS DANS UN LOT NON TRAITÉ ») — le cas du 19/10, TF-1920 : "
+      + r2.stdout.split("\n").filter((x) => x.trim()).slice(-3).join(" | "));
+    att(/\[DÉPOSÉ — COMPLÉMENT\]/.test(r2.stdout), "aucun lot complémentaire déposé : " + r2.stdout.slice(0, 300));
+    att(lots().length === 2, `${lots().length} lot(s) après la modification, 2 attendus`);
+    const complement = readFileSync(join(boite, lots().find((f) => f !== premier)), "utf8");
+    att(complement.includes("version 2 de la demande, complétée"), "le lot complémentaire ne porte pas la demande complétée");
+    att(/Lot COMPLÉMENTAIRE/.test(complement) && complement.includes(premier.replace(/\.md$/, "")),
+      "le lot complémentaire ne dit pas de quel lot il complète");
+    att(!/### TF-9921/.test(complement), "le lot complémentaire reprend un constat dont la demande n'a pas changé — doublon");
+    att(!/### TF-0626/.test(complement), "le lot complémentaire reprend les artefacts d'héritage déjà confiés — doublon des 11 éléments du 19/10");
+    att(verifier(complement).verdict === "PASS", "le lot complémentaire ne tient pas sa propre forme : "
+      + verifier(complement).constats.filter((c) => c.statut === "FAIL").map((c) => c.regle + " " + c.message).join(" · ").slice(0, 200));
+    att(readFileSync(join(boite, premier), "utf8") === avantPremier, "le lot d'origine, encore à traiter, a été retouché");
+    const sidecar = readFileSync(join(boite, lots().find((f) => f !== premier).replace(/\.md$/, ".tf.jsonl")), "utf8")
+      .split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
+    att(sidecar.length === 1 && sidecar[0].origine_tf === "TF-9920", `le sidecar du complément porte ${sidecar.length} ligne(s) au lieu de la seule TF-9920`);
+    // idempotence : la demande complétée est livrée, un troisième passage ne redépose rien.
+    const r3 = lancer();
+    att(lots().length === 2, `${lots().length} lot(s) au troisième passage : le complément n'est pas idempotent`);
+    att(/INCLUS DANS UN LOT NON TRAITÉ/.test(r3.stdout), "le troisième passage ne dit pas qu'il n'a rien à confier");
+    // une seconde modification repart, encore seule.
+    evt({ ev: "maj", id: "TF-9920", demande_produit: "version 3 de la demande" });
+    lancer();
+    att(lots().length === 3, `${lots().length} lot(s) après la seconde modification, 3 attendus`);
+  });
+
+  check("TF-1920 borne — sans modification de la demande, un lot inclus ne se redépose pas ; un lot d'origine TRAITÉ ne bloque pas", () => {
+    const a = monterDemandeModifiee("parc-1920-borne");
+    a.lancer();
+    const r = a.lancer();
+    att(a.lots().length === 1 && /DÉJÀ DÉPOSÉ|INCLUS DANS UN LOT NON TRAITÉ/.test(r.stdout),
+      "un lot dont rien n'a changé a été redéposé — le lot complémentaire ne doit partir que sur une demande modifiée");
+    // l'élément d'héritage retiré (même scène que TF-0680) + aucune demande modifiée : toujours inclus.
+    const b = monterDemandeModifiee("parc-1920-traite");
+    b.lancer();
+    const chemin = join(b.boite, b.lots()[0]);
+    writeFileSync(chemin, readFileSync(chemin, "utf8").replace(/-\s+\*\*Statut\*\*\s*:\s*a_traiter/, "- **Statut** : traite le 2026-10-19"), "utf8");
+    b.evt({ ev: "maj", id: "TF-9920", demande_produit: "version 2 de la demande" });
+    const r2 = b.lancer();
+    att(!/INCLUS DANS UN LOT NON TRAITÉ/.test(r2.stdout) && b.lots().length === 2,
+      "un lot d'origine déjà traité bloque le redépôt d'une demande modifiée");
+    att(/### TF-9921/.test(readFileSync(join(b.boite, b.lots().find((f) => f !== b.lots()[0])), "utf8")),
+      "le lot de redépôt après un lot traité devait rester complet (comportement d'avant TF-1920)");
+  });
+
   // ═══════════════════════════════════════════════════════════════════════════════════════════
   // LA SECONDE SOURCE DU CANAL — TF-0673
   //
