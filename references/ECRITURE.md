@@ -58,7 +58,7 @@ jugé à sa prochaine réécriture de fond.
 
 ## Les règles
 
-16 règles, numérotées E-1 à E-16 — les douze du plancher d'origine, puis E-13 à E-16, nées de retours humains datés. Chaque règle porte les types qu'elle vise, son juge et son
+17 règles, numérotées E-1 à E-17 — les douze du plancher d'origine, puis E-13 à E-17, nées de retours humains datés. Chaque règle porte les types qu'elle vise, son juge et son
 statut : **mécanisée** (un script la joue), **déléguée** (un oracle existant la joue déjà) ou
 **revue** (aucun script ; elle se tient à la relecture, et c'est dit). Les exemples avant / après
 sont tirés de textes réels de la Factory.
@@ -235,11 +235,21 @@ Le contrôle EXPLICATION lit le dernier message humain, la forme de la réponse 
 
 Avant (12/10) : les coûts d'un abonnement expliqués dans les blocs 4 et 8 d'une restitution, identifiants et journal compris. Après : une fiche de 744 mots, jugée « simple, bref, lisible & exploitable », et une restitution qui la cite.
 
+### E-17 — Un écrit destiné à un tiers est court et dans la langue de son lecteur
+*Types T2, T4. Juge : EC-14 et EC-15 de `oracles\oracle-ecriture.mjs`, au statut A_REJOUER. Mécanisée.*
+
+Décision humaine D-78 (c) amendée du 26/10/2026, citée mot pour mot : « 78 : c, mais plutôt que de bloquer, cela doit être rejoué pour répondre aux exigences. Attention, si l'utilisateur est anglophone, l'anglais ne doit pas être un critère de blocage. Il faut s'adapter à la langue de l'utilisateur. » Le fait : 8 reprises en 7 jours sur la longueur et la forme de courriels et de fiches destinés à un tiers (« j'ai déjà demandé plusieurs fois »), une proposition à 94 défauts de concision rendue PASS par cet oracle, des réponses en anglais à un utilisateur francophone dans 3 sessions.
+
+Un écrit est destiné à un tiers quand son en-tête porte `destinataire:` avec une valeur qui n'est pas interne (`humain`, `orchestrateur`, `pilot`, `agent`, `forge`, `méthode`, `factory`, lues par leur premier mot), ou, sans en-tête `destinataire:`, quand le type de son nom R-4 (le champ Objet de « <Marque> - <Objet> - AAAAMMJJ<indice> ») est courriel, courrier, lettre ou fiche. Une fiche de conception est un document de travail, et `destinataire: humain` écarte la règle même sur un nom de courriel. Un tiers lit vite : un paragraphe de 3 phrases et 60 mots au plus, une phrase de 25 mots au plus, aucune énumération de plus de 3 éléments en prose (au-delà, garder les 3 qui comptent, ou une liste à puces, E-11).
+
+La langue dominante du texte est celle de son lecteur. Sans indication, c'est le français, parce que la Factory est francophone (règle 12 du `CLAUDE.md` global) ; pour un utilisateur ou un tiers qui lit une autre langue, on la déclare, `langue: en` en en-tête ou `--langue en` à l'appel, et le même texte passe. L'anglais n'est donc jamais une faute en soi : la réponse suit la langue de l'utilisateur (`references\PREFERENCES-PORTEUR.md`).
+
+Exemple de la recette d'oracle-ecriture (26/10) : un courriel de relance en un seul paragraphe de 90 mots et 4 phrases est à rejouer, avec sa ligne et ses mesures ; réécrit en 3 paragraphes de 2 phrases, avec la date attendue posée en question dans le dernier, il passe.
 ## Précédence
 
 1. La structure imposée par un gabarit prime (blocs et tableaux de `RESTITUTION.md`, sections
    d'une étude) : aucune règle de ce document ne s'y oppose.
-2. Le plancher (E-1 à E-16) ne se franchit pas.
+2. Le plancher (E-1 à E-17) ne se franchit pas.
 3. La voix du produit (`MARQUE.md`) se déploie au-dessus : ton, registre, vocabulaire choisi.
 4. Un conflit entre une règle de forge et ce document se tranche par la règle la plus stricte
    (R-43 : renforcer oui, assouplir jamais) et se consigne au ledger.
@@ -250,7 +260,7 @@ Avant (12/10) : les coûts d'un abonnement expliqués dans les blocs 4 et 8 d'un
   `oracles\oracle-ecriture.mjs` et imprime ses avertissements et ses échecs ; il ne bloque pas, il
   dit. Chez un produit, `forge\hooks\factory.mjs ecriture` fait la même chose.
 - **Avant de remettre** : `node oracles\oracle-ecriture.mjs <texte.md>` doit rendre PASS ; un
-  avertissement se lit et se décide, un échec se corrige.
+  avertissement se lit et se décide, un échec se corrige, un passage A_REJOUER se réécrit (voir « La boucle de réécriture »).
 - **Sur un corpus** : `node oracles\oracle-ecriture.mjs --baseline <dossier>` mesure le taux de
   PASS ; il reste à 95 % ou plus sur les textes déjà jugés, sinon la donnée se recalibre, jamais
   la règle ne se supprime.
@@ -263,6 +273,16 @@ Avant (12/10) : les coûts d'un abonnement expliqués dans les blocs 4 et 8 d'un
   d'une voix, la véracité, le jargon hors référentiel, les textes d'application (T4, lot de
   travaux forge-design), un tic hors liste.
 
+## La boucle de réécriture (statut A_REJOUER)
+
+Décision humaine D-78 (c) amendée du 26/10/2026 : « plutôt que de bloquer, cela doit être rejoué pour répondre aux exigences ». EC-14 (concision d'un écrit à un tiers) et EC-15 (langue) ne font jamais échouer un texte. Elles rendent le statut A_REJOUER : le verdict reste PASS, et la sortie JSON porte `a_rejouer`, qui donne les passages (règle, ligne, mesure, extrait), une consigne de réécriture et la passe en cours. La session qui produit l'écrit réécrit elle-même, sans demander à l'humain :
+
+1. Lire `a_rejouer.passages` et `a_rejouer.consigne`, ou les lignes `À REJOUER` que le hook `ecriture` imprime après chaque écriture.
+2. Réécrire ces passages seulement, faits gardés, dans la langue du destinataire.
+3. Rejouer `node oracles\oracle-ecriture.mjs <texte.md> --passe <n>`, avec `--langue <code>` quand le lecteur n'est pas francophone.
+4. Trois passes au plus. Si des passages restent à rejouer après la troisième, remettre le texte avec les écarts restants nommés (règle, ligne, raison) dans le message de remise : ni quatrième passe, ni borne relâchée (G-2).
+
+C'est la forme de boucle bornée de `references\RUN-MANDAT.md` (pas 4) et de la clôture de forge-tests : 3 itérations, un échec dit plutôt que masqué. Le hook n'impose rien, il rappelle, comme pour toute la doctrine d'écriture ; la passe en cours se compte par `--passe`, et à la passe 3 la consigne dit de remettre avec les écarts nommés.
 ## Mesure du gain
 
 Indicateurs relevés à la baseline du 12/09/2026 puis toutes les quatre semaines : retours humains
