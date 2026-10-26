@@ -158,7 +158,7 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
     if (!/## Œil critique/.test(sortieTenu)) throw new Error("section « Œil critique » absente");
     if (/## Flotte d'agents|## Surveillance des récidives/.test(sortieTenu)) throw new Error("une section remplacée par « Œil critique » est encore affichée");
     if (!/poste [^\n]+ : (aucune exécution|dernière analyse jusqu'au)/.test(sortieTenu)) throw new Error("le repère du poste n'est pas dit");
-    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, revue le 2026-11-08.*2 relecture\(s\), 2 800 460 jetons.*seuil de 4 000 000 jetons par jour tenu/.test(sortieTenu))
+    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, prolongé en service par D-73 \(b\), revue le 2026-11-08.*2 relecture\(s\), 2 800 460 jetons.*seuil de 4 000 000 jetons par jour tenu/.test(sortieTenu))
       throw new Error((sortieTenu.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
     if (/FRANCHI/.test(sortieTenu)) throw new Error("seuil dit franchi à 2 800 460 jetons");
   });

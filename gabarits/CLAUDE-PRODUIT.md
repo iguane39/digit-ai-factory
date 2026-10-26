@@ -51,6 +51,17 @@ TF-1054) ; le pilot le dépose lui-même après pseudonymisation (`todo\accueill
 geste humain de remise disparaît ; la décision humaine demeure (tout entre en candidat au
 registre TODO-FORGE).
 
+**Portée d'un retour (T1, TF-1946, D-68 (a) du 26/10/2026)** : chaque retour passe le test de
+généralité du skill `oeil-critique` (vaut-il dans un autre projet, pour une autre tâche du même skill,
+révèle-t-il une règle manquante, a-t-il des chances de revenir ?) ; l'entrée `type: retour` porte les
+4 réponses. Majorité de « oui » : il remonte au pilot par le lot. Majorité de « non » : c'est un défaut
+de livrable, il se corrige ici, sans lot. Une préférence de l'humain va au fichier des préférences du
+pilot, une convention du client au `CONVENTIONS-CLIENT.md` de son projet commun. **Forçage** : quand
+l'humain demande de remonter à la Factory, le lot part même si le test dit « produit », au format
+ci-dessus ; une seule question groupée, et seulement pour un champ obligatoire qu'aucune trace ne
+remplit. **Barrière dès la 2e fois** : un défaut qui revient demande une barrière (hook, contrôle
+d'oracle, défaut qui ferme le mauvais chemin, script qui fait le geste), jamais une règle reformulée.
+
 **Remettre sans nom réel (TF-1233, 13/10/2026)** : le dépôt du pilot est public et ne porte que des
 identifiants d'emprunt (pseudonymes de produits et de clients). Ce que le produit fait : nommer son lot
 `<projet> - RETOURS - …` avec son vrai nom de projet (règle ci-dessus) et le poser dans le sas

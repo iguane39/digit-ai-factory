@@ -105,7 +105,7 @@ try {
     if (r.code !== 0) throw new Error(`exit ${r.code}`);
     if (r.rapport.criteres.length !== 3) throw new Error("le seuil de l'essai est entré dans les critères de la flotte");
     const t = executer(["--transcripts", franchi, "--depuis", "2026-10-01", "--referentiel", REF]).sortie;
-    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, revue le 2026-11-08\) : 3 relecture\(s\).*FRANCHI : arrêter l'essai et demander/.test(t)) throw new Error(t);
+    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, prolongé en service par D-73 \(b\), revue le 2026-11-08\) : 3 relecture\(s\).*FRANCHI : arrêter l'essai et demander/.test(t)) throw new Error(t);
   });
   check("vert — sans relecture d'intention, le relevé le dit (0, seuil tenu) ; un verificateur ordinaire ne compte pas", () => {
     const t = executer(["--transcripts", vert, "--depuis", "2026-10-01", "--referentiel", REF]).sortie;

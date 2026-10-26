@@ -12,6 +12,15 @@ Version 1.0.0 — 2026-08-04
 Le steering améliore les 5 forges par **itérations bornées**. Jamais d'amélioration spontanée,
 jamais d'application sans validation humaine.
 
+## Tri des retours en 3 voies et barrière dès la 2e fois (T1, TF-1946, D-68 (a) du 26/10/2026)
+
+Source : diagnostic `output/03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md`, §d-T1. Le fait : 35 corrections sur 105 répétaient une consigne déjà donnée en 30 jours, et chaque reproche devenait une règle de plus au pilot.
+
+- **Portée** : chaque retour passe le test de généralité du skill `oeil-critique` 1.1.0, étape 4. Une préférence de l'humain va à `references/PREFERENCES-PORTEUR.md` ; une convention de client va au `CONVENTIONS-CLIENT.md` de son projet commun ; ces 2 fichiers se chargent à chaque ouverture, 2 Ko au plus chacun.
+- **3 voies** : préférence ou convention au fichier ; défaut de livrable corrigé chez le produit, sans lot ; défaut systémique en contrôle au pilot, admis s'il rejoue le cas qui l'a fait naître, rouge avant, vert après.
+- **Forçage** : « remonte à la Factory » fait partir le lot même si le test dit « produit ».
+- **Barrière dès la 2e fois** : une récidive appelle une barrière, pas un texte. Accord avec T2 : les règles de forme du compte rendu restent non bloquantes ; la barrière vise un défaut de fond, ou une règle de forme dont la récidive a fait intervenir l'humain, mesurée par ses messages.
+
 ## Un mécanisme de relecture passe le banc avant d'être adopté (TF-1073, 14/09/2026, D-3 (a))
 
 Un persona, une fiche d'expert, une grille de lentilles, un juge : tout dispositif proposé au parc

@@ -50,7 +50,7 @@ export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan
 export const INTEGRES_FIXES = new Set(["claude-code-guide", "statusline-setup"]);
 export const SEUILS = { part_nommee_min: 0.9, opus_sans_effort_max: 0, hors_generation_max: 0 };
 /** L'essai de relecture d'intention (D-23 (a) du 18/10/2026, `references/RELECTURE-INTENTION.md`) : dates et seuil d'arrêt. */
-export const ESSAI_RELECTURE = { debut: "2026-10-18", fin: "2026-11-01", revue: "2026-11-08", seuil_jetons_par_jour: 4000000 };
+export const ESSAI_RELECTURE = { debut: "2026-10-18", fin: "2026-11-01", prolongation: "prolongé en service par D-73 (b)", revue: "2026-11-08", seuil_jetons_par_jour: 4000000 };
 /** Une relecture d'intention est un sous-agent `verificateur` dont la description commence par « Relecture d'intention ». */
 export const estRelectureIntention = (type, description) => type === "verificateur" && /^\s*relecture d['’]intention/i.test(String(description || ""));
 /** Limite par défaut de sous-agents simultanés d'une session (`code.claude.com/docs/en/sub-agents`, lue le 2026-10-19) : voir `references/PARALLELISME-CLAUDE-CODE.md`. */
@@ -233,7 +233,7 @@ export function ligneSimultaneite(s) {
 export function ligneEssaiRelecture(e) {
   const n = (x) => String(x).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   const max = e.jour_max ? `jour le plus chargé ${e.jour_max.jour} : ${n(e.jour_max.jetons)} jetons` : "aucun jour chargé";
-  return `  relectures d'intention (essai du ${e.debut} au ${e.fin}, revue le ${e.revue}) : ${e.relectures} relecture(s), ${n(e.jetons)} jetons ; ${max} — seuil de ${n(e.seuil_jetons_par_jour)} jetons par jour `
+  return `  relectures d'intention (essai du ${e.debut} au ${e.fin}, ${e.prolongation}, revue le ${e.revue}) : ${e.relectures} relecture(s), ${n(e.jetons)} jetons ; ${max} — seuil de ${n(e.seuil_jetons_par_jour)} jetons par jour `
     + (e.seuil_franchi ? "FRANCHI : arrêter l'essai et demander à l'humain" : "tenu");
 }
 
