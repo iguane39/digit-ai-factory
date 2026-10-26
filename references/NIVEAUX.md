@@ -1,9 +1,10 @@
 # Niveaux d'intervention — proportionner la réponse à la question
 
-Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.5.0,
-13/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
+Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.6.0,
+26/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
 Moyen en essai ; 1.3.0 ne compte plus une copie vers le dossier temporaire comme un effet ; 1.4.0
-consigne la revue de l'essai ; 1.5.0 engage l'étape 3, la propagation aux produits). Source : l'étude `output\03-etudes\2026-09\20260925-etude-opportunite-niveaux-d-intervention.md`,
+consigne la revue de l'essai ; 1.5.0 engage l'étape 3, la propagation aux produits ; 1.6.0 juge la
+réponse courte sur les écritures du tour, plus sur le nombre de commandes). Source : l'étude `output\03-etudes\2026-09\20260925-etude-opportunite-niveaux-d-intervention.md`,
 verdict O3 (3 niveaux fixés par les effets du tour, déployés en 3 étapes), validé par la décision
 humaine D-3 (a) du 25/09/2026. Candidature au registre : TF-1418 (niveaux d'intervention, étape 1).
 
@@ -12,7 +13,9 @@ en essai du 2026-09-26 au 2026-10-02 inclus ; le niveau Moyen, du 2026-10-01 au 
 avec sa branche du juge de fin de tour. Le niveau Complexe est le fonctionnement actuel, inchangé.
 Rien ici ne change l'effort de la session. **Revue jouée le 2026-10-13** (section « Essai et
 revue ») : critères non tenus, essai à prolonger. **Le même jour, la décision humaine D-68 (a)
-(« propager les niveaux aux produits ») engage l'étape 3** : section « Chez un produit ».
+(« propager les niveaux aux produits ») engage l'étape 3** : section « Chez un produit ». **Le 26/10/2026,
+la décision humaine D-75 (c) élargit la réponse courte à tout tour qui n'a rien écrit** : section
+« Réponse courte sans écriture ».
 
 ## Ce qui change pour la session
 
@@ -28,7 +31,8 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
 - **Quand** : une question de 40 mots au plus, sans verbe d'action (faire, corriger, lancer, publier,
   pousser, commiter, créer, écrire, supprimer, ingérer, synchroniser, appliquer), sans sélecteur de
   décision, sans demande de run ni de livrable ; ou un message humain qui commence par « vite : ».
-- **Bornes du tour** : lectures libres (Read, Grep, Glob) ; 3 commandes au plus ; aucune écriture. Ni
+- **Bornes du tour** : lectures libres (Read, Grep, Glob), et commandes de lecture sans limite de nombre
+  depuis le 26/10/2026 ; aucune écriture, au sens de la section « Réponse courte sans écriture ». Ni
   lectures d'ouverture de run, ni fichier de synthèse, ni oracle de restitution.
 - **Forme** : première ligne « Niveau : Simple » ; la réponse en 150 mots au plus ; une ligne de source
   (un chemin et sa ligne, ou une commande et sa sortie) ; une ligne « Non vérifié : … » s'il le faut.
@@ -51,13 +55,55 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
   temporaire ont fait du tour un tour de travail ; `--pre-vol` a rendu exit 0, puis le juge de fin de
   tour a exigé la restitution complète.
 - **Contrôle avant affichage** (01/10/2026) : la réponse se joue avant d'être rendue, par
-  `node oracles/hook-restitution.mjs --pre-vol` qui lit son texte sur l'entrée standard (une des 3
-  commandes). Exit 1 = le juge de fin de tour la refuserait : raccourcir, ou retirer la décision posée.
+  `node oracles/hook-restitution.mjs --pre-vol` qui lit son texte sur l'entrée standard. Depuis le
+  26/10/2026, il relit aussi la transcription de la session et rend les écritures du tour
+  (`ecritures_du_tour`). Exit 1 = le juge de fin de tour la refuserait : raccourcir, retirer la décision
+  posée, ou restituer en entier un tour qui a écrit.
   Une décision se cite dans la prose (« la décision de départ, D-39 »), elle ne se pose jamais. *Le
   fait* : le 01/10, une réponse de 158 mots a été refusée après affichage, et l'humain l'a lue 2 fois.
-- **Escalade** : dès qu'il faut écrire, lancer une 4e commande, rendre un verdict ou poser une décision,
-  le tour quitte le niveau Simple. Il le dit en une phrase et se restitue en entier. Le niveau ne
-  descend jamais en cours de tour.
+- **Escalade** : dès qu'il faut écrire, rendre un verdict ou poser une décision, le tour quitte le
+  niveau Simple. Il le dit en une phrase et se restitue en entier. Le niveau ne descend jamais en cours
+  de tour.
+
+## Réponse courte sans écriture (26/10/2026, D-75 (c))
+
+Décision humaine D-75 (c) du 26/10/2026, sur la synthèse `output\04-plans\Digit-AI - Synthese Mandat -
+Oeil critique recommandations affichees - 20261026j.md` (TF-1947). Ce qui change pour la session : une
+question qui lit, sans écrire, répond en court, quel que soit le nombre de fichiers lus ou de commandes
+de lecture lancées.
+
+- **Le fait** : du 19 au 26/10/2026, le journal des hooks du pilot compte 85 refus au premier passage,
+  sessions de recette exclues. 28 portent sur des tours qui n'avaient rien écrit et avaient lancé de 4
+  à 19 commandes : tous refusés sur S1, S3, S4 et S6, dont 25 chez un produit avec S48. L'analyse d'œil
+  critique du même jour en compte 73 en 7 jours sur 44 sessions, presque tous sur des réponses courtes.
+  Le seuil de 4 commandes faisait d'une question qui lit 5 fichiers un tour de travail. Le modèle ne le
+  voyait qu'après le refus.
+- **La règle** : un tour qui n'a rien écrit se rend sans restitution, quel que soit le nombre de
+  commandes de lecture. Sa réponse fait 150 mots au plus, sans mot de verdict ni décision `D-N` ou
+  action `A-N` posée.
+- **Écrire, c'est**, dans le tour :
+  - un appel Write, Edit, MultiEdit ou NotebookEdit, quel que soit le chemin, dossier temporaire
+    compris (voir « Brouillon ») ;
+  - une écriture par commande hors du dossier temporaire : redirection, `tee`, `sed -i`,
+    `Set-Content`, `Out-File`, destination d'un `cp` ou d'un `mv`, `rm`, `mkdir` ;
+  - un commit, un push ou une autre commande à effet, `git -C <dossier> commit` compris ;
+  - un agent qui peut écrire, ou un outil connecté qui écrit.
+- **Le corps d'un heredoc n'est pas une commande** : le brouillon passé à `--pre-vol` ne compte pas.
+- **Ce qui reste jugé sur une réponse courte** : un « oui » à une question de complétude, ou une
+  affirmation d'exhaustivité (« tout est à jour »), sans ligne « Mesuré sur » (COMPLÉTUDE, S82). Le
+  refus est court et la réponse le reste. Il réclame la ligne ou le retrait de l'affirmation, jamais
+  une restitution complète.
+- **Ce qui se resserre** : un tour de 3 commandes au plus qui écrivait par commande (un commit, une
+  redirection vers un fichier du dépôt) était exempté ; il est jugé désormais.
+- **Ce que le relevé ne voit pas** : un programme lancé par une commande qui écrit ou commite lui-même
+  (`node x.mjs`). L'état git du dépôt n'est pas relu, contrairement au niveau Moyen. Plusieurs
+  sessions écrivent dans le même arbre, et l'écriture d'une autre ferait juger à tort une réponse
+  courte.
+- **Juge** : `oracles\hook-restitution.mjs` (`ecrituresDuTour`, `jugeable`, `controlerReponseCourte`,
+  `--pre-vol`). Il réutilise `ecrituresParCommande` de `scripts\relecture-intention.mjs`. Recettes :
+  `oracles\hook-restitution.test.mjs` (cas 57) et `gabarits\hooks-factory.test.mjs` (cas 1 bis).
+- **Retour arrière** : rétablir dans `analyserTranscript` le critère « au moins quatre commandes » à
+  côté des écritures.
 
 ## Invariants — aucun niveau ne les lève
 
@@ -155,8 +201,8 @@ comme au pilot, avec les mêmes bornes, la même forme et la même escalade par 
 - **Les invariants** ne bougent pas, et chez un produit s'y ajoute la ligne « Remontée à la
   factory » de toute restitution complète.
 - **Recette** : `gabarits\hooks-factory.test.mjs`, sur un produit jetable : une réponse Simple courte
-  passe, la même dans un tour qui écrit est jugée complète ; une réponse Moyen passe, la même dans un
-  tour qui commite est jugée Complexe.
+  passe, y compris après 6 commandes de lecture (depuis le 26/10/2026), la même dans un tour qui écrit
+  est jugée complète ; une réponse Moyen passe, la même dans un tour qui commite est jugée Complexe.
 - **Retour arrière** : retirer l'entrée `forge/NIVEAUX.md` du contrat et la cible `forge` de la garde
   du hook de lexique ; le juge, partagé, suit le pilot.
 

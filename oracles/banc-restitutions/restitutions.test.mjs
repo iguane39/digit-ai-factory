@@ -110,7 +110,12 @@ try {
       const r = spawnSync(process.execPath, [join(ICI, "restitutions.mjs"), "--rejouer", "--corpus", sortie, "--json"], { encoding: "utf8", env: { ...process.env, FORGE_ROOT: process.env.FORGE_ROOT || join(ICI, "..", "..", "..") } });
       att(r.status === 0, `rejouer : exit ${r.status} ${r.stderr}`);
       const j = JSON.parse(r.stdout);
-      att(j.refus === 1 && j.rejouables === 1 && j.toujours_refuses === 1, `le juge réel devait encore refuser un texte sans bloc : ${JSON.stringify([j.refus, j.rejouables, j.toujours_refuses, j.ne_le_sont_plus])}`);
+      // T2 (TF-1947, 26/10/2026) : un texte sans aucun bloc reste REFUSÉ par le juge réel (S1, S4, S6), mais S3 n'y mord plus : le
+      // bloc 2 ne vient que s'il y a un verdict, et S3 se dit sans objet sans lui. Adapté : « toujours refusé sur les quatre règles
+      // nommées » devient « partiel », S1 toujours refusée et S3 « ne l'est plus » — ce que le banc existe pour montrer d'une règle
+      // assouplie par décision humaine.
+      att(j.refus === 1 && j.rejouables === 1 && j.partiels === 1 && j.par_regle?.S1?.toujours_refuses === 1 && j.par_regle?.S3?.ne_le_sont_plus === 1,
+        `le juge réel devait encore refuser un texte sans bloc sur S1, et ne plus le refuser sur S3 (T2) : ${JSON.stringify([j.refus, j.rejouables, j.toujours_refuses, j.partiels, j.ne_le_sont_plus, j.par_regle])}`);
       att(spawnSync(process.execPath, [join(ICI, "restitutions.mjs"), "--rejouer", "--corpus", join(d, "vide")], { encoding: "utf8" }).status === 2, "un corpus absent sort en 2");
       att(spawnSync(process.execPath, [join(ICI, "restitutions.mjs")], { encoding: "utf8" }).status === 2, "sans verbe, sortie 2");
     } finally { rmSync(d, { recursive: true, force: true }); }

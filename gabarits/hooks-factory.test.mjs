@@ -10,6 +10,7 @@
  * que la recette juge le code de la branche et non celui d'un autre clone).
  *
  *   1. VERT — une réponse Simple courte, sans outil : le hook de fin de tour laisse passer.
+ *   1 bis. VERT — la même après six commandes de lecture, sans écriture (TF-1947, D-75 (c)).
  *   2. ROUGE — la même réponse dans un tour qui a écrit un fichier du produit : jugée complète.
  *   3. VERT — une réponse Moyen sans effet : laisse passer à sa forme.
  *   4. ROUGE — la même réponse dans un tour qui a commité : escalade, jugée Complexe.
@@ -79,7 +80,9 @@ try {
   }
   copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie, "bootstrap.mjs"));
   // TF-1528 : le hook des droits accordés rejoue `scripts/verifier-droits-accordes.mjs` et sa table datée.
-  for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs"]) {
+  // TF-1947 : le hook de fin de tour lit les écritures par commande avec `scripts/relecture-intention.mjs` (et son import).
+  for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs",
+    "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs"]) {
     mkdirSync(join(copie, dirname(f)), { recursive: true });
     copyFileSync(join(PILOT, f), join(copie, f));
   }
@@ -102,6 +105,12 @@ try {
   const sEffet = finDeTour("simple-effet", [outil("Write", { file_path: join(P, "app.py") })], SIMPLE);
   check("2 rouge : même réponse dans un tour qui a écrit un fichier du produit → restitution complète exigée",
     sEffet?.decision === "block" && /R-44/.test(sEffet.reason), JSON.stringify(sEffet)?.slice(0, 200));
+  // 1 bis — TF-1947 (D-75 (c), 26/10/2026) : la même réponse après SIX commandes de lecture, refusée jusque-là (seuil de 4
+  // commandes), passe chez le produit comme au pilot : un tour qui n'a rien écrit se rend en court.
+  const sLectures = finDeTour("simple-six-lectures",
+    Array.from({ length: 6 }, (_, i) => outil("Bash", { command: `grep -n motif${i} forge/ledger.jsonl` })), SIMPLE);
+  check("1 bis vert : réponse Simple courte après 6 commandes de lecture, aucune écriture → le hook produit laisse passer (TF-1947)",
+    sLectures === null, JSON.stringify(sLectures)?.slice(0, 200));
 
   // 3 et 4 — Moyen : le même texte, sans puis avec un commit.
   const lectures = Array.from({ length: 6 }, (_, i) => outil("Bash", { command: `grep -n motif${i} forge/ledger.jsonl` }));
@@ -111,8 +120,10 @@ try {
   check("4 rouge : même réponse dans un tour qui a commité → jugée Complexe (escalade par les effets)",
     mEffet?.decision === "block" && /jugé Complexe/.test(mEffet.reason), JSON.stringify(mEffet)?.slice(0, 200));
 
-  // 5 — Pré-vol par le lanceur, comme le prescrit forge/NIVEAUX.md chez un produit.
-  const pv = (t) => spawnSync(process.execPath, [lanceur, "restitution", "--pre-vol"], { encoding: "utf8", cwd: P, env, input: t });
+  // 5 — Pré-vol par le lanceur, comme le prescrit forge/NIVEAUX.md chez un produit. Sans l'identifiant de la session qui
+  // joue la recette (TF-1947) : le pré-vol relit la transcription de la session pour savoir si le tour a écrit.
+  const envSansSession = { ...env }; delete envSansSession.CLAUDE_CODE_SESSION_ID;
+  const pv = (t) => spawnSync(process.execPath, [lanceur, "restitution", "--pre-vol"], { encoding: "utf8", cwd: P, env: envSansSession, input: t });
   const pvOk = pv(SIMPLE), pvKo = pv(SIMPLE + "\n\n" + "mot ".repeat(200));
   check("5 pré-vol par le lanceur : réponse Simple courte → exit 0", pvOk.status === 0 && /rendable_sans_restitution":true/.test(pvOk.stdout), pvOk.stdout + pvOk.stderr);
   check("5 bis pré-vol par le lanceur : 200 mots de plus → exit 1", pvKo.status === 1, pvKo.stdout + pvKo.stderr);
@@ -254,4 +265,4 @@ try {
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), geste destructif distant refusé sans lot, lot posé par le lanceur puis commande admise, lecture admise (TF-1959)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903)`);
