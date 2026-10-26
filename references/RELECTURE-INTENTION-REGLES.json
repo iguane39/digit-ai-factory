@@ -232,8 +232,8 @@
         "id": "P1",
         "regle": "Un tableau de données filtrable ou triable utilise le composant `table-filters` du socle `digit-ai-page-html`, jamais un tri ou un filtre maison, même quand la demande dit seulement « tri et filtres ».",
         "source": {
-          "fichier": "gabarits/CLAUDE-PRODUIT.md",
-          "ligne": 86,
+          "fichier": "references/CLAUDE-PRODUIT-DETAIL.md",
+          "ligne": 124,
           "ancre": "composant `table-filters` du skill `digit-ai-page-html`"
         },
         "fait": "TF-0765, 02/09/2026 : un brief a exigé « tri et filtres » sans nommer la règle ni le composant ; la console est partie avec un tri maison jugé conforme par ses propres oracles, et l'humain a dû redemander « comme demandé par la factory »."
