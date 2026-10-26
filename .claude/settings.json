@@ -66,6 +66,16 @@
         ]
       },
       {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-gestes-distants.mjs\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "PowerShell",
         "hooks": [
           {

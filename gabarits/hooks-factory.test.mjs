@@ -226,8 +226,32 @@ try {
     /\$\{CLAUDE_PROJECT_DIR\}\/forge\/hooks\/factory\.mjs/.test(String(cmdRemisage)) && ancre.status === 2 && /TF-1754/.test(ancre.stderr), `${cmdRemisage} → ${ancre.status} ${ancre.stdout}${ancre.stderr}`);
   check("13 bis TF-1903 rouge : la commande relative d'avant, depuis le même sous-dossier, ne trouve pas le lanceur",
     relatif.status !== 0 && /MODULE_NOT_FOUND|Cannot find module/.test(relatif.stderr), `${relatif.status} ${relatif.stderr.slice(0, 200)}`);
+
+  // 14 — TF-1959 (26/10/2026, D-77 (b) amendée), gestes distants par le lanceur : `az group delete` sans lot approuvé
+  // est refusé (exit 2) avec le remède du PRODUIT ; `--poser` par le lanceur, entrée standard ouverte, écrit le lot
+  // sous forge/ et la même commande passe ; une lecture passe sans lot.
+  const envG = { ...env, CLAUDE_PROJECT_DIR: P };
+  const geste = (command) => spawnSync(process.execPath, [lanceur, "gestes-distants"], { encoding: "utf8", cwd: P, env: envG,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command } }) });
+  const gSans = geste("az group delete --name rg-essai --yes"), gLecture = geste("az group show --name rg-essai");
+  check("14 gestes distants : `az group delete` sans lot refusé par le lanceur, remède du produit nommé (TF-1959)",
+    gSans.status === 2 && /TF-1959/.test(gSans.stderr) && /forge\\hooks\\factory\.mjs gestes-distants --poser/.test(gSans.stderr), gSans.stdout + gSans.stderr);
+  check("14 bis gestes distants : une lecture (`az group show`) passe sans lot", gLecture.status === 0, gLecture.stdout + gLecture.stderr);
+  const lotG = join(base, "lot-gestes.json");
+  writeFileSync(lotG, JSON.stringify({ decision: "D-78", reponse_humaine: "78a : approuvé, toute la liste", gestes: [
+    { commande: "az group delete --name rg-essai --yes", cible: "groupe rg-essai", effet: "supprime le groupe", retour_arriere: "aucun, se recrée par terraform apply" }] }), "utf8");
+  const poseG = await new Promise((ok) => {
+    const c = spawn(process.execPath, [lanceur, "gestes-distants", "--poser", "--lot", lotG], { cwd: P, env: envG, stdio: ["pipe", "pipe", "pipe"] });
+    let out = "", err = "";
+    c.stdout.on("data", (d) => { out += d; }); c.stderr.on("data", (d) => { err += d; });
+    const minuteur = setTimeout(() => { c.kill(); ok({ fini: false, out, err }); }, 30000);
+    c.on("exit", (code) => { clearTimeout(minuteur); ok({ fini: true, code, out, err }); });
+  });
+  const gApres = geste("az group delete --name rg-essai --yes");
+  check("14 ter gestes distants : `--poser` par le lanceur (entrée standard ouverte) écrit le lot sous forge/, et la commande passe ensuite",
+    poseG.fini && poseG.code === 0 && existsSync(join(P, "forge", "gestes-approuves.jsonl")) && gApres.status === 0, `${JSON.stringify(poseG)} ${gApres.stderr}`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), geste destructif distant refusé sans lot, lot posé par le lanceur puis commande admise, lecture admise (TF-1959)`);

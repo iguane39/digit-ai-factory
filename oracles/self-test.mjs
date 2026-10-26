@@ -103,6 +103,8 @@ writeFileSync(join(verte, ".claude", "settings.json"),
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
       { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },
         { type: "command", command: "node forge/hooks/factory.mjs remisage" }] },
+      // TF-1959 (HERITAGE 1.37.0, 26/10/2026) : les gestes destructifs distants se décident en un lot.
+      { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs gestes-distants" }] },
       // D-19 (a) (HERITAGE 1.29.0, 18/10/2026) : la flotte d'agents rappelée à chaque délégation.
       { matcher: "Agent|Task", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs flotte" }] }],
     // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
