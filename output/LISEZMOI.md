@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 519 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 520 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -475,6 +475,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md | 20261018g | 9 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` |
 | Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md | 20261018e | 13.6 Ko | `04-plans/Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md` |
 | Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md | 20261019k | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md` |
+| Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md | 20261026s | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md` |
 | Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md | 20261004a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` |
 | Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md | 20261012a | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` |
 | Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md | 20261001e | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` |
