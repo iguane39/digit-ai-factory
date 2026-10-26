@@ -35,7 +35,7 @@ import { tmpdir, homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { controlerOuiDeCompletude, affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
-import { REGISTRE_PILOT, lireRegistrePilot, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
+import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
 // de fin de tour, qui garde alors son propre relevé d'effets (`detecterEffets`) ; `ecrituresDuTour` le dit dans sa sortie.
@@ -1045,6 +1045,8 @@ const RAPPEL_DETAIL = "Un détail demandé reçoit la décision EN ENTIER, au bl
 // NON JUGÉ : que le numéro soit libre, ou continu (deux sessions qui écrivent au même instant, hors périmètre décidé le
 // 18/10 : « Ne règle pas deux sessions qui écrivent au même instant ») ; que l'entrée du registre dise la même chose
 // que la décision affichée ; un produit dont le ledger est absent (il le dit, ne l'invente pas).
+// DEPUIS TF-1911 (D-83 (a), 26/10/2026) : un numéro que le REGISTRE COMMUN DU POSTE (`<git-common-dir>/forge-decisions.jsonl`, écrit par `reserver-decision.mjs`,
+// partagé par tous les arbres de travail du même dépôt) porte pour une AUTRE question est refusé tout de suite (`prises`) ; deux postes restent hors périmètre.
 // AU PILOT : il n'existe PAS de registre des D-N. Il n'a ni `forge\ledger.jsonl` ni `forge\retours\` ; ses D-N vivent
 // dans les synthèses déposées sous `output\04-plans\`, et seule la revue hebdomadaire consigne une correspondance
 // D-N → TF-#### (`todo\observabilite\revues-hebdo.jsonl`). Aucune règle n'est posée pour lui : elle n'a pas été décidée.
@@ -1103,13 +1105,27 @@ export function controlerReservation({ dernierTexte = "", dernierHumain = "", te
   const nouvelles = decisionsPosees(dernierTexte).filter((d) => !nommees.has(d.n) && !citeD(d.n, deja));
   if (!nouvelles.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit, nouvelles: [] };
   const registre = registreDesDecisions(produit);
-  const absentes = nouvelles.filter((d) => !registre.numeros.has(d.n)).map((d) => "D-" + d.n);
+  // TF-1911 (D-83 (a), 26/10/2026) : le registre COMMUN du poste, partagé par tous les arbres de travail du même dépôt. Un numéro qu'il porte pour une AUTRE
+  // question est déjà pris, même si le ledger de CET arbre l'ignore ou le nomme ; indisponible (pas un dépôt git), il se tait et le contrôle d'avant joue seul.
+  const commun = lireRegistreCommun(produit);
+  const prises = nouvelles.filter((d) => {
+    const inscrites = commun.entrees.filter((e) => String(e.n) === d.n);
+    return inscrites.length && !inscrites.some((e) => memeQuestion(e.question, questionDeTete(d.segment)));
+  });
+  const absentes = nouvelles.filter((d) => !registre.numeros.has(d.n) && !prises.includes(d)).map((d) => "D-" + d.n);
   const bloquant = !!RESERVATION_BLOQUANTE_DES && maintenant >= new Date(RESERVATION_BLOQUANTE_DES);
-  const ecarts = absentes.length ? [`${absentes.join(", ")} posée${absentes.length > 1 ? "s" : ""} au bloc 3 sans entrée \`question_humain\` au registre du produit `
+  const ecarts = [...(absentes.length ? [`${absentes.join(", ")} posée${absentes.length > 1 ? "s" : ""} au bloc 3 sans entrée \`question_humain\` au registre du produit `
     + `(${registre.existe ? `${registre.fichier}, ${registre.entrees} entrée(s) question_humain` : `${registre.fichier} introuvable`}) : un numéro de décision ne se réserve nulle part ailleurs, `
-    + "et deux sessions du même produit peuvent le prendre toutes deux (TF-1849, retour Produit-79 RP-12 : D-37 posée deux fois à 8 minutes d'intervalle)"] : [];
-  return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", bloquant: ecarts.length ? bloquant : false, ecarts, produit,
-    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes };
+    + "et deux sessions du même produit peuvent le prendre toutes deux (TF-1849, retour Produit-79 RP-12 : D-37 posée deux fois à 8 minutes d'intervalle)"] : []),
+    ...prises.map((d) => {
+      const e = commun.entrees.find((x) => String(x.n) === d.n);
+      return `D-${d.n} est DÉJÀ PRISE au registre commun du poste (${commun.fichier}) pour une autre question (« ${String(e.question).slice(0, 110)} », ${e.date || "sans date"}, arbre ${e.arbre || "inconnu"}) `
+        + `et tu poses « ${questionDeTete(d.segment).slice(0, 110)} » : une réponse « ${d.n}a » ne dirait plus à laquelle des deux elle répond (TF-1911, D-83 (a) : D-155, D-156 et D-159 prises deux fois les 18 et 19/10/2026 entre arbres de travail d'un même dépôt)`;
+    })];
+  // Un numéro pris pour une autre question est une collision CERTAINE (le registre commun ne contient que des réservations faites par l'outil) : elle bloque tout de suite,
+  // alors qu'un numéro absent reste avertissant jusqu'à l'échéance de TF-1849 (la mesure d'entrée de cette échéance ne porte que sur les absents).
+  return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", bloquant: ecarts.length ? (bloquant && absentes.length > 0) || prises.length > 0 : false, ecarts, produit,
+    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes, prises: prises.map((d) => "D-" + d.n) };
 }
 
 // ---- TF-1872 (18/10/2026, D-32 (a), « valable tous produits ») — LE MÊME CONTRÔLE AU PILOT --------------------------------
@@ -1159,7 +1175,8 @@ const RAPPEL_RESERVATION_PILOT = "Au PILOT, une D-N NOUVELLE s'inscrit au regist
 const RAPPEL_RESERVATION = "Une D-N NOUVELLE s'inscrit au registre du produit AVANT d'être affichée : une entrée `question_humain` du ledger (forge/ledger.jsonl) qui porte D-N et la question, "
   + "de préférence par `node <pilot>/scripts/reserver-decision.mjs --question \"<la question posée ?>\"` (rend le prochain numéro libre et l'inscrit en une opération, par l'écrivain du ledger du produit), "
   + "sinon par `python forge/ledger.py question_humain --decision D-N --question \"<la question posée>\"`, ou `node <forge-agents>/scripts/ledger.mjs append forge/ledger.jsonl '{\"type\":\"question_humain\",\"decisions_posees\":{\"D-N\":\"<la question>\"}}'` ; "
-  + "puis réécris la restitution. Un rappel d'une ligne (« **D-N** : <sujet>, posée le JJ/MM à HH:MM, inchangée ») n'est pas une D-N nouvelle (S4, TF-1849).";
+  + "puis réécris la restitution. Un numéro DÉJÀ PRIS pour une autre question au registre commun du poste (celui que partagent tous les arbres de travail du produit, TF-1911) se remplace par un numéro réservé par cet outil. "
+  + "Un rappel d'une ligne (« **D-N** : <sujet>, posée le JJ/MM à HH:MM, inchangée ») n'est pas une D-N nouvelle (S4, TF-1849).";
 const rappelReservation = (r) => (r && r.cible === "pilot" ? RAPPEL_RESERVATION_PILOT : RAPPEL_RESERVATION);
 const echeanceReservation = (r) => (r && r.cible === "pilot" ? RESERVATION_PILOT_BLOQUANTE_DES : RESERVATION_BLOQUANTE_DES);
 
@@ -1415,7 +1432,7 @@ const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.50.0), le compte rendu complet allégé (T2, TF-1947). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.51.0), le compte rendu complet allégé (T2, TF-1947). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
