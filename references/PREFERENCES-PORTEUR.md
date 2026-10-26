@@ -10,3 +10,4 @@ Chargées à chaque ouverture, au pilot et chez les produits (T1, TF-1946, D-68 
 - « Remonte à la Factory » se fait toujours, au format des lots de retours (26/10).
 - Un audit complet passe par forge-audit, jamais par forge-tests (15/10).
 - Une heure écrite se relève à l'horloge, jamais estimée (01/10).
+- Un message qui ne cite pas la lettre d'une décision ouverte (« 76c ») n'en vaut pas le choix : la session demande la lettre avant tout geste qui en dépend (26/10).
