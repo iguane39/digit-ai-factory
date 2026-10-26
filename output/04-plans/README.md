@@ -59,6 +59,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` | fichier | 6,0 Ko | Synthèse Mandat — D-45 (b) exécutée, le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` | fichier | 5,8 Ko | Synthèse Mandat — D-45 reposée en clair, le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md` | fichier | 3,9 Ko | Synthèse Mandat — D-74 exécutée : conventions du client chargées à l'ouverture de ses prod |
+| `Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md` | fichier | 2,8 Ko | Synthèse Mandat — D-79 (c) enregistrée : T4 entière part dès la fusion du compte rendu all |
+| `Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md` | fichier | 5,7 Ko | Synthèse Mandat — D-79 détaillée : contrôle audit et data seul, ou T4 entière après T2 (26 |
 | `Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` | fichier | 21,3 Ko | Digit-AI — Synthèse de mandat — D-36 et D-37 exécutées, 18 candidatures closes — 01/10/202 |
 | `Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` | fichier | 19,6 Ko | Synthèse Mandat — vos décisions D-49, D-50 et D-51 sont exécutées ou en cours ; la campagn |
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
@@ -69,6 +71,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |
 | `Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` | fichier | 6,5 Ko | Synthèse Mandat — dépôts privés hors d'accès non bloquants pour un poste tiers (13/10/2026 |
 | `Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` | fichier | 5,2 Ko | Synthèse Mandat — dépôts privés silencieux et confirmation d'installation en fin de comman |
+| `Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md` | fichier | 4,9 Ko | Synthèse Mandat — deux chantiers fusionnés sur quatre : décisions sans lettre et gestes de |
 | `Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` | fichier | 17,4 Ko | Synthèse Mandat — vos 12 décisions exécutées, rien n'est encore publié (17/10/2026) |
 | `Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` | fichier | 11,3 Ko | Synthèse Mandat — l'essai de relecture d'intention est en place sur le poste, et la mesure |
 | `Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` | fichier | 12,6 Ko | Synthèse Mandat — l'essai est publié ; les alertes ne corrigent encore rien d'elles-mêmes, |
@@ -108,6 +111,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
 | `Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` | fichier | 7,1 Ko | Synthèse Mandat — campagne du matin reprise et close, relecteur du lecteur visé construit  |
 | `Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md` | fichier | 7,9 Ko | Synthèse Mandat — réponses « 68a, 69a, 70a, 73b » : registre à jour, T1 engagée, relecture |
+| `Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md` | fichier | 6,7 Ko | Synthèse Mandat — réponses 75c, 76c, 77b, 78c et 80b : quatre chantiers lancés, D-79 expli |
 | `Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` | fichier | 4,7 Ko | Synthèse Mandat — reprise multi-poste construite, fusionnée avec l'autre poste, publicatio |
 | `Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` | fichier | 9,5 Ko | Synthèse Mandat — vos réponses 1a, 2a et 3b exécutées, reprise multi-poste prête à publier |
 | `Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` | fichier | 3,5 Ko | Synthèse Mandat — reprise réseau de l'installateur publiée, chantier d'installation sans q |
@@ -123,5 +127,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` | fichier | 16,1 Ko | Synthèse Mandat — la recette hébergée du pilot repasse au vert, les 2 lots du jour attende |
 | `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
+| `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_104 fichier(s), 3 sous-dossier(s)_ · 12 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_109 fichier(s), 3 sous-dossier(s)_ · 12 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

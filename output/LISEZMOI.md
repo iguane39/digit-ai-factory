@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 511 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 516 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -499,6 +499,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md | 20261019h | 6 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` |
 | Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md | 20261019g | 5.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` |
 | Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md | 20261026g | 3.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md` |
+| Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md | 20261026n | 2.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md` |
+| Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md | 20261026m | 5.7 Ko | `04-plans/Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md` |
 | Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md | 20261001c | 21.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` |
 | Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md | 20261002a | 19.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` |
 | Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md | 20261012b | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` |
@@ -509,6 +511,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md | 20261001h | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` |
 | Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md | 20261013e | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` |
 | Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md | 20261013f | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` |
+| Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md | 20261026l | 4.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md` |
 | Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md | 20261017d | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` |
 | Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md | 20261018j | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` |
 | Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md | 20261018l | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` |
@@ -548,6 +551,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md | 20261001m | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` |
 | Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md | 20261013k | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` |
 | Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md | 20261026f | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md` |
+| Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md | 20261026k | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md` |
 | Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md | 20261015i | 4.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` |
 | Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md | 20261015j | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` |
 | Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md | 20261013j | 3.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` |
@@ -563,6 +567,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md | 20261015n | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` |
 | Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md | 20261019c | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` |
+| Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md | 20261026o | 4.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md *(archivé)* | 20261016a | 4.5 Ko | `04-plans/old/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` |
 
 ### 05-catalogues-readmes-forges
