@@ -274,6 +274,37 @@ try {
       "forge/documents/FICHE-CONCEPTION.md copie mais different de sa source");
   });
 
+  // ── T4 (TF-1949, 26/10/2026, D-69 (a) et D-79 (c)) : L'HÉRITAGE RÉDUIT ─────────────────────────────────────────────────────
+  // Le gabarit hérité par chaque produit pesait 27 762 octets en fins de ligne LF (28 040 sur un disque en CRLF), 4,5 fois le plafond
+  // du fichier hérité que la règle anti-inflation fixe à 6 Ko (diagnostic 20261026a, section f) ; la mesure se fait en LF, comme N1. Réduit, il porte la règle « Je mobilise », la carte et le renvoi au détail, sans
+  // perdre ce que R-11, R-43, R-47 et R-11 bis exigent ni les règles de sécurité, de secrets et de protection des noms ; le texte
+  // d'origine vit, mot pour mot, dans `references/CLAUDE-PRODUIT-DETAIL.md`.
+  check("TF-1949 — le CLAUDE.md recopié depuis le gabarit réduit tient en 6 144 octets et garde ses motifs exigés et ses règles de sécurité", () => {
+    const produit = join(T, "produit-heritage-reduit");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    const claude = readFileSync(join(produit, "CLAUDE.md"), "utf8").split("\r\n").join("\n");
+    const octets = Buffer.byteLength(claude, "utf8");
+    att(octets <= 6144, `CLAUDE.md hérité : ${octets} octets pour un plafond de 6 144`);
+    const absents = ["## Routage forge", "forge_tests", "init-audit-workspace", "run de version", "MEP", "R-43", "R-64", "## Référentiels",
+      "exigences", "anomalies", "contrat_interface", "Je mobilise", "CARTE-FORGES.json", "mobiliser.mjs", "CLAUDE-PRODUIT-DETAIL.md",
+      "Gestes destructifs distants", "gestes-distants --poser", ".env", "R-38", "R-62", "_arrivee", "visibility", "TF-1046", "<commande>",
+      "<autre type de ce produit>", "oracles\\resoudre-pilot.mjs"].filter((m) => !claude.includes(m));
+    att(!absents.length, `le CLAUDE.md hérité ne porte plus : ${absents.join(", ")}`);
+  });
+
+  check("TF-1949 — sans perte : le détail du pilot garde, mot pour mot, chaque section sortie du gabarit", () => {
+    const detail = join(PILOT, "references", "CLAUDE-PRODUIT-DETAIL.md");
+    att(existsSync(detail), "references/CLAUDE-PRODUIT-DETAIL.md absent : le texte sorti du gabarit n'a plus de lieu");
+    const texte = readFileSync(detail, "utf8").split("\r\n").join("\n");
+    const absents = ["| Intention | Le chemin | Jamais |", "Remontée automatique vers le pilot", "Portée d'un retour (T1, TF-1946",
+      "Remettre sans nom réel (TF-1233", "Noms réels dans le dépôt du produit (règle humaine du 01/10/2026, TF-1676)", "Règles de socle applicables", "oracle-polices-embarquees",
+      "TF-1048", "TF-1424", "TF-1503", "R-62", "Lexique d'invocation (RV-6", "Pourquoi cette section existe", "process.exit(c.length?2:1)",
+      "Reprise sur un autre poste (R-64)"].filter((m) => !texte.includes(m));
+    att(!absents.length, `le détail ne porte pas : ${absents.join(", ")}`);
+  });
+
   check("TF-0851 — le geste imprime la ligne `git add` des fichiers qu'il vient d'écrire", () => {
     const produit = join(T, "produit-add");
     mkdirSync(join(produit, "forge"), { recursive: true });

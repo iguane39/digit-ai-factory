@@ -1,0 +1,72 @@
+{
+  "schema": "pilot/carte-forges@1",
+  "version": "1.0.0",
+  "date": "2026-10-26",
+  "source": "output/03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md, section d, T4 (carte de départ) et A5 (profil du produit) ; décisions humaines D-69 (a) et D-79 (c) du 26/10/2026 ; TF-1949",
+  "fait": "Sur 10 produits clos ou publiés, 2 portaient leurs 4 livrables de forge ; un produit s'est déclaré complet sans exigences, design ni tests ; sur 7 jours, aucune trace de forge-audit sur une douzaine de demandes d'audit, aucune de forge-data sur les demandes de données (diagnostic 20261021a, section c-D2, repris par 20261026a).",
+  "regle": "La carte PRIVILÉGIE, elle ne fige pas. À chaque demande chez un produit, chacune des 13 forges reçoit un verdict « mobilisee » ou « ecartee » avec son motif, au regard de la demande et du profil du produit : une forge privilégiée se mobilise sauf motif contraire, une forge hors de la carte se mobilise dès qu'un motif la rend pertinente. Écrivain : scripts/mobiliser.mjs, qui écrit la trace forge/mobilisation.jsonl chez le produit et rend la ligne d'écran « Je mobilise : … ». Avant « livré », les livrables de chaque forge mobilisée sont présents.",
+  "comment_lire": "Un type de demande par entrée de `types`. Ses forges privilégiées se mobilisent sauf motif contraire ; `livrables_exiges` donne, pour une forge privilégiée mobilisée, les livrables présents avant « livré », et une forge privilégiée sans entrée exige ses livrables par défaut. Une forge mobilisée hors des forges privilégiées du type exige ses livrables par défaut (`forges.<forge>.livrables`). Une demande à plusieurs types cumule leurs exigences. Un livrable est présent quand un fichier du produit répond à l'un de ses `chemins` (`*` dans un segment, `**` sur plusieurs). `etabli: false` signale un chemin posé par cette carte faute d'emplacement relevé chez les produits : il se corrige ici dès qu'un produit en emploie un autre.",
+  "revue": "Dès qu'une forge privilégiée est écartée deux fois pour le même motif, ou ajoutée deux fois hors de la carte (lecture des traces forge/mobilisation.jsonl) ; au plus tard le 2026-11-26.",
+  "profil": {
+    "fichier": "forge/PROFIL.json chez le produit, déclaré une fois et revu quand un signal change",
+    "signaux": {
+      "domaine_public": "le produit est servi sur un domaine public",
+      "page_indexable": "le produit porte au moins une page qu'un moteur peut indexer",
+      "donnees_personnelles": "le produit traite des données personnelles",
+      "agents": "le produit embarque ou construit des agents",
+      "mise_en_production": "le produit, ou la demande, vise une mise en production"
+    },
+    "source": "diagnostic 20261026a, section d, A5 : une page publique rend seo-geo et websec pertinents à la demande qui l'ajoute ; les autres correspondances signal vers forge (`forges.<forge>.signaux`) sont posées par cette carte et se revoient à la revue"
+  },
+  "forges": {
+    "conception": { "depot": "digit-ai-forge-conception", "role": "les exigences du produit, par les 4 verbes (entrant, surface, exigences, vues)", "livrables": ["exigences"] },
+    "design": { "depot": "digit-ai-forge-design", "role": "la marque, les jetons, DESIGN.md et la maquette ; la critique d'implémentation en aval", "livrables": ["design-md", "jetons"] },
+    "development": { "depot": "digit-ai-forge-development", "role": "la construction du produit sous les gates du run-playbook", "livrables": [], "motif_sans_livrable": "le code du produit est son livrable, et son verdict passe par forge-tests" },
+    "tests": { "depot": "digit-ai-forge-tests", "role": "l'audit indépendant de la couverture (forge_tests), jamais l'audit du produit", "livrables": ["rapport-forge-tests"] },
+    "ops": { "depot": "digit-ai-forge-ops", "role": "l'outillage de la mise en production (O-1 à O-4) ; elle outille, elle ne décide jamais", "livrables": ["dossier-mep"], "signaux": ["mise_en_production"] },
+    "agents": { "depot": "digit-ai-forge-agents", "role": "les définitions d'agents, la flotte et leur recette", "livrables": ["definitions-agents", "recette-agents"], "signaux": ["agents"] },
+    "agents-security": { "depot": "digit-ai-forge-agents-security", "role": "la sécurité agentique : définitions d'agents et journaux d'appels d'outils", "livrables": ["verdict-agents-security"], "signaux": ["agents"] },
+    "seo-geo": { "depot": "digit-ai-forge-seo-geo", "role": "le référencement et la visibilité dans les moteurs génératifs, après la mise en production ; jamais déclenchée sans mandat humain", "livrables": ["rapport-seo-geo"], "signaux": ["page_indexable"] },
+    "organization": { "depot": "digit-ai-forge-organization", "role": "les conventions transverses ; organization propose, le pilot décide", "livrables": [], "motif_sans_livrable": "la forge n'a ni point d'entrée ni livrable de forge (dette D-O1, CONTRAT-INTERFACE.md section 5) : sa mobilisation se motive, son effet se lit dans les conventions appliquées" },
+    "audit": { "depot": "digit-ai-forge-audit", "role": "l'audit du produit (gouvernance, maturité, dimensions) ; la demande de l'humain vaut mandat", "livrables": ["rapport-forge-audit"] },
+    "data": { "depot": "digit-ai-forge-data", "role": "le lineage, la qualité et la restitution des données", "livrables": ["lineage", "rapport-qualite-donnees"] },
+    "observability": { "depot": "digit-ai-forge-observability", "role": "la veille entre les runs : plan d'observation, sondes et dérive", "livrables": ["plan-observation"] },
+    "websec": { "depot": "digit-ai-forge-websec", "role": "la sécurité du livrable web : surface exposée et dépendances, avant et après la mise en production", "livrables": ["verdict-websec"], "signaux": ["domaine_public", "page_indexable", "donnees_personnelles"] }
+  },
+  "livrables": {
+    "exigences": { "libelle": "EXIGENCES.json", "chemins": ["forge/etapes/conception/EXIGENCES.json"], "etabli": true, "source": "CONTRAT-INTERFACE.md section 2 ; references/ETAPES-RUN.md section 2" },
+    "design-md": { "libelle": "DESIGN.md", "chemins": ["forge/etapes/design/DESIGN.md", "design/DESIGN.md"], "etabli": true, "source": "references/ETAPES-RUN.md sections 3 et 4 (DESIGN.md généré sous etapes/design, copié sous design/ pour le gate de forge-development)" },
+    "jetons": { "libelle": "jetons de la marque (tokens.css)", "chemins": ["forge/etapes/design/tokens.css", "design/tokens.css"], "etabli": true, "source": "CONTRAT-INTERFACE.md section 2 (etapes/design : tokens.css) ; le second chemin est posé par cette carte" },
+    "rapport-forge-tests": { "libelle": "rapport forge-tests", "chemins": ["forge/etapes/tests/rapport-*.json"], "etabli": true, "source": "gabarits/CLAUDE-PRODUIT.md, route « Relance les tests » (--sortie forge/etapes/tests/rapport-AAAAMMJJ.json) ; CONTRAT-INTERFACE.md section 2" },
+    "dossier-mep": { "libelle": "DOSSIER-MEP.md", "chemins": ["forge/DOSSIER-MEP.md"], "etabli": true, "source": "CONTRAT-INTERFACE.md section 2 ; ETAPE-MEP.md" },
+    "rapport-forge-audit": { "libelle": "rapport forge-audit (rapport-data.json)", "chemins": ["forge/audit/*/rapport-data.json"], "etabli": true, "source": "gabarits/CLAUDE-PRODUIT.md, route « Auditer le produit » (init-audit-workspace sous forge/audit/AAAAMMJJ)" },
+    "rapport-seo-geo": { "libelle": "rapport seo-geo", "chemins": ["forge/etapes/seo-geo/*"], "etabli": false, "source": "chemin posé par cette carte : aucun emplacement de produit relevé au pilot (CONTRAT-INTERFACE.md section 5 : rapport rendu par rapport_html.py)" },
+    "verdict-websec": { "libelle": "verdict websec (sortie JSON d'oracle-exposition ou d'oracle-sca)", "chemins": ["forge/etapes/websec/*.json"], "etabli": false, "source": "chemin posé par cette carte ; oracles nommés par CONTRAT-INTERFACE.md section 5" },
+    "lineage": { "libelle": "lineage forge-data (forge-data/lineage@1)", "chemins": ["forge/etapes/data/*lineage*.json"], "etabli": false, "source": "chemin posé par cette carte ; format nommé par CONTRAT-INTERFACE.md section 5" },
+    "rapport-qualite-donnees": { "libelle": "rapport de qualité forge-data (assertions et verdict du profiler)", "chemins": ["forge/etapes/data/*assertions*.json", "forge/etapes/data/*qualite*"], "etabli": false, "source": "chemin posé par cette carte ; format forge-data/assertions@1 nommé par CONTRAT-INTERFACE.md section 5" },
+    "definitions-agents": { "libelle": "définitions d'agents", "chemins": [".claude/agents/*.md", "forge/etapes/agents/*.md"], "etabli": false, "source": "chemins posés par cette carte (le premier est l'emplacement des agents d'un projet Claude Code)" },
+    "recette-agents": { "libelle": "recette des agents", "chemins": ["forge/etapes/agents/recette*"], "etabli": false, "source": "chemin posé par cette carte" },
+    "verdict-agents-security": { "libelle": "verdict agents-security (oracle-scan-agentdef ou oracle-scan-toolcalls)", "chemins": ["forge/etapes/agents-security/*.json"], "etabli": false, "source": "chemin posé par cette carte ; oracles nommés par CONTRAT-INTERFACE.md section 5" },
+    "verdict-format": { "libelle": "verdict de l'oracle du format du document (fichier compagnon .oracles.json)", "chemins": ["output/**/*.oracles.json"], "etabli": false, "source": "chemin posé par cette carte, sur la forme des fichiers compagnons de verdict du pilot (<fichier>.oracles.json)" },
+    "plan-observation": { "libelle": "plan d'observation (forge-observability/plan@1)", "chemins": ["forge/etapes/observability/plan*.json"], "etabli": false, "source": "chemin posé par cette carte ; format nommé par CONTRAT-INTERFACE.md section 5" }
+  },
+  "types": [
+    { "id": "produit-neuf", "libelle": "Produit neuf", "forges_privilegiees": ["conception", "design", "development", "tests", "ops"],
+      "livrables_exiges": { "conception": ["exigences"], "design": ["design-md", "jetons"], "tests": ["rapport-forge-tests"], "ops": ["dossier-mep"] },
+      "note": "les 4 livrables du constat : 2 produits sur 10 clos ou publiés les portaient" },
+    { "id": "evolution", "libelle": "Évolution d'une application existante", "forges_privilegiees": ["development", "tests", "ops"],
+      "livrables_exiges": { "tests": ["rapport-forge-tests"], "ops": ["dossier-mep"] },
+      "note": "rapport forge-tests sur le périmètre touché ; ops se mobilise quand la demande met en production, et s'écarte sinon avec ce motif" },
+    { "id": "audit-complet", "libelle": "Audit complet", "forges_privilegiees": ["audit"],
+      "livrables_exiges": { "audit": ["rapport-forge-audit"] } },
+    { "id": "site-web", "libelle": "Site ou contenu web", "forges_privilegiees": ["design", "seo-geo", "websec"],
+      "livrables_exiges": { "design": ["design-md"], "seo-geo": ["rapport-seo-geo"], "websec": ["verdict-websec"] } },
+    { "id": "donnees", "libelle": "Données ou reporting", "forges_privilegiees": ["data"],
+      "livrables_exiges": { "data": ["lineage", "rapport-qualite-donnees"] } },
+    { "id": "agent", "libelle": "Agent ou automatisation", "forges_privilegiees": ["agents", "agents-security"],
+      "livrables_exiges": { "agents": ["definitions-agents", "recette-agents"], "agents-security": ["verdict-agents-security"] } },
+    { "id": "document", "libelle": "Document, présentation, propale", "forges_privilegiees": ["design"],
+      "livrables_exiges": { "design": ["verdict-format"] },
+      "note": "design au titre de la marque" }
+  ]
+}

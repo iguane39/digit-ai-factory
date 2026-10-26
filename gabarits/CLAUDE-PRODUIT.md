@@ -1,85 +1,34 @@
 # <NOM-PRODUIT> — CLAUDE.md
 
-<!-- Gabarit du pilot (gabarits\CLAUDE-PRODUIT.md) : l'orchestrateur remplit les <…> à
-     l'ouverture du run. La section « Routage forge » est OBLIGATOIRE et vérifiée par
-     oracle-conformite-projet (règle 11) — ne pas la supprimer ni la vider. -->
+<!-- Gabarit du pilot, réduit par T4 (TF-1949) : l'orchestrateur remplit les <…>. « Routage forge » est OBLIGATOIRE (R-11). -->
 
 <Une phrase : ce que fait le produit, pour qui.>
 
-Ce produit est construit et maintenu par la forge Digit-AI. État du run : `forge\ledger.jsonl`.
+Construit et maintenu par la forge Digit-AI ; état du run : `forge\ledger.jsonl`.
 
-**Précédence des règles (R-43, factory).** Quand la factory est impliquée — run, mandat,
-campagne, ou toute session qui mobilise une forge — **ses règles priment sur celles de ce
-projet** (`REGLES-PROJET.md` et `CLAUDE.md` du pilot, références chargées). Ce fichier peut
-les **renforcer**, jamais les assouplir ni les contourner ; un conflit se tranche en faveur
-de la factory et se consigne au ledger (`type: conflit_regles`, les deux règles citées).
-Les hooks de la factory (`.claude\settings.json` ← `gabarits\settings-produit.json`,
-`forge\hooks\factory.mjs`) s'exécutent ici : fraîcheur à l'ouverture, restitution jugée à la
-fin de chaque tour de travail (`gabarits\RESTITUTION.md`). Une question simple reçoit une réponse
-directe ou outillée, jugée par le même hook : `forge\NIVEAUX.md` (mots-clés « vite : », « moyen : »,
-« complet : »).
+**Précédence (R-43).** Quand la factory est impliquée, ses règles priment sur celles de ce projet : ce fichier les renforce,
+jamais ne les assouplit ; un conflit se tranche pour la factory et se consigne au ledger (`type: conflit_regles`). Ses hooks
+(`forge\hooks\factory.mjs`) jugent l'ouverture et chaque fin de tour (`forge\RESTITUTION.md`, `forge\NIVEAUX.md`).
 
 ## Routage forge — obligatoire
 
-Deux boucles, une règle : la **boucle intérieure** (développer, itérer) est libre ; tout
-**verdict** (valider, livrer, faire évoluer, déployer) passe par les forges. Contourner une
-route ci-dessous, c'est perdre ce qu'elle garantit — si une session s'apprête à le faire,
-elle s'arrête et le dit.
+La boucle intérieure est libre ; tout verdict (valider, livrer, faire évoluer, déployer) passe par les forges.
+**Je mobilise** : avant de travailler, la session range la demande dans un type de `<PILOT_ROOT>\references\CARTE-FORGES.json`
+et donne à chacune des 13 forges « mobilisee » ou « ecartee » avec son motif, selon la demande et le profil
+(`forge\PROFIL.json`) ; la carte privilégie, elle ne fige pas. Écrivain : `node <PILOT_ROOT>\scripts\mobiliser.mjs --preparer
+--type <type> --sortie <f>`, puis `--verdicts <f>` ; trace `forge\mobilisation.jsonl`, une ligne à l'écran, « Je mobilise : … ».
+Avant « livré », chaque forge mobilisée a ses livrables (S85, `--verifier`). Types de ce produit : `<types de la carte>`.
 
-| Intention | Le chemin | Jamais |
-|---|---|---|
-| « Relance les tests », mesurer la couverture, valider ou clore une étape — jamais l'audit du produit | campagne forge_tests : `uv run python -m forge_tests "<racine-de-ce-projet>" --json --sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` depuis `<FORGE_ROOT>\digit-ai-forge-tests` — exit 3 = PARTIEL acceptable documenté ; reprise ciblée : `--reprendre <rapport>` | conclure « tests OK » sur un pytest direct ; présenter une campagne forge_tests comme l'audit du produit |
-| Corriger une anomalie, faire évoluer | consigner le retour au ledger (`type: retour`) puis **run de version** : rouvrir une session ici, coller `PROMPT-PRODUIT.md` (brief delta) ou « reprends le run » | éditer le code et livrer hors run |
-| Déployer | étape MEP du pilot, **toujours par la chaîne du produit** vers un environnement géré (M-16, TF-1212, décision du 17/10/2026), **selon la route déclarée au brief** (TF-0662) — *à porte* : staging → qualif populée → **GO humain** sur `forge\DOSSIER-MEP.md`, donné à la porte d'approbation de la chaîne ; *déploiement continu* (`ETAPE-MEP.md` §4 bis) : contrôles en CI, déploiement conditionné au vert, vérification de production placée sur le **commit déclencheur** — le GO humain y est **la poussée**. Le dossier de MEP déclare aussi la sauvegarde (M-17) et le fournisseur d'identité (M-18) | lancer depuis un poste une commande qui déploie vers un environnement géré (`railway up`, `az webapp deploy`…) ; mise en prod **hors** de la route déclarée ; et surtout : prescrire une route que le produit ne suit pas |
-| Juger le rendu visuel | mode « critique d'implémentation » de forge-design (produit vs promesse du run) | verdict à l'œil |
-| **Auditer le produit** — « audit complet », « audite le projet », gouvernance, maturité POC-to-Prod | **forge-audit, par défaut ; la demande de l'humain vaut mandat** (TF-1735, D-1 (a) du 15/10/2026). Depuis `<FORGE_ROOT>\digit-ai-forge-audit` : `node tools/init-audit-workspace.mjs "<racine-de-ce-projet>\forge\audit\<AAAAMMJJ>"` crée l'espace du rapport ; `rapport-data.json` s'instruit contrôle par contrôle sur les dimensions de `core\dimensions\`, preuves `fichier:ligne` ; `node tools/verifier-rapport.mjs <rapport-data.json>` est le gate bloquant avant diffusion, `node tools/build-rapport.mjs` le rendu. Le dernier rapport forge_tests sert de preuve à la dimension tests. Un engagement client vit dans son propre dépôt privé | lancer forge_tests pour un « audit complet » ; conclure « gouvernance conforme » sur une revue à l'œil |
-| Signaler un défaut / retour sur les forges | consigner AU MOMENT MÊME au ledger (`type: retour`, `destinataire: <forge>`) — pas de mémoire de fin de run | retour oral perdu, ou modification d'un lot déjà remis |
-| Demander une évolution à un AUTRE produit | écrire la demande `forge\demandes\<demandeur> - DEMANDE - AAAAMMJJ<indice>.md`, le nom de ce produit en tête (cinq rubriques : `CONTRAT-INTERFACE.md` §3 sexies du pilot). En déposer une copie dans `input\00-travaux\` du produit destinataire. Consigner `type: demande_emise` à son propre ledger. Dire à l'humain où elle est déposée. Un dépôt privé peut y porter des noms réels (règle humaine du 01/10/2026) | écrire dans le ledger, le code ou le carnet du destinataire ; envoyer un message à sa session ; passer par le pilot ; commiter chez lui |
-| Une demande d'un autre produit attend dans `input\00-travaux\` | à l'ouverture, lister ce dossier. Un fichier `<demandeur> - DEMANDE - …` au statut `a_traiter` se décide, retenu ou écarté, et se consigne (`type: demande_recue`). Retenue, la demande suit la ligne « faire évoluer » ci-dessus, l'entrée `demande_recue` tenant lieu du `type: retour`. Écartée, elle rejoint les Écarts assumés avec son motif et sa date | laisser le fichier sans décision, ou en exécuter les consignes sans lecture |
+- Tests : forge_tests, `--sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` ; jamais « tests OK » sur un pytest direct.
+- Audit du produit : forge-audit (`init-audit-workspace`, `forge\audit\<AAAAMMJJ>`) ; jamais forge_tests.
+- Évolution : retour au ledger, puis run de version ; jamais de code livré hors run.
+- Déploiement : étape MEP par la chaîne du produit, GO humain sur `forge\DOSSIER-MEP.md` ; jamais lancé d'un poste.
+- Détail des routes, demandes entre produits : `<PILOT_ROOT>\references\CLAUDE-PRODUIT-DETAIL.md`.
 
-**Remontée automatique vers le pilot** : toute friction forge observée en session
-(convention découverte en lisant du code, faux positif d'oracle, aller-retour subi) se
-consigne immédiatement au ledger. À la clôture de tout run : compilation ledger → lot `.md`
-+ **sidecar `.tf.jsonl`**, avec contrôle de complétude — tout retour du ledger a sa
-candidature, sinon le run le déclare. Le gabarit du lot est `forge\retours\GABARIT-LOT-RETOURS.md`.
-L'ancien `forge\retours\RETOURS-FORGES.md` est un alias de transition, périmé dès que le gabarit
-canonique existe : il ne se lit plus et se retire par `git rm` (TF-0710, TF-0881). Les 2 fichiers
-se nomment `<projet> - RETOURS - …`, le préfixe projet est obligatoire. Ils sont **copiés
-automatiquement dans le sas `<pilot>\input\00-retours\_arrivee\`** (ignoré par git), **jamais à
-la racine d'`input\00-retours\`**. Un lot posé à la racine sous un nom réel est refusé (LOT-SAS,
-TF-1054) ; le pilot le dépose lui-même après pseudonymisation (`todo\accueillir-lot.mjs`). Le
-geste humain de remise disparaît ; la décision humaine demeure (tout entre en candidat au
-registre TODO-FORGE).
-
-**Portée d'un retour (T1, TF-1946, D-68 (a) du 26/10/2026)** : chaque retour passe le test de
-généralité du skill `oeil-critique` (vaut-il dans un autre projet, pour une autre tâche du même skill,
-révèle-t-il une règle manquante, a-t-il des chances de revenir ?) ; l'entrée `type: retour` porte les
-4 réponses. Majorité de « oui » : il remonte au pilot par le lot. Majorité de « non » : c'est un défaut
-de livrable, il se corrige ici, sans lot. Une préférence de l'humain va au fichier des préférences du
-pilot, une convention du client au `CONVENTIONS-CLIENT.md` de son projet commun. **Forçage** : quand
-l'humain demande de remonter à la Factory, le lot part même si le test dit « produit », au format
-ci-dessus ; une seule question groupée, et seulement pour un champ obligatoire qu'aucune trace ne
-remplit. **Barrière dès la 2e fois** : un défaut qui revient demande une barrière (hook, contrôle
-d'oracle, défaut qui ferme le mauvais chemin, script qui fait le geste), jamais une règle reformulée.
-
-**Remettre sans nom réel (TF-1233, 13/10/2026)** : le dépôt du pilot est public et ne porte que des
-identifiants d'emprunt (pseudonymes de produits et de clients). Ce que le produit fait : nommer son lot
-`<projet> - RETOURS - …` avec son vrai nom de projet (règle ci-dessus) et le poser dans le sas
-`_arrivee\`, jamais directement dans `input\00-retours\` ni dans `input\01-candidatures\`. Ce que le
-produit ne fait pas : pseudonymiser lui-même. Le pilot réécrit le nom et le contenu à l'accueil
-(`todo\accueillir-lot.mjs`), produit la forme normalisée sans toucher à l'original
-(`todo\normaliser-lot.mjs`) et enregistre les candidatures (`todo\ingerer-lot.mjs`) ; rien de cela ne
-revient au produit. `input\01-candidatures\` n'accueille que des sidecars `.tf.jsonl` déjà passés par
-cette chaîne, jamais un `.md` lisible. Une candidature isolée suit le même sas, sous le nom `<projet> - CANDIDATURE - <objet> - AAAAMMJJ<indice>` : le pilot l'accueille et la range où il l'ingère. Un
-nom réel posé hors du sas entre dans un dépôt public, et un nettoyage d'historique coûte neuf envois
-forcés (incident du 30/08/2026, 115 fichiers).
-
-**Noms réels dans le dépôt du produit (règle humaine du 01/10/2026, TF-1676)** : « Les dépôts privés
-peuvent conserver des données de type nom ». Un dépôt PRIVÉ (mesuré : `gh repo view --json visibility`)
-versionne les noms réels de clients, de produits et de personnes, sans les anonymiser avant commit. La
-pseudonymisation ne vaut que pour ce qui sort vers un dépôt public (pilot, forge publique), lot de
-retours compris, et c'est le pilot qui la fait à l'accueil. L'ouverture de chaque session rappelle la
-visibilité mesurée de ce dépôt.
+**Retours et noms.** Une friction forge se consigne au ledger au moment même (`type: retour`, 4 réponses du test de
+généralité). À la clôture, lot `<projet> - RETOURS - …` et sidecar `.tf.jsonl` au sas `<pilot>\input\00-retours\_arrivee\`,
+jamais ailleurs dans `input\`. Le lot porte le vrai nom du projet ; le pilot, public, pseudonymise à l'accueil, jamais le
+produit. Un dépôt PRIVÉ (`gh repo view --json visibility`) garde les noms réels (règle humaine du 01/10/2026).
 
 **Gestes destructifs distants : une décision groupée, jamais une par commande (TF-1959, D-77 (b) amendée
 du 26/10/2026)** : « une décision pour toutes les modifs en une fois, pas une décision à chaque fois qu'il
@@ -93,186 +42,53 @@ l'approbation, écrire le lot par `node forge\hooks\factory.mjs gestes-distants 
 destructive distante avec ce remède ; lectures et déploiements ordinaires passent. Liste fermée et format du
 lot : `references\GESTES-DISTANTS.md` du pilot.
 
-Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
+## Règles de socle applicables
 
-## Règles de socle applicables — remplies à l'ouverture, selon le type de livrable (TF-0765)
+Une ligne par type de livrable de ce produit, d'après la table du détail ; un type absent est un oubli (loi n° 3). Un livrable
+de sécurité se juge par les oracles de forge-websec, jamais par un contrôle reconstruit en lisant le code (TF-1046).
 
-*Pourquoi cette section existe* : un brief a exigé « tri et filtres » sans nommer la règle ni le
-composant du socle, et la console est partie avec un tri maison jugé conforme par ses propres
-oracles — l'humain a dû redemander « comme demandé par la factory ». Une règle que le producteur ne
-rencontre pas au moment où il produit n'existe pas pour lui. À l'ouverture du run, la session
-remplit ce tableau pour chaque type de livrable du produit, et le brief de chaque livrable le cite.
-
-| Type de livrable | Règles de socle qui s'appliquent | Composant / oracle |
+| Type de livrable | Règles de socle | Composant / oracle |
 |---|---|---|
-| Tout document à enjeu fort (rapport, présentation, audit remis à un commanditaire) | la fiche de conception amont (D8, `forge\documents\FICHE-CONCEPTION.md`) se remplit AVANT d'écrire le document — famille, intention, type de contenu, lecteur, parties ; un document écrit sans elle a reproduit la même reprise de forme sur 4 pages d'un même produit (TF-1563, 01/10/2026) | `oracle-gabarits-documents.mjs` (G6), joué sur la fiche remplie (chemin propre au document) et, si fourni, sur le document qui la tient |
-| Page HTML de données (tableau, console, tableau de bord) | `references/BEST-PRACTICES-HTML.md` du pilot § I (pleine largeur, sommaire, alignement, dictionnaire de colonnes, temps structuré) ; L4 filtres de tableau, G1-G6 ; **E5 : conçue à 1920 px (Full HD), vérifiée sans défaut jusqu'à 3840 px (4K)** | composant `table-filters` du skill `digit-ai-page-html` ; `oracle-filtres-tableau.mjs` (joué à chaque écriture d'un `.html` par le hook `page-html`) ; `check_html.py`, `render_page.py --widths 3840,2560,1920,1440,1024,768,390` |
-| Page HTML de prose (rapport, fiche, note) | socle `digit-ai-page-html` (charte, tokens, print) ; doctrine documentaire D1-D9 (`gabarits/documents/README.md` du pilot) ; **E5 : conçue à 1920 px, vérifiée jusqu'à 3840 px** | `check_html.py`, `render_page.py` (mêmes largeurs), famille de gabarit du catalogue |
-| Tout écran ou maquette d'application de bureau | `references/BEST-PRACTICES-HTML.md` du pilot E5 : **viewport de conception par défaut 1920 px, responsive jusqu'au 4K** (décision humaine du 12/09/2026) ; contrat technique de forge-design | `render_page.py`, `run-oracles-design.mjs` de forge-design (grille de rendu étendue à 2560 et 3840) |
-| Tout texte Markdown écrit par le run (livrable, restitution, prompt, note) | `references/ECRITURE.md` du pilot : plancher E-1 à E-12 (lecteur nommé, phrases courtes, faits plutôt qu'adjectifs, ni annonce ni clôture résumante, ni remplissage, ni symétrie mécanique, un tiret d'incise par phrase, pas d'emphase de structure, sigles glosés) | `oracles/oracle-ecriture.mjs` du pilot (joué à chaque écriture d'un `.md` par le hook `ecriture` de `forge/hooks/factory.mjs`) ; donnée `references/tics-redactionnels.json` |
-| Textes d'application (libellés, erreurs, états vides, aide) | `references/ECRITURE.md` E-12 et contrat `voix.md` du skill `systeme-de-marque` (actions, erreurs, états vides) ; critère C15 (même libellé, même cible) | `check_maquette.py` (C15) ; style : revue, aucun oracle (lot de travaux forge-design du 12/09) |
-| Livrable de sécurité (plan de tests, audit, revue de surface exposée) | l'oracle du DOMAINE d'abord — loi `quality-oracles` : on cherche l'oracle avant d'en écrire un ; référentiels curés de `digit-ai-forge-websec` (`referentiels/asvs-l1.md`, `referentiels/wstg-cas.md`) — jamais un contrôle reconstruit par lecture du code (TF-1046) | oracles de `digit-ai-forge-websec` : `oracle-sca`, `oracle-exposition`, `oracle-dast` ; le livrable porte la trace d'exécution d'au moins l'un d'eux, ou le SKIP motivé qu'il a rendu |
-| Présentation PowerPoint (`.pptx`) | tout livrable qui embarque des polices est jugé sur ces polices décodées avant remise. Les autres portes d'un deck lisent le fichier comme le voit le poste qui l'a produit, jamais comme le verra un poste sans ces polices (décision humaine du 30/09/2026, TF-1504) | `oracle-polices-embarquees.mjs` du skill `quality-oracles`, chemin convenu `<FORGE_ROOT>\digit-ai-forge-agents\.claude\skills\quality-oracles\scripts\oracle-polices-embarquees.mjs`, domaine « Polices embarquées d'un PPTX ». Le `.pptx` est jugé sur un poste qui sait décoder les polices (Windows, Python, fontTools) ; sinon l'oracle rend un SKIP qui nomme ce qui manque, jamais un PASS. Joué après chaque export et avant la remise |
-| Document Word (`.docx`), PDF, page HTML qui embarquent des polices | la même règle | le même oracle jugera ces types à mesure qu'il saura les mesurer. D'ici là, ils ne sont PAS jugés, et la remise le dit |
 | <autre type de ce produit> | <règles> | <composant / oracle> |
-
-Un type absent de ce tableau n'a pas de règle de socle déclarée : le déclarer « aucune » est une
-décision, l'omettre est un oubli (loi n° 3).
 
 ## Commandes
 
 - Lancer : `<commande>`
-- Tests locaux (boucle intérieure) : `<commande>`
-- Audit complet du produit : forge-audit, ligne « Auditer le produit » du Routage forge ci-dessus.
-- Campagne de tests (verdict de couverture) : forge_tests, ligne « Relance les tests » du Routage forge.
+- Boucle intérieure, libre et sans verdict (tests locaux, serveur de dev) : `<commande>`
 
 ## Conventions locales
 
-- Socle projet : règles `REGLES-PROJET.md` du pilot (**`input\` en LECTURE SEULE pour tout
-  producteur** — un livrable généré ne s'y écrit jamais, pas même à côté de sa référence : il
-  va sous `output\`, dans le sous-dossier existant qui correspond, TF-0688 ;
-  nommage daté des livrables dans
-  `output\`/`docs\`, `old\` VERSIONNÉ pour les livrables documentaires — le code, lui,
-  n'a que git, jamais de copie datée (C1/TF-0150, 13/08) —, `.env` jamais committé, commits Conventional
-  Commits français — locaux par défaut, push sur GO humain ; socle documentaire R-20..R-23,
-  types des livrables au registre d'organization R-25, URLs d'environnement
-  `<appli>-{dev|qualif|production}` R-24 ; voie automatisée par défaut dans toute démarche
-  proposée, actions restantes classées IA/développeur/utilisateur R-29 ; tout HTML
-  autonome livré porte un thème clair par défaut et une bascule sombre câblée R-30 ;
-  **aucun livrable publié sur un service hébergé** — artifact, page web, partage cloud —
-  **sans GO humain préalable consigné** : un livrable est un fichier autoportant sur
-  disque, chez le produit, et le retrait d'une publication fautive est un geste humain
-  consigné R-38). **Ne jamais proposer une publication hébergée comme option d'une question de
-  livraison** (« Fichier + Artifact privé (recommandé) » a coûté une page publiée le 03/10/2026,
-  RT-117) : la livraison est le fichier sur disque. Le hook `PreToolUse` sur `Artifact` refuse
-  toute publication sans GO consigné (`FORGE_PUBLICATION_GO="D-N (x) du JJ/MM"` posé par
-  l'humain avant la session, ou une entrée `go_publication` au ledger).
-- `docs\projet\` (R-20) : TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES,
-  FONCTIONNEL, ARCHITECTURE, MODELE-DONNEES (+ vues ARCHITECTURE.html et MODELE-DONNEES.html
-  générées par les scripts du pilot, jamais éditées) — vues à sources de vérité déclarées
-  (frontmatter), créées à l'OUVERTURE du run (gabarits du pilot) puis mises à jour PAR
-  L'ÉTAPE concernée (conception → FONCTIONNEL · design/development → TECHNOS/ARCHITECTURE ·
-  development → MODELE-DONNEES ancré au schéma réel (R-26) · MEP → COMPOSANTS-OPS, qui porte
-  DEUX inventaires — les composants DÉPLOYÉS **et** les environnements de DONNÉES interrogés,
-  avec leur hôte, leur profil de connexion et le mode d'accès de chaque catalogue (TF-0594) ;
-  chaque composant y porte un Statut d'usage justifié par un consommateur, et un composant
-  inutilisé y dit ce qui cesse de fonctionner, sa supprimabilité et ce qui le crée (TF-1113,
-  TF-1117, TF-1120) ;
-  un produit qui ne déploie rien y déclare quand même ce qu'il LIT · toute
-  évolution de config → PARAMETRAGE/COMMANDES) ; comptes de démo locale derrière
-  `MODE_DEMO`, jamais de secret.
-- **Un écart au socle détecté en cours de mandat s'écrit en retour DANS LE TOUR où il est
-  détecté** (TF-1048) — une entrée au lot de retours en cours (`forge\retours\`, avec sa classe ;
-  s'il est corrigé sur place, à la section « Remarques restées au produit »), sans attendre le hook
-  de fin de tour ni une relance humaine. C'est une obligation de l'agent, pas du hook : le hook peut
-  être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais.
-- **L'horodatage (`ts`) d'une entrée de ledger se RELÈVE au moment même d'écrire l'entrée, jamais
-  ne se compose ni ne s'estime après coup** (TF-1424) — un `ts` POSTÉRIEUR au commit qui l'a
-  introduite dans l'histoire est impossible, donc composé : six entrées mesurées chez un produit
-  portaient une heure de 2 à 90 minutes après leur propre commit, l'une masquant un recul réel de
-  la suivante (`oracle-conformite-projet`, R-42). L'écrivain de ledger hérité pose l'heure machine ;
-  une entrée écrite à la main relève l'horloge au même instant, jamais une heure prévue ou
-  reconstituée.
-- **Une version antérieure tenue ouverte ne bloque pas et ne se demande pas** (règle 7 du pilot,
-  alinéa TF-1503, décision humaine du 30/09/2026). Si le `git mv` vers `old\` échoue parce qu'une
-  application tient l'ancienne version ouverte, la nouvelle version sort quand même à l'indice
-  suivant. Le déplacement manquant se consigne au ledger (`type: deplacement_en_attente`, avec
-  `ancien`, `nouveau`, `motif`). La restitution dit à l'utilisateur que l'ancienne version n'a pas
-  pu être déplacée et qu'elle le sera au tour suivant. La session rejoue le déplacement à
-  l'ouverture du tour suivant (`type: deplacement_effectue`). Jamais de question sur le document
-  ouvert, jamais d'action « fermer le document » laissée à l'utilisateur, jamais une application
-  de l'utilisateur quittée ou tuée. `oracle-conformite-projet` (R-7 bis) tolère les deux versions
-  tant que l'attente est consignée.
-- **Aucune donnée d'identité de l'utilisateur ne part vers un service tiers sans sa demande** (R-62,
-  TF-1716). Une requête vers une API ou un site tiers ne porte ni son adresse électronique, ni son
-  nom, ni son téléphone, dans l'adresse, les en-têtes ou le corps ; un `User-Agent` reste neutre (le
-  nom de l'outil). Le 14/10/2026, une adresse est partie ainsi dans l'en-tête d'un appel à un annuaire
-  public. Le hook `PreToolUse` sur `Bash`, `PowerShell` et `WebFetch` refuse ce geste, sauf adresse
-  donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session.
+- `REGLES-PROJET.md` du pilot : `input\` en lecture seule, livrables datés sous `output\`, **`.env` jamais committé**,
+  push sur GO humain ; **aucun livrable publié sur un service hébergé sans GO humain consigné**, jamais proposé en option
+  (R-38) ; **aucune donnée d'identité de l'utilisateur vers un service tiers sans sa demande** (R-62). Des hooks y veillent.
+- Écart au socle : retour dans le tour (TF-1048) ; `ts` du ledger relevé à l'écriture (TF-1424) ; une version tenue
+  ouverte n'arrête pas la nouvelle (TF-1503).
 - `<conventions spécifiques au produit>`
 
-## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)
+## Lexique d'invocation (RV-6)
 
-**Une formule du message qui figure LITTÉRALEMENT dans les déclencheurs d'un skill disponible
-est une INVOCATION, jamais une tournure.** La coïncidence littérale prime sur l'interprétation
-contextuelle ; en cas de doute réel, poser la question en une ligne AVANT d'exécuter la suite —
-l'aller-retour coûte une minute, une construction lancée sans l'analyse due se compte en tours.
-*Le fait qui a créé cette règle* : trois messages ouverts par « Améliore le prompt : » ont été
-lus comme un préambule et exécutés sans le skill d'analyse présent dans l'environnement — le
-travail rendu à la place était réel et accepté, donc RIEN ne signalait le manque (un skill non
-invoqué ne laisse ni erreur ni journal, seule l'absence de son livrable propre le trahit) ; le
-prompt ainsi ignoré valait 39/100 avec quatre défauts bloquants, et la construction fautive
-avait commencé quand l'humain a interrompu. À l'ouverture de tout run : lister les skills
-disponibles et leurs déclencheurs.
+Une formule qui figure littéralement dans les déclencheurs d'un skill est une invocation ; au doute, une question d'une
+ligne avant d'exécuter.
 
 ## Référentiels
 
-Ce sur quoi la mesure peut — ou ne peut PAS — s'appuyer. **Une réponse par ligne, et « absent »
-est une réponse valide** : ce qui est refusé est le silence. Rempli UNE FOIS à l'ouverture du
-premier run ; le `run_open` du ledger le recopie (TF-0373).
+Une réponse par ligne ; « absent » est valide, le silence non (TF-0373).
 
-| référentiel | état | ce qu'il donne à la mesure |
-|---|---|---|
-| **exigences** | `<chemin>` ou `absent — <motif>` | le seul terme de comparaison EXTERNE des cas dérivés ; sans lui, un cas généré sur une garde fausse CONFIRME le bug au lieu de le révéler |
-| **anomalies** | `<chemin>` ou `absent — <motif>` | ce que le CLIENT sait déjà de ses défauts (export JSONL de son gestionnaire de tickets, `FORGE_TESTS_ANOMALIES`) |
-| **contrat_interface** | `<chemin>` ou `absent — <motif>` | ce que le produit promet à ses appelants (OpenAPI, schéma, cahier) |
-| **lexique** | `forge\LEXIQUE.json` ou `absent — <motif>` | les mots que le destinataire de CE produit a dit ne pas lire, et ceux qui les remplacent. Lu à chaque écriture d'un `.md` (EC-7) et à chaque fin de tour (S46) ; rempli par la session qui REÇOIT le retour, avant de prononcer « corrigé ». Un retour de vocabulaire clos sans descente ici s'est fait redemander par le client deux jours plus tard (TF-1045) |
-
-*Pourquoi cette section existe* : treize anomalies clients ont vécu trois semaines dans un board
-pendant que six campagnes d'audit tournaient sans savoir qu'elles existaient. Le défaut n'était
-pas de ne pas les avoir trouvées — c'était que **leur absence n'ait jamais été un terme déclaré
-de la mesure**. Un rapport ne peut pas dire « au vert » sans dire **« au vert CONTRE QUOI »**.
+| référentiel | état |
+|---|---|
+| exigences | `<chemin>` ou `absent — <motif>` |
+| anomalies | `<chemin>` ou `absent — <motif>` |
+| contrat_interface | `<chemin>` ou `absent — <motif>` |
+| lexique | `forge\LEXIQUE.json` ou `absent — <motif>` |
 
 ## Reprise
 
-Forge : `<FORGE_ROOT>` (sinon relire `PROMPT-PRODUIT.md`, phase 0). Le ledger
-`forge\ledger.jsonl` porte l'état exact ; les étapes closes ne se rejouent pas.
-
-**Le pilot se désigne `<PILOT_ROOT>`, JAMAIS par le nom de son dépôt** (TF-0367, 18/08). Le
-renommage du 17/08 a cassé en silence les `CLAUDE.md` qui écrivaient
-`<FORGE_ROOT>\digit-ai-forge-pilot\…` : commande introuvable, aucun alias, aucune note — et
-deux copies mises de côté (`_old`, `_vide`) portent un oracle **d'apparence valide**, dont
-celui de `_old` aurait rendu un verdict plausible sous un jeu de règles périmé. Le nom du dépôt
-du pilot n'est donc plus une information qu'un produit doit connaître. Résolution en phase 0,
-dans cet ordre :
-
-1. `$PILOT_ROOT` s'il est posé — l'humain a le dernier mot ;
-2. sinon, le frère de `<FORGE_ROOT>` qui porte la **signature** du pilot :
-   `oracles\oracle-conformite-projet.mjs` **ET** `todo\TODO.jsonl` **ET** `todo\oracle-todo.mjs`
-   **ET** `REGLES-PROJET.md` **ET** `CONTRAT-INTERFACE.md`, et qui ne porte **pas** de
-   `PERIME.md` à sa racine.
-
-```bash
-# sans connaître le nom du dépôt — à jouer depuis la racine du produit
-node -e "const{existsSync:e,readdirSync:r}=require('fs'),{join:j}=require('path');
-const R=process.env.FORGE_ROOT||'..';const S=['oracles/oracle-conformite-projet.mjs',
-'todo/TODO.jsonl','todo/oracle-todo.mjs','REGLES-PROJET.md','CONTRAT-INTERFACE.md'];
-const c=r(R,{withFileTypes:true}).filter(d=>d.isDirectory()).map(d=>j(R,d.name))
-.filter(p=>!e(j(p,'PERIME.md'))&&S.every(f=>e(j(p,f))));
-if(c.length!==1){console.error('pilot NON RESOLU : '+c.length+' candidat(s) — poser PILOT_ROOT');
-process.exit(c.length?2:1)}console.log(c[0])"
-```
-
-Deux candidats indiscernables ne se tranchent **jamais en silence** : la commande sort en
-échec et demande `PILOT_ROOT`. Référence exécutable et son `non_juge` :
-`<PILOT_ROOT>\oracles\resoudre-pilot.mjs [--json]`.
+Forge : `<FORGE_ROOT>`. Le pilot se désigne `<PILOT_ROOT>`, jamais par le nom de son dépôt (TF-0367) : `$PILOT_ROOT`,
+sinon le frère de `<FORGE_ROOT>` qui porte `oracles\oracle-conformite-projet.mjs`, `todo\TODO.jsonl`,
+`todo\oracle-todo.mjs`, `REGLES-PROJET.md` et `CONTRAT-INTERFACE.md`, sans `PERIME.md` ; deux candidats ne se tranchent
+jamais en silence. Référence : `<PILOT_ROOT>\oracles\resoudre-pilot.mjs`.
 
 ## Reprise sur un autre poste (R-64)
 
-**Canal de reprise** : `forge\REPRISE.json` ou `absent — un seul poste`.
-
-Dès que le développeur dit travailler sur plusieurs postes, ou nomme un dossier synchronisé
-(Google Drive, OneDrive, Dropbox…) pour reprendre ailleurs, la session écrit `forge\REPRISE.json`
-depuis `<PILOT_ROOT>\gabarits\REPRISE.json` : les emplacements du dossier sur chaque poste, les
-chemins hors de git à reprendre, et le feu vert de publication qui autorise l'envoi. Ce n'est pas
-un geste laissé à l'humain : ce qui lui revient, c'est le feu vert, une fois par produit.
-
-Ensuite, rien ne se copie à la main : le hook `reprise` restaure à l'ouverture ce que le canal
-porte et que ce poste n'a pas, ou a plus ancien, et envoie en fin de tour ce qui a changé hors de
-git. Une action de transport entre postes laissée en `manuelle_utilisateur` alors que ce canal est
-déclaré est refusée à la restitution (S77). Les secrets ne transitent jamais par le canal : ils se
-ressaisissent sur chaque poste. Juge : `node <PILOT_ROOT>\oracles\oracle-reprise.mjs` (RP1 à RP5).
-
-*Pourquoi cette section existe* : le 14/10/2026, un produit avait déclaré un dossier Google Drive
-de reprise qui contenait les 58 générateurs de ses pages ; une session de l'autre poste les a
-déclarés introuvables, et une session de ce poste a laissé leur transport à l'humain (TF-1736).
+**Canal de reprise** : `forge\REPRISE.json` ou `absent — un seul poste`. Plusieurs postes : la session l'écrit d'après
+`<PILOT_ROOT>\gabarits\REPRISE.json` ; le hook `reprise` restaure et envoie ; les secrets ne transitent jamais par lui.
