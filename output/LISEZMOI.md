@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 497 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 503 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -232,9 +232,11 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261021-L99-agent-nocturne-oeil-critique.md | — | 27.4 Ko | `03-etudes/20261021-L99-agent-nocturne-oeil-critique.md` |
 | 20261021-L99-agent-nocturne-skill-vs-code.md | — | 27.3 Ko | `03-etudes/20261021-L99-agent-nocturne-skill-vs-code.md` |
 | 20261026-comparaison-task-observer-oeil-critique.md | — | 5.3 Ko | `03-etudes/20261026-comparaison-task-observer-oeil-critique.md` |
+| 20261026-L99-oeil-critique-cible-retravaillee.md | — | 22.8 Ko | `03-etudes/20261026-L99-oeil-critique-cible-retravaillee.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261020b.md | 20261020b | 23.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020b.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md | 20261020c | 31.8 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md | 20261021a | 48.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` |
+| Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
 
 ### 04-plans
 
@@ -515,13 +517,17 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md | 20261015d | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` |
 | Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md | 20261013g | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md` |
 | Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md | 20261013d | 12 Ko | `04-plans/Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md` |
+| Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md | 20261026c | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` |
 | Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
+| Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md | 20261026a | 11.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` |
+| Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md | 20261026b | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md` |
 | Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md | 20261001a | 8.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md | 20261013a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md | 20261013c | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` |
 | Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md | 20261016k | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` |
 | Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md | 20261016l | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` |
+| Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md | 20261026d | 10.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` |
 | Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md | 20261001i | 4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` |
 | Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md | 20261020d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` |
 | Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md | 20261017e | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` |

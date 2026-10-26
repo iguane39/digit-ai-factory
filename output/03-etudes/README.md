@@ -55,8 +55,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20261021-L99-agent-nocturne-oeil-critique.md` | fichier | 27,4 Ko | Analyse L99 — agent nocturne de l'œil critique |
 | `20261021-L99-agent-nocturne-skill-vs-code.md` | fichier | 27,3 Ko | Analyse L99 — agent nocturne : lancement par un skill et liste de modifications |
 | `20261026-comparaison-task-observer-oeil-critique.md` | fichier | 5,3 Ko | Comparaison — task-observer et œil critique — 20261026 |
+| `20261026-L99-oeil-critique-cible-retravaillee.md` | fichier | 22,8 Ko | Analyse L99 — retravailler la cible d'œil critique avec vos remarques (26/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261020b.md` | fichier | 23,9 Ko | Diagnostic de la Factory — œil critique (20/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` | fichier | 31,8 Ko | Diagnostic de la Factory — œil critique, proposition révisée (20/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
+| `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
 
-_40 fichier(s), 2 sous-dossier(s)_ · 5 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_42 fichier(s), 2 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

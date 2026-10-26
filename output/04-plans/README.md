@@ -79,13 +79,17 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` | fichier | 13,1 Ko | Synthèse Mandat — retours et sujets de ce poste, après fusion avec l'autre poste (15/10/20 |
 | `Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md` | fichier | 8,1 Ko | Synthèse Mandat — installateur publié, commande Windows fiabilisée après mesure sur l'adre |
 | `Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md` | fichier | 12,0 Ko | Synthèse Mandat — installation de la factory sans question, avec une bannière finale d'opé |
+| `Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` | fichier | 10,8 Ko | Synthèse Mandat — prompt « retravaille la cible » analysé : contrôles par forge et par cap |
 | `Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` | fichier | 7,4 Ko | Synthèse Mandat — votre décision D-57 (a) est exécutée : les 2 lots de Produit-02 sont ent |
 | `Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` | fichier | 6,5 Ko | Synthèse Mandat — mode « L99 boucle » construit, publié et exercé une première fois (16/10 |
+| `Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` | fichier | 11,6 Ko | Synthèse Mandat — œil critique et architecture de la Factory : état au 26/10/2026 |
+| `Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md` | fichier | 17,7 Ko | Synthèse Mandat — transformations T1 à T4 détaillées, et un catalogue à la place du plafon |
 | `Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md` | fichier | 8,6 Ko | Synthèse Mandat — Opus 5.5 en effort medium est le défaut des conversations neuves, prouvé |
 | `Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` | fichier | 9,9 Ko | Synthèse Mandat — correctif d'ouverture arrêté sur une base qui a bougé, 2 candidatures in |
 | `Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` | fichier | 9,3 Ko | Synthèse Mandat — ouverture de session VS Code : correctif repris, propagé aux 19 produits |
 | `Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` | fichier | 5,6 Ko | Synthèse Mandat — pilot publié après reconstruction sur le distant, décision « 2a » exécut |
 | `Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` | fichier | 8,3 Ko | Synthèse Mandat — plans classés par mois, noms trop longs raccourcis (16/10/2026) |
+| `Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` | fichier | 10,6 Ko | Synthèse Mandat — prompt « retravaille la cible » adapté au skill oeil-critique 1.1.0 (26/ |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
 | `Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` | fichier | 4,1 Ko | Synthèse Mandat — D-52 exécutée, pilot publié jusqu'à 1855a4df (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` | fichier | 9,3 Ko | Synthèse Mandat — 4 dépôts publiés, skills recopiés, campagne de consigne jouée sans gagna |
@@ -114,4 +118,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 
-_94 fichier(s), 3 sous-dossier(s)_ · 14 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_98 fichier(s), 3 sous-dossier(s)_ · 11 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
