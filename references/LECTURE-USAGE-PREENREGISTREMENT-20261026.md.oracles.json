@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\.claude\\worktrees\\agent-a27b86d2d50bcf89d\\references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+  "date_iso": "2026-10-26T21:03:10.578Z",
+  "registre_version": "2.45.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+      "verdict": "SKIP",
+      "detail": "aucune table détectée, aucun effectif annoncé ancré, aucun pourcentage ni unité publiés"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+      "verdict": "PASS",
+      "detail": "5 constat(s) · 4 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (4 avertissement(s)) ; nombre « 3 473 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+      "verdict": "SKIP",
+      "detail": "nom ne se réclamant pas de la convention"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md",
+    "ts": "2026-10-26T21:03:10.577Z",
+    "fichiers": {
+      "references\\LECTURE-USAGE-PREENREGISTREMENT-20261026.md": "7b42dd82b7c9a7942f3482e1ad0871e1e68adadb1fa35dc4911022da66e85e48"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
