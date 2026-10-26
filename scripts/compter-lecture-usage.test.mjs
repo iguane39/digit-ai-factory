@@ -112,7 +112,8 @@ check("extraireJson : clôture de code et texte autour acceptés, charabia refus
 
 // ───────────────────────── le format de réponse ─────────────────────────
 const rubriqueReelle = readFileSync(RUBRIQUE, "utf8");
-const exemples = [...rubriqueReelle.matchAll(/```json\n([\s\S]*?)\n```/g)].map((m) => JSON.parse(m[1]));
+// \r? : extraite par git sous Windows, la rubrique arrive en CRLF
+const exemples = [...rubriqueReelle.matchAll(/```json\r?\n([\s\S]*?)\r?\n```/g)].map((m) => JSON.parse(m[1]));
 check("remède joué : les deux réponses d'exemple de la rubrique sont valides", () => {
   egal(exemples.length, 2, "exemples dans la rubrique");
   for (const e of exemples) { const d = validerReponse(e); if (d.length) throw new Error(d.join(" ; ")); }
