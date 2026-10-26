@@ -262,8 +262,17 @@ export function jouer(fichier, oracle = ORACLE) {
       ...fails.map((f) => `[ecriture]   ${f.regle}${f.ligne ? ` (ligne ${f.ligne})` : ""} : ${court(f)}`));
   } else if (averts.length) {
     lignes.push(...averts.map((f) => `[ecriture] ${nom} : ${f.regle}${f.ligne ? ` (ligne ${f.ligne})` : ""} — ${court(f)}`));
-  } else {
+  } else if (!j.a_rejouer) {
     lignes.push(`[ecriture] ${nom} : style PASS (${familles} familles, ${j.mots} mots)`);
+  }
+  // À REJOUER (TF-1960, D-78 (c) amendée du 26/10/2026) : concision d'un écrit à un tiers (EC-14) et langue (EC-15). Un RAPPEL, jamais
+  // un blocage : le verdict reste PASS. La session qui a écrit le texte le réécrit sur ces passages et rejoue l'oracle, 3 passes au plus.
+  if (j.a_rejouer && j.verdict !== "SKIP") {
+    const a = j.a_rejouer;
+    lignes.push(`[ecriture] ${nom} : À REJOUER (non bloquant) — ${a.nombre} passage(s) à réécrire (${[...new Set(a.regles)].join(", ")}) : réécrire ces passages, puis rejouer node oracles\\oracle-ecriture.mjs <ce fichier> --passe ${a.passe + 1} (${a.passes_max} passes au plus ; au-delà, remettre avec les écarts nommés ; --langue <code> si le lecteur n'est pas francophone)`);
+    const detail = (p) => `${p.regle} (ligne ${p.ligne})${p.mots ? ` ${p.mots} mots` : ""}${p.elements ? ` ${p.elements} éléments` : ""}${p.langue ? ` en ${p.langue}` : ""} : « ${String(p.extrait || "").slice(0, 60)} »`;
+    lignes.push(...a.passages.slice(0, 8).map((p) => `[ecriture]   ${detail(p)}`));
+    if (a.passages.length > 8) lignes.push(`[ecriture]   … et ${a.passages.length - 8} autre(s) passage(s) : node oracles\\oracle-ecriture.mjs <ce fichier> les liste tous`);
   }
   return lignes;
 }
@@ -337,6 +346,27 @@ function selfTest() {
 
   const lignesVertes = jouer(verte);
   if (!lignesVertes.some((l) => /style PASS/.test(l))) casse.push(`un texte sobre n'est pas déclaré PASS (${lignesVertes.join(" | ") || "aucune ligne"})`);
+  // À REJOUER (TF-1960) : un courriel à un tiers dont un paragraphe fait 90 mots rend un RAPPEL qui nomme le passage, jamais « style FAIL » ;
+  // le même réécrit rend PASS ; un courriel anglais sans déclaration de langue est rappelé, le même avec `langue: en` en en-tête PASS.
+  const courrielRouge = join(dir, "Client-A - Courriel - Relance livraison - 20261026a.md");
+  writeFileSync(courrielRouge, "Bonjour Madame Durand,\n\nNous vous écrivons au sujet de la livraison des maquettes, qui devait nous parvenir le 12 octobre et que nous n'avons toujours pas reçue. "
+    + "Cette livraison conditionne le démarrage du développement prévu la semaine prochaine, et sans elle nous ne pouvons pas engager les équipes. "
+    + "Nous avons relancé votre service par téléphone le 15 et le 19 octobre, sans obtenir de réponse écrite de sa part. "
+    + "Nous vous demandons donc de nous confirmer une date ferme avant vendredi, faute de quoi nous reporterons le démarrage à la fin du mois.\n\nCordialement,\nPaul Martin\n", "utf8");
+  const lignesRejeu = jouer(courrielRouge);
+  if (!lignesRejeu.some((l) => /À REJOUER \(non bloquant\) — 1 passage\(s\) à réécrire \(EC-14-paragraphe\).*--passe 2.*3 passes au plus/.test(l)) || !lignesRejeu.some((l) => /EC-14-paragraphe \(ligne 3\) 90 mots/.test(l)))
+    casse.push(`un courriel à un tiers dont un paragraphe fait 90 mots n'est pas rappelé À REJOUER avec son passage (${lignesRejeu.join(" | ") || "aucune ligne"})`);
+  if (lignesRejeu.some((l) => /style FAIL|style PASS/.test(l))) casse.push(`un texte à rejouer est déclaré FAIL ou PASS au lieu d'être rappelé (${lignesRejeu.join(" | ")})`);
+  const courrielVert = join(dir, "Client-A - Courriel - Relance livraison v2 - 20261026b.md");
+  writeFileSync(courrielVert, "Bonjour Madame Durand,\n\nLes maquettes devaient nous parvenir le 12 octobre. Nous ne les avons toujours pas reçues.\n\nSans elles, nous ne pouvons pas engager les équipes ni démarrer le développement prévu la semaine prochaine.\n\nPouvez-vous nous confirmer une date ferme avant vendredi ?\n\nCordialement,\nPaul Martin\n", "utf8");
+  const lignesRejeuVert = jouer(courrielVert);
+  if (!lignesRejeuVert.some((l) => /style PASS/.test(l)) || lignesRejeuVert.some((l) => /À REJOUER/.test(l))) casse.push(`le même courriel réécrit n'est pas PASS sans rappel (${lignesRejeuVert.join(" | ") || "aucune ligne"})`);
+  const courrielEn = join(dir, "Client-B - Courriel - Delivery follow-up - 20261026a.md");
+  const corpsEn = "Dear Ms Durand,\n\nThe mockups were due on 12 October and we have not received them yet.\n\nWithout them, we cannot start the development phase next week. The teams and the test environments are still to be booked.\n\nWe called your department twice, without a written answer. Could you confirm a firm date before Friday?\n\nKind regards,\nPaul Martin\n";
+  writeFileSync(courrielEn, corpsEn, "utf8");
+  if (!jouer(courrielEn).some((l) => /À REJOUER \(non bloquant\) — 3 passage\(s\) à réécrire \(EC-15\)/.test(l))) casse.push("un courriel anglais sans déclaration de langue n'est pas rappelé À REJOUER (EC-15)");
+  writeFileSync(courrielEn, "---\nlangue: en\n---\n\n" + corpsEn, "utf8");
+  if (jouer(courrielEn).some((l) => /À REJOUER|FAIL/.test(l))) casse.push("un courriel anglais déclaré `langue: en` est encore rappelé — l'anglais ne doit pas être un critère de blocage (D-78)");
   if (jouer(join(dir, "absent.md")).length) casse.push("un fichier absent produit une sortie");
   if (!jouer(rouge, join(dir, "nulle-part.mjs")).some((l) => /NON jouée/.test(l))) casse.push("un oracle absent du poste est tu au lieu d'être dit");
 
@@ -411,7 +441,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test hook-ecriture : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-ecriture : 14 cas d'avant + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077))");
+    : "Self-test hook-ecriture : 14 cas d'avant + À REJOUER (TF-1960) PASS — courriel à un tiers de 90 mots rappelé avec son passage et sa passe 2 sur 3, jamais FAIL, le même réécrit PASS, courriel anglais rappelé puis PASS avec `langue: en` ; + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077))");
   return casse.length ? 1 : 0;
 }
 
