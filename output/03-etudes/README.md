@@ -63,4 +63,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
 
-_44 fichier(s), 2 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_44 fichier(s), 2 sous-dossier(s)_
