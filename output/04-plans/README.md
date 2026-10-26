@@ -57,6 +57,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
 | `Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` | fichier | 9,4 Ko | Synthèse Mandat — D-41, D-43 et D-44 exécutées le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` | fichier | 5,8 Ko | Synthèse Mandat — D-45 reposée en clair, le 19/10/2026 au soir |
+| `Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md` | fichier | 3,9 Ko | Synthèse Mandat — D-74 exécutée : conventions du client chargées à l'ouverture de ses prod |
 | `Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` | fichier | 21,3 Ko | Digit-AI — Synthèse de mandat — D-36 et D-37 exécutées, 18 candidatures closes — 01/10/202 |
 | `Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` | fichier | 19,6 Ko | Synthèse Mandat — vos décisions D-49, D-50 et D-51 sont exécutées ou en cours ; la campagn |
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
@@ -120,4 +121,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 
-_100 fichier(s), 3 sous-dossier(s)_ · 11 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_101 fichier(s), 3 sous-dossier(s)_ · 11 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
