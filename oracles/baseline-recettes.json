@@ -687,8 +687,8 @@
   "vu_le": "2026-10-18"
  },
  "scripts/reserver-decision.test.mjs": {
-  "cas": 53,
-  "vu_le": "2026-10-18"
+  "cas": 107,
+  "vu_le": "2026-10-26"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
   "cas": 10,

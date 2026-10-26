@@ -12,15 +12,19 @@
  *   5. les numéros déjà affichés par le produit hors `question_humain` (une `reponse_humain` nomme D-7) relèvent le prochain numéro ; `--depuis` aussi ;
  *   6. depuis le dossier d'un produit, sans option, l'outil écrit CHEZ LE PRODUIT et jamais au pilot ;
  *   7. la reformulation d'une décision inscrite garde son numéro et ne compte pas comme un doublon ; `--verifier` nomme un vrai doublon ;
- *   8. la ressemblance sépare les collisions réelles du 18/10/2026 (D-24, D-25, D-26, D-27 : 0,00) de la même question reformulée.
+ *   8. la ressemblance sépare les collisions réelles du 18/10/2026 (D-24, D-25, D-26, D-27 : 0,00) de la même question reformulée ;
+ *   9. TF-1911 (D-83 (a), 26/10/2026) : le REGISTRE COMMUN DU POSTE entre deux arbres de travail d'un même dépôt (vrais `git worktree`) — fixture rouge :
+ *      D-7 réservée dans l'un, la réservation dans l'autre rend D-8, et le contrôle RÉSERVATION refuse un D-7 affiché dans le second pour une autre
+ *      question (tout de suite, au hook comme par `--prejuger`) ; six réservations simultanées sur les deux arbres ne rendent jamais le même numéro ; un
+ *      verrou périmé est repris, un verrou frais ne l'est pas ; le registre n'est jamais dans l'arbre ni versionné ; sans dépôt git, la réservation se fait comme avant et le dit.
  * Joué par oracles/self-tests.mjs (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync, utimesSync, realpathSync } from "node:fs";
+import { join, dirname, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { REGISTRE_PILOT, lireRegistrePilot, ressemblance, memeQuestion, ecrivainDeLedger, numerosDuLedger } from "../oracles/lib-decisions.mjs";
+import { REGISTRE_PILOT, lireRegistrePilot, ressemblance, memeQuestion, ecrivainDeLedger, numerosDuLedger, sousVerrou, VERROU_COMMUN } from "../oracles/lib-decisions.mjs";
 import { registreDesDecisions, controlerReservation } from "../oracles/hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -172,8 +176,127 @@ try {
   att(memeQuestion("Faut-il publier la version corrigée du démarrage ?", "Faut-il publier maintenant la version corrigée du démarrage ?"), "8 : la même question à un mot près doit être reconnue");
   att(!memeQuestion("Puis-je enregistrer et publier l'essai de relecture d'intention ?", "Puis-je enregistrer et publier la boucle de correction, le relecteur renforcé et le nouveau seuil ?"),
     "8 : deux « Puis-je enregistrer et publier … » sur des sujets différents (D-24 et D-27 du 18/10) ne doivent PAS être confondues par les deux mots d'ouverture qu'elles partagent");
+
+  // ---- 9. TF-1911 (D-83 (a), 26/10/2026) : LE REGISTRE COMMUN DU POSTE, entre arbres de travail d'un même dépôt
+  // Le fait : D-155, D-156 et D-159 prises deux fois les 18 et 19/10 chez un même produit, chaque fois entre deux arbres de travail (git worktree).
+  // Fixture rouge : D-7 réservée dans l'arbre A, réservation dans l'arbre B → D-8 (avant TF-1911 : D-7 une seconde fois), et le contrôle refuse un D-7 affiché
+  // dans B pour une autre question. Joué avec de VRAIS dépôts git et de vrais `git worktree`, par chaque écrivain de ledger disponible.
+  const gitDispo = spawnSync("git", ["--version"], { encoding: "utf8" });
+  if (gitDispo.error || gitDispo.status !== 0) echecs.push("9 : git est introuvable sur ce poste — le registre commun du poste n'est pas rejoué");
+  else {
+    const git = (cwd, ...a) => spawnSync("git", ["-c", "user.name=essai", "-c", "user.email=essai@example.invalid", "-c", "commit.gpgsign=false", "-c", "core.longpaths=true", ...a], { cwd, encoding: "utf8" });
+    const reel = (p) => realpathSync.native(p).toLowerCase();
+    const communDe = (d) => resolve(d, git(d, "rev-parse", "--git-common-dir").stdout.trim());
+    const TETE9 = (n, q) => `## 3. Décisions attendues\n\n> **D-${n} — ${q}**\n> - **Recommandation : (a)**\n\n`;
+    const Q_A = "Faut-il publier la version corrigée du démarrage ?", Q_AUTRE = "Peut-on retirer l'ancien gabarit des pages du site ?", Q_B = "Faut-il garder la version du jeudi ?";
+    const bloquantsDuHook = (d, texte, nom, env = {}) => {
+      const f = join(base, nom + ".md"); writeFileSync(f, texte, "utf8");
+      // sans la session qui joue la recette : --prejuger relirait SA transcription, où une D-7 citée n'est plus « nouvelle »
+      const sansSession = { ...process.env, ...env }; delete sansSession.CLAUDE_CODE_SESSION_ID;
+      const r = spawnSync(process.execPath, [join(PILOT, "oracles", "hook-restitution.mjs"), "--prejuger", f], { encoding: "utf8", cwd: d, env: sansSession });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+      return { code: r.status, o };
+    };
+    const sortes9 = [];
+    if (PYTHON) sortes9.push("python");
+    if (ecrivainDeLedger(join(base, "sans-ledger-py"))) sortes9.push("node");
+    for (const sorte of sortes9) {
+      const A = join(base, `depot-commun-${sorte}`), B = join(base, `arbre-b-${sorte}`);
+      mkdirSync(join(A, "forge", "retours"), { recursive: true });
+      writeFileSync(join(A, "forge", "retours", ".gitkeep"), "", "utf8");
+      if (sorte === "python") {
+        writeFileSync(join(A, "forge", "ledger.py"), LEDGER_GABARIT, "utf8");
+        spawnSync(PYTHON, [join(A, "forge", "ledger.py"), "run_open", "--run_id", "essai"], { encoding: "utf8", cwd: A, env: { ...process.env, PYTHONUTF8: "1" } });
+      } else writeFileSync(join(A, "forge", "ledger.jsonl"), JSON.stringify({ seq: 1, ts: "2026-10-18T10:00:00.000Z", type: "run_open", run_id: "essai" }) + "\n", "utf8");
+      // D-6 déjà répondue au ledger : la première réservation rend D-7 (le cas de la consigne).
+      writeFileSync(join(A, "forge", "ledger.jsonl"), readFileSync(join(A, "forge", "ledger.jsonl"), "utf8") + JSON.stringify({ seq: 2, ts: "2026-10-18T10:00:01.000Z", type: "reponse_humain", portee: "D-6" }) + "\n", "utf8");
+      const init = [git(A, "init", "-q"), git(A, "add", "-A"), git(A, "commit", "-q", "-m", "essai"), git(A, "worktree", "add", "-q", "-b", "arbre-b", B)];
+      att(init.every((r) => r.status === 0), `9 (${sorte}) : le dépôt d'essai et son second arbre de travail doivent se créer, obtenu ${init.map((r) => r.status + " " + (r.stderr || "").trim().slice(0, 80)).join(" | ")}`);
+      att(existsSync(join(B, "forge", "retours")) && existsSync(join(B, "forge", "ledger.jsonl")), `9 (${sorte}) : le second arbre doit porter son propre forge/ledger.jsonl`);
+      const commun = join(communDe(A), "forge-decisions.jsonl");
+      att(reel(communDe(A)) === reel(communDe(B)), `9 (${sorte}) : les deux arbres doivent partager le MÊME dossier git commun`);
+
+      // la fixture rouge : D-7 dans A, puis la réservation dans B rend D-8
+      const a7 = lancer(["--question", Q_A, "--produit", A]);
+      att(a7.code === 0 && a7.o?.reserve === "D-7", `9 (${sorte}) : dans A (D-6 répondue), la réservation doit rendre D-7, obtenu ${a7.code} ${JSON.stringify(a7.o || a7.brut).slice(0, 220)}`);
+      att(existsSync(commun) && reel(a7.o?.registre_commun || commun) === reel(commun), `9 (${sorte}) : le registre commun doit être rangé dans le dossier git commun (${commun}), obtenu ${a7.o?.registre_commun}`);
+      att(!existsSync(join(A, "forge-decisions.jsonl")) && !git(A, "ls-files").stdout.includes("forge-decisions"), `9 (${sorte}) : le registre commun ne doit jamais être dans l'arbre de travail ni versionné`);
+      const avantB = empreinte(commun);
+      const proB = lancer(["--prochain", "--produit", B]);
+      att(proB.o?.prochain === "D-8" && empreinte(commun) === avantB, `9 (${sorte}) : --prochain dans B doit rendre D-8 (l'union du registre commun et du ledger) sans rien écrire, obtenu ${JSON.stringify(proB.o || proB.brut).slice(0, 200)}`);
+      att(!numerosDuLedger(B).numeros.has("7"), `9 (${sorte}) : le ledger de B ne nomme PAS D-7 (c'est ce qui rendait la collision possible)`);
+      const b8 = lancer(["--question", Q_B, "--produit", B]);
+      att(b8.code === 0 && b8.o?.reserve === "D-8", `9 (${sorte}) : FIXTURE ROUGE — D-7 réservée dans A, la réservation dans B doit rendre D-8, obtenu ${b8.code} ${JSON.stringify(b8.o || b8.brut).slice(0, 220)}`);
+      att(numerosDuLedger(B).numeros.has("8") && !numerosDuLedger(A).numeros.has("8"), `9 (${sorte}) : D-8 s'inscrit au ledger de B (trace versionnée conservée) et pas à celui de A`);
+      const lus = lireRegistrePilot(commun).entrees;
+      att(lus.map((e) => e.n).join() === "7,8" && lus[0].origine === "reservation" && lus[0].question === Q_A && lus[1].question === Q_B && /^\d{4}-\d{2}-\d{2}T/.test(lus[0].ts || "") && lus[0].arbre && lus[1].arbre && lus[0].arbre !== lus[1].arbre,
+        `9 (${sorte}) : le registre commun doit porter D-7 (A) et D-8 (B) avec question, ts et arbre, obtenu ${JSON.stringify(lus).slice(0, 300)}`);
+
+      // le contrôle de fin de tour : un D-7 affiché dans B pour une AUTRE question est refusé — tout de suite, sans attendre l'échéance de TF-1849
+      const avantEcheance = new Date("2026-01-01T00:00:00Z");
+      const c7B = controlerReservation({ dernierTexte: TETE9(7, Q_AUTRE), racine: B, maintenant: avantEcheance });
+      att(c7B.verdict === "FAIL" && c7B.bloquant === true && c7B.prises?.join() === "D-7" && /DÉJÀ PRISE au registre commun/.test(c7B.ecarts.join()),
+        `9 (${sorte}) : D-7 affiché dans B pour une autre question doit être REFUSÉ (prise au registre commun), obtenu ${JSON.stringify(c7B).slice(0, 320)}`);
+      att(controlerReservation({ dernierTexte: TETE9(7, Q_A), racine: A, maintenant: avantEcheance }).verdict === "PASS", `9 (${sorte}) : D-7 affiché dans A pour SA question doit passer`);
+      att(controlerReservation({ dernierTexte: TETE9(7, "Faut-il publier maintenant la version corrigée du démarrage ?"), racine: A, maintenant: avantEcheance }).verdict === "PASS", `9 (${sorte}) : la même question à un mot près doit passer`);
+      att(controlerReservation({ dernierTexte: TETE9(8, Q_B), racine: B, maintenant: avantEcheance }).verdict === "PASS", `9 (${sorte}) : D-8 affiché dans B pour SA question doit passer`);
+      const c7Meme = controlerReservation({ dernierTexte: TETE9(7, Q_A), racine: B, maintenant: avantEcheance });
+      att(c7Meme.prises.length === 0, `9 (${sorte}) : la MÊME question affichée dans B n'est pas une collision (prises vide), obtenu ${JSON.stringify(c7Meme.prises)}`);
+      // le hook lui-même (--prejuger), échéance de TF-1849 repoussée en 2099 : la collision bloque quand même
+      const hook7 = bloquantsDuHook(B, TETE9(7, Q_AUTRE), `brouillon-9-${sorte}`, { FORGE_RESERVATION_BLOQUANTE_DES: "2099-01-01" });
+      att(hook7.code === 1 && (hook7.o?.bloquants || []).some((x) => /^RÉSERVATION — D-7 est DÉJÀ PRISE au registre commun/.test(x)) && hook7.o?.reservation?.prises?.join() === "D-7",
+        `9 (${sorte}) : --prejuger dans B doit refuser D-7 (RÉSERVATION, prise au registre commun), obtenu ${hook7.code} ${JSON.stringify(hook7.o).slice(0, 300)}`);
+      // le REMÈDE que le message recommande, joué : un numéro réservé par l'outil
+      const remede = lancer(["--question", Q_AUTRE, "--produit", B]);
+      att(remede.o?.reserve === "D-9" && controlerReservation({ dernierTexte: TETE9(9, Q_AUTRE), racine: B, maintenant: avantEcheance }).verdict === "PASS",
+        `9 (${sorte}) : le remède (réserver par l'outil, afficher le numéro rendu) doit rendre D-9 et passer le contrôle, obtenu ${JSON.stringify(remede.o || remede.brut).slice(0, 200)}`);
+
+      // concurrence : trois réservations dans A et trois dans B au même instant ne rendent jamais le même numéro
+      const six = await Promise.all(Array.from({ length: 6 }, (_, i) => lancerAsync(["--question", `Faut-il traiter le sujet ${i} du chantier ${i % 2 ? "B" : "A"} ?`, "--produit", i % 2 ? B : A], base)));
+      const ns6 = six.map((r) => r.o?.n).sort((x, y) => x - y);
+      att(six.every((r) => r.code === 0) && ns6.join() === "10,11,12,13,14,15", `9 (${sorte}) : six réservations simultanées réparties sur deux arbres doivent rendre 10 à 15 sans doublon ni trou, obtenu ${ns6.join()} (codes ${six.map((r) => r.code).join()})`);
+      const ecrits6 = lireRegistrePilot(commun).entrees.map((e) => e.n).sort((x, y) => x - y);
+      att(ecrits6.join() === "7,8,9,10,11,12,13,14,15", `9 (${sorte}) : le registre commun doit porter 7 à 15 une seule fois chacun, obtenu ${ecrits6.join()}`);
+      const seqs = (d) => lignes(join(d, "forge", "ledger.jsonl")).map((x) => x.seq);
+      att(seqs(A).every((s, i) => s === i + 1) && seqs(B).every((s, i) => s === i + 1), `9 (${sorte}) : les deux ledgers doivent rester numérotés sans trou ni doublon, obtenu A ${seqs(A).join()} / B ${seqs(B).join()}`);
+      att(![A, B].some((d) => existsSync(join(d, "forge", "decisions.lock")) || existsSync(join(d, "forge", "ledger.jsonl.lock"))) && !existsSync(commun + ".lock"), `9 (${sorte}) : aucun verrou ne doit rester`);
+
+      // un verrou PÉRIMÉ (processus mort, plus de 30 s) est repris ; le délai écrit est VERROU_COMMUN.perimeMs
+      writeFileSync(commun + ".lock", "", "utf8");
+      const vieux = new Date(Date.now() - 2 * 60_000); utimesSync(commun + ".lock", vieux, vieux);
+      const apresPerime = lancer(["--question", "Faut-il reprendre un verrou laissé par un processus mort ?", "--produit", A]);
+      att(apresPerime.code === 0 && apresPerime.o?.reserve === "D-16" && !existsSync(commun + ".lock"), `9 (${sorte}) : un verrou vieux de 2 minutes (délai de péremption ${VERROU_COMMUN.perimeMs / 1000} s) doit être repris, obtenu ${apresPerime.code} ${JSON.stringify(apresPerime.o || apresPerime.brut).slice(0, 200)}`);
+
+      // --verifier chez un produit : le registre commun sans doublon passe, un numéro pris pour deux questions sans lien est nommé
+      const v9 = lancer(["--verifier", "--produit", B]);
+      att(v9.code === 0 && v9.o?.verdict === "PASS" && v9.o?.registre_commun_entrees === 10, `9 (${sorte}) : --verifier chez B doit passer sur 10 entrées, obtenu ${v9.code} ${JSON.stringify(v9.o || v9.brut).slice(0, 220)}`);
+      writeFileSync(commun, readFileSync(commun, "utf8") + JSON.stringify({ type: "decision", n: 7, question: "Faut-il autre chose, sans aucun rapport avec le reste ?", date: "2026-10-26", origine: "reservation" }) + "\n", "utf8");
+      const v9b = lancer(["--verifier", "--produit", A]);
+      att(v9b.code === 1 && v9b.o?.verdict === "FAIL" && v9b.o?.doublons_registre_commun?.[0]?.n === 7, `9 (${sorte}) : D-7 prise pour deux questions sans lien doit être nommée par --verifier, obtenu ${v9b.code} ${JSON.stringify(v9b.o || v9b.brut).slice(0, 220)}`);
+    }
+
+    // sans dépôt git (dossier temporaire) : la réservation se fait comme avant ET dit que le registre commun est indisponible
+    if (sortes9.length) {
+      const sorte = sortes9[0];
+      const nu = join(base, `produit-sans-git-${sorte}`);
+      mkdirSync(join(nu, "forge", "retours"), { recursive: true });
+      if (sorte === "python") { writeFileSync(join(nu, "forge", "ledger.py"), LEDGER_GABARIT, "utf8"); spawnSync(PYTHON, [join(nu, "forge", "ledger.py"), "run_open", "--run_id", "essai"], { encoding: "utf8", cwd: nu, env: { ...process.env, PYTHONUTF8: "1" } }); }
+      else writeFileSync(join(nu, "forge", "ledger.jsonl"), JSON.stringify({ seq: 1, ts: "2026-10-18T10:00:00.000Z", type: "run_open", run_id: "essai" }) + "\n", "utf8");
+      const sansGit = lancer(["--question", Q_A, "--produit", nu]);
+      att(sansGit.code === 0 && sansGit.o?.reserve === "D-1" && sansGit.o?.registre_commun === null && /n'est pas dans un dépôt git/.test(sansGit.o?.registre_commun_indisponible || ""),
+        `9 : sans dépôt git, la réservation se fait comme avant (D-1) et DIT que le registre commun est indisponible, obtenu ${sansGit.code} ${JSON.stringify(sansGit.o || sansGit.brut).slice(0, 260)}`);
+    }
+    // les options du verrou : un verrou frais n'est pas repris, un verrou périmé l'est ; sans options, les valeurs d'avant (le registre du pilot ne change pas)
+    const lockEssai = join(base, "essai-verrou.lock");
+    writeFileSync(lockEssai, "", "utf8");
+    let refuse = null; try { sousVerrou(lockEssai, () => "pris", { essais: 3, pauseMs: 10, perimeMs: 60_000 }); } catch (e) { refuse = e.message; }
+    att(/verrou non obtenu/.test(refuse || "") && existsSync(lockEssai), `9 : un verrou FRAIS ne doit pas être repris (refus attendu, verrou intact), obtenu ${refuse}`);
+    const tresVieux = new Date(Date.now() - 5000); utimesSync(lockEssai, tresVieux, tresVieux);
+    att(sousVerrou(lockEssai, () => "pris", { essais: 3, pauseMs: 10, perimeMs: 1000 }) === "pris" && !existsSync(lockEssai), "9 : un verrou plus vieux que le délai écrit doit être repris puis levé");
+  }
+  att(empreinte(REGISTRE_PILOT) === empreintePilot, "9 : le registre du pilot a été modifié par la recette (elle ne doit jamais l'écrire)");
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 240)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("reserver-decision : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`reserver-decision : ${verifs}/${verifs} — cas rouges joués et refusés (une question sans point d'interrogation, une question vide, un dossier ni pilot ni produit, une reformulation d'un numéro non inscrit, un doublon sous le même numéro, huit sessions sans verrou : le mutant donne 34,34,35…) ; le prochain numéro libre est rendu ET inscrit en une opération sous verrou (huit sessions simultanées : huit numéros distincts), au pilot (decisions/REGISTRE.jsonl) comme chez un produit par l'écrivain de SON ledger (forge/ledger.py, ledger.mjs : entrée question_humain lue par le contrôle RÉSERVATION), un numéro déjà répondu au ledger relève le suivant, la reformulation garde son numéro, les refus (sans point d'interrogation, hors pilot et produit) n'écrivent rien, et la ressemblance sépare les quatre collisions réelles du 18/10/2026 de la même question reformulée`);
+console.log(`reserver-decision : ${verifs}/${verifs} — cas rouges joués et refusés (une question sans point d'interrogation, une question vide, un dossier ni pilot ni produit, une reformulation d'un numéro non inscrit, un doublon sous le même numéro, huit sessions sans verrou : le mutant donne 34,34,35…) ; le prochain numéro libre est rendu ET inscrit en une opération sous verrou (huit sessions simultanées : huit numéros distincts), au pilot (decisions/REGISTRE.jsonl) comme chez un produit par l'écrivain de SON ledger (forge/ledger.py, ledger.mjs : entrée question_humain lue par le contrôle RÉSERVATION), un numéro déjà répondu au ledger relève le suivant, la reformulation garde son numéro, les refus (sans point d'interrogation, hors pilot et produit) n'écrivent rien, et la ressemblance sépare les quatre collisions réelles du 18/10/2026 de la même question reformulée ; et, entre deux arbres de travail d'un même dépôt (TF-1911, D-83 (a)), D-7 réservée dans l'un la réservation dans l'autre rend D-8, le contrôle RÉSERVATION refuse un D-7 affiché dans le second pour une autre question, six réservations simultanées ne rendent jamais le même numéro, un verrou périmé est repris, et le registre commun reste hors de l'arbre`);
