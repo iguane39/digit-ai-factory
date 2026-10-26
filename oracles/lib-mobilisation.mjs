@@ -9,9 +9,10 @@
  * CE MODULE porte la seule lecture de `references/CARTE-FORGES.json` (donnée datée et sourcée, loi n° 4) : la liste fermée des
  * 13 forges, les 7 types de demande de la carte de départ, les forges privilégiées de chacun et les livrables exigés quand une
  * forge est mobilisée. La carte PRIVILÉGIE, elle ne fige pas : chaque forge reçoit un verdict motivé à chaque demande.
- * Consommateurs : `scripts/verifier-carte-forges.mjs` (le juge de la carte).
+ * Consommateurs : `scripts/verifier-carte-forges.mjs` (le juge de la carte) ; `scripts/mobiliser.mjs` (l'écrivain de la trace
+ * `forge/mobilisation.jsonl` chez le produit, une ligne par demande, et de la ligne d'écran « Je mobilise : … »).
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -116,4 +117,122 @@ export function validerCarte(carte) {
     if (!SIGNAUX_PROFIL.includes(s)) manquesCF5.push(`${f} : signal inconnu « ${s} »`);
   manquesCF5.length ? ko("CF5", manquesCF5.join(" ; ")) : ok("CF5", "signaux de profil pris dans la liste fermée");
   return constats;
+}
+
+// ---- LES 13 VERDICTS D'UNE DEMANDE (item 2 de TF-1949) -------------------------------------------------------------------------
+// À chaque demande chez un produit, chacune des 13 forges reçoit « mobilisee » ou « ecartee », AVEC son motif : une forge
+// mobilisée a aussi le sien, ce qui empêche de tout cocher pour ne rien oublier (diagnostic 20261026a, section d, T4).
+
+export const CHEMIN_TRACE = join("forge", "mobilisation.jsonl");
+export const CHEMIN_PROFIL = join("forge", "PROFIL.json");
+export const SCHEMA_TRACE = "forge/mobilisation@1";
+
+/** Les types de la carte désignés par leurs identifiants, ou { inconnus } : un type hors de la carte ne se devine pas. */
+export function typesDe(carte, ids) {
+  const connus = new Map((carte.types || []).map((t) => [t.id, t]));
+  const inconnus = ids.filter((id) => !connus.has(id));
+  return inconnus.length ? { inconnus, connus: [...connus.keys()] } : { types: ids.map((id) => connus.get(id)) };
+}
+
+/** Les forges privilégiées d'une demande : l'union de celles de ses types, dans l'ordre des 13. */
+export const privilegiees = (types) => FORGES.filter((f) => types.some((t) => (t.forges_privilegiees || []).includes(f)));
+
+const sansAccent = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+/** « mobilisée », « Mobilisee » → « mobilisee » ; toute autre valeur reste telle quelle et sera refusée. */
+export const normaliserVerdict = (v) => { const n = sansAccent(v); return n === "mobilisee" || n === "ecartee" ? n : String(v ?? ""); };
+
+/** Un motif tient s'il dit quelque chose : 3 mots au moins, aucun gabarit « <…> » resté en place. */
+const motifVide = (m) => { const t = String(m || "").trim(); return !t || /<[^>]*>/.test(t) || t.split(/\s+/).filter(Boolean).length < 3; };
+
+/** Juge les verdicts d'une demande ; rend la liste des refus (vide = conforme) et les verdicts normalisés. */
+export function validerVerdicts(verdicts) {
+  const refus = [];
+  const v = verdicts && typeof verdicts === "object" ? verdicts : {};
+  const inconnues = Object.keys(v).filter((f) => !FORGES.includes(f));
+  if (inconnues.length) refus.push(`forge(s) hors des 13 : ${inconnues.join(", ")} (attendu : ${FORGES.join(", ")})`);
+  const absentes = FORGES.filter((f) => !(f in v));
+  if (absentes.length) refus.push(`${absentes.length} forge(s) sans verdict : ${absentes.join(", ")} — chacune des 13 reçoit « mobilisee » ou « ecartee » avec son motif`);
+  const normalises = {};
+  for (const f of FORGES.filter((x) => x in v)) {
+    const e = v[f] && typeof v[f] === "object" ? v[f] : {};
+    const verdict = normaliserVerdict(e.verdict);
+    if (verdict !== "mobilisee" && verdict !== "ecartee") refus.push(`${f} : verdict « ${e.verdict ?? ""} » (attendu « mobilisee » ou « ecartee »)`);
+    if (motifVide(e.motif)) refus.push(`${f} : motif absent, trop court (3 mots au moins) ou resté au gabarit « <…> » — une forge ${verdict === "mobilisee" ? "mobilisée" : "écartée"} dit pourquoi`);
+    normalises[f] = { verdict, motif: String(e.motif || "").trim() };
+  }
+  return { refus, verdicts: normalises };
+}
+
+const court = (s, n = 90) => { const t = String(s).replace(/\s+/g, " ").trim(); return t.length > n ? `${t.slice(0, n - 1)}…` : t; };
+
+/** La seule ligne que l'écran montre : les forges mobilisées, puis celles qui sortent de la carte, ajoutées ou écartées, avec leur motif. */
+export function ligneEcran(types, verdicts) {
+  const priv = privilegiees(types);
+  const mobilisees = FORGES.filter((f) => verdicts[f]?.verdict === "mobilisee");
+  const ajoutees = mobilisees.filter((f) => !priv.includes(f)).map((f) => `+ ${f} (${court(verdicts[f].motif)})`);
+  const ecartees = priv.filter((f) => verdicts[f]?.verdict === "ecartee").map((f) => `− ${f} (${court(verdicts[f].motif)})`);
+  const hors = [...ajoutees, ...ecartees];
+  return `Je mobilise : ${mobilisees.length ? mobilisees.join(", ") : "aucune forge"} (carte : ${types.map((t) => t.libelle).join(" + ")}).`
+    + (hors.length ? ` Hors carte : ${hors.join(" ; ")}.` : "");
+}
+
+/** Le squelette à remplir : les forges privilégiées et celles qu'un signal du profil désigne sont proposées mobilisées, les autres
+ *  écartées ; chaque motif reste au gabarit « <…> » et l'écrivain le refuse tant qu'il n'est pas écrit. */
+export function squelette(carte, types, profil) {
+  const priv = privilegiees(types);
+  const verdicts = {};
+  for (const f of FORGES) {
+    const signaux = ((carte.forges || {})[f]?.signaux || []).filter((s) => profil && profil[s] === true);
+    verdicts[f] = priv.includes(f)
+      ? { verdict: "mobilisee", motif: "<motif : ce que cette forge apporte à la demande, ou passer à « ecartee » en disant pourquoi>" }
+      : signaux.length
+        ? { verdict: "mobilisee", motif: `<motif : le profil porte ${signaux.join(", ")} ; dire ce que la forge apporte, ou passer à « ecartee » en disant pourquoi>` }
+        : { verdict: "ecartee", motif: "<motif : pourquoi cette forge ne sert pas cette demande>" };
+  }
+  return verdicts;
+}
+
+/** « domaine_public=oui,page_indexable=non,… » → { domaine_public: true, … } ; rend { erreur } si un signal manque ou est inconnu. */
+export function lireProfilTexte(texte) {
+  const profil = {};
+  for (const morceau of String(texte || "").split(/[,;]/).map((s) => s.trim()).filter(Boolean)) {
+    const [cle, val] = morceau.split("=").map((s) => sansAccent(s));
+    if (!SIGNAUX_PROFIL.includes(cle)) return { erreur: `signal de profil inconnu « ${cle} » (attendu : ${SIGNAUX_PROFIL.join(", ")})` };
+    if (!["oui", "non", "true", "false"].includes(val)) return { erreur: `${cle} : valeur « ${val ?? ""} » (attendu oui ou non)` };
+    profil[cle] = val === "oui" || val === "true";
+  }
+  const manquants = SIGNAUX_PROFIL.filter((s) => !(s in profil));
+  return manquants.length ? { erreur: `signal(aux) de profil non déclaré(s) : ${manquants.join(", ")}` } : { profil };
+}
+
+/** Le profil déclaré du produit (forge/PROFIL.json), ou { erreur } : il se déclare une fois, il ne se devine pas. */
+export function lireProfil(produit) {
+  const chemin = join(produit, CHEMIN_PROFIL);
+  if (!existsSync(chemin)) return { erreur: `profil du produit non déclaré (${CHEMIN_PROFIL} absent)` };
+  let j;
+  try { j = JSON.parse(readFileSync(chemin, "utf8").replace(/^﻿/, "")); } catch (e) { return { erreur: `${CHEMIN_PROFIL} illisible : ${e.message}` }; }
+  const signaux = j && typeof j.signaux === "object" ? j.signaux : j;
+  const manquants = SIGNAUX_PROFIL.filter((s) => typeof signaux?.[s] !== "boolean");
+  return manquants.length ? { erreur: `${CHEMIN_PROFIL} ne déclare pas en oui/non : ${manquants.join(", ")}` }
+    : { profil: Object.fromEntries(SIGNAUX_PROFIL.map((s) => [s, signaux[s]])) };
+}
+
+/** Déclare (ou revoit) le profil du produit : forge/PROFIL.json, daté. */
+export function ecrireProfil(produit, profil, maintenant = new Date()) {
+  mkdirSync(join(produit, "forge"), { recursive: true });
+  writeFileSync(join(produit, CHEMIN_PROFIL), JSON.stringify({ schema: "forge/profil@1", date: maintenant.toISOString().slice(0, 10),
+    source: "déclaré par scripts/mobiliser.mjs --profil (diagnostic 20261026a, section d, A5)", signaux: profil }, null, 2) + "\n", "utf8");
+}
+
+/** La ligne de trace d'une demande, prête à être ajoutée à forge/mobilisation.jsonl. */
+export function ligneDeTrace({ carte, types, profil, verdicts, demande = null, maintenant = new Date() }) {
+  const priv = privilegiees(types);
+  return {
+    ts: maintenant.toISOString(), schema: SCHEMA_TRACE, demande: demande ? String(demande).trim() : null,
+    type: types.map((t) => t.id).join("+"), types: types.map((t) => t.id), profil,
+    carte: { version: carte.version, date: carte.date },
+    verdicts: Object.fromEntries(FORGES.map((f) => [f, { ...verdicts[f], privilegiee: priv.includes(f) }])),
+    mobilisees: FORGES.filter((f) => verdicts[f].verdict === "mobilisee"),
+    ligne: ligneEcran(types, verdicts),
+  };
 }

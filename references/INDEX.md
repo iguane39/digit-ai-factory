@@ -11,7 +11,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 |---|---|
 | `references\ACCUEIL.md` | Protocole d'accueil : de l'intention de l'utilisateur au run |
 | `references\BEST-PRACTICES-HTML.md` | Référentiel de best practices HTML, forge Digit-AI |
-| `references\CARTE-FORGES.json` | Donnée datée et sourcée de la carte des forges : 7 types de demande, leurs forges privilégiées parmi les 13 et les livrables exigés de chaque forge mobilisée ; la carte privilégie, elle ne fige pas (T4, TF-1949, D-69 (a) et D-79 (c) du 26/10/2026) ; jugée par `scripts\verifier-carte-forges.mjs` |
+| `references\CARTE-FORGES.json` | Donnée datée et sourcée de la carte des forges : 7 types de demande, leurs forges privilégiées parmi les 13 et les livrables exigés de chaque forge mobilisée ; la carte privilégie, elle ne fige pas (T4, TF-1949, D-69 (a) et D-79 (c) du 26/10/2026) ; jugée par `scripts\verifier-carte-forges.mjs`, lue par `scripts\mobiliser.mjs`, qui écrit chez le produit les 13 verdicts motivés de chaque demande (`forge\mobilisation.jsonl`) |
 | `references\CHAINE-TRADUCTION.md` | Traduire, auditer : deux chaînes déclarées |
 | `references\CONVENTION-DEPOTS-MIS-DE-COTE.md` | Un dépôt mis de côté se RENOMME, il ne s'exclut pas |
 | `references\CONVENTION-RECETTES.md` | Convention de nommage des recettes de contrôle — où vit la recette de chaque contrôle du pilot |

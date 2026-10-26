@@ -26,6 +26,16 @@ Deux boucles, une règle : la **boucle intérieure** (développer, itérer) est 
 route ci-dessous, c'est perdre ce qu'elle garantit — si une session s'apprête à le faire,
 elle s'arrête et le dit.
 
+**Je mobilise : 13 verdicts motivés à chaque demande (T4, TF-1949, D-69 (a) et D-79 (c) du 26/10/2026).** Avant de
+travailler, la session range la demande dans un type de la carte des forges (`references\CARTE-FORGES.json` du pilot :
+produit neuf, évolution, audit complet, site ou contenu web, données ou reporting, agent ou automatisation, document) et
+donne à chacune des 13 forges un verdict « mobilisee » ou « ecartee » avec son motif, au regard de la demande et du profil
+du produit (`forge\PROFIL.json`). La carte privilégie, elle ne fige pas : une forge privilégiée s'écarte avec son motif,
+une forge hors de la carte se mobilise dès qu'un motif la rend pertinente. Écrivain : `node <PILOT_ROOT>\scripts\mobiliser.mjs
+--preparer --type <type> --sortie <fichier>`, puis, motifs écrits, `node <PILOT_ROOT>\scripts\mobiliser.mjs --verdicts
+<fichier> --demande "<résumé>"` ; une ligne s'ajoute à `forge\mobilisation.jsonl`. L'écran n'en montre qu'une ligne, celle
+que l'écrivain rend : « Je mobilise : … ».
+
 | Intention | Le chemin | Jamais |
 |---|---|---|
 | « Relance les tests », mesurer la couverture, valider ou clore une étape — jamais l'audit du produit | campagne forge_tests : `uv run python -m forge_tests "<racine-de-ce-projet>" --json --sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` depuis `<FORGE_ROOT>\digit-ai-forge-tests` — exit 3 = PARTIEL acceptable documenté ; reprise ciblée : `--reprendre <rapport>` | conclure « tests OK » sur un pytest direct ; présenter une campagne forge_tests comme l'audit du produit |
