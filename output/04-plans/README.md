@@ -87,6 +87,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` | fichier | 6,5 Ko | Synthèse Mandat — mode « L99 boucle » construit, publié et exercé une première fois (16/10 |
 | `Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` | fichier | 11,6 Ko | Synthèse Mandat — œil critique et architecture de la Factory : état au 26/10/2026 |
 | `Digit-AI - Synthese Mandat - Oeil critique premiere analyse du poste - 20261026i.md` | fichier | 16,4 Ko | Synthèse Mandat — œil critique, première analyse du poste : 6 automatiques faites, 5 majeu |
+| `Digit-AI - Synthese Mandat - Oeil critique recommandations affichees - 20261026j.md` | fichier | 18,8 Ko | Synthèse Mandat — œil critique, première analyse du poste : recommandations affichées (26/ |
 | `Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md` | fichier | 17,7 Ko | Synthèse Mandat — transformations T1 à T4 détaillées, et un catalogue à la place du plafon |
 | `Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md` | fichier | 8,6 Ko | Synthèse Mandat — Opus 5.5 en effort medium est le défaut des conversations neuves, prouvé |
 | `Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` | fichier | 9,9 Ko | Synthèse Mandat — correctif d'ouverture arrêté sur une base qui a bougé, 2 candidatures in |
@@ -123,4 +124,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` | fichier | 5,4 Ko | Synthèse Mandat — publication arrêtée avant envoi, la session d'origine publie elle-même l |
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 
-_103 fichier(s), 3 sous-dossier(s)_ · 12 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_104 fichier(s), 3 sous-dossier(s)_ · 12 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

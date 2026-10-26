@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 510 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 511 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -527,6 +527,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
 | Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md | 20261026a | 11.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` |
 | Digit-AI - Synthese Mandat - Oeil critique premiere analyse du poste - 20261026i.md | 20261026i | 16.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique premiere analyse du poste - 20261026i.md` |
+| Digit-AI - Synthese Mandat - Oeil critique recommandations affichees - 20261026j.md | 20261026j | 18.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique recommandations affichees - 20261026j.md` |
 | Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md | 20261026b | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md` |
 | Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md | 20261001a | 8.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md | 20261013a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` |
