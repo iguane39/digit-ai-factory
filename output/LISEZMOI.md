@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 517 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 519 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -461,6 +461,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md | 20260919f | 17.7 Ko | `04-plans/2026-09/Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
+| Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
 | Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md | 20261001f | 11.9 Ko | `04-plans/Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` |
 | Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md | 20261015b | 8.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` |
 | Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md | 20261016f | 7.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` |
@@ -473,7 +474,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md | 20261018i | 8.5 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md` |
 | Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md | 20261018g | 9 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` |
 | Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md | 20261018e | 13.6 Ko | `04-plans/Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md` |
-| Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019e.md | 20261019e | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019e.md` |
+| Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md | 20261019k | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md` |
 | Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md | 20261004a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` |
 | Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md | 20261012a | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` |
 | Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md | 20261001e | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` |
@@ -556,13 +557,14 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md | 20261015i | 4.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` |
 | Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md | 20261015j | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` |
 | Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md | 20261013j | 3.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` |
-| Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019d.md | 20261019d | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019d.md` |
+| Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md | 20261019j | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md` |
 | Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md | 20261014b | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` |
 | Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md | 20261001b | 18.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md` |
 | Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md | 20261015l | 47.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` |
 | Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md | 20261019a | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` |
-| Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019c.md | 20261019c | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019c.md` |
+| Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md | 20261019i | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md` |
 | Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md | 20261020a | 7 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md` |
+| Digit-AI - Synthese Mandat - Synchronisation GitHub du 26-10 - 20261026q.md | 20261026q | 4.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub du 26-10 - 20261026q.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md | 20261018k | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md | 20261019b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` |
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |
