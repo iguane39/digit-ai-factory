@@ -182,7 +182,7 @@ Le skill demande un agent par session : 44 sessions ont été réparties en 6 lo
 
 ## 8. Prochaines actions
 
-Ordre : trié auto_ia d'abord ; A-1 suit vos réponses, A-2 est le geste humain restant.
+Ordre : trié auto_ia d'abord ; A-1 suit vos réponses, A-3 est le geste humain restant.
 
 | Sélecteur | Registre | Action | Acteur | Motif ou raison | Commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|
