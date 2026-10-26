@@ -291,6 +291,81 @@ export function contexteNiveau(message, ref = "references\\NIVEAUX.md") {
 }
 
 /**
+ * LA LETTRE D'UNE DÉCISION OUVERTE (TF-1958, décision humaine D-76 (c) du 26/10/2026).
+ *
+ * LE FAIT. Quatre fois en 7 jours, un message humain sans lettre de décision (« exécute le prompt »,
+ * « Fais 226 », « écris l'email ») a été pris pour le choix de l'option recommandée d'une décision
+ * encore ouverte ; une fois, une conception a été dite « validée par vous » sans réponse. La préférence
+ * est écrite (references/PREFERENCES-PORTEUR.md, 26/10) ; ce rappel la câble.
+ *
+ * LA RÈGLE. Quand le message humain ne cite AUCUNE lettre de décision (« 76c », « D-76 (c) », « 68a, 69a »,
+ * reconnues par `numerosDeDecision` de scripts/relecture-intention.mjs, la fonction du dépôt) ET que le
+ * DERNIER message de l'assistant, dans la transcription (`transcript_path`), posait au moins une décision
+ * « > **D-N — … ?** » que nul message humain n'a tranchée depuis, le hook ajoute au contexte un rappel :
+ * les D-N ouvertes, et la consigne de demander la lettre. Il ne bloque jamais.
+ *
+ * BORNES. Un sélecteur d'ACTION (« A1 », « A-2 ») n'est pas une décision, mais il est un choix explicite
+ * de l'humain : il ne déclenche pas le rappel. Seule la forme « > **D-N — … ?** » pose une décision ; un
+ * « D-99 (a) exécutée » ne la repose pas. Tout ce qui manque (transcription absente, illisible, import
+ * impossible) rend le silence : un détrompeur qui échoue ne retient jamais le message.
+ */
+const ACTION_CITEE = /(?<![\p{L}\p{N}_-])A\s*-?\s*\d{1,2}(?![\p{L}\p{N}])/iu;
+const DECISION_POSEE = /(?:^|\n)[ \t]*>[ \t]*\*{0,2}[ \t]*D[ \t]*-?[ \t]*(\d{1,3})[ \t]*\*{0,2}[ \t]*[—–-][^\n]*\?/g;
+const QUEUE_DE_TRANSCRIPTION = 4 * 1024 * 1024;
+
+/** Les enregistrements de la fin d'une transcription JSONL (les 4 derniers Mo au plus), ou []. */
+export function enregistrementsFinaux(chemin) {
+  try {
+    const t = readFileSync(chemin);
+    const coupe = t.length > QUEUE_DE_TRANSCRIPTION;
+    const lignes = t.subarray(coupe ? t.length - QUEUE_DE_TRANSCRIPTION : 0).toString("utf8").split("\n");
+    if (coupe) lignes.shift(); // la première ligne de la queue est tronquée
+    return lignes.filter((l) => l.trim()).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  } catch { return []; }
+}
+
+/**
+ * Les décisions posées par le dernier message de l'assistant et non tranchées depuis : { numeros: ["99"], fin }.
+ * `humain(rec)` rend le texte d'un enregistrement humain ou null ; `lettres(texte)` rend les numéros de décision cités.
+ */
+export function decisionsOuvertes(records, { humain, lettres }) {
+  const texteDe = (r) => (r?.type === "assistant" && !r.isSidechain && Array.isArray(r.message?.content)
+    ? r.message.content.filter((b) => b?.type === "text" && typeof b.text === "string").map((b) => b.text).join("\n") : "");
+  let dernier = -1;
+  for (let i = records.length - 1; i >= 0; i--) if (texteDe(records[i]).trim()) { dernier = i; break; }
+  if (dernier < 0) return { numeros: [] };
+  const id = records[dernier].message?.id;
+  // Un même message peut courir sur plusieurs enregistrements (un par bloc) : on les réunit par identifiant.
+  const rangs = records.map((r, i) => (i === dernier || (id && r?.message?.id === id && texteDe(r)) ? i : -1)).filter((i) => i >= 0);
+  const texte = rangs.map((i) => texteDe(records[i])).join("\n");
+  const posees = [...new Set([...texte.matchAll(DECISION_POSEE)].map((m) => String(Number(m[1]))))];
+  const tranchees = new Set();
+  for (const r of records.slice(Math.max(...rangs) + 1)) {
+    const h = humain(r);
+    if (h !== null) for (const n of lettres(h)) tranchees.add(String(Number(n)));
+  }
+  return { numeros: posees.filter((n) => !tranchees.has(n)) };
+}
+
+/** Le rappel injecté pour un message sans lettre devant des décisions ouvertes, ou "". Asynchrone : l'import du jugeur est paresseux. */
+export async function contexteLettre(message, transcriptPath) {
+  try {
+    if (!transcriptPath) return "";
+    const records = enregistrementsFinaux(transcriptPath);
+    // Le coût d'un import (~100 ms) ne se paie que s'il y a une décision à protéger : le jugement du message vient après.
+    const { numerosDeDecision, texteHumain } = await import("../scripts/relecture-intention.mjs");
+    const { numeros } = decisionsOuvertes(records, { humain: texteHumain, lettres: numerosDeDecision });
+    if (!numeros.length) return "";
+    const brut = String(message || "");
+    if (numerosDeDecision(brut).length || ACTION_CITEE.test(brut)) return "";
+    const liste = numeros.map((n) => `D-${n}`).join(", ");
+    return `[LETTRE — hook-lexique] Le dernier message de l'assistant posait ${numeros.length > 1 ? "des décisions" : "une décision"} encore ouverte${numeros.length > 1 ? "s" : ""} (${liste}) ` +
+      `et ce message ne cite aucune lettre (« 76c ») : ce message ne cite aucune lettre : n'exécute aucune option de ces décisions, demande la lettre ` +
+      `avant tout geste qui en dépend. Un message sans lettre n'est pas le choix de l'option recommandée (préférence du porteur du 26/10/2026, TF-1958).`;
+  } catch { return ""; }
+}
+
+/**
  * LA GARDE DE RECETTE EST ANCRÉE SUR LE POINT D'ENTRÉE (TF-1291, décision humaine A-14 du
  * 22/09/2026).
  *
@@ -513,23 +588,31 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
 if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.argv.includes("--self-test")) {
   let entree = "";
   try { entree = readFileSync(0, "utf8"); } catch { entree = ""; }
-  let message = "", dossier = "";
+  let message = "", dossier = "", transcript = "";
   try {
     const j = JSON.parse(entree);
     message = typeof j.prompt === "string" ? j.prompt : String(j.user_prompt || j.message || "");
     dossier = typeof j.cwd === "string" ? j.cwd : "";
+    transcript = typeof j.transcript_path === "string" ? j.transcript_path : "";
   } catch { message = entree; }
   // Le dossier de la session décide si les niveaux sont en service (TF-1418) ; à défaut du champ
   // `cwd`, celui où Claude Code lance le hook, qui est le même.
   if (!dossier) dossier = process.cwd();
   const lignes = [];
-  if (estMessageHumain(message)) {
+  const humain = estMessageHumain(message);
+  if (humain) {
     const appels = contexte(message);
     if (appels) lignes.push(appels);
     const ref = referentielNiveaux(dossier);
     const niveau = ref ? contexteNiveau(message, ref) : "";
     if (niveau) lignes.push(niveau);
   }
-  if (lignes.length) process.stdout.write(lignes.join("\n") + "\n");
-  process.exit(0);
+  // TF-1958 : la lettre d'une décision ouverte, lue dans la transcription ; asynchrone (import paresseux).
+  (humain ? contexteLettre(message, transcript) : Promise.resolve(""))
+    .catch(() => "")
+    .then((lettre) => {
+      if (lettre) lignes.push(lettre);
+      if (lignes.length) process.stdout.write(lignes.join("\n") + "\n");
+      process.exit(0);
+    });
 }

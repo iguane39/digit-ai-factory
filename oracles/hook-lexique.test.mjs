@@ -123,5 +123,73 @@ check("hook — « complet : » dans une session du pilot → ligne de niveau Co
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (!/\[NIVEAU — hook-lexique\][^\n]*Complexe/.test(r.stdout)) throw new Error(`niveau Complexe absent : ${r.stdout}`);
 });
+// TF-1958 (D-76 (c), 26/10/2026) — LA LETTRE D'UNE DÉCISION OUVERTE. Quatre fois en 7 jours, un message
+// sans lettre (« exécute le prompt », « Fais 226 », « écris l'email ») a été pris pour le choix de
+// l'option recommandée d'une décision encore ouverte. Le hook joue au point d'entrée réel, transcript
+// à l'appui (champ `transcript_path`) : il rappelle les D-N ouvertes quand le message ne cite aucune
+// lettre, et se tait quand il en cite une, quand c'est un sélecteur d'action (« A1 »), quand le
+// transcript ne pose aucune décision ou qu'elle a été tranchée depuis. Il ne bloque jamais.
+const assistant = (id, texte) => ({ type: "assistant", message: { id, role: "assistant", content: [{ type: "text", text: texte }] } });
+const humain = (texte) => ({ type: "user", origin: { kind: "human" }, message: { role: "user", content: texte } });
+const DECISION_99 = "## 3. Décisions\n\n> **D-99 — Publier la page maintenant ?**\n>\n> | Option | Effet |\n> | (a) oui | publie |\n> | (b) non | garde |\n>\n> Recommandation : (a).\n";
+const transcrire = (records) => {
+  const p = join(mkdtempSync(join(tmpdir(), "transcript-")), "session.jsonl");
+  writeFileSync(p, records.map((r) => JSON.stringify(r)).join("\n") + "\n");
+  return p;
+};
+const jouerAvec = (prompt, records) =>
+  spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt, transcript_path: transcrire(records), cwd: mkdtempSync(join(tmpdir(), "produit-")) }) });
+const APRES_D99 = [humain("où en est la publication ?"), assistant("m1", DECISION_99)];
+check("cas rouge — hook — « exécute le prompt » après une restitution posant D-99 → rappel citant D-99 et demandant la lettre", () => {
+  const r = jouerAvec("exécute le prompt", APRES_D99);
+  if (r.status !== 0) throw new Error(`exit ${r.status} : le hook ne doit jamais bloquer`);
+  if (!/\[LETTRE — hook-lexique\][^\n]*D-99[^\n]*ce message ne cite aucune lettre : n'exécute aucune option de ces décisions, demande la lettre/.test(r.stdout))
+    throw new Error(`rappel absent ou incomplet : ${JSON.stringify(r.stdout)}`);
+});
+check("hook — « Fais 226 » et « écris l'email » (les deux autres messages du constat) → rappel", () => {
+  for (const m of ["Fais 226", "écris l'email"]) {
+    const r = jouerAvec(m, APRES_D99);
+    if (!/\[LETTRE — hook-lexique\][^\n]*D-99/.test(r.stdout)) throw new Error(`« ${m} » sans rappel : ${JSON.stringify(r.stdout)}`);
+  }
+});
+check("hook — la lettre est citée (« 99a », « D-99 (a) », « 99 b », « 68a, 99a ») → AUCUN rappel", () => {
+  for (const m of ["99a", "D-99 (a)", "99 b", "68a, 99a"]) {
+    const r = jouerAvec(m, APRES_D99);
+    if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`« ${m} » reçoit un rappel : ${JSON.stringify(r.stdout)}`);
+  }
+});
+check("hook — un sélecteur d'action (« A1 », « A-2 ») n'est pas une décision et ne déclenche pas le rappel", () => {
+  for (const m of ["A1", "A-2"]) {
+    const r = jouerAvec(m, APRES_D99);
+    if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`« ${m} » reçoit un rappel : ${JSON.stringify(r.stdout)}`);
+  }
+});
+check("hook — aucune décision ouverte dans le dernier message de l'assistant → rien", () => {
+  const sansDecision = [humain("99a"), assistant("m2", "## 4. Exécution\n\nD-99 (a) exécutée : la page est publiée.\n\n> **D-98 — décision d'hier, déjà tranchée** : exécutée, sans question.\n")];
+  const r = jouerAvec("exécute le prompt", sansDecision);
+  if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`rappel sans décision ouverte : ${JSON.stringify(r.stdout)}`);
+});
+check("hook — la décision posée plus haut dans la conversation n'est pas celle du DERNIER message : rappel limité à la dernière", () => {
+  const r = jouerAvec("exécute le prompt", [assistant("m0", "> **D-98 — Ancienne question ?**\n"), humain("98a"), assistant("m1", DECISION_99)]);
+  if (!/D-99/.test(r.stdout) || /D-98/.test(r.stdout)) throw new Error(`rappel inattendu : ${JSON.stringify(r.stdout)}`);
+});
+check("hook — la décision est tranchée depuis (un message humain citant 99a la suit) → rien", () => {
+  const r = jouerAvec("exécute le prompt", [humain("où en est la publication ?"), assistant("m1", DECISION_99), humain("99a")]);
+  if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`rappel d'une décision tranchée : ${JSON.stringify(r.stdout)}`);
+});
+check("hook — un message qui n'est pas de l'humain (notification d'agent) ne reçoit pas le rappel", () => {
+  const r = jouerAvec("<task-notification>\n<summary>Agent terminé</summary>\nrapport remis\n</task-notification>", APRES_D99);
+  if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`notification avec rappel : ${JSON.stringify(r.stdout)}`);
+});
+check("cas rouge — hook — transcript absent, illisible ou sans champ → rien, exit 0, jamais un blocage", () => {
+  for (const entree of [{ prompt: "exécute le prompt" }, { prompt: "exécute le prompt", transcript_path: join(tmpdir(), "n-existe-pas.jsonl") }]) {
+    const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify(entree) });
+    if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`sortie inattendue (exit ${r.status}) : ${JSON.stringify(r.stdout)}`);
+  }
+  const illisible = join(mkdtempSync(join(tmpdir(), "transcript-")), "x.jsonl");
+  writeFileSync(illisible, "ceci n'est pas du JSON\n{ casse\n");
+  const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt: "exécute le prompt", transcript_path: illisible }) });
+  if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`transcript illisible : exit ${r.status}, ${JSON.stringify(r.stdout)}`);
+});
 console.log(`\nhook-lexique.test : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
