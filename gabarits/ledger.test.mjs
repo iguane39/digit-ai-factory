@@ -87,6 +87,16 @@ try {
     att(entrees(d).map((x) => x.seq).join() === "1,2,3", "seq non strictement croissants");
   });
 
+  check("rouge → vert — « --help » et un type qui commence par un tiret n'écrivent rien au ledger (revue de l'œil critique, 26/10/2026)", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const avant = entrees(d).length;
+    const aide = spawnSync(PYTHON, [script, "--help"], { env: CONSOLE });
+    const tiret = spawnSync(PYTHON, [script, "--resume", RESUME], { env: CONSOLE });
+    att(aide.status === 0, `--help exit ${aide.status}`);
+    att(tiret.status !== 0, "un type « --resume » a été accepté");
+    att(entrees(d).length === avant, `${entrees(d).length - avant} entrée(s) parasite(s) écrite(s)`);
+  });
+
   check("vert — --verifier affiche ses accents (« INTÈGRE », « · ») sous cp1252 et sort 0", () => {
     const { d, script } = produit(GABARIT); dossiers.push(d);
     spawnSync(PYTHON, [script, "retour", "--resume", RESUME], { env: CONSOLE });

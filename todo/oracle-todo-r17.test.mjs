@@ -46,6 +46,9 @@ verifier("vert — récidive close avec barrière acceptée", !r17(vert).some((f
 const texte = jouer(registre("2026-10-26T10:00:03.000Z", { type: "regle", chemin: "references/REGLE.md" }));
 verifier("rouge — une règle reformulée n'est pas une barrière", r17(texte).some((f) => f.statut === "FAIL"), JSON.stringify(r17(texte)));
 
+const chaine = jouer(registre("2026-10-26T10:00:03.000Z", null).replace("\"recidive_de\":[\"TF-9000\"]", "\"recidive_de\":\"TF-9000\""));
+verifier("rouge — une récidive saisie en chaîne est jugée comme un tableau", r17(chaine).some((f) => f.statut === "FAIL" && f.ou === "TF-9001"), JSON.stringify(r17(chaine)));
+
 const avant = spawnSync(process.execPath, [ORACLE], { encoding: "utf8" });
 verifier("registre réel — R17 rend PASS", JSON.parse(avant.stdout).findings.some((f) => f.regle === "R17" && f.statut === "PASS"), avant.stdout.slice(0, 200));
 

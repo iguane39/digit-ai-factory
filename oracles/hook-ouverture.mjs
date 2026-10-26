@@ -696,8 +696,11 @@ if (iPilot < 0) {
   if (existsSync(plan)) {
     let dernier = null;
     try { const l = readFileSync(ledger, "utf8").trim().split("\n").filter(Boolean); dernier = l.length ? JSON.parse(l[l.length - 1]).ts : null; } catch { dernier = null; }
-    const age = dernier ? (Date.now() - Date.parse(dernier)) / 86400000 : Infinity;
-    if (age >= 7) {
+    // Un ts illisible donnait NaN, et NaN >= 7 est faux : le passage ne repartait plus, sans alarme.
+    const ageBrut = dernier ? (Date.now() - Date.parse(dernier)) / 86400000 : Infinity;
+    const age = Number.isNaN(ageBrut) ? Infinity : ageBrut;
+    // FORGE_SANS_OBSERVATION=1 : la recette du hook ne régénère pas les fichiers suivis du pilot.
+    if (age >= 7 && process.env.FORGE_SANS_OBSERVATION !== "1") {
       const r = spawnSync(process.execPath, [join(PILOT, "todo", "observer-recidives.mjs")], { encoding: "utf8", cwd: PILOT, timeout: 180000 });
       let j = null; try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
       if (!j) alarmesOeil.push(`- récidives : passage hebdomadaire NON rendu (exit ${r.status}) — ${(r.stderr || r.stdout || "").trim().slice(0, 200)}`);

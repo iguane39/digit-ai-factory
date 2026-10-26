@@ -182,6 +182,13 @@ if __name__ == "__main__":
             del a[i:i + 2]
     if a and a[0] == "--verifier":
         sys.exit(verifier(run))
+    # `--help` écrivait une entrée « help: true » au ledger : une demande d'aide n'écrit rien, et un
+    # type d'entrée ne commence jamais par un tiret (revue de l'œil critique, 26/10/2026).
+    if "--help" in a or "-h" in a:
+        print(__doc__)
+        sys.exit(0)
+    if not a or a[0].startswith("-"):
+        raise SystemExit(f"type d'entrée manquant ou invalide (« {a[0] if a else ''} ») — rien n'est écrit\n{__doc__}")
     type_ = a[0]
     champs = {}
     i = 1

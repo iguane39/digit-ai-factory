@@ -224,6 +224,9 @@ function replier(evenements, ou) {
         if (CLASSES === null) ko("R13", e.id, `classe « ${e.classe} » portée mais référentiel ${CLASSES_PATH} illisible — une clé ne se juge pas sans référentiel`);
         else if (!CLASSES.has(String(e.classe))) ko("R13", e.id, `classe « ${e.classe} » absente de todo/CLASSES.json — une clé hors référentiel ne se compte pas ; la créer dans le référentiel (datée, sourcée) ou corriger la création par rectification`);
       }
+      // Une récidive saisie en chaîne (« TF-1555 ») compte comme un tableau d'un élément : la forme
+      // ne doit pas faire échapper un item au signalement ni à R17 (revue de code de l'œil critique, 26/10/2026).
+      if (typeof e.recidive_de === "string" && e.recidive_de.trim()) e.recidive_de = [e.recidive_de.trim()];
       if (Array.isArray(e.recidive_de) && e.recidive_de.length) {
         recidivesVues++;
         avert("R13", e.id, `RÉCIDIVE de ${e.recidive_de.join(", ")} (classe « ${e.classe} ») — la descente n'a pas tenu chez « ${e.demandeur} » ; à lire au tableau de bord todo/RECIDIVES.md, jamais à effacer`);

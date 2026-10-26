@@ -477,7 +477,11 @@ export function ecrituresParCommande(commandes) {
     dossier = null;   // un `cd` vaut pour la suite de SA commande ; d'une commande à l'autre, il n'est pas suivi (dit au livrable)
     // Le corps d'un heredoc est du contenu, pas des commandes : seule sa première ligne (« cat > f <<'EOF' ») se lit.
     const cmd = String(brute).replace(/<<-?\s*(["']?)(\w+)\1([^\n]*)\n[\s\S]*?\n\s*\2\s*(?=\n|$)/g, "<<$2$3");
-    for (const simple of cmd.split(/&&|\|\||[;\n]/)) {
+    // Le pipe simple coupe aussi : sans lui, « sed -i … f.txt | head » rendait « head » comme fichier écrit
+    // et perdait f.txt (revue de code de l'œil critique, 26/10/2026).
+    for (const brut of cmd.split(/&&|\|\||\||[;\n]/)) {
+      // « 2>&1 » joint deux flux, il n'écrit aucun fichier : sans ce retrait, « cp a b 2>&1 » rendait « 2>&1 ».
+      const simple = brut.replace(/\s\d?>&\d+/g, "");
       const s = simple.trim(); if (!s) continue;
       const cd = /^(?:cd|Set-Location|pushd)\s+("[^"]+"|'[^']+'|\S+)\s*$/i.exec(s);
       if (cd) { dossier = cd[1].replace(/^["']|["']$/g, ""); continue; }

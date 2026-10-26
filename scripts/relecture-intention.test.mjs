@@ -741,6 +741,10 @@ try {
     egal(e.map((x) => x.cible).join(","), "sortie.txt,journal.md,conf.ini,C:/tmp/h.txt,/c/dev/b.txt,c.txt", "cibles");
     egal(e.find((x) => x.cible === "c.txt").dossier, "sous", "cd suivi dans la commande");
   });
+  check("rouge → vert — un pipe simple coupe la commande : la cible d'un sed -i ou d'un cp suivi d'un pipe reste la cible, pas le dernier mot du pipeline (revue de code de l'œil critique, 26/10/2026)", () => {
+    const e = ecrituresParCommande(["sed -i s/a/b/ f.txt | head", "cp a.txt b.txt 2>&1 | tail -2"]);
+    egal(e.map((x) => x.cible).join(","), "f.txt,b.txt", "cibles avant le pipe");
+  });
   check("vert — TF-1941 (a) : sans --transcript, la transcription de la SESSION qui joue la commande passe avant la plus récente du projet", () => {
     const profil2 = join(T, "profil-session"), dP = join(profil2, "projects", slug);
     mkdirSync(dP, { recursive: true });

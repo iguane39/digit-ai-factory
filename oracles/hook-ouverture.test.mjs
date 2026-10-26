@@ -110,7 +110,7 @@ writeFileSync(join(produitClos, "forge", "ledger.jsonl"), [
 ].join(NL) + NL, "utf8");
 
 const lancerOuverturePilot = () => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
-  { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racineParcTest } });
+  { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest } });
 const sortieOuverturePilot = lancerOuverturePilot();
 
 check("TF-1521 — un déplacement EN ATTENTE est listé à l'ouverture, avec sa date et son motif", () => {
@@ -151,7 +151,7 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
     return profil;
   };
   const ouvrirAvec = (profil) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
-    { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonVide, HOME: maisonVide } });
+    { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonVide, HOME: maisonVide } });
   const sortieTenu = ouvrirAvec(profilRelecture("tenu", 2)), sortieFranchi = ouvrirAvec(profilRelecture("franchi", 3));
   check("D-23 vert — l'ouverture du pilot affiche les relectures d'intention (2 relectures, 2 800 460 jetons) et un seuil TENU", () => {
     // D-64 (a) du 21/10/2026 : l'alarme de l'essai vit dans la section « Œil critique », qui remplace « Flotte d'agents ».
@@ -232,7 +232,7 @@ check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans cla
 // contexte porte TOUT le relevé texte — rien de perdu au passage — précédé de l'en-tête qui dit
 // l'asynchronie. Sens rouge : une ligne du relevé absente du contexte, ou une sortie non JSON.
 const sortieJson = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--contexte-json"],
-  { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racineParcTest } });
+  { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest } });
 
 check("--contexte-json : la sortie est UN objet JSON SessionStart, sans texte autour", () => {
   let j;
