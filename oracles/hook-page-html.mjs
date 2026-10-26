@@ -33,7 +33,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { cheminSkillsInstalles } from "../scripts/lib-config-installee.mjs";
-import { jouerFamille } from "./hook-ecriture.mjs";
+import { jouerFamille, jouerFiche } from "./hook-ecriture.mjs";
 
 const SKILLS = cheminSkillsInstalles();
 const ORACLE_FILTRES = join(SKILLS, "quality-oracles", "scripts", "oracle-filtres-tableau.mjs");
@@ -145,9 +145,24 @@ process.exit(fail ? 1 : 0);
   writeFileSync(pageCouverte, "<p>x</p>", "utf8"); writeFileSync(pageNue, "<p>x</p>", "utf8");
   if (!/\[famille\][^\n]*famille « restitution »/.test(lancerHook(pageCouverte))) casse.push("une page « Synthese … » ne résout pas sa famille à l'écriture (TF-1874)");
   if (!/\[famille\][^\n]*G8 — aucune famille/.test(lancerHook(pageNue))) casse.push("une page d'un type ABSENT du catalogue n'est pas nommée à l'écriture : la classe gabarit-famille-manquante récidive par ce silence (TF-1874)");
+  // TF-1907 (21/10/2026) : la fiche de conception amont (D8) se demande aussi à l'écriture d'une PAGE — le rapport
+  // du 18/10 était un HTML. Trois sens sur le hook LANCÉ pour de bon, dans un projet jetable : une page d'une famille
+  // qui engage D8 (« Kit partenaire ») sans fiche est SIGNALÉE ; la même avec une exemption motivée se tait ; une
+  // page d'une famille qui n'engage pas D8 (« Synthese … ») se tait aussi.
+  const projetD8 = join(dir, "projet-d8"); mkdirSync(join(projetD8, "output"), { recursive: true });
+  const lancerProjet = (page) => spawnSync(process.execPath, [fileURLToPath(import.meta.url), "--fichier", page],
+    { encoding: "utf8", timeout: 120000, cwd: projetD8 }).stdout || "";
+  const pageKit = join(projetD8, "output", "Digit-AI - Kit partenaire - Revendeurs - 20261021a.html");
+  writeFileSync(pageKit, "<!doctype html><html><body><h1>Kit</h1></body></html>", "utf8");
+  if (!/\[fiche\][^\n]*D8/.test(lancerProjet(pageKit))) casse.push("une page d'une famille qui engage D8, écrite sans fiche, n'est pas signalée à l'écriture (TF-1907)");
+  writeFileSync(pageKit, "<!doctype html><html><head><meta name=\"fiche-de-conception\" content=\"exemption — page interne sans lecteur externe\"></head><body><h1>Kit</h1></body></html>", "utf8");
+  if (/\[fiche\]/.test(lancerProjet(pageKit))) casse.push("une page à exemption motivée (meta fiche-de-conception) est encore signalée (TF-1907)");
+  const pageSynth = join(projetD8, "output", "Digit-AI - Synthese Mandat - Campagne close - 20261021a.html");
+  writeFileSync(pageSynth, "<p>x</p>", "utf8");
+  if (/\[fiche\]/.test(lancerProjet(pageSynth))) casse.push("une page d'une famille qui n'engage pas D8 est signalée : la donnée du catalogue décide (TF-1907)");
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length ? `Self-test hook-page-html : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-page-html : 14/14 PASS (cas rouge : page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés ; G8 dans ses TROIS sens sur une page lancée pour de bon — pas de famille demandée hors `output\\`, famille résolue sur une « Synthese … », type absent du catalogue NOMMÉ à l'écriture, TF-1874)");
+    : "Self-test hook-page-html : 14 cas d'avant + D8 (TF-1907, page sans fiche signalée, exemption motivée en meta silencieuse, famille sans D8 silencieuse) PASS — les 14 d'avant : (cas rouge : page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés ; G8 dans ses TROIS sens sur une page lancée pour de bon — pas de famille demandée hors `output\\`, famille résolue sur une « Synthese … », type absent du catalogue NOMMÉ à l'écriture, TF-1874)");
   return casse.length ? 1 : 0;
 }
 
@@ -162,7 +177,7 @@ if (lanceEnDirect) {
   if (!page) process.exit(0);
   // TF-1874 : la famille du livrable (G8), jouée comme `hook-ecriture.mjs` la joue pour un `.md`.
   const lignes = [...jouer(resolve(page)), ...ORACLES_DOCUMENTAIRES.flatMap((o) => jouerAvertissement(resolve(page), o)),
-    ...jouerFamille(resolve(page))];
+    ...jouerFamille(resolve(page)), ...jouerFiche(resolve(page))];
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);
 }

@@ -123,7 +123,7 @@
         "forge/hooks/factory.mjs flotte"
       ],
       "motifs_derives_du_gabarit": "TF-1756 (15/10/2026) : un motif par commande `forge/hooks/factory.mjs <nom>` de gabarits/settings-produit.json ; la recette scripts/relever-heritage.test.mjs (cas TF-1756) échoue dès qu'une commande du gabarit n'est pas exigée ici. Un produit écarte un hook en le déclarant sous `_hooks_factory_exclus` ({commande, motif}) dans son settings.json : la commande y étant écrite, le motif est tenu (écart déclaré, pas oubli). Le hook d'ouverture du produit ajoute toute entrée absente (TF-1755), donc l'exigence se répare à l'ouverture.",
-      "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
+      "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit. JAMAIS RECOPIÉ (TF-1942, 21/10/2026) : la copie du gabarit n'a lieu qu'à la création du produit ; ensuite, l'ouverture n'y AJOUTE que les entrées de hook manquantes (TF-1755) et ancre en place la commande relative du lanceur (TF-1903). Les permissions du produit (`allow`, `ask`, `deny`, `defaultMode`), ses serveurs MCP et ses hooks propres restent intacts : la phrase « modification locale écrasée » du relevé d'ouverture ne vise que les artefacts en `copie_conforme`.",
       "depuis": "2026-08-23",
       "familles_protegees": [
         "skill-ou-oracle-non-invoque",

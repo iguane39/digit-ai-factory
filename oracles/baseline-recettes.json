@@ -51,8 +51,8 @@
   "vu_le": "2026-10-19"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-10-18"
+  "cas": 21,
+  "vu_le": "2026-10-21"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
@@ -799,8 +799,8 @@
   "vu_le": "2026-10-12"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 38,
-  "vu_le": "2026-10-15"
+  "cas": 40,
+  "vu_le": "2026-10-21"
  },
  "todo/generer-page.test.mjs": {
   "cas": 6,

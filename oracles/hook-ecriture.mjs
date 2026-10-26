@@ -22,7 +22,7 @@
  *
  * Usage : node oracles\hook-ecriture.mjs [--fichier <note.md>] [--self-test]   (stdin : JSON du hook)
  */
-import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname, resolve, relative, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -74,26 +74,132 @@ export function fichierVise(entree) {
 const EST_LIVRABLE = /(^|[\\/])(output|livrables)[\\/]/i;
 const ORACLE_FAMILLES = join(ICI, "oracle-gabarits-documents.mjs");
 
+// Le constat G8 d'un livrable, lu UNE fois par processus : `jouerFamille` le dit, `jouerFiche` (TF-1907) y lit
+// les règles que la famille engage. Une seule résolution, jamais deux (un second processus par écriture).
+const constatsFamille = new Map();
+function lireFamille(fichier, oracle) {
+  const nom = basename(fichier);
+  if (!existsSync(oracle)) {
+    return { nom, ligne: `[famille] non jouée sur ${nom} : ${oracle} absent de ce poste — installer les outils (bootstrap.mjs --pull)` };
+  }
+  const cle = `${oracle}|${nom}`;
+  if (!constatsFamille.has(cle)) {
+    const r = spawnSync(process.execPath, [oracle, "--livrable", nom], { encoding: "utf8", timeout: 30000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
+    constatsFamille.set(cle, j?.findings?.[0]
+      ? { nom, f: j.findings[0] }
+      : { nom, ligne: `[famille] oracle-gabarits-documents ILLISIBLE sur ${nom} (exit ${r.status}) — ce n'est pas un constat sur le livrable` });
+  }
+  return constatsFamille.get(cle);
+}
+
 /** Joue G8 sur un livrable ; rend les lignes à imprimer (vide si le fichier n'est pas un livrable). */
 export function jouerFamille(fichier, oracle = ORACLE_FAMILLES) {
   const lignes = [];
   if (!fichier || !EST_LIVRABLE.test(String(fichier).replace(/\\/g, "/"))) return lignes;
-  const nom = basename(fichier);
-  if (!existsSync(oracle)) {
-    lignes.push(`[famille] non jouée sur ${nom} : ${oracle} absent de ce poste — installer les outils (bootstrap.mjs --pull)`);
-    return lignes;
-  }
-  const r = spawnSync(process.execPath, [oracle, "--livrable", nom], { encoding: "utf8", timeout: 30000 });
-  let j = null;
-  try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
-  const f = j?.findings?.[0];
+  const { nom, f, ligne } = lireFamille(fichier, oracle);
   if (!f) {
-    lignes.push(`[famille] oracle-gabarits-documents ILLISIBLE sur ${nom} (exit ${r.status}) — ce n'est pas un constat sur le livrable`);
+    lignes.push(ligne);
     return lignes;
   }
   lignes.push(f.statut === "PASS"
     ? `[famille] ${nom} : ${f.message}`
     : `[famille] ${nom} : G8 — ${f.message}`);
+  return lignes;
+}
+
+// LA FICHE DE CONCEPTION AMONT, DEMANDÉE AU MOMENT OÙ ON ÉCRIT LE LIVRABLE (D8, TF-1907, 21/10/2026).
+//
+// LE FAIT (retour du produit Produit-79, RP-20, 18/10/2026) : un rapport HTML a été écrit, contrôlé et restitué
+// sans fiche de conception, que la règle D8 exige avant l'écriture ; la fiche n'a été remplie qu'après le refus
+// de l'exploitant. D8 était écrite (gabarits\documents\README.md, CLAUDE-PRODUIT « Règles de socle »), G6 la
+// juge SUR APPEL, et rien ne la rencontrait à l'écriture : *une règle que le producteur ne rencontre pas au
+// moment où il produit n'existe pas pour lui* (TF-0757).
+//
+// CE QUE FAIT CE CONTRÔLE. Pour un livrable `.md` ou `.html` écrit sous `output\` ou `livrables\` (la portée de
+// G8, `EST_LIVRABLE`), il lit dans le constat G8 déjà rendu — la famille est résolue UNE fois, par
+// `lireFamille` — si la famille ENGAGE D8 au catalogue (`regles` de `gabarits\documents\catalogue.jsonl`,
+// la même donnée que « Règles engagées » des gabarits). Si oui, il AVERTIT quand le livrable n'a ni fiche ni
+// exemption motivée. Une fiche est : un fichier `fiche-conception*.md` (hors gabarit et exemple) à côté du
+// livrable ou sous `forge\` du projet, dont le nom partage un terme avec l'objet du livrable (date et indice
+// compris) ou dont le texte cite le nom du livrable ; OU la ligne `fiche_de_conception: <chemin>` du livrable
+// (`<meta name="fiche-de-conception" content="…">` en HTML). Une exemption est la même ligne :
+// `fiche_de_conception: exemption — <motif d'au moins 3 mots>`.
+//
+// ELLE AVERTIT, NE BLOQUE PAS, comme tout ce hook : l'enjeu d'un document (`fort` ou `ordinaire`, § 6 de la
+// fiche) ne se décide pas à la machine, et la fiche reste due dans les deux cas. Ce hook tourne aussi chez les
+// produits : `gabarits\hooks-factory.mjs` lance ce fichier DU PILOT avec le produit pour répertoire courant,
+// et la fiche se cherche donc sous le `forge\` du produit.
+//
+// CE QU'ELLE NE COUVRE PAS, et c'est écrit : une famille qui n'engage pas D8 au catalogue (études, rapports de
+// données, restitutions…) n'est pas jugée — c'est la DONNÉE qui l'élargit, pas ce code. La recherche d'une
+// fiche est bornée (profondeur 6 sous `forge\`, 500 entrées) ; au-delà, elle ne la voit pas et avertit.
+const EST_FICHE = /fiche[-_ ]?(?:de[-_ ])?conception/i;
+const GABARIT_OU_EXEMPLE_FICHE = /^FICHE-CONCEPTION(?:-EXEMPLE)?\.md$/i;
+const TERMES_SANS_VALEUR = new Set(["fiche", "conception", "etude", "rapport", "document", "livrable", "produit", "digit"]);
+const normaliserFiche = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const termesDe = (s) => normaliserFiche(s).split(" ").filter((m) => m.length >= 4 && !TERMES_SANS_VALEUR.has(m));
+const DECLARATION_MD = /^\s*(?:<!--\s*)?fiche[_ -]?de[_ -]?conception\s*:\s*(.+?)\s*(?:-->)?\s*$/im;
+const DECLARATION_HTML = /<meta\s+name=["']fiche-(?:de-)?conception["']\s+content=["']([^"']+)["']/i;
+const BORNE_ENTREES = 500, BORNE_PROFONDEUR = 6;
+
+/** Les fiches de conception remplies (hors gabarit et exemple) à côté du livrable et sous `forge\` du projet. */
+function fichesCandidates(dossierLivrable, racine) {
+  const trouvees = []; let vues = 0;
+  const parcourir = (dir, profondeur, recursif) => {
+    if (profondeur > BORNE_PROFONDEUR || vues >= BORNE_ENTREES) return;
+    let entrees; try { entrees = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of entrees) {
+      if (++vues > BORNE_ENTREES) return;
+      const chemin = join(dir, e.name);
+      if (e.isDirectory()) { if (recursif && !IGNORES.some((re) => re.test(chemin + "/"))) parcourir(chemin, profondeur + 1, true); continue; }
+      if (e.isFile() && /\.md$/i.test(e.name) && EST_FICHE.test(e.name) && !GABARIT_OU_EXEMPLE_FICHE.test(e.name)) trouvees.push(chemin);
+    }
+  };
+  parcourir(dossierLivrable, 0, false);
+  parcourir(join(racine, "forge"), 0, true);
+  return trouvees;
+}
+
+/**
+ * Joue la règle D8 à l'écriture d'un livrable ; rend les lignes à imprimer (vide : hors livrable, famille qui
+ * n'engage pas D8, fiche trouvée ou exemption motivée — un hook bavard se désactive).
+ */
+export function jouerFiche(fichier, oracle = ORACLE_FAMILLES, racine = process.cwd()) {
+  const lignes = [];
+  if (!fichier || !existsSync(fichier) || !EST_LIVRABLE.test(String(fichier).replace(/\\/g, "/"))) return lignes;
+  if (!/\.(?:md|html?)$/i.test(fichier) || INDEX_REGENERES.has(basename(fichier).toLowerCase())) return lignes;
+  if (EST_FICHE.test(basename(fichier))) return lignes;                 // la fiche elle-même n'a pas sa fiche
+  const { nom, f } = lireFamille(fichier, oracle);
+  if (!f || f.statut !== "PASS" || !Array.isArray(f.regles) || !f.regles.includes("D8")) return lignes;
+  let texte = ""; try { texte = readFileSync(fichier, "utf8"); } catch { return lignes; }
+  const remede = "la fiche se remplit AVANT d'écrire (`gabarits\\documents\\FICHE-CONCEPTION.md`, chez un produit `forge\\documents\\FICHE-CONCEPTION.md`) "
+    + "et se juge par `node oracles\\oracle-gabarits-documents.mjs --fiche <fiche.md> <livrable>` (G6) ; sinon une ligne du livrable déclare "
+    + "`fiche_de_conception: <chemin>` ou `fiche_de_conception: exemption — <motif d'au moins 3 mots>`";
+  const entete = `[fiche] ${nom} : D8 — la famille « ${f.id} » engage la fiche de conception amont`;
+  const declaration = (DECLARATION_MD.exec(texte) || DECLARATION_HTML.exec(texte) || [])[1] || null;
+  if (declaration) {
+    const exemption = /^exemption\s*[:—–-]\s*(.+)$/i.exec(declaration);
+    if (exemption) {
+      if (exemption[1].trim().split(/\s+/).length >= 3) return lignes;
+      lignes.push(`${entete}, et son exemption est déclarée SANS motif (« ${declaration.slice(0, 60)} ») — un motif d'au moins 3 mots, ou la fiche`);
+      return lignes;
+    }
+    const dossier = dirname(resolve(fichier));
+    if ([resolve(dossier, declaration), resolve(racine, declaration)].some((p) => existsSync(p))) return lignes;
+    lignes.push(`${entete}, et la fiche déclarée (« ${declaration.slice(0, 80)} ») est introuvable — ${remede}`);
+    return lignes;
+  }
+  const termesDuLivrable = new Set(termesDe(basename(fichier).replace(/\.[a-z0-9]+$/i, "")));
+  const base = basename(fichier).replace(/\.[a-z0-9]+$/i, "");
+  const fiche = fichesCandidates(dirname(resolve(fichier)), racine).find((c) => {
+    if (termesDe(basename(c).replace(/\.md$/i, "")).some((m) => termesDuLivrable.has(m))) return true;
+    try { return readFileSync(c, "utf8").includes(base); } catch { return false; }
+  });
+  if (fiche) return lignes;
+  lignes.push(`${entete}, et aucune ne l'accompagne : ni fiche-conception*.md à côté du livrable ou sous forge\\ qui le nomme, ni ligne de déclaration — ${remede}. `
+    + "Avertissement, non bloquant (TF-1907).");
   return lignes;
 }
 
@@ -234,10 +340,78 @@ function selfTest() {
   if (jouer(join(dir, "absent.md")).length) casse.push("un fichier absent produit une sortie");
   if (!jouer(rouge, join(dir, "nulle-part.mjs")).some((l) => /NON jouée/.test(l))) casse.push("un oracle absent du poste est tu au lieu d'être dit");
 
+  // D8 (TF-1907) — LA FICHE DE CONCEPTION AMONT, À L'ÉCRITURE. Un projet jetable (`racine`), une famille qui
+  // engage D8 au catalogue réel (« Kit partenaire », D1 D3 D6 D8 D11) et une qui ne l'engage pas (« Synthese »).
+  // Rouge : le livrable sans fiche ni exemption, l'exemption sans motif, la fiche déclarée introuvable, le gabarit
+  // vierge pris pour une fiche. Vert : la fiche qui nomme le livrable, l'exemption motivée, la fiche déclarée,
+  // une famille qui n'engage pas D8, un chemin hors de `output\`, et le livrable HTML (hook-page-html).
+  const projet = join(dir, "projet-d8");
+  mkdirSync(join(projet, "output", "05-livrables"), { recursive: true });
+  mkdirSync(join(projet, "forge", "documents"), { recursive: true });
+  const NOM_D8 = "Digit-AI - Kit partenaire - Onboarding revendeurs - 20261021a";
+  const livrableD8 = (ext, corps = "Un texte de livrable.\n") => {
+    const p = join(projet, "output", "05-livrables", `${NOM_D8}.${ext}`);
+    writeFileSync(p, corps, "utf8");
+    return p;
+  };
+  const d8 = (p) => jouerFiche(p, ORACLE_FAMILLES, projet);
+  if (!d8(livrableD8("md")).some((l) => /\[fiche\][^\n]*D8[^\n]*aucune ne l'accompagne/.test(l)))
+    casse.push("D8 : un livrable d'une famille qui engage la fiche, écrit SANS fiche ni exemption, n'est pas signalé — c'est le rapport du 18/10/2026 (TF-1907)");
+  writeFileSync(join(projet, "forge", "documents", "FICHE-CONCEPTION.md"), "# gabarit vierge\n", "utf8");
+  if (!d8(livrableD8("md")).length)
+    casse.push("D8 : le GABARIT vierge forge\\documents\\FICHE-CONCEPTION.md est pris pour la fiche du livrable");
+  mkdirSync(join(projet, "forge", "etapes", "onboarding"), { recursive: true });
+  writeFileSync(join(projet, "forge", "etapes", "onboarding", "fiche-conception-onboarding-revendeurs.md"), "famille: gd-kit-partenaire\n", "utf8");
+  if (d8(livrableD8("md")).length) casse.push("D8 : la fiche qui nomme le livrable, sous forge\\, est ignorée — le hook avertit à tort");
+  rmSync(join(projet, "forge", "etapes"), { recursive: true, force: true });
+  if (d8(livrableD8("md", "fiche_de_conception: exemption — note interne sans lecteur externe\n\nTexte.\n")).length)
+    casse.push("D8 : une exemption MOTIVÉE du livrable avertit encore");
+  if (!d8(livrableD8("md", "fiche_de_conception: exemption — oui\n\nTexte.\n")).some((l) => /SANS motif/.test(l)))
+    casse.push("D8 : une exemption sans motif (un mot) passe — l'exemption doit se motiver");
+  if (!d8(livrableD8("md", "fiche_de_conception: forge/fiche-introuvable.md\n\nTexte.\n")).some((l) => /introuvable/.test(l)))
+    casse.push("D8 : une fiche déclarée mais absente du disque passe");
+  writeFileSync(join(projet, "forge", "fiche-conception-kit.md"), "famille: gd-kit-partenaire\n", "utf8");
+  if (d8(livrableD8("md", "fiche_de_conception: forge/fiche-conception-kit.md\n\nTexte.\n")).length)
+    casse.push("D8 : une fiche déclarée ET présente avertit à tort");
+  rmSync(join(projet, "forge", "fiche-conception-kit.md"), { force: true });
+  const synthese = join(projet, "output", "05-livrables", "Digit-AI - Synthese Mandat - Campagne close - 20261021a.md");
+  writeFileSync(synthese, "Un texte.\n", "utf8");
+  if (d8(synthese).length) casse.push("D8 : une famille qui n'engage pas D8 (restitution) est accusée — la donnée du catalogue décide, pas ce code");
+  const horsOutput = join(projet, `${NOM_D8}.md`);
+  writeFileSync(horsOutput, "Un texte.\n", "utf8");
+  if (d8(horsOutput).length) casse.push("D8 : un fichier hors de `output\\` est accusé — la question ne se pose pas hors des livrables");
+  const htmlD8 = livrableD8("html", "<!doctype html><html><body><h1>Kit</h1></body></html>");
+  if (!d8(htmlD8).some((l) => /D8/.test(l))) casse.push("D8 : un livrable HTML sans fiche n'est pas signalé — le rapport du 18/10/2026 était une page HTML");
+  const lancerPageHtml = spawnSync(process.execPath, [join(ICI, "hook-page-html.mjs"), "--fichier", htmlD8],
+    { encoding: "utf8", cwd: projet, timeout: 120000 });
+  if (!/\[fiche\][^\n]*D8/.test(lancerPageHtml.stdout || ""))
+    casse.push(`D8 : le hook de PAGE HTML, lancé pour de bon, ne rend pas l'avertissement de fiche (${String(lancerPageHtml.stdout).slice(0, 200)})`);
+  // Le CHEMIN PRODUIT : le lanceur gabarits\hooks-factory.mjs, copié en forge\hooks\factory.mjs d'un produit, résout le
+  // pilot (FORGE_ROOT) et lance CE hook avec le produit pour répertoire courant. Rejoué pour de bon, il rend le même
+  // avertissement, et se tait une fois la fiche posée sous le forge\ du produit. Jouable seulement si ce dépôt porte
+  // le nom que le lanceur cherche (« digit-ai-factory ») : sinon le cas est DIT non joué, jamais compté vert.
+  let produitNonJoue = null;
+  if (basename(resolve(ICI, "..")) !== "digit-ai-factory") produitNonJoue = `ce dépôt s'appelle « ${basename(resolve(ICI, ".."))} », le lanceur cherche « digit-ai-factory »`;
+  else {
+    const produit = join(dir, "produit");
+    mkdirSync(join(produit, "forge", "hooks"), { recursive: true });
+    mkdirSync(join(produit, "output"), { recursive: true });
+    writeFileSync(join(produit, "forge", "hooks", "factory.mjs"), readFileSync(join(ICI, "..", "gabarits", "hooks-factory.mjs"), "utf8"), "utf8");
+    const docProduit = join(produit, "output", `${NOM_D8}.md`);
+    writeFileSync(docProduit, "Un texte de livrable.\n", "utf8");
+    const viaProduit = () => spawnSync(process.execPath, [join(produit, "forge", "hooks", "factory.mjs"), "ecriture", "--fichier", docProduit],
+      { encoding: "utf8", cwd: produit, input: "", timeout: 120000, env: { ...process.env, FORGE_ROOT: resolve(ICI, "..", "..") } });
+    const sans = viaProduit();
+    if (!/\[fiche\][^\n]*D8/.test(sans.stdout || ""))
+      casse.push(`D8 : par le lanceur d'un PRODUIT (forge\\hooks\\factory.mjs), l'avertissement de fiche n'arrive pas (${String(sans.stdout).slice(0, 200)} / ${String(sans.stderr).slice(0, 200)})`);
+    writeFileSync(join(produit, "forge", "fiche-conception-onboarding.md"), "famille: gd-kit-partenaire\n", "utf8");
+    if (/\[fiche\]/.test(viaProduit().stdout || "")) casse.push("D8 : par le lanceur d'un produit, la fiche posée sous son forge\\ n'est pas vue");
+  }
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test hook-ecriture : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-ecriture : 14/14 PASS (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077))");
+    : "Self-test hook-ecriture : 14 cas d'avant + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077))");
   return casse.length ? 1 : 0;
 }
 
@@ -261,7 +435,7 @@ if (lanceEnDirect) {
   // `fichierVise` écarte par construction. Les lire séparément est ce qui évite de rendre l'un
   // muet pour servir l'autre.
   const lignes = [];
-  if (fichier && existsSync(resolve(fichier))) lignes.push(...jouer(resolve(fichier)), ...jouerFamille(resolve(fichier)));
+  if (fichier && existsSync(resolve(fichier))) lignes.push(...jouer(resolve(fichier)), ...jouerFamille(resolve(fichier)), ...jouerFiche(resolve(fichier)));
   if (brut && existsSync(resolve(brut))) lignes.push(...jouerControleMaison(resolve(brut)));
   if (!lignes.length) process.exit(0);
   if (lignes.length) console.log(lignes.join("\n"));

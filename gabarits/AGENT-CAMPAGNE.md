@@ -59,6 +59,19 @@ seuil ou neutraliser un test pour faire passer : un échec résistant = item non
 diagnostic au rapport. Si la vérification native est elle-même défaillante, le prouver
 (sortie à l'appui) et le rapporter — ne pas la contourner.
 
+**Un refus d'oracle jugé faux se RAPPORTE, il ne se contourne pas (TF-1912, 21/10/2026).**
+Quand un oracle, un validateur ou un contrôle remis à l'agent refuse ce que l'agent juge correct,
+l'agent n'altère pas le livrable pour le faire taire. Il garde la forme correcte, cite au rapport
+le refus (règle, message) et la raison pour laquelle il est faux, ou applique l'exemption que
+l'oracle déclare lui-même. L'item qu'un faux refus empêche de commiter reste `non_clos`, avec ce
+refus en preuve : c'est la même règle que G-2, appliquée à la forme du livrable plutôt qu'à
+l'assertion. Un livrable qui passe l'oracle en se dégradant est une conformité de façade, et elle
+coûte plus qu'un échec dit, parce que personne ne la voit. Le fait : le 18/10/2026, 6 agents
+traducteurs sur 6 ont déformé 11 segments (« The sauna », « Die Sauna », « Restaurantempfehlungen »)
+pour faire taire un validateur trop strict qui refusait tout segment identique au français ;
+aucun n'a contesté le refus, et les 11 segments ont été rétablis à la main après relecture humaine
+des rapports.
+
 **Skill touché : la recette de l'agrégateur en plus du self-test (TF-1224).** Le self-test
 d'un skill ne juge que ce skill. La recette de `quality-oracles` juge tous les skills
 ensemble : longueur des descriptions (limite 1 024 caractères), parité des copies du socle,
@@ -201,7 +214,19 @@ non propagé fait mentir le poste : ce qui s'exécute n'est plus ce qui est vers
 ## Avancement des campagnes longues (TF-0252 — convention TF-0094)
 
 Tout agent dont la campagne peut dépasser ~2 minutes ÉMET son avancement vers la
-session principale (outil SendMessage, destinataire « main ») :
+session principale. **Le canal est un fichier, pas un outil de message (TF-1898, D-41 (a) du
+19/10/2026)** : les agents `campagne`, `constructeur`, `redacteur` et `verificateur` n'ont pas
+l'outil SendMessage (`.claude/agents/*.md`, ligne `tools`), et la prescription d'avant, qui le
+supposait, n'a été tenue par aucun des deux agents qui l'ont rencontrée le 19/10 — l'un a relayé
+par sondage en avant-plan, l'autre n'a rien émis.
+
+- **où** : une ligne JSON par émission, AJOUTÉE (jamais réécrite) au fichier que la consigne
+  nomme ; sans chemin nommé, `<dossier temporaire du poste>\campagne-<item>\avancement.jsonl`
+  (`node -e "console.log(require('os').tmpdir())"`), hors de tout dépôt — le dépôt cible reste
+  propre (TF-1132). La première émission annonce ce chemin dans la sortie de l'agent ;
+  `scripts\avancement.mjs` (`creerAvancement({ dossierRun })`) écrit déjà cette forme. Si
+  l'outil SendMessage figure malgré tout dans ton jeu d'outils, il s'ajoute au fichier, il ne
+  le remplace pas ;
 
 - **quand** : au démarrage (plan des chantiers + durée prévue), à chaque frontière de
   chantier, et dès que ~3 minutes se sont écoulées depuis la dernière émission —
@@ -212,9 +237,10 @@ session principale (outil SendMessage, destinataire « main ») :
   glissement dit ;
 - **sous-découpe** : une unité qui occupe plus d'une fenêtre se découpe en sous-unités
   nommées — deux émissions identiques sont indistinguables d'un blocage ;
-- **côté pilot** : chaque émission reçue est RELAYÉE à l'humain immédiatement, sans
-  réécriture. Le silence au-delà d'une fenêtre est un défaut de contrat (TF-0094),
-  jamais une économie.
+- **côté pilot** : la consigne nomme le fichier, et la session arme un guetteur dessus au
+  lancement (outil Monitor, ou relecture du fichier à chaque frontière de son propre travail) ;
+  chaque émission lue est RELAYÉE à l'humain, sans réécriture. Le silence au-delà d'une
+  fenêtre est un défaut de contrat (TF-0094), jamais une économie.
 
 ## Rendre la main : jamais sur une attente, jamais sur un arbre sale (TF-1132)
 

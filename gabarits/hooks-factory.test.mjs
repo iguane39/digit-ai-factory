@@ -179,7 +179,7 @@ try {
   // lanceur connaît et que le pilot porte ; sans quoi la fusion à l'ouverture câblerait un hook muet.
   const gabarit = JSON.parse(readFileSync(join(ICI, "settings-produit.json"), "utf8"));
   const nomsGabarit = Object.values(gabarit.hooks).flat().flatMap((g) => g.hooks || [])
-    .map((h) => (String(h.command).match(/forge\/hooks\/factory\.mjs\s+([\w-]+)/) || [])[1]).filter(Boolean);
+    .map((h) => (String(h.command).match(/forge\/hooks\/factory\.mjs"?\s+([\w-]+)/) || [])[1]).filter(Boolean); // TF-1903 : chemin ancré entre guillemets
   const lanceurTexte = readFileSync(join(ICI, "hooks-factory.mjs"), "utf8");
   const inconnus = nomsGabarit.filter((n) => !lanceurTexte.includes(`"${n}"`) || !existsSync(join(PILOT, "oracles", `hook-${n}.mjs`)));
   check(`11 les ${nomsGabarit.length} hooks du gabarit sont connus du lanceur et portés par le pilot`, nomsGabarit.length >= 9 && !inconnus.length, inconnus.join(", "));
@@ -207,8 +207,27 @@ try {
     rP.status === 0 && !existsSync(join(canalR, "scripts", "generateurs", "local.py")), rP.stdout + rP.stderr);
   const rMuet = reprise(produit("produit-sans-reprise", false), "--restaurer");
   check("12 ter reprise : un produit sans forge/REPRISE.json reste muet", rMuet.status === 0 && !rMuet.stdout.trim() && !rMuet.stderr.trim(), rMuet.stdout + rMuet.stderr);
+
+  // 13 — TF-1903 (21/10/2026), la commande du GABARIT jouée comme le harnais la joue : par un shell, depuis le
+  // répertoire courant de la session, ici un sous-dossier du produit (après un `cd`). `${CLAUDE_PROJECT_DIR}`
+  // est remplacé par la racine du projet, comme Claude Code le fait (substitution sous PowerShell, variable
+  // d'environnement sous Git Bash, rejoué le 21/10 sur 2.1.299 et 2.1.107). Rouge : la commande relative
+  // d'avant, depuis le même sous-dossier, ne trouve pas le lanceur.
+  // Le hook joué est `remisage`, dont le verdict ne dépend pas du dossier courant : `git stash` nu refusé (exit 2).
+  const gabaritS = JSON.parse(readFileSync(join(ICI, "settings-produit.json"), "utf8"));
+  const cmdRemisage = Object.values(gabaritS.hooks).flat().flatMap((g) => g.hooks || []).map((h) => String(h.command)).find((c) => /factory\.mjs"?\s+remisage\b/.test(c));
+  const sous = join(P, "src", "module");
+  mkdirSync(sous, { recursive: true });
+  const parShell = (commande) => spawnSync(commande, { shell: true, encoding: "utf8", cwd: sous, env: { ...env, CLAUDE_PROJECT_DIR: P },
+    input: JSON.stringify({ tool_name: "Bash", cwd: sous, tool_input: { command: "git stash" } }) });
+  const ancre = parShell(String(cmdRemisage).split("${CLAUDE_PROJECT_DIR}").join(P));
+  const relatif = parShell("node forge/hooks/factory.mjs remisage");
+  check("13 TF-1903 : la commande remisage du gabarit, jouée depuis un sous-dossier du produit, atteint le lanceur et refuse `git stash` nu",
+    /\$\{CLAUDE_PROJECT_DIR\}\/forge\/hooks\/factory\.mjs/.test(String(cmdRemisage)) && ancre.status === 2 && /TF-1754/.test(ancre.stderr), `${cmdRemisage} → ${ancre.status} ${ancre.stdout}${ancre.stderr}`);
+  check("13 bis TF-1903 rouge : la commande relative d'avant, depuis le même sous-dossier, ne trouve pas le lanceur",
+    relatif.status !== 0 && /MODULE_NOT_FOUND|Cannot find module/.test(relatif.stderr), `${relatif.status} ${relatif.stderr.slice(0, 200)}`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903)`);

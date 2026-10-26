@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 506 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 509 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -229,6 +229,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261019-tri-opportunites-favoris-tiktok.md | — | 25.7 Ko | `03-etudes/20261019-tri-opportunites-favoris-tiktok.md` |
 | 20261020-etude-opportunite-conseil-avant-arbitrage.md | — | 15.7 Ko | `03-etudes/20261020-etude-opportunite-conseil-avant-arbitrage.md` |
 | 20261020-L99-oeil-critique-amelioration-continue-automatisee.md | — | 25.9 Ko | `03-etudes/20261020-L99-oeil-critique-amelioration-continue-automatisee.md` |
+| 20261021-etude-opportunite-relecteur-de-bon-sens-restitution.md | — | 28.6 Ko | `03-etudes/20261021-etude-opportunite-relecteur-de-bon-sens-restitution.md` |
+| 20261021-etude-opportunite-surcouche-permissions-produit.md | — | 19.6 Ko | `03-etudes/20261021-etude-opportunite-surcouche-permissions-produit.md` |
 | 20261021-L99-agent-nocturne-oeil-critique.md | — | 27.4 Ko | `03-etudes/20261021-L99-agent-nocturne-oeil-critique.md` |
 | 20261021-L99-agent-nocturne-skill-vs-code.md | — | 27.3 Ko | `03-etudes/20261021-L99-agent-nocturne-skill-vs-code.md` |
 | 20261026-comparaison-task-observer-oeil-critique.md | — | 5.3 Ko | `03-etudes/20261026-comparaison-task-observer-oeil-critique.md` |
@@ -494,6 +496,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
 | Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md | 20261019f | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` |
+| Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md | 20261019h | 6 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` |
 | Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md | 20261019g | 5.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` |
 | Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md | 20261026g | 3.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md` |
 | Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md | 20261001c | 21.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` |

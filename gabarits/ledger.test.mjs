@@ -242,6 +242,27 @@ try {
     const r = spawnSync(PYTHON, [script, "--verifier"], { env: CONSOLE });
     att(!/porté par/.test(r.stdout.toString("utf8")), "le mutant nomme encore le doublon : le témoin est vide");
   });
+  // TF-1892 (D-41 (a), 19/10/2026) : la copie héritée passe le lint du produit. Un produit lançait
+  // `ruff check .` sur tout son dépôt et y lisait 7 erreurs, toutes dans forge/ledger.py (UP009, E401,
+  // I001, F401 ×2, E741, UP017). Ruff n'est pas une dépendance du pilot : sans `uvx`, le cas se dit sauté.
+  const RUFF = ["--from", "ruff@0.14.0", "ruff", "check", "--no-cache", "--select", "E4,E7,E9,F,I,UP", "--target-version", "py312"];
+  const uvx = spawnSync("uvx", ["--version"], { encoding: "utf8" });
+  if (uvx.status !== 0) console.log("  [SAUTÉ] TF-1892 — uvx absent du poste : le lint du gabarit n'est pas joué");
+  else {
+    const ruff = (texte) => {
+      const d = mkdtempSync(join(tmpdir(), "ledger-ruff-")); dossiers.push(d);
+      writeFileSync(join(d, "ledger.py"), texte, "utf8");
+      return spawnSync("uvx", [...RUFF, join(d, "ledger.py")], { encoding: "utf8" });
+    };
+    check("TF-1892 vert — gabarits/ledger.py passe ruff aux règles d'un produit (E4, E7, E9, F, I, UP)", () => {
+      const r = ruff(GABARIT);
+      att(r.status === 0, `ruff exit ${r.status} : ${(r.stdout || "").split("\n").filter((x) => /^[A-Z]+\d+ /.test(x)).join(" ; ")}`);
+    });
+    check("TF-1892 rouge — un import groupé sur une ligne est refusé (le témoin voit l'erreur)", () => {
+      const r = ruff(GABARIT.replace(/^import json\nimport os\n/m, "import json, os\n"));
+      att(r.status === 1 && /E401/.test(r.stdout || ""), `le mutant passe : exit ${r.status}`);
+    });
+  }
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }
 

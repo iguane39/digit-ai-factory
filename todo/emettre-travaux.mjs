@@ -44,6 +44,11 @@
  *   node todo\emettre-travaux.mjs --produit <nom> [--essai]
  *   node todo\emettre-travaux.mjs --tous [--essai]
  * `--essai` rend le lot sur la sortie standard et n'écrit RIEN, nulle part.
+ * `--registre <fichier>` lit les constats dans ce fichier plutôt que dans `todo\TODO.jsonl` (recette).
+ *
+ * UNE DEMANDE MODIFIÉE PART SEULE (TF-1920) : un constat déjà présent dans un lot encore `a_traiter`
+ * dont la demande (ou le fait, l'effort, la vérification) a changé depuis le dépôt part dans un lot
+ * COMPLÉMENTAIRE qui ne porte que lui — sans reconfier les autres éléments du lot précédent.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -201,6 +206,9 @@ const ESSAI = args.includes("--essai");
 // TF-1083 : une correction de RÉDACTION (même contenu confié, autre forme) ne part que sur demande.
 const CORRIGER_REDACTION = args.includes("--corriger-redaction");
 const valeur = (nom) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : null; };
+// TF-1920 : `--registre <fichier>` lit les constats dans une COPIE du registre — pour la recette, qui
+// joue des lots dans des dossiers temporaires sans jamais lire ni écrire le registre réel.
+const REGISTRE = valeur("--registre");
 
 /** La date du lot, au format des lots du parc. Passée en argument pour rester déterministe. */
 export const dateLot = (d) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
@@ -219,13 +227,17 @@ export function indiceLibre(boite, jour) {
  * — genre de travail que le pilot confie : le relevé du 25/08 l'a mesuré, et le produit ne peut
  * pas le connaître autrement.
  */
-export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
-  const absents = ligne.artefacts.filter((a) => a.etat === "absent");
-  const perimes = ligne.artefacts.filter((a) => a.etat === "divergent");
+export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined, seulementConstats = null) {
+  // TF-1920 (21/10/2026) — LE LOT COMPLÉMENTAIRE NE PORTE QUE LES CONSTATS NOMMÉS : aucun artefact
+  // d'héritage n'y est repris (ils sont déjà confiés par le lot encore à traiter), et seuls les
+  // constats dont la demande a changé depuis ce dépôt y figurent.
+  const artefacts = seulementConstats ? [] : ligne.artefacts;
+  const absents = artefacts.filter((a) => a.etat === "absent");
+  const perimes = artefacts.filter((a) => a.etat === "divergent");
   // TF-0654 : un artefact TROUVE AILLEURS ne se recopie pas — il se DECLARE. Le confondre avec
   // un absent ferait deposer un fichier mort a la racine du depot, et le relevé passerait au
   // vert sur une question restee ouverte.
-  const horsRacine = ligne.artefacts.filter((a) => a.etat === "hors_racine");
+  const horsRacine = artefacts.filter((a) => a.etat === "hors_racine");
   // TF-1461 (28/09/2026, campagne D-32 (a)) — L'ALIAS PÉRIMÉ N'EST PAS UN ÉTAT, C'EST UN CHAMP
   // SUR UN ARTEFACT par ailleurs CONFORME (la cible canonique existe, `etat` vaut "ok") : le
   // relevé (scripts\relever-heritage.mjs, TF-0881) pose `alias_perime` et `geste_alias` à côté,
@@ -233,20 +245,22 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // voient donc jamais — mesuré sur un parc jetable : le relevé nomme l'alias et son geste git rm,
   // l'émetteur rend « RIEN À CONFIER ». Même défaut que TF-0654 pour le hors-racine : un
   // TROISIÈME cas qui demande AUTRE CHOSE que recopier ou mettre à jour — ici, SUPPRIMER.
-  const aliasPerimes = ligne.artefacts.filter((a) => a.alias_perime);
+  const aliasPerimes = artefacts.filter((a) => a.alias_perime);
   // TF-1592 (13/10/2026) — L'INCOMPLET N'ÉTAIT JAMAIS CONFIÉ. Un fichier présent à qui manquent les
   // motifs exigés (`.gitignore`, `.claude/settings.json`) est relevé `incomplet` (TF-0649) ; aucun
   // des filtres ci-dessus ne le lisait, et le câblage du hook publication-hebergee exigé le 12/10
   // n'aurait atteint aucun produit. Le geste est le quatrième : AJOUTER les motifs, sans recopier.
-  const incomplets = ligne.artefacts.filter((a) => a.etat === "incomplet");
+  const incomplets = artefacts.filter((a) => a.etat === "incomplet");
   // TF-0730 (01/09) — LES CONSTATS SE CALCULENT AVANT LE RETOUR ANTICIPÉ. L'ordre inverse
   // faisait rendre [RIEN À CONFIER] à un produit dont l'héritage est conforme mais que des
   // constats DÉCIDÉS attendaient au registre : le message « héritage conforme » était vrai, et
   // répondait à une question plus étroite que celle posée — la même classe que TF-0680 et
   // TF-0729, un constat perdu derrière un message normal. Le seul produit porteur de constats
   // avait AUSSI des défauts d'héritage, ce qui a masqué la voie jusqu'à sa lecture.
-  const constats = cheminRegistre === undefined
+  const constatsDuProduit = cheminRegistre === undefined
     ? constatsDuRegistre(ligne.produit) : constatsDuRegistre(ligne.produit, cheminRegistre);
+  const constats = seulementConstats
+    ? constatsDuProduit.filter((e) => seulementConstats.has(e.id)) : constatsDuProduit;
   const aHeritage = absents.length || perimes.length || horsRacine.length || aliasPerimes.length || incomplets.length;
   if (!aHeritage && !constats.length) return null;
 
@@ -361,7 +375,13 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   // TF-0730 : les sections de prose parlaient d'HÉRITAGE même quand le lot n'en portait pas —
   // un lot à constats seuls doit garder les QUATRE sections (le juge les exige, et il a raison :
   // une section absente est indiscernable d'une section oubliée) avec un contenu qui dit vrai.
-  const dejaFait = aHeritage
+  const dejaFait = seulementConstats
+    ? `- Ce lot COMPLÈTE un lot encore \`a_traiter\` de votre boîte d'entrée : il ne porte que les constats
+  dont la demande a changé au registre depuis ce dépôt. Les autres éléments du lot précédent n'y sont
+  pas repris, ils restent à traiter là-bas — rien n'est confié deux fois.
+- Chaque constat a été instruit et DÉCIDÉ côté pilot avant d'être confié : le bloc cite son
+  identifiant \`TF-xxxx\`, la décision est humaine et tracée au registre.`
+    : aHeritage
     ? `- Le contrôle qui devait mesurer cet écart ne savait pas localiser votre dépôt : il cherchait par
   préfixe de nom, sans normalisation, sur deux niveaux de profondeur. Corrigé le 25/08 — un produit
   est désormais reconnu à ses lots de retours, et non à sa profondeur de rangement. Preuve : recette
@@ -487,7 +507,7 @@ ${ordre}
   const redaction = empreinteTexte(md.split(`${jour}${indice}`).join("<lot>").split(jour).join("<jour>"), 12);
   const mdScelle = md.replace("- **Statut** : a_traiter\n",
     `- **Statut** : a_traiter\n- **Empreinte de la rédaction** : \`${redaction}\` — elle change quand le pilot corrige la FORME d'un lot sans en changer le contenu (TF-1083)\n`);
-  return { md: mdScelle, sidecar, elements: items.length, sceauConfie, redaction };
+  return { md: mdScelle, sidecar, elements: items.length, sceauConfie, redaction, constats };
 }
 
 // ---- exécution ------------------------------------------------------------------------------
@@ -516,7 +536,7 @@ if (lanceEnDirect) {
     if (cible && !ligne.produit.toLowerCase().includes(cible.toLowerCase())) continue;
     const boite = join(ligne.dossier, "input", "00-travaux");
     const indice = indiceLibre(boite, jour);
-    const lot = lotHeritage(ligne, jour, indice);
+    let lot = lotHeritage(ligne, jour, indice, REGISTRE || undefined);
     if (!lot) { console.log(`[RIEN À CONFIER] ${ligne.produit} — héritage conforme`); continue; }
 
     // LE JUGE AVANT L'ÉCRITURE : un lot en défaut n'est pas déposé, et le défaut est dit.
@@ -596,7 +616,44 @@ if (lanceEnDirect) {
       const sien = elementsDe(l.txt);
       return mien.size > 0 && [...mien].every((e) => sien.has(e));
     });
-    if (englobant) {
+    // ---- UNE DEMANDE MODIFIÉE N'EST PAS UN DOUBLON (TF-1920, 19/10/2026) -------------------------
+    //
+    // LE FAIT : la `demande_produit` d'un constat a été complétée au registre 30 minutes après le
+    // dépôt du lot qui le portait. Le sceau du contenu confié avait changé, mais les TITRES des
+    // éléments étaient les mêmes : la règle d'inclusion ci-dessus rendait « INCLUS DANS UN LOT NON
+    // TRAITÉ » et ne déposait rien. La demande complétée n'atteignait jamais le produit ; le
+    // contournement joué (un élément distinct ajouté pour faire partir un lot) a reconfié 11
+    // éléments déjà confiés — le doublon que la règle voulait éviter.
+    //
+    // L'inclusion se lit sur les ÉLÉMENTS, et un constat dont le bloc rendu (fait, demande, effort,
+    // vérification) n'est dans AUCUN lot de la boîte, traité ou non, n'est pas « déjà confié » : il
+    // part seul dans un lot COMPLÉMENTAIRE, sans reprendre les autres éléments. « Aucun lot, traité ou
+    // non » : une demande déjà livrée par un lot complémentaire, même traité, ne repart pas. Un
+    // élément d'héritage garde la lecture par titre (ses blocs portent la date du jour).
+    const blocsDe = (txt) => new Map(txt.split(/^(?=### )/m).filter((s) => s.startsWith("### "))
+      .map((s) => [s.slice(4).split(/\r?\n/)[0].trim(), s.split(/^## /m)[0].replace(/\r\n/g, "\n").trim()]));
+    const blocsDeLaBoite = lotsPresents.map((l) => blocsDe(l.txt));
+    const modifies = englobant
+      ? (lot.constats || []).filter((e) => {
+        const cle = blocConstat(e).split("\n")[0].slice(4).trim();
+        const rendu = blocConstat(e).replace(/\r\n/g, "\n").trim();
+        return !blocsDeLaBoite.some((b) => b.get(cle) === rendu);
+      })
+      : [];
+    let complement = false;
+    if (englobant && modifies.length) {
+      const seul = lotHeritage(ligne, jour, indice, REGISTRE || undefined, new Set(modifies.map((e) => e.id)));
+      seul.md = seul.md.replace(/^(# [^\n]+\n)/, `$1\n> **Lot COMPLÉMENTAIRE** de « ${englobant.nom} », encore \`a_traiter\` : il ne porte que ${modifies.length === 1 ? "le constat dont la demande a changé" : "les constats dont la demande a changé"} depuis ce dépôt (${modifies.map((e) => e.id).join(", ")}). Les autres éléments de « ${englobant.nom} » n'y sont pas repris et restent à traiter là-bas (TF-1920).\n`);
+      const rejugeComplement = verifier(seul.md, `pilot - TRAVAUX - ${jour}${indice}.md`);
+      if (rejugeComplement.verdict === "FAIL") {
+        refuses += 1;
+        console.error(`[REFUSÉ AVANT DÉPÔT] ${ligne.produit} — le lot complémentaire ne tient pas sa propre forme :`);
+        for (const c of rejugeComplement.constats.filter((x) => x.statut === "FAIL")) console.error(`  - ${c.regle} : ${c.message}`);
+        continue;
+      }
+      lot = seul;
+      complement = true;
+    } else if (englobant) {
       ignores += 1;
       console.log(`[INCLUS DANS UN LOT NON TRAITÉ] ${ligne.produit} — les ${mien.size} élément(s) de ce lot ` +
         `sont déjà tous dans « ${englobant.nom} », encore \`a_traiter\`. Rien de neuf à confier : ` +
@@ -605,8 +662,9 @@ if (lanceEnDirect) {
     }
 
     const nom = `pilot - TRAVAUX - ${jour}${indice}`;
+    const etiquette = complement ? "COMPLÉMENT" : "";
     if (ESSAI) {
-      console.log(`\n===== ESSAI, RIEN ÉCRIT : ${ligne.dossier}\\input\\00-travaux\\${nom}.md (${lot.elements} élément(s), sceau ${sceau})`);
+      console.log(`\n===== ESSAI${etiquette ? ` ${etiquette}` : ""}, RIEN ÉCRIT : ${ligne.dossier}\\input\\00-travaux\\${nom}.md (${lot.elements} élément(s), sceau ${lot.sceauConfie})`);
       console.log(lot.md.slice(0, 900) + "\n[…]");
       continue;
     }
@@ -614,7 +672,7 @@ if (lanceEnDirect) {
     writeFileSync(join(boite, `${nom}.md`), lot.md, "utf8");
     writeFileSync(join(boite, `${nom}.tf.jsonl`), lot.sidecar, "utf8");
     deposes += 1;
-    console.log(`[DÉPOSÉ] ${ligne.produit} → input\\00-travaux\\${nom}.md (${lot.elements} élément(s), sceau ${sceau})`);
+    console.log(`[DÉPOSÉ${etiquette ? ` — ${etiquette}` : ""}] ${ligne.produit} → input\\00-travaux\\${nom}.md (${lot.elements} élément(s), sceau ${lot.sceauConfie})`);
   }
 
   console.log(`\n${deposes} lot(s) déposé(s), ${ignores} déjà présent(s), ${refuses} refusé(s) avant dépôt.`);

@@ -70,7 +70,9 @@ const DEPOT_PRODUIT = !EST_LE_PILOT && existsSync(join(BASE, "forge"));
 //   · ecrire dans un depot dont on n est pas se DECLARE par `--base`. Sans lui, refus : le
 //     defaut de cette classe n est pas qu on ecrive ailleurs, c est qu on l ignore.
 const BASE_DECLAREE = args.includes("--base");
-const DEDANS = resolve(process.cwd()) === BASE || resolve(process.cwd()).startsWith(BASE + sep);
+// TF-1903 (21/10/2026) : sans casse sous Windows. Lancé par un chemin ancré (`${CLAUDE_PROJECT_DIR}`,
+// que l'extension VS Code écrit `c:\…`) depuis la session (`C:\…`), le même dépôt était refusé comme autre.
+const DEDANS = sansCasse(resolve(process.cwd())) === sansCasse(BASE) || sansCasse(resolve(process.cwd())).startsWith(sansCasse(BASE + sep));
 if (!CHECK_TOT && !DEDANS && !BASE_DECLAREE) {
   console.error(
     `refus : lance depuis ${process.cwd()}, ce generateur ecrirait dans ${BASE} — un autre depot. ` +

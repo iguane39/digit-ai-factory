@@ -149,6 +149,11 @@ et le controle ne depend alors plus de ce qui est installe chez lui. Copier enfi
 les hooks de la factory — fraîcheur à l'ouverture, restitution jugée à chaque fin de tour de
 travail — sont actifs dès la première session du produit) ; la clause de **précédence**
 du `CLAUDE.md` produit (R-43) et ces hooks sont vérifiés par `oracle-conformite-projet`.
+Cette copie de `settings-produit.json` est un geste de CRÉATION, jamais répété (TF-1942) :
+`.claude\settings.json` est en mode `presence_et_motif`, et chaque ouverture n'y AJOUTE que les
+entrées de hook manquantes du gabarit, en ancrant la commande relative du lanceur (TF-1903). Les
+`permissions` du produit (`allow`, `ask`, `deny`, `defaultMode`), ses serveurs MCP et ses hooks
+propres ne sont jamais écrasés : seuls les artefacts en copie conforme se recopient à chaque ouverture.
 
 **Socle documentaire `docs\projet\` (R-20, TF-0086/TF-0091 — la création appartient à
 l'ouverture)** : copier les **8 gabarits** de `gabarits\docs-projet\` (TECHNOS,

@@ -311,7 +311,7 @@ check("TF-1635 — sens rouge et bords : réglage sans hook de la factory, illis
 const { fusionnerHooksDuGabarit } = await import(new URL("./lib-ouverture-async.mjs", import.meta.url));
 const GABARIT_SETTINGS = join(PILOT, "gabarits", "settings-produit.json");
 const nomsDe = (j) => Object.values(j.hooks || {}).flat().flatMap((g) => g.hooks || [])
-  .map((h) => (String(h.command).match(/forge\/hooks\/factory\.mjs\s+([\w-]+)/) || [])[1]).filter(Boolean);
+  .map((h) => (String(h.command).match(/forge\/hooks\/factory\.mjs"?\s+([\w-]+)/) || [])[1]).filter(Boolean); // TF-1903 : chemin ancré entre guillemets
 const nomsGabarit = nomsDe(JSON.parse(readFileSync(GABARIT_SETTINGS, "utf8")));
 const SETTINGS_ANCIEN = JSON.stringify({
   permissions: { allow: ["Bash(npm test)"] },
@@ -338,11 +338,11 @@ check("TF-1755 — fusion : chaque entrée absente du gabarit ajoutée, rien de 
   // TF-1736 (15/10/2026) : un même hook peut servir deux événements (`reprise` à l'ouverture et en fin de
   // tour) ; le doublon se juge par ÉVÉNEMENT, l'unité où la fusion décide de la présence d'une entrée.
   const parEvenement = Object.entries(j.hooks).flatMap(([ev, gs]) => (gs || []).flatMap((g) => (g.hooks || [])
-    .map((h) => (String(h.command || "").match(/factory\.mjs\s+([a-z-]+)/) || [])[1]).filter(Boolean).map((n) => `${ev}:${n}`)));
+    .map((h) => (String(h.command || "").match(/factory\.mjs"?\s+([a-z-]+)/) || [])[1]).filter(Boolean).map((n) => `${ev}:${n}`)));
   if (parEvenement.length !== new Set(parEvenement).size) throw new Error(`doublon : ${parEvenement.join(", ")}`);
   if (j.permissions.allow[0] !== "Bash(npm test)" || j.hooks.Stop[0].hooks[0].timeout !== 90) throw new Error("un réglage du produit a été modifié");
   if (!j.hooks.PostToolUse[0].hooks.some((h) => h.command === "node scripts/mon-hook.mjs")) throw new Error("le hook propre au produit a disparu");
-  if (!j.hooks.PostToolUse[0].hooks.some((h) => /factory\.mjs ecriture/.test(h.command))) throw new Error("l'entrée ajoutée ne rejoint pas le groupe de même matcher");
+  if (!j.hooks.PostToolUse[0].hooks.some((h) => /factory\.mjs"? ecriture/.test(h.command))) throw new Error("l'entrée ajoutée ne rejoint pas le groupe de même matcher"); // TF-1903 : ajoutée sous la forme ancrée du gabarit
   if (!apres.includes("\r\n  \"hooks\"")) throw new Error("fins de ligne ou indentation du produit perdues");
   if (fusionnerHooksDuGabarit(f, GABARIT_SETTINGS).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
 });
@@ -361,6 +361,101 @@ check("TF-1755 — par le hook d'ouverture : produit muni du lanceur complété 
   writeFileSync(join(sans, ".claude", "settings.json"), SETTINGS_ANCIEN, "utf8");
   const s2 = joue(sans);
   if (readFileSync(join(sans, ".claude", "settings.json"), "utf8") !== SETTINGS_ANCIEN || /TF-1755/.test(s2)) throw new Error("un produit sans lanceur a été touché");
+});
+
+// ---- TF-1903 (21/10/2026) : LA COMMANDE RELATIVE DU LANCEUR S'ANCRE EN PLACE À L'OUVERTURE ------------------
+// Rejoué le 21/10 dans une session réelle : après `cd sub`, `node forge/hooks/factory.mjs <nom>` ne se trouve plus
+// (MODULE_NOT_FOUND) et le hook se tait ; `node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" <nom>` se déclenche.
+// Vert : un produit à l'ancienne commande la voit réécrite en place — mêmes noms et options, aucune entrée de plus
+// (jamais les deux formes), permissions, hook propre et délais intacts, seconde passe sans effet. Rouge : un hook
+// étranger, une commande déjà ancrée ou absolue ne sont pas touchés ; un fichier illisible n'est pas réécrit.
+const { ancrerCommandesFactory } = await import(new URL("./lib-ouverture-async.mjs", import.meta.url));
+const commandesDe = (j) => Object.values(j.hooks || {}).flat().flatMap((g) => g.hooks || []).map((h) => String(h.command || ""));
+
+check("TF-1903 — ancrage : fusion puis ancrage d'un produit à l'ancienne commande relative, sans doublon, réglages intacts, idempotent", () => {
+  const P = mkdtempSync(join(tmpdir(), "ouverture-ancrage-"));
+  const f = join(P, "settings.json");
+  writeFileSync(f, SETTINGS_ANCIEN, "utf8");
+  fusionnerHooksDuGabarit(f, GABARIT_SETTINGS);
+  const r = ancrerCommandesFactory(f);
+  const apres = readFileSync(f, "utf8");
+  const j = JSON.parse(apres);
+  const cmds = commandesDe(j);
+  if (r.etat !== "corrige" || !["ouverture", "restitution", "page-html"].every((n) => r.ancres.includes(n))) throw new Error(`état ${r.etat}, ancrés : ${r.ancres.join(", ")}`);
+  const relatives = cmds.filter((c) => /^node forge\/hooks\/factory\.mjs/.test(c));
+  if (relatives.length) throw new Error(`commande(s) restée(s) relative(s) : ${relatives.join(" ; ")}`);
+  if (!cmds.includes('node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" ouverture --sans-readme --contexte-json')) throw new Error("options de l'ouverture perdues à l'ancrage");
+  const parEvenement = Object.entries(j.hooks).flatMap(([ev, gs]) => (gs || []).flatMap((g) => (g.hooks || [])
+    .map((h) => (String(h.command || "").match(/factory\.mjs"?\s+([a-z-]+)/) || [])[1]).filter(Boolean).map((n) => `${ev}:${n}`)));
+  if (parEvenement.length !== new Set(parEvenement).size) throw new Error(`doublon après fusion et ancrage : ${parEvenement.join(", ")}`);
+  if (j.permissions.allow[0] !== "Bash(npm test)" || j.hooks.Stop[0].hooks[0].timeout !== 90) throw new Error("un réglage du produit a été modifié");
+  if (!cmds.includes("node scripts/mon-hook.mjs")) throw new Error("le hook propre au produit a été touché");
+  if (!apres.includes("\r\n  \"hooks\"")) throw new Error("fins de ligne ou indentation du produit perdues");
+  if (ancrerCommandesFactory(f).etat !== "deja" || fusionnerHooksDuGabarit(f, GABARIT_SETTINGS).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
+});
+
+check("TF-1903 — sens rouge et bords : hook étranger, commande ancrée ou absolue intacts ; illisible ou absent jamais réécrit", () => {
+  const P = mkdtempSync(join(tmpdir(), "ouverture-ancrage-bords-"));
+  const f = join(P, "settings.json");
+  if (ancrerCommandesFactory(f).etat !== "absent") throw new Error("fichier absent non reconnu");
+  writeFileSync(f, "{ pas du json", "utf8");
+  if (ancrerCommandesFactory(f).etat !== "illisible" || readFileSync(f, "utf8") !== "{ pas du json") throw new Error("fichier illisible réécrit");
+  const intact = JSON.stringify({ hooks: { Stop: [{ hooks: [{ command: "node scripts/mon-hook.mjs" }, { command: 'node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" restitution' }] }],
+    UserPromptSubmit: [{ hooks: [{ command: 'node "C:/dev/Produit-X/forge/hooks/factory.mjs" lexique' }] }] } });
+  writeFileSync(f, intact, "utf8");
+  if (ancrerCommandesFactory(f).etat !== "deja" || readFileSync(f, "utf8") !== intact) throw new Error("une commande étrangère, ancrée ou absolue a été touchée");
+  // Témoin rouge : la commande relative est bien celle qui est réécrite.
+  writeFileSync(f, JSON.stringify({ hooks: { Stop: [{ hooks: [{ command: "node forge/hooks/factory.mjs restitution" }] }] } }), "utf8");
+  const r = ancrerCommandesFactory(f);
+  if (r.etat !== "corrige" || commandesDe(JSON.parse(readFileSync(f, "utf8")))[0] !== 'node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" restitution') throw new Error(`témoin rouge non ancré : ${JSON.stringify(r)}`);
+});
+
+check("TF-1903 — par le hook d'ouverture : l'ancrage est fait et DIT chez un produit muni du lanceur, rien chez un produit sans lanceur", () => {
+  const avec = mkdtempSync(join(tmpdir(), "ouverture-ancrage-hook-"));
+  mkdirSync(join(avec, ".claude"), { recursive: true });
+  mkdirSync(join(avec, "forge", "hooks"), { recursive: true });
+  writeFileSync(join(avec, "forge", "hooks", "factory.mjs"), "// lanceur jouet\n", "utf8");
+  writeFileSync(join(avec, ".claude", "settings.json"), SETTINGS_ANCIEN, "utf8");
+  const s = joue(avec);
+  if (!/## Câblage des hooks de la factory \(TF-1903\)/.test(s) || !/ancrée\(s\) sur la racine du projet/.test(s)) throw new Error("l'ancrage n'est pas dit dans le relevé");
+  if (commandesDe(JSON.parse(readFileSync(join(avec, ".claude", "settings.json"), "utf8"))).some((c) => /^node forge\/hooks\/factory\.mjs/.test(c))) throw new Error("commande relative restée chez un produit muni du lanceur");
+  const sans = mkdtempSync(join(tmpdir(), "ouverture-ancrage-sans-"));
+  mkdirSync(join(sans, ".claude"), { recursive: true });
+  writeFileSync(join(sans, ".claude", "settings.json"), SETTINGS_ANCIEN, "utf8");
+  const s2 = joue(sans);
+  if (readFileSync(join(sans, ".claude", "settings.json"), "utf8") !== SETTINGS_ANCIEN || /TF-1903/.test(s2)) throw new Error("un produit sans lanceur a été touché");
+});
+
+// ---- TF-1942 (21/10/2026) : LES PERMISSIONS D'UN PRODUIT SURVIVENT À L'OUVERTURE, ET LE RELEVÉ LE DIT ---------
+// Le fait : la phrase « Si l'un d'eux portait une modification locale, elle a été écrasée » ne nommait pas ce
+// qu'elle visait ; Produit-73 a cru son `.claude/settings.json` écrasé et renoncé à poser la règle de sécurité
+// exigée par son client. Vert : un produit muni du lanceur, aux permissions `allow`, `ask`, `deny`, `defaultMode`
+// (forme de l'étude 20261021, option O2), ouvert par le hook complet : permissions identiques octet pour octet
+// après fusion, ancrage et recopie ; le relevé ne dit écrasés que les fichiers « remplacé » et dit
+// `.claude/settings.json` jamais recopié. Rouge : l'ancienne phrase, qui ne nommait rien, n'est plus émise, et
+// `.claude/settings.json` ne figure jamais parmi les fichiers recopiés.
+check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit intactes après l'ouverture ; le relevé ne vise que les fichiers remplacés", () => {
+  const P = mkdtempSync(join(tmpdir(), "ouverture-permissions-"));
+  mkdirSync(join(P, ".claude"), { recursive: true });
+  mkdirSync(join(P, "forge", "hooks"), { recursive: true });
+  writeFileSync(join(P, "forge", "hooks", "factory.mjs"), "// lanceur jouet, périmé : la recopie le remplace\n", "utf8");
+  const permissions = {
+    defaultMode: "default",
+    disableBypassPermissionsMode: "disable",
+    allow: ["Bash(npm test)", "Read(./src/**)"],
+    ask: ["Bash(git commit *)", "Bash(git push *)", "PowerShell(git commit *)", "PowerShell(git push *)"],
+    deny: ["Read(./.env)", "Bash(rm -rf *)"],
+  };
+  writeFileSync(join(P, ".claude", "settings.json"), JSON.stringify({ ...JSON.parse(SETTINGS_ANCIEN), permissions }, null, 2) + "\n", "utf8");
+  const s = joue(P);
+  const apres = JSON.parse(readFileSync(join(P, ".claude", "settings.json"), "utf8"));
+  if (JSON.stringify(apres.permissions) !== JSON.stringify(permissions)) throw new Error(`permissions modifiées : ${JSON.stringify(apres.permissions)}`);
+  if (readFileSync(join(P, "forge", "hooks", "factory.mjs"), "utf8") !== readFileSync(join(PILOT, "gabarits", "hooks-factory.mjs"), "utf8")) throw new Error("témoin mal construit : le lanceur périmé n'a pas été remplacé");
+  if (!/forge\/hooks\/factory\.mjs — remplacé depuis/.test(s)) throw new Error("le fichier remplacé n'est pas listé");
+  if (!/des \d+ fichier\(s\) « remplacé » ci-dessus, et d'eux seuls, a été écrasée/.test(s)) throw new Error("l'écrasement n'est pas borné aux fichiers remplacés");
+  if (!/Rien d'autre n'est recopié : `\.claude\/settings\.json` \(permissions `allow`, `ask`, `deny`, `defaultMode`/.test(s)) throw new Error("le relevé ne dit pas que settings.json n'est jamais recopié");
+  if (/Si l'un d'eux portait une modification locale, elle a été écrasée/.test(s)) throw new Error("l'ancienne phrase, qui ne nommait rien, est encore émise");
+  if (/^\s*- \.claude\/settings\.json — (remplacé|créé) depuis/m.test(s)) throw new Error("settings.json listé parmi les fichiers recopiés");
 });
 
 // ---- TF-1758 et TF-1760 (15/10/2026) : LOTS NON REMIS ET SORT DES RETOURS, À L'OUVERTURE DU PRODUIT --

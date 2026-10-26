@@ -1,9 +1,9 @@
 {
-  "cible": "references/RELECTURE-INTENTION.md",
-  "date_iso": "2026-10-20T06:51:59.460Z",
+  "cible": "c:\\dev\\digit-ai-factory\\references\\RELECTURE-INTENTION.md",
+  "date_iso": "2026-10-21T06:26:07.047Z",
   "registre_version": "2.45.0",
   "profil": "digit-ai",
-  "niveau": "diffuse",
+  "niveau": "note",
   "verdict": "PASS",
   "perimetre": "disque",
   "perimetre_motif": null,
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\RELECTURE-INTENTION.md",
-    "ts": "2026-10-20T06:51:59.459Z",
+    "ts": "2026-10-21T06:26:07.047Z",
     "fichiers": {
-      "references\\RELECTURE-INTENTION.md": "c75845aed86d301f5e218385fc34ed0bdf8b83433b96097c653cf4b7adcacf42"
+      "references\\RELECTURE-INTENTION.md": "65352feb5a4369e60668708726e5bac4ecbb1b1ffb034c1dea6e98b50f4d75e9"
     }
   },
   "empreinte_motif": null,
