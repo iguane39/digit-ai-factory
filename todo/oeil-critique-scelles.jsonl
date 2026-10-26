@@ -1,0 +1,5 @@
+{"type":"scelle","decision":"D-75","option":"c","motif":"73 refus de hook en 7 jours sur ce poste, presque tous sur des réponses courtes ; la mesure attendue de T1 est déjà là","poste":"Dell-XPS-16","ts":"2026-10-26T14:15:22.340Z"}
+{"type":"scelle","decision":"D-76","option":"c","motif":"4 occurrences dans 3 sessions : une récidive appelle une barrière (R17), pas une ligne de préférence","poste":"Dell-XPS-16","ts":"2026-10-26T14:15:22.564Z"}
+{"type":"scelle","decision":"D-77","option":"b","motif":"les règles ask natives couvrent les gestes destructifs sans hook neuf, conforme à la règle anti-inflation","poste":"Dell-XPS-16","ts":"2026-10-26T14:15:22.742Z"}
+{"type":"scelle","decision":"D-78","option":"c","motif":"8 reprises sur des écrits à un tiers et un PASS sur 94 défauts de concision ; limiter le blocage aux écrits à un tiers","poste":"Dell-XPS-16","ts":"2026-10-26T14:15:22.901Z"}
+{"type":"scelle","decision":"D-79","option":"b","motif":"0 trace forge-audit sur les demandes d'audit et 0 forge-data sur les demandes de données ; avancer le seul contrôle, pas toute T4","poste":"Dell-XPS-16","ts":"2026-10-26T14:15:23.072Z"}

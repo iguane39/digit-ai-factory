@@ -1,0 +1,17 @@
+{
+ "poste": "Dell-XPS-16",
+ "debut": "2026-10-20T00:00:00+02:00",
+ "fin": "2026-10-26T15:15:00+01:00",
+ "ts": "2026-10-26T14:15:35.102Z",
+ "sortie": [
+  "Analyse faite le 26/10/2026, poste Dell-XPS-16, période du 20/10 00:00 au 26/10 15:15 : 44 sessions, 122 demandes, 6 lots d'agents au lieu d'un agent par session (plafond d'un million de jetons).",
+  "Indicateurs : 47 reprises pour 122 demandes ; 13 consignes répétées en 7 jours (35 par mois au départ) ; 76 messages humains hors demande, soit 0,62 par demande, méthode non comparable au 2,0 de départ.",
+  "Refus de hook : 73, presque tous S1, S3, S4, S6, S48 sur des réponses courtes, dont environ 23 doublons à l'écran.",
+  "Forges : aucune trace forge-audit sur les demandes d'audit, aucune forge-data sur les demandes de données, design (marque) rarement tracé.",
+  "Automatiques faites : R17 sur récidive en chaîne, relevé hebdomadaire et recette du hook isolés, découpage des commandes de la relecture, ledger.py --help, extraction 1.1.1 (pilot ddfe3e7a, forge 8b26ceb).",
+  "Automatiques en attente : faux rouge de la recette --contexte-json, faux commentaire de lib-cadence-promise, settings.json reformaté par l'ancrage, guillemets dans le découpage des commandes.",
+  "Majeures posées : D-75 à D-79, recommandations scellées à 15:15 (todo/oeil-critique-scelles.jsonl).",
+  "Majeures en attente : collisions de numéros entre postes, suivi annoncé sans porteur, heure d'en-tête saisie à la main.",
+  "Écartés : 2 constats au test de généralité, 1 conforme à la règle des secrets (5 premiers caractères et longueur)."
+ ]
+}
