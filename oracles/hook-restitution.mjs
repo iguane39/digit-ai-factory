@@ -488,6 +488,8 @@ export function analyserTranscript(texte) {
 // fichier jusqu'à un `forge\retours\`) : elle rendait SANS_OBJET à chaque tour de chaque produit,
 // et le FAIL du 12/10 n'a été vu qu'au rejeu sur un fichier placé chez le produit.
 // `releves` (TF-1938, 21/10/2026) : { tour, session } de `relevesDHorloge`, passés à S84 ; absents, S84 rend SANS_OBJET.
+// `averts` (T4, TF-1949, 26/10/2026) : les constats AVERT de l'oracle, dits sous la réponse sans jamais la refuser ; S72 en rend
+// un quand le verrou « livré » (S85) juge les livrables sur fichiers.
 export function juger(texte, racine = process.cwd(), releves = null) {
   const dir = mkdtempSync(join(tmpdir(), "restitution-"));
   const f = join(dir, "message.md");
@@ -495,7 +497,8 @@ export function juger(texte, racine = process.cwd(), releves = null) {
   const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : []), ...argsReleves(releves)], { encoding: "utf8" });
   let rapport = {};
   try { rapport = JSON.parse(r.stdout); } catch { /* jugé par le code */ }
-  return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL") };
+  return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL"),
+    averts: (rapport.findings || []).filter((x) => x.statut === "AVERT") };
 }
 
 // ---- L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT (30/08/2026) ---------------------------------------
@@ -1381,12 +1384,19 @@ const RAPPEL_REPONSE_COURTE = "La réponse reste COURTE : aucune restitution com
 //   · Deviennent AVERTISSANTS : S6, S48, S80 (et S83, S84, qui devaient bloquer le 28/10/2026) ; les contrôles GESTE, DÉTAIL et
 //     PROCÉDURE du tour. Mesuré du 19 au 26/10/2026 sur les refus réels au premier passage : S48 seule ou sans S1, 10 ; DÉTAIL
 //     seul, 1. Le niveau Moyen, en essai, garde son propre juge de forme (`jugerFormeMoyen`).
-const BLOQUANTES = new Set(["S1", "S3", "S4", "S82"]);
+//
+// ---- T4 (TF-1949, 26/10/2026, décisions humaines D-69 (a) et D-79 (c)) — LE 3e MOTIF : LE VERROU « LIVRÉ ». Chez un produit, une
+// restitution qui déclare le produit livré, complet ou une clôture se juge contre la dernière ligne de `forge\mobilisation.jsonl` :
+// S85, un livrable exigé d'une forge mobilisée absent chez le produit, BLOQUE dès sa mise en service ; S86, la trace elle-même absente,
+// avertit jusqu'au 2026-11-02 puis bloque (`BLOQUANTES_DATEES`, échéance écrite ici, déplaçable pour la recette par
+// `FORGE_VERROU_LIVRE_BLOQUANT_DES`). Le fait : sur 10 produits clos ou publiés, 2 portaient leurs 4 livrables de forge. Non rétroactif :
+// une restitution datée d'avant le 2026-10-26 n'est pas jugée, et seule la dernière demande tracée compte. S72 avertit quand le verrou juge.
+const BLOQUANTES = new Set(["S1", "S3", "S4", "S82", "S85"]);
 // S83 (TF-1936) et S84 (TF-1938), 21/10/2026 : AVERTISSANTES jusqu'au 28/10, puis BLOQUANTES, décidées sous R-58. T2 (décision
 // humaine du 26/10/2026) les laisse AVERTISSANTES : aucune ne protège un vert sur un fait au sens de T2 (S84 protège l'heure
-// d'en-tête, une donnée de reprise, pas un verdict). Le mécanisme d'échéance reste, vide, pour une règle qui le demanderait :
-// `BLOQUANTES_DATEES = { Sxx: "AAAA-MM-JJ" }`.
-export const BLOQUANTES_DATEES = {};
+// d'en-tête, une donnée de reprise, pas un verdict). Le mécanisme d'échéance sert depuis T4 à S86 (`{ Sxx: "AAAA-MM-JJ" }`).
+export const VERROU_LIVRE_BLOQUANT_DES = process.env.FORGE_VERROU_LIVRE_BLOQUANT_DES || "2026-11-02";
+export const BLOQUANTES_DATEES = { S86: VERROU_LIVRE_BLOQUANT_DES };
 export const estBloquante = (regle, maintenant = new Date()) =>
   BLOQUANTES.has(regle) || (Boolean(BLOQUANTES_DATEES[regle]) && maintenant >= new Date(BLOQUANTES_DATEES[regle]));
 const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle) ? `${f.regle} (bloquante dès le ${BLOQUANTES_DATEES[f.regle]})` : f.regle);
@@ -1415,7 +1425,7 @@ const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.50.0), le compte rendu complet allégé (T2, TF-1947). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.51.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
@@ -1462,9 +1472,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     }
   } catch { affichage = "non joué : transcript ou synthèse illisible"; }
   // TF-1938 — S84 reçoit les relevés d'horloge du tour quand la transcription est retrouvée ; sinon elle rend SANS_OBJET.
-  const { fails } = juger(brouillon, process.cwd(), relevesP);
+  const { fails, averts: avertsOracle } = juger(brouillon, process.cwd(), relevesP);
   const bloquants = fails.filter((x) => estBloquante(x.regle));
-  const avertissements = fails.filter((x) => !estBloquante(x.regle));
+  const avertissements = [...fails.filter((x) => !estBloquante(x.regle)), ...avertsOracle];
   // TF-1849 — la RÉSERVATION : chaque D-N nouvelle de ce brouillon est-elle inscrite au registre du produit ?
   const reservation = controlerReservation({ dernierTexte: brouillon, dernierHumain: dernierHumainP, textePrecedent: textePrecedentP, racine: process.cwd() });
   const reservationBloque = reservation.verdict === "FAIL" && reservation.bloquant;
@@ -1560,7 +1570,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + court.ecarts.join("\n") + `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` }));
     process.exit(0);
   }
-  const { code, fails } = juger(dernierTexte, entree.cwd || process.cwd(), releves);
+  const { code, fails, averts: avertsOracle } = juger(dernierTexte, entree.cwd || process.cwd(), releves);
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.
@@ -1592,7 +1602,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const explication = controlerExplication({ dernierHumain, dernierTexte, fichiersMd });
   const bloquants = fails.filter((f) => estBloquante(f.regle));
   // T2 (TF-1947, 26/10/2026) : GESTE, PROCÉDURE et DÉTAIL avertissent ; ce qui bloque encore est dit à `BLOQUANTES`.
-  const avertissements = [...fails.filter((f) => !estBloquante(f.regle)),
+  const avertissements = [...fails.filter((f) => !estBloquante(f.regle)), ...avertsOracle,
     ...geste.ecarts.map((e) => ({ regle: "GESTE", statut: "FAIL", message: `${e}. ${RAPPEL_GESTE}` })),
     ...procedure.ecarts.map((e) => ({ regle: "PROCÉDURE", statut: "FAIL", message: `${e} ${RAPPEL_PROCEDURE}` })),
     ...detail.ecarts.map((e) => ({ regle: "DÉTAIL", statut: "FAIL", message: `${e}. ${RAPPEL_DETAIL}` })),
@@ -1625,7 +1635,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
   } catch { /* journal facultatif */ }
-  if (passe) process.exit(0);
+  if (passe) {
+    // T4 (TF-1949) : un constat AVERT de l'oracle (S72 sous le verrou « livré ») se dit sous une réponse conforme, sans refus.
+    if (avertsOracle.length) console.log(JSON.stringify({ systemMessage: `[restitution — R-44] avertissement${avertsOracle.length > 1 ? "s" : ""} non bloquant${avertsOracle.length > 1 ? "s" : ""} : `
+      + avertsOracle.map((f) => `${f.regle} — ${f.message}`).join(" · ") + " (structure conforme : rien n'est réécrit, le verdict est journalisé)" }));
+    process.exit(0);
+  }
   // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
   if (!bloquants.length && !ecartsAffichage.length && completude.verdict !== "FAIL" && !reservationBloque) {
     console.log(JSON.stringify({

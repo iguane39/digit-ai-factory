@@ -10,9 +10,10 @@
  * 13 forges, les 7 types de demande de la carte de départ, les forges privilégiées de chacun et les livrables exigés quand une
  * forge est mobilisée. La carte PRIVILÉGIE, elle ne fige pas : chaque forge reçoit un verdict motivé à chaque demande.
  * Consommateurs : `scripts/verifier-carte-forges.mjs` (le juge de la carte) ; `scripts/mobiliser.mjs` (l'écrivain de la trace
- * `forge/mobilisation.jsonl` chez le produit, une ligne par demande, et de la ligne d'écran « Je mobilise : … »).
+ * `forge/mobilisation.jsonl` chez le produit, une ligne par demande, et de la ligne d'écran « Je mobilise : … ») ;
+ * `oracles/oracle-synthese.mjs` (S85 et S86, le verrou « livré » : les livrables des forges mobilisées de la dernière demande).
  */
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -235,4 +236,83 @@ export function ligneDeTrace({ carte, types, profil, verdicts, demande = null, m
     mobilisees: FORGES.filter((f) => verdicts[f].verdict === "mobilisee"),
     ligne: ligneEcran(types, verdicts),
   };
+}
+
+// ---- LE VERROU « LIVRÉ » (item 3 de TF-1949) ----------------------------------------------------------------------------------
+// Avant « livré », les livrables de chaque forge MOBILISÉE à la dernière demande sont présents chez le produit. Non rétroactif :
+// seule la dernière ligne de la trace compte, et la trace n'existe que depuis la mise en service de l'écrivain.
+
+/** La dernière demande tracée chez le produit : { existe, chemin, lignes, illisibles, derniere } ; `derniere` est null sans ligne lisible. */
+export function derniereDemande(produit) {
+  const chemin = join(produit, CHEMIN_TRACE);
+  if (!existsSync(chemin)) return { existe: false, chemin, lignes: 0, illisibles: 0, derniere: null };
+  let derniere = null, lignes = 0, illisibles = 0;
+  for (const l of readFileSync(chemin, "utf8").split(/\r?\n/)) {
+    if (!l.trim()) continue;
+    lignes += 1;
+    try { const o = JSON.parse(l); if (o && o.verdicts && typeof o.verdicts === "object") derniere = o; else illisibles += 1; }
+    catch { illisibles += 1; }
+  }
+  return { existe: true, chemin, lignes, illisibles, derniere };
+}
+
+/** Les livrables exigés par une ligne de trace : pour chaque forge mobilisée, ceux des types qui la privilégient (ou ses livrables par
+ *  défaut quand un type la privilégie sans en nommer) ; une forge qu'aucun type ne privilégie exige ses livrables par défaut. */
+export function livrablesExiges(carte, ligne) {
+  const ids = Array.isArray(ligne?.types) ? ligne.types : String(ligne?.type || "").split("+");
+  const types = ids.map((id) => (carte.types || []).find((t) => t.id === id)).filter(Boolean);
+  const exiges = [];
+  for (const f of FORGES) {
+    if (normaliserVerdict(ligne?.verdicts?.[f]?.verdict) !== "mobilisee") continue;
+    const parDefaut = (carte.forges || {})[f]?.livrables || [];
+    const privilegiants = types.filter((t) => (t.forges_privilegiees || []).includes(f));
+    const livrables = new Set(privilegiants.length ? privilegiants.flatMap((t) => (t.livrables_exiges || {})[f] ?? parDefaut) : parDefaut);
+    exiges.push({ forge: f, livrables: [...livrables] });
+  }
+  return exiges;
+}
+
+const IGNORES = new Set(["node_modules", ".git", ".venv", "__pycache__"]);
+const lister = (d) => { try { return readdirSync(d, { withFileTypes: true }); } catch { return []; } };
+const motifSegment = (s) => new RegExp(`^${s.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".")}$`, "i");
+
+/** Le premier fichier du produit qui répond à un chemin de la carte (`*` dans un segment, `**` sur plusieurs, 8 niveaux au plus), ou null. */
+export function trouver(produit, chemin) {
+  const segments = String(chemin).split(/[\\/]+/).filter(Boolean);
+  const parcourir = (dossier, i, profondeur) => {
+    if (i === segments.length) return dossier;
+    const s = segments[i];
+    if (s === "**") {
+      const ici = parcourir(dossier, i + 1, profondeur);
+      if (ici || profondeur >= 8) return ici;
+      for (const e of lister(dossier)) if (e.isDirectory() && !IGNORES.has(e.name)) { const r = parcourir(join(dossier, e.name), i, profondeur + 1); if (r) return r; }
+      return null;
+    }
+    if (!/[*?]/.test(s)) {
+      const p = join(dossier, s);
+      if (!existsSync(p)) return null;
+      if (i < segments.length - 1) { try { if (!statSync(p).isDirectory()) return null; } catch { return null; } }
+      return parcourir(p, i + 1, profondeur);
+    }
+    const re = motifSegment(s);
+    for (const e of lister(dossier)) {
+      if (!re.test(e.name) || (i < segments.length - 1 && !e.isDirectory())) continue;
+      const r = parcourir(join(dossier, e.name), i + 1, profondeur);
+      if (r) return r;
+    }
+    return null;
+  };
+  return parcourir(produit, 0, 0);
+}
+
+/** Chaque livrable exigé par la ligne, présent (avec le fichier trouvé) ou manquant. */
+export function etatDesLivrables(produit, carte, ligne) {
+  const etats = [];
+  for (const { forge, livrables } of livrablesExiges(carte, ligne)) for (const id of livrables) {
+    const l = (carte.livrables || {})[id] || { libelle: id, chemins: [] };
+    let trouve = null;
+    for (const c of l.chemins || []) { trouve = trouver(produit, c); if (trouve) break; }
+    etats.push({ forge, livrable: id, libelle: l.libelle, chemins: l.chemins || [], present: !!trouve, trouve });
+  }
+  return { etats, manquants: etats.filter((e) => !e.present) };
 }

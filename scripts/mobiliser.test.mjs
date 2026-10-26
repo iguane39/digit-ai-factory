@@ -129,6 +129,22 @@ try {
     att(r.code === 2, `exit ${r.code}`);
   });
 
+  check("--verifier (item 3) : livrables des forges mobilisées manquants → exit 1 en les nommant ; produits → exit 0 ; sans trace → exit 2", () => {
+    const d = produit("verifier");
+    const sans = lancer(d, ["--verifier"]);
+    att(sans.code === 2, `sans trace : exit ${sans.code}`);
+    const v = verdictsProduitNeuf(); v.data = { verdict: "ecartee", motif: "aucune donnée à agréger ici" };
+    lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, v)]);
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 1 && r.sortie && r.sortie.manquants.some((m) => /^conception → EXIGENCES\.json/.test(m)), `livrables absents : exit ${r.code} ${r.brut.slice(0, 300)}`);
+    att(r.sortie.manquants.length === 5, `${r.sortie.manquants.length} manquant(s) au lieu de 5 (EXIGENCES.json, DESIGN.md, jetons, rapport forge-tests, DOSSIER-MEP.md)`);
+    for (const rel of ["forge/etapes/conception/EXIGENCES.json", "forge/etapes/design/DESIGN.md", "forge/etapes/design/tokens.css", "forge/etapes/tests/rapport-20261026.json", "forge/DOSSIER-MEP.md"]) {
+      mkdirSync(dirname(join(d, rel)), { recursive: true }); writeFileSync(join(d, rel), "x", "utf8");
+    }
+    const ok = lancer(d, ["--verifier"]);
+    att(ok.code === 0 && ok.sortie.verdict === "PRESENT", `livrables produits : exit ${ok.code} ${ok.brut.slice(0, 300)}`);
+  });
+
   check("une demande à deux types cumule leurs forges privilégiées (produit-neuf + site-web : seo-geo et websec privilégiées)", () => {
     const d = produit("deux-types");
     const v = verdictsProduitNeuf();
@@ -144,5 +160,5 @@ try {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }
 
-console.log(`\nmobiliser (TF-1949, item 2) : ${pass} PASS, ${fail} FAIL`);
+console.log(`\nmobiliser (TF-1949, items 2 et 3) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
