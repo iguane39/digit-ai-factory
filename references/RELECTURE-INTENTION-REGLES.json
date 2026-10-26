@@ -358,8 +358,8 @@
         "id": "S1",
         "regle": "Une présentation remise à un commanditaire a sa fiche de conception amont (famille, intention, type de contenu, lecteur, parties) remplie avant d'être écrite.",
         "source": {
-          "fichier": "gabarits/CLAUDE-PRODUIT.md",
-          "ligne": 85,
+          "fichier": "references/CLAUDE-PRODUIT-DETAIL.md",
+          "ligne": 123,
           "ancre": "la fiche de conception amont (D8"
         },
         "fait": "TF-1563, 01/10/2026 : un document écrit sans fiche a reproduit la même reprise de forme sur 4 pages d'un même produit ; TF-1383, 24/09/2026 : une présentation remise conforme à ses oracles avait sa fiche remplie après la remise."
@@ -368,8 +368,8 @@
         "id": "S2",
         "regle": "Un livrable qui embarque des polices est jugé sur ces polices décodées avant remise, jamais comme le voit le seul poste qui l'a produit.",
         "source": {
-          "fichier": "gabarits/CLAUDE-PRODUIT.md",
-          "ligne": 92,
+          "fichier": "references/CLAUDE-PRODUIT-DETAIL.md",
+          "ligne": 130,
           "ancre": "| Présentation PowerPoint"
         },
         "fait": "TF-1504, décision humaine du 30/09/2026 : cinq versions d'un deck illisibles hors du poste producteur ont passé toutes les portes (oracle-pptx, charte, nommage, claims, critique d'implémentation, revue commerciale)."
