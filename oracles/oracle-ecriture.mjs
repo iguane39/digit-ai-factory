@@ -35,9 +35,15 @@
  * EC-13 la revue des listes de tournures est datée et n'est pas dépassée : chaque famille de la donnée porte une
  * `revue_prevue` (AAAA-MM-JJ) ; une date absente ou dépassée avertit, sur tout texte jugé (AVERT seulement,
  * TF-1926, décision D-48 (a) du 19/10/2026).
+ * EC-14 concision d'un écrit destiné à un tiers (en-tête `destinataire:` autre que « humain », ou type de nom courriel,
+ * courrier, lettre, fiche) : paragraphe de 3 phrases et 60 mots au plus, phrase de 25 mots au plus, aucune énumération de
+ * plus de 3 éléments en prose. EC-15 langue : la langue dominante du texte est la langue attendue (`--langue`, sinon l'en-tête
+ * `langue:`, sinon « fr »). Les deux rendent le statut A_REJOUER, jamais FAIL : le verdict reste PASS, la sortie porte
+ * `a_rejouer` (passages, consigne, passe n sur 3) et la session productrice réécrit puis rejoue, 3 passes au plus (TF-1960,
+ * D-78 (c) amendée du 26/10/2026 ; references\ECRITURE.md, « La boucle de réécriture »).
  * Un AVERT n'échoue jamais : il nomme, et c'est ce qui permet à l'oracle de rester branché.
  *
- * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--aujourd-hui AAAA-MM-JJ] [--json]
+ * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--aujourd-hui AAAA-MM-JJ] [--langue <fr|en|…>] [--passe <1-9>] [--json]
  *         node oracles\oracle-ecriture.mjs --baseline <dossier> [--donnee <tics.json>]
  *         node oracles\oracle-ecriture.mjs --self-test
  * Exit : 0 PASS ou SKIP · 1 FAIL · 2 erreur (fichier introuvable, donnée illisible).
@@ -53,12 +59,14 @@ import { fileURLToPath } from "node:url";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
 const DONNEE_PAR_DEFAUT = join(RACINE, "references", "tics-redactionnels.json");
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 const NOM = "oracle-ecriture";
 
 const NON_JUGE_ORACLE = [
   "la justesse d'une glose (S20/S23/M18)",
   "la structure imposée par un gabarit (S1-S41 pour les restitutions, M7/M10/M14/M18 pour les documents) — ces règles restent jugées par leurs oracles",
+  "EC-14 : le destinataire réel d'un écrit (déduit de l'en-tête ou du type de nom du fichier, jamais du contenu) ; une série de compléments circonstanciels se repère comme une énumération",
+  "EC-15 : la qualité de la langue (seule la dominante est lue), un texte mixte à parts proches, une langue sans liste de mots vides",
 ];
 
 // ── LA PROSE ─────────────────────────────────────────────────────────────────────────────────
@@ -238,6 +246,174 @@ const extrait = (texteProse, offset, n = 60) => texteProse.slice(offset, offset 
 const deuxDec = (x) => (Math.round(x * 100) / 100).toFixed(2);
 
 // ── LE JUGEMENT ──────────────────────────────────────────────────────────────────────────────
+
+// ── EC-14 ET EC-15 : UN ÉCRIT À UN TIERS, LA LANGUE (TF-1960, D-78 (c) amendée du 26/10/2026) ────
+//
+// Ces deux règles ont un statut que les autres n'ont pas : A_REJOUER. Il ne fait jamais échouer le
+// texte (le verdict reste PASS) ; il rend la liste précise des passages à réécrire et une consigne.
+// La session qui produit l'écrit le réécrit sur cette liste et rejoue l'oracle, 3 passes au plus
+// (references\ECRITURE.md, « La boucle de réécriture »). Les bornes et les listes vivent dans la
+// donnée (`ecrit_a_un_tiers`, `langue`) : loi n° 4, recalibrer ne republie pas l'oracle.
+
+/** Une chaîne repliée pour comparer : sans accents, minuscules, mots séparés par une espace. */
+const replierMots = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Les lignes `clé: valeur` de l'en-tête (front matter) d'un texte, clés en minuscules. */
+export function enTete(texte) {
+  const t = String(texte).replace(/^﻿/, "").replace(/\r\n?/g, "\n").split("\n");
+  const cles = {};
+  if (!/^---\s*$/.test(t[0] || "")) return cles;
+  for (let i = 1; i < t.length; i++) {
+    if (/^(---|\.\.\.)\s*$/.test(t[i])) break;
+    const m = /^([A-Za-z_][\w-]*)\s*:\s*(.*?)\s*$/.exec(t[i]);
+    if (m) cles[m[1].toLowerCase()] = m[2].replace(/^["']|["']$/g, "").trim();
+  }
+  return cles;
+}
+
+/**
+ * Le champ Objet d'un nom R-4 « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » : c'est lui qui s'ouvre
+ * sur le type du livrable. Même convention que `objetDuNom` de oracle-gabarits-documents.mjs, étendue
+ * au nom sans date (« Client - Courriel relance.md ») ; une copie, parce que ce module lance son
+ * propre self-test dès qu'il est importé avec `--self-test` dans la ligne de commande.
+ */
+function objetDuNom(nomFichier) {
+  const base = String(nomFichier).replace(/\.[a-z0-9]+$/i, "");
+  const parts = base.split(" - ");
+  if (parts.length >= 2) return parts.slice(1).filter((p) => !/^\d{8}[a-z]?$/i.test(p.trim())).join(" ");
+  const date = /^(\d{8})[-_](.+)$/.exec(base);
+  return date ? date[2] : base;
+}
+
+/**
+ * Cet écrit est-il destiné à un tiers ? Rend `{ concerne, raison }`. Règle : l'en-tête `destinataire:`
+ * décide quand il existe (une valeur de `destinataires_internes` — « humain », « orchestrateur », « pilot »… — par son
+ * premier mot : document de travail, non concerné ; toute autre valeur : tiers) ; sinon le TYPE du nom du fichier (courriel, courrier, lettre, fiche…) décide, sauf
+ * exclusion nommée (une fiche de conception est un document de travail).
+ */
+export function ecritATiers(texte, nomFichier, conf) {
+  const interne = new Set((conf?.destinataires_internes || ["humain"]).map(replierMots));
+  const dest = enTete(texte).destinataire;
+  if (dest) {
+    // Le PREMIER MOT décide : « humain (commanditaire du conseil) » est un humain de la maison, comme « humain ».
+    return interne.has(replierMots(dest)) || interne.has(replierMots(dest).split(" ")[0])
+      ? { concerne: false, raison: `en-tête « destinataire: ${dest} » : document de travail` }
+      : { concerne: true, raison: `en-tête « destinataire: ${dest} »` };
+  }
+  const mots = replierMots(objetDuNom(nomFichier || "")).split(" ").filter(Boolean);
+  const types = new Set((conf?.types_de_nom || []).map(replierMots));
+  const exclus = new Set((conf?.exclusions_de_nom || []).map(replierMots));
+  for (let n = Math.min(4, mots.length); n >= 1; n--) {
+    const cle = mots.slice(0, n).join(" ");
+    if (exclus.has(cle)) return { concerne: false, raison: `type de nom « ${cle} » : document de travail` };
+  }
+  for (let n = Math.min(4, mots.length); n >= 1; n--) {
+    const cle = mots.slice(0, n).join(" ");
+    if (types.has(cle)) return { concerne: true, raison: `type de nom « ${cle} »` };
+  }
+  return { concerne: false, raison: "ni en-tête `destinataire:` ni type de nom d'un écrit à un tiers" };
+}
+
+/**
+ * Les blocs de prose d'un texte : un paragraphe, ou un élément de liste. Ni titre, ni tableau, ni
+ * citation, ni filet. `{ ligne, fin, prose }`, lignes alignées sur le fichier d'origine.
+ */
+function blocsDeProse(horsCode, proseLignes) {
+  const blocs = [];
+  let cur = null;
+  const clore = () => { if (cur) blocs.push(cur); cur = null; };
+  for (let i = 0; i < horsCode.length; i++) {
+    const l = horsCode[i];
+    if (!l.trim() || /^\s*(?:#{1,6}\s|\||>)/.test(l) || /^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(l)) { clore(); continue; }
+    if (/^\s*(?:[-*+]|\d+[.)])\s+/.test(l)) clore();
+    if (!cur) cur = { ligne: i + 1, fin: i + 1, prose: "" };
+    cur.prose += " " + proseLignes[i];
+    cur.fin = i + 1;
+  }
+  clore();
+  return blocs.map((b) => ({ ...b, prose: b.prose.replace(/\s+/g, " ").trim() })).filter((b) => b.prose);
+}
+
+/**
+ * Les énumérations de plus de `conf.enumeration_elements_max` éléments dans une phrase : des segments
+ * COURTS séparés par des virgules ou des points-virgules, le dernier pouvant porter « et / ou ».
+ * Un segment qui s'ouvre sur un mot de proposition (« qui », « car », « which »…) est une proposition,
+ * pas un élément, et coupe la série. Rend le nombre d'éléments de la plus longue série.
+ */
+export function elementsEnumeres(phrase, conf) {
+  const maxMots = Number(conf?.enumeration_mots_par_element_max ?? 4);
+  const maxIntro = Number(conf?.enumeration_mots_introduction_max ?? 7);
+  const propositions = new Set((conf?.mots_de_proposition || []).map(replierMots));
+  const liaisons = (conf?.mots_de_liaison || ["et", "ou"]).map(replierMots).filter(Boolean);
+  const reLiaison = new RegExp(`\\s+(?:${liaisons.join("|")})\\s+`, "iu");
+  const segments = String(phrase).replace(/[.!?]+\s*$/, "").split(/\s*[,;]\s*/).filter((s) => s.trim());
+  let meilleur = 0, serie = 0, courant = 0;
+  segments.forEach((seg, k) => {
+    const premier = replierMots(seg).split(" ")[0] || "";
+    const dernier = k === segments.length - 1;
+    const moities = dernier && serie > 0 ? seg.split(reLiaison) : [seg];
+    const limite = serie === 0 ? maxIntro : maxMots;
+    const court = moities.every((m) => compterMots(m) <= limite) && !propositions.has(premier);
+    if (!court) { meilleur = Math.max(meilleur, courant); serie = 0; courant = 0; return; }
+    serie++;
+    courant += moities.length;
+    meilleur = Math.max(meilleur, courant);
+  });
+  return Math.max(meilleur, courant);
+}
+
+/** Le jugement de concision (EC-14) : les passages à réécrire, par sorte. */
+function passagesDeConcision(horsCode, proseLignes, conf) {
+  const maxPh = Number(conf.paragraphe_phrases_max ?? 3);
+  const maxMotsP = Number(conf.paragraphe_mots_max ?? 60);
+  const maxMotsPh = Number(conf.phrase_mots_max ?? 25);
+  const maxElem = Number(conf.enumeration_elements_max ?? 3);
+  const sortie = { paragraphe: [], phrase: [], enumeration: [] };
+  const extrait70 = (t) => t.replace(/\s+/g, " ").trim().slice(0, 70);
+  for (const b of blocsDeProse(horsCode, proseLignes)) {
+    const ph = phrases(b.prose);
+    const mots = compterMots(b.prose);
+    if (ph.length > maxPh || mots > maxMotsP)
+      sortie.paragraphe.push({ ligne: b.ligne, mots, phrases: ph.length, extrait: extrait70(b.prose) });
+    let curseur = b.ligne - 1;
+    for (const p of ph) {
+      // La ligne exacte : on cherche le début de la phrase à partir de la ligne où la précédente a été trouvée.
+      const cle = p.texte.split(/\s+/).slice(0, 3).join(" ");
+      let ligne = b.ligne;
+      for (let k = curseur; k < b.fin; k++) {
+        if (proseLignes[k].replace(/\s+/g, " ").includes(cle)) { ligne = k + 1; curseur = k; break; }
+      }
+      if (p.mots > maxMotsPh) sortie.phrase.push({ ligne, mots: p.mots, extrait: extrait70(p.texte) });
+      const el = elementsEnumeres(p.texte, conf);
+      if (el > maxElem) sortie.enumeration.push({ ligne, elements: el, extrait: extrait70(p.texte) });
+    }
+  }
+  return sortie;
+}
+
+/**
+ * La langue dominante d'une prose, par la part de mots vides de chaque liste. Rend
+ * `{ jetons, parts: { fr: 0.31, en: 0.02, … } }`. Les élisions françaises (« l'oracle », « qu'il »)
+ * comptent pour le français : sans elles, « l' » et « d' » disparaîtraient de la mesure.
+ */
+export function partsDeLangue(texteProse, conf) {
+  const elisions = new Set((conf?.elisions_fr || []).map((e) => e.toLowerCase()));
+  let fr_elisions = 0;
+  const sansElision = String(texteProse).toLowerCase().replace(/(?<![\p{L}])([\p{L}]{1,7})['’](?=[\p{L}])/gu,
+    (m, a) => { if (elisions.has(a)) fr_elisions++; return " "; });
+  const jetons = sansElision.match(/[\p{L}]+/gu) || [];
+  const total = jetons.length + fr_elisions;
+  const parts = {};
+  for (const [code, liste] of Object.entries(conf?.mots_vides || {})) {
+    const ens = new Set(liste.map((m) => m.toLowerCase()));
+    let n = 0;
+    for (const j of jetons) if (ens.has(j)) n++;
+    if (code === "fr") n += fr_elisions;
+    parts[code] = total ? n / total : 0;
+  }
+  return { jetons: total, parts };
+}
 
 const MOTS_OUTILS = new Set([
   "le", "la", "les", "un", "une", "des", "ce", "cette", "il", "elle", "on", "nous", "vous",
@@ -797,8 +973,130 @@ export function juger(texte, options = {}) {
     }
   }
 
+  // EC-14 (TF-1960, D-78 (c) amendée du 26/10/2026) — UN ÉCRIT À UN TIERS EST COURT. A_REJOUER, JAMAIS FAIL.
+  //
+  // LE FAIT. 8 reprises en 7 jours sur la longueur et la forme de courriels et de fiches destinés à un tiers
+  // (« j'ai déjà demandé plusieurs fois »), et une proposition portant 94 défauts de concision rendue PASS par cet
+  // oracle : rien ne mesurait la concision. LA DÉCISION, mot pour mot : « plutôt que de bloquer, cela doit être
+  // rejoué pour répondre aux exigences ». Le statut est donc A_REJOUER : le verdict reste PASS, et l'oracle rend la
+  // liste des passages à réécrire avec une consigne ; la session qui produit réécrit et rejoue, 3 passes au plus.
+  //
+  // CE QU'ELLE MESURE, sur la prose d'un écrit destiné à un tiers (en-tête `destinataire:` autre que « humain », ou
+  // type de nom courriel, courrier, lettre, fiche) : un paragraphe de 3 phrases et 60 mots au plus, une phrase de
+  // 25 mots au plus, aucune énumération de plus de 3 éléments en prose. Les bornes vivent dans la donnée. NON JUGÉ :
+  // le destinataire réel (il se déduit de l'en-tête ou du nom) et la justesse de ce qui est coupé.
+  let aRejouer = null;
+  {
+    const tiers = donnee?.ecrit_a_un_tiers;
+    const nomEcrit = basename(String(options.cheminRelatif || options.cheminJuge || ""));
+    if (!tiers) {
+      pousser("EC-14", "SKIP", "aucune règle `ecrit_a_un_tiers` dans la donnée — concision non jugée");
+    } else {
+      const dest = ecritATiers(texte, nomEcrit, tiers);
+      if (!dest.concerne) {
+        pousser("EC-14", "SKIP", `${dest.raison} : concision d'un écrit à un tiers non jugée — ce n'est pas un constat sur le texte`);
+      } else {
+        const maxPh = Number(tiers.paragraphe_phrases_max ?? 3), maxMotsP = Number(tiers.paragraphe_mots_max ?? 60);
+        const maxMotsPh = Number(tiers.phrase_mots_max ?? 25), maxElem = Number(tiers.enumeration_elements_max ?? 3);
+        const p = passagesDeConcision(horsCode, proseLignes, tiers);
+        const sortes = [
+          ["EC-14-paragraphe", p.paragraphe, `paragraphe(s) de plus de ${maxPh} phrases ou de plus de ${maxMotsP} mots`,
+            (x) => `l.${x.ligne} (${x.mots} mots, ${x.phrases} phrases) « ${x.extrait} »`,
+            "une idée par paragraphe, ce qui sert le lecteur d'abord, le reste coupé", `aucun paragraphe de plus de ${maxPh} phrases ni de ${maxMotsP} mots`],
+          ["EC-14-phrase", p.phrase, `phrase(s) de plus de ${maxMotsPh} mots`,
+            (x) => `l.${x.ligne} (${x.mots} mots) « ${x.extrait} »`,
+            "couper la phrase en deux, un verbe et une idée par phrase", `aucune phrase de plus de ${maxMotsPh} mots`],
+          ["EC-14-enumeration", p.enumeration, `énumération(s) de plus de ${maxElem} éléments en prose`,
+            (x) => `l.${x.ligne} (${x.elements} éléments) « ${x.extrait} »`,
+            `garder les ${maxElem} éléments qui comptent pour le lecteur, ou les mettre en liste à puces (E-11)`, `aucune énumération de plus de ${maxElem} éléments en prose`],
+        ];
+        for (const [regle, liste, quoi, montrer, remede, rien] of sortes) {
+          if (!liste.length) { pousser(regle, "PASS", `${rien} (écrit à un tiers : ${dest.raison})`); continue; }
+          findings.push({ regle, statut: "A_REJOUER", ligne: liste[0].ligne, passages: liste,
+            message: `${liste.length} ${quoi}, dans un écrit destiné à un tiers (${dest.raison}) : ${liste.slice(0, 6).map(montrer).join(" · ")}`
+              + (liste.length > 6 ? ` · et ${liste.length - 6} autre(s), toutes dans \`a_rejouer.passages\`` : "")
+              + ` — remède : ${remede}. A_REJOUER, jamais bloquant : on réécrit puis on rejoue (D-78 (c) du 26/10/2026)` });
+        }
+      }
+    }
+  }
+
+  // EC-15 (TF-1960, D-78 (c) amendée du 26/10/2026) — LA LANGUE DU TEXTE EST CELLE QU'ON ATTEND DE LUI. A_REJOUER, JAMAIS FAIL.
+  //
+  // LE FAIT. Des réponses en anglais à un utilisateur francophone dans 3 sessions. LA DÉCISION : « si l'utilisateur est
+  // anglophone, l'anglais ne doit pas être un critère de blocage. Il faut s'adapter à la langue de l'utilisateur. »
+  // Attendue = `--langue`, sinon l'en-tête `langue:`, sinon « fr » (la Factory est francophone par défaut, règle 12 du
+  // CLAUDE.md global). Un texte anglais passe donc avec `--langue en` ou `langue: en`, et rien d'autre ne change.
+  // NON JUGÉ : la qualité de la langue, un texte mixte à parts proches, une langue sans liste de mots vides (dite).
+  {
+    const lc = donnee?.langue;
+    if (!lc) {
+      pousser("EC-15", "SKIP", "aucune clé `langue` dans la donnée — langue non jugée");
+    } else {
+      const enteteLangue = enTete(texte).langue;
+      const origine = options.langue ? "--langue" : enteteLangue ? "en-tête `langue:`" : "défaut de la Factory, francophone (règle 12 du CLAUDE.md global)";
+      const attendue = String(options.langue || enteteLangue || lc.defaut || "fr").toLowerCase().split(/[-_]/)[0];
+      const nom = (c) => lc.noms?.[c] || c;
+      const { jetons, parts } = partsDeLangue(texteProse, lc);
+      const pct = (x) => `${Math.round(x * 100)} %`;
+      const minMots = Number(lc.mots_minimum ?? 30), partMin = Number(lc.part_minimum ?? 0.08), ecart = Number(lc.ecart_minimum ?? 1.3);
+      if (!(attendue in parts)) {
+        pousser("EC-15", "SKIP", `langue attendue « ${attendue} » (${origine}) sans liste de mots vides dans la donnée : langue non jugée — ce n'est pas un PASS`);
+      } else if (jetons < minMots) {
+        pousser("EC-15", "SKIP", `${jetons} mots (< ${minMots}) : langue non jugée`);
+      } else {
+        const dominante = Object.keys(parts).sort((a, b) => parts[b] - parts[a])[0];
+        if (parts[dominante] < partMin) {
+          pousser("EC-15", "SKIP", `aucune langue reconnaissable (part maximale de mots vides ${pct(parts[dominante])} < ${pct(partMin)}) : langue non jugée`);
+        } else if (dominante === attendue || parts[dominante] < parts[attendue] * ecart) {
+          pousser("EC-15", "PASS", `langue dominante : ${nom(dominante)} (${pct(parts[dominante])} de mots vides) ; attendue : ${nom(attendue)} (${origine})`);
+        } else {
+          // Les passages : les blocs qui, pris seuls, sont dans l'autre langue.
+          const passages = [];
+          for (const b of blocsDeProse(horsCode, proseLignes)) {
+            const bp = partsDeLangue(b.prose, lc);
+            if (bp.jetons < 8) continue;
+            const d = Object.keys(bp.parts).sort((x, y) => bp.parts[y] - bp.parts[x])[0];
+            if (d !== attendue && bp.parts[d] >= partMin && bp.parts[d] >= bp.parts[attendue] * ecart)
+              passages.push({ ligne: b.ligne, langue: d, mots: bp.jetons, extrait: b.prose.slice(0, 70) });
+          }
+          const tete = passages.length ? passages : [{ ligne: 1, langue: dominante, mots: jetons, extrait: texteProse.replace(/\s+/g, " ").trim().slice(0, 70) }];
+          findings.push({ regle: "EC-15", statut: "A_REJOUER", ligne: tete[0].ligne, passages: tete,
+            message: `texte en ${nom(dominante)} (${pct(parts[dominante])} de mots vides, contre ${pct(parts[attendue])} en ${nom(attendue)}) alors que la langue attendue est le ${nom(attendue)} (${origine}) : `
+              + tete.slice(0, 4).map((x) => `l.${x.ligne} « ${x.extrait} »`).join(" · ")
+              + (tete.length > 4 ? ` · et ${tete.length - 4} autre(s)` : "")
+              + ` — remède : réécrire en ${nom(attendue)} ; si le lecteur lit le ${nom(dominante)}, le dire — \`langue: ${dominante}\` en en-tête ou \`--langue ${dominante}\` — et le même texte passe : `
+              + "l'anglais n'est jamais un critère de blocage, on s'adapte à la langue de l'utilisateur. A_REJOUER, jamais bloquant (D-78 (c) amendée du 26/10/2026)" });
+        }
+      }
+    }
+  }
+
+  // LA LISTE À REJOUER. Elle ne change pas le verdict : un texte à réécrire n'est pas un texte en échec. Elle dit quoi
+  // réécrire (les passages, au format de chaque finding), comment (la consigne) et jusqu'où (3 passes au plus).
+  const enRejeu = findings.filter((f) => f.statut === "A_REJOUER");
+  if (enRejeu.length) {
+    const passesMax = Number(donnee?.ecrit_a_un_tiers?.passes_max ?? 3);
+    const passe = Math.max(1, Number(options.passe) || 1);
+    const derniere = passe >= passesMax;
+    const bornes = donnee?.ecrit_a_un_tiers || {};
+    aRejouer = {
+      nombre: enRejeu.reduce((n, f) => n + Math.max(1, (f.passages || []).length), 0),
+      regles: enRejeu.map((f) => f.regle),
+      passe, passes_max: passesMax, derniere_passe: derniere,
+      consigne: "Réécris chaque passage listé, dans la langue du destinataire : "
+        + `un paragraphe de ${bornes.paragraphe_phrases_max ?? 3} phrases et ${bornes.paragraphe_mots_max ?? 60} mots au plus, `
+        + `une phrase de ${bornes.phrase_mots_max ?? 25} mots au plus, une énumération de ${bornes.enumeration_elements_max ?? 3} éléments au plus en prose `
+        + "(au-delà, ne garde que ceux qui comptent pour le lecteur, ou une liste à puces). Garde les faits, coupe le reste. "
+        + (derniere
+          ? `C'est la passe ${passe} sur ${passesMax} : si des écarts restent après cette réécriture, remets le texte avec les écarts restants nommés, sans rejouer une quatrième fois.`
+          : `Puis rejoue : node oracles\\oracle-ecriture.mjs <ce fichier> --passe ${passe + 1} (ajoute \`--langue <code>\` si le destinataire n'est pas francophone). ${passesMax} passes au plus ; au-delà, remets le texte avec les écarts restants nommés.`),
+      passages: enRejeu.flatMap((f) => (f.passages || [{ ligne: f.ligne }]).map((x) => ({ regle: f.regle, ...x }))),
+    };
+  }
+
   const verdict = findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS";
-  return { mots, verdict, findings, non_juge: nonJuge(donnee) };
+  return { mots, verdict, findings, non_juge: nonJuge(donnee), a_rejouer: aRejouer };
 }
 
 function nonJuge(donnee) {
@@ -1357,10 +1655,135 @@ function selfTest() {
   if (jouer("ec13-date-invalide.md", FIXTURE_VERTE, ["--aujourd-hui", "hier"]).statut !== 2)
     casse.push("EC-13 : --aujourd-hui accepte une valeur qui n'est pas une date AAAA-MM-JJ");
 
+  // 38 et suivants (TF-1960, D-78 (c) amendée du 26/10/2026) — EC-14 (CONCISION D'UN ÉCRIT À UN TIERS) ET EC-15 (LANGUE) :
+  // STATUT A_REJOUER, JAMAIS FAIL. Le rouge est un courriel à un tiers dont un paragraphe fait 90 mots ; le vert dit les MÊMES
+  // faits réécrits (le remède se joue) ; un courriel anglais sans --langue est à rejouer, le même avec --langue en passe ;
+  // un document de travail (destinataire humain), long, n'est pas concerné. Aucun de ces cas ne met le verdict en FAIL.
+  let cas14 = 0;
+  const verifie = (condition, message) => { cas14++; if (!condition) casse.push(message); };
+  const trouve = (x, regle) => (x.j?.findings || []).find((f) => f.regle === regle);
+  const jamaisFail = (x, nom) => verifie(x.statut === 0 && x.j?.verdict === "PASS" && !(x.j?.findings || []).some((f) => f.statut === "FAIL"),
+    `${nom} : le verdict n'est pas PASS (exit ${x.statut}, ${x.j?.verdict}) — A_REJOUER ne fait jamais échouer un texte (D-78 (c))`);
+
+  const COURRIEL_ROUGE = "Bonjour Madame Durand,\n\n"
+    + "Nous vous écrivons au sujet de la livraison des maquettes, qui devait nous parvenir le 12 octobre et que nous n'avons toujours pas reçue. "
+    + "Cette livraison conditionne le démarrage du développement prévu la semaine prochaine, et sans elle nous ne pouvons pas engager les équipes. "
+    + "Nous avons relancé votre service par téléphone le 15 et le 19 octobre, sans obtenir de réponse écrite de sa part. "
+    + "Nous vous demandons donc de nous confirmer une date ferme avant vendredi, faute de quoi nous reporterons le démarrage à la fin du mois.\n\n"
+    + "Cordialement,\nPaul Martin\n";
+  const COURRIEL_VERT = "Bonjour Madame Durand,\n\n"
+    + "Les maquettes devaient nous parvenir le 12 octobre. Nous ne les avons toujours pas reçues.\n\n"
+    + "Sans elles, nous ne pouvons pas engager les équipes ni démarrer le développement prévu la semaine prochaine. "
+    + "Nous avons relancé votre service par téléphone le 15 et le 19 octobre, sans réponse écrite.\n\n"
+    + "Pouvez-vous nous confirmer une date ferme avant vendredi ? À défaut, nous reporterons le démarrage à la fin du mois.\n\n"
+    + "Cordialement,\nPaul Martin\n";
+  const NOM_COURRIEL = "Client-A - Courriel - Relance livraison - 20261026a.md";
+  const c14r = jouer(NOM_COURRIEL, COURRIEL_ROUGE);
+  const c14v = jouer("Client-A - Courriel - Relance livraison v2 - 20261026b.md", COURRIEL_VERT);
+  const par = trouve(c14r, "EC-14-paragraphe");
+  verifie(par?.statut === "A_REJOUER" && par.passages?.length === 1 && par.passages[0].mots === 90 && par.passages[0].phrases === 4 && par.ligne === 3,
+    `EC-14 : un paragraphe de 90 mots et 4 phrases dans un courriel à un tiers n'est pas rendu A_REJOUER, avec sa ligne et ses mesures : ${JSON.stringify(par)}`);
+  verifie(c14r.j?.a_rejouer?.nombre >= 1 && /Réécris chaque passage listé/.test(c14r.j?.a_rejouer?.consigne || "")
+      && /--passe 2/.test(c14r.j?.a_rejouer?.consigne || "") && c14r.j.a_rejouer.passes_max === 3 && c14r.j.a_rejouer.derniere_passe === false,
+    `EC-14 : la sortie ne porte pas la liste à rejouer avec sa consigne et la passe 1 sur 3 : ${JSON.stringify(c14r.j?.a_rejouer)?.slice(0, 200)}`);
+  jamaisFail(c14r, "EC-14 (courriel rouge)");
+  verifie(["EC-14-paragraphe", "EC-14-phrase", "EC-14-enumeration"].every((r) => trouve(c14v, r)?.statut === "PASS") && trouve(c14v, "EC-15")?.statut === "PASS" && c14v.j?.a_rejouer === null,
+    `EC-14 : le MÊME courriel réécrit en 3 paragraphes n'est pas PASS sans rien à rejouer — le remède échoue : ${JSON.stringify(c14v.j?.findings?.filter((f) => f.statut !== "PASS" && /^EC-1[45]/.test(f.regle)))}`);
+  jamaisFail(c14v, "EC-14 (courriel vert)");
+
+  // La phrase de plus de 25 mots, seule : un paragraphe d'une phrase de 30 mots.
+  const PHRASE_LONGUE = "Bonjour,\n\nNous avons bien reçu votre demande du 12 octobre concernant la livraison des maquettes et nous reviendrons vers vous avant la fin de la semaine avec une date ferme.\n";
+  const c14p = jouer("Client-A - Courriel - Accuse - 20261026a.md", PHRASE_LONGUE);
+  verifie(trouve(c14p, "EC-14-phrase")?.statut === "A_REJOUER" && trouve(c14p, "EC-14-phrase").passages[0].mots === 29 && trouve(c14p, "EC-14-paragraphe")?.statut === "PASS",
+    `EC-14 : une phrase de 29 mots seule n'est pas rendue A_REJOUER sur la phrase et PASS sur le paragraphe : ${JSON.stringify(trouve(c14p, "EC-14-phrase"))}`);
+  jamaisFail(c14p, "EC-14 (phrase longue)");
+
+  // L'énumération de plus de 3 éléments en prose : 5 éléments rouge, 3 éléments vert, la liste à puces vert.
+  const ENUM_ROUGE = "Bonjour,\n\nMerci de joindre le Kbis, le RIB, l'attestation, le justificatif et la facture avant vendredi.\n";
+  const ENUM_VERTE = "Bonjour,\n\nMerci de joindre le Kbis, le RIB et l'attestation avant vendredi.\n";
+  const ENUM_PUCES = "Bonjour,\n\nMerci de joindre avant vendredi :\n\n- le Kbis ;\n- le RIB ;\n- l'attestation ;\n- le justificatif ;\n- la facture.\n";
+  const c14e = jouer("Client-A - Courriel - Pieces - 20261026a.md", ENUM_ROUGE);
+  const c14ev = jouer("Client-A - Courriel - Pieces v2 - 20261026b.md", ENUM_VERTE);
+  const c14ep = jouer("Client-A - Courriel - Pieces v3 - 20261026c.md", ENUM_PUCES);
+  verifie(trouve(c14e, "EC-14-enumeration")?.statut === "A_REJOUER" && trouve(c14e, "EC-14-enumeration").passages[0].elements === 5,
+    `EC-14 : une énumération de 5 éléments en prose n'est pas rendue A_REJOUER : ${JSON.stringify(trouve(c14e, "EC-14-enumeration"))}`);
+  verifie(trouve(c14ev, "EC-14-enumeration")?.statut === "PASS", `EC-14 : une énumération de 3 éléments est accusée : ${JSON.stringify(trouve(c14ev, "EC-14-enumeration"))}`);
+  verifie(trouve(c14ep, "EC-14-enumeration")?.statut === "PASS", `EC-14 : les 5 mêmes éléments en liste à puces sont accusés — le remède échoue : ${JSON.stringify(trouve(c14ep, "EC-14-enumeration"))}`);
+  jamaisFail(c14e, "EC-14 (énumération)");
+
+  // QUI EST UN TIERS. L'en-tête destinataire: décide ; sinon le type de nom ; une fiche de conception n'en est pas un.
+  const DOC_TRAVAIL = "---\ndestinataire: humain\n---\n\n" + COURRIEL_ROUGE;
+  const c14h = jouer("Client-A - Courriel - Brouillon de relance - 20261026a.md", DOC_TRAVAIL);
+  verifie(trouve(c14h, "EC-14")?.statut === "SKIP" && /destinataire: humain/.test(trouve(c14h, "EC-14")?.message || "") && !trouve(c14h, "EC-14-paragraphe") && c14h.j?.a_rejouer === null,
+    `EC-14 : un document de travail à destinataire humain, long, est jugé alors que l'en-tête le déclare interne : ${JSON.stringify(trouve(c14h, "EC-14"))}`);
+  jamaisFail(c14h, "EC-14 (destinataire humain)");
+  // Les valeurs INTERNES relevées dans le dépôt (« humain (commanditaire du conseil) », « orchestrateur (pilot) et forges mobilisées ») ne sont pas un tiers.
+  const c14i = jouer("Client-A - Courriel - Brouillon interne - 20261026a.md", "---\ndestinataire: humain (commanditaire du conseil)\n---\n\n" + COURRIEL_ROUGE);
+  const c14o = jouer("Client-A - Courriel - Brouillon agent - 20261026a.md", "---\ndestinataire: orchestrateur (pilot) et forges mobilis\u00e9es\n---\n\n" + COURRIEL_ROUGE);
+  verifie(trouve(c14i, "EC-14")?.statut === "SKIP" && trouve(c14o, "EC-14")?.statut === "SKIP",
+    `EC-14 : un destinataire interne à plusieurs mots (« humain (commanditaire du conseil) », « orchestrateur (pilot) et forges ») est pris pour un tiers : ${JSON.stringify([trouve(c14i, "EC-14"), trouve(c14o, "EC-14")])}`);
+  const c14n = jouer("Note de travail - Relance - 20261026a.md", COURRIEL_ROUGE);
+  verifie(trouve(c14n, "EC-14")?.statut === "SKIP" && !trouve(c14n, "EC-14-paragraphe"),
+    `EC-14 : un texte sans en-tête ni type de nom d'un écrit à un tiers est jugé : ${JSON.stringify(trouve(c14n, "EC-14"))}`);
+  const c14t = jouer("Note de travail - Relance - 20261026b.md", "---\ndestinataire: Mme Durand, Client-A\n---\n\n" + COURRIEL_ROUGE);
+  verifie(trouve(c14t, "EC-14-paragraphe")?.statut === "A_REJOUER" && /destinataire: Mme Durand/.test(trouve(c14t, "EC-14-paragraphe")?.message || ""),
+    `EC-14 : un en-tête destinataire: qui nomme un tiers ne rend pas la règle applicable : ${JSON.stringify(trouve(c14t, "EC-14-paragraphe"))}`);
+  const c14f = jouer("Digit-AI - Fiche produit - Relance - 20261026a.md", COURRIEL_ROUGE);
+  verifie(trouve(c14f, "EC-14-paragraphe")?.statut === "A_REJOUER", `EC-14 : une fiche (type de nom « fiche produit ») n'est pas jugée : ${JSON.stringify(trouve(c14f, "EC-14"))}`);
+  const c14c = jouer("FICHE-CONCEPTION.md", COURRIEL_ROUGE);
+  verifie(trouve(c14c, "EC-14")?.statut === "SKIP" && /fiche conception/.test(trouve(c14c, "EC-14")?.message || ""),
+    `EC-14 : une fiche de conception (document de travail) est jugée comme un écrit à un tiers : ${JSON.stringify(trouve(c14c, "EC-14"))}`);
+
+  // LA LANGUE. Sans --langue, un courriel anglais est à rejouer ; avec --langue en (ou langue: en), le même texte passe.
+  const COURRIEL_EN = "Dear Ms Durand,\n\n"
+    + "The mockups were due on 12 October and we have not received them yet.\n\n"
+    + "Without them, we cannot start the development phase next week. The teams and the test environments are still to be booked.\n\n"
+    + "We called your department twice, without a written answer. Could you confirm a firm date before Friday?\n\n"
+    + "Kind regards,\nPaul Martin\n";
+  const NOM_EN = "Client-B - Courriel - Delivery follow-up - 20261026a.md";
+  const c15r = jouer(NOM_EN, COURRIEL_EN);
+  const c15v = jouer(NOM_EN, COURRIEL_EN, ["--langue", "en"]);
+  const c15e = jouer("Client-B - Courriel - Delivery follow-up v2 - 20261026b.md", "---\nlangue: en\n---\n\n" + COURRIEL_EN);
+  const c15m = jouer(NOM_EN, COURRIEL_EN, ["--langue", "fr"]);
+  verifie(trouve(c15r, "EC-15")?.statut === "A_REJOUER" && /texte en anglais/.test(trouve(c15r, "EC-15")?.message || "") && /règle 12/.test(trouve(c15r, "EC-15")?.message || "")
+      && trouve(c15r, "EC-15").passages.length === 3 && c15r.j?.a_rejouer?.regles?.includes("EC-15"),
+    `EC-15 : un courriel anglais sans --langue n'est pas rendu A_REJOUER avec ses 3 passages : ${JSON.stringify(trouve(c15r, "EC-15"))}`);
+  jamaisFail(c15r, "EC-15 (anglais sans --langue)");
+  verifie(trouve(c15v, "EC-15")?.statut === "PASS" && /attendue : anglais \(--langue\)/.test(trouve(c15v, "EC-15")?.message || "") && c15v.j?.a_rejouer === null,
+    `EC-15 : le MÊME courriel avec --langue en n'est pas PASS — l'anglais bloque ou à rejouer pour un lecteur anglophone : ${JSON.stringify(trouve(c15v, "EC-15"))}`);
+  verifie(trouve(c15e, "EC-15")?.statut === "PASS" && /en-tête `langue:`/.test(trouve(c15e, "EC-15")?.message || ""),
+    `EC-15 : l'en-tête « langue: en » ne fait pas passer un texte anglais : ${JSON.stringify(trouve(c15e, "EC-15"))}`);
+  verifie(trouve(c15m, "EC-15")?.statut === "A_REJOUER", `EC-15 : --langue fr sur un texte anglais n'est pas rendu A_REJOUER : ${JSON.stringify(trouve(c15m, "EC-15"))}`);
+  verifie(trouve(verte, "EC-15")?.statut === "PASS" && /attendue : français \(défaut de la Factory/.test(trouve(verte, "EC-15")?.message || ""),
+    `EC-15 : un texte français sans déclaration n'est pas PASS avec « fr » par défaut : ${JSON.stringify(trouve(verte, "EC-15"))}`);
+  const c15j = jouer(NOM_EN, COURRIEL_EN, ["--langue", "ja"]);
+  verifie(trouve(c15j, "EC-15")?.statut === "SKIP" && /sans liste de mots vides/.test(trouve(c15j, "EC-15")?.message || "") && /pas un PASS/.test(trouve(c15j, "EC-15")?.message || ""),
+    `EC-15 : une langue attendue sans liste de mots vides n'est pas SKIP dit : ${JSON.stringify(trouve(c15j, "EC-15"))}`);
+  const c15c = jouer("Client-B - Courriel - Court - 20261026a.md", "Hello, thanks for your message.\n");
+  verifie(trouve(c15c, "EC-15")?.statut === "SKIP", `EC-15 : un texte de moins de 30 mots est jugé : ${JSON.stringify(trouve(c15c, "EC-15"))}`);
+  // Un texte mixte à parts proches (anglais 25 %, français 21 %, écart sous 1,3) n'est pas signalé : il reste à la relecture (non_juge).
+  const MIXTE = "Bonjour Madame Durand, les maquettes devaient nous parvenir le 12 octobre et nous ne les avons pas reçues. Sans elles, nous ne pouvons pas démarrer le développement de la semaine prochaine.\n\n"
+    + "Hello Ms Durand, the mockups were due on 12 October and we have not received them yet. Without them, we cannot start the development phase of next week. "
+    + "The teams and the test environments are still to be booked, and your department has not answered our calls.\n";
+  const c15x = jouer("Note de travail - Bilingue - 20261026a.md", MIXTE);
+  verifie(trouve(c15x, "EC-15")?.statut === "PASS", `EC-15 : un texte mixte à parts proches est accusé : ${JSON.stringify(trouve(c15x, "EC-15"))}`);
+  // La langue vaut pour tout texte, pas seulement pour un écrit à un tiers : un texte neutre en anglais est à rejouer.
+  const c15n = jouer("Note de travail - Notes - 20261026a.md", COURRIEL_EN);
+  verifie(trouve(c15n, "EC-15")?.statut === "A_REJOUER" && trouve(c15n, "EC-14")?.statut === "SKIP", `EC-15 : la langue n'est pas jugée sur un texte qui n'est pas un écrit à un tiers : ${JSON.stringify(trouve(c15n, "EC-15"))}`);
+  jamaisFail(c15n, "EC-15 (texte neutre anglais)");
+
+  // LA BOUCLE BORNÉE : à la passe 3, la consigne dit de remettre avec les écarts nommés ; une passe hors 1-9 est une erreur.
+  const c14d = jouer(NOM_COURRIEL, COURRIEL_ROUGE, ["--passe", "3"]);
+  verifie(c14d.j?.a_rejouer?.derniere_passe === true && c14d.j.a_rejouer.passe === 3 && /remets le texte avec les écarts restants nommés/.test(c14d.j.a_rejouer.consigne) && !/--passe 4/.test(c14d.j.a_rejouer.consigne),
+    `EC-14 : à la passe 3 la consigne ne dit pas de remettre avec les écarts nommés : ${JSON.stringify(c14d.j?.a_rejouer?.consigne)}`);
+  verifie(jouer(NOM_COURRIEL, COURRIEL_ROUGE, ["--passe", "0"]).statut === 2, "EC-14 : --passe accepte une valeur hors 1-9");
+  verifie(jouer(NOM_COURRIEL, COURRIEL_ROUGE, ["--langue", "français"]).statut === 2, "EC-15 : --langue accepte autre chose qu'un code de langue");
+  const BILAN_14 = cas14;
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 37 cas, 0 défaut (37/37 PASS — EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : ${37 + BILAN_14} cas, 0 défaut (${37 + BILAN_14}/${37 + BILAN_14} PASS — EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 
@@ -1384,7 +1807,7 @@ if (lanceEnDirect) {
   const dossier = valeur("--baseline");
   if (dossier) modeBaseline(dossier, donnee);
 
-  const DRAPEAUX_A_VALEUR = new Set(["--donnee", "--chemin-relatif", "--baseline", "--aujourd-hui"]);
+  const DRAPEAUX_A_VALEUR = new Set(["--donnee", "--chemin-relatif", "--baseline", "--aujourd-hui", "--langue", "--passe"]);
   const cible = args.find((a, i) => !a.startsWith("--") && !(i > 0 && DRAPEAUX_A_VALEUR.has(args[i - 1])));
   if (!cible) erreur("cible absente — usage : node oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] | --baseline <dossier> | --self-test");
   if (!existsSync(cible)) erreur(`fichier introuvable : ${cible}`);
@@ -1394,10 +1817,14 @@ if (lanceEnDirect) {
   try { texte = readFileSync(cible, "utf8"); } catch (e) { erreur(`fichier illisible : ${cible} (${e.message})`); }
   const aujourdhui = valeur("--aujourd-hui");
   if (aujourdhui && !/^\d{4}-\d{2}-\d{2}$/.test(aujourdhui)) erreur("--aujourd-hui attend une date AAAA-MM-JJ");
-  const r = juger(texte, { donnee, cheminRelatif, cheminJuge: resolve(cible), aujourdhui });
+  const langue = valeur("--langue");
+  if (langue && !/^[A-Za-z]{2,3}([-_][A-Za-z0-9]{2,8})?$/.test(langue)) erreur("--langue attend un code de langue (fr, en, es, de…)");
+  const passeBrute = valeur("--passe");
+  if (passeBrute && !/^[1-9]$/.test(passeBrute)) erreur("--passe attend un entier de 1 à 9 (le numéro de la passe de réécriture)");
+  const r = juger(texte, { donnee, cheminRelatif, cheminJuge: resolve(cible), aujourdhui, langue, passe: passeBrute ? Number(passeBrute) : undefined });
   console.log(JSON.stringify({
     oracle: NOM, version: VERSION, cible: String(cible).replace(/\\/g, "/"),
-    mots: r.mots, verdict: r.verdict, findings: r.findings, non_juge: r.non_juge,
+    mots: r.mots, verdict: r.verdict, findings: r.findings, a_rejouer: r.a_rejouer ?? null, non_juge: r.non_juge,
   }, null, 1));
   process.exit(r.verdict === "FAIL" ? 1 : 0);
 }
