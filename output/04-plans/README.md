@@ -96,6 +96,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` | fichier | 9,9 Ko | Synthèse Mandat — correctif d'ouverture arrêté sur une base qui a bougé, 2 candidatures in |
 | `Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` | fichier | 9,3 Ko | Synthèse Mandat — ouverture de session VS Code : correctif repris, propagé aux 19 produits |
 | `Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` | fichier | 5,6 Ko | Synthèse Mandat — pilot publié après reconstruction sur le distant, décision « 2a » exécut |
+| `Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` | fichier | 3,6 Ko | Synthèse Mandat — A-1 en partie, A-2 en attente : pilot publié avec trois chantiers, T2 en |
 | `Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` | fichier | 8,3 Ko | Synthèse Mandat — plans classés par mois, noms trop longs raccourcis (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` | fichier | 10,6 Ko | Synthèse Mandat — prompt « retravaille la cible » adapté au skill oeil-critique 1.1.0 (26/ |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
@@ -129,4 +130,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_109 fichier(s), 3 sous-dossier(s)_ · 12 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_110 fichier(s), 3 sous-dossier(s)_ · 12 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

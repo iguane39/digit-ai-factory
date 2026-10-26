@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 516 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 517 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -536,6 +536,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md | 20261013a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md | 20261013c | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` |
 | Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md | 20261016k | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` |
+| Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md | 20261026p | 3.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` |
 | Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md | 20261016l | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` |
 | Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md | 20261026d | 10.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` |
 | Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md | 20261001i | 4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` |
