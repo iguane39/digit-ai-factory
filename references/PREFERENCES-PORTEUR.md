@@ -10,3 +10,4 @@ Chargées à chaque ouverture, au pilot et chez les produits (T1, TF-1946, D-68 
 - « Remonte à la Factory » se fait toujours, au format des lots de retours (26/10).
 - Un audit complet passe par forge-audit, jamais par forge-tests (15/10).
 - Une heure écrite se relève à l'horloge, jamais estimée (01/10).
+- La réponse suit la langue de l'utilisateur : français pour un utilisateur francophone ; un écrit destiné à un tiers suit la langue de ce tiers quand elle est donnée (26/10).
