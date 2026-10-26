@@ -19,7 +19,7 @@ Source : diagnostic `output/03-etudes/Digit-AI - Diagnostic Factory - Oeil criti
 - **Portée** : chaque retour passe le test de généralité du skill `oeil-critique` 1.1.0, étape 4. Une préférence de l'humain va à `references/PREFERENCES-PORTEUR.md` ; une convention de client va au `CONVENTIONS-CLIENT.md` de son projet commun ; ces 2 fichiers se chargent à chaque ouverture, 2 Ko au plus chacun.
 - **3 voies** : préférence ou convention au fichier ; défaut de livrable corrigé chez le produit, sans lot ; défaut systémique en contrôle au pilot, admis s'il rejoue le cas qui l'a fait naître, rouge avant, vert après.
 - **Forçage** : « remonte à la Factory » fait partir le lot même si le test dit « produit ».
-- **Barrière dès la 2e fois** : une récidive appelle une barrière, pas un texte. Accord avec T2 : les règles de forme du compte rendu restent non bloquantes ; la barrière vise un défaut de fond, ou une règle de forme dont la récidive a fait intervenir l'humain, mesurée par ses messages.
+- **Barrière dès la 2e fois** : une récidive appelle une barrière, pas un texte. Accord avec T2 : les règles de forme du compte rendu restent non bloquantes ; la barrière vise un défaut de fond, ou une règle de forme dont la récidive a fait intervenir l'humain, mesurée par ses messages. Outillée par la règle R17 de `todo/oracle-todo.mjs` : une création marquée `recidive_de` ne passe pas en corrige sans `barriere` {type : hook, oracle, defaut ou script ; chemin} (recette `todo/oracle-todo-r17.test.mjs`).
 
 ## Un mécanisme de relecture passe le banc avant d'être adopté (TF-1073, 14/09/2026, D-3 (a))
 

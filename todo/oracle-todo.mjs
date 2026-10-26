@@ -115,6 +115,15 @@ try {
 // DÉCLARÉES et comptées au `non_juge`, jamais mises à zéro ni tues — elles se résorbent au rythme
 // des corrections qui les fondent.
 const SEUIL_R15 = process.env.TODO_SEUIL_R15 || "2026-09-16";
+// R17 (TF-1946, T1 de l'œil critique, D-68 (a) du 26/10/2026) — UNE RÉCIDIVE SE CLÔT PAR UNE BARRIÈRE.
+// Le diagnostic 20261026a mesurait 35 corrections répétées par mois : chaque reproche devenait un texte
+// de plus, et le reproche revenait. Une création marquée `recidive_de` ne passe plus en corrige sans
+// `barriere` : {type: hook | oracle | defaut | script, chemin} — un hook qui refuse, un contrôle qui
+// échoue, un défaut qui ferme le mauvais chemin, un script qui fait le geste. Reformuler une règle n'en
+// est pas une. Datée : les clôtures antérieures au seuil ne sont pas jugées, elles sont comptées.
+const SEUIL_R17 = process.env.TODO_SEUIL_R17 || "2026-10-26T15:00:00Z";
+const TYPES_BARRIERE = new Set(["hook", "oracle", "defaut", "script"]);
+let r17Juges = 0, r17Anterieures = 0;
 // Un oracle « à créer », « aucun », vide ou réduit à un tiret n'est pas un porteur exécutable.
 // La liste est COURTE et écrite : deviner par heuristique classerait mal, et un classement faux
 // sur un cliquet bloquant coûte plus qu'un classement absent.
@@ -255,6 +264,15 @@ function replier(evenements, ou) {
           const porte = d && typeof d === "object" && ["regle", "oracle", "digest", "non_mecanisable"].some((k) => typeof d[k] === "string" && d[k].trim().length >= 10);
           if (!porte) ko("R12", e.id, "clôture en corrige sans `descente` — nommer la règle, l'oracle ou le digest par lequel la correction REDESCEND chez les producteurs, ou déclarer non_mecanisable avec son motif (TF-0757)");
         }
+        if (e.statut === "corrige" && Array.isArray(etat.recidive_de) && etat.recidive_de.length) {
+          if (tsEffectif < SEUIL_R17) r17Anterieures++;
+          else {
+            r17Juges++;
+            const b = { ...etat, ...e }.barriere;
+            const tient = b && typeof b === "object" && TYPES_BARRIERE.has(String(b.type)) && typeof b.chemin === "string" && b.chemin.trim().length >= 5;
+            if (!tient) ko("R17", e.id, `récidive de ${etat.recidive_de.join(", ")} close en corrige sans \`barriere\` {type: hook | oracle | defaut | script, chemin} — une récidive appelle une barrière, jamais une règle reformulée (TF-1946)`);
+          }
+        }
         if (e.statut === "ecarte" && e.ts >= SEUIL_R7_ECART) {
           const fusion = { ...etat, ...e };
           for (const champ of ["motif_ecart", "decideur", "date_decision"])
@@ -349,6 +367,8 @@ for (const [id, e] of etatsActifs) {
   if (e.attente === "dependance" && !(etatsActifs.has(e.attente_de) || etatsArchive.has(e.attente_de)))
     ko("R16", id, `attente « dependance » sans \`attente_de\` qui désigne un sujet du registre (lu : « ${e.attente_de || ""} »)`);
 }
+if (!findings.some((f) => f.regle === "R17" && f.statut === "FAIL"))
+  ok("R17", `${r17Juges} récidive(s) close(s) depuis ${SEUIL_R17}, chacune avec sa barrière ; ${r17Anterieures} clôture(s) de récidive antérieure(s) au seuil, non jugées`);
 if (!findings.some((f) => f.regle === "R16" && f.statut === "FAIL"))
   ok("R16", `${r16Juges} sujet(s) en cours, chacun avec son action au vocabulaire fermé ; les actions déclarées ailleurs sont au vocabulaire`);
 
