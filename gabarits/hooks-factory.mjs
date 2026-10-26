@@ -52,7 +52,12 @@ const [nom, ...options] = process.argv.slice(2);
 // `flotte` (18/10/2026, décision humaine D-19 (a)) : hook PreToolUse sur l'outil Agent — une délégation vise un
 // agent nommé de la flotte (`.claude/agents/`, modèle, effort et outils déclarés), ou déclare `model` ET `effort`
 // pour garder l'agent générique ; sinon un rappel entre dans le contexte de la session. Avertit, ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte"]);
+// `gestes-distants` (26/10/2026, TF-1959, décision humaine D-77 (b) amendée) : hook PreToolUse sur Bash et PowerShell —
+// une décision groupée pour tous les gestes destructifs distants du tour, jamais une confirmation par commande :
+// `az … delete`, `terraform destroy`, une attribution de droits, `gh repo delete`, `git push --force` sont refusés
+// tant qu'aucun lot approuvé valide (forge/gestes-approuves.jsonl, 24 h au plus) ne les couvre. Bloque. Le mode
+// `--poser` (écrire le lot approuvé) n'a pas non plus l'usage de l'entrée standard.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [
@@ -70,7 +75,7 @@ if (!pilot) {
 // la lire attendait sa fermeture, et un préjugement lancé avec une entrée ouverte n'a rien rendu en
 // 9 minutes le 14/10. Elle n'est donc pas lue en préjugement, ni quand elle est un terminal.
 let stdin = "";
-if (!options.includes("--prejuger") && !process.stdin.isTTY) {
+if (!options.includes("--prejuger") && !options.includes("--poser") && !process.stdin.isTTY) {
   try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin (SessionStart) */ }
 }
 const argv = [join(pilot, "oracles", `hook-${nom}.mjs`), ...options];

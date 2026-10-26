@@ -81,6 +81,18 @@ pseudonymisation ne vaut que pour ce qui sort vers un dépôt public (pilot, for
 retours compris, et c'est le pilot qui la fait à l'accueil. L'ouverture de chaque session rappelle la
 visibilité mesurée de ce dépôt.
 
+**Gestes destructifs distants : une décision groupée, jamais une par commande (TF-1959, D-77 (b) amendée
+du 26/10/2026)** : « une décision pour toutes les modifs en une fois, pas une décision à chaque fois qu'il
+y a une suppression ou modification de droits ». Le fait : un dépôt d'essai et son état Terraform supprimés
+alors qu'une décision humaine les réservait à plus tard, et 4 attributions de rôles Azure DevOps
+tentées (403, 401). Ce que la session fait : (1) regrouper TOUS les gestes destructifs distants prévus dans
+le tour (`az … delete`, `terraform destroy`, attribution de droits, `gh repo delete`, `git push --force`…) en
+UNE décision au bloc 3, liste complète avec commande, cible, effet et retour arrière ; (2) après
+l'approbation, écrire le lot par `node forge\hooks\factory.mjs gestes-distants --poser --lot <lot.json>`
+(`forge\gestes-approuves.jsonl`, 24 h au plus). Le hook `gestes-distants` refuse toute autre commande
+destructive distante avec ce remède ; lectures et déploiements ordinaires passent. Liste fermée et format du
+lot : `references\GESTES-DISTANTS.md` du pilot.
+
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
 ## Règles de socle applicables — remplies à l'ouverture, selon le type de livrable (TF-0765)
