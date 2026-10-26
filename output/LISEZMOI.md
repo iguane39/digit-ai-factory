@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 503 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 504 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -488,6 +488,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015e.md | 20261015e | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015e.md` |
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015f.md | 20261015f | 4.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015f.md` |
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md | 20261015g | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md` |
+| Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md | 20261026e | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md` |
 | Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md | 20261013i | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` |
 | Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
