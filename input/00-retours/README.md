@@ -94,5 +94,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-84 - RETOURS - 20261020b - PJ - mesure_concision.py` | fichier | 2,5 Ko | PY |
 | `Produit-84 - RETOURS - 20261020b.md` | fichier | 4,2 Ko | Retours forges — Produit-84 — 20261020b |
 | `Produit-84 - RETOURS - 20261020b.tf.jsonl` | fichier | 1,8 Ko | 2 ligne(s) JSONL |
+| `Produit-85 - RETOURS - 20261024a.md` | fichier | 10,9 Ko | Retours forges — Produit-85 — 20261024a |
+| `Produit-85 - RETOURS - 20261024a.tf.jsonl` | fichier | 6,0 Ko | 7 ligne(s) JSONL |
 
-_76 fichier(s), 2 sous-dossier(s)_
+_78 fichier(s), 2 sous-dossier(s)_
