@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md",
+ "empreinte": "ada70869c13eda4b411d6f73ac21bf429f5f120fa1a98b0e7e36a49a3c509c91",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-20T07:14:16.200Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

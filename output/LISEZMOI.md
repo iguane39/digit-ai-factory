@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 521 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 540 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -228,7 +228,10 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20261019-etude-opportunite-video-lancement-generee-par-code.md | — | 19.9 Ko | `03-etudes/20261019-etude-opportunite-video-lancement-generee-par-code.md` |
 | 20261019-tri-opportunites-favoris-tiktok.md | — | 25.7 Ko | `03-etudes/20261019-tri-opportunites-favoris-tiktok.md` |
 | 20261020-etude-opportunite-conseil-avant-arbitrage.md | — | 15.7 Ko | `03-etudes/20261020-etude-opportunite-conseil-avant-arbitrage.md` |
+| 20261020-etude-opportunite-oeil-critique-des-process.md | — | 17.1 Ko | `03-etudes/20261020-etude-opportunite-oeil-critique-des-process.md` |
 | 20261020-L99-oeil-critique-amelioration-continue-automatisee.md | — | 25.9 Ko | `03-etudes/20261020-L99-oeil-critique-amelioration-continue-automatisee.md` |
+| 20261020-L99-oeil-critique-des-process.md | — | 24.6 Ko | `03-etudes/20261020-L99-oeil-critique-des-process.md` |
+| 20261020-L99-oeil-critique-global-des-process.md | — | 24.9 Ko | `03-etudes/20261020-L99-oeil-critique-global-des-process.md` |
 | 20261021-etude-opportunite-relecteur-de-bon-sens-restitution.md | — | 28.6 Ko | `03-etudes/20261021-etude-opportunite-relecteur-de-bon-sens-restitution.md` |
 | 20261021-etude-opportunite-surcouche-permissions-produit.md | — | 19.6 Ko | `03-etudes/20261021-etude-opportunite-surcouche-permissions-produit.md` |
 | 20261021-L99-agent-nocturne-oeil-critique.md | — | 27.4 Ko | `03-etudes/20261021-L99-agent-nocturne-oeil-critique.md` |
@@ -239,6 +242,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md | 20261020c | 31.8 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md | 20261021a | 48.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
+| Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 
 ### 04-plans
 
@@ -459,6 +463,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte - 20260910h.md | 20260910h | 20 Ko | `04-plans/2026-09/Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte - 20260910h.md` |
 | Digit-AI - Synthese Mandat - Vues sorties du suivi et regle ecriture nombres - 20260916d.md | 20260916d | 11.9 Ko | `04-plans/2026-09/Digit-AI - Synthese Mandat - Vues sorties du suivi et regle ecriture nombres - 20260916d.md` |
 | Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md | 20260919f | 17.7 Ko | `04-plans/2026-09/Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md` |
+| Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md | 20261020l | 14.7 Ko | `04-plans/Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
 | Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
@@ -473,9 +478,12 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md | 20261015k | 8.7 Ko | `04-plans/Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md` |
 | Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md | 20261018i | 8.5 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md` |
 | Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md | 20261018g | 9 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` |
+| Digit-AI - Synthese L99 - Oeil critique des process prompt reecrit - 20261020e.md | 20261020e | 16.2 Ko | `04-plans/Digit-AI - Synthese L99 - Oeil critique des process prompt reecrit - 20261020e.md` |
+| Digit-AI - Synthese L99 - Oeil critique global des process prompt reecrit - 20261020i.md | 20261020i | 17.2 Ko | `04-plans/Digit-AI - Synthese L99 - Oeil critique global des process prompt reecrit - 20261020i.md` |
 | Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md | 20261018e | 13.6 Ko | `04-plans/Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md` |
 | Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md | 20261019k | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md` |
 | Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md | 20261026s | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md` |
+| Digit-AI - Synthese Mandat - A1 A2 faites A3 en cours - 20261026h.md | 20261026h | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 faites A3 en cours - 20261026h.md` |
 | Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md | 20261004a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` |
 | Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md | 20261012a | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` |
 | Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md | 20261001e | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` |
@@ -516,6 +524,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md | 20261026l | 4.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md` |
 | Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md | 20261017d | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` |
 | Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md | 20261018j | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` |
+| Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md | 20261020g | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md` |
 | Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md | 20261018l | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md | 20261003a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` |
 | Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md | 20261001g | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md` |
@@ -527,16 +536,23 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md | 20261015d | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` |
 | Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md | 20261013g | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md` |
 | Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md | 20261013d | 12 Ko | `04-plans/Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md` |
+| Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md | 20261021a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md` |
 | Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md | 20261026c | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` |
 | Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
+| Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md | 20261020m | 4.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md` |
+| Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md | 20261021b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md` |
+| Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md | 20261020h | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md` |
 | Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md | 20261026a | 11.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` |
+| Digit-AI - Synthese Mandat - Oeil critique global des process etudie - 20261020j.md | 20261020j | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique global des process etudie - 20261020j.md` |
+| Digit-AI - Synthese Mandat - Oeil critique global releve des appels - 20261020k.md | 20261020k | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique global releve des appels - 20261020k.md` |
 | Digit-AI - Synthese Mandat - Oeil critique premiere analyse du poste - 20261026i.md | 20261026i | 16.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique premiere analyse du poste - 20261026i.md` |
 | Digit-AI - Synthese Mandat - Oeil critique recommandations affichees - 20261026j.md | 20261026j | 18.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique recommandations affichees - 20261026j.md` |
 | Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md | 20261026b | 17.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique T1 a T4 detaillees et catalogue - 20261026b.md` |
 | Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md | 20261001a | 8.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md | 20261013a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md | 20261013c | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` |
+| Digit-AI - Synthese Mandat - Pilot pousse sur GitHub - 20261026u.md | 20261026u | 2.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot pousse sur GitHub - 20261026u.md` |
 | Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md | 20261016k | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` |
 | Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md | 20261026p | 3.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` |
 | Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md | 20261016l | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` |
@@ -563,10 +579,13 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md | 20261014b | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` |
 | Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md | 20261001b | 18.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md` |
 | Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md | 20261015l | 47.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` |
+| Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md | 20261021c | 6.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md` |
 | Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md | 20261019a | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md | 20261019i | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md` |
 | Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md | 20261020a | 7 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub du 26-10 - 20261026q.md | 20261026q | 4.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub du 26-10 - 20261026q.md` |
+| Digit-AI - Synthese Mandat - T2 fusionnee et publiee T4 lancee - 20261026v.md | 20261026v | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - T2 fusionnee et publiee T4 lancee - 20261026v.md` |
+| Digit-AI - Synthese Mandat - T4 fusionnee carte des forges en place - 20261026w.md | 20261026w | 8.2 Ko | `04-plans/Digit-AI - Synthese Mandat - T4 fusionnee carte des forges en place - 20261026w.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md | 20261018k | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 18-10 - 20261018k.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md | 20261019b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` |
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |
