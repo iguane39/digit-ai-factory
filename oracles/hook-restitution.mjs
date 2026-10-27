@@ -35,7 +35,7 @@ import { tmpdir, homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { controlerOuiDeCompletude, affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
-import { REGISTRE_PILOT, lireRegistrePilot, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
+import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
 // de fin de tour, qui garde alors son propre relevé d'effets (`detecterEffets`) ; `ecrituresDuTour` le dit dans sa sortie.
@@ -352,6 +352,205 @@ export function ecrituresDuTour(segment) {
 }
 export const LECTURE_PAR_COMMANDE = () => (ecrituresParCommande ? "relecture-intention" : "repli : relevé d'effets du hook seul");
 
+// ---- TF-1913 (26/10/2026, D-82 (a), RT-130) — UN FICHIER SERVI ÉCRIT DANS LE TOUR PORTE LE VERDICT DE LA CRITIQUE, DATÉ DU TOUR ----------
+//
+// LE FAIT. Le 18/10/2026, la refonte d'une page de produit a été proposée à la mise en ligne avec, parmi les options de la décision,
+// « faire juger le rendu par la critique d'implémentation, puis envoyer ». Réponse humaine : « Pourquoi la critique n'est pas déjà
+// faite. Je ne dois pas avoir à la valider manuellement. Elle doit être faite automatiquement. » Jouée ensuite, elle a trouvé 4
+// défauts réels (texte rogné : 554 constats, contrôles désalignés : 134, jours passés à 2,29:1, bouton sans intitulé) que les captures
+// et 147 contrôles du site ne voyaient pas. S36 d'oracle-synthese ne juge que les pages CITÉES comme livrées : une page modifiée sans
+// être citée partait sans critique. La décision D-82 (a) du 26/10/2026 : « Un tour qui a modifié un fichier servi (HTML, CSS, JS) sans
+// verdict de critique daté du tour est signalé pendant 7 jours, puis refusé ; la session la joue d'elle-même, vous ne la validez jamais. »
+//
+// UN FICHIER SERVI est une page, une feuille de style ou un script livré à un navigateur, dans un produit ou une page livrable :
+// l'extension (.html, .htm, .css, .js) ET ce que le chemin ne désigne pas comme outillage (`fichierServi`). L'outillage de la factory n'en
+// est pas : scripts .mjs et .cjs (l'extension .js seule est servie), tests (*.test.js, *.spec.js, dossiers test, tests, specs, e2e), fixtures et
+// gabarits (comme S36), node_modules, vendor, .claude, banc*, configurations (*.config.js), fichiers minifiés, et, au premier niveau du
+// dépôt, oracles, hooks et scripts. Un .js dont le texte écrit montre du Node (require, module.exports, process.env, import de node:)
+// sans API de navigateur est un script d'outillage ou de serveur. Un fichier écrit dans le dossier temporaire est un brouillon
+// (`references\NIVEAUX.md`) : il n'est pas servi.
+//
+// LE VERDICT DE LA CRITIQUE n'est écrit dans aucun fichier : `run-oracles-design.mjs` de forge-design, le point d'entrée de la critique
+// d'implémentation (jamais oracle par oracle, mémoire du pilot du 19/09/2026), imprime son JSON sur la sortie standard (`"verdict"` :
+// PASS, FAIL ou SKIP). Son verdict est donc le RÉSULTAT d'OUTIL de cette commande dans la transcription, et sa date est celle de
+// l'enregistrement de ce résultat : aucun second format n'est créé. Il est « daté du tour » quand la commande vient APRÈS la dernière
+// écriture du fichier, dans le tour. Il couvre une page quand la commande la nomme (chemin, nom, motif) ; il couvre une feuille ou un
+// script quand il suit sa dernière écriture. Un SKIP (indéterminé) n'est pas un verdict : le point d'entrée dit qu'un oracle n'a pas
+// pu s'exécuter, et la critique n'est pas jouée. MESURÉ sur les transcriptions du poste (26/10/2026) : 146 lancements sur 198 n'ont ni PASS ni FAIL
+// dans leur sortie, parce que la session redirige le JSON vers un fichier et le relit ensuite ; la commande qui a abouti (aucun
+// plantage, aucun SKIP affiché, pas restée en arrière-plan sans notification de fin) vaut alors critique jouée, sans que son contenu soit relu
+// ici (`PLANTAGE_CRITIQUE`, `LANCE_EN_FOND`).
+//
+// CE QUE CE RELEVÉ NE VOIT PAS, dit plutôt que promis : une page produite par un générateur lancé en commande (`node generer.mjs`) ; un
+// fichier écrit dans un worktree jetable du dossier temporaire puis intégré par git ; l'écriture d'un sous-agent (sa transcription est
+// à part) ; une critique déléguée à un sous-agent, dont seul le rapport revient. Dans ces cas la session joue la critique elle-même.
+const SERVI_EXTENSION = /\.(?:html?|css|js)$/i;
+const HORS_SERVI_PARTOUT = /(?:^|\/)(?:node_modules|\.git|\.claude|fixtures?|__fixtures__|__tests__|tests?|specs?|e2e|vendor|banc[^/]*)\/|fixture|gabarit|boilerplate|temoin|\.(?:test|spec|config)\.js$|\.min\.(?:js|css)$/i;
+const HORS_SERVI_AU_PREMIER_NIVEAU = /^(?:oracles|hooks|scripts)\//i;
+const MARQUEURS_NODE = /\brequire\s*\(|\bmodule\.exports\b|\bprocess\.(?:env|argv|exit|stdout|cwd)\b|^#!\/usr\/bin\/env node|\bfrom\s+["']node:|\bimport\s+[^;\n]*\bfrom\s+["'](?:fs|path|os|http|https|child_process|url|util|crypto|express)["']/m;
+const MARQUEURS_NAVIGATEUR = /\b(?:document|window|navigator|localStorage|sessionStorage)\s*\.|\baddEventListener\s*\(/;
+const normaliserChemin = (p) => String(p || "").replace(/\\/g, "/").replace(/^\.\//, "").toLowerCase();
+
+/** Ce fichier est-il un fichier servi à un navigateur ? `racine` : le dossier du projet du tour ; `texte` : ce que le tour y a écrit (facultatif). */
+export function fichierServi(chemin, { racine = "", texte = "" } = {}) {
+  const brut = String(chemin || "");
+  if (!SERVI_EXTENSION.test(brut)) return { servi: false, motif: "extension non servie" };
+  if (TEMPORAIRE_NOMME(brut)) return { servi: false, motif: "brouillon du dossier temporaire" };
+  let p = normaliserChemin(brut).replace(/(?:^|\/)\.claude\/worktrees\/[^/]+\//, "/");
+  const r = normaliserChemin(racine).replace(/\/$/, "").replace(/(?:^|\/)\.claude\/worktrees\/[^/]+$/, "");
+  const relatif = r && p.startsWith(r + "/") ? p.slice(r.length + 1) : null;
+  p = p.replace(/^\/+/, "");
+  if (HORS_SERVI_PARTOUT.test(relatif ?? p)) return { servi: false, motif: "outillage, fixture, gabarit ou dépendance" };
+  if (relatif ? HORS_SERVI_AU_PREMIER_NIVEAU.test(relatif) : /(?:^|\/)(?:oracles|hooks|scripts)\//i.test(p))
+    return { servi: false, motif: "outillage du dépôt (oracles, hooks, scripts)" };
+  if (/\.js$/i.test(brut) && texte && MARQUEURS_NODE.test(texte) && !MARQUEURS_NAVIGATEUR.test(texte))
+    return { servi: false, motif: "script Node (serveur ou outillage)" };
+  return { servi: true, motif: "page, feuille de style ou script livré à un navigateur" };
+}
+
+const OPTIONS_A_VALEUR = new Set(["--racine", "--tokens", "--corpus", "--oracle", "--instance", "--etat-connexion", "--dtcg"]);
+/** Les pages que nomme une commande de critique (`run-oracles-design.mjs`) ; `null` si la commande n'est pas une critique de page. */
+export function ciblesDeCritique(commande) {
+  const cmd = sansCorpsDeTexte(commande);
+  // Une critique est un LANCEMENT (`node …/run-oracles-design.mjs`), pas une lecture du script (`ls`, `sed`, `grep`).
+  const lancement = /\bnode(?:\.exe)?\b[^\n;|&]*?run-oracles-design\.mjs/.exec(cmd);
+  if (!lancement) return null;
+  const reste = cmd.slice(lancement.index + lancement[0].length).split(/\r?\n|&&|\|\||[;|]/)[0];
+  const jetons = (reste.match(/"[^"]*"|'[^']*'|\S+/g) || []).map((j) => j.replace(/^["']|["']$/g, ""));
+  if (jetons.includes("--corpus") || jetons.includes("--dtcg")) return null;   // le corpus et les jetons DTCG ne sont pas la critique d'une page
+  const cibles = [];
+  for (let k = 0; k < jetons.length; k++) {
+    const j = jetons[k];
+    if (OPTIONS_A_VALEUR.has(j)) { k++; continue; }
+    if (/^\d*>>?$/.test(j)) { k++; continue; }   // `> fichier` : la sortie redirigée n'est pas une page
+    if (j.startsWith("--") || /^\d*>/.test(j)) continue;
+    cibles.push(j);
+  }
+  return cibles;
+}
+// Une critique LANCÉE n'a pas toujours son verdict à l'écran : les sessions redirigent le JSON vers un fichier (`> $TEMP\od.json`) et le relisent
+// ensuite (mesuré sur les transcriptions du poste : 198 lancements du point d'entrée, 146 sans PASS ni FAIL lisible dans leur sortie). La commande
+// qui a abouti vaut alors critique jouée ; seuls l'écartent un SKIP affiché, un lancement resté en arrière-plan et un plantage (module absent,
+// racine introuvable, syntaxe) : l'oracle n'a pas jugé la page.
+const PLANTAGE_CRITIQUE = /Cannot find module|ERR_MODULE_NOT_FOUND|SyntaxError|ENOENT|is not recognized|command not found|No such file or directory|Aucune racine/i;
+// Un lancement en ARRIÈRE-PLAN ne vaut critique qu'une fois sa notification de fin revenue dans le tour (`tachesEnAttente`, TF-1649) : tant qu'elle
+// n'est pas revenue, la page n'a pas été jugée (cas relevé dans les transcriptions du poste : la critique d'une page lancée en arrière-plan avec son rendu).
+const LANCE_EN_FOND = /running in background with ID:\s*([\w-]+)/;
+/** La commande nomme-t-elle ce fichier ? Une variable ou une substitution non résolue épargne le doute (jamais d'accusation sur ce qu'on ne lit pas). */
+export function critiqueCouvre(cibles, fichier) {
+  const f = normaliserChemin(fichier);
+  return cibles.some((brut) => {
+    if (/[$%`]/.test(brut)) return true;
+    const t = normaliserChemin(brut).replace(/^(?:\.\.\/)+/, "");
+    if (!t) return false;
+    if (/[*?]/.test(t)) {
+      const motif = t.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*/g, "\u0000").replace(/\*/g, "[^/]*").replace(/\u0000/g, ".*").replace(/\?/g, "[^/]");
+      return new RegExp("(?:^|/)" + motif + "$").test(f);
+    }
+    return f === t || f.endsWith("/" + t) || f.includes("/" + t.replace(/\/$/, "") + "/");
+  });
+}
+const _texteResultat = (b) => (typeof b.content === "string" ? b.content
+  : Array.isArray(b.content) ? b.content.map((c) => (typeof c === "string" ? c : c?.text || "")).join("\n") : "");
+/** Le verdict que la sortie du point d'entrée porte : PASS, FAIL, SKIP, ou null quand la sortie n'est pas celle d'une critique aboutie. */
+export function verdictDeCritique(sortie) {
+  const t = String(sortie || "");
+  if (/"orchestrateur"\s*:\s*"run-oracles-design"/.test(t)) return (/"verdict"\s*:\s*"(PASS|FAIL|SKIP)"/.exec(t) || [])[1] || null;
+  // `\b` ne borne pas une lettre accentuée (« INDÉTERMINÉ » finit par un É non ASCII) : la borne est une négation de lettre (TF-0805).
+  const m = /(?:^|\n)\s*(PASS|FAIL|INDÉTERMINÉ)(?![A-Za-zÀ-ÿ])/.exec(t);
+  return m ? (m[1] === "INDÉTERMINÉ" ? "SKIP" : m[1]) : null;
+}
+const _heure = (ts) => { const t = Date.parse(ts || ""); if (!Number.isFinite(t)) return null; const d = new Date(t); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+
+/**
+ * Les fichiers servis que le tour a écrits et les critiques qu'il a jouées, dans l'ORDRE des appels d'outil du tour (le rang dit « avant »
+ * et « après » sans dépendre d'une horloge). Pur : `segment` est la suite d'enregistrements qui suit le dernier message humain.
+ */
+export function critiqueDuTour(segment, { racine = "" } = {}) {
+  const dossier = racine || segment.find((e) => e && e.cwd)?.cwd || "";
+  const resultats = new Map();
+  const enAttente = new Set(tachesEnAttente(segment));
+  for (const e of segment) {
+    if (e.type !== "user") continue;
+    for (const b of contenuDe(e)) if (b.type === "tool_result") resultats.set(b.tool_use_id, { texte: _texteResultat(b), ts: e.timestamp || null });
+  }
+  const ecrits = new Map();   // chemin normalisé -> { fichier, rang, ts, textes }
+  const critiques = [];
+  const noter = (fichier, rang, ts, texte) => {
+    const k = normaliserChemin(fichier);
+    const x = ecrits.get(k) || { fichier, rang, ts, textes: [] };
+    x.rang = rang; x.ts = ts; if (texte) x.textes.push(texte);
+    ecrits.set(k, x);
+  };
+  let rang = 0;
+  for (const e of segment) {
+    if (e.type !== "assistant") continue;
+    for (const b of contenuDe(e)) {
+      if (b.type !== "tool_use") continue;
+      rang++;
+      if (ECRITURES.has(b.name)) {
+        const p = b.input?.file_path || b.input?.notebook_path;
+        if (typeof p !== "string") continue;
+        const texte = [b.input?.content, b.input?.new_string, ...(Array.isArray(b.input?.edits) ? b.input.edits.map((x) => x?.new_string) : [])]
+          .filter((x) => typeof x === "string").join("\n");
+        noter(p, rang, e.timestamp || null, texte);
+      } else if (COMMANDES.has(b.name)) {
+        const cmd = String(b.input?.command || "");
+        const cibles = ciblesDeCritique(cmd);
+        if (cibles) {
+          const r = resultats.get(b.id);
+          const verdict = r ? verdictDeCritique(r.texte) : null;
+          const fond = r ? LANCE_EN_FOND.exec(r.texte) : null;
+          critiques.push({ rang, cibles, verdict, jouee: Boolean(r) && verdict !== "SKIP" && (fond ? !enAttente.has(fond[1]) : !PLANTAGE_CRITIQUE.test(r.texte)),
+            ts: r?.ts || e.timestamp || null, commande: cmd.trim().slice(0, 160) });
+        }
+        if (ecrituresParCommande) {
+          for (const w of ecrituresParCommande([cmd])) {
+            const cible = String(w.cible || "");
+            if (/[$%`()]/.test(cible)) continue;   // chemin non résolu (variable, substitution) : jamais d'accusation sur ce qu'on ne lit pas
+            const absolu = /^(?:[A-Za-z]:[\\/]|[\\/]|~)/.test(cible);
+            noter(absolu ? cible : `${String(w.dossier || dossier || "").replace(/[\\/]$/, "")}/${cible}`, rang, e.timestamp || null, "");
+          }
+        }
+      }
+    }
+  }
+  // Un .js édité par morceaux ne montre pas s'il est Node ou navigateur : le fichier écrit, présent sur le disque du hook, le dit.
+  const surDisque = (f) => { try { return /\.js$/i.test(f) && existsSync(f) && statSync(f).size < 400000 ? readFileSync(f, "utf8") : ""; } catch { return ""; } };
+  const servis = [...ecrits.values()].map((x) => ({ ...x, ...fichierServi(x.fichier, { racine: dossier, texte: [...x.textes, surDisque(x.fichier)].join("\n") }) }))
+    .filter((x) => x.servi).map(({ fichier, rang: r, ts }) => ({ fichier, rang: r, ts }));
+  return { servis, critiques };
+}
+
+export const RAPPEL_CRITIQUE = "Joue la critique d'implémentation TOI-MÊME, maintenant, avant de rendre la main : `node <FORGE_ROOT>\\digit-ai-forge-design\\oracles\\run-oracles-design.mjs "
+  + "<page.html> --tokens <tokens.css> --rendu --json-only` (le point d'entrée, jamais oracle par oracle ; `--rendu` pour le contraste et le texte rogné, que les captures ne montrent pas). "
+  + "Corrige les écarts durs, puis rejoue-la APRÈS ta dernière écriture, et cite son verdict daté (PASS ou FAIL) au bloc 4. Une feuille de style ou un script se juge par une page qui le charge. "
+  + "Tu ne la proposes pas à l'humain et tu ne lui demandes pas de la valider : « Je ne dois pas avoir à la valider manuellement. Elle doit être faite automatiquement » (RT-130, D-82 (a)). "
+  + "Un verdict SKIP (indéterminé) n'en est pas un : règle la cause (racine de forge-design, outillage de rendu), puis rejoue.";
+/**
+ * Le contrôle : chaque fichier servi écrit dans le tour est suivi d'un verdict de critique (PASS ou FAIL) rendu APRÈS sa dernière écriture.
+ * Un verdict antérieur à la dernière écriture est périmé : la page jugée n'est plus celle qui part.
+ */
+export function controlerCritique({ critique = null }) {
+  if (!critique || !critique.servis.length) return { applicable: false, verdict: "SANS_OBJET", ecarts: [], servis: [], critiques: [] };
+  const valides = critique.critiques.filter((c) => c.jouee);
+  const sans = [];
+  for (const s of critique.servis) {
+    const estPage = /\.html?$/i.test(s.fichier);
+    const apres = valides.filter((c) => c.rang > s.rang && (!estPage || critiqueCouvre(c.cibles, s.fichier)));
+    if (apres.length) continue;
+    const avant = valides.filter((c) => c.rang < s.rang && (!estPage || critiqueCouvre(c.cibles, s.fichier)));
+    const indeterminee = critique.critiques.some((c) => c.rang > s.rang && c.verdict === "SKIP" && (!estPage || critiqueCouvre(c.cibles, s.fichier)));
+    sans.push({ fichier: s.fichier, ts: s.ts, motif: indeterminee ? "indeterminee" : avant.length ? "perimee" : "absente", avant: avant.length ? avant[avant.length - 1].ts : null });
+  }
+  if (!sans.length) return { applicable: true, verdict: "PASS", ecarts: [], servis: critique.servis, critiques: critique.critiques };
+  const nom = (f) => String(f).replace(/\\/g, "/").split("/").slice(-2).join("/");
+  const decrire = (x) => `${nom(x.fichier)}${_heure(x.ts) ? ` (écrit à ${_heure(x.ts)})` : ""}${x.motif === "perimee" ? ` — verdict${_heure(x.avant) ? ` de ${_heure(x.avant)}` : ""} antérieur à la dernière écriture` : x.motif === "indeterminee" ? " — critique rendue INDÉTERMINÉE (SKIP)" : ""}`;
+  return { applicable: true, verdict: "FAIL", servis: critique.servis, critiques: critique.critiques, sans,
+    ecarts: [`le tour a écrit ${critique.servis.length} fichier(s) servi(s) à un navigateur et ${sans.length} n'ont aucun verdict de critique d'implémentation `
+      + `daté après leur dernière écriture : ${sans.slice(0, 3).map(decrire).join(" ; ")}${sans.length > 3 ? ` (+${sans.length - 3})` : ""}`] };
+}
+
 // L'état du dépôt ouvert depuis le message humain : un commit plus récent, ou un fichier modifié
 // après lui. `depuis` est l'horodatage ISO du message humain lu au transcript.
 export function effetsGit(cwd, depuis) {
@@ -480,7 +679,9 @@ export function analyserTranscript(texte) {
   // TF-1514 — tous les messages humains de la session : le contrôle POSSESSION les confronte à la réponse.
   const textesHumains = humains.map((i) => texteDe(entrees[i]));
   return { travail: ecrit.length > 0, ecrituresDuTour: ecrit, ...m, dernierHumain, textePrecedent, depuis, textesHumains,
-    releves: relevesDHorloge(entrees, debut) };
+    releves: relevesDHorloge(entrees, debut),
+    // TF-1913 — les fichiers servis écrits dans le tour et les critiques jouées, pour le contrôle CRITIQUE.
+    critique: critiqueDuTour(entrees.slice(debut + 1)) };
 }
 
 // `racine` (TF-1644, 14/10/2026) : le dossier du projet du tour. Le message est écrit dans un
@@ -1048,6 +1249,8 @@ const RAPPEL_DETAIL = "Un détail demandé reçoit la décision EN ENTIER, au bl
 // NON JUGÉ : que le numéro soit libre, ou continu (deux sessions qui écrivent au même instant, hors périmètre décidé le
 // 18/10 : « Ne règle pas deux sessions qui écrivent au même instant ») ; que l'entrée du registre dise la même chose
 // que la décision affichée ; un produit dont le ledger est absent (il le dit, ne l'invente pas).
+// DEPUIS TF-1911 (D-83 (a), 26/10/2026) : un numéro que le REGISTRE COMMUN DU POSTE (`<git-common-dir>/forge-decisions.jsonl`, écrit par `reserver-decision.mjs`,
+// partagé par tous les arbres de travail du même dépôt) porte pour une AUTRE question est refusé tout de suite (`prises`) ; deux postes restent hors périmètre.
 // AU PILOT : il n'existe PAS de registre des D-N. Il n'a ni `forge\ledger.jsonl` ni `forge\retours\` ; ses D-N vivent
 // dans les synthèses déposées sous `output\04-plans\`, et seule la revue hebdomadaire consigne une correspondance
 // D-N → TF-#### (`todo\observabilite\revues-hebdo.jsonl`). Aucune règle n'est posée pour lui : elle n'a pas été décidée.
@@ -1106,13 +1309,27 @@ export function controlerReservation({ dernierTexte = "", dernierHumain = "", te
   const nouvelles = decisionsPosees(dernierTexte).filter((d) => !nommees.has(d.n) && !citeD(d.n, deja));
   if (!nouvelles.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit, nouvelles: [] };
   const registre = registreDesDecisions(produit);
-  const absentes = nouvelles.filter((d) => !registre.numeros.has(d.n)).map((d) => "D-" + d.n);
+  // TF-1911 (D-83 (a), 26/10/2026) : le registre COMMUN du poste, partagé par tous les arbres de travail du même dépôt. Un numéro qu'il porte pour une AUTRE
+  // question est déjà pris, même si le ledger de CET arbre l'ignore ou le nomme ; indisponible (pas un dépôt git), il se tait et le contrôle d'avant joue seul.
+  const commun = lireRegistreCommun(produit);
+  const prises = nouvelles.filter((d) => {
+    const inscrites = commun.entrees.filter((e) => String(e.n) === d.n);
+    return inscrites.length && !inscrites.some((e) => memeQuestion(e.question, questionDeTete(d.segment)));
+  });
+  const absentes = nouvelles.filter((d) => !registre.numeros.has(d.n) && !prises.includes(d)).map((d) => "D-" + d.n);
   const bloquant = !!RESERVATION_BLOQUANTE_DES && maintenant >= new Date(RESERVATION_BLOQUANTE_DES);
-  const ecarts = absentes.length ? [`${absentes.join(", ")} posée${absentes.length > 1 ? "s" : ""} au bloc 3 sans entrée \`question_humain\` au registre du produit `
+  const ecarts = [...(absentes.length ? [`${absentes.join(", ")} posée${absentes.length > 1 ? "s" : ""} au bloc 3 sans entrée \`question_humain\` au registre du produit `
     + `(${registre.existe ? `${registre.fichier}, ${registre.entrees} entrée(s) question_humain` : `${registre.fichier} introuvable`}) : un numéro de décision ne se réserve nulle part ailleurs, `
-    + "et deux sessions du même produit peuvent le prendre toutes deux (TF-1849, retour Produit-79 RP-12 : D-37 posée deux fois à 8 minutes d'intervalle)"] : [];
-  return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", bloquant: ecarts.length ? bloquant : false, ecarts, produit,
-    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes };
+    + "et deux sessions du même produit peuvent le prendre toutes deux (TF-1849, retour Produit-79 RP-12 : D-37 posée deux fois à 8 minutes d'intervalle)"] : []),
+    ...prises.map((d) => {
+      const e = commun.entrees.find((x) => String(x.n) === d.n);
+      return `D-${d.n} est DÉJÀ PRISE au registre commun du poste (${commun.fichier}) pour une autre question (« ${String(e.question).slice(0, 110)} », ${e.date || "sans date"}, arbre ${e.arbre || "inconnu"}) `
+        + `et tu poses « ${questionDeTete(d.segment).slice(0, 110)} » : une réponse « ${d.n}a » ne dirait plus à laquelle des deux elle répond (TF-1911, D-83 (a) : D-155, D-156 et D-159 prises deux fois les 18 et 19/10/2026 entre arbres de travail d'un même dépôt)`;
+    })];
+  // Un numéro pris pour une autre question est une collision CERTAINE (le registre commun ne contient que des réservations faites par l'outil) : elle bloque tout de suite,
+  // alors qu'un numéro absent reste avertissant jusqu'à l'échéance de TF-1849 (la mesure d'entrée de cette échéance ne porte que sur les absents).
+  return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", bloquant: ecarts.length ? (bloquant && absentes.length > 0) || prises.length > 0 : false, ecarts, produit,
+    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes, prises: prises.map((d) => "D-" + d.n) };
 }
 
 // ---- TF-1872 (18/10/2026, D-32 (a), « valable tous produits ») — LE MÊME CONTRÔLE AU PILOT --------------------------------
@@ -1162,7 +1379,8 @@ const RAPPEL_RESERVATION_PILOT = "Au PILOT, une D-N NOUVELLE s'inscrit au regist
 const RAPPEL_RESERVATION = "Une D-N NOUVELLE s'inscrit au registre du produit AVANT d'être affichée : une entrée `question_humain` du ledger (forge/ledger.jsonl) qui porte D-N et la question, "
   + "de préférence par `node <pilot>/scripts/reserver-decision.mjs --question \"<la question posée ?>\"` (rend le prochain numéro libre et l'inscrit en une opération, par l'écrivain du ledger du produit), "
   + "sinon par `python forge/ledger.py question_humain --decision D-N --question \"<la question posée>\"`, ou `node <forge-agents>/scripts/ledger.mjs append forge/ledger.jsonl '{\"type\":\"question_humain\",\"decisions_posees\":{\"D-N\":\"<la question>\"}}'` ; "
-  + "puis réécris la restitution. Un rappel d'une ligne (« **D-N** : <sujet>, posée le JJ/MM à HH:MM, inchangée ») n'est pas une D-N nouvelle (S4, TF-1849).";
+  + "puis réécris la restitution. Un numéro DÉJÀ PRIS pour une autre question au registre commun du poste (celui que partagent tous les arbres de travail du produit, TF-1911) se remplace par un numéro réservé par cet outil. "
+  + "Un rappel d'une ligne (« **D-N** : <sujet>, posée le JJ/MM à HH:MM, inchangée ») n'est pas une D-N nouvelle (S4, TF-1849).";
 const rappelReservation = (r) => (r && r.cible === "pilot" ? RAPPEL_RESERVATION_PILOT : RAPPEL_RESERVATION);
 const echeanceReservation = (r) => (r && r.cible === "pilot" ? RESERVATION_PILOT_BLOQUANTE_DES : RESERVATION_BLOQUANTE_DES);
 
@@ -1380,7 +1598,9 @@ const RAPPEL_REPONSE_COURTE = "La réponse reste COURTE : aucune restitution com
 //   · Exceptions gardées bloquantes, chacune parce que son refus protège un fait : S3, un verdict sans fait mesuré (un vert non
 //     mesuré ; 0 refus réel sans S1 du 19 au 26/10/2026) ; S82 et COMPLÉTUDE, une exhaustivité sans « Mesuré sur » (RT-126) ;
 //     AFFICHAGE, un écran qui ne dit pas ce que dit le fichier jugé ; RÉSERVATION, une D-N nouvelle non réservée (un numéro qui
-//     désigne deux questions). Aucun contrôle de secret ni de sécurité n'était bloquant à ce hook : il n'y a rien à garder.
+//     désigne deux questions) ; CRITIQUE (TF-1913, D-82 (a) du 26/10/2026, gabarit 2.51.0), un fichier servi écrit sans verdict de la
+//     critique d'implémentation daté du tour, avertie jusqu'au 02/11/2026, bloquante dès le 03/11/2026 (`BLOQUANTES_DATEES`).
+//     Aucun contrôle de secret ni de sécurité n'était bloquant à ce hook : il n'y a rien à garder.
 //   · Deviennent AVERTISSANTS : S6, S48, S80 (et S83, S84, qui devaient bloquer le 28/10/2026) ; les contrôles GESTE, DÉTAIL et
 //     PROCÉDURE du tour. Mesuré du 19 au 26/10/2026 sur les refus réels au premier passage : S48 seule ou sans S1, 10 ; DÉTAIL
 //     seul, 1. Le niveau Moyen, en essai, garde son propre juge de forme (`jugerFormeMoyen`).
@@ -1394,9 +1614,13 @@ const RAPPEL_REPONSE_COURTE = "La réponse reste COURTE : aucune restitution com
 const BLOQUANTES = new Set(["S1", "S3", "S4", "S82", "S85"]);
 // S83 (TF-1936) et S84 (TF-1938), 21/10/2026 : AVERTISSANTES jusqu'au 28/10, puis BLOQUANTES, décidées sous R-58. T2 (décision
 // humaine du 26/10/2026) les laisse AVERTISSANTES : aucune ne protège un vert sur un fait au sens de T2 (S84 protège l'heure
-// d'en-tête, une donnée de reprise, pas un verdict). Le mécanisme d'échéance sert depuis T4 à S86 (`{ Sxx: "AAAA-MM-JJ" }`).
+// d'en-tête, une donnée de reprise, pas un verdict). Le mécanisme d'échéance sert depuis T4 à S86 et depuis TF-1913 à CRITIQUE :
+// `BLOQUANTES_DATEES = { Sxx: "AAAA-MM-JJ" }`.
+// CRITIQUE (TF-1913, D-82 (a) du 26/10/2026) l'utilise : AVERTISSANTE jusqu'au 02/11/2026 inclus (7 jours), BLOQUANTE dès le 03/11/2026.
+// Elle protège un fait au sens de T2 : une page modifiée qui part sans que la critique d'implémentation l'ait jugée, 4 défauts réels
+// le 18/10/2026 (RT-130). `FORGE_CRITIQUE_BLOQUANTE_DES` (AAAA-MM-JJ) avance ou recule l'échéance sans toucher au hook ; la recette s'en sert.
 export const VERROU_LIVRE_BLOQUANT_DES = process.env.FORGE_VERROU_LIVRE_BLOQUANT_DES || "2026-11-02";
-export const BLOQUANTES_DATEES = { S86: VERROU_LIVRE_BLOQUANT_DES };
+export const BLOQUANTES_DATEES = { S86: VERROU_LIVRE_BLOQUANT_DES, CRITIQUE: process.env.FORGE_CRITIQUE_BLOQUANTE_DES || "2026-11-03" };
 export const estBloquante = (regle, maintenant = new Date()) =>
   BLOQUANTES.has(regle) || (Boolean(BLOQUANTES_DATEES[regle]) && maintenant >= new Date(BLOQUANTES_DATEES[regle]));
 const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle) ? `${f.regle} (bloquante dès le ${BLOQUANTES_DATEES[f.regle]})` : f.regle);
@@ -1425,7 +1649,7 @@ const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.51.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.52.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
@@ -1456,11 +1680,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
-  let dernierHumainP = "", textePrecedentP = "", relevesP = null;
+  let dernierHumainP = "", textePrecedentP = "", relevesP = null, critiqueP = null;
   try {
     if (cheminT && existsSync(cheminT)) {
       const tour = analyserTranscript(readFileSync(cheminT, "utf8"));
-      dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null;
+      dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; critiqueP = tour.critique || null;
       syntheseDeposee = syntheseDuTour(tour.fichiersMd);
       if (syntheseDeposee) {
         ecartsAffichage.push(...comparerAffiche(brouillon, readFileSync(syntheseDeposee, "utf8")));
@@ -1480,14 +1704,21 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const reservationBloque = reservation.verdict === "FAIL" && reservation.bloquant;
   // TF-1866 — le « oui » à une question de complétude, joué sur ce brouillon dès que le transcript donne le dernier message humain.
   const completude = controlerOuiDeCompletude({ dernierHumain: dernierHumainP, dernierTexte: brouillon });
-  // T2 (TF-1947) : DÉTAIL avertit, comme au hook de fin de tour ; AFFICHAGE, COMPLÉTUDE et RÉSERVATION bloquent toujours.
+  // TF-1913 — la CRITIQUE : les fichiers servis écrits dans le tour portent-ils un verdict de critique daté après leur dernière écriture ?
+  const critiqueJ = controlerCritique({ critique: critiqueP });
+  const critiqueBloque = critiqueJ.verdict === "FAIL" && estBloquante("CRITIQUE");
+  // T2 (TF-1947) : DÉTAIL avertit, comme au hook de fin de tour ; AFFICHAGE, COMPLÉTUDE, RÉSERVATION et CRITIQUE (dès son échéance) bloquent.
   const refus = [...bloquants.map((x) => `${x.regle} — ${x.message}`),
     ...ecartsAffichage.map((e) => `AFFICHAGE — ce brouillon ne dit pas ce que dit la synthèse déposée ${syntheseDeposee} : ${e}`),
     ...completude.ecarts.map((e) => `COMPLÉTUDE — ${e}. ${RAPPEL_MESURE}`),
-    ...(reservationBloque ? reservation.ecarts.map((e) => `RÉSERVATION — ${e}. ${rappelReservation(reservation)}`) : [])];
+    ...(reservationBloque ? reservation.ecarts.map((e) => `RÉSERVATION — ${e}. ${rappelReservation(reservation)}`) : []),
+    ...(critiqueBloque ? critiqueJ.ecarts.map((e) => `CRITIQUE — ${e}. ${RAPPEL_CRITIQUE}`) : [])];
   console.log(JSON.stringify({ outil: "hook-restitution --prejuger", brouillon: f, affichable: !refus.length,
     bloquants: refus, avertissements: [...avertissements.map(avecEcheance), ...detail.ecarts.map((e) => `DÉTAIL — ${e}`),
-      ...(reservation.verdict === "FAIL" && !reservationBloque ? [`RÉSERVATION (bloquante dès le ${echeanceReservation(reservation)}) — ${reservation.ecarts[0]}. ${rappelReservation(reservation)}`] : [])],
+      ...(reservation.verdict === "FAIL" && !reservationBloque ? [`RÉSERVATION (bloquante dès le ${echeanceReservation(reservation)}) — ${reservation.ecarts[0]}. ${rappelReservation(reservation)}`] : []),
+      ...(critiqueJ.verdict === "FAIL" && !critiqueBloque ? [`CRITIQUE (bloquante dès le ${BLOQUANTES_DATEES.CRITIQUE}) — ${critiqueJ.ecarts[0]}. ${RAPPEL_CRITIQUE}`] : [])],
+    critique: critiqueP ? (critiqueJ.applicable ? { verdict: critiqueJ.verdict, servis: critiqueJ.servis.length, critiques: critiqueJ.critiques.length }
+      : "sans objet : aucun fichier servi (HTML, CSS, JS) écrit dans le tour") : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
     reservation: reservation.applicable ? { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [] } : `sans objet : ${reservation.motif}`,
     completude: completude.applicable ? completude.verdict : "sans objet : le dernier message humain ne pose pas de question de complétude, ou la réponse ne s'ouvre pas sur un « oui » (ou transcript introuvable)",
     synthese_deposee: syntheseDeposee, affichage,
@@ -1496,7 +1727,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
       : "S84 non jouée : transcription introuvable (--transcript <chemin.jsonl>). Sur le brouillon seul, seule S69 juge l'heure (une heure future) ; "
         + "qu'une heure passée ait été LUE et qu'une durée ait été MESURÉE ne se voit que dans la transcription",
     non_juge: "les contrôles qui lisent le TOUR et non le texte — GESTE (réponse à un mot de décision), "
-      + "PROCÉDURE, POSSESSION, niveau Moyen : le hook de fin de tour les joue sur le transcript (DÉTAIL, TF-1851, est joué ici dès que le transcript est retrouvé) ; un brouillon affiché autrement qu'il a été préjugé n'est plus couvert" }));
+      + "PROCÉDURE, POSSESSION, niveau Moyen : le hook de fin de tour les joue sur le transcript (DÉTAIL, TF-1851, et CRITIQUE, TF-1913, sont joués ici dès que le transcript est retrouvé) ; un brouillon affiché autrement qu'il a été préjugé n'est plus couvert" }));
   process.exit(refus.length ? 1 : 0);
 }
 
@@ -1534,7 +1765,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, ecrituresDuTour: ecrit } = analyserTranscript(readFileSync(chemin, "utf8"));
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, ecrituresDuTour: ecrit, critique: critiqueTour } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
@@ -1600,6 +1831,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const possession = controlerPossession({ textesHumains, dernierTexte });
   // TF-1641 — l'EXPLICATION demandée vit dans une fiche. Avertissement seulement.
   const explication = controlerExplication({ dernierHumain, dernierTexte, fichiersMd });
+  // TF-1913 (D-82 (a)) — la CRITIQUE : un fichier servi écrit dans le tour sans verdict de critique d'implémentation daté après sa dernière
+  // écriture. Avertissante jusqu'au 02/11/2026 inclus, bloquante dès le 03/11/2026 (`BLOQUANTES_DATEES.CRITIQUE`).
+  const critique = controlerCritique({ critique: critiqueTour });
+  const critiqueBloque = critique.verdict === "FAIL" && estBloquante("CRITIQUE");
   const bloquants = fails.filter((f) => estBloquante(f.regle));
   // T2 (TF-1947, 26/10/2026) : GESTE, PROCÉDURE et DÉTAIL avertissent ; ce qui bloque encore est dit à `BLOQUANTES`.
   const avertissements = [...fails.filter((f) => !estBloquante(f.regle)), ...avertsOracle,
@@ -1609,10 +1844,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...possession.ecarts.map((e) => ({ regle: "POSSESSION", statut: "FAIL", message: e })),
     ...explication.ecarts.map((e) => ({ regle: "EXPLICATION", statut: "FAIL", message: e })),
     ...(reservation.verdict === "FAIL" && !reservationBloque
-      ? reservation.ecarts.map((e) => ({ regle: "RÉSERVATION", statut: "FAIL", message: `${e} — bloquante dès le ${echeanceReservation(reservation)}. ${rappelReservation(reservation)}` })) : [])];
+      ? reservation.ecarts.map((e) => ({ regle: "RÉSERVATION", statut: "FAIL", message: `${e} — bloquante dès le ${echeanceReservation(reservation)}. ${rappelReservation(reservation)}` })) : []),
+    ...(critique.verdict === "FAIL" && !critiqueBloque ? critique.ecarts.map((e) => ({ regle: "CRITIQUE", statut: "FAIL", message: `${e}. ${RAPPEL_CRITIQUE}` })) : [])];
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
   const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
-    && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL";
+    && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
+    && critique.verdict !== "FAIL";
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   try {
     mkdirSync(dirname(journal), { recursive: true });
@@ -1620,7 +1857,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
       portee: portee.motif,
       verdict: passe
-        ? "PASS" : ((bloquants.length || ecartsAffichage.length || completude.verdict === "FAIL" || reservationBloque)
+        ? "PASS" : ((bloquants.length || ecartsAffichage.length || completude.verdict === "FAIL" || reservationBloque || critiqueBloque)
           ? "FAIL" : "AVERTISSEMENT"),
       regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
       synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage, sceau,
@@ -1631,6 +1868,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(completude.applicable ? { completude: { verdict: completude.verdict, ecarts: completude.ecarts } } : {}),
       ...(possession.applicable ? { possession: { verdict: possession.verdict } } : {}),
       ...(explication.applicable ? { explication: { verdict: explication.verdict } } : {}),
+      // TF-1913 — la mesure de la période d'avertissement : combien de fichiers servis, combien de critiques jouées, lesquels sans verdict.
+      ...(critique.applicable ? { critique: { verdict: critique.verdict, bloquant: critiqueBloque, servis: critique.servis.map((s) => s.fichier),
+        critiques_jouees: critique.critiques.filter((c) => c.jouee).length, sans_verdict: (critique.sans || []).map((s) => `${s.fichier} (${s.motif})`) } } : {}),
       prejuge: !!prejuge,
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
@@ -1642,7 +1882,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(0);
   }
   // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
-  if (!bloquants.length && !ecartsAffichage.length && completude.verdict !== "FAIL" && !reservationBloque) {
+  if (!bloquants.length && !ecartsAffichage.length && completude.verdict !== "FAIL" && !reservationBloque && !critiqueBloque) {
     console.log(JSON.stringify({
       systemMessage: `[restitution — R-44] avertissement${avertissements.length > 1 ? "s" : ""} non bloquant${avertissements.length > 1 ? "s" : ""} : ` +
         avertissements.map((f) => `${avecEcheance(f)} — ${f.message}`).join(" · ") +
@@ -1658,6 +1898,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...ecartsAffichage.map((e) => `AFFICHAGE — ${e}`),
       ...completude.ecarts.map((e) => `COMPLÉTUDE — ${e}`),
       ...(reservationBloque ? reservation.ecarts.map((e) => `RÉSERVATION — ${e}`) : []),
+      ...(critiqueBloque ? critique.ecarts.map((e) => `CRITIQUE — ${e}`) : []),
     ]);
     process.exit(0);
   }
@@ -1669,6 +1910,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + `Le document jugé est ${fichierSynthese} : reprends-en le bloc 3 en entier plutôt qu'une version abrégée.`),
     ...completude.ecarts.map((e) => `COMPLÉTUDE — ${e}. ${RAPPEL_MESURE}`),
     ...(reservationBloque ? reservation.ecarts.map((e) => `RÉSERVATION — ${e}. ${rappelReservation(reservation)}`) : []),
+    ...(critiqueBloque ? critique.ecarts.map((e) => `CRITIQUE — ${e}. ${RAPPEL_CRITIQUE}`) : []),
     ...(prejuge ? [] : [RAPPEL_PREJUGEMENT]),
   ].join("\n");
   const enPlus = avertissements.length ? `\n(à corriger au passage, non bloquant : ${avertissements.map(avecEcheance).join(", ")})` : "";

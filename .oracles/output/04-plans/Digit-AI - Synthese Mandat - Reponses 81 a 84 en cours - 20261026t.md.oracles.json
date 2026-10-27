@@ -1,0 +1,81 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+  "date_iso": "2026-10-26T21:48:32.100Z",
+  "registre_version": "2.45.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+      "verdict": "PASS",
+      "detail": "7 constat(s) · 6 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (6 avertissement(s)) ; nombre « 20261026 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md",
+    "ts": "2026-10-26T21:48:32.099Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md": "e9e65aba5b6bd9b56b5e05aec0edc63b238be07210083e1ba44400ee45b453f8"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

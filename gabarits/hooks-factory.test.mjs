@@ -17,6 +17,8 @@
  *   5. Pré-vol par le lanceur, dans les deux sens : réponse courte exit 0, 200 mots exit 1.
  *   6. Lexique par le lanceur : « vite : » chez un produit qui porte `forge/NIVEAUX.md` injecte la
  *      ligne de niveau qui cite CE chemin ; chez un produit qui ne le porte pas, rien.
+ *  15. Critique d'implémentation exigée (TF-1913, D-82 (a)) : une page écrite sans `run-oracles-design`
+ *      est nommée avant le 03/11/2026, refusée dès cette date ; la critique jouée lève le refus.
  * Joué par oracles/self-tests.mjs (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, readFileSync, existsSync } from "node:fs";
@@ -261,8 +263,34 @@ try {
   const gApres = geste("az group delete --name rg-essai --yes");
   check("14 ter gestes distants : `--poser` par le lanceur (entrée standard ouverte) écrit le lot sous forge/, et la commande passe ensuite",
     poseG.fini && poseG.code === 0 && existsSync(join(P, "forge", "gestes-approuves.jsonl")) && gApres.status === 0, `${JSON.stringify(poseG)} ${gApres.stderr}`);
+
+  // 15 — TF-1913 (26/10/2026, D-82 (a)), la critique d'implémentation exigée par le lanceur : le juge est celui du pilot, il agit chez le produit
+  // sans recopie. Le produit jetable vit sous le dossier temporaire, où tout fichier est un brouillon : la page écrite porte donc le chemin d'un
+  // produit fictif. ROUGE : un tour qui écrit `site/x.html` sans critique → CRITIQUE nommée avec son échéance avant le 03/11, refusée à l'échéance.
+  // VERT : le même tour avec `run-oracles-design` joué après l'écriture → plus de CRITIQUE (la restitution, elle, reste jugée sur sa forme).
+  const PAGE15 = "C:\\dev\\produit-essai\\site\\x.html";
+  const ecr15 = { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id: "e15", name: "Write", input: { file_path: PAGE15, content: "<!doctype html><title>x</title>" } }] } };
+  const res15 = (id, c) => ({ type: "user", message: { role: "user", content: [{ type: "tool_result", tool_use_id: id, content: c }] } });
+  const crit15 = { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id: "c15", name: "Bash", input: { command: "node C:/dev/digit-ai-forge-design/oracles/run-oracles-design.mjs site/x.html --json-only" } }] } };
+  const tour15 = (nom, avecCritique, echeance) => {
+    const t = join(base, nom + ".jsonl");
+    writeFileSync(t, [humain, ecr15, res15("e15", "ok"), ...(avecCritique ? [crit15, res15("c15", '{"orchestrateur":"run-oracles-design","verdict":"PASS","oracles":[]}')] : []), texte(SIMPLE)]
+      .map((e) => JSON.stringify(e)).join("\n"), "utf8");
+    const r = spawnSync(process.execPath, [lanceur, "restitution"], { encoding: "utf8", cwd: P, env: { ...env, FORGE_CRITIQUE_BLOQUANTE_DES: echeance },
+      input: JSON.stringify({ session_id: "test-heritage-critique", transcript_path: t, stop_hook_active: false, cwd: P }) });
+    if (/pilot introuvable/.test(r.stderr || "")) throw new Error(`lanceur sans pilot : ${r.stderr}`);
+    try { return JSON.parse(r.stdout || "null"); } catch { return { brut: r.stdout }; }
+  };
+  const c15Avant = tour15("critique-avant", false, "2099-01-01"), c15Apres = tour15("critique-apres", false, "2026-01-01");
+  const c15Vert = tour15("critique-vert", true, "2026-01-01");
+  check("15 critique, avant l'échéance : la page écrite sans critique est NOMMÉE avec sa date, au hook du pilot atteint par le lanceur (TF-1913)",
+    c15Avant?.decision === "block" && !/CRITIQUE — /.test(c15Avant.reason || "") && /CRITIQUE \(bloquante dès le 2099-01-01\)/.test(c15Avant.reason || ""), JSON.stringify(c15Avant)?.slice(0, 300));
+  check("15 bis critique, à l'échéance : le MÊME tour est refusé sur CRITIQUE, la session chargée de jouer la critique elle-même",
+    c15Apres?.decision === "block" && /CRITIQUE — le tour a écrit 1 fichier\(s\) servi\(s\)/.test(c15Apres.reason || "") && /TOI-MÊME/.test(c15Apres.reason || ""), JSON.stringify(c15Apres)?.slice(0, 300));
+  check("15 ter critique, le remède joué : la critique lancée après l'écriture lève le refus CRITIQUE",
+    c15Vert?.decision === "block" && !/CRITIQUE — /.test(c15Vert.reason || "") && !/CRITIQUE \(bloquante/.test(c15Vert.reason || ""), JSON.stringify(c15Vert)?.slice(0, 300));
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913)`);

@@ -1,0 +1,81 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+  "date_iso": "2026-10-26T18:42:26.613Z",
+  "registre_version": "2.45.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+      "verdict": "PASS",
+      "detail": "6 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; pourcentage « 81% » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md",
+    "ts": "2026-10-26T18:42:26.613Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md": "22e2a11ccd07c194c5b6b966c55bd962484ffaa985adcfe6d75428343f6497aa"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

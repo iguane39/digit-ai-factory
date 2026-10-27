@@ -35,6 +35,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` | fichier | 9,0 Ko | Synthèse Étude — un relecteur d'intention voit les dérives à condition d'avoir une consign |
 | `Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md` | fichier | 13,6 Ko | Synthèse L99 — le prompt « relecteur critique qui garde l'intention » est analysé et réécr |
 | `Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md` | fichier | 13,3 Ko | Synthèse Mandat — A-1 à A-8 du reste à faire, traités le 19/10/2026 au soir |
+| `Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md` | fichier | 14,1 Ko | Synthèse Mandat — A-1 et A-2 : indices du 19/10 levés, revue hebdomadaire rendue (26/10/20 |
 | `Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` | fichier | 9,9 Ko | Synthèse Mandat — votre décision D-56 est exécutée : le sas est vide, 1 lot sur 5 est entr |
 | `Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` | fichier | 10,3 Ko | Synthèse Mandat — 4 lots du sas accueillis, 3 ingérés au registre (7 candidats), publicati |
 | `Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` | fichier | 9,9 Ko | Synthèse Mandat — affichage double de la réponse corrigé, et revue hebdomadaire accélérée  |
@@ -114,6 +115,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` | fichier | 7,1 Ko | Synthèse Mandat — campagne du matin reprise et close, relecteur du lecteur visé construit  |
 | `Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md` | fichier | 7,9 Ko | Synthèse Mandat — réponses « 68a, 69a, 70a, 73b » : registre à jour, T1 engagée, relecture |
 | `Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md` | fichier | 6,7 Ko | Synthèse Mandat — réponses 75c, 76c, 77b, 78c et 80b : quatre chantiers lancés, D-79 expli |
+| `Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md` | fichier | 8,3 Ko | Synthèse Mandat — réponses 81 à 84 : trois sur quatre livrées, la quatrième en constructio |
 | `Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` | fichier | 4,7 Ko | Synthèse Mandat — reprise multi-poste construite, fusionnée avec l'autre poste, publicatio |
 | `Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` | fichier | 9,5 Ko | Synthèse Mandat — vos réponses 1a, 2a et 3b exécutées, reprise multi-poste prête à publier |
 | `Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` | fichier | 3,5 Ko | Synthèse Mandat — reprise réseau de l'installateur publiée, chantier d'installation sans q |
@@ -132,4 +134,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_112 fichier(s), 3 sous-dossier(s)_ · 14 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_114 fichier(s), 3 sous-dossier(s)_ · 15 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
