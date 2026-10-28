@@ -101,7 +101,9 @@ défaillance est **silencieux**, l'effet **immédiat**, la perte **définitive**
 ce fait au plus haut.
 
 **La procédure de migration DNS et son ORDRE — qui EST le correctif — vit chez forge-ops**
-(`docs/migration-dns.md`), avec le contrôle de différence qui en est l'étape 3.
+(`references/GESTES-EXPLOITATION.md`, section G-03), avec le contrôle de différence qui en est
+l'étape 3 (`scripts/verifier-migration-dns.mjs --diff`) ; renvoi corrigé le 28/10/2026, l'ancien
+chemin `docs/migration-dns.md` n'existait pas.
 
 ### Redirections : ce qui les fait fonctionner, et ce qui les casse
 
