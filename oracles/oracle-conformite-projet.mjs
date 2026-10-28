@@ -1497,7 +1497,10 @@ else {
   // et `az.sess`), commis trois minutes plus tard ; ce contrôle a rendu PASS sur ce commit même,
   // parce que R-14 ne connaissait que `.env`. Le profil était vide par hasard. Le motif porte sur le
   // NOM du fichier, indépendamment du dossier qui le porte : c'est la propriété qui manquait.
-  const PROFILS_AUTH = /(^|\/)(azureProfile\.json|msal_token_cache[^/]*|az\.sess|\.databrickscfg|accessTokens\.json|credentials\.json|application_default_credentials\.json|\.supabase\/access-token|\.env\.keys)$/i;
+  // TF-2000 (28/10/2026) : `.dev.vars` et ses variantes par environnement portent les secrets locaux de
+  // wrangler (developers.cloudflare.com/workers/configuration/secrets/, lu le 28/10/2026) ; un modèle
+  // `.example` ou `.sample` reste versionnable.
+  const PROFILS_AUTH = /(^|\/)(azureProfile\.json|msal_token_cache[^/]*|az\.sess|\.databrickscfg|accessTokens\.json|credentials\.json|application_default_credentials\.json|\.supabase\/access-token|\.env\.keys|\.dev\.vars(\.(?!example$|sample$)[^/]+)?)$/i;
   const profils = git("ls-files").stdout.split(/\r?\n/).filter((f) => PROFILS_AUTH.test(f));
   profils.length
     ? ko("R-14", profils[0], `${profils.length} fichier(s) de PROFIL D'OUTIL D'AUTHENTIFICATION versionné(s) (${profils.slice(0, 4).join(", ")}${profils.length > 4 ? ", …" : ""}) — ` +

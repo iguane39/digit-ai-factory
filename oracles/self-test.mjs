@@ -2690,6 +2690,26 @@ check("Supabase rouge : `.supabase/access-token` et `supabase/.env.keys` commis 
     if (/docs\/access-token/.test(r14.message)) throw new Error(`R-14 accuse un access-token hors .supabase/ : ${r14.message}`);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
+// Cloudflare Workers (28/10/2026, TF-2000) : « The `.dev.vars` and `.env` files should not be committed
+// to git. Add `.dev.vars*` and `.env*` to your project's `.gitignore` file. »
+// (developers.cloudflare.com/workers/configuration/secrets/, lu le 28/10/2026). Un modèle sans valeur
+// (`.dev.vars.example`) reste versionnable.
+check("Wrangler rouge : `.dev.vars` et `.dev.vars.staging` commis → R-14 FAIL, les deux nommés ; `.dev.vars.example` n'est pas accusé", () => {
+  const d = projet1284({ "README.md": "# p\n", ".dev.vars": "x\n", "worker/.dev.vars.staging": "x\n", ".dev.vars.example": "CLE=\n" });
+  try {
+    const f = r1284(d);
+    const r14 = f.find((x) => x.regle === "R-14" && x.statut === "FAIL" && /PROFIL/.test(x.message));
+    if (!r14 || !/\(\.dev\.vars[,)]/.test(r14.message) || !/\.dev\.vars\.staging/.test(r14.message)) throw new Error(`R-14 ne voit pas les fichiers de secrets de wrangler : ${JSON.stringify(f)}`);
+    if (/\.dev\.vars\.example/.test(r14.message)) throw new Error(`R-14 accuse le modèle .dev.vars.example : ${r14.message}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("Wrangler vert : seul `.dev.vars.example` commis → R-14 PASS sur les profils", () => {
+  const d = projet1284({ "README.md": "# p\n", ".dev.vars.example": "CLE=\n" });
+  try {
+    const f = r1284(d);
+    if (f.some((x) => x.regle === "R-14" && x.statut === "FAIL")) throw new Error(`R-14 accuse un modèle sans valeur : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
 check("TF-1284 remède joué : `git rm -r --cached C` puis commit → R-14 et R-28 PASS (TF-1013)", () => {
   const d = projet1284({ "README.md": "# p\n", "C/azureProfile.json": "{}\n", "C/az.sess": "{}\n" });
   try {

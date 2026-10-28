@@ -83,6 +83,18 @@ check("vert — Supabase : migrations et config.toml restent versionnables (« s
   for (const rel of ["supabase/config.toml", "supabase/migrations/20261016000000_init.sql", "supabase/functions/notifier/index.ts"])
     if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
 });
+// Cloudflare Workers (28/10/2026, TF-2000) : secrets locaux de wrangler et données locales des
+// bindings, d'après developers.cloudflare.com/workers/configuration/secrets/ et
+// developers.cloudflare.com/workers/development-testing/local-data/, lus le 28/10/2026.
+check("rouge → vert — wrangler : le gitignore socle ignore .dev.vars, ses variantes et .wrangler/", () => {
+  for (const rel of [".dev.vars", ".dev.vars.production", "worker/.dev.vars.staging", ".wrangler/state/v3/d1/base.sqlite", "worker/.wrangler/tmp/bundle.js"])
+    if (!socle.ignore(rel)) throw new Error(`${rel} n'est pas ignoré par gabarits/gitignore-produit`);
+  if (vide.ignore(".dev.vars")) throw new Error("la recette ne distingue pas avec et sans règle");
+});
+check("vert — wrangler : la configuration et le modèle sans valeur restent versionnables", () => {
+  for (const rel of ["wrangler.jsonc", "wrangler.toml", ".dev.vars.example", "worker/.dev.vars.example"])
+    if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
+});
 // TF-1750 (D-5 (a) du 15/10/2026) : ce que le programme écrit en service vit sous var\, ignoré.
 const heritage = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
 check("rouge → vert — TF-1750 : le gitignore socle ignore var\\ (fichiers déposés, journaux, base locale)", () => {
