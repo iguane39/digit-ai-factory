@@ -69,6 +69,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` | fichier | 514,7 Ko | JSON |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` | fichier | 190,2 Ko | Inventaire — fonctionnalités de Cloudflare, GitHub et Supabase (28/10/2026) |
-| `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 4,5 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
+| `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 5,1 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
 
 _52 fichier(s), 2 sous-dossier(s)_

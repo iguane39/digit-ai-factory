@@ -16,6 +16,14 @@ alertes de vulnérabilité. Seul forge-development protège sa branche principal
 publication de la Factory n'est donc jugée que par la porte locale du poste qui publie, sauf sur
 ces 6 forges. Ce relevé répond à TF-2005, sur décision humaine du 28/10/2026 (« Fais P1 & P2 & A1 & A2 »).
 
+**État après D-89, à 10:39.** Sur décision humaine D-89 (a) et (b) du 28/10/2026 (« a + b »), la
+détection des secrets et le blocage des envois ont été activés sur les 8 dépôts qui ne les avaient
+pas, et les alertes de vulnérabilité de Dependabot sur les 14. Le relevé rejoué à 10:39 rend 14
+dépôts sur 14 avec les trois réglages actifs. Les mises à jour de sécurité de Dependabot, les
+rulesets et la protection de branche n'ont pas été touchés. Retour arrière : le même appel avec
+`disabled`, et `DELETE repos/iguane39/<d>/vulnerability-alerts`. Le tableau ci-dessous garde l'état
+d'avant, à 10:25.
+
 ## Relevé
 
 Le relevé est en lecture seule, fait le 28/10/2026 à 10:25 (heure de Paris) par `gh api`, avec

@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 93 services · 77 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 95 services · 79 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -151,7 +151,7 @@
 | cat-sec-02 | **Scanner les appels d'outils (dynamique)** | détecter les patterns d'attaque dans un journal d'exécution d'agent | `node oracles\oracle-scan-toolcalls.mjs <journal.jsonl> --perimetre <racine>` | TF-0111 (12/08) : chaque pattern prouvé rouge avec son cas légitime voisin vert (faux positifs mesurés) | prouve | experimental |
 | cat-asc-03 | **Rejouer un corpus d'injection de prompt** | savoir si une charge d'injection a TRAVERSÉ jusqu'à un acte de mon agent | `node oracles\oracle-corpus-injection.mjs <cible>` | TF-0188 (14/08) : self-test 38 PASS (24 avant), dont 2 voisins légitimes qui NE déclenchent pas. Rejeu PASSIF sur artefact : aucun modèle sollicité, donc la résistance d'un système vivant n'est pas mesurée | prouve | experimental |
 
-## forge-websec (sur mandat) — 5 services
+## forge-websec (sur mandat) — 7 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -160,6 +160,8 @@
 | cat-wsc-03 | **Tenir un contrat de sécurité ASVS L1** | m'engager sur un niveau de sécurité vérifiable et daté | `referentiels\asvs-l1.md (frontmatter challenge_date)` | référentiel curé sur le texte source OWASP — vérification partiellement outillée, le reste en revue humaine | declare | experimental |
 | cat-wsc-04 | **Méthode de test de sécurité (WSTG curé)** | savoir COMMENT vérifier une exigence de sécurité, cas par cas | `referentiels\wstg-cas.md` | TF-0186 (14/08) : curation sur le sommaire WSTG 4.2, énumération datée et à recouper au dépôt source — 20 des 28 cas restent manuels, 5 seulement rendus par un oracle exécuté | declare | experimental |
 | cat-wsc-05 | **Scanner dynamiquement (DAST, sur mandat)** | faire exécuter un scan actif contre une cible que j'ai le droit de tester | `node oracles\oracle-dast.mjs --cible <url> --autorisation <fichier.json>` | TF-0187 (14/08) : 7 verrous cumulatifs, self-test 36 PASS ; garde-fou rejoué au pilot (cible non listée -> FAIL « rien n'a été émis », sans autorisation -> FAIL). Exécution ZAP réelle NON prouvée : binaire absent du poste — D-W1 requalifiée, pas close | prouve | experimental |
+| cat-wsc-06 | **Juger le durcissement des workflows GitHub Actions** | savoir si les workflows de mon produit donnent trop de droits, tirent des actions non épinglées ou exposent un secret | `node oraclesoracle-workflows.mjs <dossier .github/workflows>` | TF-2001 (28/10/2026) : recette 42 PASS 18 FAIL avant, 61 PASS après ; joué en lecture seule sur 15 workflows de 4 produits, 58 constats dont 8 majeurs | prouve | experimental |
+| cat-wsc-07 | **Juger un fichier _headers avant déploiement** | savoir avant de déployer si les en-têtes de sécurité déclarés pour Cloudflare Workers ou Pages tiennent | `node oraclesoracle-exposition-statique.mjs <fichier _headers>` | TF-1996 (28/10/2026) : recette 61 PASS 16 FAIL avant, 77 PASS après ; 3 équivalences capture et _headers lèvent les mêmes règles | prouve | experimental |
 
 ---
 

@@ -90,7 +90,7 @@ Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [cata
 - **forge-seo-geo** (sur mandat) : **Créer une mission d'audit SEO** · **Dérouler l'audit 87 nœuds** · **Valider forge et mission** · **Rapport HTML vérifié** · *Runs de suivi récurrents (déclaré)* · **Instrumentation de crawl avancée** · **Scorer et écrire le CSV d'actions**
 - **forge-organization** (sur mandat) : **Doctrine des conventions** · **Composant filtres-tableau** · *Études normatives (déclaré)* · **Gate de conventions packagé**
 - **forge-agents-security** (sur mandat) : **Scanner un agent (statique)** · **Scanner les appels d'outils (dynamique)** · **Rejouer un corpus d'injection de prompt**
-- **forge-websec** (sur mandat) : **Juger l'exposition runtime** · **Scanner les dépendances vulnérables (SCA)** · *Tenir un contrat de sécurité ASVS L1 (déclaré)* · *Méthode de test de sécurité (WSTG curé) (déclaré)* · **Scanner dynamiquement (DAST, sur mandat)**
+- **forge-websec** (sur mandat) : **Juger l'exposition runtime** · **Scanner les dépendances vulnérables (SCA)** · *Tenir un contrat de sécurité ASVS L1 (déclaré)* · *Méthode de test de sécurité (WSTG curé) (déclaré)* · **Scanner dynamiquement (DAST, sur mandat)** · **Juger le durcissement des workflows GitHub Actions** · **Juger un fichier _headers avant déploiement**
 
 <!-- CATALOGUE:FIN -->
 

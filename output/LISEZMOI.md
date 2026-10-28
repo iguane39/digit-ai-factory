@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 547 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 548 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -246,7 +246,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json | 20261028a | 514.7 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` |
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 190.2 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` |
-| Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md | 20261028a | 4.5 Ko | `03-etudes/Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` |
+| Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md | 20261028a | 5.1 Ko | `03-etudes/Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` |
 
 ### 04-plans
 
@@ -509,6 +509,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md | 20261015g | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015g.md` |
 | Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md | 20261026e | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md` |
 | Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md | 20261013i | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` |
+| Digit-AI - Synthese Mandat - Competences Cloudflare GitHub Supabase construites - 20261028a.md | 20261028a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Cloudflare GitHub Supabase construites - 20261028a.md` |
 | Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
