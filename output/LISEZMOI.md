@@ -474,7 +474,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md | 20261001f | 11.9 Ko | `04-plans/Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` |
 | Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md | 20261015b | 8.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` |
 | Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md | 20261016f | 7.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` |
-| Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 6.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` |
+| Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 6.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md | 20261017a | 24.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` |
 | Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md | 20261018b | 11.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` |
 | Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md | 20261017b | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` |

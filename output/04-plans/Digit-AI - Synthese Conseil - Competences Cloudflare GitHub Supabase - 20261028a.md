@@ -10,7 +10,7 @@ L'étude est faite : les trois plateformes sont inventoriées en entier, 793 fon
 
 ## 1. En-tête d'identification
 
-Run de conseil, exécution du prompt « Competences Cloudflare GitHub Supabase dans les forges » version a, sur le pilot `digit-ai-factory` et en lecture des 13 forges. Période : 28/10/2026 de 09:35 à 10:07, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 3 agents `redacteur` Sonnet 5.5, un par plateforme, en parallèle.
+Run de conseil, exécution du prompt « Competences Cloudflare GitHub Supabase dans les forges » version a, sur le pilot `digit-ai-factory` et en lecture des 13 forges. Période : 28/10/2026 de 09:35 à 10:09, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 3 agents `redacteur` Sonnet 5.5, un par plateforme, en parallèle.
 
 Intention de la demande : savoir quelles compétences construire dans les forges pour travailler sur des produits qui emploient Cloudflare, Cloudflare Pages, GitHub, GitHub Actions et Supabase.
 
@@ -41,6 +41,7 @@ Rien n'attend de décision dans ce tour. Les 17 propositions entrent au registre
 - **Registre.** TF-1994 à TF-2010 écrits par `journaliser.mjs`, verdict PASS avant et après ; un fait corrigé avant l'écriture (`claude-code-action` est dans 1 workflow, pas 3).
 - **Renvoi cassé corrigé** dans la fiche des faits fournisseurs : la procédure DNS de forge-ops était citée sous un chemin qui n'existe pas. Elle pointe désormais sur la section G-03 et sur son script de vérification.
 - **Livrables.** L'étude et l'inventaire, en Markdown et en données JSON, sont dans `output\03-etudes\`. Le contrôle d'écriture a d'abord rendu exit 1 (un titre, un nombre en lettres), puis exit 0 après correction. Le balayage des formes de secret ne trouve rien.
+- **Publication du pilot** sous le GO permanent `D-54 (b) du 03/10` : `git push` exit 0, 35ec766e..830b248a, puis `git rev-list --left-right --count` rend 0 0 à 10:09.
 
 Relecture d'intention : sans objet, motif : la relecture de la consigne des agents, rappelée par le hook, n'a pas été jouée avant leur lancement ; les catalogues ont été relus à réception par la session pilote, échantillon compris.
 
@@ -68,7 +69,6 @@ Relecture d'intention : sans objet, motif : la relecture de la consigne des agen
 |---|---|---|---|---|---|
 | A-1 | TF-2000, TF-2005, TF-2001 | manuelle_utilisateur | décision de construire, revient au porteur | répondre « A-1 » pour lancer un mandat sur les trois compétences P1, ou attendre la revue hebdomadaire | les motifs wrangler, la protection côté serveur des 14 dépôts et le contrôle des workflows restent absents |
 | A-2 | TF-1994 à TF-1996, TF-2006, TF-2010 | manuelle_utilisateur | décision de construire, revient au porteur | répondre « A-2 » pour un mandat Cloudflare sur le modèle du 16/10 | le premier produit Cloudflare se déploie par essais |
-| A-3 | neuve | auto_ia | non exécutée : la publication du pilot suit le GO permanent R-38 §6 au prochain envoi groupé | `git push origin main` sous la porte de publication | l'étude reste sur ce poste |
 
 ## 9. Traces
 

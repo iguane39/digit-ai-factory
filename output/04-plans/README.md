@@ -27,7 +27,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` | fichier | 11,9 Ko | Revue hebdomadaire des propositions — 2026-10-01 |
 | `Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` | fichier | 8,4 Ko | Synthèse Conseil — pourquoi « audit complet » part encore vers forge-tests, et comment le  |
 | `Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` | fichier | 7,1 Ko | Synthèse Conseil — faire tourner L99 en boucle jusqu'à un score, étude d'opportunité (16/1 |
-| `Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 6,9 Ko | Synthèse Conseil — compétences Cloudflare, GitHub et Supabase identifiées, 17 propositions |
+| `Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 6,8 Ko | Synthèse Conseil — compétences Cloudflare, GitHub et Supabase identifiées, 17 propositions |
 | `Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` | fichier | 24,9 Ko | Synthèse Conseil — 12 décisions à trancher, une qualification de noms et 4 gestes humains  |
 | `Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` | fichier | 11,1 Ko | Synthèse Conseil — la flotte d'agents tient par ses gardes, pas par sa définition : 15 éca |
 | `Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` | fichier | 10,4 Ko | Synthèse Conseil — trois formats pour qu'une décision se comprenne et se tranche sans rien |
