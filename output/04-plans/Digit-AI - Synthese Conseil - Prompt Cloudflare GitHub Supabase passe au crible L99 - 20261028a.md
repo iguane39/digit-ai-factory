@@ -53,6 +53,9 @@ Le score se lit dimension par dimension (avant → après projeté) : clarté de
   - étude nommée selon R-4 et R-25 et contrat de sortie (majeur) ;
   - Pages et Actions traités comme produits de leur plateforme (mineur) ;
   - section Factory distincte (mineur).
+- **Contrôles joués** : `oracle-ecriture` sur le prompt réécrit, exit 1 puis exit 0 après un titre corrigé ; `hook-restitution --prejuger` sur cette synthèse, aucun bloquant.
+
+Relecture d'intention : sert.
 
 ## 5. Non traité
 
@@ -76,8 +79,10 @@ Tous relèvent de la manière d'exécuter ; aucun n'ajoute au livrable un conten
 
 ## 8. Prochaines actions
 
-- **manuelle_utilisateur** : relire le prompt réécrit, puis dire « exécute le prompt » pour lancer l'étude.
-- **auto_ia** : à l'exécution, rejouer l'étape 0 avant tout travail.
+| Sélecteur | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |
+|---|---|---|---|---|---|
+| A-1 | neuve | manuelle_utilisateur | lancer le run revient au porteur | relire le prompt réécrit, puis écrire « exécute le prompt » | l'étude n'est pas produite, aucune compétence n'entre au registre |
+| A-2 | neuve | auto_ia | non exécutée : dépend de A-1 | `node bootstrap.mjs --pull`, puis rejouer les 8 mesures d'accès de l'étape 0 | catalogue bâti sur un accès non vérifié du jour |
 
 ## 9. Traces
 
