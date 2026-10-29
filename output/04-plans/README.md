@@ -52,6 +52,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` | fichier | 9,9 Ko | Synthèse Mandat — affichage double de la réponse corrigé, et revue hebdomadaire accélérée  |
 | `Digit-AI - Synthese Mandat - Archives classees en sous-dossiers - 20261016h.md` | fichier | 9,0 Ko | Synthèse Mandat — archives d'input et d'output classées en sous-dossiers (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md` | fichier | 7,0 Ko | Synthèse Mandat — « audit complet » ouvre désormais forge-audit, chez tous les produits (1 |
+| `Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md` | fichier | 8,9 Ko | Synthèse Mandat — bases de développement et de qualification : 3 compétences construites,  |
 | `Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` | fichier | 9,6 Ko | Synthèse Mandat — seuil relevé à 4 millions, boucle de correction et relecteur renforcé en |
 | `Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` | fichier | 6,1 Ko | Synthèse Mandat — boucle de correction, relecteur renforcé et seuil de 4 millions enregist |
 | `Digit-AI - Synthese Mandat - Campagne D-41 - 20261019e.md` | fichier | 13,6 Ko | Synthèse Mandat — campagne D-41 (a), suites des études des favoris TikTok, 19/10/2026 |
@@ -157,4 +158,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_137 fichier(s), 3 sous-dossier(s)_
+_138 fichier(s), 3 sous-dossier(s)_

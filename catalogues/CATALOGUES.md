@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 95 services · 79 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 97 services · 81 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -44,7 +44,7 @@
 | cat-dev-06 | **Gate anti-patterns IA** | bloquer imports fantômes, secrets en dur et routes sans auth avant merge | `digit-ai-forge-development\conductor\gates\ai_antipatterns_gate.py` | TF-0103 (12/08) : 15 tests double sens, 0 faux positif sur conductor entier | prouve | experimental |
 | cat-dev-07 | **Gate de mutation (3e métrique)** | mesurer la force réelle de mes tests, pas seulement leur couverture | `digit-ai-forge-development\conductor\gates\mutation_gate.py + job CI mutation` | TF-0103 (12/08) : mesure réelle Docker 61,1 % (223/365) — honnête, sous seuil, consignée | prouve | experimental |
 
-## forge-tests (pipeline) — 8 services
+## forge-tests (pipeline) — 9 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -56,6 +56,7 @@
 | cat-tst-06 | **Impact par diff, flaky, propriétés, mutation par risque** | auditer moins mais juste : cibler par diff, isoler les flaky, proposer du property-based | `forge_tests\{impact,flaky,generateur_proprietes}.py · risque.repartir_mutants` | TF-0104 (12/08) : 14 tests dédiés dont 2 bout-en-bout git réel — CÂBLAGE CLI RESTANT (services non invocables par flag) | declare | experimental |
 | cat-tst-07 | **Rapport exhaustif test-par-test** | obtenir le verdict et le pourquoi de CHAQUE test, pas seulement un agrégat par pan | `forge_tests\noyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, self-test noyau vert, pytest 154 rejoué pilot ; v0 — branchement des adaptateurs (--junitxml → essais réels) = jalon d'intégration | prouve | experimental |
 | cat-tst-08 | **Juger un catalogue de traductions** | savoir si mes traductions sont COMPLÈTES, si leurs paramètres sont intacts et si mes libellés d'action sont constants — sans attendre un build servi | `forge_tests\catalogue_i18n.py, câblé au pan `i18n` (aucun modèle appelé)` | TF-0383 (19/08) : sur un produit client livré, le pan rendait SKIP / 0 finding et rend FAIL / 5 findings nommés — 150 clés manquantes sur 245 pour 5 des 7 locales déclarées, servies par le repli sans le dire. 19 tests double sens ; la JUSTESSE d'une traduction est déclarée non jugée | prouve | experimental |
+| cat-tst-09 | **Fabrique de données chargée en base** | obtenir un jeu de données synthétique tiré de mes migrations SQL, qui se charge sans rejet dans une base PostgreSQL | `uv run python -m forge_tests.fabrique_donnees <projet> --sortie <jeu.sql> [--graine N] [--volume N]` | TF-2012 (29/10/2026, commit 28269f6) : 44 tests, banc vert chargé sur PostgreSQL 16, bancs rouges attrapés (violation de contrainte, courriel hors domaine réservé refusé avant écriture) | prouve | experimental |
 
 ## forge-agents (transverse) — 12 services
 
@@ -74,7 +75,7 @@
 | cat-agt-11 | **Fixer la barre d'un livrable** | trouver, prouver (test d'existence exécuté) et décomposer la référence externe qui fixe le niveau d'un livrable — pré-vol d'un prompt ou en ligne d'une boucle | `skill la-barre — invocation : « barre… » en tête de message ; registre : .claude\skills\la-barre\references\registre-barres.md` | usages réels : pré-vol TF-0083 (11/08, 3 barres data), campagne catalogues (12/08), TF-0153 (13/08, barre Allure), run Produit-10 (13/08 : protocole tenu intégralement, arrêt au pas 5, garde anti-gameable exercé) | prouve | production |
 | cat-agt-13 | **Construire un plan d'amélioration post-audit** | recevoir un plan d'amélioration multi-domaines joint aux actions de remédiation d'un audit, jugé contre son contrat et rendu en page | `skill plan-d-amelioration — node .claude\skills\plan-d-amelioration\scripts\joindre.mjs plan.json --actions <yaml> --controles <json>, puis oracle-plan-d-amelioration.mjs et rendre.mjs` | TF-1234 (12/10/2026) : recette du skill 36/36, paire rouge/verte au manifeste de quality-oracles (434 contrôles PASS) ; gabarit de page jugé par forge-design (TF-1236, verdict « Livrer »). Aucune mission réelle encore : statut declare | declare | experimental |
 
-## forge-ops (transverse) — 7 services
+## forge-ops (transverse) — 8 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -85,6 +86,7 @@
 | cat-ops-05 | **Drift O-6 et verdict rollback SLO** | détecter la dérive déclaré↔constaté et savoir quand recommander un retour arrière | `node oracles\oracle-ops.mjs --drift <f> <cible> · --verdict-rollback <mesures> --seuils <f>` | TF-0107 (12/08) : 3 classes de dérive invisibles à O1-O4, chacune PASS-avant/FAIL-après au self-test | prouve | experimental |
 | cat-ops-06 | **Plans plan-first d'un produit data** | préparer la promotion d'un bundle Databricks et d'un projet Power BI entre espaces de travail, publication sur GO humain | `node scripts\ops.mjs plan databricks-bundle\|powerbi-workspace <build> --sortie plan.json + oracle O-5` | TF-0865 (07/09) : self-test forge-ops, O-5 PASS sur les deux plans générés | prouve | experimental |
 | cat-ops-07 | **Préparer et relever des campagnes Google Ads** | générer l'import web d'un plan de campagnes confronté aux modèles de l'écran Importations, relever le compte en lecture seule contre le plan et la diffusion, calculer le fichier des changements | `node scripts\google-ads\google-ads.mjs (import-web \| releve \| delta \| avant-depense \| --self-test)` | TF-1364 (13/10/2026) : recette 51/51 sur données factices, recette de forge-ops 163/0 ; générateur joué contre les vrais modèles d'un produit (46 colonnes, 0 défaut). Aucune lecture d'un compte réel par la version générique : statut declare | declare | experimental |
+| cat-ops-08 | **Remettre à zéro une base hors production** | vider et reconstruire ma base de développement ou de qualification à la demande, sans jamais toucher la production | `node scripts\ops.mjs reinitialiser-base <declaration.json> <cible> [--executer]` | TF-2013 (29/10/2026, commits 6812c96 et fe717c2) : self-test 278 PASS hors ligne, 287 PASS avec exercice réel sur conteneur postgres:16-alpine | prouve | experimental |
 
 ## forge-data (transverse) — 13 services
 
