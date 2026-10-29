@@ -90,6 +90,7 @@ Tous relèvent de la manière d'exécuter ; aucun n'ajoute au livrable un conten
 |---|---|---|---|---|---|
 | A-1 | neuve | manuelle_utilisateur | lancer le run revient au porteur | relire le prompt réécrit, puis écrire « exécute le prompt » | l'étude n'est pas produite, aucun manque n'entre au registre |
 | A-2 | neuve | auto_ia | non exécutée : dépend de A-1 | `node bootstrap.mjs --pull`, puis rejouer le relevé de l'étape 0 sur les 14 dépôts | inventaire bâti sur un relevé de 8 dépôts |
+| A-3 | neuve | manuelle_utilisateur | publier un livrable exige votre GO (R-38), le push a été refusé à 09:15 | dire « publie », puis `FORGE_PUSH_GO="<vos mots>" git push origin main` | les deux fichiers restent sur ce poste seul, invisibles de l'autre poste |
 
 ## 9. Traces
 

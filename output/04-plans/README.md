@@ -33,7 +33,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` | fichier | 11,1 Ko | Synthèse Conseil — la flotte d'agents tient par ses gardes, pas par sa définition : 15 éca |
 | `Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` | fichier | 10,4 Ko | Synthèse Conseil — trois formats pour qu'une décision se comprenne et se tranche sans rien |
 | `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
-| `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,0 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
+| `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
 | `Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md` | fichier | 8,7 Ko | Synthèse Conseil — 4 sujets traitables tout de suite, 2 sur un mot de vous, le reste atten |
