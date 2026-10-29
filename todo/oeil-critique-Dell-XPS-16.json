@@ -13,5 +13,14 @@
   "Majeures posées : D-75 à D-79, recommandations scellées à 15:15 (todo/oeil-critique-scelles.jsonl).",
   "Majeures en attente : collisions de numéros entre postes, suivi annoncé sans porteur, heure d'en-tête saisie à la main.",
   "Écartés : 2 constats au test de généralité, 1 conforme à la règle des secrets (5 premiers caractères et longueur)."
- ]
+ ],
+ "indicateurs": {
+  "demandes": 122,
+  "reprises": 47,
+  "consignes_repetees": 13,
+  "messages_hors_demande": 76,
+  "refus_hook": 73
+ },
+ "indicateurs_source": "lus dans la sortie de ce repère le 29/10/2026 (oeil-critique 1.2.0, D-95 (b)) ; la méthode des messages hors demande n est pas comparable au 2,0 de départ",
+ "palier": null
 }
