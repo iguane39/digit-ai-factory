@@ -310,7 +310,10 @@ export function contexteNiveau(message, ref = "references\\NIVEAUX.md") {
  * « D-99 (a) exécutée » ne la repose pas. Tout ce qui manque (transcription absente, illisible, import
  * impossible) rend le silence : un détrompeur qui échoue ne retient jamais le message.
  */
-const ACTION_CITEE = /(?<![\p{L}\p{N}_-])A\s*-?\s*\d{1,2}(?![\p{L}\p{N}])/iu;
+// Œil critique du 29/10/2026 : insensible à la casse, la forme lisait le verbe « a » suivi d'un nombre
+// (« il y a 2 jours », « il a 3 options ») comme un sélecteur d'action, et taisait le rappel. Le « a »
+// minuscule ne vaut sélecteur que collé au nombre (« a1 », « a-2 »).
+const ACTION_CITEE = /(?<![\p{L}\p{N}_-])(?:A\s*-?\s*|a-?)\d{1,2}(?![\p{L}\p{N}])/u;
 const DECISION_POSEE = /(?:^|\n)[ \t]*>[ \t]*\*{0,2}[ \t]*D[ \t]*-?[ \t]*(\d{1,3})[ \t]*\*{0,2}[ \t]*[—–-][^\n]*\?/g;
 const QUEUE_DE_TRANSCRIPTION = 4 * 1024 * 1024;
 

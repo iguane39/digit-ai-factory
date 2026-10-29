@@ -8,3 +8,8 @@
 {"type":"choix","decision":"D-77","choix":"b","recommandation":"b","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-26T14:59:19.142Z"}
 {"type":"choix","decision":"D-78","choix":"c","recommandation":"c","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-26T14:59:19.223Z"}
 {"type":"choix","decision":"D-79","choix":"c","recommandation":"b","accord":false,"poste":"Dell-XPS-16","ts":"2026-10-26T16:00:01.828Z"}
+{"type":"scelle","decision":"D-98","option":"a","motif":"6 contournements confirmés par rejeu ; les corriger un à un avec leur cas rouge suffit, un analyseur shell commun est un chantier à part","poste":"Dell-XPS-16","ts":"2026-10-29T18:37:24.008Z"}
+{"type":"scelle","decision":"D-99","option":"b","motif":"13 manques de forge dans 6 lots sur 7 ; une carte seule se contourne par « hors carte », il faut un écart motivé et refusé sinon","poste":"Dell-XPS-16","ts":"2026-10-29T18:37:24.095Z"}
+{"type":"scelle","decision":"D-100","option":"a","motif":"règle neuve : la mesurer en avertissement avant de bloquer, 8 occurrences sur 4 lots ne disent pas encore son bruit","poste":"Dell-XPS-16","ts":"2026-10-29T18:37:24.219Z"}
+{"type":"scelle","decision":"D-101","option":"b","motif":"17 refus sur 51 visaient une réponse sans écriture, dont 4 de 151 à 170 mots ; le détecteur seul ne les évite pas","poste":"Dell-XPS-16","ts":"2026-10-29T18:37:24.338Z"}
+{"type":"scelle","decision":"D-102","option":"a","motif":"l inscription vit à l accueil du premier lot par choix ; signaler les produits actifs hors table suffit à rendre la porte des noms consciente","poste":"Dell-XPS-16","ts":"2026-10-29T18:37:24.457Z"}

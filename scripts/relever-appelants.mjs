@@ -63,6 +63,13 @@ export function relever(racine, { tous = false } = {}) {
   const estCible = tous ? (f) => EST_SCRIPT.test(f) : (f) => EST_CONTROLE.test(basename(f));
   const estAppelant = tous ? EST_APPELANT_TOUS : EST_APPELANT;
   const controles = tous_.filter((f) => estCible(f) && !EST_RECETTE(f));
+  // Œil critique du 29/10/2026 : un hook git (`.git/hooks/pre-commit`, sans extension) et un workflow
+  // (`.github/workflows/*.yml`) appellent aussi des scripts ; sans eux, `pre-commit-index.mjs` et
+  // `verifications-lundi.mjs` passaient pour du code mort.
+  const crochets = [];
+  try { for (const n of readdirSync(join(racine, ".git", "hooks"))) if (!n.endsWith(".sample")) crochets.push(`.git/hooks/${n}`); } catch { /* pas de dépôt git ou pas de hooks */ }
+  const estCablage = (f) => estAppelant.test(f) || /^\.github\/workflows\/[^/]+\.ya?ml$/i.test(f);
+  const candidats = [...tous_.filter(estCablage), ...crochets];
   const lus = new Map();
   const lire = (f) => { if (!lus.has(f)) { try { lus.set(f, readFileSync(join(racine, f), "utf8")); } catch { lus.set(f, ""); } } return lus.get(f); };
   const appeles = [], sansAppelant = [];
@@ -72,7 +79,7 @@ export function relever(racine, { tous = false } = {}) {
     // « from paquet.module import x », « import module », et l'import relatif « from . import a, module ».
     const module = /\.py$/i.test(nom) ? new RegExp(`\\b(import|from)\\s+[\\w.]*\\b${stem}\\b|\\bimport\\s+[\\w\\s.,()]*\\b${stem}\\b`) : null;
     const nomme = (t) => t.includes(nom) || (module && module.test(t));
-    const appelants = tous_.filter((f) => f !== c && estAppelant.test(f) && !EST_RECETTE(f) && nomme(lire(f)));
+    const appelants = candidats.filter((f) => f !== c && !EST_RECETTE(f) && nomme(lire(f)));
     if (appelants.length) appeles.push({ controle: c, appelants });
     else sansAppelant.push({ controle: c, cite_en_doctrine: tous_.some((f) => /\.md$/i.test(f) && lire(f).includes(nom)) });
   }

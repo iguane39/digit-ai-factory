@@ -22,7 +22,7 @@
  * Usage : node scripts/nettoyer-copies.mjs [--racine <dépôt>] [--json] [--supprimer] [--self-test]
  * Exit 0 ; 1 si une suppression demandée a échoué ; 2 sur entrée illisible.
  */
-import { existsSync, mkdtempSync, writeFileSync, rmSync, realpathSync } from "node:fs";
+import { existsSync, mkdtempSync, writeFileSync, rmSync, realpathSync, statSync } from "node:fs";
 import { join, dirname, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -35,7 +35,12 @@ const norm = (p) => resolve(p).replaceAll("\\", "/").toLowerCase();
 const git = (args, cwd) => spawnSync("git", args, { cwd, encoding: "utf8" });
 
 /** Rend { copies: [...], branches: [...], supprimables: { copies, branches } } pour le dépôt `racine`. */
-export function relever(racine, principale = "main") {
+// Revue de code de l'œil critique du 29/10/2026 (D-97 (a) l'avait mis en service le même jour) :
+// `git status --porcelain` ne voit pas les fichiers ignorés (`.env`, artefacts), que `git worktree
+// remove` supprime pourtant avec le dossier ; et un agent vivant, non verrouillé, dont la branche
+// vient de naître sur `main` paraît « fusionné et propre ». D'où `--ignored` et la garde de récence.
+export const RECENCE_MIN = 120;
+export function relever(racine, principale = "main", { recenceMin = RECENCE_MIN } = {}) {
   const fusionnee = (b) => git(["merge-base", "--is-ancestor", b, principale], racine).status === 0;
   const blocs = git(["worktree", "list", "--porcelain"], racine).stdout.split(/\r?\n\r?\n/).filter((b) => b.trim());
   const copies = blocs.map((b) => ({
@@ -44,9 +49,10 @@ export function relever(racine, principale = "main") {
     verrou: /^locked/m.test(b),
   })).filter((c) => c.chemin && norm(c.chemin) !== norm(racine)).map((c) => {
     const present = existsSync(c.chemin);
-    const propre = present && git(["status", "--porcelain"], c.chemin).stdout.trim() === "";
+    const propre = present && git(["status", "--porcelain", "--ignored"], c.chemin).stdout.trim() === "";
     const fus = c.branche ? fusionnee(c.branche) : false;
-    const motif = !present ? "dossier absent" : c.verrou ? "verrouillée (agent vivant)" : !c.branche ? "tête détachée" : !fus ? "branche non fusionnée" : !propre ? "modifications ou fichiers non suivis" : null;
+    const age = present ? (Date.now() - Math.max(statSync(c.chemin).mtimeMs, 1000 * Number(git(["log", "-1", "--format=%ct", c.branche || "HEAD"], racine).stdout.trim() || 0))) / 60000 : Infinity;
+    const motif = !present ? "dossier absent" : c.verrou ? "verrouillée (agent vivant)" : !c.branche ? "tête détachée" : !fus ? "branche non fusionnée" : !propre ? "modifications, fichiers non suivis ou ignorés" : age < recenceMin ? `touchée il y a moins de ${recenceMin} minutes` : null;
     return { ...c, chemin_relatif: relative(racine, c.chemin).replaceAll("\\", "/"), fusionnee: fus, propre, supprimable: motif === null, motif };
   });
   const avecCopie = new Set(copies.map((c) => c.branche).filter(Boolean));
@@ -87,26 +93,32 @@ function selfTest() {
     writeFileSync(join(T, "encours", "b.txt"), "b\n"); git(["add", "b.txt"], join(T, "encours")); git(["commit", "-qm", "travail"], join(T, "encours"));
     g("worktree", "add", "-q", "-b", "worktree-agent-vivant", join(T, "vivant")); g("worktree", "lock", join(T, "vivant"));
     g("worktree", "add", "-q", "-b", "worktree-agent-sale", join(T, "sale")); writeFileSync(join(T, "sale", "brouillon.txt"), "x\n");
+    g("worktree", "add", "-q", "-b", "worktree-agent-secret", join(T, "secret"));
+    writeFileSync(join(T, "secret", ".gitignore"), ".env\n"); git(["add", ".gitignore"], join(T, "secret")); git(["commit", "-qm", "ignore"], join(T, "secret"));
+    g("merge", "-q", "worktree-agent-secret"); writeFileSync(join(T, "secret", ".env"), "SECRET=1\n");
     g("branch", "worktree-agent-orpheline"); g("branch", "sauvegarde-avant-x"); g("branch", "camp1013-q9");
-    const r = relever(depot);
+    // Revue du 29/10 : par défaut, une copie touchée depuis moins de 2 heures est gardée (agent peut-être vivant).
+    if (relever(depot).copies.find((c) => c.branche === "worktree-agent-fini").supprimable) casse.push("une copie touchée à l'instant est supprimable (agent peut-être vivant)");
+    const r = relever(depot, "main", { recenceMin: 0 });
     const copie = (n) => r.copies.find((c) => c.branche === `worktree-agent-${n}`);
     if (!copie("fini") || !copie("fini").supprimable) casse.push("une copie fusionnée, propre et libre n'est pas supprimable");
     if (copie("encours").supprimable) casse.push("une copie à branche non fusionnée est supprimable");
     if (copie("vivant").supprimable || copie("vivant").motif !== "verrouillée (agent vivant)") casse.push("une copie verrouillée est supprimable");
     if (copie("sale").supprimable) casse.push("une copie avec un fichier non suivi est supprimable");
+    if (copie("secret").supprimable) casse.push("une copie qui porte un fichier ignoré (.env) est supprimable : il serait perdu");
     const br = (n) => r.branches.find((b) => b.branche === n);
     if (!br("worktree-agent-orpheline").supprimable || !br("camp1013-q9").supprimable) casse.push("une branche d'agent ou de campagne fusionnée n'est pas supprimable");
     if (br("sauvegarde-avant-x").supprimable) casse.push("une branche de sauvegarde est supprimable");
     if (r.supprimables.copies !== 1 || r.supprimables.branches !== 2) casse.push(`1 copie et 2 branches supprimables attendues, ${JSON.stringify(r.supprimables)}`);
     const faits = supprimer(depot, r);
     if (faits.some((f) => f.erreur)) casse.push(`suppression en échec : ${JSON.stringify(faits)}`);
-    const apres = relever(depot);
+    const apres = relever(depot, "main", { recenceMin: 0 });
     if (apres.copies.some((c) => c.branche === "worktree-agent-fini") || existsSync(join(T, "fini"))) casse.push("la copie supprimée est toujours là");
-    if (!existsSync(join(T, "vivant")) || !existsSync(join(T, "sale", "brouillon.txt")) || !existsSync(join(T, "encours"))) casse.push("une copie à garder a été touchée");
+    if (!existsSync(join(T, "vivant")) || !existsSync(join(T, "sale", "brouillon.txt")) || !existsSync(join(T, "encours")) || !existsSync(join(T, "secret", ".env"))) casse.push("une copie à garder a été touchée");
     if (apres.supprimables.copies !== 0 || apres.supprimables.branches !== 0) casse.push("des supprimables restent après la suppression");
   } catch (e) { casse.push(`erreur : ${e.message}`); }
   finally { git(["worktree", "unlock", join(T, "vivant")], depot); rmSync(T, { recursive: true, force: true }); }
-  console.log(JSON.stringify({ outil: "nettoyer-copies", self_test: casse.length ? "FAIL" : "PASS", cas: 10, casse }));
+  console.log(JSON.stringify({ outil: "nettoyer-copies", self_test: casse.length ? "FAIL" : "PASS", cas: 12, casse }));
   process.exit(casse.length ? 1 : 0);
 }
 

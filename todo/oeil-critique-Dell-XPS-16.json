@@ -1,26 +1,81 @@
 {
  "poste": "Dell-XPS-16",
- "debut": "2026-10-20T00:00:00+02:00",
- "fin": "2026-10-26T15:15:00+01:00",
- "ts": "2026-10-26T14:15:35.102Z",
- "sortie": [
-  "Analyse faite le 26/10/2026, poste Dell-XPS-16, période du 20/10 00:00 au 26/10 15:15 : 44 sessions, 122 demandes, 6 lots d'agents au lieu d'un agent par session (plafond d'un million de jetons).",
-  "Indicateurs : 47 reprises pour 122 demandes ; 13 consignes répétées en 7 jours (35 par mois au départ) ; 76 messages humains hors demande, soit 0,62 par demande, méthode non comparable au 2,0 de départ.",
-  "Refus de hook : 73, presque tous S1, S3, S4, S6, S48 sur des réponses courtes, dont environ 23 doublons à l'écran.",
-  "Forges : aucune trace forge-audit sur les demandes d'audit, aucune forge-data sur les demandes de données, design (marque) rarement tracé.",
-  "Automatiques faites : R17 sur récidive en chaîne, relevé hebdomadaire et recette du hook isolés, découpage des commandes de la relecture, ledger.py --help, extraction 1.1.1 (pilot ddfe3e7a, forge 8b26ceb).",
-  "Automatiques en attente : faux rouge de la recette --contexte-json, faux commentaire de lib-cadence-promise, settings.json reformaté par l'ancrage, guillemets dans le découpage des commandes.",
-  "Majeures posées : D-75 à D-79, recommandations scellées à 15:15 (todo/oeil-critique-scelles.jsonl).",
-  "Majeures en attente : collisions de numéros entre postes, suivi annoncé sans porteur, heure d'en-tête saisie à la main.",
-  "Écartés : 2 constats au test de généralité, 1 conforme à la règle des secrets (5 premiers caractères et longueur)."
- ],
+ "debut": "2026-10-26T15:15:00+01:00",
+ "fin": "2026-10-29T19:37:00+01:00",
+ "ts": "2026-10-29T18:37:50.127Z",
+ "palier": null,
  "indicateurs": {
-  "demandes": 122,
-  "reprises": 47,
-  "consignes_repetees": 13,
-  "messages_hors_demande": 76,
-  "refus_hook": 73
+  "demandes": 62,
+  "reprises": 36,
+  "consignes_repetees": 12,
+  "messages_hors_demande": 87,
+  "refus_hook": 51,
+  "duree_tour_mediane_min": 3,
+  "duree_tour_p90_min": 21.4,
+  "decisions_reservees": 23,
+  "jetons_relectures": 1568082
  },
- "indicateurs_source": "lus dans la sortie de ce repère le 29/10/2026 (oeil-critique 1.2.0, D-95 (b)) ; la méthode des messages hors demande n est pas comparable au 2,0 de départ",
- "palier": null
+ "evolution": {
+  "demandes": {
+   "avant": 122,
+   "apres": 62,
+   "ecart": -60
+  },
+  "reprises": {
+   "avant": 47,
+   "apres": 36,
+   "ecart": -11
+  },
+  "consignes_repetees": {
+   "avant": 13,
+   "apres": 12,
+   "ecart": -1
+  },
+  "messages_hors_demande": {
+   "avant": 76,
+   "apres": 87,
+   "ecart": 11
+  },
+  "refus_hook": {
+   "avant": 73,
+   "apres": 51,
+   "ecart": -22
+  },
+  "duree_tour_mediane_min": {
+   "avant": null,
+   "apres": 3,
+   "ecart": null
+  },
+  "duree_tour_p90_min": {
+   "avant": null,
+   "apres": 21.4,
+   "ecart": null
+  },
+  "decisions_reservees": {
+   "avant": null,
+   "apres": 23,
+   "ecart": null
+  },
+  "jetons_relectures": {
+   "avant": null,
+   "apres": 1568082,
+   "ecart": null
+  },
+  "reprises_par_demande": {
+   "avant": 0.385,
+   "apres": 0.581
+  }
+ },
+ "sortie": [
+  "Analyse faite le 29/10/2026, poste Dell-XPS-16, période du 26/10 15:15 au 29/10 19:37 : 74 sessions dont 42 d'appel automatique (juge LLM), 7 lots d'agents et 3 agents de relevé et de revue ; 1,16 M jetons d'agents, au-delà du plafond de 1 M.",
+  "Indicateurs : 62 demandes, 36 reprises (0,58 par demande, méthode non comparable au 26/10 qui comptait les appels automatiques), 12 consignes répétées, 87 hors demande, 51 refus de hook ; tours médiane 3 min, 90e centile 21,4 min ; 23 décisions réservées ; 1,57 M jetons de relecture en 4 jours.",
+  "Refus de hook : S1 et S4 dans presque tous, 17 sur 51 après une réponse sans écriture, doublon à l'écran récurrent.",
+  "Forges : ops, websec et data écartées sur déploiement, sécurité et données personnelles (13 manques) ; 39 produits sur 40 sans trace de mobilisation.",
+  "Revue de code : 6 contournements confirmés des gardes d'identité sortante et de gestes distants ; 2 défauts du gate supabase de forge-development ; le scan de workflow d'agent accepte une négation.",
+  "Automatiques faites : sessions automatiques écartées (oeil-critique 1.3.2), nettoyage qui garde fichiers ignorés et copies récentes, appelants git et workflows, casse du rappel de lettre, CI2 sans copies de travail, oracle des caractères de contrôle de forge-design.",
+  "Automatiques en attente : gate supabase de forge-development (dossier test, appel sur plusieurs lignes), lecture tolérante du JSON du juge, 7 échecs préexistants du self-test de forge-design.",
+  "Majeures posées : D-98 à D-102, recommandations scellées (todo/oeil-critique-scelles.jsonl).",
+  "Majeures en attente : suppression de hook-droits-accordes, avertissements sans porteur, variance du juge LLM, coût du hook des produits intacts, réponses de décision hors format acceptées, scan de workflow d'agent.",
+  "Écartés : 42 sessions automatiques (contexte de test), la fiche DPO interrompue 3 fois (contexte de tâche)."
+ ]
 }

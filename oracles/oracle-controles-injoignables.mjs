@@ -98,6 +98,9 @@ function fichiers(racine) {
     for (const e of entrees) {
       if (SAUTES.has(e.name)) continue;
       const p = join(d, e.name);
+      // Œil critique du 29/10/2026 : les copies de travail d'agents (`.claude/worktrees`) dupliquent le
+      // dépôt ; CI2 y relevait les mêmes lignes que dans le dépôt, une fois par copie.
+      if (e.isDirectory() && e.name === "worktrees" && d.endsWith(".claude")) continue;
       if (e.isDirectory()) descendre(p, niveau + 1);
       else sortie.push(p);
     }

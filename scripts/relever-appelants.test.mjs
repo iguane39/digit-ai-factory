@@ -89,6 +89,19 @@ try {
     if (sansT("paquet/relatif.py")) throw new Error("« from . import relatif » n'est pas reconnu");
     if (t.sansAppelant.some((x) => x.controle.startsWith(".venv/"))) throw new Error("un fichier de .venv est relevé");
   });
+  check("VERT (œil critique du 29/10) — un hook git sans extension et un workflow GitHub sont des appelants", () => {
+    mkdirSync(join(T, ".git", "hooks"), { recursive: true });
+    mkdirSync(join(T, ".github", "workflows"), { recursive: true });
+    writeFileSync(join(T, "scripts", "index-au-commit.mjs"), "console.log('i');\n");
+    writeFileSync(join(T, "scripts", "lundi.mjs"), "console.log('l');\n");
+    writeFileSync(join(T, ".git", "hooks", "pre-commit"), "#!/bin/sh\nnode scripts/index-au-commit.mjs\n");
+    writeFileSync(join(T, ".git", "hooks", "pre-push.sample"), "node scripts/lundi.mjs\n");
+    writeFileSync(join(T, ".github", "workflows", "lundi.yml"), "jobs:\n  a:\n    steps:\n      - run: node scripts/lundi.mjs\n");
+    const g = relever(T, { tous: true });
+    const sansG = (f) => g.sansAppelant.some((x) => x.controle === f);
+    if (sansG("scripts/index-au-commit.mjs")) throw new Error("le hook git .git/hooks/pre-commit n'est pas reconnu comme appelant");
+    if (sansG("scripts/lundi.mjs")) throw new Error("le workflow .github/workflows/lundi.yml n'est pas reconnu comme appelant");
+  });
   check("BORNE (--tous-scripts) — un jeu d'essai sous fixtures n'est pas du code livré", () => {
     if (t.sansAppelant.some((x) => x.controle.startsWith("fixtures/"))) throw new Error("un fichier de fixtures est relevé");
   });

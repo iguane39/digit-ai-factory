@@ -188,6 +188,16 @@ check("hook — un sélecteur d'action (« A1 », « A-2 ») n'est pas une déci
     if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`« ${m} » reçoit un rappel : ${JSON.stringify(r.stdout)}`);
   }
 });
+check("cas rouge (œil critique du 29/10) — « il y a 2 jours, fais-le » et « il a 3 options, vas-y » ne sont pas des sélecteurs d'action → rappel", () => {
+  for (const m of ["il y a 2 jours, fais-le", "il a 3 options, vas-y"]) {
+    const r = jouerAvec(m, APRES_D99);
+    if (!/\[LETTRE — hook-lexique\][^\n]*D-99/.test(r.stdout)) throw new Error(`« ${m} » sans rappel : le verbe « a » est lu comme une action`);
+  }
+  for (const m of ["a1", "a-2"]) {
+    const r = jouerAvec(m, APRES_D99);
+    if (r.stdout.trim() !== "") throw new Error(`« ${m} » reçoit un rappel : le sélecteur en minuscules n'est plus reconnu`);
+  }
+});
 check("hook — aucune décision ouverte dans le dernier message de l'assistant → rien", () => {
   const sansDecision = [humain("99a"), assistant("m2", "## 4. Exécution\n\nD-99 (a) exécutée : la page est publiée.\n\n> **D-98 — décision d'hier, déjà tranchée** : exécutée, sans question.\n")];
   const r = jouerAvec("exécute le prompt", sansDecision);
