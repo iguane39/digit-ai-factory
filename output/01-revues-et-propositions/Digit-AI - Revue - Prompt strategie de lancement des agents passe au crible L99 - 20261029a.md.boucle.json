@@ -1,0 +1,444 @@
+{
+ "schema": "l99-boucle@1",
+ "prompt": "Stratégie de lancement des agents (suite de A-1 et A-2, 29/10/2026)",
+ "ouverture": "d office (TF-2022) : prompt de run qui lance une campagne d agents qui écrit, et défaut bloquant relevé à l analyse",
+ "arbitre": {
+  "rubrique": "couches.md Ch1, 6 dimensions /100, plafond 40 sur bloquant",
+  "arret": "0 bloquant et 0 majeur",
+  "seuil_score": null,
+  "gain_min": 3,
+  "borne": 3,
+  "garde_longueur": 0.15
+ },
+ "passes": [
+  {
+   "n": 1,
+   "fichier": "prompt-p1.md (bloc « Prompt réécrit » de la revue 20261029a, version du 29/10/2026 17:35)",
+   "mots": 681,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (relecteurs aveugles n°1 et n°2 de la passe 1)",
+    "aveugle": true,
+    "interdits": [
+     "analyse",
+     "passes précédentes",
+     "journal de boucle",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    60,
+    40
+   ],
+   "score_mesure": 40,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas, plafonné à 40 par le bloquant retenu",
+   "defauts": [
+    {
+     "severite": "bloquant",
+     "citation": "node scripts/relever-flotte.mjs --depuis <début> --journal <journal> --etiquette <campagne> : durée par agent, jetons, appels d'outils, durée totale, conflits à la fusion",
+     "defaut": "prémisse fausse : relever-flotte ne rend ni durées ni conflits et ne filtre pas par session",
+     "recompte": {
+      "commande": "grep -n -i \"durée\\|duree\\|conflit\" scripts/relever-flotte.mjs ; grep -n \"AAAA-MM-JJ\\|--session\\|--depuis\" scripts/relever-flotte.mjs",
+      "resultat": "durée seulement en interne au calcul de simultanéité (lignes 20, 21, 158) ; aucune option --session ; ligne 257 : --depuis attend une date AAAA-MM-JJ"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "CONTRAT DE SORTIE (voir ci-dessous) : à tenir avant de rendre la main.",
+     "defaut": "contrat de sortie annoncé mais absent du prompt",
+     "recompte": {
+      "commande": "tail -1 prompt-p1.md",
+      "resultat": "la dernière ligne est la phrase citée, rien ne suit"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ],
+     "note": "bloquant pour le n°2, majeur pour le n°1 ; retenu majeur, la sévérité commune"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Suite de A-1 et A-2 (réponse de 17:31, 29/10/2026)",
+     "defaut": "A-1 et A-2 non définis dans le prompt",
+     "recompte": {
+      "commande": "grep -c \"A-1 \" prompt-p1.md",
+      "resultat": "2 mentions, aucune définition"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Le plafond vit dans un référentiel daté et sourcé (loi n° 4), jamais dans le code.",
+     "defaut": "le référentiel du plafond existe déjà et n'est pas cité",
+     "recompte": {
+      "commande": "grep -n \"20 sous-agents\" references/PARALLELISME-CLAUDE-CODE.md ; grep -n \"LIMITE_SOUS_AGENTS_SIMULTANES =\" scripts/relever-flotte.mjs",
+      "resultat": "ligne 24 : 20 sous-agents simultanés par session ; ligne 57 : constante 20 en dur"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "ÉTAPE 0 — RÉFÉRENCE (lecture seule, avant toute écriture). [...] --journal <journal>",
+     "defaut": "l'option --journal écrit dans une étape déclarée en lecture seule",
+     "recompte": {
+      "commande": "sed -n 31,32p scripts/relever-flotte.mjs ; sed -n 266p scripts/relever-flotte.mjs",
+      "resultat": "--journal ajoute une ligne datée (appendFileSync)"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur ; fermé de fait par la correction du bloquant"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Si la campagne du 29/10 n'est pas finie, attends sa fin",
+     "defaut": "attente sans voie ni borne, contraire à l'étape 3",
+     "recompte": {
+      "commande": "grep -n \"Rendre la main\" gabarits/AGENT-CAMPAGNE.md",
+      "resultat": "ligne 245"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "La prochaine campagne d'au moins 10 sujets applique la stratégie",
+     "defaut": "étape 5 future non séparée du contrat du tour",
+     "recompte": {
+      "commande": "lecture de l'étape 5 de prompt-p1.md",
+      "resultat": "aucune mention « hors du tour »"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "en équilibrant la charge estimée",
+     "defaut": "charge sans unité ni formule",
+     "recompte": {
+      "commande": "grep -n \"charge estimée\\|trop petit\" prompt-p1.md",
+      "resultat": "lignes 23 et 27, aucun chiffre"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "un sujet sans chemin forme un groupe à part",
+     "defaut": "fichiers partagés par construction (index, registres) ignorés",
+     "recompte": {
+      "commande": "git status --short (ouverture de session)",
+      "resultat": "output/LISEZMOI.md et output/README.md modifiés hors de tout sujet"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "jetons totaux de la campagne au plus 20 % au-dessus de la référence",
+     "defaut": "comparaison non normalisée par sujet, taux de clôture non défini",
+     "recompte": {
+      "commande": "lecture de relever-flotte.mjs, indicateurs lignes 170-187",
+      "resultat": "aucun indicateur par sujet ni de taux de clôture"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 0,
+   "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 2,
+   "fichier": "prompt-p2.md",
+   "mots": 929,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 2 : n°2, et n°1 bis lancé après l'arrêt du n°1 par le harnais à 600 s sans progrès)",
+    "aveugle": true,
+    "interdits": [
+     "analyse",
+     "passes précédentes",
+     "journal de boucle",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    69,
+    70
+   ],
+   "score_mesure": 69,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "Durées : pour chaque sous-agent, premier et dernier horodatage de son transcript dans ...\\subagents\\",
+     "defaut": "les 9 sous-agents du dossier ne sont pas tous des agents de la campagne ; 16:10 est en UTC",
+     "recompte": {
+      "commande": "lecture des 9 *.meta.json de subagents (description, agentType)",
+      "resultat": "6 « Lot A » à « Lot F », 2 verificateur de relecture, 1 « Livré lié en fin de bloc 0 »"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "compare la référence au découpage calculé sur les mêmes 38 sujets",
+     "defaut": "la liste des 38 sujets n'est pas nommée",
+     "recompte": {
+      "commande": "grep -c '^### TF-' .../2071e2c2-.../scratchpad/candidats.md",
+      "resultat": "38"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "en équilibrant la charge estimée [...] une durée estimée inférieure à la référence",
+     "defaut": "pas de modèle charge vers durée : le point 2 du contrat compare une estimation libre à une mesure",
+     "recompte": {
+      "commande": "lecture de l'étape 1 et du contrat de prompt-p2.md",
+      "resultat": "aucune unité ni formule de charge"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Si elle n'est pas finie, mesure la partie close et dis-le.",
+     "defaut": "la campagne de référence n'est pas close ; la partie close compte 0 lot",
+     "recompte": {
+      "commande": "grep -l '\"finished\":true' .../subagents/*.meta.json | wc -l",
+      "resultat": "3 sur 9 à 18:35, aucun des 6 lots"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "aucune baisse du taux de sujets clos [...] 1. la référence est chiffrée (durée totale, durée du plus long agent, jetons, conflits)",
+     "defaut": "taux de sujets clos et jetons ni définis ni vérifiés au contrat",
+     "recompte": {
+      "commande": "lecture des 8 points du contrat de prompt-p2.md",
+      "resultat": "aucun ne porte sur le taux de clôture ni sur la borne de jetons"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Ne modifie pas une session ni une campagne en cours.",
+     "defaut": "ni commit limité, ni publication, ni cohabitation avec la session vivante qui écrit le même registre",
+     "recompte": {
+      "commande": "git status --short todo/",
+      "resultat": "M todo/TODO.jsonl à 18:35"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "le plafond se lit dans references/PARALLELISME-CLAUDE-CODE.md",
+     "defaut": "le plafond n'existe qu'en prose dans un tableau",
+     "recompte": {
+      "commande": "grep -rn 'sous-agents simultan' references/",
+      "resultat": "seule la ligne 24 du tableau"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Conflits de fusion : historique git des fusions de la campagne dans les dépôts touchés.",
+     "defaut": "aucun commit de fusion : la mesure rend toujours 0",
+     "recompte": {
+      "commande": "git log --merges --since=2026-10-29 dans le pilot et 6 forges (relecteur n°1 bis)",
+      "resultat": "0 partout"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 5,
+   "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 3,
+   "fichier": "prompt-p3.md",
+   "mots": 1214,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 3, n°1 et n°2)",
+    "aveugle": true,
+    "interdits": [
+     "analyse",
+     "passes précédentes",
+     "journal de boucle",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    72,
+    74
+   ],
+   "score_mesure": 72,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "un sujet sans chemin forme un groupe à part",
+     "defaut": "la plupart des sujets ne citent pas de fichier : ils deviennent des groupes isolés supposés disjoints",
+     "recompte": {
+      "commande": "node : blocs « ### » de candidats.md sans nom de fichier à extension",
+      "resultat": "23 sujets sur 38"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "durée d'un agent = coût fixe + somme des durées de ses sujets, les deux paramètres tirés des 6 lots",
+     "defaut": "6 mesures par lot ne donnent pas de durée par sujet ; le modèle fait baisser la durée estimée dès qu'on découpe",
+     "recompte": {
+      "commande": "lecture de lots.md de la session 2071e2c2",
+      "resultat": "6 lots de 11, 5, 3, 2, 7 et 10 sujets, aucune durée par sujet"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Conflits de fusion : historique git des fusions de la campagne dans les dépôts touchés.",
+     "defaut": "git ne garde pas trace d'un conflit résolu ; la mesure rend 0 sans rien mesurer",
+     "recompte": {
+      "commande": "git log --merges --since=2026-10-29 --oneline dans digit-ai-factory et digit-ai-forge-agents",
+      "resultat": "0 et 0"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "ÉTAPE 0 — RÉFÉRENCE (lecture seule : aucune écriture [...]) Copie les deux dans les fixtures du planificateur",
+     "defaut": "écriture ordonnée dans une étape déclarée en lecture seule, avant le git fetch et le git status",
+     "recompte": {
+      "commande": "lecture de prompt-p3.md, étape 0 contre « ÉCRITURE ET PUBLICATION »",
+      "resultat": "contradiction présente"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Copie isolée (isolation worktree) pour tout agent qui partage un dépôt avec un autre agent.",
+     "defaut": "l'isolation de l'outil Agent ne copie que le dépôt de la session, pas une forge",
+     "recompte": {
+      "commande": "grep -l worktreePath .../2071e2c2-.../subagents/*.meta.json | wc -l",
+      "resultat": "3 sur 9, aucun des lots A à D (forges)"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur ; signalé à part dans la revue"
+    },
+    {
+     "severite": "majeur",
+     "citation": "le registre ne s'écrit que par todo/journaliser.mjs",
+     "defaut": "todo/TODO.jsonl porterait 2 lignes d'une autre session",
+     "recompte": {
+      "commande": "git diff todo/TODO.jsonl",
+      "resultat": "les 2 lignes sont TF-2022, écrites par la session de la revue elle-même : le constat est faux"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "démenti par le recompte"
+    }
+   ],
+   "majeurs_clos": 6,
+   "rejetee": false,
+   "decision": "arreter"
+  }
+ ],
+ "arret": {
+  "passe": 3,
+  "raison": "borne"
+ },
+ "score_affiche": {
+  "valeur": 72,
+  "nature": "mesure"
+ },
+ "majeurs_ouverts": [
+  "la plupart des sujets ne citent pas de fichier : ils deviennent des groupes isolés supposés disjoints",
+  "6 mesures par lot ne donnent pas de durée par sujet ; le modèle fait baisser la durée estimée dès qu'on découpe",
+  "git ne garde pas trace d'un conflit résolu ; la mesure rend 0 sans rien mesurer",
+  "écriture ordonnée dans une étape déclarée en lecture seule, avant le git fetch et le git status"
+ ]
+}

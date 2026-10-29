@@ -74,7 +74,7 @@ Comment lire le tableau : une ligne par défaut, classée par sévérité puis p
 | 5 | A-2, l'attente des rapports, absente ; sans elle le gain du parallélisme se perd | majeur | Étape 3 |
 | 6 | Conflits d'écriture non traités : même dépôt sans copie isolée, registre `todo/TODO.jsonl` à écrivains uniques | majeur | Étape 2, isolation, et garde-fous |
 | 7 | Coûts fixes par agent ignorés : lecture du contrat, relecture d'intention de chaque consigne (**D-23** *(décision du 18/10/2026 : toute consigne d'agent relue avant lancement)*) | majeur | Étape 2, borne de coût |
-| 8 | Limite du harnais inconnue : aucun plafond documenté pour l'outil Agent ; l'outil Workflow, lui, vise moins de 10 agents par défaut et exige l'accord explicite de l'humain | majeur | Étape 0, relevé des limites |
+| 8 | Plafond d'agents non cité : `references/PARALLELISME-CLAUDE-CODE.md` fixe 20 sous-agents simultanés par session et 16 agents pour un workflow (relevé du 2026-10-19) ; la réponse de 17:31 disait à tort n'en avoir trouvé aucun, et l'outil Workflow exige l'accord explicite de l'humain | majeur | Étape 0, plafond lu dans ce fichier |
 | 9 | Session des candidats encore en cours : la changer en vol couperait ses agents | majeur | garde-fous |
 | 10 | Rapport à la doctrine non dit : changer le contrat de campagne est-il une décision humaine ? | majeur | Étape 4, avertissement d'abord |
 | 11 | Routage par modèle (**§4** *(section 4 de `CONTRAT-INTERFACE.md` : quel modèle pour quel rôle)*) non relié au découpage | mineur | Étape 2 |
@@ -132,57 +132,91 @@ La stratégie s'appliquera à toutes les campagnes du pilot et, par l'héritage,
 
 ## Chapitre 8 — Synthèse et prompt réécrit
 
-Le prompt passe de 27 à 84 projetés. La réécriture garde l'intention, accélérer les campagnes, et la rend mesurable, outillée et bornée.
+Le prompt passe de 27 à 72 sur 100, score mesuré par des relecteurs indépendants en 3 passes. La réécriture garde l'intention, accélérer les campagnes, et la rend mesurable, outillée et bornée. Quatre défauts majeurs restent ouverts à la borne de 3 passes ; ils sont nommés plus bas, et le prompt n'est pas présenté comme fini.
+
+### Pourquoi la boucle a été ouverte
+
+Mode boucle ouvert d'office (**TF-2022** *(règle du skill 2.7.0 du 29/10/2026 : la session ouvre la relecture indépendante sans mot-clé dans trois cas)*) : le prompt lance une campagne d'agents qui écrivent, et l'analyse avait relevé un défaut bloquant. Le score de 84 d'abord écrit ici était projeté ; mesuré, il valait 40.
 
 ### Score
 
-Comment lire le tableau : une ligne par dimension, la note avant et la note projetée après réécriture ; le score d'arrivée est une estimation de l'auteur, non mesurée par un relecteur aveugle.
+Comment lire le tableau : une ligne par passe ; le score retenu est la plus basse des deux notes des relecteurs, et seul un défaut vu par les deux est retenu, après vérification dans les fichiers.
 
-| Dimension | Avant | Après (projeté, non mesuré) |
-|---|---|---|
-| Clarté de l'intention | 8 | 17 |
-| Spécification | 3 | 17 |
-| Garde-fous et contraintes | 2 | 13 |
-| Ancrage et contexte | 9 | 13 |
-| Vérifiabilité de la sortie | 2 | 13 |
-| Robustesse | 3 | 11 |
-| **Total** | **27** | **84 (projeté, non mesuré)** |
+| Passe | Mots | Notes des 2 relecteurs | Score retenu | Bloquants et majeurs retenus | Écartés | Décision |
+|---|---|---|---|---|---|---|
+| 1 | 681 | 60 et 40 | 40 | 1 bloquant, 4 majeurs | 5, vus par un seul | continuer |
+| 2 | 929 | 69 et 70 | 69 | 6 majeurs | 2, vus par un seul | continuer |
+| 3 | 1 214 | 72 et 74 | **72 (mesuré)** | 4 majeurs | 2, dont 1 démenti au recompte | arrêter : borne de 3 passes |
+
+Le score de départ, 27, est celui de l'étalon du chapitre 1, noté par l'auteur de la revue. Le journal des passes est à côté de cette revue, en `.boucle.json`, et l'oracle `oracle-boucle-l99.mjs` le juge PASS.
 
 ### Diagnostic
 
-Intention juste, née d'un constat mesuré. Mais rien ne dit quoi optimiser, quoi livrer, ni comment prouver le gain. Le prompt réduit un problème à trois leviers (découpage, isolation, réception) au seul nombre d'agents.
+Intention juste, née d'un constat mesuré. Le prompt d'origine ne disait ni quoi optimiser, ni quoi livrer, ni comment prouver le gain, et réduisait trois leviers (découpage, isolation, réception) au seul nombre d'agents. La relecture indépendante a trouvé ce que l'auteur ne voyait pas : un script de mesure qui ne mesure pas les durées, et un plafond d'agents déjà consigné au pilot.
 
-### Prompt réécrit
+### Majeurs ouverts à la borne
+
+Ces quatre défauts, vus par les deux relecteurs de la passe 3, restent dans le prompt livré. Celui qui l'exécute doit les trancher en premier :
+
+1. **Sujets sans fichier cité** : 23 des 38 sujets ne citent aucun nom de fichier ; la règle « un sujet sans chemin forme un groupe à part » les déclarerait indépendants alors qu'ils touchent les mêmes modules. Correction proposée : résoudre chaque nom de module cité par `git ls-files`, et rattacher un sujet non résolu à son lot ou à son dépôt d'origine.
+2. **Modèle de durée sous-déterminé** : 6 mesures, une par lot, ne donnent aucune durée par sujet ; un modèle uniforme fait baisser la durée estimée dès qu'on découpe. Correction proposée : régression de la durée d'un lot sur son nombre de sujets, résidus publiés, calage séparé par type d'agent, et issue prévue si aucun découpage ne bat l'ancien.
+3. **Conflits non mesurables par git** : 0 commit de fusion le 29/10 dans le pilot et forge-agents ; un conflit résolu ne laisse pas de trace. Correction proposée : consigner à la réception le code de retour de chaque fusion ou cherry-pick, et chercher « CONFLICT » dans la transcription de la session de référence.
+4. **Écriture dans une étape en lecture seule** : l'étape 0 ordonne de copier `candidats.md` et `lots.md` dans les fixtures. Correction proposée : déplacer la copie à l'étape 4, après `git fetch` et `git status`.
+
+Un cinquième constat, vu par un seul relecteur, mérite d'être lu : l'isolation `worktree` de l'outil Agent ne copie que le dépôt de la session. Le 29/10, seuls 3 sous-agents sur 9 en portaient une, aucun des lots des forges.
+
+### Prompt réécrit (passe 3, score mesuré 72)
 
 ```text
-Suite de A-1 et A-2 (réponse de 17:31, 29/10/2026) : construis une nouvelle stratégie de
-lancement des agents d'une campagne, qui calcule leur nombre au lieu de le fixer, pour réduire
-la durée des campagnes.
+Construis une nouvelle stratégie de lancement des agents d'une campagne, qui calcule leur nombre
+au lieu de le fixer, pour réduire la durée des campagnes. Elle reprend deux actions proposées le
+29/10/2026 dans la session pilote 2071e2c2 :
+- A-1 : former les groupes d'une campagne selon les fichiers touchés, un agent isolé par groupe ;
+- A-2 : aucune attente au premier plan pendant que des agents tournent.
 
-OBJECTIF. Réduire la durée de bout en bout d'une campagne à agents (du lancement du premier
-agent au dernier rapport traité), sous trois contraintes : zéro conflit de fusion entre agents,
-jetons totaux de la campagne au plus 20 % au-dessus de la référence, aucune baisse du taux de
+OBJECTIF. Réduire la durée de bout en bout d'une campagne à agents, mesurée du lancement du premier
+agent au traitement du dernier rapport, sous trois contraintes : zéro conflit de fusion entre
+agents, jetons des agents de lot au plus 20 % au-dessus de la référence, aucune baisse du taux de
 sujets clos.
 
-ÉTAPE 0 — RÉFÉRENCE (lecture seule, avant toute écriture).
-- Relève la campagne des 38 candidats du 29/10/2026 (session 2071e2c2, à partir de 16:10) avec
-  `node scripts/relever-flotte.mjs --depuis <début> --journal <journal> --etiquette <campagne>` :
-  durée par agent, jetons, appels d'outils, durée totale, conflits à la fusion.
-- Relève les limites du harnais : plafond d'agents simultanés de l'outil Agent (documentation,
-  sinon « non documenté »), règles de l'outil Workflow. N'émets aucun appel coûteux pour les
-  mesurer.
-- Si la campagne du 29/10 n'est pas finie, attends sa fin ; ne touche jamais une session en cours.
+DÉCLENCHEUR. Ne commence que lorsque la campagne de référence est close : les 6 fichiers
+`*.meta.json` des agents « Lot A » à « Lot F » portent `"finished":true`. Sinon, rends la main
+sans rien écrire, en disant combien de lots restent ouverts.
+
+ÉTAPE 0 — RÉFÉRENCE (lecture seule : aucune écriture, pas d'option --journal).
+- Entrée : les 38 sujets de `C:\Users\iguan\AppData\Local\Temp\claude\c--dev-digit-ai-factory\2071e2c2-a550-4861-af6a-8b64f7aafe28\scratchpad\candidats.md`
+  (blocs « ### TF-xxxx »), et l'ancien découpage dans `lots.md` du même dossier. Copie les deux
+  dans les fixtures du planificateur, pour qu'ils survivent au dossier temporaire.
+- Agents de la campagne : seulement les sous-agents de
+  `~\.claude\projects\c--dev-digit-ai-factory\2071e2c2-a550-4861-af6a-8b64f7aafe28\subagents\`
+  dont la description commence par « Lot » (types `campagne` ou `constructeur`, lancés à
+  17:10-17:12 heure de Paris, soit 16:10-16:12 en UTC dans les transcripts). Les relectures
+  d'intention (`verificateur`) se comptent à part, comme coût fixe ; les autres sous-agents sont
+  exclus.
+- Durées : pour chaque agent de lot, premier et dernier horodatage de son transcript. Durée totale
+  = heure de traitement du dernier rapport, lue dans la transcription principale
+  `2071e2c2-a550-4861-af6a-8b64f7aafe28.jsonl`, moins le premier lancement.
+- Jetons : jetons de sortie et jetons relus des agents de lot, tirés de leurs transcripts ; même
+  méthode avant et après. `node scripts/relever-flotte.mjs --depuis 2026-10-29 --json` ne filtre
+  pas par session : ne t'en sers que pour recouper.
+- Taux de sujets clos : sujets passés à `corrige` au registre `todo/TODO.jsonl` sur les 38 lancés.
+- Conflits de fusion : historique git des fusions de la campagne dans les dépôts touchés.
+- Plafond d'agents : lis `references/PARALLELISME-CLAUDE-CODE.md` (20 sous-agents simultanés par
+  session, 16 agents à la fois pour un workflow, relevé du 2026-10-19). Ne refais la recherche que
+  si sa date de revue est passée. Ne crée aucun second référentiel ; signale la constante
+  LIMITE_SOUS_AGENTS_SIMULTANES écrite en dur dans relever-flotte comme un écart à la loi n° 4.
 
 ÉTAPE 1 — RÈGLE DE DÉCOUPAGE.
 - Pour chaque sujet, estime les fichiers touchés à partir des chemins qu'il cite ; un sujet sans
   chemin forme un groupe à part.
 - Deux sujets qui partagent un fichier vont dans le même groupe (composantes connexes).
-- Répartis les groupes entre agents en équilibrant la charge estimée : la durée d'une campagne est
-  celle de son plus long agent.
-- Le nombre d'agents est le résultat : min(nombre de groupes, plafond). Le plafond vit dans un
-  référentiel daté et sourcé (loi n° 4), jamais dans le code.
-- Un sujet trop petit pour payer le coût fixe d'un agent (lecture du contrat, relecture de
-  consigne) se regroupe avec un autre du même dépôt.
+- Modèle de durée, calibré sur la référence : durée d'un agent = coût fixe + somme des durées de
+  ses sujets, les deux paramètres tirés des 6 lots mesurés à l'étape 0 et cités avec leur source.
+  Le même modèle estime l'ancien découpage et le nouveau : on compare estimation à estimation.
+- Nombre d'agents : le plus petit N, sous le plafond, qui minimise la durée estimée du plus long
+  agent tant que N × coût fixe en jetons + jetons des sujets reste sous 1,2 × les jetons de
+  référence. Un sujet dont la durée estimée est inférieure au coût fixe se regroupe avec un autre
+  du même dépôt.
 
 ÉTAPE 2 — LANCEMENT.
 - Copie isolée (isolation worktree) pour tout agent qui partage un dépôt avec un autre agent.
@@ -199,22 +233,28 @@ sujets clos.
   `node oracles/hook-restitution.mjs --prejuger <fichier>`.
 
 ÉTAPE 4 — LIVRABLES.
-- Le planificateur : un script qui lit une liste de sujets et rend groupes, nombre d'agents,
-  isolation et modèle par agent, avec sa recette (une fixture où le découpage par dépôt crée un
-  lot déséquilibré, une où deux sujets partagent un fichier). Place-le là où la doctrine place
-  l'outillage des agents (forge-agents si c'est elle), appelé depuis le pilot.
+- Le planificateur : un script qui lit une liste de sujets et rend en JSON les groupes, le nombre
+  d'agents, l'isolation et le modèle par agent, la durée et les jetons estimés, avec sa recette
+  (une fixture où le découpage par dépôt crée un lot déséquilibré, une où deux sujets partagent un
+  fichier). Place-le là où la doctrine place l'outillage des agents (forge-agents si c'est elle),
+  appelé depuis le pilot.
 - La règle : une section « Découpage d'une campagne » dans `gabarits/AGENT-CAMPAGNE.md`, qui
   impose l'appel au planificateur et les étapes 2 et 3, en avertissement d'abord (règle neuve).
-- Le registre : A-1 et A-2 inscrits par `node todo/journaliser.mjs`, avec la mesure de
-  référence.
+- Le registre : A-1 et A-2 inscrits par `node todo/journaliser.mjs`, avec la mesure de référence.
 - Une étude courte qui compare la référence au découpage calculé sur les mêmes 38 sujets, nommée
   selon R-4 et R-25 du pilot : `Digit-AI - Etude - Strategie de lancement des agents - 20261029<indice>.md`
   dans `output/03-etudes/`, indice par `node scripts/allouer-indice.mjs`.
 
-ÉTAPE 5 — MESURE APRÈS.
-- La prochaine campagne d'au moins 10 sujets applique la stratégie ; relève-la par
-  `relever-flotte.mjs` et compare à la référence. L'item du registre ne se clôt que sur ce gain
-  constaté.
+ÉCRITURE ET PUBLICATION.
+- Avant toute écriture : `git fetch` et `git status` dans chaque dépôt touché.
+- Commits limités à tes chemins : `git commit --only -- <chemins>`, jamais un `git add` suivi d'un
+  commit nu ; le registre ne s'écrit que par `todo/journaliser.mjs`.
+- Publication : le pilot et forge-agents sous le GO permanent de R-38 §6
+  (`FORGE_PUSH_GO`), envoi vérifié par `git rev-list --left-right --count HEAD...@{u}`.
+
+ÉTAPE 5 — MESURE APRÈS (hors de ce tour).
+- La prochaine campagne d'au moins 10 sujets applique la stratégie et se mesure comme à l'étape 0.
+  L'item du registre reste ouvert jusque-là et ne se clôt que sur ce gain constaté.
 
 GARDE-FOUS.
 - Ne modifie pas une session ni une campagne en cours.
@@ -222,44 +262,51 @@ GARDE-FOUS.
 - Ne pose à l'humain que ce qui relève de lui : passer la règle en blocage, ou dépasser le seuil
   de jetons par jour des relectures. Le reste s'exécute et se rend pour information.
 
-CONTRAT DE SORTIE (voir ci-dessous) : à tenir avant de rendre la main.
+CONTRAT DE SORTIE — à tenir avant de rendre la main, chaque point avec sa preuve exécutée :
+1. la référence est chiffrée sur les 6 agents de lot : durée totale, durée du plus long agent,
+   jetons, taux de sujets clos, conflits, avec les commandes qui l'ont produite et ce qu'elles ne
+   mesurent pas ;
+2. le planificateur, rejoué sur `candidats.md`, rend un nombre d'agents, des groupes sans fichier
+   commun, une durée estimée inférieure à l'estimation de l'ancien découpage par le même modèle, et
+   des jetons estimés sous 1,2 × la référence ;
+3. sa recette sort en 0, et sa fixture rouge échoue sur l'ancien découpage par dépôt ;
+4. aucun nombre d'agents n'est écrit en dur dans la règle ni dans le script : le plafond se lit
+   dans `references/PARALLELISME-CLAUDE-CODE.md` ;
+5. `gabarits/AGENT-CAMPAGNE.md` porte la section de découpage, d'attente et de réception ;
+6. A-1 et A-2 sont au registre, `node todo/oracle-todo.mjs` sort en 0 ;
+7. l'étude porte un nom conforme à R-4 et R-25 ;
+8. l'étape 5 est inscrite comme ouverte, avec son déclencheur et sa commande de mesure ;
+9. chaque dépôt écrit est publié, écart avec le distant 0 0.
 ```
 
 ### Contrat de sortie
 
-Le livrable est accepté si chacun de ces points est vrai, preuve exécutée à l'appui :
-
-- la référence du 29/10 est chiffrée : durée totale, durée du plus long agent, jetons, conflits, avec la commande qui l'a produite ;
-- le planificateur, rejoué sur les 38 sujets du 29/10, rend un nombre d'agents, des groupes et une durée estimée inférieure à la référence ;
-- sa recette passe, et sa fixture rouge échoue sur l'ancien découpage par dépôt ;
-- aucun nombre d'agents n'est écrit en dur dans la règle ni dans le script : le plafond se lit dans un référentiel daté ;
-- `gabarits/AGENT-CAMPAGNE.md` porte la section de découpage, d'attente et de réception ;
-- A-1 et A-2 figurent au registre, `node todo/oracle-todo.mjs` PASS ;
-- l'étude porte un nom conforme à **R-4** *(règle du pilot : le nom du projet ouvre le nom du fichier)* et **R-25** *(règle du pilot : le type, pris au registre des types, est le premier mot du deuxième segment)*.
+Le contrat est désormais dans le prompt, en 9 points, sous « CONTRAT DE SORTIE ». À la passe 1, il était annoncé mais absent : les deux relecteurs l'ont relevé. Ses points couvrent la référence chiffrée sur les 6 agents de lot, le planificateur rejoué sur `candidats.md`, sa recette, le plafond lu dans `references/PARALLELISME-CLAUDE-CODE.md`, la section de `gabarits/AGENT-CAMPAGNE.md`, le registre, le nom de l'étude selon **R-4** *(règle du pilot : le nom du projet ouvre le nom du fichier)* et **R-25** *(règle du pilot : le type, pris au registre des types, est le premier mot du deuxième segment)*, l'étape 5 ouverte et la publication vérifiée.
 
 ### Protocole de tests du livrable
 
 Le livrable mêle du code et un document ; chaque partie a son oracle.
 
-- **Code (planificateur)** : exécution réelle sur trois jeux d'essai. Le jeu nominal : les 38 sujets du 29/10. Le cas limite 1 : 3 sujets dans un seul dépôt qui partagent un fichier, attendu un seul agent. Le cas limite 2 : 20 sujets sans aucun chemin cité, attendu le plafond, sans erreur.
+- **Code (planificateur)** : exécution réelle sur trois jeux d'essai. Le jeu nominal : les 38 sujets de `candidats.md`. Le cas limite 1 : 3 sujets dans un seul dépôt qui partagent un fichier, attendu un seul agent. Le cas limite 2 : 20 sujets sans aucun chemin cité, attendu un rattachement à leur dépôt, sans erreur.
 - **Document (règle et étude)** : présence des sections nommées, chiffres sourcés, oracle de lisibilité Markdown du socle.
 - **Boucle bornée** : générer, tester contre le contrat, corriger, 3 itérations au plus ; après 3 échecs, livrer avec la liste des écarts restants.
 
 ### Changelog
 
-Comment lire la liste : chaque ajout du prompt réécrit renvoie au défaut du chapitre 3 ou à la cause du chapitre 5 qu'il ferme.
+Comment lire la liste : chaque ajout du prompt renvoie au défaut qu'il ferme, du chapitre 3 ou d'une passe de relecture.
 
 - Objectif chiffré et trois contraintes : défaut n° 2, cause n° 4.
-- Étape 0, référence et limites du harnais : défauts n° 1 et n° 8, cause n° 4.
-- Nombre calculé sous plafond daté : défaut n° 4, cause n° 2.
-- Groupes par fichiers et équilibrage de charge : défaut n° 6, causes n° 3 et attaque de l'expert.
-- Copie isolée par agent qui partage un dépôt : défaut n° 6, cause n° 3.
-- Relecture commune D-47 et coût de N relectures : défaut n° 7, effet à l'échelle n° 1.
-- Étape 3, réception sans attente : défaut n° 5, cause n° 5.
-- Étape 4, script plus règle plus registre plus étude : défaut n° 3, cause n° 1.
-- Avertissement d'abord, décision humaine seulement pour le blocage : défaut n° 10.
-- Ne pas toucher la session en cours : défaut n° 9.
-- Étape 5, mesure après : défaut n° 12.
+- Nombre calculé sous le plafond de `references/PARALLELISME-CLAUDE-CODE.md` : défauts n° 4 et n° 8, passe 1.
+- Groupes par fichiers et copie isolée : défaut n° 6, cause n° 3.
+- Réception sans attente : défaut n° 5, cause n° 5.
+- Script plus règle plus registre plus étude : défaut n° 3, cause n° 1.
+- Mesure de référence par les transcripts des sous-agents, plus par `relever-flotte` seul, qui ne mesure pas les durées : bloquant de la passe 1.
+- Contrat de sortie écrit dans le prompt : passe 1.
+- A-1 et A-2 recopiés dans le prompt : passe 1.
+- Déclencheur sur la fin de la campagne, filtre des seuls agents « Lot », heure en heure de Paris et en UTC : passe 2.
+- Liste des 38 sujets nommée, modèle de durée calibré, comparaison estimation contre estimation : passe 2.
+- Taux de sujets clos et jetons au contrat, règles de commit et de publication : passe 2.
+- Étape 5, mesure après, hors du tour : défaut n° 12.
 
 ### Écarts à la lettre
 

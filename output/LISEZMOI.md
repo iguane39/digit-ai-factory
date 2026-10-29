@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 561 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 562 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -84,7 +84,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Proposition Architecture - Circuit - 20260815d.md | 20260815d | 5.4 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit - 20260815d.md` |
 | Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md | 20260815a | 11 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` |
 | Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md | 20260809a | 9.4 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md` |
-| Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md | 20261029a | 20.6 Ko | `01-revues-et-propositions/Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md` |
+| Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md | 20261029a | 26.9 Ko | `01-revues-et-propositions/Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md` |
+| Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md.boucle.json | — | 14.6 Ko | `01-revues-et-propositions/Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md.boucle.json` |
 | Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815c.md | 20260815c | 3.7 Ko | `01-revues-et-propositions/Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815c.md` |
 | Digit-AI - Revue Forge - Écosystème - 20260808a.md | 20260808a | 11.2 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260808a.md` |
 | Digit-AI - Revue Forge - Écosystème - 20260819a.md | 20260819a | 6 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260819a.md` |
