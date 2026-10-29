@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 562 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 563 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -514,6 +514,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md | 20261003b | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` |
 | Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md | 20261013h | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` |
 | Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md | 20261012c | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md` |
+| Digit-AI - Synthese Mandat - Campagne sur les 38 candidats - 20261029h.md | 20261029h | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne sur les 38 candidats - 20261029h.md` |
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261014a.md | 20261014a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261014a.md` |
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015a.md | 20261015a | 11.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015a.md` |
 | Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015e.md | 20261015e | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015e.md` |

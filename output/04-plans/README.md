@@ -59,6 +59,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` | fichier | 11,7 Ko | Synthèse Mandat — votre décision D-55 (a) est exécutée : les 8 améliorations des pages de  |
 | `Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` | fichier | 9,6 Ko | Synthèse Mandat — campagne du matin reprise et close, 2 restes avancés (13/10/2026) |
 | `Digit-AI - Synthese Mandat - Campagne du registre, 50 sujets clos - 20261012c.md` | fichier | 12,5 Ko | Synthèse Mandat — campagne du 12/10 sur 86 sujets du registre : 50 clos, 35 en cours avec  |
+| `Digit-AI - Synthese Mandat - Campagne sur les 38 candidats - 20261029h.md` | fichier | 6,8 Ko | Synthèse Mandat — campagne sur les 38 candidats du registre (29/10/2026) |
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261014a.md` | fichier | 9,9 Ko | Synthèse Mandat — tous les retours et sujets décidés traités, forges et pilot publiés, pro |
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015a.md` | fichier | 11,8 Ko | Synthèse Mandat — retours du 14/10 traités, deux vagues de corrections publiées, produits  |
 | `Digit-AI - Synthese Mandat - Campagne TODOs et retours - 20261015e.md` | fichier | 13,8 Ko | Synthèse Mandat — retours du 15/10 traités, 80 sujets corrigés, 6 forges publiées, pilot e |
@@ -160,4 +161,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_140 fichier(s), 3 sous-dossier(s)_
+_141 fichier(s), 3 sous-dossier(s)_
