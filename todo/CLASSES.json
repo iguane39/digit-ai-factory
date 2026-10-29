@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.46.0",
- "date": "2026-10-27",
+ "version": "1.47.0",
+ "date": "2026-10-29",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -2317,6 +2317,35 @@
    "oracle": "pilot, recette gabarits/ledger.test.mjs, cas « rouge → vert — « --help » et un type qui commence par un tiret n écrivent rien au ledger »",
    "voisines": [
     "regle-ecrite-sans-oracle-qui-la-joue"
+   ]
+  },
+  {
+   "cle": "champ-de-fichier-ignore-par-l-ecrivain",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un écrivain de trace lit un fichier d entrée mais ignore en silence un champ que l utilisateur y a mis, faute de l avoir prévu : la trace sort incomplète et la vérification rend PRÉSENT. Mesuré chez Produit-84 le 29/10/2026 : champ demande du fichier de verdicts de mobiliser.mjs, trace écrite avec demande null.",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-2017"
+   ],
+   "regle": "scripts/mobiliser.mjs : le squelette de --preparer porte « demande », --verdicts lit la demande du fichier quand --demande est absent, refuse la valeur de gabarit laissée telle quelle et dit en sortie une demande absente (correction du 29/10/2026, TF-2017)",
+   "oracle": "pilot, recette scripts/mobiliser.test.mjs, cas « TF-2017 — le squelette de --preparer porte « demande »… » et « TF-2017 — la demande laissée au gabarit est refusée… »",
+   "voisines": [
+    "reglage-projet-ignore-par-la-forge"
+   ]
+  },
+  {
+   "cle": "type-prescrit-hors-vocabulaire-de-l-ecrivain",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un oracle prescrit un type d entrée de ledger que l écrivain du gabarit refuse ou déclare hors vocabulaire : le produit qui suit la consigne du juge voit son écriture refusée. Mesuré chez Produit-84 le 28/10/2026 : rectification_versions_forges prescrite par R-19, refusée par gabarits/ledger.py.",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-2018"
+   ],
+   "regle": "gabarits/ledger.py : les quatre types de rectification par ajout du parc sont au vocabulaire, seq_vise s écrit en nombre, et un run_open sans versions_forges le dit à l écriture (correction du 29/10/2026, TF-2018)",
+   "oracle": "pilot, recette gabarits/ledger.test.mjs, cas « TF-2018 vert — les N types de rectification prescrits par le parc sont au vocabulaire du gabarit » (test croisé avec oracles/, scripts/ et ledger.mjs de forge-agents) et son témoin rouge",
+   "voisines": [
+    "declaration-de-run-sans-rectification",
+    "outil-qui-ecrit-sur-son-option-d-aide"
    ]
   }
  ],
