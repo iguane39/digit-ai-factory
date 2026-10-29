@@ -1,0 +1,54 @@
+{
+ "poste": "DESKTOP-ULTRA7",
+ "debut": "2026-10-20T00:00:00+02:00",
+ "fin": "2026-10-29T19:14:04+01:00",
+ "ts": "2026-10-29T18:14:04.401Z",
+ "palier": null,
+ "indicateurs": {
+  "demandes": 146,
+  "reprises": 41,
+  "consignes_repetees": 18,
+  "messages_hors_demande": 123,
+  "refus_hook": 67
+ },
+ "evolution": {
+  "demandes": {
+   "avant": null,
+   "apres": 146,
+   "ecart": null
+  },
+  "reprises": {
+   "avant": null,
+   "apres": 41,
+   "ecart": null
+  },
+  "consignes_repetees": {
+   "avant": null,
+   "apres": 18,
+   "ecart": null
+  },
+  "messages_hors_demande": {
+   "avant": null,
+   "apres": 123,
+   "ecart": null
+  },
+  "refus_hook": {
+   "avant": null,
+   "apres": 67,
+   "ecart": null
+  },
+  "reprises_par_demande": {
+   "avant": null,
+   "apres": 0.281
+  }
+ },
+ "sortie": [
+  "Analyse faite : DESKTOP-ULTRA7, du 20/10 au 29/10/2026 19:14, 99 sessions dont 45 appels automatisés du juge, 8 agents, 1,08 M jetons.",
+  "Indicateurs : 146 demandes, 41 reprises, 18 consignes répétées, 123 messages hors demande, 67 refus de hook ; première mesure de ce poste, rien à comparer.",
+  "54 refus sur 67 sont des réponses non préjugées ; au moins 19 visent un tour sans écriture ; 48 demandes sur 146 en écart.",
+  "Automatiques faites : oeil-critique 1.2.1 (lots d'agents égaux, champ « descente déclarée » retiré), forge-agents 84f086c.",
+  "Majeures posées : D-104 restitution à chemin unique, D-105 format du tour sans écriture, D-106 barrière secrets, D-107 script de synchronisation, D-108 PASS sans mesure réelle (réservées D-99 à D-103, renumérotées : numéros pris par le publié).",
+  "Majeures en attente : hook reprise (45 % du temps des hooks), statut de tâche longue, prompts Claude dans Chrome, faux positifs du relevé des appelants, juge en double, liste « non bloquant » des refus, essais qui écrivent, avertissements d'ouverture sans item.",
+  "Non fait : mission 1 (revue de code de la période), plafond de jetons déjà atteint."
+ ]
+}
