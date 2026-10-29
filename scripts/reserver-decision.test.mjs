@@ -150,6 +150,14 @@ try {
     const sansOption = lancer(["--question", "Faut-il publier la version corrigée du démarrage ?"], join(f, "forge"));
     att(sansOption.code === 0 && sansOption.o?.cible === "produit" && sansOption.o?.reserve === "D-1", `6 (${sorte}) : depuis forge/ d'un produit, sans --produit, l'outil écrit chez le produit, obtenu ${sansOption.code} ${JSON.stringify(sansOption.o || sansOption.brut).slice(0, 200)}`);
     att(numerosDuLedger(f).numeros.has("1"), `6 (${sorte}) : D-1 doit être au ledger du produit`);
+
+    // ---- 6 bis. TF-1961 : un ledger né vide ne reprend pas un numéro déjà AFFICHÉ dans une restitution du produit
+    const g = produit(sorte);
+    mkdirSync(join(g, "output", "04-plans"), { recursive: true });
+    writeFileSync(join(g, "output", "04-plans", "Produit - Synthese - Lot 1 - 20261002a.md"),
+      "## 3. Décisions attendues\n\n> **D-71 — Faut-il ouvrir le lot 2 ?**\n> - **Recommandation : (a)**\n\nLa suite dépendra de la réponse, comme pour D-90 évoquée en prose.\n", "utf8");
+    const apres71 = lancer(["--question", "Faut-il publier le lot 1 ?", "--produit", g]);
+    att(apres71.o?.reserve === "D-72", `6 bis (${sorte}) : D-71 affichée dans une restitution, la réservation doit rendre D-72 (une mention en prose de D-90 ne compte pas), obtenu ${JSON.stringify(apres71.o || apres71.brut).slice(0, 200)}`);
   }
   att(empreinte(REGISTRE_PILOT) === empreintePilot, "6 : le registre du pilot a été modifié par la recette (elle ne doit jamais l'écrire)");
 

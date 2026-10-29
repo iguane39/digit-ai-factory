@@ -28,7 +28,7 @@
  *     produit, le registre commun ne couvre pas non plus deux postes (D-83 (a)) : il vit dans le dossier git de CE poste ;
  *   · que la question réservée soit celle qui sera affichée : le contrôle ne compare que le sens, par les mots.
  */
-import { existsSync, readFileSync, appendFileSync, openSync, closeSync, unlinkSync, mkdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, appendFileSync, openSync, closeSync, unlinkSync, mkdirSync, statSync, writeFileSync } from "node:fs";
 import { join, dirname, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -155,6 +155,36 @@ export function numerosDuLedger(produit) {
   return { fichier, existe: true, numeros, max: [...numeros].reduce((m, n) => Math.max(m, Number(n)), 0) };
 }
 
+/**
+ * Les numéros de décision DÉJÀ AFFICHÉS chez un produit (TF-1961, 29/10/2026) : la tête « > **D-N — … ?** » d'une restitution ou
+ * d'un `DECISIONS.md`, sous `forge\` et `output\` (profondeur 6, sans `node_modules` ni `.git`). Le 19/10/2026, un ledger né vide
+ * a accepté D-68 à D-71, déjà posées à l'humain le 02/10 dans trois restitutions. Une mention en prose (« voir D-90 ») ne compte
+ * pas : seule la tête de la décision affichée est un numéro pris. Un numéro de trop laisse un trou, ce qui n'est pas une erreur.
+ */
+const TETE_DECISION = /^>\s*\*\*D-(\d{1,4})\s+[—–-]/gm;
+export function numerosAffiches(produit) {
+  let max = 0, fichiers = 0;
+  const parcourir = (d, prof) => {
+    if (prof > 6 || !existsSync(d)) return;
+    let es; try { es = readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const e of es) {
+      if (e.name === "node_modules" || e.name === ".git") continue;
+      const p = join(d, e.name);
+      if (e.isDirectory()) { parcourir(p, prof + 1); continue; }
+      if (!/\.md$/i.test(e.name)) continue;
+      let t; try { t = readFileSync(p, "utf8"); } catch { continue; }
+      let vu = false;
+      for (const m of t.matchAll(TETE_DECISION)) { max = Math.max(max, Number(m[1])); vu = true; }
+      if (vu) fichiers++;
+    }
+  };
+  parcourir(join(produit, "forge"), 0);
+  parcourir(join(produit, "output"), 0);
+  const dec = join(produit, "DECISIONS.md");
+  if (existsSync(dec)) for (const m of readFileSync(dec, "utf8").matchAll(TETE_DECISION)) max = Math.max(max, Number(m[1]));
+  return { max, fichiers };
+}
+
 /** L'écrivain du ledger de ce produit : `forge\ledger.py` s'il existe (pile Python), sinon `ledger.mjs` de forge-agents sous la racine du parc. */
 export function ecrivainDeLedger(produit, racineParc = process.env.FORGE_ROOT || dirname(PILOT)) {
   const py = join(produit, "forge", "ledger.py");
@@ -205,7 +235,8 @@ export function lireRegistreCommun(produit) {
 export function prochainChezProduit({ produit, plancher = 0 }) {
   const ledger = numerosDuLedger(produit);
   const commun = lireRegistreCommun(produit);
-  return { n: Math.max(ledger.max, commun.max, plancher) + 1, ledger, commun };
+  const affiches = numerosAffiches(produit);
+  return { n: Math.max(ledger.max, commun.max, affiches.max, plancher) + 1, ledger, commun, affiches };
 }
 
 /** Réserve le prochain numéro libre chez un produit et l'inscrit à son `forge\ledger.jsonl`, par l'écrivain du produit, sous un verrou propre à la réservation.
@@ -230,7 +261,7 @@ function reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun })
   return sousVerrou(join(produit, "forge", "decisions.lock"), () => {
     const avant = numerosDuLedger(produit);
     const commun = fichierCommun ? lireRegistrePilot(fichierCommun) : { max: 0 };
-    const n = Math.max(avant.max, commun.max, plancher) + 1;
+    const n = Math.max(avant.max, commun.max, numerosAffiches(produit).max, plancher) + 1;
     const id = "D-" + n;
     const decisions = { [id]: q.question };
     if (fichierCommun) {
