@@ -1,0 +1,520 @@
+{
+ "schema": "l99-boucle@1",
+ "prompt": "Amélioration de la boucle de relecture L99 (29/10/2026)",
+ "ouverture": "d office (TF-2022) : défaut bloquant relevé à l analyse, et prompt qui lance des agents puis modifie un skill",
+ "arbitre": {
+  "rubrique": "couches.md Ch1, 6 dimensions /100, plafond 40 sur bloquant",
+  "arret": "0 bloquant et 0 majeur",
+  "seuil_score": null,
+  "gain_min": 3,
+  "borne": 3,
+  "garde_longueur": 0.15,
+  "extension": {
+   "borne": 5,
+   "motif": "TF-2024 : la passe 3 gagne 4 points avec 3 majeurs retenus",
+   "decidee_apres_passe": 3
+  }
+ },
+ "passes": [
+  {
+   "n": 1,
+   "fichier": "bloc « Prompt réécrit » de la revue 20261029b, version de 19:52",
+   "mots": 813,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 1, n°1 et n°2)",
+    "aveugle": true,
+    "interdits": [
+     "analyse 20261029b",
+     "passes précédentes",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    69,
+    68
+   ],
+   "score_mesure": 68,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "Une variante « marche » que si sa médiane de jury dépasse 78",
+     "defaut": "la base 78 est le minimum de 2 notes de l'ancienne règle, pas une médiane du jury",
+     "recompte": {
+      "commande": "lecture du journal 20261029a, passes[4]",
+      "resultat": "scores_relecteurs [81, 78], score_mesure 78, règle « le plus bas »"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Plafond : 2 000 000 de jetons pour les étapes 1 à 3.",
+     "defaut": "le plan dépasse son plafond (environ 31 agents), sans ordre des variantes ni mesure des jetons",
+     "recompte": {
+      "commande": "décompte des agents par étape dans le prompt, et revue 20261029a ligne « Chaque passe coûte environ 200 000 jetons »",
+      "resultat": "3 + 6 + 6 + 7 + 6 + 8 = 36 agents avec les correcteurs, au-delà de 2 000 000 à 100 000 par agent"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "1 relecteur de la passe 5 repris avec son contexte",
+     "defaut": "le journal ne garde aucun identifiant d'agent : la reprise est impossible depuis une autre session",
+     "recompte": {
+      "commande": "grep -c agentId sur le journal 20261029a",
+      "resultat": "0"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "les défauts retenus qui ont été créés par la correction de la passe précédente",
+     "defaut": "ce chiffre ne se tire pas du journal, et les prompts des passes ne sont pas localisés",
+     "recompte": {
+      "commande": "git ls-files | grep prompt-p ; lecture des champs passes[].fichier",
+      "resultat": "aucun fichier suivi ; « prompt-p2.md »… sans dossier, seulement dans le dossier temporaire de la session"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "consigne de relecture inchangée [...] Fais noter le prompt de la passe 5 par le jury",
+     "defaut": "la consigne du jury et le prompt de la passe 5 ne sont pas localisés",
+     "recompte": {
+      "commande": "grep -n consigne sur la revue 20261029a",
+      "resultat": "aucun fichier de consigne cité"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "adapte scripts/oracle-boucle-l99.mjs (règles B2 et B5) [...] La règle part en avertissement",
+     "defaut": "aucune règle de l'oracle ne lit vu_par ; l'oracle n'a pas de niveau d'avertissement",
+     "recompte": {
+      "commande": "grep -n \"vu_par\\|AVERT\\|WARN\" scripts/oracle-boucle-l99.mjs",
+      "resultat": "0 ligne"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Chaque variante corrige le prompt, puis le jury note le résultat.",
+     "defaut": "l'auteur des corrections n'est pas dit : une même session contamine les variantes",
+     "recompte": {
+      "commande": "lecture de l'étape 2 du prompt",
+      "resultat": "aucune mention de l'auteur des corrections"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 0,
+   "rejetee": false,
+   "decision": "continuer",
+   "texte": "Objet : trouver ce qui ferait monter la qualité des prompts réécrits par la boucle L99 au-delà\ndu plafond observé le 29/10/2026, et le mettre en place dans le skill prompt-analyzer-l99.\nCas pratique : le prompt de stratégie de lancement des agents, revue\n`output/01-revues-et-propositions/Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md`,\nscores mesurés 40, 69, 72, 76, 78 sur 5 passes.\n\nPRINCIPE. On veut améliorer le PROMPT, pas la note. Toute variante est donc notée par un même\njury, fixé avant l'expérience : 3 relecteurs neufs et aveugles, consigne de relecture inchangée,\nscore du jury = médiane des 3 notes. Les relecteurs qui alimentent la correction sont distincts\ndu jury.\n\nÉTAPE 0 — CE QUE LE JOURNAL DIT DÉJÀ (lecture seule, sans dépense).\nLis le journal `<revue 20261029a>.md.boucle.json`. Rends, chiffré et sourcé :\n- les défauts vus par un seul relecteur, combien le recompte a démentis, combien sont revenus à\n  une passe suivante ;\n- l'écart entre les deux notes de chaque passe ;\n- les défauts retenus qui ont été créés par la correction de la passe précédente ;\n- la croissance du prompt en mots.\n\nÉTAPE 1 — LE BRUIT DE MESURE.\nFais noter le prompt de la passe 5 par le jury (3 relecteurs). Ajoute les 2 notes déjà prises à\nla passe 5 (81 et 78). L'écart maximal entre ces 5 notes est le bruit. Une variante ne « marche »\nque si sa médiane de jury dépasse 78 d'au moins ce bruit, et d'au moins 3 points.\n\nÉTAPE 2 — LES VARIANTES, une passe de correction chacune, toutes à partir du prompt de la passe 5.\nChaque variante corrige le prompt, puis le jury note le résultat.\n- A, témoin : 2 relecteurs neufs, retenue « vu par les deux » (règle actuelle).\n- B, union recomptée : 2 relecteurs neufs, tout défaut vu par au moins un relecteur est retenu\n  s'il tient au recompte à la source.\n- C, clôture vérifiée : comme B, puis un vérificateur AVEC contexte (il lit les défauts retenus et\n  la correction, pas l'analyse) dit pour chaque défaut s'il est fermé et si la correction en crée\n  un neuf ; on corrige ce qu'il signale avant le jury. Il ne note pas.\n- D, ancien et nouveau : 1 relecteur neuf et 1 relecteur de la passe 5 repris avec son contexte,\n  retenue comme B.\n- E, quatre relecteurs : 4 relecteurs neufs, retenue comme B.\nGarde de longueur : une correction qui grossit de plus de 15 % sans fermer de majeur est rejetée.\n\nÉTAPE 3 — LECTURE DES RÉSULTATS.\nPour chaque variante : médiane du jury, gain sur 78, défauts graves restants selon le jury,\njetons dépensés, mots. Une variante gagne si son gain dépasse le seuil de l'étape 1 ; à gain égal,\nla moins chère gagne. Un seul cas pratique ne fonde pas une règle : dis-le.\n\nÉTAPE 4 — MISE EN PLACE.\n- Si une variante gagne : écris-la dans `references/boucle.md` du skill prompt-analyzer-l99 de\n  digit-ai-forge-agents, adapte `scripts/oracle-boucle-l99.mjs` (règles B2 et B5) et sa recette,\n  publie, aligne la copie installée. La règle part en avertissement, avec une revue datée après\n  5 boucles réelles.\n- Sinon : écris le constat négatif, et ne change pas le skill.\n- Dans les deux cas : inscris le sujet au registre par `node todo/journaliser.mjs`, et écris une\n  étude nommée selon R-4 et R-25 du pilot :\n  `Digit-AI - Etude - Amelioration de la boucle de relecture L99 - 20261029<indice>.md` dans\n  `output/03-etudes/`, indice par `node scripts/allouer-indice.mjs`.\n\nGARDE-FOUS.\n- Plafond : 2 000 000 de jetons pour les étapes 1 à 3. Au-delà, arrête-toi et pose la suite à\n  l'humain avec le coût mesuré. Fais l'étape 0 avant toute dépense.\n- Ne modifie ni le journal ni la revue 20261029a : l'expérience vit dans ses propres fichiers.\n- Toute nouvelle règle respecte « le juge n'est jamais l'auteur » : un relecteur avec contexte\n  vérifie la clôture, il ne note jamais.\n- Commits limités à tes chemins (`git commit --only -- <chemins>`), publication sous R-38 §6,\n  envoi vérifié par `git rev-list --left-right --count HEAD...@{u}`.\n\nCONTRAT DE SORTIE — chaque point avec sa preuve exécutée :\n1. l'étape 0 rend ses quatre chiffres, avec la commande qui les a tirés du journal ;\n2. le bruit de mesure est chiffré à partir de 5 notes du même prompt ;\n3. chaque variante porte sa médiane de jury, son gain, ses défauts graves restants, ses jetons et\n   ses mots, dans un même tableau ;\n4. la conclusion nomme la variante gagnante ou dit qu'aucune ne dépasse le bruit ;\n5. si une variante gagne : `references/boucle.md`, l'oracle et sa recette sont changés, la recette\n   sort en 0, forge-agents est publié ;\n6. le registre porte le sujet, `node todo/oracle-todo.mjs` sort en 0 ;\n7. l'étude porte un nom conforme à R-4 et R-25 ;\n8. les jetons dépensés sont sous le plafond, ou l'arrêt au plafond est posé à l'humain.\n"
+  },
+  {
+   "n": 2,
+   "fichier": "b-prompt-p2.md",
+   "mots": 1163,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 2, n°1 et n°2)",
+    "aveugle": true,
+    "interdits": [
+     "analyse 20261029b",
+     "passes précédentes",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    73,
+    76
+   ],
+   "score_mesure": 73,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "note": "La passe 2 ferme aussi un défaut vu par un seul relecteur à la passe 1 (l'auteur des corrections) : écart au protocole, déclaré.",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "Toute variante est notée par un même jury, fixé avant l'expérience : 3 relecteurs neufs et aveugles",
+     "defaut": "« même jury » et « neufs » se contredisent ; le devis change selon la lecture",
+     "recompte": {
+      "commande": "lecture du PRINCIPE de b-prompt-p2.md",
+      "resultat": "aucune phrase ne tranche entre 3 jurés réutilisés et 3 jurés neufs par prompt"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Si le devis dépasse le plafond, pose le choix à l'humain",
+     "defaut": "le plan dépasse son plafond par construction (24 relecteurs, environ 2,4 millions) et ne tranche pas le sous-ensemble",
+     "recompte": {
+      "commande": "décompte : 3 + 2 + 2 + 2 + 5 × 3",
+      "resultat": "24 relecteurs, environ 2 400 000 jetons avant correcteurs"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "avec `consigne_relecteur` et `rubrique_relecteur` telles quelles",
+     "defaut": "la consigne du journal cite un chemin de dossier temporaire et un interdit propre à la passe 1 : elle ne sert pas telle quelle",
+     "recompte": {
+      "commande": "node : lecture de consigne_relecteur dans le journal 20261029a",
+      "resultat": "chemin « …\\scratchpad\\prompt-pN.md » et interdit « prompt-p autre que prompt-p1.md »"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "un relecteur qui reçoit le prompt de la passe 5 avec les défauts que le relecteur n°1 de la passe 5 avait rendus",
+     "defaut": "la reprise ne simule rien (même texte), ne voit que les défauts graves consolidés, et sa règle de retenue n'est pas dite",
+     "recompte": {
+      "commande": "node : passes[4].defauts filtrés sur vu_par contenant 1",
+      "resultat": "4 défauts graves, aucune note ni mineur"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "les défauts retenus à la passe N dont la citation est absente de passes[N-1].texte",
+     "defaut": "indice décalé (passes[] commence à 0) et recherche de sous-chaîne qui échoue sur les citations élidées",
+     "recompte": {
+      "commande": "node : citations retrouvées mot pour mot dans leur propre passe (relecteur n°2)",
+      "resultat": "26 sur 34"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Le bruit est l'écart maximal entre ces 3 notes et les 2 notes de la passe 5",
+     "defaut": "le dépôt a changé depuis la passe 5 : le bruit mêle dérive du dépôt et variance des relecteurs",
+     "recompte": {
+      "commande": "git log --format='%h %ad %s' -8",
+      "resultat": "commit de la campagne des candidats postérieur à la revue"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Un seul cas pratique ne fonde pas une règle : dis-le.",
+     "defaut": "l'étape 4 change pourtant la règle par défaut sur un seul cas",
+     "recompte": {
+      "commande": "lecture des étapes 3 et 4",
+      "resultat": "contradiction présente"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 6,
+   "rejetee": false,
+   "decision": "continuer",
+   "texte": "Objet : trouver ce qui ferait monter la qualité des prompts réécrits par la boucle L99 au-delà\ndu plafond observé le 29/10/2026, et le mettre en place dans le skill prompt-analyzer-l99.\nCas pratique : le prompt de stratégie de lancement des agents, revue\n`output/01-revues-et-propositions/Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md`,\nscores retenus 40, 69, 72, 76, 78 sur 5 passes, chacun le plus bas de 2 notes.\n\nENTRÉES, toutes dans le journal `<revue 20261029a>.md.boucle.json` :\n- le texte du prompt de chaque passe : champ `passes[].texte` (passes 1 à 5) ;\n- la consigne et la rubrique des relecteurs : champs `consigne_relecteur` et `rubrique_relecteur` ;\n- les défauts de chaque passe, avec `statut` (retenu, ecarte), `vu_par` et leur recompte.\nCopie ces trois entrées dans un dossier de l'expérience avant l'étape 1 : le jury s'en sert sans\nles modifier.\n\nPRINCIPE. On veut améliorer le PROMPT, pas la note. Toute variante est notée par un même jury,\nfixé avant l'expérience : 3 relecteurs neufs et aveugles, avec `consigne_relecteur` et\n`rubrique_relecteur` telles quelles ; score du jury = médiane des 3 notes. Les relecteurs qui\nalimentent la correction sont distincts du jury. Chaque correction est écrite par un agent neuf\n(même modèle, même effort), qui reçoit le prompt de la passe 5 et les seuls défauts retenus de sa\nvariante, et rend un fichier par variante (`variante-A.md`…).\n\nÉTAPE 0 — CE QUE LE JOURNAL DIT DÉJÀ (lecture seule, sans dépense).\nRends, chacun avec sa commande :\n- les défauts écartés (`statut` ecarte), combien le recompte a démentis ;\n- l'écart entre les deux notes de chaque passe (`scores_relecteurs`) ;\n- les défauts retenus à la passe N dont la citation est absente de `passes[N-1].texte` et\n  présente dans `passes[N].texte` : ce sont les défauts créés par la correction ;\n- les défauts écartés qui reviennent à une passe suivante : appariement fait à la main, liste\n  fournie et déclarée comme jugement ;\n- la croissance du prompt en mots.\nPuis le DEVIS : nombre d'agents par étape et par variante, à environ 100 000 jetons par relecteur\n(mesure du 29/10/2026). Si le devis dépasse le plafond, pose le choix à l'humain avant l'étape 1,\navec le devis et l'ordre des variantes.\n\nÉTAPE 1 — LA BASE ET LE BRUIT.\nFais noter le prompt de la passe 5 par le jury. Sa médiane est la base M0. Le bruit est l'écart\nmaximal entre ces 3 notes et les 2 notes de la passe 5 (81 et 78). Une variante « marche » si sa\nmédiane de jury dépasse M0 d'au moins max(bruit, 3 points). Le score 78 reste affiché pour\ninformation, jamais comme base.\n\nÉTAPE 2 — LES VARIANTES, une passe de correction chacune, toutes à partir du prompt de la passe 5,\ndans cet ordre : A, B, C, E, D. Pour économiser, A, B et C partagent les mêmes 2 relecteurs neufs ;\nE ajoute 2 relecteurs à ces 2.\n- A, témoin : retenue « vu par les deux » (règle actuelle).\n- B, union recomptée : tout défaut vu par au moins un relecteur est retenu s'il tient au recompte.\n- C, clôture vérifiée : comme B, puis un vérificateur AVEC contexte lit les défauts retenus et la\n  correction (pas l'analyse), dit pour chaque défaut s'il est fermé et si la correction en crée un\n  neuf ; on corrige ce qu'il signale avant le jury. Il ne note pas.\n- E, quatre relecteurs : les 4 relecteurs, retenue comme B.\n- D, ancien et nouveau, en reprise simulée : un relecteur neuf, et un relecteur qui reçoit le\n  prompt de la passe 5 avec les défauts que le relecteur n°1 de la passe 5 avait rendus (journal,\n  `vu_par` 1). Le journal ne garde aucun identifiant d'agent : une vraie reprise est impossible\n  depuis une autre session, et le tableau le dit.\nGarde de longueur : une correction qui grossit de plus de 15 % sans fermer de majeur est rejetée.\nJetons : somme des usages rendus par chaque agent, attribuée à sa variante ; les relecteurs\npartagés sont comptés une fois, à part.\n\nÉTAPE 3 — LECTURE DES RÉSULTATS.\nPour chaque variante : médiane du jury, gain sur M0, défauts graves restants selon le jury,\njetons, mots. Une variante gagne si son gain dépasse le seuil de l'étape 1 ; à gain égal, la\nmoins chère gagne. Un seul cas pratique ne fonde pas une règle : dis-le.\n\nÉTAPE 4 — MISE EN PLACE.\n- Si une variante gagne, écris-la dans `references/boucle.md` du skill prompt-analyzer-l99 de\n  digit-ai-forge-agents, avec les champs neufs du journal (`jury` : notes et médiane ;\n  `regle_de_retenue` : intersection ou union_recomptee ; rôle `verificateur_cloture`).\n  Dans `scripts/oracle-boucle-l99.mjs` : B, E → une règle neuve qui vérifie `vu_par` et le recompte\n  selon `regle_de_retenue` ; C → B2 admet un vérificateur non aveugle qui ne note pas ; D → B2\n  admet un relecteur repris. L'oracle n'a pas de niveau d'avertissement : crée-le (statut AVERT,\n  sortie 0) si la règle part en avertissement, avec une fixture qui le prouve. Dis si le lien\n  avec `oracle-judge --lecteur-vise`, cité par `boucle.md`, est rompu ou suivi.\n  Recette, publication, copies installées des deux profils du poste (`~\\.claude` et\n  `~\\.claude-b`) ; revue datée après 5 boucles réelles.\n- Sinon : écris le constat négatif, et ne change pas le skill.\n- Dans les deux cas : inscris le sujet au registre par `node todo/journaliser.mjs`, et écris une\n  étude nommée selon R-4 et R-25 du pilot :\n  `Digit-AI - Etude - Amelioration de la boucle de relecture L99 - 20261029<indice>.md` dans\n  `output/03-etudes/`, indice par `node scripts/allouer-indice.mjs`.\n\nGARDE-FOUS.\n- Plafond : 2 000 000 de jetons pour les étapes 1 à 3. Au-delà, ou si le devis le dépasse, arrête\n  et pose la suite à l'humain avec le coût mesuré.\n- Ne modifie ni la revue 20261029a ni son journal : l'expérience vit dans ses propres fichiers.\n- Toute nouvelle règle respecte « le juge n'est jamais l'auteur » : un relecteur avec contexte\n  vérifie la clôture, il ne note jamais.\n- Commits limités à tes chemins (`git commit --only -- <chemins>`), publication sous R-38 §6,\n  envoi vérifié par `git rev-list --left-right --count HEAD...@{u}`.\n\nCONTRAT DE SORTIE — chaque point avec sa preuve exécutée :\n1. l'étape 0 rend ses chiffres, avec la commande qui les a tirés du journal, et le devis ;\n2. M0 et le bruit sont chiffrés à partir des 5 notes du prompt de la passe 5 ;\n3. chaque variante jouée porte sa médiane de jury, son gain sur M0, ses défauts graves restants,\n   ses jetons et ses mots, dans un même tableau ;\n4. la conclusion nomme la variante gagnante ou dit qu'aucune ne dépasse le seuil ;\n5. si une variante gagne : `references/boucle.md`, l'oracle et sa recette sont changés, la recette\n   sort en 0, forge-agents est publié, les deux copies installées sont alignées ;\n6. le registre porte le sujet, `node todo/oracle-todo.mjs` sort en 0 ;\n7. l'étude porte un nom conforme à R-4 et R-25 ;\n8. les jetons dépensés sont sous le plafond, ou l'arrêt est posé à l'humain avec le devis.\n"
+  },
+  {
+   "n": 3,
+   "fichier": "b-prompt-p3.md",
+   "mots": 1330,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 3, n°1 et n°2)",
+    "aveugle": true,
+    "interdits": [
+     "analyse 20261029b",
+     "passes précédentes",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    80,
+    77
+   ],
+   "score_mesure": 77,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "Consigne du jury : `consigne_relecteur` avec deux substitutions et aucune autre",
+     "defaut": "deux substitutions ne suffisent pas (interdit « prompt-p1.md », parenthèse « passe N »), l'ajout d'interdits contredit « aucune autre », et la rubrique copiée tombe sous l'interdit",
+     "recompte": {
+      "commande": "node : lecture de consigne_relecteur dans le journal 20261029a",
+      "resultat": "« prompt-pN.md (le prompt de la passe N, champ passes[].texte) » et « « prompt-p » autre que prompt-p1.md » présents"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "les défauts retenus à la passe N dont la citation est absente de passes[N-1].texte",
+     "defaut": "indice ambigu et recherche de sous-chaîne qui classe mal les citations élidées ou tronquées",
+     "recompte": {
+      "commande": "node : citations retenues retrouvées, blancs normalisés, dans leur propre passe (relecteur n°2)",
+      "resultat": "15 sur 20"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "C, clôture vérifiée : comme B, puis un vérificateur AVEC contexte […] on corrige ce qu'il signale avant le jury.",
+     "defaut": "la seconde correction de C n'a pas d'auteur, ne part pas d'un fichier dit et n'est pas au devis",
+     "recompte": {
+      "commande": "grep -n \"correcteurs\" b-prompt-p3.md",
+      "resultat": "« 3 correcteurs et 1 vérificateur » ; aucune ligne n'attribue la reprise de C"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "3 agents NEUFS par prompt jugé (la base, puis chaque variante), même modèle, même effort",
+     "defaut": "modèle et effort non nommés, alors que les notes de la passe 5 viennent d'opus en effort high",
+     "recompte": {
+      "commande": "node : passes[].relecteur.agent du journal 20261029a",
+      "resultat": "« general-purpose neufs, opus, effort high » aux 5 passes"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Plafond : 2 000 000 de jetons pour les étapes 1 à 3.",
+     "defaut": "E et D, jouées après accord, font dépasser le plafond que le point 8 du contrat exige",
+     "recompte": {
+      "commande": "calcul : 1 700 000 + 2 × 600 000",
+      "resultat": "2 900 000"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 4,
+   "rejetee": false,
+   "decision": "continuer",
+   "texte": "Objet : trouver ce qui ferait monter la qualité des prompts réécrits par la boucle L99 au-delà\ndu plafond observé le 29/10/2026, et le mettre en place dans le skill prompt-analyzer-l99.\nCas pratique : le prompt de stratégie de lancement des agents, revue\n`output/01-revues-et-propositions/Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md`,\nscores retenus 40, 69, 72, 76, 78 sur 5 passes, chacun le plus bas de 2 notes.\n\nENTRÉES, toutes dans le journal `<revue 20261029a>.md.boucle.json` :\n- le texte du prompt de chaque passe : champ `passes[].texte` (passes 1 à 5) ;\n- la consigne et la rubrique des relecteurs : champs `consigne_relecteur` et `rubrique_relecteur` ;\n- les défauts de chaque passe, avec `statut` (retenu, ecarte), `vu_par` et leur recompte.\nCopie ces trois entrées dans un dossier de l'expérience avant l'étape 1 : le jury s'en sert sans\nles modifier.\n\nPRINCIPE. On veut améliorer le PROMPT, pas la note. Toute variante est notée par un jury de même\nconfiguration, fixée avant l'expérience : 3 agents NEUFS par prompt jugé (la base, puis chaque\nvariante), même modèle, même effort, même consigne ; aucun juré ne lit deux prompts ; score du\njury = médiane des 3 notes.\nConsigne du jury : `consigne_relecteur` avec deux substitutions et aucune autre, le chemin du\nprompt jugé et le chemin de la rubrique copiée dans le dossier de l'expérience ; ses interdits\ns'étendent à tout ce dossier, hors du seul fichier jugé. Écris une consigne instanciée par prompt\njugé, avant l'étape 1. Les relecteurs qui\nalimentent la correction sont distincts du jury. Chaque correction est écrite par un agent neuf\n(même modèle, même effort), qui reçoit le prompt de la passe 5 et les seuls défauts retenus de sa\nvariante, et rend un fichier par variante (`variante-A.md`…).\n\nÉTAPE 0 — CE QUE LE JOURNAL DIT DÉJÀ (lecture seule, sans dépense).\nRends, chacun avec sa commande :\n- les défauts écartés (`statut` ecarte), combien le recompte a démentis ;\n- l'écart entre les deux notes de chaque passe (`scores_relecteurs`) ;\n- les défauts retenus à la passe N dont la citation est absente de `passes[N-1].texte` et\n  présente dans `passes[N].texte` : ce sont les défauts créés par la correction ;\n- les défauts écartés qui reviennent à une passe suivante : appariement fait à la main, liste\n  fournie et déclarée comme jugement ;\n- la croissance du prompt en mots.\nPuis le DEVIS, à environ 100 000 jetons par relecteur (mesure du 29/10/2026), recompté sur le\nplan réel. Estimation : la base et les variantes A, B et C demandent 14 relecteurs (3 jurés pour la\nbase, 2 relecteurs partagés, 9 jurés), plus 3 correcteurs et 1 vérificateur, soit environ\n1,7 million de jetons ; E et D demandent chacune environ 600 000 jetons de plus (relecteurs propres,\n3 jurés, 1 correcteur). Joue la base, A, B et C sous le plafond ; E et D ne se jouent qu'après\nl'accord de l'humain, à qui tu poses la suite avec le devis recompté et les résultats de A, B et C.\n\nÉTAPE 1 — LA BASE ET LE BRUIT.\nFais noter le prompt de la passe 5 par le jury. Sa médiane est la base M0. Le bruit est l'écart\nmaximal entre ces 3 notes et les 2 notes de la passe 5 (81 et 78). Une variante « marche » si sa\nmédiane de jury dépasse M0 d'au moins max(bruit, 3 points). Le score 78 reste affiché pour\ninformation, jamais comme base.\n\nÉTAPE 2 — LES VARIANTES, une passe de correction chacune, toutes à partir du prompt de la passe 5,\ndans cet ordre : A, B, C, E, D. Pour économiser, A, B et C partagent les mêmes 2 relecteurs neufs ;\nE ajoute 2 relecteurs à ces 2.\n- A, témoin : retenue « vu par les deux » (règle actuelle).\n- B, union recomptée : tout défaut vu par au moins un relecteur est retenu s'il tient au recompte.\n- C, clôture vérifiée : comme B, puis un vérificateur AVEC contexte lit les défauts retenus et la\n  correction (pas l'analyse), dit pour chaque défaut s'il est fermé et si la correction en crée un\n  neuf ; on corrige ce qu'il signale avant le jury. Il ne note pas.\n- E, quatre relecteurs : les 4 relecteurs, retenue comme B.\n- D, ancien et nouveau, en reprise simulée, retenue comme B : un relecteur neuf, et un relecteur\n  qui reçoit en contexte le prompt de la passe 4 et les défauts graves de la passe 4 dont `vu_par`\n  contient 1, puis juge le prompt de la passe 5. Le journal ne garde ni identifiant d'agent, ni\n  note, ni mineurs : une vraie reprise est impossible depuis une autre session, la reprise ne voit\n  qu'une partie de ce que le relecteur avait rendu, et le tableau le dit.\nGarde de longueur : une correction qui grossit de plus de 15 % sans fermer de majeur est rejetée.\nJetons : somme des usages rendus par chaque agent, attribuée à sa variante ; les relecteurs\npartagés sont comptés une fois, à part.\n\nÉTAPE 3 — LECTURE DES RÉSULTATS.\nPour chaque variante : médiane du jury, gain sur M0, défauts graves restants selon le jury,\njetons, mots. Une variante gagne si son gain dépasse le seuil de l'étape 1 ; à gain égal, la\nmoins chère gagne. Un seul cas pratique ne fonde pas une règle : dis-le.\n\nÉTAPE 4 — MISE EN PLACE.\n- Si une variante gagne, écris-la dans `references/boucle.md` du skill prompt-analyzer-l99 de\n  digit-ai-forge-agents, avec les champs neufs du journal (`jury` : notes et médiane ;\n  `regle_de_retenue` : intersection ou union_recomptee ; rôle `verificateur_cloture`).\n  Dans `scripts/oracle-boucle-l99.mjs` : B, E → une règle neuve qui vérifie `vu_par` et le recompte\n  selon `regle_de_retenue` ; C → B2 admet un vérificateur non aveugle qui ne note pas ; D → B2\n  admet un relecteur repris. L'oracle n'a pas de niveau d'avertissement : crée-le (statut AVERT,\n  sortie 0) si la règle part en avertissement, avec une fixture qui le prouve. Dis si le lien\n  avec `oracle-judge --lecteur-vise`, cité par `boucle.md`, est rompu ou suivi.\n  Recette, publication, copies installées des deux profils du poste (`~\\.claude` et\n  `~\\.claude-b`) ; revue datée après 5 boucles réelles.\n- Sinon : écris le constat négatif, et ne change pas le skill.\n- Dans les deux cas : inscris le sujet au registre par `node todo/journaliser.mjs`, et écris une\n  étude nommée selon R-4 et R-25 du pilot :\n  `Digit-AI - Etude - Amelioration de la boucle de relecture L99 - 20261029<indice>.md` dans\n  `output/03-etudes/`, indice par `node scripts/allouer-indice.mjs`.\n\nGARDE-FOUS.\n- Plafond : 2 000 000 de jetons pour les étapes 1 à 3. Au-delà, ou si le devis le dépasse, arrête\n  et pose la suite à l'humain avec le coût mesuré.\n- Ne modifie ni la revue 20261029a ni son journal : l'expérience vit dans ses propres fichiers.\n- Toute nouvelle règle respecte « le juge n'est jamais l'auteur » : un relecteur avec contexte\n  vérifie la clôture, il ne note jamais.\n- Commits limités à tes chemins (`git commit --only -- <chemins>`), publication sous R-38 §6,\n  envoi vérifié par `git rev-list --left-right --count HEAD...@{u}`.\n\nCONTRAT DE SORTIE — chaque point avec sa preuve exécutée :\n1. l'étape 0 rend ses chiffres, avec la commande qui les a tirés du journal, et le devis ;\n2. M0 et le bruit sont chiffrés à partir des 5 notes du prompt de la passe 5 ;\n3. chaque variante jouée porte sa médiane de jury, son gain sur M0, ses défauts graves restants,\n   ses jetons et ses mots, dans un même tableau ;\n4. la conclusion nomme la variante gagnante ou dit qu'aucune ne dépasse le seuil ;\n5. si une variante gagne : `references/boucle.md`, l'oracle et sa recette sont changés, la recette\n   sort en 0, forge-agents est publié, les deux copies installées sont alignées ;\n6. le registre porte le sujet, `node todo/oracle-todo.mjs` sort en 0 ;\n7. l'étude porte un nom conforme à R-4 et R-25 ;\n8. les jetons dépensés sont sous le plafond ; E et D sont jouées après accord, ou posées à l'humain avec le devis recompté.\n"
+  },
+  {
+   "n": 4,
+   "fichier": "b-prompt-p4.md",
+   "mots": 1448,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 4, n°1 et n°2)",
+    "aveugle": true,
+    "interdits": [
+     "analyse 20261029b",
+     "passes précédentes",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    75,
+    77
+   ],
+   "score_mesure": 75,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "note": "Passe en régression (75 contre 77) : la correction a fermé les 3 majeurs de la passe 3 et en a créé, dont un devis faux (4 correcteurs au lieu de 3).",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "plus 4 correcteurs et 1 vérificateur, soit environ 1,7 million de jetons",
+     "defaut": "devis faux : 3 correcteurs suffisent, et 19 agents à 100 000 jetons font 1,9 million",
+     "recompte": {
+      "commande": "grep -n \"4 correcteurs\" b-prompt-p4.md ; calcul 14 + 4 + 1",
+      "resultat": "ligne 46 ; 19 agents, 1 900 000 jetons"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Plafond : 2 000 000 de jetons pour les étapes 1 à 3.",
+     "defaut": "E et D, de l'étape 2, font dépasser le plafond que le contrat exige ; l'accord humain ne le relève pas",
+     "recompte": {
+      "commande": "calcul : 1,8 + 2 × 0,6",
+      "resultat": "3,0 millions"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Copie ces trois entrées dans un dossier de l'expérience avant l'étape 1",
+     "defaut": "le dossier de l'expérience n'est pas situé ; dans le dossier temporaire interdit, le jury ne pourrait plus lire le fichier jugé",
+     "recompte": {
+      "commande": "grep -n \"dossier de l'expérience\" b-prompt-p4.md",
+      "resultat": "lignes 11, 21 et 24, aucun chemin"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "avec les champs neufs du journal (`jury` : notes et médiane ; `regle_de_retenue` : intersection ou union_recomptee",
+     "defaut": "prémisse fausse : regle_de_retenue existe déjà, en texte libre, et une règle neuve ferait échouer les journaux anciens",
+     "recompte": {
+      "commande": "node : passes portant regle_de_retenue dans le journal 20261029a",
+      "resultat": "5 sur 5"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "A, témoin : retenue « vu par les deux » (règle actuelle).",
+     "defaut": "le témoin A ne sert pas de référence : les variantes sont comparées au prompt non corrigé",
+     "recompte": {
+      "commande": "lecture des étapes 1 et 3 de b-prompt-p4.md",
+      "resultat": "gain mesuré sur M0, pas sur A"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "défauts graves restants selon le jury",
+     "defaut": "agrégation des défauts de 3 jurés et fermeture d'un majeur non définies",
+     "recompte": {
+      "commande": "lecture de l'étape 3",
+      "resultat": "aucune règle d'agrégation"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Le bruit est l'écart maximal entre ces 3 notes et les 2 notes de la passe 5",
+     "defaut": "formule du bruit lisible de deux façons, et mêlée à un biais de configuration",
+     "recompte": {
+      "commande": "lecture de l'étape 1",
+      "resultat": "« écart maximal entre ces 3 notes et les 2 notes » sans formule"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "Les relecteurs qui alimentent la correction sont distincts du jury.",
+     "defaut": "ni leur consigne ni l'auteur du recompte ne sont dits",
+     "recompte": {
+      "commande": "grep -n \"Recompter avant de retenir\" references/boucle.md (forge-agents)",
+      "resultat": "le recompte revient à la session, le prompt ne le reprend pas"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 3,
+   "rejetee": false,
+   "decision": "arreter",
+   "texte": "Objet : trouver ce qui ferait monter la qualité des prompts réécrits par la boucle L99 au-delà\ndu plafond observé le 29/10/2026, et le mettre en place dans le skill prompt-analyzer-l99.\nCas pratique : le prompt de stratégie de lancement des agents, revue\n`output/01-revues-et-propositions/Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md`,\nscores retenus 40, 69, 72, 76, 78 sur 5 passes, chacun le plus bas de 2 notes.\n\nENTRÉES, toutes dans le journal `<revue 20261029a>.md.boucle.json` :\n- le texte du prompt de chaque passe : champ `passes[].texte` (passes 1 à 5) ;\n- la consigne et la rubrique des relecteurs : champs `consigne_relecteur` et `rubrique_relecteur` ;\n- les défauts de chaque passe, avec `statut` (retenu, ecarte), `vu_par` et leur recompte.\nCopie ces trois entrées dans un dossier de l'expérience avant l'étape 1 : le jury s'en sert sans\nles modifier.\n\nPRINCIPE. On veut améliorer le PROMPT, pas la note. Toute variante est notée par un jury de même\nconfiguration, fixée avant l'expérience : 3 agents NEUFS par prompt jugé (la base, puis chaque\nvariante), même modèle, même effort, même consigne ; aucun juré ne lit deux prompts ; score du\njury = médiane des 3 notes.\nConsigne du jury : `consigne_relecteur`, avec ces changements et eux seuls :\n- le chemin « …\\prompt-pN.md (le prompt de la passe N, champ passes[].texte) » devient le chemin du\n  prompt jugé ;\n- le chemin de la rubrique devient celui de sa copie dans le dossier de l'expérience ;\n- l'interdit « « prompt-p » autre que prompt-p1.md » devient « tout autre prompt que le fichier\n  jugé » ;\n- une ligne d'interdits s'ajoute : le dossier de l'expérience, sauf le fichier jugé et la rubrique,\n  et le dossier temporaire de la session d'origine\n  `C:\\Users\\iguan\\AppData\\Local\\Temp\\claude\\c--dev-digit-ai-factory\\c99958e9-5fa3-4254-8894-59d90c6dce0c\\`.\nÉcris une consigne instanciée par prompt jugé, avant l'étape 1. Les relecteurs qui\nalimentent la correction sont distincts du jury. Chaque correction est écrite par un agent neuf\n(même modèle, même effort), qui reçoit le prompt de la passe 5 et les seuls défauts retenus de sa\nvariante, et rend un fichier par variante (`variante-A.md`…).\n\nÉTAPE 0 — CE QUE LE JOURNAL DIT DÉJÀ (lecture seule, sans dépense).\nRends, chacun avec sa commande :\n- les défauts écartés (`statut` ecarte), combien le recompte a démentis ;\n- l'écart entre les deux notes de chaque passe (`scores_relecteurs`) ;\n- les défauts créés par la correction : pour chaque défaut retenu à la passe de champ `n`, coupe\n  sa citation sur « [...] », normalise les blancs, et cherche chaque fragment dans le texte de la\n  passe `n` et dans celui de la passe `n` - 1. Créé par la correction = tous les fragments présents\n  en `n`, au moins un absent en `n` - 1. Une citation introuvable dans sa propre passe est classée\n  à part, « non classée », et comptée ;\n- les défauts écartés qui reviennent à une passe suivante : appariement fait à la main, liste\n  fournie et déclarée comme jugement ;\n- la croissance du prompt en mots.\nPuis le DEVIS, à environ 100 000 jetons par relecteur (mesure du 29/10/2026), recompté sur le\nplan réel. Estimation : la base et les variantes A, B et C demandent 14 relecteurs (3 jurés pour la\nbase, 2 relecteurs partagés, 9 jurés), plus 4 correcteurs et 1 vérificateur, soit environ\n1,7 million de jetons ; E et D demandent chacune environ 600 000 jetons de plus (relecteurs propres,\n3 jurés, 1 correcteur). Joue la base, A, B et C sous le plafond ; E et D ne se jouent qu'après\nl'accord de l'humain, à qui tu poses la suite avec le devis recompté et les résultats de A, B et C.\n\nÉTAPE 1 — LA BASE ET LE BRUIT.\nFais noter le prompt de la passe 5 par le jury. Sa médiane est la base M0. Le bruit est l'écart\nmaximal entre ces 3 notes et les 2 notes de la passe 5 (81 et 78). Une variante « marche » si sa\nmédiane de jury dépasse M0 d'au moins max(bruit, 3 points). Le score 78 reste affiché pour\ninformation, jamais comme base.\n\nÉTAPE 2 — LES VARIANTES, une passe de correction chacune, toutes à partir du prompt de la passe 5,\ndans cet ordre : A, B, C, E, D. Pour économiser, A, B et C partagent les mêmes 2 relecteurs neufs ;\nE ajoute 2 relecteurs à ces 2.\n- A, témoin : retenue « vu par les deux » (règle actuelle).\n- B, union recomptée : tout défaut vu par au moins un relecteur est retenu s'il tient au recompte.\n- C, clôture vérifiée : C reprend `variante-B.md`. Un vérificateur AVEC contexte lit les défauts\n  retenus de B et ce fichier (pas l'analyse), et dit pour chaque défaut s'il est fermé et si la\n  correction en crée un neuf ; il ne note pas. Un correcteur neuf, même modèle et même effort,\n  applique ses seuls signalements, une fois, et rend `variante-C.md`, que le jury note.\n- E, quatre relecteurs : les 4 relecteurs, retenue comme B.\n- D, ancien et nouveau, en reprise simulée, retenue comme B : un relecteur neuf, et un relecteur\n  qui reçoit en contexte le prompt de la passe 4 et les défauts graves de la passe 4 dont `vu_par`\n  contient 1, puis juge le prompt de la passe 5. Le journal ne garde ni identifiant d'agent, ni\n  note, ni mineurs : une vraie reprise est impossible depuis une autre session, la reprise ne voit\n  qu'une partie de ce que le relecteur avait rendu, et le tableau le dit.\nGarde de longueur : une correction qui grossit de plus de 15 % sans fermer de majeur est rejetée.\nJetons : somme des usages rendus par chaque agent, attribuée à sa variante ; les relecteurs\npartagés sont comptés une fois, à part.\n\nÉTAPE 3 — LECTURE DES RÉSULTATS.\nPour chaque variante : médiane du jury, gain sur M0, défauts graves restants selon le jury,\njetons, mots. Une variante gagne si son gain dépasse le seuil de l'étape 1 ; à gain égal, la\nmoins chère gagne. Un seul cas pratique ne fonde pas une règle : dis-le.\n\nÉTAPE 4 — MISE EN PLACE.\n- Si une variante gagne, écris-la dans `references/boucle.md` du skill prompt-analyzer-l99 de\n  digit-ai-forge-agents, avec les champs neufs du journal (`jury` : notes et médiane ;\n  `regle_de_retenue` : intersection ou union_recomptee ; rôle `verificateur_cloture`).\n  Dans `scripts/oracle-boucle-l99.mjs` : B, E → une règle neuve qui vérifie `vu_par` et le recompte\n  selon `regle_de_retenue` ; C → B2 admet un vérificateur non aveugle qui ne note pas ; D → B2\n  admet un relecteur repris. L'oracle n'a pas de niveau d'avertissement : crée-le (statut AVERT,\n  sortie 0) si la règle part en avertissement, avec une fixture qui le prouve. Dis si le lien\n  avec `oracle-judge --lecteur-vise`, cité par `boucle.md`, est rompu ou suivi.\n  Recette, publication, copies installées des deux profils du poste (`~\\.claude` et\n  `~\\.claude-b`) ; revue datée après 5 boucles réelles.\n- Sinon : écris le constat négatif, et ne change pas le skill.\n- Dans les deux cas : inscris le sujet au registre par `node todo/journaliser.mjs`, et écris une\n  étude nommée selon R-4 et R-25 du pilot :\n  `Digit-AI - Etude - Amelioration de la boucle de relecture L99 - 20261029<indice>.md` dans\n  `output/03-etudes/`, indice par `node scripts/allouer-indice.mjs`.\n\nGARDE-FOUS.\n- Plafond : 2 000 000 de jetons pour les étapes 1 à 3. Au-delà, ou si le devis le dépasse, arrête\n  et pose la suite à l'humain avec le coût mesuré.\n- Ne modifie ni la revue 20261029a ni son journal : l'expérience vit dans ses propres fichiers.\n- Toute nouvelle règle respecte « le juge n'est jamais l'auteur » : un relecteur avec contexte\n  vérifie la clôture, il ne note jamais.\n- Commits limités à tes chemins (`git commit --only -- <chemins>`), publication sous R-38 §6,\n  envoi vérifié par `git rev-list --left-right --count HEAD...@{u}`.\n\nCONTRAT DE SORTIE — chaque point avec sa preuve exécutée :\n1. l'étape 0 rend ses chiffres, avec la commande qui les a tirés du journal, et le devis ;\n2. M0 et le bruit sont chiffrés à partir des 5 notes du prompt de la passe 5 ;\n3. chaque variante jouée porte sa médiane de jury, son gain sur M0, ses défauts graves restants,\n   ses jetons et ses mots, dans un même tableau ;\n4. la conclusion nomme la variante gagnante ou dit qu'aucune ne dépasse le seuil ;\n5. si une variante gagne : `references/boucle.md`, l'oracle et sa recette sont changés, la recette\n   sort en 0, forge-agents est publié, les deux copies installées sont alignées ;\n6. le registre porte le sujet, `node todo/oracle-todo.mjs` sort en 0 ;\n7. l'étude porte un nom conforme à R-4 et R-25 ;\n8. les jetons dépensés sont sous le plafond ; E et D sont jouées après accord, ou posées à l'humain avec le devis recompté.\n"
+  }
+ ],
+ "arret": {
+  "passe": 4,
+  "raison": "gain_insuffisant"
+ },
+ "score_affiche": {
+  "valeur": 75,
+  "nature": "mesure"
+ },
+ "majeurs_ouverts": [
+  "devis faux : 3 correcteurs suffisent, et 19 agents à 100 000 jetons font 1,9 million",
+  "E et D, de l'étape 2, font dépasser le plafond que le contrat exige ; l'accord humain ne le relève pas",
+  "le dossier de l'expérience n'est pas situé ; dans le dossier temporaire interdit, le jury ne pourrait plus lire le fichier jugé",
+  "prémisse fausse : regle_de_retenue existe déjà, en texte libre, et une règle neuve ferait échouer les journaux anciens"
+ ],
+ "consigne_relecteur": "Tu es relecteur À L'AVEUGLE d'un prompt. Tu notes ce prompt, tu ne le réécris pas, et tu n'écris aucun fichier.\n\nÀ lire, et seulement cela :\n- le prompt jugé : C:\\Users\\iguan\\AppData\\Local\\Temp\\claude\\c--dev-digit-ai-factory\\c99958e9-5fa3-4254-8894-59d90c6dce0c\\scratchpad\\b-prompt-p1.md\n- la rubrique de notation et les définitions de sévérité : C:\\Users\\iguan\\AppData\\Local\\Temp\\claude\\c--dev-digit-ai-factory\\c99958e9-5fa3-4254-8894-59d90c6dce0c\\scratchpad\\rubrique.md\n\nContexte d'exécution du prompt : il sera donné à une session Claude Code ouverte dans le dépôt C:\\dev\\digit-ai-factory (le « pilot »), qui orchestre des agents. Tu peux vérifier ses prémisses en LECTURE SEULE dans ce dépôt et dans C:\\dev\\digit-ai-forge-agents (skill .claude\\skills\\prompt-analyzer-l99 : SKILL.md, references\\boucle.md, scripts\\oracle-boucle-l99.mjs). Le prompt cite comme donnée d'entrée la revue « 20261029a » et son journal `.boucle.json` : tu peux les lire pour vérifier ce que le prompt en dit.\n\nINTERDITS : n'ouvre aucun fichier dont le nom contient « 20261029b » (c'est l'analyse du prompt que tu juges), aucun fichier dont le nom commence par « b-prompt-p » autre que b-prompt-p1.md, ni aucune transcription de session (*.jsonl sous .claude\\projects). N'écris, ne modifie, ne commite rien.\n\nRègle de notation à charge : un point n'est accordé qu'avec une citation du prompt qui le justifie. Tout défaut bloquant plafonne le score à 40. Pour chaque défaut bloquant ou majeur : la citation exacte du prompt, le défaut, la correction proposée, et la commande de vérification que tu as jouée quand le défaut porte sur une prémisse.\n\nRends UNIQUEMENT ce JSON, sans texte autour :\n{\"score\": 0, \"dimensions\": {\"clarte\": 0, \"specification\": 0, \"garde_fous\": 0, \"ancrage\": 0, \"verifiabilite\": 0, \"robustesse\": 0}, \"bloquants\": [{\"citation\": \"\", \"defaut\": \"\", \"correction\": \"\", \"verification\": \"\"}], \"majeurs\": [{\"citation\": \"\", \"defaut\": \"\", \"correction\": \"\", \"verification\": \"\"}], \"mineurs_nombre\": 0, \"premisses_verifiees\": 0, \"premisses_fausses\": []}\n",
+ "rubrique_relecteur": "**Rubrique de notation (le score, pas un mot).** L'étalon est noté sur 100, réparti en 6 dimensions. C'est le chiffre de référence du Chapitre 8 (score avant → après).\n\n| Dimension | Pts | Ce qu'on mesure |\n|---|---|---|\n| Clarté de l'intention | 20 | La tâche et le résultat attendu sont-ils non ambigus ? |\n| Spécification | 20 | Format, longueur, audience, ton sont-ils posés ? |\n| Garde-fous & contraintes | 15 | Ce qu'il ne faut PAS faire, limites, exclusions |\n| Ancrage / contexte | 15 | Le prompt fournit-il (ou fait-il chercher) le contexte nécessaire ? |\n| Vérifiabilité de la sortie | 15 | Peut-on juger si la réponse est bonne ? (préfigure le contrat Ch8) |\n| Robustesse | 15 | Résistance aux interprétations divergentes et au détournement |\n\nRègle d'arrimage à la sévérité : **tout défaut bloquant plafonne le score à 40/100** (zone échec), quel que soit le reste. Chaque défaut majeur retire des points dans sa dimension. Donner le score chiffré ici, dimension par dimension, avec une ligne de justification.\n## Sévérité — tag obligatoire dès le Chapitre 3\n\nChaque défaut identifié porte un tag :\n- **bloquant** : le prompt échouera ou produira un résultat inexploitable.\n- **majeur** : dégrade fortement la qualité, mais le prompt « marche ».\n- **mineur** : cosmétique ou marginal.\n\nLes bloquants et majeurs traversent tout le pipeline jusqu'à correction au Chapitre 8.\nLes mineurs sont listés une fois, sans suivi.\n"
+}

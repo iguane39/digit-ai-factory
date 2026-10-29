@@ -21,11 +21,13 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Proposition Architecture - Circuit - 20260815d.md` | fichier | 5,4 Ko | Proposition d'architecture — le circuit de l'insatisfaction |
 | `Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` | fichier | 11,0 Ko | Proposition — Doctrine « restitution lisible » pour forge-design |
 | `Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md` | fichier | 9,4 Ko | Digit-AI — Proposition : optimisation de la tuyauterie cognitive — 2026-08-09 |
+| `Digit-AI - Revue - Prompt amelioration de la boucle de relecture passe au crible L99 - 20261029b.md` | fichier | 29,8 Ko | Revue L99 du prompt « améliorer encore le score de la boucle de relecture » |
+| `Digit-AI - Revue - Prompt amelioration de la boucle de relecture passe au crible L99 - 20261029b.md.boucle.json` | fichier | 49,1 Ko | JSON |
 | `Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md` | fichier | 29,7 Ko | Revue L99 du prompt « nouvelle stratégie de lancement des agents » |
-| `Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md.boucle.json` | fichier | 20,6 Ko | JSON |
+| `Digit-AI - Revue - Prompt strategie de lancement des agents passe au crible L99 - 20261029a.md.boucle.json` | fichier | 61,4 Ko | JSON |
 | `Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815c.md` | fichier | 3,7 Ko | Revue D8 « Lecture de données » — les trois restitutions migrées du 15/08 |
 | `Digit-AI - Revue Forge - Écosystème - 20260808a.md` | fichier | 11,2 Ko | Digit-AI — Revue stratégique de l'écosystème forge — 2026-08-08 |
 | `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,0 Ko | Digit-AI — Revue Forge — Écosystème — 20260819a |
 | `Produit-02 - Proposition Refonte - Rapport SEO - 20260815b.md` | fichier | 6,9 Ko | Proposition — Refonte du rapport d'audit SEO d'Produit-02.com |
 
-_10 fichier(s), 1 sous-dossier(s)_
+_12 fichier(s), 1 sous-dossier(s)_

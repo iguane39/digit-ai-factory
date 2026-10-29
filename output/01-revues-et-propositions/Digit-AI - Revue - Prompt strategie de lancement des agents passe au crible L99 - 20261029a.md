@@ -146,7 +146,7 @@ Comment lire le tableau : une ligne par passe ; le score retenu est la plus bass
 
 | Passe | Mots | Notes des 2 relecteurs | Score retenu | Gain | Bloquants et majeurs retenus | Décision |
 |---|---|---|---|---|---|---|
-| 1 | 681 | 60 et 40 | 40 | — | 1 bloquant, 4 majeurs | continuer |
+| 1 | 681 | 60 et 40 | 40 | — | 1 bloquant, 3 majeurs | continuer |
 | 2 | 929 | 69 et 70 | 69 | +29 | 6 majeurs | continuer |
 | 3 | 1 214 | 72 et 74 | 72 | +3 | 4 majeurs | continuer, extension à 5 |
 | 4 | 1 407 | 76 et 79 | 76 | +4 | 3 majeurs | continuer |
