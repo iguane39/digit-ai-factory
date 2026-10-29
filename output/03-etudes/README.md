@@ -68,9 +68,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
+| `Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` | fichier | 3,7 Ko | Œil critique : 4 actions pour tenir les 8 demandes (29/10/2026) |
 | `Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` | fichier | 4,8 Ko | Œil critique : ce qu'il fait, ce qu'il ne fait pas (29/10/2026) |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` | fichier | 514,7 Ko | JSON |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` | fichier | 190,2 Ko | Inventaire — fonctionnalités de Cloudflare, GitHub et Supabase (28/10/2026) |
 | `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 5,1 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
 
-_54 fichier(s), 2 sous-dossier(s)_
+_55 fichier(s), 2 sous-dossier(s)_

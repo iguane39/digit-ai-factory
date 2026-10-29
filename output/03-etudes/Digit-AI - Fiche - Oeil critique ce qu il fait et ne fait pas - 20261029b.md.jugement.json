@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md",
+ "empreinte": "9d335ff3b2e94e366e7378c27019c65361b5c67ee4fb11f8ef212b6ee403d924",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-29T15:55:13.152Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
