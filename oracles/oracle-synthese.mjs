@@ -112,6 +112,13 @@
  *   S87 LA LIGNE « Livré : » (29/10, TF-1973 et TF-2016, gabarit 2.53.0) : le bloc 0 se clôt par `Livré : [<nom>](<chemin relatif>)`, un lien par
  *       livrable écrit dans le tour. La PRÉSENCE se juge au hook de fin de tour (`controlerLivre`, hook-restitution.mjs, avertissante) : elle se lit
  *       dans la transcription. Ici, seule l'EXEMPTION : S9 ne lit plus cette ligne (liens et étiquette), le reste de l'ouverture reste jugé ;
+ *   S88 « DE QUOI S'AGIT-IL » (29/10, TF-1979, gabarit 2.54.0) : dans une décision en bloc de citation, le champ ne s'ouvre pas par un identifiant en code sans glose
+ *       et ne range pas quatre identifiants en code ou plus sur sa ligne (une énumération se met en liste) ; avertissante ;
+ *   S89 UN ÉCART ENTRE DEUX RÉFÉRENCES GIT (29/10, TF-1984, gabarit 2.54.0) : des fichiers dits « absents de » ou « pas dans » une référence git exigent, dans le texte,
+ *       `git diff --name-status`, `--diff-filter` ou un essai d'existence (`cat-file -e`, `ls-tree`) ; avertissante ;
+ *   S36 / S38 (TF-1981), S48 (TF-1982, TF-1987), S68 (TF-1985) étendues dans le même gabarit 2.54.0 : la critique d'implémentation ne se lit comme un verdict ni en action
+ *       (bloc 8) ni en option (bloc 3), et ni `hors_mandat` ni `borne_atteinte` ne dispensent de la jouer ; « reste au produit » suppose un run ouvert au ledger ;
+ *       une recréation ou un redémarrage de conteneur ou de service est une correction ; un 200 au corps vide ne prouve pas une absence sans 404 ni essai de chaque portée ;
  *   S77 chez un produit qui déclare un canal de reprise (forge/REPRISE.json), aucune action
  *       manuelle_utilisateur ne demande un transport entre postes (15/10, TF-1736, R-64) ; avertissante ;
  *   S75 une livraison déclarée d'un produit à interface dit qu'un parcours a été joué dans un vrai
@@ -719,6 +726,26 @@ function bloc(texte, motif) {
 // premier jet en accusait 11, dont 5 à tort : « sections retirées » d'un document, « annonce à
 // tort » dit d'un tiers, « heure fausse » dite d'un autre registre.
 const RESTE_AU_PRODUIT = uni(/\breste au produit,?\s+parce que\s+\S/i);
+
+// ---- S48, TROISIÈME SENS (TF-1982, 29/10/2026) — « RESTE AU PRODUIT » SUPPOSE UN RUN OUVERT ----------------------------
+//
+// LE FAIT, 26/10/2026 chez un produit : après une correction de la session, la remontée a été renvoyée « au lot de clôture du run » alors qu'aucun run n'était ouvert ;
+// S48 a accepté la ligne (le motif existait, c'est tout ce qu'elle lisait). Le CLAUDE.md d'un produit ne compile le lot qu'à la clôture d'un run : une remontée renvoyée
+// à une clôture qui ne viendra pas n'est remontée à personne. « Reste au produit » n'est donc admis que si un run est ouvert au ledger du produit : `forge/ledger.jsonl`
+// porte un `run_open` que nul `run_close` ne suit (un run clos s'archive sous `runs/`, et le ledger courant disparaît ou se ferme). Hors run, le tour remet son lot.
+function runOuvert(produit) {
+  const f = join(produit, "forge", "ledger.jsonl");
+  if (!existsSync(f)) return { existe: false, ouvert: false };
+  let dernier = null;
+  try {
+    for (const l of readFileSync(f, "utf8").split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      let e; try { e = JSON.parse(l); } catch { continue; }
+      if (e && (e.type === "run_open" || e.type === "run_close")) dernier = e.type;
+    }
+  } catch { return { existe: true, ouvert: false }; }
+  return { existe: true, ouvert: dernier === "run_open" };
+}
 const CORRECTION_DU_TOUR = uni(new RegExp([
   String.raw`correction d['’](?:une|la|ma) (?:restitution|r[ée]ponse|synth[èe]se|fiche) pr[ée]c[ée]dente`,
   String.raw`\b(?:la|cette|ma|une) (?:recommandation|d[ée]cision|affirmation|conclusion|analyse)\b[^.\n|]{0,60}\b(?:est|a [ée]t[ée]|[ée]tait) (?:retir[ée]e|fausse|erron[ée]e)\b`,
@@ -727,6 +754,15 @@ const CORRECTION_DU_TOUR = uni(new RegExp([
   String.raw`\bmon erreur\b`,
   String.raw`\b(?:j['’](?:ai|avais)|nous avons) (?:affirm[ée]|[ée]crit|dit|annonc[ée]|recommand[ée])\b[^.\n]{0,40}\b[àa] tort\b`,
   String.raw`\bheures? (?:d['’]en-t[êe]te )?(?:invent[ée]es?|compos[ée]es?)\b`,
+  // TF-1987 (29/10/2026, récidive de TF-1643 et TF-1644) — UNE CORRECTION D'INFRASTRUCTURE EST UNE CORRECTION. Le 24/10/2026, un tour qui recréait le conteneur d'un moteur
+  // avec un volume (`docker rm`, `docker run -v`) s'est clos sur « rien à remonter » : la perte du travail en cours était la cause, la restitution n'en voyait aucune. Le
+  // vocabulaire lit les commandes que la restitution cite en preuve et les verbes de recréation ou de redémarrage d'un conteneur, d'un service ou d'un moteur.
+  String.raw`\bdocker\s+(?:rm|run|restart|stop|kill|compose\s+(?:up|down|restart))\b`,
+  String.raw`\b(?:systemctl\s+(?:restart|stop)|service\s+\S+\s+(?:restart|stop)|Restart-Service|kubectl\s+rollout\s+restart)\b`,
+  String.raw`\brecr[ée]{1,2}\w*\b[^.\n|]{0,40}\b(?:conteneurs?|containers?|services?|volumes?)\b`,
+  String.raw`\b(?:conteneurs?|containers?)\b[^.\n|]{0,40}\brecr[ée]{1,2}\w*\b`,
+  String.raw`\bred[ée]marr\w*\b[^.\n|]{0,40}\b(?:services?|conteneurs?|containers?|moteur|docker|daemon)\b`,
+  String.raw`\b(?:conteneurs?|containers?|services?|moteur|docker)\b[^.\n|]{0,40}\bred[ée]marr\w*\b`,
 ].join("|"), "i"));
 
 // ---- S83 (TF-1936, 21/10/2026, retour Produit-79 RP-22) — UNE DEMANDE D'AVIS PORTE LE LIEN DU CONTENU ----------------
@@ -1468,7 +1504,12 @@ function juger(texte, cheminJuge = null) {
       .filter((l) => !/^\s*>/.test(l) && (!SOURCE36.test(l) || LIVRE36.test(l))).join("\n");
     const zones = horsSources([bloc(texte, BLOCS[3][0]) || "", bloc(texte, /(^|\n)#{1,4}\s*9[.)]?\s*traces?/i) || ""].join("\n"));
     const pagesLivrees = (zones.match(/[\w\-. \/\\]+\.html?\b/gi) || []).filter((p) => !/fixture|gabarit|boilerplate|template|temoin|\.oracles/i.test(p));
-    const verdict = /(critique-le-design|critique d'impl[ée]mentation|revue graphique|revue visuelle|verdict design)/i.test(texte);
+    // TF-1981 (29/10/2026, récidive de TF-0775) — LE VERDICT SE LIT HORS DES BLOCS QUI PROMETTENT. Le 26/10/2026, une page HTML citée comme livrée laissait la critique
+    // forge-design en A-1 `auto_ia` `hors_mandat` : le mot « critique d'implémentation » y figurait, S36 le prenait pour un verdict, et --prejuger rendait la restitution
+    // affichable. Jouée sur demande de l'humain, la critique a trouvé 4 bloquants et 19 majeurs. Les blocs 3 (décisions : une option « faire juger… » propose) et 8
+    // (actions : une ligne annonce) ne portent jamais un verdict ; il se cherche dans le reste du texte.
+    const SANS_PROMESSE = [BLOCS[2][0], BLOCS[7][0]].reduce((t, re) => { const b = bloc(t, re); return b ? t.replace(b, "") : t; }, texte);
+    const verdict = /(critique-le-design|critique d'impl[ée]mentation|revue graphique|revue visuelle|verdict design)/i.test(SANS_PROMESSE);
     pagesLivrees.length && !verdict
       ? ko("S36", `${pagesLivrees.length} page(s) HTML citée(s) comme livrées sans AUCUN verdict de critique d'implémentation (forge-design) dans la restitution — le routage « juger le rendu visuel » n'a pas été joué : ${pagesLivrees.slice(0, 2).join(", ")}`)
       : ok("S36", pagesLivrees.length ? "les pages HTML livrées portent un verdict de critique d'implémentation" : "aucune page HTML livrée citée");
@@ -1519,12 +1560,14 @@ function juger(texte, cheminJuge = null) {
     // On retire donc les noms de forge AVANT de mesurer, et l'on exige un VERBE D'EXECUTION : la
     // regle 40 dit « un test propose s'EXECUTE », elle ne dit rien d'un test qu'on mentionne.
     const sansNomDeForge = (g) => g.replace(/\bforge-[a-z-]+/gi, " ");
-    const TEST = uni(/\b(jouer|rejouer|ex[ée]cuter|lancer|relancer|mesurer|d[ée]rouler)\b[^.;|]{0,60}\b(tests?|recettes?|bancs?|couverture|self-test|jeu d'essai)\b/i);
+    // TF-1981 (29/10/2026, récidive de TF-0775) : la CRITIQUE d'implémentation et l'ORACLE d'un livrable sont jouables dans le tour comme un test. Le 26/10/2026, la
+    // critique forge-design d'une page livrée est restée en A-1 `auto_ia` `hors_mandat` ; jouée ensuite, elle a trouvé 4 bloquants et 19 majeurs.
+    const TEST = uni(/\b(jouer|rejouer|ex[ée]cuter|lancer|relancer|mesurer|d[ée]rouler)\b[^.;|]{0,60}\b(tests?|recettes?|bancs?|couverture|self-test|jeu d'essai|critiques?|revue graphique|run-oracles-design|oracles?)\b/i);
     const EXEMPTION = /\b(hors_mandat|borne_atteinte)\b/;
     const testsIA = actionsGroupees(bActions).filter((g) => /\bauto_ia\b/.test(g) && TEST.test(sansNomDeForge(g)));
     const esquives = testsIA.filter((g) => EXEMPTION.test(g));
     esquives.length
-      ? ko("S38", `${esquives.length} action(s) de TEST sur ${testsIA.length} sont laissées non exécutées sous un motif d'EXEMPTION (\`hors_mandat\`, \`borne_atteinte\`) — un test jouable s'exécute (règle 40) ; ces deux motifs déclarent un périmètre, ils ne mesurent rien : « ${esquives[0].replace(/\s+/g, " ").trim().slice(0, 110)} »`)
+      ? ko("S38", `${esquives.length} action(s) de TEST, de CRITIQUE ou d'ORACLE sur ${testsIA.length} sont laissées non exécutées sous un motif d'EXEMPTION (\`hors_mandat\`, \`borne_atteinte\`) — un test, une critique ou un oracle jouable s'exécute (règle 40) ; ces deux motifs déclarent un périmètre, ils ne mesurent rien : « ${esquives[0].replace(/\s+/g, " ").trim().slice(0, 110)} »`)
       : ok("S38", testsIA.length ? `${testsIA.length} action(s) de test \`auto_ia\` — aucune ne s'exempte de mesurer` : "aucune action de test `auto_ia` non exécutée");
   }
   // S39 — « REMONTÉ » N'EST PAS « TRAITÉ », SAUF SI LE DÉPÔT EST TRAÇABLE. Déposer un constat chez
@@ -2820,9 +2863,9 @@ function juger(texte, cheminJuge = null) {
     const departs = [];
     if (cheminJuge) { try { departs.push(dirname(resolve(cheminJuge))); } catch { /* chemin non résolu */ } }
     if (RACINE_PROJET) { try { departs.push(resolve(RACINE_PROJET)); } catch { /* racine non résolue */ } }
-    let estProduit = false;
+    let estProduit = false, dossierProduit = null;
     for (let d of departs) for (let i = 0; i < 12 && d; i++) {
-      if (existsSync(join(d, "forge", "retours"))) { estProduit = true; break; }
+      if (existsSync(join(d, "forge", "retours"))) { estProduit = true; dossierProduit = dossierProduit || d; break; }
       const parent = dirname(d); if (parent === d) break; d = parent;
     }
     if (!estProduit)
@@ -2840,7 +2883,14 @@ function juger(texte, cheminJuge = null) {
         const m = CORRECTION_DU_TOUR.exec(texte);
         ko("S48", `« rien à remonter » dans un tour qui CORRIGE une erreur de la session (« ${texte.slice(Math.max(0, m.index - 30), m.index + m[0].length + 30).replace(/\s+/g, " ").trim()} ») — `
           + "une erreur corrigée est un retour : la ligne nomme le lot remis, ou dit « reste au produit, parce que <motif> ». "
-          + "Le 12/10/2026, 3 corrections d'une même session ont été déclarées sans rien à remonter, et la troisième n'a été remontée que sur question du porteur (TF-1643)");
+          + "Le 12/10/2026, 3 corrections d'une même session ont été déclarées sans rien à remonter, et la troisième n'a été remontée que sur question du porteur (TF-1643). "
+          + "Une correction d'infrastructure en fait partie : recréation ou redémarrage d'un conteneur, d'un service ou d'un moteur, commandes `docker rm`, `docker run`, `docker restart` (TF-1987)");
+      } else if (RESTE_AU_PRODUIT.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne) && !runOuvert(dossierProduit).ouvert) {
+        // TF-1982 — « reste au produit » renvoie la remontée à la clôture d'un run : sans run ouvert, aucune clôture ne la recueillera.
+        const run = runOuvert(dossierProduit);
+        ko("S48", `« reste au produit » renvoie la remontée à la clôture d'un run, or aucun run n'est ouvert au ledger du produit (${run.existe ? "forge\\ledger.jsonl sans run_open en cours" : "forge\\ledger.jsonl absent"}) : `
+          + "le lot n'est compilé qu'à la clôture d'un run, la remontée n'a donc aucun lot où se joindre. Hors run, le tour remet son lot : « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis ». "
+          + `Le 26/10/2026, une correction a été renvoyée au lot de clôture d'un run qui n'existait pas, et S48 a accepté la ligne (TF-1982) — ${ligne.trim().slice(0, 100)}`);
       } else
         ok("S48", /rien (?:à|a) remonter/i.test(ligne) ? "le tour déclare n'avoir rien à remonter à la factory, et ne corrige aucune erreur de la session"
           : RESTE_AU_PRODUIT.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne) ? "le tour garde son retour au produit et dit pourquoi"
@@ -3040,6 +3090,52 @@ function juger(texte, cheminJuge = null) {
             + `Ex. : ${fautes78[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`)
           : ok("S78", `${enCitation78.length} décision(s) au format B : objet nommé, problème, motif humain et retour arrière de chaque option`);
       }
+    }
+
+    // ---- S88 (29/10/2026, TF-1979, gabarit 2.54.0) — « DE QUOI S'AGIT-IL » DIT CE QU'EST L'OBJET AVANT SON NOM INTERNE, ET UNE ÉNUMÉRATION SE MET EN LISTE.
+    //
+    // LE FAIT, mesuré le 20/10/2026 chez un produit : les mêmes décisions D-1 à D-3, le même format B, écrites deux fois (RESTITUTION-20261020a puis 20261020b). Retour
+    // humain, mot pour mot : « Ces explications sont bien meilleures que celles précédentes. Prends cette base pour les futures explications et remonte ce point à la Factory
+    // pour généralisation. » Le préjugement rendait les deux affichables : S78 juge la présence des trois libellés, jamais ce qu'ils disent. Quatre différences : la raison d'être
+    // de l'objet avant son nom interne ; une énumération de 7 objets passée en liste ; les deux côtés du compromis dans « Le problème » ; la portée réelle dans « Pourquoi vous ».
+    // Les deux premières se lisent dans le texte du champ « De quoi s'agit-il », les deux autres restent un jugement (gabarit, règle 1 et 5 du format B).
+    //
+    // CE QUI SE JUGE, par décision en bloc de citation : (a) le champ ne s'ouvre pas par un identifiant en code (`RESTITUTION-20261020a`, `oracle-synthese.mjs`, `S78`) qu'aucune
+    // glose ne suit (une parenthèse, un tiret, deux-points, « , qui … », « est … » puis trois mots) : le lecteur ne sait pas ce que c'est avant d'en lire le nom ; (b) le champ ne
+    // compte pas quatre identifiants en code ou plus sur sa ligne : une énumération se met en liste. AVERTISSANTE à son entrée, comme toute règle neuve.
+    // NON JUGÉ : que la raison d'être soit exacte, que « Le problème » dise les deux côtés du compromis, que « Pourquoi vous » dise la portée, et un objet nommé par un mot ordinaire.
+    {
+      const enCitation88 = groupesLignes.filter((g) => /^\s*>\s*\*\*\s*D-\d{1,3}\b/.test(g[0]));
+      const IDENTIFIANT = /[-_./\\@:]|\d|\.[a-z]{2,4}\b|[a-z][A-Z]/;
+      // La LIGNE du champ, et elle seule : les sous-puces qui suivent sont la liste que la règle demande, elles ne comptent pas.
+      const champDeQuoi = (g) => {
+        const l = g.find((x) => /de quoi s(?:'|’)agit-il/i.test(x));
+        return l === undefined ? null : l.replace(/^.*?de quoi s(?:'|’)agit-il\s*\**\s*:?\s*\**\s*/i, "").replace(/\s+/g, " ").trim();
+      };
+      const GLOSE88 = uni(/^\s*(?:\(|—|–|:|,\s*(?:qui|que|le|la|l['’]|les|un|une|des|ce|cette)\b|\bqui\b|\best\b|\bd[ée]signe\b|\bc['’]est\b|\bsert\b)\s*([^|\n]*)/i);
+      const fautes88 = [];
+      let vues88 = 0;
+      for (const g of enCitation88) {
+        const champ = champDeQuoi(g);
+        if (champ === null) continue;
+        vues88++;
+        const spans = [...champ.matchAll(/`([^`\n]+)`/g)].filter((m) => IDENTIFIANT.test(m[1]));
+        const premier = spans[0];
+        const sansGlose = premier && premier.index <= 2 && (() => {
+          const reste = champ.slice(premier.index + premier[0].length).replace(/^\**\s*/, "");
+          const m = GLOSE88.exec(reste);
+          return !(m && m[1].split(/\s+/).filter(Boolean).length >= 3);
+        })();
+        if (sansGlose) fautes88.push({ g, quoi: `le champ s'ouvre par l'identifiant ${premier[0]} sans dire ce que c'est` });
+        else if (spans.length >= 4) fautes88.push({ g, quoi: `${spans.length} identifiants en code sur une ligne (${spans.slice(0, 3).map((m) => m[0]).join(", ")}…), à mettre en liste` });
+      }
+      if (!vues88) findings.push({ regle: "S88", statut: "SANS_OBJET", message: "aucune décision en bloc de citation portant « De quoi s'agit-il » — contenu du champ non jugé" });
+      else if (fautes88.length)
+        ko("S88", `${fautes88.length} décision(s) sur ${vues88} dont « De quoi s'agit-il » nomme avant d'expliquer : ${fautes88[0].quoi}. `
+          + "Le champ dit d'abord à quoi sert l'objet et ce qu'il fait, dans les mots du lecteur, puis son nom interne entre accents graves ; plus de trois objets se mettent en liste, jamais en ligne. "
+          + "Le 20/10/2026, les mêmes décisions écrites ainsi ont été jugées « bien meilleures » par l'humain qui avait dû demander une réexplication de la première version (TF-1979). "
+          + `Ex. : ${fautes88[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+      else ok("S88", `${vues88} décision(s) dont « De quoi s'agit-il » ne s'ouvre pas par un nom interne sans glose et ne range pas quatre identifiants sur une ligne`);
     }
 
     // ---- S49 (17/09/2026, TF-1172) — UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE
@@ -3945,12 +4041,55 @@ function juger(texte, cheminJuge = null) {
         if ((surImage && !ESSAI_IMAGE.test(p)) || (surSite && !surImage && !ESSAI_SITE.test(p))) fautes.push(ph);
       }
     }
-    if (!vus) ok("S68", "aucune information déclarée non mesurable, illisible ou introuvable sur une image ou un site — rien à juger");
-    else if (fautes.length) ko("S68", `${fautes.length} absence(s) déclarée(s) sur ${vus} sans l'essai du moyen disponible — une source en image se lit `
+    // TF-1985 (29/10/2026) — UNE RESSOURCE DE PLATEFORME DÉCLARÉE SUPPRIMÉE SUR UN 200 AU CORPS VIDE CITE L'ESSAI DE CHAQUE PORTÉE. Le 26/10/2026, le diagnostic d'un
+    // build Azure DevOps a conclu qu'une connexion de service n'existait plus parce que `GET <projet>/_apis/serviceendpoint/endpoints/<id>` rendait 200 et `null` ; le même
+    // appel dans le projet voisin la rendait vivante, 200 usages, succès du 21/10 : l'API est bornée par projet, et un 200 au corps vide dit « pas dans ce projet », pas
+    // « supprimée ». Le remplacement recommandé aurait coupé 2 pipelines du bac à sable. Même forme que l'image et le site : l'absence se prouve par l'essai du moyen qui
+    // existait. Le paragraphe qui déclare la ressource supprimée, absente ou introuvable sur un 200 vide cite un 404, une liste de niveau organisation, ou l'essai dans chaque
+    // projet ou portée. NON JUGÉ : que l'essai ait eu lieu, et une absence conclue d'un autre signal que le 200 vide.
+    const VIDE_200 = uni(/\b200\b[^.\n]{0,60}\b(?:null|corps vide|r[ée]ponse vide|sans corps|vide)\b|\b(?:null|corps vide|r[ée]ponse vide)\b[^.\n]{0,60}\b200\b/i);
+    const ABSENCE_RESSOURCE = uni(/\b(?:n['’]existe (?:plus|pas)|inexistante?s?|supprim[ée]e?s?|disparu\w*|absente?s?|introuvables?|n['’]est plus)\b/i);
+    const ESSAI_PORTEE = uni(/\b404\b|\bniveau (?:de l['’])?organisation\b|\bliste (?:de niveau |au niveau )?(?:de l['’])?organisation\b|\b(?:chaque|tous les|toutes les|tout autre|l['’]autre|les autres|autres) (?:projets?|port[ée]es?|scopes?|espaces?)\b|\bm[êe]me appel (?:dans|sur) (?:le|un|l['’]autre|les autres) projets?\b|\bprojets? (?:voisins?|fr[èe]res?)\b/i);
+    const fautesPortee = [];
+    let vusPortee = 0;
+    for (const p of paragraphes68) {
+      if (!VIDE_200.test(p) || !ABSENCE_RESSOURCE.test(p)) continue;
+      vusPortee++;
+      if (!ESSAI_PORTEE.test(p)) fautesPortee.push(p);
+    }
+    if (!vus && !vusPortee) ok("S68", "aucune information déclarée non mesurable, illisible ou introuvable sur une image ou un site, ni ressource de plateforme déclarée absente sur un 200 au corps vide — rien à juger");
+    else if (fautes.length || fautesPortee.length) ko("S68", (fautes.length ? `${fautes.length} absence(s) déclarée(s) sur ${vus} sans l'essai du moyen disponible — une source en image se lit `
       + "avec l'outil de lecture d'image (recadrage au besoin) avant d'être dite « non mesurable » ; un site se parcourt par son `sitemap.xml`, nombre "
       + "de pages relues cité, avant d'être dit « introuvable » : le 25/09/2026, 4 images lues donnaient le jour de collecte déclaré non mesurable la "
-      + `veille (TF-1580). Ex. : ${fautes[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
-    else ok("S68", `${vus} absence(s) déclarée(s) sur une image ou un site, chacune avec l'essai du moyen disponible`);
+      + `veille (TF-1580). Ex. : ${fautes[0].replace(/\s+/g, " ").trim().slice(0, 110)}` : "")
+      + (fautes.length && fautesPortee.length ? " · " : "")
+      + (fautesPortee.length ? `${fautesPortee.length} ressource(s) de plateforme déclarée(s) absente(s) sur un 200 au corps vide (sur ${vusPortee}) sans 404, sans liste de niveau organisation `
+      + "ni essai dans chaque projet : l'API d'une plateforme est bornée par projet, un 200 au corps vide dit « pas dans ce projet » et non « supprimée » — le 26/10/2026, "
+      + "une connexion de service lue vide dans un projet était vivante dans le projet voisin, et son remplacement aurait coupé 2 pipelines (TF-1985). "
+      + `Ex. : ${fautesPortee[0].replace(/\s+/g, " ").trim().slice(0, 110)}` : ""));
+    else ok("S68", `${vus + vusPortee} absence(s) déclarée(s), chacune avec l'essai du moyen disponible (image lue, sitemap, ou ressource essayée dans chaque portée)`);
+  }
+
+  // S89 (TF-1984, 29/10/2026, gabarit 2.54.0) — UN ÉCART ENTRE DEUX RÉFÉRENCES GIT SE LIT AVEC SON STATUT DE FICHIER, JAMAIS EN « ABSENT DE ».
+  // LE FAIT, mesuré le 26/10/2026 chez un produit : une fiche du 21/10 (constat 4) disait que `env/uat` contient 3 fichiers qui ne sont pas dans `main`. Sur les mêmes empreintes
+  // (main 35618ba, env/uat db5274d), `git diff --name-status` rend M pour les 3 : ils existent des deux côtés, leur contenu diffère. La préconisation changeait de nature
+  // (reporter 10 lignes de `infra/prd.tfvars`, pas ajouter 3 fichiers). La fiche et la restitution avaient été jugées PASS : un écart de CONTENU se décrit volontiers comme une
+  // absence, et aucune sortie lue ne distingue l'ajout (A), la suppression (D) et la modification (M). Ce juge lit une phrase qui dit des fichiers ou dossiers « absents de »,
+  // « pas dans » une référence git (main, master, origin/…, env/…, release/…, une branche) et exige, quelque part dans le texte, la sortie qui donne le statut : `git diff
+  // --name-status`, `--diff-filter`, ou l'essai d'existence par fichier (`git cat-file -e <réf>:<chemin>`, `git ls-tree`). AVERTISSANTE à son entrée.
+  // NON JUGÉ : que la sortie citée porte bien ces fichiers, et une absence dite d'un dépôt ou d'un dossier de travail (pas d'une référence git).
+  {
+    const REF_GIT = uni(/(?:\b(?:main|master|develop|HEAD)\b|\borigin\/[\w.\-/]+|\b(?:env|release|feature|hotfix|fix)\/[\w.\-]+|\bbranches?\b)/i);
+    const ABSENCE_GIT = uni(/\b(?:fichiers?|dossiers?|r[ée]pertoires?)\b[^.\n;]{0,120}?(?:\babsents?\s+(?:de|dans|sur)\b|\b(?:ne\s+)?(?:sont|est)\s+pas\s+(?:dans|sur|pr[ée]sents?)\b|\bn['’](?:existent?|y\s+sont|y\s+est)\s+pas\b|\bmanquent?\s+(?:dans|sur|[àa])\b|\bne\s+figurent?\s+pas\b|\bqui\s+ne\s+sont\s+pas\b)/i);
+    const STATUT_GIT = /--name-status|--diff-filter\s*=\s*[A-Za-z]*[ADM]|\bcat-file\s+-e\b|\bls-tree\b/i;
+    const phrases89 = texte.replace(/\r\n?/g, "\n").replace(/```[\s\S]*?```/g, "").replace(/«[^»]*»/g, " ").split(/(?<=[.!?;])\s+|\n/);
+    const accusees89 = phrases89.filter((ph) => ABSENCE_GIT.test(ph) && REF_GIT.test(ph));
+    if (!accusees89.length) ok("S89", "aucun fichier dit « absent de » ou « pas dans » une référence git — rien à juger");
+    else if (!STATUT_GIT.test(texte)) ko("S89", `${accusees89.length} phrase(s) disent des fichiers « absents » d'une référence git sans citer le statut de fichier que git rend : `
+      + "`git diff --name-status <réf1> <réf2>` distingue A (ajouté), D (supprimé) et M (modifié) ; un fichier qui existe des deux côtés avec un contenu différent n'est pas absent. "
+      + "Le 26/10/2026, « 3 fichiers de env/uat qui ne sont pas dans main » étaient 3 modifications (M) : la préconisation changeait de nature, reporter 10 lignes au lieu d'ajouter 3 fichiers (TF-1984). "
+      + `Ex. : ${accusees89[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    else ok("S89", `${accusees89.length} phrase(s) disent des fichiers absents d'une référence git, et le texte cite le statut de fichier que git rend`);
   }
 
   // S69 (TF-1646, 14/10/2026) — UNE HEURE D'EN-TÊTE N'EST PAS DANS LE FUTUR. Le fait du 12/10 :
@@ -5666,8 +5805,46 @@ Aucun écart : la demande a été suivie à la lettre.
   const CORR48 = "\n- Correction d'une restitution précédente : l'en-tête donnait de 14h50 à 15h15, l'heure relevée était 14:29.\n";
   const r48corrRien = jouer48("s48-correction-rien.md", CORR48 + "- Remontée à la factory : rien à remonter.\n");
   const r48corrLot = jouer48("s48-correction-lot.md", CORR48 + "- Remontée à la factory : lot « Produit-99 - RETOURS - 20261012f » remis.\n");
-  const r48corrReste = jouer48("s48-correction-reste.md", CORR48
-    + "- Remontée à la factory : reste au produit, parce que l'heure fausse venait d'une note locale du produit, sans règle de la factory en cause.\n");
+  // 29/10 — TF-1982 : « reste au produit » suppose un RUN OUVERT au ledger du produit (`forge/ledger.jsonl` : un `run_open` que nul `run_close` ne suit). Trois produits de banc :
+  // un run ouvert, un run clos, un run rouvert ; `produit48`, lui, n'a aucun ledger.
+  const LEDGER48 = (...types) => types.map((t, i) => JSON.stringify({ seq: i + 1, ts: `2026-10-26T10:0${i}:00+01:00`, type: t })).join("\n") + "\n";
+  for (const [sous, types] of [["produit48-run-ouvert", ["run_open", "etape_open"]], ["produit48-run-clos", ["run_open", "etape_open", "run_close"]], ["produit48-run-rouvert", ["run_open", "run_close", "run_open"]]]) {
+    mkdirSync(join(dir, sous, "forge", "retours"), { recursive: true });
+    writeFileSync(join(dir, sous, "forge", "ledger.jsonl"), LEDGER48(...types), "utf8");
+  }
+  const c48 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S48") || {}; } catch { return {}; } };   // `constatDe` est défini plus bas
+  const jouer48Dans = (sous, nom, ajout) => {
+    const f = join(dir, sous, nom);
+    writeFileSync(f, verte + ajout, "utf8");
+    return spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
+  };
+  const RESTE48 = CORR48
+    + "- Remontée à la factory : reste au produit, parce que l'heure fausse venait d'une note locale du produit, sans règle de la factory en cause.\n";
+  const r48corrReste = jouer48Dans("produit48-run-ouvert", "s48-correction-reste.md", RESTE48);
+  const r48resteSansLedger = jouer48("s48-reste-sans-ledger.md", RESTE48);
+  const r48resteRunClos = jouer48Dans("produit48-run-clos", "s48-reste-run-clos.md", RESTE48);
+  const r48resteRunRouvert = jouer48Dans("produit48-run-rouvert", "s48-reste-run-rouvert.md", RESTE48);
+  for (const [r, statut, quoi] of [
+    [r48resteSansLedger, "FAIL", "« reste au produit » chez un produit sans ledger, donc sans run ouvert, passe — le cas du 26/10 : la remontée renvoyée à une clôture qui ne viendra pas"],
+    [r48resteRunClos, "FAIL", "« reste au produit » chez un produit dont le run est clos passe"],
+    [r48corrReste, "PASS", "« reste au produit » chez un produit dont un run est ouvert est accusé — le lot sera compilé à sa clôture"],
+    [r48resteRunRouvert, "PASS", "« reste au produit » chez un produit dont le run a été clos puis rouvert est accusé"],
+  ]) if (c48(r).statut !== statut)
+    casse.push(`S48 (TF-1982) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
+  if (!/aucun run n'est ouvert/.test(c48(r48resteSansLedger).message || "") || !/ledger\.jsonl absent/.test(c48(r48resteSansLedger).message || ""))
+    casse.push("S48 (TF-1982) : le constat sans ledger doit dire qu'aucun run n'est ouvert ET que le ledger est absent : " + String(c48(r48resteSansLedger).message || "").slice(0, 200));
+  // 29/10 — TF-1987 : UNE CORRECTION D'INFRASTRUCTURE EST UNE CORRECTION. Le cas réel du 24/10 : le tour recrée le conteneur d'un moteur avec un volume (`docker rm`, `docker run -v`),
+  // puis déclare « rien à remonter ». FAIL ; le MÊME qui nomme son lot PASS ; une commande de lecture (`docker ps`) n'est pas une correction.
+  const INFRA48 = "\n- Conteneur du moteur recréé avec un volume : `docker rm -f nodeodm` puis `docker run -d -v nodeodm-data:/var/www/data opendronemap/nodeodm` — preuve : le conteneur répond sur le port 3000.\n";
+  const r48infraRien = jouer48("s48-infra-rien.md", INFRA48 + "- Remontée à la factory : rien à remonter.\n");
+  const r48infraLot = jouer48("s48-infra-lot.md", INFRA48 + "- Remontée à la factory : lot « Produit-99 - RETOURS - 20261024a » remis.\n");
+  const r48infraLecture = jouer48("s48-infra-lecture.md", "\n- État du moteur relevé : `docker ps` montre le conteneur en marche — preuve : 1 conteneur actif.\n- Remontée à la factory : rien à remonter.\n");
+  for (const [r, statut, quoi] of [
+    [r48infraRien, "FAIL", "un tour qui recrée un conteneur (`docker rm`, `docker run -v`) et déclare « rien à remonter » passe — le cas du 24/10"],
+    [r48infraLot, "PASS", "le MÊME tour qui nomme son lot est accusé"],
+    [r48infraLecture, "PASS", "une commande de lecture (`docker ps`) est prise pour une correction d'infrastructure"],
+  ]) if (c48(r).statut !== statut)
+    casse.push(`S48 (TF-1987) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
   if (!/"S48"[^}]*FAIL/.test(r48corrRien.stdout))
     casse.push("S48 (TF-1643) : un tour qui corrige une erreur de la session et déclare « rien à remonter » passe — " +
       "la règle jugerait encore la présence de la ligne, jamais sa vérité");
@@ -6077,7 +6254,20 @@ Aucun écart : la demande a été suivie à la lettre.
   const r68site = jouerPe("tf1580-site-sans-plan.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant."));
   const r68plan = jouerPe("tf1580-site-plan-lu.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant, "
     + "`sitemap.xml` lu et 24 pages relues."));
+  // 29/10 — TF-1985 : S68 ÉTENDUE À UN 200 AU CORPS VIDE, DANS SES QUATRE SENS. Le cas réel du 26/10 (build ADO 17724) : `GET APP-IA/_apis/serviceendpoint/endpoints/a13c860e`
+  // rend 200 et `null`, la session conclut que la connexion n'existe plus ; le même appel dans le projet POC-IA la rend vivante. (a) la conclusion nue FAIL ; (b) la MÊME
+  // après l'essai dans le projet voisin PASS ; (c) la MÊME qui cite un 404 PASS ; (d) un 200 qui rend la ressource, déclarée à jour, n'est pas une absence — PASS.
+  const CONCLUSION_200 = "- Connexion de service a13c860e : motif — le GET sur APP-IA/_apis/serviceendpoint/endpoints/a13c860e rend 200 et null, la connexion n'existe plus ; on recommande de remplacer le sujet de la règle fédérée.";
+  const r68vide = jouerPe("tf1985-200-vide-sans-essai.md", B5_68(CONCLUSION_200));
+  const r68voisin = jouerPe("tf1985-200-vide-projet-voisin-essaye.md", B5_68(CONCLUSION_200.replace("on recommande", "le même appel dans le projet POC-IA la rend pourtant vivante (200 usages), donc elle existe : on recommande de garder le sujet, et d'")
+    .replace("de remplacer le sujet de la règle fédérée.", "ajouter la règle sur ce projet.")));
+  const r68404 = jouerPe("tf1985-200-vide-puis-404.md", B5_68(CONCLUSION_200.replace("on recommande", "la liste de niveau organisation et un GET qui rend 404 le confirment ; on recommande")));
+  const r68plein = jouerPe("tf1985-200-plein-ressource-presente.md", B5_68("- Connexion de service a13c860e : motif — le GET rend 200 avec le corps complet de la connexion, aucune suppression à craindre."));
   const attendu68 = [
+    [r68vide, "FAIL", "TF-1985 : une ressource de plateforme déclarée supprimée sur un 200 au corps vide, lu dans un seul projet, passe — le cas du 26/10"],
+    [r68voisin, "PASS", "TF-1985 : la MÊME, après l'essai dans le projet voisin, est accusée"],
+    [r68404, "PASS", "TF-1985 : la MÊME qui cite un 404 et la liste de niveau organisation est accusée"],
+    [r68plein, "PASS", "TF-1985 : un 200 au corps plein n'est pas une absence, et il est accusé"],
     [r68img, "FAIL", "une donnée « non mesurable » parce que publiée en image, sans lecture de l'image, passe"],
     [r68imgLue, "PASS", "la MÊME, après lecture des images avec l'outil de lecture d'image, est accusée"],
     [r68site, "FAIL", "des faits « introuvables sur le site » sans lecture du plan du site passent"],
@@ -6085,7 +6275,29 @@ Aucun écart : la demande a été suivie à la lettre.
   ];
   for (const [r, statut, quoi] of attendu68)
     if (constatDe(r, "S68").statut !== statut)
-      casse.push(`TF-1580 : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S68").message || "sortie illisible").slice(0, 160));
+      casse.push(`S68 (TF-1580, TF-1985) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S68").message || "sortie illisible").slice(0, 160));
+  // 29/10 — S89, UN ÉCART ENTRE DEUX RÉFÉRENCES GIT SE LIT AVEC SON STATUT DE FICHIER (TF-1984), DANS SES SENS. Le cas réel du 21/10 : « env/uat contient 3 fichiers qui ne sont pas
+  // dans main » ; `git diff --name-status` rend M pour les 3 (empreintes main 35618ba, env/uat db5274d). (a) La constatation nue FAIL ; (b) la MÊME après `git diff --name-status`,
+  // qui dit M et déplace la préconisation, PASS ; (c) une autre tournure (« manquent à main ») FAIL ; (d) la même avec `--diff-filter=A` PASS ; (e) des fichiers absents d'un
+  // dossier de sortie, sans référence git, n'ont rien à voir — PASS.
+  const CONSTAT_GIT = "- Constat 4 : motif — la branche env/uat contient 3 fichiers qui ne sont pas dans main (main 35618ba, env/uat db5274d) ; il faut les ajouter à main.";
+  const r89nu = jouerPe("s89-absent-de-main-sans-statut.md", B5_68(CONSTAT_GIT));
+  const r89statut = jouerPe("s89-absent-de-main-avec-name-status.md", B5_68(CONSTAT_GIT.replace("; il faut les ajouter à main.",
+    "; `git diff --name-status main env/uat` rend M pour les 3 : ils existent des deux côtés, leur contenu diffère, il faut reporter 10 lignes de `infra/prd.tfvars`.")));
+  const r89autre = jouerPe("s89-manquent-a-main-sans-statut.md", B5_68("- Constat 4 : motif — 3 fichiers de env/uat manquent à main (main 35618ba, env/uat db5274d)."));
+  const r89filtre = jouerPe("s89-manquent-a-main-avec-diff-filter.md", B5_68("- Constat 4 : motif — 3 fichiers de env/uat manquent à main : `git diff --diff-filter=A --name-only main env/uat` les liste (statut A, ajoutés)."));
+  const r89dossier = jouerPe("s89-absents-d-un-dossier-sans-reference-git.md", B5_68("- Constat 4 : motif — 3 fichiers absents du dossier de sortie, la génération s'est arrêtée avant eux."));
+  if (CONSTAT_GIT === "" || r89nu === r89statut) casse.push("S89 : une fixture n'a pas été modifiée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r89nu, "FAIL", "« 3 fichiers qui ne sont pas dans main » sans `git diff --name-status` passe — le cas du 21/10, où les 3 étaient des modifications"],
+    [r89statut, "PASS", "la MÊME constatation, après `git diff --name-status` qui rend M, est accusée"],
+    [r89autre, "FAIL", "« 3 fichiers de env/uat manquent à main » sans statut passe"],
+    [r89filtre, "PASS", "la même avec `--diff-filter=A` est accusée"],
+    [r89dossier, "PASS", "des fichiers absents d'un dossier de sortie, sans référence git, sont accusés"],
+  ]) if (constatDe(r, "S89").statut !== statut)
+    casse.push(`S89 (TF-1984) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S89").message || "sortie illisible").slice(0, 200));
+  if (constatDe(r58sansObjet, "S89").statut !== "PASS")
+    casse.push("S89 (TF-1984) : la verte, qui ne cite aucun écart entre références git, est accusée : " + String(constatDe(r58sansObjet, "S89").message || "").slice(0, 200));
   if (constatDe(r58sansObjet, "S68").statut !== "PASS")
     casse.push("TF-1580 : la verte, qui ne déclare aucune absence, est accusée par S68 : " + String(constatDe(r58sansObjet, "S68").message || "").slice(0, 200));
 
@@ -6418,6 +6630,64 @@ Aucun écart : la demande a été suivie à la lettre.
     [rv, "S78", "SANS_OBJET", "la verte, dont la décision est en puce, devrait être déclarée hors de portée"],
   ]) if (constatDe(r, regle).statut !== statut)
     casse.push(`${regle} (format B, 17/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+  // 29/10 — S36 ET S38, LA CRITIQUE JOUABLE EN ACTION (TF-1981, récidive de TF-0775). Le cas réel du 26/10 : une page HTML livrée au bloc 4, la critique d'implémentation
+  // forge-design laissée en A-1 `auto_ia` `hors_mandat`. (a) Rouge : la critique n'apparaît qu'en action exemptée — S36 FAIL (le mot n'est pas un verdict) ET S38 FAIL (une
+  // critique jouable s'exécute). (b) Vert : le MÊME tour a joué la critique, son verdict est au bloc 4 — S36 PASS, S38 PASS. (c) Vert : la critique en action bloquée par
+  // `dependance_bloc_3` — S38 PASS, la règle ne mord pas sur un obstacle réel. (d) Rouge : la critique proposée en OPTION de décision (bloc 3) n'est pas un verdict non plus.
+  {
+    const PAGE36 = "\n- Page `output/Client-A - Schema Run apres MEP - 20261026a.html` livrée — preuve : check_html PASS, 21 règles.\n";
+    const ACTION_CRITIQUE = (motif) => "- **A-3** — enfin TF-0222 (auto_ia) — jouer la critique d'implémentation forge-design de la page livrée.\n"
+      + `  - motif de non-exécution : ${motif} — le point d'entrée de la critique est jouable en lecture seule.\n`
+      + "  - si rien n'est fait : les défauts de rendu ne sont pas vus avant la mise en ligne.\n";
+    const avecAction = (base, motif) => base.replace(/- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/, ACTION_CRITIQUE(motif));
+    const baseSansVerdict = verte.replace("## 4. Traité\n", "## 4. Traité\n" + PAGE36);
+    const baseAvecVerdict = verte.replace("## 4. Traité\n", "## 4. Traité\n" + PAGE36
+      + "- Critique d'implémentation (forge-design) de cette page — preuve : run-oracles-design PASS, 0 bloquant, 0 majeur.\n");
+    const fa = jouerPe("s36-critique-seulement-en-action-exemptee.md", avecAction(baseSansVerdict, "hors_mandat"));
+    const fb = jouerPe("s36-critique-jouee-au-bloc-4.md", baseAvecVerdict);
+    const fc = jouerPe("s38-critique-bloquee-par-une-decision.md", avecAction(baseSansVerdict, "dependance_bloc_3"));
+    const fd = jouerPe("s36-critique-proposee-en-option.md", baseSansVerdict.replace("  - sans décision : rien n'est publié.",
+      "  - (c) faire juger le rendu par la critique d'implémentation, puis publier — coût : effort simple × court ; exclut de publier avant ce jugement ;\n  - sans décision : rien n'est publié."));
+    if (baseSansVerdict === verte || baseAvecVerdict === baseSansVerdict) casse.push("S36/S38 (TF-1981) : une fixture n'a pas été modifiée — le cas ne prouve plus rien");
+    for (const [r, regle, statut, quoi] of [
+      [fa, "S36", "FAIL", "la critique d'implémentation citée seulement dans une action `hors_mandat` est prise pour le verdict d'une page livrée"],
+      [fa, "S38", "FAIL", "une critique jouable laissée en `auto_ia` sous `hors_mandat` passe — la règle 40 redevient une intention"],
+      [fb, "S36", "PASS", "la page livrée dont la critique est jouée et citée au bloc 4 est accusée"],
+      [fb, "S38", "PASS", "la restitution dont la critique est jouée est accusée par S38"],
+      [fc, "S38", "PASS", "la critique bloquée par `dependance_bloc_3` est accusée — la règle mordrait sur un obstacle réel"],
+      [fd, "S36", "FAIL", "la critique proposée en option de décision (bloc 3) est prise pour le verdict d'une page livrée"],
+    ]) if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (critique en action, TF-1981, 29/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 200));
+  }
+  // 29/10 — S88, « DE QUOI S'AGIT-IL » DIT CE QU'EST L'OBJET AVANT SON NOM INTERNE (TF-1979), DANS SES SENS. Le champ de FORMAT_B est la forme de référence : S88 PASS. (a) Rouge :
+  // le champ s'ouvre par `forge_tests@1.12.0`, sans glose — le nom avant la raison d'être. (b) Vert : le MÊME nom suivi de sa glose (« , la version … qui corrige … »). (c) Vert : la raison
+  // d'être d'abord, le nom entre parenthèses ensuite. (d) Rouge : une énumération de cinq identifiants sur la ligne du champ. (e) Vert : la MÊME énumération mise en liste de
+  // sous-puces — le remède joué. (f) Vert : trois identifiants en ligne, sous le seuil. (g) Un mot ordinaire en tête, entre accents graves, n'est pas un identifiant.
+  {
+    const CHAMP_B = "> - **De quoi s'agit-il** : la version 1.12.0 de la forge de tests, qui corrige la garde de précondition du pan qualif.";
+    const avecChamp = (champ) => enFormatB.replace(CHAMP_B, champ);
+    const CINQ = "`Guide - Lot 0 - 20261029a.md`, `Note - Lot 0 - 20261029b.md`, `Plan - Lot 1 - 20261029c.md`, `Plan - Lot 2 - 20261029d.md` et `Bilan - 20261029e.md`";
+    const r88nu = jouerPe("s88-champ-ouvert-par-un-nom-interne.md", avecChamp("> - **De quoi s'agit-il** : `forge_tests@1.12.0` ; garde de précondition du pan qualif."));
+    const r88glose = jouerPe("s88-champ-nom-puis-glose.md", avecChamp("> - **De quoi s'agit-il** : `forge_tests@1.12.0`, la version de la forge de tests qui corrige la garde de précondition du pan qualif."));
+    const r88apres = jouerPe("s88-champ-raison-d-etre-puis-nom.md", avecChamp("> - **De quoi s'agit-il** : la version de la forge de tests qui corrige la garde de précondition du pan qualif (`forge_tests@1.12.0`)."));
+    const r88enum = jouerPe("s88-champ-enumeration-en-ligne.md", avecChamp(`> - **De quoi s'agit-il** : les cinq sorties de la campagne : ${CINQ}.`));
+    const r88liste = jouerPe("s88-champ-enumeration-en-liste.md", avecChamp("> - **De quoi s'agit-il** : les cinq sorties de la campagne :\n>   - `Guide - Lot 0 - 20261029a.md`\n>   - `Note - Lot 0 - 20261029b.md`\n>   - `Plan - Lot 1 - 20261029c.md`\n>   - `Plan - Lot 2 - 20261029d.md`\n>   - `Bilan - 20261029e.md`"));
+    const r88trois = jouerPe("s88-champ-trois-identifiants.md", avecChamp("> - **De quoi s'agit-il** : les trois sorties de la campagne : `Guide - Lot 0 - 20261029a.md`, `Note - Lot 0 - 20261029b.md` et `Bilan - 20261029e.md`."));
+    const r88mot = jouerPe("s88-champ-mot-ordinaire-en-code.md", avecChamp("> - **De quoi s'agit-il** : `docker` tourne sans volume sur ce poste, et un redémarrage efface le travail en cours."));
+    if (avecChamp("X") === enFormatB) casse.push("S88 : la ligne « De quoi s'agit-il » du format B n'a pas été retrouvée — le cas ne prouve plus rien");
+    for (const [r, regle, statut, quoi] of [
+      [r88nu, "S88", "FAIL", "un champ qui s'ouvre par `forge_tests@1.12.0` sans glose passe — le nom interne avant la raison d'être"],
+      [r88glose, "S88", "PASS", "le même nom suivi de sa glose est accusé"],
+      [r88apres, "S88", "PASS", "la raison d'être d'abord, le nom entre parenthèses ensuite, est accusée — la forme que le gabarit prescrit"],
+      [r88enum, "S88", "FAIL", "cinq identifiants en code sur la ligne du champ passent — une énumération se met en liste"],
+      [r88liste, "S88", "PASS", "la même énumération mise en liste de sous-puces est accusée — le remède joué"],
+      [r88trois, "S88", "PASS", "trois identifiants en ligne, sous le seuil de quatre, sont accusés"],
+      [r88mot, "S88", "PASS", "un mot ordinaire entre accents graves en tête (`docker`) est pris pour un nom interne"],
+      [r78b, "S88", "PASS", "la décision de référence du format B est accusée par S88"],
+      [rv, "S88", "SANS_OBJET", "la verte, dont la décision est en puce, devrait être déclarée hors de portée"],
+    ]) if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-1979, 29/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 200));
+  }
   if (!/De quoi s'agit-il/.test(constatDe(r78ancien, "S78").message || ""))
     casse.push("S78 : le constat sur l'ancien format doit NOMMER les libellés manquants : " + String(constatDe(r78ancien, "S78").message || "").slice(0, 160));
   if (!/retour arrière/.test(constatDe(r78sansRetour, "S78").message || ""))
@@ -6709,7 +6979,7 @@ Aucun écart : la demande a été suivie à la lettre.
   const nCas = compterFixtures(dir);
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; T4, le verrou « livré », dans ses QUATORZE cas (TF-1949, 26/10 : une livraison sans trace de mobilisation S86 FAIL et S85 SANS_OBJET, « le run est clos » sans trace S86 FAIL ; un produit neuf sans ses livrables S85 FAIL en nommant EXIGENCES.json, les livrables produits PASS, ops écartée par une nouvelle ligne de trace PASS, DOSSIER-MEP.md seul manquant nommé seul ; une livraison sans compte d'exigences sous le verrou S72 AVERT ; la même datée d'août SANS_OBJET, la verte sans livraison sous un produit PASS, une livraison hors produit SANS_OBJET) ; T2 dans ses SEPT sens (TF-1947, 26/10 : la verte sans ses blocs 2, 6 et 7 PASS en entier, S3 SANS_OBJET ; sans son bloc 9, son bloc 0 ou son bloc 4 FAIL sur S1 en nommant le bloc ; une décision au format B sans son tableau d'options FAIL sur S4 en le nommant, la même avec son tableau PASS) ; S83 dans ses DIX cas (TF-1936, RP-22 : la ligne A-11 du 19/10 « relire la semaine 2 » renvoyée au « guide de mon message de 21:45 » FAIL — le cas réel —, la même en puce FAIL, une option « relire d'abord la fiche » sans lien FAIL ; le chemin des textes (le remède), une adresse, un bloc cité PASS ; l'agent sujet, un « vérifier que… », un « valider le moyen de paiement » et la verte PASS) ; S84 dans ses CINQ cas (TF-1938, RP-24 : « 19:52, durée 4 min » sans relevé FAIL — le cas réel —, une durée sur un seul relevé FAIL, l'heure lue et la durée égale à l'écart de deux relevés PASS, la durée omise PASS, l'oracle joué sans relevés SANS_OBJET dit à voix haute) ; S82 dans ses SEIZE cas (TF-1866, D-29 (a) du 18/10 : « tout le site en ligne est à jour » fondé sur 273 pages sans ligne « Mesuré sur » FAIL — le cas réel du 15/10 —, la formule « Mesuré contre » FAIL, la source « mes marqueurs » FAIL, l'heure manquante FAIL, le périmètre sans nombre FAIL, quatre autres formes de l'affirmation (entièrement, rien oublié, inventaire complet, exhaustive) FAIL, le REMÈDE joué (source amont relue, heure, périmètre chiffré) PASS en puce comme en gras, la restitution sans affirmation PASS, l'affirmation niée, conditionnelle ou citée entre « » PASS, la restitution d'août SANS_OBJET) ; S79 dans ses DIX cas (D-23 du 18/10 : la ligne « Relecture d'intention : sert » du bloc 4 PASS, en gras PASS, « sans objet, <motif> » PASS ; la ligne absente FAIL en nommant la ligne attendue et la commande qui prépare la relecture, « sans objet » sans motif FAIL, une valeur hors vocabulaire FAIL, une dérive sans décision qui la nomme au bloc 3 FAIL et la MÊME dérive posée en décision PASS, le bloc 4 absent SANS_OBJET dit à voix haute, et la restitution datée de la veille de l'essai ou d'août SANS_OBJET : la règle ne juge pas ce qui l'a précédée ; avertissante ; et, pour la boucle de correction (D-26 (a)) : « sert après 1 passe » et « sert après 2 passes » PASS sans décision au bloc 3, « sert après 3 passes », « sert après 0 passe » et « sert après correction » FAIL, un écart qui demeure après 2 passes FAIL sans décision et PASS posé en décision) ; S80 dans ses sens (TF-1847, E-11 : « Comment faire : 1) … 2) … 3) » en ligne FAIL, la MÊME option en liste numérotée PASS S49 ET S80, une énumération en cellule FAIL en le disant, deux éléments et une citation entre guillemets français PASS) ; S81 dans ses quatre sens (guide à une sous-puce par geste PASS, étape de trois gestes en paragraphe FAIL en les comptant, clôture avant le dernier geste FAIL, sous-puce qui enchaîne FAIL) ; S78 dans ses QUATRE sens (format B du 17/10 : la décision au format B PASS sur S78, S15, S16, S30, S31 et S32 ; l'ancien format en citation FAIL en nommant les libellés manquants ; la MÊME décision B sans retour arrière FAIL ; la verte en puce SANS_OBJET dit à voix haute) ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 117 caracteres — 151 avec les 34 du sidecar d oracle, 26 jusqu au 01/10 — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS ; et TF-1500 dans ses QUATRE sens sous le forge d un produit : un chemin `forge/` cite de 117 caracteres FAIL, le meme a 116 PASS, le fichier juge sous un dossier `forge` mesure comme `forge/<nom>`, FAIL a 117 et PASS a 116) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S55 et S56 dans leurs QUATRE sens (TF-1493, TF-1498 : un guide de LANCEMENT et un feu vert au verdict sans ligne « Ne vérifie pas » et sur un audit des dependances date de la VEILLE FAIL sur les deux regles, la MEME bornee aux deux endroits et portant ses portes du jour chiffrees PASS en entier, le feu vert que l agent ATTEND de l humain ne declenche rien, et une chaine qui DECLARE n avoir aucune porte a base externe PASS — taux mesure a la mise en service : 0 sur les 215 syntheses d output\\04-plans\\, 10 et 9 sur les 142 restitutions des produits du poste : avertissantes) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit ; TF-1644 : le MEME message muet pose hors de tout produit rend SANS_OBJET seul et FAIL quand `--racine` nomme le produit, forme que le hook de fin de tour emploie ; TF-1643 dans ses TROIS sens : un tour qui CORRIGE une erreur de la session et declare « rien a remonter » FAIL, le MEME qui nomme son lot PASS, le MEME qui dit « reste au produit, parce que <motif> » PASS) ; S36 dans ses DEUX sens (TF-1653 : un schema HTML nomme par un prompt recopie dans un bloc de code et cite comme source lue PASS, le MEME schema presente comme livre sans critique d implementation FAIL) ; S69 dans ses DEUX sens (TF-1646 : la MEME verte dont l en-tete porte 15h48 jugee a 13:00 ce jour-la FAIL, heure composee dans le futur, et a 16:00 PASS ; et la MEME heure suivie de « (UTC+02:00) » lue avec son decalage, PASS) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; gabarit 2.54.0 (29/10) : S88 dans ses SEPT sens (TF-1979 : le champ « De quoi s'agit-il » ouvert par un nom interne sans glose FAIL, le même glosé ou la raison d'être d'abord PASS, cinq identifiants en ligne FAIL, mis en liste PASS, trois PASS, un mot ordinaire en code PASS), S89 dans ses CINQ sens (TF-1984 : « 3 fichiers qui ne sont pas dans main » sans `git diff --name-status` FAIL — le cas du 21/10 —, la même avec le statut M ou `--diff-filter` PASS, sans référence git PASS), S36 et S38 dans leurs SIX sens (TF-1981 : la critique d'implémentation citée seulement en action `hors_mandat` ou en option de décision FAIL, jouée au bloc 4 PASS, bloquée par une décision PASS), S68 étendue dans ses QUATRE sens (TF-1985 : une ressource déclarée supprimée sur un 200 au corps vide, lu dans un seul projet, FAIL — le cas du 26/10 —, après l'essai du projet voisin ou un 404 PASS, un 200 au corps plein PASS), S48 dans ses SEPT sens de plus (TF-1982 : « reste au produit » sans ledger ou run clos FAIL, run ouvert ou rouvert PASS ; TF-1987 : un conteneur recréé par `docker rm` et `docker run -v` suivi de « rien à remonter » FAIL, avec son lot PASS, `docker ps` seul PASS) ; T4, le verrou « livré », dans ses QUATORZE cas (TF-1949, 26/10 : une livraison sans trace de mobilisation S86 FAIL et S85 SANS_OBJET, « le run est clos » sans trace S86 FAIL ; un produit neuf sans ses livrables S85 FAIL en nommant EXIGENCES.json, les livrables produits PASS, ops écartée par une nouvelle ligne de trace PASS, DOSSIER-MEP.md seul manquant nommé seul ; une livraison sans compte d'exigences sous le verrou S72 AVERT ; la même datée d'août SANS_OBJET, la verte sans livraison sous un produit PASS, une livraison hors produit SANS_OBJET) ; T2 dans ses SEPT sens (TF-1947, 26/10 : la verte sans ses blocs 2, 6 et 7 PASS en entier, S3 SANS_OBJET ; sans son bloc 9, son bloc 0 ou son bloc 4 FAIL sur S1 en nommant le bloc ; une décision au format B sans son tableau d'options FAIL sur S4 en le nommant, la même avec son tableau PASS) ; S83 dans ses DIX cas (TF-1936, RP-22 : la ligne A-11 du 19/10 « relire la semaine 2 » renvoyée au « guide de mon message de 21:45 » FAIL — le cas réel —, la même en puce FAIL, une option « relire d'abord la fiche » sans lien FAIL ; le chemin des textes (le remède), une adresse, un bloc cité PASS ; l'agent sujet, un « vérifier que… », un « valider le moyen de paiement » et la verte PASS) ; S84 dans ses CINQ cas (TF-1938, RP-24 : « 19:52, durée 4 min » sans relevé FAIL — le cas réel —, une durée sur un seul relevé FAIL, l'heure lue et la durée égale à l'écart de deux relevés PASS, la durée omise PASS, l'oracle joué sans relevés SANS_OBJET dit à voix haute) ; S82 dans ses SEIZE cas (TF-1866, D-29 (a) du 18/10 : « tout le site en ligne est à jour » fondé sur 273 pages sans ligne « Mesuré sur » FAIL — le cas réel du 15/10 —, la formule « Mesuré contre » FAIL, la source « mes marqueurs » FAIL, l'heure manquante FAIL, le périmètre sans nombre FAIL, quatre autres formes de l'affirmation (entièrement, rien oublié, inventaire complet, exhaustive) FAIL, le REMÈDE joué (source amont relue, heure, périmètre chiffré) PASS en puce comme en gras, la restitution sans affirmation PASS, l'affirmation niée, conditionnelle ou citée entre « » PASS, la restitution d'août SANS_OBJET) ; S79 dans ses DIX cas (D-23 du 18/10 : la ligne « Relecture d'intention : sert » du bloc 4 PASS, en gras PASS, « sans objet, <motif> » PASS ; la ligne absente FAIL en nommant la ligne attendue et la commande qui prépare la relecture, « sans objet » sans motif FAIL, une valeur hors vocabulaire FAIL, une dérive sans décision qui la nomme au bloc 3 FAIL et la MÊME dérive posée en décision PASS, le bloc 4 absent SANS_OBJET dit à voix haute, et la restitution datée de la veille de l'essai ou d'août SANS_OBJET : la règle ne juge pas ce qui l'a précédée ; avertissante ; et, pour la boucle de correction (D-26 (a)) : « sert après 1 passe » et « sert après 2 passes » PASS sans décision au bloc 3, « sert après 3 passes », « sert après 0 passe » et « sert après correction » FAIL, un écart qui demeure après 2 passes FAIL sans décision et PASS posé en décision) ; S80 dans ses sens (TF-1847, E-11 : « Comment faire : 1) … 2) … 3) » en ligne FAIL, la MÊME option en liste numérotée PASS S49 ET S80, une énumération en cellule FAIL en le disant, deux éléments et une citation entre guillemets français PASS) ; S81 dans ses quatre sens (guide à une sous-puce par geste PASS, étape de trois gestes en paragraphe FAIL en les comptant, clôture avant le dernier geste FAIL, sous-puce qui enchaîne FAIL) ; S78 dans ses QUATRE sens (format B du 17/10 : la décision au format B PASS sur S78, S15, S16, S30, S31 et S32 ; l'ancien format en citation FAIL en nommant les libellés manquants ; la MÊME décision B sans retour arrière FAIL ; la verte en puce SANS_OBJET dit à voix haute) ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 117 caracteres — 151 avec les 34 du sidecar d oracle, 26 jusqu au 01/10 — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS ; et TF-1500 dans ses QUATRE sens sous le forge d un produit : un chemin `forge/` cite de 117 caracteres FAIL, le meme a 116 PASS, le fichier juge sous un dossier `forge` mesure comme `forge/<nom>`, FAIL a 117 et PASS a 116) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S55 et S56 dans leurs QUATRE sens (TF-1493, TF-1498 : un guide de LANCEMENT et un feu vert au verdict sans ligne « Ne vérifie pas » et sur un audit des dependances date de la VEILLE FAIL sur les deux regles, la MEME bornee aux deux endroits et portant ses portes du jour chiffrees PASS en entier, le feu vert que l agent ATTEND de l humain ne declenche rien, et une chaine qui DECLARE n avoir aucune porte a base externe PASS — taux mesure a la mise en service : 0 sur les 215 syntheses d output\\04-plans\\, 10 et 9 sur les 142 restitutions des produits du poste : avertissantes) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit ; TF-1644 : le MEME message muet pose hors de tout produit rend SANS_OBJET seul et FAIL quand `--racine` nomme le produit, forme que le hook de fin de tour emploie ; TF-1643 dans ses TROIS sens : un tour qui CORRIGE une erreur de la session et declare « rien a remonter » FAIL, le MEME qui nomme son lot PASS, le MEME qui dit « reste au produit, parce que <motif> » PASS) ; S36 dans ses DEUX sens (TF-1653 : un schema HTML nomme par un prompt recopie dans un bloc de code et cite comme source lue PASS, le MEME schema presente comme livre sans critique d implementation FAIL) ; S69 dans ses DEUX sens (TF-1646 : la MEME verte dont l en-tete porte 15h48 jugee a 13:00 ce jour-la FAIL, heure composee dans le futur, et a 16:00 PASS ; et la MEME heure suivie de « (UTC+02:00) » lue avec son decalage, PASS) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
