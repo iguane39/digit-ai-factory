@@ -762,6 +762,10 @@ if (iPilot < 0) {
 
 // La section « Œil critique » : le repère de chaque poste, la sortie de la dernière exécution du
 // poste courant (10 lignes au plus, écrite par le skill), puis les alarmes ci-dessus.
+// D-94 (a) du 29/10/2026 — LE RAPPEL DE LANCEMENT NE VISE QUE LE POSTE DONT LE REPÈRE A VIEILLI. Lancé
+// à la main, le skill a tourné 1 fois en 9 jours. Chaque poste n'analyse que ses propres transcripts :
+// l'exécution de l'autre poste ne couvre pas celui-ci, et son repère n'entre pas dans le calcul.
+const OEIL_RAPPEL_JOURS = 7;
 if (iPilot < 0) {
   lignes.push("", "## Œil critique (D-64 (a) du 21/10/2026, skill oeil-critique)");
   const reperes = [];
@@ -775,6 +779,7 @@ if (iPilot < 0) {
   for (const r of reperes.sort((a, b) => String(a.poste).localeCompare(String(b.poste)))) {
     const age = (Date.now() - Date.parse(r.fin)) / 86400000;
     lignes.push(`- poste ${r.poste} : dernière analyse jusqu'au ${r.fin} (${age.toFixed(1)} j)${r.poste === ici ? "" : " — autre poste, sa sortie se lit sur lui"}`);
+    if (r.poste === ici && !(age <= OEIL_RAPPEL_JOURS)) lignes.push(`  - **à lancer** : repère de plus de ${OEIL_RAPPEL_JOURS} jours sur ce poste — dire « œil critique » ; l'exécution de l'autre poste ne couvre pas ses transcripts`);
     if (r.poste === ici) for (const l of (r.sortie || []).slice(0, 10)) lignes.push(`  - ${l.replace(/^[-*]\s*/, "")}`);
   }
   lignes.push(...alarmesOeil);
