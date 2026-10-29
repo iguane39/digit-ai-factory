@@ -645,6 +645,15 @@ export function juger(texte, options = {}) {
   // échouerait ici, toute synthèse conforme ici serait refusée par le hook Stop.
   {
     const bloquantes = (donnee?.familles || []).filter((f) => Array.isArray(f.positions_bloquantes) && f.positions_bloquantes.length);
+    // TF-1974 (20/10/2026) : un TITRE IMPOSÉ mot pour mot par un contrat (la clause d'un prompt, un
+    // cahier des charges) se déclare en en-tête — `titres_imposes: <titre> | <titre>` et
+    // `titres_imposes_par: <le contrat>`, ce second champ exigé. Il ne vaut qu'en titre et au mot près,
+    // numérotation « 5. » retirée. Le 20/10, « Ce que la proposition ne protège pas », exigé par la clause
+    // 7 d'un prompt, a été refusé ici, puis contourné en le numérotant.
+    const tete8 = enTete(texte);
+    const imposes = tete8.titres_imposes_par ? String(tete8.titres_imposes || "").split(" | ").map((x) => x.trim()).filter(Boolean) : [];
+    const impose = (t) => imposes.includes(t.replace(/^\s*\d+[.)]\s*/, "").trim());
+    const admisImposes = new Set();
     if (!bloquantes.length) {
       pousser("EC-8", "SKIP", "aucune famille ne déclare de position bloquante dans la donnée");
     } else {
@@ -686,6 +695,7 @@ export function juger(texte, options = {}) {
           const titre = /^\s*#{1,6}\s+(.*\S)\s*$/.exec(brut);
           if (titre && famille.positions_bloquantes.includes("titre")) {
             const trouve = cherche(titre[1]);
+            if (trouve && impose(titre[1])) { admisImposes.add(i); continue; }
             if (trouve && !exempte(titre[1], "titre")) constats.push({ ligne: i + 1, position: "titre", texte: titre[1].slice(0, 80), trouve });
             continue;
           }
@@ -707,11 +717,13 @@ export function juger(texte, options = {}) {
           `${constats.length} tournure(s) d'annonce à une position qui les refuse : `
           + constats.slice(0, 5).map((c) => `${c.position} l.${c.ligne} « ${c.texte} »`).join(" · ")
           + (constats.length > 5 ? ` · et ${constats.length - 5} autre(s)` : "")
-          + " — un titre et un en-tête NOMMENT ce qu'ils portent, ils ne le promettent pas",
+          + " — un titre et un en-tête NOMMENT ce qu'ils portent, ils ne le promettent pas ; un titre imposé mot pour mot par un contrat "
+          + "se déclare en en-tête (`titres_imposes:` et `titres_imposes_par:`, TF-1974)",
           constats[0].ligne);
       else
         pousser("EC-8", "PASS",
-          `aucune tournure d'annonce en titre ni en en-tête de colonne (${bloquantes.length} famille(s) à position bloquante)`);
+          `aucune tournure d'annonce en titre ni en en-tête de colonne (${bloquantes.length} famille(s) à position bloquante)`
+          + (admisImposes.size ? ` ; ${admisImposes.size} titre(s) imposé(s) par « ${tete8.titres_imposes_par} » admis` : ""));
     }
   }
 
@@ -1396,6 +1408,24 @@ function selfTest() {
     casse.push("EC-8 : les 2 ANCIENS libelles du tableau d'options passent encore — l'exemption du "
       + `16/09 devait etre LEVEE par D-2 (a), et un banc qui ne teste que la forme neuve ne le voit pas : ${JSON.stringify(f8a)}`);
 
+  // 41, 42 et 43 (TF-1974, 29/10/2026) — LE TITRE IMPOSÉ PAR CONTRAT. Le titre du 20/10, déclaré avec son
+  // contrat, est admis ; le MÊME déclaré sans contrat reste refusé ; un AUTRE titre fautif du même document
+  // l'est aussi : l'exemption ne vaut que pour le titre nommé, au mot près.
+  const CORPS8 = "\n\nUn paragraphe de prose ordinaire, assez long pour ne rien declencher d'autre, qui decrit un dispositif.\n";
+  const EC8_IMPOSE = "---\ntitres_imposes: Ce que la proposition ne protège pas\ntitres_imposes_par: clause 7 du prompt de proposition\n---\n\n## Ce que la proposition ne protège pas" + CORPS8;
+  const EC8_SANS_CONTRAT = EC8_IMPOSE.replace("titres_imposes_par: clause 7 du prompt de proposition\n", "");
+  const EC8_AUTRE = EC8_IMPOSE + "\n## Ce que le guide couvre" + CORPS8;
+  const f8 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-8");
+  const r8i = jouer("ec8-impose.md", EC8_IMPOSE);
+  const r8s = jouer("ec8-sans-contrat.md", EC8_SANS_CONTRAT);
+  const r8o = jouer("ec8-autre-titre.md", EC8_AUTRE);
+  if (f8(r8i)?.statut !== "PASS" || !/1 titre\(s\) imposé\(s\) par « clause 7/.test(f8(r8i)?.message || ""))
+    casse.push(`EC-8 : le titre imposé par la clause d'un contrat, déclaré en en-tête, est refusé ou admis sans le dire : ${JSON.stringify(f8(r8i))}`);
+  if (f8(r8s)?.statut !== "FAIL")
+    casse.push(`EC-8 : un titre déclaré imposé SANS nommer son contrat est admis — l'exemption deviendrait une formule : ${JSON.stringify(f8(r8s))}`);
+  if (f8(r8o)?.statut !== "FAIL" || !/Ce que le guide couvre/.test(f8(r8o)?.message || ""))
+    casse.push(`EC-8 : un AUTRE titre fautif du document passe sous l'exemption du titre imposé : ${JSON.stringify(f8(r8o))}`);
+
   // TF-1507 (02/10/2026) — LE GABARIT RÉEL, PAS UNE FIXTURE. `gabarits\docs-projet\FONCTIONNEL.md`
   // portait, en-tête de colonne, « Ce qu'il peut faire » et « Ce qu'il ne peut pas » : EC-8 les
   // refusait chez le produit qui l'instancie (FAIL mesuré le 28/09/2026). Lire le fichier réel,
@@ -1831,7 +1861,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : ${40 + BILAN_14} cas, 0 défaut (${40 + BILAN_14}/${40 + BILAN_14} PASS — EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : ${43 + BILAN_14} cas, 0 défaut (${43 + BILAN_14}/${43 + BILAN_14} PASS — EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 
