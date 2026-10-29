@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.51.0",
+ "version": "1.52.0",
  "date": "2026-10-29",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2403,6 +2403,21 @@
    "voisines": [
     "oracle-faux-positif",
     "regle-de-forme-primant-sur-la-demande"
+   ]
+  },
+  {
+   "cle": "texte-long-non-structure",
+   "famille": "hook-ou-gate",
+   "libelle": "Un texte qui informe un lecteur porte des paragraphes longs, des phrases longues ou des énumérations en prose, et l oracle d écriture rend PASS. Mesuré chez Produit-84 le 20/10/2026 : 306 mots et 9 phrases en un paragraphe, une phrase de 52 mots, dans une proposition.",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1976",
+    "TF-1960"
+   ],
+   "regle": "references/ECRITURE.md E-17 et oracles/oracle-ecriture.mjs EC-14 (paragraphe de 3 phrases et 60 mots au plus, phrase de 25 mots au plus, énumération de plus de 3 éléments en liste), en A_REJOUER ; types d écrit à un tiers dans references/tics-redactionnels.json 1.5.0",
+   "oracle": "pilot, oracles/oracle-ecriture.mjs EC-14 et son self-test, joué par oracles/hook-ecriture.mjs",
+   "voisines": [
+    "titre-impose-refuse-par-oracle"
    ]
   }
  ],
