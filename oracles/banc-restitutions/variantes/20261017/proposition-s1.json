@@ -1,0 +1,34 @@
+{
+ "angle": "S1 (huit blocs présents) et moment où l'auteur décide qu'un message de fin de tour est une restitution complète",
+ "mecanisme_observe": "L'auteur rédige d'abord la réponse naturelle à la situation (relais d'avancement, fin de synchronisation, annonce de lot terminé, point rapide) ; la décision « ceci est une restitution » est prise après coup ou jamais, et la structure est vue comme un habillage lourd, d'où des messages sans bloc 0 ni blocs 1-8. Les exemptions de portée, lues comme des propriétés du message, attirent. Le texte accepté reprend le même fond sous les titres : le contenu n'est pas en cause.",
+ "cas_concernes": "11 des 12 cas, surtout ceux bloqués par S1/S3/S4/S6 ensemble (messages ouverts par la réponse, un relais cité ou un bilan en liste) ; les cas S4 ou S6 seuls relèvent d'autres angles",
+ "type": "insertion",
+ "ancien": "## La structure, dans cet ordre",
+ "nouveau": "**Le test de départ — il se passe AVANT la première phrase, jamais après.** Un message de fin de tour devient une restitution complète par ce que le tour a FAIT, jamais par ce que le message est (un relais, un point rapide, une synchronisation, un « juste le résultat ») ni par son poids. Avant d'écrire le premier mot, trois questions :\n\n1. Le tour a-t-il écrit un fichier, fait un commit, lancé une exécution, ou le message annonce-t-il un verdict ou une décision ? Si oui, c'est une restitution, et la forme courte n'est pas ouverte : les exemptions du § Portée ne s'appliquent pas à un tour de travail.\n2. Le message que je m'apprête à écrire commence-t-il par la réponse (« Voici où ça en est », « Le lot est fini », « Tout est synchronisé »), par un relais cité, ou par une liste de ce qui a été fait ? Si oui, je ne l'envoie pas : cette ouverture est celle d'une réponse de conversation, et c'est elle qui a fait refuser les restitutions dont le contenu était bon.\n3. Ai-je le droit de n'écrire que ce que j'ai à dire ? Non : les neuf titres sont posés d'abord, le fond vient après.\n\n**Écrire d'abord le squelette, puis le remplir.** La première ligne du message est le titre du document ou `## 0. Synthèse d'ouverture` ; viennent ensuite, dans l'ordre, les titres `### 1.` à `### 8.`, chacun suivi d'une ligne provisoire « — ». Chaque bloc se remplit ensuite à la place de son « — », ou garde une ligne qui dit pourquoi il est vide (« aucun risque identifié », « rien n'attend de décision »). Un bloc dont on n'a rien à dire n'est pas omis : il est le plus vite fait, et son absence se lit comme un oubli. Ce que l'on avait envie de dire en premier (le résultat, le point d'avancement, la question) devient la phrase d'ouverture du bloc 0, jamais un préambule posé avant lui.\n\n*Le fait* : sur les refus relevés d'un même ensemble de sessions, les messages refusés pour structure absente étaient presque tous la réponse naturelle de l'auteur (relais d'avancement, fin de synchronisation, annonce d'un lot terminé) ; le texte accepté qui suivait disait la même chose, reprise sous les neuf titres. Le contenu n'était pas en cause : la décision « ceci est une restitution » avait été prise après avoir écrit, au lieu d'avant.",
+ "pourquoi": "Place le point de décision avant l'écriture, là où l'auteur lit la consigne, et rend le remède mécanique : poser les titres puis remplir, ce qui ne laisse aucun bloc oublié et supprime l'ouverture conversationnelle. Insérée sous le titre de la structure, avant le bloc 0.",
+ "score": {
+  "cas": 12,
+  "acceptes": 0,
+  "taux": 0,
+  "bloquantes": {
+   "S3": 5,
+   "S6": 12,
+   "S1": 1,
+   "S4": 2
+  },
+  "avertissements_total": 43
+ },
+ "reference": {
+  "cas": 12,
+  "acceptes": 6,
+  "taux": 50,
+  "bloquantes": {
+   "S3": 6,
+   "S1": 2,
+   "S4": 3,
+   "S6": 3
+  },
+  "avertissements_total": 52
+ },
+ "verdict": "rejetée : ne bat pas la consigne en vigueur sur la part tenue à l'écart"
+}

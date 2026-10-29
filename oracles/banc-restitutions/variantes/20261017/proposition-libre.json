@@ -1,0 +1,45 @@
+{
+ "angle": "Longueur de la consigne et absence d'aide-mémoire en tête : l'essentiel (quand un message est jugé, quelles sorties courtes sont admises, quelle structure) est enfoui à plus de 150 Ko, aux lignes ~600 et ~20",
+ "mecanisme_observe": "Dans 9 cas sur 12, le message refusé est une courte prose sans aucun bloc (relais d'avancement, annonce de synchronisation, fin d'agent, attente), écrite à la fin d'un tour qui avait travaillé ; il tombe alors sur S1, S3, S4 et S6 ensemble (4 bloquantes à la fois), plus S2/S5/S9/S51 en avertissement. Le message accepté qui le remplace est la restitution complète du même tour. L'auteur croit que la brièveté ou le statut de 'relais' l'exempte, alors que l'exemption exige zéro écriture depuis le dernier affichage, et que cette règle figure dans un tableau en milieu de document. Les cas à S6 seul (2 cas) ou S4 seul portent déjà la structure et relèvent d'autres angles.",
+ "cas_concernes": [
+  1,
+  3,
+  4,
+  6,
+  7,
+  8,
+  9,
+  10,
+  12
+ ],
+ "type": "insertion",
+ "ancien": "# Consigne de restitution — le message de fin de traitement",
+ "nouveau": "**Aide-mémoire avant d'écrire — lis ceci d'abord, le reste de la page est le détail.**\n\n1. **Tu as écrit, committé ou lancé quelque chose dans ce tour ? Alors ton message est jugé, même s'il tient en trois lignes.** La longueur ne t'exempte pas. Un « relais », un « point d'avancement », un « tout est synchronisé » ou un « X a fini, voici où on en est » rédigé en prose, sans blocs, est refusé d'un seul coup sur S1, S3, S4 et S6 (structure, verdict, décisions, titres absents).\n2. **Il n'y a que ces sorties courtes, et rien d'autre** (tableau « les sept exemptions », plus bas) : un accusé de réception ou une réponse courte sans verdict ; une question de 60 mots au plus qui finit par « ? » ; un relais ou un « rien de neuf » de moins de 150 mots dans un tour où RIEN n'a été écrit depuis le dernier affichage ; l'attente d'une tâche d'arrière-plan encore en cours (3 lignes). Dès qu'un seul fichier a été écrit entre deux affichages, ce n'est plus un relais.\n3. **Le résultat n'est pas encore mesurable ? Écris un point d'étape** (§ « Point d'étape ») : la mention `point d'étape` au bloc 1, les blocs 1, 4 et 8 pleins, le bloc 2 réduit à « ce qui reste à mesurer, et par quoi ». Ce n'est pas une prose courte déguisée.\n4. **Sinon, écris la restitution complète, dans cet ordre, en titres `##` numérotés** : un paragraphe de synthèse d'ouverture (bloc 0, ≥ 20 mots, sans identifiant ni chemin ni sha) · `## 1. En-tête d'identification` (quoi, sur quoi, quand, qui, intention + test rétro) · `## 2. Verdict` (la ligne qui dit PASS/FAIL, chiffrée, avec l'outil qui l'a rendue) · `## 3. Décisions attendues de l'humain` · `## 4. Traité — avec sa preuve` · `## 5. Non traité — avec son motif` · `## 6. Écarts à la lettre` · `## 7. Risques` · `## 8. Prochaines actions` (un tableau, actions A-N) · `## 9. Traces`. Un bloc sans contenu garde son titre et une ligne qui le dit (« aucun risque identifié ») ; un titre seul est refusé.\n5. **Une restitution complète est un fichier** déposé sous le dossier des synthèses du pilot avec `destinataire: humain` en frontmatter, jugé par `oracle-synthese` ; ton message en donne le lien puis la reprend en entier. Un message qui renvoie à une synthèse sans la porter est lui-même refusé.\n6. **Un refus répété ne se contourne pas en raccourcissant** : relis ce que l'oracle a nommé (S1, S3, S4, S6…), cherche cette règle plus bas dans la page, corrige, redépose.",
+ "pourquoi": "Un aide-mémoire de 6 points en tête place, avant les 158 Ko de détail, la règle qui évite le refus le plus fréquent : tout tour qui a écrit est jugé quelle que soit la longueur ; les sorties courtes admises sont énumérées et bornées ; sinon point d'étape ou restitution complète avec la liste exacte des titres. Il ne crée aucune règle, il remonte des règles existantes (exemptions, point d'étape, blocs 0-9, S64) à l'endroit que l'auteur lit.",
+ "note_pilot": "titre en tête de `nouveau` retiré par le pilot : il dupliquait l ancre d insertion",
+ "score": {
+  "cas": 12,
+  "acceptes": 1,
+  "taux": 8,
+  "bloquantes": {
+   "S3": 4,
+   "S6": 11,
+   "S1": 1,
+   "S4": 3
+  },
+  "avertissements_total": 57
+ },
+ "reference": {
+  "cas": 12,
+  "acceptes": 6,
+  "taux": 50,
+  "bloquantes": {
+   "S3": 6,
+   "S1": 2,
+   "S4": 3,
+   "S6": 3
+  },
+  "avertissements_total": 52
+ },
+ "verdict": "rejetée : ne bat pas la consigne en vigueur sur la part tenue à l'écart"
+}

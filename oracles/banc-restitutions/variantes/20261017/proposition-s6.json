@@ -1,0 +1,32 @@
+{
+ "angle": "Règle S6 : bloc 8 en tableau unique, acteur en colonne, sélecteurs A-N, motifs, ordre justifié",
+ "mecanisme_observe": "Sur 11 refus où S6 bloque, 8 sont des messages courts de fin de tour d'écriture (relais d'avancement, fin d'agent, attente, synchronisation, point sur un chantier) écrits en prose libre « Réalisé / Reste / Restent attendus / Tu veux que je… ? » : l'auteur les tient pour des réponses d'étape hors restitution, donc aucun bloc 8, alors que le tour a écrit et est jugé en entier. Les 3 autres écrivent bien un tableau mais décrivent l'ordre sans le justifier (« L'ordre suit les dépendances », « A-13 conditionne A-7 », aucune phrase d'ordre), ou nomment l'acteur « IA / humain » hors vocabulaire gelé, avec une colonne Statut, ou numérotent hors suite. Dans tous les cas acceptés ensuite, les restes de la prose sont devenus des lignes du tableau (dependance_externe, dependance_bloc_3, trancher D-N) précédées d'une phrase d'ordre.",
+ "cas_concernes": 11,
+ "type": "insertion",
+ "ancien": "### 8. Prochaines actions — UN TABLEAU, ordonné, l'acteur en colonne, chaque action en `A-N`",
+ "nouveau": "### 8. Prochaines actions — UN TABLEAU, ordonné, l'acteur en colonne, chaque action en `A-N`\n\n**Avant d'écrire le bloc 8 : tout ce qui « reste » est une LIGNE de ce tableau, quelle que soit la longueur du message.** Un message de fin de tour qui a écrit, lancé une commande ou attend un agent est jugé en entier : les neuf blocs, dont celui-ci. Les formes courtes de « Forme dégradée » ne valent que si leurs conditions sont toutes réunies ; au moindre doute, écrire les neuf blocs. Une prose du genre « Réalisé / Reste / Fin prévue », « Restent attendus : … », « Je reprendrai … », « Tu veux que je … ? » ou « Rien n'est attendu de vous » est refusée sur ce bloc, même en cinq lignes : ces phrases sont des actions, et elles s'écrivent comme telles.\n\nLe squelette, à recopier tel quel et à remplir :\n\n1. Le titre `## 8. Prochaines actions`, puis UNE phrase d'ordre qui dit POURQUOI, avec un mot de justification : « D'abord A-1, parce qu'elle supprime le blocage ; A-3 vient en dernier, car elle attend D-1 ». Une phrase qui décrit sans justifier (« L'ordre suit les dépendances », « A-2 conditionne A-1 ») est refusée ; « d'abord », « en premier », « parce que », « car », « priorité », « levier » ou « impact » la rendent lisible.\n2. Un seul tableau, colonnes fixes : `Sél. | Action | Id | Acteur | Motif | Commande ou geste | Si rien n'est fait`.\n3. Acteur dans le vocabulaire gelé : `auto_ia`, `manuelle_dev` ou `manuelle_utilisateur`. Jamais « IA », « humain », « moi », « toi » seuls.\n4. Sélecteurs `A-1`, `A-2`… dans l'ordre des lignes, en repartant de `A-1` ; les actions de l'IA d'abord. Pas de colonne « Statut » à la place du motif.\n5. Où va chaque reste : une question posée à l'humain devient une décision du bloc 3 (`D-N`) et une ligne `manuelle_utilisateur` « Trancher D-N » ici ; ce que l'IA fera une fois la réponse reçue est une ligne `auto_ia` de motif `dependance_bloc_3` ; ce qui attend un agent ou un retour de tâche est une ligne `auto_ia` de motif `dependance_externe` ; une action finie n'est pas une ligne, elle va au bloc 4.\n\nCas de la synchronisation, du point sur un agent et de l'attente : le bloc 8 compte alors une ou deux lignes, et c'est correct. Mieux vaut un bloc 8 court et complet qu'un message court sans bloc 8.",
+ "pourquoi": "Le défaut n'est pas l'ignorance du tableau mais l'absence de déclencheur : l'auteur ne pense pas « bloc 8 » en écrivant « Reste : … » ou « Tu veux que je… ? ». L'insertion, placée juste sous le titre du bloc 8, convertit chaque formule de reste en ligne de tableau, donne le squelette exact (phrase d'ordre avec mot de justification, colonnes fixes, vocabulaire d'acteur gelé, A-1 en tête) et dit où va chaque type de reste. Elle ne crée aucune règle du juge ; elle reformule ce que S6, S11, S33 attendent sous une forme copiable.",
+ "score": {
+  "cas": 12,
+  "acceptes": 4,
+  "taux": 33,
+  "bloquantes": {
+   "S4": 7,
+   "S3": 3
+  },
+  "avertissements_total": 41
+ },
+ "reference": {
+  "cas": 12,
+  "acceptes": 6,
+  "taux": 50,
+  "bloquantes": {
+   "S3": 6,
+   "S1": 2,
+   "S4": 3,
+   "S6": 3
+  },
+  "avertissements_total": 52
+ },
+ "verdict": "rejetée : ne bat pas la consigne en vigueur sur la part tenue à l'écart"
+}

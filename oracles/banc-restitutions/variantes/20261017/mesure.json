@@ -1,0 +1,72 @@
+{
+ "campagne": "TF-1552, décision humaine D-8 (a) du 17/10/2026",
+ "consigne_de_reference": "gabarits/RESTITUTION.md v2.41.0",
+ "banc": "27 refus extraits des transcriptions de ce poste ; 24 rejouables ; 12 d'inspiration, 12 tenus à l'écart (partage déterministe, indices impairs)",
+ "protocole": "4 proposeurs (une insertion de 8 à 13 lignes chacun), 5 évaluateurs (référence + 4 variantes) réécrivant les 12 cas tenus à l'écart sans juge ; chaque réécriture jugée par `hook-restitution.mjs --prejuger` ; empreintes de 126 fichiers du juge relevées avant et après",
+ "scores": {
+  "base": {
+   "cas": 12,
+   "acceptes": 6,
+   "taux": 50,
+   "bloquantes": {
+    "S3": 6,
+    "S1": 2,
+    "S4": 3,
+    "S6": 3
+   },
+   "avertissements_total": 52
+  },
+  "libre": {
+   "cas": 12,
+   "acceptes": 1,
+   "taux": 8,
+   "bloquantes": {
+    "S3": 4,
+    "S6": 11,
+    "S1": 1,
+    "S4": 3
+   },
+   "avertissements_total": 57
+  },
+  "s1": {
+   "cas": 12,
+   "acceptes": 0,
+   "taux": 0,
+   "bloquantes": {
+    "S3": 5,
+    "S6": 12,
+    "S1": 1,
+    "S4": 2
+   },
+   "avertissements_total": 43
+  },
+  "s3s4": {
+   "cas": 12,
+   "acceptes": 5,
+   "taux": 42,
+   "bloquantes": {
+    "S4": 5,
+    "S6": 6,
+    "S1": 1,
+    "S3": 1
+   },
+   "avertissements_total": 49
+  },
+  "s6": {
+   "cas": 12,
+   "acceptes": 4,
+   "taux": 33,
+   "bloquantes": {
+    "S4": 7,
+    "S3": 3
+   },
+   "avertissements_total": 41
+  }
+ },
+ "empreintes_changees": 0,
+ "limites": [
+  "12 cas, un seul essai par variante : un écart de 1 à 2 cas est dans le bruit",
+  "le hook qualité d'écriture du poste a renvoyé des remarques de lisibilité aux évaluateurs, qui ont corrigé des fichiers : ce n'est pas un premier jet pur, pour toutes les variantes",
+  "27 refus au lieu des 514 relevés le 01/10 : les autres transcriptions ne sont pas sur ce poste"
+ ]
+}

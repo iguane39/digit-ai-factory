@@ -1,0 +1,47 @@
+{
+ "angle": "S3 (verdict en une ligne portant un fait mesurable) et S4 (décision en choix fermé)",
+ "mecanisme_observe": "L'auteur rédige dans l'ordre chronologique du travail (relais d'avancement, point de synchronisation, compte rendu d'agent). Le verdict devient la dernière phrase de narration, sans chiffre ou avec un chiffre rapporté dont la provenance est diluée. La question à l'humain reste une phrase de prose (« Tu veux que… ? », « je poserai la question à la restitution complète ») sans sélecteur D-N ni options, ou est promise pour plus tard avec « Rien n'est attendu de vous » écrit à côté. Les messages acceptés de la même série portent le chiffre dans la ligne du verdict et la question en bloc D-N.",
+ "cas_concernes": [
+  "0a2f7c15#2368",
+  "1dc64b33#389",
+  "2c485620#2765",
+  "2c485620#6090",
+  "41b11dfd#488",
+  "76942185#474",
+  "9ce4d026#1748",
+  "b3b1e488#113",
+  "b8387ff1#100",
+  "b8387ff1#865",
+  "b8387ff1#940",
+  "c3165eea#66"
+ ],
+ "type": "INSERTION",
+ "ancien": "### 2. Verdict en une ligne",
+ "nouveau": "### 2. Verdict en une ligne\n\n**Le verdict et la question s'écrivent AVANT le récit, jamais à sa suite.** Un message qui raconte ce qui s'est passé dans l'ordre où cela s'est passé (relais d'avancement, point de synchronisation, compte rendu d'un agent) fait sortir le verdict en dernière phrase de narration et la question en dernière ligne de prose. Ce message est une restitution : il porte les blocs 2 et 3 sous leurs titres, même court, même en cours de travail. Trois gestes, dans cet ordre :\n\n1. **Écrire le chiffre d'abord.** La ligne du bloc 2 est un compte « N sur M », un code de sortie, un écart avant/après (« 0 en avance et 0 en retard sur 15 dépôts », « 234 PASS, 0 FAIL »). « Tout est synchronisé », « les 6 travaux sont faits », « l'agent a fini » ne sont pas des faits mesurés : ce sont des conclusions, et le chiffre qui les fonde manque. Un chiffre rapporté par un agent s'écrit « rapporté par l'agent, non vérifié par moi » dans la ligne même, jamais « selon l'agent » trois lignes plus bas. Un relais d'avancement donne le chiffre du moment (« 2 familles sur 5 enregistrées »), pas un récit.\n2. **Relire le message pour y chercher une question.** Toute phrase qui demande à l'humain de faire ou de trancher quelque chose est une décision, quelle que soit sa tournure : « Tu veux que je committe et que je pousse ? », « Il reste une question sur X, à la fin », « Je vous poserai la question à la restitution complète ». Elle devient un bloc `D-N` du bloc 3, avec ses options (a), (b), (c), sa recommandation et son option par défaut. Une question promise « plus tard » est posée maintenant, ou n'est pas promise.\n3. **Écrire « Rien n'est attendu de vous » en dernier, et seulement si le geste 2 n'a rien trouvé.** Une question restée en prose rend cette phrase fausse.\n\n*Le fait* : dans les cas refusés de la série, le verdict était une phrase sans chiffre ou un chiffre rapporté sans sa provenance, et la question une phrase en « Tu veux que… ? » sans sélecteur ni option ; les versions acceptées des mêmes tours portent le chiffre dans la ligne du verdict et la question en `D-N`.",
+ "pourquoi": "Aucune règle existante ne dit l'ORDRE d'écriture ni ne traite une question en prose comme une décision. Le passage place l'écriture du chiffre et la recherche de questions avant le récit, ce qui court-circuite le mécanisme chronologique. Il ne rajoute aucune règle de contrôle, il redit S3 et S4 sous la forme d'un geste exécutable par l'auteur.",
+ "score": {
+  "cas": 12,
+  "acceptes": 5,
+  "taux": 42,
+  "bloquantes": {
+   "S4": 5,
+   "S6": 6,
+   "S1": 1,
+   "S3": 1
+  },
+  "avertissements_total": 49
+ },
+ "reference": {
+  "cas": 12,
+  "acceptes": 6,
+  "taux": 50,
+  "bloquantes": {
+   "S3": 6,
+   "S1": 2,
+   "S4": 3,
+   "S6": 3
+  },
+  "avertissements_total": 52
+ },
+ "verdict": "rejetée : ne bat pas la consigne en vigueur sur la part tenue à l'écart"
+}
