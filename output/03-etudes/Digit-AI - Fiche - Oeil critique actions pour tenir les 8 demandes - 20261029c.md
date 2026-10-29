@@ -53,4 +53,26 @@ Le skill annonce « un palier par mois », mais son repère ne garde aucune date
 
 Lot 1, simple : 4 puis 1. Lot 2, après décision : 2 puis 3.
 
+## 3. Décisions attendues
+
+> **D-95 — Faut-il mettre en œuvre les actions de la fiche 20261029c pour que l'œil critique tienne les 8 demandes ?**
+> - **De quoi s'agit-il** : 4 actions sur le skill, 1 et 4 simples, 2 et 3 qui l'élargissent à l'existant et aux process silencieux.
+> - **Le problème** : 6 demandes sur 8 ne sont tenues qu'en partie ou pas du tout, et la revue du skill tombe vers le 23/11.
+> - **Pourquoi vous** : les actions 2 et 3 changent le périmètre de l'outil que vous avez commandé ; c'est un arbitrage entre couverture et coût de chaque exécution.
+> - **Recommandation : (b)** — seules les actions 2 et 3 tiennent les demandes du 17/09 et du 20/10 matin, et elles réemploient des scripts existants. Source consultée : cette fiche.
+
+| Option | Ce qui se passe | Coût | Retour arrière |
+|---|---|---|---|
+| (a) Lot 1 seul | Actions 4 puis 1 : paliers datés, indicateurs comparés, traces des produits lues | simple × court | revenir au commit précédent du skill |
+| (b) Lots 1 et 2 | Les 4 actions, dans l'ordre 4, 1, 2, 3 ; chaque exécution lit davantage de sources | moyen × moyen ; exécutions plus longues, sous le plafond d'un million de jetons | revenir au commit précédent du skill |
+| (c) Rien | Le skill reste en 1.1.2 | aucun | sans objet |
+
+> **Sans réponse** : rien ne change, le skill reste en 1.1.2.
+
+## 8. Prochaines actions
+
+| Sélecteur | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |
+|---|---|---|---|---|---|
+| A-1 | neuve | auto_ia | `dependance_bloc_3` : attend D-95 ; ensuite, modification du skill dans forge-agents, self-tests rejoués, puis publication | `../digit-ai-forge-agents/.claude/skills/oeil-critique/` | 6 demandes restent tenues en partie ou pas du tout |
+
 Sources : fiche 20261029b, `SKILL.md` 1.1.2 de forge-agents, registre `todo/TODO.jsonl`, scripts cités du pilot.
