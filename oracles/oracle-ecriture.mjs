@@ -1808,6 +1808,12 @@ function selfTest() {
     `EC-14 : un en-tête destinataire: qui nomme un tiers ne rend pas la règle applicable : ${JSON.stringify(trouve(c14t, "EC-14-paragraphe"))}`);
   const c14f = jouer("Digit-AI - Fiche produit - Relance - 20261026a.md", COURRIEL_ROUGE);
   verifie(trouve(c14f, "EC-14-paragraphe")?.statut === "A_REJOUER", `EC-14 : une fiche (type de nom « fiche produit ») n'est pas jugée : ${JSON.stringify(trouve(c14f, "EC-14"))}`);
+  // TF-1976 (29/10/2026) : une proposition commerciale est un écrit à un tiers par son type de nom ; le 20/10, la
+  // section 1 d'une proposition (306 mots en un paragraphe) rendait PASS faute d'en-tête.
+  const c14pr = jouer("Client-A - Propale - Lot 2 - 20261020a.md", COURRIEL_ROUGE);
+  const c14po = jouer("Client-A - Proposition - Accompagnement - 20261020a.md", COURRIEL_ROUGE);
+  verifie(trouve(c14pr, "EC-14-paragraphe")?.statut === "A_REJOUER" && trouve(c14po, "EC-14-paragraphe")?.statut === "A_REJOUER",
+    `EC-14 : une proposition sans en-tête (types « Propale » et « Proposition » du registre) n'est pas jugée : ${JSON.stringify([trouve(c14pr, "EC-14"), trouve(c14po, "EC-14")])}`);
   const c14c = jouer("FICHE-CONCEPTION.md", COURRIEL_ROUGE);
   verifie(trouve(c14c, "EC-14")?.statut === "SKIP" && /fiche conception/.test(trouve(c14c, "EC-14")?.message || ""),
     `EC-14 : une fiche de conception (document de travail) est jugée comme un écrit à un tiers : ${JSON.stringify(trouve(c14c, "EC-14"))}`);
