@@ -19,6 +19,8 @@
  *      ligne de niveau qui cite CE chemin ; chez un produit qui ne le porte pas, rien.
  *  15. Critique d'implémentation exigée (TF-1913, D-82 (a)) : une page écrite sans `run-oracles-design`
  *      est nommée avant le 03/11/2026, refusée dès cette date ; la critique jouée lève le refus.
+ *  16. Ligne « Livré : » du bloc 0 (TF-1973, TF-2016, S87) : un guide écrit sous output/ et non lié au bloc 0
+ *      est dit par le juge du pilot atteint par le lanceur, parmi les avertissements non bloquants.
  * Joué par oracles/self-tests.mjs (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, readFileSync, existsSync } from "node:fs";
@@ -289,8 +291,22 @@ try {
     c15Apres?.decision === "block" && /CRITIQUE — le tour a écrit 1 fichier\(s\) servi\(s\)/.test(c15Apres.reason || "") && /TOI-MÊME/.test(c15Apres.reason || ""), JSON.stringify(c15Apres)?.slice(0, 300));
   check("15 ter critique, le remède joué : la critique lancée après l'écriture lève le refus CRITIQUE",
     c15Vert?.decision === "block" && !/CRITIQUE — /.test(c15Vert.reason || "") && !/CRITIQUE \(bloquante/.test(c15Vert.reason || ""), JSON.stringify(c15Vert)?.slice(0, 300));
+
+  // 16 — TF-1973 et TF-2016 (29/10/2026, S87) : la ligne « Livré : » du bloc 0, jugée par le lanceur chez le produit avec le juge du pilot, sans recopie. Le tour écrit un guide
+  // sous output/ (chemin d'un produit fictif, hors du dossier temporaire où tout fichier est un brouillon) ; le message final n'est pas une restitution, il est donc refusé, et le refus
+  // porte S87 parmi les « à corriger au passage » tant que le bloc 0 ne lie pas le guide.
+  const GUIDE16 = "C:\\dev\\produit-essai\\output\\04-cadrages\\Produit - Guide - Lot 0 - 20261029b.md";
+  const t16 = join(base, "livre.jsonl");
+  writeFileSync(t16, [humain, { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id: "e16", name: "Write", input: { file_path: GUIDE16, content: "# Guide" } }] } },
+    res15("e16", "ok"), texte("## 0. Synthèse d'ouverture\n\nLe guide du lot 0 est rédigé et prêt à relire : il décrit les étapes de mise en route dans l'ordre où vous les ferez, et rien ne reste à décider de votre côté avant la relecture.\n\n## 1. En-tête\nGuide du lot 0.")]
+    .map((e) => JSON.stringify(e)).join("\n"), "utf8");
+  const r16 = spawnSync(process.execPath, [lanceur, "restitution"], { encoding: "utf8", cwd: P, env: { ...env },
+    input: JSON.stringify({ session_id: "test-heritage-livre", transcript_path: t16, stop_hook_active: false, cwd: P }) });
+  let c16 = null; try { c16 = JSON.parse(r16.stdout || "null"); } catch { c16 = { brut: r16.stdout }; }
+  check("16 livré, le guide écrit sous output/ et non lié au bloc 0 : S87 est dite au hook du pilot atteint par le lanceur (TF-1973, TF-2016)",
+    c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && /\(v2\.53\.0\)/.test(c16.reason || ""), JSON.stringify(c16)?.slice(0, 300));
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016)`);
