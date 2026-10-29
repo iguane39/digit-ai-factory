@@ -116,6 +116,83 @@ export async function lotsARemettre(produit, pilot, { maintenant = Date.now(), s
   return sortie.sort((a, b) => b.jours - a.jours);
 }
 
+// ---- TF-1988 (29/10/2026, lot Produit-85 20261024a, RP-3) : LES RETOURS DU LEDGER RESTÉS SANS LOT ------------------
+// Mesuré le 24/10 : cinq entrées `type: retour` (seq 11, 12, 15, 20, 38) consignées depuis le 22/10 dans le ledger d'un
+// produit, jamais compilées en lot ; aucune ouverture ni fin de tour ne l'avait dit, et leurs cinq classes n'existaient
+// pas au référentiel du pilot. Un lot cite les seq qu'il compile (« Références ledger : seq 11, 12 », champ `source` du
+// sidecar « ledger seq 40 ») : une entrée `retour` qu'aucun lot du produit ne cite est SANS LOT. Lecture seule.
+
+/** Les numéros de seq cités par un texte de lot : « seq 11 », « seq 11, 12 et 15 », « seq 20 à 24 », « seq 30-32 ». */
+export function seqCites(texte) {
+  const cites = new Set();
+  // `\b` ne borne pas « à » (hors ASCII) : les mots séparateurs se bornent par des blancs.
+  const SEP = "(?:\\s*[,;–—-]\\s*|\\s+(?:et|à|au)\\s+)";
+  const re = new RegExp(`\\bseq(?:uences?)?\\.?\\s*(?:n°\\s*)?:?\\s*(\\d{1,6}(?:${SEP}\\d{1,6})*)`, "gi");
+  for (const m of String(texte).matchAll(re)) {
+    const morceaux = m[1].split(new RegExp(`(${SEP})`, "i"));
+    let precedent = null, plage = false;
+    for (const p of morceaux) {
+      if (/^(?:\s*[–—-]\s*|\s+(?:à|au)\s+)$/i.test(p)) { plage = true; continue; }
+      if (!/^\d+$/.test(p.trim())) { plage = false; continue; }
+      const n = Number(p.trim());
+      if (plage && precedent !== null && n >= precedent && n - precedent <= 200) for (let k = precedent; k <= n; k++) cites.add(k);
+      else cites.add(n);
+      precedent = n; plage = false;
+    }
+  }
+  return cites;
+}
+
+/** Les clés de classe du référentiel du pilot (`todo\CLASSES.json`), ou `null` s'il est illisible. */
+export function classesDuPilot(pilot) {
+  try {
+    const ref = JSON.parse(readFileSync(join(pilot, "todo", "CLASSES.json"), "utf8"));
+    return new Set((ref.classes || []).map((c) => c.cle));
+  } catch { return null; }
+}
+
+/**
+ * TF-1988 — les entrées `type: retour` du ledger COURANT du produit (`forge\ledger.jsonl`) qu'aucun lot de
+ * `forge\retours\` ne cite par son seq, consignées depuis plus de `seuilH` heures. Pour chacune : `seq`, `jours`
+ * (null si le `ts` est illisible), `classe` (champ `classe` de l'entrée, s'il existe) et `classeInconnue` (la classe
+ * n'est pas au référentiel du pilot et n'est pas « classe-a-creer » ; `null` si l'entrée n'en porte pas ou si le
+ * référentiel est illisible). Une entrée qui porte elle-même un champ `lot` est tenue pour compilée.
+ * Rend `null` quand le produit n'a pas de ledger lisible : ce n'est pas « zéro retour », c'est « non relevé ».
+ */
+export function retoursSansLot(produit, pilot, { maintenant = Date.now(), seuilH = SEUIL_H } = {}) {
+  let brut;
+  try { brut = readFileSync(join(produit, "forge", "ledger.jsonl"), "utf8"); } catch { return null; }
+  const retours = [];
+  for (const l of brut.split(/\r?\n/)) {
+    if (!l.trim()) continue;
+    let e; try { e = JSON.parse(l); } catch { continue; }
+    if (e && e.type === "retour" && Number.isInteger(e.seq)) retours.push(e);
+  }
+  if (!retours.length) return [];
+  const citees = new Set();
+  const d = join(produit, "forge", "retours");
+  let noms = [];
+  try { noms = readdirSync(d); } catch { /* pas de dossier de lots : aucune seq citée */ }
+  for (const n of noms) {
+    if (!/\.(?:md|tf\.jsonl)$/i.test(n)) continue;
+    try { for (const s of seqCites(readFileSync(join(d, n), "utf8"))) citees.add(s); } catch { /* lot illisible */ }
+  }
+  const classes = classesDuPilot(pilot);
+  const sortie = [];
+  for (const e of retours) {
+    if (citees.has(e.seq) || e.lot) continue;
+    const t = Date.parse(e.ts);
+    const age = Number.isFinite(t) ? (maintenant - t) / 3600000 : Infinity;
+    if (age <= seuilH) continue;
+    const classe = typeof e.classe === "string" && e.classe.trim() ? e.classe.trim() : null;
+    sortie.push({
+      seq: e.seq, jours: Number.isFinite(age) ? Math.floor(age / 24) : null, classe,
+      classeInconnue: classe && classes ? (classe !== "classe-a-creer" && !classes.has(classe)) : null,
+    });
+  }
+  return sortie.sort((a, b) => a.seq - b.seq);
+}
+
 /**
  * TF-1760 — les TF du registre qui désignent ce produit : demandeur égal à l'un de ses pseudonymes, ou
  * source qui cite « <pseudonyme> - RETOURS ». `depuis` (ISO) : rend aussi ceux passés à un statut clos

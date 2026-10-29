@@ -289,6 +289,26 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "retours"))) {
   } catch (e) { lignes.push("", `- lots et retours du produit : NON relevés (${String(e.message).slice(0, 160)})`); }
 }
 
+// TF-1988 (29/10/2026, lot Produit-85 20261024a, RP-3) — LES RETOURS DU LEDGER RESTÉS SANS LOT SE COMPTENT À L'OUVERTURE.
+// Mesuré le 24/10 : cinq entrées `type: retour` (seq 11, 12, 15, 20, 38), consignées depuis le 22/10, jamais compilées en
+// lot ; aucune ouverture ni fin de tour ne l'avait dit, et leurs cinq classes n'étaient pas au référentiel du pilot. Une
+// entrée qu'aucun lot de `forge/retours/` ne cite par son seq, vieille de plus de 24 h, est nommée ; une classe que le
+// référentiel du pilot ne connaît pas l'est aussi. Lecture seule : rien n'est écrit au ledger ni au lot.
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ledger.jsonl"))) {
+  try {
+    const { retoursSansLot, SEUIL_H } = await import(pathToFileURL(join(ICI, "lib-retours-produit.mjs")).href);
+    const sans = retoursSansLot(process.cwd(), PILOT);
+    if (sans && sans.length) {
+      const inconnues = sans.filter((r) => r.classeInconnue);
+      const plusVieux = Math.max(0, ...sans.map((r) => r.jours ?? 0));
+      lignes.push("", `## Retours du ledger restés sans lot, plus de ${SEUIL_H} h (TF-1988)`,
+        `- **${sans.length} entrée(s) \`type: retour\`** de \`forge/ledger.jsonl\` qu'aucun lot de \`forge/retours/\` ne cite : seq ${sans.slice(0, 12).map((r) => r.seq).join(", ")}${sans.length > 12 ? ", …" : ""} (la plus ancienne : ${plusVieux} j). `
+        + "Les compiler en lot `<projet> - RETOURS - …` avec son sidecar (gabarits/RETOURS-FORGES.md), puis les remettre au sas du pilot ; hors run, le lot se fait dans le tour.");
+      if (inconnues.length) lignes.push(`- ${inconnues.length} d'entre elles portent une classe que le référentiel du pilot ne connaît pas (seq ${inconnues.slice(0, 12).map((r) => r.seq).join(", ")} : ${[...new Set(inconnues.map((r) => `« ${r.classe} »`))].slice(0, 6).join(", ")}) : une classe se crée au pilot, jamais au ledger ; au sidecar, \`classe: classe-a-creer\` et \`classe_proposee\` {cle, famille, libelle}.`);
+    }
+  } catch (e) { lignes.push("", `- retours du ledger sans lot : NON relevés (${String(e.message).slice(0, 160)})`); }
+}
+
 // TF-1642 (14/10/2026) — LA FRAÎCHEUR NE SE JUGE PLUS SUR LES SEULS DÉPÔTS DE LA FACTORY. Le 12/10, un
 // rapport a recommandé un correctif livré 13 jours plus tôt : le clone lu avait 290 commits de retard,
 // et l'ouverture ne mesurait que le pilot et les forges. Chez un produit, son propre dépôt est mesuré
@@ -308,15 +328,25 @@ if (iPilot >= 0) {
 // une session a anonymisé avant commit et une autre a proposé d'anonymiser la norme de rangement ;
 // l'humain a refusé. Le CLAUDE.md d'un produit n'est jamais recopié : l'ouverture, elle, atteint
 // chaque produit. La visibilité du dépôt se MESURE (gh), elle ne se suppose pas.
+// TF-1955 (29/10/2026) — UN AVERTISSEMENT QUI REVIENT À CHAQUE OUVERTURE DEVIENT UN BRUIT DE FOND. Mesuré le 20/10 :
+// « Visibilité NON mesurée » dans 30 des 55 sessions qui portent un relevé, après la clôture de TF-1676. Cause : un
+// produit « git local dès la naissance » n'a AUCUN remote, et `gh repo view` y répond « no git remotes found » (mesuré
+// le 29/10). Ce n'est pas une mesure manquée : un dépôt sans remote ne publie rien, la visibilité n'a pas d'objet. Le
+// cas se DIT comme tel, une fois, au lieu de demander une mesure impossible ; une vraie panne de gh nomme sa cause.
 if (iPilot >= 0) {
-  const v = spawnSync("gh", ["repo", "view", "--json", "visibility", "-q", ".visibility"], { encoding: "utf8", cwd: process.cwd(), timeout: 15000, windowsHide: true });
-  const visibilite = v.status === 0 ? (v.stdout || "").trim().toUpperCase() : "";
+  const remotes = spawnSync("git", ["remote"], { encoding: "utf8", cwd: process.cwd(), timeout: 5000, windowsHide: true });
+  const sansRemote = remotes.status === 0 && !(remotes.stdout || "").trim();
+  const v = sansRemote ? null : spawnSync("gh", ["repo", "view", "--json", "visibility", "-q", ".visibility"], { encoding: "utf8", cwd: process.cwd(), timeout: 15000, windowsHide: true });
+  const visibilite = v && v.status === 0 ? (v.stdout || "").trim().toUpperCase() : "";
+  const cause = !v ? "" : v.error ? `gh n'a pas pu être lancé : ${v.error.code || v.error.message}` : ((v.stderr || "").trim().split("\n")[0] || `code de sortie ${v.status}`).slice(0, 140);
   const regle = "règle humaine du 01/10/2026 : « Les dépôts privés peuvent conserver des données de type nom » ; la pseudonymisation ne vaut que pour ce qui sort vers un dépôt PUBLIC (pilot, forge publique), lot de retours compris, que le pilot pseudonymise lui-même à l'accueil";
   lignes.push("", "## Noms réels dans ce dépôt (TF-1676)", visibilite === "PRIVATE"
     ? `- Dépôt PRIVÉ (mesuré par gh) : il versionne les noms réels de clients, de produits et de personnes, sans anonymiser avant commit — ${regle}.`
     : visibilite === "PUBLIC"
       ? `- Dépôt PUBLIC (mesuré par gh) : aucun nom réel de tiers n'y entre ; pseudonymiser avant commit — ${regle}.`
-      : `- Visibilité NON mesurée (\`gh repo view --json visibility\` sans réponse) : la mesurer avant de pseudonymiser quoi que ce soit — ${regle}.`);
+      : sansRemote
+        ? `- Dépôt LOCAL, sans dépôt distant (\`git remote\` vide) : rien n'en sort, la visibilité n'a pas d'objet ; la mesurer par \`gh repo view --json visibility\` dès qu'un remote est posé, avant toute publication — ${regle}.`
+        : `- Visibilité NON mesurée (\`gh repo view --json visibility\` sans réponse : ${cause}) : la mesurer avant de pseudonymiser quoi que ce soit — ${regle}.`);
 }
 
 // TF-1658 (14/10/2026) — UN SOCLE POSÉ À CÔTÉ DU DÉPÔT D'UN TIERS SE JUGE À CHAQUE OUVERTURE : rien
@@ -413,6 +443,23 @@ if (iPilot < 0) {
           !total ? "- aucun." : `- ${total} lot(s) chez ${parProduit.length} produit(s), dont **${jamais} jamais parvenu(s) au pilot** ; les autres sont reçus, leur ligne de statut n'a pas été mise à jour.`,
           ...parProduit.filter((p) => p.jamais).slice(0, 8).map((p) => `  - ${p.produit} : ${p.jamais} jamais parvenu(s), le plus ancien de ${p.plusVieux} j — nommé à sa prochaine ouverture`));
       } catch (e) { lignes.push(`- lots restés a_remettre chez les produits : NON comptés (${String(e.message).slice(0, 160)})`); }
+
+      // TF-1988 (29/10/2026) — LES RETOURS DU LEDGER D'UN PRODUIT RESTÉS SANS LOT SE COMPTENT AUSSI ICI. Le pilot ne voit
+      // que les lots arrivés dans sa boîte : une entrée `type: retour` jamais compilée n'existait pour personne. Lecture
+      // seule du ledger et des lots de chaque produit ; comptes seulement, au nom que le relevé affiche déjà.
+      try {
+        const { retoursSansLot, SEUIL_H } = await import(pathToFileURL(join(ICI, "lib-retours-produit.mjs")).href);
+        const parProduit = [];
+        for (const l of j.lignes || []) {
+          if (!l.dossier) continue;
+          const s = retoursSansLot(l.dossier, PILOT);
+          if (s && s.length) parProduit.push({ produit: l.produit, n: s.length, inconnues: s.filter((x) => x.classeInconnue).length, plusVieux: Math.max(0, ...s.map((x) => x.jours ?? 0)) });
+        }
+        const total = parProduit.reduce((t, p) => t + p.n, 0);
+        lignes.push("", `## Retours du ledger restés sans lot chez les produits, plus de ${SEUIL_H} h (TF-1988)`,
+          !total ? "- aucun." : `- ${total} entrée(s) \`type: retour\` chez ${parProduit.length} produit(s), qu'aucun lot de leur \`forge/retours/\` ne cite.`,
+          ...parProduit.slice(0, 8).map((p) => `  - ${p.produit} : ${p.n} sans lot, la plus ancienne de ${p.plusVieux} j${p.inconnues ? `, dont ${p.inconnues} à classe inconnue du référentiel` : ""} — nommé à sa prochaine ouverture`));
+      } catch (e) { lignes.push(`- retours du ledger sans lot chez les produits : NON comptés (${String(e.message).slice(0, 160)})`); }
 
       // TF-1521 (02/10/2026) — LE REJEU D'UN DÉPLACEMENT EN ATTENTE N'ÉTAIT CÂBLÉ NULLE PART. La
       // règle 7 bis (TF-1503) tolère qu'une version antérieure reste en place tant que le ledger du

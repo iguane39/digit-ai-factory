@@ -503,6 +503,53 @@ check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit inta
   });
 }
 
+// ---- TF-1988 (29/10/2026, lot Produit-85 20261024a, RP-3) : LES RETOURS DU LEDGER RESTÉS SANS LOT ------------
+// Le 24/10, cinq entrées `type: retour` du ledger d'un produit n'avaient jamais été compilées en lot, et aucune ouverture
+// ne l'avait dit. Vert : une entrée `retour` de plus de 24 h qu'aucun lot ne cite par son seq est NOMMÉE, et sa classe est
+// dite inconnue quand le référentiel du pilot ne la porte pas. Rouge : une entrée citée par un lot (liste ou plage), une
+// entrée de moins de 24 h, une entrée qui n'est pas un retour, une entrée portant son lot ne sont pas nommées ; un lot qui
+// cite tout fait disparaître la section (le remède se joue).
+{
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-ledger-")), "ProduitJouetYY");
+  mkdirSync(join(P, "forge", "retours"), { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const il = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
+  const entrees = [
+    { seq: 1, ts: il(30), type: "run_open" },
+    { seq: 2, ts: il(10), type: "retour", classe: "classe-inexistante-zz", resume: "friction A" },
+    { seq: 3, ts: il(10), type: "retour", classe: "gate-cout-invite-au-contournement", resume: "friction B" },
+    { seq: 4, ts: il(10), type: "retour", resume: "friction C" },
+    { seq: 5, ts: il(10), type: "retour", resume: "friction D" },
+    { seq: 6, ts: il(0.05), type: "retour", classe: "classe-recente-zz", resume: "friction E, de moins de 24 h" },
+    { seq: 7, ts: il(10), type: "retour", lot: "ProduitJouetYY - RETOURS - 20261001a", resume: "friction F, qui porte son lot" },
+    { seq: 8, ts: il(10), type: "reponse_humain", resume: "pas un retour" },
+  ];
+  writeFileSync(join(P, "forge", "ledger.jsonl"), entrees.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  const lot = join(P, "forge", "retours", "ProduitJouetYY - RETOURS - 20261001a.md");
+  writeFileSync(lot, "# lot\n\n- **Références ledger** : `forge\\ledger.jsonl` seq 3 et 4 (entrées `type: retour`)\n- **Statut** : remis le 2026-10-02\n", "utf8");
+  const section = (s) => (s.split("## Retours du ledger restés sans lot, plus de")[1] || "").split("\n## ")[0];
+  const s1 = joue(P);
+  check("TF-1988 — les entrées `retour` du ledger de plus de 24 h qu'aucun lot ne cite sont nommées, et elles seules", () => {
+    const l = section(s1);
+    if (!/2 entrée\(s\)/.test(l) || !/seq 2, 5 \(la plus ancienne : 10 j\)/.test(l)) throw new Error(`section : ${l.slice(0, 300) || "(absente)"}`);
+    if (/seq [^\n]*\b(3|4|6|7|8)\b/.test(l.split("\n")[1] || "")) throw new Error("une entrée citée, récente, déjà compilée ou qui n'est pas un retour est nommée");
+  });
+  check("TF-1988 — une classe que le référentiel du pilot ne connaît pas est dite, une classe connue ne l'est pas", () => {
+    const l = section(s1);
+    if (!/1 d'entre elles portent une classe que le référentiel du pilot ne connaît pas \(seq 2 : « classe-inexistante-zz »\)/.test(l)) throw new Error(`classe non dite : ${l.slice(0, 400)}`);
+    if (/gate-cout-invite/.test(l)) throw new Error("une classe connue est accusée");
+  });
+  check("TF-1988 — le remède se joue : un lot qui cite les entrées (plage « seq 2 à 5 ») fait disparaître la section", () => {
+    writeFileSync(lot, "# lot\n\n- **Références ledger** : `forge\\ledger.jsonl` seq 2 à 5\n- **Statut** : remis le 2026-10-02\n", "utf8");
+    const s2 = joue(P);
+    if (/Retours du ledger restés sans lot/.test(s2)) throw new Error("la section persiste alors que le lot cite toutes les entrées");
+  });
+  check("TF-1988 — rien n'est écrit chez le produit (lecture seule)", () => {
+    const apres = readFileSync(join(P, "forge", "ledger.jsonl"), "utf8");
+    if (apres !== entrees.map((e) => JSON.stringify(e)).join("\n") + "\n") throw new Error("le ledger a été modifié");
+  });
+}
+
 // TF-1635 — LE DÉLAI DU CLIENT EST UNE BORNE, PAS UNE CONSIGNE. Tout hook SessionStart resté
 // synchrone, au pilot comme dans le gabarit des produits, porte un délai d'au plus 45 s : coupé à
 // ce délai, il ne peut plus faire dépasser les 60 s de l'extension VS Code. Sens rouge : le même
@@ -664,6 +711,28 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   check("TF-1676 — sans visibilité mesurable, la règle du 01/10 est dite et la mesure demandée avant toute pseudonymisation", () => {
     if (!/## Noms réels dans ce dépôt \(TF-1676\)\n- Visibilité NON mesurée/.test(sansDistant)) throw new Error("la règle des noms n'atteint pas le produit");
     if (!/Les dépôts privés peuvent conserver des données de type nom/.test(sansDistant)) throw new Error("la règle humaine n'est pas citée");
+  });
+  // TF-1955 (29/10/2026) : le produit « git local dès la naissance » n'a aucun remote ; `gh repo view` y répond « no git
+  // remotes found ». Mesuré le 20/10 : « Visibilité NON mesurée » dans 30 des 55 sessions. Vert : un dépôt SANS remote
+  // est dit LOCAL, une fois, sans demander une mesure impossible. Rouge : un dépôt AVEC un remote que gh ne sait pas lire
+  // (hôte non GitHub) reste « NON mesurée » et nomme la cause rendue par gh.
+  const localSeul = mkdtempSync(join(tmpdir(), "ouverture-noms-local-"));
+  execFileSync("git", ["init", "-q"], { cwd: localSeul });
+  const sLocal = joue(localSeul);
+  check("TF-1955 — un dépôt sans remote est dit LOCAL (visibilité sans objet), et n'avertit plus d'une mesure manquée", () => {
+    const l = (sLocal.split("## Noms réels dans ce dépôt (TF-1676)")[1] || "").split("\n## ")[0];
+    if (!/Dépôt LOCAL, sans dépôt distant/.test(l)) throw new Error(`cas du dépôt local non dit : ${l.slice(0, 200)}`);
+    if (/NON mesurée/.test(l)) throw new Error("l'avertissement « NON mesurée » persiste sur un dépôt qui n'a aucun remote");
+    if (!/Les dépôts privés peuvent conserver des données de type nom/.test(l)) throw new Error("la règle humaine n'est plus citée");
+  });
+  const horsGithub = mkdtempSync(join(tmpdir(), "ouverture-noms-devops-"));
+  execFileSync("git", ["init", "-q"], { cwd: horsGithub });
+  execFileSync("git", ["remote", "add", "origin", "https://dev.azure.com/org/projet/_git/depot"], { cwd: horsGithub });
+  const sDevops = joue(horsGithub);
+  check("TF-1955 rouge — un remote que gh ne sait pas lire reste « NON mesurée » et nomme la cause", () => {
+    const l = (sDevops.split("## Noms réels dans ce dépôt (TF-1676)")[1] || "").split("\n## ")[0];
+    if (!/Visibilité NON mesurée \(`gh repo view --json visibility` sans réponse : [^)]{3,}\)/.test(l)) throw new Error(`mesure manquée non nommée : ${l.slice(0, 260)}`);
+    if (/Dépôt LOCAL/.test(l)) throw new Error("un dépôt qui a un remote est dit local");
   });
   const ghOk = spawnSync("gh", ["auth", "status"], { encoding: "utf8", timeout: 15000 }).status === 0;
   if (!ghOk) console.log("[NON JOUÉ] 1 cas — TF-1676 visibilité mesurée : gh absent ou non authentifié sur ce poste");
