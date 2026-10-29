@@ -99,7 +99,10 @@ check("cas rouge — hook — stdin illisible (pas du JSON) → exit 0, jamais u
 // existe, et chez un produit qui porte le texte hérité `forge/NIVEAUX.md` (étape 3, D-68 (a) du
 // 13/10/2026) ; le même message dans un dossier qui ne porte ni l'un ni l'autre ne produit rien.
 const PILOT = join(dirname(HOOK), "..");
-const jouerDans = (prompt, cwd) => spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt, cwd }) });
+// `CLAUDE_PROJECT_DIR` (posée aux hooks par Claude Code) ne fuit pas dans la recette : un cas la pose lui-même (TF-1943).
+const envSansProjet = () => { const e = { ...process.env }; delete e.CLAUDE_PROJECT_DIR; return e; };
+const jouerDans = (prompt, cwd, projetDir = null) => spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt, cwd }),
+  env: projetDir ? { ...envSansProjet(), CLAUDE_PROJECT_DIR: projetDir } : envSansProjet() });
 check("hook — « vite : » dans une session du pilot → ligne de niveau Simple", () => {
   const r = jouerDans("vite : où est la liste des éléments ?", PILOT);
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
@@ -117,6 +120,27 @@ check("cas rouge — hook — « vite : » dans un dossier sans NIVEAUX.md, comm
   const r = jouerDans("vite : où est la liste des éléments ?", mkdtempSync(join(tmpdir(), "produit-")));
   if (r.status !== 0) throw new Error(`exit ${r.status}`);
   if (r.stdout.trim() !== "") throw new Error(`un dossier hors pilot a reçu la ligne de niveau : ${r.stdout}`);
+});
+// TF-1943 (29/10/2026) — LES NIVEAUX SE JUGENT AU PROJET, PAS AU SOUS-DOSSIER OÙ LA SESSION S'EST DÉPLACÉE. Depuis que les hooks se déclenchent après un `cd`
+// (commandes ancrées sur CLAUDE_PROJECT_DIR, TF-1903), l'entrée porte `cwd` = le sous-dossier, où ni `references/NIVEAUX.md` ni `forge/NIVEAUX.md` n'existent :
+// le hook se taisait. ROUGE : le MÊME « vite : », `cwd` dans un sous-dossier du pilot, d'un produit, puis par CLAUDE_PROJECT_DIR.
+check("rouge — « vite : » depuis un sous-dossier du pilot → ligne de niveau Simple (racine git)", () => {
+  const r = jouerDans("vite : où est la liste des éléments ?", join(PILOT, "scripts"));
+  if (r.status !== 0) throw new Error(`exit ${r.status}`);
+  if (!/\[NIVEAU — hook-lexique\][^\n]*Simple/.test(r.stdout)) throw new Error(`le hook a lu le sous-dossier, niveau absent : « ${r.stdout} »`);
+});
+check("rouge — « vite : » depuis un sous-dossier d'un produit (dépôt portant forge/NIVEAUX.md) → ligne Simple", () => {
+  const produit = mkdtempSync(join(tmpdir(), "produit-"));
+  mkdirSync(join(produit, ".git")); mkdirSync(join(produit, "forge", "essai"), { recursive: true }); mkdirSync(join(produit, "src"));
+  writeFileSync(join(produit, "forge", "NIVEAUX.md"), "# fixture\n");
+  for (const sous of [join(produit, "src"), join(produit, "forge", "essai")]) {
+    const r = jouerDans("vite : où est la liste des éléments ?", sous);
+    if (r.status !== 0 || !/\[NIVEAU — hook-lexique\][^\n]*Simple/.test(r.stdout)) throw new Error(`depuis ${sous.slice(produit.length)} : niveau absent : « ${r.stdout} »`);
+  }
+});
+check("rouge — CLAUDE_PROJECT_DIR prime sur cwd : « vite : » depuis un dossier sans rien → ligne Simple", () => {
+  const r = jouerDans("vite : où est la liste des éléments ?", mkdtempSync(join(tmpdir(), "ailleurs-")), PILOT);
+  if (r.status !== 0 || !/\[NIVEAU — hook-lexique\][^\n]*Simple/.test(r.stdout)) throw new Error(`la variable est ignorée : « ${r.stdout} »`);
 });
 check("hook — « complet : » dans une session du pilot → ligne de niveau Complexe", () => {
   const r = jouerDans("complet : où en est le parc ?", PILOT);

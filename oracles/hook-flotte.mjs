@@ -33,6 +33,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { racineDuProjet } from "./lib-racine-projet.mjs";
 
 export const OUTILS = new Set(["Agent", "Task"]);
 export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan", ""]);
@@ -57,7 +58,8 @@ export function juger(entree, { maison } = {}) {
   if (!OUTILS.has(entree?.tool_name)) return { decision: "laisse" };
   const ti = entree?.tool_input || {};
   const type = typeof ti.subagent_type === "string" ? ti.subagent_type.trim() : "";
-  const nommes = agentsNommes(entree?.cwd || process.cwd(), maison);
+  // TF-1943 : les agents du PROJET, pas ceux du sous-dossier où la session s'est déplacée (`cwd` de l'entrée après un `cd`).
+  const nommes = agentsNommes(racineDuProjet(entree?.cwd), maison);
   // D-23 (a) du 18/10/2026 : CHAQUE consigne passée à un agent se relit avant le lancement — « Chaque consigne d'agent
   // et chaque fin de tour sont relues ». La première version ne visait que les agents d'écriture : la relecture de fin de
   // tour du 18/10 l'a relevé comme une restriction que la décision n'autorisait pas (RI-20261018-01). Seule exception, la

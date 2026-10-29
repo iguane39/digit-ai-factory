@@ -36,6 +36,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { controlerOuiDeCompletude, affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
+import { racineDuProjet } from "./lib-racine-projet.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
 // de fin de tour, qui garde alors son propre relevé d'effets (`detecterEffets`) ; `ecrituresDuTour` le dit dans sa sortie.
@@ -517,7 +518,10 @@ export function critiqueDuTour(segment, { racine = "" } = {}) {
   }
   // Un .js édité par morceaux ne montre pas s'il est Node ou navigateur : le fichier écrit, présent sur le disque du hook, le dit.
   const surDisque = (f) => { try { return /\.js$/i.test(f) && existsSync(f) && statSync(f).size < 400000 ? readFileSync(f, "utf8") : ""; } catch { return ""; } };
-  const servis = [...ecrits.values()].map((x) => ({ ...x, ...fichierServi(x.fichier, { racine: dossier, texte: [...x.textes, surDisque(x.fichier)].join("\n") }) }))
+  // TF-1943 : un fichier se juge « servi » ou « outillage » depuis la racine du PROJET ; `dossier`, le répertoire courant du tour, peut être un sous-dossier
+  // (après un `cd`), d'où `src/scripts/app.js` lu comme `scripts/app.js`, donc comme outillage du premier niveau. Il reste la base des chemins relatifs des commandes.
+  const racineProjet = racine || (dossier ? racineDuProjet(dossier) : "");
+  const servis = [...ecrits.values()].map((x) => ({ ...x, ...fichierServi(x.fichier, { racine: racineProjet, texte: [...x.textes, surDisque(x.fichier)].join("\n") }) }))
     .filter((x) => x.servi).map(({ fichier, rang: r, ts }) => ({ fichier, rang: r, ts }));
   return { servis, critiques };
 }
@@ -668,9 +672,12 @@ export function effetsGit(cwd, depuis) {
     if (head.status === 0 && Number(head.stdout.trim()) * 1000 > t0) effets.push("commit fait pendant le tour");
     const st = spawnSync("git", ["status", "--porcelain", "-uall"], { cwd, encoding: "utf8" });
     if (st.status === 0) {
+      // TF-1943 : les chemins du mode porcelain partent de la racine du dépôt, pas de `cwd` : depuis un sous-dossier, `join(cwd, p)` ne désignait rien.
+      const haut = spawnSync("git", ["rev-parse", "--show-toplevel"], { cwd, encoding: "utf8" });
+      const base = haut.status === 0 && haut.stdout.trim() ? haut.stdout.trim() : cwd;
       for (const l of st.stdout.split(/\r?\n/).filter(Boolean)) {
         const p = l.slice(3).replace(/^"|"$/g, "").split(" -> ").pop();
-        try { if (statSync(join(cwd, p)).mtimeMs > t0) { effets.push(`fichier modifié pendant le tour : ${p}`); break; } } catch { /* supprimé */ }
+        try { if (statSync(join(base, p)).mtimeMs > t0) { effets.push(`fichier modifié pendant le tour : ${p}`); break; } } catch { /* supprimé */ }
       }
     }
   } catch { /* git absent : le relevé des outils reste */ }
@@ -1805,11 +1812,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     }
   } catch { affichage = "non joué : transcript ou synthèse illisible"; }
   // TF-1938 — S84 reçoit les relevés d'horloge du tour quand la transcription est retrouvée ; sinon elle rend SANS_OBJET.
-  const { fails, averts: avertsOracle } = juger(brouillon, process.cwd(), relevesP);
+  // TF-1943 : le projet, pas le sous-dossier où la session a fait un `cd`.
+  const RACINE_P = racineDuProjet(process.cwd());
+  const { fails, averts: avertsOracle } = juger(brouillon, RACINE_P, relevesP);
   const bloquants = fails.filter((x) => estBloquante(x.regle));
   const avertissements = [...fails.filter((x) => !estBloquante(x.regle)), ...avertsOracle];
   // TF-1849 — la RÉSERVATION : chaque D-N nouvelle de ce brouillon est-elle inscrite au registre du produit ?
-  const reservation = controlerReservation({ dernierTexte: brouillon, dernierHumain: dernierHumainP, textePrecedent: textePrecedentP, racine: process.cwd() });
+  const reservation = controlerReservation({ dernierTexte: brouillon, dernierHumain: dernierHumainP, textePrecedent: textePrecedentP, racine: RACINE_P });
   const reservationBloque = reservation.verdict === "FAIL" && reservation.bloquant;
   // TF-1866 — le « oui » à une question de complétude, joué sur ce brouillon dès que le transcript donne le dernier message humain.
   const completude = controlerOuiDeCompletude({ dernierHumain: dernierHumainP, dernierTexte: brouillon });
@@ -1817,7 +1826,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const critiqueJ = controlerCritique({ critique: critiqueP });
   const critiqueBloque = critiqueJ.verdict === "FAIL" && estBloquante("CRITIQUE");
   // TF-1973 et TF-2016 (S87) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est-il lié au bloc 0 de ce brouillon ? Avertissante.
-  const livreJ = controlerLivre({ livrables: livrablesP || [], synthese: syntheseDeposee, texte: brouillon, racine: process.cwd() });
+  const livreJ = controlerLivre({ livrables: livrablesP || [], synthese: syntheseDeposee, texte: brouillon, racine: RACINE_P });
   // T2 (TF-1947) : DÉTAIL avertit, comme au hook de fin de tour ; AFFICHAGE, COMPLÉTUDE, RÉSERVATION et CRITIQUE (dès son échéance) bloquent.
   const refus = [...bloquants.map((x) => `${x.regle} — ${x.message}`),
     ...ecartsAffichage.map((e) => `AFFICHAGE — ce brouillon ne dit pas ce que dit la synthèse déposée ${syntheseDeposee} : ${e}`),
@@ -1878,6 +1887,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
+  // TF-1943 : le dossier du PROJET (CLAUDE_PROJECT_DIR, à défaut la racine git de `cwd`), jamais le `cwd` brut de l'entrée, qui est le sous-dossier
+  // où la session s'est déplacée par un `cd` : l'état git, la réservation des D-N, le lien « Livré : » et le juge de S48 se mesurent au projet.
+  const RACINE_HOOK = racineDuProjet(entree.cwd);
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
     depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, ecrituresDuTour: ecrit, critique: critiqueTour, livrables } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
@@ -1885,7 +1897,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
   let escaladeMoyen = null;
   if (declareMoyen(dernierTexte)) {
-    const tousEffets = [...effets, ...effetsGit(entree.cwd || process.cwd(), depuis)];
+    const tousEffets = [...effets, ...effetsGit(RACINE_HOOK, depuis)];
     if (tousEffets.length) {
       escaladeMoyen = `NIVEAU — réponse déclarée « Niveau : Moyen » dans un tour qui a eu ${tousEffets.length} effet(s) `
         + `(${tousEffets.slice(0, 3).join(" ; ")}) : le tour est jugé Complexe, restitution complète.`;
@@ -1915,7 +1927,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + court.ecarts.join("\n") + `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` }));
     process.exit(0);
   }
-  const { code, fails, averts: avertsOracle } = juger(dernierTexte, entree.cwd || process.cwd(), releves);
+  const { code, fails, averts: avertsOracle } = juger(dernierTexte, RACINE_HOOK, releves);
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.
@@ -1936,7 +1948,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const detail = controlerDetail({ dernierHumain, dernierTexte, textePrecedent, texteSynthese });
   // TF-1849 — la RÉSERVATION : une D-N nouvelle du bloc 3 est inscrite au registre du produit avant l'affichage.
   // Avertissante jusqu'à RESERVATION_BLOQUANTE_DES, bloquante ensuite (mesure d'entrée : gabarit RESTITUTION.md 2.45.0).
-  const reservation = controlerReservation({ dernierTexte, dernierHumain, textePrecedent, racine: entree.cwd || process.cwd() });
+  const reservation = controlerReservation({ dernierTexte, dernierHumain, textePrecedent, racine: RACINE_HOOK });
   const reservationBloque = reservation.verdict === "FAIL" && reservation.bloquant;
   // TF-1866 — le « oui » à une question de complétude porte sa ligne « Mesuré sur » (S82 juge le texte, ce contrôle lit le message humain). Bloquant.
   const completude = controlerOuiDeCompletude({ dernierHumain, dernierTexte });
@@ -1951,7 +1963,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const critiqueBloque = critique.verdict === "FAIL" && estBloquante("CRITIQUE");
   // TF-1973 et TF-2016 (S87, gabarit 2.53.0) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est la cible d'un lien du bloc 0.
   // Avertissante à son entrée (règle neuve) ; aucune échéance armée : pour en poser une, la mettre à `BLOQUANTES_DATEES` (clé S87) et reprendre la forme de `critiqueBloque`.
-  const livre = controlerLivre({ livrables, synthese: fichierSynthese, texte: dernierTexte, racine: entree.cwd || process.cwd() });
+  const livre = controlerLivre({ livrables, synthese: fichierSynthese, texte: dernierTexte, racine: RACINE_HOOK });
   const bloquants = fails.filter((f) => estBloquante(f.regle));
   // T2 (TF-1947, 26/10/2026) : GESTE, PROCÉDURE et DÉTAIL avertissent ; ce qui bloque encore est dit à `BLOQUANTES`.
   const avertissements = [...fails.filter((f) => !estBloquante(f.regle)), ...avertsOracle,

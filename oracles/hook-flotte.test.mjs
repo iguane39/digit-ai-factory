@@ -9,9 +9,10 @@
  */
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { racineDuProjet } from "./lib-racine-projet.mjs";
 
 const HOOK = join(dirname(fileURLToPath(import.meta.url)), "hook-flotte.mjs");
 let pass = 0, fail = 0;
@@ -24,9 +25,12 @@ mkdirSync(join(projet, ".claude", "agents"), { recursive: true });
 mkdirSync(maison, { recursive: true });
 for (const n of ["campagne", "explorateur"]) writeFileSync(join(projet, ".claude", "agents", `${n}.md`), `---\nname: ${n}\n---\n`);
 
-const jouer = (entree) => {
-  const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: typeof entree === "string" ? entree : JSON.stringify(entree),
-    env: { ...process.env, USERPROFILE: maison, HOME: maison } });
+// `CLAUDE_PROJECT_DIR` (posée aux hooks par Claude Code) ne fuit pas dans la recette : chaque cas la pose lui-même (TF-1943).
+const jouer = (entree, projetDir = null) => {
+  const env = { ...process.env, USERPROFILE: maison, HOME: maison };
+  delete env.CLAUDE_PROJECT_DIR;
+  if (projetDir) env.CLAUDE_PROJECT_DIR = projetDir;
+  const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: typeof entree === "string" ? entree : JSON.stringify(entree), env });
   let ctx = "";
   try { ctx = JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { ctx = "<stdout illisible>"; }
   return { code: r.status, ctx, out: r.stdout || "" };
@@ -97,6 +101,40 @@ check("rouge — une dérogation dite (générique avec model ET effort) reçoit
 check("rouge — un générique sans modèle reçoit l'avertissement de flotte ET le rappel de relecture", () => {
   const r = jouer(appel({ subagent_type: "general-purpose" }));
   if (!/FLOTTE D'AGENTS/.test(r.ctx) || !/RELECTURE D'INTENTION/.test(r.ctx)) throw new Error(r.ctx.slice(0, 200));
+});
+
+// TF-1943 (29/10/2026) — LE HOOK JUGE LE PROJET, PAS LE SOUS-DOSSIER OÙ LA SESSION S'EST DÉPLACÉE. Depuis que les hooks se déclenchent après un `cd`
+// (commandes ancrées sur CLAUDE_PROJECT_DIR, TF-1903), l'entrée porte `cwd` = le sous-dossier. Mesuré le 21/10/2026 : lancé depuis un sous-dossier, le hook
+// répondait « Aucun agent nommé n'est visible ici » alors que le projet en porte deux. ROUGE : le MÊME appel, `cwd` dans un sous-dossier, par la racine git
+// puis par CLAUDE_PROJECT_DIR. VERT : un dossier sans dépôt ni variable reste son propre projet (le cas « vide » ci-dessus).
+const projetGit = join(racine, "projet-git");
+mkdirSync(join(projetGit, ".git"), { recursive: true });
+mkdirSync(join(projetGit, ".claude", "agents"), { recursive: true });
+mkdirSync(join(projetGit, "src", "profond"), { recursive: true });
+for (const n of ["campagne", "explorateur"]) writeFileSync(join(projetGit, ".claude", "agents", `${n}.md`), `---\nname: ${n}\n---\n`);
+check("rouge — cwd dans un sous-dossier d'un dépôt : les agents du projet sont listés (racine git)", () => {
+  const r = jouer({ tool_name: "Agent", tool_input: { subagent_type: "general-purpose" }, cwd: join(projetGit, "src", "profond") });
+  if (/Aucun agent nommé n'est visible ici/.test(r.ctx)) throw new Error("le hook a lu le sous-dossier : « Aucun agent nommé n'est visible ici »");
+  if (!/campagne, explorateur/.test(r.ctx)) throw new Error(`la flotte du projet n'est pas listée : ${r.ctx.slice(0, 200)}`);
+});
+check("rouge — CLAUDE_PROJECT_DIR prime sur cwd : les agents du projet sont listés depuis un dossier sans rien", () => {
+  const ailleurs = join(racine, "ailleurs"); mkdirSync(ailleurs, { recursive: true });
+  const r = jouer({ tool_name: "Agent", tool_input: { subagent_type: "general-purpose" }, cwd: ailleurs }, projet);
+  if (!/campagne, explorateur/.test(r.ctx)) throw new Error(`la variable est ignorée : ${r.ctx.slice(0, 200)}`);
+});
+check("vert — CLAUDE_PROJECT_DIR périmée (dossier absent) : repli sur la racine git de cwd", () => {
+  const r = jouer({ tool_name: "Agent", tool_input: { subagent_type: "general-purpose" }, cwd: join(projetGit, "src") }, join(racine, "n-existe-pas"));
+  if (!/campagne, explorateur/.test(r.ctx)) throw new Error(`pas de repli : ${r.ctx.slice(0, 200)}`);
+});
+check("lib — racineDuProjet : variable, puis .git (dossier ou fichier d'arbre lié), puis cwd ; un .claude ne marque pas la racine", () => {
+  const un = (cwd, env) => racineDuProjet(cwd, env);
+  const egal = (a, b, nom) => { if (resolve(a) !== resolve(b)) throw new Error(`${nom} : ${a} ≠ ${b}`); };
+  egal(un(join(projetGit, "src", "profond"), {}), projetGit, "racine git en dossier");
+  const arbre = join(racine, "arbre-lie"); mkdirSync(join(arbre, "a", "b"), { recursive: true }); writeFileSync(join(arbre, ".git"), "gitdir: ../x\n");
+  egal(un(join(arbre, "a", "b"), {}), arbre, "racine git en fichier (arbre de travail lié)");
+  egal(un(join(projet, ".claude", "agents"), {}), join(projet, ".claude", "agents"), "un .claude sans .git ne marque pas la racine : cwd lui-même");
+  egal(un(join(projetGit, "src"), { CLAUDE_PROJECT_DIR: projet }), projet, "la variable prime");
+  egal(un(join(projetGit, "src"), { CLAUDE_PROJECT_DIR: join(racine, "absent") }), projetGit, "variable périmée : repli");
 });
 
 rmSync(racine, { recursive: true, force: true });

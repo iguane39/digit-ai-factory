@@ -16,7 +16,7 @@
  *   6. État du dépôt : intact, aucun effet ; un fichier apparu pendant le tour, effet relevé.
  * Joué par oracles/self-tests.mjs (I2).
  */
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -129,6 +129,12 @@ try {
   writeFileSync(join(depot, "ecrit-par-un-script.txt"), "x");
   const eg = effetsGit(depot, avant);
   check("6 bis : fichier apparu pendant le tour → effet relevé", eg.length === 1 && /ecrit-par-un-script/.test(eg[0]), eg.join(" ; "));
+
+  // 6 ter. TF-1943 (29/10/2026) — depuis un SOUS-DOSSIER du dépôt (le `cwd` d'une session qui a fait un `cd`), l'état git se lit encore : les chemins du mode porcelain
+  // partent de la racine du dépôt, et `join(cwd, chemin)` ne désignait rien — le fichier apparu pendant le tour n'était pas vu, un tour Moyen qui écrit passait.
+  mkdirSync(join(depot, "sous", "dossier"), { recursive: true });
+  const egSous = effetsGit(join(depot, "sous", "dossier"), avant);
+  check("6 ter : fichier apparu pendant le tour, état lu depuis un sous-dossier du dépôt → effet relevé", egSous.length === 1 && /ecrit-par-un-script/.test(egSous[0]), egSous.join(" ; ") || "aucun effet");
 
   // 5. PRÉ-VOL
   const pv = (t) => spawnSync(process.execPath, [HOOK, "--pre-vol"], { encoding: "utf8", input: t });

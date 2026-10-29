@@ -27,6 +27,7 @@
 import { readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { racineDuProjet } from "./lib-racine-projet.mjs";
 
 /** Le lexique, dans l'ordre du noyau. Chaque règle : motif sur le message ENTIER, skill, glose. */
 export const LEXIQUE = [
@@ -596,8 +597,9 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
     transcript = typeof j.transcript_path === "string" ? j.transcript_path : "";
   } catch { message = entree; }
   // Le dossier de la session décide si les niveaux sont en service (TF-1418) ; à défaut du champ
-  // `cwd`, celui où Claude Code lance le hook, qui est le même.
-  if (!dossier) dossier = process.cwd();
+  // `cwd`, celui où Claude Code lance le hook, qui est le même. TF-1943 : après un `cd` dans un sous-dossier, `cwd` est ce
+  // sous-dossier ; les niveaux se jugent au PROJET (`CLAUDE_PROJECT_DIR`, à défaut la racine git de `cwd`).
+  dossier = racineDuProjet(dossier || process.cwd());
   const lignes = [];
   const humain = estMessageHumain(message);
   if (humain) {
