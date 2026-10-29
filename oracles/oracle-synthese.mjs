@@ -109,6 +109,9 @@
  *       forge mobilisée à la dernière demande de `forge\mobilisation.jsonl` ; BLOQUANTE au hook, 3e motif avec S1 et S4 ;
  *       S72 y avertit (statut AVERT) au lieu d'échouer ; S86 la même déclaration sans aucune trace de mobilisation ;
  *       avertissante au hook jusqu'au 2026-11-02, bloquante ensuite ; les deux sans objet pour une restitution datée avant le 2026-10-26 ;
+ *   S87 LA LIGNE « Livré : » (29/10, TF-1973 et TF-2016, gabarit 2.53.0) : le bloc 0 se clôt par `Livré : [<nom>](<chemin relatif>)`, un lien par
+ *       livrable écrit dans le tour. La PRÉSENCE se juge au hook de fin de tour (`controlerLivre`, hook-restitution.mjs, avertissante) : elle se lit
+ *       dans la transcription. Ici, seule l'EXEMPTION : S9 ne lit plus cette ligne (liens et étiquette), le reste de l'ouverture reste jugé ;
  *   S77 chez un produit qui déclare un canal de reprise (forge/REPRISE.json), aucune action
  *       manuelle_utilisateur ne demande un transport entre postes (15/10, TF-1736, R-64) ; avertissante ;
  *   S75 une livraison déclarée d'un produit à interface dit qu'un parcours a été joué dans un vrai
@@ -833,6 +836,29 @@ const dureeDuBloc1 = (b1) => {
 // Le titre d'une ouverture titrée (TF-0567) ; module, parce que S52/S53 et S54 le lisent aussi dans `juger`.
 const RE_TITRE_OUVERTURE =
   /(^|\n)#{1,4}[ \t]*(?:0[ \t]*[.)\-–—:·]?[ \t]*)?(synth[èe]se d.ouverture|ouverture|bloc[ \t]*0)[^\n]*\n/i;
+// TF-1973 et TF-2016 (29/10/2026, S87, gabarit 2.53.0) — LA LIGNE « Livré : » EST LA SEULE LIGNE DU BLOC 0 QUI PORTE UN CHEMIN. Le bloc 0 se clôt, quand le tour a
+// écrit un livrable, par `Livré : [<nom lisible>](<chemin relatif, espaces en %20>)`, un lien par livrable (séparés par « · » ou en puces sous la ligne). Le nom
+// du fichier, sa date `20261029b` et sa cible sont accusés par S9 (« chemin ou nom de fichier », « sha ») : le gabarit se contredirait lui-même. La ligne se retire
+// de la lecture de l'ouverture, ses liens et son étiquette seuls : ce qui reste sur la ligne (un commentaire) est jugé comme le reste de la prose, et la ligne ne
+// compte pas dans les 20 mots exigés. La PRÉSENCE de la ligne, elle, se juge au hook de fin de tour (`controlerLivre`, hook-restitution.mjs) : elle se lit dans la
+// transcription du tour, que ce juge ne voit pas. Une ligne « Livré : » sans aucun lien n'est pas exemptée.
+const RE_ETIQUETTE_LIVRE = /^[ \t]*(?:[-*][ \t]+)?\**[ \t]*Livr[ée]s?[ \t]*\**[ \t]*:[ \t]*\**/i;
+const RE_LIEN_MARKDOWN = /\[[^\]\n]*\]\((?:<[^>\n]*>|[^)\n]*)\)/g;
+const RE_PUCE_A_LIEN = /^[ \t]*(?:[-*]|\d+[.)])[ \t]+.*\]\(/;
+function sansLigneLivre(ouverture) {
+  const lignes = ouverture.split("\n"), sortie = [];
+  for (let i = 0; i < lignes.length; i++) {
+    const l = lignes[i];
+    if (!RE_ETIQUETTE_LIVRE.test(l)) { sortie.push(l); continue; }
+    const puces = [];
+    while (i + 1 < lignes.length && RE_PUCE_A_LIEN.test(lignes[i + 1])) puces.push(lignes[++i]);
+    if (!puces.length && !(l.match(RE_LIEN_MARKDOWN) || []).length) { sortie.push(l); continue; }   // « Livré : » sans lien : de la prose
+    const reste = l.replace(RE_ETIQUETTE_LIVRE, "").replace(RE_LIEN_MARKDOWN, " ").replace(/[·\s,;]+/g, " ").trim();
+    if (reste) sortie.push(reste);
+    for (const p of puces) { const r = p.replace(/^[ \t]*(?:[-*]|\d+[.)])[ \t]+/, "").replace(RE_LIEN_MARKDOWN, " ").replace(/[·\s,;]+/g, " ").trim(); if (r) sortie.push(r); }
+  }
+  return sortie.join("\n");
+}
 function lireOuverture(texte) {
   const premierBloc = texte.search(/(^|\n)#{2,4}\s/);
   let ouverture = (premierBloc > 0 ? texte.slice(0, premierBloc) : "").trim();
@@ -849,6 +875,7 @@ function lireOuverture(texte) {
     ouverture = ouverture.replace(/^---[\s\S]*?\n---\s*/, "").replace(/^#[^\n]*\n?/, "").trim();
     if (ouverture === avant) break;
   }
+  ouverture = sansLigneLivre(ouverture).trim();
   return { ouverture, mots: ouverture.split(/\s+/).filter(Boolean).length };
 }
 
@@ -6425,6 +6452,32 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/9\. Traces/.test(constatDe(rT2b, "S1").message || "")) casse.push("T2 : le constat S1 doit NOMMER le bloc 9 absent : " + String(constatDe(rT2b, "S1").message || "").slice(0, 160));
   if (!/0\. Synthèse d'ouverture/.test(constatDe(rT2c, "S1").message || "")) casse.push("T2 : le constat S1 doit NOMMER le bloc 0 absent : " + String(constatDe(rT2c, "S1").message || "").slice(0, 160));
   if (!/TABLEAU d'options/.test(constatDe(rT2e, "S4").message || "")) casse.push("T2 : le constat S4 doit NOMMER le tableau d'options : " + String(constatDe(rT2e, "S4").message || "").slice(0, 160));
+  // 29/10 — LA LIGNE « Livré : » DU BLOC 0 (TF-1973 et TF-2016, S87, gabarit 2.53.0), DANS SES SENS. Le bloc 0 se clôt par `Livré : [nom](chemin%20relatif)` : le nom
+  // du fichier, sa date `20261029b` et sa cible lui sont propres, et S9 les accusait (chemin ou nom de fichier, sha). (a) La ligne du cas réel — un guide sous
+  // output/04-cadrages, espaces en %20 — PASS en entier. (b) La même en puces sous « Livré : » PASS en entier. (c) Le même nom de fichier dans la PROSE du bloc 0, à côté de la
+  // ligne : S9 FAIL — l'exemption est précise. (d) « Livré : » suivi d'un chemin nu, sans lien : S9 FAIL. (e) Un span de code ajouté à la ligne après ses liens : S9 FAIL.
+  // La PRÉSENCE de la ligne (le tour a écrit le fichier, le bloc 0 le lie) est jugée au hook de fin de tour, dans sa recette.
+  const LIEN_GUIDE = "[Produit - Guide - Lot 0](output/04-cadrages/Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b.md)";
+  const LIEN_NOTE = "[Note de cadrage](output/03-etudes/2026-10/20261029-note-de-cadrage.md)";
+  const avecLivre = (ligne, prose = "") => verte.replace("\n\n## 1. En-tête", `${prose}\n\n${ligne}\n\n## 1. En-tête`);
+  const rLivreLigne = jouerPe("s87-livre-ligne.md", avecLivre(`Livré : ${LIEN_GUIDE}`));
+  const rLivrePuces = jouerPe("s87-livre-puces.md", avecLivre(`Livré :\n- ${LIEN_GUIDE}\n- ${LIEN_NOTE}`));
+  const rLivrePlusieurs = jouerPe("s87-livre-plusieurs-liens.md", avecLivre(`**Livré :** ${LIEN_GUIDE} · ${LIEN_NOTE}`));
+  const rLivreProse = jouerPe("s87-livre-et-prose-technique.md", avecLivre(`Livré : ${LIEN_GUIDE}`, " Le guide est le fichier Guide-Lot-0.md, rédigé hier."));
+  const rLivreNu = jouerPe("s87-livre-chemin-nu.md", avecLivre("Livré : output/04-cadrages/Produit - Guide - Lot 0 - 20261029b.md"));
+  const rLivreCode = jouerPe("s87-livre-et-code.md", avecLivre(`Livré : ${LIEN_GUIDE} — relancer \`node oracles/oracle-synthese.mjs\``));
+  if (avecLivre(`Livré : ${LIEN_GUIDE}`) === verte) casse.push("S87 (exemption de S9) : une fixture n'a pas été modifiée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [rLivreLigne, "PASS", "la ligne « Livré : [nom](chemin%20relatif) » du cas réel (guide sous output/04-cadrages, date 20261029b) est accusée par S9"],
+    [rLivrePuces, "PASS", "la ligne « Livré : » suivie de puces à lien est accusée par S9"],
+    [rLivrePlusieurs, "PASS", "deux liens séparés par « · » sous « **Livré :** » sont accusés par S9"],
+    [rLivreProse, "FAIL", "un nom de fichier dans la PROSE du bloc 0, à côté d'une ligne « Livré : », passe S9 — l'exemption couvre toute l'ouverture"],
+    [rLivreNu, "FAIL", "« Livré : » suivi d'un chemin nu, sans lien, passe S9 — l'exemption couvre une ligne qui ne porte aucun lien"],
+    [rLivreCode, "FAIL", "un span de code ajouté après les liens de la ligne « Livré : » passe S9 — le reste de la ligne n'est plus jugé"],
+  ]) if (constatDe(r, "S9").statut !== statut)
+    casse.push(`S9 (S87, 29/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S9").message || "sortie illisible").slice(0, 200));
+  for (const [r, nom] of [[rLivreLigne, "la ligne"], [rLivrePuces, "les puces"], [rLivrePlusieurs, "les deux liens"]])
+    if (r.status !== 0) casse.push(`S87 : la verte avec ${nom} « Livré : » n'est pas PASS en entier : ` + echecsDe(r));
   // 18/10 — S49, S80 ET LA MISE EN PAGE PRESCRITE (TF-1847). La décision au format B dont l'option (b) commande un
   // geste porte « Comment faire (b) : » puis une liste numérotée SOUS le tableau des options, en pleine largeur : elle
   // passe S49 (le geste est compté et de quoi l'exécuter est là), S80 et S78 ; la MÊME décision sans la liste FAIL S49.
@@ -6695,6 +6748,7 @@ console.log(JSON.stringify({
     "S83 (TF-1936) ne voit une demande d'avis que par un vocabulaire FERMÉ de verbes (relire, valider, vérifier, approuver, donner son accord, dire si… suivi d'un jugement) et d'objets (texte, page, fiche, publication, liste, semaine…) : un verbe ou un objet hors liste passe sans être vu, et la règle préfère manquer un cas que crier sur un geste. Elle ne vérifie pas que le chemin ou l'adresse donnés mènent au contenu, ni qu'un bloc cité le montre vraiment",
     "S84 (TF-1938) ne juge que sur les relevés que le hook lui passe : joué seul sur un fichier, il rend SANS_OBJET. Un relevé est une sortie qui MONTRE l'heure courante ; une heure relevée puis mal recopiée, ou une heure lue dans un tour antérieur et reprise, n'est pas distinguée d'une heure juste quand le tour porte au moins un relevé",
     "S85 et S86 (26/10/2026, T4, TF-1949) jugent la PRÉSENCE des livrables que la carte exige des forges mobilisées à la DERNIÈRE ligne de `forge/mobilisation.jsonl` : que cette ligne soit celle de la demande livrée, que le livrable présent soit à jour, complet ou juste, et une livraison que le bloc 0 et le verdict taisent ne sont pas jugés ; un chemin de livrable marqué `etabli: false` dans la carte est une convention posée par elle",
+    "S87 (29/10/2026, TF-1973 et TF-2016) : ici seule l'EXEMPTION de la ligne « Livré : » à S9 est jouée, et elle exige un lien Markdown sur la ligne ou dans les puces dessous ; que le livrable existe, qu'il ait été écrit dans le tour et que le lien mène au fichier ne sont pas jugés. La PRÉSENCE de la ligne se juge au hook de fin de tour, qui lit les écritures du tour dans la transcription",
     "S73 et S74 (15/10/2026, R-63) jugent une MENTION : S73 qu'une justesse, un échantillon de référence ou « justesse non mesurée » figure dans une restitution qui rapporte une part traitée, jamais que l'échantillon soit indépendant ni la mesure juste (PC-2 à PC-6 non jugés) ; S74 que le contrôle des changements dans la population et l'effet sur l'existant sont nommés, jamais qu'ils aient été faits, ni le test rouge sur le code précédent ni la règle d'arrêt",
   ],
 }, null, 1));

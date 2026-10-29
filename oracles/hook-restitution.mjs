@@ -551,6 +551,112 @@ export function controlerCritique({ critique = null }) {
       + `daté après leur dernière écriture : ${sans.slice(0, 3).map(decrire).join(" ; ")}${sans.length > 3 ? ` (+${sans.length - 3})` : ""}`] };
 }
 
+// ---- TF-1973 et TF-2016 (29/10/2026, règle S87, gabarit 2.53.0) — LE LIVRABLE ÉCRIT DANS LE TOUR SE LIE EN FIN DE BLOC 0 ----------------------
+//
+// LE FAIT, deux demandes humaines en 9 jours. Le 20/10/2026 (TF-1973) : « Le livrable construit doit être lié, avec son chemin complet, en fin de
+// bloc 0 de la restitution ». Le 29/10/2026 (TF-2016), chez un produit : « le prompt de restituation doit afficher le ou les fichiers qu'elle a
+// générés et qui sont attendus par l'utilisateur dans le chapitre 0, en fin de chapitre, […] idéalement avec son lien pour que l'utilisateur puisse
+// le voir directement et l'ouvrir rapidement et facilement ». Le cas rouge : une restitution qui écrit `output/04-cadrages/<Produit> - Guide - Lot 0
+// … - 20261029b.md` ne le nomme qu'aux blocs 8 et 9, sans lien, et `factory.mjs restitution --prejuger` la jugeait affichable.
+//
+// LA RÈGLE. Chaque fichier que le tour a ÉCRIT par l'outil Write sous `output/` (séparateurs / ou \) est la cible d'un lien Markdown du bloc 0. Seul
+// Write compte : Edit, MultiEdit et NotebookEdit retouchent un fichier qui existait, et le cas visé est le livrable créé dans le tour (un Write sur un
+// fichier existant, qui le réécrit, est un faux positif accepté pendant l'avertissement : la transcription ne dit pas s'il existait). Ne sont pas des
+// livrables : les README.md et LISEZMOI.md (régénérés par hook), les sidecars `.oracles*` et `.jugement.json`, un fichier du dossier temporaire (un brouillon,
+// comme pour `fichierServi`) et la synthèse déposée elle-même, que le contrôle AFFICHAGE identifie (`syntheseDuTour`), ou dont le nom dit « synthèse » ou
+// « restitution » (RESTITUTION.md, « Où, et sous quel nom »). La comparaison se fait par NOM de fichier, après décodage des %20, sans égard aux séparateurs ni à la casse.
+//
+// CE QUE CE RELEVÉ NE VOIT PAS, dit plutôt que promis : un livrable produit par une commande (`node generer.mjs`, `pandoc`, `cp`), l'écriture d'un sous-agent,
+// un livrable écrit hors de `output/`, et le fait que le lien MÈNE au fichier (la cible est comparée par son nom, pas ouverte).
+const SOUS_OUTPUT = /(?:^|\/)output\//i;
+// Un sidecar est un `.oracles*` ou un JSON qui double un autre fichier par un second suffixe (`x.md.jugement.json`, `x.md.boucle.json`).
+const NI_LIVRABLE_NI_SYNTHESE = /(?:^|\/)\.oracles[^/]*(?:\/|$)|\.[A-Za-z0-9]{1,5}\.[A-Za-z-]+\.jsonl?$|(?:^|\/)(?:README|LISEZMOI)\.md$/i;
+const NOM_DE_SYNTHESE = /synth[eè]se|restitution/i;
+const versSlash = (p) => String(p || "").replace(/\\/g, "/");
+const cleDeChemin = (p) => versSlash(p).replace(/^\.\//, "").normalize("NFC").toLowerCase();
+const nomDe = (p) => versSlash(p).split("/").pop() || "";
+
+/** Les fichiers que le tour a écrits par Write sous `output/`, hors README, sidecars et brouillons temporaires, dans l'ordre de leur première écriture. */
+export function livrablesEcrits(segment) {
+  const vus = new Map();
+  for (const e of segment) {
+    if (e.type !== "assistant") continue;
+    for (const b of contenuDe(e)) {
+      if (b.type !== "tool_use" || b.name !== "Write") continue;
+      const p = b.input?.file_path;
+      if (typeof p !== "string" || !p.trim() || TEMPORAIRE_NOMME(p)) continue;
+      const n = versSlash(p);
+      if (!SOUS_OUTPUT.test(n) || NI_LIVRABLE_NI_SYNTHESE.test(n)) continue;
+      if (!vus.has(cleDeChemin(n))) vus.set(cleDeChemin(n), p);
+    }
+  }
+  return [...vus.values()];
+}
+
+/** Le bloc 0 d'un message : la prose avant le premier titre, ou la section titrée « 0. Synthèse d'ouverture » si elle est plus longue (même lecture que S9). */
+export function bloc0De(texte) {
+  const t = String(texte || "");
+  const premier = t.search(/(^|\n)#{2,4}\s/);
+  let ouverture = (premier > 0 ? t.slice(0, premier) : "").trim();
+  const titre = /(^|\n)#{1,4}[ \t]*(?:0[ \t]*[.)\-–—:·]?[ \t]*)?(synth[èe]se d.ouverture|ouverture|bloc[ \t]*0)[^\n]*\n/i.exec(t);
+  if (titre) {
+    const apres = t.slice(titre.index + titre[0].length);
+    const fin = apres.search(/(^|\n)#{1,4}\s/);
+    const titree = (fin >= 0 ? apres.slice(0, fin) : apres).trim();
+    if (titree.split(/\s+/).filter(Boolean).length > ouverture.split(/\s+/).filter(Boolean).length) ouverture = titree;
+  }
+  return ouverture;
+}
+
+/** Les cibles des liens Markdown `[texte](cible)` d'un texte : `<cible avec espaces>` ou cible nue sans espace (une cible nue qui porte un espace n'est pas un lien). */
+export function ciblesDeLiens(texte) {
+  const cibles = [];
+  for (const m of String(texte || "").matchAll(/\]\(\s*(?:<([^>\n]+)>|([^\s)]+))(?:\s+"[^"\n]*")?\s*\)/g)) cibles.push(m[1] || m[2]);
+  return cibles;
+}
+const nomDeCible = (c) => { let d = String(c || ""); try { d = decodeURIComponent(d); } catch { /* cible mal encodée : lue telle quelle */ } return cleDeChemin(nomDe(d.replace(/[?#].*$/, ""))); };
+
+/** Le chemin relatif depuis la racine du dépôt, espaces et parenthèses encodés : la cible du lien à écrire. */
+export function cibleDuLivrable(chemin, racine = "") {
+  let p = versSlash(chemin).replace(/(?:^|\/)\.claude\/worktrees\/[^/]+\//, "/");
+  const r = versSlash(racine).replace(/\/$/, "").replace(/(?:^|\/)\.claude\/worktrees\/[^/]+$/, "");
+  const sousRacine = r && p.toLowerCase().startsWith(r.toLowerCase() + "/");
+  const i = p.search(SOUS_OUTPUT);
+  p = sousRacine ? p.slice(r.length + 1) : i >= 0 ? p.slice(p[i] === "/" ? i + 1 : i) : p;
+  return p.replace(/ /g, "%20").replace(/\(/g, "%28").replace(/\)/g, "%29");
+}
+const nomLisible = (chemin) => nomDe(chemin).replace(/\.[A-Za-z0-9]{1,5}$/, "");
+
+export const RAPPEL_LIVRE = "Le bloc 0 se clôt, quand le tour a écrit un livrable destiné à l'utilisateur, par une ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, "
+  + "espaces en %20>) », un lien par livrable, séparés par « · » ou en puces sous la ligne (S87, gabarit 2.53.0) : l'humain l'ouvre d'un clic. C'est la seule ligne du bloc 0 qui porte un chemin. "
+  + "Le chemin relatif part de la racine du dépôt (pas d'un chemin absolu) ; les README, les sidecars et la synthèse elle-même n'en font pas partie.";
+
+/**
+ * Le contrôle : chaque livrable écrit dans le tour (hors synthèse) est la cible d'un lien du bloc 0. `livrables` vient de `livrablesEcrits`, `synthese` est le
+ * fichier que `syntheseDuTour` retient, `texte` le message jugé. Sans bloc 0 lisible, S1 le dit : le contrôle se tait plutôt que de doubler.
+ */
+export function controlerLivre({ livrables = [], synthese = null, texte = "", racine = "" }) {
+  const sans = { applicable: false, verdict: "SANS_OBJET", ecarts: [], livrables: [], manquants: [] };
+  if (!livrables.length) return sans;
+  const cleSynthese = synthese ? cleDeChemin(synthese) : null;
+  // La synthèse du tour : le fichier que `syntheseDuTour` retient, et tout .md dont le nom dit « synthèse » ou « restitution » (`RESTITUTION.md`, « Où, et sous
+  // quel nom » : le hook reconnaît la synthèse à ce mot). Le nom suffit aussi quand la synthèse a été déplacée après l'écriture (le marqueur ne se relit plus), ou
+  // quand la relecture du disque rend une autre synthèse (mesure du 29/10/2026 sur les transcriptions du poste : avant ce second critère et l'exclusion des sidecars à double suffixe, 138 tours
+  // accusés au lieu de 78, dont 41 au pilot au lieu de 23 ; sur les fichiers retirés, un seul ne portait ni « synthèse » ni « restitution » dans son nom, un `.md.boucle.json`).
+  const restants = livrables.filter((f) => !(cleSynthese && cleDeChemin(f) === cleSynthese) && !(/\.md$/i.test(f) && NOM_DE_SYNTHESE.test(nomDe(f))));
+  if (!restants.length) return sans;
+  const bloc0 = bloc0De(texte);
+  if (!bloc0) return { ...sans, motif: "bloc 0 introuvable : S1 le dit" };
+  const liees = new Set(ciblesDeLiens(bloc0).map(nomDeCible));
+  const manquants = restants.filter((f) => !liees.has(cleDeChemin(nomDe(f))));
+  if (!manquants.length) return { applicable: true, verdict: "PASS", ecarts: [], livrables: restants, manquants: [] };
+  const montres = manquants.slice(0, 5);
+  const ligne = "Livré : " + montres.map((f) => `[${nomLisible(f)}](${cibleDuLivrable(f, racine)})`).join(" · ");
+  return { applicable: true, verdict: "FAIL", livrables: restants, manquants,
+    ecarts: [`le tour a écrit ${restants.length} livrable${restants.length > 1 ? "s" : ""} sous output/${restants.length > manquants.length ? `, dont ${manquants.length} que le bloc 0 ne lie pas` : " que le bloc 0 ne lie pas"} : ${montres.map((f) => nomDe(f)).join(" ; ")}`
+      + `${manquants.length > montres.length ? ` (+${manquants.length - montres.length})` : ""}. Écris en fin de bloc 0 : « ${ligne} »${manquants.length > montres.length ? " (+ un lien par fichier restant)" : ""}`] };
+}
+
 // L'état du dépôt ouvert depuis le message humain : un commit plus récent, ou un fichier modifié
 // après lui. `depuis` est l'horodatage ISO du message humain lu au transcript.
 export function effetsGit(cwd, depuis) {
@@ -681,7 +787,9 @@ export function analyserTranscript(texte) {
   return { travail: ecrit.length > 0, ecrituresDuTour: ecrit, ...m, dernierHumain, textePrecedent, depuis, textesHumains,
     releves: relevesDHorloge(entrees, debut),
     // TF-1913 — les fichiers servis écrits dans le tour et les critiques jouées, pour le contrôle CRITIQUE.
-    critique: critiqueDuTour(entrees.slice(debut + 1)) };
+    critique: critiqueDuTour(entrees.slice(debut + 1)),
+    // TF-1973 et TF-2016 — les livrables écrits sous output/ dans le tour, pour le contrôle S87 (la ligne « Livré : » du bloc 0).
+    livrables: livrablesEcrits(entrees.slice(debut + 1)) };
 }
 
 // `racine` (TF-1644, 14/10/2026) : le dossier du projet du tour. Le message est écrit dans un
@@ -1649,7 +1757,7 @@ const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.52.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.53.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), clos, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, espaces en %20>) », un lien par livrable (S87, avertissante : seule exception à l'interdit de chemin), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : … », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
@@ -1680,11 +1788,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
-  let dernierHumainP = "", textePrecedentP = "", relevesP = null, critiqueP = null;
+  let dernierHumainP = "", textePrecedentP = "", relevesP = null, critiqueP = null, livrablesP = null;
   try {
     if (cheminT && existsSync(cheminT)) {
       const tour = analyserTranscript(readFileSync(cheminT, "utf8"));
       dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; critiqueP = tour.critique || null;
+      livrablesP = tour.livrables || [];
       syntheseDeposee = syntheseDuTour(tour.fichiersMd);
       if (syntheseDeposee) {
         ecartsAffichage.push(...comparerAffiche(brouillon, readFileSync(syntheseDeposee, "utf8")));
@@ -1707,6 +1816,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   // TF-1913 — la CRITIQUE : les fichiers servis écrits dans le tour portent-ils un verdict de critique daté après leur dernière écriture ?
   const critiqueJ = controlerCritique({ critique: critiqueP });
   const critiqueBloque = critiqueJ.verdict === "FAIL" && estBloquante("CRITIQUE");
+  // TF-1973 et TF-2016 (S87) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est-il lié au bloc 0 de ce brouillon ? Avertissante.
+  const livreJ = controlerLivre({ livrables: livrablesP || [], synthese: syntheseDeposee, texte: brouillon, racine: process.cwd() });
   // T2 (TF-1947) : DÉTAIL avertit, comme au hook de fin de tour ; AFFICHAGE, COMPLÉTUDE, RÉSERVATION et CRITIQUE (dès son échéance) bloquent.
   const refus = [...bloquants.map((x) => `${x.regle} — ${x.message}`),
     ...ecartsAffichage.map((e) => `AFFICHAGE — ce brouillon ne dit pas ce que dit la synthèse déposée ${syntheseDeposee} : ${e}`),
@@ -1716,7 +1827,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   console.log(JSON.stringify({ outil: "hook-restitution --prejuger", brouillon: f, affichable: !refus.length,
     bloquants: refus, avertissements: [...avertissements.map(avecEcheance), ...detail.ecarts.map((e) => `DÉTAIL — ${e}`),
       ...(reservation.verdict === "FAIL" && !reservationBloque ? [`RÉSERVATION (bloquante dès le ${echeanceReservation(reservation)}) — ${reservation.ecarts[0]}. ${rappelReservation(reservation)}`] : []),
-      ...(critiqueJ.verdict === "FAIL" && !critiqueBloque ? [`CRITIQUE (bloquante dès le ${BLOQUANTES_DATEES.CRITIQUE}) — ${critiqueJ.ecarts[0]}. ${RAPPEL_CRITIQUE}`] : [])],
+      ...(critiqueJ.verdict === "FAIL" && !critiqueBloque ? [`CRITIQUE (bloquante dès le ${BLOQUANTES_DATEES.CRITIQUE}) — ${critiqueJ.ecarts[0]}. ${RAPPEL_CRITIQUE}`] : []),
+      ...(livreJ.verdict === "FAIL" ? livreJ.ecarts.map((e) => `S87 — ${e}. ${RAPPEL_LIVRE}`) : [])],
+    livre: livrablesP ? (livreJ.applicable ? { verdict: livreJ.verdict, livrables: livreJ.livrables.length, manquants: livreJ.manquants.map(nomDe) }
+      : `sans objet : ${livreJ.motif || "aucun livrable écrit sous output/ dans le tour (hors synthèse, README et sidecars)"}`) : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
     critique: critiqueP ? (critiqueJ.applicable ? { verdict: critiqueJ.verdict, servis: critiqueJ.servis.length, critiques: critiqueJ.critiques.length }
       : "sans objet : aucun fichier servi (HTML, CSS, JS) écrit dans le tour") : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
     reservation: reservation.applicable ? { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [] } : `sans objet : ${reservation.motif}`,
@@ -1727,7 +1841,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
       : "S84 non jouée : transcription introuvable (--transcript <chemin.jsonl>). Sur le brouillon seul, seule S69 juge l'heure (une heure future) ; "
         + "qu'une heure passée ait été LUE et qu'une durée ait été MESURÉE ne se voit que dans la transcription",
     non_juge: "les contrôles qui lisent le TOUR et non le texte — GESTE (réponse à un mot de décision), "
-      + "PROCÉDURE, POSSESSION, niveau Moyen : le hook de fin de tour les joue sur le transcript (DÉTAIL, TF-1851, et CRITIQUE, TF-1913, sont joués ici dès que le transcript est retrouvé) ; un brouillon affiché autrement qu'il a été préjugé n'est plus couvert" }));
+      + "PROCÉDURE, POSSESSION, niveau Moyen : le hook de fin de tour les joue sur le transcript (DÉTAIL, TF-1851, CRITIQUE, TF-1913, et S87, la ligne « Livré : », TF-1973 et TF-2016, sont joués ici dès que le transcript est retrouvé) ; un brouillon affiché autrement qu'il a été préjugé n'est plus couvert" }));
   process.exit(refus.length ? 1 : 0);
 }
 
@@ -1765,7 +1879,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, ecrituresDuTour: ecrit, critique: critiqueTour } = analyserTranscript(readFileSync(chemin, "utf8"));
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, ecrituresDuTour: ecrit, critique: critiqueTour, livrables } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
@@ -1835,6 +1949,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // écriture. Avertissante jusqu'au 02/11/2026 inclus, bloquante dès le 03/11/2026 (`BLOQUANTES_DATEES.CRITIQUE`).
   const critique = controlerCritique({ critique: critiqueTour });
   const critiqueBloque = critique.verdict === "FAIL" && estBloquante("CRITIQUE");
+  // TF-1973 et TF-2016 (S87, gabarit 2.53.0) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est la cible d'un lien du bloc 0.
+  // Avertissante à son entrée (règle neuve) ; aucune échéance armée : pour en poser une, la mettre à `BLOQUANTES_DATEES` (clé S87) et reprendre la forme de `critiqueBloque`.
+  const livre = controlerLivre({ livrables, synthese: fichierSynthese, texte: dernierTexte, racine: entree.cwd || process.cwd() });
   const bloquants = fails.filter((f) => estBloquante(f.regle));
   // T2 (TF-1947, 26/10/2026) : GESTE, PROCÉDURE et DÉTAIL avertissent ; ce qui bloque encore est dit à `BLOQUANTES`.
   const avertissements = [...fails.filter((f) => !estBloquante(f.regle)), ...avertsOracle,
@@ -1845,11 +1962,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...explication.ecarts.map((e) => ({ regle: "EXPLICATION", statut: "FAIL", message: e })),
     ...(reservation.verdict === "FAIL" && !reservationBloque
       ? reservation.ecarts.map((e) => ({ regle: "RÉSERVATION", statut: "FAIL", message: `${e} — bloquante dès le ${echeanceReservation(reservation)}. ${rappelReservation(reservation)}` })) : []),
-    ...(critique.verdict === "FAIL" && !critiqueBloque ? critique.ecarts.map((e) => ({ regle: "CRITIQUE", statut: "FAIL", message: `${e}. ${RAPPEL_CRITIQUE}` })) : [])];
+    ...(critique.verdict === "FAIL" && !critiqueBloque ? critique.ecarts.map((e) => ({ regle: "CRITIQUE", statut: "FAIL", message: `${e}. ${RAPPEL_CRITIQUE}` })) : []),
+    ...(livre.verdict === "FAIL" ? livre.ecarts.map((e) => ({ regle: "S87", statut: "FAIL", message: `${e}. ${RAPPEL_LIVRE}` })) : [])];
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
   const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
     && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
-    && critique.verdict !== "FAIL";
+    && critique.verdict !== "FAIL" && livre.verdict !== "FAIL";
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   try {
     mkdirSync(dirname(journal), { recursive: true });
@@ -1871,6 +1989,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       // TF-1913 — la mesure de la période d'avertissement : combien de fichiers servis, combien de critiques jouées, lesquels sans verdict.
       ...(critique.applicable ? { critique: { verdict: critique.verdict, bloquant: critiqueBloque, servis: critique.servis.map((s) => s.fichier),
         critiques_jouees: critique.critiques.filter((c) => c.jouee).length, sans_verdict: (critique.sans || []).map((s) => `${s.fichier} (${s.motif})`) } } : {}),
+      // TF-1973 et TF-2016 — la mesure de la période d'avertissement de S87 : combien de livrables écrits, lesquels sans lien au bloc 0.
+      ...(livre.applicable ? { livre: { verdict: livre.verdict, livrables: livre.livrables.map(nomDe), sans_lien: livre.manquants.map(nomDe) } } : {}),
       prejuge: !!prejuge,
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
