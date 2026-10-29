@@ -9,9 +9,10 @@
  *  K5  les dix forges sont couvertes (au moins un service chacune)
  *  K6  vues synchronisées avec la source (generer-vues.mjs --check, exit 0)
  *  K7  chaque forge du catalogue est routée par CONTRAT-INTERFACE.md (cohérence points d'entrée)
+ *  K8  chaque script cité en point d'entrée (node x.mjs, python x.py) existe dans le dépôt de sa forge (TF-2015)
  * Usage : node oracle-catalogues.mjs [racine] | --self-test  — exit 0 PASS / 1 FAIL / 2 erreur.
  */
-import { readFileSync, existsSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, existsSync, writeFileSync, mkdtempSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -72,7 +73,32 @@ export function validerCatalogue(chemin, forgesAttendues = DIX_FORGES) {
   return findings;
 }
 
-/** Règles K6-K7 (environnement réel uniquement). */
+/**
+ * K8 (TF-2015, 29/10/2026) — un script cité en point d'entrée (`node <x>.mjs`, `python <x>.py`) existe
+ * dans le dépôt de sa forge. Deux fois le 29/10, un antislash mangé par le shell a écrit
+ * « node oraclesoracle-exposition-statique.mjs » et « node scriptsanonymiser.mjs », et --check rendait PASS :
+ * il juge la synchronisation des vues, jamais ce qu'elles disent. Un chemin à accolades ou à chevrons
+ * (`oracle-{a,b}.mjs`, `<artefact>`) n'est pas résolu ; une forge dont le dépôt est absent du parc est
+ * comptée non jugée, jamais PASS ni FAIL.
+ */
+export function validerPointsEntree(services, racineParc) {
+  const findings = [];
+  let juges = 0, nonJuges = 0;
+  const casses = [];
+  for (const s of services) {
+    const depot = join(racineParc, `digit-ai-forge-${s.forge}`);
+    for (const m of String(s.point_entree ?? "").matchAll(/\b(?:node|python)\s+([^\s<>{}|;·]+\.(?:mjs|js|py))(?=\s|$)/g)) {
+      if (!existsSync(depot)) { nonJuges++; continue; }
+      juges++;
+      if (!existsSync(join(depot, m[1].replaceAll("\\", "/")))) casses.push(`${s.id} : « ${m[1]} » introuvable dans digit-ai-forge-${s.forge}`);
+    }
+  }
+  for (const c of casses) findings.push({ regle: "K8", statut: "FAIL", message: `${c} — séparateur de dossier perdu, ou script renommé` });
+  if (!casses.length) findings.push({ regle: "K8", statut: juges ? "PASS" : "SKIP", message: `${juges} script(s) de point d'entrée résolu(s) dans le dépôt de leur forge${nonJuges ? `, ${nonJuges} non jugé(s) : dépôt de forge absent du parc` : ""}` });
+  return findings;
+}
+
+/** Règles K6-K8 (environnement réel uniquement). */
 function validerEnvironnement(racine) {
   const findings = [];
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
@@ -95,6 +121,8 @@ function validerEnvironnement(racine) {
       ? ko("K7", `forges du catalogue absentes du CONTRAT-INTERFACE : ${absentes.join(", ")}`)
       : ok("K7", `${forges.size} forges du catalogue routées par le contrat`);
   }
+  const services = readFileSync(join(racine, "catalogues", "catalogue.jsonl"), "utf8").split(/\r?\n/).filter((l) => l.trim()).slice(1).map((l) => JSON.parse(l));
+  findings.push(...validerPointsEntree(services, join(racine, "..")));
   return findings;
 }
 
@@ -120,6 +148,18 @@ function selfTest() {
   const reglesTouchees = new Set(fRouge.filter((f) => f.statut === "FAIL").map((f) => f.regle));
   for (const r of ["K2", "K3", "K4", "K5"])
     resultats.push({ fixture: `rouge/${r}`, attendu: "FAIL", obtenu: reglesTouchees.has(r) ? "FAIL" : "PASS" });
+
+  // K8 (TF-2015) : un parc jetable avec un dépôt de forge qui porte oracles/oracle-x.mjs. Le chemin
+  // juste PASS ; le même dont l'antislash est perdu FAIL (le cas réel du 29/10) ; un chemin à
+  // accolades n'est pas résolu ; une forge absente du parc n'est jamais FAIL.
+  const parc = join(dossier, "parc");
+  mkdirSync(join(parc, "digit-ai-forge-alpha", "oracles"), { recursive: true });
+  writeFileSync(join(parc, "digit-ai-forge-alpha", "oracles", "oracle-x.mjs"), "", "utf8");
+  const k8 = (point_entree, forge = "alpha") => validerPointsEntree([{ id: "cat-aaa-01", forge, point_entree }], parc)[0];
+  resultats.push({ fixture: "K8/chemin juste", attendu: "PASS", obtenu: k8("node oracles\\oracle-x.mjs <f>").statut });
+  resultats.push({ fixture: "K8/antislash perdu", attendu: "FAIL", obtenu: k8("node oraclesoracle-x.mjs <f>").statut });
+  resultats.push({ fixture: "K8/accolades non résolues", attendu: "SKIP", obtenu: k8("node oracles\\oracle-{x,y}.mjs").statut });
+  resultats.push({ fixture: "K8/forge absente du parc", attendu: "SKIP", obtenu: k8("node oraclesoracle-x.mjs", "beta").statut });
 
   rmSync(dossier, { recursive: true, force: true });
   const rates = resultats.filter((r) => r.attendu !== r.obtenu);

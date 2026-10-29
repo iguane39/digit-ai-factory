@@ -128,8 +128,8 @@
   "vu_le": "2026-10-14"
  },
  "oracle-catalogues.mjs": {
-  "cas": 5,
-  "vu_le": "2026-08-27"
+  "cas": 9,
+  "vu_le": "2026-10-29"
  },
  "oracle-chemin-ancre.mjs": {
   "cas": 14,
