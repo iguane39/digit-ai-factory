@@ -10,7 +10,7 @@
  *
  * SANS python sur le poste, la recette se déclare NON JOUÉE et sort 0 : elle ne compte ni pour ni contre.
  */
-import { readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -273,6 +273,47 @@ try {
       att(r.status === 1 && /E401/.test(r.stdout || ""), `le mutant passe : exit ${r.status}`);
     });
   }
+  // TF-2018 (RT-28, 29/10/2026) : R-19 prescrit `rectification_versions_forges`, que ce gabarit
+  // refusait comme type inconnu. Test croisé : tout type de rectification nommé par un oracle ou un
+  // script du pilot, ou par `ledger.mjs` de forge-agents quand le dépôt frère est là, est accepté ici.
+  const typesDe = (texte) => new Set([...texte.matchAll(/"(rectification_[a-z_]+)"/g)].map((m) => m[1]));
+  const vocabulaire = (texte) => new Set([...(texte.match(/TYPES = \{([\s\S]*?)\}/) || ["", ""])[1].matchAll(/"([a-z_]+)"/g)].map((m) => m[1]));
+  const prescrits = new Set();
+  for (const dossier of ["oracles", "scripts"]) {
+    const d = join(ICI, "..", dossier);
+    for (const f of readdirSync(d).filter((x) => x.endsWith(".mjs") && !x.includes(".test.")))
+      for (const t of typesDe(readFileSync(join(d, f), "utf8"))) prescrits.add(t);
+  }
+  const LEDGER_MJS = join(ICI, "..", "..", "digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
+  if (existsSync(LEDGER_MJS)) for (const t of typesDe(readFileSync(LEDGER_MJS, "utf8"))) prescrits.add(t);
+  check(`TF-2018 vert — les ${prescrits.size} types de rectification prescrits par le parc sont au vocabulaire du gabarit`, () => {
+    const v = vocabulaire(GABARIT);
+    const manquants = [...prescrits].filter((t) => !v.has(t));
+    att(prescrits.size >= 2, `relevé vide (${prescrits.size}) : le test croisé ne voit rien`);
+    att(!manquants.length, `hors vocabulaire : ${manquants.join(", ")}`);
+  });
+  check("TF-2018 rouge — sans rectification_versions_forges au vocabulaire, le test croisé le voit", () => {
+    const mutant = GABARIT.replace(' "rectification_versions_forges",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    att(!vocabulaire(mutant).has("rectification_versions_forges") && prescrits.has("rectification_versions_forges"), "le mutant passe");
+  });
+  check("TF-2018 vert — la rectification écrite en ligne de commande porte seq_vise en NOMBRE et --verifier ne la déclare pas", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "rectification_versions_forges", "--seq_vise", "1", "--cause", "versions des forges non relevées à l ouverture du run"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `écriture refusée : ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "rectification_versions_forges" && e.seq_vise === 1, `entrée écrite : ${JSON.stringify(e)}`);
+    const v = spawnSync(PYTHON, [script, "--verifier"], { encoding: "utf8", env: CONSOLE });
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2018 vert — un run_open sans versions_forges est écrit, et l'oubli se dit sur la sortie d'erreur", () => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-gabarit-")); dossiers.push(d);
+    mkdirSync(join(d, "forge"));
+    writeFileSync(join(d, "forge", "ledger.py"), GABARIT, "utf8");
+    const r = spawnSync(PYTHON, [join(d, "forge", "ledger.py"), "run_open", "--run_id", "essai"], { encoding: "utf8", env: { ...CONSOLE, PYTHONIOENCODING: "utf-8" } });
+    att(r.status === 0 && entrees(d).length === 1, `exit ${r.status}`);
+    att(/versions_forges/.test(r.stderr), `aucun rappel : ${r.stderr}`);
+  });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }
 

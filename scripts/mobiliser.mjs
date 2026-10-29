@@ -64,7 +64,9 @@ if (args.includes("--verifier")) {
     remede: manquants.length ? "produire chaque livrable manquant, ou écarter avec son motif la forge qui n'a pas servi dans une nouvelle ligne de trace (--verdicts)" : null }, manquants.length ? 1 : 0);
 }
 
-// Les verdicts : un fichier ou un JSON en ligne ; le squelette rempli de --preparer porte aussi ses types.
+const DEMANDE_A_REMPLIR = "<résumé de la demande>";
+
+// Les verdicts : un fichier ou un JSON en ligne ; le squelette rempli de --preparer porte aussi ses types et sa demande.
 let fourni = null;
 const brut = valeur("--verdicts");
 if (brut) {
@@ -92,8 +94,10 @@ if (profilTexte) {
 }
 
 if (args.includes("--preparer")) {
-  const s = { types: t.types.map((x) => x.id), profil, verdicts: squelette(carte, t.types, profil),
-    consigne: "remplace chaque motif « <…> » par une raison de 3 mots au moins, passe une forge à « ecartee » ou à « mobilisee » selon la demande et le profil, puis : node <pilot>/scripts/mobiliser.mjs --verdicts <ce fichier> --demande \"<résumé>\"" };
+  // TF-2017 (RT-27, 29/10/2026) : le squelette porte `demande`, que --verdicts lit ; sans ce champ, la
+  // session l'ajoutait au fichier et la trace sortait avec `demande: null`, sans un mot.
+  const s = { types: t.types.map((x) => x.id), demande: DEMANDE_A_REMPLIR, profil, verdicts: squelette(carte, t.types, profil),
+    consigne: "remplace « demande » par le résumé de la demande, chaque motif « <…> » par une raison de 3 mots au moins, passe une forge à « ecartee » ou à « mobilisee » selon la demande et le profil, puis : node <pilot>/scripts/mobiliser.mjs --verdicts <ce fichier>" };
   const f = valeur("--sortie");
   if (f) { writeFileSync(resolve(f), JSON.stringify(s, null, 2) + "\n", "utf8"); sortie({ outil: OUTIL, squelette: resolve(f), forges: FORGES.length, profil_connu: !!profil }, 0); }
   sortie({ outil: OUTIL, ...s }, 0);
@@ -104,8 +108,14 @@ const { refus, verdicts } = validerVerdicts(fourni.verdicts && typeof fourni.ver
 if (refus.length) sortie({ outil: OUTIL, verdict: "REFUS", refus }, 1);
 
 if (profilTexte) ecrireProfil(produit, profil);
-const ligne = ligneDeTrace({ carte, types: t.types, profil, verdicts, demande: valeur("--demande") });
+// La demande : --demande prime, sinon le champ du fichier. Le gabarit laissé tel quel est refusé ; une
+// demande absente s'écrit, mais la sortie le dit (TF-2017 : un champ ignoré en silence est le défaut).
+const demande = valeur("--demande") ?? (fourni && typeof fourni.demande === "string" ? fourni.demande.trim() || null : null);
+if (demande === DEMANDE_A_REMPLIR)
+  sortie({ outil: OUTIL, verdict: "REFUS", refus: [`demande laissée au gabarit (« ${DEMANDE_A_REMPLIR} ») : écris son résumé dans le fichier, ou passe --demande "<résumé>"`] }, 1);
+const ligne = ligneDeTrace({ carte, types: t.types, profil, verdicts, demande });
 mkdirSync(join(produit, "forge"), { recursive: true });
 appendFileSync(join(produit, CHEMIN_TRACE), JSON.stringify(ligne) + "\n", "utf8");
 sortie({ outil: OUTIL, verdict: "ECRIT", trace: join(produit, CHEMIN_TRACE), ts: ligne.ts, type: ligne.type, mobilisees: ligne.mobilisees,
-  ligne_ecran: ligne.ligne, profil_declare: profilTexte ? join(produit, "forge", "PROFIL.json") : null }, 0);
+  ligne_ecran: ligne.ligne, demande: ligne.demande ?? null, profil_declare: profilTexte ? join(produit, "forge", "PROFIL.json") : null,
+  ...(demande ? {} : { avertissement: "demande absente : la trace porte « demande: null » — la renseigner dans le fichier (champ demande) ou par --demande" }) }, 0);

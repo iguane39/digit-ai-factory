@@ -156,6 +156,25 @@ try {
     att(l.type === "produit-neuf+site-web" && l.verdicts["seo-geo"].privilegiee === true, `type ${l.type}, seo-geo privilégiée : ${l.verdicts["seo-geo"].privilegiee}`);
     att(!/\+ seo-geo/.test(r.sortie.ligne_ecran), "seo-geo est dite hors carte alors que le second type la privilégie");
   });
+  // TF-2017 (RT-27, 29/10/2026) : le champ `demande` mis dans le fichier était ignoré en silence.
+  check("TF-2017 — le squelette de --preparer porte « demande », et --verdicts lit la demande écrite dans le fichier", () => {
+    const d = produit("demande-fichier");
+    const p = lancer(d, ["--preparer", "--type", "produit-neuf"]);
+    att(p.code === 0 && p.sortie && typeof p.sortie.demande === "string", `squelette sans demande : ${p.brut.slice(0, 200)}`);
+    const f = ecrireVerdicts(d, { types: ["produit-neuf"], demande: "refondre la page d accueil", verdicts: verdictsProduitNeuf() });
+    const r = lancer(d, ["--verdicts", f]);
+    att(r.code === 0, `exit ${r.code} : ${r.brut.slice(0, 300)}`);
+    att(trace(d)[0].demande === "refondre la page d accueil", `demande tracée : ${trace(d)[0].demande}`);
+    att(!r.sortie.avertissement, "un avertissement sort alors que la demande est fournie");
+  });
+  check("TF-2017 — la demande laissée au gabarit est refusée sans rien écrire ; une demande absente s'écrit mais la sortie le dit", () => {
+    const d = produit("demande-gabarit");
+    const gabarit = lancer(d, ["--preparer", "--type", "produit-neuf"]).sortie.demande;
+    const r = lancer(d, ["--verdicts", ecrireVerdicts(d, { types: ["produit-neuf"], demande: gabarit, verdicts: verdictsProduitNeuf() })]);
+    att(r.code === 1 && r.sortie.verdict === "REFUS" && trace(d).length === 0, `gabarit accepté : exit ${r.code}`);
+    const s = lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsProduitNeuf())]);
+    att(s.code === 0 && trace(d)[0].demande === null && /demande absente/.test(s.sortie.avertissement || ""), `absence muette : ${JSON.stringify(s.sortie).slice(0, 200)}`);
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }

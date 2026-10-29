@@ -35,9 +35,16 @@ for _flux in (sys.stdout, sys.stderr):
 
 FORGE = pathlib.Path(__file__).resolve().parent
 RUNS = FORGE.parent / "runs"
+# Les quatre rectifications PAR AJOUT sont prescrites par les juges du pilot et par `ledger.mjs` :
+# `rectification_versions_forges` et `rectification_run_open` par R-19 d'oracle-conformite-projet
+# (TF-0801, TF-1454), les deux autres par
+# `ledger.mjs` (R-42, TF-1722). Absentes d'ici, le produit qui suivait la consigne de l'oracle voyait
+# son entrée refusée à l'écriture puis déclarée hors vocabulaire (retour RT-28, TF-2018, 29/10/2026).
+# La recette croise ce vocabulaire avec les types que les oracles du pilot prescrivent.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
-         "run_close"}
+         "run_close", "rectification_versions_forges", "rectification_run_open",
+         "rectification_horodatage", "rectification_forges_mobilisees"}
 
 
 def chemin(run: str = "") -> pathlib.Path:
@@ -201,4 +208,15 @@ if __name__ == "__main__":
     for k, v in list(champs.items()):
         if isinstance(v, str) and v.startswith(("{", "[")):
             champs[k] = json.loads(v)
+        # R-19 compare `seq_vise` au `seq` du run_open en NOMBRE strict : écrit en texte, la
+        # rectification serait ignorée sans un mot (TF-2018).
+        elif k == "seq_vise" and isinstance(v, str) and v.isdigit():
+            champs[k] = int(v)
     afficher(ajouter(run, type_, **champs))
+    # R-19 exige `versions_forges` au `run_open` ; l'entrée est écrite, l'oubli se dit tout de suite,
+    # avec la voie par ajout, plutôt qu'au premier relevé de conformité (TF-2018).
+    if type_ == "run_open" and "versions_forges" not in champs:
+        print("[À PORTER] run_open sans versions_forges (R-19) : la prochaine fois, "
+              "--versions_forges '{\"<forge>\": \"<sha court>\"}' ; pour celui-ci, ajouter "
+              "rectification_versions_forges --seq_vise <seq> --cause \"…\" --versions_forges '{…}'",
+              file=sys.stderr)
