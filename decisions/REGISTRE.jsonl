@@ -103,3 +103,4 @@
 {"type":"decision","n":106,"question":"Quelle barrière poser contre l'affichage d'un secret ou d'un nom réel ?","date":"2026-10-29","ts":"2026-10-29T18:13:45.230Z","session":"fd15a4ec","origine":"reservation"}
 {"type":"decision","n":107,"question":"Faut-il un script unique pour « synchronise avec GitHub » au pilot et dans les forges ?","date":"2026-10-29","ts":"2026-10-29T18:13:45.328Z","session":"fd15a4ec","origine":"reservation"}
 {"type":"decision","n":108,"question":"Faut-il qu'un oracle ou une mise en service ne puisse plus rendre PASS sans mesure réelle ?","date":"2026-10-29","ts":"2026-10-29T18:13:45.401Z","session":"fd15a4ec","origine":"reservation"}
+{"type":"decision","n":109,"question":"Faut-il publier la synthèse de D-103 (réservée D-98) malgré le refus de la porte des noms, qui ne vise que quatre enregistrements déjà publiés ?","date":"2026-10-29","ts":"2026-10-29T18:54:17.804Z","session":"fd15a4ec","origine":"reservation"}
