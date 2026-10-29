@@ -32,6 +32,8 @@
  * TF-1392, D-2 (a) du 13/10/2026).
  * EC-12 énumération numérotée « 1) … 2) … 3) » sur une même ligne, hors restitution (E-11, AVERT seulement,
  * TF-1847, 18/10/2026) ; les restitutions sont jugées par S80 d'oracle-synthese, bloquante chez elles.
+ * EC-16 une ligne qui porte deux « $ » non échappés hors code s'affiche en formule mathématique dans l'aperçu :
+ * devise en lettres ou signe échappé (AVERT seulement, TF-1977, 29/10/2026, restitution comprise).
  * EC-13 la revue des listes de tournures est datée et n'est pas dépassée : chaque famille de la donnée porte une
  * `revue_prevue` (AAAA-MM-JJ) ; une date absente ou dépassée avertit, sur tout texte jugé (AVERT seulement,
  * TF-1926, décision D-48 (a) du 19/10/2026).
@@ -939,6 +941,35 @@ export function juger(texte, options = {}) {
     }
   }
 
+  // EC-16 (TF-1977, 29/10/2026, retour Produit-84 du 20/10) — DEUX « $ » SUR UNE LIGNE SONT LUS COMME UNE FORMULE.
+  // AVERT SEULEMENT, JAMAIS FAIL, sur tout Markdown jugé, restitution comprise.
+  //
+  // LE FAIT. « 194 $ par mois, dont 105 $ » s'est affiché en italique mathématique dans l'aperçu : un moteur Markdown
+  // qui rend les formules lit le texte entre deux « $ » comme du LaTeX. 14 lignes concernées, aucun oracle ne le voyait.
+  //
+  // CE QU'ELLE MESURE. Une ligne qui porte au moins deux « $ » non échappés, hors bloc de code et hors code en ligne.
+  // Le remède : écrire la devise en lettres (« 194 USD ») ou échapper le signe (« \$ »). NON JUGÉ : un moteur qui ne
+  // rend pas les formules affiche le texte tel quel, l'avertissement y est sans effet.
+  {
+    const lignes16 = String(texte).split(/\r?\n/);
+    let dansBloc = false;
+    const dollars = [];
+    lignes16.forEach((l, i) => {
+      if (/^\s*(```|~~~)/.test(l)) { dansBloc = !dansBloc; return; }
+      if (dansBloc) return;
+      const sansCode = l.replace(/`[^`]*`/g, "");
+      if ((sansCode.match(/(?<!\\)\$/g) || []).length >= 2) dollars.push({ ligne: i + 1, extrait: sansCode.trim() });
+    });
+    if (!dollars.length) pousser("EC-16", "PASS", "aucune ligne à deux « $ » non échappés hors code");
+    else pousser("EC-16", "AVERT",
+      `${dollars.length} ligne(s) à deux « $ » non échappés ou plus : `
+      + dollars.slice(0, 4).map((d) => `l.${d.ligne} « ${d.extrait.slice(0, 60)} »`).join(" · ")
+      + (dollars.length > 4 ? ` · et ${dollars.length - 4} autre(s)` : "")
+      + " — l'aperçu lit le texte entre deux « $ » comme une formule et l'affiche en italique mathématique ; écrire la devise en lettres "
+      + "(« 194 USD ») ou échapper le signe (« \\$ »). AVERTISSEMENT, jamais bloquant (TF-1977)",
+      dollars[0].ligne);
+  }
+
   // EC-13 (TF-1926, décision D-48 (a) du 19/10/2026, étude style-ecriture O3) — LA REVUE DES LISTES DE TOURNURES A UNE DATE.
   // AVERT SEULEMENT, JAMAIS FAIL, sur tout texte jugé.
   //
@@ -1618,6 +1649,23 @@ function selfTest() {
   if (g12(r12c)?.statut !== "PASS")
     casse.push(`EC-12 : la forme interdite montrée entre guillemets français est comptée comme commise : ${JSON.stringify(g12(r12c))}`);
 
+  // 38, 39 et 40 (TF-1977, 29/10/2026) — EC-16, DEUX « $ » SUR UNE LIGNE, EN AVERTISSEMENT. Le rouge est la ligne
+  // du 20/10 ; le vert porte la MÊME information en USD et en signe échappé ; les « $ » d'un bloc de code et d'un
+  // code en ligne ne sont pas comptés.
+  const EC16_ROUGE = "# Coûts\n\nLe forfait coûte 194 $ par mois, dont 105 $ de stockage.\n";
+  const EC16_VERTE = "# Coûts\n\nLe forfait coûte 194 USD par mois, dont 105 \\$ de stockage.\n";
+  const EC16_CODE = "# Script\n\n```sh\necho \"$HOME $PATH\"\n```\n\nLa variable `$HOME` vaut `$USERPROFILE` sous Windows.\n";
+  const g16 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-16");
+  const r16r = jouer("ec16-rouge.md", EC16_ROUGE);
+  const r16v = jouer("ec16-verte.md", EC16_VERTE);
+  const r16c = jouer("ec16-code.md", EC16_CODE);
+  if (g16(r16r)?.statut !== "AVERT" || !/1 ligne\(s\) à deux « \$ »/.test(g16(r16r)?.message || "") || r16r.j?.verdict === "FAIL")
+    casse.push(`EC-16 : « 194 $ par mois, dont 105 $ » n'est pas signalé en avertissement : ${JSON.stringify(g16(r16r))}`);
+  if (g16(r16v)?.statut !== "PASS")
+    casse.push(`EC-16 : la MÊME information en USD et en signe échappé est signalée — le remède échoue : ${JSON.stringify(g16(r16v))}`);
+  if (g16(r16c)?.statut !== "PASS")
+    casse.push(`EC-16 : des « $ » de bloc de code ou de code en ligne sont comptés : ${JSON.stringify(g16(r16c))}`);
+
   // 31 à 37 (TF-1926, D-48 (a) du 19/10/2026) — EC-13, LA REVUE DES LISTES DE TOURNURES EST DATÉE, EN AVERTISSEMENT.
   // Le rouge est la donnée réelle dont deux familles ont une revue dépassée et une troisième aucune date ; le vert est la
   // donnée réelle au jour injecté (--aujourd-hui) ; le remède (dates futures inscrites) doit PASSER ; la frontière : le
@@ -1783,7 +1831,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : ${37 + BILAN_14} cas, 0 défaut (${37 + BILAN_14}/${37 + BILAN_14} PASS — EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : ${40 + BILAN_14} cas, 0 défaut (${40 + BILAN_14}/${40 + BILAN_14} PASS — EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 
