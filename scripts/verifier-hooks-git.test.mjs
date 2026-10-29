@@ -214,5 +214,43 @@ check("vert (TF-1400) — dépôt qui ne suit pas le rejeu : aucune ligne H4", (
   rmSync(D, { recursive: true, force: true });
 });
 
+// TF-1952 (20/10/2026, récidive de TF-1555 : TF-1954) — UNE SECTION QUI LIT L'ENTRÉE DE GIT LA RENDAIT AUX SUIVANTES.
+// Le 20/10, la section TF-1400 consommait l'entrée du hameçon dans sa boucle `while read` ; la section TF-1555 du gabarit,
+// placée après, ne lisait plus rien, ARG_REVS restait vide et la porte des noms jugeait toute l'histoire du pilot (19 min
+// au lieu de 46 s). La correction (16f22b51) n'avait AUCUN cas : rien n'aurait refusé la même régression. Ce cas joue la
+// section PROPRE VERSIONNÉE pour de bon, suivie d'une sonde qui lit l'entrée comme la section TF-1555 la lit. VERT : la
+// sonde reçoit la ligne envoyée par git. ROUGE : la même section sans sa ligne `exec <` (l'état d'avant le 20/10) laisse
+// la sonde sans rien.
+{
+  const shell = spawnSync("sh", ["-c", "echo ok"], { encoding: "utf8" });
+  if (shell.status !== 0) console.log("[NON JOUÉ] 1 cas — TF-1952 entrée de git rendue aux sections suivantes : sh absent de ce poste");
+  else {
+    const SECTION_PROPRE = readFileSync(join(ICI, "hooks-git", "pre-push-prolongement-local"), "utf8").replace(/\r\n/g, "\n");
+    const SHA = "1".repeat(40), ZERO = "0".repeat(40);
+    const jouerSection = (texteSection) => {
+      const D = mkdtempSync(join(tmpdir(), "prepush-entree-"));
+      spawnSync("git", ["-C", D, "init", "-q", "-b", "main"], { encoding: "utf8" });
+      mkdirSync(join(D, "scripts"), { recursive: true });
+      // La boucle TF-1400 ne tourne que si le rejeu des verdicts existe : une souche qui répond PASS suffit.
+      writeFileSync(join(D, "scripts", "rejouer-verdicts-cites.mjs"), "process.exit(0);\n", "utf8");
+      const script = join(D, "hook.sh");
+      writeFileSync(script, texteSection + "\nread -r REF_SONDE SHA_SONDE SUITE_SONDE\nprintf 'SONDE:%s\\n' \"$SHA_SONDE\"\n", "utf8");
+      const r = spawnSync("sh", [script.replace(/\\/g, "/")], { cwd: D, input: `refs/heads/main ${SHA} refs/heads/main ${ZERO}\n`, encoding: "utf8", timeout: 60000 });
+      rmSync(D, { recursive: true, force: true });
+      return { code: r.status, sortie: (r.stdout || "") + (r.stderr || "") };
+    };
+    check("vert (TF-1952) — la section propre du pre-push rend l'entrée de git à la section suivante", () => {
+      const r = jouerSection(SECTION_PROPRE);
+      if (r.code !== 0 || !r.sortie.includes(`SONDE:${SHA}`)) throw new Error(`la section suivante ne reçoit plus l'entrée (exit ${r.code}) : ${r.sortie.slice(0, 300)}`);
+    });
+    check("rouge (TF-1952) — la même section sans sa ligne `exec <` laisse la section suivante sans entrée : le garde sait échouer", () => {
+      const sans = SECTION_PROPRE.split("\n").filter((l) => !/^exec < /.test(l)).join("\n");
+      if (sans === SECTION_PROPRE) throw new Error("témoin mal construit : la ligne `exec <` n'a pas été retirée");
+      const r = jouerSection(sans);
+      if (r.sortie.includes(`SONDE:${SHA}`)) throw new Error("sans `exec <`, la sonde reçoit quand même l'entrée : le cas ne prouve rien");
+    });
+  }
+}
+
 console.log(`\nverifier-hooks-git (TF-1041) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
