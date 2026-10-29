@@ -23,3 +23,8 @@
 {"type":"choix","decision":"D-100","choix":"a","recommandation":"a","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.503Z"}
 {"type":"choix","decision":"D-101","choix":"b","recommandation":"b","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.594Z"}
 {"type":"choix","decision":"D-102","choix":"a","recommandation":"a","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.685Z"}
+{"type":"choix","decision":"D-104","choix":"b","recommandation":"b","accord":true,"poste":"DESKTOP-ULTRA7","ts":"2026-10-29T20:41:08.677Z"}
+{"type":"choix","decision":"D-105","choix":"b","recommandation":"b","accord":true,"poste":"DESKTOP-ULTRA7","ts":"2026-10-29T20:41:08.779Z"}
+{"type":"choix","decision":"D-106","choix":"b","recommandation":"b","accord":true,"poste":"DESKTOP-ULTRA7","ts":"2026-10-29T20:41:08.841Z"}
+{"type":"choix","decision":"D-107","choix":"a","recommandation":"a","accord":true,"poste":"DESKTOP-ULTRA7","ts":"2026-10-29T20:41:08.910Z"}
+{"type":"choix","decision":"D-108","choix":"b","recommandation":"b","accord":true,"poste":"DESKTOP-ULTRA7","ts":"2026-10-29T20:41:09.012Z"}
