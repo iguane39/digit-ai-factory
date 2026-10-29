@@ -317,8 +317,8 @@
   "vu_le": "2026-09-28"
  },
  "oracle-secrets-hors-perimetre.mjs": {
-  "cas": 13,
-  "vu_le": "2026-08-26"
+  "cas": 17,
+  "vu_le": "2026-10-29"
  },
  "oracle-secrets-hors-perimetre.mjs (parc réel)": {
   "non_lu": true,

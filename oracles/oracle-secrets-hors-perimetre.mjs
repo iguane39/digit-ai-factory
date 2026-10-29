@@ -37,6 +37,14 @@
  *         GRAVE des trois que la présence porte — non ignoré < SUIVI < PUBLIÉ (TF-0619) —
  *         parce que le plus faible appelle un `git rm --cached` et le plus grave une ROTATION
  *         D'IDENTIFIANT : un libellé commun aux deux fait rendre le mauvais geste.
+ *         QUALIFICATION (TF-1993, 29/10/2026). Le 27/10, SP2 prescrivait la rotation de 4 porteurs
+ *         publiés ; vérifiés sans afficher une valeur, aucun ne portait de secret, et le constat
+ *         revenait à chaque ouverture, relayé à l'humain comme « 4 identifiants à changer ». Un
+ *         porteur publié dit désormais « contenu non jugé ». Une vérification se consigne au canal
+ *         confidentiel (`qualifications/porteurs-secrets.json` : porteur, blob, date, constat) ; le
+ *         blob est l'empreinte git du fichier sur la branche publiée, lue par `git ls-tree`, sans
+ *         ouvrir le fichier. Même blob : le porteur sort du constat. Blob changé : la qualification
+ *         est périmée et le constat revient.
  *
  * AUCUNE LECTURE DE CONTENU, JAMAIS — c'est le troisième point de la demande, et il est structurel :
  * un contrôle qui ouvrirait ces fichiers pour « vérifier » deviendrait lui-même un chemin de fuite
@@ -50,7 +58,7 @@
  * Usage : node oracle-secrets-hors-perimetre.mjs [racine-du-parc] [--json]
  * Sortie : JSON {oracle,verdict,findings[],non_juge[]} · exit 0 = PASS · 1 = FAIL · 2 = SKIP.
  */
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, dirname, relative, basename } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -92,8 +100,19 @@ export const NON_JUGE = [
   "la PROFONDEUR est bornée à 3 niveaux sous la racine du parc : un porteur enfoui plus profond dans un dossier hors dépôt n'est pas vu — déclaré plutôt que promis",
   "les dossiers que git ignore DANS un dépôt (`node_modules`, `.venv`) ne sont pas parcourus : un porteur de secrets d'une dépendance tierce n'est pas notre sujet et le signaler noierait les vrais",
   "la PUBLICATION est jugée sur les références distantes du DISQUE : aucun `fetch` n'est joué, donc un porteur publié APRÈS le dernier fetch est vu « non publié ». Un contrôle hors ligne ne peut pas tenir une promesse de fraîcheur, et un dépôt sans aucune référence distante rend `publication_non_verifiee` plutôt que « non publié » (N-16)",
-  "ce qu'un porteur PUBLIÉ contient réellement : l'état dit que le contenu est déposé, pas qu'il porte un secret valide. Juger cela exigerait de l'ouvrir, ce que ce contrôle ne fait jamais — la rotation est donc RECOMMANDÉE, et la décision reste humaine",
+  "ce qu'un porteur PUBLIÉ contient réellement : l'état dit que le contenu est déposé, pas qu'il porte un secret valide. Juger cela exigerait de l'ouvrir, ce que ce contrôle ne fait jamais — le contenu est donc dit NON JUGÉ : le vérifier sans l'afficher, puis rotation s'il porte un secret, qualification sinon (TF-1993)",
+  "la JUSTESSE d'une qualification : ce contrôle vérifie que le blob publié est celui qui a été qualifié, jamais que le constat consigné est vrai ; une qualification fausse se corrige au canal confidentiel",
 ];
+
+/** Les qualifications consignées au canal confidentiel (TF-1993) ; absentes ou illisibles : aucune. */
+export function lireQualifications(racineParc) {
+  const chemin = process.env.FORGE_PORTEURS_QUALIFIES
+    || join(process.env.FORGE_CONFIDENTIEL || join(racineParc, "_confidentiel"), "qualifications", "porteurs-secrets.json");
+  try {
+    const q = JSON.parse(readFileSync(chemin, "utf8"));
+    return Array.isArray(q.qualifications) ? q.qualifications : [];
+  } catch { return []; }
+}
 
 const IGNORES = new Set([".git", "node_modules", ".venv", "__pycache__", "dist", "build", ".next", "vendor", ".pytest_cache", ".ruff_cache", ".mypy_cache"]);
 
@@ -192,27 +211,38 @@ function etatDansLeDepot(depot, chemin) {
     // rendait l'une pour l'autre au hasard de l'ordre alphabétique. La principale d'abord, donc.
     const principale = reelles.find((x) => /\/(main|master|develop)$/.test(x));
     if (branches.length) {
-      return { etat: "publie", sha, branche: (principale || reelles[0] || branches[0]),
-        branches: reelles.length || branches.length };
+      const branche = principale || reelles[0] || branches[0];
+      // Le blob publié, lu dans l'arbre de la branche (TF-1993) : l'empreinte que git a déjà
+      // calculée, jamais le contenu. Absent de la pointe de la branche : null, rien à qualifier.
+      const lt = spawnSync("git", ["-C", depot, "ls-tree", branche, "--", relative(depot, chemin).replaceAll("\\", "/")],
+        { encoding: "utf8" });
+      const blob = (String(lt.stdout || "").match(/\bblob ([0-9a-f]{40})\b/) || [])[1] || null;
+      return { etat: "publie", sha, branche, branches: reelles.length || branches.length, blob };
     }
   }
   // Suivi, des références distantes existent, et aucun de ses commits n'y figure : non publié.
   return { etat: "suivi", commits: commits.length };
 }
 
-export function juger(racineParc) {
+export function juger(racineParc, qualifications = lireQualifications(racineParc)) {
   const horsDepot = [];
   const dansDepotNonIgnore = [];
+  const qualifies = [];
   let lus = 0;
   for (const p of porteurs(racineParc)) {
     lus += 1;
     const depot = depotDe(p);
     if (!depot) { horsDepot.push(p); continue; }
     if (!ignoreParSonDepot(depot, p)) {
-      dansDepotNonIgnore.push({ p, depot, ...etatDansLeDepot(depot, p) });
+      const x = { p, depot, ...etatDansLeDepot(depot, p) };
+      const nom = relative(racineParc, p).replaceAll("\\", "/");
+      const q = x.etat === "publie" ? qualifications.find((y) => y && y.porteur === nom) : null;
+      if (q && x.blob && q.blob === x.blob) { qualifies.push({ ...x, qualification: q }); continue; }
+      if (q) x.qualification_perimee = q;
+      dansDepotNonIgnore.push(x);
     }
   }
-  return { lus, horsDepot, dansDepotNonIgnore };
+  return { lus, horsDepot, dansDepotNonIgnore, qualifies };
 }
 
 // ---- recette : les DEUX SENS, sur une arborescence fabriquée --------------------------------
@@ -277,6 +307,20 @@ if (args.includes("--self-test")) {
       rClone && rClone.etat === "publie" && typeof rClone.branche === "string");
     att("SP2 — l'état `publie` nomme le commit qui le prouve, pour que le lecteur puisse le contredire",
       rClone && /^[0-9a-f]{7,40}$/.test(String(rClone.sha)));
+    // TF-1993 — la QUALIFICATION, dans ses trois sens. Le blob vient de `git ls-tree`, et la recette
+    // le confronte à celui que git calcule lui-même : aucun contenu n'est lu par l'oracle.
+    const blobAttendu = execFileSync("git", ["-C", clone, "rev-parse", "HEAD:.env"], { encoding: "utf8" }).trim();
+    att("TF-1993 — l'état `publie` porte le blob publié, celui que git a calculé",
+      rClone && rClone.blob === blobAttendu);
+    const qJuste = juger(clone, [{ porteur: ".env", blob: blobAttendu, qualifie_le: "2026-10-27", constat: "aucun secret" }]);
+    att("TF-1993 vert — un porteur publié qualifié sous le même blob sort du constat et se compte qualifié",
+      !qJuste.dansDepotNonIgnore.some((x) => basename(x.p) === ".env") && qJuste.qualifies.length === 1);
+    const qPerimee = juger(clone, [{ porteur: ".env", blob: "0".repeat(40), qualifie_le: "2026-10-27", constat: "aucun secret" }]);
+    const xPerimee = qPerimee.dansDepotNonIgnore.find((x) => basename(x.p) === ".env");
+    att("TF-1993 rouge — une qualification dont le blob a changé est PÉRIMÉE : le porteur revient au constat, et le dit",
+      xPerimee && xPerimee.etat === "publie" && xPerimee.qualification_perimee && qPerimee.qualifies.length === 0);
+    att("TF-1993 rouge — sans qualification, le porteur publié reste au constat",
+      juger(clone, []).dansDepotNonIgnore.some((x) => basename(x.p) === ".env" && x.etat === "publie"));
 
     // Le sens ROUGE de l'échelle : un porteur suivi dont AUCUN commit n'est publié reste `suivi`.
     writeFileSync(join(clone, "autre.key"), "x\n", "utf8");
@@ -312,7 +356,7 @@ if (lanceEnDirect) {
       non_juge: NON_JUGE }, null, 1));
     process.exit(2);
   }
-  const { lus, horsDepot, dansDepotNonIgnore } = juger(racine);
+  const { lus, horsDepot, dansDepotNonIgnore, qualifies } = juger(racine);
   const rel = (p) => relative(racine, p).replaceAll("\\", "/");
 
   if (horsDepot.length) {
@@ -333,8 +377,10 @@ if (lanceEnDirect) {
     // deux ferait rendre le mauvais geste, ce qui est exactement le coût payé le 25/08.
     const parGravite = [...dansDepotNonIgnore].sort((a, b) => GRAVITE(b.etat) - GRAVITE(a.etat));
     const LIBELLE = {
-      publie: (x) => `PUBLIÉ sur \`${x.branche}\` (commit ${String(x.sha).slice(0, 7)}${x.branches > 1 ? `, et ${x.branches} branches distantes le contiennent` : ""}) — le contenu est DÉPOSÉ : ` +
-        "le retirer du disque n'y change rien, seule une ROTATION de l'identifiant réduit le risque",
+      publie: (x) => `PUBLIÉ sur \`${x.branche}\` (commit ${String(x.sha).slice(0, 7)}${x.branches > 1 ? `, et ${x.branches} branches distantes le contiennent` : ""}) — le contenu est DÉPOSÉ et NON JUGÉ par ce contrôle : ` +
+        "le vérifier sans l'afficher (noms de variables, forme des valeurs) ; s'il porte un secret, seule une ROTATION de l'identifiant réduit le risque ; " +
+        (x.blob ? `sinon, le qualifier au canal confidentiel (qualifications/porteurs-secrets.json, blob ${x.blob.slice(0, 7)})` : "sinon, il n'est plus à la pointe de la branche et ne se qualifie pas") +
+        (x.qualification_perimee ? ` — qualification du ${x.qualification_perimee.qualifie_le} PÉRIMÉE : le contenu publié a changé depuis` : ""),
       publication_non_verifiee: () => "SUIVI par git, et sa publication n'est PAS VÉRIFIABLE ici — " +
         "ce dépôt ne connaît aucune référence distante, et une absence de preuve n'est pas une preuve d'absence (N-16)",
       suivi: (x) => `SUIVI par git sur ${x.commits} commit(s), non publié — un seul \`push\` suffirait, ` +
@@ -350,7 +396,13 @@ if (lanceEnDirect) {
       "reste le sujet de R-14 et de son oracle, qui en est le juge : ce constat le SIGNALE et le lui " +
       "renvoie, il ne le double pas — deux vérités sur le même objet en valent zéro");
   } else {
-    ok("SP2", String(racine), "aucun porteur de secrets non ignoré par son dépôt");
+    ok("SP2", String(racine), "aucun porteur de secrets non ignoré par son dépôt" +
+      (qualifies.length ? ` hors des ${qualifies.length} porteur(s) publiés qualifiés` : ""));
+  }
+  if (qualifies.length) {
+    ok("SP2", String(racine), `${qualifies.length} porteur(s) publiés QUALIFIÉS sans secret au canal confidentiel, blob inchangé depuis : ` +
+      qualifies.map((x) => `${rel(x.p)} (qualifié le ${x.qualification.qualifie_le})`).join(" · ") +
+      " — la qualification se périme dès que le contenu publié change");
   }
 
   // IL NOMME, ET IL NE BLOQUE QUE CE QU'IL PEUT FAIRE RÉPARER — même arbitrage qu'

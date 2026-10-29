@@ -568,9 +568,11 @@ if (iPilot < 0) {
     else {
       for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) {
         const n = (String(f.message).match(/^\s*(\d+)/) || [])[1] || "?";
-        lignes.push(`- ${f.regle} : ${n} porteur(s) ${f.regle === "SP2" ? "DANS un dépôt qui ne les ignore pas — le plus grave : publiés ; seule une ROTATION de l'identifiant réduit le risque" : "hors de tout dépôt, ni ignorés ni suivis"}`);
+        lignes.push(`- ${f.regle} : ${n} porteur(s) ${f.regle === "SP2" ? "DANS un dépôt qui ne les ignore pas, contenu NON JUGÉ (TF-1993)" : "hors de tout dépôt, ni ignorés ni suivis"}`);
       }
-      lignes.push("- À TRAITER : rotation des identifiants publiés (geste humain, console de chaque fournisseur), puis rangement ; détail, chemins compris : node oracles/oracle-secrets-hors-perimetre.mjs");
+      // TF-1993 : la rotation n'est prescrite qu'à un porteur dont le contenu est vérifié comme secret ;
+      // le 27/10, « 4 identifiants à changer » a été relayé à l'humain pour 4 porteurs qui n'en portaient aucun.
+      lignes.push("- À TRAITER par la session : vérifier chaque porteur sans afficher de valeur (noms de variables, forme des valeurs) ; secret trouvé : rotation, geste humain dans la console du fournisseur ; aucun secret : qualification au canal confidentiel (qualifications/porteurs-secrets.json). Détail, chemins compris : node oracles/oracle-secrets-hors-perimetre.mjs");
     }
   }
   const rd = join(PILOT, "todo", "registre-dette.json");
