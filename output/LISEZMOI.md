@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 550 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 552 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -242,6 +242,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md | 20261020c | 31.8 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md | 20261021a | 48.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
+| Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json | 20261028a | 514.7 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` |
@@ -475,6 +476,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
 | Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md | 20261001f | 11.9 Ko | `04-plans/Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` |
 | Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md | 20261015b | 8.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` |
+| Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md | 20261029c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md` |
 | Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md | 20261016f | 7.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` |
 | Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 6.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md | 20261017a | 24.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` |

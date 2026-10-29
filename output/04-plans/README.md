@@ -27,6 +27,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` | fichier | 8,9 Ko | Revue hebdomadaire des propositions — 2026-10-26 |
 | `Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` | fichier | 11,9 Ko | Revue hebdomadaire des propositions — 2026-10-01 |
 | `Digit-AI - Synthese Conseil - Audit complet route vers forge-tests - 20261015b.md` | fichier | 8,4 Ko | Synthèse Conseil — pourquoi « audit complet » part encore vers forge-tests, et comment le  |
+| `Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md` | fichier | 6,5 Ko | Synthèse Conseil — bases de développement et de qualification dans les forges, prompt 2026 |
 | `Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` | fichier | 7,1 Ko | Synthèse Conseil — faire tourner L99 en boucle jusqu'à un score, étude d'opportunité (16/1 |
 | `Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 6,8 Ko | Synthèse Conseil — compétences Cloudflare, GitHub et Supabase identifiées, 17 propositions |
 | `Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` | fichier | 24,9 Ko | Synthèse Conseil — 12 décisions à trancher, une qualification de noms et 4 gestes humains  |
@@ -155,4 +156,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_135 fichier(s), 3 sous-dossier(s)_
+_136 fichier(s), 3 sous-dossier(s)_

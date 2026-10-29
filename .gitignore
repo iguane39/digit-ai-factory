@@ -66,3 +66,6 @@ todo/AVANCEMENT.md
 # 14/10/2026 : cache de compilation Python, état machine — il faisait compter le pilot « modifié localement » à chaque installation.
 __pycache__/
 *.pyc
+
+# 29/10/2026 : worktrees des agents (isolation worktree), état machine fusionné dans main — ils faisaient tomber le relevé d ouverture en DEFAUT au-delà de 48 h.
+.claude/worktrees/
