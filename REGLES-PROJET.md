@@ -1857,3 +1857,41 @@ câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.js
 Non jugé : une suppression ne se propage pas ; deux écritures du même fichier entre deux
 synchronisations ne se fusionnent pas, l'une reste en sauvegarde ; le pilot lui-même, dont la reprise
 passe par git et `scripts\rebatir-clone.mjs`, n'est pas concerné.
+
+## AT. R-65 — une base hors production peut recevoir un extrait de production, s'il est anonymisé et jugé (TF-2011 — 29/10/2026)
+
+Le fait, étude du 29/10/2026 sur les bases de développement et de qualification, décision humaine
+D-91 (a) du même jour. forge-tests avait décidé « synthétiques uniquement » le 02/08/2026 (cahier des
+charges, décision (c)) ; l'ADR0506 de forge-audit admettait un jeu « représentatif mais non sensible ».
+2 produits avaient écrit leur propre extracteur anonymisé, faute d'outil commun. L'un d'eux tenait déjà
+un classeur synthétique : c'est l'extrait réel anonymisé qui a montré les cellules fusionnées que son
+parseur ratait.
+
+**R-65.**
+1. **Une base de développement ou de qualification peut recevoir un extrait de la production du même
+   produit**, à la seule condition qu'il soit anonymisé et que le contrôle du point 3 l'ait jugé.
+2. **Une pseudonymisation n'est pas une anonymisation.** Un remplacement par clé, un hachage, même salé,
+   ou une table de correspondance gardent un lien vers la personne : l'extrait qui en sort reste une
+   donnée personnelle de production, interdite hors de la production.
+3. **Le contrôle juge l'extrait masqué, pas la déclaration de masquage.** Il refuse tout extrait où une
+   personne reste reconnaissable selon les 3 critères de l'avis 05/2014 du groupe de l'article 29 :
+   individualisation, corrélation, inférence. Chaque colonne extraite est classée et reçoit une
+   stratégie ; une colonne non classée est un refus.
+4. **Les jeux d'audit de forge-tests et les fixtures des forges restent synthétiques.** La règle ouvre
+   une voie aux produits, elle ne fait entrer aucune donnée de production dans une forge.
+5. **La voie synthétique reste le défaut** (fabrique de données de forge-tests, service `cat-tst-09`) ;
+   l'extrait anonymisé se choisit quand le synthétique ne reproduit pas la donnée réelle.
+6. **La base qui reçoit l'extrait reste à accès restreint.** L'avis 05/2014 (§2.2.2) tient pour
+   personnel un extrait masqué tant que son responsable garde la donnée source, ce qui est toujours le
+   cas d'un produit et de sa production. Le contrôle réduit le risque de réidentification ; il ne fait
+   pas sortir l'extrait du droit des données personnelles. Le plancher k = 5 de forge-data vaut pour
+   une base d'équipe ; une base partagée plus largement relève k.
+
+Contrôles exécutables : le contrôle CTL-D09-09 de forge-audit 1.21.0 (toute base hors production
+déclare la source de ses données et ne porte aucune donnée personnelle de production en clair) ; le
+verbe « anonymiser » de forge-data (TF-2011, service `cat-dat-14`) : `scripts\anonymiser.mjs` masque
+l'extrait selon une déclaration `forge-data/masquage@1`, et `oracles\oracle-anonymiser.mjs` le mesure
+(AN1 à AN10 : classement exhaustif, identifiants directs, pseudonymisation refusée, k-anonymat,
+corrélation, l-diversité et t-closeness, texte libre, intégrité référentielle). Non jugé : la
+réidentification par croisement avec une source externe au produit ; le k-anonymat mesuré sur le profil
+d'une personne à travers plusieurs tables.

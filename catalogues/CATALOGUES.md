@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 97 services · 81 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 98 services · 82 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -88,7 +88,7 @@
 | cat-ops-07 | **Préparer et relever des campagnes Google Ads** | générer l'import web d'un plan de campagnes confronté aux modèles de l'écran Importations, relever le compte en lecture seule contre le plan et la diffusion, calculer le fichier des changements | `node scripts\google-ads\google-ads.mjs (import-web \| releve \| delta \| avant-depense \| --self-test)` | TF-1364 (13/10/2026) : recette 51/51 sur données factices, recette de forge-ops 163/0 ; générateur joué contre les vrais modèles d'un produit (46 colonnes, 0 défaut). Aucune lecture d'un compte réel par la version générique : statut declare | declare | experimental |
 | cat-ops-08 | **Remettre à zéro une base hors production** | vider et reconstruire ma base de développement ou de qualification à la demande, sans jamais toucher la production | `node scripts\ops.mjs reinitialiser-base <declaration.json> <cible> [--executer]` | TF-2013 (29/10/2026, commits 6812c96 et fe717c2) : self-test 278 PASS hors ligne, 287 PASS avec exercice réel sur conteneur postgres:16-alpine | prouve | experimental |
 
-## forge-data (transverse) — 13 services
+## forge-data (transverse) — 14 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -105,6 +105,7 @@
 | cat-dat-11 | **Réconcilier (Gold ↔ modèle sémantique)** | prouver que chaque mesure exposée par mon modèle sémantique vaut ce que ma couche Gold dit, sous tolérance déclarée | `node oracles\oracle-reconcilier.mjs <reconciliation.json>` | TF-0864 (07/09) : self-test double sens sur fixtures reconciliation-{verte,rouge}.json et rapport-reconciliation-{verte,rouge}.md | prouve | experimental |
 | cat-dat-12 | **Couvrir (mapping contre l'inventaire de sa source)** | prouver qu'un mapping couvre l'inventaire réel de sa source, orphelins nommés et taux recalculé | `node oracles\oracle-couvrir.mjs <couverture.json>` | TF-0911 (08/09) : self-test double sens sur fixtures couverture-{verte,rouge}.json (rouge : CV2-CV6 déclenchées, taux déclaré 100 % contre 63,6 % recalculé) et rapport-couverture-{verte,rouge}.md (R7 seule) | prouve | experimental |
 | cat-dat-13 | **Traduire un modèle sémantique (TMDL → modèle dimensionnel)** | relire le modèle sémantique Power BI livré comme un modèle dimensionnel jugeable par la forge | `node scripts\traduire-modele-semantique.mjs <dossier-tmdl> [--complement <f.json>] [--sortie <f>]` | TF-0894 (08/09) : aller-retour prouvé sur fixture TMDL synthétique — sans complément oracle-modeliser FAIL sur M2, M4, M5, M6 et rien d'autre ; avec complément PASS ; fixture rouge (aucune relation) refusée ; self-test 148→166 | prouve | experimental |
+| cat-dat-14 | **Anonymiser un extrait de production** | alimenter ma base de développement ou de qualification avec un extrait de ma production, anonymisé et mesuré, jamais pseudonymisé | `node scripts\anonymiser.mjs --masquage <masquage.json> --source <dossier-source> --sortie <dossier-neuf> [--graine <texte>] ; node oracles\oracle-anonymiser.mjs <dossier-masqué> [--source <dossier-source>]` | TF-2011 (29/10/2026, commit 0c524c6, décision D-91 (a)) : self-test 444 PASS, 4 rouges refusées chacune sur sa règle, exercice réel sur PostgreSQL 16 et 17 en conteneur éphémère, 0 conteneur restant | prouve | experimental |
 
 ## forge-observability (transverse) — 3 services
 
