@@ -8,7 +8,12 @@
   "seuil_score": null,
   "gain_min": 3,
   "borne": 3,
-  "garde_longueur": 0.15
+  "garde_longueur": 0.15,
+  "extension": {
+   "borne": 5,
+   "motif": "demande humaine du 29/10/2026 (« essaie encore 2 boucles ») puis TF-2024 : la passe 3 gagnait encore 3 points avec 4 majeurs retenus",
+   "decidee_apres_passe": 3
+  }
  },
  "passes": [
   {
@@ -424,21 +429,212 @@
    ],
    "majeurs_clos": 6,
    "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 4,
+   "fichier": "prompt-p4.md",
+   "mots": 1407,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 4, n°1 et n°2)",
+    "aveugle": true,
+    "interdits": [
+     "analyse",
+     "passes précédentes",
+     "journal de boucle",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    76,
+    79
+   ],
+   "score_mesure": 76,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "Un sujet dont la durée estimée est inférieure au coût fixe se regroupe avec un autre",
+     "defaut": "« coût fixe » a deux sens (relectures à l'étape 0, coût par agent à l'étape 1) et compare une durée à des jetons",
+     "recompte": {
+      "commande": "grep -n \"coût fixe\" prompt-p4.md",
+      "resultat": "lignes 24, 57 et 58 : trois emplois, deux sens"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "N × coût fixe en jetons + jetons des sujets reste sous 1,2 × les jetons de référence",
+     "defaut": "les jetons n'ont aucun modèle d'estimation, alors que le contrat exige des jetons estimés",
+     "recompte": {
+      "commande": "lecture de l'étape 1 de prompt-p4.md",
+      "resultat": "seule la régression de durée est définie"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "dis-le avec les chiffres, sans retoucher le modèle, et n'écris pas la règle de l'étape 4",
+     "defaut": "le contrat de sortie n'a pas de branche négative ; les points 2 et 5 sont exigés sans condition",
+     "recompte": {
+      "commande": "lecture croisée de l'étape 1 et des points 2 et 5 du contrat de prompt-p4.md",
+      "resultat": "aucune condition sur les points 2 et 5"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "mesurée du lancement du premier agent au traitement du dernier rapport",
+     "defaut": "le modèle optimise le plus long agent, pas la durée de bout en bout",
+     "recompte": {
+      "commande": "lecture de l'OBJECTIF et de l'étape 1 de prompt-p4.md",
+      "resultat": "écart présent"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur"
+    },
+    {
+     "severite": "majeur",
+     "citation": "si la doctrine en vigueur le permet",
+     "defaut": "D-47 (a) impose aussi une relecture par livrable et une de cohérence",
+     "recompte": {
+      "commande": "sed -n 24p gabarits/AGENT-CAMPAGNE.md",
+      "resultat": "« une campagne se relit en trois temps »"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 4,
+   "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 5,
+   "fichier": "prompt-p5.md",
+   "mots": 1537,
+   "relecteur": {
+    "agent": "2 agents general-purpose neufs, opus, effort high (passe 5, n°1 et n°2)",
+    "aveugle": true,
+    "interdits": [
+     "analyse",
+     "passes précédentes",
+     "journal de boucle",
+     "transcriptions de session"
+    ]
+   },
+   "scores_relecteurs": [
+    81,
+    78
+   ],
+   "score_mesure": 78,
+   "regle_de_retenue": "prompt de run : 2 relecteurs, seul un défaut vu par les 2 est retenu ; score retenu = le plus bas",
+   "defauts": [
+    {
+     "severite": "majeur",
+     "citation": "Un sujet dont la durée marginale b est inférieure à a, l'ordonnée à l'origine du modèle de durée, se regroupe",
+     "defaut": "b est un coefficient unique : la condition vaut pour les 38 sujets ou pour aucun",
+     "recompte": {
+      "commande": "grep -n \"a + b\\|durée marginale b\" prompt-p5.md",
+      "resultat": "b défini une seule fois, ligne 51, comme coefficient de régression"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "le plus petit N, sous le plafond, qui minimise la durée estimée du plus long agent",
+     "defaut": "l'objectif compte la réception en série des rapports, le modèle ne l'estime pas",
+     "recompte": {
+      "commande": "grep -n \"plus long\" prompt-p5.md",
+      "resultat": "ligne 59 : seul le plus long agent est minimisé"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "une relecture commune de la consigne et de la liste des sujets (D-47), pas une par agent",
+     "defaut": "D-47 (a) impose une relecture par livrable : le coût de relecture croît avec N",
+     "recompte": {
+      "commande": "sed -n 24p gabarits/AGENT-CAMPAGNE.md ; grep -n \"pas une par\" prompt-p5.md",
+      "resultat": "trois temps dont un par livrable ; le prompt dit « pas une par agent », ligne 68"
+     },
+     "statut": "retenu",
+     "vu_par": [
+      1,
+      2
+     ]
+    },
+    {
+     "severite": "majeur",
+     "citation": "Copie isolée (isolation worktree) pour tout agent qui partage un dépôt avec un autre agent.",
+     "defaut": "l'isolation de l'outil Agent ne copie que le pilot, pas une forge",
+     "recompte": {
+      "commande": "grep -l worktreePath .../2071e2c2-.../subagents/*.meta.json | wc -l",
+      "resultat": "3 sur 9, aucun lot de forge"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      1
+     ],
+     "motif": "vu par un seul relecteur (déjà vu par un seul à la passe 3)"
+    },
+    {
+     "severite": "majeur",
+     "citation": "durée = a + b × sujets, ajustée sur les 6 lots",
+     "defaut": "rien n'est prévu si b ≤ 0 ou a < 0 sur 6 points mêlant campagne et constructeur",
+     "recompte": {
+      "commande": "lecture des meta.json des 6 lots",
+      "resultat": "A, E, F campagne ; B, C, D constructeur"
+     },
+     "statut": "ecarte",
+     "vu_par": [
+      2
+     ],
+     "motif": "vu par un seul relecteur"
+    }
+   ],
+   "majeurs_clos": 3,
+   "rejetee": false,
    "decision": "arreter"
   }
  ],
  "arret": {
-  "passe": 3,
-  "raison": "borne"
+  "passe": 5,
+  "raison": "gain_insuffisant"
  },
  "score_affiche": {
-  "valeur": 72,
+  "valeur": 78,
   "nature": "mesure"
  },
  "majeurs_ouverts": [
-  "la plupart des sujets ne citent pas de fichier : ils deviennent des groupes isolés supposés disjoints",
-  "6 mesures par lot ne donnent pas de durée par sujet ; le modèle fait baisser la durée estimée dès qu'on découpe",
-  "git ne garde pas trace d'un conflit résolu ; la mesure rend 0 sans rien mesurer",
-  "écriture ordonnée dans une étape déclarée en lecture seule, avant le git fetch et le git status"
+  "b est un coefficient unique : la condition vaut pour les 38 sujets ou pour aucun",
+  "l'objectif compte la réception en série des rapports, le modèle ne l'estime pas",
+  "D-47 (a) impose une relecture par livrable : le coût de relecture croît avec N"
  ]
 }
