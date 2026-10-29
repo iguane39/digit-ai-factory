@@ -65,6 +65,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` | fichier | 31,8 Ko | Diagnostic de la Factory — œil critique, proposition révisée (20/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
+| `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 6,6 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
+| `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` | fichier | 61,9 Ko | JSON |
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
@@ -76,4 +78,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 5,1 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
 | `Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` | fichier | 15,2 Ko | Analyse L99 — transformer en actions les sujets laissés de côté par l'œil critique (29/10/ |
 
-_57 fichier(s), 2 sous-dossier(s)_
+_59 fichier(s), 2 sous-dossier(s)_
