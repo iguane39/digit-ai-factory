@@ -70,9 +70,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
 | `Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` | fichier | 5,5 Ko | Œil critique : 4 actions pour tenir les 8 demandes (29/10/2026) |
 | `Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` | fichier | 4,8 Ko | Œil critique : ce qu'il fait, ce qu'il ne fait pas (29/10/2026) |
+| `Digit-AI - Fiche - Oeil critique code mort et sujets a integrer - 20261029e.md` | fichier | 6,9 Ko | Œil critique : code mort et sujets à intégrer (29/10/2026) |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` | fichier | 514,7 Ko | JSON |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` | fichier | 190,2 Ko | Inventaire — fonctionnalités de Cloudflare, GitHub et Supabase (28/10/2026) |
 | `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 5,1 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
 | `Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` | fichier | 15,2 Ko | Analyse L99 — transformer en actions les sujets laissés de côté par l'œil critique (29/10/ |
 
-_56 fichier(s), 2 sous-dossier(s)_
+_57 fichier(s), 2 sous-dossier(s)_

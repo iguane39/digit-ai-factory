@@ -91,3 +91,4 @@
 {"type":"decision","n":94,"question":"Comment planifier l'exécution de l'œil critique sur chaque poste ?","date":"2026-10-29","ts":"2026-10-29T14:25:09.948Z","session":"fbe9fe8c","origine":"reservation"}
 {"type":"decision","n":95,"question":"Faut-il mettre en œuvre les actions de la fiche 20261029c pour que l'œil critique tienne les 8 demandes ?","date":"2026-10-29","ts":"2026-10-29T16:08:40.245Z","session":"fbe9fe8c","origine":"reservation"}
 {"type":"decision","n":96,"question":"Faut-il exécuter le prompt réécrit de la revue L99 20261029d sur le code mort et les sujets de l'œil critique ?","date":"2026-10-29","ts":"2026-10-29T16:44:43.489Z","session":"fbe9fe8c","origine":"reservation"}
+{"type":"decision","n":97,"question":"Faut-il mettre en œuvre les préconisations de la fiche 20261029e sur le code mort et les sujets à intégrer à l'œil critique ?","date":"2026-10-29","ts":"2026-10-29T16:53:40.891Z","session":"fbe9fe8c","origine":"reservation"}
