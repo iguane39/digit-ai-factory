@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 98 services · 82 prouvés · 16 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 109 services · 91 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -32,7 +32,7 @@
 | cat-des-09 | **Contrôler la généricité d'une interface (règles importées)** | vérifier mécaniquement ce qui, dans un rendu, trahit une interface faite par défaut | `node oracles\oracle-taste.mjs <page.html>` | TF-0199 (14/08) : règles extraites d'une source externe MIT (consultée le 14/08), self-test 13 oracles / 56 règles. TA1/TA2 rétrogradées APRÈS mesure : la borne de saturation condamnait toute palette OKLCH du corpus, et la source se contredit (son propre accent recommandé viole sa règle) | prouve | experimental |
 | cat-des-10 | **Thème Power BI dérivé de la marque** | livrer des rapports Power BI au thème de la marque, jamais au thème par défaut | `node scripts\generer-theme-powerbi.mjs <tokens.json> --sortie <theme.json> · node oracles\oracle-theme-powerbi.mjs <tokens.json> <theme.json>` | TF-0863 (07/09) : self-test double sens (verte = régénération du corpus, rouge = thème par défaut Power BI → TP2, TP3) | prouve | experimental |
 
-## forge-development (pipeline) — 7 services
+## forge-development (pipeline) — 9 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -43,8 +43,10 @@
 | cat-dev-05 | **Générer DESIGN.md linté** | produire le document design du produit accepté par le gate | `generer-design-md.mjs (D-V2 soldée le 07/08)` | PASS vérifié le 07/08 (CONTRAT-INTERFACE §5) | prouve | experimental |
 | cat-dev-06 | **Gate anti-patterns IA** | bloquer imports fantômes, secrets en dur et routes sans auth avant merge | `digit-ai-forge-development\conductor\gates\ai_antipatterns_gate.py` | TF-0103 (12/08) : 15 tests double sens, 0 faux positif sur conductor entier | prouve | experimental |
 | cat-dev-07 | **Gate de mutation (3e métrique)** | mesurer la force réelle de mes tests, pas seulement leur couverture | `digit-ai-forge-development\conductor\gates\mutation_gate.py + job CI mutation` | TF-0103 (12/08) : mesure réelle Docker 61,1 % (223/365) — honnête, sous seuil, consignée | prouve | experimental |
+| cat-dev-08 | **Gate parité runtime (conteneur Python, Worker Cloudflare)** | vérifier que ce que mes tests exécutent est ce que la production sert | `uv run python -m conductor.gates.runtime_parity_gate <repo cible>` | TF-1042 (13 cas) et TF-1998 du 29/10/2026 (16 cas double sens ; configurations synthétiques, aucun Worker exécuté) | prouve | experimental |
+| cat-dev-09 | **Gate Supabase côté serveur** | bloquer une session lue sans vérification côté serveur, un paquet auth-helpers et un proxy.ts ignoré | `uv run python -m conductor.gates.supabase_ssr_gate <repo cible>` | TF-2008 du 29/10/2026 : 14 cas double sens, pages supabase.com lues le 29/10/2026 | prouve | experimental |
 
-## forge-tests (pipeline) — 9 services
+## forge-tests (pipeline) — 10 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -57,6 +59,7 @@
 | cat-tst-07 | **Rapport exhaustif test-par-test** | obtenir le verdict et le pourquoi de CHAQUE test, pas seulement un agrégat par pan | `forge_tests\noyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, self-test noyau vert, pytest 154 rejoué pilot ; v0 — branchement des adaptateurs (--junitxml → essais réels) = jalon d'intégration | prouve | experimental |
 | cat-tst-08 | **Juger un catalogue de traductions** | savoir si mes traductions sont COMPLÈTES, si leurs paramètres sont intacts et si mes libellés d'action sont constants — sans attendre un build servi | `forge_tests\catalogue_i18n.py, câblé au pan `i18n` (aucun modèle appelé)` | TF-0383 (19/08) : sur un produit client livré, le pan rendait SKIP / 0 finding et rend FAIL / 5 findings nommés — 150 clés manquantes sur 245 pour 5 des 7 locales déclarées, servies par le repli sans le dire. 19 tests double sens ; la JUSTESSE d'une traduction est déclarée non jugée | prouve | experimental |
 | cat-tst-09 | **Fabrique de données chargée en base** | obtenir un jeu de données synthétique tiré de mes migrations SQL, qui se charge sans rejet dans une base PostgreSQL | `uv run python -m forge_tests.fabrique_donnees <projet> --sortie <jeu.sql> [--graine N] [--volume N]` | TF-2012 (29/10/2026, commit 28269f6) : 44 tests, banc vert chargé sur PostgreSQL 16, bancs rouges attrapés (violation de contrainte, courriel hors domaine réservé refusé avant écriture) | prouve | experimental |
+| cat-tst-10 | **Auditer un Worker Cloudflare ou une base Supabase** | savoir quels gestionnaires de mon Worker et quelles tables exposées de ma base mes tests exercent | `uv run python -m forge_tests <racine> --pans workers supabase --json` | TF-1998 et TF-2008 du 29/10/2026 : 20 cas, S-01 tenu 13/13 ; pans statiques | prouve | experimental |
 
 ## forge-agents (transverse) — 12 services
 
@@ -75,7 +78,7 @@
 | cat-agt-11 | **Fixer la barre d'un livrable** | trouver, prouver (test d'existence exécuté) et décomposer la référence externe qui fixe le niveau d'un livrable — pré-vol d'un prompt ou en ligne d'une boucle | `skill la-barre — invocation : « barre… » en tête de message ; registre : .claude\skills\la-barre\references\registre-barres.md` | usages réels : pré-vol TF-0083 (11/08, 3 barres data), campagne catalogues (12/08), TF-0153 (13/08, barre Allure), run Produit-10 (13/08 : protocole tenu intégralement, arrêt au pas 5, garde anti-gameable exercé) | prouve | production |
 | cat-agt-13 | **Construire un plan d'amélioration post-audit** | recevoir un plan d'amélioration multi-domaines joint aux actions de remédiation d'un audit, jugé contre son contrat et rendu en page | `skill plan-d-amelioration — node .claude\skills\plan-d-amelioration\scripts\joindre.mjs plan.json --actions <yaml> --controles <json>, puis oracle-plan-d-amelioration.mjs et rendre.mjs` | TF-1234 (12/10/2026) : recette du skill 36/36, paire rouge/verte au manifeste de quality-oracles (434 contrôles PASS) ; gabarit de page jugé par forge-design (TF-1236, verdict « Livrer »). Aucune mission réelle encore : statut declare | declare | experimental |
 
-## forge-ops (transverse) — 8 services
+## forge-ops (transverse) — 11 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -87,8 +90,11 @@
 | cat-ops-06 | **Plans plan-first d'un produit data** | préparer la promotion d'un bundle Databricks et d'un projet Power BI entre espaces de travail, publication sur GO humain | `node scripts\ops.mjs plan databricks-bundle\|powerbi-workspace <build> --sortie plan.json + oracle O-5` | TF-0865 (07/09) : self-test forge-ops, O-5 PASS sur les deux plans générés | prouve | experimental |
 | cat-ops-07 | **Préparer et relever des campagnes Google Ads** | générer l'import web d'un plan de campagnes confronté aux modèles de l'écran Importations, relever le compte en lecture seule contre le plan et la diffusion, calculer le fichier des changements | `node scripts\google-ads\google-ads.mjs (import-web \| releve \| delta \| avant-depense \| --self-test)` | TF-1364 (13/10/2026) : recette 51/51 sur données factices, recette de forge-ops 163/0 ; générateur joué contre les vrais modèles d'un produit (46 colonnes, 0 défaut). Aucune lecture d'un compte réel par la version générique : statut declare | declare | experimental |
 | cat-ops-08 | **Remettre à zéro une base hors production** | vider et reconstruire ma base de développement ou de qualification à la demande, sans jamais toucher la production | `node scripts\ops.mjs reinitialiser-base <declaration.json> <cible> [--executer]` | TF-2013 (29/10/2026, commits 6812c96 et fe717c2) : self-test 278 PASS hors ligne, 287 PASS avec exercice réel sur conteneur postgres:16-alpine | prouve | experimental |
+| cat-ops-09 | **Garder les données d'un conteneur à état** | savoir avant un redémarrage de Docker que mes conteneurs à état gardent leurs données dans un volume et que leur commande de création est écrite | `node oracles\oracle-ops.mjs --conteneurs-a-etat <racine> [--composants <COMPOSANTS-OPS.md>]` | TF-1986 (29/10/2026, commits b8f4d19 et 10052b7) : self-test 329 PASS ; 16 des 20 contrôles O20 rouges sur l'oracle d'avant ; aucun produit réel lu | prouve | experimental |
+| cat-ops-10 | **Déployer en production par GitHub Actions sous GO humain** | porter mon plan dans un workflow où le GO humain est l'approbation d'un environnement protégé, prouvée avant chaque déploiement | `node oracles\oracle-ops.mjs --workflow-deploiement <fichier.yml> [--environnement <nom>] [--protection <capture.json>]` | TF-2003 (29/10/2026, commit 2a9ad01) : self-test 316 PASS (298 avant), 12 des 18 contrôles O21 rouges sur l'oracle d'avant ; garde jamais exécutée sur un dépôt réel | prouve | experimental |
+| cat-ops-11 | **Plan Supabase à garde-fous de déploiement** | pousser migrations, secrets et fonctions Supabase sans découvrir au déploiement une migration cassée, une dérive ou un secret absent | `node scripts\ops.mjs plan supabase <build> + oracle O-5` | TF-2007 (29/10/2026, commit 7acbaf8) : self-test 326 PASS (316 avant) ; plan du 16/10 rejugé : 4 constats ; aucune exécution réelle | prouve | experimental |
 
-## forge-data (transverse) — 14 services
+## forge-data (transverse) — 15 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -106,6 +112,7 @@
 | cat-dat-12 | **Couvrir (mapping contre l'inventaire de sa source)** | prouver qu'un mapping couvre l'inventaire réel de sa source, orphelins nommés et taux recalculé | `node oracles\oracle-couvrir.mjs <couverture.json>` | TF-0911 (08/09) : self-test double sens sur fixtures couverture-{verte,rouge}.json (rouge : CV2-CV6 déclenchées, taux déclaré 100 % contre 63,6 % recalculé) et rapport-couverture-{verte,rouge}.md (R7 seule) | prouve | experimental |
 | cat-dat-13 | **Traduire un modèle sémantique (TMDL → modèle dimensionnel)** | relire le modèle sémantique Power BI livré comme un modèle dimensionnel jugeable par la forge | `node scripts\traduire-modele-semantique.mjs <dossier-tmdl> [--complement <f.json>] [--sortie <f>]` | TF-0894 (08/09) : aller-retour prouvé sur fixture TMDL synthétique — sans complément oracle-modeliser FAIL sur M2, M4, M5, M6 et rien d'autre ; avec complément PASS ; fixture rouge (aucune relation) refusée ; self-test 148→166 | prouve | experimental |
 | cat-dat-14 | **Anonymiser un extrait de production** | alimenter ma base de développement ou de qualification avec un extrait de ma production, anonymisé et mesuré, jamais pseudonymisé | `node scripts\anonymiser.mjs --masquage <masquage.json> --source <dossier-source> --sortie <dossier-neuf> [--graine <texte>] ; node oracles\oracle-anonymiser.mjs <dossier-masqué> [--source <dossier-source>]` | TF-2011 (29/10/2026, commit 0c524c6, décision D-91 (a)) : self-test 444 PASS, 4 rouges refusées chacune sur sa règle, exercice réel sur PostgreSQL 16 et 17 en conteneur éphémère, 0 conteneur restant | prouve | experimental |
+| cat-dat-15 | **Profils-moteur et décisions hors inventaire** | savoir ce que mon moteur change pour les verbes de la forge, ou pourquoi il n'a pas de profil | `references\profils-moteur\LISEZMOI.md (lecture)` | TF-1999 et TF-2008, self-test forge-data 449 PASS le 29/10/2026 | declare | experimental |
 
 ## forge-observability (transverse) — 3 services
 
@@ -115,7 +122,7 @@
 | cat-obs-02 | **Détecter la dérive** | être alerté quand quelque chose a changé depuis le dernier passage | `node scripts\derive.mjs <snapshots.jsonl>` | TF-0112 (12/08) : régressions data et tests prouvées sur fixtures (faux oracle à état PASS→FAIL) | prouve | experimental |
 | cat-obs-03 | **Veille citation IA** | suivre la présence d'un domaine dans les réponses génératives | `veille-ia\METHODE.md (méthode manuelle documentée)` | méthode documentée seule — automatisation écartée en v0 avec raisons datées (API payantes, non-reproductibilité) | declare | experimental |
 
-## forge-audit (sur mandat) — 5 services
+## forge-audit (sur mandat) — 6 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -124,8 +131,9 @@
 | cat-aud-03 | **Engagement d'audit par tenant** | mener un engagement client isolé consommant le référentiel | `dépôt d'engagement privé par client, consommant le produit en submodule pinné — sur mandat humain` | un engagement client réel complet, 2 CI vertes (produit + engagement, iso-parité) | prouve | production |
 | cat-aud-04 | **Policy-as-code (démonstrateur OPA)** | transformer des contrôles déclaratifs en gate exécuté sur l'IaC | `profiles\policy-as-code\ (conftest via Docker)` | TF-0110 (12/08) : iac-verte 5/5 PASS, iac-rouge 5/5 FAIL nommant le CTL — démonstrateur, migration non faite | prouve | experimental |
 | cat-aud-05 | **Modèle sémantique Power BI jugé sur fichiers (TMDL)** | juger mon modèle sémantique Power BI à chaque commit, sans point de terminaison XMLA | `node oracles\verifier-modele-semantique.mjs --modele <dossier definition/>` | TF-0862 (07/09) : tests/oracles/modele-semantique.test.mjs (verte OK, rouge BLOQUANT MS2-MS6) ; barre TabularEditor/BestPracticeRules validée D-6 a ; bindings powerbi 1.1.0 | prouve | experimental |
+| cat-aud-06 | **Profil GitHub jugé en lecture seule** | auditer protection de branche, secrets, dépendances, code scanning et politique de sécurité de mon dépôt GitHub sans rien y écrire | `profiles\github\ (déclaré dans profiles[] du tenant, chargé par tools\build-banc.mjs)` | TF-2004 (29/10/2026, commit 3a724b5) : verifier-profils PASS, 7 instanciations par build-banc, npm test 14/14 ; commandes non jouées sur un dépôt réel | declare | experimental |
 
-## forge-seo-geo (sur mandat) — 7 services
+## forge-seo-geo (sur mandat) — 8 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -136,6 +144,7 @@
 | cat-seo-05 | **Runs de suivi récurrents** | suivre l'évolution SEO d'un site entre deux audits | `méthode documentée (récurrence post-MEP)` | jamais exercé — un seul run réel à ce jour ; snapshot en dérive de schéma (D-S2) | declare | experimental |
 | cat-seo-06 | **Instrumentation de crawl avancée** | mesurer aussi les sites JS, le balisage, les CWV terrain (clé CrUX gratuite requise — sinon nœud 31 non mesuré) et les crawlers IA (journaux serveur requis, accès souvent exceptionnel — sinon verdict non mesurable motivé, nœud 58 jugé sur robots.txt/llms.txt seuls) | `python scripts\{crawler.py --rendu-js, crux.py, agents_ia.py}` | TF-0105 (12/08) : 22 tests de preuve + validate 12/12 rejoué pilot ; intégration rapport en restes | prouve | experimental |
 | cat-seo-07 | **Scorer et écrire le CSV d'actions** | transformer les actions rédigées de la mission en CSV scoré, trié et contrôlé | `python scripts\scorer_actions.py --mission <chemin>` | TF-0073 (12/08) : 17/17 preuves double sens + bout-en-bout réel 8/8, rejoués par le pilot | prouve | experimental |
+| cat-seo-08 | **Redirections qui préservent le chemin (Cloudflare)** | vérifier que mes anciens domaines et chemins redirigés portent le chemin jusqu'à la page cible, sans variable restée littérale | `python scripts\oracle_redirections.py --sonder <url> \| --regles <fichier> [--assume <id>] [--projet .]` | TF-1997 (29/10/2026, commit 8d4348b) : 60/60 et 13/13 à double sens, 4/4 mutations tuées, recette 378/378 | prouve | experimental |
 
 ## forge-organization (sur mandat) — 4 services
 
@@ -146,13 +155,15 @@
 | cat-org-03 | **Études normatives** | ancrer les pratiques sur les normes du métier | `conversationnel` | étude documentée — contrôles proposés non implémentés | declare | experimental |
 | cat-org-04 | **Gate de conventions packagé** | vérifier les conventions en pre-commit/CI sans dépendre de la forge | `node output\02-composants\gate-conventions\gate-conventions.mjs [--staged]` | TF-0109 (12/08) : self-test 6/6 + 2 robustesse, rejoué pilot ; PROPOSÉ aux dépôts, jamais déployé d'office | prouve | experimental |
 
-## forge-agents-security (sur mandat) — 3 services
+## forge-agents-security (sur mandat) — 5 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
 | cat-sec-01 | **Scanner un agent (statique)** | vérifier qu'un agent défini ne porte pas de capacités dangereuses | `node oracles\oracle-scan-agentdef.mjs <def>` | TF-0111 (12/08) : self-test double sens 24 PASS rejoué pilot ; 20 fixtures synthétiques | prouve | experimental |
 | cat-sec-02 | **Scanner les appels d'outils (dynamique)** | détecter les patterns d'attaque dans un journal d'exécution d'agent | `node oracles\oracle-scan-toolcalls.mjs <journal.jsonl> --perimetre <racine>` | TF-0111 (12/08) : chaque pattern prouvé rouge avec son cas légitime voisin vert (faux positifs mesurés) | prouve | experimental |
 | cat-asc-03 | **Rejouer un corpus d'injection de prompt** | savoir si une charge d'injection a TRAVERSÉ jusqu'à un acte de mon agent | `node oracles\oracle-corpus-injection.mjs <cible>` | TF-0188 (14/08) : self-test 38 PASS (24 avant), dont 2 voisins légitimes qui NE déclenchent pas. Rejeu PASSIF sur artefact : aucun modèle sollicité, donc la résistance d'un système vivant n'est pas mesurée | prouve | experimental |
+| cat-asc-04 | **Juger un agent lancé par un workflow GitHub Actions** | savoir qui peut déclencher l'agent de mon workflow, quel texte de tiers devient sa consigne et quels secrets son shell lit | `node oracles\oracle-scan-workflow-agent.mjs <dépôt \| dossier \| fichier.yml>` | TF-2002 (29/10/2026, commit b1500a8) : self-test 76 PASS (55 avant), 20 des 21 contrôles neufs rouges sur le code d'avant | prouve | experimental |
+| cat-asc-05 | **Juger le serveur MCP de Supabase donné à un agent** | savoir si la configuration MCP de mon agent le borne à un projet de développement, en lecture seule, sans jeton en clair ni groupe qui dépense | `node oracles\oracle-scan-mcp-supabase.mjs <fichier \| dossier> --production <ref>` | TF-2009 (29/10/2026, commit 0463807) : self-test 100 PASS (76 avant), 23 des 24 contrôles neufs rouges sur le code d'avant | prouve | experimental |
 
 ## forge-websec (sur mandat) — 7 services
 

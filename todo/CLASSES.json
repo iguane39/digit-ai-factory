@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.53.0",
+ "version": "1.54.0",
  "date": "2026-10-29",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2434,6 +2434,186 @@
    "voisines": [
     "restitution-rendu-visuel-non-critique"
    ]
+  },
+  {
+   "cle": "oracle-declencheur-non-nomme",
+   "famille": "page-html-socle",
+   "libelle": "Un contrôle échoue sur un marqueur réservé sans le nommer : l auteur lit le code de l oracle pour comprendre. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1962"
+   ],
+   "regle": "check_html.py L3 nomme la classe réservée qui déclenche le contrôle et publie le tableau des classes dans references/lisibilite.md (forge-agents bea2a5e)",
+   "oracle": "pilot/forge-agents, digit-ai-page-html scripts/check_html.py L3 et self_test.py, cas « l3-classe-reservee-pv.html » et « score par classe »",
+   "voisines": []
+  },
+  {
+   "cle": "etat-ouvert-non-mesure",
+   "famille": "page-html-socle",
+   "libelle": "Un état déplié est rendu mais pas mesuré : un panneau transparent ou recouvert passe. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1963"
+   ],
+   "regle": "render_page.py V26 mesure le fond et le recouvrement de chaque panneau déplié visible (forge-agents bea2a5e)",
+   "oracle": "forge-agents, digit-ai-page-html scripts/render_page.py famille V26 panneau_deplie, cas v26-panneau-transparent, v26-panneau-recouvert, v26-composant-sans-jetons",
+   "voisines": []
+  },
+  {
+   "cle": "composant-jetons-non-verifies",
+   "famille": "page-html-socle",
+   "libelle": "Un composant consomme des jetons que l hôte ne déclare pas, sans repli ni alerte. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1964"
+   ],
+   "regle": "table-filters.css porte un repli à chaque var() ; embarquer-composants --constat refuse un jeton consommé sans repli et absent de la page (forge-agents bea2a5e)",
+   "oracle": "forge-agents, digit-ai-page-html scripts/embarquer-composants.mjs --constat et self_test.py, cas « --constat refuse un jeton consommé sans repli et absent »",
+   "voisines": []
+  },
+  {
+   "cle": "repli-cartes-filtres-masques",
+   "famille": "page-html-socle",
+   "libelle": "Le repli en cartes masque les en-têtes, et avec eux les filtres de colonne. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1965"
+   ],
+   "regle": "table-filters.css sort les déclencheurs en barre au-dessus des cartes sous 900 px ; render_page.py V27 refuse un déclencheur masqué par le repli (forge-agents bea2a5e)",
+   "oracle": "forge-agents, digit-ai-page-html scripts/render_page.py famille V27 filtres_masques_repli, cas « v27-filtres-masques-par-le-repli.html · 390 px »",
+   "voisines": []
+  },
+  {
+   "cle": "colonnes-desequilibrees",
+   "famille": "page-html-socle",
+   "libelle": "Une colonne large reste presque vide pendant qu une étroite étire la ligne. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1966"
+   ],
+   "regle": "render_page.py V25 mesure largeur et remplissage par colonne (forge-agents bea2a5e)",
+   "oracle": "forge-agents, digit-ai-page-html scripts/render_page.py famille V25 colonnes_desequilibrees (avertissement), cas « v25-colonne-large-et-vide.html »",
+   "voisines": []
+  },
+  {
+   "cle": "cellule-enumeration-en-prose",
+   "famille": "page-html-socle",
+   "libelle": "Une cellule énumère plusieurs points en paragraphe, ou diffère de forme de ses voisines. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1967"
+   ],
+   "regle": "check_html.py L12 lit une énumération par virgules en cellule et une colonne qui mêle liste et prose (forge-agents bea2a5e)",
+   "oracle": "forge-agents, digit-ai-page-html scripts/check_html.py L12, cas « l12-cellule-formes-melees.html »",
+   "voisines": []
+  },
+  {
+   "cle": "code-regle-sans-infobulle",
+   "famille": "page-html-socle",
+   "libelle": "Un code de règle cité nu, sans ce qu il impose. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1969"
+   ],
+   "regle": "check_html.py L18 signale un code de règle lettres puis chiffres cité nu (forge-agents bea2a5e)",
+   "oracle": "forge-agents, digit-ai-page-html scripts/check_html.py L18 (avertissement), cas « l18-code-regle-nu.html »",
+   "voisines": []
+  },
+  {
+   "cle": "entete-ligne-sans-definition",
+   "famille": "page-html-socle",
+   "libelle": "Un en-tête de ligne n explique pas ce qu il nomme. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1970"
+   ],
+   "regle": "check_html.py L27 bis exige une définition aux en-têtes de ligne d un tableau de 3 lignes ou plus (forge-agents bea2a5e)",
+   "oracle": "forge-agents, digit-ai-page-html scripts/check_html.py L27 bis, cas « l27-entetes-de-ligne-muets.html »",
+   "voisines": []
+  },
+  {
+   "cle": "conteneur-a-etat-sans-volume",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un service à état lancé par la chaîne d un produit (conteneur local ou géré) garde ses données de travail dans sa couche éphémère : un redémarrage du moteur efface le travail en cours. Proposée par Produit-85 (2026-10-24).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1986"
+   ],
+   "regle": "oracle-ops O-20 refuse un conteneur à état sans volume sur le chemin de ses données ou sans commande de création écrite ; référentiel references/CONTENEURS-A-ETAT.json (forge-ops b8f4d19, 10052b7)",
+   "oracle": "forge-ops, oracles/oracle-ops.mjs --conteneurs-a-etat (O-20) et oracles/self-test.mjs, cas « O20 : docker run postgres sans -v ni --mount »",
+   "voisines": []
+  },
+  {
+   "cle": "hook-juge-le-sous-dossier",
+   "famille": "hook-ou-gate",
+   "libelle": "Un hook qui lit le répertoire courant de son entrée juge le sous-dossier où la session s est déplacée au lieu du projet, et rend un verdict sur la mauvaise cible.. Proposée par pilot, campagne du 21/10/2026 (2026-10-21).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1943"
+   ],
+   "regle": "les hooks flotte, lexique et restitution jugent la racine du projet (lib-racine-projet.mjs), pilot 121eb874",
+   "oracle": "pilot, oracles/lib-racine-projet.mjs et les recettes oracles/hook-flotte.test.mjs, oracles/hook-lexique.test.mjs, oracles/hook-restitution.test.mjs cas 62",
+   "voisines": []
+  },
+  {
+   "cle": "decision-ecrite-dans-le-vocabulaire-de-l-auteur",
+   "famille": "restitution-forme",
+   "libelle": "Une decision conforme au format B nomme son objet par le nom que lui donne l auteur, sans dire pourquoi il existe ni ce qu il fait ; l humain doit demander une reexplication pour trancher.. Proposée par Produit-64 (2026-10-20).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1979"
+   ],
+   "regle": "gabarits/RESTITUTION.md 2.54.0, S88 : le champ « De quoi s agit-il » d une décision ne s ouvre pas par un identifiant sans glose ni n aligne 4 identifiants en code (pilot 1cc31c9c)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S88 (avertissante), fixtures s88-champ-*",
+   "voisines": []
+  },
+  {
+   "cle": "constat-de-difference-sans-statut-de-fichier",
+   "famille": "restitution-forme",
+   "libelle": "Un ecart entre deux branches est decrit comme une absence alors qu aucune sortie lue ne distingue ajout, suppression et modification.. Proposée par Produit-64 (2026-10-26).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1984"
+   ],
+   "regle": "gabarits/RESTITUTION.md 2.54.0, S89 : des fichiers dits absents d une référence git citent git diff --name-status, --diff-filter ou un essai d existence (pilot 1cc31c9c)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S89 (avertissante), fixtures s89-*",
+   "voisines": []
+  },
+  {
+   "cle": "absence-conclue-d-une-reponse-vide",
+   "famille": "restitution-forme",
+   "libelle": "Une ressource est declaree supprimee sur la foi d une reponse reussie au corps vide, lue dans une seule portee.. Proposée par Produit-64 (2026-10-26).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1985"
+   ],
+   "regle": "S68 : une ressource déclarée absente sur un 200 au corps vide cite un 404, une liste d organisation ou l essai dans chaque projet (pilot 1cc31c9c)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs S68 étendue, fixtures tf1985-*",
+   "voisines": []
+  },
+  {
+   "cle": "ecriture-html-non-mesuree",
+   "famille": "hook-ou-gate",
+   "libelle": "Le plancher d écriture n est jugé que sur le Markdown ; le texte d une page HTML lui échappe. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1968"
+   ],
+   "regle": "oracle-ecriture juge le texte visible d une page .html ; hook-page-html le joue à l écriture (pilot 295e4c93)",
+   "oracle": "pilot, oracles/oracle-ecriture.mjs (texte d une page HTML, cas TF-1968 du self-test) joué par oracles/hook-page-html.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "retour-de-ledger-jamais-compile",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un retour consigné au ledger d un produit reste sans lot, et rien ne compte les retours en attente ni ne valide leur classe. Proposée par Produit-85 (2026-10-24).",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1988"
+   ],
+   "regle": "le hook d ouverture nomme les entrées retour d un ledger produit restées sans lot et les classes inconnues du référentiel (pilot a34fe29e)",
+   "oracle": "pilot, section « Retours du ledger restés sans lot » d oracles/hook-ouverture.mjs avec retoursSansLot d oracles/lib-retours-produit.mjs ; cas TF-1988 d oracles/hook-ouverture.test.mjs",
+   "voisines": []
   }
  ],
  "cliquet_porteur": {
