@@ -40,11 +40,13 @@ RUNS = FORGE.parent / "runs"
 # (TF-0801, TF-1454), les deux autres par
 # `ledger.mjs` (R-42, TF-1722). Absentes d'ici, le produit qui suivait la consigne de l'oracle voyait
 # son entrée refusée à l'écriture puis déclarée hors vocabulaire (retour RT-28, TF-2018, 29/10/2026).
+# `go_publication` est le feu vert R-38 que lit oracles/hook-publication-hebergee.mjs du pilot
+# (retour RP-5, TF-1990, 22/10/2026 : refusé ici, consigné de travers en reponse_humain).
 # La recette croise ce vocabulaire avec les types que les oracles du pilot prescrivent.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
          "run_close", "rectification_versions_forges", "rectification_run_open",
-         "rectification_horodatage", "rectification_forges_mobilisees"}
+         "rectification_horodatage", "rectification_forges_mobilisees", "go_publication"}
 
 
 def chemin(run: str = "") -> pathlib.Path:
@@ -212,6 +214,10 @@ if __name__ == "__main__":
         # rectification serait ignorée sans un mot (TF-2018).
         elif k == "seq_vise" and isinstance(v, str) and v.isdigit():
             champs[k] = int(v)
+        # Même défaut pour un booléen : `--r38 true` écrivait le texte "true", et le hook de
+        # publication du pilot, qui exige `r38 === true`, ignorait le feu vert (TF-1990).
+        elif v in ("true", "false"):
+            champs[k] = v == "true"
     afficher(ajouter(run, type_, **champs))
     # R-19 exige `versions_forges` au `run_open` ; l'entrée est écrite, l'oubli se dit tout de suite,
     # avec la voie par ajout, plutôt qu'au premier relevé de conformité (TF-2018).

@@ -314,6 +314,25 @@ try {
     att(r.status === 0 && entrees(d).length === 1, `exit ${r.status}`);
     att(/versions_forges/.test(r.stderr), `aucun rappel : ${r.stderr}`);
   });
+  // TF-1990 (RP-5, 22/10/2026) : le feu vert R-38 que lit oracles/hook-publication-hebergee.mjs
+  // ({type: "go_publication", r38: true, citation}) était refusé ; écrit en ligne de commande, r38
+  // serait sorti en texte et le hook, qui exige le booléen, l'aurait ignoré.
+  const HOOK_PUB = readFileSync(join(ICI, "..", "oracles", "hook-publication-hebergee.mjs"), "utf8");
+  check("TF-1990 vert — go_publication s'écrit avec r38 en booléen, la forme que le hook de publication du pilot lit", () => {
+    att(/type === "go_publication" && e\?\.r38 === true/.test(HOOK_PUB), "le hook ne lit plus cette forme : le cas est à revoir");
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "go_publication", "--r38", "true", "--citation", "D-12 (a) du 22/10"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `écriture refusée : ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "go_publication" && e.r38 === true && e.citation === "D-12 (a) du 22/10", `entrée écrite : ${JSON.stringify(e)}`);
+  });
+  check("TF-1990 rouge — sans le typage des booléens, r38 sort en texte et le hook l'ignorerait", () => {
+    const mutant = GABARIT.replace(/        elif v in \("true", "false"\):\n            champs\[k\] = v == "true"\n/, "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    spawnSync(PYTHON, [script, "go_publication", "--r38", "true", "--citation", "D-12 (a) du 22/10"], { encoding: "utf8", env: CONSOLE });
+    att(entrees(d).at(-1).r38 === "true", "le mutant écrit encore un booléen");
+  });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }
 
