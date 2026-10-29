@@ -21,6 +21,8 @@
  *      est nommée avant le 03/11/2026, refusée dès cette date ; la critique jouée lève le refus.
  *  16. Ligne « Livré : » du bloc 0 (TF-1973, TF-2016, S87) : un guide écrit sous output/ et non lié au bloc 0
  *      est dit par le juge du pilot atteint par le lanceur, parmi les avertissements non bloquants.
+ *  17. Fichiers `.env` (D-106 (b), 29/10/2026) : `cat .env` et `Read` d'un `.env.local` refusés par le lanceur avec la voie
+ *      permise du pilot ; `.env.example` et le script de masquage passent.
  * Joué par oracles/self-tests.mjs (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, readFileSync, existsSync } from "node:fs";
@@ -266,6 +268,19 @@ try {
   check("14 ter gestes distants : `--poser` par le lanceur (entrée standard ouverte) écrit le lot sous forge/, et la commande passe ensuite",
     poseG.fini && poseG.code === 0 && existsSync(join(P, "forge", "gestes-approuves.jsonl")) && gApres.status === 0, `${JSON.stringify(poseG)} ${gApres.stderr}`);
 
+  // 17 — D-106 (b) (29/10/2026), fichiers .env par le lanceur : `cat .env` et `Read` d'un `.env.local` refusés (exit 2),
+  // avec la voie permise du PILOT nommée ; le modèle `.env.example` et le script de masquage passent. Les chemins
+  // sont des noms fictifs : ni le hook ni cette recette n'ouvrent de fichier.
+  const fichierEnv = (tool_name, tool_input) => spawnSync(process.execPath, [lanceur, "fichiers-env"], { encoding: "utf8", cwd: P, env: envG,
+    input: JSON.stringify({ tool_name, cwd: P, tool_input }) });
+  const eCat = fichierEnv("Bash", { command: "cat .env" }), eRead = fichierEnv("Read", { file_path: join(P, ".env.local") });
+  const eModele = fichierEnv("Bash", { command: "cat .env.example" }), eMasque = fichierEnv("Bash", { command: "node scripts/env-masque.mjs .env --cles" });
+  check("17 fichiers .env : `cat .env` refusé par le lanceur, voie permise du pilot nommée (D-106 (b))",
+    eCat.status === 2 && /D-106 \(b\)/.test(eCat.stderr) && /env-masque\.mjs/.test(eCat.stderr), eCat.stdout + eCat.stderr);
+  check("17 bis fichiers .env : `Read` d'un `.env.local` refusé par le lanceur", eRead.status === 2 && /D-106 \(b\)/.test(eRead.stderr), eRead.stdout + eRead.stderr);
+  check("17 ter fichiers .env : le modèle `.env.example` et le script de masquage passent",
+    eModele.status === 0 && eMasque.status === 0, `${eModele.stderr} ${eMasque.stderr}`);
+
   // 15 — TF-1913 (26/10/2026, D-82 (a)), la critique d'implémentation exigée par le lanceur : le juge est celui du pilot, il agit chez le produit
   // sans recopie. Le produit jetable vit sous le dossier temporaire, où tout fichier est un brouillon : la page écrite porte donc le chemin d'un
   // produit fictif. ROUGE : un tour qui écrit `site/x.html` sans critique → CRITIQUE nommée avec son échéance avant le 03/11, refusée à l'échéance.
@@ -309,4 +324,4 @@ try {
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b))`);

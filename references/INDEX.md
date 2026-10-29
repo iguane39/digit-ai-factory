@@ -22,6 +22,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\EMPREINTES.md` | Empreintes : un seul format, et un registre qui le fait tenir |
 | `references\ETAPES-RUN.md` | Étapes d'un run produit, détail opérationnel |
 | `references\GARDE-FOUS-PLATEFORME.json` | Donnée datée et sourcée des garde-fous de plateforme relevés chez les produits, par client sous pseudonyme ; lue avant de concevoir un déploiement (`ETAPE-MEP.md` § 1 ter, porte M-11) et jugée par `scripts\verifier-garde-fous.mjs` |
+| `references\FICHIERS-ENV.md` | Fichiers `.env` jamais lus ni affichés dans une session (D-106 (b) du 29/10/2026) : ce que le hook refuse (Read, Grep, commandes d'affichage), les modèles et faux positifs admis, la voie permise (`scripts\env-masque.mjs`, valeurs masquées ou clés seules), limites déclarées ; joué par `oracles\hook-fichiers-env.mjs` |
 | `references\GESTES-DISTANTS.md` | Gestes destructifs distants (suppression, droits, histoire distante réécrite) : une décision groupée par tour, jamais une par commande (D-77 (b) amendée du 26/10/2026, TF-1959) ; liste fermée, format du lot approuvé, limites ; jouée par `oracles\hook-gestes-distants.mjs` |
 | `references\INTEGRATIONS-FOURNISSEURS.md` | Faits mesurés sur les interfaces de fournisseurs |
 | `references\INTENTION.md` | ISTO, la cascade de l'intention : Intention → Stratégie → Tactique → Opération, et sa déclinaison par phase du développement |
