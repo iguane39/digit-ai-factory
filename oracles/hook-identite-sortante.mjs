@@ -19,6 +19,10 @@
  *     suggèrent se décide par l'humain, il ne se prend pas.
  * Une requête vers la machine locale (`localhost`, `127.0.0.1`, `::1`) n'est pas jugée.
  *
+ * SEULE LA REQUÊTE EST JUGÉE (TF-1978, 20/10/2026). Une commande composée se coupe hors guillemets ;
+ * seuls les segments qui émettent la requête sont lus. Un hôte propre de l'utilisateur (son
+ * organisation, où ses commits portent son adresse par règle) se déclare par `FORGE_HOTES_PROPRES`.
+ *
  * LA DEMANDE EXPLICITE, deux voies :
  *   · l'adresse figure dans un message HUMAIN de la session (transcript lu par `transcript_path`) :
  *     l'utilisateur l'a donnée lui-même dans la conversation ;
@@ -61,7 +65,36 @@ export function identites(env = process.env, cwd = process.cwd()) {
   return [...out].filter((a) => !NEUTRES.test(a));
 }
 
-/** Le texte de la requête que l'outil va émettre, ou null s'il n'émet pas de requête vers un tiers. */
+/**
+ * Les segments d'une commande, coupés sur `&&`, `||`, `;`, `|` et les fins de ligne HORS guillemets
+ * (TF-1978). Un séparateur dans un corps entre guillemets ne coupe rien : sinon une adresse placée
+ * après un « ; » du corps d'un curl sortirait du segment jugé.
+ */
+export function segments(commande) {
+  const out = [];
+  let cur = "", q = null;
+  const s = String(commande);
+  for (let k = 0; k < s.length; k++) {
+    const ch = s[k];
+    if (q) { cur += ch; if (ch === q && s[k - 1] !== "\\") q = null; continue; }
+    if (ch === '"' || ch === "'") { q = ch; cur += ch; continue; }
+    if (ch === ";" || ch === "\n" || ch === "|" || (ch === "&" && s[k + 1] === "&")) {
+      out.push(cur); cur = "";
+      if ((ch === "|" && s[k + 1] === "|") || ch === "&") k++;
+      continue;
+    }
+    cur += ch;
+  }
+  out.push(cur);
+  return out.map((x) => x.trim()).filter(Boolean);
+}
+
+/**
+ * Le texte de la requête que l'outil va émettre, ou null s'il n'émet pas de requête vers un tiers.
+ * Pour une commande, SEULS les segments qui émettent la requête sont rendus (TF-1978, 20/10/2026) :
+ * `git -c user.email=<adresse> commit … && curl https://dev.azure.com/…` était refusé pour l'adresse
+ * d'un commit local, que la requête ne portait pas.
+ */
 export function requeteSortante(entree) {
   const outil = String(entree?.tool_name || "");
   const i = entree?.tool_input || {};
@@ -70,10 +103,23 @@ export function requeteSortante(entree) {
     return URL_DISTANTE.test(u) ? u : null;
   }
   if (outil === "Bash" || outil === "PowerShell") {
-    const c = String(i.command || "");
-    return CLIENT_HTTP.test(c) && URL_DISTANTE.test(c) ? c : null;
+    const emetteurs = segments(String(i.command || "")).filter((x) => CLIENT_HTTP.test(x) && URL_DISTANTE.test(x));
+    return emetteurs.length ? emetteurs.join("\n") : null;
   }
   return null;
+}
+
+/**
+ * Les hôtes PROPRES de l'utilisateur, déclarés par l'humain avant la session (TF-1978) :
+ * `FORGE_HOTES_PROPRES`, préfixes séparés par des virgules (`dev.azure.com/mon-org`). Une requête dont
+ * TOUTES les adresses distantes commencent par l'un d'eux peut porter son adresse : ses commits y
+ * portent cette adresse par règle. L'agent ne peut pas poser la variable par un outil.
+ */
+export function versHotesPropres(req, env = process.env) {
+  const propres = String(env.FORGE_HOTES_PROPRES || "").split(/[,\s]+/).map((h) => h.replace(/^https?:\/\//i, "").toLowerCase()).filter(Boolean);
+  if (!propres.length) return false;
+  const urls = String(req).match(new RegExp(URL_DISTANTE.source, "gi")) || [];
+  return urls.length > 0 && urls.every((u) => propres.some((h) => u.replace(/^https?:\/\//i, "").toLowerCase().startsWith(h)));
 }
 
 /** Les messages humains de la session, lus au transcript. */
@@ -104,6 +150,7 @@ export function juger(entree, env = process.env) {
   const fautes = [...new Set([...portees, ...enEntete.map((a) => a.toLowerCase())])];
   if (!fautes.length) return { decision: "laisse", motif: "aucune donnée d'identité dans la requête" };
   if (String(env.FORGE_IDENTITE_GO || "").trim()) return { decision: "laisse", motif: `demande consignée : ${env.FORGE_IDENTITE_GO}` };
+  if (versHotesPropres(req, env)) return { decision: "laisse", motif: "requête vers un hôte propre de l'utilisateur, déclaré par FORGE_HOTES_PROPRES" };
   const humain = messagesHumains(entree?.transcript_path);
   if (fautes.every((a) => humain.includes(a))) return { decision: "laisse", motif: "adresse donnée par l'utilisateur dans la conversation" };
   const masque = (a) => a.replace(/^(.{2})[^@]*(@.*)$/, "$1…$2");

@@ -76,6 +76,28 @@ check("vert — un outil qui n'émet pas de requête (Read) n'est pas jugé ; un
   if (r.status !== 0) throw new Error(`entrée illisible : exit ${r.status}`);
 });
 
+// TF-1978 (20/10/2026) : seule la requête est jugée, pas le reste de la commande.
+const AZURE = "https://dev.azure.com/organisation-fictive/projet/_apis/git/repositories?api-version=7.1";
+check("TF-1978 vert — la forme du 20/10 : un commit local à l'adresse de l'utilisateur, chaîné avant un curl sans adresse, passe", () => {
+  const r = jouer(bash(`git -c user.email=${MOI} commit -q -m "essai" && curl -s -H "Authorization: Bearer $JETON" "${AZURE}"`));
+  if (r.code !== 0) throw new Error(`exit ${r.code} — ${r.out}`);
+});
+check("TF-1978 rouge — l'adresse dans le segment qui émet reste refusée, même chaînée après un autre segment", () => {
+  const r = jouer(bash(`cd /tmp ; curl -s -H "User-Agent: outil (${MOI})" "${API}"`));
+  if (r.code !== 2) throw new Error(`exit ${r.code} — ${r.out}`);
+});
+check("TF-1978 rouge — un « ; » DANS un corps entre guillemets ne coupe pas la requête : l'adresse qui le suit est vue", () => {
+  const r = jouer(bash(`curl -s -X POST "${API}" -d "nom=essai; contact=${MOI}"`));
+  if (r.code !== 2) throw new Error(`exit ${r.code} — ${r.out}`);
+});
+check("TF-1978 vert — un hôte propre déclaré par FORGE_HOTES_PROPRES peut porter l'adresse ; un autre hôte, non", () => {
+  const env = { ...ENV, FORGE_HOTES_PROPRES: "dev.azure.com/organisation-fictive" };
+  const propre = jouer(bash(`curl -s -d "auteur=${MOI}" "${AZURE}"`), env);
+  if (propre.code !== 0) throw new Error(`hôte propre : exit ${propre.code} — ${propre.out}`);
+  const tiers = jouer(bash(`curl -s -d "auteur=${MOI}" "${API}"`), env);
+  if (tiers.code !== 2) throw new Error(`hôte tiers : exit ${tiers.code} — ${tiers.out}`);
+});
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\nhook-identite-sortante (R-62, TF-1716) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
