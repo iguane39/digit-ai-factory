@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.47.0",
+ "version": "1.48.0",
  "date": "2026-10-29",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2346,6 +2346,20 @@
    "voisines": [
     "declaration-de-run-sans-rectification",
     "outil-qui-ecrit-sur-son-option-d-aide"
+   ]
+  },
+  {
+   "cle": "dollar-rendu-mathematique",
+   "famille": "hook-ou-gate",
+   "libelle": "Deux signes dollar non échappés sur une ligne de Markdown sont rendus en formule mathématique par l aperçu : le montant s affiche en italique et le texte entre les deux disparaît de la lecture. Mesuré chez Produit-84 le 20/10/2026 : 14 lignes d une étude de coûts.",
+   "creee_le": "2026-10-29",
+   "fondee_par": [
+    "TF-1977"
+   ],
+   "regle": "oracles/oracle-ecriture.mjs EC-16 : une ligne à deux « $ » non échappés hors code avertit, remède devise en lettres ou signe échappé (correction du 29/10/2026, TF-1977)",
+   "oracle": "pilot, oracles/oracle-ecriture.mjs EC-16 et son self-test (3 cas : rouge, remède, code non compté)",
+   "voisines": [
+    "restitution-rendu-visuel-non-critique"
    ]
   }
  ],
