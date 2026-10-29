@@ -698,6 +698,10 @@
   "cas": 10,
   "vu_le": "2026-10-13"
  },
+ "scripts/synchroniser.test.mjs": {
+  "cas": 19,
+  "vu_le": "2026-10-29"
+ },
  "scripts/verifier-avance-publication.test.mjs": {
   "cas": 10,
   "vu_le": "2026-10-02"
