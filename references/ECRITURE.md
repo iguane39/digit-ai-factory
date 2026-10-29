@@ -41,7 +41,7 @@ dit qui rend le verdict aujourd'hui, et « revue » signifie qu'aucun script ne 
 | Type | Textes | Lecteur | Porteur | Juge |
 |---|---|---|---|---|
 | T1 | prompts, skills, agents, `CLAUDE.md` | le modèle, puis l'humain qui relit | forge-agents, pilot | `oracle-claude-md` (N1-N4) ; style : `oracle-ecriture` |
-| T2 | livrables documentaires (Markdown, HTML, PowerPoint) | le destinataire nommé du livrable | forge-design (socle `digit-ai-page-html`), pilot | M7-M18, L1-L31 ; style : `oracle-ecriture` (Markdown), revue (HTML, PowerPoint) |
+| T2 | livrables documentaires (Markdown, HTML, PowerPoint) | le destinataire nommé du livrable | forge-design (socle `digit-ai-page-html`), pilot | M7-M18, L1-L31 ; style : `oracle-ecriture` (Markdown, et texte visible d'une page HTML depuis le 29/10/2026), revue (PowerPoint) |
 | T3 | restitutions et messages de fin de tour | l'humain qui décide | pilot | S1-S41 ; style : `oracle-ecriture` |
 | T4 | textes d'application : libellés, erreurs, états vides, aide, courriels transactionnels | l'utilisateur du produit | forge-design (`voix.md`), forge-development | C15 ; style : revue (lot de travaux forge-design) |
 | T5 | messages de commit, entrées de ledger | le relecteur d'histoire | pilot, forges | revue |

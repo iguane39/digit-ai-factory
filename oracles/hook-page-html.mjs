@@ -33,9 +33,11 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { cheminSkillsInstalles } from "../scripts/lib-config-installee.mjs";
-import { jouerFamille, jouerFiche } from "./hook-ecriture.mjs";
+import { jouerFamille, jouerFiche, jouer as jouerEcriture } from "./hook-ecriture.mjs";
 
 const SKILLS = cheminSkillsInstalles();
+// Les chemins que le hook d'écriture écarte aussi (copies, dépendances, historique) : une page y est un artefact, pas un texte écrit.
+const ECRITURE_IGNORES = [/(^|[\\/])node_modules[\\/]/i, /(^|[\\/])\.git[\\/]/i, /(^|[\\/])old[\\/]/i];
 const ORACLE_FILTRES = join(SKILLS, "quality-oracles", "scripts", "oracle-filtres-tableau.mjs");
 // TF-1098 (14/09/2026) — la LECTURE PAR UN TIERS et la CONCEPTION DU LIVRABLE se jouent d'office.
 // Mesure du 14/09 (todo\RECIDIVES.md) : la classe lecture-tiers-non-jugee récidive 7 fois sur 7,
@@ -160,9 +162,30 @@ process.exit(fail ? 1 : 0);
   const pageSynth = join(projetD8, "output", "Digit-AI - Synthese Mandat - Campagne close - 20261021a.html");
   writeFileSync(pageSynth, "<p>x</p>", "utf8");
   if (/\[fiche\]/.test(lancerProjet(pageSynth))) casse.push("une page d'une famille qui n'engage pas D8 est signalée : la donnée du catalogue décide (TF-1907)");
+  // TF-1968 (29/10/2026) : le plancher d'écriture se joue sur le TEXTE d'une page, à son écriture. Avant, une page de
+  // 807 phrases dont 15 de plus de 35 mots n'avait aucun juge, le hook d'écriture écartant tout fichier qui n'est pas un
+  // `.md`. Trois sens, jugés par le hook LANCÉ pour de bon : ROUGE sept phrases de 40 mots d'affilée (style FAIL, EC-2) ;
+  // VERT les mêmes mots en phrases de 10 mots (style PASS) ; SILENCE sous `old\` (l'historique n'est pas réécrit).
+  // Des mots tous différents, en lettres seules : trois phrases qui ouvrent sur le même mot avertiraient (EC-5) et brouilleraient le vert.
+  const motDe = (i) => "t" + i.toString(26).replace(/[0-9a-p]/g, (c) => "abcdefghijklmnopqrstuvwxyz"[parseInt(c, 26)]);
+  const motsDe = (n, depart) => Array.from({ length: n }, (_, i) => motDe(depart + i)).join(" ") + ".";
+  const pageDeTexte = (paragraphes) => `<!doctype html><html lang="fr"><head><title>Rapport</title></head><body><h1>Rapport</h1>${paragraphes}</body></html>`;
+  const pageLongue = join(dir, "page-phrases-longues.html");
+  writeFileSync(pageLongue, pageDeTexte(Array.from({ length: 7 }, (_, k) => `<p>${motsDe(40, k * 40)}</p>`).join("\n")), "utf8");
+  const pageCourte = join(dir, "page-phrases-courtes.html");
+  writeFileSync(pageCourte, pageDeTexte(`<p>${Array.from({ length: 28 }, (_, k) => motsDe(10, k * 10)).join(" ")}</p>`), "utf8");
+  mkdirSync(join(dir, "old"), { recursive: true });
+  const pageAncienne = join(dir, "old", "page-phrases-longues.html");
+  writeFileSync(pageAncienne, readFileSync(pageLongue, "utf8"), "utf8");
+  if (!/\[ecriture\][^\n]*style FAIL/.test(lancerHook(pageLongue)) || !/\[ecriture\][^\n]*EC-2/.test(lancerHook(pageLongue)))
+    casse.push("TF-1968 : sept phrases de 40 mots d'affilée dans une PAGE ne sont pas signalées à son écriture (style FAIL, EC-2)");
+  if (!/\[ecriture\][^\n]*style PASS/.test(lancerHook(pageCourte)))
+    casse.push("TF-1968 : les MÊMES mots coupés en phrases de 10 mots ne sont pas déclarés style PASS — le remède échoue");
+  if (/\[ecriture\]/.test(lancerHook(pageAncienne)))
+    casse.push("TF-1968 : une page sous old\\ est jugée — l'historique ne se réécrit pas");
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length ? `Self-test hook-page-html : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-page-html : 14 cas d'avant + D8 (TF-1907, page sans fiche signalée, exemption motivée en meta silencieuse, famille sans D8 silencieuse) PASS — les 14 d'avant : (cas rouge : page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés ; G8 dans ses TROIS sens sur une page lancée pour de bon — pas de famille demandée hors `output\\`, famille résolue sur une « Synthese … », type absent du catalogue NOMMÉ à l'écriture, TF-1874)");
+    : "Self-test hook-page-html : 17/17 PASS — 14 cas d'avant + D8 (TF-1907, page sans fiche signalée, exemption motivée en meta silencieuse, famille sans D8 silencieuse) PASS — les 14 d'avant : (cas rouge : page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés ; G8 dans ses TROIS sens sur une page lancée pour de bon — pas de famille demandée hors `output\\`, famille résolue sur une « Synthese … », type absent du catalogue NOMMÉ à l'écriture, TF-1874)");
   return casse.length ? 1 : 0;
 }
 
@@ -176,7 +199,10 @@ if (lanceEnDirect) {
   else { let stdin = ""; try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin */ } page = fichierVise(stdin); }
   if (!page) process.exit(0);
   // TF-1874 : la famille du livrable (G8), jouée comme `hook-ecriture.mjs` la joue pour un `.md`.
+  // TF-1968 : le plancher d'écriture se joue aussi sur le TEXTE d'une page (`oracle-ecriture` lit un `.html` par son texte
+  // visible) ; il n'était joué que sur les `.md`, et une page de 807 phrases dont 15 de plus de 35 mots n'avait aucun juge.
   const lignes = [...jouer(resolve(page)), ...ORACLES_DOCUMENTAIRES.flatMap((o) => jouerAvertissement(resolve(page), o)),
+    ...(ECRITURE_IGNORES.some((re) => re.test(page)) ? [] : jouerEcriture(resolve(page))),
     ...jouerFamille(resolve(page)), ...jouerFiche(resolve(page))];
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);

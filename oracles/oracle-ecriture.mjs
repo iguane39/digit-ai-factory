@@ -136,6 +136,70 @@ export function prose(texte) {
   return decouper(texte).proseLignes.join("\n");
 }
 
+// ── LE TEXTE D'UNE PAGE HTML (TF-1968, 29/10/2026) ───────────────────────────────────────────
+//
+// LE FAIT (lot Produit-84 20261019e, RT-17). Le plancher d'écriture n'était joué que sur les `.md` : le hook
+// d'écriture écarte tout autre fichier, et ECRITURE.md notait « revue (HTML, PowerPoint) ». Une page de 807 phrases,
+// dont 15 de plus de 35 mots et 45 de plus de 25, n'a été jugée que parce que l'agent en a extrait le texte à la main.
+// `texteDeHtml` fait cette extraction : le texte VISIBLE de la page en Markdown, que l'oracle juge comme n'importe quel
+// texte. Les titres deviennent des titres, les éléments de liste des puces, les lignes de tableau des lignes à barres, les
+// blocs des paragraphes ; les scripts, styles, SVG, blocs et spans de code disparaissent, comme le code d'un Markdown.
+// `lignes[i]` donne la ligne de la page d'où vient la ligne i du texte : un verdict dit « ligne 214 » de la PAGE.
+const ENTITES_HTML = { amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", nbsp: " ", laquo: "«", raquo: "»", hellip: "…",
+  mdash: "—", ndash: "–", rsquo: "’", lsquo: "‘", eacute: "é", egrave: "è", ecirc: "ê", agrave: "à", ccedil: "ç", euro: "€" };
+const decoderEntites = (s) => String(s)
+  .replace(/&#x([0-9a-f]{1,6});/gi, (m, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch { return " "; } })
+  .replace(/&#(\d{1,7});/g, (m, d) => { try { return String.fromCodePoint(Number(d)); } catch { return " "; } })
+  .replace(/&([a-z]+);/gi, (m, n) => ENTITES_HTML[n.toLowerCase()] ?? m);
+const BALISES_DE_BLOC = new Set(["p", "div", "section", "article", "header", "footer", "main", "aside", "nav", "blockquote",
+  "figure", "figcaption", "table", "thead", "tbody", "tfoot", "ul", "ol", "dl", "dt", "dd", "details", "summary", "form",
+  "fieldset", "hr", "address", "caption"]);
+
+/** Le texte visible d'une page HTML, en Markdown : `{ texte, lignes }` (`lignes[i]` : ligne de la page, 1-based). */
+export function texteDeHtml(html) {
+  const source = String(html).replace(/\r\n?/g, "\n");
+  const sorties = [];                                   // { t, l }
+  const nouvelleLigne = (l, t = "") => { sorties.push({ t, l }); };
+  // Un saut de bloc laisse une ligne VIDE entre deux blocs : c'est elle qui sépare deux paragraphes dans un Markdown.
+  const saut = (l) => {
+    let vides = 0;
+    for (let k = sorties.length - 1; k >= 0 && vides < 2 && sorties[k].t.trim() === ""; k--) vides++;
+    for (; vides < 2; vides++) nouvelleLigne(l);
+  };
+  const ajouter = (txt, l) => {
+    if (!sorties.length) nouvelleLigne(l);
+    const derniere = sorties[sorties.length - 1];
+    // Une ligne ouverte par un saut de bloc prend la ligne de la page de son PREMIER texte, pas celle de la balise qui l'a ouverte.
+    if (derniere.t.trim() === "" && txt.trim() !== "") derniere.l = l;
+    derniere.t += txt;
+  };
+  const re = /<!--[\s\S]*?-->|<![^>]*>|<\?[^>]*>|<(script|style|head|svg|noscript|template|pre|code|math|object|iframe)\b[^>]*>[\s\S]*?<\/\1\s*>|<(\/?)([a-zA-Z][\w:-]*)\b[^>]*>|[^<]+|</g;
+  let ligne = 1;
+  let m;
+  while ((m = re.exec(source))) {
+    const l = ligne;
+    ligne += (m[0].match(/\n/g) || []).length;
+    if (m[0].startsWith("<!") || m[0].startsWith("<?") || m[1]) { ajouter(" ", l); continue; }  // commentaire, doctype, code, script, style : une espace
+    if (m[3]) {
+      const nom = m[3].toLowerCase(), ferme = m[2] === "/";
+      if (/^h[1-6]$/.test(nom)) { saut(l); if (!ferme) ajouter("#".repeat(Number(nom[1])) + " ", l); else saut(l); }
+      else if (nom === "li") { nouvelleLigne(l, ferme ? "" : "- "); }
+      else if (nom === "tr") { nouvelleLigne(l, ferme ? "" : "| "); }
+      else if (nom === "td" || nom === "th") { if (ferme) ajouter(" | ", l); }
+      else if (nom === "br") { ajouter(" ", l); }
+      else if (BALISES_DE_BLOC.has(nom)) { saut(l); }
+      else { ajouter(" ", l); }                          // balise en ligne : le texte voisin se rejoint par une espace
+      continue;
+    }
+    if (m[0] === "<") { ajouter("<", l); continue; }
+    const txt = decoderEntites(m[0]).replace(/\s+/g, " ");
+    if (txt.trim()) ajouter(txt, l);
+    else ajouter(" ", l);
+  }
+  const net = sorties.map((s) => ({ t: s.t.replace(/[ \t]+/g, " ").trim(), l: s.l }));
+  return { texte: net.map((s) => s.t).join("\n") + "\n", lignes: net.map((s) => s.l) };
+}
+
 /** Rend une fonction offset → numéro de ligne (1-based, aligné sur le fichier d'origine). */
 function localisateur(texteProse) {
   const debuts = [0];
@@ -503,6 +567,8 @@ export function juger(texte, options = {}) {
     } else {
       pousser("EC-2", "PASS", `${longues.length} phrase(s) de plus de 35 mots sur ${ph.length}`);
     }
+    // Les deux comptes du verdict, lisibles par une machine (TF-1968) : un seuil se recalibre sur des nombres, pas sur un message.
+    Object.assign(findings[findings.length - 1], { phrases_longues: longues.length, phrases: ph.length });
   }
 
   // EC-3 — PROFONDEUR DE PUCES (S7 des restitutions, étendu à tout Markdown). Un troisième niveau
@@ -652,8 +718,20 @@ export function juger(texte, options = {}) {
     // 7 d'un prompt, a été refusé ici, puis contourné en le numérotant.
     const tete8 = enTete(texte);
     const imposes = tete8.titres_imposes_par ? String(tete8.titres_imposes || "").split(" | ").map((x) => x.trim()).filter(Boolean) : [];
-    const impose = (t) => imposes.includes(t.replace(/^\s*\d+[.)]\s*/, "").trim());
+    // TF-2020 (29/10/2026) : la numérotation d'un titre (« 7. », « 7) », « 2.1 », « 3 · », « 4 — ») se retire AVANT de
+    // chercher la tournure. Le motif de position s'ancre en début de titre : « ## 7. Ce que … » lui échappait, et c'est
+    // ainsi qu'un titre refusé a été contourné le 20/10/2026. Les exemptions et les titres imposés retiraient déjà ce
+    // numéro (TF-1901) ; la recherche, elle, ne le retirait pas.
+    const sansNumero = (t) => String(t).replace(/^\s*\d+(?:\.\d+)*(?:\s*[.)·:—–-]\s*|\s+)/u, "").trim();
+    const impose = (t) => imposes.includes(sansNumero(t));
+    // Antériorité des titres NUMÉROTÉS (TF-2020) : les documents qui portaient déjà un titre numéroté refusé à la date
+    // déclarée ne se réécrivent pas (R-4, R-5) ; ils sont nommés dans la donnée, comptés, et dits au verdict. Un chemin
+    // absent de la liste, ou un titre non numéroté, reste refusé.
+    const anterieurNum = new Set((donnee?.anteriorite_titres_numerotes?.chemins || []).map((c) => c.replace(/\\/g, "/")));
+    const cheminDuTexte = (options.cheminRelatif || "").replace(/\\/g, "/");
+    const dateAnteriorite = donnee?.anteriorite_titres_numerotes?.avant || null;
     const admisImposes = new Set();
+    const admisAnterieurs = new Set();
     if (!bloquantes.length) {
       pousser("EC-8", "SKIP", "aucune famille ne déclare de position bloquante dans la donnée");
     } else {
@@ -664,7 +742,7 @@ export function juger(texte, options = {}) {
         // Sans borne, le comportement d'avant : le libellé contenu dans le texte, à toute position.
         const exempte = (texte, position) => (famille.exemptions || []).some((e) => {
           if (e.position && e.position !== position) return false;
-          if (e.exact) return texte.replace(/^\s*\d+[.)]\s*/, "").trim() === e.literal;
+          if (e.exact) return sansNumero(texte) === e.literal;
           return texte.includes(e.literal);
         });
         // LE MOTIF DE POSITION EST PLUS LARGE QUE CELUI DE DENSITÉ, et la mesure du 16/09 dit
@@ -694,9 +772,13 @@ export function juger(texte, options = {}) {
           // Un TITRE Markdown : le dièse, puis son texte.
           const titre = /^\s*#{1,6}\s+(.*\S)\s*$/.exec(brut);
           if (titre && famille.positions_bloquantes.includes("titre")) {
-            const trouve = cherche(titre[1]);
+            const nu = sansNumero(titre[1]);
+            const trouve = cherche(nu);
             if (trouve && impose(titre[1])) { admisImposes.add(i); continue; }
-            if (trouve && !exempte(titre[1], "titre")) constats.push({ ligne: i + 1, position: "titre", texte: titre[1].slice(0, 80), trouve });
+            if (trouve && !exempte(titre[1], "titre")) {
+              if (nu !== titre[1].trim() && cheminDuTexte && anterieurNum.has(cheminDuTexte)) { admisAnterieurs.add(i); continue; }
+              constats.push({ ligne: i + 1, position: "titre", texte: titre[1].slice(0, 80), trouve });
+            }
             continue;
           }
           // UN EN-TÊTE DE COLONNE : une ligne de tableau dont la SUIVANTE est le séparateur. C'est
@@ -723,7 +805,8 @@ export function juger(texte, options = {}) {
       else
         pousser("EC-8", "PASS",
           `aucune tournure d'annonce en titre ni en en-tête de colonne (${bloquantes.length} famille(s) à position bloquante)`
-          + (admisImposes.size ? ` ; ${admisImposes.size} titre(s) imposé(s) par « ${tete8.titres_imposes_par} » admis` : ""));
+          + (admisImposes.size ? ` ; ${admisImposes.size} titre(s) imposé(s) par « ${tete8.titres_imposes_par} » admis` : "")
+          + (admisAnterieurs.size ? ` ; ${admisAnterieurs.size} titre(s) numéroté(s) antérieur(s) au ${dateAnteriorite || "jour déclaré"} admis (antériorité déclarée, TF-2020) : à renommer à la prochaine réécriture de fond` : ""));
     }
   }
 
@@ -1494,6 +1577,62 @@ function selfTest() {
       casse.push(`TF-1901 : le gabarit gabarits\\${nomDemande} est refusé par EC-8 chez le produit qui l'instancie : ${JSON.stringify(f8dem)}`);
   }
 
+  // TF-2020 (29/10/2026) — UN TITRE NUMÉROTÉ N'ÉCHAPPE PLUS À EC-8. Le motif de position s'ancre en début de titre ;
+  // « ## 7. Ce que … » lui échappait, et c'est ainsi qu'un titre refusé a été contourné le 20/10/2026. ROUGES : la
+  // numérotation en « 7. », « 7) », « 2.1 » et « 3 · ». VERT : le même titre qui nomme son contenu, numéroté. ANTÉRIORITÉ
+  // (donnée `anteriorite_titres_numerotes`) : un fichier nommé dans la donnée est admis et le dit ; le même texte sous un
+  // chemin absent de la liste reste refusé ; et la liste ne couvre jamais un titre NON numéroté.
+  const TEXTE_2020 = "Un paragraphe de prose ordinaire qui pose le sujet du guide avant ses rubriques.\n\n";
+  const ec8Num = (titre, chemin) => (jouer("tf2020.md", `# Guide\n\n${TEXTE_2020}## ${titre}\n\n- un point\n`, chemin ? ["--chemin-relatif", chemin] : []).j?.findings || []).find((f) => f.regle === "EC-8");
+  const CHEMIN_ANTERIEUR = "references/PLATEFORME-LINKEDIN.md";
+  const formes2020 = ["7. Ce que le guide couvre", "7) Ce qu'il ne tient pas", "2.1 Ce que le guide apprend", "3 · Ce que le client en dit"];
+  const statuts2020 = formes2020.map((t) => ec8Num(t)?.statut);
+  if (statuts2020.some((s) => s !== "FAIL"))
+    casse.push(`TF-2020 : un titre numéroté (« 7. », « 7) », « 2.1 », « 3 · ») échappe encore à EC-8 — statuts ${JSON.stringify(statuts2020)} pour ${JSON.stringify(formes2020)} ; c'est ainsi qu'un titre refusé a été contourné le 20/10/2026`);
+  const f2020vert = ec8Num("7. Périmètre du guide");
+  if (f2020vert?.statut !== "PASS")
+    casse.push(`TF-2020 : un titre numéroté qui NOMME son contenu est refusé : ${JSON.stringify(f2020vert)}`);
+  const f2020ant = ec8Num("7. Ce que le guide couvre", CHEMIN_ANTERIEUR);
+  if (f2020ant?.statut !== "PASS" || !/1 titre\(s\) numéroté\(s\) antérieur\(s\) au 2026-10-29 admis/.test(f2020ant?.message || ""))
+    casse.push(`TF-2020 : un titre numéroté d'un fichier nommé par l'antériorité n'est pas admis en le DISANT : ${JSON.stringify(f2020ant)}`);
+  const f2020neuf = ec8Num("7. Ce que le guide couvre", "output/04-plans/Digit-AI - Note - Guide neuf - 20261030a.md");
+  if (f2020neuf?.statut !== "FAIL")
+    casse.push(`TF-2020 : le même titre numéroté dans un document ABSENT de la liste est admis — l'antériorité devient un laissez-passer : ${JSON.stringify(f2020neuf)}`);
+  const f2020nu = ec8Num("Ce que le guide couvre", CHEMIN_ANTERIEUR);
+  if (f2020nu?.statut !== "FAIL")
+    casse.push(`TF-2020 : un titre NON numéroté est admis sous un chemin de la liste — l'antériorité ne couvre que la numérotation : ${JSON.stringify(f2020nu)}`);
+
+  // TF-1968 (29/10/2026) — LE TEXTE D'UNE PAGE HTML EST JUGÉ COMME UN MARKDOWN. Le 19/10, une page de 807 phrases dont
+  // 15 de plus de 35 mots n'avait aucun juge : le hook d'écriture écartait tout autre fichier qu'un `.md`. ROUGE : sept
+  // phrases de 40 mots d'affilée dans des `<p>` (EC-2 FAIL, avec la ligne de la PAGE) et un titre « Ce que … » en `<h2>`
+  // (EC-8 FAIL, avec la ligne de la PAGE). VERTS : les mêmes mots coupés en phrases de 10 mots ; les mêmes phrases longues
+  // dans un `<script>`, un `<style>` ou un `<pre>`, qui ne sont pas du texte lu.
+  const motDe = (i) => "t" + i.toString(26).replace(/[0-9a-p]/g, (c) => "abcdefghijklmnopqrstuvwxyz"[parseInt(c, 26)]);
+  const phraseDe = (n, depart) => Array.from({ length: n }, (_, i) => motDe(depart + i)).join(" ") + ".";
+  const longues1968 = Array.from({ length: 7 }, (_, k) => phraseDe(40, k * 40));
+  const courtes1968 = Array.from({ length: 28 }, (_, k) => phraseDe(10, k * 10));
+  const page1968 = (corps) => `<!doctype html>\n<html lang="fr">\n<head><meta charset="utf-8"><title>Rapport</title>\n<style>p { color: red; }</style></head>\n<body>\n<h1>Rapport</h1>\n${corps}\n</body></html>\n`;
+  const htmlRouge = page1968(longues1968.map((p) => `<p>${p}</p>`).join("\n"));
+  const ligneDeLaPage = (html, extrait) => html.slice(0, html.indexOf(extrait)).split("\n").length;
+  const h1 = jouer("tf1968-rouge.html", htmlRouge);
+  const e2 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-2");
+  const ligneAttendue = ligneDeLaPage(htmlRouge, "<p>ta ");
+  if (h1.statut !== 1 || e2(h1)?.statut !== "FAIL" || e2(h1)?.ligne !== ligneAttendue)
+    casse.push(`TF-1968 : sept phrases de 40 mots d'affilée dans une page HTML ne sont pas refusées par EC-2, ou pas à la ligne de la PAGE (attendu FAIL ligne ${ligneAttendue}) : exit ${h1.statut}, ${JSON.stringify(e2(h1))}`);
+  const h2 = jouer("tf1968-vert.html", page1968(`<p>${courtes1968.join(" ")}</p>`));
+  if (h2.statut !== 0 || e2(h2)?.statut !== "PASS")
+    casse.push(`TF-1968 : les MÊMES mots coupés en phrases de 10 mots sont refusés — le remède échoue : ${JSON.stringify(e2(h2))}`);
+  const h3 = jouer("tf1968-code.html", page1968(`<script>const t = "${longues1968.join(" ")}";</script>\n<pre>${longues1968.join(" ")}</pre>\n<p>${courtes1968.join(" ")}</p>`));
+  if (e2(h3)?.statut !== "PASS")
+    casse.push(`TF-1968 : des phrases longues placées dans un <script> ou un <pre> sont comptées comme du texte lu : ${JSON.stringify(e2(h3))}`);
+  const htmlTitre = page1968(`<h2>Ce que le rapport couvre</h2>\n<p>${courtes1968.join(" ")}</p>`);
+  const h4 = jouer("tf1968-titre.html", htmlTitre);
+  const e8h = (h4.j?.findings || []).find((f) => f.regle === "EC-8");
+  if (h4.statut !== 1 || e8h?.statut !== "FAIL" || e8h?.ligne !== ligneDeLaPage(htmlTitre, "<h2>") || !new RegExp(`titre l\\.${ligneDeLaPage(htmlTitre, "<h2>")} `).test(e8h?.message || ""))
+    casse.push(`TF-1968 : un titre « Ce que … » en <h2> n'est pas refusé par EC-8, ou pas à la ligne de la PAGE (attendu ligne ${ligneDeLaPage(htmlTitre, "<h2>")}) : ${JSON.stringify(e8h)}`);
+  if (h1.j?.source !== "html" || jouer("tf1968-md.md", "# Note\n\n" + courtes1968.join(" ") + "\n").j?.source !== undefined)
+    casse.push("TF-1968 : la sortie ne dit pas que le texte d'une page HTML est extrait (champ `source`), ou le dit pour un Markdown");
+
   // TF-1784 (lot Produit-83 20261015b, RT-9) — LE TIRET SEUL DANS UNE CELLULE EST UNE CELLULE VIDE.
   // Le gabarit MODELE-DONNEES.md prescrit « — » pour une clé absente ; EC-1 comptait chacun comme un
   // tiret d'incise, et un modèle de 20 tables écrit comme le gabarit échouait (120 occurrences, 77 ‰).
@@ -1867,7 +2006,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : ${43 + BILAN_14} cas, 0 défaut (${43 + BILAN_14}/${43 + BILAN_14} PASS — EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : ${53 + BILAN_14} cas, 0 défaut (${53 + BILAN_14}/${53 + BILAN_14} PASS — page HTML jugée sur son texte visible (TF-1968) : sept phrases de 40 mots d'affilée refusées par EC-2 à la ligne de la page, les mêmes mots en phrases de 10 mots PASS, <script> et <pre> non comptés, un titre « Ce que » en <h2> refusé par EC-8 à la ligne de la page, source html dite ; EC-8 titre NUMÉROTÉ (TF-2020) : « 7. », « 7) », « 2.1 » et « 3 · » refusés, le même titre qui nomme son contenu PASS, un fichier de la liste d'antériorité admis en le disant, le même texte hors liste ou non numéroté refusé ; EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 
@@ -1905,9 +2044,24 @@ if (lanceEnDirect) {
   if (langue && !/^[A-Za-z]{2,3}([-_][A-Za-z0-9]{2,8})?$/.test(langue)) erreur("--langue attend un code de langue (fr, en, es, de…)");
   const passeBrute = valeur("--passe");
   if (passeBrute && !/^[1-9]$/.test(passeBrute)) erreur("--passe attend un entier de 1 à 9 (le numéro de la passe de réécriture)");
-  const r = juger(texte, { donnee, cheminRelatif, cheminJuge: resolve(cible), aujourdhui, langue, passe: passeBrute ? Number(passeBrute) : undefined });
+  // TF-1968 : une page HTML est jugée sur son TEXTE VISIBLE (`texteDeHtml`), et les lignes du verdict sont celles de la PAGE.
+  const estHtml = /\.html?$/i.test(String(cible));
+  const page = estHtml ? texteDeHtml(texte) : null;
+  const r = juger(page ? page.texte : texte, { donnee, cheminRelatif, cheminJuge: resolve(cible), aujourdhui, langue, passe: passeBrute ? Number(passeBrute) : undefined });
+  const dePage = (n) => (page && Number.isInteger(n) && page.lignes[n - 1] ? page.lignes[n - 1] : n);
+  if (page) {
+    // Les numéros de ligne cités DANS un message (« l.66 », « ligne 66 ») sont ceux du texte extrait : ils se disent ceux de la page.
+    const messageDePage = (s) => String(s).replace(/\bl\.(\d+)/g, (m, n) => `l.${dePage(Number(n))}`).replace(/\bligne (\d+)/g, (m, n) => `ligne ${dePage(Number(n))}`);
+    for (const f of r.findings || []) {
+      if (typeof f.message === "string") f.message = messageDePage(f.message);
+      if (Number.isInteger(f.ligne)) f.ligne = dePage(f.ligne);
+      for (const p of f.passages || []) if (Number.isInteger(p.ligne)) p.ligne = dePage(p.ligne);
+    }
+    for (const p of r.a_rejouer?.passages || []) if (Number.isInteger(p.ligne)) p.ligne = dePage(p.ligne);
+  }
   console.log(JSON.stringify({
     oracle: NOM, version: VERSION, cible: String(cible).replace(/\\/g, "/"),
+    ...(page ? { source: "html", lignes: "de la page (le texte visible est extrait par texteDeHtml)" } : {}),
     mots: r.mots, verdict: r.verdict, findings: r.findings, a_rejouer: r.a_rejouer ?? null, non_juge: r.non_juge,
   }, null, 1));
   process.exit(r.verdict === "FAIL" ? 1 : 0);
