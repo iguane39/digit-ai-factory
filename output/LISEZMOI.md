@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 569 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 570 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -498,6 +498,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
 | Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md | 20261016c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` |
+| Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md | 20261030a | 8.7 Ko | `04-plans/Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md` |
 | Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md | 20261015k | 8.7 Ko | `04-plans/Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md` |
 | Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md | 20261018i | 8.5 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md` |
 | Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md | 20261018g | 9 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` |

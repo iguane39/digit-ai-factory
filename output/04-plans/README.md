@@ -38,6 +38,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
+| `Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md` | fichier | 8,7 Ko | Synthèse Conseil — skill PDF de la Factory, étude rendue, 1 décision attendue (30/10/2026) |
 | `Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md` | fichier | 8,7 Ko | Synthèse Conseil — 4 sujets traitables tout de suite, 2 sur un mot de vous, le reste atten |
 | `Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md` | fichier | 8,5 Ko | Synthèse Étude — la relecture d'intention étendue à tous les travaux : deux points de rele |
 | `Digit-AI - Synthese Etude - Relecteur d intention verdict O4 - 20261018g.md` | fichier | 9,0 Ko | Synthèse Étude — un relecteur d'intention voit les dérives à condition d'avoir une consign |
@@ -162,4 +163,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_142 fichier(s), 3 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_143 fichier(s), 3 sous-dossier(s)_
