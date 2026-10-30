@@ -84,17 +84,48 @@ const H = 3_600_000;
 // 1. Lecture d'une commande : segments, mots, outil
 // ---------------------------------------------------------------------------------------------
 
-/** Ôte le corps des documents en ligne (`<<EOF … EOF`, `@' … '@`) : du texte écrit, pas des commandes. */
+/**
+ * Le mot de fin d'un document en ligne ouvert par cette ligne, hors guillemets et hors commentaire ; null
+ * sinon. `etat.q` porte le guillemet resté ouvert d'une ligne à l'autre (D-98 (a) du 29/10/2026).
+ */
+function motDeDocument(ligne, etat) {
+  for (let k = 0; k < ligne.length; k++) {
+    const c = ligne[k];
+    if (etat.q) { if (c === etat.q && ligne[k - 1] !== "\\") etat.q = null; continue; }
+    if (c === '"' || c === "'") { etat.q = c; continue; }
+    if (c === "#" && (k === 0 || /\s/.test(ligne[k - 1]))) return null;
+    if (c === "<" && ligne[k + 1] === "<" && ligne[k + 2] !== "<") {
+      const h = /^<<-?\s*(['"]?)([A-Za-z_]\w*)\1/.exec(ligne.slice(k));
+      if (h) return h[2];
+    }
+  }
+  return null;
+}
+
+/**
+ * Ôte le corps des documents en ligne (`<<EOF … EOF`, `@' … '@`) : du texte écrit, pas des commandes.
+ * D-98 (a) : `echo "use <<EOF"` ou un `<<EOF` de commentaire n'ouvrent aucun document, et un document sans
+ * sa ligne de fin ne masque rien. Sinon la commande destructive de la ligne suivante n'était jamais jugée.
+ */
 export function sansCorpsDeDocuments(texte) {
   const lignes = String(texte || "").split(/\r?\n/);
   const sortie = [];
+  const etat = { q: null };
   let fin = null;
-  for (const ligne of lignes) {
+  for (let i = 0; i < lignes.length; i++) {
+    const ligne = lignes[i];
     if (fin !== null) { if (fin.test(ligne)) fin = null; continue; }
     sortie.push(ligne);
-    const h = /<<-?\s*(['"]?)([A-Za-z_]\w*)\1/.exec(ligne);
-    if (h && !/<<</.test(ligne)) { fin = new RegExp(`^\\s*${h[2]}\\s*$`); continue; }
-    if (/@['"]\s*$/.test(ligne)) { const q = ligne.trim().slice(-2, -1); fin = new RegExp(`^${q === "'" ? "'" : '"'}@`); }
+    const mot = motDeDocument(ligne, etat);
+    if (mot) {
+      const f = new RegExp(`^\\s*${mot}\\s*$`);
+      if (lignes.slice(i + 1).some((l) => f.test(l))) fin = f;
+      continue;
+    }
+    if (!etat.q && /@['"]\s*$/.test(ligne)) {
+      const f = new RegExp(`^${ligne.trim().slice(-2, -1) === "'" ? "'" : '"'}@`);
+      if (lignes.slice(i + 1).some((l) => f.test(l))) fin = f;
+    }
   }
   return sortie.join("\n");
 }
@@ -136,6 +167,8 @@ const nomOutil = (w) => String(w).split(/[\\/]/).pop().toLowerCase().replace(/\.
 const OUTILS_JUGES = new Set(["az", "terraform", "tofu", "gh", "git", "curl", "wget", "invoke-restmethod", "irm", "invoke-webrequest", "iwr", "invoke-azrestmethod"]);
 const SHELLS = new Set(["bash", "sh", "zsh", "dash", "pwsh", "powershell", "cmd"]);
 const ENVELOPPES = new Set(["sudo", "env", "time", "nohup", "xargs", "command", "exec", "call", "start", "timeout", "stdbuf", "nice", "then", "do", "else", "{", "}", "&", ".", "!"]);
+/** D-98 (a) : `if az group delete …`, `while …`. Le mot de contrôle se saute seul, sans ouvrir une enveloppe. */
+const MOTS_DE_CONTROLE = new Set(["if", "elif", "while", "until"]);
 const CMDLETS_LOCAUX = new Set(["remove-azcontext", "remove-azenvironment", "remove-azdefault"]);
 const estCmdlet = (n) => (/^remove-(az|mg)[a-z0-9]+$/.test(n) && !CMDLETS_LOCAUX.has(n))
   || /^(new|set)-azroleassignment$/.test(n)
@@ -158,6 +191,7 @@ export function localiser(m) {
       const k = m.findIndex((x, j) => j > i && /^(-[A-Za-z]*c|-command|\/c|\/k)$/i.test(x));
       return k < 0 ? null : { interne: m.slice(k + 1).join(" ") };
     }
+    if (MOTS_DE_CONTROLE.has(n)) continue;
     if (ENVELOPPES.has(n)) { enveloppe = true; continue; }
     if (enveloppe) continue;
     return null;
@@ -207,6 +241,11 @@ function valeurOption(args, cles, ps) {
       if (a === cle) return args[k + 1] ?? null;
       if (a.startsWith(cle + "=") || (ps && a.startsWith(cle + ":"))) return args[k].slice(cle.length + 1);
       if (!ps && cle.length === 2 && a.startsWith(cle) && !a.startsWith("--") && a.length > 2) return args[k].slice(2);
+      // D-98 (a) : options courtes groupées, `curl -sX DELETE`, `-sSXDELETE`.
+      if (!ps && cle.length === 2 && !a.startsWith("--")) {
+        const g = new RegExp(`^-[A-Za-z]+${cle[1]}(.*)$`).exec(a);
+        if (g) return g[1] || (args[k + 1] ?? null);
+      }
     }
   }
   return null;

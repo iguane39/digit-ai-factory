@@ -15,5 +15,6 @@ let j = null;
 try { j = JSON.parse(r.stdout); } catch { /* dit ci-dessous */ }
 if (!j) { console.error(`  [FAIL] self-test illisible (exit ${r.status}) : ${(r.stderr || r.stdout).slice(0, 300)}`); console.log("\nnettoyer-copies (D-97) : 0 PASS, 1 FAIL"); process.exit(1); }
 for (const c of j.casse) console.error(`  [FAIL] ${c}`);
-console.log(`\nnettoyer-copies (D-97) : ${j.cas - j.casse.length} PASS, ${j.casse.length} FAIL`);
+console.log(`  ${j.couverture}`);
+console.log(`\nnettoyer-copies (D-97) : ${j.cas - j.casse.length} PASS, ${j.casse.length} FAIL — couverture à double sens`);
 process.exit(j.casse.length ? 1 : 0);

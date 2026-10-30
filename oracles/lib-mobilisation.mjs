@@ -7,7 +7,7 @@
  * forge-data sur les demandes de données (diagnostic 20261026a, section d, T4). Une forge que rien n'oblige à nommer s'oublie.
  *
  * CE MODULE porte la seule lecture de `references/CARTE-FORGES.json` (donnée datée et sourcée, loi n° 4) : la liste fermée des
- * 13 forges, les 7 types de demande de la carte de départ, les forges privilégiées de chacun et les livrables exigés quand une
+ * 13 forges, les types de demande de la carte (7 au départ, 10 depuis D-99 (b)), les forges privilégiées de chacun et les livrables exigés quand une
  * forge est mobilisée. La carte PRIVILÉGIE, elle ne fige pas : chaque forge reçoit un verdict motivé à chaque demande.
  * Consommateurs : `scripts/verifier-carte-forges.mjs` (le juge de la carte) ; `scripts/mobiliser.mjs` (l'écrivain de la trace
  * `forge/mobilisation.jsonl` chez le produit, une ligne par demande, et de la ligne d'écran « Je mobilise : … ») ;
@@ -162,6 +162,28 @@ export function validerVerdicts(verdicts) {
     normalises[f] = { verdict, motif: String(e.motif || "").trim() };
   }
   return { refus, verdicts: normalises };
+}
+
+// D-99 (b) du 29/10/2026 — ÉCARTER OPS, WEBSEC OU DATA D'UNE DEMANDE QUI LES VISE EXIGE UN FAIT MESURÉ. Le fait, relevé par l'œil
+// critique du 29/10 sur 7 lots de sessions : 20 demandes sur 62 sans une forge attendue (ops 8, websec ou agents-security 7, data 5),
+// le plus souvent écartée d'un « hors carte » ou d'un « hors mandat ». Une forge est visée quand le type de la demande la privilégie
+// ou que le résumé de la demande la nomme par son sujet. Un fait mesuré est un nombre, un chemin ou une commande citée : c'est tout ce
+// que le contrôle lit, il ne juge pas que le fait soit vrai.
+export const FORGES_A_ECART_MOTIVE = Object.freeze(["ops", "websec", "data"]);
+const SUJET_DE_LA_FORGE = {
+  ops: /d[ée]ploi|mise en production|\bmep\b|ci\s*\/\s*cd|qualification|staging|h[ée]bergement/i,
+  websec: /s[ée]curit[ée]|authentification|\brls\b|\bsaml\b|vuln[ée]rabilit|secops/i,
+  data: /donn[ée]es personnelles|\bdpo\b|\brgpd\b|anonymis|pseudonymis|registre des traitements/i,
+};
+const FAIT_MESURE = /\d|[\w.-]+\/[\w.-]+|`[^`]+`/;
+
+/** Les refus D-99 (b) : une forge de la liste, visée par la demande, écartée sans un fait mesuré dans son motif. */
+export function ecartsSansFait(types, verdicts, demande) {
+  const priv = privilegiees(types);
+  return FORGES_A_ECART_MOTIVE.filter((f) => verdicts[f]?.verdict === "ecartee"
+      && (priv.includes(f) || SUJET_DE_LA_FORGE[f].test(String(demande || "")))
+      && !FAIT_MESURE.test(verdicts[f].motif))
+    .map((f) => `${f} : la demande la vise, et son écart ne cite aucun fait mesuré (« ${verdicts[f].motif} ») — mobilise-la, ou cite un nombre, un chemin ou une commande qui montre qu'elle ne sert pas (D-99 (b))`);
 }
 
 const court = (s, n = 90) => { const t = String(s).replace(/\s+/g, " ").trim(); return t.length > n ? `${t.slice(0, n - 1)}…` : t; };

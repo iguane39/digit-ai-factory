@@ -1,10 +1,10 @@
 # Niveaux d'intervention — proportionner la réponse à la question
 
-Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.6.0,
-26/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
+Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.7.0,
+30/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
 Moyen en essai ; 1.3.0 ne compte plus une copie vers le dossier temporaire comme un effet ; 1.4.0
 consigne la revue de l'essai ; 1.5.0 engage l'étape 3, la propagation aux produits ; 1.6.0 juge la
-réponse courte sur les écritures du tour, plus sur le nombre de commandes). Source : l'étude `output\03-etudes\2026-09\20260925-etude-opportunite-niveaux-d-intervention.md`,
+réponse courte sur les écritures du tour, plus sur le nombre de commandes ; 1.7.0 porte la réponse courte à 250 mots et sort le dossier temporaire des écritures, décision D-101 (b) du 29/10/2026). Source : l'étude `output\03-etudes\2026-09\20260925-etude-opportunite-niveaux-d-intervention.md`,
 verdict O3 (3 niveaux fixés par les effets du tour, déployés en 3 étapes), validé par la décision
 humaine D-3 (a) du 25/09/2026. Candidature au registre : TF-1418 (niveaux d'intervention, étape 1).
 
@@ -34,7 +34,7 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
 - **Bornes du tour** : lectures libres (Read, Grep, Glob), et commandes de lecture sans limite de nombre
   depuis le 26/10/2026 ; aucune écriture, au sens de la section « Réponse courte sans écriture ». Ni
   lectures d'ouverture de run, ni fichier de synthèse, ni oracle de restitution.
-- **Forme** : première ligne « Niveau : Simple » ; la réponse en 150 mots au plus ; une ligne de source
+- **Forme** : première ligne « Niveau : Simple » ; la réponse en 250 mots au plus ; une ligne de source
   (un chemin et sa ligne, ou une commande et sa sortie) ; une ligne « Non vérifié : … » s'il le faut.
   Aucun bloc, aucune décision ni action numérotée, aucun mot de verdict (PASS, FAIL, conforme,
   garanti, exhaustif, verdict).
@@ -50,10 +50,10 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
   > - Le planificateur Windows peut préparer le dossier le lundi.
   >
   > Source : `oracles/hook-ouverture.mjs:448`.
-- **Brouillon** : la réponse se joue par `--pre-vol` depuis un heredoc, jamais depuis un fichier écrit
-  par Write ou Edit, même temporaire. *Le fait* : le 01/10, 3 brouillons écrits dans le dossier
-  temporaire ont fait du tour un tour de travail ; `--pre-vol` a rendu exit 0, puis le juge de fin de
-  tour a exigé la restitution complète.
+- **Brouillon** : la réponse se joue par `--pre-vol`, depuis un heredoc ou un fichier du dossier
+  temporaire : depuis D-101 (b) du 29/10/2026, un brouillon temporaire ne fait plus du tour un tour de
+  travail. *Le fait* : le 29/10, 2 fichiers de travail écrits dans ce dossier ont fait refuser un message
+  d'attente de 12 mots pendant que des agents tournaient.
 - **Contrôle avant affichage** (01/10/2026) : la réponse se joue avant d'être rendue, par
   `node oracles/hook-restitution.mjs --pre-vol` qui lit son texte sur l'entrée standard. Depuis le
   26/10/2026, il relit aussi la transcription de la session et rend les écritures du tour
@@ -79,13 +79,15 @@ de lecture lancées.
   Le seuil de 4 commandes faisait d'une question qui lit 5 fichiers un tour de travail. Le modèle ne le
   voyait qu'après le refus.
 - **La règle** : un tour qui n'a rien écrit se rend sans restitution, quel que soit le nombre de
-  commandes de lecture. Sa réponse fait 150 mots au plus, sans mot de verdict ni décision `D-N` ou
-  action `A-N` posée.
+  commandes de lecture. Sa réponse fait 250 mots au plus (150 jusqu'à D-101 (b) du 29/10/2026 : 17 refus
+  sur 51 visaient une réponse sans écriture, dont des réponses de 151 à 170 mots), sans mot de verdict ni
+  décision `D-N` ou action `A-N` posée.
 - **Écrire, c'est**, dans le tour :
-  - un appel Write, Edit, MultiEdit ou NotebookEdit, quel que soit le chemin, dossier temporaire
-    compris (voir « Brouillon ») ;
+  - un appel Write, Edit, MultiEdit ou NotebookEdit hors du dossier temporaire (voir « Brouillon ») ;
   - une écriture par commande hors du dossier temporaire : redirection, `tee`, `sed -i`,
-    `Set-Content`, `Out-File`, destination d'un `cp` ou d'un `mv`, `rm`, `mkdir` ;
+    `Set-Content`, `Out-File`, destination d'un `cp` ou d'un `mv`, `rm`, `mkdir` ; une variable posée dans
+    la même commande et qui désigne le dossier temporaire est lue, et un programme entre guillemets
+    (`awk '…; n>40…'`) n'est ni coupé ni pris pour une redirection (D-101 (b)) ;
   - un commit, un push ou une autre commande à effet, `git -C <dossier> commit` compris ;
   - un agent qui peut écrire, ou un outil connecté qui écrit.
 - **Le corps d'un heredoc n'est pas une commande** : le brouillon passé à `--pre-vol` ne compte pas.

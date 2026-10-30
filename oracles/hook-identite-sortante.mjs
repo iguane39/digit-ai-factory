@@ -103,10 +103,41 @@ export function requeteSortante(entree) {
     return URL_DISTANTE.test(u) ? u : null;
   }
   if (outil === "Bash" || outil === "PowerShell") {
-    const emetteurs = segments(String(i.command || "")).filter((x) => CLIENT_HTTP.test(x) && URL_DISTANTE.test(x));
+    const emetteurs = pipelines(String(i.command || "")).flatMap((p) => {
+      const k = p.findIndex((x) => CLIENT_HTTP.test(x) && URL_DISTANTE.test(x));
+      return k < 0 ? [] : [p.slice(0, k + 1).join(" | ")];
+    });
     return emetteurs.length ? emetteurs.join("\n") : null;
   }
   return null;
+}
+
+/**
+ * Les tubes d'une commande : chacun liste ses étages, dans l'ordre (D-98 (a) du 29/10/2026). Ce qui
+ * précède un client HTTP dans un tube lui fournit ses données : `echo <adresse> | curl -d @- <url>`
+ * passait, parce que le premier étage ne porte ni client ni adresse distante. Ce qui le suit reçoit
+ * sa réponse et ne sort pas (`curl <url> | grep <adresse>`) : TF-1978 reste tenu.
+ */
+export function pipelines(commande) {
+  const out = [];
+  let tube = [], cur = "", q = null;
+  const s = String(commande);
+  const etage = () => { if (cur.trim()) tube.push(cur.trim()); cur = ""; };
+  const finir = () => { etage(); if (tube.length) out.push(tube); tube = []; };
+  for (let k = 0; k < s.length; k++) {
+    const ch = s[k];
+    if (q) { cur += ch; if (ch === q && s[k - 1] !== "\\") q = null; continue; }
+    if (ch === '"' || ch === "'") { q = ch; cur += ch; continue; }
+    if (ch === "|" && s[k + 1] !== "|") { etage(); continue; }
+    if (ch === ";" || ch === "\n" || ch === "|" || (ch === "&" && s[k + 1] === "&")) {
+      finir();
+      if (ch === "|" || ch === "&") k++;
+      continue;
+    }
+    cur += ch;
+  }
+  finir();
+  return out;
 }
 
 /**
@@ -116,10 +147,12 @@ export function requeteSortante(entree) {
  * portent cette adresse par règle. L'agent ne peut pas poser la variable par un outil.
  */
 export function versHotesPropres(req, env = process.env) {
-  const propres = String(env.FORGE_HOTES_PROPRES || "").split(/[,\s]+/).map((h) => h.replace(/^https?:\/\//i, "").toLowerCase()).filter(Boolean);
+  const propres = String(env.FORGE_HOTES_PROPRES || "").split(/[,\s]+/).map((h) => h.replace(/^https?:\/\//i, "").replace(/\/+$/, "").toLowerCase()).filter(Boolean);
   if (!propres.length) return false;
   const urls = String(req).match(new RegExp(URL_DISTANTE.source, "gi")) || [];
-  return urls.length > 0 && urls.every((u) => propres.some((h) => u.replace(/^https?:\/\//i, "").toLowerCase().startsWith(h)));
+  // D-98 (a) : le préfixe s'arrête à une frontière ; `dev.azure.com/mon-org` ne couvre pas `dev.azure.com/mon-org-tiers`.
+  const couvre = (u, h) => u.startsWith(h) && /^($|[/?#:])/.test(u.slice(h.length));
+  return urls.length > 0 && urls.every((u) => propres.some((h) => couvre(u.replace(/^https?:\/\//i, "").toLowerCase(), h)));
 }
 
 /** Les messages humains de la session, lus au transcript. */

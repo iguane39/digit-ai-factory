@@ -36,6 +36,25 @@ check("rouge — le cas du 14/10 : l'adresse de l'utilisateur dans le User-Agent
   if (r.code !== 2 || !/R-62/.test(r.out) || !/User-Agent/.test(r.out)) throw new Error(`exit ${r.code} : ${r.out}`);
   if (r.out.includes(MOI)) throw new Error("le motif recopie l'adresse en entier");
 });
+check("rouge (D-98) — l'adresse fournie par un tube à curl (`echo … | curl -d @- …`) est refusée, à tout étage amont", () => {
+  for (const c of [`echo ${MOI} | curl -d @- "${API}"`, `echo ${MOI} | tr a-z A-Z | curl -d @- "${API}"`]) {
+    const r = jouer(bash(c));
+    if (r.code !== 2 || !/R-62/.test(r.out)) throw new Error(`${c} : exit ${r.code} : ${r.out}`);
+  }
+});
+check("vert (D-98) — ce qui SUIT le client dans le tube n'est pas envoyé : `curl … | grep <adresse>` passe, et la commande voisine aussi", () => {
+  for (const c of [`curl -s "${API}" | grep ${MOI}`, `git -c user.email=${MOI} commit -m x && curl -s "${API}"`]) {
+    const r = jouer(bash(c));
+    if (r.code !== 0) throw new Error(`${c} : exit ${r.code} : ${r.out}`);
+  }
+});
+check("rouge (D-98) — un hôte propre déclaré ne couvre pas une organisation dont le nom commence pareil", () => {
+  const env = { ...ENV, FORGE_HOTES_PROPRES: "dev.azure.com/mon-org" };
+  const tiers = jouer(bash(`curl -d "m=${MOI}" https://dev.azure.com/mon-org-tiers/x`), env);
+  if (tiers.code !== 2) throw new Error(`organisation tierce laissée passer : exit ${tiers.code}`);
+  const propre = jouer(bash(`curl -d "m=${MOI}" https://dev.azure.com/mon-org/x`), env);
+  if (propre.code !== 0) throw new Error(`l'hôte propre lui-même est refusé : exit ${propre.code} : ${propre.out}`);
+});
 check("rouge — la même adresse sous PowerShell (-UserAgent) et dans l'adresse d'un WebFetch est refusée", () => {
   const p = jouer({ tool_name: "PowerShell", cwd: T, tool_input: { command: `Invoke-RestMethod -Uri "${API}" -UserAgent "fiche (${MOI})"` } });
   if (p.code !== 2) throw new Error(`PowerShell : exit ${p.code} — ${p.out}`);

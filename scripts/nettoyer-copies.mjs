@@ -118,7 +118,7 @@ function selfTest() {
     if (apres.supprimables.copies !== 0 || apres.supprimables.branches !== 0) casse.push("des supprimables restent après la suppression");
   } catch (e) { casse.push(`erreur : ${e.message}`); }
   finally { git(["worktree", "unlock", join(T, "vivant")], depot); rmSync(T, { recursive: true, force: true }); }
-  console.log(JSON.stringify({ outil: "nettoyer-copies", self_test: casse.length ? "FAIL" : "PASS", cas: 12, casse }));
+  console.log(JSON.stringify({ outil: "nettoyer-copies", self_test: casse.length ? "FAIL" : "PASS", cas: 12, couverture: "double sens : 7 cas rouges, 5 cas verts", casse }));
   process.exit(casse.length ? 1 : 0);
 }
 

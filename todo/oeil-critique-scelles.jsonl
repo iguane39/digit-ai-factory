@@ -18,3 +18,8 @@
 {"type":"scelle","decision":"D-106","option":"b","motif":"une clé de .env affichée et aucune barrière de lecture trouvée dans les hooks ; le contrôle de motif en sortie risque des faux positifs non mesurés","poste":"DESKTOP-ULTRA7","ts":"2026-10-29T18:13:53.155Z"}
 {"type":"scelle","decision":"D-107","option":"a","motif":"8 demandes en 7 sessions, 2 refus de publication dans ce seul tour ; le miroir Drive des produits est un autre périmètre","poste":"DESKTOP-ULTRA7","ts":"2026-10-29T18:13:53.246Z"}
 {"type":"scelle","decision":"D-108","option":"b","motif":"un PASS à 60 images par seconde pour 3,3 mesurées et 4 jours sans publication annoncée en service : deux forges, même défaut","poste":"DESKTOP-ULTRA7","ts":"2026-10-29T18:13:53.353Z"}
+{"type":"choix","decision":"D-98","choix":"a","recommandation":"a","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.307Z"}
+{"type":"choix","decision":"D-99","choix":"b","recommandation":"b","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.410Z"}
+{"type":"choix","decision":"D-100","choix":"a","recommandation":"a","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.503Z"}
+{"type":"choix","decision":"D-101","choix":"b","recommandation":"b","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.594Z"}
+{"type":"choix","decision":"D-102","choix":"a","recommandation":"a","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.685Z"}

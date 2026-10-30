@@ -271,7 +271,7 @@ try {
         { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: BON }] } },
       ];
       if (ecritureEntreDeux) {
-        e.push({ type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Edit", input: { file_path: join(base, "code.mjs") } }] } });
+        e.push({ type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Edit", input: { file_path: "C:/dev/produit-fictif/code.mjs" } }] } });
         e.push({ type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } });
       }
       e.push({ type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteRelais }] } });
@@ -746,8 +746,8 @@ try {
     const simple = preVol("Niveau : Simple\n\nOui, le fichier existe.\n\nSource : `README.md:1`.\n");
     if (simple.code !== 0 || simple.o?.rendable_sans_restitution !== true)
       echecs.push(`43 : réponse Simple courte → attendu exit 0 et rendable, obtenu ${simple.code} ${JSON.stringify(simple.o).slice(0, 160)}`);
-    const long = preVol(Array.from({ length: 220 }, (_, i) => `mot${i}`).join(" ") + ".\n");
-    if (long.code !== 1) echecs.push(`43 : texte de 220 mots sans restitution → attendu exit 1, obtenu ${long.code}`);
+    const long = preVol(Array.from({ length: 320 }, (_, i) => `mot${i}`).join(" ") + ".\n");
+    if (long.code !== 1) echecs.push(`43 : texte de 320 mots sans restitution → attendu exit 1, obtenu ${long.code}`);
     const pieces = (reponse) => `Niveau : Moyen\n\n**La réponse.** ${reponse}\n\n**Preuves.**\n- \`git log -1\` rend le commit.\n- \`README.md:1\` porte le titre.\n- \`node -v\` rend la version.\n\n**Non vérifié.** Rien.\n\n**Décision attendue.** Aucune.\n`;
     const moyen = preVol(pieces("Oui, le dépôt est à jour."));
     if (moyen.code !== 0 || moyen.o?.niveau !== "Moyen")
@@ -1529,7 +1529,7 @@ try {
     if (an57.travail || an57.ecrituresDuTour.length || an57.commandes !== 5)
       echecs.push(`57 bis : 5 commandes de lecture, heredoc compris, ne sont pas une écriture — obtenu travail=${an57.travail}, `
         + `commandes=${an57.commandes}, écrit : ${an57.ecrituresDuTour.join(" ; ")}`);
-    const ecrit = jouer57("lecture-et-ecriture", QUESTION, [...LECTURES.map(bash), { name: "Write", input: { file_path: join(cwd57, "note.md") } }], COURTE);
+    const ecrit = jouer57("lecture-et-ecriture", QUESTION, [...LECTURES.map(bash), { name: "Write", input: { file_path: "C:/dev/produit-fictif/note.md" } }], COURTE);
     if (ecrit.o?.decision !== "block" || !/S1 —/.test(ecrit.o.reason || "") || !/Jugé parce que : tour de travail[^\n]*écrit : Write de /.test(ecrit.o.reason || ""))
       echecs.push(`57 ter : la MÊME réponse dans un tour qui a écrit un fichier → attendu jugée et refusée (S1), l'écriture nommée, obtenu ${JSON.stringify(ecrit.o).slice(0, 300)}`);
     const commit = jouer57("deux-commandes-commit", QUESTION, [bash("git status"), bash(`git -C "${cwd57.replace(/\\/g, "/")}" commit -m correctif`)], COURTE);

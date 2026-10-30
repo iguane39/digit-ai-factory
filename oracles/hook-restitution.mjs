@@ -26,7 +26,7 @@
  * TF-0904 (08/09/2026) — ET DEPUIS, UN VERDICT SANS ÉCRITURE L'EST AUSSI. Le critère ci-dessus
  * mesure l'EFFORT ; `RESTITUTION.md` régit « tout message de fin de traitement », c'est-à-dire la
  * NATURE de ce qui est rendu. Un message final est donc jugé aussi quand il porte un VERDICT ou
- * dépasse 150 mots, écriture ou pas (fonction `jugeable`) ; les exemptions — accusé de réception,
+ * dépasse 250 mots (150 jusqu'à D-101 (b) du 29/10/2026), écriture ou pas (fonction `jugeable`) ; les exemptions — accusé de réception,
  * réponse courte, question rendue à l'humain — sont écrites au §Portée du gabarit.
  */
 import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
@@ -37,6 +37,8 @@ import { fileURLToPath } from "node:url";
 import { controlerOuiDeCompletude, affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
 import { racineDuProjet } from "./lib-racine-projet.mjs";
+import { decouperCommande, resoudreTemporaires } from "./lib-decoupe-commande.mjs";
+import { nombresDuTexte } from "./lib-chiffres-releves.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
 // de fin de tour, qui garde alors son propre relevé d'effets (`detecterEffets`) ; `ecrituresDuTour` le dit dans sa sortie.
@@ -267,7 +269,7 @@ export function detecterEffets(segment) {
         // 12/10/2026 (TF-1418) : un `cp` vers le dossier temporaire de la session faisait juger
         // Complexe un tour de pure lecture. La commande se juge par commande simple, et un verbe de
         // fichier dont toutes les cibles sont temporaires n'est pas un effet.
-        const v = cmd.split(/&&|\|\||[;|\n]/).map((c) => {
+        const v = decouperCommande(cmd).map((c) => {
           const m = c.match(VERBES_EFFET);
           const fichier = m && VERBES_FICHIER.test(m[0].replace(/^[\s;&|(]+/, "").trim());
           return m && !(fichier && versTemporaire(c)) ? m : null;
@@ -299,7 +301,7 @@ export function detecterEffets(segment) {
 // qui lisait cinq fichiers recevait une restitution complète que le modèle ne voyait exigée qu'après le refus.
 //
 // LA RÈGLE. Le tour est jugé comme un tour de travail quand il a ÉCRIT : un appel Write, Edit, MultiEdit ou NotebookEdit,
-// quel que soit le chemin (dossier temporaire compris, `references\NIVEAUX.md`, « Brouillon ») ; une écriture par commande
+// hors du dossier temporaire (D-101 (b) du 29/10/2026 : il comptait jusque-là) ; une écriture par commande
 // hors du dossier temporaire, lue par `ecrituresParCommande` de la relecture d'intention ; un commit, un push ou une autre
 // commande à effet (`VERBES_EFFET`, `git -C <dossier> commit` compris) ; un agent qui peut écrire ; un outil connecté qui
 // écrit. Le nombre de commandes de lecture ne compte plus.
@@ -328,13 +330,15 @@ export function ecrituresDuTour(segment) {
     const blocs = contenuDe(e);
     if (!blocs.some((b) => b.type === "tool_use" && COMMANDES.has(b.name))) return e;
     return { ...e, message: { ...(e.message || {}), content: blocs.map((b) => (b.type === "tool_use" && COMMANDES.has(b.name)
-      ? { ...b, input: { ...(b.input || {}), command: sansCorpsDeTexte(b.input?.command) } } : b)) } };
+      ? { ...b, input: { ...(b.input || {}), command: resoudreTemporaires(sansCorpsDeTexte(b.input?.command), TEMPORAIRE) } } : b)) } };
   });
   for (const e of nettoye) {
     if (e.type !== "assistant") continue;
     for (const b of contenuDe(e)) {
       if (b.type !== "tool_use") continue;
-      if (ECRITURES.has(b.name)) ajouter(`${b.name} de ${b.input?.file_path || b.input?.notebook_path || "chemin inconnu"}`);
+      // D-101 (b) du 29/10/2026 : un brouillon écrit dans le dossier temporaire n'est pas une écriture du tour ; 2 écritures de
+      // travail y ont fait refuser un message d'attente de 12 mots, le 29/10, pendant que des agents tournaient.
+      if (ECRITURES.has(b.name)) { const p = b.input?.file_path || b.input?.notebook_path; if (!TEMPORAIRE(p)) ajouter(`${b.name} de ${p || "chemin inconnu"}`); }
       else if (COMMANDES.has(b.name)) {
         const cmd = String(b.input?.command || "");
         if (cmd.trim()) commandes.push(cmd);
@@ -771,6 +775,12 @@ export function relevesDHorloge(entrees, debut) {
   return { tour, session: session.slice(-300) };
 }
 const argsReleves = (r) => (r ? ["--releves-tour", r.tour.length ? r.tour.join(",") : "aucun", "--releves-session", r.session.length ? r.session.join(",") : "aucun"] : []);
+// D-100 (a) du 29/10/2026 — pour S90 : les nombres que le tour a pu LIRE, sorties d'outil, pièces jointes de hook et messages humains.
+export function nombresDuTour(entrees, debut) {
+  const out = new Set();
+  entrees.forEach((e, i) => { if (i >= debut && e.type !== "assistant") for (const n of nombresDuTexte(_texteBrut(e))) out.add(n); });
+  return [...out];
+}
 
 export function analyserTranscript(texte) {
   const entrees = texte.split(/\r?\n/).filter((l) => l.trim()).map((l) => { try { return JSON.parse(l); } catch { return null; } })
@@ -793,6 +803,7 @@ export function analyserTranscript(texte) {
   const textesHumains = humains.map((i) => texteDe(entrees[i]));
   return { travail: ecrit.length > 0, ecrituresDuTour: ecrit, ...m, dernierHumain, textePrecedent, depuis, textesHumains,
     releves: relevesDHorloge(entrees, debut),
+    nombresTour: nombresDuTour(entrees, debut),
     // TF-1913 — les fichiers servis écrits dans le tour et les critiques jouées, pour le contrôle CRITIQUE.
     critique: critiqueDuTour(entrees.slice(debut + 1)),
     // TF-1973 et TF-2016 — les livrables écrits sous output/ dans le tour, pour le contrôle S87 (la ligne « Livré : » du bloc 0).
@@ -806,11 +817,14 @@ export function analyserTranscript(texte) {
 // `releves` (TF-1938, 21/10/2026) : { tour, session } de `relevesDHorloge`, passés à S84 ; absents, S84 rend SANS_OBJET.
 // `averts` (T4, TF-1949, 26/10/2026) : les constats AVERT de l'oracle, dits sous la réponse sans jamais la refuser ; S72 en rend
 // un quand le verrou « livré » (S85) juge les livrables sur fichiers.
-export function juger(texte, racine = process.cwd(), releves = null) {
+// `nombres` (D-100 (a), 29/10/2026) : les nombres du tour, passés à S90 par un fichier ; absents, S90 rend SANS_OBJET.
+export function juger(texte, racine = process.cwd(), releves = null, nombres = null) {
   const dir = mkdtempSync(join(tmpdir(), "restitution-"));
   const f = join(dir, "message.md");
   writeFileSync(f, texte, "utf8");
-  const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : []), ...argsReleves(releves)], { encoding: "utf8" });
+  const fn = join(dir, "nombres.json");
+  if (nombres) writeFileSync(fn, JSON.stringify(nombres), "utf8");
+  const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : []), ...argsReleves(releves), ...(nombres ? ["--nombres-tour", fn] : [])], { encoding: "utf8" });
   let rapport = {};
   try { rapport = JSON.parse(r.stdout); } catch { /* jugé par le code */ }
   return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL"),
@@ -1560,10 +1574,12 @@ const RAPPEL_PROCEDURE = "Une procédure demandée reçoit un guide EN TÊTE, av
 // CE QUI EST AJOUTÉ, et rien de plus : un message final est jugé s'il porte un VERDICT (mots du
 // vocabulaire fermé ci-dessous) ou s'il dépasse le seuil de mots. Les EXEMPTIONS sont écrites au
 // §Portée du gabarit et tenues ici : un accusé de réception, une réponse courte, une question
-// rendue à l'humain. Le seuil est haut (150 mots) par choix : un gate `Stop` juge APRÈS
+// rendue à l'humain. Le seuil est haut (250 mots) par choix : un gate `Stop` juge APRÈS
 // affichage, donc chaque faux refus fait relire un message entier (v2.5.0) — mieux vaut manquer
-// une prose de 140 mots que refuser une phrase de politesse.
-const SEUIL_MOTS = 150;
+// une prose de 240 mots que refuser une phrase de politesse.
+// D-101 (b) du 29/10/2026 : 150 → 250. L'œil critique du 29/10 compte 17 refus sur 51 après une réponse sans écriture, dont
+// des réponses de 151 à 170 mots.
+const SEUIL_MOTS = 250;
 // LE VOCABULAIRE DE VERDICT, ET LE PIÈGE QU'IL A TENDU DÈS SA PREMIÈRE EXÉCUTION. Écrit d'abord
 // en un seul motif insensible à la casse, il contenait le jeton PASS — qui a matché « passé »
 // dans « tout s'est bien passé » : le « é » final n'est pas un caractère de mot ASCII, donc la
@@ -1631,13 +1647,16 @@ export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, 
     return { juge: false, motif: `message d'attente de ${mots} mots : ${enAttente.length} tâche(s) d'arrière-plan lancée(s) dans le tour et `
       + "non revenue(s), aucun verdict, aucune D-N ni A-N — la restitution vient avec son résultat (TF-1649)" };
   // TF-1947 — `travail` vaut « le tour a écrit » (`ecrituresDuTour`) ; le motif nomme les premières écritures relevées.
-  if (travail) return { juge: true, motif: `tour de travail (${ecritures} écriture(s), ${commandes} commande(s))`
+  // D-101 (b) : le compte est celui des écritures relevées, commandes comprises ; le 29/10, des refus annonçaient « 0 écriture(s) » après un `git mv`.
+  if (travail) return { juge: true, motif: `tour de travail (${ecrituresDuTour.length || ecritures} écriture(s), ${commandes} commande(s))`
     + (ecrituresDuTour.length ? ` — écrit : ${ecrituresDuTour.slice(0, 3).join(" ; ")}${ecrituresDuTour.length > 3 ? ` (+${ecrituresDuTour.length - 3})` : ""}` : "") };
   // Une QUESTION rendue à l'humain n'est pas une restitution : c'est `bloque_question`, et la
   // doctrine la veut courte. L'exempter explicitement vaut mieux que de la laisser au seuil.
-  if (/\?\s*$/.test(dernierTexte.trim()) && mots <= 60) return { juge: false, motif: `question rendue à l'humain (${mots} mots)` };
+  // D-101 (b) : une question qui POSE une décision n'est pas une question rendue, elle demande un geste. Tant que le brouillon
+  // temporaire comptait comme une écriture, ce trou restait masqué dans la recette (cas 25).
+  if (/\?\s*$/.test(dernierTexte.trim()) && mots <= 60 && !POSE_UN_GESTE.test(dernierTexte)) return { juge: false, motif: `question rendue à l'humain (${mots} mots)` };
   if (VERDICT.test(dernierTexte)) return { juge: true, motif: `message portant un VERDICT (${mots} mots, sans écriture)` };
-  // TF-1947 (26/10/2026) : « 150 mots au plus » (D-75 (c), `references\NIVEAUX.md`) — le 150e mot n'est plus jugé, comme au relais.
+  // TF-1947 (26/10/2026) : « N mots au plus » (D-75 (c), `references\NIVEAUX.md`) — le dernier mot admis n'est plus jugé, comme au relais ; 250 depuis D-101 (b).
   if (mots > SEUIL_MOTS) return { juge: true, motif: `message de ${mots} mots rendu à l'humain (sans écriture)` };
   // TF-0990 (09/09/2026) — L'EXEMPTION « RIEN DE NEUF » ET SON TROU SYMÉTRIQUE. Le référentiel
   // annonçait depuis la v2.18.0 qu'un tour qui n'apporte rien de neuf — une notification de tâche
@@ -1764,7 +1783,7 @@ const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.54.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), clos, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, espaces en %20>) », un lien par livrable (S87, avertissante : seule exception à l'interdit de chemin), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : à quoi sert l'objet, puis son nom interne entre accents graves, plus de trois objets en liste (S88) », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.55.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), clos, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, espaces en %20>) », un lien par livrable (S87, avertissante : seule exception à l'interdit de chemin), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : à quoi sert l'objet, puis son nom interne entre accents graves, plus de trois objets en liste (S88) », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis. · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0.";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
@@ -1795,11 +1814,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
-  let dernierHumainP = "", textePrecedentP = "", relevesP = null, critiqueP = null, livrablesP = null;
+  let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null;
   try {
     if (cheminT && existsSync(cheminT)) {
       const tour = analyserTranscript(readFileSync(cheminT, "utf8"));
-      dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; critiqueP = tour.critique || null;
+      dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; nombresP = tour.nombresTour || null; critiqueP = tour.critique || null;
       livrablesP = tour.livrables || [];
       syntheseDeposee = syntheseDuTour(tour.fichiersMd);
       if (syntheseDeposee) {
@@ -1814,7 +1833,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   // TF-1938 — S84 reçoit les relevés d'horloge du tour quand la transcription est retrouvée ; sinon elle rend SANS_OBJET.
   // TF-1943 : le projet, pas le sous-dossier où la session a fait un `cd`.
   const RACINE_P = racineDuProjet(process.cwd());
-  const { fails, averts: avertsOracle } = juger(brouillon, RACINE_P, relevesP);
+  const { fails, averts: avertsOracle } = juger(brouillon, RACINE_P, relevesP, nombresP);
   const bloquants = fails.filter((x) => estBloquante(x.regle));
   const avertissements = [...fails.filter((x) => !estBloquante(x.regle)), ...avertsOracle];
   // TF-1849 — la RÉSERVATION : chaque D-N nouvelle de ce brouillon est-elle inscrite au registre du produit ?
@@ -1891,7 +1910,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // où la session s'est déplacée par un `cd` : l'état git, la réservation des D-N, le lien « Livré : » et le juge de S48 se mesurent au projet.
   const RACINE_HOOK = racineDuProjet(entree.cwd);
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, ecrituresDuTour: ecrit, critique: critiqueTour, livrables } = analyserTranscript(readFileSync(chemin, "utf8"));
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, nombresTour, ecrituresDuTour: ecrit, critique: critiqueTour, livrables } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
@@ -1927,7 +1946,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + court.ecarts.join("\n") + `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` }));
     process.exit(0);
   }
-  const { code, fails, averts: avertsOracle } = juger(dernierTexte, RACINE_HOOK, releves);
+  const { code, fails, averts: avertsOracle } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour);
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.

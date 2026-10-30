@@ -277,7 +277,7 @@ export function contexteNiveau(message, ref = "references\\NIVEAUX.md") {
   const n = reconnaitreNiveau(message);
   if (!n) return "";
   if (n.niveau === "Simple") return `[NIVEAU — hook-lexique] L'humain demande le niveau Simple (${n.forme}) : ` +
-    `retirer le mot-clé et répondre selon ${ref} — première ligne « Niveau : Simple », 150 mots au plus, ` +
+    `retirer le mot-clé et répondre selon ${ref} — première ligne « Niveau : Simple », 250 mots au plus, ` +
     `lectures libres, 3 commandes au plus, aucune écriture, aucun mot de verdict ni décision ou action numérotée ; ` +
     `source citée, « Non vérifié » s'il le faut. Si la question dépasse ces bornes, le dire en une phrase et restituer ` +
     `en entier : le niveau ne descend jamais.`;

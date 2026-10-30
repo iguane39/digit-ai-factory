@@ -64,6 +64,7 @@ import { tmpdir, homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { dossiersParDefaut } from "./relever-contexte-sessions.mjs";
+import { decouperCommande } from "../oracles/lib-decoupe-commande.mjs";
 
 export const VERSION = "2.1.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -479,7 +480,8 @@ export function ecrituresParCommande(commandes) {
     const cmd = String(brute).replace(/<<-?\s*(["']?)(\w+)\1([^\n]*)\n[\s\S]*?\n\s*\2\s*(?=\n|$)/g, "<<$2$3");
     // Le pipe simple coupe aussi : sans lui, « sed -i … f.txt | head » rendait « head » comme fichier écrit
     // et perdait f.txt (revue de code de l'œil critique, 26/10/2026).
-    for (const brut of cmd.split(/&&|\|\||\||[;\n]/)) {
+    // D-101 (b) du 29/10/2026 : le découpage se fait hors guillemets ; le « ; » d'un programme awk n'est pas un séparateur.
+    for (const brut of decouperCommande(cmd)) {
       // « 2>&1 » joint deux flux, il n'écrit aucun fichier : sans ce retrait, « cp a b 2>&1 » rendait « 2>&1 ».
       const simple = brut.replace(/\s\d?>&\d+/g, "");
       const s = simple.trim(); if (!s) continue;

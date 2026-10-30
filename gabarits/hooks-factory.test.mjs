@@ -106,7 +106,7 @@ try {
   // 1 et 2 — Simple : le même texte, sans puis avec un effet.
   const s = finDeTour("simple", [outil("Read", { file_path: join(P, "forge", "NIVEAUX.md") })], SIMPLE);
   check("1 vert : réponse Simple courte, lecture seule → le hook produit laisse passer", s === null, JSON.stringify(s)?.slice(0, 200));
-  const sEffet = finDeTour("simple-effet", [outil("Write", { file_path: join(P, "app.py") })], SIMPLE);
+  const sEffet = finDeTour("simple-effet", [outil("Write", { file_path: "C:/dev/produit-essai/app.py" })], SIMPLE);
   check("2 rouge : même réponse dans un tour qui a écrit un fichier du produit → restitution complète exigée",
     sEffet?.decision === "block" && /R-44/.test(sEffet.reason), JSON.stringify(sEffet)?.slice(0, 200));
   // 1 bis — TF-1947 (D-75 (c), 26/10/2026) : la même réponse après SIX commandes de lecture, refusée jusque-là (seuil de 4
@@ -128,9 +128,9 @@ try {
   // joue la recette (TF-1947) : le pré-vol relit la transcription de la session pour savoir si le tour a écrit.
   const envSansSession = { ...env }; delete envSansSession.CLAUDE_CODE_SESSION_ID;
   const pv = (t) => spawnSync(process.execPath, [lanceur, "restitution", "--pre-vol"], { encoding: "utf8", cwd: P, env: envSansSession, input: t });
-  const pvOk = pv(SIMPLE), pvKo = pv(SIMPLE + "\n\n" + "mot ".repeat(200));
+  const pvOk = pv(SIMPLE), pvKo = pv(SIMPLE + "\n\n" + "mot ".repeat(300));
   check("5 pré-vol par le lanceur : réponse Simple courte → exit 0", pvOk.status === 0 && /rendable_sans_restitution":true/.test(pvOk.stdout), pvOk.stdout + pvOk.stderr);
-  check("5 bis pré-vol par le lanceur : 200 mots de plus → exit 1", pvKo.status === 1, pvKo.stdout + pvKo.stderr);
+  check("5 bis pré-vol par le lanceur : 300 mots de plus → exit 1", pvKo.status === 1, pvKo.stdout + pvKo.stderr);
 
   // 6 — Lexique par le lanceur : la ligne de niveau suit le texte hérité.
   const lex = (dossier) => spawnSync(process.execPath, [join(dossier, "forge", "hooks", "factory.mjs"), "lexique"], { encoding: "utf8", cwd: dossier, env,
@@ -304,7 +304,7 @@ try {
     input: JSON.stringify({ session_id: "test-heritage-livre", transcript_path: t16, stop_hook_active: false, cwd: P }) });
   let c16 = null; try { c16 = JSON.parse(r16.stdout || "null"); } catch { c16 = { brut: r16.stdout }; }
   check("16 livré, le guide écrit sous output/ et non lié au bloc 0 : S87 est dite au hook du pilot atteint par le lanceur (TF-1973, TF-2016)",
-    c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && /\(v2\.54\.0\)/.test(c16.reason || ""), JSON.stringify(c16)?.slice(0, 300));
+    c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && /\(v2\.55\.0\)/.test(c16.reason || ""), JSON.stringify(c16)?.slice(0, 300));
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 

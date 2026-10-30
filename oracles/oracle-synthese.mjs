@@ -116,6 +116,8 @@
  *       et ne range pas quatre identifiants en code ou plus sur sa ligne (une énumération se met en liste) ; avertissante ;
  *   S89 UN ÉCART ENTRE DEUX RÉFÉRENCES GIT (29/10, TF-1984, gabarit 2.54.0) : des fichiers dits « absents de » ou « pas dans » une référence git exigent, dans le texte,
  *       `git diff --name-status`, `--diff-filter` ou un essai d'existence (`cat-file -e`, `ls-tree`) ; avertissante ;
+ *   S90 UN CHIFFRE SE RELÈVE (30/10, D-100 (a) du 29/10, gabarit 2.55.0) : une durée, un coût, un score, un volume ou un compte d'objets qu'aucune sortie du tour ne montre, et que la ligne
+ *       ne dit pas non mesuré ; lue par `lib-chiffres-releves.mjs`, sur les nombres passés par le hook (`--nombres-tour`) ; avertissante ;
  *   S36 / S38 (TF-1981), S48 (TF-1982, TF-1987), S68 (TF-1985) étendues dans le même gabarit 2.54.0 : la critique d'implémentation ne se lit comme un verdict ni en action
  *       (bloc 8) ni en option (bloc 3), et ni `hors_mandat` ni `borne_atteinte` ne dispensent de la jouer ; « reste au produit » suppose un run ouvert au ledger ;
  *       une recréation ou un redémarrage de conteneur ou de service est une correction ; un 200 au corps vide ne prouve pas une absence sans 404 ni essai de chaque portée ;
@@ -207,6 +209,7 @@ import { fileURLToPath } from "node:url";
 import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
 import { enumerationsEnLigne, etapesDeGuide, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
 import { affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
+import { chiffresSansReleve } from "./lib-chiffres-releves.mjs";
 import { lireCarte, derniereDemande, etatDesLivrables } from "./lib-mobilisation.mjs";
 
 // --racine <dossier> (TF-1644, 14/10/2026) : le dossier du PROJET dont la restitution est jugée,
@@ -224,6 +227,8 @@ const HORLOGE = _option("--horloge");
 const _releves = (nom) => { const v = _option(nom); if (v === null) return null; return v === "aucun" ? [] : v.split(",").map((x) => Date.parse(x.trim())).filter(Number.isFinite); };
 const RELEVES_TOUR = _releves("--releves-tour");
 const RELEVES_SESSION = _releves("--releves-session");
+// --nombres-tour <fichier.json> (D-100 (a), 29/10/2026) : les nombres que le tour a pu lire. Seul le hook de fin de tour les connaît ; sans eux, S90 rend SANS_OBJET.
+const NOMBRES_TOUR = (() => { const f = _option("--nombres-tour"); if (!f) return null; try { return JSON.parse(readFileSync(f, "utf8")); } catch { return null; } })();
 // Mise en service du verrou « livré » (S85, S86 ; T4, TF-1949) : une restitution datée d'avant au bloc 1 n'est pas jugée (non rétroactif).
 const VERROU_LIVRE_DEPUIS = "2026-10-26";
 
@@ -4090,6 +4095,15 @@ function juger(texte, cheminJuge = null) {
       + "Le 26/10/2026, « 3 fichiers de env/uat qui ne sont pas dans main » étaient 3 modifications (M) : la préconisation changeait de nature, reporter 10 lignes au lieu d'ajouter 3 fichiers (TF-1984). "
       + `Ex. : ${accusees89[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
     else ok("S89", `${accusees89.length} phrase(s) disent des fichiers absents d'une référence git, et le texte cite le statut de fichier que git rend`);
+  }
+  // S90 (D-100 (a) du 29/10/2026, gabarit 2.55.0) — UN CHIFFRE SE RELÈVE DANS LE TOUR, OU SE DIT NON MESURÉ. Le fait, relevé par l'œil critique du 29/10 : 9 chiffres
+  // affirmés sans mesure puis corrigés en 3 jours (« 15 minutes » pour 46 secondes, 599 $, 84 sur 100). Avertissante : la décision veut mesurer son bruit avant tout blocage.
+  // NON JUGÉ : qu'un chiffre retrouvé soit le bon ; un total calculé dans la réponse est accusé à tort. Sans les nombres du tour (oracle joué seul), SANS_OBJET.
+  if (NOMBRES_TOUR === null) findings.push({ regle: "S90", statut: "SANS_OBJET", message: "nombres du tour inconnus (--nombres-tour) : le texte seul ne dit pas si un chiffre a été lu" });
+  else {
+    const sans90 = chiffresSansReleve(texte, NOMBRES_TOUR);
+    if (!sans90.length) ok("S90", "tout chiffre de durée, de coût, de score, de volume ou de compte a été lu dans une sortie du tour, ou se dit non mesuré");
+    else ko("S90", `${sans90.length} chiffre(s) qu'aucune sortie du tour ne montre : ${sans90.slice(0, 3).map((x) => `« ${x.chiffre} » (${x.nature})`).join(", ")} — relève-le dans le tour, ou écris « non mesuré », « estimé » ou « projeté » sur sa ligne. Le 29/10, « 15 minutes » reprises d'une note périmée en valaient 46 secondes.`);
   }
 
   // S69 (TF-1646, 14/10/2026) — UNE HEURE D'EN-TÊTE N'EST PAS DANS LE FUTUR. Le fait du 12/10 :

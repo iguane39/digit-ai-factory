@@ -38,6 +38,30 @@ const gesteEssai = { commande: "az group delete --name rg-essai --yes", cible: "
 const lotOk = (gestes, extra = {}) => ({ schema: "pilot/gestes-approuves@1", decision: "D-78", reponse_humaine: "78a, vas-y pour toute la liste", horodatage: il_y_a(1), expire: il_y_a(-23), gestes, ...extra });
 
 try {
+  // ---- D-98 (a) du 29/10/2026 : les 4 formes que la revue de code a laissées passer ---------
+  const p98 = projet();
+  check("rouge (D-98) — `if` et `while` devant le geste ne le cachent pas", () => {
+    for (const c of ["if az group delete -n x; then echo ok; fi", "while az group delete -n x; do :; done", "until az group delete -n x; do :; done"]) refuse(jouer(p98, "Bash", c));
+  });
+  check("vert (D-98) — un mot de contrôle devant une commande ordinaire ne rend rien suspect", () => {
+    for (const c of ["if grep -q az fichier; then echo ok; fi", "while read ligne; do echo $ligne; done"]) passe(jouer(p98, "Bash", c));
+  });
+  check("rouge (D-98) — un `<<EOF` entre guillemets ou en commentaire ne masque pas la ligne suivante", () => {
+    for (const c of ['echo "use <<EOF"\naz group delete -n x', "# voir <<EOF\naz group delete -n x", "git log --grep '<<EOF'\naz group delete -n x"]) refuse(jouer(p98, "Bash", c));
+  });
+  check("rouge (D-98) — un `<<EOF` réel sans ligne de fin ne masque rien", () => {
+    refuse(jouer(p98, "Bash", "cat <<EOF\naz group delete -n x"));
+  });
+  check("vert (D-98) — le corps d'un vrai document en ligne reste du texte", () => {
+    passe(jouer(p98, "Bash", "cat <<EOF > note.txt\naz group delete -n x\nEOF\necho fini"));
+  });
+  check("rouge (D-98) — les options courtes groupées de curl : `-sX DELETE`, `-sSXDELETE`", () => {
+    for (const c of ["curl -sX DELETE https://api.github.com/repos/a/b", "curl -sSXDELETE https://api.github.com/repos/a/b"]) refuse(jouer(p98, "Bash", c));
+  });
+  check("vert (D-98) — `curl -sS` sans méthode reste une lecture", () => {
+    passe(jouer(p98, "Bash", "curl -sS https://api.github.com/repos/a/b"));
+  });
+
   // ---- Les six cas de la consigne ----------------------------------------------------------
   const p1 = projet();
   check("1 rouge — `az group delete` sans lot : refusé, avec le remède (décision groupée au bloc 3)", () => {

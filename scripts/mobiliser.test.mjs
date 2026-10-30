@@ -68,11 +68,11 @@ try {
   check("une forge privilégiée écartée sort de la carte avec son motif ; une 2e demande AJOUTE une ligne, n'en réécrit aucune", () => {
     const d = produit("deux-demandes");
     lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsProduitNeuf())]);
-    const v = verdictsProduitNeuf(); v.ops = { verdict: "ecartee", motif: "aucune mise en production dans cette demande" }; v.data = { verdict: "ecartee", motif: "aucune donnée à agréger ici" };
+    const v = verdictsProduitNeuf(); v.ops = { verdict: "ecartee", motif: "0 fichier de déploiement touché par cette demande" }; v.data = { verdict: "ecartee", motif: "aucune donnée à agréger ici" };
     const r = lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, v)]);
     att(r.code === 0, `exit ${r.code} : ${r.brut.slice(0, 300)}`);
     att(trace(d).length === 2, `${trace(d).length} ligne(s) au lieu de 2`);
-    att(/− ops \(aucune mise en production/.test(r.sortie.ligne_ecran), `l'écart à la carte n'est pas dit : ${r.sortie.ligne_ecran}`);
+    att(/− ops \(0 fichier de déploiement/.test(r.sortie.ligne_ecran), `l'écart à la carte n'est pas dit : ${r.sortie.ligne_ecran}`);
   });
 
   check("rouge — une forge sans verdict (12 sur 13) est refusée en la nommant, et rien n'est écrit", () => {
@@ -90,6 +90,29 @@ try {
       const r = lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, v)]);
       att(r.code === 1 && /websec/.test(r.brut), `motif « ${motif} » : exit ${r.code}`);
     }
+  });
+
+  check("rouge (D-99 b) — ops, websec ou data écartées d'une demande qui les vise, sans fait mesuré, sont refusées et rien n'est écrit", () => {
+    for (const [f, type, demande] of [["ops", "evolution", "ajouter un filtre"], ["websec", "securite", "corriger des défauts"], ["data", "document", "Crée une fiche DPO de l'application"], ["ops", "document", "plan de déploiement sur Cloudflare"]]) {
+      const d = produit(`ecart-${f}-${type}`);
+      const v = verdictsProduitNeuf(); v[f] = { verdict: "ecartee", motif: "hors carte pour cette demande" };
+      const r = lancer(d, ["--type", type, "--demande", demande, "--verdicts", ecrireVerdicts(d, v)]);
+      att(r.code === 1 && new RegExp(`${f} : la demande la vise`).test(r.brut), `${f} / ${type} : exit ${r.code} ${r.brut.slice(0, 200)}`);
+      att(trace(d).length === 0, `${f} / ${type} : une ligne a été écrite`);
+    }
+  });
+
+  check("vert (D-99 b) — le même écart avec un fait mesuré passe, et une forge que la demande ne vise pas s'écarte d'un motif simple", () => {
+    for (const motif of ["0 fichier de déploiement touché", "seul src/filtre.ts change", "`git diff --stat` ne touche aucun workflow"]) {
+      const d = produit(`fait-${motif.length}`);
+      const v = verdictsProduitNeuf(); v.ops = { verdict: "ecartee", motif };
+      const r = lancer(d, ["--type", "evolution", "--demande", "ajouter un filtre", "--verdicts", ecrireVerdicts(d, v)]);
+      att(r.code === 0, `motif « ${motif} » : exit ${r.code} ${r.brut.slice(0, 200)}`);
+    }
+    const d = produit("non-visee");
+    const v = verdictsProduitNeuf(); v.ops = { verdict: "ecartee", motif: "un document ne se déploie pas" };
+    const r = lancer(d, ["--type", "document", "--demande", "rédiger une note", "--verdicts", ecrireVerdicts(d, v)]);
+    att(r.code === 0, `forge non visée : exit ${r.code} ${r.brut.slice(0, 200)}`);
   });
 
   check("rouge — un type hors de la carte est refusé avec la liste des types connus", () => {

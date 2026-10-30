@@ -11,7 +11,8 @@
  * l'écriture, type de demande (carte `references/CARTE-FORGES.json` du pilot), profil du produit (`forge/PROFIL.json`), et pour
  * chacune des 13 forges « mobilisee » ou « ecartee » avec son motif. Il rend la seule ligne que l'écran montre, « Je mobilise : … ».
  * Il refuse (exit 1, rien d'écrit) une forge sans verdict, un motif absent, de moins de 3 mots ou resté au gabarit, un type hors de
- * la carte, un profil non déclaré. Le pilot est lu, jamais écrit.
+ * la carte, un profil non déclaré, et depuis D-99 (b) ops, websec ou data écartées d'une demande qui les vise sans un fait mesuré
+ * (nombre, chemin ou commande citée). Le pilot est lu, jamais écrit.
  *
  *   node <pilot>/scripts/mobiliser.mjs --preparer --type <type>[,<type>] [--sortie <fichier.json>]
  *       le squelette des 13 verdicts : forges privilégiées et forges que le profil désigne proposées « mobilisee », les autres
@@ -29,7 +30,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
-  CHEMIN_TRACE, FORGES, derniereDemande, ecrireProfil, etatDesLivrables, ligneDeTrace, lireCarte, lireProfil, lireProfilTexte, squelette,
+  CHEMIN_TRACE, FORGES, derniereDemande, ecartsSansFait, ecrireProfil, etatDesLivrables, ligneDeTrace, lireCarte, lireProfil, lireProfilTexte, squelette,
   typesDe, validerVerdicts,
 } from "../oracles/lib-mobilisation.mjs";
 import { produitDe } from "../oracles/hook-restitution.mjs";
@@ -113,6 +114,8 @@ if (profilTexte) ecrireProfil(produit, profil);
 const demande = valeur("--demande") ?? (fourni && typeof fourni.demande === "string" ? fourni.demande.trim() || null : null);
 if (demande === DEMANDE_A_REMPLIR)
   sortie({ outil: OUTIL, verdict: "REFUS", refus: [`demande laissée au gabarit (« ${DEMANDE_A_REMPLIR} ») : écris son résumé dans le fichier, ou passe --demande "<résumé>"`] }, 1);
+const sansFait = ecartsSansFait(t.types, verdicts, demande);
+if (sansFait.length) sortie({ outil: OUTIL, verdict: "REFUS", refus: sansFait }, 1);
 const ligne = ligneDeTrace({ carte, types: t.types, profil, verdicts, demande });
 mkdirSync(join(produit, "forge"), { recursive: true });
 appendFileSync(join(produit, CHEMIN_TRACE), JSON.stringify(ligne) + "\n", "utf8");
