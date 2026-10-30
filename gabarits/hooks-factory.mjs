@@ -57,7 +57,12 @@ const [nom, ...options] = process.argv.slice(2);
 // `az … delete`, `terraform destroy`, une attribution de droits, `gh repo delete`, `git push --force` sont refusés
 // tant qu'aucun lot approuvé valide (forge/gestes-approuves.jsonl, 24 h au plus) ne les couvre. Bloque. Le mode
 // `--poser` (écrire le lot approuvé) n'a pas non plus l'usage de l'entrée standard.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants"]);
+// `fichiers-env` (29/10/2026, décision humaine D-106 (b)) : hook PreToolUse sur Read, Grep, Bash et PowerShell — « les .env
+// ne transitent jamais » se joue sur l'outil qui lit : Read et Grep d'un `.env*`, et les commandes qui en affichent le
+// contenu (cat, type, Get-Content, head, tail, less, more, grep, sed, awk, Select-String, copie vers la sortie standard)
+// sont refusés ; `.env.example`, `.env.sample` et `.env.template` passent. Voie permise : `scripts/env-masque.mjs` du
+// pilot (valeurs masquées, ou clés seules). Bloque.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "fichiers-env"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [

@@ -101,6 +101,8 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true }] }],
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
+      // D-106 (b) (HERITAGE 1.44.0, 29/10/2026) : les .env ne transitent jamais, le hook refuse leur lecture.
+      { matcher: "Read|Grep|Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs fichiers-env" }] },
       { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },
         { type: "command", command: "node forge/hooks/factory.mjs remisage" }] },
       // TF-1959 (HERITAGE 1.37.0, 26/10/2026) : les gestes destructifs distants se décident en un lot.
