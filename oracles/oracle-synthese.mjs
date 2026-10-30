@@ -116,6 +116,7 @@
  *       et ne range pas quatre identifiants en code ou plus sur sa ligne (une énumération se met en liste) ; avertissante ;
  *   S89 UN ÉCART ENTRE DEUX RÉFÉRENCES GIT (29/10, TF-1984, gabarit 2.54.0) : des fichiers dits « absents de » ou « pas dans » une référence git exigent, dans le texte,
  *       `git diff --name-status`, `--diff-filter` ou un essai d'existence (`cat-file -e`, `ls-tree`) ; avertissante ;
+ *   S91 UNE ACTION DIT CE QU'ELLE FAIT (30/10, gabarit 2.56.0) : un tableau d'actions A-N au bloc 8 porte une colonne « Action » et, sur chaque ligne, une phrase de 4 mots au moins hors code ; avertissante ;
  *   S90 UN CHIFFRE SE RELÈVE (30/10, D-100 (a) du 29/10, gabarit 2.55.0) : une durée, un coût, un score, un volume ou un compte d'objets qu'aucune sortie du tour ne montre, et que la ligne
  *       ne dit pas non mesuré ; lue par `lib-chiffres-releves.mjs`, sur les nombres passés par le hook (`--nombres-tour`) ; avertissante ;
  *   S36 / S38 (TF-1981), S48 (TF-1982, TF-1987), S68 (TF-1985) étendues dans le même gabarit 2.54.0 : la critique d'implémentation ne se lit comme un verdict ni en action
@@ -1111,6 +1112,23 @@ function juger(texte, cheminJuge = null) {
     const ordre = /(priorit|d'abord|en premier|impact|risque \d+|parce qu|car\b|levier)/i.test(bActions);
     if (acteur && ordre) ok("S6", "prochaines actions : acteur nommé et ordre justifié");
     else ko("S6", `prochaines actions sans ${!acteur ? "acteur" : ""}${!acteur && !ordre ? " ni " : ""}${!ordre ? "justification d'ordre" : ""} — une liste non ordonnée se lit dans l'ordre où elle a été écrite, pas dans celui qui sert`);
+  }
+
+  // S91 (30/10/2026, gabarit 2.56.0) — UNE ACTION DIT CE QU'ELLE FAIT. Retour humain du 30/10 sur 3 actions réduites à un motif et un chemin : « On ne sait pas ce que
+  // font A1, A2 & A3, recommence. Et remonte à la factory. » Le gabarit lui-même ne prévoyait aucune colonne pour le dire. Avertissante. NON JUGÉ : que la phrase soit claire ;
+  // une action en liste (« - **A-1** — … ») porte déjà sa phrase.
+  {
+    const lignes91 = bActions.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.startsWith("|"));
+    const cellules91 = (l) => l.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+    const actions91 = lignes91.filter((l) => /^\|\s*\**\s*A\s*-?\s*\d+/.test(l));
+    if (!actions91.length) ok("S91", "aucun tableau d'actions A-N au bloc 8 — rien à juger");
+    else {
+      const col91 = cellules91(lignes91[0]).findIndex((c) => /^\**\s*(action|ce que|quoi)/i.test(c));
+      const muettes91 = col91 < 0 ? actions91 : actions91.filter((l) => (cellules91(l)[col91] || "").replace(/`[^`]*`/g, " ").split(/\s+/).filter(Boolean).length < 4);
+      if (col91 < 0) ko("S91", `le tableau du bloc 8 n'a pas de colonne « Action » : ${actions91.length} action(s) ne disent pas ce qu'elles font. Une phrase par ligne, en mots du lecteur : ce que l'action change, pas son fichier. Le 30/10/2026 : « On ne sait pas ce que font A1, A2 & A3 ».`);
+      else if (muettes91.length) ko("S91", `${muettes91.length} action(s) sur ${actions91.length} sans phrase dans la colonne « Action » (4 mots au moins, hors code).`);
+      else ok("S91", `${actions91.length} action(s) disent ce qu'elles font`);
+    }
   }
 
   // S7 — profondeur de puces
@@ -6290,6 +6308,20 @@ Aucun écart : la demande a été suivie à la lettre.
   for (const [r, statut, quoi] of attendu68)
     if (constatDe(r, "S68").statut !== statut)
       casse.push(`S68 (TF-1580, TF-1985) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S68").message || "sortie illisible").slice(0, 160));
+  // 30/10 — S91, UNE ACTION DIT CE QU'ELLE FAIT, DANS SES SENS : un tableau sans colonne « Action » FAIL (le cas du 30/10) ; la colonne vide ou réduite à un chemin FAIL ; une phrase PASS ; une action en liste PASS.
+  const B8_91 = (corps) => verte.replace(/## 8\. Prochaines actions[\s\S]*?(?=\n## |\s*$)/, "## 8. Prochaines actions\n\nD'abord le gate, parce qu'il protège la production.\n\n" + corps + "\n");
+  const LIGNE_91 = "| A-1 | neuve | auto_ia | `borne_atteinte` : durée du tour | `gate.py` | une page passe le gate |";
+  const r91sans = jouerPe("s91-sans-colonne.md", B8_91("| Sélecteur | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |\n|---|---|---|---|---|---|\n" + LIGNE_91));
+  const r91chemin = jouerPe("s91-colonne-chemin.md", B8_91("| Sélecteur | Action | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |\n|---|---|---|---|---|---|---|\n| A-1 | `gate.py` | neuve | auto_ia | `borne_atteinte` | `gate.py` | une page passe le gate |"));
+  const r91phrase = jouerPe("s91-phrase.md", B8_91("| Sélecteur | Action | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |\n|---|---|---|---|---|---|---|\n| A-1 | Faire voir au contrôle les pages du dossier test | neuve | auto_ia | `borne_atteinte` | `gate.py` | une page passe le gate |"));
+  for (const [r, statut, quoi] of [
+    [r91sans, "FAIL", "un tableau d'actions sans colonne « Action » passe — le cas du 30/10"],
+    [r91chemin, "FAIL", "une colonne « Action » réduite à un chemin passe"],
+    [r91phrase, "PASS", "une action qui dit ce qu'elle fait est accusée"],
+    [r58sansObjet, "PASS", "la verte, dont les actions sont en liste, est accusée"],
+  ]) if (constatDe(r, "S91").statut !== statut)
+    casse.push(`S91 : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S91").message || "sortie illisible").slice(0, 200));
+
   // 29/10 — S89, UN ÉCART ENTRE DEUX RÉFÉRENCES GIT SE LIT AVEC SON STATUT DE FICHIER (TF-1984), DANS SES SENS. Le cas réel du 21/10 : « env/uat contient 3 fichiers qui ne sont pas
   // dans main » ; `git diff --name-status` rend M pour les 3 (empreintes main 35618ba, env/uat db5274d). (a) La constatation nue FAIL ; (b) la MÊME après `git diff --name-status`,
   // qui dit M et déplace la préconisation, PASS ; (c) une autre tournure (« manquent à main ») FAIL ; (d) la même avec `--diff-filter=A` PASS ; (e) des fichiers absents d'un
