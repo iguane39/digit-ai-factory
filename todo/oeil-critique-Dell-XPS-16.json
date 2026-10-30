@@ -73,7 +73,7 @@
   "Forges : 20 demandes sur 62 sans une forge attendue (ops 8, websec ou agents-security 7, data 5, design 4) ; 39 produits sur 40 sans trace de mobilisation.",
   "Revue de code : 6 contournements confirmés des gardes d'identité sortante et de gestes distants ; 2 défauts du gate supabase de forge-development ; le scan de workflow d'agent accepte une négation.",
   "Automatiques faites : sessions automatiques écartées (oeil-critique 1.3.2), nettoyage qui garde fichiers ignorés et copies récentes, appelants git et workflows, casse du rappel de lettre, CI2 sans copies de travail, oracle des caractères de contrôle de forge-design.",
-  "Automatiques en attente : gate supabase de forge-development (dossier test, appel sur plusieurs lignes), 7 échecs préexistants du self-test de forge-design (oracle-dtcg, oracle-perceptibilite).",
+  "Automatiques en attente : gate supabase de forge-development (dossier test, appel sur plusieurs lignes), 7 échecs préexistants du self-test de forge-design (5 oracle-dtcg, 2 run-oracles-design).",
   "Majeures posées : D-98 à D-102, recommandations scellées (todo/oeil-critique-scelles.jsonl).",
   "Majeures en attente : suppression de hook-droits-accordes, avertissements sans porteur, variance du juge LLM, coût du hook des produits intacts, réponses de décision hors format acceptées, scan de workflow d'agent.",
   "Écartés : 42 sessions automatiques (contexte de test), la fiche DPO interrompue 3 fois (contexte de tâche)."
