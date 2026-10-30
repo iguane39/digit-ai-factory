@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md",
+ "empreinte": "689caa0cb152af08539a44160e38f1c89e6d0dcfb6cceecc3c1f94f57cf05344",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-10-30T10:06:00.192Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
