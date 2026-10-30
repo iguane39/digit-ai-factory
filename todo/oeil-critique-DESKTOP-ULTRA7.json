@@ -43,7 +43,7 @@
   }
  },
  "sortie": [
-  "Analyse faite : DESKTOP-ULTRA7, du 20/10 au 29/10/2026 19:14, 99 sessions dont 45 appels automatisés du juge, 8 agents, 1,08 M jetons.",
+  "Analyse faite : DESKTOP-ULTRA7, du 20/10 au 29/10/2026 19:14, 99 sessions dont 49 appels automatisés (47 du juge, 50 sessions humaines ; 45 écrit à tort à la première version), 8 agents, 1,08 M jetons.",
   "Indicateurs : 146 demandes, 41 reprises, 18 consignes répétées, 123 messages hors demande, 67 refus de hook ; première mesure de ce poste, rien à comparer.",
   "54 refus sur 67 sont des réponses non préjugées ; au moins 19 visent un tour sans écriture ; 48 demandes sur 146 en écart.",
   "Automatiques faites : oeil-critique 1.2.1 (lots d'agents égaux, champ « descente déclarée » retiré), forge-agents 84f086c.",
