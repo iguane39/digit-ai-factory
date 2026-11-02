@@ -38,6 +38,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { racineDuProjet } from "./lib-racine-projet.mjs";
 
 /** Actions qui ne publient rien, ou qui retirent. Tout le reste est refusé sans GO. */
 export const ACTIONS_LIBRES = new Set([
@@ -88,7 +89,9 @@ export function juger(entree, env = process.env) {
   if (!estOutilArtifact(entree?.tool_name)) return { decision: "laisse", motif: "outil hors Artifact" };
   const action = actionDe(entree);
   if (!exigeGo(action)) return { decision: "laisse", motif: `action « ${action} » : ne publie rien` };
-  const go = goEnvironnement(env) || goLedger(entree?.cwd || process.cwd());
+  // TF-2038 : le ledger vit à la racine du dépôt ; une session déplacée dans un sous-dossier le lit aussi.
+  const cwd = entree?.cwd || process.cwd();
+  const go = goEnvironnement(env) || goLedger(cwd) || goLedger(racineDuProjet(cwd, env));
   if (go) return { decision: "laisse", motif: `GO consigné : ${go}`, go };
   return {
     decision: "refuse",

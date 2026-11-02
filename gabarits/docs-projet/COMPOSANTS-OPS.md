@@ -87,6 +87,22 @@ verdict : le 14/09/2026, sur dix lignes déclarées inutilisées, cinq n'étaien
   l'instance est-elle supprimée sur CHAQUE environnement où elle existe, ce qui la crée est-il
   traité, et le PROCHAIN environnement la recréera-t-il ?
 
+## Composants à état (TF-1986)
+
+*Un conteneur qui garde des données de travail perd tout quand il est recréé, si elles ne vivent pas
+dans un volume. Une ligne par composant à état lancé par le produit ; sans composant de ce genre, écrire
+« aucun ». Le contrôle : `node oracles\oracle-ops.mjs --conteneurs-a-etat <racine> --composants <ce fichier>`
+de forge-ops (O-20), qui refuse un volume absent et une commande de création non écrite.*
+
+| Composant | Image | Données de travail | Volume | Commande de création |
+|---|---|---|---|---|
+| {nom} | {image:version} | {chemin des données dans le conteneur} | {volume nommé ou chemin monté} | `{docker run … -v <volume>:<chemin> <image>}` |
+
+**Le fait payé le 24/10/2026** : un moteur lancé sans volume, sa commande de création écrite nulle part ;
+Docker Desktop a redémarré, et une tâche de 612 photos a été perdue à 7 % après 3 h.
+
+---
+
 ## Cible d'exploitation forge-ops
 
 *Où ce produit se déploie, et avec quel plan. Une seule ligne par cible : c'est elle que l'étape MEP lit pour savoir à quoi elle s'adresse.*
