@@ -71,6 +71,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
+| `Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` | fichier | 36,8 Ko | Étude d'opportunité — Plateforme de pentest autorisé automatisé (CDC v1.1) : adoption par  |
 | `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,7 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
 | `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 12,4 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
@@ -92,4 +93,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_73 fichier(s), 2 sous-dossier(s)_
+_74 fichier(s), 2 sous-dossier(s)_ · 3 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
