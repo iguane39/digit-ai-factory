@@ -84,4 +84,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_65 fichier(s), 2 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_65 fichier(s), 2 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

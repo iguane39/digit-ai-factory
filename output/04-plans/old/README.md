@@ -17,5 +17,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` | fichier | 4,5 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
+| `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md` | fichier | 18,4 Ko | Prompt — construire le skill make-it-better et sa page de versions |
 
-_1 fichier(s), 0 sous-dossier(s)_
+_2 fichier(s), 0 sous-dossier(s)_

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 582 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 583 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -489,7 +489,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md | 20261028a | 10.1 Ko | `04-plans/Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
-| Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md | 20261102e | 18.4 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md` |
+| Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |
 | Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md | 20261102c | 14.5 Ko | `04-plans/Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md | 20261102a | 11.1 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
@@ -505,6 +505,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
+| Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md | 20261102h | 7.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` |
 | Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md | 20261102f | 10.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` |
 | Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md | 20261016c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` |
 | Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md | 20261102d | 12.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md` |
@@ -635,6 +636,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md | 20261019c | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` |
 | Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md | 20261026o | 4.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md *(archivé)* | 20261016a | 4.5 Ko | `04-plans/old/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` |
+| Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md *(archivé)* | 20261102e | 18.4 Ko | `04-plans/old/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md` |
 
 ### 05-catalogues-readmes-forges
 

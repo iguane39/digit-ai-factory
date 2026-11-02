@@ -18,13 +18,13 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 |---|---|---|---|
 | [`2026-08\`](2026-08/README.md) | dossier (39 fichiers) | — | Livrables de la famille `04-plans\` du mois clos 2026-08, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la famille, où … |
 | [`2026-09\`](2026-09/README.md) | dossier (176 fichiers) | — | Livrables de la famille `04-plans\` du mois clos 2026-09, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la famille, où … |
-| [`old\`](old/README.md) | dossier (1 fichier) | — | Versions remplacées des plans et prompts de `output\04-plans\`, gardées pour trace (règle 7 des règles du projet). Une session y déplace par `git mv` l'ancienne… |
+| [`old\`](old/README.md) | dossier (2 fichiers) | — | Versions remplacées des plans et prompts de `output\04-plans\`, gardées pour trace (règle 7 des règles du projet). Une session y déplace par `git mv` l'ancienne… |
 | `Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` | fichier | 14,7 Ko | Note — un œil critique sur les process de la Factory : le sujet, ce qui est mesuré, ce qui |
 | `Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` | fichier | 8,3 Ko | Prompt — Inventorier ce que les forges savent faire des bases de développement et de quali |
 | `Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` | fichier | 10,1 Ko | Prompt — Inventorier les fonctionnalités de Cloudflare, GitHub et Supabase pour en tirer l |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
-| `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md` | fichier | 18,4 Ko | Prompt — construire le skill make-it-better et sa page de versions |
+| `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` | fichier | 22,1 Ko | Prompt — construire le skill make-it-better et sa page de versions |
 | `Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` | fichier | 14,5 Ko | markdown |
 | `Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` | fichier | 11,1 Ko | Revue hebdomadaire des propositions — 2026-11-02 |
 | `Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` | fichier | 8,9 Ko | Revue hebdomadaire des propositions — 2026-10-26 |
@@ -40,6 +40,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
 | `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
+| `Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` | fichier | 7,8 Ko | Synthèse Conseil — prompt make-it-better avec Word et PDF, 1 décision attendue (02/11/2026 |
 | `Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` | fichier | 10,6 Ko | Synthèse Conseil — prompt du skill make-it-better passé au crible L99, 2 décisions attendu |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
 | `Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md` | fichier | 12,1 Ko | Synthèse Conseil — prompt de tri des favoris TikTok et de skill passé au crible L99 (02/11 |
@@ -170,4 +171,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_150 fichier(s), 3 sous-dossier(s)_
+_151 fichier(s), 3 sous-dossier(s)_
