@@ -24,7 +24,7 @@ Elle fournit un seul chemin, la page enregistrée le 02/11. Elle ne nomme ni le 
 
 **Decide.** 3 stratégies se présentaient :
 
-- Rejouer le tri du 19/10 sur les vidéos neuves. C'est rapide, mais la même grille n'a pas prédit la valeur des études : l'opportunité de score 21 a fini écartée (TF-1900), celle de score 16 a donné une suite de valeur 12 (TF-1903).
+- Rejouer le tri du 19/10 sur les vidéos neuves. C'est rapide, mais la grille n'a jamais été confrontée aux résultats des études. *Corrigé le 02/11/2026 : cette ligne affirmait que le score 21 avait fini écarté, en lisant au registre TF-1900 et TF-1903, numéros de la synthèse du 19/10 qui désignent aujourd'hui d'autres sujets. Relevé par le chemin des études : la suite du score 21 est TF-1921, au statut `corrige`.*
 - Construire le skill d'abord, puis l'appliquer. Le skill naîtrait alors sans cas réel.
 - Traiter le tableau à la main, en tirer le skill, puis le juger par un back-test sur le tri du 19/10.
 
@@ -108,7 +108,7 @@ Un refus ne ferme qu'une porte : ici aucune voie permise n'est fermée, et la se
 
 Les autres prémisses :
 
-- **« vidéos […] non encore analysées » suppose un registre : vrai, mais caché.** L'annexe du tri porte 109 identifiants. Comparer les 2 pages rend 29 contenus neufs. Comparer à l'annexe en rend 37, car 8 carrousels photo n'ont jamais été rangés. En ajoutant les 17 rangés sans qualification (7 « sans légende » et 10 « légende trop vague »), le périmètre vaut 54. Le chiffre le plus simple, 29, manque donc près de la moitié.
+- **« vidéos […] non encore analysées » suppose un registre : vrai, mais caché.** L'annexe du tri porte 109 identifiants. Comparer les 2 pages rend 29 contenus neufs. Comparer à l'annexe en rend 37, car 8 carrousels photo n'ont jamais été rangés. En ajoutant les 17 rangés sans qualification (7 « sans légende » et 10 « légende trop vague »), le périmètre vaut 54. Le chiffre le plus simple, 29, manque donc près de la moitié. *Précisé à l'exécution, le 02/11/2026 : les 7 « sans légende » ne sont pas des favoris, mais des liens du panneau de notifications de la page. Les 54 contenus se lisent donc 47 favoris et 7 notifications.*
 - **« le poste n'a ni `yt-dlp`, ni `ffmpeg` » (tri du 19/10) : périmé pour ce poste.** Les outils sont là ; l'interdiction des conditions de TikTok, elle, demeure. Cet argument est à ne pas réutiliser tel quel.
 - **Des vidéos se recoupent avec l'existant : vrai.** La n° 25 de la liste neuve (le skill « OBSERVER ») recoupe `output\03-etudes\20261026-comparaison-task-observer-oeil-critique.md` ; la n° 28 (`llm-council-skill`) recoupe `output\03-etudes\20261020-etude-opportunite-conseil-avant-arbitrage.md`.
 - **Un NO-GO a déjà visé un skill voisin : vrai.** `output\03-etudes\2026-08\20260813-etude-opportunite-outillage-analyse.md`, ligne 161. Sa clause de réveil (ligne 110) demande 5 emplois du gabarit ; 29 études portent ce nom dans le dossier courant et 107 dans le dépôt. La clause est atteinte, ce qui autorise la réévaluation sans préjuger du verdict.

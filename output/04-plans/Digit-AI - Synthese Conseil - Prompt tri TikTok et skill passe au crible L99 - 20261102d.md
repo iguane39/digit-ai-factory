@@ -92,7 +92,7 @@ Tous relèvent de la manière d'exécuter, et la relecture d'intention en relèv
 
 ## 7. Risques
 
-- **Grille non prédictive.** Le score 21 du 19/10 a fini écarté, et le score 16 a donné une suite corrigée. Signal : le taux d'accord du back-test, sous 9 sur 14. Parade : le réglage est proposé, jamais appliqué seul.
+- **Grille jamais éprouvée.** Elle n'a pas été confrontée aux résultats des 14 études. Signal : le taux d'accord du back-test, sous 9 sur 14. Parade : le réglage est proposé, jamais appliqué seul. *Corrigé le 02/11/2026 : cette ligne affirmait à tort que le score 21 avait fini écarté, sur des numéros de registre qui désignent aujourd'hui d'autres sujets. Sa suite est au statut corrigé.*
 - **Prompt long.** Il passe de 1 579 à plus de 2 000 mots. Signal : une étape sautée dans la restitution du run. Parade : le contrat de sortie vérifiable et le tableau enregistré avant le skill.
 
 ## 8. Prochaines actions
