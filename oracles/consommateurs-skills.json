@@ -4,7 +4,7 @@
   "_ce_que_cette_table_n_est_pas": "un inventaire des dépôts qui MENTIONNENT un skill. Seuls y figurent les dépôts dont un fichier EXÉCUTABLE invoque la copie installée (`~/.claude/skills/<nom>/…`) et qui portent une vérification native jouable. Une mention en prose, en TODO ou en rapport ne fait pas d'un dépôt un consommateur : elle ne casse rien quand la règle bouge.",
   "mesure_le": "2026-09-20",
   "mesure_par": "balayage de c:\\dev\\digit-ai-forge-* sur le motif `.claude/skills/<nom>` dans les fichiers .py .mjs .js .json .md .ps1 .sh .toml .cfg, puis tri des seules invocations portées par un fichier exécutable. 13 dépôts balayés, 4 retenus.",
-  "revise_le": "2026-09-20 (premier usage réel, décision humaine D-3 (a))",
+  "revise_le": "2026-11-02",
   "_ce_que_le_premier_usage_a_appris": "DEUX manques, tous deux dans cette table. (1) Chaque dépôt imprime ses échecs à sa façon ; sans `extracteur` déclaré, le contrôle ne comparait que des CODES DE SORTIE et un rouge préexistant a masqué un rouge neuf chez forge-tests. Les motifs ci-dessous sont MESURÉS sur la sortie réelle de chaque dépôt, pas devinés. (2) Une vérification peut sortir sans avoir rien jugé : `sortie_sans_jugement` liste les codes qui le déclarent, et `interprete` dit ce dont la commande a besoin pour être jouable — chez forge-audit, un shell POSIX.",
   "_extracteurs_provenance": "forge-tests : forme `FAILED <nodeid>` de pytest, lue dans la sortie réelle relevée par le pilot le 20/09. forge-audit : forme `[ROUGE] <étape>`, mesurée ici en rejouant la commande sous Git Bash. forge-design : forme ` ÉCHEC <txt>`, lue dans `oracles/self-test.mjs` du dépôt (`const ligne = (ok, txt) => …`). forge-data : forme `  [FAIL] <msg>`, lue dans `oracles/self-test.mjs` du dépôt (`const ok = (b, m) => …`). Les deux derniers n'ont PAS été rejoués — leurs suites n'ont pas été lancées depuis le pilot hors propagation. Un extracteur qui aurait dérivé ne reconnaît rien, et le verbe rend alors INDÉTERMINÉ : la dégradation est sûre, jamais une innocence.",
   "_ecartes_et_pourquoi": [
@@ -122,10 +122,10 @@
             "/usr/bin/bash"
           ],
           "argv": [
-            "-lc",
+            "-c",
             "{commande}"
           ],
-          "motif": "tools/verifier.mjs rejoue les blocs run: du workflow, qui sont du shell POSIX. Lance depuis un lanceur Windows il sort en 2 sans rien juger (mesure du 20/09 : 138 ms) ; sous Git Bash il juge vraiment. Aucun chemin nest ecrit dans le module : variable dabord, candidats ensuite, INDETERMINE nomme si aucun ne repond."
+          "motif": "tools/verifier.mjs rejoue les blocs run: du workflow, qui sont du shell POSIX. Lance depuis un lanceur Windows il sort en 2 sans rien juger (mesure du 20/09 : 138 ms) ; sous Git Bash il juge vraiment. Aucun chemin nest ecrit dans le module : variable dabord, candidats ensuite, INDETERMINE nomme si aucun ne repond. Sans -l depuis le 02/11/2026 (D-135) : un shell de connexion pose LANG=fr_FR.UTF-8, et le grep de Git Bash ne retrouve plus l'emoji « PII 🔒 » d'une étape du workflow, ce qui rendait 13/14 alors que le rapport le contient ; bash -c rend 14/14."
         }
       },
       "motif": "rapport-engine rend ses schémas par la copie installée de digit-ai-schemas ; `npm test` du dépôt lance exactement cette commande. Exposé, jamais encore mordu. PREMIER USAGE REEL (20/09) : la commande sortait en 2 sans rien juger faute de shell POSIX, et cet exit 2 etait compte pour un rouge preexistant. Corrige par interprete + sortie_sans_jugement."
