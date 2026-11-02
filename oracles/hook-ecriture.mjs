@@ -203,6 +203,72 @@ export function jouerFiche(fichier, oracle = ORACLE_FAMILLES, racine = process.c
   return lignes;
 }
 
+// UN LIVRABLE DÉPOSÉ À LA RACINE D'UN `output\` RANGÉ EN FAMILLES NUMÉROTÉES (TF-2041, RT-141, 02/11/2026).
+//
+// LE FAIT. Le 30/10/2026, un produit a reçu 2 PDF à la racine de `output\`, qu'il range en 7 familles (D-15 al. a, R-4) :
+// `git ls-tree -d origin/main output/` en rendait 7, l'arbre local, en retard de 194 commits, aucune. La session a copié ce
+// qu'elle voyait, et rien n'a réagi : le nommage de `oracle-conformite-projet` a rendu PASS. L'humain : « Pourquoi ce n'est
+// pas dans un dossier à part dans output ? »
+//
+// CE QUE FAIT CE CONTRÔLE. Pour tout fichier écrit DIRECTEMENT dans un dossier `output\` (hors index régénérés et fichiers
+// cachés), il lit les familles de ce dossier — les sous-dossiers `NN-…` — sur l'arbre local, puis sur la référence distante
+// déjà présente dans le clone (`origin/HEAD`, `origin/main` ou `origin/master`) : si le clone est en retard, ce sont les familles
+// de la référence distante qui comptent. Une seule famille, d'un côté ou de l'autre, suffit à dire que le dossier est rangé : il
+// AVERTIT alors, en nommant les familles et d'où elles sont lues. Un `output\` sans aucune famille est plat à bon droit et reste muet.
+//
+// IL AVERTIT, IL NE BLOQUE PAS, comme tout ce hook. IL NE FAIT AUCUN `git fetch` (un hook d'écriture n'ouvre pas le réseau) : la
+// référence distante est celle du dernier fetch du clone, et la ligne le dit. Il ne voit que les écritures par outil (Write, Edit,
+// MultiEdit) : un `cp` ou un `mv` par commande vers la racine d'`output\` passe. La mécanisation de la structure interne d'`output\`
+// (unicité de la version courante, `old\`, `LISEZMOI.md`) reste celle de D-15, chez `oracle-conventions` d'organization ;
+// ce contrôle ne juge que l'endroit où le fichier se pose.
+const EST_FAMILLE = /^\d{2,}-[^\\/]+$/;
+const envSansGit = () => Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_/i.test(k)));
+const gitDans = (cwd, ...a) => {
+  const r = spawnSync("git", ["-C", cwd, ...a], { encoding: "utf8", timeout: 15000, env: envSansGit() });
+  return r.status === 0 ? r.stdout.trim() : null;
+};
+
+/** Les familles de `output\` : sur l'arbre local, et sur la référence distante du clone ; `ref` est null quand aucune n'existe. */
+export function famillesDeOutput(dossierOutput) {
+  const locales = [];
+  try { for (const e of readdirSync(dossierOutput, { withFileTypes: true })) if (e.isDirectory() && EST_FAMILLE.test(e.name)) locales.push(e.name); } catch { /* illisible */ }
+  const racineGit = gitDans(dossierOutput, "rev-parse", "--show-toplevel");
+  let ref = null, distantes = [], retard = 0;
+  if (racineGit) {
+    const symbolique = gitDans(racineGit, "symbolic-ref", "-q", "refs/remotes/origin/HEAD");
+    for (const c of [symbolique && symbolique.replace(/^refs\/remotes\//, ""), "origin/main", "origin/master"].filter(Boolean)) {
+      if (gitDans(racineGit, "rev-parse", "--verify", "-q", `refs/remotes/${c}`) !== null) { ref = c; break; }
+    }
+    if (ref) {
+      const rel = relative(racineGit, resolve(dossierOutput)).replace(/\\/g, "/");
+      const arbre = gitDans(racineGit, "ls-tree", "-d", "--name-only", `refs/remotes/${ref}`, `${rel}/`);
+      distantes = (arbre || "").split(/\r?\n/).map((l) => basename(l.trim())).filter((n) => EST_FAMILLE.test(n));
+      retard = Number(gitDans(racineGit, "rev-list", "--count", `HEAD..refs/remotes/${ref}`)) || 0;
+    }
+  }
+  return { locales: locales.sort(), distantes: distantes.sort(), ref, retard };
+}
+
+/** Joue le contrôle de rangement sur un fichier écrit ; rend les lignes à imprimer (vide : pas à la racine d'un `output\`, ou `output\` plat). */
+export function jouerRangement(fichier) {
+  const lignes = [];
+  if (!fichier) return lignes;
+  const chemin = resolve(fichier), nom = basename(chemin), dossier = dirname(chemin);
+  if (basename(dossier).toLowerCase() !== "output" || nom.startsWith(".") || INDEX_REGENERES.has(nom.toLowerCase())) return lignes;
+  if (IGNORES.some((re) => re.test(chemin.replace(/\\/g, "/")))) return lignes;
+  const { locales, distantes, ref, retard } = famillesDeOutput(dossier);
+  const familles = [...new Set([...locales, ...distantes])].sort();
+  if (!familles.length) return lignes;
+  const source = distantes.length && (retard > 0 || !locales.length)
+    ? `lues sur ${ref} (${retard} commit(s) de ce dépôt distant absent(s) de ce clone ; dernier fetch, non rejoué)${locales.length ? "" : ", l'arbre local n'en montre aucune"}`
+    : "lues sur l'arbre local";
+  lignes.push(`[rangement] ${nom} : déposé à la RACINE de output\\, que ce dépôt range en ${familles.length} famille(s) numérotée(s) (D-15 al. a) — ${source} : `
+    + `${familles.slice(0, 12).join(", ")}${familles.length > 12 ? `, … (${familles.length} au total)` : ""}. `
+    + "Déplacer le livrable dans la famille qui porte son objet (le nom du dossier dit son contenu), ou créer la famille au premier numéro libre. "
+    + "Avertissement, non bloquant (TF-2041).");
+  return lignes;
+}
+
 // LE REGISTRE DES ORACLES SOUS LES YEUX AU MOMENT OÙ ON ÉCRIT UN CONTRÔLE (TF-1077, 16/09/2026).
 //
 // LE FAIT EST UN TAUX : la classe `oracle-remplace-par-controle-maison` compte 14 items dont
@@ -438,10 +504,49 @@ function selfTest() {
     if (/\[fiche\]/.test(viaProduit().stdout || "")) casse.push("D8 : par le lanceur d'un produit, la fiche posée sous son forge\\ n'est pas vue");
   }
 
+  // RANGEMENT (TF-2041) — un livrable déposé à la racine d'un `output\` rangé en familles est signalé, y compris quand le clone est en retard
+  // et que seule la référence distante montre les familles (le cas du 30/10/2026) ; rangé dans sa famille, ou dans un `output\` plat, il ne l'est pas.
+  {
+    const git = (cwd, ...a) => spawnSync("git", ["-c", "user.name=banc", "-c", "user.email=banc@exemple.fr", "-C", cwd, ...a], { encoding: "utf8", env: envSansGit() });
+    const poser = (p, texte = "x\n") => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, texte, "utf8"); return p; };
+    const base = join(dir, "rangement"); mkdirSync(base, { recursive: true });
+    const distant = join(base, "distant.git"), c1 = join(base, "c1"), c2 = join(base, "c2");
+    if (git(base, "init", "-q", "--bare", "-b", "main", distant).status !== 0) casse.push("RANGEMENT : le banc n'a pas pu créer son dépôt distant (git init --bare -b main)");
+    else {
+      git(base, "init", "-q", "-b", "main", c1);
+      poser(join(c1, "output", "Digit-AI - Note plate - 20261001a.md"));
+      git(c1, "add", "-A"); git(c1, "commit", "-q", "-m", "etat plat");
+      git(c1, "remote", "add", "origin", distant); git(c1, "push", "-q", "-u", "origin", "main");
+      git(base, "clone", "-q", distant, c2);
+      poser(join(c1, "output", "01-etudes", "Digit-AI - Etude - 20261002a.md")); poser(join(c1, "output", "02-plans", "Digit-AI - Plan - 20261003a.md"));
+      git(c1, "add", "-A"); git(c1, "commit", "-q", "-m", "familles"); git(c1, "push", "-q", "origin", "main");
+      git(c2, "fetch", "-q", "origin");
+      const racineEnRetard = jouerRangement(poser(join(c2, "output", "Rapport-audit.pdf"), "%PDF-1.4\n"));
+      if (!racineEnRetard.some((l) => /\[rangement\] Rapport-audit\.pdf[^\n]*RACINE de output[^\n]*lues sur origin\/main \(1 commit\(s\)[^\n]*l'arbre local n'en montre aucune[^\n]*01-etudes, 02-plans/.test(l)))
+        casse.push(`RANGEMENT : un PDF déposé à la racine d'un output\\ dont seule la référence distante montre les familles (clone en retard, le cas du 30/10) n'est pas signalé (${racineEnRetard.join(" | ") || "aucune ligne"})`);
+      const racineAJour = jouerRangement(poser(join(c1, "output", "Rapport-audit.pdf"), "%PDF-1.4\n"));
+      if (!racineAJour.some((l) => /lues sur l'arbre local[^\n]*01-etudes, 02-plans/.test(l)))
+        casse.push(`RANGEMENT : un livrable déposé à la racine d'un output\\ rangé en familles, clone à jour, n'est pas signalé sur l'arbre local (${racineAJour.join(" | ") || "aucune ligne"})`);
+      // Le remède joué : le même livrable dans sa famille ne dit rien.
+      const rangeEnFamille = jouerRangement(poser(join(c2, "output", "01-etudes", "Rapport-audit.pdf"), "%PDF-1.4\n"));
+      if (rangeEnFamille.length) casse.push(`RANGEMENT : le livrable rangé dans sa famille avertit encore — le remède du message échoue (${rangeEnFamille.join(" | ")})`);
+      if (jouerRangement(poser(join(c1, "output", "README.md"))).length || jouerRangement(poser(join(c1, "output", "LISEZMOI.md"))).length)
+        casse.push("RANGEMENT : un index régénéré (README.md, LISEZMOI.md) à la racine d'output\\ est accusé");
+      if (jouerRangement(poser(join(c1, "docs", "Rapport-audit.pdf"))).length) casse.push("RANGEMENT : un fichier hors d'un dossier output\\ est accusé");
+    }
+    const plat = join(base, "plat"); git(base, "init", "-q", "-b", "main", plat);
+    if (jouerRangement(poser(join(plat, "output", "Digit-AI - Note - 20261004a.md"))).length)
+      casse.push("RANGEMENT : un output\\ plat, sans aucune famille ni localement ni à distance, est accusé — le hook deviendrait bavard");
+    const horsGit = join(base, "hors-git");
+    poser(join(horsGit, "output", "03-livrables", "x.md"));
+    if (!jouerRangement(poser(join(horsGit, "output", "Digit-AI - Note - 20261005a.md"))).some((l) => /lues sur l'arbre local[^\n]*03-livrables/.test(l)))
+      casse.push("RANGEMENT : hors de tout dépôt git, un output\\ rangé en familles ne signale pas le dépôt à sa racine");
+  }
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test hook-ecriture : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-ecriture : 14 cas d'avant + À REJOUER (TF-1960) PASS — courriel à un tiers de 90 mots rappelé avec son passage et sa passe 2 sur 3, jamais FAIL, le même réécrit PASS, courriel anglais rappelé puis PASS avec `langue: en` ; + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077))");
+    : "Self-test hook-ecriture : 14 cas d'avant + À REJOUER (TF-1960) PASS — courriel à un tiers de 90 mots rappelé avec son passage et sa passe 2 sur 3, jamais FAIL, le même réécrit PASS, courriel anglais rappelé puis PASS avec `langue: en` ; + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077)) ; + RANGEMENT (TF-2041) PASS — livrable à la racine d'un output\\ rangé en familles signalé sur la référence distante quand le clone est en retard et sur l'arbre local sinon, rangé dans sa famille, index régénérés, fichier hors output\\ et output\\ plat silencieux, hors dépôt git signalé sur l'arbre local");
   return casse.length ? 1 : 0;
 }
 
@@ -466,7 +571,7 @@ if (lanceEnDirect) {
   // muet pour servir l'autre.
   const lignes = [];
   if (fichier && existsSync(resolve(fichier))) lignes.push(...jouer(resolve(fichier)), ...jouerFamille(resolve(fichier)), ...jouerFiche(resolve(fichier)));
-  if (brut && existsSync(resolve(brut))) lignes.push(...jouerControleMaison(resolve(brut)));
+  if (brut && existsSync(resolve(brut))) lignes.push(...jouerControleMaison(resolve(brut)), ...jouerRangement(resolve(brut)));
   if (!lignes.length) process.exit(0);
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);
