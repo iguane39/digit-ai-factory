@@ -2012,6 +2012,44 @@ check("TF-0898 borne : une règle demandée sans constat est DITE, jamais un PAS
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-2028 (02/11/2026) — une étude suit R-4 ; le préfixe daté « AAAAMMJJ-… » reste admis ----
+// R-4 nomme « tout livrable documentaire » `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` et n'excepte
+// aucun dossier. L'oracle exigeait pourtant, sous `output\03-etudes\`, un préfixe daté (TF-0197) et
+// refusait les études nommées selon R-4. VERT : l'étude au nom R-4 passe, l'étude au préfixe daté
+// historique passe. ROUGE : un nom sans date échoue, une étude R-4 sans indice échoue, et deux études
+// R-4 de radical distinct qui partagent un indice échouent (le jugement ordinaire s'applique à elles).
+const projetEtudes = (noms) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-etudes-"));
+  mkdirSync(join(d, "output", "03-etudes"), { recursive: true });
+  for (const n of noms) writeFileSync(join(d, "output", "03-etudes", n), "# étude\n", "utf8");
+  return d;
+};
+const r4Etudes = (noms) => {
+  const d = projetEtudes(noms);
+  try { const r = lanceArgs(d, "--regles", "R-4"); return { exit: r.exit, fails: (r.rapport.findings || []).filter((x) => x.regle === "R-4" && x.statut === "FAIL") }; }
+  finally { rmSync(d, { recursive: true, force: true }); }
+};
+check("TF-2028 vert : une étude nommée selon R-4 (« Projet - Type - Objet - AAAAMMJJ<i> ») sous 03-etudes → PASS", () => {
+  const r = r4Etudes(["Digit-AI - Étude - Boucle de relecture - 20261029f.md"]);
+  if (r.exit !== 0 || r.fails.length) throw new Error(`étude conforme à R-4 refusée : ${JSON.stringify(r.fails)}`);
+});
+check("TF-2028 vert : le préfixe daté historique « AAAAMMJJ-… » sous 03-etudes reste valide → PASS", () => {
+  const r = r4Etudes(["20260817-etude-rangement.md", "20261001-L99-etude-textes-relance.md"]);
+  if (r.exit !== 0 || r.fails.length) throw new Error(`nom historique refusé : ${JSON.stringify(r.fails)}`);
+});
+check("TF-2028 rouge : un nom d'étude sans aucune date → FAIL R-4", () => {
+  const r = r4Etudes(["etude-sans-date.md"]);
+  if (r.exit !== 1 || !r.fails.some((f) => /etude-sans-date/.test(f.ou))) throw new Error(`nom sans date accepté : exit ${r.exit}`);
+});
+check("TF-2028 rouge : « Projet - Type - Objet » sans date ni indice → FAIL R-4", () => {
+  const r = r4Etudes(["Digit-AI - Étude - Boucle de relecture.md"]);
+  if (r.exit !== 1 || !r.fails.some((f) => /Boucle de relecture/.test(f.ou))) throw new Error(`nom R-4 sans date accepté : exit ${r.exit}`);
+});
+check("TF-2028 rouge : deux études R-4 de radical distinct au même indice → FAIL R-4 (unicité de l'indice, TF-0750)", () => {
+  const r = r4Etudes(["Digit-AI - Étude - Sujet A - 20261028a.md", "Digit-AI - Inventaire - Sujet B - 20261028a.md"]);
+  if (r.exit !== 1 || !r.fails.some((f) => /20261028a/.test(f.message))) throw new Error(`indice partagé accepté : exit ${r.exit} ${JSON.stringify(r.fails)}`);
+});
+
 // ---- TF-0902 (08/09) — R-7 bis : deux versions du même livrable hors old\ ---------------------
 // ROUGE : le cas exact du 07/09 — deux indices du même journal dans le même dossier, que R-4
 // laissait passer (deux noms valides, chacun unique). VERTE : la version remplacée a migré dans

@@ -352,10 +352,17 @@ for (const d of ["output", "docs"]) {
     // que le dossier se lise dans l'ordre chronologique. Deux textes du pilot se
     // contredisaient : les 5 études sortaient en FAIL R-4 sans qu'aucune soit fautive. Le
     // nommage y reste CONTRAINT, mais par son propre motif : un préfixe daté obligatoire.
-    if (/^output[\/]03-etudes[\/]/.test(rel(f))) {
-      if (!/^\d{8}-/.test(nom)) { ko("R-4", rel(f), "étude sans préfixe daté « AAAAMMJJ-… » (gabarits\\ETUDE-OPPORTUNITE.md)"); r4 = false; }
-      continue;
-    }
+    //
+    // TF-2028 (02/11/2026) : ce motif a CESSÉ de dire la règle. R-4 (REGLES-PROJET.md l.44) nomme
+    // « tout livrable documentaire » `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` et n'excepte
+    // aucun dossier ; R-25 (l.46) fait du `<Type>` le 2ᵉ segment de ce nom. Les études récentes
+    // suivent R-4 (projet en tête), et le gabarit d'étude prescrit désormais cette forme : le
+    // 29/10, 63 constats R-4 tombaient sur des études ainsi nommées (mesure de TF-2028). Le
+    // préfixe daté « AAAAMMJJ-… » reste VALIDE pour les noms historiques (R-4 : « Les fichiers
+    // historiques ne sont pas renommés ») et seuls ces noms échappent au jugement ordinaire ;
+    // tout autre nom d'`03-etudes\` est jugé comme n'importe quel livrable d'`output\` (forme,
+    // unicité de l'indice, plafond de chemin).
+    if (/^output[\/]03-etudes[\/]/.test(rel(f)) && /^\d{8}-/.test(nom)) continue;
     if (!MOTIF_DATE.test(nom)) { ko("R-4", rel(f), "livrable sans nommage « <Marque> - <Objet> - AAAAMMJJ<indice> »"); r4 = false; continue; }
     const m = nom.match(/ - (\d{8}[a-z]?)\.[\w.]+$/);
     const dossier = dirname(rel(f));
