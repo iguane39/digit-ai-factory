@@ -21,7 +21,7 @@ Livré : [Tableau de tri](output/03-etudes/Digit-AI%20-%20%C3%89tude%20-%20Tri%2
 
 ## 1. En-tête d'identification
 
-Conseil sur le pilot `digit-ai-factory`, en réponse à votre question sur les éléments à traiter. Période : 02/11/2026 de 14:35 à 14:46, heure de Paris, relevée par `date`. Session pilote Claude Opus 5.5, sans agent.
+Conseil sur le pilot `digit-ai-factory`, en réponse à votre question sur les éléments à traiter. Période : 02/11/2026 de 14:35 à 14:48, heure de Paris, relevée par `date`. Session pilote Claude Opus 5.5 ; 3 agents `verificateur` Haiku pour la relecture d'intention.
 
 Intention de la demande : savoir ce qu'il reste à faire du tri TikTok, avec assez de détail pour trancher chaque sujet sans rouvrir les vidéos.
 
@@ -123,7 +123,7 @@ Répondez par exemple « 136a, 137a, 138a, 139c, 140c, 141c, 142a, 143a », en n
 | Option | Ce qui se passe | Coût | Retour arrière |
 |---|---|---|---|
 | (a) L'étudier pour la Factory | Une étude cherche si une forge de design y gagnerait | Moyen × moyen | Possible : l'étude conclut, rien ne s'engage |
-| (b) L'essayer vous-même | Vous l'ouvrez sur `https://app.getartcraft.com`, sans installation et hors de la Factory | Simple × court ; gratuit sans génération payante | Possible : désinstaller |
+| (b) L'essayer vous-même | Vous l'ouvrez sur `https://app.getartcraft.com`, sans installation et hors de la Factory | Simple × court ; gratuit sans génération payante | Possible : ne plus l'ouvrir |
 | (c) Laisser | Le sujet reste au tableau de tri | Nul | Possible : le rouvrir plus tard |
 
 > **Sans réponse** : (c), rien ne se fait.
@@ -145,7 +145,7 @@ Répondez par exemple « 136a, 137a, 138a, 139c, 140c, 141c, 142a, 143a », en n
 > **D-143 — Votre liste des éléments à traiter doit-elle couvrir aussi le reste du registre, au-delà du tri TikTok ?**
 >
 > - **De quoi s'agit-il** : le registre `todo/TODO.jsonl`, qui compte 5 candidats, 11 items décidés et 59 en cours. J'ai lu votre question dans la suite de celle sur les vidéos TikTok, sans vous le demander : la relecture d'intention y voit une dérive, parce que « Quelle est la liste des éléments à traiter ? » ne pose pas cette limite.
-> - **Le problème** : si vous visiez tout le travail ouvert, cette liste ne montre que 6 sujets sur ces 75. L'élargir donnerait une vue complète, au prix d'une liste bien plus longue, qui recoupe la revue hebdomadaire.
+> - **Le problème** : si vous visiez tout le travail ouvert, cette liste n'en détaille que 2, ceux de D-136. L'élargir donnerait une vue complète, au prix d'une liste bien plus longue, qui recoupe la revue hebdomadaire.
 > - **Pourquoi vous** : vous seul savez ce que votre question visait.
 > - **Recommandation : (a)** — votre question suivait celle sur les vidéos. Source consultée : vos messages de cette conversation.
 
@@ -182,7 +182,7 @@ Relecture d'intention : dérive maintenue après 2 passes de correction, consign
 
 ## 6. Écarts à la lettre
 
-- Vous demandez une liste → 6 décisions au format de la restitution → sinon votre choix ne se trancherait pas par une lettre.
+- Vous demandez une liste → 8 décisions au format de la restitution → sinon votre choix ne se trancherait pas par une lettre.
 
 ## 8. Prochaines actions
 
