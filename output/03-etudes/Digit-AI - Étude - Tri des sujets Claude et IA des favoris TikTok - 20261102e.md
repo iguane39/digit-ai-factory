@@ -23,10 +23,6 @@ Seules ces 8 vidéos ont été écoutées. Les vidéos lues par leur légende pe
 
 22 contenus sortent du filtre : les 7 notifications et 15 favoris sans rapport avec l'IA, dont 3 sur le référencement local de Google. Leur détail reste dans le fichier de rangement, hors du dépôt public. La page ne porte qu'une fenêtre des favoris : 28 contenus déjà triés le 19/10 n'y figurent plus, ce qui ne veut pas dire qu'ils en sont retirés.
 
-## Limite à garder en tête
-
-La règle qui classe ces sujets reste plus stricte que les faits. Rejouée à l'aveugle sur les 14 études du 19/10 avec le score minimal de 14, elle s'accorde 7 fois sur 14 avec leur résultat réel. Elle lance 6 études dont 5 ont produit une suite, et en écarte encore 6 qui en ont produit une. Un « Sans suite » noté ici veut donc dire « rien ne presse », pas « rien à en tirer ». Le détail est dans `output/03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md`.
-
 ## Le tableau
 
 Une ligne porte un sujet ; les lignes vont du verdict le plus engageant au moins engageant. Les chiffres cités par une vidéo se lisent « selon l'auteur », sauf quand le motif renvoie à la source.

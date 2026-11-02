@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 588 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 589 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -254,7 +254,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
 | Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md | 20261030a | 14.2 Ko | `03-etudes/Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` |
-| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md | 20261102e | 12.4 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` |
+| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md | 20261102e | 11.9 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` |
 | Digit-AI - Étude - Video Make it better cent fois - 20261102b.md | 20261102b | 15.5 Ko | `03-etudes/Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` |
 | Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md | 20261029c | 5.5 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` |
 | Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md | 20261029b | 4.8 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` |
@@ -553,6 +553,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md | 20261026g | 3.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md` |
 | Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md | 20261026n | 2.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md` |
 | Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md | 20261026m | 5.7 Ko | `04-plans/Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md` |
+| Digit-AI - Synthese Mandat - Decisions 125a et 126a du tri TikTok - 20261102j.md | 20261102j | 9.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 125a et 126a du tri TikTok - 20261102j.md` |
 | Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md | 20261001c | 21.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` |
 | Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md | 20261002a | 19.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` |
 | Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md | 20261012b | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` |
