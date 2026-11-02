@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 599 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 603 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -248,9 +248,11 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md | 20261029f | 7.7 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json | — | 98.8 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` |
+| Digit-AI - Étude - ArtCraft pour la Factory - 20261102s.md | 20261102s | 14.1 Ko | `03-etudes/Digit-AI - Étude - ArtCraft pour la Factory - 20261102s.md` |
 | Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md | 20261102f | 35.8 Ko | `03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` |
 | Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
+| Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md | 20261102t | 25.3 Ko | `03-etudes/Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
 | Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
@@ -264,6 +266,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 190.2 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md | 20261028a | 5.1 Ko | `03-etudes/Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` |
 | Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md | 20261102g | 3.9 Ko | `03-etudes/Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` |
+| Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
+| Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
 | Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md | 20261102k | 5.9 Ko | `03-etudes/Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` |
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md | 20261102j | 56.1 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` |

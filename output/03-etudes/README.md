@@ -67,9 +67,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 7,7 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` | fichier | 98,8 Ko | JSON |
+| `Digit-AI - Étude - ArtCraft pour la Factory - 20261102s.md` | fichier | 14,1 Ko | Étude d'opportunité — ArtCraft pour la forge de design — 20261102s |
 | `Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` | fichier | 35,8 Ko | Étude d'opportunité — Audit de sécurité par agents de Cloudflare — 20261102f |
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
+| `Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` | fichier | 25,3 Ko | Étude d'opportunité — huit outils de motion design pour la Factory — 20261102t |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
 | `Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` | fichier | 36,8 Ko | Étude d'opportunité — Plateforme de pentest autorisé automatisé (CDC v1.1) : adoption par  |
 | `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,7 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
@@ -83,6 +85,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` | fichier | 190,2 Ko | Inventaire — fonctionnalités de Cloudflare, GitHub et Supabase (28/10/2026) |
 | `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 5,1 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
 | `Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` | fichier | 3,9 Ko | Essai — les 10 règles du skill i-have-adhd contre nos règles d'écriture — 20261102g |
+| `Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` | fichier | 8,3 Ko | Note — Harvey comparé à digit-ai-prospection |
+| `Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` | fichier | 9,1 Ko | Refine de Prime Agent contre oeil-critique — 20261102r |
 | `Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` | fichier | 5,9 Ko | Essai borné de l'audit de sécurité de Cloudflare — 20261102k |
 | `Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` | fichier | 15,2 Ko | Analyse L99 — transformer en actions les sujets laissés de côté par l'œil critique (29/10/ |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` | fichier | 56,1 Ko | Digit-AI — Revue L99 — Prompt « pentest automatisé de bout en bout » (Claude + LLM local) |
@@ -93,4 +97,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_74 fichier(s), 2 sous-dossier(s)_ · 3 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_78 fichier(s), 2 sous-dossier(s)_
