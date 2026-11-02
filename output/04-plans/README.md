@@ -19,6 +19,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`2026-08\`](2026-08/README.md) | dossier (39 fichiers) | — | Livrables de la famille `04-plans\` du mois clos 2026-08, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la famille, où … |
 | [`2026-09\`](2026-09/README.md) | dossier (176 fichiers) | — | Livrables de la famille `04-plans\` du mois clos 2026-09, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la famille, où … |
 | [`old\`](old/README.md) | dossier (2 fichiers) | — | Versions remplacées des plans et prompts de `output\04-plans\`, gardées pour trace (règle 7 des règles du projet). Une session y déplace par `git mv` l'ancienne… |
+| [`plateforme-pentest-gate-a-20261102\`](plateforme-pentest-gate-a-20261102/README.md) | dossier (10 fichiers) | — | Dossier de conception Gate A (option O3, décision humaine D-146 a du 02/11/2026) de la plateforme de pentest autorisé automatisé étudiée dans `output/03-etudes/… |
 | `Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` | fichier | 14,7 Ko | Note — un œil critique sur les process de la Factory : le sujet, ce qui est mesuré, ce qui |
 | `Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` | fichier | 8,3 Ko | Prompt — Inventorier ce que les forges savent faire des bases de développement et de quali |
 | `Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` | fichier | 10,1 Ko | Prompt — Inventorier les fonctionnalités de Cloudflare, GitHub et Supabase pour en tirer l |
@@ -178,4 +179,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_158 fichier(s), 3 sous-dossier(s)_
+_158 fichier(s), 4 sous-dossier(s)_

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 603 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 613 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -657,6 +657,16 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md | 20261026o | 4.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md *(archivé)* | 20261016a | 4.5 Ko | `04-plans/old/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md *(archivé)* | 20261102e | 18.4 Ko | `04-plans/old/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md` |
+| 00-audit-environnement.md | — | 20.2 Ko | `04-plans/plateforme-pentest-gate-a-20261102/00-audit-environnement.md` |
+| 01-architecture.md | — | 49.6 Ko | `04-plans/plateforme-pentest-gate-a-20261102/01-architecture.md` |
+| 02-threat-model.md | — | 31.9 Ko | `04-plans/plateforme-pentest-gate-a-20261102/02-threat-model.md` |
+| 03-data-protection.md | — | 26.7 Ko | `04-plans/plateforme-pentest-gate-a-20261102/03-data-protection.md` |
+| 04-backlog.md | — | 19.4 Ko | `04-plans/plateforme-pentest-gate-a-20261102/04-backlog.md` |
+| 05-decisions.md | — | 17.7 Ko | `04-plans/plateforme-pentest-gate-a-20261102/05-decisions.md` |
+| 06-open-questions.md | — | 14.7 Ko | `04-plans/plateforme-pentest-gate-a-20261102/06-open-questions.md` |
+| 07-ai-access-matrix.md | — | 22.2 Ko | `04-plans/plateforme-pentest-gate-a-20261102/07-ai-access-matrix.md` |
+| 08-cost-model.md | — | 18.6 Ko | `04-plans/plateforme-pentest-gate-a-20261102/08-cost-model.md` |
+| 09-cyber-model-evaluation.md | — | 21.5 Ko | `04-plans/plateforme-pentest-gate-a-20261102/09-cyber-model-evaluation.md` |
 
 ### 05-catalogues-readmes-forges
 
