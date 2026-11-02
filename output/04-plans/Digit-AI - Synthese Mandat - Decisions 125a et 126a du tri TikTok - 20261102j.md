@@ -6,7 +6,7 @@ destinataire: humain
 
 ## 0. Synthèse d'ouverture
 
-Vos 2 réponses sont exécutées. Le score minimal est à 14, le skill est republié et le tableau rejugé : 5 sujets vous reviennent désormais, contre 2. L'étude sur l'outil de Cloudflare ne dit pas qu'il est bon, car personne ne l'a joué ici, et elle recommande un essai contrôlé qui coûte jusqu'à 3 150 000 jetons. L'essai sur `i-have-adhd` conclut de ne pas l'installer. Il vous reste 2 réponses : autoriser ou non cet essai, et garder ou non un avertissement en tête du tableau.
+Vos 2 réponses sont exécutées. Le score minimal est à 14, le skill est republié et le tableau rejugé : 5 sujets vous reviennent désormais, contre 2. L'étude sur l'outil de Cloudflare ne dit pas qu'il est bon, car personne ne l'a joué ici, et elle recommande un essai contrôlé qui coûte jusqu'à 3 150 000 jetons. L'essai sur le skill i-have-adhd conclut de ne pas l'installer. Il vous reste 2 réponses : autoriser ou non cet essai, et garder ou non un avertissement en tête du tableau.
 
 Livré : [Étude de l'outil de Cloudflare](output/03-etudes/Digit-AI%20-%20%C3%89tude%20-%20Audit%20de%20securite%20par%20agents%20de%20Cloudflare%20-%2020261102f.md) · [Essai sur i-have-adhd](output/03-etudes/Digit-AI%20-%20Note%20-%20Essai%20des%20regles%20i-have-adhd%20contre%20nos%20regles%20d%20ecriture%20-%2020261102g.md) · [Tableau rejugé](output/03-etudes/Digit-AI%20-%20%C3%89tude%20-%20Tri%20des%20sujets%20Claude%20et%20IA%20des%20favoris%20TikTok%20-%2020261102e.md)
 
@@ -41,7 +41,7 @@ Skill `tri-de-sujets` 1.1.0, self-test 42/42 ; tableau à 54 entrées, `oracle-t
 
 > **D-128 — Le tableau de tri doit-il afficher en tête l'avertissement que sa règle ne s'accorde que 7 fois sur 14 avec les études réelles ?**
 >
-> - **De quoi s'agit-il** : une section que j'avais ajoutée à `output/03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md`, que vous n'aviez pas demandée, et que j'ai retirée sur relecture.
+> - **De quoi s'agit-il** : une section que j'avais ajoutée à `output/03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md`, que vous n'aviez pas demandée. La relecture d'intention relève cette dérive : votre demande dit « un tableau avec les éléments abordés et la pertinence ». Correction déjà faite : la section est retirée.
 > - **Le problème** : sans elle, un lecteur peut prendre « Sans suite » pour « rien à en tirer », alors que la règle écarte encore 6 études sur les 11 qui ont eu une suite. Avec elle, le tableau porte un texte de plus. Le chiffre reste dans l'étude du skill.
 > - **Pourquoi vous** : c'est un contenu visible de votre livrable, et il se choisit à part.
 > - **Recommandation : (b)** — une phrase suffit à éviter la mauvaise lecture. Source consultée : `output/03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md`.
@@ -90,7 +90,7 @@ Une seule action reste, la vôtre, car l'essai ne part pas sans elle.
 
 | Sélecteur | Action | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|
-| A-1 | Autoriser ou non l'essai de l'outil de Cloudflare, et choisir l'avertissement du tableau | `TF-2054` | manuelle_utilisateur | decision : les réponses à D-127 et D-128 vous reviennent | relire `output/03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md`, puis écrire vos lettres, par exemple « 127a, 128b » | si rien n'est fait : aucun jeton dépensé, le manque de sécurité reste déclaré, et le tableau reste sans avertissement |
+| A-1 | Autoriser ou non l'essai de l'outil d'audit, et choisir l'avertissement du tableau | `TF-2054` | manuelle_utilisateur | decision : les réponses à D-127 et D-128 vous reviennent | relire `output/03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md`, puis écrire vos lettres, par exemple « 127a, 128b » | si rien n'est fait : aucun jeton dépensé, le manque de sécurité reste déclaré, et le tableau reste sans avertissement |
 
 ## 9. Traces
 
