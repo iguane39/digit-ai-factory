@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 581 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 582 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -505,6 +505,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
+| Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md | 20261102f | 10.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` |
 | Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md | 20261016c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` |
 | Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md | 20261102d | 12.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md` |
 | Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md | 20261030a | 8.7 Ko | `04-plans/Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md` |
