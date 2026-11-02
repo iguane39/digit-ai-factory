@@ -75,6 +75,11 @@ Un verdict « derive » de gravité majeure ou bloquante est une **alerte**. Dep
 
 Chaque restitution d'un tour de travail porte au **bloc 4** une ligne `Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif>` (S79, `oracles\oracle-synthese.mjs`, avertissante pendant l'essai ; N vaut 1 ou 2). « sert après N passe(s) » dit qu'une alerte a été levée par N passes de correction sans l'humain : elle ne devient pas une décision au bloc 3. « dérive » reste la ligne d'un écart qui demeure ou relève d'un choix de l'humain, et seul celui-là devient une décision.
 
+**Une règle nommée sans son texte déclenche une alerte** (décision humaine D-116 (b) du 02/11/2026, TF-1972). `--preparer consigne`
+signale en tête de sa sortie une consigne qui nomme une règle par son identifiant (`XYZ0202-R05`, « règle R-38 ») sans une citation
+d'au moins 6 mots, ou une ligne citée, sur la ligne ou dans les 3 suivantes. Le 20/10/2026, un plan et un prompt ont contredit une
+règle écrite et claire d'un produit, relus 4 fois sans son texte. Rien n'est imposé au livrable ; une citation se vérifie à la source.
+
 ## La boucle de correction (D-26 (a) du 18/10/2026)
 
 *Le fait.* Le 18/10, 0 alerte sur 1 a été corrigée sans l'humain : aucun agent ne reprenait une alerte, qui était notée puis posée. La seule corrigée l'a été à la main, en une passe (RI-20261018-01 « derive », puis RI-20261018-02 « sert »). La boucle rend ce geste systématique, borné et mesuré, pour tous les travaux, ceux du pilot comme ceux des produits.

@@ -245,6 +245,13 @@ Un écrit est destiné à un tiers quand son en-tête porte `destinataire:` avec
 La langue dominante du texte est celle de son lecteur. Sans indication, c'est le français, parce que la Factory est francophone (règle 12 du `CLAUDE.md` global) ; pour un utilisateur ou un tiers qui lit une autre langue, on la déclare, `langue: en` en en-tête ou `--langue en` à l'appel, et le même texte passe. L'anglais n'est donc jamais une faute en soi : la réponse suit la langue de l'utilisateur (`references\PREFERENCES-PORTEUR.md`).
 
 Exemple de la recette d'oracle-ecriture (26/10) : un courriel de relance en un seul paragraphe de 90 mots et 4 phrases est à rejouer, avec sa ligne et ses mesures ; réécrit en 3 paragraphes de 2 phrases, avec la date attendue posée en question dans le dernier, il passe.
+### E-18 — Deux montants comparés disent ce que chacun comprend
+
+Un texte qui compare deux coûts porte la rubrique « Compris : … · Non compris : … · Conséquence : … » (décision humaine
+D-114 (a) du 02/11/2026). Le 19/10/2026, un livrable comparait 224 € à 320 €, pare-feu compris d'un seul côté, et
+6 relectures à l'aveugle ne l'ont pas relevé. `oracle-ecriture` EC-17 avertit sur une ligne qui oppose deux montants
+dans un texte sans cette rubrique. Il ne voit pas deux montants placés dans deux cellules d'un tableau.
+
 ## Précédence
 
 1. La structure imposée par un gabarit prime (blocs et tableaux de `RESTITUTION.md`, sections

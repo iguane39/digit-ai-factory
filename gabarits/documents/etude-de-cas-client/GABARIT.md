@@ -144,6 +144,10 @@ l'en-tête), propriété des marques citées, et contact.
 
 ---
 
+**Une question posée à ce tiers** (D-119 (b) du 02/11/2026, TF-1983) : chaque question a d'abord été posée à
+l'humain si la réponse est connue de lui. Une hypothèse ouverte du document source ne se recopie pas en question
+à un tiers : le 26/10/2026, une fiche demandait à son destinataire le statut de son propre signataire.
+
 ## Ce que ce document ne fait JAMAIS
 
 Cinq exclusions, chacune capable de rendre une étude de cas publiable en pièce à charge. Le

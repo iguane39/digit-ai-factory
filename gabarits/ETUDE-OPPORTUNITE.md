@@ -58,6 +58,9 @@ explicite `état de l'art : non instruit` avec son motif. Jamais d'entre-deux.>
 - **O0 — ne rien faire** : à réfuter EXPLICITEMENT (coût du statu quo, cité) ou à retenir.
 - **O1…O4** : <options réelles, chacune : contenu, coût estimé, ce qu'elle exclut.>
 
+Deux options comparées sur un montant portent la rubrique « Compris : … · Non compris : … · Conséquence : … »
+(D-114 (a) du 02/11/2026, TF-1971 ; `oracle-ecriture` EC-17 avertit quand elle manque).
+
 ## 5. Verdict
 
 - **Option retenue** : <une seule — un verdict multiple n'est pas un verdict>.

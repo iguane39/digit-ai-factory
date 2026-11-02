@@ -162,6 +162,20 @@ try {
     if (!readFileSync(join(d, "demande.txt"), "utf8").includes(`2. « ${H2} »`)) throw new Error("demande absente");
     if (!/Le LIVRABLE est la consigne que l'on s'apprête à passer à un agent/.test(r.sortie)) throw new Error("la consigne du relecteur ne dit pas que le livrable est une consigne");
   });
+  check("TF-1972 rouge — une consigne qui nomme une règle sans son texte déclenche l'alerte, écrite en tête de la sortie", () => {
+    const c = join(T, "consigne-regle.md"); writeFileSync(c, "Applique la règle XYZ0202-R05 au plan de cartes, et la règle R-38 aussi.\n");
+    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-regle")], {}, new Date(), CTX);
+    egal(r.code, 0, "l'alerte ne bloque pas");
+    if (!/^ALERTE \(D-116 \(b\), TF-1972\) : cette consigne nomme 2 règle\(s\)/.test(r.sortie) || !/XYZ0202-R05 \(l\.1\)/.test(r.sortie)) throw new Error(`sortie : ${r.sortie.slice(0, 200)}`);
+  });
+  check("TF-1972 vert — la même règle avec son texte cité, ou aucune règle nommée : pas d'alerte ; ISO27001 et SHA256 ne sont pas des règles", () => {
+    const c = join(T, "consigne-texte.md"); writeFileSync(c, "Applique la règle XYZ0202-R05 : « une carte ne porte jamais plus de deux montants affichés » au plan.\nConforme à ISO27001 et SHA256.\n");
+    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-texte")], {}, new Date(), CTX);
+    if (/ALERTE \(D-116/.test(r.sortie)) throw new Error(`alerte à tort : ${r.sortie.slice(0, 200)}`);
+    const l = join(T, "consigne-citee.md"); writeFileSync(l, "Applique ADR0501.\n> Toute décision d'architecture porte sa date.\n");
+    const q = executer(["--preparer", "consigne", "--fichier", l, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-citee")], {}, new Date(), CTX);
+    if (/ALERTE \(D-116/.test(q.sortie)) throw new Error("une ligne citée en dessous ne compte pas");
+  });
   check("rouge — --preparer consigne sans --fichier, ou avec un fichier absent : 2", () => {
     egal(executer(["--preparer", "consigne", "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "sans fichier");
     egal(executer(["--preparer", "consigne", "--fichier", join(T, "absent.md"), "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "fichier absent");

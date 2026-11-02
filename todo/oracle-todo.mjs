@@ -55,6 +55,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ATTENTES as ATTENTES_ACTION } from "./lib-action.mjs";
+import { defautsRemesure } from "./remesurer.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // Les drapeaux ne sont pas des chemins : sans ce tri, `--rectifications` était lu comme le
@@ -276,6 +277,8 @@ function replier(evenements, ou) {
             if (!tient) ko("R17", e.id, `récidive de ${etat.recidive_de.join(", ")} close en corrige sans \`barriere\` {type: hook | oracle | defaut | script, chemin} — une récidive appelle une barrière, jamais une règle reformulée (TF-1946)`);
           }
         }
+        // R18 (D-118 (a) du 02/11/2026, TF-1954) : le champ `remesure` est facultatif ; porté, il doit pouvoir se rejouer.
+        if (e.remesure !== undefined) for (const d of defautsRemesure(e.remesure)) ko("R18", e.id, `${d} — voir todo/remesurer.mjs`);
         if (e.statut === "ecarte" && e.ts >= SEUIL_R7_ECART) {
           const fusion = { ...etat, ...e };
           for (const champ of ["motif_ecart", "decideur", "date_decision"])

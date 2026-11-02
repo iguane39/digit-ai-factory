@@ -184,8 +184,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 86,
-  "vu_le": "2026-10-30"
+  "cas": 91,
+  "vu_le": "2026-11-02"
  },
  "oracle-empreintes.mjs": {
   "cas": 13,
@@ -687,8 +687,8 @@
   "vu_le": "2026-10-12"
  },
  "scripts/relecture-intention.test.mjs": {
-  "cas": 76,
-  "vu_le": "2026-10-30"
+  "cas": 78,
+  "vu_le": "2026-11-02"
  },
  "scripts/relever-appelants.test.mjs": {
   "cas": 12,

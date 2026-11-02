@@ -124,6 +124,10 @@ n'engage pas toujours son organisation sur une exclusivité), la date, et le lie
 
 ---
 
+**Une question posée à ce tiers** (D-119 (b) du 02/11/2026, TF-1983) : chaque question a d'abord été posée à
+l'humain si la réponse est connue de lui. Une hypothèse ouverte du document source ne se recopie pas en question
+à un tiers : le 26/10/2026, une fiche demandait à son destinataire le statut de son propre signataire.
+
 ## Ce que ce document ne fait JAMAIS
 
 Quatre exclusions, chacune protégeant la charte d'un document voisin qui la ferait dériver. Le

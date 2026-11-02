@@ -644,6 +644,29 @@ export function fabriquerLivrablesFin(travail, ajouts = {}, relus = new Map()) {
 }
 
 /**
+ * D-116 (b) du 02/11/2026, TF-1972 : les règles qu'une consigne NOMME par leur identifiant sans en porter le texte. Le 20/10/2026,
+ * un plan et un prompt ont contredit une règle écrite et claire d'un produit, conçus sur des résumés, relus 4 fois sans son texte.
+ * Identifiant : un code lettres puis chiffres (`ADR0501`, `XYZ0202-R05`) ou « règle <identifiant> ». Le texte est porté quand une
+ * citation « … » d'au moins 6 mots, ou une ligne citée `> …`, se trouve sur la ligne ou dans les 3 suivantes. Alerte, jamais blocage.
+ */
+const CODE_DE_REGLE = /\b(?!ISO\d|SHA\d|HTTP\d|UTF\d|WCAG\d|RFC\d|MD\d|HS\d|RS\d)[A-Z]{2,6}\d{2,}(?:-[A-Z]{1,3}\d{1,3})?\b|\b[Rr][èe]gle\s+([A-Z][A-Za-z]*-?\d[\w-]*)/g;
+export function reglesSansTexte(pieces) {
+  const trouvees = [];
+  for (const { chemin, texte } of pieces) {
+    const lignes = String(texte).split(/\r?\n/);
+    lignes.forEach((l, i) => {
+      for (const m of l.matchAll(CODE_DE_REGLE)) {
+        const proche = lignes.slice(i, i + 4);
+        const porte = proche.some((x) => /^\s*>\s*\S/.test(x) || [...x.matchAll(/«([^»]+)»/g)].some((c) => c[1].trim().split(/\s+/).length >= 6));
+        if (!porte) trouvees.push({ regle: m[1] || m[0], chemin, ligne: i + 1 });
+      }
+    });
+  }
+  const vues = new Set();
+  return trouvees.filter((t) => !vues.has(t.regle) && vues.add(t.regle));
+}
+
+/**
  * livrables.md d'un point « consigne ». `pieces` : [{ chemin, texte }] ; une seule pièce, ou le gabarit commun d'une campagne
  * suivi de la liste de ses sujets (A-1 du 19/10/2026 : une relecture pour les N agents qui reçoivent le même gabarit).
  */
@@ -1134,7 +1157,12 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   writeFileSync(fLivrables, livrables, "utf8");
   const consigne = consigneRelecteur(a.preparer, fDemande, fLivrables, !!regles);
   const nbRegles = regles ? reglesDesTypes(regles.ref, types).length : 0;
+  const sansTexte = pieces ? reglesSansTexte(pieces) : [];
+  const alerte = sansTexte.length
+    ? `ALERTE (D-116 (b), TF-1972) : cette consigne nomme ${sansTexte.length} règle(s) sans en porter le texte : ${sansTexte.slice(0, 8).map((t) => `${t.regle} (l.${t.ligne})`).join(", ")}. Citer le texte, mot pour mot, lu à la source : sans lui, ni l'agent ni le relecteur ne peuvent juger la conformité. Alerte, jamais blocage.`
+    : null;
   const sortie = [
+    ...(alerte ? [alerte, ""] : []),
     `relecture-intention ${VERSION} — point « ${a.preparer} » : ${humains.length} message(s) humain(s) cité(s) mot pour mot, ${decisions.length} décision(s) posée(s) retrouvée(s), ${resume}${regles ? `, ${nbRegles} règle(s) applicable(s) au type ${types.join("+")} (référentiel ${regles.ref.version})` : ", aucune règle applicable ajoutée (pas de --type)"}`,
     `transcription lue : ${transcript} (${origine}) ; ${avisCwd}`,
     `écrit : ${fDemande} · ${fLivrables}`,
@@ -1144,7 +1172,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     "--- FIN DE LA CONSIGNE ---",
     `Ensuite : écrire le bloc JSON rendu dans un fichier, puis node scripts\\relecture-intention.mjs --consigner <verdict.json> --point ${a.preparer} --type <${TYPES.join("|")}>${a.preparer === "reception" ? ` --fichier ${a.fichiers[0]}` : ""} [--passe <n> --suite-de <identifiant>]. Un écart majeur de nature hors_demande se corrige (2 passes au plus, chacune relue) ; un écart de nature choix_humain, ou qui résiste, est posé à l'humain : alerte, jamais blocage. L'état d'une chaîne : --boucle <identifiant>.`,
   ].join("\n");
-  return { code: 0, sortie, dossier, consigne, demande: fDemande, livrables: fLivrables };
+  return { code: 0, sortie, dossier, consigne, demande: fDemande, livrables: fLivrables, regles_sans_texte: sansTexte };
 }
 
 if (process.argv[1] && resolve(process.argv[1]).toLowerCase() === fileURLToPath(import.meta.url).toLowerCase()) {

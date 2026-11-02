@@ -347,6 +347,15 @@ et TF-0318 a été instruit dessus ; TF-0328). Le self-test
 Consulter le registre à l'ouverture de tout run. `BOUCLE-AMELIORATION.md` reste le journal
 narratif : il référence les ids TF, il ne duplique plus les listes.
 
+**Un gain de coût ou de durée se remesure en service (décision humaine D-118 (a) du 02/11/2026, TF-1954).** Une clôture peut porter
+`remesure` : `commande` et sa valeur visée (`duree_max_s` ou `sortie`), `avertissement` (l'expression d'un avertissement d'ouverture
+qui doit avoir disparu), `apres_jours` (7 par défaut). Le champ est facultatif ; **R18** refuse celui qui ne pourrait pas se rejouer.
+À sa date, `oracles\hook-ouverture.mjs` joue la commande par `todo\remesurer.mjs`, 2 au plus par ouverture, l'inscrit une fois au
+journal `todo\observabilite\remesures.jsonl`, et dit l'écart ; il nomme aussi l'avertissement que son relevé porte encore. Un écart
+se signale, il ne rouvre rien. *Le fait* : une correction du pre-push close le 13/10/2026 sur 36 s, 52 s et 41 s mesurées à blanc ;
+25 envois réels ont ensuite attendu jusqu'au 20/10, dont 9 coupés par le délai de 600 s. **Quand le poser** : toute correction dont
+le gain déclaré est une durée ou un coût ; un gain à blanc reste une présomption tant que sa remesure n'a pas parlé.
+
 ## Revue hebdomadaire accélérée (demande humaine du 01/10/2026)
 
 **Ce qui change pour le porteur** : les propositions ne lui arrivent plus une à une. Une fois par

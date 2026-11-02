@@ -920,6 +920,26 @@ function lignesPreferences() {
   return out;
 }
 
+// D-118 (a) du 02/11/2026, TF-1954 : LA SENTINELLE DE REMESURE. Une correction close sur un gain mesuré à blanc n'était
+// jamais remesurée en service. L'ouverture du pilot joue les remesures dues, 2 au plus, et dit les écarts ; elle dit aussi
+// un avertissement de CE relevé qui survit à son item clos, d'où sa place après toutes les sections.
+if (iPilot < 0) {
+  try {
+    const { jouerDues, avertissementsSurvivants } = await import(pathToFileURL(join(PILOT, "todo", "remesurer.mjs")).href);
+    const { etatCourant } = await import(pathToFileURL(join(PILOT, "todo", "revue-hebdo.mjs")).href);
+    const etat = etatCourant(readFileSync(join(PILOT, "todo", "TODO.jsonl"), "utf8"));
+    const jour = new Date().toISOString().slice(0, 10);
+    // Sous recette, rien ne se rejoue et le journal suivi ne s'écrit pas : même signal que l'observation hebdomadaire.
+    const { jouees } = process.env.FORGE_SANS_OBSERVATION === "1" ? { jouees: [] } : jouerDues(etat, jour);
+    const restes = avertissementsSurvivants(etat, lignes.join("\n"), jour);
+    if (jouees.length || restes.length) {
+      lignes.push("", "## Remesures en service (TF-1954, todo/remesurer.mjs)");
+      for (const j of jouees) lignes.push(j.ecarts.length ? `- **ÉCART sur ${j.id}** : ${j.ecarts.join(" ; ")} (\`${j.commande}\`)` : `- ${j.id} : gain tenu en service, ${j.duree_s} s (\`${j.commande}\`)`);
+      for (const r of restes) lignes.push(`- **avertissement encore présent, item clos ${r.id}** : « ${r.avertissement} » — ${String(r.titre).slice(0, 120)}`);
+    }
+  } catch (e) { lignes.push("", `- remesures : NON jouées (${String(e.message).slice(0, 160)})`); }
+}
+
 // SORTIE EN JSON POUR LE MODE ASYNCHRONE (13/10/2026). L'extension VS Code abandonne une session
 // dont l'initialisation dépasse 60 s, et le CLI n'annonce sa disponibilité qu'APRÈS la fin de tous
 // les hooks SessionStart synchrones : ce hook, avec son `bootstrap --pull` réseau, a fait échouer
