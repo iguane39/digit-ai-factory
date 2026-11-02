@@ -100,6 +100,12 @@ try {
     outil("Bash", { command: `cp oracles/hook-restitution.mjs "$TEMP/copie.mjs"` }),
     outil("Bash", { command: `git show HEAD:x.md > /dev/null; cp x.md ${join(tmpdir(), "x.md").replace(/\\/g, "/")}` }),
     outil("PowerShell", { command: "Copy-Item x.md -Destination $env:TEMP\\x.md" }),
+    // TF-2034 (02/11/2026) : lister les remisages et les étiquettes lit, comme `git worktree list`.
+    outil("Bash", { command: "git stash list" }),
+    outil("Bash", { command: "git stash show -p stash@{0}" }),
+    outil("Bash", { command: "git tag -l" }),
+    outil("Bash", { command: "git tag --list 'v*'" }),
+    outil("Bash", { command: "git -C /c/dev/x stash list && git -C /c/dev/x tag -l" }),
   ];
   const e0 = detecterEffets(epargnes);
   check("4 détecteur : temporaire, néant, flèche, Explore, lecture connectée → aucun effet", e0.length === 0, e0.join(" ; "));
@@ -115,6 +121,11 @@ try {
     [outil("Bash", { command: "cp x.md references/x.md" }), /« cp »/],
     [outil("Bash", { command: "cp /tmp/x.md references/x.md" }), /« cp »/],
     [outil("Bash", { command: "cp x.md /tmp/x.md && git commit -m y" }), /git commit/],
+    // TF-2034 : le côté qui écrit de `stash` et de `tag` reste un effet (remède joué : seuls list/show/-l/--list sont épargnés).
+    [outil("Bash", { command: "git stash" }), /git stash/],
+    [outil("Bash", { command: "git stash pop" }), /git stash/],
+    [outil("Bash", { command: "git tag v1.0" }), /git tag/],
+    [outil("Bash", { command: "git tag -d v1.0" }), /git tag/],
   ];
   for (const [o, re] of releves) {
     const e = detecterEffets([o]);
