@@ -122,6 +122,9 @@
  *                                              # et le DÉCLARE au verdict (suites longues, TF-0965)
  *         node oracle-skills.mjs --rejouer-consommateurs   # rejoue les SEULS dépôts en rouge neuf ouvert (TF-2048),
  *                                              # sans rien propager, et lève la trace de ceux qui passent ; exit 1 si un rouge reste
+ *         node oracle-skills.mjs --rejouer-tous-consommateurs   # rejoue TOUS les dépôts de la table (D-135 (a)) : « rouge-neuf » pour un dépôt qui
+ *                                              # échoue sans rouge ouvert, « leve » pour un rouge ouvert qui passe ; lancé en arrière-plan, une fois par
+ *                                              # semaine, par l'ouverture du pilot ; exit 0 rien ne reste rouge, 1 un dépôt échoue, 2 un rejeu tourne déjà
  *         node oracle-skills.mjs --purger      # orphelins de la copie → quarantaine datée (K2)
  *         node oracle-skills.mjs --self-test
  * Exit : 0 PASS · 1 FAIL (y compris un consommateur qui passait et ne passe plus) · 2 non jugeable.
@@ -148,7 +151,7 @@ import { homedir, tmpdir } from "node:os";
 import { racineConfigInstallee, skillsInstalles, hooksInstalles, settingsInstalle as settingsInstalleDe } from "../scripts/lib-config-installee.mjs";
 import { postesParDefaut } from "./oracle-amorcage-poste.mjs";
 // TF-0965 — la table des dépôts consommateurs (DONNÉE datée) et le geste avant/après.
-import { encadrer, ecrireTrace, evenementNonRejoue, evenementsDePropagation, jouer as jouerConsommateur, lireTable, rougesOuverts, traceRouges } from "./consommateurs-skills.mjs";
+import { encadrer, ecrireTrace, evenementNonRejoue, evenementsDePropagation, executerRejeuHebdomadaire, jouer as jouerConsommateur, lireTable, rougesOuverts, traceRouges } from "./consommateurs-skills.mjs";
 
 // TF-1878 : l'environnement d'un appel git SANS les variables GIT_* héritées (GIT_DIR, GIT_WORK_TREE,
 // GIT_INDEX_FILE… posées par un hameçon git ou par une session). Lu à CHAQUE appel, pas à l'import :
@@ -220,7 +223,7 @@ const NON_JUGE = [
   "les PRODUITS du parc, qui consomment aussi la copie installée : le pilot n'exécute rien chez un produit sans mandat humain. Leur mesure passe par un run qui leur est demandé",
   "ce que la propagation casse AILLEURS que dans une vérification native : un consommateur dont la suite ne couvre pas la règle neuve passera au vert des deux côtés. Le rejeu prouve une NON-RÉGRESSION mesurée, jamais une absence d'effet",
   "un consommateur rejoué et INDÉTERMINÉ (délai dépassé, lancement impossible) : déclaré tel quel, jamais compté pour un vert — une suite qui n'a pas fini n'a rien prouvé",
-  "la TRACE des rouges neufs (TF-2048) ne se remplit que sur une propagation qui rejoue les consommateurs : `bootstrap.mjs --pull` passe `--sans-consommateurs` à chaque ouverture, et n'y laisse qu'un événement « non-rejoue » ; un consommateur cassé par une propagation d'ouverture n'est vu qu'au prochain `--appliquer` mesuré ou `--rejouer-consommateurs`",
+  "la TRACE des rouges neufs (TF-2048) ne se remplit que sur une propagation qui rejoue les consommateurs : `bootstrap.mjs --pull` passe `--sans-consommateurs` à chaque ouverture, et n'y laisse qu'un événement « non-rejoue » ; un consommateur cassé par une propagation d'ouverture n'est vu qu'au prochain `--appliquer` mesuré, `--rejouer-consommateurs` ou rejeu hebdomadaire (D-135 (a) : `--rejouer-tous-consommateurs`, lancé en arrière-plan par l'ouverture du pilot au plus une fois par 7 jours — un rouge y est donc vu avec 7 jours de retard au plus, et un rejeu coupé ou un dépôt INDÉTERMINÉ n'a rien jugé)",
 ];
 
 function racineForges() {
@@ -1895,6 +1898,13 @@ if (args.includes("--rejouer-consommateurs")) {
   process.stdout.write(JSON.stringify({ oracle: ORACLE, version: VERSION, mode: "--rejouer-consommateurs", racine, ouverts: ouverts.map((e) => e.depot),
     leves: resultats.filter((r) => r.statut === "PASS").map((r) => r.depot), restent, trace }, null, 1) + "\n");
   process.exit(restent.length ? 1 : 0);
+}
+// D-135 (a) du 02/11/2026 — le rejeu de TOUS les dépôts de la table, que l'ouverture du pilot lance une fois par semaine en arrière-plan. La logique, le verrou
+// et l'état vivent dans `consommateurs-skills.mjs` (la table se lit comme partout : `FORGE_TABLE_CONSOMMATEURS` désigne une table de recette).
+if (args.includes("--rejouer-tous-consommateurs")) {
+  const r = executerRejeuHebdomadaire({ trace: cheminTraceRouges, racine, table: lireTable() });
+  process.stdout.write(JSON.stringify({ oracle: ORACLE, version: VERSION, mode: "--rejouer-tous-consommateurs", racine, ...r }, null, 1) + "\n");
+  process.exit(r.statut === "deja-en-cours" ? 2 : r.depots?.some((d) => d.statut === "FAIL") ? 1 : 0);
 }
 let consommateurs;
 let rapport;

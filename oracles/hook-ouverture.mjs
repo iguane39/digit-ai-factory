@@ -24,7 +24,7 @@ import { passerOuvertureEnAsync, fusionnerHooksDuGabarit, ancrerCommandesFactory
 import { borner, BUDGET_CONTEXTE_ASYNC } from "./lib-budget-contexte.mjs";
 import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gestes-avant-releve.mjs";
 import { constatR47 } from "./lib-resume-r47.mjs";
-import { lignesOuverture as lignesConsommateursRouges, traceRouges } from "./consommateurs-skills.mjs";
+import { lancerRejeuHebdomadaire, lignesOuverture as lignesConsommateursRouges, lignesRejeuOuverture, traceRouges } from "./consommateurs-skills.mjs";
 import { skillsInstalles } from "../scripts/lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -101,9 +101,20 @@ if (!args.includes("--sans-bootstrap")) {
 // commande, lue ce jour-là ou jamais. La trace est écrite par `oracle-skills.mjs` (voir `consommateurs-skills.mjs`) ; ici, on la lit.
 // Chez le pilot seulement (sans `--pilot`) : un produit ne propage rien et ne peut pas réparer un consommateur. Aucun rejeu à
 // l'ouverture (les suites vont jusqu'à vingt minutes) : le rejeu est le geste nommé, `--rejouer-consommateurs`.
+// D-135 (a) du 02/11/2026 — SAUF UNE FOIS PAR SEMAINE, ET SANS L'ATTENDRE : l'ouverture lance le rejeu de TOUS les dépôts de la table
+// dans un processus DÉTACHÉ (`oracle-skills --rejouer-tous-consommateurs`) et poursuit ; un rouge s'affiche à l'ouverture suivante, avec
+// 7 jours de retard au plus. Pas de lancement si le dernier rejeu complet a moins de 7 jours ou si un rejeu tourne déjà. L'état se lit
+// d'abord (un rejeu coupé, un dépôt sans jugement, 14 jours sans abouti se disent), le lancement vient après. FORGE_SANS_REJEU_HEBDOMADAIRE=1 :
+// aucun rejeu n'est lancé (la recette du hook le pose par défaut ; seul son banc du rejeu l'ôte, sur une table factice et une trace jetable).
 if (iPilot < 0) {
-  try { lignes.push(...lignesConsommateursRouges(traceRouges(skillsInstalles().chemin))); }
-  catch (e) { lignes.push("", `## Consommateurs des skills : trace NON lue (${String(e.message).slice(0, 120)}) — TF-2048`); }
+  try {
+    const trace = traceRouges(skillsInstalles().chemin);
+    lignes.push(...lignesConsommateursRouges(trace));
+    try {
+      const lancer = process.env.FORGE_SANS_REJEU_HEBDOMADAIRE === "1" ? null : () => lancerRejeuHebdomadaire({ trace, pilot: PILOT });
+      lignes.push(...lignesRejeuOuverture(trace, { lancer }));
+    } catch (e) { lignes.push("", `## Rejeu hebdomadaire des consommateurs : NON jugé (${String(e.message).slice(0, 120)}) — D-135 (a), TF-2048`); }
+  } catch (e) { lignes.push("", `## Consommateurs des skills : trace NON lue (${String(e.message).slice(0, 120)}) — TF-2048`); }
 }
 
 // TF-1359 (D-21 (b), 26/09/2026) — L'UNICITÉ DES INDICES SE REJOUE APRÈS TOUT CE QUI A PU AMENER UN

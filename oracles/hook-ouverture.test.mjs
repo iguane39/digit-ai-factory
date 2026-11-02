@@ -34,6 +34,10 @@ const TABLES = mkdtempSync(join(tmpdir(), "hook-ouverture-tables-"));
 process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
 process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
 const PILOT = join(ICI, "..");
+// D-135 (a) : l'ouverture du pilot lance, une fois par semaine, le rejeu de tous les consommateurs des skills (jusqu'à 50 minutes). Ce banc ne
+// doit JAMAIS déclencher le vrai : le lancement est coupé pour tous les passages ci-dessous, et seul le banc du rejeu (fin de fichier) le rétablit,
+// sur une table factice et une trace jetable.
+process.env.FORGE_SANS_REJEU_HEBDOMADAIRE = "1";
 
 const NL = String.fromCharCode(10);
 const EXEMPLE = [
@@ -777,5 +781,108 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   });
 }
 
-console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048) : ${pass} PASS, ${fail} FAIL`);
+// ---- D-135 (a) du 02/11/2026 : le rejeu hebdomadaire part en arrière-plan, l'ouverture ne l'attend pas -------------------------------------
+// Un dépôt FACTICE dont la vérification ATTEND qu'on la libère (fichier `liberer`) : si l'ouverture attendait le rejeu, elle ne rendrait pas la main.
+// Table et trace sont jetables ; la vraie table (4 dépôts, 50 minutes au plus) n'est jamais jouée.
+{
+  const dormir = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+  const attendreQue = (cond, ms) => { const fin = Date.now() + ms; while (Date.now() < fin) { if (cond()) return true; dormir(250); } return cond(); };
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-rejeu-"));
+  const racine = join(dossier, "forges");
+  const depot = join(racine, "faux-depot-long");
+  mkdirSync(depot, { recursive: true });
+  // Un produit factice sous la racine : sans lui, le relevé d'héritage de l'ouverture est vide, et l'ouverture le JOURNALISE dans
+  // `todo/HERITAGE-RELEVES.jsonl` (suivi par git) ; avec lui, le référentiel de pseudonymes absent de la recette empêche toute écriture.
+  mkdirSync(join(racine, "produit-factice", "forge"), { recursive: true });
+  writeFileSync(join(racine, "produit-factice", "forge", "ledger.jsonl"), "", "utf8");
+  const liberer = join(dossier, "liberer");
+  writeFileSync(join(depot, "attendre.mjs"), [
+    'import { existsSync } from "node:fs";',
+    `const L = ${JSON.stringify(liberer)};`,
+    "const fin = Date.now() + 120000;",
+    "while (!existsSync(L) && Date.now() < fin) await new Promise((r) => setTimeout(r, 200));",
+    'console.log(existsSync(L) ? "[FAIL] rouge-du-rejeu-factice" : "[FAIL] jamais-libere");',
+    "process.exit(1);",
+  ].join(NL) + NL, "utf8");
+  const tablePath = join(dossier, "table-recette.json");
+  writeFileSync(tablePath, JSON.stringify({ mesure_le: "2026-11-02", consommateurs: [{ depot: "faux-depot-long", skills: ["digit-ai-page-html"],
+    verification: { commande: ["node", "attendre.mjs"], delai_ms: 120000, extracteur: { nom: "banc", motif: "^\\s*\\[FAIL\\]\\s+(.+?)\\s*$", drapeaux: "gm", groupe: 1 } } }] }), "utf8");
+  const trace = join(dossier, "consommateurs-rouges.jsonl");
+  const etatPath = join(dossier, "rejeu-hebdomadaire.json");
+  const verrouPath = join(dossier, "rejeu-hebdomadaire.verrou");
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-rejeu-cwd-"));
+  const SECTION = "## Rejeu hebdomadaire des consommateurs des skills";
+  const lire = (p) => { try { return JSON.parse(readFileSync(p, "utf8")); } catch { return null; } };
+  const base = { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racine, FORGE_TRACE_CONSOMMATEURS: trace, FORGE_TABLE_CONSOMMATEURS: tablePath };
+  // `undefined` retire la variable du processus lancé : c'est ce qui rétablit le lancement.
+  const jouerRejeu = (extra = {}, enProduit = false) => {
+    const t0 = Date.now();
+    const out = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
+      { cwd, encoding: "utf8", timeout: 120000, env: { ...base, ...extra } });
+    return { out, ms: Date.now() - t0 };
+  };
+  const LANCE = { FORGE_SANS_REJEU_HEBDOMADAIRE: undefined };
+  try {
+    const temoin = jouerRejeu({ FORGE_SANS_REJEU_HEBDOMADAIRE: "1" });
+    check("D-135 vert — FORGE_SANS_REJEU_HEBDOMADAIRE=1 : l'ouverture ne lance rien, n'écrit ni état ni verrou", () => {
+      if (temoin.out.includes(SECTION) || existsSync(etatPath) || existsSync(verrouPath)) throw new Error("un rejeu est lancé malgré le drapeau");
+    });
+
+    const lance = jouerRejeu(LANCE);
+    const apresRetour = attendreQue(() => lire(etatPath)?.dernier?.statut === "en-cours", 30000);
+    const verrou = lire(verrouPath);
+    check("D-135 rouge — l'ouverture lance le rejeu, REND LA MAIN sans l'attendre, et le rejeu lui survit (processus détaché, toujours en cours, verrou posé)", () => {
+      if (!lance.out.includes(SECTION) || !/lancé en arrière-plan/.test(lance.out)) throw new Error(`lancement non dit : ${lance.out.slice(lance.out.indexOf("## Rejeu") >= 0 ? lance.out.indexOf("## Rejeu") : 0, 400)}`);
+      if (existsSync(liberer)) throw new Error("le dépôt factice a été libéré avant la fin de l'ouverture");
+      if (!apresRetour || !verrou) throw new Error(`après le retour du hook : état ${JSON.stringify(lire(etatPath))}, verrou ${JSON.stringify(verrou)}`);
+      try { process.kill(verrou.pid, 0); } catch { throw new Error(`le processus du rejeu (pid ${verrou.pid}) n'a pas survécu à l'ouverture`); }
+    });
+    const msLancement = Number((/lancement en (\d+) ms/.exec(lance.out) || [])[1]);
+    console.log(`  (mesure : ouverture sans lancement ${temoin.ms} ms, avec lancement ${lance.ms} ms, appel de lancement ${msLancement} ms ; rejeu factice encore en cours au retour)`);
+    check("D-135 — 0 seconde de plus à attendre : le lancement lui-même prend moins de 2 s et l'ouverture avec lancement ne dépasse pas l'ouverture sans lui de plus de 5 s", () => {
+      if (!(msLancement < 2000)) throw new Error(`appel de lancement : ${msLancement} ms`);
+      if (lance.ms - temoin.ms > 5000) throw new Error(`ouverture avec lancement ${lance.ms} ms contre ${temoin.ms} ms sans`);
+    });
+
+    const debut = lire(etatPath)?.dernier?.debut;
+    const seconde = jouerRejeu(LANCE);
+    check("D-135 — une seconde ouverture pendant que le rejeu tourne n'en lance pas un autre", () => {
+      if (/lancé en arrière-plan/.test(seconde.out)) throw new Error("un second rejeu est lancé");
+      if (lire(etatPath)?.dernier?.debut !== debut) throw new Error(`l'état a été réécrit : ${debut} -> ${lire(etatPath)?.dernier?.debut}`);
+    });
+
+    const autre = mkdtempSync(join(tmpdir(), "ouverture-rejeu-produit-"));
+    const produit = jouerRejeu({ ...LANCE, FORGE_TRACE_CONSOMMATEURS: join(autre, "consommateurs-rouges.jsonl") }, true);
+    check("D-135 — chez un produit (--pilot), l'ouverture ne lance aucun rejeu et n'écrit aucun état", () => {
+      if (produit.out.includes(SECTION) || existsSync(join(autre, "rejeu-hebdomadaire.json")) || existsSync(join(autre, "rejeu-hebdomadaire.verrou"))) throw new Error("un rejeu part d'un produit");
+    });
+    rmSync(autre, { recursive: true, force: true });
+
+    writeFileSync(liberer, "1", "utf8");
+    const fini = attendreQue(() => lire(etatPath)?.dernier?.statut === "termine", 60000);
+    const etat = lire(etatPath);
+    check("D-135 — le rejeu écrit sa date de début et de fin à côté de la trace, retire son verrou, et trace le rouge neuf avec son origine", () => {
+      if (!fini) throw new Error(`rejeu non terminé : ${JSON.stringify(etat)}`);
+      const c = etat.dernier_complet;
+      if (!c || !c.debut || !c.fin || Date.parse(c.fin) < Date.parse(c.debut) || c.debut !== debut) throw new Error(`dates : ${JSON.stringify(c)}`);
+      if (existsSync(verrouPath)) throw new Error("verrou non retiré");
+      const l = readFileSync(trace, "utf8").trim().split(NL).map((x) => JSON.parse(x));
+      if (l.length !== 1 || l[0].evenement !== "rouge-neuf" || l[0].depot !== "faux-depot-long" || l[0].origine !== "rejeu-hebdomadaire") throw new Error(`trace : ${JSON.stringify(l)}`);
+    });
+
+    const suivante = jouerRejeu(LANCE);
+    check("D-135 — à l'ouverture suivante, le rouge s'affiche (ligne « rejeu hebdomadaire », dépôt, commande, remède) et rien n'est relancé avant 7 jours", () => {
+      const l = suivante.out.split("## Consommateurs des skills")[1] || "";
+      if (!/rejeu hebdomadaire/.test(l) || !/faux-depot-long/.test(l) || !/node attendre\.mjs/.test(l) || !/--rejouer-consommateurs/.test(l)) throw new Error(`rouge non affiché : ${suivante.out.slice(0, 300)}`);
+      if (/lancé en arrière-plan/.test(suivante.out) || lire(etatPath)?.dernier?.debut !== debut) throw new Error("un rejeu a été relancé à moins de 7 jours");
+    });
+  } finally {
+    try { writeFileSync(liberer, "1", "utf8"); } catch { /* le dossier jetable est déjà retiré */ }
+    attendreQue(() => !existsSync(verrouPath), 15000);
+    rmSync(dossier, { recursive: true, force: true });
+    rmSync(cwd, { recursive: true, force: true });
+  }
+}
+
+console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

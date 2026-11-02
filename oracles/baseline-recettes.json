@@ -383,8 +383,8 @@
   "vu_le": "2026-10-12"
  },
  "oracles/consommateurs-skills.test.mjs": {
-  "cas": 22,
-  "vu_le": "2026-09-20"
+  "cas": 38,
+  "vu_le": "2026-11-02"
  },
  "oracles/decouvrir-oracles.test.mjs": {
   "cas": 7,
@@ -419,8 +419,8 @@
   "vu_le": "2026-10-29"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 50,
-  "vu_le": "2026-10-30"
+  "cas": 61,
+  "vu_le": "2026-11-02"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
   "cas": 10,
