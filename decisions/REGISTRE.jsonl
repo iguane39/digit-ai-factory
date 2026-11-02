@@ -138,3 +138,4 @@
 {"type":"decision","n":141,"question":"Que fait-on d'ArtCraft, le studio d'images et de vidéos par IA présenté comme alternative à Adobe ?","date":"2026-11-02","ts":"2026-11-02T13:38:22.985Z","session":"a1f1254b","origine":"reservation"}
 {"type":"decision","n":142,"question":"Faut-il écouter les 39 favoris TikTok qui n'ont été lus que par leur légende ou leur couverture ?","date":"2026-11-02","ts":"2026-11-02T13:41:52.450Z","session":"a1f1254b","origine":"reservation"}
 {"type":"decision","n":143,"question":"Votre liste des éléments à traiter doit-elle couvrir aussi le reste du registre, au-delà du tri TikTok ?","date":"2026-11-02","ts":"2026-11-02T13:41:52.612Z","session":"a1f1254b","origine":"reservation"}
+{"type":"decision","n":144,"question":"Faut-il publier make-it-better 1.1.0 (commit 207698c) sur le distant de digit-ai-forge-agents ?","date":"2026-11-02","ts":"2026-11-02T13:58:00.487Z","session":"0b4662f2","origine":"reservation"}
