@@ -73,7 +73,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
 | `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,7 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
-| `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 11,9 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
+| `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 12,4 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
 | `Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` | fichier | 15,5 Ko | Étude — une vidéo où Claude reçoit 100 fois la consigne « fais mieux » |
 | `Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` | fichier | 5,5 Ko | Œil critique : 4 actions pour tenir les 8 demandes (29/10/2026) |
 | `Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` | fichier | 4,8 Ko | Œil critique : ce qu'il fait, ce qu'il ne fait pas (29/10/2026) |
