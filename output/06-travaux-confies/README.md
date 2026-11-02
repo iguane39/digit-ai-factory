@@ -18,4 +18,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 |---|---|---|---|
 | [`2026-09\`](2026-09/README.md) | dossier (30 fichiers) | — | Livrables de la famille `06-travaux-confies\` du mois clos 2026-09, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la fa… |
 
-_0 fichier(s), 1 sous-dossier(s)_
+_0 fichier(s), 1 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
