@@ -21,8 +21,9 @@
  *       écrit la ligne ; `--verdicts` accepte le squelette rempli (clé `verdicts`) ou l'objet des 13 verdicts ; le type peut venir
  *       du squelette ;
  *   node <pilot>/scripts/mobiliser.mjs --verifier
- *       avant « livré » : les livrables exigés des forges mobilisées à la dernière demande, présents ou manquants (la lecture du
- *       verrou S85) ; exit 0 rien ne manque, 1 un livrable manque, 2 aucune trace ;
+ *       avant « livré » : les livrables exigés des forges mobilisées à la dernière demande DE LA SESSION qui vérifie (CLAUDE_CODE_SESSION_ID,
+ *       ou --session <id>), présents ou manquants (la lecture du verrou S85) ; chaque ligne écrite porte l'identifiant de sa session
+ *       (TF-2045), les lignes d'avant l'identifiant sont le repli déclaré ; exit 0 rien ne manque, 1 un livrable manque, 2 aucune trace ;
  *   options : --profil domaine_public=oui|non,page_indexable=…,donnees_personnelles=…,agents=…,mise_en_production=…  (déclare ou
  *       revoit forge/PROFIL.json, puis l'emploie) ; --produit <dossier> (désigne le produit sans y être).
  * Sortie : une ligne JSON ; exit 0 = écrit (ou squelette rendu), 1 = refus motivé, 2 = usage, carte illisible ou hors d'un produit.
@@ -30,8 +31,8 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
-  CHEMIN_TRACE, FORGES, derniereDemande, ecartsSansFait, ecrireProfil, etatDesLivrables, ligneDeTrace, lireCarte, lireProfil, lireProfilTexte, squelette,
-  typesDe, validerVerdicts,
+  CHEMIN_TRACE, FORGES, REPLI_DIT, derniereDemande, ecartsSansFait, ecrireProfil, etatDesLivrables, ligneDeTrace, lireCarte, lireProfil, lireProfilTexte,
+  sessionDe, squelette, typesDe, validerVerdicts,
 } from "../oracles/lib-mobilisation.mjs";
 import { produitDe } from "../oracles/hook-restitution.mjs";
 
@@ -55,11 +56,17 @@ if (!produit || !existsSync(join(produit, "forge")))
 // --verifier (item 3 de TF-1949) : avant « livré », les livrables exigés des forges mobilisées à la DERNIÈRE demande, présents ou
 // manquants — la même lecture que le verrou S85 d'oracle-synthese. Exit 0 rien ne manque, 1 un livrable manque, 2 aucune trace.
 if (args.includes("--verifier")) {
-  const trace = derniereDemande(produit);
-  if (!trace.derniere) sortie({ outil: OUTIL, verdict: "SANS_TRACE", message: `${trace.chemin} ${trace.existe ? "sans ligne lisible" : "absent"} : écris d'abord les 13 verdicts de la demande (--preparer, puis --verdicts)` }, 2);
+  // TF-2045 : la demande jugée est la dernière ligne de la session qui vérifie (--session <id> la désigne, sinon CLAUDE_CODE_SESSION_ID) ;
+  // les lignes d'avant l'identifiant sont le repli déclaré, et sans identifiant de session c'est la dernière ligne du fichier.
+  const session = valeur("--session") || sessionDe();
+  const trace = derniereDemande(produit, session);
+  if (!trace.derniere) sortie({ outil: OUTIL, verdict: "SANS_TRACE", session: trace.session, autres_sessions: trace.autres_sessions,
+    message: `${trace.chemin} ${!trace.existe ? "absent" : trace.autres_sessions ? `ne porte aucune ligne de cette session (${trace.autres_sessions} ligne(s) d'autres sessions, non jugées à sa place)` : "sans ligne lisible"} : écris d'abord les 13 verdicts de la demande (--preparer, puis --verdicts)` }, 2);
   const d = trace.derniere;
   const { etats, manquants } = etatDesLivrables(produit, carte, d);
-  sortie({ outil: OUTIL, verdict: manquants.length ? "MANQUE" : "PRESENT", derniere_demande: { ts: d.ts, type: d.type, demande: d.demande ?? null },
+  sortie({ outil: OUTIL, verdict: manquants.length ? "MANQUE" : "PRESENT", session: trace.session, repli: trace.repli,
+    ...(trace.repli ? { repli_dit: REPLI_DIT[trace.repli] } : {}),
+    derniere_demande: { ts: d.ts, type: d.type, demande: d.demande ?? null, session: d.session ?? null },
     exiges: etats.map((e) => ({ forge: e.forge, livrable: e.libelle, present: e.present, trouve: e.trouve, chemins: e.chemins })),
     manquants: manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})`),
     remede: manquants.length ? "produire chaque livrable manquant, ou écarter avec son motif la forge qui n'a pas servi dans une nouvelle ligne de trace (--verdicts)" : null }, manquants.length ? 1 : 0);
@@ -119,6 +126,6 @@ if (sansFait.length) sortie({ outil: OUTIL, verdict: "REFUS", refus: sansFait },
 const ligne = ligneDeTrace({ carte, types: t.types, profil, verdicts, demande });
 mkdirSync(join(produit, "forge"), { recursive: true });
 appendFileSync(join(produit, CHEMIN_TRACE), JSON.stringify(ligne) + "\n", "utf8");
-sortie({ outil: OUTIL, verdict: "ECRIT", trace: join(produit, CHEMIN_TRACE), ts: ligne.ts, type: ligne.type, mobilisees: ligne.mobilisees,
+sortie({ outil: OUTIL, verdict: "ECRIT", trace: join(produit, CHEMIN_TRACE), ts: ligne.ts, session: ligne.session, type: ligne.type, mobilisees: ligne.mobilisees,
   ligne_ecran: ligne.ligne, demande: ligne.demande ?? null, profil_declare: profilTexte ? join(produit, "forge", "PROFIL.json") : null,
   ...(demande ? {} : { avertissement: "demande absente : la trace porte « demande: null » — la renseigner dans le fichier (champ demande) ou par --demande" }) }, 0);

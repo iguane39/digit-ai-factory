@@ -254,11 +254,15 @@ export function ecrireProfil(produit, profil, maintenant = new Date()) {
     source: "déclaré par scripts/mobiliser.mjs --profil (diagnostic 20261026a, section d, A5)", signaux: profil }, null, 2) + "\n", "utf8");
 }
 
+/** L'identifiant de la session qui écrit ou qui restitue (`CLAUDE_CODE_SESSION_ID`), ou null quand rien ne l'identifie. */
+export const sessionDe = (env = process.env) => String(env.CLAUDE_CODE_SESSION_ID || "").trim() || null;
+
 /** La ligne de trace d'une demande, prête à être ajoutée à forge/mobilisation.jsonl. */
-export function ligneDeTrace({ carte, types, profil, verdicts, demande = null, maintenant = new Date() }) {
+export function ligneDeTrace({ carte, types, profil, verdicts, demande = null, maintenant = new Date(), session = sessionDe() }) {
   const priv = privilegiees(types);
   return {
-    ts: maintenant.toISOString(), schema: SCHEMA_TRACE, demande: demande ? String(demande).trim() : null,
+    // TF-2045 (02/11/2026) : deux sessions d'un produit écrivent le même fichier ; l'identifiant dit laquelle a écrit la ligne.
+    ts: maintenant.toISOString(), schema: SCHEMA_TRACE, session: session || null, demande: demande ? String(demande).trim() : null,
     type: types.map((t) => t.id).join("+"), types: types.map((t) => t.id), profil,
     carte: { version: carte.version, date: carte.date },
     verdicts: Object.fromEntries(FORGES.map((f) => [f, { ...verdicts[f], privilegiee: priv.includes(f) }])),
@@ -271,18 +275,48 @@ export function ligneDeTrace({ carte, types, profil, verdicts, demande = null, m
 // Avant « livré », les livrables de chaque forge MOBILISÉE à la dernière demande sont présents chez le produit. Non rétroactif :
 // seule la dernière ligne de la trace compte, et la trace n'existe que depuis la mise en service de l'écrivain.
 
-/** La dernière demande tracée chez le produit : { existe, chemin, lignes, illisibles, derniere } ; `derniere` est null sans ligne lisible. */
-export function derniereDemande(produit) {
+/** Ce que dit chaque repli de `derniereDemande`, pour l'écran et pour le constat. */
+export const REPLI_DIT = Object.freeze({
+  ancienne: "cette session n'a écrit aucune ligne ; la dernière ligne SANS identifiant de session (écrite avant le 02/11/2026) est jugée, faute de savoir qui l'a écrite",
+  "session-non-identifiee": "aucune session n'est identifiée (CLAUDE_CODE_SESSION_ID absent, pas de --session) ; la dernière ligne du fichier est jugée, quelle que soit sa session",
+});
+
+/**
+ * La dernière demande tracée chez le produit : { existe, chemin, lignes, illisibles, derniere, session, repli, autres_sessions } ;
+ * `derniere` est null sans ligne lisible.
+ *
+ * TF-2045 (02/11/2026) : deux sessions d'un produit écrivent `forge/mobilisation.jsonl`, et la dernière ligne du fichier peut être celle
+ * de l'autre. Avec `session` (celle qui restitue), la demande jugée est la DERNIÈRE LIGNE DE CETTE SESSION. Repli déclaré, dans `repli` :
+ *   · « ancienne » : la session n'a écrit aucune ligne, mais des lignes d'avant l'identifiant (sans champ `session`) existent ; la dernière
+ *     d'entre elles est jugée, faute de savoir qui l'a écrite ;
+ *   · « session-non-identifiee » : aucune session n'est connue (`session` null, jeu à la main) ; la dernière ligne du fichier est jugée,
+ *     comme avant.
+ * Une session qui n'a rien écrit, et pour qui il n'existe aucune ligne ancienne, n'a pas de demande : `derniere` est null, et
+ * `autres_sessions` compte les lignes lisibles d'autres sessions, que l'appelant dit sans les juger à sa place.
+ */
+export function derniereDemande(produit, session = null) {
   const chemin = join(produit, CHEMIN_TRACE);
-  if (!existsSync(chemin)) return { existe: false, chemin, lignes: 0, illisibles: 0, derniere: null };
-  let derniere = null, lignes = 0, illisibles = 0;
+  if (!existsSync(chemin)) return { existe: false, chemin, lignes: 0, illisibles: 0, derniere: null, session: session || null, repli: null, autres_sessions: 0 };
+  const lues = [];
+  let lignes = 0, illisibles = 0;
   for (const l of readFileSync(chemin, "utf8").split(/\r?\n/)) {
     if (!l.trim()) continue;
     lignes += 1;
-    try { const o = JSON.parse(l); if (o && o.verdicts && typeof o.verdicts === "object") derniere = o; else illisibles += 1; }
+    try { const o = JSON.parse(l); if (o && o.verdicts && typeof o.verdicts === "object") lues.push(o); else illisibles += 1; }
     catch { illisibles += 1; }
   }
-  return { existe: true, chemin, lignes, illisibles, derniere };
+  const dernierDe = (liste) => (liste.length ? liste[liste.length - 1] : null);
+  let derniere, repli = null;
+  if (!session) { derniere = dernierDe(lues); repli = lues.length ? "session-non-identifiee" : null; }
+  else {
+    const siennes = lues.filter((o) => o.session === session);
+    const anciennes = lues.filter((o) => !o.session);
+    if (siennes.length) derniere = dernierDe(siennes);
+    else if (anciennes.length) { derniere = dernierDe(anciennes); repli = "ancienne"; }
+    else derniere = null;
+  }
+  const autres = session ? lues.filter((o) => o.session && o.session !== session).length : 0;
+  return { existe: true, chemin, lignes, illisibles, derniere, session: session || null, repli, autres_sessions: autres };
 }
 
 /** Les livrables exigés par une ligne de trace : pour chaque forge mobilisée, ceux des types qui la privilégient (ou ses livrables par

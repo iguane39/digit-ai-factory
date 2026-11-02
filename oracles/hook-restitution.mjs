@@ -819,13 +819,15 @@ export function analyserTranscript(texte) {
 // `averts` (T4, TF-1949, 26/10/2026) : les constats AVERT de l'oracle, dits sous la réponse sans jamais la refuser ; S72 en rend
 // un quand le verrou « livré » (S85) juge les livrables sur fichiers.
 // `nombres` (D-100 (a), 29/10/2026) : les nombres du tour, passés à S90 par un fichier ; absents, S90 rend SANS_OBJET.
-export function juger(texte, racine = process.cwd(), releves = null, nombres = null) {
+// `session` (TF-2045, 02/11/2026) : la session qui restitue, passée à S85 et S86 pour qu'elles jugent sa dernière ligne de
+// `forge/mobilisation.jsonl`, pas celle de l'autre session du produit ; absente, l'oracle lit CLAUDE_CODE_SESSION_ID.
+export function juger(texte, racine = process.cwd(), releves = null, nombres = null, session = null) {
   const dir = mkdtempSync(join(tmpdir(), "restitution-"));
   const f = join(dir, "message.md");
   writeFileSync(f, texte, "utf8");
   const fn = join(dir, "nombres.json");
   if (nombres) writeFileSync(fn, JSON.stringify(nombres), "utf8");
-  const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : []), ...argsReleves(releves), ...(nombres ? ["--nombres-tour", fn] : [])], { encoding: "utf8" });
+  const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : []), ...(session ? ["--session", String(session)] : []), ...argsReleves(releves), ...(nombres ? ["--nombres-tour", fn] : [])], { encoding: "utf8" });
   let rapport = {};
   try { rapport = JSON.parse(r.stdout); } catch { /* jugé par le code */ }
   return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL"),
@@ -1947,7 +1949,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + court.ecarts.join("\n") + `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` }));
     process.exit(0);
   }
-  const { code, fails, averts: avertsOracle } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour);
+  const { code, fails, averts: avertsOracle } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour, entree.session_id);
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.

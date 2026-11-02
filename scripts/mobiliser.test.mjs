@@ -33,8 +33,12 @@ const produit = (nom, { profil = true } = {}) => {
     donnees_personnelles: false, agents: false, mise_en_production: true } }), "utf8");
   return d;
 };
-const lancer = (cwd, args) => {
-  const r = spawnSync(process.execPath, [ECRIVAIN, ...args], { cwd, encoding: "utf8" });
+// TF-2045 : l'écrivain lit CLAUDE_CODE_SESSION_ID ; la recette le retire de l'environnement hérité, pour que ses cas ne dépendent pas de
+// la session qui la joue, et le pose cas par cas (`session`).
+const lancer = (cwd, args, session = null) => {
+  const env = { ...process.env }; delete env.CLAUDE_CODE_SESSION_ID;
+  if (session) env.CLAUDE_CODE_SESSION_ID = session;
+  const r = spawnSync(process.execPath, [ECRIVAIN, ...args], { cwd, encoding: "utf8", env });
   let sortie = null;
   try { sortie = JSON.parse(r.stdout); } catch { /* sortie illisible : le cas le dira */ }
   return { code: r.status, sortie, brut: `${r.stdout || ""}${r.stderr || ""}` };
@@ -197,6 +201,49 @@ try {
     att(r.code === 1 && r.sortie.verdict === "REFUS" && trace(d).length === 0, `gabarit accepté : exit ${r.code}`);
     const s = lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsProduitNeuf())]);
     att(s.code === 0 && trace(d)[0].demande === null && /demande absente/.test(s.sortie.avertissement || ""), `absence muette : ${JSON.stringify(s.sortie).slice(0, 200)}`);
+  });
+
+  // TF-2045 (02/11/2026) : deux sessions d'un produit écrivent le même fichier ; --verifier juge la dernière ligne de la session qui vérifie.
+  // La session A mobilise les 5 forges du produit neuf, data écartée : 5 livrables manquent (comme au cas --verifier ci-dessus).
+  const verdictsA = () => ({ ...verdictsProduitNeuf(), data: { verdict: "ecartee", motif: "aucune donnée à agréger ici" } });
+  const verdictsSansRien = () => Object.fromEntries(FORGES.map((f) => [f, { verdict: "ecartee", motif: `aucun fichier du produit n'est touché (0 fichier) : la forge ${f} n'a pas lieu d'être` }]));
+  check("TF-2045 rouge — la session A, dont les livrables manquent, n'est plus jugée sur la ligne que la session B a écrite après elle", () => {
+    const d = produit("deux-sessions");
+    att(lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsA())], "sess-A").code === 0, "écriture de A");
+    att(lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-B").code === 0, "écriture de B");
+    const lignes = trace(d);
+    att(lignes.length === 2 && lignes[0].session === "sess-A" && lignes[1].session === "sess-B", `chaque ligne porte l'identifiant de sa session : ${lignes.map((l) => l.session)}`);
+    const a = lancer(d, ["--verifier"], "sess-A");
+    att(a.code === 1 && a.sortie.verdict === "MANQUE" && a.sortie.manquants.length === 5 && a.sortie.session === "sess-A" && a.sortie.derniere_demande.session === "sess-A",
+      `A doit être jugée sur SA ligne (5 manquants) : exit ${a.code} ${a.brut.slice(0, 300)}`);
+  });
+  check("TF-2045 vert — la session B, dont la ligne n'exige rien, passe ; --session désigne la session sans variable d'environnement", () => {
+    const d = produit("deux-sessions-b");
+    lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsA())], "sess-A");
+    lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-B");
+    const b = lancer(d, ["--verifier"], "sess-B");
+    att(b.code === 0 && b.sortie.verdict === "PRESENT" && b.sortie.repli === null, `B : exit ${b.code} ${b.brut.slice(0, 300)}`);
+    const parOption = lancer(d, ["--verifier", "--session", "sess-A"]);
+    att(parOption.code === 1 && parOption.sortie.session === "sess-A", `--session sess-A : exit ${parOption.code} ${parOption.brut.slice(0, 300)}`);
+  });
+  check("TF-2045 — une session sans ligne propre n'emprunte pas la ligne d'une autre : exit 2, les lignes des autres sessions comptées", () => {
+    const d = produit("deux-sessions-c");
+    lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsA())], "sess-A");
+    lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-B");
+    const c = lancer(d, ["--verifier"], "sess-C");
+    att(c.code === 2 && c.sortie.verdict === "SANS_TRACE" && c.sortie.autres_sessions === 2 && /2 ligne\(s\) d'autres sessions/.test(c.sortie.message), `C : exit ${c.code} ${c.brut.slice(0, 300)}`);
+  });
+  check("TF-2045 — repli déclaré : une ligne d'avant l'identifiant sert à la session qui n'a rien écrit, et sans identifiant de session la dernière ligne sert, les deux DITS", () => {
+    const d = produit("ligne-ancienne");
+    att(lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsProduitNeuf())]).code === 0, "écriture sans session");
+    att(trace(d)[0].session === null, `une ligne écrite sans session porte session: ${trace(d)[0].session}`);
+    const a = lancer(d, ["--verifier"], "sess-A");
+    att(a.code === 1 && a.sortie.repli === "ancienne" && /SANS identifiant de session/.test(a.sortie.repli_dit), `repli ancien : exit ${a.code} ${a.brut.slice(0, 300)}`);
+    const n = lancer(d, ["--verifier"]);
+    att(n.code === 1 && n.sortie.repli === "session-non-identifiee" && /aucune session n'est identifiée/.test(n.sortie.repli_dit), `sans session : exit ${n.code} ${n.brut.slice(0, 300)}`);
+    lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-B");
+    const sansSession = lancer(d, ["--verifier"]);
+    att(sansSession.code === 0 && sansSession.sortie.repli === "session-non-identifiee", `sans session, dernière ligne du fichier : exit ${sansSession.code}`);
   });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }

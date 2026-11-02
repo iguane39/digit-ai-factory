@@ -211,7 +211,7 @@ import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
 import { enumerationsEnLigne, etapesDeGuide, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
 import { affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { chiffresSansReleve } from "./lib-chiffres-releves.mjs";
-import { lireCarte, derniereDemande, etatDesLivrables } from "./lib-mobilisation.mjs";
+import { lireCarte, derniereDemande, etatDesLivrables, sessionDe, REPLI_DIT } from "./lib-mobilisation.mjs";
 
 // --racine <dossier> (TF-1644, 14/10/2026) : le dossier du PROJET dont la restitution est jugée,
 // quand le fichier jugé n'y vit pas. Le hook de fin de tour écrit le message dans un fichier
@@ -220,6 +220,10 @@ import { lireCarte, derniereDemande, etatDesLivrables } from "./lib-mobilisation
 // Le FAIL du 12/10 n'est apparu qu'au rejeu sur un fichier placé sous le `forge\` du produit.
 const _option = (nom) => { const i = process.argv.indexOf(nom); return i > 1 ? process.argv[i + 1] || null : null; };
 const RACINE_PROJET = _option("--racine");
+// --session <id> (TF-2045, 02/11/2026) : la session qui restitue. S85 et S86 jugent la dernière ligne de `forge/mobilisation.jsonl` ÉCRITE PAR
+// CETTE SESSION, pas la dernière du fichier, que l'autre session d'un produit peut avoir écrite. Le hook de fin de tour la passe ; à défaut,
+// `CLAUDE_CODE_SESSION_ID` ; sans l'une ni l'autre, la dernière ligne du fichier, et le constat le dit.
+const SESSION_JUGEE = _option("--session") || sessionDe();
 // --horloge <ISO> (TF-1646, 14/10/2026) : le moment du jugement pour S69, l'horloge du poste à défaut.
 const HORLOGE = _option("--horloge");
 // --releves-tour <ISO,ISO,…|aucun> et --releves-session <ISO,…|aucun> (TF-1938, 21/10/2026) : les instants où le tour, puis la
@@ -4272,7 +4276,7 @@ function juger(texte, cheminJuge = null) {
     if (!declarations.length) return { etat: "sans-declaration", produit };
     const { carte, erreur } = lireCarte();
     if (erreur) return { etat: "carte-illisible", produit, erreur };
-    const trace = derniereDemande(produit);
+    const trace = derniereDemande(produit, SESSION_JUGEE);
     if (!trace.derniere) return { etat: "sans-trace", produit, trace, declarations };
     return { etat: "juge", produit, trace, declarations, ...etatDesLivrables(produit, carte, trace.derniere) };
   })();
@@ -4304,14 +4308,18 @@ function juger(texte, cheminJuge = null) {
     else if (verrou.etat === "carte-illisible") for (const r of ["S85", "S86"]) so(r, `${verrou.erreur} — les livrables exigés ne se déduisent pas ; node scripts/verifier-carte-forges.mjs au pilot`);
     else if (verrou.etat === "sans-trace") {
       so("S85", "sans trace de mobilisation, les livrables exigés ne se déduisent pas — S86 le dit");
-      ko("S86", `une livraison ou une clôture est déclarée chez un produit sans trace de mobilisation (${verrou.trace.existe ? `${verrou.trace.chemin} sans ligne lisible` : `${verrou.trace.chemin} absent`}) : `
+      ko("S86", `une livraison ou une clôture est déclarée chez un produit sans trace de mobilisation (${!verrou.trace.existe ? `${verrou.trace.chemin} absent`
+        : verrou.trace.autres_sessions ? `${verrou.trace.chemin} ne porte aucune ligne de cette session (${verrou.trace.session}) : ${verrou.trace.autres_sessions} ligne(s) d'autres sessions, qui ne valent pas la sienne (TF-2045)`
+        : `${verrou.trace.chemin} sans ligne lisible`}) : `
         + "à chaque demande, chacune des 13 forges reçoit « mobilisee » ou « ecartee » avec son motif, et « livré » se juge contre ces verdicts (T4, TF-1949). "
         + `Écris la trace de la demande : ${REMEDE_TRACE}. Ex. : ${verrou.declarations[0].replace(/\s+/g, " ").slice(0, 110)}`);
     } else {
       const d = verrou.trace.derniere;
-      ok("S86", `trace de mobilisation présente : dernière demande du ${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}`);
+      // TF-2045 : la ligne jugée est celle de la session qui restitue ; un repli (ligne d'avant l'identifiant, session inconnue) se dit ici.
+      const repliDit = verrou.trace.repli ? ` — REPLI DÉCLARÉ : ${REPLI_DIT[verrou.trace.repli]}` : "";
+      ok("S86", `trace de mobilisation présente : dernière demande de la session${verrou.trace.session ? ` ${String(verrou.trace.session).slice(0, 8)}` : ""} du ${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}${repliDit}`);
       verrou.manquants.length
-        ? ko("S85", `${verrou.manquants.length} livrable(s) exigé(s) absent(s) chez le produit pour les forges mobilisées de la dernière demande (${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}) : `
+        ? ko("S85", `${verrou.manquants.length} livrable(s) exigé(s) absent(s) chez le produit pour les forges mobilisées de la dernière demande de cette session (${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}${repliDit}) : `
           + verrou.manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})`).join(" ; ")
           + " — « livré » attend les livrables de chaque forge mobilisée (T4, TF-1949 ; 2 produits sur 10 clos ou publiés les portaient). Produis-les ; une forge qui n'a pas servi "
           + "s'écarte avec son motif dans une nouvelle ligne de trace (node <PILOT_ROOT>/scripts/mobiliser.mjs --verifier liste ce qui manque).")
@@ -6534,7 +6542,7 @@ Aucun écart : la demande a été suivie à la lettre.
     const base85 = mkdtempSync(join(tmpdir(), "verrou-livre-"));
     const produit85 = (nom) => { const p = join(base85, nom); mkdirSync(join(p, "forge", "retours"), { recursive: true }); return p; };
     const FORGES85 = ["conception", "design", "development", "tests", "ops", "agents", "agents-security", "seo-geo", "organization", "audit", "data", "observability", "websec"];
-    const ligne85 = (mobilisees, ts) => JSON.stringify({ ts, schema: "forge/mobilisation@1", type: "produit-neuf", types: ["produit-neuf"],
+    const ligne85 = (mobilisees, ts, session = null) => JSON.stringify({ ts, schema: "forge/mobilisation@1", ...(session ? { session } : {}), type: "produit-neuf", types: ["produit-neuf"],
       verdicts: Object.fromEntries(FORGES85.map((f) => [f, { verdict: mobilisees.includes(f) ? "mobilisee" : "ecartee", motif: `motif écrit pour la forge ${f}` }])) }) + nl;
     const NEUF = ["conception", "design", "development", "tests", "ops"];
     const poser = (p, rel) => { mkdirSync(dirname(join(p, rel)), { recursive: true }); writeFileSync(join(p, rel), "x", "utf8"); };
@@ -6557,6 +6565,39 @@ Aucun écart : la demande a été suivie à la lettre.
     const rD1 = jouer85(pD, "t4-dossier-mep-absent.md", LIVRE_85);
     writeFileSync(join(pD, "forge", "mobilisation.jsonl"), ligne85(NEUF, "2026-10-27T09:00:00.000Z") + ligne85(NEUF.filter((f) => f !== "ops"), "2026-10-27T10:00:00.000Z"), "utf8");
     const rD2 = jouer85(pD, "t4-ops-ecartee-par-une-nouvelle-ligne.md", LIVRE_85);
+    // (j) TF-2045 (02/11/2026) : deux sessions d'un produit écrivent le même fichier ; la dernière ligne est jugée PAR SESSION. La session A
+    // mobilise un produit neuf dont les livrables manquent (09:00) ; la session B écrit APRÈS elle une ligne qui n'exige rien (10:00). Avant
+    // la correction, A était jugée sur la ligne de B et passait. Les cas sont hermétiques : --session explicite, CLAUDE_CODE_SESSION_ID retirée.
+    const jouerSession85 = (p, nom, contenu, session) => {
+      const f = join(dir, nom); writeFileSync(f, contenu, "utf8");
+      const env = { ...process.env }; delete env.CLAUDE_CODE_SESSION_ID;
+      return spawnSync(process.execPath, [moi, f, "--racine", p, ...(session ? ["--session", session] : [])], { encoding: "utf8", env });
+    };
+    const pJ = produit85("produit85-deux-sessions");
+    writeFileSync(join(pJ, "forge", "mobilisation.jsonl"), ligne85(NEUF, "2026-10-27T09:00:00.000Z", "sess-A") + ligne85([], "2026-10-27T10:00:00.000Z", "sess-B"), "utf8");
+    const rJA = jouerSession85(pJ, "tf2045-session-a.md", LIVRE_85, "sess-A");
+    const rJB = jouerSession85(pJ, "tf2045-session-b.md", LIVRE_85, "sess-B");
+    const rJC = jouerSession85(pJ, "tf2045-session-c.md", LIVRE_85, "sess-C");
+    const rJN = jouerSession85(pJ, "tf2045-session-inconnue.md", LIVRE_85, null);
+    const pL = produit85("produit85-ligne-ancienne");
+    writeFileSync(join(pL, "forge", "mobilisation.jsonl"), ligne85(NEUF, "2026-10-27T09:00:00.000Z"), "utf8");
+    const rJL = jouerSession85(pL, "tf2045-ligne-ancienne.md", LIVRE_85, "sess-A");
+    for (const [r, regle, statut, quoi] of [
+      [rJA, "S85", "FAIL", "(j) la session A, dont la ligne exige des livrables absents, est jugée sur la ligne que la session B a écrite après elle et passe"],
+      [rJB, "S85", "PASS", "(j) la session B, dont la ligne n'exige rien, est jugée sur la ligne de A"],
+      [rJC, "S86", "FAIL", "(j) une session qui n'a écrit aucune ligne est jugée sur la ligne d'une autre session"],
+      [rJC, "S85", "SANS_OBJET", "(j) une session sans ligne propre voit S85 déduire des livrables de la ligne d'une autre"],
+      [rJN, "S86", "PASS", "(j) sans identifiant de session, la dernière ligne du fichier n'est plus jugée (repli déclaré)"],
+      [rJL, "S86", "PASS", "(j) la ligne d'avant l'identifiant n'est pas reprise en repli pour une session qui n'a rien écrit"],
+      [rJL, "S85", "FAIL", "(j) le repli sur la ligne ancienne ne juge pas ses livrables"],
+    ]) if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-2045) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+    if (!/ne porte aucune ligne de cette session \(sess-C\) : 2 ligne\(s\) d'autres sessions/.test(constatDe(rJC, "S86").message || ""))
+      casse.push("S86 (TF-2045) : le refus d'une session sans ligne propre doit dire combien de lignes d'autres sessions existent : " + String(constatDe(rJC, "S86").message || "").slice(0, 200));
+    if (!/REPLI DÉCLARÉ : aucune session n'est identifiée/.test(constatDe(rJN, "S86").message || ""))
+      casse.push("S86 (TF-2045) : sans identifiant de session, le repli sur la dernière ligne du fichier doit être DIT : " + String(constatDe(rJN, "S86").message || "").slice(0, 200));
+    if (!/REPLI DÉCLARÉ : cette session n'a écrit aucune ligne/.test(constatDe(rJL, "S86").message || "") || !/REPLI DÉCLARÉ/.test(constatDe(rJL, "S85").message || ""))
+      casse.push("S85/S86 (TF-2045) : le repli sur une ligne ancienne sans identifiant doit être DIT par S86 comme par S85 : " + String(constatDe(rJL, "S85").message || "").slice(0, 200));
     for (const [r, regle, statut, quoi] of [
       [rA, "S86", "FAIL", "(a) une livraison déclarée chez un produit sans trace de mobilisation passe"],
       [rA, "S85", "SANS_OBJET", "(a) sans trace, S85 ne peut pas déduire les livrables exigés et doit le dire"],
