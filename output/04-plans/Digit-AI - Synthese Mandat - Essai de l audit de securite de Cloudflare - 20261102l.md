@@ -59,7 +59,7 @@ Le protocole de l'étude est tenu, sauf sur ces points.
 ## 7. Risques
 
 - **Conclusion prise pour générale.** Une cible de 1 052 lignes écrite par un modèle n'est pas un vrai dépôt : la requête unique peut y réussir plus qu'ailleurs. Signal : l'essai de `TF-2057` sur un vrai dépôt. Parade : le rapport le dit dès son ouverture.
-- **Trop-plein de jetons.** Chaque agent a coûté 65 000 à 118 000 jetons, contre 30 000 estimés par l'étude, surtout à cause du contexte fixe. Signal : tout essai à plusieurs agents dépassera ses plafonds. Parade : compter 70 000 jetons par agent au prochain calcul.
+- **Trop-plein de jetons.** Chaque agent a coûté 65 000 à 118 000 jetons, contre 30 000 de contexte fixe retenus par l'étude ; la cause de l'écart n'est pas mesurée. Signal : tout essai à plusieurs agents dépassera ses plafonds. Parade : compter 70 000 jetons par agent au prochain calcul.
 
 ## 8. Prochaines actions
 
@@ -67,7 +67,7 @@ Aucune action ne vous revient ; la seule suite passe par la revue hebdomadaire.
 
 | Sélecteur | Action | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|
-| A-1 | Présenter à la revue hebdomadaire l'essai d'une revue par agent unique sur un vrai dépôt | `TF-2057` | auto_ia | non exécutée : la revue a lieu dans 7 jours | `todo/TODO.jsonl` | si rien n'est fait : le manque de contrôle du code reste entier |
+| A-1 | Présenter à la revue hebdomadaire l'essai d'une revue par agent unique sur un vrai dépôt | `TF-2057` | auto_ia | non exécutée, motif decision : la revue hebdomadaire a lieu dans 7 jours | `todo/TODO.jsonl` | si rien n'est fait : le manque de contrôle du code reste entier |
 
 ## 9. Traces
 
