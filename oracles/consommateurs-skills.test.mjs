@@ -16,7 +16,7 @@ import { tmpdir, homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { concernes, confronter, encadrer, extraireEchecs, jouer, lireTable, resoudreInterprete, TABLE_PAR_DEFAUT } from "./consommateurs-skills.mjs";
+import { concernes, confronter, ecrireTrace, encadrer, evenementNonRejoue, evenementsDePropagation, extraireEchecs, jouer, lignesOuverture, lireTable, resoudreInterprete, rougesOuverts, TABLE_PAR_DEFAUT } from "./consommateurs-skills.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 let pass = 0, fail = 0;
@@ -333,5 +333,86 @@ check("CÂBLAGE — `--sans-consommateurs` est DÉCLARÉ au verdict, jamais sile
   rmSync(p.base, { recursive: true, force: true });
 });
 
-console.log(`\nconsommateurs-skills (TF-0965) : ${pass} PASS, ${fail} FAIL`);
+// ---- TF-2048 (02/11/2026) : un rouge neuf laisse une trace que l'ouverture relit -----------------------------------------------------
+check("TF-2048 rouge — C1 et C5 laissent un événement « rouge-neuf » par dépôt ; un vert, un rouge préexistant (C3), un SKIP et un absent n'en laissent aucun", () => {
+  const p = parc();
+  const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
+  const evts = evenementsDePropagation(r, { maintenant: new Date("2026-11-02T10:00:00Z") });
+  const noms = evts.filter((e) => e.evenement === "rouge-neuf").map((e) => `${e.regle}:${e.depot}`).sort();
+  if (noms.join(",") !== "C1:faux-casse,C5:faux-aggrave") throw new Error(`rouges neufs tracés : ${noms.join(",") || "aucun"}`);
+  const casse = evts.find((e) => e.depot === "faux-casse");
+  if (casse.commande !== "node verif.mjs" || !casse.skills.includes("faux-socle") || casse.ts !== "2026-11-02T10:00:00.000Z" || !/regle-neuve-refusee/.test(casse.extrait || ""))
+    throw new Error(`événement incomplet : ${JSON.stringify(casse)}`);
+  if (evts.some((e) => ["faux-stable", "faux-rouge", "faux-skip", "faux-absent", "faux-muet", "faux-fige"].includes(e.depot) && e.evenement === "rouge-neuf"))
+    throw new Error(`un dépôt non cassé par la propagation est tracé : ${JSON.stringify(evts)}`);
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("TF-2048 vert — le remède joué : une propagation suivante qui trouve le dépôt vert LÈVE la trace, et il ne reste que l'autre rouge", () => {
+  const p = parc();
+  const trace = join(p.base, "consommateurs-rouges.jsonl");
+  const r = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: p.propager });
+  ecrireTrace(trace, evenementsDePropagation(r));
+  ecrireTrace(trace, evenementNonRejoue(["faux-socle"]));
+  let o = rougesOuverts(trace);
+  if (o.ouverts.map((e) => e.depot).sort().join(",") !== "faux-aggrave,faux-casse" || o.non_rejoue !== 1)
+    throw new Error(`avant remède : ouverts ${o.ouverts.map((e) => e.depot)}, non rejoués ${o.non_rejoue}`);
+  // Le remède : la règle neuve est retirée (ou le consommateur corrigé) ; faux-casse repasse. faux-aggrave reste rouge.
+  writeFileSync(p.regle, "regles d'origine\n", "utf8");
+  const apres = encadrer({ skills: ["faux-socle"], racine: p.racine, table: p.table, propager: () => "rien" });
+  ecrireTrace(trace, evenementsDePropagation(apres, { ouverts: o.ouverts.map((e) => e.depot) }));
+  o = rougesOuverts(trace);
+  if (o.ouverts.map((e) => e.depot).join(",") !== "faux-aggrave") throw new Error(`après remède : ouverts ${o.ouverts.map((e) => e.depot)}`);
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+check("TF-2048 — l'ouverture ne dit rien sans rouge ouvert (trace absente, vide ou levée), et nomme dépôt, commande et remède sinon", () => {
+  const dir = mkdtempSync(join(tmpdir(), "consommateurs-trace-"));
+  const trace = join(dir, "consommateurs-rouges.jsonl");
+  if (lignesOuverture(trace).length) throw new Error("une trace absente fait parler l'ouverture");
+  ecrireTrace(trace, [{ ts: "2026-10-21T08:00:00.000Z", evenement: "rouge-neuf", depot: "digit-ai-forge-design", regle: "C1", commande: "node oracles/self-test.mjs", skills: ["digit-ai-page-html"], extrait: "[FAIL] V23" }]);
+  const l = lignesOuverture(trace).join("\n");
+  if (!/digit-ai-forge-design/.test(l) || !/node oracles\/self-test\.mjs/.test(l) || !/--rejouer-consommateurs/.test(l) || !/V23/.test(l)) throw new Error(`ligne incomplète : ${l}`);
+  ecrireTrace(trace, [{ ts: "2026-11-02T08:00:00.000Z", evenement: "leve", depot: "digit-ai-forge-design" }]);
+  if (lignesOuverture(trace).length) throw new Error("un rouge levé fait encore parler l'ouverture");
+  writeFileSync(join(dir, "illisible.jsonl"), "{pas du json\n", "utf8");
+  if (rougesOuverts(join(dir, "illisible.jsonl")).illisibles !== 1) throw new Error("une ligne illisible n'est pas comptée");
+  rmSync(dir, { recursive: true, force: true });
+});
+
+const lancerAvecTrace = (p, trace, ...extra) => {
+  const r = spawnSync(process.execPath, [join(ICI, "oracle-skills.mjs"), "--racine", p.racine, "--installes", p.inst,
+    "--installes-hooks", join(p.base, "hooks"), "--settings-installe", join(p.base, "settings.json"), ...extra],
+  { encoding: "utf8", env: { ...process.env, FORGE_TRACE_CONSOMMATEURS: trace } });
+  let j = null; try { j = JSON.parse(r.stdout); } catch { /* dit par l'appelant */ }
+  return { code: r.status, j, brut: (r.stdout || "") + (r.stderr || "") };
+};
+
+check("TF-2048 CÂBLAGE — `--appliquer --sans-consommateurs` trace la propagation « non-rejoue » ; la propagation mesurée sans rouge ne trace rien", () => {
+  const p = parcOracle();
+  const trace = join(p.base, "trace.jsonl");
+  const sans = lancerAvecTrace(p, trace, "--appliquer", "--sans-consommateurs");
+  if (sans.j?.consommateurs?.trace?.ecrit !== 1) throw new Error(`le raccourci n'est pas tracé : ${JSON.stringify(sans.j?.consommateurs)} ${sans.brut.slice(0, 200)}`);
+  const o = rougesOuverts(trace);
+  if (o.non_rejoue !== 1 || o.ouverts.length) throw new Error(`trace : ${JSON.stringify(o)}`);
+  const p2 = parcOracle();
+  const trace2 = join(p2.base, "trace.jsonl");
+  const mesure = lancerAvecTrace(p2, trace2, "--appliquer");
+  if (mesure.j?.consommateurs?.mode !== "mesuré" || existsSync(trace2)) throw new Error(`une propagation mesurée sans rouge a écrit une trace : ${JSON.stringify(mesure.j?.consommateurs?.trace)}`);
+  rmSync(p.base, { recursive: true, force: true }); rmSync(p2.base, { recursive: true, force: true });
+});
+
+check("TF-2048 CÂBLAGE — `--rejouer-consommateurs` : sans rouge ouvert exit 0 ; un dépôt hors de la table reste ouvert, exit 1, nommé, rien n'est levé à tort", () => {
+  const p = parcOracle();
+  const trace = join(p.base, "trace.jsonl");
+  const vide = lancerAvecTrace(p, trace, "--rejouer-consommateurs");
+  if (vide.code !== 0 || vide.j?.ouverts?.length !== 0) throw new Error(`sans rouge ouvert : exit ${vide.code} ${vide.brut.slice(0, 200)}`);
+  ecrireTrace(trace, [{ ts: "2026-11-02T08:00:00.000Z", evenement: "rouge-neuf", depot: "depot-hors-table", regle: "C1", commande: "node x.mjs", skills: ["s"] }]);
+  const r = lancerAvecTrace(p, trace, "--rejouer-consommateurs");
+  if (r.code !== 1 || r.j?.restent?.[0]?.depot !== "depot-hors-table" || !/absent de la table/.test(r.j.restent[0].motif || "")) throw new Error(`dépôt hors table : exit ${r.code} ${r.brut.slice(0, 300)}`);
+  if (rougesOuverts(trace).ouverts.length !== 1) throw new Error("un dépôt non rejoué a été levé à tort");
+  rmSync(p.base, { recursive: true, force: true });
+});
+
+console.log(`\nconsommateurs-skills (TF-0965, TF-2048) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

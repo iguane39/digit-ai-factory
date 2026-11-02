@@ -24,6 +24,8 @@ import { passerOuvertureEnAsync, fusionnerHooksDuGabarit, ancrerCommandesFactory
 import { borner, BUDGET_CONTEXTE_ASYNC } from "./lib-budget-contexte.mjs";
 import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gestes-avant-releve.mjs";
 import { constatR47 } from "./lib-resume-r47.mjs";
+import { lignesOuverture as lignesConsommateursRouges, traceRouges } from "./consommateurs-skills.mjs";
+import { skillsInstalles } from "../scripts/lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -92,6 +94,16 @@ if (!args.includes("--sans-bootstrap")) {
     if (r.status !== 0) lignes.push("→ Poste NON prêt : appliquer les remèdes ci-dessus AVANT tout run (règle Fraîcheur, R-19).");
   } else lignes.push("## Fraîcheur : bootstrap.mjs introuvable dans le pilot — mise à jour NON jouée.");
   indicesApresRapatriement();
+}
+
+// TF-2048 (02/11/2026) — UN ROUGE NEUF DE CONSOMMATEUR, LAISSÉ PAR UNE PROPAGATION, SE RELIT À L'OUVERTURE du pilot. Le 02/11, la
+// recette de forge-design rendait 2 échecs depuis 12 jours (V23, 21/10) : `oracle-skills --appliquer` le dit dans la sortie d'une
+// commande, lue ce jour-là ou jamais. La trace est écrite par `oracle-skills.mjs` (voir `consommateurs-skills.mjs`) ; ici, on la lit.
+// Chez le pilot seulement (sans `--pilot`) : un produit ne propage rien et ne peut pas réparer un consommateur. Aucun rejeu à
+// l'ouverture (les suites vont jusqu'à vingt minutes) : le rejeu est le geste nommé, `--rejouer-consommateurs`.
+if (iPilot < 0) {
+  try { lignes.push(...lignesConsommateursRouges(traceRouges(skillsInstalles().chemin))); }
+  catch (e) { lignes.push("", `## Consommateurs des skills : trace NON lue (${String(e.message).slice(0, 120)}) — TF-2048`); }
 }
 
 // TF-1359 (D-21 (b), 26/09/2026) — L'UNICITÉ DES INDICES SE REJOUE APRÈS TOUT CE QUI A PU AMENER UN

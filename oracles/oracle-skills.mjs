@@ -120,6 +120,8 @@
  *                                              # CONSOMMENT les skills touchés, avant et après
  *         node oracle-skills.mjs --appliquer --sans-consommateurs   # propage SANS les rejouer,
  *                                              # et le DÉCLARE au verdict (suites longues, TF-0965)
+ *         node oracle-skills.mjs --rejouer-consommateurs   # rejoue les SEULS dépôts en rouge neuf ouvert (TF-2048),
+ *                                              # sans rien propager, et lève la trace de ceux qui passent ; exit 1 si un rouge reste
  *         node oracle-skills.mjs --purger      # orphelins de la copie → quarantaine datée (K2)
  *         node oracle-skills.mjs --self-test
  * Exit : 0 PASS · 1 FAIL (y compris un consommateur qui passait et ne passe plus) · 2 non jugeable.
@@ -146,7 +148,7 @@ import { homedir, tmpdir } from "node:os";
 import { racineConfigInstallee, skillsInstalles, hooksInstalles, settingsInstalle as settingsInstalleDe } from "../scripts/lib-config-installee.mjs";
 import { postesParDefaut } from "./oracle-amorcage-poste.mjs";
 // TF-0965 — la table des dépôts consommateurs (DONNÉE datée) et le geste avant/après.
-import { encadrer } from "./consommateurs-skills.mjs";
+import { encadrer, ecrireTrace, evenementNonRejoue, evenementsDePropagation, jouer as jouerConsommateur, lireTable, rougesOuverts, traceRouges } from "./consommateurs-skills.mjs";
 
 // TF-1878 : l'environnement d'un appel git SANS les variables GIT_* héritées (GIT_DIR, GIT_WORK_TREE,
 // GIT_INDEX_FILE… posées par un hameçon git ou par une session). Lu à CHAQUE appel, pas à l'import :
@@ -218,6 +220,7 @@ const NON_JUGE = [
   "les PRODUITS du parc, qui consomment aussi la copie installée : le pilot n'exécute rien chez un produit sans mandat humain. Leur mesure passe par un run qui leur est demandé",
   "ce que la propagation casse AILLEURS que dans une vérification native : un consommateur dont la suite ne couvre pas la règle neuve passera au vert des deux côtés. Le rejeu prouve une NON-RÉGRESSION mesurée, jamais une absence d'effet",
   "un consommateur rejoué et INDÉTERMINÉ (délai dépassé, lancement impossible) : déclaré tel quel, jamais compté pour un vert — une suite qui n'a pas fini n'a rien prouvé",
+  "la TRACE des rouges neufs (TF-2048) ne se remplit que sur une propagation qui rejoue les consommateurs : `bootstrap.mjs --pull` passe `--sans-consommateurs` à chaque ouverture, et n'y laisse qu'un événement « non-rejoue » ; un consommateur cassé par une propagation d'ouverture n'est vu qu'au prochain `--appliquer` mesuré ou `--rejouer-consommateurs`",
 ];
 
 function racineForges() {
@@ -1874,6 +1877,25 @@ SAUF_SOURCES = lire("--sauf-sources", "").split(",").map((s) => s.trim()).filter
 // forge-tests) et que `bootstrap.mjs --pull` tourne à chaque ouverture de session. Le mode est
 // TOUJOURS déclaré dans la sortie : un raccourci silencieux se lirait comme une mesure verte.
 const propagation = () => juger(racine, installes, appliquer, purger, installes_hooks, settings_installe, config);
+// TF-2048 (02/11/2026) — la trace d'un rouge neuf de consommateur, que `hook-ouverture.mjs` relit (voir consommateurs-skills.mjs).
+const cheminTraceRouges = traceRouges(installes);
+const noterTrace = (evts) => { const t = ecrireTrace(cheminTraceRouges, evts); return { chemin: cheminTraceRouges, ecrit: t.ecrit, ...(t.erreur ? { erreur: t.erreur } : {}) }; };
+// --rejouer-consommateurs : rejoue la vérification native des SEULS dépôts en rouge ouvert, sans rien propager, et lève la trace de ceux qui
+// passent. C'est le remède que l'ouverture nomme une fois le consommateur (ou la règle neuve) corrigé. Exit 0 rien ne reste ouvert, 1 un rouge persiste.
+if (args.includes("--rejouer-consommateurs")) {
+  const ouverts = rougesOuverts(cheminTraceRouges).ouverts;
+  const table = lireTable();
+  const resultats = ouverts.map((e) => {
+    const entree = (table.consommateurs || []).find((c) => c.depot === e.depot);
+    return entree ? jouerConsommateur(entree, racine) : { depot: e.depot, commande: e.commande, statut: "SKIP", motif: "dépôt absent de la table des consommateurs — non rejoué" };
+  });
+  const ts = new Date().toISOString();
+  const trace = noterTrace(resultats.filter((r) => r.statut === "PASS").map((r) => ({ ts, evenement: "leve", depot: r.depot, commande: r.commande || null })));
+  const restent = resultats.filter((r) => r.statut !== "PASS").map((r) => ({ depot: r.depot, statut: r.statut, motif: r.motif || null, extrait: r.extrait || null }));
+  process.stdout.write(JSON.stringify({ oracle: ORACLE, version: VERSION, mode: "--rejouer-consommateurs", racine, ouverts: ouverts.map((e) => e.depot),
+    leves: resultats.filter((r) => r.statut === "PASS").map((r) => r.depot), restent, trace }, null, 1) + "\n");
+  process.exit(restent.length ? 1 : 0);
+}
 let consommateurs;
 let rapport;
 if (appliquer && !sansConsommateurs) {
@@ -1882,12 +1904,13 @@ if (appliquer && !sansConsommateurs) {
     .filter((f) => f.statut === "FAIL" && (f.regle === "K1" || f.regle === "K2")).map((f) => f.ou).filter(Boolean))];
   const enc = encadrer({ skills: skillsTouches, racine, propager: propagation });
   rapport = enc.resultat;
+  const trace = noterTrace(evenementsDePropagation(enc, { ouverts: rougesOuverts(cheminTraceRouges).ouverts.map((e) => e.depot) }));
   consommateurs = { mode: "mesuré", mesure_le: enc.mesure_le, skills_touches: enc.skills_touches,
-    depots: enc.consommateurs, motif: enc.motif, avant: enc.avant, apres: enc.apres, findings: enc.findings };
+    depots: enc.consommateurs, motif: enc.motif, avant: enc.avant, apres: enc.apres, findings: enc.findings, trace };
 } else {
   rapport = propagation();
   if (appliquer) {
-    consommateurs = { mode: "--sans-consommateurs", depots: [], findings: [],
+    consommateurs = { mode: "--sans-consommateurs", depots: [], findings: [], trace: noterTrace(evenementNonRejoue(rapport.applique)),
       motif: "les dépôts qui CONSOMMENT la copie installée n'ont PAS été rejoués autour de cette propagation "
         + "— une règle neuve du socle peut avoir rendu rouge une suite verte sans que rien ne le dise (TF-0965). "
         + `Pour le savoir : node oracles/oracle-skills.mjs --racine "${racine}" --appliquer` };

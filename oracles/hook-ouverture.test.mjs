@@ -747,5 +747,35 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   }
 }
 
-console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
+// ---- TF-2048 (02/11/2026) : un rouge neuf de consommateur, laissé par une propagation, se relit à l'ouverture du pilot ----------------------
+{
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-"));
+  const trace = join(dossier, "consommateurs-rouges.jsonl");
+  const ROUGE = { ts: "2026-10-21T08:00:00.000Z", evenement: "rouge-neuf", depot: "digit-ai-forge-design", regle: "C1", commande: "node oracles/self-test.mjs",
+    skills: ["digit-ai-page-html"], extrait: "[FAIL] V23 contenu sous 75 % de la fenetre" };
+  // Joué comme la session du pilot (sans --pilot) ou comme celle d'un produit (--pilot), la trace désignée par FORGE_TRACE_CONSOMMATEURS.
+  const jouerOuverture = (cwd, enProduit) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
+    { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_TRACE_CONSOMMATEURS: trace } });
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-cwd-"));
+  const SECTION = "## Consommateurs des skills";
+  check("TF-2048 vert — sans trace, l'ouverture du pilot ne dit rien des consommateurs", () => {
+    if (jouerOuverture(cwd, false).includes(SECTION)) throw new Error("une trace absente fait parler l'ouverture");
+  });
+  writeFileSync(trace, JSON.stringify(ROUGE) + NL, "utf8");
+  const pilote = jouerOuverture(cwd, false);
+  check("TF-2048 rouge — un rouge neuf non levé est dit à l'ouverture du pilot : dépôt, commande, règle, remède", () => {
+    const l = pilote.split(SECTION)[1] || "";
+    if (!/1 rouge\(s\) neuf\(s\)/.test(pilote) || !/digit-ai-forge-design/.test(l) || !/node oracles\/self-test\.mjs/.test(l) || !/C1/.test(l) || !/--rejouer-consommateurs/.test(l))
+      throw new Error(`section absente ou incomplète : ${l.slice(0, 300)}`);
+  });
+  check("TF-2048 — chez un produit (--pilot), l'ouverture ne le dit pas : il ne propage rien et ne peut pas réparer un consommateur", () => {
+    if (jouerOuverture(cwd, true).includes(SECTION)) throw new Error("la section est imprimée chez un produit");
+  });
+  writeFileSync(trace, JSON.stringify(ROUGE) + NL + JSON.stringify({ ts: "2026-11-02T08:00:00.000Z", evenement: "leve", depot: "digit-ai-forge-design" }) + NL, "utf8");
+  check("TF-2048 remède joué — le rouge levé par un rejeu ne revient plus à l'ouverture", () => {
+    if (jouerOuverture(cwd, false).includes(SECTION)) throw new Error("un rouge levé est encore dit");
+  });
+}
+
+console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

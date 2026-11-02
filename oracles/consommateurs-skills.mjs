@@ -61,7 +61,7 @@
  *    d'environnement puis par chemins candidats DÉCLARÉS. Aucun chemin n'est écrit en dur ici :
  *    un poste qui range Git ailleurs édite la table, il ne corrige pas le module.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -299,4 +299,73 @@ export function encadrer({ skills, racine, table = lireTable(), propager, delaiP
   const apres = vises.map((c) => jouer(c, racine, { delaiParDefaut, lanceur }));
   return { mesure_le: table.mesure_le || null, skills_touches: skills || [], consommateurs: vises.map((c) => c.depot),
     avant, apres, findings: confronter(avant, apres), resultat };
+}
+
+// ---- TF-2048 (02/11/2026) · UN ROUGE NEUF LAISSE UNE TRACE QUE L'OUVERTURE RELIT -----------------------------------------
+//
+// LE FAIT. Le 02/11, la recette de forge-design rendait 2 échecs depuis 12 jours : V23 de render_page (digit-ai-page-html 1.40.0,
+// 21/10) refusait une fixture verte que personne ne rejouait, et la même fixture avait déjà cassé avec V18 en septembre (TF-1100).
+// Le constat C1/C5 de ce module existait déjà ; il s'imprimait dans la sortie d'UNE commande, lue ce jour-là ou jamais.
+//
+// LA TRACE. Un fichier JSONL HORS dépôt, à côté du journal des propagations (`consommateurs-rouges.jsonl`), une ligne par événement :
+//   · « rouge-neuf » — un consommateur passait avant la propagation et échoue après (C1), ou son rouge s'est aggravé (C5) ;
+//   · « leve »       — le même consommateur, rejoué, passe ;
+//   · « non-rejoue » — une propagation réelle a eu lieu SANS rejouer les consommateurs (`--sans-consommateurs`, le mode de
+//                      `bootstrap.mjs --pull`) : de quoi mesurer la fréquence du raccourci, qu'aucun journal ne portait.
+// `hook-ouverture.mjs` relit les rouges encore ouverts et les dit à chaque ouverture du pilot, jusqu'à ce qu'un rejeu les lève
+// (`oracle-skills.mjs --rejouer-consommateurs`). La trace SIGNALE : comme le reste de ce module, elle ne retient ni n'annule rien.
+export const traceRouges = (installes) => process.env.FORGE_TRACE_CONSOMMATEURS || join(dirname(installes), "consommateurs-rouges.jsonl");
+
+/** Les événements de trace d'une propagation encadrée. `ouverts` : les dépôts déjà en rouge ouvert, que ce rejeu a pu lever. */
+export function evenementsDePropagation(enc, { ouverts = [], maintenant = new Date() } = {}) {
+  const ts = maintenant.toISOString();
+  const evts = [];
+  const commandeDe = (depot) => ((enc.apres || []).find((r) => r.depot === depot) || {}).commande || null;
+  for (const f of enc.findings || []) {
+    if (f.statut !== "FAIL" || (f.regle !== "C1" && f.regle !== "C5")) continue;
+    const r = (enc.apres || []).find((x) => x.depot === f.ou) || {};
+    evts.push({ ts, evenement: "rouge-neuf", depot: f.ou, regle: f.regle, commande: commandeDe(f.ou), skills: enc.skills_touches || [],
+      exit: r.exit ?? null, extrait: r.extrait || null });
+  }
+  for (const r of enc.apres || []) {
+    if (r.statut === "PASS" && ouverts.includes(r.depot)) evts.push({ ts, evenement: "leve", depot: r.depot, commande: r.commande || null });
+  }
+  return evts;
+}
+
+/** L'événement d'une propagation réelle faite sans rejouer les consommateurs ; rien si elle n'a rien copié. */
+export const evenementNonRejoue = (applique, maintenant = new Date()) =>
+  (applique || []).length ? [{ ts: maintenant.toISOString(), evenement: "non-rejoue", skills: applique }] : [];
+
+/** Ajoute des événements à la trace. Une trace qui ne s'écrit pas ne retient jamais la propagation : l'échec est rendu, pas levé. */
+export function ecrireTrace(chemin, evts) {
+  if (!evts.length) return { ecrit: 0, chemin };
+  try { appendFileSync(chemin, evts.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8"); return { ecrit: evts.length, chemin }; }
+  catch (e) { return { ecrit: 0, chemin, erreur: e.message }; }
+}
+
+/** Les lignes que l'ouverture du pilot imprime pour les rouges encore ouverts ; vide quand il n'y en a aucun (un relevé bavard se désactive). */
+export function lignesOuverture(chemin) {
+  const { ouverts } = rougesOuverts(chemin);
+  if (!ouverts.length) return [];
+  return ["", `## Consommateurs des skills : ${ouverts.length} rouge(s) neuf(s) non levé(s) par une propagation (TF-2048)`,
+    ...ouverts.map((e) => `- ${e.depot} : \`${e.commande || "vérification native"}\` passait avant la propagation du ${String(e.ts).slice(0, 10)} à ${String(e.ts).slice(11, 16)} UTC `
+      + `(${e.regle}, skills touchés : ${(e.skills || []).join(", ") || "?"}) et échoue après${e.extrait ? ` — ${String(e.extrait).slice(0, 160)}` : ""}.`),
+    "→ corriger la règle neuve du socle ou le consommateur, puis `node oracles/oracle-skills.mjs --rejouer-consommateurs` lève la trace dès que la vérification passe ; rien n'a été annulé."];
+}
+
+/** Les rouges encore ouverts : le dernier événement de chaque dépôt est « rouge-neuf ». `non-rejoue` ne compte que pour la mesure. */
+export function rougesOuverts(chemin) {
+  const parDepot = new Map();
+  let nonRejoue = 0, lignes = 0, illisibles = 0;
+  if (existsSync(chemin)) {
+    for (const l of readFileSync(chemin, "utf8").split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      lignes += 1;
+      let e; try { e = JSON.parse(l); } catch { illisibles += 1; continue; }
+      if (e.evenement === "non-rejoue") nonRejoue += 1;
+      else if (e.depot && (e.evenement === "rouge-neuf" || e.evenement === "leve")) parDepot.set(e.depot, e);
+    }
+  }
+  return { ouverts: [...parDepot.values()].filter((e) => e.evenement === "rouge-neuf"), non_rejoue: nonRejoue, lignes, illisibles, existe: existsSync(chemin) };
 }
