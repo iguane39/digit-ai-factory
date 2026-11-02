@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 586 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 588 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -248,12 +248,13 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md | 20261029f | 7.7 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json | — | 98.8 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` |
+| Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md | 20261102f | 35.8 Ko | `03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` |
 | Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
-| Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.6 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
+| Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
 | Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md | 20261030a | 14.2 Ko | `03-etudes/Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` |
-| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md | 20261102e | 12.2 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` |
+| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md | 20261102e | 12.4 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` |
 | Digit-AI - Étude - Video Make it better cent fois - 20261102b.md | 20261102b | 15.5 Ko | `03-etudes/Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` |
 | Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md | 20261029c | 5.5 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` |
 | Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md | 20261029b | 4.8 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` |
@@ -261,6 +262,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json | 20261028a | 514.7 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` |
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 190.2 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md | 20261028a | 5.1 Ko | `03-etudes/Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` |
+| Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md | 20261102g | 3.9 Ko | `03-etudes/Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` |
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md | 20261102d | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` |
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json | — | 19.6 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` |

@@ -67,12 +67,13 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 7,7 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` | fichier | 98,8 Ko | JSON |
+| `Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` | fichier | 35,8 Ko | Étude d'opportunité — Audit de sécurité par agents de Cloudflare — 20261102f |
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
-| `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,6 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
+| `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,7 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
-| `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 12,2 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
+| `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 12,4 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
 | `Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` | fichier | 15,5 Ko | Étude — une vidéo où Claude reçoit 100 fois la consigne « fais mieux » |
 | `Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` | fichier | 5,5 Ko | Œil critique : 4 actions pour tenir les 8 demandes (29/10/2026) |
 | `Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` | fichier | 4,8 Ko | Œil critique : ce qu'il fait, ce qu'il ne fait pas (29/10/2026) |
@@ -80,10 +81,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` | fichier | 514,7 Ko | JSON |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` | fichier | 190,2 Ko | Inventaire — fonctionnalités de Cloudflare, GitHub et Supabase (28/10/2026) |
 | `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 5,1 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
+| `Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` | fichier | 3,9 Ko | Essai — les 10 règles du skill i-have-adhd contre nos règles d'écriture — 20261102g |
 | `Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` | fichier | 15,2 Ko | Analyse L99 — transformer en actions les sujets laissés de côté par l'œil critique (29/10/ |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` | fichier | 19,1 Ko | Revue — prompt du skill make-it-better et de sa page de versions, passé au crible L99 — 02 |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` | fichier | 19,6 Ko | JSON |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_67 fichier(s), 2 sous-dossier(s)_
+_69 fichier(s), 2 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

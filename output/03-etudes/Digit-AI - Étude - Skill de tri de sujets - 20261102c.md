@@ -111,7 +111,7 @@ Le skill construit, un agent neuf a noté les 14 sujets à l'aveugle, sans ouvri
 - La suite du rang 17 est un défaut relevé en passant, et son étude conclut à ne rien faire.
 - La suite du rang 8 est décidée, pas encore exécutée, donc comptée non utile selon la règle fixée avant la mesure.
 
-**Réglage proposé, non appliqué** (D-125) : abaisser le score minimal de 15 à 14. Sur ces 14 sujets, il donne 7 accords, et lance 6 études dont 5 utiles. Descendre à 10 atteindrait 9 accords mais lancerait 10 études sur 14 : le tri ne filtrerait plus. Le réglage est calculé sur les mêmes sujets qui le suggèrent, sans échantillon tenu à l'écart.
+**Réglage appliqué le 02/11/2026** (réponse humaine « 125a » à D-125) : le score minimal passe de 15 à 14. Sur ces 14 sujets, il donne 7 accords, et lance 6 études dont 5 utiles ; la matrice ci-dessus reste celle de la mesure, à 15. Descendre à 10 atteindrait 9 accords mais lancerait 10 études sur 14 : le tri ne filtrerait plus. Le réglage est calculé sur les mêmes sujets qui le suggèrent, sans échantillon tenu à l'écart.
 
 ## 5. Verdict
 
