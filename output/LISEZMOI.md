@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 573 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 574 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -252,6 +252,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md | 20261030a | 14.2 Ko | `03-etudes/Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` |
+| Digit-AI - Étude - Video Make it better cent fois - 20261102b.md | 20261102b | 15.5 Ko | `03-etudes/Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` |
 | Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md | 20261029c | 5.5 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` |
 | Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md | 20261029b | 4.8 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` |
 | Digit-AI - Fiche - Oeil critique code mort et sujets a integrer - 20261029e.md | 20261029e | 6.9 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique code mort et sujets a integrer - 20261029e.md` |
