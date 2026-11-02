@@ -24,6 +24,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` | fichier | 10,1 Ko | Prompt — Inventorier les fonctionnalités de Cloudflare, GitHub et Supabase pour en tirer l |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
+| `Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` | fichier | 10,3 Ko | Revue hebdomadaire des propositions — 2026-11-02 |
 | `Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` | fichier | 8,9 Ko | Revue hebdomadaire des propositions — 2026-10-26 |
 | `Digit-AI - Revue hebdomadaire - Propositions D-91 et bases de donnees - 20261029d.md` | fichier | 3,6 Ko | Revue hebdomadaire des propositions — 2026-10-29 |
 | `Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` | fichier | 11,9 Ko | Revue hebdomadaire des propositions — 2026-10-01 |
@@ -164,4 +165,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` | fichier | 7,2 Ko | Synthèse Mandat — tri des favoris TikTok du 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_144 fichier(s), 3 sous-dossier(s)_
+_145 fichier(s), 3 sous-dossier(s)_
