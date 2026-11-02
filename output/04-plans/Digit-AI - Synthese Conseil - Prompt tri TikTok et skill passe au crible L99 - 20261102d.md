@@ -12,7 +12,7 @@ Livré : [Prompt réécrit](output/04-plans/Digit-AI%20-%20Prompt%20-%20Tri%20de
 
 ## 1. En-tête d'identification
 
-Analyse L99 (grille d'analyse de prompt en 8 couches, skill `prompt-analyzer-l99`), en mode boucle, de la demande sur les vidéos Claude et IA et le skill d'étude de listes de sujets, sur le pilot `digit-ai-factory`. Période : 02/11/2026 de 08:45 à 09:03, heure de Paris, relevée par `date`. Session pilote Claude Opus 5.5 ; 7 agents `verificateur` : 4 relecteurs aveugles, 2 vérificateurs de correction, 1 relecteur d'intention rejoué une fois.
+Analyse L99 (grille d'analyse de prompt en 8 couches, skill `prompt-analyzer-l99`), en mode boucle, de la demande sur les vidéos Claude et IA et le skill d'étude de listes de sujets, sur le pilot `digit-ai-factory`. Période : 02/11/2026 de 08:45 à 09:03, heure de Paris, relevée par `date`. Session pilote Claude Opus 5.5 ; 8 agents `verificateur` : 4 relecteurs aveugles, 2 vérificateurs de correction, 2 relecteurs d'intention.
 
 Intention de la demande : savoir quels sujets Claude et IA de vos favoris méritent une étude d'opportunité, et rendre ce tri réutilisable sur toute liste de sujets.
 
