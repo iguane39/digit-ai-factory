@@ -443,16 +443,16 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 62,
-  "vu_le": "2026-10-30"
+  "cas": 63,
+  "vu_le": "2026-11-02"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
   "vu_le": "2026-10-02"
  },
  "oracles/lib-chiffres-releves.test.mjs": {
-  "cas": 13,
-  "vu_le": "2026-10-30"
+  "cas": 19,
+  "vu_le": "2026-11-02"
  },
  "oracles/lib-enumeration-liste.test.mjs": {
   "cas": 29,

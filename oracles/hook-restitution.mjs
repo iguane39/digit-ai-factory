@@ -38,7 +38,7 @@ import { controlerOuiDeCompletude, affirmationsDExhaustivite, lignesMesure, RAPP
 import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
 import { racineDuProjet } from "./lib-racine-projet.mjs";
 import { decouperCommande, resoudreTemporaires } from "./lib-decoupe-commande.mjs";
-import { nombresDuTexte } from "./lib-chiffres-releves.mjs";
+import { nombresDuTexte, chiffresDeGains } from "./lib-chiffres-releves.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
 // de fin de tour, qui garde alors son propre relevé d'effets (`detecterEffets`) ; `ecrituresDuTour` le dit dans sa sortie.
@@ -783,6 +783,88 @@ export function nombresDuTour(entrees, debut) {
   return [...out];
 }
 
+// ---- D-131 (a) du 02/11/2026 (TF-2056) — LES CHIFFRES D'UN GAIN ÉCRIT AU REGISTRE SE RELÈVENT DANS LE TOUR, OU S'AVERTISSENT ----------------------
+// LE FAIT : le 02/11/2026, une clôture a écrit `gains_constates` « 813 Markdown suivis, 4 accusés » sans sortie à l'appui ; la mesure rejouée donnait
+// 1 209 et 5. S90 d'oracle-synthese juge le texte de la restitution, jamais ce champ. Ici, un chiffre d'un gain ÉCRIT dans le tour et qu'aucune sortie du tour
+// ne montre (`nombresDuTour`) s'affiche en avertissement sous la réponse ; la réponse n'est jamais refusée pour cela.
+// DEUX VOIES, relevées sur les transcripts du poste (161 écritures de `gains_constates`, dont 79 sans valeur littérale à lire) :
+//   A. la valeur LITTÉRALE dans l'entrée d'un outil — un Write (le fichier JSON passé à `todo\journaliser.mjs --fichier`), ou une commande Bash qui l'écrit (heredoc, printf, node -e) ;
+//   B. le REGISTRE lui-même, pour les gains composés par un script (`gains_constates: g`) : `journaliser` imprime « <ts> <TF-id> <ev> <statut> » pour chaque événement
+//      qu'il écrit ; l'événement se retrouve dans `todo\TODO.jsonl` par ce `ts` exact. C'est ce lien, et non la fenêtre de temps, qui lie l'événement à CE tour
+//      (une autre session du pilot peut écrire au registre pendant le même tour).
+// NON JUGÉ : que le chiffre retrouvé soit le bon ; un gain qu'un script compose et que `journaliser` n'a pas imprimé ; un chiffre que `journaliser --essai` a
+// imprimé (la sortie le montre, donc il est « lu »).
+const CLE_GAINS = /(["']?)gains_constates\1\s*:\s*("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`)/g;
+const valeurLitterale = (lit) => {
+  if (lit[0] === '"') { try { return JSON.parse(lit); } catch { /* repli ci-dessous */ } }
+  return lit.slice(1, -1).replace(/\\(["'`\\])/g, "$1").replace(/\\n/g, "\n").replace(/\$\{[^}]*\}/g, " ");
+};
+export function gainsLitterauxDuTour(entrees, debut) {
+  const out = [];
+  entrees.forEach((e, i) => {
+    if (i < debut || e.type !== "assistant") return;
+    for (const b of contenuDe(e)) {
+      if (b.type !== "tool_use") continue;
+      const saisie = b.input || {};
+      const texte = ECRITURES.has(b.name) ? [saisie.content, saisie.new_string, ...(Array.isArray(saisie.edits) ? saisie.edits.map((x) => x.new_string) : [])].filter((x) => typeof x === "string").join("\n")
+        : COMMANDES.has(b.name) ? String(saisie.command || "") : "";
+      if (!texte.includes("gains_constates")) continue;
+      for (const m of texte.matchAll(CLE_GAINS)) out.push({ texte: valeurLitterale(m[2]), voie: `${b.name} (valeur littérale)` });
+    }
+  });
+  return out;
+}
+const LIGNE_JOURNALISEE = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z) (TF-\d+) [a-z_]+\b/g;
+/** Les `ts` des événements que `journaliser` a écrits dans le tour (voie B) : [{ ts, id }]. */
+export function evenementsJournalisesDuTour(entrees, debut) {
+  const out = new Map();
+  entrees.forEach((e, i) => {
+    if (i < debut || e.type === "assistant") return;
+    for (const m of _texteBrut(e).matchAll(LIGNE_JOURNALISEE)) out.set(m[1], m[2]);
+  });
+  return [...out].map(([ts, id]) => ({ ts, id }));
+}
+/** Les gains_constates de ces événements, lus au registre à leur `ts` exact (voie B). Registre absent ou illisible : aucun gain, jamais une accusation. */
+export function gainsDuRegistre(racine, evenements, registre = null) {
+  if (!evenements.length) return [];
+  const chemin = registre || join(racine || process.cwd(), "todo", "TODO.jsonl");
+  let lignes = [];
+  try { lignes = readFileSync(chemin, "utf8").split(/\r?\n/); } catch { return []; }
+  const cherches = new Map(evenements.map((x) => [x.ts, x.id]));
+  const out = [];
+  for (const l of lignes) {
+    const m = /"ts":"([^"]+)"/.exec(l);
+    if (!m || !cherches.has(m[1])) continue;
+    try { const ev = JSON.parse(l); if (typeof ev.gains_constates === "string") out.push({ texte: ev.gains_constates, voie: `registre (${cherches.get(m[1])})` }); } catch { /* ligne illisible */ }
+  }
+  return out;
+}
+/** Les gains écrits par le tour qui commence au rang `debut` : voies A et B, un même texte une seule fois. */
+export function gainsDuTour(entrees, debut, racine = null, registre = null) {
+  return fusionnerGains(gainsLitterauxDuTour(entrees, debut), evenementsJournalisesDuTour(entrees, debut), racine, registre);
+}
+export function fusionnerGains(litteraux, evenements, racine = null, registre = null) {
+  const vus = new Set(), out = [];
+  for (const g of [...litteraux, ...gainsDuRegistre(racine, evenements, registre)]) {
+    if (vus.has(g.texte)) continue;
+    vus.add(g.texte); out.push(g);
+  }
+  return out;
+}
+/** Les chiffres de ces gains qu'aucun nombre du tour ne montre : [{ chiffre, extrait, voie }], un chiffre une seule fois par gain. */
+export function gainsSansReleve(gains, nombres) {
+  const connus = nombres instanceof Set ? nombres : new Set(nombres);
+  const out = [];
+  for (const g of gains) for (const c of chiffresDeGains(g.texte)) {
+    if (connus.has(c.forme) || (c.morceaux.length > 1 && c.morceaux.every((p) => connus.has(p)))) continue;
+    out.push({ chiffre: c.chiffre, forme: c.forme, extrait: c.extrait, voie: g.voie });
+  }
+  return out;
+}
+/** La ligne d'avertissement de chaque chiffre : même forme que les constats AVERT d'oracle-synthese (`regle`, `statut`, `message`). */
+export const avertsDeGains = (sansReleve) => sansReleve.map((x) => ({ regle: "GAINS", statut: "AVERT",
+  message: `gains_constates écrit avec « ${x.chiffre} » (« …${x.extrait}… », ${x.voie}) : aucune sortie du tour ne le montre — relève-le (commande, compte) avant de l'écrire, ou marque-le dans le gain (« non mesuré », « rapporté par l'agent ») ; D-131 (a), TF-2056` }));
+
 export function analyserTranscript(texte) {
   const entrees = texte.split(/\r?\n/).filter((l) => l.trim()).map((l) => { try { return JSON.parse(l); } catch { return null; } })
     .filter((e) => e && !e.isSidechain);
@@ -805,6 +887,8 @@ export function analyserTranscript(texte) {
   return { travail: ecrit.length > 0, ecrituresDuTour: ecrit, ...m, dernierHumain, textePrecedent, depuis, textesHumains,
     releves: relevesDHorloge(entrees, debut),
     nombresTour: nombresDuTour(entrees, debut),
+    // D-131 (a), TF-2056 — les gains écrits au registre par le tour : valeurs littérales, et événements que `journaliser` a imprimés (lus au registre au moment de juger).
+    gainsLitteraux: gainsLitterauxDuTour(entrees, debut), evenementsJournalises: evenementsJournalisesDuTour(entrees, debut),
     // TF-1913 — les fichiers servis écrits dans le tour et les critiques jouées, pour le contrôle CRITIQUE.
     critique: critiqueDuTour(entrees.slice(debut + 1)),
     // TF-1973 et TF-2016 — les livrables écrits sous output/ dans le tour, pour le contrôle S87 (la ligne « Livré : » du bloc 0).
@@ -1817,12 +1901,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
-  let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null;
+  let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null, gainsP = [];
   try {
     if (cheminT && existsSync(cheminT)) {
       const tour = analyserTranscript(readFileSync(cheminT, "utf8"));
       dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; nombresP = tour.nombresTour || null; critiqueP = tour.critique || null;
       livrablesP = tour.livrables || [];
+      gainsP = fusionnerGains(tour.gainsLitteraux || [], tour.evenementsJournalises || [], racineDuProjet(process.cwd()));
       syntheseDeposee = syntheseDuTour(tour.fichiersMd);
       if (syntheseDeposee) {
         ecartsAffichage.push(...comparerAffiche(brouillon, readFileSync(syntheseDeposee, "utf8")));
@@ -1836,7 +1921,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   // TF-1938 — S84 reçoit les relevés d'horloge du tour quand la transcription est retrouvée ; sinon elle rend SANS_OBJET.
   // TF-1943 : le projet, pas le sous-dossier où la session a fait un `cd`.
   const RACINE_P = racineDuProjet(process.cwd());
-  const { fails, averts: avertsOracle } = juger(brouillon, RACINE_P, relevesP, nombresP);
+  const { fails, averts: avertsSynthese } = juger(brouillon, RACINE_P, relevesP, nombresP);
+  // D-131 (a), TF-2056 — les chiffres des gains écrits au registre dans le tour, absents des sorties du tour : avertissement, jamais un refus.
+  const gainsSans = nombresP ? gainsSansReleve(gainsP, nombresP) : [];
+  const avertsOracle = [...avertsSynthese, ...avertsDeGains(gainsSans)];
   const bloquants = fails.filter((x) => estBloquante(x.regle));
   const avertissements = [...fails.filter((x) => !estBloquante(x.regle)), ...avertsOracle];
   // TF-1849 — la RÉSERVATION : chaque D-N nouvelle de ce brouillon est-elle inscrite au registre du produit ?
@@ -1913,7 +2001,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // où la session s'est déplacée par un `cd` : l'état git, la réservation des D-N, le lien « Livré : » et le juge de S48 se mesurent au projet.
   const RACINE_HOOK = racineDuProjet(entree.cwd);
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, nombresTour, ecrituresDuTour: ecrit, critique: critiqueTour, livrables } = analyserTranscript(readFileSync(chemin, "utf8"));
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
@@ -1949,7 +2037,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + court.ecarts.join("\n") + `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` }));
     process.exit(0);
   }
-  const { code, fails, averts: avertsOracle } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour, entree.session_id);
+  const { code, fails, averts: avertsSynthese } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour, entree.session_id);
+  // D-131 (a), TF-2056 — un chiffre d'un gain écrit au registre dans ce tour et qu'aucune sortie du tour ne montre rejoint les avertissements (jamais un refus).
+  const gainsEcrits = fusionnerGains(gainsLitteraux, evenementsJournalises, RACINE_HOOK);
+  const gainsSans = gainsSansReleve(gainsEcrits, nombresTour);
+  const avertsOracle = [...avertsSynthese, ...avertsDeGains(gainsSans)];
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.
@@ -2025,6 +2117,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         critiques_jouees: critique.critiques.filter((c) => c.jouee).length, sans_verdict: (critique.sans || []).map((s) => `${s.fichier} (${s.motif})`) } } : {}),
       // TF-1973 et TF-2016 — la mesure de la période d'avertissement de S87 : combien de livrables écrits, lesquels sans lien au bloc 0.
       ...(livre.applicable ? { livre: { verdict: livre.verdict, livrables: livre.livrables.map(nomDe), sans_lien: livre.manquants.map(nomDe) } } : {}),
+      // D-131 (a), TF-2056 — la mesure de la période d'avertissement des gains : combien de gains écrits dans le tour, quels chiffres sans sortie à l'appui.
+      ...(gainsEcrits.length ? { gains: { ecrits: gainsEcrits.length, chiffres_sans_releve: gainsSans.map((x) => x.chiffre) } } : {}),
       prejuge: !!prejuge,
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
