@@ -72,6 +72,8 @@ export function validerCarte(carte) {
     if (!Array.isArray(e.livrables)) manquesCF2.push(`${f} : liste de livrables`);
     else if (!e.livrables.length && !String(e.motif_sans_livrable || "").trim()) manquesCF2.push(`${f} : aucun livrable et aucun motif`);
     for (const id of Array.isArray(e.livrables) ? e.livrables : []) if (!(id in livrables)) manquesCF2.push(`${f} : livrable « ${id} » non déclaré`);
+    // TF-2044 : une question posée à la forge est un texte lisible, sans `<` ni `>` (le motif qui la porte reste reconnu comme gabarit).
+    if ("question" in e && (typeof e.question !== "string" || !e.question.trim() || /[<>]/.test(e.question))) manquesCF2.push(`${f} : question vide ou contenant < ou >`);
   }
   (enTrop.length || absentes.length || manquesCF2.length)
     ? ko("CF2", [absentes.length && `forge(s) absente(s) : ${absentes.join(", ")}`, enTrop.length && `forge(s) hors des 13 : ${enTrop.join(", ")}`,
@@ -206,11 +208,16 @@ export function squelette(carte, types, profil) {
   const verdicts = {};
   for (const f of FORGES) {
     const signaux = ((carte.forges || {})[f]?.signaux || []).filter((s) => profil && profil[s] === true);
+    // TF-2044 : la carte peut poser à une forge la question à laquelle répondre avant de l'écarter (design : le sens ou la source
+    // d'un texte affiché, pas les fichiers touchés) ; le motif à écrire la porte, sans `<` ni `>` pour rester un gabarit refusé.
+    const question = String((carte.forges || {})[f]?.question || "").trim();
     verdicts[f] = priv.includes(f)
       ? { verdict: "mobilisee", motif: "<motif : ce que cette forge apporte à la demande, ou passer à « ecartee » en disant pourquoi>" }
       : signaux.length
         ? { verdict: "mobilisee", motif: `<motif : le profil porte ${signaux.join(", ")} ; dire ce que la forge apporte, ou passer à « ecartee » en disant pourquoi>` }
-        : { verdict: "ecartee", motif: "<motif : pourquoi cette forge ne sert pas cette demande>" };
+        : { verdict: "ecartee", motif: question
+          ? `<motif : pourquoi cette forge ne sert pas cette demande — répondre d'abord à « ${question} »>`
+          : "<motif : pourquoi cette forge ne sert pas cette demande>" };
   }
   return verdicts;
 }
