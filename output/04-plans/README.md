@@ -130,6 +130,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` | fichier | 5,0 Ko | Synthèse Mandat — les 18 gabarits de lecture tiennent la règle de largeur, D-154 exécutée  |
 | `Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` | fichier | 7,4 Ko | Synthèse Mandat — votre décision D-57 (a) est exécutée : les 2 lots de Produit-02 sont ent |
 | `Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` | fichier | 6,5 Ko | Synthèse Mandat — mode « L99 boucle » construit, publié et exercé une première fois (16/10 |
+| `Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md` | fichier | 3,2 Ko | Synthèse Mandat — moment de la revue de code dans la mise en production (03/11/2026) |
 | `Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md` | fichier | 4,8 Ko | Synthèse Mandat — la note de travail sur l'œil critique des process est remise, prête à êt |
 | `Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md` | fichier | 10,7 Ko | Synthèse Mandat — vos réponses 61a, 62a et 63a appliquées, proposition d'œil critique du 2 |
 | `Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md` | fichier | 11,0 Ko | Synthèse Mandat — l'œil critique des process est étudié, son premier cycle explique les 19 |
@@ -195,4 +196,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_174 fichier(s), 4 sous-dossier(s)_
+_175 fichier(s), 4 sous-dossier(s)_

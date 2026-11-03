@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 635 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 636 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -613,6 +613,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md | 20261103e | 5 Ko | `04-plans/Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` |
 | Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
+| Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md | 20261103q | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md` |
 | Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md | 20261020m | 4.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md` |
 | Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md | 20261021b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md` |
 | Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md | 20261020h | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md` |
