@@ -156,6 +156,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` | fichier | 5,9 Ko | Synthèse Mandat — rangement des entrants dans input et output (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` | fichier | 6,1 Ko | Synthèse Mandat — recette complète du pilot jouée : 2 contrôles en défaut sur 221, aucun d |
 | `Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md` | fichier | 5,9 Ko | Synthèse Mandat — recette Terraform réparée, revue du mode boucle câblée à sa date (16/10/ |
+| `Digit-AI - Synthese Mandat - Registre des mutants et index des dossiers corriges - 20261103o.md` | fichier | 8,8 Ko | Synthèse Mandat — les 3 restes de la campagne d'hier sont corrigés et publiés, le registre |
 | `Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001n.md` | fichier | 9,6 Ko | Point d'étape : le rejeu tourne en version 2 ; un défaut de mon banc, vu sur les 7 premièr |
 | `Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` | fichier | 18,3 Ko | Synthèse de mandat : le rejeu est joué en entier ; Opus 5.5 à l'effort high réussit les 6  |
 | `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
@@ -193,4 +194,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_172 fichier(s), 4 sous-dossier(s)_
+_173 fichier(s), 4 sous-dossier(s)_
