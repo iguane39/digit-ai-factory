@@ -45,7 +45,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
 | `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
-| `Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` | fichier | 7,2 Ko | Synthèse Conseil — prompt « compétences OpenAI et Gemini » passé au crible L99, aucune déc |
+| `Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` | fichier | 7,9 Ko | Synthèse Conseil — prompt « compétences OpenAI et Gemini » passé au crible L99, aucune déc |
 | `Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` | fichier | 7,8 Ko | Synthèse Conseil — prompt make-it-better avec Word et PDF, 1 décision attendue (02/11/2026 |
 | `Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` | fichier | 10,6 Ko | Synthèse Conseil — prompt du skill make-it-better passé au crible L99, 2 décisions attendu |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |

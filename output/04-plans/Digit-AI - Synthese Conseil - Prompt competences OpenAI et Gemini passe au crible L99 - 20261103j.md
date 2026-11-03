@@ -12,7 +12,7 @@ Livré : [Prompt de l'étude OpenAI et Gemini](output/04-plans/Digit-AI%20-%20Pr
 
 ## 1. En-tête d'identification
 
-Analyse L99 (examen d'un prompt en 8 couches) en mode boucle, sur le pilot `digit-ai-factory`, le 03/11/2026 de 14:54 à 15:20, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5, skills `prompt-analyzer-l99` et `quality-oracles`, 10 agents `verificateur` en lecture seule ; escalade de modèle : aucune.
+Analyse L99 (examen d'un prompt en 8 couches) en mode boucle, sur le pilot `digit-ai-factory`, le 03/11/2026 de 14:54 à 15:25, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5, skills `prompt-analyzer-l99` et `quality-oracles`, 10 agents `verificateur` en lecture seule ; escalade de modèle : aucune.
 
 Intention de la demande : savoir s'il faut ajouter à la Factory des compétences pour les API et bibliothèques d'OpenAI et de Gemini, par un prompt amélioré qui le fera établir.
 
@@ -36,6 +36,8 @@ Aucune décision ne vous revient : les 4 écarts du bloc 6 se valident avec le p
 - **Après l'arrêt.** 8 défauts fermés dans la version remise, 8 clôtures confirmées par un vérificateur, puis 3 défauts créés corrigés.
 - **Prémisse corrigée par la session seule.** Mon relevé disait 0 dépendance déclarée ; rejoué avec un motif plus large, il en trouve 1. Aucun des 6 relecteurs ne l'avait vu.
 - **Collision d'indice réparée.** Une autre session a pris l'indice « g » pendant mon travail ; le prompt est renommé en « i », renvois corrigés.
+- **Chemin réparé après la porte des noms.** Le crochet de commit a pseudonymisé le nom du dossier client dans un chemin du relevé, qui ne menait plus nulle part. Le périmètre s'énumère désormais par `find`, qui liste 56 dépôts et 4 copies de travail à 15:20, sans nommer le dossier ; commit `8a852c1c`.
+- **Publication du pilot** sous le GO permanent `D-54 (b) du 03/10` : commits `fb45dcb2` et `8a852c1c` limités à mes fichiers et à leurs index. `git push` exit 0, puis `git rev-list --left-right --count` rend 0 0. Le même envoi a publié 8 commits déjà enregistrés par une autre session du poste, ce que la règle admet ; cette synthèse part ensuite par le même geste.
 - **Contrôles.**
   - `quality-oracles` sur l'analyse : 6 PASS, 1 SKIP, 0 échec.
   - `quality-oracles` sur le prompt : 6 PASS, 1 SKIP, 0 échec.
