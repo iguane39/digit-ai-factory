@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 615 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 616 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -636,6 +636,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md | 20261015j | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` |
 | Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md | 20261013j | 3.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` |
 | Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md | 20261019j | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md` |
+| Digit-AI - Synthese Mandat - Restes de campagne corriges et largeur des gabarits - 20261103b.md | 20261103b | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Restes de campagne corriges et largeur des gabarits - 20261103b.md` |
 | Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md | 20261014b | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md | 20261029g | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` |
 | Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md | 20261102b | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` |
