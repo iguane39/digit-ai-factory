@@ -297,6 +297,31 @@ try {
     att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
     att(!vocabulaire(mutant).has("rectification_versions_forges") && prescrits.has("rectification_versions_forges"), "le mutant passe");
   });
+
+  // TF-2083 (RT-38, 29/10/2026) : `conflit_regles` (R-43) et quatre autres types — `demande_emise`,
+  // `demande_recue`, `deplacement_effectue`, `deplacement_en_attente` — sont prescrits « au ledger »
+  // du produit par les gabarits de doctrine, et ce gabarit les refusait comme types inconnus. Test
+  // croisé : tout `type: X` que CLAUDE-PRODUIT.md, CLAUDE-PRODUIT-DETAIL.md ou REGLES-PROJET.md
+  // prescrit entre guillemets inversés doit être au vocabulaire du gabarit.
+  const DOCTRINE = [
+    join(ICI, "CLAUDE-PRODUIT.md"),
+    join(ICI, "..", "references", "CLAUDE-PRODUIT-DETAIL.md"),
+    join(ICI, "..", "REGLES-PROJET.md"),
+  ].filter((f) => existsSync(f));
+  const prescritsDoctrine = new Set();
+  for (const f of DOCTRINE)
+    for (const m of readFileSync(f, "utf8").matchAll(/`type: ?([a-z_]+)`/g)) prescritsDoctrine.add(m[1]);
+  check(`TF-2083 vert — les ${prescritsDoctrine.size} types prescrits au ledger par les gabarits de doctrine sont au vocabulaire`, () => {
+    const v = vocabulaire(GABARIT);
+    att(prescritsDoctrine.size >= 5, `relevé insuffisant (${prescritsDoctrine.size}) : le test croisé ne voit pas la doctrine`);
+    const manquants = [...prescritsDoctrine].filter((t) => !v.has(t));
+    att(!manquants.length, `hors vocabulaire : ${manquants.join(", ")}`);
+  });
+  check("TF-2083 rouge — sans conflit_regles au vocabulaire, le test croisé le voit", () => {
+    const mutant = GABARIT.replace(' "conflit_regles",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    att(!vocabulaire(mutant).has("conflit_regles") && prescritsDoctrine.has("conflit_regles"), "le mutant passe");
+  });
   check("TF-2018 vert — la rectification écrite en ligne de commande porte seq_vise en NOMBRE et --verifier ne la déclare pas", () => {
     const { d, script } = produit(GABARIT); dossiers.push(d);
     const r = spawnSync(PYTHON, [script, "rectification_versions_forges", "--seq_vise", "1", "--cause", "versions des forges non relevées à l ouverture du run"], { encoding: "utf8", env: CONSOLE });

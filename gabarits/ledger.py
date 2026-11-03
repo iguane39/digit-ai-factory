@@ -42,11 +42,18 @@ RUNS = FORGE.parent / "runs"
 # son entrée refusée à l'écriture puis déclarée hors vocabulaire (retour RT-28, TF-2018, 29/10/2026).
 # `go_publication` est le feu vert R-38 que lit oracles/hook-publication-hebergee.mjs du pilot
 # (retour RP-5, TF-1990, 22/10/2026 : refusé ici, consigné de travers en reponse_humain).
-# La recette croise ce vocabulaire avec les types que les oracles du pilot prescrivent.
+# `conflit_regles`, `demande_emise`, `demande_recue`, `deplacement_effectue` et
+# `deplacement_en_attente` sont prescrits « au ledger » du produit par CLAUDE-PRODUIT.md,
+# CLAUDE-PRODUIT-DETAIL.md et REGLES-PROJET.md (R-43 pour le premier) : absents d'ici, le produit
+# qui suivait la doctrine voyait son entrée refusée comme type inconnu (retour RT-38, TF-2083,
+# 29/10/2026, même classe que RT-28). La recette croise désormais ce vocabulaire avec les types que
+# les oracles du pilot ET les gabarits de doctrine prescrivent, pour que la dérive ne se répète pas.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
          "run_close", "rectification_versions_forges", "rectification_run_open",
-         "rectification_horodatage", "rectification_forges_mobilisees", "go_publication"}
+         "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
+         "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
+         "deplacement_en_attente"}
 
 
 def chemin(run: str = "") -> pathlib.Path:
