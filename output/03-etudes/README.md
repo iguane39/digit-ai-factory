@@ -71,7 +71,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` | fichier | 35,8 Ko | Étude d'opportunité — Audit de sécurité par agents de Cloudflare — 20261102f |
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
-| `Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` | fichier | 198,5 Ko | Étude — Compétences OpenAI et Gemini dans la Factory |
+| `Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` | fichier | 199,3 Ko | Étude — Compétences OpenAI et Gemini dans la Factory |
 | `Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` | fichier | 13,0 Ko | Étude d'opportunité — Étape de revue de code par un seul agent — 20261103k |
 | `Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` | fichier | 25,3 Ko | Étude d'opportunité — huit outils de motion design pour la Factory — 20261102t |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |

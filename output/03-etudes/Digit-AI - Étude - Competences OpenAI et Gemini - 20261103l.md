@@ -12,7 +12,7 @@ l'utilisation des APIs et/ou Bibliothèques OpenAI et Gemini. »
 
 Ce qui change pour vous : la réponse est oui, pour les deux fournisseurs et pour les deux
 questions. 2 produits et 2 autres dépôts du parc appellent déjà ces API sans aucun outillage
-de forge, et trois d'entre eux visent un modèle déprécié ou bientôt arrêté. La Factory, elle,
+de forge, et les 4 visent un modèle déprécié ou bientôt arrêté (section 3.6, corrigée à 20:00). La Factory, elle,
 n'appelle Gemini que par un script de forge-design autorisé, mais deux de ses gardes ne voyaient
 pas ces appels.
 
@@ -364,7 +364,7 @@ gardent 2 lignes, comme l'index.
 | Customer support analysis with Gemini and CrewAI | https://ai.google.dev/gemini-api/docs/crewai-example.md.txt | 03/11/2026 | CrewAI is a framework for orchestrating autonomous AI agents that collaborate to achieve complex goals. | aucune | à connaître | aucun couple au relevé du 03/11/2026 (35 dépôts et copies relus, 1 EXIGENCES.json qui cite ces fournisseurs) |
 | Building managed agents | https://ai.google.dev/gemini-api/docs/custom-agents.md.txt | 03/11/2026 | Managed agents on the Gemini API let you extend the Antigravity agent with your own instructions, skills, and data. | aucune | à connaître | aucun couple au relevé du 03/11/2026 (35 dépôts et copies relus, 1 EXIGENCES.json qui cite ces fournisseurs) |
 | Gemini Deep Research agent | https://ai.google.dev/gemini-api/docs/deep-research.md.txt | 03/11/2026 | The Gemini Deep Research agent autonomously plans, executes, and synthesizes multi-step research tasks. | aucune | à connaître | aucun couple au relevé du 03/11/2026 (35 dépôts et copies relus, 1 EXIGENCES.json qui cite ces fournisseurs) |
-| Gemini deprecations | https://ai.google.dev/gemini-api/docs/deprecations.md.txt | 03/11/2026 | This page lists the known deprecation schedules for stable (GA) and preview models and for managed agents in the Gemini API. | voir section 3 (cette page est le calendrier des arrêts) : This page lists the known deprecation schedules for stable (GA) and preview models and for managed agents in the Gemini API. / A "deprecation " is the announcement that we no longer provide support for a model, and that it will be "shut down " in the near future. | pertinente | forge-design et un dépôt retail hors table visent par défaut `gemini-3.1-flash-image`, déprécié le 28/05/2026 selon cette page |
+| Gemini deprecations | https://ai.google.dev/gemini-api/docs/deprecations.md.txt | 03/11/2026 | This page lists the known deprecation schedules for stable (GA) and preview models and for managed agents in the Gemini API. | voir section 3 (cette page est le calendrier des arrêts) : This page lists the known deprecation schedules for stable (GA) and preview models and for managed agents in the Gemini API. / A "deprecation " is the announcement that we no longer provide support for a model, and that it will be "shut down " in the near future. | pertinente | forge-design et un dépôt retail hors table visent par défaut `gemini-3.1-flash-image`, déprécié sans date d'arrêt selon cette page |
 | Document understanding | https://ai.google.dev/gemini-api/docs/document-processing.md.txt | 03/11/2026 | Gemini models can process documents in PDF format, using native vision to understand entire document contexts. | aucune | à connaître | aucun couple au relevé du 03/11/2026 (35 dépôts et copies relus, 1 EXIGENCES.json qui cite ces fournisseurs) |
 | Embeddings | https://ai.google.dev/gemini-api/docs/embeddings.md.txt | 03/11/2026 | The Gemini API offers embedding models to generate embeddings for text, images, video, and other content. | For deprecated Embeddings models, visit the Deprecations page | à connaître | aucun couple au relevé du 03/11/2026 (35 dépôts et copies relus, 1 EXIGENCES.json qui cite ces fournisseurs) |
 | Feedback | https://ai.google.dev/gemini-api/docs/feedback-policies.md.txt | 03/11/2026 | Google AI Studio provides multiple ways for you to submit feedback on model outputs, generated artifacts, and API request logs. | aucune | à connaître | aucun couple au relevé du 03/11/2026 (35 dépôts et copies relus, 1 EXIGENCES.json qui cite ces fournisseurs) |
@@ -648,14 +648,21 @@ se lit par ligne, de la date d'arrêt la plus proche à la plus lointaine.
 | Modèle | Où | État selon le fournisseur | Remplaçant |
 |---|---|---|---|
 | `gemini-3.1-flash-image-preview`, `gemini-3-pro-image-preview` | replis de `generer-images.mjs` (forge-design) | arrêtés le 25/06/2026 | `gemini-nano-banana-2.1`, `gemini-3-pro-image` |
+| `gpt-5`, `gpt-5-mini`, `gpt-5-nano` | Produit-12, `backend/app/services/config_ia.py:49` à `:51` ; `gpt-5` aussi chez un autre produit | arrêt le 11/12/2026 | `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna` |
 | `gpt-4o-mini-2024-07-18` | Produit-82, `<application>/config/fournisseurs.json:150` | arrêt le 14/01/2027 | `gpt-6-luna` |
 | `gemini-2.5-flash-image` | repli de `generer-images.mjs` | arrêt le 15/03/2027 | `gemini-3.1-flash-lite-image` |
-| `gemini-3.1-flash-image` | défaut de forge-design et du dépôt retail | déprécié le 28/05/2026, sans date d'arrêt | `gemini-nano-banana-2.1` |
+| `gemini-3.1-flash-image` | défaut de forge-design et du dépôt retail | déprécié, sans date d'arrêt annoncée | `gemini-nano-banana-2.1` |
 | API Assistants d'OpenAI | aucun appelant | arrêtée le 26/08/2026 | API Responses |
 
+Correction du 03/11/2026 à 20:00. La première version de cette étude disait `gemini-3.1-flash-image`
+« déprécié le 28/05/2026 » : cette date est celle de sa sortie, la colonne de la page s'intitulant
+« Release date ». Les 3 lignes `gpt-5` manquaient : l'oracle `oracle-modeles-tiers.mjs`, construit
+ensuite, les a trouvées. La page de Gemini, relue à 19:58, annonce aussi la redirection de
+`gemini-2.5-pro` et `gemini-2.5-flash` au 01/12/2026 ; aucun appelant du parc ne les cite en code.
+
 Cas limites du protocole : chez OpenAI, l'API Assistants porte sa date et son remplaçant ; chez
-Gemini, `gemini-3.1-flash-image` aussi. Le contrôle de cohérence tient : Produit-12 est employeur
-de la génération de texte des deux fournisseurs.
+Gemini, `gemini-3.1-flash-image` porte son remplaçant, sans date d'arrêt. Le contrôle de cohérence
+tient : Produit-12 est employeur de la génération de texte des deux fournisseurs.
 
 ## 4. Q2 — Usage par la Factory
 

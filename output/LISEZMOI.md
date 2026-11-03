@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 636 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 637 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -252,7 +252,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md | 20261102f | 35.8 Ko | `03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` |
 | Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
-| Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md | 20261103l | 198.5 Ko | `03-etudes/Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` |
+| Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md | 20261103l | 199.3 Ko | `03-etudes/Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` |
 | Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md | 20261103k | 13 Ko | `03-etudes/Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` |
 | Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md | 20261102t | 25.3 Ko | `03-etudes/Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
@@ -566,6 +566,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md | 20261026e | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md` |
 | Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md | 20261013i | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` |
 | Digit-AI - Synthese Mandat - Competences Cloudflare GitHub Supabase construites - 20261028a.md | 20261028a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Cloudflare GitHub Supabase construites - 20261028a.md` |
+| Digit-AI - Synthese Mandat - Competences OpenAI et Gemini construites - 20261103r.md | 20261103r | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences OpenAI et Gemini construites - 20261103r.md` |
 | Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |

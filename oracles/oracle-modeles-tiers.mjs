@@ -56,7 +56,7 @@
  * d'environnement réels (`.env`, `.env.local`, `.env.production`…) sont exclus de la lecture par
  * pathspec, `.env.example` reste lu. Chaque ligne trouvée est revérifiée : l'identifiant doit être
  * entier, ni précédé ni suivi d'un caractère d'identifiant (`gpt-4o` ne se lit pas dans `gpt-4o-mini`,
- * `x-5` pas dans `x-5.6`), et un identifiant d'un seul mot (`o3`, `ada`) n'est retenu que s'il est
+ * `x-5` pas dans `x-5.6`), et un identifiant d'un seul mot (o3 ou ada par exemple) n'est retenu que s'il est
  * entre guillemets. Un fichier de plus de 64 Mo n'est pas lu et se signale (AVERT). Le contenu des
  * lignes n'est jamais rendu, seulement chemin et numéro.
  *
@@ -240,7 +240,7 @@ export function chercherDansDepot(depot, ids, dossierTemp) {
   if (!ids.length) return { occurrences: [], erreur: null };
   const motifs = new Map(ids.map((id) => [id, motifIdentifiant(id)]));
   const fichierMotifs = join(dossierTemp, `motifs-${Math.abs(depot.split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7))}.txt`);
-  // Un mot isolé (`ada`, `o3`) n'est cherché qu'entre guillemets : nu, il tombe dans « metadata » ou
+  // Un mot isolé (ada ou o3 par exemple) n'est cherché qu'entre guillemets : nu, il tombe dans « metadata » ou
   // « Canada » et git rend des centaines de milliers de lignes à revérifier.
   const motifsGit = [...new Set(ids.flatMap((id) => (MOT_ISOLE.test(id) ? [`"${id}"`, `'${id}'`, `\`${id}\``] : [racineGit(id)])))];
   writeFileSync(fichierMotifs, motifsGit.join("\n") + "\n", "utf8");
