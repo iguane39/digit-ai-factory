@@ -25,4 +25,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Tiktok\` | dossier ignoré par git (absent d'un clone) | — | Page de favoris TikTok enregistrée par l'humain depuis son compte, IGNORÉE par git : elle porte des adresses signées de sa session. Le tri qui en est tiré est s… |
 | `LISEZMOI.md` | fichier | 5,0 Ko | input\ — entrants du pilot, familles numérotées |
 
-_1 fichier(s), 7 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914) · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
+_1 fichier(s), 7 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)

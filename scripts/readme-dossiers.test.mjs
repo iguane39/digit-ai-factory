@@ -123,15 +123,18 @@ check("dérive de STRUCTURE (une ligne de fichier retirée) → --check REFUSE, 
   if (!/périmé/.test(r.stderr || "")) throw new Error("le motif du refus n'est pas dit");
 });
 
+// Ajouté AU DÉPÔT (`git add`) : un fichier non suivi n'entre pas dans l'index (TF-0914, TF-2068).
 check("un fichier AJOUTÉ au dossier reste un défaut", () => {
   writeFileSync(README, temoin, "utf8");
   writeFileSync(join(T, "input", "c.md"), "# Document C\n", "utf8");
+  git("add", "input/c.md");
   const r = lancer(["--check"]);
   if (r.status !== 1) throw new Error(`exit ${r.status} attendu 1`);
 });
 
 check("`--strict` a disparu sans casser l'appel : le drapeau est ignoré, le verdict est le même", () => {
   writeFileSync(README, temoin, "utf8");
+  git("rm", "-q", "--cached", "input/c.md");
   rmSync(join(T, "input", "c.md"), { force: true });
   lancer();
   const sans = lancer(["--check"]);
@@ -148,17 +151,26 @@ check("`--strict` a disparu sans casser l'appel : le drapeau est ignoré, le ver
 // connaît. La règle qui supprime la classe : hors de l'histoire du dépôt, hors de l'index.
 //
 // LES DEUX SENS, sur le même dossier et dans le même état de départ :
-//   · non suivi  → ABSENT de la table, et son NOMBRE dit au pied (jamais par omission) ;
+//   · non suivi  → ABSENT de la table, et son NOMBRE dit sur le poste (jamais par omission) ;
 //   · suivi      → PRÉSENT, dès le commit qui le versionne et sans autre geste.
+// TF-2068 (03/11/2026) : le nombre s'écrivait au pied de l'index publié. Il dépend du poste : un
+// worktree ou l'autre poste, sans le fichier, régénéraient un autre pied, et RD2 y jugeait l'index
+// périmé. Même règle que D-20 (a) pour l'index d'output : le compte se lit sur le poste.
 const NOM_NON_SUIVI = "Client-X_Reporting - RETOURS - 20260908z.md";
+const avantNonSuivi = readFileSync(README, "utf8");
 writeFileSync(join(T, "input", NOM_NON_SUIVI), "# Retours d un produit dont le nom n est pas au canal\n", "utf8");
-lancer();
+const rNonSuivi = lancer();
+const sortieNonSuivi = (rNonSuivi.stdout || "") + (rNonSuivi.stderr || "");
 
-check("TF-0914 : un fichier NON SUIVI n'entre pas dans l'index, et le pied DIT combien ont été écartés", () => {
+check("TF-0914 : un fichier NON SUIVI n'entre pas dans l'index, et le générateur DIT combien il en a écarté", () => {
   const t = readFileSync(README, "utf8");
   if (t.includes(NOM_NON_SUIVI)) throw new Error("le nom d'un fichier non suivi est écrit dans un index suivi et publié");
-  if (!/1 fichier\(s\) présent\(s\) sur le poste et NON suivi\(s\) par git/.test(t))
-    throw new Error("l'index tait ce qu'il a écarté — un index muet se lit comme un index complet (loi n° 3)");
+  if (!/1 fichier\(s\) présent\(s\) sur ce poste et NON suivi\(s\) par git/.test(sortieNonSuivi))
+    throw new Error(`le générateur tait ce qu'il a écarté — un écart muet se lit comme un index complet (loi n° 3) : ${sortieNonSuivi.slice(0, 200)}`);
+});
+
+check("TF-2068 : un fichier NON SUIVI ne change pas l'index publié — il ne dépend pas du poste qui le régénère", () => {
+  if (readFileSync(README, "utf8") !== avantNonSuivi) throw new Error("l'index publié diffère selon qu'un fichier non suivi est présent sur le poste");
 });
 
 check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autre geste", () => {
