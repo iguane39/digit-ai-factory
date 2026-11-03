@@ -24,7 +24,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` | fichier | 14,7 Ko | Note — un œil critique sur les process de la Factory : le sujet, ce qui est mesuré, ce qui |
 | `Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` | fichier | 8,3 Ko | Prompt — Inventorier ce que les forges savent faire des bases de développement et de quali |
 | `Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` | fichier | 10,1 Ko | Prompt — Inventorier les fonctionnalités de Cloudflare, GitHub et Supabase pour en tirer l |
-| `Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` | fichier | 16,2 Ko | Prompt — Décider s'il faut des compétences OpenAI et Gemini dans la Factory, et lesquelles |
+| `Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` | fichier | 16,5 Ko | Prompt — Décider s'il faut des compétences OpenAI et Gemini dans la Factory, et lesquelles |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
 | `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` | fichier | 22,1 Ko | Prompt — construire le skill make-it-better et sa page de versions |

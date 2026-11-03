@@ -505,7 +505,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md | 20261020l | 14.7 Ko | `04-plans/Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` |
 | Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md | 20261029a | 8.3 Ko | `04-plans/Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` |
 | Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md | 20261028a | 10.1 Ko | `04-plans/Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` |
-| Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md | 20261103i | 16.2 Ko | `04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` |
+| Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md | 20261103i | 16.5 Ko | `04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |

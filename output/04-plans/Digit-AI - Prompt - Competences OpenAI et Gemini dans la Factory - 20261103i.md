@@ -51,7 +51,10 @@ de la question 2 : elle décrit l'écart et pose la décision.
    **Aucune fonctionnalité, aucun nom de modèle, aucun prix ne s'écrit de mémoire** : la mémoire
    du modèle s'arrête en juin 2026, et ces API changent plus vite.
 3. **Relevé de l'existant par mesure**, à rejouer. Périmètre : tous les dépôts git de `C:\dev`
-   jusqu'à trois niveaux (`C:\dev\*`, `C:\dev\_Client-A\*`, `C:\dev\_Client-A\*\*`), plus
+   jusqu'à trois niveaux de dossiers, dossiers de regroupement de produits compris, listés par
+   `find /c/dev -mindepth 2 -maxdepth 4 -name .git -not -path '*/node_modules/*'`. Un `.git`
+   dossier est un dépôt, un `.git` fichier une copie de travail, comptée à part ; à 15:20, elle
+   liste 56 dépôts et 4 copies, plus que le relevé ci-dessous, fait sur moins de dossiers. S'y ajoutent
    `input\00-retours\` et `todo\TODO.jsonl` du pilot. Commandes, à jouer sur chaque dépôt :
    - mentions : `git -C <dépôt> grep -l -i -E "openai|gemini"` ;
    - appels : `git -C <dépôt> grep -l -E "api\.openai\.com|generativelanguage\.googleapis|new

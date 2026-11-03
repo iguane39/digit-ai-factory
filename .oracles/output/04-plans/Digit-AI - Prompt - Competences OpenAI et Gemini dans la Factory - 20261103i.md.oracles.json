@@ -1,6 +1,6 @@
 {
   "cible": "output/04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
-  "date_iso": "2026-11-03T14:18:35.196Z",
+  "date_iso": "2026-11-03T14:21:02.406Z",
   "registre_version": "2.51.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
-    "ts": "2026-11-03T14:18:35.195Z",
+    "ts": "2026-11-03T14:21:02.405Z",
     "fichiers": {
-      "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md": "5001037a85ebab91de8e8374a88547243c83893c60e55f9c9facb5f3f1df0e53"
+      "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md": "d8e81c1da2ad189145746d3167ec68ed1bea120b6d217b0b5b6fcd6c576d4d19"
     }
   },
   "empreinte_motif": null,
