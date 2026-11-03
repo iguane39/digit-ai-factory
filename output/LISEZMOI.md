@@ -597,7 +597,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md | 20261015d | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` |
 | Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md | 20261013g | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md` |
 | Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md | 20261013d | 12 Ko | `04-plans/Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md` |
-| Digit-AI - Synthese Mandat - Kit du logo du produit de pentest - 20261103f.md | 20261103f | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Kit du logo du produit de pentest - 20261103f.md` |
+| Digit-AI - Synthese Mandat - Kit du logo du produit de pentest - 20261103f.md | 20261103f | 7.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Kit du logo du produit de pentest - 20261103f.md` |
 | Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md | 20261021a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md` |
 | Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md | 20261026c | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` |
 | Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md | 20261103e | 5 Ko | `04-plans/Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` |
