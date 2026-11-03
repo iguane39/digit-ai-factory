@@ -100,7 +100,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-84 - RETOURS - 20261029a.tf.jsonl` | fichier | 4,7 Ko | 4 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261030a.md` | fichier | 12,2 Ko | Retours forges — Produit-84 — 20261030a |
 | `Produit-84 - RETOURS - 20261030a.tf.jsonl` | fichier | 6,0 Ko | 5 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261103a.md` | fichier | 8,8 Ko | Retours forges — Produit-84 — 20261103a |
+| `Produit-84 - RETOURS - 20261103a.tf.jsonl` | fichier | 4,6 Ko | 4 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261103b.md` | fichier | 12,9 Ko | Retours forges — Produit-84 — 20261103b |
+| `Produit-84 - RETOURS - 20261103b.tf.jsonl` | fichier | 10,4 Ko | 11 ligne(s) JSONL |
 | `Produit-85 - RETOURS - 20261024a.md` | fichier | 10,9 Ko | Retours forges — Produit-85 — 20261024a |
 | `Produit-85 - RETOURS - 20261024a.tf.jsonl` | fichier | 6,0 Ko | 7 ligne(s) JSONL |
 
-_84 fichier(s), 2 sous-dossier(s)_
+_88 fichier(s), 2 sous-dossier(s)_

@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.58.0",
- "date": "2026-11-02",
+ "version": "1.59.0",
+ "date": "2026-11-03",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -2711,6 +2711,118 @@
    ],
    "regle": "une table appelée par l'API depuis un dossier tests compte comme exercée",
    "oracle": "digit-ai-forge-tests, tests/test_tf_2008_pan_supabase.py",
+   "voisines": []
+  },
+  {
+   "cle": "skill-sans-sortie-partageable",
+   "famille": "affordance-ui",
+   "libelle": "Un skill ne rend son résultat que dans une forme liée à la session (serveur local, état en mémoire) : le porteur ne peut ni le rouvrir ni le transmettre sans le reconstruire. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2076"
+   ],
+   "regle": "forge-agents, skill make-it-better : un rendu de comparaison s'exporte en page HTML autoportante sous output/ (proposé, à sceller à la clôture)",
+   "oracle": "forge-agents, recette du skill make-it-better (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "ecriture-temporaire-comptee-tour-de-travail",
+   "famille": "hook-ou-gate",
+   "libelle": "Une écriture ou suppression dans le dossier temporaire de la session fait juger un tour de lecture comme tour de travail. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2079"
+   ],
+   "regle": "pilot, references/NIVEAUX.md : une écriture dans le scratchpad de session ne compte pas comme écriture de tour (proposé, à sceller à la clôture)",
+   "oracle": "pilot, oracles/hook-restitution.mjs, détection d'écriture du tour (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "reservation-bornee-au-format-en-citation",
+   "famille": "restitution-forme",
+   "libelle": "Le contrôle de réservation des décisions ne reconnaît qu'un format d'écriture et laisse passer une D-N non réservée écrite autrement. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2081"
+   ],
+   "regle": "pilot, gabarits/RESTITUTION.md : toute D-N nouvelle du bloc 3 se réserve, quel que soit son format d'écriture (proposé, à sceller à la clôture)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs, contrôle RÉSERVATION (proposé, à outiller à la clôture)",
+   "voisines": [
+    "decision-non-reservee"
+   ]
+  },
+  {
+   "cle": "garde-contraire-a-une-preference-du-porteur",
+   "famille": "hook-ou-gate",
+   "libelle": "Une garde refuse la forme de réponse qu'une préférence enregistrée du porteur impose. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2082"
+   ],
+   "regle": "pilot, references/PREFERENCES-PORTEUR.md prime sur la longueur minimale exigée par le hook gestes-distants (proposé, à sceller à la clôture)",
+   "oracle": "pilot, oracle/hook des gestes distants, validation de reponse_humaine (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "type-de-ledger-prescrit-refuse-par-l-ecrivain",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un gabarit prescrit un type d'entrée de ledger que l'écrivain du ledger refuse comme inconnu. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2083"
+   ],
+   "regle": "pilot, gabarits/ledger.py : les cinq types prescrits « au ledger » par les gabarits de doctrine (CLAUDE-PRODUIT.md, CLAUDE-PRODUIT-DETAIL.md, REGLES-PROJET.md, dont conflit_regles par R-43) sont au vocabulaire TYPES, hérité par les produits (R-47)",
+   "oracle": "pilot, gabarits/ledger.test.mjs banc TF-2083 (vert/rouge), joué par oracles/self-tests.mjs (I2)",
+   "voisines": []
+  },
+  {
+   "cle": "gestes-distants-concurrents-sans-registre",
+   "famille": "hook-ou-gate",
+   "libelle": "Plusieurs sessions d'un même produit font des gestes distants sur les mêmes ressources sans registre commun qui les rende visibles l'une à l'autre. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2084"
+   ],
+   "regle": "pilot, references/GESTES-DISTANTS.md : registre des gestes distants en cours, partagé par les sessions d'un produit, lu avant tout geste distant et tout diagnostic de panne (proposé, à sceller à la clôture)",
+   "oracle": "pilot, à définir (proposé, à outiller à la clôture)",
+   "voisines": [
+    "trace-de-mobilisation-partagee-entre-sessions"
+   ]
+  },
+  {
+   "cle": "jeu-fictif-sans-definition-ni-oracle",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un jeu de données fictif est livré sans définition de ce qu'il doit couvrir ni oracle qui juge sa complétude. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2085"
+   ],
+   "regle": "forge-data ou forge-tests : définition d'un jeu fictif (chaque écran alimenté, chaque type d'enregistrement, histoire cohérente par stade) (proposé, à sceller à la clôture)",
+   "oracle": "forge-data/forge-tests, oracle comparant les totaux affichés à ceux du générateur (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "outil-sans-repli-de-moteur",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un outil qui dépend d'un moteur externe s'arrête sur l'échec du premier trouvé sans essayer les autres présents. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2088"
+   ],
+   "regle": "forge-audit, fiche-en-pdf.mjs : sur échec de démarrage d'un moteur, essayer les autres moteurs trouvés avant de rendre 3 (récidive de TF-1408) (proposé, à sceller à la clôture)",
+   "oracle": "forge-audit, recette de fiche-en-pdf.mjs (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "outil-sans-garde-d-argument",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un outil prend une option d'usage (--help) pour un argument positionnel et fait un geste réel au lieu d'afficher l'usage. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2089"
+   ],
+   "regle": "forge-audit : tout outil de tools/ refuse un argument commençant par « - » comme dossier cible et affiche l'usage (récidive de TF-1181) (proposé, à sceller à la clôture)",
+   "oracle": "forge-audit, recette des outils de tools/ (proposé, à outiller à la clôture)",
    "voisines": []
   }
  ],
