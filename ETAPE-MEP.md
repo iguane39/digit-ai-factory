@@ -184,6 +184,59 @@ pas le relevé. Les plateformes autres qu'Azure : leur mécanisme de stratégie 
 commande vérifiée à sa source. Une option impossible encore proposée à l'humain : les options
 vivent dans la restitution, que ce contrôle ne lit pas.
 
+## 1 quater. La revue de code se propose ICI, sur demande (D-162, 03/11/2026)
+
+**La décision humaine** : D-162 (a), réponse « 162a » du 03/11/2026 à l'étude d'opportunité
+20261103k (option O2). La revue de code par un seul agent reste à la demande, outillée par
+`digit-ai-forge-websec/referentiels/revue-de-code.md`, et cette étape la propose. Le point se refait
+le 2026-12-01, ou au retour du rejeu des failles du second produit relu (D-152) s'il vient avant.
+
+**Pourquoi ici.** Aucune revue de la chaîne de construction ne vise les classes d'attaque, et aucun
+oracle de forge-websec ne lit le code applicatif (`classes-attaque.md`, § 4). L'entrée de la mise en
+production est le dernier moment où une faille de code se corrige avant d'être servie, comme pour la
+mutation (§ 1 bis).
+
+**Le geste, à l'entrée de l'étape** : lire le marqueur `forge\revue-de-code-derniere.json` du
+produit. Si aucune revue n'y est notée, ou si 10 commits au moins ont touché le code source depuis
+son `sha`, la revue se PROPOSE au bloc de décisions de la restitution, avec 3 chiffres : les lignes de
+code suivi, le nombre de tranches de 2 000 lignes, et la dépense attendue de 250 000 à 300 000 jetons.
+Une ancienneté inconnue vaut périmée, comme pour la mutation. La décision reste humaine (R-29) : la
+revue engage l'abonnement.
+
+**Jouée** : le pilot commande les tranches selon le référentiel, une par agent, la suivante seulement
+si le cumul relevé laisse 130 000 jetons de marge sur 300 000. Il fusionne le rapport chez le produit,
+relit les constats élevés et critiques (statut « relu » ou « non confirmé »), puis écrit le marqueur :
+`{ "sha", "date", "rapport", "jetons", "constats" }`. La revue tourne en parallèle de M-1 à M-5 et son
+rapport se verse avant le GO.
+
+**Rien ne bloque.** Un constat élevé ou critique qui n'est pas « non confirmé » se pose au GO, avec
+son identifiant et son statut ; le GO reste humain. forge-websec ne bloque jamais une mise en
+production (`CLAUDE.md` de la forge, garde-fous).
+
+**La section du dossier** (M-19), jouée ou refusée, jamais muette :
+
+```markdown
+## Revue de code
+
+Revue jouée le 2026-12-01 : rapport `output/<produit> - Revue de code - 20261201a.md`, consigne
+`revue-de-code.md` 1.0.0 de forge-websec. 2 tranches, 268 000 jetons relevés.
+Constats : 9 (0 critique, 1 élevé, 3 moyens, 5 faibles) ; statuts : 2 relus, 0 rejoué,
+1 non confirmé, 6 lus.
+Posé au GO : RC-1, élevé, relu.
+```
+
+« Revue proposée et refusée le <date> : <motif> » et « Revue non proposée : dernière revue du <date>,
+<n> commits depuis » sont des réponses valides. Le silence n'en est pas une.
+
+**Le contrôle exécutable.** `node oracles\oracle-trace-mutation-mep.mjs <produit>` le joue en TM14 :
+la section existe ; jouée, elle cite un rapport `.md`, un nombre de constats et les jetons ; refusée
+ou non proposée, elle le dit. **Sévérité : AVERTISSEMENT**, règle neuve opposable à tous les produits
+(précédent D-70 (b)). Son passage en blocage ne se pose pas : la doctrine de forge-websec l'exclut.
+
+**Hors jugement, et c'est dit.** Le contenu du rapport : aucun oracle ne lit un rapport de revue. Le
+compte des commits depuis la dernière revue : TM14 ne le refait pas. La vérité des statuts recopiés
+au dossier.
+
 ## 2. Ce que l'étape produit (staging, autonome)
 
 Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fichiers de build) :
@@ -235,7 +288,7 @@ et elle grossit par les incidents, pas par la devinette.
 
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
 
-12 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
+19 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
@@ -257,6 +310,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-16 | **Déploiement par la chaîne, exclusivement** (AVERTISSEMENT, règle neuve du 17/10/2026) | Tout déploiement vers un environnement géré passe par la chaîne du produit, jamais par une commande lancée d'un poste. Le dossier porte la section « Chaîne de déploiement » : la chaîne nommée (fichier de pipeline du produit, ou chaîne de l'hébergeur déclenchée par la poussée) et l'exécution qui a déployé, citée par son identifiant ; ou « Aucun environnement géré : <motif> ». Le dossier ne prescrit aucune commande de déploiement direct (`railway up`, `az webapp deploy`, `terraform apply`…). Exigence fatale CTL-D09-01 du référentiel d'audit. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle pipeline`, joué en TM11 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 terdecies, TF-1212 |
 | M-17 | **Sauvegarde et restauration des actifs critiques** (AVERTISSEMENT, règle neuve du 17/10/2026) | Le dossier porte la section « Sauvegarde et restauration » : elle cite la déclaration de sauvegarde du produit (`forge-ops/sauvegarde@1`), que l'oracle O-19 de forge-ops juge (RPO et RTO déclarés, sauvegarde effective conforme au RPO, restauration réussie depuis 12 mois au plus, durée sous le RTO, intégrité constatée) ; ou « Aucun actif de données critique : <motif> », refusé si le produit persiste des données. Exigences fatales CTL-D05-09, CTL-D12-06 et CTL-D16-09. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle sauvegarde`, joué en TM12, qui l'**avertit** — § 3 terdecies, TF-1212 |
 | M-18 | **Fournisseur d'identité central, avec MFA** (AVERTISSEMENT, règle neuve du 17/10/2026) | Le dossier porte la section « Fournisseur d'identité » : le fournisseur central qui authentifie tout accès humain et le MFA qui l'accompagne, la procédure de tout compte local restant (secours) ; ou « Aucun accès humain authentifié : <motif> », refusé si le code porte une authentification locale. Exigence fatale CTL-D03-01. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle identite`, joué en TM13, qui l'**avertit** — § 3 terdecies, TF-1212 |
+| M-19 | **Revue de code proposée** (AVERTISSEMENT, règle neuve du 03/11/2026) | Le dossier porte la section « Revue de code » : jouée, elle cite le rapport chez le produit, le nombre de constats par gravité et par statut, les jetons relevés et les constats posés au GO ; ou « Revue proposée et refusée le <date> : <motif> » ; ou « Revue non proposée : dernière revue du <date>, <n> commits depuis ». Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM14, qui l'**avertit** sans le bloquer — § 1 quater, D-162 (a), TF-2057 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -909,6 +963,8 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   la portée cible, et chaque contrainte avec son verdict contre la séquence retenue (M-11, § 1 ter) ;
 - les trois sections des exigences fatales du référentiel d'audit : « Chaîne de déploiement »,
   « Sauvegarde et restauration », « Fournisseur d'identité » (M-16 à M-18, § 3 terdecies) ;
+- la section « Revue de code » : jouée, avec les constats élevés et critiques posés au GO, ou
+  proposée puis refusée (M-19, § 1 quater) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - le geste exact qui déclenche la mise en production — l'approbation de la porte de la chaîne, ou la
   poussée d'un commit nommé (§4 bis), jamais une commande de déploiement lancée d'un poste vers un

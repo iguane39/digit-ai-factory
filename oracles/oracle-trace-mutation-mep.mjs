@@ -64,7 +64,11 @@
  *   TM13 le dossier porte la section « Fournisseur d'identité » : le fournisseur central et le MFA, ou
  *        « aucun accès humain authentifié » motivé (M-18, CTL-D03-01). TM11 à TM13 sont câblés sur
  *        `scripts\verifier-exigences-fatales.mjs` et AVERTISSENT, comme TM9 : règles neuves du
- *        17/10/2026 (TF-1212, décision humaine D-3 (a)), taux d'accusation mesuré à l'entrée 7 sur 7.
+ *        17/10/2026 (TF-1212, décision humaine D-3 (a)), taux d'accusation mesuré à l'entrée 7 sur 7 ;
+ *   TM14 le dossier porte la section « Revue de code » : jouée, avec son rapport, ses constats et ses
+ *        jetons ; ou proposée puis refusée ; ou non proposée, motivée (M-19, D-162 (a) du 03/11/2026,
+ *        ETAPE-MEP.md § 1 quater). AVERTISSEMENT, sans passage en blocage à poser : forge-websec ne
+ *        bloque jamais une mise en production.
  *
  * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
  * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
@@ -300,6 +304,40 @@ const confronterSauvegarde = (racine) => confronterExigenceFatale(racine, "sauve
 const confronterIdentite = (racine) => confronterExigenceFatale(racine, "identite", "M-18",
   () => "fournisseur d'identité central et MFA déclarés au dossier (ou aucun accès humain, motivé) — CTL-D03-01");
 
+/**
+ * TM14 — la revue de code se propose à l'entrée de la MEP, et le dossier dit ce qu'il en est advenu
+ * (M-19, D-162 (a) du 03/11/2026). Même forme que TM1 pour la mutation : jouée avec sa preuve,
+ * refusée, ou non proposée avec son motif ; le silence est le défaut. Jugée ici, sans verbe : la règle
+ * ne lit que le dossier, jamais le rapport de revue ni le marqueur.
+ */
+const TITRE_REVUE = /^(#{1,4})\s*Revue de code\s*$/im;
+function sectionRevue(texte) {
+  const m = TITRE_REVUE.exec(texte);
+  if (!m) return null;
+  const suite = texte.slice(m.index + m[0].length);
+  const fin = suite.search(new RegExp(`^#{1,${m[1].length}}\\s`, "m"));
+  return fin < 0 ? suite : suite.slice(0, fin);
+}
+function confronterRevue(texte) {
+  const section = sectionRevue(texte);
+  const avertir = (message) => ({ statut: "AVERTISSEMENT", message: "règle neuve du 03/11/2026, non bloquante — " + message });
+  if (section === null) return avertir("le dossier n'a pas de section « Revue de code ». Depuis D-162 (a), la revue se "
+    + "propose à l'entrée de la MEP : écrire « Revue jouée le <date> : rapport <chemin>, <n> constats, <n> jetons », "
+    + "« Revue proposée et refusée le <date> : <motif> » ou « Revue non proposée : dernière revue du <date> » (ETAPE-MEP.md § 1 quater)");
+  if (/refus|non propos/i.test(section)) return { statut: "PASS", message: "revue de code dite proposée puis refusée, ou non proposée" };
+  if (/\bjou[ée]+/i.test(section)) {
+    const manque = [];
+    if (!/\.md\b/.test(section)) manque.push("le rapport (chemin .md)");
+    if (!/\d+\s*constats?\b|\bconstats?\s*:\s*\d+/i.test(section)) manque.push("le nombre de constats");
+    if (!/\d[\d\s  ]*\s*jetons\b/i.test(section)) manque.push("les jetons relevés");
+    return manque.length
+      ? avertir(`revue déclarée jouée sans ${manque.join(", ")} — un ✓ nu ne mesure pas la part de faux constats`)
+      : { statut: "PASS", message: "revue de code jouée, avec son rapport, ses constats et ses jetons" };
+  }
+  return avertir("la section « Revue de code » ne dit pas ce qu'il en est advenu — ni jouée, ni refusée, ni non proposée. "
+    + "Une mention n'est pas un état.");
+}
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -403,6 +441,13 @@ export function juger(racine) {
     const v = confronter(racine);
     findings.push({ regle, statut: v.statut, ou: racine, message: v.message });
   }
+  // TM14 — une fois par dossier, comme TM1 : chaque dossier dit ce qu'il en est de la revue de code.
+  for (const chemin of dossiers) {
+    let texte;
+    try { texte = readFileSync(chemin, "utf8"); } catch { continue; }
+    const rv = confronterRevue(texte);
+    findings.push({ regle: "TM14", statut: rv.statut, ou: chemin, message: rv.message });
+  }
   return findings;
 }
 
@@ -430,6 +475,9 @@ const NON_JUGE = [
   + "section, la chaîne et son exécution, la déclaration de sauvegarde jugée par O-19, le fournisseur et le MFA ; "
   + "l'inventaire des accès de déploiement direct et la capture de la configuration d'identité restent des gestes "
   + "d'audit (forge-audit) — et ces trois règles AVERTISSENT sans bloquer, règles neuves du 17/10/2026",
+  "le CONTENU d'un rapport de revue de code (TM14) : la règle lit la section du dossier, ni le rapport, ni le "
+  + "marqueur forge\\revue-de-code-derniere.json, ni le compte des commits depuis la dernière revue ; la vérité "
+  + "des statuts recopiés n'est pas jugée, et TM14 AVERTIT sans bloquer",
   "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
   + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
 ];
@@ -704,6 +752,21 @@ function selfTest() {
     if (!/TM11/.test(r.stdout) || !/railway up/.test(r.stdout) || !/CTL-D03-01/.test(r.stdout)) casse.push("TM11 à TM13 n'apparaissent pas au verdict JSON avec la commande et l'exigence d'audit — un avertissement que personne ne lit n'est pas un avertissement");
   }
 
+  // ---- TM14 : LA REVUE DE CODE PROPOSÉE À L'ENTRÉE DE LA MEP (M-19, D-162 (a)) -------------------
+  // Le cas fondateur du 03/11/2026 : aucune revue de la chaîne ne vise les failles, et un dossier muet
+  // sur la revue ne se distingue pas d'une étape où personne ne l'a proposée.
+  const REVUE_JOUEE = `${DOSSIER_OK}\n## Revue de code\n\nRevue jouée le 2026-12-01 : rapport \`output/p - Revue de code - 20261201a.md\`. `
+    + "2 tranches, 268 000 jetons relevés. Constats : 9 (0 critique, 1 élevé, 3 moyens, 5 faibles).\n";
+  attendre("tm14-muet", produit("tm14-muet", DOSSIER_OK, MARQUEUR), "TM14", "AVERTISSEMENT");
+  attendre("tm14-jouee", produit("tm14-jouee", REVUE_JOUEE, MARQUEUR), "TM14", "PASS");
+  attendre("tm14-refusee", produit("tm14-refusee", `${DOSSIER_OK}\n## Revue de code\n\nRevue proposée et refusée le 2026-12-01 : aucun code modifié depuis la dernière.\n`, MARQUEUR), "TM14", "PASS");
+  attendre("tm14-sans-preuve", produit("tm14-sans-preuve", `${DOSSIER_OK}\n## Revue de code\n\nRevue jouée, rien de grave.\n`, MARQUEUR), "TM14", "AVERTISSEMENT");
+  attendre("tm14-sans-etat", produit("tm14-sans-etat", `${DOSSIER_OK}\n## Revue de code\n\nÀ voir avec le porteur.\n\n## Suite\n\nRevue jouée ailleurs : rapport x.md, 3 constats, 10 jetons.\n`, MARQUEUR), "TM14", "AVERTISSEMENT");
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm14-muet")], { encoding: "utf8" });
+    if (r.status !== 0) casse.push("un dossier muet sur la revue de code fait sortir l'oracle en échec — TM14 devait AVERTIR, forge-websec ne bloque jamais une MEP");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -713,7 +776,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 43/43 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 49/49 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -736,7 +799,10 @@ function selfTest() {
       + "TM10 bloque depuis TF-1688, code de sortie 1 vérifié ; TM11 à TM13 dossier qui prescrit `railway up` "
       + "et ne dit rien de la sauvegarde ni du fournisseur d'identité AVERTISSEMENT ×3 — le cas fondateur du "
       + "09/09/2026 (TF-1212) ; TM11 à TM13 chaîne nommée avec son exécution, « aucun » motivés PASS ×3 ; TM11 à "
-      + "TM13 ne bloquent PAS, code de sortie 0 vérifié)");
+      + "TM13 ne bloquent PAS, code de sortie 0 vérifié ; TM14 dossier muet sur la revue de code AVERTISSEMENT — le "
+      + "cas fondateur du 03/11/2026 ; TM14 revue jouée avec rapport, constats et jetons PASS ; TM14 revue proposée "
+      + "et refusée PASS ; TM14 revue jouée sans preuve AVERTISSEMENT ; TM14 section sans état, preuve placée hors "
+      + "section AVERTISSEMENT ; TM14 ne bloque PAS, code de sortie 0 vérifié)");
   return casse.length ? 1 : 0;
 }
 
