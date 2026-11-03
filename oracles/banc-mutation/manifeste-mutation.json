@@ -17,17 +17,18 @@
    },
    "pertinentes": [
     "section-retiree:En-tête",
-    "section-retiree:Risques",
-    "section-retiree:Écarts",
-    "section-retiree:Verdict",
+    "section-retiree:Décisions attendues",
+    "section-retiree:Prochaines actions",
+    "section-retiree:Traces",
     "section-videe:Risques",
     "section-retiree:Synthèse d'ouverture",
     "identifiant-nu",
     "ajout:Coût de la reprise proposée : 3 j.",
     "puce-profondeur",
     "verdict-vague",
-    "coche-sans-preuve"
-   ]
+    "avant-ligne:^## 5\\. Non traité=>- ✓ fait"
+   ],
+   "mise_a_jour": "02/11/2026 (TF-2066) : section-retiree:Risques, :Écarts et :Verdict retirées, car le gabarit 2.50.0 (T2, TF-1947) rend les blocs 2, 6 et 7 facultatifs et S1 ne les exige plus (oracles/oracle-synthese.mjs, BLOCS_TOUJOURS) : leur retrait n'est plus un défaut, la mutation ne visait plus rien que l'oracle juge. Remplacées par le retrait des blocs toujours présents 3, 8 et 9. coche-sans-preuve (ajout en fin de document) tombait dans le bloc 9 que S8 ne juge pas par construction (S8 est bornée au verdict, au traité et aux actions) : la puce « ✓ fait » est posée avant le bloc 5, dans le bloc 4."
   },
   {
    "id": "oracle-ecriture",

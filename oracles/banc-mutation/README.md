@@ -43,6 +43,15 @@ Lecture des 4 survivants, faite à la main le 12/10/2026 (le script ne tranche p
 - `oracle-travaux-pilot`, ligne « Si ce n'est pas fait » retirée : hors périmètre. Aucune des règles T1 à T5 ne la
   cite.
 
+Mise à jour du 02/11/2026 (TF-2066). Le banc mesurait 62 détections sur 69, soit 89,86 %, sous le plancher de 90 %, et
+l'affichage à l'entier le lisait « 90 % » : les taux se lisent désormais avec leur décimale (`pourcent`) et le message
+d'échec donne le rapport exact (`tauxExact`). Quatre mutations de `oracle-synthese` ne visaient plus ce que l'oracle juge,
+aucune n'était une détection perdue. Le gabarit 2.50.0 (T2, TF-1947) rend les blocs 2, 6 et 7 facultatifs : retirer
+« Verdict », « Écarts » ou « Risques » n'est plus un défaut, et ces trois mutations sont remplacées par le retrait des
+blocs 3, 8 et 9, toujours exigés. La puce « ✓ fait » ajoutée en fin de document tombait dans le bloc 9, que S8 ne juge pas
+par construction ; elle est posée dans le bloc 4. Le survivant « Risques vidé » de la lecture ci-dessus est détecté depuis
+(`section-videe:Risques`). Le plancher de 90 % ne bouge pas.
+
 Les cinq oracles les plus cités qui jugent un dossier, le registre ou le poste sont déclarés `hors_banc` au manifeste,
 avec leur raison. La sollicitation est un proxy (fichiers du dépôt qui citent l'oracle), pas un compte d'appels.
 

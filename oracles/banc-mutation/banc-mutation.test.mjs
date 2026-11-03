@@ -13,7 +13,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { mesurer, mesurerOracle, lireVerdict, tableauMarkdown, MIN_MUTATIONS_PERTINENTES } from "./banc-mutation.mjs";
+import { mesurer, mesurerOracle, lireVerdict, tableauMarkdown, pourcent, tauxExact, MIN_MUTATIONS_PERTINENTES } from "./banc-mutation.mjs";
 import { MUTATIONS, resoudre } from "./mutations.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -135,6 +135,16 @@ try {
     att(/\| `faible` \| 12 \| 0 \| 12 \| 0 % \|/.test(t) && /\*\*Total\*\*/.test(t) && /Survivants/.test(t), t.slice(0, 300));
   });
 
+  check("TAUX EXACT (TF-2066) — 62 sur 69 se lit 89,9 % (jamais « 90 % » sous un plancher de 90 %) ; un taux entier reste entier", () => {
+    // ROUGE : l'ancien affichage, Math.round(x * 100), rendait « 90 » pour 62/69 et trompait sur le plancher.
+    att(Math.round(62 / 69 * 100) === 90 && pourcent(62 / 69) !== "90 %", "l'affichage à l'entier arrondit 62/69 à 90 %");
+    att(pourcent(62 / 69) === "89,9 %", pourcent(62 / 69));
+    att(tauxExact(62, 69) === "62/69 = 89,86 %", tauxExact(62, 69));
+    // VERT : les taux entiers et l'absence de taux gardent leur forme.
+    att(pourcent(1) === "100 %" && pourcent(0) === "0 %" && pourcent(0.9) === "90 %" && pourcent(null) === "—", [pourcent(1), pourcent(0), pourcent(0.9), pourcent(null)].join());
+    att(tauxExact(65, 69) === "65/69 = 94,20 %" && tauxExact(0, 0) === "aucune mutation jouée", tauxExact(65, 69));
+  });
+
   // ---- le manifeste RÉEL ----
   const manifeste = JSON.parse(readFileSync(join(ICI, "manifeste-mutation.json"), "utf8"));
   check("manifeste — dix oracles, chacun avec son vert existant, son script existant et au moins cinq mutations déclarées", () => {
@@ -154,7 +164,7 @@ try {
     att(res.total.mutations >= 50, `${res.total.mutations} mutations jouées seulement`);
     att(res.oracles.every((o) => o.taux !== null), "un taux est absent");
     // CLIQUET : le taux mesuré le 12/10/2026 est de 94 % (65 détectées sur 69). Un oracle assoupli par une session le ferait baisser.
-    att(res.total.taux >= 0.9, `taux de détection global ${Math.round(res.total.taux * 100)} %, sous le plancher de 90 % (mesuré à 94 % le 12/10/2026) : un oracle a perdu une détection`);
+    att(res.total.taux >= 0.9, `taux de détection global ${tauxExact(res.total.detectees, res.total.mutations)}, sous le plancher de 90 % (mesuré à 94 % le 12/10/2026) : un oracle a perdu une détection`);
   });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { rmSync(racine, { recursive: true, force: true }); }
