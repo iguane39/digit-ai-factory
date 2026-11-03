@@ -53,6 +53,7 @@ Rappel : D-161, posée par une autre session sur le nom d'emprunt du produit de 
 - **Registre.** TF-2108 à TF-2114 écrits par `journaliser.mjs`, verdict PASS avant et après, `oracle-todo` exit 0.
 - **Décision.** D-163 réservée par `reserver-decision.mjs`, PASS.
 - **Nom réel retiré avant publication.** Le crochet de commit a pseudonymisé le registre mais pas 3 chemins de l'étude qui portaient le nom d'un produit en minuscules. Je les ai remplacés par `<application>` et refait mon commit non publié : `git log -p origin/main..HEAD` ne porte plus ce nom (0 occurrence).
+- **Commit d'une autre session réparé.** Un `git commit --amend` de ma synthèse a pris le commit `b04431f5` d'une autre session, arrivé entre deux de mes commandes. Son contenu restait intact, mais il portait ma ligne : `git reset --soft` l'a remis à l'identique (`git diff --stat` vide), et ma ligne est partie dans le commit `506db881`.
 - **Contrôles de l'étude.** `oracle-ecriture` exit 0 ; `check_markdown.py` PASS ; `quality-oracles` 5 PASS, 2 SKIP, 0 échec ; 1 272 mots hors tableaux pour 2 500 permis ; 0 motif de clé trouvé.
 
 Relecture d'intention : sans objet, motif : la relecture des consignes des 2 agents n'a pas été jouée avant leur lancement ; leurs catalogues ont été relus à réception, chaque extrait contrôlé par script.
