@@ -91,6 +91,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` | fichier | 9,1 Ko | Refine de Prime Agent contre oeil-critique — 20261102r |
 | `Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` | fichier | 5,9 Ko | Essai borné de l'audit de sécurité de Cloudflare — 20261102k |
 | `Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` | fichier | 15,2 Ko | Analyse L99 — transformer en actions les sujets laissés de côté par l'œil critique (29/10/ |
+| `Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` | fichier | 20,6 Ko | Revue L99 — prompt « compétences OpenAI et Gemini dans la Factory » |
+| `Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json` | fichier | 10,6 Ko | JSON |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` | fichier | 56,1 Ko | Digit-AI — Revue L99 — Prompt « pentest automatisé de bout en bout » (Claude + LLM local) |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json` | fichier | 6,9 Ko | JSON |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` | fichier | 6,9 Ko | JSON |
@@ -99,4 +101,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_80 fichier(s), 2 sous-dossier(s)_
+_82 fichier(s), 2 sous-dossier(s)_

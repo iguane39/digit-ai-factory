@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 624 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 628 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -272,6 +272,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
 | Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md | 20261102k | 5.9 Ko | `03-etudes/Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` |
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
+| Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md | 20261103c | 20.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` |
+| Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json | — | 10.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md | 20261102j | 56.1 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` |
@@ -503,6 +505,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md | 20261020l | 14.7 Ko | `04-plans/Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` |
 | Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md | 20261029a | 8.3 Ko | `04-plans/Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` |
 | Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md | 20261028a | 10.1 Ko | `04-plans/Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` |
+| Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md | 20261103i | 16.2 Ko | `04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |
@@ -523,6 +526,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
+| Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md | 20261103j | 7.2 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` |
 | Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md | 20261102h | 7.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` |
 | Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md | 20261102f | 10.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` |
 | Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md | 20261016c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` |

@@ -24,6 +24,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` | fichier | 14,7 Ko | Note — un œil critique sur les process de la Factory : le sujet, ce qui est mesuré, ce qui |
 | `Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` | fichier | 8,3 Ko | Prompt — Inventorier ce que les forges savent faire des bases de développement et de quali |
 | `Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` | fichier | 10,1 Ko | Prompt — Inventorier les fonctionnalités de Cloudflare, GitHub et Supabase pour en tirer l |
+| `Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` | fichier | 16,2 Ko | Prompt — Décider s'il faut des compétences OpenAI et Gemini dans la Factory, et lesquelles |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
 | `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` | fichier | 22,1 Ko | Prompt — construire le skill make-it-better et sa page de versions |
@@ -44,6 +45,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
 | `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
+| `Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` | fichier | 7,2 Ko | Synthèse Conseil — prompt « compétences OpenAI et Gemini » passé au crible L99, aucune déc |
 | `Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` | fichier | 7,8 Ko | Synthèse Conseil — prompt make-it-better avec Word et PDF, 1 décision attendue (02/11/2026 |
 | `Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` | fichier | 10,6 Ko | Synthèse Conseil — prompt du skill make-it-better passé au crible L99, 2 décisions attendu |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
@@ -188,4 +190,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_167 fichier(s), 4 sous-dossier(s)_
+_169 fichier(s), 4 sous-dossier(s)_

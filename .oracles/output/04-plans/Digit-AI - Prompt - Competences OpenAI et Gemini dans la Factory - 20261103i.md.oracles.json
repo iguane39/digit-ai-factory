@@ -1,0 +1,81 @@
+{
+  "cible": "output/04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+  "date_iso": "2026-11-03T14:18:35.196Z",
+  "registre_version": "2.51.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 6,
+    "fail": 0,
+    "skip": 1,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 0 total(aux) de colonne vérifié(s) par re-somme + 1 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 0/0 mesure(s) publiée(s) portant leur dénominateur et leurs unités + 0 indicateur(s) à valeur unique, 0 écart"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+      "verdict": "PASS",
+      "detail": "5 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (4 avertissement(s)) ; nombre « 2 000 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+    "ts": "2026-11-03T14:18:35.195Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md": "5001037a85ebab91de8e8374a88547243c83893c60e55f9c9facb5f3f1df0e53"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
