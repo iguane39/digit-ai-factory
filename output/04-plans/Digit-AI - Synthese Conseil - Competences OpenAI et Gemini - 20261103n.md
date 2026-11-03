@@ -59,7 +59,7 @@ Relecture d'intention : sans objet, motif : la relecture des consignes des 2 age
 
 ## 5. Non traité
 
-- **La publication du pilot** : motif, bloqué par un garde-fou ; à 16:00, `oracle-nom-client-publie` refuse l'envoi pour 16 constats d'un nom de produit réel, tous dans des fichiers d'une autre session, en attente de D-161. Mes commits restent locaux, `git rev-list` rend 0 6 ; critère de réouverture : D-161 tranchée et ses fichiers pseudonymisés.
+- **La publication du pilot** : motif, bloqué par un garde-fou ; à 16:00, `oracle-nom-client-publie` refuse l'envoi pour 16 constats d'un nom de produit réel, tous dans des fichiers d'une autre session, en attente de D-161. Mes commits restent locaux, `git rev-list --left-right --count` rend 0 7 à 16:01 ; critère de réouverture : D-161 tranchée et ses fichiers pseudonymisés.
 - **La construction des 3 compétences** : motif, dépendance à une décision humaine ; la construction attend votre choix du bloc 8.
 - **Le changement des modèles de forge-design et du signalement à Produit-82** : motif, écarté ; un changement de modèle se prouve par un appel payant sous le GO existant, et un produit ne reçoit de geste que sur son run, critère de réouverture : TF-2109 ou TF-2111 décidés.
 - **L'enregistrement de la réservation D-163** : motif, bloqué par un garde-fou ; le registre des décisions porte aussi les réservations 160 à 162 d'une autre session, non enregistrées, que je n'emporte pas.
