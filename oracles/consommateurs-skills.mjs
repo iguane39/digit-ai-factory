@@ -102,7 +102,8 @@ export function concernes(table, skills) {
  */
 export function resoudreInterprete(interprete, { existe = existsSync, env = process.env } = {}) {
   if (!interprete) return { requis: false };
-  const developper = (s) => String(s).replace(/%([A-Za-z_][A-Za-z0-9_]*)%|\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g,
+  // Windows admet des parenthèses dans un nom de variable : %ProgramFiles(x86)% (TF-2068).
+  const developper = (s) => String(s).replace(/%([A-Za-z_][A-Za-z0-9_()]*)%|\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g,
     (_, a, b) => env[a || b] || "");
   const parVariable = interprete.variable ? env[interprete.variable] : null;
   if (parVariable && existe(parVariable)) return { requis: true, chemin: parVariable, par: `$${interprete.variable}` };

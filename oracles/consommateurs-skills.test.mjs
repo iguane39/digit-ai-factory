@@ -182,6 +182,10 @@ check("INTERPRÈTE — résolu par variable d'environnement, puis par candidat, 
   if (parVar.chemin !== "/vu/bash" || !/FORGE_BASH_BANC/.test(parVar.par)) throw new Error(JSON.stringify(parVar));
   const parCand = resoudreInterprete(decl, { env: { RACINE_BANC: "/git" }, existe: (p) => p === "/git/bin/bash.exe" });
   if (parCand.chemin !== "/git/bin/bash.exe") throw new Error(JSON.stringify(parCand));
+  // Windows nomme une variable avec des parenthèses : %ProgramFiles(x86)% était toujours écarté (TF-2068).
+  const x86 = resoudreInterprete({ nom: "git-bash", candidats: ["%ProgramFiles(x86)%/Git/bin/bash.exe"] },
+    { env: { "ProgramFiles(x86)": "/px86" }, existe: (p) => p === "/px86/Git/bin/bash.exe" });
+  if (x86.chemin !== "/px86/Git/bin/bash.exe") throw new Error(`variable à parenthèses non développée : ${JSON.stringify(x86)}`);
   const absent = resoudreInterprete(decl, { env: {}, existe: () => false });
   if (absent.chemin !== null || !/INTROUVABLE/.test(absent.motif) || !/FORGE_BASH_BANC/.test(absent.motif)) throw new Error(JSON.stringify(absent));
   // Aucun chemin n'est écrit dans le module : sans déclaration, il n'exige aucun interprète.
