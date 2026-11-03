@@ -118,6 +118,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` | fichier | 13,1 Ko | Synthèse Mandat — retours et sujets de ce poste, après fusion avec l'autre poste (15/10/20 |
 | `Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md` | fichier | 8,1 Ko | Synthèse Mandat — installateur publié, commande Windows fiabilisée après mesure sur l'adre |
 | `Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md` | fichier | 12,0 Ko | Synthèse Mandat — installation de la factory sans question, avec une bannière finale d'opé |
+| `Digit-AI - Synthese Mandat - Kit du logo du produit de pentest - 20261103f.md` | fichier | 7,4 Ko | Synthèse Mandat — kit du logo du produit de pentest (03/11/2026) |
 | `Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md` | fichier | 9,8 Ko | Synthèse Mandat — prompt de l'agent nocturne amélioré : skill dans VS Code, liste de modif |
 | `Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` | fichier | 10,8 Ko | Synthèse Mandat — prompt « retravaille la cible » analysé : contrôles par forge et par cap |
 | `Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` | fichier | 5,0 Ko | Synthèse Mandat — les 18 gabarits de lecture tiennent la règle de largeur, D-154 exécutée  |
@@ -185,4 +186,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_164 fichier(s), 4 sous-dossier(s)_
+_165 fichier(s), 4 sous-dossier(s)_
