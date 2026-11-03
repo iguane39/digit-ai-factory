@@ -172,6 +172,25 @@ try {
     att(ok.code === 0 && ok.sortie.verdict === "PRESENT", `livrables produits : exit ${ok.code} ${ok.brut.slice(0, 300)}`);
   });
 
+  check("--verifier (TF-2080) : le verdict de design écrit par run-oracles sous .oracles/output/ est reconnu présent", () => {
+    const d = produit("verdict-sous-oracles");
+    const v = {};
+    for (const f of FORGES) v[f] = { verdict: "ecartee", motif: `la demande ne touche pas le domaine ${f}` };
+    v.design = { verdict: "mobilisee", motif: "document à la marque, verdict de format du livrable attendu" };
+    const w = lancer(d, ["--type", "document", "--verdicts", ecrireVerdicts(d, v), "--demande", "produire la note à la marque"]);
+    att(w.code === 0, `écriture de la trace : exit ${w.code} ${w.brut.slice(0, 200)}`);
+    // rouge : aucun verdict écrit → verdict-format manquant
+    const sans = lancer(d, ["--verifier"]);
+    att(sans.code === 1 && sans.sortie && sans.sortie.manquants.some((m) => /format du document|verdict-format/.test(m)),
+      `sans verdict, verdict-format doit manquer : exit ${sans.code} ${sans.brut.slice(0, 250)}`);
+    // vert : run-oracles écrit le compagnon sous .oracles/output/ (miroir de output/), reconnu par le chemin ajouté à la carte
+    mkdirSync(join(d, ".oracles", "output", "04-plans"), { recursive: true });
+    writeFileSync(join(d, ".oracles", "output", "04-plans", "note.md.oracles.json"), '{"verdict":"PASS"}', "utf8");
+    const avec = lancer(d, ["--verifier"]);
+    att(avec.code === 0 && avec.sortie && avec.sortie.verdict === "PRESENT",
+      `verdict sous .oracles/output/ doit être reconnu présent : exit ${avec.code} ${avec.brut.slice(0, 250)}`);
+  });
+
   check("une demande à deux types cumule leurs forges privilégiées (produit-neuf + site-web : seo-geo et websec privilégiées)", () => {
     const d = produit("deux-types");
     const v = verdictsProduitNeuf();

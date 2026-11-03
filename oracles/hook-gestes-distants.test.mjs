@@ -151,6 +151,14 @@ try {
     const w = spawnSync(process.execPath, [HOOK, "--poser", "--lot", spec, "--racine", p], { encoding: "utf8" });
     if (w.status !== 1 || !/reponse_humaine/.test(w.stderr)) throw new Error(`${w.status} ${w.stderr}`);
   });
+  check("12 ter (TF-2082) — une reponse_humaine « 10a » (lettre de décision) vaut : le geste du lot passe ; « ok » ne vaut pas", () => {
+    const p = projet();
+    ecrireLot(p, lotOk([gesteEssai], { reponse_humaine: "10a" }));
+    passe(jouer(p, "Bash", "az group delete --name rg-essai --yes"));
+    const q = projet();
+    ecrireLot(q, lotOk([gesteEssai], { reponse_humaine: "ok" }));
+    refuse(jouer(q, "Bash", "az group delete --name rg-essai --yes"));
+  });
   check("12 bis — `--poser` refuse une durée de 48 h et un geste sans retour arrière (exit 1, rien d'écrit)", () => {
     const p = projet();
     const spec = join(base, "lot12b.json");

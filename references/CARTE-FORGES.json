@@ -47,7 +47,7 @@
     "definitions-agents": { "libelle": "définitions d'agents", "chemins": [".claude/agents/*.md", "forge/etapes/agents/*.md"], "etabli": false, "source": "chemins posés par cette carte (le premier est l'emplacement des agents d'un projet Claude Code)" },
     "recette-agents": { "libelle": "recette des agents", "chemins": ["forge/etapes/agents/recette*"], "etabli": false, "source": "chemin posé par cette carte" },
     "verdict-agents-security": { "libelle": "verdict agents-security (oracle-scan-agentdef ou oracle-scan-toolcalls)", "chemins": ["forge/etapes/agents-security/*.json"], "etabli": false, "source": "chemin posé par cette carte ; oracles nommés par CONTRAT-INTERFACE.md section 5" },
-    "verdict-format": { "libelle": "verdict de l'oracle du format du document (fichier compagnon .oracles.json)", "chemins": ["output/**/*.oracles.json"], "etabli": false, "source": "chemin posé par cette carte, sur la forme des fichiers compagnons de verdict du pilot (<fichier>.oracles.json)" },
+    "verdict-format": { "libelle": "verdict de l'oracle du format du document (fichier compagnon .oracles.json)", "chemins": ["output/**/*.oracles.json", ".oracles/output/**/*.oracles.json"], "etabli": true, "source": "emplacement relevé (RT-35, TF-2080, 29/10/2026) : run-oracles écrit le compagnon de verdict sous .oracles/output/<chemin du livrable>.oracles.json, miroir de output/ ; le premier chemin reste pour un verdict écrit à côté du livrable" },
     "plan-observation": { "libelle": "plan d'observation (forge-observability/plan@1)", "chemins": ["forge/etapes/observability/plan*.json"], "etabli": false, "source": "chemin posé par cette carte ; format nommé par CONTRAT-INTERFACE.md section 5" }
   },
   "types": [

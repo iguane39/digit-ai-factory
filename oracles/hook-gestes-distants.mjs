@@ -414,11 +414,19 @@ export function lireLots(racines) {
 
 const texteNonVide = (x, min = 1) => typeof x === "string" && x.trim().length >= min;
 
+// TF-2082 (RT-37, 29/10/2026) : la préférence du porteur du 26/10 impose de citer la LETTRE de la
+// décision (« 10a », « 76c », « D-10 a ») ; une longueur minimale de 5 refusait cette forme que la
+// préférence rend obligatoire, et obligeait à habiller la citation pour passer. Une reponse_humaine
+// vaut désormais par un texte d'au moins 5 caractères OU par une citation de lettre de décision :
+// des chiffres suivis d'une lettre, « D- » et une parenthèse fermante admis.
+const CITATION_DECISION = /^\s*(?:d-?\s*)?\d{1,4}\s*[a-z]\)?\s*$/i;
+const reponseHumaineValide = (x) => texteNonVide(x, 5) || (typeof x === "string" && CITATION_DECISION.test(x));
+
 /** Un lot est-il valide à cet instant ? { ok, raison, jusqua } */
 export function lotValide(lot, maintenant = Date.now(), sessionId = null) {
   if (lot._illisible) return { ok: false, raison: "ligne illisible (JSON invalide)" };
   if (!/^D-\d+/.test(String(lot.decision || ""))) return { ok: false, raison: "pas de décision D-N" };
-  if (!texteNonVide(lot.reponse_humaine, 5)) return { ok: false, raison: "pas de reponse_humaine (les mots de l'humain)" };
+  if (!reponseHumaineValide(lot.reponse_humaine)) return { ok: false, raison: "pas de reponse_humaine (les mots de l'humain, ou la lettre de la décision : « 10a »)" };
   const t0 = Date.parse(lot.horodatage), t1 = Date.parse(lot.expire);
   if (!Number.isFinite(t0) || !Number.isFinite(t1)) return { ok: false, raison: "horodatage ou expire illisible" };
   if (!Array.isArray(lot.gestes) || !lot.gestes.length) return { ok: false, raison: "aucun geste listé" };
@@ -497,7 +505,7 @@ export function juger(entree, { lots = null, maintenant = Date.now(), env = proc
 /** Valide une spécification de lot et rend la ligne à inscrire, ou { erreur }. */
 export function construireLot(spec, { maintenant = Date.now(), dureeH = DUREE_MAX_H, session = null } = {}) {
   if (!/^D-\d+/.test(String(spec?.decision || ""))) return { erreur: "`decision` (D-N) manquante" };
-  if (!texteNonVide(spec.reponse_humaine, 5)) return { erreur: "`reponse_humaine` manquante : cite les mots de l'humain qui approuvent la liste" };
+  if (!reponseHumaineValide(spec.reponse_humaine)) return { erreur: "`reponse_humaine` manquante : cite les mots de l'humain qui approuvent la liste, ou la lettre de la décision (« 10a »)" };
   if (!Array.isArray(spec.gestes) || !spec.gestes.length) return { erreur: "`gestes` vide : la liste complète est exigée" };
   const bancal = spec.gestes.findIndex((g) => !texteNonVide(g?.commande) || !texteNonVide(g?.cible) || !texteNonVide(g?.effet) || !texteNonVide(g?.retour_arriere));
   if (bancal >= 0) return { erreur: `geste ${bancal + 1} : commande, cible, effet et retour_arriere sont tous exigés` };
