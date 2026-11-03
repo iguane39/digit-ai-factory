@@ -47,4 +47,8 @@ export const DEDIES = {
   "oracle-source-contenu.mjs": "oracle-source-contenu.test.mjs",
   // L'état présenté comme normal à côté d'un code d'erreur (TF-1511, décision du 12/10/2026).
   "oracle-ecart-normal.mjs": "oracle-ecart-normal.test.mjs",
+  // Le croisement des identifiants de modèles tiers du parc avec le calendrier de leurs fournisseurs
+  // (TF-2109, décision humaine « A2 » du 03/11/2026). Banc dédié : ses fixtures bâtissent des parcs
+  // jetables en dépôts git et y écrivent à dessein les identifiants arrêtés que l'oracle refuse.
+  "oracle-modeles-tiers.mjs": "oracle-modeles-tiers.test.mjs",
 };

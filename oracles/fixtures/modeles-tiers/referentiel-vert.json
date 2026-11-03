@@ -1,0 +1,34 @@
+{
+  "schema": "pilot/modeles-tiers@1",
+  "version": "0.0.1-fixture",
+  "date": "2026-11-03",
+  "regle": "Fixture de recette de oracle-modeles-tiers : identifiants fictifs, aucune valeur réelle.",
+  "fournisseurs": {
+    "fournisseur-a": {
+      "documentation": "https://exemple.invalid/doc/llms.txt",
+      "calendrier": "https://exemple.invalid/doc/deprecations",
+      "lu_le": "2026-11-03",
+      "modeles": [
+        { "id": "modele-a-arrete", "famille": "texte", "etat": "arrete", "depreciation": "2026-03-01", "arret": "2026-06-25", "remplacant": "modele-a-nouveau", "citation": "June 25, 2026 | modele-a-arrete | modele-a-nouveau" },
+        { "id": "modele-a-nouveau", "famille": "texte", "etat": "courant", "depreciation": null, "arret": null, "remplacant": null, "citation": "recommended replacement : modele-a-nouveau" },
+        { "id": "modele-b-bientot", "famille": "texte", "etat": "deprecie", "depreciation": "2026-10-14", "arret": "2027-01-14", "remplacant": "modele-a-nouveau", "citation": "January 14, 2027 | modele-b-bientot | modele-a-nouveau" },
+        { "id": "modele-c-sans-date", "famille": "image", "etat": "deprecie", "depreciation": null, "arret": null, "remplacant": "modele-a-nouveau", "citation": "modele-c-sans-date | No shutdown date announced | modele-a-nouveau" },
+        { "id": "modele-d-lointain", "famille": "texte", "etat": "deprecie", "depreciation": "2026-10-01", "arret": "2027-05-07", "remplacant": "modele-a-nouveau", "citation": "May 7, 2027 | modele-d-lointain | modele-a-nouveau" },
+        { "id": "modele-f-90j", "famille": "texte", "etat": "deprecie", "depreciation": null, "arret": "2027-02-01", "remplacant": null, "citation": "February 1, 2027 | modele-f-90j" },
+        { "id": "modele-g-89j", "famille": "texte", "etat": "deprecie", "depreciation": null, "arret": "2027-01-31", "remplacant": null, "citation": "January 31, 2027 | modele-g-89j" },
+        { "id": "alpha-4o", "famille": "texte", "etat": "deprecie", "depreciation": null, "arret": "2026-12-01", "remplacant": "alpha-6", "citation": "December 1, 2026 | alpha-4o | alpha-6" },
+        { "id": "alpha-4o-mini", "famille": "texte", "etat": "courant", "depreciation": null, "arret": null, "remplacant": null, "citation": "alpha-4o-mini | No shutdown date announced" },
+        { "id": "alpha-5", "famille": "texte", "etat": "deprecie", "depreciation": null, "arret": "2026-12-11", "remplacant": "alpha-5.6", "citation": "Dec 11, 2026 | alpha-5 | alpha-5.6" },
+        { "id": "alpha-5.6", "famille": "texte", "etat": "courant", "depreciation": null, "arret": null, "remplacant": null, "citation": "recommended replacement : alpha-5.6" },
+        { "id": "orbe3", "famille": "texte", "etat": "arrete", "depreciation": null, "arret": "2026-05-01", "remplacant": "alpha-6", "citation": "May 1, 2026 | orbe3 | alpha-6" },
+        { "id": "modele-h-aujourdhui", "famille": "texte", "etat": "deprecie", "depreciation": null, "arret": "2026-11-03", "remplacant": null, "citation": "November 3, 2026 | modele-h-aujourdhui" }
+      ],
+      "api": [
+        { "id": "points-d-acces-v0", "etat": "arrete", "arret": "2026-08-26", "remplacant": "points-d-acces-v1", "citation": "2026-08-26 | /v0/ancien-point | /v1/nouveau-point", "litteraux": ["/v0/ancien-point"] }
+      ],
+      "bibliotheques": [
+        { "paquet": "bibliotheque-a", "langage": "Python", "depot": "https://exemple.invalid/depot-a", "version": "1.0.0", "publiee_le": "2026-10-01", "etat": "courante" }
+      ]
+    }
+  }
+}

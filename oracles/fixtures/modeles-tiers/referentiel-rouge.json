@@ -1,0 +1,20 @@
+{
+  "schema": "pilot/modeles-tiers@1",
+  "date": "03/11/2026",
+  "fournisseurs": {
+    "fournisseur-a": {
+      "documentation": "https://exemple.invalid/doc/llms.txt",
+      "calendrier": "https://exemple.invalid/doc/deprecations",
+      "lu_le": "2026-11-03",
+      "modeles": [
+        { "id": "modele-x-etat-inconnu", "famille": "texte", "etat": "arrété", "arret": "2026-06-25", "citation": "x" },
+        { "id": "modele-y-date-mal-formee", "famille": "texte", "etat": "deprecie", "arret": "14/01/2027", "citation": "y" },
+        { "id": "modele-z-sans-citation", "famille": "texte", "etat": "deprecie", "arret": "2027-01-14" },
+        { "id": "modele-w-arrete-sans-date", "famille": "texte", "etat": "arrete", "citation": "w" },
+        { "id": "modele-v-arrete-futur", "famille": "texte", "etat": "arrete", "arret": "2027-06-01", "citation": "v" },
+        { "id": "modele-u-double", "famille": "texte", "etat": "courant", "citation": "u" },
+        { "id": "modele-u-double", "famille": "texte", "etat": "courant", "citation": "u" }
+      ]
+    }
+  }
+}
