@@ -432,7 +432,9 @@ if (iPilot < 0) {
       // le moindre mal. L'affichage à l'écran, lui, garde les chemins réels — il n'est pas suivi.
       try {
         const { pseudonymeProduit } = await import("../scripts/lib-pseudonyme-produit.mjs");
-        appendFileSync(join(PILOT, "todo", "HERITAGE-RELEVES.jsonl"), JSON.stringify({
+        // TF-2067 : FORGE_HERITAGE_RELEVES désigne un autre journal (la recette du hook le pose sous un dossier
+        // temporaire : une recette n'écrit pas le registre du dépôt qui la joue). Absent, le comportement est inchangé.
+        appendFileSync(process.env.FORGE_HERITAGE_RELEVES || join(PILOT, "todo", "HERITAGE-RELEVES.jsonl"), JSON.stringify({
           ts: new Date().toISOString(), contrat: j.contrat, produits: (j.lignes || []).map((l) => ({
             produit: pseudonymeProduit(l.produit), absents: l.absents, divergents: l.divergents, incomplets: l.incomplets, total: l.total,
             artefacts: (l.artefacts || []).map((a) => ({ cible: a.cible, etat: a.etat })),

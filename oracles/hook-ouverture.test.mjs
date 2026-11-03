@@ -38,6 +38,15 @@ const PILOT = join(ICI, "..");
 // doit JAMAIS déclencher le vrai : le lancement est coupé pour tous les passages ci-dessous, et seul le banc du rejeu (fin de fichier) le rétablit,
 // sur une table factice et une trace jetable.
 process.env.FORGE_SANS_REJEU_HEBDOMADAIRE = "1";
+// TF-2067 : une recette n'écrit pas le registre du dépôt qui la joue. L'ouverture du pilot écrit, dans des fichiers SUIVIS, le passage
+// hebdomadaire des récidives (todo/observabilite/snapshots-recidives.jsonl et RECIDIVES.json, dès que le dernier relevé a 7 jours) et le journal
+// d'héritage (todo/HERITAGE-RELEVES.jsonl). Les deux sont coupés ici, une fois pour tout le fichier, et non appel par appel : le passage
+// des consommateurs (TF-2048) n'avait pas le drapeau et réécrivait ces fichiers à chaque recette jouée après 7 jours sans relevé.
+// L'observation est SAUTÉE plutôt que déroutée : son plan écrit par des chemins relatifs à la racine du pilot. Le journal d'héritage, lui,
+// est dérouté vers un fichier jetable, que le banc « TF-2067 » ci-dessous lit pour prouver que l'écriture a bien lieu — ailleurs.
+process.env.FORGE_SANS_OBSERVATION = "1";
+const HERITAGE_JETABLE = join(TABLES, "HERITAGE-RELEVES.jsonl");
+process.env.FORGE_HERITAGE_RELEVES = HERITAGE_JETABLE;
 
 const NL = String.fromCharCode(10);
 const EXEMPLE = [
@@ -884,5 +893,36 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   }
 }
 
-console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135) : ${pass} PASS, ${fail} FAIL`);
+// ---- TF-2067 : le journal d'héritage de l'ouverture du pilot s'écrit où FORGE_HERITAGE_RELEVES le désigne ------------------------------------
+// Tables de pseudonymes PRÉSENTES et produit connu d'elles : c'est le cas où l'ouverture journalise, donc le seul où une recette écrirait
+// `todo/HERITAGE-RELEVES.jsonl` si le déroutement manquait (jusqu'ici seule l'absence des tables l'en empêchait). Tout est jetable.
+{
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-heritage-"));
+  const racine = join(dossier, "parc");
+  mkdirSync(join(racine, "produit-banc-heritage", "forge"), { recursive: true });
+  writeFileSync(join(racine, "produit-banc-heritage", "forge", "ledger.jsonl"), "", "utf8");
+  writeFileSync(join(dossier, "_noms-interdits.json"), JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+  writeFileSync(join(dossier, "_produits-pseudonymes.json"), JSON.stringify({ produits: { "produit-banc-heritage": "Produit-77" } }), "utf8");
+  const journal = join(dossier, "HERITAGE-RELEVES.jsonl");
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-heritage-cwd-"));
+  const jouer = (extra) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
+    { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racine, FORGE_NOMS_INTERDITS: join(dossier, "_noms-interdits.json"),
+      FORGE_PRODUITS_PSEUDO: join(dossier, "_produits-pseudonymes.json"), FORGE_HERITAGE_RELEVES: journal, ...extra } });
+  try {
+    const sortie = jouer({});
+    check("TF-2067 vert — avec des tables présentes, le relevé d'héritage est journalisé dans le fichier désigné, sous pseudonyme", () => {
+      if (!existsSync(journal)) throw new Error(`rien écrit dans ${journal} (sortie : ${sortie.slice(0, 200)})`);
+      const lignes = readFileSync(journal, "utf8").split(NL).filter(Boolean);
+      if (lignes.length !== 1) throw new Error(`${lignes.length} lignes écrites, une attendue`);
+      const noms = (JSON.parse(lignes[0]).produits || []).map((p) => p.produit);
+      if (!noms.includes("Produit-77")) throw new Error(`pseudonyme absent du journal : ${noms.join(", ")}`);
+      if (/produit-banc-heritage/.test(lignes[0])) throw new Error("le nom réel du produit est entré dans le journal");
+    });
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+    rmSync(cwd, { recursive: true, force: true });
+  }
+}
+
+console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135 ; journal d'héritage, TF-2067) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
