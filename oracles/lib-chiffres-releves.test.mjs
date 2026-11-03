@@ -28,6 +28,11 @@ check("vert — le même chiffre lu dans une sortie du tour passe, à la graphie
 check("vert — une ligne qui déclare le chiffre non mesuré, estimé ou visé n'est pas accusée", () => {
   for (const l of ["Score de 84 sur 100, projeté et non mesuré.", "Environ 15 minutes.", "Objectif : de 6 à 0 en 30 jours."]) att(!figures(l, "").length, l);
 });
+check("« visé » (TF-2066) — rouge : le délai visé n'est pas accusé ; vert : un autre sens (révisé, visite, viser) l'est toujours", () => {
+  // La frontière `\b` ne voit pas le « é » : « visé » en fin de mot n'était pas reconnu, « visée » et « visés » l'étaient.
+  for (const l of ["Le délai visé est de 15 minutes.", "Les délais visés : 15 minutes.", "La durée visée dure 15 minutes.", "Délai visé 15 minutes."]) att(!figures(l, "").length, l);
+  for (const l of ["Le texte révisé dure 15 minutes.", "Une visite de 15 minutes.", "Il faut viser 15 minutes.", "Un plan avisé coûte 15 minutes."]) att(figures(l, "").length === 1, `accusation perdue : ${l}`);
+});
 check("borne — le bloc 1, le bloc 9, le code, un lien encodé et un chemin ne sont pas lus", () => {
   att(!figures("## 1. En-tête\nDurée 12 minutes.\n## 9. Traces\n40 fichiers.\n", "").length, "blocs 1 et 9 lus");
   att(!figures("```\n99 tests\n```\n", "").length, "bloc de code lu");

@@ -35,7 +35,7 @@ const FIGURES = [
   ["volume", new RegExp(String.raw`(?<![\d.,:/-])(${NOMBRE})\s*(?:jetons?\b|tokens?\b|Ko\b|Mo\b|Go\b)`, "gu")],
   ["compte", new RegExp(String.raw`(?<![\d.,:/-])(${NOMBRE})\s+(?:fichiers?|lignes?|tests?|cas\b|commits?|sessions?|demandes?|refus\b|erreurs?|d[ée]fauts?|produits?|scripts?|contr[ôo]les?|entr[ée]es\b|items?\b|occurrences?)`, "giu")],
 ];
-export const DECLARE_NON_MESURE = /non mesur|non recompt|non v[ée]rifi|projet[ée]|estim|environ|hypoth|à mesurer|\bcible\b|objectif|attendue?s?\b|vis[ée]e?s?\b|d'ici|plafond|seuil|au plus|au moins/i;
+export const DECLARE_NON_MESURE = /non mesur|non recompt|non v[ée]rifi|projet[ée]|estim|environ|hypoth|à mesurer|\bcible\b|objectif|attendue?s?\b|(?<![A-Za-zÀ-ÿ])vis[ée]e?s?(?![A-Za-zÀ-ÿ])|d'ici|plafond|seuil|au plus|au moins/i;
 
 /**
  * Les chiffres d'une réponse qu'aucune sortie du tour ne montre : [{ nature, chiffre, ligne }]. Le bloc 1 (l'heure, jugée par S84) et le
