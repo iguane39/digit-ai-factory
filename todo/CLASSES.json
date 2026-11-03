@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.59.0",
+ "version": "1.60.0",
  "date": "2026-11-03",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -2823,6 +2823,139 @@
    ],
    "regle": "forge-audit : tout outil de tools/ refuse un argument commençant par « - » comme dossier cible et affiche l'usage (récidive de TF-1181) (proposé, à sceller à la clôture)",
    "oracle": "forge-audit, recette des outils de tools/ (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "adaptateur-plante-emporte-le-rapport",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un adaptateur d'audit plante sur une entrée absente au lieu de rendre sans objet, et le rapport entier sort en ERREUR. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2090"
+   ],
+   "regle": "forge-tests : un adaptateur teste l'absence de sa source (sans_objet) avant de l'exercer (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette de l'analyseur (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "audit-mute-l-arbre-audite",
+   "famille": "hook-ou-gate",
+   "libelle": "Une campagne d'audit altère en place les sources du projet audité : une écriture ou un commit concurrent peut figer un mutant. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2091"
+   ],
+   "regle": "forge-tests : la campagne de mutation travaille sur une copie, ou pose un verrou lu par les hooks de la factory (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette de la campagne de mutation (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "ressource-statique-generee-sans-version",
+   "famille": "page-html-socle",
+   "libelle": "Une page générée par un script de la factory charge une ressource statique sans version ni empreinte. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2094"
+   ],
+   "regle": "pilot : les générateurs de projections (ARCHITECTURE.html, MODELE-DONNEES.html) versionnent l'adresse des ressources statiques par empreinte (proposé, à sceller à la clôture)",
+   "oracle": "pilot, recette des générateurs de projections (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "capture-de-preuve-porte-un-jeton",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une capture produite par un outil de forge conserve un jeton ou un cookie réel, et la preuve versionnée l'emporte dans le dépôt. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2095",
+    "TF-2100"
+   ],
+   "regle": "forge-websec et forge-tests : une capture caviarde la valeur des cookies et des champs cachés, ou s'écrit hors de l'arbre versionné du produit (proposé, à sceller à la clôture)",
+   "oracle": "forge-websec et forge-tests, recettes de capture (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "regle-de-framework-hors-framework",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un audit applique une règle propre à un framework absent des dépendances du projet et produit des bloquants faux. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2096"
+   ],
+   "regle": "forge-tests : les règles propres à un framework ne se jouent que si ce framework figure dans les dépendances du projet (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan sécurité (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "motif-reconnu-sur-la-cible-pas-sur-le-lien",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un contrôle reconnaît un motif sur la page qui le porte, mais pas sur la page qui y renvoie. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2097"
+   ],
+   "regle": "forge-tests : le contrôle interface/création reconnaît un lien dont la cible porte le motif de page dédiée (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan interface (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "instance-tls-locale-injoignable",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un pan d'audit à navigateur ne peut pas joindre une instance locale servie en TLS auto-signé, faute d'option déclarée. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2098"
+   ],
+   "regle": "forge-tests : une option déclarée, bornée aux hôtes de boucle locale, autorise un certificat auto-signé pour le pan qualif (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan qualif (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "mire-standard-non-reconnue",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un pan d'audit ne reconnaît pas le champ identifiant d'une mire standard et poursuit en anonyme. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2099"
+   ],
+   "regle": "forge-tests : le sélecteur d'identifiant reconnaît autocomplete=username et un champ sans attribut type (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan qualif (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "livrable-de-forge-hors-critique",
+   "famille": "page-html-socle",
+   "libelle": "Un livrable HTML généré par une forge n'est pas jugé par la critique d'implémentation d'une autre forge et la refuse. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2101"
+   ],
+   "regle": "forge-tests : le gabarit du tableau de bord passe par run-oracles-design de forge-design dans la recette de la forge (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du gabarit de tableau de bord (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "lexique-de-langue-incomplet",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un oracle d'écriture juge sur un lexique fermé qui ignore des formes courantes de la langue et produit des bloquants faux. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2102"
+   ],
+   "regle": "forge-design : oracle-textes-application complète son lexique, ou ne bloque pas sur une forme hors lexique (proposé, à sceller à la clôture)",
+   "oracle": "forge-design, recette d'oracle-textes-application (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "perimetre-de-session-confondu",
+   "famille": "hook-ou-gate",
+   "libelle": "Un juge de fin de tour attribue à la session les fichiers qu'une autre session a écrits dans le même arbre. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2103"
+   ],
+   "regle": "pilot : la relecture d'intention n'attribue au tour que les fichiers écrits par la session courante (proposé, à sceller à la clôture)",
+   "oracle": "pilot, recette de la relecture d'intention (proposé, à outiller à la clôture)",
    "voisines": []
   }
  ],
