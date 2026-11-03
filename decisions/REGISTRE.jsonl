@@ -153,3 +153,4 @@
 {"type":"decision","n":156,"question":"Faut-il essayer le skill de création de logo logo-design-skill pour les produits neufs sans logo ?","date":"2026-11-03","ts":"2026-11-03T08:44:51.279Z","session":"a1f1254b","origine":"reservation"}
 {"type":"decision","n":157,"question":"La colonne Motif du tableau de tri doit-elle aussi dire vos choix déjà faits sur chaque sujet ?","date":"2026-11-03","ts":"2026-11-03T08:59:33.194Z","session":"a1f1254b","origine":"reservation"}
 {"type":"decision","n":158,"question":"Quel concept de logo retenir pour le produit de pentest, avant de finir son jeu d'icônes ?","date":"2026-11-03","ts":"2026-11-03T09:52:43.696Z","session":"a1f1254b","origine":"reservation"}
+{"type":"decision","n":159,"question":"Faut-il admettre la fiche d'expertise en sécurité offensive que le juge d'admission a refusée deux fois ?","date":"2026-11-03","ts":"2026-11-03T11:06:26.853Z","session":"2afcf2b9","origine":"reservation"}
