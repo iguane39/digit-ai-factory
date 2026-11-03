@@ -110,6 +110,19 @@ check("le motif d'appel payant est court et ne mord pas sur n'importe quelle API
   if (!RE_APPEL_PAYANT.test("process.env.ANTHROPIC_API_KEY")) throw new Error("le motif est trop étroit");
 });
 
+check("le motif reconnaît Gemini et Azure OpenAI, pas seulement Anthropic et OpenAI", () => {
+  const appels = [
+    "let cle = process.env.GEMINI_API_KEY;",
+    "fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`)",
+    'import { GoogleGenAI } from "@google/genai";',
+    "const ai = new GoogleGenAI({ apiKey });",
+    "from google import genai",
+    'curl -X POST "https://x.openai.azure.com/openai/deployments/d/chat/completions"',
+  ];
+  for (const a of appels) if (!RE_APPEL_PAYANT.test(a)) throw new Error(`appel payant non vu : ${a}`);
+  if (RE_APPEL_PAYANT.test("const GEMINI_IMAGE_MODEL_LISIBLE = 'note';")) throw new Error("le motif mord sur un nom voisin");
+});
+
 check("le verdict PUBLIE ce qu'il n'a pas jugé, dont le plafond de dépense", () => {
   if (!Array.isArray(NON_JUGE) || NON_JUGE.length < 3) throw new Error("non_juge absent ou squelettique");
   if (!NON_JUGE.some((x) => /plafond/i.test(x))) throw new Error("la borne principale n'est pas déclarée");

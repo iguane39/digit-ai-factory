@@ -1,0 +1,81 @@
+{
+  "cible": "output/03-etudes/Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+  "date_iso": "2026-11-03T14:55:35.083Z",
+  "registre_version": "2.51.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+      "verdict": "SKIP",
+      "detail": "aucune affirmation chiffrée hors table détectée"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 4 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 0 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md",
+    "ts": "2026-11-03T14:55:35.082Z",
+    "fichiers": {
+      "output\\03-etudes\\Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md": "9b22456b254cfe8efdb872d9f6dbd9b3c64151338c08d883a994fd49f484afa3"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

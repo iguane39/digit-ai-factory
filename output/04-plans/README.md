@@ -37,6 +37,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md` | fichier | 6,5 Ko | Synthèse Conseil — bases de développement et de qualification dans les forges, prompt 2026 |
 | `Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` | fichier | 7,1 Ko | Synthèse Conseil — faire tourner L99 en boucle jusqu'à un score, étude d'opportunité (16/1 |
 | `Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 6,8 Ko | Synthèse Conseil — compétences Cloudflare, GitHub et Supabase identifiées, 17 propositions |
+| `Digit-AI - Synthese Conseil - Competences OpenAI et Gemini - 20261103n.md` | fichier | 9,2 Ko | Synthèse Conseil — compétences OpenAI et Gemini dans la Factory : oui, 3 à construire, 1 d |
 | `Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` | fichier | 24,9 Ko | Synthèse Conseil — 12 décisions à trancher, une qualification de noms et 4 gestes humains  |
 | `Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md` | fichier | 4,0 Ko | Synthèse Conseil — détail de l'étude d'une étape de revue de code (03/11/2026) |
 | `Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md` | fichier | 18,8 Ko | Synthèse Conseil — éléments à traiter du tri TikTok et options (02/11/2026) |
@@ -192,4 +193,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_171 fichier(s), 4 sous-dossier(s)_
+_172 fichier(s), 4 sous-dossier(s)_

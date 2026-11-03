@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 631 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 633 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -252,6 +252,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md | 20261102f | 35.8 Ko | `03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` |
 | Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
+| Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md | 20261103l | 198.5 Ko | `03-etudes/Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` |
 | Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md | 20261103k | 13 Ko | `03-etudes/Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` |
 | Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md | 20261102t | 25.3 Ko | `03-etudes/Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
@@ -519,6 +520,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md | 20261029c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md` |
 | Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md | 20261016f | 7.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` |
 | Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 6.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` |
+| Digit-AI - Synthese Conseil - Competences OpenAI et Gemini - 20261103n.md | 20261103n | 9.2 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences OpenAI et Gemini - 20261103n.md` |
 | Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md | 20261017a | 24.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` |
 | Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md | 20261103h | 4 Ko | `04-plans/Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md` |
 | Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md | 20261102o | 18.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md` |

@@ -50,8 +50,10 @@ const args = process.argv.slice(2);
 /** Les dépôts dont la voie par défaut est jugée : ceux qui AUDITENT, donc ceux qui peuvent dépenser. */
 export const DEPOTS_AUDITEURS = ["digit-ai-forge-audit", "digit-ai-forge-agents"];
 
-/** La marque d'un appel à un modèle payant. Une clé, un point d'entrée distant, un client de SDK. */
-export const RE_APPEL_PAYANT = /ANTHROPIC_API_KEY|OPENAI_API_KEY|api\.anthropic\.com|api\.openai\.com|new\s+(?:Anthropic|OpenAI)\s*\(|from\s+["']@anthropic-ai\/|from\s+["']openai["']|import\s+anthropic\b|import\s+openai\b/;
+/** La marque d'un appel à un modèle payant. Une clé, un point d'entrée distant, un client de SDK.
+ *  Gemini et Azure OpenAI ajoutés le 03/11/2026 : le motif ne reconnaissait qu'Anthropic et OpenAI,
+ *  et un appel à Gemini dans un dépôt auditeur passait sans être vu (étude 20261103 OpenAI et Gemini). */
+export const RE_APPEL_PAYANT = /ANTHROPIC_API_KEY|OPENAI_API_KEY|GEMINI_API_KEY|api\.anthropic\.com|api\.openai\.com|\.openai\.azure\.com|generativelanguage\.googleapis\.com|new\s+(?:Anthropic|OpenAI|AzureOpenAI|GoogleGenAI)\s*\(|from\s+["']@anthropic-ai\/|from\s+["']openai["']|from\s+["']@google\/(?:genai|generative-ai)["']|import\s+anthropic\b|import\s+openai\b|from\s+google\s+import\s+genai\b|import\s+google\.generativeai\b/;
 
 /** Un garde d'option : le fichier lit un drapeau de ligne de commande avant d'agir. */
 export const RE_GARDE_OPTION = /(?:argv|args|process\.argv|sys\.argv)[^\n]{0,80}(?:includes|indexOf|in\s|contains)[^\n]{0,40}["'`]--/;
