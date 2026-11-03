@@ -1153,6 +1153,20 @@ try {
     const rappel = cR(D61_RAPPEL, nu);
     if (rappel.verdict !== "PASS")
       echecs.push(`52 ter : un rappel d'une ligne (S4) n'est pas une D-N nouvelle → attendu PASS, obtenu ${JSON.stringify(rappel).slice(0, 200)}`);
+    // 52 ter bis — TF-2081 (RT-36, 03/11/2026) : UNE D-N NOUVELLE POSÉE EN PUCE, HORS DU FORMAT « > **D-N — …** », EST VUE. Le 29/10, D-1, D-2 et
+    // D-3 en puces (deux-points) passaient sous RÉSERVATION, et D-1 était déjà pris. Double sens : une puce à deux-points ET une puce sans séparateur,
+    // toutes deux closes par « ? », sont détectées (FAIL) ; le rappel S4 en puce à deux-points SANS « ? » reste épargné — le « ? » terminal discrimine.
+    const bloc3Puces = "## 3. Décisions attendues\n\n- **D-61 :** Faut-il publier maintenant la version corrigée du démarrage ?\n- **D-62** Faut-il enchaîner sur la forge-ops ce soir ?\n\n";
+    const D61_PUCES = BON.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, bloc3Puces) + "\n- Remontée à la factory : rien à remonter.\n";
+    const bloc3PuceRappel = "## 3. Décisions attendues\n\n- **D-61 :** publication de la version corrigée du démarrage, posée le 18/10 à 10:00, inchangée.\n\n";
+    const D61_PUCE_RAPPEL = BON.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, bloc3PuceRappel) + "\n- Remontée à la factory : rien à remonter.\n";
+    if (D61_PUCES === BON || D61_PUCE_RAPPEL === BON) echecs.push("52 ter bis : une fixture en puces n'a pas été modifiée — le cas ne prouve plus rien");
+    const puces = cR(D61_PUCES, nu);
+    if (puces.verdict !== "FAIL" || !/D-61/.test((puces.ecarts || []).join(" ")) || !/D-62/.test((puces.ecarts || []).join(" ")))
+      echecs.push(`52 ter bis : D-61 (deux-points) et D-62 (sans séparateur) posées EN PUCE, nouvelles et absentes du registre → attendu FAIL nommant les deux (TF-2081), obtenu ${JSON.stringify(puces).slice(0, 280)}`);
+    const puceRappel = cR(D61_PUCE_RAPPEL, nu);
+    if (puceRappel.verdict !== "PASS")
+      echecs.push(`52 ter ter : un rappel S4 en puce à deux-points, SANS « ? », n'est pas une D-N nouvelle → attendu PASS (TF-2081 garde le « ? » terminal), obtenu ${JSON.stringify(puceRappel).slice(0, 200)}`);
     for (const [quoi, extra] of [["citée par le message précédent", { textePrecedent: "## 3\n- **D-61 —** Publier ? (a) oui (b) non" }],
       ["nommée par l'humain (« 61a »)", { dernierHumain: "61a" }], ["nommée par l'humain (« 61 détaille »)", { dernierHumain: "61 détaille" }]]) {
       const r = cR(D61, nu, extra);

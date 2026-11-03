@@ -36,7 +36,7 @@ const H1 = "Étudie « l'opportunité » d'un relecteur,\navec deux lignes et de
 const H2 = "pour chaque liste, pas seulement les longues";
 const H3 = "23a + b";
 const humain = (texte, extra = {}) => JSON.stringify({ type: "user", origin: { kind: "human" }, timestamp: "2026-10-18T10:00:00Z", message: { role: "user", content: [{ type: "text", text: texte }] }, ...extra });
-const assistant = (blocs) => JSON.stringify({ type: "assistant", timestamp: "2026-10-18T10:00:05Z", message: { id: `m${Math.random()}`, role: "assistant", content: blocs } });
+const assistant = (blocs, ts = "2026-10-18T10:00:05Z") => JSON.stringify({ type: "assistant", timestamp: ts, message: { id: `m${Math.random()}`, role: "assistant", content: blocs } });
 const texte = (t) => ({ type: "text", text: t });
 const outil = (name, input) => ({ type: "tool_use", id: `t${Math.random()}`, name, input });
 
@@ -551,7 +551,10 @@ try {
   const HORS = join(T, "hors-depot"); mkdirSync(HORS, { recursive: true });
   const S0 = join(HORS, "s0.md"), S1 = join(HORS, "s1.md");
   writeFileSync(S0, "CONTENU-S0-ECRIT-AVANT-LE-MESSAGE\n"); writeFileSync(S1, "CONTENU-SOUS-AGENT-S1\n");
-  writeFileSync(TR2, [humain("Mets en place X.", { timestamp: T0 }), assistant([outil("Write", { file_path: join(REPO, "a.txt"), content: "x" })]), assistant([texte("Fini.")])].join("\n") + "\n");
+  // TF-2103 : la session lance une commande de 10:10 à 10:45 (fenêtre) ; les fichiers du dépôt modifiés dans cet intervalle (c, d, n, .env, 10:15–10:40)
+  // lui sont attribués comme écritures de programme, a.txt l'est comme Write (cheminsConnus). Sans cette fenêtre, ils seraient tenus pour une autre session.
+  writeFileSync(TR2, [humain("Mets en place X.", { timestamp: T0 }), assistant([outil("Write", { file_path: join(REPO, "a.txt"), content: "x" })]),
+    assistant([outil("Bash", { command: "node genere.mjs" })], "2026-10-18T10:10:00Z"), assistant([texte("Fini.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
   const SA = join(SESSION2, "session2", "subagents"); mkdirSync(SA, { recursive: true });
   const rec = (ts, blocs) => JSON.stringify({ type: "assistant", isSidechain: true, timestamp: ts, message: { role: "assistant", content: blocs } });
   writeFileSync(join(SA, "agent-aaa.jsonl"), [rec("2026-10-18T09:30:00Z", [outil("Write", { file_path: S0, content: "x" })]), rec("2026-10-18T10:20:00Z", [outil("Write", { file_path: S1, content: "x" })]),
@@ -597,12 +600,35 @@ try {
     const { d: R2, g: g2 } = mkRepo("depot-borne");
     g2(["commit", "-q", "--allow-empty", "-m", "base"], "2026-10-18T09:00:00Z");
     for (let i = 0; i < 45; i++) ecrireA(join(R2, `f${String(i).padStart(2, "0")}.txt`), `contenu ${i}\n`, date("10:30"));
-    const tr = join(T, "borne-depot.jsonl"); writeFileSync(tr, humain("Mets en place Y.", { timestamp: T0 }) + "\n");
+    // TF-2103 : une commande (fenêtre 10:10–10:45) attribue au tour les 45 fichiers modifiés à 10:30.
+    const tr = join(T, "borne-depot.jsonl"); writeFileSync(tr, [humain("Mets en place Y.", { timestamp: T0 }),
+      assistant([outil("Bash", { command: "node genere.mjs" })], "2026-10-18T10:10:00Z"), assistant([texte("Fini.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
     const d = join(T, "sortie-borne-depot"); executer(["--preparer", "fin-de-tour", "--transcript", tr, "--sortie", d], {}, new Date(), { cwd: R2, maison: MAISON });
     const l = readFileSync(join(d, "livrables.md"), "utf8");
     if (!/\[BORNE : 5 fichier\(s\) du dépôt cité\(s\) par leur seul chemin, contenu omis \(borne 40 fichiers et 80000 caractères\)/.test(l)) throw new Error("borne non dite : " + (l.match(/\[BORNE[^\]]*/) || ["aucune"])[0].slice(0, 200));
     egal((l.match(/^### f\d\d\.txt/gm) || []).length, 40, "fichiers cités avec contenu");
     if (!/45 fichier\(s\) retenu\(s\)/.test(l)) throw new Error("total non dit");
+  });
+
+  // ==== TF-2103 (03/11/2026) : la relecture n'attribue au tour que les fichiers de la session courante ====
+  check("vert/rouge — TF-2103 : un fichier modifié PENDANT une commande du tour est attribué ; un fichier écrit par une AUTRE session du même arbre, hors de toute fenêtre de commande, ne l'est pas (et l'exclusion est dite)", () => {
+    const { d: R3, g: g3 } = mkRepo("depot-2103");
+    ecrireA(join(R3, "notre.txt"), "base\n", date("08:00"));
+    ecrireA(join(R3, "autre.txt"), "base\n", date("08:00"));
+    g3(["add", "-A"]); g3(["commit", "-q", "-m", "base"], "2026-10-18T09:00:00Z");
+    ecrireA(join(R3, "notre.txt"), "ecrit-par-notre-programme\n", date("10:30"));     // dans la fenêtre de commande 10:10–10:45
+    ecrireA(join(R3, "autre.txt"), "ecrit-par-une-AUTRE-session\n", date("10:50"));   // après la dernière activité du tour : une autre session
+    const tr = join(T, "tr-2103.jsonl");
+    writeFileSync(tr, [humain("Mets à jour notre.txt.", { timestamp: T0 }),
+      assistant([outil("Bash", { command: "node maj.mjs" })], "2026-10-18T10:10:00Z"),
+      assistant([texte("Fait.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
+    const d = join(T, "sortie-2103");
+    executer(["--preparer", "fin-de-tour", "--transcript", tr, "--sortie", d], {}, new Date(), { cwd: R3, maison: MAISON });
+    const l = readFileSync(join(d, "livrables.md"), "utf8");
+    const sec = l.slice(l.indexOf("## Fichiers du dépôt"), l.indexOf("## Commits du dépôt relu"));
+    if (!/### notre\.txt/.test(sec) || !sec.includes("ecrit-par-notre-programme")) throw new Error("le fichier modifié pendant une commande du tour n'est pas attribué : " + sec.slice(0, 600));
+    if (/### autre\.txt/.test(sec) || sec.includes("ecrit-par-une-AUTRE-session")) throw new Error("un fichier écrit par une AUTRE session (hors fenêtre de commande) est attribué au tour : " + sec.slice(0, 600));
+    if (!/1 fichier\(s\) modifié\(s\) hors d'une commande de cette session — écrit\(s\) par une AUTRE session du même arbre, non attribué\(s\) à ce tour \(TF-2103\)/.test(sec)) throw new Error("l'exclusion de l'autre session n'est pas DITE : " + sec.slice(0, 600));
   });
 
   // ==== D-26 (a), point 7 : la reconnaissance des réponses de décision dans --preparer ====

@@ -151,6 +151,31 @@ export function travailDuTour(records, depuisRang) {
   return { fichiers, commandes, dernierTexte };
 }
 
+// TF-2103 (03/11/2026) — LES FENÊTRES D'EXÉCUTION DES COMMANDES DE CETTE SESSION, depuis le dernier message humain.
+// Une commande (Bash, PowerShell) commence à l'horodatage de son message assistant et finit à celui de la PROCHAINE entrée
+// horodatée (son tool_result arrive juste après). Un programme lancé par la session n'écrit que pendant l'une de ces fenêtres :
+// `fichiersDepot` n'attribue au tour qu'un fichier de l'arbre modifié PENDANT l'une d'elles (ou une écriture connue de la session,
+// Write ou sous-agent). Un fichier modifié hors de toute fenêtre a été écrit par une AUTRE session du même arbre (le git voit tout
+// l'arbre, partagé entre sessions). Un programme lancé en arrière-plan qui écrit APRÈS son tool_result n'est pas vu ici (dit, pas promis).
+export const MARGE_FENETRE_MS = 2000;
+export function fenetresDeCommande(records, depuisRang) {
+  const fenetres = [];
+  for (let i = depuisRang + 1; i < records.length; i++) {
+    const r = records[i];
+    if (!r || r.type !== "assistant" || r.isSidechain) continue;
+    const debut = Date.parse(r.timestamp || "");
+    if (!Number.isFinite(debut)) continue;
+    if (!(r.message?.content || []).some((b) => b?.type === "tool_use" && OUTILS_COMMANDE.has(b.name))) continue;
+    let fin = debut;
+    for (let j = i + 1; j < records.length; j++) {
+      const t = Date.parse(records[j]?.timestamp || "");
+      if (Number.isFinite(t) && t >= debut) { fin = t; break; }
+    }
+    fenetres.push({ debut, fin });
+  }
+  return fenetres;
+}
+
 /**
  * Les numéros de décision qu'un message humain désigne (D-26 (a), point 7 : le 18/10, « 24a + comment faire… » (232 caractères),
  * « 25 relever le seuil à 4 millions. 26 : a » et « 23a + b » ont répondu à D-24, D-25, D-26 et D-23, et D-24 à D-26 ont été manquées).
@@ -329,7 +354,7 @@ function git(dossier, args) {
  * (commits faits depuis, modifications non enregistrées, fichiers neufs), dont la date de modification est postérieure au message.
  * Les dérivés des contrôles (`.oracles\`, `*.oracles*.json*`, `*.jugement.json`) sont comptés à part, jamais cités.
  */
-export function fichiersDepot(dossier, depuisTs) {
+export function fichiersDepot(dossier, depuisTs, fenetres = null, cheminsConnus = null) {
   if (!dossier || !existsSync(dossier)) return { ok: false, raison: `le dossier du projet n'existe pas (${dossier})` };
   const ms = Date.parse(depuisTs || "");
   if (!Number.isFinite(ms)) return { ok: false, raison: "le dernier message humain n'a pas d'horodatage lisible dans la transcription" };
@@ -345,16 +370,23 @@ export function fichiersDepot(dossier, depuisTs) {
   const morceaux = suivis.out.split("\0").filter((x) => x !== "");
   for (let i = 0; i + 1 < morceaux.length; i += 2) etats.set(morceaux[i + 1], morceaux[i].startsWith("A") ? "ajouté" : morceaux[i].startsWith("D") ? "supprimé" : "modifié");
   if (neufs.ok) for (const f of neufs.out.split("\0").filter(Boolean)) if (!etats.has(f)) etats.set(f, "neuf (non suivi)");
-  const fichiers = []; let exclus = 0, anterieurs = 0;
+  const fichiers = []; let exclus = 0, anterieurs = 0, autresSessions = 0;
   for (const [rel, etat] of etats) {
     if (EXCLUS_DEPOT.some((re) => re.test(rel.replace(/\\/g, "/")))) { exclus++; continue; }
     const abs = join(racine, rel);
     let mtime = null;
-    if (etat !== "supprimé") { try { mtime = statSync(abs).mtimeMs; } catch { continue; } if (mtime < ms) { anterieurs++; continue; } }
+    if (etat !== "supprimé") {
+      try { mtime = statSync(abs).mtimeMs; } catch { continue; }
+      if (mtime < ms) { anterieurs++; continue; }
+      // TF-2103 : n'attribuer au tour que ce que la session a écrit — une écriture connue (Write, sous-agent) ou un fichier
+      // modifié PENDANT une commande de la session. Hors de toute fenêtre, et inconnu, c'est une AUTRE session du même arbre.
+      if (fenetres && !(cheminsConnus && cheminsConnus.has(norm(abs)))
+          && !fenetres.some((f) => mtime >= f.debut - MARGE_FENETRE_MS && mtime <= f.fin + MARGE_FENETRE_MS)) { autresSessions++; continue; }
+    }
     fichiers.push({ rel, abs, etat, mtime });
   }
   fichiers.sort((a, b2) => (b2.mtime ?? 0) - (a.mtime ?? 0));
-  return { ok: true, racine, baseRev: base, base: base === ARBRE_VIDE ? "(aucun commit antérieur au message : arbre vide)" : base.slice(0, 10), fichiers, exclus, anterieurs, depuis: depuisTs };
+  return { ok: true, racine, baseRev: base, base: base === ARBRE_VIDE ? "(aucun commit antérieur au message : arbre vide)" : base.slice(0, 10), fichiers, exclus, anterieurs, autresSessions, depuis: depuisTs };
 }
 
 /** Les écritures (Write, Edit, NotebookEdit) faites depuis `depuisTs` par les sous-agents d'une session : `<session>\subagents\agent-*.jsonl`. */
@@ -558,7 +590,7 @@ export function fabriquerDepot(depot, dejaCites, relus = new Map(), titre = "## 
   const surDisque = depot.fichiers.filter((f) => !dejaCites.has(norm(f.abs)) && !relus.has(norm(f.abs)));
   const dejaRelus = depot.fichiers.filter((f) => !dejaCites.has(norm(f.abs)) && relus.has(norm(f.abs)));
   const dedoubles = depot.fichiers.length - surDisque.length - dejaRelus.length;
-  out.push(`${depot.fichiers.length} fichier(s) retenu(s)${dedoubles ? `, dont ${dedoubles} déjà cité(s) plus haut (Write, Edit, NotebookEdit)` : ""}${dejaRelus.length ? `, dont ${dejaRelus.length} relu(s) à leur réception et inchangé(s) depuis, cité(s) par leur seul chemin` : ""} ; ${depot.exclus} dérivé(s) des contrôles non cité(s) (\`.oracles\\\`, \`*.oracles*.json*\`, \`*.jugement.json\`) ; ${depot.anterieurs} fichier(s) changé(s) par rapport à ce commit mais modifié(s) sur le disque avant le message, non cité(s).`, "");
+  out.push(`${depot.fichiers.length} fichier(s) retenu(s)${dedoubles ? `, dont ${dedoubles} déjà cité(s) plus haut (Write, Edit, NotebookEdit)` : ""}${dejaRelus.length ? `, dont ${dejaRelus.length} relu(s) à leur réception et inchangé(s) depuis, cité(s) par leur seul chemin` : ""} ; ${depot.exclus} dérivé(s) des contrôles non cité(s) (\`.oracles\\\`, \`*.oracles*.json*\`, \`*.jugement.json\`) ; ${depot.anterieurs} fichier(s) changé(s) par rapport à ce commit mais modifié(s) sur le disque avant le message, non cité(s)${depot.autresSessions ? ` ; ${depot.autresSessions} fichier(s) modifié(s) hors d'une commande de cette session — écrit(s) par une AUTRE session du même arbre, non attribué(s) à ce tour (TF-2103)` : ""}.`, "");
   for (const f of dejaRelus) { out.push(`- ${f.rel} — ${f.etat} — ${MENTION_RELU(relus.get(norm(f.abs)))}`); cites.add(norm(f.abs)); }
   if (dejaRelus.length) out.push("");
   let reste = BORNES.depot; const omis = [];
@@ -1113,8 +1145,18 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   if (a.preparer === "fin-de-tour") {
     const dernier = humains.length ? humains[humains.length - 1] : null;
     const travail = travailDuTour(records, dernier ? dernier.rang : -1);
-    const depot = fichiersDepot(resolve(projetDir), dernier?.ts);
     const sa = ecrituresSousAgents(transcript, dernier?.ts);
+    const parCommande = ecrituresParCommande(travail.commandes);
+    // TF-2103 : les fenêtres de commande de CETTE session, et ses écritures connues (Write, sous-agents, cibles de commande lues dans
+    // le texte) ; fichiersDepot n'attribue au tour qu'un fichier tombant dans une fenêtre ou figurant parmi ces chemins — le reste a été
+    // écrit par une AUTRE session du même arbre (le git voit tout l'arbre partagé).
+    const fenetres = fenetresDeCommande(records, dernier ? dernier.rang : -1);
+    const cheminsConnus = new Set([
+      ...travail.fichiers,
+      ...(sa.ecritures || []).map((e) => e.chemin),
+      ...parCommande.map((w) => cheminDeCible(w.cible, w.dossier || resolve(projetDir))),
+    ].filter(Boolean).map((p) => norm(p)));
+    const depot = fichiersDepot(resolve(projetDir), dernier?.ts, fenetres, cheminsConnus);
     const relus = relusALaReception(lireRegistre(a.registre));
     const cites = new Set(travail.fichiers.map(norm));
     const sectionDepot = fabriquerDepot(depot, cites, relus);
@@ -1127,7 +1169,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     let fichiersWt = 0, commitsWt = 0;
     if (depot.ok) parties.push(wts.length ? `## Worktrees du dépôt touchés par les commandes du tour : ${wts.length}\n` : "## Worktrees du dépôt touchés par les commandes du tour : aucun\n\nAucune commande ni aucun fichier écrit du tour ne vise un worktree de ce dépôt (`git worktree list`).\n");
     for (const w of wts) {
-      const dw = fichiersDepot(w.chemin, dernier?.ts);
+      const dw = fichiersDepot(w.chemin, dernier?.ts, fenetres, cheminsConnus);
       const sw = fabriquerDepot(dw, cites, relus, `### Worktree ${w.chemin} (branche ${w.branche}) — fichiers modifiés depuis le dernier message humain (git)`);
       for (const c of sw.cites) cites.add(c);
       const depuis = dernier?.ts ? commitsDe(w.chemin, { depuisTs: dernier.ts }) : [];
@@ -1137,8 +1179,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       parties.push(sw.texte, fabriquerCommits(`#### Commits du worktree faits depuis le dernier message humain`, depuis, "depuis ce message"),
         base ? fabriquerCommits(`#### Commits du worktree absents de ${base} (\`${base}..HEAD\`)`, plage, `dans ${base}..HEAD`) : "#### Commits absents de l'amont\n\nAucune référence amont (origin/main, origin/master, origin/HEAD ni branche du worktree principal) : plage non relevée.\n");
     }
-    // TF-1941 (d) : les écritures faites par commande, lues dans le texte des commandes ; ce qui ne s'y lit pas est déclaré.
-    const parCommande = ecrituresParCommande(travail.commandes);
+    // TF-1941 (d) : les écritures faites par commande, lues dans le texte des commandes ; ce qui ne s'y lit pas est déclaré. (parCommande calculé plus haut, TF-2103.)
     const sectionCommandes = fabriquerEcrituresCommande(parCommande, depot.ok ? depot.racine : resolve(projetDir), cites);
     livrables = fabriquerLivrablesFin(travail, { depot: [...parties, sectionCommandes].join("\n"), sousAgents: fabriquerSousAgents(sa, cites, relus) }, relus);
     resume = `${travail.fichiers.length} fichier(s) écrit(s), ${travail.commandes.length} commande(s) depuis le dernier message humain ; dépôt : ${depot.ok ? `${depot.fichiers.length} fichier(s) modifié(s), ${commitsDepot.length} commit(s) depuis le message` : "non relevé"} ; worktrees touchés : ${wts.length}${wts.length ? ` (${fichiersWt} fichier(s) modifié(s), ${commitsWt} commit(s) depuis le message)` : ""} ; écritures par commande : ${parCommande.length} relevée(s) (ce qu'écrit un programme lancé n'est pas lu, git le relève) ; sous-agents : ${sa.absent ? "aucun" : `${sa.ecritures.length} écriture(s) de ${sa.agents} sous-agent(s)`} ; ${relus.size} livrable(s) relu(s) à leur réception et inchangé(s), cité(s) par leur seul chemin`;
