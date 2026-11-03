@@ -12,7 +12,7 @@ Livré : [Étude des compétences OpenAI et Gemini](output/03-etudes/Digit-AI%20
 
 ## 1. En-tête d'identification
 
-Run de conseil, exécution du prompt « Competences OpenAI et Gemini dans la Factory » version i, sur le pilot `digit-ai-factory` et en lecture du parc de `C:\dev`. Période : 03/11/2026 de 15:27 à 15:58, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 2 agents `redacteur` Sonnet pour les catalogues ; escalade de modèle : aucune.
+Run de conseil, exécution du prompt « Competences OpenAI et Gemini dans la Factory » version i, sur le pilot `digit-ai-factory` et en lecture du parc de `C:\dev`. Période : 03/11/2026 de 15:27 à 16:03, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 2 agents `redacteur` Sonnet pour les catalogues ; escalade de modèle : aucune.
 
 Intention de la demande : savoir s'il est pertinent d'ajouter à la Factory des compétences pour les API et bibliothèques d'OpenAI et de Gemini.
 
@@ -39,6 +39,8 @@ Oui aux 4 verdicts : 5 dépôts appellent ces API, aucun véhicule de forge ne s
 
 > **Sans réponse** : (c), la commande reste telle quelle et l'item TF-2112 attend.
 
+Rappel : D-161, posée par une autre session sur le nom d'emprunt du produit de tests d'intrusion, bloque aussi la publication de ce travail (bloc 5).
+
 ## 4. Traité
 
 - **Relevé du parc, rejoué à 15:30.** 35 dépôts et copies de travail font mention d'OpenAI ou de Gemini ; 5 appellent, 2 déclarent une dépendance. Le prompt disait 3 et 1, sur moins de dossiers : le rejeu fait foi, l'étude écrit les deux.
@@ -50,12 +52,14 @@ Oui aux 4 verdicts : 5 dépôts appellent ces API, aucun véhicule de forge ne s
 - **Garde de dépense corrigée.** Le motif de `oracle-depense-voie-par-defaut.mjs` reconnaît désormais Gemini et Azure OpenAI : test unitaire 14 PASS, 0 FAIL. Rejoué sur le parc, il rend FAIL sur une ligne de make-it-better que l'ancien motif accusait déjà, un faux positif inscrit.
 - **Registre.** TF-2108 à TF-2114 écrits par `journaliser.mjs`, verdict PASS avant et après, `oracle-todo` exit 0.
 - **Décision.** D-163 réservée par `reserver-decision.mjs`, PASS.
+- **Nom réel retiré avant publication.** Le crochet de commit a pseudonymisé le registre mais pas 3 chemins de l'étude qui portaient le nom d'un produit en minuscules. Je les ai remplacés par `<application>` et refait mon commit non publié : `git log -p origin/main..HEAD` ne porte plus ce nom (0 occurrence).
 - **Contrôles de l'étude.** `oracle-ecriture` exit 0 ; `check_markdown.py` PASS ; `quality-oracles` 5 PASS, 2 SKIP, 0 échec ; 1 272 mots hors tableaux pour 2 500 permis ; 0 motif de clé trouvé.
 
 Relecture d'intention : sans objet, motif : la relecture des consignes des 2 agents n'a pas été jouée avant leur lancement ; leurs catalogues ont été relus à réception, chaque extrait contrôlé par script.
 
 ## 5. Non traité
 
+- **La publication du pilot** : motif, bloqué par un garde-fou ; à 16:00, `oracle-nom-client-publie` refuse l'envoi pour 16 constats d'un nom de produit réel, tous dans des fichiers d'une autre session, en attente de D-161. Mes commits restent locaux, `git rev-list` rend 0 6 ; critère de réouverture : D-161 tranchée et ses fichiers pseudonymisés.
 - **La construction des 3 compétences** : motif, dépendance à une décision humaine ; la construction attend votre choix du bloc 8.
 - **Le changement des modèles de forge-design et du signalement à Produit-82** : motif, écarté ; un changement de modèle se prouve par un appel payant sous le GO existant, et un produit ne reçoit de geste que sur son run, critère de réouverture : TF-2109 ou TF-2111 décidés.
 - **L'enregistrement de la réservation D-163** : motif, bloqué par un garde-fou ; le registre des décisions porte aussi les réservations 160 à 162 d'une autre session, non enregistrées, que je n'emporte pas.
