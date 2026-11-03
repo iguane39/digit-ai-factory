@@ -47,8 +47,8 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 20,
-  "vu_le": "2026-10-19"
+  "cas": 30,
+  "vu_le": "2026-11-03"
  },
  "gabarits/ledger.test.mjs": {
   "cas": 28,
@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 192,
-  "vu_le": "2026-10-30"
+  "cas": 197,
+  "vu_le": "2026-11-03"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -343,8 +343,8 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 286,
-  "vu_le": "2026-10-30"
+  "cas": 291,
+  "vu_le": "2026-11-03"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
   "cas": 31,
@@ -371,8 +371,8 @@
   "vu_le": "2026-09-16"
  },
  "oracles/banc-mutation/banc-mutation.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-10-12"
+  "cas": 15,
+  "vu_le": "2026-11-03"
  },
  "oracles/banc-paires/paires.test.mjs": {
   "cas": 11,
@@ -423,8 +423,8 @@
   "vu_le": "2026-11-02"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
-  "cas": 10,
-  "vu_le": "2026-10-12"
+  "cas": 12,
+  "vu_le": "2026-11-03"
  },
  "oracles/hook-puits-windows.test.mjs": {
   "cas": 8,
@@ -435,8 +435,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution-moyen.test.mjs": {
-  "cas": 22,
-  "vu_le": "2026-10-30"
+  "cas": 26,
+  "vu_le": "2026-11-03"
  },
  "oracles/hook-restitution-selection.test.mjs": {
   "cas": 7,
@@ -451,8 +451,8 @@
   "vu_le": "2026-10-02"
  },
  "oracles/lib-chiffres-releves.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-11-02"
+  "cas": 20,
+  "vu_le": "2026-11-03"
  },
  "oracles/lib-enumeration-liste.test.mjs": {
   "cas": 29,
@@ -643,8 +643,8 @@
   "vu_le": "2026-09-28"
  },
  "scripts/mobiliser.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-10-30"
+  "cas": 18,
+  "vu_le": "2026-11-03"
  },
  "scripts/nettoyer-copies.test.mjs": {
   "cas": 12,
@@ -727,8 +727,8 @@
   "vu_le": "2026-08-26"
  },
  "scripts/verifier-carte-forges.mjs": {
-  "cas": 13,
-  "vu_le": "2026-10-30"
+  "cas": 19,
+  "vu_le": "2026-11-03"
  },
  "scripts/verifier-contre-lecture.mjs": {
   "cas": 9,
@@ -763,8 +763,8 @@
   "vu_le": "2026-09-22"
  },
  "scripts/verifier-hooks-git.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-10-30"
+  "cas": 20,
+  "vu_le": "2026-11-03"
  },
  "scripts/verifier-jeu-livrables.test.mjs": {
   "cas": 7,
@@ -933,6 +933,10 @@
  "todo/reempreinter-lot.test.mjs": {
   "cas": 16,
   "vu_le": "2026-10-13"
+ },
+ "todo/remesurer.test.mjs": {
+  "cas": 20,
+  "vu_le": "2026-11-03"
  },
  "todo/renumeroter.test.mjs": {
   "cas": 8,
