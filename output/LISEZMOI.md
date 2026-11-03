@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 628 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 631 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -252,6 +252,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md | 20261102f | 35.8 Ko | `03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` |
 | Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
+| Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md | 20261103k | 13 Ko | `03-etudes/Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` |
 | Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md | 20261102t | 25.3 Ko | `03-etudes/Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
@@ -591,6 +592,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md | 20261020g | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md` |
 | Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md | 20261018l | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` |
 | Digit-AI - Synthese Mandat - Essais de MarkItDown et du skill de logo - 20261103d.md | 20261103d | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Essais de MarkItDown et du skill de logo - 20261103d.md` |
+| Digit-AI - Synthese Mandat - Etude d'une etape de revue de code - 20261103m.md | 20261103m | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude d'une etape de revue de code - 20261103m.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md | 20261003a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` |
 | Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md | 20261001g | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md` |
 | Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md | 20261001d | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` |
@@ -625,6 +627,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md | 20261016k | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` |
 | Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md | 20261026p | 3.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` |
 | Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md | 20261016l | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` |
+| Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md | 20261103l | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md` |
 | Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md | 20261026d | 10.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` |
 | Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md | 20261001i | 4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` |
 | Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md | 20261020d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` |

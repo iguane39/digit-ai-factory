@@ -110,6 +110,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md` | fichier | 6,7 Ko | Synthèse Mandat — essai du conseil de cinq agents joué, D-53 (a) exécutée (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` | fichier | 12,6 Ko | Synthèse Mandat — l'essai est publié ; les alertes ne corrigent encore rien d'elles-mêmes, |
 | `Digit-AI - Synthese Mandat - Essais de MarkItDown et du skill de logo - 20261103d.md` | fichier | 8,0 Ko | Synthèse Mandat — essais de MarkItDown et du skill de logo (03/11/2026) |
+| `Digit-AI - Synthese Mandat - Etude d'une etape de revue de code - 20261103m.md` | fichier | 7,4 Ko | Synthèse Mandat — étude d'une étape de revue de code (03/11/2026) |
 | `Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` | fichier | 10,2 Ko | Synthèse Mandat — la remontée sur les pages HTML et les indicateurs est instruite ; l'étud |
 | `Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md` | fichier | 17,9 Ko | Synthèse de mandat : vos décisions D-1 (a), D-2 (a) et D-3 (a) sont exécutées, l'étude du  |
 | `Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` | fichier | 10,8 Ko | Synthèse Mandat — étude d'opportunité sur l'auto-amélioration récursive et l'apprentissage |
@@ -144,6 +145,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` | fichier | 5,6 Ko | Synthèse Mandat — pilot publié après reconstruction sur le distant, décision « 2a » exécut |
 | `Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` | fichier | 3,6 Ko | Synthèse Mandat — A-1 en partie, A-2 en attente : pilot publié avec trois chantiers, T2 en |
 | `Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` | fichier | 8,3 Ko | Synthèse Mandat — plans classés par mois, noms trop longs raccourcis (16/10/2026) |
+| `Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md` | fichier | 3,2 Ko | Synthèse Mandat — point d'étape de l'étude d'une revue de code (03/11/2026) |
 | `Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` | fichier | 10,6 Ko | Synthèse Mandat — prompt « retravaille la cible » adapté au skill oeil-critique 1.1.0 (26/ |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
 | `Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` | fichier | 4,1 Ko | Synthèse Mandat — D-52 exécutée, pilot publié jusqu'à 1855a4df (20/10/2026) |
@@ -190,4 +192,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_169 fichier(s), 4 sous-dossier(s)_
+_171 fichier(s), 4 sous-dossier(s)_
