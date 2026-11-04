@@ -51,6 +51,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` | fichier | 7,9 Ko | Synthèse Conseil — prompt « compétences OpenAI et Gemini » passé au crible L99, aucune déc |
 | `Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` | fichier | 7,8 Ko | Synthèse Conseil — prompt make-it-better avec Word et PDF, 1 décision attendue (02/11/2026 |
 | `Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` | fichier | 10,6 Ko | Synthèse Conseil — prompt du skill make-it-better passé au crible L99, 2 décisions attendu |
+| `Digit-AI - Synthese Conseil - Prompt suivi des temps et couts passe au crible L99 - 20261104h.md` | fichier | 9,2 Ko | Synthèse Conseil — prompt « suivre temps, délais, charges, jetons et coûts des produits »  |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
 | `Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md` | fichier | 12,1 Ko | Synthèse Conseil — prompt de tri des favoris TikTok et de skill passé au crible L99 (02/11 |
 | `Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md` | fichier | 8,7 Ko | Synthèse Conseil — skill PDF de la Factory, étude rendue, 1 décision attendue (30/10/2026) |
@@ -202,4 +203,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_181 fichier(s), 4 sous-dossier(s)_
+_182 fichier(s), 4 sous-dossier(s)_
