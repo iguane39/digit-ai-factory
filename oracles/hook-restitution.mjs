@@ -231,14 +231,34 @@ const TEMPORAIRE_NOMME = (p) => TEMPORAIRE(p)
 // pour une copie, la seule destination (le dernier argument) ; pour les autres verbes, chaque
 // argument. Une option ou une valeur non temporaire laisse l'effet relevé : l'erreur tombe du côté sûr.
 const VERBES_FICHIER = /^(?:rm|del|mv|cp|rmdir|mkdir|touch|tee|Remove-Item|Move-Item|Copy-Item|Set-Content|Add-Content|Out-File|New-Item|Rename-Item|Clear-Content)$/i;
-function versTemporaire(commande) {
-  const jetons = (commande.match(/"[^"]*"|'[^']*'|\S+/g) || []).map((j) => j.replace(/^["']|["']$/g, ""));
+// TF-2079 (04/11/2026, RT-34) : une SUPPRESSION dans le dossier temporaire n'est pas une écriture du tour. Le 29/10, une question de
+// procédure en lecture seule a été jugée tour de travail pour 2 JSON effacés dans le dossier temporaire de la session, et la réponse
+// courte a été refusée. Deux formes échappaient à la lecture : une cible RELATIVE après un `cd` vers le dossier temporaire
+// (`cd $TEMP/x && rm a.json b.json`, `dansTemp`), et une liste à virgules (`Remove-Item "T\a.json", "T\b.json"`, où la virgule et le
+// guillemet collé restaient des « cibles » non temporaires). Une cible relative portant `..` ou une cible non temporaire reste une écriture.
+const CIBLE_RELATIVE = (p) => Boolean(p) && !/^(?:[A-Za-z]:|[\\/~$%])/.test(p) && !/(?:^|[\\/])\.\.(?:[\\/]|$)/.test(p);
+function versTemporaire(commande, dansTemp = false) {
+  const jetons = (commande.match(/"[^"]*"|'[^']*'|\S+/g) || []).map((j) => j.replace(/^[,\s]+|[,\s]+$/g, "").replace(/^["']|["']$/g, "")).filter(Boolean);
   const i = jetons.findIndex((j) => VERBES_FICHIER.test(j));
   if (i < 0) return false;
   const args = jetons.slice(i + 1).filter((j) => !/^-/.test(j));
   if (!args.length) return false;
   const cibles = /^(?:cp|Copy-Item)$/i.test(jetons[i]) ? args.slice(-1) : args;
-  return cibles.every(TEMPORAIRE_NOMME);
+  return cibles.every((c) => TEMPORAIRE_NOMME(c) || (dansTemp && CIBLE_RELATIVE(c)));
+}
+const CHANGE_DE_DOSSIER = /^\s*(?:cd|Set-Location|pushd)\s+("[^"]+"|'[^']+'|\S+)\s*$/i;
+const dossierTemporaire = (c) => { const m = CHANGE_DE_DOSSIER.exec(c); return m ? TEMPORAIRE_NOMME(m[1].replace(/^["']|["']$/g, "")) : null; };
+// Un programme en ligne (`python -c "…"`, `node -e "…"`) qui ne fait que SUPPRIMER des fichiers du dossier temporaire : son corps n'est pas
+// du shell, et un mot de Python (`del f`) s'y lisait comme la commande `del`. Il n'est exempté que si le corps supprime (os.remove,
+// unlink, rmtree, rmSync…), n'écrit ni ne copie rien, et nomme au moins un chemin absolu, tous temporaires. Un chemin du dépôt le rend à l'effet.
+const PROGRAMME_EN_LIGNE = /^\s*(?:python3?|py|node)(?:\.exe)?\s+(?:-[\w-]+\s+)*-[ce]\s+(["'])([\s\S]*)\1\s*$/i;
+const SUPPRESSION_EN_LIGNE = /\bos\.(?:remove|unlink|rmdir)\b|\bshutil\.rmtree\b|\.unlink\s*\(|\b(?:rmSync|unlinkSync|rmdirSync)\b|\bfs\.(?:rm|unlink)\b/;
+const ECRITURE_EN_LIGNE = /\bopen\s*\([^)]*["'][wax+]|write_text|write_bytes|writeFile|appendFile|\bcopy|\bmove|\brename|shutil\.(?!rmtree)|subprocess|os\.system|child_process/i;
+function suppressionTemporaireEnLigne(c) {
+  const m = PROGRAMME_EN_LIGNE.exec(c);
+  if (!m || !SUPPRESSION_EN_LIGNE.test(m[2]) || ECRITURE_EN_LIGNE.test(m[2])) return false;
+  const chemins = m[2].match(/(?:[A-Za-z]:[\\/]|\/tmp\/)[^'"\s)\],]*/g) || [];
+  return chemins.length > 0 && chemins.every(TEMPORAIRE_NOMME);
 }
 const VERBES_EFFET = new RegExp([
   // TF-2034 (02/11/2026) : `git stash list|show` et `git tag -l|--list` lisent, comme `git worktree list` ; seuls `stash` et `tag` qui écrivent restent des effets.
@@ -270,17 +290,23 @@ export function detecterEffets(segment) {
         // 12/10/2026 (TF-1418) : un `cp` vers le dossier temporaire de la session faisait juger
         // Complexe un tour de pure lecture. La commande se juge par commande simple, et un verbe de
         // fichier dont toutes les cibles sont temporaires n'est pas un effet.
+        const cds = decouperCommande(cmd).map(dossierTemporaire).filter((x) => x !== null);
+        const toutEnTemp = cds.length > 0 && cds.every(Boolean);   // TF-2079 : tous les `cd` de la commande vont au dossier temporaire
+        let dansTemp = false;   // TF-2079 : un `cd` vers le dossier temporaire vaut pour la suite de SA commande
         const v = decouperCommande(cmd).map((c) => {
+          const cd = dossierTemporaire(c);
+          if (cd !== null) { dansTemp = cd; return null; }
+          if (suppressionTemporaireEnLigne(c)) return null;
           const m = c.match(VERBES_EFFET);
           const fichier = m && VERBES_FICHIER.test(m[0].replace(/^[\s;&|(]+/, "").trim());
-          return m && !(fichier && versTemporaire(c)) ? m : null;
+          return m && !(fichier && versTemporaire(c, dansTemp)) ? m : null;
         }).find(Boolean);
         if (v) effets.push(`commande à effet « ${v[0].trim()} »`);
         // Le contenu d'une chaîne entre guillemets (un `node -e "x > 2"`) n'est pas une redirection ;
         // une cible de redirection entre guillemets (`> "f.txt"`) en reste une.
         const horsChaines = cmd.replace(/(?<!>\s*)(["'])(?:\\.|(?!\1)[^\\])*\1/g, "''");
         for (const [, , , cible] of horsChaines.matchAll(REDIRECTION)) {
-          if (/^&\d?$|^\/dev\/null$|^\$null$|^nul$/i.test(cible) || TEMPORAIRE(cible) || /^\$/.test(cible)) continue;
+          if (/^&\d?$|^\/dev\/null$|^\$null$|^nul$/i.test(cible) || TEMPORAIRE(cible) || /^\$/.test(cible) || (toutEnTemp && CIBLE_RELATIVE(cible))) continue;
           effets.push(`redirection vers ${cible}`);
         }
       } else if (nom === "Workflow" || (nom === "Agent" && !OUTILS_LECTURE.has(b.input?.subagent_type))) {
@@ -352,7 +378,8 @@ export function ecrituresDuTour(segment) {
   for (const x of detecterEffets(nettoye)) if (!/^écriture de /.test(x)) ajouter(x);
   if (ecrituresParCommande) {
     for (const w of ecrituresParCommande(commandes))
-      if (!TEMPORAIRE_NOMME(w.cible)) ajouter(`écriture par commande vers ${w.cible}`);
+      // TF-2079 : une cible relative lue depuis un `cd` vers le dossier temporaire (`w.dossier`) est temporaire aussi.
+      if (!TEMPORAIRE_NOMME(w.cible) && !(w.dossier && TEMPORAIRE_NOMME(w.dossier.replace(/^["']|["']$/g, "")) && CIBLE_RELATIVE(String(w.cible).replace(/^["']|["']$/g, "")))) ajouter(`écriture par commande vers ${w.cible}`);
   }
   return sortie;
 }
@@ -892,7 +919,102 @@ export function analyserTranscript(texte) {
     // TF-1913 — les fichiers servis écrits dans le tour et les critiques jouées, pour le contrôle CRITIQUE.
     critique: critiqueDuTour(entrees.slice(debut + 1)),
     // TF-1973 et TF-2016 — les livrables écrits sous output/ dans le tour, pour le contrôle S87 (la ligne « Livré : » du bloc 0).
-    livrables: livrablesEcrits(entrees.slice(debut + 1)) };
+    livrables: livrablesEcrits(entrees.slice(debut + 1)),
+    // TF-2078 — les skills touchés, les livrables écrits à la main et le retour consigné par commande, pour l'avertissement REMONTÉE.
+    remontee: releveRemontee(entrees.slice(debut + 1)) };
+}
+
+// ---- TF-2078 (04/11/2026, RT-33) — UN LIVRABLE ÉCRIT À LA MAIN À CÔTÉ D'UN SKILL DE LA FACTORY SE REMONTE, IL NE SE DÉCLARE PAS « RIEN DE NEUF » ----
+//
+// LE FAIT. Restitution d'un produit du 03/11/2026 : « Remontée à la factory : rien de neuf », dans le tour où la session construisait, à la demande du
+// porteur, une capacité que le skill make-it-better n'avait pas (une page autonome). Le porteur : « pourquoi ma demande d'une page autonome n'est pas
+// remontée à la Factory pour l'appliquer au skill Make it better de la Factory ? ». S48 accepte « rien à remonter » : elle juge la ligne, pas le tour.
+//
+// LA RÈGLE, AVERTISSANTE (jamais bloquante). Chez un produit (un `forge/retours/` à la racine du projet), quand le tour (1) a lancé ou lu un skill de la
+// Factory — appel de l'outil Skill, lecture de son SKILL.md, commande qui joue l'un de ses scripts —, (2) a écrit PAR Write un livrable d'un format de page ou
+// de document (`FORMATS_LIVRABLE`) sous output/ et (3) n'a consigné aucun retour au ledger — une commande du tour qui écrit `type: retour`, ou une entrée
+// `type: retour` de `forge/ledger.jsonl` datée après le message humain —, la restitution reçoit l'avertissement REMONTÉE qui nomme le skill, le livrable et le
+// geste. Un skill de la Factory est un dossier `.claude/skills/<nom>/SKILL.md` d'un dépôt `digit-ai-*` du parc (FORGE_ROOT, ou le parent du projet).
+//
+// ÉCART ASSUMÉ À LA LETTRE DE LA PROPOSITION (« a écrit un livrable que ce skill ne produit pas »). Le hook ne sait pas ce qu'un skill produit : son SKILL.md
+// cite « page HTML autonome » comme sortie du skill make-it-better, et un test par mot du texte du skill aurait tu précisément le cas du 03/11. Le relevé retient
+// le geste observable : un skill de la Factory a servi ET le livrable a été écrit à la main (un skill produit les siens par ses scripts, pas par Write).
+//
+// CE QUE CE RELEVÉ NE VOIT PAS, dit plutôt que promis : un livrable produit par une commande, un sous-agent, ou écrit hors de output/ ; un retour consigné dans un
+// autre ledger que celui du projet ; que le livrable étende réellement le skill (c'est ce que l'humain tranche) ; un dépôt de skill introuvable (le contrôle se tait).
+const FORMATS_LIVRABLE = /\.(?:html?|pptx|docx|xlsx|pdf|svg)$/i;
+const RETOUR_PAR_COMMANDE = /ledger\.(?:py|mjs)[^\n]*\bretour\b|>>\s*\S*ledger\.jsonl[\s\S]*"type"\s*:\s*"retour"|"type"\s*:\s*"retour"[\s\S]*>>\s*\S*ledger\.jsonl/i;
+
+/** Ce que le tour montre d'un skill et d'un retour : tous les skills touchés (la Factory se filtre ensuite), les livrables écrits à la main, le retour par commande. Pur. */
+export function releveRemontee(segment) {
+  const skills = new Map();
+  let retourCommande = false;
+  const noter = (nom, via) => { if (nom && !skills.has(nom)) skills.set(nom, via); };
+  for (const e of segment) {
+    if (e.type !== "assistant") continue;
+    for (const b of contenuDe(e)) {
+      if (b.type !== "tool_use") continue;
+      const entree = b.input || {};
+      if (b.name === "Skill") noter(String(entree.skill || "").split(":").pop().trim(), "lancé");
+      else if (b.name === "Read") { const m = /[\\/]skills[\\/]([\w.-]+)[\\/]SKILL\.md$/i.exec(String(entree.file_path || "")); if (m) noter(m[1], "lu"); }
+      else if (COMMANDES.has(b.name)) {
+        const cmd = String(entree.command || "");
+        for (const m of cmd.matchAll(/[\\/]skills[\\/]([\w.-]+)[\\/]scripts[\\/]/gi)) noter(m[1], "joué");
+        if (RETOUR_PAR_COMMANDE.test(cmd)) retourCommande = true;
+      } else if (ECRITURES.has(b.name) && /ledger\.jsonl$/i.test(String(entree.file_path || "")) && /"type"\s*:\s*"retour"/.test(JSON.stringify(entree))) retourCommande = true;
+    }
+  }
+  return { skills: [...skills].map(([nom, via]) => ({ nom, via })), livrables: livrablesEcrits(segment).filter((f) => FORMATS_LIVRABLE.test(f)), retourCommande };
+}
+
+/** Les noms des skills de la Factory du poste : `.claude/skills/<nom>/SKILL.md` des dépôts `digit-ai-*` sous FORGE_ROOT et sous le parent du projet. */
+export function nomsSkillsFactory(racine, env = process.env) {
+  const noms = new Set();
+  const bases = new Set([env.FORGE_ROOT, racine ? dirname(resolve(racine)) : null].filter(Boolean));
+  for (const base of bases) {
+    let depots = [];
+    try { depots = readdirSync(base).filter((d) => /^digit-ai-/i.test(d)); } catch { continue; }
+    for (const d of depots) {
+      const skills = join(base, d, ".claude", "skills");
+      let liste = [];
+      try { liste = readdirSync(skills); } catch { continue; }
+      for (const s of liste) if (existsSync(join(skills, s, "SKILL.md"))) noms.add(s);
+    }
+  }
+  return noms;
+}
+
+/** Une entrée `type: retour` de `forge/ledger.jsonl` datée de `depuis` ou après (tout retour si `depuis` est inconnu). */
+function retourAuLedger(racine, depuis) {
+  try {
+    const t0 = depuis ? Date.parse(depuis) : NaN;
+    for (const l of readFileSync(join(racine, "forge", "ledger.jsonl"), "utf8").split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      let o; try { o = JSON.parse(l); } catch { continue; }
+      if (o?.type === "retour" && (Number.isNaN(t0) || !(Date.parse(o.ts) < t0))) return true;
+    }
+  } catch { /* ledger absent ou illisible : aucun retour lu */ }
+  return false;
+}
+
+export const RAPPEL_REMONTEE = "Si ce livrable étend ce que le skill produit, ou corrige un défaut du skill, c'est un retour à la Factory : consigne-le au ledger du produit (`type: retour`, avec les 4 réponses du test de généralité, "
+  + "`gabarits\\RETOURS-FORGES.md` du pilot) et nomme le lot à la ligne « Remontée à la factory » de la restitution, plutôt que « rien de neuf ». Si le skill produit déjà ce livrable par ses scripts, l'avertissement ne s'applique pas.";
+
+/**
+ * Le contrôle. `releve` vient de `releveRemontee`, `racine` est le projet du tour, `depuis` l'horodatage du message humain, `estFactory(nom)` dit si un skill vient de la Factory.
+ * SANS_OBJET hors d'un produit, sans skill de la Factory, ou sans livrable écrit à la main ; PASS quand un retour est consigné ; FAIL (avertissant) sinon.
+ */
+export function controlerRemontee({ releve = null, racine = "", depuis = null, estFactory = () => false } = {}) {
+  const sans = { applicable: false, verdict: "SANS_OBJET", ecarts: [], skills: [], livrables: [] };
+  if (!releve || !racine || !existsSync(join(racine, "forge", "retours"))) return sans;
+  const skills = releve.skills.filter((s) => estFactory(s.nom));
+  if (!skills.length || !releve.livrables.length) return sans;
+  if (releve.retourCommande || retourAuLedger(racine, depuis)) return { applicable: true, verdict: "PASS", ecarts: [], skills, livrables: releve.livrables };
+  const noms = skills.map((s) => `« ${s.nom} » (${s.via})`).join(", ");
+  const montres = releve.livrables.slice(0, 3).map(nomDe);
+  return { applicable: true, verdict: "FAIL", skills, livrables: releve.livrables,
+    ecarts: [`le tour a utilisé le skill de la Factory ${noms} et écrit à la main ${releve.livrables.length} livrable${releve.livrables.length > 1 ? "s" : ""} (${montres.join(" ; ")}${releve.livrables.length > 3 ? ` (+${releve.livrables.length - 3})` : ""}) `
+      + "sans consigner aucun retour au ledger du produit"] };
 }
 
 // `racine` (TF-1644, 14/10/2026) : le dossier du projet du tour. Le message est écrit dans un
@@ -1906,12 +2028,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
-  let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null, gainsP = [];
+  let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null, gainsP = [], remonteeP = null, depuisP = null;
   try {
     if (cheminT && existsSync(cheminT)) {
       const tour = analyserTranscript(readFileSync(cheminT, "utf8"));
       dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; nombresP = tour.nombresTour || null; critiqueP = tour.critique || null;
       livrablesP = tour.livrables || [];
+      remonteeP = tour.remontee || null; depuisP = tour.depuis || null;
       gainsP = fusionnerGains(tour.gainsLitteraux || [], tour.evenementsJournalises || [], racineDuProjet(process.cwd()));
       syntheseDeposee = syntheseDuTour(tour.fichiersMd);
       if (syntheseDeposee) {
@@ -1942,6 +2065,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const critiqueBloque = critiqueJ.verdict === "FAIL" && estBloquante("CRITIQUE");
   // TF-1973 et TF-2016 (S87) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est-il lié au bloc 0 de ce brouillon ? Avertissante.
   const livreJ = controlerLivre({ livrables: livrablesP || [], synthese: syntheseDeposee, texte: brouillon, racine: RACINE_P });
+  // TF-2078 (RT-33) — la REMONTÉE : un skill de la Factory a servi, un livrable a été écrit à la main, aucun retour au ledger. Avertissante.
+  const remonteeJ = controlerRemontee({ releve: remonteeP, racine: RACINE_P, depuis: depuisP, estFactory: (nom) => nomsSkillsFactory(RACINE_P).has(nom) });
   // T2 (TF-1947) : DÉTAIL avertit, comme au hook de fin de tour ; AFFICHAGE, COMPLÉTUDE, RÉSERVATION et CRITIQUE (dès son échéance) bloquent.
   const refus = [...bloquants.map((x) => `${x.regle} — ${x.message}`),
     ...ecartsAffichage.map((e) => `AFFICHAGE — ce brouillon ne dit pas ce que dit la synthèse déposée ${syntheseDeposee} : ${e}`),
@@ -1952,7 +2077,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     bloquants: refus, avertissements: [...avertissements.map(avecEcheance), ...detail.ecarts.map((e) => `DÉTAIL — ${e}`),
       ...(reservation.verdict === "FAIL" && !reservationBloque ? [`RÉSERVATION (bloquante dès le ${echeanceReservation(reservation)}) — ${reservation.ecarts[0]}. ${rappelReservation(reservation)}`] : []),
       ...(critiqueJ.verdict === "FAIL" && !critiqueBloque ? [`CRITIQUE (bloquante dès le ${BLOQUANTES_DATEES.CRITIQUE}) — ${critiqueJ.ecarts[0]}. ${RAPPEL_CRITIQUE}`] : []),
-      ...(livreJ.verdict === "FAIL" ? livreJ.ecarts.map((e) => `S87 — ${e}. ${RAPPEL_LIVRE}`) : [])],
+      ...(livreJ.verdict === "FAIL" ? livreJ.ecarts.map((e) => `S87 — ${e}. ${RAPPEL_LIVRE}`) : []),
+      ...(remonteeJ.verdict === "FAIL" ? remonteeJ.ecarts.map((e) => `REMONTÉE — ${e}. ${RAPPEL_REMONTEE}`) : [])],
+    remontee: remonteeJ.applicable ? { verdict: remonteeJ.verdict, skills: remonteeJ.skills.map((s) => s.nom), livrables: remonteeJ.livrables.map(nomDe) }
+      : "sans objet : hors d'un produit, aucun skill de la Factory utilisé, ou aucun livrable de page ou de document écrit à la main sous output/ (ou transcript introuvable)",
     livre: livrablesP ? (livreJ.applicable ? { verdict: livreJ.verdict, livrables: livreJ.livrables.length, manquants: livreJ.manquants.map(nomDe) }
       : `sans objet : ${livreJ.motif || "aucun livrable écrit sous output/ dans le tour (hors synthèse, README et sidecars)"}`) : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
     critique: critiqueP ? (critiqueJ.applicable ? { verdict: critiqueJ.verdict, servis: critiqueJ.servis.length, critiques: critiqueJ.critiques.length }
@@ -2006,7 +2134,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // où la session s'est déplacée par un `cd` : l'état git, la réservation des D-N, le lien « Livré : » et le juge de S48 se mesurent au projet.
   const RACINE_HOOK = racineDuProjet(entree.cwd);
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables } = analyserTranscript(readFileSync(chemin, "utf8"));
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables, remontee: remonteeTour } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
@@ -2083,6 +2211,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // TF-1973 et TF-2016 (S87, gabarit 2.53.0) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est la cible d'un lien du bloc 0.
   // Avertissante à son entrée (règle neuve) ; aucune échéance armée : pour en poser une, la mettre à `BLOQUANTES_DATEES` (clé S87) et reprendre la forme de `critiqueBloque`.
   const livre = controlerLivre({ livrables, synthese: fichierSynthese, texte: dernierTexte, racine: RACINE_HOOK });
+  // TF-2078 (RT-33) — la REMONTÉE : un skill de la Factory a servi, un livrable a été écrit à la main, aucun retour n'est consigné au ledger. Avertissante, jamais bloquante.
+  const remontee = controlerRemontee({ releve: remonteeTour, racine: RACINE_HOOK, depuis, estFactory: (nom) => nomsSkillsFactory(RACINE_HOOK).has(nom) });
   const bloquants = fails.filter((f) => estBloquante(f.regle));
   // T2 (TF-1947, 26/10/2026) : GESTE, PROCÉDURE et DÉTAIL avertissent ; ce qui bloque encore est dit à `BLOQUANTES`.
   const avertissements = [...fails.filter((f) => !estBloquante(f.regle)), ...avertsOracle,
@@ -2094,11 +2224,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...(reservation.verdict === "FAIL" && !reservationBloque
       ? reservation.ecarts.map((e) => ({ regle: "RÉSERVATION", statut: "FAIL", message: `${e} — bloquante dès le ${echeanceReservation(reservation)}. ${rappelReservation(reservation)}` })) : []),
     ...(critique.verdict === "FAIL" && !critiqueBloque ? critique.ecarts.map((e) => ({ regle: "CRITIQUE", statut: "FAIL", message: `${e}. ${RAPPEL_CRITIQUE}` })) : []),
-    ...(livre.verdict === "FAIL" ? livre.ecarts.map((e) => ({ regle: "S87", statut: "FAIL", message: `${e}. ${RAPPEL_LIVRE}` })) : [])];
+    ...(livre.verdict === "FAIL" ? livre.ecarts.map((e) => ({ regle: "S87", statut: "FAIL", message: `${e}. ${RAPPEL_LIVRE}` })) : []),
+    ...(remontee.verdict === "FAIL" ? remontee.ecarts.map((e) => ({ regle: "REMONTÉE", statut: "FAIL", message: `${e}. ${RAPPEL_REMONTEE}` })) : [])];
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
   const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
     && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
-    && critique.verdict !== "FAIL" && livre.verdict !== "FAIL";
+    && critique.verdict !== "FAIL" && livre.verdict !== "FAIL" && remontee.verdict !== "FAIL";
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   try {
     mkdirSync(dirname(journal), { recursive: true });
@@ -2122,6 +2253,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         critiques_jouees: critique.critiques.filter((c) => c.jouee).length, sans_verdict: (critique.sans || []).map((s) => `${s.fichier} (${s.motif})`) } } : {}),
       // TF-1973 et TF-2016 — la mesure de la période d'avertissement de S87 : combien de livrables écrits, lesquels sans lien au bloc 0.
       ...(livre.applicable ? { livre: { verdict: livre.verdict, livrables: livre.livrables.map(nomDe), sans_lien: livre.manquants.map(nomDe) } } : {}),
+      // TF-2078 — la mesure de la période d'avertissement de REMONTÉE : quels skills de la Factory, quels livrables écrits à la main, retour consigné ou non.
+      ...(remontee.applicable ? { remontee: { verdict: remontee.verdict, skills: remontee.skills.map((s) => s.nom), livrables: remontee.livrables.map(nomDe) } } : {}),
       // D-131 (a), TF-2056 — la mesure de la période d'avertissement des gains : combien de gains écrits dans le tour, quels chiffres sans sortie à l'appui.
       ...(gainsEcrits.length ? { gains: { ecrits: gainsEcrits.length, chiffres_sans_releve: gainsSans.map((x) => x.chiffre) } } : {}),
       prejuge: !!prejuge,

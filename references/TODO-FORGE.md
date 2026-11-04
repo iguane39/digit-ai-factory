@@ -389,7 +389,14 @@ une décision humaine.
    propositions prêtes par valeur décroissante, 7 au plus, reporte les suivantes, et liste « à
    instruire » celles dont la fiche est incomplète, avec les champs manquants. Le dossier se range
    dans `output\04-plans\` au nommage de la règle R-4 ; la correspondance D-N → TF-#### s'ajoute à
-   `todo\observabilite\revues-hebdo.jsonl`, qui date la revue.
+   `todo\observabilite\revues-hebdo.jsonl`, qui date la revue. **Depuis le 04/11/2026 (TF-2116)**, le
+   dossier ajoute une section « Modèles des fournisseurs tiers » : `oracles\oracle-modeles-tiers.mjs`
+   est joué ici (processus fils borné à 120 s ; 49 s mesurés le 03/11 sur 57 dépôts, trop long pour
+   l'ouverture, qui répond en moins de 45 s), et la section rend les identifiants arrêtés (MT1), ceux
+   qui s'arrêtent dans moins de 90 jours (MT2) et l'âge du référentiel (MT4). Quand MT4 avertit, elle
+   nomme le geste de session qui le rafraîchit (relire les pages des fournisseurs, redater
+   `references\MODELES-TIERS.json`) : la revue le nomme, elle ne le fait pas. Un contrôle qui ne s'est pas
+   joué est dit « non mesuré » avec sa raison. `--sans-modeles-tiers` saute la section.
 4. **L'affichage.** La restitution du tour reprend les décisions du dossier EN ENTIER à son bloc 3,
    comme toute décision : c'est là que le porteur les lit.
 5. **La réponse.** Chaque sélecteur reçu se consigne par `todo\journaliser.mjs` : (a) ou (b) font

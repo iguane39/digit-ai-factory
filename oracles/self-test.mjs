@@ -615,6 +615,71 @@ check("R-11 bis : les trois déclarés — dont « absent » motivé — → PAS
     writeFileSync(chemin, avant);
   }
 });
+// TF-2125 (04/11/2026, retour Produit-86) — R-11 ter : la table « Règles de socle applicables » du CLAUDE.md est confrontée aux types
+// d'écrans que le produit porte. ROUGES : une page à tableau sans ligne « Page HTML de données » (section absente, ou section qui ne
+// porte qu'une autre ligne, ou seule la ligne-gabarit non remplie) ; des boutons sans ligne « Textes d'application » — la ligne
+// manquante est NOMMÉE et celle qui existe n'est pas redemandée. VERTS : le remède joué (la ligne ajoutée, « aucune » motivée comprise),
+// les deux types déclarés, une page à tableau sous output\ (un livrable, pas un écran du produit), un produit sans écran.
+// L'avertissement ne fait jamais échouer l'oracle (exit 0), comme R-11 bis.
+{
+  const PAGE_TABLEAU = "<html><body><h1>Clients</h1><table><tr><th>Nom</th></tr><tr><td>A</td></tr></table></body></html>\n";
+  const PAGE_BOUTONS = "<html><body><button>Enregistrer</button><form><input name=\"q\"></form></body></html>\n";
+  const ENTETE_TABLE = "\n## Règles de socle applicables\n\n| Type de livrable | Règles de socle | Composant / oracle |\n|---|---|---|\n";
+  const LIGNE_DONNEES = "| Page HTML de données (tableau, console, tableau de bord) | BEST-PRACTICES-HTML.md § I ; L4 | check_html.py |\n";
+  const LIGNE_TEXTES = "| Textes d'application (libellés, erreurs, états vides, aide) | ECRITURE.md E-12 | C15 |\n";
+  const avecEcrans = (pages, ajoutClaude, controle) => {
+    const chemin = join(verte, "CLAUDE.md");
+    const avant = readFileSync(chemin, "utf8");
+    const posees = [];
+    try {
+      for (const [rel, contenu] of Object.entries(pages)) {
+        const f = join(verte, ...rel.split("/"));
+        mkdirSync(dirname(f), { recursive: true });
+        writeFileSync(f, contenu);
+        posees.push(f);
+      }
+      writeFileSync(chemin, avant + ajoutClaude);
+      const { exit, rapport } = lance(verte);
+      controle({ exit, avert: rapport.non_juge.filter((l) => /^R-11 ter — /.test(l)), pass: rapport.findings.filter((x) => x.regle === "R-11 ter") });
+    } finally {
+      writeFileSync(chemin, avant);
+      for (const f of posees) rmSync(f, { force: true });
+      rmSync(join(verte, "src"), { recursive: true, force: true });
+    }
+  };
+  check("R-11 ter : une page à tableau et aucune section de règles de socle → la ligne « Page HTML de données » est NOMMÉE, sans échec (TF-2125)", () => {
+    avecEcrans({ "src/clients.html": PAGE_TABLEAU }, "", ({ exit, avert, pass }) => {
+      if (!avert.length) throw new Error("aucun avertissement R-11 ter — le trou de Produit-86 resterait invisible");
+      if (!/Page HTML de données/.test(avert[0]) || !/src\/clients\.html/.test(avert[0])) throw new Error(`la ligne manquante ou la page n'est pas nommée : ${avert[0]}`);
+      if (/Textes d'application/.test(avert.join(" "))) throw new Error("un type absent du produit est réclamé");
+      if (pass.length) throw new Error("un PASS est rendu alors que la ligne manque");
+      if (exit !== 0) throw new Error(`l'avertissement fait échouer l'oracle (exit ${exit})`);
+    });
+  });
+  check("R-11 ter : une section qui ne porte qu'une autre ligne, ou la ligne-gabarit non remplie, ne couvre pas la page à tableau (TF-2125)", () => {
+    avecEcrans({ "src/clients.html": PAGE_TABLEAU }, ENTETE_TABLE + "| Page HTML de prose (rapport, fiche, note) | socle digit-ai-page-html | check_html.py |\n| <autre type de ce produit> | <règles> | <composant / oracle> |\n",
+      ({ avert }) => { if (!avert.length || !/Page HTML de données/.test(avert[0])) throw new Error(`la ligne manquante n'est pas nommée : ${avert[0]}`); });
+  });
+  check("R-11 ter : des boutons sans ligne « Textes d'application » → cette ligne est nommée, celle qui existe n'est pas redemandée (TF-2125)", () => {
+    avecEcrans({ "src/app.html": PAGE_BOUTONS }, ENTETE_TABLE + LIGNE_DONNEES, ({ avert }) => {
+      if (!avert.length || !/Textes d'application/.test(avert[0])) throw new Error(`la ligne manquante n'est pas nommée : ${avert[0]}`);
+      if (/Page HTML de données/.test(avert.join(" "))) throw new Error("la ligne déjà déclarée est redemandée");
+    });
+  });
+  check("R-11 ter : le remède joué — la ligne ajoutée, « aucune » motivée comprise — rend PASS et lève l'avertissement (TF-2125)", () => {
+    avecEcrans({ "src/clients.html": PAGE_TABLEAU, "src/app.html": PAGE_BOUTONS }, ENTETE_TABLE + LIGNE_DONNEES + "| Textes d'application | aucune — les libellés viennent du client, hors périmètre | sans objet |\n",
+      ({ avert, pass }) => {
+        if (avert.length) throw new Error(`l'avertissement subsiste après le remède : ${avert[0]}`);
+        if (!pass.length || pass[0].statut !== "PASS" || !/2 type\(s\)/.test(pass[0].message)) throw new Error(`PASS attendu sur les 2 types, obtenu ${JSON.stringify(pass[0])}`);
+      });
+  });
+  check("R-11 ter : une page à tableau sous output\\ ou un produit sans écran ne déclenche rien (TF-2125)", () => {
+    avecEcrans({ "output/Produit - Rapport Test - 20260806b.html": PAGE_TABLEAU }, "", ({ avert, pass }) => {
+      if (avert.length || pass.length) throw new Error("un livrable d'output\\ est pris pour un écran du produit");
+    });
+    avecEcrans({}, "", ({ avert, pass }) => { if (avert.length || pass.length) throw new Error("un produit sans écran est jugé"); });
+  });
+}
 // ---- fixture ROUGE : défauts plantés, chaque règle dure doit se déclencher -------------------
 const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)

@@ -1399,6 +1399,71 @@ else {
   }
 }
 
+// R-11 ter — LA TABLE DES RÈGLES DE SOCLE COUVRE LES TYPES D'ÉCRANS QUE LE PRODUIT PORTE (TF-2125, 04/11/2026, retour Produit-86).
+// Le fait : ni « Page HTML de données » ni « Textes d'application » ne figuraient dans la table « Règles de socle applicables » du
+// CLAUDE.md du produit. Le brief du tableau n'a donc cité ni L4 (filtres de tableau) ni le composant du socle, et un tableau est parti
+// avec un filtre maison. Le gabarit le dit déjà (CLAUDE-PRODUIT.md : « un type absent est un oubli », loi n° 3) ; aucun contrôle ne
+// confrontait la table à ce que le produit contient. Celui-ci le fait : il relève les types d'écrans présents (TYPES_D_ECRAN, une donnée
+// éditable : un type de plus = une entrée de plus), lit la première colonne de la table, et NOMME la ligne manquante.
+// Avertissement au `non_juge`, pas échec, comme R-11 bis : la table est neuve pour les produits ouverts avant le 04/11/2026, et
+// « aucune » motivée est une réponse valide — ce que la règle refuse est le silence.
+const HORS_ECRANS = /(^|\/)(old|input|output|docs|forge|fixtures?|tests?|__tests__|e2e|coverage|build|vendor)\//i;
+const TYPES_D_ECRAN = [
+  {
+    type: "Page HTML de données (tableau, console, tableau de bord)",
+    ligne: /donn[ée]es|tableaux?\b|console/i,
+    voir: "BEST-PRACTICES-HTML.md § I du pilot : L4 filtres de tableau, G1-G6, composant table-filters du socle",
+    signal: "une balise <table>",
+    fichier: /\.(?:html?|vue|jsx|tsx|svelte)$/i,
+    signe: (texte) => /<table[\s>]/i.test(texte),
+  },
+  {
+    type: "Textes d'application (libellés, erreurs, états vides, aide)",
+    ligne: /textes?\s+d['’]\s*application|libell[ée]s|[ée]tats?\s+vides?/i,
+    voir: "ECRITURE.md E-12 et voix.md du skill systeme-de-marque, critère C15",
+    signal: "des boutons, formulaires ou champs, ou un dossier de textes (locales, i18n)",
+    fichier: /\.(?:html?|vue|jsx|tsx|svelte)$|(?:^|\/)(?:locales?|i18n|translations?)\/[^/]+\.(?:json|ya?ml|po)$/i,
+    signe: (texte, chemin) => /(?:^|\/)(?:locales?|i18n|translations?)\//i.test(chemin) || /<(?:button|form|input|select|textarea)[\s>]/i.test(texte),
+  },
+];
+{
+  const claudeMd = existsSync(p("CLAUDE.md")) ? readFileSync(p("CLAUDE.md"), "utf8") : "";
+  const entete = /^##\s+R[èe]gles\s+de\s+socle[^\n]*$/im.exec(claudeMd);
+  const lignesDeclarees = [];
+  if (entete) {
+    const apres = claudeMd.slice(entete.index + entete[0].length);
+    const fin = apres.search(/^##\s/m);
+    for (const l of (fin >= 0 ? apres.slice(0, fin) : apres).split(/\r?\n/)) {
+      if (!/^\s*\|/.test(l)) continue;
+      const cellule = l.trim().replace(/^\|/, "").split("|")[0].trim();
+      if (!cellule || /^:?-{2,}:?$/.test(cellule) || /^type\s+de\s+livrable$/i.test(cellule) || /^<.*>$/.test(cellule)) continue;   // en-tête, filet, gabarit non rempli
+      lignesDeclarees.push(cellule);
+    }
+  }
+  const candidats = [...fichiers(cible)].map((f) => rel(f)).filter((r) => !HORS_ECRANS.test(r) && !/\.(?:test|spec|min)\.[a-z]+$/i.test(r) && !estExcluDuDepot(r));
+  const relevesParType = TYPES_D_ECRAN.map((t) => {
+    const trouves = [];
+    for (const r of candidats) {
+      if (!t.fichier.test(r)) continue;
+      let texte = "";
+      try { if (statSync(p(r)).size <= 2 * 1024 * 1024) texte = readFileSync(p(r), "utf8"); } catch { continue; }
+      if (t.signe(texte, r)) trouves.push(r);
+    }
+    return { ...t, trouves };
+  }).filter((t) => t.trouves.length);
+  if (relevesParType.length) {
+    const manquants = relevesParType.filter((t) => !lignesDeclarees.some((c) => t.ligne.test(c)));
+    for (const t of manquants) {
+      antecedences.push(
+        `R-11 ter — ${entete ? "la table « Règles de socle applicables » du CLAUDE.md n'a pas de ligne" : "le CLAUDE.md n'a pas de section « Règles de socle applicables », donc pas de ligne"} pour « ${t.type} », `
+        + `alors que le produit porte ${t.trouves.length} fichier(s) qui en relèvent (${t.signal}) : ${t.trouves.slice(0, 3).join(", ")}${t.trouves.length > 3 ? `, +${t.trouves.length - 3}` : ""}. `
+        + `Sans cette ligne, le brief de l'écran ne cite ni la règle ni le composant du socle (${t.voir}) : un tableau a été livré avec un filtre maison au lieu du composant (Produit-86). `
+        + "Ajouter la ligne d'après references\\CLAUDE-PRODUIT-DETAIL.md du pilot ; « aucune » motivée est une réponse valide, l'omettre est un oubli (loi n° 3)");
+    }
+    if (!manquants.length) ok("R-11 ter", "CLAUDE.md", `les ${relevesParType.length} type(s) d'écran du produit (${relevesParType.map((t) => t.type.split(" (")[0]).join(", ")}) ont leur ligne dans la table des règles de socle`);
+  }
+}
+
 existsSync(p("README.md")) ? ok("R-12", "README.md", "présent") : ko("R-12", "README.md", "absent");
 
 // R-13 — .env.example exhaustif (présence + ≥ 1 variable + SUIVI par git, TF-0714)
@@ -2781,6 +2846,7 @@ const nonJuge = [
   "R-15 : seule une variable SANS valeur est jugée (R-15.1, TF-1080) ; une variable AVEC valeur par défaut qui serait en réalité tierce n'est pas vue — l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
+  "R-11 ter (TF-2125) : les types d écrans sont reconnus à des SIGNAUX de fichier (balise <table> ; boutons, formulaires ou champs ; dossier locales ou i18n) dans les .html, .vue, .jsx, .tsx et .svelte hors output, input, docs, forge, old et tests — un écran construit par programme sans ces balises, ou servi par un gabarit hors du dépôt, n est pas vu. La ligne est reconnue à son LIBELLÉ (première colonne de la table), jamais à la pertinence de ses règles ; deux types seulement sont relevés (TYPES_D_ECRAN), les autres lignes du détail restent à la déclaration de la session",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
   "R-23, volet « page servie » (TF-1088) : la reconnaissance passe par le NOM du fichier (connexion, login, sign-in, authentification, aide, help) — un identifiant de démonstration affiché depuis un composant dont le nom ne dit rien reste invisible. Le vocabulaire est étroit et fermé par choix : l'élargir à tout le code d'un produit rendrait la règle bavarde là où elle doit être opposable",
