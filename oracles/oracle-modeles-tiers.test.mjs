@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { executer, juger, lireReferentiel, classerFichier, motifIdentifiant, racineGit, trouverDepots, joursEntre, NON_JUGE, REF_DEFAUT } from "./oracle-modeles-tiers.mjs";
+import { executer, juger, lireReferentiel, classerFichier, motifIdentifiant, racineGit, trouverDepots, estWorktreeLie, joursEntre, NON_JUGE, REF_DEFAUT } from "./oracle-modeles-tiers.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const FIX = join(ICI, "fixtures", "modeles-tiers");
@@ -239,6 +239,23 @@ check("unités — classement des fichiers, frontières d'identifiant, racines d
   ok(motifIdentifiant("o3").test('"o3"') && !motifIdentifiant("o3").test("var o3 = 1") && !motifIdentifiant("ada").test("metadata"), "mots isolés");
   ok(racineGit("alpha-4o-mini") === "alpha-" && racineGit("o3-pro") === "o3-pro" && racineGit("/v0/x") === "/v0/x" && racineGit("ft-o4") === "ft-o4", "racines");
   ok(trouverDepots(PARC_ROUGE).length === 3 && trouverDepots(PARC_ROUGE, 3).length === 2, `${trouverDepots(PARC_ROUGE).length} dépôts à 4 niveaux, ${trouverDepots(PARC_ROUGE, 3).length} à 3`);
+});
+
+check("TF-2135 — un arbre de travail lié est hors parc, son dépôt principal reste vu", () => {
+  const racine = join(T, `wt${++n}`);
+  const principal = join(racine, "depot-principal");
+  mkdirSync(principal, { recursive: true });
+  ok(git(principal, "init", "-q").status === 0, "git init");
+  writeFileSync(join(principal, "f.mjs"), "const m = 'modele-a-arrete';\n", "utf8");
+  ok(git(principal, "add", "-A").status === 0, "git add");
+  ok(git(principal, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "x").status === 0, "git commit");
+  const wt = join(racine, "copie-de-travail");
+  ok(git(principal, "worktree", "add", "-q", wt).status === 0, "git worktree add");
+  // le .git de la copie est un FICHIER pointant vers …/worktrees/… ; le .git du principal est un dossier
+  ok(estWorktreeLie(join(wt, ".git")) === true, "la copie liée est reconnue");
+  ok(estWorktreeLie(join(principal, ".git")) === false, "le dépôt principal n'est pas une copie liée");
+  const vus = trouverDepots(racine).map((d) => d.split(/[/\\]/).pop());
+  ok(vus.length === 1 && vus[0] === "depot-principal", `seul le principal est vu : ${vus.join(", ")}`);
 });
 
 check("de bout en bout : la ligne de commande rend le rouge (exit 1, JSON) puis le vert (exit 0)", () => {

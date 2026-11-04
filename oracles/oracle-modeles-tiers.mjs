@@ -93,7 +93,7 @@ export const NON_JUGE = [
   "les identifiants construits à l'exécution (concaténation, variable d'environnement, valeur lue en base ou en ligne de commande) : un appelant qui compose le nom du modèle échappe à toute recherche de texte",
   "la casse et l'orthographe : la recherche est exacte, `GPT-4o` n'est pas `gpt-4o`",
   "l'usage réel d'une occurrence : une citation dans un commentaire, un message d'erreur ou une liste de refus compte comme une occurrence en code ou en configuration. Seule la nature du fichier (extension) les sépare du documentaire",
-  "les fichiers non suivis par git, les fichiers d'environnement réels (.env, .env.local, .env.production…, exclus de la lecture), les dépôts à plus de 4 niveaux sous la racine et ceux imbriqués dans un autre dépôt",
+  "les fichiers non suivis par git, les fichiers d'environnement réels (.env, .env.local, .env.production…, exclus de la lecture), les dépôts à plus de 4 niveaux sous la racine, ceux imbriqués dans un autre dépôt, et les arbres de travail liés (`git worktree`), copies transitoires hors parc (TF-2135)",
   "l'effet d'un arrêt : certains identifiants déprécient sans s'arrêter (redirection automatique vers le remplaçant, mentionnée en note du référentiel) ; l'oracle date, il ne mesure pas le comportement du fournisseur",
   "l'exactitude de la page du fournisseur et la complétude du référentiel : il reflète la page relue à sa date, pas la liste réelle des modèles servis",
   "les bibliothèques officielles et leurs versions : données du référentiel, non confrontées aux manifestes (package.json, requirements) du parc",
@@ -191,11 +191,25 @@ export function lireReferentiel(ref, date) {
 }
 
 // ---- les dépôts ------------------------------------------------------------------------------------
-/** Dépôts git sous la racine : `.git` (dossier ou fichier) jusqu'à `profondeur` niveaux, sans descendre dans un dépôt. */
+/**
+ * Un arbre de travail LIÉ (`git worktree add`) : son `.git` est un FICHIER dont le pointeur `gitdir:`
+ * vise le dossier d'administration `…/.git/worktrees/<nom>` du dépôt principal. Ce n'est pas un dépôt
+ * du parc mais une copie de travail transitoire : la scanner double chaque occurrence et, lancé depuis
+ * l'un d'eux, l'oracle lisait le référentiel de la copie et comptait de faux MT1 (TF-2135).
+ */
+export function estWorktreeLie(cheminGit) {
+  try {
+    if (!statSync(cheminGit).isFile()) return false;
+    return /gitdir:\s*.*[/\\]worktrees[/\\]/.test(readFileSync(cheminGit, "utf8"));
+  } catch { return false; }
+}
+
+/** Dépôts git sous la racine : `.git` (dossier ou fichier) jusqu'à `profondeur` niveaux, sans descendre dans un dépôt, hors arbres de travail liés (TF-2135). */
 export function trouverDepots(racine, profondeur = PROFONDEUR) {
   const trouves = [];
   const marcher = (d, niveau) => {
-    if (existsSync(join(d, ".git"))) { trouves.push(d); return; }
+    const g = join(d, ".git");
+    if (existsSync(g)) { if (!estWorktreeLie(g)) trouves.push(d); return; }
     if (niveau >= profondeur) return;
     let entrees;
     try { entrees = readdirSync(d, { withFileTypes: true }); } catch { return; }
