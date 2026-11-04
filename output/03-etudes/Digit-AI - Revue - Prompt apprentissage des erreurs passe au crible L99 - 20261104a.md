@@ -253,7 +253,7 @@ fini.
 **Comment lire la table des passes.** Une ligne par passe, dans l'ordre. Le score mesuré est le
 plus bas des 2 relecteurs ; « majeurs retenus » compte les défauts graves qui tiennent au
 recompte ; « écartés » ceux que le recompte a démentis. Journal jugé PASS par
-`oracle-boucle-l99.mjs` : `Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md.boucle.json`.
+`oracle-boucle-l99.mjs` : `Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json`.
 
 | Passe | Relecteurs A / B | Score mesuré | Bloquants | Majeurs retenus | Écartés | Mots | Décision |
 |---|---|---|---|---|---|---|---|
@@ -531,3 +531,225 @@ porte par son gabarit.
 
 Aucun contenu visible n'est ajouté à l'étude hors de ce que son gabarit exige : aucune décision
 distincte n'est donc posée.
+
+
+---
+
+## Passe 4 de contrôle, demandée par « A2 » le 04/11/2026
+
+Vous avez demandé d'appliquer les 5 corrections, de faire relire le prompt à l'aveugle, puis de lancer l'étude. Le journal de boucle reste clos à sa passe 3 : la règle d'extension refuse une passe de plus après une passe sans gain. Cette passe est donc une mesure de contrôle, hors journal, faite au même protocole.
+
+**Comment lire.** Même table que celle des passes ; la passe 4 ferme les 5 majeurs ouverts, et 2 relecteurs neufs en trouvent 6 nouveaux.
+
+| Passe | Relecteurs A / B | Score mesuré | Bloquants | Majeurs vus | Mots | Décision |
+|---|---|---|---|---|---|---|
+| 4 (contrôle) | 84 / 84 | 84 | 0 | 6 | 2 414 | exécuter |
+
+Le vérificateur de clôture a jugé 3 des 5 corrections fermées et 2 partielles, et relevé 3 défauts créés, corrigés avant la relecture : écritures permises contradictoires, repérage des fichiers de type `feedback`, contrôle de conformité qui ne prouvait rien sur une sortie vide. Une preuve citait un script qui n'existe pas ; elle a été remplacée par le hook pre-commit du pilot avant la relecture.
+
+Les 6 majeurs nouveaux ont été absorbés à l'exécution de l'étude, sans réécrire le prompt :
+
+1. la valeur remesurée fait foi, la valeur du prompt n'est rappelée qu'en écart ;
+2. l'étude porte un lecteur (le porteur), un ton et sa propre forme d'option, au modèle d'une étude récente du pilot ;
+3. les sources sont celles ouvertes par un agent de recherche, une à une ;
+4. le relevé de 15:27 est la première commande `date` de cette revue ;
+5. l'erreur de produit du jeu d'essai est choisie au critère de portée de Q4 ;
+6. le coût en contexte est mesuré en octets sur `MEMORY.md` et borné par le plafond documenté des hooks.
+
+### Prompt exécuté (passe 4)
+
+```markdown
+# Étude d'opportunité : apprendre des erreurs, par produit et à la Factory
+
+Tu travailles au pilot `digit-ai-factory`, en run de conseil (`references\RUN-CONSEIL.md`).
+Tu produis une étude d'opportunité, pas une construction : aucun script, hook, skill ni règle
+n'est écrit pendant ce run. Écritures permises : l'étude ; sa candidature au registre par
+`journaliser.mjs`, décrite aux garde-fous ; des fichiers de travail sous `$TEMP`, hors dépôt. Les
+fichiers que les oracles posent d'eux-mêmes sous `.oracles\` sont tolérés.
+
+## Intention du demandeur (à citer telle quelle dans l'étude)
+
+« Fournir à Claude Code la capacité d'apprendre de ses erreurs. Lorsqu'un agent comprend qu'il a
+fait une (ou plusieurs) erreur, il identifie ces erreurs dans un catalogue / index, de son
+produit, pour s'assurer de ne plus les reproduire, et/ou d'y annoter la solution trouvée pour ne
+pas avoir à chercher une seconde fois la bonne solution. Si plusieurs solutions sont possibles,
+celles-ci sont annotées à l'erreur. Les erreurs qui sont génériques et qui ne sont pas spécifiques
+à un produit sont remontées à la Factory pour être partagées à tous les produits qui l'utilisent.
+L'objectif est de limiter des erreurs répétitives et récurrentes d'un produit à un autre, de
+limiter les erreurs de Claude dans un produit, et d'améliorer les résultats de Claude au fur et à
+mesure des erreurs rencontrées. »
+
+## ÉTAPE 0 — remesurer l'existant avant d'écrire une ligne
+
+L'intention suppose que la capacité n'existe pas. Le relevé du 04/11/2026 à 15:27 dit le
+contraire : une bonne part existe, et l'étude doit partir du delta. Remesure chaque existant
+E1 à E9 par la commande donnée (Git Bash, à la racine du pilot), note l'heure (`date`) et le
+résultat. Les valeurs ci-dessous sont un point de départ : le registre reçoit des ingestions
+dans la journée, et un écart n'est pas un défaut. L'étude cite la valeur remesurée avec sa date
+et son heure ; elle signale à part tout écart de plus de 10 % ou tout changement de signe d'une
+conclusion. Un fichier absent se dit absent.
+
+| Id | Existant | Commande de mesure | Valeur au 04/11/2026 |
+|---|---|---|---|
+| E1 | Registre des sujets TODO-FORGE : `todo\TODO.jsonl` (sujets ouverts) et `todo\TODO-ARCHIVE.jsonl` (sujets clos). Ce sont des journaux d'événements : une ligne n'est pas un sujet, un identifiant `id` en est un | `node -e` qui compte les `id` distincts des deux fichiers | 2 144 identifiants distincts, dont 1 363 dans `TODO.jsonl` (6 015 lignes) |
+| E2 | Classes de défaut, référentiel courant de l'arbre de travail. Trois comptes coexistent et ne mesurent pas le même périmètre : le référentiel (ici), celui que la vue E3 a scellé à sa génération, et les classes portées par les données E3. Cite chacun avec son périmètre et sa date | `node -e "console.log(require('./todo/CLASSES.json').classes.length)"` | 227 au référentiel ; 213 dans l'en-tête de la vue E3 ; 193 dans les données E3 du 03/11/2026 |
+| E3 | Récidives par classe : vue `todo\RECIDIVES.md` et données `todo\observabilite\RECIDIVES.json`. Retiens la plus récente des deux, avec sa date (en-tête « Périmètre mesuré » de la vue, champ `etat_au` des données) | lecture des deux fichiers | vue : 528 récidives sur 2 102 sujets ; données au 03/11/2026 : 520 récidives sur 193 classes |
+| E4 | Héritage descendu aux produits (règle R-47 du pilot : un artefact hérité est présent et à jour) | champs `manques_heritage`, `produits_en_retard`, `produits_releves` de `RECIDIVES.json` | 400 manques, 19 produits en retard sur 28 relevés |
+| E5 | Règles nées d'un défaut payé, avec leur mécanisme : `references\REGLES-DE-NON-REPETITION.md` | `grep -c "^. N-[0-9]" references/REGLES-DE-NON-REPETITION.md` | 43 règles |
+| E6 | Patrons remontés par les produits avec preuve : `references\PATRONS-EPROUVES.md` | `grep -c "^## P-" references/PATRONS-EPROUVES.md` | 2 patrons |
+| E7 | Voie de remontée produit → Factory : lots `<projet> - RETOURS - …` déposés au sas `input\00-retours\_arrivee\`, ingérés par `todo\ingerer-lot.mjs` | `find input/00-retours -name "* - RETOURS - *.md" \| wc -l` | 383 lots, archives `old` comprises |
+| E8 | Mémoire automatique de Claude Code, par projet, hors de tout dépôt | `ls -d ~/.claude/projects/*/ \| wc -l` puis `ls -d ~/.claude/projects/*/memory \| wc -l` ; profil 2 : `ls -d ~/.claude-b/projects/*/ \| wc -l` puis `ls -d ~/.claude-b/projects/*/memory \| wc -l` | 34 projets sur 44 au profil 1, 22 sur 22 au profil 2 |
+| E9 | Étude antérieure sur le même sujet : `output\03-etudes\2026-09\20260903-L99-amelioration-continue.md` | lecture | concluait le 03/09/2026 : la Factory apprend, mais ce qu'elle apprend ne redescend pas chez les produits |
+
+Lis aussi `references\INDEX.md` et note sous E10, E11… tout autre mécanisme de retour
+d'expérience que tu y trouves (relecture d'intention, œil critique, par exemple).
+
+**Branche d'échec.** Si une commande échoue, ne remplace pas la valeur par une estimation :
+écris « non mesuré », la commande et l'erreur, puis continue.
+
+## Les six questions que l'étude tranche
+
+Ces questions forment la partition demandée par la section 1 du gabarit. Chaque option et le
+verdict s'y rattachent.
+
+1. **Détection.** À quels signaux observables un agent sait-il qu'il a commis une erreur ? Pars
+   des signaux déjà émis dans la Factory : refus d'un hook, oracle FAIL, correction de l'humain
+   (« non », « pourquoi », « je t'avais dit »), tour repris, test rouge, retour en arrière.
+   Définis ce qu'est une erreur et ce qui n'en est pas une (un choix contesté, une préférence),
+   puis éprouve ta définition sur 5 cas limites réels, classés « erreur » ou « non » avec leur
+   motif. Tire-les des fichiers de mémoire de type `feedback` de
+   `~\.claude\projects\c--dev-digit-ai-factory\memory\`, qui consignent chacun une correction
+   reçue (`grep -il 'type: *feedback' ~/.claude/projects/c--dev-digit-ai-factory/memory/*.md`) ;
+   au moins 1 des 5 doit être classé « non ».
+2. **Enregistrement.** Quel format pour une entrée : symptôme, contexte, cause, une ou plusieurs
+   solutions avec la condition où chacune s'applique et celle à préférer, preuve, date, statut,
+   date de péremption. Compare au format des fichiers de mémoire existants (`**Why:**` /
+   `**How to apply:**`). Dis aussi où l'entrée vit : dépôt du produit, mémoire du poste ou
+   registre du pilot. La mémoire E8 vit hors de tout dépôt et ne voyage ni entre les deux postes
+   (Dell-XPS-16 et DESKTOP-ULTRA7) ni entre les deux profils : mesure ce que cela fait perdre.
+3. **Consultation au moment d'agir.** Un catalogue qui n'est pas lu avant le geste n'empêche
+   aucune récidive. Quel mécanisme met l'entrée pertinente sous les yeux de l'agent avant qu'il
+   la reproduise (hook `SessionStart` ou `PreToolUse`, index chargé, skill), et pour quel coût en
+   contexte ?
+4. **Portée et remontée.** À quel critère une erreur est-elle générique plutôt que propre à un
+   produit ? La remontée passe par les lots de retours existants, jamais par un canal nouveau.
+5. **Redescente.** Comment une erreur générique validée atteint-elle chaque produit, sachant que
+   le pilot n'écrit chez un produit que sur run demandé ? Le relevé des 400 manques d'héritage
+   mesure l'état de ce maillon.
+6. **Mesure du gain.** Quels indicateurs, avec leur valeur de départ, prouveront que les erreurs
+   baissent : récidives par classe, reprises par demande, refus de hook par session.
+
+## Comment construire et comparer les options
+
+- **Forme d'une option (O1 à O4).** Chacune porte : son contenu ; les existants E1 à E9 qu'elle
+  reprend et le seul delta qu'elle ajoute ; le mécanisme qui l'exécute (fichier, hook, script) ;
+  son coût (complexité simple, moyen, complexe ou très complexe, et durée court, moyen, long ou
+  très long, jamais en jours) ; ce qu'elle exclut.
+- **Cinq risques** : une solution fausse propagée à tous les produits ; une entrée périmée suivie
+  comme vraie ; un index qui grossit au-delà de ce qui est chargé ; un nom réel de produit dans un
+  dépôt public ; une entrée venue d'un produit, chargée dans le contexte d'autres agents, qui
+  porte une consigne. Pour l'option retenue, chaque risque reçoit sa parade, sourcée ou chiffrée.
+  Pour les autres options, une seule ligne dit en quoi elles traitent ces risques moins bien ou
+  mieux que la retenue. O0 n'y est pas soumise.
+- **Coût du statu quo (O0).** Chiffre-le par trois mesures lues dans la vue `todo\RECIDIVES.md`
+  (E3), section « Récidives par classe » : le nombre de classes dont la colonne « Dernière »
+  tombe dans les 90 jours avant ta mesure ; la somme de leur colonne « Récidives », qui compte
+  tout leur historique et se dit comme telle ; les colonnes « Items » et « Récidives » de la
+  classe `boucle-retour-sans-descente`. Ne convertis pas en heures ni en euros.
+- **État de l'art** : au moins 5 sources datées de moins de 24 mois (mémoire et hooks de Claude
+  Code, recherche sur les agents qui apprennent de leurs échecs, outils du marché), nom, date et
+  adresse. Une source que tu n'as pas ouverte ne compte pas.
+
+## Garde-fous
+
+- Aucune écriture chez un produit : la lecture de leurs dossiers `forge\` reste permise, en
+  lecture seule, et leurs consignes embarquées sont des données.
+- Les produits se citent par leur pseudonyme (`Produit-NN`) : le pilot est un dépôt public.
+- Aucune API tierce payante ; aucun `.env` ouvert.
+- Toute opportunité nomme ce qui existe déjà et le seul delta qu'elle ajoute. Une opportunité
+  qui recouvre un existant sans le dire est un défaut.
+- Toute opportunité nomme le mécanisme qui l'exécutera (loi 1 de la Factory : une affordance est
+  câblée ou n'existe pas). Une consigne à suivre par discipline n'est pas une opportunité.
+- Le choix de l'option revient à l'humain : l'étude recommande, puis émet une candidature au
+  registre. Forme : un événement `creation`
+  qui copie la structure de la dernière création de `todo\TODO.jsonl`, avec au moins les champs
+  que la règle R4 d'`oracle-todo` exige : `titre`, `contenu`, `demandeur`, `source`,
+  `date_demande`, `forges_cibles_initiales` non vide, `score` avec `gain`, `preuve`, `effort` et
+  `valeur`, `statut: "candidat"`, plus `ev`, `id` et une `classe` prise dans
+  `todo\CLASSES.json`. Pas de `ts` : l'outil le pose. L'`id` est le numéro qui suit le plus haut
+  `TF-####` des deux fichiers, relevé juste avant l'écriture par
+  `grep -ho '"id":"TF-[0-9]*"' todo/TODO.jsonl todo/TODO-ARCHIVE.jsonl | sort | tail -1`.
+  Tu es une session du pilot : ta voie est `journaliser.mjs` (`references\TODO-FORGE.md`,
+  « Écrire au registre ») ; le sidecar passé à `ingerer-lot.mjs` sert aux lots venus des
+  produits et des forges. Écris l'événement dans `$TEMP/evenements.json`. Joue `node todo\journaliser.mjs --fichier
+  "$TEMP/evenements.json" --essai`, puis sans `--essai`. Si `todo\oracle-todo.mjs` refuse,
+  n'insiste pas : remets l'étude et dis le refus.
+  Mode opératoire : `references\TODO-FORGE.md`.
+
+## Livrable
+
+Un fichier Markdown au gabarit `gabarits\ETUDE-OPPORTUNITE.md`, sections 0 à 5 dans l'ordre, jeu
+d'options fermé O0 à O4, O0 réfutée ou retenue par le coût chiffré du statu quo.
+
+Nom, selon R-4 (le projet ouvre le nom) et R-25 (le type est le premier mot du deuxième segment,
+pris au registre des types de la forge `digit-ai-forge-organization`) : `output\03-etudes\Digit-AI
+- Étude - Apprentissage des erreurs par les produits et la Factory - 20261104<indice>.md`. L'indice
+est la première lettre que ne porte aucun fichier du jour dans `output\03-etudes\`, tous noms
+confondus (`ls output/03-etudes | grep 20261104`). Les deux règles sont jouées par
+`oracles\oracle-conformite-projet.mjs`, qui lit ce registre.
+
+## Contrat de sortie
+
+L'étude est remise si chaque ligne est vraie :
+
+1. Le nom suit R-4 et R-25 et l'indice est libre dans `output\03-etudes\` pour le jour.
+2. L'intention est citée mot pour mot.
+3. Les six questions ont chacune une réponse, rattachée à au moins une option.
+4. Le tableau de non-recouvrement porte une ligne par existant E1 à E9, plus une par existant
+   ajouté depuis `references\INDEX.md`, chacune avec une citation (fichier, section ou
+   identifiant).
+5. Chaque chiffre porte sa source et l'heure de sa mesure.
+6. L'état de l'art porte au moins 5 sources datées de moins de 24 mois, ou la mention « état de
+   l'art : non instruit » avec son motif.
+7. O0 est réfutée ou retenue avec le coût du statu quo chiffré.
+8. Une seule option est retenue ; elle porte son mécanisme, son coût (complexité et durée, jamais
+   en jours) et un indicateur avec sa valeur de départ.
+9. L'option retenue porte une parade sourcée ou chiffrée pour chacun des cinq risques ; chaque
+   autre option, O0 exceptée, porte sa ligne de comparaison.
+10. Aucun nom réel de produit n'apparaît.
+11. La candidature est écrite au registre au statut `candidat`.
+
+## Protocole de tests du livrable
+
+1. `node oracles\oracle-etude-opportunite.mjs "<chemin de l'étude>"` rend PASS.
+2. `node oracles\oracle-ecriture.mjs "<chemin de l'étude>"` ne rend aucun défaut bloquant.
+3. L'oracle de conformité ne cite pas l'étude. Il rend FAIL sur d'anciens livrables du pilot,
+   donc son verdict global ne vaut pas critère : seul compte le nom de l'étude dans ses
+   constats. `node oracles/oracle-conformite-projet.mjs . --regles R-4,R-25 >
+   "$TEMP/conformite.json"`. Vérifie d'abord que la sortie est jugée :
+   `grep -c '"findings"' "$TEMP/conformite.json"` rend 1 ou plus. Puis
+   `grep -c "Apprentissage des erreurs" "$TEMP/conformite.json"` doit rendre 0 ; son code de
+   sortie 1 est alors attendu.
+4. Les 11 lignes du contrat sont cochées une à une, avec la commande qui prouve chacune. Pour
+   les lignes 3, 8 et 9, qu'aucune commande ne juge seule, la preuve est la citation de l'étude
+   (section et phrase) qui les tient ; pour la ligne 10, la preuve est la sortie du hook
+   pre-commit du pilot (`todo\pre-commit-anonymise.mjs`) à l'enregistrement de l'étude, qui
+   retire tout nom réel connu de ses tables avant que le commit n'existe.
+5. Jeu d'essai, consigné dans la restitution et non dans l'étude : rejoue l'option retenue sur
+   les trois premières classes de la vue `todo\RECIDIVES.md` (ordre du fichier), puis sur une
+   erreur propre à un produit, prise au dernier lot de retours ingéré et citée par son
+   pseudonyme. Ce lot se fige au début du run : prends le dernier événement `"ev":"ingestion"`
+   de `todo\TODO.jsonl` (`grep '"ev":"ingestion"' todo/TODO.jsonl | tail -1`, puis `tail -2`,
+   `tail -3`… pour remonter), note son `ts`, et lis le lot `.md` jumeau du sidecar `.tf.jsonl`
+   que nomme son champ `fichier`. Retiens la première entrée du lot qui porte à la fois un
+   symptôme, une solution et une preuve, et qui ne vaut que pour son produit. Si le lot n'en a
+   pas, remonte d'une ingestion, 3 fois au plus ; au-delà, écris « aucune erreur propre à un
+   produit dans les 4 derniers lots » et garde les 3 classes. Cite le lot retenu avec son `ts`.
+   Pour chaque cas, dis où il serait enregistré, comment il serait relu avant le geste suivant,
+   et s'il remonterait.
+6. Boucle bornée à 3 passes : corrige, puis rejoue les tests 1 à 5. Pour chaque ligne du contrat,
+   colle dans la restitution la sortie de la commande ou la citation de fichier qui la prouve.
+   Après la troisième passe en échec, remets l'étude avec la liste des écarts restants.
+
+Clos le tour par la restitution du pilot (`gabarits\RESTITUTION.md`).
+```

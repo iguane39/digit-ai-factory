@@ -8,7 +8,7 @@ destinataire: humain
 
 Votre prompt est réécrit et noté 84 sur 100 par 2 relecteurs aveugles, contre 27 au départ. La Factory a déjà l'essentiel de ce que vous demandez : un registre de 2 144 sujets, 227 classes d'erreurs, 520 récidives comptées et une mémoire par projet. Une étude du 03/09/2026 avait déjà conclu sur ce sujet. Le prompt réécrit fait donc partir l'étude de cet existant. Il la concentre sur 2 maillons faibles : une erreur connue n'est pas relue avant le geste suivant, et ce que la Factory apprend redescend mal chez les produits. Il reste 5 défauts moyens, listés avec leur correction. Vous pouvez lancer l'étude telle quelle, ou demander d'abord ces corrections.
 
-Livré : [Revue L99 du prompt d'étude sur l'apprentissage par les erreurs](output/03-etudes/Digit-AI%20-%20Revue%20-%20Prompt%20etude%20apprentissage%20par%20les%20erreurs%20passe%20au%20crible%20L99%20-%2020261104a.md)
+Livré : [Revue L99 du prompt d'étude sur l'apprentissage par les erreurs](output/03-etudes/Digit-AI%20-%20Revue%20-%20Prompt%20apprentissage%20des%20erreurs%20passe%20au%20crible%20L99%20-%2020261104a.md)
 
 ## 1. En-tête d'identification
 
@@ -60,7 +60,7 @@ Aucune décision ne vous revient : lancer l'étude ou corriger d'abord le prompt
 
 ## 9. Traces
 
-- Revue : `output/03-etudes/Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md`.
+- Revue : `output/03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md`.
 - Journal de boucle : même chemin, suffixe `.boucle.json`.
 - Passes du prompt : `C:\Users\iguan\AppData\Local\Temp\claude\c--dev-digit-ai-factory\6f67c906-a169-46fe-8511-7988d35b1555\scratchpad\l99-erreurs\prompt-p1.md`, `prompt-p2.md` et `prompt-p3.md` dans ce même dossier.
 - Enregistrement : commit local `223dd259` au pilot, non publié.

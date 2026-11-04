@@ -67,6 +67,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 7,7 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` | fichier | 98,8 Ko | JSON |
+| `Digit-AI - Étude - Apprentissage des erreurs par les produits et la Factory - 20261104b.md` | fichier | 22,5 Ko | Étude d'opportunité — Apprentissage des erreurs par les produits et la Factory — 20261104b |
 | `Digit-AI - Étude - ArtCraft pour la Factory - 20261102s.md` | fichier | 14,1 Ko | Étude d'opportunité — ArtCraft pour la forge de design — 20261102s |
 | `Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` | fichier | 35,8 Ko | Étude d'opportunité — Audit de sécurité par agents de Cloudflare — 20261102f |
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
@@ -93,10 +94,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` | fichier | 9,1 Ko | Refine de Prime Agent contre oeil-critique — 20261102r |
 | `Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` | fichier | 5,9 Ko | Essai borné de l'audit de sécurité de Cloudflare — 20261102k |
 | `Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` | fichier | 15,2 Ko | Analyse L99 — transformer en actions les sujets laissés de côté par l'œil critique (29/10/ |
+| `Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md` | fichier | 53,5 Ko | Revue L99 — « Étude d'opportunités : Claude Code apprend de ses erreurs » |
+| `Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json` | fichier | 10,7 Ko | JSON |
 | `Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` | fichier | 20,6 Ko | Revue L99 — prompt « compétences OpenAI et Gemini dans la Factory » |
 | `Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json` | fichier | 10,6 Ko | JSON |
-| `Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md` | fichier | 36,3 Ko | Revue L99 — « Étude d'opportunités : Claude Code apprend de ses erreurs » |
-| `Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md.boucle.json` | fichier | 10,7 Ko | JSON |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` | fichier | 56,1 Ko | Digit-AI — Revue L99 — Prompt « pentest automatisé de bout en bout » (Claude + LLM local) |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json` | fichier | 6,9 Ko | JSON |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` | fichier | 6,9 Ko | JSON |
@@ -105,4 +106,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_86 fichier(s), 2 sous-dossier(s)_
+_87 fichier(s), 2 sous-dossier(s)_

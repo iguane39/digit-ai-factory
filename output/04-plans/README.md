@@ -41,13 +41,14 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` | fichier | 24,9 Ko | Synthèse Conseil — 12 décisions à trancher, une qualification de noms et 4 gestes humains  |
 | `Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md` | fichier | 4,0 Ko | Synthèse Conseil — détail de l'étude d'une étape de revue de code (03/11/2026) |
 | `Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md` | fichier | 18,8 Ko | Synthèse Conseil — éléments à traiter du tri TikTok et options (02/11/2026) |
+| `Digit-AI - Synthese Conseil - Etude apprentissage des erreurs - 20261104g.md` | fichier | 9,6 Ko | Synthèse Conseil — étude « Claude Code apprend de ses erreurs », lancée sur votre « A2 » ( |
 | `Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` | fichier | 11,1 Ko | Synthèse Conseil — la flotte d'agents tient par ses gardes, pas par sa définition : 15 éca |
 | `Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` | fichier | 10,4 Ko | Synthèse Conseil — trois formats pour qu'une décision se comprenne et se tranche sans rien |
 | `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
+| `Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md` | fichier | 6,1 Ko | Synthèse Conseil — prompt d'étude « Claude Code apprend de ses erreurs » passé au crible L |
 | `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
 | `Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` | fichier | 7,9 Ko | Synthèse Conseil — prompt « compétences OpenAI et Gemini » passé au crible L99, aucune déc |
-| `Digit-AI - Synthese Conseil - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104f.md` | fichier | 6,2 Ko | Synthèse Conseil — prompt d'étude « Claude Code apprend de ses erreurs » passé au crible L |
 | `Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` | fichier | 7,8 Ko | Synthèse Conseil — prompt make-it-better avec Word et PDF, 1 décision attendue (02/11/2026 |
 | `Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` | fichier | 10,6 Ko | Synthèse Conseil — prompt du skill make-it-better passé au crible L99, 2 décisions attendu |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
@@ -201,4 +202,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_180 fichier(s), 4 sous-dossier(s)_
+_181 fichier(s), 4 sous-dossier(s)_
