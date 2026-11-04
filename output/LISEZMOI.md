@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 638 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 639 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -547,6 +547,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md | 20261004a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` |
 | Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md | 20261012a | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` |
 | Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md | 20261001e | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` |
+| Digit-AI - Synthese Mandat - Appel de preuve Gemini et cadence mensuelle des modeles - 20261104d.md | 20261104d | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Appel de preuve Gemini et cadence mensuelle des modeles - 20261104d.md` |
 | Digit-AI - Synthese Mandat - Archives classees en sous-dossiers - 20261016h.md | 20261016h | 9 Ko | `04-plans/Digit-AI - Synthese Mandat - Archives classees en sous-dossiers - 20261016h.md` |
 | Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md | 20261015c | 7 Ko | `04-plans/Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md` |
 | Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md | 20261029e | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md` |
