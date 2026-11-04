@@ -12,7 +12,7 @@ Livré : [Revue L99 du prompt d'étude sur l'apprentissage par les erreurs](outp
 
 ## 1. En-tête d'identification
 
-Analyse de prompt L99 en mode boucle, au pilot `digit-ai-factory`. Période : 04/11/2026 de 15:27 à 15:48, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 8 agents `verificateur` : 6 relecteurs aveugles et 2 vérificateurs de clôture ; escalade de modèle : aucune.
+Analyse de prompt L99 en mode boucle, au pilot `digit-ai-factory`. Période : 04/11/2026 de 15:27 à 15:49, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 8 agents `verificateur` : 6 relecteurs aveugles et 2 vérificateurs de clôture ; escalade de modèle : aucune.
 
 Intention de la demande : obtenir un prompt qui lance une étude d'opportunités utile, pour que Claude enregistre ses erreurs et leurs solutions par produit, remonte les erreurs génériques à la Factory et réduise les récidives d'un produit à l'autre.
 
@@ -63,4 +63,4 @@ Aucune décision ne vous revient : lancer l'étude ou corriger d'abord le prompt
 - Revue : `output/03-etudes/Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md`.
 - Journal de boucle : même chemin, suffixe `.boucle.json`.
 - Passes du prompt : `C:\Users\iguan\AppData\Local\Temp\claude\c--dev-digit-ai-factory\6f67c906-a169-46fe-8511-7988d35b1555\scratchpad\l99-erreurs\prompt-p1.md`, `prompt-p2.md` et `prompt-p3.md` dans ce même dossier.
-- Enregistrement : commit local au pilot, cité à l'écran.
+- Enregistrement : commit local `223dd259` au pilot, non publié.
