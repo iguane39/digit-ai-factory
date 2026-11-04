@@ -90,4 +90,4 @@ Test rétro : le résultat sert cette intention. Le prompt corrigé a été relu
 - Étude : `output/03-etudes/Digit-AI - Étude - Apprentissage des erreurs par les produits et la Factory - 20261104b.md`.
 - Revue, avec la passe 4 et le prompt exécuté : `output/03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md`, et son journal `.boucle.json` (PASS).
 - Registre : `todo/TODO.jsonl`, création `TF-2150` ; décisions : `decisions/REGISTRE.jsonl`, `D-172` ; écrits, non enregistrés.
-- Enregistrement : commit local au pilot, cité à l'écran ; non publié.
+- Enregistrement : commit local `d6f565d6` au pilot, passé par le hook pre-commit sans retrait de nom ; non publié.
