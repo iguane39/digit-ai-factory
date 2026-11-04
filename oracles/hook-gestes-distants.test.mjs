@@ -28,7 +28,7 @@ const projet = () => { const p = join(base, `p${++n}`); mkdirSync(join(p, ".clau
 const jouer = (p, tool_name, command, extra = {}) => {
   const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: p,
     env: { ...process.env, CLAUDE_PROJECT_DIR: p }, input: JSON.stringify({ tool_name, tool_input: { command }, cwd: p, ...extra }) });
-  return { code: r.status, err: r.stderr || "" };
+  return { code: r.status, err: r.stderr || "", out: r.stdout || "" };
 };
 const refuse = (r) => { if (r.code !== 2 || !/GESTE DISTANT DESTRUCTIF REFUSÉ \(TF-1959, D-77\)/.test(r.err)) throw new Error(`exit ${r.code} : ${r.err.slice(0, 200)}`); };
 const passe = (r) => { if (r.code !== 0 || /panne du juge/.test(r.err)) throw new Error(`exit ${r.code} : ${r.err.slice(0, 200)}`); };
@@ -181,6 +181,193 @@ try {
     refuse(jouer(lie, "Bash", "az group delete --name rg-essai --yes"));
     ecrireLot(principal, lotOk([gesteEssai]));
     passe(jouer(lie, "Bash", "az group delete --name rg-essai --yes"));
+  });
+
+  // ---- TF-2128 (D-168 (a), 04/11/2026) : le retrait d'une ressource créée par la même session --------
+  // Le fait (RP-6, lot Produit-86 20261103d) : changer la région d'un réseau vide créé 10 minutes plus tôt exigeait une
+  // décision groupée ; la session l'a dupliqué et l'original est resté facturé. Trois conditions, toutes mesurées
+  // au registre `forge/gestes-en-cours.jsonl` : (a) créée par la même session, (b) création consignée avec son
+  // identifiant (PostToolUse, donc réussie), (c) aucune dépendance consignée. Toute condition non tenue garde le refus.
+  const registreDe = (p) => join(p, "forge", "gestes-en-cours.jsonl");
+  const lignesDe = (p) => (existsSync(registreDe(p)) ? readFileSync(registreDe(p), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : []);
+  const evt = (p, session, command, hook_event_name, reponse = null, tool_name = "Bash") =>
+    jouer(p, tool_name, command, { session_id: session, hook_event_name, ...(reponse ? { tool_response: reponse } : {}) });
+  /** La session crée (PreToolUse puis PostToolUse réussi) : la création est consignée. */
+  const creer = (p, session, command, stdout = "", tool_name = "Bash") => {
+    const pre = evt(p, session, command, "PreToolUse", null, tool_name);
+    if (pre.code !== 0) throw new Error(`la création est refusée : ${pre.err.slice(0, 200)}`);
+    evt(p, session, command, "PostToolUse", { stdout }, tool_name);
+  };
+  const refuseExc = (r, condition, motif) => {
+    refuse(r);
+    if (!/TF-2128/.test(r.err) || !new RegExp(`condition \\(${condition}\\)`).test(r.err)) throw new Error(`le message ne nomme pas la condition (${condition}) : ${r.err.slice(0, 500)}`);
+    if (motif && !motif.test(r.err)) throw new Error(`motif attendu ${motif} : ${r.err.slice(0, 500)}`);
+  };
+  const SUB = "/subscriptions/s1/resourceGroups/rg-essai/providers/Microsoft.Network/virtualNetworks/vnet-essai";
+  const CREE_VNET = "az network vnet create --name vnet-essai --resource-group rg-essai --location westeurope --address-prefixes 10.0.0.0/16";
+  const SUPPR_VNET = "az network vnet delete --name vnet-essai --resource-group rg-essai";
+
+  check("vert (TF-2128) — retrait d'une ressource créée et consignée par la même session, sans dépendance : admis sans lot", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET, JSON.stringify({ newVNet: { id: SUB } }));
+    const c = lignesDe(p).find((l) => l.ev === "creation");
+    if (!c || c.session !== "A" || !/vnet-essai/.test(c.ressource)) throw new Error(`création non consignée : ${JSON.stringify(lignesDe(p))}`);
+    const r = evt(p, "A", SUPPR_VNET, "PreToolUse");
+    passe(r);
+    if (!/TF-2128/.test(r.out)) throw new Error(`l'admission n'est pas tracée dans le contexte : ${r.out}`);
+  });
+  check("vert (TF-2128) — l'identifiant distant lu de la sortie est consigné, et `--ids` le retrouve", () => {
+    // `az network vnet create` enveloppe l'objet sous `newVNet` ; `az group create` porte `id` à la racine
+    for (const sortie of [{ newVNet: { id: SUB } }, { id: SUB, name: "vnet-essai" }]) {
+      const q = projet();
+      creer(q, "A", "az network vnet create --name vnet-essai --resource-group rg-essai", JSON.stringify(sortie));
+      const c = lignesDe(q).find((l) => l.ev === "creation");
+      if (c.id_distant !== SUB) throw new Error(`id_distant : ${c.id_distant}`);
+      passe(evt(q, "A", `az network vnet delete --ids ${SUB}`, "PreToolUse"));
+      passe(evt(q, "A", `az network vnet delete --ids ${SUB.toUpperCase()}`, "PreToolUse"));
+      refuseExc(evt(q, "A", "az network vnet delete --ids /subscriptions/s1/resourceGroups/rg-essai/providers/Microsoft.Network/virtualNetworks/autre", "PreToolUse"), "b");
+    }
+  });
+  check("rouge (TF-2128) — créée par une AUTRE session : refusé, la condition (a) est nommée avec la session créatrice", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    refuseExc(evt(p, "B", SUPPR_VNET, "PreToolUse"), "a", /session A/);
+  });
+  check("rouge (TF-2128) — création NON consignée (aucune trace) : refusé, la condition (b) est nommée", () => {
+    refuseExc(evt(projet(), "A", SUPPR_VNET, "PreToolUse"), "b", /aucune création consignée/);
+  });
+  check("rouge (TF-2128) — création lancée mais échouée (PreToolUse sans PostToolUse) : non consignée, refusé", () => {
+    const p = projet();
+    evt(p, "A", CREE_VNET, "PreToolUse");
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "b");
+  });
+  check("rouge (TF-2128) — PostToolUse d'un outil interrompu : rien n'est consigné", () => {
+    const p = projet();
+    evt(p, "A", CREE_VNET, "PreToolUse");
+    evt(p, "A", CREE_VNET, "PostToolUse", { stdout: "", interrupted: true });
+    if (lignesDe(p).some((l) => l.ev === "creation")) throw new Error("une création interrompue a été consignée");
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "b");
+  });
+  check("rouge (TF-2128) — AVEC dépendance : un sous-réseau consigné cite le réseau, refusé ; le sous-réseau seul est admis", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    creer(p, "A", "az network vnet subnet create --name sn-1 --vnet-name vnet-essai --resource-group rg-essai --address-prefixes 10.0.1.0/24");
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "c", /sn-1/);
+    passe(evt(p, "A", "az network vnet subnet delete --name sn-1 --vnet-name vnet-essai --resource-group rg-essai", "PreToolUse"));
+  });
+  check("remède joué (TF-2128) — le sous-réseau retiré (consigné au retour de l'outil), le réseau n'a plus de dépendance et est admis", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    const sn = "az network vnet subnet create --name sn-1 --vnet-name vnet-essai --resource-group rg-essai --address-prefixes 10.0.1.0/24";
+    creer(p, "A", sn);
+    const supprSn = "az network vnet subnet delete --name sn-1 --vnet-name vnet-essai --resource-group rg-essai";
+    passe(evt(p, "A", supprSn, "PreToolUse"));
+    evt(p, "A", supprSn, "PostToolUse", { stdout: "" });
+    if (!lignesDe(p).some((l) => l.ev === "retrait")) throw new Error("le retrait n'est pas consigné");
+    passe(evt(p, "A", SUPPR_VNET, "PreToolUse"));
+  });
+  check("rouge (TF-2128) — dépendance par modification : un `update` qui cite la ressource en paramètre bloque son retrait", () => {
+    const p = projet();
+    creer(p, "A", "az network nsg create --name nsg-essai --resource-group rg-essai");
+    creer(p, "A", "az network vnet subnet update --name sn-1 --vnet-name vnet-ext --resource-group rg-essai --network-security-group nsg-essai");
+    refuseExc(evt(p, "A", "az network nsg delete --name nsg-essai --resource-group rg-essai", "PreToolUse"), "c", /nsg-essai/);
+  });
+  check("rouge (TF-2128) — dépendance non constatable : une création à paramètre par variable ($VNET) bloque le retrait", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    creer(p, "A", "az network vnet subnet create --name sn-2 --vnet-name $VNET --resource-group rg-essai --address-prefixes 10.0.2.0/24");
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "c", /variable|fichier/);
+  });
+  check("rouge (TF-2128) — un déploiement (az deployment … create) crée des ressources que le hook ne voit pas : il bloque le retrait", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    creer(p, "A", "az deployment group create --resource-group rg-essai --template-file main.bicep");
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "c");
+  });
+  check("rouge (TF-2128) — terraform appliqué après la création : ses ressources échappent au hook, refusé", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    evt(p, "A", "terraform apply -auto-approve", "PreToolUse");
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "c", /terraform/);
+  });
+  check("rouge (TF-2128) — un groupe de ressources n'est jamais admis : son contenu n'est pas énumérable par le hook", () => {
+    const p = projet();
+    creer(p, "A", "az group create --name rg-essai --location westeurope");
+    refuseExc(evt(p, "A", "az group delete --name rg-essai --yes", "PreToolUse"), "c", /groupe de ressources/);
+  });
+  check("rouge (TF-2128) — même nom, autre groupe de ressources, ou autre réseau parent : ce n'est pas la ressource créée", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    refuseExc(evt(p, "A", "az network vnet delete --name vnet-essai --resource-group rg-prod", "PreToolUse"), "b");
+    refuseExc(evt(p, "A", "az network vnet delete --name vnet-essai", "PreToolUse"), "b");
+    creer(p, "A", "az network vnet subnet create --name default --vnet-name vnet-essai --resource-group rg-essai");
+    refuseExc(evt(p, "A", "az network vnet subnet delete --name default --vnet-name vnet-prod --resource-group rg-essai", "PreToolUse"), "b");
+    refuseExc(evt(p, "A", "az network vnet delete --resource-group rg-essai", "PreToolUse"), "b", /ni --name ni --ids/);
+  });
+  check("rouge (TF-2128) — recréée par une autre session (create est un upsert) : l'origine n'est plus certaine, refusé", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    creer(p, "B", CREE_VNET);
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "a", /session B/);
+  });
+  check("rouge (TF-2128) — session non identifiée (pas de session_id) : refusé, jamais admis par défaut", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    refuseExc(jouer(p, "Bash", SUPPR_VNET, { hook_event_name: "PreToolUse" }), "a", /session/);
+  });
+  check("rouge (TF-2128) — un geste admis ne couvre pas un autre geste de la même commande : un `terraform destroy` voisin reste refusé", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    refuse(evt(p, "A", `${SUPPR_VNET} && terraform destroy`, "PreToolUse"));
+  });
+  check("vert (TF-2128) — deux retraits admis dans la même commande", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    creer(p, "A", "az network nsg create --name nsg-essai --resource-group rg-essai");
+    passe(evt(p, "A", `${SUPPR_VNET} && az network nsg delete --name nsg-essai --resource-group rg-essai`, "PreToolUse"));
+  });
+  check("rouge (TF-2128) — hors exception : purge, droits, DELETE HTTP, gh repo delete restent refusés même pour une ressource consignée", () => {
+    const p = projet();
+    creer(p, "A", "az keyvault create --name kv-essai --resource-group rg-essai");
+    for (const c of ["az keyvault purge --name kv-essai --resource-group rg-essai","az role assignment delete --assignee x --role Reader", "gh repo delete org/depot --yes", "az rest --method delete --url https://management.azure.com/subscriptions/s/resourceGroups/rg-essai/providers/Microsoft.KeyVault/vaults/kv-essai?api-version=2023-07-01"]) {
+      refuse(evt(p, "A", c, "PreToolUse"));
+    }
+  });
+  check("rouge (TF-2128) — le pilot (todo/TODO.jsonl) n'écrit aucun registre : aucune création consignée, le retrait reste refusé", () => {
+    const p = projet();
+    writeFileSync(join(p, "todo", "TODO.jsonl"), "");
+    evt(p, "A", CREE_VNET, "PreToolUse");
+    evt(p, "A", CREE_VNET, "PostToolUse", { stdout: "" });
+    if (existsSync(registreDe(p))) throw new Error("registre écrit au pilot");
+    refuseExc(evt(p, "A", SUPPR_VNET, "PreToolUse"), "b");
+  });
+  check("vert (TF-2128) — la même création rejouée par la même session ne s'empile pas (une seule ligne)", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    creer(p, "A", CREE_VNET);
+    const n = lignesDe(p).filter((l) => l.ev === "creation").length;
+    if (n !== 1) throw new Error(`${n} lignes de création`);
+  });
+  check("vert (TF-2128) — la clé de la création est celle du registre des gestes en cours (même ressource, même périmètre)", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    const l = lignesDe(p);
+    const d = l.find((x) => x.ev === "debut"), c = l.find((x) => x.ev === "creation");
+    if (!d || !c || d.ressource !== c.ressource || d.perimetre !== c.perimetre) throw new Error(`debut ${d?.ressource} / creation ${c?.ressource}`);
+  });
+  check("vert (TF-2128) — PowerShell : New-AzVirtualNetwork consigné, Remove-AzVirtualNetwork admis ; Remove-AzResourceGroup reste refusé", () => {
+    const p = projet();
+    creer(p, "A", "New-AzVirtualNetwork -Name vnet-essai -ResourceGroupName rg-essai -Location westeurope -AddressPrefix 10.0.0.0/16", "", "PowerShell");
+    passe(evt(p, "A", "Remove-AzVirtualNetwork -Name vnet-essai -ResourceGroupName rg-essai -Force", "PreToolUse", null, "PowerShell"));
+    refuseExc(evt(p, "B", "Remove-AzVirtualNetwork -Name vnet-essai -ResourceGroupName rg-essai -Force", "PreToolUse", null, "PowerShell"), "a");
+    creer(p, "A", "New-AzResourceGroup -Name rg-ps -Location westeurope", "", "PowerShell");
+    refuseExc(evt(p, "A", "Remove-AzResourceGroup -Name rg-ps -Force", "PreToolUse", null, "PowerShell"), "c", /groupe de ressources/);
+  });
+  check("vert (TF-2128) — un lot approuvé reste valable à côté de l'exception : le geste couvert passe, celui de la ressource consignée aussi", () => {
+    const p = projet();
+    creer(p, "A", CREE_VNET);
+    ecrireLot(p, lotOk([gesteEssai]));
+    passe(evt(p, "A", `az group delete --name rg-essai --yes && ${SUPPR_VNET}`, "PreToolUse"));
   });
 
   // ---- La liste fermée, dans les deux sens --------------------------------------------------

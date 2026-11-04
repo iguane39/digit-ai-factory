@@ -108,6 +108,98 @@ export function clore(racines, racineEcriture, { session, ressource = null }, ma
   return ouverts.length;
 }
 
+// ---------------------------------------------------------------------------------------------
+// Les créations consignées et le retrait admis sans décision groupée (TF-2128, D-168 (a) du 04/11/2026)
+// ---------------------------------------------------------------------------------------------
+// Le fait (RP-6, lot Produit-86 20261103d) : changer la région d'un réseau VIDE créé dix minutes plus tôt exigeait une
+// décision groupée ; la session l'a dupliqué, et l'original est resté facturé. La décision humaine : « La liste fermée
+// des gestes distants admet, sans décision groupée, le retrait d'une ressource créée par la même session, consignée à
+// sa création avec son identifiant, et sans aucune dépendance. »
+//
+// Trois événements s'ajoutent au registre, écrits au retour d'un outil RÉUSSI (PostToolUse) :
+//   · `creation`     : { schema, ev, id, session, ressource, perimetre, chemin, identite, id_distant, references, opaque, geste, ts }
+//   · `modification` : un geste mutant autre que create/delete qui cite d'autres ressources (références seules) ;
+//   · `retrait`      : { schema, ev, id (de la création retirée), session, ressource, ts }.
+// `ressource` et `perimetre` sont ceux du `debut` du même geste ; `identite` porte nom, groupe de ressources, abonnement
+// et les options `*-name` (réseau parent, compte) qui distinguent deux ressources de même nom ; `id_distant` est l'identifiant
+// que la sortie de l'outil donne (champ `id`), quand il le donne ; `references` les valeurs des autres options (les ressources
+// que la commande cite).
+
+/** Les groupes dont le contenu n'est pas énumérable par le hook : leur retrait n'est jamais admis. */
+export const CONTENEURS = new Set(["az group", "ps azresourcegroup"]);
+
+const minus = (x) => String(x ?? "").trim().toLowerCase();
+
+/** La ligne `creation` d'une ressource créée par la session. */
+export function ligneCreation({ session, ressource, perimetre = null, chemin, identite = {}, id_distant = null, references = [], opaque = false, geste = "" }, maintenant = Date.now()) {
+  return {
+    schema: "pilot/gestes-en-cours@1", ev: "creation", id: identifiant(maintenant), session: session || "inconnue", ressource, perimetre, chemin, identite,
+    id_distant: id_distant || null, references, opaque: !!opaque, geste: String(geste).slice(0, 200), ts: new Date(maintenant).toISOString(),
+  };
+}
+
+/** La ligne `modification` : un geste mutant qui cite d'autres ressources (leur retrait n'est plus sans dépendance). */
+export function ligneModification({ session, references = [], opaque = false, geste = "" }, maintenant = Date.now()) {
+  return { schema: "pilot/gestes-en-cours@1", ev: "modification", id: identifiant(maintenant), session: session || "inconnue", references, opaque: !!opaque, geste: String(geste).slice(0, 200), ts: new Date(maintenant).toISOString() };
+}
+
+/** La ligne `retrait` d'une création retirée. */
+export const ligneRetrait = (creation, session, maintenant = Date.now()) => ({
+  schema: "pilot/gestes-en-cours@1", ev: "retrait", id: creation.id, session: session || "inconnue", ressource: creation.ressource, ts: new Date(maintenant).toISOString(),
+});
+
+/** Les créations consignées et pas encore retirées. */
+export function creationsVivantes(lignes) {
+  const retires = new Set(lignes.filter((l) => l.ev === "retrait").map((l) => l.id));
+  return lignes.filter((l) => l.ev === "creation" && l.id && !retires.has(l.id));
+}
+
+/** Une création est-elle la ressource visée ? Par identifiant distant (`--ids`), sinon par chemin de commande + identité. */
+export function viseeParCible(creation, cible) {
+  if (cible.ids?.length) return !!creation.id_distant && cible.ids.some((i) => minus(i) === minus(creation.id_distant));
+  if (!cible.nom || creation.chemin !== cible.chemin) return false;
+  const c = creation.identite || {}, v = cible.identite || {};
+  if (minus(c.name) !== minus(v.name) || minus(c["resource-group"]) !== minus(v["resource-group"]) || minus(c.subscription) !== minus(v.subscription)) return false;
+  return Object.keys(v).every((k) => ["name", "resource-group", "subscription"].includes(k) || minus(c[k]) === minus(v[k]));
+}
+
+/** Une valeur de paramètre cite-t-elle cette création ? Le nom comme segment, ou l'identifiant distant comme préfixe. */
+function cite(valeur, creation) {
+  const v = minus(valeur), nom = minus(creation.identite?.name), id = minus(creation.id_distant);
+  return (!!nom && v.split("/").includes(nom)) || (!!id && (v === id || v.startsWith(id + "/")));
+}
+
+const refus = (condition, raison) => ({ ok: false, condition, raison });
+
+/**
+ * Le retrait de `cible` est-il admis sans décision groupée ? Trois conditions, la première non tenue est nommée :
+ *  (b) la création est consignée avec son identifiant, (a) par la même session, (c) sans aucune dépendance consignée.
+ * `cible` : { chemin, nom, identite, ids, libelle } ; `session` : l'identifiant de session du hook.
+ * Rend { ok: true, creation } ou { ok: false, condition: "a"|"b"|"c", raison }.
+ */
+export function jugerRetrait(lignes, cible, session) {
+  const libelle = cible.libelle || cible.nom || (cible.ids || []).join(" ");
+  if (!cible.nom && !(cible.ids || []).length) return refus("b", "l'identifiant de la ressource n'est pas déterminable : la commande ne porte ni --name ni --ids");
+  const trouvees = creationsVivantes(lignes).filter((c) => viseeParCible(c, cible));
+  if (!trouvees.length) return refus("b", `aucune création consignée pour ${libelle} : le registre des gestes en cours (forge/gestes-en-cours.jsonl) n'a pas la trace d'une création réussie par une session de ce produit`);
+  if (!session || session === "inconnue") return refus("a", `la session qui retire n'est pas identifiée (pas de session_id) : impossible de dire si elle a créé ${libelle}`);
+  const autres = trouvees.filter((c) => c.session !== session);
+  if (autres.length) return refus("a", `${libelle} a été créée ou recréée par la session ${autres[0].session}, pas par celle-ci (${session})`);
+  const cree = trouvees.reduce((a, b) => (Date.parse(a.ts) <= Date.parse(b.ts) ? a : b));
+  if (CONTENEURS.has(cree.chemin)) return refus("c", `${libelle} est un groupe de ressources : son contenu (terraform, portail, autre session non consignée) n'est pas énumérable par le hook, donc l'absence de dépendance n'est pas constatable`);
+  const t0 = Date.parse(cree.ts);
+  const retires = new Set(lignes.filter((l) => l.ev === "retrait").map((l) => l.id));
+  for (const l of lignes) {
+    if (l.id === cree.id || !(Date.parse(l.ts) >= t0)) continue;
+    if (l.ev === "debut" && /^terraform /.test(String(l.ressource))) return refus("c", `terraform ou tofu a agi (session ${l.session}) après la création de ${libelle} : les ressources qu'il gère échappent au hook`);
+    if ((l.ev !== "creation" && l.ev !== "modification") || retires.has(l.id)) continue;
+    if (l.opaque) return refus("c", `« ${l.geste} » (session ${l.session}) a un paramètre par variable, par fichier ou un déploiement : ses dépendances ne sont pas constatables`);
+    const dep = (l.references || []).find((r) => cite(r, cree));
+    if (dep !== undefined) return refus("c", `« ${l.geste} » (session ${l.session}) cite ${libelle} (paramètre « ${dep} ») : retirer ${libelle} casserait cette ressource`);
+  }
+  return { ok: true, creation: cree };
+}
+
 /** L'avertissement qui nomme chaque geste concurrent et ce qu'il faut en faire. Texte vide s'il n'y en a pas. */
 export function avertissement(trouves, { ressource }, maintenant = Date.now()) {
   if (!trouves.length) return "";

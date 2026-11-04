@@ -49,6 +49,7 @@ Chaque famille se justifie par l'effet, pas par l'outil. Source : `oracles\hook-
 | Droits | `az role assignment` ou `definition create\|update`, `az ad app permission add\|grant\|admin-consent`, `az keyvault set-policy`, `az devops security …`, `az devops user add\|update`, `New-AzRoleAssignment` ; requête HTTP POST, PUT ou PATCH sur un point d'accès de droits (Azure DevOps, Microsoft Graph, Azure Resource Manager, GitHub) par `az rest`, `az devops invoke`, `gh api`, `curl`, `wget`, `Invoke-RestMethod` | un droit accordé ouvre un accès que personne n'a décidé ; le fait des 4 tentatives du 26/10 |
 | Suppression par HTTP ou GitHub | méthode DELETE vers un hôte autre que la machine locale ; `gh <groupe> delete` | `gh repo delete` et `gh api -X DELETE` sont des suppressions distantes comme les autres |
 | Histoire distante | `git push` avec `--force`, `-f`, `--force-with-lease`, `--force-if-includes`, une référence `+x` ou `:x`, `--delete`, `-d`, `--mirror`, `--prune` | l'histoire réécrite ou une branche supprimée ne se retrouve que si quelqu'un en a une copie |
+| Exception (TF-2128, D-168 (a)) | `az … delete\|remove` ou `Remove-Az*` d'une ressource créée par la même session, consignée à sa création avec son identifiant, sans aucune dépendance consignée | passe sans décision groupée : la session retire ce qu'elle a elle-même créé ; conditions et limites ci-dessous |
 
 Hors liste : les lectures (`az group show`, `az role assignment list`, `terraform plan`, `gh api` en GET), les
 déploiements ordinaires (`terraform apply`, `az deployment … create`) et `git push` simple.
@@ -63,6 +64,48 @@ déploiements ordinaires (`terraform apply`, `az deployment … create`) et `git
   mais une session qui écrirait un lot sans approbation ne serait pas arrêtée par le hook. La revue d'un
   lot (qui l'a posé, quand, avec quels mots) est le seul garde-fou de ce point.
 - Que le champ `cible` du lot corresponde à la commande : seule la commande approuvée est comparée.
+
+## Le retrait d'une ressource que la session a créée (TF-2128, D-168 (a))
+
+Décision humaine D-168 (a) du 04/11/2026, mot pour mot : « La liste fermée des gestes distants admet, sans décision
+groupée, le retrait d'une ressource créée par la même session, consignée à sa création avec son identifiant, et sans
+aucune dépendance. » Le fait (RP-6, lot Produit-86 20261103d) : changer la région d'un réseau vide créé dix minutes plus
+tôt exigeait une décision groupée ; la session l'a dupliqué, et l'original est resté facturé.
+
+**La trace.** Le hook écrit au retour d'un outil réussi (`PostToolUse`, jamais après un échec ni une interruption) dans
+`forge\gestes-en-cours.jsonl`, le même fichier que les gestes en cours : `creation` (session, ressource, chemin de commande, identité
+nom + groupe de ressources + options `*-name`, `id_distant` lu du champ `id` de la sortie quand elle le donne, références, horodatage),
+`modification` (un geste mutant qui cite d'autres ressources) et `retrait` (la création retirée). Sont lus : `az` (`create`, `delete`,
+`remove`, tout autre verbe mutant) et les cmdlets `New-Az*`, `Remove-Az*`, `Set|Update|Add-Az*`. Le pilot n'écrit pas ce registre :
+l'exception n'y joue donc jamais.
+
+**Les trois conditions**, toutes lues au registre, la première non tenue est nommée dans le refus :
+
+- (b) la création est consignée avec son identifiant : une `creation` non retirée porte le même chemin de commande, le même nom, le même
+  groupe de ressources et les mêmes options `*-name` que le retrait (ou, avec `--ids`, le même `id_distant`). Sans `--name` ni `--ids`,
+  l'identifiant n'est pas déterminable : refus.
+- (a) la même session : le `session_id` du hook est celui de la création, et aucune autre session n'a consigné une création de cette
+  ressource (`create` vaut `upsert` : une autre session qui l'a « recréée » en ôte la certitude). Sans `session_id`, refus.
+- (c) aucune dépendance, mesurée ainsi : aucune création ou modification consignée depuis ne cite la ressource (son nom comme
+  segment d'une valeur de paramètre, ou son `id_distant` comme préfixe) ; aucune n'a un paramètre par variable, par fichier (`@x`) ou
+  un déploiement (`az deployment`, `az stack`), dont les dépendances ne se lisent pas ; aucun `terraform` ou `tofu` n'a agi depuis.
+  Une dépendance retirée (`retrait` consigné) ne compte plus : le remède est de retirer d'abord l'enfant, puis le parent.
+
+**Jamais admis par l'exception** : un groupe de ressources (`az group delete`, `Remove-AzResourceGroup`), dont le contenu n'est pas
+énumérable par le hook ; `purge` ; les droits (`az role`, `az ad`, `az devops`) ; terraform ; DELETE HTTP, `az rest`, `gh` ; l'histoire
+git. Toute commande composée garde le refus tant qu'un de ses gestes n'est ni couvert par un lot ni admis par l'exception.
+
+**Non jugé (déclaré).** Une ressource créée par un autre moyen que la liste lue (portail, script dont le texte n'est pas dans la
+commande, terraform avant la création, `az … up`) et qui dépend de la ressource retirée ; les dépendances implicites que le fournisseur
+crée de son côté (une carte réseau créée avec une machine virtuelle) ; le contenu de la ressource (blobs d'un compte de stockage,
+secrets d'un coffre) ; un `create` rejoué sur une ressource préexistante (c'est un `upsert`, il est consigné comme création de la
+session) ; une commande composée dont un élément échoue (l'outil échoue, aucun `PostToolUse`, rien n'est consigné : refus prudent) ; une
+valeur de paramètre sans le nom exact (un identifiant abrégé) ; un alias ou une variable de nom. Au pilot, l'exception ne joue pas.
+
+Recette : `oracles\hook-gestes-distants.test.mjs`, cas « TF-2128 » à double sens (admis : même session, consignée, sans dépendance, y
+compris après retrait de l'enfant et par `--ids` ; refusés : autre session, non consignée, création échouée, dépendance par création,
+par modification ou par variable, déploiement, terraform, groupe de ressources, autre groupe ou parent, recréation par une autre
+session, session non identifiée, pilot).
 
 ## Deux sessions, une ressource : le registre des gestes en cours (TF-2084, RT-39)
 

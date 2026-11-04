@@ -72,6 +72,15 @@
  * et AVERTIT quand une autre session du produit a un geste ouvert sur la même ressource. Il ne refuse jamais pour cela.
  * Liste et limites : `references\GESTES-DISTANTS.md`, section « Deux sessions, une ressource ».
  *
+ * TF-2128 (04/11/2026, D-168 (a), RP-6 du lot Produit-86 20261103d) : UNE EXCEPTION à la décision groupée. Le retrait
+ * (`az … delete|remove`, `Remove-Az*`) d'une ressource passe sans lot si, et seulement si, trois conditions tiennent, lues au
+ * registre `forge\gestes-en-cours.jsonl` : (a) la ressource a été créée par la MÊME session, (b) sa création est consignée avec
+ * son identifiant (événement `creation`, écrit au retour d'un outil réussi), (c) aucune dépendance consignée (aucune création ou
+ * modification postérieure ne la cite en paramètre, aucun paramètre par variable ou fichier, aucun déploiement ni terraform
+ * depuis). Une condition non tenue garde le refus, et le message nomme laquelle. Jamais admis : un groupe de ressources (son
+ * contenu n'est pas énumérable), `purge`, les droits, terraform, DELETE HTTP, `gh`, l'histoire git. Non jugé : voir
+ * `references\GESTES-DISTANTS.md`, « Le retrait d'une ressource que la session a créée ».
+ *
  * Usage : node oracles\hook-gestes-distants.mjs                      (stdin : JSON du hook PreToolUse ou PostToolUse)
  *         node oracles\hook-gestes-distants.mjs --ouvrir --ressource <objet> [--session <id>] [--geste <texte>] [--duree-min N]
  *         node oracles\hook-gestes-distants.mjs --clore [--ressource <objet>] [--session <id>] | --lister
@@ -82,7 +91,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from "n
 import { basename, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { DUREE_DEFAUT_MIN, avertissement, clore, gestesOuverts, lireRegistre, ouvrir } from "./lib-gestes-en-cours.mjs";
+import { DUREE_DEFAUT_MIN, avertissement, clore, creationsVivantes, ecrireLigne, gestesOuverts, jugerRetrait, ligneCreation, ligneModification, ligneRetrait, lireRegistre, ouvrir, viseeParCible } from "./lib-gestes-en-cours.mjs";
 
 export const OUTILS = new Set(["Bash", "PowerShell"]);
 export const DUREE_MAX_H = 24;
@@ -178,6 +187,8 @@ const ENVELOPPES = new Set(["sudo", "env", "time", "nohup", "xargs", "command", 
 /** D-98 (a) : `if az group delete …`, `while …`. Le mot de contrôle se saute seul, sans ouvrir une enveloppe. */
 const MOTS_DE_CONTROLE = new Set(["if", "elif", "while", "until"]);
 const CMDLETS_LOCAUX = new Set(["remove-azcontext", "remove-azenvironment", "remove-azdefault"]);
+/** TF-2128 : les cmdlets Az qui écrivent, lues pour le registre des créations (elles ne sont pas jugées destructives pour autant). */
+const CMDLET_AZ_ECRITURE = /^(new|set|update|add|remove|start|stop|restart|grant|revoke|register|unregister|move|import|publish|enable|disable)-az[a-z0-9]+$/;
 const estCmdlet = (n) => (/^remove-(az|mg)[a-z0-9]+$/.test(n) && !CMDLETS_LOCAUX.has(n))
   || /^(new|set)-azroleassignment$/.test(n)
   || /^new-mg(serviceprincipalapproleassignment|userapproleassignment|oauth2permissiongrant|groupmember|groupowner|directoryrolemember\w*)$/.test(n);
@@ -194,7 +205,7 @@ export function localiser(m) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(w)) continue;
     if (/^\$[\w:.]+$/.test(w) && m[i + 1] === "=") { i++; continue; }
     const n = nomOutil(w);
-    if (OUTILS_JUGES.has(n) || estCmdlet(n)) return { outil: n, args: m.slice(i + 1) };
+    if (OUTILS_JUGES.has(n) || estCmdlet(n) || CMDLET_AZ_ECRITURE.test(n)) return { outil: n, args: m.slice(i + 1) };
     if (SHELLS.has(n)) {
       const k = m.findIndex((x, j) => j > i && /^(-[A-Za-z]*c|-command|\/c|\/k)$/i.test(x));
       return k < 0 ? null : { interne: m.slice(k + 1).join(" ") };
@@ -473,7 +484,7 @@ export const couvre = (commande, geste) => {
 // ---------------------------------------------------------------------------------------------
 
 /** Juge l'entrée d'un hook PreToolUse. `lots` : lignes déjà lues (sinon lues aux racines du projet). */
-export function juger(entree, { lots = null, maintenant = Date.now(), env = process.env } = {}) {
+export function juger(entree, { lots = null, registre = null, maintenant = Date.now(), env = process.env } = {}) {
   if (!OUTILS.has(entree?.tool_name)) return { decision: "laisse" };
   const commande = entree?.tool_input?.command;
   if (typeof commande !== "string") return { decision: "laisse" };
@@ -483,8 +494,24 @@ export function juger(entree, { lots = null, maintenant = Date.now(), env = proc
   const toutes = lots ?? lireLots(racines);
   const etats = toutes.map((l) => ({ lot: l, ...lotValide(l, maintenant, entree?.session_id ?? null) }));
   const valides = etats.filter((e) => e.ok).map((e) => e.lot);
-  const nonCouverts = gestes.filter((g) => !valides.some((l) => l.gestes.some((x) => couvre(x.commande, g))));
-  if (!nonCouverts.length) return { decision: "laisse", couverts: gestes.length };
+  const sansLot = gestes.filter((g) => !valides.some((l) => l.gestes.some((x) => couvre(x.commande, g))));
+  if (!sansLot.length) return { decision: "laisse", couverts: gestes.length };
+  // TF-2128 (D-168 (a)) : un retrait que la session a créé, consigné, sans dépendance, passe sans lot. Les autres restent refusés.
+  let lignesRegistre = registre;
+  const nonCouverts = [], exceptions = [], admis = [];
+  for (const g of sansLot) {
+    const cible = g.categorie === "suppression" ? cibleDeRetrait(g, resolve(entree?.cwd || env.CLAUDE_PROJECT_DIR || process.cwd())) : null;
+    if (!cible) { nonCouverts.push(g); continue; }
+    lignesRegistre ??= lireRegistre(racines);
+    const j = jugerRetrait(lignesRegistre, cible, entree?.session_id ?? null);
+    if (j.ok) admis.push({ cible, creation: j.creation });
+    else { nonCouverts.push(g); exceptions.push({ cible, ...j }); }
+  }
+  if (!nonCouverts.length) {
+    return { decision: "laisse", couverts: gestes.length - admis.length, admis: admis.length,
+      contexte: `RETRAIT ADMIS SANS DÉCISION GROUPÉE (TF-2128, D-168 (a)) — ${admis.map((a) => `${a.cible.libelle}, créée par cette session le ${a.creation.ts} (création ${a.creation.id}), aucune dépendance consignée`).join(" ; ")}. `
+        + "Rien n'est bloqué ; limites de cette preuve : references\\GESTES-DISTANTS.md, « Le retrait d'une ressource que la session a créée »." };
+  }
   const produit = existsSync(join(racines[0], "forge", "hooks", "factory.mjs")) && !existsSync(join(racines[0], "todo", "TODO.jsonl"));
   const poser = produit
     ? "node forge\\hooks\\factory.mjs gestes-distants --poser --lot <lot.json>"
@@ -497,6 +524,11 @@ export function juger(entree, { lots = null, maintenant = Date.now(), env = proc
     gestes: nonCouverts,
     motif: `GESTE DISTANT DESTRUCTIF REFUSÉ (TF-1959, D-77) — ${nonCouverts.map((g) => `${g.mots.join(" ")} : ${g.raison}`).join(" ; ")}. `
       + `Aucun lot approuvé valide ne le couvre (${lecture}). `
+      + (exceptions.length
+        ? `${exceptions.map((e) => `Exception TF-2128 (D-168 (a)) non tenue pour ${e.cible.libelle} — condition (${e.condition}) : ${e.raison}.`).join(" ")} `
+          + "Un retrait passe sans décision groupée si (a) la ressource a été créée par cette session, (b) sa création est consignée avec son identifiant, (c) aucune dépendance n'est consignée ; "
+          + "sinon, la décision groupée ci-dessous. "
+        : "")
       + "Remède, en UNE fois pour tous les gestes destructifs distants que tu prévois dans ce tour, pas un par commande : "
       + "(1) pose UNE décision au bloc 3 de ta restitution, liste complète, chaque geste avec sa commande, sa cible, son effet et son retour arrière ; "
       + "(2) quand l'humain l'a approuvée, écris le lot : un fichier JSON { \"decision\": \"D-N\", \"reponse_humaine\": \"<ses mots>\", \"gestes\": [ { \"commande\", \"cible\", \"effet\", \"retour_arriere\" } ] } "
@@ -597,6 +629,170 @@ export function suivre(entree, { maintenant = Date.now(), env = process.env } = 
   return { avertissement: textes.join(" | "), ouverts, fermes: 0 };
 }
 
+// ---------------------------------------------------------------------------------------------
+// 4 ter. Les créations consignées et le retrait admis sans décision groupée (TF-2128, D-168 (a))
+// ---------------------------------------------------------------------------------------------
+
+const minus = (x) => String(x ?? "").trim().toLowerCase();
+/** Options qui ne désignent aucune ressource citée : elles ne comptent ni comme identité de groupe ni comme référence. */
+const OPTIONS_BRUIT = new Set(["name", "n", "location", "l", "tags", "tag", "output", "o", "query", "subscription", "subscriptionid", "yes", "y", "no-wait",
+  "verbose", "debug", "only-show-errors", "force", "confirm", "whatif", "erroraction"]);
+/** Une valeur qu'aucune lecture de la commande ne résout : variable, substitution, fichier. */
+const OPAQUE = /[$`%]|^@/;
+/** Les premiers mots d'`az` dont le retrait n'est jamais jugé ici (droits, annuaire, DevOps, REST). */
+const AZ_HORS_EXCEPTION = new Set(["role", "ad", "devops", "rest"]);
+const AZ_IDENTITE = { n: "name", g: "resource-group" };
+const PS_IDENTITE = { name: "name", resourcegroupname: "resource-group", resourcegroup: "resource-group", subscriptionid: "subscription" };
+
+/** Les options d'une ligne de commande : [clé en minuscules sans tiret, [valeurs consécutives]]. `-Cle:valeur` (PowerShell) compris. */
+function optionsDe(args, ps) {
+  const sortie = [];
+  for (let k = 0; k < args.length; k++) {
+    const a = args[k];
+    if (!a.startsWith("-") || a === "-" || /^-\d/.test(a)) continue;
+    let cle = null, valeurs = [];
+    if (ps) {
+      const m = /^-([A-Za-z]+)(?::(.*))?$/.exec(a);
+      if (!m) continue;
+      cle = m[1].toLowerCase();
+      if (m[2] !== undefined) valeurs.push(m[2]);
+    } else if (a.startsWith("--")) {
+      const eq = a.indexOf("=");
+      cle = (eq > 0 ? a.slice(2, eq) : a.slice(2)).toLowerCase();
+      if (eq > 0) valeurs.push(a.slice(eq + 1));
+    } else {
+      cle = a.slice(1, 2).toLowerCase();
+      if (a.length > 2) valeurs.push(a.slice(2));
+    }
+    while (args[k + 1] !== undefined && !args[k + 1].startsWith("-")) valeurs.push(args[++k]);
+    sortie.push([cle, valeurs]);
+  }
+  return sortie;
+}
+
+/**
+ * Lit ce qu'une commande `az` ou `*-Az*` fait à une ressource : { sorte, chemin, nom, identite, ids, references, opaque, ressource,
+ * perimetre, libelle, geste } ou null. `sorte` : "creation" (create / New-Az*), "retrait" (delete|remove exact / Remove-Az*),
+ * "modification" (tout autre geste mutant). `chemin` est le même pour la création et le retrait d'une ressource de même type.
+ */
+function lireRessource(outil, args, cwd) {
+  const ps = outil !== "az";
+  let chemin, sorte;
+  if (!ps) {
+    const pos = positionnels(args);
+    if (!pos.length || pos[0] === "rest" || AZ_LOCAL.has(pos[0]) || pos[0] === "account" || AZ_HORS_EXCEPTION.has(pos[0])) return null;
+    const i = pos.findIndex((v, k) => k >= 1 && VERBE_MUTANT.test(v));
+    if (i < 0) return null;
+    const verbe = pos[i];
+    if (/^purge/.test(verbe)) return null;
+    chemin = `az ${pos.slice(0, i).join(" ")}`;
+    sorte = verbe === "create" ? "creation" : /^(delete|remove)$/.test(verbe) ? "retrait" : "modification";
+  } else {
+    const m = /^(new|remove)-(az[a-z0-9]+)$/.exec(outil);
+    if (CMDLETS_LOCAUX.has(outil)) return null;
+    if (m) { chemin = `ps ${m[2]}`; sorte = m[1] === "new" ? "creation" : "retrait"; }
+    else if (CMDLET_AZ_ECRITURE.test(outil)) { chemin = `ps ${outil.replace(/^[a-z]+-/, "")}`; sorte = "modification"; }
+    else return null;
+  }
+  const identite = {}, references = [];
+  let ids = [], opaque = /(^| )(deployment|stack)( |$)/.test(chemin);
+  for (const [cle, valeurs] of optionsDe(args, ps)) {
+    const k = ps ? (PS_IDENTITE[cle] || cle) : (AZ_IDENTITE[cle] || cle);
+    if (k === "ids" || k === "resourceid") { ids = ids.concat(valeurs.map(minus)); continue; }
+    if (valeurs.some((v) => OPAQUE.test(v)) && !OPTIONS_BRUIT.has(cle)) opaque = true;
+    if (valeurs.length && (k === "name" || k === "resource-group" || k === "subscription" || /name$/.test(k))) identite[k] = minus(valeurs[0]);
+    if (!OPTIONS_BRUIT.has(cle) && k !== "name") references.push(...valeurs.map(minus).filter(Boolean));
+  }
+  if (identite.name !== undefined && OPAQUE.test(identite.name)) opaque = true;
+  const nom = identite.name || null;
+  const libelle = `${chemin} ${nom ? `« ${nom} »` : ids.join(" ")}`.trim();
+  const resume = `${outil} ${args.join(" ")}`.slice(0, 200);
+  let perimetre, ressource;
+  if (!ps) {
+    const g = geste("az", args, cwd);
+    perimetre = g?.perimetre ?? chemin; ressource = g?.ressource ?? chemin;
+  } else {
+    perimetre = `${chemin}${identite["resource-group"] ? ` -g ${identite["resource-group"]}` : ""}`;
+    ressource = nom ? `${perimetre} ${nom}` : perimetre;
+  }
+  return { sorte, chemin, nom, identite, ids, references, opaque, ressource, perimetre, libelle, geste: resume };
+}
+
+/** La cible d'un geste destructif jugé : une ressource nommée, retirée par `delete|remove` exact ; sinon null (l'exception ne s'applique pas). */
+function cibleDeRetrait(g, cwd) {
+  const [outil, ...args] = g.mots;
+  if (outil !== "az" && !/^remove-az[a-z0-9]+$/.test(outil)) return null;
+  const r = lireRessource(outil, args, cwd);
+  return r && r.sorte === "retrait" ? r : null;
+}
+
+/** Les ressources touchées par une commande (shells imbriqués compris), dans l'ordre. */
+function ressourcesDeCommande(commande, cwd, profondeur = 0) {
+  const sortie = [];
+  for (const s of segmenter(commande)) {
+    const l = localiser(mots(s));
+    if (!l) continue;
+    if (l.interne !== undefined) { if (profondeur < 3) sortie.push(...ressourcesDeCommande(l.interne, cwd, profondeur + 1)); continue; }
+    if (l.outil !== "az" && !CMDLET_AZ_ECRITURE.test(l.outil)) continue;
+    const r = lireRessource(l.outil, l.args, cwd);
+    if (r) sortie.push(r);
+  }
+  return sortie;
+}
+
+/** L'identifiant distant que la sortie d'un `create` donne (champ `id` à la racine ou d'un objet de premier niveau), s'il désigne la ressource nommée. */
+function idDeSortie(sortie, nom) {
+  const i = String(sortie || "").search(/[{[]/);
+  if (i < 0) return null;
+  let o;
+  try { o = JSON.parse(String(sortie).slice(i)); } catch { return null; }
+  if (!o || typeof o !== "object") return null;
+  const candidats = [o, ...Object.values(o).filter((v) => v && typeof v === "object" && !Array.isArray(v))];
+  for (const c of candidats) {
+    if (typeof c.id === "string" && c.id.startsWith("/") && (!nom || minus(c.id.split("/").pop()) === nom)) return c.id;
+  }
+  return null;
+}
+
+/**
+ * PostToolUse (outil RÉUSSI) : consigne les créations (avec leur identifiant), les modifications qui citent d'autres ressources
+ * et les retraits. N'écrit rien au pilot, qui n'a pas de registre. Rend les comptes écrits.
+ */
+export function consigner(entree, { maintenant = Date.now(), env = process.env } = {}) {
+  const vide = { creations: 0, modifications: 0, retraits: 0 };
+  if (entree?.hook_event_name !== "PostToolUse" || !OUTILS.has(entree?.tool_name) || typeof entree?.tool_input?.command !== "string") return vide;
+  const rep = entree.tool_response;
+  if (rep && typeof rep === "object" && (rep.interrupted === true || rep.is_error === true || rep.isError === true)) return vide;
+  const cwd = resolve(entree.cwd || env.CLAUDE_PROJECT_DIR || process.cwd());
+  const touches = ressourcesDeCommande(entree.tool_input.command, cwd);
+  if (!touches.length) return vide;
+  const racines = racinesDuProjet(entree, env);
+  if (estPilot(racines[0])) return vide;
+  const principal = racines[racines.length - 1];
+  const session = entree.session_id || "inconnue";
+  const sortie = typeof rep === "string" ? rep : String(rep?.stdout ?? rep?.output ?? "");
+  const nommees = touches.filter((t) => t.sorte === "creation" && t.nom);
+  const idDistant = nommees.length === 1 && touches.filter((t) => t.sorte === "creation").length === 1 ? idDeSortie(sortie, nommees[0].nom) : null;
+  const lignes = lireRegistre(racines);
+  const c = { ...vide };
+  for (const t of touches) {
+    if (t.sorte === "creation" && t.nom) {
+      const deja = creationsVivantes(lignes).some((x) => x.session === session && viseeParCible(x, { chemin: t.chemin, nom: t.nom, identite: t.identite, ids: [] }));
+      if (!deja) {
+        ecrireLigne(principal, ligneCreation({ session, ressource: t.ressource, perimetre: t.perimetre, chemin: t.chemin, identite: t.identite,
+          id_distant: t === nommees[0] ? idDistant : null, references: t.references, opaque: t.opaque, geste: t.geste }, maintenant));
+        c.creations++;
+      }
+    } else if (t.sorte === "retrait") {
+      for (const v of creationsVivantes(lignes).filter((x) => viseeParCible(x, t))) { ecrireLigne(principal, ligneRetrait(v, session, maintenant)); c.retraits++; }
+    } else if (t.references.length || t.opaque) {
+      ecrireLigne(principal, ligneModification({ session, references: t.references, opaque: t.opaque, geste: t.geste }, maintenant));
+      c.modifications++;
+    }
+  }
+  return c;
+}
+
 /** `--ouvrir`, `--clore`, `--lister` : la session déclare elle-même un geste que la liste fermée ne reconnaît pas (un banc, un déploiement). */
 function enCours(argv) {
   const val = (cle) => { const i = argv.indexOf(cle); return i >= 0 ? argv[i + 1] : null; };
@@ -678,9 +874,13 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     if (v.decision === "refuse") { process.stderr.write(v.motif + "\n"); process.exit(2); }
   }
   // TF-2084 : le registre des gestes en cours avertit (jamais ne bloque) et ne fait jamais tomber l'outil.
+  let contexte = v.contexte || "";
   try {
     const s = suivre(entree);
-    if (s.avertissement) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: s.avertissement } }) + "\n");
+    if (s.avertissement) contexte = [contexte, s.avertissement].filter(Boolean).join(" | ");
   } catch (e) { process.stderr.write(`[hook-gestes-distants] registre des gestes en cours illisible, geste NON suivi : ${String(e).slice(0, 200)}\n`); }
+  // TF-2128 : au retour d'un outil réussi, la création (avec son identifiant) et le retrait se consignent ; sans cette trace, l'exception ne se juge pas.
+  try { consigner(entree); } catch (e) { process.stderr.write(`[hook-gestes-distants] consignation des créations impossible, ressource NON consignée : ${String(e).slice(0, 200)}\n`); }
+  if (contexte) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: contexte } }) + "\n");
   process.exit(0);
 }
