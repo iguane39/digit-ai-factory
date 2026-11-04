@@ -500,6 +500,8 @@ MVP → tests 100 % · ledger vérifié par `ledger.mjs verify` · couverture de
 chaîne de déploiement exclusive, sauvegarde des actifs critiques et fournisseur d'identité déclarés au
 dossier de MEP (M-16 à M-18, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage).
 
+*« Prêt pour la production » exige aussi le pan `parcours-personas` de forge-tests et `oracle-exploitabilite` de forge-design, tous deux au verdict PASS dans le ledger du run* (TF-2124, D-166 (a) du 04/11/2026) : un manque rend un avertissement nommé jusqu'au 18/11/2026 inclus, puis un échec dès le 19/11/2026, jugé par la règle R-61 bis d'`oracles\oracle-conformite-projet.mjs`, rejouée avec `--declarer-pret` avant l'écriture du `run_close` ; la date se lit à l'horloge, `--aujourd-hui AAAA-MM-JJ` la fixe pour la recette.
+
 *« Livré » a une définition opposable* (R-61, TF-1711, 15/10/2026) : toutes les exigences de la fiche
 implémentées et testées, seuls les secrets restant à saisir par l'administrateur, par un geste guidé
 unique. Un run qui s'arrête avant le dit, écrit « N exigences sur M tenues » au bloc 0 ou au verdict de

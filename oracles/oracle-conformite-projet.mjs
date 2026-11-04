@@ -23,7 +23,8 @@
  * vrais restes à faire. Une contrainte CONDITIONNELLE et un écart DÉJÀ ASSUMÉ y ressortaient
  * indéfiniment comme du travail en attente — deux lignes sur neuf contestées par le lecteur.
  *
- * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
+ * Usage : node oracle-conformite-projet.mjs <racine-du-projet> [--regles R-4,…] [--declarer-pret] [--aujourd-hui AAAA-MM-JJ]
+ *         (--declarer-pret et --aujourd-hui : R-61 bis, TF-2124 — voir son bloc)
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
  *          finding = { regle: "R-<n>", statut: PASS|FAIL|SANS_OBJET, ou, message }
  * Exit : 0 = PASS · 1 = FAIL · 2 = l'oracle n'a pas pu juger.
@@ -71,11 +72,22 @@ if (REGLES_DEMANDEES && !REGLES_DEMANDEES.size) {
 // argument — la cible — était filtré, et TOUT appel ordinaire de l'oracle rendait « racine
 // introuvable ». Défaut commis puis mesuré ici même : 50 cas de la recette rouges d'un coup.
 const iValeur = iRegles >= 0 ? iRegles + 1 : -1;
-const cible = argv.filter((a, i) => !a.startsWith("--") && i !== iValeur)[0];
+// TF-2124 (D-166 (a), 04/11/2026) — `--aujourd-hui AAAA-MM-JJ` fixe le jour que R-61 bis lit à l'horloge
+// (recette : la bascule avertissement → échec du 19/11/2026) ; `--declarer-pret` rejoue la règle AVANT
+// l'écriture du `run_close` d'un run qui s'apprête à se dire prêt. Même nom d'option qu'oracle-ecriture.
+const iAujourdhui = argv.indexOf("--aujourd-hui");
+const iValeurAujourdhui = iAujourdhui >= 0 ? iAujourdhui + 1 : -1;
+const cible = argv.filter((a, i) => !a.startsWith("--") && i !== iValeur && i !== iValeurAujourdhui)[0];
 if (!cible || !existsSync(cible)) {
   console.log(JSON.stringify({ oracle: "oracle-conformite-projet", verdict: "ERREUR", message: "racine de projet introuvable" }));
   process.exit(2);
 }
+const JOUR_FORCE = iAujourdhui >= 0 ? String(argv[iAujourdhui + 1] ?? "") : null;
+if (JOUR_FORCE !== null && (!/^\d{4}-\d{2}-\d{2}$/.test(JOUR_FORCE) || Number.isNaN(Date.parse(JOUR_FORCE)))) {
+  console.log(JSON.stringify({ oracle: "oracle-conformite-projet", verdict: "ERREUR", message: "--aujourd-hui attend une date AAAA-MM-JJ" }));
+  process.exit(2);
+}
+const DECLARER_PRET = argv.includes("--declarer-pret");
 
 const findings = [];
 const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -2836,6 +2848,80 @@ else {
   }
 }
 
+// ---- R-61 bis (TF-2124, décision humaine D-166 (a) du 04/11/2026) — « PRÊT POUR LA PRODUCTION » EXIGE UN PARCOURS PAR PERSONA ET UNE EXPLOITABILITÉ MESURÉE --
+//
+// LE FAIT (lot Produit-86 20261103c, RP-3) : un produit s'est déclaré prêt avec 85 exigences tenues sur 85, comptées sur
+// un référentiel écrit par la session, et le porteur l'a jugé inexploitable (12 remarques). Le contrat « prêt client »
+// (`references\ETAPES-RUN.md`) ne jugeait que des comptes. Deux contrôles livrés le 04/11/2026 mesurent l'usage : le pan
+// `parcours-personas` de forge-tests (TF-2123) et `oracle-exploitabilite` de forge-design.
+//
+// LA RÈGLE. Un run qui se déclare prêt porte au ledger de CE run (les entrées qui suivent son dernier `run_open`) un verdict
+// PASS de chacun des deux contrôles. Seul PASS est vert : NA et SKIP sont nommés, ils ne comptent pas (un pan sans persona
+// déclaré est précisément le trou de RP-3). Le dernier verdict consigné de chaque contrôle fait foi. SÉVÉRITÉ lue à
+// l'HORLOGE : AVERTISSEMENT nommé, non bloquant, jusqu'au 18/11/2026 inclus ; FAIL à partir du 19/11/2026 (`--aujourd-hui
+// AAAA-MM-JJ` fixe le jour pour la recette).
+//
+// QUAND ELLE S'APPLIQUE. Le run « se déclare prêt » quand son dernier segment porte un `run_close` de statut `pret_*` ou
+// `en_production`, ou quand l'appelant joue l'oracle avec `--declarer-pret` juste AVANT d'écrire ce `run_close`
+// (`ETAPES-RUN.md`, contrat « prêt client »). Sans l'un des deux : SANS_OBJET, rien n'est accusé en cours de run.
+// ANTÉRIORITÉ DÉCLARÉE : une déclaration datée d'avant le 04/11/2026 n'est pas jugée (R-42 interdit de réécrire l'entrée).
+{
+  const ENTREE_R61B = "2026-11-04";
+  const BLOCAGE_R61B = "2026-11-19"; // premier jour bloquant ; l'avertissement court jusqu'au 18/11/2026 inclus
+  const jourLocal = () => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`; };
+  const aujourdhui = JOUR_FORCE ?? jourLocal();
+  // Le nom d'un oracle servi au ledger : premier mot, sans chemin ni extension, sans préfixe de forge (`forge-tests:`,
+  // `forge-design:`) — les trois graphies du parc (Produit-86, 04/11/2026) : `forge-tests:parcours-personas`,
+  // `oracle-exploitabilite`, `forge-design:oracle-exploitabilite`.
+  const nomServi = (o) => String(o ?? "").trim().split(/[\s(]/)[0].split(/[\\/]/).pop().replace(/\.(?:mjs|cjs|js|py)$/i, "").toLowerCase().replace(/^forge-(?:tests|design):/, "");
+  const CONTROLES_R61B = [
+    { nom: "parcours-personas", forge: "forge-tests", geste: "jouer le pan (`uv run python -m forge_tests <racine-produit> --pans parcours-personas --json` depuis digit-ai-forge-tests) et consigner son verdict sous l'oracle `forge-tests:parcours-personas`" },
+    { nom: "oracle-exploitabilite", forge: "forge-design", geste: "jouer `node <racine>\\digit-ai-forge-design\\oracles\\oracle-exploitabilite.mjs <adresse de l'instance servie et alimentée> --json-only` (`--etat-connexion` derrière une connexion) et le consigner par `ledger.mjs consigner`" },
+  ];
+  const lignes61 = existsSync(ledgerF) ? readFileSync(ledgerF, "utf8").split("\n").filter((l) => l.trim()) : [];
+  const entrees61 = lignes61.map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  let iDernierOpen = -1;
+  entrees61.forEach((e, i) => { if (e.type === "run_open" || e.ev === "run_open") iDernierOpen = i; });
+  if (iDernierOpen < 0) {
+    so("R-61 bis", "aucun run_open au ledger : aucun run qui se déclare prêt");
+  } else {
+    const segment = entrees61.slice(iDernierOpen);
+    const clotures = segment.filter((e) => e.type === "run_close" && /^(?:pret|en_production)/i.test(String(e.statut ?? "")));
+    const cloture = clotures.length ? clotures[clotures.length - 1] : null;
+    if (!cloture && !DECLARER_PRET) {
+      so("R-61 bis", "le dernier run ne se déclare pas prêt (aucun run_close `pret_*` ou `en_production`, et pas de --declarer-pret) — les deux contrôles ne sont dus qu'à cette déclaration");
+    } else {
+      // Quand les deux existent, `--declarer-pret` prime : l'appelant joue la porte maintenant, la date est celle d'aujourd'hui.
+      const declareLe = DECLARER_PRET ? aujourdhui : String(cloture.ts ?? "").slice(0, 10);
+      const ou = DECLARER_PRET ? "forge/ledger.jsonl (--declarer-pret)" : `forge/ledger.jsonl (run_close seq ${cloture.seq ?? "?"})`;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(declareLe) || declareLe < ENTREE_R61B) {
+        so("R-61 bis", `déclaration de prêt ${declareLe ? `du ${declareLe}` : "sans date lisible"}, antérieure à l'entrée de la règle le ${ENTREE_R61B}`);
+        antecedences.push(`R-61 bis (parcours par persona et exploitabilité, TF-2124) non jugé : le run se déclare prêt ${declareLe ? `le ${declareLe}` : "sans date lisible"}, avant l'entrée de la règle le ${ENTREE_R61B} (D-166 (a)) — antériorité déclarée, l'entrée ne se réécrit pas (R-42) ; exigée à la prochaine déclaration de prêt`);
+      } else {
+        const manques = [];
+        const verts = [];
+        for (const c of CONTROLES_R61B) {
+          const servis = segment.filter((e) => e.type === "oracles_verdict" && nomServi(e.oracle) === c.nom);
+          const dernier = servis.length ? servis[servis.length - 1] : null;
+          const verdict = dernier ? String(dernier.verdict ?? "").trim().toUpperCase() : "";
+          if (verdict === "PASS") verts.push(`${c.nom} PASS (seq ${dernier.seq ?? "?"})`);
+          else manques.push({ c, texte: dernier ? `${c.nom} (${c.forge}) : dernier verdict ${verdict || "sans verdict"} (seq ${dernier.seq ?? "?"}), seul PASS est vert` : `${c.nom} (${c.forge}) : aucun verdict au ledger de ce run` });
+        }
+        if (!manques.length) {
+          ok("R-61 bis", ou, `run déclaré prêt avec ses deux contrôles d'usage verts au ledger : ${verts.join(" · ")} (jour lu : ${aujourdhui})`);
+        } else {
+          const bloquant = aujourdhui >= BLOCAGE_R61B;
+          const gestes = manques.map((m) => `${m.c.nom} : ${m.c.geste}`).join(" ; ");
+          const corps = `« prêt pour la production » exige le pan parcours-personas de forge-tests ET oracle-exploitabilite de forge-design, tous deux PASS au ledger du run — manque : ${manques.map((m) => m.texte).join(" ; ")}. `
+            + `Geste : ${gestes}. Mesuré le 03/11/2026 chez Produit-86 : 85 exigences tenues sur 85, produit jugé inexploitable par le porteur (RP-3, TF-2124, D-166 (a)) ; jour lu : ${aujourdhui}`;
+          if (bloquant) ko("R-61 bis", ou, `${corps}. Avertissement jusqu'au 18/11/2026 inclus, bloquant depuis le 19/11/2026`);
+          else ok("R-61 bis", ou, `AVERTISSEMENT, non bloquant jusqu'au 18/11/2026 inclus, FAIL à partir du 19/11/2026 : ${corps}`);
+        }
+      }
+    }
+  }
+}
+
 const nonJuge = [
   ...antecedences,
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
@@ -2868,6 +2954,7 @@ const nonJuge = [
   "R-14 profils d'authentification et R-28 (TF-1284) : le profil se reconnaît à une liste NOMMÉE de noms de fichiers (azureProfile.json, msal_token_cache*, az.sess, .databrickscfg, accessTokens.json, credentials.json, application_default_credentials.json) — l'outil d'un autre éditeur, sous un autre nom, passera ; l'historique n'est pas fouillé, seul l'index courant est lu. R-28 ne voit que les noms d'artefact de shell (lettre seule, null, NUL, con, prn, aux, ~) : la liste FERMÉE des entrées attendues à la racine n'est pas jouée, parce que sur 13 dépôts de produits mesurés le 12/10/2026 elle accuserait des dizaines d'entrées légitimes (code, données, manifestes)",
   "R-60 (TF-1678) : la moitié STRUCTURELLE du test rétro est jugée, par oracle-cascade-isto rejoué sur la source avec le référentiel d'exigences ; la VÉRITÉ de l'intention et la pertinence d'un rattachement restent humaines (I2 exige la trace de la ratification, jamais sa justesse). La vue CASCADE.md n'est pas confrontée à sa source ici : son générateur le fait (`--verifier`). La date d'entrée se lit au PREMIER run_open du ledger : un produit sans run_open daté est tenu pour antérieur, et c'est un faux négatif déclaré",
   "R-35 bis (TF-1915) : une promesse de cadence se reconnaît à un VOCABULAIRE fermé — un mot de cadence (chaque semaine, quotidien, every week, daily…) à moins de 60 caractères d'un participe de mise à jour non daté (mis à jour, relevé, actualisé, updated…) — dans les textes servis et les seuls COMMENTAIRES des scripts ; une promesse dite autrement n'est pas vue, une description du monde dite ainsi est signalée. Le rapprochement est TEXTUEL : un script est porté si un porteur planifié le nomme ; une page l'est si l'un de ses producteurs (scripts qui nomment son fichier) l'est, ou, sans producteur repérable, dès qu'un porteur existe. Une planification hors dépôt (serveur, interface d'une CI) n'est vue que DÉCLARÉE (`porteur-cadence:`) ; que le porteur tourne vraiment, et à la cadence promise, n'est pas jugé (M-7 de l'étape MEP)",
+  "R-61 bis (TF-2124) : la PRÉSENCE et le verdict des deux contrôles au ledger du dernier run sont jugés, pas leur justesse — un `parcours-personas` PASS dit qu'un parcours de bout en bout CITE chaque persona déclaré (pan statique, il ne joue aucun parcours), un `oracle-exploitabilite` PASS dit qu'une cible a été jugée, ni qu'elle était l'instance servie et alimentée ni que la revue humaine des captures a eu lieu ; l'ORDRE des entrées par rapport au `run_close` n'est pas jugé (un verdict consigné après coup lève le refus) ; un produit sans persona ni écran (pan NA, cible SKIP) n'a pas d'exemption : la décision D-166 (a) dit « verts »",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
@@ -2879,7 +2966,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, « R-35 bis », R-42, « R-42 bis », R-43, R-47, R-60)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, « R-35 bis », R-42, « R-42 bis », R-43, R-47, R-60, « R-61 bis »)" });
     }
   }
 }

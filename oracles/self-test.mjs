@@ -3008,5 +3008,142 @@ check("TF-1746 antériorité : un livrable daté avant le 15/10/2026 n'est pas j
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- R-61 bis (TF-2124, D-166 (a) du 04/11/2026) — « prêt pour la production » exige le pan parcours-personas et oracle-exploitabilite ---
+// Le fait (Produit-86, RP-3) : 85 exigences tenues sur 85 comptées sur un référentiel écrit par la session, produit jugé
+// inexploitable par le porteur. Un run qui se déclare prêt porte au ledger de CE run un PASS de chacun des deux contrôles :
+// avertissement nommé jusqu'au 18/11/2026 inclus, FAIL à partir du 19/11/2026. Le jour se lit à l'horloge ; `--aujourd-hui`
+// le fixe ici, `--declarer-pret` joue la porte avant l'écriture du run_close. Fixtures à double sens : un run sans les deux
+// contrôles verts (avertissement avant la date, rouge après), un run avec les deux verts (vert), et le remède prescrit joué.
+const R61B_OUVERTURE = { seq: 1, ts: "2026-11-04T08:00:00Z", type: "run_open", schema_ledger: "1.1" };
+const r61bVerdict = (oracleNom, verdict, seq) => ({ seq, ts: "2026-11-04T09:00:00Z", type: "oracles_verdict", oracle: oracleNom, verdict });
+const R61B_PARCOURS = (v = "PASS") => r61bVerdict("forge-tests:parcours-personas", v, 2);
+const R61B_EXPLOIT = (v = "PASS") => r61bVerdict("oracle-exploitabilite", v, 3);
+const r61bCloture = (ts = "2026-11-04T13:00:00Z", statut = "pret_production_en_attente_GO") => ({ seq: 99, ts, type: "run_close", statut });
+const projet61b = (entrees) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r61b-"));
+  mkdirSync(join(d, "forge"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"), entrees.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  return d;
+};
+const juge61b = (d, jour, ...plus) => {
+  const r = lanceArgs(d, "--regles", "R-61 bis", ...(jour ? ["--aujourd-hui", jour] : []), ...plus);
+  return { ...r, f: (r.rapport.findings || []).filter((x) => x.regle === "R-61 bis") };
+};
+check("R-61 bis vert : les deux contrôles PASS au ledger du run déclaré prêt → PASS sans avertissement, exit 0 (TF-2124)", () => {
+  const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(), R61B_EXPLOIT(), r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-20");
+    if (exit !== 0 || !f.some((x) => x.statut === "PASS" && /parcours-personas/.test(x.message) && /oracle-exploitabilite/.test(x.message)) || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge avant la date : aucun des deux contrôles, le 2026-11-18 (dernier jour inclus) → AVERTISSEMENT nommant les deux, jamais un FAIL", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-18");
+    const a = f.find((x) => /AVERTISSEMENT/.test(x.message));
+    if (exit !== 0 || !a || a.statut !== "PASS" || !/parcours-personas/.test(a.message) || !/oracle-exploitabilite/.test(a.message) || !/19\/11\/2026/.test(a.message)) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge à la date : le même run le 2026-11-19 → FAIL nommant les deux contrôles, exit 1", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-19");
+    const k = f.find((x) => x.statut === "FAIL");
+    if (exit !== 1 || !k || !/parcours-personas/.test(k.message) || !/oracle-exploitabilite/.test(k.message) || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge : un seul contrôle manque (exploitabilité FAIL, parcours PASS) → seule l'exploitabilité est nommée, avec son verdict", () => {
+  const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(), R61B_EXPLOIT("FAIL"), r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-12-01");
+    const k = f.find((x) => x.statut === "FAIL");
+    if (exit !== 1 || !k || !/oracle-exploitabilite[^;]*FAIL/.test(k.message) || /manque[^]*parcours-personas :/.test(k.message)) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge : un verdict NA ou SKIP n'est pas un vert (pan sans persona déclaré, cible non jugeable) → nommé", () => {
+  for (const v of ["NA", "SKIP"]) {
+    const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(v), R61B_EXPLOIT(), r61bCloture()]);
+    try {
+      const { exit, f } = juge61b(d, "2026-12-01");
+      const k = f.find((x) => x.statut === "FAIL");
+      if (exit !== 1 || !k || !new RegExp(`parcours-personas[^;]*${v}`).test(k.message)) throw new Error(`${v} : ${JSON.stringify({ exit, f })}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  }
+});
+check("R-61 bis vert : les graphies du parc (forge-tests:…, forge-design:…, chemin et .mjs, nom nu) sont reconnues", () => {
+  const a = projet61b([R61B_OUVERTURE, r61bVerdict("forge-tests:parcours-personas", "PASS", 2), r61bVerdict("digit-ai-forge-design/oracles/oracle-exploitabilite.mjs (instance servie)", "PASS", 3), r61bCloture()]);
+  const b = projet61b([R61B_OUVERTURE, r61bVerdict("parcours-personas", "PASS", 2), r61bVerdict("forge-design:oracle-exploitabilite", "PASS", 3), r61bCloture()]);
+  try {
+    for (const x of [a, b]) {
+      const { exit, f } = juge61b(x, "2026-12-01");
+      if (exit !== 0 || !f.some((y) => y.statut === "PASS" && !/AVERTISSEMENT/.test(y.message))) throw new Error(JSON.stringify({ exit, f }));
+    }
+  } finally { rmSync(a, { recursive: true, force: true }); rmSync(b, { recursive: true, force: true }); }
+});
+check("R-61 bis : le dernier verdict d'un contrôle fait foi (FAIL puis PASS → vert ; PASS puis FAIL → rouge)", () => {
+  const vert = projet61b([R61B_OUVERTURE, r61bVerdict("forge-tests:parcours-personas", "FAIL", 2), r61bVerdict("forge-tests:parcours-personas", "PASS", 3), R61B_EXPLOIT(), r61bCloture()]);
+  const rouge = projet61b([R61B_OUVERTURE, R61B_PARCOURS("PASS"), r61bVerdict("forge-tests:parcours-personas", "FAIL", 3), R61B_EXPLOIT(), r61bCloture()]);
+  try {
+    if (juge61b(vert, "2026-12-01").exit !== 0) throw new Error("FAIL puis PASS devrait être vert");
+    if (juge61b(rouge, "2026-12-01").exit !== 1) throw new Error("PASS puis FAIL devrait être rouge");
+  } finally { rmSync(vert, { recursive: true, force: true }); rmSync(rouge, { recursive: true, force: true }); }
+});
+check("R-61 bis : les verdicts d'un run précédent ne comptent pas, seuls ceux qui suivent le dernier run_open sont lus", () => {
+  const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(), R61B_EXPLOIT(), r61bCloture("2026-11-04T10:00:00Z"), { ...R61B_OUVERTURE, seq: 5, ts: "2026-11-05T08:00:00Z" }, r61bCloture("2026-11-05T13:00:00Z")]);
+  try {
+    const { exit, f } = juge61b(d, "2026-12-01");
+    if (exit !== 1 || !f.some((x) => x.statut === "FAIL")) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis : un run qui ne se déclare pas prêt n'est pas jugé (SANS_OBJET, même après la date, exit 0)", () => {
+  const d = projet61b([R61B_OUVERTURE, { seq: 4, ts: "2026-11-04T13:00:00Z", type: "run_close", statut: "en_cours_de_repli" }]);
+  try {
+    const { exit, f } = juge61b(d, "2026-12-01");
+    if (exit !== 0 || !f.length || f.some((x) => x.statut !== "SANS_OBJET")) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis : --declarer-pret joue la porte avant le run_close (avertissement avant la date, FAIL à partir du 19/11/2026)", () => {
+  const d = projet61b([R61B_OUVERTURE]);
+  try {
+    const av = juge61b(d, "2026-11-10", "--declarer-pret");
+    if (av.exit !== 0 || !av.f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(`avant : ${JSON.stringify(av.f)}`);
+    const ap = juge61b(d, "2026-11-19", "--declarer-pret");
+    if (ap.exit !== 1 || !ap.f.some((x) => x.statut === "FAIL")) throw new Error(`après : ${JSON.stringify(ap.f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis antériorité : un run déclaré prêt le 2026-11-03, avant la décision, n'est pas jugé et c'est dit au non_juge", () => {
+  const d = projet61b([{ ...R61B_OUVERTURE, ts: "2026-11-03T08:00:00Z" }, r61bCloture("2026-11-03T13:00:00Z")]);
+  try {
+    const { exit, f, rapport } = juge61b(d, "2026-12-01");
+    if (exit !== 0 || f.some((x) => x.statut !== "SANS_OBJET")) throw new Error(JSON.stringify({ exit, f }));
+    if (!(rapport.non_juge || []).some((l) => /R-61 bis/.test(l) && /2026-11-03/.test(l))) throw new Error("antériorité non déclarée au non_juge");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis remède joué (TF-1013) : consigner les deux verdicts PASS lève le refus du 2026-11-19", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    if (juge61b(d, "2026-11-19").exit !== 1) throw new Error("le cas de départ n'est pas rouge");
+    appendFileSync(join(d, "forge", "ledger.jsonl"), [R61B_PARCOURS(), R61B_EXPLOIT()].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    const { exit, f } = juge61b(d, "2026-11-19");
+    if (exit !== 0 || !f.some((x) => x.statut === "PASS" && !/AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis : --aujourd-hui invalide → ERREUR exit 2, rien n'est jugé", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const r = lanceArgs(d, "--regles", "R-61 bis", "--aujourd-hui", "hier");
+    if (r.exit !== 2 || r.rapport.verdict !== "ERREUR") throw new Error(JSON.stringify(r));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis horloge : sans --aujourd-hui, le jour lu est celui de la machine (AAAA-MM-JJ local)", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const n = new Date();
+    const jour = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+    const { f } = juge61b(d, null);
+    if (!f.length || !f.some((x) => x.message.includes(jour))) throw new Error(`jour ${jour} absent : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
