@@ -560,6 +560,7 @@ export function critiqueDuTour(segment, { racine = "" } = {}) {
 
 export const RAPPEL_CRITIQUE = "Joue la critique d'implémentation TOI-MÊME, maintenant, avant de rendre la main : `node <FORGE_ROOT>\\digit-ai-forge-design\\oracles\\run-oracles-design.mjs "
   + "<page.html> --tokens <tokens.css> --rendu --json-only` (le point d'entrée, jamais oracle par oracle ; `--rendu` pour le contraste et le texte rogné, que les captures ne montrent pas). "
+  + "Une page d'APPLICATION se juge servie : ajoute `--instance <url>` (en https auto-signé local, `--accepter-certificat-local`) ; sans instance, X7 la refuse, sauf `--maquette` pour une maquette ou `--type-page editoriale` pour une page éditoriale (TF-2121). "
   + "Corrige les écarts durs, puis rejoue-la APRÈS ta dernière écriture, et cite son verdict daté (PASS ou FAIL) au bloc 4. Une feuille de style ou un script se juge par une page qui le charge. "
   + "Tu ne la proposes pas à l'humain et tu ne lui demandes pas de la valider : « Je ne dois pas avoir à la valider manuellement. Elle doit être faite automatiquement » (RT-130, D-82 (a)). "
   + "Un verdict SKIP (indéterminé) n'en est pas un : règle la cause (racine de forge-design, outillage de rendu), puis rejoue.";

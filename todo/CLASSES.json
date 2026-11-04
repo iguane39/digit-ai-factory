@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.62.0",
- "date": "2026-11-03",
+ "version": "1.64.0",
+ "date": "2026-11-04",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -2993,6 +2993,102 @@
    "regle": "forge-tests : un test qui appelle le fournisseur LLM réel sans double est dénoncé par le pan prompts",
    "oracle": "forge-tests, banc du pan prompts (TF-2117)",
    "voisines": []
+  },
+  {
+   "voisines": [],
+   "cle": "pret-annonce-sans-usage-reel",
+   "famille": "hook-ou-gate",
+   "libelle": "Un run se déclare prêt pour la production sans qu'un parcours réel par persona ait été joué sur l'instance servie et revu",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2124"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261103c RP-3) : porte d'exploitabilité avant « prêt » ; doctrine posée à l'humain sous D-166",
+   "oracle": "forge-design oracles/oracle-exploitabilite.mjs, joué sur l'instance servie (porteur partiel : il juge l'exploitabilité d'une page, pas la clôture du run)"
+  },
+  {
+   "voisines": [],
+   "cle": "secret-sans-canal-entre-sessions",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un secret fourni par l'humain dans une session n'a aucun canal vers la session suivante du produit, qui le redemande ou le relit dans une transcription",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2127"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261103d RP-5) : un geste « ranger un secret » au coffre du produit, consigné au ledger par nom et empreinte ; posé à l'humain sous D-167",
+   "oracle": "oracles/oracle-secrets-hors-perimetre.mjs SP1 et SP2 (porteur partiel : il constate un secret rangé hors du coffre, pas un secret perdu entre deux sessions)"
+  },
+  {
+   "voisines": [],
+   "cle": "ressource-neuve-retiree-comptee-geste-destructif",
+   "famille": "hook-ou-gate",
+   "libelle": "Le retrait d'une ressource distante créée dans le même tour et jamais employée est traité comme un geste destructif, et la session la duplique plutôt que de la retirer",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2128"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261103d RP-6) : l'admettre dans la liste fermée de GESTES-DISTANTS, consigné avec son identifiant de création ; posé à l'humain sous D-168",
+   "oracle": "oracles/hook-gestes-distants.mjs (liste fermée des gestes distants)"
+  },
+  {
+   "voisines": [],
+   "cle": "ecart-de-surface-decide-par-la-session",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un écart de surface implicite est accepté alors que la session, un agent ou le build l'a décidé, sans décision humaine référencée",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2119"
+   ],
+   "regle": "forge-conception : un écart de surface implicite porte une décision humaine référencée (D-N, entrée de ledger ou citation datée)",
+   "oracle": "forge-conception oracles/oracle-surface.mjs S4 et S5 (1.6.0)"
+  },
+  {
+   "voisines": [],
+   "cle": "region-de-convention-sans-repli-de-capacite",
+   "famille": "contrat-interface-forge",
+   "libelle": "La région de convention d'une souscription n'a pas de repli quand la capacité manque, et le réseau créé avant l'échec reste orphelin",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2129"
+   ],
+   "regle": "forge-ops : un plan Azure déclare une région de repli et sonde la capacité avant le premier réseau (runbook G-05)",
+   "oracle": "forge-ops oracles/oracle-ops.mjs O-5"
+  },
+  {
+   "voisines": [],
+   "cle": "modification-automatique-sur-fichier-change",
+   "famille": "hook-ou-gate",
+   "libelle": "Une modification automatique s'applique alors que le fichier visé a changé depuis qu'elle a été listée, et rien ne dit l'effet qu'elle devait produire",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2070"
+   ],
+   "regle": "oeil-critique 1.4.0 : empreinte du fichier visé à la liste, refus si elle a changé, ligne « effet attendu » jugée à l'exécution suivante",
+   "oracle": "forge-agents .claude/skills/oeil-critique/scripts/automatiques.mjs verifier (self-test 23 cas)"
+  },
+  {
+   "voisines": [],
+   "cle": "produit-sans-logo-sans-methode",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un produit qui n'a pas encore de logo n'est guidé par aucune méthode de création : concepts, clichés de la catégorie, familiarité, lecture en petit",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2073"
+   ],
+   "regle": "systeme-de-marque 1.4.0, références produit-sans-logo.md (méthode reprise de logo-design-skill, MIT, sans sa bibliothèque)",
+   "oracle": "forge-design skills/systeme-de-marque/scripts/self-test.mjs (branche produit sans logo)"
+  },
+  {
+   "voisines": [],
+   "cle": "logo-illisible-en-petit",
+   "famille": "affordance-ui",
+   "libelle": "Un logo SVG passe les contrôles alors qu'il est illisible à 16 ou 32 px : traits plus fins qu'un pixel, détails fusionnés, contraste insuffisant",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2074"
+   ],
+   "regle": "forge-design : un logo se juge rendu à 16 et 32 px",
+   "oracle": "forge-design oracles/oracle-logo-petit.mjs LP1 à LP5"
   }
  ],
  "cliquet_porteur": {

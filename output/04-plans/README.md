@@ -174,6 +174,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md` | fichier | 7,9 Ko | Synthèse Mandat — ce qui reste à faire au pilot, le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - Restes de campagne corriges et largeur des gabarits - 20261103b.md` | fichier | 10,4 Ko | Synthèse Mandat — 2 restes sur 3 corrigés et publiés, 1 décision pour la largeur des gabar |
 | `Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` | fichier | 12,2 Ko | Synthèse Mandat — retours et sujets qui attendaient ce poste (14/10/2026) |
+| `Digit-AI - Synthese Mandat - Retours et TODOs du 04-11 - 20261104a.md` | fichier | 17,6 Ko | Synthèse Mandat — retours du 03/11 ingérés, 23 sujets du registre clos (04/11/2026) |
 | `Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` | fichier | 10,3 Ko | Synthèse Mandat — retours du jour ingérés, 19 sujets du registre clos (29/10/2026) |
 | `Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` | fichier | 16,6 Ko | Synthèse Mandat — revue des 6 décisions posée, 6 restes de la campagne clos (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` | fichier | 8,3 Ko | Synthèse Mandat — revue de code proposée à la mise en production (03/11/2026) |
@@ -197,4 +198,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_176 fichier(s), 4 sous-dossier(s)_
+_177 fichier(s), 4 sous-dossier(s)_
