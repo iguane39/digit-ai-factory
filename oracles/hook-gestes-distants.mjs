@@ -67,7 +67,14 @@
  * `reponse_humaine` doit citer ses mots, et la revue du lot (qui l'a écrit, quand, avec quels mots) reste
  * possible parce que le fichier garde chaque ligne.
  *
- * Usage : node oracles\hook-gestes-distants.mjs                      (stdin : JSON du hook PreToolUse)
+ * TF-2084 (04/11/2026, RT-39) : le même hook tient le registre des gestes distants EN COURS (`forge\gestes-en-cours.jsonl`,
+ * `oracles\lib-gestes-en-cours.mjs`) : il inscrit le début d'un geste qui modifie l'état distant (PreToolUse), sa fin (PostToolUse),
+ * et AVERTIT quand une autre session du produit a un geste ouvert sur la même ressource. Il ne refuse jamais pour cela.
+ * Liste et limites : `references\GESTES-DISTANTS.md`, section « Deux sessions, une ressource ».
+ *
+ * Usage : node oracles\hook-gestes-distants.mjs                      (stdin : JSON du hook PreToolUse ou PostToolUse)
+ *         node oracles\hook-gestes-distants.mjs --ouvrir --ressource <objet> [--session <id>] [--geste <texte>] [--duree-min N]
+ *         node oracles\hook-gestes-distants.mjs --clore [--ressource <objet>] [--session <id>] | --lister
  *         node oracles\hook-gestes-distants.mjs --poser --lot <lot.json> [--racine <dossier>] [--duree-h N] [--session <id>]
  * Exit : 0 laisse passer · 2 refuse (motif sur stderr) ; en mode --poser : 0 posé · 1 lot refusé.
  */
@@ -75,6 +82,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from "n
 import { basename, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { DUREE_DEFAUT_MIN, avertissement, clore, gestesOuverts, lireRegistre, ouvrir } from "./lib-gestes-en-cours.mjs";
 
 export const OUTILS = new Set(["Bash", "PowerShell"]);
 export const DUREE_MAX_H = 24;
@@ -164,7 +172,7 @@ export function mots(segment) {
 }
 
 const nomOutil = (w) => String(w).split(/[\\/]/).pop().toLowerCase().replace(/\.(exe|cmd|bat|ps1|com)$/, "");
-const OUTILS_JUGES = new Set(["az", "terraform", "tofu", "gh", "git", "curl", "wget", "invoke-restmethod", "irm", "invoke-webrequest", "iwr", "invoke-azrestmethod"]);
+const OUTILS_JUGES = new Set(["az", "terraform", "tofu", "gh", "git", "wrangler", "curl", "wget", "invoke-restmethod", "irm", "invoke-webrequest", "iwr", "invoke-azrestmethod"]);
 const SHELLS = new Set(["bash", "sh", "zsh", "dash", "pwsh", "powershell", "cmd"]);
 const ENVELOPPES = new Set(["sudo", "env", "time", "nohup", "xargs", "command", "exec", "call", "start", "timeout", "stdbuf", "nice", "then", "do", "else", "{", "}", "&", ".", "!"]);
 /** D-98 (a) : `if az group delete …`, `while …`. Le mot de contrôle se saute seul, sans ouvrir une enveloppe. */
@@ -499,6 +507,123 @@ export function juger(entree, { lots = null, maintenant = Date.now(), env = proc
 }
 
 // ---------------------------------------------------------------------------------------------
+// 4 bis. Les gestes distants EN COURS (TF-2084) : un registre partagé, une lecture qui avertit
+// ---------------------------------------------------------------------------------------------
+
+const VERBE_MUTANT = /^(create|delete|update|deploy|up|purge|remove|set|add|start|stop|restart|swap|scale|import|restore|sync|upload|upload-batch|put|publish|rollback)(-[a-z0-9-]+)?$/;
+const VERBE_WRANGLER = /^(create|delete|put|deploy|publish|upload|rollback|apply|execute|bulk)$/;
+const norm = (s) => String(s).toLowerCase().replace(/\\/g, "/");
+
+/** Le geste d'un outil, ou null : { ressource, perimetre, geste }. Liste fermée, voir GESTES-DISTANTS.md. */
+function geste(outil, args, cwd) {
+  const pos = positionnels(args);
+  if (outil === "az") {
+    if (!pos.length || pos[0] === "rest" || AZ_LOCAL.has(pos[0]) || pos[0] === "account") return null;
+    const i = pos.findIndex((v, k) => k >= 1 && VERBE_MUTANT.test(v));
+    if (i < 0) return null;
+    const rg = valeurOption(args, ["--resource-group", "-g"]), compte = valeurOption(args, ["--account-name"]);
+    const etendue = rg ? ` -g ${rg}` : compte ? ` --account-name ${compte}` : "";
+    const perimetre = norm(`az ${pos.slice(0, i).join(" ")}${etendue}`);
+    const nom = valeurOption(args, ["--name", "-n"]);
+    return { perimetre, ressource: nom ? norm(`${perimetre} ${nom}`) : perimetre, geste: `az ${pos.join(" ")}` };
+  }
+  if (outil === "terraform" || outil === "tofu") {
+    const mute = ["apply", "destroy", "import"].includes(pos[0]) || (pos[0] === "state" && ["rm", "mv", "push"].includes(pos[1]))
+      || (pos[0] === "workspace" && ["new", "delete"].includes(pos[1]));
+    if (!mute) return null;
+    const chdir = args.find((a) => /^-chdir=/.test(a));
+    const dossier = norm(resolve(cwd, chdir ? chdir.slice(7) : "."));
+    return { perimetre: `terraform ${dossier}`, ressource: `terraform ${dossier}`, geste: `${outil} ${pos.slice(0, 2).join(" ")}`.trim() };
+  }
+  if (outil === "wrangler") {
+    const i = pos.findIndex((v) => VERBE_WRANGLER.test(v));
+    if (i < 0) return null;
+    let perimetre, nom;
+    if (pos[0] === "pages") { perimetre = "wrangler pages project"; nom = valeurOption(args, ["--project-name"]) || (pos[1] === "project" ? pos[3] : null); }
+    else if (i === 0) { perimetre = "wrangler worker"; nom = valeurOption(args, ["--name"]) || basename(cwd).toLowerCase(); }
+    else { perimetre = `wrangler ${pos.slice(0, i).join(" ")}`; nom = pos[i + 1] || valeurOption(args, ["--name"]); }
+    return { perimetre, ressource: nom ? `${perimetre} ${norm(nom)}` : perimetre, geste: `wrangler ${pos.slice(0, i + 1).join(" ")}` };
+  }
+  if (outil === "gh" && pos[0] === "repo" && /^(create|delete|rename|edit|archive|unarchive|fork)$/.test(pos[1] || "")) {
+    return { perimetre: "gh repo", ressource: `gh repo ${pos[2] || "(courant)"}`, geste: `gh repo ${pos[1]}` };
+  }
+  return null;
+}
+
+/** Les gestes distants d'une commande qui MODIFIENT l'état distant (liste fermée : az, terraform/tofu, wrangler, gh repo). */
+export function gestesDistants(commande, cwd = process.cwd(), profondeur = 0) {
+  const sortie = [];
+  for (const s of segmenter(commande)) {
+    const l = localiser(mots(s));
+    if (!l) continue;
+    if (l.interne !== undefined) { if (profondeur < 3) sortie.push(...gestesDistants(l.interne, cwd, profondeur + 1)); continue; }
+    const g = geste(l.outil, l.args, cwd);
+    if (g) sortie.push(g);
+  }
+  return sortie;
+}
+
+/** Le registre est celui d'un PRODUIT : le pilot (qui porte `todo\TODO.jsonl`) n'en écrit pas. */
+const estPilot = (racine) => existsSync(join(racine, "todo", "TODO.jsonl"));
+
+/**
+ * Suit les gestes distants d'un appel d'outil. PreToolUse : avertit si une autre session a un geste ouvert sur la
+ * même ressource ou le même périmètre, puis inscrit le `debut`. PostToolUse : inscrit la `fin`. Ne bloque jamais.
+ * Rend { avertissement, ouverts, fermes }.
+ */
+export function suivre(entree, { maintenant = Date.now(), env = process.env } = {}) {
+  const vide = { avertissement: "", ouverts: 0, fermes: 0 };
+  if (!OUTILS.has(entree?.tool_name) || typeof entree?.tool_input?.command !== "string") return vide;
+  const cwd = resolve(entree.cwd || env.CLAUDE_PROJECT_DIR || process.cwd());
+  const gestes = gestesDistants(entree.tool_input.command, cwd);
+  if (!gestes.length) return vide;
+  const racines = racinesDuProjet(entree, env);
+  if (estPilot(racines[0])) return vide;
+  const principal = racines[racines.length - 1]; // l'arbre principal : partagé par les arbres de travail liés
+  const session = entree.session_id || "inconnue";
+  if (entree.hook_event_name === "PostToolUse") {
+    let fermes = 0;
+    for (const g of gestes) fermes += clore(racines, principal, { session, ressource: g.ressource }, maintenant);
+    return { ...vide, fermes };
+  }
+  const textes = [];
+  let ouverts = 0;
+  for (const g of gestes) {
+    const r = ouvrir(racines, principal, { session, ressource: g.ressource, perimetre: g.perimetre, geste: g.geste, dureeMin: DUREE_DEFAUT_MIN }, maintenant);
+    if (r.ouvert) ouverts++;
+    const t = avertissement(r.conflits, g, maintenant);
+    if (t) textes.push(t);
+  }
+  return { avertissement: textes.join(" | "), ouverts, fermes: 0 };
+}
+
+/** `--ouvrir`, `--clore`, `--lister` : la session déclare elle-même un geste que la liste fermée ne reconnaît pas (un banc, un déploiement). */
+function enCours(argv) {
+  const val = (cle) => { const i = argv.indexOf(cle); return i >= 0 ? argv[i + 1] : null; };
+  const racines = val("--racine") ? [resolve(val("--racine"))] : racinesDuProjet({}, process.env);
+  const principal = racines[racines.length - 1];
+  const session = val("--session") || process.env.CLAUDE_SESSION_ID || "manuel";
+  const ressource = val("--ressource");
+  if (argv.includes("--lister")) {
+    const ouverts = gestesOuverts(lireRegistre(racines));
+    process.stdout.write(ouverts.length ? ouverts.map((g) => `${g.session}\t${g.ressource}\t${g.ts}\t${g.expire}\t${g.geste}`).join("\n") + "\n" : "aucun geste distant ouvert\n");
+    return 0;
+  }
+  if (argv.includes("--clore")) {
+    const n = clore(racines, principal, { session, ressource: ressource || null });
+    process.stdout.write(`${n} geste(s) clos pour la session ${session}\n`);
+    return 0;
+  }
+  if (!ressource) { process.stderr.write("--ouvrir exige --ressource <objet visé> (ex. banc:recette, wrangler r2 bucket rapports)\n"); return 1; }
+  const r = ouvrir(racines, principal, { session, ressource: norm(ressource), perimetre: val("--perimetre") ? norm(val("--perimetre")) : null,
+    geste: val("--geste") || ressource, dureeMin: val("--duree-min") ? Number(val("--duree-min")) : DUREE_DEFAUT_MIN });
+  const t = avertissement(r.conflits, { ressource }, Date.now());
+  process.stdout.write(`geste ${r.ouvert ? "ouvert" : "déjà ouvert par cette session"} sur ${norm(ressource)} (session ${session})\n`);
+  if (t) process.stderr.write(t + "\n");
+  return 0;
+}
+
+// ---------------------------------------------------------------------------------------------
 // 5. Poser un lot
 // ---------------------------------------------------------------------------------------------
 
@@ -541,12 +666,21 @@ function poser(argv) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   if (process.argv.includes("--poser")) process.exit(poser(process.argv.slice(2)));
+  if (["--ouvrir", "--clore", "--lister"].some((o) => process.argv.includes(o))) process.exit(enCours(process.argv.slice(2)));
   let brut = "";
   try { brut = readFileSync(0, "utf8"); } catch { /* pas de stdin */ }
   let entree = {};
   try { entree = JSON.parse(brut || "{}"); } catch { /* entrée illisible : pas un appel d'outil */ }
+  const apres = entree?.hook_event_name === "PostToolUse"; // le geste a eu lieu : plus rien à refuser, seulement à clore
   let v = { decision: "laisse" };
-  try { v = juger(entree); } catch (e) { process.stderr.write(`[hook-gestes-distants] panne du juge, geste NON jugé : ${String(e).slice(0, 200)}\n`); }
-  if (v.decision === "refuse") { process.stderr.write(v.motif + "\n"); process.exit(2); }
+  if (!apres) {
+    try { v = juger(entree); } catch (e) { process.stderr.write(`[hook-gestes-distants] panne du juge, geste NON jugé : ${String(e).slice(0, 200)}\n`); }
+    if (v.decision === "refuse") { process.stderr.write(v.motif + "\n"); process.exit(2); }
+  }
+  // TF-2084 : le registre des gestes en cours avertit (jamais ne bloque) et ne fait jamais tomber l'outil.
+  try {
+    const s = suivre(entree);
+    if (s.avertissement) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: s.avertissement } }) + "\n");
+  } catch (e) { process.stderr.write(`[hook-gestes-distants] registre des gestes en cours illisible, geste NON suivi : ${String(e).slice(0, 200)}\n`); }
   process.exit(0);
 }

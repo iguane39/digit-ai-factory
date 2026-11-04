@@ -305,8 +305,54 @@ try {
   let c16 = null; try { c16 = JSON.parse(r16.stdout || "null"); } catch { c16 = { brut: r16.stdout }; }
   check("16 livré, le guide écrit sous output/ et non lié au bloc 0 : S87 est dite au hook du pilot atteint par le lanceur (TF-1973, TF-2016)",
     c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && /\(v2\.58\.0\)/.test(c16.reason || ""), JSON.stringify(c16)?.slice(0, 300));
+
+  // 17 — TF-2126 (04/11/2026), verrou de mutation par le lanceur : un `git commit` chez un produit dont la racine porte
+  // `.forge-tests-mutation-en-cours` est refusé (exit 2) avec les fichiers mutés nommés ; le verrou retiré (fenêtre fermée),
+  // la même commande passe ; une lecture passe pendant le verrou.
+  const verrou17 = join(P, ".forge-tests-mutation-en-cours");
+  writeFileSync(verrou17, JSON.stringify({ pid: process.pid, depuis: new Date().toISOString(), fichiers: ["app/audit.py", "app/egress.py"],
+    message: "mutation forge-tests en cours — sources alterees par un mutant, ne pas commiter" }), "utf8");
+  const mut = (command) => spawnSync(process.execPath, [lanceur, "mutation-en-cours"], { encoding: "utf8", cwd: P, env: { ...env, CLAUDE_PROJECT_DIR: P },
+    input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command } }) });
+  const mCommit = mut("git commit -m x"), mLecture = mut("git status");
+  rmSync(verrou17);
+  const mApres = mut("git commit -m x");
+  check("17 mutation : `git commit` refusé par le lanceur tant que le verrou existe, fichiers mutés nommés (TF-2126)",
+    mCommit.status === 2 && /TF-2126/.test(mCommit.stderr) && /app\/audit\.py, app\/egress\.py/.test(mCommit.stderr), mCommit.stdout + mCommit.stderr);
+  check("17 bis mutation : `git status` passe pendant le verrou", mLecture.status === 0, mLecture.stdout + mLecture.stderr);
+  check("17 ter mutation : le verrou retiré, la même commande `git commit` passe", mApres.status === 0, mApres.stdout + mApres.stderr);
+
+  // 18 — TF-2084 (04/11/2026), registre des gestes distants en cours par le lanceur : `--ouvrir` (entrée standard OUVERTE,
+  // jamais lue) inscrit le banc de la session A sous forge/ ; la session B qui lance une commande visant la même ressource
+  // est avertie (exit 0) en nommant A ; `--clore` par A lève l'avertissement.
+  const P18 = produit("produit-gestes-en-cours", false);
+  const env18 = { ...env, CLAUDE_PROJECT_DIR: P18 };
+  const lanceur18 = join(P18, "forge", "hooks", "factory.mjs");
+  const ouvrir18 = await new Promise((ok) => {
+    const c = spawn(process.execPath, [lanceur18, "gestes-distants", "--ouvrir", "--ressource", "wrangler r2 bucket rapports", "--session", "A"], { cwd: P18, env: env18, stdio: ["pipe", "pipe", "pipe"] });
+    let out = "", err = "";
+    c.stdout.on("data", (d) => { out += d; }); c.stderr.on("data", (d) => { err += d; });
+    const minuteur = setTimeout(() => { c.kill(); ok({ fini: false, out, err }); }, 30000);
+    c.on("exit", (code) => { clearTimeout(minuteur); ok({ fini: true, code, out, err }); });
+  });
+  const geste18 = (session) => spawnSync(process.execPath, [lanceur18, "gestes-distants"], { encoding: "utf8", cwd: P18, env: env18,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P18, session_id: session, hook_event_name: "PreToolUse", tool_input: { command: "wrangler r2 bucket create rapports" } }) });
+  const b18 = geste18("B");
+  await new Promise((ok) => {
+    const c = spawn(process.execPath, [lanceur18, "gestes-distants", "--clore", "--ressource", "wrangler r2 bucket rapports", "--session", "A"], { cwd: P18, env: env18, stdio: ["pipe", "pipe", "pipe"] });
+    const minuteur = setTimeout(() => { c.kill(); ok(); }, 30000);
+    c.on("exit", () => { clearTimeout(minuteur); ok(); });
+  });
+  const c18 = spawnSync(process.execPath, [lanceur18, "gestes-distants"], { encoding: "utf8", cwd: P18, env: env18,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P18, session_id: "C", hook_event_name: "PreToolUse", tool_input: { command: "wrangler r2 bucket create rapports" } }) });
+  check("18 gestes en cours : `--ouvrir` par le lanceur (entrée standard ouverte) inscrit le geste de A sous forge/",
+    ouvrir18.fini && ouvrir18.code === 0 && /geste ouvert/.test(ouvrir18.out) && existsSync(join(P18, "forge", "gestes-en-cours.jsonl")), JSON.stringify(ouvrir18));
+  check("18 bis gestes en cours : la session B visant la même ressource est avertie par le lanceur (exit 0), A nommée (TF-2084)",
+    b18.status === 0 && /TF-2084/.test(b18.stdout) && /session A/.test(b18.stdout), b18.stdout + b18.stderr);
+  check("18 ter gestes en cours : `--clore` par A lève l'avertissement, la session C n'est pas avertie de A",
+    c18.status === 0 && !/session A/.test(c18.stdout), c18.stdout + c18.stderr);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084)`);

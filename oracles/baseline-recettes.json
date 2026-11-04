@@ -47,12 +47,12 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 30,
-  "vu_le": "2026-11-03"
+  "cas": 36,
+  "vu_le": "2026-11-04"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 28,
-  "vu_le": "2026-10-30"
+  "cas": 30,
+  "vu_le": "2026-11-03"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
@@ -410,6 +410,10 @@
   "cas": 81,
   "vu_le": "2026-10-30"
  },
+ "oracles/hook-gestes-en-cours.test.mjs": {
+  "cas": 25,
+  "vu_le": "2026-11-04"
+ },
  "oracles/hook-identite-sortante.test.mjs": {
   "cas": 15,
   "vu_le": "2026-10-30"
@@ -417,6 +421,10 @@
  "oracles/hook-lexique.test.mjs": {
   "cas": 27,
   "vu_le": "2026-10-29"
+ },
+ "oracles/hook-mutation-en-cours.test.mjs": {
+  "cas": 37,
+  "vu_le": "2026-11-04"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 61,
@@ -499,8 +507,8 @@
   "vu_le": "2026-09-05"
  },
  "oracles/oracle-depense-voie-par-defaut.test.mjs": {
-  "cas": 13,
-  "vu_le": "2026-09-22"
+  "cas": 14,
+  "vu_le": "2026-11-03"
  },
  "oracles/oracle-ecart-normal.test.mjs": {
   "cas": 10,
@@ -667,8 +675,8 @@
   "vu_le": "2026-09-23"
  },
  "scripts/readme-dossiers.test.mjs": {
-  "cas": 36,
-  "vu_le": "2026-10-30"
+  "cas": 37,
+  "vu_le": "2026-11-03"
  },
  "scripts/rebatir-clone.test.mjs": {
   "cas": 7,

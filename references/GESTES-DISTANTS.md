@@ -64,10 +64,51 @@ déploiements ordinaires (`terraform apply`, `az deployment … create`) et `git
   lot (qui l'a posé, quand, avec quels mots) est le seul garde-fou de ce point.
 - Que le champ `cible` du lot corresponde à la commande : seule la commande approuvée est comparée.
 
+## Deux sessions, une ressource : le registre des gestes en cours (TF-2084, RT-39)
+
+Le fait du 29/10/2026, chez un produit : deux compartiments de stockage créés par deux sessions à deux
+minutes d'écart, un projet d'hébergement recréé pendant le test d'une autre session, une erreur 522
+attribuée à tort au fournisseur, deux bancs simultanés faussés. Chaque session lisait l'état distant, jamais
+l'intention de l'autre. Le hook sait déjà lire une commande ; il tient donc aussi le registre.
+
+- **Fichier** : `forge\gestes-en-cours.jsonl`, ajouté jamais réécrit, une ligne par événement. `debut` porte la
+  session, la ressource (`wrangler r2 bucket rapports`), le périmètre qui la contient (`wrangler r2 bucket`), la
+  commande résumée, l'heure et l'expiration ; `fin` porte l'identifiant du `debut`. Il est écrit dans l'arbre
+  principal du dépôt et lu aussi depuis un arbre de travail lié. Gitignoré (`gabarits\gitignore-produit`).
+- **Écriture** : le hook `gestes-distants` inscrit le `debut` en `PreToolUse` et la `fin` en `PostToolUse`, pour
+  les gestes qui MODIFIENT l'état distant. Liste fermée : `az` dont un mot de sous-commande est `create`, `delete`,
+  `update`, `deploy`, `up`, `set`, `add`, `purge`, `remove`, `start`, `stop`, `restart`, `swap`, `scale`, `import`,
+  `restore`, `sync`, `upload`, `put`, `publish` ou `rollback` ; `terraform|tofu` `apply`, `destroy`, `import`, `state rm|mv|push`,
+  `workspace new|delete` (la ressource est le dossier, `-chdir` compris) ; `wrangler` `create`, `delete`, `put`,
+  `deploy`, `publish`, `upload`, `rollback`, `apply`, `execute`, `bulk` (un projet Pages a une seule clé, qu'il soit
+  créé, supprimé ou déployé) ; `gh repo create|delete|rename|edit|archive|unarchive|fork`.
+- **Lecture qui avertit** : quand une AUTRE session a un geste ouvert sur la même ressource (« même
+  ressource ») ou sur le même périmètre sous un autre nom (« même périmètre » : deux compartiments pour le même
+  usage), la commande part avec un avertissement (`additionalContext`) qui nomme l'autre session, depuis quand
+  et ce qu'il faut faire : lire l'état distant, attendre, ne pas imputer une erreur au fournisseur. Exit 0 : le
+  registre n'a pas de refus. Les refus de ce fichier (gestes destructifs sans lot) passent d'abord et
+  n'inscrivent rien.
+- **Un geste est ouvert** tant qu'il n'a pas de `fin` et que son expiration n'est pas passée : 15 minutes par
+  défaut, 4 heures au plus. C'est la seule preuve de vie d'une session : une session tuée cesse d'être comptée à
+  l'expiration, et un outil qui échoue ne déclenche pas `PostToolUse`, donc son geste dure jusqu'à l'expiration.
+- **Déclarer à la main** ce que la liste fermée ne reconnaît pas (un banc, un déploiement par un autre outil) :
+  `node forge\hooks\factory.mjs gestes-distants --ouvrir --ressource banc:recette --geste "banc de recette"
+  --session <id> [--duree-min 60]`, puis `--clore --ressource banc:recette --session <id>` ; `--lister` montre les
+  gestes ouverts. Sans `--session`, la session vaut `manuel` : deux sessions qui omettent l'option se confondent.
+- **Hors liste, non jugé** : `git push` (git arbitre seul), `az rest`, `gh api`, `curl`, `vercel`, `netlify`,
+  `supabase`, les autres nuages ; un geste lancé par un script dont le texte n'est pas dans la commande ; la
+  vie réelle d'une session (seule l'expiration compte) ; la même ressource nommée différemment (`rapports` et
+  `rapports-v2`), signalée seulement quand le périmètre est le même. Le pilot (`todo\TODO.jsonl`) n'écrit pas de
+  registre : ses sessions se coordonnent par `mobilisation.jsonl` et le registre des décisions.
+- **Reste à faire, non livré** : un hook `PostToolUseFailure` qui clôt un geste dont l'outil a échoué ; la lecture
+  de l'état distant avant chaque geste (la session le fait, rien ne l'y oblige) ; l'extension de la liste aux
+  autres outils quand un fait la justifie.
+
 ## Câblage
 
 Au pilot : `.claude\settings.json` (matcher `Bash|PowerShell`). Chez un produit : `gabarits\settings-produit.json`
 par le relais `forge\hooks\factory.mjs gestes-distants` (`gabarits\hooks-factory.mjs`), exigé par
-`gabarits\HERITAGE.json` 1.37.0. Section courte du produit : `gabarits\CLAUDE-PRODUIT.md`, « Gestes
+`gabarits\HERITAGE.json` 1.37.0 ; le registre des gestes en cours ajoute l'événement `PostToolUse` (même
+commande, 1.49.0) et `oracles\lib-gestes-en-cours.mjs`, recette `oracles\hook-gestes-en-cours.test.mjs`. Section courte du produit : `gabarits\CLAUDE-PRODUIT.md`, « Gestes
 destructifs distants ». Recettes : `oracles\hook-gestes-distants.test.mjs` (cas rouges et verts, remède
 joué) et `gabarits\hooks-factory.test.mjs`, cas 14.

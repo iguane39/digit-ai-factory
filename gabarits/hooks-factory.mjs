@@ -56,8 +56,15 @@ const [nom, ...options] = process.argv.slice(2);
 // une décision groupée pour tous les gestes destructifs distants du tour, jamais une confirmation par commande :
 // `az … delete`, `terraform destroy`, une attribution de droits, `gh repo delete`, `git push --force` sont refusés
 // tant qu'aucun lot approuvé valide (forge/gestes-approuves.jsonl, 24 h au plus) ne les couvre. Bloque. Le mode
-// `--poser` (écrire le lot approuvé) n'a pas non plus l'usage de l'entrée standard.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants"]);
+// `--poser` (écrire le lot approuvé) n'a pas non plus l'usage de l'entrée standard. TF-2084 (04/11/2026) : le même hook,
+// en PreToolUse et en PostToolUse, tient le registre `forge/gestes-en-cours.jsonl` des gestes distants ouverts par les
+// sessions du produit et AVERTIT quand une autre session a un geste ouvert sur la même ressource ; `--ouvrir`, `--clore`
+// et `--lister` déclarent ou lisent un geste à la main (un banc), sans entrée standard non plus.
+// `mutation-en-cours` (04/11/2026, TF-2126) : hook PreToolUse sur Bash et PowerShell — la campagne de mutation de
+// forge-tests altère les sources EN PLACE et pose `.forge-tests-mutation-en-cours` (TF-2091) ; tant que ce verrou
+// existe, `git commit`, le `git add` d'un fichier muté et un déploiement sont refusés, avec les fichiers mutés
+// nommés et le remède d'un verrou orphelin (pid mort). Bloque.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [
@@ -75,7 +82,7 @@ if (!pilot) {
 // la lire attendait sa fermeture, et un préjugement lancé avec une entrée ouverte n'a rien rendu en
 // 9 minutes le 14/10. Elle n'est donc pas lue en préjugement, ni quand elle est un terminal.
 let stdin = "";
-if (!options.includes("--prejuger") && !options.includes("--poser") && !process.stdin.isTTY) {
+if (!["--prejuger", "--poser", "--ouvrir", "--clore", "--lister"].some((o) => options.includes(o)) && !process.stdin.isTTY) {
   try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin (SessionStart) */ }
 }
 const argv = [join(pilot, "oracles", `hook-${nom}.mjs`), ...options];
