@@ -30,7 +30,7 @@ MarkItDown à laisser, 3 formats sur 3 déjà couverts ; skill de logo à repren
 
 > **D-158 — Quel concept de logo retenir pour le produit de pentest, avant de finir son jeu d'icônes ?**
 >
-> - **De quoi s'agit-il** : 3 logos en une couleur pour le produit en construction dans `C:\dev\_Client-A\PenTests`, dessinés par la méthode du skill, sur la planche `output/logo-essai-20261103/planche-comparaison.png` de ce produit. Le skill s'arrête ici pour une revue humaine, avant les icônes et les favicons.
+> - **De quoi s'agit-il** : 3 logos en une couleur pour le produit en construction dans `C:\dev\_Client-A\Produit-86`, dessinés par la méthode du skill, sur la planche `output/logo-essai-20261103/planche-comparaison.png` de ce produit. Le skill s'arrête ici pour une revue humaine, avant les icônes et les favicons.
 > - **Le problème** : A reste net de 64 à 16 px ; B devient des points en diagonale à 16 px ; C se lit « P! » dès 64 px. La planche du skill marque B « recommended », mais c'est l'étiquette de son outil, pas un jugement fondé sur la lisibilité.
 > - **Pourquoi vous** : c'est un choix de marque, et le nom du produit n'est pas encore arrêté.
 > - **Recommandation : (a)** — c'est le seul qui tient à la taille d'un favicon, et son idée, ce qui est hors cadre n'existe pas, dit le périmètre signé. Source consultée : `output/03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md`.
@@ -91,5 +91,5 @@ Le logo passe d'abord, parce que le produit avance ; les 2 décisions sur les re
 ## 9. Traces
 
 - Notes : `output/03-etudes/Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md` et `output/03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md`.
-- Logos : `C:\dev\_Client-A\PenTests\output\logo-essai-20261103\`, hors de git.
+- Logos : `C:\dev\_Client-A\Produit-86\output\logo-essai-20261103\`, hors de git.
 - Registre : `TF-2073` et `TF-2074` à `todo/TODO.jsonl` ; D-158 à `decisions/REGISTRE.jsonl`.

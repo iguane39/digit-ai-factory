@@ -2,7 +2,7 @@
 
 > Provenance : agent `redacteur` (Sonnet), essai de la décision D-156 (a) du 03/11/2026. Destinataire : humain (le porteur).
 > Verdict de l'arbitre : oracle d'écriture rejoué avant remise, voir la section Contrôles.
-> Hypothèses non résolues : le nom du produit n'est pas arrêté (le dossier s'appelle PenTests, nom de travail) ; la qualité de goût des 3 logos n'est pas jugée, seul le porteur la tranche.
+> Hypothèses non résolues : le nom du produit n'est pas arrêté (le dossier s'appelle Produit-86, nom de travail) ; la qualité de goût des 3 logos n'est pas jugée, seul le porteur la tranche.
 
 ## Ce qui change pour vous
 
@@ -52,7 +52,7 @@ Lecture du skill et de ses 6 outils : environ 103 Ko de texte, soit 30 000 jeton
 
 ## Sorties
 
-- `C:\dev\_Client-A\PenTests\output\logo-essai-20261103\` : `concept-a-equerres.svg`, `concept-b-maillon-vide.svg`, `concept-c-p-pied-detache.svg`, `planche-comparaison.png` et `planche-comparaison.svg`. Rien n'est commité.
+- `C:\dev\_Client-A\Produit-86\output\logo-essai-20261103\` : `concept-a-equerres.svg`, `concept-b-maillon-vide.svg`, `concept-c-p-pied-detache.svg`, `planche-comparaison.png` et `planche-comparaison.svg`. Rien n'est commité.
 - Mesures conservées : dossier `essais\logo\mesures\` du répertoire temporaire de la session (audits, sorties de `run-oracles-design`).
 
 ## Sources
