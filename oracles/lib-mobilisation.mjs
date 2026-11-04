@@ -368,14 +368,26 @@ export function trouver(produit, chemin) {
   return parcourir(produit, 0, 0);
 }
 
-/** Chaque livrable exigé par la ligne, présent (avec le fichier trouvé) ou manquant. */
+/**
+ * Chaque livrable exigé par la ligne, présent (fichier trouvé ET écrit après la demande) ou manquant.
+ * TF-2136 : un fichier d'une demande antérieure (mtime < ts de la demande) ne compte pas comme livré —
+ * il est trouvé mais `perime`, donc rangé dans les manquants. mtime est l'heure d'écriture : un `git
+ * checkout` la réinitialise, aussi un livrable produit dans le tour la porte bien, c'est le cas visé.
+ */
 export function etatDesLivrables(produit, carte, ligne) {
+  const seuil = ligne && ligne.ts ? Date.parse(ligne.ts) : NaN;
   const etats = [];
   for (const { forge, livrables } of livrablesExiges(carte, ligne)) for (const id of livrables) {
     const l = (carte.livrables || {})[id] || { libelle: id, chemins: [] };
     let trouve = null;
     for (const c of l.chemins || []) { trouve = trouver(produit, c); if (trouve) break; }
-    etats.push({ forge, livrable: id, libelle: l.libelle, chemins: l.chemins || [], present: !!trouve, trouve });
+    let frais = true, ecritLe = null;
+    if (trouve && Number.isFinite(seuil)) {
+      try { ecritLe = statSync(trouve).mtimeMs; frais = ecritLe >= seuil; } catch { frais = false; }
+    }
+    const present = !!trouve && frais;
+    etats.push({ forge, livrable: id, libelle: l.libelle, chemins: l.chemins || [], present, trouve,
+      perime: !!trouve && !frais, ecrit_le: ecritLe != null ? new Date(ecritLe).toISOString() : null });
   }
   return { etats, manquants: etats.filter((e) => !e.present) };
 }

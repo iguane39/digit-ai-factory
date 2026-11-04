@@ -10,7 +10,7 @@
  * désigne, et l'écrivain le refuse tant que ses motifs ne sont pas écrits.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, utimesSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -170,6 +170,24 @@ try {
     }
     const ok = lancer(d, ["--verifier"]);
     att(ok.code === 0 && ok.sortie.verdict === "PRESENT", `livrables produits : exit ${ok.code} ${ok.brut.slice(0, 300)}`);
+  });
+
+  check("--verifier (TF-2136) : un livrable écrit AVANT la demande est périmé (manquant), réécrit après il redevient présent", () => {
+    const d = produit("fraicheur");
+    // les 5 livrables déposés, mais datés une heure avant la demande à venir
+    const rels = ["forge/etapes/conception/EXIGENCES.json", "forge/etapes/design/DESIGN.md", "forge/etapes/design/tokens.css", "forge/etapes/tests/rapport-20261026.json", "forge/DOSSIER-MEP.md"];
+    const vieux = new Date(Date.now() - 3600_000);
+    for (const rel of rels) { mkdirSync(dirname(join(d, rel)), { recursive: true }); writeFileSync(join(d, rel), "x", "utf8"); utimesSync(join(d, rel), vieux, vieux); }
+    const v = verdictsProduitNeuf(); v.data = { verdict: "ecartee", motif: "aucune donnée à agréger ici" };
+    lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, v)]); // demande écrite maintenant : ts > vieux
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 1 && r.sortie.verdict === "MANQUE" && r.sortie.manquants.length === 5, `5 livrables périmés doivent manquer : exit ${r.code} ${r.brut.slice(0, 300)}`);
+    att(r.sortie.manquants.every((m) => /périmé/.test(m)), `chaque manquant doit se dire périmé : ${r.sortie.manquants.join(" | ").slice(0, 300)}`);
+    att(r.sortie.exiges.every((e) => e.perime === true && e.present === false), `drapeau perime attendu sur chaque exigé : ${JSON.stringify(r.sortie.exiges).slice(0, 300)}`);
+    // réécriture après la demande : frais → présent
+    for (const rel of rels) writeFileSync(join(d, rel), "y", "utf8");
+    const ok = lancer(d, ["--verifier"]);
+    att(ok.code === 0 && ok.sortie.verdict === "PRESENT", `après réécriture : exit ${ok.code} ${ok.brut.slice(0, 200)}`);
   });
 
   check("--verifier (TF-2080) : le verdict de design écrit par run-oracles sous .oracles/output/ est reconnu présent", () => {
