@@ -21,11 +21,13 @@
  *
  * Les modèles des fournisseurs tiers (TF-2116) : le dossier joue aussi `oracles\oracle-modeles-tiers.mjs` (borné à 120 s) et
  * ajoute une section avec les identifiants arrêtés, ceux qui s'arrêtent bientôt et l'âge du référentiel ; quand MT4 avertit, la
- * section nomme le geste de session qui le rafraîchit. `--sans-modeles-tiers` la saute ; `--modeles-racine`, `--modeles-referentiel`
- * et `--modeles-date` passent leurs options à l'oracle (recette).
+ * section nomme le geste de session qui le rafraîchit. Cadence MENSUELLE (réponse humaine « A2 & A3 : Tous les mois suffit » du
+ * 04/11/2026) : l'oracle ne se rejoue que si le dernier contrôle mesuré du journal a 30 jours ou plus ; sinon la section dit la date
+ * du dernier et celle du prochain. `--modeles-tiers-forcer` le rejoue quand même ; `--sans-modeles-tiers` saute la section ;
+ * `--modeles-racine`, `--modeles-referentiel` et `--modeles-date` passent leurs options à l'oracle (recette).
  *
  * Usage : node todo\revue-hebdo.mjs --depuis <N> [--max 7] [--registre <TODO.jsonl>] [--sortie <dossier.md>]
- *           [--journal <revues-hebdo.jsonl>] [--sans-modeles-tiers]
+ *           [--journal <revues-hebdo.jsonl>] [--sans-modeles-tiers | --modeles-tiers-forcer]
  *         node todo\revue-hebdo.mjs --self-test
  * Sortie : JSON {outil, dossier, decisions[], a_instruire[]} · exit 0, ou 2 si l'entrée manque.
  */
@@ -172,8 +174,38 @@ export function construire({ texteRegistre, depuis, max = 7, jour }) {
 // geste : relire les pages des fournisseurs et redater le référentiel. Ce geste reste celui d'une session, la revue ne le fait pas.
 // Un contrôle qui ne s'est pas joué (dépôt introuvable, plus de 120 s, oracle absent) est dit « non mesuré » avec sa raison : la
 // section ne se tait jamais.
+//
+// LA CADENCE (réponse humaine « A2 & A3 : Tous les mois suffit » du 04/11/2026, à l'action A-3 de la synthèse 20261103r). Le
+// contrôle coûte 49 à 75 s, et le référentiel n'est déclaré périmé (MT4) qu'à 30 jours : le rejouer chaque semaine ne disait rien de
+// plus trois fois sur quatre. La revue lit donc son journal : elle rejoue l'oracle si aucun contrôle MESURÉ n'y figure, ou si le
+// dernier a 30 jours ou plus ; sinon la section dit la date du dernier contrôle et celle du prochain, sans jouer l'oracle. Un
+// contrôle « non mesuré » ne compte pas : la revue suivante le rejoue.
 const ORACLE_MODELES_TIERS = join(ICI, "..", "oracles", "oracle-modeles-tiers.mjs");
 export const DELAI_MODELES_TIERS_MS = 120000;
+export const CADENCE_MODELES_TIERS_JOURS = 30;
+
+const JOUR_MS = 86400000;
+const enClair = (iso) => iso.slice(0, 10).split("-").reverse().join("/");
+
+/** Le contrôle est-il dû ? Lit le journal des revues ; rend { du, dernier, prochain } (dates ISO ou null). Pur. */
+export function controleModelesDu({ texteJournal = "", maintenant = new Date(), cadenceJours = CADENCE_MODELES_TIERS_JOURS } = {}) {
+  let dernier = null;
+  for (const l of texteJournal.split("\n")) {
+    if (!l.trim()) continue;
+    let e; try { e = JSON.parse(l); } catch { continue; }
+    if (e?.modeles_tiers?.mesure === true && e.ts && (!dernier || e.ts > dernier)) dernier = e.ts;
+  }
+  if (!dernier) return { du: true, dernier: null, prochain: null };
+  const prochain = new Date(Date.parse(dernier) + cadenceJours * JOUR_MS).toISOString();
+  return { du: maintenant.getTime() >= Date.parse(prochain), dernier, prochain };
+}
+
+/** La section quand le contrôle n'est pas dû : elle dit les deux dates, et comment forcer. Pur. */
+export function sectionModelesTiersNonDue({ dernier, prochain }) {
+  const titre = "## Modèles des fournisseurs tiers, pour information (oracle-modeles-tiers, TF-2116)";
+  return { texte: [titre, "", `Contrôle non rejoué cette semaine : la cadence est mensuelle. Dernier contrôle mesuré le ${enClair(dernier)} ; prochain à la première revue à partir du ${enClair(prochain)}. Le forcer : \`--modeles-tiers-forcer\`, ou \`node oracles/oracle-modeles-tiers.mjs\`.`, ""].join("\n"),
+    mesure: false, saute: true, dernier, prochain, mt1: null, mt2: null, mt4: null, rafraichir: false };
+}
 
 /** Joue l'oracle des modèles tiers en processus fils. Rend { mesure, rapport | raison, duree_s }. */
 export function jouerModelesTiers({ racine = null, referentiel = null, date = null, oracle = ORACLE_MODELES_TIERS, delaiMs = DELAI_MODELES_TIERS_MS } = {}) {
@@ -299,7 +331,31 @@ function selfTest() {
   const c2 = cli(["--sortie", join(dir, "d2.md"), "--sans-modeles-tiers"]);
   const d2 = existsSync(join(dir, "d2.md")) ? readFileSync(join(dir, "d2.md"), "utf8") : "";
   if (c2.status !== 0 || /Modèles des fournisseurs tiers/.test(d2) || !/> \*\*D-40 /.test(d2)) casse.push("modèles tiers, --sans-modeles-tiers : attendu le dossier sans la section");
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — modèles tiers joués à la revue (TF-2116) : parc sain et référentiel jeune sans geste, référentiel de 47 jours remonté avec le geste de session nommé, identifiant arrêté cité nommé, « non mesuré » dit pour un parc sans dépôt, un oracle absent et un délai dépassé, ligne de commande câblée au dossier et au journal ; et, d'avant : 1 décision rendue au format B du bloc 3 (de quoi il s agit, le problème, pourquoi vous, recommandation, tableau à retour arrière, repli « Sans réponse »), 1 fiche d avant le format B listée à instruire, 1 proposition hors du ressort humain rendue pour information et non posée, cas rouges : la décidée écartée, l'incomplète et celle sans ressort refusées comme décision et listées à instruire");
+  // Cadence mensuelle (04/11/2026) : la fonction pure sur 4 journaux, puis la ligne de commande sur le journal que c1 vient d'écrire.
+  const ligne = (ts, mesure) => JSON.stringify({ ts, decisions: [], modeles_tiers: mesure === undefined ? null : { mesure } });
+  const auJour = new Date("2026-11-04T12:00:00Z");
+  const cadence = [
+    ["journal vide", "", true],
+    ["contrôle mesuré il y a 10 jours", ligne("2026-10-25T08:00:00Z", true), false],
+    ["contrôle mesuré il y a 31 jours", ligne("2026-10-04T08:00:00Z", true), true],
+    ["contrôle récent non mesuré, mesuré il y a 31 jours", [ligne("2026-10-04T08:00:00Z", true), ligne("2026-11-01T08:00:00Z", false), ligne("2026-11-02T08:00:00Z")].join("\n"), true],
+  ];
+  for (const [nom, texteJournal, attendu] of cadence) {
+    const c = controleModelesDu({ texteJournal, maintenant: auJour });
+    if (c.du !== attendu) casse.push(`cadence des modèles tiers, ${nom} : attendu ${attendu ? "dû" : "non dû"}, obtenu ${JSON.stringify(c)}`);
+  }
+  const nonDue = sectionModelesTiersNonDue(controleModelesDu({ texteJournal: ligne("2026-10-25T08:00:00Z", true), maintenant: auJour }));
+  if (!/le 25\/10\/2026/.test(nonDue.texte) || !/à partir du 24\/11\/2026/.test(nonDue.texte) || !/--modeles-tiers-forcer/.test(nonDue.texte) || nonDue.mesure || !nonDue.saute)
+    casse.push(`cadence des modèles tiers, section non due : attendu les dates du dernier et du prochain contrôle et le moyen de forcer — obtenu ${nonDue.texte.slice(0, 300)}`);
+  const c3 = cli(["--sortie", join(dir, "d3.md"), "--modeles-racine", parcSain, "--modeles-referentiel", REF, "--modeles-date", "2026-12-20"]);
+  const d3 = existsSync(join(dir, "d3.md")) ? readFileSync(join(dir, "d3.md"), "utf8") : "";
+  const j3 = readFileSync(join(dir, "j.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l)).pop();
+  if (c3.status !== 0 || !/la cadence est mensuelle/.test(d3) || /Contrôle joué en/.test(d3) || j3?.modeles_tiers?.saute !== true)
+    casse.push(`cadence des modèles tiers, revue une semaine après un contrôle mesuré : attendu l'oracle non rejoué, dit au dossier et au journal — code ${c3.status}, journal ${JSON.stringify(j3?.modeles_tiers)}`);
+  const c4 = cli(["--sortie", join(dir, "d4.md"), "--modeles-racine", parcSain, "--modeles-referentiel", REF, "--modeles-date", "2026-12-20", "--modeles-tiers-forcer"]);
+  const d4 = existsSync(join(dir, "d4.md")) ? readFileSync(join(dir, "d4.md"), "utf8") : "";
+  if (c4.status !== 0 || !/Contrôle joué en/.test(d4)) casse.push(`cadence des modèles tiers, --modeles-tiers-forcer : attendu l'oracle rejoué malgré un contrôle récent — code ${c4.status}`);
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test revue-hebdo : PASS — cadence mensuelle des modèles tiers (04/11/2026) : dû sur un journal vide, sur un contrôle de 31 jours et quand le dernier contrôle récent n'a pas été mesuré, non dû sur un contrôle de 10 jours, dates et moyen de forcer dits au dossier, oracle non rejoué une semaine après et rejoué par --modeles-tiers-forcer ; modèles tiers joués à la revue (TF-2116) : parc sain et référentiel jeune sans geste, référentiel de 47 jours remonté avec le geste de session nommé, identifiant arrêté cité nommé, « non mesuré » dit pour un parc sans dépôt, un oracle absent et un délai dépassé, ligne de commande câblée au dossier et au journal ; et, d'avant : 1 décision rendue au format B du bloc 3 (de quoi il s agit, le problème, pourquoi vous, recommandation, tableau à retour arrière, repli « Sans réponse »), 1 fiche d avant le format B listée à instruire, 1 proposition hors du ressort humain rendue pour information et non posée, cas rouges : la décidée écartée, l'incomplète et celle sans ressort refusées comme décision et listées à instruire");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -314,14 +370,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const journal = valeur("--journal", join(ICI, "observabilite", "revues-hebdo.jsonl"));
   const jour = new Date().toISOString().slice(0, 10);
   const r = construire({ texteRegistre: readFileSync(registre, "utf8"), depuis, max: Number(valeur("--max", 7)), jour });
-  // TF-2116 : l'oracle des modèles tiers se joue ici, jamais à l'ouverture (49 s mesurés, borne du hook d'ouverture 45 s).
+  // TF-2116 : l'oracle des modèles tiers se joue ici, jamais à l'ouverture (49 s mesurés, borne du hook d'ouverture 45 s), et une
+  // fois par mois : le journal dit si le dernier contrôle mesuré a 30 jours.
+  const cadence = controleModelesDu({ texteJournal: existsSync(journal) ? readFileSync(journal, "utf8") : "" });
   const modeles = args.includes("--sans-modeles-tiers") ? null
+    : !cadence.du && !args.includes("--modeles-tiers-forcer") ? sectionModelesTiersNonDue(cadence)
     : sectionModelesTiers(jouerModelesTiers({ racine: valeur("--modeles-racine"), referentiel: valeur("--modeles-referentiel"), date: valeur("--modeles-date") }));
   const corps = modeles ? r.corps + "\n\n" + modeles.texte : r.corps;
   const sortie = valeur("--sortie");
   if (sortie) writeFileSync(sortie, corps + "\n", "utf8");
   else process.stdout.write(corps + "\n\n");
-  const bilanModeles = modeles ? { mesure: modeles.mesure, mt1: modeles.mt1, mt2: modeles.mt2, mt4: modeles.mt4, rafraichir: modeles.rafraichir } : null;
+  const bilanModeles = !modeles ? null : modeles.saute ? { mesure: false, saute: true, dernier: modeles.dernier, prochain: modeles.prochain }
+    : { mesure: modeles.mesure, mt1: modeles.mt1, mt2: modeles.mt2, mt4: modeles.mt4, rafraichir: modeles.rafraichir };
   appendFileSync(journal, JSON.stringify({ ts: new Date().toISOString(), dossier: sortie, decisions: r.decisions, automatiques: r.automatiques, reportes: r.reportes, modeles_tiers: bilanModeles }) + "\n");
   console.log(JSON.stringify({ outil: "revue-hebdo", dossier: sortie, decisions: r.decisions, automatiques: r.automatiques, a_instruire: r.aInstruire.map((x) => x.id), modeles_tiers: bilanModeles }));
 }

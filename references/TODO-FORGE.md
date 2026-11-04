@@ -396,7 +396,10 @@ une décision humaine.
    qui s'arrêtent dans moins de 90 jours (MT2) et l'âge du référentiel (MT4). Quand MT4 avertit, elle
    nomme le geste de session qui le rafraîchit (relire les pages des fournisseurs, redater
    `references\MODELES-TIERS.json`) : la revue le nomme, elle ne le fait pas. Un contrôle qui ne s'est pas
-   joué est dit « non mesuré » avec sa raison. `--sans-modeles-tiers` saute la section.
+   joué est dit « non mesuré » avec sa raison. `--sans-modeles-tiers` saute la section. **Cadence
+   mensuelle depuis le 04/11/2026** (réponse humaine « A2 & A3 : Tous les mois suffit ») : l'oracle ne se
+   rejoue que si le dernier contrôle mesuré du journal a 30 jours ou plus ; sinon la section donne la date du
+   dernier contrôle et celle du prochain. `--modeles-tiers-forcer` le rejoue quand même.
 4. **L'affichage.** La restitution du tour reprend les décisions du dossier EN ENTIER à son bloc 3,
    comme toute décision : c'est là que le porteur les lit.
 5. **La réponse.** Chaque sélecteur reçu se consigne par `todo\journaliser.mjs` : (a) ou (b) font
