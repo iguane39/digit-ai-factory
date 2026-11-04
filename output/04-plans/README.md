@@ -153,6 +153,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` | fichier | 10,6 Ko | Synthèse Mandat — prompt « retravaille la cible » adapté au skill oeil-critique 1.1.0 (26/ |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
 | `Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` | fichier | 4,1 Ko | Synthèse Mandat — D-52 exécutée, pilot publié jusqu'à 1855a4df (20/10/2026) |
+| `Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` | fichier | 3,3 Ko | Synthèse Mandat — publication du pilot constatée, mes commits publiés sous de nouveaux num |
 | `Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` | fichier | 9,3 Ko | Synthèse Mandat — 4 dépôts publiés, skills recopiés, campagne de consigne jouée sans gagna |
 | `Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` | fichier | 5,3 Ko | Synthèse Mandat — vos décisions D-61 (a), D-62 (a) et D-63 sont exécutées : 3 dépôts publi |
 | `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
@@ -199,4 +200,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_178 fichier(s), 4 sous-dossier(s)_
+_179 fichier(s), 4 sous-dossier(s)_
