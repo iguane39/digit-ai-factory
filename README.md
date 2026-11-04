@@ -35,10 +35,11 @@ rien que le ledger d'un run ne puisse prouver.
 
 ## Démarrer un produit
 
-Créer un dossier vide pour le nouveau produit, y **copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md)**
-(depuis ce dépôt GitHub — c'est le seul fichier nécessaire au départ), ouvrir une session
-Claude Code **dans ce nouveau dossier** et coller le prompt rempli. Le prompt est autonome pour
-tout nouvel utilisateur : sa phase 0 joue l'installateur, qui pose sans question ce qui manque
+Créer un dossier vide pour le nouveau produit, ouvrir une session Claude Code **dans ce
+nouveau dossier** et coller la phrase d'usage, la même pour tous les cas
+([Utiliser la Factory](#utiliser-la-factory--une-seule-phrase)). Le brief se donne ensuite en
+session ; [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md) reste la voie pour le préparer à l'avance.
+La phrase suffit à tout nouvel utilisateur : sa phase 0 joue l'installateur, qui pose sans question ce qui manque
 (git, node ≥ 18, uv, en portée utilisateur et sans droit administrateur ; `gh` n'est requis
 que pour les dépôts d'engagement privés), localise la forge ou **l'installe depuis GitHub**
 (`~/.digit-ai-forge` par défaut), installe le projet et finit sur « FACTORY DIGIT-AI
@@ -94,77 +95,37 @@ Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [cata
 
 <!-- CATALOGUE:FIN -->
 
-## Prompts d'usage — 2 lignes, copier-coller strict
+## Utiliser la Factory — une seule phrase
 
-Chaque bloc se colle **tel quel** dans une session Claude Code ouverte **dans le dossier du
-produit** — zéro modification, zéro mécanique. Toute l'intelligence vit dans le dépôt :
-l'installation est portée par [AGENTS.md](AGENTS.md) (phase 0 idempotente et **sans question** :
-sur un poste déjà équipé, le même prompt met à jour ; elle finit sur « FACTORY DIGIT-AI
-OPÉRATIONNELLE »), le déroulé par
-[references/ACCUEIL.md](references/ACCUEIL.md) (intention reformulée, catalogues affichés,
-démarche proposée, **accord explicite avant exécution**, spécifiques demandés **en une seule
-question**). La 2e ligne est obligatoire : elle impose l'installation réelle et interdit de
-répondre en improvisant depuis le README distant.
-
-### 0 · Accueil générique — dire ce qu'on veut
+Ouvrez une session Claude Code **dans le dossier du projet**, un dossier vide pour un produit
+neuf, et collez cette phrase telle quelle. C'est la même pour tous les cas d'usage :
 
 ```
-Utilise https://github.com/iguane39/digit-ai-factory pour <intention>.
-Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
+Utilise https://github.com/iguane39/digit-ai-factory pour ce projet
 ```
 
-`<intention>` est votre demande en langage courant (« créer un site de réservation »,
-« fiabiliser mon appli ») — c'est le seul mot à remplacer, tout le reste se demande en session.
+La session installe ou met à jour la Factory et les forges sans poser de question
+([AGENTS.md](AGENTS.md), phase 0 idempotente). Elle finit sur « FACTORY DIGIT-AI
+OPÉRATIONNELLE ». Vous dites ensuite ce que vous voulez obtenir, en langage courant.
+[references/ACCUEIL.md](references/ACCUEIL.md) reformule votre intention, affiche les catalogues,
+propose la démarche et attend votre **accord explicite avant d'exécuter**. Les spécificités se
+demandent **en une seule question**. Rien d'autre n'est à recopier : l'encadré « Agent IA » en
+tête de ce README impose l'installation réelle et interdit de répondre depuis la page distante.
 
-### 1 · Lancer un nouveau produit
+Ce que vous pouvez demander au message suivant :
 
-```
-Utilise https://github.com/iguane39/digit-ai-factory pour lancer un nouveau produit dans CE dossier.
-Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
-```
-
-Sans fichier : l'accueil demande le brief en session. [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md)
-(7 champs) reste la voie recommandée pour préparer son brief à l'avance — c'est le seul cas à
-fichier, et il est désormais optionnel.
-
-### 2 · Faire évoluer ou remédier un produit existant
-
-```
-Utilise https://github.com/iguane39/digit-ai-factory pour faire évoluer ou remédier LE produit de CE dossier (run de version).
-Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
-```
-
-### 3 · Tester et corriger
-
-```
-Utilise https://github.com/iguane39/digit-ai-factory pour exécuter un cycle de tests COMPLET de CE projet — stratégie, cas, jeux de données, exécution, corrections.
-Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
-```
-
-### 4 · Revoir le design d'une implémentation
-
-```
-Utilise https://github.com/iguane39/digit-ai-factory pour une revue graphique du produit RENDU de CE projet contre sa promesse design.
-Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
-```
-
-### 5 · Déployer en staging puis préparer la production
-
-```
-Utilise https://github.com/iguane39/digit-ai-factory pour déployer CE projet en staging et préparer la production (MEP).
-Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
-```
-
-### 6 · Auditer le SEO d'un produit en ligne
-
-```
-Utilise https://github.com/iguane39/digit-ai-factory pour auditer le SEO du produit en ligne de CE projet — ce message vaut mandat.
-Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
-```
+| Vous voulez | Dites par exemple |
+|---|---|
+| lancer un nouveau produit | « crée un site de réservation » ; [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md) (7 champs) prépare le brief à l'avance, sans obligation |
+| faire évoluer ou remédier le produit | « ajoute l'export PDF », « corrige la connexion » (run de version) |
+| tester et corriger | « exécute un cycle de tests complet : stratégie, cas, jeux de données, exécution, corrections » |
+| revoir le design d'une implémentation | « revois le produit rendu contre sa promesse design » |
+| déployer | « déploie en staging et prépare la production » |
+| auditer le SEO d'un site en ligne | « audite le SEO de mon site », ce message vaut mandat |
 
 Les spécificités de chaque situation (garde-fous G-1/G-2, gates MEP, bornes de boucle, seuils,
 questions à poser) vivent dans `references\ACCUEIL.md` et les références qu'il désigne — jamais
-dans les prompts.
+dans la phrase d'usage.
 
 Deux garde-fous transverses : une amélioration des **forges** ne se lance jamais depuis un
 produit (elle passe par un lot de retours `forge\retours\`, ingéré au registre TF du pilot,
@@ -214,7 +175,7 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 | Fichier | Rôle |
 |---|---|
 | `CLAUDE.md` | l'orchestrateur — instructions de pilotage de la session (5 étapes) |
-| `PROMPT-PRODUIT.md` | modèle du point d'entrée — à copier à la racine de chaque projet produit |
+| `PROMPT-PRODUIT.md` | modèle de brief en 7 champs, optionnel : prépare à l'avance ce que la phrase d'usage demande en session |
 | `INVENTAIRE.md` | état réel des forges (points d'entrée, oracles, manques) |
 | `CONTRAT-INTERFACE.md` | format d'invocation, ledger, routage par modèle, dette d'intégration |
 | `ETAPE-MEP.md` | la 5e étape : staging outillé par **forge-ops** (O-1…O-4), oracle MEP, gate GO production |
