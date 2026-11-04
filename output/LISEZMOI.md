@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 640 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 643 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -276,6 +276,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
 | Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md | 20261103c | 20.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` |
 | Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json | — | 10.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json` |
+| Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md | 20261104a | 36.3 Ko | `03-etudes/Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md` |
+| Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md.boucle.json | — | 10.7 Ko | `03-etudes/Digit-AI - Revue - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104a.md.boucle.json` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md | 20261102j | 56.1 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` |
@@ -530,6 +532,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
 | Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md | 20261103j | 7.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` |
+| Digit-AI - Synthese Conseil - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104f.md | 20261104f | 6.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt etude apprentissage par les erreurs passe au crible L99 - 20261104f.md` |
 | Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md | 20261102h | 7.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` |
 | Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md | 20261102f | 10.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` |
 | Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md | 20261016c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` |
