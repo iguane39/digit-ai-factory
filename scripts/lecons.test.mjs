@@ -80,6 +80,10 @@ try {
     ["V5", "`sur: commande` sur un outil d'écriture", { t: table([lecon("L-901", { declencheur: { outils: ["Write"], sur: "commande", motif: "x" } })]) }],
     ["V5", "motif invalide", { t: table([lecon("L-901", { declencheur: { outils: ["Bash"], sur: "commande", motif: "(x" } })]) }],
     ["V5", "`chaines` inconnu", { t: table([lecon("L-901", { declencheur: { outils: ["Bash"], sur: "commande", chaines: "toutes", motif: "x" } })]) }],
+    ["V5", "`sur: agent` sur un outil de commande", { t: table([lecon("L-901", { declencheur: { outils: ["Bash"], sur: "agent", motif: "x" } })]) }, /sur: agent.*ne lance pas d'agent : Bash/],
+    ["V5", "`sur: commande` sur l'outil Agent", { t: table([lecon("L-901", { declencheur: { outils: ["Agent"], sur: "commande", motif: "x" } })]) }, /sur: commande.*sans commande : Agent/],
+    ["V5", "`chaines` sur un déclencheur `sur: agent`", { t: table([lecon("L-901", { declencheur: { outils: ["Agent", "Task"], sur: "agent", chaines: "retirees", motif: "x" } })]) }, /`chaines` ne vaut que pour/],
+    ["V5", "motif invalide d'un déclencheur `sur: agent`", { t: table([lecon("L-901", { declencheur: { outils: ["Agent"], sur: "agent", motif: "(x" } })]) }, /motif invalide/],
     ["V6", "aucune solution préférée", { t: table([lecon("L-901", { solutions: [{ texte: "a", condition: "b", preferee: false }] })]) }],
     ["V6", "deux solutions préférées", { t: table([lecon("L-901", { solutions: [{ texte: "a", condition: "b", preferee: true }, { texte: "c", condition: "d", preferee: true }] })]) }],
     ["V6", "solution sans condition", { t: table([lecon("L-901", { solutions: [{ texte: "a", condition: "", preferee: true }] })]) }],
@@ -93,11 +97,16 @@ try {
     ["V10", "revue_le dépassée", { t: table([lecon("L-901", { revue_le: "2026-11-03" })]) }],
     ["V10", "revue_le hors forme", { t: table([lecon("L-901", { revue_le: "15/12/2026" })]) }],
   ];
-  ROUGES.forEach(([regle, nom, opts], k) => {
+  ROUGES.forEach(([regle, nom, opts, message], k) => {
     check(`rouge — ${regle} ${nom} : FAIL sur ${regle}, exit 1`, () => {
       const r = verifierFixture(pilote(`rouge-${k}`, opts));
       if (r.code !== 1 || r.json?.verdict !== "FAIL" || !regles(r).includes(regle)) throw new Error(`exit ${r.code} règles [${regles(r)}] ${r.out.slice(0, 200)}`);
+      if (message && !(r.json?.constats || []).some((c) => c.regle === regle && message.test(c.message))) throw new Error(`échoue, mais pas pour la bonne raison : ${JSON.stringify((r.json?.constats || []).map((c) => c.message))}`);
     });
+  });
+  check("vert — V5 : déclencheur `sur: agent` sur les outils Agent et Task : PASS", () => {
+    const r = verifierFixture(pilote("agent-vert", { t: table([lecon("L-901", { declencheur: { outils: ["Agent", "Task"], sur: "agent", motif: "^(?!Relecture d'intention)" } })]) }));
+    if (r.code !== 0 || r.json?.verdict !== "PASS") throw new Error(`exit ${r.code} ${JSON.stringify(r.json?.constats)}`);
   });
   check("vert — V7 : preuve trouvée à l'archive seule, et fichier relatif qui contient sa chaîne : PASS", () => {
     const p = pilote("preuves-vertes", { t: table([lecon("L-901", { preuve: { type: "registre", id: "TF-9002" } }), lecon("L-902", { preuve: { type: "fichier", chemin: "references/P.md", contient: "mordu" } })]), fichiers: { "references/P.md": "le geste a mordu\n" } });

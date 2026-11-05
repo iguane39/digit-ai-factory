@@ -92,7 +92,7 @@
         ]
       },
       {
-        "matcher": "Bash|PowerShell|Write|Edit|MultiEdit",
+        "matcher": "Bash|PowerShell|Write|Edit|MultiEdit|Agent|Task",
         "hooks": [
           {
             "type": "command",
