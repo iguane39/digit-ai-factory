@@ -22,6 +22,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`plateforme-pentest-gate-a-20261102\`](plateforme-pentest-gate-a-20261102/README.md) | dossier (10 fichiers) | — | Dossier de conception Gate A (option O3, décision humaine D-146 a du 02/11/2026) de la plateforme de pentest autorisé automatisé étudiée dans `output/03-etudes/… |
 | `Digit-AI - Fiche - Produit plateforme de pentest autorise a construire pour Client-A - 20261103a.md` | fichier | 14,6 Ko | Digit-AI — Fiche produit : plateforme de pentest autorisé automatisé, à construire pour Cl |
 | `Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` | fichier | 14,7 Ko | Note — un œil critique sur les process de la Factory : le sujet, ce qui est mesuré, ce qui |
+| `Digit-AI - Prompt - Activation du releve des couts chez un produit - 20261105h.md` | fichier | 2,0 Ko | Prompt — activer le relevé des coûts dans un produit (05/11/2026) |
 | `Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` | fichier | 8,3 Ko | Prompt — Inventorier ce que les forges savent faire des bases de développement et de quali |
 | `Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` | fichier | 10,1 Ko | Prompt — Inventorier les fonctionnalités de Cloudflare, GitHub et Supabase pour en tirer l |
 | `Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` | fichier | 16,5 Ko | Prompt — Décider s'il faut des compétences OpenAI et Gemini dans la Factory, et lesquelles |
@@ -157,6 +158,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` | fichier | 8,3 Ko | Synthèse Mandat — plans classés par mois, noms trop longs raccourcis (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md` | fichier | 3,2 Ko | Synthèse Mandat — point d'étape de l'étude d'une revue de code (03/11/2026) |
 | `Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` | fichier | 10,6 Ko | Synthèse Mandat — prompt « retravaille la cible » adapté au skill oeil-critique 1.1.0 (26/ |
+| `Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md` | fichier | 4,6 Ko | Synthèse Mandat — prompt court pour activer le relevé des coûts dans un produit (05/11/202 |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
 | `Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` | fichier | 4,1 Ko | Synthèse Mandat — D-52 exécutée, pilot publié jusqu'à 1855a4df (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` | fichier | 3,3 Ko | Synthèse Mandat — publication du pilot constatée, mes commits publiés sous de nouveaux num |
@@ -210,4 +212,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_189 fichier(s), 4 sous-dossier(s)_
+_191 fichier(s), 4 sous-dossier(s)_

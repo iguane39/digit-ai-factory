@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 657 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 659 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -512,6 +512,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md | 20260919f | 17.7 Ko | `04-plans/2026-09/Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md` |
 | Digit-AI - Fiche - Produit plateforme de pentest autorise a construire pour Client-A - 20261103a.md | 20261103a | 14.6 Ko | `04-plans/Digit-AI - Fiche - Produit plateforme de pentest autorise a construire pour Client-A - 20261103a.md` |
 | Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md | 20261020l | 14.7 Ko | `04-plans/Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` |
+| Digit-AI - Prompt - Activation du releve des couts chez un produit - 20261105h.md | 20261105h | 2 Ko | `04-plans/Digit-AI - Prompt - Activation du releve des couts chez un produit - 20261105h.md` |
 | Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md | 20261029a | 8.3 Ko | `04-plans/Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` |
 | Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md | 20261028a | 10.1 Ko | `04-plans/Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` |
 | Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md | 20261103i | 16.5 Ko | `04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` |
@@ -647,6 +648,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md | 20261016l | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` |
 | Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md | 20261103l | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md` |
 | Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md | 20261026d | 10.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` |
+| Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md | 20261105i | 4.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md` |
 | Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md | 20261001i | 4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` |
 | Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md | 20261020d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` |
 | Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md | 20261104e | 3.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` |
