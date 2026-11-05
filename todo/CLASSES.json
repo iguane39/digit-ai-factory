@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.65.0",
- "date": "2026-11-04",
+ "version": "1.66.0",
+ "date": "2026-11-05",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -3131,6 +3131,160 @@
    ],
    "regle": "Proposition de Produit-84 (lot 20261104e RT-45) : une demande humaine de correction d'un livrable de forge se remonte comme demande de portage dans la forge ; doctrine du format posée à l'humain sous D-171",
    "oracle": "pilot, gabarits/oracle-lot-retours.mjs (porteur partiel : il juge la forme du lot, pas encore la présence d'une demande de portage, TF-2145)"
+  },
+  {
+   "cle": "ergonomie-d-office-non-exigee",
+   "famille": "affordance-ui",
+   "libelle": "Un défaut d'ergonomie qu'un nouvel arrivant voit d'emblée passe tous les oracles du design Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2158"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : pilot : des défauts d'ergonomie vus d'emblée par le porteur passent tous les oracles du design",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2158 — porteur à outiller"
+  },
+  {
+   "cle": "instruction-lue-comme-option",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une instruction du porteur qui touche une doctrine est transformée en options au lieu d'être confirmée Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2159"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : pilot : une instruction du porteur qui touche une doctrine est transformée en options",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2159 — porteur à outiller"
+  },
+  {
+   "cle": "releve-relit-les-secrets",
+   "famille": "hook-ou-gate",
+   "libelle": "La relève d'un tour recopie un fichier de secret vers un agent Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2160"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : pilot : la relève de relecture d'intention recopie un fichier de clé vers l'agent relecteur",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2160 — porteur à outiller"
+  },
+  {
+   "cle": "configuration-d-audit-non-persistee",
+   "famille": "contrat-interface-forge",
+   "libelle": "La configuration d'audit d'un produit ne vit que dans la transcription d'une session Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2161"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-tests : la configuration d'audit d'un produit ne vit que dans la transcription",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2161 — porteur à outiller"
+  },
+  {
+   "cle": "alignement-compte-un-panneau-deplie",
+   "famille": "contrat-interface-forge",
+   "libelle": "La règle d'alignement compte les contrôles d'un panneau déplié comme une rangée Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2162"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-design : la règle d'alignement compte les cases d'un menu déplié, T4-2 lit une négation comme un état vide",
+   "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture de TF-2162 — porteur à outiller"
+  },
+  {
+   "cle": "appel-de-modele-sous-verrou-et-pseudonyme-fragile",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un appel de modèle tient un verrou d'écriture, et ses pseudonymes ne survivent pas à la reformulation Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2163"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-agents : un appel de modèle tient un verrou d'écriture, et ses pseudonymes ne survivent pas à la reformulation",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2163 — porteur à outiller"
+  },
+  {
+   "cle": "reseau-docker-sans-releve-ni-ignore",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un réseau Docker posé par Terraform ne relève pas les plages prises et dérive à chaque apply Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2164"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-ops : un réseau Docker posé par Terraform ne relève pas les plages prises et dérive à chaque apply",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2164 — porteur à outiller"
+  },
+  {
+   "cle": "frontal-resout-l-amont-une-fois",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un frontal nginx fige l'adresse de son amont au démarrage et rend 502 après sa recréation Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2165"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-ops : un frontal nginx fige l'adresse de son amont au démarrage et rend 502 après sa recréation",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2165 — porteur à outiller"
+  },
+  {
+   "cle": "identifiants-de-test-renouveles-a-chaque-deploiement",
+   "famille": "contrat-interface-forge",
+   "libelle": "Les identifiants de test remis à l'humain changent à chaque déploiement Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2166"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104b) : pilot : les identifiants de test remis à l'humain changent à chaque déploiement (règle demandée par le porteur)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2166 — porteur à outiller"
+  },
+  {
+   "cle": "secret-remis-a-l-humain-difficile-a-recopier",
+   "famille": "affordance-ui",
+   "libelle": "Un secret remis à l'humain contient des signes et des sosies qui se recopient mal Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2167"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104b) : pilot : un secret remis à l'humain contient des signes et des sosies qui se recopient mal",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2167 — porteur à outiller"
+  },
+  {
+   "cle": "mandat-de-push-sans-identite",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un mandat de publication des forges est écrit sans l'identité sous laquelle il s'exerce : depuis un profil de session lié à un autre compte, le push est refusé, et un agent qui ignore le mandat prend un push légitime pour une anomalie. Proposée par Produit-84 (2026-11-05).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2168"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261105a) : pilot : RT-46 — le mandat permanent de push des forges ne dit pas sous quelle identité il s'exerce (403 depuis un profil lié au compte d'un client)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2168 — porteur à outiller"
+  },
+  {
+   "cle": "erreur-de-saisie-sans-champ-designe",
+   "famille": "affordance-ui",
+   "libelle": "Une saisie refusée ne désigne pas son champ et ne dit pas la forme attendue Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2172"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105a) : forge-design : une saisie refusée s'affiche loin du formulaire, sans champ désigné ni forme attendue (demande du porteur)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture de TF-2172 — porteur à outiller"
+  },
+  {
+   "cle": "outil-autonome-hors-application-sans-verdict-de-tests",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un outil Python autonome rangé hors de l'application principale ne peut recevoir aucun verdict de la forge de tests Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2173"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105a) : forge-tests : un outil Python autonome hors de backend/ ne peut pas être jugé",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2173 — porteur à outiller"
+  },
+  {
+   "cle": "champ-d-entree-capture-par-une-option-de-l-ecrivain",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un champ d'entrée de ledger porte le nom d'une option de l'écrivain et ne peut pas être écrit Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2174"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105a) : pilot : forge/ledger.py ne sait pas écrire le champ run d'un run_open",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2174 — porteur à outiller"
   }
  ],
  "cliquet_porteur": {

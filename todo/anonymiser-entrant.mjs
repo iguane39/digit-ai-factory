@@ -50,7 +50,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
-import { cheminsTables } from "../scripts/lib-confidentiel.mjs";
+import { cheminsTables, pseudoDe, formesDe } from "../scripts/lib-confidentiel.mjs";
 import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -245,7 +245,7 @@ export function pseudonymeDeRacine(racine) {
   let propre;
   try { propre = anonymiser(anonymiser(dossier).texte).texte; } catch { return null; }
   const m = String(propre).match(/Produit-\d{2,}/);
-  return m && Object.values(d.produits).includes(m[0]) ? m[0] : null;
+  return m && Object.values(d.produits).map(pseudoDe).includes(m[0]) ? m[0] : null;
 }
 
 /**
@@ -286,7 +286,7 @@ export function pseudoProduit(nom, { racine = null } = {}) {
   // inconnu comme CLÉ, donc inscrit comme produit neuf → « Produit-13 », et l'anonymiseur a
   // ensuite substitué Produit-12 par Produit-13 dans dix candidatures. Une table qui pseudonymise
   // ses propres pseudonymes tourne en rond, et chaque tour décale tout le parc d'un cran.
-  if (Object.values(d.produits).includes(nom) || /^Produit-\d{2,}$/.test(nom)) return nom;
+  if (Object.values(d.produits).map(pseudoDe).includes(nom) || /^Produit-\d{2,}$/.test(nom)) return nom;
   // UNE FORGE N'EST PAS UN PRODUIT (TF-0807, 05/09/2026) : le gabarit des lots autorise une forge à
   // remettre un lot au pilot, préfixé de son nom — et ce nom est PUBLIC (dépôt publié, cité par le
   // noyau). Le 05/09, trois lots de forges ont inscrit « Produit-60 », « Produit-61 », « Produit-62 »
@@ -346,7 +346,9 @@ export function pseudoProduit(nom, { racine = null } = {}) {
     // de clés. Compter les clés ré-attribue un indice retiré sans réservation dès que la table porte
     // moins de clés que d'indices : 61 et 62, pris le 05/09 par deux forges puis retirés (TF-0807),
     // désignent aujourd'hui aussi deux produits.
-    const indices = Object.values(d.produits).map((v) => Number(String(v).replace(/^Produit-/, ""))).filter((x) => Number.isInteger(x) && x > 0);
+    // Une entrée objet (TF-2130) compte aussi : lue par `String(v)`, elle rendait NaN et son indice
+    // aurait été ré-attribué au produit suivant.
+    const indices = Object.values(d.produits).map((v) => Number(String(pseudoDe(v)).replace(/^Produit-/, ""))).filter((x) => Number.isInteger(x) && x > 0);
     const n = (indices.length ? Math.max(...indices) : 0) + 1;
     d.produits[nom] = `Produit-${String(n).padStart(2, "0")}`;
     d.depuis = d.depuis && typeof d.depuis === "object" ? d.depuis : {};
@@ -354,7 +356,7 @@ export function pseudoProduit(nom, { racine = null } = {}) {
     d.date_derniere_extension = jour;
     writeFileSync(p, JSON.stringify(d, null, 1), "utf8");
   }
-  return d.produits[nom];
+  return pseudoDe(d.produits[nom]);
 }
 
 // Les caractères dont est fait un identifiant de code, dans à peu près tous les langages.
@@ -477,7 +479,21 @@ export function anonymiser(texte, { code = false } = {}) {
   // TF-1456 : nom de client replié (minuscules, sans accent) → pseudonyme, pour les variantes de clé.
   const parNom = new Map();
   for (const [de, vers] of clients.table) { const k = plier(de).toLowerCase(); if (!parNom.has(k)) parNom.set(k, vers); }
-  for (const [nom, pseudo] of Object.entries(produits.produits || {}).sort(parLongueur)) {
+  for (const [nom, entree] of Object.entries(produits.produits || {}).sort(parLongueur)) {
+    const pseudo = pseudoDe(entree);
+    if (!pseudo) throw new Error(`entrée de produit sans pseudonyme lisible dans ${CHEMIN_PRODUITS()} — `
+      + "l'ingestion s'arrête : anonymiser à moitié serait pire que ne pas anonymiser");
+    // TF-2130 : les graphies déclarées REMPLACENT la clé nue, chacune à la casse exacte et en mot
+    // entier — la frontière de la porte (`litteralProduit`), sans variante ni repli de casse : le
+    // même terme en minuscules est un mot courant, pas une mention.
+    const formes = formesDe(entree);
+    if (formes) {
+      for (const f of formes) {
+        const re = new RegExp(`(?<![A-Za-z0-9])${echapperRe(f)}(?![A-Za-z0-9])`, "g");
+        if (re.test(out)) { re.lastIndex = 0; out = out.replace(re, pseudo); remplaces.push(nom); }
+      }
+      continue;
+    }
     // TF-1457 : en dessous de SEUIL_MOT, la voie littérale est SAUTÉE — elle mordrait sur un mot
     // plus long qui contient le nom court, et sa garde contre les identifiants ne s'arme qu'en
     // code. Le nom court n'est substitué que par les voies déjà bornées, plus bas (`variantes`,
@@ -778,6 +794,26 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
       casse.push("TF-1456 : une clé à un mot, sans accent dans le texte, n'est pas substituée aux deux graphies — ou mord dans un mot : " + rM.texte);
   }
 
+  // 3 duodecies) TF-2130 (05/11/2026) — UNE ENTRÉE OBJET `{ pseudo, formes }`, sur sa propre table
+  //            jetable (les indices des cas du dessus restent ce qu'ils étaient). Rouge avant le
+  //            correctif : le pseudonyme rendu était l'objet, et l'accueil nommait le lot
+  //            « [object Object] - RETOURS - … ». Vert : la graphie déclarée devient le pseudonyme ;
+  //            contre-épreuves : le même terme en minuscules et collé à des lettres ne bouge pas, et
+  //            l'indice de l'objet compte pour le produit neuf suivant.
+  {
+    const tObj = join(dir, "_produits-objet.json");
+    writeFileSync(tObj, JSON.stringify({ produits: { "PlumeTests":{ pseudo: "Produit-07", formes: ["PlumeTests"] } } }), "utf8");
+    const avant = process.env.FORGE_PRODUITS_PSEUDO;
+    process.env.FORGE_PRODUITS_PSEUDO = tObj;
+    const pO = pseudoProduit("PlumeTests");
+    if (pO !== "Produit-07") casse.push(`TF-2130 : une entrée objet rend ${pO} au lieu de son champ pseudo`);
+    const rO = anonymiser("Lot PlumeTests, des plumetests au sens courant, xPlumeTestsx collé.");
+    if (rO.texte !== "Lot Produit-07, des plumetests au sens courant, xPlumeTestsx collé.") casse.push("TF-2130 : la graphie déclarée n'est pas seule substituée, à la casse exacte et en mot entier : " + rO.texte);
+    const pN = pseudoProduit("un-neuf-apres-objet");
+    if (pN !== "Produit-08") casse.push(`TF-2130 : le produit neuf après une entrée objet reçoit ${pN} au lieu de Produit-08 — l'indice de l'objet n'est pas compté`);
+    process.env.FORGE_PRODUITS_PSEUDO = avant;
+  }
+
   // 4) référentiel ABSENT → refus, jamais un passage silencieux
   process.env.FORGE_NOMS_INTERDITS = join(dir, "absent.json");
   let refuse = false;
@@ -785,7 +821,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${12 - casse.length}/12 cas, ${casse.length} FAIL`
+  console.log(`\nSelf-test anonymiseur d'entrants : ${13 - casse.length}/13 cas, ${casse.length} FAIL`
     + (casse.length ? "" : " — cas rouges : référentiel absent REFUSÉ sans laisser passer le texte, extension de la table hors banc REFUSÉE avec la variable à poser nommée"));
   process.exit(casse.length ? 1 : 0);
 }
