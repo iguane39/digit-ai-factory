@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 197,
-  "vu_le": "2026-11-03"
+  "cas": 202,
+  "vu_le": "2026-11-05"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -168,8 +168,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-depense-voie-par-defaut.mjs": {
-  "cas": 13,
-  "vu_le": "2026-09-22"
+  "cas": 21,
+  "vu_le": "2026-11-05"
  },
  "oracle-domaines-declares.mjs": {
   "cas": 10,
@@ -252,6 +252,10 @@
  "oracle-modeles-en-service.mjs": {
   "cas": 31,
   "vu_le": "2026-10-13"
+ },
+ "oracle-modeles-tiers.mjs": {
+  "cas": 26,
+  "vu_le": "2026-11-05"
  },
  "oracle-parite-configuration.mjs": {
   "cas": 18,
@@ -343,16 +347,16 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 291,
-  "vu_le": "2026-11-03"
+  "cas": 294,
+  "vu_le": "2026-11-05"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
   "cas": 31,
   "vu_le": "2026-10-18"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 43,
-  "vu_le": "2026-10-17"
+  "cas": 49,
+  "vu_le": "2026-11-05"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -407,8 +411,8 @@
   "vu_le": "2026-10-30"
  },
  "oracles/hook-gestes-distants.test.mjs": {
-  "cas": 81,
-  "vu_le": "2026-10-30"
+  "cas": 82,
+  "vu_le": "2026-11-05"
  },
  "oracles/hook-gestes-en-cours.test.mjs": {
   "cas": 25,
@@ -427,8 +431,8 @@
   "vu_le": "2026-11-04"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 61,
-  "vu_le": "2026-11-02"
+  "cas": 62,
+  "vu_le": "2026-11-05"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
   "cas": 12,
@@ -442,6 +446,10 @@
   "cas": 20,
   "vu_le": "2026-10-15"
  },
+ "oracles/hook-restitution-frictions.test.mjs": {
+  "cas": 30,
+  "vu_le": "2026-11-05"
+ },
  "oracles/hook-restitution-moyen.test.mjs": {
   "cas": 26,
   "vu_le": "2026-11-03"
@@ -451,8 +459,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 63,
-  "vu_le": "2026-11-02"
+  "cas": 64,
+  "vu_le": "2026-11-05"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
@@ -507,8 +515,8 @@
   "vu_le": "2026-09-05"
  },
  "oracles/oracle-depense-voie-par-defaut.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-11-03"
+  "cas": 21,
+  "vu_le": "2026-11-05"
  },
  "oracles/oracle-ecart-normal.test.mjs": {
   "cas": 10,
@@ -521,6 +529,10 @@
  "oracles/oracle-invariant-mesure.test.mjs": {
   "cas": 16,
   "vu_le": "2026-09-22"
+ },
+ "oracles/oracle-modeles-tiers.test.mjs": {
+  "cas": 26,
+  "vu_le": "2026-11-05"
  },
  "oracles/oracle-parite-configuration.test.mjs": {
   "cas": 18,
@@ -651,8 +663,8 @@
   "vu_le": "2026-09-28"
  },
  "scripts/mobiliser.test.mjs": {
-  "cas": 18,
-  "vu_le": "2026-11-03"
+  "cas": 20,
+  "vu_le": "2026-11-05"
  },
  "scripts/nettoyer-copies.test.mjs": {
   "cas": 12,
@@ -695,8 +707,8 @@
   "vu_le": "2026-10-12"
  },
  "scripts/relecture-intention.test.mjs": {
-  "cas": 78,
-  "vu_le": "2026-11-02"
+  "cas": 79,
+  "vu_le": "2026-11-05"
  },
  "scripts/relever-appelants.test.mjs": {
   "cas": 12,
