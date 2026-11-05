@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 649 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 650 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -649,6 +649,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md | 20261012d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` |
 | Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md | 20261001l | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` |
 | Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md | 20261016d | 5.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` |
+| Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md | 20261105b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md` |
 | Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md | 20261015m | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` |
 | Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md | 20261016j | 5.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md` |
 | Digit-AI - Synthese Mandat - Registre des mutants et index des dossiers corriges - 20261103o.md | 20261103o | 8.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Registre des mutants et index des dossiers corriges - 20261103o.md` |

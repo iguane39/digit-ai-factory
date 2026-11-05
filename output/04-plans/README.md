@@ -161,6 +161,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` | fichier | 5,3 Ko | Synthèse Mandat — vos décisions D-61 (a), D-62 (a) et D-63 sont exécutées : 3 dépôts publi |
 | `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
 | `Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` | fichier | 5,9 Ko | Synthèse Mandat — rangement des entrants dans input et output (16/10/2026) |
+| `Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md` | fichier | 7,4 Ko | Synthèse Mandat — rappel des leçons au geste et relevé des frictions du tour, sur D-172 (a |
 | `Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` | fichier | 6,1 Ko | Synthèse Mandat — recette complète du pilot jouée : 2 contrôles en défaut sur 221, aucun d |
 | `Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md` | fichier | 5,9 Ko | Synthèse Mandat — recette Terraform réparée, revue du mode boucle câblée à sa date (16/10/ |
 | `Digit-AI - Synthese Mandat - Registre des mutants et index des dossiers corriges - 20261103o.md` | fichier | 8,8 Ko | Synthèse Mandat — les 3 restes de la campagne d'hier sont corrigés et publiés, le registre |
@@ -204,4 +205,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_183 fichier(s), 4 sous-dossier(s)_
+_184 fichier(s), 4 sous-dossier(s)_
