@@ -146,7 +146,7 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
   if (!/AUTRE poste n'y est pas visible/.test(sortieOuverturePilot)) throw new Error("la limite (autre poste) n'est pas dite");
 });
 // D-23 (a) du 18/10/2026 — l'ouverture du pilot affiche, dans « Flotte d'agents », les relectures d'intention de l'essai et dit
-// si le seuil d'arrêt (plus de 4 000 000 de jetons de relecture par jour, D-25 du 18/10/2026) est franchi. Transcriptions SYNTHÉTIQUES d'un profil
+// si le seuil d'arrêt (plus de 6 000 000 de jetons de relecture par jour, D-165 (c) du 04/11/2026 ; 4 000 000 par D-25 du 18/10/2026) est franchi. Transcriptions SYNTHÉTIQUES d'un profil
 // jetable : ni le vrai poste (USERPROFILE/HOME vidés), ni le vrai relevé.
 {
   const maisonVide = mkdtempSync(join(tmpdir(), "hook-ouverture-maison-"));
@@ -165,18 +165,18 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
   };
   const ouvrirAvec = (profil) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
     { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonVide, HOME: maisonVide } });
-  const sortieTenu = ouvrirAvec(profilRelecture("tenu", 2)), sortieFranchi = ouvrirAvec(profilRelecture("franchi", 3));
+  const sortieTenu = ouvrirAvec(profilRelecture("tenu", 2)), sortieFranchi = ouvrirAvec(profilRelecture("franchi", 5));
   check("D-23 vert — l'ouverture du pilot affiche les relectures d'intention (2 relectures, 2 800 460 jetons) et un seuil TENU", () => {
     // D-64 (a) du 21/10/2026 : l'alarme de l'essai vit dans la section « Œil critique », qui remplace « Flotte d'agents ».
     if (!/## Œil critique/.test(sortieTenu)) throw new Error("section « Œil critique » absente");
     if (/## Flotte d'agents|## Surveillance des récidives/.test(sortieTenu)) throw new Error("une section remplacée par « Œil critique » est encore affichée");
     if (!/poste [^\n]+ : (aucune exécution|dernière analyse jusqu'au)/.test(sortieTenu)) throw new Error("le repère du poste n'est pas dit");
-    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, prolongé en service par D-73 \(b\), revue le 2026-11-08.*2 relecture\(s\), 2 800 460 jetons.*seuil de 4 000 000 jetons par jour tenu/.test(sortieTenu))
+    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, prolongé en service par D-73 \(b\), revue le 2026-11-08.*2 relecture\(s\), 2 800 460 jetons.*seuil de 6 000 000 jetons par jour tenu/.test(sortieTenu))
       throw new Error((sortieTenu.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
     if (/FRANCHI/.test(sortieTenu)) throw new Error("seuil dit franchi à 2 800 460 jetons");
   });
-  check("D-23 rouge — plus de 4 000 000 de jetons de relecture en un jour (3 relectures, 4 200 690) : l'ouverture dit FRANCHI et demande l'arrêt", () => {
-    if (!/3 relecture\(s\), 4 200 690 jetons.*\*\*FRANCHI : arrêter l'essai et demander à l'humain\*\*/.test(sortieFranchi))
+  check("D-23 rouge — plus de 6 000 000 de jetons de relecture en un jour (5 relectures, 7 001 150) : l'ouverture dit FRANCHI et demande l'arrêt", () => {
+    if (!/5 relecture\(s\), 7 001 150 jetons.*\*\*FRANCHI : arrêter l'essai et demander à l'humain\*\*/.test(sortieFranchi))
       throw new Error((sortieFranchi.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
   });
 }

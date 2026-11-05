@@ -150,7 +150,7 @@ try {
   });
   check("vert — le référentiel recopie la consigne stricte, la forme JSON, les dates de l'essai et le seuil", () => {
     const ref = readFileSync(join(RACINE, "references", "RELECTURE-INTENTION.md"), "utf8");
-    for (const m of [STRICTE, FORME_JSON, FORME_JSON_V1, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, "2026-10-18", "2026-11-01", "2026-11-08", "4 000 000 de jetons", "`verificateur`", "alerte"])
+    for (const m of [STRICTE, FORME_JSON, FORME_JSON_V1, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, "2026-10-18", "2026-11-01", "2026-11-08", "6 000 000 de jetons", "`verificateur`", "alerte"])
       if (!ref.includes(m)) throw new Error(`référentiel sans « ${m.slice(0, 60)} »`);
   });
   check("vert — --preparer consigne : la consigne de délégation est le livrable, la demande reste celle de la transcription", () => {

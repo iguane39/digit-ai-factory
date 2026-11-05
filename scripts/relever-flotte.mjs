@@ -23,7 +23,7 @@
  *     sous-agent d'une session, pas la session parallèle. Indicateur seul : il n'entre pas dans les critères de la flotte ;
  *   · les RELECTURES D'INTENTION de l'essai du 18/10/2026 (D-23 (a), `references/RELECTURE-INTENTION.md`) : les sous-agents
  *     `verificateur` dont la description commence par « Relecture d'intention », leurs jetons par jour, et si le SEUIL
- *     D'ARRÊT de l'essai (plus de 4 000 000 de jetons de relecture par jour, D-25 du 18/10/2026 ; 1 000 000 à l'ouverture de l'essai) est franchi — il se dit à part des critères.
+ *     D'ARRÊT de l'essai (plus de 6 000 000 de jetons de relecture par jour, D-165 (c) du 04/11/2026 ; 4 000 000 par D-25 du 18/10/2026, 1 000 000 à l'ouverture de l'essai) est franchi — il se dit à part des critères.
  * Et il juge les 4 critères de revue écrits d'avance par l'étude (revue du 2026-11-01) : part des appels vers un
  * agent nommé ≥ 90 % ; 0 délégation Opus sans effort déclaré ; 0 réponse hors génération courante ; et il donne la
  * médiane des jetons relus par sous-agent, à comparer à la période de l'étude.
@@ -50,7 +50,7 @@ export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan
 export const INTEGRES_FIXES = new Set(["claude-code-guide", "statusline-setup"]);
 export const SEUILS = { part_nommee_min: 0.9, opus_sans_effort_max: 0, hors_generation_max: 0 };
 /** L'essai de relecture d'intention (D-23 (a) du 18/10/2026, `references/RELECTURE-INTENTION.md`) : dates et seuil d'arrêt. */
-export const ESSAI_RELECTURE = { debut: "2026-10-18", fin: "2026-11-01", prolongation: "prolongé en service par D-73 (b)", revue: "2026-11-08", seuil_jetons_par_jour: 4000000 };
+export const ESSAI_RELECTURE = { debut: "2026-10-18", fin: "2026-11-01", prolongation: "prolongé en service par D-73 (b)", revue: "2026-11-08", seuil_jetons_par_jour: 6000000 };
 /** Une relecture d'intention est un sous-agent `verificateur` dont la description commence par « Relecture d'intention ». */
 export const estRelectureIntention = (type, description) => type === "verificateur" && /^\s*relecture d['’]intention/i.test(String(description || ""));
 /** Limite par défaut de sous-agents simultanés d'une session (`code.claude.com/docs/en/sub-agents`, lue le 2026-10-19) : voir `references/PARALLELISME-CLAUDE-CODE.md`. */
