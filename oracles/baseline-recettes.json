@@ -450,6 +450,10 @@
   "cas": 20,
   "vu_le": "2026-10-15"
  },
+ "oracles/hook-restitution-frictions.test.mjs": {
+  "cas": 30,
+  "vu_le": "2026-11-05"
+ },
  "oracles/hook-restitution-moyen.test.mjs": {
   "cas": 26,
   "vu_le": "2026-11-03"

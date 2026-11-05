@@ -303,8 +303,10 @@ try {
   const r16 = spawnSync(process.execPath, [lanceur, "restitution"], { encoding: "utf8", cwd: P, env: { ...env },
     input: JSON.stringify({ session_id: "test-heritage-livre", transcript_path: t16, stop_hook_active: false, cwd: P }) });
   let c16 = null; try { c16 = JSON.parse(r16.stdout || "null"); } catch { c16 = { brut: r16.stdout }; }
+  // La version attendue se lit dans le gabarit, jamais en dur : figée à v2.58.0, le cas a rougi dès la montée en v2.59.0 du 03/11/2026 (TF-2077).
+  const VERSION_RESTITUTION16 = (/\*\*version (\d+\.\d+\.\d+),/.exec(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "RESTITUTION.md"), "utf8")) || [])[1] || "inconnue";
   check("16 livré, le guide écrit sous output/ et non lié au bloc 0 : S87 est dite au hook du pilot atteint par le lanceur (TF-1973, TF-2016)",
-    c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && /\(v2\.58\.0\)/.test(c16.reason || ""), JSON.stringify(c16)?.slice(0, 300));
+    c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && (c16.reason || "").includes(`(v${VERSION_RESTITUTION16})`), JSON.stringify(c16)?.slice(0, 300));
 
   // 17 — TF-2126 (04/11/2026), verrou de mutation par le lanceur : un `git commit` chez un produit dont la racine porte
   // `.forge-tests-mutation-en-cours` est refusé (exit 2) avec les fichiers mutés nommés ; le verrou retiré (fenêtre fermée),
