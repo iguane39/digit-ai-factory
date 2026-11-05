@@ -64,7 +64,7 @@ Les 14 refus du 29/10 sur des réponses de 151 à 250 mots sont déjà résolus 
 
 ## Ordre conseillé
 
-D'abord la première préconisation, qui vise le plus gros groupe. Ensuite la quatrième, sans décision, puis la mesure du 12/11, qui dira si la troisième vaut la question.
+D'abord la première préconisation, qui vise le plus gros groupe. Ensuite la quatrième, sans décision, puis la mesure du 12/11, qui dira si la troisième vaut la question. Dans la restitution du 05/11, la première est l'action A-2 et la quatrième l'action A-3 ; elles suivent A-1, en construction.
 
 ## Sources
 
