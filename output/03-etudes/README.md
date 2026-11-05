@@ -79,6 +79,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` | fichier | 36,8 Ko | Étude d'opportunité — Plateforme de pentest autorisé automatisé (CDC v1.1) : adoption par  |
 | `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,7 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
+| `Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` | fichier | 23,0 Ko | Étude d'opportunité — Suivi des temps et des coûts par produit — 20261105a |
 | `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 19,1 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
 | `Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` | fichier | 15,5 Ko | Étude — une vidéo où Claude reçoit 100 fois la consigne « fais mieux » |
 | `Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` | fichier | 5,5 Ko | Œil critique : 4 actions pour tenir les 8 demandes (29/10/2026) |
@@ -103,9 +104,9 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` | fichier | 6,9 Ko | JSON |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` | fichier | 19,1 Ko | Revue — prompt du skill make-it-better et de sa page de versions, passé au crible L99 — 02 |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` | fichier | 19,6 Ko | JSON |
-| `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` | fichier | 34,7 Ko | Revue L99 — « Tracer temps, délais, charges, jetons et coûts de chaque produit » |
-| `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` | fichier | 7,7 Ko | JSON |
+| `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` | fichier | 35,7 Ko | Revue L99 — « Tracer temps, délais, charges, jetons et coûts de chaque produit » |
+| `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` | fichier | 12,8 Ko | JSON |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_89 fichier(s), 2 sous-dossier(s)_
+_90 fichier(s), 2 sous-dossier(s)_

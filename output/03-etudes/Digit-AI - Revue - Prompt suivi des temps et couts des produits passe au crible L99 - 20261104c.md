@@ -262,6 +262,22 @@ recompte ; « écartés » ceux que le recompte a démentis. Journal jugé PASS 
 |---|---|---|---|---|---|---|---|
 | 1 | 86 / 88 | 86 | 0 | 5 | 0 | 1 448 | continuer |
 | 2 | 84 / 74 | 74 | 0 | 5 | 0 | 1 989 | rejetée, régression |
+| 3 | 84 / 84 | 84 | 0 | 4 | 0 | 2 057 | rejetée, régression |
+
+**La passe 3, demandée par le porteur le 05/11/2026** (« A2 puis A1 »). Elle repart de la passe 1
+et y applique les 10 corrections ci-dessous. Le vérificateur de clôture en a jugé 9 fermées sur
+10 ; il a relevé 1 défaut créé, corrigé avant la relecture : `--projet <pseudonyme>`, exécuté tel
+quel, filtre 0 dossier. Les 2 relecteurs l'ont notée 84 : sous les 86 de la passe 1, elle est
+rejetée, et la passe 1 reste le prompt livré par la revue. Ses 4 majeurs, recomptés à la source,
+sont neufs :
+- aucune correspondance entre le contrat et les sections du gabarit ;
+- aucun ordre de sacrifice ;
+- les sections du gabarit absentes du contrat ;
+- aucun repli si la page de rétention est illisible.
+
+L'étude a été lancée sur la passe 3 corrigée de ces 4 majeurs, sans relecture aveugle de ces
+corrections : c'est la seule version qui porte les 10 corrections demandées. Livrable :
+`Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md`, dans ce dossier.
 
 **Pourquoi la passe 2 a régressé.** Avant la relecture, un vérificateur neuf, qui ne notait pas, a
 jugé fermés les 7 défauts visés. Il a relevé 2 défauts créés, corrigés avant la relecture : la
