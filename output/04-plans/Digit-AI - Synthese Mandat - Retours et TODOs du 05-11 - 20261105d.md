@@ -91,7 +91,7 @@ Relecture d'intention : sert après 1 passe. La première relecture de la consig
 
 ## 5. Non traité
 
-- TF-2172, le composant de saisie posé au socle des pages — motif : `borne_atteinte`, le socle vit dans forge-agents, hors du dépôt de l'agent de design.
+- TF-2172, le motif d'erreur de saisie appliqué aux formulaires d'application par forge-development — motif : `borne_atteinte`, reste reformulé le 05/11 après la campagne ; la première formulation visait le socle des pages d'information, qui ne sert pas les applications.
 - TF-2094, les projections déjà générées chez les produits — motif : `hors_mandat`, elles se régénèrent au prochain run de chaque produit.
 - TF-2168 et TF-2159 — motif : `decision`, posés sous D-175 et D-176.
 - TF-2155, la barrière qui refuserait un geste une fois par session — motif : `borne_atteinte`, 3 heures de mesure ne suffisent pas ; rejouée le 12/11.
@@ -118,7 +118,7 @@ Ordre : les actions de la session d'abord, par coût décroissant de ne pas les 
 
 | Sélecteur | Action | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|
-| A-1 | Poser le composant de saisie au socle des pages et le sceller | TF-2172 | auto_ia | borne_atteinte : hors du dépôt de l'agent de design | `digit-ai-forge-agents`, `digit-ai-page-html/assets/`, `embarquer-composants.mjs --poser` | si rien n'est fait, chaque produit recopie le composant à la main |
+| A-1 | Faire appliquer par forge-development le motif d'erreur de saisie à tout formulaire d'application, jugé par l'oracle des erreurs de formulaire sur l'instance (reformulée le 05/11 : le socle des pages ne sert pas les applications) | TF-2172 | auto_ia | borne_atteinte : reformulée après la campagne | `digit-ai-forge-development`, `docs/run-playbook.md` ; référence `digit-ai-forge-design/corpus/composants/saisie-erreurs.js` | si rien n'est fait, une application peut encore afficher une erreur loin de son champ |
 | A-2 | Réduire les refus du hook dus aux blocs absents et aux décisions sans choix fermé, 80 sur 83 | TF-1947 | auto_ia | borne_atteinte : la mesure est d'aujourd'hui | `oracles/oracle-synthese.mjs`, `gabarits/RESTITUTION.md` | si rien n'est fait, environ 78 refus par semaine, un tour chacun |
 | A-3 | Traiter les 6 constats des agents inscrits ce jour | TF-2175 | auto_ia | borne_atteinte : nés en fin de tour | `todo/TODO.jsonl`, TF-2175 à TF-2180 | si rien n'est fait, 6 défauts connus restent ouverts |
 | A-4 | Répondre à D-175, l'identité de publication des forges | TF-2168 | manuelle_utilisateur | decision | écrire dans cette conversation `175a`, `175b` ou `175c` | si rien n'est fait, un refus 403 se règle à la main |
