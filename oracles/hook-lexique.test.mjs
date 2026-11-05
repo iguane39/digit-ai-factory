@@ -30,11 +30,28 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // et 6 phrases voisines épargnées (audits spécialisés, run de forge-tests) ; puis de 58 à 66 le 15/10
 // (TF-1753) : la question d'IMITATION, 4 questions « comme X » reconnues et 4 phrases voisines épargnées ;
 // puis de 66 à 74 le 19/10 (TF-1885) : la route jugée sur le texte de l'humain hors bloc collé ou cité,
-// 2 cas fondateurs (prompt collé, formule du lexique qui prime) et 6 cas voisins dans les deux sens.
-check("self-test du hook : 74 cas verts", () => {
+// 2 cas fondateurs (prompt collé, formule du lexique qui prime) et 6 cas voisins dans les deux sens ;
+// puis de 74 à 81 le 05/11 (TF-2144) : le standard d'audit du client lu avant le routage, 7 cas dans les deux sens.
+check("self-test du hook : 81 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/74 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/81 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+});
+// TF-2144 — le point d'entrée RÉEL lit le standard d'audit du client : une session ouverte dans un produit d'un dossier `_<client>` dont le projet
+// commun publie une porte reçoit cette porte dans la consigne d'audit ; la même demande hors de tout client reçoit la consigne d'avant.
+check("hook — « lance un audit complet du projet » chez un client qui publie sa porte → la consigne nomme le standard et sa porte, hors client elle ne change pas", () => {
+  const parc = mkdtempSync(join(tmpdir(), "lexique-client-"));
+  mkdirSync(join(parc, "_ClientFictif", "commun", "kit"), { recursive: true });
+  mkdirSync(join(parc, "_ClientFictif", "produit-a"), { recursive: true });
+  mkdirSync(join(parc, "produit-libre"), { recursive: true });
+  writeFileSync(join(parc, "_ClientFictif", "commun", "CONVENTIONS-CLIENT.md"), "# Conventions\n\n- Audit : porte du kit obligatoire.\n", "utf8");
+  writeFileSync(join(parc, "_ClientFictif", "commun", "kit", "verifier-rapport-audit.mjs"), "// porte fictive\n", "utf8");
+  const lancer = (cwd) => spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt: "lance un audit complet du projet", cwd }),
+    env: { ...process.env, FORGE_ROOT: parc, CLAUDE_PROJECT_DIR: cwd } });
+  const chez = lancer(join(parc, "_ClientFictif", "produit-a"));
+  if (chez.status !== 0 || !/STANDARD D'AUDIT PUBLIÉ PAR LE CLIENT _ClientFictif/.test(chez.stdout) || !/verifier-rapport-audit\.mjs/.test(chez.stdout)) throw new Error(`standard absent : ${chez.stdout}`);
+  const libre = lancer(join(parc, "produit-libre"));
+  if (libre.status !== 0 || !/\[audit — hook-lexique\]/.test(libre.stdout) || /STANDARD D'AUDIT PUBLIÉ/.test(libre.stdout)) throw new Error(`hors client : ${libre.stdout}`);
 });
 // TF-1753 — la question de l'humain, jouée au point d'entrée réel : elle reçoit la consigne
 // d'imitation ; « Demande à la Factory de le faire », délégation explicite, ne reçoit rien.

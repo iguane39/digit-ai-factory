@@ -35,8 +35,8 @@ const produit = (nom, { profil = true } = {}) => {
 };
 // TF-2045 : l'écrivain lit CLAUDE_CODE_SESSION_ID ; la recette le retire de l'environnement hérité, pour que ses cas ne dépendent pas de
 // la session qui la joue, et le pose cas par cas (`session`).
-const lancer = (cwd, args, session = null) => {
-  const env = { ...process.env }; delete env.CLAUDE_CODE_SESSION_ID;
+const lancer = (cwd, args, session = null, extra = {}) => {
+  const env = { ...process.env, ...extra }; delete env.CLAUDE_CODE_SESSION_ID;
   if (session) env.CLAUDE_CODE_SESSION_ID = session;
   const r = spawnSync(process.execPath, [ECRIVAIN, ...args], { cwd, encoding: "utf8", env });
   let sortie = null;
@@ -281,6 +281,51 @@ try {
     lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-B");
     const sansSession = lancer(d, ["--verifier"]);
     att(sansSession.code === 0 && sansSession.sortie.repli === "session-non-identifiee", `sans session, dernière ligne du fichier : exit ${sansSession.code}`);
+  });
+
+  // TF-2144 (RT-44 du 04/11/2026) : forge-audit mobilisée chez un produit dont le client publie une porte d'audit → la sortie de CETTE porte
+  // (forge/audit/<date>/porte-client.txt, fraîche et CONFORME) est exigée aussi. Un parc jetable : racine = T (FORGE_ROOT), client `_ClientFictif`.
+  const verdictsAudit = () => { const v = verdictsSansRien(); v.audit = { verdict: "mobilisee", motif: "la demande est un audit complet du produit (0 fichier touché)" }; return v; };
+  const clientFictif = (nom) => {
+    const commun = join(T, "_ClientFictif", "commun");
+    mkdirSync(join(commun, "kit"), { recursive: true });
+    writeFileSync(join(commun, "CONVENTIONS-CLIENT.md"), "# Conventions\n\n- Audit : rapport au modèle POC-to-Prod, porte du kit.\n", "utf8");
+    writeFileSync(join(commun, "kit", "verifier-rapport-audit.mjs"), "// porte fictive\n", "utf8");
+    const d = join(T, "_ClientFictif", nom);
+    mkdirSync(join(d, "forge", "retours"), { recursive: true });
+    writeFileSync(join(d, "forge", "PROFIL.json"), JSON.stringify({ signaux: { domaine_public: false, page_indexable: false, donnees_personnelles: false, agents: false, mise_en_production: false } }), "utf8");
+    return d;
+  };
+  const ENV_CLIENT = { FORGE_ROOT: T };
+  const ecrireAudit = (d, rel, contenu) => { const f = join(d, "forge", "audit", ...rel.split("/")); mkdirSync(dirname(f), { recursive: true }); writeFileSync(f, contenu, "utf8"); };
+  check("rouge → vert — TF-2144 : forge-audit mobilisée chez un client qui publie sa porte → la sortie de cette porte manque tant qu'elle n'est pas CONFORME", () => {
+    const d = clientFictif("produit-audit");
+    att(lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, verdictsAudit()), "--demande", "audit complet du produit"], null, ENV_CLIENT).code === 0, "écriture de la trace");
+    const r = lancer(d, ["--verifier"], null, ENV_CLIENT);
+    att(r.code === 1 && r.sortie.manquants.length === 2 && r.sortie.manquants.some((m) => /^audit → porte du standard d'audit du client _ClientFictif \(verifier-rapport-audit\.mjs\)/.test(m)),
+      `rapport ET porte du client doivent manquer : exit ${r.code} ${r.brut.slice(0, 400)}`);
+    ecrireAudit(d, "20261105/rapport-data.json", "{}");
+    const r2 = lancer(d, ["--verifier"], null, ENV_CLIENT);
+    att(r2.code === 1 && r2.sortie.manquants.length === 1 && /porte du standard d'audit du client/.test(r2.sortie.manquants[0]), `le rapport produit, la porte manque encore : ${r2.brut.slice(0, 300)}`);
+    ecrireAudit(d, "20261105/porte-client.txt", "❌ NON CONFORME — 5 anomalie(s) bloquante(s) :\nPublication INTERDITE");
+    const r3 = lancer(d, ["--verifier"], null, ENV_CLIENT);
+    att(r3.code === 1 && /dit NON CONFORME/.test(r3.sortie.manquants[0]), `une sortie NON CONFORME ne vaut pas la porte : ${r3.brut.slice(0, 300)}`);
+    ecrireAudit(d, "20261105/porte-client.txt", "✅ CONFORME — format conforme au modèle, rapport diffusable.");
+    const r4 = lancer(d, ["--verifier"], null, ENV_CLIENT);
+    att(r4.code === 0 && r4.sortie.verdict === "PRESENT", `sortie CONFORME : exit ${r4.code} ${r4.brut.slice(0, 300)}`);
+  });
+  check("vert — TF-2144 : hors d'un dossier client, ou avant le 05/11/2026, la porte n'est pas exigée (seul le rapport forge-audit l'est)", () => {
+    const libre = produit("audit-hors-client");
+    att(lancer(libre, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(libre, verdictsAudit())], null, ENV_CLIENT).code === 0, "trace hors client");
+    const r = lancer(libre, ["--verifier"], null, ENV_CLIENT);
+    att(r.code === 1 && r.sortie.manquants.length === 1 && /rapport forge-audit/.test(r.sortie.manquants[0]), `hors client : un seul manquant attendu : ${r.brut.slice(0, 300)}`);
+    const ancien = clientFictif("produit-audit-ancien");
+    att(lancer(ancien, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(ancien, verdictsAudit())], null, ENV_CLIENT).code === 0, "trace du client");
+    const f = join(ancien, "forge", "mobilisation.jsonl");
+    writeFileSync(f, readFileSync(f, "utf8").replace(/"ts":"[^"]+"/, '"ts":"2026-11-04T10:00:00.000Z"'), "utf8");
+    ecrireAudit(ancien, "20261104/rapport-data.json", "{}");
+    const a = lancer(ancien, ["--verifier"], null, ENV_CLIENT);
+    att(a.code === 0 && a.sortie.verdict === "PRESENT", `demande tracée avant le 05/11 : non rétroactif : exit ${a.code} ${a.brut.slice(0, 300)}`);
   });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }

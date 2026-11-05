@@ -219,14 +219,42 @@ export function estMessageHumain(message) {
 export const MARQUEURS_NON_HUMAINS =
   /<task-notification>|<cross-session-message|\[SYSTEM NOTIFICATION|<system-reminder>|NOT\s+USER\s+INPUT/i;
 
-/** Le texte injecté dans le contexte — une ligne par appel de skill, puis par consigne de règle, ou rien. */
-export function contexte(message) {
+/**
+ * TF-2144 (RT-44 du 04/11/2026) — LE STANDARD D'AUDIT DU CLIENT SE LIT AVANT LE ROUTAGE. Le 04/11, un audit complet a été rendu deux fois
+ * par forge-audit générique, avec un tenant fabriqué, alors que le client publie son prompt, son modèle, son tenant et sa porte
+ * (`verifier-rapport-audit.mjs`) ; la porte rendait NON CONFORME le rapport que forge-audit déclarait diffusable. `standard` est ce que
+ * `standardClientAudit` d'`oracles/lib-mobilisation.mjs` a lu dans le projet commun du client ; sans porte ni convention, rien n'est ajouté.
+ */
+export function ajoutStandardClient(standard) {
+  if (!standard || !standard.client || (!standard.porte && !(standard.conventions || []).length)) return "";
+  const lieu = standard.projet_commun ? ` (projet commun ${String(standard.projet_commun).replace(/\\/g, "/")})` : "";
+  const conv = (standard.conventions || []).length ? ` Ses conventions sur l'audit : ${standard.conventions.map((l) => `« ${l.replace(/^[-*]\s*/, "")} »`).join(" ; ")}.` : "";
+  const declare = ["prompt", "modele", "tenant"].filter((c) => standard[c]).map((c) => `${c} : ${standard[c]}`).join(" ; ");
+  const porte = standard.porte
+    ? ` Sa PORTE : \`node "${String(standard.porte).replace(/\\/g, "/")}" "<rapport>.html"\` (sortie CONFORME, exit 0, ou le rapport n'est pas diffusable) ; en enregistrer la sortie par ` +
+      "`> forge\\audit\\<AAAAMMJJ>\\porte-client.txt` : la mobilisation de forge-audit exige ce fichier, frais et CONFORME, avant « livré » (verrou S85, TF-2144)."
+    : "";
+  return ` STANDARD D'AUDIT PUBLIÉ PAR LE CLIENT ${standard.client}${lieu} (TF-2144, RT-44) : à lire AVANT de lancer forge-audit, et il prime sur ses valeurs génériques ` +
+    `(prompt, modèle, tenant) ; un rapport rendu hors de ce format est NON CONFORME (cas du 04/11/2026 : 5 anomalies à la porte du client).${declare ? ` Déclaré : ${declare}.` : ""}${conv}${porte}`;
+}
+
+/** Le texte injecté dans le contexte — une ligne par appel de skill, puis par consigne de règle, ou rien. `standardAudit` : TF-2144. */
+export function contexte(message, standardAudit = null) {
   const appels = reconnaitre(message).map((a) =>
     `[LEXIQUE RV-6 — hook-lexique] Ce message est un APPEL du skill \`${a.skill}\` (${a.forme}) : ` +
     `l'invoquer par l'outil Skill AVANT toute autre action ou réponse ; retirer le mot-clé, le reste du message est l'entrant. ` +
     `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`);
-  const consignes = reconnaitreConsignes(message).map((c) => `[${c.regle} — hook-lexique] ${c.texte}`);
+  const consignes = reconnaitreConsignes(message).map((c) => `[${c.regle} — hook-lexique] ${c.texte}${c.regle === "audit" ? ajoutStandardClient(standardAudit) : ""}`);
   return [...appels, ...consignes].join("\n");
+}
+
+/** Le standard d'audit du client du dossier de session, lu SEULEMENT si le message est une demande d'audit du produit ; null sinon (import paresseux, jamais bloquant). */
+export async function standardPourLeMessage(message, dossier) {
+  try {
+    if (!dossier || !reconnaitreConsignes(message).some((c) => c.regle === "audit")) return null;
+    const { standardClientAudit } = await import("./lib-mobilisation.mjs");
+    return standardClientAudit(dossier);
+  } catch { return null; }
 }
 
 /**
@@ -585,6 +613,44 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
   console.log(`  [${okOrigine ? "PASS" : "FAIL"}] niveau — notification portant « vite : » → REFUS, non humaine, rien injecté`);
   okOrigine ? pass++ : fail++;
 
+  // TF-2144 (RT-44 du 04/11/2026) — LE STANDARD D'AUDIT DU CLIENT SE LIT AVANT LE ROUTAGE, dans les deux sens. Un parc jetable :
+  // un client `_ClientFictif` dont le projet commun publie sa porte et ses conventions, un produit dessous, un produit hors client.
+  {
+    const { standardClientAudit } = await import("./lib-mobilisation.mjs");
+    const parc = mkdtempSync(join(tmpdir(), "standard-audit-"));
+    const commun = join(parc, "_ClientFictif", "projet-commun");
+    mkdirSync(join(commun, "kit", "pack"), { recursive: true });
+    mkdirSync(join(parc, "_ClientFictif", "produit-a"), { recursive: true });
+    mkdirSync(join(parc, "produit-libre"), { recursive: true });
+    writeFileSync(join(commun, "CONVENTIONS-CLIENT.md"), "# Conventions\n\n- Audit : le rapport suit le modèle POC-to-Prod et passe la porte du kit (2026-10-19).\n- Autre chose sans rapport.\n", "utf8");
+    writeFileSync(join(commun, "kit", "pack", "verifier-rapport-audit.mjs"), "// porte fictive\n", "utf8");
+    const msgAudit = "lance un audit complet du projet";
+    const std = standardClientAudit(join(parc, "_ClientFictif", "produit-a"), parc);
+    const injecte = contexte(msgAudit, std);
+    const cas = [
+      [std.client === "_ClientFictif" && /verifier-rapport-audit\.mjs$/.test(std.porte || "") && std.source === "detecte" && std.conventions.length === 1,
+        "produit sous un client : la porte du projet commun et la convention d'audit sont lues"],
+      [/STANDARD D'AUDIT PUBLIÉ PAR LE CLIENT _ClientFictif/.test(injecte) && /verifier-rapport-audit\.mjs/.test(injecte) && /porte-client\.txt/.test(injecte) && /AUDIT DU PRODUIT/.test(injecte),
+        "la consigne d'audit nomme le standard, sa porte et le fichier de preuve exigé"],
+      [!/STANDARD D'AUDIT PUBLIÉ/.test(contexte(msgAudit)) && /AUDIT DU PRODUIT/.test(contexte(msgAudit)),
+        "rouge — sans standard lu, la consigne d'audit reste celle d'avant (aucune mention du client)"],
+      [standardClientAudit(join(parc, "produit-libre"), parc).porte === null && !/STANDARD D'AUDIT PUBLIÉ/.test(contexte(msgAudit, standardClientAudit(join(parc, "produit-libre"), parc))),
+        "rouge — un produit hors de tout dossier client n'a aucun standard à lire, rien n'est ajouté"],
+      [!/STANDARD D'AUDIT PUBLIÉ/.test(contexte("lance un audit SEO du site", std)) && contexte("lance un audit SEO du site", std) === "",
+        "rouge — un audit spécialisé (SEO) n'est pas routé vers le standard d'audit du produit"],
+    ];
+    // La forme déclarée prime sur la détection, et une déclaration inutilisable est DITE, jamais contournée.
+    writeFileSync(join(commun, "STANDARD-AUDIT.json"), JSON.stringify({ porte: "kit/pack/verifier-rapport-audit.mjs", prompt: "kit/prompt.md", modele: "modele-v3", tenant: "tenant-fictif (260 contraintes)" }), "utf8");
+    const decl = standardClientAudit(join(parc, "_ClientFictif", "produit-a"), parc);
+    cas.push([decl.source === "declare" && decl.tenant === "tenant-fictif (260 contraintes)" && /Déclaré : prompt : kit\/prompt\.md ; modele : modele-v3 ; tenant : tenant-fictif/.test(contexte(msgAudit, decl)),
+      "forme déclarée (STANDARD-AUDIT.json) : prompt, modèle et tenant du client sont repris dans la consigne"]);
+    writeFileSync(join(commun, "STANDARD-AUDIT.json"), JSON.stringify({ porte: "../../hors-du-projet/porte.mjs" }), "utf8");
+    const evade = standardClientAudit(join(parc, "_ClientFictif", "produit-a"), parc);
+    cas.push([evade.refus.some((r) => /sort du projet commun/.test(r)) && evade.source === "detecte",
+      "rouge — une porte déclarée hors du projet commun est refusée et dite ; la porte détectée prend le relais"]);
+    for (const [ok, glose] of cas) { console.log(`  [${ok ? "PASS" : "FAIL"}] TF-2144 — ${glose}`); ok ? pass++ : fail++; }
+  }
+
   console.log(`\nhook-lexique : ${pass} PASS, ${fail} FAIL`);
   process.exit(fail ? 1 : 0);
 }
@@ -605,15 +671,20 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
   dossier = racineDuProjet(dossier || process.cwd());
   const lignes = [];
   const humain = estMessageHumain(message);
-  if (humain) {
-    const appels = contexte(message);
-    if (appels) lignes.push(appels);
-    const ref = referentielNiveaux(dossier);
-    const niveau = ref ? contexteNiveau(message, ref) : "";
-    if (niveau) lignes.push(niveau);
-  }
-  // TF-1958 : la lettre d'une décision ouverte, lue dans la transcription ; asynchrone (import paresseux).
-  (humain ? contexteLettre(message, transcript) : Promise.resolve(""))
+  // TF-2144 : le standard d'audit du client, lu dans son projet commun, SEULEMENT pour une demande d'audit ; asynchrone (import paresseux).
+  (humain ? standardPourLeMessage(message, dossier) : Promise.resolve(null))
+    .catch(() => null)
+    .then((standard) => {
+      if (humain) {
+        const appels = contexte(message, standard);
+        if (appels) lignes.push(appels);
+        const ref = referentielNiveaux(dossier);
+        const niveau = ref ? contexteNiveau(message, ref) : "";
+        if (niveau) lignes.push(niveau);
+      }
+      // TF-1958 : la lettre d'une décision ouverte, lue dans la transcription ; asynchrone (import paresseux).
+      return humain ? contexteLettre(message, transcript) : "";
+    })
     .catch(() => "")
     .then((lettre) => {
       if (lettre) lignes.push(lettre);

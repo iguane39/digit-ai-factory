@@ -54,7 +54,7 @@ const entrees = (d) => readFileSync(join(d, "forge", "ledger.jsonl"), "utf8").sp
 
 // Le témoin rouge : le gabarit privé de ses deux protections. La chirurgie est VÉRIFIÉE, sans quoi le rouge serait vide.
 const sansFlux = GABARIT.replace(/for _flux in \(sys\.stdout, sys\.stderr\):[\s\S]*?pass\n/, "");
-const MUTANT = sansFlux.replace("    afficher(ajouter(run, type_, **champs))", "    print(json.dumps(ajouter(run, type_, **champs), ensure_ascii=False))");
+const MUTANT = sansFlux.replace("    afficher(ajouter(archive, type_, **champs))", "    print(json.dumps(ajouter(archive, type_, **champs), ensure_ascii=False))");
 
 const dossiers = [];
 try {
@@ -357,6 +357,51 @@ try {
     const { d, script } = produit(mutant); dossiers.push(d);
     spawnSync(PYTHON, [script, "go_publication", "--r38", "true", "--citation", "D-12 (a) du 22/10"], { encoding: "utf8", env: CONSOLE });
     att(entrees(d).at(-1).r38 === "true", "le mutant écrit encore un booléen");
+  });
+
+  // ---- TF-2174 (RP-14, lot du 05/11/2026) : `--run` était CONSOMMÉ comme sélecteur d'archive, jamais écrit ----------------------
+  // Le fait : l'entrée seq 207 d'un produit est partie sans identifiant de run (--run avalé), un second --run levait TypeError
+  // (le champ `run` entrait en collision avec le paramètre positionnel d'`ajouter`). Le sélecteur d'archive s'appelle désormais
+  // --archive ; --run s'écrit au champ `run` de l'entrée ; l'ancien nom reste lu par --verifier (lecture seule).
+  const unProduit = (texte = GABARIT) => { const r = produit(texte); dossiers.push(r.d); return r; };
+  const ecrire = (script, ...args) => spawnSync(PYTHON, [script, ...args], { encoding: "utf8", env: CONSOLE });
+  check("rouge → vert — TF-2174 : --run s'écrit au champ run d'un run_open, d'un run_close et d'une rectification", () => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-gabarit-")); dossiers.push(d); mkdirSync(join(d, "forge"));
+    const script = join(d, "forge", "ledger.py"); writeFileSync(script, GABARIT, "utf8");
+    const o = ecrire(script, "run_open", "--run", "RUN-9", "--run_id", "essai", "--versions_forges", "{\"forge-x\": \"abc1234\"}");
+    att(o.status === 0, `run_open refusé : ${o.stderr}`);
+    att(entrees(d)[0].run === "RUN-9", `run_open sans son champ run : ${JSON.stringify(entrees(d)[0])}`);
+    const r = ecrire(script, "rectification_run_open", "--run", "RUN-9", "--seq_vise", "1", "--cause", "identifiant de run oublié");
+    att(r.status === 0 && entrees(d)[1].run === "RUN-9" && entrees(d)[1].seq_vise === 1, `rectification : ${r.stderr} ${JSON.stringify(entrees(d)[1])}`);
+    const c = ecrire(script, "run_close", "--run", "RUN-9", "--statut", "pret_client");
+    att(c.status === 0 && entrees(d)[2].run === "RUN-9" && entrees(d)[2].statut === "pret_client", `run_close : ${c.stderr} ${JSON.stringify(entrees(d)[2])}`);
+    att(!existsSync(join(d, "runs")), "un dossier runs/ a été créé");
+  });
+  check("rouge → vert — TF-2174 : deux --run ne lèvent plus TypeError (le dernier fait foi), et un nom d'option ne collisionne plus avec un paramètre", () => {
+    const { d, script } = unProduit();
+    const r = ecrire(script, "retour", "--run", "A", "--run", "B", "--resume", "x");
+    att(r.status === 0 && !/TypeError/.test(r.stderr), `exit ${r.status} : ${r.stderr.slice(-200)}`);
+    att(entrees(d).at(-1).run === "B", `champ run : ${JSON.stringify(entrees(d).at(-1))}`);
+    const t = ecrire(script, "retour", "--archive", "", "--type_", "z", "--resume", "y");
+    att(!/TypeError/.test(t.stderr), `un champ nommé type_ collisionne : ${t.stderr.slice(-200)}`);
+  });
+  check("vert — TF-2174 : --archive désigne l'archive d'un run clos (écriture et lecture) ; --run n'y redirige plus l'écriture", () => {
+    const { d, script } = unProduit();
+    mkdirSync(join(d, "runs", "ARCH"), { recursive: true });
+    const sans = ecrire(script, "retour", "--run", "ARCH", "--resume", "dans le ledger courant");
+    att(sans.status === 0 && entrees(d).at(-1).run === "ARCH" && !existsSync(join(d, "runs", "ARCH", "ledger.jsonl")), "--run a redirigé l'écriture vers l'archive");
+    const o = ecrire(script, "run_open", "--archive", "ARCH", "--run_id", "arch", "--versions_forges", "{}");
+    att(o.status === 0, `run_open dans l'archive refusé : ${o.stderr}`);
+    const archive = join(d, "runs", "ARCH", "ledger.jsonl");
+    att(existsSync(archive), "l'archive n'a pas reçu le run_open");
+    const avant = entrees(d).length;
+    att(ecrire(script, "retour", "--archive", "ARCH", "--resume", "dans l'archive").status === 0, "écriture dans l'archive refusée");
+    att(entrees(d).length === avant, "le ledger courant a changé");
+    att(readFileSync(archive, "utf8").split("\n").filter(Boolean).length === 2, "l'archive ne porte pas deux entrées");
+    const v = ecrire(script, "--verifier", "--archive", "ARCH");
+    att(v.status === 0 && /2 entrée\(s\)/.test(v.stdout), `--verifier --archive : ${v.stdout}${v.stderr}`);
+    const ancien = ecrire(script, "--verifier", "--run", "ARCH");
+    att(ancien.status === 0 && /2 entrée\(s\)/.test(ancien.stdout), `l'ancien --verifier --run n'est plus lu : ${ancien.stdout}${ancien.stderr}`);
   });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }

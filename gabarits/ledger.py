@@ -5,6 +5,10 @@ première entrée `run_open`. Écrivain unique : l'orchestrateur de session.
 
   python forge/ledger.py <type> --champ valeur ...
   python forge/ledger.py --verifier
+  python forge/ledger.py <type> --archive <run clos> --champ valeur ...   (écrit dans runs/<run clos>/ledger.jsonl)
+
+`--run <identifiant>` est un CHAMP comme un autre : il s'écrit dans l'entrée (run_open, run_close, rectification_*...). Il ne
+désigne plus l'archive d'un run clos, c'est `--archive` ; `--verifier --run <identifiant>` reste lu pour l'ancien usage (TF-2174).
 
 POUR QUI. Un produit dont la pile est Python et qui n'a pas Node sous la main. La voie de doctrine
 reste `ledger.mjs` de `digit-ai-forge-agents` (références\\ETAPES-RUN.md : « un produit écrit son
@@ -99,10 +103,12 @@ def prendre_verrou(verrou: pathlib.Path) -> None:
                      f"processus détient {verrou} (s'il est mort, supprimer ce fichier)")
 
 
-def ajouter(run: str, type_: str, **champs) -> dict:
+def ajouter(archive: str, type_: str, /, **champs) -> dict:
+    # Paramètres POSITIONNELS SEULEMENT (TF-2174) : un champ d'entrée nommé `run`, `archive` ou `type_` ne collisionne plus avec eux
+    # (un second `--run` levait « multiple values for argument 'run' »).
     if type_ not in TYPES:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
-    p = chemin(run)
+    p = chemin(archive)
     verrou = p.with_name(p.name + ".lock")
     prendre_verrou(verrou)
     try:
@@ -191,15 +197,21 @@ if __name__ == "__main__":
     # Le run est VIDE par défaut, pour que `chemin("")` rende le chemin de doctrine
     # `forge/ledger.jsonl`. Un run-id figé rendrait INERTE ce chemin : `chemin()` prendrait toujours
     # la branche `runs/`, et les entrées partiraient dans l'archive sans que rien ne le signale.
-    # Un run précis reste adressable : `--run <identifiant>`.
-    run = ""
-    if "--run" in a:
-        i = a.index("--run")
+    # Un run CLOS reste adressable : `--archive <identifiant>` (TF-2174, 05/11/2026). `--run` était ce sélecteur : il était donc
+    # consommé et l'identifiant du run n'entrait jamais dans l'entrée (seq 207 d'un produit, partie sans run). `--run <identifiant>`
+    # s'écrit désormais au champ `run` de l'entrée, comme tout autre champ (run_open, run_close, rectification_*...). L'ancien nom
+    # reste LU hors écriture : `--verifier --run <identifiant>` désigne encore l'archive.
+    archive = ""
+    if "--archive" in a:
+        i = a.index("--archive")
         if i + 1 < len(a):
-            run = a[i + 1]
+            archive = a[i + 1]
             del a[i:i + 2]
     if a and a[0] == "--verifier":
-        sys.exit(verifier(run))
+        if not archive and "--run" in a:
+            i = a.index("--run")
+            archive = a[i + 1] if i + 1 < len(a) else ""
+        sys.exit(verifier(archive))
     # `--help` écrivait une entrée « help: true » au ledger : une demande d'aide n'écrit rien, et un
     # type d'entrée ne commence jamais par un tiret (revue de l'œil critique, 26/10/2026).
     if "--help" in a or "-h" in a:
@@ -227,7 +239,7 @@ if __name__ == "__main__":
         # publication du pilot, qui exige `r38 === true`, ignorait le feu vert (TF-1990).
         elif v in ("true", "false"):
             champs[k] = v == "true"
-    afficher(ajouter(run, type_, **champs))
+    afficher(ajouter(archive, type_, **champs))
     # R-19 exige `versions_forges` au `run_open` ; l'entrée est écrite, l'oubli se dit tout de suite,
     # avec la voie par ajout, plutôt qu'au premier relevé de conformité (TF-2018).
     if type_ == "run_open" and "versions_forges" not in champs:

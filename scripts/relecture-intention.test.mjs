@@ -31,6 +31,15 @@ const PROJET = join(T, "monprojet");
 mkdirSync(PROJET, { recursive: true });
 const slug = PROJET.replace(/[^A-Za-z0-9]/g, "-");
 
+// TF-2146 : le registre est un journal PUBLIC ; --consigner le pseudonymise par les tables du canal. La recette pose ses TABLES JETABLES
+// (jamais les tables réelles), noms inventés : un client, deux produits dont un nom de dossier.
+const TABLES = join(T, "tables");
+mkdirSync(TABLES, { recursive: true });
+writeFileSync(join(TABLES, "noms-interdits.json"), JSON.stringify({ noms: ["Zorglub"], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+writeFileSync(join(TABLES, "produits-pseudonymes.json"), JSON.stringify({ produits: { AtelierZetaPrive: "Produit-90", "Mon Produit Fictif": "Produit-91" } }), "utf8");
+process.env.FORGE_NOMS_INTERDITS = join(TABLES, "noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "produits-pseudonymes.json");
+
 // ---- la transcription synthétique -----------------------------------------------------------------------------------
 const H1 = "Étudie « l'opportunité » d'un relecteur,\navec deux lignes et des accents : œ, é, à — mot pour mot.";
 const H2 = "pour chaque liste, pas seulement les longues";
@@ -232,6 +241,45 @@ try {
       [verdict({ verdict: "sert", gravite: "aucune" }), "fin-de-tour", "poème", "type inconnu"], [join(T, "absent.json"), "fin-de-tour", "etude", "fichier absent"]])
       egal(consigner(v, p, t).code, 2, quoi);
     egal(readFileSync(REG, "utf8"), avant, "registre modifié par un refus");
+  });
+  // ---- TF-2146 : le journal public ne reçoit ni le nom réel du dossier ni les noms cités ----------------------------------------
+  const PRODUIT_REEL = join(T, "AtelierZetaPrive");
+  mkdirSync(PRODUIT_REEL, { recursive: true });
+  const dirCite = { cwd: PRODUIT_REEL, maison: MAISON };
+  const REGP = join(T, "registre-pseudonymes.jsonl");
+  const ecartsNommes = [{ la_demande_dit: "Livre le rapport de Zorglub pour AtelierZetaPrive", le_livrable_fait: "Le rapport de Mon Produit Fictif est vide", pourquoi: "Zorglub n'est pas cité dans la section 2 de atelier zeta prive", nature: "hors_demande" }];
+  check("rouge → vert — TF-2146 : --consigner pseudonyme le champ projet et les demandes citées (client, produit, graphie espacée) avant d'écrire le journal public", () => {
+    const r = executer(["--consigner", verdict({ verdict: "derive", gravite: "majeure", ecarts: ecartsNommes, confiance: "moyenne" }), "--point", "fin-de-tour", "--type", "etude", "--registre", REGP, "--session", "sess-p"], {}, new Date("2026-10-18T12:00:00Z"), dirCite);
+    egal(r.code, 0, "exit");
+    const brut = readFileSync(REGP, "utf8");
+    for (const nom of ["AtelierZetaPrive", "Zorglub", "Mon Produit Fictif", "atelier zeta prive"]) if (brut.toLowerCase().includes(nom.toLowerCase())) throw new Error(`« ${nom} » écrit tel quel dans le journal : ${brut.slice(0, 300)}`);
+    const l = JSON.parse(brut.trim().split("\n").pop());
+    egal(l.projet, "Produit-90", "projet pseudonymisé");
+    const e = l.detail_ecarts[0];
+    egal(e.la_demande_dit, "Livre le rapport de Client-A pour Produit-90", "la_demande_dit");
+    egal(e.le_livrable_fait, "Le rapport de Produit-91 est vide", "le_livrable_fait");
+    egal(e.pourquoi, "Client-A n'est pas cité dans la section 2 de Produit-90", "pourquoi");
+    egal(l.ecarts, 1, "le nombre d'écarts est inchangé"); egal(l.natures.hors_demande, 1, "la nature est inchangée"); egal(l.alerte, true, "l'alerte est inchangée");
+  });
+  check("vert — TF-2146 : un nom sans rien à cacher traverse tel quel (projet « monprojet », texte ordinaire) ; la chaîne et les relevés lisent le texte pseudonymisé", () => {
+    const r = executer(["--consigner", verdict({ verdict: "derive", gravite: "majeure", ecarts: [{ la_demande_dit: "pour chaque liste", le_livrable_fait: "dès 8 lignes", pourquoi: "seuil ajouté", nature: "hors_demande" }], confiance: "elevee" }), "--point", "consigne", "--type", "code", "--registre", REGP, "--session", "sess-p"], {}, new Date("2026-10-18T12:05:00Z"), CTX);
+    egal(r.code, 0, "exit");
+    const l = JSON.parse(readFileSync(REGP, "utf8").trim().split("\n").pop());
+    egal(l.projet, "monprojet", "projet ordinaire"); egal(l.detail_ecarts[0].la_demande_dit, "pour chaque liste", "citation ordinaire");
+    const boucle = executer(["--boucle", "RI-20261018-01", "--registre", REGP, "--json"], {}, new Date(), CTX);
+    egal(boucle.code, 0, "exit --boucle");
+    if (/AtelierZetaPrive|Zorglub|Mon Produit Fictif/i.test(JSON.stringify(boucle))) throw new Error("--boucle relit un nom réel");
+  });
+  check("rouge — TF-2146 : tables de pseudonymes introuvables → 2, le refus le dit, et RIEN n'est écrit au journal (un anonymiseur qui ne peut pas anonymiser arrête le convoi)", () => {
+    const avant = readFileSync(REGP, "utf8");
+    const noms = process.env.FORGE_NOMS_INTERDITS;
+    process.env.FORGE_NOMS_INTERDITS = join(T, "tables-absentes", "noms.json");
+    try {
+      const r = executer(["--consigner", verdict({ verdict: "sert", gravite: "aucune", ecarts: [], confiance: "elevee" }), "--point", "fin-de-tour", "--type", "etude", "--registre", REGP], {}, new Date("2026-10-18T12:10:00Z"), dirCite);
+      egal(r.code, 2, "exit");
+      if (!/pseudonym|table/i.test(r.sortie) || !/rien n'est consigné/i.test(r.sortie)) throw new Error(r.sortie);
+    } finally { process.env.FORGE_NOMS_INTERDITS = noms; }
+    egal(readFileSync(REGP, "utf8"), avant, "journal modifié malgré le refus");
   });
   check("vert — --confirmer : la réponse humaine à une alerte est consignée (oui / non), la dernière fait foi", () => {
     const r = executer(["--confirmer", "RI-20261018-02", "oui", "--registre", REG], {}, new Date("2026-10-18T13:00:00Z"), CTX);
@@ -812,6 +860,60 @@ try {
     const r3 = executer(["--preparer", "fin-de-tour", "--transcript", join(dQ, "sess-produit.jsonl"), "--sortie", join(T, "sortie-cwd-ok")], {}, new Date(), { cwd: PRODUIT, maison: MAISON });
     egal(r3.code, 0, "la MÊME transcription lue depuis son dépôt");
     if (!/même dépôt que/.test(r3.sortie)) throw new Error("la correspondance n'est pas dite : " + r3.sortie.slice(0, 300));
+  });
+  // ==== TF-2160 : la préparation n'embarque ni un fichier ignoré par git, ni var/, secrets/, *.cle, et caviarde les motifs de secret ====
+  // Les « secrets » sont fabriqués à l'exécution (aucun motif de secret ne figure en clair dans ce fichier suivi).
+  const JETON_ANT = "sk-" + "ant-api03-" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefgh";
+  const JETON_GH = "ghp_" + "0123456789abcdefghijklmnopqrstuvwxyz";
+  const PEM = ["-----BEGIN " + "RSA PRIVATE KEY-----", "MIIEowIBAAKCAQEA-CORPS-DE-CLE-A-NE-JAMAIS-CITER", "-----END " + "RSA PRIVATE KEY-----"].join("\n");
+  const { d: REPO2, g: gitS } = mkRepo("depot-secrets");
+  writeFileSync(join(REPO2, ".gitignore"), "ignore-par-git.txt\n");
+  writeFileSync(join(REPO2, "base.txt"), "base\n");
+  gitS(["add", "-A"]); gitS(["commit", "-q", "-m", "base"], "2026-10-18T09:00:00Z");
+  const F2 = { ignore: join(REPO2, "ignore-par-git.txt"), sousVar: join(REPO2, "var", "secrets", "pentest_cle.txt"), sousSecrets: join(REPO2, "secrets", "a.txt"), cle: join(REPO2, "docs", "serveur.cle"),
+    notes: join(REPO2, "notes.md"), ordinaire: join(REPO2, "ordinaire.txt"), neufVar: join(REPO2, "var", "etat.txt") };
+  ecrireA(F2.ignore, "VALEUR-IGNOREE-PAR-GIT\n", date("10:20")); ecrireA(F2.sousVar, "VALEUR-SOUS-VAR\n", date("10:20")); ecrireA(F2.sousSecrets, "VALEUR-SOUS-SECRETS\n", date("10:20"));
+  ecrireA(F2.cle, "VALEUR-FICHIER-CLE\n", date("10:20")); ecrireA(F2.ordinaire, "VALEUR-ORDINAIRE-CONSERVEE\n", date("10:20")); ecrireA(F2.neufVar, "VALEUR-NEUF-SOUS-VAR\n", date("10:20"));
+  ecrireA(F2.notes, `Notes du tour. VALEUR-NOTES-CONSERVEE\n${PEM}\nclé : ${JETON_ANT}\npassword = "Tr0ub4dor-et-trois-mots"\nAuthorization: Bearer ${JETON_GH}\nle token est géré par le coffre, aucune valeur ici\n`, date("10:20"));
+  const TRSEC = join(T, "session-secrets.jsonl");
+  writeFileSync(TRSEC, [humain(`Prépare la relève. Mon jeton : ${JETON_GH}, ne le recopie pas.`, { timestamp: T0 }),
+    assistant([...Object.values(F2).map((f) => outil("Write", { file_path: f, content: "x" })), outil("Bash", { command: `echo x > ${F2.sousSecrets}` })], "2026-10-18T10:10:00Z"),
+    assistant([texte("Fini.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
+  const finS = executer(["--preparer", "fin-de-tour", "--transcript", TRSEC, "--sortie", join(T, "sortie-secrets")], {}, new Date(), { cwd: REPO2, maison: MAISON });
+  const livS = existsSync(join(T, "sortie-secrets", "livrables.md")) ? readFileSync(join(T, "sortie-secrets", "livrables.md"), "utf8") : "";
+  const demS = existsSync(join(T, "sortie-secrets", "demande.txt")) ? readFileSync(join(T, "sortie-secrets", "demande.txt"), "utf8") : "";
+  const toutS = livS + "\n" + demS;
+  check("rouge → vert — TF-2160 : un fichier ignoré par git, sous var/ ou secrets/, ou en *.cle n'est jamais embarqué ; son chemin est cité, l'omission est dite", () => {
+    egal(finS.code, 0, "exit");
+    for (const v of ["VALEUR-IGNOREE-PAR-GIT", "VALEUR-SOUS-VAR", "VALEUR-SOUS-SECRETS", "VALEUR-FICHIER-CLE", "VALEUR-NEUF-SOUS-VAR"]) if (toutS.includes(v)) throw new Error(`« ${v} » embarqué dans la relève`);
+    for (const f of [F2.ignore, F2.sousVar, F2.sousSecrets, F2.cle]) if (!livS.includes(f)) throw new Error(`le chemin ${f} n'est pas cité`);
+    if (!/NON cité : fichier ignoré par git/.test(livS)) throw new Error("l'omission d'un fichier ignoré n'est pas dite");
+    if (!/NON cité : fichier de secret par son chemin/.test(livS)) throw new Error("l'omission d'un fichier de secret n'est pas dite");
+  });
+  check("vert — TF-2160 : un fichier ordinaire du même dépôt est embarqué comme avant (l'exclusion ne mord pas le reste)", () => {
+    if (!livS.includes("VALEUR-ORDINAIRE-CONSERVEE") || !livS.includes("VALEUR-NOTES-CONSERVEE")) throw new Error("un fichier ordinaire a disparu de la relève : " + livS.slice(0, 500));
+  });
+  check("rouge → vert — TF-2160 : les motifs de secret sont caviardés avant l'écriture, dans les livrables ET dans la demande citée mot pour mot ; le caviardage est DIT", () => {
+    for (const v of [JETON_ANT, JETON_GH, "CORPS-DE-CLE-A-NE-JAMAIS-CITER", "Tr0ub4dor-et-trois-mots", "BEGIN RSA PRIVATE"]) if (toutS.includes(v)) throw new Error(`motif de secret « ${v.slice(0, 20)}… » écrit en clair`);
+    if (!/CAVIARDÉ/.test(livS) || !/CAVIARDÉ/.test(demS)) throw new Error("le caviardage n'est pas marqué dans les deux fichiers");
+    if (!/motif\(s\) de secret caviardé\(s\)/.test(finS.sortie)) throw new Error("la sortie ne dit pas le caviardage : " + finS.sortie.slice(0, 400));
+    if (!livS.includes("le token est géré par le coffre, aucune valeur ici")) throw new Error("une phrase ordinaire sur un token a été caviardée à tort (faux positif)");
+  });
+  check("rouge — TF-2160 : --preparer consigne refuse (2) un fichier ignoré par git ou un *.cle désigné par --fichier, et n'écrit rien", () => {
+    for (const f of [F2.ignore, F2.cle, F2.sousSecrets]) {
+      const d = join(T, `sortie-refus-${Math.random().toString(36).slice(2)}`);
+      const r = executer(["--preparer", "consigne", "--fichier", f, "--transcript", TRSEC, "--sortie", d], {}, new Date(), { cwd: REPO2, maison: MAISON });
+      egal(r.code, 2, `exit pour ${f}`); if (!/n'est pas embarqué|ne transite jamais|ignoré par git|fichier de secret/.test(r.sortie)) throw new Error(r.sortie);
+      egal(existsSync(d), false, "dossier de sortie créé par un refus");
+    }
+  });
+  check("vert — TF-2160 : un *.cle reçu à la réception est cité par son chemin sans contenu ; une consigne ordinaire passe", () => {
+    const d = join(T, "sortie-reception-cle");
+    const r = executer(["--preparer", "reception", "--fichier", F2.cle, "--transcript", TRSEC, "--sortie", d], {}, new Date(), { cwd: REPO2, maison: MAISON });
+    // L'oracle de forme ne juge que les .md : le .cle passe à la préparation, et son contenu n'est pas cité.
+    egal(r.code, 0, "exit réception"); if (readFileSync(join(d, "livrables.md"), "utf8").includes("VALEUR-FICHIER-CLE")) throw new Error("le contenu d'un .cle est cité à la réception");
+    const c = executer(["--preparer", "consigne", "--fichier", F2.ordinaire, "--transcript", TRSEC, "--sortie", join(T, "sortie-consigne-ok")], {}, new Date(), { cwd: REPO2, maison: MAISON });
+    egal(c.code, 0, "exit consigne ordinaire");
   });
   check("borne — le registre du pilot n'a pas été touché par la recette", () => {
     const pilote = join(RACINE, "todo", "relectures-intention.jsonl");

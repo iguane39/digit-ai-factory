@@ -14,7 +14,7 @@
  * `oracles/oracle-synthese.mjs` (S85 et S86, le verrou « livré » : les livrables des forges mobilisées de la dernière demande).
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -368,6 +368,103 @@ export function trouver(produit, chemin) {
   return parcourir(produit, 0, 0);
 }
 
+// ---- LE STANDARD D'AUDIT QUE LE CLIENT PUBLIE (TF-2144, RT-44 du 04/11/2026) ---------------------------------------------------
+// Le fait : le 04/11/2026, un audit complet a été rendu DEUX fois par forge-audit générique, avec un tenant fabriqué (185 contraintes),
+// alors que le client publie son propre standard (prompt et modèle POC-to-Prod, tenant à 260 contraintes, porte
+// `verifier-rapport-audit.mjs`) ; la porte du client rend NON CONFORME (5 anomalies) le rapport que forge-audit déclarait diffusable.
+// Ni le routage du lexique ni le CLAUDE.md du produit ne désignaient ce standard. Désormais le routage le LIT d'abord, et la mobilisation
+// de forge-audit exige la sortie de SA porte (un livrable de plus au verrou « livré »). Lecture seule : rien n'est exécuté ici.
+//
+// Où se publie un standard : dans le PROJET COMMUN du client (le dossier `_<client>` qui contient le produit, à sa racine ou un niveau
+// dessous, celui qui porte `CONVENTIONS-CLIENT.md`). Deux formes, la déclarée prime :
+//   · `STANDARD-AUDIT.json` { "porte": "<chemin relatif au projet commun>", "prompt", "modele", "tenant" } ;
+//   · sinon, le `verifier-rapport-audit.mjs` que le projet commun contient (8 niveaux de dossier au plus, hors node_modules, .git, old),
+//     et les lignes de `CONVENTIONS-CLIENT.md` qui parlent d'audit.
+export const STANDARD_AUDIT_DEPUIS = "2026-11-05";
+const racineDuParc = () => process.env.FORGE_ROOT || join(ICI, "..", "..");
+const NOM_PORTE_CLIENT = "verifier-rapport-audit.mjs";
+export const PREUVE_PORTE_CLIENT = join("forge", "audit", "*", "porte-client.txt");
+
+/** Le dossier `_<client>` qui contient `chemin` sous la racine du parc, ou null (un produit hors client n'a pas de standard à lire). */
+export function dossierClientDe(chemin, racine = racineDuParc()) {
+  if (!chemin) return null;
+  const rel = relative(resolve(racine), resolve(chemin));
+  if (!rel || rel.startsWith("..") || isAbsolute(rel)) return null;
+  const segments = rel.split(/[\\/]/).filter(Boolean);
+  return segments.length > 1 && segments[0].startsWith("_") ? join(resolve(racine), segments[0]) : null;
+}
+
+const SANS_PORTE = new Set(["node_modules", ".git", ".venv", "__pycache__", "old"]);
+function chercherPorte(dossier, profondeur = 0) {
+  if (profondeur > 8) return null;
+  const entrees = lister(dossier);
+  if (entrees.some((e) => e.isFile() && e.name.toLowerCase() === NOM_PORTE_CLIENT)) return join(dossier, NOM_PORTE_CLIENT);
+  for (const e of entrees) if (e.isDirectory() && !SANS_PORTE.has(e.name)) { const r = chercherPorte(join(dossier, e.name), profondeur + 1); if (r) return r; }
+  return null;
+}
+
+/**
+ * Le standard d'audit publié par le client du produit désigné (`chemin`), sans rien exécuter. Rend toujours un objet :
+ * { client, projet_commun, source ("declare" | "detecte" | null), porte (chemin absolu | null), prompt, modele, tenant, conventions[], refus[] }.
+ * `client` null : le produit n'est pas sous un dossier `_<client>`. `porte` null : le client ne publie aucune porte. Un refus nomme une
+ * déclaration inutilisable (porte absente du disque, chemin qui sort du projet commun) : elle est dite, jamais contournée en silence.
+ */
+export function standardClientAudit(chemin, racine = racineDuParc()) {
+  const vide = { client: null, projet_commun: null, source: null, porte: null, prompt: null, modele: null, tenant: null, conventions: [], refus: [] };
+  const client = dossierClientDe(chemin, racine);
+  if (!client) return vide;
+  const sortie = { ...vide, client: basename(client) };
+  const communs = [client, ...lister(client).filter((e) => e.isDirectory()).map((e) => join(client, e.name))]
+    .filter((d) => existsSync(join(d, "CONVENTIONS-CLIENT.md")) || existsSync(join(d, "STANDARD-AUDIT.json")));
+  for (const commun of communs) {
+    sortie.projet_commun = sortie.projet_commun || commun;
+    const conv = join(commun, "CONVENTIONS-CLIENT.md");
+    if (existsSync(conv)) {
+      try { for (const l of readFileSync(conv, "utf8").split(/\r?\n/)) if (/audit/i.test(l) && l.trim()) sortie.conventions.push(l.trim().slice(0, 320)); } catch { /* illisible : sans ces lignes */ }
+    }
+    const decl = join(commun, "STANDARD-AUDIT.json");
+    if (existsSync(decl)) {
+      let j = null;
+      try { j = JSON.parse(readFileSync(decl, "utf8").replace(/^﻿/, "")); } catch (e) { sortie.refus.push(`${decl} illisible : ${e.message}`); }
+      if (j && typeof j === "object") {
+        for (const c of ["prompt", "modele", "tenant"]) if (typeof j[c] === "string" && j[c].trim()) sortie[c] = j[c].trim();
+        if (typeof j.porte === "string" && j.porte.trim()) {
+          const abs = resolve(commun, j.porte.trim());
+          const dedans = relative(resolve(commun), abs);
+          if (!dedans || dedans.startsWith("..") || isAbsolute(dedans)) sortie.refus.push(`${decl} : la porte « ${j.porte} » sort du projet commun`);
+          else if (!existsSync(abs)) sortie.refus.push(`${decl} : la porte « ${j.porte} » est absente du disque`);
+          else { sortie.porte = abs; sortie.source = "declare"; }
+        }
+      }
+    }
+    if (!sortie.porte) { const p = chercherPorte(commun); if (p) { sortie.porte = p; sortie.source = "detecte"; } }
+    if (sortie.porte) { sortie.projet_commun = commun; break; }
+  }
+  sortie.conventions = [...new Set(sortie.conventions)].slice(0, 5);
+  return sortie;
+}
+
+/** L'état de la preuve de la porte du client : la sortie de sa porte, enregistrée sous forge/audit/<date>/porte-client.txt, fraîche et CONFORME. */
+function etatPorteClient(produit, std, seuil) {
+  const dossierAudit = join(produit, "forge", "audit");
+  let meilleur = null;
+  for (const e of lister(dossierAudit)) {
+    if (!e.isDirectory()) continue;
+    const f = join(dossierAudit, e.name, "porte-client.txt");
+    try { const mt = statSync(f).mtimeMs; if (!meilleur || mt > meilleur.mt) meilleur = { f, mt }; } catch { /* absent : suivant */ }
+  }
+  let frais = true, conforme = null;
+  if (meilleur) {
+    if (Number.isFinite(seuil)) frais = meilleur.mt >= seuil;
+    try { const t = readFileSync(meilleur.f, "utf8"); conforme = /CONFORME/.test(t) && !/NON\s+CONFORME/i.test(t); } catch { conforme = false; }
+  }
+  const nom = basename(std.porte);
+  return { forge: "audit", livrable: "porte-audit-client",
+    libelle: `porte du standard d'audit du client ${std.client} (${nom}) : sa sortie, enregistrée sous forge/audit/<AAAAMMJJ>/porte-client.txt, dit CONFORME${meilleur && conforme === false ? " — la dernière sortie lue dit NON CONFORME" : ""}`,
+    chemins: [PREUVE_PORTE_CLIENT.replace(/\\/g, "/")], present: !!meilleur && frais && conforme === true, trouve: meilleur ? meilleur.f : null,
+    perime: !!meilleur && !frais, ecrit_le: meilleur ? new Date(meilleur.mt).toISOString() : null, porte: std.porte, conforme };
+}
+
 /**
  * Chaque livrable exigé par la ligne, présent (fichier trouvé ET écrit après la demande) ou manquant.
  * TF-2136 : un fichier d'une demande antérieure (mtime < ts de la demande) ne compte pas comme livré —
@@ -388,6 +485,12 @@ export function etatDesLivrables(produit, carte, ligne) {
     const present = !!trouve && frais;
     etats.push({ forge, livrable: id, libelle: l.libelle, chemins: l.chemins || [], present, trouve,
       perime: !!trouve && !frais, ecrit_le: ecritLe != null ? new Date(ecritLe).toISOString() : null });
+  }
+  // TF-2144 : forge-audit mobilisée chez un produit d'un client qui publie une porte d'audit → la sortie de cette porte est exigée aussi.
+  // Non rétroactif : une demande tracée avant le 05/11/2026 n'est pas jugée sur ce livrable.
+  if (normaliserVerdict(ligne?.verdicts?.audit?.verdict) === "mobilisee" && String(ligne?.ts || "").slice(0, 10) >= STANDARD_AUDIT_DEPUIS) {
+    const std = standardClientAudit(produit);
+    if (std.porte) etats.push(etatPorteClient(produit, std, seuil));
   }
   return { etats, manquants: etats.filter((e) => !e.present) };
 }

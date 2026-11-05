@@ -255,11 +255,26 @@ check("--contexte-json : la sortie est UN objet JSON SessionStart, sans texte au
   if (typeof h.additionalContext !== "string" || !h.additionalContext) throw new Error("additionalContext absent ou vide");
 });
 
+// Deux lancements successifs diffèrent par construction sur des valeurs VIVANTES seulement : l'horodatage du relevé précédent (le
+// premier lancement l'a écrit), une durée en millisecondes et, depuis TF-2151, les COMPTES que les lignes MS2 et le verdict d'
+// `oracle-modeles-en-service` lisent dans les transcripts du poste (« 229 réponse(s) lues », « sur 400 fichier(s) ») : d'autres
+// sessions les font grandir entre les deux lancements. Elles sont neutralisées, et rien d'autre : toute autre différence reste une perte.
+const neutreAvant = (t) => t.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g, "<horodatage>").replace(/\ben \d+ ms\b/g, "en <durée> ms");
+const neutre = (t) => neutreAvant(t).replace(/\b\d+( réponse\(s\))/g, "<n>$1").replace(/\b(lue\(s\) sur )\d+( fichier\(s\))/g, "$1<n>$2");
+
+check("TF-2151 rouge → vert — des comptes de transcripts qui ont grandi entre deux lancements ne comptent plus pour une perte du relevé", () => {
+  const grandi = sortieOuverturePilot.replace(/\b(\d+)( réponse\(s\))/g, (_, n, s) => `${Number(n) + 7}${s}`).replace(/(lue\(s\) sur )(\d+)( fichier\(s\))/g, (_, a, n, s) => `${a}${Number(n) + 3}${s}`);
+  if (grandi === sortieOuverturePilot) throw new Error("le relevé ne porte aucun compte de transcripts : le cas ne prouve rien (ligne MS2 absente ?)");
+  const perdues = (a, b, f) => f(a).split(NL).map((l) => l.trimEnd()).filter(Boolean).filter((l) => !f(b).includes(l));
+  if (!perdues(sortieOuverturePilot, grandi, neutreAvant).length) throw new Error("rouge perdu : l'ancienne neutralisation accepte déjà des comptes qui ont grandi");
+  const apres = perdues(sortieOuverturePilot, grandi, neutre);
+  if (apres.length) throw new Error(`${apres.length} ligne(s) encore perdue(s) après neutralisation, dont : ${apres[0].slice(0, 160)}`);
+  // La borne : une AUTRE différence (une version servie qui change de nom) reste une perte.
+  const autre = sortieOuverturePilot.replace(/claude-[a-z]+-\d+-\d+/, "claude-autre-9-9");
+  if (autre !== sortieOuverturePilot && !perdues(sortieOuverturePilot, autre, neutre).length) throw new Error("une version servie qui change de nom n'est plus vue comme une perte");
+});
+
 check("--contexte-json : le contexte porte TOUT le relevé texte, et l'en-tête d'asynchronie", () => {
-  // Deux lancements successifs diffèrent par construction sur DEUX valeurs seulement : l'horodatage
-  // du relevé précédent (le premier lancement l'a écrit) et une durée en millisecondes. Elles sont
-  // neutralisées, et rien d'autre : toute autre différence reste une perte.
-  const neutre = (t) => t.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g, "<horodatage>").replace(/\ben \d+ ms\b/g, "en <durée> ms");
   const ctx = neutre(JSON.parse(sortieJson).hookSpecificOutput.additionalContext);
   const manquantes = neutre(sortieOuverturePilot).split(NL).map((l) => l.trimEnd()).filter(Boolean).filter((l) => !ctx.includes(l));
   if (manquantes.length) throw new Error(`${manquantes.length} ligne(s) du relevé absente(s) du contexte, dont : ${manquantes[0].slice(0, 120)}`);
