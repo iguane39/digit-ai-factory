@@ -435,7 +435,7 @@
   "vu_le": "2026-11-04"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 62,
+  "cas": 64,
   "vu_le": "2026-11-05"
  },
  "oracles/hook-publication-hebergee.test.mjs": {

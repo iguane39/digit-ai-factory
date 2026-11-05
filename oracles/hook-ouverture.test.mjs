@@ -782,8 +782,21 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   const ROUGE = { ts: "2026-10-21T08:00:00.000Z", evenement: "rouge-neuf", depot: "digit-ai-forge-design", regle: "C1", commande: "node oracles/self-test.mjs",
     skills: ["digit-ai-page-html"], extrait: "[FAIL] V23 contenu sous 75 % de la fenetre" };
   // Joué comme la session du pilot (sans --pilot) ou comme celle d'un produit (--pilot), la trace désignée par FORGE_TRACE_CONSOMMATEURS.
-  const jouerOuverture = (cwd, enProduit) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
-    { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_TRACE_CONSOMMATEURS: trace } });
+  // TF-2179 (05/11/2026) : le parc est JETABLE (FORGE_ROOT), comme dans le banc D-135 plus bas et dans les bancs TF-1521. Sans lui, l'ouverture du pilot
+  // relevait l'héritage des produits RÉELS du poste : mesuré le 05/11/2026 sur 31 produits, `relever-heritage.mjs` prenait 92 s, l'ouverture entière
+  // 107 à 132 s pour une borne de 120 s, donc ETIMEDOUT dès que d'autres agents jouaient en même temps ; joué seul, le cas passait. Ce banc ne juge
+  // que la section des consommateurs : son verdict ne doit pas dépendre du nombre de produits du poste ni de sa charge.
+  const parc = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-parc-"));
+  mkdirSync(join(parc, "produit-factice", "forge"), { recursive: true });
+  writeFileSync(join(parc, "produit-factice", "forge", "ledger.jsonl"), "", "utf8");
+  const durees = [];
+  const jouerOuverture = (cwd, enProduit) => {
+    const t0 = Date.now();
+    try {
+      return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
+        { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_TRACE_CONSOMMATEURS: trace, FORGE_ROOT: parc } });
+    } finally { if (!enProduit) durees.push(Date.now() - t0); }
+  };
   const cwd = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-cwd-"));
   const SECTION = "## Consommateurs des skills";
   check("TF-2048 vert — sans trace, l'ouverture du pilot ne dit rien des consommateurs", () => {
@@ -802,6 +815,15 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   writeFileSync(trace, JSON.stringify(ROUGE) + NL + JSON.stringify({ ts: "2026-11-02T08:00:00.000Z", evenement: "leve", depot: "digit-ai-forge-design" }) + NL, "utf8");
   check("TF-2048 remède joué — le rouge levé par un rejeu ne revient plus à l'ouverture", () => {
     if (jouerOuverture(cwd, false).includes(SECTION)) throw new Error("un rouge levé est encore dit");
+  });
+  // TF-2179 : le sens rouge de l'isolement. Sur le parc réel du poste (31 produits le 05/11/2026) ce passage relevait 31 produits ; sur le parc jetable
+  // il n'en relève qu'un. La durée de chaque passage est DITE dans le nom du cas, pas bornée plus bas que le délai de 120 s de l'appel : une borne
+  // serrée remettrait le verdict sous la dépendance de la charge. Mesure avant : 107 à 132 s ; après : voir le nom du cas.
+  let dit = "", panne = null;
+  try { dit = jouerOuverture(cwd, false); } catch (e) { panne = e; }
+  check(`TF-2179 — le cas ouvre le pilot sur son parc jetable (1 produit relevé, pas les produits réels du poste) : ${durees.length} passages du pilot, de ${Math.min(...durees)} à ${Math.max(...durees)} ms, délai 120 000 ms`, () => {
+    if (panne) throw new Error(`l'ouverture du pilot n'a pas rendu la main : ${String(panne.message).slice(0, 160)}`);
+    if (!/- 1 produit\(s\) relevé\(s\)/.test(dit)) throw new Error(`le relevé d'héritage ne porte pas le seul produit factice : ${(dit.split("## Héritage des produits")[1] || "section absente").slice(0, 200)}`);
   });
 }
 
