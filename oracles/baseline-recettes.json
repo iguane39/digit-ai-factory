@@ -47,8 +47,8 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 36,
-  "vu_le": "2026-11-04"
+  "cas": 39,
+  "vu_le": "2026-11-05"
  },
  "gabarits/ledger.test.mjs": {
   "cas": 30,
@@ -140,15 +140,15 @@
   "vu_le": "2026-09-22"
  },
  "oracle-claude-md.mjs": {
-  "cas": 14,
-  "vu_le": "2026-09-10"
+  "cas": 18,
+  "vu_le": "2026-11-05"
  },
  "oracle-coherence-restitution.mjs": {
   "cas": 4,
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 202,
+  "cas": 216,
   "vu_le": "2026-11-05"
  },
  "oracle-constantes-externes.mjs": {
@@ -347,7 +347,7 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 294,
+  "cas": 305,
   "vu_le": "2026-11-05"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
@@ -451,7 +451,7 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution-frictions.test.mjs": {
-  "cas": 30,
+  "cas": 39,
   "vu_le": "2026-11-05"
  },
  "oracles/hook-restitution-moyen.test.mjs": {
@@ -693,6 +693,10 @@
  "scripts/produire-plan-ancres.test.mjs": {
   "cas": 19,
   "vu_le": "2026-09-23"
+ },
+ "scripts/ranger-secret.test.mjs": {
+  "cas": 51,
+  "vu_le": "2026-11-05"
  },
  "scripts/readme-dossiers.test.mjs": {
   "cas": 37,
