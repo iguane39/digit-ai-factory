@@ -6,7 +6,7 @@ destinataire: humain
 
 ## 0. Synthèse d'ouverture
 
-La boîte des retours est vide, et 25 sujets du registre sont clos, chacun avec sa recette rouge puis verte. Les forges savent désormais garder les mêmes identifiants de test d'un déploiement à l'autre, comme vous l'aviez demandé, refuser un appel de modèle tenu sous un verrou de base, et montrer une erreur de saisie sous son champ. Les 5 forges touchées sont publiées. Avant l'accueil, j'ai corrigé un défaut qui aurait nommé 3 lots « [object Object] ». Le pilot attend d'être publié avec cette synthèse. Deux décisions vous reviennent : l'identité sous laquelle les forges publient, et le sort d'une consigne qui touche une doctrine.
+La boîte des retours est vide, et 25 sujets du registre sont clos, chacun avec sa recette rouge puis verte. Les forges savent désormais garder les mêmes identifiants de test d'un déploiement à l'autre, comme vous l'aviez demandé, refuser un appel de modèle tenu sous un verrou de base, et montrer une erreur de saisie sous son champ. Les 5 forges touchées et le pilot sont publiés. Avant l'accueil, j'ai corrigé un défaut qui aurait nommé 3 lots « [object Object] ». Deux décisions vous reviennent : l'identité sous laquelle les forges publient, et le sort d'une consigne qui touche une doctrine.
 
 Livré : [Synthèse du 05/11, retours et TODOs](Digit-AI%20-%20Synthese%20Mandat%20-%20Retours%20et%20TODOs%20du%2005-11%20-%2020261105d.md)
 
@@ -20,7 +20,7 @@ Test rétro : le résultat sert cette intention. Le sas est vide, 25 sujets sont
 
 ## 2. Verdict
 
-25 sujets clos sur 32 confiés, 4 restés en cours avec leur mesure, 2 posés à vous ; `oracle-todo` rend PASS après chacune des 5 écritures du registre ; 5 forges publiées, 0 commit en avance vérifié par `rev-list`.
+25 sujets clos sur 32 confiés, 4 restés en cours avec leur mesure, 2 posés à vous ; `oracle-todo` rend PASS après chacune des 5 écritures du registre ; 5 forges et le pilot publiés, 0 commit en avance vérifié par `rev-list`.
 
 ## 3. Décisions attendues
 
@@ -65,11 +65,11 @@ Le tour a d'abord vidé le sas, puis confié les 32 sujets à 7 agents de constr
   - Le ledger joue le contrôle de parcours réel à l'écriture d'une clôture « prêt » (TF-2152), et lit le rapport de forge-tests (TF-2153).
   - Un oracle neuf refuse un appel de modèle tenu sous une transaction d'écriture (TF-2163) : 0 faux constat sur 287 fichiers Python de 3 forges, rapporté par l'agent et non recompté.
   - V15 (la règle de `render_page` qui accuse un en-tête posé sur ses lignes) ne compte plus un en-tête invisible parce que rogné (TF-2170) ; un menu déplié ne lève plus de faux défaut d'alignement (TF-2162) ; le filtre doublé est refusé (TF-2158) ; le script de recherche ne fait plus lever de faux constat de cache (TF-2094).
-- **forge-tests**, fixture rouge de V15 réécrite par la session : 8 passés sur son fichier, commit e9824ba.
+- **forge-tests**, pytest rejoué par la session sur l'état publié : exit 0, aucun échec ; fixture rouge de V15 réécrite par la session, 8 passés sur son fichier, commit e9824ba.
   - La configuration d'audit vit chez le produit, et une application non désignée est refusée avec la ligne à recopier (TF-2161).
   - Un outil Python autonome reçoit un verdict au pan back (TF-2173).
   - Le parcours de chaque persona se joue sous l'identité de son rôle contre l'instance servie (TF-2123).
-- **forge-design**, self-test de l'agent : 71 oracles verts.
+- **forge-design**, self-test rejoué par la session sur l'état publié : 71 oracles et 169 règles verts.
   - T4-2 (la règle qui accuse un état vide sans invitation à agir) ne prend plus une carte de choix pour un état vide (TF-2162).
   - Une application exige une visite guidée et un lexique à infobulles (TF-2158).
   - Un oracle neuf refuse une erreur de saisie affichée loin de son champ, et un composant de saisie la pose sous le champ (TF-2172) ; 3 mutations du composant sont refusées.
