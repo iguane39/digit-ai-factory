@@ -86,6 +86,16 @@
         ]
       },
       {
+        "matcher": "Bash|PowerShell|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-lecons.mjs\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "Agent|Task",
         "hooks": [
           {

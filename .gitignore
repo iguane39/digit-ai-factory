@@ -69,3 +69,8 @@ __pycache__/
 
 # 29/10/2026 : worktrees des agents (isolation worktree), état machine fusionné dans main — ils faisaient tomber le relevé d ouverture en DEFAUT au-delà de 48 h.
 .claude/worktrees/
+
+# TF-2150 (04/11/2026) : journaux de session des leçons, état machine — les rappels servis au geste par
+# oracles/hook-lecons.mjs et les frictions du tour (TF-2141) ; `scripts/lecons.mjs --recidives` les croise.
+.claude/lecons-rappels.jsonl
+.claude/frictions.jsonl
