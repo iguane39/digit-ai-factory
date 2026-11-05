@@ -172,6 +172,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` | fichier | 18,3 Ko | Synthèse de mandat : le rejeu est joué en entier ; Opus 5.5 à l'effort high réussit les 6  |
 | `Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` | fichier | 9,9 Ko | Point d'étape : vos décisions D-5 (a), D-6 (a) et D-7 (a) sont exécutées ; le rejeu de 38  |
 | `Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` | fichier | 7,1 Ko | Synthèse Mandat — campagne du matin reprise et close, relecteur du lecteur visé construit  |
+| `Digit-AI - Synthese Mandat - Releve des couts par session construit - 20261105g.md` | fichier | 6,8 Ko | Synthèse Mandat — relevé des temps, des jetons et de la charge à la fin de chaque session, |
 | `Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md` | fichier | 7,9 Ko | Synthèse Mandat — réponses « 68a, 69a, 70a, 73b » : registre à jour, T1 engagée, relecture |
 | `Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md` | fichier | 6,7 Ko | Synthèse Mandat — réponses 75c, 76c, 77b, 78c et 80b : quatre chantiers lancés, D-79 expli |
 | `Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md` | fichier | 8,3 Ko | Synthèse Mandat — réponses 81 à 84 : trois sur quatre livrées, la quatrième en constructio |
@@ -209,4 +210,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_188 fichier(s), 4 sous-dossier(s)_
+_189 fichier(s), 4 sous-dossier(s)_

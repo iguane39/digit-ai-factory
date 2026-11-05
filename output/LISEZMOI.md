@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 656 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 657 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -662,6 +662,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md | 20261001k | 18.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` |
 | Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md | 20261001m | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` |
 | Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md | 20261013k | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` |
+| Digit-AI - Synthese Mandat - Releve des couts par session construit - 20261105g.md | 20261105g | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Releve des couts par session construit - 20261105g.md` |
 | Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md | 20261026f | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md` |
 | Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md | 20261026k | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md` |
 | Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md | 20261026t | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md` |
