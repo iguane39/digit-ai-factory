@@ -21,6 +21,8 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\tics-redactionnels.json` | Donnée fermée des familles de tournures creuses (seuils de densité, antériorité), jouée par `oracles\oracle-ecriture.mjs` |
 | `references\EMPREINTES.md` | Empreintes : un seul format, et un registre qui le fait tenir |
 | `references\ETAPES-RUN.md` | Étapes d'un run produit, détail opérationnel |
+| `references\EXIGENCES-PROJET.json` | Les 70 exigences des règles de `REGLES-PROJET.md`, chacune sous un identifiant stable `R-<n>.<i>` avec le contrôle qui la juge ; le taux de couverture se calcule sur elles, jugé par `oracles\oracle-couverture-exigences.mjs` (TF-0548) |
+| `references\EXTENSIONS-JUGEES.json` | Source unique, datée et motivée, des extensions de fichier qu'un contrôle du pilot juge (décision D-15 (a) du 17/09/2026, TF-1266) ; lue par `scripts\lib-extensions-jugees.mjs`, une famille de livrable neuve s'y ajoute sans toucher aux contrôles |
 | `references\GARDE-FOUS-PLATEFORME.json` | Donnée datée et sourcée des garde-fous de plateforme relevés chez les produits, par client sous pseudonyme ; lue avant de concevoir un déploiement (`ETAPE-MEP.md` § 1 ter, porte M-11) et jugée par `scripts\verifier-garde-fous.mjs` |
 | `references\GESTES-DISTANTS.md` | Gestes destructifs distants (suppression, droits, histoire distante réécrite) : une décision groupée par tour, jamais une par commande (D-77 (b) amendée du 26/10/2026, TF-1959) ; liste fermée, format du lot approuvé, limites ; jouée par `oracles\hook-gestes-distants.mjs` |
 | `references\INTEGRATIONS-FOURNISSEURS.md` | Faits mesurés sur les interfaces de fournisseurs |
