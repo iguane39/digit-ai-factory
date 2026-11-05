@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 648 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 649 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -660,6 +660,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md | 20261026k | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md` |
 | Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md | 20261026t | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md` |
 | Digit-AI - Synthese Mandat - Reponses 81 a 84 executees et publiees - 20261026x.md | 20261026x | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 81 a 84 executees et publiees - 20261026x.md` |
+| Digit-AI - Synthese Mandat - Reponses D-165 a D-169 appliquees - 20261105a.md | 20261105a | 11.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses D-165 a D-169 appliquees - 20261105a.md` |
 | Digit-AI - Synthese Mandat - Reponses de la revue D-114 a D-119 construites - 20261102k.md | 20261102k | 8.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses de la revue D-114 a D-119 construites - 20261102k.md` |
 | Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md | 20261015i | 4.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` |
 | Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md | 20261015j | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` |
