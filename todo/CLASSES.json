@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.64.0",
+ "version": "1.65.0",
  "date": "2026-11-04",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -3089,6 +3089,48 @@
    ],
    "regle": "forge-design : un logo se juge rendu à 16 et 32 px",
    "oracle": "forge-design oracles/oracle-logo-petit.mjs LP1 à LP5"
+  },
+  {
+   "voisines": [
+    "trace-de-mobilisation-partagee-entre-sessions"
+   ],
+   "cle": "verrou-livre-sans-fraicheur",
+   "famille": "hook-ou-gate",
+   "libelle": "Le verrou « livré » accepte un livrable antérieur à la demande qu'il est censé clore. Proposée par Produit-84 (2026-11-04).",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2136"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261104a RT-41) : mobiliser --verifier ne rend PRESENT qu'un livrable écrit après l'horodatage de la demande, sinon MANQUANT",
+   "oracle": "pilot, scripts/mobiliser.mjs --verifier (S85) et scripts/mobiliser.test.mjs (porteur partiel : la fraîcheur du livrable reste à y juger, TF-2136)"
+  },
+  {
+   "voisines": [
+    "contrainte-client-connue-non-consultee"
+   ],
+   "cle": "standard-client-ignore-par-le-routage",
+   "famille": "hook-ou-gate",
+   "libelle": "Le routage d'une demande vers une forge générique ignore le standard que le client publie pour ce livrable (prompt, modèle, référentiel, porte). Proposée par Produit-84 (2026-11-04).",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2144"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261104d RT-44) : le routage lit d'abord le standard du client (conventions client, projet commun) et la mobilisation exige sa porte",
+   "oracle": "pilot, oracles/hook-lexique.mjs et oracles/lib-mobilisation.mjs (porteur partiel : ni l'un ni l'autre ne lit encore le standard du client, TF-2144)"
+  },
+  {
+   "voisines": [
+    "remontee-declaree-nulle-apres-correction"
+   ],
+   "cle": "correction-de-livrable-restee-au-produit",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une correction humaine d'un livrable produit par une forge reste chez le produit au lieu d'être portée dans la forge qui le génère. Proposée par Produit-84 (2026-11-04).",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2145"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261104e RT-45) : une demande humaine de correction d'un livrable de forge se remonte comme demande de portage dans la forge ; doctrine du format posée à l'humain sous D-171",
+   "oracle": "pilot, gabarits/oracle-lot-retours.mjs (porteur partiel : il juge la forme du lot, pas encore la présence d'une demande de portage, TF-2145)"
   }
  ],
  "cliquet_porteur": {
