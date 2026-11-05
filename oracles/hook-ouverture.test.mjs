@@ -375,6 +375,38 @@ check("TF-1755 — fusion : chaque entrée absente du gabarit ajoutée, rien de 
   if (fusionnerHooksDuGabarit(f, GABARIT_SETTINGS).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
 });
 
+// ---- TF-2185 (05/11/2026) : UNE ENTRÉE PRÉSENTE DONT LE GABARIT A ÉLARGI LE MATCHER S'ÉLARGIT -----------
+// Mesuré le 05/11 : `lecons` restait sur `Bash|PowerShell|Write|Edit|MultiEdit` chez le produit du poste qui
+// le portait, après que le gabarit l'a passé à `…|Agent|Task` (TF-1947). Vert : seule, l'entrée prend le
+// matcher du gabarit ; dans un groupe mêlé, elle seule en sort et le hook du produit garde son matcher.
+// Rouge : un matcher que le produit a rendu différent n'est pas touché ; une seconde passe n'ajoute rien.
+check("TF-2185 — fusion : matcher élargi par le gabarit porté à l'entrée présente, jamais rétréci ni dupliqué", () => {
+  const mG = JSON.parse(readFileSync(GABARIT_SETTINGS, "utf8")).hooks.PreToolUse
+    .find((g) => g.hooks.some((h) => /factory\.mjs"?\s+lecons\b/.test(h.command))).matcher;
+  const ANCIEN = "Bash|PowerShell|Write|Edit|MultiEdit";
+  if (!mG.split("|").includes("Agent") || mG === ANCIEN) throw new Error(`témoin mal construit : matcher du gabarit ${mG}`);
+  const lecons = { type: "command", command: 'node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" lecons', timeout: 10 };
+  const mien = { type: "command", command: "node scripts/mon-hook.mjs", timeout: 5 };
+  const joueCas = (groupes) => {
+    const f = join(mkdtempSync(join(tmpdir(), "ouverture-elargir-")), "settings.json");
+    writeFileSync(f, JSON.stringify({ hooks: { PreToolUse: groupes } }, null, 2), "utf8");
+    const r = fusionnerHooksDuGabarit(f, GABARIT_SETTINGS);
+    const gs = JSON.parse(readFileSync(f, "utf8")).hooks.PreToolUse;
+    const porteurs = gs.filter((g) => g.hooks.some((h) => /factory\.mjs"?\s+lecons\b/.test(h.command)));
+    if (porteurs.length !== 1 || porteurs[0].hooks.filter((h) => /lecons/.test(h.command)).length !== 1) throw new Error("lecons absent ou en double");
+    if (fusionnerHooksDuGabarit(f, GABARIT_SETTINGS).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
+    return { r, gs, porteur: porteurs[0] };
+  };
+  const seul = joueCas([{ matcher: ANCIEN, hooks: [{ ...lecons }] }]);
+  if (seul.porteur.matcher !== mG || !(seul.r.elargis || []).includes("lecons")) throw new Error(`entrée seule : matcher ${seul.porteur.matcher}, élargies ${JSON.stringify(seul.r.elargis)}`);
+  const mele = joueCas([{ matcher: ANCIEN, hooks: [{ ...mien }, { ...lecons }] }]);
+  const groupeMien = mele.gs.find((g) => g.hooks.some((h) => h.command === mien.command));
+  if (mele.porteur.matcher !== mG || groupeMien?.matcher !== ANCIEN || groupeMien.hooks.length !== 1) throw new Error("groupe mêlé : le hook du produit a changé de matcher ou lecons n'en est pas sorti");
+  const PROPRE = "Bash|PowerShell|Write|Edit|MultiEdit|Read";
+  const propre = joueCas([{ matcher: PROPRE, hooks: [{ ...lecons }] }]);
+  if (propre.porteur.matcher !== PROPRE || (propre.r.elargis || []).length) throw new Error("un matcher propre au produit a été réécrit");
+});
+
 check("TF-1755 — par le hook d'ouverture : produit muni du lanceur complété et le geste DIT ; produit sans lanceur intact", () => {
   const avec = mkdtempSync(join(tmpdir(), "ouverture-fusion-hook-"));
   mkdirSync(join(avec, ".claude"), { recursive: true });

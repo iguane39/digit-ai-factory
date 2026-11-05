@@ -56,7 +56,8 @@ const lignesFusion = [];
 if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "hooks", "factory.mjs"))) {
   const fu = fusionnerHooksDuGabarit(join(process.cwd(), ".claude", "settings.json"), join(PILOT, "gabarits", "settings-produit.json"));
   if (fu.etat === "corrige") lignesFusion.push("## Câblage des hooks de la factory (TF-1755)",
-    `- \`.claude/settings.json\` : ${fu.ajoutes.length} entrée(s) du gabarit ajoutée(s) — ${fu.ajoutes.join(", ")} ; rien d'autre n'est touché. Actives à la prochaine session. Enregistrer ce changement avec le travail du produit ; pour en écarter une, la déclarer sous \`_hooks_factory_exclus\` avec son motif.`
+    `- \`.claude/settings.json\` : ${fu.ajoutes.length} entrée(s) du gabarit ajoutée(s)${fu.ajoutes.length ? ` — ${fu.ajoutes.join(", ")}` : ""}`
+      + (fu.elargis?.length ? `, ${fu.elargis.length} élargie(s) au matcher du gabarit — ${fu.elargis.join(", ")} (TF-2185)` : "") + ` ; rien d'autre n'est touché. Actives à la prochaine session. Enregistrer ce changement avec le travail du produit ; pour en écarter une, la déclarer sous \`_hooks_factory_exclus\` avec son motif.`
       + (fu.exclus.length ? ` Exclusion(s) déclarée(s) et respectée(s) : ${fu.exclus.join(", ")}.` : ""), "");
   else if (fu.etat === "illisible" || fu.etat === "gabarit_illisible") lignesFusion.push("## Câblage des hooks de la factory (TF-1755)", `- fusion NON jouée (${fu.etat} : ${fu.detail}) : les entrées neuves du gabarit n'atteignent pas ce produit.`, "");
   // TF-1903 (21/10/2026) — ET LA COMMANDE RELATIVE DU LANCEUR S'ANCRE EN PLACE sur la racine du projet : après un `cd`
