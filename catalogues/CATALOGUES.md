@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 109 services · 91 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 110 services · 92 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -32,7 +32,7 @@
 | cat-des-09 | **Contrôler la généricité d'une interface (règles importées)** | vérifier mécaniquement ce qui, dans un rendu, trahit une interface faite par défaut | `node oracles\oracle-taste.mjs <page.html>` | TF-0199 (14/08) : règles extraites d'une source externe MIT (consultée le 14/08), self-test 13 oracles / 56 règles. TA1/TA2 rétrogradées APRÈS mesure : la borne de saturation condamnait toute palette OKLCH du corpus, et la source se contredit (son propre accent recommandé viole sa règle) | prouve | experimental |
 | cat-des-10 | **Thème Power BI dérivé de la marque** | livrer des rapports Power BI au thème de la marque, jamais au thème par défaut | `node scripts\generer-theme-powerbi.mjs <tokens.json> --sortie <theme.json> · node oracles\oracle-theme-powerbi.mjs <tokens.json> <theme.json>` | TF-0863 (07/09) : self-test double sens (verte = régénération du corpus, rouge = thème par défaut Power BI → TP2, TP3) | prouve | experimental |
 
-## forge-development (pipeline) — 9 services
+## forge-development (pipeline) — 10 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -45,6 +45,7 @@
 | cat-dev-07 | **Gate de mutation (3e métrique)** | mesurer la force réelle de mes tests, pas seulement leur couverture | `digit-ai-forge-development\conductor\gates\mutation_gate.py + job CI mutation` | TF-0103 (12/08) : mesure réelle Docker 61,1 % (223/365) — honnête, sous seuil, consignée | prouve | experimental |
 | cat-dev-08 | **Gate parité runtime (conteneur Python, Worker Cloudflare)** | vérifier que ce que mes tests exécutent est ce que la production sert | `uv run python -m conductor.gates.runtime_parity_gate <repo cible>` | TF-1042 (13 cas) et TF-1998 du 29/10/2026 (16 cas double sens ; configurations synthétiques, aucun Worker exécuté) | prouve | experimental |
 | cat-dev-09 | **Gate Supabase côté serveur** | bloquer une session lue sans vérification côté serveur, un paquet auth-helpers et un proxy.ts ignoré | `uv run python -m conductor.gates.supabase_ssr_gate <repo cible>` | TF-2008 du 29/10/2026 : 14 cas double sens, pages supabase.com lues le 29/10/2026 | prouve | experimental |
+| cat-dev-10 | **Gate des erreurs de formulaire** | refuser une saisie refusée affichée loin de son champ, sans champ désigné ni forme attendue | `uv run python -m conductor.gates.formulaire_erreurs_gate <repo cible> <forge-design> <adresse d un écran> [<autre adresse> …]` | TF-2172 du 05/11/2026 : 30 cas, dont 4 sur l'oracle réel ; le bandeau « Refusé : CIBLE_INVALIDE » traversait les 6 gates existants et rend FAIL | prouve | experimental |
 
 ## forge-tests (pipeline) — 10 services
 
