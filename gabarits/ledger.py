@@ -48,12 +48,14 @@ RUNS = FORGE.parent / "runs"
 # qui suivait la doctrine voyait son entrée refusée comme type inconnu (retour RT-38, TF-2083,
 # 29/10/2026, même classe que RT-28). La recette croise désormais ce vocabulaire avec les types que
 # les oracles du pilot ET les gabarits de doctrine prescrivent, pour que la dérive ne se répète pas.
+# `secret_range` est l'entrée du geste `forge/ranger-secret.mjs` (TF-2127, D-167 (a), 04/11/2026) : le nom, l'empreinte
+# et la date d'un secret rangé au fichier d'environnement local, jamais sa valeur.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
          "run_close", "rectification_versions_forges", "rectification_run_open",
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
-         "deplacement_en_attente"}
+         "deplacement_en_attente", "secret_range"}
 
 
 def chemin(run: str = "") -> pathlib.Path:

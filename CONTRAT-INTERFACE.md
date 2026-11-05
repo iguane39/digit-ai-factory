@@ -136,7 +136,8 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   guetté + ts — TF-0173, §4 ter), `demande_emise` et `demande_recue` (un produit demande une
   évolution à un autre, §3 sexies), `deplacement_en_attente` et `deplacement_effectue` (version
   antérieure tenue ouverte, règle 7 de `REGLES-PROJET.md`), `rectification_forges_mobilisees`
-  (TF-1715, ci-dessous), `run_close`.
+  (TF-1715, ci-dessous), `secret_range` (TF-2127, D-167 (a) du 04/11/2026 : le nom, l'empreinte sha256 et la date d'un
+  secret que `forge/ranger-secret.mjs` a rangé au fichier d'environnement local du produit, jamais sa valeur), `run_close`.
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
   quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
   jugé selon ses propres règles). Sous `1.1`, `run_open` porte aussi **`forges_mobilisees`**, un
