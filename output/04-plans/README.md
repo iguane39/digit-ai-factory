@@ -185,7 +185,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Restes de campagne corriges et largeur des gabarits - 20261103b.md` | fichier | 10,4 Ko | Synthèse Mandat — 2 restes sur 3 corrigés et publiés, 1 décision pour la largeur des gabar |
 | `Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` | fichier | 12,2 Ko | Synthèse Mandat — retours et sujets qui attendaient ce poste (14/10/2026) |
 | `Digit-AI - Synthese Mandat - Retours et TODOs du 04-11 - 20261104a.md` | fichier | 17,6 Ko | Synthèse Mandat — retours du 03/11 ingérés, 23 sujets du registre clos (04/11/2026) |
-| `Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md` | fichier | 14,7 Ko | Synthèse Mandat — 5 lots de retours ingérés, 25 sujets du registre clos (05/11/2026) |
+| `Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md` | fichier | 11,3 Ko | Synthèse Mandat — 5 lots de retours ingérés, 25 sujets du registre clos (05/11/2026) |
 | `Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` | fichier | 10,3 Ko | Synthèse Mandat — retours du jour ingérés, 19 sujets du registre clos (29/10/2026) |
 | `Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` | fichier | 16,6 Ko | Synthèse Mandat — revue des 6 décisions posée, 6 restes de la campagne clos (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` | fichier | 8,3 Ko | Synthèse Mandat — revue de code proposée à la mise en production (03/11/2026) |

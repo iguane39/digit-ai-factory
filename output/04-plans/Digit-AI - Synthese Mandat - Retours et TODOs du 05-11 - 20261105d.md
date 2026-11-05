@@ -24,35 +24,7 @@ Test rétro : le résultat sert cette intention. Le sas est vide, 25 sujets sont
 
 ## 3. Décisions attendues
 
-> **D-175 — Sous quelle identité les forges publient-elles leurs envois, quand le profil de session est lié au compte d'un client (TF-2168) ?**
->
-> - **De quoi s'agit-il** : le mandat permanent d'écriture et de publication des forges, et le compte GitHub sous lequel `git push` part ; le profil de session d'un produit client désigne son propre compte par la variable `GH_CONFIG_DIR`.
-> - **Le problème** : le 05/11 à 09:17, l'envoi de `digit-ai-forge-audit` a été refusé (403) sous le compte du profil client, puis publié à 09:18 sans cette variable. Un agent a pris pour suspect l'envoi légitime d'une autre session, parce que son contrat ne cite pas le mandat.
-> - **Pourquoi vous** : c'est une règle de publication, et elle choisit un compte qui écrit sur vos dépôts publics.
-> - **Recommandation : (a)** — le compte du poste est celui qui a publié avec succès à 09:18, et le geste se borne à la seule commande d'envoi. Source consultée : le lot `Produit-84 - RETOURS - 20261105a`, remarque RT-46.
-
-| Option | Ce qui se passe | Coût | Retour arrière |
-|---|---|---|---|
-| (a) *(recommandée)* Publier sous le compte du poste | L'envoi vers une forge retire `GH_CONFIG_DIR` pour cette seule commande, et le contrat des agents de campagne cite le mandat | Une session au pilot | Possible : la règle se retire |
-| (b) Déclarer un compte par dépôt | Un référentiel nomme le compte de chaque dépôt distant, et le lanceur le sélectionne | Une session et demie | Possible |
-| (c) Ne rien changer | Un refus 403 se règle à la main, au cas par cas | Nul, sauf le temps du refus | Sans objet |
-
-> **Sans réponse** : (c), ne rien changer.
-
-> **D-176 — Faut-il qu'une session reformule et fasse confirmer en une ligne toute consigne du porteur qui touche une doctrine, avant d'en tirer des options (TF-2159) ?**
->
-> - **De quoi s'agit-il** : ce qu'une session fait d'une consigne du porteur qui touche une règle de fond ; le produit de tests d'intrusion propose de la reformuler et de la faire confirmer (`input/00-retours/Produit-86 - RETOURS - 20261104a.md`).
-> - **Le problème** : le 03/11, une consigne lue comme interdisant le Docker local a été transformée en 2 décisions à options, D-46 et D-47 du produit ; le porteur a dû la rappeler le 04/11.
-> - **Pourquoi vous** : c'est une règle de doctrine, elle change la façon dont toutes les sessions traitent vos consignes.
-> - **Recommandation : (b)** — une consigne donnée est déjà une décision ; vos préférences demandent de ne poser une question que si la réponse change le livrable. Source consultée : `references/PREFERENCES-PORTEUR.md`.
-
-| Option | Ce qui se passe | Coût | Retour arrière |
-|---|---|---|---|
-| (a) Reformuler et faire confirmer | La session reformule la consigne en une ligne et attend votre accord avant d'agir | Un échange de plus par consigne de doctrine | Possible |
-| (b) *(recommandée)* Appliquer telle quelle | La consigne s'applique, citée mot pour mot ; une reformulation n'est demandée que si 2 lectures changent le livrable | Une session au pilot | Possible |
-| (c) Ne rien changer | Une consigne peut encore devenir des options | Nul ; un rappel de votre part à chaque dérive | Sans objet |
-
-> **Sans réponse** : (c), ne rien changer.
+Aucune décision ne vous revient. Les 2 posées ici, sur l'identité de publication et sur les consignes qui touchent une doctrine, ont reçu votre réponse le 05/11/2026 et sont appliquées ; leur trace est au registre, sous TF-2168 et TF-2159.
 
 ## 4. Traité
 
@@ -114,15 +86,13 @@ Relecture d'intention : sert après 1 passe. La première relecture de la consig
 
 ## 8. Prochaines actions
 
-Ordre : les actions de la session d'abord, par coût décroissant de ne pas les faire, puis les 2 décisions qui vous reviennent.
+Ordre : par coût décroissant de ne pas les faire, A-1 d'abord parce qu'il touche chaque formulaire d'application.
 
 | Sélecteur | Action | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|
 | A-1 | Faire appliquer par forge-development le motif d'erreur de saisie à tout formulaire d'application, jugé par l'oracle des erreurs de formulaire sur l'instance (reformulée le 05/11 : le socle des pages ne sert pas les applications) | TF-2172 | auto_ia | borne_atteinte : reformulée après la campagne | `digit-ai-forge-development`, `docs/run-playbook.md` ; référence `digit-ai-forge-design/corpus/composants/saisie-erreurs.js` | si rien n'est fait, une application peut encore afficher une erreur loin de son champ |
 | A-2 | Réduire les refus du hook dus aux blocs absents et aux décisions sans choix fermé, 80 sur 83 | TF-1947 | auto_ia | borne_atteinte : la mesure est d'aujourd'hui | `oracles/oracle-synthese.mjs`, `gabarits/RESTITUTION.md` | si rien n'est fait, environ 78 refus par semaine, un tour chacun |
 | A-3 | Traiter les 6 constats des agents inscrits ce jour | TF-2175 | auto_ia | borne_atteinte : nés en fin de tour | `todo/TODO.jsonl`, TF-2175 à TF-2180 | si rien n'est fait, 6 défauts connus restent ouverts |
-| A-4 | Répondre à D-175, l'identité de publication des forges | TF-2168 | manuelle_utilisateur | decision | écrire dans cette conversation `175a`, `175b` ou `175c` | si rien n'est fait, un refus 403 se règle à la main |
-| A-5 | Répondre à D-176, une consigne qui touche une doctrine | TF-2159 | manuelle_utilisateur | decision | écrire dans cette conversation `176a`, `176b` ou `176c` | si rien n'est fait, une consigne peut encore devenir des options |
 
 ## 9. Traces
 
