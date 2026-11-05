@@ -103,7 +103,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` | fichier | 6,9 Ko | JSON |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` | fichier | 19,1 Ko | Revue — prompt du skill make-it-better et de sa page de versions, passé au crible L99 — 02 |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` | fichier | 19,6 Ko | JSON |
-| `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` | fichier | 34,5 Ko | Revue L99 — « Tracer temps, délais, charges, jetons et coûts de chaque produit » |
+| `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` | fichier | 34,7 Ko | Revue L99 — « Tracer temps, délais, charges, jetons et coûts de chaque produit » |
 | `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` | fichier | 7,7 Ko | JSON |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |

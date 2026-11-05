@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 650 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 651 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -284,7 +284,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` |
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md | 20261102d | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` |
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json | — | 19.6 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` |
-| Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md | 20261104c | 34.5 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` |
+| Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md | 20261104c | 34.7 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` |
 | Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json | — | 7.7 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` |
 | Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md | 20261102a | 20 Ko | `03-etudes/Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` |
 | Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json | — | 9.2 Ko | `03-etudes/Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` |
@@ -526,6 +526,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md | 20261016f | 7.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` |
 | Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 6.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Synthese Conseil - Competences OpenAI et Gemini - 20261103n.md | 20261103n | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences OpenAI et Gemini - 20261103n.md` |
+| Digit-AI - Synthese Conseil - D-173 appliquee au prompt de suivi des couts - 20261105c.md | 20261105c | 4.2 Ko | `04-plans/Digit-AI - Synthese Conseil - D-173 appliquee au prompt de suivi des couts - 20261105c.md` |
 | Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md | 20261017a | 24.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` |
 | Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md | 20261103h | 4 Ko | `04-plans/Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md` |
 | Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md | 20261102o | 18.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md` |

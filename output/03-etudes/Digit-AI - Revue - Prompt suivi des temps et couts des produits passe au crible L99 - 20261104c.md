@@ -302,9 +302,9 @@ dans la forme ci-dessous.
     « non réalisée » avec sa cause, sans bloquer le livrable.
 
 **Les écarts avec le texte mesuré.** Le prompt ci-dessous est celui de la passe 1, à 4 retouches
-près, sans effet sur le fond. Le paragraphe de démonstration et la ligne 9 du contrat portent la
-mention « Suspendu à la décision D-173 » : la démonstration est un contenu que l'étude montrerait et
-que vous n'avez pas demandé, elle se décide à part (section « Écarts à la lettre »). Un titre-annonce
+près. Le paragraphe de démonstration et la ligne 9 du contrat suivent la décision D-173 (b) du
+05/11/2026 : l'étude montre une ligne de résultat par preuve, et les calculs vont dans la
+restitution du run. Ces 2 passages n'ont pas été relus à l'aveugle. Un titre-annonce
 refusé par `oracle-ecriture.mjs` devient « Définitions à poser avant de mesurer », et « cinq » passe
 en chiffres. Un `diff` prouve que le prompt inclus ici est identique à la copie livrée.
 
@@ -428,9 +428,10 @@ selon R-4 (le projet ouvre le nom) et R-25 (le type « Étude » est le premier 
 pris au registre des types de forge-organization). L'indice est le premier libre du jour dans le dossier
 (`scripts\allouer-indice.mjs`). Gabarit : `gabarits\ETUDE-OPPORTUNITE.md`.
 
-[Suspendu à la décision D-173 : sans réponse, ce paragraphe et la ligne 9 du contrat sont retirés.]
-L'étude porte une démonstration : le relevé des 5 mesures pour un run réel d'un produit, dans la
-fenêtre de conservation, sous pseudonyme.
+L'étude porte une preuve sur un run réel d'un produit, dans la fenêtre de conservation, sous
+pseudonyme. Elle n'en montre qu'une ligne de résultat par preuve : le seuil d'inactivité retenu,
+l'écart entre les deux décomptes de jetons du run, et le verdict de la règle d'attribution. Les
+calculs vont dans la restitution de fin de run (`gabarits\RESTITUTION.md`).
 
 ## Contrat de sortie
 
@@ -442,7 +443,8 @@ fenêtre de conservation, sous pseudonyme.
 6. La date du plus ancien relevé possible et la liste des runs hors fenêtre, sous pseudonyme.
 7. O0 et au moins deux options, chacune avec coût, couverture et les quatre risques.
 8. Une recommandation et son identifiant de candidat au registre.
-9. [Suspendu à la décision D-173.] La démonstration, dont le total de jetons est recompté par une seconde méthode, écart d'au plus 1 %.
+9. Les 3 lignes de résultat de la preuve dans l'étude ; dans la restitution du run, les calculs, dont
+   le total de jetons recompté par une seconde méthode, écart d'au plus 1 %.
 10. Aucun nom réel de produit ni de client dans le fichier.
 
 ## Protocole de tests du livrable
@@ -458,8 +460,8 @@ Boucle : générer, tester T1 à T4, corriger ; 3 itérations au plus. Après 3,
 ### Contrat de sortie
 
 Le contrat est embarqué dans le prompt, section « Contrat de sortie » : 10 lignes vérifiables, du
-tableau de l'existant remesuré à l'absence de nom réel. La ligne 9, la démonstration, attend la
-décision D-173 (ajouter ou non à l'étude la démonstration sur un run réel).
+tableau de l'existant remesuré à l'absence de nom réel. La ligne 9 suit la décision D-173 (b) du
+05/11/2026 : 3 lignes de résultat dans l'étude, les calculs dans la restitution du run.
 
 ### Protocole de tests du livrable
 
@@ -505,4 +507,4 @@ contenu visible ajouté se décide à part.
 | « des différents produits construits » | les runs sortis de la fenêtre de conservation sont listés, pas reconstruits | leurs jetons sont purgés (Ch4, P4) | manière d'exécuter |
 | « rajouter … dans chaque projet » | l'étude dit comment chaque produit reçoit l'ajout, par l'héritage ou un run de version ; elle n'écrit chez aucun | le pilot n'écrit pas chez un produit hors run demandé | manière d'exécuter |
 | « Identifie … puis des éléments à rajouter » | une étude qui compare des options et en recommande une, et une candidature au registre ; vous décidez | l'arbitrage vous revient (R-58) | manière d'exécuter |
-| (rien sur une démonstration) | le relevé des 5 mesures sur un run réel, sous pseudonyme, montré dans l'étude | une définition qui ne se calcule pas ne vaut rien | contenu visible ajouté : décision D-173, suspendu dans le prompt |
+| (rien sur une démonstration) | une ligne de résultat par preuve dans l'étude, les calculs dans la restitution du run | une définition qui ne se calcule pas ne vaut rien | contenu visible ajouté : décidé par D-173 (b) le 05/11/2026 |
