@@ -17,7 +17,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { releverSession, ecrireReleve, rattraper, marquer, vue, lireJournal, lireReferentiel, coutModele, cible, poste } from "./relever-couts.mjs";
+import { releverSession, ecrireReleve, rattraper, marquer, vue, lireJournal, lireReferentiel, coutModele, cible, poste, rattraperIci, dossierDuProjet } from "./relever-couts.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "..", "oracles", "hook-couts.mjs");
@@ -154,6 +154,22 @@ check("13 un fichier par poste : 2 postes n'écrivent jamais le même fichier, e
   writeFileSync(cible(prod4, "A").sortie, JSON.stringify(r) + "\n", "utf8");
   writeFileSync(cible(prod4, "B").sortie, JSON.stringify({ ...r, sessionId: "S-B" }) + "\n", "utf8");
   egal(vue(join(prod4, "forge"), REF).sessions, 2, "sessions lues sur les 2 postes");
+});
+check("14 --ici trouve les transcriptions du projet dans chaque profil du poste, par le nom encodé de son chemin", () => {
+  const prod5 = join(base, "Mon.Produit 5"); mkdirSync(join(prod5, "forge"), { recursive: true });
+  const maison = join(base, "maison");
+  const enc = dossierDuProjet(prod5);
+  for (const [p, id] of [[".claude", "A1"], [".claude-b", "B1"]]) ecrire(join(maison, p, "projects", enc.toUpperCase().slice(0, 1) + enc.slice(1), `${id}.jsonl`), [humain(0), reponse(5, id, U(1, 0, 0, 1))]);
+  ecrire(join(maison, ".claude", "projects", "un-autre-projet", "X1.jsonl"), [humain(0), reponse(5, "x", U(1, 0, 0, 1))]);
+  const b = rattraperIci(prod5, { maison, referentiel: REF });
+  const ids = readFileSync(cible(prod5).sortie, "utf8").trim().split("\n").map((l) => JSON.parse(l).sessionId).sort();
+  egal([b.dossiers, ids], [2, ["A1", "B1"]], "dossiers et sessions relevés");
+  // Une sortie nommée est respectée : un essai depuis le pilot n'écrit rien chez le produit (incident du 05/11/2026).
+  const prod6 = join(base, "Mon.Produit 6"); mkdirSync(join(prod6, "forge"), { recursive: true });
+  for (const p of [".claude", ".claude-b"]) ecrire(join(maison, p, "projects", dossierDuProjet(prod6), "C1.jsonl"), [humain(0), reponse(5, "c1", U(1, 0, 0, 1))]);
+  const ailleurs = join(base, "essai-ici.jsonl");
+  rattraperIci(prod6, { maison, sortie: ailleurs, referentiel: REF });
+  if (existsSync(cible(prod6).sortie) || !existsSync(ailleurs)) throw new Error("la sortie nommée n'a pas été respectée");
 });
 check("12 le hook écrit chez un produit à la fin de session, et sort en 0 sur une entrée illisible", () => {
   const prod3 = join(base, "produit3"); mkdirSync(join(prod3, "forge"), { recursive: true }); mkdirSync(join(prod3, ".git"));

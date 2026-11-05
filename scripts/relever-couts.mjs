@@ -25,6 +25,7 @@
  * Usage :
  *   node scripts\relever-couts.mjs --session <transcription.jsonl> [--racine <projet>] [--sortie <f.jsonl>]
  *   node scripts\relever-couts.mjs --rattraper <dossier de transcriptions> [--racine <projet>] [--sauf <sessionId>] [--budget-s N]
+ *   node scripts\relever-couts.mjs --ici [--racine <projet>]   (les transcriptions de ce projet, dans tous les profils du poste)
  *   node scripts\relever-couts.mjs --pour <pseudonyme> [--session-id <id>]        (au pilot ; défaut : CLAUDE_CODE_SESSION_ID)
  *   node scripts\relever-couts.mjs --vue <couts-<poste>.jsonl | dossier> [--json]
  *   options communes : [--referentiel <SUIVI-COUTS.json>]
@@ -36,7 +37,8 @@
 import { existsSync, readFileSync, readdirSync, statSync, appendFileSync, mkdirSync } from "node:fs";
 import { join, dirname, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { hostname } from "node:os";
+import { hostname, homedir } from "node:os";
+import { dossiersParDefaut } from "./relever-contexte-sessions.mjs";
 
 export const VERSION = "1.0.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -250,9 +252,9 @@ export function ecrireReleve(cheminSession, { racine, sortie, referentiel = lire
 }
 
 /** Rattrapage : toute session du dossier qui n'a pas son relevé à jour, la plus ancienne d'abord, dans le budget. */
-export function rattraper(dossier, { racine, sauf = null, budgetS = 40, referentiel = lireReferentiel() } = {}) {
+export function rattraper(dossier, { racine, sortie = null, sauf = null, budgetS = 40, referentiel = lireReferentiel() } = {}) {
   const t0 = Date.now();
-  const out = cible(racine).sortie;
+  const out = sortie || cible(racine).sortie;
   const deja = dejaReleves(out);
   const fichiers = existsSync(dossier) ? readdirSync(dossier).filter((f) => f.endsWith(".jsonl")).map((f) => join(dossier, f)) : [];
   fichiers.sort((a, b) => statSync(a).mtimeMs - statSync(b).mtimeMs);
@@ -264,8 +266,20 @@ export function rattraper(dossier, { racine, sauf = null, budgetS = 40, referent
     const d = deja.get(id);
     if (d && Date.parse(d.fin) >= statSync(f).mtimeMs - 1000) { bilan.a_jour++; continue; }
     bilan.examinees++;
-    if (ecrireReleve(f, { racine, referentiel }).ecrit) bilan.ecrites++;
+    if (ecrireReleve(f, { racine, sortie: out, referentiel }).ecrit) bilan.ecrites++;
   }
+  return bilan;
+}
+
+/** Le nom du dossier de transcriptions d'un projet : son chemin, chaque caractère hors lettres et chiffres changé en « - ». */
+export const dossierDuProjet = (racine) => resolve(racine).replace(/[^A-Za-z0-9]/g, "-").toLowerCase();
+
+/** Rattrapage `--ici` : les transcriptions de CE projet dans tous les profils du poste, sans avoir à nommer leur dossier. */
+export function rattraperIci(racine, { maison, sortie = null, budgetS = 120, referentiel = lireReferentiel() } = {}) {
+  const nom = dossierDuProjet(racine);
+  const dossiers = dossiersParDefaut(process.env, maison).filter((d) => basename(d).toLowerCase() === nom);
+  const bilan = { dossiers: dossiers.length, examinees: 0, ecrites: 0, a_jour: 0, hors_budget: 0 };
+  for (const d of dossiers) for (const [k, v] of Object.entries(rattraper(d, { racine, sortie, budgetS, referentiel }))) bilan[k] += v;
   return bilan;
 }
 
@@ -331,6 +345,7 @@ function main(argv) {
     const x = argv[i], val = () => argv[++i];
     if (x === "--session") a.session = val();
     else if (x === "--rattraper") a.rattraper = val();
+    else if (x === "--ici") a.ici = true;
     else if (x === "--racine") a.racine = val();
     else if (x === "--sortie") a.sortie = val();
     else if (x === "--sauf") a.sauf = val();
@@ -364,8 +379,13 @@ function main(argv) {
     const r = ecrireReleve(a.session, { racine: a.racine, sortie: a.sortie, referentiel: ref });
     return { code: 0, sortie: r.ecrit ? `relever-couts : session ${basename(a.session, ".jsonl")} relevée (${r.releve.jetons.total} jetons) → ${r.sortie}` : `relever-couts : ${r.motif}` };
   }
+  if (a.ici) {
+    const b = rattraperIci(a.racine, { maison: homedir(), sortie: a.sortie, budgetS: a.budget === 40 ? 120 : a.budget, referentiel: ref });
+    if (!b.dossiers) return { code: 0, sortie: `relever-couts : aucun dossier de transcriptions pour ${a.racine} sur ce poste (${dossierDuProjet(a.racine)})` };
+    return { code: 0, sortie: `relever-couts : rattrapage de ${a.racine} — ${b.dossiers} dossier(s), ${b.ecrites} relevé(s) écrit(s), ${b.a_jour} à jour, ${b.hors_budget} hors budget → ${a.sortie || cible(a.racine).sortie}` };
+  }
   if (a.rattraper) {
-    const b = rattraper(a.rattraper, { racine: a.racine, sauf: a.sauf, budgetS: a.budget, referentiel: ref });
+    const b = rattraper(a.rattraper, { racine: a.racine, sortie: a.sortie, sauf: a.sauf, budgetS: a.budget, referentiel: ref });
     return { code: 0, sortie: `relever-couts : rattrapage — ${b.ecrites} relevé(s) écrit(s), ${b.a_jour} à jour, ${b.hors_budget} hors budget` };
   }
   return { code: 2, sortie: "usage : node scripts\\relever-couts.mjs --session <f.jsonl> | --rattraper <dossier> | --pour <pseudonyme> | --vue <couts-<poste>.jsonl | dossier> [--json]" };
