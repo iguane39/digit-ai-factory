@@ -732,7 +732,9 @@ exactement le défaut**. Étude : `output\03-etudes\2026-08\20260817-etude-oppor
    (`digit-ai-factory`) se poussent sans GO humain par envoi : la session déclare
    `FORGE_PUSH_GO="D-53 (b) du 03/10"` (forge) ou `"D-54 (b) du 03/10"` (pilot), et la
    garde pre-push du dépôt juge seule. Restent exigés : la garde rend PASS (porte des noms
-   comprise), et seul part ce qui est déjà committé — le travail non committé d'une autre
+   comprise), l'envoi part sous le seul compte de `references\IDENTITE-PUBLICATION.json`
+   (décision humaine D-175 du 05/11/2026, mot pour mot : « Seule l'identité de l'utilisateur de la
+   Factory […] peut publier pour la Factory et les forges, personne d'autre. »), et seul part ce qui est déjà committé — le travail non committé d'une autre
    session ne se committe pas pour pousser. Hors de ce paragraphe, inchangés : le canal
    `_confidentiel`, `digit-ai-queue` et les produits (GO par envoi) ; le §1 (services
    hébergés). *Pourquoi* : le 03/10, une demande humaine « synchronise avec github » a été
@@ -1638,6 +1640,14 @@ que R-55 rendait déjà automatiques, 2 corrections du pilot réversibles et san
 4. **Ce que R-58 n'ouvre PAS** : elle ne lève ni R-38 (publication), ni R-29 (dépenses et gates), ni
    la règle des produits autonomes ; elle ne change pas les décisions déjà rendues ; l'humain revient
    sur toute décision prise sans lui, et sa réponse prime.
+5. **Une consigne du porteur est déjà une décision** (décision humaine D-176 (b) du 05/11/2026, TF-2159).
+   Elle s'applique telle quelle, citée mot pour mot, et ne se transforme pas en options, même quand
+   elle touche une doctrine. Une reformulation ne se demande que si 2 lectures de la consigne changent
+   le livrable, en une question fermée d'une ligne. Le fait : le 03/11/2026, une consigne lue comme
+   interdisant le Docker local a été posée en 2 décisions à options, et le porteur a dû la rappeler le
+   04/11. Non mécanisable : distinguer une consigne d'un avis demande de lire l'échange ; la relecture
+   d'intention (`references\RELECTURE-INTENTION.md`) classe déjà en `choix_humain` une décision humaine
+   reposée.
 
 Contrôle exécutable : `todo\revue-hebdo.mjs`, tri par le champ `ressort` (recette `--self-test`, à
 double sens : une proposition hors du ressort humain n'est pas posée, une fiche sans ressort est

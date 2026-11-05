@@ -37,6 +37,11 @@ consigne modèle, effort, jetons et appels d'outils de chaque agent (CONTRAT-INT
 Tous les autres dépôts (forges sœurs, pilot, produits, missions) sont en LECTURE SEULE.
 Le registre TODO-FORGE (`todo/TODO.jsonl` du pilot) t'est interdit en écriture : tes
 constats reviennent dans ton rapport final, le pilot est l'unique écrivain du registre.
+
+**Publication des forges : un mandat, un seul compte** (D-175 du 05/11/2026, TF-2168). Le pilot
+publie les forges et lui-même sans feu vert par envoi (`REGLES-PROJET.md`, R-38 §6), sous le seul
+compte de `references\IDENTITE-PUBLICATION.json`. Un envoi vu chez une forge, fait par une autre
+session sous ce compte, est légitime : il ne se signale pas comme suspect. Toi, tu ne publies pas.
 Aucun fichier temporaire dans le dépôt cible : scratchpad de session uniquement.
 
 **Écarts à la lettre (TF-0176).** Si ton prompt reformule une demande humaine, tout endroit

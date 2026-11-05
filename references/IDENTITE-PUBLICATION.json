@@ -1,0 +1,12 @@
+{
+ "schema": "pilot/identite-publication@1",
+ "version": "1.0.0",
+ "date": "2026-11-05",
+ "decision": "D-175 du 05/11/2026, réponse humaine citée mot pour mot : « Seule l'identité de l'utilisateur de la Factory (ici iguane39@gmail.com) peut publier pour la Factory et les forges, personne d'autre. »",
+ "regle": "Un envoi vers le dépôt distant du pilot ou d'une forge ne part que sous un compte de comptes_autorises. Le compte est celui que l'assistant d'identification de git rendra pour l'envoi (gh api user, avec l'environnement de la commande : GH_CONFIG_DIR, GH_TOKEN, GITHUB_TOKEN). Un autre compte, ou un compte qu'on ne peut pas lire, refuse l'envoi.",
+ "comptes_autorises": ["iguane39"],
+ "depots": ["digit-ai-factory", "digit-ai-forge-*"],
+ "remede": "Rejouer l'envoi sous le compte du poste, pour cette seule commande : env -u GH_CONFIG_DIR -u GH_TOKEN -u GITHUB_TOKEN git push …",
+ "pourquoi": "Le 05/11/2026 à 09:17, l'envoi de digit-ai-forge-audit est parti sous le compte du profil de session d'un produit client (GH_CONFIG_DIR) et a été refusé 403 ; il a été publié à 09:18 sous le compte du poste (TF-2168, lot Produit-84 - RETOURS - 20261105a, RT-46).",
+ "source_du_compte": "compte GitHub actif du poste, relevé par gh auth status le 05/11/2026 à 14:20 (Logged in to github.com account iguane39)"
+}
