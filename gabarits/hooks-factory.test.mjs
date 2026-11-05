@@ -387,7 +387,7 @@ try {
   const copie20 = join(racine20, "digit-ai-factory");
   for (const d of ["oracles", "references", "scripts"]) mkdirSync(join(copie20, d), { recursive: true });
   copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie20, "bootstrap.mjs"));
-  for (const f of ["oracles/hook-couts.mjs", "oracles/lib-racine-projet.mjs", "scripts/relever-couts.mjs", "references/SUIVI-COUTS.json"]) copyFileSync(join(PILOT, f), join(copie20, f));
+  for (const f of ["oracles/hook-couts.mjs", "oracles/lib-racine-projet.mjs", "scripts/relever-couts.mjs", "scripts/relever-contexte-sessions.mjs", "references/SUIVI-COUTS.json"]) copyFileSync(join(PILOT, f), join(copie20, f));
   const P20 = produit("produit-couts", false);
   const transcription20 = join(base, "transcriptions20", "S20.jsonl");
   mkdirSync(dirname(transcription20), { recursive: true });
