@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 653 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 654 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -532,6 +532,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md | 20261103h | 4 Ko | `04-plans/Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md` |
 | Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md | 20261102o | 18.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md` |
 | Digit-AI - Synthese Conseil - Etude apprentissage des erreurs - 20261104g.md | 20261104g | 9.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Etude apprentissage des erreurs - 20261104g.md` |
+| Digit-AI - Synthese Conseil - Etude suivi des temps et couts rendue - 20261105e.md | 20261105e | 8.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Etude suivi des temps et couts rendue - 20261105e.md` |
 | Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md | 20261018b | 11.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` |
 | Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md | 20261017b | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` |
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
