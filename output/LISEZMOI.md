@@ -648,7 +648,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md | 20261016l | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` |
 | Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md | 20261103l | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md` |
 | Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md | 20261026d | 10.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` |
-| Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md | 20261105i | 4.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md` |
+| Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md | 20261105i | 5.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md` |
 | Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md | 20261001i | 4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` |
 | Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md | 20261020d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` |
 | Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md | 20261104e | 3.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` |

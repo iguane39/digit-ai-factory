@@ -57,3 +57,24 @@ Une action, d'abord pour D-b, parce que sa plus ancienne session sera purgée le
 - Code : `scripts/relever-couts.mjs` et sa recette, commit local 4d46c770.
 - Incident : fichier retiré chez Produit-79, `git status --short forge/` du produit vide après retrait.
 - Enregistrement : commit local au pilot, non publié ; son numéro se lit par `git log -1`.
+
+## Annexe — le prompt à coller
+
+Le même bloc que dans le fichier livré, à coller dans une session ouverte à la racine du produit.
+
+```text
+Active le relevé des coûts de la Factory dans ce produit (TF-2181, hook « couts »).
+
+1. Rattrape les sessions de ce produit encore sur le disque :
+   node ../digit-ai-factory/scripts/relever-couts.mjs --ici --racine .
+   (pilot ailleurs : remplace ../digit-ai-factory par son chemin, $FORGE_ROOT/digit-ai-factory)
+2. Montre le résultat : node ../digit-ai-factory/scripts/relever-couts.mjs --vue forge
+3. Vérifie le câblage pour les sessions suivantes : .claude/settings.json porte
+   « forge/hooks/factory.mjs couts » en SessionEnd et « couts --rattraper » en SessionStart,
+   et forge/hooks/factory.mjs accepte le nom « couts ». S'il manque, rejoue l'ouverture :
+   node forge/hooks/factory.mjs ouverture --sans-readme
+4. Enregistre par git commit --only les fichiers forge/couts-*.jsonl, et .claude/settings.json
+   et forge/hooks/factory.mjs s'ils ont changé. Ne pousse rien.
+5. Réponds en 3 lignes : sessions relevées, jetons et coût équivalent rendus par la vue,
+   câblage présent ou réparé.
+```

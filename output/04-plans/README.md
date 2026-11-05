@@ -158,7 +158,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` | fichier | 8,3 Ko | Synthèse Mandat — plans classés par mois, noms trop longs raccourcis (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md` | fichier | 3,2 Ko | Synthèse Mandat — point d'étape de l'étude d'une revue de code (03/11/2026) |
 | `Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` | fichier | 10,6 Ko | Synthèse Mandat — prompt « retravaille la cible » adapté au skill oeil-critique 1.1.0 (26/ |
-| `Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md` | fichier | 4,6 Ko | Synthèse Mandat — prompt court pour activer le relevé des coûts dans un produit (05/11/202 |
+| `Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md` | fichier | 5,7 Ko | Synthèse Mandat — prompt court pour activer le relevé des coûts dans un produit (05/11/202 |
 | `Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` | fichier | 4,0 Ko | Synthèse Mandat — publication « 48a » faite : le pilot et forge-agents sont à jour sur Git |
 | `Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` | fichier | 4,1 Ko | Synthèse Mandat — D-52 exécutée, pilot publié jusqu'à 1855a4df (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` | fichier | 3,3 Ko | Synthèse Mandat — publication du pilot constatée, mes commits publiés sous de nouveaux num |
