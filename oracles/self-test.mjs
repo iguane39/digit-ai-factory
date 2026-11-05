@@ -98,7 +98,10 @@ mkdirSync(join(verte, ".claude"), { recursive: true });
 // pas, et 9 cas de cette recette étaient rouges à HEAD depuis l'entrée de l'exigence.
 writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true },
-      { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true }] }],
+      { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true },
+      // TF-2181 (HERITAGE 1.52.0, 05/11/2026) : les sessions sans relevé des coûts rattrapées à l'ouverture.
+      { type: "command", command: "node forge/hooks/factory.mjs couts --rattraper", async: true }] }],
+    SessionEnd: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs couts" }] }],
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
       { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },

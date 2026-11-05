@@ -69,7 +69,11 @@ const [nom, ...options] = process.argv.slice(2);
 // au moment du geste : la leçon dont le déclencheur correspond entre au contexte, citée comme une donnée (600 caractères
 // au plus, 3 leçons au plus), et chaque rappel servi s'écrit à forge/lecons-rappels.jsonl. Une leçon en barrière, qui
 // refuse le geste au pilot, AVERTIT seulement chez un produit en v1. Ne bloque jamais chez un produit.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons"]);
+// `couts` (05/11/2026, TF-2181, GO humain « A1 », lecture de la charge D-177) : hook SessionEnd et SessionStart (asynchrone,
+// `--rattraper`) — la session qui se ferme est relevée par scripts/relever-couts.mjs du pilot et sa ligne s'écrit à
+// forge/couts-<poste>.jsonl : jetons, temps actif, charge en 3 indicateurs séparés, ventilation par run et par étape. Aucun montant
+// écrit ; ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [

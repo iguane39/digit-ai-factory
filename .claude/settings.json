@@ -15,6 +15,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-produits-intacts.mjs\" --empreinte",
             "timeout": 45
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-couts.mjs\" --rattraper",
+            "timeout": 120,
+            "async": true
           }
         ]
       }
@@ -145,6 +151,17 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-lexique.mjs\"",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-couts.mjs\"",
+            "timeout": 30
           }
         ]
       }

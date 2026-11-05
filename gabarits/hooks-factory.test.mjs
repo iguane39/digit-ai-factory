@@ -380,8 +380,33 @@ try {
   check("19 bis leçons : la même leçon en barrière n'est qu'un AVERTISSEMENT chez un produit (exit 0, jamais un refus)",
     b19.status === 0 && /^AVERTISSEMENT \(leçon en barrière/.test(contexte19(b19)), `exit ${b19.status} ` + b19.stdout + b19.stderr);
   check("19 ter leçons : un geste hors motif ne reçoit rien", horsMotif19.status === 0 && !horsMotif19.stdout.trim(), horsMotif19.stdout + horsMotif19.stderr);
+
+  // 20 — TF-2181 (05/11/2026), le relevé des coûts par le lanceur : à la fin d'une session d'un produit, sa ligne s'écrit
+  // à forge/couts-<poste>.jsonl, sans montant ; le rattrapage d'ouverture sort en 0 ; une entrée illisible ne fait jamais échouer.
+  const racine20 = join(base, "racine20");
+  const copie20 = join(racine20, "digit-ai-factory");
+  for (const d of ["oracles", "references", "scripts"]) mkdirSync(join(copie20, d), { recursive: true });
+  copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie20, "bootstrap.mjs"));
+  for (const f of ["oracles/hook-couts.mjs", "oracles/lib-racine-projet.mjs", "scripts/relever-couts.mjs", "references/SUIVI-COUTS.json"]) copyFileSync(join(PILOT, f), join(copie20, f));
+  const P20 = produit("produit-couts", false);
+  const transcription20 = join(base, "transcriptions20", "S20.jsonl");
+  mkdirSync(dirname(transcription20), { recursive: true });
+  writeFileSync(transcription20, [
+    { type: "user", timestamp: "2026-11-05T10:00:00Z", message: { role: "user", content: "question" } },
+    { type: "assistant", timestamp: "2026-11-05T10:00:05Z", message: { id: "m1", model: "claude-opus-5-5", usage: { input_tokens: 1, cache_creation_input_tokens: 2, cache_read_input_tokens: 3, output_tokens: 4 } } },
+  ].map((o) => JSON.stringify(o)).join("\n") + "\n", "utf8");
+  const env20 = { ...process.env, FORGE_ROOT: racine20, CLAUDE_PROJECT_DIR: P20 };
+  const couts20 = (args, input) => spawnSync(process.execPath, [join(P20, "forge", "hooks", "factory.mjs"), "couts", ...args], { encoding: "utf8", cwd: P20, env: env20, input });
+  const entree20 = JSON.stringify({ session_id: "S20", transcript_path: transcription20, cwd: P20 });
+  const r20 = couts20([], entree20);
+  const ligne20 = (() => { try { return JSON.parse(readFileSync(join(P20, "forge", readdirSync(join(P20, "forge")).find((f) => /^couts-.+\.jsonl$/.test(f))), "utf8").trim().split("\n").at(-1)); } catch { return null; } })();
+  check("20 coûts : la session qui se ferme est relevée par le lanceur à forge/couts-<poste>.jsonl, 10 jetons, aucun montant (TF-2181)",
+    r20.status === 0 && ligne20?.sessionId === "S20" && ligne20?.jetons?.total === 10 && !/usd|\$/i.test(JSON.stringify(ligne20)), r20.stdout + r20.stderr);
+  const ratt20 = couts20(["--rattraper"], entree20);
+  const illisible20 = couts20([], "pas du JSON");
+  check("20 bis coûts : le rattrapage et une entrée illisible sortent en 0", ratt20.status === 0 && illisible20.status === 0, ratt20.stderr + illisible20.stderr);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181)`);

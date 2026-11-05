@@ -47,12 +47,12 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 39,
+  "cas": 41,
   "vu_le": "2026-11-05"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 30,
-  "vu_le": "2026-11-03"
+  "cas": 33,
+  "vu_le": "2026-11-05"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
@@ -83,8 +83,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 74,
-  "vu_le": "2026-10-26"
+  "cas": 81,
+  "vu_le": "2026-11-05"
  },
  "hook-page-html.mjs": {
   "cas": 17,
@@ -427,15 +427,15 @@
   "vu_le": "2026-11-05"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 27,
-  "vu_le": "2026-10-29"
+  "cas": 28,
+  "vu_le": "2026-11-05"
  },
  "oracles/hook-mutation-en-cours.test.mjs": {
   "cas": 37,
   "vu_le": "2026-11-04"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 62,
+  "cas": 63,
   "vu_le": "2026-11-05"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
@@ -671,7 +671,7 @@
   "vu_le": "2026-09-28"
  },
  "scripts/mobiliser.test.mjs": {
-  "cas": 20,
+  "cas": 22,
   "vu_le": "2026-11-05"
  },
  "scripts/nettoyer-copies.test.mjs": {
@@ -719,7 +719,7 @@
   "vu_le": "2026-10-12"
  },
  "scripts/relecture-intention.test.mjs": {
-  "cas": 79,
+  "cas": 87,
   "vu_le": "2026-11-05"
  },
  "scripts/relever-appelants.test.mjs": {
@@ -729,6 +729,10 @@
  "scripts/relever-contexte-sessions.test.mjs": {
   "cas": 10,
   "vu_le": "2026-10-26"
+ },
+ "scripts/relever-couts.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-11-05"
  },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,
@@ -843,8 +847,8 @@
   "vu_le": "2026-09-15"
  },
  "todo/anonymiser-entrant.mjs": {
-  "cas": 12,
-  "vu_le": "2026-10-02"
+  "cas": 13,
+  "vu_le": "2026-11-05"
  },
  "todo/anonymiser-suivis.mjs": {
   "cas": 12,
