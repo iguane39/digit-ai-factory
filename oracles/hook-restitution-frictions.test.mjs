@@ -341,10 +341,20 @@ try {
     const p = produit();
     const t = join(base, "tour-prejuger.jsonl"); writeFileSync(t, jsonl([humain(CORRECTION), final("Je corrige.")]), "utf8");
     const b = join(base, "brouillon-frictions.md"); writeFileSync(b, RIEN, "utf8");
-    const pj = (env) => { const r = spawnSync(process.execPath, [HOOK, "--prejuger", b, "--transcript", t], { encoding: "utf8", cwd: p, env }); let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* illisible */ } return { code: r.status, o }; };
+    const pj = (env, ...autres) => { const r = spawnSync(process.execPath, [HOOK, "--prejuger", b, "--transcript", t, ...autres], { encoding: "utf8", cwd: p, env }); let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* illisible */ } return { code: r.status, o }; };
     const av = pj(ENV_PRODUIT), bl = pj({ ...ENV_PRODUIT, FORGE_FRICTIONS_BLOQUANTE: "1" });
-    verifier(av.code === 0 && av.o?.affichable === true && (av.o?.avertissements || []).some((a) => /^FRICTIONS — /.test(a)) && av.o?.frictions?.verdict === "FAIL",
-      `25 : --prejuger → attendu affichable avec l'avertissement FRICTIONS, obtenu exit ${av.code} ${JSON.stringify(av.o).slice(0, 400)}`);
+    // TF-2171 (05/11/2026) : l'avertissement non motivé rend le préjugement non affichable (exit 1) ; motivé à l'appel, il l'est (exit 0).
+    verifier(av.code === 1 && av.o?.affichable === false && (av.o?.avertissements || []).some((a) => /^FRICTIONS — .{20,}/.test(a)) && (av.o?.avertissements_sans_motif || []).includes("FRICTIONS") && av.o?.frictions?.verdict === "FAIL",
+      `25 : --prejuger → attendu non affichable (exit 1) tant que l'avertissement FRICTIONS n'est pas motivé, dit avec son message, obtenu exit ${av.code} ${JSON.stringify(av.o).slice(0, 400)}`);
+    // Le motif d'une règle ne couvre que cette règle : FRICTIONS motivée, le brouillon (qui porte aussi d'autres avertissements, ex. l'heure d'en-tête sans relevé) reste non affichable
+    // tant que chacun n'est pas motivé ; tous motivés, il l'est.
+    const motifs = (codes) => codes.flatMap((c) => ["--motif", `${c}=motif de la recette sur cette règle`]);
+    const seul = pj(ENV_PRODUIT, ...motifs(["FRICTIONS"]));
+    const tous = pj(ENV_PRODUIT, ...motifs(av.o?.avertissements_sans_motif || []));
+    verifier(!(seul.o?.avertissements_sans_motif || []).includes("FRICTIONS") && (seul.o?.avertissements_motives || []).some((m) => m.code === "FRICTIONS")
+      && (seul.o?.avertissements_sans_motif || []).length === (av.o?.avertissements_sans_motif || []).length - 1
+      && tous.code === 0 && tous.o?.affichable === true && (tous.o?.avertissements_sans_motif || []).length === 0,
+      `25 ter : le motif FRICTIONS ne couvre que FRICTIONS ; tous les avertissements motivés → affichable (exit 0), obtenu ${JSON.stringify({ seul: seul.o?.avertissements_sans_motif, tous: [tous.code, tous.o?.affichable, tous.o?.avertissements_sans_motif] })}`);
     verifier(bl.code === 1 && bl.o?.affichable === false && (bl.o?.bloquants || []).some((a) => /^FRICTIONS — /.test(a)),
       `25 bis : --prejuger armé bloquant → attendu exit 1 et le refus FRICTIONS, obtenu exit ${bl.code} ${JSON.stringify(bl.o?.bloquants || null).slice(0, 300)}`);
   }

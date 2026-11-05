@@ -964,8 +964,9 @@ try {
     if (d.code !== 0 || d.o?.affichage !== "PASS")
       echecs.push(`49 quater : le brouillon qui reprend la synthèse déposée → attendu exit 0 et affichage PASS, obtenu ${d.code} ${JSON.stringify(d.o).slice(0, 200)}`);
     const e = prejuger49("brouillon-49-sans-transcript", SANS_REPLI, null);
-    if (e.code !== 0 || !/non joué/.test(e.o?.affichage || ""))
-      echecs.push(`49 quinquies : sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit → attendu exit 0 et « non joué », obtenu ${e.code} ${JSON.stringify(e.o).slice(0, 200)}`);
+    // TF-2171 : le brouillon porte un avertissement (non motivé), l'exit suit `affichable` ; ce que 49 quinquies garde, c'est qu'aucun refus ne tient à l'AFFICHAGE non joué.
+    if ((e.o?.bloquants || []).length || !/non joué/.test(e.o?.affichage || ""))
+      echecs.push(`49 quinquies : sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit → attendu aucun bloquant et « non joué », obtenu ${e.code} ${JSON.stringify(e.o).slice(0, 200)}`);
   }
   // 50 — TF-1847 (18/10/2026) : E-11 SUR LE MARKDOWN, S80 BLOQUANTE, dans ses quatre sens. (a) Une restitution
   // conforme dont le bloc 4 énumère « 1) … 2) … 3) » sur une ligne est REFUSÉE par `--prejuger` (exit 1) et par le
@@ -981,9 +982,9 @@ try {
       "- bootstrap v2 livré ; l'ancien gabarit écrivait « 1) écriture ; 2) recette ; 3) enregistrement » sur une ligne — preuve : bootstrap.test.mjs 7/7, recette 22/22.");
     const GUIDE_PARAGRAPHE = "## Guide — connecter le compte\n\nSource : `docs.exemple.org`, lue le 17/10/2026.\n\n"
       + "1. Ouvrez la console, choisissez le projet, cliquez sur « Activer ». Résultat attendu : l'API est active.\n\n## 0. Synthèse d'ouverture\n\n";
-    const prejuger50 = (nom, texte) => {
+    const prejuger50 = (nom, texte, ...autres) => {
       const fichier = join(base, nom + ".md"); writeFileSync(fichier, texte, "utf8");
-      const r = spawnSync(process.execPath, [HOOK, "--prejuger", fichier], { encoding: "utf8", env: ENV_SANS_SESSION });
+      const r = spawnSync(process.execPath, [HOOK, "--prejuger", fichier, ...autres], { encoding: "utf8", env: ENV_SANS_SESSION });
       let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
       return { code: r.status, o };
     };
@@ -1004,21 +1005,34 @@ try {
     // T2 (TF-1947, 26/10/2026) : S80 AVERTIT, elle ne refuse plus. Adapté : 50 et 50 bis attendaient un refus ; ils attendent
     // désormais l'avertissement S80 (préjugement affichable, S80 dite ; hook sans refus, S80 dite sous la réponse) ; 50 ter garde
     // le sens contraire : la MÊME information en liste n'est pas même avertie.
+    // TF-2171 (05/11/2026) : `affichable` ne vaut vrai que sans avertissement NON MOTIVÉ, et l'exit suit `affichable`. 50 attend donc l'avertissement S80 AVEC son message, le préjugement
+    // non affichable (exit 1) ; 50 sexies joue le remède (le motif à l'appel) et attend exit 0.
     const a = prejuger50("brouillon-50-en-ligne", EN_LIGNE);
-    if (a.code !== 0 || (a.o?.bloquants || []).some((x) => /^S80\b/.test(x)) || !(a.o?.avertissements || []).includes("S80"))
-      echecs.push(`50 : « 1) … 2) … 3) » sur une ligne du bloc 4 → attendu --prejuger exit 0 et S80 avertie (T2), obtenu ${a.code} ${JSON.stringify(a.o).slice(0, 240)}`);
+    if (a.code !== 1 || a.o?.affichable !== false || (a.o?.bloquants || []).some((x) => /^S80\b/.test(x)) || !(a.o?.avertissements || []).some((x) => /^S80 — .{20,}/.test(x)) || !(a.o?.avertissements_sans_motif || []).includes("S80"))
+      echecs.push(`50 : « 1) … 2) … 3) » sur une ligne du bloc 4 → attendu --prejuger exit 1 (avertissement non motivé), S80 dite avec son message (T2, TF-2171), obtenu ${a.code} ${JSON.stringify(a.o).slice(0, 240)}`);
     const h = hook50("tour-50-en-ligne", EN_LIGNE);
     if (h?.decision === "block" || !/S80 — /.test(h?.systemMessage || ""))
       echecs.push(`50 bis : le hook de fin de tour doit DIRE l'énumération en ligne en nommant S80, sans refus (T2), obtenu ${JSON.stringify(h).slice(0, 240)}`);
     const b = prejuger50("brouillon-50-en-liste", EN_LISTE);
-    if (b.code !== 0 || b.o?.affichable !== true || (b.o?.avertissements || []).includes("S80"))
+    if (b.code !== 0 || b.o?.affichable !== true || (b.o?.avertissements || []).some((x) => /^S80\b/.test(x)))
       echecs.push(`50 ter : la MÊME information en liste doit être affichable sans avertissement S80 (le remède du message), obtenu ${b.code} ${JSON.stringify(b.o).slice(0, 240)}`);
     const c = prejuger50("brouillon-50-citee", CITEE);
     if (c.code !== 0)
       echecs.push(`50 quater : la forme interdite montrée entre guillemets français ne doit pas être refusée, obtenu ${c.code} ${JSON.stringify(c.o).slice(0, 240)}`);
     const d = prejuger50("brouillon-50-guide-paragraphe", GUIDE_PARAGRAPHE + BON);
-    if ((d.o?.bloquants || []).some((x) => /^S81\b/.test(x)) || !(d.o?.avertissements || []).includes("S81"))
+    if ((d.o?.bloquants || []).some((x) => /^S81\b/.test(x)) || !(d.o?.avertissements || []).some((x) => /^S81\b/.test(x)))
       echecs.push(`50 quinquies : un guide dont l'étape enchaîne trois gestes doit être AVERTI par S81 sans être bloqué, obtenu ${d.code} ${JSON.stringify(d.o).slice(0, 240)}`);
+    // 50 sexies à 50 octies — TF-2171 (RT-74 de Produit-64) : le MÊME brouillon, trois sens. (sexies) le remède joué : S80 motivée à l'appel → affichable, exit 0, le motif revient dans
+    // avertissements_motives. (septies) un motif de deux mots ne dit pas pourquoi : ignoré, exit 1. (octies) le motif d'une AUTRE règle ne couvre pas S80 : exit 1.
+    const s80motive = prejuger50("brouillon-50-motive", EN_LIGNE, "--motif", "S80=la liste est un tableau de preuves citées telles quelles");
+    if (s80motive.code !== 0 || s80motive.o?.affichable !== true || !(s80motive.o?.avertissements_motives || []).some((m) => m.code === "S80" && /tableau de preuves/.test(m.motif)) || (s80motive.o?.avertissements_sans_motif || []).length)
+      echecs.push(`50 sexies : S80 motivée à l'appel (--motif S80=…) → attendu exit 0, affichable et le motif rendu, obtenu ${s80motive.code} ${JSON.stringify(s80motive.o).slice(0, 300)}`);
+    const s80court = prejuger50("brouillon-50-motif-court", EN_LIGNE, "--motif", "S80=voulu");
+    if (s80court.code !== 1 || s80court.o?.affichable !== false || !(s80court.o?.motifs_ignores || []).length)
+      echecs.push(`50 septies : un motif de deux mots (ou moins) ne dit pas pourquoi → attendu exit 1 et le motif ignoré, obtenu ${s80court.code} ${JSON.stringify(s80court.o).slice(0, 300)}`);
+    const s80autre = prejuger50("brouillon-50-motif-autre-regle", EN_LIGNE, "--motif", "S81=le guide est celui du produit tel quel");
+    if (s80autre.code !== 1 || s80autre.o?.affichable !== false || !(s80autre.o?.motifs_ignores || []).length)
+      echecs.push(`50 octies : le motif d'une autre règle (S81) ne couvre pas S80 → attendu exit 1 et le motif ignoré, obtenu ${s80autre.code} ${JSON.stringify(s80autre.o).slice(0, 300)}`);
   }
   // 51 — TF-1851 (18/10/2026) : UNE DEMANDE DE DÉTAIL L'EMPORTE SUR LE RAPPEL D'UNE LIGNE (S4), DANS SES SENS.
   // (a) La reconnaissance du message humain : « 51 détaille », « détaille D-51 », « détaille la 51 », « détaille la
@@ -1103,7 +1117,7 @@ try {
     if (/DÉTAIL/.test(JSON.stringify(neutre.d || "")))
       echecs.push(`51 quater : le MÊME rappel sous un message qui ne demande aucun détail ne doit rien dire pour DÉTAIL, obtenu ${JSON.stringify(neutre.d).slice(0, 240)}`);
     const pr = prejuger51("brouillon-51-rappel", RAPPEL_UNE_LIGNE, rouge.p);
-    if (pr.code !== 0 || (pr.o?.bloquants || []).some((x) => /^DÉTAIL/.test(x)) || !(pr.o?.avertissements || []).some((x) => /^DÉTAIL/.test(x)))
+    if ((pr.o?.bloquants || []).length || (pr.o?.bloquants || []).some((x) => /^DÉTAIL/.test(x)) || !(pr.o?.avertissements || []).some((x) => /^DÉTAIL — .{20,}/.test(x)) || pr.code !== 1 || !(pr.o?.avertissements_sans_motif || []).includes("DÉTAIL"))
       echecs.push(`51 quinquies : --prejuger avec le transcript doit dire l'avertissement DÉTAIL avant l'affichage, sans refus (T2), obtenu ${pr.code} ${JSON.stringify(pr.o).slice(0, 240)}`);
     const pv = prejuger51("brouillon-51-entiere", D51_ENTIERE, rouge.p);
     if (pv.code !== 0 || pv.o?.detail !== "PASS")
@@ -1228,8 +1242,8 @@ try {
     if (pRefuse.code !== 1 || !(pRefuse.o?.bloquants || []).some((x) => /^RÉSERVATION/.test(x)))
       echecs.push(`52 duodecies : --prejuger chez le produit, à l'échéance, refuse avant l'affichage → attendu exit 1 et RÉSERVATION, obtenu ${pRefuse.code} ${JSON.stringify(pRefuse.o).slice(0, 220)}`);
     const pAvertit = prejuger52(produit52(), D61, "brouillon-52-avertit", LOIN);
-    if (pAvertit.code !== 0 || !(pAvertit.o?.avertissements || []).some((x) => /^RÉSERVATION/.test(x)))
-      echecs.push(`52 terdecies : --prejuger avant l'échéance → attendu exit 0 et un avertissement RÉSERVATION, obtenu ${pAvertit.code} ${JSON.stringify(pAvertit.o).slice(0, 220)}`);
+    if ((pAvertit.o?.bloquants || []).length || !(pAvertit.o?.avertissements || []).some((x) => /^RÉSERVATION/.test(x)) || pAvertit.code !== 1 || !(pAvertit.o?.avertissements_sans_motif || []).includes("RÉSERVATION"))
+      echecs.push(`52 terdecies : --prejuger avant l'échéance → attendu aucun bloquant, un avertissement RÉSERVATION non motivé (exit 1, TF-2171), obtenu ${pAvertit.code} ${JSON.stringify(pAvertit.o).slice(0, 220)}`);
     inscrire(dRefus, JSON.stringify({ seq: 2, ts: "2026-10-18T10:00:01Z", type: "question_humain", decision: "D-61", question: "Publier ?" }), ["question_humain", "--decision", "D-61", "--question", "Publier ?"]);
     const hVert = hook52(dRefus, D61, BLOQUE);
     if (hVert !== null) echecs.push(`52 quaterdecies : après l'inscription de D-61, la MÊME restitution à l'échéance passe sans rien dire, obtenu ${JSON.stringify(hVert).slice(0, 240)}`);
@@ -1496,7 +1510,7 @@ try {
     const fb56 = join(base, "brouillon-56.md"); writeFileSync(fb56, ROUGE56, "utf8");
     const pj = spawnSync(process.execPath, [HOOK, "--prejuger", fb56, "--transcript", pRouge], { encoding: "utf8", cwd: cwd56, env: { ...ENV_SANS_SESSION, FORGE_S84_BLOQUANTE_DES: "2099-01-01" } });
     let pjo = null; try { pjo = JSON.parse(pj.stdout || "null"); } catch { /* illisible */ }
-    if (!/S84 jouée sur 0 relevé/.test(pjo?.horloge || "") || !(pjo?.avertissements || []).includes("S84"))
+    if (!/S84 jouée sur 0 relevé/.test(pjo?.horloge || "") || !(pjo?.avertissements || []).some((x) => /^S84 — .{20,}/.test(x)))
       echecs.push(`56 quinquies : --prejuger avec la transcription doit jouer S84 et la dire en avertissement, sans échéance (T2), obtenu ${JSON.stringify(pjo).slice(0, 320)}`);
     const pn = spawnSync(process.execPath, [HOOK, "--prejuger", fb56], { encoding: "utf8", cwd: cwd56, env: ENV_SANS_SESSION });
     let pno = null; try { pno = JSON.parse(pn.stdout || "null"); } catch { /* illisible */ }
@@ -1794,8 +1808,8 @@ try {
     };
     const pRouge = hook59("prejuger-rouge", [ecr(PAGE)], {}).p, pVert = hook59("prejuger-vert", [ecr(PAGE), crit(CRITIQUE("site/x.html"))], {}).p;
     const pjA = prejuger(pRouge, AVERTIT), pjB = prejuger(pRouge, BLOQUE), pjV = prejuger(pVert, BLOQUE);
-    if (pjA.code !== 0 || !(pjA.o?.avertissements || []).some((x) => /^CRITIQUE \(bloquante dès le 2099-01-01\) — /.test(x)) || pjA.o?.critique?.verdict !== "FAIL")
-      echecs.push(`59 unvicies : --prejuger avant l'échéance → attendu affichable avec l'avertissement CRITIQUE, obtenu ${pjA.code} ${JSON.stringify(pjA.o).slice(0, 300)}`);
+    if ((pjA.o?.bloquants || []).length || pjA.code !== 1 || !(pjA.o?.avertissements || []).some((x) => /^CRITIQUE \(bloquante dès le 2099-01-01\) — /.test(x)) || pjA.o?.critique?.verdict !== "FAIL" || !(pjA.o?.avertissements_sans_motif || []).includes("CRITIQUE"))
+      echecs.push(`59 unvicies : --prejuger avant l'échéance → attendu aucun bloquant et l'avertissement CRITIQUE non motivé (exit 1, TF-2171), obtenu ${pjA.code} ${JSON.stringify(pjA.o).slice(0, 300)}`);
     if (pjB.code !== 1 || !(pjB.o?.bloquants || []).some((x) => /^CRITIQUE — /.test(x)))
       echecs.push(`59 duovicies : --prejuger à l'échéance → attendu non affichable, CRITIQUE bloquante, obtenu ${pjB.code} ${JSON.stringify(pjB.o).slice(0, 300)}`);
     if (pjV.code !== 0 || (pjV.o?.bloquants || []).length || pjV.o?.critique?.verdict !== "PASS")
@@ -1902,10 +1916,10 @@ try {
     if (rouge.o?.decision === "block" || !s87(rouge.o)
       || !/Livré : \[Produit - Guide - Lot 0 - 20261029b\]\(output\/04-cadrages\/Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b\.md\)/.test(rouge.o?.systemMessage || ""))
       echecs.push(`61 : un tour qui écrit le guide sous output/04-cadrages et dont le bloc 0 ne le lie pas → attendu l'avertissement S87 (sans refus) qui NOMME le fichier et donne la ligne « Livré : [nom](chemin%20relatif) », obtenu ${JSON.stringify(rouge.o).slice(0, 400)}`);
-    // ROUGE — par --prejuger : l'avertissement est dit, le verdict affichable reste (règle neuve, avertissante).
+    // ROUGE — par --prejuger : l'avertissement est dit avec son message ; règle avertissante, aucun bloquant, mais non affichable (exit 1) tant qu'il n'est pas corrigé ou motivé (TF-2171).
     const pj = prejuge61("rouge", rouge.p, BON);
-    if (pj.code !== 0 || pj.o?.affichable !== true || !(pj.o?.avertissements || []).some((a) => /^S87 — le tour a écrit 1 livrable/.test(a) && /Produit - Guide - Lot 0/.test(a)) || pj.o?.livre?.verdict !== "FAIL")
-      echecs.push(`61 bis : --prejuger sur le même brouillon → attendu exit 0, avertissement S87 qui nomme le guide et livre.verdict FAIL, obtenu exit ${pj.code} ${JSON.stringify(pj.o).slice(0, 400)}`);
+    if ((pj.o?.bloquants || []).length || pj.code !== 1 || pj.o?.affichable !== false || !(pj.o?.avertissements || []).some((a) => /^S87 — le tour a écrit 1 livrable/.test(a) && /Produit - Guide - Lot 0/.test(a)) || pj.o?.livre?.verdict !== "FAIL" || !(pj.o?.avertissements_sans_motif || []).includes("S87"))
+      echecs.push(`61 bis : --prejuger sur le même brouillon → attendu aucun bloquant, exit 1, avertissement S87 qui nomme le guide et livre.verdict FAIL, obtenu exit ${pj.code} ${JSON.stringify(pj.o).slice(0, 400)}`);
     // VERTS — le remède joué : la ligne « Livré : » liée, en ligne, en puces, en bloc 0 titré, avec deux livrables.
     for (const [nom, etapes, ligne, titre] of [
       ["ligne", [ecr61(GUIDE)], `Livré : ${LIEN_GUIDE}`, false],
@@ -2111,8 +2125,8 @@ try {
     const fb64 = join(base, "brouillon-64.md"); writeFileSync(fb64, RIEN64, "utf8");
     const pj64 = spawnSync(process.execPath, [HOOK, "--prejuger", fb64, "--transcript", rouge64.p], { encoding: "utf8", cwd: pRouge, env: { ...ENV_SANS_SESSION, ...ENV64 } });
     let pjo64 = null; try { pjo64 = JSON.parse(pj64.stdout || "null"); } catch { /* illisible */ }
-    if (pj64.status !== 0 || pjo64?.affichable !== true || !(pjo64?.avertissements || []).some((a) => /^REMONTÉE — le tour a utilisé le skill de la Factory « make-it-better »/.test(a)) || pjo64?.remontee?.verdict !== "FAIL")
-      echecs.push(`64 bis : --prejuger sur le même brouillon → attendu affichable avec l'avertissement REMONTÉE et remontee.verdict FAIL, obtenu exit ${pj64.status} ${JSON.stringify(pjo64).slice(0, 400)}`);
+    if ((pjo64?.bloquants || []).length || pj64.status !== 1 || pjo64?.affichable !== false || !(pjo64?.avertissements || []).some((a) => /^REMONTÉE — le tour a utilisé le skill de la Factory « make-it-better »/.test(a)) || pjo64?.remontee?.verdict !== "FAIL" || !(pjo64?.avertissements_sans_motif || []).includes("REMONTÉE"))
+      echecs.push(`64 bis : --prejuger sur le même brouillon → attendu aucun bloquant, l'avertissement REMONTÉE non motivé (exit 1, TF-2171) et remontee.verdict FAIL, obtenu exit ${pj64.status} ${JSON.stringify(pjo64).slice(0, 400)}`);
     // VERTS — le remède joué, de deux façons.
     const pCmd = produit64("remede-commande");
     const parCommande = hook64("remede-commande", pCmd, [skillOutil(), livrable64(pCmd), { name: "Bash", input: { command: "python forge/ledger.py retour --titre \"page autonome absente de make-it-better\" --test-generalite oui" } }]);
