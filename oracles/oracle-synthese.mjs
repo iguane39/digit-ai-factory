@@ -214,6 +214,7 @@ import { enumerationsEnLigne, etapesDeGuide, etapesQuiEnchainent, etapesSansClot
 import { affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { chiffresSansReleve } from "./lib-chiffres-releves.mjs";
 import { lireCarte, derniereDemande, etatDesLivrables, sessionDe, REPLI_DIT } from "./lib-mobilisation.mjs";
+import { motifDeResteAuProduit, retourNommeNonEcrit } from "./lib-frictions.mjs";
 
 // --racine <dossier> (TF-1644, 14/10/2026) : le dossier du PROJET dont la restitution est jugée,
 // quand le fichier jugé n'y vit pas. Le hook de fin de tour écrit le message dans un fichier
@@ -757,6 +758,18 @@ function runOuvert(produit) {
     }
   } catch { return { existe: true, ouvert: false }; }
   return { existe: true, ouvert: dernier === "run_open" };
+}
+/** Les `seq` des entrées `type: retour` du ledger courant d'un produit (TF-2137) ; ledger absent ou illisible : aucun. */
+function retoursDuLedger(produit) {
+  const seqs = [];
+  try {
+    for (const l of readFileSync(join(produit, "forge", "ledger.jsonl"), "utf8").split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      let e; try { e = JSON.parse(l); } catch { continue; }
+      if (e && e.type === "retour" && Number.isFinite(e.seq)) seqs.push(e.seq);
+    }
+  } catch { /* ledger absent : aucun retour lu */ }
+  return seqs;
 }
 const CORRECTION_DU_TOUR = uni(new RegExp([
   String.raw`correction d['’](?:une|la|ma) (?:restitution|r[ée]ponse|synth[èe]se|fiche) pr[ée]c[ée]dente`,
@@ -1391,9 +1404,17 @@ function juger(texte, cheminJuge = null) {
       : ok(regle, `${concernes.length} action(s) concernée(s) — ${siOk}`);
   };
 
-  juger8("S11", /\bauto_ia\b/, (g, zm) => MOTIFS_IA.test(zm),
+  // TF-2137 (05/11/2026, RT-42 de Produit-84) — `hors_mandat` NE COUVRE PAS LA CONSIGNATION D'UN RETOUR. Le 04/11/2026, l'action « consigner le retour » (auto_ia) est restée
+  // non exécutée sous `hors_mandat`, et le porteur a dû réclamer la remontée. Écrire un retour au ledger du produit est du ressort de toute session de ce produit : le
+  // motif déclarait un périmètre qui n'existe pas. Le registre du pilot (TODO.jsonl) est un autre mandat, et reste admis sous `hors_mandat`.
+  // `(?<![\w-])` : « allers-retours » n'est pas un retour (mesuré : deux actions de traitement de candidats l'ont accusé au premier jet).
+  const CONSIGNE_UN_RETOUR = /\b(?:consign|signal|remont|enregistr|journalis|[ée]cri)\w*[^.\n|]{0,80}(?<![\w-])(?:retours?|remont[ée]es?|frictions?)\b|(?<![\w-])(?:retours?|frictions?)\b[^.\n|]{0,60}\bconsign\w*|ledger\.(?:py|mjs)\s+retour|\btype\s*:?\s*retour\b/i;
+  const REGISTRE_DU_PILOT = /TODO\.jsonl|TODO-FORGE|journaliser\.mjs|ingerer-lot|registre (?:du )?pilot/i;
+  const consigneUnRetour = (g) => CONSIGNE_UN_RETOUR.test(g) && !REGISTRE_DU_PILOT.test(g);
+  juger8("S11", /\bauto_ia\b/, (g, zm) => MOTIFS_IA.test(zm) && !(/\bhors_mandat\b/.test(zm) && consigneUnRetour(g)),
     "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
-    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat.",
+    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat. " +
+    "`hors_mandat` ne couvre pas une action qui consigne un retour : l'écrire au ledger du produit est du ressort de toute session (TF-2137).",
     "chaque action `auto_ia` non exécutée porte son motif");
 
   juger8("S12", HUMAINS, (g, zm) => MOTIFS_HUMAIN.test(zm),
@@ -2954,6 +2975,12 @@ function juger(texte, cheminJuge = null) {
         ko("S48", `« reste au produit » renvoie la remontée à la clôture d'un run, or aucun run n'est ouvert au ledger du produit (${run.existe ? "forge\\ledger.jsonl sans run_open en cours" : "forge\\ledger.jsonl absent"}) : `
           + "le lot n'est compilé qu'à la clôture d'un run, la remontée n'a donc aucun lot où se joindre. Hors run, le tour remet son lot : « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis ». "
           + `Le 26/10/2026, une correction a été renvoyée au lot de clôture d'un run qui n'existait pas, et S48 a accepté la ligne (TF-1982) — ${ligne.trim().slice(0, 100)}`);
+      } else if (RESTE_AU_PRODUIT.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne) && retourNommeNonEcrit(motifDeResteAuProduit(ligne), retoursDuLedger(dossierProduit)).refus) {
+        // TF-2137 (RT-42) — le motif nomme un retour que le ledger du produit ne porte pas : promis au futur, ou cité sans entrée correspondante.
+        const verdictMotif = retourNommeNonEcrit(motifDeResteAuProduit(ligne), retoursDuLedger(dossierProduit));
+        ko("S48", `« reste au produit » nomme un retour qui n'est pas écrit au ledger du produit : ${verdictMotif.raison}. Un motif se lit comme un fait : le retour est déjà une entrée \`type: retour\` de \`forge\\ledger.jsonl\` (`
+          + "`python forge/ledger.py retour --resume \"…\"`), ou la ligne nomme le lot remis. "
+          + `Le 04/11/2026, « reste au produit, parce que le retour sera consigné avec A-2 » a été jugé affichable, le retour n'a été écrit nulle part et le porteur a dû réclamer la remontée (TF-2137, RT-42) — ${ligne.trim().slice(0, 100)}`);
       } else
         ok("S48", /rien (?:à|a) remonter/i.test(ligne) ? "le tour déclare n'avoir rien à remonter à la factory, et ne corrige aucune erreur de la session"
           : RESTE_AU_PRODUIT.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne) ? "le tour garde son retour au produit et dit pourquoi"
@@ -5909,6 +5936,27 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`S48 (TF-1982) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
   if (!/aucun run n'est ouvert/.test(c48(r48resteSansLedger).message || "") || !/ledger\.jsonl absent/.test(c48(r48resteSansLedger).message || ""))
     casse.push("S48 (TF-1982) : le constat sans ledger doit dire qu'aucun run n'est ouvert ET que le ledger est absent : " + String(c48(r48resteSansLedger).message || "").slice(0, 200));
+  // 05/11 — TF-2137 (RT-42) : un motif « reste au produit » qui NOMME un retour le lit comme un fait. Rouge : « le retour sera consigné avec A-2 » (le cas du 04/11), « consigné (seq 2) » alors
+  // que l'entrée 2 du ledger n'est pas un retour, « consigné au ledger » sans aucun retour au ledger. Vert : le MÊME motif devant un ledger qui porte l'entrée `type: retour` (le remède joué),
+  // et un retour écrit qui annonce seulement sa remise future (« sera remonté dans le lot de clôture »).
+  mkdirSync(join(dir, "produit48-retour", "forge", "retours"), { recursive: true });
+  writeFileSync(join(dir, "produit48-retour", "forge", "ledger.jsonl"), LEDGER48("run_open", "retour"), "utf8");
+  const reste48 = (motif) => `\n- Remontée à la factory : reste au produit, parce que ${motif}\n`;
+  const r48futur = jouer48Dans("produit48-run-ouvert", "s48-reste-retour-futur.md", reste48("le retour sera consigné avec A-2."));
+  const r48seqAbsent = jouer48Dans("produit48-run-ouvert", "s48-reste-retour-seq-absent.md", reste48("le retour est consigné au ledger (seq 2)."));
+  const r48sansRetour = jouer48Dans("produit48-run-ouvert", "s48-reste-retour-sans-entree.md", reste48("le retour est consigné au ledger."));
+  const r48seqPresent = jouer48Dans("produit48-retour", "s48-reste-retour-ecrit.md", reste48("le retour est consigné au ledger (seq 2)."));
+  const r48ecritPuisRemis = jouer48Dans("produit48-retour", "s48-reste-retour-ecrit-remis-plus-tard.md", reste48("le retour est consigné (seq 2) et sera remonté dans le lot de clôture."));
+  for (const [r, statut, quoi] of [
+    [r48futur, "FAIL", "« reste au produit, parce que le retour sera consigné avec A-2 » passe — le cas du 04/11, un retour promis au futur et écrit nulle part"],
+    [r48seqAbsent, "FAIL", "un motif qui cite l'entrée seq 2 comme un retour passe alors que l'entrée 2 du ledger n'en est pas un"],
+    [r48sansRetour, "FAIL", "un motif qui dit le retour consigné au ledger passe alors que le ledger ne porte aucune entrée type: retour"],
+    [r48seqPresent, "PASS", "le MÊME motif devant un ledger dont l'entrée seq 2 est un retour (le remède joué) est accusé"],
+    [r48ecritPuisRemis, "PASS", "un retour écrit qui annonce sa seule remise future (« sera remonté dans le lot de clôture ») est accusé"],
+  ]) if (c48(r).statut !== statut)
+    casse.push(`S48 (TF-2137) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
+  if (!/n'est pas écrit/.test(c48(r48futur).message || "") || !/TF-2137/.test(c48(r48futur).message || ""))
+    casse.push("S48 (TF-2137) : le constat du retour promis au futur doit dire que le retour n'est pas écrit et citer TF-2137 : " + String(c48(r48futur).message || "").slice(0, 200));
   // 29/10 — TF-1987 : UNE CORRECTION D'INFRASTRUCTURE EST UNE CORRECTION. Le cas réel du 24/10 : le tour recrée le conteneur d'un moteur avec un volume (`docker rm`, `docker run -v`),
   // puis déclare « rien à remonter ». FAIL ; le MÊME qui nomme son lot PASS ; une commande de lecture (`docker ps`) n'est pas une correction.
   const INFRA48 = "\n- Conteneur du moteur recréé avec un volume : `docker rm -f nodeodm` puis `docker run -d -v nodeodm-data:/var/www/data opendronemap/nodeodm` — preuve : le conteneur répond sur le port 3000.\n";
@@ -6781,6 +6829,34 @@ Aucun écart : la demande a été suivie à la lettre.
       [fd, "S36", "FAIL", "la critique proposée en option de décision (bloc 3) est prise pour le verdict d'une page livrée"],
     ]) if (constatDe(r, regle).statut !== statut)
       casse.push(`${regle} (critique en action, TF-1981, 29/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 200));
+  }
+  // 05/11 — S11 ET LA CONSIGNATION D'UN RETOUR (TF-2137, RT-42). (a) Rouge : « consigner le retour au ledger du produit » laissée en `auto_ia` sous `hors_mandat` — le cas du 04/11, où le porteur
+  // a dû réclamer la remontée. (b) Vert : la même action sous `dependance_externe`, un obstacle réel. (c) Vert : `hors_mandat` sur une action qui ne consigne aucun retour. (d) Vert : ingérer des
+  // lots au registre du pilot, un autre mandat. (e) Vert : « allers-retours » n'est pas un retour. (f) Rouge : « Signaler à forge-audit l'écart », dont le comment est « entrée de type retour ».
+  {
+    const ACTION_RETOUR = (texte, motif, comment = "") => `- **A-3** — enfin TF-0222 (auto_ia) — ${texte}.\n`
+      + `  - motif de non-exécution : ${motif} — l'écriture est jouable.\n${comment ? `  - où : ${comment}.\n` : ""}`
+      + "  - si rien n'est fait : l'écart reste au produit et n'est remonté à personne.\n";
+    const avec = (texte, motif, comment) => verte.replace(/- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/, ACTION_RETOUR(texte, motif, comment));
+    const TEXTE_RETOUR = "consigner le retour au ledger du produit avec `python forge/ledger.py retour --resume \"écart au gabarit\"`";
+    const s11a = jouerPe("s11-retour-hors-mandat.md", avec(TEXTE_RETOUR, "hors_mandat"));
+    const s11b = jouerPe("s11-retour-dependance-externe.md", avec(TEXTE_RETOUR, "dependance_externe"));
+    const s11c = jouerPe("s11-hors-mandat-sans-retour.md", avec("regrouper les constats par cause racine", "hors_mandat"));
+    const s11d = jouerPe("s11-hors-mandat-ingestion-pilot.md", avec("ingérer les lots de retours au registre du pilot avec `node todo\\ingerer-lot.mjs`", "hors_mandat"));
+    const s11e = jouerPe("s11-hors-mandat-allers-retours.md", avec("instruire les candidats remontés par les produits, qui coûtent des allers-retours", "hors_mandat"));
+    const s11f = jouerPe("s11-signaler-entree-de-type-retour.md", avec("signaler à forge-audit l'écart entre ses contrôles et son gabarit", "hors_mandat", "`forge/ledger.jsonl`, entrée de type retour"));
+    if (avec(TEXTE_RETOUR, "hors_mandat") === verte) casse.push("S11 (TF-2137) : la fixture n'a pas été modifiée — le cas ne prouve plus rien");
+    for (const [r, statut, quoi] of [
+      [s11a, "FAIL", "une action qui consigne un retour, laissée non exécutée sous `hors_mandat`, passe — le cas du 04/11"],
+      [s11b, "PASS", "la même action sous `dependance_externe` est accusée — S11 mordrait sur un obstacle réel"],
+      [s11c, "PASS", "`hors_mandat` sur une action qui ne consigne aucun retour est accusé"],
+      [s11d, "PASS", "`hors_mandat` sur l'ingestion de lots au registre du pilot, un autre mandat, est accusé"],
+      [s11e, "PASS", "« allers-retours » est pris pour un retour à consigner"],
+      [s11f, "FAIL", "« Signaler à forge-audit l'écart », dont le comment est « entrée de type retour », passe sous `hors_mandat`"],
+    ]) if (constatDe(r, "S11").statut !== statut)
+      casse.push(`S11 (consignation d'un retour, TF-2137, 05/11) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S11").message || "sortie illisible").slice(0, 200));
+    if (!/TF-2137/.test(constatDe(s11a, "S11").message || "") || !/consigne un retour/.test(constatDe(s11a, "S11").message || ""))
+      casse.push("S11 (TF-2137) : le constat doit dire que `hors_mandat` ne couvre pas une action qui consigne un retour : " + String(constatDe(s11a, "S11").message || "").slice(0, 200));
   }
   // 29/10 — S88, « DE QUOI S'AGIT-IL » DIT CE QU'EST L'OBJET AVANT SON NOM INTERNE (TF-1979), DANS SES SENS. Le champ de FORMAT_B est la forme de référence : S88 PASS. (a) Rouge :
   // le champ s'ouvre par `forge_tests@1.12.0`, sans glose — le nom avant la raison d'être. (b) Vert : le MÊME nom suivi de sa glose (« , la version … qui corrige … »). (c) Vert : la raison

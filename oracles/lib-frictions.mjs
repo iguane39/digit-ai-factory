@@ -308,6 +308,56 @@ export const declareRienARemonter = (ligne) => {
   return /rien (?:à|a) remonter/i.test(l) && !/RETOURS - \d{8}[a-z]+/.test(l) && !/\breste au produit,?\s+parce qu(?:e\s+\S|['’]\S)/i.test(l);
 };
 
+// TF-2156 (05/11/2026) — LES DEUX AUTRES FORMES QUI PASSAIENT PAR LA MÊME PORTE. Mesure de TF-2141 : après une friction, sans aucun retour au ledger du tour,
+// 4 restitutions disaient « reste au produit, parce que… » et 4 « rien de neuf ». Le contrôle ne jugeait que « rien à remonter ».
+/** La ligne garde le retour au produit : « reste au produit, parce que <motif> », sans lot nommé. */
+export const declareResteAuProduit = (ligne) => {
+  const l = String(ligne || "");
+  return /\breste au produit,?\s+parce qu(?:e\s+\S|['’]\S)/i.test(l) && !/RETOURS - \d{8}[a-z]+/.test(l);
+};
+/** La ligne dit « rien de neuf » (sans « à remonter »), sans lot nommé ni « reste au produit, parce que <motif> ». */
+export const declareRienDeNeuf = (ligne) => {
+  const l = String(ligne || "");
+  return /\brien de neuf\b/i.test(l) && !/rien (?:à|a) remonter/i.test(l) && !/RETOURS - \d{8}[a-z]+/.test(l) && !declareResteAuProduit(l);
+};
+
+// TF-2137 (05/11/2026, RT-42 de Produit-84) — UN MOTIF « RESTE AU PRODUIT » QUI NOMME UN RETOUR NON ÉCRIT. Le 04/11/2026 : « reste au produit, parce que le retour sera
+// consigné avec A-2 » rendait affichable : le motif existait, c'est tout ce que S48 lisait, et le retour promis au futur n'était écrit nulle part. Le porteur a dû
+// réclamer la remontée. Le motif est lu comme un fait : s'il nomme un retour, ce retour est déjà écrit au ledger du produit, ou la ligne ne passe pas.
+const NOMME_UN_RETOUR = /(?<![\w-])(?:retours?|remont[ée]es?|frictions?|consignations?)\b/i;   // « allers-retours » n'est pas un retour
+// Le futur et le report : « sera consigné », « à consigner », « consignerai », « plus tard », « pas encore écrit ».
+const RETOUR_A_VENIR = /\b(?:sera|seront|serait|seraient)\s+(?:\w+\s+){0,2}(?:consign|[ée]crit|remont|ajout|enregistr|journalis)\w*|\b(?:va|vont)\s+[êe]tre\b|(?<![\p{L}\p{N}_])[àa]\s+(?:consigner|[ée]crire|remonter|ajouter|enregistrer|journaliser|venir)\b|\b(?:consigner|[ée]crir|remonter|ajouter|enregistrer|journaliser)(?:ai|as|a|ons|ez|ont|ais|ait|ions|aient)\b|\bplus tard\b|\bpas encore\b|\bn['’]est pas (?:encore )?(?:consign|[ée]crit|remont|enregistr)\w*/giu;
+// Le passé : « consigné au ledger », « écrit (seq 171) ».
+const RETOUR_DIT_ECRIT = /(?<![\p{L}\p{N}_])(?:consign[ée]e?s?|[ée]crit(?:e|s|es)?|enregistr[ée]e?s?|journalis[ée]e?s?)(?![\p{L}\p{N}_])|\bseq\.?\s*\d+/iu;   // « é » n'est pas un caractère de mot pour \b
+/**
+ * Le motif d'une ligne « reste au produit, parce que <motif> » (le reste de la ligne), ou null.
+ */
+export const motifDeResteAuProduit = (ligne) => {
+  const m = /\breste au produit,?\s+parce qu(?:e\s+|['’])(\S[\s\S]*)$/i.exec(String(ligne || ""));
+  return m ? m[1] : null;
+};
+/**
+ * Le motif nomme-t-il un retour que le ledger du produit ne porte pas ? `retoursSeq` : les `seq` des entrées `type: retour` du ledger courant.
+ * Rend { nomme: bool, ecrit: bool, raison } — `nomme` seul est une mention sans promesse (« la correction ne concerne que ce produit »).
+ */
+export function retourNommeNonEcrit(motif, retoursSeq = []) {
+  const m = String(motif || "");
+  if (!NOMME_UN_RETOUR.test(m)) return { nomme: false, ecrit: false, refus: false, raison: "le motif ne nomme aucun retour" };
+  // Le futur se retire d'abord : « consigné (seq 5) et sera remonté à la clôture » dit le retour écrit ; « sera consigné avec A-2 » ne le dit pas.
+  const avenir = m.match(RETOUR_A_VENIR) !== null;
+  const sansFutur = m.replace(RETOUR_A_VENIR, " ");
+  if (avenir && !RETOUR_DIT_ECRIT.test(sansFutur)) return { nomme: true, ecrit: false, refus: true, raison: "le motif promet le retour au futur ou à plus tard : il n'est écrit nulle part" };
+  if (!RETOUR_DIT_ECRIT.test(sansFutur)) return { nomme: true, ecrit: false, refus: false, raison: "le motif nomme un retour sans dire qu'il est écrit ni qu'il le sera" };
+  // Seul « seq N » désigne sans ambiguïté une entrée du ledger : « entrée 67 » a désigné, mesuré, le numéro d'un autre registre ou une entrée voisine (66 et 68 étaient les retours).
+  const cite = /\bseq\.?\s*(\d+)/i.exec(sansFutur);
+  if (cite) return retoursSeq.includes(Number(cite[1]))
+    ? { nomme: true, ecrit: true, refus: false, raison: `l'entrée seq ${cite[1]} est un retour du ledger` }
+    : { nomme: true, ecrit: false, refus: true, raison: `le motif cite l'entrée seq ${cite[1]}, qui n'est pas un retour du ledger du produit` };
+  return retoursSeq.length
+    ? { nomme: true, ecrit: true, refus: false, raison: "le ledger du produit porte au moins un retour" }
+    : { nomme: true, ecrit: false, refus: true, raison: "le motif dit le retour écrit, or le ledger du produit ne porte aucune entrée type: retour" };
+}
+
 // ---- FRICTIONS (TF-2141, D-172 (b) du 04/11/2026) — « RIEN À REMONTER » APRÈS UNE FRICTION, SANS RETOUR AU LEDGER ----------------
 //
 // LA RÈGLE. Chez un produit (un `forge/retours/` à la racine du projet), quand le tour porte une friction RETENUE, que la ligne
@@ -346,10 +396,9 @@ export const declareRienARemonter = (ligne) => {
 // un choix contesté sans règle, un brouillon refusé puis corrigé, une cause hors de la session.
 //
 // CE QUE LE CONTRÔLE NE VOIT PAS, dit plutôt que promis : une correction écrite hors du vocabulaire (« focalise-toi sur tel site, pas
-// sur tel autre ? ») ; une correction faite au tour d'avant, quand le tour jugé ne répond qu'à « 1a » ; « reste au produit, parce que le
-// retour sera consigné » sans retour au ledger (4 passages sur la période, avec une friction retenue), forme que S48 juge contre le run
-// ouvert ; « rien de neuf » sans « à remonter » (4 passages), que S48 dit ne pas trancher ; un retour écrit dans un autre ledger que
-// celui du projet ; la pertinence du retour consigné, que l'humain tranche.
+// sur tel autre ? ») ; une correction faite au tour d'avant, quand le tour jugé ne répond qu'à « 1a » ; un retour écrit dans un autre
+// ledger que celui du projet ; la pertinence du retour consigné, que l'humain tranche. « Reste au produit, parce que… » et « rien de neuf »
+// sans retour consigné, que cette liste donnait pour non vus (4 passages de chaque sur la période), sont jugés depuis le 05/11/2026 (TF-2156).
 export const FRICTIONS_BLOQUANTE = process.env.FORGE_FRICTIONS_BLOQUANTE === "1";
 /** Les frictions que le contrôle retient : une correction humaine, un refus de hook avant outil (pas le hook Stop, pas un oracle). */
 export const frictionRetenue = (f) => f?.type === "correction_humaine" || (f?.type === "refus_hook" && !/^Stop\b/i.test(f.outil || ""));
@@ -371,10 +420,15 @@ export function controlerFrictions({ frictions = [], texte = "", racine = "", re
   if (!retenues.length) return sans(frictions.length ? "aucune friction retenue (refus du hook Stop et échecs d'oracle sont journalisés, pas jugés)" : "aucune friction relevée dans le tour");
   const ligne = (String(texte || "").match(LIGNE_REMONTEE) || [])[0] || null;
   if (!ligne) return sans("aucune ligne « Remontée à la factory » : S48 la réclame");
-  if (!declareRienARemonter(ligne)) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], retenues, motif: "la ligne nomme un lot ou garde le retour au produit" };
+  // TF-2156 : trois formes disent qu'il n'y a rien à lire au ledger — « rien à remonter », « rien de neuf » et « reste au produit, parce que… » (qui garde le retour
+  // au produit : un retour qui reste s'écrit au ledger, c'est lui que la clôture du run compile). Seule la ligne qui nomme un lot passe sans retour consigné.
+  const forme = declareRienARemonter(ligne) ? "rien à remonter" : declareRienDeNeuf(ligne) ? "rien de neuf" : declareResteAuProduit(ligne) ? "reste au produit" : null;
+  if (!forme) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], retenues, motif: "la ligne nomme un lot" };
   if (retourConsigne) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], retenues, motif: "un retour est consigné depuis le message humain du tour" };
   const cites = retenues.slice(0, 3).map((f) => `${f.type}${f.outil ? ` (${f.outil})` : ""} : « ${resserrer(f.extrait, 160)} »`).join(" ; ");
-  return { applicable: true, verdict: "FAIL", bloquant: FRICTIONS_BLOQUANTE, retenues,
+  return { applicable: true, verdict: "FAIL", bloquant: FRICTIONS_BLOQUANTE, retenues, forme,
     ecarts: [`« ${resserrer(ligne, 120)} » dans un tour qui porte ${retenues.length} friction${retenues.length > 1 ? "s" : ""} — ${cites}${retenues.length > 3 ? ` (+${retenues.length - 3})` : ""} — `
-      + "et aucun retour n'est consigné au ledger du produit depuis le message humain"] };
+      + "et aucun retour n'est consigné au ledger du produit depuis le message humain"
+      + (forme === "reste au produit" ? " (« reste au produit » garde le retour au produit : un retour qui reste s'y écrit au ledger, que la clôture du run compile)"
+        : forme === "rien de neuf" ? " (« rien de neuf » dit la même chose que « rien à remonter »)" : "")] };
 }

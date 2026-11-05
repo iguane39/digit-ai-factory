@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { releveFrictions, correctionHumaine, commandeLanceOracle, echecDOracle, journaliserFrictions, cheminFrictions, controlerFrictions,
-  tourDesFrictions, declareRienARemonter, RAPPEL_FRICTIONS } from "./lib-frictions.mjs";
+  tourDesFrictions, declareRienARemonter, declareResteAuProduit, declareRienDeNeuf, motifDeResteAuProduit, retourNommeNonEcrit, RAPPEL_FRICTIONS } from "./lib-frictions.mjs";
 import { analyserTranscript } from "./hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -228,11 +228,53 @@ try {
   {
     const r = controlerFrictions({ frictions: fC, texte: RIEN, racine: pC, retourConsigne: true });
     const lot = controlerFrictions({ frictions: fC, texte: LOT, racine: pC });
-    const reste = controlerFrictions({ frictions: fC, texte: BON + "\n- Remontée à la factory : rien à remonter. La contradiction reste au produit, parce qu'elle vient de ma relecture.\n", racine: pC });
-    verifier(r.verdict === "PASS" && lot.verdict === "PASS" && reste.verdict === "PASS",
-      `12 : retour consigné, lot nommé, « reste au produit, parce qu'… » → attendu PASS, obtenu ${JSON.stringify([r.verdict, lot.verdict, reste.verdict])}`);
+    // TF-2156 (05/11/2026) : « reste au produit, parce que… » ne passe plus SANS retour consigné — la doctrine de TF-1643 l'admettait, la mesure de TF-2141 a trouvé 4 passages
+    // où il servait de porte de sortie à une friction sans retour. Avec le retour consigné (le remède joué), il passe ; le lot nommé passe comme avant.
+    const LIGNE_RESTE = BON + "\n- Remontée à la factory : rien à remonter. La contradiction reste au produit, parce qu'elle vient de ma relecture.\n";
+    const reste = controlerFrictions({ frictions: fC, texte: LIGNE_RESTE, racine: pC });
+    const resteRemede = controlerFrictions({ frictions: fC, texte: LIGNE_RESTE, racine: pC, retourConsigne: true });
+    verifier(r.verdict === "PASS" && lot.verdict === "PASS" && reste.verdict === "FAIL" && resteRemede.verdict === "PASS",
+      `12 : retour consigné et lot nommé → PASS ; « reste au produit, parce qu'… » sans retour consigné → FAIL, avec retour consigné → PASS (TF-2156), obtenu ${JSON.stringify([r.verdict, lot.verdict, reste.verdict, resteRemede.verdict])}`);
     verifier(declareRienARemonter("Remontée à la factory : rien à remonter dans ce tour.") && !declareRienARemonter("Remontée à la factory : lot « P - RETOURS - 20261104a » remis, rien à remonter de plus."),
       "12 bis : declareRienARemonter lit la forme de S48 et écarte un lot nommé");
+  }
+  // 12 ter — TF-2156 : les deux formes qui passaient par la même porte. ROUGE : « reste au produit, parce que le retour sera consigné avec A-2 » (le cas du 04/11) et « rien de neuf à
+  // remonter dans ce tour » après une friction, sans retour consigné → FAIL avertissant, la forme dite. VERT : les mêmes lignes avec le retour consigné (le remède), le lot nommé, et
+  // « rien de neuf » sans friction (SANS_OBJET). Les prédicats de forme à double sens : le lot nommé n'est ni « reste au produit » ni « rien de neuf ».
+  {
+    const LIGNE_AVENIR = BON + "\n- Remontée à la factory : reste au produit, parce que le retour sera consigné avec A-2.\n";
+    const LIGNE_NEUF = BON + "\n- Remontée à la factory : rien de neuf à remonter dans ce tour.\n";
+    const a = controlerFrictions({ frictions: fC, texte: LIGNE_AVENIR, racine: pC });
+    const n = controlerFrictions({ frictions: fC, texte: LIGNE_NEUF, racine: pC });
+    verifier(a.verdict === "FAIL" && a.bloquant === false && a.forme === "reste au produit" && /garde le retour au produit/.test(a.ecarts[0] || "") && /correction_humaine : « Pourquoi ce sujet/.test(a.ecarts[0] || ""),
+      `12 ter : friction + « reste au produit, parce que le retour sera consigné » sans retour → attendu FAIL avertissant, forme « reste au produit », la friction citée, obtenu ${JSON.stringify(a)}`);
+    verifier(n.verdict === "FAIL" && n.bloquant === false && n.forme === "rien de neuf" && /rien de neuf/.test(n.ecarts[0] || ""),
+      `12 quater : friction + « rien de neuf » sans retour → attendu FAIL avertissant, forme « rien de neuf », obtenu ${JSON.stringify(n)}`);
+    const remedes = [LIGNE_AVENIR, LIGNE_NEUF].map((texte) => controlerFrictions({ frictions: fC, texte, racine: pC, retourConsigne: true }).verdict);
+    const sansFriction = controlerFrictions({ frictions: [], texte: LIGNE_NEUF, racine: pC });
+    verifier(remedes.every((v) => v === "PASS") && sansFriction.verdict === "SANS_OBJET",
+      `12 quinquies : le retour consigné lève les deux formes ; « rien de neuf » sans friction est sans objet, obtenu ${JSON.stringify({ remedes, sans: sansFriction.verdict })}`);
+    verifier(declareResteAuProduit("Remontée à la factory : reste au produit, parce que la note est locale.") && !declareResteAuProduit("Remontée à la factory : lot « P - RETOURS - 20261104a » remis ; le reste au produit, parce que la note est locale.")
+      && !declareResteAuProduit("Remontée à la factory : rien à remonter.") && declareRienDeNeuf("Remontée à la factory : rien de neuf.")
+      && !declareRienDeNeuf("Remontée à la factory : rien de neuf, rien à remonter.") && !declareRienDeNeuf("Remontée à la factory : rien de neuf ; reste au produit, parce que la note est locale.")
+      && !declareRienDeNeuf("Remontée à la factory : lot « P - RETOURS - 20261104a » remis, rien de neuf de plus."),
+      "12 sexies : declareResteAuProduit et declareRienDeNeuf lisent la forme, écartent le lot nommé et ne se recouvrent pas");
+  }
+  // 12 septies — TF-2137 (S48) : le motif d'un « reste au produit » qui NOMME un retour le dit écrit ou ne passe pas. ROUGE : promis au futur (« sera consigné avec A-2 », le cas du 04/11),
+  // « consigné au ledger » devant un ledger sans retour, « seq 2 » alors que l'entrée 2 n'est pas un retour. VERT : le retour écrit (le remède, entrée seq 2 de type retour), écrit puis remis
+  // plus tard (« sera remonté dans le lot de clôture »), un motif qui ne nomme aucun retour, « allers-retours » qui n'en est pas un.
+  {
+    const dit = (motif, seqs = []) => retourNommeNonEcrit(motifDeResteAuProduit(`Remontée à la factory : reste au produit, parce que ${motif}`), seqs);
+    const futur = dit("le retour sera consigné avec A-2."), aVenir = dit("le retour est à consigner au prochain tour."), plusTard = dit("le retour sera écrit plus tard.");
+    const sansEntree = dit("le retour est consigné au ledger."), seqAbsent = dit("le retour est consigné au ledger (seq 2).", [5]);
+    const ecrit = dit("le retour est consigné au ledger (seq 2).", [2]), ecritPuisRemis = dit("le retour est consigné (seq 2) et sera remonté dans le lot de clôture.", [2]);
+    const ecritSansSeq = dit("le retour est consigné au ledger.", [4]), sansRetour = dit("la note vient du produit, sans règle de la factory en cause."), allersRetours = dit("la page coûte des allers-retours au porteur.");
+    verifier(futur.refus && aVenir.refus && plusTard.refus && sansEntree.refus && seqAbsent.refus,
+      `12 septies : un retour promis au futur, ou dit écrit sans entrée correspondante → attendu refus, obtenu ${JSON.stringify({ futur, aVenir, plusTard, sansEntree, seqAbsent })}`);
+    verifier(!ecrit.refus && ecrit.ecrit && !ecritPuisRemis.refus && !ecritSansSeq.refus && !sansRetour.refus && !sansRetour.nomme && !allersRetours.nomme,
+      `12 octies : le retour écrit (seq présente), écrit puis remis plus tard, le motif sans retour, « allers-retours » → attendu aucun refus, obtenu ${JSON.stringify({ ecrit, ecritPuisRemis, ecritSansSeq, sansRetour, allersRetours })}`);
+    verifier(motifDeResteAuProduit("Remontée à la factory : lot « P - RETOURS - 20261104a » remis.") === null && /sera consigné/.test(motifDeResteAuProduit("Remontée à la factory : reste au produit, parce que le retour sera consigné.") || ""),
+      "12 nonies : motifDeResteAuProduit rend le motif d'une ligne « reste au produit », null sans elle");
   }
   // 13 — VERT : un refus du hook Stop (la forme de la restitution, déjà journalisée au pilot) et un échec d'oracle ne sont pas retenus ;
   // hors d'un produit, le contrôle se dit sans objet.
@@ -302,6 +344,19 @@ try {
   {
     const h = hook(produit(), [humain(CORRECTION), final(LOT)]);
     verifier(!aFrictions(h.o), `20 : lot nommé → attendu aucun FRICTIONS, obtenu ${JSON.stringify(h.o).slice(0, 300)}`);
+  }
+  // 20 bis — TF-2156 de bout en bout, par le hook de fin de tour : ROUGE « reste au produit, parce que le retour sera consigné avec A-2 » et « rien de neuf à remonter » après la correction
+  // du porteur, sans retour → avertissement FRICTIONS ; VERT, le remède joué : le retour consigné par commande, ou une entrée `type: retour` du ledger datée après le message humain.
+  {
+    const AVENIR = BON + "\n- Remontée à la factory : reste au produit, parce que le retour sera consigné avec A-2.\n";
+    const NEUF = BON + "\n- Remontée à la factory : rien de neuf à remonter dans ce tour.\n";
+    const hAvenir = hook(produit(), [humain(CORRECTION), final(AVENIR)]);
+    const hNeuf = hook(produit(), [humain(CORRECTION), final(NEUF)]);
+    const remedeCommande = hook(produit(), [humain(CORRECTION), ...outil("Bash", { command: "python forge/ledger.py retour --resume \"sujet non remonté\"" }, "seq 174 écrit"), final(AVENIR)]);
+    const remedeLedger = hook(produit({ ledger: [{ seq: 1, ts: "2026-11-04T09:26:00.000Z", type: "retour", resume: "sujet non remonté" }] }), [humain(CORRECTION), final(NEUF)]);
+    verifier(aFrictions(hAvenir.o) && /reste au produit, parce que le retour sera consigné avec A-2/.test(JSON.stringify(hAvenir.o)) && hAvenir.o?.decision !== "block"
+      && aFrictions(hNeuf.o) && /rien de neuf à remonter/.test(JSON.stringify(hNeuf.o)) && !aFrictions(remedeCommande.o) && !aFrictions(remedeLedger.o),
+      `20 bis : « reste au produit » et « rien de neuf » après une correction, sans retour → FRICTIONS (sans refus) ; avec le retour consigné → aucun FRICTIONS, obtenu ${JSON.stringify([aFrictions(hAvenir.o), aFrictions(hNeuf.o), aFrictions(remedeCommande.o), aFrictions(remedeLedger.o)])}`);
   }
   // 21 — ROUGE : le refus d'un hook avant outil est une friction retenue ; VERT : le seul refus de forme par le hook Stop, puis la réécriture,
   // ne l'est pas, mais il est journalisé.
@@ -373,4 +428,7 @@ console.log(`hook-restitution-frictions : ${cas}/${cas} PASS — LES FRICTIONS D
   + "l'échec d'un oracle relevé, une lecture, un verdict imbriqué ou « Verdict : PASS » de tête non relevés, l'échec résolu marqué ; cas rouges : chez un produit, « rien à remonter » après "
   + "une correction ou un refus avant outil averti par le hook et par --prejuger, refusé quand le blocage est armé ; le remède joué (retour par commande ou au ledger daté du tour) passe, "
   + "un retour antérieur ne couvre pas, le lot nommé passe, le refus du hook Stop seul et l'échec d'oracle journalisés sans être retenus ; au pilot sans objet et journalisé ; "
-  + "le journal écrit aux champs de l'interface, sans doublon au second passage, une écriture ratée sans blocage");
+  + "le journal écrit aux champs de l'interface, sans doublon au second passage, une écriture ratée sans blocage ; "
+  + "TF-2156 (05/11/2026) : « reste au produit, parce que… » et « rien de neuf » après une friction, sans retour consigné, avertis comme « rien à remonter », le retour consigné ou le lot nommé les levant ; "
+  + "TF-2137 : le motif d'un « reste au produit » qui nomme un retour promis au futur, ou dit écrit sans entrée au ledger, refusé, le retour écrit (seq présente) accepté ; "
+  + "TF-2171 : --prejuger non affichable (exit 1) tant qu'un avertissement n'est pas motivé par --motif, affichable une fois chacun motivé");
