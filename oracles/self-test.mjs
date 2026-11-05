@@ -107,6 +107,8 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs gestes-distants" },
         // TF-2126 (HERITAGE 1.48.0, 04/11/2026) : pas de commit ni de déploiement pendant une campagne de mutation.
         { type: "command", command: "node forge/hooks/factory.mjs mutation-en-cours" }] },
+      // TF-2150 (HERITAGE 1.50.0, 04/11/2026) : la leçon rappelée au geste qui la déclenche.
+      { matcher: "Bash|PowerShell|Write|Edit|MultiEdit", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lecons" }] },
       // D-19 (a) (HERITAGE 1.29.0, 18/10/2026) : la flotte d'agents rappelée à chaque délégation.
       { matcher: "Agent|Task", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs flotte" }] }],
     // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.

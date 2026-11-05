@@ -107,6 +107,10 @@ forge/**/*motdepasse*
 # TF-2084 (04/11/2026) : registre transitoire des gestes distants ouverts par les sessions du produit. Il
 # change à chaque geste et vaut 15 minutes ; l'historique des gestes DÉCIDÉS reste dans gestes-approuves.jsonl.
 forge/gestes-en-cours.jsonl
+# TF-2150 (04/11/2026) : journaux de session des leçons, les rappels servis au geste (hook lecons) et les frictions
+# du tour (TF-2141) ; `scripts/lecons.mjs --recidives` du pilot les croise. Ils ne se commitent jamais.
+forge/lecons-rappels.jsonl
+forge/frictions.jsonl
 
 # ---- CE QUI N'EST PAS ICI, ET C'EST UNE DÉCISION ------------------------------------------------
 # `old\` N'EST PAS EXCLU. L'arbitrage C1, amendé par décision humaine du 13/08/2026 (TF-0150), le

@@ -64,7 +64,12 @@ const [nom, ...options] = process.argv.slice(2);
 // forge-tests altère les sources EN PLACE et pose `.forge-tests-mutation-en-cours` (TF-2091) ; tant que ce verrou
 // existe, `git commit`, le `git add` d'un fichier muté et un déploiement sont refusés, avec les fichiers mutés
 // nommés et le remède d'un verrou orphelin (pid mort). Bloque.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours"]);
+// `lecons` (04/11/2026, TF-2150, décision humaine D-172 (a)) : hook PreToolUse sur Bash, PowerShell, Write, Edit et
+// MultiEdit — la table des leçons du pilot (references/LECONS.json) et celle du produit (forge/LECONS.jsonl) sont lues
+// au moment du geste : la leçon dont le déclencheur correspond entre au contexte, citée comme une donnée (600 caractères
+// au plus, 3 leçons au plus), et chaque rappel servi s'écrit à forge/lecons-rappels.jsonl. Une leçon en barrière, qui
+// refuse le geste au pilot, AVERTIT seulement chez un produit en v1. Ne bloque jamais chez un produit.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [

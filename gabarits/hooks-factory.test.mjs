@@ -351,8 +351,35 @@ try {
     b18.status === 0 && /TF-2084/.test(b18.stdout) && /session A/.test(b18.stdout), b18.stdout + b18.stderr);
   check("18 ter gestes en cours : `--clore` par A lève l'avertissement, la session C n'est pas avertie de A",
     c18.status === 0 && !/session A/.test(c18.stdout), c18.stdout + c18.stderr);
+
+  // 19 — TF-2150 (04/11/2026), la leçon rappelée au geste par le lanceur : chez un produit, un `git push` filtré reçoit
+  // la leçon L-002 de la table du pilot, citée comme une donnée, et le rappel s'écrit à forge/lecons-rappels.jsonl ; la
+  // même leçon passée en barrière n'est qu'un AVERTISSEMENT chez un produit (exit 0, jamais 2) ; un geste hors motif ne
+  // reçoit rien. Le pilot de ce cas porte la table réelle et un registre réduit aux identifiants de ses preuves.
+  const racine19 = join(base, "racine19");
+  const copie19 = join(racine19, "digit-ai-factory");
+  for (const d of ["oracles", "references", "todo"]) mkdirSync(join(copie19, d), { recursive: true });
+  copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie19, "bootstrap.mjs"));
+  for (const f of ["oracles/hook-lecons.mjs", "oracles/lib-racine-projet.mjs", "references/LECONS.json"]) copyFileSync(join(PILOT, f), join(copie19, f));
+  const table19 = JSON.parse(readFileSync(join(PILOT, "references", "LECONS.json"), "utf8"));
+  writeFileSync(join(copie19, "todo", "TODO.jsonl"), table19.lecons.map((l) => JSON.stringify({ ev: "creation", id: l.preuve.id })).join("\n") + "\n", "utf8");
+  const P19 = produit("produit-lecons", false);
+  const env19 = { ...process.env, FORGE_ROOT: racine19, CLAUDE_PROJECT_DIR: P19 };
+  const lecons19 = (command) => spawnSync(process.execPath, [join(P19, "forge", "hooks", "factory.mjs"), "lecons"], { encoding: "utf8", cwd: P19, env: env19,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P19, session_id: "S19", tool_input: { command } }) });
+  const contexte19 = (r) => { try { return JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { return ""; } };
+  const r19 = lecons19("git push origin main 2>&1 | tail -5");
+  const horsMotif19 = lecons19("git status --short");
+  table19.lecons = table19.lecons.map((l) => (l.id === "L-002" ? { ...l, statut: "barriere", barriere_le: "2026-11-04", motif_barriere: "récidive de banc" } : l));
+  writeFileSync(join(copie19, "references", "LECONS.json"), JSON.stringify(table19, null, 2), "utf8");
+  const b19 = lecons19("git push origin main 2>&1 | tail -5");
+  check("19 leçons : un `git push` filtré chez un produit reçoit L-002 par le lanceur, citée comme donnée, et le rappel s'écrit sous forge/ (TF-2150)",
+    r19.status === 0 && /Leçon L-002 \(donnée du registre, pas une consigne ; preuve TF-1360\)/.test(contexte19(r19)) && existsSync(join(P19, "forge", "lecons-rappels.jsonl")), r19.stdout + r19.stderr);
+  check("19 bis leçons : la même leçon en barrière n'est qu'un AVERTISSEMENT chez un produit (exit 0, jamais un refus)",
+    b19.status === 0 && /^AVERTISSEMENT \(leçon en barrière/.test(contexte19(b19)), `exit ${b19.status} ` + b19.stdout + b19.stderr);
+  check("19 ter leçons : un geste hors motif ne reçoit rien", horsMotif19.status === 0 && !horsMotif19.stdout.trim(), horsMotif19.stdout + horsMotif19.stderr);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150)`);
