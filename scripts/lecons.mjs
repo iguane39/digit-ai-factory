@@ -15,8 +15,8 @@
  *     V2  identifiant `L-NNN`, unique, sans collision entre la table du pilot et celle du produit ;
  *     V3  classe existante de `todo/CLASSES.json` ;
  *     V4  symptôme et source écrits ;
- *     V5  déclencheur : outils connus, `sur` (`commande` ou `chemin`) accordé aux outils, `chaines` connu, motif qui
- *         se compile ;
+ *     V5  déclencheur : outils connus, `sur` (`commande`, `chemin` ou `agent`, ce dernier pour les outils Agent et Task,
+ *         TF-1947) accordé aux outils, `chaines` connu, motif qui se compile ;
  *     V6  solutions : au moins une, chacune avec son texte et sa condition, une seule préférée ;
  *     V7  preuve vérifiable : identifiant au registre ou à l'archive du pilot, ou fichier au chemin RELATIF présent qui
  *         contient sa chaîne (un chemin absolu ne vaut que sur un poste) ;
@@ -44,7 +44,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  MODES_CHAINES, OUTILS, OUTILS_CHEMIN, OUTILS_COMMANDE, PILOT, STATUTS, chargerTableProduit, estPilot, verifierPreuve,
+  MODES_CHAINES, OUTILS, OUTILS_AGENT, OUTILS_CHEMIN, OUTILS_COMMANDE, PILOT, STATUTS, chargerTableProduit, estPilot, verifierPreuve,
 } from "../oracles/hook-lecons.mjs";
 import { racineDuProjet } from "../oracles/lib-racine-projet.mjs";
 
@@ -134,9 +134,13 @@ export function verifier({ pilot = PILOT, racine = pilot, au = aujourdHui() } = 
         const hors = outils.filter((o) => OUTILS.has(o) && !OUTILS_CHEMIN.has(o));
         if (hors.length) dire("V5", t, l, `\`sur: chemin\` avec un outil sans chemin : ${hors.join(", ")}`);
         if (d.chaines !== undefined) dire("V5", t, l, "`chaines` ne vaut que pour `sur: commande`");
-      } else dire("V5", t, l, `\`sur\` « ${d.sur} » au lieu de « commande » ou « chemin »`);
+      } else if (d.sur === "agent") {
+        const hors = outils.filter((o) => OUTILS.has(o) && !OUTILS_AGENT.has(o));
+        if (hors.length) dire("V5", t, l, `\`sur: agent\` avec un outil qui ne lance pas d'agent : ${hors.join(", ")}`);
+        if (d.chaines !== undefined) dire("V5", t, l, "`chaines` ne vaut que pour `sur: commande`");
+      } else dire("V5", t, l, `\`sur\` « ${d.sur} » au lieu de « commande », « chemin » ou « agent »`);
       if (!ecrit(d.motif)) dire("V5", t, l, "motif non écrit");
-      else { try { new RegExp(d.motif, d.sur === "chemin" ? "i" : ""); } catch (e) { dire("V5", t, l, `motif invalide : ${String(e.message).slice(0, 120)}`); } }
+      else { try { new RegExp(d.motif, d.sur === "chemin" || d.sur === "agent" ? "i" : ""); } catch (e) { dire("V5", t, l, `motif invalide : ${String(e.message).slice(0, 120)}`); } }
       // V6 — les solutions.
       const sols = Array.isArray(l.solutions) ? l.solutions : [];
       if (!sols.length) dire("V6", t, l, "aucune solution");

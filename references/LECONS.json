@@ -1,8 +1,8 @@
 {
   "schema": "lecons@1",
-  "version": "1.0.0",
-  "date": "2026-11-04",
-  "_commentaire": "Table des leçons génériques du pilot (TF-2150, décision humaine D-172 (a) du 04/11/2026, étude « Apprentissage des erreurs par les produits et la Factory » 20261104b, option O2). Lue au moment du geste par oracles/hook-lecons.mjs (PreToolUse sur Bash, PowerShell, Write, Edit et MultiEdit), au pilot et chez chaque produit par `forge/hooks/factory.mjs lecons` ; rien n'est chargé à l'ouverture. Une leçon générique entre ici après décision au registre, avec une preuve qui se vérifie : le hook la revérifie avant chaque rappel et tait la leçon dont la preuve ne se vérifie plus. Jugée par `node scripts/lecons.mjs --verifier` ; passée de `rappel` à `barriere` par `--appliquer` quand elle récidive après son rappel (BOUCLE-AMELIORATION.md, section T1). Champs facultatifs : `declencheur.chaines` (`retirees` par défaut, `interpretees`, `gardees` : ce que le motif voit d'une commande, voir l'en-tête du hook), `barriere_le` et `motif_barriere` (écrits par --appliquer), `mesure` (calibrage du motif sur les gestes réels des transcriptions du poste).",
+  "version": "1.1.0",
+  "date": "2026-11-05",
+  "_commentaire": "Table des leçons génériques du pilot (TF-2150, décision humaine D-172 (a) du 04/11/2026, étude « Apprentissage des erreurs par les produits et la Factory » 20261104b, option O2). Lue au moment du geste par oracles/hook-lecons.mjs (PreToolUse sur Bash, PowerShell, Write, Edit, MultiEdit, Agent et Task ; `declencheur.sur` vaut `commande`, `chemin` ou `agent`, ce dernier jugeant la description d'un lancement d'agent, TF-1947), au pilot et chez chaque produit par `forge/hooks/factory.mjs lecons` ; rien n'est chargé à l'ouverture. Une leçon générique entre ici après décision au registre, avec une preuve qui se vérifie : le hook la revérifie avant chaque rappel et tait la leçon dont la preuve ne se vérifie plus. Jugée par `node scripts/lecons.mjs --verifier` ; passée de `rappel` à `barriere` par `--appliquer` quand elle récidive après son rappel (BOUCLE-AMELIORATION.md, section T1). Champs facultatifs : `declencheur.chaines` (`retirees` par défaut, `interpretees`, `gardees` : ce que le motif voit d'une commande, voir l'en-tête du hook), `barriere_le` et `motif_barriere` (écrits par --appliquer), `mesure` (calibrage du motif sur les gestes réels des transcriptions du poste).",
   "lecons": [
     {
       "id": "L-001",
@@ -239,6 +239,48 @@
         "echantillon_relu": 2,
         "faux_positifs_vus": 0,
         "note": "les 2 gestes, d'une même session du 26/10/2026, ajoutaient des événements au registre par `>>` ; une première forme du motif comptait aussi 2 fixtures jetables `: > $T/todo/TODO.jsonl`, écartées (un chemin à variable n'est pas le registre)"
+      }
+    },
+    {
+      "id": "L-006",
+      "classe": "tour-clos-sur-une-attente",
+      "symptome": "Un tour qui a écrit (fichier, commit, registre) puis lance des agents se clôt sur un message d'attente ou une réponse courte, que le hook de fin de tour refuse : 36 refus sur 83, du 29/10 au 05/11/2026",
+      "declencheur": {
+        "outils": [
+          "Agent",
+          "Task"
+        ],
+        "sur": "agent",
+        "motif": "^(?!Relecture d'intention)"
+      },
+      "solutions": [
+        {
+          "texte": "se clore par la restitution complète (gabarits/RESTITUTION.md), préjugée par `node oracles/hook-restitution.mjs --prejuger <fichier>`, jamais par un message d'attente",
+          "condition": "tour qui a écrit, avant ou pendant le lancement des agents",
+          "preferee": true
+        },
+        {
+          "texte": "jouer l'attente en avant-plan, avec un délai explicite, puis relire le résultat des agents avant de rendre la main",
+          "condition": "résultat d'agent dû dans le tour",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-1947"
+      },
+      "portee": "generique",
+      "statut": "rappel",
+      "revue_le": "2026-12-15",
+      "source": "TF-1947 (mesure du 05/11/2026 : 83 refus du hook de fin de tour sur 515 transcriptions des 2 profils du poste, dont 36 d'un tour qui avait écrit puis s'était clos sur un message court, souvent une attente d'agents) ; fiche 20261105b, action A-2 ; la relecture d'intention, dont la description commence par « Relecture d'intention », est exemptée comme dans hook-flotte.mjs",
+      "mesure": {
+        "le": "2026-11-05",
+        "periode": "2026-10-05 au 2026-11-05",
+        "gestes_juges": 512,
+        "gestes_rappeles": 415,
+        "echantillon_relu": 0,
+        "faux_positifs_vus": null,
+        "note": "faux positifs non mesurés (aucun échantillon relu). 512 lancements d'agent (outil Agent ou Task) dans les 59 transcriptions des 2 profils du poste dont le dossier est celui du pilot, hors ses arbres de travail ; 97 relectures d'intention écartées par le motif, 415 rappels. Aucun échantillon relu : le hook ne sait pas si le tour a écrit, la leçon est donc servie à tout lancement d'agent et son texte pose la condition. Coût : environ 500 caractères par lancement servi"
       }
     }
   ]

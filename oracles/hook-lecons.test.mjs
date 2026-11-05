@@ -14,6 +14,11 @@
  * `$T/todo/TODO.jsonl`, outil hors liste, leçon suspendue, entrée illisible.
  * Remède JOUÉ (TF-1013) : la barrière du heredoc refuse le geste ; le contenu écrit par l'outil Write puis lancé par
  * son chemin passe et garde ses antislashs ; le `git push` vers un fichier passe la barrière du push filtré.
+ * Lancement d'agent (TF-1947) : la leçon L-006 est servie à un lancement par l'outil Agent ou Task, d'un produit comme
+ * du pilot (le journal garde la description comme geste), et pas à une relecture d'intention (description qui COMMENCE par
+ * « Relecture d'intention », casse et espaces en tête sans effet) ni à un outil voisin ; le matcher de `.claude/settings.json`
+ * et celui de `gabarits/settings-produit.json` couvrent Agent et Task ; la commande de sa solution préférée
+ * (`hook-restitution.mjs --prejuger`) est jouée sur un brouillon et le refuse.
  * Durée : 20 appels du hook réel sur un geste qui sert une leçon, médiane sous 300 ms.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
@@ -44,6 +49,8 @@ function jouer(entree, racine, hook = HOOK) {
 const bash = (command) => ({ tool_name: "Bash", tool_input: { command } });
 const ps = (command) => ({ tool_name: "PowerShell", tool_input: { command } });
 const ecrit = (file_path, content = "x") => ({ tool_name: "Write", tool_input: { file_path, content } });
+/** Un lancement d'agent : l'outil Agent (ou Task), sa description, son type et sa consigne. */
+const agent = (description, outil = "Agent") => ({ tool_name: outil, tool_input: { description, subagent_type: "campagne", prompt: "Corrige le sujet et rends le rapport." } });
 const lecons = (contexte) => [...contexte.matchAll(/Leçon (L-\d+)/g)].map((m) => m[1]);
 
 /** Une racine en mode pilot (elle porte `todo/TODO.jsonl`) ou produit (elle porte `forge/`). */
@@ -103,6 +110,10 @@ try {
     [ecrit("C:\\dev\\digit-ai-factory\\todo\\TODO.jsonl", "{}\n"), "L-004", "Write sur todo/TODO.jsonl (chemin Windows)"],
     [{ tool_name: "Edit", tool_input: { file_path: "C:/dev/digit-ai-factory/todo/TODO-ARCHIVE.jsonl", old_string: "a", new_string: "b" } }, "L-004", "Edit sur todo/TODO-ARCHIVE.jsonl"],
     [bash("cat \"$TEMP/ev2.jsonl\" >> todo/TODO.jsonl && node todo/oracle-todo.mjs"), "L-005", "ajout au registre par >> (forme du 26/10/2026)"],
+    [agent("Campagne A-2 et A-3 : agent 5 du pilot"), "L-006", "lancement d'agent par l'outil Agent (TF-1947, les 36 refus de fin de tour sur 83)"],
+    [agent("Campagne A-2 et A-3 : agent 5 du pilot", "Task"), "L-006", "lancement d'agent par l'outil Task"],
+    [agent("Vérifier la relecture d'intention de la consigne"), "L-006", "description qui CONTIENT « relecture d'intention » sans la commencer : ce n'est pas une relecture"],
+    [agent(""), "L-006", "lancement d'agent sans description : servi, l'agent est un agent"],
   ];
   for (const [entree, attendue, nom] of ROUGES) {
     check(`rouge — ${nom} : ${attendue} servie, citée comme donnée, exit 0`, () => {
@@ -135,6 +146,48 @@ try {
     if (!existsSync(join(p, "forge", "lecons-rappels.jsonl"))) throw new Error("journal absent sous forge/");
   });
 
+  check("rouge — chez un produit, le lancement d'un agent sert L-006 et le journal garde la description comme geste", () => {
+    const p = racineProduit("produit-agent");
+    const r = jouer(agent("Campagne du produit : agent 2"), p);
+    if (r.code !== 0 || !lecons(r.contexte).includes("L-006")) throw new Error(`exit ${r.code} ${r.contexte.slice(0, 120)} ${r.err.slice(0, 200)}`);
+    const l = readFileSync(join(p, "forge", "lecons-rappels.jsonl"), "utf8").trim().split("\n").map((x) => JSON.parse(x)).find((x) => x.lecon === "L-006");
+    if (!l || l.outil !== "Agent" || l.geste !== "Campagne du produit : agent 2") throw new Error(JSON.stringify(l));
+  });
+  check("rouge — L-006 dit la règle : le tour qui a écrit se clôt par la restitution complète, préjugée, jamais par un message d'attente", () => {
+    const t = jouer(agent("Campagne A-2"), rp).contexte;
+    for (const motif of [/tour qui a écrit/, /restitution complète/, /hook-restitution\.mjs --prejuger <fichier>/, /jamais par un message d'attente/, /preuve TF-1947/]) {
+      if (!motif.test(t)) throw new Error(`absent : ${motif} — ${t.slice(0, 300)}`);
+    }
+  });
+  check("remède joué — la commande de la solution préférée de L-006 existe et juge un brouillon (JSON `hook-restitution --prejuger`, un brouillon sans bloc refusé)", () => {
+    const brouillon = join(base, "brouillon-attente.md");
+    writeFileSync(brouillon, "J'attends la fin des agents.\n", "utf8");
+    const r = spawnSync(process.execPath, [join(ICI, "hook-restitution.mjs"), "--prejuger", brouillon], { encoding: "utf8", cwd: base, env: { ...process.env, CLAUDE_PROJECT_DIR: base } });
+    let j = null;
+    try { j = JSON.parse(r.stdout); } catch { /* sortie non JSON */ }
+    if (!j || j.outil !== "hook-restitution --prejuger" || j.affichable !== false || r.status !== 1) throw new Error(`exit ${r.status} ${String(r.stdout).slice(0, 200)} ${String(r.stderr).slice(0, 200)}`);
+  });
+
+  // --- Câblage (TF-1947) : l'outil Agent et l'outil Task sont au matcher de hook-lecons, au pilot et au gabarit produit ---
+  /** Un matcher de hook couvre un outil quand l'expression, ancrée, le reconnaît. */
+  const couvre = (matcher, outil) => new RegExp(`^(?:${matcher})$`).test(outil);
+  const matcherDe = (fichier, commande) => {
+    const j = JSON.parse(readFileSync(join(ICI, "..", fichier), "utf8"));
+    const groupe = (j.hooks?.PreToolUse || []).find((g) => (g.hooks || []).some((h) => commande.test(String(h.command || ""))));
+    return groupe?.matcher ?? null;
+  };
+  check("rouge — l'ancien matcher (Bash|PowerShell|Write|Edit|MultiEdit) ne couvre ni Agent ni Task : le cas rouge du câblage", () => {
+    const ancien = "Bash|PowerShell|Write|Edit|MultiEdit";
+    if (couvre(ancien, "Agent") || couvre(ancien, "Task") || !couvre(ancien, "Bash")) throw new Error("la fonction couvre() ne distingue pas l'ancien matcher");
+  });
+  for (const [fichier, commande] of [[".claude/settings.json", /oracles\/hook-lecons\.mjs/], ["gabarits/settings-produit.json", /factory\.mjs\\?"? lecons\b/]]) {
+    check(`vert — ${fichier} : le matcher du hook des leçons couvre Agent, Task et les 5 outils de départ`, () => {
+      const m = matcherDe(fichier, commande);
+      if (m === null) throw new Error("hook des leçons introuvable sous PreToolUse");
+      for (const o of ["Bash", "PowerShell", "Write", "Edit", "MultiEdit", "Agent", "Task"]) if (!couvre(m, o)) throw new Error(`${o} non couvert par « ${m} »`);
+    });
+  }
+
   // --- Sens vert : la table réelle ne dit rien hors de ses formes ------------------------------------------------
   const VERTS = [
     [bash("cat > court.txt <<'EOF'\nbonjour\nEOF"), "heredoc court, sans antislash"],
@@ -151,6 +204,9 @@ try {
     [ecrit("C:\\dev\\digit-ai-factory\\todo\\NOTES.md"), "Write hors du registre"],
     [bash("T=/tmp/f && mkdir -p $T/todo && : > $T/todo/TODO.jsonl"), "fixture jetable $T/todo/TODO.jsonl"],
     [{ tool_name: "Read", tool_input: { file_path: "C:/dev/digit-ai-factory/todo/TODO.jsonl" } }, "outil hors liste (Read)"],
+    [agent("Relecture d'intention de la consigne de la campagne A-2 et A-3"), "relecture d'intention lancée par l'outil Agent : la leçon ne se déclenche pas"],
+    [agent("  relecture d'intention : livrable de l'agent 4", "Task"), "relecture d'intention lancée par l'outil Task, casse et espaces en tête sans effet"],
+    [{ tool_name: "SendMessage", tool_input: { description: "Campagne A-2", message: "x" } }, "outil voisin de l'agent (SendMessage) : hors liste"],
   ];
   for (const [entree, nom] of VERTS) {
     check(`vert — ${nom} : rien servi, exit 0`, () => {

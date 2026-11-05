@@ -423,7 +423,7 @@
   "vu_le": "2026-10-30"
  },
  "oracles/hook-lecons.test.mjs": {
-  "cas": 49,
+  "cas": 62,
   "vu_le": "2026-11-05"
  },
  "oracles/hook-lexique.test.mjs": {
@@ -647,7 +647,7 @@
   "vu_le": "2026-10-15"
  },
  "scripts/lecons.test.mjs": {
-  "cas": 40,
+  "cas": 45,
   "vu_le": "2026-11-05"
  },
  "scripts/lib-extensions-jugees.test.mjs": {

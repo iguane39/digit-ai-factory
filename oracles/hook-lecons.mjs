@@ -8,7 +8,8 @@
  * l'agent au moment du geste. Six classes d'erreur seulement ont un hook PreToolUse dédié (`.claude/settings.json`) ;
  * un hook par classe ne passe pas à 227 classes.
  *
- * CE QUE FAIT CE HOOK. Hook `PreToolUse` UNIQUE sur Bash, PowerShell, Write, Edit et MultiEdit. Il lit la table des
+ * CE QUE FAIT CE HOOK. Hook `PreToolUse` UNIQUE sur Bash, PowerShell, Write, Edit, MultiEdit, Agent et Task (les deux
+ * derniers depuis TF-1947 : le lancement d'un agent). Il lit la table des
  * leçons du pilot, `references/LECONS.json` (schéma `lecons@1`, résolue depuis l'emplacement de ce fichier), et
  * `forge/LECONS.jsonl` de la racine du projet quand elle existe (les leçons propres d'un produit, même schéma, une
  * par ligne). Pour chaque leçon non suspendue dont un outil et le motif correspondent au geste :
@@ -26,7 +27,11 @@
  *     qui récidive après son rappel (« barrière dès la 2e fois », BOUCLE-AMELIORATION.md, section T1).
  *
  * CE QUE LE MOTIF VOIT. `sur: "chemin"` : le `file_path` de l'outil, antislashs changés en `/`, sans distinction de
- * casse (Windows). `sur: "commande"` : la commande, et le champ facultatif `chaines` dit quoi en retirer :
+ * casse (Windows). `sur: "agent"` (TF-1947) : la `description` du lancement d'un agent (outil Agent ou Task), sans
+ * espace en tête ni en queue, sans distinction de casse ; la chaîne vide si l'outil n'en porte pas. Une relecture
+ * d'intention (description qui commence par « Relecture d'intention », comme dans `hook-flotte.mjs`) s'écarte par le
+ * motif lui-même : `^(?!Relecture d'intention)`. `sur: "commande"` : la commande, et le champ facultatif `chaines`
+ * dit quoi en retirer :
  *   · `retirees` (défaut) : ce qui est CITÉ — chaînes entre guillemets, corps de heredoc, here-strings, commentaires.
  *     Citer `git push | tail` dans un message de commit n'est pas le jouer ;
  *   · `interpretees` : seules les zones que Bash développe restent — guillemets doubles et heredoc à délimiteur nu ;
@@ -43,7 +48,9 @@
  *
  * NON JUGÉ (déclaré). Un geste construit par variable, ou joué par un script dont le texte n'est pas dans la
  * commande ; une erreur de conception sans geste reconnaissable (l'étude l'exclut d'O2) ; la pertinence du rappel
- * pour l'intention du geste, le motif étant lexical ; la date `revue_le`, que juge `scripts/lecons.mjs --verifier` ;
+ * pour l'intention du geste, le motif étant lexical ; qu'un tour ait ÉCRIT avant de lancer un agent (TF-1947) : le
+ * hook ne lit pas la transcription, la leçon L-006 est servie à tout lancement d'agent et son texte pose la condition
+ * (« un tour qui a écrit ») ; la date `revue_le`, que juge `scripts/lecons.mjs --verifier` ;
  * l'analyse des guillemets est celle d'un lecteur simple, pas d'un shell : une `$(…)` imbriquée dans des guillemets
  * doubles peut en laisser fuir un morceau, sans autre effet qu'un rappel de trop.
  *
@@ -58,7 +65,9 @@ import { racineDuProjet } from "./lib-racine-projet.mjs";
 export const PILOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const OUTILS_COMMANDE = new Set(["Bash", "PowerShell"]);
 export const OUTILS_CHEMIN = new Set(["Write", "Edit", "MultiEdit"]);
-export const OUTILS = new Set([...OUTILS_COMMANDE, ...OUTILS_CHEMIN]);
+/** Les outils qui lancent un agent (TF-1947) : `Agent` aujourd'hui, `Task` son ancien nom. */
+export const OUTILS_AGENT = new Set(["Agent", "Task"]);
+export const OUTILS = new Set([...OUTILS_COMMANDE, ...OUTILS_CHEMIN, ...OUTILS_AGENT]);
 export const MODES_CHAINES = new Set(["retirees", "interpretees", "gardees"]);
 export const STATUTS = new Set(["rappel", "barriere", "suspendue"]);
 export const PLAFOND_LECON = 600;
@@ -143,9 +152,14 @@ export function compiler(motif, drapeaux = "") {
   return COMPILES.get(cle);
 }
 
-/** Ce que le motif d'une leçon juge dans l'entrée de l'outil : la commande ou le chemin, ou null. */
+/**
+ * Ce que le motif d'une leçon juge dans l'entrée de l'outil : la commande, le chemin ou la description d'un lancement
+ * d'agent (TF-1947), ou null. Un lancement sans description rend la chaîne vide : l'agent est lancé, la leçon peut le
+ * viser (`^(?!Relecture d'intention)`).
+ */
 export function sujetDuGeste(entree, sur) {
   const ti = entree?.tool_input || {};
+  if (sur === "agent") return typeof ti.description === "string" ? ti.description.trim() : "";
   if (sur === "chemin") return typeof ti.file_path === "string" && ti.file_path ? ti.file_path.replace(/\\/g, "/") : null;
   if (sur === "commande") return typeof ti.command === "string" && ti.command ? ti.command : null;
   return null;
@@ -158,7 +172,7 @@ export function correspond(lecon, entree) {
   if (!Array.isArray(d.outils) || !d.outils.includes(outil)) return false;
   const sujet = sujetDuGeste(entree, d.sur);
   if (sujet === null) return false;
-  if (d.sur === "chemin") return compiler(d.motif, "i").test(sujet);
+  if (d.sur === "chemin" || d.sur === "agent") return compiler(d.motif, "i").test(sujet);
   const shell = outil === "PowerShell" ? "powershell" : "bash";
   return compiler(d.motif, "").test(nettoyer(sujet, d.chaines || "retirees", shell));
 }
