@@ -40,6 +40,8 @@
  *        ajoute une ligne horodatée à todo/relectures-intention.jsonl ; `--passe` et `--suite-de` chaînent les passes d'un
  *        même travail (au plus 2 passes de correction, soit 3 relectures) ; au point « reception », `--fichier` est exigé : le
  *        point « fin-de-tour » cite ensuite ce livrable par son seul chemin tant qu'il n'a pas changé depuis sa relecture ;
+ *        le champ `projet` et les citations des écarts sont PSEUDONYMISÉS par les tables du canal avant l'écriture (TF-2146 : le journal
+ *        est publié) ; sans tables ni anonymiseur, rien n'est consigné (2) ;
  *   --boucle <identifiant>                          l'état de la chaîne d'un travail : passes faites, passe suivante permise ou non,
  *        écarts à poser à l'humain ;
  *   --confirmer <id> <oui|non>                      consigne la réponse humaine à une alerte ;
@@ -65,6 +67,14 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { dossiersParDefaut } from "./relever-contexte-sessions.mjs";
 import { decouperCommande } from "../oracles/lib-decoupe-commande.mjs";
+
+// TF-2146 (05/11/2026) : le journal `todo/relectures-intention.jsonl` est SUIVI par un dépôt public. Le 04/11, cinq lignes non commitées y portaient
+// le nom réel d'un produit, neuf fois (champ `projet` = nom du dossier ; demandes citées mot pour mot) : le commit suivant aurait rebloqué toute
+// publication. `--consigner` passe donc ce texte par l'anonymiseur du canal (todo/anonymiser-entrant.mjs, tables de scripts/lib-confidentiel.mjs)
+// AVANT d'écrire. Chargé ici et non en import statique : une copie de ce script sans le dossier todo\ (les hooks des produits) reste importable ;
+// son `--consigner` refuse alors, il n'écrit pas sans pseudonymiser.
+let anonymiserTexte = null;
+try { ({ anonymiser: anonymiserTexte } = await import("../todo/anonymiser-entrant.mjs")); } catch { /* dit au refus de --consigner */ }
 
 export const VERSION = "2.1.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -344,6 +354,61 @@ const EXCLUS_DEPOT = [/(^|\/)\.oracles\//, /\.oracles(-cache|-historique)?\.json
 const ARBRE_VIDE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 const ESTENV = (p) => /^\.env(\..+)?$/i.test(basename(p)) && !/\.(example|sample|template)$/i.test(basename(p));
 
+// TF-2160 (05/11/2026) : le 03/11 à 23:15, `--preparer fin-de-tour` a recopié dans livrables.md un fichier de clé IGNORÉ par git
+// (var/secrets/…cle) que la session venait d'écrire, vers l'agent relecteur. Le `.env` seul était protégé ; la règle s'étend à ce qu'un
+// dépôt déclare ne pas vouloir suivre (git) et aux chemins de secret connus. Un chemin de secret : un segment `var` ou `secrets`, ou `*.cle`.
+const CHEMIN_DE_SECRET = (p) => /(^|\/)(?:var|secrets)(?:\/|$)/i.test(String(p).replace(/\\/g, "/")) || /\.cle$/i.test(String(p));
+const CACHE_IGNORE = new Map();
+/** Le fichier est-il ignoré par git (.gitignore, exclude, ignore global) dans le dépôt qui le contient ? Hors dépôt, ou git absent : non. */
+export function ignoreParGit(chemin) {
+  const abs = resolve(chemin), k = abs.replace(/\\/g, "/").toLowerCase();
+  if (CACHE_IGNORE.has(k)) return CACHE_IGNORE.get(k);
+  let dossier = dirname(abs);
+  for (let i = 0; i < 64 && !existsSync(dossier) && dirname(dossier) !== dossier; i++) dossier = dirname(dossier);
+  let ignore = false;
+  if (existsSync(dossier)) { const r = spawnSync("git", ["-C", dossier, "check-ignore", "-q", "--", abs], { encoding: "utf8", timeout: 10000 }); ignore = r.status === 0 && !r.error; }
+  CACHE_IGNORE.set(k, ignore);
+  return ignore;
+}
+/** Pourquoi le contenu d'un fichier ne transite pas : le texte qui le DIT à sa place, ou null si le fichier peut être cité. */
+export function contenuInterdit(chemin) {
+  if (ESTENV(chemin)) return "[contenu NON cité : un fichier `.env` ne transite jamais]";
+  if (CHEMIN_DE_SECRET(chemin)) return "[contenu NON cité : fichier de secret par son chemin (dossier var/ ou secrets/, ou extension .cle) — TF-2160]";
+  if (ignoreParGit(chemin)) return "[contenu NON cité : fichier ignoré par git (.gitignore) — état machine ou secret, jamais un livrable — TF-2160]";
+  return null;
+}
+
+/** Les motifs de secret reconnus par leur forme. Un motif ne caviarde que la VALEUR : le nom du champ, la clé qui la porte restent lisibles. */
+const VALEUR_DE_REFERENCE = /^(?:[$<{%\[]|process\.env|os\.environ|env\.|getenv|null$|true$|false$|none$|undefined$)/i;
+export const MOTIFS_DE_SECRET = [
+  { nom: "clé privée PEM", re: /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]{0,8000}?(?:-----END [A-Z0-9 ]*PRIVATE KEY-----|(?=\r?\n\r?\n)|$)/g },
+  { nom: "jeton sk-", re: /\bsk-(?:ant-)?(?=[A-Za-z0-9_-]*\d)[A-Za-z0-9_-]{20,}/g },
+  { nom: "jeton GitHub", re: /\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})/g },
+  { nom: "clé AWS", re: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g },
+  { nom: "jeton Slack", re: /\bxox[baprs]-[A-Za-z0-9-]{10,}/g },
+  { nom: "clé API Google", re: /\bAIza[0-9A-Za-z_-]{35}\b/g },
+  { nom: "JWT", re: /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{5,}/g },
+  { nom: "jeton Bearer", re: /\b(Bearer\s+)[A-Za-z0-9._~+/-]{20,}=*/gi, garde: 1 },
+  { nom: "clé de chaîne de connexion", re: /\b((?:AccountKey|SharedAccessKey|Password|Pwd)=)[^;"'\s]{6,}/gi, garde: 1 },
+  { nom: "mot de passe d'URL", re: /\b([a-z][a-z0-9+.-]*:\/\/[^\s:/@]+:)[^\s@/]{3,}(?=@)/gi, garde: 1 },
+  { nom: "valeur de mot de passe, jeton ou clé affectée", re: /(\b[\w-]*(?:password|passwd|mot[_ -]?de[_ -]?passe|mdp|secret|token|api[_-]?key|access[_-]?key|private[_-]?key)[\w-]*["']?\s*[:=]\s*)("[^"\n]{6,}"|'[^'\n]{6,}'|[^\s"'`,;)\]}]{12,})/gi, garde: 1,
+    garder: (valeur) => { const v = valeur.replace(/^["']|["']$/g, ""); if (VALEUR_DE_REFERENCE.test(v)) return true; if (/\s/.test(v)) return true; /* une phrase n'est pas un secret */ return !/^["']/.test(valeur) && !(/\d/.test(v) && /^[A-Za-z0-9+/_.~=-]+$/.test(v)); } },
+];
+/** Caviarde les motifs de secret d'un texte : rend { texte, n, motifs } où `motifs` compte par nom. Pur. */
+export function caviarder(texte) {
+  let n = 0; const motifs = {};
+  let out = String(texte ?? "");
+  for (const m of MOTIFS_DE_SECRET) {
+    out = out.replace(m.re, (...a) => {
+      const tout = a[0], prefixe = m.garde ? a[m.garde] : "";
+      if (m.garder && m.garder(a[m.garde + 1] ?? "")) return tout;
+      n++; motifs[m.nom] = (motifs[m.nom] || 0) + 1;
+      return `${prefixe}[CAVIARDÉ : ${m.nom} — TF-2160]`;
+    });
+  }
+  return { texte: out, n, motifs };
+}
+
 function git(dossier, args) {
   const r = spawnSync("git", ["-c", "core.quotepath=false", ...args], { cwd: dossier, encoding: "utf8", timeout: 30000, maxBuffer: 256 * 1024 * 1024 });
   return { ok: r.status === 0 && !r.error, out: r.stdout || "", err: (r.stderr || "") + (r.error ? String(r.error.message) : "") };
@@ -556,7 +621,8 @@ export function fabriquerEcrituresCommande(ecritures, base, dejaCites) {
     const p = cheminDeCible(e.cible, e.dossier ? cheminDeCible(e.dossier, base) : base);
     const ent = `- ${e.cible} — par : \`${e.commande.replace(/`/g, "'")}\``;
     if (dejaCites.has(norm(p))) { out.push(`${ent} — contenu cité plus haut`); continue; }
-    if (ESTENV(p)) { out.push(`${ent} — [contenu NON cité : un fichier \`.env\` ne transite jamais]`); continue; }
+    const interdit = contenuInterdit(p);
+    if (interdit) { out.push(`${ent} — ${interdit}`); continue; }
     if (!existsSync(p)) { out.push(`${ent} — [absent du disque à la préparation : fichier temporaire supprimé, déplacé, ou chemin relatif à un autre dossier]`); continue; }
     if (reste <= 0) { out.push(`${ent} — [contenu omis : borne ${BORNES.depot} caractères atteinte]`); continue; }
     const c = coupe(citerFichier(p), Math.min(BORNES.depotFichier, reste), "contenu d'un fichier écrit par commande");
@@ -597,7 +663,8 @@ export function fabriquerDepot(depot, dejaCites, relus = new Map(), titre = "## 
   surDisque.forEach((f, i) => {
     if (i >= BORNES.depotFichiers || reste <= 0) { omis.push(`${f.rel} (${f.etat})`); return; }
     let corps;
-    if (ESTENV(f.rel)) corps = "[contenu NON cité : un fichier `.env` ne transite jamais]";
+    const interdit = contenuInterdit(f.abs || f.rel);
+    if (interdit) corps = interdit;
     else if (f.etat === "supprimé") corps = "[supprimé du disque depuis le commit de comparaison ; date de la suppression inconnue]";
     else if (f.etat.startsWith("neuf")) corps = coupe(citerFichier(f.abs), BORNES.depotFichier, "contenu du fichier neuf");
     else { const d = git(depot.racine, ["diff", "--no-color", "--no-ext-diff", depot.baseRev, "--", f.rel]); corps = coupe(d.ok ? (d.out || "[diff vide]") : `[diff illisible : ${court(d.err, 150)}]`, BORNES.depotFichier, "diff du fichier"); }
@@ -624,7 +691,8 @@ export function fabriquerSousAgents(sa, citesPlusHaut, relus = new Map()) {
     const ent = `- ${x.chemin} — ${[...x.outils].join(", ")} ×${x.n} — par : ${[...x.agents].join(" ; ")}`;
     if (citesPlusHaut.has(norm(x.chemin))) { out.push(`${ent} — contenu cité plus haut`); continue; }
     if (relus.has(norm(x.chemin))) { out.push(`${ent} — ${MENTION_RELU(relus.get(norm(x.chemin)))}`); continue; }
-    if (ESTENV(x.chemin)) { out.push(`${ent} — [contenu NON cité : un fichier \`.env\` ne transite jamais]`); continue; }
+    const interdit = contenuInterdit(x.chemin);
+    if (interdit) { out.push(`${ent} — ${interdit}`); continue; }
     if (reste <= 0) { omis.push(x.chemin); out.push(ent); continue; }
     const c = coupe(citerFichier(x.chemin), BORNES.sousAgentsFichier, "contenu d'un fichier écrit par un sous-agent");
     const corps = c.length > reste ? coupe(c, reste, "borne globale des sous-agents") : c;
@@ -638,7 +706,8 @@ export function fabriquerSousAgents(sa, citesPlusHaut, relus = new Map()) {
 
 /** Le contenu d'un fichier écrit, borné, la borne dite. */
 export function citerFichier(chemin) {
-  if (ESTENV(chemin)) return "[contenu NON cité : un fichier `.env` ne transite jamais]";
+  const interdit = contenuInterdit(chemin);
+  if (interdit) return interdit;
   if (!existsSync(chemin)) return "[fichier absent du disque à la préparation (supprimé ou déplacé depuis)]";
   let st; try { st = statSync(chemin); } catch (e) { return `[illisible : ${e.message}]`; }
   if (!st.isFile()) return "[n'est pas un fichier]";
@@ -758,8 +827,9 @@ export function fabriquerLivrablesCoherence(chemins) {
   const out = [`# Les livrables d'une même campagne, côte à côte : ${chemins.length} livrable(s)`, "",
     `Pour chacun : son chapeau et ses sections de verdict, de conclusion, de recommandation ou de synthèse, ${part} caractères au plus (borne ${BORNES.coherence} pour l'ensemble). Le texte entier de chaque livrable a été relu à sa réception.`, ""];
   chemins.forEach((c, i) => {
-    let t; try { t = ESTENV(c) ? null : readFileSync(c, "utf8"); } catch { t = undefined; }
-    out.push(`## Livrable ${i + 1} — ${c}`, "", "```", t === null ? "[contenu NON cité : un fichier `.env` ne transite jamais]" : t === undefined ? "[illisible ou absent du disque]" : sectionsDeConclusion(t, part), "```", "");
+    const interdit = contenuInterdit(c);
+    let t; try { t = interdit ? null : readFileSync(c, "utf8"); } catch { t = undefined; }
+    out.push(`## Livrable ${i + 1} — ${c}`, "", "```", t === null ? interdit : t === undefined ? "[illisible ou absent du disque]" : sectionsDeConclusion(t, part), "```", "");
   });
   return out.join("\n");
 }
@@ -870,6 +940,19 @@ export function lireVerdict(brut) {
   const natures = { hors_demande: 0, choix_humain: 0, non_precisee: 0 };
   for (const d of detail) natures[d.nature]++;
   return { ok: true, verdict: { verdict, gravite, ecarts: liste.length, natures, detail_ecarts: detail, confiance: typeof j.confiance === "string" ? j.confiance : null } };
+}
+
+/**
+ * TF-2146 — pseudonymise ce que la ligne d'une relecture porte de TEXTE LIBRE : le champ `projet` (nom du dossier du dépôt relu) et les trois
+ * citations de chaque écart (`la_demande_dit`, `le_livrable_fait`, `pourquoi`). Lève quand l'anonymiseur ou ses tables manquent : mieux vaut ne
+ * rien consigner qu'écrire un nom réel dans un journal publié. `fichier` (chemin relu) n'y passe pas : sa comparaison à la réception est exacte.
+ */
+export function pseudonymiserLigne(ligne) {
+  if (!anonymiserTexte) throw new Error("l'anonymiseur du canal (todo/anonymiser-entrant.mjs) est introuvable");
+  const p = (t) => (typeof t === "string" ? anonymiserTexte(t).texte : t);
+  const sortie = { ...ligne, projet: p(ligne.projet) };
+  if (Array.isArray(ligne.detail_ecarts)) sortie.detail_ecarts = ligne.detail_ecarts.map((e) => ({ ...e, la_demande_dit: p(e.la_demande_dit), le_livrable_fait: p(e.le_livrable_fait), pourquoi: p(e.pourquoi) }));
+  return sortie;
 }
 
 const estAlerte = (l) => l.alerte === true || (l.verdict === "derive" && ["majeure", "bloquante"].includes(l.gravite));
@@ -1077,7 +1160,8 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     const n = registre.filter((l) => l.ev === "relecture" && String(l.id).startsWith(`RI-${jour}-`)).length + 1;
     const alerte = v.verdict.verdict === "derive" && ["majeure", "bloquante"].includes(v.verdict.gravite);
     const id = `RI-${jour}-${String(n).padStart(2, "0")}`;
-    const ligne = { ts: maintenant.toISOString(), ev: "relecture", id, point: a.point, type: a.type, ...v.verdict, alerte, passe, suite_de: suiteDe, chaine: chaine || id, projet: basename(resolve(projetDir)), session, ...(fichier ? { fichier } : {}) };
+    let ligne = { ts: maintenant.toISOString(), ev: "relecture", id, point: a.point, type: a.type, ...v.verdict, alerte, passe, suite_de: suiteDe, chaine: chaine || id, projet: basename(resolve(projetDir)), session, ...(fichier ? { fichier } : {}) };
+    try { ligne = pseudonymiserLigne(ligne); } catch (e) { return usage(`pseudonymisation impossible (tables de pseudonymes ou anonymiseur du canal) : ${e.message} — rien n'est consigné (TF-2146 : le journal est publié)`); }
     mkdirSync(dirname(resolve(a.registre)), { recursive: true });
     appendFileSync(a.registre, JSON.stringify(ligne) + "\n");
     const avis = v.verdict.verdict === "derive" && !alerte ? " — verdict « derive » sans écart majeur ni bloquant : consigné tel quel, pas d'alerte" : "";
@@ -1108,7 +1192,11 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   if (a.preparer === "consigne") {
     if (!a.fichiers.length) return usage("--preparer consigne attend --fichier <consigne.md> (et, pour une campagne, --fichier <liste des sujets>)");
     pieces = [];
-    for (const f of a.fichiers) { try { pieces.push({ chemin: resolve(cwd, f), texte: readFileSync(resolve(cwd, f), "utf8") }); } catch (e) { return usage(`consigne illisible : ${e.message}`); } }
+    for (const f of a.fichiers) {
+      // TF-2160 : une pièce de consigne est lue directement, hors citerFichier ; la même interdiction s'y applique, et le refus nomme le fichier.
+      const interdit = contenuInterdit(resolve(cwd, f));
+      if (interdit) return usage(`--fichier ${f} : ${interdit.replace(/^\[|\]$/g, "")} — il n'est pas embarqué dans la préparation ; rien n'est écrit`);
+      try { pieces.push({ chemin: resolve(cwd, f), texte: readFileSync(resolve(cwd, f), "utf8") }); } catch (e) { return usage(`consigne illisible : ${e.message}`); } }
   }
   let forme = null;
   if (a.preparer === "reception") {
@@ -1194,8 +1282,12 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     resume = pieces.length > 1 ? `la consigne d'une campagne en ${pieces.length} pièces (${a.fichiers.join(", ")})` : `la consigne ${a.fichiers[0]}`;
   }
   const blocRegles = regles ? fabriquerRegles(regles.ref, types) : "";
-  writeFileSync(fDemande, fabriquerDemande(humains, decisions, blocRegles), "utf8");
-  writeFileSync(fLivrables, livrables, "utf8");
+  // TF-2160 : les motifs de secret sont caviardés AVANT l'écriture, dans la demande (citée mot pour mot) comme dans les livrables ; le nombre est DIT.
+  const cavDemande = caviarder(fabriquerDemande(humains, decisions, blocRegles)), cavLivrables = caviarder(livrables);
+  writeFileSync(fDemande, cavDemande.texte, "utf8");
+  writeFileSync(fLivrables, cavLivrables.texte, "utf8");
+  const nbCaviardes = cavDemande.n + cavLivrables.n;
+  const nomsCaviardes = [...new Set([...Object.keys(cavDemande.motifs), ...Object.keys(cavLivrables.motifs)])];
   const consigne = consigneRelecteur(a.preparer, fDemande, fLivrables, !!regles);
   const nbRegles = regles ? reglesDesTypes(regles.ref, types).length : 0;
   const sansTexte = pieces ? reglesSansTexte(pieces) : [];
@@ -1207,6 +1299,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     `relecture-intention ${VERSION} — point « ${a.preparer} » : ${humains.length} message(s) humain(s) cité(s) mot pour mot, ${decisions.length} décision(s) posée(s) retrouvée(s), ${resume}${regles ? `, ${nbRegles} règle(s) applicable(s) au type ${types.join("+")} (référentiel ${regles.ref.version})` : ", aucune règle applicable ajoutée (pas de --type)"}`,
     `transcription lue : ${transcript} (${origine}) ; ${avisCwd}`,
     `écrit : ${fDemande} · ${fLivrables}`,
+    ...(nbCaviardes ? [`${nbCaviardes} motif(s) de secret caviardé(s) avant l'écriture (demande.txt ${cavDemande.n}, livrables.md ${cavLivrables.n} ; ${nomsCaviardes.join(", ")}) : repéré(s) par leur forme, remplacé(s) par « [CAVIARDÉ … — TF-2160] » dans les deux fichiers (TF-2160)`] : []),
     "",
     `--- CONSIGNE À PASSER À L'AGENT verificateur (description de l'appel : « Relecture d'intention ${a.preparer} » — c'est elle que compte scripts\\relever-flotte.mjs) ---`,
     consigne,
