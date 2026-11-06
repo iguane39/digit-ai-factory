@@ -24,6 +24,8 @@
  *       avant « livré » : les livrables exigés des forges mobilisées à la dernière demande DE LA SESSION qui vérifie (CLAUDE_CODE_SESSION_ID,
  *       ou --session <id>), présents ou manquants (la lecture du verrou S85) ; chaque ligne écrite porte l'identifiant de sa session
  *       (TF-2045), les lignes d'avant l'identifiant sont le repli déclaré ; exit 0 rien ne manque, 1 un livrable manque, 2 aucune trace ;
+ *       le livrable retenu est le fichier le PLUS RÉCENT qui répond au motif de la carte (TF-2188, TF-2205), et un livrable écrit avant la demande
+ *       mais déclaré INCHANGÉ avec son motif (`livrables_inchanges` du verdict de la forge, TF-2221) compte comme présent ;
  *   options : --profil domaine_public=oui|non,page_indexable=…,donnees_personnelles=…,agents=…,mise_en_production=…  (déclare ou
  *       revoit forge/PROFIL.json, puis l'emploie) ; --produit <dossier> (désigne le produit sans y être).
  * Sortie : une ligne JSON ; exit 0 = écrit (ou squelette rendu), 1 = refus motivé, 2 = usage, carte illisible ou hors d'un produit.
@@ -31,7 +33,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
-  CHEMIN_TRACE, FORGES, REPLI_DIT, derniereDemande, ecartsSansFait, ecrireProfil, etatDesLivrables, ligneDeTrace, lireCarte, lireProfil, lireProfilTexte,
+  CHEMIN_TRACE, FORGES, REPLI_DIT, derniereDemande, ecartsSansFait, ecrireProfil, etatDesLivrables, ligneDeTrace, lireCarte, lireProfil, lireProfilTexte, refusInchanges,
   sessionDe, squelette, typesDe, validerVerdicts,
 } from "../oracles/lib-mobilisation.mjs";
 import { produitDe } from "../oracles/hook-restitution.mjs";
@@ -67,9 +69,9 @@ if (args.includes("--verifier")) {
   sortie({ outil: OUTIL, verdict: manquants.length ? "MANQUE" : "PRESENT", session: trace.session, repli: trace.repli,
     ...(trace.repli ? { repli_dit: REPLI_DIT[trace.repli] } : {}),
     derniere_demande: { ts: d.ts, type: d.type, demande: d.demande ?? null, session: d.session ?? null },
-    exiges: etats.map((e) => ({ forge: e.forge, livrable: e.libelle, present: e.present, trouve: e.trouve, perime: e.perime, ecrit_le: e.ecrit_le, chemins: e.chemins })),
+    exiges: etats.map((e) => ({ forge: e.forge, livrable: e.libelle, present: e.present, trouve: e.trouve, perime: e.perime, inchange: e.inchange, ecrit_le: e.ecrit_le, chemins: e.chemins })),
     manquants: manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})${m.perime ? ` — périmé : ${m.trouve} écrit le ${m.ecrit_le}, avant la demande (${d.ts})` : ""}`),
-    remede: manquants.length ? "produire chaque livrable manquant, ou écarter avec son motif la forge qui n'a pas servi dans une nouvelle ligne de trace (--verdicts)" : null }, manquants.length ? 1 : 0);
+    remede: manquants.length ? "produire chaque livrable manquant, écarter avec son motif la forge qui n'a pas servi, ou déclarer inchangé — avec son motif — un livrable que la demande ne touche pas (livrables_inchanges de la forge), dans une nouvelle ligne de trace (--verdicts)" : null }, manquants.length ? 1 : 0);
 }
 
 const DEMANDE_A_REMPLIR = "<résumé de la demande>";
@@ -105,7 +107,7 @@ if (args.includes("--preparer")) {
   // TF-2017 (RT-27, 29/10/2026) : le squelette porte `demande`, que --verdicts lit ; sans ce champ, la
   // session l'ajoutait au fichier et la trace sortait avec `demande: null`, sans un mot.
   const s = { types: t.types.map((x) => x.id), demande: DEMANDE_A_REMPLIR, profil, verdicts: squelette(carte, t.types, profil),
-    consigne: "remplace « demande » par le résumé de la demande, chaque motif « <…> » par une raison de 3 mots au moins, passe une forge à « ecartee » ou à « mobilisee » selon la demande et le profil, puis : node <pilot>/scripts/mobiliser.mjs --verdicts <ce fichier>" };
+    consigne: "remplace « demande » par le résumé de la demande, chaque motif « <…> » par une raison de 3 mots au moins, passe une forge à « ecartee » ou à « mobilisee » selon la demande et le profil, puis : node <pilot>/scripts/mobiliser.mjs --verdicts <ce fichier>. Un livrable exigé que la demande ne touche pas (un fichier de jetons quand aucun jeton n'est ajouté) se déclare dans la forge mobilisée : \"livrables_inchanges\": { \"<livrable>\": \"<motif de 3 mots au moins>\" }" };
   const f = valeur("--sortie");
   if (f) { writeFileSync(resolve(f), JSON.stringify(s, null, 2) + "\n", "utf8"); sortie({ outil: OUTIL, squelette: resolve(f), forges: FORGES.length, profil_connu: !!profil }, 0); }
   sortie({ outil: OUTIL, ...s }, 0);
@@ -114,6 +116,9 @@ if (args.includes("--preparer")) {
 if (!fourni) sortie({ outil: OUTIL, verdict: "REFUS", refus: ["verdicts absents : --verdicts <fichier.json | JSON> (squelette : --preparer --type <type>)"] }, 1);
 const { refus, verdicts } = validerVerdicts(fourni.verdicts && typeof fourni.verdicts === "object" ? fourni.verdicts : fourni);
 if (refus.length) sortie({ outil: OUTIL, verdict: "REFUS", refus }, 1);
+// TF-2221 : un livrable déclaré inchangé doit être exigé de sa forge par la demande ; sinon la déclaration ne couvre rien et se refuse.
+const inchanges = refusInchanges(carte, t.types, verdicts);
+if (inchanges.length) sortie({ outil: OUTIL, verdict: "REFUS", refus: inchanges }, 1);
 
 if (profilTexte) ecrireProfil(produit, profil);
 // La demande : --demande prime, sinon le champ du fichier. Le gabarit laissé tel quel est refusé ; une

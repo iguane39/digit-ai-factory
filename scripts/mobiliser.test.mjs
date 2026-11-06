@@ -190,6 +190,103 @@ try {
     att(ok.code === 0 && ok.sortie.verdict === "PRESENT", `après réécriture : exit ${ok.code} ${ok.brut.slice(0, 200)}`);
   });
 
+  const verdictsSansRien = () => Object.fromEntries(FORGES.map((f) => [f, { verdict: "ecartee", motif: `aucun fichier du produit n'est touché (0 fichier) : la forge ${f} n'a pas lieu d'être` }]));
+  // TF-2188 et TF-2205 (RT-47 de Produit-84, RP-25 de Produit-86, 05/11/2026) : trouver() rendait le PREMIER fichier qui répondait au motif
+  // (ordre du dossier) ; le rapport du 04/11 était masqué par celui du 30/10, et le produit recevait MANQUE « périmé » pour toujours.
+  const deposer = (d, rel, ageMs = 0) => {
+    const f = join(d, ...rel.split("/")); mkdirSync(dirname(f), { recursive: true }); writeFileSync(f, "x", "utf8");
+    if (ageMs) { const t = new Date(Date.now() - ageMs); utimesSync(f, t, t); }
+    return f;
+  };
+  const JOUR = 86_400_000;
+  const verdictsAuditSeul = () => { const v = verdictsSansRien(); v.audit = { verdict: "mobilisee", motif: "la demande est un audit complet du produit (0 fichier touché)" }; return v; };
+  const verdictsTestsSeul = () => { const v = verdictsSansRien(); v.tests = { verdict: "mobilisee", motif: "l'évolution touche 3 fichiers, le rapport forge-tests est attendu" }; return v; };
+  check("rouge → vert — TF-2188 : deux dossiers datés, le rapport forge-audit du plus RÉCENT juge la fraîcheur (le premier du motif ne le masque plus)", () => {
+    const d = produit("deux-dossiers-dates");
+    deposer(d, "forge/audit/20261030/rapport-data.json", 6 * JOUR);
+    att(lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, verdictsAuditSeul()), "--demande", "audit complet du produit"]).code === 0, "écriture de la trace");
+    const recent = deposer(d, "forge/audit/20261104/rapport-data.json");
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 0 && r.sortie.verdict === "PRESENT", `le rapport du 04/11 écrit après la demande doit compter : exit ${r.code} ${r.brut.slice(0, 400)}`);
+    att(r.sortie.exiges.length === 1 && r.sortie.exiges[0].trouve === recent, `le fichier retenu doit être le plus récent : ${r.sortie.exiges[0] && r.sortie.exiges[0].trouve}`);
+  });
+  check("vert — TF-2188 : le plus récent l'emporte sur l'ORDRE du dossier ; tous périmés → le périmé cité est le plus récent des périmés", () => {
+    const d = produit("recent-hors-ordre");
+    deposer(d, "forge/audit/20261030/rapport-data.json", 6 * JOUR);
+    deposer(d, "forge/audit/20261101/rapport-data.json", 3 * JOUR);
+    deposer(d, "forge/audit/20261102/rapport-data.json", 5 * JOUR);
+    att(lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, verdictsAuditSeul())]).code === 0, "écriture de la trace");
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 1 && r.sortie.exiges[0].perime === true && /20261101/.test(r.sortie.exiges[0].trouve), `périmé : le fichier cité doit être celui du 01/11 (mtime le plus récent) : ${r.brut.slice(0, 400)}`);
+    const frais = deposer(d, "forge/audit/20261029/rapport-data.json"); // nom le plus ancien, écrit après la demande
+    const ok = lancer(d, ["--verifier"]);
+    att(ok.code === 0 && ok.sortie.exiges[0].trouve === frais, `un dossier de nom ancien mais écrit après la demande doit compter : exit ${ok.code} ${ok.brut.slice(0, 300)}`);
+  });
+  check("rouge → vert — TF-2205 : rapport-*.json de forge-tests, celui du 05/11 n'est plus masqué par celui du 03/11", () => {
+    const d = produit("rapports-tests-dates");
+    deposer(d, "forge/etapes/tests/rapport-20261103.json", 3 * JOUR);
+    att(lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsTestsSeul()), "--demande", "retoucher le composant"]).code === 0, "écriture de la trace");
+    const recent = deposer(d, "forge/etapes/tests/rapport-20261105.json");
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 0 && r.sortie.exiges[0].trouve === recent, `le rapport du 05/11 doit compter : exit ${r.code} ${r.brut.slice(0, 400)}`);
+  });
+  check("vert — TF-2188 : un motif à `**` (verdict de format sous output/) retient aussi le fichier le plus récent", () => {
+    const d = produit("double-etoile");
+    const v = verdictsSansRien(); v.design = { verdict: "mobilisee", motif: "document à la marque, verdict de format attendu (1 note)" };
+    deposer(d, ".oracles/output/03-etudes/ancien.md.oracles.json", 2 * JOUR);
+    att(lancer(d, ["--type", "document", "--verdicts", ecrireVerdicts(d, v)]).code === 0, "écriture de la trace");
+    att(lancer(d, ["--verifier"]).code === 1, "le verdict d'avant la demande doit manquer");
+    const recent = deposer(d, ".oracles/output/04-plans/note.md.oracles.json");
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 0 && r.sortie.exiges[0].trouve === recent, `exit ${r.code} ${r.brut.slice(0, 300)}`);
+  });
+
+  // TF-2221 (RP-41 de Produit-86, 05/11/2026) : une évolution qui pose un composant sur les jetons EXISTANTS recevait MANQUE « jetons périmé ».
+  // Remède : la ligne de trace déclare le livrable INCHANGÉ avec son motif (`livrables_inchanges` du verdict de la forge) ; le fichier doit
+  // exister (un livrable absent n'est pas « inchangé »), le motif dit quelque chose, la forge est mobilisée et le livrable est exigé d'elle.
+  const verdictsDesign = (inchanges) => { const v = verdictsSansRien(); v.design = { verdict: "mobilisee", motif: "le composant est un élément d'interface à la marque (1 composant)", ...(inchanges ? { livrables_inchanges: inchanges } : {}) }; return v; };
+  const deposerDesign = (d, ageJetons = 3 * JOUR) => { deposer(d, "forge/etapes/design/tokens.css", ageJetons); };
+  check("rouge → vert — TF-2221 : un livrable INCHANGÉ et motivé n'est plus périmé ; sans la déclaration il manque toujours", () => {
+    const d = produit("jetons-inchanges");
+    deposerDesign(d);
+    att(lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsDesign()), "--demande", "poser le composant sur les jetons existants"]).code === 0, "écriture sans déclaration");
+    deposer(d, "forge/etapes/design/DESIGN.md"); // le DESIGN.md est touché par la demande, le fichier de jetons non
+    const sans = lancer(d, ["--verifier"]);
+    att(sans.code === 1 && sans.sortie.manquants.length === 1 && /jetons/.test(sans.sortie.manquants[0]) && /périmé/.test(sans.sortie.manquants[0]), `rouge : seul tokens.css doit manquer, périmé : ${sans.brut.slice(0, 400)}`);
+    const motif = "le composant utilise les jetons existants, aucun jeton ajouté ni modifié";
+    const w = lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsDesign({ jetons: motif })), "--demande", "poser le composant sur les jetons existants"]);
+    att(w.code === 0, `écriture avec déclaration : exit ${w.code} ${w.brut.slice(0, 300)}`);
+    att(trace(d)[1].verdicts.design.livrables_inchanges.jetons === motif, "la trace ne porte pas le livrable inchangé");
+    deposer(d, "forge/etapes/design/DESIGN.md"); // réécrit après la 2e demande
+    const avec = lancer(d, ["--verifier"]);
+    att(avec.code === 0 && avec.sortie.verdict === "PRESENT", `inchangé motivé : exit ${avec.code} ${avec.brut.slice(0, 400)}`);
+    const jetons = avec.sortie.exiges.find((e) => /jetons/.test(e.livrable));
+    att(jetons && jetons.present === true && jetons.inchange === motif && jetons.perime === false, `l'exigé doit dire qu'il est inchangé et pourquoi : ${JSON.stringify(jetons)}`);
+  });
+  check("TF-2221 — un livrable déclaré inchangé mais ABSENT manque toujours (rien à déclarer inchangé)", () => {
+    const d = produit("jetons-absents");
+    att(lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsDesign({ jetons: "le composant utilise les jetons existants, aucun ajout" }))]).code === 0, "écriture");
+    deposer(d, "forge/etapes/design/DESIGN.md");
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 1 && r.sortie.manquants.length === 1 && /jetons/.test(r.sortie.manquants[0]) && !/périmé/.test(r.sortie.manquants[0]), `un fichier absent n'est pas inchangé : ${r.brut.slice(0, 400)}`);
+  });
+  check("TF-2221 — la déclaration d'un livrable inchangé est REFUSÉE (rien d'écrit) : motif court ou au gabarit, livrable inconnu ou non exigé de la forge, forge écartée", () => {
+    const d = produit("inchange-refuse");
+    const essai = (v) => lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, v)]);
+    const court = essai(verdictsDesign({ jetons: "inchangé" }));
+    att(court.code === 1 && /motif/.test(court.brut) && /jetons/.test(court.brut), `motif d'un mot accepté : exit ${court.code} ${court.brut.slice(0, 300)}`);
+    const gabarit = essai(verdictsDesign({ jetons: "<motif : pourquoi ce livrable reste inchangé>" }));
+    att(gabarit.code === 1, `motif au gabarit accepté : exit ${gabarit.code}`);
+    const inconnu = essai(verdictsDesign({ "jetons-fictifs": "le composant utilise les jetons existants, rien d'ajouté" }));
+    att(inconnu.code === 1 && /jetons-fictifs/.test(inconnu.brut), `livrable inconnu accepté : exit ${inconnu.code} ${inconnu.brut.slice(0, 300)}`);
+    const autre = essai(verdictsDesign({ exigences: "le composant ne change aucune exigence du produit existant" }));
+    att(autre.code === 1 && /exigences/.test(autre.brut), `livrable d'une autre forge accepté : exit ${autre.code} ${autre.brut.slice(0, 300)}`);
+    const v = verdictsSansRien(); v.design = { verdict: "ecartee", motif: "aucun texte affiché ne change (0 libellé)", livrables_inchanges: { jetons: "le composant utilise les jetons existants, aucun ajout" } };
+    const ecartee = essai(v);
+    att(ecartee.code === 1 && /écartée|ecartee/.test(ecartee.brut), `forge écartée avec livrable inchangé acceptée : exit ${ecartee.code} ${ecartee.brut.slice(0, 300)}`);
+    att(trace(d).length === 0, `${trace(d).length} ligne(s) écrite(s) malgré les refus`);
+  });
+
   check("--verifier (TF-2080) : le verdict de design écrit par run-oracles sous .oracles/output/ est reconnu présent", () => {
     const d = produit("verdict-sous-oracles");
     const v = {};
@@ -243,7 +340,6 @@ try {
   // TF-2045 (02/11/2026) : deux sessions d'un produit écrivent le même fichier ; --verifier juge la dernière ligne de la session qui vérifie.
   // La session A mobilise les 5 forges du produit neuf, data écartée : 5 livrables manquent (comme au cas --verifier ci-dessus).
   const verdictsA = () => ({ ...verdictsProduitNeuf(), data: { verdict: "ecartee", motif: "aucune donnée à agréger ici" } });
-  const verdictsSansRien = () => Object.fromEntries(FORGES.map((f) => [f, { verdict: "ecartee", motif: `aucun fichier du produit n'est touché (0 fichier) : la forge ${f} n'a pas lieu d'être` }]));
   check("TF-2045 rouge — la session A, dont les livrables manquent, n'est plus jugée sur la ligne que la session B a écrite après elle", () => {
     const d = produit("deux-sessions");
     att(lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsA())], "sess-A").code === 0, "écriture de A");
