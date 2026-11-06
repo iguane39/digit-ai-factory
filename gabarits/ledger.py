@@ -6,6 +6,13 @@ première entrée `run_open`. Écrivain unique : l'orchestrateur de session.
   python forge/ledger.py <type> --champ valeur ...
   python forge/ledger.py --verifier
   python forge/ledger.py <type> --archive <run clos> --champ valeur ...   (écrit dans runs/<run clos>/ledger.jsonl)
+  python forge/ledger.py --hors-run                  (liste forge/hors-run.jsonl) ; --verifier --hors-run en juge l'intégrité
+
+HORS RUN (TF-2223). Sans ledger de run, `retour`, `question_humain`, `reponse_humain` et `demande_humain` s'écrivent à
+`forge/hors-run.jsonl`, pas au ledger du run : R-42 exige que celui-ci s'ouvre par `run_open`. Le prochain lot de retours les compile.
+
+REMPLACEMENT (TF-2206). `--remplace D-46` nomme la décision remplacée ; `--artefacts_remplaces '[{"artefact": "…", "sort":
+"retire|conserve|a_decider"}]'` liste ce qu'elle avait créé et ce que cela devient.
 
 `--run <identifiant>` est un CHAMP comme un autre : il s'écrit dans l'entrée (run_open, run_close, rectification_*...). Il ne
 désigne plus l'archive d'un run clos, c'est `--archive` ; `--verifier --run <identifiant>` reste lu pour l'ancien usage (TF-2174).
@@ -66,6 +73,32 @@ TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_mo
          "deplacement_en_attente", "secret_range", "demande_humain", "qualification_enclenchement"}
 
 
+# TF-2223 (RP-2, 06/11/2026) : hors run, ces types s'écrivent à `forge/hors-run.jsonl`, jamais au ledger du run, dont R-42
+# exige qu'il s'ouvre par `run_open`. Le journal garde la même discipline de `seq` et de `ts` ; le prochain lot de retours le compile.
+HORS_RUN = {"retour", "question_humain", "reponse_humain", "demande_humain"}
+JOURNAL_HORS_RUN = FORGE / "hors-run.jsonl"
+
+# TF-2206 (RP-26, 06/11/2026) : ce que devient ce qu'une décision remplacée avait créé.
+SORTS = ("retire", "conserve", "a_decider")
+
+
+def controler_remplacement(champs: dict) -> None:
+    """`remplace` nomme la ou les décisions remplacées ; `artefacts_remplaces` liste ce qu'elles avaient créé avec son sort.
+    La forme fausse est refusée AVANT d'écrire : une entrée écrite ne se réécrit pas."""
+    if "remplace" in champs:
+        r = champs["remplace"]
+        refs = r if isinstance(r, list) else [r]
+        if not refs or not all(isinstance(x, str) and x.strip() for x in refs):
+            raise SystemExit("`remplace` doit nommer la ou les décisions remplacées (« D-46 »), pas une valeur vide")
+    if "artefacts_remplaces" in champs:
+        a = champs["artefacts_remplaces"]
+        if "remplace" not in champs:
+            raise SystemExit("`artefacts_remplaces` sans `remplace` : de quelle décision ces artefacts sont-ils ?")
+        if not isinstance(a, list) or not a or not all(
+                isinstance(x, dict) and str(x.get("artefact", "")).strip() and x.get("sort") in SORTS for x in a):
+            raise SystemExit(f"`artefacts_remplaces` : liste non vide de {{artefact, sort}}, sort parmi {', '.join(SORTS)}")
+
+
 def chemin(run: str = "") -> pathlib.Path:
     """Le ledger du run COURANT vit a `forge/ledger.jsonl` — chemin de doctrine (R-19, R-42,
     ETAPES-RUN, CONTRAT-INTERFACE §3), et celui qu'annonce le CLAUDE.md de ce produit.
@@ -112,12 +145,15 @@ def ajouter(archive: str, type_: str, /, **champs) -> dict:
     # (un second `--run` levait « multiple values for argument 'run' »).
     if type_ not in TYPES:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
-    p = chemin(archive)
+    controler_remplacement(champs)
+    # Hors run (aucune entrée au ledger du run, hors archive), un retour ou une décision s'écrit au journal hors run.
+    hors_run = type_ in HORS_RUN and not archive and not lignes(chemin(archive))
+    p = JOURNAL_HORS_RUN if hors_run else chemin(archive)
     verrou = p.with_name(p.name + ".lock")
     prendre_verrou(verrou)
     try:
         dejà = lignes(p)                         # relu SOUS verrou : la fin du fichier au moment d'écrire
-        if not dejà and type_ != "run_open":
+        if not dejà and type_ != "run_open" and not hors_run:
             raise SystemExit("la première entrée d'un ledger doit être `run_open`")
         # TF-1867 : après le PLUS GRAND numéro déjà pris, pas après le nombre de lignes (une copie
         # de produit portait `len(dejà) + 1` : 13 seq en double relevés le 15/10/2026) ni après le
@@ -126,7 +162,7 @@ def ajouter(archive: str, type_: str, /, **champs) -> dict:
         ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         if dejà and ts < dejà[-1]["ts"]:
             ts = dejà[-1]["ts"]                  # `ts` non décroissant, jamais falsifié
-        e = {"seq": seq, "ts": ts, "type": type_, **champs}
+        e = {"seq": seq, "ts": ts, "type": type_, **({"hors_run": True} if hors_run else {}), **champs}
         with p.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(e, ensure_ascii=False) + "\n")
     finally:
@@ -134,6 +170,12 @@ def ajouter(archive: str, type_: str, /, **champs) -> dict:
             verrou.unlink()
         except FileNotFoundError:
             pass
+    if hors_run:
+        print(f"[HORS RUN] aucun run ouvert : entrée écrite à {JOURNAL_HORS_RUN.name} (seq {e['seq']}), pas au ledger du run ; "
+              "le prochain lot de retours la compile (`python forge/ledger.py --hors-run` la liste)", file=sys.stderr)
+    elif type_ == "run_open" and not archive and lignes(JOURNAL_HORS_RUN):
+        print(f"[À COMPILER] {len(lignes(JOURNAL_HORS_RUN))} entrée(s) hors run attendent au prochain lot de retours "
+              f"({JOURNAL_HORS_RUN.name}) : `python forge/ledger.py --hors-run` les liste", file=sys.stderr)
     return e
 
 
@@ -146,7 +188,7 @@ def afficher(e: dict) -> None:
         print(json.dumps(e, ensure_ascii=True))
 
 
-def verifier(run: str) -> int:
+def verifier(run: str, hors_run: bool = False) -> int:
     """Deux niveaux, et l'écart de vocabulaire n'est pas au même que la rupture de structure.
 
     Un `seq` rompu ou un `ts` décroissant rend le ledger INEXPLOITABLE : c'est bloquant.
@@ -158,7 +200,7 @@ def verifier(run: str) -> int:
 
     Le type conforme pour un arbitrage humain consigné est `reponse_humain`.
     """
-    p = chemin(run)
+    p = JOURNAL_HORS_RUN if hors_run else chemin(run)
     e = lignes(p)
     bloquants, declares = [], []
     if not e:
@@ -174,7 +216,8 @@ def verifier(run: str) -> int:
                 bloquants.append(f"seq {s} porté par {len(ls)} entrées, lignes "
                                  f"{', '.join(map(str, ls))} — deux écrivains sans verrou commun")
         if e[0]["type"] != "run_open":
-            bloquants.append("première entrée ≠ run_open")
+            if not hors_run:                     # le journal hors run ne s'ouvre pas par run_open (TF-2223)
+                bloquants.append("première entrée ≠ run_open")
         for i, x in enumerate(e, start=1):
             if x["seq"] != i:
                 bloquants.append(f"seq {x['seq']} attendu {i}")
@@ -184,6 +227,12 @@ def verifier(run: str) -> int:
                 declares.append(f"seq {x['seq']} : type « {x['type']} » hors du vocabulaire du "
                                 f"pilot — entrée déjà écrite, non réécrite ; employer "
                                 f"`reponse_humain` pour un arbitrage humain")
+            # TF-2206 : une entrée qui en remplace une autre sans lister ce que celle-ci avait créé (D-49 avait remplacé D-46
+            # chez un produit, et onze ressources, deux exigences et leurs contrôles étaient restés).
+            if x.get("remplace") and not x.get("artefacts_remplaces"):
+                declares.append(f"seq {x['seq']} : remplace {x['remplace']} sans `artefacts_remplaces` — entrée déjà écrite, non "
+                                f"réécrite ; consigner par ajout `--remplace <D-N> --artefacts_remplaces "
+                                f"'[{{\"artefact\": \"…\", \"sort\": \"retire|conserve|a_decider\"}}]'`")
     etat = "INTÈGRE" if not bloquants else "ANOMALIES"
     print(f"{len(e)} entrée(s) · {etat}"
           + (f" · {len(declares)} écart(s) déclaré(s)" if declares else ""))
@@ -211,6 +260,13 @@ if __name__ == "__main__":
         if i + 1 < len(a):
             archive = a[i + 1]
             del a[i:i + 2]
+    if a and a[0] == "--hors-run":
+        # TF-2223 : le journal hors run, tel quel, pour le prochain lot de retours.
+        for x in lignes(JOURNAL_HORS_RUN):
+            afficher(x)
+        sys.exit(0)
+    if a and a[0] == "--verifier" and "--hors-run" in a:
+        sys.exit(verifier("", hors_run=True))
     if a and a[0] == "--verifier":
         if not archive and "--run" in a:
             i = a.index("--run")
@@ -244,6 +300,11 @@ if __name__ == "__main__":
         elif v in ("true", "false"):
             champs[k] = v == "true"
     afficher(ajouter(archive, type_, **champs))
+    # TF-2206 : une décision qui en remplace une autre dit ce que la première avait créé, et son sort.
+    if "remplace" in champs and "artefacts_remplaces" not in champs:
+        print("[À PORTER] remplace sans artefacts_remplaces : lister ce que la décision remplacée avait créé (ressources, exigences, "
+              "contrôles) avec son sort, par une entrée de plus : --remplace <D-N> --artefacts_remplaces "
+              "'[{\"artefact\": \"…\", \"sort\": \"retire|conserve|a_decider\"}]'", file=sys.stderr)
     # R-19 exige `versions_forges` au `run_open` ; l'entrée est écrite, l'oubli se dit tout de suite,
     # avec la voie par ajout, plutôt qu'au premier relevé de conformité (TF-2018).
     if type_ == "run_open" and "versions_forges" not in champs:

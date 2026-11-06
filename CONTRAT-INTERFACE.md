@@ -139,6 +139,11 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   (TF-1715, ci-dessous), `secret_range` (TF-2127, D-167 (a) du 04/11/2026 : le nom, l'empreinte sha256 et la date d'un
   secret que `forge/ranger-secret.mjs` a rangé au fichier d'environnement local du produit, jamais sa valeur),
   `demande_humain` (TF-2198, 06/11/2026 : une demande humaine consignée mot pour mot, avant toute reformulation en exigence), `run_close`.
+  **Hors run (TF-2223, 06/11/2026)** : sans ledger de run, `retour`, `question_humain`, `reponse_humain` et `demande_humain` s'écrivent à
+  `forge/hors-run.jsonl` (même discipline de `seq` et de `ts`, champ `hors_run: true`), jamais à `forge/ledger.jsonl`, que R-42 exige ouvert
+  par `run_open` ; le prochain lot de retours les compile. **Un remplacement se dit (TF-2206)** : une entrée qui remplace une décision porte
+  `remplace` (la ou les décisions remplacées) et `artefacts_remplaces` (liste de `{artefact, sort}`, sort parmi `retire`, `conserve`,
+  `a_decider`) ; `forge/ledger.py` refuse la forme fausse et déclare l'oubli, `ledger.mjs` de forge-agents reste à aligner.
 - **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
   quelle version le ledger est écrit (`schema_ledger: "1.1"` depuis le 27/09/2026 ; `"1.0"` reste
   jugé selon ses propres règles). Sous `1.1`, `run_open` porte aussi **`forges_mobilisees`**, un

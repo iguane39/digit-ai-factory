@@ -351,6 +351,99 @@ try {
     const r = spawnSync(PYTHON, [script, "demande_humain", "--verbatim", "essai"], { encoding: "utf8", env: CONSOLE });
     att(r.status !== 0 && /type inconnu/.test(r.stderr || ""), `le mutant écrit : exit ${r.status} ${r.stderr}`);
   });
+  // TF-2206 (RP-26, 06/11/2026) : une décision qui en remplace une autre doit dire QUOI elle remplace et ce que devient
+  // ce que la première avait créé. Le ledger porte `remplace` (la ou les décisions remplacées) et `artefacts_remplaces`
+  // (liste de { artefact, sort }, sort parmi retire, conserve, a_decider). L'écrivain refuse la forme fausse AVANT d'écrire,
+  // rappelle l'oubli des artefacts sur la sortie d'erreur, et `--verifier` le déclare sur une entrée déjà écrite.
+  const ARTEFACTS = JSON.stringify([{ artefact: "11 ressources Azure du groupe rg-demo", sort: "retire" }, { artefact: "E-108 et son smoke", sort: "a_decider" }]);
+  check("TF-2206 vert — une décision qui remplace D-46 liste ses artefacts avec leur sort, l'entrée est écrite et --verifier ne déclare rien", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "reponse_humain", "--decision", "D-49", "--remplace", "D-46", "--artefacts_remplaces", ARTEFACTS], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0 && !/À PORTER/.test(r.stderr), `écriture : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.remplace === "D-46" && Array.isArray(e.artefacts_remplaces) && e.artefacts_remplaces[0].sort === "retire", `entrée : ${JSON.stringify(e)}`);
+    const v = spawnSync(PYTHON, [script, "--verifier"], { encoding: "utf8", env: CONSOLE });
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2206 rouge — un remplacement sans artefacts est écrit mais l'oubli se dit sur la sortie d'erreur, et --verifier le déclare sans échouer", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "reponse_humain", "--decision", "D-49", "--remplace", "D-46"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0 && /À PORTER/.test(r.stderr) && /artefacts_remplaces/.test(r.stderr), `sortie d'erreur : ${r.stderr}`);
+    const v = spawnSync(PYTHON, [script, "--verifier"], { encoding: "utf8", env: CONSOLE });
+    att(v.status === 0 && /DÉCLARÉ/.test(v.stdout) && /remplace D-46/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2206 rouge — un sort inconnu, une liste vide et un remplace vide sont refusés sans rien écrire", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const avant = entrees(d).length;
+    const essais = [
+      ["--remplace", "D-46", "--artefacts_remplaces", JSON.stringify([{ artefact: "x", sort: "peut-etre" }])],
+      ["--remplace", "D-46", "--artefacts_remplaces", "[]"],
+      ["--remplace", "D-46", "--artefacts_remplaces", JSON.stringify([{ sort: "retire" }])],
+      ["--artefacts_remplaces", ARTEFACTS],
+      ["--remplace", "[]"],
+    ];
+    for (const a of essais) {
+      const r = spawnSync(PYTHON, [script, "reponse_humain", "--decision", "D-49", ...a], { encoding: "utf8", env: CONSOLE });
+      att(r.status !== 0, `accepté à tort : ${a.join(" ")}`);
+    }
+    att(entrees(d).length === avant, "une entrée refusée a pourtant été écrite");
+  });
+  check("TF-2206 rouge — sans le contrôle, le sort inconnu serait écrit (le témoin voit la chirurgie)", () => {
+    const mutant = GABARIT.replace("    controler_remplacement(champs)\n", "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "reponse_humain", "--remplace", "D-46", "--artefacts_remplaces", JSON.stringify([{ artefact: "x", sort: "peut-etre" }])], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, "le mutant refuse encore : le contrôle n'est pas celui qu'on croit");
+  });
+  // TF-2223 (RP-2, lot Produit-81 20261105a, 06/11/2026) : hors run, `ledger.py` exigeait un run_open et refusait donc un retour
+  // ou une réservation de décision ; la décision se numérotait à la main, et une friction isolée forçait l'ouverture d'un run.
+  // Désormais, sans ledger de run, un retour, une question, une réponse ou une demande humaine s'écrit à `forge/hors-run.jsonl`
+  // (même discipline de seq et de ts), jamais à `forge/ledger.jsonl` (R-42 exige que celui-ci s'ouvre par run_open). Le run_open
+  // suivant dit ce qui attend, et `--hors-run` le liste pour le prochain lot de retours.
+  const horsRun = (texte = GABARIT) => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-hors-run-")); dossiers.push(d);
+    mkdirSync(join(d, "forge"));
+    const script = join(d, "forge", "ledger.py");
+    writeFileSync(script, texte, "utf8");
+    return { d, script, journal: join(d, "forge", "hors-run.jsonl"), ledger: join(d, "forge", "ledger.jsonl") };
+  };
+  const py = (script, ...a) => spawnSync(PYTHON, [script, ...a], { encoding: "utf8", env: CONSOLE });
+  check("TF-2223 vert — hors run, un retour et une question s'écrivent à forge/hors-run.jsonl (seq 1, 2), sans créer le ledger du run", () => {
+    const h = horsRun();
+    const a = py(h.script, "retour", "--source", "produit", "--note", "friction hors run");
+    const b = py(h.script, "question_humain", "--decisions_posees", JSON.stringify({ "D-12": "Faut-il garder le gabarit ?" }));
+    att(a.status === 0 && b.status === 0, `écriture : ${a.stderr} ${b.stderr}`);
+    att(/HORS RUN/.test(a.stderr), `la sortie d'erreur ne dit pas le journal : ${a.stderr}`);
+    const l = readFileSync(h.journal, "utf8").split("\n").filter(Boolean).map((x) => JSON.parse(x));
+    att(l.length === 2 && l[0].seq === 1 && l[1].seq === 2 && l[0].type === "retour" && l[0].hors_run === true && l[1].decisions_posees["D-12"], `journal : ${JSON.stringify(l)}`);
+    att(!existsSync(h.ledger), "forge/ledger.jsonl a été créé hors run : R-42 le lirait comme un run sans run_open");
+  });
+  check("TF-2223 rouge — hors run, un type qui n'est ni un retour ni une décision (etape_open) reste refusé : la première entrée d'un ledger de run est run_open", () => {
+    const h = horsRun();
+    const r = py(h.script, "etape_open", "--etape", "tests");
+    att(r.status !== 0 && /run_open/.test(r.stderr), `accepté à tort : exit ${r.status} ${r.stderr}`);
+    att(!existsSync(h.journal) && !existsSync(h.ledger), "une entrée refusée a laissé un fichier");
+  });
+  check("TF-2223 vert — le run_open suivant dit ce qui attend, --hors-run le liste, --verifier --hors-run le juge intègre", () => {
+    const h = horsRun();
+    py(h.script, "retour", "--source", "produit", "--note", "premier");
+    py(h.script, "retour", "--source", "produit", "--note", "second");
+    const o = py(h.script, "run_open", "--run_id", "essai", "--versions_forges", "{}");
+    att(o.status === 0 && /À COMPILER/.test(o.stderr) && /2 entrée/.test(o.stderr), `run_open : exit ${o.status} ${o.stderr}`);
+    const l = py(h.script, "--hors-run");
+    att(l.status === 0 && /premier/.test(l.stdout) && /second/.test(l.stdout), `--hors-run : ${l.stdout} ${l.stderr}`);
+    const v = py(h.script, "--verifier", "--hors-run");
+    att(v.status === 0 && /2 entrée\(s\) · INTÈGRE/.test(v.stdout), `--verifier --hors-run : exit ${v.status} ${v.stdout}`);
+    const run = readFileSync(h.ledger, "utf8").split("\n").filter(Boolean).map((x) => JSON.parse(x));
+    att(run.length === 1 && run[0].type === "run_open" && run[0].seq === 1, "le ledger du run n'a pas repris sa numérotation depuis 1");
+  });
+  check("TF-2223 rouge — sans l'aiguillage hors run, le retour est refusé comme avant (le témoin voit la chirurgie)", () => {
+    const mutant = GABARIT.replace("    hors_run = type_ in HORS_RUN and not archive and not lignes(chemin(archive))\n", "    hors_run = False\n");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const h = horsRun(mutant);
+    const r = py(h.script, "retour", "--source", "produit", "--note", "x");
+    att(r.status !== 0 && /run_open/.test(r.stderr), `le mutant écrit : exit ${r.status} ${r.stderr}`);
+  });
   check("TF-2018 vert — la rectification écrite en ligne de commande porte seq_vise en NOMBRE et --verifier ne la déclare pas", () => {
     const { d, script } = produit(GABARIT); dossiers.push(d);
     const r = spawnSync(PYTHON, [script, "rectification_versions_forges", "--seq_vise", "1", "--cause", "versions des forges non relevées à l ouverture du run"], { encoding: "utf8", env: CONSOLE });
