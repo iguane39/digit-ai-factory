@@ -919,6 +919,8 @@ export function analyserTranscript(texte) {
   const tourF = tourDesFrictions(entrees);
   return { travail: ecrit.length > 0, ecrituresDuTour: ecrit, ...m, dernierHumain, textePrecedent, depuis, textesHumains,
     frictions: releveFrictions(tourF.segment), depuisFrictions: tourF.depuis, retourFrictions: releveRemontee(tourF.segment).retourCommande,
+    // TF-2193 — la session est non interactive (`claude -p`, SDK) : la transcription date alors chaque message humain de `entrypoint: "sdk-cli"` (mesuré le 06/11/2026 sur 146 entrées de ce poste ; une session interactive porte "cli" ou "claude-vscode").
+    nonInteractif: debut >= 0 && entrees[debut].entrypoint === "sdk-cli",
     releves: relevesDHorloge(entrees, debut),
     nombresTour: nombresDuTour(entrees, debut),
     // D-131 (a), TF-2056 — les gains écrits au registre par le tour : valeurs littérales, et événements que `journaliser` a imprimés (lus au registre au moment de juger).
@@ -1154,7 +1156,13 @@ const estMarque = (c) => {
     // LIGNE, comme un champ de frontmatter — jamais dans la prose. `gabarits\RESTITUTION.md` CITE le
     // marqueur dans ses 400 premiers caractères et s'appelle « restitution » : édité dans un tour, il a
     // été jugé à la place de la synthèse du tour, et une restitution conforme a été refusée.
-    return /^destinataire\s*:\s*humain\s*$/im.test(readFileSync(c, "utf8").slice(0, 400));
+    const contenu = readFileSync(c, "utf8");
+    if (!/^destinataire\s*:\s*humain\s*$/im.test(contenu.slice(0, 400))) return false;
+    // TF-2182 (06/11/2026) — UNE FICHE ÉCRITE SELON UN GABARIT DE DOCUMENT N'EST PAS LA SYNTHÈSE DU TOUR. Le 05/11/2026 à 15:50, la demande « détaille A2 & A3 »
+    // appelle une fiche datée (E-16, gabarit `gd-fiche-constat-precos`) dont l'en-tête porte `destinataire: humain` : le hook la retenait comme synthèse et AFFICHAGE
+    // exigeait d'y retrouver les actions A-N de la restitution, qu'un gabarit de fiche ne porte pas — la restitution ne passait qu'en ajoutant des sélecteurs à la fiche.
+    // Un fichier qui déclare `gabarit:` dans son en-tête est un document, jamais une restitution (0 synthèse sur 191 sous output/04-plans/ le déclare, mesuré le 06/11/2026).
+    return !/^gabarit\s*:\s*\S/m.test((/^﻿?---\r?\n([\s\S]*?)\r?\n---/.exec(contenu) || [])[1] || "");
   } catch { return false; /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
 };
 // TF-1720 (15/10/2026, lot Produit-83 20261014b RT-6) — UN DOCUMENT DE PROJET N'EST JAMAIS LA SYNTHÈSE.
@@ -1241,6 +1249,16 @@ export function scellerSynthese(fichier) {
     if (r.status !== 0) return null;
     return JSON.parse(r.stdout).mesure?.scelles ? fichier : null;
   } catch { return null; /* le sceau est un bonus, jamais un motif de refus */ }
+}
+
+// TF-2191 (06/11/2026) — LE LIVRABLE QU'UNE RESTITUTION PASS VIENT DE LIER « LIVRÉ » SE SCELLE AUSSI. Le 05/11/2026, l'étude 20261105b, liée « Livré », a été réécrite en place après trois remarques ; aucun contrôle
+// ne comparait un livrable déjà remis à son contenu suivant. Le sceau (`<fichier>.jugement.json`, `scripts/verifier-jugement.mjs --sceller`) est posé au PASS, sur les livrables que le tour a écrits et que le bloc 0
+// lie (`controlerLivre` PASS) ; S94 d'`oracle-synthese` le relit à la restitution suivante et refuse un contenu qui a changé. Jamais sur un sceau EXISTANT : le remplacer effacerait l'écart qu'il garde (les sceaux
+// d'un fichier déjà scellé se posent à la main, avec `--sceller`, qui dit l'écart avant de l'écraser). Seuls les livrables à indice (`<nom> - AAAAMMJJx.md|html|pdf`) se scellent. Au mieux : un sceau raté ne refuse rien.
+export function scellerLivrable(fichier) {
+  if (!fichier || !existsSync(fichier) || existsSync(fichier + ".jugement.json")) return null;
+  if (!/\s-\s\d{8}[a-z]\.(?:html?|md|pdf)$/i.test(fichier) || NOM_DE_SYNTHESE.test(nomDe(fichier))) return null;
+  return scellerSynthese(fichier);
 }
 
 // TF-0891 — ce qui s'ajoute aux deux propriétés de 30/08, et pourquoi CELLES-LÀ. Le critère reste
@@ -1825,10 +1843,26 @@ const VERDICT = { test: (s) => VERDICT_MOTS.test(s) || VERDICT_JETONS.test(s) };
 const POSE_UN_GESTE = /(?<![A-Za-zÀ-ÿ])[DA]\s*-\s*\d{1,3}(?![0-9])\**\s*(?:[—–:|]|-\s|\(\s*[a-e]\s*\)|[a-e](?=\s*(?:[.,;!?»]|$)))/m;
 
 const SEUIL_ATTENTE = 60;
+// TF-2193 — nombre de refus consécutifs d'une même session non interactive au-delà duquel on la laisse finir : sans borne, des tâches qui ne reviennent jamais bouclent sans fin.
+const BORNE_ATTENTE_NON_INTERACTIVE = 30;
 const ATTENTE = /\b(?:attends?|attente|en cours|tourne(?:nt)?|arri[èe]re-plan|reviens|reprends|reprendrai|d[èe]s (?:qu|la fin|son|leur)|notifi|en t[âa]che de fond)/i;
-export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null, enAttente = [], ecrituresDuTour = [] }) {
+export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null, enAttente = [], ecrituresDuTour = [], nonInteractif = false }) {
   if (!dernierTexte) return { juge: false, motif: "aucun texte final dans le transcript" };
   const mots = dernierTexte.trim().split(/\s+/).filter(Boolean).length;
+  // ---- TF-2193 (06/11/2026) — EN MODE NON INTERACTIF, UN MESSAGE D'ATTENTE NE DIFFÈRE PAS LA RESTITUTION, IL TERMINE LA SESSION ----------
+  //
+  // LE FAIT, mesuré le 05/11/2026 chez un produit : session `claude -p`, 17 agents de lecture lancés en arrière-plan, tour clos sur un message d'attente que
+  // l'exemption TF-1649 (plus bas) admet. En mode interactif, le harnais rouvre le tour à la notification de fin ; en `-p`, la session s'arrête avec le tour et Claude
+  // Code coupe les agents restants au bout de 10 minutes (rapporté par le porteur, non remesuré ici). Deux relevés perdus (ADR 10 sur 20, pièces DA1), une reprise
+  // humaine et 3 agents de plus. Les fichiers de sortie des tâches restaient vides (0 octet) : rien à récupérer après la coupure.
+  // LA RÈGLE : l'exemption ne s'applique pas tant qu'une tâche d'arrière-plan du tour n'est pas revenue ET que la session est non interactive. Le message d'attente
+  // est alors jugé (`attenteArrierePlan`), et le refus dit quoi faire à la place. Il passe devant l'exemption de relais (TF-1182), qui l'aurait admis avant.
+  // Borne dite : le mode se lit à `entrypoint` de la transcription ; une transcription sans ce champ est lue comme interactive, donc exemptée comme avant.
+  const lignesAttente = dernierTexte.trim().split(/\r?\n/).filter((l) => l.trim()).length;
+  if (nonInteractif && enAttente.length && mots <= SEUIL_ATTENTE && lignesAttente <= 3 && ATTENTE.test(dernierTexte)
+    && !VERDICT.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
+    return { juge: true, attenteArrierePlan: true, motif: `message d'attente de ${mots} mots en mode non interactif (claude -p) : ${enAttente.length} tâche(s) d'arrière-plan `
+      + "lancée(s) dans le tour et non revenue(s) — clore le tour terminerait la session et couperait ces tâches (TF-2193)" };
   // ---- TF-1182 (17/09/2026) — LE RELAIS D'AVANCEMENT N'EST PAS UN RENDU DE FIN DE TRAITEMENT ---
   //
   // L'INVARIANT, et il se lit en une phrase : **on juge un RENDU, et un rendu porte du travail que
@@ -1966,7 +2000,8 @@ const RAPPEL_REPONSE_COURTE = "La réponse reste COURTE : aucune restitution com
 // avertit jusqu'au 2026-11-02 puis bloque (`BLOQUANTES_DATEES`, échéance écrite ici, déplaçable pour la recette par
 // `FORGE_VERROU_LIVRE_BLOQUANT_DES`). Le fait : sur 10 produits clos ou publiés, 2 portaient leurs 4 livrables de forge. Non rétroactif :
 // une restitution datée d'avant le 2026-10-26 n'est pas jugée, et seule la dernière demande tracée compte. S72 avertit quand le verrou juge.
-const BLOQUANTES = new Set(["S1", "S3", "S4", "S82", "S85"]);
+// S94 (TF-2191, 06/11/2026) refuse un « Livré » réécrit en place : le porteur a demandé que la restitution refuse, et le fait protégé est un livrable déjà remis dont le contenu a changé sous le même nom.
+const BLOQUANTES = new Set(["S1", "S3", "S4", "S82", "S85", "S94"]);
 // S83 (TF-1936) et S84 (TF-1938), 21/10/2026 : AVERTISSANTES jusqu'au 28/10, puis BLOQUANTES, décidées sous R-58. T2 (décision
 // humaine du 26/10/2026) les laisse AVERTISSANTES : aucune ne protège un vert sur un fait au sens de T2 (S84 protège l'heure
 // d'en-tête, une donnée de reprise, pas un verdict). Le mécanisme d'échéance sert depuis T4 à S86 et depuis TF-1913 à CRITIQUE :
@@ -2004,7 +2039,7 @@ const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.62.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), clos, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, espaces en %20>) », un lien par livrable (S87, avertissante : seule exception à l'interdit de chemin), et, quand une action manuelle_utilisateur du bloc 8 porte une adresse http(s) hors plateforme tierce, par la ligne « À ouvrir : [<nom>](<adresse>) » (S92, avertissante), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : à quoi sert l'objet, puis son nom interne entre accents graves, plus de trois objets en liste (S88) », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, action (ce qu'elle fait, une phrase en mots du lecteur, S91), identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis ; après une correction du porteur ou le refus d'un hook avant outil dans le tour, « rien à remonter », « rien de neuf » et « reste au produit, parce que <motif> » supposent un retour consigné au ledger du produit (FRICTIONS, avertissante, TF-2141, TF-2156), et un motif « reste au produit » qui nomme un retour le dit déjà écrit (S48, TF-2137). · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande de la session (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0 : il suppose aussi chaque avertissement corrigé, ou motivé à l'appel par `--motif <CODE>=\"<raison>\"` (TF-2171).";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.63.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), clos, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, espaces en %20>) », un lien par livrable (S87, avertissante : seule exception à l'interdit de chemin), et, quand une action manuelle_utilisateur du bloc 8 porte une adresse http(s) hors plateforme tierce, par la ligne « À ouvrir : [<nom>](<adresse>) » (S92, avertissante), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : à quoi sert l'objet, puis son nom interne entre accents graves, plus de trois objets en liste (S88) », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, action (ce qu'elle fait, une phrase en mots du lecteur, S91), identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis ; après une correction du porteur ou le refus d'un hook avant outil dans le tour, « rien à remonter », « rien de neuf » et « reste au produit, parce que <motif> » supposent un retour consigné au ledger du produit (FRICTIONS, avertissante, TF-2141, TF-2156), et un motif « reste au produit » qui nomme un retour le dit déjà écrit (S48, TF-2137). · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande de la session (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; un livrable déjà lié « Livré » puis réécrit en place, au lieu de prendre l'indice suivant (S94, TF-2191) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0 : il suppose aussi chaque avertissement corrigé, ou motivé à l'appel par `--motif <CODE>=\"<raison>\"` (TF-2171).";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
@@ -2174,7 +2209,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // où la session s'est déplacée par un `cd` : l'état git, la réservation des D-N, le lien « Livré : » et le juge de S48 se mesurent au projet.
   const RACINE_HOOK = racineDuProjet(entree.cwd);
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
-    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables, remontee: remonteeTour,
+    depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, nonInteractif, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables, remontee: remonteeTour,
     frictions: frictionsTour, depuisFrictions, retourFrictions } = analyserTranscript(readFileSync(chemin, "utf8"));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
@@ -2202,7 +2237,19 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
   }
   const portee = escaladeMoyen ? { juge: true, motif: escaladeMoyen }
-    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage, enAttente, ecrituresDuTour: ecrit });
+    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage, enAttente, ecrituresDuTour: ecrit, nonInteractif });
+  // TF-2193 — le message d'attente d'une session non interactive qui a des tâches d'arrière-plan en route : refus dédié, qui dit d'attendre au premier plan. La garde anti-boucle ne le couvre pas
+  // (le second passage laisserait finir la session, donc couper les tâches) ; elle est remplacée par une borne comptée au journal, et le refus cesse dès que les tâches sont revenues.
+  if (portee.attenteArrierePlan) {
+    const dejaRefuses = (() => { try { return readFileSync(journal, "utf8").split(/\r?\n/).filter((l) => l.includes("\"attente_arriere_plan\":true") && l.includes(JSON.stringify(entree.session_id || ""))).length; } catch { return 0; } })();
+    journaliser({ ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes, portee: portee.motif, verdict: "FAIL", regles: [], bloquantes: [],
+      attente_arriere_plan: true, taches_en_attente: enAttente.length, deja_refuses: dejaRefuses, prejuge: !!prejuge, deja_refuse: !!entree.stop_hook_active });
+    if (dejaRefuses >= BORNE_ATTENTE_NON_INTERACTIVE) { afficherReecritureEnDefaut([`ATTENTE — ${enAttente.length} tâche(s) d'arrière-plan toujours non revenue(s) après ${dejaRefuses} refus : la session est laissée finir`]); process.exit(0); }
+    console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — R-44] ${portee.motif}.\n`
+      + "Ne clos pas le tour sur un message d'attente. Attends le retour des tâches au PREMIER PLAN (lis leur résultat avec l'outil prévu, ou une commande d'attente bornée), puis restitue. "
+      + "En mode non interactif, lance les agents au premier plan, et fais écrire à chacun son relevé dans un fichier : un fichier de sortie de tâche coupée reste vide." }));
+    process.exit(0);
+  }
   if (!portee.juge) {
     // TF-1947 — la réponse courte n'est pas jugée sur sa forme ; une exhaustivité qu'elle affirme se mesure (COMPLÉTUDE, S82).
     const court = dernierTexte ? controlerReponseCourte({ dernierHumain, dernierTexte }) : { verdict: "SANS_OBJET", ecarts: [] };
@@ -2283,6 +2330,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
     && critique.verdict !== "FAIL" && livre.verdict !== "FAIL" && remontee.verdict !== "FAIL" && frictionsC.verdict !== "FAIL";
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
+  // TF-2191 — au PASS, les livrables écrits dans le tour et liés au bloc 0 reçoivent leur sceau ; le journal en garde la liste.
+  const sceauxLivrables = passe && livre.applicable && livre.verdict === "PASS" ? livre.livrables.map((f) => scellerLivrable(f)).filter(Boolean) : [];
   try {
     mkdirSync(dirname(journal), { recursive: true });
     appendFileSync(journal, JSON.stringify({
@@ -2292,7 +2341,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         ? "PASS" : ((bloquants.length || ecartsAffichage.length || completude.verdict === "FAIL" || reservationBloque || critiqueBloque || frictionsBloque)
           ? "FAIL" : "AVERTISSEMENT"),
       regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
-      synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage, sceau,
+      synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage, sceau, ...(sceauxLivrables.length ? { sceaux_livrables: sceauxLivrables.map(nomDe) } : {}),
       ...(geste.applicable ? { geste: { decision: geste.decision, verdict: geste.verdict, ecarts: geste.ecarts } } : {}),
       ...(procedure.applicable ? { procedure: { verdict: procedure.verdict, ecarts: procedure.ecarts } } : {}),
       ...(detail.applicable ? { detail: { decision: detail.decision, verdict: detail.verdict, ecarts: detail.ecarts } } : {}),

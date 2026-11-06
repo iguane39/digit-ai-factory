@@ -610,6 +610,36 @@ check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit inta
   });
 }
 
+// ---- TF-2214 (06/11/2026, RP-34 de Produit-86) : LES DÉCISIONS POSÉES SANS RÉPONSE SE SIGNALENT À L'OUVERTURE -----
+// D-48 (réseau vide facturé), posée le 03/11, est restée sans réponse ni rappel pendant deux jours. Vert : une D-N posée au ledger depuis 14 jours au plus, sans `reponse_humain`
+// postérieure qui la nomme, est NOMMÉE avec sa date et son seq ; une décision répondue, une décision de plus de 14 jours et un ledger sans décision ne sont pas nommés ; la réponse
+// consignée fait disparaître la section (le remède se joue) ; rien n'est écrit chez le produit.
+{
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-decisions-")), "ProduitJouetZZ");
+  mkdirSync(join(P, "forge", "retours"), { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const il = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
+  const entrees = [
+    { seq: 1, ts: il(30), type: "run_open" },
+    { seq: 2, ts: il(2), type: "question_humain", decisions_posees: { "D-48": "Supprime-t-on le réseau vide créé en Europe du Nord ?" } },
+    { seq: 3, ts: il(2), type: "question_humain", decisions_posees: { "D-49": "Quel hébergement pour le poste ?" } },
+    { seq: 4, ts: il(1), type: "reponse_humain", decision: "D-49", reponse: "a" },
+    { seq: 5, ts: il(20), type: "question_humain", decisions_posees: { "D-12": "Question ancienne restée sans réponse ?" } },
+  ];
+  writeFileSync(join(P, "forge", "ledger.jsonl"), entrees.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  const section = (s) => (s.split("## Décisions posées sans réponse nommée (TF-2214)")[1] || "").split("\n## ")[0];
+  const s1 = joue(P);
+  check("TF-2214 — la décision posée il y a 2 jours sans réponse est nommée (date, seq, question), et elle seule", () => {
+    const l = section(s1);
+    if (!/1 décision\(s\)/.test(l) || !/D-48 \(posée le \d{4}-\d{2}-\d{2}, seq 2 — Supprime-t-on le réseau vide/.test(l)) throw new Error(`section : ${l.slice(0, 300) || "(absente)"}`);
+    if (/D-49|D-12/.test(l)) throw new Error("une décision répondue ou de plus de 14 jours est nommée");
+  });
+  check("TF-2214 — le remède se joue : la réponse consignée avec son numéro fait disparaître la section", () => {
+    writeFileSync(join(P, "forge", "ledger.jsonl"), entrees.concat([{ seq: 6, ts: il(0.5), type: "reponse_humain", decisions: { "D-48": "a" } }]).map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    if (/Décisions posées sans réponse nommée/.test(joue(P))) throw new Error("la section persiste alors que la réponse est consignée");
+  });
+}
+
 // TF-1635 — LE DÉLAI DU CLIENT EST UNE BORNE, PAS UNE CONSIGNE. Tout hook SessionStart resté
 // synchrone, au pilot comme dans le gabarit des produits, porte un délai d'au plus 45 s : coupé à
 // ce délai, il ne peut plus faire dépasser les 60 s de l'extension VS Code. Sens rouge : le même
