@@ -254,8 +254,14 @@ export function resoudreFamille(nomFichier, catalogue) {
 const ROLES_PAGE_DUE = /^(proposition|trajectoire|etude|conseil)\b/i;
 const ENTREE_DOCTRINE = "20260907";   // TF-0895 — jour où la règle est devenue opposable
 
+// TF-2258 (06/11/2026) — LA PAGE N'EST DUE QU'À UNE FAMILLE QUI LIVRE DU HTML. Le rôle du nom ne suffisait pas : la famille neuve
+// `gd-etude-reprise-activite` (statut ok, formats ["md"]) rendait « aucune page homonyme » pour « Étude - Reprise d'activité du portail »
+// alors que son catalogue ne lui promet aucune page. Quand l'appelant fournit le catalogue, G9 résout la famille du nom ; une famille
+// de statut `ok` dont les formats ne portent pas `html` est SANS_OBJET, et le dit. Une famille `porte_ailleurs` ou `a_extraire` ne déclare
+// pas ses formats de livraison de façon opposable (le vide y est déclaré) : elle reste jugée sur le rôle, comme les études d'opportunité,
+// dont la décision humaine du 16/09/2026 veut la page. Sans catalogue fourni, rien ne change.
 /** G9 sur UN livrable Markdown : `{ regle, statut, ou, message }`. */
-export function jugerPageHomonyme(chemin, { existe = null, depuis = ENTREE_DOCTRINE } = {}) {
+export function jugerPageHomonyme(chemin, { existe = null, depuis = ENTREE_DOCTRINE, catalogue = null } = {}) {
   const nom = String(chemin).replace(/^.*[\\/]/, "");
   if (!/\.md$/i.test(nom) || /^(README|LISEZMOI)\.md$/i.test(nom)) {
     return { regle: "G9", statut: "SKIP", ou: nom, message: "ce n'est pas un livrable Markdown — la question ne se pose pas" };
@@ -270,6 +276,14 @@ export function jugerPageHomonyme(chemin, { existe = null, depuis = ENTREE_DOCTR
   if (!date || date < depuis) {
     return { regle: "G9", statut: "SANS_OBJET", ou: nom,
       message: `livrable antérieur au ${depuis} — la doctrine de la page homonyme lui est postérieure, et la règle 5 interdit de réécrire l'existant (antériorité DÉCLARÉE, jamais rattrapée en silence)` };
+  }
+  if (Array.isArray(catalogue) && catalogue.length) {
+    const r = resoudreFamille(nom, catalogue);
+    const fam = r.resolue ? catalogue.find((f) => f.id === r.id) : null;
+    if (fam && fam.statut === "ok" && Array.isArray(fam.formats) && !fam.formats.includes("html")) {
+      return { regle: "G9", statut: "SANS_OBJET", ou: nom,
+        message: `famille « ${fam.famille} » (${fam.id}, statut ok) livrée en ${fam.formats.join(", ")} sans html — la page homonyme n'est due qu'à une famille dont les formats portent html (TF-2258)` };
+    }
   }
   const cible = String(chemin).replace(/\.md$/i, ".html");
   const present = existe === null ? existsSync(cible) : existe;
@@ -1227,6 +1241,30 @@ if (args[0] === "--self-test") {
   if (g9("Digit-AI - Synthese Mandat - Sujet - 20260916a.md", { existe: false }).statut !== "SKIP")
     casse.push("G9 : une RESTITUTION est traitée comme une proposition — la page n'est due qu'aux propositions, " +
       "trajectoires, études et conseils remis à un humain");
+  // G9 (TF-2258) — LA FAMILLE QUI NE LIVRE PAS DE HTML. Quatre fixtures de catalogue qui ne diffèrent que par les formats et le statut
+  // de la famille, puis le catalogue RÉEL : la famille neuve en Markdown seul est exemptée, l'étude d'opportunité (porte_ailleurs) ne l'est pas.
+  {
+    const famG9 = (id, formats, statut) => ({ id, famille: id, statut, formats, types_de_nom: [id.replace(/^gd-/, "").replace(/-/g, " ")] });
+    const catG9 = [famG9("gd-etude-md-seul", ["md"], "ok"), famG9("gd-etude-avec-html", ["md", "html"], "ok"), famG9("gd-etude-ailleurs", ["md"], "porte_ailleurs")];
+    const nomG9 = (suffixe) => `Digit-AI - Etude ${suffixe} - 20261105a.md`;
+    const md = g9(nomG9("md seul"), { existe: false, catalogue: catG9 });
+    if (md.statut !== "SANS_OBJET" || !/sans html/.test(md.message))
+      casse.push(`G9 (TF-2258) : une famille de statut ok en Markdown seul, SANS page, est accusée — la page n'est due qu'à une famille dont les formats portent html : ${JSON.stringify(md)}`);
+    if (g9(nomG9("avec html"), { existe: false, catalogue: catG9 }).statut !== "FAIL")
+      casse.push("G9 (TF-2258) : une famille dont les formats portent html, SANS page, passe — l'exemption mord trop large");
+    if (g9(nomG9("avec html"), { existe: true, catalogue: catG9 }).statut !== "PASS")
+      casse.push("G9 (TF-2258) : la même famille html AVEC sa page est accusée");
+    if (g9(nomG9("ailleurs"), { existe: false, catalogue: catG9 }).statut !== "FAIL")
+      casse.push("G9 (TF-2258) : une famille porte_ailleurs en Markdown seul est exemptée — la décision du 16/09/2026 veut la page des études d'opportunité");
+    if (g9(nomG9("md seul"), { existe: false }).statut !== "FAIL")
+      casse.push("G9 (TF-2258) : sans catalogue fourni, le comportement d'avant a changé (la page est due par le rôle du nom)");
+    const reprise = g9("Digit-AI - Étude - Reprise d'activité du portail - 20261105c.md", { existe: false, catalogue: cat8 });
+    if (reprise.statut !== "SANS_OBJET")
+      casse.push(`G9 (TF-2258) : l'étude de reprise d'activité (gd-etude-reprise-activite, Markdown seul) rend ${reprise.statut} avec le catalogue réel : ${reprise.message}`);
+    const kit = g9("Digit-AI - Étude - Opportunité du kit - 20261105c.md", { existe: false, catalogue: cat8 });
+    if (kit.statut !== "FAIL")
+      casse.push(`G9 (TF-2258) : l'étude d'opportunité sans page rend ${kit.statut} avec le catalogue réel — l'exemption ne doit pas toucher gd-etude-opportunite`);
+  }
 
   // G6 (TF-1097) — LA FICHE DE CONCEPTION, DANS SES SIX SENS. Chaque cas rouge ne diffère du cas
   // vert que par UNE propriété : c'est la seule forme qui prouve que la règle juge ce qu'elle dit
@@ -1426,7 +1464,7 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 63/63 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 70/70 PASS (G9 dans ses SEPT sens de plus (TF-2258) : une famille de statut ok en Markdown seul sans page → SANS_OBJET, une famille html sans page → FAIL et avec sa page → PASS, une famille porte_ailleurs en Markdown seul sans page → FAIL, sans catalogue fourni le comportement d'avant → FAIL, puis sur le catalogue réel l'étude de reprise d'activité → SANS_OBJET et l'étude d'opportunité → FAIL ; famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
@@ -1455,7 +1493,7 @@ if (args.includes("--livrable")) {
       message: "usage : node oracle-gabarits-documents.mjs --livrable <chemin.md> [<chemin.md>…]" }, null, 1));
     process.exit(2);
   }
-  const f8 = vus.flatMap((c) => [jugerLivrable(c, cat), jugerPageHomonyme(c)]);
+  const f8 = vus.flatMap((c) => [jugerLivrable(c, cat), jugerPageHomonyme(c, { catalogue: cat })]);
   const v8 = f8.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS";
   console.log(JSON.stringify({
     oracle: "oracle-gabarits-documents", mode: "livrable", version: "1.1.0", verdict: v8, findings: f8,
@@ -1464,6 +1502,7 @@ if (args.includes("--livrable")) {
       "la JUSTESSE de la famille résolue : un livrable nommé « Synthese … » qui serait en réalité une étude résout « restitution » et G8 ne le verra pas",
       "les livrables dont le nom ne suit NI R-4 NI la forme datée des études : leur radical entier sert de type, et la résolution échoue le plus souvent — c'est voulu, un nom hors convention est déjà un défaut R-4",
       "G9 ne juge que la PRÉSENCE de la page homonyme, jamais sa fraîcheur ni son contenu : une page générée puis laissée derrière une source corrigée la satisfait. Sa conformité au socle est le travail de check_html et render_page, joués séparément",
+      "G9 n'exempte (SANS_OBJET) que la famille de statut ok dont les formats ne portent pas html (TF-2258) : une famille porte_ailleurs ou a_extraire en Markdown seul (gd-etude-opportunite) reste jugée sur le rôle du nom, la décision humaine du 16/09/2026 voulant la page des études d'opportunité — l'ajout de html à ses formats, ou une exemption plus large, est une décision du pilot",
     ],
   }, null, 1));
   process.exit(v8 === "FAIL" ? 1 : 0);

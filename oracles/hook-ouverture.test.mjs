@@ -632,6 +632,52 @@ if (veut(1988)) {
   });
 }
 
+// ---- TF-2260 (06/11/2026) : LE JOURNAL HORS RUN COMPTE AUSSI --------------------------------------------------------
+// Hors run, `ledger.py` inscrit un retour à `forge/hors-run.jsonl` (TF-2223) ; aucun contrôle de lot ne le lisait, la compilation restait à la session qui ferme un
+// run. Vert : un produit SANS ledger de run mais avec un journal hors run voit ses retours de plus de 24 h, non cités par un lot, nommés dans leur section
+// (« hors-run seq n ») ; un lot qui cite « forge/hors-run.jsonl seq 1 » les retire. Rouge : un seq cité pour le ledger ne retire pas le même numéro du journal
+// hors run (et inversement), une entrée récente, une entrée qui n'est pas un retour, une entrée portant son lot ne sont pas nommées ; rien n'est écrit chez le produit.
+{
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-hors-run-")), "ProduitJouetHR");
+  mkdirSync(join(P, "forge", "retours"), { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const il = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
+  const horsRun = [
+    { seq: 1, ts: il(9), type: "retour", hors_run: true, resume: "friction A hors run" },
+    { seq: 2, ts: il(9), type: "retour", hors_run: true, resume: "friction B hors run" },
+    { seq: 3, ts: il(9), type: "question_humain", hors_run: true, resume: "pas un retour" },
+    { seq: 4, ts: il(0.05), type: "retour", hors_run: true, resume: "friction C, de moins de 24 h" },
+    { seq: 5, ts: il(9), type: "retour", hors_run: true, lot: "ProduitJouetHR - RETOURS - 20261001a", resume: "friction D, qui porte son lot" },
+  ];
+  const brutHr = horsRun.map((e) => JSON.stringify(e)).join("\n") + "\n";
+  writeFileSync(join(P, "forge", "hors-run.jsonl"), brutHr, "utf8");
+  const lot = join(P, "forge", "retours", "ProduitJouetHR - RETOURS - 20261001a.md");
+  writeFileSync(lot, "# lot\n\n- **Références ledger** : `forge\\ledger.jsonl` seq 1 et 2 (entrées `type: retour`)\n- **Statut** : remis le 2026-10-02\n", "utf8");
+  const sectionHr = (s) => (s.split("## Retours du journal hors run restés sans lot, plus de")[1] || "").split("\n## ")[0];
+  const s1 = joue(P);
+  check("TF-2260 — sans ledger de run, les retours du journal hors run de plus de 24 h qu'aucun lot ne cite sont nommés (un lot qui cite « ledger seq 1 et 2 » ne les retire pas)", () => {
+    const l = sectionHr(s1);
+    if (!/2 entrée\(s\)/.test(l) || !/hors-run seq 1, 2 \(la plus ancienne : 9 j\)/.test(l)) throw new Error(`section : ${l.slice(0, 400) || "(absente)"}`);
+    if (/hors-run seq [^\n]*\b(3|4|5)\b/.test(l.split("\n")[1] || "")) throw new Error("une entrée récente, déjà compilée ou qui n'est pas un retour est nommée");
+  });
+  check("TF-2260 — la section du ledger ne dit rien des entrées hors run (deux journaux, deux numérotations)", () => {
+    if (/Retours du ledger restés sans lot/.test(s1)) throw new Error("la section du ledger du run est ouverte alors que ce produit n'a pas de ledger");
+  });
+  check("TF-2260 — le remède se joue : un lot qui cite « forge/hors-run.jsonl seq 1, 2 » fait disparaître la section, et ce segment ne retire rien au ledger", () => {
+    writeFileSync(lot, "# lot\n\n- **Références hors run** : `forge/hors-run.jsonl` seq 1, 2 (entrées `type: retour`)\n- **Statut** : remis le 2026-10-02\n", "utf8");
+    const s2 = joue(P);
+    if (/Retours du journal hors run restés sans lot/.test(s2)) throw new Error("la section persiste alors que le lot cite les deux entrées");
+    // Le même numéro côté ledger du run n'est pas cité : un ledger neuf qui porte un retour seq 2 doit rester nommé.
+    writeFileSync(join(P, "forge", "ledger.jsonl"), [{ seq: 1, ts: il(30), type: "run_open" }, { seq: 2, ts: il(9), type: "retour", resume: "friction ledger" }].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    const s3 = joue(P);
+    const l = (s3.split("## Retours du ledger restés sans lot, plus de")[1] || "").split("\n## ")[0];
+    if (!/1 entrée\(s\)/.test(l) || !/seq 2 \(la plus ancienne : 9 j\)/.test(l)) throw new Error(`le segment hors run a retiré le seq 2 du ledger du run : ${l.slice(0, 300) || "(section absente)"}`);
+  });
+  check("TF-2260 — rien n'est écrit chez le produit (lecture seule)", () => {
+    if (readFileSync(join(P, "forge", "hors-run.jsonl"), "utf8") !== brutHr) throw new Error("le journal hors run a été modifié");
+  });
+}
+
 // ---- TF-2214 (06/11/2026, RP-34 de Produit-86) : LES DÉCISIONS POSÉES SANS RÉPONSE SE SIGNALENT À L'OUVERTURE -----
 // D-48 (réseau vide facturé), posée le 03/11, est restée sans réponse ni rappel pendant deux jours. Vert : une D-N posée au ledger depuis 14 jours au plus, sans `reponse_humain`
 // postérieure qui la nomme, est NOMMÉE avec sa date et son seq ; une décision répondue, une décision de plus de 14 jours et un ledger sans décision ne sont pas nommés ; la réponse

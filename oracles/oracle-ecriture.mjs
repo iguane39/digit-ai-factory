@@ -358,7 +358,8 @@ function objetDuNom(nomFichier) {
  * décide quand il existe (une valeur de `destinataires_internes` — « humain », « orchestrateur », « pilot »… — par son
  * premier mot : document de travail, non concerné ; toute autre valeur : tiers) ; sinon le TYPE du nom du fichier (courriel, courrier, lettre, fiche…) décide, sauf
  * exclusion nommée (une fiche de conception est un document de travail) ; sinon, PAR DÉFAUT (TF-2189, 06/11/2026), tout écrit sous un des
- * `dossiers_juges_par_defaut` (`output/`) : une synthèse sans en-tête n'échappe plus à la règle faute de dire qui la lit.
+ * `dossiers_juges_par_defaut` (`output/`) : une synthèse sans en-tête n'échappe plus à la règle faute de dire qui la lit. TF-2259 : ce jugement par
+ * défaut ne vaut que pour les écrits NEUFS, dont le nom porte une date égale ou postérieure à `dossiers_juges_par_defaut_depuis` (ou aucune date).
  */
 export function ecritATiers(texte, nomFichier, conf, cheminRelatif = "") {
   const interne = new Set((conf?.destinataires_internes || ["humain"]).map(replierMots));
@@ -383,8 +384,18 @@ export function ecritATiers(texte, nomFichier, conf, cheminRelatif = "") {
   // TF-2189 : sans en-tête `destinataire:` ni type de nom, un écrit sous `output/` est jugé. Un en-tête interne (ci-dessus) reste l'exception déclarée.
   const premier = String(cheminRelatif || "").replace(/\\/g, "/").replace(/^\.\//, "").split("/").filter(Boolean)[0];
   const dossiers = (conf?.dossiers_juges_par_defaut || []).map(replierMots);
-  if (premier && String(cheminRelatif).replace(/\\/g, "/").split("/").filter(Boolean).length > 1 && dossiers.includes(replierMots(premier)))
+  if (premier && String(cheminRelatif).replace(/\\/g, "/").split("/").filter(Boolean).length > 1 && dossiers.includes(replierMots(premier))) {
+    // TF-2259 (06/11/2026) : le jugement par défaut ne vaut que pour les écrits NEUFS. Le 06/11, il rendait A_REJOUER sur 179 écrits sur 193 (92,7 %) :
+    // un contrôle qui accuse presque tout le corpus se fait désactiver (leçon N4). Un écrit dont le nom porte une date antérieure au seuil de la donnée
+    // (`dossiers_juges_par_defaut_depuis`) est antérieur à la règle : la règle 5 interdit de réécrire l'existant, l'antériorité se DIT au verdict et au
+    // non_juge. Un nom sans date ne prouve aucune antériorité : l'écrit reste jugé. Sans seuil dans la donnée, tout écrit sous le dossier est jugé.
+    const depuis = /^\d{4}-\d{2}-\d{2}$/.test(String(conf?.dossiers_juges_par_defaut_depuis || "")) ? conf.dossiers_juges_par_defaut_depuis : null;
+    const dates = [...String(nomFichier || "").matchAll(/(?<!\d)(20\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(?!\d)/g)];
+    const jour = dates.length ? dates[dates.length - 1].slice(1, 4).join("-") : null;
+    if (depuis && jour && jour < depuis)
+      return { concerne: false, raison: `écrit sous ${premier}/ daté du ${jour} par son nom, antérieur au ${depuis} : jugement par défaut non appliqué, antériorité déclarée (TF-2259)` };
     return { concerne: true, raison: `écrit sous ${premier}/ : jugé par défaut, en-tête \`destinataire:\` ou non` };
+  }
   return { concerne: false, raison: "ni en-tête `destinataire:`, ni type de nom d'un écrit à un tiers, ni dossier jugé par défaut" };
 }
 
@@ -1264,7 +1275,13 @@ export function juger(texte, options = {}) {
 }
 
 function nonJuge(donnee) {
-  return [...(donnee?.non_juge || []), ...NON_JUGE_ORACLE];
+  // TF-2259 : l'antériorité du jugement par défaut se déclare ici, avec le seuil lu dans la donnée.
+  const depuis = donnee?.ecrit_a_un_tiers?.dossiers_juges_par_defaut_depuis;
+  const dossiers = (donnee?.ecrit_a_un_tiers?.dossiers_juges_par_defaut || []).join(", ");
+  const anteriorite = /^\d{4}-\d{2}-\d{2}$/.test(String(depuis || ""))
+    ? [`EC-14 : les écrits sans en-tête \`destinataire:\` sous ${dossiers}/ dont le nom porte une date antérieure au ${depuis} ne sont pas jugés par défaut (antériorité, TF-2259) — leur concision se juge à leur prochaine réécriture sous un nom daté d'après le seuil ; un nom sans date ne prouve aucune antériorité, l'écrit reste jugé`]
+    : [];
+  return [...(donnee?.non_juge || []), ...anteriorite, ...NON_JUGE_ORACLE];
 }
 
 // ── LA DONNÉE ────────────────────────────────────────────────────────────────────────────────
@@ -2021,7 +2038,8 @@ function selfTest() {
   // TF-2189 (RT-48 de Produit-84, 05/11/2026) : une synthèse en un paragraphe de 5 phrases denses rendait PASS, EC-14 en SKIP « faute d'en-tête ».
   // Par défaut, tout écrit sous output/ est jugé, en-tête `destinataire:` ou non ; un en-tête interne reste l'exception déclarée, hors de output/ rien ne change.
   const SOUS_OUTPUT = (nom) => ["--chemin-relatif", `output/04-plans/${nom}`];
-  const NOM_SYNTHESE = "Digit-AI - Synthese Mandat - Etude rendue - 20261105a.md";
+  // TF-2259 : le jugement par défaut ne vaut que pour les écrits neufs (nom daté du seuil de la donnée, 2026-11-06, ou d'après) ; ce nom est celui d'un écrit neuf.
+  const NOM_SYNTHESE = "Digit-AI - Synthese Mandat - Etude rendue - 20261106a.md";
   const c14s = jouer(NOM_SYNTHESE, COURRIEL_ROUGE, SOUS_OUTPUT(NOM_SYNTHESE));
   verifie(trouve(c14s, "EC-14-paragraphe")?.statut === "A_REJOUER" && /output\/ : jugé par défaut/.test(trouve(c14s, "EC-14-paragraphe")?.message || "") && c14s.j?.a_rejouer?.nombre >= 1,
     `EC-14 : un écrit sans en-tête sous output/ n'est pas jugé par défaut : ${JSON.stringify(trouve(c14s, "EC-14-paragraphe") || trouve(c14s, "EC-14"))}`);
@@ -2045,6 +2063,25 @@ function selfTest() {
   verifie(trouve(c14sr, "EC-14")?.statut === "SKIP", `EC-14 : un index régénéré (output/README.md) est jugé par défaut : ${JSON.stringify(trouve(c14sr, "EC-14"))}`);
   const c14sl = jouer("lisezmoi.md", COURRIEL_ROUGE, ["--chemin-relatif", "output/LISEZMOI.md"]);
   verifie(trouve(c14sl, "EC-14")?.statut === "SKIP", `EC-14 : un index régénéré (output/LISEZMOI.md) est jugé par défaut : ${JSON.stringify(trouve(c14sl, "EC-14"))}`);
+  // TF-2259 (06/11/2026) : le jugement par défaut ne vaut que pour les écrits NEUFS. Le MÊME texte rouge, sous output/, sans en-tête, ne diffère
+  // que par la date de son nom : daté d'avant le seuil de la donnée (2026-11-06) il est écarté et le dit ; daté du seuil (cas c14s ci-dessus) il est à rejouer.
+  const NOM_ANCIEN = "Digit-AI - Synthese Mandat - Etude rendue - 20261105a.md";
+  const c14a = jouer(NOM_ANCIEN, COURRIEL_ROUGE, SOUS_OUTPUT(NOM_ANCIEN));
+  verifie(trouve(c14a, "EC-14")?.statut === "SKIP" && /antérieur au 2026-11-06/.test(trouve(c14a, "EC-14")?.message || "") && !trouve(c14a, "EC-14-paragraphe") && c14a.j?.a_rejouer === null,
+    `EC-14 (TF-2259) : un écrit sans en-tête sous output/, daté d'avant le seuil, est jugé par défaut : ${JSON.stringify(trouve(c14a, "EC-14") || trouve(c14a, "EC-14-paragraphe"))}`);
+  jamaisFail(c14a, "EC-14 (output/ ancien)");
+  verifie((c14a.j?.non_juge || []).some((n) => /antériorité, TF-2259/.test(n) && /2026-11-06/.test(n)),
+    `EC-14 (TF-2259) : l'antériorité du jugement par défaut n'est pas déclarée au non_juge : ${JSON.stringify((c14a.j?.non_juge || []).slice(0, 2))}`);
+  const c14at = jouer(NOM_ANCIEN, "---\ndestinataire: Mme Durand, Client-A\n---\n\n" + COURRIEL_ROUGE, SOUS_OUTPUT(NOM_ANCIEN));
+  verifie(trouve(c14at, "EC-14-paragraphe")?.statut === "A_REJOUER", `EC-14 (TF-2259) : un en-tête qui nomme un tiers perd sa raison sous output/ parce que le nom est ancien : ${JSON.stringify(trouve(c14at, "EC-14-paragraphe") || trouve(c14at, "EC-14"))}`);
+  const NOM_COURRIEL_ANCIEN = "Client-A - Courriel relance - 20261020a.md";
+  const c14ac = jouer(NOM_COURRIEL_ANCIEN, COURRIEL_ROUGE, ["--chemin-relatif", `output/${NOM_COURRIEL_ANCIEN}`]);
+  verifie(trouve(c14ac, "EC-14-paragraphe")?.statut === "A_REJOUER", `EC-14 (TF-2259) : un type de nom d'écrit à un tiers (courriel) n'est plus jugé parce que sa date est ancienne : ${JSON.stringify(trouve(c14ac, "EC-14-paragraphe") || trouve(c14ac, "EC-14"))}`);
+  const NOM_SANS_DATE = "Digit-AI - Synthese Mandat - Etude rendue.md";
+  const c14ad = jouer(NOM_SANS_DATE, COURRIEL_ROUGE, SOUS_OUTPUT(NOM_SANS_DATE));
+  verifie(trouve(c14ad, "EC-14-paragraphe")?.statut === "A_REJOUER", `EC-14 (TF-2259) : un nom sans date, qui ne prouve aucune antériorité, n'est plus jugé : ${JSON.stringify(trouve(c14ad, "EC-14-paragraphe") || trouve(c14ad, "EC-14"))}`);
+  const sansSeuil = ecritATiers(COURRIEL_ROUGE, NOM_ANCIEN, { dossiers_juges_par_defaut: ["output"] }, `output/04-plans/${NOM_ANCIEN}`);
+  verifie(sansSeuil.concerne === true, `EC-14 (TF-2259) : sans seuil dans la donnée, un écrit ancien sous output/ n'est plus jugé (comportement d'avant 1.8.0) : ${JSON.stringify(sansSeuil)}`);
 
   // LA LANGUE. Sans --langue, un courriel anglais est à rejouer ; avec --langue en (ou langue: en), le même texte passe.
   const COURRIEL_EN = "Dear Ms Durand,\n\n"
@@ -2095,7 +2132,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : ${58 + BILAN_14} cas, 0 défaut (${58 + BILAN_14}/${58 + BILAN_14} PASS — EC-17 (D-114 (a)) : comparatif sans rubrique AVERT, avec rubrique PASS, sans comparateur PASS ; EC-2 (D-115 (a)) : 15 phrases longues non consécutives AVERT, 14 PASS ; page HTML jugée sur son texte visible (TF-1968) : sept phrases de 40 mots d'affilée refusées par EC-2 à la ligne de la page, les mêmes mots en phrases de 10 mots PASS, <script> et <pre> non comptés, un titre « Ce que » en <h2> refusé par EC-8 à la ligne de la page, source html dite ; EC-8 titre NUMÉROTÉ (TF-2020) : « 7. », « 7) », « 2.1 » et « 3 · » refusés, le même titre qui nomme son contenu PASS, un fichier de la liste d'antériorité admis en le disant, le même texte hors liste ou non numéroté refusé ; EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : ${58 + BILAN_14} cas, 0 défaut (${58 + BILAN_14}/${58 + BILAN_14} PASS — EC-17 (D-114 (a)) : comparatif sans rubrique AVERT, avec rubrique PASS, sans comparateur PASS ; EC-2 (D-115 (a)) : 15 phrases longues non consécutives AVERT, 14 PASS ; page HTML jugée sur son texte visible (TF-1968) : sept phrases de 40 mots d'affilée refusées par EC-2 à la ligne de la page, les mêmes mots en phrases de 10 mots PASS, <script> et <pre> non comptés, un titre « Ce que » en <h2> refusé par EC-8 à la ligne de la page, source html dite ; EC-8 titre NUMÉROTÉ (TF-2020) : « 7. », « 7) », « 2.1 » et « 3 · » refusés, le même titre qui nomme son contenu PASS, un fichier de la liste d'antériorité admis en le disant, le même texte hors liste ou non numéroté refusé ; EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; le jugement par défaut sous output/ ne vaut que pour les écrits neufs (TF-2259) — le même texte daté d'avant le seuil est écarté, dit au verdict et déclaré au non_juge, daté du seuil il est à rejouer, un en-tête tiers, un type de nom de tiers ou un nom sans date restent jugés, sans seuil dans la donnée tout est jugé ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 

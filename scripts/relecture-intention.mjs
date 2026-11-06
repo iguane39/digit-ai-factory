@@ -48,7 +48,8 @@
  *   --releve [--depuis AAAA-MM-JJ]                  par type et par point : relectures, dérives signalées, alertes confirmées et
  *        infirmées, corrigées par la boucle ; et les écarts levés sans l'humain ou posés à l'humain. Exit 0 toujours.
  * Options communes : --registre <fichier> (registre autre que celui du pilot, pour un essai), --sortie <dossier>, --json.
- * Exit : 0 · 1 (point « reception » seulement) l'oracle de forme rend FAIL, rien n'est préparé · 2 usage invalide ou pièce illisible (jamais pour --releve).
+ * Exit : 0 · 1 (point « reception » seulement) l'oracle de forme rend FAIL, rien n'est préparé · 2 usage invalide, pièce illisible, ou aucune
+ *        demande humaine retrouvée dans la transcription (TF-2235 : rien n'est préparé, aucune consigne imprimée) (jamais pour --releve).
  *
  * NON JUGÉ (déclaré) : la justesse d'un verdict de relecteur ; la nature (hors_demande / choix_humain) qu'il donne à un écart ;
  * les commandes à effet, listées mais pas lues ; MultiEdit (outil absent de la flotte d'outils de ce poste) ; le diff d'un fichier
@@ -114,10 +115,18 @@ const norm = (p) => { let r = resolve(String(p)); try { r = realpathSync.native(
 
 // ---------- la transcription ----------
 
+/**
+ * TF-2235 (06/11/2026) — L'INVITE D'OUVERTURE D'UNE SESSION NON INTERACTIVE. Une session ouverte avec son invite (le SDK, `claude -p`, un
+ * lanceur) date son premier message sans champ `origin`, avec `turnOrigin` et `promptSource` à « sdk » et `turnPosition.promptIndex` à 0
+ * (relevé dans la transcription de la session qui a ouvert l'étude sur la sécurité par défaut). C'est la demande de cette session : elle est
+ * citée. Un message du SDK qui n'est pas en position d'ouverture (promptIndex ≠ 0, ou sans position) reste refusé — rubrique ou rappel injecté.
+ */
+export const estInviteOuverture = (rec) => !rec?.origin && rec?.turnOrigin === "sdk" && rec?.promptSource === "sdk" && rec?.turnPosition?.promptIndex === 0;
+
 /** Le texte d'un message humain, ou null si ce n'en est pas un. Mot pour mot : on n'ôte que les balises que le harnais injecte. */
 export function texteHumain(rec) {
   if (!rec || rec.type !== "user" || rec.isMeta || rec.isSidechain) return null;
-  const humain = rec.origin ? rec.origin.kind === "human" : rec.turnOrigin === "human";
+  const humain = rec.origin ? rec.origin.kind === "human" : (rec.turnOrigin === "human" || estInviteOuverture(rec));
   if (!humain) return null;
   const c = rec.message?.content;
   if (Array.isArray(c) && c.some((b) => b?.type === "tool_result")) return null;
@@ -1225,6 +1234,9 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       + `Lance la commande depuis ${cwdTranscription}, ou désigne par --transcript la transcription d'une session ouverte dans ${resolve(projetDir)}.`);
   const avisCwd = cwdTranscription ? `répertoire de la transcription : ${cwdTranscription}, même dépôt que ${resolve(projetDir)}` : "la transcription ne dit pas son répertoire de travail : sa correspondance au dépôt relu n'est pas vérifiée";
   const humains = messagesHumains(records);
+  // TF-2235 : sans aucune demande retrouvée, la relecture n'a rien à comparer ; préparer quand même ferait dépenser un agent sur une demande vide.
+  if (!humains.length) return usage(`aucune demande humaine retrouvée dans la transcription lue (${transcript}, ${origine}) : ni message de l'humain, ni invite d'ouverture de session non interactive. `
+    + "Rien n'est préparé, aucune consigne n'est imprimée. --transcript <jsonl> désigne la transcription qui porte la demande.");
   const decisions = decisionsPosees(records, humains);
   const dossier = a.sortie ? resolve(cwd, a.sortie) : mkdtempSync(join(tmpdir(), "relecture-intention-"));
   mkdirSync(dossier, { recursive: true });
