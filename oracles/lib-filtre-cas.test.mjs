@@ -86,4 +86,4 @@ const jouer = (fichier, variable, valeur) => {
 }
 
 if (echecs.length) { console.error("lib-filtre-cas : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`lib-filtre-cas : ${n}/${n} PASS — le filtre de cas des recettes (TF-2256) se lit dans ses formes, restreint aux tranches nommées, refuse un numéro sans tranche et une sélection illisible, dit PARTIELLE sans jamais ressembler à un total ; hook-restitution.test filtré sur le cas 9, hook-ouverture.test sur un numéro absent`);
+console.log(`lib-filtre-cas : ${n}/${n} PASS — le filtre de cas des recettes (TF-2256) se lit dans ses formes, restreint aux tranches nommées, et dans les deux sens : les cas rouges (un numéro sans tranche, une sélection illisible) doivent échouer et échouent, dit PARTIELLE sans jamais ressembler à un total ; hook-restitution.test filtré sur le cas 9, hook-ouverture.test sur un numéro absent`);
