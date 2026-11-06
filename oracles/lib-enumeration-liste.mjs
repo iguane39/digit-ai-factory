@@ -180,3 +180,43 @@ export function etapesSansClotureEnDerniere(texte) {
     .filter((e) => e.sousPuces.length && !RE.test(e.sousPuces[e.sousPuces.length - 1].texte))
     .map((e) => ({ ligne: e.ligne, extrait: e.texte.slice(0, 110) }));
 }
+
+// ── C. Une étape de guide qui fait écrire l'humain dans un fichier d'environnement (TF-2190, RT-49, 06/11/2026) ──────────────────
+//
+// LE FAIT. Le 05/11/2026, un guide disait « ajoutez la ligne CLOUDFLARE_BILLING_TOKEN=<le secret> » et « remplacez la valeur de
+// SUPABASE_ACCESS_TOKEN », alors que `forge\ranger-secret.mjs` (D-167 (a), TF-2127) range un secret reçu en session dans le fichier
+// d'environnement du produit et en consigne l'empreinte au ledger. Retour du porteur : « Pourquoi les lignes dans le .env ne sont pas
+// créées automatiquement, comme demandé par la Factory. Corrige. » Le hook de restitution avait rendu le guide affichable.
+//
+// CE QUI EST JUGÉ : une étape ou une sous-puce de la section « Guide » qui porte un verbe d'écriture à l'impératif (ajoutez, remplacez,
+// modifiez, éditez, collez, créez, saisissez…) ET, au choix : un nom de fichier d'environnement (`.env`, `.env.local`, « fichier
+// d'environnement ») ; une ligne `NOM_DE_VARIABLE=` quand l'étape parle d'une « ligne » ou qu'une autre étape cite un fichier
+// d'environnement ; « la valeur de NOM_DE_VARIABLE » quand une autre étape cite un fichier d'environnement. Une étape qui nomme
+// `ranger-secret` est le remède et n'est jamais accusée. NON JUGÉ : un geste hors de la section « Guide » (une action du bloc 8, de la
+// prose), une variable posée dans la console d'un hébergeur (aucun fichier n'est nommé), le verbe d'écriture hors du vocabulaire fermé.
+
+const RE_VERBE_ECRIRE = /(?<![\p{L}\p{N}])(?:ajout(?:ez|er)|rajout(?:ez|er)|remplac(?:ez|er)|modifi(?:ez|er)|[ée]dit(?:ez|er)|[ée]cri(?:vez|re)|ins[ée](?:rez|rer)|coll(?:ez|er)|renseign(?:ez|er)|compl[ée]t(?:ez|er)|mett(?:ez|re)|cr[ée](?:ez|er)|saisi(?:ssez|r)|copi(?:ez|er)|d[ée]commentez|rempliss(?:ez)|remplir)(?![\p{L}\p{N}])/iu;
+const RE_FICHIER_ENV = /(?<![\p{L}\p{N}])\.env(?:\.[\p{L}\p{N}_.-]+)?(?![\p{L}\p{N}_])|fichier\s+d['’]environnement|\.dev\.vars/iu;
+const RE_LIGNE_VARIABLE = /(?<![\p{L}\p{N}_])[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\s*=/u;
+const RE_VALEUR_DE = /(?:valeur|contenu)\s+de\s+`?[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+`?/u;
+const RE_REMEDE_RANGER = /ranger-secret/i;
+
+/**
+ * Les étapes et sous-puces d'un guide qui font écrire l'humain dans un fichier d'environnement.
+ * @returns {{ligne:number, forme:"fichier"|"ligne"|"valeur", extrait:string}[]}
+ */
+export function etapesQuiEcriventDansUnEnv(texte) {
+  const etapes = etapesDeGuide(texte);
+  const textes = (e) => [{ ligne: e.ligne, texte: e.texte }, ...e.sousPuces];
+  const contexteEnv = etapes.some((e) => textes(e).some((x) => RE_FICHIER_ENV.test(x.texte)));
+  const res = [];
+  for (const e of etapes) for (const x of textes(e)) {
+    const t = String(x.texte);
+    if (RE_REMEDE_RANGER.test(t) || !RE_VERBE_ECRIRE.test(t)) continue;
+    const forme = RE_FICHIER_ENV.test(t) ? "fichier"
+      : RE_LIGNE_VARIABLE.test(t) && (contexteEnv || /\bligne\b/i.test(t)) ? "ligne"
+        : contexteEnv && RE_VALEUR_DE.test(t) ? "valeur" : null;
+    if (forme) res.push({ ligne: x.ligne, forme, extrait: t.replace(/\s+/g, " ").slice(0, 110) });
+  }
+  return res;
+}

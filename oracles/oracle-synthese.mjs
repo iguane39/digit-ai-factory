@@ -121,6 +121,9 @@
  *       ne dit pas non mesuré ; lue par `lib-chiffres-releves.mjs`, sur les nombres passés par le hook (`--nombres-tour`) ; avertissante ;
  *   S92 LA LIGNE « À ouvrir : » (03/11, TF-2077, RT-32, gabarit 2.59.0) : pendant de S87 — quand une action `manuelle_utilisateur` du bloc 8 porte une adresse http(s) hors
  *       plateforme tierce de la liste (celles-là relèvent de S52/S53), le bloc 0 se clôt par `À ouvrir : [<nom>](<adresse>)` ; cette ligne est exemptée de S9 comme « Livré : » ; avertissante ;
+ *   S103 UN GUIDE NE FAIT PAS ÉCRIRE L'HUMAIN DANS UN FICHIER D'ENVIRONNEMENT (06/11, TF-2190, RT-49) : une étape ou sous-puce de la section « Guide » qui dit d'ajouter, remplacer, coller ou éditer une ligne
+ *       d'un `.env` (ou une `NOM=` / « la valeur de NOM » quand le guide cite ce fichier) est signalée, et `forge/ranger-secret.mjs` nommé (D-167 (a), TF-2127) ; lue par `lib-enumeration-liste.mjs` ;
+ *       numéro pris au-delà du suivant libre (S93) plus 10, pour ne pas heurter les règles qu'une autre session ajoute le même jour ; hors de BLOQUANTES du hook de restitution, donc avertissante à l'écran ;
  *   S36 / S38 (TF-1981), S48 (TF-1982, TF-1987), S68 (TF-1985) étendues dans le même gabarit 2.54.0 : la critique d'implémentation ne se lit comme un verdict ni en action
  *       (bloc 8) ni en option (bloc 3), et ni `hors_mandat` ni `borne_atteinte` ne dispensent de la jouer ; « reste au produit » suppose un run ouvert au ledger ;
  *       une recréation ou un redémarrage de conteneur ou de service est une correction ; un 200 au corps vide ne prouve pas une absence sans 404 ni essai de chaque portée ;
@@ -210,7 +213,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
-import { enumerationsEnLigne, etapesDeGuide, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
+import { enumerationsEnLigne, etapesDeGuide, etapesQuiEcriventDansUnEnv, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
 import { affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { chiffresSansReleve } from "./lib-chiffres-releves.mjs";
 import { lireCarte, derniereDemande, etatDesLivrables, sessionDe, REPLI_DIT } from "./lib-mobilisation.mjs";
@@ -3565,6 +3568,27 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // ---- S103 (06/11/2026, TF-2190, RT-49 de Produit-84) — UN GUIDE NE FAIT PAS ÉCRIRE L'HUMAIN DANS UN FICHIER D'ENVIRONNEMENT ------
+  //
+  // LE FAIT. Le 05/11/2026, un guide disait « ajoutez la ligne CLOUDFLARE_BILLING_TOKEN=<le secret> » et « remplacez la valeur de
+  // SUPABASE_ACCESS_TOKEN », alors que `forge\ranger-secret.mjs` (D-167 (a), TF-2127) range un secret reçu en session dans le fichier
+  // d'environnement du produit et consigne son empreinte au ledger. Retour du porteur : « Pourquoi les lignes dans le .env ne sont pas
+  // créées automatiquement, comme demandé par la Factory. Corrige. » Le hook de restitution avait rendu le guide affichable.
+  // Le juge vit dans `lib-enumeration-liste.mjs` (`etapesQuiEcriventDansUnEnv`) : une étape ou une sous-puce de la section « Guide » avec
+  // un verbe d'écriture à l'impératif et un fichier d'environnement (ou une ligne `NOM=`). Une étape qui nomme `ranger-secret` est le remède.
+  // NON JUGÉ : un geste hors de la section « Guide » (action du bloc 8, prose), une variable posée dans la console d'un hébergeur.
+  {
+    const ecrivent103 = etapesQuiEcriventDansUnEnv(texte);
+    if (!etapesDeGuide(texte).length) ok("S103", "aucune étape de guide — rien dont juger le fichier d'environnement");
+    else if (!ecrivent103.length) ok("S103", `${etapesDeGuide(texte).length} étape(s) de guide, aucune ne fait écrire l'humain dans un fichier d'environnement`);
+    else ko("S103", `${ecrivent103.length} étape(s) ou sous-puce(s) du guide font écrire l'humain dans un fichier d'environnement : `
+      + ecrivent103.slice(0, 2).map((e) => `l.${e.ligne} « ${e.extrait.slice(0, 80)} »`).join(" · ")
+      + ". Le geste existe : le porteur donne le secret dans la conversation et la session le range avec `<valeur> | node forge/ranger-secret.mjs NOM` "
+      + "(D-167 (a), TF-2127), qui l'écrit dans le fichier d'environnement ignoré par git et consigne au ledger son nom et son empreinte, jamais sa valeur. "
+      + "Remplace l'étape par : « Donnez le secret NOM dans la conversation », et dis que la session le range. Le 05/11/2026, un guide disait « ajoutez la ligne "
+      + "NOM=<le secret> » ; retour du porteur : « Pourquoi les lignes dans le .env ne sont pas créées automatiquement, comme demandé par la Factory. Corrige. »");
+  }
+
   // ---- S54 (01/10/2026, TF-1494) — UN PARAGRAPHE DE PROSE S'ÉCRIT SUR UNE SEULE LIGNE SOURCE ------
   //
   // LE FAIT, retour humain du 29/09/2026 chez un produit, capture à l'appui, mot pour mot : « Il y a
@@ -5280,6 +5304,33 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push("S81 : le constat sur le guide en paragraphe doit COMPTER les gestes de l'étape (« (3 gestes) ») : " + String(constat81(rpar, "S81").message || "").slice(0, 200));
     if (!/Résultat attendu/.test(constat81(rtete, "S81").message || ""))
       casse.push("S81 : le constat sur la clôture mal placée doit la NOMMER (« Résultat attendu ») : " + String(constat81(rtete, "S81").message || "").slice(0, 200));
+  }
+  // 06/11 — S103 (TF-2190, RT-49) DANS SES QUATRE SENS. La verte est le guide d'importation sans fichier d'environnement (ria, rv) ; les deux rouges
+  // font écrire la ligne (« Ajoutez la ligne NOM=<le secret> » dans `.env`) ou la valeur (« Remplacez la valeur de NOM ») ; le remède joué — donner le
+  // secret dans la conversation, la session le range par `forge/ranger-secret.mjs` — passe.
+  {
+    const constat103 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S103") || {}; } catch { return {}; } };
+    const sousPuceOuvrir = "   - Ouvrez Outils." + saut;
+    const avecGeste = (lignes) => interfaceAvecSource.replace(sousPuceOuvrir, lignes.map((l) => `   - ${l}` + saut).join(""));
+    const fixtures103 = {
+      "s103-ligne.md": avecGeste(["Ouvrez le fichier `.env` du produit.", "Ajoutez la ligne `CLOUDFLARE_BILLING_TOKEN=<le secret>`."]),
+      "s103-valeur.md": avecGeste(["Ouvrez le fichier `.env` du produit.", "Remplacez la valeur de `SUPABASE_ACCESS_TOKEN`."]),
+      "s103-remede.md": avecGeste(["Donnez le secret `CLOUDFLARE_BILLING_TOKEN` dans la conversation.", "La session le range dans `.env` avec `forge/ranger-secret.mjs`."]),
+    };
+    for (const [nom, contenu] of Object.entries(fixtures103)) writeFileSync(join(dir, nom), contenu, "utf8");
+    const rl = spawnSync(process.execPath, [moi, join(dir, "s103-ligne.md")], { encoding: "utf8" });
+    const rva = spawnSync(process.execPath, [moi, join(dir, "s103-valeur.md")], { encoding: "utf8" });
+    const rre = spawnSync(process.execPath, [moi, join(dir, "s103-remede.md")], { encoding: "utf8" });
+    for (const [r, statut, quoi] of [
+      [ria, "PASS", "la verte (un guide d'importation, aucun fichier d'environnement) est accusée"],
+      [rv, "PASS", "la verte d'origine, sans guide, est accusée"],
+      [rl, "FAIL", "« Ajoutez la ligne CLOUDFLARE_BILLING_TOKEN=<le secret> » dans un guide qui ouvre `.env` passe — c'est le guide du 05/11/2026"],
+      [rva, "FAIL", "« Remplacez la valeur de SUPABASE_ACCESS_TOKEN » dans un guide qui ouvre `.env` passe"],
+      [rre, "PASS", "le remède (donner le secret dans la conversation, la session le range par ranger-secret) est accusé — le remède que le message prescrit échoue"],
+    ]) if (constat103(r).statut !== statut)
+      casse.push(`S103 (TF-2190) : ${quoi} — attendu ${statut} : ` + String(constat103(r).message || "sortie illisible").slice(0, 200));
+    if (!/ranger-secret\.mjs/.test(constat103(rl).message || ""))
+      casse.push("S103 : le constat doit NOMMER le geste forge/ranger-secret.mjs : " + String(constat103(rl).message || "").slice(0, 200));
   }
   const rnn = spawnSync(process.execPath, [moi, join(dir, "numero-nu.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnn.stdout))
