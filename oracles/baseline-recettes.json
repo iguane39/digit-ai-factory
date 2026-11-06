@@ -351,7 +351,7 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 326,
+  "cas": 330,
   "vu_le": "2026-11-06"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
@@ -467,7 +467,7 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 68,
+  "cas": 69,
   "vu_le": "2026-11-06"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
@@ -485,6 +485,10 @@
  "oracles/lib-exhaustivite.test.mjs": {
   "cas": 85,
   "vu_le": "2026-10-18"
+ },
+ "oracles/lib-filtre-cas.test.mjs": {
+  "cas": 28,
+  "vu_le": "2026-11-06"
  },
  "oracles/lib-garde-arbre-suivi.test.mjs": {
   "cas": 12,
@@ -679,7 +683,7 @@
   "vu_le": "2026-11-05"
  },
  "scripts/mobiliser.test.mjs": {
-  "cas": 30,
+  "cas": 33,
   "vu_le": "2026-11-06"
  },
  "scripts/nettoyer-copies.test.mjs": {
