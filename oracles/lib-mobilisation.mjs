@@ -271,10 +271,17 @@ export function lireProfil(produit) {
     : { profil: Object.fromEntries(SIGNAUX_PROFIL.map((s) => [s, signaux[s]])) };
 }
 
-/** Déclare (ou revoit) le profil du produit : forge/PROFIL.json, daté. */
+/** Déclare (ou revoit) le profil du produit : forge/PROFIL.json, daté. Les clés qu'il n'écrit pas restent (TF-2211 : `controles_produit`). */
 export function ecrireProfil(produit, profil, maintenant = new Date()) {
   mkdirSync(join(produit, "forge"), { recursive: true });
-  writeFileSync(join(produit, CHEMIN_PROFIL), JSON.stringify({ schema: "forge/profil@1", date: maintenant.toISOString().slice(0, 10),
+  const chemin = join(produit, CHEMIN_PROFIL);
+  let avant = {};
+  try {
+    const j = JSON.parse(readFileSync(chemin, "utf8").replace(/^﻿/, ""));
+    // Un profil à plat (signaux à la racine) garde ses autres clés ; ses signaux passent sous `signaux`.
+    if (j && typeof j === "object" && !Array.isArray(j)) avant = Object.fromEntries(Object.entries(j).filter(([k]) => !SIGNAUX_PROFIL.includes(k)));
+  } catch { /* absent ou illisible : rien à garder */ }
+  writeFileSync(chemin, JSON.stringify({ ...avant, schema: "forge/profil@1", date: maintenant.toISOString().slice(0, 10),
     source: "déclaré par scripts/mobiliser.mjs --profil (diagnostic 20261026a, section d, A5)", signaux: profil }, null, 2) + "\n", "utf8");
 }
 
