@@ -1327,11 +1327,13 @@ function juger(texte, cheminJuge = null) {
       const ouvertes93 = decisionsSansReponse(produit93);
       const b3_93 = bloc(texte, BLOCS[2][0]) || "";
       const manquantes93 = ouvertes93.filter((d) => !new RegExp(`\\b${d.n}\\b`).test(b3_93));
+      // TF-2266 : le remède se dit dans la forme que `manqueAuRappel` (S4) reconnaît — JJ/MM à HH:MM tirés de l'horodatage du ledger.
+      const horodate93 = (ts) => { const t = new Date(ts); if (Number.isNaN(t.getTime())) return "JJ/MM à HH:MM"; const p = (n) => String(n).padStart(2, "0"); return `${p(t.getDate())}/${p(t.getMonth() + 1)} à ${p(t.getHours())}:${p(t.getMinutes())}`; };
       if (!ouvertes93.length) ok("S93", "aucune décision posée au ledger du produit depuis 14 jours n'attend de réponse");
       else if (!manquantes93.length) ok("S93", `${ouvertes93.length} décision(s) en attente de réponse, toutes nommées au bloc 3 (${ouvertes93.map((d) => d.n).join(", ")})`);
       else ko("S93", `${manquantes93.length} décision(s) posée(s) au ledger du produit sans réponse nommée ne sont pas rappelées au bloc 3 : `
         + manquantes93.slice(0, 5).map((d) => `${d.n} (posée le ${String(d.ts).slice(0, 10)}${d.seq != null ? `, ledger seq ${d.seq}` : ""}${d.question ? ` : « ${d.question.slice(0, 80)} »` : ""})`).join(" ; ")
-        + `${manquantes93.length > 5 ? ` (+${manquantes93.length - 5})` : ""}. Rappelle chacune en une ligne au bloc 3 : « > **D-N — <la question ?>** posée le <jour>, sans réponse », ou écris qu'elle est répondue `
+        + `${manquantes93.length > 5 ? ` (+${manquantes93.length - 5})` : ""}. Rappelle chacune en une ligne au bloc 3, dans la forme que S4 lit comme un rappel, sans option ni question : « ${manquantes93[0].n} : <son sujet, trois mots au moins>, posée le ${horodate93(manquantes93[0].ts)}, inchangée » (TF-2266 : la forme « > **D-N — <la question ?>** posée le <jour>, sans réponse » était refusée par S4), ou écris qu'elle est répondue `
         + "et consigne la réponse au ledger (`reponse_humain`, avec son numéro). Le 03/11/2026, D-48 restée sans rappel a laissé des ressources facturées deux jours (TF-2214).");
     }
   }
@@ -7345,6 +7347,19 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`S93 (TF-2214) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S93").message || "sortie illisible").slice(0, 200));
     if (!/D-90/.test(String(constatDe(rS93Rouge, "S93").message || "")) || !/seq 305/.test(String(constatDe(rS93Rouge, "S93").message || "")))
       casse.push("S93 : le constat doit nommer D-90 et son numéro de séquence au ledger : " + String(constatDe(rS93Rouge, "S93").message || "").slice(0, 200));
+    // TF-2266 (06/11/2026) — LE REMÈDE DE S93 SE JOUE AVEC S4. Rouge d'origine : S93 prescrivait « > **D-N — <la question ?>** posée le <jour>, sans réponse », que S4 (bloquante) refusait
+    // (question, pas d'heure, pas de « inchangée »). Ici la ligne est EXTRAITE du message de S93, son sujet rempli, puis posée seule au bloc 3 : S93 et S4 doivent passer ensemble.
+    const ligne93 = (String(constatDe(rS93Rouge, "S93").message || "").match(/« (D-90 : <son sujet, trois mots au moins>, posée le \d{2}\/\d{2} à \d{2}:\d{2}, inchangée) »/) || [])[1];
+    if (!ligne93) casse.push("S93 (TF-2266) : le message ne prescrit pas la ligne « D-N : <sujet>, posée le JJ/MM à HH:MM, inchangée » que S4 lit comme un rappel : " + String(constatDe(rS93Rouge, "S93").message || "").slice(0, 260));
+    else {
+      const remede93 = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, `## 3. Décisions attendues\n\n- ${ligne93.replace("<son sujet, trois mots au moins>", "suppression du réseau vide")}\n\n`);
+      const rS93Remede = jouerRacine(pOuverte, "s93-remede-prescrit.md", remede93);
+      for (const regle of ["S93", "S4"]) if (constatDe(rS93Remede, regle).statut !== "PASS")
+        casse.push(`S93 (TF-2266) : la ligne que S93 prescrit (« ${ligne93} ») est refusée par ${regle} — le remède se heurte à une règle : ` + String(constatDe(rS93Remede, regle).message || "sortie illisible").slice(0, 220));
+    }
+    const ancien93 = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, "## 3. Décisions attendues\n\n> **D-90 — Supprime-t-on le réseau vide créé en Europe du Nord ?** posée le 03/11, sans réponse\n\n");
+    if (constatDe(jouerRacine(pOuverte, "s93-ancien-remede.md", ancien93), "S4").statut !== "FAIL")
+      casse.push("S93 (TF-2266) : l'ancienne forme « Rappel : D-90 — <question ?>, posée il y a deux jours, sans réponse » doit rester refusée par S4 (c'est la raison du changement de remède)");
     // S94 — un livrable lié « Livré » puis réécrit. Le sceau est posé comme le fait le hook de fin de tour : `verifier-jugement.mjs <fichier> --sceller`.
     const outil94 = join(dirname(moi), "..", "scripts", "verifier-jugement.mjs");
     const p94 = produit93("s94");
