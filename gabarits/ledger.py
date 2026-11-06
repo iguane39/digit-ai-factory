@@ -70,7 +70,7 @@ TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_mo
          "run_close", "rectification_versions_forges", "rectification_run_open",
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
-         "deplacement_en_attente", "secret_range", "demande_humain", "qualification_enclenchement"}
+         "deplacement_en_attente", "demande_humain", "qualification_enclenchement", "secret_range"}
 
 
 # TF-2223 (RP-2, 06/11/2026) : hors run, ces types s'écrivent à `forge/hors-run.jsonl`, jamais au ledger du run, dont R-42
@@ -82,9 +82,13 @@ JOURNAL_HORS_RUN = FORGE / "hors-run.jsonl"
 SORTS = ("retire", "conserve", "a_decider")
 
 
-def controler_remplacement(champs: dict) -> None:
+def controler_remplacement(type_: str, champs: dict) -> None:
     """`remplace` nomme la ou les décisions remplacées ; `artefacts_remplaces` liste ce qu'elles avaient créé avec son sort.
-    La forme fausse est refusée AVANT d'écrire : une entrée écrite ne se réécrit pas."""
+    La forme fausse est refusée AVANT d'écrire : une entrée écrite ne se réécrit pas.
+    `secret_range` est hors de ce contrôle : son champ `remplace` est un booléen (« la ligne existait déjà »), écrit par
+    `forge/ranger-secret.mjs` ; la recette d'ensemble du 06/11/2026 l'a relevé (ranger-secret.test.mjs rouge après TF-2206)."""
+    if type_ == "secret_range":
+        return
     if "remplace" in champs:
         r = champs["remplace"]
         refs = r if isinstance(r, list) else [r]
@@ -145,7 +149,7 @@ def ajouter(archive: str, type_: str, /, **champs) -> dict:
     # (un second `--run` levait « multiple values for argument 'run' »).
     if type_ not in TYPES:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
-    controler_remplacement(champs)
+    controler_remplacement(type_, champs)
     # Hors run (aucune entrée au ledger du run, hors archive), un retour ou une décision s'écrit au journal hors run.
     hors_run = type_ in HORS_RUN and not archive and not lignes(chemin(archive))
     p = JOURNAL_HORS_RUN if hors_run else chemin(archive)

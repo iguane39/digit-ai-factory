@@ -47,12 +47,12 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 41,
-  "vu_le": "2026-11-05"
+  "cas": 50,
+  "vu_le": "2026-11-06"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 33,
-  "vu_le": "2026-11-05"
+  "cas": 44,
+  "vu_le": "2026-11-06"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 216,
-  "vu_le": "2026-11-05"
+  "cas": 222,
+  "vu_le": "2026-11-06"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -735,8 +735,8 @@
   "vu_le": "2026-10-26"
  },
  "scripts/relever-couts.test.mjs": {
-  "cas": 13,
-  "vu_le": "2026-11-05"
+  "cas": 14,
+  "vu_le": "2026-11-06"
  },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,
@@ -751,8 +751,8 @@
   "vu_le": "2026-10-18"
  },
  "scripts/reserver-decision.test.mjs": {
-  "cas": 109,
-  "vu_le": "2026-10-30"
+  "cas": 116,
+  "vu_le": "2026-11-06"
  },
  "scripts/sas-retours-doctrine.test.mjs": {
   "cas": 10,
@@ -877,6 +877,10 @@
  "todo/generer-recidives.test.mjs": {
   "cas": 13,
   "vu_le": "2026-10-02"
+ },
+ "todo/generer-todo-produit.test.mjs": {
+  "cas": 9,
+  "vu_le": "2026-11-06"
  },
  "todo/ingerer-anonymise-fichier.test.mjs": {
   "cas": 5,

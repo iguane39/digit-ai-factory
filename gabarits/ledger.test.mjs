@@ -388,8 +388,19 @@ try {
     }
     att(entrees(d).length === avant, "une entrée refusée a pourtant été écrite");
   });
+  check("TF-2206 vert — le champ booléen remplace de secret_range (forge/ranger-secret.mjs) n'est pas une décision remplacée : l'entrée s'écrit", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    for (const v of ["false", "true"]) {
+      const r = spawnSync(PYTHON, [script, "secret_range", "--variable", "ESSAI_CLE", "--fichier", ".env", "--empreinte_sha256", "ab12", "--date", "2026-11-06", "--remplace", v], { encoding: "utf8", env: CONSOLE });
+      att(r.status === 0, `secret_range --remplace ${v} refusé : exit ${r.status} ${r.stderr}`);
+    }
+    const e = entrees(d).at(-1);
+    att(e.type === "secret_range" && e.remplace === true, `entrée : ${JSON.stringify(e)}`);
+    const refus = spawnSync(PYTHON, [script, "reponse_humain", "--remplace", "true"], { encoding: "utf8", env: CONSOLE });
+    att(refus.status !== 0, "un remplace booléen sur une décision doit rester refusé");
+  });
   check("TF-2206 rouge — sans le contrôle, le sort inconnu serait écrit (le témoin voit la chirurgie)", () => {
-    const mutant = GABARIT.replace("    controler_remplacement(champs)\n", "");
+    const mutant = GABARIT.replace("    controler_remplacement(type_, champs)\n", "");
     att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
     const { d, script } = produit(mutant); dossiers.push(d);
     const r = spawnSync(PYTHON, [script, "reponse_humain", "--remplace", "D-46", "--artefacts_remplaces", JSON.stringify([{ artefact: "x", sort: "peut-etre" }])], { encoding: "utf8", env: CONSOLE });
