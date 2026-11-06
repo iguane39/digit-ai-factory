@@ -73,7 +73,10 @@ const [nom, ...options] = process.argv.slice(2);
 // `--rattraper`) — la session qui se ferme est relevée par scripts/relever-couts.mjs du pilot et sa ligne s'écrit à
 // forge/couts-<poste>.jsonl : jetons, temps actif, charge en 3 indicateurs séparés, ventilation par run et par étape. Aucun montant
 // écrit ; ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts"]);
+// `controles-produit` (06/11/2026, TF-2211, retour RP-31 de Produit-86) : hook PostToolUse sur Bash et PowerShell — la clé
+// `controles_produit` de forge/PROFIL.json désigne les contrôles PROPRES du produit (commande en tableau, `quand` : run_open, run_close) ;
+// la commande qui vient d'écrire un run_open ou un run_close au ledger les déclenche, et leur verdict entre au contexte de la session. Ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [

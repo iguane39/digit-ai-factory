@@ -405,8 +405,46 @@ try {
   const ratt20 = couts20(["--rattraper"], entree20);
   const illisible20 = couts20([], "pas du JSON");
   check("20 bis coûts : le rattrapage et une entrée illisible sortent en 0", ratt20.status === 0 && illisible20.status === 0, ratt20.stderr + illisible20.stderr);
+
+  // 21 — TF-2211 (06/11/2026), les contrôles PROPRES du produit joués par le lanceur à l'écriture d'un run_open et d'un run_close :
+  // la clé `controles_produit` de forge/PROFIL.json désigne des commandes (tableau, jamais une chaîne de shell). Le run_open joue
+  // celles qui le demandent, le run_close celles qui le demandent (dont un contrôle rouge), une déclaration mal formée est nommée
+  // et jamais jouée, une autre commande ne joue rien, un produit sans la clé reste muet. Le hook ne bloque jamais (exit 0).
+  const racine21 = join(base, "racine21");
+  const copie21 = join(racine21, "digit-ai-factory");
+  for (const d of ["oracles"]) mkdirSync(join(copie21, d), { recursive: true });
+  copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie21, "bootstrap.mjs"));
+  for (const f of ["oracles/hook-controles-produit.mjs", "oracles/lib-racine-projet.mjs"]) copyFileSync(join(PILOT, f), join(copie21, f));
+  const P21 = produit("produit-controles", false);
+  writeFileSync(join(P21, "forge", "PROFIL.json"), JSON.stringify({ schema: "forge/profil@1", signaux: {}, controles_produit: [
+    { nom: "hygiene-ouverture", commande: [process.execPath, "-e", "process.exit(0)"], quand: ["run_open", "run_close"] },
+    { nom: "hygiene-cloture", commande: [process.execPath, "-e", "console.error('trace de poste dans un journal'); process.exit(3)"], quand: ["run_close"] },
+    { nom: "mal-forme", commande: "python -m pytest -q" },
+  ] }), "utf8");
+  const env21 = { ...process.env, FORGE_ROOT: racine21, CLAUDE_PROJECT_DIR: P21 };
+  const ledger21 = (command, outil = "Bash") => spawnSync(process.execPath, [join(P21, "forge", "hooks", "factory.mjs"), "controles-produit"], { encoding: "utf8", cwd: P21, env: env21,
+    input: JSON.stringify({ tool_name: outil, cwd: P21, hook_event_name: "PostToolUse", tool_input: { command } }) });
+  const contexte21 = (r) => { try { return JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { return ""; } };
+  const ouv21 = ledger21("python forge/ledger.py run_open --run_id essai");
+  const clo21 = ledger21("python forge/ledger.py run_close --statut pret_production");
+  const mjs21 = ledger21(`node ledger.mjs append forge/ledger.jsonl '{"type":"run_close","statut":"echec"}'`);
+  const autre21 = ledger21("git status --short");
+  const verif21 = ledger21("python forge/ledger.py --verifier");
+  const ps21 = ledger21("python forge/ledger.py run_open --run_id x", "PowerShell");
+  check("21 contrôles du produit : à l'écriture d'un run_open, le lanceur joue le contrôle déclaré pour l'ouverture (PASS) et nomme la déclaration mal formée sans la jouer (TF-2211)",
+    ouv21.status === 0 && /hygiene-ouverture : PASS/.test(contexte21(ouv21)) && !/hygiene-cloture/.test(contexte21(ouv21)) && /mal-forme : « commande » doit être un tableau/.test(contexte21(ouv21)), ouv21.stdout + ouv21.stderr);
+  check("21 bis contrôles du produit : à l'écriture d'un run_close, le contrôle rouge est dit FAIL avec son code de sortie et sa trace, et la clôture « prêt » est déconseillée",
+    clo21.status === 0 && /hygiene-cloture : FAIL \(exit 3\) — trace de poste dans un journal/.test(contexte21(clo21)) && /ne pas déclarer le run « prêt »/.test(contexte21(clo21)), clo21.stdout + clo21.stderr);
+  check("21 ter contrôles du produit : un run_close écrit par ledger.mjs (charge utile en ligne) ou sous PowerShell est reconnu", /hygiene-cloture : FAIL/.test(contexte21(mjs21)) && /hygiene-ouverture : PASS/.test(contexte21(ps21)), mjs21.stdout + ps21.stdout);
+  check("21 quater contrôles du produit : une autre commande, ou la vérification du ledger, ne joue rien et n'écrit rien", !autre21.stdout.trim() && !verif21.stdout.trim() && autre21.status === 0 && verif21.status === 0, autre21.stdout + verif21.stdout);
+  const P21b = produit("produit-sans-controles", false);
+  writeFileSync(join(P21b, "forge", "PROFIL.json"), JSON.stringify({ schema: "forge/profil@1", signaux: {} }), "utf8");
+  const nu21 = spawnSync(process.execPath, [join(P21b, "forge", "hooks", "factory.mjs"), "controles-produit"], { encoding: "utf8", cwd: P21b, env: { ...env21, CLAUDE_PROJECT_DIR: P21b },
+    input: JSON.stringify({ tool_name: "Bash", cwd: P21b, tool_input: { command: "python forge/ledger.py run_close --statut pret" } }) });
+  check("21 quinquies contrôles du produit : un produit dont PROFIL.json ne porte pas la clé reste muet (exit 0)", nu21.status === 0 && !nu21.stdout.trim(), nu21.stdout + nu21.stderr);
+
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211)`);
