@@ -443,8 +443,36 @@ try {
     input: JSON.stringify({ tool_name: "Bash", cwd: P21b, tool_input: { command: "python forge/ledger.py run_close --statut pret" } }) });
   check("21 quinquies contrôles du produit : un produit dont PROFIL.json ne porte pas la clé reste muet (exit 0)", nu21.status === 0 && !nu21.stdout.trim(), nu21.stdout + nu21.stderr);
 
+  // 22 — TF-2213 et TF-2215 (06/11/2026), les journaux que les hooks de la factory écrivent sous forge/ ne se commitent jamais et se
+  // déclarent à tout balayage de secrets du produit : `forge/lecons-rappels.jsonl` recopie les commandes de session, `forge/gestes-approuves.jsonl`
+  // porte un chemin d'abonnement cloud ; non ignorés, un contrôle d'hygiène du produit les a lus comme des secrets (E-082 de Produit-86).
+  // Le contrat d'héritage les nomme (clé `journaux_de_hooks`) ; la recette les fait écrire par leurs hooks, ou à la main quand le hook n'est
+  // pas rejouable ici, dans un dépôt git qui porte le `.gitignore` du gabarit, et exige que git ne les voie ni suivis ni non suivis.
+  const heritage22 = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
+  const journaux22 = (heritage22.journaux_de_hooks || []).map((j) => j.chemin);
+  check("22 journaux de hooks : le contrat d'héritage nomme les journaux écrits par les hooks, et chacun est cité par une source de hook du pilot",
+    journaux22.length >= 4 && ["forge/lecons-rappels.jsonl", "forge/gestes-approuves.jsonl", "forge/gestes-en-cours.jsonl", "forge/frictions.jsonl"].every((c) => journaux22.includes(c))
+      && journaux22.every((c) => ["oracles/hook-lecons.mjs", "oracles/hook-gestes-distants.mjs", "scripts/lecons.mjs", "oracles/lib-gestes-en-cours.mjs"]
+        .some((f) => { try { return readFileSync(join(PILOT, f), "utf8").includes(c.split("/").pop()); } catch { return false; } })),
+    JSON.stringify(journaux22));
+  const gitignore22 = (texte) => {
+    const d = mkdtempSync(join(base, "git22-"));
+    spawnSync("git", ["init", "-q"], { cwd: d });
+    writeFileSync(join(d, ".gitignore"), texte, "utf8");
+    mkdirSync(join(d, "forge"), { recursive: true });
+    for (const c of journaux22) writeFileSync(join(d, ...c.split("/")), JSON.stringify({ commande: "az account show --subscription 00000000-0000-0000-0000-000000000000" }) + "\n", "utf8");
+    const visibles = spawnSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: d, encoding: "utf8" }).stdout.split("\n").filter((l) => /forge\/.*\.jsonl/.test(l));
+    return visibles;
+  };
+  const gabaritGitignore = readFileSync(join(ICI, "gitignore-produit"), "utf8");
+  const visibles22 = gitignore22(gabaritGitignore);
+  check("22 bis journaux de hooks : avec le .gitignore du gabarit, git ne voit aucun journal de hook (ni suivi, ni non suivi)", journaux22.length > 0 && visibles22.length === 0, visibles22.join(" | "));
+  const rouge22 = gitignore22(gabaritGitignore.replace(/^forge\/gestes-approuves\.jsonl\r?\n/m, ""));
+  check("22 ter journaux de hooks : sans le motif de forge/gestes-approuves.jsonl, git voit ce journal (le témoin sait échouer)", rouge22.some((l) => /gestes-approuves/.test(l)) && rouge22.length === 1, rouge22.join(" | "));
+  const motifs22 = (heritage22.artefacts.find((a) => a.source === "gabarits/gitignore-produit") || {}).motifs_exiges || [];
+  check("22 quater journaux de hooks : chaque journal déclaré est un motif EXIGÉ du .gitignore (l'ouverture l'ajoute à un produit qui l'a perdu)", journaux22.length > 0 && journaux22.every((c) => motifs22.includes(c)), journaux22.filter((c) => !motifs22.includes(c)).join(", "));
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211)`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215)`);
