@@ -683,7 +683,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Retours et TODOs du 04-11 - 20261104a.md | 20261104a | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 04-11 - 20261104a.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md | 20261105d | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 - 20261106a.md | 20261106a | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 - 20261106a.md` |
-| Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md | 20261106b | 12.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md | 20261106b | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md | 20261029g | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` |
 | Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md | 20261102b | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` |
 | Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md | 20261103p | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` |

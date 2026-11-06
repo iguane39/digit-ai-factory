@@ -69,9 +69,9 @@ Le tour a vidé le sas, décidé les sujets hors de votre ressort, fait corriger
   - forge-websec, forge-design, forge-agents-security : audit des dépendances uv et poetry (138 PASS), glossaires lus comme définitions (68 PASS), faux échec sur un journal étranger supprimé (125 PASS) ;
   - pilot, 3 copies fusionnées : recettes jouables par cas, mobilisation qui juge le verdict le plus récent (33 PASS), remède de S93 aligné sur S4, relecture d'intention en session non interactive, concision jugée sur les seuls écrits neufs.
 - Une perte de réseau vers 17:05 a coupé 8 agents ; relancés à 17:15 avec leur contexte, tous ont fini sans travail perdu.
-- Recette d'ensemble du pilot fusionné : 253 verts sur 256 ; I6, un cas rouge non nommé de la recette neuve du filtre de cas, corrigé au commit a7ed5bce.
+- Recette d'ensemble du pilot fusionné : 253 verts sur 256 ; I6, un cas rouge non nommé de la recette neuve du filtre de cas, corrigé au commit e6ff978f.
 - Registre : 44 clôtures avec leur descente et, pour les 10 récidives, la barrière exigée par R17 ; TF-2255 en cours ; 13 candidats tirés des restes, TF-2278 à TF-2290 ; `oracle-todo` PASS.
-- Publication : 9 forges à 0 commit d'écart après `git fetch`, vérifié par `rev-list`.
+- Publication : 9 forges à 0 commit d'écart après `git fetch`, vérifié par `rev-list`. Le premier envoi du pilot a été refusé par la protection contre les secrets de GitHub, sur un faux jeton Supabase écrit en clair dans une fixture de test ; les 22 commits non publiés ont été réécrits pour l'assembler à l'exécution, la recette de l'oracle concerné rend 36 sur 36, et les SHA changés sont notés au registre.
 
 Relecture d'intention : dérive sur la consigne, 2 passes (RI-20261106-08 et 09) ; l'écart `hors_demande` réel, TF-2265 absent de la liste des sujets, est repris dans la consigne ; l'écart `choix_humain` est D-180.
 
@@ -111,6 +111,6 @@ Ordre : A-1 et A-2 d'abord parce qu'elles vous reviennent ; les deux autres suiv
 - `todo/TODO.jsonl` (TF-2261 à TF-2290), `todo/CLASSES.json` (1.69.0), `todo/relectures-intention.jsonl` (RI-20261106-08 et 09), `todo/observabilite/flotte-campagnes.jsonl` (retours-todos-20261106b)
 - `decisions/REGISTRE.jsonl` : D-180 et D-181
 - `references/REGLAGES-SURS-PAR-DEFAUT.json`, `REGLES-PROJET.md` (R-66), `ETAPE-MEP.md` (M-21, M-22)
-- Pilot : fusions 8cd798b0, 3e31f60c et 12d76355, correctif a7ed5bce
+- Pilot : fusions 752aa598, e348e0db et 0ec15fbc, correctif e6ff978f ; ces 22 commits ont été réécrits avant leur envoi pour retirer un faux jeton de fixture que la protection contre les secrets de GitHub refusait
 - Forges publiées : forge-agents-security 448eac5 ; forge-development 01d6063 ; forge-websec 62b64db ; forge-audit 6d17274 ; forge-ops 84d03f4 ; forge-design 1f43109 ; forge-conception 67c8bb6 ; forge-tests 0acbdaa ; forge-agents 4658bdd
 - Canal confidentiel, local : c8aab12
