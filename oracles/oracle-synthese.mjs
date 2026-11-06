@@ -4409,7 +4409,7 @@ function juger(texte, cheminJuge = null) {
         ? ko("S85", `${verrou.manquants.length} livrable(s) exigé(s) absent(s) chez le produit pour les forges mobilisées de la dernière demande de cette session (${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}${repliDit}) : `
           + verrou.manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})`).join(" ; ")
           + " — « livré » attend les livrables de chaque forge mobilisée (T4, TF-1949 ; 2 produits sur 10 clos ou publiés les portaient). Produis-les ; une forge qui n'a pas servi "
-          + "s'écarte avec son motif dans une nouvelle ligne de trace (node <PILOT_ROOT>/scripts/mobiliser.mjs --verifier liste ce qui manque).")
+          + "s'écarte avec son motif dans une nouvelle ligne de trace, et un livrable que la demande ne touche pas se déclare inchangé avec son motif (`livrables_inchanges` de la forge, TF-2221) (node <PILOT_ROOT>/scripts/mobiliser.mjs --verifier liste ce qui manque).")
         : ok("S85", `${verrou.etats.length} livrable(s) exigé(s) présent(s) pour ${new Set(verrou.etats.map((e) => e.forge)).size} forge(s) mobilisée(s) à livrable, dernière demande du ${d.ts || "?"}`);
     }
   }
