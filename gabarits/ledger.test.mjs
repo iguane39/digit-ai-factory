@@ -284,7 +284,7 @@ try {
     for (const f of readdirSync(d).filter((x) => x.endsWith(".mjs") && !x.includes(".test.")))
       for (const t of typesDe(readFileSync(join(d, f), "utf8"))) prescrits.add(t);
   }
-  const LEDGER_MJS = join(ICI, "..", "..", "digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
+  const LEDGER_MJS = join(process.env.FORGE_ROOT || join(ICI, "..", ".."), "digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
   if (existsSync(LEDGER_MJS)) for (const t of typesDe(readFileSync(LEDGER_MJS, "utf8"))) prescrits.add(t);
   check(`TF-2018 vert — les ${prescrits.size} types de rectification prescrits par le parc sont au vocabulaire du gabarit`, () => {
     const v = vocabulaire(GABARIT);
@@ -321,6 +321,35 @@ try {
     const mutant = GABARIT.replace(' "conflit_regles",', "");
     att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
     att(!vocabulaire(mutant).has("conflit_regles") && prescritsDoctrine.has("conflit_regles"), "le mutant passe");
+  });
+  // TF-2198 (RP-18, 06/11/2026) : `demande_humain`, le type qui consigne une demande humaine mot pour
+  // mot, était refusé par le gabarit (type inconnu) : un produit l'écrivait à la main (2 entrées sur 458
+  // à son ledger) et la revue du 04/11 n'a été consignée qu'en résumé. Test croisé avec `ledger.mjs` :
+  // tout type que le script de doctrine nomme en constante (`const TYPE_X = "…"`) est au vocabulaire.
+  const typesConstantsMjs = new Set(existsSync(LEDGER_MJS)
+    ? [...readFileSync(LEDGER_MJS, "utf8").matchAll(/^const TYPE_[A-Z_]+ = "([a-z_]+)";/gm)].map((m) => m[1]) : []);
+  if (existsSync(LEDGER_MJS)) check(`TF-2198 vert — les ${typesConstantsMjs.size} types nommés en constante par ledger.mjs sont au vocabulaire du gabarit`, () => {
+    att(typesConstantsMjs.size >= 2, `relevé insuffisant (${typesConstantsMjs.size}) : le test croisé ne voit pas ledger.mjs`);
+    const v = vocabulaire(GABARIT);
+    const manquants = [...typesConstantsMjs].filter((t) => !v.has(t));
+    att(!manquants.length, `hors vocabulaire : ${manquants.join(", ")}`);
+  });
+  else console.log("  [SAUTÉ] TF-2198 — ledger.mjs de forge-agents absent de ce poste : le croisement n'est pas joué");
+  check("TF-2198 vert — demande_humain s'écrit au ledger du produit et --verifier ne la déclare pas hors vocabulaire", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "demande_humain", "--verbatim", "Refais la revue de la colonne Parcours, en entier", "--tour", "revue du 04/11"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `écriture refusée : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "demande_humain" && /colonne Parcours/.test(e.verbatim), `entrée écrite : ${JSON.stringify(e)}`);
+    const v = spawnSync(PYTHON, [script, "--verifier"], { encoding: "utf8", env: CONSOLE });
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2198 rouge — sans demande_humain au vocabulaire, l'écriture est refusée comme type inconnu", () => {
+    const mutant = GABARIT.replace(' "demande_humain",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "demande_humain", "--verbatim", "essai"], { encoding: "utf8", env: CONSOLE });
+    att(r.status !== 0 && /type inconnu/.test(r.stderr || ""), `le mutant écrit : exit ${r.status} ${r.stderr}`);
   });
   check("TF-2018 vert — la rectification écrite en ligne de commande porte seq_vise en NOMBRE et --verifier ne la déclare pas", () => {
     const { d, script } = produit(GABARIT); dossiers.push(d);

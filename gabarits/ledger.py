@@ -54,12 +54,16 @@ RUNS = FORGE.parent / "runs"
 # les oracles du pilot ET les gabarits de doctrine prescrivent, pour que la dérive ne se répète pas.
 # `secret_range` est l'entrée du geste `forge/ranger-secret.mjs` (TF-2127, D-167 (a), 04/11/2026) : le nom, l'empreinte
 # et la date d'un secret rangé au fichier d'environnement local, jamais sa valeur.
+# `demande_humain` consigne une demande humaine MOT POUR MOT ; refusé ici, il s'écrivait à la main ou se résumait (retour
+# RP-18, TF-2198, 06/11/2026 : revue du 04/11 consignée en résumé, 2 entrées à la main sur 458). `qualification_enclenchement`
+# est la qualification d'un refus du juge d'enclenchement (CONTRAT-INTERFACE.md, `ledger.mjs`) : le croisement de la recette
+# avec les constantes `TYPE_*` de `ledger.mjs` l'a relevé absent le même jour.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
          "run_close", "rectification_versions_forges", "rectification_run_open",
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
-         "deplacement_en_attente", "secret_range"}
+         "deplacement_en_attente", "secret_range", "demande_humain", "qualification_enclenchement"}
 
 
 def chemin(run: str = "") -> pathlib.Path:
