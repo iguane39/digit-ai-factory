@@ -78,6 +78,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-79 - RETOURS - 20261019a.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
 | `Produit-79 - RETOURS - 20261020a.md` | fichier | 3,2 Ko | Retours forges — Produit-79 — 20261020a |
 | `Produit-79 - RETOURS - 20261020a.tf.jsonl` | fichier | 872 o | 1 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261105a.md` | fichier | 4,6 Ko | Retours forges — Produit-81 — 20261105a |
+| `Produit-81 - RETOURS - 20261105a.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261016a - PJ - oracle-format-a4.py` | fichier | 2,4 Ko | PY |
 | `Produit-84 - RETOURS - 20261016a.md` | fichier | 6,3 Ko | Retours forges — Produit-84 — 20261016a |
 | `Produit-84 - RETOURS - 20261016a.tf.jsonl` | fichier | 2,3 Ko | 2 ligne(s) JSONL |
@@ -157,4 +159,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261105h.md` | fichier | 6,8 Ko | Retours forges — Produit-86 — 20261105h |
 | `Produit-86 - RETOURS - 20261105h.tf.jsonl` | fichier | 2,4 Ko | 3 ligne(s) JSONL |
 
-_138 fichier(s), 2 sous-dossier(s)_
+_140 fichier(s), 2 sous-dossier(s)_
