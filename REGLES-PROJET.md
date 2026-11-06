@@ -1905,3 +1905,48 @@ l'extrait selon une déclaration `forge-data/masquage@1`, et `oracles\oracle-ano
 corrélation, l-diversité et t-closeness, texte libre, intégrité référentielle). Non jugé : la
 réidentification par croisement avec une source externe au produit ; le k-anonymat mesuré sur le profil
 d'une personne à travers plusieurs tables.
+
+## AU. R-66 — un réglage admissible s'applique à la création, se vérifie à chaque livraison, et son exception se décide (loi transverse n° 8 — D-178 (a), 06/11/2026, TF-2225 à TF-2233)
+
+Le fait. L'étude du 06/11/2026 (« Sécurité par défaut de bout en bout », indice 20261106a) a croisé 8
+réglages de sécurité standard de Supabase, GitHub et Cloudflare avec les 7 étapes de la chaîne : sur 56
+cases, 17 où une forge connaît le réglage, 9 où elle le contrôle, aucune où elle l'écrit. Dans l'audit du
+cas témoin, 7 écarts sur 30 sont une option gratuite laissée à sa valeur d'origine. La décision humaine
+D-178 (a), réponse « A10a » du 06/11/2026, adopte le principe en loi transverse pour toute la chaîne, sans
+essai préalable sur un seul produit.
+
+**R-66.**
+1. **Admissible veut dire classé `defaut` au registre.** `references\REGLAGES-SURS-PAR-DEFAUT.json`
+   classe chaque réglage en `defaut` (les cinq critères sont tenus : source, coût nul, aucun flux nominal
+   cassé, retour arrière par commande, lecture comparable à un attendu) ou en `decision` (un critère
+   échoue). Aucune forge ne tient sa propre liste : elle lit celle-là, et un réglage absent du registre
+   n'est pas admissible d'office.
+2. **Appliqué à la création.** La forge qui crée un projet joue la commande de pose du registre, puis sa
+   commande de lecture, et consigne l'état lu. Le cadrage pose une exigence vérifiable par réglage
+   `defaut`, et une question de conception avec ses options et leur coût par réglage `decision`.
+3. **Vérifié à chaque livraison.** La campagne de tests, le plan de forge-ops avant la MEP, le dossier de
+   MEP (`ETAPE-MEP.md` § 3 quaterdecies) et l'audit relisent chaque réglage contre l'attendu du registre.
+   Un réglage non lu est un réglage non vérifié, et la porte « prêt » le refuse.
+4. **L'exception se décide.** Un réglage `decision`, ou un réglage `defaut` que le produit veut garder à
+   sa valeur d'origine, ne reste jamais un écart nu : le choix est consigné avec son motif et sa date, et
+   chaque livraison vérifie l'écart accepté tel que décidé. Le choix du produit, la dépense et
+   l'irréversible restent au porteur (R-29, R-58).
+5. **Un écart d'audit sur un réglage `defaut` rouvre un retour vers la forge qui crée.** Le corriger chez
+   le produit referme l'écart pour ce produit, et le produit suivant le rouvre. `node
+   scripts\ouvrir-retour-reglage.mjs --reglage <adresse> --ecart <identifiant> --produit <pseudonyme>`
+   rend la candidature à ingérer par `todo\ingerer-lot.mjs`. Un écart sur un réglage `decision` renvoie à
+   sa décision, que l'appelant nomme (`--decision D-nn`) ; sans décision nommée, le script le refuse.
+6. **Le registre est une donnée** (loi n° 4) : daté, sourcé à la page de l'éditeur lue le jour dit, secrets
+   écrits `$NOM`. Une page relue qui contredit une entrée la met à jour, datée, jamais en silence.
+
+Contrôles exécutables. `node oracles\oracle-reglages-surs.mjs` juge le registre : RS-1 à RS-7, clés
+exactes, `defaut` seulement si c1 à c5 sont tenus, secrets en `$NOM`, citations retrouvées dans les pages
+de l'éditeur avec `--pages`. Pièces au pilot : TF-2225 (registre et oracle), TF-2232 (aiguillage de
+l'écart), TF-2233 (rubrique du dossier de MEP). Pièces chez les forges, suivies chacune à son TF :
+cadrage TF-2226, corpus TF-2227, création TF-2228, tests TF-2229, déploiement TF-2230, audit TF-2231.
+
+Non jugé. Que chaque forge ait livré sa pièce : la loi est écrite ici, les pièces se livrent forge par
+forge. La disponibilité d'un réglage selon l'offre du client : l'API de Supabase rend un champ à lire avant
+d'appliquer la restriction des adresses. Le critère de fonctionnement c3 est mesuré sur un seul produit de
+référence : un produit qui migre par connexion directe depuis un exécuteur de GitHub casserait sous la
+restriction des adresses de Supabase.
