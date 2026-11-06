@@ -357,9 +357,10 @@ function objetDuNom(nomFichier) {
  * Cet écrit est-il destiné à un tiers ? Rend `{ concerne, raison }`. Règle : l'en-tête `destinataire:`
  * décide quand il existe (une valeur de `destinataires_internes` — « humain », « orchestrateur », « pilot »… — par son
  * premier mot : document de travail, non concerné ; toute autre valeur : tiers) ; sinon le TYPE du nom du fichier (courriel, courrier, lettre, fiche…) décide, sauf
- * exclusion nommée (une fiche de conception est un document de travail).
+ * exclusion nommée (une fiche de conception est un document de travail) ; sinon, PAR DÉFAUT (TF-2189, 06/11/2026), tout écrit sous un des
+ * `dossiers_juges_par_defaut` (`output/`) : une synthèse sans en-tête n'échappe plus à la règle faute de dire qui la lit.
  */
-export function ecritATiers(texte, nomFichier, conf) {
+export function ecritATiers(texte, nomFichier, conf, cheminRelatif = "") {
   const interne = new Set((conf?.destinataires_internes || ["humain"]).map(replierMots));
   const dest = enTete(texte).destinataire;
   if (dest) {
@@ -379,7 +380,12 @@ export function ecritATiers(texte, nomFichier, conf) {
     const cle = mots.slice(0, n).join(" ");
     if (types.has(cle)) return { concerne: true, raison: `type de nom « ${cle} »` };
   }
-  return { concerne: false, raison: "ni en-tête `destinataire:` ni type de nom d'un écrit à un tiers" };
+  // TF-2189 : sans en-tête `destinataire:` ni type de nom, un écrit sous `output/` est jugé. Un en-tête interne (ci-dessus) reste l'exception déclarée.
+  const premier = String(cheminRelatif || "").replace(/\\/g, "/").replace(/^\.\//, "").split("/").filter(Boolean)[0];
+  const dossiers = (conf?.dossiers_juges_par_defaut || []).map(replierMots);
+  if (premier && String(cheminRelatif).replace(/\\/g, "/").split("/").filter(Boolean).length > 1 && dossiers.includes(replierMots(premier)))
+    return { concerne: true, raison: `écrit sous ${premier}/ : jugé par défaut, en-tête \`destinataire:\` ou non` };
+  return { concerne: false, raison: "ni en-tête `destinataire:`, ni type de nom d'un écrit à un tiers, ni dossier jugé par défaut" };
 }
 
 /**
@@ -1150,7 +1156,7 @@ export function juger(texte, options = {}) {
     if (!tiers) {
       pousser("EC-14", "SKIP", "aucune règle `ecrit_a_un_tiers` dans la donnée — concision non jugée");
     } else {
-      const dest = ecritATiers(texte, nomEcrit, tiers);
+      const dest = ecritATiers(texte, nomEcrit, tiers, String(options.cheminRelatif || ""));
       if (!dest.concerne) {
         pousser("EC-14", "SKIP", `${dest.raison} : concision d'un écrit à un tiers non jugée — ce n'est pas un constat sur le texte`);
       } else {
@@ -2012,6 +2018,33 @@ function selfTest() {
   const c14c = jouer("FICHE-CONCEPTION.md", COURRIEL_ROUGE);
   verifie(trouve(c14c, "EC-14")?.statut === "SKIP" && /fiche conception/.test(trouve(c14c, "EC-14")?.message || ""),
     `EC-14 : une fiche de conception (document de travail) est jugée comme un écrit à un tiers : ${JSON.stringify(trouve(c14c, "EC-14"))}`);
+  // TF-2189 (RT-48 de Produit-84, 05/11/2026) : une synthèse en un paragraphe de 5 phrases denses rendait PASS, EC-14 en SKIP « faute d'en-tête ».
+  // Par défaut, tout écrit sous output/ est jugé, en-tête `destinataire:` ou non ; un en-tête interne reste l'exception déclarée, hors de output/ rien ne change.
+  const SOUS_OUTPUT = (nom) => ["--chemin-relatif", `output/04-plans/${nom}`];
+  const NOM_SYNTHESE = "Digit-AI - Synthese Mandat - Etude rendue - 20261105a.md";
+  const c14s = jouer(NOM_SYNTHESE, COURRIEL_ROUGE, SOUS_OUTPUT(NOM_SYNTHESE));
+  verifie(trouve(c14s, "EC-14-paragraphe")?.statut === "A_REJOUER" && /output\/ : jugé par défaut/.test(trouve(c14s, "EC-14-paragraphe")?.message || "") && c14s.j?.a_rejouer?.nombre >= 1,
+    `EC-14 : un écrit sans en-tête sous output/ n'est pas jugé par défaut : ${JSON.stringify(trouve(c14s, "EC-14-paragraphe") || trouve(c14s, "EC-14"))}`);
+  jamaisFail(c14s, "EC-14 (output/ sans en-tête)");
+  const c14sv = jouer(NOM_SYNTHESE, COURRIEL_VERT, SOUS_OUTPUT(NOM_SYNTHESE));
+  verifie(["EC-14-paragraphe", "EC-14-phrase", "EC-14-enumeration"].every((r) => trouve(c14sv, r)?.statut === "PASS") && c14sv.j?.a_rejouer === null,
+    `EC-14 : le MÊME texte réécrit court, sous output/, n'est pas PASS sans rien à rejouer — le remède échoue : ${JSON.stringify(c14sv.j?.findings?.filter((f) => f.statut !== "PASS" && /^EC-14/.test(f.regle)))}`);
+  const c14sh = jouer(NOM_SYNTHESE, DOC_TRAVAIL, SOUS_OUTPUT(NOM_SYNTHESE));
+  verifie(trouve(c14sh, "EC-14")?.statut === "SKIP" && /destinataire: humain/.test(trouve(c14sh, "EC-14")?.message || ""),
+    `EC-14 : l'en-tête interne déclaré (destinataire: humain) n'écarte plus la règle sous output/ : ${JSON.stringify(trouve(c14sh, "EC-14"))}`);
+  const c14st = jouer(NOM_SYNTHESE, "---\ndestinataire: Mme Durand, Client-A\n---\n\n" + COURRIEL_ROUGE, SOUS_OUTPUT(NOM_SYNTHESE));
+  verifie(trouve(c14st, "EC-14-paragraphe")?.statut === "A_REJOUER" && /destinataire: Mme Durand/.test(trouve(c14st, "EC-14-paragraphe")?.message || ""),
+    `EC-14 : un en-tête qui nomme un tiers, sous output/, perd sa raison : ${JSON.stringify(trouve(c14st, "EC-14-paragraphe"))}`);
+  const c14sh2 = jouer(NOM_SYNTHESE, COURRIEL_ROUGE, ["--chemin-relatif", `docs/${NOM_SYNTHESE}`]);
+  verifie(trouve(c14sh2, "EC-14")?.statut === "SKIP" && !trouve(c14sh2, "EC-14-paragraphe"),
+    `EC-14 : un écrit sans en-tête HORS de output/ est jugé alors que rien ne le désigne : ${JSON.stringify(trouve(c14sh2, "EC-14"))}`);
+  const c14sf = jouer("FICHE-CONCEPTION.md", COURRIEL_ROUGE, ["--chemin-relatif", "output/05-livrables/FICHE-CONCEPTION.md"]);
+  verifie(trouve(c14sf, "EC-14")?.statut === "SKIP" && /fiche conception/.test(trouve(c14sf, "EC-14")?.message || ""),
+    `EC-14 : une fiche de conception sous output/ perd son exclusion nommée : ${JSON.stringify(trouve(c14sf, "EC-14"))}`);
+  const c14sr = jouer("README.md", COURRIEL_ROUGE, ["--chemin-relatif", "output/README.md"]);
+  verifie(trouve(c14sr, "EC-14")?.statut === "SKIP", `EC-14 : un index régénéré (output/README.md) est jugé par défaut : ${JSON.stringify(trouve(c14sr, "EC-14"))}`);
+  const c14sl = jouer("lisezmoi.md", COURRIEL_ROUGE, ["--chemin-relatif", "output/LISEZMOI.md"]);
+  verifie(trouve(c14sl, "EC-14")?.statut === "SKIP", `EC-14 : un index régénéré (output/LISEZMOI.md) est jugé par défaut : ${JSON.stringify(trouve(c14sl, "EC-14"))}`);
 
   // LA LANGUE. Sans --langue, un courriel anglais est à rejouer ; avec --langue en (ou langue: en), le même texte passe.
   const COURRIEL_EN = "Dear Ms Durand,\n\n"

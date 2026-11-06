@@ -162,8 +162,32 @@ export function validerVerdicts(verdicts) {
     if (verdict !== "mobilisee" && verdict !== "ecartee") refus.push(`${f} : verdict « ${e.verdict ?? ""} » (attendu « mobilisee » ou « ecartee »)`);
     if (motifVide(e.motif)) refus.push(`${f} : motif absent, trop court (3 mots au moins) ou resté au gabarit « <…> » — une forge ${verdict === "mobilisee" ? "mobilisée" : "écartée"} dit pourquoi`);
     normalises[f] = { verdict, motif: String(e.motif || "").trim() };
+    // TF-2221 : `livrables_inchanges` { <livrable>: <motif> } déclare, pour une forge mobilisée, un livrable exigé que la demande ne touche pas.
+    if ("livrables_inchanges" in e) {
+      const li = e.livrables_inchanges;
+      if (!li || typeof li !== "object" || Array.isArray(li)) refus.push(`${f} : livrables_inchanges doit être un objet { livrable: motif }`);
+      else if (verdict === "ecartee" && Object.keys(li).length) refus.push(`${f} : livrables_inchanges sur une forge écartée — une forge écartée n'exige aucun livrable`);
+      else {
+        const gardes = {};
+        for (const [id, m] of Object.entries(li)) {
+          if (motifVide(m)) refus.push(`${f} : livrable inchangé « ${id} » sans motif (3 mots au moins, aucun gabarit « <…> ») — dis pourquoi la demande ne le touche pas`);
+          else gardes[id] = String(m).trim();
+        }
+        if (Object.keys(gardes).length) normalises[f].livrables_inchanges = gardes;
+      }
+    }
   }
   return { refus, verdicts: normalises };
+}
+
+/** TF-2221 : les livrables déclarés inchangés doivent être exigés de leur forge par la demande ; rend la liste des refus (vide = conforme). */
+export function refusInchanges(carte, types, verdicts) {
+  const exiges = new Map(livrablesExiges(carte, { types: types.map((t) => t.id), verdicts }).map((x) => [x.forge, x.livrables]));
+  const refus = [];
+  for (const f of FORGES) for (const id of Object.keys(verdicts[f]?.livrables_inchanges || {}))
+    if (!(exiges.get(f) || []).includes(id))
+      refus.push(`${f} : « ${id} » est déclaré inchangé mais cette demande ne l'exige pas de ${f}${exiges.get(f)?.length ? ` (exigés : ${exiges.get(f).join(", ")})` : " (aucun livrable exigé)"}`);
+  return refus;
 }
 
 // D-99 (b) du 29/10/2026 — ÉCARTER OPS, WEBSEC OU DATA D'UNE DEMANDE QUI LES VISE EXIGE UN FAIT MESURÉ. Le fait, relevé par l'œil
@@ -339,33 +363,43 @@ const IGNORES = new Set(["node_modules", ".git", ".venv", "__pycache__"]);
 const lister = (d) => { try { return readdirSync(d, { withFileTypes: true }); } catch { return []; } };
 const motifSegment = (s) => new RegExp(`^${s.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".")}$`, "i");
 
-/** Le premier fichier du produit qui répond à un chemin de la carte (`*` dans un segment, `**` sur plusieurs, 8 niveaux au plus), ou null. */
+const heureDe = (p) => { try { return statSync(p).mtimeMs; } catch { return 0; } };
+
+/**
+ * Le fichier du produit le plus RÉCEMMENT écrit parmi ceux qui répondent à un chemin de la carte (`*` dans un segment, `**` sur plusieurs,
+ * 8 niveaux au plus), ou null. TF-2188 et TF-2205 (05/11/2026) : `trouver` rendait le premier fichier dans l'ordre du dossier ; avec deux
+ * dossiers datés (`forge/audit/20261030/` et `.../20261104/`) ou deux `rapport-*.json`, le plus ancien masquait le rapport du jour et le
+ * produit recevait MANQUE « périmé » pour toujours. À heure égale, le dernier dans l'ordre des chemins l'emporte (les dossiers datés montent).
+ */
 export function trouver(produit, chemin) {
   const segments = String(chemin).split(/[\\/]+/).filter(Boolean);
+  const reponses = new Set();
   const parcourir = (dossier, i, profondeur) => {
-    if (i === segments.length) return dossier;
+    if (i === segments.length) { reponses.add(dossier); return; }
     const s = segments[i];
     if (s === "**") {
-      const ici = parcourir(dossier, i + 1, profondeur);
-      if (ici || profondeur >= 8) return ici;
-      for (const e of lister(dossier)) if (e.isDirectory() && !IGNORES.has(e.name)) { const r = parcourir(join(dossier, e.name), i, profondeur + 1); if (r) return r; }
-      return null;
+      parcourir(dossier, i + 1, profondeur);
+      if (profondeur >= 8) return;
+      for (const e of lister(dossier)) if (e.isDirectory() && !IGNORES.has(e.name)) parcourir(join(dossier, e.name), i, profondeur + 1);
+      return;
     }
     if (!/[*?]/.test(s)) {
       const p = join(dossier, s);
-      if (!existsSync(p)) return null;
-      if (i < segments.length - 1) { try { if (!statSync(p).isDirectory()) return null; } catch { return null; } }
-      return parcourir(p, i + 1, profondeur);
+      if (!existsSync(p)) return;
+      if (i < segments.length - 1) { try { if (!statSync(p).isDirectory()) return; } catch { return; } }
+      parcourir(p, i + 1, profondeur);
+      return;
     }
     const re = motifSegment(s);
     for (const e of lister(dossier)) {
       if (!re.test(e.name) || (i < segments.length - 1 && !e.isDirectory())) continue;
-      const r = parcourir(join(dossier, e.name), i + 1, profondeur);
-      if (r) return r;
+      parcourir(join(dossier, e.name), i + 1, profondeur);
     }
-    return null;
   };
-  return parcourir(produit, 0, 0);
+  parcourir(produit, 0, 0);
+  let meilleur = null;
+  for (const p of [...reponses].sort()) { const h = heureDe(p); if (!meilleur || h >= meilleur.h) meilleur = { p, h }; }
+  return meilleur ? meilleur.p : null;
 }
 
 // ---- LE STANDARD D'AUDIT QUE LE CLIENT PUBLIE (TF-2144, RT-44 du 04/11/2026) ---------------------------------------------------
@@ -482,9 +516,12 @@ export function etatDesLivrables(produit, carte, ligne) {
     if (trouve && Number.isFinite(seuil)) {
       try { ecritLe = statSync(trouve).mtimeMs; frais = ecritLe >= seuil; } catch { frais = false; }
     }
-    const present = !!trouve && frais;
+    // TF-2221 : un fichier présent mais écrit avant la demande compte quand la ligne de trace le déclare inchangé, avec son motif.
+    const m = ligne?.verdicts?.[forge]?.livrables_inchanges?.[id];
+    const inchange = trouve && !frais && !motifVide(m) ? String(m).trim() : null;
+    const present = !!trouve && (frais || !!inchange);
     etats.push({ forge, livrable: id, libelle: l.libelle, chemins: l.chemins || [], present, trouve,
-      perime: !!trouve && !frais, ecrit_le: ecritLe != null ? new Date(ecritLe).toISOString() : null });
+      perime: !!trouve && !frais && !inchange, inchange, ecrit_le: ecritLe != null ? new Date(ecritLe).toISOString() : null });
   }
   // TF-2144 : forge-audit mobilisée chez un produit d'un client qui publie une porte d'audit → la sortie de cette porte est exigée aussi.
   // Non rétroactif : une demande tracée avant le 05/11/2026 n'est pas jugée sur ce livrable.

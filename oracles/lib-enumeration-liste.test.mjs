@@ -9,7 +9,7 @@
  * une étape de deux gestes avec sa clôture dans le paragraphe (ancienne forme courte, tolérée) ; un
  * guide à une sous-puce par geste. Joué par `oracles\self-tests.mjs` (I2).
  */
-import { enumerationsEnLigne, suiteNumerotee, gestesDe, etapesDeGuide, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
+import { enumerationsEnLigne, suiteNumerotee, gestesDe, etapesDeGuide, etapesQuiEnchainent, etapesSansClotureEnDerniere, etapesQuiEcriventDansUnEnv } from "./lib-enumeration-liste.mjs";
 
 const casse = [];
 let n = 0;
@@ -81,6 +81,30 @@ const GUIDE_IMBRIQUE = GUIDE_PUCES.replace("   - Résultat attendu : l'API est a
   "   - Résultat attendu : l'API est active.\n     - elle figure dans la liste des API activées ;\n     - son quota du jour est affiché.");
 veut(etapesSansClotureEnDerniere(GUIDE_IMBRIQUE).length === 0 && etapesDeGuide(GUIDE_IMBRIQUE)[0].sousPuces.length === 4,
   "B15 vert : une puce imbriquée sous « Résultat attendu » est lue comme une sous-puce de plus, et la clôture est accusée d être mal placée");
+
+// TF-2190 (RT-49, 06/11/2026) : un guide ne fait pas écrire l'humain dans un fichier d'environnement ; `forge/ranger-secret.mjs` le fait.
+const guideEnv = (...sousPuces) => ["## Guide — brancher le compte", "", "Source : `docs.exemple.org`, lue le 05/11/2026.", "", "1. Déclarer le secret.",
+  ...sousPuces.map((s) => `   - ${s}`), "   - Résultat attendu : le secret est déclaré.", "", "## 0. Synthèse d'ouverture", ""].join("\n");
+const AJOUT = guideEnv("Ouvrez le fichier `.env` du produit.", "Ajoutez la ligne `CLOUDFLARE_BILLING_TOKEN=<le secret>`.");
+veut(etapesQuiEcriventDansUnEnv(AJOUT).length === 1 && etapesQuiEcriventDansUnEnv(AJOUT)[0].forme === "ligne",
+  "C1 rouge : « Ajoutez la ligne NOM=<le secret> » dans un guide qui cite `.env` n'est pas accusé une fois");
+const REMPLACE = guideEnv("Ouvrez le fichier `.env` du produit.", "Remplacez la valeur de `SUPABASE_ACCESS_TOKEN`.");
+veut(etapesQuiEcriventDansUnEnv(REMPLACE).length === 1 && etapesQuiEcriventDansUnEnv(REMPLACE)[0].forme === "valeur",
+  "C2 rouge : « Remplacez la valeur de NOM » dans un guide qui cite `.env` n'est pas accusé");
+veut(etapesQuiEcriventDansUnEnv(guideEnv("Collez le secret dans le fichier `.env.local`."))[0]?.forme === "fichier",
+  "C3 rouge : « Collez le secret dans le fichier .env.local » n'est pas accusé");
+veut(etapesQuiEcriventDansUnEnv(guideEnv("Ajoutez la ligne `CLOUDFLARE_BILLING_TOKEN=<le secret>` au fichier d'environnement.")).length === 1,
+  "C4 rouge : « fichier d'environnement » en toutes lettres n'est pas accusé");
+const REMEDE = guideEnv("Donnez le secret `CLOUDFLARE_BILLING_TOKEN` dans la conversation.", "La session le range dans `.env` avec `forge/ranger-secret.mjs` : vous n'ouvrez aucun fichier.");
+veut(etapesQuiEcriventDansUnEnv(REMEDE).length === 0, "C5 vert : le remède (donner le secret, la session le range par ranger-secret) est accusé — le remède échoue");
+veut(etapesQuiEcriventDansUnEnv(guideEnv("Vérifiez que `.env` est ignoré par git.", "Lisez la ligne `NODE_ENV=production` du fichier `.env`.")).length === 0,
+  "C6 vert : lire ou vérifier un fichier d'environnement (aucun verbe d'écriture) est accusé");
+veut(etapesQuiEcriventDansUnEnv(guideEnv("Dans la console de l'hébergeur, ajoutez la variable `NODE_ENV=production`.")).length === 0,
+  "C7 vert : poser une variable dans la console d'un hébergeur (aucun fichier d'environnement nommé, aucune « ligne ») est accusé");
+veut(etapesQuiEcriventDansUnEnv("# Titre\n\n1. Ajoutez la ligne `X_Y=1` au fichier `.env`.\n").length === 0, "C8 vert : une liste numérotée hors section « Guide » est lue comme un guide");
+veut(etapesQuiEcriventDansUnEnv("## Guide — x\n\n```\n1. Ajoutez la ligne X_Y=1 au fichier .env.\n```\n").length === 0, "C9 vert : un bloc de code du guide est lu comme une étape");
+veut(etapesQuiEcriventDansUnEnv("## Guide — x\n\n1. Ajoutez la ligne `CLOUDFLARE_BILLING_TOKEN=<le secret>` au fichier `.env`. Résultat attendu : la ligne existe.\n").length === 1,
+  "C10 rouge : l'ancienne forme (l'étape et sa clôture dans un paragraphe) n'est pas accusée");
 
 if (casse.length) {
   console.log(`Self-test lib-enumeration-liste : ${n - casse.length}/${n} PASS · CASSE : ${casse.join(" · ")}`);

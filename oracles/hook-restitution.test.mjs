@@ -1868,6 +1868,32 @@ try {
     const apres = hook60(pSans, "sans-trace-apres", LIVRE60(true), { FORGE_VERROU_LIVRE_BLOQUANT_DES: "2026-01-01" });
     if (apres?.decision !== "block" || !/S86 — /.test(apres.reason || "") || !/mobiliser\.mjs --preparer/.test(apres.reason || ""))
       echecs.push(`60 sexies : sans trace, à l'échéance → attendu REFUSÉ sur S86, l'écrivain nommé, obtenu ${JSON.stringify(apres).slice(0, 300)}`);
+    // 60 septies — TF-2221 (RP-41, 06/11/2026) : un livrable que la demande ne touche pas (le fichier de jetons d'un composant posé sur les jetons existants)
+    // se déclare INCHANGÉ avec son motif dans la ligne de trace. ROUGE : sans la déclaration, le fichier de jetons écrit avant la demande est périmé → REFUSÉ sur S85, jetons nommé.
+    // VERT : le remède que S85 prescrit, joué (la même ligne de trace avec `livrables_inchanges`), lève le refus. Un livrable absent n'est pas « inchangé » : refusé encore.
+    const produitInchange60 = (nom, inchanges, jetonsPresent = true) => {
+      const d = join(base, `produit-60-${nom}`);
+      mkdirSync(join(d, "forge", "retours"), { recursive: true });
+      const verdicts = Object.fromEntries(FORGES60.map((f) => [f, { verdict: f === "design" ? "mobilisee" : "ecartee", motif: `motif écrit pour la forge ${f}` }]));
+      if (inchanges) verdicts.design.livrables_inchanges = { jetons: "le composant utilise les jetons existants, aucun jeton ajouté" };
+      writeFileSync(join(d, "forge", "mobilisation.jsonl"), JSON.stringify({ ts: "2026-10-26T07:00:00.000Z", schema: "forge/mobilisation@1", type: "evolution", types: ["evolution"], verdicts }) + "\n", "utf8");
+      mkdirSync(join(d, "forge", "etapes", "design"), { recursive: true });
+      writeFileSync(join(d, "forge", "etapes", "design", "DESIGN.md"), "x", "utf8");
+      if (jetonsPresent) {
+        const tokens = join(d, "forge", "etapes", "design", "tokens.css"); writeFileSync(tokens, "x", "utf8");
+        const vieux = new Date("2026-10-01T00:00:00Z"); utimesSync(tokens, vieux, vieux);
+      }
+      return d;
+    };
+    const sansDecl = hook60(produitInchange60("jetons-sans-declaration", false), "jetons-sans-decl", LIVRE60(true));
+    if (sansDecl?.decision !== "block" || !/S85 — /.test(sansDecl.reason || "") || !/jetons/.test(sansDecl.reason || ""))
+      echecs.push(`60 septies : un fichier de jetons écrit avant la demande, sans déclaration d'inchangé → attendu REFUSÉ sur S85, jetons nommé, obtenu ${JSON.stringify(sansDecl).slice(0, 300)}`);
+    const avecDecl = hook60(produitInchange60("jetons-inchanges", true), "jetons-decl", LIVRE60(true));
+    if (avecDecl?.decision === "block")
+      echecs.push(`60 octies : le remède joué (jetons déclarés inchangés avec leur motif) doit lever le refus S85, obtenu ${String(avecDecl.reason).slice(0, 300)}`);
+    const absentDecl = hook60(produitInchange60("jetons-absents", true, false), "jetons-absents-decl", LIVRE60(true));
+    if (absentDecl?.decision !== "block" || !/S85 — /.test(absentDecl.reason || ""))
+      echecs.push(`60 nonies : un fichier de jetons ABSENT déclaré inchangé ne doit pas passer (rien à déclarer inchangé), obtenu ${JSON.stringify(absentDecl).slice(0, 300)}`);
   }
 
   // 61 — TF-1973 et TF-2016 (29/10/2026, S87, gabarit 2.53.0) : LE LIVRABLE ÉCRIT DANS LE TOUR SE LIE EN FIN DE BLOC 0, par la ligne « Livré : [nom](chemin%20relatif) ».
