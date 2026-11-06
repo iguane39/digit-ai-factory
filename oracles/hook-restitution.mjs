@@ -1635,20 +1635,23 @@ export function produitDe(racine) {
   return null;
 }
 
-/** Les numéros de décision inscrits au registre d'un produit : toute entrée `question_humain` de `forge\ledger.jsonl` qui nomme D-N. */
+/** Les numéros de décision inscrits au registre d'un produit : toute entrée `question_humain` de `forge\ledger.jsonl` qui nomme D-N,
+ *  ou du journal hors run `forge\hors-run.jsonl` (TF-2223 : hors run, `reserver-decision.mjs` y inscrit la réservation). */
 export function registreDesDecisions(produit) {
   const fichier = join(produit, "forge", "ledger.jsonl");
-  if (!existsSync(fichier)) return { fichier, existe: false, entrees: 0, numeros: new Set() };
+  const horsRun = join(produit, "forge", "hors-run.jsonl");
+  const sources = [fichier, horsRun].filter((f) => existsSync(f));
+  if (!sources.length) return { fichier, existe: false, entrees: 0, numeros: new Set() };
   const numeros = new Set();
   let entrees = 0;
-  for (const l of readFileSync(fichier, "utf8").split(/\r?\n/)) {
+  for (const f of sources) for (const l of readFileSync(f, "utf8").split(/\r?\n/)) {
     if (!l.trim()) continue;
     let e; try { e = JSON.parse(l); } catch { continue; }
     if (e?.type !== "question_humain") continue;
     entrees += 1;
     for (const m of JSON.stringify(e).matchAll(D_NUMERO)) numeros.add(String(Number(m[1])));
   }
-  return { fichier, existe: true, entrees, numeros };
+  return { fichier: sources.length === 2 ? `${fichier} et ${horsRun}` : sources[0], existe: true, entrees, numeros };
 }
 
 // MESURE D'ENTRÉE (18/10/2026, lecture seule) — population : les messages finaux des sessions de produits conservées à ce

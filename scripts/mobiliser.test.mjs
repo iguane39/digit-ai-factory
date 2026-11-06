@@ -136,6 +136,18 @@ try {
     att(trace(d)[0].profil.page_indexable === true, "la ligne ne porte pas le profil déclaré");
   });
 
+  check("vert — TF-2211 : --profil revoit les signaux sans perdre les autres clés de forge/PROFIL.json (controles_produit)", () => {
+    const d = produit("profil-garde-cles");
+    const p = join(d, "forge", "PROFIL.json");
+    const controles = [{ nom: "hygiene", commande: ["node", "scripts/hygiene.mjs"] }];
+    writeFileSync(p, JSON.stringify({ ...JSON.parse(readFileSync(p, "utf8")), controles_produit: controles }), "utf8");
+    const r = lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsProduitNeuf()), "--profil", "domaine_public=oui,page_indexable=non,donnees_personnelles=non,agents=non,mise_en_production=oui"]);
+    att(r.code === 0, `avec --profil : exit ${r.code} : ${r.brut.slice(0, 300)}`);
+    const j = JSON.parse(readFileSync(p, "utf8"));
+    att(JSON.stringify(j.controles_produit) === JSON.stringify(controles), `controles_produit perdu ou changé : ${JSON.stringify(j).slice(0, 300)}`);
+    att(j.signaux?.domaine_public === true && j.signaux?.page_indexable === false, `signaux non revus : ${JSON.stringify(j.signaux)}`);
+  });
+
   check("--preparer rend les 13 forges : privilégiées et désignées par le profil proposées mobilisées, motifs au gabarit, refusés tels quels", () => {
     const d = produit("preparer", { profil: false });
     writeFileSync(join(d, "forge", "PROFIL.json"), JSON.stringify({ signaux: { domaine_public: true, page_indexable: true, donnees_personnelles: false, agents: false, mise_en_production: true } }), "utf8");

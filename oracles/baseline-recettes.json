@@ -463,8 +463,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 64,
-  "vu_le": "2026-11-05"
+  "cas": 68,
+  "vu_le": "2026-11-06"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
@@ -675,7 +675,7 @@
   "vu_le": "2026-11-05"
  },
  "scripts/mobiliser.test.mjs": {
-  "cas": 29,
+  "cas": 30,
   "vu_le": "2026-11-06"
  },
  "scripts/nettoyer-copies.test.mjs": {

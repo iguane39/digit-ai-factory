@@ -1209,6 +1209,11 @@ try {
     const rSans = cR(D61, sansLedger);
     if (rSans.verdict !== "FAIL" || !/introuvable/.test((rSans.ecarts || []).join(" ")))
       echecs.push(`52 octies : sans forge/ledger.jsonl, la D-61 est non inscrite et le refus dit que le registre est introuvable, obtenu ${JSON.stringify(rSans).slice(0, 200)}`);
+    // 52 octies bis — TF-2223 (06/11/2026) : hors run, `reserver-decision.mjs` inscrit au journal `forge/hors-run.jsonl` ; la D-N qu'il y porte est réservée.
+    writeFileSync(join(sansLedger, "forge", "hors-run.jsonl"), JSON.stringify({ seq: 1, ts: "2026-10-18T10:00:01Z", type: "question_humain", hors_run: true, decisions_posees: { "D-61": "publication" }, reservee_par: "reserver-decision.mjs" }) + "\n", "utf8");
+    const rHorsRun = cR(D61, sansLedger, { maintenant: apres });
+    if (rHorsRun.verdict !== "PASS")
+      echecs.push(`52 octies bis : D-61 réservée au journal hors run (TF-2223) → attendu PASS même à l'échéance, obtenu ${JSON.stringify(rHorsRun).slice(0, 200)}`);
     // (3) hors produit ET hors pilot (une forge, un dossier quelconque) : SANS_OBJET, dit. Le pilot, lui, est jugé depuis TF-1872 (cas 53).
     const horsProduit = controlerReservation({ dernierTexte: D61, racine: join(base, "dossier-quelconque") });
     if (horsProduit.verdict !== "SANS_OBJET" || !/registre/.test(horsProduit.motif || ""))
