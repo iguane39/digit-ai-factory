@@ -210,36 +210,57 @@ export function estCouvertParPlusLarge(motif, lignes) {
  * décision de le faire basculer appartient au pilot (TF-0848 le dit en toutes lettres), et le
  * comptage à part en est le préalable. Ce qui change dès aujourd'hui, c'est que le silence cesse.
  */
-function etatDansHistoire(dossierProduit, cible) {
-  if (!cible || !existsSync(cible) || !existsSync(join(dossierProduit, ".git"))) return {};
-  const rel = relative(dossierProduit, cible).replaceAll("\\", "/");
-  const suivi = spawnSync("git", ["-C", dossierProduit, "ls-files", "--error-unmatch", "--", rel],
-    { encoding: "utf8", timeout: 20000 });
-  if (suivi.status !== 0) {
-    return { histoire: "non_suivi", geste_git: `git add "${rel}"`,
-      note_histoire: "présent, conforme, HORS HISTOIRE — ce poste l'a, le dépôt ne l'a pas : un clone neuf repartirait sans lui" };
+/**
+ * TF-2184 (06/11/2026) — L'HISTOIRE SE LIT UNE FOIS PAR PRODUIT, PAS DEUX FOIS PAR ARTEFACT.
+ *
+ * Le fait : le relevé du parc a pris 92 s sous charge (05/11), pour environ 1 838 sous-processus
+ * `git` d'un passage ; la plupart venaient d'ici — `ls-files` puis `diff` PAR artefact, soit 56 par
+ * produit. Les deux questions se posent désormais sur tous les chemins jugés d'un produit à la fois,
+ * en deux appels : mêmes pathspecs, mêmes verdicts, 28 fois moins de sous-processus.
+ * Rend, pour chaque cible existante d'un dépôt git, le résultat qu'`etatDansHistoire` rendait seul.
+ */
+function histoireDesCibles(dossierProduit, cibles) {
+  const sortie = new Map();
+  if (!existsSync(join(dossierProduit, ".git"))) return sortie;
+  const rels = new Map(); // cible → chemin relatif posix
+  for (const c of cibles) if (c && existsSync(c)) rels.set(c, relative(dossierProduit, c).replaceAll("\\", "/"));
+  if (!rels.size) return sortie;
+  const chemins = [...new Set(rels.values())];
+  const noms = (r) => new Set((r.stdout || "").split("\0").filter(Boolean).map((x) => x.toLowerCase()));
+  const suivis = noms(spawnSync("git", ["-C", dossierProduit, "ls-files", "-z", "--", ...chemins],
+    { encoding: "utf8", timeout: 20000, maxBuffer: 64 * 1024 * 1024 }));
+  const rD = spawnSync("git", ["-C", dossierProduit, "diff", "--name-only", "-z", "HEAD", "--", ...chemins],
+    { encoding: "utf8", timeout: 20000, maxBuffer: 64 * 1024 * 1024 });
+  const differents = rD.status === 0 ? noms(rD) : new Set(); // HEAD illisible : « commis », comme avant
+  for (const [cible, rel] of rels) {
+    if (!suivis.has(rel.toLowerCase())) {
+      sortie.set(cible, { histoire: "non_suivi", geste_git: `git add "${rel}"`,
+        note_histoire: "présent, conforme, HORS HISTOIRE — ce poste l'a, le dépôt ne l'a pas : un clone neuf repartirait sans lui" });
+    } else if (differents.has(rel.toLowerCase())) {
+      sortie.set(cible, { histoire: "non_commis", geste_git: `git add "${rel}" && git commit`,
+        note_histoire: "conforme sur le DISQUE, divergent de HEAD — une recopie n'est TENUE qu'une fois commise ; un `git restore` ramènerait la version d'avant" });
+    } else sortie.set(cible, { histoire: "commis" });
   }
-  const propre = spawnSync("git", ["-C", dossierProduit, "diff", "--quiet", "HEAD", "--", rel],
-    { encoding: "utf8", timeout: 20000 });
-  if (propre.status === 1) {
-    return { histoire: "non_commis", geste_git: `git add "${rel}" && git commit`,
-      note_histoire: "conforme sur le DISQUE, divergent de HEAD — une recopie n'est TENUE qu'une fois commise ; un `git restore` ramènerait la version d'avant" };
-  }
-  return { histoire: "commis" };
+  return sortie;
 }
 
-/** L'état d'UN artefact chez UN produit : absent, présent-divergent, ou conforme. */
-export function etatArtefact(dossierProduit, artefact, racinePilot) {
-  const sortie = {};
-  const etat = etatSurDisque(dossierProduit, artefact, racinePilot, sortie);
+/** L'état assemblé d'un artefact : disque, puis histoire, puis alias périmé (l'ordre des clés est celui du relevé). */
+function assemblerEtat(etat, sortie, histoire) {
   const alias = sortie.alias_perime
     ? { alias_perime: sortie.alias_perime, geste_alias: sortie.geste_alias,
         note_alias: "l'alias de TRANSITION survit à côté de la cible canonique — un gabarit périmé qu'aucun contrôle ne regarde reste lu et cité (TF-0881)" }
     : {};
-  return { ...etat, ...etatDansHistoire(dossierProduit, sortie.cible), ...alias };
+  return { ...etat, ...(histoire || {}), ...alias };
 }
 
-function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
+/** L'état d'UN artefact chez UN produit : absent, présent-divergent, ou conforme. */
+export function etatArtefact(dossierProduit, artefact, racinePilot, ctx) {
+  const sortie = {};
+  const etat = etatSurDisque(dossierProduit, artefact, racinePilot, sortie, ctx);
+  return assemblerEtat(etat, sortie, histoireDesCibles(dossierProduit, [sortie.cible]).get(sortie.cible));
+}
+
+function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}, ctx = undefined) {
   let cible = join(dossierProduit, String(artefact.cible));
   // TF-0793 — LA DÉCLARATION SE LIT. Quand la cible manque à la racine du dépôt et que le produit
   // a déclaré sa racine web, l'artefact se cherche SOUS cette racine, et c'est là qu'il se juge
@@ -370,7 +391,7 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
   // ne se documente pas : il se renomme.
   if (a === b) return { etat: "conforme", empreinte: a };
   return { etat: "divergent", empreinte_pilot: a, empreinte_produit: b,
-    cause: attribuerDivergence(artefact.source, readFileSync(cible, "utf8"), racinePilot) };
+    cause: attribuerDivergence(artefact.source, readFileSync(cible, "utf8"), racinePilot, ctx) };
 }
 
 /**
@@ -409,18 +430,63 @@ function versionDeclaree(contenu) {
   return m[1] + (d ? ` du ${d[1]}` : "");
 }
 
-export function attribuerDivergence(sourceRel, contenuProduit, racinePilot) {
-  const posix = String(sourceRel).replaceAll("\\", "/");
+const norm = (t) => String(t).split("\r\n").join("\n").trimEnd();
+
+/**
+ * TF-2184 (06/11/2026) — L'HISTORIQUE D'UNE SOURCE SE LIT UNE FOIS, EN DEUX APPELS, PAS 31 FOIS.
+ *
+ * Le fait : chaque copie divergente relançait `git log` puis jusqu'à 30 `git show` de la MÊME source
+ * du pilot, autant de fois qu'il y avait de produits en retard sur elle — l'essentiel des sous-processus
+ * du relevé. Les contenus des 30 dernières révisions et celui de HEAD viennent d'un seul
+ * `git cat-file --batch` ; `ctx.versions` les garde pour les produits suivants du MÊME relevé (une
+ * source ne change pas pendant un passage). Sans `ctx`, rien n'est gardé : un appel isolé relit tout,
+ * comme avant. Rend `null` si le journal git du pilot est illisible.
+ */
+function versionsDeSource(racinePilot, posix, ctx) {
+  const cle = `${racinePilot}\0${posix}`;
+  if (ctx?.versions?.has(cle)) return ctx.versions.get(cle);
   const log = spawnSync("git", ["-C", racinePilot, "log", "-n", "30", "--format=%H %cs", "--", posix],
     { encoding: "utf8", timeout: 30000 });
-  if (log.status !== 0) return { qui: "inconnu", detail: "historique git du pilot illisible — attribution impossible, dite plutôt que devinée" };
-  const norm = (t) => String(t).split("\r\n").join("\n").trimEnd();
+  let versions = null;
+  if (log.status === 0) {
+    const revs = (log.stdout || "").split("\n").filter((l) => l.trim()).map((l) => l.trim().split(/\s+/));
+    const demande = [...revs.map(([h]) => `${h}:${posix}`), `HEAD:${posix}`];
+    const lot = spawnSync("git", ["-C", racinePilot, "cat-file", "--batch"],
+      { input: demande.join("\n") + "\n", timeout: 60000, maxBuffer: 256 * 1024 * 1024 });
+    const contenus = [];
+    if (lot.status === 0 && lot.stdout) {
+      // Sortie : `<oid> blob <taille>\n<octets>\n` par objet trouvé, `<demande> missing\n` sinon, dans l'ordre.
+      const buf = lot.stdout;
+      let pos = 0;
+      for (let i = 0; i < demande.length && pos < buf.length; i++) {
+        const fin = buf.indexOf(10, pos);
+        if (fin < 0) break;
+        const [, type, taille] = buf.toString("utf8", pos, fin).split(" ");
+        pos = fin + 1;
+        if (type === "blob" && taille !== undefined) {
+          const n = Number(taille);
+          contenus.push(buf.toString("utf8", pos, pos + n));
+          pos += n + 1;
+        } else contenus.push(null);
+      }
+    }
+    versions = { revs: revs.map(([h, date], i) => ({ h, date, contenu: contenus[i] ?? null, norme: null })),
+      tete: contenus[revs.length] ?? null };
+  }
+  ctx?.versions?.set(cle, versions);
+  return versions;
+}
+
+export function attribuerDivergence(sourceRel, contenuProduit, racinePilot, ctx = undefined) {
+  const posix = String(sourceRel).replaceAll("\\", "/");
+  const histo = versionsDeSource(racinePilot, posix, ctx);
+  if (!histo) return { qui: "inconnu", detail: "historique git du pilot illisible — attribution impossible, dite plutôt que devinée" };
   const attendu = norm(contenuProduit);
-  for (const ligne of (log.stdout || "").split("\n").filter((l) => l.trim())) {
-    const [h, date] = ligne.trim().split(/\s+/);
-    const montre = spawnSync("git", ["-C", racinePilot, "show", `${h}:${posix}`],
-      { encoding: "utf8", timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
-    if (montre.status === 0 && norm(montre.stdout) === attendu) {
+  for (const rev of histo.revs) {
+    if (rev.contenu === null) continue;
+    rev.norme ??= norm(rev.contenu);
+    const date = rev.date;
+    if (rev.norme === attendu) {
       // TF-0849 (08/09/2026) — LE MESSAGE DISAIT « VERSION PUBLIÉE LE X » LÀ OÙ IL MESURE
       // « ÉTAT PORTÉ PAR LE COMMIT DU X ». Le mécanisme n'était pas faux, la PHRASE l'était : la
       // date rendue est celle du COMMIT qui portait ce contenu, pas la version que l'artefact
@@ -436,9 +502,7 @@ export function attribuerDivergence(sourceRel, contenuProduit, racinePilot) {
       // déclarées quand l'artefact en porte une. Le message machine dit désormais ce que la prose
       // humaine du lot disait déjà — au lieu de la contredire.
       const vProduit = versionDeclaree(contenuProduit);
-      const source = spawnSync("git", ["-C", racinePilot, "show", `HEAD:${posix}`],
-        { encoding: "utf8", timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
-      const vPilot = source.status === 0 ? versionDeclaree(source.stdout) : null;
+      const vPilot = histo.tete !== null ? versionDeclaree(histo.tete) : null;
       const versions = vProduit || vPilot
         ? ` · versions DÉCLARÉES — votre copie : ${vProduit || "aucune"} · pilot : ${vPilot || "aucune"}`
         : "";
@@ -452,12 +516,18 @@ export function attribuerDivergence(sourceRel, contenuProduit, racinePilot) {
 }
 
 export function relever(base, contrat, racinePilot) {
+  // TF-2184 : un contexte PAR relevé — l'historique de chaque source du pilot n'y est lu qu'une fois,
+  // et l'histoire git d'un produit en deux appels pour tous ses artefacts (voir `histoireDesCibles`).
+  const ctx = { versions: new Map() };
   return produitsDuParc(base).map((dossier) => {
-    const artefacts = contrat.artefacts.map((a) => ({
+    const sorties = contrat.artefacts.map(() => ({}));
+    const etats = contrat.artefacts.map((a, i) => etatSurDisque(dossier, a, racinePilot, sorties[i], ctx));
+    const histoire = histoireDesCibles(dossier, sorties.map((s) => s.cible));
+    const artefacts = contrat.artefacts.map((a, i) => ({
       // `source` est PORTE jusqu'ici, tel que le contrat l'ecrit : c'est le chemin que le
       // consommateur doit citer, et le deduire de la cible est faux des que les deux ne se
       // repondent pas (TF-0645).
-      cible: a.cible, source: a.source, mode: a.mode, ...etatArtefact(dossier, a, racinePilot),
+      cible: a.cible, source: a.source, mode: a.mode, ...assemblerEtat(etats[i], sorties[i], histoire.get(sorties[i].cible)),
     }));
     const compte = (e) => artefacts.filter((x) => x.etat === e).length;
     return {

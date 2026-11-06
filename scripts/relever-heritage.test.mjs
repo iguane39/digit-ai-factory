@@ -636,6 +636,76 @@ try {
     att(cause.qui === "inconnu", `attribution « ${cause.qui} » sur un dépôt sans historique`);
   });
 
+  // ---- TF-2184 (06/11/2026) : LE RELEVÉ DU PARC NE LANCE PAS UN `git` PAR QUESTION --------------
+  // Le 05/11, 92 s pour 31 produits sous charge, environ 1 838 sous-processus : `ls-files` + `diff` par
+  // artefact et par produit, et `git log` + jusqu'à 30 `git show` par copie divergente. Le banc compte les
+  // commandes `git` réellement lancées (GIT_TRACE, une ligne « built-in » par commande) sur un parc jetable
+  // de 4 produits sous git, 6 artefacts en copie conforme, 3 copies divergentes d'une MÊME source ; il exige
+  // aussi que les VERDICTS soient ceux d'avant (qui a bougé, état dans l'histoire).
+  {
+    const P = join(T, "tf2184");
+    const pilotG = join(P, "digit-ai-factory");
+    const SOURCES = ["A", "B", "C", "D", "E", "F"].map((x) => `gabarits/${x}.md`);
+    const contrat = { version: "9.9.9", artefacts: SOURCES.map((s) => ({ mode: "copie_conforme", source: s, cible: `forge/${s.split("/")[1]}` })) };
+    const gitIn = (dir, ...a) => spawnSync("git", ["-C", dir, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+    mkdirSync(join(pilotG, "gabarits"), { recursive: true });
+    gitIn(pilotG, "init", "-q", "-b", "main");
+    const versionDe = (s, n) => `${s} version ${n}\n`;
+    for (let n = 1; n <= 3; n++) {
+      for (const s of SOURCES) writeFileSync(join(pilotG, s), versionDe(s, n), "utf8");
+      gitIn(pilotG, "add", "-A"); gitIn(pilotG, "commit", "-q", "-m", `version ${n}`);
+    }
+    const fabriquer = (nom, texteDe, commis = true) => {
+      const d = join(P, nom);
+      mkdirSync(join(d, "forge"), { recursive: true });
+      for (const s of SOURCES) writeFileSync(join(d, "forge", s.split("/")[1]), texteDe(s), "utf8");
+      gitIn(d, "init", "-q", "-b", "main");
+      if (commis) { gitIn(d, "add", "-A"); gitIn(d, "commit", "-q", "-m", "socle"); }
+      return d;
+    };
+    fabriquer("retard-1", (s) => versionDe(s, 1));
+    fabriquer("retard-2", (s) => versionDe(s, 2));
+    fabriquer("modifie", (s) => `${s} modifié par le produit\n`);
+    fabriquer("a-jour", (s) => versionDe(s, 3), false);
+    const trace = join(T, "tf2184-git.trace");
+    const compter = () => {
+      writeFileSync(trace, "", "utf8");
+      process.env.GIT_TRACE = trace;
+      let lignes;
+      try { lignes = relever(P, contrat, pilotG); } finally { delete process.env.GIT_TRACE; }
+      const cmds = readFileSync(trace, "utf8").split(/\r?\n/).filter((l) => /built-in: git /.test(l));
+      return { lignes, cmds };
+    };
+    const { lignes, cmds } = compter();
+    const par = (nom) => lignes.find((l) => l.produit === nom);
+
+    check("cas rouge — TF-2184 — le relevé lance au plus 2 commandes git par produit (histoire) et 2 par source du pilot (historique)", () => {
+      const borne = 2 * lignes.length + 2 * SOURCES.length;
+      att(lignes.length === 4, `${lignes.length} produits relevés, 4 attendus`);
+      att(cmds.length <= borne, `${cmds.length} commandes git lancées, plus que la borne ${borne} (2 × ${lignes.length} produits + 2 × ${SOURCES.length} sources) — une commande par artefact refait le défaut`);
+    });
+
+    check("TF-2184 — l'historique d'une source n'est lu qu'une fois, quel que soit le nombre de produits en retard sur elle", () => {
+      const logs = cmds.filter((c) => /built-in: git 'log'|built-in: git log/.test(c));
+      att(logs.length === SOURCES.length, `${logs.length} lectures d'historique pour ${SOURCES.length} sources`);
+    });
+
+    check("TF-2184 vert — les verdicts sont inchangés : le retard est attribué au pilot, la modification au produit, la copie à jour est conforme", () => {
+      for (const nom of ["retard-1", "retard-2"]) {
+        const l = par(nom);
+        att(l.divergents === 6, `${nom} : ${l.divergents} divergents, 6 attendus`);
+        for (const a of l.artefacts) att(a.cause?.qui === "pilot", `${nom}/${a.cible} : attribution « ${a.cause?.qui} », « pilot » attendu`);
+        att(l.artefacts.every((a) => a.histoire === "commis"), `${nom} : état dans l'histoire inattendu`);
+      }
+      const m = par("modifie");
+      att(m.artefacts.every((a) => a.etat === "divergent" && a.cause?.qui === "produit"), "la copie modifiée n'est pas attribuée au produit");
+      const j = par("a-jour");
+      att(j.conformes === 6 && j.divergents === 0, `copie à jour : ${j.conformes} conformes, ${j.divergents} divergents`);
+      att(j.artefacts.every((a) => a.histoire === "non_suivi"), "copies à jour d'un dépôt sans commit : « non_suivi » attendu");
+      att(/PAR LE COMMIT du \d{4}-\d{2}-\d{2}/.test(par("retard-1").artefacts[0].cause.detail), "la date du commit n'est pas citée");
+    });
+  }
+
   // ---- TF-1867 (18/10/2026) : l'écrivain de ledger Python entre à l'héritage, copie conforme -----
   // Avant, gabarits/ledger.py n'était déclaré nulle part (0 occurrence au contrat) : la copie d'un produit
   // numérotait `len(dejà) + 1` et aucune ouverture ne la remettait à niveau (13 seq en double, RT-127).
