@@ -22,6 +22,8 @@ Qui fait quoi, et surtout qui NE decide pas : ce tableau se lit par acteur, et l
 | oracle-ops (O-13, TF-1116 et TF-1118) | tout geste destructif écrit dans un document d'exploitation ou un carnet d'écarts porte sa MATURITÉ (éprouvé sur cette cible, ou déduit et à mesurer) et sa MESURE DE NON-RÉGRESSION — joué sur les documents que la MEP produit, § 3 septies |
 | oracle-ops (O-14, TF-1114) | chaque nom de l'export machine du parc figure littéralement dans `docs\projet\COMPOSANTS-OPS.md` — joué à chaque MEP qui actualise ce document, § 3 septies |
 | oracle-ops (O-19, TF-1212) | chaque actif de données critique de la déclaration de sauvegarde porte RPO, RTO, sauvegarde effective conforme au RPO, et une restauration réussie depuis 12 mois au plus — consommé par M-17, § 3 terdecies |
+| oracle-ops (O-26, TF-2201) | la version servie par une instance se LIT dans `/healthz` (`scripts/version-servie.mjs lire`), elle ne se reconstitue pas : un commit de 7 à 40 caractères, qui est un commit du dépôt et celui que le dossier annonce — consommé par M-22, § 3 quaterdecies |
+| oracle-ops (O-27, TF-2209) | l'inventaire des composants contient chaque composant que les sorties d'état de la MEP nomment (`terraform state list`, `docker ps`, `az resource list`) ; un FAIL vaut refus de la porte « prêt » — consommé par M-22, § 3 quaterdecies |
 | pilot (cette étape) | orchestre les gestes, exécute M-1…M-5 (qui consomme O-1…O-4 comme preuves), assemble `DOSSIER-MEP.md` |
 | humain | **GO production** — incompressible, jamais délégué à un oracle |
 
@@ -288,7 +290,7 @@ et elle grossit par les incidents, pas par la devinette.
 
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
 
-19 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
+22 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
@@ -312,6 +314,8 @@ et elle grossit par les incidents, pas par la devinette.
 | M-18 | **Fournisseur d'identité central, avec MFA** (AVERTISSEMENT, règle neuve du 17/10/2026) | Le dossier porte la section « Fournisseur d'identité » : le fournisseur central qui authentifie tout accès humain et le MFA qui l'accompagne, la procédure de tout compte local restant (secours) ; ou « Aucun accès humain authentifié : <motif> », refusé si le code porte une authentification locale. Exigence fatale CTL-D03-01. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle identite`, joué en TM13, qui l'**avertit** — § 3 terdecies, TF-1212 |
 | M-19 | **Revue de code proposée** (AVERTISSEMENT, règle neuve du 03/11/2026) | Le dossier porte la section « Revue de code » : jouée, elle cite le rapport chez le produit, le nombre de constats par gravité et par statut, les jetons relevés et les constats posés au GO ; ou « Revue proposée et refusée le <date> : <motif> » ; ou « Revue non proposée : dernière revue du <date>, <n> commits depuis ». Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM14, qui l'**avertit** sans le bloquer — § 1 quater, D-162 (a), TF-2057 |
 | M-20 | **Identifiants de test stables et recopiables** (AVERTISSEMENT, règle neuve du 05/11/2026) | **si et seulement si** le produit remet à l'humain des identifiants de test : ils restent les mêmes d'un déploiement à l'autre, et ne changent que sur demande de l'humain ou si leur fichier manque ; chaque mot de passe tient en 20 caractères au moins d'un alphabet sans sosie (0 O 1 l I) ni signe ; la chaîne vérifie la connexion de chaque compte. Consigne du porteur du 04/11/2026, citée mot pour mot : « arrête de changer les mdp à chaque fois que tu déploies une nouvelle version. Et remonte cette règle à la Factory. » Outil : `node <ops>\scripts\identifiants-test.mjs assurer`, `verifier` et `renouveler --demande`. Contrôle exécutable : `node <ops>\oracles\oracle-ops.mjs --identifiants-test <fichier.json> --journal <journal.jsonl>`, règle O-25 de forge-ops ; référentiel `<ops>\references\IDENTIFIANTS-DE-TEST.md` — TF-2166, TF-2167 |
+| M-21 | **Réglages de plateforme lus contre leur attendu** (AVERTISSEMENT, règle neuve du 06/11/2026) | Le dossier porte la section « Réglages de plateforme » : pour chaque réglage de `references\REGLAGES-SURS-PAR-DEFAUT.json` que le produit emploie, l'état lu le jour du dossier par la commande `cmd_lire` de l'entrée, l'attendu et un verdict ; un écart accepté nomme sa décision (`D-nn`) ; ou « Aucun réglage de plateforme : <motif> ». Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM15 — § 3 quaterdecies, R-66, D-178 (a), TF-2233 |
+| M-22 | **Version servie lue, inventaire confronté** (AVERTISSEMENT, FAIL pour un FAIL porté par le dossier) | Le dossier porte la section « Version servie et inventaire » : le commit lu par `version-servie.mjs lire`, le verdict d'O-26 de forge-ops et celui d'O-27 rejoué par la porte « prêt » ; ou « Sans objet : <motif> ». Un FAIL d'O-26 ou d'O-27 vaut refus. Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM16 — § 3 quaterdecies, TF-2201, TF-2209, TF-2243 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -878,6 +882,76 @@ l'inventaire des accès de déploiement direct sur chaque environnement reste un
 de la déclaration de sauvegarde : O-19 juge ce qu'elle déclare, pas la plateforme. La configuration
 réelle du fournisseur d'identité : sa capture reste la preuve d'audit de CTL-D03-01.
 
+### § 3 quaterdecies — Ce que le dossier lit en vrai avant le GO : les réglages de plateforme, la version servie, l'inventaire (M-21, M-22, TF-2233, TF-2243)
+
+**Le fait des réglages, du 06/11/2026.** L'étude « Sécurité par défaut de bout en bout » (20261106a) n'a trouvé
+dans `ETAPE-MEP.md` aucun des 8 réglages de sécurité standard de Supabase, GitHub et Cloudflare : sa seule ligne
+voisine, M-18, vise le fournisseur d'identité des utilisateurs de l'application, pas les membres de l'organisation de
+la plateforme. Dans l'audit du cas témoin, 7 écarts sur 30 étaient une option gratuite laissée à sa valeur d'origine.
+La décision humaine D-178 (a) en fait la règle R-66 : un réglage admissible s'applique à la création, se vérifie à
+chaque livraison, et son exception se décide. Le dossier de MEP est la dernière livraison avant la production.
+
+**M-21 — l'état lu de chaque réglage de plateforme, contre son attendu.** Pour chaque réglage de
+`references\REGLAGES-SURS-PAR-DEFAUT.json` que le produit emploie, le dossier porte l'état **lu le jour du dossier**
+par la commande `cmd_lire` de l'entrée, l'attendu de l'entrée, et un verdict :
+
+- `conforme` : l'état lu est l'attendu ;
+- `écart` sur un réglage classé `decision` : le choix du porteur est nommé (`D-nn`), et l'écart accepté se vérifie tel
+  que décidé ;
+- `écart` sur un réglage classé `defaut` : corrigé avant le GO, ou nommé avec sa décision. Dans les deux cas un retour
+  s'ouvre vers la forge qui crée (R-66, point 5 : `node scripts\ouvrir-retour-reglage.mjs`) ;
+- `non lu` : le réglage n'est pas vérifié, et le dossier ne se présente pas comme complet.
+
+La comparaison de l'état lu à l'attendu est le contrôle bloquant que forge-ops pose avant la MEP (TF-2230, en
+construction à la date de cette section). Tant qu'il n'est pas livré, la session lit et recopie, et le dossier le dit.
+
+**M-22 — la version servie se lit, l'inventaire se confronte.** Le dossier de MEP cite la version servie par
+l'instance, lue dans `/healthz` : `node <ops>/scripts/version-servie.mjs lire https://<instance> --attendu <commit>
+--sortie version-servie.json`, puis le verdict d'O-26 : `node <ops>/oracles/oracle-ops.mjs --version-servie
+version-servie.json --depot <dépôt du produit> --attendu <commit>`. Il ne cite jamais un commit reconstitué. La porte
+« prêt » rejoue O-27 avec les sorties d'état de la MEP (`terraform state list`, `docker ps` filtré sur le produit,
+`az resource list`) : `node <ops>/oracles/oracle-ops.mjs --inventaire-a-jour docs\projet\COMPOSANTS-OPS.md --etat
+<genre>:<fichier>`. **Un FAIL d'O-26 ou d'O-27 vaut refus** : le dossier ne se présente pas au GO avant correction et
+rejeu. O-27 sans sortie d'état rend SKIP, et le dossier dit que l'inventaire n'a pas été comparé. Mesures de forge-ops
+qui fondent les deux verdicts, rapportées par sa documentation et non remesurées ici : une empreinte servie qui ne
+correspondait à aucun des 25 derniers commits (TF-2201), un inventaire resté au texte du premier commit pendant 3
+déploiements (TF-2209).
+
+**La forme, au dossier de MEP** (les exemples sont inventés) :
+
+```
+## Réglages de plateforme
+
+Registre des réglages sûrs lu le 2026-11-06 : references\REGLAGES-SURS-PAR-DEFAUT.json
+
+| Réglage | Classement | État lu | Lu le | Attendu | Verdict ou décision |
+|---|---|---|---|---|---|
+| Supabase, TLS imposé | defaut | true | 2026-11-06 | true | conforme |
+| Supabase, double vérification des membres | decision | 2 membres sur 3 | 2026-11-06 | true pour chaque membre | écart accepté, D-123 du 2026-11-02 |
+```
+
+```
+## Version servie et inventaire
+
+Version servie : commit 6f78b88 lu le 2026-11-06 par `version-servie.mjs lire` (instance de préproduction).
+O-26 : PASS
+O-27 : PASS (sorties d'état : terraform state list, docker ps filtré sur le produit)
+```
+
+« Aucun réglage de plateforme : <motif> » et « Sans objet : <motif> » (un produit statique sans point de santé) sont
+des réponses valides. Le silence n'en est pas une.
+
+**Le contrôle exécutable.** `node oracles\oracle-trace-mutation-mep.mjs <produit>` joue TM15 (la section des réglages
+existe, chaque ligne est datée et porte son verdict, un écart accepté nomme sa décision) et TM16 (la section de la
+version servie existe, porte le commit lu et les verdicts d'O-26 et d'O-27). **Sévérité.** TM15 AVERTIT : règle neuve,
+opposable à tous les produits, elle entre en avertissement (précédent D-70 (b)). TM16 AVERTIT une section absente ou
+incomplète et FAIL un dossier qui porte lui-même un FAIL d'O-26 ou d'O-27, parce que la décision de TF-2243 en fait un
+refus de la porte « prêt ». Un FAIL suivi d'un rejeu PASS se lit au dernier verdict.
+
+**Hors jugement, et c'est dit.** La vérité des états recopiés : le contrôle ne rejoue ni la commande de lecture du
+registre, ni `version-servie.mjs`, ni O-27. Que le dossier cite tous les réglages des plateformes que le produit
+emploie : il ne sait pas lesquelles. La comparaison à l'attendu elle-même : elle est celle de forge-ops (TF-2230).
+
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
 Entre le staging technique et le GO, une **version de qualification populée de données** est
@@ -966,6 +1040,10 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   « Sauvegarde et restauration », « Fournisseur d'identité » (M-16 à M-18, § 3 terdecies) ;
 - la section « Revue de code » : jouée, avec les constats élevés et critiques posés au GO, ou
   proposée puis refusée (M-19, § 1 quater) ;
+- les réglages de plateforme que le produit emploie, avec leur état lu le jour du dossier contre l'attendu du registre,
+  et la décision nommée de chaque écart accepté (M-21, § 3 quaterdecies, R-66) ;
+- la version servie lue par `version-servie.mjs lire` et les verdicts d'O-26 et d'O-27, un FAIL valant refus
+  (M-22, § 3 quaterdecies, TF-2243) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - le geste exact qui déclenche la mise en production — l'approbation de la porte de la chaîne, ou la
   poussée d'un commit nommé (§4 bis), jamais une commande de déploiement lancée d'un poste vers un

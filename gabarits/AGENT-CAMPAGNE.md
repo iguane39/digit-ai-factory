@@ -88,6 +88,17 @@ de commit. Le défaut a été payé 2 fois : le 14/09/2026, une description de 1
 vue en fin de campagne seulement ; le 20/09/2026, 8 copies réécrites avec de mauvaises fins
 de ligne et 3 échecs trouvés au seul rejeu du pilot.
 
+**Un écart d'audit sur un réglage de plateforme se lit contre le registre (R-66, D-178 (a) du 06/11/2026,
+TF-2232).** Quand un item corrige un écart dont l'objet est un réglage de Supabase, GitHub ou Cloudflare
+(TLS, restriction des adresses, alertes de dépendances, HTTPS imposé, HSTS, protection de branche, double
+vérification), joue `node scripts\ouvrir-retour-reglage.mjs --reglage <adresse de la page de l'éditeur>
+--ecart <identifiant de l'écart> --produit <pseudonyme>` du pilot. Un réglage classé `defaut` rend une
+candidature vers la forge qui crée : corriger chez le produit referme l'écart pour lui seul, le produit
+suivant le rouvre. Tu ne l'écris pas au registre ; elle va dans les `restes` de ton rapport, avec la sortie
+du script, et le pilot l'ingère. Un réglage classé `decision` ne rouvre rien : l'écart renvoie à la décision
+que tu nommes (`--decision D-nn`), et sans décision nommée le script le refuse, parce qu'un écart accepté
+ne reste jamais nu. Un réglage absent du registre se note au rapport, il ne se classe pas de ta main.
+
 **Fixtures à double sens.** Toute nouvelle règle d'oracle ou de contrôle embarque sa
 preuve : une fixture verte qui PASSE et une fixture rouge qui ÉCHOUE pour la bonne
 raison. Une règle sans fixture rouge n'est pas prouvée.

@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 110 services · 92 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 111 services · 93 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -156,7 +156,7 @@
 | cat-org-03 | **Études normatives** | ancrer les pratiques sur les normes du métier | `conversationnel` | étude documentée — contrôles proposés non implémentés | declare | experimental |
 | cat-org-04 | **Gate de conventions packagé** | vérifier les conventions en pre-commit/CI sans dépendre de la forge | `node output\02-composants\gate-conventions\gate-conventions.mjs [--staged]` | TF-0109 (12/08) : self-test 6/6 + 2 robustesse, rejoué pilot ; PROPOSÉ aux dépôts, jamais déployé d'office | prouve | experimental |
 
-## forge-agents-security (sur mandat) — 5 services
+## forge-agents-security (sur mandat) — 6 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -165,6 +165,7 @@
 | cat-asc-03 | **Rejouer un corpus d'injection de prompt** | savoir si une charge d'injection a TRAVERSÉ jusqu'à un acte de mon agent | `node oracles\oracle-corpus-injection.mjs <cible>` | TF-0188 (14/08) : self-test 38 PASS (24 avant), dont 2 voisins légitimes qui NE déclenchent pas. Rejeu PASSIF sur artefact : aucun modèle sollicité, donc la résistance d'un système vivant n'est pas mesurée | prouve | experimental |
 | cat-asc-04 | **Juger un agent lancé par un workflow GitHub Actions** | savoir qui peut déclencher l'agent de mon workflow, quel texte de tiers devient sa consigne et quels secrets son shell lit | `node oracles\oracle-scan-workflow-agent.mjs <dépôt \| dossier \| fichier.yml>` | TF-2002 (29/10/2026, commit b1500a8) : self-test 76 PASS (55 avant), 20 des 21 contrôles neufs rouges sur le code d'avant | prouve | experimental |
 | cat-asc-05 | **Juger le serveur MCP de Supabase donné à un agent** | savoir si la configuration MCP de mon agent le borne à un projet de développement, en lecture seule, sans jeton en clair ni groupe qui dépense | `node oracles\oracle-scan-mcp-supabase.mjs <fichier \| dossier> --production <ref>` | TF-2009 (29/10/2026, commit 0463807) : self-test 100 PASS (76 avant), 23 des 24 contrôles neufs rouges sur le code d'avant | prouve | experimental |
+| cat-asc-06 | **Rejouer l'arrêt d'urgence d'une mission en course** | savoir si l'arrêt d'urgence de ma mission tient quand un job a déjà été autorisé : aucun job ne démarre après l'arrêt, aucun effet n'est émis, aucune action en cours n'est laissée sans accusé | `node oracles\oracle-arret-en-course.mjs <journal.jsonl>` | TF-2217 (06/11/2026, commit 4b5a5fa) : trois fixtures rouges (AU-1, AU-2, AU-3) et une verte ; self-test de la forge 125 PASS à 448eac5, relevé le 06/11/2026 | prouve | experimental |
 
 ## forge-websec (sur mandat) — 7 services
 

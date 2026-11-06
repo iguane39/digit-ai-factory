@@ -15,7 +15,7 @@
  * contrainte ; « obligatoire » dans un commentaire ordinaire n'est pas une contrainte apprise.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -146,6 +146,15 @@ check("borne — « obligatoire » dans un commentaire ordinaire (« variable ob
 check("vert — le registre RÉEL du pilot (references/GARDE-FOUS-PLATEFORME.json) passe GR-1 à GR-3 : il est jugé à chaque recette", () => {
   const r = lancer("--registre");
   if (r.code !== 0 || r.j.verdict !== "PASS" || r.j.mesure.entrees < 1) throw new Error(r.brut.slice(0, 400));
+});
+check("vert — le registre RÉEL porte le verrou exclusif d'Azure DevOps (client « tous », parade lockBehavior: sequential, lot du 06/11/2026) (TF-2268)", () => {
+  const j = JSON.parse(readFileSync(join(ICI, "..", "references", "GARDE-FOUS-PLATEFORME.json"), "utf8"));
+  const e = j.garde_fous.find((g) => /azure-devops/i.test(g.plateforme) && /verrou exclusif/i.test(g.mecanisme));
+  if (!e) throw new Error("aucune entrée « azure-devops » sur le verrou exclusif d'un environnement");
+  if (e.client !== "tous") throw new Error(`client « ${e.client} » : le verrou est une contrainte de la plateforme, attendu « tous »`);
+  if (!/lockBehavior:\s*sequential/.test(e.remede_eprouve || "")) throw new Error("la parade lockBehavior: sequential n'est pas écrite au remède");
+  if (!/le plus récent/.test(e.effet) || !/annul/.test(e.effet)) throw new Error("l'effet ne dit pas que seul le run le plus récent est gardé et l'autre annulé");
+  if (!/RETOURS - 20261106a/.test(e.source)) throw new Error("la source ne cite pas le lot du 06/11/2026");
 });
 check("rouge — registre qui porte un identifiant de souscription, un client nommé et une entrée sans lot : GR-2 et GR-1", () => {
   const D = mkdtempSync(join(tmpdir(), "garde-fous-registre-"));

@@ -430,7 +430,8 @@ déclare comme tel, jamais par silence.
 Dockerfile/compose dans le produit, déploiement **staging** réel, `ROLLBACK.md` testé une
 fois, oracle MEP exécuté (`ETAPE-MEP.md`, liste à jour ; build, healthcheck ×3, smoke tests des exigences critiques
 contre l'instance servie, rollback prouvé, scan secrets de l'image ; chaîne de déploiement,
-sauvegarde et fournisseur d'identité déclarés, M-16 à M-18). Puis générer
+sauvegarde et fournisseur d'identité déclarés, M-16 à M-18 ; réglages de plateforme lus contre le registre
+et version servie lue avec O-26 et O-27, M-21 et M-22). Puis générer
 `DOSSIER-MEP.md` et demander le **GO humain** — la production n'est jamais lancée sans lui, et
 jamais depuis un poste : le GO est la porte d'approbation de la chaîne ou la poussée d'un commit nommé ;
 sans GO, clore en `pret_production_en_attente_GO` (état de succès).

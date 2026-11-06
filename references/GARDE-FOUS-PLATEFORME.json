@@ -1,7 +1,7 @@
 {
   "format": "pilot/garde-fous-plateforme@1",
-  "version": "1.4.0",
-  "date": "2026-10-21",
+  "version": "1.5.0",
+  "date": "2026-11-06",
   "source": "Décision humaine D-37 (a) du 01/10/2026, TF-1495 et TF-1496 — lots « Produit-03 - RETOURS - 20260929d » (RA-51) et « Produit-03 - RETOURS - 20260929e » (RA-52). Le 29/09/2026, une stratégie Deny de la souscription d'un client a refusé la première livraison de production d'un produit. Le même produit l'avait heurtée en qualification le 23/07 et l'avait écrite en commentaire ; un produit voisin du même client l'avait heurtée le 31/08. La leçon n'a circulé ni vers la production, ni vers la factory.",
   "pourquoi_une_donnee": "Loi transverse n° 4 : une contrainte de plateforme est une donnée volatile. Le client la pose, la change ou la retire sans prévenir. Elle vit ici, datée et sourcée, et se confirme par le relevé du jour (ETAPE-MEP.md § 1 ter) : une entrée de ce registre est une piste à vérifier, jamais une preuve.",
   "pourquoi_ici": "Le pilot reçoit les lots de retours de tous les produits : c'est le seul endroit où une contrainte trouvée par un produit peut servir au suivant. Un fichier tenu par chaque produit ne circulerait pas, et un fichier tenu chez le client ne serait lu par aucun produit.",
@@ -173,6 +173,35 @@
       "inscrite_le": "2026-10-21",
       "verifiee_le": "2026-10-16",
       "verifiee_par": "constat du produit sur capture humaine ; non rejoué par le pilot"
+    },
+    {
+      "id": "GFP-008",
+      "client": "tous",
+      "plateforme": "azure-devops",
+      "mecanisme": "verrou exclusif d'un environnement de déploiement Azure DevOps, comportement par défaut runLatest",
+      "effet": "quand deux runs visent le même environnement, seul le run le plus récent est gardé : le plus ancien est annulé sans message, sans avoir démarré",
+      "portee": "toute chaîne dont plusieurs runs, manuels ou non, visent le même environnement derrière un verrou exclusif",
+      "vise": "deux déploiements concurrents sur un même environnement",
+      "refuse": "le deuxième lancement d'une chaîne à opérations manuelles tant que le premier n'est pas fini : il n'attend pas, il est annulé (étape « Contrôles de sécurité » `canceled`, run `canceled`, jamais démarré)",
+      "consequence": "une opération manuelle lancée en second est perdue sans erreur ; il faut relever la cause dans le run, relancer après la fin du plus récent, et l'ordre voulu n'est pas celui du résultat (1 h 20 de décalage mesurées sur le produit qui l'a heurtée)",
+      "remede_eprouve": "déclarer `lockBehavior: sequential` sur la chaîne qui expose des opérations manuelles, ou enchaîner les lancements depuis la session en attendant la fin du précédent ; la parade `lockBehavior: sequential` est celle que le produit propose, non encore jouée par lui",
+      "non_mesure": [
+        "le comportement sous `lockBehavior: sequential` : la parade vient de la documentation du produit et de sa proposition, aucun run ne l'a rejouée",
+        "la date à laquelle l'organisation a posé le verrou exclusif sur l'environnement"
+      ],
+      "posee_le": null,
+      "constatee": [
+        {
+          "produit": "Produit-81",
+          "le": "2026-11-06",
+          "environnement": "développement",
+          "trace": "deux runs manuels lancés à 11:07 avec deux valeurs du même paramètre ; le plus ancien annulé sans démarrer, le plus récent exécuté ; RP-4 du lot"
+        }
+      ],
+      "source": "lot « Produit-81 - RETOURS - 20261106a » (section « Garde-fou de plateforme relevé », RP-4), inscrit pour TF-2268",
+      "inscrite_le": "2026-11-06",
+      "verifiee_le": "2026-11-06",
+      "verifiee_par": "constat du produit : statuts des deux runs relevés dans l'interface de la chaîne ; non rejoué par le pilot"
     }
   ]
 }

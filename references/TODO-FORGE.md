@@ -93,6 +93,17 @@ clôture qui n'en porte aucun — et `journaliser.mjs` annule alors l'écriture.
 dans le registre du pilot et nulle part chez le producteur n'est pas câblée* (loi n° 1). Les 600+
 clôtures antérieures restent de la prose : c'est déclaré, pas rattrapé.
 
+**Un écart d'audit sur un réglage de plateforme rouvre un retour vers la forge qui crée (R-66 point 5,
+D-178 (a) du 06/11/2026, TF-2232).** L'audit du cas témoin du 30/10/2026 comptait 7 écarts sur 30 qui étaient
+une option gratuite laissée à sa valeur d'origine ; les corriger chez le produit les referme pour lui, et le
+produit suivant les rouvre. À la réception d'un lot ou d'un rapport de campagne qui corrige un tel écart,
+`node scripts\ouvrir-retour-reglage.mjs --reglage <adresse> --ecart <identifiant> --produit <pseudonyme>`
+lit l'écart contre `references\REGLAGES-SURS-PAR-DEFAUT.json` : classé `defaut`, il rend la candidature vers
+`digit-ai-forge-development`, à ingérer par `todo\ingerer-lot.mjs` avec l'identifiant de l'écart ; classé
+`decision`, il renvoie à la décision nommée et n'ouvre rien. Le script rend la candidature, il ne l'écrit pas
+au registre : l'écrivain reste `ingerer-lot.mjs`. Non câblé à l'ingestion : un sidecar qui nomme un réglage n'y
+déclenche pas l'aiguillage tout seul, c'est un geste du pilot à la réception.
+
 **Un retour porte sa CLASSE, et une récidive se COMPTE — jamais refusée (R13, mandat du 03/09/2026).**
 Mesuré au pas 0 du mandat, sur les 788 items du registre : **50** déclaraient une récidive en toutes
 lettres (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine
