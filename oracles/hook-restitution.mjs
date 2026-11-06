@@ -2214,7 +2214,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
     depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, nonInteractif, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables, remontee: remonteeTour,
     frictions: frictionsTour, depuisFrictions, retourFrictions } = analyserTranscript(readFileSync(chemin, "utf8"));
-  const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
+  // TF-2257 (06/11/2026) : `FORGE_HOOKS_JOURNAL` dérive le journal ailleurs que sous `.claude\` du dépôt — la recette du hook s'en sert pour que ses
+  // sessions fictives (« test-66-borne-… ») n'entrent jamais au journal réel. Absente, le chemin est celui d'avant.
+  const journal = process.env.FORGE_HOOKS_JOURNAL || join(ICI, "..", ".claude", "hooks-journal.jsonl");
   const journaliser = (o) => { try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify(o) + "\n"); } catch { /* journal facultatif */ } };
   // TF-2141 — LES FRICTIONS DU TOUR SE JOURNALISENT À CHAQUE FIN DE TOUR, jugé ou non, AVANT toute sortie : au pilot `.claude/frictions.jsonl`,
   // chez un produit `forge/frictions.jsonl` (lib-frictions.mjs). Une friction déjà écrite par un passage précédent du tour ne s'écrit pas deux

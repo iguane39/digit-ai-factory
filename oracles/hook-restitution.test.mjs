@@ -21,6 +21,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
 import { RESERVATION_BLOQUANTE_DES, RESERVATION_PILOT_BLOQUANTE_DES, analyserTranscript, comparerAffiche, controlerDetail, controlerReservation, controlerExplication, controlerGeste, controlerPossession, controlerProcedure, demandeProcedure, demandesDetail, syntheseDuTour,
   BLOQUANTES_DATEES, estBloquante, controlerCritique, critiqueDuTour, critiqueCouvre, ciblesDeCritique, fichierServi, verdictDeCritique,
   livrablesEcrits, controlerLivre, cibleDuLivrable, gainsDuTour, gainsSansReleve, avertsDeGains, nombresDuTour, releveRemontee, scellerLivrable } from "./hook-restitution.mjs";
@@ -30,6 +31,14 @@ const HOOK = join(ICI, "hook-restitution.mjs");
 const ORACLE = join(ICI, "oracle-synthese.mjs");
 const base = mkdtempSync(join(tmpdir(), "hook-rest-"));
 const echecs = [];
+// TF-2256 (06/11/2026) : `FORGE_CAS_RESTITUTION=66` (ou `65,66`, `60-66`) ne joue que les tranches de ces numéros de cas — voir
+// `lib-filtre-cas.mjs`. Sans la variable, tout se joue ; avec elle, la recette se dit PARTIELLE et n'écrit jamais son total.
+const filtre = creerFiltre("FORGE_CAS_RESTITUTION");
+const veut = (...ids) => filtre.veut(...ids);
+// TF-2257 (06/11/2026) : le journal des hooks est dérouté vers un fichier jetable PENDANT la recette. Le hook l'écrit à chaque jugement, et le cas 66
+// y pose en plus 30 lignes de session fictive : sans ce déroutement, chaque passage de la recette salissait `.claude\hooks-journal.jsonl` du dépôt qui
+// la joue. Posé avant `ENV_SANS_SESSION`, copie de l'environnement que reçoivent les hooks lancés plus bas ; le cas 69 prouve le déroutement.
+process.env.FORGE_HOOKS_JOURNAL = join(base, "hooks-journal.jsonl");
 // TF-1872 (18/10/2026) : le contrôle RÉSERVATION joue AUSSI au pilot, dont les sessions de cette recette portent le dossier de travail. Les cas qui n'ont
 // rien à voir avec lui (3, 6, 16, 31 à 37…) posent D-1 et D-12 : ils les trouvent au registre d'ESSAI que cette recette fabrique (jamais celui du pilot, que
 // l'environnement ci-dessous remplace) — le contrôle reste donc armé dans ces cas, et ne les accuse pas de ce qui n'est pas leur objet.
@@ -138,13 +147,15 @@ try {
   const ob = spawnSync(process.execPath, [ORACLE, fb], { encoding: "utf8" });
   if (ob.status !== 0) echecs.push(`fixture BON refusée par oracle-synthese : ${(ob.stdout.match(/"regle": "(S\d+)",\s*"statut": "FAIL"/g) || []).join(" ")}`);
 
+  if (veut(1)) {
   const r1 = lancer("mauvais", MAUVAIS, ["Write", "Bash"]);
   if (r1.decision?.decision !== "block") echecs.push(`1 : travail + hors format → attendu block, obtenu ${JSON.stringify(r1.decision)} ${r1.stderr.slice(0, 120)}`);
   else if (!/S1/.test(r1.decision.reason)) echecs.push("1 : le refus ne nomme pas la règle S1 (blocs absents)");
+  }
 
   // 6 (TF-0516) — forme RÉELLE d'un tour de travail : une phrase de transition, les outils, puis
   // la restitution. Le hook doit juger la RESTITUTION, pas la phrase.
-  {
+  if (veut(6)) {
     const q = join(base, "tour-complet.jsonl");
     writeFileSync(q, tourComplet(
       "14 restent. Je passe au lot suivant.", BON, ["Write", "Edit"]), "utf8");
@@ -160,7 +171,7 @@ try {
   // a donc aucun texte FINAL, et rien à juger. Avec la lecture « le plus long texte du tour », ce
   // cas rendait quatre échecs bloquants sur un message qui portait ses neuf titres — mesuré le
   // 23/08 sur un tour réel de 24 écritures, 90 commandes et VINGT textes de transition.
-  {
+  if (veut(6)) {
     const q = join(base, "tour-tronque.jsonl");
     writeFileSync(q, tourTronque("14 restent. Je passe au lot suivant.", ["Write", "Edit"]), "utf8");
     const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
@@ -170,6 +181,7 @@ try {
     if (d !== null) echecs.push(`6 bis : transcript sans texte final → attendu ne RIEN juger, obtenu ${JSON.stringify(d).slice(0, 200)}`);
   }
 
+  if (veut(2)) {
   const r2 = lancer("mauvais-actif", MAUVAIS, ["Write"], true);
   // TF-1739 (lot du 25/08, RV-2) : la garde anti-boucle laissait passer la réécriture SANS la juger
   // visiblement — refusée sur S1/S3/S4/S6, réécrite, acceptée, puis rejouée à la main : S15 et S16 FAIL.
@@ -178,33 +190,44 @@ try {
   if (r2.decision === null || r2.decision.decision === "block"
       || !/réécriture/.test(r2.decision.systemMessage || "") || !/S\d+/.test(r2.decision.systemMessage || ""))
     echecs.push(`2 : stop_hook_active → attendu pas de second refus ET verdict de la réécriture affiché (TF-1739), obtenu ${JSON.stringify(r2.decision)?.slice(0, 200)}`);
+  }
 
+  if (veut(3)) {
   const r3 = lancer("bon", BON, ["Write", "Edit"]);
   if (r3.decision !== null) echecs.push(`3 : travail + conforme → attendu laisser passer, obtenu ${JSON.stringify(r3.decision).slice(0, 200)}`);
+  }
 
+  if (veut(4)) {
   const r4 = lancer("lecture", MAUVAIS, ["Read", "Grep"]);
   if (r4.decision !== null) echecs.push("4 : tour de lecture → attendu non jugé");
+  }
 
   // 7 (TF-0904, 08/09) — UN VERDICT RENDU SANS ÉCRITURE EST UNE RESTITUTION. Le cas du 07/09 :
   // une question « la proposition a-t-elle été testée ? peut-on garantir… », une réponse en prose
   // portant un verdict, UNE commande, ZÉRO écriture. Hors critère « tour de travail » → jamais
   // jugée, alors que RESTITUTION.md régit « tout message de fin de traitement ».
+  if (veut(7)) {
   const VERDICT_LIBRE = "La proposition est conforme et je peux garantir qu'elle couvre le périmètre : "
     + "le mapping a été relu, les colonnes se correspondent, et rien ne manque à ma connaissance.";
   const r7 = lancer("verdict-sans-ecriture", VERDICT_LIBRE, ["Read"]);
   if (r7.decision?.decision !== "block")
     echecs.push(`7 : verdict rendu sans écriture → attendu block, obtenu ${JSON.stringify(r7.decision)}`);
+  }
 
   // 8 — SA CONTRE-ÉPREUVE, et sans elle la règle 7 désarmerait la conversation ordinaire : un
   // accusé de réception court, sans verdict, reste NON jugé (exemption écrite au §Portée).
+  if (veut(8)) {
   const r8 = lancer("accuse-reception", "C'est noté, je m'en occupe.", ["Read"]);
   if (r8.decision !== null)
     echecs.push(`8 : accusé de réception court → attendu non jugé, obtenu ${JSON.stringify(r8.decision).slice(0, 160)}`);
+  }
 
   // 9 — et une QUESTION rendue à l'humain (bloque_question) n'est pas une restitution non plus.
+  if (veut(9)) {
   const r9 = lancer("question", "Sur quel environnement dois-je mesurer, la recette ou la production ?", ["Read"]);
   if (r9.decision !== null)
     echecs.push(`9 : question rendue à l'humain → attendu non jugé, obtenu ${JSON.stringify(r9.decision).slice(0, 160)}`);
+  }
 
   // 21 et 22 (TF-0990, 16/09) — L'EXEMPTION « RIEN DE NEUF » ET SA BORNE, DANS LEURS DEUX SENS.
   // Le référentiel l'annonçait depuis la v2.18.0 et le juge l'ignorait : un accusé de trois phrases
@@ -212,6 +235,7 @@ try {
   // sur quatre constats bloquants, et la restitution complète écrite à la place faisait
   // quatre-vingt-dix lignes pour dire qu'il ne s'était rien passé. Elle est nommée, et bornée par
   // les TROIS absences : un message court qui POSE une décision demande un geste, donc il est jugé.
+  if (veut(21, 22)) {
   const RIEN_DE_NEUF = "La tâche de fond lancée hier s'est terminée à 06h12. Rien n'a changé dans le dépôt : "
     + "aucun fichier écrit, aucun contrôle rejoué. Rien n'est attendu de vous à ce stade.";
   const r21 = lancer("rien-de-neuf", RIEN_DE_NEUF, ["Read"]);
@@ -226,6 +250,7 @@ try {
     echecs.push("22 : un message court qui POSE une décision D-N passerait pour un accusé de réception — "
       + "l'exemption « rien de neuf » perdrait sa borne et s'appliquerait à un message qui demande un geste, "
       + `obtenu ${JSON.stringify(r22.decision)}`);
+  }
 
   // 38 et 39 (01/10/2026) — CITER UNE DÉCISION N'EST PAS LA POSER. LE FAIT : une réponse « Niveau :
   // Simple » de 129 mots, qui rappelait « la décision de départ (D-39) » au milieu d'une phrase, a
@@ -235,6 +260,7 @@ try {
   // « A-2 : », « | **A-1** | ») ou d'une option à choisir (« D-39 (a) », « D-39 a. »). Une mention
   // dans la prose reste une citation. Les cas 22 et 25 (« D-4 — … ? », « D-7 — … ? ») tiennent la
   // borne dans l'autre sens.
+  if (veut(38, 39)) {
   const CITE_UNE_DECISION = "Niveau : Simple\n\nOui, il y a une étape humaine récurrente : chaque "
     + "proposition entre en candidature et attend votre décision. Les autres sont espacées : la décision "
     + "de départ (D-39), puis les revues du 2026-10-15 et du 2026-10-29.\n\nSource : l'étude, ligne 251.";
@@ -247,6 +273,7 @@ try {
   if (r39.decision?.decision !== "block")
     echecs.push("39 : un message court qui demande un sélecteur « D-39 (a) » pose une décision et doit rester "
       + `jugé, obtenu ${JSON.stringify(r39.decision)}`);
+  }
 
   // 23 à 25 (TF-1182, 17/09) — LE RELAIS D'AVANCEMENT, ET LA BORNE QUI L'EMPÊCHE D'ÊTRE UN TROU.
   //
@@ -258,7 +285,7 @@ try {
   //
   // Les trois transcripts ne diffèrent QUE par ce que la règle regarde : ce qui s'est passé entre
   // les deux affichages (rien / une écriture), et ce que le relais porte (rien / une D-N).
-  {
+  if (veut(23, 24, 25)) {
     const deposee = join(base, "Synthese - Mandat - 20260917a.md");
     writeFileSync(deposee, "---\ndestinataire: humain\n---\n\n" + BON, "utf8");
     const RELAIS = "L'agent de campagne sur le juge de restitution vient d'émettre son avancement : "
@@ -304,6 +331,7 @@ try {
   // 5 — défaut de DÉTAIL seul : la structure tient, une puce du bloc 4 perd sa preuve.
   // S8 cherche un mot d'achèvement (« fait », « terminé », « clos », ✓) dans une puce SANS
   // preuve : on retire la preuve de la seule puce du bloc 4 et on garde le mot.
+  if (veut(5)) {
   const DETAIL = BON.replace(
     "- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
     "- la mise à jour du poste est terminée.");
@@ -314,12 +342,14 @@ try {
     echecs.push("5 : défaut de détail → ni blocage ni avertissement : le verdict serait muet");
   else if (!/S8/.test(r5.decision.systemMessage))
     echecs.push("5 : l'avertissement ne nomme pas la règle en cause");
+  }
 
   // 10 à 12 (TF-0891, 08/09) — L'AFFICHÉ REPREND LES BLOCS 3 ET 8 DU FICHIER JUGÉ.
   // Le fait du 07/09 : un fichier PASS S1-S37 paraphrasé à l'écran — bloc 3 sans tableau
   // d'options, bloc 8 avec « vous » et « IA » à la place du vocabulaire gelé. La comparaison du
   // 30/08 ne regardait que les numéros de décision et les lignes de repli : elle n'a rien vu.
   // Les trois sens se jouent sur le MÊME fichier de référence, seule la paraphrase change.
+  if (veut(10, 11, 12, 13, 14)) {
   const FICHIER = BON.replace(
     "  - (a) pousser maintenant — coût nul, exclut un dernier regard humain ; recommandé : le journal `recette.md` ne porte aucun défaut ouvert.",
     "\n| Option | Coût | Exclusions |\n|---|---|---|\n| (a) pousser maintenant | nul | un dernier regard humain |\n| (b) pousser demain | un poste périmé une nuit | la mise à disposition immédiate |\n");
@@ -362,6 +392,7 @@ try {
   const e14 = comparerAffiche(REFORMULE, AVEC_VERDICT);
   if (e14.some((x) => /VERDICT \(bloc 2\) affiché/.test(x)))
     echecs.push(`14 ter : identifiants, empreinte, date et version comptés comme des faits mesurés — écarts : ${e14.join(" | ")}`);
+  }
 
   // 15 à 18 (TF-1019, 11/09) — UNE DÉCISION RENDUE RÉCLAME LA PREUVE DU GESTE.
   // Le fait, mesuré sur une transcription de ce poste : l'humain écrit « 11a » à 07:05:01Z puis de
@@ -370,6 +401,7 @@ try {
   // deux fois. `oracle-synthese` juge la FORME d'un message, jamais son rapport au message humain
   // qui le précède : une restitution conforme rejouée à l'identique est, par construction,
   // conforme. Le geste demandé (le push) n'est venu que deux heures plus tard.
+  if (veut(15, 16, 17, 18)) {
   const FIXTURES = join(ICI, "fixtures");
   const lancerFichier = (p) => {
     const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
@@ -448,12 +480,14 @@ try {
     if (g.applicable)
       echecs.push(`18 bis : « ${texte.slice(0, 40)} » pris pour un sélecteur (${g.decision}) — la règle crierait sur une prose`);
   }
+  }
 
   // 40 et 41 (TF-1468, 28/09/2026) — LE MARQUEUR N'EST PAS LA FORME. Mesuré par l'agent « synthese » :
   // après la réponse « 6a », un rappel de D-6 en PUCE passait (non vu), la même ligne en CITATION
   // était refusée — alors que les deux posent à l'identique la question déjà tranchée. La forme qui
   // compte est COMPLÈTE : identifiant, tiret, question qui se termine par un point d'interrogation,
   // qu'elle vive sous `>` ou sous une puce ; le seul marqueur de tête de ligne ne suffit plus.
+  if (veut(40, 41)) {
   const d40 = controlerGeste({
     dernierHumain: "6a",
     dernierTexte: "## 3. Décisions attendues\n\n- D-6 — Faut-il publier la branche maintenant, ou "
@@ -470,11 +504,12 @@ try {
   });
   if (!d41.applicable || d41.verdict !== "PASS")
     echecs.push(`41 : « D-6 — exécutée » (identifiant et tiret SEULS, sans question) n'est pas une décision reposée — obtenu ${JSON.stringify(d41)}`);
+  }
 
   // 19 — LE MARQUEUR SE LIT EN TÊTE DE LIGNE (17/09/2026). Le gabarit de restitution CITE le marqueur dans
   // sa prose et s'appelle « restitution » : édité dans le même tour que la synthèse, il a été jugé à sa
   // place. Les deux fichiers ne diffèrent que par la POSITION du marqueur : champ, ou mot dans une phrase.
-  {
+  if (veut(19)) {
     const gabarit = join(base, "RESTITUTION.md");
     const synthese = join(base, "Marque - Synthese Mandat - Objet - 20260917a.md");
     writeFileSync(gabarit, "# Consigne de restitution\n\nLa synthèse naît avec `destinataire: humain` en frontmatter YAML.\n", "utf8");
@@ -489,7 +524,7 @@ try {
   // Le fait rejoué le 17/09 : la synthèse déposée a été renommée par `mv` pour tenir le plafond de
   // longueur de chemin (S42). Le hook ne connaît que les chemins passés aux outils d'écriture ; ce
   // jour-là le repli a tenu parce qu'un seul fichier marqué existait, et rien ne le garantissait.
-  {
+  if (veut(27, 28, 29)) {
     const d = join(base, "renomme");
     mkdirSync(d, { recursive: true });
     const ecrit = join(d, "Marque - Synthese Mandat - Un titre tres long qui depasse le plafond - 20260917a.md");
@@ -545,7 +580,7 @@ try {
   // produit : dépôt, redépôt, retouche à la main, tour qui relit sans écrire. C'est cette suite
   // qui prouve l'invariant — le sceau porte l'état exact que l'oracle vient de juger, et il ne se
   // pose que sur le fichier écrit dans le tour.
-  {
+  if (veut(31, 32, 33, 34)) {
     const d31 = join(base, "sceau");
     mkdirSync(d31, { recursive: true });
     const JUGEUR = join(ICI, "..", "scripts", "verifier-jugement.mjs");
@@ -627,6 +662,7 @@ try {
   // 35 — LA DEMANDE DE PROCÉDURE, RECONNUE SUR LA SOIRÉE RÉELLE (TF-1361). Les neuf messages de
   // l'annexe A du lot « Produit-02 - RETOURS - 20260922a », mot pour mot : les cinq demandes de
   // procédure sont reconnues, et aucun des quatre autres messages de la même soirée.
+  if (veut(35)) {
   for (const m of [
     "Détaille à partir de ma page Google Ads comment j'importe les campagnes pour les lancer.",
     "Fournis le descriptif pas à pas dans Google Ads sur le web pour poster les campagnes",
@@ -641,10 +677,11 @@ try {
     "ok, j'ai mis l'accès lecture, vérifie",
     "fais la mise à jour", "26a, 25a, 24b", "synchronise avec github",
   ]) if (demandeProcedure(m)) echecs.push(`35 bis : message pris à tort pour une demande de procédure : « ${m.slice(0, 70)} »`);
+  }
 
   // 36 — LE CONTRÔLE SEUL, DANS SES TROIS SENS : demande + S53 en échec → FAIL ; demande + S53
   // tenue → PASS ; aucune demande → hors contrôle, même avec S53 en échec (elle reste avertissante).
-  {
+  if (veut(36)) {
     const demande = "Fournis le descriptif pas à pas dans Google Ads sur le web pour poster les campagnes";
     const s53 = [{ regle: "S53", statut: "FAIL", message: "1 action(s) manuelle_utilisateur visent l'interface de Google Ads" }];
     const a = controlerProcedure({ dernierHumain: demande, fails: s53 });
@@ -659,7 +696,7 @@ try {
   // d'import dans l'écran de Google Ads : sans guide, il est refusé quand le dernier message humain
   // demande la procédure (rouge) ; le MÊME message, avec sa source datée et un guide en tête, passe
   // (vert) ; le rouge, sous un message humain qui ne demande rien, n'est qu'averti (borne).
-  {
+  if (veut(37)) {
     const ACTION_ADS = "- **A-3** — manuelle_utilisateur : neuve — importer les campagnes dans Google Ads : écran « Importations », "
       + "bouton « Aperçu » puis « Appliquer », sur `https://ads.google.com`.\n"
       + "  - pourquoi pas l'IA : acces — import TENTÉ le 22/09 par l'API de la plateforme avec l'identité de la session, `HTTP 403 PERMISSION_DENIED` ; seul le titulaire du compte y est connecté.\n"
@@ -721,7 +758,7 @@ try {
   // RAPPEL affiché par ce hook ne bouge : l'agent a lu une version périmée de la consigne au moment
   // précis où il devait se corriger (rattrapé en 92349b13, trois versions plus tard). Rien ne
   // comparait les deux numéros — ce cas le fait, sur les fichiers RÉELS du dépôt.
-  {
+  if (veut(42)) {
     const gabaritTexte = readFileSync(join(ICI, "..", "gabarits", "RESTITUTION.md"), "utf8");
     const versionGabarit = (gabaritTexte.match(/\*\*version (\d+\.\d+\.\d+),/) || [])[1];
     const hookTexte = readFileSync(HOOK, "utf8");
@@ -735,7 +772,7 @@ try {
   // Le 12/10/2026, oracle-chemin-prescrit (CP3) l'a trouvée prescrite et jouée par aucun cas : le
   // producteur était le premier à l'essayer. Simple court → exit 0 ; texte long sans restitution → exit 1 ;
   // forme Moyen tenue → exit 0 ; réponse Moyen au-delà de 150 mots → exit 1, l'écart nommé.
-  {
+  if (veut(43)) {
     // TF-1947 (26/10/2026) : sans l'identifiant de la session qui joue la recette — le pré-vol relit désormais la transcription
     // de la session pour savoir si le tour a écrit, et celle de la recette n'est pas celle de ce cas (cas 57 pour ce volet).
     const preVol = (texte) => {
@@ -761,7 +798,7 @@ try {
   // le jeton → FAIL, la valeur jamais recopiée ; la MÊME réponse sans aucune valeur de forme secrète dans
   // la conversation → PASS ; une réponse qui ne dit rien de tel → hors contrôle ; un chemin ou un sha
   // dans un message humain n'est pas une valeur secrète. Et le transcript rend bien TOUS les messages humains.
-  {
+  if (veut(44)) {
     const JETON = "pk.eyJ1IjoiZXhlbXBsZSIsImEiOiJjbDAwMDAwMDAifQ.Zz9fake0000";
     const REPONSE = "A-4 — déposer le jeton dans la variable secrète du pipeline (manuelle_utilisateur) — le jeton n'est qu'en votre possession.";
     const a = controlerPossession({ textesHumains: ["voici le jeton : " + JETON, "dépose-le"], dernierTexte: REPONSE });
@@ -786,7 +823,7 @@ try {
   // ni par la session ni par le porteur. Un tour de travail dans un produit (dossier courant portant
   // `forge\retours\`) dont la restitution conforme ne dit rien de sa remontée → BLOQUÉ, S48 nommée ; la
   // MÊME restitution portant « Remontée à la factory : rien à remonter. » → laissée passer.
-  {
+  if (veut(45)) {
     const produit = join(base, "produit-45");
     mkdirSync(join(produit, "forge", "retours"), { recursive: true });
     // TF-1849 : la D-1 de BON est inscrite au registre de ce produit (entrée question_humain), comme la règle l'exige d'un produit
@@ -817,7 +854,7 @@ try {
   // même verdict bloquant que le hook, avant l'affichage. (b) Un refus d'un tour SANS préjugement dit le
   // défaut distinct « PRÉJUGEMENT » ; le MÊME refus dans un tour qui a joué `--prejuger` ne le dit pas,
   // et le journal porte `prejuge` dans les deux sens.
-  {
+  if (veut(46)) {
     const prejuger = (nom, texte) => {
       const f = join(base, nom + ".md"); writeFileSync(f, texte, "utf8");
       // Sans l'identifiant de la session qui joue la recette : depuis TF-1720, --prejuger relit le
@@ -859,7 +896,7 @@ try {
   // écrit, lancé une recette en arrière-plan non revenue, et rend 2 lignes d'attente → NON jugé ; le
   // MÊME texte sans tâche lancée → jugé (bloqué) ; la MÊME tâche dont la notification de fin est au
   // transcript → jugé ; la MÊME attente qui porte un verdict → jugé.
-  {
+  if (veut(47)) {
     const ATTENTE_TXT = "La recette complète tourne en arrière-plan, environ 10 minutes.\nJe reprends la restitution dès son résultat.";
     const tour47 = (texte, { lancee = true, revenue = false } = {}) => [
       { type: "user", message: { role: "user", content: "corrige et rejoue la recette" } },
@@ -889,7 +926,7 @@ try {
   // les différentes pipelines » rendu en restitution complète sans fiche → FAIL (avertissement) ; le
   // MÊME tour qui écrit sa fiche → PASS ; la MÊME restitution qui cite sa fiche → PASS ; une demande de
   // travail (« fais la mise à jour ») → hors contrôle. Et le hook le dit sans bloquer.
-  {
+  if (veut(48)) {
     const DEMANDE = "Explique les différentes pipelines et ce qui est encore utile";
     const FICHE = "output/Client-A - Fiche Pipelines constat et precos - 20261014a.md";
     const a = controlerExplication({ dernierHumain: DEMANDE, dernierTexte: BON, fichiersMd: [] });
@@ -920,7 +957,7 @@ try {
   // perd sa ligne de repli est refusé sur AFFICHAGE. (c) `--prejuger` sur le MÊME brouillon, avec le
   // transcript, rend le même refus avant l'affichage ; (d) le brouillon identique à la synthèse passe ;
   // (e) sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit, sans refus.
-  {
+  if (veut(49)) {
     const MARQUEE = (t) => "---\ndestinataire: humain\n---\n\n" + t;
     const DOC_PROJET = MARQUEE("# Composants d'exploitation\n\nLe service tourne sur deux réplicas.\n");
     const SANS_REPLI = BON.replace("  - si rien n'est décidé : (a) s'applique.\n", "");
@@ -973,7 +1010,7 @@ try {
   // hook de fin de tour, S80 nommée ; c'est le retour du 17/10/2026, jugé affichable jusque-là. (b) La MÊME
   // information en liste (une ligne par élément) est affichable : le remède du message PASSE. (c) La forme montrée
   // entre guillemets français n'est pas commise. (d) Le guide en paragraphe n'est qu'AVERTI (S81), jamais refusé.
-  {
+  if (veut(50)) {
     const EN_LIGNE = BON.replace("- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
       "- bootstrap v2 livré en trois temps : 1) écriture ; 2) recette ; 3) enregistrement — preuve : bootstrap.test.mjs 7/7, recette 22/22.");
     const EN_LISTE = BON.replace("- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
@@ -1044,7 +1081,7 @@ try {
   // (c) De bout en bout par le hook de fin de tour : la restitution conforme qui rappelle D-51 en une ligne est
   // REFUSÉE (DÉTAIL nommé), la MÊME avec D-51 reposée en entier est acceptée, la MÊME sous un message qui ne demande
   // rien n'est pas refusée. (d) `--prejuger` avec le transcript rend le même refus avant l'affichage.
-  {
+  if (veut(51)) {
     const demande = (m) => demandesDetail(m).join(",");
     for (const m of ["51 détaille", "détaille D-51", "détaille la 51", "Détaille la décision 51", "peux-tu détailler la D-51 ?", "détaille-moi la 51", "le détail de la 51", "D-51, détaille"])
       if (demande(m) !== "51") echecs.push(`51 : « ${m} » est une demande de détail de D-51 → attendu "51", obtenu "${demande(m)}"`);
@@ -1128,7 +1165,7 @@ try {
   // tard. Le registre est le `forge/ledger.jsonl` du produit ; chez le pilot il n'existe pas, le contrôle se tait et le dit. Avant
   // l'échéance (2026-11-01) la D-N non inscrite est un AVERTISSEMENT ; à l'échéance, un REFUS — la recette joue les deux états par
   // `FORGE_RESERVATION_BLOQUANTE_DES`. Le remède que le message recommande est JOUÉ (ledger.py du gabarit) et le refus tombe.
-  {
+  if (veut(52)) {
     const PYTHON52 = ["python", "python3", "py"].find((bin) => { const r = spawnSync(bin, ["--version"], { encoding: "utf8" }); return !r.error && r.status === 0; });
     const LEDGER_GABARIT = readFileSync(join(ICI, "..", "gabarits", "ledger.py"), "utf8");
     let nProduit = 0;
@@ -1265,7 +1302,7 @@ try {
   // NOUVELLE du bloc 3 qui n'y figure pas, ou qui y figure pour une AUTRE question, est refusée. Échéance choisie pour le pilot : 2026-10-25 (la plus longue session
   // du pilot mesurée dure 107 h, le 90e centile 31 h : au 25/10 toute session ouverte avant la règle a été rouverte). La recette joue les deux états par
   // `FORGE_RESERVATION_PILOT_BLOQUANTE_DES`, avec un registre d'ESSAI (`FORGE_REGISTRE_DECISIONS_PILOT`), jamais celui du pilot. Les remèdes que le refus recommande sont JOUÉS.
-  {
+  if (veut(53)) {
     const regP = join(base, "registre-pilot-53.jsonl");
     const Q30 = "Faut-il suivre le verdict de l'étude, une procédure au référentiel sans skill, plutôt que le skill que vous avez choisi ?";
     const Q31 = "Faut-il construire la famille « tableau de bord de pilotage », puis sa règle de lecture, comme l'étude le conclut ?";
@@ -1367,7 +1404,7 @@ try {
   // à « Est-ce que le reste du site a été mis à jour ? », « Oui, tout le site en ligne est à jour » rendu PASS sur 273 pages cherchées avec la liste de l'auteur.
   // Deux juges se complètent : S82 d'oracle-synthese juge le TEXTE (cas 54 a), le contrôle COMPLÉTUDE du hook lit le dernier message humain (54 b, c) — seul à savoir qu'un
   // « oui » répond à une question de complétude. Les deux sont BLOQUANTS. Les remèdes sont JOUÉS.
-  {
+  if (veut(54)) {
     const QCOMPLETUDE = "Est-ce que le reste du site a été mis à jour ?";
     const MESURE = "Mesuré sur : conditions générales du 15/10 du produit amont (docs/cgv-20261015d.md), relue à 14:32, périmètre 273 pages";
     const AFF = "Oui, tout le site en ligne est à jour : 273 pages relues. ";
@@ -1433,7 +1470,7 @@ try {
   // ROUGE : le cas réel du 19/10 — l'action A-11 « relire la semaine 2 et répondre « ok semaine 2 » », « guide de mon message de 21:45 »,
   // sans lien — est DITE en avertissement avec son échéance avant le 2026-10-28, et REFUSÉE à l'échéance (FORGE_S83_BLOQUANTE_DES passée).
   // VERTES : la MÊME action portant le chemin des textes et des photos (le remède du constat) passe en silence, avant comme après l'échéance.
-  {
+  if (veut(55)) {
     const cwd55 = mkdtempSync(join(base, "hors-55-"));
     const A11 = (ou) => BON.replace("- manuelle_dev : aucune.", `- **A-3** — manuelle_utilisateur : TF-0003 relire la semaine 2 et répondre « ok semaine 2 » (enfin, parce que rien ne part sans votre relecture).
   - pourquoi pas l'IA : decision — D-94 (a) prévoit votre relecture avant chaque semaine.
@@ -1468,7 +1505,7 @@ try {
   // VERTES : le tour qui a joué `date` deux fois et dont l'en-tête recopie l'heure lue et l'écart des deux relevés passe en silence, même à
   // l'échéance ; un transcript SANS horodatage ne se mesure pas (SANS_OBJET, aucune accusation) ; `--prejuger` sans transcription dit ce
   // que la règle ne peut pas juger.
-  {
+  if (veut(56)) {
     const cwd56 = mkdtempSync(join(base, "hors-56-"));
     const T0 = Date.parse("2026-10-20T18:00:30.000Z"), T1 = Date.parse("2026-10-20T18:30:38.000Z");
     const local = (ms) => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
@@ -1531,7 +1568,7 @@ try {
   // moins de 4 commandes) ; une redirection vers un fichier du dépôt est une écriture, vers le dossier temporaire non. Et une réponse
   // courte qui dit « oui » à une question de complétude sans « Mesuré sur » est refusée sur COMPLÉTUDE SANS exiger de restitution,
   // le remède (la ligne « Mesuré sur ») passe. Le pré-vol relit la transcription et le dit avant l'affichage, dans les deux sens.
-  {
+  if (veut(57)) {
     const cwd57 = mkdtempSync(join(base, "hors-57-"));
     const QUESTION = "est-ce que le rappel de revue part sans session ouverte ?";
     const COURTE = "Niveau : Simple\n\nNon, le rappel vient seulement à l'ouverture d'une session.\n- Après 7 jours sans revue, elle affiche « revue DUE ».\n"
@@ -1635,7 +1672,7 @@ try {
   // des actions sans ordre justifié (S6) ne sont plus qu'averties. ROUGES : BON privé de son bloc 9 est refusé sur S1, le bloc nommé ; la MÊME
   // décision au format B SANS son tableau est refusée sur S4, le tableau nommé ; un verdict sans fait mesuré reste refusé (S3,
   // exception qui protège un fait).
-  {
+  if (veut(58)) {
     const retirer58 = (texte, n) => texte.replace(new RegExp(`## ${n}\\.[^\\n]*\\n[\\s\\S]*?(?=## \\d\\.|$)`), "");
     const ALLEGEE = [2, 6, 7].reduce(retirer58, BON);
     const SANS9 = retirer58(BON, 9);
@@ -1679,7 +1716,7 @@ try {
   // VERTES : le MÊME tour avec la critique jouée APRÈS l'écriture (le remède du message, joué) passe en silence, avant comme après l'échéance ; un tour d'OUTILLAGE
   // (scripts .mjs, tests, fixtures, gabarits, node_modules, hooks, script Node) ne l'est pas. BORNES : un verdict ANTÉRIEUR à la dernière écriture, une critique d'une
   // AUTRE page, un SKIP et un plantage ne valent pas critique ; un verdict redirigé vers un fichier, si ; un brouillon du dossier temporaire n'est pas servi.
-  {
+  if (veut(59)) {
     const cwd59 = mkdtempSync(join(base, "hors-59-"));
     const RACINE59 = "C:\\dev\\produit-essai";   // un produit fictif, hors du dossier temporaire où tout fichier est un brouillon
     const PAGE = `${RACINE59}\\site\\x.html`, CSS = `${RACINE59}\\site\\assets\\x.css`;
@@ -1825,7 +1862,7 @@ try {
   // n'est là → REFUSÉ sur S85, EXIGENCES.json nommé, par le hook comme par --prejuger ; sans trace, AVERTI sur S86 avant l'échéance, REFUSÉ
   // après. VERTS : le remède joué (les livrables produits) → aucun refus ; une livraison sans compte d'exigences sous le verrou → S72 avertie,
   // jamais refusée. L'échéance de RÉSERVATION est repoussée : seule le verrou est en jeu.
-  {
+  if (veut(60)) {
     const LIVRE60 = (avecCompte) => BON
       .replace("sur le moment de la publication.", "sur le moment de la publication. Le produit est livré : vous pouvez ouvrir le portail à l'instant ; il reste à saisir les clés des fournisseurs."
         + (avecCompte ? " 34 exigences sur 35 tenues, la dernière nommée au bloc 5." : ""))
@@ -1907,7 +1944,7 @@ try {
   // VERTS : le MÊME tour dont le bloc 0 se clôt par la ligne liée (en ligne, en puces, bloc 0 titré) → silence, et le brouillon préjugé sans S87 ; un tour qui n'écrit que la
   // synthèse, des README, des sidecars, un fichier du dossier temporaire ou une retouche par Edit → rien à juger. BORNES : un lien vers un AUTRE fichier ne couvre pas ; une cible
   // nue qui porte des espaces n'est pas un lien ; la comparaison passe par le nom (séparateurs, %20, casse, accents composés) ; la synthèse retrouvée par le contrôle AFFICHAGE est exclue.
-  {
+  if (veut(61)) {
     const cwd61 = mkdtempSync(join(base, "hors-61-"));
     const RACINE61 = "C:\\dev\\produit-essai";
     const GUIDE = `${RACINE61}\\output\\04-cadrages\\Produit - Guide - Lot 0 - 20261029b.md`, NOTE = `${RACINE61}\\output\\03-etudes\\2026-10\\Produit - Note - 20261029c.md`;
@@ -2023,7 +2060,7 @@ try {
   // courant est `<projet>/site/src` était lu `scripts/app.js`, donc comme outillage du premier niveau, et la critique d'implémentation ne lui était pas exigée ; la racine
   // du projet (`.git` en remontant) le lit `site/src/scripts/app.js`, fichier servi. VERTS : le même tour dont le répertoire courant est la racine ; un script d'outillage réel
   // (`<projet>/scripts/outil.js`) écrit depuis le même sous-dossier reste de l'outillage ; CLAUDE_PROJECT_DIR prime sur le répertoire courant.
-  {
+  if (veut(62)) {
     // Le projet est celui de la recette (un dépôt, donc un `.git` en remontant) : le dossier temporaire ne convient pas, tout fichier y est un brouillon. Les sous-dossiers
     // `site/` et `site/src/` sont fictifs : aucun fichier n'est écrit, seuls les chemins du tour comptent.
     const PROJ62 = dirname(ICI);
@@ -2052,7 +2089,7 @@ try {
   // (heredoc, printf) et d'un gain composé par un script (`gains_constates: g`) que `journaliser` a imprimé, retrouvé au registre par son ts exact. VERTS : les mêmes chiffres
   // lus dans une sortie du tour ; un gain qui n'en porte aucun ; un chiffre « rapporté par l'agent » ; un événement du registre qu'AUCUNE ligne imprimée du tour ne désigne (une
   // autre session du pilot) ; et, de bout en bout, le hook ne REFUSE jamais : il dit GAINS sous la réponse conforme.
-  {
+  if (veut(63)) {
     const GAIN63 = "813 Markdown suivis, 4 accusés";
     const ecrit63 = (id, nom, saisie) => ({ type: "assistant", timestamp: "2026-11-02T10:00:00.000Z", message: { role: "assistant", content: [{ type: "tool_use", id, name: nom, input: saisie }] } });
     const sortie63 = (texte) => ({ type: "user", timestamp: "2026-11-02T10:00:01.000Z", message: { role: "user", content: [{ type: "tool_result", content: texte }] } });
@@ -2115,7 +2152,7 @@ try {
   // le geste), sans refus, par le hook et par --prejuger. VERTS : le remède joué — une commande du tour qui écrit `type: retour`, ou une entrée `type: retour` du ledger
   // datée après le message humain —, un skill qui n'est pas de la Factory, un skill sans livrable écrit à la main, un livrable sans skill, un projet qui n'est pas un produit.
   // BORNES : un retour ANTÉRIEUR au message humain ne couvre pas ; lire le SKILL.md et jouer l'un de ses scripts valent « utiliser » ; l'avertissement ne refuse jamais.
-  {
+  if (veut(64)) {
     const parc64 = mkdtempSync(join(base, "parc-64-"));
     const skill64 = join(parc64, "digit-ai-forge-agents", ".claude", "skills", "make-it-better");
     mkdirSync(skill64, { recursive: true });
@@ -2197,7 +2234,7 @@ try {
   // E-16 (`gabarit: gd-fiche-constat-precos`, `destinataire: humain`) ; le hook la retenait comme synthèse et refusait la restitution sur AFFICHAGE, la fiche ne portant
   // aucune action A-N. (a) La fiche seule : le hook laisse passer. (b) Une synthèse NOMMÉE déposée dans le même tour reste comparée à l'écran. (c) Unitaire : la fiche
   // n'est jamais retenue, un `gabarit:` écrit dans la PROSE d'une synthèse ne l'écarte pas. (d) `--prejuger` avec le transcript ne joue pas AFFICHAGE contre la fiche.
-  {
+  if (veut(65)) {
     const FICHE65 = "---\ndestinataire: humain\nrole_destinataire: le porteur, qui choisit ce que la session traite\ngabarit: gd-fiche-constat-precos\nversion_du_gabarit: 1.0.0\n---\n\n# Actions A-2 et A-3 : constat et préconisations\n\nAucun sélecteur de décision ici.\n";
     const SYNTHESE65 = "---\ndestinataire: humain\n---\n\n" + BON;
     const SANS_REPLI65 = BON.replace("  - si rien n'est décidé : (a) s'applique.\n", "");
@@ -2238,7 +2275,7 @@ try {
   // session `-p` date son message humain de `entrypoint: "sdk-cli"`. (a) Interactif : exempté comme avant (cas 47). (b) Non interactif, tâche non revenue : refus dédié, qui dit
   // d'attendre au premier plan. (c) Non interactif, tâche revenue : le refus dédié n'a plus d'objet. (d) Non interactif, attente qui porte un verdict : jugée par le chemin ordinaire.
   // (e) La borne : 30 refus comptés au journal pour la session, puis la session est laissée finir. (f) Unitaire : `analyserTranscript` lit le mode.
-  {
+  if (veut(66)) {
     const ATTENTE66 = "Les agents de lecture tournent en arrière-plan, environ 10 minutes.\nJe reprends la restitution dès leur retour.";
     const tour66 = (texte, { entrypoint = "sdk-cli", revenue = false } = {}) => [
       { type: "user", entrypoint, message: { role: "user", content: "lis les vingt pièces avec des agents de lecture" } },
@@ -2262,7 +2299,7 @@ try {
     if (dedie(c66.d)) echecs.push(`66 ter : la tâche est REVENUE, le refus dédié n'a plus d'objet → attendu pas de refus TF-2193, obtenu ${JSON.stringify(c66.d).slice(0, 200)}`);
     const d66 = hook66("p-verdict", "Les agents tournent en arrière-plan ; le premier lot est PASS.\nJe reprends dès leur retour.");
     if (dedie(d66.d)) echecs.push(`66 quater : une attente qui porte un verdict est jugée par le chemin ordinaire, pas par le refus dédié → obtenu ${JSON.stringify(d66.d).slice(0, 200)}`);
-    const journal66 = join(ICI, "..", ".claude", "hooks-journal.jsonl"), session66 = "test-66-borne-" + Date.now();
+    const journal66 = process.env.FORGE_HOOKS_JOURNAL, session66 = "test-66-borne-" + Date.now();
     mkdirSync(dirname(journal66), { recursive: true });
     appendFileSync(journal66, Array.from({ length: 30 }, () => JSON.stringify({ ts: new Date().toISOString(), hook: "restitution", session: session66, attente_arriere_plan: true })).join("\n") + "\n", "utf8");
     const e66 = hook66("p-borne", ATTENTE66, {}, session66);
@@ -2275,7 +2312,7 @@ try {
   // réécrite après trois remarques sous le même nom. (a) Le tour écrit l'étude et la lie : PASS, sceau posé (`.jugement.json`). (b) Un tour suivant la réécrit en place et la lie de
   // nouveau : refus S94, l'indice suivant nommé. (c) Le remède : la version réécrite sous l'indice suivant, liée : PASS, sceau posé sur elle ; la version d'origine reste intacte.
   // (d) Unitaires : `scellerLivrable` ne scelle ni sans convention d'indice, ni une synthèse, ni un fichier déjà scellé (il garde l'écart).
-  {
+  if (veut(68)) {
     // Hors du dossier temporaire du poste : tout fichier qui s'y trouve est un brouillon que le relevé des livrables écarte (TEMPORAIRE) ; racine courte, jamais sous le dépôt (TF-1532).
     const racine68 = process.platform === "win32" ? "C:/tmp" : "/var/tmp"; mkdirSync(racine68, { recursive: true });
     const d68 = mkdtempSync(join(racine68, "hook-68-")); mkdirSync(join(d68, "forge", "retours"), { recursive: true }); mkdirSync(join(d68, "output"), { recursive: true });
@@ -2317,7 +2354,7 @@ try {
   // 67 — TF-2203 (06/11/2026) : `--prejuger` SORT EN CODE NON NUL TANT QU'UN AVERTISSEMENT DE FORME DES BLOCS 2, 3 ET 8 SUBSISTE. Le 05/11, un préjugement avait rendu `affichable: true` avec 11 avertissements
   // (S78, S31, S32, S16, S18) sur une restitution que le porteur a refusée. TF-2171 (05/11, 12:28) a fait de l'avertissement non motivé un code de sortie 1 ; ce cas verrouille cet acquis par bloc,
   // et garde l'autre moitié de la décision : le hook de fin de tour ne refuse pas ces avertissements (TF-1947 vise moins de refus), il les dit sous la réponse.
-  {
+  if (veut(67)) {
     const variantes67 = [
       ["bloc 2", "S3", BON.replace("- Recette du pilot 22/22 verte, bootstrap 7/7.", "- Tout est vert."), true],
       ["bloc 3 (recommandation)", "S16", BON.replace("; recommandé : le journal `recette.md` ne porte aucun défaut ouvert.", "."), false],
@@ -2342,8 +2379,25 @@ try {
       }
     }
   }
+  // 69 — TF-2257 (06/11/2026) : LE JOURNAL DES HOOKS D'UNE RECETTE N'EST PAS CELUI DU DÉPÔT. Le cas 66 posait 30 lignes de session fictive
+  // (« test-66-borne-… ») dans `.claude/hooks-journal.jsonl` du dépôt qui jouait la recette, et chaque cas jugé y ajoutait la sienne. Vert : le hook,
+  // lancé avec FORGE_HOOKS_JOURNAL comme le fait cette recette, écrit la ligne de sa session dans le fichier désigné et le journal du dépôt n'en porte
+  // aucune trace. La trace se cherche par l'identifiant UNIQUE de la session, jamais par la taille du fichier : une session vivante du dépôt peut le
+  // faire grandir pendant la recette. Rouge (ancien hook, qui ignore la variable) : la ligne manque au fichier désigné et figure au journal du dépôt.
+  if (veut(69)) {
+    const sess69 = "test-69-journal-" + Date.now();
+    const q69 = join(base, "journal-69.jsonl");
+    writeFileSync(q69, transcript(MAUVAIS, ["Write", "Bash"]), "utf8");
+    spawnSync(process.execPath, [HOOK], { encoding: "utf8", env: ENV_SANS_SESSION, input: JSON.stringify({ session_id: sess69, transcript_path: q69, stop_hook_active: false }) });
+    const depot69 = join(ICI, "..", ".claude", "hooks-journal.jsonl");
+    const dansDepot69 = existsSync(depot69) && readFileSync(depot69, "utf8").includes(sess69);
+    const dansJetable69 = existsSync(process.env.FORGE_HOOKS_JOURNAL) && readFileSync(process.env.FORGE_HOOKS_JOURNAL, "utf8").includes(sess69);
+    if (dansDepot69) echecs.push("69 : la session de la recette figure au journal des hooks du DÉPÔT — la recette le salit à chaque passage");
+    if (!dansJetable69) echecs.push("69 : la session de la recette ne figure pas au journal désigné par FORGE_HOOKS_JOURNAL — le déroutement ne s'applique pas");
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
+if (filtre.actif) { const c = conclureFiltre("hook-restitution", filtre, echecs); (c.code === 0 ? console.log : console.error)(c.ligne); process.exit(c.code); }
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 68/68 — UN LIVRABLE LIÉ « LIVRÉ » SE SCELLE AU PASS ET SA RÉÉCRITURE EN PLACE EST REFUSÉE (cas 68, TF-2191, S94 : le sceau est posé sur l'étude liée, la même réécrite et liée de nouveau est refusée avec l'indice suivant nommé, le remède passe et se scelle ; scellerLivrable ne scelle ni un nom hors convention, ni une synthèse, ni un fichier déjà scellé) ; UNE FICHE DE GABARIT N'EST PAS LA SYNTHÈSE DU TOUR (cas 65, TF-2182, 06/11/2026 : une fiche E-16 qui déclare gabarit: en en-tête n'est plus retenue par syntheseDuTour, la restitution qui la cite passe, une synthèse nommée reste comparée, un gabarit: en prose n'écarte rien) ; EN MODE NON INTERACTIF, UN MESSAGE D'ATTENTE NE DIFFÈRE PAS LA RESTITUTION (cas 66, TF-2193 : session claude -p, tâche d'arrière-plan non revenue, refus dédié qui dit d'attendre au premier plan, exemption TF-1649 intacte en interactif, borne de 30 refus) ; --prejuger SORT EN 1 TANT QU'UN AVERTISSEMENT DES BLOCS 2, 3 ET 8 SUBSISTE (cas 67, TF-2203 : S3, S16, S32, S19, S11 ; le hook de fin de tour les dit sans refuser) ; UN LIVRABLE ÉCRIT À LA MAIN À CÔTÉ D UN SKILL DE LA FACTORY SE REMONTE (cas 64, TF-2078, RT-33, 04/11/2026 : chez un produit, un tour qui lance un skill de la Factory et écrit un livrable de page ou de document par Write sans retour au ledger reçoit l avertissement REMONTÉE, par le hook et par --prejuger, sans refus ; un retour consigné par commande ou au ledger après le message humain, un skill qui n est pas de la Factory, un skill sans livrable écrit à la main, un livrable sans skill, un projet hors produit ne disent rien, et un retour antérieur ne couvre pas) ; UNE SUPPRESSION DANS LE DOSSIER TEMPORAIRE N EST PAS UNE ÉCRITURE (cas 57 duodecies à quindecies, TF-2079, RT-34) ; LES CHIFFRES D'UN GAIN ÉCRIT AU REGISTRE (cas 63, D-131 (a), TF-2056, 02/11/2026 : « 813 Markdown suivis, 4 accusés » écrit par un Write devant une sortie qui dit 1 209 et 5 rend un avertissement GAINS par chiffre, jamais un refus ; un gain écrit par un heredoc, ou composé par un script que journaliser a imprimé et retrouvé au registre par son ts exact, aussi ; les chiffres lus dans le tour, un gain sans chiffre, un chiffre rapporté par l'agent, l'événement d'une autre session et un registre introuvable ne disent rien) ; LA RACINE DU PROJET (cas 62, TF-1943, 29/10/2026 : un script de navigateur écrit sous src/scripts/ par un tour dont le répertoire courant est src/ est un fichier servi, il n'est plus lu comme l'outillage scripts/ du premier niveau ; l'outillage réel reste de l'outillage ; CLAUDE_PROJECT_DIR prime sur le répertoire courant) ; LA LIGNE « Livré : » DU BLOC 0 (cas 61, S87, TF-1973 et TF-2016, 29/10/2026 : un guide écrit sous output/04-cadrages dont le bloc 0 ne le lie pas est nommé en avertissement avec la ligne à écrire, par le hook comme par --prejuger ; la même ligne liée, en ligne, en puces, deux liens ou bloc 0 titré, ne dit rien ; la synthèse, les README, les sidecars, un brouillon temporaire et une retouche par Edit n'ont rien à lier ; un lien vers un autre fichier ne couvre pas, une cible nue à espaces n'est pas un lien, la comparaison passe par le nom) ; LE VERROU « LIVRÉ » (cas 60, T4, TF-1949, 26/10/2026 : chez un produit, un produit neuf déclaré livré sans ses livrables refusé sur S85 par le hook et par --prejuger, EXIGENCES.json nommé ; les livrables produits, aucun refus ; une livraison sans compte d'exigences sous le verrou, S72 avertie ; sans trace de mobilisation, S86 avertie avant l'échéance et refusée après, l'écrivain nommé) ; LA CRITIQUE D'IMPLÉMENTATION EXIGÉE D'OFFICE (cas 59, TF-1913, D-82 (a), 26/10/2026 : un tour qui écrit site/x.html sans critique averti avec son échéance jusqu'au 02/11 puis refusé dès le 03/11, le message dit à la session de la jouer et ne propose jamais à l'humain de la valider ; la même page suivie de sa critique, le remède joué, passe en silence avant comme après l'échéance, y compris au second passage ; un verdict antérieur à la dernière écriture, la critique d'une autre page, un SKIP, un plantage et la simple lecture du script ne valent pas critique, une sortie redirigée vers un fichier et une boucle shell si ; un tour d'outillage (.mjs, tests, scripts, gabarits, node_modules, fixtures, hooks, script Node, brouillon temporaire) n'accuse rien et le même plus une page n'accuse que la page ; la définition d'un fichier servi cas par cas au pilot et chez un produit ; --prejuger joue la critique) ; LE COMPTE RENDU COMPLET ALLÉGÉ (cas 58, T2, TF-1947, 26/10/2026 : sans les blocs 2, 6 et 7 sans refus ; sans le bloc 9 refusé sur S1 ; une décision au format B sans son tableau refusée sur S4, avec lui sans refus ; un verdict sans fait mesuré refusé sur S3 ; des actions sans ordre justifié averties sur S6 ; et, adaptés, GESTE (15), PROCÉDURE (37), S48 (45), S80 (50), DÉTAIL (51), S83 (55) et S84 (56) avertis au lieu de refusés, la détection inchangée) ; LA RÉPONSE COURTE VAUT POUR TOUT TOUR QUI N A RIEN ÉCRIT (cas 57, TF-1947, D-75 (c), 26/10/2026 : une question, 5 commandes de lecture dont le pré-vol par heredoc et une réponse courte, refusée jusque-là, passe ; la même dans un tour qui écrit un fichier, ou de 2 commandes dont un `git -C … commit`, reste jugée ; une redirection vers le dépôt est une écriture, vers le dossier temporaire non ; un « oui » court à une question de complétude sans « Mesuré sur » est refusé sans restitution exigée et son remède passe ; le pré-vol relit la transcription dans les deux sens) ; UNE DEMANDE D AVIS PORTE LE LIEN DU CONTENU (S83, TF-1936 : le cas réel « guide de mon message de 21:45 » dit avant le 28/10 et refusé à l échéance, le remède joué en silence) et L HEURE DU BLOC 1 SE RELÈVE DANS LE TOUR (S84, TF-1938 : « 19:52, durée 4 min » sans relevé dit puis refusé, l en-tête recopié de deux `date` en silence, un transcript sans horodatage non accusé, --prejuger avec et sans transcription) ; UNE AFFIRMATION D EXHAUSTIVITE PORTE SA LIGNE « Mesuré sur » (S82, bloquante) et UN « OUI » A UNE QUESTION DE COMPLETUDE AUSSI (contrôle COMPLÉTUDE, bloquant, seul à lire le dernier message humain) : le « oui » du 15/10 (RT-126) sans ligne est refusé par le hook de fin de tour et par --prejuger, avec la ligne « Mesuré sur : <source amont>, relue à HH:MM, périmètre <n> » il passe, la liste de l auteur (« mes marqueurs ») et la formule « Mesuré contre » restent refusées, un « non » n est pas l affirmation (cas 54, TF-1866, D-29 (a), 18/10/2026) ; LA MÊME RÉSERVATION AU PILOT (cas 53, TF-1872, D-32 (a), 18/10/2026) : une D-N nouvelle absente du registre decisions/REGISTRE.jsonl est AVERTIE jusqu au 2026-10-25 puis REFUSÉE, une D-N déjà prise pour une AUTRE question est nommée avec la question inscrite, les remèdes sont joués (scripts/reserver-decision.mjs --question rend et inscrit le numéro suivant, --reformuler garde le numéro d une décision réécrite), une D-N nommée par l humain, citée par le message précédent ou rappelée en une ligne n est pas nouvelle, un registre introuvable est dit sans accuser ; une D-N NOUVELLE du bloc 3 est inscrite au registre du produit est inscrite au registre du produit (une entrée question_humain de forge/ledger.jsonl qui la nomme) AVANT l affichage : non inscrite, elle est AVERTIE jusqu à l échéance du 2026-11-01 puis REFUSÉE par le hook de fin de tour et par --prejuger, le remède recommandé (ledger.py question_humain --decision D-N) est joué et lève le refus, un rappel d une ligne (S4), une D-N déjà à l écran ou nommée par l humain (61a, 61 détaille) ne sont pas jugés, et une forge ou un dossier hors pilot et hors produit n a pas de registre (cas 52, TF-1849, 18/10/2026) ; une demande de détail l emporte sur le rappel d une ligne (S4) : « 51 détaille », « détaille la 51 » reconnus et « étape 3 détaille », « TF-1851 détaille » épargnés, la décision rappelée en une ligne, absente ou reposée sans options REFUSÉE par le hook de fin de tour et par --prejuger, la décision reposée en entier ou remplacée par des décisions détaillées qui la citent acceptée (cas 51, TF-1851, 18/10/2026) ; S80 (E-11 sur le Markdown, TF-1847, 18/10/2026) est BLOQUANTE : une énumération « 1) … 2) … 3) » sur une ligne du bloc 4 est refusée par --prejuger et par le hook de fin de tour, la MÊME information en liste est affichable, la forme montrée entre guillemets français n est pas refusée, et le guide en paragraphe n est qu averti par S81 (cas 50) ; un document de projet marqué par son gabarit n est plus jugé à la place de la restitution, une synthèse nommée reste comparée, et --prejuger rend le même refus AFFICHAGE avant l affichage en relisant le transcript, la comparaison non jouée étant dite (cas 49, TF-1720, 15/10/2026) ; une explication demandée rendue en restitution sans fiche est dite en avertissement EXPLICATION, et la fiche écrite ou citée la lève (cas 48, TF-1641, 14/10/2026) ; un message d attente de 3 lignes au plus n est pas jugé tant qu une tâche d arrière-plan du tour n est pas revenue, et il redevient jugé sans tâche, tâche revenue ou verdict porté (cas 47, TF-1649, 14/10/2026) ; --prejuger rend le verdict bloquant du hook avant affichage, et un refus sans préjugement le dit comme un défaut distinct (cas 46, TF-1647, TF-1666, 14/10/2026) ; S48 est jugée au hook chez un produit, bloquante, et « rien à remonter » passe (cas 45, TF-1644, 14/10/2026) ; « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 69/69 — LE JOURNAL DES HOOKS D'UNE RECETTE N'EST PAS CELUI DU DÉPÔT (cas 69, TF-2257 : le hook lancé avec FORGE_HOOKS_JOURNAL écrit la ligne de sa session au fichier désigné et jamais à .claude/hooks-journal.jsonl du dépôt ; la recette dérive tout son journal, cas 66 compris, vers un fichier jetable) ; UN LIVRABLE LIÉ « LIVRÉ » SE SCELLE AU PASS ET SA RÉÉCRITURE EN PLACE EST REFUSÉE (cas 68, TF-2191, S94 : le sceau est posé sur l'étude liée, la même réécrite et liée de nouveau est refusée avec l'indice suivant nommé, le remède passe et se scelle ; scellerLivrable ne scelle ni un nom hors convention, ni une synthèse, ni un fichier déjà scellé) ; UNE FICHE DE GABARIT N'EST PAS LA SYNTHÈSE DU TOUR (cas 65, TF-2182, 06/11/2026 : une fiche E-16 qui déclare gabarit: en en-tête n'est plus retenue par syntheseDuTour, la restitution qui la cite passe, une synthèse nommée reste comparée, un gabarit: en prose n'écarte rien) ; EN MODE NON INTERACTIF, UN MESSAGE D'ATTENTE NE DIFFÈRE PAS LA RESTITUTION (cas 66, TF-2193 : session claude -p, tâche d'arrière-plan non revenue, refus dédié qui dit d'attendre au premier plan, exemption TF-1649 intacte en interactif, borne de 30 refus) ; --prejuger SORT EN 1 TANT QU'UN AVERTISSEMENT DES BLOCS 2, 3 ET 8 SUBSISTE (cas 67, TF-2203 : S3, S16, S32, S19, S11 ; le hook de fin de tour les dit sans refuser) ; UN LIVRABLE ÉCRIT À LA MAIN À CÔTÉ D UN SKILL DE LA FACTORY SE REMONTE (cas 64, TF-2078, RT-33, 04/11/2026 : chez un produit, un tour qui lance un skill de la Factory et écrit un livrable de page ou de document par Write sans retour au ledger reçoit l avertissement REMONTÉE, par le hook et par --prejuger, sans refus ; un retour consigné par commande ou au ledger après le message humain, un skill qui n est pas de la Factory, un skill sans livrable écrit à la main, un livrable sans skill, un projet hors produit ne disent rien, et un retour antérieur ne couvre pas) ; UNE SUPPRESSION DANS LE DOSSIER TEMPORAIRE N EST PAS UNE ÉCRITURE (cas 57 duodecies à quindecies, TF-2079, RT-34) ; LES CHIFFRES D'UN GAIN ÉCRIT AU REGISTRE (cas 63, D-131 (a), TF-2056, 02/11/2026 : « 813 Markdown suivis, 4 accusés » écrit par un Write devant une sortie qui dit 1 209 et 5 rend un avertissement GAINS par chiffre, jamais un refus ; un gain écrit par un heredoc, ou composé par un script que journaliser a imprimé et retrouvé au registre par son ts exact, aussi ; les chiffres lus dans le tour, un gain sans chiffre, un chiffre rapporté par l'agent, l'événement d'une autre session et un registre introuvable ne disent rien) ; LA RACINE DU PROJET (cas 62, TF-1943, 29/10/2026 : un script de navigateur écrit sous src/scripts/ par un tour dont le répertoire courant est src/ est un fichier servi, il n'est plus lu comme l'outillage scripts/ du premier niveau ; l'outillage réel reste de l'outillage ; CLAUDE_PROJECT_DIR prime sur le répertoire courant) ; LA LIGNE « Livré : » DU BLOC 0 (cas 61, S87, TF-1973 et TF-2016, 29/10/2026 : un guide écrit sous output/04-cadrages dont le bloc 0 ne le lie pas est nommé en avertissement avec la ligne à écrire, par le hook comme par --prejuger ; la même ligne liée, en ligne, en puces, deux liens ou bloc 0 titré, ne dit rien ; la synthèse, les README, les sidecars, un brouillon temporaire et une retouche par Edit n'ont rien à lier ; un lien vers un autre fichier ne couvre pas, une cible nue à espaces n'est pas un lien, la comparaison passe par le nom) ; LE VERROU « LIVRÉ » (cas 60, T4, TF-1949, 26/10/2026 : chez un produit, un produit neuf déclaré livré sans ses livrables refusé sur S85 par le hook et par --prejuger, EXIGENCES.json nommé ; les livrables produits, aucun refus ; une livraison sans compte d'exigences sous le verrou, S72 avertie ; sans trace de mobilisation, S86 avertie avant l'échéance et refusée après, l'écrivain nommé) ; LA CRITIQUE D'IMPLÉMENTATION EXIGÉE D'OFFICE (cas 59, TF-1913, D-82 (a), 26/10/2026 : un tour qui écrit site/x.html sans critique averti avec son échéance jusqu'au 02/11 puis refusé dès le 03/11, le message dit à la session de la jouer et ne propose jamais à l'humain de la valider ; la même page suivie de sa critique, le remède joué, passe en silence avant comme après l'échéance, y compris au second passage ; un verdict antérieur à la dernière écriture, la critique d'une autre page, un SKIP, un plantage et la simple lecture du script ne valent pas critique, une sortie redirigée vers un fichier et une boucle shell si ; un tour d'outillage (.mjs, tests, scripts, gabarits, node_modules, fixtures, hooks, script Node, brouillon temporaire) n'accuse rien et le même plus une page n'accuse que la page ; la définition d'un fichier servi cas par cas au pilot et chez un produit ; --prejuger joue la critique) ; LE COMPTE RENDU COMPLET ALLÉGÉ (cas 58, T2, TF-1947, 26/10/2026 : sans les blocs 2, 6 et 7 sans refus ; sans le bloc 9 refusé sur S1 ; une décision au format B sans son tableau refusée sur S4, avec lui sans refus ; un verdict sans fait mesuré refusé sur S3 ; des actions sans ordre justifié averties sur S6 ; et, adaptés, GESTE (15), PROCÉDURE (37), S48 (45), S80 (50), DÉTAIL (51), S83 (55) et S84 (56) avertis au lieu de refusés, la détection inchangée) ; LA RÉPONSE COURTE VAUT POUR TOUT TOUR QUI N A RIEN ÉCRIT (cas 57, TF-1947, D-75 (c), 26/10/2026 : une question, 5 commandes de lecture dont le pré-vol par heredoc et une réponse courte, refusée jusque-là, passe ; la même dans un tour qui écrit un fichier, ou de 2 commandes dont un `git -C … commit`, reste jugée ; une redirection vers le dépôt est une écriture, vers le dossier temporaire non ; un « oui » court à une question de complétude sans « Mesuré sur » est refusé sans restitution exigée et son remède passe ; le pré-vol relit la transcription dans les deux sens) ; UNE DEMANDE D AVIS PORTE LE LIEN DU CONTENU (S83, TF-1936 : le cas réel « guide de mon message de 21:45 » dit avant le 28/10 et refusé à l échéance, le remède joué en silence) et L HEURE DU BLOC 1 SE RELÈVE DANS LE TOUR (S84, TF-1938 : « 19:52, durée 4 min » sans relevé dit puis refusé, l en-tête recopié de deux `date` en silence, un transcript sans horodatage non accusé, --prejuger avec et sans transcription) ; UNE AFFIRMATION D EXHAUSTIVITE PORTE SA LIGNE « Mesuré sur » (S82, bloquante) et UN « OUI » A UNE QUESTION DE COMPLETUDE AUSSI (contrôle COMPLÉTUDE, bloquant, seul à lire le dernier message humain) : le « oui » du 15/10 (RT-126) sans ligne est refusé par le hook de fin de tour et par --prejuger, avec la ligne « Mesuré sur : <source amont>, relue à HH:MM, périmètre <n> » il passe, la liste de l auteur (« mes marqueurs ») et la formule « Mesuré contre » restent refusées, un « non » n est pas l affirmation (cas 54, TF-1866, D-29 (a), 18/10/2026) ; LA MÊME RÉSERVATION AU PILOT (cas 53, TF-1872, D-32 (a), 18/10/2026) : une D-N nouvelle absente du registre decisions/REGISTRE.jsonl est AVERTIE jusqu au 2026-10-25 puis REFUSÉE, une D-N déjà prise pour une AUTRE question est nommée avec la question inscrite, les remèdes sont joués (scripts/reserver-decision.mjs --question rend et inscrit le numéro suivant, --reformuler garde le numéro d une décision réécrite), une D-N nommée par l humain, citée par le message précédent ou rappelée en une ligne n est pas nouvelle, un registre introuvable est dit sans accuser ; une D-N NOUVELLE du bloc 3 est inscrite au registre du produit est inscrite au registre du produit (une entrée question_humain de forge/ledger.jsonl qui la nomme) AVANT l affichage : non inscrite, elle est AVERTIE jusqu à l échéance du 2026-11-01 puis REFUSÉE par le hook de fin de tour et par --prejuger, le remède recommandé (ledger.py question_humain --decision D-N) est joué et lève le refus, un rappel d une ligne (S4), une D-N déjà à l écran ou nommée par l humain (61a, 61 détaille) ne sont pas jugés, et une forge ou un dossier hors pilot et hors produit n a pas de registre (cas 52, TF-1849, 18/10/2026) ; une demande de détail l emporte sur le rappel d une ligne (S4) : « 51 détaille », « détaille la 51 » reconnus et « étape 3 détaille », « TF-1851 détaille » épargnés, la décision rappelée en une ligne, absente ou reposée sans options REFUSÉE par le hook de fin de tour et par --prejuger, la décision reposée en entier ou remplacée par des décisions détaillées qui la citent acceptée (cas 51, TF-1851, 18/10/2026) ; S80 (E-11 sur le Markdown, TF-1847, 18/10/2026) est BLOQUANTE : une énumération « 1) … 2) … 3) » sur une ligne du bloc 4 est refusée par --prejuger et par le hook de fin de tour, la MÊME information en liste est affichable, la forme montrée entre guillemets français n est pas refusée, et le guide en paragraphe n est qu averti par S81 (cas 50) ; un document de projet marqué par son gabarit n est plus jugé à la place de la restitution, une synthèse nommée reste comparée, et --prejuger rend le même refus AFFICHAGE avant l affichage en relisant le transcript, la comparaison non jouée étant dite (cas 49, TF-1720, 15/10/2026) ; une explication demandée rendue en restitution sans fiche est dite en avertissement EXPLICATION, et la fiche écrite ou citée la lève (cas 48, TF-1641, 14/10/2026) ; un message d attente de 3 lignes au plus n est pas jugé tant qu une tâche d arrière-plan du tour n est pas revenue, et il redevient jugé sans tâche, tâche revenue ou verdict porté (cas 47, TF-1649, 14/10/2026) ; --prejuger rend le verdict bloquant du hook avant affichage, et un refus sans préjugement le dit comme un défaut distinct (cas 46, TF-1647, TF-1666, 14/10/2026) ; S48 est jugée au hook chez un produit, bloquante, et « rien à remonter » passe (cas 45, TF-1644, 14/10/2026) ; « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
