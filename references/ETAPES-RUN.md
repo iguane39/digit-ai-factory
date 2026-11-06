@@ -502,6 +502,8 @@ dossier de MEP (M-16 à M-18, TF-1212 ; **avertissement** tant que l'humain n'en
 
 *« Prêt pour la production » exige aussi le pan `parcours-personas` de forge-tests et `oracle-exploitabilite` de forge-design, tous deux au verdict PASS dans le ledger du run* (TF-2124, D-166 (a) du 04/11/2026) : un manque rend un avertissement nommé jusqu'au 18/11/2026 inclus, puis un échec dès le 19/11/2026, jugé par la règle R-61 bis d'`oracles\oracle-conformite-projet.mjs`, rejouée avec `--declarer-pret` avant l'écriture du `run_close` ; la date se lit à l'horloge, `--aujourd-hui AAAA-MM-JJ` la fixe pour la recette.
 
+*Un forge-tests PARTIEL se motive avant « prêt »* (TF-2207, RP-27, décision R-58 du 06/11/2026) : l'exit 3 de la campagne reste acceptable, mais le `run_close` « prêt » est refusé, dès le 06/11/2026 et sans période d'avertissement, tant que le dernier verdict `PARTIEL` de la campagne (oracle `forge-tests` ou `forge_tests`) ne porte pas un champ `motif_partiel` de 20 caractères au moins, qui nomme les pans non couverts et dit pourquoi l'état est acceptable. Le motif se consigne par une entrée de plus (`oracles_verdict`, même oracle, même verdict) ; un PASS consigné ensuite lève aussi le refus. Même règle R-61 bis, même `--declarer-pret` : `ledger.mjs append` d'un `run_close` « prêt » la joue avant d'écrire. Mesuré le 05/11/2026 chez Produit-86 : trois `run_close` « prêt » sur un PARTIEL, 27 exigences sur 127 citées par un test de bout en bout.
+
 *« Livré » a une définition opposable* (R-61, TF-1711, 15/10/2026) : toutes les exigences de la fiche
 implémentées et testées, seuls les secrets restant à saisir par l'administrateur, par un geste guidé
 unique. Un run qui s'arrête avant le dit, écrit « N exigences sur M tenues » au bloc 0 ou au verdict de
