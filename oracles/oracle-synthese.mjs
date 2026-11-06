@@ -122,6 +122,8 @@
  *       de tour au PASS qui la lie ; un contenu changé depuis le sceau FAIL, l'indice suivant nommé ; BLOQUANTE au hook ;
  *   S95 UNE DÉCISION QUI EN REMPLACE UNE AUTRE LISTE LES ARTEFACTS DE LA PREMIÈRE ET DIT LEUR SORT (06/11, TF-2206 et TF-2210, RP-26, RP-30, gabarit 2.63.0) : « D-N remplace D-M » exige la ligne `Artefacts de D-M : <liste>` avec le sort
  *       de chacun (conservé, retiré, à décider…) ou « aucun artefact » ; avertissante ;
+ *   S104 « POURQUOI VOUS » NOMME UN MOTIF DE R-58 (06/11, TF-2273, RP-46, gabarit 2.64.0) : la ligne « Pourquoi vous » d'une décision au format B porte l'un des six motifs (dépense, publication, irréversible, doctrine, arbitrage, produit) ;
+ *       sinon la décision ne se pose pas, la session exécute et rend pour information ; avertissante ;
  *   S91 UNE ACTION DIT CE QU'ELLE FAIT (30/10, gabarit 2.56.0) : un tableau d'actions A-N au bloc 8 porte une colonne « Action » et, sur chaque ligne, une phrase de 4 mots au moins hors code ; avertissante ;
  *   S90 UN CHIFFRE SE RELÈVE (30/10, D-100 (a) du 29/10, gabarit 2.55.0) : une durée, un coût, un score, un volume ou un compte d'objets qu'aucune sortie du tour ne montre, et que la ligne
  *       ne dit pas non mesuré ; lue par `lib-chiffres-releves.mjs`, sur les nombres passés par le hook (`--nombres-tour`) ; avertissante ;
@@ -593,6 +595,21 @@ function manqueAuRappel(ligne) {
   if (/\?/.test(l)) manque.push("une ligne sans question");
   return manque;
 }
+
+// TF-2273 (06/11/2026) — LES SIX MOTIFS DE R-58, lus dans la ligne « Pourquoi vous » d'une décision au format B (S104). Lexique FERMÉ, mesuré le 06/11/2026 sur les
+// 151 lignes « Pourquoi vous » des 65 synthèses d'`output\04-plans\` qui en portent : voir la règle S104.
+const L_MOT = "\\p{L}\\p{N}_";
+const motR58 = (src) => new RegExp(`(?<![${L_MOT}])(?:${src})`, "iu");
+const MOTIFS_R58 = [
+  ["depense", motR58("d[ée]penses?|d[ée]pens[ée]\\w*|co[ûu]t(?:e|era|ent|s)?(?![" + L_MOT + "])|factur\\w*|payant\\w*|budget\\w*|abonnement\\w*|licence\\w*|\\d\\s*(?:€|eur(?:os?)?|usd|\\$)|argent|frais(?![" + L_MOT + "])|tarif\\w*|quota\\w*|consommation|montant\\w*|offre commerciale")],
+  ["publication", motR58("publi\\w*|pouss(?:er|e|é|ée|ent)(?![" + L_MOT + "])|push\\w*|diffus\\w*|mise? en (?:production|ligne|prod)|production|hors du poste|en ligne|rend\\w* (?:public|visible)|expos\\w*|d[ée]ploi\\w*|envoy\\w*|expéditeur|domaine d'envoi|contenu visible|tag(?:ger|uer)?(?![" + L_MOT + "])")],
+  ["irreversible", motR58("irr[ée]versible\\w*|supprim\\w*|d[ée]finitiv\\w*|d[ée]trui\\w*|effac\\w*|ne se d[ée]fait|sans retour|perdu\\w*|perte\\w*|[ée]cras\\w*|r[ée]voqu\\w*|purg\\w*|rotation|irrattrapable")],
+  ["doctrine", motR58("doctrine\\w*|r[èe]gles?(?![" + L_MOT + "])|norme\\w*|opposable\\w*|gouvernance|noyau|s'impos\\w*|convention\\w*|politique\\w*|loi n|R-\\d+|invariant\\w*|contrat\\w*|tous les produits|toutes les forges|obligatoire\\w*|standard\\w*|d[ée]cision humaine|r[ée]glage appliqu[ée] [àa] toutes")],
+  ["arbitrage", motR58("arbitr\\w*|pr[ée]f[ée]rence\\w*|vous seul\\w*|seule? vous|seule? (?:à|a) (?:savoir|trancher|d[ée]cider)|il n'y a que vous|go[ûu]t\\w*|priorit\\w*|trancher|concurrent\\w*|choix|chois\\w*|(?:votre|vos) (?:souhait\\w*|attente\\w*|appr[ée]ciation|volont[ée]|ligne|strat[ée]gie|temps|comptes?|marque)|strat[ée]gi\\w*|vous (?:seul )?(?:savez|connaissez|d[ée]tenez)|votre accord|compte\\b")],
+  ["produit", motR58("produits? autonomes?|chez (?:un|le|ce|votre|les) (?:produits?|clients?)|[ée]criture chez|d[ée]p[ôo]t du produit|projet du client|client\\w*|hors run|repo du produit|(?:le|du|au|sur un|\\d+) produits?(?![" + L_MOT + "])|produits relev[ée]s|projets voisins")],
+];
+/** Les motifs de R-58 que le texte d'un « Pourquoi vous » nomme (liste vide : aucun ne relève de R-58). */
+const motifsR58De = (texte) => MOTIFS_R58.filter(([, re]) => re.test(String(texte))).map(([nom]) => nom);
 
 // TF-1338 (26/09/2026, lot Produit-64 du 22/09) — UNE TÊTE DE DÉCISION CITÉE COMMENCE UN PARAGRAPHE.
 // Le fait : dans un bloc 3 conforme, « > **171** paragraphes ; s'arrêter au CSS… », simple REPLI
@@ -3355,6 +3372,29 @@ function juger(texte, cheminJuge = null) {
       else ok("S88", `${vues88} décision(s) dont « De quoi s'agit-il » ne s'ouvre pas par un nom interne sans glose et ne range pas quatre identifiants sur une ligne`);
     }
 
+    // ---- S104 (06/11/2026, TF-2273, gabarit 2.64.0) — « POURQUOI VOUS » NOMME UN MOTIF DE R-58, OU LA DÉCISION NE SE POSE PAS.
+    //
+    // LE FAIT : une décision (D-480) a été posée au porteur pour des tests de bout en bout et une dérive d'infrastructure locale qu'il avait demandés d'office, « sans GO » ; aucun
+    // motif de R-58 ne lui revenait. Le travail fait d'office a trouvé un défaut réel (un job en erreur 500) ; la décision a coûté un aller-retour au porteur (retour RP-46 de Produit-86).
+    // R-58 (REGLES-PROJET.md §AM) : une décision n'est posée que si elle porte `depense`, `publication`, `irreversible`, `doctrine`, `arbitrage` ou `produit` ; sinon la session
+    // exécute l'option recommandée et la rend pour information (blocs 4 et 8). Le format B demande « Pourquoi vous » à chaque décision : S104 lit cette ligne et cherche l'un des six motifs
+    // dans un lexique fermé (`MOTIFS_R58`). AVERTISSANTE à son entrée. Mesure (06/11/2026, 65 synthèses d'`output\04-plans\`) : 139 lignes sur 151 nomment un motif ; les 12 autres reposent
+    // presque toutes sur une consigne que le porteur avait déjà donnée (« l'ordre des transformations que vous avez arrêté »), ce que R-58 point 5 traite en exécutant la consigne.
+    // NON JUGÉ : la sincérité du motif (un mot du lexique dans une phrase qui ne le porte pas), et la lecture de la demande de l'humain (« d'office », « sans GO »), que cet oracle ne reçoit pas.
+    {
+      const enCitation104 = groupesLignes.filter((g) => /^\s*>\s*\*\*\s*D-\d{1,3}\b/.test(g[0]));
+      const motifDe = (g) => { const l = g.find((x) => /pourquoi vous/i.test(x)); return l === undefined ? null : l.replace(/^.*?pourquoi vous\s*\**\s*:?\s*\**\s*/i, "").replace(/\s+/g, " ").trim(); };
+      const vues104 = enCitation104.map((g) => ({ g, motif: motifDe(g) })).filter((x) => x.motif !== null);
+      const sans104 = vues104.filter((x) => !motifsR58De(x.motif).length);
+      if (!vues104.length) findings.push({ regle: "S104", statut: "SANS_OBJET", message: "aucune décision en bloc de citation portant « Pourquoi vous » — motif R-58 non jugé" });
+      else if (sans104.length)
+        ko("S104", `${sans104.length} décision(s) sur ${vues104.length} dont « Pourquoi vous » ne relève d'aucun motif de R-58 (dépense, publication, irréversible, doctrine, arbitrage, produit) : « ${sans104[0].motif.slice(0, 120)} ». `
+          + "Une décision n'est posée que si elle porte l'un de ces six motifs ; sinon la session exécute l'option recommandée dans le tour et la rend pour information (bloc 4, ou bloc 8 en auto_ia), surtout quand la demande du porteur "
+          + "prolongeait ce travail (« d'office », « sans GO ») ; une consigne du porteur est déjà une décision (R-58 point 5). Le 06/11/2026, D-480 posée pour des tests et un redéploiement local demandés d'office n'avait aucun motif humain (TF-2273). "
+          + `Ex. : ${sans104[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+      else ok("S104", `${vues104.length} décision(s) dont « Pourquoi vous » nomme un motif de R-58 (${[...new Set(vues104.flatMap((x) => motifsR58De(x.motif)))].join(", ")})`);
+    }
+
     // ---- S49 (17/09/2026, TF-1172) — UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE
     //
     // LE RETOUR EST LA MESURE, mot pour mot (16/09/2026) : « Tu dis ce qu'il faut faire, mais tu ne
@@ -4821,7 +4861,8 @@ if (arg === "--self-test") {
   // ses numéros portent ceux de ses utilisatrices, et ses constantes partagées sont déclarées `var` pour rester visibles hors du bloc.
   // Seul le préambule (fixtures, vert/rouge de base) se joue toujours. Sans la variable, tout se joue, comme avant.
   const filtre = creerFiltre("FORGE_CAS_SYNTHESE");
-  const veut = (...ids) => filtre.veut(...ids);
+  // Les cas S104 (TF-2273) vivent dans la section de S78, dont ils réutilisent la décision au format B : tout ce qui sert S78 sert S104 (ses définitions comprises).
+  const veut = (...ids) => filtre.veut(...(ids.includes(78) ? [...ids, 104, 2273] : ids));
   // TF-1494 (01/10/2026) : l'ouverture de la verte tient sur UNE ligne source, comme S54 l'exige ;
   // sa forme coupée d'origine, mot pour mot, est la fixture rouge de S54 (`OUVERTURE_COUPEE`).
   const verte = `# Restitution — campagne de test
@@ -7126,6 +7167,22 @@ Aucun écart : la demande a été suivie à la lettre.
     [rv, "S78", "SANS_OBJET", "la verte, dont la décision est en puce, devrait être déclarée hors de portée"],
   ]) if (constatDe(r, regle).statut !== statut)
     casse.push(`${regle} (format B, 17/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+  // TF-2273 (06/11/2026) — S104 DANS SES SENS. Rouge : « Pourquoi vous » donne une raison de confort, qu'aucun des six motifs de R-58 ne porte. Vert : la ligne d'origine (publication) et
+  // une ligne qui déclare un arbitrage. Le remède que le message prescrit — exécuter et rendre pour information, donc ne pas poser la décision — se joue : sans décision en citation, SANS_OBJET.
+  const POURQUOI_VOUS = "> - **Pourquoi vous** : publier hors du poste vous revient.";
+  const s104 = (ligne) => enFormatB.replace(POURQUOI_VOUS, ligne);
+  const r104confort = jouerPe("s104-confort.md", s104("> - **Pourquoi vous** : c'est plus simple de vous demander avant de continuer."));
+  const r104arbitrage = jouerPe("s104-arbitrage.md", s104("> - **Pourquoi vous** : c'est un arbitrage entre deux options que rien dans les données ne tranche."));
+  if (s104("x") === enFormatB) casse.push("S104 : l'ancre « Pourquoi vous » du format B n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r104confort, "FAIL", "« c'est plus simple de vous demander » (aucun motif de R-58) passe — le cas D-480 du 06/11"],
+    [r78b, "PASS", "la ligne d'origine (publication) est refusée"],
+    [r104arbitrage, "PASS", "une ligne qui déclare un arbitrage est refusée"],
+    [rv, "SANS_OBJET", "le remède (ne pas poser la décision : la verte n'en porte aucune en citation) devrait être déclaré hors de portée"],
+  ]) if (constatDe(r, "S104").statut !== statut)
+    casse.push(`S104 (TF-2273) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S104").message || "sortie illisible").slice(0, 200));
+  if (!/D-480|R-58/.test(String(constatDe(r104confort, "S104").message || "")) || !/pour information/.test(String(constatDe(r104confort, "S104").message || "")))
+    casse.push("S104 : le constat doit nommer R-58 et le remède (exécuter, rendre pour information) : " + String(constatDe(r104confort, "S104").message || "").slice(0, 200));
   }
   // 29/10 — S36 ET S38, LA CRITIQUE JOUABLE EN ACTION (TF-1981, récidive de TF-0775). Le cas réel du 26/10 : une page HTML livrée au bloc 4, la critique d'implémentation
   // forge-design laissée en A-1 `auto_ia` `hors_mandat`. (a) Rouge : la critique n'apparaît qu'en action exemptée — S36 FAIL (le mot n'est pas un verdict) ET S38 FAIL (une
