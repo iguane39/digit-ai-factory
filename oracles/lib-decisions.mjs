@@ -145,15 +145,23 @@ export function reformulerAuPilot({ n, question, fichier = REGISTRE_PILOT, sessi
 /** Tous les numéros D-N que le ledger d'un produit nomme, toutes entrées confondues (une décision posée ou répondue occupe son numéro). */
 export function numerosDuLedger(produit) {
   const fichier = join(produit, "forge", "ledger.jsonl");
+  const horsRun = join(produit, "forge", HORS_RUN_NOM);
   const numeros = new Set();
-  if (!existsSync(fichier)) return { fichier, existe: false, numeros, max: 0 };
-  for (const l of readFileSync(fichier, "utf8").split(/\r?\n/)) {
-    if (!l.trim()) continue;
-    let e; try { e = JSON.parse(l); } catch { continue; }
-    for (const m of JSON.stringify(e).matchAll(D_NUMERO)) numeros.add(String(Number(m[1])));
+  // TF-2223 : le journal hors run compte comme le ledger du run pour le prochain numéro et pour la preuve d'inscription.
+  const existe = existsSync(fichier) || existsSync(horsRun);
+  for (const f of [fichier, horsRun]) {
+    if (!existsSync(f)) continue;
+    for (const l of readFileSync(f, "utf8").split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      let e; try { e = JSON.parse(l); } catch { continue; }
+      for (const m of JSON.stringify(e).matchAll(D_NUMERO)) numeros.add(String(Number(m[1])));
+    }
   }
-  return { fichier, existe: true, numeros, max: [...numeros].reduce((m, n) => Math.max(m, Number(n)), 0) };
+  return { fichier, existe, numeros, max: [...numeros].reduce((m, n) => Math.max(m, Number(n)), 0) };
 }
+
+/** TF-2223 (RP-2, 06/11/2026) : le journal des entrées écrites hors run, à côté du ledger — `forge/ledger.py` l'écrit de la même façon. */
+export const HORS_RUN_NOM = "hors-run.jsonl";
 
 /**
  * Les décisions POSÉES au ledger d'un produit et SANS RÉPONSE NOMMÉE (TF-2214, 06/11/2026). Le 03/11/2026, D-48 (« Supprime-t-on le réseau vide créé en Europe du Nord ?
@@ -284,19 +292,35 @@ export function prochainChezProduit({ produit, plancher = 0 }) {
 export function reserverChezProduit({ produit, question, plancher = 0, racineParc, ecrivain = null }) {
   const q = controlerQuestion(question);
   if (!q.ok) throw new Error(q.raison);
-  const w = ecrivain || ecrivainDeLedger(produit, racineParc);
-  if (!w) throw new Error("écrivain du ledger introuvable : ni forge/ledger.py chez le produit, ni ledger.mjs de forge-agents sous la racine du parc (node bootstrap.mjs --pull dans le pilot)");
   const ledger = join(produit, "forge", "ledger.jsonl");
-  if (!existsSync(ledger)) throw new Error(`ledger du produit introuvable (${ledger}) : un produit ouvre son run avant de poser une décision`);
+  // TF-2223 : hors run (aucun ledger de run), la réservation s'inscrit au journal hors run, sans écrivain de ledger — ledger.mjs refuse
+  // d'ouvrir un journal autrement que par run_open. Le prochain lot de retours le compile.
+  const horsRun = !existsSync(ledger);
+  const w = horsRun ? null : (ecrivain || ecrivainDeLedger(produit, racineParc));
+  if (!horsRun && !w) throw new Error("écrivain du ledger introuvable : ni forge/ledger.py chez le produit, ni ledger.mjs de forge-agents sous la racine du parc (node bootstrap.mjs --pull dans le pilot)");
   const g = dossierGitCommun(produit);
   const fichierCommun = g.ok ? join(g.dossier, REGISTRE_COMMUN_NOM) : null;
-  const section = () => reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun });
+  const section = () => reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun, horsRun });
   // Le verrou du registre commun est pris EN PREMIER, celui du produit ensuite : toujours dans cet ordre, donc sans interblocage.
   const r = fichierCommun ? sousVerrou(fichierCommun + ".lock", section, VERROU_COMMUN) : section();
   return fichierCommun ? { ...r, registre_commun: fichierCommun } : { ...r, registre_commun: null, registre_commun_indisponible: g.raison };
 }
 
-function reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun }) {
+/** Une entrée au journal hors run, sous le verrou de `forge/ledger.py` (`<journal>.lock`) : seq après le plus grand déjà pris, ts non décroissant. */
+function ecrireHorsRun(produit, entree) {
+  const journal = join(produit, "forge", HORS_RUN_NOM);
+  return sousVerrou(journal + ".lock", () => {
+    const deja = existsSync(journal) ? readFileSync(journal, "utf8").split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l)) : [];
+    const seq = deja.reduce((m, x) => Math.max(m, x.seq || 0), 0) + 1;
+    let ts = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+    if (deja.length && ts < deja[deja.length - 1].ts) ts = deja[deja.length - 1].ts;
+    const brut = existsSync(journal) ? readFileSync(journal, "utf8") : "";
+    writeFileSync(journal, brut + (brut && !brut.endsWith("\n") ? "\n" : "") + JSON.stringify({ seq, ts, type: entree.type, hors_run: true, ...entree.champs }) + "\n", "utf8");
+    return journal;
+  });
+}
+
+function reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun, horsRun = false }) {
   // Verrou PROPRE à la réservation : ceux de `ledger.py` et de `ledger.mjs` (`<ledger>.lock`) sont pris par l'écrivain lui-même, dans la section qui suit.
   return sousVerrou(join(produit, "forge", "decisions.lock"), () => {
     const avant = numerosDuLedger(produit);
@@ -311,6 +335,12 @@ function reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun })
       appendFileSync(fichierCommun, (contenu && !contenu.endsWith("\n") ? "\n" : "") + JSON.stringify(entree) + "\n", "utf8");
     }
     let r;
+    if (horsRun) {
+      const journal = ecrireHorsRun(produit, { type: "question_humain", champs: { decisions_posees: decisions, reservee_par: "reserver-decision.mjs" } });
+      const apres = numerosDuLedger(produit);
+      if (!apres.numeros.has(String(n))) throw new Error(`${id} n'apparaît pas au journal hors run après l'écriture : l'inscription n'est pas prouvée`);
+      return { id, n, question: q.question, registre: journal, ecrit_par: "reserver-decision.mjs (journal hors run, aucun ledger de run)" };
+    }
     if (w.sorte === "python") {
       r = spawnSync("python", [w.chemin, "question_humain", "--decisions_posees", JSON.stringify(decisions), "--reservee_par", "reserver-decision.mjs"], { encoding: "utf8", env: { ...process.env, PYTHONUTF8: "1" }, cwd: produit });
     } else {

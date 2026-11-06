@@ -13,6 +13,9 @@
  *       Chez un produit, le prochain numéro se calcule sur l'UNION du ledger et du REGISTRE COMMUN DU POSTE (TF-1911, D-83 (a) du 26/10/2026) :
  *       `<git rev-parse --git-common-dir>/forge-decisions.jsonl`, partagé par tous les arbres de travail du même dépôt, jamais versionné ; la
  *       réservation s'y écrit sous verrou AVANT le ledger, qui reste la trace versionnée.
+ *       HORS RUN (TF-2223, 06/11/2026) : sans `forge/ledger.jsonl`, la réservation s'inscrit à `forge/hors-run.jsonl` (même entrée
+ *       `question_humain`, champ `hors_run: true`) au lieu d'échouer ; le journal compte pour le numéro suivant, avant comme après l'ouverture
+ *       d'un run, et le prochain lot de retours le compile (`python forge/ledger.py --hors-run` le liste).
  *   node scripts/reserver-decision.mjs --prochain          lecture seule : le prochain numéro libre, sans rien inscrire.
  *   node scripts/reserver-decision.mjs --verifier          lecture seule : les numéros pris deux fois pour des questions différentes.
  *   node scripts/reserver-decision.mjs --reformuler D-N --question "<la question réécrite ?>"   (pilot) la MÊME décision, reposée avec un libellé réécrit : elle garde son numéro.

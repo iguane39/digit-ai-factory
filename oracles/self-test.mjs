@@ -115,7 +115,9 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       // D-19 (a) (HERITAGE 1.29.0, 18/10/2026) : la flotte d'agents rappelée à chaque délégation.
       { matcher: "Agent|Task", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs flotte" }] }],
     // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
-    PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) }],
+    PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) },
+      // TF-2211 (HERITAGE 1.55.0, 06/11/2026) : les contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close.
+      { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs controles-produit" }] }],
     UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } })
     // TF-1903 (21/10/2026) : le lanceur s'appelle par un chemin ancré sur la racine du projet (R-43), comme au gabarit.
     .replace(/node forge\/hooks\/factory\.mjs/g, () => 'node \\"${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs\\"') + "\n");
@@ -1754,11 +1756,26 @@ check("verte-TODO-PRODUIT : générateur déterministe (2 exécutions = HTML ide
   // RV-9 (14/08) : `color-scheme` FIGÉ à « light dark » faisait peindre au navigateur ses propres
   // surfaces en sombre sur un corps clair. Il doit SUIVRE le thème effectif — donc porté par les
   // deux blocs de tokens, jamais figé dans un <meta>.
-  // (les commentaires HTML sont retirés d'abord : la page DOCUMENTE l'anti-pattern, elle ne le porte pas)
-  if (/<meta\s+name="color-scheme"/i.test(apres.replace(/<!--[\s\S]*?-->/g, "")))
-    throw new Error("color-scheme figé dans un <meta> — défaut relevé par RV-9 : il doit suivre le thème effectif");
-  if (!/:root\{color-scheme:light/.test(apres) || !/:root\[data-theme="dark"\]\{color-scheme:dark/.test(apres))
-    throw new Error("color-scheme absent des blocs de tokens — les surfaces du navigateur ne suivraient pas le thème (RV-9)");
+  // TF-2212 (06/11/2026) : la page dérive désormais du socle digit-ai-page-html, qui tient RV-9 par un autre idiome — un <meta
+  // name="color-scheme"> que le script d'amorçage RÉÉCRIT à chaque thème (`meta.setAttribute('content', theme)`). L'exigence reste
+  // celle de RV-9 (jamais figé à « light dark », toujours suivre le thème) ; les deux idiomes la tiennent, un troisième non.
+  // Écart déclaré au rapport de campagne : la lettre de ce contrôle (« jamais de <meta> », jetons seuls) change, son défaut ciblé non.
+  const erreurRV9 = (page) => {
+    const sansCommentaires = page.replace(/<!--[\s\S]*?-->/g, ""); // la page DOCUMENTE l'anti-pattern, elle ne le porte pas
+    const meta = sansCommentaires.match(/<meta\s+name="color-scheme"\s+content="([^"]*)"/i);
+    if (meta && /light\s+dark|dark\s+light/i.test(meta[1]))
+      return "color-scheme figé à « light dark » dans un <meta> — défaut relevé par RV-9 : il doit suivre le thème effectif";
+    const parJetons = /:root\{color-scheme:light/.test(sansCommentaires) && /:root\[data-theme="dark"\]\{color-scheme:dark/.test(sansCommentaires);
+    const parScript = Boolean(meta) && /meta\.setAttribute\('content',\s*theme\)/.test(sansCommentaires);
+    return parJetons || parScript ? null : "color-scheme ne suit pas le thème (ni blocs de tokens, ni <meta> réécrit par le script) — les surfaces du navigateur ne suivraient pas le thème (RV-9)";
+  };
+  { const e = erreurRV9(apres); if (e) throw new Error(e); }
+  { // le même contrôle sait refuser : meta figé « light dark », et page sans aucun suivi du thème
+    const figee = apres.replace(/(<meta\s+name="color-scheme"\s+content=")[^"]*"/i, '$1light dark"');
+    if (figee === apres || !erreurRV9(figee)) throw new Error("contrôle RV-9 sans effet : un <meta> figé à « light dark » passe");
+    const sansSuivi = apres.replace("meta.setAttribute('content', theme)", "void 0");
+    if (sansSuivi === apres || !erreurRV9(sansSuivi)) throw new Error("contrôle RV-9 sans effet : une page qui ne réécrit plus le <meta> passe");
+  }
   // volet ÉCRITURE refusé par le verdict O3 : la page ne doit porter AUCUNE surface de saisie
   if (/<(input|textarea|form|button[^>]*type="submit")/i.test(apres.replace(/<button id="theme-toggle"[\s\S]*?<\/button>/, "")))
     throw new Error("surface de saisie dans une page déclarée en lecture seule — la moitié ÉCRITURE est refusée en l'état (LLM01)");
@@ -3132,6 +3149,65 @@ check("R-61 bis remède joué (TF-1013) : consigner les deux verdicts PASS lève
     const { exit, f } = juge61b(d, "2026-11-19");
     if (exit !== 0 || !f.some((x) => x.statut === "PASS" && !/AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
   } finally { rmSync(d, { recursive: true, force: true }); }
+});
+// ---- R-61 bis, volet campagne forge-tests (TF-2207, RP-27, décision R-58 du 06/11/2026) : un `run_close` « prêt » ne se pose pas sur
+// un forge-tests PARTIEL non motivé. Refus DÈS le 06/11/2026 (pas de période d'avertissement), alors que les deux contrôles d'usage
+// avertissent jusqu'au 18/11. Fixtures à double sens : PARTIEL nu (rouge), PARTIEL motivé (vert), PASS (vert), graphie `forge_tests --json` en
+// tableau `oracles[]` (rouge), pan `forge-tests:parcours-personas` PARTIEL (hors volet), antériorité, remède joué.
+const r61cCampagne = (verdict, plus = {}, seq = 4) => ({ seq, ts: "2026-11-06T09:30:00Z", type: "oracles_verdict", oracle: "forge-tests", verdict, ...plus });
+const R61C_USAGE = () => [R61B_PARCOURS(), R61B_EXPLOIT()];
+const MOTIF_PARTIEL = "pans api et mobile sans adaptateur : produit backend-only, 7 pans non jouables, couverture des 4 parcours tenue";
+check("R-61 bis forge-tests : PARTIEL sans motif → FAIL dès le 2026-11-06, le constat nomme la campagne et le champ motif_partiel (TF-2207)", () => {
+  const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne("PARTIEL"), r61bCloture("2026-11-06T13:00:00Z")]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-06");
+    if (exit !== 1 || !f.some((x) => x.statut === "FAIL" && /campagne forge-tests \(seq 4\) est PARTIELLE sans motif/.test(x.message) && /motif_partiel/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests : PARTIEL motivé (motif_partiel ou motif de 20 caractères) → PASS qui le dit, PASS → PASS (TF-2207)", () => {
+  for (const [verdict, plus, attendu] of [["PARTIEL", { motif_partiel: MOTIF_PARTIEL }, /forge-tests PARTIEL motivée/], ["PARTIEL", { motif: MOTIF_PARTIEL }, /motivée/], ["PASS", {}, /forge-tests PASS/]]) {
+    const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne(verdict, plus), r61bCloture("2026-11-06T13:00:00Z")]);
+    try {
+      const { exit, f } = juge61b(d, "2026-11-06");
+      if (exit !== 0 || !f.some((x) => x.statut === "PASS" && attendu.test(x.message))) throw new Error(`${verdict} ${JSON.stringify(plus).slice(0, 40)} : ${JSON.stringify({ exit, f })}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  }
+});
+check("R-61 bis forge-tests : un motif trop court (« ok ») ne motive pas, un PARTIEL du pan parcours-personas n'est pas une campagne (TF-2207)", () => {
+  const court = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne("PARTIEL", { motif_partiel: "ok" }), r61bCloture("2026-11-06T13:00:00Z")]);
+  const pan = projet61b([R61B_OUVERTURE, R61B_EXPLOIT(), r61bVerdict("forge-tests:parcours-personas", "PARTIEL", 2), r61bCloture("2026-11-06T13:00:00Z")]);
+  try {
+    if (juge61b(court, "2026-11-06").exit !== 1) throw new Error("un motif de 2 caractères a motivé le PARTIEL");
+    const { f } = juge61b(pan, "2026-11-06");
+    if (f.some((x) => /campagne forge-tests/.test(x.message))) throw new Error(`le pan parcours-personas a été pris pour la campagne : ${JSON.stringify(f)}`);
+  } finally { rmSync(court, { recursive: true, force: true }); rmSync(pan, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests : la graphie du parc `forge_tests --json` en tableau oracles[] est lue (ledger du run d'août), et --declarer-pret refuse avant l'écriture (TF-2207)", () => {
+  const tableau = { seq: 4, ts: "2026-11-06T09:30:00Z", type: "oracles_verdict", etape: "tests", oracles: [{ oracle: "forge_tests --json", verdict: "PARTIEL", exit: 3, detail: "7 pans sans adaptateur" }] };
+  const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), tableau]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-06", "--declarer-pret");
+    if (exit !== 1 || !f.some((x) => x.statut === "FAIL" && /PARTIELLE sans motif/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests : antériorité — un run déclaré prêt le 2026-11-05 avec un PARTIEL nu n'est pas refusé par ce volet (la règle entre le 06/11)", () => {
+  const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), { ...r61cCampagne("PARTIEL"), ts: "2026-11-05T09:30:00Z" }, r61bCloture("2026-11-05T13:00:00Z")]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-10");
+    if (exit !== 0 || f.some((x) => /campagne forge-tests/.test(x.message) && x.statut === "FAIL")) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests remède joué (TF-1013) : consigner le motif, ou un PASS plus tard, lève le refus", () => {
+  const base61c = [R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne("PARTIEL"), r61bCloture("2026-11-06T13:00:00Z")];
+  for (const ajout of [r61cCampagne("PARTIEL", { motif_partiel: MOTIF_PARTIEL }, 5), r61cCampagne("PASS", {}, 5)]) {
+    const d = projet61b(base61c);
+    try {
+      if (juge61b(d, "2026-11-06").exit !== 1) throw new Error("le cas de départ n'est pas rouge");
+      appendFileSync(join(d, "forge", "ledger.jsonl"), JSON.stringify(ajout) + "\n", "utf8");
+      const { exit, f } = juge61b(d, "2026-11-06");
+      if (exit !== 0 || !f.some((x) => x.statut === "PASS")) throw new Error(`${ajout.verdict} : ${JSON.stringify({ exit, f })}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  }
 });
 check("R-61 bis : --aujourd-hui invalide → ERREUR exit 2, rien n'est jugé", () => {
   const d = projet61b([R61B_OUVERTURE, r61bCloture()]);

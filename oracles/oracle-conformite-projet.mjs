@@ -2907,8 +2907,36 @@ else {
           if (verdict === "PASS") verts.push(`${c.nom} PASS (seq ${dernier.seq ?? "?"})`);
           else manques.push({ c, texte: dernier ? `${c.nom} (${c.forge}) : dernier verdict ${verdict || "sans verdict"} (seq ${dernier.seq ?? "?"}), seul PASS est vert` : `${c.nom} (${c.forge}) : aucun verdict au ledger de ce run` });
         }
-        if (!manques.length) {
-          ok("R-61 bis", ou, `run déclaré prêt avec ses deux contrôles d'usage verts au ledger : ${verts.join(" · ")} (jour lu : ${aujourdhui})`);
+        // TF-2207 (RP-27, lot Produit-86 20261105e ; décision R-58 du 06/11/2026) — LA CAMPAGNE forge-tests EN VERDICT PARTIEL DOIT ÊTRE
+        // MOTIVÉE. Chez ce produit, trois `run_close` « prêt » (seq 371, 418, 521) avaient été écrits sur un forge-tests PARTIEL, dont 27
+        // exigences sur 127 citées par un test de bout en bout : ETAPES-RUN.md accepte l'exit 3 en demandant de « consigner les pans non
+        // couverts », ce que rien ne vérifiait. Le DERNIER verdict de la campagne (oracle `forge-tests`, `forge_tests`, hors ses pans
+        // `forge-tests:<pan>`) du run est lu : PARTIEL sans `motif` (ou `motif_partiel`) d'au moins 20 caractères refuse la déclaration
+        // DÈS L'ENTRÉE de cette règle (06/11/2026), sans la période d'avertissement des deux contrôles d'usage ; un PASS consigné ensuite
+        // ou un motif consigné par une entrée de plus (même oracle, même verdict PARTIEL) lève le refus. Aucun verdict de campagne au
+        // ledger : rien d'accusé ici (R-61 bis juge l'usage, pas la présence de l'audit).
+        const ENTREE_R61C = "2026-11-06";
+        const nomCampagne = (o) => String(o ?? "").trim().split(/[\s(]/)[0].split(/[\\/]/).pop().replace(/\.(?:mjs|cjs|js|py)$/i, "").toLowerCase();
+        const campagnes = [];
+        for (const e of segment) {
+          if (e.type !== "oracles_verdict") continue;
+          if (/^forge[-_]tests$/.test(nomCampagne(e.oracle))) campagnes.push(e);
+          for (const o of Array.isArray(e.oracles) ? e.oracles : []) {
+            if (/^forge[-_]tests$/.test(nomCampagne(o?.oracle))) campagnes.push({ ...e, ...o });
+          }
+        }
+        const derniereCampagne = campagnes.length ? campagnes[campagnes.length - 1] : null;
+        const motifPartiel = derniereCampagne ? String(derniereCampagne.motif_partiel ?? derniereCampagne.motif ?? "").trim() : "";
+        const partielNonMotive = Boolean(derniereCampagne) && declareLe >= ENTREE_R61C
+          && String(derniereCampagne.verdict ?? "").trim().toUpperCase() === "PARTIEL" && motifPartiel.length < 20;
+        const refusPartiel = partielNonMotive
+          ? `la campagne forge-tests (seq ${derniereCampagne.seq ?? "?"}) est PARTIELLE sans motif : consigner par une entrée de plus (oracles_verdict, oracle forge-tests, verdict PARTIEL) un champ \`motif_partiel\` qui nomme les pans non couverts et pourquoi l'état est acceptable à la clôture (≥ 20 caractères), ou rejouer la campagne jusqu'à PASS. Mesuré le 05/11/2026 chez Produit-86 : trois run_close « prêt » sur PARTIEL, 27 exigences sur 127 citées par un test de bout en bout (RP-27, TF-2207)`
+          : null;
+        if (!manques.length && !refusPartiel) {
+          ok("R-61 bis", ou, `run déclaré prêt avec ses deux contrôles d'usage verts au ledger : ${verts.join(" · ")}${derniereCampagne ? ` · campagne forge-tests ${String(derniereCampagne.verdict ?? "").toUpperCase() || "sans verdict"}${/PARTIEL/i.test(String(derniereCampagne.verdict ?? "")) ? " motivée" : ""} (seq ${derniereCampagne.seq ?? "?"})` : ""} (jour lu : ${aujourdhui})`);
+        } else if (refusPartiel) {
+          const usage = manques.length ? ` Par ailleurs : ${manques.map((m) => m.texte).join(" ; ")} (avertissement jusqu'au 18/11/2026 inclus, bloquant ensuite).` : "";
+          ko("R-61 bis", ou, `« prêt pour la production » refusé : ${refusPartiel}.${usage} Jour lu : ${aujourdhui}`);
         } else {
           const bloquant = aujourdhui >= BLOCAGE_R61B;
           const gestes = manques.map((m) => `${m.c.nom} : ${m.c.geste}`).join(" ; ");
@@ -2955,6 +2983,7 @@ const nonJuge = [
   "R-60 (TF-1678) : la moitié STRUCTURELLE du test rétro est jugée, par oracle-cascade-isto rejoué sur la source avec le référentiel d'exigences ; la VÉRITÉ de l'intention et la pertinence d'un rattachement restent humaines (I2 exige la trace de la ratification, jamais sa justesse). La vue CASCADE.md n'est pas confrontée à sa source ici : son générateur le fait (`--verifier`). La date d'entrée se lit au PREMIER run_open du ledger : un produit sans run_open daté est tenu pour antérieur, et c'est un faux négatif déclaré",
   "R-35 bis (TF-1915) : une promesse de cadence se reconnaît à un VOCABULAIRE fermé — un mot de cadence (chaque semaine, quotidien, every week, daily…) à moins de 60 caractères d'un participe de mise à jour non daté (mis à jour, relevé, actualisé, updated…) — dans les textes servis et les seuls COMMENTAIRES des scripts ; une promesse dite autrement n'est pas vue, une description du monde dite ainsi est signalée. Le rapprochement est TEXTUEL : un script est porté si un porteur planifié le nomme ; une page l'est si l'un de ses producteurs (scripts qui nomment son fichier) l'est, ou, sans producteur repérable, dès qu'un porteur existe. Une planification hors dépôt (serveur, interface d'une CI) n'est vue que DÉCLARÉE (`porteur-cadence:`) ; que le porteur tourne vraiment, et à la cadence promise, n'est pas jugé (M-7 de l'étape MEP)",
   "R-61 bis (TF-2124) : la PRÉSENCE et le verdict des deux contrôles au ledger du dernier run sont jugés, pas leur justesse — un `parcours-personas` PASS dit qu'un parcours de bout en bout CITE chaque persona déclaré (pan statique, il ne joue aucun parcours), un `oracle-exploitabilite` PASS dit qu'une cible a été jugée, ni qu'elle était l'instance servie et alimentée ni que la revue humaine des captures a eu lieu ; l'ORDRE des entrées par rapport au `run_close` n'est pas jugé (un verdict consigné après coup lève le refus) ; un produit sans persona ni écran (pan NA, cible SKIP) n'a pas d'exemption : la décision D-166 (a) dit « verts »",
+  "R-61 bis (TF-2207) : un verdict PARTIEL de la campagne forge-tests est tenu pour MOTIVÉ dès qu'un champ `motif_partiel` (ou `motif`) de 20 caractères au moins l'accompagne — la JUSTESSE du motif et le fait qu'il nomme réellement les pans non couverts ne sont pas jugés (relecture humaine) ; l'oracle ne voit que le dernier verdict de la campagne nommée `forge-tests` ou `forge_tests` (ses pans `forge-tests:<pan>` sont d'autres contrôles), et une campagne absente du ledger n'est pas accusée ; le refus vaut dès le 06/11/2026, sans période d'avertissement, parce que la décision dit « refusé »",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
