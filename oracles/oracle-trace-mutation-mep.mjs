@@ -68,7 +68,15 @@
  *   TM14 le dossier porte la section « Revue de code » : jouée, avec son rapport, ses constats et ses
  *        jetons ; ou proposée puis refusée ; ou non proposée, motivée (M-19, D-162 (a) du 03/11/2026,
  *        ETAPE-MEP.md § 1 quater). AVERTISSEMENT, sans passage en blocage à poser : forge-websec ne
- *        bloque jamais une mise en production.
+ *        bloque jamais une mise en production ;
+ *   TM15 le dossier porte la section « Réglages de plateforme » : chaque réglage du registre
+ *        `references\REGLAGES-SURS-PAR-DEFAUT.json` que le produit emploie, avec son état lu daté et son
+ *        verdict, un écart accepté nommant sa décision ; ou « Aucun réglage de plateforme : <motif> »
+ *        (M-21, D-178 (a) du 06/11/2026, TF-2233, ETAPE-MEP.md § 3 quaterdecies). AVERTISSEMENT ;
+ *   TM16 le dossier porte la section « Version servie et inventaire » : le commit lu par
+ *        `version-servie.mjs lire`, le verdict d'O-26 et celui d'O-27 de forge-ops (M-22, TF-2243). Absente
+ *        ou incomplète : AVERTISSEMENT. Un FAIL d'O-26 ou d'O-27 porté par le dossier : FAIL, puisque la
+ *        décision de TF-2243 fait de ce FAIL un refus de la porte « prêt ».
  *
  * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
  * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
@@ -338,6 +346,66 @@ function confronterRevue(texte) {
     + "Une mention n'est pas un état.");
 }
 
+/**
+ * TM15 et TM16 — ce que le dossier a LU en vrai avant le GO (M-21 et M-22, D-178 (a) et TF-2243, 06/11/2026).
+ * Même forme que TM14 : une section par titre, le silence est le défaut, AVERTISSEMENT pour une règle neuve ;
+ * TM16 refuse seulement un dossier qui porte lui-même un FAIL d'O-26 ou d'O-27, parce que la décision de
+ * TF-2243 fait de ce FAIL un refus de la porte « prêt ».
+ */
+const TITRE_REGLAGES = /^(#{1,4})\s*R[ée]glages de plateforme\s*$/im;
+const TITRE_VERSION = /^(#{1,4})\s*Version servie et inventaire\s*$/im;
+function sectionDe(texte, titre) {
+  const m = titre.exec(texte);
+  if (!m) return null;
+  const suite = texte.slice(m.index + m[0].length);
+  const fin = suite.search(new RegExp(`^#{1,${m[1].length}}\\s`, "m"));
+  return fin < 0 ? suite : suite.slice(0, fin);
+}
+const avertirNeuve = (message) => ({ statut: "AVERTISSEMENT", message: "règle neuve du 06/11/2026, non bloquante — " + message });
+const DATE_LUE = /\b20\d{2}-\d{2}-\d{2}\b|\b\d{1,2}\/\d{1,2}\/20\d{2}\b/;
+function confronterReglages(texte) {
+  const section = sectionDe(texte, TITRE_REGLAGES);
+  if (section === null) return avertirNeuve("le dossier n'a pas de section « Réglages de plateforme ». Depuis D-178 (a), chaque réglage "
+    + "du registre que le produit emploie y figure avec son état lu, sa date et son verdict, ou « Aucun réglage de plateforme : <motif> » "
+    + "(ETAPE-MEP.md § 3 quaterdecies, R-66)");
+  if (/aucun r[ée]glage de plateforme\s*:\s*\S.{8,}/i.test(section)) return { statut: "PASS", message: "aucun réglage de plateforme, motivé au dossier" };
+  const lignes = section.split(/\r?\n/).filter((l) => /^\s*\|/.test(l));
+  const separateur = (l) => /^\s*\|?[\s:|-]+\|[\s:|-]*$/.test(l) && /-{2,}/.test(l);
+  const lignesDonnees = lignes.filter((l, i) => !separateur(l) && !(lignes[i + 1] && separateur(lignes[i + 1])));
+  if (!lignesDonnees.length) return avertirNeuve("la section « Réglages de plateforme » ne porte aucune ligne : une ligne par réglage lu "
+    + "(réglage, classement, état lu, date, attendu, verdict ou décision)");
+  const defauts = [];
+  for (const l of lignesDonnees) {
+    const nom = (l.split("|")[1] || "?").trim().slice(0, 40);
+    if (!DATE_LUE.test(l)) defauts.push(`« ${nom} » : état lu non daté`);
+    else if (/non lu/i.test(l)) defauts.push(`« ${nom} » : réglage non lu, donc non vérifié`);
+    else if (!/conforme|[ée]cart/i.test(l)) defauts.push(`« ${nom} » : ni « conforme » ni « écart » au verdict`);
+    else if (/[ée]cart/i.test(l) && !/\bD-\d+\b|d[ée]cision du porteur du \d/i.test(l)) defauts.push(`« ${nom} » : écart sans décision nommée (écart nu)`);
+  }
+  return defauts.length
+    ? avertirNeuve(`${defauts.length} ligne(s) de réglage incomplète(s) — ${defauts.slice(0, 3).join(" ; ")}${defauts.length > 3 ? " ; …" : ""}`)
+    : { statut: "PASS", message: `${lignesDonnees.length} réglage(s) de plateforme lu(s), datés, chacun avec son verdict` };
+}
+function confronterVersionServie(texte) {
+  const section = sectionDe(texte, TITRE_VERSION);
+  if (section === null) return avertirNeuve("le dossier n'a pas de section « Version servie et inventaire ». Depuis TF-2243, il cite la sortie de "
+    + "`version-servie.mjs lire`, le verdict d'O-26 et celui d'O-27, ou « Sans objet : <motif> » (ETAPE-MEP.md § 3 quaterdecies, M-22)");
+  if (/sans objet\s*:\s*\S.{8,}/i.test(section)) return { statut: "PASS", message: "version servie et inventaire sans objet, motivés au dossier" };
+  const dernier = (n) => { const re = new RegExp(`O-?${n}\\b[^\\n]*?\\b(PASS|FAIL|SKIP)\\b`, "g"); let v = null, m; while ((m = re.exec(section)) !== null) v = m[1]; return v; };
+  const o26 = dernier(26), o27 = dernier(27);
+  const refus = [o26 === "FAIL" ? "O-26" : null, o27 === "FAIL" ? "O-27" : null].filter(Boolean);
+  if (refus.length) return { statut: "FAIL", message: `le dossier porte un FAIL de ${refus.join(" et ")} : la porte « prêt » le refuse (TF-2243). `
+    + "Corriger (version servie ou inventaire des composants), rejouer, puis écrire le nouveau verdict" };
+  const manque = [];
+  if (!/\b(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b/.test(section)) manque.push("le commit lu par `version-servie.mjs lire`");
+  if (!o26) manque.push("le verdict d'O-26");
+  if (!o27) manque.push("le verdict d'O-27");
+  if (manque.length) return avertirNeuve(`la section « Version servie et inventaire » ne porte pas ${manque.join(", ")}`);
+  return o27 === "SKIP"
+    ? avertirNeuve("O-27 rend SKIP : aucune sortie d'état n'a été donnée, l'inventaire des composants n'est pas comparé aux ressources réelles")
+    : { statut: "PASS", message: `version servie lue (O-26 ${o26}) et inventaire confronté aux sorties d'état (O-27 ${o27})` };
+}
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -448,6 +516,15 @@ export function juger(racine) {
     const rv = confronterRevue(texte);
     findings.push({ regle: "TM14", statut: rv.statut, ou: chemin, message: rv.message });
   }
+  // TM15 et TM16 — une fois par dossier : les réglages de plateforme lus, la version servie et l'inventaire.
+  for (const chemin of dossiers) {
+    let texte;
+    try { texte = readFileSync(chemin, "utf8"); } catch { continue; }
+    const rg = confronterReglages(texte);
+    findings.push({ regle: "TM15", statut: rg.statut, ou: chemin, message: rg.message });
+    const vs = confronterVersionServie(texte);
+    findings.push({ regle: "TM16", statut: vs.statut, ou: chemin, message: vs.message });
+  }
   return findings;
 }
 
@@ -478,6 +555,10 @@ const NON_JUGE = [
   "le CONTENU d'un rapport de revue de code (TM14) : la règle lit la section du dossier, ni le rapport, ni le "
   + "marqueur forge\\revue-de-code-derniere.json, ni le compte des commits depuis la dernière revue ; la vérité "
   + "des statuts recopiés n'est pas jugée, et TM14 AVERTIT sans bloquer",
+  "la VÉRITÉ des réglages de plateforme recopiés au dossier (TM15) et des verdicts d'O-26 et d'O-27 (TM16) : la règle lit les "
+  + "sections du dossier, elle ne rejoue ni la commande de lecture du registre, ni la lecture de la version servie, ni la "
+  + "confrontation de l'inventaire ; que le dossier cite tous les réglages des plateformes que le produit emploie n'est pas jugé "
+  + "non plus, faute de savoir lesquelles il emploie. TM15 avertit sans bloquer, TM16 ne bloque que le FAIL que le dossier porte lui-même",
   "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
   + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
 ];
@@ -767,6 +848,55 @@ function selfTest() {
     if (r.status !== 0) casse.push("un dossier muet sur la revue de code fait sortir l'oracle en échec — TM14 devait AVERTIR, forge-websec ne bloque jamais une MEP");
   }
 
+  // ---- TM15 et TM16 : CE QUE LE DOSSIER A LU EN VRAI AVANT LE GO (M-21, M-22 ; D-178 (a), TF-2233, TF-2243) ----
+  // Le cas fondateur de TM15 : l'étude du 06/11/2026 ne trouve aucun des 8 réglages dans ETAPE-MEP.md. Celui de
+  // TM16 : un dossier de MEP citait deux commits servis, reconstitués, et un inventaire resté au texte du premier
+  // commit pendant trois déploiements (mesures rapportées par forge-ops, TF-2201 et TF-2209).
+  const TABLE = "| Réglage | Classement | État lu | Lu le | Attendu | Verdict ou décision |\n|---|---|---|---|---|---|\n";
+  const REGLAGES = (lignes) => `${DOSSIER_OK}\n## Réglages de plateforme\n\nRegistre lu le 2026-11-06.\n\n${TABLE}${lignes}\n`;
+  const L_DEFAUT = "| Supabase, TLS imposé | defaut | true | 2026-11-06 | true | conforme |\n";
+  const L_DECISION = "| Supabase, double vérification des membres | decision | 2 membres sur 3 | 2026-11-06 | true pour chaque membre | écart accepté, D-123 du 2026-11-02 |\n";
+  attendre("tm15-muet", produit("tm15-muet", DOSSIER_OK, MARQUEUR), "TM15", "AVERTISSEMENT");
+  attendre("tm15-conforme", produit("tm15-conforme", REGLAGES(L_DEFAUT + L_DECISION), MARQUEUR), "TM15", "PASS");
+  attendre("tm15-ecart-nu", produit("tm15-ecart-nu", REGLAGES(L_DEFAUT + L_DECISION.replace(", D-123 du 2026-11-02", "")), MARQUEUR), "TM15", "AVERTISSEMENT");
+  attendre("tm15-non-lu", produit("tm15-non-lu", REGLAGES(L_DEFAUT.replace("| true | 2026-11-06 | true | conforme |", "| non lu | 2026-11-06 | true | non lu |")), MARQUEUR), "TM15", "AVERTISSEMENT");
+  attendre("tm15-sans-date", produit("tm15-sans-date", REGLAGES(L_DEFAUT.replace("2026-11-06 ", "")), MARQUEUR), "TM15", "AVERTISSEMENT");
+  attendre("tm15-sans-ligne", produit("tm15-sans-ligne", REGLAGES(""), MARQUEUR), "TM15", "AVERTISSEMENT");
+  attendre("tm15-aucun", produit("tm15-aucun", `${DOSSIER_OK}\n## Réglages de plateforme\n\nAucun réglage de plateforme : produit local, aucun compte chez Supabase, GitHub ni Cloudflare.\n`, MARQUEUR), "TM15", "PASS");
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm15-ecart-nu")], { encoding: "utf8" });
+    if (r.status !== 0) casse.push("un écart de réglage sans décision nommée fait sortir l'oracle en échec — TM15 devait AVERTIR, règle neuve du 06/11/2026");
+  }
+  const VERSION = (corps) => `${DOSSIER_OK}\n## Version servie et inventaire\n\n${corps}\n`;
+  const LU = "Version servie : commit 6f78b88 lu le 2026-11-06 par `version-servie.mjs lire`.\n";
+  attendre("tm16-muet", produit("tm16-muet", DOSSIER_OK, MARQUEUR), "TM16", "AVERTISSEMENT");
+  attendre("tm16-ok", produit("tm16-ok", VERSION(`${LU}O-26 : PASS\nO-27 : PASS`), MARQUEUR), "TM16", "PASS");
+  attendre("tm16-fail-o27", produit("tm16-fail-o27", VERSION(`${LU}O-26 : PASS\nO-27 : FAIL, composant présent non inventorié`), MARQUEUR), "TM16", "FAIL");
+  attendre("tm16-fail-o26", produit("tm16-fail-o26", VERSION(`${LU}O-26 : FAIL, commit servi absent du dépôt\nO-27 : PASS`), MARQUEUR), "TM16", "FAIL");
+  attendre("tm16-rejoue", produit("tm16-rejoue", VERSION(`${LU}O-26 : PASS\nO-27 : FAIL le 2026-11-05, composant non inventorié\nO-27 : PASS, rejoué le 2026-11-06 après mise à jour de l'inventaire`), MARQUEUR), "TM16", "PASS");
+  attendre("tm16-sans-o27", produit("tm16-sans-o27", VERSION(`${LU}O-26 : PASS`), MARQUEUR), "TM16", "AVERTISSEMENT");
+  attendre("tm16-skip-o27", produit("tm16-skip-o27", VERSION(`${LU}O-26 : PASS\nO-27 : SKIP, aucune sortie d'état donnée`), MARQUEUR), "TM16", "AVERTISSEMENT");
+  attendre("tm16-sans-commit", produit("tm16-sans-commit", VERSION("O-26 : PASS\nO-27 : PASS"), MARQUEUR), "TM16", "AVERTISSEMENT");
+  attendre("tm16-sans-objet", produit("tm16-sans-objet", VERSION("Sans objet : produit statique servi par fichiers, aucun point de santé."), MARQUEUR), "TM16", "PASS");
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm16-fail-o27")], { encoding: "utf8" });
+    if (r.status !== 1) casse.push("un dossier qui porte un FAIL d'O-27 ne sort pas en 1 — la porte « prêt » devait le refuser (TF-2243)");
+    const m = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm16-muet")], { encoding: "utf8" });
+    if (m.status !== 0) casse.push("un dossier muet sur la version servie fait sortir l'oracle en échec — TM16 devait AVERTIR");
+  }
+  // Le remède que la doctrine prescrit se joue : les deux formes écrites à ETAPE-MEP.md § 3 quaterdecies passent leur oracle.
+  {
+    const etape = join(dirname(fileURLToPath(import.meta.url)), "..", "ETAPE-MEP.md");
+    const doc = existsSync(etape) ? readFileSync(etape, "utf8").replace(/\r\n/g, "\n") : "";
+    const forme = (titre) => { const m = new RegExp("```\\n(## " + titre + "\\n[\\s\\S]*?)```").exec(doc); return m ? m[1] : null; };
+    const fReglages = forme("Réglages de plateforme"), fVersion = forme("Version servie et inventaire");
+    if (!fReglages || !fVersion) casse.push("ETAPE-MEP.md ne porte pas la forme du dossier pour « Réglages de plateforme » et « Version servie et inventaire »");
+    else {
+      attendre("tm15-forme-doctrine", produit("tm15-forme-doctrine", `${DOSSIER_OK}\n${fReglages}`, MARQUEUR), "TM15", "PASS");
+      attendre("tm16-forme-doctrine", produit("tm16-forme-doctrine", `${DOSSIER_OK}\n${fVersion}`, MARQUEUR), "TM16", "PASS");
+    }
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -776,7 +906,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 49/49 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 70/70 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -802,7 +932,13 @@ function selfTest() {
       + "TM13 ne bloquent PAS, code de sortie 0 vérifié ; TM14 dossier muet sur la revue de code AVERTISSEMENT — le "
       + "cas fondateur du 03/11/2026 ; TM14 revue jouée avec rapport, constats et jetons PASS ; TM14 revue proposée "
       + "et refusée PASS ; TM14 revue jouée sans preuve AVERTISSEMENT ; TM14 section sans état, preuve placée hors "
-      + "section AVERTISSEMENT ; TM14 ne bloque PAS, code de sortie 0 vérifié)");
+      + "section AVERTISSEMENT ; TM14 ne bloque PAS, code de sortie 0 vérifié ; TM15 dossier muet sur les réglages de plateforme "
+      + "AVERTISSEMENT — le cas fondateur du 06/11/2026 ; TM15 réglages lus, datés, écart accepté avec sa décision PASS ; TM15 écart "
+      + "sans décision, réglage non lu, ligne sans date, section sans ligne AVERTISSEMENT ×4 ; TM15 « Aucun réglage de plateforme » "
+      + "motivé PASS ; TM15 ne bloque PAS, code de sortie 0 vérifié ; TM16 dossier muet sur la version servie AVERTISSEMENT ; "
+      + "TM16 commit lu, O-26 et O-27 PASS ; TM16 FAIL d'O-26 ou d'O-27 porté par le dossier FAIL, code de sortie 1 vérifié ; "
+      + "TM16 O-27 rejoué PASS après un FAIL, le dernier verdict compte ; TM16 O-27 absent, SKIP, commit absent AVERTISSEMENT ×3 ; "
+      + "TM16 « Sans objet » motivé PASS ; TM16 muet ne bloque PAS ; les deux formes écrites à ETAPE-MEP.md passent TM15 et TM16)");
   return casse.length ? 1 : 0;
 }
 
