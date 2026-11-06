@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.66.0",
- "date": "2026-11-05",
+ "version": "1.67.0",
+ "date": "2026-11-06",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -3285,6 +3285,140 @@
    ],
    "regle": "Proposition de Produit-86 (lot 20261105a) : pilot : forge/ledger.py ne sait pas écrire le champ run d'un run_open",
    "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2174 — porteur à outiller"
+  },
+  {
+   "cle": "version-servie-illisible",
+   "famille": "contrat-interface-forge",
+   "libelle": "L'instance servie ne dit pas quel commit elle sert : la session doit le reconstituer Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2201"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105b) : forge-ops : version servie illisible",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2201 — porteur à outiller"
+  },
+  {
+   "cle": "note-de-relecteur-integree-sans-recompte",
+   "famille": "regle-morte",
+   "libelle": "Une affirmation d'un relecteur entre dans une correction sans avoir été vérifiée à la source Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2202"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105b) : prompt-analyzer-l99, mode boucle : note de relecteur non recomptée, rejet par régression qui livre une passe aux majeurs connus",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2202 — porteur à outiller"
+  },
+  {
+   "cle": "decision-remplacee-sans-retrait-de-ses-artefacts",
+   "famille": "restitution-forme",
+   "libelle": "Une décision humaine en remplace une autre sans que soit retiré ce que la première avait créé Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2206",
+    "TF-2210"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105d) : décision humaine qui en remplace une autre sans retirer ce que la première a créé",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2206 — porteur à outiller"
+  },
+  {
+   "cle": "inventaire-de-composants-sans-controle-de-fraicheur",
+   "famille": "regle-morte",
+   "libelle": "L'inventaire des composants existe mais aucun oracle ne le compare aux ressources réelles Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2209"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : COMPOSANTS-OPS figé depuis le premier commit malgré TF-1113 : R-20 ne juge pas la fraîcheur",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2209 — porteur à outiller"
+  },
+  {
+   "cle": "controle-produit-sans-accroche-de-run",
+   "famille": "hook-ou-gate",
+   "libelle": "Un produit ne peut pas faire rejouer ses propres contrôles à chaque run Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2211"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : contrôle du produit sans accroche possible à l'ouverture et à la clôture des runs",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2211 — porteur à outiller"
+  },
+  {
+   "cle": "page-generee-par-le-pilot-hors-oracles",
+   "famille": "page-html-socle",
+   "libelle": "Une page générée par le pilot échoue aux oracles qu'il impose aux produits Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2212"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : generer-todo-produit.mjs : page TODO-PRODUIT en échec à run-oracles-design (7/11)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2212 — porteur à outiller"
+  },
+  {
+   "cle": "journal-de-hook-dans-l-arbre-du-produit",
+   "famille": "hook-ou-gate",
+   "libelle": "Un hook de la factory écrit son journal dans l'arbre de travail d'un produit Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2213",
+    "TF-2215"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : hook des rappels de leçons : journal écrit dans l'arbre du produit, lu comme secret par son balayage",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2213 — porteur à outiller"
+  },
+  {
+   "cle": "decision-ouverte-perdue-entre-deux-runs",
+   "famille": "restitution-forme",
+   "libelle": "Une décision posée à l'humain disparaît des restitutions suivantes sans avoir reçu de réponse Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2214"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105f) : décision posée puis jamais rappelée : D-48 perdue entre deux runs",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2214 — porteur à outiller"
+  },
+  {
+   "cle": "assertion-de-test-executee-zero-fois",
+   "famille": "regle-morte",
+   "libelle": "Un test passe sans avoir exécuté son assertion : boucle sur zéro élément ou attente expirée en silence Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2216"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105g) : tests de bout en bout verts sans rien vérifier : boucle exécutée zéro fois, attente qui expire sans échouer",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2216 — porteur à outiller"
+  },
+  {
+   "cle": "interrupteur-d-arret-sans-oracle-en-course",
+   "famille": "regle-morte",
+   "libelle": "Un interrupteur d'arrêt n'est prouvé qu'au repos, jamais pendant une action en cours Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2217"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105g) : arrêt d'urgence jamais rejoué en course par un oracle : job démarré 0,3 s après l'arrêt de sa mission",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents-security) à la clôture de TF-2217 — porteur à outiller"
+  },
+  {
+   "cle": "go-humain-exige-pour-un-geste-local-reversible",
+   "famille": "hook-ou-gate",
+   "libelle": "Un geste local et réversible, nécessaire à la demande en cours, est soumis au GO humain comme une mise en production Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2218"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105g) : GO humain exigé pour redéployer la préproduction locale, réversible, dont dépend la demande en cours",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2218 — porteur à outiller"
+  },
+  {
+   "cle": "livrable-exige-hors-perimetre-de-la-demande",
+   "famille": "hook-ou-gate",
+   "libelle": "Un vérificateur exige qu'un livrable soit réécrit alors que la demande ne le touche pas Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2221"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105h) : mobiliser --verifier exige tokens.css pour une évolution qui n'ajoute aucun jeton",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2221 — porteur à outiller"
   }
  ],
  "cliquet_porteur": {
