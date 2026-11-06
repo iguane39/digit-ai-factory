@@ -904,17 +904,22 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   mkdirSync(join(racine, "produit-factice", "forge"), { recursive: true });
   writeFileSync(join(racine, "produit-factice", "forge", "ledger.jsonl"), "", "utf8");
   const liberer = join(dossier, "liberer");
+  // TF-2234 (06/11/2026) : le factice doit survivre aux 3 ouvertures jouées avant sa libération. À 120 s, il mourait sous la charge
+  // (une ouverture à 96 s le 06/11) : la vérification coupée n'écrivait aucun rouge, et 2 cas tombaient avec le minutage.
+  // Sa vie se dérive du délai d'une ouverture : seule une ouverture coupée, qui échoue sous son propre nom, peut encore l'épuiser.
+  const DELAI_OUVERTURE = 240000;
+  const VIE_FACTICE = 3 * DELAI_OUVERTURE + 60000;
   writeFileSync(join(depot, "attendre.mjs"), [
     'import { existsSync } from "node:fs";',
     `const L = ${JSON.stringify(liberer)};`,
-    "const fin = Date.now() + 120000;",
+    `const fin = Date.now() + ${VIE_FACTICE};`,
     "while (!existsSync(L) && Date.now() < fin) await new Promise((r) => setTimeout(r, 200));",
     'console.log(existsSync(L) ? "[FAIL] rouge-du-rejeu-factice" : "[FAIL] jamais-libere");',
     "process.exit(1);",
   ].join(NL) + NL, "utf8");
   const tablePath = join(dossier, "table-recette.json");
   writeFileSync(tablePath, JSON.stringify({ mesure_le: "2026-11-02", consommateurs: [{ depot: "faux-depot-long", skills: ["digit-ai-page-html"],
-    verification: { commande: ["node", "attendre.mjs"], delai_ms: 120000, extracteur: { nom: "banc", motif: "^\\s*\\[FAIL\\]\\s+(.+?)\\s*$", drapeaux: "gm", groupe: 1 } } }] }), "utf8");
+    verification: { commande: ["node", "attendre.mjs"], delai_ms: VIE_FACTICE, extracteur: { nom: "banc", motif: "^\\s*\\[FAIL\\]\\s+(.+?)\\s*$", drapeaux: "gm", groupe: 1 } } }] }), "utf8");
   const trace = join(dossier, "consommateurs-rouges.jsonl");
   const etatPath = join(dossier, "rejeu-hebdomadaire.json");
   const verrouPath = join(dossier, "rejeu-hebdomadaire.verrou");
@@ -926,7 +931,7 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   const jouerRejeu = (extra = {}, enProduit = false) => {
     const t0 = Date.now();
     const out = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
-      { cwd, encoding: "utf8", timeout: 120000, env: { ...base, ...extra } });
+      { cwd, encoding: "utf8", timeout: DELAI_OUVERTURE, env: { ...base, ...extra } });
     return { out, ms: Date.now() - t0 };
   };
   const LANCE = { FORGE_SANS_REJEU_HEBDOMADAIRE: undefined };
@@ -947,9 +952,11 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
     });
     const msLancement = Number((/lancement en (\d+) ms/.exec(lance.out) || [])[1]);
     console.log(`  (mesure : ouverture sans lancement ${temoin.ms} ms, avec lancement ${lance.ms} ms, appel de lancement ${msLancement} ms ; rejeu factice encore en cours au retour)`);
-    check("D-135 — 0 seconde de plus à attendre : le lancement lui-même prend moins de 2 s et l'ouverture avec lancement ne dépasse pas l'ouverture sans lui de plus de 5 s", () => {
+    // TF-2234 (06/11/2026) : l'écart entre 2 ouvertures complètes mesurait la charge du poste, pas le lancement (96 s contre 47 s un passage,
+    // 40 s contre 52 s le suivant). Le coût se juge sur l'appel de lancement, mesuré dans le hook ; l'attente, sur le factice encore bloqué au retour
+    // (cas rouge ci-dessus) : une ouverture qui l'attendrait serait coupée à DELAI_OUVERTURE, bien avant VIE_FACTICE. L'écart reste affiché, pour information.
+    check("D-135 — 0 seconde de plus à attendre : le lancement lui-même prend moins de 2 s, mesuré dans le hook", () => {
       if (!(msLancement < 2000)) throw new Error(`appel de lancement : ${msLancement} ms`);
-      if (lance.ms - temoin.ms > 5000) throw new Error(`ouverture avec lancement ${lance.ms} ms contre ${temoin.ms} ms sans`);
     });
 
     const debut = lire(etatPath)?.dernier?.debut;
@@ -967,7 +974,8 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
     rmSync(autre, { recursive: true, force: true });
 
     writeFileSync(liberer, "1", "utf8");
-    const fini = attendreQue(() => lire(etatPath)?.dernier?.statut === "termine", 60000);
+    console.log(`  (mesure : rejeu factice libéré ${Date.now() - Date.parse(debut)} ms après son début, pour une vie de ${VIE_FACTICE} ms ; 120 000 ms avant TF-2234)`);
+    const fini =attendreQue(() => lire(etatPath)?.dernier?.statut === "termine", 60000);
     const etat = lire(etatPath);
     check("D-135 — le rejeu écrit sa date de début et de fin à côté de la trace, retire son verrou, et trace le rouge neuf avec son origine", () => {
       if (!fini) throw new Error(`rejeu non terminé : ${JSON.stringify(etat)}`);
