@@ -184,8 +184,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 91,
-  "vu_le": "2026-11-02"
+  "cas": 100,
+  "vu_le": "2026-11-06"
  },
  "oracle-empreintes.mjs": {
   "cas": 13,
@@ -475,8 +475,8 @@
   "vu_le": "2026-11-03"
  },
  "oracles/lib-enumeration-liste.test.mjs": {
-  "cas": 29,
-  "vu_le": "2026-10-18"
+  "cas": 39,
+  "vu_le": "2026-11-06"
  },
  "oracles/lib-exhaustivite.test.mjs": {
   "cas": 85,
@@ -675,8 +675,8 @@
   "vu_le": "2026-11-05"
  },
  "scripts/mobiliser.test.mjs": {
-  "cas": 22,
-  "vu_le": "2026-11-05"
+  "cas": 29,
+  "vu_le": "2026-11-06"
  },
  "scripts/nettoyer-copies.test.mjs": {
   "cas": 12,
