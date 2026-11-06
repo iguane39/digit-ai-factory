@@ -318,10 +318,20 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "retours"))) {
 // lot ; aucune ouverture ni fin de tour ne l'avait dit, et leurs cinq classes n'étaient pas au référentiel du pilot. Une
 // entrée qu'aucun lot de `forge/retours/` ne cite par son seq, vieille de plus de 24 h, est nommée ; une classe que le
 // référentiel du pilot ne connaît pas l'est aussi. Lecture seule : rien n'est écrit au ledger ni au lot.
-if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ledger.jsonl"))) {
+// TF-2260 (06/11/2026) : le journal hors run (`forge/hors-run.jsonl`, où `ledger.py` écrit quand aucun run n'est ouvert, TF-2223) compte aussi ; il a sa
+// section, parce que son `seq` repart de 1 et ne se confond pas avec celui du ledger du run.
+if (iPilot >= 0 && (existsSync(join(process.cwd(), "forge", "ledger.jsonl")) || existsSync(join(process.cwd(), "forge", "hors-run.jsonl")))) {
   try {
     const { retoursSansLot, SEUIL_H } = await import(pathToFileURL(join(ICI, "lib-retours-produit.mjs")).href);
-    const sans = retoursSansLot(process.cwd(), PILOT);
+    const tous = retoursSansLot(process.cwd(), PILOT);
+    const sans = tous ? tous.filter((r) => !r.horsRun) : tous;
+    const sansHorsRun = tous ? tous.filter((r) => r.horsRun) : [];
+    if (sansHorsRun.length) {
+      const plusVieuxHr = Math.max(0, ...sansHorsRun.map((r) => r.jours ?? 0));
+      lignes.push("", `## Retours du journal hors run restés sans lot, plus de ${SEUIL_H} h (TF-2260)`,
+        `- **${sansHorsRun.length} entrée(s) \`type: retour\`** de \`forge/hors-run.jsonl\` (inscrites hors run, TF-2223) qu'aucun lot de \`forge/retours/\` ne cite : hors-run seq ${sansHorsRun.slice(0, 12).map((r) => r.seq).join(", ")}${sansHorsRun.length > 12 ? ", …" : ""} (la plus ancienne : ${plusVieuxHr} j). `
+        + "Les compiler en lot `<projet> - RETOURS - …` avec son sidecar (gabarits/RETOURS-FORGES.md) et les y citer par un segment qui nomme le journal, terminé par « ; » : `forge/hors-run.jsonl seq 1, 2` (leur seq n'est pas celui du ledger du run).");
+    }
     if (sans && sans.length) {
       const inconnues = sans.filter((r) => r.classeInconnue);
       const plusVieux = Math.max(0, ...sans.map((r) => r.jours ?? 0));
@@ -493,12 +503,14 @@ if (iPilot < 0) {
         for (const l of j.lignes || []) {
           if (!l.dossier) continue;
           const s = retoursSansLot(l.dossier, PILOT);
-          if (s && s.length) parProduit.push({ produit: l.produit, n: s.length, inconnues: s.filter((x) => x.classeInconnue).length, plusVieux: Math.max(0, ...s.map((x) => x.jours ?? 0)) });
+          // TF-2260 : les retours du journal hors run (`forge/hors-run.jsonl`) se comptent avec ceux du ledger, et se disent à part.
+          if (s && s.length) parProduit.push({ produit: l.produit, n: s.length, horsRun: s.filter((x) => x.horsRun).length, inconnues: s.filter((x) => x.classeInconnue).length, plusVieux: Math.max(0, ...s.map((x) => x.jours ?? 0)) });
         }
         const total = parProduit.reduce((t, p) => t + p.n, 0);
+        const totalHr = parProduit.reduce((t, p) => t + p.horsRun, 0);
         lignes.push("", `## Retours du ledger restés sans lot chez les produits, plus de ${SEUIL_H} h (TF-1988)`,
-          !total ? "- aucun." : `- ${total} entrée(s) \`type: retour\` chez ${parProduit.length} produit(s), qu'aucun lot de leur \`forge/retours/\` ne cite.`,
-          ...parProduit.slice(0, 8).map((p) => `  - ${p.produit} : ${p.n} sans lot, la plus ancienne de ${p.plusVieux} j${p.inconnues ? `, dont ${p.inconnues} à classe inconnue du référentiel` : ""} — nommé à sa prochaine ouverture`));
+          !total ? "- aucun." : `- ${total} entrée(s) \`type: retour\` chez ${parProduit.length} produit(s)${totalHr ? ` (dont ${totalHr} du journal hors run, TF-2260)` : ""}, qu'aucun lot de leur \`forge/retours/\` ne cite.`,
+          ...parProduit.slice(0, 8).map((p) => `  - ${p.produit} : ${p.n} sans lot${p.horsRun ? ` (dont ${p.horsRun} hors run)` : ""}, la plus ancienne de ${p.plusVieux} j${p.inconnues ? `, dont ${p.inconnues} à classe inconnue du référentiel` : ""} — nommé à sa prochaine ouverture`));
       } catch (e) { lignes.push(`- retours du ledger sans lot chez les produits : NON comptés (${String(e.message).slice(0, 160)})`); }
 
       // TF-1521 (02/10/2026) — LE REJEU D'UN DÉPLACEMENT EN ATTENTE N'ÉTAIT CÂBLÉ NULLE PART. La

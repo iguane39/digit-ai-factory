@@ -8,6 +8,7 @@
 
 - **Contexte** : <clôture du run <run-id> | inspection production v<X> | incident | autre>
 - **Références ledger** : `forge\ledger.jsonl` seq <n, n…> (entrées `type: retour`)
+- **Références hors run** (si des retours ont été écrits sans run ouvert) : `forge/hors-run.jsonl` seq <n, n…> (entrées `type: retour`, TF-2260). Le seq du journal hors run repart de 1 : le segment nomme le journal et se termine par « ; » ou la fin de ligne, sinon l'ouverture du produit ne sait pas lequel des deux journaux le lot a compilé.
 - **Remise au pilot** : copier ce fichier (et son sidecar) dans le SAS
   `<pilot>\input\00-retours\_arrivee\` (ignoré par git), jamais à la racine de `input\00-retours\` :
   le pilot l'y dépose lui-même après pseudonymisation (`todo\accueillir-lot.mjs`, TF-0981) ; un lot
