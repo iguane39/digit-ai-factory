@@ -51,7 +51,7 @@
   "vu_le": "2026-11-06"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 44,
+  "cas": 45,
   "vu_le": "2026-11-06"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
