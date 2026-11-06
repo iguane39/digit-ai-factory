@@ -73,10 +73,13 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
 | `Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` | fichier | 199,3 Ko | Étude — Compétences OpenAI et Gemini dans la Factory |
+| `Digit-AI - Étude - Cout et qualite de la boucle L99 - 20261106b.md` | fichier | 24,3 Ko | Coût et qualité de la boucle L99 : pourquoi elle ne s'arrête jamais où elle le dit, et ce  |
 | `Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` | fichier | 13,0 Ko | Étude d'opportunité — Étape de revue de code par un seul agent — 20261103k |
 | `Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` | fichier | 25,3 Ko | Étude d'opportunité — huit outils de motion design pour la Factory — 20261102t |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
 | `Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` | fichier | 36,8 Ko | Étude d'opportunité — Plateforme de pentest autorisé automatisé (CDC v1.1) : adoption par  |
+| `Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` | fichier | 19,2 Ko | JSON |
+| `Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` | fichier | 98,4 Ko | Étude — Sécurité par défaut de bout en bout — 20261106a |
 | `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,7 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
 | `Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` | fichier | 23,0 Ko | Étude d'opportunité — Suivi des temps et des coûts par produit — 20261105a |
@@ -110,4 +113,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_91 fichier(s), 2 sous-dossier(s)_
+_94 fichier(s), 2 sous-dossier(s)_

@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 660 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 663 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -254,10 +254,13 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md | 20261103l | 199.3 Ko | `03-etudes/Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` |
+| Digit-AI - Étude - Cout et qualite de la boucle L99 - 20261106b.md | 20261106b | 24.3 Ko | `03-etudes/Digit-AI - Étude - Cout et qualite de la boucle L99 - 20261106b.md` |
 | Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md | 20261103k | 13 Ko | `03-etudes/Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` |
 | Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md | 20261102t | 25.3 Ko | `03-etudes/Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
+| Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
+| Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md | 20261106a | 98.4 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` |
 | Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
 | Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md | 20261030a | 14.2 Ko | `03-etudes/Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` |
 | Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md | 20261105a | 23 Ko | `03-etudes/Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` |
