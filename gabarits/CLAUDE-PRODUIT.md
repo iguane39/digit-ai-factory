@@ -22,7 +22,7 @@ Avant « livré », chaque forge mobilisée a ses livrables (S85, `--verifier`).
 - Tests : forge_tests, `--sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` ; jamais « tests OK » sur un pytest direct.
 - Audit du produit : forge-audit (`init-audit-workspace`, `forge\audit\<AAAAMMJJ>`) ; jamais forge_tests.
 - Évolution : retour au ledger, puis run de version ; jamais de code livré hors run.
-- Déploiement : étape MEP par la chaîne du produit, GO humain sur `forge\DOSSIER-MEP.md` ; jamais lancé d'un poste.
+- Déploiement : étape MEP par la chaîne du produit, GO humain sur `forge\DOSSIER-MEP.md`, sauf préprod locale (TF-2218) ; jamais lancé d'un poste.
 - Détail des routes, demandes entre produits : `<PILOT_ROOT>\references\CLAUDE-PRODUIT-DETAIL.md`.
 
 **Retours et noms.** Une friction forge se consigne au ledger au moment même (`type: retour`, 4 réponses du test de
