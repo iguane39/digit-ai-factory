@@ -435,6 +435,56 @@ try {
     const a = lancer(ancien, ["--verifier"], null, ENV_CLIENT);
     att(a.code === 0 && a.sortie.verdict === "PRESENT", `demande tracée avant le 05/11 : non rétroactif : exit ${a.code} ${a.brut.slice(0, 300)}`);
   });
+
+  // TF-2264 (RT-55 de Produit-84, 06/11/2026) : le verdict de format d'un livrable se cherche sous DEUX motifs de la carte
+  // (`output/**/*.oracles.json`, puis `.oracles/output/**/*.oracles.json`). Le premier motif qui trouvait un fichier gagnait, si ancien soit-il :
+  // l'ancien verdict de `output/02-fiches-securite` (30/10) masquait le verdict frais que run-oracles venait d'écrire sous `.oracles/output/`.
+  check("rouge → vert — TF-2264 : un livrable à deux motifs retient le fichier le plus récent des DEUX, pas celui du premier motif qui répond", () => {
+    const d = produit("deux-motifs");
+    const v = verdictsSansRien(); v.design = { verdict: "mobilisee", motif: "document à la marque, verdict de format attendu (1 note)" };
+    deposer(d, "output/02-fiches-securite/ancien.md.oracles.json", 6 * JOUR); // 1er motif, écrit avant la demande
+    att(lancer(d, ["--type", "document", "--verdicts", ecrireVerdicts(d, v), "--demande", "rédiger la note à la marque"]).code === 0, "écriture de la trace");
+    const avant = lancer(d, ["--verifier"]);
+    att(avant.code === 1 && /périmé/.test(avant.sortie.manquants[0] || ""), `le verdict d'avant la demande doit manquer, périmé : exit ${avant.code} ${avant.brut.slice(0, 300)}`);
+    const recent = deposer(d, ".oracles/output/03-prompts/note.md.oracles.json"); // 2e motif, écrit après la demande
+    const r = lancer(d, ["--verifier"]);
+    att(r.code === 0 && r.sortie.verdict === "PRESENT" && r.sortie.exiges[0].trouve === recent, `le verdict frais du 2e motif doit compter : exit ${r.code} ${r.brut.slice(0, 400)}`);
+    const ancienEcrit = join(d, "output", "02-fiches-securite", "ancien.md.oracles.json");
+    const sens = lancer(d, ["--verifier"]);
+    att(existsSync(ancienEcrit) && sens.sortie.exiges[0].trouve !== ancienEcrit, "le fichier retenu est l'ancien du 1er motif");
+  });
+
+  // TF-2277 (RP-50 de Produit-86, 06/11/2026) : déclarer un livrable inchangé exige une NOUVELLE ligne --verdicts (TF-2221), et cette ligne portait
+  // une nouvelle heure de demande : les livrables produits depuis la demande d'origine devenaient périmés (2 manques devenaient 3 autres). Une ligne
+  // qui amende la MÊME demande — même session, même type, même texte de demande — garde l'heure de la première de la suite.
+  const demande2277 = "poser le composant sur les jetons existants";
+  const motif2277 = "le composant utilise les jetons existants, aucun jeton ajouté ni modifié";
+  check("rouge → vert — TF-2277 : la ligne qui amende la même demande garde l'heure de la première, les livrables produits depuis restent frais", () => {
+    const d = produit("amende-meme-demande");
+    deposerDesign(d); // jetons : écrits il y a 3 jours, inchangés par la demande
+    att(lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsDesign()), "--demande", demande2277], "sess-A").code === 0, "1re ligne");
+    deposer(d, "forge/etapes/design/DESIGN.md"); // produit APRÈS la 1re ligne, AVANT l'amendement
+    const w = lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsDesign({ jetons: motif2277 })), "--demande", demande2277], "sess-A");
+    att(w.code === 0, `amendement : exit ${w.code} ${w.brut.slice(0, 300)}`);
+    const lignes = trace(d);
+    att(lignes.length === 2 && Date.parse(lignes[1].ts) > Date.parse(lignes[0].ts), "deux lignes attendues, la seconde plus tardive");
+    const r = lancer(d, ["--verifier"], "sess-A"); // sans réécrire DESIGN.md : c'était le contournement imposé
+    att(r.code === 0 && r.sortie.verdict === "PRESENT", `le DESIGN.md produit entre les deux lignes doit rester frais : exit ${r.code} ${r.brut.slice(0, 400)}`);
+    att(r.sortie.derniere_demande.depuis === lignes[0].ts && r.sortie.derniere_demande.ts === lignes[1].ts, `la sortie doit dire l'heure d'origine : ${JSON.stringify(r.sortie.derniere_demande)}`);
+  });
+  check("TF-2277 bornes — une autre demande, une autre session ou une demande sans texte repartent de LEUR heure : le livrable d'avant reste périmé", () => {
+    for (const [nom, seconde, session2] of [["autre-texte", "retoucher le libellé du bouton", "sess-A"], ["autre-session", demande2277, "sess-B"], ["sans-texte", null, "sess-A"]]) {
+      const d = produit(`amende-${nom}`);
+      deposerDesign(d);
+      att(lancer(d, ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsDesign()), "--demande", demande2277], "sess-A").code === 0, `${nom} : 1re ligne`);
+      deposer(d, "forge/etapes/design/DESIGN.md");
+      const args = ["--type", "evolution", "--verdicts", ecrireVerdicts(d, verdictsDesign({ jetons: motif2277 }))];
+      att(lancer(d, seconde ? [...args, "--demande", seconde] : args, session2).code === 0, `${nom} : 2e ligne`);
+      const r = lancer(d, ["--verifier"], session2);
+      att(r.code === 1 && r.sortie.manquants.length === 1 && /DESIGN|design/.test(r.sortie.manquants[0]) && /périmé/.test(r.sortie.manquants[0]), `${nom} : le DESIGN.md d'avant la nouvelle demande doit rester périmé : exit ${r.code} ${r.brut.slice(0, 400)}`);
+      att(!r.sortie.derniere_demande.depuis, `${nom} : aucune heure d'origine ne doit être reprise : ${JSON.stringify(r.sortie.derniere_demande)}`);
+    }
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }

@@ -62,6 +62,9 @@ import { confronterSensRouge, verdictSensRouge, SEUIL_I6_BLOQUANT } from "./lib-
 import { creerGarde } from "./lib-garde-arbre-suivi.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
+// TF-2256 (06/11/2026) : les recettes qui filtrent leurs cas par une variable `FORGE_CAS_*` (lib-filtre-cas.mjs) se jouent ICI en entier. Une variable
+// restée dans l'environnement de la session rendrait chacune PARTIELLE sans que ce total le dise : le total d'un dépôt ne se mesure jamais sur une sélection.
+for (const k of Object.keys(process.env)) if (k.startsWith("FORGE_CAS_")) delete process.env[k];
 // I7 (TF-1690, 14/10/2026) — UNE RECETTE N'ÉCRIT PAS DANS L'ARBRE SUIVI. Chaque recette se joue sous
 // une garde qui relève les fichiers suivis avant et après elle ; un écart nomme la recette et les
 // chemins (motif et limites : `lib-garde-arbre-suivi.mjs`). Le cas : deux recettes réécrivaient à chaque

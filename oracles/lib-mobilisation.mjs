@@ -347,6 +347,16 @@ export function derniereDemande(produit, session = null) {
     else derniere = null;
   }
   const autres = session ? lues.filter((o) => o.session && o.session !== session).length : 0;
+  // TF-2277 (06/11/2026) : déclarer un livrable inchangé exige une NOUVELLE ligne (TF-2221), qui portait une nouvelle heure de demande : les livrables
+  // produits depuis la demande d'origine devenaient périmés. Une ligne qui amende la MÊME demande (même session, même type, même texte non vide) garde
+  // l'heure de la première de la suite consécutive : `depuis`. Une autre demande, une autre session ou une demande sans texte repartent de leur heure.
+  if (derniere) {
+    const pool = !session ? lues : (lues.filter((o) => o.session === session).length ? lues.filter((o) => o.session === session) : lues.filter((o) => !o.session));
+    const norme = (o) => String(o.demande || "").toLowerCase().replace(/\s+/g, " ").trim();
+    let i = pool.lastIndexOf(derniere), origine = derniere;
+    while (i > 0 && norme(derniere) && pool[i - 1].session === derniere.session && pool[i - 1].type === derniere.type && norme(pool[i - 1]) === norme(derniere)) { i -= 1; origine = pool[i]; }
+    if (origine !== derniere && origine.ts) derniere = { ...derniere, depuis: origine.ts };
+  }
   return { existe: true, chemin, lignes, illisibles, derniere, session: session || null, repli, autres_sessions: autres };
 }
 
@@ -513,12 +523,15 @@ function etatPorteClient(produit, std, seuil) {
  * checkout` la réinitialise, aussi un livrable produit dans le tour la porte bien, c'est le cas visé.
  */
 export function etatDesLivrables(produit, carte, ligne) {
-  const seuil = ligne && ligne.ts ? Date.parse(ligne.ts) : NaN;
+  // TF-2277 : une ligne qui amende la même demande porte `depuis`, l'heure de la première de la suite ; c'est elle qui date la demande.
+  const seuil = ligne && (ligne.depuis || ligne.ts) ? Date.parse(ligne.depuis || ligne.ts) : NaN;
   const etats = [];
   for (const { forge, livrables } of livrablesExiges(carte, ligne)) for (const id of livrables) {
     const l = (carte.livrables || {})[id] || { libelle: id, chemins: [] };
-    let trouve = null;
-    for (const c of l.chemins || []) { trouve = trouver(produit, c); if (trouve) break; }
+    // TF-2264 (06/11/2026) : tous les motifs du livrable sont parcourus, le fichier le plus récent des DEUX gagne. Le premier motif qui répondait
+    // masquait un fichier frais du second (verdict de format : `output/**` ancien, `.oracles/output/**` frais) et la fraîcheur se jugeait sur l'ancien.
+    let trouve = null, hTrouve = -1;
+    for (const c of l.chemins || []) { const t = trouver(produit, c); if (!t) continue; const h = heureDe(t); if (!trouve || h >= hTrouve) { trouve = t; hTrouve = h; } }
     let frais = true, ecritLe = null;
     if (trouve && Number.isFinite(seuil)) {
       try { ecritLe = statSync(trouve).mtimeMs; frais = ecritLe >= seuil; } catch { frais = false; }

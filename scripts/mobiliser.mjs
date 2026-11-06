@@ -68,9 +68,9 @@ if (args.includes("--verifier")) {
   const { etats, manquants } = etatDesLivrables(produit, carte, d);
   sortie({ outil: OUTIL, verdict: manquants.length ? "MANQUE" : "PRESENT", session: trace.session, repli: trace.repli,
     ...(trace.repli ? { repli_dit: REPLI_DIT[trace.repli] } : {}),
-    derniere_demande: { ts: d.ts, type: d.type, demande: d.demande ?? null, session: d.session ?? null },
+    derniere_demande: { ts: d.ts, depuis: d.depuis ?? null, type: d.type, demande: d.demande ?? null, session: d.session ?? null },
     exiges: etats.map((e) => ({ forge: e.forge, livrable: e.libelle, present: e.present, trouve: e.trouve, perime: e.perime, inchange: e.inchange, ecrit_le: e.ecrit_le, chemins: e.chemins })),
-    manquants: manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})${m.perime ? ` — périmé : ${m.trouve} écrit le ${m.ecrit_le}, avant la demande (${d.ts})` : ""}`),
+    manquants: manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})${m.perime ? ` — périmé : ${m.trouve} écrit le ${m.ecrit_le}, avant la demande (${d.depuis || d.ts})` : ""}`),
     remede: manquants.length ? "produire chaque livrable manquant, écarter avec son motif la forge qui n'a pas servi, ou déclarer inchangé — avec son motif — un livrable que la demande ne touche pas (livrables_inchanges de la forge), dans une nouvelle ligne de trace (--verdicts)" : null }, manquants.length ? 1 : 0);
 }
 
