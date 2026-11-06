@@ -1754,11 +1754,26 @@ check("verte-TODO-PRODUIT : générateur déterministe (2 exécutions = HTML ide
   // RV-9 (14/08) : `color-scheme` FIGÉ à « light dark » faisait peindre au navigateur ses propres
   // surfaces en sombre sur un corps clair. Il doit SUIVRE le thème effectif — donc porté par les
   // deux blocs de tokens, jamais figé dans un <meta>.
-  // (les commentaires HTML sont retirés d'abord : la page DOCUMENTE l'anti-pattern, elle ne le porte pas)
-  if (/<meta\s+name="color-scheme"/i.test(apres.replace(/<!--[\s\S]*?-->/g, "")))
-    throw new Error("color-scheme figé dans un <meta> — défaut relevé par RV-9 : il doit suivre le thème effectif");
-  if (!/:root\{color-scheme:light/.test(apres) || !/:root\[data-theme="dark"\]\{color-scheme:dark/.test(apres))
-    throw new Error("color-scheme absent des blocs de tokens — les surfaces du navigateur ne suivraient pas le thème (RV-9)");
+  // TF-2212 (06/11/2026) : la page dérive désormais du socle digit-ai-page-html, qui tient RV-9 par un autre idiome — un <meta
+  // name="color-scheme"> que le script d'amorçage RÉÉCRIT à chaque thème (`meta.setAttribute('content', theme)`). L'exigence reste
+  // celle de RV-9 (jamais figé à « light dark », toujours suivre le thème) ; les deux idiomes la tiennent, un troisième non.
+  // Écart déclaré au rapport de campagne : la lettre de ce contrôle (« jamais de <meta> », jetons seuls) change, son défaut ciblé non.
+  const erreurRV9 = (page) => {
+    const sansCommentaires = page.replace(/<!--[\s\S]*?-->/g, ""); // la page DOCUMENTE l'anti-pattern, elle ne le porte pas
+    const meta = sansCommentaires.match(/<meta\s+name="color-scheme"\s+content="([^"]*)"/i);
+    if (meta && /light\s+dark|dark\s+light/i.test(meta[1]))
+      return "color-scheme figé à « light dark » dans un <meta> — défaut relevé par RV-9 : il doit suivre le thème effectif";
+    const parJetons = /:root\{color-scheme:light/.test(sansCommentaires) && /:root\[data-theme="dark"\]\{color-scheme:dark/.test(sansCommentaires);
+    const parScript = Boolean(meta) && /meta\.setAttribute\('content',\s*theme\)/.test(sansCommentaires);
+    return parJetons || parScript ? null : "color-scheme ne suit pas le thème (ni blocs de tokens, ni <meta> réécrit par le script) — les surfaces du navigateur ne suivraient pas le thème (RV-9)";
+  };
+  { const e = erreurRV9(apres); if (e) throw new Error(e); }
+  { // le même contrôle sait refuser : meta figé « light dark », et page sans aucun suivi du thème
+    const figee = apres.replace(/(<meta\s+name="color-scheme"\s+content=")[^"]*"/i, '$1light dark"');
+    if (figee === apres || !erreurRV9(figee)) throw new Error("contrôle RV-9 sans effet : un <meta> figé à « light dark » passe");
+    const sansSuivi = apres.replace("meta.setAttribute('content', theme)", "void 0");
+    if (sansSuivi === apres || !erreurRV9(sansSuivi)) throw new Error("contrôle RV-9 sans effet : une page qui ne réécrit plus le <meta> passe");
+  }
   // volet ÉCRITURE refusé par le verdict O3 : la page ne doit porter AUCUNE surface de saisie
   if (/<(input|textarea|form|button[^>]*type="submit")/i.test(apres.replace(/<button id="theme-toggle"[\s\S]*?<\/button>/, "")))
     throw new Error("surface de saisie dans une page déclarée en lecture seule — la moitié ÉCRITURE est refusée en l'état (LLM01)");
