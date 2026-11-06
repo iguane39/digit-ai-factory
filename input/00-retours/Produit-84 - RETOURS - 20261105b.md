@@ -34,7 +34,7 @@ Items recoupés : TF-2136.
 ## Remarques restées au produit
 
 - La trace de mobilisation a été écrite après le travail. C'est une erreur de la session, et le contrôle la refuse à juste titre. Généralisable : non.
-- La porte du client contredit forge-audit sur 4 points. Ces contradictions relèvent du projet commun du client, et lui ont été remontées par son propre canal (lot `CDC_ControlDeCostes - RETOURS - 20261105a`, branche de retours du dépôt du projet commun). Généralisable : non pour la Factory.
+- La porte du client contredit forge-audit sur 4 points. Ces contradictions relèvent du projet commun du client, et lui ont été remontées par son propre canal (lot `Produit-84 - RETOURS - 20261105a` du projet commun, branche de retours du dépôt du projet commun). Généralisable : non pour la Factory.
 
 ## Retours sur les documents produits
 
