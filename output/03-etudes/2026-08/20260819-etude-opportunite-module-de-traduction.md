@@ -86,7 +86,7 @@ navigateur et bascule manuelle, **sans préfixe d'URL** : toutes les routes exis
 les locales, et le repli sert du français. Le pan est donc **structurellement aveugle** à ce trou.
 
 C'est la forme dominante du parc : sur 22 projets Client-A, trois portent un catalogue de chaînes —
-**Approval, Produit-01, GalaxyWeb** — et aucun n'est un site à locales préfixées comme
+**Approval, Produit-01, Produit-81** — et aucun n'est un site à locales préfixées comme
 `produit-07`, le produit sur lequel le pan i18n a été conçu.
 
 **Le paramétrage, en revanche, est sain** : 27 paramètres au catalogue français (`{{nom}}` ×12,
@@ -95,7 +95,7 @@ six locales. Un contrôle posé maintenant **maintient** un état propre au lieu
 dette — c'est le moment le moins cher pour l'écrire.
 
 **Limite déclarée** : mesure sur un produit, celui qui déclare le plus de langues. Les catalogues
-d'Produit-01 et de GalaxyWeb n'ont pas été comptés.
+d'Produit-01 et de Produit-81 n'ont pas été comptés.
 
 ## 3 ter. Ce qui est jugeable, et ce qui ne l'est pas
 
