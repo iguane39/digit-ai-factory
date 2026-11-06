@@ -915,6 +915,46 @@ try {
     const c = executer(["--preparer", "consigne", "--fichier", F2.ordinaire, "--transcript", TRSEC, "--sortie", join(T, "sortie-consigne-ok")], {}, new Date(), { cwd: REPO2, maison: MAISON });
     egal(c.code, 0, "exit consigne ordinaire");
   });
+  // ==== TF-2235 : la demande d'ouverture d'une session non interactive est un message humain ; sans aucune demande, rien n'est préparé ====
+  // Forme relevée le 06/11/2026 dans la transcription d'une session ouverte avec son invite (de1103cb) : pas de champ `origin`, `turnOrigin` et
+  // `promptSource` à « sdk », `turnPosition.promptIndex` à 0, contenu en chaîne. Les quatre sessions du juge externe portent la même forme
+  // (« Rubrique figée ») : leur invite d'ouverture est la demande de LEUR session, et seule elle.
+  const OUVERTURE = "Lis en entier le fichier prompt-fictif.md, puis exécute tel quel le prompt contenu dans son bloc text.";
+  const ouvertureSdk = (texte, extra = {}) => JSON.stringify({ type: "user", isSidechain: false, promptSource: "sdk", turnOrigin: "sdk", turnPosition: { promptIndex: 0, turnIndex: 1 }, timestamp: "2026-11-06T10:05:22.854Z", message: { role: "user", content: texte }, cwd: PROJET, ...extra });
+  const TRSDK = join(T, "session-sdk.jsonl");
+  writeFileSync(TRSDK, [JSON.stringify({ type: "session-owner", sessionId: "s" }), ouvertureSdk(OUVERTURE),
+    JSON.stringify({ type: "user", isSidechain: false, turnOrigin: "sdk", timestamp: "2026-11-06T10:06:00.000Z", message: { role: "user", content: "# Rubrique figée SDK-EN-COURS-DE-SESSION-A-NE-PAS-CITER" } }),
+    assistant([texte("Je lis le fichier.")], "2026-11-06T10:05:30Z")].join("\n") + "\n");
+  const dSdk = join(T, "sortie-sdk");
+  const finSdk = executer(["--preparer", "fin-de-tour", "--transcript", TRSDK, "--sortie", dSdk], {}, new Date("2026-11-06T12:00:00Z"), CTX);
+  check("rouge → vert — TF-2235 : l'invite d'ouverture d'une session non interactive est citée mot pour mot comme la demande (exit 0, consigne imprimée)", () => {
+    egal(finSdk.code, 0, "exit");
+    const dm = existsSync(join(dSdk, "demande.txt")) ? readFileSync(join(dSdk, "demande.txt"), "utf8") : "";
+    if (!dm.includes(`1. « ${OUVERTURE} »`)) throw new Error("l'invite d'ouverture n'est pas citée : " + dm.slice(0, 300));
+    if (/aucun message humain/.test(dm) || !/1 message\(s\) humain\(s\) cité\(s\)/.test(finSdk.sortie)) throw new Error(finSdk.sortie.slice(0, 300));
+    if (!/CONSIGNE À PASSER À L'AGENT verificateur/.test(finSdk.sortie)) throw new Error("la consigne n'est pas imprimée");
+  });
+  check("rouge — TF-2235 : un message du SDK en cours de session, sans position d'ouverture, n'est toujours pas une demande", () => {
+    const dm = readFileSync(join(dSdk, "demande.txt"), "utf8");
+    if (dm.includes("SDK-EN-COURS-DE-SESSION")) throw new Error("un message du SDK en cours de session est cité comme demande");
+    egal(texteHumain(JSON.parse(ouvertureSdk("x", { turnPosition: { promptIndex: 3, turnIndex: 4 } }))), null, "promptIndex 3");
+    egal(texteHumain(JSON.parse(ouvertureSdk("x", { promptSource: "system" }))), null, "promptSource system");
+    egal(texteHumain(JSON.parse(ouvertureSdk("x", { isMeta: true }))), null, "méta");
+    egal(texteHumain(JSON.parse(ouvertureSdk("ma demande"))), "ma demande", "forme d'ouverture");
+  });
+  check("rouge → vert — TF-2235 : une transcription sans aucune demande retrouvée REFUSE (2) à chaque point, ne prépare aucune consigne et n'écrit rien", () => {
+    const TRVIDE = join(T, "session-sans-demande.jsonl");
+    writeFileSync(TRVIDE, [JSON.stringify({ type: "user", isMeta: true, timestamp: "2026-11-06T10:00:00Z", message: { role: "user", content: "<system-reminder>RAPPEL-SYSTEME</system-reminder>" } }),
+      assistant([texte("Rien à faire.")], "2026-11-06T10:00:05Z")].join("\n") + "\n");
+    const piece = join(T, "piece-vide.md"); writeFileSync(piece, "# Une pièce\n\nUn contenu.\n");
+    for (const [point, extra] of [["fin-de-tour", []], ["consigne", ["--fichier", piece]], ["coherence", ["--fichier", piece, "--fichier", PETIT]]]) {
+      const d = join(T, `sortie-vide-${point}`);
+      const r = executer(["--preparer", point, ...extra, "--transcript", TRVIDE, "--sortie", d], {}, new Date("2026-11-06T12:00:00Z"), CTX);
+      egal(r.code, 2, `exit au point ${point}`);
+      if (!/aucune demande|aucun message humain/.test(r.sortie) || /CONSIGNE À PASSER/.test(r.sortie)) throw new Error(`point ${point} : ${r.sortie.slice(0, 300)}`);
+      egal(existsSync(d), false, `dossier de sortie créé par un refus au point ${point}`);
+    }
+  });
   check("borne — le registre du pilot n'a pas été touché par la recette", () => {
     const pilote = join(RACINE, "todo", "relectures-intention.jsonl");
     if (existsSync(pilote) && /RI-20261018-0[12]"/.test(readFileSync(pilote, "utf8")) && /"session":"sess-1"/.test(readFileSync(pilote, "utf8"))) throw new Error("la recette a écrit au registre du pilot");
