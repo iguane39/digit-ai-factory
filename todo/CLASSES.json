@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.68.0",
+ "version": "1.69.0",
  "date": "2026-11-06",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -3430,6 +3430,83 @@
    ],
    "regle": "Proposition de Produit-81 (lot 20261105a) : forge_tests déduit la pile d'un nom de dossier : FRONT/ React et BACK .NET non reconnus",
    "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2222 — porteur à outiller"
+  },
+  {
+   "cle": "gabarit-skill-rouge-aux-oracles-du-socle",
+   "famille": "page-html-socle",
+   "libelle": "Un gabarit fourni par un skill, instancié tel quel, échoue aux oracles du socle qui jugent la page produite, sans que le skill nomme ces oracles dans son flux Proposée par Produit-84 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2263"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261106c) : client-a-schemas : RT-54 — le gabarit du skill, instancié tel quel, échoue à run-oracles-design (81 bloquants de jetons, 453 de rendu dont 413 V4 sur les cadres de couloir)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2263 — porteur à outiller"
+  },
+  {
+   "cle": "livrable-frais-masque-par-un-ancien",
+   "famille": "hook-ou-gate",
+   "libelle": "Un contrôle de présence retient la première correspondance d'un motif de chemin et juge sa fraîcheur seule, si bien qu'un livrable ancien masque un livrable frais du même motif Proposée par Produit-84 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2264"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261106d) : factory : RT-55 — mobiliser --verifier déclare manquant un livrable frais, masqué par un ancien du même motif rangé dans un dossier trié avant",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2264 — porteur à outiller"
+  },
+  {
+   "cle": "verification-sur-substitut-non-representatif",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un script ou un geste est valide sur un substitut (base jetable, jeu fictif) construit sans relire la cible ; le substitut differe de la cible sur un point decisif et l echec n apparait qu a l execution reelle Proposée par Produit-81 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2267"
+   ],
+   "regle": "Proposition de Produit-81 (lot 20261106a) : forge-tests : RP-3 — un script SQL de données validé sur une base jetable reconstruite d'après le jeu fictif échoue sur la cible (colonne d'identité)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2267 — porteur à outiller"
+  },
+  {
+   "cle": "suite-rouge-rendue-en-skip",
+   "famille": "hook-ou-gate",
+   "libelle": "Une suite de tests rouge est rendue comme une absence de mesure (SKIP) au lieu d'un échec nommé Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2269"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106a) : forge_tests : une suite backend rouge rend les pans api, data et migrations en SKIP, verdict PARTIEL inchangé",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2269 — porteur à outiller"
+  },
+  {
+   "cle": "infra-appliquee-sans-convergence",
+   "famille": "hook-ou-gate",
+   "libelle": "Une chaîne applique l'infrastructure et rend PASS sans vérifier que le plan suivant est vide Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2271"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106a) : Chaîne de déploiement Terraform : apply PASS sans convergence, dérive permanente du fournisseur Docker",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2271 — porteur à outiller"
+  },
+  {
+   "cle": "condition-de-saut-lue-hors-contexte",
+   "famille": "hook-ou-gate",
+   "libelle": "Un contrôle juge qu'un test se saute sans tenir compte du contexte où il le joue Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2274"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106c) : parcours-personas : fichiers e2e écartés comme sautables même quand l'instance est fournie",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2274 — porteur à outiller"
+  },
+  {
+   "cle": "banc-sans-reponse-realiste",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un outil qui lit les réponses d'une cible tierce n'est testé que sur des réponses factices idéales (200 sans cookie, un seul passage) : les défauts de la première réponse réelle (redirection, cookie, jeton, rejeu) passent tous les bancs Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2275"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106d) : Bancs sans réponse de cible réaliste : 4 défauts du mode client vus seulement au premier job réel",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2275 — porteur à outiller"
   }
  ],
  "cliquet_porteur": {

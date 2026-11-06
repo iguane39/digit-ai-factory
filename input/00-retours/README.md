@@ -80,6 +80,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-79 - RETOURS - 20261020a.tf.jsonl` | fichier | 872 o | 1 ligne(s) JSONL |
 | `Produit-81 - RETOURS - 20261105a.md` | fichier | 4,6 Ko | Retours forges — Produit-81 — 20261105a |
 | `Produit-81 - RETOURS - 20261105a.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261106a.md` | fichier | 5,7 Ko | Retours forges — Produit-81 — 20261106a |
+| `Produit-81 - RETOURS - 20261106a.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261016a - PJ - oracle-format-a4.py` | fichier | 2,4 Ko | PY |
 | `Produit-84 - RETOURS - 20261016a.md` | fichier | 6,3 Ko | Retours forges — Produit-84 — 20261016a |
 | `Produit-84 - RETOURS - 20261016a.tf.jsonl` | fichier | 2,3 Ko | 2 ligne(s) JSONL |
@@ -107,11 +109,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-84 - RETOURS - 20261029a.md` | fichier | 9,1 Ko | Retours forges — Produit-84 — 20261029a |
 | `Produit-84 - RETOURS - 20261029a.tf.jsonl` | fichier | 4,7 Ko | 4 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261030a.md` | fichier | 12,2 Ko | Retours forges — Produit-84 — 20261030a |
-| `Produit-84 - RETOURS - 20261030a.tf.jsonl` | fichier | 6,0 Ko | 5 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261030a.tf.jsonl` | fichier | 6,1 Ko | 5 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261103a.md` | fichier | 8,8 Ko | Retours forges — Produit-84 — 20261103a |
 | `Produit-84 - RETOURS - 20261103a.tf.jsonl` | fichier | 4,6 Ko | 4 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261103b.md` | fichier | 12,9 Ko | Retours forges — Produit-84 — 20261103b |
-| `Produit-84 - RETOURS - 20261103b.tf.jsonl` | fichier | 10,4 Ko | 11 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261103b.tf.jsonl` | fichier | 10,5 Ko | 11 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261104a.md` | fichier | 7,9 Ko | Retours forges — Produit-84 — 20261104a |
 | `Produit-84 - RETOURS - 20261104a.tf.jsonl` | fichier | 4,4 Ko | 5 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261104b.md` | fichier | 4,6 Ko | Retours forges — Produit-84 — 20261104b |
@@ -128,6 +130,16 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-84 - RETOURS - 20261105b.tf.jsonl` | fichier | 966 o | 1 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261105c.md` | fichier | 7,0 Ko | Retours forges — Produit-84 — 20261105c |
 | `Produit-84 - RETOURS - 20261105c.tf.jsonl` | fichier | 3,6 Ko | 4 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261106a.md` | fichier | 3,8 Ko | Retours forges — Produit-84 — 20261106a |
+| `Produit-84 - RETOURS - 20261106a.tf.jsonl` | fichier | 995 o | 1 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261106b.md` | fichier | 4,0 Ko | Retours forges — Produit-84 — 20261106b |
+| `Produit-84 - RETOURS - 20261106b.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261106c.md` | fichier | 4,0 Ko | Retours forges — Produit-84 — 20261106c |
+| `Produit-84 - RETOURS - 20261106c.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261106d.md` | fichier | 3,6 Ko | Retours forges — Produit-84 — 20261106d |
+| `Produit-84 - RETOURS - 20261106d.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261106e.md` | fichier | 5,5 Ko | Retours forges — Produit-84 — 20261106e |
+| `Produit-84 - RETOURS - 20261106e.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
 | `Produit-85 - RETOURS - 20261024a.md` | fichier | 10,9 Ko | Retours forges — Produit-85 — 20261024a |
 | `Produit-85 - RETOURS - 20261024a.tf.jsonl` | fichier | 6,0 Ko | 7 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261103a.md` | fichier | 17,1 Ko | Retours forges — Produit-86 — 20261103a |
@@ -158,5 +170,15 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261105g.tf.jsonl` | fichier | 2,8 Ko | 3 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261105h.md` | fichier | 6,8 Ko | Retours forges — Produit-86 — 20261105h |
 | `Produit-86 - RETOURS - 20261105h.tf.jsonl` | fichier | 2,4 Ko | 3 ligne(s) JSONL |
+| `Produit-86 - RETOURS - 20261106a.md` | fichier | 6,5 Ko | Retours forges — Produit-86 — 20261106a |
+| `Produit-86 - RETOURS - 20261106a.tf.jsonl` | fichier | 2,7 Ko | 3 ligne(s) JSONL |
+| `Produit-86 - RETOURS - 20261106b.md` | fichier | 3,5 Ko | Retours forges — Produit-86 — 20261106b |
+| `Produit-86 - RETOURS - 20261106b.tf.jsonl` | fichier | 825 o | 1 ligne(s) JSONL |
+| `Produit-86 - RETOURS - 20261106c.md` | fichier | 6,5 Ko | Retours forges — Produit-86 — 20261106c |
+| `Produit-86 - RETOURS - 20261106c.tf.jsonl` | fichier | 1,9 Ko | 2 ligne(s) JSONL |
+| `Produit-86 - RETOURS - 20261106d.md` | fichier | 6,0 Ko | Retours forges — Produit-86 — 20261106d |
+| `Produit-86 - RETOURS - 20261106d.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
+| `Produit-86 - RETOURS - 20261106e.md` | fichier | 3,5 Ko | Retours forges — Produit-86 — 20261106e |
+| `Produit-86 - RETOURS - 20261106e.tf.jsonl` | fichier | 855 o | 1 ligne(s) JSONL |
 
-_140 fichier(s), 2 sous-dossier(s)_
+_162 fichier(s), 2 sous-dossier(s)_
