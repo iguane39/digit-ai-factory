@@ -156,6 +156,46 @@ export function numerosDuLedger(produit) {
 }
 
 /**
+ * Les décisions POSÉES au ledger d'un produit et SANS RÉPONSE NOMMÉE (TF-2214, 06/11/2026). Le 03/11/2026, D-48 (« Supprime-t-on le réseau vide créé en Europe du Nord ?
+ * ») a été posée, n'a reçu ni réponse ni rappel, et les ressources qu'elle visait sont restées facturées deux jours. Une décision est POSÉE par une entrée `question_humain`
+ * (`decisions_posees` : { "D-N": question }, ou `decision` : "D-N") ; elle est RÉPONDUE quand une entrée `reponse_humain` POSTÉRIEURE la nomme, où que ce soit dans l'entrée.
+ * Limite dite : une réponse que le produit n'a pas consignée avec son numéro compte comme absente (la mesure du 06/11/2026 sur 11 ledgers locaux : 25 décisions sur 40 sans réponse
+ * nommée, dont beaucoup de réponses probablement non consignées) ; c'est pourquoi la fenêtre est bornée (`fenetreJours`, 14 par défaut) et que les contrôles qui s'en servent avertissent.
+ * Rend [{ n: "D-48", question, ts, seq }], de la plus ancienne à la plus récente. `maintenant` s'injecte pour les essais.
+ */
+export function decisionsSansReponse(produit, { maintenant = Date.now(), fenetreJours = 14 } = {}) {
+  const fichier = join(produit, "forge", "ledger.jsonl");
+  if (!existsSync(fichier)) return [];
+  const entrees = [];
+  for (const l of readFileSync(fichier, "utf8").split(/\r?\n/)) {
+    if (!l.trim()) continue;
+    try { entrees.push(JSON.parse(l)); } catch { /* ligne illisible : ignorée */ }
+  }
+  const posees = new Map();
+  entrees.forEach((e, i) => {
+    if (e.type !== "question_humain") return;
+    const d = e.decisions_posees;
+    const posees_ = d && typeof d === "object" && !Array.isArray(d) ? Object.entries(d).map(([k, q]) => [k, String(q)])
+      : Array.isArray(d) ? d.map((x) => [typeof x === "string" ? x : (x && x.n ? `D-${x.n}` : ""), String(x && x.question ? x.question : "")])
+        : (typeof e.decision === "string" ? [[e.decision, String(e.question || "")]] : []);
+    for (const [k, q] of posees_) {
+      const m = /^D-(\d{1,4})$/.exec(String(k).trim());
+      if (m && !posees.has(`D-${Number(m[1])}`)) posees.set(`D-${Number(m[1])}`, { i, ts: e.ts || null, seq: e.seq ?? null, question: q });
+    }
+  });
+  const limite = maintenant - fenetreJours * 86400000;
+  const ouvertes = [];
+  for (const [n, { i, ts, seq, question }] of posees) {
+    const t = ts ? Date.parse(ts) : NaN;
+    if (!Number.isFinite(t) || t < limite) continue;
+    const re = new RegExp(`\\b${n}\\b`);
+    if (entrees.some((e, j) => j > i && e.type === "reponse_humain" && re.test(JSON.stringify(e)))) continue;
+    ouvertes.push({ n, question, ts, seq });
+  }
+  return ouvertes.sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
+}
+
+/**
  * Les numéros de décision DÉJÀ AFFICHÉS chez un produit (TF-1961, 29/10/2026) : la tête « > **D-N — … ?** » d'une restitution ou
  * d'un `DECISIONS.md`, sous `forge\` et `output\` (profondeur 6, sans `node_modules` ni `.git`). Le 19/10/2026, un ledger né vide
  * a accepté D-68 à D-71, déjà posées à l'humain le 02/10 dans trois restitutions. Une mention en prose (« voir D-90 ») ne compte
