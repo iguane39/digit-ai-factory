@@ -1,6 +1,7 @@
 {
   "format": "pilot/tics-redactionnels@1",
-  "version": "1.7.0",
+  "version": "1.8.0",
+  "evolution_1_8_0": "TF-2259 (06/11/2026, décision R-58 de la campagne « Traite les retours et TODOs ») : le jugement par défaut d'EC-14 sous output/ (1.7.0) ne vaut plus que pour les écrits NEUFS (nouvelle clé `ecrit_a_un_tiers.dossiers_juges_par_defaut_depuis`, AAAA-MM-JJ : 2026-11-06, jour de l'entrée de la règle). Le fait : 179 écrits sur 193 rendaient A_REJOUER (5 817 passages, 92,7 %) ; un contrôle qui accuse presque tout le corpus se fait désactiver (leçon N4), et la règle 5 interdit de réécrire l'existant. Un écrit dont le nom porte une date antérieure au seuil est écarté, le motif est dit au verdict et l'antériorité au non_juge ; un nom sans date reste jugé (rien ne prouve son antériorité). Les écrits à en-tête `destinataire:` tiers et ceux dont le type de nom désigne un tiers (courriel, proposition…) restent jugés à toute date. Le seuil est une donnée : le reculer rejuge le corpus, l'avancer l'exempte davantage.",
   "evolution_1_7_0": "TF-2189 (RT-48 de Produit-84, 05/11/2026, décision du 06/11/2026) : EC-14 juge par défaut tout écrit sous output/, avec ou sans en-tête `destinataire:` (nouvelle clé `ecrit_a_un_tiers.dossiers_juges_par_defaut`). Le fait : une synthèse en un paragraphe de 5 phrases denses rendait PASS, EC-14 en SKIP faute d'en-tête ; avec l'en-tête, EC-14 relevait 1 énumération et 3 phrases trop longues. Un en-tête `destinataire:` interne (humain, orchestrateur…) reste l'exception déclarée, et les index régénérés (README, LISEZMOI) rejoignent `exclusions_de_nom`.",
   "evolution_1_6_0": "TF-2020 et TF-1968 (29/10/2026) : (1) EC-8 retire la numérotation d'un titre (« 7. », « 2.1 », « 3 · ») avant de chercher la tournure refusée ; les 29 fichiers qui portaient déjà un tel titre sont nommés dans `anteriorite_titres_numerotes`, admis et dits au verdict, la liste étant figée au 29/10/2026 ; (2) l'oracle juge une page HTML sur son texte visible (`texteDeHtml`), le verdict citant les lignes de la page.",
   "evolution_1_5_0": "TF-1976 (29/10/2026) : les types « Propale » (alias « Propal ») et « Proposition » du registre des types entrent aux types de nom d un écrit à un tiers. Le fait fondateur de EC-14 était une proposition à 94 défauts de concision rendue PASS ; sans en-tête destinataire, une proposition n était pas reconnue comme écrit à un tiers.",
@@ -526,6 +527,7 @@
     "types_de_nom": ["courriel", "e mail", "email", "mail", "courrier", "lettre", "fiche", "propale", "propal", "proposition"],
     "exclusions_de_nom": ["fiche conception", "fiche de conception", "readme", "lisezmoi"],
     "dossiers_juges_par_defaut": ["output"],
+    "dossiers_juges_par_defaut_depuis": "2026-11-06",
     "paragraphe_phrases_max": 3,
     "paragraphe_mots_max": 60,
     "phrase_mots_max": 25,
