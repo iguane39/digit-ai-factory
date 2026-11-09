@@ -895,6 +895,29 @@ export function gainsSansReleve(gains, nombres) {
 export const avertsDeGains = (sansReleve) => sansReleve.map((x) => ({ regle: "GAINS", statut: "AVERT",
   message: `gains_constates écrit avec « ${x.chiffre} » (« …${x.extrait}… », ${x.voie}) : aucune sortie du tour ne le montre — relève-le (commande, compte) avant de l'écrire, ou marque-le dans le gain (« non mesuré », « rapporté par l'agent ») ; D-131 (a), TF-2056` }));
 
+// ---- TF-2280 (09/11/2026) — UNE SESSION `claude -p` LANCÉE DEPUIS L'EXTENSION VS CODE SE RECONNAÎT À `turnOrigin`, PAS À `entrypoint`, NI À `promptSource`/`querySource` ----
+//
+// LE FAIT. Une session `claude -p` lancée depuis l'extension hérite de CLAUDE_CODE_ENTRYPOINT=claude-vscode : `entrypoint` ne dit plus qu'elle est non interactive, et le refus
+// du message d'attente (TF-2193) ne se déclenche pas. La demande proposait de lire `promptSource` et `querySource`, qui valent « sdk » dans cette session.
+//
+// MESURÉ LE 09/11/2026 sur les 609 transcriptions des deux profils du poste (`~\.claude`, `~\.claude-b`), messages humains hors sidechain et hors isMeta : les 243 sessions
+// interactives de l'extension portent AUSSI `promptSource: "sdk"` (243 sur 243), et 166 d'entre elles des lignes `api-request` de `querySource: "sdk"` — l'extension pilote le
+// CLI par le SDK. Ces deux champs ne séparent donc rien. `turnOrigin` sépare tout : 354 sessions `claude-vscode` n'ont que des messages `turnOrigin: "sdk"` (aucun humain),
+// 243 ont un humain (241 par `turnOrigin: "human"`, 2 par `origin.kind: "human"` seul) et aucun message `sdk` ; aucune session ne mêle les deux. Les 5 sessions `sdk-cli` sont toutes `turnOrigin: "sdk"`.
+//
+// LA RÈGLE. Non interactive = un message humain porte `turnOrigin: "sdk"` et aucun ne porte `turnOrigin: "human"` ni `origin.kind: "human"`. Les notifications de tâche
+// (`task_notification`) et les messages d'une autre session (`peer`) ne comptent ni d'un côté ni de l'autre. Ce qu'elle ne voit pas : une transcription sans aucun `turnOrigin`
+// (versions anciennes du CLI) — la session reste alors jugée interactive, comme avant.
+export function sessionProgrammatique(entrees, humains) {
+  let sdk = false;
+  for (const i of humains) {
+    const e = entrees[i];
+    if (e.turnOrigin === "human" || e.origin?.kind === "human") return false;
+    if (e.turnOrigin === "sdk") sdk = true;
+  }
+  return sdk;
+}
+
 export function analyserTranscript(texte) {
   const entrees = texte.split(/\r?\n/).filter((l) => l.trim()).map((l) => { try { return JSON.parse(l); } catch { return null; } })
     .filter((e) => e && !e.isSidechain);
@@ -920,7 +943,8 @@ export function analyserTranscript(texte) {
   return { travail: ecrit.length > 0, ecrituresDuTour: ecrit, ...m, dernierHumain, textePrecedent, depuis, textesHumains,
     frictions: releveFrictions(tourF.segment), depuisFrictions: tourF.depuis, retourFrictions: releveRemontee(tourF.segment).retourCommande,
     // TF-2193 — la session est non interactive (`claude -p`, SDK) : la transcription date alors chaque message humain de `entrypoint: "sdk-cli"` (mesuré le 06/11/2026 sur 146 entrées de ce poste ; une session interactive porte "cli" ou "claude-vscode").
-    nonInteractif: debut >= 0 && entrees[debut].entrypoint === "sdk-cli",
+    // TF-2280 — lancée depuis l'extension VS Code, la session `-p` hérite de CLAUDE_CODE_ENTRYPOINT=claude-vscode : on lit alors le `turnOrigin` des messages humains (voir sessionProgrammatique).
+    nonInteractif: debut >= 0 && (entrees[debut].entrypoint === "sdk-cli" || sessionProgrammatique(entrees, humains)),
     releves: relevesDHorloge(entrees, debut),
     nombresTour: nombresDuTour(entrees, debut),
     // D-131 (a), TF-2056 — les gains écrits au registre par le tour : valeurs littérales, et événements que `journaliser` a imprimés (lus au registre au moment de juger).

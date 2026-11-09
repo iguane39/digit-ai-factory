@@ -2277,8 +2277,8 @@ try {
   // (e) La borne : 30 refus comptés au journal pour la session, puis la session est laissée finir. (f) Unitaire : `analyserTranscript` lit le mode.
   if (veut(66)) {
     const ATTENTE66 = "Les agents de lecture tournent en arrière-plan, environ 10 minutes.\nJe reprends la restitution dès leur retour.";
-    const tour66 = (texte, { entrypoint = "sdk-cli", revenue = false } = {}) => [
-      { type: "user", entrypoint, message: { role: "user", content: "lis les vingt pièces avec des agents de lecture" } },
+    const tour66 = (texte, { entrypoint = "sdk-cli", revenue = false, humain = {} } = {}) => [
+      { type: "user", entrypoint, ...humain, message: { role: "user", content: "lis les vingt pièces avec des agents de lecture" } },
       { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id: "ag66", name: "Task", input: { description: "lecture 1" } }] } },
       { type: "user", message: { role: "user", content: [{ type: "tool_result", tool_use_id: "ag66", content: "Async agent launched successfully.\nagentId: a66xyz (internal ID)" }] } },
       ...(revenue ? [{ type: "queue-operation", operation: "enqueue", content: "<task-notification>\n<task-id>a66xyz</task-id>\n<status>completed</status>\n</task-notification>" }] : []),
@@ -2307,6 +2307,21 @@ try {
     const f66 = analyserTranscript(tour66(ATTENTE66)), g66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "cli" })), h66 = analyserTranscript(tour66(ATTENTE66).replace(/"entrypoint":"sdk-cli",/, ""));
     if (f66.nonInteractif !== true || g66.nonInteractif !== false || h66.nonInteractif !== false)
       echecs.push(`66 sexies : analyserTranscript doit lire le mode (sdk-cli → true ; cli → false ; champ absent → false), obtenu ${f66.nonInteractif} ${g66.nonInteractif} ${h66.nonInteractif}`);
+    // TF-2280 (09/11/2026) — formes RÉELLES relevées sur les transcriptions du poste (champs seuls, aucun contenu de conversation). Session `claude -p` lancée depuis l'extension : entrypoint hérité
+    // « claude-vscode », mais le message humain porte turnOrigin « sdk » et promptSource « sdk », sans `origin`. Session interactive de l'extension : turnOrigin « human », origin.kind « human »,
+    // ET promptSource « sdk » (243 sessions interactives sur 243 le portent : ce champ seul ne sépare rien, c'est le piège du cas rouge ci-dessous).
+    const SESSION_P66 = { permissionMode: "bypassPermissions", promptSource: "sdk", turnOrigin: "sdk", turnPosition: { promptIndex: 0, turnIndex: 1 }, userType: "external" };
+    const INTERACTIVE66 = { permissionMode: "bypassPermissions", origin: { kind: "human" }, promptSource: "sdk", turnOrigin: "human", turnPosition: { promptIndex: 1, turnIndex: 1 }, userType: "external" };
+    const NOTIF66 = { permissionMode: "bypassPermissions", origin: { kind: "task-notification", producer: "session-task" }, promptSource: "system", turnOrigin: "task_notification", userType: "external" };
+    const i66 = hook66("p-vscode-programmatique", ATTENTE66, { entrypoint: "claude-vscode", humain: SESSION_P66 });
+    if (!dedie(i66.d)) echecs.push(`66 septies : session \`claude -p\` lancée depuis l'extension (entrypoint hérité claude-vscode, turnOrigin sdk) avec une tâche non revenue → attendu le refus dédié (TF-2193, PREMIER PLAN), obtenu ${JSON.stringify(i66.d).slice(0, 240)}`);
+    const j66 = hook66("p-vscode-interactif-reel", ATTENTE66, { entrypoint: "claude-vscode", humain: INTERACTIVE66 });
+    if (j66.d !== null) echecs.push(`66 octies : session INTERACTIVE de l'extension (promptSource sdk comme toutes, turnOrigin human) → attendu exemptée (TF-1649), obtenu ${JSON.stringify(j66.d).slice(0, 240)} — lire promptSource ou querySource ferait refuser toutes les sessions de l'extension`);
+    const k66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: SESSION_P66 })), l66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: INTERACTIVE66 }));
+    const m66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: { promptSource: "sdk" } })); // CLI ancien : aucun turnOrigin, aucune origine
+    const n66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: SESSION_P66, revenue: true }).replace(/\n$/, "") + "\n" + JSON.stringify({ type: "user", entrypoint: "claude-vscode", ...NOTIF66, message: { role: "user", content: "<task-notification>\n<task-id>a66xyz</task-id>\n<status>completed</status>\n</task-notification>" } }) + "\n");
+    if (k66.nonInteractif !== true || l66.nonInteractif !== false || m66.nonInteractif !== false || n66.nonInteractif !== true)
+      echecs.push(`66 nonies : sessionProgrammatique (extension : turnOrigin sdk → true ; turnOrigin human → false ; aucun turnOrigin → false ; sdk suivi d'une notification de tâche → true), obtenu ${k66.nonInteractif} ${l66.nonInteractif} ${m66.nonInteractif} ${n66.nonInteractif}`);
   }
   // 68 — TF-2191 (06/11/2026) : UN LIVRABLE LIÉ « LIVRÉ » PAR UNE RESTITUTION PASS SE SCELLE, ET LA RÉÉCRITURE EN PLACE EST REFUSÉE (S94). Le cas du 05/11 : l'étude 20261105b, liée « Livré »,
   // réécrite après trois remarques sous le même nom. (a) Le tour écrit l'étude et la lie : PASS, sceau posé (`.jugement.json`). (b) Un tour suivant la réécrit en place et la lie de
