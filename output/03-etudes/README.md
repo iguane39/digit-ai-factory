@@ -18,6 +18,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 |---|---|---|---|
 | [`2026-08\`](2026-08/README.md) | dossier (42 fichiers) | — | Livrables de la famille `03-etudes\` du mois clos 2026-08, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la famille, où… |
 | [`2026-09\`](2026-09/README.md) | dossier (49 fichiers) | — | Livrables de la famille `03-etudes\` du mois clos 2026-09, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la famille, où… |
+| [`old\`](old/README.md) | dossier (1 fichier) | — | Versions remplacées des livrables de `output/03-etudes/`, déplacées ici à la sortie de leur version suivante (règle 7 de `REGLES-PROJET.md`). Versionnées ; à li… |
 | `20261001-etude-opportunite-rsi-et-ssl.md` | fichier | 30,0 Ko | Étude d'opportunité — auto-amélioration récursive (RSI) et apprentissage auto-supervisé (S |
 | `20261001-etude-opportunite-saut-opus-5-5.md` | fichier | 37,1 Ko | Étude d'opportunité — Le passage d'Opus 5 à Opus 5.5 : que changer dans la Factory et ses  |
 | `20261001-etude-opportunite-textes-affiches.md` | fichier | 18,2 Ko | Étude d'opportunité — grammaire d'écran des textes affichés en session — 20261001c |
@@ -84,7 +85,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
 | `Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` | fichier | 23,0 Ko | Étude d'opportunité — Suivi des temps et des coûts par produit — 20261105a |
 | `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 19,1 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
-| `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md` | fichier | 7,1 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261109a |
+| `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109c.md` | fichier | 10,3 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261109c |
 | `Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` | fichier | 15,5 Ko | Étude — une vidéo où Claude reçoit 100 fois la consigne « fais mieux » |
 | `Digit-AI - Fiche - Actions A-2 et A-3 detaillees - 20261105b.md` | fichier | 4,5 Ko | Actions A-2 et A-3 de la synthèse du 05/11 : constat et préconisations |
 | `Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` | fichier | 5,5 Ko | Œil critique : 4 actions pour tenir les 8 demandes (29/10/2026) |
@@ -114,4 +115,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_95 fichier(s), 2 sous-dossier(s)_
+_95 fichier(s), 3 sous-dossier(s)_
