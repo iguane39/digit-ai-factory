@@ -69,7 +69,7 @@ Rangées par dépendance : le report des corrections précède le lancement, et 
 |---|---|---|---|---|---|---|
 | A-1 | Reporter dans le prompt retenu les 5 corrections déjà vérifiées en passe 3 | neuve | auto_ia | garde_fou : une modification faite après l'arrêt de la boucle n'est plus mesurée ; elle se fait sur votre demande | revue du 09/11/2026, chapitre 8, table des majeurs ouverts | si rien n'est fait : le run garde 5 défauts connus, dont la contradiction sur l'enchaînement des épisodes |
 | A-2 | Lancer le prompt retenu dans une session ouverte dans le dépôt marketing | neuve | manuelle_utilisateur | decision : vous avez demandé d'améliorer le prompt, pas de lancer le run ; un run chez un produit se lance sur votre demande (R-58, produit), et le relevé d'ouverture déclare refusée toute écriture de cette session chez les produits | `C:\dev\digit-ai-marketing`, prompt du chapitre 8 | si rien n'est fait : aucune animation produite |
-| A-3 | Publier les commits du pilot | neuve | auto_ia | garde_fou : une autre session du poste écrit en ce moment au pilot (2 synthèses du jour sont arrivées pendant ce tour) ; publier enverrait ses commits non relus | `git push` après un `git fetch` | si rien n'est fait : la revue reste sur ce poste seulement |
+| A-3 | Publier le commit de la revue au dépôt distant du pilot | neuve | auto_ia | garde_fou : une autre session du poste écrit au pilot en ce moment (2 synthèses du jour sont arrivées pendant ce tour), et l'envoi demande des mots humains cités dans `FORGE_PUSH_GO` ; il se fait sur un « publie » de votre part | `git fetch` puis `git push`, sortie dans un fichier | si rien n'est fait : la revue reste sur ce poste seulement |
 
 ## 9. Traces
 
