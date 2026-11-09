@@ -28,6 +28,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` | fichier | 16,5 Ko | Prompt — Décider s'il faut des compétences OpenAI et Gemini dans la Factory, et lesquelles |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
+| `Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` | fichier | 15,0 Ko | Série d'animations « La Factory Digit-AI en action » : cadrage et cinq épisodes |
 | `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` | fichier | 22,1 Ko | Prompt — construire le skill make-it-better et sa page de versions |
 | `Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` | fichier | 14,5 Ko | markdown |
 | `Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` | fichier | 11,1 Ko | Revue hebdomadaire des propositions — 2026-11-02 |
@@ -221,4 +222,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_200 fichier(s), 4 sous-dossier(s)_
+_201 fichier(s), 4 sous-dossier(s)_

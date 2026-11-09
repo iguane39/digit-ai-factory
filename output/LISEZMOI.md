@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 674 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 675 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -525,6 +525,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md | 20261103i | 16.5 Ko | `04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
+| Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md | 20261109g | 15 Ko | `04-plans/Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |
 | Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md | 20261102c | 14.5 Ko | `04-plans/Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md | 20261102a | 11.1 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` |
