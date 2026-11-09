@@ -399,6 +399,29 @@ try {
     const refus = spawnSync(PYTHON, [script, "reponse_humain", "--remplace", "true"], { encoding: "utf8", env: CONSOLE });
     att(refus.status !== 0, "un remplace booléen sur une décision doit rester refusé");
   });
+  // TF-2284 (06/11/2026) : l'écriture exemptait secret_range, `--verifier` non : il déclarait « remplace true sans artefacts_remplaces » sur une entrée que l'écrivain venait d'accepter.
+  const lancer = (script, ...a) => spawnSync(PYTHON, [script, ...a], { encoding: "utf8", env: CONSOLE });
+  const ecrireSecret = (script) => lancer(script, "secret_range", "--variable", "ESSAI_CLE", "--fichier", ".env", "--empreinte_sha256", "ab12", "--date", "2026-11-06", "--remplace", "true");
+  check("TF-2284 vert — un secret_range qui porte remplace true est écrit, et --verifier ne le déclare pas", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = ecrireSecret(script);
+    att(r.status === 0, `écriture : exit ${r.status} ${r.stderr}`);
+    att(entrees(d).at(-1).remplace === true, `entrée : ${JSON.stringify(entrees(d).at(-1))}`);
+    const v = lancer(script, "--verifier");
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE|artefacts_remplaces/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2284 rouge — sans l'exemption, --verifier déclare à tort le secret_range ; une décision qui remplace sans artefacts reste déclarée avec elle", () => {
+    const mutant = GABARIT.replace('x["type"] != "secret_range" and ', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    att(ecrireSecret(script).status === 0, "écriture refusée");
+    const v = lancer(script, "--verifier");
+    att(/DÉCLARÉ/.test(v.stdout) && /remplace True/.test(v.stdout), `le mutant ne déclare pas : exit ${v.status} ${v.stdout}`);
+    const { d: d2, script: s2 } = produit(GABARIT); dossiers.push(d2);
+    att(lancer(s2, "reponse_humain", "--decision", "D-49", "--remplace", "D-46").status === 0, "écriture refusée");
+    const v2 = lancer(s2, "--verifier");
+    att(/DÉCLARÉ/.test(v2.stdout) && /remplace D-46/.test(v2.stdout), `la décision sans artefacts n'est plus déclarée : ${v2.stdout}`);
+  });
   check("TF-2206 rouge — sans le contrôle, le sort inconnu serait écrit (le témoin voit la chirurgie)", () => {
     const mutant = GABARIT.replace("    controler_remplacement(type_, champs)\n", "");
     att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");

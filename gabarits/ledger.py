@@ -233,7 +233,8 @@ def verifier(run: str, hors_run: bool = False) -> int:
                                 f"`reponse_humain` pour un arbitrage humain")
             # TF-2206 : une entrée qui en remplace une autre sans lister ce que celle-ci avait créé (D-49 avait remplacé D-46
             # chez un produit, et onze ressources, deux exigences et leurs contrôles étaient restés).
-            if x.get("remplace") and not x.get("artefacts_remplaces"):
+            # TF-2284 : `secret_range` est exempté, comme à l'écriture (`controler_remplacement`) — son `remplace` est un booléen « la ligne existait déjà », pas une décision remplacée.
+            if x["type"] != "secret_range" and x.get("remplace") and not x.get("artefacts_remplaces"):
                 declares.append(f"seq {x['seq']} : remplace {x['remplace']} sans `artefacts_remplaces` — entrée déjà écrite, non "
                                 f"réécrite ; consigner par ajout `--remplace <D-N> --artefacts_remplaces "
                                 f"'[{{\"artefact\": \"…\", \"sort\": \"retire|conserve|a_decider\"}}]'`")
