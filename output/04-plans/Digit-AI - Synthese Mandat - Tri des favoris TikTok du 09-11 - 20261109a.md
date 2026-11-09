@@ -47,7 +47,7 @@ Répondez par exemple « 182a, 184a ».
 > **D-184 — Faut-il relire les 42 favoris TikTok de la page du 09/11 déjà triés le 19/10 ou le 02/11, que le tri du 09/11 a laissés à leur verdict ?**
 >
 > - **De quoi s'agit-il** : votre demande, « Traite les favoris Tiktok », vise une page de 48 favoris. J'ai trié les 6 neufs et rappelé en chiffres le verdict des 42 autres, sans les relire.
-> - **Le problème** : le relecteur d'intention, rejoué 2 fois, lit votre demande comme visant les 48, et juge la restriction aux 6 neufs comme une dérive majeure. Relire les 42 referait un travail déjà rendu les 19/10 et 02/11, dont 22 contenus écoutés en entier.
+> - **Le problème** : le relecteur d'intention, rejoué 2 fois, lit votre demande comme visant les 48, et juge la restriction aux 6 neufs comme une dérive majeure. Relire les 42 referait un travail déjà rendu les 19/10 et 02/11, dont 32 contenus écoutés ou lus sur leurs images le 02/11.
 > - **Pourquoi vous** : c'est un arbitrage sur le périmètre de votre demande, que seul vous pouvez lever.
 > - **Recommandation : (a)** — aucun fait neuf ne vise ces 42 favoris, et le skill de tri soustrait par conception ce qui est déjà rangé. Source consultée : `input/Tiktok/rangement-20261102.json` et l'annexe de `output/03-etudes/20261019-tri-opportunites-favoris-tiktok.md`.
 
