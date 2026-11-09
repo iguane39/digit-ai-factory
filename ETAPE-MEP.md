@@ -296,7 +296,7 @@ et elle grossit par les incidents, pas par la devinette.
 |---|---|---|
 | M-1 | Build du conteneur | `docker build` exit 0, image taguée `<produit>:<run-id>` |
 | M-2 | Healthcheck | HTTP 200 sur l'endpoint de santé de l'instance staging, 3 mesures espacées de 10 s |
-| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient |
+| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient ; l'état servi est relu après la dernière épreuve et doit être celui du départ (gabarit `gabarits/smoke-mise-en-production.mjs` de forge-ops, jugé par O-30 `oracle-ops.mjs --etat-servi`, TF-2308) |
 | M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) **et RELUE après coup** : le fichier ne porte aucune valeur masquée (`***`, `[REDACTED]`) ni vide — §2 bis, TF-0512 |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
