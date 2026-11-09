@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 665 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 666 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -705,6 +705,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md | 20261015n | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` |
 | Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md | 20261019c | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` |
+| Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md | 20261109a | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md` |
 | Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md | 20261102i | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` |
 | Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md | 20261026o | 4.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md *(archivé)* | 20261016a | 4.5 Ko | `04-plans/old/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` |
