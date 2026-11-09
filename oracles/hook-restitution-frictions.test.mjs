@@ -404,12 +404,33 @@ try {
     // Le motif d'une règle ne couvre que cette règle : FRICTIONS motivée, le brouillon (qui porte aussi d'autres avertissements, ex. l'heure d'en-tête sans relevé) reste non affichable
     // tant que chacun n'est pas motivé ; tous motivés, il l'est.
     const motifs = (codes) => codes.flatMap((c) => ["--motif", `${c}=motif de la recette sur cette règle`]);
+    // TF-2303 (09/11/2026) : FRICTIONS (et S48) ne se motivent plus tant que le texte ne cite aucun lot de retours remis. Le motif d'une autre règle, lui, continue d'éteindre cette règle seule :
+    // la paire ci-dessous joue les deux sens sur FRICTIONS — motif refusé sans lot (le cas du 09/11), motif accepté quand le texte cite un lot « <projet> - RETOURS - AAAAMMJJx ».
+    const autresCodes = (av.o?.avertissements_sans_motif || []).filter((c) => c !== "FRICTIONS");
     const seul = pj(ENV_PRODUIT, ...motifs(["FRICTIONS"]));
     const tous = pj(ENV_PRODUIT, ...motifs(av.o?.avertissements_sans_motif || []));
-    verifier(!(seul.o?.avertissements_sans_motif || []).includes("FRICTIONS") && (seul.o?.avertissements_motives || []).some((m) => m.code === "FRICTIONS")
-      && (seul.o?.avertissements_sans_motif || []).length === (av.o?.avertissements_sans_motif || []).length - 1
-      && tous.code === 0 && tous.o?.affichable === true && (tous.o?.avertissements_sans_motif || []).length === 0,
-      `25 ter : le motif FRICTIONS ne couvre que FRICTIONS ; tous les avertissements motivés → affichable (exit 0), obtenu ${JSON.stringify({ seul: seul.o?.avertissements_sans_motif, tous: [tous.code, tous.o?.affichable, tous.o?.avertissements_sans_motif] })}`);
+    const autresSeuls = pj(ENV_PRODUIT, ...motifs(autresCodes));
+    verifier(seul.code === 1 && (seul.o?.avertissements_sans_motif || []).includes("FRICTIONS") && !(seul.o?.avertissements_motives || []).some((m) => m.code === "FRICTIONS")
+      && (seul.o?.motifs_refuses || []).some((m) => /^FRICTIONS : /.test(m) && /remonte l'erreur/.test(m))
+      && tous.code === 1 && tous.o?.affichable === false && JSON.stringify(tous.o?.avertissements_sans_motif) === JSON.stringify(["FRICTIONS"])
+      && /lot de retours remis/.test(tous.o?.a_corriger || "")
+      && autresSeuls.code === 1 && JSON.stringify(autresSeuls.o?.avertissements_sans_motif) === JSON.stringify(["FRICTIONS"]),
+      `25 ter : le motif FRICTIONS sans lot cité est REFUSÉ (le cas du 09/11, TF-2303) ; tous les autres avertissements motivés, FRICTIONS reste à corriger (exit 1), obtenu ${JSON.stringify({ seul: [seul.code, seul.o?.avertissements_sans_motif, seul.o?.motifs_refuses], tous: [tous.code, tous.o?.affichable, tous.o?.avertissements_sans_motif, tous.o?.a_corriger], autresSeuls: [autresSeuls.code, autresSeuls.o?.avertissements_sans_motif] })}`);
+    const bLot = join(base, "brouillon-frictions-lot.md");
+    writeFileSync(bLot, RIEN + "\nLe lot « Produit-00 - RETOURS - 20261101a » a été remis le 01/11 pour une autre correction.\n", "utf8");
+    const pjLot = (...autres) => { const r = spawnSync(process.execPath, [HOOK, "--prejuger", bLot, "--transcript", t, ...autres], { encoding: "utf8", cwd: p, env: ENV_PRODUIT }); let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* illisible */ } return { code: r.status, o }; };
+    const sansLot = pjLot(), avecMotif = pjLot(...motifs(["FRICTIONS"]));
+    verifier((sansLot.o?.avertissements_sans_motif || []).includes("FRICTIONS")
+      && !(avecMotif.o?.avertissements_sans_motif || []).includes("FRICTIONS") && (avecMotif.o?.avertissements_motives || []).some((m) => m.code === "FRICTIONS") && !avecMotif.o?.motifs_refuses,
+      `25 quater : un lot de retours remis cité dans le texte, le motif FRICTIONS est accepté (TF-2303), obtenu ${JSON.stringify({ sansLot: sansLot.o?.avertissements_sans_motif, avecMotif: [avecMotif.o?.avertissements_sans_motif, avecMotif.o?.avertissements_motives, avecMotif.o?.motifs_refuses] })}`);
+    // 25 quinquies — la MÊME règle pour S48 : un tour sans ligne « Remontée à la factory » chez un produit reçoit S48 ; son motif est refusé sans lot cité, accepté avec un lot cité (TF-2303).
+    const bS48 = join(base, "brouillon-s48-sans-ligne.md"); writeFileSync(bS48, BON, "utf8");
+    const bS48Lot = join(base, "brouillon-s48-lot-cite.md"); writeFileSync(bS48Lot, BON + "\nLe lot « Produit-00 - RETOURS - 20261101a » est remis, il couvre une autre correction.\n", "utf8");
+    const pjS48 = (fichier, ...autres) => { const r = spawnSync(process.execPath, [HOOK, "--prejuger", fichier, "--transcript", t, ...autres], { encoding: "utf8", cwd: p, env: ENV_PRODUIT }); let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* illisible */ } return { code: r.status, o }; };
+    const s48sans = pjS48(bS48), s48refuse = pjS48(bS48, ...motifs(["S48"])), s48accepte = pjS48(bS48Lot, ...motifs(["S48"]));
+    verifier((s48sans.o?.avertissements_sans_motif || []).includes("S48") && (s48refuse.o?.avertissements_sans_motif || []).includes("S48") && (s48refuse.o?.motifs_refuses || []).some((m) => /^S48 : /.test(m))
+      && !(s48accepte.o?.avertissements_sans_motif || []).includes("S48") && (s48accepte.o?.avertissements_motives || []).some((m) => m.code === "S48"),
+      `25 quinquies : le motif S48 sans lot cité est REFUSÉ, avec un lot « <projet> - RETOURS - AAAAMMJJx » cité il est accepté (TF-2303), obtenu ${JSON.stringify({ sans: s48sans.o?.avertissements_sans_motif, refuse: [s48refuse.o?.avertissements_sans_motif, s48refuse.o?.motifs_refuses], accepte: [s48accepte.o?.avertissements_sans_motif, s48accepte.o?.avertissements_motives] })}`);
     verifier(bl.code === 1 && bl.o?.affichable === false && (bl.o?.bloquants || []).some((a) => /^FRICTIONS — /.test(a)),
       `25 bis : --prejuger armé bloquant → attendu exit 1 et le refus FRICTIONS, obtenu exit ${bl.code} ${JSON.stringify(bl.o?.bloquants || null).slice(0, 300)}`);
   }
@@ -431,4 +452,5 @@ console.log(`hook-restitution-frictions : ${cas}/${cas} PASS — LES FRICTIONS D
   + "le journal écrit aux champs de l'interface, sans doublon au second passage, une écriture ratée sans blocage ; "
   + "TF-2156 (05/11/2026) : « reste au produit, parce que… » et « rien de neuf » après une friction, sans retour consigné, avertis comme « rien à remonter », le retour consigné ou le lot nommé les levant ; "
   + "TF-2137 : le motif d'un « reste au produit » qui nomme un retour promis au futur, ou dit écrit sans entrée au ledger, refusé, le retour écrit (seq présente) accepté ; "
-  + "TF-2171 : --prejuger non affichable (exit 1) tant qu'un avertissement n'est pas motivé par --motif, affichable une fois chacun motivé");
+  + "TF-2171 : --prejuger non affichable (exit 1) tant qu'un avertissement n'est pas motivé par --motif, affichable une fois chacun motivé ; "
+  + "TF-2303 (09/11/2026) : le motif de FRICTIONS (et de S48) est refusé tant que le texte ne cite aucun lot « <projet> - RETOURS - AAAAMMJJx » — le cas du 09/11 — et accepté quand il en cite un");

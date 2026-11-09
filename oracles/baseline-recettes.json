@@ -351,8 +351,8 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 330,
-  "vu_le": "2026-11-06"
+  "cas": 349,
+  "vu_le": "2026-11-09"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
   "cas": 31,
@@ -455,8 +455,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution-frictions.test.mjs": {
-  "cas": 39,
-  "vu_le": "2026-11-05"
+  "cas": 41,
+  "vu_le": "2026-11-09"
  },
  "oracles/hook-restitution-moyen.test.mjs": {
   "cas": 26,
