@@ -84,6 +84,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
 | `Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` | fichier | 23,0 Ko | Étude d'opportunité — Suivi des temps et des coûts par produit — 20261105a |
 | `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 19,1 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
+| `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md` | fichier | 6,6 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261109a |
 | `Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` | fichier | 15,5 Ko | Étude — une vidéo où Claude reçoit 100 fois la consigne « fais mieux » |
 | `Digit-AI - Fiche - Actions A-2 et A-3 detaillees - 20261105b.md` | fichier | 4,5 Ko | Actions A-2 et A-3 de la synthèse du 05/11 : constat et préconisations |
 | `Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` | fichier | 5,5 Ko | Œil critique : 4 actions pour tenir les 8 demandes (29/10/2026) |
@@ -113,4 +114,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_94 fichier(s), 2 sous-dossier(s)_
+_95 fichier(s), 2 sous-dossier(s)_

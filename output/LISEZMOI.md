@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 664 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 665 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -265,6 +265,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md | 20261030a | 14.2 Ko | `03-etudes/Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` |
 | Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md | 20261105a | 23 Ko | `03-etudes/Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` |
 | Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md | 20261102e | 19.1 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` |
+| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md | 20261109a | 6.6 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md` |
 | Digit-AI - Étude - Video Make it better cent fois - 20261102b.md | 20261102b | 15.5 Ko | `03-etudes/Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` |
 | Digit-AI - Fiche - Actions A-2 et A-3 detaillees - 20261105b.md | 20261105b | 4.5 Ko | `03-etudes/Digit-AI - Fiche - Actions A-2 et A-3 detaillees - 20261105b.md` |
 | Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md | 20261029c | 5.5 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` |
