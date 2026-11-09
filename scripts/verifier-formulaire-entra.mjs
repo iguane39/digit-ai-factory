@@ -61,7 +61,9 @@ export function lireReponse(status, location, corps) {
 }
 
 async function demander(url, ua, fetchFn) {
-  const r = await fetchFn(url, { redirect: "manual", headers: { "User-Agent": ua, "X-Sonde": "digit-ai-verifier-formulaire-entra", "Accept": "text/html,application/xhtml+xml" } });
+  // « Connection: close » : aucune connexion maintenue ne survit à la réponse, la sortie du processus
+  // ne croise donc jamais une fermeture en cours (TF-2297, plantage 0xC0000409 sous Windows).
+  const r = await fetchFn(url, { redirect: "manual", headers: { "User-Agent": ua, "X-Sonde": "digit-ai-verifier-formulaire-entra", "Accept": "text/html,application/xhtml+xml", "Connection": "close" } });
   const corps = r.status >= 300 && r.status < 400 ? "" : (await r.text()).slice(0, 200000);
   return { status: r.status, location: r.headers.get("location"), corps };
 }
@@ -113,13 +115,20 @@ if (lanceEnDirect) {
   const args = process.argv.slice(2);
   const valeur = (nom) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : null; };
   const adresse = args.filter((a, i) => !a.startsWith("--") && !["--hote-entra", "--user-agent"].includes(args[i - 1]))[0];
-  const sortir = (corps, code) => { process.stdout.write(JSON.stringify({ outil: "verifier-formulaire-entra", version: "1.0.0", regle: "M-13 (ETAPE-MEP.md § 3 decies, règle 6)", ...corps, non_juge: NON_JUGE }, null, 1) + "\n", () => {
-    // process.exit() immédiat pendant que fetch referme ses connexions plante Node sous Windows (0xC0000409) : on laisse la boucle respirer.
-    process.exitCode = code; setTimeout(() => process.exit(code), 150);
-  }); };
-  if (!adresse || !/^https?:\/\//i.test(adresse)) sortir({ verdict: "NON_JUGEABLE", message: "adresse absente ou sans http(s)://" }, 2);
-  const r = await verifier(adresse, { hoteEntra: valeur("--hote-entra"), userAgent: valeur("--user-agent") || UA_MESURE });
-  const { code, ...reste } = r;
-  const findings = r.verdict === "FAIL" ? [{ regle: "FE-1", statut: "FAIL", ou: adresse, message: r.message }] : [];
-  sortir({ adresse, ...reste, findings }, code);
+  // JAMAIS process.exit() ici (TF-2297) : sortir de force pendant que fetch referme ses connexions plante
+  // Node sous Windows (0xC0000409). L'attente de 150 ms qui le précédait laissait encore planter
+  // 19 sous-processus sur 120 au rejeu du 09/11/2026. Le code de sortie se pose, et le processus
+  // s'arrête de lui-même quand la boucle est vide.
+  const sortir = (corps, code) => {
+    process.exitCode = code;
+    process.stdout.write(JSON.stringify({ outil: "verifier-formulaire-entra", version: "1.0.1", regle: "M-13 (ETAPE-MEP.md § 3 decies, règle 6)", ...corps, non_juge: NON_JUGE }, null, 1) + "\n");
+  };
+  if (!adresse || !/^https?:\/\//i.test(adresse)) {
+    sortir({ verdict: "NON_JUGEABLE", message: "adresse absente ou sans http(s)://" }, 2);
+  } else {
+    const r = await verifier(adresse, { hoteEntra: valeur("--hote-entra"), userAgent: valeur("--user-agent") || UA_MESURE });
+    const { code, ...reste } = r;
+    const findings = r.verdict === "FAIL" ? [{ regle: "FE-1", statut: "FAIL", ou: adresse, message: r.message }] : [];
+    sortir({ adresse, ...reste, findings }, code);
+  }
 }

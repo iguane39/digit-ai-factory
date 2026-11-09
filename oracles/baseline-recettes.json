@@ -803,8 +803,8 @@
   "vu_le": "2026-09-15"
  },
  "scripts/verifier-formulaire-entra.test.mjs": {
-  "cas": 12,
-  "vu_le": "2026-10-12"
+  "cas": 13,
+  "vu_le": "2026-11-09"
  },
  "scripts/verifier-garde-fous.test.mjs": {
   "cas": 16,
