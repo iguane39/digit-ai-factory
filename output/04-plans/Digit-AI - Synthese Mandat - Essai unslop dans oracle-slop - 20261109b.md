@@ -45,7 +45,7 @@ Rappels :
 
 ## 4. Traité
 
-Mesuré sur : `skills/unslop/references/signs.md` d'unslop au commit `97daa3e` et 2 799 pages uniques de `C:\dev`, relus à 15:20, périmètre 9 signes et 2 799 pages.
+Mesuré sur : `skills/unslop/references/signs.md` d'unslop au commit `97daa3e` et 2 799 pages uniques de `C:\dev`, relus entre 15:12 et 15:40, périmètre 9 signes et 2 799 pages.
 
 - **Les 9 signes.** 4 étaient déjà couverts par `oracle-slop` (dégradé violet S5, texte en dégradé S2, emojis et badges « New ✨ » S6). Sur les 5 restants, 2 entrent et 3 sont écartés.
 - **S11, halo coloré.** Une ombre sans décalage, au flou de 12px au moins, d'une couleur saturée ; en CSS, en `drop-shadow` et en classe Tailwind. L'ombre portée, l'ombre grise, l'anneau de focus et l'ombre intérieure restent hors règle. 0 constat dans le parc : la règle est préventive.
