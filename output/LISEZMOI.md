@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 668 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 669 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -623,6 +623,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md | 20261019d | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md` |
 | Digit-AI - Synthese Mandat - Extrait de production anonymise admis et outille - 20261029f.md | 20261029f | 6.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Extrait de production anonymise admis et outille - 20261029f.md` |
 | Digit-AI - Synthese Mandat - Favicon du produit de pentest en thème sombre - 20261103g.md | 20261103g | 3.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Favicon du produit de pentest en thème sombre - 20261103g.md` |
+| Digit-AI - Synthese Mandat - Favori TikTok ecoute et tri complete - 20261109d.md | 20261109d | 6 Ko | `04-plans/Digit-AI - Synthese Mandat - Favori TikTok ecoute et tri complete - 20261109d.md` |
 | Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md | 20261018c | 12.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md` |
 | Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md | 20261018d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md` |
 | Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md | 20261017c | 28.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md` |

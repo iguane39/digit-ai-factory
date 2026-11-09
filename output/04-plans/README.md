@@ -128,6 +128,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md` | fichier | 8,9 Ko | Synthèse Mandat — études d'opportunité tirées des favoris TikTok, 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Extrait de production anonymise admis et outille - 20261029f.md` | fichier | 6,9 Ko | Synthèse Mandat — extrait de production anonymisé : règle écrite, outil construit et publi |
 | `Digit-AI - Synthese Mandat - Favicon du produit de pentest en thème sombre - 20261103g.md` | fichier | 3,6 Ko | Synthèse Mandat — favicon du produit de pentest en thème sombre (03/11/2026) |
+| `Digit-AI - Synthese Mandat - Favori TikTok ecoute et tri complete - 20261109d.md` | fichier | 6,0 Ko | Synthèse Mandat — favori TikTok écouté et tri complété (09/11/2026) |
 | `Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md` | fichier | 12,3 Ko | Synthèse Mandat — D-19 (a) exécutée : 5 agents nommés, un rappel à chaque délégation, un r |
 | `Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md` | fichier | 5,3 Ko | Synthèse Mandat — D-20 (a) exécutée : la flotte d'agents est enregistrée et publiée, et la |
 | `Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md` | fichier | 28,5 Ko | Synthèse Mandat — format B appliqué aux décisions, et les 12 décisions ouvertes réécrites  |
@@ -217,4 +218,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_196 fichier(s), 4 sous-dossier(s)_
+_197 fichier(s), 4 sous-dossier(s)_
