@@ -23,7 +23,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260902-etude-opportunite-dataforseo-produit-02.md` | fichier | 43,7 Ko | Étude d'opportunité — entrée de DataForSEO dans le dispositif de mesure de Produit-02 — 20 |
 | `20260903-L99-amelioration-continue.md` | fichier | 42,3 Ko | Analyse L99 — « Conçois et construis un système d'amélioration continue de la factory » |
 | `20260903-recidives-mesure.md` | fichier | 7,3 Ko | Récidives au registre — mesure du pas 0 (03/09/2026) |
-| `20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` | fichier | 134,3 Ko | Digit-AI — Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur |
+| `20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` | fichier | 134,5 Ko | Digit-AI — Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur |
 | `20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` | fichier | 46,5 Ko | Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks |
 | `20260907-L99-mission-data-silver-gold-powerbi.md` | fichier | 47,5 Ko | Analyse L99 — « Identifie les compétences manquantes des forges pour une mission data Silv |
 | `20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` | fichier | 10,9 Ko | Pourquoi faut-il réécrire l'histoire à chaque fois, et comment cesser |
@@ -31,7 +31,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260911-etude-opportunite-communication-marketing-ao.md` | fichier | 48,9 Ko | Étude d'opportunité — communication, marketing et réponse aux appels d'offres pour Digit-A |
 | `20260911-L99-forge-communication-marketing.md` | fichier | 52,4 Ko | Analyse L99 — « Construire une forge communication & marketing pour Digit-AI : étude d'opp |
 | `20260911-L99-regles-d-ecriture-factory.md` | fichier | 58,5 Ko | Analyse L99 — « Améliorer tous les textes générés par la Factory : état de l'art, règles d |
-| `20260914-etude-opportunite-conception-documentaire-amont.html` | fichier | 112,8 Ko | Digit-AI — Étude d'opportunité — conception documentaire en amont — 20260914b — 20260914a |
+| `20260914-etude-opportunite-conception-documentaire-amont.html` | fichier | 113,2 Ko | Digit-AI — Étude d'opportunité — conception documentaire en amont — 20260914b — 20260914a |
 | `20260914-etude-opportunite-conception-documentaire-amont.md` | fichier | 27,4 Ko | Étude d'opportunité — conception documentaire en amont — 20260914b |
 | `20260914-etude-opportunite-personas-par-phase.html` | fichier | 111,1 Ko | Digit-AI — Étude d'opportunité — personas par phase de run — 20260914a — 20260914a |
 | `20260914-etude-opportunite-personas-par-phase.md` | fichier | 26,4 Ko | Étude d'opportunité — personas par phase de run — 20260914a |
@@ -55,7 +55,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `20260917-L99-revue-hebdomadaire-amelioration-continue.md` | fichier | 36,5 Ko | Analyse L99 — « Un process hebdomadaire d'analyse de l'existant pour l'amélioration contin |
 | `20260917-releve-autres-reseaux-sociaux.md` | fichier | 8,3 Ko | Relevé — les autres réseaux sociaux et les étapes non traitées (17/09/2026) |
 | `20260917-revue-hebdomadaire-mesure-pas0.md` | fichier | 21,2 Ko | Annexe de mesure — pas 0 de l'étude « revue hebdomadaire de l'existant » |
-| `20260919-etude-opportunite-plan-d-amelioration-post-audit.html` | fichier | 116,6 Ko | Digit-AI — Étude d'opportunité — plan d'amélioration d'une application après audit, rendu |
+| `20260919-etude-opportunite-plan-d-amelioration-post-audit.html` | fichier | 116,8 Ko | Digit-AI — Étude d'opportunité — plan d'amélioration d'une application après audit, rendu |
 | `20260919-etude-opportunite-plan-d-amelioration-post-audit.md` | fichier | 33,0 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
 | `20260919-L99-audit-et-plan-d-amelioration-plateforme.md` | fichier | 43,3 Ko | Analyse L99 — « Un audit, et en plus un plan d'amélioration complet de la plateforme » |
 | `20260921-etude-opportunite-reseaux-sociaux-complement.md` | fichier | 26,1 Ko | Étude d'opportunité — réseaux sociaux au-delà de LinkedIn : réseaux, étapes et types d'éme |
