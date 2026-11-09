@@ -150,7 +150,7 @@
     "source_lue_le": "2026-11-06",
     "criteres": {
       "c1": {"verdict": "tenu", "preuve": "Page de l'éditeur, mot pour mot : « Even with daily backups, you could still lose a day's worth of data. With PITR, you can back up to the point of disaster. »"},
-      "c2": {"verdict": "echoue", "preuve": "Page backups : « Note: Pro, Team and Enterprise Plan projects can enable PITR as an add-on. » ; page pricing, mot pour mot : « | Point-in-Time Recovery (PITR) | $100 per month per 7 days retention »."},
+      "c2": {"verdict": "echoue", "preuve": "Page backups : « Note: Pro, Team and Enterprise Plan projects can enable PITR as an add-on. » ; page pricing (https://supabase.com/pricing, relue le 09/11/2026), mot pour mot : « Point in time recovery … $100 per month per 7 days retention »."},
       "c3": {"verdict": "non_mesure", "preuve": "Effet d'une souscription sur le calcul du projet non mesurable sans geste distant."},
       "c4": {"verdict": "tenu", "preuve": "PATCH /v1/projects/{ref}/billing/addons, GET /database/backups, DELETE /billing/addons/{addon_variant} (OpenAPI de gestion)."},
       "c5": {"verdict": "tenu", "preuve": "GET /database/backups rend pitr_enabled (lu par l'audit de Client-A : false)."}
