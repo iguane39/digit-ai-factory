@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 666 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
+**État** : 667 livrable(s) courant(s), 7 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -613,6 +613,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md | 20261018j | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` |
 | Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md | 20261020g | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md` |
 | Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md | 20261018l | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` |
+| Digit-AI - Synthese Mandat - Essai unslop dans oracle-slop - 20261109b.md | 20261109b | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai unslop dans oracle-slop - 20261109b.md` |
 | Digit-AI - Synthese Mandat - Essais de MarkItDown et du skill de logo - 20261103d.md | 20261103d | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Essais de MarkItDown et du skill de logo - 20261103d.md` |
 | Digit-AI - Synthese Mandat - Etude d'une etape de revue de code - 20261103m.md | 20261103m | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude d'une etape de revue de code - 20261103m.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md | 20261003a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` |
