@@ -19,6 +19,13 @@ La page porte 48 favoris, après dédoublonnage, et 7 liens hors liste, ceux du 
 
 Rien n'a été téléchargé : les réponses 120b et 142b valaient pour le tri du 02/11. 1 contenu reste non qualifié : sa légende ne dit rien et sa couverture ne nomme qu'un dépôt sur 9. Le télécharger pour l'écouter est la décision D-182. Aucun contenu ne sort du filtre. Le détail des 6 reste dans `input/Tiktok/rangement-20261109.json`, ignoré par git.
 
+## Les 42 favoris déjà triés
+
+Ils gardent le verdict de leur tri ; ce tri ne les a pas relus.
+
+- 32 favoris triés le 02/11 : 22 sur l'IA, dont 1 étude poussée, 1 essai court, 4 décisions directes, 1 sujet à écarter et 15 sans suite, et 10 hors du filtre. Tableau : `output/03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md`.
+- 10 favoris triés le 19/10 : 5 rattachés aux opportunités n° 2, 3, 8 et 13 de ce tri, 1 rangé en contexte sans geste et 4 hors champ. Tableau : `output/03-etudes/20261019-tri-opportunites-favoris-tiktok.md`.
+
 ## Le tableau
 
 Les lignes vont du verdict le plus engageant au moins engageant. Les chiffres d'étoiles et de dates viennent de l'API GitHub, relevée le 09/11.
