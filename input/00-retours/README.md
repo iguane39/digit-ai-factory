@@ -20,6 +20,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`old\`](old/README.md) | dossier (678 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
 | `digit-ai-marketing - RETOURS - 20261109a.md` | fichier | 5,8 Ko | Retours forges — digit-ai-marketing — 20261109a |
 | `digit-ai-marketing - RETOURS - 20261109a.tf.jsonl` | fichier | 2,7 Ko | 3 ligne(s) JSONL |
+| `digit-ai-marketing - RETOURS - 20261109b.md` | fichier | 25,0 Ko | Retours forges — digit-ai-marketing — 20261109b |
+| `digit-ai-marketing - RETOURS - 20261109b.tf.jsonl` | fichier | 23,3 Ko | 22 ligne(s) JSONL |
+| `digit-ai-marketing - RETOURS - 20261109c.md` | fichier | 79,5 Ko | Retours forges — digit-ai-marketing — 20261109c |
+| `digit-ai-marketing - RETOURS - 20261109c.tf.jsonl` | fichier | 70,5 Ko | 52 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261015a.md` | fichier | 8,5 Ko | Retours forges — Produit-02 — 20261015a |
 | `Produit-02 - RETOURS - 20261015a.tf.jsonl` | fichier | 3,3 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261018a.md` | fichier | 6,4 Ko | Retours forges — Produit-02 — 20261018a |
@@ -150,6 +154,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-84 - RETOURS - 20261106e.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261109a.md` | fichier | 3,3 Ko | Retours forges — Produit-84 — 20261109a |
 | `Produit-84 - RETOURS - 20261109a.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `Produit-84 - RETOURS - 20261109b.md` | fichier | 5,9 Ko | Retours forges — Produit-84 — 20261109b |
+| `Produit-84 - RETOURS - 20261109b.tf.jsonl` | fichier | 3,3 Ko | 3 ligne(s) JSONL |
 | `Produit-85 - RETOURS - 20261024a.md` | fichier | 10,9 Ko | Retours forges — Produit-85 — 20261024a |
 | `Produit-85 - RETOURS - 20261024a.tf.jsonl` | fichier | 6,0 Ko | 7 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261103a.md` | fichier | 17,1 Ko | Retours forges — Produit-86 — 20261103a |
@@ -195,4 +201,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261109b.md` | fichier | 3,9 Ko | Retours forges — Produit-86 — 20261109b |
 | `Produit-86 - RETOURS - 20261109b.tf.jsonl` | fichier | 862 o | 1 ligne(s) JSONL |
 
-_176 fichier(s), 2 sous-dossier(s)_
+_182 fichier(s), 2 sous-dossier(s)_
