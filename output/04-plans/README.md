@@ -165,6 +165,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` | fichier | 4,1 Ko | Synthèse Mandat — D-52 exécutée, pilot publié jusqu'à 1855a4df (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` | fichier | 3,3 Ko | Synthèse Mandat — publication du pilot constatée, mes commits publiés sous de nouveaux num |
 | `Digit-AI - Synthese Mandat - Publication du pilot et detail de D-182 et D-184 - 20261109c.md` | fichier | 7,8 Ko | Synthèse Mandat — publication du pilot et détail de D-182 et D-184 (09/11/2026) |
+| `Digit-AI - Synthese Mandat - Publication du pilot sur A1 - 20261109e.md` | fichier | 2,3 Ko | Synthèse Mandat — publication du pilot sur A1 (09/11/2026) |
 | `Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` | fichier | 9,3 Ko | Synthèse Mandat — 4 dépôts publiés, skills recopiés, campagne de consigne jouée sans gagna |
 | `Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` | fichier | 5,3 Ko | Synthèse Mandat — vos décisions D-61 (a), D-62 (a) et D-63 sont exécutées : 3 dépôts publi |
 | `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
@@ -218,4 +219,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_197 fichier(s), 4 sous-dossier(s)_
+_198 fichier(s), 4 sous-dossier(s)_

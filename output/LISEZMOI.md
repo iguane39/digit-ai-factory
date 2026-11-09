@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 669 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 671 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -660,6 +660,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md | 20261020d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` |
 | Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md | 20261104e | 3.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` |
 | Digit-AI - Synthese Mandat - Publication du pilot et detail de D-182 et D-184 - 20261109c.md | 20261109c | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot et detail de D-182 et D-184 - 20261109c.md` |
+| Digit-AI - Synthese Mandat - Publication du pilot sur A1 - 20261109e.md | 20261109e | 2.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot sur A1 - 20261109e.md` |
 | Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md | 20261017e | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` |
 | Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md | 20261012d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` |
 | Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md | 20261001l | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` |
@@ -689,6 +690,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md | 20261105d | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 - 20261106a.md | 20261106a | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 - 20261106a.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md | 20261106b | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 - 20261109d.md | 20261109d | 10.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 - 20261109d.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md | 20261029g | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` |
 | Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md | 20261102b | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` |
 | Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md | 20261103p | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` |
