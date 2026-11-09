@@ -91,15 +91,42 @@ export function correctionDeProcessus(message) {
  * leur skill ou leur forge. Limite assumée : « le rapport d'audit du projet est prêt » reçoit aussi la
  * ligne ; elle ne bloque rien et ne dit à la session que la route à suivre si audit il y a.
  */
-const MOT_AUDIT = /\b(?:audit|audits|auditer|audite[rz]?)\b\s*(?:(?:des|du|de|d['’]|les|la|le|l['’]|cette|cet|ce|mon|ma|notre|son|sa)(?![\p{L}])\s*)*(\p{L}+)?/iu;
+const MOT_AUDIT = /(?<![\p{L}\p{N}_])(audit|audits|auditer|audite[rz]?|auditons)(?![\p{L}\p{N}_])\s*(?:(?:des|du|de|d['’]|les|la|le|l['’]|cette|cet|ce|mon|ma|notre|son|sa)(?![\p{L}])\s*)*(\p{L}+)?/giu;
 const AUDIT_SPECIALISE = /^(?:prompts?|skills?|seo|geo|s[ée]curit[ée]|websec|tests?|couverture|accessibilit[ée]|rgaa|traductions?|design|rendu|donn[ée]es|forge)$/iu;
 const OBJET_PRODUIT = /\b(?:complet|compl[èe]te|global|globale|g[ée]n[ée]ral|projet|produit|appli|application|code|d[ée]p[ôo]t|repo|plateforme|site|gouvernance|maturit[ée]|poc[- ]to[- ]prod)\b/iu;
+
+/**
+ * TF-2301 (09/11/2026, décision R-58) — LE VERBE DE LA DEMANDE PORTE L'AUDIT. Le fait : la consigne d'une série
+ * d'animations, dont une liste d'idées citait `forge-audit`, a reçu « ce message demande un AUDIT DU PRODUIT »,
+ * parce que le mot « audit » et le mot « produit » se trouvaient dans la même phrase. Le mot ne suffit plus, il
+ * doit être DEMANDÉ : (1) un verbe d'audit (« audite », « auditer »), ou le nom « audit » sous un verbe de
+ * demande (« lance », « fais », « je veux », « il faut »…) dans la même proposition, ou le nom en tête de
+ * phrase (« Audit complet du projet. ») ; (2) jamais collé à un identifiant (`forge-audit`, `audit-produit`) ; (3)
+ * jamais dans une citation entre guillemets ; (4) jamais dans une énumération d'idées (une ligne à puce sans verbe,
+ * ou une phrase ouverte par « idées : », « pistes : », « exemples : »…). Limite assumée : un verbe de demande placé
+ * dans une idée (« idées : lancer un audit du produit ») est lu comme une idée, pas comme une demande.
+ */
+const VERBE_DE_DEMANDE = /(?<![\p{L}])(?:lanc(?:e|er|ez|ons)|relanc(?:e|er|ez)|fais|faire|faites|effectu(?:e|er|ez)|r[ée]alis(?:e|er|ez)|m[èe]ne|mener|menez|conduis|conduire|conduisez|ouvr(?:e|ir|ez)|pass(?:e|er|ez)|proc[èe]d(?:e|er|ez)|d[ée]clench(?:e|er|ez)|d[ée]marr(?:e|er|ez)|ex[ée]cut(?:e|er|ez)|pr[ée]par(?:e|er|ez)|planifi(?:e|er|ez)|demand(?:e|er|ez)|command(?:e|er|ez)|veux|voudrais|souhait(?:e|es|ons)|aimerais|exige|besoin|faut|faudrait|obtien(?:s|dr)|obtenir|donne|donner|donnez)(?![\p{L}])/iu;
+const CITATION = /«[^»]*»|"[^"\n]*"|“[^”]*”/gu;
+const PUCE = /^\s*(?:[-*•–—]|\d+\s*[).])\s/u;
+const INTRO_D_ENUMERATION = /(?<![\p{L}])(?:id[ée]es?|pistes?|exemples?|options?|suggestions?|inspirations?|propositions?|th[èe]mes?|liste)(?![\p{L}])[^:\n]*:/iu;
 export function demandeAuditProduit(message) {
-  return String(message || "").split(/[.!?\n]/).some((p) => {
-    const a = MOT_AUDIT.exec(p);
-    if (!a) return false;
-    if (a[1] && AUDIT_SPECIALISE.test(a[1])) return false;
-    return OBJET_PRODUIT.test(p);
+  return String(message || "").split(/[.!?\n]/).some((brut) => {
+    const p = brut.replace(CITATION, " ");
+    if (!OBJET_PRODUIT.test(p)) return false;
+    const enPuce = PUCE.test(brut);
+    for (const a of p.matchAll(MOT_AUDIT)) {
+      if (a[2] && AUDIT_SPECIALISE.test(a[2])) continue;
+      const avant = p[a.index - 1], apres = p[a.index + a[1].length];
+      if ((avant && /[-./\\@]/.test(avant)) || (apres && /[-/\\@]/.test(apres))) continue; // un identifiant, pas une demande
+      const prefixe = p.slice(0, a.index);
+      if (INTRO_D_ENUMERATION.test(prefixe)) continue; // une idée citée, pas une demande
+      if (/^audit/i.test(a[1]) && !/^audit(?:s)?$/i.test(a[1])) return true; // « audite », « auditer » : le verbe d'audit
+      const fenetre = prefixe.slice(-60).split(/[;:(]/).pop();
+      if (VERBE_DE_DEMANDE.test(fenetre)) return true; // le nom « audit » sous un verbe de demande
+      if (!enPuce && prefixe.trim() === "") return true; // « Audit complet du projet » : la demande nominale
+    }
+    return false;
   });
 }
 
@@ -500,6 +527,21 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ["Fais un audit de sécurité de l'application", []],
     ["Relance l'audit des tests du projet", []],
     ["l'audit forge-tests a rendu exit 3", []],
+    // TF-2301 (09/11/2026) — LE VERBE DE LA DEMANDE PORTE L'AUDIT. Les rouges sont les mentions d'une consigne
+    // d'animations (identifiant `forge-audit`, énumération d'idées, citation, constat au passé) ; les verts sont
+    // les mêmes mots portés par un verbe de demande, y compris au milieu d'une liste ou après des idées.
+    ["Idées d'animation pour la série : un audit du produit raconté en 30 secondes, un test de charge du site", []],
+    ["Pistes : forge-audit sur le produit entier, forge-seo pour le site", []],
+    ["Pour la série, une scène où forge-audit passe le produit au crible", []],
+    ["- audit complet du projet en accéléré\n- tests du site en direct", []],
+    ["Le titre « audit complet du projet » est trop long", []],
+    ["Le rapport d'audit du projet est prêt", []],
+    ["L'audit complet du projet a été fait hier", []],
+    ["Audit complet du projet", ["audit"]],
+    ["Je veux un audit complet du produit avant jeudi", ["audit"]],
+    ["Voici ma demande :\n- lance un audit complet du projet\n- puis corrige les écarts", ["audit"]],
+    ["Idées d'animation : un audit du produit raconté en 30 secondes.\nPuis lance un audit complet du projet", ["audit"]],
+    ["Il faut un audit de gouvernance du projet", ["audit"]],
     // TF-1753 (15/10/2026, lot Produit-64 20261015a RT-69) — « peut-on le faire comme X ? » demande
     // une IMITATION, pas une délégation à X. Les verts reprennent la question de l'humain et ses
     // voisines ; les rouges sont les « comme » qui n'imitent personne, et la délégation explicite.

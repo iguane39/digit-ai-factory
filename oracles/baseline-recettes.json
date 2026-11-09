@@ -83,8 +83,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 81,
-  "vu_le": "2026-11-05"
+  "cas": 93,
+  "vu_le": "2026-11-09"
  },
  "hook-page-html.mjs": {
   "cas": 17,
@@ -431,8 +431,8 @@
   "vu_le": "2026-11-05"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 28,
-  "vu_le": "2026-11-05"
+  "cas": 29,
+  "vu_le": "2026-11-09"
  },
  "oracles/hook-mutation-en-cours.test.mjs": {
   "cas": 37,
