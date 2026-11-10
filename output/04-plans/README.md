@@ -106,6 +106,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md` | fichier | 2,8 Ko | Synthèse Mandat — D-79 (c) enregistrée : T4 entière part dès la fusion du compte rendu all |
 | `Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md` | fichier | 5,7 Ko | Synthèse Mandat — D-79 détaillée : contrôle audit et data seul, ou T4 entière après T2 (26 |
 | `Digit-AI - Synthese Mandat - Decisions 125a et 126a du tri TikTok - 20261102j.md` | fichier | 9,8 Ko | Synthèse Mandat — réponses 125a et 126a sur le tri des favoris TikTok (02/11/2026) |
+| `Digit-AI - Synthese Mandat - Decisions 191 a 193 appliquees - 20261110e.md` | fichier | 5,8 Ko | markdown |
 | `Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` | fichier | 21,3 Ko | Digit-AI — Synthèse de mandat — D-36 et D-37 exécutées, 18 candidatures closes — 01/10/202 |
 | `Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` | fichier | 19,6 Ko | Synthèse Mandat — vos décisions D-49, D-50 et D-51 sont exécutées ou en cours ; la campagn |
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
@@ -228,4 +229,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_207 fichier(s), 4 sous-dossier(s)_
+_208 fichier(s), 4 sous-dossier(s)_
