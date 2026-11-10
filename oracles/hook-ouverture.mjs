@@ -141,7 +141,8 @@ function indicesApresRapatriement() {
   if (o.collisions.length) {
     lignes.push("", `## Indices des livrables (R-4, TF-1359) : DÉFAUT — ${o.collisions.length} indice(s) partagé(s) par un livrable arrivé depuis l'ouverture précédente`,
       ...o.collisions.map((c) => `- ${c.ou} ${String(c.message).split(" : l'indice existe")[0]}`),
-      "→ réindexer le plus récent : `node scripts/allouer-indice.mjs`, puis renommer ; la tête relevée n'avance pas avant.");
+      // TF-2335 (10/11/2026) : le chemin se résout depuis le pilot. Chez un produit, `scripts/allouer-indice.mjs` n'existe pas (ls : No such file).
+      `→ réindexer le plus récent : \`node "${enSlash(join(PILOT, "scripts", "allouer-indice.mjs"))}"\`, puis renommer ; la tête relevée n'avance pas avant.`);
     return;
   }
   lignes.push("", !precedente

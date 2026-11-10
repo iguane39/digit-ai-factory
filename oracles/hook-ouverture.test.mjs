@@ -1101,6 +1101,44 @@ if (veut(2067)) {
   }
 }
 
+veut(2335);
+// ---- TF-2335 (10/11/2026, RP-12 de Produit-84) : le remède prescrit à une collision d'indice est une commande qui MARCHE chez le produit.
+// Le message disait `node scripts/allouer-indice.mjs`, chemin relatif : chez un produit, ce script n'existe pas (il vit au pilot) et la
+// commande prescrite échouait. Le banc joue le hook d'un produit sans `scripts\` contre un pilot factice dont le contrôle d'unicité rend une
+// collision, puis EXÉCUTE la commande imprimée (le remède qu'on recommande se joue, TF-1013) : elle doit trouver son script.
+if (sectionVoulue) {
+  const pilotFactice = mkdtempSync(join(tmpdir(), "ouverture-indice-pilot-"));
+  const produitSansScripts = mkdtempSync(join(tmpdir(), "ouverture-indice-produit-"));
+  try {
+    const git = (...a) => execFileSync("git", ["-C", pilotFactice, "-c", "user.email=banc@example.invalid", "-c", "user.name=banc", ...a], { encoding: "utf8" });
+    git("init", "-q"); git("commit", "-q", "--allow-empty", "-m", "banc");
+    mkdirSync(join(pilotFactice, "scripts"), { recursive: true });
+    writeFileSync(join(pilotFactice, "scripts", "indices-uniques.mjs"), "console.log(JSON.stringify({ collisions: [{ ou: 'output/x.md', message: \"indice 'a' partagé : l'indice existe déjà\" }], passif: 0 }));" + NL);
+    writeFileSync(join(pilotFactice, "scripts", "allouer-indice.mjs"), "console.log('allouer-indice-joue');" + NL);
+    const sortie = execFileSync(process.execPath, [hook, "--sans-readme", "--pilot", pilotFactice], { cwd: produitSansScripts, encoding: "utf8", timeout: 120000 });
+    const m = sortie.match(/réindexer le plus récent : `(node [^`]+)`/);
+    check("TF-2335 vert — la collision d'indice est dite chez le produit avec une commande de réindexation", () => {
+      if (!m) throw new Error(`commande de réindexation absente de la sortie : ${sortie.slice(0, 300)}`);
+    });
+    check("TF-2335 vert — la commande imprimée porte le chemin RÉSOLU du pilot, pas un chemin relatif", () => {
+      const attendu = join(pilotFactice, "scripts", "allouer-indice.mjs").replace(/\\/g, "/");
+      if (!m || !m[1].includes(attendu)) throw new Error(`chemin du pilot absent de « ${m && m[1]} » (attendu : ${attendu})`);
+    });
+    check("TF-2335 vert — la commande imprimée, jouée depuis le produit, trouve son script", () => {
+      if (!m) throw new Error("pas de commande à jouer");
+      const r = spawnSync(m[1], { cwd: produitSansScripts, shell: true, encoding: "utf8" });
+      if (r.status !== 0 || !/allouer-indice-joue/.test(r.stdout || "")) throw new Error(`commande imprimée en échec (exit ${r.status}) : ${(r.stderr || "").slice(0, 200)}`);
+    });
+    check("TF-2335 rouge — l'ancien message (chemin relatif) échoue chez un produit sans scripts\\", () => {
+      const r = spawnSync("node scripts/allouer-indice.mjs", { cwd: produitSansScripts, shell: true, encoding: "utf8" });
+      if (r.status === 0) throw new Error("la commande relative réussit chez le produit : le banc ne distingue plus l'ancien message du nouveau");
+    });
+  } finally {
+    rmSync(pilotFactice, { recursive: true, force: true });
+    rmSync(produitSansScripts, { recursive: true, force: true });
+  }
+}
+
 if (filtre.actif) { const c = conclureFiltre("hook-ouverture", filtre, fail ? [`${fail} contrôle(s) en échec (lignes [FAIL] ci-dessus)`] : []); (c.code === 0 ? console.log : console.error)(c.ligne); process.exit(c.code); }
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135 ; journal d'héritage, TF-2067) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
