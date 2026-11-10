@@ -147,6 +147,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md` | fichier | 4,8 Ko | Synthèse Mandat — la note de travail sur l'œil critique des process est remise, prête à êt |
 | `Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md` | fichier | 10,7 Ko | Synthèse Mandat — vos réponses 61a, 62a et 63a appliquées, proposition d'œil critique du 2 |
 | `Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md` | fichier | 11,0 Ko | Synthèse Mandat — l'œil critique des process est étudié, son premier cycle explique les 19 |
+| `Digit-AI - Synthese Mandat - Oeil critique du 29-10 au 05-11 - 20261110a.md` | fichier | 24,5 Ko | Synthèse Mandat — Œil critique du poste, première moitié de la période due (10/11/2026) |
 | `Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` | fichier | 11,6 Ko | Synthèse Mandat — œil critique et architecture de la Factory : état au 26/10/2026 |
 | `Digit-AI - Synthese Mandat - Oeil critique global des process etudie - 20261020j.md` | fichier | 10,4 Ko | Synthèse Mandat — l'œil critique global des process est étudié : 10 périmètres, 7 leviers, |
 | `Digit-AI - Synthese Mandat - Oeil critique global releve des appels - 20261020k.md` | fichier | 5,2 Ko | Synthèse Mandat — l'étude de l'œil critique global reçoit le relevé des appels : aucun pro |
@@ -223,4 +224,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_202 fichier(s), 4 sous-dossier(s)_
+_203 fichier(s), 4 sous-dossier(s)_

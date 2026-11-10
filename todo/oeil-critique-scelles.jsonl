@@ -23,3 +23,9 @@
 {"type":"choix","decision":"D-100","choix":"a","recommandation":"a","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.503Z"}
 {"type":"choix","decision":"D-101","choix":"b","recommandation":"b","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.594Z"}
 {"type":"choix","decision":"D-102","choix":"a","recommandation":"a","accord":true,"poste":"Dell-XPS-16","ts":"2026-10-30T08:13:22.685Z"}
+{"type":"choix","decision":"D-106","choix":"b","recommandation":"b","accord":true,"poste":"Dell-XPS-16","ts":"2026-11-10T10:12:15.014Z"}
+{"type":"scelle","decision":"D-194","option":"b","motif":"D-98 (a) a durci les gardes le 30/10 et 12 formes passent encore, dont une créée par ce durcissement : ajouter des cas ne ferme pas la famille, refuser ce que l'analyse ne lit pas la ferme","poste":"Dell-XPS-16","ts":"2026-11-10T10:39:04.775Z"}
+{"type":"scelle","decision":"D-195","option":"b","motif":"un accord de 5 caractères quelconques et une commande « * » couvrent tout geste distant : la session peut fabriquer son propre accord","poste":"Dell-XPS-16","ts":"2026-11-10T10:39:05.677Z"}
+{"type":"scelle","decision":"D-196","option":"c","motif":"3 gestes graves en une semaine chez 2 produits, droits de contournement encore en place à vérifier ; une barrière seule laisse en place ce qui a déjà été accordé","poste":"Dell-XPS-16","ts":"2026-11-10T10:39:06.765Z"}
+{"type":"scelle","decision":"D-197","option":"c","motif":"le scan rend PASS sur une négation pour la 2e exécution de suite ; une liste de noms d'en-têtes manquera toujours le suivant, un motif de nom couvre la famille","poste":"Dell-XPS-16","ts":"2026-11-10T10:39:07.528Z"}
+{"type":"scelle","decision":"D-198","option":"b","motif":"les relevés masquent déjà ces noms depuis D-106 (b) ; l'extraction est le seul maillon qui les laisse passer vers les agents","poste":"Dell-XPS-16","ts":"2026-11-10T10:39:08.117Z"}
