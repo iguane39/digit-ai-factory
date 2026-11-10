@@ -4,7 +4,9 @@
      Emplacement : forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md dans le projet.
      Le PRÉFIXE PROJET est obligatoire (décision humaine 13/08) : côté pilot, les lots de
      tous les projets cohabitent dans input\00-retours\ — le nom dit qui retourne quoi.
-     Un fichier remis ne se modifie JAMAIS — le lot suivant est un nouveau fichier daté. -->
+     Un fichier remis ne se modifie JAMAIS — le lot suivant est un nouveau fichier daté.
+     QUAND : DANS LE TOUR où le retour est écrit au ledger, pas à la clôture du run (D-191 (a), TF-2329). Le hook de fin de tour
+     du produit refuse un tour qui a écrit une entrée `type: retour` qu'aucun lot de `forge\retours\` ne cite par son seq. -->
 
 - **Contexte** : <clôture du run <run-id> | inspection production v<X> | incident | autre>
 - **Références ledger** : `forge\ledger.jsonl` seq <n, n…> (entrées `type: retour`)

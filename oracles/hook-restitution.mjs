@@ -41,6 +41,8 @@ import { decouperCommande, resoudreTemporaires } from "./lib-decoupe-commande.mj
 import { nombresDuTexte, chiffresDeGains } from "./lib-chiffres-releves.mjs";
 // TF-2141 (D-172 (b), 04/11/2026, RT-43) — les FRICTIONS du tour : relevé sur la transcription, journal `frictions.jsonl`, contrôle chez un produit.
 import { releveFrictions, tourDesFrictions, journaliserFrictions, controlerFrictions, RAPPEL_FRICTIONS } from "./lib-frictions.mjs";
+// TF-2329 (D-191 (a), 10/11/2026) — les retours écrits dans le tour et restés sans lot : la lecture du ledger est celle de l'alerte d'ouverture (TF-1988), réutilisée.
+import { retoursDuTourSansLot } from "./lib-retours-produit.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
 // de fin de tour, qui garde alors son propre relevé d'effets (`detecterEffets`) ; `ecrituresDuTour` le dit dans sa sortie.
@@ -1053,6 +1055,52 @@ export function controlerRemontee({ releve = null, racine = "", depuis = null, e
   return { applicable: true, verdict: "FAIL", skills, livrables: releve.livrables,
     ecarts: [`le tour a utilisé le skill de la Factory ${noms} et écrit à la main ${releve.livrables.length} livrable${releve.livrables.length > 1 ? "s" : ""} (${montres.join(" ; ")}${releve.livrables.length > 3 ? ` (+${releve.livrables.length - 3})` : ""}) `
       + "sans consigner aucun retour au ledger du produit"] };
+}
+
+// ---- TF-2329 (10/11/2026, décision humaine D-191 (a)) — UN RETOUR ÉCRIT DANS LE TOUR PART EN LOT DANS CE MÊME TOUR, BLOQUANT --------------------------
+//
+// LE FAIT, mesuré le 09/11/2026 chez un produit (récidive de TF-1988, TF-2223 et TF-2260) : 104 entrées `type: retour` sans lot, la plus ancienne de 59 jours,
+// 21 écrites depuis le dernier lot ; l'alerte d'ouverture figurait à 7 sessions du jour et aucune n'a compilé de lot. Le contrat produit ne compilait le lot
+// qu'« à la clôture de tout run » : le ledger comptait 2 `run_open` pour 0 clôture. Une restitution du jour écrivait « remontées à la Factory » pour des causes
+// qui n'étaient qu'au ledger. TF-1988 est un affichage ; S48 juge une ligne de texte, pas l'existence d'un lot.
+//
+// LA RÈGLE (D-191 (a)). Chez un produit (un `forge/retours/`), un tour qui a écrit au moins une entrée `type: retour` au ledger du run ou au journal hors run
+// (TF-2260) sans qu'un lot de `forge/retours/` la cite à la fin du tour est REFUSÉ. Le refus dit la commande : compiler le lot, le citer par seq, puis
+// `node forge/retours/oracle-lot.mjs "<lot>.md" --remettre` (TF-2314). Un retour écrit AVANT le tour n'est pas accusé : l'alerte d'ouverture le dit toujours.
+// Bloquante dès l'entrée (décision humaine : « le hook de fin de tour du produit refuse »), `--prejuger` rend le même refus avant l'affichage.
+//
+// COMMENT UN RETOUR EST DIT « ÉCRIT DANS LE TOUR ». Par le `ts` de l'entrée (UTC, à la seconde) contre l'horodatage du dernier message humain RÉEL
+// (`tourDesFrictions`), pas par une lecture des commandes : un script, un sous-agent ou un outil qui écrit au ledger sont vus eux aussi. `retourCommande`
+// (la transcription montre une commande ou une écriture qui consigne un retour) ne change pas le verdict, il est journalisé : il dit si la datation du ledger
+// est seule à accuser (`via: "ledger"`), ce qui sert à mesurer le faux positif ci-dessous.
+//
+// CE QUE CE CONTRÔLE NE VOIT PAS, dit plutôt que promis : (1) une AUTRE session du même produit qui écrit un retour pendant ce tour est accusée aussi — la
+// datation ne distingue pas les écrivains ; la garde anti-boucle laisse alors finir au second passage, avec l'écart affiché ; (2) un lot qui cite un retour
+// autrement que par « seq n » (ce que `seqCites` ne lit pas) laisse le retour sans lot ; (3) que le lot soit REMIS au sas du pilot : c'est l'alerte
+// d'ouverture des lots `a_remettre` (TF-1758) ; (4) une transcription sans message humain réel (début du tour inconnu) : personne n'est accusé.
+export const RAPPEL_LOT = "D-191 (a), TF-2329 : un retour part en lot dans le tour où il est écrit, pas à la clôture du run. Compile le lot `forge/retours/<projet> - RETOURS - AAAAMMJJx.md` "
+  + "et son sidecar `.tf.jsonl` (gabarit `gabarits/RETOURS-FORGES.md` du pilot), cite chaque seq (« Références ledger : forge/ledger.jsonl seq 12, 13 » ; hors run : « forge/hors-run.jsonl seq 2 ; »), "
+  + "puis joue `node forge/retours/oracle-lot.mjs \"<lot>.md\" --remettre` : il contrôle le lot et ne le copie au sas du pilot qu'à exit 0. Cite ensuite le lot à la ligne « Remontée à la factory » de ta restitution.";
+
+/**
+ * Le contrôle. SANS_OBJET hors d'un produit, ou quand le début du tour ou le ledger sont illisibles ; PASS sans retour écrit dans le tour (ou tous cités par un lot) ;
+ * FAIL — bloquant — sinon. `depuis` : horodatage du dernier message humain réel ; `tourEcrit` : le tour a écrit (`travail` de la transcription) ; `retourCommande` : la
+ * transcription montre une consignation de retour (elle suffit seule à tenir le tour pour écrivant, et dit au journal `via`).
+ */
+export function controlerLotDansLeTour({ racine = "", depuis = null, retourCommande = false, tourEcrit = false, pilot = join(ICI, "..") } = {}) {
+  const sans = { applicable: false, verdict: "SANS_OBJET", bloquant: false, ecarts: [], retours: [] };
+  // Un tour qui n'a rien écrit (question, lecture) n'a pas écrit de retour : celui que le ledger daterait de ce tour vient d'une AUTRE session du produit.
+  if (!tourEcrit && !retourCommande) return { ...sans, motif: "le tour n'a rien écrit (aucune écriture ni consignation de retour dans la transcription) : un retour daté de ce tour vient d'une autre session" };
+  const produit = produitDe(racine);
+  if (!produit) return { ...sans, motif: "ni un produit (aucun forge/retours/ en remontant depuis le dossier de la session) : le pilot et les forges n'ont pas de lot de retours à compiler dans le tour" };
+  let retours = null;
+  try { retours = retoursDuTourSansLot(produit, pilot, { depuis }); } catch { retours = null; }
+  if (retours === null) return { ...sans, motif: "début du tour ou ledger du produit illisible : aucun retour du tour relevé" };
+  if (!retours.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], retours: [], via: null };
+  const duRun = retours.filter((r) => !r.horsRun).map((r) => r.seq), horsRun = retours.filter((r) => r.horsRun).map((r) => r.seq);
+  const quoi = [duRun.length ? `forge/ledger.jsonl seq ${duRun.join(", ")}` : "", horsRun.length ? `forge/hors-run.jsonl seq ${horsRun.join(", ")}` : ""].filter(Boolean).join(" ; ");
+  return { applicable: true, verdict: "FAIL", bloquant: true, produit, retours, via: retourCommande ? "transcription+ledger" : "ledger",
+    ecarts: [`le tour a écrit ${retours.length} retour${retours.length > 1 ? "s" : ""} (${quoi}) et aucun lot de forge/retours/ ne ${retours.length > 1 ? "les cite" : "le cite"} à la fin du tour`] };
 }
 
 // `racine` (TF-1644, 14/10/2026) : le dossier du projet du tour. Le message est écrit dans un
@@ -2114,14 +2162,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
   let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null, gainsP = [], remonteeP = null, depuisP = null;
-  let frictionsP = null, depuisFrictionsP = null, retourFrictionsP = false;
+  let frictionsP = null, depuisFrictionsP = null, retourFrictionsP = false, travailP = false;
   try {
     if (cheminT && existsSync(cheminT)) {
       const tour = analyserTranscript(readFileSync(cheminT, "utf8"));
       dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; nombresP = tour.nombresTour || null; critiqueP = tour.critique || null;
       livrablesP = tour.livrables || [];
       remonteeP = tour.remontee || null; depuisP = tour.depuis || null;
-      frictionsP = tour.frictions || []; depuisFrictionsP = tour.depuisFrictions || null; retourFrictionsP = Boolean(tour.retourFrictions);
+      frictionsP = tour.frictions || []; depuisFrictionsP = tour.depuisFrictions || null; retourFrictionsP = Boolean(tour.retourFrictions); travailP = Boolean(tour.travail);
       gainsP = fusionnerGains(tour.gainsLitteraux || [], tour.evenementsJournalises || [], racineDuProjet(process.cwd()));
       syntheseDeposee = syntheseDuTour(tour.fichiersMd);
       if (syntheseDeposee) {
@@ -2158,13 +2206,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   // depuis le message humain du tour. Avertissante (mesure d'entrée en tête du contrôle, lib-frictions.mjs) ; transcription introuvable : non jouée.
   const frictionsJ = frictionsP ? controlerFrictions({ frictions: frictionsP, texte: brouillon, racine: RACINE_P, retourConsigne: retourFrictionsP || retourAuLedger(RACINE_P, depuisFrictionsP) }) : null;
   const frictionsBloque = Boolean(frictionsJ && frictionsJ.verdict === "FAIL" && frictionsJ.bloquant);
+  // TF-2329 (D-191 (a)) — le LOT dans le tour : un retour écrit au ledger depuis le message humain du tour, sans lot qui le cite, REFUSE l'affichage comme il refuserait la fin du tour.
+  // Transcription introuvable : le début du tour est inconnu, le contrôle n'est pas joué (et le dit).
+  const lotJ = frictionsP ? controlerLotDansLeTour({ racine: RACINE_P, depuis: depuisFrictionsP, retourCommande: retourFrictionsP, tourEcrit: travailP }) : null;
+  const lotBloqueP = Boolean(lotJ && lotJ.verdict === "FAIL" && lotJ.bloquant);
   // T2 (TF-1947) : DÉTAIL avertit, comme au hook de fin de tour ; AFFICHAGE, COMPLÉTUDE, RÉSERVATION et CRITIQUE (dès son échéance) bloquent.
   const refus = [...bloquants.map((x) => `${x.regle} — ${x.message}`),
     ...ecartsAffichage.map((e) => `AFFICHAGE — ce brouillon ne dit pas ce que dit la synthèse déposée ${syntheseDeposee} : ${e}`),
     ...completude.ecarts.map((e) => `COMPLÉTUDE — ${e}. ${RAPPEL_MESURE}`),
     ...(reservationBloque ? reservation.ecarts.map((e) => `RÉSERVATION — ${e}. ${rappelReservation(reservation)}`) : []),
     ...(critiqueBloque ? critiqueJ.ecarts.map((e) => `CRITIQUE — ${e}. ${RAPPEL_CRITIQUE}`) : []),
-    ...(frictionsBloque ? frictionsJ.ecarts.map((e) => `FRICTIONS — ${e}. ${RAPPEL_FRICTIONS}`) : [])];
+    ...(frictionsBloque ? frictionsJ.ecarts.map((e) => `FRICTIONS — ${e}. ${RAPPEL_FRICTIONS}`) : []),
+    ...(lotBloqueP ? lotJ.ecarts.map((e) => `LOT — ${e}. ${RAPPEL_LOT}`) : [])];
   // TF-2171 (05/11/2026, RT-74 de Produit-64) — UN AVERTISSEMENT SE LIT AVANT L'AFFICHAGE, IL NE SE COMPTE PAS. Le 05/11/2026, `--prejuger` a rendu `affichable: true`, aucun bloquant et 17 avertissements
   // en codes nus (S11 à S84), sans message : la session a affiché le texte, le porteur l'a refusé, et `oracle-synthese` sur le même fichier rendait FAIL (S30, S31, S32, S13, S42, S48…). Le hook de
   // fin de tour, lui, dit « code — message » sous la réponse. Désormais chaque avertissement est rendu avec son message, et `affichable` ne vaut vrai que sans avertissement NON MOTIVÉ : un avertissement
@@ -2206,6 +2259,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     ...(motifsInutiles.length ? { motifs_ignores: motifsInutiles } : {}),
     remontee: remonteeJ.applicable ? { verdict: remonteeJ.verdict, skills: remonteeJ.skills.map((s) => s.nom), livrables: remonteeJ.livrables.map(nomDe) }
       : "sans objet : hors d'un produit, aucun skill de la Factory utilisé, ou aucun livrable de page ou de document écrit à la main sous output/ (ou transcript introuvable)",
+    lot_dans_le_tour: !lotJ ? "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)"
+      : lotJ.applicable ? { verdict: lotJ.verdict, bloquant: lotJ.bloquant, retours: lotJ.retours.map((r) => `${r.horsRun ? "hors-run " : ""}seq ${r.seq}`), via: lotJ.via || null }
+        : `sans objet : ${lotJ.motif}`,
     frictions: !frictionsJ ? "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)"
       : frictionsJ.applicable ? { verdict: frictionsJ.verdict, bloquant: frictionsJ.bloquant, relevees: frictionsP.length, retenues: frictionsJ.retenues.map((x) => x.type) }
         : `sans objet : ${frictionsJ.motif}`,
@@ -2220,7 +2276,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     horloge: relevesP ? `S84 jouée sur ${relevesP.tour.length} relevé(s) d'horloge du tour et ${relevesP.session.length} de la session`
       : "S84 non jouée : transcription introuvable (--transcript <chemin.jsonl>). Sur le brouillon seul, seule S69 juge l'heure (une heure future) ; "
         + "qu'une heure passée ait été LUE et qu'une durée ait été MESURÉE ne se voit que dans la transcription",
-    non_juge: "les contrôles qui lisent le TOUR et non le texte — GESTE (réponse à un mot de décision), "
+    non_juge: "les contrôles qui lisent le TOUR et non le texte — GESTE (réponse à un mot de décision), LOT (retour écrit dans le tour sans lot, TF-2329 : joué ici dès que le transcript est retrouvé), "
       + "PROCÉDURE, POSSESSION, niveau Moyen : le hook de fin de tour les joue sur le transcript (DÉTAIL, TF-1851, CRITIQUE, TF-1913, S87, la ligne « Livré : », TF-1973 et TF-2016, et FRICTIONS, TF-2141, sont joués ici dès que le transcript est retrouvé ; le journal des frictions ne s'écrit qu'en fin de tour) ; un brouillon affiché autrement qu'il a été préjugé n'est plus couvert" }));
   process.exit(affichable ? 0 : 1);
 }
@@ -2245,9 +2301,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const r = jugeable({ travail: tour ? tour.travail : false, ecritures: tour ? tour.ecritures : 0, commandes: tour ? tour.commandes : 0,
     dernierTexte: texte, ecrituresDuTour: tour ? tour.ecrituresDuTour : [] });
   const court = r.juge ? null : controlerReponseCourte({ dernierHumain: tour ? tour.dernierHumain : "", dernierTexte: texte });
-  const rendable = !r.juge && !(court && court.verdict === "FAIL");
+  // TF-2329 (D-191 (a)) — un retour écrit dans le tour sans lot refuse AUSSI la réponse courte : le pré-vol le dit avant l'affichage, au lieu du refus après.
+  const lotV = tour ? controlerLotDansLeTour({ racine: racineDuProjet(process.cwd()), depuis: tour.depuisFrictions, retourCommande: Boolean(tour.retourFrictions), tourEcrit: Boolean(tour.travail) }) : null;
+  const lotVBloque = Boolean(lotV && lotV.verdict === "FAIL" && lotV.bloquant);
+  const ecartsV = [...(court && court.ecarts.length ? court.ecarts : []), ...(lotVBloque ? lotV.ecarts.map((e) => `LOT — ${e}. ${RAPPEL_LOT}`) : [])];
+  const rendable = !r.juge && !(court && court.verdict === "FAIL") && !lotVBloque;
   console.log(JSON.stringify({ outil: "hook-restitution --pre-vol", mots: texte.trim().split(/\s+/).filter(Boolean).length,
-    rendable_sans_restitution: rendable, motif: r.motif, ...(court && court.ecarts.length ? { ecarts: court.ecarts } : {}),
+    rendable_sans_restitution: rendable, motif: r.motif, ...(ecartsV.length ? { ecarts: ecartsV } : {}),
     ecritures_du_tour: tour ? tour.ecrituresDuTour
       : "non relevées : transcription de la session introuvable (--transcript <chemin.jsonl>) — le tour est supposé sans écriture",
     lecture_par_commande: LECTURE_PAR_COMMANDE() }));
@@ -2272,6 +2332,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // chez un produit `forge/frictions.jsonl` (lib-frictions.mjs). Une friction déjà écrite par un passage précédent du tour ne s'écrit pas deux
   // fois ; une écriture ratée se dit au journal des hooks, elle ne bloque jamais.
   const journalFrictions = journaliserFrictions({ racine: RACINE_HOOK, session: entree.session_id || null, frictions: frictionsTour });
+  // TF-2329 (D-191 (a), 10/11/2026) — LE LOT DANS LE TOUR : un retour écrit au ledger depuis le message humain, sans lot qui le cite, REFUSE le tour. Joué AVANT les portées :
+  // un tour qui a écrit un retour est un tour de travail, quelle que soit la forme de son dernier message (Moyen, relais, réponse courte).
+  const lotC = controlerLotDansLeTour({ racine: RACINE_HOOK, depuis: depuisFrictions, retourCommande: Boolean(retourFrictions), tourEcrit: Boolean(travail) });
+  const lotBloque = lotC.verdict === "FAIL" && lotC.bloquant;
+  const lotMotif = lotBloque ? lotC.ecarts.map((e) => `LOT — ${e}. ${RAPPEL_LOT}`) : [];
+  const lotJournal = lotC.applicable ? { lot_dans_le_tour: { verdict: lotC.verdict, retours: lotC.retours.map((r) => `${r.horsRun ? "hors-run " : ""}seq ${r.seq}`), via: lotC.via } } : {};
   // NIVEAU MOYEN — jugé AVANT le compte d'outils, qu'il remplace par le relevé d'effets.
   let escaladeMoyen = null;
   if (declareMoyen(dernierTexte)) {
@@ -2279,6 +2345,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (tousEffets.length) {
       escaladeMoyen = `NIVEAU — réponse déclarée « Niveau : Moyen » dans un tour qui a eu ${tousEffets.length} effet(s) `
         + `(${tousEffets.slice(0, 3).join(" ; ")}) : le tour est jugé Complexe, restitution complète.`;
+    } else if (lotBloque) {
+      escaladeMoyen = `NIVEAU — réponse déclarée « Niveau : Moyen » dans un tour qui a écrit ${lotC.retours.length} retour(s) au ledger du produit : le tour est jugé Complexe, restitution complète.`;
     } else {
       const { mots, ecarts } = jugerFormeMoyen(dernierTexte);
       journaliser({ ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
@@ -2308,13 +2376,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (!portee.juge) {
     // TF-1947 — la réponse courte n'est pas jugée sur sa forme ; une exhaustivité qu'elle affirme se mesure (COMPLÉTUDE, S82).
     const court = dernierTexte ? controlerReponseCourte({ dernierHumain, dernierTexte }) : { verdict: "SANS_OBJET", ecarts: [] };
-    if (court.verdict !== "FAIL") process.exit(0);
+    if (court.verdict !== "FAIL" && !lotBloque) process.exit(0);
+    // TF-2329 — le lot dû d'un retour écrit dans le tour se refuse aussi sur un message non jugé (relais, réponse courte, tour sans texte final).
     journaliser({ ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
-      portee: `${portee.motif} — exhaustivité affirmée sans mesure`, verdict: "FAIL", regles: [], bloquantes: [],
-      reponse_courte: { ecarts: court.ecarts }, prejuge: !!prejuge, deja_refuse: !!entree.stop_hook_active });
-    if (entree.stop_hook_active) { afficherReecritureEnDefaut(court.ecarts); process.exit(0); }
-    console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — réponse courte] ${portee.motif}, mais :\n`
-      + court.ecarts.join("\n") + `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` }));
+      portee: `${portee.motif}${court.verdict === "FAIL" ? " — exhaustivité affirmée sans mesure" : ""}${lotBloque ? " — retour écrit dans le tour sans lot (TF-2329)" : ""}`, verdict: "FAIL", regles: [], bloquantes: lotBloque ? ["LOT"] : [],
+      ...(court.verdict === "FAIL" ? { reponse_courte: { ecarts: court.ecarts } } : {}), ...lotJournal, prejuge: !!prejuge, deja_refuse: !!entree.stop_hook_active });
+    if (entree.stop_hook_active) { afficherReecritureEnDefaut([...lotMotif, ...(court.verdict === "FAIL" ? court.ecarts : [])]); process.exit(0); }
+    console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — ${lotBloque ? "lot dans le tour" : "réponse courte"}] ${portee.motif}, mais :\n`
+      + [...lotMotif, ...(court.verdict === "FAIL" ? court.ecarts : [])].join("\n")
+      + (court.verdict === "FAIL" ? `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` : "") }));
     process.exit(0);
   }
   const { code, fails, averts: avertsSynthese } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour, entree.session_id);
@@ -2383,7 +2453,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
   const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
     && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
-    && critique.verdict !== "FAIL" && livre.verdict !== "FAIL" && remontee.verdict !== "FAIL" && frictionsC.verdict !== "FAIL";
+    && critique.verdict !== "FAIL" && livre.verdict !== "FAIL" && remontee.verdict !== "FAIL" && frictionsC.verdict !== "FAIL" && !lotBloque;
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   // TF-2191 — au PASS, les livrables écrits dans le tour et liés au bloc 0 reçoivent leur sceau ; le journal en garde la liste.
   const sceauxLivrables = passe && livre.applicable && livre.verdict === "PASS" ? livre.livrables.map((f) => scellerLivrable(f)).filter(Boolean) : [];
@@ -2393,9 +2463,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
       portee: portee.motif,
       verdict: passe
-        ? "PASS" : ((bloquants.length || ecartsAffichage.length || completude.verdict === "FAIL" || reservationBloque || critiqueBloque || frictionsBloque)
+        ? "PASS" : ((bloquants.length || ecartsAffichage.length || completude.verdict === "FAIL" || reservationBloque || critiqueBloque || frictionsBloque || lotBloque)
           ? "FAIL" : "AVERTISSEMENT"),
-      regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
+      regles: fails.map((f) => f.regle), bloquantes: [...bloquants.map((f) => f.regle), ...(lotBloque ? ["LOT"] : [])],
       synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage,
       // TF-2348 : sans synthèse écrite par cette session dans ce tour, l'AFFICHAGE n'est pas joué, et le journal le dit (SANS_OBJET) au lieu de se taire.
       affichage: fichierSynthese ? (ecartsAffichage.length ? "FAIL" : "PASS") : "SANS_OBJET : aucune synthèse écrite par cette session dans ce tour, le message est jugé seul",
@@ -2414,6 +2484,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(livre.applicable ? { livre: { verdict: livre.verdict, livrables: livre.livrables.map(nomDe), sans_lien: livre.manquants.map(nomDe) } } : {}),
       // TF-2078 — la mesure de la période d'avertissement de REMONTÉE : quels skills de la Factory, quels livrables écrits à la main, retour consigné ou non.
       ...(remontee.applicable ? { remontee: { verdict: remontee.verdict, skills: remontee.skills.map((s) => s.nom), livrables: remontee.livrables.map(nomDe) } } : {}),
+      // TF-2329 — le lot dans le tour : les retours écrits dans le tour, cités ou non par un lot (`via` : la transcription les montrait-elle, ou le ledger seul ?).
+      ...lotJournal,
       // TF-2141 — la mesure de la période d'avertissement des FRICTIONS : combien relevées et journalisées, et, chez un produit, le verdict du contrôle.
       ...(frictionsTour.length ? { frictions: { relevees: frictionsTour.length, ecrites: journalFrictions.ecrites,
         ...(journalFrictions.erreur ? { erreur_journal: journalFrictions.erreur } : {}),
@@ -2431,7 +2503,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(0);
   }
   // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
-  if (!bloquants.length && !ecartsAffichage.length && completude.verdict !== "FAIL" && !reservationBloque && !critiqueBloque && !frictionsBloque) {
+  if (!bloquants.length && !ecartsAffichage.length && completude.verdict !== "FAIL" && !reservationBloque && !critiqueBloque && !frictionsBloque && !lotBloque) {
     console.log(JSON.stringify({
       systemMessage: `[restitution — R-44] avertissement${avertissements.length > 1 ? "s" : ""} non bloquant${avertissements.length > 1 ? "s" : ""} : ` +
         avertissements.map((f) => `${avecEcheance(f)} — ${f.message}`).join(" · ") +
@@ -2449,6 +2521,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(reservationBloque ? reservation.ecarts.map((e) => `RÉSERVATION — ${e}`) : []),
       ...(critiqueBloque ? critique.ecarts.map((e) => `CRITIQUE — ${e}`) : []),
       ...(frictionsBloque ? frictionsC.ecarts.map((e) => `FRICTIONS — ${e}`) : []),
+      ...lotMotif,
     ]);
     process.exit(0);
   }
@@ -2462,6 +2535,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...(reservationBloque ? reservation.ecarts.map((e) => `RÉSERVATION — ${e}. ${rappelReservation(reservation)}`) : []),
     ...(critiqueBloque ? critique.ecarts.map((e) => `CRITIQUE — ${e}. ${RAPPEL_CRITIQUE}`) : []),
     ...(frictionsBloque ? frictionsC.ecarts.map((e) => `FRICTIONS — ${e}. ${RAPPEL_FRICTIONS}`) : []),
+    ...lotMotif,
     ...(prejuge ? [] : [RAPPEL_PREJUGEMENT]),
   ].join("\n");
   const enPlus = avertissements.length ? `\n(à corriger au passage, non bloquant : ${avertissements.map(avecEcheance).join(", ")})` : "";

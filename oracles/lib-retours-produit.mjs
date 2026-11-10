@@ -217,11 +217,32 @@ export function retoursSansLot(produit, pilot, { maintenant = Date.now(), seuilH
     if (age <= seuilH) continue;
     const classe = typeof e.classe === "string" && e.classe.trim() ? e.classe.trim() : null;
     sortie.push({
-      seq: e.seq, jours: Number.isFinite(age) ? Math.floor(age / 24) : null, classe, horsRun: hr,
+      seq: e.seq, ts: typeof e.ts === "string" ? e.ts : null, jours: Number.isFinite(age) ? Math.floor(age / 24) : null, classe, horsRun: hr,
       classeInconnue: classe && classes ? (classe !== "classe-a-creer" && !classes.has(classe)) : null,
     });
   }
   return sortie.sort((a, b) => (a.horsRun === b.horsRun ? a.seq - b.seq : (a.horsRun ? 1 : -1)));
+}
+
+// ---- TF-2329 (10/11/2026, décision humaine D-191 (a)) : LE LOT PART DANS LE TOUR OÙ LE RETOUR EST ÉCRIT -----------------------------
+// Le 09/11/2026, `retoursSansLot` rendait 104 entrées sans lot chez un produit, la plus ancienne de 59 jours ; l'alerte d'ouverture (TF-1988) s'affichait
+// à 7 sessions du jour, aucune n'a compilé de lot : le contrat disait « à la clôture du run », et ce produit comptait 2 `run_open` pour 0 clôture.
+// L'alerte informe, elle n'arrête rien. `retoursDuTourSansLot` en fait la matière d'une porte : parmi les retours sans lot, ceux dont le `ts` tombe
+// DEPUIS le début du tour. Le hook de fin de tour (`hook-restitution.mjs`, contrôle LOT) refuse alors le tour ; un retour écrit AVANT le tour reste
+// à l'alerte d'ouverture. Aucune lecture du ledger n'est recodée : c'est `retoursSansLot`, sans seuil d'âge, filtré par date.
+
+/**
+ * Les entrées `type: retour` du ledger du produit et du journal hors run écrites DEPUIS `depuis` (ISO, début du tour) et qu'aucun lot de
+ * `forge\retours\` ne cite. Chacune : { seq, ts, horsRun, classe, … } (voir `retoursSansLot`). `ts` du ledger est à la seconde, tronqué : la borne
+ * tolère 999 ms. Rend `null` quand le début du tour est illisible ou que le produit n'a ni ledger ni journal hors run : ce n'est pas « zéro », c'est
+ * « non relevé », et le contrôle n'accuse alors personne.
+ */
+export function retoursDuTourSansLot(produit, pilot, { depuis = null } = {}) {
+  const t0 = Date.parse(depuis);
+  if (!Number.isFinite(t0)) return null;
+  const sans = retoursSansLot(produit, pilot, { seuilH: -Infinity });
+  if (sans === null) return null;
+  return sans.filter((r) => { const t = Date.parse(r.ts); return Number.isFinite(t) && t + 999 >= t0; });
 }
 
 /**
