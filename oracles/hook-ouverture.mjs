@@ -194,6 +194,7 @@ if (iPilot >= 0) {
   const o = join(PILOT, "oracles", "oracle-conformite-projet.mjs");
   const PRODUIT = process.cwd();
   const recopies = [];
+  const nes = [];
   const refus = [];
   try {
     const manifeste = join(PILOT, "gabarits", "HERITAGE.json");
@@ -201,6 +202,21 @@ if (iPilot >= 0) {
       const h = JSON.parse(readFileSync(manifeste, "utf8"));
       const norme = (t) => t.replace(/\r\n/g, "\n");
       for (const a of (h.artefacts || [])) {
+        // D-193 (a) du 10/11/2026 (TF-2330, TF-2333) — UN FICHIER À REMPLIR NAÎT À L'OUVERTURE, UNE FOIS. Le calendrier des séances et le
+        // registre des engagements se personnalisent (mode `presence`) : ils ne se recopient jamais. Mais la place où inscrire une séance
+        // doit exister avant la première séance, comme le `.env` avant le premier secret (TF-0869). `naissance: "si_absent"` : absent, le
+        // fichier naît de son modèle, en-tête daté du jour (oracles/lib-calendrier.mjs) ; présent, il n'est jamais touché.
+        if (a.naissance === "si_absent" && a.mode !== "copie_conforme") {
+          const src = join(PILOT, a.source.replace(/\//g, sep));
+          const dst = join(PRODUIT, a.cible.replace(/\//g, sep));
+          if (existsSync(dst)) continue;
+          if (!existsSync(src)) { refus.push(`${a.source} — modèle absent du pilot, ${a.cible} ne naît pas`); continue; }
+          const { instancierNaissance, jourLocal } = await import(pathToFileURL(join(ICI, "lib-calendrier.mjs")).href);
+          mkdirSync(dirname(dst), { recursive: true });
+          writeFileSync(dst, instancierNaissance(readFileSync(src, "utf8"), jourLocal()), "utf8");
+          nes.push(`${a.cible} — né de ${a.source}`);
+          continue;
+        }
         if (a.mode !== "copie_conforme") continue;
         const src = join(PILOT, a.source.replace(/\//g, sep));
         const dst = join(PRODUIT, a.cible.replace(/\//g, sep));
@@ -258,6 +274,9 @@ if (iPilot >= 0) {
         (remplaces ? `  Une modification locale de l'un des ${remplaces} fichier(s) « remplacé » ci-dessus, et d'eux seuls, a été écrasée : c'est ce que leur mode déclare, et la version du pilot fait foi. ` : "  ")
           + "Rien d'autre n'est recopié : `.claude/settings.json` (permissions `allow`, `ask`, `deny`, `defaultMode`, serveurs MCP, hooks propres), `CLAUDE.md` et les autres fichiers que le produit personnalise ne le sont jamais — l'ouverture n'ajoute à `.claude/settings.json` que les entrées de hook manquantes du gabarit, et n'y réécrit que le chemin relatif du lanceur (TF-1903).");
     }
+    if (nes.length) lignes.push(`- **${nes.length} fichier(s) NÉ(S) à l'instant** de leur modèle du pilot (D-193 (a)) : ce produit les remplit, et ils ne seront jamais recopiés ni écrasés :`,
+      ...nes.map((r) => `  - ${r}`),
+      "  Les enregistrer avec le travail du produit. Une séance datée s'inscrit au calendrier, un engagement d'un document remis au registre.");
     for (const r of refus) lignes.push(`- non recopié : ${r}`);
     if (!f) lignes.push("- verdict ILLISIBLE — le contrôle n'a pas rendu de résultat exploitable ; ce n'est pas un constat sur ce produit.");
     else if (f.statut === "PASS") lignes.push(`- à jour — ${f.message}`);
@@ -356,6 +375,35 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ledger.jsonl"))) {
         `- **${ouvertes.length} décision(s)** de \`forge/ledger.jsonl\`, posée(s) depuis 14 jours au plus : ${ouvertes.slice(0, 8).map((d) => `${d.n} (posée le ${String(d.ts).slice(0, 10)}${d.seq != null ? `, seq ${d.seq}` : ""}${d.question ? ` — ${d.question.slice(0, 70)}` : ""})`).join(" ; ")}${ouvertes.length > 8 ? " ; …" : ""}. `
         + "Rappelle chacune en une ligne au bloc 3 de la prochaine restitution (S93), ou consigne sa réponse au ledger (`reponse_humain`, avec son numéro) : une décision sans réponse ni rappel laisse courir ce qu'elle devait arrêter.");
   } catch (e) { lignes.push("", `- décisions sans réponse : NON relevées (${String(e.message).slice(0, 160)})`); }
+}
+
+// D-193 (a) du 10/11/2026, TF-2330 (RP-07 du produit marketing, lot 20261109b, ledger seq 693) — UNE SÉANCE DATÉE NOMME SA REVUE DE
+// PRÉPARATION, DE J-5 À J-0. La séance de formation du 13/11/2026 n'était inscrite dans aucun calendrier du produit, et sa revue de fond
+// n'a eu lieu que sur demande humaine, le 09/11 : neuf défauts relevés à quatre jours de la séance. Le calendrier `forge/CALENDRIER.md`
+// (né ci-dessus de son modèle) se lit ici : chaque séance proche nomme sa revue, ce qu'elle couvre et la commande qui la joue ; une séance
+// passée ou à plus de 5 jours ne dit rien ; une ligne mal formée est dite. Lecture seule (`oracles/lib-calendrier.mjs`, R-67).
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "CALENDRIER.md"))) {
+  try {
+    const { lireCalendrier, lignesSeances, jourLocal } = await import(pathToFileURL(join(ICI, "lib-calendrier.mjs")).href);
+    const cal = lireCalendrier(readFileSync(join(process.cwd(), "forge", "CALENDRIER.md"), "utf8"));
+    const l = lignesSeances(cal, jourLocal(), { oracleEngagements: enSlash(join(ICI, "oracle-engagements.mjs")), modele: enSlash(join(PILOT, "gabarits", "CALENDRIER-PRODUIT.md")) });
+    if (l.length) lignes.push("", ...l);
+  } catch (e) { lignes.push("", `- calendrier des séances : NON lu (${String(e.message).slice(0, 160)}) — D-193 (a), TF-2330`); }
+}
+
+// D-193 (a), TF-2333 (RP-10, ledger seq 694) — UN ENGAGEMENT NON TENU D'UN DOCUMENT REMIS SE REDIT À L'OUVERTURE. Des documents des 27
+// et 28/10/2026 ont promis un QCM et une satisfaction en formulaires et une skill installée par le formateur ; aucune pièce n'a été produite
+// avant que l'humain le voie, le 09/11. Le registre `forge/ENGAGEMENTS.md` est jugé à chaque livrable écrit (hook d'écriture) ; ici, ce qui
+// reste non tenu se redit, une action échue comprise : une échéance passe sans que rien ne s'écrive. Silencieux quand tout est tenu.
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ENGAGEMENTS.md"))) {
+  try {
+    const { jugerRegistre, REMEDE } = await import(pathToFileURL(join(ICI, "oracle-engagements.mjs")).href);
+    const ko = jugerRegistre(process.cwd()).findings.filter((f) => f.statut === "FAIL");
+    if (ko.length) lignes.push("", "## Engagements des documents remis, NON tenus (D-193 (a), TF-2333 — forge/ENGAGEMENTS.md)",
+      ...ko.slice(0, 8).map((f) => `- ${f.regle}${f.ligne ? ` (ligne ${f.ligne})` : ""} : ${f.message}`),
+      ...(ko.length > 8 ? [`- … et ${ko.length - 8} autre(s)`] : []),
+      `- Remède : ${REMEDE}. Rejouer : \`node "${enSlash(join(ICI, "oracle-engagements.mjs"))}" .\``);
+  } catch (e) { lignes.push("", `- engagements des documents remis : NON jugés (${String(e.message).slice(0, 160)}) — D-193 (a), TF-2333`); }
 }
 
 // TF-1642 (14/10/2026) — LA FRAÎCHEUR NE SE JUGE PLUS SUR LES SEULS DÉPÔTS DE LA FACTORY. Le 12/10, un

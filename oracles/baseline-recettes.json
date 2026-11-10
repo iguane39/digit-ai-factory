@@ -200,6 +200,10 @@
   "cas": 38,
   "vu_le": "2026-10-17"
  },
+ "oracle-engagements.mjs": {
+  "cas": 29,
+  "vu_le": "2026-11-10"
+ },
  "oracle-etude-opportunite.mjs": {
   "cas": 3,
   "vu_le": "2026-10-12"
@@ -439,7 +443,7 @@
   "vu_le": "2026-11-04"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 75,
+  "cas": 84,
   "vu_le": "2026-11-10"
  },
  "oracles/hook-publication-hebergee.test.mjs": {

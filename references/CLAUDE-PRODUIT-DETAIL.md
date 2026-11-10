@@ -204,6 +204,17 @@ décision, l'omettre est un oubli (loi n° 3).
   nom de l'outil). Le 14/10/2026, une adresse est partie ainsi dans l'en-tête d'un appel à un annuaire
   public. Le hook `PreToolUse` sur `Bash`, `PowerShell` et `WebFetch` refuse ce geste, sauf adresse
   donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session.
+- **Une séance datée nomme sa revue de préparation, et un engagement écrit a son livrable** (R-67, décision
+  humaine D-193 (a) du 10/11/2026, TF-2330 et TF-2333). Une séance datée (formation, atelier, comité,
+  soutenance, démonstration, séminaire) s'inscrit dans `forge\CALENDRIER.md` dès que sa date est connue. Le fichier
+  naît à l'ouverture, de son modèle `gabarits\CALENDRIER-PRODUIT.md` du pilot. De J-5 à J-0, le hook d'ouverture
+  nomme sa revue de préparation, ses 5 points et la commande qui juge les engagements de ses documents. La revue
+  se joue par un agent `verificateur`, puis se déclare « faite le AAAA-MM-JJ ». Chaque pièce, temps ou outil
+  promis par un document remis s'inscrit dans `forge\ENGAGEMENTS.md`, dans le tour où le document s'écrit. Il est
+  tenu par un livrable présent, ou par une action qui nomme son porteur et son échéance.
+  `oracles\oracle-engagements.mjs` du pilot le juge à chaque livrable écrit sous `output\` (hook d'écriture), et
+  l'ouverture redit ce qui n'est pas tenu. Le fait : le 09/11, la séance du 13/11 n'était dans aucun calendrier,
+  et 3 pièces promises par les documents du 28/10 ont été faites dans l'urgence.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)
