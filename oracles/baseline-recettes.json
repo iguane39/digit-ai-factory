@@ -67,8 +67,8 @@
   "vu_le": "2026-10-12"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 91,
-  "vu_le": "2026-10-19"
+  "cas": 96,
+  "vu_le": "2026-11-10"
  },
  "gabarits/oracle-revue-deck.test.mjs": {
   "cas": 21,
@@ -107,8 +107,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-boite-entree.mjs": {
-  "cas": 47,
-  "vu_le": "2026-10-17"
+  "cas": 51,
+  "vu_le": "2026-11-10"
  },
  "oracle-cadence.mjs": {
   "cas": 16,
@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 222,
-  "vu_le": "2026-11-06"
+  "cas": 223,
+  "vu_le": "2026-11-10"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -184,8 +184,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 107,
-  "vu_le": "2026-11-06"
+  "cas": 117,
+  "vu_le": "2026-11-10"
  },
  "oracle-empreintes.mjs": {
   "cas": 13,
@@ -217,8 +217,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 70,
-  "vu_le": "2026-11-06"
+  "cas": 82,
+  "vu_le": "2026-11-10"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -351,8 +351,8 @@
   "vu_le": "2026-10-12"
  },
  "oracle-synthese.mjs": {
-  "cas": 349,
-  "vu_le": "2026-11-09"
+  "cas": 356,
+  "vu_le": "2026-11-10"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
   "cas": 31,
@@ -439,8 +439,8 @@
   "vu_le": "2026-11-04"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 71,
-  "vu_le": "2026-11-06"
+  "cas": 75,
+  "vu_le": "2026-11-10"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
   "cas": 12,
@@ -467,8 +467,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 69,
-  "vu_le": "2026-11-06"
+  "cas": 71,
+  "vu_le": "2026-11-10"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,
