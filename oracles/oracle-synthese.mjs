@@ -124,6 +124,10 @@
  *       de chacun (conservé, retiré, à décider…) ou « aucun artefact » ; avertissante ;
  *   S104 « POURQUOI VOUS » NOMME UN MOTIF DE R-58 (06/11, TF-2273, RP-46, gabarit 2.64.0) : la ligne « Pourquoi vous » d'une décision au format B porte l'un des six motifs (dépense, publication, irréversible, doctrine, arbitrage, produit) ;
  *       sinon la décision ne se pose pas, la session exécute et rend pour information ; avertissante ;
+ *   S125 DES DÉFAUTS SANS ARBITRAGE SE CORRIGENT DANS LE TOUR (10/11, TF-2332, gabarit 2.66.0) : une décision en citation qui propose
+ *       « tout, une partie, rien » sur des défauts à corriger est refusée, corriger étant un geste d'agent (loi n° 5) ;
+ *   S34 (TF-2331, 10/11, gabarit 2.66.0) étendue : une action manuelle_utilisateur de relecture de fond est refusée tant que le bloc 4
+ *       ne montre pas la relecture par un agent ; S9 (TF-2342) compte l'ouverture après retrait de l'en-tête YAML et du titre ;
  *   S115 UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (09/11, TF-2304, loi n° 5, gabarit 2.65.0) : une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage
  *       (decision, depense, irreversible) porte une commande d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, cmdlets Az et Graph ; pas git, node ni npm, souvent demandés pour un autre poste), la même figure ailleurs dans le texte, et aucune ligne qui la porte ne montre un code de retour d'échec ;
  *       numéro pris au suivant libre (S105) plus 10, comme S103, pour ne pas heurter une règle qu'une autre session ajoute le même jour ; avertissante ;
@@ -966,24 +970,32 @@ function sansLigneLivre(ouverture) {
   return sortie.join("\n");
 }
 function lireOuverture(texte) {
+  // TF-2342 (10/11/2026) : le frontmatter et le titre sont retirés AVANT de comparer les deux lectures. Comparés avant, un en-tête et un titre plus longs
+  // que la synthèse titrée (ou égaux : « D-19 (a) » ajoute deux mots au titre) faisaient garder la lecture « en tête », qui se vidait ensuite au retrait :
+  // S9 lisait 0 mot dans une synthèse de 72 mots (bissection du 16/09/2026).
+  const sansEnteteNiTitre = (t) => {
+    let o = t.trim();
+    for (let i = 0; i < 4; i++) {
+      const avant = o;
+      o = o.replace(/^---[\s\S]*?\n---\s*/, "").replace(/^#[^\n]*\n?/, "").trim();
+      if (o === avant) break;
+    }
+    return o;
+  };
+  const compte = (t) => t.split(/\s+/).filter(Boolean).length;
   const premierBloc = texte.search(/(^|\n)#{2,4}\s/);
-  let ouverture = (premierBloc > 0 ? texte.slice(0, premierBloc) : "").trim();
+  let ouverture = sansEnteteNiTitre(premierBloc > 0 ? texte.slice(0, premierBloc) : "");
+  let source = "en tête, avant le premier titre de niveau 2 à 4, après retrait de l'en-tête YAML et du titre";
   const mTitre = RE_TITRE_OUVERTURE.exec(texte);
   if (mTitre) {
     const apres = texte.slice(mTitre.index + mTitre[0].length);
     const fin = apres.search(/(^|\n)#{1,4}\s/);
-    const titree = (fin >= 0 ? apres.slice(0, fin) : apres).trim();
-    const compte = (t) => t.split(/\s+/).filter(Boolean).length;
-    if (compte(titree) > compte(ouverture)) ouverture = titree;
-  }
-  for (let i = 0; i < 4; i++) {
-    const avant = ouverture;
-    ouverture = ouverture.replace(/^---[\s\S]*?\n---\s*/, "").replace(/^#[^\n]*\n?/, "").trim();
-    if (ouverture === avant) break;
+    const titree = sansEnteteNiTitre(fin >= 0 ? apres.slice(0, fin) : apres);
+    if (compte(titree) > compte(ouverture)) { ouverture = titree; source = `sous le titre d'ouverture « ${mTitre[0].replace(/^[\s#]+/, "").trim().slice(0, 50)} »`; }
   }
   const brute = ouverture;                       // avant retrait des lignes « Livré : » / « À ouvrir : », pour S87/S92
   ouverture = sansLigneLivre(ouverture).trim();
-  return { ouverture, mots: ouverture.split(/\s+/).filter(Boolean).length, brute };
+  return { ouverture, mots: compte(ouverture), brute, source };
 }
 
 // TF-2214 et TF-2191 — le dossier du PRODUIT qui porte le fichier jugé ou `--racine` (un `forge/retours/` en remontant, douze niveaux au plus, même voie que S48 et le verrou « livré ») ; null hors d'un produit.
@@ -1297,7 +1309,7 @@ function juger(texte, cheminJuge = null) {
   // On accepte les deux formes, et on garde la plus longue : celui qui titre son ouverture ET
   // écrit avant le titre ne doit être puni ni pour l'un ni pour l'autre.
   // La lecture vit dans `lireOuverture` depuis le gabarit 2.50.0 : S1 s'en sert pour dire si le bloc 0 existe.
-  const { ouverture, mots } = lireOuverture(texte);
+  const { ouverture, mots, source: sourceOuverture } = lireOuverture(texte);
   const techniques = [
     [/\bTF-\d{3,4}\b/, "identifiant TF nu"],
     [/[\w-]+\.(?:md|mjs|py|json|jsonl|html|toml)\b/, "chemin ou nom de fichier"],
@@ -1305,8 +1317,9 @@ function juger(texte, cheminJuge = null) {
     [/\b[a-f0-9]{7,40}\b/, "sha"],
   ].filter(([motif]) => motif.test(ouverture)).map(([, quoi]) => quoi);
   if (mots < 20) {
-    ko("S9", `synthèse d'ouverture absente ou trop courte (${mots} mot(s) lu(s), en tête ou sous un titre d'ouverture) — ` +
-      "l'état, ce que ça change et ce qui est attendu se disent en langage commanditaire AVANT le détail");
+    ko("S9", `synthèse d'ouverture absente ou trop courte (${mots} mot(s) lu(s) ${sourceOuverture}) — ` +
+      "l'état, ce que ça change et ce qui est attendu se disent en langage commanditaire AVANT le détail ; " +
+      "S9 lit le paragraphe entre le titre et le premier bloc, ou celui qui suit un titre « 0. Synthèse d'ouverture » (la plus longue des deux lectures, après retrait de l'en-tête YAML et du titre)");
   } else if (techniques.length) {
     ko("S9", `la synthèse d'ouverture porte du vocabulaire technique nu (${techniques.join(", ")}) — ` +
       "ces éléments vont APRÈS, dans les blocs : on ordonne, on ne supprime jamais");
@@ -1716,9 +1729,22 @@ function juger(texte, cheminJuge = null) {
       .filter((l) => /\bmanuelle_utilisateur\b/.test(l));
     const ECRITURE = uni(/\b(cr[ée]er|ajouter|[ée]crire dans|coller|ins[ée]rer|renseigner)\b[^.;|]{0,60}\b(ligne|variable|fichier|cl[ée]|entr[ée]e|section)\b/i);
     const fautives = humaines.filter((l) => ECRITURE.test(l) && !/\bacces\b/.test(l));
+    // TF-2331 (10/11/2026, RP-08) — UNE RELECTURE DE FOND EST UN GESTE D'AGENT, ELLE AUSSI. Le 26/10/2026, la restitution des supports portait l'action A-1, « relecture de
+    // fond » par l'humain, au lieu de la faire ; les relecteurs neufs simulaient le participant, jamais le formateur ; l'humain a dû demander une revue pour que des corrections
+    // soient proposées, et elle a été faite quatorze jours plus tard. S34 ne visait que créer, ajouter et écrire (la décision nommait S13, qui juge l'exécutabilité d'une action
+    // et non son acteur : le défaut vit ici). Une action `manuelle_utilisateur` qui demande une relecture de fond (relecture de fond, du contenu, sur le fond) est refusée tant
+    // que le bloc 4 ne montre pas la relecture par agent, jouée et sa sortie citée : l'humain relit alors ce qu'un agent n'a pas pu juger, jamais à la place. Un motif `acces` ou
+    // `presence` (le lecteur doit être là, ou détenir un droit) lève le refus, comme pour l'écriture. Ce que S34 ne juge pas : que la relecture par agent ait réellement couvert
+    // le fond — la phrase du bloc 4 le déclare, la lecture humaine du rapport de l'agent le vérifie.
+    const RELECTURE_DE_FOND = uni(/\b(?:relecture|relire|relis|revue|r[ée]viser|contre-?lecture|faire relire)\b[^.;|\n]{0,50}\b(?:de fond|sur le fond|du fond|du contenu|de contenu|[àa] fond)\b|\b(?:de fond|sur le fond)\b[^.;|\n]{0,25}\b(?:relecture|relire|revue)\b/i);
+    const RELECTURE_PAR_AGENT = uni(/\brelecteurs?\b|\brelu[es]? par (?:un |des |trois |deux |\d+ )?(?:agents?|relecteurs?|v[ée]rificateurs?)|\brelecture\b[^.;\n]{0,40}\bpar (?:un |des |trois |deux |\d+ )?(?:agents?|relecteurs?|v[ée]rificateurs?)|\bv[ée]rificateurs? (?:a|ont) (?:relu|jug[ée])|\bagents? (?:relecteur|v[ée]rificateur)/i);
+    const preuveRelecture = RELECTURE_PAR_AGENT.test(bloc(texte, BLOCS[3][0]) || "");
+    const fautivesRelecture = preuveRelecture ? [] : humaines.filter((l) => RELECTURE_DE_FOND.test(l) && !/\b(?:acces|presence)\b/.test(l));
     fautives.length
       ? ko("S34", `${fautives.length} action(s) manuelle_utilisateur demandent à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier — c'est un geste d'agent (loi n° 5) ; ce qui lui reste est la valeur, jamais l'écriture : « ${fautives[0].trim().slice(0, 90)} »`)
-      : ok("S34", "aucune action humaine ne demande un geste d'écriture que l'IA peut faire");
+      : fautivesRelecture.length
+        ? ko("S34", `${fautivesRelecture.length} action(s) manuelle_utilisateur demandent à l'humain une RELECTURE DE FOND alors que le bloc 4 ne montre aucune relecture par un agent — c'est un geste d'agent (loi n° 5) : la jouer dans le tour avec des relecteurs neufs, citer sa sortie au bloc 4, et ne laisser à l'humain que ce qu'aucun agent ne peut juger (TF-2331) : « ${fautivesRelecture[0].trim().slice(0, 90)} »`)
+        : ok("S34", "aucune action humaine ne demande un geste d'écriture ni une relecture de fond que l'IA peut faire");
   }
   // S35 — UNE PREUVE DU BLOC 4 EST UNE SORTIE EXÉCUTÉE, JAMAIS UN RENVOI À UNE ACTION. « Préparé »,
   // « prêt à coller », « voir A-2 » ne prouvent rien : ils annoncent. Le fait du 02/09 : des lignes
@@ -3481,6 +3507,31 @@ function juger(texte, cheminJuge = null) {
           + "prolongeait ce travail (« d'office », « sans GO ») ; une consigne du porteur est déjà une décision (R-58 point 5). Le 06/11/2026, D-480 posée pour des tests et un redéploiement local demandés d'office n'avait aucun motif humain (TF-2273). "
           + `Ex. : ${sans104[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
       else ok("S104", `${vues104.length} décision(s) dont « Pourquoi vous » nomme un motif de R-58 (${[...new Set(vues104.flatMap((x) => motifsR58De(x.motif)))].join(", ")})`);
+    }
+
+    // ---- S125 (10/11/2026, TF-2332, gabarit 2.66.0) — DES DÉFAUTS SANS ARBITRAGE SE CORRIGENT DANS LE TOUR, ILS NE SE POSENT PAS EN DÉCISION.
+    //
+    // LE FAIT : le 09/11/2026, une revue a posé la décision D-179 (« corriger tout, une partie, ou rien ») au lieu de corriger d'abord les défauts qui n'appelaient aucun arbitrage :
+    // des solutions laissées dans un kit, des durées qui divergeaient, un pied de page. Un aller-retour avec l'humain, et la quatrième récidive de la classe fondée par TF-2273 (S104
+    // regarde le motif, pas l'objet). Le numéro est le suivant libre plus 10, comme S103 et S115.
+    // CE QUE LA RÈGLE LIT : une décision en bloc de citation dont le texte parle de corriger des défauts (défaut, anomalie, coquille, erreur, incohérence, divergence) ET offre le trio
+    // « tout / une partie / rien » ou « tous / certains / aucun ». Ces options ne laissent rien à l'humain que la session ne puisse faire : corriger est un geste d'agent (loi n° 5),
+    // et un défaut sans arbitrage se corrige, puis se rend au bloc 4. Une option humaine s'écrit autrement : un choix entre deux corrections incompatibles, une dépense, une publication,
+    // une exception à la doctrine. Mesure d'entrée (10/11/2026) : 594 décisions en bloc de citation dans les 433 fichiers d'`output\04-plans\`, 0 accusée.
+    // NON JUGÉ : un trio d'options écrit avec d'autres mots, et la nature réelle des défauts (qu'ils soient sans arbitrage) ; la règle lit la forme du trio, pas le fond de la revue.
+    {
+      const CORRIGE125 = /\b(?:corrig|r[ée]par|trait)\w*/i;
+      const DEFAUTS125 = /\bd[ée]fauts?\b|\banomalies?\b|\bcoquilles?\b|\berreurs?\b|\bincoh[ée]rences?\b|\bdivergences?\b/i;
+      const TRIO125 = /\b(?:tout|tous|l['’]ensemble)\b[\s\S]{0,160}\b(?:une partie|partiellement|certains|seulement)\b[\s\S]{0,160}\b(?:rien|aucun)\b/i;
+      const enCitation125 = groupesLignes.filter((g) => /^\s*>\s*\*\*\s*D-\d{1,3}\b/.test(g[0]));
+      const fautes125 = enCitation125.filter((g) => { const x = g.join("\n"); return CORRIGE125.test(x) && DEFAUTS125.test(x) && TRIO125.test(x); });
+      if (!enCitation125.length) findings.push({ regle: "S125", statut: "SANS_OBJET", message: "aucune décision en bloc de citation — correction de défauts posée en décision non jugée" });
+      else if (fautes125.length)
+        ko("S125", `${fautes125.length} décision(s) sur ${enCitation125.length} proposent à l'humain de corriger des défauts « tout, une partie ou rien » — corriger est un geste d'agent (loi n° 5) : `
+          + "les défauts sans arbitrage se corrigent dans le tour et se rendent au bloc 4, et ne reste en décision que ce qui relève de l'humain (dépense, publication, irréversible, doctrine, arbitrage entre deux corrections incompatibles, produit). "
+          + "Le 09/11/2026, la décision D-179 posée ainsi a coûté un aller-retour pour des défauts évidents (TF-2332). "
+          + `Ex. : ${fautes125[0][0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+      else ok("S125", `${enCitation125.length} décision(s) dont aucune ne propose de corriger des défauts « tout, une partie ou rien »`);
     }
 
     // ---- S49 (17/09/2026, TF-1172) — UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE
@@ -7381,6 +7432,49 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`S104 (TF-2273) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S104").message || "sortie illisible").slice(0, 200));
   if (!/D-480|R-58/.test(String(constatDe(r104confort, "S104").message || "")) || !/pour information/.test(String(constatDe(r104confort, "S104").message || "")))
     casse.push("S104 : le constat doit nommer R-58 et le remède (exécuter, rendre pour information) : " + String(constatDe(r104confort, "S104").message || "").slice(0, 200));
+  // TF-2332 (10/11/2026) — S125 DANS SES SENS. Rouge : la décision D-179 du 09/11, « corriger tout, une partie, ou rien » sur des défauts sans arbitrage. Vert : la même décision sans
+  // cette ligne (le remède : corriger dans le tour, ne poser que la publication) ; et une décision qui parle de défauts mais offre un VRAI choix entre deux corrections incompatibles.
+  const LIGNE_DEFAUTS = "> - **Les défauts** : la revue a trouvé des solutions laissées dans le kit, des durées qui divergent et un pied de page ; corriger tout, corriger une partie, ou ne rien corriger.";
+  const r125rouge = jouerPe("s125-rouge.md", enFormatB.replace(POURQUOI_VOUS, `${POURQUOI_VOUS}\n${LIGNE_DEFAUTS}`));
+  const r125choix = jouerPe("s125-choix.md", enFormatB.replace(POURQUOI_VOUS, `${POURQUOI_VOUS}\n> - **Les défauts** : la durée du module diverge entre 90 et 120 minutes ; aligner sur 90 ou sur 120 retire deux séances au programme, et la revue ne peut pas trancher.`));
+  if (enFormatB.replace(POURQUOI_VOUS, `${POURQUOI_VOUS}\n${LIGNE_DEFAUTS}`) === enFormatB) casse.push("S125 : l'ancre « Pourquoi vous » n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r125rouge, "FAIL", "« corriger tout, une partie, ou rien » sur des défauts passe — c'est la décision D-179 du 09/11"],
+    [r78b, "PASS", "la décision sans ligne de défauts (le remède : corriger dans le tour) est refusée"],
+    [r125choix, "PASS", "un vrai choix entre deux corrections incompatibles est refusé — la règle crie sur une décision humaine"],
+    [rv, "SANS_OBJET", "la verte, sans décision en citation, devrait être déclarée hors de portée"],
+  ]) if (constatDe(r, "S125").statut !== statut)
+    casse.push(`S125 (TF-2332) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S125").message || "sortie illisible").slice(0, 200));
+  // TF-2331 (10/11/2026) — S34 ET LA RELECTURE DE FOND. Rouge : l'action A-1 du 26/10, relecture de fond par l'humain, sans relecture par agent au bloc 4. Vert : la même action quand le
+  // bloc 4 cite la relecture par des relecteurs neufs (le remède du message se joue) ; vert aussi, la relecture d'un natif, qui n'est pas de fond et que la verte du bloc 7 porte déjà.
+  const ACTION_RELECTURE = "## 8. Prochaines actions\n\n- d'abord faire la relecture de fond des supports (manuelle_utilisateur) — parce que c'est le seul contrôle de contenu restant ;\n  - pourquoi pas l'IA : decision — le fond d'un support se juge à la lecture ;\n  - où : `docs/supports/guide.md`.\n  - si rien n'est fait : les supports partent sans relecture de fond.\n";
+  const avecRelecture = verte.replace(/## 8\. Prochaines actions[\s\S]*$/, ACTION_RELECTURE);
+  const relectureJouee = avecRelecture.replace("## 4. Traité", "## 4. Traité\n\n- La relecture de fond des supports a été jouée par trois relecteurs neufs, un par rôle de lecteur — preuve : 3 rapports, 11 défauts corrigés.");
+  const r34nu = jouerPe("s34-relecture-nue.md", avecRelecture);
+  const r34jouee = jouerPe("s34-relecture-jouee.md", relectureJouee);
+  if (avecRelecture === verte || relectureJouee === avecRelecture) casse.push("S34 (relecture) : une ancre de fixture n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r34nu, "FAIL", "une relecture de fond laissée à l'humain, sans relecture par agent au bloc 4, passe — c'est l'action A-1 du 26/10"],
+    [r34jouee, "PASS", "la même action quand le bloc 4 cite la relecture par des relecteurs neufs est refusée — le remède échoue"],
+    [rv, "PASS", "la verte, sans relecture de fond, est accusée"],
+  ]) if (constatDe(r, "S34").statut !== statut)
+    casse.push(`S34 (TF-2331) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S34").message || "sortie illisible").slice(0, 200));
+  // TF-2342 (10/11/2026) — S9 COMPTE LES MOTS APRÈS LE RETRAIT DE L'EN-TÊTE. Fautif : un en-tête YAML plus long que la synthèse titrée, un titre qui porte « D-19 (a) » ; la synthèse de
+  // 72 mots (ici celle de la verte) était écartée, puis l'en-tête retiré, et S9 lisait 0 mot. Conforme : le même texte sans « (a) ». Et le message d'un vrai défaut nomme la lecture faite.
+  const ENTETE_LONG = `---\ndestinataire: humain\nsource: ${"mot ".repeat(90).trim()}\n---\n\n`;
+  const titreeEnteteLong = `${ENTETE_LONG}${titree.replace("# Restitution — campagne de test", "# Restitution — campagne de test, décision D-19 (a)")}`;
+  const r9entete = jouerPe("s9-entete-long-a.md", titreeEnteteLong);
+  const r9sansA = jouerPe("s9-entete-long-sans-a.md", titreeEnteteLong.replace(" (a)", ""));
+  const r9vide = jouerPe("s9-ouverture-vide.md", `${ENTETE_LONG}# Restitution — campagne de test\n\n### 0. Synthèse d'ouverture\n\nTrop court.\n\n${titree.slice(titree.indexOf("## 1. En-tête"))}`);
+  if (titreeEnteteLong === titree) casse.push("S9 (TF-2342) : l'ancre du titre n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r9entete, "PASS", "un en-tête YAML plus long que la synthèse titrée, avec « D-19 (a) » au titre, fait lire 0 mot à S9"],
+    [r9sansA, "PASS", "le même texte sans « (a) » est accusé"],
+    [r9vide, "FAIL", "une ouverture réellement trop courte passe S9"],
+  ]) if (constatDe(r, "S9").statut !== statut)
+    casse.push(`S9 (TF-2342) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S9").message || "sortie illisible").slice(0, 200));
+  if (!/titre d'ouverture « 0\. Synthèse d'ouverture/.test(String(constatDe(r9vide, "S9").message || "")) && !/en tête/.test(String(constatDe(r9vide, "S9").message || "")))
+    casse.push("S9 (TF-2342) : le message ne nomme pas la lecture faite (en tête ou sous le titre d'ouverture) : " + String(constatDe(r9vide, "S9").message || "").slice(0, 200));
   }
   // 29/10 — S36 ET S38, LA CRITIQUE JOUABLE EN ACTION (TF-1981, récidive de TF-0775). Le cas réel du 26/10 : une page HTML livrée au bloc 4, la critique d'implémentation
   // forge-design laissée en A-1 `auto_ia` `hors_mandat`. (a) Rouge : la critique n'apparaît qu'en action exemptée — S36 FAIL (le mot n'est pas un verdict) ET S38 FAIL (une
