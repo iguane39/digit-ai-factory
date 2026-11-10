@@ -432,6 +432,10 @@ const SIDECAR_AVANT_TF1500 = 26;
 for (const f of fichiers(p("output"))) {
   const r = rel(f);
   if (/(^|\/)\.oracles\//.test(r)) continue;      // comptés dans les 34 caractères de leur livrable
+  // TF-2344 (10/11/2026) : `<restitution>.md.jugement.json` est écrit par le hook de fin de tour, à côté de la restitution jugée. Ce n'est pas un livrable : il n'a pas de
+  // sidecar d'oracle (les 34 caractères ne s'y ajoutent pas) et son chemin est plus court que celui du sidecar de sa restitution, que ce plafond mesure déjà. Une restitution
+  // de 111 à 116 caractères, conforme, rendait R-4 FAIL par le seul fait d'avoir été jugée (le 29/09/2026 : 15 FAIL, « 126 caractères, soit 152 »).
+  if (/\.md\.jugement\.json$/.test(r)) continue;
   if (estExcluDuDepot(r)) continue;               // TF-0853 : jamais versionné = jamais cloné
   if (r.length + SIDECAR_ORACLE <= PLAFOND_CHEMIN) continue;
   r4 = false;

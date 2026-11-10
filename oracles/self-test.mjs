@@ -1020,6 +1020,31 @@ check("TF-1015, recalée TF-1500 — R-4 dénonce un chemin d'output\\ qui dépa
   if (/passait jusqu'au/.test(surAncien.message))
     throw new Error(`le chemin de 125 caractères est présenté comme une nouveauté, il était refusé avant le 01/10/2026 : « ${surAncien.message.slice(0, 240)} »`);
 });
+// TF-2344 (10/11/2026) — LE SIDECAR `.md.jugement.json` QUE LE HOOK ÉCRIT N'EST PAS UN LIVRABLE. Les DEUX SENS sur le même dossier : une restitution de 110 caractères (144 avec son
+// sidecar d'oracle, conforme) porte son `.md.jugement.json` de 124 caractères (158 avec 34 de plus) — R-4 ne l'accuse pas, il ne dépasse pas le plafond de sa restitution — ; une
+// restitution de 117 caractères, elle, reste accusée (le plafond n'est pas désarmé), et un fichier `.json` ordinaire de 124 caractères n'est pas exempté par ce suffixe.
+const jugementLong = mkdtempSync(join(tmpdir(), "conf-jugement-"));
+mkdirSync(join(jugementLong, "output", "07-restitutions"), { recursive: true });
+const restitutionDe = (n) => {
+  const tete = "output/07-restitutions/Produit - Restitution - ";
+  const queue = " - 20261110a.md";
+  return tete + "x".repeat(n - tete.length - queue.length) + queue;
+};
+const RESTITUTION_CONFORME = restitutionDe(110);
+const JUGEMENT_DU_HOOK = `${RESTITUTION_CONFORME}.jugement.json`;           // 124 caractères
+const JSON_ORDINAIRE = RESTITUTION_CONFORME.replace(/\.md$/, "") + ".donnees.json";   // même longueur à un caractère près, sans le suffixe du hook
+const RESTITUTION_TROP_LONGUE = restitutionDe(117);
+for (const c of [RESTITUTION_CONFORME, JUGEMENT_DU_HOOK, JSON_ORDINAIRE, RESTITUTION_TROP_LONGUE]) writeFileSync(join(jugementLong, c), "x" + NL_TEST);
+sh("git", ["init", "-q", "-b", "main"], jugementLong);
+check("TF-2344 — R-4 ne compte pas les 34 du sidecar sur le `.md.jugement.json` du hook, accuse toujours la restitution trop longue et le `.json` ordinaire de même longueur", () => {
+  if (JUGEMENT_DU_HOOK.length !== 124 + 0 || RESTITUTION_CONFORME.length !== 110) throw new Error(`fixture invalide : ${RESTITUTION_CONFORME.length} et ${JUGEMENT_DU_HOOK.length} caractères`);
+  const { rapport } = lance(jugementLong);
+  const r4 = rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL" && /plafond/.test(f.message));
+  if (r4.some((f) => f.ou === JUGEMENT_DU_HOOK)) throw new Error(`le sidecar jugement.json du hook est accusé comme un livrable : « ${r4.find((f) => f.ou === JUGEMENT_DU_HOOK).message.slice(0, 200)} »`);
+  if (r4.some((f) => f.ou === RESTITUTION_CONFORME)) throw new Error("la restitution de 110 caractères, conforme, est accusée");
+  if (!r4.some((f) => f.ou === RESTITUTION_TROP_LONGUE)) throw new Error("la restitution de 117 caractères n'est plus accusée — l'exemption a désarmé le plafond");
+  if (!r4.some((f) => f.ou === JSON_ORDINAIRE)) throw new Error(`le .json ordinaire de ${JSON_ORDINAIRE.length} caractères n'est plus accusé — l'exemption est trop large : ${JSON.stringify(r4.map((f) => f.ou.length))}`);
+});
 // TF-1500 — LA CONSTANTE SE MESURE SUR LE DISQUE, ELLE NE SE RECOPIE PAS. Elle valait 26 pendant trois
 // semaines : personne ne l'avait comparée à un sidecar réel. La mesure est une FONCTION PURE, jouée
 // sur des listes fabriquées dans les deux sens, puis sur les fichiers SUIVIS du pilot (`git ls-files`,
