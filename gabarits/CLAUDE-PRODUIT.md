@@ -26,9 +26,9 @@ Avant « livré », chaque forge mobilisée a ses livrables (S85, `--verifier`).
 - Détail des routes, demandes entre produits : `<PILOT_ROOT>\references\CLAUDE-PRODUIT-DETAIL.md`.
 
 **Retours et noms.** Une friction forge se consigne au ledger au moment même (`type: retour`, 4 réponses du test de
-généralité). À la clôture, lot `<projet> - RETOURS - …` et sidecar `.tf.jsonl` au sas `<pilot>\input\00-retours\_arrivee\`,
-jamais ailleurs dans `input\`. Le lot porte le vrai nom du projet ; le pilot, public, pseudonymise à l'accueil, jamais le
-produit. Un dépôt PRIVÉ (`gh repo view --json visibility`) garde les noms réels (règle humaine du 01/10/2026).
+généralité) ; son lot `<projet> - RETOURS - …` + sidecar `.tf.jsonl` part dans CE tour au sas `<pilot>\input\00-retours\_arrivee\`,
+jamais ailleurs dans `input\` (D-191 : sans lot, le tour est refusé). Le lot porte le vrai nom du
+projet ; seul le pilot pseudonymise, à l'accueil. Un dépôt PRIVÉ (`gh repo view --json visibility`) garde les noms réels.
 
 **Gestes destructifs distants : une décision groupée, jamais une par commande (TF-1959, D-77 (b) amendée
 du 26/10/2026)** : « une décision pour toutes les modifs en une fois, pas une décision à chaque fois qu'il

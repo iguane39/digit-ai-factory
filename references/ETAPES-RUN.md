@@ -482,11 +482,16 @@ erreur), et sa `cause`. `node <pilot>\oracles\mesure-refus-enclenchement.mjs` co
 tous les produits, les clôtures que le juge aurait refusées et la part à tort, en séparant les runs
 qui ont consigné par l'outil : c'est sur ces chiffres que l'humain décidera du passage en bloquant.
 
+**Le lot part dans le tour où le retour est écrit, pas à la clôture (D-191 (a), TF-2329).** Le contrôle LOT du hook de fin de
+tour d'un produit (`oracles\hook-restitution.mjs`, recette `oracles\hook-restitution.test.mjs` cas 72 à 76) refuse un tour qui a
+écrit une entrée `type: retour` (ledger du run ou journal hors run) qu'aucun lot de `forge\retours\` ne cite par son seq, et
+`--prejuger` rend le même refus avant l'affichage ; un retour écrit avant le tour reste à l'alerte d'ouverture (TF-1988). La
+clôture ne compile donc plus que ce que les tours n'ont pas déjà remis, et le geste est le même :
 Compiler les entrées `type: retour` du ledger en un **lot de retours** —
 `forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** homonyme
 (candidatures SANS id, gabarit `gabarits\RETOURS-FORGES.md` ; le préfixe projet est
 obligatoire, décision 13/08) avec contrôle de complétude ledger↔lot — puis
-**remise automatique** : copie des deux fichiers dans le sas `<pilot>\input\00-retours\_arrivee\`. Ensuite `run_close`
+**remise automatique** : copie des deux fichiers dans le sas `<pilot>\input\00-retours\_arrivee\` (`node forge\retours\oracle-lot.mjs "<lot>.md" --remettre`, TF-2314). Ensuite `run_close`
 au ledger avec le bilan, et synthèse à l'humain. Hors run, toute inspection/incident produit
 son propre lot — un fichier par lot, jamais modifié après remise. **À réception d'un sidecar
 dans `input\00-retours\`** (côté pilot) : le confronter d'abord au registre ET à l'archive
