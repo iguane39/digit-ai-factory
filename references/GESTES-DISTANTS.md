@@ -50,6 +50,9 @@ Chaque famille se justifie par l'effet, pas par l'outil. Source : `oracles\hook-
 | Droits | `az role assignment` ou `definition create\|update`, `az ad app permission add\|grant\|admin-consent`, `az keyvault set-policy`, `az devops security …`, `az devops user add\|update`, `New-AzRoleAssignment` ; requête HTTP POST, PUT ou PATCH sur un point d'accès de droits (Azure DevOps, Microsoft Graph, Azure Resource Manager, GitHub) par `az rest`, `az devops invoke`, `gh api`, `curl`, `wget`, `Invoke-RestMethod` | un droit accordé ouvre un accès que personne n'a décidé ; le fait des 4 tentatives du 26/10 |
 | Suppression par HTTP ou GitHub | méthode DELETE vers un hôte autre que la machine locale ; `gh <groupe> delete` | `gh repo delete` et `gh api -X DELETE` sont des suppressions distantes comme les autres |
 | Histoire distante | `git push` avec `--force`, `-f`, `--force-with-lease`, `--force-if-includes`, une référence `+x` ou `:x`, `--delete`, `-d`, `--mirror`, `--prune` | l'histoire réécrite ou une branche supprimée ne se retrouve que si quelqu'un en a une copie |
+| Politiques (D-196 (b)) | `az repos policy … create\|update`, `az policy assignment\|exemption create\|update`, `New-AzPolicyAssignment`, `New-AzPolicyExemption` ; requête POST, PUT ou PATCH sur `policy/configurations` d'Azure DevOps ou sur `policyAssignments\|policyExemptions` d'Azure ; le retrait (`delete`, DELETE) était déjà jugé | une politique levée ou exemptée laisse passer ce qu'elle arrêtait ; le fait des 2 droits de contournement du 04/11 |
+| Production par un secret du dépôt (D-196 (b)) | un client de base (`psql`, `pg_dump`, `sqlcmd`, `Invoke-Sqlcmd`, `mysql`, `mongosh`, `redis-cli`…) ou une chaîne de connexion, alimentés par une variable ou un fichier d'environnement dont le nom porte PROD ou PRODUCTION, ou vers un hôte non local nommé prod | une mesure « en lecture seule » reste une connexion à la production avec un secret ; le fait du 31/10 |
+| Arrêt de processus par nom (D-196 (b)) | `taskkill /IM` ou `/FI`, `Stop-Process -Name`, `Get-Process x \| Stop-Process`, `pkill`, `killall`, `kill $(pgrep …)`, `… \| xargs kill` après une recherche par nom, `wmic process … delete` ; l'arrêt par PID reste libre | tous les processus de ce nom s'arrêtent, ceux des autres sessions compris ; le fait du 04/11 |
 | Exception (TF-2128, D-168 (a)) | `az … delete\|remove` ou `Remove-Az*` d'une ressource créée par la même session, consignée à sa création avec son identifiant, sans aucune dépendance consignée | passe sans décision groupée : la session retire ce qu'elle a elle-même créé ; conditions et limites ci-dessous |
 
 Hors liste : les lectures (`az group show`, `az role assignment list`, `terraform plan`, `gh api` en GET), les
@@ -67,6 +70,46 @@ déploiements ordinaires (`terraform apply`, `az deployment … create`) et `git
   écrirait une fausse entrée dans sa propre transcription, et le sens des mots cités (« je n'approuve pas »,
   tapé par l'humain, serait une citation valide). La revue d'un lot reste le garde-fou de ces deux points.
 - Que le champ `cible` du lot corresponde à la commande : seule la commande approuvée est comparée.
+
+## Droits, production, processus : trois familles sans lot (D-196, 10/11/2026)
+
+Décision humaine du 10/11/2026, même réponse. La recommandation scellée est l'option (c) : la barrière de l'option (b), plus
+un relevé en lecture des droits déjà accordés chez les 2 produits. Ce fichier décrit la barrière ; le relevé est un autre
+geste, hors de la garde. Les faits : le 04/11, une session de produit s'est accordé 2 droits de contournement des politiques de
+branche ; le 31/10, une mesure dite en lecture seule s'est connectée à la production avec le mot de passe du dépôt ; le 04/11,
+un nettoyage a lancé `taskkill` sur tous les `node.exe` du poste. Les trois familles sont dans la liste fermée ci-dessus.
+
+**Les droits.** Attribuer ou retirer un rôle, une permission ou une politique demande un lot. Les attributions de rôle, les
+permissions Azure DevOps, les collaborateurs et la protection de branche GitHub étaient déjà jugés ; D-196 ajoute les
+politiques de branche (`az repos policy`), les politiques Azure et leurs exemptions, et leurs équivalents REST. Une option
+globale placée entre les mots d'`az` ne masque plus la commande (`az devops --org … security permission update`).
+
+**La production, heuristique.** Une connexion est jugée « de production » quand un client de base, ou une chaîne de connexion
+portée par un autre outil, est alimenté par une variable dont le nom porte PROD ou PRODUCTION (`DATABASE_URL_PROD`,
+`$env:SQL_PROD_PASSWORD`), par un fichier d'environnement de ce nom (`.env.production`, `prod.env`), ou vise un hôte non local
+dont un composant du nom est `prod` ou `production` (`db-prod.exemple.net`, jamais `product-db`). La variable compte si la
+commande la lit (`$NOM`, `${NOM}`, `$env:NOM`, `%NOM%`) ou l'affecte hors guillemets : un `PROD=%s` dans le format d'un
+`printf` n'est pas une variable.
+
+**La mesure de cette heuristique.** Sur les 11 921 commandes des 7 jours, aucune connexion n'est jugée de production. Sur
+les 43 708 commandes de toutes les transcriptions du poste, 96 nomment un client de base ou une chaîne de connexion. Avant la
+correction du `printf`, 2 étaient jugées de production à tort, deux bases locales en conteneur ; après, aucune. Le fait du
+31/10 échappe à l'heuristique : c'était un script Python qui lisait le mot de passe d'un fichier d'environnement du dépôt,
+nommé sans PROD, et ouvrait une session IMAP, sans client de base. Une extension (lecture d'un `.env` du dépôt et appel réseau vers un hôte non
+local) toucherait 10 commandes sur 11 921 en 7 jours. Elle n'est pas appliquée : c'est une décision humaine.
+
+**Les processus.** Un arrêt par nom ou en masse demande un lot : `taskkill /IM` ou `/FI` (`//IM` sous Git Bash), `Stop-Process
+-Name`, un `Stop-Process` qui reçoit par le tube des processus cherchés par nom, `pkill`, `killall`, `kill $(pgrep …)`, un
+`xargs kill` derrière une recherche par nom, `wmic process … delete`. L'arrêt par PID reste libre : `taskkill /PID`,
+`Stop-Process -Id`, `Get-Process -Id n | Stop-Process`, `kill <pid>`, `kill %1`, un PID lu d'un fichier. Le refus le dit.
+
+**La mesure d'ensemble.** Sur les 11 921 commandes des 7 jours, les deux hooks refusaient 10 commandes avant ce travail et 12
+après. Les 2 refus nouveaux sont la commande cassée de D-194 et le nettoyage du 04/11 (`pkill … || taskkill //F //IM
+node.exe`), un vrai geste. Aucun refus n'est perdu, aucun faux positif n'apparaît.
+
+**Limites.** Un geste joué par un script dont le texte n'est pas dans la commande ; une connexion à la production par une API
+de gestion ou un client applicatif (`imaplib`, `requests`), et non par un client de base ; un hôte de production qui ne porte
+pas `prod` dans son nom ; `Stop-Process` sur une variable qui ne tient qu'un processus, refusé par prudence.
 
 ## L'accord est cité, la commande est nommée (D-195 (b), 10/11/2026)
 
@@ -136,8 +179,8 @@ change que l'environnement de la commande. Une commande qui l'écrit pour une se
 Write et Edit, qui pourraient l'écrire dans `.claude\settings.json`.
 
 **La mesure.** Rejeu des 11 921 commandes Bash et PowerShell des transcriptions du poste (profils `~\.claude` et
-`~\.claude-b`, du 03/11 15:30 au 10/11 15:30 UTC), en fonctions pures, ancien juge contre nouveau. Les refus des gestes
-distants passent de 10 à 11, ceux de l'identité sortante restent à 0. Le seul refus nouveau est une commande dont une
+`~\.claude-b`, du 03/11 15:30 au 10/11 15:30 UTC), en fonctions pures, ancien juge contre nouveau. Avant D-196, les refus
+des gestes distants passent de 10 à 11, ceux de l'identité sortante restent à 0. Le seul refus nouveau est une commande dont une
 apostrophe ferme réellement la chaîne bash d'un `node -e` : bash la rejette lui-même. Faux positif : aucun.
 
 **Limites.** Une variable venue de l'environnement ou d'une commande précédente ne se résout pas : la commande qui l'invoque

@@ -53,7 +53,13 @@
  *     `gh release delete`, `gh secret delete`…), sauf `gh alias` (local) ;
  *   · réécriture ou suppression de l'histoire distante : `git push --force`, `-f`, `--force-with-lease`,
  *     `--force-if-includes`, refspec `+branche`, `--delete`, `-d`, refspec `:branche` (suppression de
- *     branche ou d'étiquette distante), `--mirror`, `--prune`.
+ *     branche ou d'étiquette distante), `--mirror`, `--prune` ;
+ *   · D-196 (b) du 10/11/2026 : les politiques (`az repos policy … create|update`, `az policy assignment|exemption create|update`,
+ *     `New|Set-AzPolicyAssignment|Exemption`, REST `policy/configurations` d'Azure DevOps et `policyAssignments|policyExemptions`
+ *     d'Azure) ; la connexion à une base de production par un secret du dépôt (client de base ou chaîne de connexion, alimentés
+ *     par une variable ou un fichier d'environnement dont le nom porte PROD ou PRODUCTION, ou vers un hôte non local nommé prod) ;
+ *     l'arrêt de processus par nom ou en masse (`taskkill /IM|/FI`, `Stop-Process -Name`, `Get-Process x | Stop-Process`, `pkill`,
+ *     `killall`, `kill $(pgrep …)`, `wmic process … delete`). L'arrêt par PID reste libre.
  * Les lectures (`az group show`, `az role assignment list`, `terraform plan`, `gh api` GET) et les
  * déploiements ordinaires (`terraform apply`, `az deployment … create`, `git push` simple) ne sont pas
  * concernés.
@@ -351,7 +357,7 @@ const CMDLETS_LOCAUX = new Set(["remove-azcontext", "remove-azenvironment", "rem
 /** TF-2128 : les cmdlets Az qui écrivent, lues pour le registre des créations (elles ne sont pas jugées destructives pour autant). */
 const CMDLET_AZ_ECRITURE = /^(new|set|update|add|remove|start|stop|restart|grant|revoke|register|unregister|move|import|publish|enable|disable)-az[a-z0-9]+$/;
 const estCmdlet = (n) => (/^remove-(az|mg)[a-z0-9]+$/.test(n) && !CMDLETS_LOCAUX.has(n))
-  || /^(new|set)-azroleassignment$/.test(n)
+  || /^(new|set)-az(roleassignment|policyassignment|policyexemption)$/.test(n)
   || /^new-mg(serviceprincipalapproleassignment|userapproleassignment|oauth2permissiongrant|groupmember|groupowner|directoryrolemember\w*)$/.test(n);
 
 /** Le texte d'un jeton base64 (`-EncodedCommand`, UTF-16LE par défaut), s'il se lit : 90 % de caractères imprimables au moins. */
@@ -442,7 +448,7 @@ export function localiser(m, dialecte = null, ctx = null) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(w)) continue;
     if (/^\$[\w:.]+$/.test(w) && m[i + 1] === "=") { i++; continue; }
     const n = nomOutil(w);
-    if (OUTILS_JUGES.has(n) || estCmdlet(n) || CMDLET_AZ_ECRITURE.test(n)) return { outil: n, args: m.slice(i + 1), mot: w };
+    if (OUTILS_JUGES.has(n) || CLIENTS_BASE.has(n) || ARRET.has(n) || estCmdlet(n) || CMDLET_AZ_ECRITURE.test(n)) return { outil: n, args: m.slice(i + 1), mot: w };
     if (DIALECTE_SHELL[n]) return interneDeShell(n, m.slice(i + 1));
     if (EVALUATEURS.has(n)) return interneEvalue(m.slice(i + 1), dialecte, ctx);
     if (START_PROCESS.has(n) || (n === "start" && m.slice(i + 1).some(estOptionStartProcess))) return interneDeStartProcess(m.slice(i + 1), ctx);
@@ -469,7 +475,8 @@ const PREFIXES = new Set(["sudo", "env", "time", "nohup", "command", "exec", "ti
  */
 export function contexteDe(commande, dialecte = null, parent = null) {
   const variables = new Map(parent?.variables ?? []), fonctions = new Set(parent?.fonctions ?? []);
-  if (!dialecte || dialecte === "cmd") return { variables, fonctions };
+  const texte = parent?.texte ?? String(commande ?? ""); // la commande entière : D-196 (b) y cherche ce qui alimente une connexion
+  if (!dialecte || dialecte === "cmd") return { variables, fonctions, texte };
   const lu = lireCommande(commande, dialecte);
   for (const s of lu.segments) {
     const m = mots(s, dialecte);
@@ -486,11 +493,10 @@ export function contexteDe(commande, dialecte = null, parent = null) {
       variables.set(p[1], p[2]);
     }
   }
-  const texte = lireDocuments(commande, dialecte).texte;
   const formes = dialecte === "ps" ? [/\bfunction\s+([A-Za-z_][\w-]*)/gi]
     : [/(?:^|[\s;&|(){}])(?:function\s+)?([A-Za-z_][\w.:-]*)\s*\(\s*\)\s*\{/g, /(?:^|[\s;&|{}])function\s+([A-Za-z_][\w.:-]*)\s*\{/g];
-  for (const re of formes) for (const f of texte.matchAll(re)) fonctions.add(f[1].toLowerCase());
-  return { variables, fonctions };
+  for (const re of formes) for (const f of lireDocuments(commande, dialecte).texte.matchAll(re)) fonctions.add(f[1].toLowerCase());
+  return { variables, fonctions, texte };
 }
 
 /** La valeur lisible d'un texte de variable : variables imbriquées résolues, `$(where X)`, `$(which X)`, `$(find … -name X)` valent X ; null sinon. */
@@ -592,6 +598,9 @@ const AZ_DROITS = [
   /^keyvault set-policy\b/,
   /^devops security (group membership add|group create|permission (update|reset|reset-all))\b/,
   /^devops user (add|update)\b/,
+  // D-196 (b) : les politiques de branche et les politiques Azure, dont l'exemption contourne la règle (retrait : `delete`, déjà jugé).
+  /^repos policy (?:[a-z0-9-]+ )*(create|update)\b/,
+  /^policy (assignment|exemption) (create|update)\b/,
 ];
 
 const HTTP = {
@@ -635,11 +644,11 @@ function toutLocal(texte) {
 }
 
 const ADO_HOTE = /(dev\.azure\.com|vssps\.dev\.azure\.com|vsaex\.dev\.azure\.com|\.visualstudio\.com)/i;
-const ADO_DROITS = /(accesscontrolentries|accesscontrollists|securityroles|roleassignments|graph\/(memberships|groups|users)|memberships|userentitlements|memberentitlements|groupentitlements)/i;
+const ADO_DROITS = /(accesscontrolentries|accesscontrollists|securityroles|roleassignments|graph\/(memberships|groups|users)|memberships|userentitlements|memberentitlements|groupentitlements|policy\/configurations|--area\s+policy\b)/i;
 const GRAPH_HOTE = /graph\.(microsoft\.com|windows\.net)/i;
 const GRAPH_DROITS = /(approleassignments|approleassignedto|oauth2permissiongrants|directoryroles|rolemanagement|roleassignments|\/members|\/owners|\$ref)/i;
 const ARM_HOTE = /management\.azure\.com/i;
-const ARM_DROITS = /microsoft\.authorization\/(roleassignments|roledefinitions|denyassignments|roleeligibility|roleassignmentschedule)/i;
+const ARM_DROITS = /microsoft\.authorization\/(roleassignments|roledefinitions|denyassignments|roleeligibility|roleassignmentschedule|policyassignments|policyexemptions)/i;
 const GITHUB_DROITS = /(\/collaborators|\/memberships|\/invitations|\/branches\/[^\s/]+\/protection|\/rulesets|\/teams\/[^\s/]+\/(repos|memberships))/i;
 
 /** Le texte vise-t-il un point d'accès de droits ? */
@@ -718,21 +727,141 @@ function jugerGit(args) {
   return null;
 }
 
+// ---------------------------------------------------------------------------------------------
+// 2 ter. D-196 (b) du 10/11/2026 : la production par un secret du dépôt, l'arrêt de processus par leur nom
+// ---------------------------------------------------------------------------------------------
+// Les faits : le 31/10, une mesure dite en lecture seule s'est connectée à la production avec le mot de passe du fichier
+// d'environnement du dépôt ; le 04/11, un nettoyage a lancé `taskkill` sur tous les `node.exe` du poste.
+
+/** Les clients de base de données et de cache : leur connexion se juge par ce qui l'alimente et par l'hôte visé. */
+const CLIENTS_BASE = new Set(["psql", "pg_dump", "pg_dumpall", "pg_restore", "pgcli", "sqlcmd", "invoke-sqlcmd", "mysql", "mysqldump", "mariadb", "mycli",
+  "mongosh", "mongo", "mongodump", "mongorestore", "mongoexport", "mongoimport", "redis-cli", "sqlplus", "cqlsh"]);
+/** Une chaîne de connexion : à schéma (`postgresql://…`, `mongodb+srv://…`), ou à clés (`Server=…;Password=…`). */
+const CHAINE_CONNEXION = /\b(?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|rediss?|sqlserver|mssql|jdbc:[a-z]+):\/\/[^\s"'`]+|\b(?:server|data source|host|address)\s*=\s*[^;"'`\s]+\s*;[^"'`]*?\b(?:password|pwd)\s*=/i;
+/** Une variable qui porte une connexion (`DATABASE_URL`, `PGPASSWORD`, `MONGO_URI`, `ConnectionString`). */
+const VARIABLE_CONNEXION = /^(?:DATABASE|DB|PG|POSTGRES\w*|MYSQL|MARIADB|MONGO\w*|REDIS|SQL\w*|MSSQL)[A-Z0-9_]*$|CONNECTION_?STRING|_DSN$|^DSN$/i;
+/** Un nom porte PROD s'il en a une composante : `DATABASE_URL_PROD`, `prodDbUrl`, `db-prod.exemple.net` ; jamais `product` ni `produit`. */
+const porteProd = (nom) => String(nom).split(/[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])/).some((c) => /^(prod|production)$/i.test(c));
+const HOTE_LOCAL_BASE = /^(localhost|127(?:\.\d+){3}|::1|0\.0\.0\.0|host\.docker\.internal)$/i;
+
+/** Le texte, variables que la commande affecte remplacées par leur valeur quand elle se lit. */
+const developper = (texte, ctx) => String(texte).replace(/\$(?:env:)?\{?([A-Za-z_]\w*)\}?/g, (m, n) => {
+  const v = ctx?.variables?.get(n) ?? ctx?.variables?.get(n.toLowerCase());
+  return typeof v === "string" && !v.includes("$") ? v : m;
+});
+
+/**
+ * Les variables dont le nom porte PROD : lues par le texte (`$NOM`, `${NOM}`, `$env:NOM`, `%NOM%`), ou affectées hors guillemets
+ * (`affectees`, lues par `contexteDe`). Un `PROD=%s` dans le format d'un `printf` entre guillemets n'est pas une variable.
+ */
+function variablesProd(texte, affectees = []) {
+  const noms = new Set();
+  for (const r of String(texte).matchAll(/\$(?:env:)?\{?([A-Za-z_]\w*)\}?|%([A-Za-z_]\w*)%/g)) { const n = r[1] ?? r[2]; if (porteProd(n)) noms.add(n); }
+  for (const n of affectees) if (porteProd(n)) noms.add(n);
+  return [...noms];
+}
+
+/** Les fichiers d'environnement nommés par un texte et dont le nom porte PROD : `.env.production`, `prod.env`, `env/prod/.env`. */
+function fichiersEnvProd(texte) {
+  const f = new Set();
+  for (const r of String(texte).matchAll(/[^\s"'`;|&<>()=]*\.env\b[^\s"'`;|&<>()]*|[^\s"'`;|&<>()=]*\benv[\\/][^\s"'`;|&<>()]*/gi)) if (porteProd(r[0])) f.add(r[0]);
+  return [...f];
+}
+
+/** Les hôtes qu'un texte de connexion vise : adresses à schéma, `-h`, `--host`, `-S` de sqlcmd, `-ServerInstance`, `Server=`, `Host=`. */
+function hotesDeConnexion(texte) {
+  const h = [];
+  for (const r of String(texte).matchAll(/\b[a-z][a-z0-9+.-]*:\/\/([^\s"'`/?#]+)/gi)) h.push(r[1].slice(r[1].lastIndexOf("@") + 1));
+  for (const r of String(texte).matchAll(/(?:^|\s)(?:-h|--host|--hostname|-S|--server|-ServerInstance|-Server)(?:[=:]|\s+)["']?([^\s"';,]+)/gi)) h.push(r[1]);
+  for (const r of String(texte).matchAll(/\b(?:server|data source|host|address|hostname)\s*=\s*["']?([^;"'`\s,]+)/gi)) h.push(r[1]);
+  return h.map((x) => x.replace(/^tcp:/i, "").replace(/[,:]\d+$/, "").replace(/\\.*$/, "").replace(/^\[|\]$/g, "").toLowerCase()).filter(Boolean);
+}
+
+/**
+ * Ce qui relie une connexion à la production (heuristique de D-196 (b), mesurée au rejeu) : une variable ou un fichier
+ * d'environnement dont le nom porte PROD ou PRODUCTION, ou un hôte non local nommé prod. Pour un client de base, la variable
+ * et le fichier se cherchent dans toute la commande, qui l'alimente ; pour une chaîne de connexion portée par un autre outil,
+ * dans son segment seul.
+ */
+function raisonsProduction(segment, ctx, client, affecteesDuSegment = []) {
+  const tout = ctx?.texte ?? segment;
+  const raisons = [];
+  const vars = client ? variablesProd(tout, [...(ctx?.variables?.keys() ?? [])]) : variablesProd(segment, affecteesDuSegment);
+  if (vars.length) raisons.push(`variable ${vars.map((v) => `\`${v}\``).join(", ")}`);
+  const fichiers = fichiersEnvProd(tout);
+  if (fichiers.length) raisons.push(`fichier d'environnement ${fichiers.map((v) => `\`${v}\``).join(", ")}`);
+  const hotes = [...new Set(hotesDeConnexion(segment).filter((x) => !HOTE_LOCAL_BASE.test(x) && porteProd(x)))];
+  if (hotes.length) raisons.push(`hôte ${hotes.map((v) => `\`${v}\``).join(", ")}`);
+  return raisons;
+}
+
+function jugerProduction(outil, segment, ctx) {
+  const r = raisonsProduction(developper(segment, ctx), ctx, true);
+  return r.length ? { categorie: "production", raison: `\`${outil}\` se connecte à une base de production (${r.join(" ; ")}) : en lecture comme en écriture, la connexion porte un secret du dépôt (D-196 (b))` } : null;
+}
+
+/** Une chaîne de connexion vers la production portée par un autre outil (`node x.mjs "postgresql://…"`, `DATABASE_URL=$DB_PROD npm run …`). */
+function connexionDeSegment(segment, m, ctx) {
+  const t = developper(segment, ctx);
+  const affectees = m.map((w, k) => (/^(?:\$env:)?([A-Za-z_]\w*)=/.exec(w) || (m[k + 1] === "=" ? /^\$(?:env:)?([A-Za-z_]\w*)$/.exec(w) : null))?.[1]).filter(Boolean);
+  const affecte = affectees.some((n) => VARIABLE_CONNEXION.test(n));
+  if (!CHAINE_CONNEXION.test(t) && !affecte) return null;
+  const r = raisonsProduction(t, ctx, false, affectees);
+  return r.length ? { mots: m, categorie: "production", raison: `une chaîne de connexion vers une base de production (${r.join(" ; ")}) : la connexion porte un secret du dépôt (D-196 (b))` } : null;
+}
+
+/** Les outils qui arrêtent des processus ; l'arrêt par PID reste libre. */
+const ARRET = new Set(["taskkill", "tskill", "stop-process", "spps", "pkill", "killall", "kill", "wmic"]);
+function jugerArret(outil, args, amont, dialecte) {
+  const par = (quoi) => ({ categorie: "processus", raison: `\`${outil}\` arrête des processus ${quoi} : ceux des autres sessions et des autres outils du poste s'arrêtent aussi ; `
+    + "arrête par PID (`taskkill /PID <pid>`, `Stop-Process -Id <pid>`, `kill <pid>`) (D-196 (b))" });
+  const bas = args.map((a) => a.toLowerCase());
+  // `/IM` sous cmd et PowerShell, `//IM` sous Git Bash (la double barre échappe à la conversion de chemin de MSYS)
+  if (outil === "taskkill") return bas.some((a) => /^(?:\/{1,2}|-)im$/.test(a)) ? par("par leur nom (/IM)") : bas.some((a) => /^(?:\/{1,2}|-)fi$/.test(a)) ? par("en masse (filtre /FI)") : null;
+  if (outil === "tskill") return args.some((a) => !a.startsWith("/") && !/^\d+$/.test(a)) ? par("par leur nom") : null;
+  if (outil === "pkill" || outil === "killall") return args.length && args.every((a) => /^(-l|--list|-L|--help|-h|-V|--version)$/.test(a)) ? null : par("par leur nom");
+  if (outil === "wmic") return bas.includes("process") && bas.some((a) => a === "delete" || a === "terminate") && !/processid\s*=\s*\d+/i.test(args.join(" ")) ? par("par une requête WMI") : null;
+  const pidParTube = amont && /^\s*(get-process|gps|ps)\s+-(id|pid)\b/i.test(amont);
+  if (outil === "kill" && dialecte !== "ps" && !args.some((a) => /^-(n|na|nam|name|pr\w*|in\w*)$/i.test(a))) {
+    // `kill` de bash : un PID ou un travail (`%1`) restent libres
+    if (args.some((a) => /\$\(\s*(pgrep|pidof)\b|`\s*(pgrep|pidof)\b/.test(a))) return par("par leur nom (pgrep, pidof)");
+    if (args.includes("-1")) return par("en masse (-1 : tous les processus)");
+    if (!args.some((a) => /^(%?\d+|\$\S+|%\S+)$/.test(a)) && amont && /\b(pgrep|pidof|grep|tasklist|ps)\b/.test(amont)) return par("par leur nom (le tube les cherche par leur nom)");
+    return null;
+  }
+  // Stop-Process, spps, et `kill` sous PowerShell (alias de Stop-Process)
+  let nom = false, id = false, objet = false;
+  for (let k = 0; k < args.length; k++) {
+    const p = /^-([A-Za-z]+)(?::.*)?$/.exec(args[k]);
+    if (!p) { if (/^\d+(,\d+)*$/.test(args[k]) || args[k].startsWith("$")) id = true; continue; }
+    const n = p[1].toLowerCase();
+    if (prefixeDe(n, "name") || prefixeDe(n, "processname", 2)) nom = true;
+    else if (n === "id" || n === "pid") id = true;
+    else if (prefixeDe(n, "inputobject", 2)) { objet = true; k++; }
+  }
+  if (nom) return par("par leur nom (-Name)");
+  if (id || pidParTube) return null;
+  return par(objet ? "reçus par -InputObject" : "reçus par le tube (Get-Process par nom, Where-Object…)");
+}
+
 /** Sous PowerShell 5.1, `curl` et `wget` sont des alias d'`Invoke-WebRequest` ; `curl.exe` reste le vrai curl (D-194 (b)). */
 const aliasPowerShell = (l, dialecte) => (dialecte === "ps" || dialecte === null) && !/\.exe$/i.test(String(l.mot || ""));
 
 /**
- * Juge UN segment : rend [] ou la liste des gestes destructifs distants { mots, categorie, raison }. `precedent` est le segment
- * dont celui-ci reçoit le tube (`Get-Process node | Stop-Process`), null sinon.
+ * Juge UN segment : rend [] ou la liste des gestes destructifs distants { mots, categorie, raison }. `precedent` est le texte des
+ * segments dont celui-ci reçoit le tube (`Get-Process node | Stop-Process`), null sinon.
  */
 export function jugerSegment(segment, profondeur = 0, dialecte = null, precedent = null, ctx = null) {
   const m = teteResolue(mots(segment, dialecte), dialecte, ctx).m;
   const l = localiser(m, dialecte, ctx);
-  if (!l) return [];
+  const chaine = connexionDeSegment(segment, m, ctx); // D-196 (b) : une chaîne de connexion vers la production, quel que soit l'outil
+  if (!l) return chaine ? [chaine] : [];
   if (l.interne !== undefined) return profondeur >= 3 ? [] : jugerCommande(l.interne, profondeur + 1, l.dialecte ?? dialecte, ctx);
   const { outil, args } = l;
   let v = null;
-  if (outil === "az") v = jugerAz(args);
+  if (CLIENTS_BASE.has(outil)) v = jugerProduction(outil, segment, ctx);
+  else if (ARRET.has(outil)) v = jugerArret(outil, args, precedent, dialecte);
+  else if (outil === "az") v = jugerAz(args);
   else if (outil === "terraform" || outil === "tofu") v = jugerTerraform(outil, args);
   else if (outil === "gh") v = jugerGh(args);
   else if (outil === "git") v = jugerGit(args);
@@ -743,14 +872,16 @@ export function jugerSegment(segment, profondeur = 0, dialecte = null, precedent
       ? { categorie: "suppression", raison: `\`${outil}\` supprime une ressource distante` }
       : { categorie: "droits", raison: `\`${outil}\` attribue ou modifie des droits` };
   }
-  return v ? [{ mots: [outil, ...args], ...v }] : [];
+  return v ? [{ mots: [outil, ...args], ...v }] : chaine ? [chaine] : [];
 }
 
 /** Les gestes destructifs distants d'une commande complète (tous segments, shells imbriqués et `"$( … )"` compris). */
 export function jugerCommande(commande, profondeur = 0, dialecte = null, parent = null) {
   const lu = lireCommande(commande, dialecte);
   const ctx = contexteDe(commande, dialecte, parent);
-  const gestes = lu.segments.flatMap((s, i) => jugerSegment(s, profondeur, dialecte, lu.separateurs[i] === "|" ? lu.segments[i - 1] : null, ctx));
+  // Le texte des segments dont le segment i reçoit le tube, depuis le début du tube.
+  const amont = (i) => { const t = []; for (let k = i; k > 0 && lu.separateurs[k] === "|"; k--) t.unshift(lu.segments[k - 1]); return t.length ? t.join(" | ") : null; };
+  const gestes = lu.segments.flatMap((s, i) => jugerSegment(s, profondeur, dialecte, amont(i), ctx));
   if (profondeur < 3) for (const s of lu.substitutions) gestes.push(...jugerCommande(s, profondeur + 1, dialecte, ctx));
   return gestes;
 }
@@ -819,7 +950,9 @@ export function causesIllisibles(commande, dialecte = null, profondeur = 0, pare
 }
 
 /** Les outils dont la garde juge les gestes, ou qui agissent hors du poste : la liste de D-194 (b). */
-const OUTILS_DISTANTS = new Set(["az", "gh", "terraform", "tofu", "kubectl", "helm", "aws", "gcloud", "curl", "wget", "irm", "iwr", "ssh", "scp", "sftp", "rsync", "wrangler", "start-process", "saps"]);
+const OUTILS_DISTANTS = new Set(["az", "gh", "terraform", "tofu", "kubectl", "helm", "aws", "gcloud", "curl", "wget", "irm", "iwr", "ssh", "scp", "sftp", "rsync", "wrangler", "start-process", "saps",
+  // D-196 (b) : les clients de base et les arrêts de processus par nom, jugés eux aussi
+  "psql", "pg_dump", "pg_restore", "sqlcmd", "mysql", "mariadb", "mongosh", "mongo", "redis-cli", "sqlplus", "taskkill", "tskill", "pkill", "killall", "stop-process", "spps", "wmic"]);
 const estOutilDistant = (n) => OUTILS_DISTANTS.has(n) || /^invoke-[a-z]+$/.test(n) || estCmdlet(n) || CMDLET_AZ_ECRITURE.test(n) || /^[a-z]+-mg[a-z0-9]+$/.test(n);
 
 /** Les mots d'outil distant d'un texte, jetons base64 décodés compris ; `git` compte quand `push` le suit. */
@@ -972,7 +1105,8 @@ export function citeDans(reponse, textes) {
  */
 export function nommeOutilEtVerbe(commande) {
   const l = localiser(mots(commande));
-  if (!l?.outil) return false;
+  // D-196 (b) : une chaîne de connexion portée par un autre outil (`node x.mjs "postgresql://…"`) se nomme par son texte, sans joker.
+  if (!l?.outil) return !String(commande).includes("*") && jugerSegment(String(commande)).length > 0;
   const tous = [l.outil, ...l.args];
   const k = tous.findIndex((w) => w.includes("*"));
   const prefixe = (k < 0 ? tous : tous.slice(0, k)).map((w) => (/[\s"']/.test(w) ? `"${w.replace(/"/g, "")}"` : w)).join(" ");

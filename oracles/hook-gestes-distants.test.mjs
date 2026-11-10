@@ -264,6 +264,100 @@ try {
     if (sans.status !== 1 || !/transcription introuvable/.test(sans.stderr)) throw new Error(`sans transcription : ${sans.status} ${sans.stderr}`);
   });
 
+  // ---- D-196 (b) du 10/11/2026 : trois familles refusées sans lot d'accord ----------------------
+  // Les faits : le 04/11, une session de produit s'est accordé 2 droits de contournement des politiques de branche ; le 31/10, une
+  // mesure dite en lecture seule s'est connectée à la production avec le mot de passe du dépôt ; le 04/11, un nettoyage a lancé
+  // `taskkill` sur tous les `node.exe` du poste. « avant » : la forme était déjà refusée par le code d'avant (non-régression).
+  const ROUGES_196 = [
+    ["droits", "Bash", "az role assignment create --assignee x --role Contributor --scope /subscriptions/s", "avant"],
+    ["droits", "Bash", "az role assignment delete --assignee x --role Reader", "avant"],
+    ["droits", "Bash", "az devops security permission update --org https://dev.azure.com/o --namespace-id ns --subject s --token t --allow-bit 32768", "avant"],
+    ["droits", "Bash", "az devops security permission reset --namespace-id ns --subject s --token t --permission-bit 128", "avant"],
+    ["droits", "Bash", "az devops --org https://dev.azure.com/o security permission update --id ns --subject s --token t --allow-bit 128"],
+    ["droits", "Bash", "az repos policy create --config politique.json"],
+    ["droits", "Bash", "az repos policy approver-count update --id 3 --minimum-approver-count 0 --branch main --repository-id r"],
+    ["droits", "Bash", "az repos policy delete --id 3 --yes", "avant"],
+    ["droits", "Bash", "az policy exemption create --name e --policy-assignment a --exemption-category Waiver"],
+    ["droits", "Bash", "gh api -X PUT repos/o/r/collaborators/x -f permission=admin", "avant"],
+    ["droits", "Bash", "gh api -X DELETE repos/o/r/collaborators/x", "avant"],
+    ["droits", "Bash", "gh api -X PUT repos/o/r/branches/main/protection --input p.json", "avant"],
+    ["droits", "Bash", "gh api -X DELETE repos/o/r/branches/main/protection", "avant"],
+    ["droits", "Bash", 'curl -X POST "https://dev.azure.com/o/p/_apis/policy/configurations?api-version=7.1" -d @p.json'],
+    ["droits", "PowerShell", "Invoke-RestMethod -Method Put -Uri https://api.github.com/repos/o/r/branches/main/protection -Body $b", "avant"],
+    ["droits", "PowerShell", 'Invoke-RestMethod -Method Patch -Uri "https://dev.azure.com/o/p/_apis/policy/configurations/3?api-version=7.1" -Body $b'],
+    ["droits", "Bash", "az devops invoke --area policy --resource configurations --http-method PUT --route-parameters project=p configurationId=3 --in-file p.json"],
+    ["droits", "PowerShell", "New-AzPolicyExemption -Name e -PolicyAssignment $a -ExemptionCategory Waiver"],
+    ["production", "Bash", 'psql "$DATABASE_URL_PROD" -c "select 1"'],
+    ["production", "Bash", 'set -a; source .env.production; set +a; psql "$DATABASE_URL" -c "select count(*) from t"'],
+    ["production", "Bash", 'psql -h db-prod.exemple.net -U lecteur -d app -c "select 1"'],
+    ["production", "PowerShell", 'sqlcmd -S tcp:app-prod.database.windows.net,1433 -U u -P $env:SQL_PROD_PASSWORD -Q "select 1"'],
+    ["production", "PowerShell", 'Invoke-Sqlcmd -ServerInstance sql-prod.exemple.net -Query "select 1"'],
+    ["production", "Bash", 'mongosh "mongodb+srv://lecteur:$MONGO_PW@cluster-prod.exemple.net/app"'],
+    ["production", "Bash", "mysql -h mysql-production.exemple.net -u r -p"],
+    ["production", "Bash", 'node scripts/mesure.mjs "postgresql://u:p@db-prod.exemple.net/app"'],
+    ["production", "Bash", "DATABASE_URL=$DATABASE_URL_PROD npx prisma migrate status"],
+    ["production", "Bash", 'export $(grep -v "^#" .env.prod | xargs) && psql "$DATABASE_URL" -c "select 1"'],
+    ["processus", "PowerShell", "taskkill /IM node.exe"],
+    ["processus", "Bash", "taskkill //F //IM node.exe"],
+    ["processus", "PowerShell", "taskkill /F /IM node.exe"],
+    ["processus", "PowerShell", 'taskkill /F /FI "IMAGENAME eq node.exe"'],
+    ["processus", "PowerShell", "Stop-Process -Name node"],
+    ["processus", "PowerShell", "Stop-Process -Name node -Force"],
+    ["processus", "PowerShell", "Get-Process node | Stop-Process"],
+    ["processus", "PowerShell", "Get-Process | Where-Object { $_.ProcessName -eq 'node' } | Stop-Process -Force"],
+    ["processus", "PowerShell", "spps -n node"],
+    ["processus", "Bash", "pkill node"],
+    ["processus", "Bash", 'pkill -f "vite"'],
+    ["processus", "Bash", "killall node"],
+    ["processus", "Bash", "kill -9 $(pgrep node)"],
+    ["processus", "Bash", "pgrep -f vite | xargs kill"],
+    ["processus", "Bash", "ps aux | grep node | awk '{print $2}' | xargs kill -9"],
+    ["processus", "PowerShell", "wmic process where \"name='node.exe'\" delete"],
+  ];
+  for (const [famille, outil, c, avant] of ROUGES_196) {
+    check(`rouge (D-196, ${famille}) — ${c.replace(/\s+/g, " ").slice(0, 90)} : refusé sans lot${avant ? " (déjà refusé avant D-196 : non-régression)" : ""}`, () => {
+      const r = direct(outil, c);
+      refuseD(r);
+      if (!r.gestes?.some((g) => (famille === "droits" ? ["droits", "suppression"] : [famille]).includes(g.categorie))) throw new Error(`famille ${famille} absente : ${JSON.stringify(r.gestes?.map((g) => g.categorie))}`);
+    });
+  }
+  const VERTS_196 = [
+    ["droits", "Bash", "az role assignment list --assignee x"],
+    ["droits", "Bash", "az repos policy list --repository-id r"],
+    ["droits", "Bash", "gh api repos/o/r/collaborators"],
+    ["droits", "Bash", "gh api repos/o/r/branches/main/protection"],
+    ["droits", "Bash", 'curl -s "https://dev.azure.com/o/p/_apis/policy/configurations?api-version=7.1"'],
+    ["production", "Bash", 'psql -h localhost -U postgres -c "select 1"'],
+    ["production", "Bash", 'psql "$DATABASE_URL" -c "select 1"'],
+    ["production", "Bash", 'sqlcmd -S localhost -Q "select 1"'],
+    ["production", "Bash", 'psql -h product-db.exemple.net -U u -c "select 1"'],
+    ["production", "Bash", "grep -rn PRODUCTION src/ && echo PROD"],
+    ["production", "Bash", 'node scripts/mesure.mjs "postgresql://u:p@localhost:5432/app"'],
+    ["production", "Bash", "docker run -d -e POSTGRES_PASSWORD=x postgres:17 && psql -h localhost -c \"select 1\" | awk -F'|' '{printf \"ORIGINE=%s PROD=%s\\n\",$1,$2}'"],
+    ["processus", "PowerShell", "taskkill /PID 1234 /F"],
+    ["processus", "Bash", "taskkill //PID 1234 //F"],
+    ["processus", "PowerShell", "Stop-Process -Id 1234"],
+    ["processus", "PowerShell", "Stop-Process -Id $pid -Force"],
+    ["processus", "PowerShell", "Get-Process -Id 1234 | Stop-Process"],
+    ["processus", "Bash", "kill 1234"],
+    ["processus", "Bash", "kill -9 4321"],
+    ["processus", "Bash", "kill %1"],
+    ["processus", "Bash", "kill $(cat app.pid)"],
+    ["processus", "Bash", "cat app.pid | xargs kill"],
+    ["processus", "PowerShell", "Get-Process node"],
+  ];
+  for (const [famille, outil, c] of VERTS_196) check(`vert (D-196, ${famille}) — ${c.replace(/\s+/g, " ").slice(0, 90)} : laisse passer`, () => passeD(direct(outil, c)));
+  check("rouge (D-196) — le refus d'un arrêt par nom dit le remède : arrêter par PID", () => {
+    const r = direct("PowerShell", "taskkill /F /IM node.exe");
+    if (!/arrête par PID \(`taskkill \/PID <pid>`, `Stop-Process -Id <pid>`/.test(r.motif) || !/D-196 \(b\)/.test(r.motif)) throw new Error(String(r.motif).slice(0, 300));
+  });
+  check("vert (D-196) — le remède joué : un lot cité qui nomme `taskkill /F /IM node.exe` le laisse passer, par le hook", () => {
+    const p = projet();
+    ecrireLot(p, lotOk([{ commande: "taskkill /F /IM node.exe", cible: "les node.exe du poste", effet: "arrête tous les node.exe", retour_arriere: "relancer les serveurs" }]));
+    passe(jouer(p, "PowerShell", "taskkill /F /IM node.exe"));
+    refuse(jouer(p, "PowerShell", "taskkill /F /IM python.exe"));
+  });
+
   // ---- Les six cas de la consigne ----------------------------------------------------------
   const p1 = projet();
   check("1 rouge — `az group delete` sans lot : refusé, avec le remède (décision groupée au bloc 3)", () => {
