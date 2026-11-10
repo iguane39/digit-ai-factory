@@ -35,3 +35,4 @@
 {"type":"choix","decision":"D-197","choix":"c","recommandation":"c","accord":true,"poste":"Dell-XPS-16","ts":"2026-11-10T13:54:14.541Z"}
 {"type":"choix","decision":"D-198","choix":"b","recommandation":"b","accord":true,"poste":"Dell-XPS-16","ts":"2026-11-10T13:54:15.891Z"}
 {"type":"scelle","decision":"D-202","option":"b","motif":"retirer ce que vous n'avez pas demandé ferme les droits accordés par erreur ; le contournement du compte que vous avez désigné vient de votre message du 04/11","poste":"Dell-XPS-16","ts":"2026-11-10T18:04:50.881Z"}
+{"type":"choix","decision":"D-202","choix":"a","recommandation":"b","accord":false,"poste":"Dell-XPS-16","ts":"2026-11-10T18:37:00.490Z"}
