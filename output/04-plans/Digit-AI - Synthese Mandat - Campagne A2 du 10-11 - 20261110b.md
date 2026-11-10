@@ -1,10 +1,10 @@
 ## 0. Synthèse d'ouverture
 
-La seconde campagne du 10/11 est finie : sur les 76 sujets décidés ce matin, 73 sont corrigés, rejoués par moi et publiés dans 8 dépôts. Il en reste 3 ouverts. Le premier attend un travail dans forge-agents. Les 2 autres portent une règle écrite mais pas encore de barrière exécutable, et le registre refuse de clore une récidive sans elle. Les restes des agents deviennent 9 nouveaux candidats. Trois décisions de doctrine vous reviennent ; elles portent sur 5 sujets laissés hors campagne. En attendant, rien n'est bloqué ailleurs.
+La seconde campagne du 10/11 est finie : sur les 76 sujets décidés ce matin, 73 sont corrigés, rejoués par moi et publiés dans 8 dépôts. Il en reste 3 ouverts. Le premier attend un travail dans forge-agents. Les 2 autres portent une règle écrite mais pas encore de barrière exécutable, et le registre refuse de clore une récidive sans elle. Le relevé des recettes après fusion a montré un rouge ouvert par la campagne elle-même ; je l'ai refermé dans le tour. Les restes des agents deviennent 9 nouveaux candidats. Trois décisions de doctrine vous reviennent ; elles portent sur 5 sujets laissés hors campagne. En attendant, rien n'est bloqué ailleurs.
 
 ## 1. En-tête d'identification
 
-Synthèse du mandat « 190b puis A2 », sur le pilot et 7 forges, le 10/11/2026 à 16:39, par l'orchestrateur du pilot (Claude Opus 5.5). L'intention est de corriger les candidats du jour sans laisser à l'humain ce qui ne lui revient pas. Test rétro : chaque sujet finit corrigé sur une recette rejouée par le pilot, ou laissé ouvert avec ce qui manque, ou posé à l'humain avec son motif.
+Synthèse du mandat « 190b puis A2 », sur le pilot et 7 forges, le 10/11/2026 à 18:39, par l'orchestrateur du pilot (Claude Opus 5.5). L'intention est de corriger les candidats du jour sans laisser à l'humain ce qui ne lui revient pas. Test rétro : chaque sujet finit corrigé sur une recette rejouée par le pilot, ou laissé ouvert avec ce qui manque, ou posé à l'humain avec son motif.
 
 ## 3. Décisions attendues
 
@@ -79,6 +79,8 @@ La campagne a couru sur 9 agents et sur le pilot ; voici, lot par lot, ce qui es
 - 2 empreintes neuves sont déclarées à `references/EMPREINTES.md` ; l'oracle des empreintes passe de FAIL (E2) à PASS.
 - La flotte de la campagne est relevée : 47 appels sur 48 vers un agent nommé (98 %), verdict AVERT pour une délégation Opus sans effort déclaré.
 - Les restes des agents deviennent 9 candidats, de TF-2396 à TF-2404, dont un faux négatif de sécurité dans forge-tests : 4 avis connus ne sont pas vus en mode vif.
+- Le relevé de toutes les recettes du pilot (256) a monté 8 cliquets, dont oracle-synthese de 349 à 356. Il a aussi trouvé un rouge neuf : la page TODO-PRODUIT générée passait de 9 PASS à 8 PASS, 1 FAIL. Le contrôle SC4 de forge-design, durci ce jour, exige un `color-scheme` CSS par thème, et le gabarit du socle n'avait que la balise meta. Gabarit corrigé (page-html 1.45.1), 2 copies embarquées reposées, quality-oracles rejoué PASS à 730, skills propagés : la recette repasse à 9 PASS, 0 FAIL (TF-2406).
+- Constat laissé tel quel, hors campagne : verifier-jugement rend FAIL sur une synthèse du 02/11 modifiée après son jugement, à indice inchangé ; son remède (re-sceller ou réindexer) est un geste humain.
 
 Relecture d'intention : sert.
 
@@ -102,8 +104,8 @@ Ordre : la décision d'abord, parce qu'elle seule vous revient et qu'elle lève 
 
 ## 9. Traces
 
-- `todo/TODO.jsonl` : 85 événements depuis le point d'étape de 11:40 (76 clôtures et passages en cours, 9 candidats), en plus des 91 du tri du matin ; oracle du registre PASS après chaque écriture.
-- Pilot : la fusion de la campagne (faad37ff) et le commit de clôture, publiés avec cette synthèse. Le commit b537e65b de l'autre session, déjà enregistré, part avec eux.
-- forge-agents : 8a88c54 pour les skills de rendu, 8d486a1 pour le socle des pages, 94566d9 pour quality-oracles, 7efb814 pour le manifeste. Mon premier envoi a publié seul le commit 31b9860 d'une autre session, déjà enregistré, avant la fusion.
+- `todo/TODO.jsonl` : 88 événements depuis le point d'étape de 11:40 (76 clôtures et passages en cours, 9 candidats, 3 pour TF-2406), en plus des 91 du tri du matin ; oracle du registre PASS après chaque écriture.
+- Pilot : la fusion de la campagne (faad37ff), le commit de clôture de95f303, la base des recettes ea94deab et la flotte 652802c1. Le commit b537e65b de l'autre session, déjà enregistré, est parti avec la fusion.
+- forge-agents : 8a88c54 pour les skills de rendu, 8d486a1 pour le socle des pages, 94566d9 pour quality-oracles, 7efb814 pour le manifeste, 4c10bf1 pour le gabarit du socle. Mon premier envoi a publié seul le commit 31b9860 d'une autre session, déjà enregistré, avant la fusion.
 - forge-design 4c3e04a, forge-tests 955454a, forge-ops 723f4ee, forge-websec e5681d8, forge-organization 9a7669c : publiés, chacun vérifié par `git rev-list --count origin/main..main` à 0.
 - `todo/observabilite/flotte-campagnes.jsonl` : la ligne « campagne-a2-20261110 ».

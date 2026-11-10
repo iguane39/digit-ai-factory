@@ -80,7 +80,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md` | fichier | 8,9 Ko | Synthèse Mandat — bases de développement et de qualification : 3 compétences construites,  |
 | `Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` | fichier | 9,6 Ko | Synthèse Mandat — seuil relevé à 4 millions, boucle de correction et relecteur renforcé en |
 | `Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` | fichier | 6,1 Ko | Synthèse Mandat — boucle de correction, relecteur renforcé et seuil de 4 millions enregist |
-| `Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md` | fichier | 12,7 Ko | markdown |
+| `Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md` | fichier | 13,6 Ko | markdown |
 | `Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md` | fichier | 20,8 Ko | Synthèse Mandat — 21 candidats instruits, 14 corrigés et publiés, 6 décisions pour vous (0 |
 | `Digit-AI - Synthese Mandat - Campagne D-41 - 20261019e.md` | fichier | 13,6 Ko | Synthèse Mandat — campagne D-41 (a), suites des études des favoris TikTok, 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` | fichier | 11,7 Ko | Synthèse Mandat — votre décision D-55 (a) est exécutée : les 8 améliorations des pages de  |
