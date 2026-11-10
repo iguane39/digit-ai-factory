@@ -75,6 +75,12 @@
  * dans l'environnement du harnais et jamais dans la commande, rétablit l'ancien comportement. Détail et limites :
  * `references\GESTES-DISTANTS.md`, « Ce que la garde ne sait pas lire ».
  *
+ * D-195 (b) (10/11/2026) : L'ACCORD EST CITÉ, LA COMMANDE EST NOMMÉE. Un lot ne couvre une commande que si sa `reponse_humaine`
+ * figure mot pour mot dans un message TAPÉ par l'humain (rôle user, ni `tool_result`, ni injection de hook, ni `<system-reminder>`,
+ * ni corps de skill, ni `<task-notification>`), lu dans `transcript_path` au moment où le lot couvre. Une commande approuvée nomme
+ * l'outil et son verbe en mots littéraux avant tout joker : `*`, `az *` et `az group` ne couvrent plus `az group delete -n prod`.
+ * `--poser` refuse les deux défauts dès l'écriture ; la transcription lui vient de `--transcript` ou de `CLAUDE_CODE_SESSION_ID`.
+ *
  * TF-2084 (04/11/2026, RT-39) : le même hook tient le registre des gestes distants EN COURS (`forge\gestes-en-cours.jsonl`,
  * `oracles\lib-gestes-en-cours.mjs`) : il inscrit le début d'un geste qui modifie l'état distant (PreToolUse), sa fin (PostToolUse),
  * et AVERTIT quand une autre session du produit a un geste ouvert sur la même ressource. Il ne refuse jamais pour cela.
@@ -92,10 +98,11 @@
  * Usage : node oracles\hook-gestes-distants.mjs                      (stdin : JSON du hook PreToolUse ou PostToolUse)
  *         node oracles\hook-gestes-distants.mjs --ouvrir --ressource <objet> [--session <id>] [--geste <texte>] [--duree-min N]
  *         node oracles\hook-gestes-distants.mjs --clore [--ressource <objet>] [--session <id>] | --lister
- *         node oracles\hook-gestes-distants.mjs --poser --lot <lot.json> [--racine <dossier>] [--duree-h N] [--session <id>]
+ *         node oracles\hook-gestes-distants.mjs --poser --lot <lot.json> [--transcript <session.jsonl>] [--racine <dossier>] [--duree-h N] [--session <id>]
  * Exit : 0 laisse passer · 2 refuse (motif sur stderr) ; en mode --poser : 0 posé · 1 lot refusé.
  */
-import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -829,6 +836,15 @@ export function motsDistants(texte, profondeur = 0) {
   return [...trouves];
 }
 
+/** La règle de famille (D-194 (b)) : les causes d'illisibilité d'une commande, et les outils distants qu'elle porte. */
+export function illisibleDistant(commande, dialecte = null) {
+  const causes = causesIllisibles(commande, dialecte);
+  const distants = causes.length ? motsDistants(commande) : [];
+  // Renfort : une commande en variable suivie d'un verbe destructif de la liste (`$AZ group delete`) compte comme un outil distant.
+  if (!distants.length && causes.includes("commande dans une variable") && /(^|[\s"'])(delete|purge|remove|destroy)(-[a-z0-9-]+)?(?=[\s"']|$)/i.test(commande)) distants.push("un verbe destructif (delete, purge, remove, destroy)");
+  return { causes, distants };
+}
+
 /**
  * Le réglage `FORGE_GARDE_ILLISIBLE=laisse` rétablit l'ancien comportement (D-194 (b)) : ce qui est illisible, une panne du juge
  * et une entrée illisible passent. Il est lu dans l'environnement du harnais, dont le hook hérite : une commande ne le pose pas
@@ -895,7 +911,76 @@ const texteNonVide = (x, min = 1) => typeof x === "string" && x.trim().length >=
 // vaut désormais par un texte d'au moins 5 caractères OU par une citation de lettre de décision :
 // des chiffres suivis d'une lettre, « D- » et une parenthèse fermante admis.
 const CITATION_DECISION = /^\s*(?:d-?\s*)?\d{1,4}\s*[a-z]\)?\s*$/i;
-const reponseHumaineValide = (x) => texteNonVide(x, 5) || (typeof x === "string" && CITATION_DECISION.test(x));
+/** D-195 (b) : une citation porte au moins une lettre ou un chiffre ; « ????? » et « ----- » ne citent rien. */
+const SIGNE = /[\p{L}\p{N}]/u;
+const reponseHumaineValide = (x) => typeof x === "string" && SIGNE.test(x) && (texteNonVide(x, 5) || CITATION_DECISION.test(x));
+
+/**
+ * Les messages TAPÉS par l'humain dans une transcription (D-195 (b)) : entrées `user` d'origine humaine (`origin.kind` « human » ;
+ * sans `origin`, `promptSource` ni `turnOrigin`, la forme d'avant ces champs). Exclus : `tool_result`, les injections `isMeta`
+ * (rappels système, corps de skill, retours de hook), les résumés de compaction, la consigne d'un sous-agent (`isSidechain`), les
+ * notifications de tâche, les messages d'une autre session (`origin.kind` « peer »), les invites envoyées par programme
+ * (`turnOrigin` « sdk »), les blocs `<system-reminder>` et le contexte de l'éditeur (`<ide_opened_file>`). La transcription d'un
+ * sous-agent se lit avec celle de sa session, où l'humain a parlé.
+ */
+export function messagesTapes(chemin) {
+  const fichiers = [chemin];
+  const parent = /^(.*)[\\/]subagents[\\/][^\\/]+\.jsonl$/i.exec(String(chemin || ""));
+  if (parent) fichiers.push(`${parent[1]}.jsonl`);
+  const textes = [];
+  for (const f of fichiers) {
+    if (!f || !existsSync(f)) continue;
+    let brut = "";
+    try { brut = readFileSync(f, "utf8"); } catch { continue; }
+    for (const l of brut.split(/\r?\n/)) {
+      if (!l.includes('"user"')) continue;
+      let e; try { e = JSON.parse(l); } catch { continue; }
+      if (e?.type !== "user" || e.isMeta || e.isCompactSummary || e.isVisibleInTranscriptOnly || e.isSidechain || e.toolUseResult !== undefined || e.sourceToolUseID) continue;
+      if (!(e.origin ? e.origin.kind === "human" : e.promptSource === undefined && e.turnOrigin === undefined)) continue;
+      const c = e.message?.content;
+      const blocs = typeof c === "string" ? [c] : Array.isArray(c) && !c.some((b) => b?.type === "tool_result") ? c.filter((b) => b?.type === "text").map((b) => String(b.text ?? "")) : [];
+      for (const b of blocs) {
+        const t = b.replace(/<system-reminder>[\s\S]*?<\/system-reminder>/g, "").replace(/<ide_[a-z_]+>[\s\S]*?<\/ide_[a-z_]+>/g, "");
+        if (/^\s*(<task-notification>|<command-(name|message|args)>|<local-command-|<cross-session-message|\[Request interrupted|Caveat:)/.test(t)) continue;
+        if (t.trim()) textes.push(t);
+      }
+    }
+  }
+  return textes;
+}
+
+const normaliserCitation = (s) => String(s ?? "").normalize("NFC").replace(/[‘’ʼ′´]/g, "'").replace(/[“”„«»]/g, '"')
+  .replace(/[    ]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+/** La réponse figure-t-elle mot pour mot dans un des textes ? Casse, espaces et apostrophes typographiques normalisés ; jamais au milieu d'un mot (« 1a » n'est pas dans « 21a »). */
+export function citeDans(reponse, textes) {
+  const r = normaliserCitation(reponse);
+  if (!SIGNE.test(r)) return false;
+  for (const t of textes || []) {
+    const n = normaliserCitation(t);
+    for (let i = n.indexOf(r); i >= 0; i = n.indexOf(r, i + 1)) {
+      const avant = n[i - 1], apres = n[i + r.length];
+      if ((!SIGNE.test(r[0]) || avant === undefined || !SIGNE.test(avant)) && (!SIGNE.test(r[r.length - 1]) || apres === undefined || !SIGNE.test(apres))) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * D-195 (b) : une commande approuvée nomme au moins l'outil et son verbe en mots littéraux avant tout joker. Le préfixe qui
+ * précède le premier `*` doit être, à lui seul, un geste de la liste fermée (`az group delete`, `terraform destroy`, `az group
+ * delete --name rg-essai-*`). `*`, `az *` et `az group` ne nomment pas le verbe : ils couvraient `az group delete -n prod`.
+ */
+export function nommeOutilEtVerbe(commande) {
+  const l = localiser(mots(commande));
+  if (!l?.outil) return false;
+  const tous = [l.outil, ...l.args];
+  const k = tous.findIndex((w) => w.includes("*"));
+  const prefixe = (k < 0 ? tous : tous.slice(0, k)).map((w) => (/[\s"']/.test(w) ? `"${w.replace(/"/g, "")}"` : w)).join(" ");
+  return jugerSegment(prefixe).length > 0;
+}
+
+/** Une commande illisible pour la garde s'approuve par son texte exact, sans joker (D-194 (b)) : la règle de famille la refuserait sinon. */
+const approbationExacte = (commande) => !String(commande).includes("*") && ["bash", "ps"].some((d) => illisibleDistant(commande, d).distants.length > 0);
 
 /** Un lot est-il valide à cet instant ? { ok, raison, jusqua } */
 export function lotValide(lot, maintenant = Date.now(), sessionId = null) {
@@ -907,6 +992,8 @@ export function lotValide(lot, maintenant = Date.now(), sessionId = null) {
   if (!Array.isArray(lot.gestes) || !lot.gestes.length) return { ok: false, raison: "aucun geste listé" };
   const bancal = lot.gestes.findIndex((g) => !texteNonVide(g?.commande) || !texteNonVide(g?.cible) || !texteNonVide(g?.effet) || !texteNonVide(g?.retour_arriere));
   if (bancal >= 0) return { ok: false, raison: `geste ${bancal + 1} sans commande, cible, effet ou retour_arriere` };
+  const sansVerbe = lot.gestes.findIndex((g) => !nommeOutilEtVerbe(g.commande) && !approbationExacte(g.commande));
+  if (sansVerbe >= 0) return { ok: false, raison: `geste ${sansVerbe + 1} : la commande approuvée « ${String(lot.gestes[sansVerbe].commande).slice(0, 60)} » ne nomme pas l'outil et son verbe avant tout joker (D-195 (b))` };
   const jusqua = Math.min(t1, t0 + DUREE_MAX_H * H);
   if (t0 > maintenant + 5 * 60_000) return { ok: false, raison: "horodatage dans le futur" };
   if (maintenant >= jusqua) return { ok: false, raison: `expiré (valait jusqu'au ${new Date(jusqua).toISOString()}, 24 h au plus)` };
@@ -964,24 +1051,39 @@ export function juger(entree, { lots = null, registre = null, maintenant = Date.
   }
   const dialecte = dialecteDe(entree.tool_name);
   const gestes = jugerCommande(commande, 0, dialecte);
-  const causes = garde_permissive(env) ? [] : causesIllisibles(commande, dialecte);
-  const distants = causes.length ? motsDistants(commande) : [];
-  // Renfort : une commande en variable suivie d'un verbe destructif de la liste (`$AZ group delete`) compte comme un outil distant.
-  if (!distants.length && causes.includes("commande dans une variable") && /(^|[\s"'])(delete|purge|remove|destroy)(-[a-z0-9-]+)?(?=[\s"']|$)/i.test(commande)) distants.push("un verbe destructif (delete, purge, remove, destroy)");
+  const { causes, distants } = garde_permissive(env) ? { causes: [], distants: [] } : illisibleDistant(commande, dialecte);
   const illisible = causes.length > 0 && distants.length > 0;
   if (!gestes.length && !illisible) return { decision: "laisse" };
   const racines = racinesDuProjet(entree, env);
   const toutes = lots ?? lireLots(racines);
   const etats = toutes.map((l) => ({ lot: l, ...lotValide(l, maintenant, entree?.session_id ?? null) }));
   const valides = etats.filter((e) => e.ok).map((e) => e.lot);
-  const sansLot = gestes.filter((g) => !valides.some((l) => l.gestes.some((x) => couvre(x.commande, g))));
-  const illisibleSansLot = illisible && !valides.some((l) => l.gestes.some((x) => memeTexte(x.commande, commande)));
+  // D-195 (b) : un lot ne couvre que si sa reponse_humaine figure mot pour mot dans un message tapé par l'humain, lu dans la
+  // transcription de l'entrée du hook au moment où un lot couvre la commande.
+  let textes = null;
+  const cites = new Map(), nonCites = new Set();
+  const cite = (lot) => {
+    if (!cites.has(lot)) { textes ??= entree?.transcript_path ? messagesTapes(entree.transcript_path) : []; cites.set(lot, citeDans(lot.reponse_humaine, textes)); }
+    return cites.get(lot);
+  };
+  const couvertPar = (pred) => {
+    const ls = valides.filter((l) => l.gestes.some(pred));
+    if (ls.some(cite)) return true;
+    for (const l of ls) nonCites.add(l);
+    return false;
+  };
+  const sansLot = gestes.filter((g) => !couvertPar((x) => couvre(x.commande, g)));
+  const illisibleSansLot = illisible && !couvertPar((x) => memeTexte(x.commande, commande));
+  const noteCitation = nonCites.size
+    ? ` Lot sans citation (D-195 (b)) : ${[...nonCites].map((l) => l._source).join(", ")} couvre la commande, mais sa reponse_humaine ne figure mot pour mot dans aucun message `
+      + `tapé par l'humain${entree?.transcript_path ? " de la transcription" : " (l'entrée du hook ne donne pas de transcription)"} ; cite ses mots exacts, puis pose le lot à nouveau.`
+    : "";
   const produit = existsSync(join(racines[0], "forge", "hooks", "factory.mjs")) && !existsSync(join(racines[0], "todo", "TODO.jsonl"));
   const poser = produit
     ? "node forge\\hooks\\factory.mjs gestes-distants --poser --lot <lot.json>"
     : "node oracles\\hook-gestes-distants.mjs --poser --lot <lot.json>";
   if (!sansLot.length && !illisibleSansLot) return { decision: "laisse", couverts: gestes.length + (illisible ? 1 : 0) };
-  if (!sansLot.length) return { decision: "refuse", gestes: [], illisible: causes, motif: motifIllisible(causes, distants, poser) };
+  if (!sansLot.length) return { decision: "refuse", gestes: [], illisible: causes, motif: motifIllisible(causes, distants, poser) + noteCitation };
   // TF-2128 (D-168 (a)) : un retrait que la session a créé, consigné, sans dépendance, passe sans lot. Les autres restent refusés.
   let lignesRegistre = registre;
   const nonCouverts = [], exceptions = [], admis = [];
@@ -993,7 +1095,7 @@ export function juger(entree, { lots = null, registre = null, maintenant = Date.
     if (j.ok) admis.push({ cible, creation: j.creation });
     else { nonCouverts.push(g); exceptions.push({ cible, ...j }); }
   }
-  if (!nonCouverts.length && illisibleSansLot) return { decision: "refuse", gestes: [], illisible: causes, motif: motifIllisible(causes, distants, poser) };
+  if (!nonCouverts.length && illisibleSansLot) return { decision: "refuse", gestes: [], illisible: causes, motif: motifIllisible(causes, distants, poser) + noteCitation };
   if (!nonCouverts.length) {
     return { decision: "laisse", couverts: gestes.length - admis.length, admis: admis.length,
       contexte: `RETRAIT ADMIS SANS DÉCISION GROUPÉE (TF-2128, D-168 (a)) — ${admis.map((a) => `${a.cible.libelle}, créée par cette session le ${a.creation.ts} (création ${a.creation.id}), aucune dépendance consignée`).join(" ; ")}. `
@@ -1008,7 +1110,7 @@ export function juger(entree, { lots = null, registre = null, maintenant = Date.
     illisible: illisibleSansLot ? causes : [],
     motif: (illisibleSansLot ? `${motifIllisible(causes, distants, poser)} | ` : "")
       + `GESTE DISTANT DESTRUCTIF REFUSÉ (TF-1959, D-77) — ${nonCouverts.map((g) => `${g.mots.join(" ")} : ${g.raison}`).join(" ; ")}. `
-      + `Aucun lot approuvé valide ne le couvre (${lecture}). `
+      + `Aucun lot approuvé valide ne le couvre (${lecture}).${noteCitation} `
       + (exceptions.length
         ? `${exceptions.map((e) => `Exception TF-2128 (D-168 (a)) non tenue pour ${e.cible.libelle} — condition (${e.condition}) : ${e.raison}.`).join(" ")} `
           + "Un retrait passe sans décision groupée si (a) la ressource a été créée par cette session, (b) sa création est consignée avec son identifiant, (c) aucune dépendance n'est consignée ; "
@@ -1016,7 +1118,7 @@ export function juger(entree, { lots = null, registre = null, maintenant = Date.
         : "")
       + "Remède, en UNE fois pour tous les gestes destructifs distants que tu prévois dans ce tour, pas un par commande : "
       + "(1) pose UNE décision au bloc 3 de ta restitution, liste complète, chaque geste avec sa commande, sa cible, son effet et son retour arrière ; "
-      + "(2) quand l'humain l'a approuvée, écris le lot : un fichier JSON { \"decision\": \"D-N\", \"reponse_humaine\": \"<ses mots>\", \"gestes\": [ { \"commande\", \"cible\", \"effet\", \"retour_arriere\" } ] } "
+      + "(2) quand l'humain l'a approuvée, écris le lot : un fichier JSON { \"decision\": \"D-N\", \"reponse_humaine\": \"<ses mots exacts, tels qu'il les a tapés>\", \"gestes\": [ { \"commande\", \"cible\", \"effet\", \"retour_arriere\" } ] } "
       + `puis \`${poser}\` (valable 24 h au plus) ; (3) rejoue la commande. `
       + "Le fait : le 26/10/2026, un dépôt d'essai et son état Terraform ont été supprimés alors qu'une décision humaine les réservait à plus tard ; "
       + "l'humain veut une décision groupée, pas une confirmation par commande.",
@@ -1308,14 +1410,26 @@ function enCours(argv) {
 // 5. Poser un lot
 // ---------------------------------------------------------------------------------------------
 
-/** Valide une spécification de lot et rend la ligne à inscrire, ou { erreur }. */
-export function construireLot(spec, { maintenant = Date.now(), dureeH = DUREE_MAX_H, session = null } = {}) {
+/**
+ * Valide une spécification de lot et rend la ligne à inscrire, ou { erreur }. D-195 (b) : `textesHumains` porte les messages tapés
+ * par l'humain dans la transcription de la session (null : transcription introuvable, le lot est refusé).
+ */
+export function construireLot(spec, { maintenant = Date.now(), dureeH = DUREE_MAX_H, session = null, textesHumains = null } = {}) {
   if (!/^D-\d+/.test(String(spec?.decision || ""))) return { erreur: "`decision` (D-N) manquante" };
   if (!reponseHumaineValide(spec.reponse_humaine)) return { erreur: "`reponse_humaine` manquante : cite les mots de l'humain qui approuvent la liste, ou la lettre de la décision (« 10a »)" };
   if (!Array.isArray(spec.gestes) || !spec.gestes.length) return { erreur: "`gestes` vide : la liste complète est exigée" };
   const bancal = spec.gestes.findIndex((g) => !texteNonVide(g?.commande) || !texteNonVide(g?.cible) || !texteNonVide(g?.effet) || !texteNonVide(g?.retour_arriere));
   if (bancal >= 0) return { erreur: `geste ${bancal + 1} : commande, cible, effet et retour_arriere sont tous exigés` };
+  const sansVerbe = spec.gestes.findIndex((g) => !nommeOutilEtVerbe(g.commande) && !approbationExacte(g.commande));
+  if (sansVerbe >= 0) {
+    return { erreur: `geste ${sansVerbe + 1} : la commande approuvée nomme l'outil et son verbe en mots littéraux avant tout joker (« az group delete --name rg-essai-* », `
+      + "jamais « * », « az * » ni « az group ») ; une commande illisible pour la garde s'approuve par son texte exact, sans joker (D-195 (b))" };
+  }
   if (!(dureeH > 0) || dureeH > DUREE_MAX_H) return { erreur: `durée ${dureeH} h refusée : entre 0 et ${DUREE_MAX_H} h` };
+  if (!Array.isArray(textesHumains)) return { erreur: "transcription introuvable : passe --transcript <fichier .jsonl de la session où l'humain a répondu> (D-195 (b))" };
+  if (!citeDans(spec.reponse_humaine, textesHumains)) {
+    return { erreur: "`reponse_humaine` ne figure mot pour mot dans aucun message tapé par l'humain dans la transcription : cite ses mots exacts, sans les reformuler (D-195 (b))" };
+  }
   const ligne = {
     schema: "pilot/gestes-approuves@1",
     decision: spec.decision,
@@ -1328,13 +1442,30 @@ export function construireLot(spec, { maintenant = Date.now(), dureeH = DUREE_MA
   return { ligne };
 }
 
+/**
+ * D-195 (b) : la transcription de la session qui pose le lot, par `CLAUDE_CODE_SESSION_ID`, que le harnais donne aux commandes qu'il
+ * lance (celle d'un sous-agent est celle de sa session) ; cherchée sous `CLAUDE_CONFIG_DIR`, puis `~\.claude`. Null sinon.
+ */
+function transcriptionDeSession(env = process.env) {
+  const id = String(env.CLAUDE_CODE_SESSION_ID || "");
+  if (!/^[\w-]+$/.test(id)) return null;
+  for (const b of [env.CLAUDE_CONFIG_DIR, join(homedir(), ".claude")].filter(Boolean)) {
+    let projets = [];
+    try { projets = readdirSync(join(b, "projects")); } catch { continue; }
+    for (const p of projets) { const f = join(b, "projects", p, `${id}.jsonl`); if (existsSync(f)) return f; }
+  }
+  return null;
+}
+
 function poser(argv) {
   const val = (cle) => { const i = argv.indexOf(cle); return i >= 0 ? argv[i + 1] : null; };
   const fichier = val("--lot");
   if (!fichier) { process.stderr.write("--poser exige --lot <lot.json>\n"); return 1; }
   let spec;
   try { spec = JSON.parse(readFileSync(resolve(fichier), "utf8").replace(/^﻿/, "")); } catch (e) { process.stderr.write(`lot illisible : ${e.message}\n`); return 1; }
-  const r = construireLot(spec, { dureeH: val("--duree-h") ? Number(val("--duree-h")) : DUREE_MAX_H, session: val("--session") });
+  const transcript = val("--transcript") ? resolve(val("--transcript")) : transcriptionDeSession(process.env);
+  const textesHumains = transcript && existsSync(transcript) ? messagesTapes(transcript) : null;
+  const r = construireLot(spec, { dureeH: val("--duree-h") ? Number(val("--duree-h")) : DUREE_MAX_H, session: val("--session"), textesHumains });
   if (r.erreur) { process.stderr.write(`lot refusé : ${r.erreur}\n`); return 1; }
   const racine = val("--racine") ? resolve(val("--racine")) : racinesDuProjet({}, process.env)[0];
   const dossier = existsSync(join(racine, "todo", "TODO.jsonl")) ? "todo" : "forge";

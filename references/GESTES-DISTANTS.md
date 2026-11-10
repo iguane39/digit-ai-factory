@@ -25,6 +25,7 @@ Ce qui manquait est un mécanisme et sa donnée : une liste fermée de commandes
 3. La session écrit le lot approuvé : un fichier JSON `{ decision, reponse_humaine, gestes: [{ commande,
    cible, effet, retour_arriere }] }`, puis `node oracles\hook-gestes-distants.mjs --poser --lot <lot.json>`
    au pilot, `node forge\hooks\factory.mjs gestes-distants --poser --lot <lot.json>` chez un produit.
+   `reponse_humaine` cite les mots que l'humain a tapés, tels quels (D-195 (b), section suivante).
 4. Le hook `PreToolUse` sur `Bash` et `PowerShell` laisse passer les commandes du lot et refuse (exit 2) les
    autres gestes destructifs distants, avec le remède dans le message.
 
@@ -61,10 +62,39 @@ déploiements ordinaires (`terraform apply`, `az deployment … create`) et `git
   distant ni verbe destructif (section suivante).
 - Les autres nuages (`aws`, `gcloud`, `kubectl`), faute de fait fondateur ; `terraform state push|mv`,
   `gh repo archive`, `gh repo deploy-key add`.
-- Que l'humain ait réellement approuvé : `reponse_humaine` cite ses mots et le fichier garde chaque ligne,
-  mais une session qui écrirait un lot sans approbation ne serait pas arrêtée par le hook. La revue d'un
-  lot (qui l'a posé, quand, avec quels mots) est le seul garde-fou de ce point.
+- Que l'humain ait réellement approuvé : depuis D-195 (b), `reponse_humaine` doit figurer mot pour mot dans
+  un message qu'il a tapé dans la transcription de la session. Restent hors de portée : une session qui
+  écrirait une fausse entrée dans sa propre transcription, et le sens des mots cités (« je n'approuve pas »,
+  tapé par l'humain, serait une citation valide). La revue d'un lot reste le garde-fou de ces deux points.
 - Que le champ `cible` du lot corresponde à la commande : seule la commande approuvée est comparée.
+
+## L'accord est cité, la commande est nommée (D-195 (b), 10/11/2026)
+
+Décision humaine du 10/11/2026, même réponse, option (b) : « l'accord doit se retrouver mot pour mot dans un message humain
+de la transcription, et une commande approuvée ne commence pas par un joker ». Le fait : un accord valait dès 5 caractères
+quelconques (« xxxxx », « je n'approuve pas », « ????? », « ----- », « 1a »), et une commande approuvée `*`, `az *` ou
+`az group` couvrait `az group delete -n prod` comme `terraform destroy`.
+
+**La citation.** Quand un lot couvre la commande, le hook relit le `transcript_path` de son entrée. Le lot ne vaut que si sa
+`reponse_humaine` figure mot pour mot dans un message tapé par l'humain : une entrée `user` d'origine humaine (`origin.kind`
+« human »). Ne comptent pas : un `tool_result`, une injection de hook, un `<system-reminder>`, un corps de skill, une
+`<task-notification>`, un message d'une autre session, une invite envoyée par programme, la consigne d'un sous-agent, un résumé
+de compaction. La comparaison ignore la casse, les espaces multiples et les apostrophes typographiques ; elle ne prend jamais
+la citation au milieu d'un mot (« 1a » ne se lit pas dans « 21a »). Une citation porte au moins une lettre ou un chiffre. La
+transcription d'un sous-agent se lit avec celle de sa session, où l'humain a répondu. Sans transcription, ou sans citation,
+le refus le dit et nomme le lot.
+
+**La commande nommée.** Une commande approuvée nomme l'outil et son verbe en mots littéraux avant tout joker : ce qui précède
+le premier `*` doit être, à lui seul, un geste de la liste fermée. `az group delete --name rg-essai-*` reste admis ; `*`,
+`az *` et `az group` font refuser le lot. Seule exception : une commande illisible pour la garde (D-194 (b)) s'approuve par
+son texte exact, sans joker.
+
+**À l'écriture.** `--poser` refuse les deux défauts. Il lit la transcription donnée par `--transcript <session.jsonl>`, ou
+celle que désigne `CLAUDE_CODE_SESSION_ID`, que le harnais donne aux commandes qu'il lance (cherchée sous `CLAUDE_CONFIG_DIR`,
+puis `~\.claude`). Sans l'une ni l'autre, le lot est refusé.
+
+**Ce que cela change.** Un lot ne couvre que les sessions dont la transcription porte les mots de l'humain : la session qui a
+reçu l'accord et ses sous-agents. Retour arrière prévu par l'option : revenir au contrôle de longueur.
 
 ## Ce que la garde ne sait pas lire (D-194 (b), 10/11/2026)
 

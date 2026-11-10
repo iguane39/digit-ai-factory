@@ -246,8 +246,11 @@ try {
   // est refusé (exit 2) avec le remède du PRODUIT ; `--poser` par le lanceur, entrée standard ouverte, écrit le lot
   // sous forge/ et la même commande passe ; une lecture passe sans lot.
   const envG = { ...env, CLAUDE_PROJECT_DIR: P };
+  // D-195 (b) : l'accord du lot se lit mot pour mot dans un message tapé par l'humain, dans la transcription que le harnais donne au hook.
+  const tG = join(base, "transcription-gestes.jsonl");
+  writeFileSync(tG, JSON.stringify({ type: "user", origin: { kind: "human" }, promptSource: "sdk", turnOrigin: "human", message: { role: "user", content: "78a : approuvé, toute la liste" } }) + "\n", "utf8");
   const geste = (command) => spawnSync(process.execPath, [lanceur, "gestes-distants"], { encoding: "utf8", cwd: P, env: envG,
-    input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command } }) });
+    input: JSON.stringify({ tool_name: "Bash", cwd: P, transcript_path: tG, tool_input: { command } }) });
   const gSans = geste("az group delete --name rg-essai --yes"), gLecture = geste("az group show --name rg-essai");
   check("14 gestes distants : `az group delete` sans lot refusé par le lanceur, remède du produit nommé (TF-1959)",
     gSans.status === 2 && /TF-1959/.test(gSans.stderr) && /forge\\hooks\\factory\.mjs gestes-distants --poser/.test(gSans.stderr), gSans.stdout + gSans.stderr);
@@ -256,7 +259,7 @@ try {
   writeFileSync(lotG, JSON.stringify({ decision: "D-78", reponse_humaine: "78a : approuvé, toute la liste", gestes: [
     { commande: "az group delete --name rg-essai --yes", cible: "groupe rg-essai", effet: "supprime le groupe", retour_arriere: "aucun, se recrée par terraform apply" }] }), "utf8");
   const poseG = await new Promise((ok) => {
-    const c = spawn(process.execPath, [lanceur, "gestes-distants", "--poser", "--lot", lotG], { cwd: P, env: envG, stdio: ["pipe", "pipe", "pipe"] });
+    const c = spawn(process.execPath, [lanceur, "gestes-distants", "--poser", "--lot", lotG, "--transcript", tG], { cwd: P, env: envG, stdio: ["pipe", "pipe", "pipe"] });
     let out = "", err = "";
     c.stdout.on("data", (d) => { out += d; }); c.stderr.on("data", (d) => { err += d; });
     const minuteur = setTimeout(() => { c.kill(); ok({ fini: false, out, err }); }, 30000);
