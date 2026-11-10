@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 676 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 678 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -294,6 +294,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json | — | 19.6 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` |
 | Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md | 20261104c | 35.7 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` |
 | Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json | — | 12.8 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` |
+| Digit-AI - Revue - Prompt textes du clip ingénierie logicielle passé au crible L99 - 20261110b.md | 20261110b | 25.7 Ko | `03-etudes/Digit-AI - Revue - Prompt textes du clip ingénierie logicielle passé au crible L99 - 20261110b.md` |
 | Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md | 20261102a | 20 Ko | `03-etudes/Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` |
 | Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json | — | 9.2 Ko | `03-etudes/Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` |
 | Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md *(archivé)* | 20261109a | 7.1 Ko | `03-etudes/old/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md` |
@@ -644,6 +645,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md | 20261020m | 4.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md` |
 | Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md | 20261021b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md` |
 | Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md | 20261020h | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md` |
+| Digit-AI - Synthese Mandat - Oeil critique du 29-10 au 05-11 - 20261110a.md | 20261110a | 24.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique du 29-10 au 05-11 - 20261110a.md` |
 | Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md | 20261026a | 11.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` |
 | Digit-AI - Synthese Mandat - Oeil critique global des process etudie - 20261020j.md | 20261020j | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique global des process etudie - 20261020j.md` |
 | Digit-AI - Synthese Mandat - Oeil critique global releve des appels - 20261020k.md | 20261020k | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique global releve des appels - 20261020k.md` |
