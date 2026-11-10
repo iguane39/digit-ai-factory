@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.70.1",
- "date": "2026-11-09",
+ "version": "1.71.0",
+ "date": "2026-11-10",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -3540,6 +3540,149 @@
    ],
    "regle": "Proposition de Produit-86 (lot 20261109a, RP-55) : S13 ne compte pas une adresse http(s) nue comme localisateur, que S92 exige",
    "oracle": "à porter par le pilot (oracles/oracle-synthese.mjs S13) à la clôture de TF-2310 — porteur à outiller"
+  },
+  {
+   "cle": "attente-fournisseur-sur-service-inutilise",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un fournisseur d'infrastructure attend la santé d'un service que le produit n'utilise pas Proposée par Produit-84 (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2312"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261109b + ledger seq 264) : RU-13 — supabase_settings échoue tant qu'un service inutilisé (realtime) n'est pas sain",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2312 — porteur à outiller"
+  },
+  {
+   "cle": "remise-sans-verdict",
+   "famille": "lot-forme",
+   "libelle": "Un lot est remis au sas sans que la copie attende le verdict de son contrôle Proposée par Produit-84 (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2314"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261109b + ledger seq 267) : RT-58 — un lot part au sas alors que son contrôle rend FAIL (2e occurrence)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2314 — porteur à outiller"
+  },
+  {
+   "cle": "formation-sans-document-du-formateur",
+   "famille": "gabarit-document",
+   "libelle": "Une chaîne de formation ne produit que les pièces du participant (support, kit) : aucun document du formateur (minutage, solutions, matériel, préparation de la veille) n'est prévu ni exigé, et ce qui revient au formateur finit dans le kit du participant ou nulle part Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2315"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 703)) : une chaîne de formation ne produit aucun document du formateur (RA-06)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2315 — porteur à outiller"
+  },
+  {
+   "cle": "coherence-entre-pieces-d-une-formation-non-jugee",
+   "famille": "gabarit-document",
+   "libelle": "Les pièces d'une formation (support, notes, kit, programme) passent chacune leurs oracles alors qu'elles se contredisent : durée d'un exercice, temps d'une demi-journée, solution chez le participant, fiche contraire à la grille enseignée Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2316"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 692)) : aucun oracle ne juge la cohérence entre les pièces d'une formation (RA-07)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2316 — porteur à outiller"
+  },
+  {
+   "cle": "programme-de-formation-calque-sur-la-propale",
+   "famille": "gabarit-document",
+   "libelle": "Un programme de formation reprend la lettre de la propale commerciale au lieu de l'usage attendu par chaque public, et enchaîne des modules suivis séparément Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2317"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 609)) : les modules de formation suivent la lettre de la propale, pas l'usage attendu (RA-08)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2317 — porteur à outiller"
+  },
+  {
+   "cle": "hamecon-d-anonymisation-reecrit-l-arbre-de-travail",
+   "famille": "anonymisation",
+   "libelle": "Le hameçon d'anonymisation au commit réécrit les fichiers de travail sur le disque au lieu de la seule copie indexée, y compris des entrants en lecture seule Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2321"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 540)) : pre-commit-anonymiser réécrit le disque, pas seulement l'index (RA-12)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2321 — porteur à outiller"
+  },
+  {
+   "cle": "prerequis-declare-installe-absent-du-poste",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un skill déclare un prérequis installé que le poste n'a pas, et l'échec qui en résulte ne le nomme pas Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2326"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 645)) : digit-ai-pptx déclare pptxgenjs installé globalement, absent du poste (RA-17)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2326 — porteur à outiller"
+  },
+  {
+   "cle": "insecable-perdu-par-le-generateur-pptx",
+   "famille": "contrat-interface-forge",
+   "libelle": "Le générateur de diapositives prescrit par un skill perd l'espace insécable U+00A0 que l'oracle de charte du même socle exige Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2328"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 681)) : pptxgenjs remplace l'espace insécable U+00A0, que S8 exige ensuite (RA-19)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2328 — porteur à outiller"
+  },
+  {
+   "cle": "echeance-de-seance-sans-revue-declenchee",
+   "famille": "hook-ou-gate",
+   "libelle": "La date d'une séance ou d'une remise n'est inscrite dans aucun calendrier lu par le dispositif : aucune revue de préparation n'est déclenchée avant elle Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2330"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 693)) : rien ne déclenche une revue de préparation avant une séance datée (RP-07)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2330 — porteur à outiller"
+  },
+  {
+   "cle": "engagement-de-document-sans-livrable",
+   "famille": "gabarit-document",
+   "libelle": "Un document remis au client annonce une pièce, un temps ou un outil qu'aucun autre livrable de la chaîne ne produit ni ne contrôle Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2333"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 694)) : un engagement écrit dans un document n'a ni livrable ni contrôle (RP-10)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2333 — porteur à outiller"
+  },
+  {
+   "cle": "lot-de-fiches-sans-indice-commun",
+   "famille": "versionnement-livrable",
+   "libelle": "R-4 exige un indice du jour distinct par livrable d'un dossier : un lot de fiches produit en un seul traitement porte autant de lettres que de fiches, et ces lettres ne disent aucune version. Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2341"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109c (ledger forge/ledger.jsonl seq 218)) : R-4 impose un indice distinct à chaque fiche d'un lot produit en un seul traitement (RP-204)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2341 — porteur à outiller"
+  },
+  {
+   "cle": "documentation-d-outil-differente-de-sa-sortie",
+   "famille": "contrat-interface-forge",
+   "libelle": "La documentation d'un outil de forge annonce un format de sortie que l'outil ne rend pas : le script qui suit la documentation échoue à l'exécution. Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2355"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109c (ledger forge/ledger.jsonl seq 152)) : SKILL.md annonce de l'hexadécimal pour les clés usages_pptx, lire-marque.mjs rend un objet (RA-205)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2355 — porteur à outiller"
+  },
+  {
+   "cle": "asset-vectoriel-rendu-faux-sans-erreur",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un skill de rendu ne déclare pas les formats d'asset qu'il rend fidèlement : un SVG à dégradé rendu par un moteur qui l'ignore sort faux (logo noir), sans erreur ni avertissement. Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2377"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109c (ledger forge/ledger.jsonl seq 480)) : prepare_images.py ne lit pas le SVG, et un moteur choisi à la place rend un logo faux sans erreur (RA-227)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2377 — porteur à outiller"
   }
  ],
  "cliquet_porteur": {
