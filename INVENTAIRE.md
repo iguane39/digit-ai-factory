@@ -36,9 +36,11 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 
 ## 2. digit-ai-forge-design — `c:\dev\digit-ai-forge-design`
 
-- **Rôle** : design pur, frontière dure (ni spec fonctionnelle, ni backlog, ni code). 4 verbes **indépendants**
+- **Rôle** : design pur, frontière dure (ni spec fonctionnelle, ni backlog, ni code). 5 verbes **indépendants**
   (« forge, pas pipeline ») : `systeme-de-marque` (→ `tokens.css` + `MARQUE.md`), `studio-de-direction`
-  (→ `DIRECTION.md`), `ameliore-le-design` (→ 1 maquette HTML autonome), `critique-le-design` (→ `revue.md`).
+  (→ `DIRECTION.md`), `ameliore-le-design` (→ 1 maquette HTML autonome), `critique-le-design` (→ `revue.md`),
+  `clip-de-presentation` (→ `clip.html` + MP4 de ~60 s rendu chez le produit, jugé par `oracle-clip` ;
+  TF-2405, D-203 (a) du 10/11/2026).
 - **Point d'entrée réel** : documentaire (`README.md`, `conception-forge-design.md`) + skills packagés dans `dist/`
   **non installés**. Seul vrai point d'accroche machine : `node oracles/run-oracles-design.mjs <fichier.html>
   [--mobile] [--tokens t.css] [--json-only]` — orchestrateur unique des 5 oracles, exit 0/1/2, résolution de racine
