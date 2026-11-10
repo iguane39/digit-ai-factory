@@ -1950,3 +1950,48 @@ forge. La disponibilité d'un réglage selon l'offre du client : l'API de Supaba
 d'appliquer la restriction des adresses. Le critère de fonctionnement c3 est mesuré sur un seul produit de
 référence : un produit qui migre par connexion directe depuis un exécuteur de GitHub casserait sous la
 restriction des adresses de Supabase.
+
+## AV. R-67 — une séance datée nomme sa revue de préparation à J-5, et l'engagement d'un document remis a son livrable (D-193 (a), 10/11/2026, TF-2330, TF-2333)
+
+Le fait. Chez le produit marketing, la séance de formation du 13/11/2026 n'était inscrite dans aucun
+calendrier : son seul fichier d'échéances tient les appels d'offres. Sa revue de fond n'a eu lieu que sur
+demande humaine, le 09/11, et elle a relevé 9 défauts à 4 jours de la séance. Les documents de la même
+formation, écrits les 27 et 28/10, avaient promis un QCM et un questionnaire de satisfaction en formulaires
+en ligne, et une skill installée par le formateur. Aucune de ces pièces n'existait le 09/11 ; 3 ont été
+produites dans l'urgence (lot du 09/11/2026, RP-07 et RP-10). La décision humaine D-193 (a), réponse
+« 193a » du 10/11/2026, ajoute ces 2 processus chez tous les produits.
+
+**R-67.**
+1. **Une séance datée s'inscrit au calendrier du produit.** Formation, atelier, comité, soutenance,
+   démonstration ou séminaire : dès que sa date est connue, elle entre dans `forge\CALENDRIER.md`. Sa
+   ligne porte sa source, ses documents et l'état de sa revue. Le fichier naît à l'ouverture du produit, de
+   son modèle `gabarits\CALENDRIER-PRODUIT.md`, daté et sourcé (loi n° 4). Les dates de remise et les appels
+   d'offres n'y entrent pas : la décision vise les séances.
+2. **De J-5 à J-0, l'ouverture du produit nomme la revue de préparation de la séance.** La revue couvre les
+   engagements des documents de la séance, le matériel de celui qui anime et son minutage. Elle couvre aussi
+   la cohérence des pièces entre elles, les mentions restées ouvertes et le jugement de chaque pièce par
+   l'oracle de son domaine. L'ouverture donne la commande qui juge les engagements ; la revue se joue par un
+   agent `verificateur`. Une séance passée ou à plus de 5 jours ne dit rien. Une revue jouée se déclare
+   « faite le AAAA-MM-JJ » au calendrier et ne se rappelle plus.
+3. **Chaque engagement d'un document remis a son livrable ou son action nommée.** Une pièce, un temps ou un
+   outil promis au client s'inscrit dans `forge\ENGAGEMENTS.md`, dans le tour où le document s'écrit. Il est
+   tenu par un livrable présent, ou par une action qui nomme son porteur et son échéance. Le registre naît à
+   l'ouverture, de son modèle `gabarits\ENGAGEMENTS-PRODUIT.md`.
+4. **L'engagement se juge à la production suivante de la chaîne.** À chaque livrable écrit sous `output\`,
+   le registre est jugé et le livrable est lu : un engagement non tenu, ou un document qui promet sans
+   figurer au registre, est nommé. L'ouverture redit ce qui n'est pas tenu, une action échue comprise.
+
+Contrôles exécutables. `node oracles\oracle-engagements.mjs <racine du produit> --documents <dossier>` juge
+le registre et les documents. EN1 juge la forme, EN2 la tenue (livrable présent, repère lu, action non
+échue), EN3 le document qui promet sans figurer au registre ; la recette est `--self-test`.
+`oracles\hook-ecriture.mjs` l'appelle à chaque livrable écrit, au pilot comme chez le produit, et juge le
+calendrier quand il s'écrit. `oracles\hook-ouverture.mjs` fait naître les 2 fichiers et lit le calendrier par
+`oracles\lib-calendrier.mjs`. Il nomme la revue de J-5 à J-0 et redit les engagements non tenus ; sa recette
+est `oracles\hook-ouverture.test.mjs`, sections 2330 et 2333. Les 2 modèles sont déclarés dans
+`gabarits\HERITAGE.json`, en mode `presence` avec `naissance: si_absent`.
+
+Non jugé. La justesse de la date d'une séance, et l'inscription de toutes les séances. La complétude des
+engagements d'un document cité au registre : ses lignes font foi. Une promesse écrite hors du vocabulaire
+fermé d'EN3, et le texte d'un PDF. Le contenu de la revue jouée : la mention « faite le » se lit, la revue ne
+se juge pas. Un document produit par un script n'est jugé qu'à l'écriture suivante, à l'ouverture du produit
+et dans la revue de sa séance.

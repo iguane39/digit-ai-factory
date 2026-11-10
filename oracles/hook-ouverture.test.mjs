@@ -708,6 +708,91 @@ if (veut(2214)) {
   });
 }
 
+// ---- D-193 (a) du 10/11/2026, TF-2330 et TF-2333 (RP-07 et RP-10 du produit marketing) : LA SÉANCE DATÉE NOMME SA REVUE À 5 JOURS, ET UN
+// ENGAGEMENT NON TENU SE REDIT. La séance du 13/11/2026 n'était dans aucun calendrier et sa revue n'a eu lieu que sur demande humaine ; des
+// documents ont promis des pièces que personne n'a produites. Vert : le calendrier et le registre NAISSENT de leur modèle chez un produit qui
+// n'en a pas, en-tête daté du jour, et un fichier présent n'est jamais touché ; une séance à J-3 est nommée avec ce que sa revue couvre et une
+// commande qui MARCHE depuis le produit ; une revue faite se dit en une ligne. Rouge : une séance à J-10 et une séance passée sont muettes, une
+// date hors forme est dite avec sa ligne, un engagement dont le livrable manque est redit ; le remède joué (livrable produit) fait taire la section.
+if (veut(2330, 2333)) {
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-seances-")), "ProduitJouetSE");
+  mkdirSync(join(P, "forge", "retours"), { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const jourDans = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+  const AUJ = jourDans(0);
+  const calendrier = join(P, "forge", "CALENDRIER.md"), registre = join(P, "forge", "ENGAGEMENTS.md");
+  const sectionSeances = (s) => (s.split("## Séances datées dans les 5 jours")[1] || "").split("\n## ")[0];
+  const sectionMalFormee = (s) => (s.split("## Calendrier des séances mal formé")[1] || "").split("\n## ")[0];
+  const sectionEngagements = (s) => (s.split("## Engagements des documents remis, NON tenus")[1] || "").split("\n## ")[0];
+  const t0 = Date.now();
+  const s0 = joue(P);
+  const duree0 = Date.now() - t0;
+  check("TF-2330 vert — le calendrier et le registre NAISSENT de leur modèle chez un produit qui n'en a pas, en-tête daté du jour, et la naissance est dite", () => {
+    for (const f of [calendrier, registre]) {
+      if (!existsSync(f)) throw new Error(`${f} n'est pas né`);
+      if (!new RegExp(`^verifie_le: ${AUJ}\\r?$`, "m").test(readFileSync(f, "utf8"))) throw new Error(`en-tête de ${f} non daté du jour`);
+    }
+    if (!/2 fichier\(s\) NÉ\(S\) à l'instant[\s\S]*forge\/CALENDRIER\.md — né de gabarits\/CALENDRIER-PRODUIT\.md[\s\S]*forge\/ENGAGEMENTS\.md — né de gabarits\/ENGAGEMENTS-PRODUIT\.md/.test(s0)) throw new Error("naissance non dite au relevé");
+    if (/Séances datées|Calendrier des séances mal formé|Engagements des documents remis, NON tenus/.test(s0)) throw new Error("un calendrier et un registre vides font parler l'ouverture");
+  });
+  // Sur un hook qui ne les fait pas naître (l'état d'avant D-193), le banc pose lui-même les deux fichiers depuis leur modèle : chaque
+  // contrôle ci-dessous rend alors son propre rouge, au lieu d'un arrêt du banc sur un fichier absent.
+  for (const [f, m] of [[calendrier, "CALENDRIER-PRODUIT.md"], [registre, "ENGAGEMENTS-PRODUIT.md"]]) {
+    if (!existsSync(f)) writeFileSync(f, readFileSync(join(PILOT, "gabarits", m), "utf8").replace(/^---[\s\S]*?\n---/, (fm) => fm.replace(/AAAA-MM-JJ/g, AUJ)), "utf8");
+  }
+  const lignesSeances = [
+    `| ${jourDans(3)} | Formation de prise en main | Client-A | \`output/formation\` | à faire | convention du 2026-10-13 |`,
+    `| ${jourDans(10)} | Atelier lointain | Client-B | — | à faire | courriel du 2026-11-01 |`,
+    `| ${jourDans(-1)} | Comité d'hier | Client-C | — | à faire | ledger seq 12 |`,
+    `| ${jourDans(2)} | Démonstration déjà revue | Client-D | — | faite le ${AUJ} | ledger seq 40 |`,
+    "| 13/11/2026 | Séance mal datée | Client-E | — | à faire | courriel |",
+  ];
+  writeFileSync(calendrier, readFileSync(calendrier, "utf8").replace("| *(aucune)* | — | — | — | — | — |", lignesSeances.join("\n")), "utf8");
+  const avantGarde = readFileSync(calendrier, "utf8");
+  const s1 = joue(P);
+  check("TF-2330 garde — un calendrier présent n'est jamais réécrit par l'ouverture", () => {
+    if (readFileSync(calendrier, "utf8") !== avantGarde) throw new Error("le calendrier rempli a été modifié");
+    if (/NÉ\(S\) à l'instant/.test(s1)) throw new Error("une naissance est annoncée alors que les fichiers existent");
+  });
+  check("TF-2330 rouge → nommé — la séance à J-3 nomme sa revue À FAIRE, ce qu'elle couvre (5 points) et la commande de ses documents", () => {
+    const l = sectionSeances(s1);
+    if (!new RegExp(`Séance du ${jourDans(3)}, dans 3 jours \\(J-3\\) : Formation de prise en main — pour Client-A — revue de préparation À FAIRE`).test(l)) throw new Error(`section : ${l.slice(0, 400) || "(absente)"}`);
+    if (!/\(1\) chaque engagement[\s\S]*\(5\) chaque pièce jugée par l'oracle de son domaine/.test(l) || !/agent `verificateur`/.test(l)) throw new Error("couverture de la revue ou agent qui la joue absents");
+    if (!/oracle-engagements\.mjs" \. --documents "output\/formation"`/.test(l)) throw new Error("commande des engagements absente ou sans les documents de la séance");
+  });
+  check("TF-2330 vert — une séance à J-10 et une séance passée sont MUETTES, une revue faite se dit en une ligne sans rappel", () => {
+    const l = sectionSeances(s1);
+    if (/Atelier lointain|Comité d'hier/.test(l)) throw new Error("une séance lointaine ou passée est nommée");
+    if (!new RegExp(`Séance du ${jourDans(2)}, dans 2 jours \\(J-2\\) : Démonstration déjà revue — pour Client-D — revue de préparation faite le ${AUJ}\\.`).test(l)) throw new Error(`revue faite non dite : ${l.slice(0, 300)}`);
+    if (/Démonstration déjà revue[^\n]*À FAIRE/.test(l)) throw new Error("une revue faite est encore rappelée à faire");
+  });
+  check("TF-2330 rouge — un calendrier mal formé est DIT : la ligne de la date hors forme, et la forme attendue", () => {
+    const l = sectionMalFormee(s1);
+    if (!/ligne 24 : date « 13\/11\/2026 » hors du format AAAA-MM-JJ/.test(l) || !/gabarits\/CALENDRIER-PRODUIT\.md/.test(l)) throw new Error(`section : ${l.slice(0, 300) || "(absente)"}`);
+  });
+  check("TF-2330 remède joué (TF-1013) — la commande imprimée, jouée depuis le produit, rend le verdict JSON de l'oracle des engagements", () => {
+    const m = sectionSeances(s1).match(/`(node "[^`]+oracle-engagements\.mjs" \.[^`]*)`/);
+    if (!m) throw new Error("commande introuvable dans la section");
+    const r = spawnSync(m[1], { cwd: P, shell: true, encoding: "utf8" });
+    let j = null; try { j = JSON.parse(r.stdout); } catch { /* dit ci-dessous */ }
+    if (!j || j.oracle !== "oracle-engagements" || ![0, 1].includes(r.status)) throw new Error(`commande en échec (exit ${r.status}) : ${(r.stderr || r.stdout || "").slice(0, 200)}`);
+  });
+  writeFileSync(registre, readFileSync(registre, "utf8").replace("| *(aucun)* | — | — | — |",
+    "| QCM final en formulaire en ligne | pièce | `output/formation/Client-A - Programme - 20261028g.docx` | livrable : `output/formation/Client-A - QCM - 20261109a.md` |"), "utf8");
+  check("TF-2333 rouge — un engagement dont le livrable manque est redit à l'ouverture, avec sa ligne et le remède", () => {
+    const l = sectionEngagements(joue(P));
+    if (!/EN2 \(ligne 21\) : « QCM final en formulaire en ligne »[^\n]*Client-A - QCM - 20261109a\.md` n'existe pas/.test(l) || !/Remède : chaque engagement pointe un livrable présent/.test(l)) throw new Error(`section : ${l.slice(0, 400) || "(absente)"}`);
+  });
+  check("TF-2333 vert — le remède joué (livrable produit) fait taire la section", () => {
+    mkdirSync(join(P, "output", "formation"), { recursive: true });
+    writeFileSync(join(P, "output", "formation", "Client-A - QCM - 20261109a.md"), "# QCM final\n", "utf8");
+    if (/Engagements des documents remis, NON tenus/.test(joue(P))) throw new Error("la section persiste alors que le livrable existe");
+  });
+  check(`TF-2330 durée — le relevé d'un produit (sans le tirage réseau) reste sous 45 s, calendrier et registre compris (mesuré : ${duree0} ms)`, () => {
+    if (duree0 >= 45000) throw new Error(`${duree0} ms`);
+  });
+}
+
 veut(1635);
 // TF-1635 — LE DÉLAI DU CLIENT EST UNE BORNE, PAS UNE CONSIGNE. Tout hook SessionStart resté
 // synchrone, au pilot comme dans le gabarit des produits, porte un délai d'au plus 45 s : coupé à

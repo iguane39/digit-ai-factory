@@ -421,6 +421,29 @@
       "motif": "LE GESTE QUI RANGE UN SECRET REÇU EN SESSION (TF-2127, D-167 (a) du 04/11/2026). Le 03/11/2026, une clé d'API collée à 09:24 dans une session manquait au produit à 21:31 : rien ne la rangeait, la session suivante l'a retrouvée dans une transcription (lot Produit-86 20261103d, RP-5). Le geste lit la valeur sur l'entrée standard, l'écrit au fichier d'environnement local IGNORÉ par git (refus sinon) et consigne au ledger le nom et l'empreinte, jamais la valeur. Copie CONFORME et non simple présence : il porte la garde d'ignorance et la règle « jamais la valeur au ledger », deux points où une copie qui dérive annule la décision. Il résout seul l'écrivain du ledger du produit (forge/ledger.py, sinon ledger.mjs de forge-agents), comme scripts/reserver-decision.mjs. Recette : scripts/ranger-secret.test.mjs.",
       "depuis": "2026-11-04",
       "familles_protegees": []
+    },
+    {
+      "source": "gabarits/CALENDRIER-PRODUIT.md",
+      "cible": "forge/CALENDRIER.md",
+      "mode": "presence",
+      "naissance": "si_absent",
+      "motif": "LE CALENDRIER DES SÉANCES DATÉES du produit (D-193 (a) du 10/11/2026, TF-2330, R-67). Le fait : la séance de formation du 13/11/2026 n'était inscrite dans aucun calendrier du produit marketing, dont le seul fichier d'échéances tient les appels d'offres, et sa revue de fond n'a eu lieu que sur demande humaine, le 09/11, avec neuf défauts relevés (lot 20261109b, RP-07, ledger seq 693 et 686). Le hook d'ouverture du produit lit ce fichier et, de J-5 à J-0, nomme la revue de préparation de chaque séance, ce qu'elle couvre et la commande qui la joue ; le hook d'écriture juge sa forme quand il s'écrit. Mode `presence` : le produit le remplit, il ne se recopie jamais. `naissance: si_absent` : absent, il naît à l'ouverture de son modèle, en-tête daté du jour ; présent, il n'est jamais touché. Recette : `oracles/hook-ouverture.test.mjs`, section 2330.",
+      "depuis": "2026-11-10",
+      "familles_protegees": [
+        "hook-ou-gate",
+        "donnees-perissables-en-dur"
+      ]
+    },
+    {
+      "source": "gabarits/ENGAGEMENTS-PRODUIT.md",
+      "cible": "forge/ENGAGEMENTS.md",
+      "mode": "presence",
+      "naissance": "si_absent",
+      "motif": "LE REGISTRE DES ENGAGEMENTS des documents remis au client (D-193 (a) du 10/11/2026, TF-2333, R-67). Le fait : des documents d'une formation, écrits les 27 et 28/10/2026, ont promis un QCM et un questionnaire de satisfaction en formulaires en ligne et une skill installée par le formateur ; aucune de ces pièces n'a été produite avant que l'humain le voie, le 09/11 (lot 20261109b, RP-10, ledger seq 694). Chaque engagement s'y inscrit avec ce qui le tient, un livrable présent ou une action nommée ; `oracles/oracle-engagements.mjs` le juge à chaque livrable écrit (hook d'écriture), l'ouverture redit ce qui n'est pas tenu, et la revue de préparation d'une séance le joue sur ses documents. Mode `presence` et `naissance: si_absent`, comme le calendrier. Recette : `oracles/oracle-engagements.mjs --self-test`.",
+      "depuis": "2026-11-10",
+      "familles_protegees": [
+        "gabarit-document"
+      ]
     }
   ],
   "evolution_1_8_0": "Mandat d'amélioration continue (03/09/2026) : (1) le lanceur de hooks (copie identique) connaît un quatrième hook, `lexique` — UserPromptSubmit, le lexique d'invocation RV-6 devient un détrompeur ; `settings-produit.json` le câble ; (2) `todo/CLASSES.json` est hérité en copie identique (forge/retours/CLASSES.json) — le producteur qui écrit un lot y lit les classes qu'il doit déclarer ; (3) chaque artefact déclare les FAMILLES de défaut dont il protège (`familles_protegees`), pour que le relevé d'ouverture nomme, chez un produit non équipé, ce dont il n'est pas protégé — et non seulement ce qui lui manque.",
