@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 680 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 681 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -548,6 +548,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Etude suivi des temps et couts rendue - 20261105e.md | 20261105e | 8.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Etude suivi des temps et couts rendue - 20261105e.md` |
 | Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md | 20261018b | 11.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` |
 | Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md | 20261017b | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` |
+| Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md | 20261110c | 6.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md` |
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
 | Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md | 20261104f | 6.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md` |
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
