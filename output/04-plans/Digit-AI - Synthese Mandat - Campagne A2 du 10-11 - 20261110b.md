@@ -105,7 +105,7 @@ Ordre : la décision d'abord, parce qu'elle seule vous revient et qu'elle lève 
 ## 9. Traces
 
 - `todo/TODO.jsonl` : 88 événements depuis le point d'étape de 11:40 (76 clôtures et passages en cours, 9 candidats, 3 pour TF-2406), en plus des 91 du tri du matin ; oracle du registre PASS après chaque écriture.
-- Pilot : la fusion de la campagne (faad37ff), le commit de clôture de95f303, la base des recettes ea94deab et la flotte 652802c1. Trois commits de l'autre session, déjà enregistrés, sont partis avec les miens : b537e65b, 30b775cc et 28334e94.
+- Pilot : la fusion de la campagne (faad37ff), le commit de clôture de95f303, la base des recettes ea94deab et la flotte 652802c1. Les 3 commits déjà enregistrés de l'autre session sont partis avec les miens : b537e65b, 30b775cc et 28334e94.
 - forge-agents : 8a88c54 pour les skills de rendu, 8d486a1 pour le socle des pages, 94566d9 pour quality-oracles, 7efb814 pour le manifeste, 4c10bf1 pour le gabarit du socle. Mon premier envoi a publié seul le commit 31b9860 d'une autre session, déjà enregistré, avant la fusion.
 - forge-design 4c3e04a, forge-tests 955454a, forge-ops 723f4ee, forge-websec e5681d8, forge-organization 9a7669c : publiés, chacun vérifié par `git rev-list --count origin/main..main` à 0.
 - `todo/observabilite/flotte-campagnes.jsonl` : la ligne « campagne-a2-20261110 ».
