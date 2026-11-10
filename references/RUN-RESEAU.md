@@ -98,8 +98,15 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
    une réponse sur un texte collé ; elle ne lit aucun compte. Sur la fiche d'établissement, la
    politique de la plateforme exige un consentement exprès et préalable pour toute réponse
    automatisée : ce run n'en publie aucune.
-5. **Mesurer (N5), chaque semaine.** L'humain exporte ; l'IA lit les indicateurs de N0 contre leur
-   seuil. La cadence est portée par un plan `forge-observability/plan@1` à sonde « manuel »
+5. **Mesurer (N5), chaque semaine.** L'humain exporte, et dépose le fichier XLSX là où le plan
+   l'attend : c'est son seul geste. **L'agent lit l'export** (skill `xlsx`, ou `openpyxl` en lecture
+   seule), relève la valeur de la semaine pour chaque indicateur de N0 et la **consigne dans le
+   fichier JSON que la sonde lit** (le `fichier` du plan, `champ_valeur` pointant le champ) :
+   `{ "mesure_le": "AAAA-MM-JJ", "export": "<nom du fichier XLSX>", "<champ>": <valeur> }`. La sonde
+   « manuel » de `forge-observability/scripts/observer.mjs` lit ce JSON (`JSON.parse`), jamais le
+   XLSX, et transporte la valeur sans la vérifier : sans cette étape, rien ne relie l'export
+   déposé à la mesure (TF-2343, réponse à TF-1159). Puis l'IA lit les indicateurs de N0 contre
+   leur seuil. La cadence est portée par un plan `forge-observability/plan@1` à sonde « manuel »
    (TF-1159) ; les chiffres restitués sont ancrés à leur export (cat-dat-03). L'humain relève son
    temps de la semaine, en minutes, programmation comprise : c'est ce chiffre qui dira à la revue
    si un outil de diffusion mérite d'être instruit.
