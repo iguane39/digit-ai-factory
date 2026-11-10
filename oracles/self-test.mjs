@@ -3251,5 +3251,121 @@ check("R-61 bis horloge : sans --aujourd-hui, le jour lu est celui de la machine
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- D-192 (a) du 10/11/2026 (TF-2341, TF-2347) — les deux assouplissements de la règle de nommage -----------
+// Double sens. LOT (R-4) : un indice partagé par des livrables de radical distinct passe quand une ligne de
+// `forge/lots-livrables.jsonl` déclare le couple dossier + indice (traitement cité, date réelle), et reste refusé
+// sans elle, avec une déclaration d'un autre couple, incomplète, au modèle non rempli ou datée du futur. NOMMAGE (R-25) :
+// « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<i> » passe quand `forge/NOMMAGE.json` cite la décision humaine, et reste
+// refusé comme avant sans déclaration, sans décision citée, avec un autre préfixe ou un type qui n'est pas au registre.
+// Le remède que le message propose est JOUÉ : sa ligne modèle, remplie, doit faire PASSER (TF-1013).
+const JOUR_D192 = "2026-11-10";
+const projetD192 = ({ fichiers, lots, nommage }) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-d192-"));
+  mkdirSync(join(d, "output", "Fiches"), { recursive: true });
+  mkdirSync(join(d, "forge"), { recursive: true });
+  for (const n of fichiers) writeFileSync(join(d, "output", n.includes("/") ? "" : "Fiches", n), "# livrable\n", "utf8");
+  if (lots !== undefined) writeFileSync(join(d, "forge", "lots-livrables.jsonl"), lots.map((l) => (typeof l === "string" ? l : JSON.stringify(l))).join("\n") + "\n", "utf8");
+  if (nommage !== undefined) writeFileSync(join(d, "forge", "NOMMAGE.json"), typeof nommage === "string" ? nommage : JSON.stringify(nommage), "utf8");
+  return d;
+};
+const jugeD192 = (d, regle) => {
+  const r = lanceArgs(d, "--regles", regle, "--aujourd-hui", JOUR_D192);
+  const f = r.rapport.findings || [];
+  return { exit: r.exit, fails: f.filter((x) => x.regle === regle && x.statut === "FAIL"), passes: f.filter((x) => x.regle === regle && x.statut === "PASS") };
+};
+const avecD192 = (cfg, regle, fn) => { const d = projetD192(cfg); try { return fn(jugeD192(d, regle), d); } finally { rmSync(d, { recursive: true, force: true }); } };
+const FICHES_LOT = ["Digit-AI - Client-A - Fiche Accueil - 20261109a.md", "Digit-AI - Client-A - Fiche Cuisine - 20261109a.md", "Digit-AI - Client-A - Fiche Salle - 20261109a.md"];
+const LOT_OK = { ts: "2026-11-09T21:00:00.000Z", dossier: "output/Fiches", indice: "20261109a", traitement: "kit de trois fiches produit en un seul traitement" };
+check("D-192 (a) lot vert : trois fiches au même indice, le lot est déclaré (dossier + indice + traitement) → R-4 PASS, le constat cite le lot déclaré", () =>
+  avecD192({ fichiers: FICHES_LOT, lots: [LOT_OK] }, "R-4", (r) => {
+    if (r.exit !== 0 || r.fails.length) throw new Error(`lot déclaré refusé : exit ${r.exit} ${JSON.stringify(r.fails)}`);
+    if (!r.passes.some((x) => /lot DÉCLARÉ le 2026-11-09/.test(x.message) && /un seul traitement/.test(x.message))) throw new Error(`aucun constat ne cite le lot : ${JSON.stringify(r.passes)}`);
+  }));
+check("D-192 (a) lot rouge : les mêmes trois fiches SANS déclaration → FAIL R-4, et le message donne la forme de la déclaration", () =>
+  avecD192({ fichiers: FICHES_LOT }, "R-4", (r) => {
+    const f = r.fails.find((x) => /indice « 20261109a »/.test(x.message));
+    if (r.exit !== 1 || !f) throw new Error(`indice partagé sans déclaration accepté : exit ${r.exit}`);
+    if (!/forge\\lots-livrables\.jsonl/.test(f.message) || !/"traitement"/.test(f.message)) throw new Error(`le message ne donne pas la forme de la déclaration : ${f.message}`);
+  }));
+check("D-192 (a) lot remède : la ligne modèle du message, remplie, fait PASSER (TF-1013)", () => {
+  const msg = avecD192({ fichiers: FICHES_LOT }, "R-4", (r) => r.fails[0].message);
+  const m = msg.match(/la ligne (\{.*\}) — un indice partagé sans déclaration/);
+  if (!m) throw new Error(`aucune ligne modèle extractible du message : ${msg}`);
+  const ligne = JSON.parse(m[1]);
+  if (ligne.dossier !== "output/Fiches" || ligne.indice !== "20261109a") throw new Error(`le modèle ne nomme pas le bon couple : ${m[1]}`);
+  ligne.ts = "2026-11-09T21:00:00.000Z"; ligne.traitement = "kit de trois fiches produit en un seul traitement";
+  avecD192({ fichiers: FICHES_LOT, lots: [ligne] }, "R-4", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`le remède du message ne passe pas : ${JSON.stringify(r.fails)}`); });
+});
+check("D-192 (a) lot rouge : une déclaration d'un AUTRE indice, ou d'un AUTRE dossier, ne couvre pas le lot → FAIL R-4", () => {
+  for (const autre of [{ ...LOT_OK, indice: "20261108a" }, { ...LOT_OK, dossier: "output/Autres" }])
+    avecD192({ fichiers: FICHES_LOT, lots: [autre] }, "R-4", (r) => { if (r.exit !== 1 || !r.fails.some((x) => /indice « 20261109a »/.test(x.message))) throw new Error(`couple non couvert accepté : ${JSON.stringify(autre)}`); });
+});
+check("D-192 (a) lot borne : le lot déclaré ne couvre que SON indice — un autre indice partagé du même dossier reste refusé", () =>
+  avecD192({ fichiers: [...FICHES_LOT, "Digit-AI - Client-A - Plan Salle - 20261110a.md", "Digit-AI - Client-A - Plan Cuisine - 20261110a.md"], lots: [LOT_OK] }, "R-4", (r) => {
+    if (r.exit !== 1 || r.fails.length !== 1 || !/indice « 20261110a »/.test(r.fails[0].message)) throw new Error(`attendu un seul refus, sur 20261110a : ${JSON.stringify(r.fails.map((x) => x.message.slice(0, 60)))}`);
+  }));
+check("D-192 (a) lot rouge : déclaration incomplète, modèle non rempli ou datée du futur → la ligne est REFUSÉE (FAIL nommé) et l'indice reste refusé", () => {
+  for (const [nom, ligne] of [["traitement trop court", { ...LOT_OK, traitement: "lot" }], ["traitement sans objet", { ...LOT_OK, traitement: undefined }],
+    ["modèle recopié", { ...LOT_OK, traitement: "<le traitement unique qui a produit ces livrables, 20 caractères au moins>" }],
+    ["ts futur", { ...LOT_OK, ts: "2026-11-11T08:00:00.000Z" }], ["indice mal formé", { ...LOT_OK, indice: "9a" }], ["JSON invalide", "{pas du json"]])
+    avecD192({ fichiers: FICHES_LOT, lots: [ligne] }, "R-4", (r) => {
+      if (r.exit !== 1) throw new Error(`${nom} : déclaration acceptée, exit ${r.exit}`);
+      if (!r.fails.some((x) => /lots-livrables\.jsonl ligne 1/.test(x.ou))) throw new Error(`${nom} : la ligne refusée n'est pas nommée : ${JSON.stringify(r.fails.map((x) => x.ou))}`);
+      if (!r.fails.some((x) => /indice « 20261109a »/.test(x.message))) throw new Error(`${nom} : l'indice partagé n'est plus refusé`);
+    });
+});
+check("D-192 (a) lot vert : sans fichier de lots et sans indice partagé, R-4 ne change pas (aucune déclaration par défaut)", () =>
+  avecD192({ fichiers: ["Digit-AI - Client-A - Fiche Accueil - 20261109a.md", "Digit-AI - Client-A - Fiche Salle - 20261109b.md"] }, "R-4", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(JSON.stringify(r.fails)); }));
+
+const NOMME = "Digit-AI - Client-A - Rapport Test - 20261109a.md";
+const NOMMAGE_OK = { prefixe: "Digit-AI", rang_type: 3, decision: { date: "2026-09-30", source: "décision du porteur du 30/09/2026 : « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<indice> » pour un fichier qui concerne un client" } };
+const refusType = (r, mot) => r.fails.some((x) => x.regle === "R-25" && new RegExp(`type « ${mot} »`).test(x.message));
+check("D-192 (a) nommage vert : « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<i> » avec le nommage décidé déclaré → R-25 PASS, le type est lu au 3e segment", () =>
+  avecD192({ fichiers: [NOMME], nommage: NOMMAGE_OK }, "R-25", (r) => {
+    if (r.exit !== 0 || r.fails.length) throw new Error(`nommage déclaré refusé : exit ${r.exit} ${JSON.stringify(r.fails)}`);
+    if (!r.passes.some((x) => /au type admis/.test(x.message))) throw new Error("aucun PASS « au type admis » : le registre des types est-il lisible ? (verte vide)");
+    if (!r.passes.some((x) => /nommage décidé par le porteur le 2026-09-30/.test(x.message))) throw new Error("le constat ne cite pas la décision");
+  }));
+check("D-192 (a) nommage rouge : le même nom SANS déclaration → FAIL R-25 comme aujourd'hui (type « Client-A »), le message donne la forme à déclarer", () =>
+  avecD192({ fichiers: [NOMME] }, "R-25", (r) => {
+    if (r.exit !== 1 || !refusType(r, "Client-A")) throw new Error(`nom refusé pour une autre raison, ou accepté : exit ${r.exit}`);
+    if (!/forge\\NOMMAGE\.json/.test(r.fails[0].message)) throw new Error("le message ne dit pas où déclarer le nommage");
+  }));
+check("D-192 (a) nommage remède : la forme du message, remplie, fait PASSER (TF-1013)", () => {
+  const msg = avecD192({ fichiers: [NOMME] }, "R-25", (r) => r.fails[0].message);
+  const m = msg.match(/NOMMAGE-PRODUIT\.json\) : (\{.*\}) ; sans déclaration valide/);
+  if (!m) throw new Error(`aucune forme extractible du message : ${msg}`);
+  const decl = JSON.parse(m[1]);
+  decl.prefixe = "Digit-AI"; decl.decision = { date: "2026-09-30", source: "décision du porteur du 30/09/2026 : le client en 2e segment" };
+  avecD192({ fichiers: [NOMME], nommage: decl }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`le remède du message ne passe pas : ${JSON.stringify(r.fails)}`); });
+});
+check("D-192 (a) nommage rouge : déclaration sans décision citée (absente, vide, modèle non rempli, date future, date réelle mais fausse) → REFUSÉE, et le nom reste refusé", () => {
+  const sans = { prefixe: "Digit-AI", rang_type: 3 };
+  for (const [nom, decl] of [["sans decision", sans], ["source vide", { ...sans, decision: { date: "2026-09-30", source: "" } }],
+    ["source modèle", { ...sans, decision: { date: "2026-09-30", source: "<la décision humaine citée : date, auteur, message>" } }],
+    ["date future", { ...sans, decision: { date: "2026-12-01", source: "décision du porteur du 01/12/2026" } }],
+    ["date 31 février", { ...sans, decision: { date: "2026-02-31", source: "décision du porteur du 31/02/2026" } }],
+    ["rang 2", { ...NOMMAGE_OK, rang_type: 2 }], ["JSON invalide", "{pas du json"]])
+    avecD192({ fichiers: [NOMME], nommage: decl }, "R-25", (r) => {
+      if (r.exit !== 1) throw new Error(`${nom} : déclaration acceptée, exit ${r.exit}`);
+      if (!r.fails.some((x) => x.ou === "forge/NOMMAGE.json" && /REFUSÉE/.test(x.message))) throw new Error(`${nom} : la déclaration refusée n'est pas nommée`);
+      if (!refusType(r, "Client-A")) throw new Error(`${nom} : le nom n'est plus refusé comme avant`);
+    });
+});
+check("D-192 (a) nommage gabarit : le gabarit du pilot recopié tel quel est REFUSÉ (modèle non rempli), rempli il PASSE", () => {
+  const gabarit = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "NOMMAGE-PRODUIT.json"), "utf8"));
+  avecD192({ fichiers: [NOMME], nommage: gabarit }, "R-25", (r) => { if (r.exit !== 1 || !r.fails.some((x) => x.ou === "forge/NOMMAGE.json" && /REFUSÉE/.test(x.message))) throw new Error(`le gabarit non rempli est accepté : exit ${r.exit}`); });
+  const rempli = { ...gabarit, prefixe: "Digit-AI", decision: { date: "2026-09-30", source: "décision du porteur du 30/09/2026 : le client en 2e segment" } };
+  avecD192({ fichiers: [NOMME], nommage: rempli }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`le gabarit rempli est refusé : ${JSON.stringify(r.fails)}`); });
+});
+check("D-192 (a) nommage borne : la déclaration déplace la lecture, pas le registre — un type du 3e segment hors registre, ou un autre préfixe, restent refusés", () => {
+  avecD192({ fichiers: ["Digit-AI - Client-A - Grimoire Test - 20261109a.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Grimoire")) throw new Error(`type hors registre accepté : exit ${r.exit}`); });
+  avecD192({ fichiers: ["Autre - Client-A - Rapport Test - 20261109a.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Client-A")) throw new Error(`autre préfixe lu comme déclaré : exit ${r.exit}`); });
+});
+check("D-192 (a) nommage vert : un produit déclaré garde la lecture ordinaire pour un nom SANS client (3 segments), et son type reste jugé", () => {
+  avecD192({ fichiers: ["Digit-AI - Rapport Test - 20261109b.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`nom à 3 segments refusé : ${JSON.stringify(r.fails)}`); });
+  avecD192({ fichiers: ["Digit-AI - Grimoire Test - 20261109b.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Grimoire")) throw new Error("type hors registre à 3 segments accepté"); });
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

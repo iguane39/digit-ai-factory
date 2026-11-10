@@ -1,0 +1,9 @@
+{
+  "_commentaire": "Gabarit du pilot (gabarits/NOMMAGE-PRODUIT.json, règle de nommage, D-192 (a) du 10/11/2026, TF-2347) : copié en forge/NOMMAGE.json par la session du produit quand le porteur a décidé pour CE produit un nommage qui place le type ailleurs qu'au 2e segment (exemple : « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<indice> », type au rang 3). Aucun produit ne le porte par défaut : ce n'est pas un artefact hérité. Tant que prefixe, rang_type et decision portent le modèle ci-dessous, la déclaration est REFUSÉE par oracle-conformite-projet (R-25) : la décision humaine se cite (date réelle, source d'au moins 10 caractères). La déclaration déplace la lecture du type, jamais le registre des types. Second assouplissement du même alinéa, un lot produit en un seul traitement qui partage un indice : une ligne par lot dans forge/lots-livrables.jsonl, {\"ts\":\"<horodatage ISO relevé à l'écriture>\",\"dossier\":\"output/<…>\",\"indice\":\"AAAAMMJJ<i>\",\"traitement\":\"<le traitement unique, 20 caractères au moins>\"}. Juge : node <PILOT_ROOT>/oracles/oracle-conformite-projet.mjs <produit> --regles R-4,R-25. Forme détaillée : REGLES-PROJET.md, « Alinéa DÉCLARATIONS DE NOMMAGE ».",
+  "prefixe": "<préfixe du nom>",
+  "rang_type": 3,
+  "decision": {
+    "date": "<AAAA-MM-JJ>",
+    "source": "<la décision humaine citée : date, auteur, message>"
+  }
+}

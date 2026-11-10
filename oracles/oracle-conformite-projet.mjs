@@ -23,6 +23,15 @@
  * vrais restes à faire. Une contrainte CONDITIONNELLE et un écart DÉJÀ ASSUMÉ y ressortaient
  * indéfiniment comme du travail en attente — deux lignes sur neuf contestées par le lecteur.
  *
+ * D-192 (a) du 10/11/2026 — la règle de nommage lit DEUX déclarations du produit, absentes par défaut (TF-2341, TF-2347) :
+ *  · R-4 : `forge/lots-livrables.jsonl`, une ligne par lot produit en un seul traitement, qui partage un indice
+ *    commun : {"ts":"<ISO>","dossier":"output/<…>","indice":"AAAAMMJJ<i>","traitement":"<20 caractères au moins>"} ;
+ *    un indice partagé SANS cette ligne reste refusé (TF-0750) ;
+ *  · R-25 : `forge/NOMMAGE.json`, le nommage décidé par le porteur : {"prefixe":"<préfixe>","rang_type":3,
+ *    "decision":{"date":"AAAA-MM-JJ","source":"<la décision humaine citée>"}} ; le type d'un nom qui ouvre sur ce
+ *    préfixe se lit au segment de ce rang au lieu du 2e. Sans décision citée, la déclaration est refusée (FAIL) et
+ *    ignorée. Sans fichier, le comportement d'avant s'applique.
+ *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet> [--regles R-4,…] [--declarer-pret] [--aujourd-hui AAAA-MM-JJ]
  *         (--declarer-pret et --aujourd-hui : R-61 bis, TF-2124 — voir son bloc)
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
@@ -307,8 +316,88 @@ existsSync(p("forge", "QUESTIONS.md"))
   ? ok("R-18", "forge/QUESTIONS.md", "canal des questions en attente présent — un arbitrage suspendu y est visible hors session")
   : so("R-18", "forge\\QUESTIONS.md absent — les arbitrages en attente ne sont visibles nulle part hors de la session qui les a posés (`CONTRAT-INTERFACE.md` le prescrit, TF-0330) : dette DÉCLARÉE, à créer au prochain run de version de ce produit ; ce n'est pas un défaut de produit");
 
+// ---- D-192 (a) du 10/11/2026 (TF-2341, TF-2347) · DEUX ASSOUPLISSEMENTS DE LA RÈGLE DE NOMMAGE, DÉCLARÉS ----
+//
+// LE FAIT. Un kit de 11 fiches produites en un seul traitement devait porter 11 indices, de a à k : les lettres
+// comptaient des fichiers et ne disaient aucune version (TF-2341). Et le produit marketing, dont le porteur a décidé
+// le 30/09/2026 le nommage « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<indice> », voyait R-25 lire le type
+// au 2e segment, y lire le nom du client et refuser 11 livrables conformes à cette décision (TF-2347).
+//
+// DEUX DÉCLARATIONS, DEUX FICHIERS, AUCUNE PAR DÉFAUT — l'oracle ne devine rien :
+//  · R-4 lit `forge/lots-livrables.jsonl`, une ligne JSON par lot :
+//      {"ts":"<horodatage ISO relevé à l'écriture>","dossier":"output/<…>","indice":"AAAAMMJJ<i>","traitement":"<le traitement unique, 20 caractères au moins>"}
+//    Un indice partagé par plusieurs livrables de radical distinct n'est accusé que si AUCUNE ligne n'en déclare le
+//    couple dossier + indice. Un indice partagé SANS déclaration reste refusé, comme avant (TF-0750).
+//  · R-25 lit `forge/NOMMAGE.json`, un objet JSON :
+//      {"prefixe":"<préfixe du nom>","rang_type":3,"decision":{"date":"AAAA-MM-JJ","source":"<la décision humaine citée>"}}
+//    Un nom qui ouvre sur ce préfixe et porte au moins `rang_type` segments + la date voit son type lu au segment de
+//    ce rang (1-based) ; tout autre nom — dont le nom sans client à 3 segments — garde la lecture au 2e segment. La
+//    décision HUMAINE est citée (date passée ou du jour, source d'au moins 10 caractères) : sans elle, la déclaration
+//    est REFUSÉE (FAIL nommé) et ignorée, donc le comportement d'avant s'applique. Sans fichier, rien ne change.
+// Une valeur qui garde le gabarit non rempli du modèle est refusée comme une valeur absente : la recopie du modèle du
+// message ne vaut pas déclaration. Un gabarit non rempli : la valeur ENTIÈRE est un « <…> », ou elle recopie un fragment des modèles ci-dessous. Un « <Client> » cité dans une source
+// qui décrit la forme du nommage n'est pas un gabarit (le nommage décidé du produit marketing s'écrit avec des « <…> »).
+const FRAGMENTS_DE_MODELE = ["<horodatage ISO", "output/<…>", "<le traitement unique", "<préfixe du nom>", "<la décision humaine citée"];
+const gabaritNonRempli = (v) => /^<[^<>]*>$/.test(String(v).trim()) || FRAGMENTS_DE_MODELE.some((m) => String(v).includes(m));
+function jourDeCeJour() {
+  if (JOUR_FORCE) return JOUR_FORCE;
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+}
+/** Un AAAA-MM-JJ réel, qui n'est pas dans le futur (une décision ou un lot datés de demain n'existent pas encore). */
+function jourReelNonFutur(s) {
+  const j = String(s ?? "").slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(j) && !Number.isNaN(Date.parse(j)) && new Date(j).toISOString().slice(0, 10) === j && j <= jourDeCeJour() ? j : null;
+}
+const texteRempli = (v, min) => typeof v === "string" && v.trim().length >= min && !gabaritNonRempli(v);
+const normDossierDeclare = (d) => { const s = String(d ?? "").trim().replaceAll("\\", "/").replace(/^\.\//, "").replace(/\/+$/, ""); return s || "."; };
+const FORME_LOT = '{"ts":"<horodatage ISO relevé à l\'écriture>","dossier":"output/<…>","indice":"AAAAMMJJ<i>","traitement":"<le traitement unique qui a produit ces livrables, 20 caractères au moins>"}';
+const FORME_NOMMAGE = '{"prefixe":"<préfixe du nom>","rang_type":3,"decision":{"date":"AAAA-MM-JJ","source":"<la décision humaine citée : date, auteur, message>"}}';
+/** Les lots DÉCLARÉS de `forge/lots-livrables.jsonl` : { lots: Map("dossier|indice" → ligne), refus: [{ligne, motif}] }. */
+function lireLotsDeclares() {
+  const sortie = { lots: new Map(), refus: [] };
+  const f = p("forge", "lots-livrables.jsonl");
+  if (!existsSync(f)) return sortie;
+  readFileSync(f, "utf8").split(/\r?\n/).forEach((l, i) => {
+    if (!l.trim()) return;
+    let e; try { e = JSON.parse(l); } catch { sortie.refus.push({ ligne: i + 1, motif: "ligne illisible (JSON invalide)" }); return; }
+    const manques = [];
+    if (!e || typeof e !== "object" || Array.isArray(e)) { sortie.refus.push({ ligne: i + 1, motif: "la ligne n'est pas un objet JSON" }); return; }
+    if (!jourReelNonFutur(e.ts) || String(e.ts).length < 10) manques.push("`ts` (date ISO réelle, non future)");
+    if (!texteRempli(e.dossier, 1)) manques.push("`dossier`");
+    if (typeof e.indice !== "string" || !/^\d{8}[a-z]?$/.test(e.indice)) manques.push("`indice` (AAAAMMJJ<i>)");
+    if (!texteRempli(e.traitement, 20)) manques.push("`traitement` (20 caractères au moins, sans gabarit « <…> » non rempli)");
+    if (manques.length) { sortie.refus.push({ ligne: i + 1, motif: `déclaration incomplète — manque : ${manques.join(", ")}` }); return; }
+    sortie.lots.set(`${normDossierDeclare(e.dossier)}|${e.indice}`, { ...e, ligne: i + 1 });
+  });
+  return sortie;
+}
+/** Le nommage DÉCLARÉ de `forge/NOMMAGE.json` : { etat: "absent" | "valide" | "refuse", decl, motifs }. */
+function lireNommageDeclare() {
+  const f = p("forge", "NOMMAGE.json");
+  if (!existsSync(f)) return { etat: "absent" };
+  let e;
+  try { e = JSON.parse(readFileSync(f, "utf8")); } catch { return { etat: "refuse", motifs: ["fichier illisible (JSON invalide)"] }; }
+  if (!e || typeof e !== "object" || Array.isArray(e)) return { etat: "refuse", motifs: ["le fichier n'est pas un objet JSON"] };
+  const motifs = [];
+  if (!texteRempli(e.prefixe, 1) || String(e.prefixe).includes(" - ")) motifs.push("`prefixe` (texte sans « - »)");
+  if (!Number.isInteger(e.rang_type) || e.rang_type < 3 || e.rang_type > 6) motifs.push("`rang_type` (entier de 3 à 6 : le rang 2 est la lecture ordinaire)");
+  const d = e.decision;
+  if (!d || typeof d !== "object") motifs.push("`decision` (la décision humaine citée : { date, source })");
+  else {
+    if (!jourReelNonFutur(d.date) || String(d.date).length !== 10) motifs.push("`decision.date` (AAAA-MM-JJ réel, non futur)");
+    if (!texteRempli(d.source, 10)) motifs.push("`decision.source` (10 caractères au moins, sans gabarit « <…> » non rempli)");
+  }
+  return motifs.length ? { etat: "refuse", motifs } : { etat: "valide", decl: e };
+}
+
 // R-4 — nommage daté des livrables (output/ et docs/ ; input/ non jugé : entrants humains)
 let r4 = true;
+const lotsDeclares = lireLotsDeclares();
+for (const x of lotsDeclares.refus) {
+  r4 = false;
+  ko("R-4", `forge/lots-livrables.jsonl ligne ${x.ligne}`, `${x.motif} — une ligne de lot a la forme ${FORME_LOT} (D-192 (a)) ; la ligne refusée ne déclare rien, l'indice partagé qu'elle visait reste refusé`);
+}
 // TF-0750 (02/09/2026) : R-4 jugeait la FORME du nom, jamais l'UNICITÉ de l'indice. Deux synthèses
 // du même jour, dans le même dossier, ont porté « 20260901b » sans qu'un mot soit dit — et
 // l'indice existe précisément pour ORDONNER plusieurs traitements d'un même jour (même classe que
@@ -389,12 +478,23 @@ for (const d of ["output", "docs"]) {
 for (const [dossier, parCle] of indicesParDossier) {
   for (const [cle, radicaux] of parCle) {
     if (radicaux.size < 2) continue;
+    // D-192 (a) (TF-2341) : un lot DÉCLARÉ — même dossier, même indice — partage son indice à bon droit.
+    const lot = lotsDeclares.lots.get(`${normDossierDeclare(dossier)}|${cle}`);
+    if (lot) {
+      ok("R-4", `${dossier}/`, `indice « ${cle} » partagé par ${radicaux.size} livrables de radical distinct : lot DÉCLARÉ le ${String(lot.ts).slice(0, 10)} ` +
+        `(forge/lots-livrables.jsonl ligne ${lot.ligne}) — ${String(lot.traitement).trim()}`);
+      continue;
+    }
     r4 = false;
+    const modeleLot = JSON.stringify({ ts: "<horodatage ISO relevé à l'écriture>", dossier: normDossierDeclare(dossier), indice: cle,
+      traitement: "<le traitement unique qui a produit ces livrables, 20 caractères au moins>" });
     ko("R-4", `${dossier}/`, `indice « ${cle} » porté par ${radicaux.size} livrables de radical distinct — ` +
       `${[...radicaux].map((r) => `« ${r} »`).join(", ")} : l'indice existe pour ORDONNER les traitements d'un même jour, ` +
       "deux livrables qui le partagent ne s'ordonnent pas (TF-0750) ; réindexer le plus récent — " +
       "`allouerIndice({ …, porte: \"dossier\" })` (`scripts\\allouer-indice.mjs`) : la portée par défaut " +
-      "ne voit que son propre préfixe et peut rendre un indice déjà pris par un AUTRE radical (TF-1450)");
+      "ne voit que son propre préfixe et peut rendre un indice déjà pris par un AUTRE radical (TF-1450). " +
+      "Si ces livrables sont UN SEUL traitement (un lot, fiches produites ensemble), le DÉCLARER est l'autre issue (D-192 (a), TF-2341) : " +
+      `ajouter à forge\\lots-livrables.jsonl la ligne ${modeleLot} — un indice partagé sans déclaration reste refusé`);
   }
 }
 // R-4 · PLAFOND DE LONGUEUR DU CHEMIN (TF-1015, décidé le 11/09/2026 — alinéa de la règle 4).
@@ -560,7 +660,19 @@ else {
   } catch { admis = null; }
   if (!admis) so("R-25", "registre-types.json illisible — types non jugeables");
   else {
-    let r25 = true, vus = 0;
+    let r25 = true, vus = 0, modeleNommageDonne = false;
+    // D-192 (a) (TF-2347) : le nommage que le porteur a décidé pour ce produit, DÉCLARÉ, est lu au lieu du 2e segment.
+    const nommage = lireNommageDeclare();
+    const decl = nommage.etat === "valide" ? nommage.decl : null;
+    const prefixeDecl = decl ? normeType(decl.prefixe) : null;
+    if (decl) {
+      ok("R-25", "forge/NOMMAGE.json", `nommage décidé par le porteur le ${decl.decision.date} (${String(decl.decision.source).trim()}) : un nom qui ouvre sur « ${decl.prefixe} » ` +
+        `et compte au moins ${decl.rang_type} segments + la date voit son type lu au segment ${decl.rang_type} ; les autres noms gardent la lecture au 2e segment`);
+    } else if (nommage.etat === "refuse") {
+      r25 = false;
+      ko("R-25", "forge/NOMMAGE.json", `déclaration de nommage REFUSÉE et ignorée — manque : ${nommage.motifs.join(", ")} ; une déclaration cite la décision humaine (date et source), ` +
+        `forme ${FORME_NOMMAGE}, gabarit du pilot gabarits\\NOMMAGE-PRODUIT.json (D-192 (a)) ; sans déclaration valide, le type se lit au 2e segment comme avant`);
+    }
     for (const d of ["output", "docs"]) {
       for (const f of fichiers(p(d))) {
         const nom = basename(f);
@@ -571,8 +683,10 @@ else {
         const segs = nom.split(" - ");
         if (segs.length < 3) continue; // pas de segment type — déjà R-4
         vus++;
-        const type = segs[1].split(" ")[0];
-        const parCatalogue = admis.has(normeType(type)) ? null : familleDuNom(segs[1]);
+        // Segment qui porte le type : le 2e, sauf nommage DÉCLARÉ dont le préfixe ouvre ce nom (segs.length > rang : la date suit).
+        const iType = decl && normeType(segs[0]) === prefixeDecl && segs.length > decl.rang_type ? decl.rang_type - 1 : 1;
+        const type = segs[iType].split(" ")[0];
+        const parCatalogue = admis.has(normeType(type)) ? null : familleDuNom(segs[iType]);
         if (parCatalogue) {
           ok("R-25", rel(f),
             `AVERTISSEMENT, non bloquant : type « ${type} » absent du registre d'organization, mais le nom suit le type ` +
@@ -592,11 +706,20 @@ else {
             : dansDossier
               ? ` — « ${type} » figure dans le nom du dossier du produit : le nom de projet semble contenir le séparateur « - », et le type lu est un mot de ce nom`
               : "";
+          // D-192 (a) : un nom à 4 segments ou plus, jugé sans nommage déclaré, est peut-être le nommage décidé du produit (client en 2e segment).
+          // Le modèle complet est donné au premier refus de ce genre, un renvoi aux suivants : 125 refus d'un même produit ne portent pas 125 modèles.
+          const aDeclarer = !decl && segs.length >= 4
+            ? (modeleNommageDonne
+              ? " — nommage décidé propre à ce produit : le déclarer (forge\\NOMMAGE.json, forme donnée au premier refus de ce genre, D-192 (a))"
+              : ` — si le porteur a décidé pour ce produit un nommage « <Préfixe> - <Client> - <Type> <Objet> - AAAAMMJJ<indice> », le produit le DÉCLARE (D-192 (a), TF-2347) ` +
+                `dans forge\\NOMMAGE.json (gabarit du pilot : gabarits\\NOMMAGE-PRODUIT.json) : ${FORME_NOMMAGE} ; sans déclaration valide, le type se lit au 2e segment`)
+            : "";
+          if (aDeclarer) modeleNommageDonne = true;
           ko("R-25", rel(f),
             `type « ${type} » absent du registre des types` + cause +
             (suggestion ? ` — vouliez-vous dire « ${suggestion.type} » (distance ${suggestion.distance}) ?` : "") +
             ` — types admis : ${typesAffiches.join(", ")}` +
-            " — un type nouveau s'ajoute au registre d'organization (commit motivé, D-04), jamais improvisé dans un nom");
+            " — un type nouveau s'ajoute au registre d'organization (commit motivé, D-04), jamais improvisé dans un nom" + aDeclarer);
           r25 = false;
         }
       }
@@ -2956,6 +3079,7 @@ else {
 
 const nonJuge = [
   ...antecedences,
+  "D-192 (a) (TF-2341, TF-2347) : les deux déclarations sont lues pour leur FORME et leur DATE, jamais pour leur VÉRITÉ — un lot déclaré n'est pas vérifié comme étant réellement UN traitement, et la décision humaine citée dans `forge/NOMMAGE.json` n'est pas retrouvée dans une source : l'oracle refuse l'absence de citation, pas son inexactitude. Le garde-fou est la lisibilité (la déclaration est un fichier suivi, datée, relue au diff) et son périmètre étroit (un lot = un dossier + un indice ; le nommage ne déplace que la lecture du type, le type doit toujours figurer au registre)",
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
   "R-7 bis (TF-1503) : l'oracle lit la CONSIGNATION d'un déplacement en attente au ledger, il n'ouvre ni ne teste le fichier — que l'ancienne version soit réellement tenue ouverte n'est pas jugé, et une attente consignée à tort tolère donc deux versions. La DURÉE de l'attente n'est pas bornée : le constat la dit par la date de consignation, aucun seuil n'étant fondé sur une mesure. Que la session n'ait posé aucune question ni fermé l'application de l'utilisateur n'est pas jugé non plus : seule la consignation l'est",

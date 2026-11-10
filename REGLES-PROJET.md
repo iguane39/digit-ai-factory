@@ -41,9 +41,9 @@ Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte s
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
-| 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
+| 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux. **Alinéas D-192 (a) du 10/11/2026** : un indice peut être partagé par un **lot déclaré** (`forge\lots-livrables.jsonl`), et un produit dont le porteur a décidé le nommage le **déclare** (`forge\NOMMAGE.json`, lu par R-25) — voir « Alinéa DÉCLARATIONS DE NOMMAGE » | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé 4 fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
-| 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL. **Alinéa TF-1713 (15/10/2026)** : un nom qui suit un type de nom déclaré par une famille du catalogue du pilot (`gabaritsdocumentscatalogue.jsonl`, champ `types_de_nom`, préfixe entier) passe en AVERTISSEMENT nommant la famille, l'ajout au registre d'organization restant dû | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
+| 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL. **Alinéa TF-1713 (15/10/2026)** : un nom qui suit un type de nom déclaré par une famille du catalogue du pilot (`gabaritsdocumentscatalogue.jsonl`, champ `types_de_nom`, préfixe entier) passe en AVERTISSEMENT nommant la famille, l'ajout au registre d'organization restant dû. **Alinéa D-192 (a) (TF-2347)** : un produit qui déclare le nommage décidé par le porteur (`forge\NOMMAGE.json`, décision citée) voit son type lu au segment déclaré au lieu du 2ᵉ | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
 **Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026 ; constante du
 sidecar corrigée le 01/10/2026, TF-1500).** La règle 4
@@ -68,6 +68,36 @@ d'un produit, avec une fixture à double sens 116/117, soit 150/151 avec le side
 Les fichiers antérieurs au-dessus de la borne ne sont pas renommés : ils sont **nommés** par
 l'oracle, un renommage cassant les liens déjà restitués. Le passage de 26 à 34 nomme de la même
 façon la bande de 117 à 124 caractères, que la constante erronée laissait passer.
+
+**Alinéa DÉCLARATIONS DE NOMMAGE (D-192 (a) du 10/11/2026, TF-2341 et TF-2347 ; décision humaine
+« 191a, 192a, 193a »).** La règle 4 imposait un indice distinct par livrable et par jour, et R-25 lisait
+toujours le type au 2ᵉ segment. Deux cas réels ont montré le coût : un kit de 11 fiches produites en un seul
+traitement portait 11 indices, de a à k, qui comptaient des fichiers et ne disaient aucune version ; et le
+produit marketing, dont le porteur a décidé le 30/09/2026 le nommage « Digit-AI - <Client> - <Type> <Objet> -
+AAAAMMJJ<indice> », voyait R-25 prendre le nom du client pour le type (125 refus de R-25 mesurés le 10/11/2026,
+dont 124 sur des noms à ce préfixe). Deux assouplissements, **tous deux déclarés, aucun par défaut** :
+
+1. **Lot déclaré à indice commun (R-4).** Des livrables produits en un seul traitement partagent un indice
+   quand une ligne de `forge\lots-livrables.jsonl` déclare le lot :
+   `{"ts":"<horodatage ISO relevé à l'écriture>","dossier":"output/<…>","indice":"AAAAMMJJ<i>","traitement":"<le traitement unique, 20 caractères au moins>"}`.
+   La déclaration couvre un dossier et un indice, rien d'autre. Un indice partagé sans déclaration reste refusé
+   (TF-0750) ; une ligne incomplète, au modèle non rempli ou datée du futur est refusée par un FAIL qui la nomme.
+2. **Nommage décidé par le porteur (R-25).** Un produit déclare dans `forge\NOMMAGE.json` son préfixe et le rang du
+   segment Type : `{"prefixe":"Digit-AI","rang_type":3,"decision":{"date":"AAAA-MM-JJ","source":"<la décision humaine citée>"}}`.
+   Un nom qui ouvre sur ce préfixe et compte au moins `rang_type` segments + la date voit son type lu à ce rang ;
+   les autres noms, dont le nom sans client à 3 segments, gardent la lecture au 2ᵉ. La déclaration **cite la
+   décision humaine** (date réelle non future, source d'au moins 10 caractères) : sans elle, elle est refusée par un
+   FAIL et ignorée, donc le comportement d'avant s'applique. Elle déplace la lecture, jamais le registre : le type lu
+   doit toujours figurer au registre des types (règle 25).
+
+**Câblé** : `oracle-conformite-projet` (R-4 lit les lots, R-25 lit le nommage ; formes dans son en-tête et dans les
+messages de refus), recette `oracles\self-test.mjs` (cas D-192, dont le remède du message joué). La déclaration est
+l'affaire du **produit** : elle n'est pas un artefact hérité (`gabarits\HERITAGE.json`), parce qu'imposer un fichier de
+déclaration à tous les produits en ferait une dérogation par défaut ; le gabarit `gabarits\NOMMAGE-PRODUIT.json` en donne le
+modèle (refusé tant qu'il n'est pas rempli) et les messages de refus de l'oracle en citent la forme. Le gabarit
+`CLAUDE-PRODUIT.md`, à 7 octets de son plafond de 6 144 (TF-1949), ne la porte pas. **Non jugé** : la VÉRITÉ des
+déclarations — l'oracle ne vérifie ni qu'un lot est réellement un seul traitement, ni que la décision citée existe ;
+il refuse l'absence de citation et la rend lisible au diff (fichier suivi, daté).
 
 **Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
 instruit d'un système de paramètres).** 3 classes de conventions ne se négocient pas,
