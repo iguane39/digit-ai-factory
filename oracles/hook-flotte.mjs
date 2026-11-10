@@ -69,11 +69,12 @@ export function juger(entree, { maison } = {}) {
   if (/^Relecture d'intention/i.test(description)) return { decision: "laisse" };
   // L'essai a couru du 2026-10-18 au 2026-11-01, puis a été prolongé en service par D-73 (b) du 26/10/2026
   // (references/RELECTURE-INTENTION.md) : le rappel ne le présente plus comme un essai en cours (œil critique du 10/11/2026).
+  // Œil critique du 10/11/2026 (A4) : le rappel tenait 894 caractères et se recopiait à chaque appel d'agent, 8 fois
+  // dans un même tour ; il garde la commande et la règle de campagne, le détail vit dans la référence.
   const rappel = (cible) => "RELECTURE D'INTENTION (essai D-23 (a) du 18/10/2026, en service depuis le 2026-11-01 par D-73 (b)) — cet appel vise « " + cible + " » : "
-    + "chaque consigne passée à un agent se relit AVANT le lancement. `node scripts/relecture-intention.mjs --preparer consigne --fichier <consigne.md>` "
-    + "(chez un produit : le script du pilot) écrit la demande humaine du tour, citée mot pour mot, et imprime la consigne à passer à un `verificateur` "
-    + "dont la description commence par « Relecture d'intention » ; un écart majeur se corrige dans la consigne ou se pose à l'humain avant l'appel. Une campagne dont les agents reçoivent le même gabarit se relit une fois, le gabarit et la liste des sujets ensemble (plusieurs --fichier), puis chaque livrable à sa réception (--preparer reception, D-47 (a) du 19/10/2026). "
-    + "Rappel seulement (alerte, jamais blocage) : l'appel part tel quel. `references/RELECTURE-INTENTION.md`.";
+    + "relire la consigne avant le lancement, `node scripts/relecture-intention.mjs --preparer consigne --fichier <consigne.md>` (chez un produit, le script du pilot), "
+    + "puis la passer à un `verificateur` « Relecture d'intention » ; une campagne relit une fois son gabarit commun (D-47 (a)). "
+    + "Alerte, jamais blocage : l'appel part tel quel. `references/RELECTURE-INTENTION.md`.";
   if (type && !GENERIQUES.has(type)) return { decision: "rappelle", message: rappel(type) };
   const aModele = typeof ti.model === "string" && ti.model.trim() !== "";
   const aEffort = typeof ti.effort === "string" && ti.effort.trim() !== "";
