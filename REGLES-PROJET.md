@@ -583,7 +583,7 @@ Deux corollaires opposables :
 
 1. **À l'ouverture de tout run**, `node oracles\self-tests.mjs`, `node
    oracles\oracle-boite-entree.mjs` et `node oracles\oracle-skills.mjs` sont joués et leurs
-   verdicts portés au ledger en `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`). Un
+   verdicts portés au ledger en `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`) — au ledger d'un produit, le compte seul : `oracle-boite-entree --pour-ledger`, sans nom de fichier (TF-2339). Un
    échec **suspend l'ouverture** : des oracles qui ne savent plus refuser ne peuvent rien juger
    de ce qui suit, un lot non pris fausse tout ce qu'on croit savoir du reste-à-faire, et un
    skill — ou un hook (K6-K8, TF-0290/0297/0305 : intégrité, câblage, existence du fichier

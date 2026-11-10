@@ -15,7 +15,11 @@ node oracles\oracle-boite-entree.mjs # un lot est-il arrivé sans être pris ? (
 node oracles\oracle-skills.mjs       # skills, hooks, câblages = versionnés et vivants ? (K1-K8)
 ```
 
-Verdicts portés au ledger en `oracles_verdict`. La suspension n'est pas un excès de zèle :
+Verdicts portés au ledger en `oracles_verdict`. **Au ledger d'un produit (suivi par git), l'entrée de
+`oracle-boite-entree` ne porte que des comptes** (TF-2339, 10/11/2026) : la commande est
+`node oracles\oracle-boite-entree.mjs --pour-ledger`, qui rend le verdict et « 3 constats B1 », sans nom de
+fichier ni chemin. Le 11/09/2026, trois sidecars d'autres dépôts, nommés dans une entrée de ledger, étaient des
+noms de produits que la porte de publication a refusés sur 14 commits. La suspension n'est pas un excès de zèle :
 des oracles qui ne savent plus refuser ne peuvent rien juger de ce qui suit, et un lot non
 pris fausse tout ce qu'on croit savoir du reste-à-faire — on ouvrirait un run en croyant
 connaître le travail en attente.

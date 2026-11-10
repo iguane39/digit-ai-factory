@@ -526,6 +526,19 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   return { verdict: findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings };
 }
 
+// ---- TF-2339 (10/11/2026) · UN VERDICT QUI ENTRE AU LEDGER D'UN PRODUIT NE PORTE QUE DES COMPTES -----------------------
+// Le 11/09/2026, le verdict de cet oracle (joué à l'ouverture d'un run, R-35) a été consigné au ledger d'un produit, fichier suivi par git, avec « trois sidecars déposés et jamais
+// ingérés » désignés par leur nom : des noms de produits d'autres dépôts, que la porte de publication refuse (C5 sur 14 commits). `findings[].ou` porte ces noms, utiles au pilot qui
+// traite la boîte, nuisibles dans le journal d'un autre dépôt. Ce compte est la seule forme à consigner ailleurs que chez le pilot : verdict, nombre de constats par règle, et une
+// phrase ; aucun nom de fichier, aucun chemin.
+function compteLedger({ verdict, findings }) {
+  const parRegle = {};
+  for (const f of findings || []) if (f.statut === "FAIL") parRegle[f.regle] = (parRegle[f.regle] || 0) + 1;
+  const regles = Object.keys(parRegle).sort();
+  return { verdict, constats_par_regle: parRegle,
+    texte: regles.length ? regles.map((r) => `${parRegle[r]} constat${parRegle[r] > 1 ? "s" : ""} ${r}`).join(", ") : "aucun constat" };
+}
+
 // ---- self-test : chaque règle prouvée dans les DEUX sens -------------------------------------
 function selfTest() {
   const base = mkdtempSync(join(tmpdir(), "boite-"));
@@ -901,6 +914,24 @@ function selfTest() {
   cas.push(["TF-1830 bis — --registre en PREMIER argument est lu, et le répertoire qui suit est jugé",
     cibleDuCli(["--registre", reg9, boite9]) === resolve(boite9), String(cibleDuCli(["--registre", reg9, boite9]))]);
 
+  // TF-2339 (10/11/2026) — LE COMPTE POUR LE LEDGER D'UN PRODUIT NE PORTE AUCUN NOM. Fautif : le 11/09/2026, un verdict de cet oracle a été consigné au ledger SUIVI d'un produit avec
+  // les noms de fichiers des sidecars d'autres dépôts (des noms de produits) ; la porte de publication le refusait ensuite (C5, 14 commits). Conforme : `--pour-ledger` ne rend que le
+  // verdict et des comptes par règle, sans nom de fichier ni chemin ; un verdict PASS dit « aucun constat ».
+  const bl = join(base, "boite-ledger");
+  mkdirSync(bl);
+  writeFileSync(join(bl, "NOMREEL - RETOURS - 20260911a.tf.jsonl"), '{"titre":"x"}\n');
+  const regVide = join(base, "TODO-vide.jsonl");
+  writeFileSync(regVide, "");
+  const rl = juger(bl, regVide);
+  const cl = compteLedger(rl);
+  cas.push(["TF-2339 rouge — la sortie complète nomme le sidecar (la raison d'être du compte)", JSON.stringify(rl.findings).includes("NOMREEL"), rl.verdict]);
+  cas.push(["TF-2339 vert — le compte pour le ledger dit le verdict et « 1 constat B1 », sans le nom du sidecar ni un chemin",
+    cl.verdict === "FAIL" && /1 constat B1/.test(cl.texte) && !JSON.stringify(cl).includes("NOMREEL") && !/[\\/]/.test(JSON.stringify(cl)), JSON.stringify(cl).slice(0, 80)]);
+  cas.push(["TF-2339 vert — une boîte à jour : « aucun constat », verdict PASS", compteLedger(vert).verdict === "PASS" && /aucun constat/.test(compteLedger(vert).texte), compteLedger(vert).texte]);
+  const sortieLedger = spawnSync(process.execPath, [fileURLToPath(import.meta.url), bl, "--registre", regVide, "--pour-ledger"], { encoding: "utf8" });
+  cas.push(["TF-2339 — le CLI --pour-ledger n'imprime ni le nom du sidecar ni le répertoire jugé",
+    sortieLedger.status === 1 && /1 constat B1/.test(sortieLedger.stdout) && !/NOMREEL|boite-ledger/.test(sortieLedger.stdout), String(sortieLedger.status)]);
+
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {
     console.log(`  [${tenu ? "OK    " : "ECHEC "}] ${nom} (verdict ${verdict})`);
@@ -921,6 +952,11 @@ const registre = resolve(iReg >= 0 ? args[iReg + 1] : join(ICI, "..", "todo", "T
 const cible = resolve(args.find((a, i) => !a.startsWith("--") && (iReg < 0 || i !== iReg + 1)) ?? join(ICI, "..", "input", "00-retours"));
 
 const { verdict, findings, motif } = juger(cible, registre);
+// TF-2339 (10/11/2026) : `--pour-ledger` rend le seul compte, sans nom de fichier ni chemin — la forme qui s'écrit au ledger d'un produit (suivi par git).
+if (args.includes("--pour-ledger")) {
+  process.stdout.write(JSON.stringify({ oracle: ORACLE, version: VERSION, ...compteLedger({ verdict, findings }) }, null, 1) + "\n");
+  process.exit(verdict === "FAIL" ? 1 : verdict === "SKIP" ? 2 : 0);
+}
 // TF-1214 (13/10/2026) — LE POSTE QUI JUGE SE DIT. Un fichier non suivi par git ne voyage pas : le 14/09,
 // quinze dépôts déposés sur un poste sont restés invisibles jusqu'à 61 h au pilot qui travaillait depuis
 // l'autre, et chacun des deux postes rendait un verdict sûr de lui. Le relevé croisé des boîtes de tous

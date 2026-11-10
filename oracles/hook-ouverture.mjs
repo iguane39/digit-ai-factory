@@ -613,7 +613,7 @@ if (iPilot < 0) {
     } else {
       lignes.push(`- **BLOQUANT — ${f8.message}**`,
         "- À TRAITER AVANT TOUT AUTRE TRAVAIL de cette session : un lot remonté qui n'entre pas au registre",
-        "  n'existe pour personne, et le producteur le croit pris. Détail : node oracles/oracle-boite-entree.mjs");
+        "  n'existe pour personne, et le producteur le croit pris. Détail : node oracles/oracle-boite-entree.mjs (au ledger d'un produit, suivi par git : `--pour-ledger`, des comptes et aucun nom de fichier, TF-2339).");
     }
     // B9 (TF-1198, 19/09/2026) — le sas d'arrivée se DIT à l'ouverture. Le 19/09, six lots y ont
     // attendu deux jours sous un « boîte à jour » : une règle que le relevé d'ouverture ne lit pas
