@@ -54,6 +54,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
 import { enumerationsEnLigne } from "./lib-enumeration-liste.mjs";
+import { lecteurDeclare } from "./lib-lecteur-declare.mjs";
 import { join, dirname, resolve, relative, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -215,6 +216,9 @@ function localisateur(texteProse) {
   };
 }
 
+// TF-2345 : les balises d'un bloc de code dont le contenu se RECOPIE (un modèle de document), jamais une console.
+const BALISES_A_RECOPIER = new Set(["markdown", "md", "text"]);
+
 // Abréviations courantes : un point qui les suit ne clôt pas une phrase. La liste est COURTE et
 // écrite — deviner les abréviations par une heuristique produirait des phrases fantômes, donc des
 // verdicts EC-2 faux.
@@ -246,8 +250,12 @@ export function phrases(texteProse, coupures = []) {
   while ((m = re.exec(texteProse))) {
     const fin = m.index + m[0].length;
     if (fin < texteProse.length && !/\s/.test(texteProse[fin])) continue; // « p.ex », « 3.5 », « etc.) »
-    const jeton = (/([\p{L}\p{N}°]+)$/u.exec(texteProse.slice(0, m.index)) || ["", ""])[1];
-    if (jeton && (ABREVIATIONS.has(jeton.toLowerCase()) || (jeton.length === 1 && /\p{L}/u.test(jeton)))) continue;
+    const avant = texteProse.slice(0, m.index);
+    const jeton = (/([\p{L}\p{N}°]+)$/u.exec(avant) || ["", ""])[1];
+    // TF-2334 (10/11/2026) : « h » précédé d'un nombre (« à 14 h. », « 8 h. ») est une heure, pas une abréviation : le point clôt la phrase.
+    // Sans cette exception, la lettre seule passait pour une initiale, deux phrases se soudaient et EC-2 comptait 1 phrase longue sur 2 au lieu de 0 sur 17.
+    const heure = /^h$/i.test(jeton) && /\d[\s  ]*$/.test(avant.slice(0, avant.length - jeton.length));
+    if (!heure && jeton && (ABREVIATIONS.has(jeton.toLowerCase()) || (jeton.length === 1 && /\p{L}/u.test(jeton)))) continue;
     fins.push(fin);
   }
   for (const c of coupures) if (c > 0 && c < texteProse.length) fins.push(c);
@@ -914,9 +922,10 @@ export function juger(texte, options = {}) {
   // le lecteur est inconnu n'est pas un document sans défaut, c'est un document non jugé.
   {
     const conf = donnee?.blocs_de_code;
-    const declare = /^---\s*$/m.test(texte.slice(0, 4)) || /^﻿?---\s*$/m.test(texte.slice(0, 5))
-      ? /^\s*(?:role_destinataire|lecteur)\s*:\s*(.+)$/im.exec(texte.split(/^---\s*$/m)[1] || "")
-      : null;
+    // TF-2346 (10/11/2026) : le lecteur se lit à trois places (en-tête YAML, commentaire HTML masqué par le rendu, sidecar
+    // `<fichier>.lecteur.json`), voir lib-lecteur-declare.mjs. Un livrable remis à un tiers n'a plus à porter un en-tête d'auteur.
+    const lecteurLu = lecteurDeclare(texte, options.cheminJuge || "");
+    const declare = lecteurLu ? [lecteurLu, lecteurLu] : null;
     if (!conf || !Array.isArray(conf.invocations) || !conf.invocations.length) {
       pousser("EC-10", "SKIP", "aucun vocabulaire d'invocation dans la donnée — blocs de code non jugés");
     } else if (!declare) {
@@ -932,13 +941,16 @@ export function juger(texte, options = {}) {
       // bloc se recopie ou s'exécute.
       const lignes = String(texte).replace(/\r\n?/g, "\n").split("\n");
       const commandes = [];
-      let dans = false, premiere = null, debut = 0;
+      let dans = false, premiere = null, debut = 0, balise = "";
       for (let i = 0; i < lignes.length; i++) {
         if (/^\s*(```|~~~)/.test(lignes[i])) {
           if (dans) {
-            if (premiere && invocations.some((r) => r.test(premiere))) commandes.push({ ligne: debut, texte: premiere.trim().slice(0, 60) });
+            // TF-2345 (10/11/2026) : dans un bloc balisé markdown, md ou text, une première ligne « # titre » est un titre à recopier,
+            // pas l'invite root d'une console. Les invites « $ » et « > » et les invocations d'outil y restent comptées.
+            const titreARecopier = BALISES_A_RECOPIER.has(balise) && /^\s*#+\s/.test(premiere || "");
+            if (premiere && !titreARecopier && invocations.some((r) => r.test(premiere))) commandes.push({ ligne: debut, texte: premiere.trim().slice(0, 60) });
             dans = false; premiere = null;
-          } else { dans = true; debut = i + 1; }
+          } else { dans = true; debut = i + 1; balise = lignes[i].replace(/^\s*(?:```|~~~)\s*/, "").split(/\s+/)[0].toLowerCase(); }
           continue;
         }
         if (dans && premiere === null && lignes[i].trim()) premiere = lignes[i];
@@ -2127,6 +2139,38 @@ function selfTest() {
     `EC-14 : à la passe 3 la consigne ne dit pas de remettre avec les écarts nommés : ${JSON.stringify(c14d.j?.a_rejouer?.consigne)}`);
   verifie(jouer(NOM_COURRIEL, COURRIEL_ROUGE, ["--passe", "0"]).statut === 2, "EC-14 : --passe accepte une valeur hors 1-9");
   verifie(jouer(NOM_COURRIEL, COURRIEL_ROUGE, ["--langue", "français"]).statut === 2, "EC-15 : --langue accepte autre chose qu'un code de langue");
+  // TF-2334 (10/11/2026) — LE POINT APRÈS UNE HEURE (« 14 h. ») CLÔT LA PHRASE. Le fautif est la phrase d'essai du 01/10/2026 : deux phrases qui
+  // se soudaient. Le conforme garde ses abréviations : « p. » devant un numéro de page et une initiale seule hors d'une heure ne coupent toujours pas.
+  verifie(phrases("Le départ est fixé à 14 h. Le retour suit demain matin.").length === 2,
+    "EC-2 (TF-2334) : « à 14 h. Le retour… » est lu comme une seule phrase — le point après une heure ne clôt pas");
+  verifie(phrases("Rendez-vous à 8 h. Ensuite, le groupe part.").length === 2,
+    "EC-2 (TF-2334) : « 8 h. » avec espace insécable est lu comme une seule phrase");
+  verifie(phrases("Voir p. 12 pour le détail. La lettre h. suit seule dans ce texte.").length === 2,
+    "EC-2 (TF-2334) : « p. » ou un « h. » sans nombre coupe la phrase — l'exception déborde de l'heure");
+  // TF-2345 (10/11/2026) — LE TITRE « # » D'UN BLOC MARKDOWN À RECOPIER N'EST PAS UNE INVITE ROOT. Le fautif est le modèle de fichier de
+  // consignes du 30/09/2026 (« # Consignes de l'assistant documentaire » en première ligne d'un bloc markdown). Le conforme garde le refus
+  // de la MÊME ligne dans un bloc bash, et celui d'une invite « $ » dans un bloc text : seule la balise markdown, md ou text lève le « # ».
+  const ENTETE_NON_EXEC = "---\nrole_destinataire: lectrice qui recopie un modèle\n---\n\n# Modèle\n\nUn paragraphe de prose.\n\n";
+  const f10 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-10");
+  const e45m = jouer("ec10-md.md", `${ENTETE_NON_EXEC}\`\`\`markdown\n# Consignes de l'assistant documentaire\n\nRéponds en français.\n\`\`\`\n`);
+  verifie(f10(e45m)?.statut === "PASS", `EC-10 (TF-2345) : un titre « # » en première ligne d'un bloc markdown est compté comme commande : ${JSON.stringify(f10(e45m))}`);
+  const e45t = jouer("ec10-text.md", `${ENTETE_NON_EXEC}\`\`\`text\n# Consignes\n\`\`\`\n`);
+  verifie(f10(e45t)?.statut === "PASS", `EC-10 (TF-2345) : un titre « # » en première ligne d'un bloc text est compté comme commande : ${JSON.stringify(f10(e45t))}`);
+  const e45b = jouer("ec10-bash.md", `${ENTETE_NON_EXEC}\`\`\`bash\n# Consignes de l'assistant documentaire\n\`\`\`\n`);
+  verifie(f10(e45b)?.statut === "FAIL", `EC-10 (TF-2345) : la même ligne « # » dans un bloc bash n'est plus refusée — la levée déborde des balises à recopier : ${JSON.stringify(f10(e45b))}`);
+  const e45d = jouer("ec10-text-dollar.md", `${ENTETE_NON_EXEC}\`\`\`text\n$ git status\n\`\`\`\n`);
+  verifie(f10(e45d)?.statut === "FAIL", `EC-10 (TF-2345) : une invite « $ » dans un bloc text n'est plus refusée : ${JSON.stringify(f10(e45d))}`);
+  // TF-2346 (10/11/2026) — LE LECTEUR SE DÉCLARE HORS DE L'EN-TÊTE QUE LE CLIENT VOIT. Sans déclaration nulle part, SKIP (déjà couvert plus haut).
+  // Commentaire HTML : le document est jugé, la commande est nommée. Sidecar : un lecteur exécutant lève le refus, preuve que la lecture a lieu.
+  const BLOC_AZ = "# Guide remis au client\n\nUn paragraphe de prose.\n\n```\naz repos list\n```\n";
+  const e46c = jouer("ec10-commentaire.md", `<!-- lecteur : le responsable métier du client, qui lit sans exécuter -->\n${BLOC_AZ}`);
+  verifie(f10(e46c)?.statut === "FAIL" && /az repos list/.test(f10(e46c)?.message || ""), `EC-10 (TF-2346) : un lecteur déclaré en commentaire HTML n'est pas lu — le document reste non jugé : ${JSON.stringify(f10(e46c))}`);
+  writeFileSync(join(dir, "ec10-sidecar.md.lecteur.json"), JSON.stringify({ lecteur: "exploitant / astreinte" }), "utf8");
+  const e46s = jouer("ec10-sidecar.md", BLOC_AZ);
+  verifie(f10(e46s)?.statut === "PASS" && /exploitant/.test(f10(e46s)?.message || ""), `EC-10 (TF-2346) : un lecteur déclaré dans le sidecar .lecteur.json n'est pas lu : ${JSON.stringify(f10(e46s))}`);
+  writeFileSync(join(dir, "ec10-sidecar-vide.md.lecteur.json"), "{ pas du json", "utf8");
+  const e46v = jouer("ec10-sidecar-vide.md", BLOC_AZ);
+  verifie(f10(e46v)?.statut === "SKIP", `EC-10 (TF-2346) : un sidecar illisible produit un verdict au lieu de rendre SKIP : ${JSON.stringify(f10(e46v))}`);
   const BILAN_14 = cas14;
 
   rmSync(dir, { recursive: true, force: true });
