@@ -415,16 +415,16 @@
   "vu_le": "2026-10-30"
  },
  "oracles/hook-gestes-distants.test.mjs": {
-  "cas": 106,
-  "vu_le": "2026-11-04"
+  "cas": 131,
+  "vu_le": "2026-11-10"
  },
  "oracles/hook-gestes-en-cours.test.mjs": {
   "cas": 25,
   "vu_le": "2026-11-04"
  },
  "oracles/hook-identite-sortante.test.mjs": {
-  "cas": 15,
-  "vu_le": "2026-10-30"
+  "cas": 27,
+  "vu_le": "2026-11-10"
  },
  "oracles/hook-lecons.test.mjs": {
   "cas": 62,

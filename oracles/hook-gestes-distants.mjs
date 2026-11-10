@@ -59,13 +59,21 @@
  * concernés.
  *
  * NON JUGÉ (déclaré). Un geste joué par un script dont le texte n'est pas dans la commande ; une commande
- * construite par variable ou lue d'un fichier ; une commande dans une chaîne entre guillemets d'une
- * substitution (`"$(az group delete …)"`) ; une commande encodée (`-EncodedCommand`) ; une commande envoyée par
- * `ssh` ou `wsl` ; un alias ; les autres
+ * lue d'un fichier ; une commande envoyée par `ssh` ou `wsl` ; un alias ; les autres
  * nuages (aws, gcloud, kubectl), faute de fait fondateur ; `terraform state push|mv`, `gh repo archive`,
  * `gh repo deploy-key add`. Surtout : le hook ne prouve pas que l'humain a réellement approuvé le lot ;
  * `reponse_humaine` doit citer ses mots, et la revue du lot (qui l'a écrit, quand, avec quels mots) reste
  * possible parce que le fichier garde chaque ligne.
+ *
+ * D-194 (b) (10/11/2026) : CE QUE LA GARDE NE SAIT PAS LIRE EST REFUSÉ, SAUF ACCORD. La lecture suit le dialecte de l'outil
+ * (Bash : `\`, `$'…'`, commentaires `#` ; PowerShell : accent grave, here-strings `@'…'@`, `<# … #>`) et résout `eval`, `iex`,
+ * `Start-Process`, `ForEach-Object { … }`, `-EncodedCommand`, `"$(…)"`, les alias PowerShell `curl` et `wget`, les abréviations
+ * de paramètre (`-Me Delete`) et les options globales d'`az` placées entre ses mots (`az group --subscription S delete`). Ce
+ * qui reste illisible (guillemets non équilibrés, document en ligne sans fin, texte évalué non littéral, commande dans une
+ * variable, encodage, imbrication trop profonde) est REFUSÉ quand la commande porte un outil distant, sauf lot d'accord qui en
+ * cite le texte exact ; une panne du juge et une entrée illisible sont refusées. Le réglage `FORGE_GARDE_ILLISIBLE=laisse`, lu
+ * dans l'environnement du harnais et jamais dans la commande, rétablit l'ancien comportement. Détail et limites :
+ * `references\GESTES-DISTANTS.md`, « Ce que la garde ne sait pas lire ».
  *
  * TF-2084 (04/11/2026, RT-39) : le même hook tient le registre des gestes distants EN COURS (`forge\gestes-en-cours.jsonl`,
  * `oracles\lib-gestes-en-cours.mjs`) : il inscrit le début d'un geste qui modifie l'état distant (PreToolUse), sa fin (PostToolUse),
@@ -102,77 +110,216 @@ const H = 3_600_000;
 // ---------------------------------------------------------------------------------------------
 
 /**
- * Le mot de fin d'un document en ligne ouvert par cette ligne, hors guillemets et hors commentaire ; null
- * sinon. `etat.q` porte le guillemet resté ouvert d'une ligne à l'autre (D-98 (a) du 29/10/2026).
+ * Le dialecte de l'outil du harnais (D-194 (b)) : `bash` (Git Bash), `ps` (PowerShell) ; `cmd` pour `cmd /c`. Sans dialecte
+ * (null), la lecture d'avant : guillemets simples et doubles, sans échappement ni commentaire.
  */
-function motDeDocument(ligne, etat) {
+export const dialecteDe = (outil) => ({ Bash: "bash", PowerShell: "ps" })[outil] ?? null;
+const ECHAPPEMENT = { bash: "\\", ps: "`", cmd: "^" };
+/** Un `#` ouvre un commentaire en début de mot : `# l'essai` ne laisse plus un guillemet ouvert sur la suite (D-194 (b)). */
+const debutDeMot = (t, k) => k === 0 || /[\s;&|(){}]/.test(t[k - 1]);
+
+/**
+ * Le document en ligne qu'ouvre cette ligne, hors guillemets et hors commentaire : { fin, developpe } pour `<<MOT`,
+ * { chaine } pour un here-string PowerShell (`@'` ou `@"` en fin de ligne) ; null sinon. `etat.q` porte le guillemet resté
+ * ouvert d'une ligne à l'autre (D-98 (a) du 29/10/2026), `etat.bloc` un commentaire `<# … #>` de PowerShell.
+ * D-194 (b) : le `'` de `@'` n'ouvre plus de guillemet. Il l'ouvrait toujours, et la branche du here-string ne s'exécutait
+ * jamais : une apostrophe du corps (« it's fine ») fermait ce faux guillemet et masquait les lignes suivantes, ou faisait
+ * lire le corps comme des commandes.
+ */
+function motDeDocument(ligne, etat, dialecte = null) {
+  const esc = ECHAPPEMENT[dialecte];
   for (let k = 0; k < ligne.length; k++) {
     const c = ligne[k];
-    if (etat.q) { if (c === etat.q && ligne[k - 1] !== "\\") etat.q = null; continue; }
-    if (c === '"' || c === "'") { etat.q = c; continue; }
-    if (c === "#" && (k === 0 || /\s/.test(ligne[k - 1]))) return null;
+    if (etat.bloc) { if (c === "#" && ligne[k + 1] === ">") { etat.bloc = false; k++; } continue; }
+    if (etat.q) {
+      if (dialecte && dialecte !== "cmd" && etat.q !== "'" && c === (etat.q === "$'" ? "\\" : esc)) { k++; continue; }
+      if (c === (etat.q === "$'" ? "'" : etat.q) && (dialecte || ligne[k - 1] !== "\\")) etat.q = null;
+      continue;
+    }
+    if (dialecte && dialecte !== "cmd" && c === esc) { k++; continue; }
+    if (dialecte === "ps" && c === "<" && ligne[k + 1] === "#") { etat.bloc = true; k++; continue; }
+    if (c === "#" && dialecte !== "cmd" && (dialecte ? debutDeMot(ligne, k) : (k === 0 || /\s/.test(ligne[k - 1])))) return null;
+    if (dialecte !== "bash" && dialecte !== "cmd" && c === "@" && (ligne[k + 1] === "'" || ligne[k + 1] === '"') && !ligne.slice(k + 2).trim()) return { chaine: ligne[k + 1] };
+    if (dialecte === "bash" && c === "$" && ligne[k + 1] === "'") { etat.q = "$'"; k++; continue; }
+    if (c === '"' || (c === "'" && dialecte !== "cmd")) { etat.q = c; continue; }
     if (c === "<" && ligne[k + 1] === "<" && ligne[k + 2] !== "<") {
       const h = /^<<-?\s*(['"]?)([A-Za-z_]\w*)\1/.exec(ligne.slice(k));
-      if (h) return h[2];
+      if (h) return { fin: h[2], developpe: !h[1] };
     }
   }
   return null;
 }
 
-/**
- * Ôte le corps des documents en ligne (`<<EOF … EOF`, `@' … '@`) : du texte écrit, pas des commandes.
- * D-98 (a) : `echo "use <<EOF"` ou un `<<EOF` de commentaire n'ouvrent aucun document, et un document sans
- * sa ligne de fin ne masque rien. Sinon la commande destructive de la ligne suivante n'était jamais jugée.
- */
-export function sansCorpsDeDocuments(texte) {
-  const lignes = String(texte || "").split(/\r?\n/);
-  const sortie = [];
-  const etat = { q: null };
-  let fin = null;
-  for (let i = 0; i < lignes.length; i++) {
-    const ligne = lignes[i];
-    if (fin !== null) { if (fin.test(ligne)) fin = null; continue; }
-    sortie.push(ligne);
-    const mot = motDeDocument(ligne, etat);
-    if (mot) {
-      const f = new RegExp(`^\\s*${mot}\\s*$`);
-      if (lignes.slice(i + 1).some((l) => f.test(l))) fin = f;
-      continue;
-    }
-    if (!etat.q && /@['"]\s*$/.test(ligne)) {
-      const f = new RegExp(`^${ligne.trim().slice(-2, -1) === "'" ? "'" : '"'}@`);
-      if (lignes.slice(i + 1).some((l) => f.test(l))) fin = f;
-    }
+/** Le contenu de la parenthèse (ou de l'accolade) ouverte en `t[i]`, jusqu'à sa fermante, guillemets sautés : { contenu, fin } ou null. */
+function parenthese(t, i) {
+  const ouvre = t[i], ferme = ouvre === "{" ? "}" : ")";
+  let prof = 0, q = null;
+  for (let k = i; k < t.length; k++) {
+    const c = t[k];
+    if (q) { if (c === q) q = null; continue; }
+    if (c === "'" || c === '"') { q = c; continue; }
+    if (c === ouvre) prof++;
+    else if (c === ferme && --prof === 0) return { contenu: t.slice(i + 1, k), fin: k };
   }
-  return sortie.join("\n");
+  return null;
 }
 
-/** Les segments d'une commande composée : opérateurs hors guillemets (`&&`, `||`, `;`, `|`, `&`, saut de ligne, parenthèses). */
-export function segmenter(commande) {
-  const t = sansCorpsDeDocuments(commande);
+/**
+ * Ce qu'exécute un `$( … )` : son contenu, sauf un développement arithmétique `$(( … ))`, dont seules les substitutions
+ * imbriquées s'exécutent (`$(( $(date +%s) - t0 ))`).
+ */
+const executeDe = (contenu, dialecte) => (contenu.startsWith("(") && contenu.endsWith(")") ? substitutionsDe(contenu.slice(1, -1), dialecte) : [contenu]);
+
+/** Les `$( … )` d'un texte que le shell développe (corps d'un `<<EOF` non cité, d'un `@" … "@`), et les accents graves en bash. */
+function substitutionsDe(texte, dialecte) {
   const sortie = [];
-  let cur = "", q = null;
-  const pousser = () => { if (cur.trim()) sortie.push(cur); cur = ""; };
-  for (let i = 0; i < t.length; i++) {
-    const c = t[i], n = t[i + 1];
-    if (q) { cur += c; if (c === q) q = null; continue; }
-    if (c === '"' || c === "'") { q = c; cur += c; continue; }
-    if ((c === "`" || c === "\\") && (n === "\n" || (n === "\r" && t[i + 2] === "\n"))) { i += n === "\r" ? 2 : 1; cur += " "; continue; }
-    if (c === "\n" || c === "\r" || c === ";" || c === "|" || c === "(" || c === ")") { pousser(); continue; }
-    if (c === "&") { if (t[i - 1] === ">" || n === ">") { cur += c; continue; } pousser(); continue; }
-    cur += c;
+  for (let k = 0; k < texte.length; k++) {
+    if (texte[k] === "$" && texte[k + 1] === "(") { const p = parenthese(texte, k + 1); if (p) { sortie.push(...executeDe(p.contenu, dialecte)); k = p.fin; } }
+    else if (dialecte !== "ps" && texte[k] === "`") { const j = texte.indexOf("`", k + 1); if (j > k) { sortie.push(texte.slice(k + 1, j)); k = j; } }
   }
-  pousser();
   return sortie;
 }
 
-/** Les mots d'un segment, guillemets simples et doubles ôtés. */
-export function mots(segment) {
+/**
+ * Les documents en ligne d'un texte (`<<EOF … EOF`, `@' … '@`), corps ôtés : du texte écrit, pas des commandes.
+ * D-98 (a) : `echo "use <<EOF"` ou un `<<EOF` de commentaire n'ouvrent aucun document, et un document sans sa ligne de fin
+ * ne masque rien. D-194 (b) : la ligne qui ouvre un here-string garde `''` à la place de `@'`, ce qui suit `'@` sur la ligne
+ * de fin reste lu, les `$( … )` d'un corps que le shell développe sont rendus à juger, et un document sans ligne de fin est
+ * compté (`nonFermes`). Rend { texte, nonFermes, substitutions }.
+ */
+function lireDocuments(texte, dialecte = null) {
+  const lignes = String(texte || "").split(/\r?\n/);
+  const sortie = [], substitutions = [];
+  const etat = { q: null, bloc: false };
+  let fin = null, reste = false, developpe = false, nonFermes = 0;
+  for (let i = 0; i < lignes.length; i++) {
+    const ligne = lignes[i];
+    if (fin !== null) {
+      const m = fin.exec(ligne);
+      if (!m) { if (developpe && dialecte) substitutions.push(...substitutionsDe(ligne, dialecte)); continue; }
+      fin = null;
+      const suite = reste ? ligne.slice(m[0].length) : "";
+      if (suite.trim()) { sortie.push(suite); motDeDocument(suite, etat, dialecte); }
+      continue;
+    }
+    const doc = motDeDocument(ligne, etat, dialecte);
+    if (doc?.fin) {
+      sortie.push(ligne);
+      const f = new RegExp(`^\\s*${doc.fin}\\s*$`);
+      if (lignes.slice(i + 1).some((l) => f.test(l))) { fin = f; reste = false; developpe = doc.developpe; } else nonFermes++;
+      continue;
+    }
+    if (doc?.chaine) {
+      const f = new RegExp(`^${doc.chaine}@`);
+      if (lignes.slice(i + 1).some((l) => f.test(l))) { sortie.push(ligne.replace(/@['"]\s*$/, "''")); fin = f; reste = true; developpe = doc.chaine === '"'; }
+      else { nonFermes++; sortie.push(ligne); }
+      continue;
+    }
+    sortie.push(ligne);
+  }
+  return { texte: sortie.join("\n"), nonFermes, substitutions };
+}
+
+/** Le texte d'une commande sans le corps de ses documents en ligne (voir `lireDocuments`). */
+export function sansCorpsDeDocuments(texte, dialecte = null) {
+  return lireDocuments(texte, dialecte).texte;
+}
+
+/**
+ * La lecture d'une commande composée dans le dialecte de son outil (D-194 (b)) : { segments, separateurs, ouvert, nonFermes,
+ * substitutions }. `separateurs[i]` est l'opérateur qui précède le segment i (`|` pour un tube) ; `ouvert` le guillemet resté
+ * ouvert à la fin du texte (la suite n'a pas pu être coupée en segments) ; `substitutions` le texte des `$( … )` lus entre
+ * guillemets doubles et dans les corps développés : bash et PowerShell les exécutent.
+ */
+export function lireCommande(commande, dialecte = null) {
+  const docs = lireDocuments(commande, dialecte);
+  const t = docs.texte;
+  const esc = ECHAPPEMENT[dialecte];
+  const segments = [], separateurs = [], substitutions = [...docs.substitutions];
+  let cur = "", q = null, commentaire = false, bloc = false, sep = null;
+  const pousser = (s) => { if (cur.trim()) { segments.push(cur); separateurs.push(sep); } cur = ""; sep = s; };
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i], n = t[i + 1];
+    if (bloc) { if (c === "#" && n === ">") { bloc = false; i++; } continue; }
+    if (commentaire) { if (c === "\n") { commentaire = false; pousser("\n"); } continue; }
+    if (q) {
+      if (q === "'") { cur += c; if (c === "'") q = null; continue; }
+      if (q === "$'") { cur += c; if (c === "\\") { cur += n ?? ""; i++; } else if (c === "'") q = null; continue; }
+      if (dialecte && dialecte !== "cmd" && c === esc) { cur += c + (n ?? ""); i++; continue; }
+      if (dialecte && dialecte !== "cmd" && c === "$" && n === "(") {
+        const p = parenthese(t, i + 1);
+        if (p) { substitutions.push(...executeDe(p.contenu, dialecte)); cur += t.slice(i, p.fin + 1); i = p.fin; continue; }
+      }
+      if (dialecte === "bash" && c === "`") {
+        const j = t.indexOf("`", i + 1);
+        if (j > i) { substitutions.push(t.slice(i + 1, j)); cur += t.slice(i, j + 1); i = j; continue; }
+      }
+      cur += c;
+      if (c === '"') q = null;
+      continue;
+    }
+    if ((c === "`" || c === "\\") && (n === "\n" || (n === "\r" && t[i + 2] === "\n")) && (!dialecte || c === esc)) { i += n === "\r" ? 2 : 1; cur += " "; continue; }
+    if (dialecte && c === esc) { cur += c + (n ?? ""); i++; continue; }
+    // Un `$( … )` reste dans son segment, et son contenu est jugé à part ; un tableau bash `NOM=( … )` est une affectation.
+    if (dialecte && dialecte !== "cmd" && c === "$" && n === "(") {
+      const p = parenthese(t, i + 1);
+      if (p) { substitutions.push(...executeDe(p.contenu, dialecte)); cur += t.slice(i, p.fin + 1); i = p.fin; continue; }
+    }
+    if (dialecte === "bash" && c === "(" && /[A-Za-z0-9_]\+?=$/.test(cur)) {
+      const p = parenthese(t, i);
+      if (p) { cur += t.slice(i, p.fin + 1); i = p.fin; continue; }
+    }
+    if (dialecte === "ps" && c === "@" && n === "{") { // une table `@{ a = 1; b = 2 }` : ses `;` ne coupent rien
+      const p = parenthese(t, i + 1);
+      if (p) { substitutions.push(...substitutionsDe(p.contenu, dialecte)); cur += t.slice(i, p.fin + 1); i = p.fin; continue; }
+    }
+    if (dialecte === "ps" && c === "<" && n === "#") { bloc = true; i++; continue; }
+    if (dialecte && dialecte !== "cmd" && c === "#" && debutDeMot(t, i)) { commentaire = true; continue; }
+    if (dialecte === "bash" && c === "$" && n === "'") { q = "$'"; cur += "$'"; i++; continue; }
+    if (c === '"' || (c === "'" && dialecte !== "cmd")) { q = c; cur += c; continue; }
+    if (c === "\n" || c === "\r" || c === ";" || c === "(" || c === ")") { pousser(c === "\r" ? "\n" : c); continue; }
+    if (c === "|") { const double = n === "|"; pousser(double ? "||" : "|"); if (double) i++; continue; }
+    if (c === "&") {
+      if (t[i - 1] === ">" || n === ">") { cur += c; continue; }
+      if (n === "&") { pousser("&&"); i++; continue; }
+      pousser("&");
+      if (dialecte === "ps") cur = "& "; // l'opérateur d'appel de PowerShell reste en tête de ce qu'il appelle
+      continue;
+    }
+    cur += c;
+  }
+  pousser(null);
+  return { segments, separateurs, ouvert: q, nonFermes: docs.nonFermes, substitutions };
+}
+
+/** Les segments d'une commande composée : opérateurs hors guillemets (`&&`, `||`, `;`, `|`, `&`, saut de ligne, parenthèses). */
+export function segmenter(commande, dialecte = null) {
+  return lireCommande(commande, dialecte).segments;
+}
+
+/** Les mots d'un segment, guillemets ôtés ; dans un dialecte, les caractères échappés restent littéraux (D-194 (b)). */
+export function mots(segment, dialecte = null) {
   const out = [];
+  const s = String(segment || "");
+  const esc = ECHAPPEMENT[dialecte];
   let cur = "", actif = false, q = null;
-  for (const c of String(segment || "")) {
-    if (q) { if (c === q) q = null; else cur += c; continue; }
-    if (c === '"' || c === "'") { q = c; actif = true; continue; }
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (q) {
+      if (q === "'") { if (c !== "'") cur += c; else if (dialecte === "ps" && s[i + 1] === "'") { cur += "'"; i++; } else q = null; continue; }
+      if (q === "$'") { if (c === "\\" && i + 1 < s.length) cur += s[++i]; else if (c === "'") q = null; else cur += c; continue; }
+      if (dialecte === "ps" && c === esc && i + 1 < s.length) { cur += s[++i]; continue; }
+      if (dialecte === "bash" && c === "\\" && /["\\$`\n]/.test(s[i + 1] ?? "")) { cur += s[++i]; continue; }
+      if (c !== '"') cur += c; else if (dialecte === "ps" && s[i + 1] === '"') { cur += '"'; i++; } else q = null;
+      continue;
+    }
+    if (dialecte && c === esc && i + 1 < s.length) { cur += s[++i]; actif = true; continue; }
+    if (dialecte && dialecte !== "cmd" && ((c === "$" && s[i + 1] === "(") || (dialecte === "ps" && c === "@" && s[i + 1] === "{") || (dialecte === "bash" && c === "(" && /[A-Za-z0-9_]\+?=$/.test(cur)))) {
+      const p = parenthese(s, c === "(" ? i : i + 1);
+      if (p) { cur += s.slice(i, p.fin + 1); i = p.fin; actif = true; continue; }
+    }
+    if (dialecte === "bash" && c === "$" && s[i + 1] === "'") { q = "$'"; actif = true; i++; continue; }
+    if (c === '"' || (c === "'" && dialecte !== "cmd")) { q = c; actif = true; continue; }
     if (/\s/.test(c)) { if (actif) { out.push(cur); cur = ""; actif = false; } continue; }
     cur += c; actif = true;
   }
@@ -180,10 +327,17 @@ export function mots(segment) {
   return out;
 }
 
-const nomOutil = (w) => String(w).split(/[\\/]/).pop().toLowerCase().replace(/\.(exe|cmd|bat|ps1|com)$/, "");
+/** Le nom d'un outil : chemin et extension ôtés ; D-194 (b) : un numéro de version aussi (`terraform-1.9.8.exe` est terraform). */
+const nomOutil = (w) => String(w).split(/[\\/]/).pop().toLowerCase().replace(/\.(exe|cmd|bat|ps1|com)$/, "").replace(/[-_]v?\d+(?:\.\d+)+$/, "");
 const OUTILS_JUGES = new Set(["az", "terraform", "tofu", "gh", "git", "wrangler", "curl", "wget", "invoke-restmethod", "irm", "invoke-webrequest", "iwr", "invoke-azrestmethod"]);
-const SHELLS = new Set(["bash", "sh", "zsh", "dash", "pwsh", "powershell", "cmd"]);
-const ENVELOPPES = new Set(["sudo", "env", "time", "nohup", "xargs", "command", "exec", "call", "start", "timeout", "stdbuf", "nice", "then", "do", "else", "{", "}", "&", ".", "!"]);
+/** Le dialecte du texte qu'un shell exécute (`bash -c`, `pwsh -Command`, `cmd /c`). */
+const DIALECTE_SHELL = { bash: "bash", sh: "bash", zsh: "bash", dash: "bash", pwsh: "ps", powershell: "ps", cmd: "cmd" };
+/** D-194 (b) : les cmdlets qui exécutent un bloc `{ … }` (`ForEach-Object`, `Invoke-Command`) sont des enveloppes : le bloc est lu. */
+const ENVELOPPES = new Set(["sudo", "env", "time", "nohup", "xargs", "command", "exec", "call", "start", "timeout", "stdbuf", "nice", "then", "do", "else", "{", "}", "&", ".", "!",
+  "foreach-object", "%", "start-job", "start-threadjob", "invoke-command", "icm"]);
+/** D-194 (b) : `eval`, `iex` et `Invoke-Expression` exécutent un texte ; il est lu comme une commande. */
+const EVALUATEURS = new Set(["eval", "iex", "invoke-expression"]);
+const START_PROCESS = new Set(["start-process", "saps"]);
 /** D-98 (a) : `if az group delete …`, `while …`. Le mot de contrôle se saute seul, sans ouvrir une enveloppe. */
 const MOTS_DE_CONTROLE = new Set(["if", "elif", "while", "until"]);
 const CMDLETS_LOCAUX = new Set(["remove-azcontext", "remove-azenvironment", "remove-azdefault"]);
@@ -193,29 +347,200 @@ const estCmdlet = (n) => (/^remove-(az|mg)[a-z0-9]+$/.test(n) && !CMDLETS_LOCAUX
   || /^(new|set)-azroleassignment$/.test(n)
   || /^new-mg(serviceprincipalapproleassignment|userapproleassignment|oauth2permissiongrant|groupmember|groupowner|directoryrolemember\w*)$/.test(n);
 
+/** Le texte d'un jeton base64 (`-EncodedCommand`, UTF-16LE par défaut), s'il se lit : 90 % de caractères imprimables au moins. */
+function decoderBase64(b, codage = "utf16le") {
+  try {
+    const t = Buffer.from(String(b).replace(/\s+/g, ""), "base64").toString(codage);
+    const imprimables = (t.match(/[\x09\x0a\x0d\x20-\x7e]/g) || []).length;
+    return t.trim() && imprimables / t.length >= 0.9 ? t : null;
+  } catch { return null; }
+}
+
+/** PowerShell admet tout préfixe d'un nom de paramètre : `-c` et `-Com` valent `-Command` (D-194 (b)). */
+const prefixeDe = (nom, plein, min = 1) => nom.length >= min && plein.startsWith(nom);
+const PS_VALEURS = ["executionpolicy", "windowstyle", "version", "outputformat", "inputformat", "psconsolefile", "configurationname", "workingdirectory", "settingsfile", "custompipename"];
+
+/** Le texte qu'exécute un shell : `bash -c "…"`, `pwsh -Command …` (abrégé), `-EncodedCommand <base64>` décodé, `cmd /c …`. */
+function interneDeShell(n, args) {
+  const d = DIALECTE_SHELL[n];
+  if (d === "cmd") {
+    const k = args.findIndex((x) => /^\/[ck]$/i.test(x));
+    return k < 0 ? null : { interne: args.slice(k + 1).join(" "), dialecte: "cmd" };
+  }
+  if (d === "bash") {
+    const k = args.findIndex((x) => /^-[A-Za-z]*c$/.test(x));
+    return k < 0 ? null : { interne: args.slice(k + 1).join(" "), dialecte: "bash" };
+  }
+  for (let k = 0; k < args.length; k++) {
+    const p = /^[-/]([A-Za-z]+)(?::(.*))?$/.exec(args[k]);
+    if (!p) return { interne: args.slice(k).join(" "), dialecte: "ps" }; // powershell.exe exécute les mots qui suivent ses options
+    const nom = p[1].toLowerCase(), colle = p[2];
+    if (prefixeDe(nom, "command")) return { interne: colle !== undefined ? [colle, ...args.slice(k + 1)].join(" ") : args.slice(k + 1).join(" "), dialecte: "ps" };
+    if (nom === "e" || nom === "ec" || prefixeDe(nom, "encodedcommand", 2)) {
+      const brut = colle ?? args[k + 1] ?? "";
+      const texte = decoderBase64(brut);
+      return texte ? { interne: texte, dialecte: "ps" } : { interne: "", dialecte: "ps", illisible: "commande encodée illisible (-EncodedCommand)" };
+    }
+    if (prefixeDe(nom, "file")) return null; // un script : son texte n'est pas dans la commande
+    if (colle === undefined && (nom === "ep" || PS_VALEURS.some((v) => prefixeDe(nom, v, 2)))) k++;
+  }
+  return null;
+}
+
+/** D-194 (b) : le texte qu'exécutent `eval` et `iex`. Une variable, une expression ou un texte reçu par le tube ne se lisent pas. */
+function interneEvalue(args, dialecte, ctx = null) {
+  const a = dialecte === "bash" ? args : args.filter((w) => !/^-c(o(m(m(a(n(d)?)?)?)?)?)?$/i.test(w));
+  let texte = a.join(" ");
+  if (/^\s*\$/.test(texte)) { const r = resoudreValeur(texte, ctx, dialecte); if (r !== null && r.trim()) texte = r; } // `C="az …"; eval "$C"`
+  if (!texte.trim() || /^\s*[$([]/.test(texte) || (dialecte === "bash" && texte.includes("`"))) return { interne: "", dialecte, illisible: "texte évalué non littéral (eval, iex, Invoke-Expression)" };
+  return { interne: texte, dialecte };
+}
+
+const SP_VALEURS = ["workingdirectory", "verb", "windowstyle", "redirectstandardinput", "redirectstandardoutput", "redirectstandarderror", "credential"];
+const estOptionStartProcess = (w) => { const p = /^-([A-Za-z]+)(?::.*)?$/.exec(w); const nom = p?.[1]?.toLowerCase() ?? ""; return nom === "args" || prefixeDe(nom, "argumentlist", 2) || prefixeDe(nom, "filepath", 2); };
+
+/** D-194 (b) : `Start-Process az -ArgumentList "group delete -n x"` lance `az group delete -n x` ; ce texte est lu comme une commande. */
+function interneDeStartProcess(args, ctx = null) {
+  let fichier = null;
+  const liste = [], positionnels = [];
+  for (let k = 0; k < args.length; k++) {
+    const p = /^-([A-Za-z]+)(?::(.*))?$/.exec(args[k]);
+    if (!p) { positionnels.push(args[k]); continue; }
+    const nom = p[1].toLowerCase(), colle = p[2];
+    if (prefixeDe(nom, "filepath") || nom === "path" || nom === "pspath") { fichier = colle ?? args[++k] ?? null; continue; }
+    if (nom === "args" || prefixeDe(nom, "argumentlist")) {
+      if (colle !== undefined) liste.push(colle);
+      else while (args[k + 1] !== undefined && !/^-[A-Za-z]/.test(args[k + 1])) liste.push(args[++k]);
+      continue;
+    }
+    if (colle === undefined && SP_VALEURS.some((v) => prefixeDe(nom, v, 2))) k++;
+  }
+  if (!fichier) fichier = positionnels.shift() ?? null;
+  if (!liste.length) liste.push(...positionnels);
+  if (!fichier) return null;
+  if (fichier.startsWith("$")) fichier = resoudreValeur(fichier, ctx, "ps") ?? fichier; // `$exe = "…"; Start-Process $exe`
+  if (/^[$(]/.test(fichier)) return { interne: "", dialecte: "ps", illisible: "commande dans une variable (Start-Process)" };
+  return { interne: [fichier, ...liste.map((x) => x.replace(/^@\(|\)$/g, "").replace(/,/g, " "))].join(" "), dialecte: "ps" };
+}
+
 /**
- * Trouve l'outil joué dans un segment, derrière les enveloppes (`sudo`, `env`, `xargs`…), les affectations
- * (`VAR=x`, `$r =`) et les shells (`bash -c "…"`, `pwsh -Command …`, `cmd /c …`).
- * Rend { outil, args } | { interne } (texte à rejuger) | null.
+ * Trouve l'outil joué dans un segment, derrière les enveloppes (`sudo`, `env`, `xargs`, `ForEach-Object`…), les affectations
+ * (`VAR=x`, `$r =`), les shells (`bash -c "…"`, `pwsh -Command …`, `cmd /c …`) et, depuis D-194 (b), `eval`, `iex` et
+ * `Start-Process`. Rend { outil, args, mot } | { interne, dialecte, illisible? } (texte à rejuger) | null.
  */
-export function localiser(m) {
+export function localiser(m, dialecte = null, ctx = null) {
   let enveloppe = false;
   for (let i = 0; i < m.length; i++) {
     const w = m[i];
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(w)) continue;
     if (/^\$[\w:.]+$/.test(w) && m[i + 1] === "=") { i++; continue; }
     const n = nomOutil(w);
-    if (OUTILS_JUGES.has(n) || estCmdlet(n) || CMDLET_AZ_ECRITURE.test(n)) return { outil: n, args: m.slice(i + 1) };
-    if (SHELLS.has(n)) {
-      const k = m.findIndex((x, j) => j > i && /^(-[A-Za-z]*c|-command|\/c|\/k)$/i.test(x));
-      return k < 0 ? null : { interne: m.slice(k + 1).join(" ") };
-    }
+    if (OUTILS_JUGES.has(n) || estCmdlet(n) || CMDLET_AZ_ECRITURE.test(n)) return { outil: n, args: m.slice(i + 1), mot: w };
+    if (DIALECTE_SHELL[n]) return interneDeShell(n, m.slice(i + 1));
+    if (EVALUATEURS.has(n)) return interneEvalue(m.slice(i + 1), dialecte, ctx);
+    if (START_PROCESS.has(n) || (n === "start" && m.slice(i + 1).some(estOptionStartProcess))) return interneDeStartProcess(m.slice(i + 1), ctx);
     if (MOTS_DE_CONTROLE.has(n)) continue;
-    if (ENVELOPPES.has(n)) { enveloppe = true; continue; }
+    // D-194 (b) : une fonction que la commande définit (`m(){ … "$@" … }; m gh api …`) joue ses arguments : c'est une enveloppe.
+    if (ENVELOPPES.has(n) || ctx?.fonctions?.has(n)) { enveloppe = true; continue; }
     if (enveloppe) continue;
     return null;
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------------------------
+// 1 bis. Les variables et les fonctions que la commande définit elle-même (D-194 (b))
+// ---------------------------------------------------------------------------------------------
+
+/** Les mots qui précèdent la commande jouée sans la changer. */
+const PREFIXES = new Set(["sudo", "env", "time", "nohup", "command", "exec", "timeout", "stdbuf", "nice", "then", "do", "else", "!"]);
+
+/**
+ * Les variables qu'une commande affecte (`SP="C:\…"`, `export X=y`, `$exe = "…"`) et les fonctions qu'elle définit (`m(){ … }`,
+ * `function m { … }`) : { variables, fonctions }, ajoutées à celles du `parent` (le texte qui contient celui-ci). Noms en
+ * minuscules sous PowerShell, et pour les fonctions.
+ */
+export function contexteDe(commande, dialecte = null, parent = null) {
+  const variables = new Map(parent?.variables ?? []), fonctions = new Set(parent?.fonctions ?? []);
+  if (!dialecte || dialecte === "cmd") return { variables, fonctions };
+  const lu = lireCommande(commande, dialecte);
+  for (const s of lu.segments) {
+    const m = mots(s, dialecte);
+    if (dialecte === "ps") {
+      // Une valeur littérale : entre guillemets, une table `@{ … }`, un nombre. `$c = Get-Content f` affecte la SORTIE d'une commande : inconnue.
+      const p = /^\s*(?:&\s*)?\$(?:env:)?\{?([A-Za-z_]\w*)\}?\s*=(?!=)\s*([^]*)$/.exec(s);
+      if (p) variables.set(p[1].toLowerCase(), /^(["']|@["'{]|\d)/.test(p[2].trim()) ? mots(p[2].trim(), "ps").join(" ") : null);
+      continue;
+    }
+    for (let k = 0; k < m.length; k++) {
+      if (["export", "local", "declare", "readonly", "typeset"].includes(m[k]) || (k > 0 && /^-[A-Za-z]+$/.test(m[k]))) continue;
+      const p = /^([A-Za-z_][A-Za-z0-9_]*)\+?=([^]*)$/.exec(m[k]);
+      if (!p) break;
+      variables.set(p[1], p[2]);
+    }
+  }
+  const texte = lireDocuments(commande, dialecte).texte;
+  const formes = dialecte === "ps" ? [/\bfunction\s+([A-Za-z_][\w-]*)/gi]
+    : [/(?:^|[\s;&|(){}])(?:function\s+)?([A-Za-z_][\w.:-]*)\s*\(\s*\)\s*\{/g, /(?:^|[\s;&|{}])function\s+([A-Za-z_][\w.:-]*)\s*\{/g];
+  for (const re of formes) for (const f of texte.matchAll(re)) fonctions.add(f[1].toLowerCase());
+  return { variables, fonctions };
+}
+
+/** La valeur lisible d'un texte de variable : variables imbriquées résolues, `$(where X)`, `$(which X)`, `$(find … -name X)` valent X ; null sinon. */
+function resoudreValeur(valeur, ctx, dialecte, profondeur = 0) {
+  if (valeur === undefined || valeur === null || profondeur > 3) return null;
+  let v = String(valeur).trim();
+  const cherche = /^\$\(\s*(?:where(?:\.exe)?|which|command\s+-v|type\s+-[pP]|Get-Command)\s+["']?([^\s"'|)]+)/i.exec(v)
+    || /^\$\(\s*find\b[^)]*?-i?name\s+["']?([^\s"'|)]+)/.exec(v)
+    || /^\(\s*Get-Command\s+["']?([^\s"')]+)["']?\s*\)\.(?:Source|Path|Definition)$/i.exec(v);
+  if (cherche) return cherche[1];
+  if (/\$\(/.test(v) || (dialecte === "bash" && v.includes("`"))) return null;
+  let inconnu = false;
+  v = v.replace(/\$(?:env:)?(?:\{([^}]+)\}|([A-Za-z_]\w*))/g, (_, a, b) => {
+    const nom = a ?? b;
+    const r = resoudreValeur(ctx?.variables?.get(dialecte === "ps" ? nom.toLowerCase() : nom), ctx, dialecte, profondeur + 1);
+    if (r === null) inconnu = true;
+    return r ?? "";
+  });
+  return inconnu ? null : v;
+}
+
+/** Le texte d'une valeur de la commande, variables résolues (`hook-identite-sortante.mjs` y lit l'adresse d'une requête) ; null s'il ne se lit pas. */
+export const resoudreTexte = (texte, ctx, dialecte) => resoudreValeur(texte, ctx, dialecte);
+
+/** Les mots que vaut un mot de variable (`$SP/x.exe`, `"$TF"`, `$(which az)`) ; [] pour `"$@"` dans une commande qui définit une fonction ; null s'il ne se lit pas. */
+function resoudreMot(w, ctx, dialecte) {
+  if (w.startsWith("$(")) { const r = resoudreValeur(w, ctx, dialecte); return r === null ? null : mots(r, dialecte); }
+  const p = /^\$(?:env:)?(?:\{([^}]+)\}|([A-Za-z_]\w*|[@*#?$!0-9]))([^]*)$/.exec(w);
+  if (!p) return null;
+  const nom = p[1] ?? p[2], suffixe = p[3];
+  if (/^[@*]$/.test(nom)) return ctx?.fonctions?.size ? [] : null; // les arguments d'une fonction : jugés là où elle est appelée
+  const valeur = resoudreValeur(ctx?.variables?.get(dialecte === "ps" ? nom.toLowerCase() : nom), ctx, dialecte);
+  if (valeur === null) return null;
+  return suffixe ? [valeur + suffixe] : mots(valeur, dialecte);
+}
+
+/**
+ * Le segment, mot de tête résolu quand la commande jouée est une variable que la commande affecte elle-même (`SP=…; "$SP/x.exe"`,
+ * `$exe = "…"; & $exe`) : { m, inconnu }. `inconnu` : la commande jouée est une variable que rien ne résout. Sous PowerShell,
+ * `$x` seul est une expression ; `& $x` et `. $x` sont des appels.
+ */
+function teteResolue(m, dialecte, ctx) {
+  let appel = false;
+  for (let k = 0; k < m.length; k++) {
+    const w = m[k];
+    if (/^[A-Za-z_][A-Za-z0-9_]*\+?=/.test(w)) continue;
+    if (/^\$[\w:.]+$/.test(w) && m[k + 1] === "=") { k++; continue; }
+    if (w === "&" || w === ".") { appel = true; continue; }
+    const n = nomOutil(w);
+    if (MOTS_DE_CONTROLE.has(n) || PREFIXES.has(n)) continue;
+    if (dialecte === "ps" && appel && w.startsWith("(")) return { m, inconnu: true };
+    if (!w.startsWith("$") || (dialecte === "ps" && !appel)) return { m, inconnu: false };
+    const r = resoudreMot(w, ctx, dialecte);
+    if (r === null) return { m, inconnu: true };
+    return { m: [...m.slice(0, k), ...r, ...m.slice(k + 1)], inconnu: false };
+  }
+  return { m, inconnu: dialecte === "ps" && appel && m.length === 1 }; // `& (Get-Command az) …` : l'appel vise une expression
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -228,6 +553,26 @@ function positionnels(args) {
   while (i < args.length && args[i].startsWith("-")) i++;
   const p = [];
   for (; i < args.length && !args[i].startsWith("-"); i++) p.push(args[i].toLowerCase());
+  return p;
+}
+
+/**
+ * Les mots de la commande `az`, au-delà des options globales placées entre eux (D-194 (b)) : `az group --subscription S delete`
+ * rendait `group` seul, et la suppression passait. Une autre option arrête la lecture, comme avant.
+ */
+const AZ_GLOBALES_A_VALEUR = new Set(["--subscription", "--output", "-o", "--query", "--org", "--organization", "--project", "-p"]);
+const AZ_DRAPEAUX = new Set(["--debug", "--verbose", "--only-show-errors", "--help", "-h", "--yes", "-y", "--no-wait"]);
+function positionnelsAz(args) {
+  const p = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (!a.startsWith("-")) { p.push(a.toLowerCase()); continue; }
+    const cle = a.split("=")[0].toLowerCase();
+    if (AZ_DRAPEAUX.has(cle)) continue;
+    if (AZ_GLOBALES_A_VALEUR.has(cle)) { if (!a.includes("=")) i++; continue; }
+    if (!p.length) continue;
+    break;
+  }
   return p;
 }
 
@@ -248,14 +593,20 @@ const HTTP = {
   "gh api": { cles: ["-X", "--method"], implicite: /^(-f|-F|--field|--raw-field|--input)$/, ps: false },
   "az rest": { cles: ["--method", "-m"], implicite: null, ps: false },
   "az devops invoke": { cles: ["--http-method"], implicite: null, ps: false },
-  ps: { cles: ["-method"], implicite: /^-(body|infile)$/i, ps: true },
+  ps: { cles: ["-method", "-custommethod"], implicite: /^-(b|bo|bod|body|infi|infil|infile)$/i, ps: true },
 };
 const HTTP_PS = new Set(["invoke-restmethod", "irm", "invoke-webrequest", "iwr", "invoke-azrestmethod"]);
 
-/** Valeur d'une option : `-X DELETE`, `-XDELETE`, `--request=DELETE`, `-Method:Delete`. */
+/** Valeur d'une option : `-X DELETE`, `-XDELETE`, `--request=DELETE`, `-Method:Delete`, et sous PowerShell tout préfixe (`-Me Delete`). */
 function valeurOption(args, cles, ps) {
   for (let k = 0; k < args.length; k++) {
-    const a = ps ? args[k].toLowerCase() : args[k];
+    if (ps) {
+      // D-194 (b) : `irm -Me Delete` et `-Meth Delete` valent `-Method Delete` ; seul `-method` entier était lu.
+      const p = /^-([A-Za-z]+)(?::(.*))?$/.exec(args[k]);
+      if (p && cles.some((cle) => { const plein = cle.replace(/^-+/, ""); return prefixeDe(p[1].toLowerCase(), plein, plein === "method" ? 1 : 2); })) return p[2] !== undefined ? p[2] : (args[k + 1] ?? null);
+      continue;
+    }
+    const a = args[k];
     for (const cle of cles) {
       if (a === cle) return args[k + 1] ?? null;
       if (a.startsWith(cle + "=") || (ps && a.startsWith(cle + ":"))) return args[k].slice(cle.length + 1);
@@ -298,14 +649,14 @@ function jugerHttp(libelle, cfg, args) {
   const texte = args.join(" ");
   let methode = valeurOption(args, cfg.cles, cfg.ps);
   if (!methode && cfg.implicite && args.some((a) => cfg.implicite.test(a))) methode = "POST";
-  const M = String(methode || "GET").toUpperCase();
+  const M = String(methode || "GET").replace(/^.*::/, "").replace(/[()'"\s]/g, "").toUpperCase();
   if (M === "DELETE" && !toutLocal(texte)) return { categorie: "suppression", raison: `\`${libelle}\` en méthode DELETE : suppression sur un service distant` };
   if (["POST", "PUT", "PATCH"].includes(M) && pointDeDroits(texte, libelle)) return { categorie: "droits", raison: `\`${libelle}\` en méthode ${M} sur un point d'accès de droits : attribution ou modification de droits` };
   return null;
 }
 
 function jugerAz(args) {
-  const pos = positionnels(args);
+  const pos = positionnelsAz(args);
   if (!pos.length) return null;
   if (pos[0] === "rest") return jugerHttp("az rest", HTTP["az rest"], args);
   if (pos[0] === "devops" && pos[1] === "invoke") return jugerHttp("az devops invoke", HTTP["az devops invoke"], args);
@@ -360,19 +711,25 @@ function jugerGit(args) {
   return null;
 }
 
-/** Juge UN segment : rend [] ou la liste des gestes destructifs distants { mots, categorie, raison }. */
-export function jugerSegment(segment, profondeur = 0) {
-  const m = mots(segment);
-  const l = localiser(m);
+/** Sous PowerShell 5.1, `curl` et `wget` sont des alias d'`Invoke-WebRequest` ; `curl.exe` reste le vrai curl (D-194 (b)). */
+const aliasPowerShell = (l, dialecte) => (dialecte === "ps" || dialecte === null) && !/\.exe$/i.test(String(l.mot || ""));
+
+/**
+ * Juge UN segment : rend [] ou la liste des gestes destructifs distants { mots, categorie, raison }. `precedent` est le segment
+ * dont celui-ci reçoit le tube (`Get-Process node | Stop-Process`), null sinon.
+ */
+export function jugerSegment(segment, profondeur = 0, dialecte = null, precedent = null, ctx = null) {
+  const m = teteResolue(mots(segment, dialecte), dialecte, ctx).m;
+  const l = localiser(m, dialecte, ctx);
   if (!l) return [];
-  if (l.interne !== undefined) return profondeur >= 3 ? [] : jugerCommande(l.interne, profondeur + 1);
+  if (l.interne !== undefined) return profondeur >= 3 ? [] : jugerCommande(l.interne, profondeur + 1, l.dialecte ?? dialecte, ctx);
   const { outil, args } = l;
   let v = null;
   if (outil === "az") v = jugerAz(args);
   else if (outil === "terraform" || outil === "tofu") v = jugerTerraform(outil, args);
   else if (outil === "gh") v = jugerGh(args);
   else if (outil === "git") v = jugerGit(args);
-  else if (outil === "curl" || outil === "wget") v = jugerHttp(outil, HTTP[outil], args);
+  else if (outil === "curl" || outil === "wget") v = jugerHttp(outil, HTTP[outil], args) || (aliasPowerShell(l, dialecte) ? jugerHttp(outil, HTTP.ps, args) : null);
   else if (HTTP_PS.has(outil)) v = jugerHttp(outil, HTTP.ps, args);
   else if (estCmdlet(outil)) {
     v = /^remove-/.test(outil)
@@ -382,9 +739,108 @@ export function jugerSegment(segment, profondeur = 0) {
   return v ? [{ mots: [outil, ...args], ...v }] : [];
 }
 
-/** Les gestes destructifs distants d'une commande complète (tous segments, shells imbriqués compris). */
-export function jugerCommande(commande, profondeur = 0) {
-  return segmenter(commande).flatMap((s) => jugerSegment(s, profondeur));
+/** Les gestes destructifs distants d'une commande complète (tous segments, shells imbriqués et `"$( … )"` compris). */
+export function jugerCommande(commande, profondeur = 0, dialecte = null, parent = null) {
+  const lu = lireCommande(commande, dialecte);
+  const ctx = contexteDe(commande, dialecte, parent);
+  const gestes = lu.segments.flatMap((s, i) => jugerSegment(s, profondeur, dialecte, lu.separateurs[i] === "|" ? lu.segments[i - 1] : null, ctx));
+  if (profondeur < 3) for (const s of lu.substitutions) gestes.push(...jugerCommande(s, profondeur + 1, dialecte, ctx));
+  return gestes;
+}
+
+// ---------------------------------------------------------------------------------------------
+// 2 bis. Ce que la garde ne sait pas lire (D-194 (b), 10/11/2026)
+// ---------------------------------------------------------------------------------------------
+
+/** Les interprètes qui exécutent ce que leur tube leur donne quand aucun script ni code ne leur est passé. */
+function interpreteSurEntree(m) {
+  let i = 0;
+  while (i < m.length && (/^[A-Za-z_]\w*=/.test(m[i]) || ["sudo", "env", "command", "exec", "time", "nohup"].includes(nomOutil(m[i])))) i++;
+  const n = nomOutil(m[i] ?? ""), reste = m.slice(i + 1);
+  const positionnel = reste.some((a) => !a.startsWith("-") && !a.startsWith("/"));
+  if (n === "iex" || n === "invoke-expression") return !reste.length;
+  if (DIALECTE_SHELL[n] === "bash") return reste.includes("-") || reste.some((a) => /^-[A-Za-z]*s[A-Za-z]*$/.test(a) && !a.includes("c")) || (!positionnel && !reste.some((a) => /^-[A-Za-z]*c$/.test(a)));
+  if (DIALECTE_SHELL[n] === "ps") {
+    const k = reste.findIndex((a) => /^[-/]c(o(m(m(a(n(d)?)?)?)?)?)?$/i.test(a));
+    return k >= 0 ? reste[k + 1] === "-" : !positionnel && !reste.some((a) => /^[-/](e|ec|en\w*|f\w*)$/i.test(a));
+  }
+  if (n === "cmd") return !reste.some((a) => /^\/[ck]$/i.test(a));
+  if (["python", "python3", "py"].includes(n)) return reste.includes("-") || (!positionnel && !reste.some((a) => /^-[cm]$/.test(a)));
+  if (["node", "perl", "ruby"].includes(n)) return reste.includes("-") || (!positionnel && !reste.some((a) => /^(-[eEp]|--eval|--print)$/.test(a)));
+  return false;
+}
+
+/** La méthode d'une requête HTTP est-elle dans une variable (`curl -X $M`, `irm -Method $m`) ? */
+function methodeHttpVariable(l, dialecte) {
+  const { outil, args } = l;
+  let cfgs = [];
+  if (outil === "curl" || outil === "wget") cfgs = aliasPowerShell(l, dialecte) ? [HTTP[outil], HTTP.ps] : [HTTP[outil]];
+  else if (HTTP_PS.has(outil)) cfgs = [HTTP.ps];
+  else if (outil === "gh" && positionnels(args)[0] === "api") cfgs = [HTTP["gh api"]];
+  else if (outil === "az") { const p = positionnelsAz(args); cfgs = p[0] === "rest" ? [HTTP["az rest"]] : p[0] === "devops" && p[1] === "invoke" ? [HTTP["az devops invoke"]] : []; }
+  return cfgs.some((cfg) => /^[$(]/.test(String(valeurOption(args, cfg.cles, cfg.ps) ?? "")));
+}
+
+/**
+ * Ce que la garde ne sait pas lire dans une commande : la liste des causes, vide quand tout se lit. Les causes : guillemets
+ * non équilibrés, document en ligne sans ligne de fin, texte évalué non littéral (eval, iex, tube vers un interprète, bloc de
+ * script construit, substitution de processus), commande dans une variable, méthode HTTP dans une variable, commande encodée
+ * illisible, imbrication de plus de trois shells.
+ */
+export function causesIllisibles(commande, dialecte = null, profondeur = 0, parent = null) {
+  const lu = lireCommande(commande, dialecte);
+  const ctx = contexteDe(commande, dialecte, parent);
+  const causes = [];
+  if (lu.ouvert) causes.push("guillemets non équilibrés");
+  if (lu.nonFermes) causes.push("document en ligne sans ligne de fin");
+  lu.segments.forEach((s, i) => {
+    const t = teteResolue(mots(s, dialecte), dialecte, ctx);
+    const m = t.m;
+    const l = localiser(m, dialecte, ctx);
+    if (l?.illisible) causes.push(l.illisible);
+    else if (l?.interne !== undefined) causes.push(...(profondeur >= 3 ? ["imbrication trop profonde"] : causesIllisibles(l.interne, l.dialecte ?? dialecte, profondeur + 1, ctx)));
+    if (t.inconnu) causes.push("commande dans une variable");
+    if (lu.separateurs[i] === "|" && interpreteSurEntree(m)) causes.push("texte évalué (tube vers un interprète)");
+    if (l?.outil && methodeHttpVariable(l, dialecte)) causes.push("méthode HTTP dans une variable");
+    if (/^(invoke-command|icm|start-job|start-threadjob)$/.test(nomOutil(m[0] ?? "")) && m.some((w, k) => /^-s(c(r(i(p(t(b(l(o(c(k)?)?)?)?)?)?)?)?)?)?$/i.test(w) && /^[$(]/.test(m[k + 1] ?? ""))) causes.push("texte évalué non littéral (bloc de script dans une variable)");
+  });
+  if (profondeur < 3) for (const s of lu.substitutions) causes.push(...causesIllisibles(s, dialecte, profondeur + 1, ctx));
+  const brut = String(commande);
+  if (/(^|[\s;&|(])(source|\.)\s+<\(|\b(bash|sh|zsh)\s+<\(/.test(brut)) causes.push("texte évalué (substitution de processus)");
+  if (/\[scriptblock\]::create\s*\(|\$executioncontext\.invokecommand|\.invokescript\s*\(/i.test(brut)) causes.push("texte évalué (bloc de script construit)");
+  return [...new Set(causes)];
+}
+
+/** Les outils dont la garde juge les gestes, ou qui agissent hors du poste : la liste de D-194 (b). */
+const OUTILS_DISTANTS = new Set(["az", "gh", "terraform", "tofu", "kubectl", "helm", "aws", "gcloud", "curl", "wget", "irm", "iwr", "ssh", "scp", "sftp", "rsync", "wrangler", "start-process", "saps"]);
+const estOutilDistant = (n) => OUTILS_DISTANTS.has(n) || /^invoke-[a-z]+$/.test(n) || estCmdlet(n) || CMDLET_AZ_ECRITURE.test(n) || /^[a-z]+-mg[a-z0-9]+$/.test(n);
+
+/** Les mots d'outil distant d'un texte, jetons base64 décodés compris ; `git` compte quand `push` le suit. */
+export function motsDistants(texte, profondeur = 0) {
+  const jetons = String(texte).split(/[\s"'`;|&(){}<>,=]+/).filter(Boolean);
+  const noms = jetons.map(nomOutil);
+  const trouves = new Set(noms.filter(estOutilDistant));
+  noms.forEach((n, k) => { if (n === "git" && noms.slice(k + 1).includes("push")) trouves.add("git push"); });
+  if (profondeur === 0) {
+    for (const j of jetons.filter((x) => /^[A-Za-z0-9+/]{16,}={0,2}$/.test(x)).slice(0, 20)) {
+      for (const t of [decoderBase64(j, "utf16le"), decoderBase64(j, "utf8")]) if (t) for (const x of motsDistants(t, 1)) trouves.add(x);
+    }
+  }
+  return [...trouves];
+}
+
+/**
+ * Le réglage `FORGE_GARDE_ILLISIBLE=laisse` rétablit l'ancien comportement (D-194 (b)) : ce qui est illisible, une panne du juge
+ * et une entrée illisible passent. Il est lu dans l'environnement du harnais, dont le hook hérite : une commande ne le pose pas
+ * (`FORGE_GARDE_ILLISIBLE=laisse az …` ne change que l'environnement de la commande, que le hook ne lit pas).
+ */
+export const garde_permissive = (env = process.env) => String(env?.FORGE_GARDE_ILLISIBLE ?? "").trim().toLowerCase() === "laisse";
+
+/** Une commande qui écrit ce réglage pour une session suivante (environnement du poste, réglages du harnais, profil du shell). */
+function ecritLeReglage(commande) {
+  const t = String(commande);
+  return /FORGE_GARDE_ILLISIBLE/i.test(t)
+    && /\bsetx\b|SetEnvironmentVariable|\\Environment\b|HKCU:|settings(\.local)?\.json|\.bashrc|\.bash_profile|\.profile\b|\$PROFILE\b|_profile\.ps1/i.test(t);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -483,19 +939,49 @@ export const couvre = (commande, geste) => {
 // 4. Verdict
 // ---------------------------------------------------------------------------------------------
 
+/** Le texte exact d'une commande, espaces et fins de ligne normalisés : la seule couverture d'une commande illisible. */
+const texteNormalise = (t) => String(t ?? "").replace(/\r\n/g, "\n").replace(/[ \t]+/g, " ").replace(/\s*\n\s*/g, "\n").trim();
+export const memeTexte = (approuve, commande) => texteNormalise(approuve) !== "" && texteNormalise(approuve) === texteNormalise(commande);
+
+const motifIllisible = (causes, distants, poser) => `COMMANDE ILLISIBLE POUR LA GARDE (D-194 (b)) — ${causes.join(" ; ")} : `
+  + `la commande porte ${distants.map((d) => `\`${d}\``).join(", ")}, et la garde ne peut pas dire si elle supprime, attribue des droits ou réécrit l'histoire. `
+  + "Remède : réécris-la lisiblement, le geste en clair (sans eval, iex ni Invoke-Expression, sans commande dans une variable, guillemets fermés, "
+  + "here-string fermé par '@ en début de ligne, sans -EncodedCommand) ; si elle doit rester telle quelle, pose un lot d'accord dont un geste porte "
+  + `ce texte exact en \`commande\`, puis \`${poser}\`. Le fait : le 10/11/2026, une revue a montré qu'une apostrophe, un alias PowerShell ou un eval `
+  + "suffisaient à faire passer une suppression sans décision.";
+
 /** Juge l'entrée d'un hook PreToolUse. `lots` : lignes déjà lues (sinon lues aux racines du projet). */
 export function juger(entree, { lots = null, registre = null, maintenant = Date.now(), env = process.env } = {}) {
+  // D-194 (b) : la sonde de panne, posée par la recette dans l'environnement du hook ; elle ne peut que faire refuser.
+  if (env?.FORGE_GARDE_PANNE_ESSAI === "1") throw new Error("panne simulée par FORGE_GARDE_PANNE_ESSAI=1");
   if (!OUTILS.has(entree?.tool_name)) return { decision: "laisse" };
   const commande = entree?.tool_input?.command;
   if (typeof commande !== "string") return { decision: "laisse" };
-  const gestes = jugerCommande(commande);
-  if (!gestes.length) return { decision: "laisse" };
+  if (ecritLeReglage(commande)) {
+    return { decision: "refuse", gestes: [], illisible: [], motif: "RÉGLAGE DE LA GARDE REFUSÉ (D-194 (b)) — cette commande écrit FORGE_GARDE_ILLISIBLE pour une session suivante "
+      + "(environnement du poste, réglages du harnais ou profil du shell). Ce réglage rétablit l'ancien comportement de la garde : l'humain le pose avant d'ouvrir "
+      + "la session, la session ne le pose jamais. Remède : rends la main à l'humain avec la commande refusée." };
+  }
+  const dialecte = dialecteDe(entree.tool_name);
+  const gestes = jugerCommande(commande, 0, dialecte);
+  const causes = garde_permissive(env) ? [] : causesIllisibles(commande, dialecte);
+  const distants = causes.length ? motsDistants(commande) : [];
+  // Renfort : une commande en variable suivie d'un verbe destructif de la liste (`$AZ group delete`) compte comme un outil distant.
+  if (!distants.length && causes.includes("commande dans une variable") && /(^|[\s"'])(delete|purge|remove|destroy)(-[a-z0-9-]+)?(?=[\s"']|$)/i.test(commande)) distants.push("un verbe destructif (delete, purge, remove, destroy)");
+  const illisible = causes.length > 0 && distants.length > 0;
+  if (!gestes.length && !illisible) return { decision: "laisse" };
   const racines = racinesDuProjet(entree, env);
   const toutes = lots ?? lireLots(racines);
   const etats = toutes.map((l) => ({ lot: l, ...lotValide(l, maintenant, entree?.session_id ?? null) }));
   const valides = etats.filter((e) => e.ok).map((e) => e.lot);
   const sansLot = gestes.filter((g) => !valides.some((l) => l.gestes.some((x) => couvre(x.commande, g))));
-  if (!sansLot.length) return { decision: "laisse", couverts: gestes.length };
+  const illisibleSansLot = illisible && !valides.some((l) => l.gestes.some((x) => memeTexte(x.commande, commande)));
+  const produit = existsSync(join(racines[0], "forge", "hooks", "factory.mjs")) && !existsSync(join(racines[0], "todo", "TODO.jsonl"));
+  const poser = produit
+    ? "node forge\\hooks\\factory.mjs gestes-distants --poser --lot <lot.json>"
+    : "node oracles\\hook-gestes-distants.mjs --poser --lot <lot.json>";
+  if (!sansLot.length && !illisibleSansLot) return { decision: "laisse", couverts: gestes.length + (illisible ? 1 : 0) };
+  if (!sansLot.length) return { decision: "refuse", gestes: [], illisible: causes, motif: motifIllisible(causes, distants, poser) };
   // TF-2128 (D-168 (a)) : un retrait que la session a créé, consigné, sans dépendance, passe sans lot. Les autres restent refusés.
   let lignesRegistre = registre;
   const nonCouverts = [], exceptions = [], admis = [];
@@ -507,22 +993,21 @@ export function juger(entree, { lots = null, registre = null, maintenant = Date.
     if (j.ok) admis.push({ cible, creation: j.creation });
     else { nonCouverts.push(g); exceptions.push({ cible, ...j }); }
   }
+  if (!nonCouverts.length && illisibleSansLot) return { decision: "refuse", gestes: [], illisible: causes, motif: motifIllisible(causes, distants, poser) };
   if (!nonCouverts.length) {
     return { decision: "laisse", couverts: gestes.length - admis.length, admis: admis.length,
       contexte: `RETRAIT ADMIS SANS DÉCISION GROUPÉE (TF-2128, D-168 (a)) — ${admis.map((a) => `${a.cible.libelle}, créée par cette session le ${a.creation.ts} (création ${a.creation.id}), aucune dépendance consignée`).join(" ; ")}. `
         + "Rien n'est bloqué ; limites de cette preuve : references\\GESTES-DISTANTS.md, « Le retrait d'une ressource que la session a créée »." };
   }
-  const produit = existsSync(join(racines[0], "forge", "hooks", "factory.mjs")) && !existsSync(join(racines[0], "todo", "TODO.jsonl"));
-  const poser = produit
-    ? "node forge\\hooks\\factory.mjs gestes-distants --poser --lot <lot.json>"
-    : "node oracles\\hook-gestes-distants.mjs --poser --lot <lot.json>";
   const lecture = etats.length
     ? `${etats.length} lot(s) lu(s), ${valides.length} valide(s)${etats.filter((e) => !e.ok).map((e) => ` ; ${e.lot._source} : ${e.raison}`).join("")}`
     : "aucun lot approuvé n'existe";
   return {
     decision: "refuse",
     gestes: nonCouverts,
-    motif: `GESTE DISTANT DESTRUCTIF REFUSÉ (TF-1959, D-77) — ${nonCouverts.map((g) => `${g.mots.join(" ")} : ${g.raison}`).join(" ; ")}. `
+    illisible: illisibleSansLot ? causes : [],
+    motif: (illisibleSansLot ? `${motifIllisible(causes, distants, poser)} | ` : "")
+      + `GESTE DISTANT DESTRUCTIF REFUSÉ (TF-1959, D-77) — ${nonCouverts.map((g) => `${g.mots.join(" ")} : ${g.raison}`).join(" ; ")}. `
       + `Aucun lot approuvé valide ne le couvre (${lecture}). `
       + (exceptions.length
         ? `${exceptions.map((e) => `Exception TF-2128 (D-168 (a)) non tenue pour ${e.cible.libelle} — condition (${e.condition}) : ${e.raison}.`).join(" ")} `
@@ -863,15 +1348,32 @@ function poser(argv) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   if (process.argv.includes("--poser")) process.exit(poser(process.argv.slice(2)));
   if (["--ouvrir", "--clore", "--lister"].some((o) => process.argv.includes(o))) process.exit(enCours(process.argv.slice(2)));
+  // D-194 (b) : une entrée illisible et une panne du juge refusent, sauf réglage humain FORGE_GARDE_ILLISIBLE=laisse. Avant,
+  // elles laissaient passer, et le hook n'écrivait que « geste NON jugé » sur stderr.
+  const permissif = garde_permissive(process.env);
+  const refuser = (motif) => { process.stderr.write(motif + "\n"); process.exit(2); };
+  const motifPanne = (e) => `GARDE EN PANNE, COMMANDE REFUSÉE (D-194 (b)) — le juge des gestes distants a levé une exception (${String(e).slice(0, 200)}) : `
+    + "il ne peut pas dire si la commande est un geste destructif, il la refuse. Remède : rejoue la commande ; si la panne persiste, rends la main avec ce "
+    + "message : réparer le hook est un geste du pilot, et l'humain dispose d'un réglage de secours (references\\GESTES-DISTANTS.md, « Ce que la garde ne sait pas lire »).";
+  // Une exception qui échapperait aux gardes ci-dessous ferait sortir node en code 1, que le harnais laisse passer.
+  process.on("uncaughtException", (e) => { if (permissif) process.exit(0); refuser(motifPanne(e)); });
   let brut = "";
   try { brut = readFileSync(0, "utf8"); } catch { /* pas de stdin */ }
-  let entree = {};
-  try { entree = JSON.parse(brut || "{}"); } catch { /* entrée illisible : pas un appel d'outil */ }
+  let entree = null;
+  try { entree = JSON.parse(brut); } catch { entree = null; }
+  if (!entree || typeof entree !== "object" || Array.isArray(entree)) {
+    if (!permissif) refuser("ENTRÉE ILLISIBLE, COMMANDE REFUSÉE (D-194 (b)) — le hook n'a pas reçu du harnais un objet JSON lisible : il ne peut pas juger "
+      + "la commande, il la refuse. Remède : rejoue la commande ; si le refus persiste, rends la main avec ce message.");
+    entree = {};
+  }
   const apres = entree?.hook_event_name === "PostToolUse"; // le geste a eu lieu : plus rien à refuser, seulement à clore
   let v = { decision: "laisse" };
   if (!apres) {
-    try { v = juger(entree); } catch (e) { process.stderr.write(`[hook-gestes-distants] panne du juge, geste NON jugé : ${String(e).slice(0, 200)}\n`); }
-    if (v.decision === "refuse") { process.stderr.write(v.motif + "\n"); process.exit(2); }
+    try { v = juger(entree); } catch (e) {
+      if (!permissif) refuser(motifPanne(e));
+      process.stderr.write(`[hook-gestes-distants] panne du juge, geste NON jugé (réglage FORGE_GARDE_ILLISIBLE=laisse) : ${String(e).slice(0, 200)}\n`);
+    }
+    if (v.decision === "refuse") refuser(v.motif);
   }
   // TF-2084 : le registre des gestes en cours avertit (jamais ne bloque) et ne fait jamais tomber l'outil.
   let contexte = v.contexte || "";

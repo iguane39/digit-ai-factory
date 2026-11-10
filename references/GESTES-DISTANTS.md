@@ -56,14 +56,67 @@ déploiements ordinaires (`terraform apply`, `az deployment … create`) et `git
 
 ## Limites du hook
 
-- Un geste joué par un script dont le texte n'est pas dans la commande, une commande construite par
-  variable, une commande encodée (`-EncodedCommand`), une commande envoyée par `ssh` ou `wsl`, un alias.
+- Un geste joué par un script dont le texte n'est pas dans la commande, une commande envoyée par `ssh` ou
+  `wsl`, un alias ; une commande en variable venue de l'environnement quand la commande ne porte ni outil
+  distant ni verbe destructif (section suivante).
 - Les autres nuages (`aws`, `gcloud`, `kubectl`), faute de fait fondateur ; `terraform state push|mv`,
   `gh repo archive`, `gh repo deploy-key add`.
 - Que l'humain ait réellement approuvé : `reponse_humaine` cite ses mots et le fichier garde chaque ligne,
   mais une session qui écrirait un lot sans approbation ne serait pas arrêtée par le hook. La revue d'un
   lot (qui l'a posé, quand, avec quels mots) est le seul garde-fou de ce point.
 - Que le champ `cible` du lot corresponde à la commande : seule la commande approuvée est comparée.
+
+## Ce que la garde ne sait pas lire (D-194 (b), 10/11/2026)
+
+Décision humaine du 10/11/2026, réponse « Choisis toutes les décisions recommandées et applique. », option (b) : « une
+commande illisible pour la garde, ou une panne du juge, est refusée sauf accord ; les 12 formes entrent en recette rouge ; un
+réglage rétablit l'ancien comportement ». Le fait : une revue de code du 10/11 a rejoué les fonctions des deux hooks. Une
+suppression passait sous un alias PowerShell (`curl -Method Delete`), une abréviation (`irm -Me Delete`), un `eval`, un `iex`,
+un `Start-Process`, une option globale placée entre les mots d'`az`, ou une apostrophe isolée qui masquait les lignes suivantes.
+Côté identité sortante, `http://localhost:80@evil.com` passait pour local. Une panne du juge laissait passer les deux hooks.
+
+**La lecture suit le dialecte de l'outil.** Bash : barre oblique inverse, `$'…'`, commentaires `#`, tableaux `NOM=( … )`,
+développement arithmétique `$(( … ))`. PowerShell : accent grave, here-strings `@' … '@` (le corps est du texte), `<# … #>`,
+tables `@{ … }`, alias `curl` et `wget` d'`Invoke-WebRequest`, abréviations de paramètre (`-Me`, `-Meth`). Sont résolus puis
+jugés : `eval`, `iex`, `Invoke-Expression`, `Start-Process … -ArgumentList`, `ForEach-Object { … }`, `-EncodedCommand`
+décodé, `"$( … )"` et le corps d'un `<<EOF` non cité, les fonctions d'enveloppe (`m(){ "$@"; }; m gh api …`), les variables
+que la commande affecte elle-même (`SP="C:\…"; "$SP\x.exe"`, `$exe = "…"; Start-Process $exe`, `TF=$(where terraform-1.9.8.exe)`).
+
+**La règle de famille.** Une commande que la garde ne sait pas lire est refusée quand elle porte un mot d'outil distant :
+`az`, `gh`, `terraform`, `tofu`, `kubectl`, `helm`, `aws`, `gcloud`, `curl`, `wget`, `irm`, `iwr`, `Invoke-*`, `Start-Process`,
+`ssh`, `scp`, `sftp`, `rsync`, `wrangler`, les cmdlets `*-Az*` et `*-Mg*`, `git` suivi de `push`, y compris dans un jeton
+base64. Les causes d'illisibilité sont fermées : guillemets non équilibrés, document en ligne sans ligne de fin, texte évalué
+non littéral (`eval "$CMD"`, `iex $c`, tube vers un interprète, bloc de script construit), commande dans une variable que rien
+ne résout, méthode HTTP dans une variable, commande encodée illisible, plus de trois shells imbriqués. Renfort : une commande
+en variable suivie de `delete`, `purge`, `remove` ou `destroy` compte comme un outil distant (`$AZ group delete`). Le refus
+dit quoi faire : réécrire la commande lisiblement, ou poser un lot d'accord dont un geste porte son texte exact. Ce texte
+couvre la seule commande identique, espaces normalisés, jamais un préfixe. Côté identité sortante, la même lecture vaut pour
+une commande qui porte une adresse d'identité (`FORGE_IDENTITES` ou adresse git). Une requête dont l'hôte ne se lit pas
+(variable non résolue, aucune cible) et qui porte une adresse est refusée.
+
+**Panne et entrée illisible.** Une exception du juge, une exception qui échapperait aux gardes, une entrée qui n'est pas un
+objet JSON : les deux hooks refusent (exit 2) avec un motif qui dit quoi faire. Avant, ils laissaient passer.
+
+**Le réglage.** `FORGE_GARDE_ILLISIBLE=laisse`, posé par l'humain dans l'environnement du harnais avant d'ouvrir la session,
+rétablit l'ancien comportement : la règle de famille ne s'applique plus, une panne et une entrée illisible passent. La liste
+fermée et les formes résolues restent jugées : ce sont des corrections, pas un durcissement. La commande ne peut pas poser ce
+réglage. Le hook lit son propre environnement, hérité du harnais, et aucun fichier : `FORGE_GARDE_ILLISIBLE=laisse az …` ne
+change que l'environnement de la commande. Une commande qui l'écrit pour une session suivante est refusée (`setx`,
+`SetEnvironmentVariable`, `HKCU:\Environment`, `settings.json`, profil du shell). Limite : ce hook ne voit pas les outils
+Write et Edit, qui pourraient l'écrire dans `.claude\settings.json`.
+
+**La mesure.** Rejeu des 11 921 commandes Bash et PowerShell des transcriptions du poste (profils `~\.claude` et
+`~\.claude-b`, du 03/11 15:30 au 10/11 15:30 UTC), en fonctions pures, ancien juge contre nouveau. Les refus des gestes
+distants passent de 10 à 11, ceux de l'identité sortante restent à 0. Le seul refus nouveau est une commande dont une
+apostrophe ferme réellement la chaîne bash d'un `node -e` : bash la rejette lui-même. Faux positif : aucun.
+
+**Limites.** Une variable venue de l'environnement ou d'une commande précédente ne se résout pas : la commande qui l'invoque
+passe si elle ne porte ni outil distant ni verbe destructif. Un `& (Get-Command az) …` est refusé comme illisible, sans être
+résolu. Le contenu d'un script, et d'un fichier lu par la commande, reste hors de la lecture. Une erreur de syntaxe dans le
+fichier du hook arrête node avant toute garde ; le harnais lit alors un code 1, qui ne bloque pas.
+
+Recettes : `oracles\hook-gestes-distants.test.mjs` et `oracles\hook-identite-sortante.test.mjs`, cas « D-194 », chacun vu
+rouge sur le code d'avant.
 
 ## Le retrait d'une ressource que la session a créée (TF-2128, D-168 (a))
 
