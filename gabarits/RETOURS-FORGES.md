@@ -23,6 +23,12 @@
 > node forge\retours\oracle-lot.mjs "<ce fichier>.md"
 > ```
 >
+> **Remettre = ce même geste avec `--remettre`** (TF-2314, 10/11/2026) :
+> `node forge\retours\oracle-lot.mjs "<ce fichier>.md" --remettre` joue le contrôle puis copie le lot et son sidecar
+> dans le sas du pilot, et **ne copie rien si le verdict est FAIL** (sortie 1). Ne copie jamais à la main un lot
+> dont le dernier verdict est FAIL : le 04/11 et le 09/11/2026, un lot en échec est parti au sas dans la même commande
+> que son contrôle.
+>
 > Il rend **0** si la forme du lot est tenue, **1** sinon — et il dit alors ce qui manque *et le
 > geste qui répare*. C'est **exactement le contrôle** que la porte du pilot joue à l'ingestion :
 > le même module, importé des deux côtés. Un lot qui passe ici passe là-bas.

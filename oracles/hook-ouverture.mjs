@@ -290,7 +290,7 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "retours"))) {
     if (enAttente.length) {
       const jamais = enAttente.filter((l) => l.parvenu === false), parvenus = enAttente.filter((l) => l.parvenu === true);
       lignes.push("", `## Lots de retours restés « a_remettre » plus de ${SEUIL_H} h (TF-1758)`);
-      if (jamais.length) lignes.push(`- **${jamais.length} lot(s) JAMAIS parvenu(s) au pilot** — ${jamais.slice(0, 6).map((l) => `« ${l.nom} » (${l.jours} j)`).join(", ")}${jamais.length > 6 ? ", …" : ""} : jouer \`node forge/retours/oracle-lot.mjs "<lot>.md"\`, copier le lot et son sidecar dans \`${enSlash(join(PILOT, "input", "00-retours", "_arrivee"))}\`, puis passer la ligne de statut à « remis le <date> ».`);
+      if (jamais.length) lignes.push(`- **${jamais.length} lot(s) JAMAIS parvenu(s) au pilot** — ${jamais.slice(0, 6).map((l) => `« ${l.nom} » (${l.jours} j)`).join(", ")}${jamais.length > 6 ? ", …" : ""} : remettre par \`node forge/retours/oracle-lot.mjs "<lot>.md" --remettre\` (il joue le contrôle, puis copie le lot et son sidecar dans \`${enSlash(join(PILOT, "input", "00-retours", "_arrivee"))}\` à exit 0 seulement, TF-2314), puis passer la ligne de statut à « remis le <date> ».`);
       if (parvenus.length) lignes.push(`- ${parvenus.length} lot(s) déjà reçu(s) par le pilot dont la ligne de statut dit encore « a_remettre » : la passer à « remis le <date> » (seule édition permise d'un lot remis).`);
       const inconnus = enAttente.length - jamais.length - parvenus.length;
       if (inconnus) lignes.push(`- ${inconnus} lot(s) dont l'arrivée au pilot n'a pas pu être vérifiée (boîte du pilot illisible).`);

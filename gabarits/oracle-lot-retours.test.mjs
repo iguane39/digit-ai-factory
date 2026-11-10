@@ -626,7 +626,7 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
 // que ce juge ne regardait pas — le produit avait rendu PASS. Chaque règle rejouée a son cas rouge ET
 // son cas vert ; la règle entre en AVERTISSEMENT (jamais en blocage, précédent D-70 (b)).
 {
-  const { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } = await import("node:fs");
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, readdirSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { join, dirname } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
@@ -731,6 +731,51 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
     writeFileSync(`${ok}.tf.jsonl`, ligne() + "\n", "utf8");
     if (verifier(`${ok}.md`, lotMd(), { aujourdhui: AUJ }).refus_predit) throw new Error("refus prédit sur un sidecar conforme");
   });
+  // TF-2314 (10/11/2026, RT-58 de Produit-84) — LA COPIE AU SAS SE LIE AU VERDICT. Fautif : un lot qui rend FAIL est copié au sas dans la même commande (2 fois, 04/11 et 09/11).
+  // `--remettre` joue le juge puis copie : un lot FAIL ne laisse RIEN au sas et la sortie est 1 ; un lot conforme est copié avec son sidecar, sortie 0 ; la remise rejouée est
+  // sans effet ; un fichier déjà au sas avec un autre contenu, un sidecar absent et un sas introuvable sont refusés.
+  {
+    const sasT = join(D, "sas"); mkdirSync(sasT, { recursive: true });
+    const poser = (nom, md, avecSidecar = true) => {
+      const base = join(D, nom);
+      writeFileSync(`${base}.md`, md, "utf8");
+      if (avecSidecar) writeFileSync(`${base}.tf.jsonl`, ligne() + "\n", "utf8");
+      return `${base}.md`;
+    };
+    const remettre = (lotMdChemin, sas = sasT) => spawnSyncS(process.execPath, [join(ICI_S, "oracle-lot-retours.mjs"), lotMdChemin, "--remettre", sas], { encoding: "utf8" });
+    const auSas = () => readdirSync(sasT).sort().join(" | ");
+    const fautif = poser("PROD - RETOURS - 20261013r", "# lot\n\nUn lot sans ses sections obligatoires.\n");
+    const conforme = poser("PROD - RETOURS - 20261013s", lotMd());
+    check("TF-2314 rouge — un lot dont le juge rend FAIL n'est PAS copié au sas : sortie 1, sas intact", () => {
+      const r = remettre(fautif);
+      if (r.status !== 1) throw new Error(`sortie ${r.status}, attendu 1 : ${(r.stdout || "").slice(0, 200)}`);
+      if (auSas() !== "") throw new Error(`le sas contient ${auSas()} alors que le verdict est FAIL`);
+      if (!/NON FAITE/.test(r.stderr || "")) throw new Error(`la sortie ne dit pas que la remise n'est pas faite : ${(r.stderr || "").slice(0, 200)}`);
+    });
+    check("TF-2314 vert — un lot conforme est copié avec son sidecar, sortie 0 (le remède de la sortie en échec se joue)", () => {
+      const r = remettre(conforme);
+      if (r.status !== 0) throw new Error(`sortie ${r.status}, attendu 0 : ${(r.stdout || "").slice(0, 200)} ${(r.stderr || "").slice(0, 200)}`);
+      if (auSas() !== "PROD - RETOURS - 20261013s.md | PROD - RETOURS - 20261013s.tf.jsonl") throw new Error(`sas : ${auSas()}`);
+    });
+    check("TF-2314 vert — la remise rejouée sur un contenu identique est sans effet et sortie 0", () => {
+      const r = remettre(conforme);
+      if (r.status !== 0 || !/déjà au sas/.test(r.stderr || "")) throw new Error(`sortie ${r.status} : ${(r.stderr || "").slice(0, 200)}`);
+    });
+    check("TF-2314 rouge — un fichier déjà au sas avec un AUTRE contenu est refusé (R-49), sortie 2, sas intact", () => {
+      writeFileSync(join(D, "PROD - RETOURS - 20261013s.md"), lotMd("\nUne ligne ajoutée après la remise.\n"), "utf8");
+      const avant = auSas();
+      const r = remettre(conforme);
+      if (r.status !== 2 || !/AUTRE contenu/.test(r.stderr || "")) throw new Error(`sortie ${r.status} : ${(r.stderr || "").slice(0, 200)}`);
+      if (auSas() !== avant) throw new Error("le sas a changé");
+    });
+    check("TF-2314 rouge — un lot sans sidecar et un sas introuvable ne sont pas remis, sortie 2", () => {
+      const sansSidecar = poser("PROD - RETOURS - 20261013t", lotMd(), false);
+      const r1 = remettre(sansSidecar);
+      if (r1.status !== 2 || !/sidecar introuvable/.test(r1.stderr || "")) throw new Error(`sans sidecar : sortie ${r1.status} ${(r1.stderr || "").slice(0, 160)}`);
+      const r2 = remettre(poser("PROD - RETOURS - 20261013u", lotMd()), join(D, "sas-absent"));
+      if (r2.status !== 2 || !/sas introuvable/.test(r2.stderr || "")) throw new Error(`sas absent : sortie ${r2.status} ${(r2.stderr || "").slice(0, 160)}`);
+    });
+  }
   try { rmSync(D, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
