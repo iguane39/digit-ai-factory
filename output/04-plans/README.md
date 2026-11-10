@@ -110,6 +110,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` | fichier | 19,6 Ko | Synthèse Mandat — vos décisions D-49, D-50 et D-51 sont exécutées ou en cours ; la campagn |
 | `Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` | fichier | 5,4 Ko | Synthèse Mandat — vos décisions D-58, D-59 et D-60 (a) sont exécutées : Produit-79 au regi |
 | `Digit-AI - Synthese Mandat - Decisions D-130 a D-135 construites - 20261102p.md` | fichier | 9,4 Ko | Synthèse Mandat — vos 6 réponses sont construites et publiées, et le premier rejeu réel a  |
+| `Digit-AI - Synthese Mandat - Decisions D-194 a D-198 appliquees - 20261110c.md` | fichier | 14,3 Ko | Synthèse Mandat — Décisions D-194 à D-198 appliquées (10/11/2026) |
 | `Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md` | fichier | 16,7 Ko | Synthèse Mandat — vos 5 décisions exécutées, 2 études rendues, 5 nouvelles décisions (18/1 |
 | `Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md` | fichier | 8,1 Ko | Synthèse Mandat — vos décisions D-29 à D-33 exécutées, 5 sujets clos, aucune décision nouv |
 | `Digit-AI - Synthese Mandat - Decisions D-49 a D-51 detaillees - 20261020b.md` | fichier | 7,6 Ko | Synthèse Mandat — D-49, D-50 et D-51 détaillées (20/10/2026) |
@@ -226,4 +227,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_205 fichier(s), 4 sous-dossier(s)_
+_206 fichier(s), 4 sous-dossier(s)_
