@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 692 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 694 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -532,6 +532,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md | 20261109g | 15 Ko | `04-plans/Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |
 | Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md | 20261112e | 15.2 Ko | `04-plans/Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` |
+| Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md | 20261112g | 15.3 Ko | `04-plans/Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md` |
 | Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md | 20261102c | 14.5 Ko | `04-plans/Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md | 20261102a | 11.1 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
@@ -604,6 +605,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
 | Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md | 20261112d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md` |
+| Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md | 20261112h | 3.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` |
 | Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md | 20261019f | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` |
 | Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md | 20261019h | 6 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` |
 | Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md | 20261019g | 5.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` |

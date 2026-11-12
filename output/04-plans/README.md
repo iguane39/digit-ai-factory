@@ -31,6 +31,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` | fichier | 15,0 Ko | Série d'animations « La Factory Digit-AI en action » : cadrage et cinq épisodes |
 | `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` | fichier | 22,1 Ko | Prompt — construire le skill make-it-better et sa page de versions |
 | `Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` | fichier | 15,2 Ko | Prompt — Suivi des agents toutes les 15 minutes |
+| `Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md` | fichier | 15,3 Ko | Prompt — Suivi des agents toutes les 15 minutes |
 | `Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` | fichier | 14,5 Ko | markdown |
 | `Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` | fichier | 11,1 Ko | Revue hebdomadaire des propositions — 2026-11-02 |
 | `Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` | fichier | 8,9 Ko | Revue hebdomadaire des propositions — 2026-10-26 |
@@ -103,6 +104,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` | fichier | 6,5 Ko | Synthèse Mandat — conseil de cinq agents avant un arbitrage : étude instruite (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
 | `Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md` | fichier | 4,1 Ko | markdown |
+| `Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` | fichier | 3,1 Ko | Synthèse Mandat — D-209 appliquée au prompt de suivi des agents, 12/11/2026 |
 | `Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` | fichier | 9,4 Ko | Synthèse Mandat — D-41, D-43 et D-44 exécutées le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` | fichier | 6,0 Ko | Synthèse Mandat — D-45 (b) exécutée, le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` | fichier | 5,8 Ko | Synthèse Mandat — D-45 reposée en clair, le 19/10/2026 au soir |
@@ -235,4 +237,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_214 fichier(s), 4 sous-dossier(s)_
+_216 fichier(s), 4 sous-dossier(s)_
