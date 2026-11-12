@@ -42,7 +42,19 @@ constats reviennent dans ton rapport final, le pilot est l'unique écrivain du r
 publie les forges et lui-même sans feu vert par envoi (`REGLES-PROJET.md`, R-38 §6), sous le seul
 compte de `references\IDENTITE-PUBLICATION.json`. Un envoi vu chez une forge, fait par une autre
 session sous ce compte, est légitime : il ne se signale pas comme suspect. Toi, tu ne publies pas.
-Aucun fichier temporaire dans le dépôt cible : scratchpad de session uniquement.
+Aucun fichier temporaire dans le dépôt cible.
+
+**Un dossier temporaire propre à l'agent (TF-2437, 12/11/2026).** Tes scripts, captures et copies
+vont dans le dossier temporaire que ta consigne nomme, un sous-dossier de celui de la session
+(`<scratchpad>\agent-<lot>\`), jamais à la racine du dossier de la session : elle le partage avec
+la session qui t'a lancé et avec ses autres agents. Le pilot nomme un dossier par agent dans chaque
+consigne de campagne. Une consigne qui n'en nomme pas est incomplète : crée `agent-<lot ou item>`
+sous le dossier temporaire de ta session et dis-le à ta première émission d'avancement. Le fait :
+le 10/11/2026, un agent `constructeur` a écrit ses scripts et ses captures dans le dossier de la
+session, mêlés à ceux de la session et d'autres agents, sans nettoyage possible. La garde des
+suppressions ne change pas (`garde-rm-variable` refuse une suppression dont la cible passe par une
+variable) : un dossier propre se vide par un chemin écrit en entier, et tu ne supprimes que ce que
+tu as créé dans le tien.
 
 **Écarts à la lettre (TF-0176).** Si ton prompt reformule une demande humaine, tout endroit
 où ton implémentation s'écarte du texte LITTÉRAL de cette demande (seuil, périmètre,
