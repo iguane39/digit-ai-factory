@@ -630,6 +630,10 @@
   "cas": 5,
   "vu_le": "2026-10-14"
  },
+ "scripts/fusionner-env.test.mjs": {
+  "cas": 9,
+  "vu_le": "2026-11-12"
+ },
  "scripts/fusionner-tables-confidentielles.test.mjs": {
   "cas": 7,
   "vu_le": "2026-09-27"
