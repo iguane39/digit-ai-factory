@@ -2069,14 +2069,24 @@ try {
     const ecriture62 = (cwd, fichier, contenu) => [{ type: "assistant", cwd, timestamp: "2026-10-29T10:00:00.000Z",
       message: { role: "assistant", content: [{ type: "tool_use", id: "t62", name: "Write", input: { file_path: fichier, content: contenu } }] } }];
     const BROWSER62 = "document.addEventListener('click', () => { window.alert('x'); });";
+    // TF-2404 (12/11/2026) : ce cas juge la RACINE du projet, pas la règle du brouillon (cas 59 septendecies). Le projet d'essai est le dépôt qui joue la recette : quand
+    // cet arbre vit sous le dossier temporaire (arbre de travail d'une campagne), tout fichier y était un brouillon et 62, 62 bis et 62 quater rendaient 0 au lieu de 1.
+    // Les appels ci-dessous disent donc qu'aucun chemin n'est un brouillon, et 62 quinquies garde la règle réelle (un fichier du dossier temporaire reste un brouillon).
+    const aucunBrouillon = () => false;
     const sansVar = process.env.CLAUDE_PROJECT_DIR; delete process.env.CLAUDE_PROJECT_DIR;
     try {
-      const depuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), APP62, BROWSER62)).servis.length;
-      const depuisRacine = critiqueDuTour(ecriture62(PROJ62, APP62, BROWSER62)).servis.length;
-      const outilDepuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), OUTIL62, "import fs from 'node:fs';")).servis.length;
+      const depuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), APP62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
+      const depuisRacine = critiqueDuTour(ecriture62(PROJ62, APP62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
+      const outilDepuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), OUTIL62, "import fs from 'node:fs';"), { estBrouillon: aucunBrouillon }).servis.length;
       process.env.CLAUDE_PROJECT_DIR = PROJ62;
-      const parVariable = critiqueDuTour(ecriture62(join(base, "ailleurs-62"), APP62, BROWSER62)).servis.length;
+      const parVariable = critiqueDuTour(ecriture62(join(base, "ailleurs-62"), APP62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
       delete process.env.CLAUDE_PROJECT_DIR;
+      // 62 quinquies : la règle réelle tient (brouillon par défaut) et l'injection la lève, quel que soit l'emplacement du dépôt.
+      const BROUILLON62 = join(tmpdir(), "page-62.js");
+      const brouillonReel = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, BROWSER62)).servis.length;
+      const brouillonLeve = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
+      if (brouillonReel !== 0) echecs.push(`62 quinquies : un script de navigateur écrit dans le dossier temporaire, règle réelle → attendu 0 fichier servi (brouillon), obtenu ${brouillonReel}`);
+      if (brouillonLeve !== 1) echecs.push(`62 quinquies bis : le même fichier, règle du brouillon levée par l'appelant → attendu 1 fichier servi, obtenu ${brouillonLeve}`);
       if (depuisSous !== 1) echecs.push(`62 : un script de navigateur écrit sous src/scripts/ par un tour dont le cwd est src/ → attendu 1 fichier servi (la critique est exigée), obtenu ${depuisSous} : le hook a lu le sous-dossier comme racine`);
       if (depuisRacine !== 1) echecs.push(`62 bis : le même tour, cwd à la racine du projet → attendu 1 fichier servi, obtenu ${depuisRacine}`);
       if (outilDepuisSous !== 0) echecs.push(`62 ter : un script d'outillage du premier niveau (scripts/outil.js) écrit depuis site/src/ → attendu 0 fichier servi, obtenu ${outilDepuisSous}`);

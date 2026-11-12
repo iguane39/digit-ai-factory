@@ -128,6 +128,8 @@
  *       « tout, une partie, rien » sur des défauts à corriger est refusée, corriger étant un geste d'agent (loi n° 5) ;
  *   S34 (TF-2331, 10/11, gabarit 2.66.0) étendue : une action manuelle_utilisateur de relecture de fond est refusée tant que le bloc 4
  *       ne montre pas la relecture par un agent ; S9 (TF-2342) compte l'ouverture après retrait de l'en-tête YAML et du titre ;
+ *   S135 UN « LOT DE CLÔTURE » SUPPOSE UN RUN QUI SE CLORA (12/11, TF-2429, gabarit 2.67.0) : chez un produit, une phrase qui promet un « lot de clôture » (hors ligne de remontée, que S48 juge, hors citation, hors négation)
+ *       alors que le ledger ne porte aucun run ouvert est signalée ; numéro pris au suivant libre (S125) plus 10 ; SANS_OBJET hors produit ; avertissante ;
  *   S115 UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (09/11, TF-2304, loi n° 5, gabarit 2.65.0) : une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage
  *       (decision, depense, irreversible) porte une commande d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, cmdlets Az et Graph ; pas git, node ni npm, souvent demandés pour un autre poste), la même figure ailleurs dans le texte, et aucune ligne qui la porte ne montre un code de retour d'échec ;
  *       numéro pris au suivant libre (S105) plus 10, comme S103, pour ne pas heurter une règle qu'une autre session ajoute le même jour ; avertissante ;
@@ -796,6 +798,23 @@ function runOuvert(produit) {
     }
   } catch { return { existe: true, ouvert: false }; }
   return { existe: true, ouvert: dernier === "run_open" };
+}
+// TF-2429 (S135) — les phrases qui promettent un « lot de clôture ». Lues hors citations (« … », `…`, blocs de code) et hors ligne de remontée (S48 la juge) ; écartée, une phrase dont
+// l'expression suit une négation ou un contraste (« pas », « plus », « jamais », « au lieu de », « plutôt que », « et non », « sans »), parce qu'elle dit ce qui ne se fait plus.
+const LOT_DE_CLOTURE_135 = uni(/\blots?\s+de\s+cl[ôo]ture\b/i);
+const NEGATION_AVANT_135 = uni(/\b(?:pas|plus|jamais|sans|au lieu d[eu]|plut[ôo]t que|et non|aucun\w*)\b[^.\n|]{0,60}$/i);
+function annoncesLotDeCloture(texte) {
+  const nu = String(texte).replace(/```[\s\S]*?```/g, " ").replace(/`[^`\n]*`/g, " ").replace(/«[^»\n]*»/g, " ");
+  const annonces = [];
+  for (const ligne of nu.split("\n")) {
+    if (/remont[ée]e\s+(?:à|a|vers)\s+la\s+factory/i.test(ligne)) continue;
+    for (const phrase of ligne.split(/(?<=[.;!?])\s+/)) {
+      const m = LOT_DE_CLOTURE_135.exec(phrase);
+      if (!m || NEGATION_AVANT_135.test(phrase.slice(0, m.index))) continue;
+      annonces.push(phrase.replace(/^[\s>*|-]+/, "").trim().slice(0, 110));
+    }
+  }
+  return annonces;
 }
 /** Les `seq` des entrées `type: retour` du ledger courant d'un produit (TF-2137) ; ledger absent ou illisible : aucun. */
 function retoursDuLedger(produit) {
@@ -3243,6 +3262,37 @@ function juger(texte, cheminJuge = null) {
         ok("S48", /rien (?:à|a) remonter/i.test(ligne) ? "le tour déclare n'avoir rien à remonter à la factory, et ne corrige aucune erreur de la session"
           : RESTE_AU_PRODUIT.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne) ? "le tour garde son retour au produit et dit pourquoi"
           : "le tour nomme le lot de retours remis à la factory");
+    }
+  }
+
+  // ---- S135 (12/11/2026, TF-2429, gabarit 2.67.0) — UN « LOT DE CLÔTURE » SUPPOSE UN RUN QUI SE CLORA -----------------------------------------------------
+  //
+  // LE FAIT. Le 26/10/2026 (un produit sans run ouvert) puis le 09/11/2026 (un autre, dont le ledger comptait 2 `run_open` pour 0 `run_close` : un run ouvert qui ne se clôt pas, cas que
+  // D-191 (a) traite en faisant partir le lot dans le tour), des restitutions écrivaient « partent avec le lot de clôture du run » pour des retours que le ledger gardait seuls. S48 (TF-1982) refuse
+  // déjà « reste au produit » sans run ouvert. Restait la promesse d'un « lot de clôture » écrite ailleurs que sur la ligne de remontée, que S48 ne lit pas, sans run ouvert (TF-2329, TF-2429).
+  // Un lot de clôture se compile à la clôture d'un run : sans run ouvert, aucune clôture ne viendra.
+  //
+  // LA RÈGLE. Chez un produit, une phrase qui parle d'un « lot de clôture » alors que `forge/ledger.jsonl` ne porte aucun run ouvert (même lecture que S48 : `runOuvert`) est
+  // signalée. AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook), à la demande de la décision du 12/11/2026 (« faire avertir »).
+  // MESURE D'ENTRÉE (12/11/2026, 167 sessions de 26 produits du poste, 7 047 messages d'assistant) : 59 messages disent « lot de clôture », 4 le disent sans run ouvert au ledger, tous
+  // chez un même produit, tous avant le 29/10 (date de S48 TF-1982), tous sur la ligne « reste au produit, parce que » que S48 refuse désormais ; 0 hors de cette ligne. Le besoin
+  // résiduel mesuré est donc nul à ce jour : la règle couvre la forme qui n'est pas encore arrivée, au prix d'un avertissement.
+  // CE QUI N'EST PAS LU, dit plutôt que promis : la ligne « Remontée à la factory » (S48 la juge) ; ce qui est entre « », entre accents graves ou en bloc de code (une citation de la
+  // règle n'est pas une promesse) ; une phrase qui nie la promesse (« pas », « plus », « jamais », « au lieu de », « sans » avant l'expression) ; un « lot de fin de run » ou
+  // « à la clôture du run » sans le mot « lot de clôture » ; l'état du ledger à l'instant de l'écriture (c'est celui d'aujourd'hui qui est lu).
+  {
+    const produit135 = produitDuJuge(cheminJuge);
+    if (!produit135)
+      findings.push({ regle: "S135", statut: "SANS_OBJET", message: "hors d'un produit (aucun forge/retours/ en remontant depuis le fichier jugé ou --racine) : le pilot et les forges n'ont pas de run au ledger auquel rattacher un lot de clôture" });
+    else {
+      const annonces135 = annoncesLotDeCloture(texte);
+      const run135 = runOuvert(produit135);
+      if (!annonces135.length) ok("S135", "aucune phrase ne promet un « lot de clôture » en dehors de la ligne de remontée");
+      else if (run135.ouvert) ok("S135", `${annonces135.length} phrase(s) parlent d'un « lot de clôture », et un run est ouvert au ledger du produit : la clôture viendra`);
+      else ko("S135", `${annonces135.length} phrase(s) renvoient à un « lot de clôture » (${annonces135.slice(0, 2).map((a) => `« ${a} »`).join(" ; ")}) alors qu'aucun run n'est ouvert au ledger du produit `
+        + `(${run135.existe ? "forge\\ledger.jsonl sans run_open en cours" : "forge\\ledger.jsonl absent"}) : un lot de clôture se compile à la clôture d'un run, et sans run ouvert aucune clôture ne viendra. `
+        + "Hors run, le tour remet son lot lui-même : compile `forge/retours/<projet> - RETOURS - AAAAMMJJx.md`, joue `node forge/retours/oracle-lot.mjs \"<lot>.md\" --remettre`, et nomme-le à la ligne « Remontée à la factory » "
+        + "(D-191 (a), TF-2429)");
     }
   }
 
@@ -6304,7 +6354,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   // 17/09 — S48 DANS SES QUATRE SENS (TF-1166, D-3 (a)). Un produit se reconnaît à son `forge\retours\` :
   // les fixtures vivent sous un faux socle qui le porte. Les quatre ne diffèrent que d'UNE ligne.
-  if (veut(48, 1166, 1643, 1982, 1987, 2137, 2305)) {
+  if (veut(48, 1166, 1643, 1982, 1987, 2137, 2305, 2429)) {
   mkdirSync(join(dir, "produit48", "forge", "retours"), { recursive: true });
   var jouer48 = (nom, ajout) => {
     const f = join(dir, "produit48", nom);
@@ -6383,7 +6433,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   // 29/10 — TF-1982 : « reste au produit » suppose un RUN OUVERT au ledger du produit (`forge/ledger.jsonl` : un `run_open` que nul `run_close` ne suit). Trois produits de banc :
   // un run ouvert, un run clos, un run rouvert ; `produit48`, lui, n'a aucun ledger.
-  if (veut(1982, 2137, 1987, 2305)) {
+  if (veut(1982, 2137, 1987, 2305, 2429)) {
   var LEDGER48 = (...types) => types.map((t, i) => JSON.stringify({ seq: i + 1, ts: `2026-10-26T10:0${i}:00+01:00`, type: t })).join("\n") + "\n";
   for (const [sous, types] of [["produit48-run-ouvert", ["run_open", "etape_open"]], ["produit48-run-clos", ["run_open", "etape_open", "run_close"]], ["produit48-run-rouvert", ["run_open", "run_close", "run_open"]]]) {
     mkdirSync(join(dir, sous, "forge", "retours"), { recursive: true });
@@ -6433,6 +6483,41 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`S48 (TF-2137) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
   if (!/n'est pas écrit/.test(c48(r48futur).message || "") || !/TF-2137/.test(c48(r48futur).message || ""))
     casse.push("S48 (TF-2137) : le constat du retour promis au futur doit dire que le retour n'est pas écrit et citer TF-2137 : " + String(c48(r48futur).message || "").slice(0, 200));
+  }
+  // 12/11 — TF-2429, S135 DANS SES SENS. Rouge : une phrase du bloc 4 promet « le lot de clôture du run » chez un produit dont le run est clos, ou qui n'a pas de ledger. Verts : le MÊME texte chez un
+  // produit dont un run est ouvert ; le remède (le lot nommé et remis) ; une phrase qui nie la promesse ; l'expression citée entre « » ; la ligne « Remontée à la factory » (S48 la juge, S135 la laisse) ;
+  // hors de tout produit (SANS_OBJET).
+  if (veut(2429)) {
+  const c135 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S135") || {}; } catch { return {}; } };
+  const PROMESSE135 = "\n- Les deux retours consignés au ledger (seq 3 et 4) partent avec le lot de clôture du run.\n";
+  const r135clos = jouer48Dans("produit48-run-clos", "s135-run-clos.md", PROMESSE135);
+  const r135sansLedger = jouer48("s135-sans-ledger.md", PROMESSE135);
+  const r135ouvert = jouer48Dans("produit48-run-ouvert", "s135-run-ouvert.md", PROMESSE135);
+  const r135remede = jouer48Dans("produit48-run-clos", "s135-remede.md", "\n- Les deux retours consignés au ledger (seq 3 et 4) sont compilés dans le lot « Produit-99 - RETOURS - 20261112a », remis au pilot.\n");
+  const r135nie = jouer48Dans("produit48-run-clos", "s135-niee.md", "\n- Le lot part dans le tour, plus avec le lot de clôture du run.\n");
+  const r135cite = jouer48Dans("produit48-run-clos", "s135-citee.md", "\n- La règle S135 refuse la promesse « le lot de clôture du run » quand aucun run n'est ouvert.\n");
+  const r135remontee = jouer48Dans("produit48-run-clos", "s135-remontee.md", "\n- Remontée à la factory : reste au produit, parce que les deux retours partent avec le lot de clôture du run.\n");
+  mkdirSync(join(dir, "hors-produit135"), { recursive: true });
+  const f135hors = join(dir, "hors-produit135", "s135-hors-produit.md");
+  writeFileSync(f135hors, verte + PROMESSE135, "utf8");
+  const r135hors = spawnSync(process.execPath, [moi, f135hors], { encoding: "utf8" });
+  for (const [r, statut, quoi] of [
+    [r135clos, "FAIL", "« partent avec le lot de clôture du run » chez un produit dont le run est clos passe — une clôture qui ne viendra pas"],
+    [r135sansLedger, "FAIL", "la même promesse chez un produit sans ledger passe"],
+    [r135ouvert, "PASS", "la même promesse chez un produit dont un run est ouvert est accusée — la clôture viendra"],
+    [r135remede, "PASS", "le remède (le lot nommé et remis, sans « lot de clôture ») est accusé"],
+    [r135nie, "PASS", "une phrase qui nie la promesse (« plus avec le lot de clôture ») est accusée"],
+    [r135cite, "PASS", "l'expression citée entre « » est prise pour une promesse"],
+    [r135remontee, "PASS", "la ligne « Remontée à la factory » est lue par S135 alors que S48 la juge"],
+    [r135hors, "SANS_OBJET", "hors de tout produit, la règle devrait être déclarée hors de portée"],
+  ]) if (c135(r).statut !== statut)
+    casse.push(`S135 (TF-2429) : ${quoi} — attendu ${statut} : ` + String(c135(r).message || "sortie illisible").slice(0, 200));
+  if (!/aucun run n'est ouvert/.test(c135(r135clos).message || "") || !/ledger\.jsonl sans run_open en cours/.test(c135(r135clos).message || "") || !/oracle-lot\.mjs/.test(c135(r135clos).message || ""))
+    casse.push("S135 (TF-2429) : le constat doit dire qu'aucun run n'est ouvert et nommer la commande qui remet le lot : " + String(c135(r135clos).message || "").slice(0, 240));
+  if (!/ledger\.jsonl absent/.test(c135(r135sansLedger).message || ""))
+    casse.push("S135 (TF-2429) : le constat sans ledger doit dire que le ledger est absent : " + String(c135(r135sansLedger).message || "").slice(0, 240));
+  // S48 garde sa ligne : la remontée « reste au produit » sans run ouvert reste refusée par S48, S135 ne la double pas.
+  if (c48(r135remontee).statut !== "FAIL") casse.push("S135 (TF-2429) : le témoin de la ligne de remontée n'est plus refusé par S48 — la répartition S48/S135 ne tient plus : " + String(c48(r135remontee).message || "").slice(0, 200));
   }
   // 29/10 — TF-1987 : UNE CORRECTION D'INFRASTRUCTURE EST UNE CORRECTION. Le cas réel du 24/10 : le tour recrée le conteneur d'un moteur avec un volume (`docker rm`, `docker run -v`),
   // puis déclare « rien à remonter ». FAIL ; le MÊME qui nomme son lot PASS ; une commande de lecture (`docker ps`) n'est pas une correction.
