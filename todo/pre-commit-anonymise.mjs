@@ -28,6 +28,10 @@
  *
  *   1. IL NE JUGE QUE L'INDEX, jamais l'histoire. C'est ce qui rend son coût nul — quelques
  *      fichiers au lieu de 909 révisions, quelques millisecondes au lieu de trois minutes ;
+ *      et, depuis TF-2457, il ne LIT que l'index (`git cat-file`) et ne RÉÉCRIT que l'index
+ *      (`hash-object -w` + `update-index`) : la copie de travail n'est jamais touchée, et ce que
+ *      d'autres sessions y ont posé sans l'enregistrer n'entre pas dans le commit (le 12/11/2026,
+ *      56 lignes neuves au lieu de 51 dans `todo/TODO.jsonl`) ;
  *   2. IL JOURNALISE CHAQUE SUBSTITUTION. Une correction silencieuse et non tracée est
  *      indiscernable d'une corruption : qui relit son diff doit pouvoir savoir POURQUOI son
  *      fichier a changé, et le journal le dit, fichier par fichier ;
@@ -45,7 +49,8 @@
  * Usage : appelé par `.git/hooks/pre-commit`. Manuellement : node todo/pre-commit-anonymise.mjs
  */
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync, existsSync, appendFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, appendFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { anonymiser } from "./anonymiser-entrant.mjs";
@@ -88,34 +93,74 @@ export function passer({ fichiers, ecrire = true, racine = RACINE, reempreindre 
   // 11/09, réparées à la main par `--par-rapprochement`.
   const sidecarsReecrits = [];
   for (const f of liste) {
-    const abs = join(racine, f);
-    if (!existsSync(abs)) continue;
+    // TF-2457 (12/11/2026) — LE CONTENU SE PREND À L'INDEX, jamais à la copie de travail. La passe
+    // lisait le disque, y réécrivait le fichier puis faisait `git add` : tout ce que la copie de
+    // travail portait en plus de l'index (les lignes qu'une autre session n'avait pas enregistrées)
+    // entrait dans le commit — 56 lignes neuves au lieu de 51, le 12/11 — et la copie de travail
+    // changeait sous les pieds de l'autre session. Même classe que TF-2321 (hameçon de
+    // quality-oracles), corrigée là le 10/11. Un fichier absent de l'index n'est pas le sujet d'un
+    // commit : seul le mode `--essai` (ecrire: false) le lit encore sur le disque.
+    const entree = entreeIndex(racine, f);
+    let octets;
+    if (entree) octets = contenuIndexe(racine, entree.sha);
+    else if (!ecrire && existsSync(join(racine, f))) { try { octets = readFileSync(join(racine, f)); } catch { continue; } }
+    if (!octets) continue;
 
     const nom = anonymiser(f);
     if (nom.texte !== f) nomsPorteurs.push({ fichier: f, propose: nom.texte });
 
-    let brut;
-    try { brut = readFileSync(abs, "utf8"); } catch { continue; }
-    if (brut.includes("\0")) continue;                      // binaire : jamais réécrit
+    if (octets.includes(0)) continue;                       // binaire : jamais réécrit
+    const brut = octets.toString("utf8");
     const { texte, remplaces, refuses: resistes } = anonymiser(brut, { code: EST_CODE.test(f) });
     for (const x of resistes || []) refuses.push({ fichier: f, ligne: x.ligne ?? null, motif: x.motif, autour: x.autour });
     if (texte === brut) continue;
     for (const t of tautologiesCreees(brut, texte)) tautologies.push({ fichier: f, ...t });
 
-    if (ecrire) {
-      writeFileSync(abs, texte, "utf8");
-      gitDans(racine, "add", "--", f);
+    if (ecrire && entree) {
+      // Le résultat retourne à l'INDEX par un objet neuf ; la copie de travail n'est pas touchée.
+      reindexer(racine, entree, f, texte);
+      if (f.endsWith(".tf.jsonl")) sidecarsReecrits.push({ fichier: f, avant: brut, apres: texte });
     }
     corriges.push({ fichier: f, termes: remplaces.length });
-    if (f.endsWith(".tf.jsonl")) sidecarsReecrits.push({ fichier: f, avant: brut });
   }
-  // La ré-empreinte n'a de sens QUE si le fichier a réellement été écrit sur disque : en mode
-  // `--essai` (ecrire: false), le contenu courant est encore celui d'avant, et reempreinter-lot
-  // dirait « rien à faire » sans jamais rien prouver.
-  const reempreintes = ecrire && sidecarsReecrits.length
-    ? reempreindre(racine, { contenus: sidecarsReecrits, renommages: [] })
-    : [];
+  // La ré-empreinte n'a de sens QUE si l'index a réellement été réécrit : en mode `--essai`
+  // (ecrire: false), le contenu courant est encore celui d'avant, et reempreinter-lot dirait
+  // « rien à faire » sans jamais rien prouver. Elle juge le contenu NOUVEAU de l'index, posé dans un
+  // dépôt jetable au même chemin relatif (la copie de travail, elle, garde le nom réel) ; le registre
+  // consigné reste celui du dépôt.
+  let reempreintes = [];
+  if (ecrire && sidecarsReecrits.length) {
+    const miroir = mkdtempSync(join(tmpdir(), "reemp-miroir-"));
+    try {
+      for (const s of sidecarsReecrits) {
+        mkdirSync(dirname(join(miroir, s.fichier)), { recursive: true });
+        writeFileSync(join(miroir, s.fichier), s.apres, "utf8");
+      }
+      reempreintes = reempreindre(miroir, { contenus: sidecarsReecrits, renommages: [] }, join(racine, "todo", "TODO.jsonl"));
+    } finally { rmSync(miroir, { recursive: true, force: true }); }
+  }
   return { corriges, nomsPorteurs, refuses, tautologies, reempreintes };
+}
+
+/** L'entrée d'INDEX d'un chemin (`{ mode, sha }`), ou null : absent de l'index, en conflit, lien ou sous-module. */
+function entreeIndex(racine, f) {
+  const sortie = gitDans(racine, "--literal-pathspecs", "ls-files", "--stage", "-z", "--", f);
+  const lignes = sortie.split("\0").filter(Boolean);
+  if (lignes.length !== 1) return null;                     // absent, ou conflit (plusieurs étages)
+  const m = /^(\d{6}) ([0-9a-f]{40,64}) 0\t/.exec(lignes[0]);
+  return m && (m[1] === "100644" || m[1] === "100755") ? { mode: m[1], sha: m[2] } : null;
+}
+
+/** Les octets de l'objet indexé, tels que git les tient (jamais convertis par la copie de travail). */
+function contenuIndexe(racine, sha) {
+  return execFileSync("git", ["cat-file", "blob", sha], { cwd: racine, maxBuffer: 64e6 });
+}
+
+/** Pose `texte` à l'index sous le même mode : un objet neuf, une entrée mise à jour, rien d'autre. */
+function reindexer(racine, entree, f, texte) {
+  const sha = execFileSync("git", ["hash-object", "-w", "--stdin"],
+    { cwd: racine, input: Buffer.from(texte, "utf8"), encoding: "utf8", maxBuffer: 64e6 }).trim();
+  gitDans(racine, "--literal-pathspecs", "update-index", "--cacheinfo", entree.mode, sha, f);
 }
 
 /**
@@ -157,7 +202,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   }
 
   for (const c of r.corriges) {
-    console.error(`  [pseudonymisé et ré-indexé] ${c.fichier} — ${c.termes} terme(s)`);
+    console.error(`  [pseudonymisé et ré-indexé, copie de travail intacte] ${c.fichier} — ${c.termes} terme(s)`);
     try {
       appendFileSync(JOURNAL, JSON.stringify({ ts: new Date().toISOString(), ...c }) + "\n", "utf8");
     } catch { /* le journal ne doit jamais bloquer un commit */ }

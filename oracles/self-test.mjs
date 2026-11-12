@@ -3367,5 +3367,44 @@ check("D-192 (a) nommage vert : un produit déclaré garde la lecture ordinaire 
   avecD192({ fichiers: ["Digit-AI - Grimoire Test - 20261109b.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Grimoire")) throw new Error("type hors registre à 3 segments accepté"); });
 });
 
+// ---- TF-2447 (12/11/2026) — R-25 NE LIT LE TYPE AU RANG DÉCLARÉ QUE SI LE 2E SEGMENT N'EST PAS DÉJÀ UN TYPE ADMIS ----
+// Le fait : chez le produit marketing, « Digit-AI - <Type> - <Objet> - AAAAMMJJ<i> » a son type au 2e segment, et le nommage
+// décidé (« Digit-AI - <Client> - <Type> <Objet> - … », rang 3) faisait lire le 3e : 10 noms conformes refusés sur leur objet
+// (Animation, Textes, Face, Série). Double sens sur les QUATRE formes mesurées, noms inventés : le type du 2e segment,
+// admis, suffit ; un 2e segment qui n'est pas un type (le client) laisse la lecture au rang déclaré ; sans déclaration,
+// la lecture au 2e segment est celle d'avant.
+const FORMES_2447 = [
+  ["Animation", "Digit-AI - Présentation - Animation du produit test - 20261109a.md"],
+  ["Textes", "Digit-AI - Proposition - Textes du clip test - 20261109b.md"],
+  ["Face", "Digit-AI - Proposition - Face au test - 20261109c.md"],
+  ["Série", "Digit-AI - Cadrage - Série d'animations du test - 20261109d.md"],
+];
+check("TF-2447 rouge→vert : avec le nommage décidé déclaré, un nom dont le 2e segment est un type admis (Présentation, Proposition, Cadrage) est lu au 2e segment — les 4 formes (Animation, Textes, Face, Série) PASSENT", () => {
+  const ecarts = [];   // les quatre formes sont jugées, et toutes celles qui échouent sont nommées
+  for (const [mot, nom] of FORMES_2447)
+    avecD192({ fichiers: [nom], nommage: NOMMAGE_OK }, "R-25", (r) => {
+      if (refusType(r, mot)) ecarts.push(`« ${mot} » est lu comme un type alors que le 2e segment en porte un`);
+      else if (r.exit !== 0 || r.fails.length) ecarts.push(`${nom} : exit ${r.exit} ${JSON.stringify(r.fails.map((x) => x.message.slice(0, 80)))}`);
+      else if (!r.passes.some((x) => /au type admis/.test(x.message))) ecarts.push(`${nom} : aucun PASS « au type admis » (verte vide)`);
+    });
+  if (ecarts.length) throw new Error(`${ecarts.length}/${FORMES_2447.length} forme(s) refusée(s) : ${ecarts.join(" ; ")}`);
+});
+check("TF-2447 second sens : le client en 2e segment laisse la lecture au rang déclaré — les mêmes 4 objets, derrière un client, restent REFUSÉS comme types", () => {
+  for (const [mot, nom] of FORMES_2447)
+    avecD192({ fichiers: [nom.replace(/^Digit-AI - \S+ - /, "Digit-AI - Client-A - ")], nommage: NOMMAGE_OK }, "R-25", (r) => {
+      if (r.exit !== 1 || !refusType(r, mot)) throw new Error(`« ${mot} » derrière un client n'est plus lu au rang 3 : exit ${r.exit} ${JSON.stringify(r.fails.map((x) => x.message.slice(0, 60)))}`);
+    });
+});
+check("TF-2447 second sens : un 2e segment HORS registre n'est pas « déjà un type » — la lecture reste au rang 3 et le 3e segment hors registre est refusé", () => {
+  // « Grimoire » n'est pas un type admis : le 2e segment n'est pas « déjà un type », la lecture reste au rang 3 (« Série »).
+  avecD192({ fichiers: ["Digit-AI - Grimoire - Série d'animations du test - 20261109e.md"], nommage: NOMMAGE_OK }, "R-25", (r) => {
+    if (r.exit !== 1 || !refusType(r, "Série")) throw new Error(`2e segment hors registre : la lecture a quitté le rang 3, exit ${r.exit}`);
+  });
+});
+check("TF-2447 borne : sans déclaration, la lecture reste au 2e segment — le nom du 2e rang admis passe, un 2e rang hors registre est refusé comme avant", () => {
+  avecD192({ fichiers: [FORMES_2447[3][1]] }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`nom à type en 2e segment refusé sans déclaration : ${JSON.stringify(r.fails)}`); });
+  avecD192({ fichiers: ["Digit-AI - Grimoire - Série d'animations du test - 20261109e.md"] }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Grimoire")) throw new Error(`2e segment hors registre accepté sans déclaration : exit ${r.exit}`); });
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
