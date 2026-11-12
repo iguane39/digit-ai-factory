@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 684 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 686 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -618,6 +618,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md | 20261001h | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` |
 | Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md | 20261013e | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` |
 | Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md | 20261013f | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` |
+| Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md | 20261112b | 5.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md` |
 | Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md | 20261026l | 4.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md` |
 | Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md | 20261017d | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` |
 | Digit-AI - Synthese Mandat - Essai de l audit de securite de Cloudflare - 20261102l.md | 20261102l | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de l audit de securite de Cloudflare - 20261102l.md` |
@@ -723,6 +724,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md | 20261019b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` |
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md | 20261015n | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` |
+| Digit-AI - Synthese Mandat - Tri A3 et boite d entree du 12-11 - 20261112a.md | 20261112a | 6.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri A3 et boite d entree du 12-11 - 20261112a.md` |
 | Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md | 20261019c | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` |
 | Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md | 20261109a | 9.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md` |
 | Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md | 20261102i | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` |

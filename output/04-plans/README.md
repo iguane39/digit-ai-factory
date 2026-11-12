@@ -119,6 +119,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` | fichier | 10,7 Ko | Synthèse Mandat — seules les décisions qui vous reviennent vous sont posées, 42a exécutée  |
 | `Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` | fichier | 6,5 Ko | Synthèse Mandat — dépôts privés hors d'accès non bloquants pour un poste tiers (13/10/2026 |
 | `Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` | fichier | 5,2 Ko | Synthèse Mandat — dépôts privés silencieux et confirmation d'installation en fin de comman |
+| `Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md` | fichier | 5,1 Ko | markdown |
 | `Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md` | fichier | 4,9 Ko | Synthèse Mandat — deux chantiers fusionnés sur quatre : décisions sans lettre et gestes de |
 | `Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` | fichier | 17,4 Ko | Synthèse Mandat — vos 12 décisions exécutées, rien n'est encore publié (17/10/2026) |
 | `Digit-AI - Synthese Mandat - Essai de l audit de securite de Cloudflare - 20261102l.md` | fichier | 6,4 Ko | Synthèse Mandat — essai de l'audit de sécurité de Cloudflare (02/11/2026) |
@@ -230,4 +231,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_209 fichier(s), 4 sous-dossier(s)_
+_210 fichier(s), 4 sous-dossier(s)_
