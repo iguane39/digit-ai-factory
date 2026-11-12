@@ -104,6 +104,23 @@ produit, un agent a commité un référentiel seul sans la recette du dépôt, e
 `docker compose config` ; la session a rejoué les deux, exit 0, mais rien dans le contrat ne
 disait que la vérification était due.
 
+**Au pilot, la recette est ciblée par nature de commit, la recette entière reste due avant la fusion
+(TF-2462, 12/11/2026).** Sur le pilot (`digit-ai-factory`), la recette ENTIÈRE (`node oracles\self-tests.mjs`)
+a duré 109 minutes sous charge le 12/11/2026 (de 13:51 à 15:40, mesurée par l'agent du lot pa : rapporté,
+non rejoué ici) : exigée avant chaque commit, elle rend la campagne impraticable. Pour le pilot seulement,
+la vérification d'un commit est donc ciblée :
+- code, référentiel ou configuration : les recettes des fichiers touchés ET de leurs consommateurs, soit le
+  test ou le `--self-test` de chaque fichier modifié, puis ceux des fichiers qui le lisent ou l'importent
+  (`git grep -l <nom du fichier>` sur le dépôt, hors `todo\`, `output\`, `input\` et `decisions\`) ;
+- référentiel : le régénérateur de la vue dérivée en plus, diff vide ;
+- configuration : la vérification de syntaxe de l'outil qui la lit, avant ces recettes.
+
+La recette entière reste due, une fois, avant la fusion : l'agent la joue en arrière-plan avant son rapport
+final et le rapport en cite le verdict (l'attente se règle par la section « Avancement des campagnes
+longues »). Pour chaque commit, le rapport nomme les fichiers touchés, les consommateurs trouvés, la
+commande jouée et son verdict. L'exemption est celle du pilot : un autre dépôt ne l'hérite pas, elle s'y
+décide sur une durée mesurée.
+
 **Un refus d'oracle jugé faux se RAPPORTE, il ne se contourne pas (TF-1912, 21/10/2026).**
 Quand un oracle, un validateur ou un contrôle remis à l'agent refuse ce que l'agent juge correct,
 l'agent n'altère pas le livrable pour le faire taire. Il garde la forme correcte, cite au rapport
