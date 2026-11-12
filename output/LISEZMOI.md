@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 686 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 687 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -579,6 +579,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md | 20261029e | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md` |
 | Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md | 20261018n | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` |
 | Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md | 20261018o | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` |
+| Digit-AI - Synthese Mandat - Campagne A1 et tri A2 du 12-11 - 20261112c.md | 20261112c | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A1 et tri A2 du 12-11 - 20261112c.md` |
 | Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md | 20261110b | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md` |
 | Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md | 20261102n | 20.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md` |
 | Digit-AI - Synthese Mandat - Campagne D-41 - 20261019e.md | 20261019e | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne D-41 - 20261019e.md` |
