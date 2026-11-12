@@ -102,7 +102,9 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       // TF-2181 (HERITAGE 1.52.0, 05/11/2026) : les sessions sans relevé des coûts rattrapées à l'ouverture.
       { type: "command", command: "node forge/hooks/factory.mjs couts --rattraper", async: true }] }],
     SessionEnd: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs couts" }] }],
-    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
+    // D-209 (a) (HERITAGE 1.61.0, 12/11/2026) : la veille du suivi des agents, en asyncRewake, en fin de tour.
+    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" },
+      { type: "command", command: "node forge/hooks/factory.mjs suivi-agents --veille", asyncRewake: true, timeout: 1200 }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
       { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },
         { type: "command", command: "node forge/hooks/factory.mjs remisage" }] },
@@ -115,7 +117,8 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       // D-19 (a) (HERITAGE 1.29.0, 18/10/2026) : la flotte d'agents rappelée à chaque délégation.
       { matcher: "Agent|Task", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs flotte" }] }],
     // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
-    PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) },
+    PostToolUse: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs suivi-agents" }] },
+      { matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) },
       // TF-2211 (HERITAGE 1.55.0, 06/11/2026) : les contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close.
       { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs controles-produit" }] }],
     UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } })

@@ -191,5 +191,6 @@ verifier("Agent avec fichier d'avancement : silence", avecAv === null);
 
 rmSync(racine, { recursive: true, force: true });
 rmSync(ETAT, { recursive: true, force: true });
-console.log(`hook-suivi-agents.test : ${ok}/${ok + ko} PASS`);
+console.log(`hook-suivi-agents.test : ${ok}/${ok + ko} PASS — à double sens : cas rouges joués (faux point refusé, synthèse titrée refusée, point qui pose une décision refusé, `
+  + "faux point jugé exit 1 par oracle-synthese, tour d'écriture clos sur un point jugé, agent fini depuis plus de 17 min jamais montré) et leurs cas verts");
 process.exit(ko ? 1 : 0);
