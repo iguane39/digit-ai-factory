@@ -12,7 +12,7 @@ Livré : [Revue L99 du prompt](output/03-etudes/Digit-AI%20-%20Revue%20-%20Promp
 
 ## 1. En-tête d'identification
 
-Analyse L99 en mode boucle (skill `prompt-analyzer-l99`, 8 couches, relecteurs aveugles) de la demande « Certains agents tournent pendant des heures… toutes les 15 minutes, avec les tâches exécutées et celles restants à faire ». Sur le pilot `digit-ai-factory` (commit 9d4c4f21). Période : 12/11/2026, du premier relevé à 17:36 jusqu'à 19:21, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 12 sous-agents de relecture et de vérification, en lecture seule.
+Analyse L99 en mode boucle (skill `prompt-analyzer-l99`, 8 couches, relecteurs aveugles) de la demande « Certains agents tournent pendant des heures… toutes les 15 minutes, avec les tâches exécutées et celles restants à faire ». Sur le pilot `digit-ai-factory` (commit 9d4c4f21). Période : 12/11/2026, du premier relevé à 17:36 jusqu'à 19:21, heure de Paris (UTC+01:00). Session pilote Claude Opus 5.5 ; 10 sous-agents en lecture seule : 6 relecteurs aveugles, 2 vérificateurs de clôture, 2 relecteurs d'intention.
 
 Intention de la demande : savoir à tout moment si un agent long vit encore, ce qu'il a fait et ce qui lui reste, et que ce suivi tourne vraiment chez tous les produits.
 
@@ -29,7 +29,7 @@ Le seul bloquant qui retient l'exécution complète :
 
 > **D-209 — Le suivi des agents toutes les 15 minutes doit-il être exigé et prouvé par des bancs, ou rester un réglage visé sans preuve, comme le laissait entendre le mot idéalement ?**
 > - **De quoi s'agit-il** : l'étape 5 du prompt `Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` fait tourner 4 agents de test (35, 12, 20 et 10 minutes) et un contrôle qui relit les transcripts, avant de déclarer le suivi livré.
-> - **Le problème** : vous avez écrit « Idéalement, lorsqu'un agent s'exécute plus de 15 minutes ». La preuve par bancs transforme ce souhait en exigence, et rallonge le mandat d'environ 1 h 30 de bancs.
+> - **Le problème** : vous avez écrit « Idéalement, lorsqu'un agent s'exécute plus de 15 minutes ». La preuve par bancs transforme ce souhait en exigence, et rallonge le mandat d'environ 1 h 30 de bancs, durée estimée.
 > - **Pourquoi vous** : c'est un arbitrage entre la charge du mandat et la certitude qu'il marche ; les 3 corrections précédentes, du 11/08 au 12/11, ont été closes sans aucune mesure d'usage.
 > - **Recommandation : (a)** — votre phrase « assure toi qu'elle puisse être complétée et exécutée correctement » demande une preuve, et seul un banc la donne. Source consultée : le registre `todo/TODO.jsonl`, clôture du 12/11 « aucun gain chiffré avant usage ».
 
