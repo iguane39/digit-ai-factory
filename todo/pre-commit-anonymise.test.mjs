@@ -6,7 +6,7 @@
  * temporaire, y indexe des fichiers, et vérifie ce que le geste en fait. Il pose aussi ses
  * propres tables jetables (TF-0957) — un banc qui hérite du référentiel de production l'abîme.
  */
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, copyFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -132,6 +132,7 @@ check("ROUGE sans le correctif / VERT avec : un sidecar DÉJÀ INGÉRÉ, réécr
     fichier: "Produit-09 - RETOURS - 20260911a.tf.jsonl", lot_sha: shaIngere,
   }) + "\n", "utf8");
   const f = poser("Produit-09 - RETOURS - 20260911a.tf.jsonl", AVANT_INGERE);
+  git("add", "--", f);   // TF-2457 : la porte ne juge que l'INDEX, le sidecar doit y être comme au commit
   const r = passer({ fichiers: [f], ecrire: true, racine: DEPOT });
   att(Array.isArray(r.reempreintes), "passer() ne rend pas `reempreintes` — le correctif TF-1213 n'est pas câblé");
   const rp = r.reempreintes.find((x) => x.fichier === f);
@@ -149,11 +150,93 @@ const nbLignes = (chemin) => readFileSync(chemin, "utf8").trim().split("\n").len
 check("SECOND SENS — un sidecar JAMAIS INGÉRÉ, réécrit par la passe, ne consigne RIEN (verdict REFUS, registre inchangé)", () => {
   const avant = nbLignes(registreDepot);
   const f = poser("Produit-77 - RETOURS - 20260911a.tf.jsonl", '{"ev":"creation","titre":"Lot de Zorglub"}\n');
+  git("add", "--", f);   // TF-2457 : idem, le sidecar est dans l'index comme au commit
   const r = passer({ fichiers: [f], ecrire: true, racine: DEPOT });
   const rp = r.reempreintes.find((x) => x.fichier === f);
   att(rp, `aucune ré-empreinte rendue pour ${f}`);
   att(rp.verdict !== "CONSIGNE", `verdict ${rp.verdict} — un sidecar jamais ingéré ne doit rien consigner`);
   att(nbLignes(registreDepot) === avant, "le registre a grossi alors qu'aucune ingestion ne couvrait ce sidecar");
+});
+
+// TF-2457 (12/11/2026) — LA PORTE NE JUGE QUE L'INDEX ET NE RÉÉCRIT QUE L'INDEX. Elle lisait la
+// copie de TRAVAIL, la pseudonymisait, l'écrivait sur le disque puis faisait `git add` : les lignes
+// qu'une autre session n'avait pas enregistrées entraient dans le commit (56 lignes neuves au lieu de
+// 51, le 12/11). Le contenu se prend à l'index (`git show :chemin`), le résultat y retourne par un
+// objet neuf (`hash-object -w` + `update-index`), et la copie de travail reste intacte.
+const indexe = (f) => git("show", ":" + f);
+const surDisque = (f) => readFileSync(join(DEPOT, f), "utf8");
+const modeIndex = (f) => git("ls-files", "--stage", "--", f).split(/\s/)[0];
+
+check("ROUGE → VERT (TF-2457) — des lignes NON INDEXÉES de la copie de travail restent hors de l'index, et la copie n'est pas réécrite", () => {
+  const f = "partage.jsonl";
+  poser(f, "ligne 1 de Zorglub\nligne 2\n");
+  git("add", "--", f);
+  const travail = "ligne 1 de Zorglub\nligne 2\nligne 3 d'une autre session, non enregistrée\n";
+  poser(f, travail);
+  const r = passer({ fichiers: [f], ecrire: true, racine: DEPOT });
+  att(r.corriges.some((c) => c.fichier === f), "le fichier porteur de l'index n'est pas relevé");
+  const i = indexe(f);
+  att(!i.includes("autre session"), `une ligne non indexée est entrée dans l'index : ${JSON.stringify(i)}`);
+  att(i === "ligne 1 de Client-A\nligne 2\n", `l'index n'est pas le contenu indexé pseudonymisé : ${JSON.stringify(i)}`);
+  att(surDisque(f) === travail, `la copie de travail a été réécrite : ${JSON.stringify(surDisque(f))}`);
+});
+
+check("ROUGE → VERT (TF-2457, le cas du 12/11) — commit sur un INDEX TEMPORAIRE : ses lignes sont pseudonymisées, celles d'une autre session ne le rejoignent pas", () => {
+  const f = "registre-commun.jsonl";
+  const base = '{"n":1}\n';
+  poser(f, base);
+  git("add", "--", f);                                     // l'index principal
+  const session = base + '{"n":2,"t":"Zorglub"}\n';        // ce que la session enregistre
+  const travail = session + '{"n":3,"t":"autre session"}\n'; // la copie de travail porte aussi l'autre
+  poser(f, travail);
+  // L'index d'un `git commit --only` : une copie de l'index principal où la session pose SA version.
+  const temporaire = join(T, "index-temporaire");
+  copyFileSync(join(DEPOT, ".git", "index"), temporaire);
+  const memoire = process.env.GIT_INDEX_FILE;
+  let dansTemporaire;
+  try {
+    process.env.GIT_INDEX_FILE = temporaire;
+    const sha = execFileSync("git", ["hash-object", "-w", "--stdin"], { cwd: DEPOT, input: session, encoding: "utf8" }).trim();
+    git("update-index", "--cacheinfo", "100644", sha, f);
+    passer({ fichiers: [f], ecrire: true, racine: DEPOT });
+    dansTemporaire = indexe(f);
+  } finally {
+    if (memoire === undefined) delete process.env.GIT_INDEX_FILE; else process.env.GIT_INDEX_FILE = memoire;
+  }
+  att(!dansTemporaire.includes("autre session"), `la ligne de l'autre session est entrée dans le commit : ${JSON.stringify(dansTemporaire)}`);
+  att(dansTemporaire === base + '{"n":2,"t":"Client-A"}\n', `le commit ne porte pas exactement les lignes de la session pseudonymisées : ${JSON.stringify(dansTemporaire)}`);
+  att(surDisque(f) === travail, "la copie de travail a été réécrite");
+  att(indexe(f) === base, "l'index principal a été touché alors que la passe travaillait sur l'index temporaire");
+});
+
+check("SECOND SENS (TF-2457) — un fichier indexé PROPRE dont la copie de travail diffère n'est touché ni dans l'index ni sur le disque, et n'est pas relevé", () => {
+  const f = "propre-partage.md";
+  poser(f, "a\n");
+  git("add", "--", f);
+  const travail = "a\nb de Zorglub, non indexé\n";
+  poser(f, travail);
+  const avant = git("ls-files", "--stage", "--", f);
+  const r = passer({ fichiers: [f], ecrire: true, racine: DEPOT });
+  att(!r.corriges.some((c) => c.fichier === f), "un fichier propre à l'index est déclaré corrigé d'après sa copie de travail");
+  att(git("ls-files", "--stage", "--", f) === avant, "l'entrée d'index d'un fichier propre a changé");
+  att(surDisque(f) === travail, "la copie de travail d'un fichier propre a été réécrite");
+});
+
+check("SECOND SENS (TF-2457) — un fichier ABSENT de l'index n'y entre jamais, même porteur, et reste intact sur le disque", () => {
+  const f = poser("hors-index.md", "Zorglub, jamais indexé.\n");
+  const r = passer({ fichiers: [f], ecrire: true, racine: DEPOT });
+  att(git("ls-files", "--", f).trim() === "", "un fichier non indexé est entré dans l'index");
+  att(!r.corriges.some((c) => c.fichier === f), "un fichier non indexé est déclaré corrigé");
+  att(surDisque(f) === "Zorglub, jamais indexé.\n", "un fichier non indexé a été réécrit");
+});
+
+check("le mode de l'entrée d'index est conservé à la réécriture (100755 reste 100755)", () => {
+  const f = poser("lanceur.sh", "echo Zorglub\n");
+  git("add", "--chmod=+x", "--", f);
+  att(modeIndex(f) === "100755", "préparation : l'entrée n'est pas exécutable");
+  passer({ fichiers: [f], ecrire: true, racine: DEPOT });
+  att(indexe(f) === "echo Client-A\n", `contenu indexé inattendu : ${JSON.stringify(indexe(f))}`);
+  att(modeIndex(f) === "100755", `le mode est devenu ${modeIndex(f)}`);
 });
 
 rmSync(T, { recursive: true, force: true });
