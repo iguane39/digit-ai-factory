@@ -26,6 +26,7 @@ import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gest
 import { constatR47 } from "./lib-resume-r47.mjs";
 import { lancerRejeuHebdomadaire, lignesOuverture as lignesConsommateursRouges, lignesRejeuOuverture, traceRouges } from "./consommateurs-skills.mjs";
 import { skillsInstalles } from "../scripts/lib-config-installee.mjs";
+import { cheminTrace as cheminTraceWorkflows, lancerReleve as lancerReleveWorkflows, lignesOuverture as lignesWorkflowsHeberges } from "./releve-workflows-heberges.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -600,6 +601,19 @@ if (iPilot < 0) {
       }
     }
   }
+}
+
+// TF-2442 (12/11/2026, RP-26) — UN WORKFLOW HÉBERGÉ QUI ÉCHOUE SE DIT À L'OUVERTURE DU PILOT. Le fait : du 03 au 12/11, le workflow de programmation des
+// publications d'un produit a échoué 5 fois de suite ; 3 publications du client ne sont pas parties et personne ne l'a su pendant 9 jours. Le relevé des
+// exécutions (`gh run list`, lecture seule) se joue EN ARRIÈRE-PLAN par `releve-workflows-heberges.mjs`, détaché comme le rejeu hebdomadaire (D-135 (a)) : ce
+// hook synchrone ne lit qu'un fichier de trace locale et lance le relevé s'il est périmé ; son résultat se lit à l'ouverture suivante. Chez le pilot seulement.
+// FORGE_SANS_RELEVE_WORKFLOWS=1 : aucun relevé n'est lancé (la recette du hook le pose par défaut ; son banc dédié l'ôte, sur un faux `gh` et une trace jetable).
+if (iPilot < 0) {
+  try {
+    const trace = cheminTraceWorkflows(PILOT);
+    const lancer = process.env.FORGE_SANS_RELEVE_WORKFLOWS === "1" ? null : () => lancerReleveWorkflows({ trace, pilot: PILOT });
+    lignes.push(...lignesWorkflowsHeberges(trace, { lancer }));
+  } catch (e) { lignes.push("", `## Workflows hébergés des produits : NON jugés (${String(e.message).slice(0, 120)}) — TF-2442`); }
 }
 
 // TF-0788 (décision D-3 (a), 03/09/2026) — UNE MONTÉE DE VERSION D'UN SKILL SE LIT CHEZ QUI LE

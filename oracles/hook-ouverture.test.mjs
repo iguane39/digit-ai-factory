@@ -39,6 +39,11 @@ const PILOT = join(ICI, "..");
 // doit JAMAIS déclencher le vrai : le lancement est coupé pour tous les passages ci-dessous, et seul le banc du rejeu (fin de fichier) le rétablit,
 // sur une table factice et une trace jetable.
 process.env.FORGE_SANS_REJEU_HEBDOMADAIRE = "1";
+// TF-2442 : l'ouverture du pilot lance aussi, en arrière-plan, le relevé des workflows hébergés des produits (`gh run list`, réseau). Ce banc ne doit JAMAIS
+// le déclencher en vrai : le lancement est coupé pour tous les passages ci-dessous, la trace désignée est jetable, et seul le banc dédié (fin de fichier) le
+// rétablit, sur un faux `gh` et des dépôts jetables.
+process.env.FORGE_SANS_RELEVE_WORKFLOWS = "1";
+process.env.FORGE_TRACE_WORKFLOWS = join(TABLES, "workflows-heberges.json");
 // TF-2067 : une recette n'écrit pas le registre du dépôt qui la joue. L'ouverture du pilot écrit, dans des fichiers SUIVIS, le passage
 // hebdomadaire des récidives (todo/observabilite/snapshots-recidives.jsonl et RECIDIVES.json, dès que le dernier relevé a 7 jours) et le journal
 // d'héritage (todo/HERITAGE-RELEVES.jsonl). Les deux sont coupés ici, une fois pour tout le fichier, et non appel par appel : le passage
@@ -1224,6 +1229,105 @@ if (sectionVoulue) {
   }
 }
 
+// ---- TF-2442 (12/11/2026, RP-26) : un workflow hébergé en échec 2 fois de suite se dit à l'ouverture du pilot, relevé en arrière-plan -------------------
+// Le fait : le workflow de programmation des publications d'un produit a échoué 5 fois de suite du 03 au 12/11, 9 jours sans alerte. Un produit FICTIF (vrai
+// dépôt git, remote GitHub fictif jamais interrogé, un workflow local) et un FAUX `gh` qui ATTEND qu'on le libère : si l'ouverture attendait le relevé, elle ne
+// rendrait pas la main. Aucun réseau, aucun nom réel ; la trace et le parc sont jetables.
+if (veut(2442)) {
+  const dormir = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+  const attendreQue = (cond, ms) => { const fin = Date.now() + ms; while (Date.now() < fin) { if (cond()) return true; dormir(250); } return cond(); };
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-workflows-"));
+  const racine = join(dossier, "parc");
+  const produit = join(racine, "produit-fictif-a");
+  mkdirSync(join(produit, "forge"), { recursive: true });
+  writeFileSync(join(produit, "forge", "ledger.jsonl"), "", "utf8");
+  mkdirSync(join(produit, ".github", "workflows"), { recursive: true });
+  writeFileSync(join(produit, ".github", "workflows", "programmer.yml"), "name: programmer" + NL, "utf8");
+  spawnSync("git", ["init", "-q"], { cwd: produit });
+  spawnSync("git", ["remote", "add", "origin", "https://github.com/acme-fictif/depot-fictif.git"], { cwd: produit });
+  const liberer = join(dossier, "liberer"), appels = join(dossier, "appels-gh.txt"), trace = join(dossier, "workflows-heberges.json");
+  const DELAI_OUVERTURE = 240000;
+  const VIE_FACTICE = 3 * DELAI_OUVERTURE + 60000;
+  const runsFaux = [1, 2, 3, 4, 5].map((n) => ({ databaseId: n, workflowName: "programmer", status: "completed", conclusion: "failure", createdAt: `2026-11-0${n + 3}T06:00:00Z`, url: `https://exemple.invalid/runs/${n}` }));
+  const ghFaux = join(dossier, "gh-faux.mjs");
+  writeFileSync(ghFaux, [
+    'import { existsSync, appendFileSync } from "node:fs";',
+    `appendFileSync(${JSON.stringify(appels)}, process.argv.slice(2).join(" ") + ${JSON.stringify(NL)});`,
+    `const L = ${JSON.stringify(liberer)}; const fin = Date.now() + ${VIE_FACTICE};`,
+    "while (!existsSync(L) && Date.now() < fin) await new Promise((r) => setTimeout(r, 200));",
+    `console.log(${JSON.stringify(JSON.stringify(runsFaux))});`,
+  ].join(NL) + NL, "utf8");
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-workflows-cwd-"));
+  const SECTION = "## Workflows hébergés des produits";
+  const lire = (p) => { try { return JSON.parse(readFileSync(p, "utf8")); } catch { return null; } };
+  const base = { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racine, FORGE_TRACE_WORKFLOWS: trace, FORGE_GH_SCRIPT: ghFaux, FORGE_DELAI_GH_MS: String(VIE_FACTICE + 60000) };
+  const LANCE = { FORGE_SANS_RELEVE_WORKFLOWS: undefined };   // `undefined` retire la variable du processus lancé : c'est ce qui rétablit le lancement
+  const jouer = (extra = {}, enProduit = false) => {
+    const t0 = Date.now();
+    const out = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
+      { cwd, encoding: "utf8", timeout: DELAI_OUVERTURE, env: { ...base, ...extra } });
+    return { out, ms: Date.now() - t0 };
+  };
+  try {
+    const temoin = jouer({ FORGE_SANS_RELEVE_WORKFLOWS: "1" });
+    check("TF-2442 vert — FORGE_SANS_RELEVE_WORKFLOWS=1 : l'ouverture ne lance rien et ne dit rien des workflows", () => {
+      if (temoin.out.includes(SECTION) || existsSync(trace) || existsSync(`${trace}.verrou`) || existsSync(appels)) throw new Error("un relevé est lancé malgré le drapeau");
+    });
+
+    const premiere = jouer(LANCE);
+    const verrouPose = attendreQue(() => lire(`${trace}.verrou`) !== null, 30000);
+    const verrou = lire(`${trace}.verrou`);
+    check("TF-2442 rouge — l'ouverture lance le relevé, REND LA MAIN sans l'attendre, et le relevé lui survit (processus détaché, verrou posé, gh encore bloqué)", () => {
+      if (!premiere.out.includes(SECTION) || !/relevé relancé en arrière-plan/.test(premiere.out) || !/aucun relevé encore/.test(premiere.out)) throw new Error(`lancement non dit : ${premiere.out.slice(Math.max(0, premiere.out.indexOf("## Workflows")), 500)}`);
+      if (existsSync(liberer)) throw new Error("le faux gh a été libéré avant la fin de l'ouverture");
+      if (!verrouPose || !verrou) throw new Error(`après le retour du hook : verrou ${JSON.stringify(verrou)}`);
+      try { process.kill(verrou.pid, 0); } catch { throw new Error(`le processus du relevé (pid ${verrou.pid}) n'a pas survécu à l'ouverture`); }
+      if (existsSync(trace)) throw new Error("la trace existe avant que gh ait répondu : l'ouverture a attendu le relevé");
+    });
+    const msLancement = Number((/lancement en (\d+) ms/.exec(premiere.out) || [])[1]);
+    console.log(`  (mesure : ouverture sans lancement ${temoin.ms} ms, avec lancement ${premiere.ms} ms, appel de lancement ${msLancement} ms ; faux gh encore bloqué au retour)`);
+    check("TF-2442 — le hook reste synchrone et court : le lancement lui-même prend moins de 2 s, mesuré dans le hook (la coupure est à 60 s, la borne du hook à 45 s)", () => {
+      if (!(msLancement < 2000)) throw new Error(`appel de lancement : ${msLancement} ms`);
+    });
+
+    const pendant = jouer(LANCE);
+    check("TF-2442 — une seconde ouverture pendant que le relevé tourne n'en lance pas un autre", () => {
+      if (/relevé relancé en arrière-plan/.test(pendant.out)) throw new Error("un second relevé est lancé");
+      if ((readFileSync(appels, "utf8").match(/\n/g) || []).length !== 1) throw new Error(`gh appelé ${(readFileSync(appels, "utf8").match(/\n/g) || []).length} fois`);
+    });
+
+    const autre = mkdtempSync(join(tmpdir(), "ouverture-workflows-produit-"));
+    const enProduit = jouer({ ...LANCE, FORGE_TRACE_WORKFLOWS: join(autre, "t.json") }, true);
+    check("TF-2442 — chez un produit (--pilot), l'ouverture ne lance aucun relevé et n'écrit rien", () => {
+      if (enProduit.out.includes(SECTION) || existsSync(join(autre, "t.json")) || existsSync(join(autre, "t.json.verrou"))) throw new Error("un relevé part d'un produit");
+    });
+    rmSync(autre, { recursive: true, force: true });
+
+    writeFileSync(liberer, "1", "utf8");
+    const fini = attendreQue(() => lire(trace) !== null && !existsSync(`${trace}.verrou`), 60000);
+    check("TF-2442 — le relevé écrit sa trace (produit, workflow, 5 échecs de suite), retire son verrou, et n'a lancé que `gh run list`", () => {
+      const t = lire(trace);
+      if (!fini || !t) throw new Error(`relevé non terminé : trace ${JSON.stringify(t)}`);
+      const e = t.produits?.[0]?.en_echec?.[0];
+      if (t.produits.length !== 1 || t.produits[0].produit !== "produit-fictif-a" || e?.workflow !== "programmer" || e?.consecutifs !== 5) throw new Error(`trace : ${JSON.stringify(t.produits)}`);
+      const l = readFileSync(appels, "utf8").split(NL).filter(Boolean);
+      if (l.length !== 1 || !/^run list --repo acme-fictif\/depot-fictif /.test(l[0])) throw new Error(`appels à gh : ${JSON.stringify(l)}`);
+    });
+
+    const suivante = jouer(LANCE);
+    check("TF-2442 rouge — à l'ouverture suivante, le workflow en échec est NOMMÉ (produit, workflow, 5 fois de suite, depuis le 04/11, adresse) et rien n'est relancé avant 60 min", () => {
+      const l = suivante.out.split(SECTION)[1] || "";
+      if (!/produit-fictif-a/.test(l) || !/`programmer` en échec 5 fois de suite/.test(l) || !/depuis le 2026-11-04/.test(l) || !/exemple\.invalid\/runs\/5/.test(l) || !/1 en échec/.test(l)) throw new Error(`échec non affiché : ${suivante.out.slice(0, 400)}`);
+      if (/relevé relancé en arrière-plan/.test(suivante.out) || (readFileSync(appels, "utf8").match(/\n/g) || []).length !== 1) throw new Error("un relevé a été relancé à moins de 60 min");
+    });
+  } finally {
+    try { writeFileSync(liberer, "1", "utf8"); } catch { /* le dossier jetable est déjà retiré */ }
+    attendreQue(() => !existsSync(`${trace}.verrou`), 15000);
+    rmSync(dossier, { recursive: true, force: true });
+    rmSync(cwd, { recursive: true, force: true });
+  }
+}
+
 if (filtre.actif) { const c = conclureFiltre("hook-ouverture", filtre, fail ? [`${fail} contrôle(s) en échec (lignes [FAIL] ci-dessus)`] : []); (c.code === 0 ? console.log : console.error)(c.ligne); process.exit(c.code); }
-console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135 ; journal d'héritage, TF-2067) : ${pass} PASS, ${fail} FAIL`);
+console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135 ; journal d'héritage, TF-2067 ; workflows hébergés en échec, TF-2442) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
