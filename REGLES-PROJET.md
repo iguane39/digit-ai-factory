@@ -1897,6 +1897,12 @@ critique pour le travail des développeurs, leur efficacité, résilience. »
    une fois par produit. Sans lui, la restauration joue seule.
 4. **Un secret ne transite jamais par le canal**, dans aucun sens et quelle que soit la liste du
    manifeste (garde-fou « les .env ne transitent jamais ») : il se ressaisit sur chaque poste.
+   **Exception écrite (D-208 (a) du porteur, 12/11/2026, TF-2440)** : la sauvegarde qu'un développeur
+   fait de SES PROPRES fichiers de secrets, hors du canal de reprise, est permise. Elle passe par
+   `forge\fusionner-env.mjs` (copie conforme de `scripts\fusionner-env.mjs`), qui fusionne clé par clé,
+   refuse toute copie qui perdrait une clé, refuse un conflit de valeur sans choix explicite, exige un
+   fichier de poste ignoré par git et n'imprime jamais une valeur. Le canal de reprise lui-même reste
+   fermé aux secrets : RP2 d'`oracle-reprise` les refuse toujours au manifeste.
 5. **Une action de transport entre postes ne se laisse pas à l'humain** quand un canal est déclaré :
    ce qui lui reste, c'est le feu vert, pas la copie.
 
