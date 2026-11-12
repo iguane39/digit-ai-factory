@@ -295,8 +295,13 @@ par sondage en avant-plan, l'autre n'a rien émis.
   la nomme et donne sa fin attendue (une heure relevée à l'horloge, appuyée sur une durée déjà
   mesurée ou sur le délai que tu poses à l'outil) ; tant que cette heure n'est pas passée, aucune
   émission n'est due. Si la commande l'a dépassée, tu émets à cette heure une ligne qui dit le
-  glissement et la nouvelle fin attendue. La commande se joue en avant-plan, avec un délai
-  explicite (section suivante). 2) Une compaction du contexte : tu ne peux pas émettre pendant ;
+  glissement et la nouvelle fin attendue. La ligne porte deux clés lues par le suivi des
+  agents : `commande` (son nom) et `fin_attendue` (heure ISO 8601) ; tant que cette heure n'est pas
+  passée, le point de suivi dit « commande longue » et jamais « présumé arrêté ». Le harnais bascule
+  en arrière-plan, vers 175 s, une commande lancée au premier plan (TF-2463, mesuré 4 fois le
+  12/11/2026) : une commande qui peut dépasser 2 minutes se lance donc d'emblée en arrière-plan,
+  sa fin attendue annoncée, et tu l'attends par des tranches bornées (une commande d'attente de
+  150 s au plus, rejouée jusqu'à sa fin), jamais en clôturant ton tour. 2) Une compaction du contexte : tu ne peux pas émettre pendant ;
   ta première ligne après la reprise dit qu'une compaction a eu lieu et redonne le plan (réalisé,
   RAF). Le fait : le 10/11/2026, une campagne de 2 h 30 a fait 18 émissions, dont 10 écarts de
   plus de 4 minutes et un de 33 minutes, tous pendant des commandes longues ou une compaction ;
@@ -304,15 +309,24 @@ par sondage en avant-plan, l'autre n'a rien émis.
 - **quoi** : la forme dégradée d'`AVANCEMENT-PROCESS.md` — heure de démarrage · heure
   d'émission · réalisé (chantiers finis, avec leur preuve) · en cours (chantier + une
   sous-unité mesurable : fichier, cas de test, compteur) · RAF nommé · fin prévue,
-  glissement dit ;
+  glissement dit. Le suivi des agents lit trois clés de la DERNIÈRE ligne : `ts` (heure
+  d'émission ISO 8601), `faits` et `restants` (listes de tâches nommées) ; une ligne qui ne les
+  porte pas rend « non déclaré par l'agent » au point de suivi ;
 - **sous-découpe** : une unité qui occupe plus d'une fenêtre se découpe en sous-unités
   nommées — deux émissions identiques sont indistinguables d'un blocage ;
-- **côté pilot** : la consigne nomme le fichier, et la session arme un guetteur dessus au
-  lancement (outil Monitor, ou relecture du fichier à chaque frontière de son propre travail) ;
-  chaque émission lue est RELAYÉE à l'humain, sans réécriture. Le silence au-delà d'une
-  fenêtre est un défaut de contrat (TF-0094), jamais une économie. Deux silences ne se lisent
-  pas comme un blocage : celui d'une commande longue dont la dernière ligne donne une fin
-  attendue non échue, et celui qu'une ligne de reprise explique par une compaction.
+- **côté session qui lance l'agent** : la consigne nomme le fichier, par un chemin qui
+  contient `avancement` et finit par `.jsonl` ; c'est tout ce que la session fait. Le relais à
+  l'humain ne dépend plus d'un guetteur qu'elle armerait (D-209 (a) du 12/11/2026, prompt
+  20261112g) : le hook `suivi-agents` (`oracles/hook-suivi-agents.mjs`, hérité par les produits)
+  lit le dossier des sous-agents que le harnais écrit, juge la vie de chaque agent de l'extérieur
+  (dernière écriture de son transcript ou de son avancement) et réveille la session à 15 minutes
+  de course, puis toutes les 15 minutes, même après la fin de son tour (`asyncRewake`). Réveillée,
+  la session écrit le point de suivi qu'il lui donne, première ligne « Suivi agents », une ligne
+  par agent : nom, état (actif, silencieux, commande longue, présumé arrêté, fini) avec l'âge
+  mesuré, tâches faites, tâches restantes. Le silence au-delà d'une fenêtre reste un défaut de
+  contrat de l'agent (TF-0094). Deux silences ne se lisent pas comme un blocage : celui d'une
+  commande longue dont la dernière ligne donne une fin attendue non échue, et celui qu'une ligne
+  de reprise explique par une compaction.
 
 ## Rendre la main : jamais sur une attente, jamais sur un arbre sale (TF-1132)
 

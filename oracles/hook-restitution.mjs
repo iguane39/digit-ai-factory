@@ -37,6 +37,7 @@ import { fileURLToPath } from "node:url";
 import { controlerOuiDeCompletude, affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
 import { racineDuProjet } from "./lib-racine-projet.mjs";
+import { estPointDeSuivi } from "./lib-suivi-agents.mjs";
 import { decouperCommande, resoudreTemporaires } from "./lib-decoupe-commande.mjs";
 import { nombresDuTexte, chiffresDeGains } from "./lib-chiffres-releves.mjs";
 // TF-2141 (D-172 (b), 04/11/2026, RT-43) — les FRICTIONS du tour : relevé sur la transcription, journal `frictions.jsonl`, contrôle chez un produit.
@@ -1943,6 +1944,13 @@ const ATTENTE = /\b(?:attends?|attente|en cours|tourne(?:nt)?|arri[èe]re-plan|r
 export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null, enAttente = [], ecrituresDuTour = [], nonInteractif = false }) {
   if (!dernierTexte) return { juge: false, motif: "aucun texte final dans le transcript" };
   const mots = dernierTexte.trim().split(/\s+/).filter(Boolean).length;
+  // ---- S116 (12/11/2026, D-209 (a), prompt 20261112g ÉTAPE 3.5) — LE POINT DE SUIVI DES AGENTS EST UN RELAIS, PAS UN RENDU ----------
+  // Le hook `hook-suivi-agents.mjs --veille` réveille la session toutes les 15 minutes tant qu'un agent tourne ; elle écrit un point
+  // (première ligne « Suivi agents », une ligne mesurée par agent). Il n'est exempté que si RIEN n'a été écrit depuis le dernier
+  // affichage, ou dans tout le tour : un tour de travail qui se clôt sur un point reste jugé, comme sous TF-0978. Aucune borne de
+  // mots ni de verdict ici, à la différence du relais (TF-1182) : les tâches d'un agent portent souvent « PASS » ou « FAIL ».
+  if (estPointDeSuivi(dernierTexte) && (!travail || (depuisDernierAffichage && depuisDernierAffichage.ecritures === 0)))
+    return { juge: false, motif: `point de suivi des agents (${mots} mots), rien d'écrit depuis le dernier affichage — relais du hook suivi-agents (S116)` };
   // ---- TF-2193 (06/11/2026) — EN MODE NON INTERACTIF, UN MESSAGE D'ATTENTE NE DIFFÈRE PAS LA RESTITUTION, IL TERMINE LA SESSION ----------
   //
   // LE FAIT, mesuré le 05/11/2026 chez un produit : session `claude -p`, 17 agents de lecture lancés en arrière-plan, tour clos sur un message d'attente que

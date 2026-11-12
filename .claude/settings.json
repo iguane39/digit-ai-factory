@@ -41,6 +41,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-restitution.mjs\"",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-suivi-agents.mjs\" --veille",
+            "timeout": 1200,
+            "asyncRewake": true
           }
         ]
       }
@@ -113,6 +119,15 @@
       }
     ],
     "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-suivi-agents.mjs\"",
+            "timeout": 15
+          }
+        ]
+      },
       {
         "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell",
         "hooks": [

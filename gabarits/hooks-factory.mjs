@@ -76,7 +76,12 @@ const [nom, ...options] = process.argv.slice(2);
 // `controles-produit` (06/11/2026, TF-2211, retour RP-31 de Produit-86) : hook PostToolUse sur Bash et PowerShell — la clé
 // `controles_produit` de forge/PROFIL.json désigne les contrôles PROPRES du produit (commande en tableau, `quand` : run_open, run_close) ;
 // la commande qui vient d'écrire un run_open ou un run_close au ledger les déclenche, et leur verdict entre au contexte de la session. Ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit"]);
+// `suivi-agents` (12/11/2026, D-209 (a), prompt « Suivi des agents toutes les 15 minutes » 20261112g) : hook Stop en `asyncRewake`
+// (`--veille`) et hook PostToolUse — tant qu'un sous-agent de la session tourne, la session est réveillée toutes les 15 minutes, même
+// après la fin de son tour, et écrit un point « Suivi agents » : état de chaque agent jugé de l'extérieur (actif, silencieux, commande
+// longue, présumé arrêté, fini) avec l'âge mesuré, tâches faites et restantes lues à son fichier d'avancement. La veille attend jusqu'à
+// 19 min : le délai du lanceur est porté à 1 190 s pour elle seule. Ne bloque jamais un outil.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [
@@ -99,7 +104,8 @@ if (!["--prejuger", "--poser", "--ouvrir", "--clore", "--lister"].some((o) => op
 }
 const argv = [join(pilot, "oracles", `hook-${nom}.mjs`), ...options];
 if (nom === "ouverture") argv.push("--pilot", pilot);
-const r = spawnSync(process.execPath, argv, { encoding: "utf8", input: stdin, cwd: PRODUIT, timeout: 230000 });
+const delai = nom === "suivi-agents" && options.includes("--veille") ? 1190000 : 230000;
+const r = spawnSync(process.execPath, argv, { encoding: "utf8", input: stdin, cwd: PRODUIT, timeout: delai });
 if (r.stdout) process.stdout.write(r.stdout);
 if (r.stderr) process.stderr.write(r.stderr);
 process.exit(r.status ?? 0);

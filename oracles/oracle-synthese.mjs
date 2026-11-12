@@ -237,6 +237,7 @@ import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
 import { enumerationsEnLigne, etapesDeGuide, etapesQuiEcriventDansUnEnv, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
 import { affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { chiffresSansReleve } from "./lib-chiffres-releves.mjs";
+import { estPointDeSuivi, lignesAgent } from "./lib-suivi-agents.mjs";
 import { lireCarte, derniereDemande, etatDesLivrables, sessionDe, REPLI_DIT } from "./lib-mobilisation.mjs";
 import { motifDeResteAuProduit, retourNommeNonEcrit } from "./lib-frictions.mjs";
 import { decisionsSansReponse } from "./lib-decisions.mjs";
@@ -1039,6 +1040,17 @@ function juger(texte, cheminJuge = null) {
   const findings = [];
   const ok = (regle, message) => findings.push({ regle, statut: "PASS", message });
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
+
+  // S116 (12/11/2026, D-209 (a), prompt « Suivi des agents toutes les 15 minutes » 20261112g, ÉTAPE 3.5) — LE POINT DE SUIVI
+  // DES AGENTS N'EST PAS UNE RESTITUTION. Le hook `hook-suivi-agents.mjs` réveille la session toutes les 15 minutes tant qu'un
+  // agent tourne ; elle écrit alors un point dont la première ligne est exactement « Suivi agents », puis une ligne mesurée par
+  // agent (état et âge en minutes, tâches faites et restantes). Jugé comme une restitution, chaque point serait refusé.
+  // La forme est stricte (`estPointDeSuivi`, lib-suivi-agents.mjs) : aucun titre, aucune D-N ni A-N, 60 lignes au plus, au moins
+  // une ligne d'agent mesurée. Le « faux point » (le motif sans ligne d'agent mesurée) est jugé comme tout autre texte.
+  if (estPointDeSuivi(texte)) {
+    ok("S116", `point de suivi des agents : ${lignesAgent(texte).length} ligne(s) d'agent mesurée(s), forme reconnue — pas une restitution (hook-suivi-agents)`);
+    return findings;
+  }
 
   // Le POINT D'ÉTAPE se DÉCLARE, et il se déclare au bloc 1 (TF-1182). Sans bloc 1 reconnu, la
   // mention n'est pas une déclaration : le document est jugé comme une restitution ordinaire.
