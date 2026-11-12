@@ -2165,10 +2165,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
   let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null, gainsP = [], remonteeP = null, depuisP = null;
-  let frictionsP = null, depuisFrictionsP = null, retourFrictionsP = false, travailP = false;
+  let frictionsP = null, depuisFrictionsP = null, retourFrictionsP = false, travailP = false, tourP = null;
   try {
     if (cheminT && existsSync(cheminT)) {
-      const tour = analyserTranscript(readFileSync(cheminT, "utf8"));
+      const tour = analyserTranscript(readFileSync(cheminT, "utf8")); tourP = tour;
       dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; nombresP = tour.nombresTour || null; critiqueP = tour.critique || null;
       livrablesP = tour.livrables || [];
       remonteeP = tour.remontee || null; depuisP = tour.depuis || null;
@@ -2184,6 +2184,26 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
         texteSynthese: syntheseDeposee ? readFileSync(syntheseDeposee, "utf8") : "" });
     }
   } catch { affichage = "non joué : transcript ou synthèse illisible"; }
+  // TF-2445 (12/11/2026, RU-21) — UNE RÉPONSE COURTE D'UN TOUR SANS ÉCRITURE N'EST PAS JUGÉE COMME UNE RESTITUTION, PAR `--prejuger` NON PLUS. Le fait : un brouillon de 207 mots, « Niveau : Simple »,
+  // dans un tour qui n'avait rien écrit, rendait `affichable: false` (S1 et S4 bloquantes) alors que le hook de fin de tour l'acceptait par l'exemption « réponse courte sans écriture »
+  // (`references\NIVEAUX.md`, `jugeable`) : le préjugement était inutilisable pour toute réponse courte, et la session affichait sans préjuger. `--pre-vol` couvrait déjà ce cas (il lit le tour) ;
+  // `--prejuger`, que le RAPPEL prescrit, ne le couvrait pas. Il lit désormais les écritures du tour au transcript et, quand `jugeable` exempte le brouillon, applique `controlerReponseCourte`
+  // (COMPLÉTUDE, S82) et le contrôle LOT, comme le hook de fin de tour. Borne dite : sans transcript, le tour est inconnu et le brouillon reste jugé en restitution complète (comportement d'avant) ;
+  // un brouillon qui se déclare « Niveau : Moyen » garde `--pre-vol`, qui juge sa forme.
+  if (tourP && !declareMoyen(brouillon)) {
+    const exempt = jugeable({ travail: tourP.travail, ecritures: tourP.ecritures, commandes: tourP.commandes, dernierTexte: brouillon, ecrituresDuTour: tourP.ecrituresDuTour });
+    if (!exempt.juge) {
+      const court = controlerReponseCourte({ dernierHumain: tourP.dernierHumain || "", dernierTexte: brouillon });
+      const lotC = controlerLotDansLeTour({ racine: racineDuProjet(process.cwd()), depuis: tourP.depuisFrictions, retourCommande: Boolean(tourP.retourFrictions), tourEcrit: Boolean(tourP.travail) });
+      const lotCBloque = lotC.verdict === "FAIL" && lotC.bloquant;
+      const refusCourt = [...court.ecarts, ...(lotCBloque ? lotC.ecarts.map((e) => `LOT — ${e}. ${RAPPEL_LOT}`) : [])];
+      console.log(JSON.stringify({ outil: "hook-restitution --prejuger", brouillon: f, affichable: !refusCourt.length, portee: "réponse courte, sans restitution (exemption du hook de fin de tour)",
+        mots: brouillon.trim().split(/\s+/).filter(Boolean).length, motif: exempt.motif, bloquants: refusCourt, avertissements: [], ecritures_du_tour: tourP.ecrituresDuTour,
+        ...(refusCourt.length ? { a_corriger: `${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` } : {}),
+        non_juge: "la forme d'une restitution (blocs, S1 à S94), que le hook de fin de tour n'exige pas d'un tour sans écriture : le brouillon est jugé comme le hook le jugerait, sur COMPLÉTUDE, S82 et LOT" }));
+      process.exit(refusCourt.length ? 1 : 0);
+    }
+  }
   // TF-1938 — S84 reçoit les relevés d'horloge du tour quand la transcription est retrouvée ; sinon elle rend SANS_OBJET.
   // TF-1943 : le projet, pas le sous-dossier où la session a fait un `cd`.
   const RACINE_P = racineDuProjet(process.cwd());
