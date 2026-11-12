@@ -434,10 +434,13 @@ const MARQUEURS_NAVIGATEUR = /\b(?:document|window|navigator|localStorage|sessio
 const normaliserChemin = (p) => String(p || "").replace(/\\/g, "/").replace(/^\.\//, "").toLowerCase();
 
 /** Ce fichier est-il un fichier servi à un navigateur ? `racine` : le dossier du projet du tour ; `texte` : ce que le tour y a écrit (facultatif). */
-export function fichierServi(chemin, { racine = "", texte = "" } = {}) {
+// TF-2404 (12/11/2026) : `estBrouillon` désigne ce qui compte pour un brouillon (le dossier temporaire du poste, par défaut). Il ne s'injecte qu'en
+// recette : un cas qui bâtit son projet dans le dépôt qui le joue ne peut pas, sinon, rendre le même verdict dans tous les emplacements — sous le dossier
+// temporaire (arbre de travail d'une campagne), le projet d'essai y devenait un brouillon et les cas 62 rougissaient sans que le code ait changé.
+export function fichierServi(chemin, { racine = "", texte = "", estBrouillon = TEMPORAIRE_NOMME } = {}) {
   const brut = String(chemin || "");
   if (!SERVI_EXTENSION.test(brut)) return { servi: false, motif: "extension non servie" };
-  if (TEMPORAIRE_NOMME(brut)) return { servi: false, motif: "brouillon du dossier temporaire" };
+  if (estBrouillon(brut)) return { servi: false, motif: "brouillon du dossier temporaire" };
   let p = normaliserChemin(brut).replace(/(?:^|\/)\.claude\/worktrees\/[^/]+\//, "/");
   const r = normaliserChemin(racine).replace(/\/$/, "").replace(/(?:^|\/)\.claude\/worktrees\/[^/]+$/, "");
   const relatif = r && p.startsWith(r + "/") ? p.slice(r.length + 1) : null;
@@ -508,7 +511,7 @@ const _heure = (ts) => { const t = Date.parse(ts || ""); if (!Number.isFinite(t)
  * Les fichiers servis que le tour a écrits et les critiques qu'il a jouées, dans l'ORDRE des appels d'outil du tour (le rang dit « avant »
  * et « après » sans dépendre d'une horloge). Pur : `segment` est la suite d'enregistrements qui suit le dernier message humain.
  */
-export function critiqueDuTour(segment, { racine = "" } = {}) {
+export function critiqueDuTour(segment, { racine = "", estBrouillon } = {}) {
   const dossier = racine || segment.find((e) => e && e.cwd)?.cwd || "";
   const resultats = new Map();
   const enAttente = new Set(tachesEnAttente(segment));
@@ -562,7 +565,7 @@ export function critiqueDuTour(segment, { racine = "" } = {}) {
   // TF-1943 : un fichier se juge « servi » ou « outillage » depuis la racine du PROJET ; `dossier`, le répertoire courant du tour, peut être un sous-dossier
   // (après un `cd`), d'où `src/scripts/app.js` lu comme `scripts/app.js`, donc comme outillage du premier niveau. Il reste la base des chemins relatifs des commandes.
   const racineProjet = racine || (dossier ? racineDuProjet(dossier) : "");
-  const servis = [...ecrits.values()].map((x) => ({ ...x, ...fichierServi(x.fichier, { racine: racineProjet, texte: [...x.textes, surDisque(x.fichier)].join("\n") }) }))
+  const servis = [...ecrits.values()].map((x) => ({ ...x, ...fichierServi(x.fichier, { racine: racineProjet, texte: [...x.textes, surDisque(x.fichier)].join("\n"), estBrouillon }) }))
     .filter((x) => x.servi).map(({ fichier, rang: r, ts }) => ({ fichier, rang: r, ts }));
   return { servis, critiques };
 }
