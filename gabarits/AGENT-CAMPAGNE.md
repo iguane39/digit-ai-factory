@@ -168,7 +168,9 @@ son avancement toutes les 3 minutes au format `gabarits\AVANCEMENT-PROCESS.md` d
 tableau 8 champs (heures de démarrage et de reporting, réalisé, en cours, RAF, restant
 estimé sur cadence MESURÉE, total prévu, fin prévue avec glissement dit) — émetteurs
 prêts `scripts\avancement.py` / `.mjs`. Une unité qui occupe plus d'une fenêtre se
-sous-découpe (avancement interne nommé). Un process long muet est en défaut de contrat.
+sous-découpe (avancement interne nommé). Un process long muet est en défaut de contrat,
+sauf les deux suspensions déclarées de la section « Avancement des campagnes longues » (commande
+longue annoncée avec sa fin attendue, compaction du contexte).
 **Le relais aussi (TF-0173)** : si tu lances un process long en arrière-plan, tu armes un
 guetteur sur son flux dès le lancement et tu relaies chaque émission — rediriger sa sortie
 vers un fichier que toi seul consultes est la même cécité, déplacée d'un cran. Au lancement,
@@ -288,6 +290,17 @@ par sondage en avant-plan, l'autre n'a rien émis.
 - **quand** : au démarrage (plan des chantiers + durée prévue), à chaque frontière de
   chantier, et dès que ~3 minutes se sont écoulées depuis la dernière émission —
   l'horloge se RELÈVE (une commande date entre deux outils), jamais devinée ;
+- **suspension (TF-2434, 12/11/2026)** : la cadence de 3 minutes se suspend dans deux cas, et
+  dans ces deux-là seulement. 1) Une commande longue : avant de la lancer, tu émets une ligne qui
+  la nomme et donne sa fin attendue (une heure relevée à l'horloge, appuyée sur une durée déjà
+  mesurée ou sur le délai que tu poses à l'outil) ; tant que cette heure n'est pas passée, aucune
+  émission n'est due. Si la commande l'a dépassée, tu émets à cette heure une ligne qui dit le
+  glissement et la nouvelle fin attendue. La commande se joue en avant-plan, avec un délai
+  explicite (section suivante). 2) Une compaction du contexte : tu ne peux pas émettre pendant ;
+  ta première ligne après la reprise dit qu'une compaction a eu lieu et redonne le plan (réalisé,
+  RAF). Le fait : le 10/11/2026, une campagne de 2 h 30 a fait 18 émissions, dont 10 écarts de
+  plus de 4 minutes et un de 33 minutes, tous pendant des commandes longues ou une compaction ;
+  une cadence qu'aucun agent ne peut tenir se déclarait en écart à la lettre ;
 - **quoi** : la forme dégradée d'`AVANCEMENT-PROCESS.md` — heure de démarrage · heure
   d'émission · réalisé (chantiers finis, avec leur preuve) · en cours (chantier + une
   sous-unité mesurable : fichier, cas de test, compteur) · RAF nommé · fin prévue,
@@ -297,7 +310,9 @@ par sondage en avant-plan, l'autre n'a rien émis.
 - **côté pilot** : la consigne nomme le fichier, et la session arme un guetteur dessus au
   lancement (outil Monitor, ou relecture du fichier à chaque frontière de son propre travail) ;
   chaque émission lue est RELAYÉE à l'humain, sans réécriture. Le silence au-delà d'une
-  fenêtre est un défaut de contrat (TF-0094), jamais une économie.
+  fenêtre est un défaut de contrat (TF-0094), jamais une économie. Deux silences ne se lisent
+  pas comme un blocage : celui d'une commande longue dont la dernière ligne donne une fin
+  attendue non échue, et celui qu'une ligne de reprise explique par une compaction.
 
 ## Rendre la main : jamais sur une attente, jamais sur un arbre sale (TF-1132)
 
