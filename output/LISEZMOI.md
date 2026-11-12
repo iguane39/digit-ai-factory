@@ -618,7 +618,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md | 20261001h | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` |
 | Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md | 20261013e | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` |
 | Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md | 20261013f | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` |
-| Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md | 20261112b | 5.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md` |
+| Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md | 20261112b | 5.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md` |
 | Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md | 20261026l | 4.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md` |
 | Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md | 20261017d | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` |
 | Digit-AI - Synthese Mandat - Essai de l audit de securite de Cloudflare - 20261102l.md | 20261102l | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de l audit de securite de Cloudflare - 20261102l.md` |

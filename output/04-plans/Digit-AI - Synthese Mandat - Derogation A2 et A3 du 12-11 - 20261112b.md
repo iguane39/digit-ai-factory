@@ -27,6 +27,7 @@ Les 3 demandes ont été traitées dans l'ordre de leur coût, la dérogation d'
 - Pilot (TF-2429, TF-2404) : un avertissement neuf signale un « lot de clôture » promis sans run ouvert. Les cas 62 du hook de fin de tour, rouges sous le dossier temporaire, passent maintenant à 76/76 partout. Recettes rejouées vertes sur la fusion, conformité 237 PASS.
 - Tri A-3 : 16 candidats décidés, dont 10 classés au passage, et 5 classes créées au référentiel 1.73.0.
 - Les restes des agents deviennent 10 candidats, de TF-2447 à TF-2456.
+- Incident à l'enregistrement, corrigé avant publication : le hameçon d'anonymisation du pilot a reconstruit le registre depuis la copie de travail, et mon premier commit portait 5 lignes non enregistrées d'une autre session. Je l'ai défait et refait ; le second porte mes seules 51 lignes. Le défaut devient le candidat TF-2457, récidive de la classe corrigée le 10/11 pour quality-oracles.
 
 Relecture d'intention : sert.
 
@@ -41,7 +42,7 @@ Deux actions suivent, aucune ne vous revient.
 | Sélecteur | Action | Identifiant | Acteur | Motif de non-exécution | Chemin ou commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|
 | A-1 | Lancer la campagne qui corrige les 16 candidats triés ce matin, en commençant par les 2 qui touchent à la sécurité | TF-2444 | auto_ia | hors_mandat : la demande portait sur leur tri | `todo/TODO.jsonl`, décisions du 12/11 ; agents de campagne en arbres de travail | si rien n'est fait, le balayage actif d'un pentest mandaté reste impossible |
-| A-2 | Trier les 10 candidats nés de la campagne, dont le refus de SC4 sur le dashboard de tests | TF-2447 | auto_ia | hors_mandat : nés pendant ce tour | `node todo/journaliser.mjs --fichier <décisions.json>` | si rien n'est fait, 2 tests de forge-tests restent rouges |
+| A-2 | Trier les 11 candidats nés de la campagne, dont le hameçon d'anonymisation du pilot et le refus de SC4 sur le dashboard de tests | TF-2457 | auto_ia | hors_mandat : nés pendant ce tour | `node todo/journaliser.mjs --fichier <décisions.json>` | si rien n'est fait, 2 tests de forge-tests restent rouges |
 
 Ordre : la campagne d'abord, parce qu'elle porte des défauts de sécurité ; le tri ensuite, parce qu'il ne bloque rien.
 
