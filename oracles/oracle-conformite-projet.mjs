@@ -29,7 +29,8 @@
  *    un indice partagé SANS cette ligne reste refusé (TF-0750) ;
  *  · R-25 : `forge/NOMMAGE.json`, le nommage décidé par le porteur : {"prefixe":"<préfixe>","rang_type":3,
  *    "decision":{"date":"AAAA-MM-JJ","source":"<la décision humaine citée>"}} ; le type d'un nom qui ouvre sur ce
- *    préfixe se lit au segment de ce rang au lieu du 2e. Sans décision citée, la déclaration est refusée (FAIL) et
+ *    préfixe se lit au segment de ce rang au lieu du 2e, sauf si son 2e segment ouvre déjà sur un type admis
+ *    (TF-2447, 12/11/2026). Sans décision citée, la déclaration est refusée (FAIL) et
  *    ignorée. Sans fichier, le comportement d'avant s'applique.
  *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet> [--regles R-4,…] [--declarer-pret] [--aujourd-hui AAAA-MM-JJ]
@@ -667,7 +668,7 @@ else {
     const prefixeDecl = decl ? normeType(decl.prefixe) : null;
     if (decl) {
       ok("R-25", "forge/NOMMAGE.json", `nommage décidé par le porteur le ${decl.decision.date} (${String(decl.decision.source).trim()}) : un nom qui ouvre sur « ${decl.prefixe} » ` +
-        `et compte au moins ${decl.rang_type} segments + la date voit son type lu au segment ${decl.rang_type} ; les autres noms gardent la lecture au 2e segment`);
+        `et compte au moins ${decl.rang_type} segments + la date voit son type lu au segment ${decl.rang_type}, sauf si son 2e segment porte déjà un type admis (TF-2447) ; les autres noms gardent la lecture au 2e segment`);
     } else if (nommage.etat === "refuse") {
       r25 = false;
       ko("R-25", "forge/NOMMAGE.json", `déclaration de nommage REFUSÉE et ignorée — manque : ${nommage.motifs.join(", ")} ; une déclaration cite la décision humaine (date et source), ` +
@@ -684,7 +685,11 @@ else {
         if (segs.length < 3) continue; // pas de segment type — déjà R-4
         vus++;
         // Segment qui porte le type : le 2e, sauf nommage DÉCLARÉ dont le préfixe ouvre ce nom (segs.length > rang : la date suit).
-        const iType = decl && normeType(segs[0]) === prefixeDecl && segs.length > decl.rang_type ? decl.rang_type - 1 : 1;
+        // TF-2447 (12/11/2026) : et sauf si le 2e segment porte DÉJÀ un type admis — « Digit-AI - Cadrage - Série d'animations - … »
+        // a son type au 2e rang, et lire le 3e y jugeait « Série » : 10 noms conformes refusés chez le produit marketing.
+        // Le client d'un nommage décidé n'est jamais lu comme un type tant que le 2e segment n'ouvre pas sur un type du registre.
+        const deuxiemeEstUnType = admis.has(normeType(segs[1].split(" ")[0]));
+        const iType = decl && normeType(segs[0]) === prefixeDecl && segs.length > decl.rang_type && !deuxiemeEstUnType ? decl.rang_type - 1 : 1;
         const type = segs[iType].split(" ")[0];
         const parCatalogue = admis.has(normeType(type)) ? null : familleDuNom(segs[iType]);
         if (parCatalogue) {
