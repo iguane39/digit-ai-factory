@@ -56,6 +56,17 @@ suppressions ne change pas (`garde-rm-variable` refuse une suppression dont la c
 variable) : un dossier propre se vide par un chemin écrit en entier, et tu ne supprimes que ce que
 tu as créé dans le tien.
 
+**Écart au socle d'un produit : le journal de campagne tient lieu du lot (TF-2435, 12/11/2026).**
+La règle de TF-1048 (`references\CLAUDE-PRODUIT-DETAIL.md`) veut qu'un écart au socle s'écrive dans
+le tour où il est détecté, au lot de retours du produit (`forge\retours\`). Ta consigne t'interdit
+le ledger et `forge\retours\` : les deux ne se tiennent pas. Pour un agent délégué, le journal de
+campagne tient lieu du lot. Tu consignes l'écart dans le tour où tu le détectes, dans le fichier
+d'avancement que ta consigne nomme (une ligne qui porte sa classe et sa preuve), et tu le reprends
+aux `restes` de ton rapport. La session le recopie au ledger et au lot à la réception du rapport :
+elle seule écrit l'un et l'autre. Le fait : le 10/11/2026, un agent a mis ses frictions dans son
+journal de campagne faute de pouvoir écrire au lot, et la session les a portées au ledger à la
+réception ; le contrat ne disait ni l'un ni l'autre.
+
 **Écarts à la lettre (TF-0176).** Si ton prompt reformule une demande humaine, tout endroit
 où ton implémentation s'écarte du texte LITTÉRAL de cette demande (seuil, périmètre,
 condition, adoucissement) se déclare dans une section « Écarts à la lettre » de ton rapport —
