@@ -897,6 +897,17 @@ pas encore — c'est le patron de la règle dormante que R-35 dénonce. Borne : 
 **2026-11-17**, si aucun des trois invariants n'a servi à trancher une question réelle, ils se
 **retirent** plutôt que de dormir.
 
+**12/11/2026, première instance en service, sur demande humaine.** Demande, mot pour mot :
+« Relance le projet digit-ai-queue initié pour l'appliquer sur ce projet », pour un produit où
+Claude Code et Codex échangeaient par textes recopiés à la main (Produit-79). Une instance de la
+file vit désormais DANS ce produit (`queue/`), posée par `scripts/installer-instance.mjs` de
+`digit-ai-queue` (commit 3bccafe), qui en mesure aussi la dérive (`--verifier`). Les deux agents
+partagent le même arbre de travail local, donc il n'y a ni transport, ni dossier écouté, ni push
+requis. Le pilot ne câble rien chez lui, et aucun agent n'est lancé par un autre. Les 3
+invariants servent donc un usage réel, ce qui répond à la question (2) de la revue du
+2026-11-17. Garde de claim corrigée le même jour : sous Windows, elle laissait éditer un ticket
+non réclamé.
+
 ## V. L'intégrité du ledger se juge là où le ledger s'ouvre (règle 42 — 20/08, TF-0411)
 
 **R-42.** Tout oracle du pilot qui LIT un ledger en juge d'abord l'**intégrité** : `seq`
