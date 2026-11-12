@@ -87,6 +87,23 @@ seuil ou neutraliser un test pour faire passer : un échec résistant = item non
 diagnostic au rapport. Si la vérification native est elle-même défaillante, le prouver
 (sortie à l'appui) et le rapporter — ne pas la contourner.
 
+**La vérification native se nomme par nature de commit (TF-2436, 12/11/2026).** Un commit qui ne
+touche pas au code n'est pas dispensé de vérification. Si ta consigne ne nomme pas la vérification
+du dépôt, c'est la recette ENTIÈRE du dépôt (tests, lint, oracles qu'il joue), et la nature du
+commit dit ce qui s'y ajoute :
+- code (sources, scripts, hooks, oracles, tests) : la recette entière, pas le seul test du fichier
+  touché ;
+- référentiel (registre, table, catalogue, données de référence) : la recette entière, qui lit ces
+  données, et le régénérateur de la vue dérivée quand il existe, diff vide ;
+- configuration (compose, CI, réglages, manifestes) : la vérification de syntaxe de l'outil qui la
+  lit (`docker compose config` pour un fichier compose), puis la recette entière.
+
+Un commit qui mêle plusieurs natures passe la vérification de chacune. Le rapport cite, pour
+CHAQUE commit, sa nature, la commande jouée et son verdict. Le fait : le 10/11/2026, chez un
+produit, un agent a commité un référentiel seul sans la recette du dépôt, et un correctif sans
+`docker compose config` ; la session a rejoué les deux, exit 0, mais rien dans le contrat ne
+disait que la vérification était due.
+
 **Un refus d'oracle jugé faux se RAPPORTE, il ne se contourne pas (TF-1912, 21/10/2026).**
 Quand un oracle, un validateur ou un contrôle remis à l'agent refuse ce que l'agent juge correct,
 l'agent n'altère pas le livrable pour le faire taire. Il garde la forme correcte, cite au rapport
@@ -185,7 +202,8 @@ statut: corrige | non_clos | deja_fait
 corrections_realisees: <ce qui a changé, fichiers cités chemin:ligne>
 preuve: <sortie de vérification native, avant/après mesuré>
 gains_constates: <effet mesurable, chiffré si possible — exigé pour corrige>
-commit: <sha court> (local, non poussé)
+commit: <sha court> (local, non poussé) — nature : code | référentiel | configuration —
+  vérification : <commande jouée, verdict>   (une ligne par commit de l'item, TF-2436)
 restes: <ce qui manque — classé IA / développeur / utilisateur (R-29, REGLES-PROJET.md
   §I ; format actions[] de forge-tests généralisé), constats hors périmètre,
   candidatures nouvelles>
