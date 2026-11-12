@@ -901,7 +901,7 @@ pas encore — c'est le patron de la règle dormante que R-35 dénonce. Borne : 
 « Relance le projet digit-ai-queue initié pour l'appliquer sur ce projet », pour un produit où
 Claude Code et Codex échangeaient par textes recopiés à la main (Produit-79). Une instance de la
 file vit désormais DANS ce produit (`queue/`), posée par `scripts/installer-instance.mjs` de
-`digit-ai-queue` (commit 3bccafe), qui en mesure aussi la dérive (`--verifier`). Les deux agents
+`digit-ai-queue` (commit 34b05dd), qui en mesure aussi la dérive (`--verifier`). Les deux agents
 partagent le même arbre de travail local, donc il n'y a ni transport, ni dossier écouté, ni push
 requis. Le pilot ne câble rien chez lui, et aucun agent n'est lancé par un autre. Les 3
 invariants servent donc un usage réel, ce qui répond à la question (2) de la revue du
