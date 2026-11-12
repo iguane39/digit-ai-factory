@@ -113,10 +113,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json` | fichier | 19,1 Ko | JSON |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` | fichier | 19,1 Ko | Revue — prompt du skill make-it-better et de sa page de versions, passé au crible L99 — 02 |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` | fichier | 19,6 Ko | JSON |
+| `Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md` | fichier | 17,8 Ko | Prompt « suivi d'avancement des agents » passé au crible L99 |
+| `Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md.boucle.json` | fichier | 11,8 Ko | JSON |
 | `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` | fichier | 35,7 Ko | Revue L99 — « Tracer temps, délais, charges, jetons et coûts de chaque produit » |
 | `Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` | fichier | 12,8 Ko | JSON |
 | `Digit-AI - Revue - Prompt textes du clip ingénierie logicielle passé au crible L99 - 20261110b.md` | fichier | 25,7 Ko | Revue L99 du prompt « textes du clip ingénierie logicielle » |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_99 fichier(s), 3 sous-dossier(s)_
+_101 fichier(s), 3 sous-dossier(s)_

@@ -30,6 +30,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
 | `Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` | fichier | 15,0 Ko | Série d'animations « La Factory Digit-AI en action » : cadrage et cinq épisodes |
 | `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` | fichier | 22,1 Ko | Prompt — construire le skill make-it-better et sa page de versions |
+| `Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` | fichier | 15,2 Ko | Prompt — Suivi des agents toutes les 15 minutes |
 | `Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` | fichier | 14,5 Ko | markdown |
 | `Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` | fichier | 11,1 Ko | Revue hebdomadaire des propositions — 2026-11-02 |
 | `Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` | fichier | 8,9 Ko | Revue hebdomadaire des propositions — 2026-10-26 |
@@ -58,6 +59,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` | fichier | 7,8 Ko | Synthèse Conseil — prompt make-it-better avec Word et PDF, 1 décision attendue (02/11/2026 |
 | `Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md` | fichier | 7,5 Ko | markdown |
 | `Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` | fichier | 10,6 Ko | Synthèse Conseil — prompt du skill make-it-better passé au crible L99, 2 décisions attendu |
+| `Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md` | fichier | 10,4 Ko | Synthèse Conseil — prompt « suivi d'avancement des agents » passé au crible L99 (analyse d |
 | `Digit-AI - Synthese Conseil - Prompt suivi des temps et couts passe au crible L99 - 20261104h.md` | fichier | 9,2 Ko | Synthèse Conseil — prompt « suivre temps, délais, charges, jetons et coûts des produits »  |
 | `Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` | fichier | 6,5 Ko | Synthèse Conseil — prompt Supabase passé au crible L99, version b déposée (16/10/2026) |
 | `Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md` | fichier | 12,1 Ko | Synthèse Conseil — prompt de tri des favoris TikTok et de skill passé au crible L99 (02/11 |
@@ -233,4 +235,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_212 fichier(s), 4 sous-dossier(s)_
+_214 fichier(s), 4 sous-dossier(s)_

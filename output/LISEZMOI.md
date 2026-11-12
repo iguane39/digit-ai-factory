@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 688 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 692 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -293,6 +293,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json | — | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json` |
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md | 20261102d | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` |
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json | — | 19.6 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` |
+| Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md | 20261112a | 17.8 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md` |
+| Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md.boucle.json | — | 11.8 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md.boucle.json` |
 | Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md | 20261104c | 35.7 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` |
 | Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json | — | 12.8 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` |
 | Digit-AI - Revue - Prompt textes du clip ingénierie logicielle passé au crible L99 - 20261110b.md | 20261110b | 25.7 Ko | `03-etudes/Digit-AI - Revue - Prompt textes du clip ingénierie logicielle passé au crible L99 - 20261110b.md` |
@@ -529,6 +531,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
 | Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md | 20261109g | 15 Ko | `04-plans/Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |
+| Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md | 20261112e | 15.2 Ko | `04-plans/Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` |
 | Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md | 20261102c | 14.5 Ko | `04-plans/Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md | 20261102a | 11.1 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
@@ -557,6 +560,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md | 20261102h | 7.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` |
 | Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md | 20261109f | 7.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md` |
 | Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md | 20261102f | 10.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` |
+| Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md | 20261112f | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md` |
 | Digit-AI - Synthese Conseil - Prompt suivi des temps et couts passe au crible L99 - 20261104h.md | 20261104h | 9.2 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt suivi des temps et couts passe au crible L99 - 20261104h.md` |
 | Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md | 20261016c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` |
 | Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md | 20261102d | 12.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md` |
