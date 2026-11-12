@@ -28,10 +28,11 @@ const tete = `[reprise — R-64] ${sens === "restaurer" ? "restauration depuis l
 let ligne;
 if (r.erreur) ligne = `${tete} : ${r.erreur}`;
 else if (r.refuse) ligne = sens === "pousser" && /non actif/.test(r.message) ? null : `${tete} : ${r.message}`;
-else if (r.fait.length || r.conflits.length || r.reste)
+else if (r.fait.length || r.conflits.length || r.reste || r.refuses.length)
   ligne = `${tete} : ${r.fait.length} fichier(s) ${sens === "restaurer" ? "restauré(s)" : "envoyé(s)"}`
     + (r.conflits.length ? `, dont ${r.conflits.length} écrasé(s) par plus récent, version précédente sauvegardée (${r.conflits[0].sauvegarde})` : "")
     + (r.reste ? `, ${r.reste} reporté(s) au prochain passage (budget de temps atteint)` : "")
+    + (r.refuses.length ? `, ${r.refuses.length} refusé(s) car ni ignoré(s) ni suivi(s) par git (ex. ${r.refuses[0].rel}) : garder le chemin dans .gitignore, ou retirer le fichier du canal` : "")
     + ` — canal ${r.canal}`;
 if (ligne) (sens === "restaurer" ? process.stdout : process.stderr).write(ligne + "\n");
 process.exit(0);
