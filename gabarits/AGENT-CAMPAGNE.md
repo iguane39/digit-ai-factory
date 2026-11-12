@@ -104,6 +104,23 @@ produit, un agent a commité un référentiel seul sans la recette du dépôt, e
 `docker compose config` ; la session a rejoué les deux, exit 0, mais rien dans le contrat ne
 disait que la vérification était due.
 
+**Au pilot, la recette est ciblée par nature de commit, la recette entière reste due avant la fusion
+(TF-2462, 12/11/2026).** Sur le pilot (`digit-ai-factory`), la recette ENTIÈRE (`node oracles\self-tests.mjs`)
+a duré 109 minutes sous charge le 12/11/2026 (de 13:51 à 15:40, mesurée par l'agent du lot pa : rapporté,
+non rejoué ici) : exigée avant chaque commit, elle rend la campagne impraticable. Pour le pilot seulement,
+la vérification d'un commit est donc ciblée :
+- code, référentiel ou configuration : les recettes des fichiers touchés ET de leurs consommateurs, soit le
+  test ou le `--self-test` de chaque fichier modifié, puis ceux des fichiers qui le lisent ou l'importent
+  (`git grep -l <nom du fichier>` sur le dépôt, hors `todo\`, `output\`, `input\` et `decisions\`) ;
+- référentiel : le régénérateur de la vue dérivée en plus, diff vide ;
+- configuration : la vérification de syntaxe de l'outil qui la lit, avant ces recettes.
+
+La recette entière reste due, une fois, avant la fusion : l'agent la joue en arrière-plan avant son rapport
+final et le rapport en cite le verdict (l'attente se règle par la section « Avancement des campagnes
+longues »). Pour chaque commit, le rapport nomme les fichiers touchés, les consommateurs trouvés, la
+commande jouée et son verdict. L'exemption est celle du pilot : un autre dépôt ne l'hérite pas, elle s'y
+décide sur une durée mesurée.
+
 **Un refus d'oracle jugé faux se RAPPORTE, il ne se contourne pas (TF-1912, 21/10/2026).**
 Quand un oracle, un validateur ou un contrôle remis à l'agent refuse ce que l'agent juge correct,
 l'agent n'altère pas le livrable pour le faire taire. Il garde la forme correcte, cite au rapport
@@ -301,7 +318,8 @@ par sondage en avant-plan, l'autre n'a rien émis.
   en arrière-plan, vers 175 s, une commande lancée au premier plan (TF-2463, mesuré 4 fois le
   12/11/2026) : une commande qui peut dépasser 2 minutes se lance donc d'emblée en arrière-plan,
   sa fin attendue annoncée, et tu l'attends par des tranches bornées (une commande d'attente de
-  150 s au plus, rejouée jusqu'à sa fin), jamais en clôturant ton tour. 2) Une compaction du contexte : tu ne peux pas émettre pendant ;
+  150 s au plus, rejouée jusqu'à sa fin), jamais en clôturant ton tour ; une tranche n'est pas
+  une émission. 2) Une compaction du contexte : tu ne peux pas émettre pendant ;
   ta première ligne après la reprise dit qu'une compaction a eu lieu et redonne le plan (réalisé,
   RAF). Le fait : le 10/11/2026, une campagne de 2 h 30 a fait 18 émissions, dont 10 écarts de
   plus de 4 minutes et un de 33 minutes, tous pendant des commandes longues ou une compaction ;
@@ -338,9 +356,11 @@ recette qui y écrivait ses diagnostics, et un commit tardif arrivé pendant que
 le chantier.
 
 - **Aucun tour ne se clôt sur l'attente d'une tâche d'arrière-plan.** Une vérification longue se
-  joue en AVANT-PLAN, avec un délai explicite (paramètre de délai de l'outil) ; si elle a été
-  lancée en arrière-plan, son résultat est RELU avant de rendre la main. Un agent qui s'arrête
-  dit ce qui est fini et ce qui ne l'est pas ; il n'annonce jamais qu'il attend.
+  lance d'emblée en arrière-plan, sa fin attendue annoncée, et s'attend par des tranches bornées
+  dans le même tour (section « Avancement des campagnes longues », TF-2463) : une commande d'avant-plan
+  à délai explicite est basculée par le harnais vers 175 s et son attente se perd. Son résultat est
+  RELU avant de rendre la main. Un agent qui s'arrête dit ce qui est fini et ce qui ne l'est pas ;
+  il n'annonce jamais qu'il attend.
 - **`git status` propre avant tout message de fin, même intermédiaire.** Aucun fichier de
   diagnostic, aucune fixture mutée, aucune modification non commitée de TES chemins ; ce qui
   appartient à une autre session se liste au message, sans y toucher.
