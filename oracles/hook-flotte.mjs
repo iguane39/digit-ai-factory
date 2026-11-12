@@ -26,6 +26,11 @@
  * Et quand l'appel vise un agent d'ÉCRITURE (`campagne`, `constructeur`, `redacteur`), il rappelle la relecture de la consigne de
  * l'essai du 18/10/2026 (D-23 (a), `references/RELECTURE-INTENTION.md`) : même sortie `additionalContext`, même exit 0.
  *
+ * Et quand l'appel demande `isolation: "worktree"` depuis une racine de session dont la lettre de lecteur est en minuscule
+ * (`c:\…`), il avertit que le harnais refusera l'isolation et nomme la racine canonique (TF-2443, voir `racineEnMinuscule`).
+ * NON JUGÉ de ce volet : une isolation posée par la définition d'un agent (`isolation: worktree` en tête de son `.md`), que
+ * l'entrée du hook ne porte pas.
+ *
  * Usage : node oracles\hook-flotte.mjs      (stdin : JSON du hook PreToolUse)
  * Exit : toujours 0 ; l'avertissement sort sur stdout en JSON `hookSpecificOutput.additionalContext`.
  */
@@ -53,8 +58,35 @@ export function agentsNommes(cwd, maison = homedir()) {
   return noms;
 }
 
+/**
+ * TF-2443 (12/11/2026) — UNE RACINE DE SESSION À LETTRE DE LECTEUR MINUSCULE FAIT REFUSER L'ISOLATION.
+ * Le fait, rejoué le 12/11/2026 avec Claude Code 2.1.322 depuis une racine `c:\…` puis `C:\…` : avec `isolation: "worktree"`,
+ * la racine en minuscule rend « Refusing to use c:\…\.claude\worktrees\agent-… as an isolation worktree: git resolves its
+ * working tree to C:/… » et laisse une copie vide verrouillée ; la même racine en majuscule réussit. Git résout toujours
+ * `C:/…`, et le harnais compare les deux chemins à la casse près. Ce refus ne vit dans aucun hook ni outil du parc : il est
+ * dans le harnais. Le remède est d'ouvrir la session sur la racine canonique ; ce rappel le dit AVANT le refus.
+ */
+export const LECTEUR_MINUSCULE = /^[a-z]:[\\/]/;
+export function racineEnMinuscule(entree, env = process.env) {
+  const ti = entree?.tool_input || {};
+  if (typeof ti.isolation !== "string" || ti.isolation.trim() !== "worktree") return null;
+  return [entree?.cwd, env?.CLAUDE_PROJECT_DIR].find((c) => typeof c === "string" && LECTEUR_MINUSCULE.test(c)) ?? null;
+}
+const messageRacine = (racine) => "RACINE DE SESSION EN MINUSCULE (TF-2443, 12/11/2026) — cet appel demande `isolation: \"worktree\"` depuis « " + racine
+  + " » : git résout « " + racine[0].toUpperCase() + racine.slice(1) + " », le harnais compare les deux chemins à la casse près et refuse l'isolation "
+  + "(« Refusing to use … as an isolation worktree: git resolves its working tree to C:/… »), en laissant une copie vide verrouillée sous `.claude/worktrees`. "
+  + "Rouvrir la session sur « " + racine[0].toUpperCase() + racine.slice(1) + " » (lettre de lecteur en majuscule), ou lancer l'agent sans `isolation` sur un arbre "
+  + "créé par `git worktree add` (consigne de campagne). Avertissement seulement : l'appel part tel quel.";
+
 /** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message } ou { decision: "rappelle", message }. */
-export function juger(entree, { maison } = {}) {
+export function juger(entree, options = {}) {
+  const v = jugerFlotte(entree, options);
+  const racine = OUTILS.has(entree?.tool_name) ? racineEnMinuscule(entree) : null;
+  if (!racine) return v;
+  return { decision: "avertit", message: messageRacine(racine) + (v.message ? "\n\n" + v.message : "") };
+}
+
+function jugerFlotte(entree, { maison } = {}) {
   if (!OUTILS.has(entree?.tool_name)) return { decision: "laisse" };
   const ti = entree?.tool_input || {};
   const type = typeof ti.subagent_type === "string" ? ti.subagent_type.trim() : "";

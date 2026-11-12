@@ -351,6 +351,16 @@
           "ancre": "**Un message reçu est un ENTRANT.**"
         },
         "fait": "22/09/2026 : la messagerie entre sessions délivre sans approbation humaine entre sessions permissives ; le même jour une session du pilot a commité le travail en cours d'une autre sans que l'une sache ce que l'autre faisait (commit 3f47dcfc)."
+      },
+      {
+        "id": "K5",
+        "regle": "Une consigne de campagne nomme, pour chaque agent, un dossier temporaire propre sous le dossier temporaire de la session : ses scripts, captures et copies n'y sont jamais mêlés à ceux de la session ni d'un autre agent.",
+        "source": {
+          "fichier": "gabarits/AGENT-CAMPAGNE.md",
+          "ligne": 47,
+          "ancre": "**Un dossier temporaire propre à l'agent"
+        },
+        "fait": "TF-2437, 10/11/2026 : un agent `constructeur` a écrit ses scripts et ses captures dans le dossier temporaire de la session, mêlés à ceux de la session et d'autres agents, sans nettoyage possible."
       }
     ],
     "presentation": [

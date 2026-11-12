@@ -180,7 +180,10 @@ décision, l'omettre est un oubli (loi n° 3).
   détecté** (TF-1048) — une entrée au lot de retours en cours (`forge\retours\`, avec sa classe ;
   s'il est corrigé sur place, à la section « Remarques restées au produit »), sans attendre le hook
   de fin de tour ni une relance humaine. C'est une obligation de l'agent, pas du hook : le hook peut
-  être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais.
+  être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais. **Exception
+  (TF-2435, 12/11/2026) :** un agent délégué par une session n'écrit ni le ledger ni `forge\retours\`
+  (sa consigne le lui interdit) ; pour lui, son journal de campagne tient lieu du lot, et la session
+  recopie l'écart au ledger et au lot à la réception du rapport (`gabarits\AGENT-CAMPAGNE.md`).
 - **L'horodatage (`ts`) d'une entrée de ledger se RELÈVE au moment même d'écrire l'entrée, jamais
   ne se compose ni ne s'estime après coup** (TF-1424) — un `ts` POSTÉRIEUR au commit qui l'a
   introduite dans l'histoire est impossible, donc composé : six entrées mesurées chez un produit

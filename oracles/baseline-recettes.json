@@ -415,8 +415,8 @@
   "vu_le": "2026-10-13"
  },
  "oracles/hook-flotte.test.mjs": {
-  "cas": 24,
-  "vu_le": "2026-10-30"
+  "cas": 32,
+  "vu_le": "2026-11-12"
  },
  "oracles/hook-gestes-distants.test.mjs": {
   "cas": 214,

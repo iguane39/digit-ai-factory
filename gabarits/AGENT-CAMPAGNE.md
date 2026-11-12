@@ -42,7 +42,30 @@ constats reviennent dans ton rapport final, le pilot est l'unique écrivain du r
 publie les forges et lui-même sans feu vert par envoi (`REGLES-PROJET.md`, R-38 §6), sous le seul
 compte de `references\IDENTITE-PUBLICATION.json`. Un envoi vu chez une forge, fait par une autre
 session sous ce compte, est légitime : il ne se signale pas comme suspect. Toi, tu ne publies pas.
-Aucun fichier temporaire dans le dépôt cible : scratchpad de session uniquement.
+Aucun fichier temporaire dans le dépôt cible.
+
+**Un dossier temporaire propre à l'agent (TF-2437, 12/11/2026).** Tes scripts, captures et copies
+vont dans le dossier temporaire que ta consigne nomme, un sous-dossier de celui de la session
+(`<scratchpad>\agent-<lot>\`), jamais à la racine du dossier de la session : elle le partage avec
+la session qui t'a lancé et avec ses autres agents. Le pilot nomme un dossier par agent dans chaque
+consigne de campagne. Une consigne qui n'en nomme pas est incomplète : crée `agent-<lot ou item>`
+sous le dossier temporaire de ta session et dis-le à ta première émission d'avancement. Le fait :
+le 10/11/2026, un agent `constructeur` a écrit ses scripts et ses captures dans le dossier de la
+session, mêlés à ceux de la session et d'autres agents, sans nettoyage possible. La garde des
+suppressions ne change pas (`garde-rm-variable` refuse une suppression dont la cible passe par une
+variable) : un dossier propre se vide par un chemin écrit en entier, et tu ne supprimes que ce que
+tu as créé dans le tien.
+
+**Écart au socle d'un produit : le journal de campagne tient lieu du lot (TF-2435, 12/11/2026).**
+La règle de TF-1048 (`references\CLAUDE-PRODUIT-DETAIL.md`) veut qu'un écart au socle s'écrive dans
+le tour où il est détecté, au lot de retours du produit (`forge\retours\`). Ta consigne t'interdit
+le ledger et `forge\retours\` : les deux ne se tiennent pas. Pour un agent délégué, le journal de
+campagne tient lieu du lot. Tu consignes l'écart dans le tour où tu le détectes, dans le fichier
+d'avancement que ta consigne nomme (une ligne qui porte sa classe et sa preuve), et tu le reprends
+aux `restes` de ton rapport. La session le recopie au ledger et au lot à la réception du rapport :
+elle seule écrit l'un et l'autre. Le fait : le 10/11/2026, un agent a mis ses frictions dans son
+journal de campagne faute de pouvoir écrire au lot, et la session les a portées au ledger à la
+réception ; le contrat ne disait ni l'un ni l'autre.
 
 **Écarts à la lettre (TF-0176).** Si ton prompt reformule une demande humaine, tout endroit
 où ton implémentation s'écarte du texte LITTÉRAL de cette demande (seuil, périmètre,
@@ -63,6 +86,23 @@ commit, VERTES. Interdiction absolue (G-2) d'assouplir une assertion, requalifie
 seuil ou neutraliser un test pour faire passer : un échec résistant = item non clos,
 diagnostic au rapport. Si la vérification native est elle-même défaillante, le prouver
 (sortie à l'appui) et le rapporter — ne pas la contourner.
+
+**La vérification native se nomme par nature de commit (TF-2436, 12/11/2026).** Un commit qui ne
+touche pas au code n'est pas dispensé de vérification. Si ta consigne ne nomme pas la vérification
+du dépôt, c'est la recette ENTIÈRE du dépôt (tests, lint, oracles qu'il joue), et la nature du
+commit dit ce qui s'y ajoute :
+- code (sources, scripts, hooks, oracles, tests) : la recette entière, pas le seul test du fichier
+  touché ;
+- référentiel (registre, table, catalogue, données de référence) : la recette entière, qui lit ces
+  données, et le régénérateur de la vue dérivée quand il existe, diff vide ;
+- configuration (compose, CI, réglages, manifestes) : la vérification de syntaxe de l'outil qui la
+  lit (`docker compose config` pour un fichier compose), puis la recette entière.
+
+Un commit qui mêle plusieurs natures passe la vérification de chacune. Le rapport cite, pour
+CHAQUE commit, sa nature, la commande jouée et son verdict. Le fait : le 10/11/2026, chez un
+produit, un agent a commité un référentiel seul sans la recette du dépôt, et un correctif sans
+`docker compose config` ; la session a rejoué les deux, exit 0, mais rien dans le contrat ne
+disait que la vérification était due.
 
 **Un refus d'oracle jugé faux se RAPPORTE, il ne se contourne pas (TF-1912, 21/10/2026).**
 Quand un oracle, un validateur ou un contrôle remis à l'agent refuse ce que l'agent juge correct,
@@ -128,7 +168,9 @@ son avancement toutes les 3 minutes au format `gabarits\AVANCEMENT-PROCESS.md` d
 tableau 8 champs (heures de démarrage et de reporting, réalisé, en cours, RAF, restant
 estimé sur cadence MESURÉE, total prévu, fin prévue avec glissement dit) — émetteurs
 prêts `scripts\avancement.py` / `.mjs`. Une unité qui occupe plus d'une fenêtre se
-sous-découpe (avancement interne nommé). Un process long muet est en défaut de contrat.
+sous-découpe (avancement interne nommé). Un process long muet est en défaut de contrat,
+sauf les deux suspensions déclarées de la section « Avancement des campagnes longues » (commande
+longue annoncée avec sa fin attendue, compaction du contexte).
 **Le relais aussi (TF-0173)** : si tu lances un process long en arrière-plan, tu armes un
 guetteur sur son flux dès le lancement et tu relaies chaque émission — rediriger sa sortie
 vers un fichier que toi seul consultes est la même cécité, déplacée d'un cran. Au lancement,
@@ -162,7 +204,8 @@ statut: corrige | non_clos | deja_fait
 corrections_realisees: <ce qui a changé, fichiers cités chemin:ligne>
 preuve: <sortie de vérification native, avant/après mesuré>
 gains_constates: <effet mesurable, chiffré si possible — exigé pour corrige>
-commit: <sha court> (local, non poussé)
+commit: <sha court> (local, non poussé) — nature : code | référentiel | configuration —
+  vérification : <commande jouée, verdict>   (une ligne par commit de l'item, TF-2436)
 restes: <ce qui manque — classé IA / développeur / utilisateur (R-29, REGLES-PROJET.md
   §I ; format actions[] de forge-tests généralisé), constats hors périmètre,
   candidatures nouvelles>
@@ -247,6 +290,17 @@ par sondage en avant-plan, l'autre n'a rien émis.
 - **quand** : au démarrage (plan des chantiers + durée prévue), à chaque frontière de
   chantier, et dès que ~3 minutes se sont écoulées depuis la dernière émission —
   l'horloge se RELÈVE (une commande date entre deux outils), jamais devinée ;
+- **suspension (TF-2434, 12/11/2026)** : la cadence de 3 minutes se suspend dans deux cas, et
+  dans ces deux-là seulement. 1) Une commande longue : avant de la lancer, tu émets une ligne qui
+  la nomme et donne sa fin attendue (une heure relevée à l'horloge, appuyée sur une durée déjà
+  mesurée ou sur le délai que tu poses à l'outil) ; tant que cette heure n'est pas passée, aucune
+  émission n'est due. Si la commande l'a dépassée, tu émets à cette heure une ligne qui dit le
+  glissement et la nouvelle fin attendue. La commande se joue en avant-plan, avec un délai
+  explicite (section suivante). 2) Une compaction du contexte : tu ne peux pas émettre pendant ;
+  ta première ligne après la reprise dit qu'une compaction a eu lieu et redonne le plan (réalisé,
+  RAF). Le fait : le 10/11/2026, une campagne de 2 h 30 a fait 18 émissions, dont 10 écarts de
+  plus de 4 minutes et un de 33 minutes, tous pendant des commandes longues ou une compaction ;
+  une cadence qu'aucun agent ne peut tenir se déclarait en écart à la lettre ;
 - **quoi** : la forme dégradée d'`AVANCEMENT-PROCESS.md` — heure de démarrage · heure
   d'émission · réalisé (chantiers finis, avec leur preuve) · en cours (chantier + une
   sous-unité mesurable : fichier, cas de test, compteur) · RAF nommé · fin prévue,
@@ -256,7 +310,9 @@ par sondage en avant-plan, l'autre n'a rien émis.
 - **côté pilot** : la consigne nomme le fichier, et la session arme un guetteur dessus au
   lancement (outil Monitor, ou relecture du fichier à chaque frontière de son propre travail) ;
   chaque émission lue est RELAYÉE à l'humain, sans réécriture. Le silence au-delà d'une
-  fenêtre est un défaut de contrat (TF-0094), jamais une économie.
+  fenêtre est un défaut de contrat (TF-0094), jamais une économie. Deux silences ne se lisent
+  pas comme un blocage : celui d'une commande longue dont la dernière ligne donne une fin
+  attendue non échue, et celui qu'une ligne de reprise explique par une compaction.
 
 ## Rendre la main : jamais sur une attente, jamais sur un arbre sale (TF-1132)
 
