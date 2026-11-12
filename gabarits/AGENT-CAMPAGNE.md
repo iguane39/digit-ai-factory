@@ -310,10 +310,16 @@ par sondage en avant-plan, l'autre n'a rien émis.
 - **suspension (TF-2434, 12/11/2026)** : la cadence de 3 minutes se suspend dans deux cas, et
   dans ces deux-là seulement. 1) Une commande longue : avant de la lancer, tu émets une ligne qui
   la nomme et donne sa fin attendue (une heure relevée à l'horloge, appuyée sur une durée déjà
-  mesurée ou sur le délai que tu poses à l'outil) ; tant que cette heure n'est pas passée, aucune
-  émission n'est due. Si la commande l'a dépassée, tu émets à cette heure une ligne qui dit le
-  glissement et la nouvelle fin attendue. La commande se joue en avant-plan, avec un délai
-  explicite (section suivante). 2) Une compaction du contexte : tu ne peux pas émettre pendant ;
+  mesurée ou sur le délai d'arrêt que tu poses à la commande) ; tant que cette heure n'est pas
+  passée, aucune émission n'est due. Si la commande l'a dépassée, tu émets à cette heure une ligne
+  qui dit le glissement et la nouvelle fin attendue. **La commande se lance d'emblée en arrière-plan
+  (TF-2463, 12/11/2026)** : une commande lancée en avant-plan avec un délai explicite est basculée en
+  arrière-plan par le harnais vers 175 à 180 s (mesuré 4 fois le 12/11/2026 par l'agent du lot pa :
+  rapporté, non rejoué ici), et sa fin n'est alors plus attendue par personne. Elle s'attend par des
+  tranches bornées : des attentes de 120 s au plus, chacune finie sur la relecture de la sortie ou du
+  code de retour de la commande, jamais une attente sans borne ni un tour rendu sur l'attente (section
+  « Rendre la main »). Une tranche n'est pas une émission. 2) Une compaction du contexte : tu ne peux pas
+  émettre pendant ;
   ta première ligne après la reprise dit qu'une compaction a eu lieu et redonne le plan (réalisé,
   RAF). Le fait : le 10/11/2026, une campagne de 2 h 30 a fait 18 émissions, dont 10 écarts de
   plus de 4 minutes et un de 33 minutes, tous pendant des commandes longues ou une compaction ;
@@ -341,9 +347,11 @@ recette qui y écrivait ses diagnostics, et un commit tardif arrivé pendant que
 le chantier.
 
 - **Aucun tour ne se clôt sur l'attente d'une tâche d'arrière-plan.** Une vérification longue se
-  joue en AVANT-PLAN, avec un délai explicite (paramètre de délai de l'outil) ; si elle a été
-  lancée en arrière-plan, son résultat est RELU avant de rendre la main. Un agent qui s'arrête
-  dit ce qui est fini et ce qui ne l'est pas ; il n'annonce jamais qu'il attend.
+  lance d'emblée en arrière-plan, sa fin attendue annoncée, et s'attend par des tranches bornées
+  dans le même tour (section « Avancement des campagnes longues », TF-2463) : une commande d'avant-plan
+  à délai explicite est basculée par le harnais vers 175 s et son attente se perd. Son résultat est
+  RELU avant de rendre la main. Un agent qui s'arrête dit ce qui est fini et ce qui ne l'est pas ;
+  il n'annonce jamais qu'il attend.
 - **`git status` propre avant tout message de fin, même intermédiaire.** Aucun fichier de
   diagnostic, aucune fixture mutée, aucune modification non commitée de TES chemins ; ce qui
   appartient à une autre session se liste au message, sans y toucher.
