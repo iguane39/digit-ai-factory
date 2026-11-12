@@ -1902,7 +1902,8 @@ critique pour le travail des développeurs, leur efficacité, résilience. »
 
 Contrôles exécutables : `oracles\oracle-reprise.mjs` (RP1 manifeste valide, RP2 aucun secret déclaré,
 RP3 canal joignable sur ce poste, RP4 aucun écart non restauré, RP5 envoi actif sous feu vert
-consigné ; recette `oracle-reprise.test.mjs`, 8 cas, dont le cas du 14/10 rejoué) ; `oracles\hook-reprise.mjs`,
+consigné, RP6 rien de ce que le canal poserait n'est commitable : un dossier ignoré puis renommé garde son
+ancien chemin dans `.gitignore`, TF-2441 ; recette `oracle-reprise.test.mjs`, 11 cas, dont le cas du 14/10 rejoué) ; `oracles\hook-reprise.mjs`,
 câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.json` 1.26.0, et ajouté par le hook d'ouverture du produit depuis le gabarit (recette
 `gabarits\hooks-factory.test.mjs`, cas 12) ; la règle S77 d'`oracles\oracle-synthese.mjs` (point 5).
 Non jugé : une suppression ne se propage pas ; deux écritures du même fichier entre deux
