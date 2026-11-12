@@ -104,7 +104,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` | fichier | 6,5 Ko | Synthèse Mandat — conseil de cinq agents avant un arbitrage : étude instruite (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
 | `Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md` | fichier | 4,1 Ko | markdown |
-| `Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` | fichier | 3,1 Ko | Synthèse Mandat — D-209 appliquée au prompt de suivi des agents, 12/11/2026 |
+| `Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` | fichier | 3,2 Ko | Synthèse Mandat — D-209 appliquée au prompt de suivi des agents, 12/11/2026 |
 | `Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` | fichier | 9,4 Ko | Synthèse Mandat — D-41, D-43 et D-44 exécutées le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` | fichier | 6,0 Ko | Synthèse Mandat — D-45 (b) exécutée, le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` | fichier | 5,8 Ko | Synthèse Mandat — D-45 reposée en clair, le 19/10/2026 au soir |

@@ -45,7 +45,7 @@ Relecture d'intention : sans objet, la réponse à une décision s'applique tell
 
 ## 8. Prochaines actions
 
-Les actions sont classées dans l'ordre où elles se font ; il n'en reste qu'une, la vôtre.
+Les actions sont classées dans l'ordre où elles se font, parce que chacune attend la précédente ; il n'en reste qu'une, la vôtre.
 
 | Sélecteur | Item | Action | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|

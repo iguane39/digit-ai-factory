@@ -605,7 +605,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
 | Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md | 20261112d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md` |
-| Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md | 20261112h | 3.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` |
+| Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md | 20261112h | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` |
 | Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md | 20261019f | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` |
 | Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md | 20261019h | 6 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` |
 | Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md | 20261019g | 5.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` |
