@@ -32,7 +32,7 @@ writeFileSync(join(T, "_prod.json"), JSON.stringify({ produits: { "CalculatriceZ
 process.env.FORGE_NOMS_INTERDITS = join(T, "_noms.json");
 process.env.FORGE_PRODUITS_PSEUDO = join(T, "_prod.json");
 
-const { passer } = await import("./pre-commit-anonymise.mjs");
+const { passer, fichiersIndexes } = await import("./pre-commit-anonymise.mjs");
 
 // Le module lit la racine depuis SON emplacement ; on lui donne donc les fichiers à la main,
 // ce qui est aussi la façon de l'éprouver sans dépendre de l'index du dépôt courant.
@@ -237,6 +237,59 @@ check("le mode de l'entrée d'index est conservé à la réécriture (100755 res
   passer({ fichiers: [f], ecrire: true, racine: DEPOT });
   att(indexe(f) === "echo Client-A\n", `contenu indexé inattendu : ${JSON.stringify(indexe(f))}`);
   att(modeIndex(f) === "100755", `le mode est devenu ${modeIndex(f)}`);
+});
+
+// TF-2471 (13/11/2026) — LA LISTE INDEXÉE SE LIT AVEC -z. `git diff --cached --name-only` sans -z rend
+// un nom accentué ENTRE GUILLEMETS, en octaux (`"\303\251t\303\251.md"`, core.quotepath à true, sa
+// valeur par défaut) : le nom ainsi rendu n'existe pas à l'index, `entreeIndex` ne trouvait rien et la
+// passe sautait le fichier sans rien dire. Le 12/11, le même contenu était pseudonymisé sous un nom
+// ASCII et gardait le nom réel sous un nom accentué (rejoué avec le vrai hameçon par l'agent du lot pi).
+// Un dépôt jetable à part, et la passe SANS liste : c'est le chemin que le hameçon emprunte.
+const DEPOT2 = join(T, "depot-accents");
+mkdirSync(DEPOT2, { recursive: true });
+const git2 = (...a) => execFileSync("git", a, { cwd: DEPOT2, encoding: "utf8" });
+git2("init", "-q");
+git2("config", "user.email", "banc@exemple.test");
+git2("config", "user.name", "banc");
+git2("config", "core.autocrlf", "false");                  // pas d'avertissement de fin de ligne dans la sortie du banc
+git2("config", "core.quotepath", "true");                // le défaut de git, posé pour que le banc ne dépende pas du poste
+const poser2 = (nom, corps) => { writeFileSync(join(DEPOT2, nom), corps, "utf8"); git2("add", "--", nom); return nom; };
+const indexe2 = (f) => git2("show", ":" + f);
+
+check("ROUGE → VERT (TF-2471) — un fichier au nom ACCENTUÉ est pseudonymisé au commit comme son jumeau au nom ASCII", () => {
+  const ascii = poser2("note-ete.md", "Lot de Zorglub.\n");
+  const accent = poser2("note-été.md", "Lot de Zorglub.\n");
+  const liste = fichiersIndexes(DEPOT2);
+  att(liste.includes(accent), `la liste indexée ne porte pas le nom brut ${accent} : ${JSON.stringify(liste)}`);
+  const r = passer({ ecrire: true, racine: DEPOT2 });
+  att(r.corriges.some((c) => c.fichier === ascii), "le jumeau ASCII n'est pas relevé");
+  att(r.corriges.some((c) => c.fichier === accent), `le fichier au nom accentué n'est pas relevé : ${JSON.stringify(r.corriges)}`);
+  att(indexe2(ascii) === "Lot de Client-A.\n", `le jumeau ASCII n'est pas pseudonymisé : ${JSON.stringify(indexe2(ascii))}`);
+  att(indexe2(accent) === "Lot de Client-A.\n", `le nom réel reste dans l'index sous un nom accentué : ${JSON.stringify(indexe2(accent))}`);
+});
+
+check("SECOND SENS (TF-2471) — un fichier au nom accentué et PROPRE n'est ni relevé ni réécrit", () => {
+  const f = poser2("propre-à-garder.md", "Rien a voir ici.\n");
+  const avant = git2("ls-files", "--stage", "--", f);
+  const r = passer({ ecrire: true, racine: DEPOT2 });
+  att(!r.corriges.some((c) => c.fichier === f), "un fichier accentué propre est déclaré corrigé");
+  att(git2("ls-files", "--stage", "--", f) === avant, "l'entrée d'index d'un fichier accentué propre a changé");
+});
+
+check("VERT (TF-2471) — un nom exotique (espace, apostrophe, idéogramme) revient brut de la liste indexée, jamais échappé", () => {
+  const noms = ['avec espace é.md', "d'apostrophe é.md", "日本.md"];
+  for (const n of noms) poser2(n, "texte\n");
+  const liste = fichiersIndexes(DEPOT2);
+  for (const n of noms) att(liste.includes(n), `${n} absent de la liste indexée : ${JSON.stringify(liste)}`);
+  att(!liste.some((n) => n.startsWith('"') || n.includes("\\")), `un nom échappé ou entre guillemets subsiste : ${JSON.stringify(liste)}`);
+});
+
+check("REFUS conservé (TF-2471) — un NOM de fichier accentué qui porte un nom réel est relevé avec sa commande de renommage", () => {
+  const f = poser2("CalculatriceZorglubZAP - RETOURS - été.md", "corps propre\n");
+  const r = passer({ ecrire: true, racine: DEPOT2 });
+  const n = r.nomsPorteurs.find((x) => x.fichier === f);
+  att(n, `le nom porteur accentué n'est pas relevé : ${JSON.stringify(r.nomsPorteurs)}`);
+  att(!/Zorglub/i.test(n.propose), "le nom proposé porte encore le nom réel : " + n.propose);
 });
 
 rmSync(T, { recursive: true, force: true });

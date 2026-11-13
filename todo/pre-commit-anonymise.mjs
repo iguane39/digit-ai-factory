@@ -67,9 +67,12 @@ const git = (...a) => execFileSync("git", a, { cwd: RACINE, encoding: "utf8", ma
 const gitDans = (racine, ...a) => execFileSync("git", a, { cwd: racine, encoding: "utf8", maxBuffer: 64e6 });
 
 /** Les fichiers de l'INDEX, ajoutés ou modifiés — jamais les supprimés, ni l'histoire. */
-export function fichiersIndexes() {
-  return git("diff", "--cached", "--name-only", "--diff-filter=ACM")
-    .split("\n").map((s) => s.trim()).filter(Boolean);
+export function fichiersIndexes(racine = RACINE) {
+  // TF-2471 : `-z` rend les noms BRUTS, séparés par NUL. Sans lui, git met entre guillemets et écrit
+  // en octaux tout nom non ASCII (core.quotepath, à true par défaut) : `"\303\251t\303\251.md"` n'est
+  // le chemin d'aucune entrée d'index, la passe sautait le fichier et le nom réel partait au commit.
+  return gitDans(racine, "diff", "--cached", "--name-only", "-z", "--diff-filter=ACM")
+    .split("\0").filter(Boolean);
 }
 
 /**
@@ -80,7 +83,7 @@ export function passer({ fichiers, ecrire = true, racine = RACINE, reempreindre 
   // La RACINE est un parametre, et c'est ce qui rend ce geste eprouvable : le banc lui donne un
   // depot jetable au lieu de celui-ci. Un module qui ne sait travailler que sur son propre depot
   // ne se teste que sur son propre depot, donc jamais dans les deux sens.
-  const liste = fichiers ?? fichiersIndexes();
+  const liste = fichiers ?? fichiersIndexes(racine);
   // TF-0993 : `refuses` — les occurrences que la chaîne a LAISSÉES EN PLACE à dessein (collées à
   // un identifiant, TF-0927). Le hook annonçait « pseudonymisé » sans jamais dire ce qui avait
   // résisté ; le 09/09, un nom est ainsi resté dans un commentaire du pilot, vu par la seule relecture.
