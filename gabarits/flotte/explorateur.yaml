@@ -1,6 +1,7 @@
 # Flotte d'agents de la Factory (D-19 (a) du 18/10/2026, étude output/03-etudes/20261018-etude-opportunite-flotte-d-agents.md).
 # Classe « mécanique » du tableau de routage (CONTRAT-INTERFACE.md §4) : Haiku. Haiku est absent du rejeu D-6 (a) :
 # aucun effort n'est déclaré, le compilateur n'en pose pas ; la mesure viendra du relevé de flotte (scripts/relever-flotte.mjs).
+# scan-agentdef CAP-3 : Bash reste accordé à un mandat de lecture seule parce que le rôle ne compte ni n'extrait sans shell. Relevé du 13/11/2026 sur les transcriptions des deux profils du poste (30 jours, 58 sous-agents explorateur) : 1 627 appels Bash contre 324 Read, 20 Grep et 7 Glob, pour compter, filtrer et croiser des registres que Read et Grep ne totalisent pas. L'agent n'a ni Write ni Edit (ses 23 appels Write, dont 15 portent un résultat lu, sont tous refusés par le harnais : « No such tool available »), et son mandat dit « n'écrit rien ».
 id: explorateur
 mandat: "Lecture seule mécanique — localiser des fichiers, extraire ou compter dans un registre, un journal ou un dépôt, inventorier — et rendre un relevé chiffré avec son périmètre et sa provenance ; n'écrit rien et n'arbitre rien"
 outils: [Read, Grep, Glob, Bash]
