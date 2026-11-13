@@ -105,6 +105,74 @@ try {
   check("BORNE (--tous-scripts) — un jeu d'essai sous fixtures n'est pas du code livré", () => {
     if (t.sansAppelant.some((x) => x.controle.startsWith("fixtures/"))) throw new Error("un fichier de fixtures est relevé");
   });
+
+  // TF-2488 (13/11/2026, lot pd) : chaque déclaration NOMME SA NATURE, et le registre de quality-oracles fait foi.
+  // Le fait : 9 des 12 oracles relevés « sans appelant » le 13/11 étaient joués à la demande ou en recette, et le
+  // relevé disait « sans appelant » d'oracle-clip et d'oracle-restitution, que le registre inscrit.
+  const N = mkdtempSync(join(tmpdir(), "appelants-natures-"));
+  try {
+    mkdirSync(join(N, "forge-x", "oracles"), { recursive: true });
+    const nu = (c) => writeFileSync(join(N, "forge-x", "oracles", c), "console.log('x');\n");
+    for (const c of ["oracle-cable.mjs", "oracle-recette.mjs", "oracle-prescrit.mjs", "oracle-cite.mjs", "oracle-seul.mjs", "oracle-clip.mjs", "oracle-restitution.mjs"]) nu(c);
+    writeFileSync(join(N, "forge-x", "oracles", "hook-fin.mjs"), "spawnSync('node', ['oracles/oracle-cable.mjs']);\n");
+    writeFileSync(join(N, "forge-x", "oracles", "oracle-recette.test.mjs"), "import './oracle-recette.mjs';\n");
+    writeFileSync(join(N, "forge-x", "oracles", "self-test.mjs"), "run('oracle-recette.mjs --self-test');\n");
+    mkdirSync(join(N, "forge-x", "docs"), { recursive: true });
+    writeFileSync(join(N, "forge-x", "docs", "etape.md"), "À l'étape 4, jouer :\n\n    node oracles/oracle-prescrit.mjs <page.html>\n\nLe contrôle `oracle-cite.mjs` juge la forme.\n");
+    const registre = join(N, "registre-oracles.json");
+    writeFileSync(registre, JSON.stringify({ version: 1, oracles: [
+      { domaine: "Clip", ext: [], type: "cli", cmd: ["node", "{forges}/forge-x/oracles/oracle-clip.mjs", "{file}", "--json-only"] },
+      { domaine: "Restitution", ext: [], content_patterns: ["data-restitution"], type: "cli", cmd: ["node", "{forges}/forge-x/oracles/oracle-restitution.mjs", "{file}"] },
+      { domaine: "Autre dépôt", ext: [], type: "cli", cmd: ["node", "{forges}/forge-y/oracles/oracle-seul.mjs", "{file}"] },
+    ] }));
+    const racineX = join(N, "forge-x");
+    const sans = (r, c) => r.sansAppelant.find((x) => x.controle === `oracles/${c}`);
+    const sansRegistre = relever(racineX);
+    const avecRegistre = relever(racineX, { registre });
+    check("ROUGE (TF-2488) — sans le registre, oracle-clip et oracle-restitution sont relevés sans appelant (la contradiction mesurée)", () => {
+      if (!sans(sansRegistre, "oracle-clip.mjs") || !sans(sansRegistre, "oracle-restitution.mjs")) throw new Error("le témoin est vide : ils ne sont pas relevés sans registre");
+    });
+    check("VERT (TF-2488) — le registre de quality-oracles les inscrit : ils sont appelés, de nature « registre », le fichier nommé", () => {
+      if (sans(avecRegistre, "oracle-clip.mjs") || sans(avecRegistre, "oracle-restitution.mjs")) throw new Error("le relevé contredit encore le registre");
+      const a = avecRegistre.appeles.find((x) => x.controle === "oracles/oracle-clip.mjs");
+      if (!a || a.nature !== "registre" || !/registre-oracles\.json$/.test(a.appelants[0])) throw new Error(`nature ou fichier non dit : ${JSON.stringify(a)}`);
+    });
+    check("BORNE (TF-2488) — une inscription au registre pour le MÊME nom dans un AUTRE dépôt n'appelle pas oracle-seul", () => {
+      if (!sans(avecRegistre, "oracle-seul.mjs")) throw new Error("oracle-seul est tenu pour inscrit sur le seul nom de fichier");
+    });
+    check("VERT (TF-2488) — un appel exécutable reste de nature « executable »", () => {
+      const a = avecRegistre.appeles.find((x) => x.controle === "oracles/oracle-cable.mjs");
+      if (!a || a.nature !== "executable") throw new Error(`nature : ${JSON.stringify(a)}`);
+    });
+    check("ROUGE (TF-2488) — joué par un test et un self-test seulement : nature « recette », les deux fichiers nommés, toujours sans appelant exécutable", () => {
+      const s = sans(avecRegistre, "oracle-recette.mjs");
+      if (!s || s.nature !== "recette") throw new Error(`nature : ${JSON.stringify(s)}`);
+      if (!s.recettes.includes("oracles/oracle-recette.test.mjs") || !s.recettes.includes("oracles/self-test.mjs")) throw new Error(`recettes : ${s.recettes}`);
+    });
+    check("ROUGE (TF-2488) — un document qui lance `node …` sur son nom : nature « prescription » ; une mention sans commande : « citation »", () => {
+      const p = sans(avecRegistre, "oracle-prescrit.mjs"), c = sans(avecRegistre, "oracle-cite.mjs");
+      if (!p || p.nature !== "prescription" || p.prescriptions[0] !== "docs/etape.md") throw new Error(`prescription : ${JSON.stringify(p)}`);
+      if (!c || c.nature !== "citation" || c.prescriptions.length) throw new Error(`citation : ${JSON.stringify(c)}`);
+    });
+    check("ROUGE (TF-2488) — rien ne le nomme : nature « aucune » ; la sonde compte les non-appelés, pas les inscrits au registre", () => {
+      const s = sans(avecRegistre, "oracle-seul.mjs");
+      if (!s || s.nature !== "aucune") throw new Error(`nature : ${JSON.stringify(s)}`);
+      const j = spawnSync(process.execPath, [join(ICI, "relever-appelants.mjs"), "--racine", racineX, "--registre", registre, "--json"], { encoding: "utf8" });
+      if (j.status !== 0) throw new Error(`exit ${j.status} : ${j.stderr}`);
+      const d = JSON.parse(j.stdout);
+      if (d.nombre_sans_appelant !== avecRegistre.sansAppelant.length || d.nombre_sans_appelant !== 5) throw new Error(`nombre_sans_appelant = ${d.nombre_sans_appelant}, 5 attendus (recette, prescrit, cité, seul, et hook-fin que rien ne lance)`);
+    });
+    check("VERT (TF-2488) — --depot nomme le dépôt tel que le registre l'écrit (un arbre de travail n'en porte pas le nom) : oracle-seul, inscrit sous forge-y, est alors appelé", () => {
+      const j = spawnSync(process.execPath, [join(ICI, "relever-appelants.mjs"), "--racine", racineX, "--registre", registre, "--depot", "forge-y", "--json"], { encoding: "utf8" });
+      if (j.status !== 0) throw new Error(`exit ${j.status} : ${j.stderr}`);
+      const d = JSON.parse(j.stdout);
+      if (d.sansAppelant.some((x) => x.controle === "oracles/oracle-seul.mjs") || !d.appeles.some((x) => x.controle === "oracles/oracle-seul.mjs" && x.nature === "registre")) throw new Error("--depot est ignoré");
+    });
+    check("BORNE (TF-2488) — un registre illisible demandé par --registre : exit 2, jamais un relevé muet", () => {
+      const j = spawnSync(process.execPath, [join(ICI, "relever-appelants.mjs"), "--racine", racineX, "--registre", join(N, "absent.json")], { encoding: "utf8" });
+      if (j.status !== 2) throw new Error(`exit ${j.status} attendu 2`);
+    });
+  } finally { rmSync(N, { recursive: true, force: true }); }
 } finally { rmSync(T, { recursive: true, force: true }); }
 console.log(`\nrelever-appelants (TF-1096) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

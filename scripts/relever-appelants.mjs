@@ -29,10 +29,26 @@
  * relatif, ou qu'un `pyproject.toml` le déclare ; les environnements Python (`.venv`) sont écartés. Le fait :
  * 4 forges comptaient 0 contrôle selon la convention de nom, alors qu'elles portent des scripts.
  *
- * Usage : node scripts/relever-appelants.mjs [--racine <dépôt>] [--tous-scripts] [--json]
+ * TF-2488 (13/11/2026, lot pd) — CHAQUE DÉCLARATION NOMME SA NATURE. Le relevé ne connaissait que deux
+ * états, « appelé » et « sans appelant », et mêlait sous le second ce qui se joue en recette, ce qu'un
+ * document prescrit et ce que rien ne nomme : 9 des 12 oracles relevés sans appelant le 13/11 étaient
+ * joués à la demande ou en recette. Quatre natures, de la plus forte à la plus faible :
+ *   - `executable`   : un fichier exécutable ou de câblage le nomme (le sens historique d'« appelant ») ;
+ *   - `registre`     : le registre machine de quality-oracles l'inscrit (`registre-oracles.json`, lu par
+ *                      `run-oracles.mjs`) — le registre FAIT FOI : sur `oracle-clip` et `oracle-restitution`,
+ *                      le relevé disait « sans appelant » là où le registre les inscrit ;
+ *   - `recette`      : seul un test, un self-test ou le harnais des recettes le nomme ;
+ *   - `prescription` : seul un document `.md` en prescrit l'appel (une ligne qui lance `node` ou `python`
+ *                      sur son nom) ; une mention sans commande reste `citation` ; rien ne le nomme : `aucune`.
+ * Un contrôle d'une des deux premières natures est APPELÉ. Les autres restent dans `sansAppelant`, avec leur
+ * nature, leurs `recettes` et leurs `prescriptions` nommées : `nombre_sans_appelant` ne change pas de sens.
+ * Le registre se lit par `--registre <fichier>` ; à défaut, `$FORGE_ROOT` ou le parent du dépôt relevé, puis
+ * `digit-ai-forge-agents/.claude/skills/quality-oracles/references/registre-oracles.json`.
+ *
+ * Usage : node scripts/relever-appelants.mjs [--racine <dépôt>] [--depot <nom>] [--tous-scripts] [--registre <fichier>] [--json]
  */
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
-import { join, relative, basename, dirname } from "node:path";
+import { join, relative, basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -57,8 +73,41 @@ function* fichiers(dir, racine, ecartes = ECARTES) {
   }
 }
 
-/** Rend { controles, mode, sansAppelant: [{controle, cite_en_doctrine}], appeles: [{controle, appelants[]}] }. */
-export function relever(racine, { tous = false } = {}) {
+const RACINE_REGISTRE = ".claude/skills/quality-oracles";
+const SCRIPT_DE_REGISTRE = /\.(mjs|cjs|js|py)$/i;
+
+/** Les scripts que le registre machine de quality-oracles inscrit, en { depot, chemin } (TF-2488). Illisible : null. */
+export function lireRegistre(fichier) {
+  let d;
+  try { d = JSON.parse(readFileSync(fichier, "utf8")); } catch { return null; }
+  const inscrits = new Set();
+  for (const o of Array.isArray(d && d.oracles) ? d.oracles : []) {
+    for (const t of Array.isArray(o && o.cmd) ? o.cmd : []) {
+      const m = String(t).match(/^\{(forges|pilot|skilldir)\}\/(.+)$/);
+      if (!m || !SCRIPT_DE_REGISTRE.test(m[2])) continue;
+      if (m[1] === "forges") { const [depot, ...reste] = m[2].split("/"); inscrits.add(`${depot}/${reste.join("/")}`); }
+      else if (m[1] === "pilot") inscrits.add(`digit-ai-factory/${m[2]}`);
+      else inscrits.add(`digit-ai-forge-agents/${RACINE_REGISTRE}/${m[2]}`);
+    }
+  }
+  return { fichier, inscrits };
+}
+
+/** Où chercher le registre quand la ligne de commande n'en nomme aucun : le dépôt frère du relevé. */
+export function registreParDefaut(racine) {
+  const forges = process.env.FORGE_ROOT || dirname(resolve(racine));
+  const f = join(forges, "digit-ai-forge-agents", RACINE_REGISTRE, "references", "registre-oracles.json");
+  return existsSync(f) ? f : null;
+}
+
+/**
+ * Rend { controles, mode, registre, sansAppelant: [{controle, nature, recettes[], prescriptions[], cite_en_doctrine}],
+ *        appeles: [{controle, nature, appelants[]}] }.
+ * `registre` : fichier du registre de quality-oracles lu (TF-2488), ou null ; `depot` : nom du dépôt relevé, tel
+ * que le registre l'écrit (par défaut le nom du dossier).
+ */
+export function relever(racine, { tous = false, registre = null, depot = basename(resolve(racine)) } = {}) {
+  const reg = registre ? lireRegistre(registre) : null;
   const tous_ = [...fichiers(racine, racine, tous ? new Set([...ECARTES, ...ECARTES_TOUS]) : ECARTES)];
   const estCible = tous ? (f) => EST_SCRIPT.test(f) : (f) => EST_CONTROLE.test(basename(f));
   const estAppelant = tous ? EST_APPELANT_TOUS : EST_APPELANT;
@@ -80,10 +129,18 @@ export function relever(racine, { tous = false } = {}) {
     const module = /\.py$/i.test(nom) ? new RegExp(`\\b(import|from)\\s+[\\w.]*\\b${stem}\\b|\\bimport\\s+[\\w\\s.,()]*\\b${stem}\\b`) : null;
     const nomme = (t) => t.includes(nom) || (module && module.test(t));
     const appelants = candidats.filter((f) => f !== c && !EST_RECETTE(f) && nomme(lire(f)));
-    if (appelants.length) appeles.push({ controle: c, appelants });
-    else sansAppelant.push({ controle: c, cite_en_doctrine: tous_.some((f) => /\.md$/i.test(f) && lire(f).includes(nom)) });
+    if (appelants.length) { appeles.push({ controle: c, nature: "executable", appelants }); continue; }
+    // TF-2488 : le registre de quality-oracles inscrit le contrôle ; il fait foi, le relevé ne le contredit pas.
+    if (reg && reg.inscrits.has(`${depot}/${c}`)) { appeles.push({ controle: c, nature: "registre", appelants: [reg.fichier.split("\\").join("/")] }); continue; }
+    // Ni exécutable ni registre : la recette qui le joue et le document qui en prescrit l'appel se NOMMENT.
+    const recettes = tous_.filter((f) => f !== c && EST_RECETTE(f) && estAppelant.test(f) && nomme(lire(f)));
+    const lancement = new RegExp(`\\b(node|python3?|py)\\b[^\\n]*${nom.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+    const docs = tous_.filter((f) => /\.md$/i.test(f) && lire(f).includes(nom));
+    const prescriptions = docs.filter((f) => lancement.test(lire(f)));
+    const nature = recettes.length ? "recette" : prescriptions.length ? "prescription" : docs.length ? "citation" : "aucune";
+    sansAppelant.push({ controle: c, nature, recettes, prescriptions, cite_en_doctrine: docs.length > 0 });
   }
-  return { controles: controles.length, mode: tous ? "tous-scripts" : "controles", sansAppelant, appeles };
+  return { controles: controles.length, mode: tous ? "tous-scripts" : "controles", registre: reg ? reg.fichier : null, sansAppelant, appeles };
 }
 
 const lanceEnDirect = process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("\\", "/") === process.argv[1].toLowerCase().replaceAll("\\", "/");
@@ -92,10 +149,15 @@ if (lanceEnDirect) {
   const i = args.indexOf("--racine");
   const racine = i >= 0 ? args[i + 1] : join(ICI, "..");
   if (!racine || !existsSync(racine) || !statSync(racine).isDirectory()) { console.error(`racine illisible : ${racine}`); process.exit(2); }
-  const r = relever(racine, { tous: args.includes("--tous-scripts") });
+  const j = args.indexOf("--registre");
+  const registre = j >= 0 ? args[j + 1] : registreParDefaut(racine);
+  if (j >= 0 && (!registre || !existsSync(registre))) { console.error(`registre illisible : ${registre}`); process.exit(2); }
+  const k = args.indexOf("--depot"); // nom du dépôt tel que le registre l'écrit : un arbre de travail ne porte pas le nom du dépôt
+  const r = relever(racine, { tous: args.includes("--tous-scripts"), registre, ...(k >= 0 && args[k + 1] ? { depot: args[k + 1] } : {}) });
   // `nombre_sans_appelant` : le scalaire que lit la sonde hebdomadaire du plan des récidives (TF-1165).
   if (args.includes("--json")) { console.log(JSON.stringify({ nombre_sans_appelant: r.sansAppelant.length, ...r }, null, 1)); process.exit(0); }
-  console.log(`relever-appelants — ${r.controles} ${r.mode === "tous-scripts" ? "script(s)" : "contrôle(s)"}, ${r.sansAppelant.length} sans appelant exécutable :`);
-  for (const s of r.sansAppelant) console.log(`  - ${s.controle}${s.cite_en_doctrine ? " (cité en doctrine seulement)" : " (cité nulle part)"}`);
+  console.log(`relever-appelants — ${r.controles} ${r.mode === "tous-scripts" ? "script(s)" : "contrôle(s)"}, ${r.sansAppelant.length} sans appelant exécutable ni inscription au registre${r.registre ? ` (${r.registre})` : " (registre de quality-oracles non lu)"} :`);
+  const DIT = { recette: (s) => `joué en recette seulement : ${s.recettes.join(", ")}`, prescription: (s) => `appel prescrit par un document : ${s.prescriptions.join(", ")}`, citation: () => "cité en doctrine seulement", aucune: () => "cité nulle part" };
+  for (const s of r.sansAppelant) console.log(`  - ${s.controle} [${s.nature}] (${DIT[s.nature](s)})`);
   process.exit(0);
 }
