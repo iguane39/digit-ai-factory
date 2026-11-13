@@ -1,7 +1,7 @@
 {
   "schema": "lecons@1",
-  "version": "1.1.0",
-  "date": "2026-11-05",
+  "version": "1.2.0",
+  "date": "2026-11-13",
   "_commentaire": "Table des leçons génériques du pilot (TF-2150, décision humaine D-172 (a) du 04/11/2026, étude « Apprentissage des erreurs par les produits et la Factory » 20261104b, option O2). Lue au moment du geste par oracles/hook-lecons.mjs (PreToolUse sur Bash, PowerShell, Write, Edit, MultiEdit, Agent et Task ; `declencheur.sur` vaut `commande`, `chemin` ou `agent`, ce dernier jugeant la description d'un lancement d'agent, TF-1947), au pilot et chez chaque produit par `forge/hooks/factory.mjs lecons` ; rien n'est chargé à l'ouverture. Une leçon générique entre ici après décision au registre, avec une preuve qui se vérifie : le hook la revérifie avant chaque rappel et tait la leçon dont la preuve ne se vérifie plus. Jugée par `node scripts/lecons.mjs --verifier` ; passée de `rappel` à `barriere` par `--appliquer` quand elle récidive après son rappel (BOUCLE-AMELIORATION.md, section T1). Champs facultatifs : `declencheur.chaines` (`retirees` par défaut, `interpretees`, `gardees` : ce que le motif voit d'une commande, voir l'en-tête du hook), `barriere_le` et `motif_barriere` (écrits par --appliquer), `mesure` (calibrage du motif sur les gestes réels des transcriptions du poste).",
   "lecons": [
     {
@@ -260,7 +260,7 @@
           "preferee": true
         },
         {
-          "texte": "jouer l'attente en avant-plan, avec un délai explicite, puis relire le résultat des agents avant de rendre la main",
+          "texte": "lancer l'attente d'emblée en arrière-plan, sa fin annoncée, et l'attendre par tranches bornées (une commande d'attente de 150 s au plus, rejouée jusqu'à la fin) dans le même tour, puis relire le résultat des agents avant de rendre la main (gabarits/AGENT-CAMPAGNE.md, TF-2463)",
           "condition": "résultat d'agent dû dans le tour",
           "preferee": false
         }
