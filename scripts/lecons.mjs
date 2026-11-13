@@ -22,7 +22,9 @@
  *         contient sa chaîne (un chemin absolu ne vaut que sur un poste) ;
  *     V8  portée : `generique` dans la table du pilot, `produit` dans celle d'un produit ;
  *     V9  statut `rappel`, `barriere` ou `suspendue` ; une barrière porte `barriere_le` et `motif_barriere` ;
- *     V10 `revue_le` : une date valide, non dépassée au jour du jugement (`--au AAAA-MM-JJ`, défaut : aujourd'hui).
+ *     V10 `revue_le` : une date valide, non dépassée au jour du jugement (`--au AAAA-MM-JJ`, défaut : aujourd'hui) ;
+ *     V11 (TF-2479) aucune solution ne prescrit l'attente en avant-plan avec un délai explicite, que le contrat d'agent retire depuis TF-2463
+ *         (arrière-plan d'emblée, fin annoncée, tranches bornées) : `prescritAttenteAvantPlan`.
  *   --recidives  (lecture seule) croise les deux journaux de la racine (`.claude/` au pilot, `forge/` chez un produit) :
  *     une leçon récidive quand, dans une session où elle a été rappelée (ligne au statut `rappel`), une friction de
  *     la même session SUIT le rappel ; une friction qui nomme son outil ne compte que pour une leçon rappelée sur ce
@@ -53,12 +55,26 @@ export const NON_JUGE = [
   "la PRÉCISION d'un motif sur les gestes réels : elle se mesure sur les transcriptions (champ facultatif `mesure`), pas ici",
   "le lien de CAUSE entre un rappel et la friction qui le suit : --recidives compte une friction postérieure de la même session, même outil quand elle le nomme ; une friction sans rapport avec la leçon compte aussi",
   "les récidives d'une leçon générique chez les AUTRES produits : --recidives lit les journaux d'une seule racine",
+  "V11 juge la FORMULATION d'une solution (attente en avant-plan avec délai, dite par ces mots), pas le sens : une prescription équivalente en d'autres termes passe ; elle ne lit pas le contrat d'agent, elle en porte la règle de TF-2463",
 ];
 
 const JOUR = /^\d{4}-\d{2}-\d{2}$/;
 const dateValide = (d) => typeof d === "string" && JOUR.test(d) && new Date(`${d}T00:00:00Z`).toISOString().slice(0, 10) === d;
 const ecrit = (x) => typeof x === "string" && x.trim().length > 0;
 const aujourdHui = () => new Date().toISOString().slice(0, 10);
+
+/**
+ * TF-2479 (13/11/2026) — V11. Le contrat d'agent (`gabarits/AGENT-CAMPAGNE.md`, TF-2463) retire l'attente en avant-plan avec un délai explicite : le
+ * harnais bascule en arrière-plan, vers 175 s, une commande lancée au premier plan, et l'attente se perd ; une commande longue se lance d'emblée en
+ * arrière-plan, sa fin annoncée, et s'attend par tranches bornées. Une phrase de solution qui prescrit l'attente (ou un délai) « en avant-plan » ou
+ * « au premier plan » le contredit, sauf si la même phrase la proscrit (« jamais », « ne pas »). Pur : prend le texte d'une solution.
+ */
+export function prescritAttenteAvantPlan(texte) {
+  if (typeof texte !== "string") return false;
+  return texte.split(/[.;]/).some((phrase) =>
+    (/\b(?:attend\w*|attente)\b[^.;]{0,80}\b(?:en|au)\s+(?:avant-plan|premier\s+plan)\b/i.test(phrase) || /\b(?:en|au)\s+(?:avant-plan|premier\s+plan)\b[^.;]{0,60}\bd[ée]lai\b/i.test(phrase))
+    && !/\b(?:jamais|ne\s+pas|interdit\w*|retir\w+|basculée?s?)\b/i.test(phrase));
+}
 
 /** Les chemins des journaux d'une racine. */
 export function journaux(racine) {
@@ -84,7 +100,7 @@ export function lireTables({ pilot = PILOT, racine = pilot } = {}) {
   return tables;
 }
 
-/** Juge les tables (règles V1 à V10). Rend { verdict, au, tables, constats }. */
+/** Juge les tables (règles V1 à V11). Rend { verdict, au, tables, constats }. */
 export function verifier({ pilot = PILOT, racine = pilot, au = aujourdHui() } = {}) {
   const tables = lireTables({ pilot, racine });
   const constats = [];
@@ -151,6 +167,8 @@ export function verifier({ pilot = PILOT, racine = pilot, au = aujourdHui() } = 
       });
       const pref = sols.filter((s) => s?.preferee === true).length;
       if (sols.length && pref !== 1) dire("V6", t, l, `${pref} solution(s) préférée(s) au lieu d'une seule`);
+      // V11 — aucune solution ne prescrit l'attente en avant-plan avec délai explicite (TF-2479).
+      sols.forEach((s, k) => { if (prescritAttenteAvantPlan(s?.texte)) dire("V11", t, l, `solution ${k + 1} : prescrit une attente en avant-plan avec délai explicite, que le contrat d'agent retire depuis TF-2463 (gabarits/AGENT-CAMPAGNE.md, « Avancement des campagnes longues ») : lancer d'emblée en arrière-plan, annoncer la fin attendue, attendre par tranches bornées`); });
       // V7 — la preuve.
       if (l.preuve?.type === "fichier" && typeof l.preuve.chemin === "string" && isAbsolute(l.preuve.chemin)) {
         dire("V7", t, l, `preuve au chemin absolu ${l.preuve.chemin} : elle ne vaut que sur un poste, un chemin relatif à la racine de la table est attendu`);

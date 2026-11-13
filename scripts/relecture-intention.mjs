@@ -47,8 +47,14 @@
  *   --confirmer <id> <oui|non>                      consigne la réponse humaine à une alerte ;
  *   --releve [--depuis AAAA-MM-JJ]                  par type et par point : relectures, dérives signalées, alertes confirmées et
  *        infirmées, corrigées par la boucle ; et les écarts levés sans l'humain ou posés à l'humain. Exit 0 toujours.
+ *   --actualiser [--regles <fichier>] [--racine <dossier>]
+ *        (TF-2481, 13/11/2026) recale le numéro de ligne de chaque source du référentiel des règles sur son ANCRE : la source dont la ligne
+ *        citée ne porte plus l'ancre prend la ligne où l'ancre se trouve (la plus proche de la ligne citée si elle figure plusieurs fois) ;
+ *        seuls les numéros changent dans le fichier. Une ancre disparue n'est pas recalée : la ligne reste, la source reste une erreur de la
+ *        recette, le rapport la nomme (exit 1, comme un fichier de source absent). `--racine` : le dossier d'où se lisent les chemins de source.
  * Options communes : --registre <fichier> (registre autre que celui du pilot, pour un essai), --sortie <dossier>, --json.
- * Exit : 0 · 1 (point « reception » seulement) l'oracle de forme rend FAIL, rien n'est préparé · 2 usage invalide, pièce illisible, ou aucune
+ * Exit : 0 · 1 (point « reception » seulement) l'oracle de forme rend FAIL, rien n'est préparé ; (--actualiser) une ancre disparue ou un fichier de
+ *        source absent, ce qui reste à la main · 2 usage invalide, pièce illisible, ou aucune
  *        demande humaine retrouvée dans la transcription (TF-2235 : rien n'est préparé, aucune consigne imprimée) (jamais pour --releve).
  *
  * NON JUGÉ (déclaré) : la justesse d'un verdict de relecteur ; la nature (hors_demande / choix_humain) qu'il donne à un écart ;
@@ -77,7 +83,7 @@ import { decouperCommande } from "../oracles/lib-decoupe-commande.mjs";
 let anonymiserTexte = null;
 try { ({ anonymiser: anonymiserTexte } = await import("../todo/anonymiser-entrant.mjs")); } catch { /* dit au refus de --consigner */ }
 
-export const VERSION = "2.1.0";
+export const VERSION = "2.2.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const REGISTRE_DEFAUT = join(ICI, "..", "todo", "relectures-intention.jsonl");
 export const REGLES_DEFAUT = join(ICI, "..", "references", "RELECTURE-INTENTION-REGLES.json");
@@ -332,6 +338,60 @@ export function verifierSources(ref, racine) {
     }
   }
   return { erreurs, avertissements };
+}
+
+/**
+ * TF-2481 (13/11/2026) — le MODE `--actualiser`. Le 12/11/2026, 29 sources sur 41 ont vu leur ligne glisser en un jour, sans outil pour les recaler :
+ * chaque édition d'un fichier cité décalait des numéros que la recette ne savait que signaler. Pour chaque source dont la ligne citée ne porte plus
+ * l'ANCRE, cherche l'ancre dans le fichier et dit la ligne où elle est ; l'ancre présente à plusieurs endroits se résout à l'occurrence la plus
+ * proche de la ligne citée (à égalité, la première). Une ancre disparue ne se recale pas : la ligne reste telle quelle, la source reste une erreur
+ * de `verifierSources`, et le rapport la nomme. Une source de forge sœur absente de ce poste n'est pas rejouée. Pur sauf lecture de fichiers.
+ */
+export function actualiserSources(ref, racine) {
+  const corrections = [], disparues = [], absentes = [], nonRejouees = [];
+  let lues = 0, justes = 0;
+  const cache = new Map();
+  const lire = (f) => { if (!cache.has(f)) { try { cache.set(f, readFileSync(resolve(racine, f), "utf8").split(/\r?\n/)); } catch { cache.set(f, null); } } return cache.get(f); };
+  for (const type of Object.keys(ref?.types || {})) {
+    for (const r of ref.types[type] || []) {
+      const s = r?.source; if (!s?.fichier) continue;
+      lues++;
+      const L = lire(s.fichier);
+      if (!L && s.fichier.startsWith("../")) { nonRejouees.push({ id: r.id, fichier: s.fichier }); continue; }
+      if (!L) { absentes.push({ id: r.id, fichier: s.fichier }); continue; }
+      if (s.ligne >= 1 && s.ligne <= L.length && L[s.ligne - 1].includes(s.ancre)) { justes++; continue; }
+      const trouvees = []; L.forEach((l, k) => { if (l.includes(s.ancre)) trouvees.push(k + 1); });
+      if (!trouvees.length) { disparues.push({ id: r.id, fichier: s.fichier, ligne: s.ligne, ancre: s.ancre }); continue; }
+      const a = trouvees.reduce((meilleure, k) => (Math.abs(k - s.ligne) < Math.abs(meilleure - s.ligne) ? k : meilleure), trouvees[0]);
+      corrections.push({ id: r.id, fichier: s.fichier, de: s.ligne, a, occurrences: trouvees.length });
+    }
+  }
+  return { lues, justes, corrections, disparues, absentes, nonRejouees };
+}
+
+/**
+ * TF-2481 — réécrit, dans le TEXTE du référentiel, les seuls numéros de ligne des sources corrigées : tout le reste (indentation, ordre, fins de
+ * ligne) reste octet pour octet, le diff git ne montre que les numéros. Refuse (lève) si le texte réécrit ne donne pas, une fois lu, le référentiel
+ * attendu : rien n'est alors écrit par l'appelant.
+ */
+export function actualiserTexte(texte, ref, corrections) {
+  let sortie = texte;
+  const attendu = JSON.parse(JSON.stringify(ref));
+  for (const c of corrections) {
+    const ids = [...sortie.matchAll(new RegExp(`"id"\\s*:\\s*"${c.id}"`, "g"))];
+    if (ids.length !== 1) throw new Error(`${c.id} : ${ids.length} occurrence(s) de l'identifiant dans le texte du référentiel (attendu 1)`);
+    const debut = ids[0].index + ids[0][0].length;
+    const suivant = sortie.slice(debut).search(/"id"\s*:/);
+    const fin = suivant < 0 ? sortie.length : debut + suivant;
+    const m = /("ligne"\s*:\s*)(\d+)/.exec(sortie.slice(debut, fin));
+    if (!m) throw new Error(`${c.id} : aucune clé "ligne" dans le bloc de la règle`);
+    if (Number(m[2]) !== c.de) throw new Error(`${c.id} : la ligne lue dans le texte (${m[2]}) n'est pas celle du référentiel (${c.de})`);
+    const pos = debut + m.index + m[1].length;
+    sortie = sortie.slice(0, pos) + String(c.a) + sortie.slice(pos + m[2].length);
+    for (const type of Object.keys(attendu.types)) for (const r of attendu.types[type]) if (r.id === c.id) r.source.ligne = c.a;
+  }
+  if (JSON.stringify(JSON.parse(sortie)) !== JSON.stringify(attendu)) throw new Error("le texte réécrit ne relit pas comme le référentiel attendu : seuls les numéros de ligne des sources devaient changer");
+  return sortie;
 }
 
 /** Les règles d'un ou plusieurs types, précédées de celles de tous les types, sans doublon. */
@@ -1059,7 +1119,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   const cwd = contexte.cwd || process.cwd();
   const projetDir = contexte.projet || env.CLAUDE_PROJECT_DIR || cwd;   // le projet dont on lit la transcription
   const maison = contexte.maison || homedir();
-  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null };
+  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null, racine: null };
   const usage = (m) => ({ code: 2, sortie: `relecture-intention : ${m}` });
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
@@ -1070,6 +1130,8 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       else if (x === "--confirmer") { a.mode = "confirmer"; a.id = val(); a.reponse = val(); }
       else if (x === "--boucle") { a.mode = "boucle"; a.boucle = val(); }
       else if (x === "--releve") a.mode = "releve";
+      else if (x === "--actualiser") a.mode = "actualiser";
+      else if (x === "--racine") a.racine = val();
       else if (x === "--fichier") a.fichiers.push(val());
       else if (x === "--transcript") a.transcript = val();
       else if (x === "--sortie") a.sortie = val();
@@ -1085,7 +1147,31 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       else return usage(`option inconnue : ${x}`);
     } catch (e) { return usage(e.message); }
   }
-  if (!a.mode) return usage("aucun mode — --preparer, --consigner, --boucle, --confirmer ou --releve");
+  if (!a.mode) return usage("aucun mode — --preparer, --consigner, --boucle, --confirmer, --releve ou --actualiser");
+
+  if (a.mode === "actualiser") {
+    const racine = resolve(cwd, a.racine || join(ICI, ".."));
+    const chemin = resolve(cwd, a.regles);
+    let texte, ref;
+    try { texte = readFileSync(chemin, "utf8"); ref = JSON.parse(texte); } catch (e) { return usage(`référentiel des règles illisible (${chemin}) : ${e.message}`); }
+    const p = problemesReferentiel(ref);
+    if (p.length) return usage(`référentiel des règles invalide (${chemin}) : ${p.slice(0, 5).join(" ; ")}${p.length > 5 ? ` ; … ${p.length} problèmes` : ""} — rien n'est réécrit`);
+    const r = actualiserSources(ref, racine);
+    if (r.corrections.length) {
+      let nouveau; try { nouveau = actualiserTexte(texte, ref, r.corrections); } catch (e) { return usage(`${e.message} — rien n'est réécrit`); }
+      writeFileSync(chemin, nouveau);
+    }
+    const code = r.disparues.length || r.absentes.length ? 1 : 0;
+    const resume = { ...r, regles: chemin, racine, code };
+    if (a.json) return { code, sortie: JSON.stringify(resume, null, 1), actualiser: resume };
+    const L = [`relecture-intention ${VERSION} — actualiser les sources (${chemin}, chemins lus depuis ${racine}) : ${r.lues} source(s) lue(s)`];
+    for (const c of r.corrections) L.push(`  recalée   ${c.id} : ${c.fichier} ligne ${c.de} → ${c.a}${c.occurrences > 1 ? ` (ancre présente ${c.occurrences} fois, la plus proche de la ligne citée)` : ""}`);
+    for (const d of r.disparues) L.push(`  ANCRE DISPARUE  ${d.id} : l'ancre « ${d.ancre.slice(0, 50)} » n'est plus dans ${d.fichier} — ligne ${d.ligne} laissée, la source reste une erreur de la recette`);
+    for (const d of r.absentes) L.push(`  FICHIER ABSENT  ${d.id} : ${d.fichier} — ligne laissée`);
+    for (const d of r.nonRejouees) L.push(`  non rejouée     ${d.id} : source d'une forge sœur absente de ce poste (${d.fichier})`);
+    L.push(`  bilan : ${r.corrections.length} recalée(s), ${r.justes} déjà juste(s), ${r.disparues.length} ancre(s) disparue(s), ${r.absentes.length} fichier(s) absent(s), ${r.nonRejouees.length} non rejouée(s)${r.corrections.length ? ` — ${chemin} réécrit (seuls les numéros de ligne ont changé)` : " — rien à réécrire"}`);
+    return { code, sortie: L.join("\n"), actualiser: resume };
+  }
 
   if (a.mode === "releve") {
     let depuis = null, avis = "";

@@ -529,6 +529,88 @@ try {
     const soeur = verifierSources(ref({ fichier: "../forge-absente/SKILL.md", ligne: 1, ancre: "x" }), rac);
     egal(soeur.erreurs.length, 0, "forge sœur : erreurs"); egal(soeur.avertissements.length, 1, "forge sœur : avertissements");
   });
+  // ----- TF-2481 : --actualiser recale le numéro de ligne d'une source sur son ancre (13/11/2026) -----
+  const refActualiser = (sources) => ({ schema: "pilot/relecture-intention-regles@1", version: "1.0.0", date: "2026-11-13",
+    types: Object.fromEntries(["tous", ...TYPES].map((t) => [t, t === "page" ? sources.map((source, i) => ({ id: `P${i + 1}`, regle: "x".repeat(30), source, fait: "y".repeat(30) })) : []])) });
+  const poserActualiser = (nom, sources, doctrine, eol = "\n") => {
+    const rac = join(T, `actualiser-${nom}`); mkdirSync(rac, { recursive: true });
+    writeFileSync(join(rac, "d.md"), doctrine);
+    const f = join(rac, "regles.json");
+    writeFileSync(f, JSON.stringify(refActualiser(sources), null, 2).replace(/\n/g, eol));
+    return { rac, f, avant: readFileSync(f, "utf8") };
+  };
+  const sansNumeros = (t) => t.replace(/"ligne": \d+/g, "\"ligne\": N");
+  check("rouge → vert — TF-2481 : --actualiser recale une ligne glissée sur son ancre, seuls les numéros changent (octet pour octet, fins de ligne CRLF comprises), la recette passe de 1 avertissement à 0, et un second passage ne change rien", () => {
+    const doctrine = "un\ndeux\ntrois\nla première règle\nla seconde règle\nsix\n";
+    const sources = [{ fichier: "d.md", ligne: 1, ancre: "la première règle" }, { fichier: "d.md", ligne: 5, ancre: "la seconde règle" }, { fichier: "d.md", ligne: 2, ancre: "deux" }];
+    for (const eol of ["\n", "\r\n"]) {
+      const { rac, f, avant } = poserActualiser(`vert-${eol.length}`, sources, doctrine);
+      if (eol === "\r\n") writeFileSync(f, avant.replace(/\n/g, "\r\n"));
+      const texteAvant = readFileSync(f, "utf8");
+      const rouge = verifierSources(JSON.parse(texteAvant), rac);
+      egal(rouge.avertissements.length, 1, "avant : une ligne glissée (la première règle, ligne 1 citée pour la ligne 4)");
+      const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+      egal(r.code, 0, "exit"); egal(r.actualiser.corrections.length, 1, "corrections"); egal(r.actualiser.justes, 2, "déjà justes");
+      if (!/recalée\s+P1 : d\.md ligne 1 → 4/.test(r.sortie)) throw new Error(`la sortie ne nomme pas la source recalée : ${r.sortie}`);
+      const texteApres = readFileSync(f, "utf8");
+      egal(sansNumeros(texteApres), sansNumeros(texteAvant), "tout le reste du fichier, octet pour octet");
+      egal(texteApres.includes("\r\n"), eol === "\r\n", "fins de ligne conservées");
+      const ref = JSON.parse(texteApres);
+      egal(ref.types.page[0].source.ligne, 4, "ligne recalée"); egal(ref.types.page[1].source.ligne, 5, "ligne juste intacte"); egal(ref.types.page[2].source.ligne, 2, "ligne juste intacte (bis)");
+      const vert = verifierSources(ref, rac);
+      egal(vert.erreurs.length + vert.avertissements.length, 0, "après : plus aucun avertissement");
+      const encore = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+      egal(encore.code, 0, "second passage : exit"); egal(encore.actualiser.corrections.length, 0, "second passage : rien à recaler"); egal(readFileSync(f, "utf8"), texteApres, "second passage : fichier inchangé");
+    }
+  });
+  check("rouge — TF-2481 : une ancre disparue n'est PAS recalée (ligne laissée à l'octet près, exit 1, source nommée, l'erreur de la recette reste), et les autres sources du même fichier sont recalées quand même", () => {
+    const { rac, f, avant } = poserActualiser("disparue", [{ fichier: "d.md", ligne: 1, ancre: "une règle qui a disparu" }, { fichier: "d.md", ligne: 1, ancre: "la seconde règle" }], "un\ndeux\nla seconde règle\n");
+    const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.code, 1, "exit"); egal(r.actualiser.disparues.length, 1, "disparues"); egal(r.actualiser.corrections.length, 1, "l'autre source est recalée");
+    if (!/ANCRE DISPARUE\s+P1/.test(r.sortie)) throw new Error(`la sortie ne nomme pas l'ancre disparue : ${r.sortie}`);
+    const ref = JSON.parse(readFileSync(f, "utf8"));
+    egal(ref.types.page[0].source.ligne, 1, "ligne de l'ancre disparue laissée"); egal(ref.types.page[1].source.ligne, 3, "l'autre ligne recalée");
+    egal(sansNumeros(readFileSync(f, "utf8")), sansNumeros(avant), "le reste du fichier, octet pour octet");
+    egal(verifierSources(ref, rac).erreurs.length, 1, "la recette garde l'erreur de l'ancre disparue");
+    // le fichier laissé tel quel quand rien n'est recalable
+    const seul = poserActualiser("disparue-seule", [{ fichier: "d.md", ligne: 1, ancre: "une règle qui a disparu" }], "un\ndeux\n");
+    executer(["--actualiser", "--regles", seul.f, "--racine", seul.rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(readFileSync(seul.f, "utf8"), seul.avant, "aucune écriture quand rien n'est recalable");
+  });
+  check("rouge → vert — TF-2481 : une ancre présente plusieurs fois se recale sur l'occurrence la plus proche de la ligne citée ; un fichier de source absent est nommé (exit 1) et une forge sœur absente n'est pas rejouée (exit 0)", () => {
+    const doctrine = "la règle\nb\nc\nd\ne\nf\ng\nh\nla règle\nj\nk\nl\nm\nla règle\n";   // lignes 1, 9 et 14
+    const { rac, f } = poserActualiser("multiple", [{ fichier: "d.md", ligne: 12, ancre: "la règle" }, { fichier: "d.md", ligne: 3, ancre: "la règle" }], doctrine);
+    const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.code, 0, "exit");
+    const ref = JSON.parse(readFileSync(f, "utf8"));
+    egal(ref.types.page[0].source.ligne, 14, "12 → 14 (14 est à 2, 9 est à 3)"); egal(ref.types.page[1].source.ligne, 1, "3 → 1 (1 est à 2, 9 est à 6)");
+    if (!/ancre présente 3 fois/.test(r.sortie)) throw new Error(`la sortie ne dit pas l'ancre multiple : ${r.sortie}`);
+    const abs = poserActualiser("absent", [{ fichier: "absent.md", ligne: 1, ancre: "x" }, { fichier: "../forge-absente/SKILL.md", ligne: 1, ancre: "x" }], "un\n");
+    const ra = executer(["--actualiser", "--regles", abs.f, "--racine", abs.rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(ra.code, 1, "exit : fichier absent"); egal(ra.actualiser.absentes.length, 1, "absentes"); egal(ra.actualiser.nonRejouees.length, 1, "forge sœur non rejouée");
+    egal(readFileSync(abs.f, "utf8"), abs.avant, "aucune écriture");
+  });
+  check("rouge — TF-2481 : un référentiel invalide ou illisible rend 2 sans rien réécrire", () => {
+    const { rac, f } = poserActualiser("invalide", [{ fichier: "d.md", ligne: 1, ancre: "deux" }], "un\ndeux\n");
+    const ref = JSON.parse(readFileSync(f, "utf8")); delete ref.types.page[0].fait; writeFileSync(f, JSON.stringify(ref, null, 2));
+    const avant = readFileSync(f, "utf8");
+    const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.code, 2, "exit référentiel invalide"); egal(readFileSync(f, "utf8"), avant, "fichier intact");
+    egal(executer(["--actualiser", "--regles", join(rac, "absent.json"), "--racine", rac], {}, new Date("2026-11-13T12:00:00Z")).code, 2, "exit référentiel illisible");
+  });
+  check("vert — TF-2481 : sur le référentiel RÉEL dont toutes les lignes sont décalées de 7, --actualiser les recale sur leurs ancres : plus un avertissement de ligne glissée, les erreurs de la recette inchangées (rejouée sur une copie, le fichier du dépôt n'est pas touché)", () => {
+    const copie = JSON.parse(JSON.stringify(REGLES_REEL));
+    for (const t of Object.values(copie.types)) for (const r of t) r.source.ligne += 7;
+    const f = join(T, "regles-reel-decalees.json"); writeFileSync(f, JSON.stringify(copie, null, 2));
+    const avant = verifierSources(copie, RACINE);
+    const decalees = avant.avertissements.filter((x) => /citée, ancre trouvée/.test(x)).length;
+    if (decalees < 30) throw new Error(`le décalage de 7 devait glisser au moins 30 sources, mesuré ${decalees}`);
+    const r = executer(["--actualiser", "--regles", f, "--racine", RACINE], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.actualiser.corrections.length, decalees, "une correction par source glissée");
+    const apres = verifierSources(JSON.parse(readFileSync(f, "utf8")), RACINE);
+    egal(apres.avertissements.filter((x) => /citée, ancre trouvée/.test(x)).length, 0, "après : plus de ligne glissée");
+    egal(apres.erreurs.length, avant.erreurs.length, "les erreurs de la recette sont inchangées");
+  });
   const preparerType = (type, nom, extra = []) => {
     const d = join(T, `sortie-${nom}`);
     const r = executer(["--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", d, ...(type ? ["--type", type] : []), ...extra], {}, new Date("2026-10-18T12:00:00Z"), CTX);

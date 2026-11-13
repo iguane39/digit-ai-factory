@@ -3,8 +3,8 @@
  * lecons.test.mjs — la table des leçons jugée, et la leçon qui récidive après son rappel passée en barrière
  * (TF-2150, D-172 (a) du 04/11/2026 ; « barrière dès la 2e fois », BOUCLE-AMELIORATION.md, T1).
  *
- * --verifier, double sens : une table de fixture conforme passe ; une fixture rouge par règle (V1 à V10) échoue sur
- * SA règle ; la table réelle du pilot passe sur sa structure (V1 à V9), et sa date de revue (V10) est seulement dite :
+ * --verifier, double sens : une table de fixture conforme passe ; une fixture rouge par règle (V1 à V11) échoue sur
+ * SA règle ; la table réelle du pilot passe sur sa structure (V1 à V9 et V11), et sa date de revue (V10) est seulement dite :
  * un passage de date ne doit pas rendre rouge le harnais de tout le pilot, c'est `--verifier` joué à la revue qui la juge.
  * --recidives : sans `frictions.jsonl`, il le DIT et ne conclut rien (exit 2) ; une friction de la même session qui
  * SUIT le rappel fait récidiver la leçon ; une friction antérieure, d'une autre session ou d'un autre outil, non.
@@ -18,6 +18,7 @@ import { appendFileSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmS
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { prescritAttenteAvantPlan } from "./lecons.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SCRIPT = join(ICI, "lecons.mjs");
@@ -60,7 +61,7 @@ try {
   const reel = lancer(["--verifier", "--pilot", PILOT_REEL, "--racine", PILOT_REEL, "--json"]);
   const horsRevue = (reel.json?.constats || []).filter((c) => c.regle !== "V10");
   const revue = (reel.json?.constats || []).filter((c) => c.regle === "V10");
-  check(`vert — la table réelle du pilot passe V1 à V9 (${reel.json?.tables?.[0]?.lecons ?? "?"} leçons) ; V10, sa date de revue : ${revue.length ? `${revue.length} leçon(s) à revoir, dites ici sans échec` : "aucune leçon à revoir"}`, () => {
+  check(`vert — la table réelle du pilot passe V1 à V9 et V11 (${reel.json?.tables?.[0]?.lecons ?? "?"} leçons) ; V10, sa date de revue : ${revue.length ? `${revue.length} leçon(s) à revoir, dites ici sans échec` : "aucune leçon à revoir"}`, () => {
     if (!reel.json) throw new Error(`sortie illisible : ${reel.out.slice(0, 200)} ${reel.err.slice(0, 200)}`);
     if (horsRevue.length) throw new Error(horsRevue.map((c) => `[${c.regle}] ${c.lecon} ${c.message}`).join(" ; "));
   });
@@ -96,6 +97,8 @@ try {
     ["V9", "barrière sans date ni motif", { t: table([lecon("L-901", { statut: "barriere" })]) }],
     ["V10", "revue_le dépassée", { t: table([lecon("L-901", { revue_le: "2026-11-03" })]) }],
     ["V10", "revue_le hors forme", { t: table([lecon("L-901", { revue_le: "15/12/2026" })]) }],
+    ["V11", "solution qui prescrit l'attente en avant-plan avec un délai explicite (le texte de L-006 avant TF-2479)", { t: table([lecon("L-901", { solutions: [{ texte: "se clore par la restitution complète", condition: "tour qui a écrit", preferee: true }, { texte: "jouer l'attente en avant-plan, avec un délai explicite, puis relire le résultat des agents avant de rendre la main", condition: "résultat d'agent dû dans le tour", preferee: false }] })]) }, /solution 2 : prescrit une attente en avant-plan avec délai explicite.*TF-2463/],
+    ["V11", "solution qui lance une commande au premier plan avec un délai", { t: table([lecon("L-901", { solutions: [{ texte: "lancer la recette au premier plan avec un délai de 600 s", condition: "toujours", preferee: true }] })]) }, /solution 1 : prescrit une attente en avant-plan/],
   ];
   ROUGES.forEach(([regle, nom, opts, message], k) => {
     check(`rouge — ${regle} ${nom} : FAIL sur ${regle}, exit 1`, () => {
@@ -103,6 +106,14 @@ try {
       if (r.code !== 1 || r.json?.verdict !== "FAIL" || !regles(r).includes(regle)) throw new Error(`exit ${r.code} règles [${regles(r)}] ${r.out.slice(0, 200)}`);
       if (message && !(r.json?.constats || []).some((c) => c.regle === regle && message.test(c.message))) throw new Error(`échoue, mais pas pour la bonne raison : ${JSON.stringify((r.json?.constats || []).map((c) => c.message))}`);
     });
+  });
+  check("vert — V11 : le remède de TF-2479 (arrière-plan d'emblée, fin annoncée, tranches bornées) et une phrase qui proscrit l'avant-plan passent", () => {
+    const solutions = [{ texte: "lancer l'attente d'emblée en arrière-plan, sa fin annoncée, et l'attendre par tranches bornées (150 s au plus), puis relire le résultat des agents", condition: "résultat d'agent dû dans le tour", preferee: true },
+      { texte: "ne jamais attendre en avant-plan avec un délai explicite : le harnais bascule la commande vers 175 s", condition: "toujours", preferee: false }];
+    const r = verifierFixture(pilote("v11-vert", { t: table([lecon("L-901", { solutions })]) }));
+    if (r.code !== 0 || r.json?.verdict !== "PASS") throw new Error(`exit ${r.code} ${JSON.stringify(r.json?.constats)}`);
+    if (prescritAttenteAvantPlan(solutions[0].texte) || prescritAttenteAvantPlan(solutions[1].texte)) throw new Error("prescritAttenteAvantPlan refuse un texte conforme");
+    if (!prescritAttenteAvantPlan("attendre en avant-plan") || prescritAttenteAvantPlan(undefined)) throw new Error("prescritAttenteAvantPlan : cas nus");
   });
   check("vert — V5 : déclencheur `sur: agent` sur les outils Agent et Task : PASS", () => {
     const r = verifierFixture(pilote("agent-vert", { t: table([lecon("L-901", { declencheur: { outils: ["Agent", "Task"], sur: "agent", motif: "^(?!Relecture d'intention)" } })]) }));

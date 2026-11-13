@@ -247,6 +247,72 @@ check("TF-1434 — la lecture : plusieurs déclarations s'additionnent, fins de 
   att(nonJouesDe(undefined).length === 0 && nonJouesDe(null).length === 0, "une sortie absente a levé ou rendu une déclaration");
 });
 
+// ── TF-2480 (13/11/2026) : dans un arbre de campagne (worktree git lié), les hausses ne s'inscrivent pas toutes seules ──
+// Le 12/11, la recette entière d'un agent avait réécrit la référence dans son arbre : 5 entrées relevées d'un coup. Chaque cas se joue dans les deux
+// sens : l'arbre ordinaire inscrit (comportement d'origine), l'arbre de campagne non, et `--ecrire-baseline` l'inscrit sciemment.
+{
+  const { spawnSync } = await import("node:child_process");
+  const { dirname, join: jn } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const { copyFileSync, mkdirSync: mk } = await import("node:fs");
+  const { arbreLie, arbreDeCampagne, decisionInscription } = await import("./lib-baseline-recettes.mjs");
+  const ICI = dirname(fileURLToPath(import.meta.url));
+  const montee = { montees: [{ nom: "a.test.mjs", avant: 3, vu: 5, nonJoues: 0 }], baisses: [], disparues: [] };
+
+  check("TF-2480 — arbreLie : le répertoire git d'un arbre lié n'est pas le répertoire commun ; fins de barre, séparateurs et casse ne comptent pas", () => {
+    att(arbreLie("C:/depot/.git/worktrees/wt-a", "C:/depot/.git") === true, "un arbre lié n'est pas reconnu");
+    att(arbreLie("C:/depot/.git", "C:/depot/.git") === false, "l'arbre principal est pris pour un arbre lié");
+    att(arbreLie("C:\\depot\\.git\\", "C:/depot/.git") === false, "la forme du chemin (séparateurs, barre finale) fait un arbre lié");
+    if (process.platform === "win32") att(arbreLie("c:/DEPOT/.git", "C:/depot/.git") === false, "la casse d'un chemin Windows fait un arbre lié");
+  });
+
+  check("TF-2480 — decisionInscription : une hausse s'inscrit en arbre ordinaire, pas en arbre de campagne sauf geste écrit ; une baisse ou une disparition n'inscrit jamais", () => {
+    let d = decisionInscription(montee, { campagne: false, forcer: false });
+    att(d.ecrire === true && d.campagne === false, `arbre ordinaire : ${JSON.stringify(d)}`);
+    d = decisionInscription(montee, { campagne: true, forcer: false });
+    att(d.ecrire === false && d.campagne === true, `arbre de campagne : ${JSON.stringify(d)}`);
+    d = decisionInscription(montee, { campagne: true, forcer: true });
+    att(d.ecrire === true && d.campagne === false, `arbre de campagne, --ecrire-baseline : ${JSON.stringify(d)}`);
+    for (const [nom, bilan] of [["baisse", { ...montee, baisses: [{ nom: "b", avant: 4, vu: 2, perdus: 2 }] }], ["disparition", { ...montee, disparues: [{ nom: "c", exemption: false, cas: 3 }] }], ["rien", { montees: [], baisses: [], disparues: [] }]]) {
+      for (const campagne of [false, true]) {
+        const r = decisionInscription(bilan, { campagne, forcer: true });
+        att(r.ecrire === false, `${nom} (campagne ${campagne}) : le harnais a inscrit une hausse malgré ${nom}`);
+      }
+    }
+  });
+
+  const git = (cwd, ...a) => spawnSync("git", ["-c", "user.name=t", "-c", "user.email=t@t", ...a], { cwd, encoding: "utf8" });
+  const TG = mkdtempSync(join(tmpdir(), "cliquet-arbres-"));
+  const principal = join(TG, "principal"), lie = join(TG, "lie");
+  mk(join(principal, "oracles"), { recursive: true });
+  for (const f of ["self-tests.mjs", "lib-baseline-recettes.mjs", "lib-sens-rouge.mjs", "lib-garde-arbre-suivi.mjs", "lib-recettes-dediees.mjs"]) copyFileSync(join(ICI, f), join(principal, "oracles", f));
+  writeFileSync(join(principal, "oracles", "oracle-fictif.mjs"), "if (process.argv.includes(\"--self-test\")) { console.log(\"oracle-fictif : 5 PASS, 0 FAIL (cas rouge joué)\"); process.exit(0); }\n");
+  writeFileSync(join(principal, "oracles", "baseline-recettes.json"), JSON.stringify({ "oracle-fictif.mjs": { cas: 3, vu_le: "2026-01-01" } }, null, 1) + "\n");
+  git(principal, "init", "-q"); git(principal, "add", "-A"); git(principal, "commit", "-q", "-m", "base");
+  const lier = git(principal, "worktree", "add", "-q", lie, "-b", "campagne");
+
+  check("TF-2480 — arbreDeCampagne sur de vrais arbres git : l'arbre principal non, le worktree lié oui, un dossier hors dépôt non", () => {
+    att(lier.status === 0, `git worktree add a échoué : ${lier.stderr}`);
+    att(arbreDeCampagne(principal) === false, "l'arbre principal est pris pour un arbre de campagne");
+    att(arbreDeCampagne(lie) === true, "le worktree lié n'est pas reconnu comme arbre de campagne");
+    att(arbreDeCampagne(join(TG, "hors-depot-inexistant")) === false, "un dossier absent est pris pour un arbre de campagne");
+  });
+
+  // Le harnais entier joué dans un dépôt minimal (un oracle fictif de 5 cas, référence à 3) : le chemin que la recette du pilot emprunte à chaque passage.
+  const baseDe = (dossier) => JSON.parse(readFileSync(join(dossier, "oracles", "baseline-recettes.json"), "utf8"))["oracle-fictif.mjs"].cas;
+  const jouer = (dossier, ...args) => spawnSync(process.execPath, [join(dossier, "oracles", "self-tests.mjs"), ...args], { cwd: dossier, encoding: "utf8" }).stdout || "";
+  check("TF-2480 — le harnais joué dans un arbre ORDINAIRE inscrit la hausse (3 → 5) ; joué dans le worktree LIÉ, il la dit et ne l'inscrit pas (reste 3) ; avec --ecrire-baseline il l'inscrit (5)", () => {
+    const sortiePrincipal = jouer(principal);
+    att(baseDe(principal) === 5, `arbre ordinaire : la hausse n'est pas inscrite (${baseDe(principal)})`);
+    att(!/arbre de campagne/.test(sortiePrincipal), "l'arbre ordinaire a dit « arbre de campagne »");
+    const sortieLie = jouer(lie);
+    att(baseDe(lie) === 3, `arbre de campagne : la référence a été réécrite (${baseDe(lie)} au lieu de 3)`);
+    att(/arbre de campagne \(worktree git lié\) : 1 hausse\(s\) vue\(s\) et NON inscrite\(s\)/.test(sortieLie), `l'arbre de campagne ne dit pas la hausse non inscrite : ${sortieLie.split("\n").filter((l) => /CLIQUET/.test(l)).join(" / ")}`);
+    jouer(lie, "--ecrire-baseline");
+    att(baseDe(lie) === 5, `--ecrire-baseline n'a pas inscrit la hausse (${baseDe(lie)})`);
+  });
+}
+
 // ── TF-1477 : DEUX recettes réelles du dépôt se déclaraient NON JOUÉES hors de la forme fermée ──
 // (sans crochets, sans compte) quand leur environnement d'exécution manque sur ce poste. Lues par
 // CE cliquet, une telle ligne ne vaut RIEN (cf. ci-dessus, « hors de la forme fermée ») : la
