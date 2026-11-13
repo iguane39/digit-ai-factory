@@ -128,7 +128,10 @@ check("TF-1251 — la classe « registre-doublon-non-detecte » cite R14, qui ex
   const ref = JSON.parse(readFileSync(join(ICI, "CLASSES.json"), "utf8"));
   const classe = ref.classes.find((c) => c.cle === "registre-doublon-non-detecte");
   if (!classe) throw new Error("classe absente du référentiel");
-  if (/\b(à\s*créer|a\s*creer)\b/i.test(classe.oracle))
+  // TF-2496 : la garde se prouve avant de juger — la frontière ASCII `\b` collée à « à » la rendait morte sur « règle à créer ».
+  const aCreer = /(?<![\wà-ÿ])(à\s*créer|a\s*creer)\b/i;
+  if (!aCreer.test("règle à créer") || !aCreer.test("regle a creer") || aCreer.test("voilà créer")) throw new Error("la garde « à créer » ne distingue plus la marque d'un mot qui la contient");
+  if (aCreer.test(classe.oracle))
     throw new Error(`le champ « oracle » déclare encore une règle à créer, alors que R14 existe : ${classe.oracle}`);
   if (!/\bR14\b/.test(classe.oracle)) throw new Error(`le champ « oracle » ne cite pas R14 : ${classe.oracle}`);
   const oracleTodo = readFileSync(join(ICI, "oracle-todo.mjs"), "utf8");

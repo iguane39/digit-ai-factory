@@ -372,13 +372,31 @@ const ETAT_DU_PARC = [
     motif: "README d'input\\ et output\\ absents, périmés ou non rédigés",
     remede: "node scripts\\readme-dossiers.mjs, puis rédiger le bloc ROLE des README signalés",
   },
+  {
+    // TF-2487 (13/11/2026) : 4 des 5 agents de la flotte échouaient à oracle-scan-agentdef et aucun pas ne les jouait. Un FAIL
+    // se retire (l'outil que le rôle n'emploie pas) ou se déclare dans la source de l'agent ; un FAIL non déclaré, un motif
+    // de moins de 60 caractères ou une déclaration périmée est rouge. SANS_OBJET (2) si forge-agents-security est absent.
+    nom: "../scripts/compiler-flotte.mjs",
+    args: ["--verifier", "--json"],
+    motif: "agent compilé de .claude/agents en échec à oracle-scan-agentdef sans déclaration motivée dans sa source gabarits/flotte/<id>.yaml",
+    remede: "retirer l'outil que le rôle n'emploie pas, ou ajouter à gabarits/flotte/<id>.yaml « # scan-agentdef CAP-n : <motif> », puis node scripts\\compiler-flotte.mjs",
+  },
+  {
+    // TF-2496 (13/11/2026) : l'oracle ne se jouait que sur ses fixtures (--self-test), et le parc réel lui rendait 30 FAIL que
+    // personne ne lisait : des expressions mortes (`\bà\b`, `\b(à`) dans le pilot et ses forges, qui rendent PASS en croyant juger.
+    // C'est un état du PARC : le défaut naît d'une écriture, jamais d'un artefact qu'on passerait à un oracle.
+    nom: "oracle-pieges-regex.mjs",
+    motif: "expression régulière morte : frontière de mot ASCII collée à une lettre accentuée, classe de majuscules sous drapeau i, octet de contrôle dans une source",
+    remede: "frontière Unicode `(?<![\\wà-ÿ])…(?![\\wà-ÿ])` ou forme non accentuée à la ligne nommée ; une expression juste se déclare `// piege-ok : <motif>` sur sa ligne",
+  },
 ];
 for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // Certains oracles d'etat jugent des ARTEFACTS nommes plutot qu'un parc entier : ils portent
   // leur liste ici, une seule fois, au lieu de la deviner. Sans ce passage, l'oracle rendait
   // SANS_OBJET faute de cible — un vert de complaisance, exactement ce que cet agregateur
   // existe pour eteindre. Un chemin relatif se resout depuis la racine du pilot.
-  const cibles = (argsParc || []).map((c) => join(ICI, "..", c));
+  // Un argument d'option (`--verifier`) passe tel quel ; seul un chemin se résout depuis la racine.
+  const cibles = (argsParc || []).map((c) => (c.startsWith("--") ? c : join(ICI, "..", c)));
   const r = garde.jouer(`${nom} (parc réel)`, () => spawnSync(process.execPath, [join(ICI, nom), ...cibles], { encoding: "utf8" }));
   let verdict = null, sansObjet = null;
   try {

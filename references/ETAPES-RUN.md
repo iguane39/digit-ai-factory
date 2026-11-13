@@ -317,11 +317,16 @@ Outillage réel, tout en lecture (aucune exécution active — R-33 ne s'appliqu
 FORGE_TESTS_QUALIF_URL=<url-deployee>   # pans qualif : 1 et 2, sans identifiants
 node scripts\capturer.mjs <url> --sortie <capture.json> --suivre-redirections
 node oracles\oracle-exposition.mjs <capture.json>          # 3 (EX-1…EX-11)
+node oracles\oracle-sca.mjs <racine-produit>               # gate : dépendances vulnérables (npm audit, pip-audit)
 ```
 
 depuis `<racine>\digit-ai-forge-websec`. La chaîne de redirections se lit **dans la capture**
 (`--suivre-redirections`), qui donne aussi le contrôle 4 sur `/docs`. Verdicts au ledger en
-`oracles_verdict`, l'URL auditée nommée.
+`oracles_verdict`, l'URL auditée nommée. `oracle-sca` ne lit pas la capture : il se joue sur la RACINE du produit
+(`package-lock.json`, `requirements.txt`, `uv.lock`, `poetry.lock`) et rend 0 PASS, 1 FAIL ou 2 SKIP motivé (outil ou
+manifeste absent, registre injoignable). Un SKIP se consigne tel quel, avec son motif : l'audit des dépendances n'a pas eu
+lieu, ce n'est pas un PASS. *Le fait* : trois verdicts `oracle-sca` du 03/11/2026 ont été joués au gate chez un produit de
+l'écosystème (rapporté par l'agent du lot wc le 13/11/2026, non rejoué ici), et ce bloc ne nommait pas l'oracle (TF-2489).
 
 Le smoke ne remplace pas l'audit : il regarde la **frontière**, là où l'audit regarde
 l'intérieur. Un produit dont le smoke échoue ne « passe » pas au vert parce que ses pans
