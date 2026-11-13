@@ -437,3 +437,14 @@ sections 6 et 7.
   une invite. `oracles\hook-lexique.mjs` l'ignore : le marqueur `<cross-session-message` est
   couvert depuis TF-1103, et testé depuis TF-1314. Un hameçon tiers, comme celui d'un plugin de
   mémoire, le reçoit aussi : ce qu'il en fait n'est pas du ressort du pilot.
+
+## Arbre neuf de forge-tests (TF-2467, 13/11/2026)
+
+Un arbre de travail neuf de forge-tests n'a ni les `.venv` des bancs, ni les `node_modules` et
+`dist` de leurs fronts. Avant toute recette dans un tel arbre, joue depuis sa racine
+`uv run --frozen --offline python recette/preparer_arbre.py` : hors ligne, elle lit les caches
+`uv` et `npm` du poste, ne refait que ce qui manque, et prend une dizaine de minutes sous charge,
+donc elle se lance d'emblée en arrière-plan. `python recette/preparer_arbre.py --verifier` ne
+modifie rien et rend 3 s'il manque un préalable. Sans préparation, la recette rend « PRÉREQUIS
+ABSENT » (code 3) avec la commande, jamais un verdict. Elle ne couvre ni le navigateur Playwright
+ni Docker.
