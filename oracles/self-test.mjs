@@ -1762,6 +1762,71 @@ check("TF-2494 borne : une antériorité datée AVANT le saut ne le couvre pas �
   if (!f || !/seq 7 là où 4 était attendu/.test(f.message)) throw new Error(`le saut récent n'est plus dénoncé : ${f && f.message}`);
 });
 
+// ---- TF-2495 (13/11/2026, lot pd) — R-16 NE LISAIT QUE LA RACINE D'output\ ET R-32 EXIGE UN JOURNAL, PAS UN PASS.
+// Mesuré le 13/11 par l'agent du lot ps chez le produit 02 : la copie du dossier de MEP existait dans une famille
+// d'output\ posée par D-15 (output\NN-…) et R-16 la déclarait absente ; 9 pages sur 10 étaient conformes à R-32
+// avec un journal qui consigne un FAIL. R-16 lit donc aussi les racines des familles NN-… (jamais leur old\) ; R-32
+// garde sa règle (la présence du journal) et un avertissement NOMMÉ, « R-32 sexies », dit le FAIL consigné. -------
+const MEP_COPIE = "Digit-AI - Dossier de MEP - 20261113a.md";
+const projetMep = (nom, copieA) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-${nom}-`));
+  ecrireDans(d, "forge/DOSSIER-MEP.md", "# Dossier de MEP\n");
+  ecrireDans(d, "output/Digit-AI - Note - 20261113a.md", "# Une note\n");
+  if (copieA) ecrireDans(d, `${copieA}/${MEP_COPIE}`, "# Dossier de MEP\n");
+  return d;
+};
+const r16 = (d) => (lance(d).rapport.findings || []).find((x) => x.regle === "R-16");
+check("TF-2495 rouge : DOSSIER-MEP.md et AUCUNE copie datée dans output\\ → R-16 FAIL (la règle est intacte)", () => {
+  const f = r16(projetMep("r16-sans"));
+  if (!f || f.statut !== "FAIL") throw new Error(`R-16 : ${JSON.stringify(f)}`);
+});
+check("TF-2495 rouge : la copie vit SEULEMENT dans une famille D-15 (output/06-mep/) → R-16 PASS, et le message nomme la famille", () => {
+  const f = r16(projetMep("r16-famille", "output/06-mep"));
+  if (!f || f.statut !== "PASS") throw new Error(`R-16 : ${JSON.stringify(f)} — la famille posée par D-15 n'est pas lue`);
+  if (!/06-mep/.test(f.message)) throw new Error(`le constat ne dit pas où la copie a été trouvée : ${f.message}`);
+});
+check("TF-2495 vert : la copie à la racine d'output\\ passe comme avant", () => {
+  const f = r16(projetMep("r16-racine", "output"));
+  if (!f || f.statut !== "PASS") throw new Error(`R-16 : ${JSON.stringify(f)}`);
+});
+check("TF-2495 borne : une copie dans old\\ d'une famille, ou dans un dossier qui n'est pas une famille NN-…, ne tient pas lieu de copie courante → R-16 FAIL", () => {
+  for (const ou of ["output/06-mep/old", "output/divers"]) {
+    const f = r16(projetMep("r16-borne", ou));
+    if (!f || f.statut !== "FAIL") throw new Error(`${ou} : R-16 ${JSON.stringify(f)} — le périmètre de la lecture déborde les familles de D-15`);
+  }
+});
+
+const HTML_R32 = '<!DOCTYPE html>\n<html lang="fr"><head><title>x</title></head><body>x</body></html>\n';
+const projetJournal = (nom, journal) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-${nom}-`));
+  ecrireDans(d, "output/Digit-AI - Page - 20261113a.html", HTML_R32);
+  if (journal !== null) ecrireDans(d, "forge/oracles/Digit-AI - Page - 20261113a.json", typeof journal === "string" ? journal : JSON.stringify(journal, null, 1));
+  return d;
+};
+const r32 = (d) => { const f = lance(d).rapport.findings || []; return { r32: f.find((x) => x.regle === "R-32"), sexies: f.find((x) => x.regle === "R-32 sexies") }; };
+check("TF-2495 rouge : un journal qui consigne un FAIL (verdicts.render_page) → R-32 reste PASS, et « R-32 sexies » AVERTIT en nommant la page et l'oracle", () => {
+  const { r32: f, sexies } = r32(projetJournal("r32-fail", { verdicts: { check_html: "PASS", render_page: "FAIL" } }));
+  if (!f || f.statut !== "PASS") throw new Error(`R-32 a changé de règle : ${JSON.stringify(f)}`);
+  if (!sexies || sexies.statut !== "PASS" || !/AVERTISSEMENT, non bloquant/.test(sexies.message)) throw new Error(`pas d'avertissement nommé : ${JSON.stringify(sexies)}`);
+  if (!/Digit-AI - Page - 20261113a\.html/.test(sexies.message) || !/render_page/.test(sexies.message)) throw new Error(`l'avertissement ne nomme ni la page ni l'oracle : ${sexies.message}`);
+});
+check("TF-2495 rouge : le verdict d'ensemble en texte libre (« PASS (socle) / FAIL (critique) ») est lu aussi", () => {
+  const { sexies } = r32(projetJournal("r32-texte", { verdict: "PASS (socle) / FAIL (critique forge-design, 3 écarts)" }));
+  if (!sexies || !/AVERTISSEMENT/.test(sexies.message) || !/verdict/.test(sexies.message)) throw new Error(`pas d'avertissement : ${JSON.stringify(sexies)}`);
+});
+check("TF-2495 vert : un journal tout PASS, ou « 0 FAIL », ne déclenche aucun avertissement ; un journal illisible n'est pas jugé", () => {
+  for (const [nom, j] of [["propre", { verdicts: { check_html: "PASS", render_page: "PASS" } }], ["zero", { verdict: "PASS aux oracles, 0 FAIL" }], ["illisible", "{ pas du json"]]) {
+    const { r32: f, sexies } = r32(projetJournal(`r32-${nom}`, j));
+    if (!f || f.statut !== "PASS") throw new Error(`${nom} : R-32 ${JSON.stringify(f)}`);
+    if (sexies && /AVERTISSEMENT/.test(sexies.message)) throw new Error(`${nom} : avertissement à tort : ${sexies.message}`);
+  }
+});
+check("TF-2495 borne : sans journal, R-32 reste FAIL (la règle ne change pas) et « R-32 sexies » ne dit rien", () => {
+  const { r32: f, sexies } = r32(projetJournal("r32-sans", null));
+  if (!f || f.statut !== "FAIL") throw new Error(`R-32 : ${JSON.stringify(f)}`);
+  if (sexies && /AVERTISSEMENT/.test(sexies.message)) throw new Error("un avertissement sur un journal qui n'existe pas");
+});
+
 // ---- fixture R-42 bis (TF-1424, 25/09/2026, RS-3) : un ts POSTÉRIEUR au commit qui l'a introduite
 // est composé, pas relevé — double sens sur un dépôt git JETABLE, la date du commit FIXÉE par
 // `--date`, comme `projetAnteriorite` plus bas (même idiome, TF-0923). --------------------------

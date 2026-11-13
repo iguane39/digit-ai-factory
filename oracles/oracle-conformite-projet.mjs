@@ -970,6 +970,40 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
     }
     if (ok32) ok("R-32", "output/*.html", `${htmls.length} livrable(s) HTML avec journal d'oracles sous forge\\oracles\\`);
 
+    // R-32 sexies (TF-2495, 13/11/2026, lot pd) — UN JOURNAL QUI CONSIGNE UN FAIL N'EST PAS UN VERDICT DE CONFORMITÉ.
+    // R-32 exige la PRÉSENCE du journal (la preuve que les oracles ont été joués), pas qu'il dise PASS : mesuré le 13/11
+    // chez le produit 02, 9 pages sur 10 étaient conformes à R-32 avec un journal qui consigne un FAIL. La règle ne
+    // change pas (un journal présent reste PASS, sinon un produit apprendrait à ne plus consigner ses échecs) ; un
+    // AVERTISSEMENT nommé dit la page, l'oracle et le champ. Lus : `verdicts{}` (une valeur par oracle) et `verdict`
+    // (texte d'ensemble, dont « PASS (socle) / FAIL (critique) ») ; « 0 FAIL » n'est pas un FAIL.
+    {
+      const MOT_FAIL = /(?<!\b0 )\bFAIL\b/;
+      const consignes = [];
+      let lisibles = 0;
+      for (const f of htmls) {
+        const journal = p("forge", "oracles", basename(f, ".html") + ".json");
+        if (!existsSync(journal)) continue;
+        let j;
+        try { j = JSON.parse(readFileSync(journal, "utf8")); } catch { continue; }
+        if (!j || typeof j !== "object") continue;
+        lisibles += 1;
+        const vus = [];
+        if (typeof j.verdict === "string" && MOT_FAIL.test(j.verdict)) vus.push("verdict");
+        if (j.verdicts && typeof j.verdicts === "object") {
+          for (const [k, v] of Object.entries(j.verdicts)) if (typeof v === "string" && MOT_FAIL.test(v)) vus.push(`verdicts.${k}`);
+        }
+        if (vus.length) consignes.push(`${rel(f)} (${vus.join(", ")})`);
+      }
+      if (consignes.length) {
+        ok("R-32 sexies", "forge/oracles/",
+          `AVERTISSEMENT, non bloquant : ${consignes.length} journal(aux) d'oracles consigne(nt) un FAIL : ${consignes.join(" · ")} — ` +
+          "R-32 exige la présence du journal, pas un verdict PASS : une page livrée sur un FAIL consigné n'est pas conforme à ses oracles. " +
+          "Corriger puis rejouer check_html.py et render_page.py, ou déclarer l'exemption de l'oracle (journal d'exemptions) ; ne pas lire ce journal comme un verdict de conformité");
+      } else if (lisibles) {
+        ok("R-32 sexies", "forge/oracles/", `${lisibles} journal(aux) d'oracles lu(s), aucun ne consigne de FAIL`);
+      }
+    }
+
     // R-32 bis (TF-0366) — un journal existe, mais SOUS QUELLES RÈGLES ? Le 18/08, la règle
     // A3 met en échec un livrable DÉCLARÉ PASS le 14/08 et rejoué à l'identique : le fichier
     // n'a pas changé, la règle est postérieure. Le journal affirmait un PASS qui n'était plus
@@ -1743,10 +1777,20 @@ else {
 }
 
 // R-16 — dossier de MEP copié dans output\ au nommage daté
+//
+// TF-2495 (13/11/2026, lot pd) — LA COPIE PEUT VIVRE DANS UNE FAMILLE D'output\ POSÉE PAR D-15. R-16 ne lisait que la
+// racine : mesuré le 13/11 chez le produit 02, la copie datée du dossier de MEP existait sous output\NN-… et la règle la
+// déclarait absente. Sont lus la racine d'output\ ET la racine de chaque famille `NN-…` ; jamais le `old\` d'une famille
+// (une version remplacée n'est pas la copie courante) ni un dossier qui n'est pas une famille.
 if (!existsSync(p("forge", "DOSSIER-MEP.md"))) so("R-16", "pas de DOSSIER-MEP.md (étape MEP non atteinte)");
 else {
-  const copie = existsSync(p("output")) && readdirSync(p("output")).some((n) => /MEP/i.test(n) && MOTIF_DATE.test(n));
-  copie ? ok("R-16", "output/", "dossier de MEP copié au nommage daté") : ko("R-16", "output/", "DOSSIER-MEP.md existe mais aucune copie datée dans output\\");
+  const lieux = existsSync(p("output"))
+    ? ["output", ...readdirSync(p("output"), { withFileTypes: true }).filter((e) => e.isDirectory() && /^\d{2}-/.test(e.name)).map((e) => `output/${e.name}`)]
+    : [];
+  const copies = lieux.flatMap((lieu) => readdirSync(p(...lieu.split("/"))).filter((n) => /MEP/i.test(n) && MOTIF_DATE.test(n)).map((n) => `${lieu}/${n}`));
+  copies.length
+    ? ok("R-16", "output/", `dossier de MEP copié au nommage daté : ${copies[0]}`)
+    : ko("R-16", "output/", "DOSSIER-MEP.md existe mais aucune copie datée dans output\\ ni à la racine d'une de ses familles NN-… (D-15)");
 }
 
 // R-17 — journaux d'oracles versionnés dans forge\ (C4)
