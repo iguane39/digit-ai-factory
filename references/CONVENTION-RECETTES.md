@@ -54,8 +54,10 @@ une fenêtre) prend l'un des deux partis, écrit dans son propre fichier :
 
 **Le contrôle.** `node oracles\oracle-recette-rejouable.mjs <fichier ou dossier de recette>` refuse un fichier de
 recette qui nomme un état borné sans l'une de ces 2 lignes (RJ1) et une ligne qui ne dit rien (RJ2). Sa recette est
-`--self-test`, 13 cas : la recette fautive rend FAIL avec les 2 remèdes, chaque remède joué rend PASS. Il lit, il ne
-joue rien. Appelant : l'audit de recette d'un produit, côté forge-tests (reste ouvert au registre, TF-2438).
+`--self-test`, 18 cas : la recette fautive rend FAIL avec les 2 remèdes, chaque remède joué rend PASS. Il lit, il ne
+joue rien. Appelant du pilot (TF-2466, 13/11/2026) : l'étape 5 de `references\ETAPES-RUN.md` prescrit la commande sur la
+racine du produit, et 5 cas du `--self-test` la lisent dans ce document puis la jouent telle qu'écrite (exit 1, 0 et 2).
+Appelant de forge-tests : l'audit de recette d'un produit, toujours ouvert au registre (TF-2438).
 
 **Non jugé.** Que la déclaration soit vraie : « état créé à chaque passage » se prouve par un second passage sur la
 même base, que seule la recette de forge-tests peut jouer. Une recette qui consomme un état borné sans le vocabulaire

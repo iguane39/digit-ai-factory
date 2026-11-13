@@ -25,7 +25,8 @@
  * Exit : 0 = PASS · 1 = FAIL · 2 = SKIP motivé (aucun fichier de recette à juger).
  */
 import { existsSync, readFileSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
-import { join, basename } from "node:path";
+import { join, basename, dirname } from "node:path";
+import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
@@ -96,16 +97,38 @@ if (lanceEnDirect && process.argv.includes("--self-test")) {
     const dossier = jugerCibles([join(racine, "a")]);
     attendu("9 un dossier se parcourt : la recette fautive qu'il contient est vue", dossier, "FAIL");
     attendu("10 un faux positif de nombre : 1429 ou 4,29 ne sont pas 429", verdictDe("i/prix.test.mjs", "assert.equal(prix, 1429);\nassert.equal(total, '4,29');\n"), "PASS", /rien à déclarer/);
+    // TF-2466 (13/11/2026) — L'APPEL. Le contrôle n'avait aucun appelant : l'étape 5 de `references\ETAPES-RUN.md` le prescrit désormais,
+    // sur la racine du produit. Ces cas prouvent l'appel : la commande est LUE dans le document, puis JOUÉE telle qu'écrite (processus
+    // fils, codes de sortie 1, 0 et 2), sur une racine de produit jetable. Le document sans la prescription est le sens rouge de la sonde.
+    const ICI = dirname(fileURLToPath(import.meta.url));
+    const commandeDe = (doc) => { const m = /`(node oracles\\oracle-recette-rejouable\.mjs <racine-produit>)`/.exec(doc); return m ? m[1] : null; };
+    const verifier = (cas, ok, detail) => { n++; if (!ok) echecs.push(`${cas} : ${detail}`); };
+    const prescrite = commandeDe(readFileSync(join(ICI, "..", "references", "ETAPES-RUN.md"), "utf8"));
+    verifier("11 ROUGE puis VERT — l'étape 5 de ETAPES-RUN.md prescrit « node oracles\\oracle-recette-rejouable.mjs <racine-produit> »", prescrite !== null, "la commande n'est pas écrite dans references\\ETAPES-RUN.md");
+    verifier("11 bis SENS ROUGE de la sonde — un document sans la prescription n'en rend aucune", commandeDe("## 5. Étape tests\n\n`uv run python -m forge_tests <racine-produit> --json`\n") === null, "la sonde trouve une commande dans un document qui n'en porte pas");
+    const jouerPrescrite = (racineProduit) => {
+      const [, script, ...reste] = (prescrite || "node oracles\\absente.mjs <racine-produit>").split(" ");
+      const r = spawnSync(process.execPath, [join(ICI, "..", script.replaceAll("\\", "/")), ...reste.map((a) => (a === "<racine-produit>" ? racineProduit : a))], { encoding: "utf8" });
+      let j = null; try { j = JSON.parse(r.stdout); } catch { /* sortie illisible : dite par le cas */ }
+      return { code: r.status, verdict: j && j.verdict };
+    };
+    poser("p-rouge/tests/budget.test.mjs", CONSOMME);
+    poser("p-vert/tests/budget.test.mjs", "// Rejeu : état créé à chaque passage\n" + CONSOMME);
+    mkdirSync(join(racine, "p-vide"), { recursive: true });
+    const rouge = jouerPrescrite(join(racine, "p-rouge")), vert = jouerPrescrite(join(racine, "p-vert")), vide = jouerPrescrite(join(racine, "p-vide"));
+    verifier("12 ROUGE — la commande prescrite, jouée sur un produit dont la recette consomme un budget sans rejeu, sort en 1", rouge.code === 1 && rouge.verdict === "FAIL", `code ${rouge.code}, verdict ${rouge.verdict}`);
+    verifier("13 VERT — la même commande sur un produit qui déclare « Rejeu : état créé à chaque passage » sort en 0", vert.code === 0 && vert.verdict === "PASS", `code ${vert.code}, verdict ${vert.verdict}`);
+    verifier("14 SKIP — la même commande sur un produit sans fichier de recette sort en 2, jamais en 0", vide.code === 2 && vide.verdict === "SKIP", `code ${vide.code}, verdict ${vide.verdict}`);
   } finally { rmSync(racine, { recursive: true, force: true }); }
   if (echecs.length) { console.error(`oracle-recette-rejouable --self-test : ${echecs.length} échec(s)\n  - ${echecs.join("\n  - ")}`); process.exit(1); }
-  console.log(`oracle-recette-rejouable --self-test : ${n} PASS, 0 FAIL — rouge sans déclaration, remèdes joués (état créé à chaque passage, période en h et en min), déclaration vide refusée, recette sans état borné, code non jugé, SKIP, dossier, faux positif de nombre`);
+  console.log(`oracle-recette-rejouable --self-test : ${n} PASS, 0 FAIL — rouge sans déclaration, remèdes joués (état créé à chaque passage, période en h et en min), déclaration vide refusée, recette sans état borné, code non jugé, SKIP, dossier, faux positif de nombre, appel de l'étape 5 (commande lue dans ETAPES-RUN.md et jouée : exit 1, 0 et 2)`);
   process.exit(0);
 }
 
 if (lanceEnDirect) {
   const cibles = process.argv.slice(2).filter((a) => !a.startsWith("--"));
   const r = jugerCibles(cibles);
-  console.log(JSON.stringify({ oracle: "oracle-recette-rejouable", version: "1.0.0", regle: "TF-2438 (references/CONVENTION-RECETTES.md)", verdict: r.verdict, fichiers_jugés: r.fichiers,
+  console.log(JSON.stringify({ oracle: "oracle-recette-rejouable", version: "1.0.1", regle: "TF-2438 (references/CONVENTION-RECETTES.md)", verdict: r.verdict, fichiers_jugés: r.fichiers,
     findings: r.findings.filter((f) => f.statut !== "SANS_OBJET"), sans_objet: r.findings.filter((f) => f.statut === "SANS_OBJET").length,
     ...(r.verdict === "SKIP" ? { motif: "aucun fichier de recette (test, Makefile, script de recette, COMMANDES.md) sous la cible" } : {}), non_juge: NON_JUGE }));
   process.exit(r.verdict === "FAIL" ? 1 : r.verdict === "SKIP" ? 2 : 0);

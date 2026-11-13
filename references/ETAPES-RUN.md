@@ -338,6 +338,15 @@ DANS le projet audité — corriger le chemin, jamais contourner). Ajouter `--li
 datés dans `output\` du produit** (règle 16), ce qui est un geste explicite et non un
 effet de bord de l'audit.
 
+**Une recette qui consomme un état borné se rejoue (TF-2438, TF-2466, 13/11/2026).** Avant le premier audit,
+le pilot joue `node oracles\oracle-recette-rejouable.mjs <racine-produit>` sur le produit. Exit 0 : aucune recette
+ne nomme un budget, un quota ou une fenêtre glissante sans le déclarer, ou chacune porte sa ligne `Rejeu :`.
+Exit 1 : la recette consomme un état borné sans le déclarer, et elle ajoute `Rejeu : état créé à chaque passage`
+ou `Rejeu : période 24 h` (`references\CONVENTION-RECETTES.md`) avant l'audit. Exit 2 : aucun fichier de recette
+sous la racine, ce qui se consigne et ne vaut pas PASS. Le contrôle lit les fichiers de recette, il ne rejoue rien :
+qu'un second passage sur la même base soit réellement jugé reste à la recette de forge-tests. Le verdict entre au
+ledger en `oracles_verdict`.
+
 **Corrigé le 15/08 (TF-0271)** : cette ligne prescrivait `etapes\tests\livrables\`, chemin
 qui — résolu depuis la racine produit — tombe DANS le projet audité. La garde **G-1** le
 refuse (l'auditeur n'écrit pas chez l'audité) et le refuse désormais **bruyamment**
