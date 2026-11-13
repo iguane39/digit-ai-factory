@@ -2049,11 +2049,18 @@ else {
         if (seq !== seqAttendu) {
           const quoi = `seq ${seq} là où ${seqAttendu} était attendu`;
           // TF-0794 : un seq en double ou en recul NOMMÉ par une rectification ultérieure est
-          // déclaré, pas fautif ; un saut en avant ou un seq non nommé reste un écart. TF-1203 :
-          // à défaut d'être nommé, un écart dont l'horodatage précède une antériorité bornée
-          // déclarée (anteriorite_ledger) est tout autant couvert.
-          if (seq < seqAttendu && rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : seq en collision — ${rectifies.get(seq)}`);
-          else if (seq < seqAttendu && avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} : seq en collision — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
+          // déclaré, pas fautif ; un seq non nommé reste un écart. TF-1203 : à défaut d'être
+          // nommé, un écart dont l'horodatage précède une antériorité bornée déclarée
+          // (anteriorite_ledger) est tout autant couvert.
+          // TF-2494 (13/11/2026) : LE SAUT EN AVANT A SES DEUX VOIES AUSSI. Il restait « un écart »
+          // sans remède : 15 sauts mesurés chez le produit 02, aucune entrée pour les couvrir. Il se
+          // déclare comme une collision — la rectification nomme, dans `entrees[]`, le seq qui SUIT
+          // la lacune (TF-1466 : ts cité, rectification postérieure), ou l'antériorité datée le couvre.
+          const nature = seq > seqAttendu
+            ? `saut en avant, seq ${seqAttendu}${seq - 1 > seqAttendu ? ` à ${seq - 1}` : ""} jamais écrit${seq - 1 > seqAttendu ? "s" : ""}`
+            : "seq en collision";
+          if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : ${nature} — ${rectifies.get(seq)}`);
+          else if (avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} : ${nature} — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
           else ecarts.push(`${quoi} — append-only rompu`);
         }
         seqAttendu = Math.max(seqAttendu, seq + 1);
@@ -2079,7 +2086,7 @@ else {
   if (ecarts.length) {
     ko("R-42", "forge/ledger.jsonl", `intégrité rompue — ${ecarts.length} écart(s) : ${ecarts.slice(0, 6).join(" · ")}${ecarts.length > 6 ? " …" : ""}` +
       (notes.length ? ` (par ailleurs : ${notes.join(" · ")})` : "") +
-      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ], un saut en avant reste un écart. " +
+      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ]. Un saut en avant (des seq jamais écrits) se déclare de la même façon : nommer dans `entrees[]` le seq qui SUIT la lacune, avec son `ts_consigne` et la cause — ce que les seq manquants contenaient ou pourquoi ils n'existent pas (TF-2494). " +
       "Pour un lot d'écarts anciens sans les nommer un par un : une entrée `type: anteriorite_ledger` portant `avant` (date ISO) et `cause` (≥20 car.) couvre, en [ANTÉRIORITÉ], tout écart dont l'horodatage précède `avant` (TF-1203) — seuls les écarts sans horodatage lisible restent hors de sa portée");
   } else {
     ok("R-42", "forge/ledger.jsonl", `intégrité tenue sur ${lues.length} entrée(s) — seq continu, horodatages non décroissants, ouverture par run_open` +
