@@ -65,12 +65,17 @@ RUNS = FORGE.parent / "runs"
 # RP-18, TF-2198, 06/11/2026 : revue du 04/11 consignée en résumé, 2 entrées à la main sur 458). `qualification_enclenchement`
 # est la qualification d'un refus du juge d'enclenchement (CONTRAT-INTERFACE.md, `ledger.mjs`) : le croisement de la recette
 # avec les constantes `TYPE_*` de `ledger.mjs` l'a relevé absent le même jour.
+# `anteriorite_ledger` est le type que le message de R-42 d'oracle-conformite-projet PRESCRIT (TF-1203) pour couvrir en bloc les
+# écarts de `seq` ou d'horodatage antérieurs à une date (`--avant <date ISO> --cause "<≥ 20 caractères>"`) : refusé ici comme type
+# inconnu, le produit qui suivait le message de l'oracle voyait son remède refusé (TF-2494, 13/11/2026, même classe que TF-2018).
+# `secret_range` reste le DERNIER type : la chirurgie du banc de `scripts/ranger-secret.test.mjs` le retire par sa position.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
          "run_close", "rectification_versions_forges", "rectification_run_open",
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
-         "deplacement_en_attente", "demande_humain", "qualification_enclenchement", "secret_range"}
+         "deplacement_en_attente", "demande_humain", "qualification_enclenchement",
+         "anteriorite_ledger", "secret_range"}
 
 
 # TF-2223 (RP-2, 06/11/2026) : hors run, ces types s'écrivent à `forge/hors-run.jsonl`, jamais au ledger du run, dont R-42

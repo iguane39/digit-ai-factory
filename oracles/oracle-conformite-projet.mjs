@@ -970,6 +970,40 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
     }
     if (ok32) ok("R-32", "output/*.html", `${htmls.length} livrable(s) HTML avec journal d'oracles sous forge\\oracles\\`);
 
+    // R-32 sexies (TF-2495, 13/11/2026, lot pd) — UN JOURNAL QUI CONSIGNE UN FAIL N'EST PAS UN VERDICT DE CONFORMITÉ.
+    // R-32 exige la PRÉSENCE du journal (la preuve que les oracles ont été joués), pas qu'il dise PASS : mesuré le 13/11
+    // chez le produit 02, 9 pages sur 10 étaient conformes à R-32 avec un journal qui consigne un FAIL. La règle ne
+    // change pas (un journal présent reste PASS, sinon un produit apprendrait à ne plus consigner ses échecs) ; un
+    // AVERTISSEMENT nommé dit la page, l'oracle et le champ. Lus : `verdicts{}` (une valeur par oracle) et `verdict`
+    // (texte d'ensemble, dont « PASS (socle) / FAIL (critique) ») ; « 0 FAIL » n'est pas un FAIL.
+    {
+      const MOT_FAIL = /(?<!\b0 )\bFAIL\b/;
+      const consignes = [];
+      let lisibles = 0;
+      for (const f of htmls) {
+        const journal = p("forge", "oracles", basename(f, ".html") + ".json");
+        if (!existsSync(journal)) continue;
+        let j;
+        try { j = JSON.parse(readFileSync(journal, "utf8")); } catch { continue; }
+        if (!j || typeof j !== "object") continue;
+        lisibles += 1;
+        const vus = [];
+        if (typeof j.verdict === "string" && MOT_FAIL.test(j.verdict)) vus.push("verdict");
+        if (j.verdicts && typeof j.verdicts === "object") {
+          for (const [k, v] of Object.entries(j.verdicts)) if (typeof v === "string" && MOT_FAIL.test(v)) vus.push(`verdicts.${k}`);
+        }
+        if (vus.length) consignes.push(`${rel(f)} (${vus.join(", ")})`);
+      }
+      if (consignes.length) {
+        ok("R-32 sexies", "forge/oracles/",
+          `AVERTISSEMENT, non bloquant : ${consignes.length} journal(aux) d'oracles consigne(nt) un FAIL : ${consignes.join(" · ")} — ` +
+          "R-32 exige la présence du journal, pas un verdict PASS : une page livrée sur un FAIL consigné n'est pas conforme à ses oracles. " +
+          "Corriger puis rejouer check_html.py et render_page.py, ou déclarer l'exemption de l'oracle (journal d'exemptions) ; ne pas lire ce journal comme un verdict de conformité");
+      } else if (lisibles) {
+        ok("R-32 sexies", "forge/oracles/", `${lisibles} journal(aux) d'oracles lu(s), aucun ne consigne de FAIL`);
+      }
+    }
+
     // R-32 bis (TF-0366) — un journal existe, mais SOUS QUELLES RÈGLES ? Le 18/08, la règle
     // A3 met en échec un livrable DÉCLARÉ PASS le 14/08 et rejoué à l'identique : le fichier
     // n'a pas changé, la règle est postérieure. Le journal affirmait un PASS qui n'était plus
@@ -1743,10 +1777,20 @@ else {
 }
 
 // R-16 — dossier de MEP copié dans output\ au nommage daté
+//
+// TF-2495 (13/11/2026, lot pd) — LA COPIE PEUT VIVRE DANS UNE FAMILLE D'output\ POSÉE PAR D-15. R-16 ne lisait que la
+// racine : mesuré le 13/11 chez le produit 02, la copie datée du dossier de MEP existait sous output\NN-… et la règle la
+// déclarait absente. Sont lus la racine d'output\ ET la racine de chaque famille `NN-…` ; jamais le `old\` d'une famille
+// (une version remplacée n'est pas la copie courante) ni un dossier qui n'est pas une famille.
 if (!existsSync(p("forge", "DOSSIER-MEP.md"))) so("R-16", "pas de DOSSIER-MEP.md (étape MEP non atteinte)");
 else {
-  const copie = existsSync(p("output")) && readdirSync(p("output")).some((n) => /MEP/i.test(n) && MOTIF_DATE.test(n));
-  copie ? ok("R-16", "output/", "dossier de MEP copié au nommage daté") : ko("R-16", "output/", "DOSSIER-MEP.md existe mais aucune copie datée dans output\\");
+  const lieux = existsSync(p("output"))
+    ? ["output", ...readdirSync(p("output"), { withFileTypes: true }).filter((e) => e.isDirectory() && /^\d{2}-/.test(e.name)).map((e) => `output/${e.name}`)]
+    : [];
+  const copies = lieux.flatMap((lieu) => readdirSync(p(...lieu.split("/"))).filter((n) => /MEP/i.test(n) && MOTIF_DATE.test(n)).map((n) => `${lieu}/${n}`));
+  copies.length
+    ? ok("R-16", "output/", `dossier de MEP copié au nommage daté : ${copies[0]}`)
+    : ko("R-16", "output/", "DOSSIER-MEP.md existe mais aucune copie datée dans output\\ ni à la racine d'une de ses familles NN-… (D-15)");
 }
 
 // R-17 — journaux d'oracles versionnés dans forge\ (C4)
@@ -2049,11 +2093,18 @@ else {
         if (seq !== seqAttendu) {
           const quoi = `seq ${seq} là où ${seqAttendu} était attendu`;
           // TF-0794 : un seq en double ou en recul NOMMÉ par une rectification ultérieure est
-          // déclaré, pas fautif ; un saut en avant ou un seq non nommé reste un écart. TF-1203 :
-          // à défaut d'être nommé, un écart dont l'horodatage précède une antériorité bornée
-          // déclarée (anteriorite_ledger) est tout autant couvert.
-          if (seq < seqAttendu && rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : seq en collision — ${rectifies.get(seq)}`);
-          else if (seq < seqAttendu && avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} : seq en collision — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
+          // déclaré, pas fautif ; un seq non nommé reste un écart. TF-1203 : à défaut d'être
+          // nommé, un écart dont l'horodatage précède une antériorité bornée déclarée
+          // (anteriorite_ledger) est tout autant couvert.
+          // TF-2494 (13/11/2026) : LE SAUT EN AVANT A SES DEUX VOIES AUSSI. Il restait « un écart »
+          // sans remède : 15 sauts mesurés chez le produit 02, aucune entrée pour les couvrir. Il se
+          // déclare comme une collision — la rectification nomme, dans `entrees[]`, le seq qui SUIT
+          // la lacune (TF-1466 : ts cité, rectification postérieure), ou l'antériorité datée le couvre.
+          const nature = seq > seqAttendu
+            ? `saut en avant, seq ${seqAttendu}${seq - 1 > seqAttendu ? ` à ${seq - 1}` : ""} jamais écrit${seq - 1 > seqAttendu ? "s" : ""}`
+            : "seq en collision";
+          if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : ${nature} — ${rectifies.get(seq)}`);
+          else if (avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} : ${nature} — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
           else ecarts.push(`${quoi} — append-only rompu`);
         }
         seqAttendu = Math.max(seqAttendu, seq + 1);
@@ -2079,7 +2130,7 @@ else {
   if (ecarts.length) {
     ko("R-42", "forge/ledger.jsonl", `intégrité rompue — ${ecarts.length} écart(s) : ${ecarts.slice(0, 6).join(" · ")}${ecarts.length > 6 ? " …" : ""}` +
       (notes.length ? ` (par ailleurs : ${notes.join(" · ")})` : "") +
-      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ], un saut en avant reste un écart. " +
+      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ]. Un saut en avant (des seq jamais écrits) se déclare de la même façon : nommer dans `entrees[]` le seq qui SUIT la lacune, avec son `ts_consigne` et la cause — ce que les seq manquants contenaient ou pourquoi ils n'existent pas (TF-2494). " +
       "Pour un lot d'écarts anciens sans les nommer un par un : une entrée `type: anteriorite_ledger` portant `avant` (date ISO) et `cause` (≥20 car.) couvre, en [ANTÉRIORITÉ], tout écart dont l'horodatage précède `avant` (TF-1203) — seuls les écarts sans horodatage lisible restent hors de sa portée");
   } else {
     ok("R-42", "forge/ledger.jsonl", `intégrité tenue sur ${lues.length} entrée(s) — seq continu, horodatages non décroissants, ouverture par run_open` +

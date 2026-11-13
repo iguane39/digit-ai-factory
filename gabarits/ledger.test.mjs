@@ -322,6 +322,62 @@ try {
     att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
     att(!vocabulaire(mutant).has("conflit_regles") && prescritsDoctrine.has("conflit_regles"), "le mutant passe");
   });
+  // TF-2494 (13/11/2026) : le message de R-42 d'oracle-conformite-projet PRESCRIT `type: anteriorite_ledger` (TF-1203) pour
+  // couvrir en bloc des écarts anciens, et ce gabarit le refusait comme type inconnu : le remède prescrit n'était pas
+  // écrivable. Test croisé (tout `type: X` que l'oracle prescrit est au vocabulaire), puis le REMÈDE JOUÉ de bout en bout
+  // (TF-1013) : l'écrivain écrit l'entrée que le message demande, et R-42 la lit et passe.
+  const ORACLE_CONFORMITE = join(ICI, "..", "oracles", "oracle-conformite-projet.mjs");
+  const prescritsR42 = new Set([...readFileSync(ORACLE_CONFORMITE, "utf8").matchAll(/`type: ?([a-z_]+)`/g)].map((m) => m[1]));
+  check(`TF-2494 vert — les ${prescritsR42.size} types que le message de R-42 prescrit sont au vocabulaire du gabarit`, () => {
+    att(prescritsR42.has("anteriorite_ledger") && prescritsR42.has("rectification_horodatage"), `relevé incomplet : ${[...prescritsR42]}`);
+    const v = vocabulaire(GABARIT);
+    const manquants = [...prescritsR42].filter((t) => !v.has(t));
+    att(!manquants.length, `hors vocabulaire : ${manquants.join(", ")}`);
+  });
+  check("TF-2494 rouge — sans anteriorite_ledger au vocabulaire, le test croisé le voit et l'écrivain refuse le remède prescrit", () => {
+    const mutant = GABARIT.replace(' "anteriorite_ledger",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    att(!vocabulaire(mutant).has("anteriorite_ledger") && prescritsR42.has("anteriorite_ledger"), "le mutant passe le croisement");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "anteriorite_ledger", "--avant", "2026-09-01T00:00:00Z", "--cause", "lacune du 02/08 antérieure à la session"], { encoding: "utf8", env: CONSOLE });
+    att(r.status !== 0 && /type inconnu/.test(r.stderr || ""), `le mutant écrit : exit ${r.status} ${r.stderr}`);
+  });
+  /** Un produit dont le ledger porte un saut de seq EN AVANT (3 puis 7), écrit à la main comme le ferait un second écrivain perdu. */
+  const produitAvecSaut = () => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-saut-")); dossiers.push(d);
+    mkdirSync(join(d, "forge"));
+    writeFileSync(join(d, "forge", "ledger.py"), GABARIT, "utf8");
+    writeFileSync(join(d, "forge", "ledger.jsonl"), [
+      { seq: 1, ts: "2026-08-01T08:00:00Z", type: "run_open", run_id: "essai" },
+      { seq: 2, ts: "2026-08-02T09:00:00Z", type: "retour" },
+      { seq: 3, ts: "2026-08-02T09:30:00Z", type: "etape_close" },
+      { seq: 7, ts: "2026-08-03T10:00:00Z", type: "retour" },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    return { d, script: join(d, "forge", "ledger.py") };
+  };
+  const r42 = (d) => {
+    const r = spawnSync(process.execPath, [ORACLE_CONFORMITE, d], { encoding: "utf8" });
+    return (JSON.parse(r.stdout || "{}").findings || []).filter((f) => f.regle === "R-42");
+  };
+  check("TF-2494 rouge — le saut de seq 3 → 7 que rien ne déclare est un écart de R-42", () => {
+    const { d } = produitAvecSaut();
+    att(r42(d).some((f) => f.statut === "FAIL" && /seq 7 là où 4 était attendu/.test(f.message)), `R-42 : ${JSON.stringify(r42(d))}`);
+  });
+  check("TF-2494 vert — le remède prescrit (anteriorite_ledger, écrite par l'écrivain) couvre le saut ancien : R-42 passe, [ANTÉRIORITÉ] imprimé", () => {
+    const { d, script } = produitAvecSaut();
+    const r = spawnSync(PYTHON, [script, "anteriorite_ledger", "--avant", "2026-09-01T00:00:00Z", "--cause", "lacune de seq du 03/08, antérieure à la session qui la révèle"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `le remède prescrit est refusé : exit ${r.status} ${r.stderr}`);
+    const f = r42(d);
+    att(!f.some((x) => x.statut === "FAIL") && f.some((x) => x.statut === "PASS" && /\[ANTÉRIORITÉ\] seq 7 là où 4 était attendu : saut en avant/.test(x.message)), `R-42 : ${JSON.stringify(f)}`);
+  });
+  check("TF-2494 vert — le remède prescrit (rectification_horodatage nommant le seq qui suit la lacune) couvre le saut : R-42 passe, [RECTIFIÉ] imprimé", () => {
+    const { d, script } = produitAvecSaut();
+    const entrees = JSON.stringify([{ seq: 7, ts_consigne: "2026-08-03T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu" }]);
+    const r = spawnSync(PYTHON, [script, "rectification_horodatage", "--entrees", entrees], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `exit ${r.status} ${r.stderr}`);
+    const f = r42(d);
+    att(!f.some((x) => x.statut === "FAIL") && f.some((x) => x.statut === "PASS" && /\[RECTIFIÉ\] seq 7 là où 4 était attendu : saut en avant/.test(x.message)), `R-42 : ${JSON.stringify(f)}`);
+  });
   // TF-2198 (RP-18, 06/11/2026) : `demande_humain`, le type qui consigne une demande humaine mot pour
   // mot, était refusé par le gabarit (type inconnu) : un produit l'écrivait à la main (2 entrées sur 458
   // à son ledger) et la revue du 04/11 n'a été consignée qu'en résumé. Test croisé avec `ledger.mjs` :

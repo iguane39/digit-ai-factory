@@ -1693,6 +1693,140 @@ check("TF-1203 borne : une antériorité déclarée ne pardonne QUE ce qui préc
     throw new Error(`les deux écarts anciens, par ailleurs toujours couverts, ne sont plus imprimés : ${f.message}`);
 });
 
+// ---- TF-2494 (13/11/2026, campagne « A1 & A2 », lot pd) — R-42 N'AVAIT AUCUN REMÈDE POUR UN SAUT DE SEQ EN
+// AVANT. Mesuré le 13/11 par l'agent du lot ps chez le produit 02 : 15 sauts en avant (des entrées jamais
+// écrites, ou écrites ailleurs) restaient sans entrée qui les couvre, et le message de R-42 disait seulement
+// qu'un saut « reste un écart ». Une rectification ULTÉRIEURE qui NOMME, dans `entrees[]`, le seq qui suit la
+// lacune la déclare ; une `anteriorite_ledger` datée la couvre en bloc. Dans les deux cas l'écart reste IMPRIMÉ,
+// et une lacune récente que rien ne déclare reste un écart. ------------------------------------------------
+const LEDGER_SAUT = [
+  { seq: 1, ts: "2026-09-01T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "2026-09-01T09:00:00Z", type: "retour" },
+  { seq: 3, ts: "2026-09-01T09:30:00Z", type: "etape_close" },
+  { seq: 7, ts: "2026-09-02T10:00:00Z", type: "retour" },        // saut en avant : 4, 5 et 6 jamais écrits
+  { seq: 8, ts: "2026-09-02T10:05:00Z", type: "etape_close" },
+];
+const DECL_SAUT = { seq: 9, ts: "2026-09-03T08:00:00Z", type: "rectification_horodatage",
+  entrees: [{ seq: 7, ts_consigne: "2026-09-02T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu avant la fusion" }] };
+const sautNuR42 = mkdtempSync(join(tmpdir(), "conf-saut-nu-r42-"));
+ecrireDans(sautNuR42, "forge/ledger.jsonl", LEDGER_SAUT.map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 rouge : un saut de seq EN AVANT (3 puis 7) que rien ne déclare → FAIL, et le message dit comment déclarer la lacune", () => {
+  const { exit, rapport } = lance(sautNuR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 7 là où 4 était attendu/.test(f.message)) throw new Error(`le saut n'est pas dénoncé : ${f && f.message}`);
+  if (!/saut en avant.*seq qui SUIT la lacune/.test(f.message))
+    throw new Error(`le message ne prescrit aucun remède pour un saut en avant : ${f.message}`);
+});
+const sautDeclareR42 = mkdtempSync(join(tmpdir(), "conf-saut-declare-r42-"));
+ecrireDans(sautDeclareR42, "forge/ledger.jsonl", [...LEDGER_SAUT, DECL_SAUT].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 vert : le MÊME saut, déclaré par une rectification qui nomme le seq 7 dans entrees[] → PASS, imprimé [RECTIFIÉ] (le remède prescrit est joué)", () => {
+  const { exit, rapport } = lance(sautDeclareR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+  const f = r42.find((x) => x.statut === "PASS");
+  if (!f || !/\[RECTIFIÉ\] seq 7 là où 4 était attendu : saut en avant/.test(f.message))
+    throw new Error(`le saut déclaré n'est pas imprimé [RECTIFIÉ] : ${f && f.message} — une lacune silencieuse serait une réécriture`);
+  if (/sans écart correspondant/.test(f.message)) throw new Error(`une rectification consommée est comptée « sans écart » : ${f.message}`);
+});
+const sautSansTsR42 = mkdtempSync(join(tmpdir(), "conf-saut-sans-ts-r42-"));
+ecrireDans(sautSansTsR42, "forge/ledger.jsonl", [...LEDGER_SAUT,
+  { ...DECL_SAUT, entrees: [{ seq: 7, cause: "trois entrées perdues" }] }].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 borne : une déclaration de lacune SANS ts cité n'est pas opposable (TF-1466) → le saut reste un écart", () => {
+  const { exit, rapport } = lance(sautSansTsR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 7 là où 4 était attendu/.test(f.message) || /\[RECTIFIÉ\] seq 7 là où/.test(f.message))
+    throw new Error(`la déclaration sans ts a quand même couvert le saut : ${f && f.message}`);
+});
+const sautAnterioriteR42 = mkdtempSync(join(tmpdir(), "conf-saut-anteriorite-r42-"));
+ecrireDans(sautAnterioriteR42, "forge/ledger.jsonl", [...LEDGER_SAUT,
+  { seq: 9, ts: "2026-09-12T10:00:00Z", type: "anteriorite_ledger", avant: "2026-09-05T00:00:00Z",
+    cause: "mesure du 12/09/2026 : lacune de seq du 02/09, antérieure à la session révélatrice (TF-2494)" }].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 vert : le même saut, ANCIEN, couvert en bloc par une antériorité bornée par une date → PASS, imprimé [ANTÉRIORITÉ]", () => {
+  const { rapport } = lance(sautAnterioriteR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+  const f = r42.find((x) => x.statut === "PASS");
+  if (!f || !/\[ANTÉRIORITÉ\] seq 7 là où 4 était attendu : saut en avant/.test(f.message))
+    throw new Error(`le saut ancien n'est pas imprimé [ANTÉRIORITÉ] : ${f && f.message}`);
+});
+const sautRecentR42 = mkdtempSync(join(tmpdir(), "conf-saut-recent-r42-"));
+ecrireDans(sautRecentR42, "forge/ledger.jsonl", [...LEDGER_SAUT,
+  { seq: 9, ts: "2026-09-12T10:00:00Z", type: "anteriorite_ledger", avant: "2026-09-02T00:00:00Z",
+    cause: "mesure du 12/09/2026 : écarts antérieurs au 02/09, avant la session révélatrice (TF-2494)" }].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 borne : une antériorité datée AVANT le saut ne le couvre pas — un saut récent reste un écart", () => {
+  const { exit, rapport } = lance(sautRecentR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 7 là où 4 était attendu/.test(f.message)) throw new Error(`le saut récent n'est plus dénoncé : ${f && f.message}`);
+});
+
+// ---- TF-2495 (13/11/2026, lot pd) — R-16 NE LISAIT QUE LA RACINE D'output\ ET R-32 EXIGE UN JOURNAL, PAS UN PASS.
+// Mesuré le 13/11 par l'agent du lot ps chez le produit 02 : la copie du dossier de MEP existait dans une famille
+// d'output\ posée par D-15 (output\NN-…) et R-16 la déclarait absente ; 9 pages sur 10 étaient conformes à R-32
+// avec un journal qui consigne un FAIL. R-16 lit donc aussi les racines des familles NN-… (jamais leur old\) ; R-32
+// garde sa règle (la présence du journal) et un avertissement NOMMÉ, « R-32 sexies », dit le FAIL consigné. -------
+const MEP_COPIE = "Digit-AI - Dossier de MEP - 20261113a.md";
+const projetMep = (nom, copieA) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-${nom}-`));
+  ecrireDans(d, "forge/DOSSIER-MEP.md", "# Dossier de MEP\n");
+  ecrireDans(d, "output/Digit-AI - Note - 20261113a.md", "# Une note\n");
+  if (copieA) ecrireDans(d, `${copieA}/${MEP_COPIE}`, "# Dossier de MEP\n");
+  return d;
+};
+const r16 = (d) => (lance(d).rapport.findings || []).find((x) => x.regle === "R-16");
+check("TF-2495 rouge : DOSSIER-MEP.md et AUCUNE copie datée dans output\\ → R-16 FAIL (la règle est intacte)", () => {
+  const f = r16(projetMep("r16-sans"));
+  if (!f || f.statut !== "FAIL") throw new Error(`R-16 : ${JSON.stringify(f)}`);
+});
+check("TF-2495 rouge : la copie vit SEULEMENT dans une famille D-15 (output/06-mep/) → R-16 PASS, et le message nomme la famille", () => {
+  const f = r16(projetMep("r16-famille", "output/06-mep"));
+  if (!f || f.statut !== "PASS") throw new Error(`R-16 : ${JSON.stringify(f)} — la famille posée par D-15 n'est pas lue`);
+  if (!/06-mep/.test(f.message)) throw new Error(`le constat ne dit pas où la copie a été trouvée : ${f.message}`);
+});
+check("TF-2495 vert : la copie à la racine d'output\\ passe comme avant", () => {
+  const f = r16(projetMep("r16-racine", "output"));
+  if (!f || f.statut !== "PASS") throw new Error(`R-16 : ${JSON.stringify(f)}`);
+});
+check("TF-2495 borne : une copie dans old\\ d'une famille, ou dans un dossier qui n'est pas une famille NN-…, ne tient pas lieu de copie courante → R-16 FAIL", () => {
+  for (const ou of ["output/06-mep/old", "output/divers"]) {
+    const f = r16(projetMep("r16-borne", ou));
+    if (!f || f.statut !== "FAIL") throw new Error(`${ou} : R-16 ${JSON.stringify(f)} — le périmètre de la lecture déborde les familles de D-15`);
+  }
+});
+
+const HTML_R32 = '<!DOCTYPE html>\n<html lang="fr"><head><title>x</title></head><body>x</body></html>\n';
+const projetJournal = (nom, journal) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-${nom}-`));
+  ecrireDans(d, "output/Digit-AI - Page - 20261113a.html", HTML_R32);
+  if (journal !== null) ecrireDans(d, "forge/oracles/Digit-AI - Page - 20261113a.json", typeof journal === "string" ? journal : JSON.stringify(journal, null, 1));
+  return d;
+};
+const r32 = (d) => { const f = lance(d).rapport.findings || []; return { r32: f.find((x) => x.regle === "R-32"), sexies: f.find((x) => x.regle === "R-32 sexies") }; };
+check("TF-2495 rouge : un journal qui consigne un FAIL (verdicts.render_page) → R-32 reste PASS, et « R-32 sexies » AVERTIT en nommant la page et l'oracle", () => {
+  const { r32: f, sexies } = r32(projetJournal("r32-fail", { verdicts: { check_html: "PASS", render_page: "FAIL" } }));
+  if (!f || f.statut !== "PASS") throw new Error(`R-32 a changé de règle : ${JSON.stringify(f)}`);
+  if (!sexies || sexies.statut !== "PASS" || !/AVERTISSEMENT, non bloquant/.test(sexies.message)) throw new Error(`pas d'avertissement nommé : ${JSON.stringify(sexies)}`);
+  if (!/Digit-AI - Page - 20261113a\.html/.test(sexies.message) || !/render_page/.test(sexies.message)) throw new Error(`l'avertissement ne nomme ni la page ni l'oracle : ${sexies.message}`);
+});
+check("TF-2495 rouge : le verdict d'ensemble en texte libre (« PASS (socle) / FAIL (critique) ») est lu aussi", () => {
+  const { sexies } = r32(projetJournal("r32-texte", { verdict: "PASS (socle) / FAIL (critique forge-design, 3 écarts)" }));
+  if (!sexies || !/AVERTISSEMENT/.test(sexies.message) || !/verdict/.test(sexies.message)) throw new Error(`pas d'avertissement : ${JSON.stringify(sexies)}`);
+});
+check("TF-2495 vert : un journal tout PASS, ou « 0 FAIL », ne déclenche aucun avertissement ; un journal illisible n'est pas jugé", () => {
+  for (const [nom, j] of [["propre", { verdicts: { check_html: "PASS", render_page: "PASS" } }], ["zero", { verdict: "PASS aux oracles, 0 FAIL" }], ["illisible", "{ pas du json"]]) {
+    const { r32: f, sexies } = r32(projetJournal(`r32-${nom}`, j));
+    if (!f || f.statut !== "PASS") throw new Error(`${nom} : R-32 ${JSON.stringify(f)}`);
+    if (sexies && /AVERTISSEMENT/.test(sexies.message)) throw new Error(`${nom} : avertissement à tort : ${sexies.message}`);
+  }
+});
+check("TF-2495 borne : sans journal, R-32 reste FAIL (la règle ne change pas) et « R-32 sexies » ne dit rien", () => {
+  const { r32: f, sexies } = r32(projetJournal("r32-sans", null));
+  if (!f || f.statut !== "FAIL") throw new Error(`R-32 : ${JSON.stringify(f)}`);
+  if (sexies && /AVERTISSEMENT/.test(sexies.message)) throw new Error("un avertissement sur un journal qui n'existe pas");
+});
+
 // ---- fixture R-42 bis (TF-1424, 25/09/2026, RS-3) : un ts POSTÉRIEUR au commit qui l'a introduite
 // est composé, pas relevé — double sens sur un dépôt git JETABLE, la date du commit FIXÉE par
 // `--date`, comme `projetAnteriorite` plus bas (même idiome, TF-0923). --------------------------
