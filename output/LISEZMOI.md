@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 698 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 699 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -576,6 +576,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md | 20261026s | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md` |
 | Digit-AI - Synthese Mandat - A1 A2 A3 de la nuit du 12-11 - 20261112k.md | 20261112k | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 A3 de la nuit du 12-11 - 20261112k.md` |
 | Digit-AI - Synthese Mandat - A1 A2 A3 du 12-11 au soir - 20261112i.md | 20261112i | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 A3 du 12-11 au soir - 20261112i.md` |
+| Digit-AI - Synthese Mandat - A1 A2 A3 du matin du 13-11 - 20261113e.md | 20261113e | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 A3 du matin du 13-11 - 20261113e.md` |
 | Digit-AI - Synthese Mandat - A1 A2 faites A3 en cours - 20261026h.md | 20261026h | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 faites A3 en cours - 20261026h.md` |
 | Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md | 20261004a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` |
 | Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md | 20261012a | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` |

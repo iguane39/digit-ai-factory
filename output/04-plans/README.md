@@ -75,6 +75,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md` | fichier | 14,1 Ko | Synthèse Mandat — A-1 et A-2 : indices du 19/10 levés, revue hebdomadaire rendue (26/10/20 |
 | `Digit-AI - Synthese Mandat - A1 A2 A3 de la nuit du 12-11 - 20261112k.md` | fichier | 7,8 Ko | markdown |
 | `Digit-AI - Synthese Mandat - A1 A2 A3 du 12-11 au soir - 20261112i.md` | fichier | 5,2 Ko | markdown |
+| `Digit-AI - Synthese Mandat - A1 A2 A3 du matin du 13-11 - 20261113e.md` | fichier | 6,1 Ko | markdown |
 | `Digit-AI - Synthese Mandat - A1 A2 faites A3 en cours - 20261026h.md` | fichier | 5,3 Ko | Synthèse Mandat — A-1 et A-2 faites, A-3 en cours : barrière outillée, pilot publié, premi |
 | `Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` | fichier | 9,9 Ko | Synthèse Mandat — votre décision D-56 est exécutée : le sas est vide, 1 lot sur 5 est entr |
 | `Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` | fichier | 10,3 Ko | Synthèse Mandat — 4 lots du sas accueillis, 3 ingérés au registre (7 candidats), publicati |
@@ -241,4 +242,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_220 fichier(s), 4 sous-dossier(s)_
+_221 fichier(s), 4 sous-dossier(s)_
