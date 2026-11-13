@@ -4841,7 +4841,7 @@ function juger(texte, cheminJuge = null) {
   // le test rouge sur le code précédent, la taille du tirage, la règle d'arrêt (étapes 4, 6 et 8 de la
   // méthode, R-63).
   {
-    const GAIN_ECHANTILLON = uni(/\b(gagne|gain|am[ée]lior\w*|progress\w*|monte|passe de)\b[^.\n]{0,80}\b[ée]chantillon\b|\b[ée]chantillon\b[^.\n]{0,80}\b(gagne|gain|am[ée]lior\w*|progress\w*|\+\s?\d+(?:[,.]\d+)?\s*points?|passe de)\b/i);
+    const GAIN_ECHANTILLON = uni(/\b(gagne|gain|am[ée]lior\w*|progress\w*|monte|passe de)\b[^.\n]{0,80}\b[ée]chantillon\b|\b[ée]chantillon\b[^.\n]{0,80}\b(gagne|gain|am[ée]lior\w*|progress\w*|\+\s?\d+(?:[,.]\d+)?\s*points?|passe de)\b/i);   // piege-ok : uni() réécrit chaque \b en frontière Unicode (TF-0805), la classe [ée] touche une vraie frontière (TF-2496)
     const POPULATION = uni(/\b(changements?|modifications?|retypages?|d[ée]placements?)\b[^.\n]{0,60}\b(?:dans|sur) (?:toute )?la population\b|\btirage des changements\b|\bchangements? (?:non contr[ôo]l[ée]s|relus)\b/i);
     const EXISTANT = uni(/\b(appliqu[ée]e?s? (?:aux|[àa] l['’]|sur les) (?:lignes?|fichiers?|[ée]l[ée]ments?)? ?(?:d[ée]j[àa] (?:trait|rang|class)\w*|existant)|effet sur l['’]existant|lignes? d[ée]j[àa] (?:trait|rang|class)[ée]e?s?)\b/i);
     const gains = phrasesDe(texte).filter((p) => GAIN_ECHANTILLON.test(p));

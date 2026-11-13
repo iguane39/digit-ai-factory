@@ -55,10 +55,10 @@ const PILOT = resolve(join(ICI, "..", ".."));
 const ORACLE = /\boracle-[a-z0-9]+(?:-[a-z0-9]+)*/gi;
 /** Les formes du sens rouge → vert. Chacune est nommée : le corpus dit laquelle a mordu. */
 export const SENS = [
-  ["fleche", /\bFAIL\b(?:\s*\([^)]{0,80}\))?(?:\s+[\d/]+)?(?:\s+(?:sur|en|pour)\s[^;.]{0,40}?)?\s*(?:->|→|=>|\ba\b|\bà\b|\bdevient\b|\bpuis\b|\bvers\b)\s*(?:(?:un\s+)?verdict\s+)?PASS\b/i],
+  ["fleche", /\bFAIL\b(?:\s*\([^)]{0,80}\))?(?:\s+[\d/]+)?(?:\s+(?:sur|en|pour)\s[^;.]{0,40}?)?\s*(?:->|→|=>|\ba\b|(?<![\wà-ÿ])à(?![\wà-ÿ])|\bdevient\b|\bpuis\b|\bvers\b)\s*(?:(?:un\s+)?verdict\s+)?PASS\b/i],
   ["avant-apres", /\bFAIL\b[^;.]{0,60}?\bavant\b[^;.]{0,60}?\bPASS\b[^;.]{0,20}?\bapr[eè]s\b/i],
   ["etait", /\bPASS\b\s*\((?:il\s+|elle\s+)?[eé]tait\s+FAIL\b/i],
-  ["couleur", /\brouge\s*(?:->|→|=>|\ba\b|\bà\b|\bvers\b|\bpuis\b)\s*vert\b/i],
+  ["couleur", /\brouge\s*(?:->|→|=>|\ba\b|(?<![\wà-ÿ])à(?![\wà-ÿ])|\bvers\b|\bpuis\b)\s*vert\b/i],
 ];
 /**
  * Découpe un message en propositions : `;`, fin de phrase (point suivi d'un espace), ligne vide, puce. Un message de

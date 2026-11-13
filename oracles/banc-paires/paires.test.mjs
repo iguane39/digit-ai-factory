@@ -34,6 +34,12 @@ try {
     att(oracles("oracle-skills --appliquer (K2 FAIL 10/17 -> PASS 8/8)") === "oracle-skills", "compte entre FAIL et la flèche");
     att(regle("oracle-x FAIL -> PASS")[0].forme === "fleche" && regle("oracle-x PASS (était FAIL)")[0].forme === "etait", "la forme est nommée");
   });
+  check("P1 — TF-2496 : « à » accentué est reconnu comme le « a » nu (la frontière ASCII le rendait mort), et un mot qui le contient reste refusé", () => {
+    att(oracles("oracle-x FAIL à PASS") === "oracle-x", "« FAIL à PASS »");
+    att(oracles("oracle-y passe de rouge à vert") === "oracle-y", "« rouge à vert »");
+    att(regle("oracle-x FAIL à PASS")[0].forme === "fleche" && regle("oracle-y passe de rouge à vert")[0].forme === "couleur", "formes nommées");
+    att(oracles("oracle-x FAIL voilà PASS") === "" && oracles("oracle-x rouge voilà vert") === "", "« voilà » n'est pas la marque « à »");
+  });
   check("P1 — contre-formes : compte de cas, verdict sans sens, oracle cité pour son propre verdict après la marque", () => {
     att(oracles("Self-test oracle-synthese 20/20 -> 21/21 PASS (non declaree FAIL, declaree PASS)") === "", "un compte de recette n'est pas une correction");
     att(oracles("oracle-synthese 24 -> 27 cas (FAIL, PASS, SANS_OBJET)") === "", "une liste de verdicts n'est pas un sens");

@@ -381,6 +381,14 @@ const ETAT_DU_PARC = [
     motif: "agent compilé de .claude/agents en échec à oracle-scan-agentdef sans déclaration motivée dans sa source gabarits/flotte/<id>.yaml",
     remede: "retirer l'outil que le rôle n'emploie pas, ou ajouter à gabarits/flotte/<id>.yaml « # scan-agentdef CAP-n : <motif> », puis node scripts\\compiler-flotte.mjs",
   },
+  {
+    // TF-2496 (13/11/2026) : l'oracle ne se jouait que sur ses fixtures (--self-test), et le parc réel lui rendait 30 FAIL que
+    // personne ne lisait : des expressions mortes (`\bà\b`, `\b(à`) dans le pilot et ses forges, qui rendent PASS en croyant juger.
+    // C'est un état du PARC : le défaut naît d'une écriture, jamais d'un artefact qu'on passerait à un oracle.
+    nom: "oracle-pieges-regex.mjs",
+    motif: "expression régulière morte : frontière de mot ASCII collée à une lettre accentuée, classe de majuscules sous drapeau i, octet de contrôle dans une source",
+    remede: "frontière Unicode `(?<![\\wà-ÿ])…(?![\\wà-ÿ])` ou forme non accentuée à la ligne nommée ; une expression juste se déclare `// piege-ok : <motif>` sur sa ligne",
+  },
 ];
 for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // Certains oracles d'etat jugent des ARTEFACTS nommes plutot qu'un parc entier : ils portent

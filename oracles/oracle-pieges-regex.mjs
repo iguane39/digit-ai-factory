@@ -62,13 +62,17 @@ const NON_JUGE = [
 const ACCENTS = "àâäåçéèêëîïìôöòõûüùÿñæœÀÂÄÅÇÉÈÊËÎÏÌÔÖÒÕÛÜÙŸÑÆŒ";
 // Entre la frontiere et la lettre accentuee, il peut y avoir une ouverture de groupe ou une
 // alternance : `\b(ecart|refus)`. Le premier jet ne lisait que le cas nu, et la recette l'a dit.
-const P1_AVANT = new RegExp("\\\\b[(\\[|]*[" + ACCENTS + "]");        //  \bÉ…
+// TF-2496 (13/11/2026) : le `|` a quitté les deux classes d'entre-deux. Une alternance REMET À ZÉRO la frontière : dans
+// `\btemporaire\b|élévation` ou `réf\b|à vérifier`, le `\b` ferme le mot qui précède et « é » ou « à » ouvre une autre
+// branche, sans frontière collée à elle. Mesuré le 13/11/2026 : 3 des 8 relevés du parc (un dans le pilot, un dans une
+// forge, un dans la classe `[\wà-ÿ])|\brafra` du pilot) étaient de cette forme, expressions justes accusées à tort.
+const P1_AVANT = new RegExp("\\\\b[(\\[]*[" + ACCENTS + "]");        //  \bÉ…
 // TROISIEME PIEGE, attrape par la fixture de cet oracle meme : `"[)\]|]*"` ne porte PAS le
 // crochet fermant dans la classe — `\]` n'est pas un echappement de chaine JavaScript, donc la
 // valeur devient `[)]|]*`, la classe se referme sur `)` et le `|` devient une ALTERNANCE :
 // l'expression matchait alors `]*\\b` seul, c'est-a-dire n'importe quelle frontiere. Elle
 // accusait tout. Le crochet fermant se double dans la chaine, toujours.
-const P1_APRES = new RegExp("[" + ACCENTS + "][)\\]|]*\\\\b");        //  …é\b
+const P1_APRES = new RegExp("[" + ACCENTS + "][)\\]]*\\\\b");        //  …é\b
 // P2 : une classe qui ne contient QUE des majuscules (ou un littéral tout en majuscules de 3+
 // lettres), dans une expression portant le drapeau insensible à la casse.
 // P2 a ete RESSERRE apres son premier passage sur le parc : il accusait 6 emplois legitimes
@@ -162,10 +166,15 @@ export function jugerDossierTemporaire(racineTemp = RACINE_TEMP) {
   const trouves = [];
   if (!existsSync(racineTemp)) return trouves;
   for (const f of fichiers(racineTemp, 0, EXT_P3, 6)) {
+    // TF-2496 (13/11/2026) : le dossier temporaire ne se juge qu'en P3, comme le dit l'en-tête de TF-1300 (« même garde P3 »).
+    // Le code lisait aussi P1 et P2 : les copies d'arbres de campagne (`wt-*`, 6 relevés chacune sur 8 arbres) et les scripts
+    // d'autres sessions rendaient 53 des 58 relevés temporaires du 13/11/2026, sans qu'aucun soit un fichier d'un dépôt.
+    // Un fichier minifié (`*.min.js`) est une bibliothèque tierce, jamais un script écrit par un heredoc : ses tables de
+    // caractères portent des octets de contrôle LICITES (`xlsx.full.min.js` : 5 relevés P3 sur la table des pages de code).
+    if (/\.min\.[cm]?js$/i.test(f)) continue;
     let texte = "";
     try { texte = readFileSync(f, "utf8"); } catch { continue; }
-    const constats = EXT.test(f) ? [...juger(texte), ...jugerOctets(texte)] : jugerOctets(texte);
-    for (const c of constats) trouves.push({ ...c, ou: `${relative(racineTemp, f).replaceAll("\\", "/")}:${c.ligne}` });
+    for (const c of jugerOctets(texte)) trouves.push({ ...c, ou: `${relative(racineTemp, f).replaceAll("\\", "/")}:${c.ligne}` });
   }
   return trouves;
 }
@@ -225,6 +234,15 @@ if (args.includes("--self-test")) {
     juger("const ECARTE = /(écart|ecart|refus)/i;").length === 0);
   att("P1 — une frontière sur un mot ASCII reste acceptée",
     juger("const M = /\\b(exit|status)\\b/;").length === 0);
+  // TF-2496 (13/11/2026) · une ALTERNANCE remet la frontière à zéro : ces trois formes, mesurées sur le parc le 13/11, sont justes.
+  att("P1 — TF-2496 : `\\btemporaire\\b|élévation` n'est pas accusée (le `\\b` ferme le mot qui précède, « é » ouvre une autre branche)",
+    juger("const A = /droits? d['’]administrat|\\btemporaire(ment)?\\b|élévation de privilèges|\\bPIM\\b/i;").length === 0);
+  att("P1 — TF-2496 : `réf\\b|à vérifier` n'est pas accusée non plus",
+    juger("const B = /^[\\s>*_]*(sources?\\b|selon\\b|réf\\b|à vérifier|https?:)/i;").length === 0);
+  att("P1 — TF-2496 : la classe Unicode `[\\wà-ÿ])|\\brafra` (le remède lui-même) n'est pas accusée",
+    juger("const C = /(?:\\bactualis[ée]e?s?(?![\\wà-ÿ])|\\brafra[iî]chi(?![\\wà-ÿ]))/i;").length === 0);
+  att("P1 — TF-2496 : sans le `|`, les deux vraies formes restent attrapées (`)` puis `\\b` après la lettre, `(` puis la lettre après `\\b`)",
+    juger("const D = /(tranché|validé)\\b/i;").some((c) => c.piege === "P1") && juger("const E = /\\b(écart|refus)/i;").some((c) => c.piege === "P1"));   // piege-ok
 
   // P2 · le cas EXACT du 23/08 : la règle S21, qui rendait PASS sur une action sans trace.
   const p2 = juger('const TRACE = /(HTTP\\s*\\d{3}|\\bE[A-Z]{4,}\\b|refusé)/i;');   // piege-ok
@@ -280,6 +298,17 @@ if (args.includes("--self-test")) {
   writeFileSync(join(session, "propre.mjs"), 'new RegExp(cle + "\\\\b")', "utf8");
   att("TF-1300 — un script SAIN du scratchpad ne déclenche rien",
     jugerDossierTemporaire(join(tempJetable, "claude")).filter((c) => /propre\.mjs/.test(c.ou)).length === 0);
+  // TF-2496 · le dossier temporaire ne se juge qu'en P3 : une frontière ASCII collée à un accent dans la COPIE d'un arbre de
+  // campagne n'est pas un fichier d'un dépôt, et une bibliothèque minifiée porte des octets de contrôle licites.
+  writeFileSync(join(session, "copie-arbre.mjs"), 'const X = /\\b(écart|refus)/i;\nconst Y = /(HTTP\\s*\\d{3}|\\bE[A-Z]{4,}\\b)/i;', "utf8");   // piege-ok
+  writeFileSync(join(session, "vendor.min.js"), 'var t="' + BS + String.fromCharCode(11) + '";', "utf8");
+  att("TF-2496 — la copie d'un arbre de campagne (P1 et P2 dans le scratchpad) ne déclenche rien : le temporaire ne se juge qu'en P3",
+    jugerDossierTemporaire(join(tempJetable, "claude")).filter((c) => /copie-arbre\.mjs/.test(c.ou)).length === 0);
+  att("TF-2496 — une bibliothèque minifiée (`*.min.js`) et ses octets de contrôle licites ne déclenchent rien",
+    jugerDossierTemporaire(join(tempJetable, "claude")).filter((c) => /vendor\.min\.js/.test(c.ou)).length === 0);
+  writeFileSync(join(session, "vendor.js"), 'var t="' + BS + '";', "utf8");
+  att("TF-2496 — le même octet dans un fichier NON minifié reste attrapé",
+    jugerDossierTemporaire(join(tempJetable, "claude")).some((c) => /vendor\.js:/.test(c.ou) && c.piege === "P3"));
   att("TF-1300 — un scratchpad ABSENT (poste qui n'a encore rien écrit) ne lève pas, rend []",
     jugerDossierTemporaire(join(tempJetable, "jamais-cree")).length === 0);
   rmSync(tempJetable, { recursive: true, force: true });
@@ -350,7 +379,7 @@ for (const t of trouvesTemp) trouves.push(t);
 for (const t of trouves) ko(t.piege, t.ou, `${t.message} — expression : /${t.corps.slice(0, 90)}/`);
 if (!trouves.length) ok("P1+P2+P3", String(racine), `${lus} fichier(s) de code lus dans ${depots.length} dépôt(s) (parc) + scratchpad de session : aucune expression atteinte par les trois pièges connus, et aucun octet de contrôle accidentel`);
 
-console.log(JSON.stringify({ oracle: "oracle-pieges-regex", version: "1.0.0", racine: String(racine),
+console.log(JSON.stringify({ oracle: "oracle-pieges-regex", version: "1.1.0", racine: String(racine),
   verdict: trouves.length ? "FAIL" : "PASS", findings: F, non_juge: NON_JUGE }, null, jsonOnly ? 0 : 1));
 process.exit(trouves.length ? 1 : 0);
 }
