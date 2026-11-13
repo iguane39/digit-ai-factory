@@ -304,6 +304,51 @@ try {
     } });
     att(r.verdict === "PASS", `verdict ${r.verdict} — ${JSON.stringify(r.findings.filter((f) => f.statut === "FAIL"))}`);
   });
+  // ── TF-2482 : un arbre git imbriqué (worktree d'agent) n'est pas le dépôt jugé ──────────────
+  // Le fait, mesuré le 13/11/2026 sur main : CP1 rendait 31 commandes introuvables, dont 28 dans
+  // `.claude\worktrees\agent-*`, des arbres d'agents qui portent chacun leur `.git` et leurs
+  // propres documents (des états anciens ou à venir du dépôt, jamais le dépôt jugé).
+  check("TF-2482 VERT — une commande prescrite par un document d'un arbre git IMBRIQUÉ n'est pas jugée", () => {
+    const r = jugerParc({ pilot: { docs: {
+      "R.md": "node scripts\\s.mjs\n",
+      ".claude/worktrees/agent-a1/R.md": "node scripts\\disparu-de-main.mjs\n",
+      ".claude/worktrees/agent-a1/.git": "gitdir: C:/ailleurs/.git/worktrees/agent-a1\n",
+    }, scripts: { "scripts/s.mjs": "// s\n" } } });
+    att(passe(r, "CP1"), `CP1 ${(regle(r, "CP1") || {}).statut} — ${(regle(r, "CP1") || {}).message}`);
+    att(r.prescriptions === 1, `${r.prescriptions} prescription(s) lue(s), l'arbre imbriqué a été lu`);
+  });
+
+  check("TF-2482 ROUGE — le même document dans un sous-dossier SANS .git reste jugé : DOIT ÉCHOUER", () => {
+    const r = jugerParc({ pilot: { docs: {
+      "R.md": "node scripts\\s.mjs\n",
+      ".claude/worktrees/agent-a1/R.md": "node scripts\\disparu-de-main.mjs\n",
+    }, scripts: { "scripts/s.mjs": "// s\n" } } });
+    att(echoue(r, "CP1"), "l'exclusion déborde : un sous-dossier ordinaire échappe à CP1");
+    att(/disparu-de-main/.test(regle(r, "CP1").message), "la commande introuvable n'est pas nommée");
+  });
+
+  check("TF-2482 — le .git de la RACINE jugée ne l'écarte pas elle-même (dépôt avec son propre .git)", () => {
+    const r = jugerParc({ pilot: { docs: { "R.md": "node scripts\\absent.mjs\n", ".git/HEAD": "ref: refs/heads/main\n" } } });
+    att(echoue(r, "CP1"), "la racine jugée est écartée parce qu'elle porte un .git");
+  });
+
+  // ── TF-2482 : le nom d'EXEMPLE d'une seule lettre (`node x.mjs`) n'est pas une prescription ──
+  // Le fait : `references\NIVEAUX.md` écrit « un programme lancé par une commande (`node x.mjs`) »
+  // pour DÉCRIRE un effet que le relevé ne voit pas ; CP1 l'accusait de prescrire un script absent.
+  check("TF-2482 VERT — `node x.mjs` (nom d'exemple d'une lettre, sans dossier) est hors portée", () => {
+    att(estHorsPortee("x.mjs") && estHorsPortee("y.py"), "x.mjs / y.py ne sont pas reconnus comme exemples");
+    const r = jugerParc({ pilot: { docs: { "R.md": "node scripts\\s.mjs\n\nUn programme lancé (`node x.mjs`).\n" },
+      scripts: { "scripts/s.mjs": "// s\n" } } });
+    att(passe(r, "CP1"), `CP1 ${(regle(r, "CP1") || {}).statut} — ${(regle(r, "CP1") || {}).message}`);
+  });
+
+  check("TF-2482 ROUGE — un exemple qui porte un dossier ou un nom plein reste jugé : DOIT ÉCHOUER", () => {
+    for (const cmd of ["node scripts\\x.mjs", "node verifier.mjs", "node xy.mjs"]) {
+      att(!estHorsPortee(cmd.replace(/^node /, "")), `${cmd} est écarté — l'exclusion déborde`);
+      const r = jugerParc({ pilot: { docs: { "R.md": `${cmd}\n` } } });
+      att(echoue(r, "CP1"), `${cmd} absent n'est pas accusé`);
+    }
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }

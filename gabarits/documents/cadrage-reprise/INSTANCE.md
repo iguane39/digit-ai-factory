@@ -33,7 +33,7 @@ version_du_gabarit: 1.0.0
 
 | # | Lot | Contenu | Dépend de | Preuve de fin |
 |---|---|---|---|---|
-| 1 | Configuration unique | Un fichier de configuration lu par les trois environnements, sans valeur secrète | aucun | `node scripts/verifier-config.mjs` rend le code 0 sur les trois environnements |
+| 1 | Configuration unique | Un fichier de configuration lu par les trois environnements, sans valeur secrète | aucun | `node <produit-x>/scripts/verifier-config.mjs` rend le code 0 sur les trois environnements |
 | 2 | Recette rejouable | Un jeu de données de recette et les parcours automatisés | 1 | le rapport de recette liste 12 parcours, tous au vert |
 | 3 | Domaine de recette | Le nom de domaine de recette pointe sur le portail | 1 | la page d'accueil de recette répond avec la version `v1.4.0` |
 
@@ -41,7 +41,7 @@ version_du_gabarit: 1.0.0
 
 | Lot | Critère (oui ou non) | Qui le joue | Avec quoi | Où le résultat se lit |
 |---|---|---|---|---|
-| 1 | Aucune valeur secrète n'apparaît dans le fichier de configuration | le Build | `node scripts/verifier-config.mjs` | sortie du script, code de retour |
+| 1 | Aucune valeur secrète n'apparaît dans le fichier de configuration | le Build | `node <produit-x>/scripts/verifier-config.mjs` | sortie du script, code de retour |
 | 2 | Les 12 parcours passent sur le jeu de données de recette | le Build, puis le porteur | `npm run recette` | `recette/rapport.html` |
 | 3 | La page de recette affiche la version de l'étiquette déployée | le porteur | un navigateur | l'en-tête de la page de recette |
 

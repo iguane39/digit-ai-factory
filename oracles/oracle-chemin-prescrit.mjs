@@ -84,6 +84,11 @@ export const RE_PRESCRIPTION = /node\s+((?:[A-Za-z]:)?[\w.$<>/\\-]*[\w>-]+\.(?:m
 export const HORS_PORTEE = [
   /^~[\\/]/, /^forge[\\/]/, /^\.claude[\\/]/, /^\.\.[\\/]/,
   /[<>]/, /\$FORGE_ROOT/i, /%[A-Z_]+%/,
+  // TF-2482 : le nom d'EXEMPLE d'une seule lettre, sans dossier (`node x.mjs`, `python y.py`), que la
+  // prose de la doctrine emploie pour DÉCRIRE un programme sans en prescrire un. Mesuré : le seul cas
+  // jugé à tort est `references\NIVEAUX.md:116`. Un chemin avec dossier (`scripts/x.mjs`) ou un nom
+  // plein (`xy.mjs`) reste jugé : la borne est la lettre unique, pas « tout nom court ».
+  /^[A-Za-z]\.(?:mjs|cjs|js|py)$/,
 ];
 
 /**
@@ -168,6 +173,13 @@ export function depotsDuParc(racine) {
   } catch { return []; }
 }
 
+/**
+ * UN ARBRE GIT IMBRIQUÉ N'EST PAS LE DÉPÔT JUGÉ (TF-2482). Un sous-dossier qui porte son propre
+ * `.git` (fichier ou dossier) est un autre arbre de travail : les worktrees d'agents de
+ * `.claude\worktrees\` y copient les documents d'un état ancien ou à venir du dépôt. Mesuré le
+ * 13/11/2026 sur main : 28 des 31 commandes « introuvables » de CP1 venaient de ces arbres. Le
+ * `.git` de la racine jugée ne l'écarte pas : seul un SOUS-dossier est testé.
+ */
 export function documents(d, out = []) {
   let noms = [];
   try { noms = readdirSync(d); } catch { return out; }
@@ -175,7 +187,7 @@ export function documents(d, out = []) {
     if (SAUTES.has(nom)) continue;
     const p = join(d, nom);
     let st; try { st = statSync(p); } catch { continue; }
-    if (st.isDirectory()) documents(p, out);
+    if (st.isDirectory()) { if (!existsSync(join(p, ".git"))) documents(p, out); }
     else if (/\.md$/i.test(nom)) out.push(p);
   }
   return out;
@@ -374,6 +386,8 @@ export const NON_JUGE = [
   "la prescription en PROSE (« lancez le script de capture », « relancez l'oracle ») : seule la forme `node <script>` est reconnue, parce que deviner une prescription accuserait la doctrine qui décrit un défaut pour l'interdire — le faux positif le plus cher de tous",
   "les chemins de CONVENTION D'ACCUEIL (`forge\\…`, `.claude\\…`, `~\\…`) et les chemins sous PLACEHOLDER (`<racine>`, `$FORGE_ROOT`) sont écartés par construction : un gabarit prescrit un chemin qui n'a de sens que chez son hôte futur, et résoudre un paramètre serait l'inventer",
   "les documents de `output\\` et `input\\` : livrables et entrants datés, jamais des prescriptions. Un plan du 30/08 cite l'outillage du 30/08, et le corriger réécrirait l'histoire au lieu de cesser d'en produire (R-42)",
+  "les documents d'un ARBRE GIT IMBRIQUÉ (un sous-dossier qui porte son propre `.git`, tel un worktree d'agent de `.claude\\worktrees\\`) : un autre arbre de travail, jugé par son propre dépôt et non par celui-ci (TF-2482). Un dépôt versionné DANS le dépôt jugé échappe donc à CP1, et c'est voulu",
+  "le nom d'EXEMPLE d'une seule lettre sans dossier (`node x.mjs`, `python y.py`) : la prose de la doctrine s'en sert pour décrire un programme, pas pour en prescrire un (TF-2482). Un vrai script d'une lettre, sans dossier, échapperait à CP1 — aucun n'existe au parc, la borne est mesurée plutôt que promise",
   "CP2 juge la PRÉSENCE du libellé de l'option dans la source du script, jamais que le script en fasse quelque chose de juste : une option lue et jetée passe CP2, et c'est le banc — donc CP3 — qui a une chance de l'attraper",
   "CP3 ne mesure QUE les scripts qui portent un banc nommé `<script>.test.mjs`. Un script sans banc n'est pas accusé ici : son juge est l'invariant I1 de `oracles\\self-tests.mjs`, et deux vérités sur le même objet valent moins qu'une",
   "CP3 constate qu'un CAS cite l'option, jamais qu'il la joue BIEN ni sur la cible que la prescription nomme. Le défaut fondateur — `--sections` qui rend TimeoutError sur un panneau MASQUÉ — demanderait d'exécuter le geste sur une instance servie : c'est la classe `controle-joue-sur-fichier-pas-sur-instance-servie`, un autre dispositif sur un autre objet. La borne est déclarée, pas comblée",
