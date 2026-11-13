@@ -51,8 +51,8 @@
   "vu_le": "2026-11-06"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 47,
-  "vu_le": "2026-11-09"
+  "cas": 52,
+  "vu_le": "2026-11-13"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 10,
@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 241,
-  "vu_le": "2026-11-12"
+  "cas": 254,
+  "vu_le": "2026-11-13"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -266,8 +266,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-pieges-regex.mjs": {
-  "cas": 23,
-  "vu_le": "2026-10-02"
+  "cas": 30,
+  "vu_le": "2026-11-13"
  },
  "oracle-portee-doctrine.mjs": {
   "cas": 18,
@@ -395,8 +395,8 @@
   "vu_le": "2026-11-03"
  },
  "oracles/banc-paires/paires.test.mjs": {
-  "cas": 11,
-  "vu_le": "2026-10-13"
+  "cas": 12,
+  "vu_le": "2026-11-13"
  },
  "oracles/banc-restitutions/restitutions.test.mjs": {
   "cas": 11,
@@ -630,6 +630,10 @@
   "cas": 9,
   "vu_le": "2026-08-26"
  },
+ "scripts/compiler-flotte.test.mjs": {
+  "cas": 26,
+  "vu_le": "2026-11-13"
+ },
  "scripts/compter-lecture-usage.test.mjs": {
   "cas": 35,
   "vu_le": "2026-10-30"
@@ -763,8 +767,8 @@
   "vu_le": "2026-11-13"
  },
  "scripts/relever-appelants.test.mjs": {
-  "cas": 12,
-  "vu_le": "2026-10-29"
+  "cas": 21,
+  "vu_le": "2026-11-13"
  },
  "scripts/relever-contexte-sessions.test.mjs": {
   "cas": 10,
