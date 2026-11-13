@@ -50,13 +50,15 @@
  * après elle et nomme celle qui a écrit. Deux recettes le faisaient à chaque passage, sans le dire.
  *
  * Usage : node oracles\self-tests.mjs        → exit 0 si tout passe, 1 sinon.
+ *         `--appliquer` accepte une baisse ou une disparition du cliquet ; `--ecrire-baseline` inscrit les hausses dans un arbre de
+ *         campagne (worktree git lié), où elles ne s'inscrivent pas seules (TF-2480).
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline,
+  confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline, decisionInscription, arbreDeCampagne,
 } from "./lib-baseline-recettes.mjs";
 import { confronterSensRouge, verdictSensRouge, SEUIL_I6_BLOQUANT } from "./lib-sens-rouge.mjs";
 import { creerGarde } from "./lib-garde-arbre-suivi.mjs";
@@ -456,7 +458,14 @@ for (const d of bilan.disparues) {
     + "présente à la baseline, jouée par PERSONNE à ce passage. Restaurer la recette, ou retirer l'entrée "
     + "par `--appliquer` après avoir dit POURQUOI — une disparition est un geste écrit.");
 }
-if (bilan.montees.length && !bilan.baisses.length && !bilan.disparues.length) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
+// TF-2480 (13/11/2026) : dans un arbre de campagne (worktree git lié), les hausses ne s'inscrivent pas toutes seules : la référence de main se met à jour
+// par son écrivain, joué dans main (motif et limites : `lib-baseline-recettes.mjs`). `--ecrire-baseline` les inscrit sciemment.
+const inscription = decisionInscription(bilan, { campagne: arbreDeCampagne(join(ICI, "..")), forcer: process.argv.includes("--ecrire-baseline") });
+if (inscription.ecrire) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
+if (inscription.campagne) {
+  console.log(`  [CLIQUET] arbre de campagne (worktree git lié) : ${bilan.montees.length} hausse(s) vue(s) et NON inscrite(s) dans ${CHEMIN_BASELINE} — `
+    + "la référence de main se met à jour par son écrivain, joué dans main ; `--ecrire-baseline` l'inscrit ici sciemment (TF-2480)");
+}
 if ((bilan.baisses.length || bilan.disparues.length) && APPLIQUER) {
   const accepte = { ...bilan.baseline };
   for (const b of bilan.baisses) accepte[b.nom] = { cas: b.vu, vu_le: jour, baisse_acceptee_le: jour };
