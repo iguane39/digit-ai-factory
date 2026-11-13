@@ -349,9 +349,56 @@ try {
       att(echoue(r, "CP1"), `${cmd} absent n'est pas accusé`);
     }
   });
+  // ── CP5 (TF-2473) : une consigne ne cite pas le repli uv retiré du rendu de forge-design ────────
+  // Le fait : TF-2461 (forge-design b6ebb1a) a retiré le repli qui cherchait playwright dans
+  // l'environnement uv du dossier courant ; un produit qui lançait la critique ainsi rend SKIP tant qu'il
+  // ne pose pas FORGE_DESIGN_PYTHON. Une consigne qui dit encore « playwright dans l'environnement uv »
+  // envoie le producteur sur un chemin qui ne rend plus de verdict.
+  const AVEC_SCRIPT = { scripts: { "scripts/s.mjs": "// s\n" } };
+  const doc = (corps) => ({ pilot: { docs: { "R.md": `node scripts\\s.mjs\n\n${corps}\n` }, ...AVEC_SCRIPT } });
+
+  check("CP5 ROUGE — une consigne qui renvoie le rendu à playwright dans l'environnement uv : DOIT ÉCHOUER, avec sa ligne", () => {
+    const r = jugerParc(doc("Lancer la critique avec `--rendu` : playwright est dans l'environnement uv du produit, le rendu l'y trouve."));
+    att(echoue(r, "CP5"), "le repli retiré est cité sans que rien le refuse");
+    const m = regle(r, "CP5").message;
+    att(/R\.md:3/.test(m), `la ligne n'est pas citée : ${m.slice(0, 160)}`);
+    att(/FORGE_DESIGN_PYTHON/.test(m) && /TF-2461/.test(m), "le message ne nomme ni le remède ni l'origine du retrait");
+  });
+
+  check("CP5 VERT — le REMÈDE que le message recommande passe : la même consigne qui pose FORGE_DESIGN_PYTHON", () => {
+    const r = jugerParc(doc("Lancer la critique avec `--rendu` : playwright est dans l'environnement uv du produit, donc poser FORGE_DESIGN_PYTHON sur son interpréteur."));
+    att(passe(r, "CP5"), `CP5 ${(regle(r, "CP5") || {}).statut} — ${(regle(r, "CP5") || {}).message}`);
+  });
+
+  check("CP5 VERT — uv sans le rendu, playwright sans uv, `uv.lock` près de playwright : aucun n'est le repli", () => {
+    const r = jugerParc(doc("Les tests se jouent par `uv run python -m forge_tests .`.\n\nLe navigateur playwright se pose par `playwright install chromium`.\n\nLa dette uv.lock et playwright restent deux sujets."));
+    att(passe(r, "CP5"), `CP5 ${(regle(r, "CP5") || {}).statut} — ${(regle(r, "CP5") || {}).message}`);
+  });
+
+  check("CP5 VERT — playwright et uv côte à côte dans une consigne de forge-tests, sans rendu ni critique (3 cas mesurés au pilot)", () => {
+    const r = jugerParc(doc("Avant toute recette, `uv run --frozen --offline python recette/preparer_arbre.py`.\nElle ne couvre ni le navigateur Playwright ni Docker."));
+    att(passe(r, "CP5"), `faux positif : ${(regle(r, "CP5") || {}).message}`);
+  });
+
+  check("CP5 — une LIGNE de tableau est un paragraphe : le rendu sur une ligne, uv et playwright sur l'autre, ne s'additionnent pas ; sur UNE ligne ils sont accusés", () => {
+    const sans = jugerParc(doc("| Design | `--rendu` |\n| Tests | `uv run python -m forge_tests`, Playwright |"));
+    att(passe(sans, "CP5"), `deux lignes de tableau additionnées : ${(regle(sans, "CP5") || {}).message}`);
+    const avec = jugerParc(doc("| Design | `--rendu` avec playwright dans l'environnement uv |"));
+    att(echoue(avec, "CP5") && /R\.md:3/.test(regle(avec, "CP5").message), "la ligne de tableau qui cite le repli n'est pas accusée");
+  });
+
+  check("CP5 ROUGE — la forme `uv run … playwright` sur le rendu : DOIT ÉCHOUER aussi", () => {
+    const r = jugerParc(doc("Avant le rendu, `uv run --with playwright python render_page.py page.html`."));
+    att(echoue(r, "CP5"), "uv run avec playwright n'est pas vu");
+  });
+
+  check("CP5 — une consigne en UN seul paragraphe avec la variable n'est pas accusée, un autre paragraphe plus bas l'est", () => {
+    const r = jugerParc(doc("Le rendu (--rendu) lit FORGE_DESIGN_PYTHON, plus l'environnement uv du produit.\n\nAutre consigne : le rendu de playwright se lance depuis l'environnement uv."));
+    att(echoue(r, "CP5") && /R\.md:5/.test(regle(r, "CP5").message), `le second paragraphe n'est pas accusé seul : ${(regle(r, "CP5") || {}).message}`);
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }
 
-console.log(`\nchemin-prescrit (TF-1282) : ${pass} PASS, ${fail} FAIL — couverture à double sens sur CP1, CP2, CP3, CP4, plus les 5 calibrages payés sur le dépôt réel`);
+console.log(`\nchemin-prescrit (TF-1282) : ${pass} PASS, ${fail} FAIL — couverture à double sens sur CP1, CP2, CP3, CP4, CP5, plus les 5 calibrages payés sur le dépôt réel`);
 process.exit(fail ? 1 : 0);
