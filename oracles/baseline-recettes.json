@@ -359,8 +359,8 @@
   "vu_le": "2026-10-12"
  },
  "oracle-suivi-agents.mjs": {
-  "cas": 5,
-  "vu_le": "2026-11-12"
+  "cas": 10,
+  "vu_le": "2026-11-13"
  },
  "oracle-synthese.mjs": {
   "cas": 364,
@@ -483,8 +483,8 @@
   "vu_le": "2026-11-10"
  },
  "oracles/hook-suivi-agents.test.mjs": {
-  "cas": 41,
-  "vu_le": "2026-11-12"
+  "cas": 45,
+  "vu_le": "2026-11-13"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 25,

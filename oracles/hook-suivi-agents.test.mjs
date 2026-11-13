@@ -2,7 +2,7 @@
 // Recette de hook-suivi-agents.mjs et lib-suivi-agents.mjs (prompt 20261112g, ÉTAPE 3) : chaque état et chaque garde joués
 // sur une session fictive écrite dans un dossier temporaire, à double sens quand la règle a deux côtés.
 // Horloge : les instants sont passés en argument (`maintenant`), aucune attente réelle ; FORGE_SUIVI_POLL_MS=1 pour la veille.
-import { mkdtempSync, mkdirSync, writeFileSync, utimesSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, utimesSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -135,12 +135,22 @@ const avant = enTour({ session_id: "st1", transcript_path: st.transcript, tool_n
 verifier("en tour : rien avant 15 min", avant === null);
 const apres = enTour({ session_id: "st2", transcript_path: st.transcript, tool_name: "Bash" }, T0 + 16 * M);
 verifier("en tour : tour de plus de 15 min → point au contexte", /Suivi agents\n- session principale/.test(apres?.hookSpecificOutput?.additionalContext || ""));
+// L'outil d'un sous-agent porte `agent_id` : aucun rappel dans son contexte, et l'échéance de la session reste due.
+const sousAgent = enTour({ session_id: "st5", transcript_path: st.transcript, tool_name: "Bash", agent_id: "a1b2c3", agent_type: "campagne" }, T0 + 16 * M);
+verifier("en tour : outil d'un sous-agent → aucun rappel", sousAgent === null);
+verifier("en tour : rappel encore dû à la session après l'outil du sous-agent", /Suivi agents/.test(enTour({ session_id: "st5", transcript_path: st.transcript, tool_name: "Bash" }, T0 + 16.2 * M)?.hookSpecificOutput?.additionalContext || ""));
 const rep = enTour({ session_id: "st2", transcript_path: st.transcript, tool_name: "Bash" }, T0 + 16.5 * M);
 verifier("en tour : vérification au plus une fois par minute", rep === null);
 const encore = enTour({ session_id: "st2", transcript_path: st.transcript, tool_name: "Bash" }, T0 + 22 * M);
 verifier("en tour : point demandé absent du transcript, pas de nouveau rappel avant 15 min", encore === null);
 const ensuite = enTour({ session_id: "st2", transcript_path: st.transcript, tool_name: "Bash" }, T0 + 31.5 * M);
 verifier("en tour : nouveau rappel 15 min après le point demandé", /Suivi agents/.test(ensuite?.hookSpecificOutput?.additionalContext || ""));
+// Résumé de compaction écrit après le message humain, à une heure ANTÉRIEURE : il ne déplace pas le début du tour.
+const sc = session("s-compact", { humainA: T0 + 60 * M });
+appendFileSync(sc.transcript, JSON.stringify({ type: "user", isCompactSummary: true, isVisibleInTranscriptOnly: true, timestamp: iso(T0), message: { role: "user", content: "This session is being continued from a previous conversation." } }) + "\n");
+verifier("en tour : résumé de compaction ignoré, tour neuf muet", enTour({ session_id: "sc1", transcript_path: sc.transcript, tool_name: "Bash" }, T0 + 61 * M) === null);
+appendFileSync(sc.transcript, JSON.stringify({ type: "user", timestamp: iso(T0 + 62 * M), message: { role: "user", content: [{ type: "text", text: "A1 & A2" }] } }) + "\n");
+verifier("en tour : message humain après le résumé → début de tour", enTour({ session_id: "sc2", transcript_path: sc.transcript, tool_name: "Bash" }, T0 + 78 * M) !== null);
 const sansAv = enTour({ session_id: "st3", transcript_path: st.transcript, tool_name: "Agent", tool_input: { prompt: "Fais X." } }, T0 + 1 * M);
 verifier("Agent sans fichier d'avancement signalé", /ne nomme aucun fichier d'avancement/.test(sansAv?.hookSpecificOutput?.additionalContext || ""));
 const avecAv = enTour({ session_id: "st4", transcript_path: st.transcript, tool_name: "Agent", tool_input: { prompt: "Écris dans C:/t/campagne-x/avancement.jsonl" } }, T0 + 1 * M);

@@ -44,6 +44,11 @@ export function dossierEtat() { return process.env.FORGE_SUIVI_ETAT || join(tmpd
 export function lireEtat(session) {
   try { return JSON.parse(readFileSync(join(dossierEtat(), `${session}.json`), "utf8")); } catch { return {}; }
 }
+// Les points demandés se gardent 8 jours, pas par nombre : le relevé d'usage d'une semaine les lit (oracle-suivi-agents,
+// session VS Code dont le transcript ne garde pas le texte du point, TF-2472). « Les 20 derniers » en perdait dès le 2e jour.
+export function ajouterDemande(liste, t) {
+  return [...(liste || []), new Date(t).toISOString()].filter((x) => Date.parse(x) >= t - 8 * 24 * 60 * MINUTE);
+}
 export function ecrireEtat(session, maj) {
   try {
     mkdirSync(dossierEtat(), { recursive: true });
@@ -79,7 +84,7 @@ export async function veiller(entree, { maintenant = () => Date.now(), dormirMs 
     if ((du && t - dernierReveil >= ECART_REVEILS_MS) || borne) {
       const point = redigerPoint(etat, t);
       if (point) {
-        ecrireEtat(session, { dernier_reveil: new Date(t).toISOString(), points_demandes: [...(etatFichier.points_demandes || []), new Date(t).toISOString()].slice(-20) });
+        ecrireEtat(session, { dernier_reveil: new Date(t).toISOString(), points_demandes: ajouterDemande(etatFichier.points_demandes, t) });
         return { code: 2, texte: consignePoint(point), point };
       }
       if (borne) return { code: 0, motif: "borne atteinte sans agent à montrer" };
@@ -90,6 +95,10 @@ export async function veiller(entree, { maintenant = () => Date.now(), dormirMs 
 
 /** Mode en tour (PostToolUse) : rend le JSON à écrire sur stdout, ou null. */
 export function enTour(entree, maintenant = Date.now()) {
+  // L'outil d'un SOUS-AGENT déclenche aussi ce hook, avec l'identifiant de session et le transcript du parent ; son entrée
+  // porte `agent_id` et `agent_type` (mesuré le 13/11/2026 sur 14 entrées, harnais 2.1.322). Le rappel y partait dans le
+  // contexte de l'agent, jamais vu de la session, et repoussait l'échéance : 4 rappels sur 5 perdus ainsi le 13/11 au matin.
+  if (entree.agent_id) return null;
   const session = entree.session_id || "inconnue";
   const transcript = entree.transcript_path;
   const sorties = [];
@@ -111,7 +120,7 @@ export function enTour(entree, maintenant = Date.now()) {
       if (etat.echeance !== null && maintenant >= etat.echeance && maintenant - dernierRappel >= ECART_RAPPELS_MS) {
         const point = redigerPoint(etat, maintenant);
         if (point) {
-          ecrireEtat(session, { dernier_rappel: new Date(maintenant).toISOString(), points_demandes: [...(e.points_demandes || []), new Date(maintenant).toISOString()].slice(-20) });
+          ecrireEtat(session, { dernier_rappel: new Date(maintenant).toISOString(), points_demandes: ajouterDemande(e.points_demandes, maintenant) });
           sorties.push(consignePoint(point, { enTour: true }));
         }
       }

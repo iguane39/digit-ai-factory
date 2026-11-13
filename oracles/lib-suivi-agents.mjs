@@ -90,7 +90,9 @@ function texteAssistant(e) {
 }
 
 function estMessageHumain(e) {
-  if (!e || e.type !== "user" || e.isMeta) return false;
+  // Le résumé de compaction est écrit APRÈS le message humain, à l'heure de la compaction : le prendre pour un début de
+  // tour a fait dire « tour en cours depuis 553 min » au premier outil d'un tour neuf (13/11/2026).
+  if (!e || e.type !== "user" || e.isMeta || e.isCompactSummary || e.isVisibleInTranscriptOnly) return false;
   const c = e.message && e.message.content;
   if (typeof c === "string") return !/^<task-notification>/.test(c.trim());
   if (!Array.isArray(c)) return false;
