@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 697 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 698 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -724,6 +724,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md | 20261021c | 6.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md` |
 | Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md | 20261030a | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md` |
 | Digit-AI - Synthese Mandat - Suites du tri TikTok et revues de code - 20261103c.md | 20261103c | 14.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Suites du tri TikTok et revues de code - 20261103c.md` |
+| Digit-AI - Synthese Mandat - Suivi des agents A1 et A2 - 20261113d.md | 20261113d | 8.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Suivi des agents A1 et A2 - 20261113d.md` |
 | Digit-AI - Synthese Mandat - Suivi des agents toutes les 15 minutes - 20261112j.md | 20261112j | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Suivi des agents toutes les 15 minutes - 20261112j.md` |
 | Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md | 20261019a | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md | 20261019i | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md` |

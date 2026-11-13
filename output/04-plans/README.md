@@ -223,6 +223,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md` | fichier | 6,3 Ko | Synthèse Mandat — skill oeil-critique créé et installé, 3 retraits faits (21/10/2026) |
 | `Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md` | fichier | 7,8 Ko | Synthèse Mandat — skill PDF de la Factory, construit et publié, aucune décision attendue ( |
 | `Digit-AI - Synthese Mandat - Suites du tri TikTok et revues de code - 20261103c.md` | fichier | 14,4 Ko | Synthèse Mandat — suites du tri TikTok et revues de code (02 et 03/11/2026) |
+| `Digit-AI - Synthese Mandat - Suivi des agents A1 et A2 - 20261113d.md` | fichier | 8,7 Ko | Synthèse Mandat — suivi des agents, 2 produits équipés et premier relevé d'usage, 13/11/20 |
 | `Digit-AI - Synthese Mandat - Suivi des agents toutes les 15 minutes - 20261112j.md` | fichier | 13,6 Ko | Synthèse Mandat — suivi des agents toutes les 15 minutes, construit et prouvé, 12/11/2026 |
 | `Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` | fichier | 9,2 Ko | Synthèse Mandat — sujets ouverts au 19/10/2026 |
 | `Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md` | fichier | 6,8 Ko | Synthèse Mandat — pilot aligné sur GitHub, 29 commits récupérés, rien à publier (19/10/202 |
@@ -240,4 +241,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_219 fichier(s), 4 sous-dossier(s)_
+_220 fichier(s), 4 sous-dossier(s)_
