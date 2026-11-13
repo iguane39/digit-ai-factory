@@ -88,6 +88,36 @@ check("VERT — une déclaration indentée n'est pas au niveau module", () => {
   if (resolutionsAuNiveauModule(ligne).length) throw new Error("l'indentation n'est pas le discriminant");
 });
 
+// -- CA2 et la fonction fléchée de premier niveau (TF-2483) ----------------------------------------
+// Le fait, mesuré le 13/11/2026 : `oracles\oracle-reprise.mjs:131` écrit
+// `const dossierEtat = (opt) => opt.etat || … join(homedir(), …)` — la résolution est dans le CORPS
+// d'une fonction fléchée, donc jamais au chargement, et CA2 l'accusait pour sa seule colonne 0.
+check("VERT (TF-2483) — une fonction FLÉCHÉE de premier niveau qui résout le répertoire personnel dans son corps passe CA2", () => {
+  const formes = [
+    'const dossierEtat = (opt) => opt.etat || join(homedir(), ".etat");',
+    'const dossierEtat = opt => opt.etat || join(homedir(), ".etat");',
+    'export const dossierEtat = async (opt) => join(homedir(), ".etat");',
+    'const dossierEtat = function (opt) { return join(homedir(), ".etat"); };',
+  ];
+  for (const l of formes) {
+    if (resolutionsAuNiveauModule(l).length) throw new Error(`faux positif sur « ${l} » : le corps d'une fonction ne s'exécute pas au chargement`);
+  }
+  const f = constat(juger(depot(`import { homedir } from "node:os";\n${formes[0]}\n`)), "CA2");
+  if (f.statut !== "PASS") throw new Error(`CA2 ${f.statut} : ${f.message}`);
+});
+
+check("ROUGE (TF-2483) — une valeur résolue au chargement reste accusée, fût-elle près d'une fonction : DOIT ÉCHOUER", () => {
+  const formes = [
+    'const racine = join(homedir(), ".etat");',
+    'const lire = lireDans(join(homedir(), ".etat"), (x) => x);',
+    'const exe = existsSync(join(homedir(), "AppData", "claude.exe")) ? join(homedir(), "AppData", "claude.exe") : "claude";',
+    'const dossier = (() => join(homedir(), ".etat"))();',
+  ];
+  for (const l of formes) {
+    if (!resolutionsAuNiveauModule(l).length) throw new Error(`l'exclusion déborde : « ${l} » s'exécute au chargement et n'est plus accusée`);
+  }
+});
+
 // -- CA3 : la fonction partagee rend bien les deux choses ---------------------------------------
 check("VERT — une lib qui rend le chemin ET la variable décidante passe CA3", () => {
   const f = constat(juger(depot("// rien\n")), "CA3");

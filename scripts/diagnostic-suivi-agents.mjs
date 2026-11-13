@@ -17,9 +17,9 @@
  * Usage : node scripts/diagnostic-suivi-agents.mjs [--jours 30] [--profils <d1>,<d2>] [--echantillon 10] [--graine 20261112] [--json <sortie>]
  */
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
-import { homedir } from "node:os";
+import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { racineConfigInstallee } from "./lib-config-installee.mjs";
 
 const opt = (n, d = null) => { const i = process.argv.indexOf(n); return i > 1 ? process.argv[i + 1] : d; };
 const MIN = 60000;
@@ -126,9 +126,18 @@ export function classer(agent, session, consigne) {
 
 function aleatoire(graine) { let s = graine >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
 
+/**
+ * Les profils de configuration du poste, par la fonction partagée (TF-2483, TF-0995) : celui que la session charge (`CLAUDE_CONFIG_DIR`),
+ * puis `~\.claude` et son frère `~\.claude-b`, sans doublon. Sans répertoire personnel, la liste est vide au lieu de lever.
+ */
+function profilsParDefaut() {
+  const defaut = racineConfigInstallee({}).racine;
+  return [...new Set([racineConfigInstallee().racine, defaut, defaut && join(dirname(defaut), ".claude-b")].filter(Boolean))];
+}
+
 async function main() {
   const jours = Number(opt("--jours", "30"));
-  const profils = (opt("--profils") || [join(homedir(), ".claude"), join(homedir(), ".claude-b")].join(",")).split(",");
+  const profils = (opt("--profils") || profilsParDefaut().join(",")).split(",");
   const depuis = Date.now() - jours * 24 * 3600000;
   const { pseudonymeProduit } = await import("./lib-pseudonyme-produit.mjs");
   const parc = "c:\\dev";

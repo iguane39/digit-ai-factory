@@ -29,6 +29,7 @@ import { mkdirSync, writeFileSync, createWriteStream, existsSync, readFileSync }
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
+import { racineConfigInstallee } from "./lib-config-installee.mjs";
 
 const PILOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const opt = (n, d = null) => { const i = process.argv.indexOf(n); return i > 1 ? process.argv[i + 1] : d; };
@@ -59,8 +60,15 @@ const SCENARIOS = { e2e: ["e2e"], fige: ["fige", "commande"], court: ["court"] }
 const message = `Banc du suivi des agents. Lance avec l'outil Agent, dans un seul message et en arrière-plan :\n${SCENARIOS[banc].map(lancer).join("\n")}\n\nPuis termine ton tour en écrivant exactement « Lancé. » et rien d'autre. N'appelle aucun autre outil.`;
 
 const env = { ...process.env, BASH_MAX_TIMEOUT_MS: "3000000", CLAUDE_CODE_AUTO_BACKGROUND_TIMEOUT_MS: "3000000", FORGE_HOOKS_JOURNAL: slash(join(dossier, "hooks-journal.jsonl")) };
-const exe = existsSync(join(homedir(), "AppData", "Roaming", "npm", "node_modules", "@anthropic-ai", "claude-code", "bin", "claude.exe"))
-  ? join(homedir(), "AppData", "Roaming", "npm", "node_modules", "@anthropic-ai", "claude-code", "bin", "claude.exe") : "claude";
+// TF-2483 : le répertoire personnel se résout DANS une fonction ; sans lui, le banc retombe sur `claude` du PATH au lieu de lever au chargement.
+function exeClaude() {
+  try {
+    const p = join(homedir(), "AppData", "Roaming", "npm", "node_modules", "@anthropic-ai", "claude-code", "bin", "claude.exe");
+    if (existsSync(p)) return p;
+  } catch { /* pas de répertoire personnel : `claude` du PATH */ }
+  return "claude";
+}
+const exe = exeClaude();
 const args = ["-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose", "--model", modele, "--permission-mode", "bypassPermissions"];
 const sortie = createWriteStream(join(dossier, "sortie.jsonl"));
 const debut = new Date();
@@ -78,7 +86,9 @@ enfant.on("exit", (code) => {
   let session = null;
   try { for (const l of readFileSync(join(dossier, "sortie.jsonl"), "utf8").split("\n")) { const o = JSON.parse(l || "null"); if (o && o.session_id) { session = o.session_id; break; } } } catch { /* sortie vide */ }
   const projet = dossier.replace(/[^A-Za-z0-9]/g, "-");
-  const transcript = session ? join(homedir(), ".claude", "projects", projet, `${session}.jsonl`) : null;
+  // TF-2483 : la racine de configuration que la session lancée a chargée (celle de `env`, qui porte `CLAUDE_CONFIG_DIR`), pas `~\.claude` en dur.
+  const racineConfig = racineConfigInstallee(env).racine;
+  const transcript = session && racineConfig ? join(racineConfig, "projects", projet, `${session}.jsonl`) : null;
   writeFileSync(join(dossier, "banc.json"), JSON.stringify({ ...bilan, fin: new Date().toISOString(), code, session, transcript, transcript_existe: transcript ? existsSync(transcript) : false }, null, 1));
   console.log(`banc ${banc} fini, code ${code}, session ${session}, transcript ${transcript}`);
   process.exit(0);
