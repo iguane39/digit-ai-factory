@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 699 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 700 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -656,6 +656,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md | 20261021a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md` |
 | Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md | 20261026c | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` |
 | Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md | 20261103e | 5 Ko | `04-plans/Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` |
+| Digit-AI - Synthese Mandat - Lot de retours Produit-86 du 12-11 traite - 20261113f.md | 20261113f | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Lot de retours Produit-86 du 12-11 traite - 20261113f.md` |
 | Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
 | Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md | 20261103q | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md` |
