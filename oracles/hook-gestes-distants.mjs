@@ -108,8 +108,8 @@
  * Exit : 0 laisse passer · 2 refuse (motif sur stderr) ; en mode --poser : 0 posé · 1 lot refusé.
  */
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
+import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { DUREE_DEFAUT_MIN, avertissement, clore, creationsVivantes, ecrireLigne, gestesOuverts, jugerRetrait, ligneCreation, ligneModification, ligneRetrait, lireRegistre, ouvrir, viseeParCible } from "./lib-gestes-en-cours.mjs";
@@ -1583,7 +1583,9 @@ export function construireLot(spec, { maintenant = Date.now(), dureeH = DUREE_MA
 function transcriptionDeSession(env = process.env) {
   const id = String(env.CLAUDE_CODE_SESSION_ID || "");
   if (!/^[\w-]+$/.test(id)) return null;
-  for (const b of [env.CLAUDE_CONFIG_DIR, join(homedir(), ".claude")].filter(Boolean)) {
+  // TF-2483 : le défaut `~\.claude` se résout par la fonction partagée (env vide : on ne relit pas CLAUDE_CONFIG_DIR, déjà essayée
+  // en premier) ; sans répertoire personnel, elle rend `racine: null` et la recherche saute ce candidat au lieu de lever.
+  for (const b of [env.CLAUDE_CONFIG_DIR, racineConfigInstallee({}).racine].filter(Boolean)) {
     let projets = [];
     try { projets = readdirSync(join(b, "projects")); } catch { continue; }
     for (const p of projets) { const f = join(b, "projects", p, `${id}.jsonl`); if (existsSync(f)) return f; }

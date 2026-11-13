@@ -24,9 +24,10 @@
  * une commande d'arrière-plan de la session, une session `claude -p` lancée par un script.
  */
 import { existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, utimesSync, rmSync, openSync, readSync, closeSync } from "node:fs";
-import { join, basename } from "node:path";
-import { homedir, tmpdir } from "node:os";
+import { join, basename, dirname } from "node:path";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
 import { lireParent, agentsDeSession, MINUTE } from "./lib-suivi-agents.mjs";
 import { lireEtat } from "./hook-suivi-agents.mjs";
 
@@ -83,6 +84,16 @@ export function mesurerSession(transcript, maintenant = Date.now(), { depuis = 0
     res.push({ id: a.id, nom: a.nom, courseMin: +courseMin.toFixed(1), fini: a.fini, points: pts.map((t) => new Date(t).toISOString()), source, ecarts: ecarts.map((e) => ({ ...e, min: +e.min.toFixed(1) })), pire: +pire.toFixed(1), verdict, cause, motif });
   }
   return res;
+}
+
+/**
+ * Les profils de configuration du poste, par la fonction partagée (TF-2483, TF-0995) : celui que la session charge (`CLAUDE_CONFIG_DIR`),
+ * puis `~\.claude` et son frère `~\.claude-b`, sans doublon. Sans répertoire personnel, la fonction rend `racine: null` : la liste
+ * est vide au lieu de lever, et l'appelant le dit.
+ */
+function profilsParDefaut() {
+  const defaut = racineConfigInstallee({}).racine;
+  return [...new Set([racineConfigInstallee().racine, defaut, defaut && join(dirname(defaut), ".claude-b")].filter(Boolean))];
 }
 
 function transcriptsDepuis(depuis, profils) {
@@ -181,7 +192,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     depuis = Date.parse(args[iDepuis + 1]);
     if (Number.isNaN(depuis)) { console.error("--depuis : date illisible"); process.exit(2); }
     const iP = args.indexOf("--profils");
-    const profils = iP >= 0 ? args[iP + 1].split(",") : [join(homedir(), ".claude"), join(homedir(), ".claude-b")];
+    const profils = iP >= 0 ? args[iP + 1].split(",") : profilsParDefaut();
     transcripts.push(...transcriptsDepuis(depuis, profils));
   }
   if (!transcripts.length) { console.error("usage : --transcript <session.jsonl> | --depuis <date> | --self-test"); process.exit(2); }
