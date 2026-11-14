@@ -396,9 +396,69 @@ try {
     const r = jugerParc(doc("Le rendu (--rendu) lit FORGE_DESIGN_PYTHON, plus l'environnement uv du produit.\n\nAutre consigne : le rendu de playwright se lance depuis l'environnement uv."));
     att(echoue(r, "CP5") && /R\.md:5/.test(regle(r, "CP5").message), `le second paragraphe n'est pas accusé seul : ${(regle(r, "CP5") || {}).message}`);
   });
+
+  // ── CP6 (TF-2526, piste 2 de TF-2518) : les arguments positionnels prescrits tiennent dans l'usage du script ────────────────
+  //
+  // Le fait fondateur : le README de forge-websec prescrivait `node scripts\capturer.mjs <url> <capture.json>` ; le script déclarait
+  // `Usage : node capturer.mjs <url> [--sortie <fichier.json>] …` et ne lisait qu'un positionnel. L'oracle rendait PASS avant comme
+  // après la correction du script (CP1 : le chemin résout ; CP2 : aucune option prescrite).
+  const ANCIEN_USAGE = "#!/usr/bin/env node\n// capturer — capture réelle d'une réponse HTTP(S).\n// Usage : node capturer.mjs <url> [--sortie <fichier.json>] [--suivre-redirections] [--timeout-ms <n>]\nconsole.log('x');\n";
+  const NOUVEL_USAGE = "#!/usr/bin/env node\n// capturer — capture réelle d'une réponse HTTP(S).\n// Usage : node capturer.mjs <url> [<fichier.json> | --sortie <fichier.json>] [--suivre-redirections] [--timeout-ms <n>]\nconsole.log('x');\n";
+  const README_WEBSEC = "# forge\n\n| Capturer | `node scripts\\capturer.mjs <url> <capture.json>` puis `node oracles\\oracle-exposition.mjs <capture.json>` |\n";
+  const cp6 = (docs, scripts) => jugerParc({ pilot: { docs: { "README.md": docs }, scripts } });
+
+  check("CP6 ROUGE — l'ancienne forme de capturer.mjs (un positionnel) contre la table d'usage du README (deux) : DOIT ÉCHOUER, avec les deux nombres et la ligne d'usage", () => {
+    const r = cp6(README_WEBSEC, { "scripts/capturer.mjs": ANCIEN_USAGE, "oracles/oracle-exposition.mjs": "// Usage : node oracle-exposition.mjs <capture.json>\n" });
+    att(echoue(r, "CP6"), `CP6 a absous la table d'usage de TF-2518 — ${JSON.stringify(regle(r, "CP6"))}`);
+    const m = regle(r, "CP6").message;
+    att(/README\.md:3/.test(m) && /<url> <capture\.json>/.test(m) && /\(2\)/.test(m) && /accepte 1/.test(m) && /« node capturer\.mjs <url> \[--sortie/.test(m), `le constat ne nomme pas la ligne, les deux positionnels et l'usage : ${m.slice(0, 300)}`);
+    att(passe(r, "CP1") && passe(r, "CP2"), "CP1 et CP2 doivent rester vertes : c'est la lacune que CP6 ferme");
+  });
+
+  check("CP6 VERT — la forme corrigée de capturer.mjs (`<url> [<fichier.json> | --sortie <fichier.json>]`) accepte la même prescription", () => {
+    const r = cp6(README_WEBSEC, { "scripts/capturer.mjs": NOUVEL_USAGE, "oracles/oracle-exposition.mjs": "// Usage : node oracle-exposition.mjs <capture.json>\n" });
+    att(passe(r, "CP6"), `CP6 ${JSON.stringify(regle(r, "CP6"))}`);
+  });
+
+  check("CP6 ROUGE — un positionnel obligatoire manquant (`derive.mjs <snapshots.jsonl>` contre `<plan.json> <snapshots.jsonl>`, cas réel d'INVENTAIRE.md) est accusé", () => {
+    const r = cp6("`node scripts\\derive.mjs <snapshots.jsonl>`\n", { "scripts/derive.mjs": "// Usage : node derive.mjs <plan.json> <snapshots.jsonl> [--index N] [--json-only]\n" });
+    att(echoue(r, "CP6") && /accepte 2/.test(regle(r, "CP6").message), `positionnel manquant non vu : ${JSON.stringify(regle(r, "CP6"))}`);
+  });
+
+  check("CP6 VERT — la valeur d'une option n'est pas un positionnel : `--sortie <f>`, `[--run <id>]`, `--depuis <date>` (usage `--depuis AAAA-MM-JJ`)", () => {
+    const r = cp6("`node scripts\\a.mjs <ledger.jsonl> [--run <id>]`\n\n`node scripts\\a.mjs <ledger.jsonl> --sortie <fichier> --depuis <date>`\n", {
+      "scripts/a.mjs": "// Usage : node a.mjs <ledger.jsonl> [--run <id>] [--sortie <f>] [--depuis AAAA-MM-JJ]\n" });
+    att(passe(r, "CP6"), `une valeur d'option a été prise pour un positionnel — ${JSON.stringify(regle(r, "CP6"))}`);
+  });
+
+  check("CP6 VERT — une prescription sans positionnel (`--self-test`, `--help`) n'est jamais accusée, même quand l'usage en exige", () => {
+    const r = cp6("`node scripts\\a.mjs --self-test`\n", { "scripts/a.mjs": "// Usage : node a.mjs <fichier> [--self-test]\n" });
+    att(!echoue(r, "CP6"), `CP6 a accusé une prescription sans argument — ${JSON.stringify(regle(r, "CP6"))}`);
+  });
+
+  check("CP6 VERT — un usage à plusieurs modes (une ligne `node …` par mode) est satisfait par l'un d'eux ; la prose après la commande n'est pas lue", () => {
+    const src = "// Usage : node m.mjs --verifier [--json]\n//         node m.mjs --mesurer <ID> [--dossier <d>]...\n//         node m.mjs <a> <b>\n";
+    const r = cp6("`node scripts\\m.mjs <a> <b>`, puis `node scripts\\n.mjs <c>` pour la suite.\n\nPrescrit : `node scripts\\m.mjs --mesurer <ID>` et la sortie <x> <y> <z> se lit.\n", { "scripts/m.mjs": src, "scripts/n.mjs": "// Usage : node n.mjs <c>\n" });
+    att(passe(r, "CP6"), `CP6 ${JSON.stringify(regle(r, "CP6"))}`);
+  });
+
+  check("CP6 — un script qui ne déclare aucun usage n'est pas jugé, et le constat le DIT (SANS_OBJET), jamais un PASS", () => {
+    const r = cp6("`node scripts\\sans-usage.mjs <a> <b> <c>`\n", { "scripts/sans-usage.mjs": "console.log('pas de ligne d usage');\n" });
+    const f = regle(r, "CP6");
+    att(f.statut === "SANS_OBJET" && /1 script\(s\) sans ligne/.test(f.message), `CP6 ${JSON.stringify(f)}`);
+  });
+
+  check("CP6 — usage variadique (`<fichier>...`) : plusieurs positionnels passent ; usage lu dans une chaîne `Usage : …` d'un script", () => {
+    const r = cp6("`node scripts\\v.mjs <a> <b> <c>`\n\n`node scripts\\w.mjs <x> <y>`\n", {
+      "scripts/v.mjs": "// Usage : node v.mjs <fichier>...\n",
+      "scripts/w.mjs": "const USAGE = \"Usage : node w.mjs <x> [<y>]\";\n" });
+    att(passe(r, "CP6"), `CP6 ${JSON.stringify(regle(r, "CP6"))}`);
+    const trop = cp6("`node scripts\\w.mjs <x> <y> <z>`\n", { "scripts/w.mjs": "const USAGE = \"Usage : node w.mjs <x> [<y>]\";\n" });
+    att(echoue(trop, "CP6"), "l'usage d'une chaîne n'est pas lu");
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }
 
-console.log(`\nchemin-prescrit (TF-1282) : ${pass} PASS, ${fail} FAIL — couverture à double sens sur CP1, CP2, CP3, CP4, CP5, plus les 5 calibrages payés sur le dépôt réel`);
+console.log(`\nchemin-prescrit (TF-1282) : ${pass} PASS, ${fail} FAIL — couverture à double sens sur CP1, CP2, CP3, CP4, CP5, CP6, plus les 5 calibrages payés sur le dépôt réel`);
 process.exit(fail ? 1 : 0);

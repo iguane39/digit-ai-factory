@@ -295,8 +295,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   de dérive (seuils, régression de verdict, disparition de sonde). 3 volets : data
   (prouvé sur fixture), tests (prouvé), veille citation IA (**déclaré**, méthode manuelle
   documentée). Elle observe et alerte, ne corrige jamais.
-- **Point d'entrée réel** : `node scripts\observer.mjs <plan.json>` ·
-  `node scripts\derive.mjs <snapshots.jsonl>` (contrats JSON, exit 0/1/2).
+- **Point d'entrée réel** : `node scripts\observer.mjs <plan.json> <snapshots.jsonl>` ·
+  `node scripts\derive.mjs <plan.json> <snapshots.jsonl>` (contrats JSON, exit 0/1/2).
 - **Maturité** : v0 née exercée — self-test double sens **30 PASS**. Dettes : pas de
   scheduler ni d'alerting (le FAIL est le signal), composition avec un oracle réel de
   forge-data à exercer au premier plan réel.

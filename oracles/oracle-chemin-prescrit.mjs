@@ -47,6 +47,10 @@
  *         repli, la référence qui l'a retiré et son remède ; un paragraphe qui parle de l'outil retiré
  *         sans nommer le remède est refusé. Premier repli : playwright cherché dans l'environnement
  *         uv par `--rendu` de forge-design, retiré par TF-2461, remplacé par `FORGE_DESIGN_PYTHON`.
+ *   CP6 · les ARGUMENTS POSITIONNELS prescrits (`<url> <capture.json>`) tiennent dans l'usage que le
+ *         script déclare (`Usage : node <script> …`) : leur nombre, de ses positionnels obligatoires à
+ *         tous les siens, la valeur d'une option n'en étant pas un (TF-2526, piste 2 de TF-2518 : la
+ *         table d'usage d'un README prescrivait deux positionnels, le script en lisait un).
  *
  * ============================================================================================
  * LES EXCLUSIONS, ÉCRITES ET MESURÉES — un faux positif sur une prescription fait désactiver
@@ -214,7 +218,9 @@ export function prescriptions(depot, racineParc) {
       const brut = m[1];
       const chemin = brut.replaceAll("\\", "/");
       const options = (m[2] || "").trim().split(/\s+/).filter((o) => o.startsWith("--"));
-      const entree = { document: doc, ligne: ligneDe(texte, m.index), chemin: brut, options, resolu: null, horsPortee: estHorsPortee(brut, texte) };
+      // CP6 : le reste de la ligne derrière le chemin (options comprises, que le motif a déjà lues), d'où se lisent les arguments positionnels
+      const suite = texte.slice(m.index + m[0].length - (m[2] || "").length).split(/\r?\n/, 1)[0];
+      const entree = { document: doc, ligne: ligneDe(texte, m.index), chemin: brut, options, suite, resolu: null, horsPortee: estHorsPortee(brut, texte) };
       if (!entree.horsPortee) {
         const candidats = [
           resolve(dirname(doc), chemin),
@@ -351,6 +357,104 @@ export function replisRetiresCites(depot, table = REPLIS_RETIRES) {
   return out;
 }
 
+// ── CP6 (TF-2526, décision du pilot du 14/11/2026 ; piste 2 de TF-2518) ──────────────────────────
+//
+// LE FAIT : TF-2518. La table d'usage du README de forge-websec prescrivait `node scripts\capturer.mjs <url> <capture.json>` ;
+// le script déclarait `Usage : node capturer.mjs <url> [--sortie <fichier.json>] …` et ne lisait qu'UN argument positionnel.
+// Sous la forme du README, la capture partait sur la sortie standard, le fichier n'existait pas et l'oracle suivant rendait
+// SKIP « capture introuvable » : un aller-retour. CP1 à CP3 ne le voyaient pas : le chemin résout, `--sortie` n'est pas prescrit,
+// et le motif de prescription ne lit que des options. Mesuré le 14/11/2026 par l'agent du lot ws : l'oracle rendait PASS avant
+// comme après la correction du script.
+//
+// LA RÈGLE : quand le script prescrit déclare son USAGE (une ligne `Usage : node <script> …`, en commentaire ou dans une chaîne,
+// et les lignes `node <script> …` qui la prolongent), les arguments positionnels que le document met derrière le chemin — les
+// seuls `<…>` posés avant le premier mot qui n'en est pas — se comptent et se confrontent au nombre que l'usage accepte, de ses
+// positionnels obligatoires (`<x>` hors crochets) à tous ses positionnels (`<x>` entre crochets compris, sans compter la valeur
+// d'une option : `--sortie <f>` est une option, pas un positionnel). Un usage qui a plusieurs lignes (un mode par ligne) est
+// satisfait par n'importe laquelle. Une prescription sans positionnel n'est jamais accusée (`node x.mjs --self-test`, `--help`) ;
+// l'oracle ne lit pas la forme d'un nom (`<capture.json>` contre `<fichier.json>`) : seul le nombre, et la place d'une option.
+// Un script sans ligne d'usage n'est pas jugé ici, et le dit.
+
+/** Les lignes d'usage d'un script : `[{ ligne, texte, min, max, valuees }]`, `valuees` étant les options qui prennent une valeur. */
+export function usagesDuScript(source, nomScript) {
+  const nom = String(nomScript).split(/[\\/]/).pop().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const reNode = new RegExp(`\\bnode\\s+(?:[\\w.$<>-]*[\\\\/])*${nom}(?![\\w.-])([^\\n"'\`]*)`, "gi");
+  const usages = [];
+  let dans = false;
+  String(source).split(/\r?\n/).forEach((l, i) => {
+    if (/Usage\s*:/i.test(l)) dans = true;
+    else if (dans && !/^\s*(?:\/\/|\*|#|\/\*)/.test(l)) dans = false;
+    if (!dans) return;
+    for (const m of l.matchAll(reNode)) usages.push({ ligne: i + 1, texte: m[0].trim(), ...lireUsage(m[1] || "") });
+  });
+  return usages;
+}
+
+/** Lit le reste d'une ligne d'usage : positionnels obligatoires (min), tous les positionnels (max), options à valeur. */
+export function lireUsage(reste) {
+  const jetons = String(reste).match(/\[|\]|\||\.\.\.|…|--[\w-]+=?|<[^<>]+>|[^\s\[\]|<>]+/g) || [];
+  const valuees = new Set();
+  let profondeur = 0, min = 0, max = 0, variadique = false;
+  for (let i = 0; i < jetons.length; i++) {
+    const j = jetons[i];
+    if (j === "[") profondeur++;
+    else if (j === "]") profondeur = Math.max(0, profondeur - 1);
+    else if (/^--/.test(j)) {
+      if (/^<.*>$/.test(jetons[i + 1] || "")) { valuees.add(j.replace(/=$/, "")); i++; }
+    } else if (/^<.*>$/.test(j)) {
+      max++;
+      if (profondeur === 0) min++;
+      if (/^(?:\.\.\.|…)$/.test(jetons[i + 1] || "")) variadique = true;
+    }
+  }
+  return { min, max: variadique ? Infinity : max, valuees };
+}
+
+const ARRET_PRESCRIPTION = /^(?:node|python3?|py|puis|et|ou|then|→|->|;|&&|\|\||\||#|—|–)$/i;
+
+/** Les arguments positionnels (`<…>`) qu'une prescription met derrière son chemin, `valuees` donnant les options à valeur. */
+export function positionnelsPrescrits(suite, valuees = new Set()) {
+  const trouves = [];
+  const jetons = String(suite).trim().split(/\s+/).filter(Boolean);
+  for (let i = 0; i < jetons.length; i++) {
+    const brut = jetons[i];
+    if (ARRET_PRESCRIPTION.test(brut)) break;
+    const fin = /`$/.test(brut) || /[;|]$/.test(brut);
+    const j = brut.replace(/^[`("']+|[`)"',.;:|]+$/g, "");
+    // Un `<…>` posé juste derrière une option, entre crochets ou non, en est la valeur, que l'usage la déclare `--x <v>` ou
+    // `--x N` : c'est la lecture la plus indulgente, et un faux positif sur une prescription fait désactiver l'oracle.
+    if (/^\[*--/.test(j)) { if (/^[`(]*\[?<[^<>]+>/.test(jetons[i + 1] || "")) i++; }
+    else {
+      const m = /^(\[?)(<[^<>]+>)\]?$/.exec(j);
+      if (m) trouves.push({ texte: m[2], facultatif: m[1] === "[" });
+    }
+    if (fin) break;
+  }
+  return trouves;
+}
+
+/**
+ * CP6 : les prescriptions dont le nombre de positionnels sort de ce que l'usage de leur script accepte.
+ * Rend { jugees, sansUsage, ecarts: [{ document, ligne, chemin, positionnels, usage }] }.
+ */
+export function positionnelsHorsUsage(prescrites) {
+  const sources = new Map();
+  const lire = (p) => { if (!sources.has(p)) { try { sources.set(p, readFileSync(p, "utf8")); } catch { sources.set(p, ""); } } return sources.get(p); };
+  const ecarts = [];
+  let jugees = 0, sansUsage = 0;
+  for (const p of prescrites) {
+    if (p.horsPortee || !p.resolu) continue;
+    const usages = usagesDuScript(lire(p.resolu), p.resolu);
+    if (!usages.length) { sansUsage++; continue; }
+    const valuees = new Set(usages.flatMap((u) => [...u.valuees]));
+    const pos = positionnelsPrescrits(p.suite || "", valuees);
+    if (!pos.length) continue;
+    jugees++;
+    if (!usages.some((u) => pos.length <= u.max && pos.length >= u.min)) ecarts.push({ document: p.document, ligne: p.ligne, chemin: p.chemin, positionnels: pos.map((x) => x.texte), usage: usages[0] });
+  }
+  return { jugees, sansUsage, ecarts };
+}
+
 export function juger(depot, { racineParc = null } = {}) {
   const racine = racineParc || racineDuParc(depot);
   const F = [];
@@ -450,6 +554,22 @@ export function juger(depot, { racineParc = null } = {}) {
       + `. Le producteur qui la suit n'obtient plus de verdict. Remède : ${[...new Set(citees.map((c) => c.repli.reparer))].join(" ; ")}`);
   }
 
+  // ── CP6 — les arguments positionnels prescrits tiennent dans l'usage du script (TF-2526) ────────
+  const cp6 = positionnelsHorsUsage(toutes);
+  if (!cp6.jugees) {
+    F.push({ regle: "CP6", statut: "SANS_OBJET", ou: "-",
+      message: `aucune prescription ne met d'argument positionnel derrière un script qui déclare son usage (${cp6.sansUsage} script(s) sans ligne « Usage : node … ») — CP6 n'a rien à mesurer ici, et ne le maquille pas en PASS` });
+  } else if (!cp6.ecarts.length) {
+    ok("CP6", `${cp6.jugees} prescription(s) à argument(s) positionnel(s) tiennent dans l'usage que leur script déclare`);
+  } else {
+    ko("CP6", cp6.ecarts.map((e) => `${rel(e.document)}:${e.ligne}`).join(", "),
+      `${cp6.ecarts.length} prescription(s) sur ${cp6.jugees} mettent un nombre d'arguments positionnels que le script n'accepte pas : `
+      + cp6.ecarts.map((e) => `${rel(e.document)}:${e.ligne} prescrit « ${e.chemin} ${e.positionnels.join(" ")} » (${e.positionnels.length}), `
+        + `l'usage du script en accepte ${e.usage.min === e.usage.max ? e.usage.min : `de ${e.usage.min} à ${e.usage.max === Infinity ? "plusieurs" : e.usage.max}`} : « ${e.usage.texte.slice(0, 160)} »`).join(" ; ")
+      + ". Sous cette forme le script lit autre chose ou ignore l'argument : le producteur croit avoir obéi (TF-2518, la capture partait sur la sortie standard). "
+      + "Écrire la prescription sur la forme de l'usage, ou faire lire au script la forme prescrite et l'écrire à son usage");
+  }
+
   return {
     verdict: F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings: F,
     prescriptions: toutes.length, jugeables: jugeables.length, horsPortee: toutes.length - jugeables.length,
@@ -469,7 +589,8 @@ export const NON_JUGE = [
   "CP2 juge la PRÉSENCE du libellé de l'option dans la source du script, jamais que le script en fasse quelque chose de juste : une option lue et jetée passe CP2, et c'est le banc — donc CP3 — qui a une chance de l'attraper",
   "CP3 ne mesure QUE les scripts qui portent un banc nommé `<script>.test.mjs`. Un script sans banc n'est pas accusé ici : son juge est l'invariant I1 de `oracles\\self-tests.mjs`, et deux vérités sur le même objet valent moins qu'une",
   "CP3 constate qu'un CAS cite l'option, jamais qu'il la joue BIEN ni sur la cible que la prescription nomme. Le défaut fondateur — `--sections` qui rend TimeoutError sur un panneau MASQUÉ — demanderait d'exécuter le geste sur une instance servie : c'est la classe `controle-joue-sur-fichier-pas-sur-instance-servie`, un autre dispositif sur un autre objet. La borne est déclarée, pas comblée",
-  "les options courtes (`-x`) et les arguments positionnels : hors du motif, faute d'une façon fiable de les distinguer d'un fragment de prose",
+  "les options courtes (`-x`) : hors du motif, faute d'une façon fiable de les distinguer d'un fragment de prose",
+  "CP6 ne juge les arguments positionnels que d'un script qui DÉCLARE son usage (une ligne `Usage : node <script> …`, en commentaire ou dans une chaîne) : un script sans usage est dit, jamais jugé ; elle compte des `<…>` posés derrière le chemin (jamais un mot nu, un nom de fichier ou une valeur entre guillemets), lit un `<…>` derrière une option comme sa valeur, et s'arrête au premier mot de liaison (`puis`, `et`, `node`) ; elle compare des NOMBRES, pas la nature d'un argument (`<capture.json>` contre `<fichier.json>`), et une prescription sans positionnel (`--self-test`) n'est jamais accusée",
   "les RÉFÉRENTIELS de données (`.jsonl`, `.json`) qui portent eux aussi des points d'entrée : seuls les documents `.md` sont lus. La borne a un coût mesuré le 22/09, et il est écrit plutôt que tu — `catalogues\\catalogue.jsonl` annonce deux services en statut « prouvé » dont le point d'entrée a perdu un segment de chemin (`output\\composant-filtres-tableau\\…` au lieu de `output\\02-composants\\composant-filtres-tableau\\…`) : le défaut est exactement de cette classe, et cet oracle ne le voit pas. Consigné en candidature, pas absous",
 ];
 
