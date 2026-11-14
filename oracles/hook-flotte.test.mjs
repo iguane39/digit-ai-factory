@@ -57,6 +57,10 @@ check("rouge — l'ancien nom d'outil Task est jugé comme Agent", () => {
   const r = jouer(appel({ subagent_type: "general-purpose" }, "Task"));
   if (!/FLOTTE D'AGENTS/.test(r.ctx)) throw new Error("Task passe sans rappel");
 });
+check("TF-2554 — l'avertissement de flotte décrit le `relecteur` : lecture seule, sans Write, Edit ni shell, pour qu'un relecteur ne parte pas en agent générique", () => {
+  const r = jouer(appel({ subagent_type: "general-purpose" }));
+  if (!/relecteur : relecture aveugle en lecture seule, sans Write, Edit ni shell/.test(r.ctx)) throw new Error(`le relecteur n'est pas décrit : ${r.ctx.slice(0, 400)}`);
+});
 check("rouge — sans agent nommé visible, le rappel le dit au lieu d'inventer une flotte", () => {
   const vide = join(racine, "vide"); mkdirSync(vide, { recursive: true });
   const r = jouer({ tool_name: "Agent", tool_input: { subagent_type: "general-purpose" }, cwd: vide });
@@ -77,7 +81,7 @@ for (const [entree, nom] of VERTS) {
 
 // D-23 (a) du 18/10/2026 — « chaque consigne d'agent » : TOUT appel d'agent rappelle la relecture de sa consigne, pas seulement
 // les agents d'écriture (restriction relevée par la relecture de fin de tour RI-20261018-01). Même sortie, exit 0, jamais un refus.
-for (const nom of ["campagne", "constructeur", "redacteur", "explorateur", "verificateur", "claude-code-guide"]) {
+for (const nom of ["campagne", "constructeur", "redacteur", "explorateur", "verificateur", "relecteur", "claude-code-guide"]) {
   check(`rouge — un appel vers « ${nom} » rappelle la relecture de la consigne sans bloquer`, () => {
     const r = jouer(appel({ subagent_type: nom }));
     if (r.code !== 0) throw new Error(`exit ${r.code} : un rappel ne bloque jamais`);

@@ -398,7 +398,8 @@ symétriques — déléguer un arbitrage, et facturer un travail mécanique au p
 **La flotte d'agents porte ce tableau dans ses définitions** (décision humaine D-19 (a) du 18/10/2026, étude
 `output\03-etudes\20261018-etude-opportunite-flotte-d-agents.md`). Une délégation vise un agent NOMMÉ, par
 `subagent_type` : `explorateur` (mécanique, Haiku), `verificateur` (vérification d'état en lecture seule, Sonnet à
-medium), `campagne` (écriture dans UN dépôt sous `gabarits\AGENT-CAMPAGNE.md`, Sonnet à high), `constructeur`
+medium, sans exécuter d'écrivain de ledger : TF-2549), `relecteur` (relecture aveugle en lecture seule, sans Write, Edit ni
+shell, Opus à high : TF-2554), `campagne` (écriture dans UN dépôt sous `gabarits\AGENT-CAMPAGNE.md`, Sonnet à high), `constructeur`
 (construction complexe, Opus à max), `redacteur` (document sous gabarit, Sonnet à high). Chacun déclare son modèle,
 son effort et ses outils dans `gabarits\flotte\<id>.yaml`, compilé en `.claude\agents\<id>.md` par
 `compile-agent-def.mjs` de forge-agents, et voyage chez les produits par l'héritage (HERITAGE 1.29.0). L'agent

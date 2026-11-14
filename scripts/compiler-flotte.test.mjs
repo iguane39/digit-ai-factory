@@ -204,6 +204,43 @@ if (!oracleReel || !compilateurReel) {
   });
 }
 
+// ---- TF-2554 et TF-2549 (14/11/2026) : ce que deux agents de la flotte NE FONT PAS se tient par leur définition, pas par la consigne -----
+// Le fait : 2 relecteurs génériques sur 2 ont écrit des fichiers temporaires malgré « aucune écriture » (TF-2554), et un `verificateur` a écrit
+// l'entrée 84 d'un ledger en testant son écrivain (TF-2549). Le `relecteur` n'a donc NI Write, NI Edit, NI shell (un shell écrit par redirection) ;
+// l'arbitre du `verificateur` lui interdit d'exécuter un écrivain de ledger. Joués sur les VRAIES définitions du dépôt (source et agent installé).
+{
+  const RACINE = join(ICI, "..");
+  const lire = (...p) => readFileSync(join(RACINE, ...p), "utf8").replace(/\r\n/g, "\n");
+  const outilsSource = (t) => (/^outils:\s*\[(.*)\]\s*$/m.exec(t) || [, ""])[1].split(",").map((s) => s.trim()).filter(Boolean);
+  const outilsInstalles = (t) => (/^tools:\s*(.*)$/m.exec(t) || [, ""])[1].split(",").map((s) => s.trim()).filter(Boolean);
+  const INTERDITS_RELECTEUR = ["Write", "Edit", "NotebookEdit", "Bash", "PowerShell"];
+  const ecrivains = (t) => INTERDITS_RELECTEUR.filter((o) => t.includes(o));
+  const LIGNE_LEDGER = /Aucun écrivain de ledger n'est exécuté/;
+  check("TF-2554 vert — le relecteur n'a ni Write, ni Edit, ni shell, dans sa source ET dans l'agent installé ; il lit (Read, Grep, Glob)", () => {
+    const src = outilsSource(lire("gabarits", "flotte", "relecteur.yaml")), inst = outilsInstalles(lire(".claude", "agents", "relecteur.md"));
+    vrai(ecrivains(src).length === 0 && ecrivains(inst).length === 0, `outils d'écriture ou de shell : source ${src}, installé ${inst}`);
+    vrai(["Read", "Grep", "Glob"].every((o) => src.includes(o) && inst.includes(o)), `le relecteur ne lit plus : ${src} / ${inst}`);
+    vrai(src.join() === inst.join(), `la source et l'agent installé divergent : ${src} / ${inst}`);
+  });
+  check("TF-2554 rouge — un relecteur qui regagne Write, Edit ou un shell est refusé par le contrôle (le témoin voit la chirurgie)", () => {
+    const src = lire("gabarits", "flotte", "relecteur.yaml");
+    for (const outil of ["Write", "Edit", "Bash", "PowerShell"]) {
+      const mutant = src.replace(/^outils:\s*\[(.*)\]\s*$/m, (_m, o) => `outils: [${o}, ${outil}]`);
+      vrai(mutant !== src, "chirurgie sans effet : le témoin est vide");
+      vrai(ecrivains(outilsSource(mutant).join()).includes(outil), `${outil} regagné sans que le contrôle le voie`);
+    }
+  });
+  check("TF-2549 vert — le verificateur interdit d'exécuter un écrivain de ledger, dans sa source ET dans l'agent installé, et garde son shell", () => {
+    vrai(LIGNE_LEDGER.test(lire("gabarits", "flotte", "verificateur.yaml")), "la source ne porte pas l'interdiction");
+    vrai(LIGNE_LEDGER.test(lire(".claude", "agents", "verificateur.md")), "l'agent installé ne porte pas l'interdiction : recompiler (node scripts\\compiler-flotte.mjs)");
+    vrai(outilsInstalles(lire(".claude", "agents", "verificateur.md")).includes("Bash"), "le verificateur a perdu son shell : rejouer une recette est son rôle");
+  });
+  check("TF-2549 rouge — sans la ligne de l'arbitre, le contrôle voit l'interdiction manquer", () => {
+    const mutant = lire("gabarits", "flotte", "verificateur.yaml").replace(/^ {2}- "Aucun écrivain de ledger n'est exécuté[^\n]*\n/m, "");
+    vrai(mutant !== lire("gabarits", "flotte", "verificateur.yaml") && !LIGNE_LEDGER.test(mutant), "la chirurgie n'a pas retiré la ligne");
+  });
+}
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\ncompiler-flotte.test : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

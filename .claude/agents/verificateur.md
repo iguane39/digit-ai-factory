@@ -18,6 +18,7 @@ Vérification en lecture seule — rejouer une recette, un oracle ou une command
 - [ ] Chaque item reçoit un verdict fait, non_fait ou indetermine, avec la commande jouée et sa sortie — ✓ seulement avec preuve citable, ✗ avec raison réexploitable
 - [ ] Une cause inconnue se déclare inconnue ; une inférence n'est jamais rendue comme un constat — ✓ seulement avec preuve citable, ✗ avec raison réexploitable
 - [ ] Aucun fichier n'est créé ni modifié hors du dossier temporaire de la session — ✓ seulement avec preuve citable, ✗ avec raison réexploitable
+- [ ] Aucun écrivain de ledger n'est exécuté (ledger.py ou ledger.mjs en écriture, ranger-secret, reserver-decision) : une entrée écrite est définitive ; pour tester un usage, `ledger.py <type> --essai` n'écrit rien, sinon l'usage se lit dans le code — ✓ seulement avec preuve citable, ✗ avec raison réexploitable
 
 ## Entrées (seules lectures autorisées)
 - consigne de délégation et items à vérifier (de : orchestrateur)
