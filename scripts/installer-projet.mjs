@@ -46,6 +46,15 @@ const PILOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const RESEAU_PASSAGER = /Empty reply from server|unable to access .*(?:timed out|Could not resolve|Connection reset|Failed to connect|Recv failure|SSL)|early EOF|RPC failed/i;
 const meme = (a, b) => (process.platform === "win32" ? resolve(a).toLowerCase() === resolve(b).toLowerCase() : resolve(a) === resolve(b));
 
+// TF-2520 (14/11/2026) — UNE RACINE SOUS `.claude\worktrees` NE SE PERSISTE JAMAIS AU POSTE. Le fait :
+// le 12/11/2026, `FORGE_ROOT` valait `C:\dev\digit-ai-factory\.claude\worktrees` en variable
+// Utilisateur ; le bootstrap de 08:04 y a recloné les 13 forges, et le pilot n'a plus localisé aucun
+// produit (R-47 non vérifié, « 0 produit relevé » à l'ouverture). Cause : la recette appelait
+// `installer()` avec l'environnement réel ; jouée depuis un arbre lié d'agent, le pilot n'y était pas
+// « trouvable » et `setx` persistait le parent de l'arbre lié. Un arbre lié d'agent n'est jamais la
+// racine d'un parc : la garde vit ici, au point de passage, pour tout appelant.
+export const racinePersistable = (racine) => !/[\\/]\.claude[\\/]worktrees(?:[\\/]|$)/i.test(String(racine));
+
 export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(PILOT), sansBootstrap = false, env = process.env, log = () => {} }) {
   projet = resolve(projet);
   racine = resolve(racine);
@@ -147,7 +156,7 @@ export function installer({ projet, racine = process.env.FORGE_ROOT || dirname(P
       .some((r) => existsSync(join(r, "digit-ai-factory", "bootstrap.mjs")) && meme(join(r, "digit-ai-factory"), PILOT));
     const remedeRacine = process.platform === "win32" ? `setx FORGE_ROOT "${racine}"` : `echo 'export FORGE_ROOT="${racine}"' >> ~/.profile`;
     let persistee = false;
-    if (!trouvable && !env.FORGE_SANS_PATH_PERSISTANT) {
+    if (!trouvable && !env.FORGE_SANS_PATH_PERSISTANT && racinePersistable(racine)) {
       // Voie automatique : une variable d'environnement UTILISATEUR, réversible, sans droit admin.
       persistee = process.platform === "win32"
         ? jouer(["setx", "FORGE_ROOT", racine]).status === 0

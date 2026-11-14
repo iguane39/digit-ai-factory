@@ -44,6 +44,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-02 - RETOURS - 20261019d.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261030a.md` | fichier | 6,7 Ko | Retours forges — Produit-02 — 20261030a |
 | `Produit-02 - RETOURS - 20261030a.tf.jsonl` | fichier | 2,6 Ko | 2 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261102a.md` | fichier | 2,0 Ko | Retours forges — Produit-02 — 20261102a |
+| `Produit-02 - RETOURS - 20261102a.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261103a.md` | fichier | 18,6 Ko | Retours forges — Produit-02 — 20261103a |
+| `Produit-02 - RETOURS - 20261103a.tf.jsonl` | fichier | 4,8 Ko | 3 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261105a.md` | fichier | 5,3 Ko | Retours forges — Produit-02 — 20261105a |
+| `Produit-02 - RETOURS - 20261105a.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261111a.md` | fichier | 4,4 Ko | Retours forges — Produit-02 — 20261111a |
 | `Produit-02 - RETOURS - 20261111a.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261112a.md` | fichier | 5,3 Ko | Retours forges — Produit-02 — 20261112a |
@@ -182,6 +188,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-84 - RETOURS - 20261110d.tf.jsonl` | fichier | 881 o | 1 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261110e.md` | fichier | 3,4 Ko | Retours forges — Produit-84 — 20261110e |
 | `Produit-84 - RETOURS - 20261110e.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
+| `Produit-85 - CANDIDATURE - Decision ouverte reposee en entier - 20261028a.md` | fichier | 2,3 Ko | Produit-85 — candidature : une décision ouverte se repose en entier, jamais en rappel d'un |
+| `Produit-85 - CANDIDATURE - Decision ouverte reposee en entier - 20261028a.tf.jsonl` | fichier | 1,4 Ko | 1 ligne(s) JSONL |
 | `Produit-85 - RETOURS - 20261024a.md` | fichier | 10,9 Ko | Retours forges — Produit-85 — 20261024a |
 | `Produit-85 - RETOURS - 20261024a.tf.jsonl` | fichier | 6,0 Ko | 7 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261103a.md` | fichier | 17,1 Ko | Retours forges — Produit-86 — 20261103a |
@@ -239,4 +247,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261112h.md` | fichier | 5,4 Ko | Retours forges — Produit-86 — 20261112h |
 | `Produit-86 - RETOURS - 20261112h.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 
-_220 fichier(s), 2 sous-dossier(s)_
+_228 fichier(s), 2 sous-dossier(s)_

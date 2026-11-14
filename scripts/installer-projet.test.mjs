@@ -19,8 +19,13 @@ import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+// TF-2520 (14/11/2026) : une recette ne modifie jamais le poste. Sans cette garde, `installer()` et la
+// CLI jouée plus bas persistaient `FORGE_ROOT` par `setx` dès que le pilot n'était pas « trouvable »
+// — le cas d'un arbre lié d'agent, qui a posé `…\.claude\worktrees` comme racine du poste le 12/11.
+process.env.FORGE_SANS_PATH_PERSISTANT = "1";
 import * as INSTALLATEUR from "./installer-projet.mjs";
 const { installer, RESEAU_PASSAGER } = INSTALLATEUR;
+const racinePersistable = INSTALLATEUR.racinePersistable;   // TF-2520 : lu par l'espace de noms, absent sur l'ancien code
 const banniere = INSTALLATEUR.banniere;   // TF-1696 : lu par l'espace de noms, absent sur l'ancien code
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -87,6 +92,16 @@ try {
   att(!rp.conformite, "TF-1696 : la conformité d'un PRODUIT est jouée sur le pilot");
   const ra = installer({ projet: join(base, "absent"), sansBootstrap: true });
   att(ctl(ra, "projet")?.ok === false && !existsSync(join(base, "absent")), "dossier absent : créé ou jugé vert");
+
+  // 5 bis. TF-2520 — une racine sous `.claude\worktrees` n'est jamais persistée ; une racine de parc
+  // ordinaire l'est. Les deux sens se jugent sur la fonction pure : jouer l'ancien code en vrai
+  // exécuterait `setx` sur le poste.
+  if (typeof racinePersistable === "function") {
+    att(!racinePersistable("C:\\dev\\digit-ai-factory\\.claude\\worktrees"), "TF-2520 : la racine d'un arbre lié d'agent est jugée persistable");
+    att(!racinePersistable("/home/x/digit-ai-factory/.claude/worktrees/agent-a1"), "TF-2520 : un sous-dossier d'arbre lié est jugé persistable");
+    att(racinePersistable("C:\\dev") && racinePersistable("/home/x/parc"), "TF-2520 sens vert : une racine de parc ordinaire est refusée");
+    att(racinePersistable("C:\\dev\\claude\\worktrees-ancien"), "TF-2520 sens vert : un nom voisin sans `.claude` est refusé");
+  } else att(false, "TF-2520 : racinePersistable n'est pas exportée, la garde de persistance n'est pas jugeable");
 
   // 6. Usage : une option inconnue est refusée en exit 2.
   att(spawnSync(process.execPath, [SCRIPT, "--oui"], { encoding: "utf8" }).status === 2, "option inconnue : exit 2 attendu");
