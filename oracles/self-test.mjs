@@ -8,8 +8,8 @@
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, cpSync, renameSync, appendFileSync, utimesSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join, dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { socleDePage } from "../scripts/lib-socle-page.mjs";
 
 const oracle = join(dirname(fileURLToPath(import.meta.url)), "oracle-conformite-projet.mjs");
@@ -1762,6 +1762,174 @@ check("TF-2494 borne : une antériorité datée AVANT le saut ne le couvre pas �
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
   if (!f || !/seq 7 là où 4 était attendu/.test(f.message)) throw new Error(`le saut récent n'est plus dénoncé : ${f && f.message}`);
+});
+
+// ---- TF-2540 (14/11/2026, campagne « A1 & A2 », lot ph) — R-42 NE VÉRIFIAIT PAS QUE `ts_consigne` COLLE AU TS DE L'ENTRÉE VISÉE.
+// `ledger.mjs verify` (forge-agents, TF-1425) tient depuis le 28/09 qu'une déclaration couvre l'entrée dont le ts est son `ts_consigne`
+// EXACT ; R-42 ne contrôlait que l'antériorité de la rectification (TF-1466) et rendait PASS là où `verify` rend exit 1 (mesuré le
+// 14/11/2026 par l'agent du lot fa2, TF-2494, sur le saut comme sur la collision). Rouge : une déclaration dont `ts_consigne` ne désigne
+// aucune entrée de ce seq ne couvre rien, pour la collision, le saut et le recul d'horodatage. Vert : la même, exacte, couvre ; avec deux
+// déclarations au même seq, celle qui colle couvre. Puis l'ACCORD, sur les mêmes fixtures, avec `verify` quand forge-agents est présent. ---
+const declarationTs = (seq, tsConsigne) => ({ seq, ts_consigne: tsConsigne, ts_reel_estime: tsConsigne, cause: "deux sessions, même queue — seq attribué sans verrou" });
+const rectifDe = (seq, ts, entrees) => ({ seq, ts, type: "rectification_horodatage", entrees });
+const ENTETE_RECUL = [
+  { seq: 1, ts: "2026-09-01T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "2026-09-01T09:00:00Z", type: "retour" },
+  { seq: 3, ts: "2026-09-01T08:30:00Z", type: "retour" },        // recul d'horodatage (08:30 après 09:00)
+];
+const lignesJsonl = (entrees) => entrees.map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST;
+const entreesCollision = () => LEDGER_COLLISION.split(NL_TEST).filter(Boolean).map((l) => JSON.parse(l));
+const ANTERIORITE_2540 = (seq, avant) => ({ seq, ts: "2026-10-12T10:00:00Z", type: "anteriorite_ledger", avant, cause: "mesure du 12/10/2026 : écarts du 01/09, antérieurs à la session révélatrice (TF-2540)" });
+const ACCORD_LEDGER = [
+  // [nom, entrées, intègre ?, nature]
+  ["collision nue", entreesCollision(), false, "ts"],
+  ["collision, déclaration exacte", [...entreesCollision(), rectifDe(5, "2026-09-01T20:57:22Z", [declarationTs(3, "2026-09-01T20:52:00Z"), declarationTs(4, "2026-09-01T20:56:15Z")])], true, "ts"],
+  ["collision, ts_consigne qui ne désigne aucune entrée du seq 3", [...entreesCollision(), rectifDe(5, "2026-09-01T20:57:22Z", [declarationTs(3, "2026-09-01T20:40:00Z"), declarationTs(4, "2026-09-01T20:56:15Z")])], false, "ts"],
+  ["collision, deux déclarations au seq 3 dont l'une colle", [...entreesCollision(), rectifDe(5, "2026-09-01T20:57:22Z", [declarationTs(3, "2026-09-01T20:40:00Z"), declarationTs(3, "2026-09-01T20:52:00Z"), declarationTs(4, "2026-09-01T20:56:15Z")])], true, "ts"],
+  ["saut nu", LEDGER_SAUT, false, "ts"],
+  ["saut, déclaration exacte", [...LEDGER_SAUT, rectifDe(9, "2026-09-03T08:00:00Z", [declarationTs(7, "2026-09-02T10:00:00Z")])], true, "ts"],
+  ["saut, ts_consigne qui ne désigne pas l'entrée du seq 7", [...LEDGER_SAUT, rectifDe(9, "2026-09-03T08:00:00Z", [declarationTs(7, "2026-09-02T09:00:00Z")])], false, "ts"],
+  ["recul d'horodatage nu", ENTETE_RECUL, false, "ts"],
+  ["recul, déclaration exacte", [...ENTETE_RECUL, rectifDe(4, "2026-09-01T10:00:00Z", [declarationTs(3, "2026-09-01T08:30:00Z")])], true, "ts"],
+  ["recul, ts_consigne qui ne désigne pas l'entrée du seq 3", [...ENTETE_RECUL, rectifDe(4, "2026-09-01T10:00:00Z", [declarationTs(3, "2026-09-01T08:15:00Z")])], false, "ts"],
+  // L'ÉTENDUE de l'antériorité : R-42 la tient pour la collision et le recul (TF-1203) ; `verify` la tenait pour le seul saut en avant.
+  ["collision ancienne couverte par une antériorité datée", [...entreesCollision(), ANTERIORITE_2540(5, "2026-09-02T00:00:00Z")], true, "etendue"],
+  ["recul ancien couvert par une antériorité datée", [...ENTETE_RECUL, ANTERIORITE_2540(4, "2026-09-02T00:00:00Z")], true, "etendue"],
+  ["collision récente, antériorité datée avant elle", [...entreesCollision(), ANTERIORITE_2540(5, "2026-09-01T20:00:00Z")], false, "etendue"],
+];
+const projetLedger2540 = (nom, entrees) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-2540-${nom}-`));
+  ecrireDans(d, "forge/ledger.jsonl", lignesJsonl(entrees));
+  return d;
+};
+const r42De = (d) => (lance(d).rapport.findings || []).filter((x) => x.regle === "R-42");
+const r42Integre = (d) => !r42De(d).some((x) => x.statut === "FAIL");
+check("TF-2540 rouge : une rectification dont `ts_consigne` ne désigne aucune entrée du seq visé ne couvre rien — collision, saut, recul → FAIL, la divergence est NOMMÉE", () => {
+  for (const [nom, entrees, integre] of ACCORD_LEDGER.filter(([n]) => /ne désigne/.test(n))) {
+    const d = projetLedger2540("rouge", entrees);
+    const f = r42De(d).find((x) => x.statut === "FAIL");
+    if (integre || !f) throw new Error(`${nom} : R-42 ${JSON.stringify(r42De(d).map((x) => x.statut))} — la déclaration qui ne colle pas à l'histoire a couvert l'écart`);
+    if (!/déclare `ts_consigne` \S+, l'entrée porte \S+ : une déclaration qui ne correspond pas à l'histoire ne couvre rien/.test(f.message)) throw new Error(`${nom} : la divergence n'est pas nommée : ${f.message}`);
+    if (/sans écart correspondant/.test(f.message)) throw new Error(`${nom} : la déclaration divergente est aussi comptée « sans écart » : ${f.message}`);
+  }
+});
+check("TF-2540 vert : la même déclaration, exacte, couvre ; avec deux déclarations au même seq, celle qui colle couvre ([RECTIFIÉ] imprimé)", () => {
+  for (const [nom, entrees] of ACCORD_LEDGER.filter(([n, , integre, nature]) => integre && nature === "ts" && /déclaration|dont l'une/.test(n))) {
+    const d = projetLedger2540("vert", entrees);
+    const r42 = r42De(d);
+    if (r42.some((x) => x.statut === "FAIL")) throw new Error(`${nom} : FAIL inattendu ${JSON.stringify(r42.map((x) => x.message))}`);
+    if (!r42.some((x) => /\[RECTIFIÉ\]/.test(x.message))) throw new Error(`${nom} : aucun [RECTIFIÉ] imprimé : ${r42.map((x) => x.message)}`);
+  }
+});
+check("TF-2540 rouge : sans le contrôle du ts, le témoin voit la chirurgie — une déclaration divergente couvre de nouveau", () => {
+  const source = readFileSync(oracle, "utf8");
+  const mutant = source.replace("const r = declarees.find((d) => !d.tsConsigne || d.tsConsigne === ts) || null;", "const r = declarees[0] || null;");
+  if (mutant === source) throw new Error("chirurgie sans effet : le témoin est vide");
+  // Le mutant vit hors du dépôt : ses imports relatifs sont réécrits en URL absolues.
+  const absolu = mutant.replace(/from "(\.\.?\/[^"]+)"/g, (_m, rel) => `from "${pathToFileURL(resolve(dirname(oracle), rel)).href}"`);
+  const copie = join(mkdtempSync(join(tmpdir(), "conf-mutant-2540-")), "oracle-conformite-projet.mjs");
+  writeFileSync(copie, absolu, "utf8");
+  try {
+    const d = projetLedger2540("mutant", ACCORD_LEDGER.find(([n]) => n === "collision, ts_consigne qui ne désigne aucune entrée du seq 3")[1]);
+    let r;
+    try { r = JSON.parse(sh("node", [copie, d])); } catch (e) { r = JSON.parse(String(e.stdout || "{}")); }
+    if (!(r.findings || []).some((x) => x.regle === "R-42")) throw new Error("le mutant ne rend aucun constat R-42 : le témoin est vide");
+    if ((r.findings || []).some((x) => x.regle === "R-42" && x.statut === "FAIL")) throw new Error("le mutant refuse encore la déclaration divergente : le rouge n'est pas le défaut du 14/11");
+  } finally { rmSync(dirname(copie), { recursive: true, force: true }); }
+});
+{
+  const LEDGER_MJS_2540 = join("digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
+  const racinesParc = [process.env.FORGE_ROOT, join(dirname(oracle), "..", ".."), "c:\\dev"].filter(Boolean);
+  const parc = racinesParc.find((r) => existsSync(join(r, LEDGER_MJS_2540)));
+  const verifyIntegre = (d) => { try { execFileSync("node", [join(parc, LEDGER_MJS_2540), "verify", join(d, "forge", "ledger.jsonl")], { encoding: "utf8", stdio: "pipe" }); return true; } catch { return false; } };
+  if (!parc) console.log("  [NON JOUÉ] TF-2540 : accord avec `ledger.mjs verify` — forge-agents introuvable (FORGE_ROOT, voisin du pilot, c:\\dev)");
+  else {
+    check("TF-2540 accord : sur les mêmes fixtures (nue, déclarée exacte, ts_consigne divergent ; collision, saut, recul), R-42 et `ledger.mjs verify` rendent le MÊME verdict", () => {
+      for (const [nom, entrees, integre] of ACCORD_LEDGER.filter(([, , , nature]) => nature === "ts")) {
+        const d = projetLedger2540("accord", entrees);
+        const r42 = r42Integre(d), verify = verifyIntegre(d);
+        if (r42 !== integre || verify !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
+      }
+    });
+    check("TF-2540 étendue : R-42 couvre par une antériorité datée la collision et le recul anciens, jamais l'écart récent (la référence que `verify` doit rejoindre)", () => {
+      for (const [nom, entrees, integre] of ACCORD_LEDGER.filter(([, , , nature]) => nature === "etendue")) {
+        if (r42Integre(projetLedger2540("etendue", entrees)) !== integre) throw new Error(`${nom} : R-42 ne rend pas le verdict attendu (${integre})`);
+      }
+    });
+    // L'étendue de verify : ses deux juges ne s'accordent qu'une fois `verify` étendu à la collision et au recul (part forge-agents de TF-2540).
+    // Tant qu'il ne l'est pas, la comparaison se DIT non jouée au lieu de rougir ou de passer en silence ; étendu, elle devient stricte.
+    const sondeEtendue = ACCORD_LEDGER.find(([n]) => n === "collision ancienne couverte par une antériorité datée");
+    if (!verifyIntegre(projetLedger2540("sonde", sondeEtendue[1]))) console.log("  [NON JOUÉ] TF-2540 : accord sur l'ÉTENDUE de l'antériorité — `ledger.mjs verify` ne la couvre pas encore pour la collision et le recul (part forge-agents de TF-2540, à aligner sur R-42)");
+    else check("TF-2540 accord (étendue) : `verify` rejoint R-42 — collision et recul anciens couverts, écart récent refusé, chez les DEUX juges", () => {
+      for (const [nom, entrees, integre] of ACCORD_LEDGER.filter(([, , , nature]) => nature === "etendue")) {
+        const d = projetLedger2540("accord-etendue", entrees);
+        if (verifyIntegre(d) !== integre || r42Integre(d) !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42Integre(d)}, verify ${verifyIntegre(d)}`);
+      }
+    });
+  }
+}
+
+// ---- TF-2542 (14/11/2026, campagne « A1 & A2 », lot ph) — R-42 ter : UNE ÉVOLUTION LIVRÉE APRÈS LA CLÔTURE D'UN RUN, SANS TRACE AU LEDGER.
+// Le fait : cinq évolutions d'un produit (90350be, b28cf0c, d61b813, c1f2511, fba0efc) livrées après le run_close du 20260818a, sans
+// entrée au ledger ; seule 3abf516 y était tracée, et il a fallu une mesure à la main pour le voir. Dépôt git JETABLE, dates de commit
+// FIXÉES (auteur et committer), même idiome que R-42 bis. Rouge : un commit de code postérieur au run_close et que le ledger ne nomme pas
+// est NOMMÉ (avertissement, jamais un FAIL). Vert : le même commit, cité par son sha dans une entrée, ne l'est plus ; un commit qui ne
+// touche que forge/ n'est pas une évolution ; un commit postérieur au run_open suivant appartient à ce run. ----------------------------
+const commitA = (d, date, message, fichiers, avecLedger) => {
+  process.env.GIT_COMMITTER_DATE = date; process.env.GIT_AUTHOR_DATE = date;
+  try {
+    for (const [chemin, contenu] of Object.entries(fichiers)) { mkdirSync(dirname(join(d, chemin)), { recursive: true }); writeFileSync(join(d, chemin), contenu, "utf8"); }
+    const env = ["-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false"];
+    sh("git", [...env, "add", "-A"], d);
+    sh("git", [...env, "commit", "-q", "-m", message], d);
+    return sh("git", ["rev-parse", "HEAD"], d).trim();
+  } finally { delete process.env.GIT_COMMITTER_DATE; delete process.env.GIT_AUTHOR_DATE; }
+};
+const ENTREES_CLOS = [
+  { seq: 1, ts: "2026-08-18T08:00:00Z", type: "run_open", run: "prod-20260818a", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "2026-08-18T18:00:00Z", type: "run_close", run: "prod-20260818a", statut: "pret_client" },
+];
+/** Un produit clos au 18/08 : une évolution avant la clôture, puis `apres` (liste [date, message, fichiers]) ; renvoie le dossier et les sha. */
+const produitClos = (nom, apres, { ledgerSupplementaire = () => [] } = {}) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-r42ter-${nom}-`));
+  sh("git", ["init", "-q", "-b", "main"], d);
+  commitA(d, "2026-08-18T09:00:00+00:00", "feat: socle", { "README.md": "# produit\n", "app.txt": "v1\n", "forge/ledger.jsonl": lignesJsonl(ENTREES_CLOS) });
+  const sha = {};
+  for (const [cle, date, message, fichiers] of apres) sha[cle] = commitA(d, date, message, fichiers);
+  const supp = ledgerSupplementaire(sha);
+  if (supp.length) writeFileSync(join(d, "forge", "ledger.jsonl"), lignesJsonl([...ENTREES_CLOS, ...supp]), "utf8");
+  return { d, sha };
+};
+const r42ter = (d) => (lance(d).rapport.findings || []).find((x) => x.regle === "R-42 ter");
+check("TF-2542 rouge : un commit de code livré après le run_close et que le ledger ne nomme pas est NOMMÉ (avertissement non bloquant) ; un commit antérieur, jamais", () => {
+  const { d, sha } = produitClos("rouge", [["b", "2026-08-25T10:00:00+00:00", "feat: en-tête figé", { "app.txt": "v2\n" }]]);
+  const f = r42ter(d);
+  if (!f) throw new Error("aucun finding R-42 ter");
+  if (f.statut !== "PASS") throw new Error(`règle neuve : doit rester en PASS (avertissement), pas ${f.statut}`);
+  if (!/AVERTISSEMENT/.test(f.message) || !f.message.includes(sha.b.slice(0, 7)) || !/1 commit\(s\)/.test(f.message)) throw new Error(`le commit non tracé n'est pas nommé : ${f.message}`);
+  if (/feat: socle/.test(f.message)) throw new Error(`un commit antérieur à la clôture est nommé : ${f.message}`);
+});
+check("TF-2542 vert : le même commit, cité par son sha court dans une entrée du ledger, n'est plus nommé", () => {
+  const { d } = produitClos("vert", [["b", "2026-08-25T10:00:00+00:00", "feat: en-tête figé", { "app.txt": "v2\n" }]],
+    { ledgerSupplementaire: (s) => [{ seq: 3, ts: "2026-08-26T08:00:00Z", type: "retour", constat: `évolution ${s.b.slice(0, 7)} livrée hors run, consignée après coup` }] });
+  const f = r42ter(d);
+  if (!f || /AVERTISSEMENT/.test(f.message)) throw new Error(`le commit tracé est encore nommé : ${f && f.message}`);
+  if (!/aucun commit livré après le run_close/.test(f.message)) throw new Error(`le constat vert ne dit pas son compte : ${f.message}`);
+});
+check("TF-2542 borne : un commit qui ne touche que forge/ n'est pas une évolution ; un commit après le run_open suivant est celui du run ouvert", () => {
+  const { d } = produitClos("borne", [
+    ["f", "2026-08-25T10:00:00+00:00", "forge: pièce du run", { "forge/NOTES.md": "# notes\n" }],
+    ["o", "2026-09-02T08:00:00+00:00", "feat: pendant le run suivant", { "app.txt": "v3\n" }],
+  ], { ledgerSupplementaire: () => [{ seq: 3, ts: "2026-09-01T08:00:00Z", type: "run_open", run: "prod-20260901a", run_precedent: "prod-20260818a" }] });
+  const f = r42ter(d);
+  if (!f || /AVERTISSEMENT/.test(f.message)) throw new Error(`un commit de forge/ ou d'un run ouvert est nommé : ${f && f.message}`);
+});
+check("TF-2542 borne : sans run_close au ledger, la règle ne dit rien (rien à comparer)", () => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r42ter-sans-"));
+  sh("git", ["init", "-q", "-b", "main"], d);
+  commitA(d, "2026-08-18T09:00:00+00:00", "feat: socle", { "README.md": "# produit\n", "forge/ledger.jsonl": lignesJsonl(ENTREES_CLOS.slice(0, 1)) });
+  commitA(d, "2026-08-25T10:00:00+00:00", "feat: autre", { "app.txt": "v2\n" });
+  if (r42ter(d)) throw new Error("R-42 ter a rendu un constat sans run_close");
 });
 
 // ---- TF-2495 (13/11/2026, lot pd) — R-16 NE LISAIT QUE LA RACINE D'output\ ET R-32 EXIGE UN JOURNAL, PAS UN PASS.
