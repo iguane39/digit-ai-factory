@@ -323,6 +323,52 @@ try {
     if (remede.code !== 0 || remede.contexte) throw new Error(`remède exit ${remede.code} ${remede.err.slice(0, 200)}`);
   });
 
+  // --- L-007 (TF-2416, RT-60 de Produit-84, 3e occurrence de RT-58) : UN CONTRÔLE ET UNE REMISE DANS LA MÊME COMMANDE, SUR LA TABLE RÉELLE ----------
+  // Le fait : le 10/11/2026, `check_markdown.py`, `git commit` et `git push` joués dans une même commande, le contrôle rendant FAIL ; 2 copies de lot au sas, de même forme, les 04 et 09/11.
+  // Rouge : la remise (commit, push, copie au sas) précédée d'un contrôle joué dans la commande est REFUSÉE au pilot (exit 2) et AVERTIE chez un produit (exit 0). Vert : le contrôle seul, la remise
+  // seule, un nom de test seulement cité (`git add x.test.mjs`, un message de commit), la remise gardée par un `if … then`, la remise AVANT le contrôle, et le geste outillé `--remettre` ne sont pas touchés.
+  const L007_ROUGES = [
+    [bash("python scripts/check_markdown.py rapport.md ; git commit -m correctif ; git push"), "la forme du 10/11/2026 : check_markdown.py, commit et push joints par des points-virgules"],
+    [bash("python scripts/check_markdown.py rapport.md && git commit -m correctif && git push origin main"), "les mêmes gestes joints par &&"],
+    [bash("node forge/retours/oracle-lot.mjs lot.md ; cp lot.md input/00-retours/_arrivee/"), "la copie d'un lot au sas après son juge (la forme des 04 et 09/11)"],
+    [bash("node oracles/hook-lecons.test.mjs\ngit commit -am suite"), "un test, puis un commit à la ligne suivante de la même commande"],
+    [bash("node oracles/oracle-synthese.mjs f.md | tail -3 ; git -C C:/dev/depot push"), "un oracle filtré, puis git -C … push"],
+    [ps("node oracles/oracle-x.mjs; Copy-Item lot.md input\\00-retours\\_arrivee\\"), "la copie au sas sous PowerShell"],
+  ];
+  for (const [entree, nom] of L007_ROUGES) {
+    check(`rouge — L-007 en barrière au pilot : ${nom} → refus, exit 2`, () => {
+      const r = jouer(entree, rp);
+      if (r.code !== 2 || !/LEÇON EN BARRIÈRE L-007/.test(r.err)) throw new Error(`exit ${r.code} : ${r.err.slice(0, 200)} ${r.contexte.slice(0, 120)}`);
+      if (!/jouer le contrôle seul/.test(r.err)) throw new Error("la solution préférée n'est pas dite au refus");
+    });
+  }
+  check("rouge — chez un produit, la même remise est AVERTIE (exit 0), jamais refusée : L-007 est servie avec l'avertissement", () => {
+    const p = racineProduit("produit-remise");
+    const r = jouer(bash("python scripts/check_markdown.py rapport.md ; git commit -m correctif ; git push"), p);
+    if (r.code !== 0 || !lecons(r.contexte).includes("L-007") || !/avertissement|barrière/i.test(r.contexte)) throw new Error(`exit ${r.code} ${r.contexte.slice(0, 200)} ${r.err.slice(0, 200)}`);
+  });
+  const L007_VERTS = [
+    [bash("node oracles/oracle-synthese.mjs f.md"), "le contrôle joué seul (le remède : lire son verdict avant de remettre)"],
+    [bash("git commit -F msg.txt"), "la remise jouée seule, après le verdict lu"],
+    [bash("git add oracles/hook-lecons.test.mjs && git commit -F msg.txt"), "un fichier de test seulement NOMMÉ par git add, sans contrôle joué"],
+    [bash("git commit -m \"corrige oracle-synthese.mjs, rejoué par node oracles/hook-x.test.mjs\""), "un contrôle seulement CITÉ dans le message de commit"],
+    [bash("if node oracles/hook-lecons.test.mjs; then git commit -F msg.txt; fi"), "la remise gardée par un `if` sur le verdict (la forme du contrat, TF-1009)"],
+    [bash("git push origin main > push.log 2>&1; node oracles/hook-lecons.test.mjs"), "la remise AVANT le contrôle : rien à garder"],
+    [bash("node forge/retours/oracle-lot.mjs \"lot.md\" --remettre"), "le geste outillé --remettre, qui lie la copie au verdict (TF-2314)"],
+  ];
+  for (const [entree, nom] of L007_VERTS) {
+    check(`vert — L-007 ne touche pas : ${nom}`, () => {
+      const r = jouer(entree, rp);
+      if (r.code !== 0 || lecons(r.contexte).includes("L-007") || /L-007/.test(r.err)) throw new Error(`exit ${r.code} ${r.contexte.slice(0, 160)} ${r.err.slice(0, 160)}`);
+    });
+  }
+  check("remède joué — la remise refusée passe en deux gestes : le contrôle seul, puis la remise seule", () => {
+    const refus = jouer(bash("python scripts/check_markdown.py rapport.md && git commit -F msg.txt"), rp);
+    const controle = jouer(bash("python scripts/check_markdown.py rapport.md"), rp), remise = jouer(bash("git commit -F msg.txt"), rp);
+    if (refus.code !== 2) throw new Error(`refus exit ${refus.code}`);
+    if (controle.code !== 0 || remise.code !== 0 || /L-007/.test(controle.err + remise.err + controle.contexte + remise.contexte)) throw new Error(`contrôle exit ${controle.code}, remise exit ${remise.code}`);
+  });
+
   // --- Durée : 20 appels du hook réel sur un geste qui sert une leçon ----------------------------------------------
   const rd = racinePilot("pilot-duree");
   const durees = Array.from({ length: 20 }, () => jouer(bash(HEREDOC_WINDOWS), rd).ms).sort((a, b) => a - b);

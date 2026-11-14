@@ -1,7 +1,7 @@
 {
   "schema": "lecons@1",
-  "version": "1.2.0",
-  "date": "2026-11-13",
+  "version": "1.3.0",
+  "date": "2026-11-14",
   "_commentaire": "Table des leçons génériques du pilot (TF-2150, décision humaine D-172 (a) du 04/11/2026, étude « Apprentissage des erreurs par les produits et la Factory » 20261104b, option O2). Lue au moment du geste par oracles/hook-lecons.mjs (PreToolUse sur Bash, PowerShell, Write, Edit, MultiEdit, Agent et Task ; `declencheur.sur` vaut `commande`, `chemin` ou `agent`, ce dernier jugeant la description d'un lancement d'agent, TF-1947), au pilot et chez chaque produit par `forge/hooks/factory.mjs lecons` ; rien n'est chargé à l'ouverture. Une leçon générique entre ici après décision au registre, avec une preuve qui se vérifie : le hook la revérifie avant chaque rappel et tait la leçon dont la preuve ne se vérifie plus. Jugée par `node scripts/lecons.mjs --verifier` ; passée de `rappel` à `barriere` par `--appliquer` quand elle récidive après son rappel (BOUCLE-AMELIORATION.md, section T1). Champs facultatifs : `declencheur.chaines` (`retirees` par défaut, `interpretees`, `gardees` : ce que le motif voit d'une commande, voir l'en-tête du hook), `barriere_le` et `motif_barriere` (écrits par --appliquer), `mesure` (calibrage du motif sur les gestes réels des transcriptions du poste).",
   "lecons": [
     {
@@ -282,6 +282,41 @@
         "faux_positifs_vus": null,
         "note": "faux positifs non mesurés (aucun échantillon relu). 512 lancements d'agent (outil Agent ou Task) dans les 59 transcriptions des 2 profils du poste dont le dossier est celui du pilot, hors ses arbres de travail ; 97 relectures d'intention écartées par le motif, 415 rappels. Aucun échantillon relu : le hook ne sait pas si le tour a écrit, la leçon est donc servie à tout lancement d'agent et son texte pose la condition. Coût : environ 500 caractères par lancement servi"
       }
+    },
+    {
+      "id": "L-007",
+      "classe": "remise-sans-verdict",
+      "symptome": "Un contrôle joué dans la même commande qu'une remise (`git commit`, `git push`, copie au sas) ne l'empêche pas : la remise part même quand le contrôle rend FAIL. 3 fois : copie d'un lot au sas les 04/11 et 09/11/2026 (RT-58), puis `check_markdown.py`, commit et push dans une commande le 10/11/2026 (RT-60), contrôle en FAIL",
+      "declencheur": {
+        "outils": [
+          "Bash",
+          "PowerShell"
+        ],
+        "sur": "commande",
+        "motif": "(?:\\b(?:node|python3?|py)(?:\\.exe)?[ \\t]+[^\\n;&|]*?(?:\\.test\\.mjs|\\boracle[\\w-]*\\.mjs|\\bself-tests?\\.mjs|\\bcheck_[\\w-]+\\.py|\\bverifier-[\\w-]+\\.mjs|\\brun-oracles?[\\w-]*\\.mjs|--self-test\\b)|(?:^|[;&|(][ \\t]*|\\n[ \\t]*)(?:pytest|ruff)\\b|\\bpython3?[ \\t]+-m[ \\t]+(?:pytest|ruff)\\b)(?:(?!\\bthen\\b)[\\s\\S]){0,3000}?(?:\\bgit(?:\\.exe)?(?:[ \\t]+-[Cc][ \\t]+\\S+)*[ \\t]+(?:commit|push)\\b|\\b(?:cp|copy|Copy-Item|mv|Move-Item)\\b[^\\n;&|]*_arrivee)"
+      },
+      "solutions": [
+        {
+          "texte": "jouer le contrôle seul, lire son verdict (PASS) dans sa sortie, puis remettre dans une commande à part ; pour un lot de retours, `node forge/retours/oracle-lot.mjs \"<lot>.md\" --remettre` joue le juge et ne copie qu'à un verdict sans FAIL",
+          "condition": "toute remise précédée d'un contrôle",
+          "preferee": true
+        },
+        {
+          "texte": "garder la remise dans un `if` sur la valeur lue (`if node <contrôle>; then git commit …; fi`)",
+          "condition": "contrôle qui sort en code non nul sur FAIL",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-2416"
+      },
+      "portee": "generique",
+      "statut": "barriere",
+      "revue_le": "2026-12-15",
+      "source": "TF-2416 (10/11/2026, RT-60 de Produit-84, 3e occurrence de RT-58 ; décision R-58 « A1 et A2 » du 10/11/2026 : la barrière de RT-58 couvre tout geste de remise) ; geste réel : `check_markdown.py`, `git commit`, `git push` en une commande, contrôle en FAIL (M7)",
+      "barriere_le": "2026-11-14",
+      "motif_barriere": "décision du 10/11/2026 (TF-2416, R-58) : barrière dès la 3e occurrence de RT-58, et la remise se refuse dès qu'un contrôle la précède dans la commande, puisque le verdict ne se lit qu'après"
     }
   ]
 }
