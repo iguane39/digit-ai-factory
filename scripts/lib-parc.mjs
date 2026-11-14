@@ -68,7 +68,10 @@ export const FORGES = [
 // mot : « Les dépôts privés peuvent conserver des données de type nom. Ces 2 projets sont privés, donc
 // pas de problème. » Les noms de cette liste se citent donc en clair, pilot public compris, et
 // l'écrivain de la table des pseudonymes ne les y inscrit jamais (TF-1505, `todo/anonymiser-entrant.mjs`).
-export const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing", "digit-ai-prospection"]);
+// `factory-digit-ai-fr` et `forge-digit-ai-fr` y entrent le 14/11/2026 (D-214 (a), réponse « 214a », mot pour mot :
+// « Site web portant la présentation complète de la Factory et ses forges ») : les deux graphies d'un même dépôt,
+// le préfixe de ses lots et son dossier local, déjà citées en clair dans 21 fichiers suivis du pilot (TF-2556).
+export const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing", "digit-ai-prospection", "factory-digit-ai-fr", "forge-digit-ai-fr"]);
 
 // LE PILOT ET SES NOMS D'HIER (TF-0525, mesuré le 25/08/2026). Le pilot n'est pas une forge et ne
 // figure pas dans `FORGES` : son nom s'écrivait donc en littéral à chaque endroit qui en avait

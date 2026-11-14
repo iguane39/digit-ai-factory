@@ -24,6 +24,34 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `digit-ai-marketing - RETOURS - 20261109b.tf.jsonl` | fichier | 23,3 Ko | 22 ligne(s) JSONL |
 | `digit-ai-marketing - RETOURS - 20261109c.md` | fichier | 79,5 Ko | Retours forges — digit-ai-marketing — 20261109c |
 | `digit-ai-marketing - RETOURS - 20261109c.tf.jsonl` | fichier | 70,5 Ko | 52 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114a.md` | fichier | 2,9 Ko | Retours forges — factory-digit-ai-fr — 20261114a |
+| `factory-digit-ai-fr - RETOURS - 20261114a.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114b.md` | fichier | 3,4 Ko | Retours forges — factory-digit-ai-fr — 20261114b |
+| `factory-digit-ai-fr - RETOURS - 20261114b.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114c.md` | fichier | 2,3 Ko | Retours forges — factory-digit-ai-fr — 20261114c |
+| `factory-digit-ai-fr - RETOURS - 20261114c.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114d.md` | fichier | 2,3 Ko | Retours forges — factory-digit-ai-fr — 20261114d |
+| `factory-digit-ai-fr - RETOURS - 20261114d.tf.jsonl` | fichier | 929 o | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114e.md` | fichier | 2,4 Ko | Retours forges — factory-digit-ai-fr — 20261114e |
+| `factory-digit-ai-fr - RETOURS - 20261114e.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114f.md` | fichier | 3,4 Ko | Retours forges — factory-digit-ai-fr — 20261114f |
+| `factory-digit-ai-fr - RETOURS - 20261114f.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114g.md` | fichier | 2,6 Ko | Retours forges — factory-digit-ai-fr — 20261114g |
+| `factory-digit-ai-fr - RETOURS - 20261114g.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114h.md` | fichier | 2,8 Ko | Retours forges — factory-digit-ai-fr — 20261114h |
+| `factory-digit-ai-fr - RETOURS - 20261114h.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114i.md` | fichier | 3,6 Ko | Retours forges — factory-digit-ai-fr — 20261114i |
+| `factory-digit-ai-fr - RETOURS - 20261114i.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114j.md` | fichier | 3,7 Ko | Retours forges — factory-digit-ai-fr — 20261114j |
+| `factory-digit-ai-fr - RETOURS - 20261114j.tf.jsonl` | fichier | 2,2 Ko | 2 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114k.md` | fichier | 2,5 Ko | Retours forges — factory-digit-ai-fr — 20261114k |
+| `factory-digit-ai-fr - RETOURS - 20261114k.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114l.md` | fichier | 2,7 Ko | Retours forges — factory-digit-ai-fr — 20261114l |
+| `factory-digit-ai-fr - RETOURS - 20261114l.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114m.md` | fichier | 2,5 Ko | Retours forges — factory-digit-ai-fr — 20261114m |
+| `factory-digit-ai-fr - RETOURS - 20261114m.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114n.md` | fichier | 2,5 Ko | Retours forges — factory-digit-ai-fr — 20261114n |
+| `factory-digit-ai-fr - RETOURS - 20261114n.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261015a.md` | fichier | 8,5 Ko | Retours forges — Produit-02 — 20261015a |
 | `Produit-02 - RETOURS - 20261015a.tf.jsonl` | fichier | 3,3 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261018a.md` | fichier | 6,4 Ko | Retours forges — Produit-02 — 20261018a |
@@ -247,4 +275,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261112h.md` | fichier | 5,4 Ko | Retours forges — Produit-86 — 20261112h |
 | `Produit-86 - RETOURS - 20261112h.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 
-_228 fichier(s), 2 sous-dossier(s)_
+_256 fichier(s), 2 sous-dossier(s)_
