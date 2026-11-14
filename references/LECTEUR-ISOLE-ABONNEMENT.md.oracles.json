@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+  "date_iso": "2026-11-14T17:07:35.240Z",
+  "registre_version": "2.63.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 4,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+      "verdict": "SKIP",
+      "detail": "aucune affirmation chiffrée hors table détectée"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+      "verdict": "SKIP",
+      "detail": "nom ne se réclamant pas de la convention"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md",
+    "ts": "2026-11-14T17:07:35.239Z",
+    "fichiers": {
+      "..\\_wt-pilot-ph\\references\\LECTEUR-ISOLE-ABONNEMENT.md": "cb491a8b3a2134a276c04503a3cff253a922c49b1144e752559870f5d7a0654d"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
