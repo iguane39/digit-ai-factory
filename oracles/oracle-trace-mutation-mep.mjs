@@ -472,7 +472,10 @@ function confronterWebsec(texte, param) {
  * Un dossier qui cite une fiche de sécurité porte donc le verdict de FS12, rejoué AVEC l'étiquette. Même forme que TM15 et TM16 : le silence est le
  * défaut, AVERTISSEMENT pour une règle neuve, y compris pour le FAIL que le dossier porte (la fiche périmée se réémet, elle ne bloque pas le GO d'elle-même).
  */
-const FICHE_SECURITE = /fiche\s+(?:de\s+)?s[ée]curit[ée]|\b[A-Z0-9]{2,}-SEC-(?:DEV|HPR|PRD)-\d{8}[a-z]?\b/i;
+// Deux expressions (P2 d'oracle-pieges-regex) : la phrase en casse libre, le code de fiche en casse exacte.
+const FICHE_SECURITE_MOTS = /fiche\s+(?:de\s+)?s[ée]curit[ée]/i;
+const FICHE_SECURITE_CODE = /\b[A-Z0-9]{2,}-SEC-(?:DEV|HPR|PRD)-\d{8}[a-z]?\b/;
+const FICHE_SECURITE = { test: (t) => FICHE_SECURITE_MOTS.test(t) || FICHE_SECURITE_CODE.test(t) };
 const COMMANDE_FS12 = "node <audit>/oracles/verifier-fiche-securite.mjs <fiche.html> --etiquette-deployee <x.y.z>";
 function confronterFicheSecurite(texte) {
   if (!FICHE_SECURITE.test(texte)) return { statut: "SANS_OBJET", message: "aucune fiche de sécurité citée au dossier : FS12 sans objet" };
