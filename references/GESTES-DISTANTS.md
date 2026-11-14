@@ -111,6 +111,24 @@ node.exe`), un vrai geste. Aucun refus n'est perdu, aucun faux positif n'appara�
 de gestion ou un client applicatif (`imaplib`, `requests`), et non par un client de base ; un hôte de production qui ne porte
 pas `prod` dans son nom ; `Stop-Process` sur une variable qui ne tient qu'un processus, refusé par prudence.
 
+## Un lot de droits qui ouvre un environnement relève d'abord toutes les ressources protégées de la chaîne (TF-2409, 14/11/2026)
+
+Décision prise sous R-58 le 10/11/2026. Un lot de gestes de droits qui OUVRE un environnement (premier déploiement d'une
+chaîne, environnement neuf) se pose après un **relevé en lecture de TOUTES les ressources protégées que la chaîne
+référence**. Ce sont les environnements, les connexions de service, les groupes de variables et les files d'agents. Pour chacune, le relevé dit si
+la chaîne y est déjà autorisée. Une ressource où elle ne l'est pas entre au lot, avec son geste, ou se nomme comme
+volontairement laissée de côté. Le lot ne se limite pas aux ressources que la session a pensé à citer.
+
+Le fait : le 10/11/2026, chez un produit, la décision groupée qui ouvrait l'environnement de préproduction listait les
+autorisations de la chaîne sur les deux environnements du dépôt. Elle omettait la connexion de service que la chaîne
+référence. Le run s'est arrêté sur la vérification d'autorisation de cette connexion (`Checkpoint.Authorization`), et une
+seconde décision de droits a dû être posée. Une décision groupée unique (TF-1959, point 1 ci-dessus) n'est tenue que si sa
+liste est complète. Le relevé précède donc le lot, il ne le suit pas. Un relevé en lecture n'est pas un geste de la liste
+fermée : il se joue sans lot.
+
+Non jugé, et c'est dit : le hook ne lit pas la définition de la chaîne et ne sait pas quelles ressources elle référence.
+La complétude du relevé tient à la session qui pose le lot.
+
 ## L'accord est cité, la commande est nommée (D-195 (b), 10/11/2026)
 
 Décision humaine du 10/11/2026, même réponse, option (b) : « l'accord doit se retrouver mot pour mot dans un message humain
