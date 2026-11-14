@@ -272,7 +272,9 @@ function suppressionTemporaireEnLigne(c) {
 }
 const VERBES_EFFET = new RegExp([
   // TF-2034 (02/11/2026) : `git stash list|show` et `git tag -l|--list` lisent, comme `git worktree list` ; seuls `stash` et `tag` qui écrivent restent des effets.
-  String.raw`\bgit\s+(?:commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))\b`,
+  // TF-2407 (14/11/2026) : le verbe se termine par `(?![\w-])`, non par `\b` — le tiret est une frontière de mot, et `git merge-base`, `git merge-tree`,
+  // `git merge-file` (lectures) se lisaient comme `git merge`.
+  String.raw`\bgit\s+(?:commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))(?![\w-])`,
   String.raw`(?:^|[\s;&|(])(?:rm|del|mv|cp|rmdir|mkdir|touch|tee|Remove-Item|Move-Item|Copy-Item|Set-Content|Add-Content|Out-File|New-Item|Rename-Item|Clear-Content)(?=\s|$)`,
   String.raw`\bsed\s+-i\b`,
   String.raw`\b(?:npm|pnpm|yarn)\s+(?:install|i|ci|add|remove|update|publish)\b`,
@@ -355,7 +357,7 @@ const sansCorpsDeTexte = (cmd) => String(cmd || "")
   .replace(/<<-?\s*(["']?)(\w+)\1([^\n]*)\n[\s\S]*?\n\s*\2\s*(?=\n|$)/g, "<<$2$3")
   .replace(/@(['"])\r?\n[\s\S]*?\r?\n\1@/g, "@$1$1@");
 // `git -C <dossier> commit`, `git -c clé=valeur push` : `VERBES_EFFET` n'admet aucune option entre `git` et son verbe.
-const GIT_A_OPTIONS = /\bgit(?:\s+(?:-C\s+(?:"[^"]*"|'[^']*'|\S+)|-c\s+\S+|--(?:git-dir|work-tree|namespace)(?:=\S+|\s+\S+)|--no-pager|--bare|-P))+\s+(commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))\b/i;
+const GIT_A_OPTIONS = /\bgit(?:\s+(?:-C\s+(?:"[^"]*"|'[^']*'|\S+)|-c\s+\S+|--(?:git-dir|work-tree|namespace)(?:=\S+|\s+\S+)|--no-pager|--bare|-P))+\s+(commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))(?![\w-])/i;   // TF-2407 : fin de verbe sans `\b`, comme VERBES_EFFET
 
 /** Ce que le tour a écrit, une ligne par écriture relevée ; vide pour un tour de lecture. Voir le bloc ci-dessus. */
 export function ecrituresDuTour(segment) {
