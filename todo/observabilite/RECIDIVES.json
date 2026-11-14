@@ -1,175 +1,179 @@
 {
  "outil": "generer-recidives",
- "etat_au": "2026-10-26T13:49:35.276Z",
- "items": 1956,
- "items_classes": 978,
- "recidives": 508,
- "classes": 161,
+ "etat_au": "2026-10-30T17:13:35.004Z",
+ "items": 2033,
+ "items_classes": 1049,
+ "recidives": 517,
+ "classes": 186,
  "familles": 18,
- "classes_sans_fondateur": 22,
+ "classes_sans_fondateur": 23,
  "retours_classe_suspecte": 88,
- "releves": 233,
- "produits_releves": 26,
- "produits_non_equipes": 1,
- "manques_heritage": 408,
- "couples_non_atteints": 378,
- "produits_en_retard": 18,
- "stock_candidats": 12,
- "stock_decides_non_clos": 55,
- "items_ouverts_vieux": 46,
- "sources_silencieuses": 38,
+ "releves": 247,
+ "produits_releves": 0,
+ "produits_non_equipes": 0,
+ "manques_heritage": 0,
+ "couples_non_atteints": 508,
+ "produits_en_retard": 19,
+ "stock_candidats": 11,
+ "stock_decides_non_clos": 62,
+ "items_ouverts_vieux": 56,
+ "sources_silencieuses": 39,
  "sources_muettes": [
   {
    "source": "pilot-campagne-fiches-html",
-   "silence": 78
+   "silence": 82
   },
   {
    "source": "COMPTA - Ventilation de facture Fournisseur-A",
-   "silence": 73
+   "silence": 77
   },
   {
    "source": "BdL",
-   "silence": 72
+   "silence": 76
   },
   {
    "source": "digit-desk.fr",
-   "silence": 72
+   "silence": 76
   },
   {
    "source": "forge-digit-ai-fr",
-   "silence": 72
+   "silence": 76
   },
   {
    "source": "Produit-09",
-   "silence": 67
+   "silence": 71
   },
   {
    "source": "digit-ai-fr",
-   "silence": 65
+   "silence": 69
   },
   {
    "source": "Produit-10",
-   "silence": 63
+   "silence": 67
   },
   {
    "source": "factory-digit-ai-fr",
-   "silence": 62
+   "silence": 66
   },
   {
    "source": "Produit-01",
-   "silence": 60
+   "silence": 64
   },
   {
    "source": "Produit-04",
-   "silence": 60
+   "silence": 64
   },
   {
    "source": "Produit-05",
-   "silence": 56
+   "silence": 60
   },
   {
    "source": "Produit-65",
-   "silence": 53
+   "silence": 57
   },
   {
    "source": "digit-ai-forge-tests",
-   "silence": 51
+   "silence": 55
   },
   {
    "source": "digit-ai-forge-conception",
-   "silence": 50
+   "silence": 54
   },
   {
    "source": "produits-anciens",
-   "silence": 50
+   "silence": 54
   },
   {
    "source": "Produit-61",
-   "silence": 47
+   "silence": 51
   },
   {
    "source": "digit-ai-forge-agents",
-   "silence": 44
+   "silence": 48
   },
   {
    "source": "digit-ai-forge-design",
-   "silence": 44
+   "silence": 48
   },
   {
    "source": "digit-ai-forge-development",
-   "silence": 44
+   "silence": 48
   },
   {
    "source": "Produit-11",
-   "silence": 42
+   "silence": 46
   },
   {
    "source": "Produit-62",
-   "silence": 35
+   "silence": 39
   },
   {
    "source": "Produit-67",
-   "silence": 34
+   "silence": 38
   },
   {
    "source": "Produit-70",
-   "silence": 32
+   "silence": 36
   },
   {
    "source": "Produit-72",
-   "silence": 32
+   "silence": 36
   },
   {
    "source": "Produit-77",
-   "silence": 31
+   "silence": 35
   },
   {
    "source": "Produit-68",
-   "silence": 29
+   "silence": 33
   },
   {
    "source": "digit-ai-prospection",
-   "silence": 28
+   "silence": 32
   },
   {
    "source": "Produit-76",
-   "silence": 28
+   "silence": 32
   },
   {
    "source": "Produit-78",
-   "silence": 28
+   "silence": 32
   },
   {
    "source": "digit-ai-marketing",
-   "silence": 26
-  },
-  {
-   "source": "Produit-03",
-   "silence": 24
+   "silence": 30
   },
   {
    "source": "Produit-80",
-   "silence": 14
+   "silence": 18
   },
   {
    "source": "Produit-81",
-   "silence": 13
-  },
-  {
-   "source": "Produit-64",
-   "silence": 11
+   "silence": 17
   },
   {
    "source": "Produit-82",
-   "silence": 11
+   "silence": 15
   },
   {
    "source": "Produit-83",
-   "silence": 11
+   "silence": 15
   },
   {
    "source": "Produit-12",
-   "silence": 8
+   "silence": 12
+  },
+  {
+   "source": "Produit-02",
+   "silence": 11
+  },
+  {
+   "source": "Produit-03",
+   "silence": 10
+  },
+  {
+   "source": "Produit-79",
+   "silence": 10
   }
  ],
  "seuil_jours": 7,
