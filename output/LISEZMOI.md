@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 710 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 711 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -730,6 +730,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md | 20261102b | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` |
 | Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md | 20261103p | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` |
 | Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md | 20261001b | 18.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md` |
+| Digit-AI - Synthese Mandat - Seconde campagne du 14-11 close et publiee - 20261114e.md | 20261114e | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Seconde campagne du 14-11 close et publiee - 20261114e.md` |
 | Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md | 20261015l | 47.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` |
 | Digit-AI - Synthese Mandat - Skill clip de presentation integre - 20261110d.md | 20261110d | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill clip de presentation integre - 20261110d.md` |
 | Digit-AI - Synthese Mandat - Skill make-it-better construit - 20261102m.md | 20261102m | 8.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill make-it-better construit - 20261102m.md` |
