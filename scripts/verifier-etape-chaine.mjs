@@ -163,7 +163,7 @@ let BASH = undefined;
 function bashDuPoste() {
   if (BASH !== undefined) return BASH;
   const candidats = [process.env.FORGE_BASH,
-    ...(process.platform === "win32" ? ["C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe"] : []), "bash"].filter(Boolean);
+    ...(process.platform === "win32" ? ["C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe"] : []), "bash"].filter(Boolean); // outil-en-dur-ok : repli de FORGE_BASH, puis du chemin ; sans bash, EC-6 dit SKIP (TF-2505)
   BASH = null;
   for (const c of candidats) {
     if (c !== "bash" && !existsSync(c)) continue;

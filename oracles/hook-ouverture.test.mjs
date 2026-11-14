@@ -35,6 +35,28 @@ const TABLES = mkdtempSync(join(tmpdir(), "hook-ouverture-tables-"));
 process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
 process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
 const PILOT = join(ICI, "..");
+// TF-2511 (14/11/2026) — LES BORNES DE DURÉE SE LISENT CONTRE UNE MESURE TÉMOIN, PAS EN MILLISECONDES ABSOLUES. Le fait : le 13/11/2026, sous la charge du poste (une dizaine d'agents), la recette
+// rougissait au hasard — le relevé d'un produit, borné à 20 s, mesuré à 23 s (3,8 s au repos, 3,69 s pour le relevé de 45 s) ; le relevé de la flotte, que le hook coupe à 60 s, tué alors qu'il
+// rend en 2 s au repos ; vert joué seul et dans la recette entière. Le témoin est le démarrage nu de Node (`node -e ""`, 7 passages, la médiane), que la charge ralentit comme elle ralentit
+// le hook : le facteur de charge vaut cette médiane sur `TEMOIN_REPOS_MS`, et chaque borne vaut sa valeur au repos fois ce facteur (jamais moins d'une fois). Au repos, les bornes restent
+// celles d'avant (20 s, 45 s, 2 s) ; un relevé réellement ralenti, à poste calme, les dépasse toujours et reste rouge.
+// `TEMOIN_REPOS_MS` : médiane de 20 passages, mesurée sur 9 séries le 14/11/2026 sur le poste de la recette, de 35 à 51 ms d'une série à l'autre.
+const TEMOIN_REPOS_MS = 40;
+/** La médiane, en ms, de `n` démarrages nus de Node, joués maintenant. */
+const mesurerTemoinMs = (n = 5) => {
+  const d = [];
+  for (let i = 0; i < n; i++) { const t0 = process.hrtime.bigint(); spawnSync(process.execPath, ["-e", ""], { encoding: "utf8" }); d.push(Number(process.hrtime.bigint() - t0) / 1e6); }
+  d.sort((a, b) => a - b);
+  return d[Math.floor(n / 2)];
+};
+/** Le facteur de charge d'un témoin : jamais sous 1, de sorte qu'un poste calme garde la borne au repos. */
+const facteurDeCharge = (temoinMs = mesurerTemoinMs()) => Math.max(1, temoinMs / TEMOIN_REPOS_MS);
+/** La borne (ms) d'une durée dont la valeur au repos est `reposMs`, à l'échelle de la charge mesurée par le témoin. */
+const borneSousCharge = (reposMs, facteur) => Math.round(reposMs * facteur);
+// Les DÉLAIS des appels (`timeout`, 120 s au repos) se posent d'un facteur gardé 30 s : un délai n'est pas un verdict, et mesurer le témoin avant chaque appel coûterait le temps qu'il protège.
+// Les BORNES jugées ci-dessous mesurent le témoin à neuf, avant et après l'opération. Sous la charge, un appel qui dépasse son délai au repos plantait la recette (ETIMEDOUT) au lieu d'un verdict.
+let facteurGarde = { t: 0, f: 1 };
+const delaiSousCharge = (reposMs) => { if (Date.now() - facteurGarde.t > 30000) facteurGarde = { t: Date.now(), f: facteurDeCharge() }; return Math.round(reposMs * facteurGarde.f); };
 // D-135 (a) : l'ouverture du pilot lance, une fois par semaine, le rejeu de tous les consommateurs des skills (jusqu'à 50 minutes). Ce banc ne
 // doit JAMAIS déclencher le vrai : le lancement est coupé pour tous les passages ci-dessous, et seul le banc du rejeu (fin de fichier) le rétablit,
 // sur une table factice et une trace jetable.
@@ -63,7 +85,7 @@ const EXEMPLE = [
 ].join(NL);
 
 const joue = (produit) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT],
-  { cwd: produit, encoding: "utf8", timeout: 120000 });
+  { cwd: produit, encoding: "utf8", timeout: delaiSousCharge(120000) });
 
 let pass = 0, fail = 0;
 // TF-2256 (06/11/2026) : `FORGE_CAS_OUVERTURE=2214` (ou `1521,1214`, `1635-1642`) ne joue que les sections de ces numéros — le numéro du TF de
@@ -139,8 +161,9 @@ writeFileSync(join(produitClos, "forge", "ledger.jsonl"), [
   JSON.stringify({ type: "deplacement_effectue", ancien: "output/Note - 20260920a.html", ts: "2026-09-21T09:00:00.000Z" }),
 ].join(NL) + NL, "utf8");
 
-const lancerOuverturePilot = () => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
-  { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest } });
+const lancerOuverturePilot = () => { const f = facteurDeCharge();   // TF-2511 : délais de l'appel et du relevé de la flotte à l'échelle de la charge
+  return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
+    { cwd: PILOT, encoding: "utf8", timeout: Math.round(120000 * f), env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, FORGE_DELAI_RELEVE_FLOTTE_S: String(Math.round(60 * f)) } }); };
 const sortieOuverturePilot = voudrait(1521, 1214, 1301, 2151, 1635) ? lancerOuverturePilot() : "";   // relevé lu par ces cinq sections
 
 check("TF-1521 — un déplacement EN ATTENTE est listé à l'ouverture, avec sa date et son motif", () => {
@@ -180,8 +203,14 @@ if (veut(23)) {
     }
     return profil;
   };
-  const ouvrirAvec = (profil) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
-    { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonVide, HOME: maisonVide } });
+  // TF-2511 : le délai de l'appel et celui du relevé de la flotte (60 s dans le hook) valent leur valeur au repos fois le facteur de charge mesuré par le témoin ;
+  // `delaiFlotteS` pose le délai du relevé (en secondes) pour le cas rouge, où il est volontairement trop court.
+  const ouvrirAvec = (profil, delaiFlotteS = null) => {
+    const f = facteurDeCharge();
+    return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
+      { cwd: PILOT, encoding: "utf8", timeout: Math.round(120000 * f), env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonVide, HOME: maisonVide,
+        FORGE_DELAI_RELEVE_FLOTTE_S: String(delaiFlotteS ?? Math.round(60 * f)) } });
+  };
   const sortieTenu = ouvrirAvec(profilRelecture("tenu", 2)), sortieFranchi = ouvrirAvec(profilRelecture("franchi", 5));
   check("D-23 vert — l'ouverture du pilot affiche les relectures d'intention (2 relectures, 2 800 460 jetons) et un seuil TENU", () => {
     // D-64 (a) du 21/10/2026 : l'alarme de l'essai vit dans la section « Œil critique », qui remplace « Flotte d'agents ».
@@ -195,6 +224,13 @@ if (veut(23)) {
   check("D-23 rouge — plus de 6 000 000 de jetons de relecture en un jour (5 relectures, 7 001 150) : l'ouverture dit FRANCHI et demande l'arrêt", () => {
     if (!/5 relecture\(s\), 7 001 150 jetons.*\*\*FRANCHI : arrêter l'essai et demander à l'humain\*\*/.test(sortieFranchi))
       throw new Error((sortieFranchi.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
+  });
+  // TF-2511 rouge → vert — un relevé de la flotte qui dépasse son délai reste ROUGE : le délai posé à 1 ms, plus court que n'importe quel relevé, tue le relevé ; le hook le dit ILLISIBLE
+  // et la ligne des relectures est absente (le hook ne bloque jamais). Au délai de la recette (cas D-23 ci-dessus), le relevé rend. Le délai est ce qui sépare un relevé lent d'un relevé tué.
+  check("TF-2511 rouge — le relevé de la flotte coupé à son délai (1 ms) est dit ILLISIBLE et la ligne des relectures disparaît ; vert — au délai de la recette, elle est là", () => {
+    const coupe = ouvrirAvec(profilRelecture("coupe", 2), 0.001);
+    if (!/relevé de la flotte ILLISIBLE/.test(coupe) || /relectures d'intention \(essai/.test(coupe)) throw new Error((coupe.match(/relevé de la flotte[^\n]*|relectures d'intention[^\n]*/) || ["ni alarme ni ligne"])[0]);
+    if (!/relectures d'intention \(essai/.test(sortieTenu) || /relevé de la flotte ILLISIBLE/.test(sortieTenu)) throw new Error("au délai de la recette, le relevé de la flotte n'a pas rendu");
   });
 }
 veut(1301);
@@ -264,7 +300,7 @@ veut(1635);
 // contexte porte TOUT le relevé texte — rien de perdu au passage — précédé de l'en-tête qui dit
 // l'asynchronie. Sens rouge : une ligne du relevé absente du contexte, ou une sortie non JSON.
 const sortieJson = !voudrait(1635, 1636) ? "" : execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--contexte-json"],
-  { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest } });
+  { cwd: PILOT, encoding: "utf8", timeout: delaiSousCharge(120000), env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest } });
 
 check("--contexte-json : la sortie est UN objet JSON SessionStart, sans texte autour", () => {
   let j;
@@ -323,6 +359,7 @@ check("TF-1635 — le hook lancé en synchrone chez un produit passe son réglag
   mkdirSync(join(P, ".claude"), { recursive: true });
   const f = join(P, ".claude", "settings.json");
   writeFileSync(f, SETTINGS_SYNC, "utf8");
+  const chargeAvant1 = facteurDeCharge();
   const t0 = Date.now();
   const sortie = joue(P);
   const duree = Date.now() - t0;
@@ -335,7 +372,8 @@ check("TF-1635 — le hook lancé en synchrone chez un produit passe son réglag
   if (!apres.includes("\r\n    \"hooks\"")) throw new Error("fins de ligne ou indentation du produit perdues");
   if (!/## Gates actifs dans cette session \(R-44\)/.test(sortie)) throw new Error("les gates de session manquent à la sortie");
   if (/## Fraîcheur|## Héritage/.test(sortie)) throw new Error("le relevé complet a été joué au lieu de rendre la main");
-  if (duree > 20000) throw new Error(`rendu en ${duree} ms, au-delà de 20 s`);
+  const borne1 = borneSousCharge(20000, Math.max(chargeAvant1, facteurDeCharge()));   // TF-2511
+  if (duree > borne1) throw new Error(`rendu en ${duree} ms, au-delà de ${borne1} ms (20 s au repos, à l'échelle de la charge mesurée par le témoin)`);
   if (passerOuvertureEnAsync(f).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
 });
 
@@ -599,7 +637,8 @@ if (veut(1758, 1760)) {
   writeFileSync(join(T2, "noms.json"), JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
   writeFileSync(join(T2, "produits.json"), JSON.stringify({ produits: { ProduitJouetZZ: "Produit-64" } }), "utf8");
   const env = { ...process.env, FORGE_NOMS_INTERDITS: join(T2, "noms.json"), FORGE_PRODUITS_PSEUDO: join(T2, "produits.json") };
-  const jouer = () => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT], { cwd: P, encoding: "utf8", timeout: 120000, env });
+  const jouer = () => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT], { cwd: P, encoding: "utf8", timeout: delaiSousCharge(120000), env });
+  const chargeAvant2 = facteurDeCharge();
   const t0 = Date.now();
   const s1 = jouer();
   const duree = Date.now() - t0;
@@ -617,7 +656,8 @@ if (veut(1758, 1760)) {
     if (!/depuis votre ouverture précédente/.test(section(s2, "## Vos retours au registre du pilot (TF-1760)"))) throw new Error("la seconde ouverture ne situe pas les clôtures");
   });
   check(`TF-1758/TF-1760 — le relevé du produit reste sous 20 s (mesuré : ${duree} ms, sans bootstrap)`, () => {
-    if (duree > 20000) throw new Error(`${duree} ms`);
+    const borne = borneSousCharge(20000, Math.max(chargeAvant2, facteurDeCharge()));   // TF-2511
+    if (duree > borne) throw new Error(`${duree} ms, au-delà de ${borne} ms (20 s au repos, à l'échelle de la charge mesurée par le témoin)`);
   });
 }
 
@@ -760,6 +800,7 @@ if (veut(2330, 2333)) {
   const sectionSeances = (s) => (s.split("## Séances datées dans les 5 jours")[1] || "").split("\n## ")[0];
   const sectionMalFormee = (s) => (s.split("## Calendrier des séances mal formé")[1] || "").split("\n## ")[0];
   const sectionEngagements = (s) => (s.split("## Engagements des documents remis, NON tenus")[1] || "").split("\n## ")[0];
+  const chargeAvant3 = facteurDeCharge();
   const t0 = Date.now();
   const s0 = joue(P);
   const duree0 = Date.now() - t0;
@@ -825,7 +866,8 @@ if (veut(2330, 2333)) {
     if (/Engagements des documents remis, NON tenus/.test(joue(P))) throw new Error("la section persiste alors que le livrable existe");
   });
   check(`TF-2330 durée — le relevé d'un produit (sans le tirage réseau) reste sous 45 s, calendrier et registre compris (mesuré : ${duree0} ms)`, () => {
-    if (duree0 >= 45000) throw new Error(`${duree0} ms`);
+    const borne = borneSousCharge(45000, Math.max(chargeAvant3, facteurDeCharge()));   // TF-2511
+    if (duree0 >= borne) throw new Error(`${duree0} ms, au-delà de ${borne} ms (45 s au repos, à l'échelle de la charge mesurée par le témoin)`);
   });
 }
 
@@ -896,7 +938,7 @@ if (veut(1635)) {
     const t0 = Date.now();
     writeFileSync(tr, [entree(t0 - 60000, "Read"), entree(t0 + decalage, "Bash")].join(NL) + NL, "utf8");
     sortie = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT, "--contexte-json"],
-      { cwd: P, encoding: "utf8", timeout: 120000, input: JSON.stringify({ session_id: "s-test", transcript_path: tr }) });
+      { cwd: P, encoding: "utf8", timeout: delaiSousCharge(120000), input: JSON.stringify({ session_id: "s-test", transcript_path: tr }) });
     const fin = Date.now();
     let debut = t0;
     try { debut = Date.parse(JSON.parse(readFileSync(traceGestes, "utf8").trim().split(NL).pop()).debut_releve); } catch { /* trace absente : le cas le dira */ }
@@ -1047,7 +1089,7 @@ if (veut(2048)) {
     const t0 = Date.now();
     try {
       return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
-        { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_TRACE_CONSOMMATEURS: trace, FORGE_ROOT: parc } });
+        { cwd, encoding: "utf8", timeout: delaiSousCharge(120000), env: { ...process.env, FORGE_TRACE_CONSOMMATEURS: trace, FORGE_ROOT: parc } });
     } finally { if (!enProduit) durees.push(Date.now() - t0); }
   };
   const cwd = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-cwd-"));
@@ -1147,7 +1189,8 @@ if (veut(135)) {
     // 40 s contre 52 s le suivant). Le coût se juge sur l'appel de lancement, mesuré dans le hook ; l'attente, sur le factice encore bloqué au retour
     // (cas rouge ci-dessus) : une ouverture qui l'attendrait serait coupée à DELAI_OUVERTURE, bien avant VIE_FACTICE. L'écart reste affiché, pour information.
     check("D-135 — 0 seconde de plus à attendre : le lancement lui-même prend moins de 2 s, mesuré dans le hook", () => {
-      if (!(msLancement < 2000)) throw new Error(`appel de lancement : ${msLancement} ms`);
+      const borne = borneSousCharge(2000, facteurDeCharge());   // TF-2511
+      if (!(msLancement < borne)) throw new Error(`appel de lancement : ${msLancement} ms, au-delà de ${borne} ms (2 s au repos, à l'échelle de la charge mesurée par le témoin)`);
     });
 
     const debut = lire(etatPath)?.dernier?.debut;
@@ -1204,7 +1247,7 @@ if (veut(2067)) {
   const journal = join(dossier, "HERITAGE-RELEVES.jsonl");
   const cwd = mkdtempSync(join(tmpdir(), "ouverture-heritage-cwd-"));
   const jouer = (extra) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
-    { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racine, FORGE_NOMS_INTERDITS: join(dossier, "_noms-interdits.json"),
+    { cwd, encoding: "utf8", timeout: delaiSousCharge(120000), env: { ...process.env, FORGE_ROOT: racine, FORGE_NOMS_INTERDITS: join(dossier, "_noms-interdits.json"),
       FORGE_PRODUITS_PSEUDO: join(dossier, "_produits-pseudonymes.json"), FORGE_HERITAGE_RELEVES: journal, ...extra } });
   try {
     const sortie = jouer({});
@@ -1236,7 +1279,7 @@ if (sectionVoulue) {
     mkdirSync(join(pilotFactice, "scripts"), { recursive: true });
     writeFileSync(join(pilotFactice, "scripts", "indices-uniques.mjs"), "console.log(JSON.stringify({ collisions: [{ ou: 'output/x.md', message: \"indice 'a' partagé : l'indice existe déjà\" }], passif: 0 }));" + NL);
     writeFileSync(join(pilotFactice, "scripts", "allouer-indice.mjs"), "console.log('allouer-indice-joue');" + NL);
-    const sortie = execFileSync(process.execPath, [hook, "--sans-readme", "--pilot", pilotFactice], { cwd: produitSansScripts, encoding: "utf8", timeout: 120000 });
+    const sortie = execFileSync(process.execPath, [hook, "--sans-readme", "--pilot", pilotFactice], { cwd: produitSansScripts, encoding: "utf8", timeout: delaiSousCharge(120000) });
     const m = sortie.match(/réindexer le plus récent : `(node [^`]+)`/);
     check("TF-2335 vert — la collision d'indice est dite chez le produit avec une commande de réindexation", () => {
       if (!m) throw new Error(`commande de réindexation absente de la sortie : ${sortie.slice(0, 300)}`);
@@ -1318,7 +1361,8 @@ if (veut(2442)) {
     const msLancement = Number((/lancement en (\d+) ms/.exec(premiere.out) || [])[1]);
     console.log(`  (mesure : ouverture sans lancement ${temoin.ms} ms, avec lancement ${premiere.ms} ms, appel de lancement ${msLancement} ms ; faux gh encore bloqué au retour)`);
     check("TF-2442 — le hook reste synchrone et court : le lancement lui-même prend moins de 2 s, mesuré dans le hook (la coupure est à 60 s, la borne du hook à 45 s)", () => {
-      if (!(msLancement < 2000)) throw new Error(`appel de lancement : ${msLancement} ms`);
+      const borne = borneSousCharge(2000, facteurDeCharge());   // TF-2511
+      if (!(msLancement < borne)) throw new Error(`appel de lancement : ${msLancement} ms, au-delà de ${borne} ms (2 s au repos, à l'échelle de la charge mesurée par le témoin)`);
     });
 
     const pendant = jouer(LANCE);
@@ -1357,6 +1401,24 @@ if (veut(2442)) {
     rmSync(dossier, { recursive: true, force: true });
     rmSync(cwd, { recursive: true, force: true });
   }
+}
+
+// ---- TF-2511 (14/11/2026) : LES BORNES DE DURÉE SE LISENT CONTRE UNE MESURE TÉMOIN ------------------------------------------------------------------------------------------
+// Sens rouge : au repos (témoin à 40 ms, facteur 1), un relevé de 23 s dépasse sa borne de 20 s, et un hook réellement ralenti, à poste calme, reste refusé. Sens vert : sous une charge qui multiplie le
+// témoin par 4 (160 ms), la même durée de 23 s tient sous la borne de 80 s — la charge seule ne rougit plus. Le témoin mesuré est un nombre fini et positif, et le facteur ne descend jamais sous 1.
+if (veut(2511)) {
+  check("TF-2511 rouge — au repos (témoin à 40 ms), un relevé de 23 s reste refusé : la borne de 20 s tient, le facteur ne descend pas sous 1 même pour un témoin plus rapide", () => {
+    if (!(23000 > borneSousCharge(20000, facteurDeCharge(40)))) throw new Error("23 s passent sous la borne de 20 s à poste calme");
+    if (facteurDeCharge(10) !== 1 || borneSousCharge(20000, facteurDeCharge(10)) !== 20000) throw new Error("un témoin plus rapide que le repos desserre la borne");
+  });
+  check("TF-2511 vert — sous une charge qui porte le témoin à 160 ms (facteur 4), 23 s tiennent sous la borne de 80 s : la charge seule ne rougit plus", () => {
+    const b = borneSousCharge(20000, facteurDeCharge(160));
+    if (b !== 80000 || !(23000 <= b)) throw new Error(`borne ${b} ms`);
+  });
+  check(`TF-2511 — le témoin mesuré ici est un nombre fini et positif (facteur de charge ${facteurDeCharge().toFixed(2)}, repos ${TEMOIN_REPOS_MS} ms)`, () => {
+    const t = mesurerTemoinMs(3);
+    if (!Number.isFinite(t) || !(t > 0) || !Number.isFinite(facteurDeCharge())) throw new Error(`témoin ${t}`);
+  });
 }
 
 if (filtre.actif) { const c = conclureFiltre("hook-ouverture", filtre, fail ? [`${fail} contrôle(s) en échec (lignes [FAIL] ci-dessus)`] : []); (c.code === 0 ? console.log : console.error)(c.ligne); process.exit(c.code); }

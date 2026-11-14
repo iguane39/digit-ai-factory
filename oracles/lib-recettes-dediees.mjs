@@ -51,4 +51,8 @@ export const DEDIES = {
   // (TF-2109, décision humaine « A2 » du 03/11/2026). Banc dédié : ses fixtures bâtissent des parcs
   // jetables en dépôts git et y écrivent à dessein les identifiants arrêtés que l'oracle refuse.
   "oracle-modeles-tiers.mjs": "oracle-modeles-tiers.test.mjs",
+  // Les contrôles propres d'un produit (TF-2211, TF-2505). Le hook se joue par le lanceur du produit (`factory.mjs controles-produit`) : son banc est
+  // celui des hooks du gabarit, `hooks-factory.test.mjs` (cas 21 à 21 quinquies : contrôle vert, contrôle rouge dit FAIL avec son exit, déclaration mal
+  // formée nommée sans être jouée, commande étrangère muette). Entrée lue par le seul juge BD1 : `self-tests.mjs` joue ce fichier par I2, jamais par I1.
+  "hook-controles-produit.mjs": "../gabarits/hooks-factory.test.mjs",
 };

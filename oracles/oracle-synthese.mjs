@@ -130,6 +130,8 @@
  *       ne montre pas la relecture par un agent ; S9 (TF-2342) compte l'ouverture après retrait de l'en-tête YAML et du titre ;
  *   S135 UN « LOT DE CLÔTURE » SUPPOSE UN RUN QUI SE CLORA (12/11, TF-2429, gabarit 2.67.0) : chez un produit, une phrase qui promet un « lot de clôture » (hors ligne de remontée, que S48 juge, hors citation, hors négation)
  *       alors que le ledger ne porte aucun run ouvert est signalée ; numéro pris au suivant libre (S125) plus 10 ; SANS_OBJET hors produit ; avertissante ;
+ *   S145 UNE RESTITUTION NOMME UN RÔLE, PAS UNE PERSONNE (14/11, TF-2410, RT de Produit-81, préférence du porteur du 09/11) : une forme que `todo/noms-de-personnes.mjs` relève à l'accueil des lots (« Prénom NOM », « Prénom Nom »
+ *       à prénom de la liste fermée, civilité suivie d'un nom, adresse électronique nominative) est signalée hors des blocs de code, le rôle étant le remède ; numéro pris au suivant libre (S135) plus 10 ; avertissante ;
  *   S115 UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (09/11, TF-2304, loi n° 5, gabarit 2.65.0) : une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage
  *       (decision, depense, irreversible) porte une commande d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, cmdlets Az et Graph ; pas git, node ni npm, souvent demandés pour un autre poste), la même figure ailleurs dans le texte, et aucune ligne qui la porte ne montre un code de retour d'échec ;
  *       numéro pris au suivant libre (S105) plus 10, comme S103, pour ne pas heurter une règle qu'une autre session ajoute le même jour ; avertissante ;
@@ -241,6 +243,7 @@ import { estPointDeSuivi, lignesAgent } from "./lib-suivi-agents.mjs";
 import { lireCarte, derniereDemande, etatDesLivrables, sessionDe, REPLI_DIT } from "./lib-mobilisation.mjs";
 import { motifDeResteAuProduit, retourNommeNonEcrit } from "./lib-frictions.mjs";
 import { decisionsSansReponse } from "./lib-decisions.mjs";
+import { relever as personnesNommees, PRENOMS as PRENOMS_145 } from "../todo/noms-de-personnes.mjs";   // S145 (TF-2410) : le relevé des personnes de l'accueil des lots
 
 // --racine <dossier> (TF-1644, 14/10/2026) : le dossier du PROJET dont la restitution est jugée,
 // quand le fichier jugé n'y vit pas. Le hook de fin de tour écrit le message dans un fichier
@@ -3306,6 +3309,31 @@ function juger(texte, cheminJuge = null) {
         + "Hors run, le tour remet son lot lui-même : compile `forge/retours/<projet> - RETOURS - AAAAMMJJx.md`, joue `node forge/retours/oracle-lot.mjs \"<lot>.md\" --remettre`, et nomme-le à la ligne « Remontée à la factory » "
         + "(D-191 (a), TF-2429)");
     }
+  }
+
+  // ---- S145 (14/11/2026, TF-2410, RT de Produit-81) — UNE RESTITUTION NOMME UN RÔLE, PAS UNE PERSONNE ---------------------------------------------------------
+  //
+  // LE FAIT. Le 09/11/2026, le porteur a corrigé une réponse qui citait, par leur nom, des personnes relevées dans les attributions de rôle Azure d'un abonnement ; il l'a consigné en préférence
+  // (« un rôle, pas un nom »). Aucune règle écrite ne l'interdisait : TF-1676 autorise les noms réels dans le dépôt privé, et rien ne couvre ce qui s'affiche à l'écran.
+  //
+  // LA RÈGLE (décision du 10/11/2026, R-58). Le texte jugé ne nomme pas de personne : chaque forme que `todo/noms-de-personnes.mjs` relève à l'accueil des lots ET qui désigne une personne CONNUE de ce relevé —
+  // « Prénom NOM » ou « Prénom Nom » dont le prénom figure à sa liste fermée (`PRENOMS`), civilité suivie d'un nom, adresse électronique nominative — est signalée, avec le remède : le rôle (« la personne qui
+  // administre l'abonnement »). AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook de restitution) ; un faux positif se motive à l'appel de `--prejuger` (`--motif S145="<raison>"`).
+  // MESURE D'ENTRÉE (14/11/2026, 455 synthèses de `output/04-plans`, hors blocs de code) : le relevé brut de l'accueil rend 11 formes distinctes en 11 fichiers (2,4 %), dont 10 emphases de la forme « Verbe MAJUSCULE »
+  // (« Rendre GESTE », « Statut ASSUMED », « Contrôle CRITIQUE ») que l'accueil laisse à un humain, et une boîte de service (`contact@`) ; le prénom connu les écarte toutes, sauf la boîte, écartée par `BOITES_DE_SERVICE_145`.
+  // Reste 0 fichier sur 455 : le rappel (ce que la règle voit) se prouve par les fixtures, pas par cette mesure.
+  // CE QUI N'EST PAS LU, dit plutôt que promis : les blocs de code (la sortie d'une commande se cite telle quelle) ; les adresses de service (`noreply@`, `contact@`) et de documentation (`example.*`, `*.invalid`) ;
+  // un nom de personne dont le prénom n'est pas à la liste fermée et sans civilité (« Gwenola DUPONT », « Gwenola Dupont », « Dupont » seul) — la limite déclarée de l'accueil (TF-1812), plus étroite ici que
+  // sa forme « Prénom NOM » brute, qui relèverait les emphases ; un pseudonyme ou un identifiant de compte (« iguane39 »).
+  {
+    const CIVILITE_145 = /^(?:M\.|Mme|Mlle|Monsieur|Madame|Mademoiselle|Me|Maître|Dr\.?|Docteur)\s/;
+    const BOITES_DE_SERVICE_145 = /^contact@/i;
+    const connue145 = (f) => (f.includes("@") ? !BOITES_DE_SERVICE_145.test(f) : CIVILITE_145.test(f) || PRENOMS_145.has(f.split(/\s+/)[0].split("-")[0]));
+    const formes145 = personnesNommees(String(texte).replace(/```[\s\S]*?```/g, " ")).filter(connue145);
+    if (!formes145.length) ok("S145", "aucun nom de personne ni adresse électronique nominative dans le texte affiché (hors blocs de code)");
+    else ko("S145", `${formes145.length} forme(s) nomment une personne ou donnent son adresse (${formes145.slice(0, 4).map((f) => `« ${f} »`).join(" ; ")}${formes145.length > 4 ? ` ; +${formes145.length - 4}` : ""}) : une restitution nomme un RÔLE, `
+      + "jamais une personne par son nom ou son adresse (préférence du porteur du 09/11/2026). Remplace chaque forme par son rôle (« la personne qui administre l'abonnement », « le titulaire du compte »). "
+      + "Si la forme ne désigne aucune personne (nom de produit, personnage d'exemple), motive-le à l'appel de `--prejuger` : `--motif S145=\"<raison>\"` (TF-2410)");
   }
 
   // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
@@ -6530,6 +6558,45 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S135 (TF-2429) : le constat sans ledger doit dire que le ledger est absent : " + String(c135(r135sansLedger).message || "").slice(0, 240));
   // S48 garde sa ligne : la remontée « reste au produit » sans run ouvert reste refusée par S48, S135 ne la double pas.
   if (c48(r135remontee).statut !== "FAIL") casse.push("S135 (TF-2429) : le témoin de la ligne de remontée n'est plus refusé par S48 — la répartition S48/S135 ne tient plus : " + String(c48(r135remontee).message || "").slice(0, 200));
+  }
+  // 14/11 — TF-2410, S145 DANS SES SENS. Le fait : le 09/11, une réponse citait par leur nom des personnes relevées dans les attributions de rôle Azure ; le porteur l'a corrigée (« un rôle, pas un nom »).
+  // Rouge : « Prénom NOM », « Prénom Nom » à prénom connu, civilité suivie d'un nom, adresse électronique nominative — chacune dans une ligne du bloc 4. Verts : le MÊME texte au rôle (le remède joué), l'adresse
+  // de service, l'adresse de documentation, le nom cité dans un bloc de code, un nom de produit en deux mots à capitales. Le constat nomme la forme relevée et le remède.
+  if (veut(2410)) {
+  const c145 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S145") || {}; } catch { return {}; } };
+  const jouer145 = (nom, ajout) => { const f = join(dir, nom); writeFileSync(f, verte + ajout, "utf8"); return spawnSync(process.execPath, [moi, f], { encoding: "utf8" }); };
+  const r145muet = jouer145("s145-muet.md", "");
+  const r145nom = jouer145("s145-prenom-nom.md", "\n- Le rôle Contributeur de l'abonnement est attribué à Marie DUPONT — preuve : `az role assignment list` rend 1 attribution.\n");
+  const r145courant = jouer145("s145-prenom-connu.md", "\n- Le rôle Lecteur revient à Sophie Bernard — preuve : 1 attribution relevée au portail.\n");
+  const r145civilite = jouer145("s145-civilite.md", "\n- La demande d'accès vient de Mme Martin, qui administre l'abonnement — preuve : 1 demande lue.\n");
+  const r145courriel = jouer145("s145-courriel.md", "\n- Le compte jean.durand@cabinet-conseil.fr porte le rôle Propriétaire — preuve : 1 attribution lue.\n");
+  const r145role = jouer145("s145-role.md", "\n- Le rôle Contributeur de l'abonnement est attribué à la personne qui l'administre — preuve : `az role assignment list` rend 1 attribution.\n");
+  const r145service = jouer145("s145-service.md", "\n- Les notifications partent de noreply@exemple-fictif.fr et no-reply@societe-fictive.com — preuve : 2 adresses de service lues.\n");
+  const r145doc = jouer145("s145-doc.md", "\n- L'exemple de configuration cite jean.martin@example.com et alice@exemple.fr — preuve : 2 adresses de documentation lues.\n");
+  const r145code = jouer145("s145-code.md", "\n- La sortie de la commande, citée telle quelle :\n```\nauthor: Marie DUPONT <marie.dupont@cabinet-conseil.fr>\n```\n");
+  const r145produit = jouer145("s145-produit.md", "\n- L'outil Power BI et le service Azure DevOps sont relevés au parc — preuve : 2 services lus.\n");
+  const r145emphase = jouer145("s145-emphase.md", "\n- Rendre GESTE : le statut ASSUMED du contrôle CRITIQUE est relu — preuve : 3 formes lues.\n");
+  const r145boite = jouer145("s145-boite.md", "\n- La demande part à contact@cabinet-conseil.fr — preuve : 1 adresse de service lue.\n");
+  const r145inconnu = jouer145("s145-prenom-inconnu.md", "\n- Le rôle Lecteur revient à Gwenola DUPONT — preuve : 1 attribution lue.\n");
+  for (const [r, statut, quoi] of [
+    [r145muet, "PASS", "la restitution de référence, sans nom ni adresse, est accusée"],
+    [r145nom, "FAIL", "« Marie DUPONT » (Prénom NOM) dans une ligne du bloc 4 passe — le nom d'une personne à l'écran"],
+    [r145courant, "FAIL", "« Sophie Bernard » (prénom de la liste fermée) passe"],
+    [r145civilite, "FAIL", "« Mme Martin » (civilité suivie d'un nom) passe"],
+    [r145courriel, "FAIL", "une adresse électronique nominative passe"],
+    [r145role, "PASS", "le remède joué (le rôle au lieu du nom) est accusé"],
+    [r145service, "PASS", "des adresses de service (noreply@, no-reply@) sont prises pour des personnes"],
+    [r145doc, "PASS", "des adresses de documentation (example.com, exemple.fr) sont prises pour des personnes"],
+    [r145code, "PASS", "un nom cité dans un bloc de code (la sortie d'une commande) est accusé"],
+    [r145produit, "PASS", "des noms de produits en deux mots sont pris pour des personnes"],
+    [r145emphase, "PASS", "des emphases « Verbe MAJUSCULE » (Rendre GESTE, statut ASSUMED, contrôle CRITIQUE), que le relevé brut de l'accueil relève, sont prises pour des personnes"],
+    [r145boite, "PASS", "une boîte de service (contact@) est prise pour une personne"],
+    [r145inconnu, "PASS", "LIMITE DÉCLARÉE : un « Prénom NOM » dont le prénom n'est pas à la liste fermée n'est pas relevé ici (le relevé brut de l'accueil le relève, mais relève aussi les emphases)"],
+  ]) if (c145(r).statut !== statut)
+    casse.push(`S145 (TF-2410) : ${quoi} — attendu ${statut} : ` + String(c145(r).message || "sortie illisible").slice(0, 200));
+  for (const [r, forme, nom] of [[r145nom, "Marie DUPONT", "Prénom NOM"], [r145courant, "Sophie Bernard", "prénom connu"], [r145civilite, "Mme Martin", "civilité"], [r145courriel, "jean.durand@cabinet-conseil.fr", "courriel"]])
+    if (!(c145(r).message || "").includes(forme) || !/RÔLE/.test(c145(r).message || "") || !/TF-2410/.test(c145(r).message || ""))
+      casse.push(`S145 (TF-2410) : le constat sur ${nom} doit nommer la forme « ${forme} », le rôle comme remède et TF-2410 : ` + String(c145(r).message || "").slice(0, 240));
   }
   // 29/10 — TF-1987 : UNE CORRECTION D'INFRASTRUCTURE EST UNE CORRECTION. Le cas réel du 24/10 : le tour recrée le conteneur d'un moteur avec un volume (`docker rm`, `docker run -v`),
   // puis déclare « rien à remonter ». FAIL ; le MÊME qui nomme son lot PASS ; une commande de lecture (`docker ps`) n'est pas une correction.

@@ -272,7 +272,9 @@ function suppressionTemporaireEnLigne(c) {
 }
 const VERBES_EFFET = new RegExp([
   // TF-2034 (02/11/2026) : `git stash list|show` et `git tag -l|--list` lisent, comme `git worktree list` ; seuls `stash` et `tag` qui écrivent restent des effets.
-  String.raw`\bgit\s+(?:commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))\b`,
+  // TF-2407 (14/11/2026) : le verbe se termine par `(?![\w-])`, non par `\b` — le tiret est une frontière de mot, et `git merge-base`, `git merge-tree`,
+  // `git merge-file` (lectures) se lisaient comme `git merge`.
+  String.raw`\bgit\s+(?:commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))(?![\w-])`,
   String.raw`(?:^|[\s;&|(])(?:rm|del|mv|cp|rmdir|mkdir|touch|tee|Remove-Item|Move-Item|Copy-Item|Set-Content|Add-Content|Out-File|New-Item|Rename-Item|Clear-Content)(?=\s|$)`,
   String.raw`\bsed\s+-i\b`,
   String.raw`\b(?:npm|pnpm|yarn)\s+(?:install|i|ci|add|remove|update|publish)\b`,
@@ -355,7 +357,7 @@ const sansCorpsDeTexte = (cmd) => String(cmd || "")
   .replace(/<<-?\s*(["']?)(\w+)\1([^\n]*)\n[\s\S]*?\n\s*\2\s*(?=\n|$)/g, "<<$2$3")
   .replace(/@(['"])\r?\n[\s\S]*?\r?\n\1@/g, "@$1$1@");
 // `git -C <dossier> commit`, `git -c clé=valeur push` : `VERBES_EFFET` n'admet aucune option entre `git` et son verbe.
-const GIT_A_OPTIONS = /\bgit(?:\s+(?:-C\s+(?:"[^"]*"|'[^']*'|\S+)|-c\s+\S+|--(?:git-dir|work-tree|namespace)(?:=\S+|\s+\S+)|--no-pager|--bare|-P))+\s+(commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))\b/i;
+const GIT_A_OPTIONS = /\bgit(?:\s+(?:-C\s+(?:"[^"]*"|'[^']*'|\S+)|-c\s+\S+|--(?:git-dir|work-tree|namespace)(?:=\S+|\s+\S+)|--no-pager|--bare|-P))+\s+(commit|push|reset|rebase|merge|restore|clean|stash(?!\s+(?:list|show)\b)|tag(?!\s+(?:-l|--list)\b)|cherry-pick|revert|am|apply|rm|mv|filter-repo|worktree\s+(?:add|remove))(?![\w-])/i;   // TF-2407 : fin de verbe sans `\b`, comme VERBES_EFFET
 
 /** Ce que le tour a écrit, une ligne par écriture relevée ; vide pour un tour de lecture. Voir le bloc ci-dessus. */
 export function ecrituresDuTour(segment) {
@@ -1537,7 +1539,7 @@ export function controlerExplication({ dernierHumain = "", dernierTexte = "", fi
 const RAPPEL_PREJUGEMENT = "PRÉJUGEMENT — cette réponse n'a pas été préjugée avant affichage, d'où le doublon à l'écran : écris la "
   + "prochaine restitution dans un fichier du dossier temporaire, joue `node oracles/hook-restitution.mjs --prejuger <fichier>` "
   + "(chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), corrige jusqu'à l'exit 0 (chaque avertissement corrigé, ou motivé par `--motif <CODE>=\"<raison>\"` ; S48 et FRICTIONS ne se motivent pas tant que le texte ne cite aucun lot « <projet> - RETOURS - AAAAMMJJx »), puis affiche "
-  + "ce texte tel quel (TF-1647, TF-1666, TF-2171, TF-2303).";
+  + "ce texte tel quel. Un tour qui n'a rien écrit se rend en réponse courte, sans restitution (references\\NIVEAUX.md) : `--prejuger` la juge comme ce hook et rend le motif de l'exemption, `--pre-vol` la joue depuis un heredoc (TF-1647, TF-1666, TF-2171, TF-2303, TF-2516).";
 // TF-2303 — un lot de retours remis se cite par son nom : « <projet> - RETOURS - AAAAMMJJ<indice> » (gabarits\RETOURS-FORGES.md), comme S48 le lit.
 const LOT_REMIS_NOMME = /[\p{L}\p{N}][\p{L}\p{N} ._()-]{0,60} - RETOURS - \d{8}[a-z]+/u;
 const RAPPEL_GESTE = "Un mot de décision reçoit la PREUVE du geste au bloc 4, jamais la décision reposée.";
