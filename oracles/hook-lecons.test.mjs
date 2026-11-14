@@ -19,7 +19,9 @@
  * « Relecture d'intention », casse et espaces en tête sans effet) ni à un outil voisin ; le matcher de `.claude/settings.json`
  * et celui de `gabarits/settings-produit.json` couvrent Agent et Task ; la commande de sa solution préférée
  * (`hook-restitution.mjs --prejuger`) est jouée sur un brouillon et le refuse.
- * Durée : 20 appels du hook réel sur un geste qui sert une leçon, médiane sous 300 ms.
+ * Durée (TF-2504) : 20 appels du hook réel sur un geste qui sert une leçon, médiane sous 7 fois celle d'une MESURE TÉMOIN (le
+ * démarrage nu de Node, joué dans le même passage) — plus une borne absolue en millisecondes, que la charge du poste faisait rougir ;
+ * un hook ralenti reste refusé (cas rouge mesuré), la charge seule ne l'est plus (cas vert).
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { spawnSync } from "node:child_process";
@@ -369,13 +371,46 @@ try {
     if (controle.code !== 0 || remise.code !== 0 || /L-007/.test(controle.err + remise.err + controle.contexte + remise.contexte)) throw new Error(`contrôle exit ${controle.code}, remise exit ${remise.code}`);
   });
 
-  // --- Durée : 20 appels du hook réel sur un geste qui sert une leçon ----------------------------------------------
+  // --- Durée : 20 appels du hook réel sur un geste qui sert une leçon, comparés à une MESURE TÉMOIN (TF-2504) ----------
+  // Le fait : le 13/11/2026, la borne absolue de 300 ms rougissait sous la charge du poste (médianes de 310 à 590 ms), à l'identique
+  // sur l'arbre principal et sans changement de code ; 62/0 joué seul. Une borne en millisecondes mesure le poste autant que le hook.
+  // Le témoin est le démarrage nu de Node (`node -e ""`), joué dans le MÊME passage, un appel sur deux entre ceux du hook : la charge
+  // qui ralentit l'un ralentit l'autre. La borne est relative, `RAPPORT_MAX` fois la médiane du témoin ; à poste au repos (témoin
+  // de 40 ms) elle vaut 280 ms, comme l'ancienne borne de 300 ms. Un ralentissement RÉEL du hook (plus de 7 fois le témoin) reste rouge.
+  const RAPPORT_MAX = 7;
+  const medianeDe = (xs) => { const s = [...xs].sort((a, b) => a - b), k = s.length; return k % 2 ? s[(k - 1) / 2] : (s[k / 2 - 1] + s[k / 2]) / 2; };
+  /** Joue `n` fois le hook sur `entree` et le témoin, alternés ; rend les durées triées. */
+  function mesurerDuree(hook, racine, entree, n = 20) {
+    const env = { ...process.env, CLAUDE_PROJECT_DIR: racine };
+    const chrono = (args, input) => { const d = process.hrtime.bigint(); spawnSync(process.execPath, args, { encoding: "utf8", cwd: racine, env, input }); return Number(process.hrtime.bigint() - d) / 1e6; };
+    const hookMs = [], temoinMs = [];
+    for (let i = 0; i < n; i++) { temoinMs.push(chrono(["-e", ""], "")); hookMs.push(chrono([hook], JSON.stringify({ cwd: racine, session_id: "S-test", ...entree }))); }
+    return { hook: hookMs.sort((a, b) => a - b), temoin: temoinMs.sort((a, b) => a - b) };
+  }
+  /** Le verdict, pur : le hook est lent quand sa médiane dépasse `RAPPORT_MAX` fois celle du témoin. */
+  const hookLent = (medHook, medTemoin) => medHook > RAPPORT_MAX * medTemoin;
   const rd = racinePilot("pilot-duree");
-  const durees = Array.from({ length: 20 }, () => jouer(bash(HEREDOC_WINDOWS), rd).ms).sort((a, b) => a - b);
-  const mediane = (durees[9] + durees[10]) / 2;
-  const moyenne = durees.reduce((a, b) => a + b, 0) / durees.length;
-  check(`vert — durée sur 20 appels du hook réel qui sert L-001 : médiane ${Math.round(mediane)} ms, moyenne ${Math.round(moyenne)} ms, max ${Math.round(durees[19])} ms (borne : médiane sous 300 ms)`, () => {
-    if (mediane >= 300) throw new Error(`médiane ${Math.round(mediane)} ms`);
+  const m = mesurerDuree(HOOK, rd, bash(HEREDOC_WINDOWS));
+  const mediane = medianeDe(m.hook), temoin = medianeDe(m.temoin);
+  check(`vert — durée sur 20 appels du hook réel qui sert L-001 : médiane ${Math.round(mediane)} ms contre ${Math.round(temoin)} ms de témoin (rapport ${(mediane / temoin).toFixed(2)}, max ${Math.round(m.hook[19])} ms ; borne : ${RAPPORT_MAX} fois le témoin)`, () => {
+    if (hookLent(mediane, temoin)) throw new Error(`médiane ${Math.round(mediane)} ms, soit plus de ${RAPPORT_MAX} fois le témoin (${Math.round(temoin)} ms)`);
+  });
+  // Les deux sens du verdict, sur les médianes du 13/11/2026 : la charge seule ne rougit plus, un ralentissement réel reste rouge.
+  check("vert — sous charge, hook et témoin ralentis ensemble : médianes de 590 ms et 450 ms (rapport 1,3) ne sont pas un ralentissement du hook", () => {
+    if (hookLent(590, 450) || hookLent(310, 250)) throw new Error("la charge du poste seule rougit encore");
+  });
+  check("rouge — un ralentissement réel du hook, médianes de 590 ms contre un témoin de 40 ms (rapport 14,8), reste refusé", () => {
+    if (!hookLent(590, 40)) throw new Error("un hook 14 fois plus lent que le témoin passe");
+  });
+  // Rouge MESURÉ : le même hook, ralenti par une attente posée en tête, est refusé par la mesure témoin sur le poste réel. L'attente vaut 8 fois
+  // le témoin du passage (plus que `RAPPORT_MAX`, quelle que soit la charge : une attente fixe de 400 ms ne dépassait pas 7 fois un témoin de 83 ms).
+  const lent = piloteFixture("pilot-lent", { table: table(lecon("L-910", { declencheur: { outils: ["Bash"], sur: "commande", motif: "\\bgeste-l-910\\b" } })) });
+  const source = readFileSync(lent.hook, "utf8").split("\n");
+  source.splice(source[0].startsWith("#!") ? 1 : 0, 0, `Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ${Math.ceil(8 * temoin)}); // ralentissement de la fixture (TF-2504)`);
+  writeFileSync(lent.hook, source.join("\n"), "utf8");
+  const ml = mesurerDuree(lent.hook, lent.racine, bash("geste-l-910"), 3);
+  check(`rouge — le hook ralenti de 8 fois le témoin est refusé par la mesure témoin : médiane ${Math.round(medianeDe(ml.hook))} ms contre ${Math.round(medianeDe(ml.temoin))} ms de témoin`, () => {
+    if (!hookLent(medianeDe(ml.hook), medianeDe(ml.temoin))) throw new Error("le hook ralenti de 8 fois le témoin n'est pas vu");
   });
 } finally {
   try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ }
